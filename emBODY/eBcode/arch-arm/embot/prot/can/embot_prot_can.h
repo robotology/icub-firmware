@@ -85,7 +85,7 @@ namespace embot { namespace prot { namespace can {
     
     enum class Clas { none = 0xfe, 
                       pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, 
-                      periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, bootloader = 7 };
+                      periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, periodicForFutureUse = 6, bootloader = 7 };
         
     // the commands in each class and the messages which manage their forming / parsing are defined in namespaces ::bootloader, ::motor etc.
       
