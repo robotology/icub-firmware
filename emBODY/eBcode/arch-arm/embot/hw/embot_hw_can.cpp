@@ -42,13 +42,13 @@
 
 using namespace std;
 
-// --------------------------------------------------------------------------------------------------------------------
-// - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
-// --------------------------------------------------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------------------------------------------------
-// - all the rest
+// - refactored in july-october 2020 by marco.accame to handle: 
+//   (a) more than one embot::hw::CAN; 
+//   (b) the API of FDCAN 
 // --------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(EMBOT_ENABLE_hw_can)
 
@@ -94,8 +94,7 @@ namespace embot { namespace hw { namespace can {
     {
         return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(p));
     } 
-    
-    
+        
     struct CANdata
     {
         Config config {};
@@ -132,11 +131,13 @@ namespace embot { namespace hw { namespace can {
     static bool s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan);
     static result_t s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::uint8_t address);
     bool s_filters_set_by_class(embot::hw::bsp::can::CAN_Handle *hcan, uint8_t filternumber, uint8_t cls, uint8_t src, uint8_t dst);
-
-    void callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan);
+    
+    void callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan);    
+#if defined(HAL_CAN_MODULE_ENABLED)  
     void callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan);
-    void callbackOnRXcompletionCANFD(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t RxFifo0ITs);
-    void callbackOnTXcompletionCANFD(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t BufferIndexes);
+#elif defined(HAL_FDCAN_MODULE_ENABLED)    
+    void callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t RxFifo0ITs);
+#endif     
     // void callbackOnError(embot::hw::bsp::can::CAN_Handle* hcan); // not used, so far
         
     static void RX_IRQenable(embot::hw::CAN p);
@@ -307,15 +308,8 @@ result_t can::transmit(embot::hw::CAN p)
         return resNOK;
     } 
     
-    if(embot::hw::CAN::one == p)
-    {    
-        can::s_tx_start(p);     
-        return resOK;
-    }
-    else
-    {
-        return resNOK;
-    }
+    can::s_tx_start(p);     
+    return resOK;     
 }
 
 
@@ -493,17 +487,6 @@ static void can::s_rx_oneframehascome(embot::hw::CAN p, embot::hw::bsp::can::CAN
 
     s_getrxmessagefromqueue(hcan, rxframe);        
     
-//#if defined(HAL_CAN_MODULE_ENABLED)
-//    
-//    // use stack variables ...     
-//    CAN_RxHeaderTypeDef RxMessage = {0};        
-//    HAL_CAN_GetRxMessage (hcan, CAN_RX_FIFO0, &RxMessage, rxframe.data);
-//    rxframe.id = RxMessage.StdId;
-//    rxframe.size = RxMessage.DLC;   
-
-//#elif defined(HAL_FDCAN_MODULE_ENABLED)  
-//    #warning TODO: ...    
-//#endif  
     
     // now we put the rxframe inside the rx circular fifo 
     if(_candata_array[index].rxQ->size() >= _candata_array[index].config.rxcapacity)
@@ -518,6 +501,8 @@ static void can::s_rx_oneframehascome(embot::hw::CAN p, embot::hw::bsp::can::CAN
 }
 
 
+
+
 void can::callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
 {
     // this function is called inside IRQ handler of stm32hal.     
@@ -530,7 +515,11 @@ void can::callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
     }
 }
 
+#if defined(HAL_CAN_MODULE_ENABLED) 
 void can::callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
+#elif defined(HAL_FDCAN_MODULE_ENABLED) 
+void can::callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t RxFifo0ITs)
+#endif
 {   
     // this function is called inside IRQ handler of stm32hal.
     embot::hw::CAN p = toCAN(hcan); 
@@ -542,32 +531,6 @@ void can::callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
     }
 
 }
-
-void can::callbackOnTXcompletionCANFD(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t BufferIndexes)
-{
-    // this function is called inside IRQ handler of stm32hal.     
-    embot::hw::CAN p = toCAN(hcan); 
-    
-    // i need to check that the interrupt is on the peripheral I have initialised.    
-    if( (embot::hw::CAN::none != p) && initialised(p) )
-    {        
-        s_tx_oneframehasgone(p, hcan);
-    }
-}
-
-void can::callbackOnRXcompletionCANFD(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t RxFifo0ITs)
-{   
-    // this function is called inside IRQ handler of stm32hal.
-    embot::hw::CAN p = toCAN(hcan); 
-    
-    // i need to check that the interrupt is on the peripheral I have initialised. 
-    if( (embot::hw::CAN::none != p) && initialised(p) )
-    {
-        s_rx_oneframehascome(p, hcan);
-    }
-
-}
-
 
 static void can::s_tx_oneframehasgone(embot::hw::CAN p, embot::hw::bsp::can::CAN_Handle *hcan)
 {
@@ -599,26 +562,7 @@ static void can::s_tx_oneframehasgone(embot::hw::CAN p, embot::hw::bsp::can::CAN
         // marco.accame: as this code is alreeady executed by the CAN IRQ handler 
         // we can safely use standard burst activation (i enable IRQ and then i tx)
         tx_IRQenable(p);         
-        s_addtxmessagetoqueue(hcan, frame);
-        
-//#if defined(HAL_CAN_MODULE_ENABLED)
-//        
-//        CAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
-//        headertx.ExtId = 0;
-//        headertx.IDE = CAN_ID_STD;
-//        headertx.RTR = CAN_RTR_DATA; 
-//        headertx.StdId = frame.id & 0x7FF;
-//        headertx.DLC = frame.size;    
-//        // 2. i assign it to stm32
-//        uint32_t TxMailboxNum {0};    
-//         
-//        // marco.accame: as this code is alreeady executed by the CAN IRQ handler 
-//        // we can safely use standard burst activation (i enable IRQ and then i tx)
-//        tx_IRQenable(p); 
-//        HAL_CAN_AddTxMessage(hcan, &headertx, frame.data, &TxMailboxNum);  
-//#elif defined(HAL_FDCAN_MODULE_ENABLED)  
-//    #warning TODO: ...    
-//#endif 
+        s_addtxmessagetoqueue(hcan, frame);        
         
     }
         
@@ -643,7 +587,6 @@ static void can::RX_IRQenable(embot::hw::CAN p)
 #if defined(HAL_CAN_MODULE_ENABLED)
     HAL_CAN_ActivateNotification(_candata_array[index].handle, CAN_IT_RX_FIFO0_MSG_PENDING);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    #warning TODO: ... check it
     HAL_FDCAN_ActivateNotification(_candata_array[index].handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
 #endif
 }
@@ -655,7 +598,6 @@ static void can::RX_IRQdisable(embot::hw::CAN p)
 #if defined(HAL_CAN_MODULE_ENABLED)
     HAL_CAN_DeactivateNotification(_candata_array[index].handle, CAN_IT_RX_FIFO0_MSG_PENDING);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    #warning TODO: ... check it   
     HAL_FDCAN_DeactivateNotification(_candata_array[index].handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE); 
 #endif        
 }
@@ -667,12 +609,9 @@ static void can::tx_IRQenable(embot::hw::CAN p)
 #if defined(HAL_CAN_MODULE_ENABLED)
     HAL_CAN_ActivateNotification(_candata_array[index].handle, CAN_IT_TX_MAILBOX_EMPTY);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    #warning TODO: ... check it
     HAL_FDCAN_ActivateNotification(_candata_array[index].handle, FDCAN_IT_TX_FIFO_EMPTY, 0);
     // comments / doubts
-    // 1. we use FDCAN_IT_TX_COMPLETE or FDCAN_IT_TX_FIFO_EMPTY?   
-    // 2. if dont use FDCAN_IT_TX_COMPLETE, we can remove the FDCAN_TX_BUFFER0 because st says: `This parameter is ignored if ActiveITs does not include one of the following: ...`
-         
+    // 1. we use FDCAN_IT_TX_COMPLETE or FDCAN_IT_TX_FIFO_EMPTY?            
 #endif
     
 } 
@@ -685,7 +624,6 @@ static bool can::tx_IRQdisable(embot::hw::CAN p)
     enabled = ((_candata_array[index].handle->Instance->IER & (CAN_IT_TX_MAILBOX_EMPTY)) == (CAN_IT_TX_MAILBOX_EMPTY));
     HAL_CAN_DeactivateNotification(_candata_array[index].handle, CAN_IT_TX_MAILBOX_EMPTY);
 #elif defined(HAL_FDCAN_MODULE_ENABLED) 
-    #warning TODO: ... check it
     enabled = ((_candata_array[index].handle->Instance->IE & (FDCAN_IT_TX_FIFO_EMPTY)) == (FDCAN_IT_TX_FIFO_EMPTY));  
     HAL_FDCAN_DeactivateNotification(_candata_array[index].handle, FDCAN_IT_TX_FIFO_EMPTY);   
 #endif    
@@ -700,8 +638,7 @@ static void can::tx_IRQresume(embot::hw::CAN p, const bool previouslyenabled)
 #if defined(HAL_CAN_MODULE_ENABLED)        
         HAL_CAN_ActivateNotification(_candata_array[index].handle, CAN_IT_TX_MAILBOX_EMPTY);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-        #warning TODO: ... check it
-        HAL_FDCAN_ActivateNotification(_candata_array[index].handle, FDCAN_IT_TX_FIFO_EMPTY, 0); // or FDCAN_IT_TX_FIFO_EMPTY?   
+        HAL_FDCAN_ActivateNotification(_candata_array[index].handle, FDCAN_IT_TX_FIFO_EMPTY, 0);  
 #endif         
     }
 } 
@@ -732,8 +669,6 @@ static bool can::s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan)
     
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
 
-    //return true;
-
     FDCAN_FilterTypeDef sFilterConfig {};     
     sFilterConfig.IdType = FDCAN_STANDARD_ID;
     sFilterConfig.FilterIndex = 0;  
@@ -746,9 +681,9 @@ static bool can::s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan)
     {
         return false;
     }
-    
+
     return true;
-    
+  
 #endif    
 }
 
@@ -867,9 +802,7 @@ static result_t can::s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::u
 
     if i use `Filter for dedicated IDs` i can use three rules with ...
     #endif 
-    
-    //return resNOK;
-    
+        
     can::s_filters_set_by_class(hcan, 0, cls_bootloader, 0, address);
     can::s_filters_set_by_class(hcan, 1, cls_as_polling, 0, address); 
     can::s_filters_set_by_class(hcan, 2, cls_mc_polling, 0, address);    
@@ -923,6 +856,9 @@ bool can::s_filters_set_by_class(embot::hw::bsp::can::CAN_Handle *hcan, uint8_t 
     
 #elif defined(HAL_FDCAN_MODULE_ENABLED)
 
+    // marco.accame on 13 oct 2020: 
+    // tests are required to verify if the filters are effective to avoid reception of unwanted frames
+
     FDCAN_FilterTypeDef sFilterConfig {};     
     sFilterConfig.IdType = FDCAN_STANDARD_ID;
     sFilterConfig.FilterIndex = filternumber;  
@@ -958,10 +894,9 @@ static bool can::s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan)
         return false; //TODO: adding clear of vector    
 
 #elif defined(HAL_FDCAN_MODULE_ENABLED)   
-    #warning TODO: verify s_registercallbacks()   
     
-    HAL_FDCAN_RegisterTxBufferCompleteCallback(hcan, can::callbackOnTXcompletionCANFD); 
-    HAL_FDCAN_RegisterRxFifo0Callback(hcan, can::callbackOnRXcompletionCANFD);
+    HAL_FDCAN_RegisterCallback(hcan, HAL_FDCAN_TX_FIFO_EMPTY_CB_ID, can::callbackOnTXcompletion);
+    HAL_FDCAN_RegisterRxFifo0Callback(hcan, can::callbackOnRXcompletion);
     
 #endif 
     
@@ -1010,27 +945,17 @@ void can::s_addtxmessagetoqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& fr
 
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
     
-        #warning TODO: test it
-    
-    volatile int32_t rr = 0;
-    
-    static constexpr std::array<uint32_t, 9> lengthsLUT =  
-    {
-        FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, FDCAN_DLC_BYTES_2, FDCAN_DLC_BYTES_3, 
-        FDCAN_DLC_BYTES_4, FDCAN_DLC_BYTES_5, FDCAN_DLC_BYTES_6, FDCAN_DLC_BYTES_7,
-        FDCAN_DLC_BYTES_8        
-    };
-
+    volatile HAL_StatusTypeDef rr = HAL_OK;    
     FDCAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
     headertx.Identifier = frame.id & 0x7FF;
     headertx.IdType = FDCAN_STANDARD_ID;
     headertx.TxFrameType = FDCAN_DATA_FRAME;
-    headertx.DataLength = lengthsLUT[frame.size];
+    headertx.DataLength = static_cast<uint32_t>(frame.size) << 16; // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16
     headertx.ErrorStateIndicator = FDCAN_ESI_ACTIVE; // or FDCAN_ESI_PASSIVE ???
     headertx.BitRateSwitch = FDCAN_BRS_OFF;
     headertx.FDFormat = FDCAN_CLASSIC_CAN;
     headertx.TxEventFifoControl = FDCAN_NO_TX_EVENTS; // or FDCAN_STORE_TX_EVENTS ??
-    headertx.MessageMarker = 0; //  Specifies the message marker to be copied into Tx Event FIFO ... between 0 and 0xFF
+    headertx.MessageMarker = 0; //  Specifies the message marker to be copied into Tx Event FIFO ... between 0 and 0xFF   
     rr = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &headertx, frame.data);
     rr = rr;
 #endif 
@@ -1040,19 +965,16 @@ void can::s_addtxmessagetoqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& fr
 void can::s_getrxmessagefromqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& frame)
 {
         
-#if defined(HAL_CAN_MODULE_ENABLED)    
-    // use stack variables ...     
-    CAN_RxHeaderTypeDef headerRX = {0};        
+#if defined(HAL_CAN_MODULE_ENABLED)      
+    CAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK        
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &headerRX, frame.data);
     frame.id = headerRX.StdId;
     frame.size = headerRX.DLC;   
-
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    #warning TODO: verify it
     FDCAN_RxHeaderTypeDef headerRX = {0}; // KEEP IT IN STACK   
     HAL_FDCAN_GetRxMessage(hcan, FDCAN_RX_FIFO0, &headerRX, frame.data);
     frame.id = headerRX.Identifier & 0x7ff;
-    frame.size = headerRX.DataLength;       
+    frame.size = headerRX.DataLength >> 16;   // DataLength uses FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, etc. where FDCAN_DLC_BYTES_x is x << 16    
 #endif  
     
 }
