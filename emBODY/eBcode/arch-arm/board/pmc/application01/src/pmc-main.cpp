@@ -94,11 +94,13 @@ int main(void)
 #include "embot_hw_tlv493d.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_gpio.h"
+#include "embot_hw_can.h"
 
-constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
+
+constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
 constexpr embot::core::relTime tickperiod = 2000*embot::core::time1millisec;
 
-constexpr embot::os::Event evtReadFAP = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
+constexpr embot::os::Event evtReadFAP = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
 embot::hw::tlv493d::Position positionFAP = 0;
 
 
@@ -266,6 +268,20 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
 
 }
 
+#if 0
+    void transmit()
+    {
+        static uint8_t cnt {0};
+        static embot::hw::can::Frame frame {};
+        frame.id = 0x201;
+        frame.size = 2;
+        frame.data[0] = 0x66;
+        frame.data[1] = cnt++;
+        embot::hw::can::put(embot::hw::CAN::one, frame);
+        embot::hw::can::transmit(embot::hw::CAN::one);            
+    }
+#endif
+
 void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const
 {
     
@@ -277,7 +293,9 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(startOfFAPacquisition);        
         embot::core::print("userdefOnEventANYother() -> evtTick received @ time = " + tf.to_string());    
-#endif  
+#endif 
+
+//        transmit();       
 
 //        embot::core::print("::userdefOnEventANYother() -> called a reading of chip TLV493D on fap board");    
 //        embot::core::Callback cbk00(alertFAPdataisready, t);

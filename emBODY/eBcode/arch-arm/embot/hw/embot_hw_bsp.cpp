@@ -962,7 +962,30 @@ namespace embot { namespace hw { namespace bsp { namespace can {
     {
         if(h == CAN::one)
         {            
-            MX_FDCAN1_Init();
+            // for 80 mhz (from a project by st)
+            hfdcan1.Instance = FDCAN1;
+            hfdcan1.Init.ClockDivider = FDCAN_CLOCK_DIV1;
+            hfdcan1.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
+            hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
+            hfdcan1.Init.AutoRetransmission = ENABLE;
+            hfdcan1.Init.TransmitPause = ENABLE;
+            hfdcan1.Init.ProtocolException = DISABLE;
+            hfdcan1.Init.NominalPrescaler = 1;
+            hfdcan1.Init.NominalSyncJumpWidth = 16;
+            hfdcan1.Init.NominalTimeSeg1 = 63;
+            hfdcan1.Init.NominalTimeSeg2 = 16;
+            hfdcan1.Init.DataPrescaler = 1;
+            hfdcan1.Init.DataSyncJumpWidth = 4;
+            hfdcan1.Init.DataTimeSeg1 = 5;
+            hfdcan1.Init.DataTimeSeg2 = 4;
+            hfdcan1.Init.StdFiltersNbr = 1;
+            hfdcan1.Init.ExtFiltersNbr = 0;
+            hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+            if(HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
+            {
+                Error_Handler();
+            }
+
         }
 //        else if(h == CAN::two)
 //        {            
@@ -1122,11 +1145,20 @@ void CAN1_RX0_IRQHandler(void)
         } 
     
     #else
-    
+
+extern "C"
+{    
         void FDCAN1_IT0_IRQHandler(void)
         {
             HAL_FDCAN_IRQHandler(&hfdcan1);
         }  
+        
+        void FDCAN1_IT1_IRQHandler(void)
+        {
+            HAL_FDCAN_IRQHandler(&hfdcan1);
+        }  
+}
+        
         
 //        void FDCAN2_IT0_IRQHandler(void)
 //        {
