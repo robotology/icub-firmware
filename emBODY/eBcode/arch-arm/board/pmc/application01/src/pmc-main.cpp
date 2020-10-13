@@ -100,7 +100,7 @@ int main(void)
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
 constexpr embot::core::relTime tickperiod = 2000*embot::core::time1millisec;
 
-constexpr embot::os::Event evtReadFAP = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
+constexpr embot::os::Event evtReadFAP = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
 embot::hw::tlv493d::Position positionFAP = 0;
 
 
