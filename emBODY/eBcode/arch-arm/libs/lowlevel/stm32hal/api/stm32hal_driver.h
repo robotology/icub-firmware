@@ -96,11 +96,15 @@ extern "C" {
       
 #elif   defined(STM32HAL_BOARD_NUCLEOH7)
 
-    // only one possible driver
-    #if !defined(STM32HAL_DRIVER_V180)
-        #define STM32HAL_DRIVER_V180
+    // two possible drivers: v180 and v190. default is the 190 ...
+    #if     defined(STM32HAL_DRIVER_V180)    
+        #define STM32HAL_DRIVER_VERSION 0x180  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V190)
+            #define STM32HAL_DRIVER_V190
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x190   
     #endif
-    #define STM32HAL_DRIVER_VERSION 0x180
 
 #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
 
