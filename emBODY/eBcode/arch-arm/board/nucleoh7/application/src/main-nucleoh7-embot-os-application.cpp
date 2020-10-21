@@ -5,6 +5,39 @@
  * email:   marco.accame@iit.it
 */
 
+#if 0
+
+    Brief explanation of the application
+
+    The main() function starts the embot::os environment.
+    The function embot::os::start() executes in exclusive mode the function initSystem() and 
+    when it terminates it starts the scheduling of the other threads.
+    
+    In this application we start a single thread called tMAIN.
+    This thread starts some services in its tMAIN_startup() function and then it executes function
+    tMAIN_onevent() when triggered by events. 
+
+    The function tMAIN_startup() inits the sensors BNO055, ADS122C04 and AD7147, starts a timer 
+    which sends an event to the tMAIN thread every 10 ms for sensor acquisition and finally programs 
+    a GPIO to send a transmission event to the thread when triggered.
+    
+    The function tMAIN_onevent() executes only when events are sent to it.
+        
+    The events sent to the thread activate data acquisition which is done in chain (IMU, ADC, CDC) and data 
+    transmission over USART.
+    
+    The application can be used for normal use and also for debug or trace.
+    
+    For normal use you need to define macro macro_APPL_MODE_STANDARD and for debuf the other macros.
+
+#endif
+
+#define macro_APPL_MODE_STANDARD
+//#define macro_APPL_MODE_STANDARD_CYCLE_TRANSMISSION
+//#define macro_APPL_MODE_STANDARD_PERIODIC_TRANSMIT
+//#define macro_APPL_MODE_DEBUG
+    
+
 #include "embot_core.h"
 #include "embot_core_binary.h"
 
@@ -30,42 +63,135 @@
 // macro definition. we keep some behaviours in the same code.
 
 // it tells to use the serial port to print data on it
-#undef  enableSERIAL  
-// if enableSERIAL is defined, it prints in human readable format
-#undef  enableSERIAL_string
-// if enableSERIAL is defined, it prints in compact binary format
-#undef  enableSERIAL_binary
-// if defined acquisitionPeriod is = 10 ms, else it is 1 sec 
-//#define  enableACQUISITION_fast
-// if defined, the values are asked to the chips bno055 and the adc, if undefined we tx fake values
-#undef  enableACQUISITION
+#undef  macro_enableSERIAL  
+// if macro_enableSERIAL is defined, it prints in human readable format
+#undef  macro_enableSERIAL_string
+// if macro_enableSERIAL is defined, it prints in compact binary format
+#undef  macro_enableSERIAL_binary
+// if defined acquisitionPeriod is = 100 ms, else it is the normal 10 ms 
+#undef  macro_enableACQUISITION_slow
+// if defined, the values are asked to the chips, if undefined we tx fake values
+#undef  macro_enableACQUISITION
+// if enabled the tx trigger evtDATAtransmit comes (also) from a periodic timer
+#undef macro_enablePERIODICtransmit
+// if enabled the tx trigger evtDATAtransmit comes (also) from the exti trigger
+#undef macro_enableEXTItransmit
 // if defined we print values on the trace port
-#undef  enableTRACE
+#undef  macro_enableTRACE
+// the following specifies what to print
+#undef macro_enableTRACE_timeofusart
+#undef macro_enableTRACE_histograms
+#undef macro_enableTRACE_activations
+#undef macro_enableTRACE_readings
 
-// enablePERIODICtransmit
-#undef enablePERIODICtransmit
 
-#undef enableTRACE_readings
+#if defined(macro_APPL_MODE_STANDARD)
 
-#define enableACQUISITION_fast
-//#define enableTRACE_all
-//#define enableSERIAL
-#define enableACQUISITION
+    // use it to tx acquisitions over usart in binary format upon trigger from external interrupt
+    
+    #define macro_enableACQUISITION
+    #undef macro_enableACQUISITION_slow
+    #define macro_enableSERIAL
+    #define macro_enableSERIAL_binary
+    #undef  macro_enableSERIAL_string
+    // the tx is activated by external trigger only
+    #define macro_enableEXTItransmit
+    #undef  macro_enableCYCLEtransmit
+    #undef  macro_enablePERIODICtransmit
+    #undef macro_enableSLOWtxperiod
+    // we disable trace
+    #undef macro_enableTRACE
 
-#if defined(enableSERIAL)
-//#define enableSERIAL_string
-#define enableSERIAL_binary
+#elif defined(macro_APPL_MODE_STANDARD_CYCLE_TRANSMISSION)
+
+    // use it to tx acquisitions over usart in binary format at the beginning of every cycle
+    
+    #define macro_enableACQUISITION
+    #undef macro_enableACQUISITION_slow
+    #define macro_enableSERIAL
+    #define macro_enableSERIAL_binary
+    #undef  macro_enableSERIAL_string
+    // the tx is done at very start of cycles
+    #define macro_enableCYCLEtransmit
+    #undef  macro_enableEXTItransmit
+    #undef macro_enablePERIODICtransmit
+    #undef macro_enableSLOWtxperiod
+    // we disable trace
+    #undef macro_enableTRACE
+
+#elif defined(macro_APPL_MODE_STANDARD_PERIODIC_TRANSMIT)
+
+    // use it to tx acquisitions over usart in binary format upon trigger periodic timer @ 10 ms
+    
+    #define macro_enableACQUISITION
+    #undef macro_enableACQUISITION_slow
+    #define macro_enableSERIAL
+    #define macro_enableSERIAL_binary
+    #undef  macro_enableSERIAL_string
+    // the tx is activated by a periodic timer @ 10 ms
+    #undef  macro_enableEXTItransmit
+    #undef macro_enableCYCLEtransmit
+    #define macro_enablePERIODICtransmit
+    #undef macro_enableSLOWtxperiod
+    // we disable trace
+    #undef macro_enableTRACE
+
+#elif defined(macro_APPL_MODE_DEBUG)
+
+    // use it to debug or trace acquisition timings
+
+    // mode with trace only and periodic activation
+    // the trace is configured below
+    
+//    #define macro_enableACQUISITION
+//    #undef macro_enableACQUISITION_slow
+//    #undef macro_enableSERIAL
+//    #define macro_enableTRACE
+//    #undef  macro_enableEXTItransmit
+//    #define macro_enablePERIODICtransmit
+//    #define macro_enableSLOWtxperiod
+
+
+    // mode with serial in string form and periodic activation
+
+    #define macro_enableACQUISITION
+    #undef macro_enableACQUISITION_slow
+    #define macro_enableSERIAL
+    //#define macro_enableSERIAL_string
+    #define macro_enableSERIAL_binary
+    //#define  macro_enableTRACE
+    #undef  macro_enableEXTItransmit
+    #undef macro_enablePERIODICtransmit
+    #undef macro_enableSLOWtxperiod
+    
+    // the tx is done at very start of cycles
+    #define macro_enableCYCLEtransmit
+
+
+
+    // it prints the times of acquisition of sensors and the time for the TX over USART
+    
+//    #define macro_enableACQUISITION
+//    #undef macro_enableACQUISITION_slow
+//    #define macro_enableSERIAL
+//    #define macro_enableSERIAL_binary
+//    #define macro_enableTRACE
+//    #define macro_enablePERIODICtransmit
+//    #define macro_enableSLOWtxperiod
+    
+
 #endif
 
-#define enableTRACE
-#if defined(enableTRACE)
-//#define enableTRACE_timeofusart
-//#define enableTRACE_histograms
-//#define enableTRACE_activations
-#define enableTRACE_readings
+
+
+#if defined(macro_enableTRACE)
+#define macro_enableTRACE_timeofusart
+//#define macro_enableTRACE_histograms
+//#define macro_enableTRACE_activations
+#define macro_enableTRACE_readings
 #endif
 
-#define enablePERIODICtransmit
+
 
 static void s_chips_init();
 static void s_imu_start();
@@ -78,6 +204,7 @@ static void s_cdc_get(embot::hw::AD7147 cdc);
 
 static void s_transmit();
 
+// activation events for thread tMAIN
 
 constexpr embot::os::Event evtAcquisition = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::os::Event evtIMUdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
@@ -92,10 +219,10 @@ constexpr embot::os::Event evtCDC2ready = embot::core::binary::mask::pos2mask<em
 constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(15);
 
  
-#if defined(enableACQUISITION_fast) 
-constexpr embot::core::relTime acquisitionPeriod = 10*embot::core::time1millisec;
+#if defined(macro_enableACQUISITION_slow) 
+constexpr embot::core::relTime acquisitionPeriod = 100*embot::core::time1millisec;
 #else
-constexpr embot::core::relTime acquisitionPeriod = embot::core::time1second;
+constexpr embot::core::relTime acquisitionPeriod = 10*embot::core::time1millisec;
 #endif
 
 
@@ -108,35 +235,79 @@ embot::tools::Histogram *histoIMU {nullptr};
 //embot::tools::Histogram *histoUSART {nullptr};
 void txrequest(void *p)
 {
-//    embot::hw::sys::puts(std::string("B @") + embot::core::TimeFormatter(embot::core::now()).to_string());
+
     embot::os::Thread *t = reinterpret_cast<embot::os::Thread *>(p);
     t->setEvent(evtDATAtransmit);
 }
 
-void eventbasedthread_startup(embot::os::Thread *t, void *param)
-{       
-    // init imu + adc
-    s_chips_init(); 
+void tMAIN_startup(embot::os::Thread *t, void *param)
+{  
+
+#if defined(macro_enableTRACE)
+    embot::core::print("macro_enableTRACE is defined");
     
+#if defined(macro_enableTRACE_timeofusart)
+    embot::core::print("macro_enableTRACE_timeofusart is defined");
+#endif
+#if defined(macro_enableTRACE_histograms)
+    embot::core::print("macro_enableTRACE_histograms is defined");
+#endif  
+#if defined(macro_enableTRACE_activations)
+    embot::core::print("macro_enableTRACE_activations is defined");
+#endif
+#if defined(macro_enableTRACE_readings)
+    embot::core::print("macro_enableTRACE_readings is defined");
+#endif
+         
+#endif
+    
+    // init imu + adc + cdc
+    s_chips_init(); 
+
+#if defined(macro_enableEXTItransmit)
     // init the ext interrupt button
     embot::hw::button::init(buttonTX, {embot::hw::button::Mode::TriggeredOnRelease, {txrequest, t}, 0});
+#endif
     
-    embot::hw::sys::puts("evthread-startup: chips + exti initted" );
+    embot::core::print("evthread-startup: chips + exti initted" );
     
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtAcquisition, t));
     embot::os::Timer::Config cfg{acquisitionPeriod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
     
-    embot::hw::sys::puts("evthread-startup: started timer which sends evtAcquisition to evthread every us = " + std::to_string(acquisitionPeriod));
+    embot::core::print("evthread-startup: started timer which sends evtAcquisition to evthread every us = " + std::to_string(acquisitionPeriod));
  
-#if defined(enablePERIODICtransmit)    
-    constexpr embot::core::relTime txperiod = 2000*embot::core::time1millisec;
+#if defined(macro_enablePERIODICtransmit)   
+#if defined(macro_enableSLOWtxperiod)    
+    constexpr embot::core::relTime txperiod = 100*embot::core::time1millisec;
+#else
+    constexpr embot::core::relTime txperiod = 10*embot::core::time1millisec;
+#endif    
     embot::os::Timer *tmrTX = new embot::os::Timer;   
     embot::os::Action actTX(embot::os::EventToThread(evtDATAtransmit, t));
     embot::os::Timer::Config cfgTX{txperiod, actTX, embot::os::Timer::Mode::forever, 0};
     tmrTX->start(cfgTX);
 #endif    
+    
+#if defined(macro_enableTRACE)
+    embot::core::print("macro_enableTRACE is defined");
+    
+#if defined(macro_enableTRACE_timeofusart)
+    embot::core::print("macro_enableTRACE_timeofusart is defined");
+#endif
+#if defined(macro_enableTRACE_histograms)
+    embot::core::print("macro_enableTRACE_histograms is defined");
+#endif  
+#if defined(macro_enableTRACE_activations)
+    embot::core::print("macro_enableTRACE_activations is defined");
+#endif
+#if defined(macro_enableTRACE_readings)
+    embot::core::print("macro_enableTRACE_readings is defined");
+#endif
+         
+#endif
+    
 }
 
 uint64_t timeadc_start[2] = {0, 0};
@@ -190,7 +361,11 @@ void testi2c()
 // 0x5A (con << 1)
 #endif
 
-void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
+static uint64_t numberofCYCLE = 0; 
+static uint8_t skin = 0;
+constexpr uint8_t skindecimationfactor = 2;
+
+void tMAIN_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {    
     if(0 == eventmask)
     {   // timeout ...          
@@ -199,18 +374,25 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
 
     if(true == embot::core::binary::mask::check(eventmask, evtAcquisition)) 
     {
-#if defined(enableTRACE_activations)        
+        numberofCYCLE++;
+        
+#if defined(macro_enableTRACE_activations)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
-#endif        
+        embot::core::print("tMAIN_onevent(): evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+#endif          
         s_imu_start();
+        
+#if defined(macro_enableCYCLEtransmit)
+        t->setEvent(evtDATAtransmit);
+        //s_transmit();
+#endif        
     }
     
     if(true == embot::core::binary::mask::check(eventmask, evtIMUdataready))
     {
-#if defined(enableTRACE_activations)        
+#if defined(macro_enableTRACE_activations)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtIMUdataready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::core::print("tMAIN_onevent(): evtIMUdataready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
         s_imu_get();
         timeadc_start[0] = embot::core::now();
@@ -220,9 +402,9 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
 
     if(true == embot::core::binary::mask::check(eventmask, evtADCchn1ready))
     {
-#if defined(enableTRACE_activations)        
+#if defined(macro_enableTRACE_activations)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtADCchn1ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::core::print("tMAIN_onevent(): evtADCchn1ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif      
         timeadc_start[1] = timeadc_ready[0] = embot::core::now();        
         s_adc_start(embot::hw::ads122c04::Channel::two);  
@@ -231,47 +413,56 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     
     if(true == embot::core::binary::mask::check(eventmask, evtADCchn2ready))
     {
-#if defined(enableTRACE_activations)        
+#if defined(macro_enableTRACE_activations)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtADCchn2ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::core::print("tMAIN_onevent(): evtADCchn2ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif 
         timeadc_ready[1] = embot::core::now();     
         timeadc_delta[0] = timeadc_ready[0] - timeadc_start[0];     
         timeadc_delta[1] = timeadc_ready[1] - timeadc_start[1];        
         s_adc_get();
-        timeskin_start[0] = embot::core::now();        
-        s_cdc_start(embot::hw::AD7147::one);        
+        
+        // choose the skin to acquire
+        uint8_t skin = numberofCYCLE % skindecimationfactor;
+        
+        if((0 == skin) || (1 == skin))
+        {
+            timeskin_start[skin] = embot::core::now();        
+            s_cdc_start((0==skin) ? embot::hw::AD7147::one : embot::hw::AD7147::two); 
+        }            
+          
     }  
 
     if(true == embot::core::binary::mask::check(eventmask, evtCDC1ready))
     {
-#if defined(enableTRACE_activations)        
+#if defined(macro_enableTRACE_activations)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtCDC1ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::core::print("tMAIN_onevent(): evtCDC1ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif  
         timeskin_ready[0] = embot::core::now();
+        timeskin_delta[0] = timeskin_ready[0] - timeskin_start[0];
         s_cdc_get(embot::hw::AD7147::one);
-        timeskin_start[1] = embot::core::now();            
-        s_cdc_start(embot::hw::AD7147::two);        
+        
+//        timeskin_start[1] = embot::core::now();            
+//        s_cdc_start(embot::hw::AD7147::two);        
     }      
 
     if(true == embot::core::binary::mask::check(eventmask, evtCDC2ready))
     {
-#if defined(enableTRACE_activations)        
+#if defined(macro_enableTRACE_activations)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtCDC2ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::core::print("tMAIN_onevent(): evtCDC2ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif 
-        timeskin_ready[1] = embot::core::now();   
-        timeskin_delta[0] = timeskin_ready[0] - timeskin_start[0];        
+        timeskin_ready[1] = embot::core::now();          
         timeskin_delta[1] = timeskin_ready[1] - timeskin_start[1];
         s_cdc_get(embot::hw::AD7147::two);        
     }
     
     if(true == embot::core::binary::mask::check(eventmask, evtDATAtransmit))
     {
-#if defined(enableTRACE_activations)        
+#if defined(macro_enableTRACE_activations)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtDATAtransmit received @ time = " + tf.to_string());    
+        embot::core::print("tMAIN_onevent(): evtDATAtransmit received @ time = " + tf.to_string());    
 #endif        
         s_transmit();
     }
@@ -301,44 +492,40 @@ void initSystem(embot::os::Thread *t, void* initparam)
     theleds.get(embot::hw::LED::one).pulse(2*embot::core::time1second); 
        
     
-    embot::os::EventThread::Config configEV { 
+    embot::os::EventThread::Config tMAINconfig { 
         6*1024, 
         embot::os::Priority::high40, 
-        eventbasedthread_startup,
+        tMAIN_startup,
         nullptr,
         50*embot::core::time1millisec,
-        eventbasedthread_onevent
+        tMAIN_onevent
     };
         
     // create the main thread 
     thr = new embot::os::EventThread;          
     // and start it
-    thr->start(configEV, tMAIN);   
+    thr->start(tMAINconfig, tMAIN);   
 }
 
-// usart 921600
 
 // --------------------------------------------------------------------------------------------------------------------
 
 int main(void)
 { 
-    // steps:
-    // 1. i init the embot::os
-    // 2 i start the scheduler
-        
+    // configuration of the embot::os environment
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
     constexpr embot::os::IdleThread::Config idlecfg = { 1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
-    constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
+    constexpr embot::os::Config osconfig {1000*embot::core::time1microsec, initcfg, idlecfg, onOSerror};
     
     // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
     embot::os::init(osconfig);
     
-    // now i start the os    
-    embot::os::start();
-
-    // just because i am paranoid (thescheduler.start() never returns)
-    for(;;);    
+    // now i start the os
+    // at first it is executed the tINIT thread in exclusive mode which calls initSystem() to init 
+    // user defined threads and then stops execution allowing the system to schedule all other threads. 
+    // note: function embot::os::start() is marked [[noreturn]] and hence ... it never returns     
+    embot::os::start();   
 }
 
 
@@ -349,7 +536,7 @@ int main(void)
 static void s_chips_init()
 {
 
-#if defined(enableTRACE_histograms)     
+#if defined(macro_enableTRACE_histograms)     
     histoIMU = new embot::tools::Histogram;
     histoIMU->init({0, 2500, 100});
     
@@ -357,7 +544,7 @@ static void s_chips_init()
 //    histoUSART->init({0, 500, 50});
 #endif
     
-#if !defined(enableACQUISITION)
+#if !defined(macro_enableACQUISITION)
     
     // nothing. we just simulate the sensors
     
@@ -424,13 +611,13 @@ static void s_imu_get()
     imu_acquisitiontime = imu_stop - imu_start;
     acc2transmit = {data.acc.x, data.acc.y, data.acc.z}; 
 
-#if defined(enableTRACE_histograms)    
+#if defined(macro_enableTRACE_histograms)    
     histoIMU->add(imu_acquisitiontime);
     static uint32_t cnt = 0;
     cnt++;
     if((cnt%1000) == 0)
     {
-//        embot::hw::sys::puts(std::string("imu read in ") + embot::core::TimeFormatter(imu_acquisitiontime).to_string());
+//        embot::core::print(std::string("imu read in ") + embot::core::TimeFormatter(imu_acquisitiontime).to_string());
         char str[256] = {0};
         const embot::tools::Histogram::Values *v = histoIMU->getvalues();
         snprintf(str, sizeof(str), "(%d) %f [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f] %f", 
@@ -463,7 +650,7 @@ static void s_imu_get()
                                     100.0f*v->inside[24]/static_cast<float>(v->total),                                        
                                     100.0f*v->beyond/static_cast<float>(v->total)
                                     );
-        embot::hw::sys::puts(std::string("histo IMU -> ") + str);
+        embot::core::print(std::string("histo IMU -> ") + str);
                                     
         histoIMU->reset();
     }  
@@ -569,9 +756,9 @@ static void s_transmit()
 
 bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc)
 {   
-    char text[128] = {0};
+    char text[512] = {0};
     
-#if defined(enableTRACE_readings)
+#if defined(macro_enableTRACE_readings)
     
     embot::core::print(" ");  
     
@@ -614,59 +801,23 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
                         "in " + skin2time
     );  
     
-     
-    
-//    if(0 != imu_acquisitiontime)
-//    {
-//        float ax = 0.01f * std::get<0>(acc);
-//        float ay = 0.01f * std::get<1>(acc);
-//        float az = 0.01f * std::get<2>(acc);
-//        embot::core::print(std::string("acceleration [m/s^2] = (") + 
-//                std::to_string(ax) + " " +
-//                std::to_string(ay) + " " +
-//                std::to_string(az) + 
-//                ") read in " + embot::core::TimeFormatter(imu_acquisitiontime).to_string()
-//        );
-//    
-//        embot::core::print(std::string("adc = (") + 
-//                    std::to_string(adc.first) + " " +
-//                    std::to_string(adc.second) + 
-//                    ") read in fake ... " + embot::core::TimeFormatter(imu_acquisitiontime).to_string()
-//            );
-//       
-//        std::string taxels02to13 {};
-//        std::string taxels14to24 {};
-//        for(size_t i=0; i<12; i++)
-//        {
-//            taxels02to13 += std::to_string(cdc2transmit[i]); 
-//            taxels02to13 += " ";
-//            taxels14to24 += std::to_string(cdc2transmit[i+12]);
-//            taxels14to24 += " ";
-//        }
-//        
-//        embot::core::print(std::string("taxels 02->13 = (") + 
-//                    taxels02to13 +         
-//                    ") read in fake ... " + embot::core::TimeFormatter(imu_acquisitiontime).to_string()
-//            );        
-//    
-//        embot::core::print(std::string("taxels 14->24 = (") + 
-//                    taxels14to24 +         
-//                    ") read in fake ... " + embot::core::TimeFormatter(imu_acquisitiontime).to_string()
-//            );     
-//    
-//    
-//    }    
-    
+             
 #endif    
     
-#if defined(enableSERIAL) && defined(enableSERIAL_string)
+#if defined(macro_enableSERIAL) && defined(macro_enableSERIAL_string)
   
-    #warning CAVEAT: the mode enableSERIAL_string is incomplete and does not prints everything
     // this prints in hex the entire range of values
-    snprintf(text, sizeof(text), "%04x %04x %04x %04x %04x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);        
+    snprintf(text, sizeof(text), 
+        "-> %08x %08x %08x %08x %08x [%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x]\r\n\n", 
+    
+        std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second,
+        cdc2transmit[ 0], cdc2transmit[ 1], cdc2transmit[ 2], cdc2transmit[ 3], cdc2transmit[ 4], cdc2transmit[ 5], cdc2transmit[ 6], cdc2transmit[ 7],
+        cdc2transmit[ 8], cdc2transmit[ 9], cdc2transmit[10], cdc2transmit[11], cdc2transmit[12], cdc2transmit[13], cdc2transmit[14], cdc2transmit[15], 
+        cdc2transmit[16], cdc2transmit[17], cdc2transmit[18], cdc2transmit[19], cdc2transmit[20], cdc2transmit[21], cdc2transmit[22], cdc2transmit[23]
+    );        
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), std::strlen(text), 0xFFFF);    
     
-#elif defined(enableSERIAL) && defined(enableSERIAL_binary)   
+#elif defined(macro_enableSERIAL) && defined(macro_enableSERIAL_binary)   
 
     //snprintf(text, sizeof(text), "%d\n", static_cast<uint8_t>(std::get<0>(acc)));   
     // writing into text[] in big endian order all values with the same integer 32 bit type.
@@ -747,8 +898,8 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
     embot::core::Time t0 = embot::core::now();
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), pos, 0xFFFF);
     
-#if defined(enableTRACE_timeofusart)     
-    embot::hw::sys::puts(std::string("USART TX time: ") + embot::core::TimeFormatter(embot::core::now()-t0).to_string());
+#if defined(macro_enableTRACE_timeofusart)     
+    embot::core::print(std::string("USART TX time: ") + embot::core::TimeFormatter(embot::core::now()-t0).to_string());
 #endif
 
 #endif
@@ -762,7 +913,7 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
 
 //bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t, uint32_t> &adc)
 //{
-//#if !defined(enableACQUISITION)
+//#if !defined(macro_enableACQUISITION)
 //    
 //    constexpr int32_t accmin = -30;
 //    constexpr int32_t accmax = +270;
