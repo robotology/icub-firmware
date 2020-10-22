@@ -909,8 +909,8 @@ void dcdc_management(void){
 		
 		if(PB2_debounce){
 			PB2_debounce=0;
-			if      (HSM)                         	{state_fsm = ON_BOARD;}             // if HSM is on, switch off
-			else if (!HSM && V12board && V12motor)	{state_fsm = ON_BOARD_MOTORS;}      // else if V12motor is off and V12board is on, switch on
+			if      (HSM || (state_fsm == ON_BOARD_MOTORS))     {state_fsm = ON_BOARD;}             // if HSM is on, switch off
+			else if (!HSM && V12board && V12motor)              {state_fsm = ON_BOARD_MOTORS;}      // else if V12motor is on and V12board is on, switch on
 		}	
 	}
 
@@ -1016,13 +1016,20 @@ void dcdc_management(void){
 		
 		case ON_BOARD_MOTORS:
     {
-      EN_V12board_ON;                             // switch on V12board
-      EN_V12motor_ON;                             // switch on V12motor
-      HSM_EN_ON;                                  // switch on HSM
-      
-      V12board=1;             // switch on V12board
-			V12motor=1;             // switch on V12motor
-			HSM=1;                  // switch on HSM
+      if(timer_delay_motor < timer_delay_motor_max){
+        timer_delay_motor++;
+      }
+      else{
+        EN_V12board_ON;                             // switch on V12board
+        EN_V12motor_ON;                             // switch on V12motor
+        HSM_EN_ON;                                  // switch on HSM
+        
+        V12board=1;             // switch on V12board
+        V12motor=1;             // switch on V12motor
+        
+        HSM=1;                  // switch on HSM
+        timer_delay_motor=0;
+      }
       //if(V12board==0){                          // - for iCub
       if(V12board==0 || V12motor==0){             // - for CER
         if(toggle_100ms)  {PB1_LED_GREEN;}
