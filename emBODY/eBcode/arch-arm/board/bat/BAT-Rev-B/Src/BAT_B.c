@@ -9,9 +9,9 @@
 #include "stm32l4xx_hal.h"
 #include "BAT_B.h"
 
-char Firmware_vers = 0;
+char Firmware_vers = 1;
 char Revision_vers = 0;
-char Build_number  = 2;
+char Build_number  = 0;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
 uint32_t vhyst=0;    // voltage hysteresis
