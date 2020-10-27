@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>EMBOT_USE_rtos_cmsisos2 USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\skeleton;..\..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\skeleton;..\..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\bsp</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -777,6 +777,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>embot::hw::bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_stm32g4eval.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_bsp_stm32g4eval.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1183,7 +1193,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>EMBOT_USE_rtos_osal USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\skeleton;..\..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\skeleton;..\..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\bsp</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1566,6 +1576,16 @@
               <FileName>embot_app_application_theCANparserBasic.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_application_theCANparserBasic.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_stm32g4eval.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_bsp_stm32g4eval.cpp</FilePath>
             </File>
           </Files>
         </Group>

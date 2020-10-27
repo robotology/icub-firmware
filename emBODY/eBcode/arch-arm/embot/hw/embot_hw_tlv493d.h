@@ -43,10 +43,8 @@ namespace embot { namespace hw { namespace tlv493d {
     
     using Position = std::int32_t; // the measurement units is: 0.01 degrees
             
-    bool supported(embot::hw::TLV493D h);
-    
-    bool initialised(embot::hw::TLV493D h);
-    
+    bool supported(embot::hw::TLV493D h);    
+    bool initialised(embot::hw::TLV493D h);    
     result_t init(embot::hw::TLV493D h, const Config &config);
         
     

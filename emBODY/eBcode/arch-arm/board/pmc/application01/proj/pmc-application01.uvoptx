@@ -994,7 +994,7 @@
 
   <Group>
     <GroupName>embot-hw</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1017,8 +1017,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_sys.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_bsp.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1029,8 +1029,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_bsp.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_bsp.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_sys.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1154,6 +1154,18 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>51</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_types.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_types.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -1164,13 +1176,33 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>51</FileNumber>
+      <FileNumber>52</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_lowlevel.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>embot::hw::bsp</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>11</GroupNumber>
+      <FileNumber>53</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\bsp\embot_hw_bsp_pmc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp_pmc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

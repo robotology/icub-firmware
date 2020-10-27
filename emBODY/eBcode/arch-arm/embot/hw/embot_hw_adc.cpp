@@ -27,15 +27,20 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_adc_bsp.h"
+
 #include <cstring>
 #include <vector>
-
-using namespace std;
-
 #include "embot_core_binary.h"
-#include "embot_hw_bsp.h"
-#include "embot_hw_bsp_config.h"
-#include "stm32hal.h"
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
+
+using namespace embot::hw;
 
 
 
@@ -86,7 +91,7 @@ namespace embot { namespace hw { namespace adc {
 
     bool supported(ADC p)
     {
-        return embot::hw::bsp::adc::getBSP().supported(p);
+        return embot::hw::adc::getBSP().supported(p);
     }
     
     bool initialised(ADC p)
@@ -145,11 +150,11 @@ namespace embot { namespace hw { namespace adc {
         }
         
         // init peripherals: adc1 and dma1
-        embot::hw::bsp::adc::getBSP().init(p);     
+        embot::hw::adc::getBSP().init(p);     
         
         adcdata.config = config;
         adcdata.adc_isrunning = false;
-        adcdata.handle = embot::hw::bsp::adc::getBSP().getPROP(p)->handle;
+        adcdata.handle = embot::hw::adc::getBSP().getPROP(p)->handle;
                                 
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(p));
 

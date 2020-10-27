@@ -42,10 +42,8 @@ namespace embot { namespace hw { namespace ads122c04 {
     enum class Channel : uint8_t { one = 0, two = 1 };
     
             
-    bool supported(embot::hw::ADS122C04 s);
-    
-    bool initialised(embot::hw::ADS122C04 s);
-    
+    bool supported(embot::hw::ADS122C04 s);    
+    bool initialised(embot::hw::ADS122C04 s);    
     result_t init(embot::hw::ADS122C04 s, const Config &config);
         
     

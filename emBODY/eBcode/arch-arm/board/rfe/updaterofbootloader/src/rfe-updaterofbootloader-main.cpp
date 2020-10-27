@@ -103,7 +103,7 @@ static void bl_activity(void* param)
     configEV.onevent = eventbasedthread_onevent;
     configEV.param = nullptr;
     configEV.stacksize = 4*1024;
-    configEV.priority = embot::os::Priority::high200;
+    configEV.priority = embot::os::Priority::high40;
     configEV.timeout = waitEventTimeout;
     
     eventbasedthread = new embot::os::EventThread;

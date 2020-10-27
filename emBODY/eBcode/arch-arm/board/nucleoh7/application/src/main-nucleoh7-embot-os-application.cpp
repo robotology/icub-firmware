@@ -155,17 +155,17 @@
     // mode with serial in string form and periodic activation
 
     #define macro_enableACQUISITION
-    #undef macro_enableACQUISITION_slow
+    #define macro_enableACQUISITION_slow
     #define macro_enableSERIAL
-    //#define macro_enableSERIAL_string
-    #define macro_enableSERIAL_binary
-    //#define  macro_enableTRACE
-    #undef  macro_enableEXTItransmit
-    #undef macro_enablePERIODICtransmit
-    #undef macro_enableSLOWtxperiod
+    #define macro_enableSERIAL_string
+    //#define macro_enableSERIAL_binary
+    #define  macro_enableTRACE
+    //#define  macro_enableEXTItransmit
+    #define macro_enablePERIODICtransmit
+    #define macro_enableSLOWtxperiod
     
     // the tx is done at very start of cycles
-    #define macro_enableCYCLEtransmit
+    #undef macro_enableCYCLEtransmit
 
 
 
@@ -229,7 +229,7 @@ constexpr embot::core::relTime acquisitionPeriod = 10*embot::core::time1millisec
 constexpr embot::hw::BTN buttonBLUE = embot::hw::BTN::one;
 constexpr embot::hw::BTN buttonPB8 = embot::hw::BTN::two;
     
-constexpr embot::hw::BTN buttonTX = buttonPB8; // but later on: buttonPB8 ore buttonBLUE
+constexpr embot::hw::BTN buttonTX = buttonBLUE; //buttonPB8; // but later on: buttonPB8 ore buttonBLUE
 
 embot::tools::Histogram *histoIMU {nullptr};
 //embot::tools::Histogram *histoUSART {nullptr};

@@ -17,17 +17,19 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_ads122c04_bsp.h"
+
 #include <cstring>
 #include <vector>
-#include "stm32hal.h"
-#include "embot_hw_bsp.h"
-#include "embot_hw_bsp_config.h"
-
-using namespace std;
-
 #include "embot_core_binary.h"
 #include "embot_hw_sys.h"
 
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
 
 using namespace embot::hw;
 
@@ -35,11 +37,6 @@ using namespace embot::hw;
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-//#define ads122c04_FAKEmode
-
-#if defined(ads122c04_FAKEmode)
-#warning WIP: ads122c04_FAKEmode is still defined 
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -72,7 +69,7 @@ namespace embot { namespace hw { namespace ads122c04 {
     
     bool supported(ADS122C04 a)
     {
-        return embot::hw::bsp::ads122c04::getBSP().supported(a);
+        return embot::hw::ads122c04::getBSP().supported(a);
     }
     
     bool initialised(ADS122C04 a)
@@ -429,7 +426,7 @@ mode.
         }
         
         // init peripheral
-        embot::hw::bsp::ads122c04::getBSP().init(s);
+        embot::hw::ads122c04::getBSP().init(s);
         
         std::uint8_t index = embot::core::tointegral(s);
         
@@ -438,13 +435,13 @@ mode.
                 
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::ads122c04::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::ads122c04::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
                        
 #endif        
-        s_privatedata.i2caddress[index] = embot::hw::bsp::ads122c04::getBSP().getPROP(s)->i2caddress;
+        s_privatedata.i2caddress[index] = embot::hw::ads122c04::getBSP().getPROP(s)->i2caddress;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
         
@@ -452,7 +449,7 @@ mode.
 #else          
         // we need to perform chip initialization
         
-        _ads_chip.setaddress(config.i2cdes.bus, embot::hw::bsp::ads122c04::getBSP().getPROP(s)->i2caddress);
+        _ads_chip.setaddress(config.i2cdes.bus, embot::hw::ads122c04::getBSP().getPROP(s)->i2caddress);
         
         volatile result_t res = result_t::NOK;     
         // 1. reset

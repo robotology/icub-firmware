@@ -29,16 +29,19 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_bno055_bsp.h"
+
 #include <cstring>
 #include <vector>
-#include "stm32hal.h"
 #include "embot_core_binary.h"
 #include "embot_hw_sys.h"
-#include "embot_hw_gpio.h"
-#include "embot_hw_bsp.h"
-#include "embot_hw_bsp_config.h"
 
-using namespace std;
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
 
 using namespace embot::hw;
 
@@ -83,7 +86,7 @@ namespace embot { namespace hw { namespace bno055 {
     
     bool supported(BNO055 s)
     {
-        return embot::hw::bsp::bno055::getBSP().supported(s);
+        return embot::hw::bno055::getBSP().supported(s);
     }
     
     bool initialised(BNO055 s)
@@ -153,7 +156,7 @@ namespace embot { namespace hw { namespace bno055 {
         }
         
         // init peripheral
-        embot::hw::bsp::bno055::getBSP().init(s);
+        embot::hw::bno055::getBSP().init(s);
         
         // power on and wait until the i2c is working. datasheet say: POR time > 650 ms.
         s_powerON(s, PORtime);
@@ -164,14 +167,14 @@ namespace embot { namespace hw { namespace bno055 {
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
         
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::bno055::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bno055::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
         
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
-        s_privatedata.i2caddress[index] = embot::hw::bsp::bno055::getBSP().getPROP(s)->i2caddress;
+        s_privatedata.i2caddress[index] = embot::hw::bno055::getBSP().getPROP(s)->i2caddress;
         
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(s));
                 
@@ -453,8 +456,8 @@ namespace embot { namespace hw { namespace bno055 {
     
     static void s_powerON(BNO055 s, embot::core::relTime waittime)
     {        
-        embot::hw::gpio::set(embot::hw::bsp::bno055::getBSP().getPROP(s)->boot, embot::hw::gpio::State::SET);
-        embot::hw::gpio::set(embot::hw::bsp::bno055::getBSP().getPROP(s)->reset, embot::hw::gpio::State::SET);
+        embot::hw::gpio::set(embot::hw::bno055::getBSP().getPROP(s)->boot, embot::hw::gpio::State::SET);
+        embot::hw::gpio::set(embot::hw::bno055::getBSP().getPROP(s)->reset, embot::hw::gpio::State::SET);
         
         embot::hw::sys::delay(waittime);         
     }

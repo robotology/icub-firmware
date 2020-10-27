@@ -40,7 +40,8 @@
 #include "embot_dsp.h"
 
 #include "embot_hw.h"
-#include "embot_hw_bsp.h"
+#include "embot_hw_pga308_bsp.h"
+#include "embot_hw_onewire_bsp.h"
 #include "embot_hw_can.h"
 #include "embot_hw_pga308.h"
 #include "embot_hw_adc.h"
@@ -1679,7 +1680,7 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     embot::hw::pga308::Config pga308cfg;
     
     // common settings
-    pga308cfg.powerongpio = embot::hw::bsp::pga308::getBSP().getPROP(embot::hw::PGA308::one)->poweron; // embot::hw::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
+    pga308cfg.powerongpio = embot::hw::pga308::getBSP().getPROP(embot::hw::PGA308::one)->poweron; // embot::hw::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
     pga308cfg.poweronstate = embot::hw::gpio::State::SET;
     pga308cfg.onewireconfig.rate = embot::hw::onewire::Rate::tenKbps;
     pga308cfg.onewireconfig.usepreamble = true;
@@ -1689,32 +1690,32 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     
     // embot::hw::PGA308::one
     pga308cfg.onewirechannel = embot::hw::ONEWIRE::one;
-    pga308cfg.onewireconfig.gpio = embot::hw::bsp::onewire::getBSP().getPROP(embot::hw::ONEWIRE::one)->gpio; // embot::hw::GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::onewire::getBSP().getPROP(embot::hw::ONEWIRE::one)->gpio; // embot::hw::GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
     embot::hw::pga308::init(embot::hw::PGA308::one, pga308cfg);
     
     // embot::hw::PGA308::two
     pga308cfg.onewirechannel = embot::hw::ONEWIRE::two;
-    pga308cfg.onewireconfig.gpio = embot::hw::bsp::onewire::getBSP().getPROP(embot::hw::ONEWIRE::two)->gpio; //embot::hw::GPIO(W_STRAIN2_GPIO_Port, W_STRAIN2_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::onewire::getBSP().getPROP(embot::hw::ONEWIRE::two)->gpio; //embot::hw::GPIO(W_STRAIN2_GPIO_Port, W_STRAIN2_Pin);
     embot::hw::pga308::init(embot::hw::PGA308::two, pga308cfg);
     
     // embot::hw::PGA308::three
     pga308cfg.onewirechannel = embot::hw::ONEWIRE::three;
-    pga308cfg.onewireconfig.gpio = embot::hw::bsp::onewire::getBSP().getPROP(embot::hw::ONEWIRE::three)->gpio;; // embot::hw::GPIO(W_STRAIN3_GPIO_Port, W_STRAIN3_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::onewire::getBSP().getPROP(embot::hw::ONEWIRE::three)->gpio;; // embot::hw::GPIO(W_STRAIN3_GPIO_Port, W_STRAIN3_Pin);
     embot::hw::pga308::init(embot::hw::PGA308::three, pga308cfg);
         
     // embot::hw::PGA308::four
     pga308cfg.onewirechannel = embot::hw::ONEWIRE::four;
-    pga308cfg.onewireconfig.gpio = embot::hw::bsp::onewire::getBSP().getPROP(embot::hw::ONEWIRE::four)->gpio; // embot::hw::GPIO(W_STRAIN4_GPIO_Port, W_STRAIN4_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::onewire::getBSP().getPROP(embot::hw::ONEWIRE::four)->gpio; // embot::hw::GPIO(W_STRAIN4_GPIO_Port, W_STRAIN4_Pin);
     embot::hw::pga308::init(embot::hw::PGA308::four, pga308cfg);    
     
     // embot::hw::PGA308::five
     pga308cfg.onewirechannel = embot::hw::ONEWIRE::five;
-    pga308cfg.onewireconfig.gpio = embot::hw::bsp::onewire::getBSP().getPROP(embot::hw::ONEWIRE::five)->gpio; // embot::hw::GPIO(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::onewire::getBSP().getPROP(embot::hw::ONEWIRE::five)->gpio; // embot::hw::GPIO(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin);
     embot::hw::pga308::init(embot::hw::PGA308::five, pga308cfg);     
 
     // embot::hw::PGA308::six
     pga308cfg.onewirechannel = embot::hw::ONEWIRE::six;
-    pga308cfg.onewireconfig.gpio = embot::hw::bsp::onewire::getBSP().getPROP(embot::hw::ONEWIRE::six)->gpio; // embot::hw::GPIO(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::onewire::getBSP().getPROP(embot::hw::ONEWIRE::six)->gpio; // embot::hw::GPIO(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin);
     embot::hw::pga308::init(embot::hw::PGA308::six, pga308cfg);   
     
     

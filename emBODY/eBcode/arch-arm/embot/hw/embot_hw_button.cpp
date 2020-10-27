@@ -28,17 +28,20 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stm32hal.h"
-#include "embot_hw_gpio.h"
-#include "embot_hw_bsp.h"
-#include "embot_hw_bsp_config.h"
 
-#include "embot_hw_sys.h"
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_button_bsp.h"
 
 #include <cstring>
 #include <vector>
-
 #include "embot_core_binary.h"
+#include "embot_hw_sys.h"
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
 
 
 using namespace std;
@@ -89,7 +92,7 @@ namespace embot { namespace hw { namespace button {
     
     bool supported(BTN btn)
     {
-        return embot::hw::bsp::button::getBSP().supported(btn);
+        return embot::hw::button::getBSP().supported(btn);
     }
     
     bool initialised(BTN btn)
@@ -116,7 +119,7 @@ namespace embot { namespace hw { namespace button {
         
         s_privatedata.config[embot::core::tointegral(btn)] = cfg;
         
-        const embot::hw::bsp::button::BSP &btnbsp = embot::hw::bsp::button::getBSP();
+        const embot::hw::button::BSP &btnbsp = embot::hw::button::getBSP();
         
         // bsp specific initialization                    
         btnbsp.init(btn);  
@@ -171,10 +174,10 @@ namespace embot { namespace hw { namespace button {
         {
             return false;
         }  
-        const embot::hw::GPIO gpio = embot::hw::bsp::button::getBSP().getPROP(btn)->gpio;       
+        const embot::hw::GPIO gpio = embot::hw::button::getBSP().getPROP(btn)->gpio;       
         
         embot::hw::gpio::State s = embot::hw::gpio::get(gpio);
-        return (embot::hw::bsp::button::getBSP().getPROP(btn)->pressed == s) ? (true) : (false);        
+        return (embot::hw::button::getBSP().getPROP(btn)->pressed == s) ? (true) : (false);        
     }
     
     

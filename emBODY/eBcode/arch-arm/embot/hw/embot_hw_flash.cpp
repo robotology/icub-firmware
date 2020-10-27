@@ -29,11 +29,21 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stm32hal.h"
-#include "embot_hw_bsp.h"
 #include "embot_hw_bsp_config.h"
+#include "embot_hw_flash_bsp.h"
+
+#include <cstring>
+#include <vector>
+#include "embot_core_binary.h"
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
 
 using namespace std;
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -47,11 +57,32 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
 
 
+#if !defined(EMBOT_ENABLE_hw_flash)
+
+
+namespace embot { namespace hw { namespace flash {
+
+    const embot::hw::Partition& getpartition(embot::hw::FLASH fl) { static constexpr embot::hw::Partition p {}; return p; }
+    
+    // the following functions use embot::hw::FLASH::whole
+    
+    bool isaddressvalid(std::uint32_t address) { return false; }    
+    std::uint32_t address2page(std::uint32_t address) { return 0; }
+    
+    bool erase(std::uint32_t page) { return false; }
+    bool erase(std::uint32_t address, std::uint32_t size) { return false; }
+    bool read(std::uint32_t address, std::uint32_t size, void *data) { return false; }
+    bool write(std::uint32_t address, std::uint32_t size, const void *data) { return false; }
+    
+}}} // namespace embot { namespace hw { namespace flash {
+
+#else
+
 namespace embot { namespace hw { namespace flash {
     
     const Partition& getpartition(embot::hw::FLASH fl)
     {
-        return embot::hw::bsp::flash::getBSP().getPROP(fl)->partition;         
+        return embot::hw::flash::getBSP().getPROP(fl)->partition;         
     }
         
     
@@ -192,11 +223,11 @@ namespace embot { namespace hw { namespace flash {
         return (HAL_FLASH_ERROR_NONE == r) ? true : false;
     }        
     
-    
-    
-    
+     
 }}} // namespace embot { namespace hw { namespace flash {
-    
+   
+
+#endif //defined(EMBOT_ENABLE_hw_flash)
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -30,17 +30,23 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stm32hal.h"
-#include "embot_core.h"
-#include "embot_hw_timer.h"
-#include "embot_hw_bsp.h"
+
 #include "embot_hw_bsp_config.h"
+#include "embot_hw_onewire_bsp.h"
+
 #include <cstring>
 #include <vector>
-
-using namespace std;
-
 #include "embot_core_binary.h"
+//#include "embot_hw_sys.h"
+#include "embot_hw_timer.h"
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
+
+using namespace embot::hw;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -51,6 +57,26 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
+
+#if !defined(EMBOT_ENABLE_hw_onewire)
+
+namespace embot { namespace hw { namespace onewire {
+
+    bool supported(embot::hw::ONEWIRE c) { return false; }
+    
+    bool initialised(embot::hw::ONEWIRE c) { return false; }
+    
+    result_t init(embot::hw::ONEWIRE c, const Config &config) { return resNOK; }
+    
+    bool isrunning(embot::hw::ONEWIRE c) { return false; }
+    
+    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::core::relTime timeout) { return resNOK; }
+
+}}} // namespace embot { namespace hw { namespace onewire {
+
+
+#else
+
 
 //#if 0
 // 
@@ -87,7 +113,7 @@ namespace embot { namespace hw { namespace onewire {
     
     bool supported(ONEWIRE c)
     {
-        return embot::hw::bsp::onewire::getBSP().supported(c);
+        return embot::hw::onewire::getBSP().supported(c);
     }
     
     bool initialised(ONEWIRE c)
@@ -166,7 +192,7 @@ namespace embot { namespace hw { namespace onewire {
             return resOK;
         }
         
-        embot::hw::bsp::onewire::getBSP().init(c);        
+        embot::hw::onewire::getBSP().init(c);        
         
         s_privatedata.config[embot::core::tointegral(c)] = config;
         
@@ -350,6 +376,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
     
 }}} // namespace embot { namespace hw { namespace onewire {
 
+#endif // //defined(EMBOT_ENABLE_hw_onewire)
 
 // - stm32hal.lib needs some handlers being compiled in here: IRQ handlers and callbacks.
 

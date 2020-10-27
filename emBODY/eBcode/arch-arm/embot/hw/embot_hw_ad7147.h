@@ -32,10 +32,8 @@ namespace embot { namespace hw { namespace ad7147 {
     using Values = std::array<std::uint16_t, 12>; 
     
     
-    bool supported(embot::hw::AD7147 s);
-    
-    bool initialised(embot::hw::AD7147 s);
-    
+    bool supported(embot::hw::AD7147 s);    
+    bool initialised(embot::hw::AD7147 s);    
     result_t init(embot::hw::AD7147 s, const Config &config);
         
     

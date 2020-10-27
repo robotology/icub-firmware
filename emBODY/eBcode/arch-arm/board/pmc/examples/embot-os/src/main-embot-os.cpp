@@ -37,7 +37,7 @@ void btncallback(void *p)
 
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {       
-    embot::hw::sys::puts("evthread-startup: ..." ); 
+    embot::core::print("evthread-startup: ..." ); 
     
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
@@ -47,7 +47,7 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     // init the ext interrupt button
     embot::hw::button::init(buttonBLUE, {embot::hw::button::Mode::TriggeredOnRelease, {btncallback, t}, 0});
     
-    embot::hw::sys::puts("evthread-startup: started timer which sends evtTick to evthread every = " + embot::core::TimeFormatter(tickperiod).to_string());
+    embot::core::print("evthread-startup: started timer which sends evtTick to evthread every = " + embot::core::TimeFormatter(tickperiod).to_string());
 
     
 }
@@ -64,7 +64,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::core::print("evthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
 
     }
@@ -72,7 +72,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     if(true == embot::core::binary::mask::check(eventmask, evtBTNreleased)) 
     {    
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtBTNreleased received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));        
+        embot::core::print("evthread-onevent: evtBTNreleased received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));        
     }
 
 }

@@ -47,10 +47,8 @@ namespace embot { namespace hw { namespace adc {
         Config() : mode(Mode::dma), acquisition(Acquisition::single), itemsize(ItemSize::U16), destination(nullptr), numberofitems(0), oncompletion(nullptr, nullptr) {}
     };
     
-    bool supported(embot::hw::ADC p);
-    
-    bool initialised(embot::hw::ADC p);
-    
+    bool supported(embot::hw::ADC p);    
+    bool initialised(embot::hw::ADC p);   
     result_t init(embot::hw::ADC p, const Config &config);
     
     

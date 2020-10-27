@@ -28,13 +28,13 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stm32hal.h"
 #include <cstring>
 #include <vector>
 
 #include "embot_core.h"
+#include "embot_hw_bsp.h"
 
-#include "embot_hw_sys.h"
+
 
 using namespace std;
 
@@ -48,10 +48,6 @@ namespace embot { namespace hw {
         return initted;
     }   
         
-    static uint32_t _get1millitick()
-    {
-        return embot::core::now() / 1000;        
-    }
 
     bool init(const Config &config)
     {
@@ -60,14 +56,8 @@ namespace embot { namespace hw {
             return true;
         }
         
-        embot::core::init({{nullptr, config.get1microtime}, {embot::hw::sys::puts}});
-                   
-        stm32hal_config_t cfg = {0};
-        cfg.tick1ms_init = config.initmicrotime;
-        cfg.tick1ms_get = _get1millitick;       
-        stm32hal_init(&cfg);
-        
-        embot::hw::bsp::init();
+        embot::core::init({{nullptr, config.get1microtime}, {embot::hw::bsp::print}});        
+        embot::hw::bsp::init(config);
                       
         initted = true;
         return true;

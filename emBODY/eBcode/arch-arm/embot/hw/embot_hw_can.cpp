@@ -28,17 +28,20 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
-#include "stm32hal.h"
-
-#include "embot_core_binary.h"
-#include "embot_hw_bsp.h"
 #include "embot_hw_bsp_config.h"
-#include "embot_hw_sys.h"
+#include "embot_hw_can_bsp.h"
 
 #include <cstring>
 #include <vector>
+#include "embot_core_binary.h"
 
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
+
+using namespace std;
 
 using namespace std;
 
@@ -87,7 +90,7 @@ namespace embot { namespace hw { namespace can {
     
     bool supported(embot::hw::CAN p)
     {
-        return embot::hw::bsp::can::getBSP().supported(p);
+        return embot::hw::can::getBSP().supported(p);
     }
 
     bool initialised(embot::hw::CAN p)
@@ -98,7 +101,7 @@ namespace embot { namespace hw { namespace can {
     struct CANdata
     {
         Config config {};
-        embot::hw::bsp::can::CAN_Handle *handle {nullptr};
+        embot::hw::can::CAN_Handle *handle {nullptr};
         std::vector<Frame> *Qtx {nullptr};
         std::vector<Frame> *rxQ {nullptr};
         
@@ -108,7 +111,7 @@ namespace embot { namespace hw { namespace can {
    
     std::array<CANdata, embot::core::tointegral(embot::hw::CAN::maxnumberof)> _candata_array {};
         
-    static embot::hw::CAN toCAN(embot::hw::bsp::can::CAN_Handle *hcan)
+    static embot::hw::CAN toCAN(embot::hw::can::CAN_Handle *hcan)
     {
         // look inside _candata_array               
         for(uint8_t i=0; i<_candata_array.size(); i++)
@@ -124,21 +127,21 @@ namespace embot { namespace hw { namespace can {
     
     // - declaration of helper functions which are not in the API  
     static void s_tx_start(embot::hw::CAN p);
-    static void s_tx_oneframehasgone(embot::hw::CAN p, embot::hw::bsp::can::CAN_Handle *hcan);  
-    static void s_rx_oneframehascome(embot::hw::CAN p, embot::hw::bsp::can::CAN_Handle *hcan);      
-    static bool s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan);
-    static bool s_startdriver(embot::hw::bsp::can::CAN_Handle *hcan);
-    static bool s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan);
-    static result_t s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::uint8_t address);
-    bool s_filters_set_by_class(embot::hw::bsp::can::CAN_Handle *hcan, uint8_t filternumber, uint8_t cls, uint8_t src, uint8_t dst);
+    static void s_tx_oneframehasgone(embot::hw::CAN p, embot::hw::can::CAN_Handle *hcan);  
+    static void s_rx_oneframehascome(embot::hw::CAN p, embot::hw::can::CAN_Handle *hcan);      
+    static bool s_registercallbacks(embot::hw::can::CAN_Handle *hcan);
+    static bool s_startdriver(embot::hw::can::CAN_Handle *hcan);
+    static bool s_filters_init(embot::hw::can::CAN_Handle *hcan);
+    static result_t s_filters_set(embot::hw::can::CAN_Handle *hcan, std::uint8_t address);
+    bool s_filters_set_by_class(embot::hw::can::CAN_Handle *hcan, uint8_t filternumber, uint8_t cls, uint8_t src, uint8_t dst);
     
-    void callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan);    
+    void callbackOnTXcompletion(embot::hw::can::CAN_Handle* hcan);    
 #if defined(HAL_CAN_MODULE_ENABLED)  
-    void callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan);
+    void callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)    
-    void callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t RxFifo0ITs);
+    void callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan, uint32_t RxFifo0ITs);
 #endif     
-    // void callbackOnError(embot::hw::bsp::can::CAN_Handle* hcan); // not used, so far
+    // void callbackOnError(embot::hw::can::CAN_Handle* hcan); // not used, so far
         
     static void RX_IRQenable(embot::hw::CAN p);
     static void RX_IRQdisable(embot::hw::CAN p);
@@ -151,9 +154,9 @@ namespace embot { namespace hw { namespace can {
     constexpr uint8_t cls_as_polling = 2;
     constexpr uint8_t cls_bootloader = 7;
     
-    void s_addtxmessagetoqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& frame);   
+    void s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame);   
     
-    void s_getrxmessagefromqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& frame);
+    void s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame);
       
 }}};
 
@@ -174,12 +177,12 @@ result_t can::init(embot::hw::CAN p, const Config &config)
     }    
     
     // init peripheral
-    embot::hw::bsp::can::getBSP().init(p);
+    embot::hw::can::getBSP().init(p);
     
     std::uint8_t index = embot::core::tointegral(p);
     
     _candata_array[index].config = config;
-    _candata_array[index].handle = embot::hw::bsp::can::getBSP().getPROP(p)->handle;
+    _candata_array[index].handle = embot::hw::can::getBSP().getPROP(p)->handle;
     
     // do whatever else is required .... for instance... init the buffers.
     
@@ -366,7 +369,7 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
 static void can::s_tx_start(embot::hw::CAN p)
 {
     std::uint8_t index = embot::core::tointegral(p);    
-    embot::hw::bsp::can::CAN_Handle *hcan = _candata_array[index].handle;
+    embot::hw::can::CAN_Handle *hcan = _candata_array[index].handle;
     
     // transmit the first frame inside Qtx and then activate the interrupt (on fifo empty, hence ...) 
      
@@ -474,7 +477,7 @@ static void can::s_tx_start(embot::hw::CAN p)
        
 }
 
-static void can::s_rx_oneframehascome(embot::hw::CAN p, embot::hw::bsp::can::CAN_Handle *hcan)
+static void can::s_rx_oneframehascome(embot::hw::CAN p, embot::hw::can::CAN_Handle *hcan)
 {
     std::uint8_t index = embot::core::tointegral(p);      
     
@@ -503,7 +506,7 @@ static void can::s_rx_oneframehascome(embot::hw::CAN p, embot::hw::bsp::can::CAN
 
 
 
-void can::callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
+void can::callbackOnTXcompletion(embot::hw::can::CAN_Handle* hcan)
 {
     // this function is called inside IRQ handler of stm32hal.     
     embot::hw::CAN p = toCAN(hcan); 
@@ -516,9 +519,9 @@ void can::callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
 }
 
 #if defined(HAL_CAN_MODULE_ENABLED) 
-void can::callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
+void can::callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan)
 #elif defined(HAL_FDCAN_MODULE_ENABLED) 
-void can::callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t RxFifo0ITs)
+void can::callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan, uint32_t RxFifo0ITs)
 #endif
 {   
     // this function is called inside IRQ handler of stm32hal.
@@ -532,7 +535,7 @@ void can::callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan, uint32_t
 
 }
 
-static void can::s_tx_oneframehasgone(embot::hw::CAN p, embot::hw::bsp::can::CAN_Handle *hcan)
+static void can::s_tx_oneframehasgone(embot::hw::CAN p, embot::hw::can::CAN_Handle *hcan)
 {
     std::uint8_t index = embot::core::tointegral(p);
     
@@ -643,7 +646,7 @@ static void can::tx_IRQresume(embot::hw::CAN p, const bool previouslyenabled)
     }
 } 
 
-static bool can::s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan)
+static bool can::s_filters_init(embot::hw::can::CAN_Handle *hcan)
 {
 #if defined(HAL_CAN_MODULE_ENABLED)
     
@@ -687,7 +690,7 @@ static bool can::s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan)
 #endif    
 }
 
-static result_t can::s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::uint8_t address)
+static result_t can::s_filters_set(embot::hw::can::CAN_Handle *hcan, std::uint8_t address)
 {
 
 #if defined(HAL_CAN_MODULE_ENABLED)
@@ -813,7 +816,7 @@ static result_t can::s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::u
 }
 
 
-bool can::s_filters_set_by_class(embot::hw::bsp::can::CAN_Handle *hcan, uint8_t filternumber, uint8_t cls, uint8_t src, uint8_t dst)
+bool can::s_filters_set_by_class(embot::hw::can::CAN_Handle *hcan, uint8_t filternumber, uint8_t cls, uint8_t src, uint8_t dst)
 {
     
 #if defined(HAL_CAN_MODULE_ENABLED)
@@ -879,7 +882,7 @@ bool can::s_filters_set_by_class(embot::hw::bsp::can::CAN_Handle *hcan, uint8_t 
 }
 
 
-static bool can::s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan)
+static bool can::s_registercallbacks(embot::hw::can::CAN_Handle *hcan)
 {  
 
 #if defined(HAL_CAN_MODULE_ENABLED)    
@@ -904,7 +907,7 @@ static bool can::s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan)
 }    
 
 
-static bool can::s_startdriver(embot::hw::bsp::can::CAN_Handle *hcan)
+static bool can::s_startdriver(embot::hw::can::CAN_Handle *hcan)
 {  
 
 #if defined(HAL_CAN_MODULE_ENABLED)    
@@ -928,7 +931,7 @@ static bool can::s_startdriver(embot::hw::bsp::can::CAN_Handle *hcan)
 
 
 
-void can::s_addtxmessagetoqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& frame)
+void can::s_addtxmessagetoqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
 {
 
 #if defined(HAL_CAN_MODULE_ENABLED)         
@@ -962,7 +965,7 @@ void can::s_addtxmessagetoqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& fr
         
 }
 
-void can::s_getrxmessagefromqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& frame)
+void can::s_getrxmessagefromqueue(embot::hw::can::CAN_Handle *hcan, Frame& frame)
 {
         
 #if defined(HAL_CAN_MODULE_ENABLED)      
@@ -980,7 +983,7 @@ void can::s_getrxmessagefromqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& 
 }
  
 // not used, so far
-//void can::callbackOnError(embot::hw::bsp::can::CAN_Handle* hcan)
+//void can::callbackOnError(embot::hw::can::CAN_Handle* hcan)
 //{
 //    hcan = hcan;
 //    static uint32_t error_count = 0;

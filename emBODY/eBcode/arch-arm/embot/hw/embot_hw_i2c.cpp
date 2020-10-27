@@ -28,16 +28,19 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_i2c_bsp.h"
+
 #include <cstring>
 #include <vector>
-
-using namespace std;
-
 #include "embot_core_binary.h"
-#include "embot_hw_sys.h"
-#include "embot_hw_bsp.h"
-#include "embot_hw_bsp_config.h"
-#include "stm32hal.h"
+//#include "embot_hw_gpio.h"
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
 
 
 using namespace embot::hw;
@@ -126,7 +129,7 @@ namespace embot { namespace hw { namespace i2c {
     
     bool supported(embot::hw::I2C p)
     {
-        return embot::hw::bsp::i2c::getBSP().supported(p);
+        return embot::hw::i2c::getBSP().supported(p);
     }
 
     bool initialised(embot::hw::I2C p)
@@ -146,11 +149,11 @@ namespace embot { namespace hw { namespace i2c {
             return resOK;
         }        
         
-        embot::hw::bsp::i2c::getBSP().init(b);
+        embot::hw::i2c::getBSP().init(b);
         
         std::uint8_t index = embot::core::tointegral(b);
         s_privatedata.config[index] = config;
-        s_privatedata.handles[index] = embot::hw::bsp::i2c::getBSP().getPROP(b)->handle;
+        s_privatedata.handles[index] = embot::hw::i2c::getBSP().getPROP(b)->handle;
                        
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(b));
                 

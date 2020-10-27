@@ -28,8 +28,6 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stm32hal.h"
-
 #include <cstring>
 #include <vector>
 
@@ -39,7 +37,11 @@ using namespace std;
 #include "embot_hw_bsp_config.h"
 #include "embot_hw_lowlevel.h"
 
-
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -200,11 +202,13 @@ namespace embot { namespace hw { namespace sys {
         return maxRANDmask;
     }
     
+    //[[deprecated( "use embot::core::print()" )]]
     int puts(const std::string &str) 
     {
         return puts(str.c_str());
     }
     
+    //[[deprecated( "use embot::core::print()" )]]
     int puts(const char* str) 
     {    
  

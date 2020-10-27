@@ -40,10 +40,8 @@ namespace embot { namespace hw { namespace timer {
     };
     
     
-    bool supported(embot::hw::TIMER t);
-    
-    bool initialised(embot::hw::TIMER t);
-    
+    bool supported(embot::hw::TIMER t);    
+    bool initialised(embot::hw::TIMER t);    
     result_t init(embot::hw::TIMER t, const Config &config);
     
     result_t configure(embot::hw::TIMER t, const Config &config);

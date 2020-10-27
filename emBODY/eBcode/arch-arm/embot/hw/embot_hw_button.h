@@ -46,15 +46,13 @@ namespace embot { namespace hw { namespace button {
         constexpr Config(Mode mo, const embot::core::Callback &ca, embot::core::Time de) : mode(mo), callback(ca), debouncetime(de) {}         
     };    
 
-    bool supported(BTN btn);
-    
-    bool initialised(BTN btn);
-        
+    bool supported(BTN btn);    
+    bool initialised(BTN btn);        
     result_t init(BTN btn, const Config &cfg);
     
+    
     const Config & config(BTN btn);
-     
-        
+             
     bool pressed(BTN btn);
     
     // must put it inside the handler of exti when the pin associated to the button is triggered

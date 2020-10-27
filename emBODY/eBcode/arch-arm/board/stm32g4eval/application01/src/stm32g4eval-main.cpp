@@ -92,7 +92,7 @@ int main(void)
 #include "embot_app_application_theCANtracer.h"
 
 #include "embot_hw_tlv493d.h"
-#include "embot_hw_bsp.h"
+#include "embot_hw_tlv493d_bsp.h"
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::core::relTime tickperiod = 2000*embot::core::time1millisec;
@@ -156,7 +156,7 @@ void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
     
     // init the fap
     
-    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::bsp::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
+    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
     
     // start a timer which sends an event which forces an acquisition from the FAP  
     embot::os::Timer *tmr = new embot::os::Timer;   
