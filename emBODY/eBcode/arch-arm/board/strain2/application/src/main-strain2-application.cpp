@@ -87,7 +87,20 @@ int main(void)
 #undef DEBUG_atstartup_tx_FTdata
 #undef ENABLE_IHAVEJUSTSTARTED
 
-#include "embot_hw_bsp_strain2.h"
+#include "embot_hw_led.h"
+#include "embot_hw_si7051.h"
+#include "embot_hw_bno055.h"
+#include "embot_hw_pga308.h"
+
+namespace embot { namespace hw { namespace bsp { namespace strain2 {
+    const embot::hw::LED ledBLUE = embot::hw::LED::one;    
+    const embot::hw::i2c::Descriptor descrI2Cone = embot::hw::i2c::Descriptor(embot::hw::I2C::one, 400000);
+    const embot::hw::i2c::Descriptor descrI2Ctwo = embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000);    
+    const embot::hw::SI7051 thermometerSGAUGES = embot::hw::SI7051::one;
+    const embot::hw::si7051::Config thermometerSGAUGESconfig = embot::hw::si7051::Config(descrI2Cone);    
+    const embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
+    const embot::hw::bno055::Config imuBOSCHconfig = embot::hw::bno055::Config(descrI2Ctwo);         
+}}}} // namespace embot { namespace hw { namespace bsp { namespace strain2 {
 
 #include "embot_os_theScheduler.h"
 #include "embot_app_theLEDmanager.h"

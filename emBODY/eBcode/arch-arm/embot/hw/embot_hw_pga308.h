@@ -504,10 +504,8 @@ namespace embot { namespace hw { namespace pga308 {
     
     
     
-    bool supported(PGA308 a);
-    
-    bool initialised(PGA308 a);
-    
+    bool supported(PGA308 a);    
+    bool initialised(PGA308 a);    
     // inits onewire, set default value of registers 
     result_t init(PGA308 a, const Config &config);
     

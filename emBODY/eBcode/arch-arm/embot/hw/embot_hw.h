@@ -22,8 +22,15 @@
 #ifndef _EMBOT_HW_H_
 #define _EMBOT_HW_H_
 
-#include "embot_core.h"
+// this module initialises the hw layer and enables the use of the drivers: hw::gpio, hw::can, hw::i2c, etc.
+// it is however, still a glue layer which allows boards using different HAL, such as the ems and the pmc, to run 
+// the embot system.
+// the dependency from a specific HAL library (stm32hal or other) is in:
+// - embot::hw::board which calls initialization of the HAL, 
+// - embot::bsp which tells which drivers are availale,
+// - in the actual drivers embot::gpio, embot::can, embo::i2c etc.
 
+#include "embot_core.h"
 
 namespace embot { namespace hw {
     
@@ -39,38 +46,11 @@ namespace embot { namespace hw {
             
     bool initialised();
     
-    // it calls the proper initialisations for stm32hal etc.
+    // it calls the proper initialisations for the hw layer and links its to embot::core
+    // after this call you can use the hw drivers
     bool init(const Config &config);       
 }}
 
-//namespace embot { namespace hw { 
-//    
-//    // this funtion is called inside embot::hw::init() just after stm32hal_init()
-//    // it can be empty. in such a case, the settings executed by stm32hal_init() remain.
-//    // but also it can be filled with whatever required to complete or override what stm32hal_init() did.
-//    // for example you can use it to change the clock tree without changing the stm32hal library   
-//    // the file embot_hw.cpp does not contain the implementation of such a function. 
-//    // you should put it for instance inside the bsp files.
-//    
-//    // marco.accame: and yes, in case you are wondering the name of this function is from a bike brand. 
-//    // i just hope they read this comment and deliver me an S-Works Epic Hardtail ;-).
-//    
-//    void specialize();
-//    
-//}}
-
-namespace embot { namespace hw { namespace bsp {
-    
-    // this funtion is called inside embot::hw::init() just after stm32hal_init()
-    // it can be empty. in such a case, the settings executed by stm32hal_init() remain.
-    // but also it can be filled with whatever required to complete or override what stm32hal_init() did.
-    // for example you can use it to change the clock tree without changing the stm32hal library   
-    // the file embot_hw.cpp does not contain the implementation of such a function. 
-    // you should put it inside the bsp files.
-       
-    void init();
-    
-}}}
 
 
 #endif  // include-guard

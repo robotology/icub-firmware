@@ -50,8 +50,10 @@ namespace embot { namespace hw { namespace sys {
     std::uint32_t minrandom();
     std::uint32_t maxrandom();
     
-    // prints on the trace port
+    // prints on the trace port. 
+    // [[deprecated( "use embot::core::print()" )]] 
     int puts(const char* str);
+    // [[deprecated( "use embot::core::print()" )]] 
     int puts(const std::string &str);
     
     // forces the cpu to exec instructions to reach a given delay

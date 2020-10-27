@@ -23,7 +23,12 @@
 
 #include "embot_hw_bsp_config.h"
 #include "embot_hw_lowlevel.h"
-#include "stm32hal.h"
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

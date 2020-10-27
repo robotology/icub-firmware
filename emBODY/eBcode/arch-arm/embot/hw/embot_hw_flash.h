@@ -33,7 +33,7 @@ namespace embot { namespace hw { namespace flash {
     // the following functions use embot::hw::FLASH::whole
     
     bool isaddressvalid(std::uint32_t address);    
-    std::uint32_t address2page(std::uint32_t address); // returns [0, maxNumOfPAGEs). if address not valid, it returns maxNumOfPAGEs.
+    std::uint32_t address2page(std::uint32_t address); // returns [0, maxNumOfPAGEs). if address not valid, it returns an unreliable number.
     
     bool erase(std::uint32_t page);
     bool erase(std::uint32_t address, std::uint32_t size);

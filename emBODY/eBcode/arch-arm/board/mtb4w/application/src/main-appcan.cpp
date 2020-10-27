@@ -84,8 +84,21 @@ int main(void)
 
 // - here is the tailoring of the board.
 
+#include "embot_hw_si7051.h"
+#include "embot_hw_bno055.h"
 
-#include "embot_hw_bsp_mtb4.h"
+namespace embot { namespace hw { namespace bsp { namespace mtb4 {
+    
+    constexpr embot::hw::i2c::Descriptor descrI2Cone = embot::hw::i2c::Descriptor(embot::hw::I2C::one, 400000);
+    constexpr embot::hw::i2c::Descriptor descrI2Ctwo = embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000);
+    
+    constexpr embot::hw::SI7051 thermometer = embot::hw::SI7051::one;
+    constexpr embot::hw::si7051::Config thermometerconfig = embot::hw::si7051::Config(descrI2Cone);
+   
+    constexpr embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
+    constexpr embot::hw::bno055::Config imuBOSCHconfig = embot::hw::bno055::Config(descrI2Ctwo);   
+             
+}}}} // namespace embot { namespace hw { namespace bsp { namespace mtb4 {
 
 #include "embot_os_theScheduler.h"
 #include "embot_app_theLEDmanager.h"

@@ -136,7 +136,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
         configEV.onevent = eventbasedtask_onevent;
         configEV.param = nullptr;
         configEV.stacksize = 4*1024;
-        configEV.priority = embot::os::Priority::high200;
+        configEV.priority = embot::os::Priority::high40;
         configEV.timeout = waitEventTimeout;
         
         embot::os::EventThread* eventbasedtask = new embot::os::EventThread; 

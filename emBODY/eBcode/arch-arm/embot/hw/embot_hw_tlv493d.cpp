@@ -28,19 +28,21 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_tlv493d_bsp.h"
+
 #include <cstring>
 #include <vector>
-#include "stm32hal.h"
-#include "embot_hw_bsp.h"
-#include "embot_core_utils.h"
-
-using namespace std;
-
+#include <math.h>
 #include "embot_core_binary.h"
 #include "embot_hw_sys.h"
-#include "embot_hw_bsp_config.h"
 
-#include <math.h>
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
+
 
 #define PII 3.14159265
 
@@ -106,7 +108,7 @@ namespace embot { namespace hw { namespace tlv493d {
     
     bool supported(TLV493D h)
     {
-        return embot::hw::bsp::tlv493d::getBSP().supported(h);
+        return embot::hw::tlv493d::getBSP().supported(h);
     }
     
     bool initialised(TLV493D h)
@@ -247,7 +249,7 @@ namespace embot { namespace hw { namespace tlv493d {
         }
         
         // init peripheral
-        embot::hw::bsp::tlv493d::getBSP().init(h);
+        embot::hw::tlv493d::getBSP().init(h);
         
         std::uint8_t index = embot::core::tointegral(h);
                 
@@ -255,7 +257,7 @@ namespace embot { namespace hw { namespace tlv493d {
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
            
         // load config etc
-        s_privatedata.i2caddress[index] = embot::hw::bsp::tlv493d::getBSP().getPROP(h)->i2caddress;
+        s_privatedata.i2caddress[index] = embot::hw::tlv493d::getBSP().getPROP(h)->i2caddress;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
                         

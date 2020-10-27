@@ -48,7 +48,7 @@
 
 #include "embot_core.h"
 
-#include "embot_hw_bsp_strain2.h"
+//#include "embot_hw_bsp_strain2.h"
 
 #include "embot_hw_si7051.h"
 

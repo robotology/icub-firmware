@@ -27,7 +27,7 @@
 
 
 //#include "embot_hw_i2c.h"
-
+#error dont use me
 
 namespace embot { namespace hw { namespace i2c {
     

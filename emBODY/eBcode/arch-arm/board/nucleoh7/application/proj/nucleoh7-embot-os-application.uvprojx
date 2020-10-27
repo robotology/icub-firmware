@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>2</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEOH7 STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -518,6 +518,16 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_nucleoh7.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_bsp_nucleoh7.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1236,6 +1246,16 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_nucleoh7.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_bsp_nucleoh7.cpp</FilePath>
             </File>
           </Files>
         </Group>

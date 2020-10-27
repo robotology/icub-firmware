@@ -53,8 +53,8 @@ static void DE_0input(void);
 
 #include "embot_hw_bsp.h"
 #include "embot_hw_sys.h"
-
-static const embot::hw::bsp::multisda::PROP& props = embot::hw::bsp::multisda::getBSP().prop;
+#include "embot_hw_multisda_bsp.h"
+static const embot::hw::multisda::PROP& props = embot::hw::multisda::getBSP().prop;
 
 
 

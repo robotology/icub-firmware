@@ -22,20 +22,29 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_si705x.h"
-#include "stm32hal.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_pga308_bsp.h"
+
 #include <cstring>
 #include <vector>
-
-using namespace std;
-
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_hw_sys.h"
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
+
+using namespace embot::hw;
 
 
 extern DMA_HandleTypeDef hdma_i2c1_tx;

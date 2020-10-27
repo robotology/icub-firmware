@@ -95,9 +95,6 @@ int main(void)
 // - here is the tailoring of the board.
 
 
-
-#include "embot_hw_bsp_rfe.h"
-
 #include "embot_os_theScheduler.h"
 #include "embot_app_theLEDmanager.h"
 #include "embot_app_application_theCANparserBasic.h"
@@ -110,6 +107,13 @@ int main(void)
 #include "faceExpressionsModule.h"
 
 #include "embot_app_application_theCANtracer.h"
+
+namespace embot { namespace hw { namespace bsp { namespace rfe {    
+    const embot::hw::LED ledBLUE = embot::hw::LED::one;    
+    const embot::hw::i2c::Descriptor descrI2Cone = embot::hw::i2c::Descriptor(embot::hw::I2C::one, 400000);    
+    const embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
+    const embot::hw::bno055::Config imuBOSCHconfig = embot::hw::bno055::Config(descrI2Cone);        
+}}}} // namespace embot { namespace hw { namespace bsp { namespace rfe {
 
 
 constexpr embot::os::Event evRXusbmessage = 0x00000001 << 1;

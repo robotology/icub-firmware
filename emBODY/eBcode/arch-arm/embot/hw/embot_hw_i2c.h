@@ -70,10 +70,8 @@ namespace embot { namespace hw { namespace i2c {
     };
 
     
-    bool supported(embot::hw::I2C b);
-    
-    bool initialised(embot::hw::I2C b);
-    
+    bool supported(embot::hw::I2C b);    
+    bool initialised(embot::hw::I2C b);    
     result_t init(embot::hw::I2C b, const Config &config);
     
     

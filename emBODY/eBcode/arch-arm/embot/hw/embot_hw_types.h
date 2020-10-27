@@ -18,12 +18,16 @@
 
 namespace embot { namespace hw {
     
+    // the result type
+    
     enum class result_t : std::int8_t { OK = 0, NOK = -1, NOKtimeout = -2 };
     
-    const result_t resOK            = result_t::OK;
-    const result_t resNOK           = result_t::NOK;
-    const result_t resNOKtimeout    = result_t::NOKtimeout;
+    constexpr result_t resOK            = result_t::OK;
+    constexpr result_t resNOK           = result_t::NOK;
+    constexpr result_t resNOKtimeout    = result_t::NOKtimeout;
     
+    
+    // list of IDs for peripherals, drivers, ...
     
     enum class CLOCK : std::uint8_t { syscore = 0, pclk1 = 1, pclk2 = 2, none = 31, maxnumberof = 3 };
     
@@ -56,7 +60,9 @@ namespace embot { namespace hw {
     enum class ADS122C04 : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };
     
     enum class AD7147 : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
-    
+  
+  
+    // definition of more complex data structures
     
     struct GPIO
     { 
@@ -64,8 +70,8 @@ namespace embot { namespace hw {
         enum class PIN : std::uint8_t { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, eight = 8, nine = 9, 
                                         ten = 10, eleven = 11, twelve = 12, thirteen = 13, fourteen = 14, fifteen = 15, none = 31, maxnumberof = 16 };
             
-        PORT    port;
-        PIN     pin;
+        PORT port {PORT::none};
+        PIN pin {PIN::none};
         
         constexpr GPIO(PORT po, PIN pi) : port(po), pin(pi) {}
         constexpr GPIO() : port(PORT::none), pin(PIN::none) {}            
@@ -75,27 +81,23 @@ namespace embot { namespace hw {
     
     struct Partition
     {
-        std::uint32_t   address;
-        std::uint32_t   maxsize; 
-        std::uint32_t   pagesize; 
+        std::uint32_t   address {0};
+        std::uint32_t   maxsize {0}; 
+        std::uint32_t   pagesize {0}; 
+        constexpr Partition() = default;
+        constexpr Partition(uint32_t a, uint32_t m, uint32_t p) : address(a), maxsize(m), pagesize(p) {}
         bool isvalid() const { if((0 == address) || (0 == maxsize) || (0 == pagesize)) { return false; } else { return true; } }
     }; 
+        
+        
     
-}} // namespace embot { namespace hw {
-
-
-
-namespace embot { namespace hw {
-    
-    
+    // REG<> is a template type for modeling a register of a given size and with a given number of fields
+    // rTyp is one of regXXtype below, nFld is the number of fields 
+    // for 8-bit register w/ 3 fields use:
+    // REG<reg08type, 3>    
     using reg08type = uint8_t;
     using reg16type = uint8_t;
     using reg32type = uint32_t;
-    
-    
-    // rTyp is one of regXXtype above, nFld is the number of fields 
-    // for 8-bit register w/ 3 fields use:
-    // REG<reg08type, 3>
     template<typename rTyp, uint8_t nFld>
     struct REG
     {        
@@ -196,13 +198,9 @@ namespace embot { namespace hw {
         reg08type get(const FIELD tag) { return getfield(embot::core::tointegral(tag)); }
     };
     #endif
-    
-    
-    
-    
+      
 
 }} // namespace embot { namespace hw {
-
 
 
 

@@ -29,12 +29,10 @@
 
 namespace embot { namespace hw { namespace led {
         
-//    enum class LED : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 31, maxnumberof = 8 };
-
     bool supported(embot::hw::LED led);    
-    bool initialised(embot::hw::LED led);
-        
+    bool initialised(embot::hw::LED led);        
     result_t init(embot::hw::LED led);
+    
     result_t on(embot::hw::LED led);
     result_t off(embot::hw::LED led);
     result_t toggle(embot::hw::LED led);        

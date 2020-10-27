@@ -49,7 +49,7 @@
 #include "embot_core.h"
 
 #include "embot_hw_bno055.h"
-#include "embot_hw_bsp_strain2.h"
+//#include "embot_hw_bsp_strain2.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------

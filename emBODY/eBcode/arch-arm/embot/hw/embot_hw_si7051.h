@@ -43,10 +43,8 @@ namespace embot { namespace hw { namespace si7051 {
     
     using Temperature = std::int16_t; // in 0.1 Celsius Degrees
             
-    bool supported(embot::hw::SI7051 s);
-    
-    bool initialised(embot::hw::SI7051 s);
-    
+    bool supported(embot::hw::SI7051 s);    
+    bool initialised(embot::hw::SI7051 s);    
     result_t init(embot::hw::SI7051 s, const Config &config);
         
     

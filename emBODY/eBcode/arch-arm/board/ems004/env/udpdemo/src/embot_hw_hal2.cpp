@@ -4,17 +4,49 @@
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
-
-
-
 // ------------------------------------------------------------------------------------------------------------------
 // - minimal 
 // - embot::hw
 // -------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw.h"
+#include "embot_hw_bsp.h"
 
-void embot::hw::bsp::init() {}
+#include "stm32hal.h"
+
+#include "hal_trace.h"
+
+namespace embot { namespace hw { namespace bsp {
+    
+    bool specialize() { return true; }
+    
+    static uint32_t _get1millitick()
+    {
+        return embot::core::now() / 1000;        
+    }
+    
+    bool init(const embot::hw::Config &config)
+    {          
+        // init the chosen hal
+        stm32hal_config_t cfg = {0};
+        cfg.tick1ms_init = config.initmicrotime;
+        cfg.tick1ms_get = _get1millitick;       
+        stm32hal_init(&cfg);
+        
+        // perform further initialization defined board by board        
+        specialize();
+
+        return true;
+    }
+    
+   
+    
+    int print(const std::string &str)
+    {
+        return hal_trace_puts(str.c_str());
+    }    
+
+}}}
     
 
 // ------------------------------------------------------------------------------------------------------------------

@@ -22,21 +22,28 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_gpio.h"
-#include "embot_hw_bsp_config.h"
-#include "stm32hal.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_gpio_bsp.h"
+
 #include <cstring>
 #include <vector>
+#include <math.h>
+#include "embot_core_binary.h"
+
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
+
 
 using namespace std;
-
-#include "embot_hw_bsp.h"
-#include "embot_hw_bsp_config.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -69,10 +76,10 @@ namespace embot { namespace hw { namespace gpio {
 
 namespace embot { namespace hw { namespace gpio {
     
-    result_t _configure(const embot::hw::bsp::gpio::PROP &g, Mode m, Pull p, Speed s);    
-    result_t _set(const embot::hw::bsp::gpio::PROP &g, State s);
-    result_t _toggle(const embot::hw::bsp::gpio::PROP &g);    
-    State _get(const embot::hw::bsp::gpio::PROP &g);
+    result_t _configure(const embot::hw::gpio::PROP &g, Mode m, Pull p, Speed s);    
+    result_t _set(const embot::hw::gpio::PROP &g, State s);
+    result_t _toggle(const embot::hw::gpio::PROP &g);    
+    State _get(const embot::hw::gpio::PROP &g);
     
     
     // initialised mask. there must be one for each of PORT::maxnumberof     
@@ -81,7 +88,7 @@ namespace embot { namespace hw { namespace gpio {
 
     bool supported(GPIO &g)
     {
-        return embot::hw::bsp::gpio::getBSP().supported(g);
+        return embot::hw::gpio::getBSP().supported(g);
     }
     
     bool initialised(GPIO &g)
@@ -97,7 +104,7 @@ namespace embot { namespace hw { namespace gpio {
 
     result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s)
     {        
-        embot::hw::bsp::gpio::PROP gg = embot::hw::bsp::gpio::getBSP().getPROP(g);    
+        embot::hw::gpio::PROP gg = embot::hw::gpio::getBSP().getPROP(g);    
         if(!gg.isvalid())
         {
             return resNOK;
@@ -108,7 +115,7 @@ namespace embot { namespace hw { namespace gpio {
     
     result_t set(const embot::hw::GPIO &g, State s)
     {
-        embot::hw::bsp::gpio::PROP gg = embot::hw::bsp::gpio::getBSP().getPROP(g);
+        embot::hw::gpio::PROP gg = embot::hw::gpio::getBSP().getPROP(g);
         if(!gg.isvalid())
         {
             return resNOK;
@@ -119,7 +126,7 @@ namespace embot { namespace hw { namespace gpio {
     
     result_t toggle(const embot::hw::GPIO &g)
     {
-        embot::hw::bsp::gpio::PROP gg = embot::hw::bsp::gpio::getBSP().getPROP(g);
+        embot::hw::gpio::PROP gg = embot::hw::gpio::getBSP().getPROP(g);
         if(!gg.isvalid())
         {
             return resNOK;
@@ -130,7 +137,7 @@ namespace embot { namespace hw { namespace gpio {
     
     State get(const embot::hw::GPIO &g)
     {
-        embot::hw::bsp::gpio::PROP gg = embot::hw::bsp::gpio::getBSP().getPROP(g);
+        embot::hw::gpio::PROP gg = embot::hw::gpio::getBSP().getPROP(g);
         if(!gg.isvalid())
         {
             return State::RESET;
@@ -169,7 +176,7 @@ namespace embot { namespace hw { namespace gpio {
     }
         
    
-    result_t _configure(const embot::hw::bsp::gpio::PROP &g, Mode m, Pull p, Speed s)
+    result_t _configure(const embot::hw::gpio::PROP &g, Mode m, Pull p, Speed s)
     {
         // caveat: for pins HAL_GPIO_* use u16, and all macros are u16, whereas LL_GPIO_* use u32 
         if(m == Mode::OUTPUTopendrain)
@@ -207,19 +214,19 @@ namespace embot { namespace hw { namespace gpio {
         return resOK;
     }  
     
-    result_t _set(const embot::hw::bsp::gpio::PROP &g, State s)
+    result_t _set(const embot::hw::gpio::PROP &g, State s)
     {
         HAL_GPIO_WritePin(g.stmport, g.stmpin, static_cast<GPIO_PinState>(s));    
         return resOK;        
     }
     
-    result_t _toggle(const embot::hw::bsp::gpio::PROP &g)
+    result_t _toggle(const embot::hw::gpio::PROP &g)
     {
         HAL_GPIO_TogglePin(g.stmport, g.stmpin);    
         return resOK;        
     }
     
-    State _get(const embot::hw::bsp::gpio::PROP &g)
+    State _get(const embot::hw::gpio::PROP &g)
     {
         GPIO_PinState s = HAL_GPIO_ReadPin(g.stmport, g.stmpin);            
         return static_cast<State>(s);        

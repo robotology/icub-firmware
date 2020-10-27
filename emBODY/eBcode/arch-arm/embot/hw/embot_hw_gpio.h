@@ -68,10 +68,8 @@ namespace embot { namespace hw { namespace gpio {
         constexpr Config(Mode m, Pull p, Speed s) : mode(m), pull(p), speed(s) {}
     };
     
-    bool supported(const embot::hw::GPIO &g);
-    
-    bool initialised(const embot::hw::GPIO g);
-    
+    bool supported(const embot::hw::GPIO &g);    
+    bool initialised(const embot::hw::GPIO g);    
     result_t init(embot::hw::GPIO &g, const Config &config);
     
     result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s);

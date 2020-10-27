@@ -27,18 +27,22 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#include "embot_hw_bsp_config.h"
+#include "embot_hw_pga308_bsp.h"
+
 #include <cstring>
 #include <vector>
-
-using namespace std;
-
 #include "embot_core_binary.h"
-#include "stm32hal.h"
-#include "embot_core.h"
-#include "embot_hw.h"
-#include "embot_hw_bsp.h"
 #include "embot_hw_sys.h"
-#include "embot_hw_bsp_config.h"
+
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
+#else
+    #warning this implementation is only for stm32hal
+#endif
+
+using namespace embot::hw;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -56,15 +60,14 @@ namespace embot { namespace hw { namespace pga308 {
 
     bool supported(PGA308 a)                                                                         { return false; }
     bool initialised(PGA308 a)                                                                       { return false; }
-    result_t init(PGA308 a, const Config &config)                                                    { return resNOK; }
+    result_t init(PGA308 a, const Config &config)                                                    { return resNOK; }    
     
-    
-    result_t result_t set(PGA308 a, const TransferFunctionConfig &tfconfig)                          { return resNOK; }
+    result_t set(PGA308 a, const TransferFunctionConfig &tfconfig)                                   { return resNOK; }
     result_t set(PGA308 a, const TransferFunctionConfig::Parameter par, const std::uint16_t value)   { return resNOK; }   
     result_t get(PGA308 a, TransferFunctionConfig &tfconfig)                                         { return resNOK; }
     
     result_t set(PGA308 a, const RegisterAddress address, const std::uint16_t value)                 { return resNOK; }
-    result_t get(PGA308 a, const RegisterAddress address, std::uint16_t &value)                      { return false; }
+    result_t get(PGA308 a, const RegisterAddress address, std::uint16_t &value)                      { return resNOK; }
 
 }}} // namespace embot { namespace hw { namespace pga308 {
 
@@ -77,7 +80,7 @@ namespace embot { namespace hw { namespace pga308 {
            
     bool supported(PGA308 a)
     {
-        return embot::hw::bsp::pga308::getBSP().supported(a);
+        return embot::hw::pga308::getBSP().supported(a);
     }
     
     bool initialised(PGA308 a)
@@ -155,7 +158,7 @@ namespace embot { namespace hw { namespace pga308 {
         }
         
         // init chip
-        embot::hw::bsp::pga308::getBSP().init(a);     
+        embot::hw::pga308::getBSP().init(a);     
         
         s_privatedata.config[embot::core::tointegral(a)] = config;
                         

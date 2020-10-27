@@ -51,10 +51,8 @@ namespace embot { namespace hw { namespace can {
         Config() = default;
     };
     
-    bool supported(embot::hw::CAN p);
-    
-    bool initialised(embot::hw::CAN p);
-    
+    bool supported(embot::hw::CAN p);   
+    bool initialised(embot::hw::CAN p);    
     result_t init(embot::hw::CAN p, const Config &config);
     
     result_t enable(embot::hw::CAN p);

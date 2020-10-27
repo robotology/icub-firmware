@@ -57,10 +57,8 @@ namespace embot { namespace hw { namespace onewire {
         }
     };
     
-    bool supported(embot::hw::ONEWIRE c);
-    
-    bool initialised(embot::hw::ONEWIRE c);
-    
+    bool supported(embot::hw::ONEWIRE c);    
+    bool initialised(embot::hw::ONEWIRE c);   
     result_t init(embot::hw::ONEWIRE c, const Config &config);
     
     bool isrunning(embot::hw::ONEWIRE c);
