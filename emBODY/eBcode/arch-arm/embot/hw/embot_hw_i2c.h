@@ -63,9 +63,10 @@ namespace embot { namespace hw { namespace i2c {
     {
         embot::hw::I2C bus {embot::hw::I2C::none};
         Config config {Speed::none};
+        ADR adr {0};
         constexpr Descriptor() = default;
-        constexpr Descriptor(embot::hw::I2C b, std::uint32_t s) : bus(b), config(s) {}
-        constexpr Descriptor(embot::hw::I2C b, Speed s) : bus(b), config(s) {} 
+        constexpr Descriptor(embot::hw::I2C b, std::uint32_t s, ADR a = 0) : bus(b), config(s), adr{a} {}
+        constexpr Descriptor(embot::hw::I2C b, Speed s, ADR a = 0) : bus(b), config(s), adr(a) {}
         constexpr bool isvalid() const { return (embot::hw::I2C::none != bus) && (0 != config.speed); }              
     };
 

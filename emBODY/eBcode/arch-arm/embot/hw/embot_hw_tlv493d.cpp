@@ -47,6 +47,37 @@
 #define PII 3.14159265
 
 
+#if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+#include "embot_os_theCallbackManager.h"
+#include "embot_os_Timer.h"
+
+namespace embot { namespace hw { namespace tlv493d {
+std::array<embot::os::Timer*, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> emulatedMODE_timers4callback {nullptr}; 
+constexpr uint32_t emulatedMODE_maskofUNresponsivesensors = 0;  // every sensor is responsive
+//constexpr uint32_t emulatedMODE_maskofUNresponsivesensors =  
+//    embot::core::binary::mask::pos2mask<uint32_t>(embot::hw::TLV493D::one);
+//constexpr uint32_t emulatedMODE_maskofUNresponsivesensors =  
+//    embot::core::binary::mask::pos2mask<uint32_t>(embot::hw::TLV493D::two) | 
+//    embot::core::binary::mask::pos2mask<uint32_t>(embot::hw::TLV493D::six);
+
+Position emulatedMODE_getposition(TLV493D h)
+{
+    static std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> pos {0, 1000, 2000, 3000, 4000, 5000}; 
+    if(false == supported(h))
+    {
+        return 0;        
+    }
+    
+    Position p = pos[embot::core::tointegral(h)];
+    pos[embot::core::tointegral(h)] += 100;
+    if(pos[embot::core::tointegral(h)] >= 36000) pos[embot::core::tointegral(h)] = 0;
+    return p;
+}
+
+}}}
+
+#endif
+
 using namespace embot::hw;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -188,11 +219,13 @@ namespace embot { namespace hw { namespace tlv493d {
     struct Acquisition
     {
         static constexpr std::uint8_t rxdatasize = 8;
+        TLV493D id;
         volatile bool done;
         volatile bool ongoing;
         Position position;
         RegisterMap registermap;;
-        embot::core::Callback userdefCBK;  
+        embot::core::Callback userdefCBK;
+        void init(TLV493D _id) { clear(); id = _id; }        
         void clear() { done = false; ongoing = false; position = 0; std::memset(registermap.readmemory, 0, sizeof(registermap.readmemory)); userdefCBK.clear(); }         
     };
     
@@ -230,6 +263,9 @@ namespace embot { namespace hw { namespace tlv493d {
         volatile double an12atan2 = atan2(Yv, Xv) * tocentdeg + 18000.0;
 
         acq->position = static_cast<Position>(an12atan2);
+#if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+        acq->position = emulatedMODE_getposition(acq->id);
+#endif        
         acq->ongoing = false;
         acq->done = true;
         
@@ -248,27 +284,33 @@ namespace embot { namespace hw { namespace tlv493d {
             return resOK;
         }
         
-        // init peripheral
-        embot::hw::tlv493d::getBSP().init(h);
         
         std::uint8_t index = embot::core::tointegral(h);
-                
+        
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)        
+        // init peripheral
+        embot::hw::tlv493d::getBSP().init(h);                             
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-           
+#endif 
+        
         // load config etc
         s_privatedata.i2caddress[index] = embot::hw::tlv493d::getBSP().getPROP(h)->i2caddress;
         s_privatedata.config[index] = config;
-        s_privatedata.acquisition[index].clear();
-                        
+        s_privatedata.acquisition[index].init(h);
+
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)          
         // sensor init
         if(resOK != s_sensor_init(h))
         {
             return resNOK;
         }            
-        
-        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(h));
-                
+#else
+        // we emulate the sensor action with a timer which executes the callback
+        emulatedMODE_timers4callback[embot::core::tointegral(h)] = new embot::os::Timer;  
+#endif
+
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(h));                
         return resOK;
     }
 
@@ -298,7 +340,10 @@ namespace embot { namespace hw { namespace tlv493d {
         {
             return false;
         }
-        
+
+#if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)             
+        return true;
+#endif         
         return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
     }    
     
@@ -314,14 +359,24 @@ namespace embot { namespace hw { namespace tlv493d {
         s_privatedata.acquisition[index].clear();
         s_privatedata.acquisition[index].ongoing = true;
         s_privatedata.acquisition[index].done = false;
-        s_privatedata.acquisition[index].userdefCBK = oncompletion;
+        s_privatedata.acquisition[index].userdefCBK = oncompletion;              
         
         // ok, now i trigger i2c.
         embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::core::Data data = embot::core::Data(&s_privatedata.acquisition[index].registermap.readmemory[0], sizeof(s_privatedata.acquisition[index].registermap.readmemory));
-        //embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerToRead, data, cbk);
-        embot::hw::i2c::receive(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], data, cbk);
-                
+#if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+        // we config the timer to execute the callback only if the sensor is responsive
+        if(false == embot::core::binary::bit::check(emulatedMODE_maskofUNresponsivesensors, embot::core::tointegral(h)))
+        {
+            emulatedMODE_timers4callback[index]->stop();
+            embot::os::Action act { embot::os::CallbackToThread(cbk, embot::os::theCallbackManager::getInstance().thread()) };
+            embot::os::Timer::Config tcfg(1*embot::core::time1millisec, act, embot::os::Timer::Mode::oneshot);
+            emulatedMODE_timers4callback[index]->start(tcfg);
+            //cbk.execute();            
+        }     
+        return resOK;
+#endif         
+        embot::hw::i2c::receive(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], data, cbk);                
         return resOK;
     }
     
@@ -331,6 +386,9 @@ namespace embot { namespace hw { namespace tlv493d {
         {
             return false;
         } 
+#if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+        return true;
+#endif        
         std::uint8_t index = embot::core::tointegral(h);
         return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
     }
