@@ -719,16 +719,36 @@ namespace embot { namespace hw { namespace tlv493d {
            
     #if defined(STM32HAL_BOARD_PMC)
     
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
     constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC }; 
-    constexpr PROP prop04 { .i2cbus = embot::hw::I2C::two, .i2caddress = 0xBC }; 
-
-    constexpr BSP thebsp {        
+    constexpr PROP prop04 { .i2cbus = embot::hw::I2C::two, .i2caddress = 0xBC };    
+    #else
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC };
+    constexpr PROP prop02fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x02 };
+    constexpr PROP prop03fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x03 };
+    constexpr PROP prop04fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x04 };
+    constexpr PROP prop05fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x05 };
+    constexpr PROP prop06fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x06 };  
+#endif
+    
+    
+    constexpr BSP thebsp {     
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
         // maskofsupported
         mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::four),        
         // properties
         {{
             &prop01, nullptr, nullptr, &prop04, nullptr, nullptr
-        }}        
+        }}
+#else
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TLV493D::one) |  mask::pos2mask<uint32_t>(TLV493D::two) |  mask::pos2mask<uint32_t>(TLV493D::three) |
+        mask::pos2mask<uint32_t>(TLV493D::four) |  mask::pos2mask<uint32_t>(TLV493D::five) |  mask::pos2mask<uint32_t>(TLV493D::six),        
+        // properties
+        {{
+            &prop01, &prop02fake, &prop03fake, &prop04fake, &prop05fake, &prop06fake 
+        }}
+#endif        
     };
     
     void BSP::init(embot::hw::TLV493D h) const {}
