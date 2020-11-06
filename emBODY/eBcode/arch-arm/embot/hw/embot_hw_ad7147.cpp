@@ -218,13 +218,13 @@ namespace embot { namespace hw { namespace ad7147 {
         }   
     }
     
-    
+    constexpr uint16_t conval = 0x2200; // in mtb4 the default is 0x2200. in other places is used 0x2000
     
     constexpr std::array<regContent, 8> st0 
     {
         regContent{0x080, 0xFFFE},
         regContent{0x081, 0x1FFF},
-        regContent{0x082, 0x2200},
+        regContent{0x082, conval},
         regContent{0x083, 0x2626},
         regContent{0x084, 50},
         regContent{0x085, 50},
@@ -236,7 +236,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x088, 0xFFFB},
         regContent{0x089, 0x1FFF},
-        regContent{0x08a, 0x2200},
+        regContent{0x08a, conval},
         regContent{0x08b, 0x2626},
         regContent{0x08c, 50},
         regContent{0x08d, 50},
@@ -248,7 +248,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x090, 0xFFEF},
         regContent{0x091, 0x1FFF},
-        regContent{0x092, 0x2200},
+        regContent{0x092, conval},
         regContent{0x093, 0x2626},
         regContent{0x094, 50},
         regContent{0x095, 50},
@@ -260,7 +260,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x098, 0xFFBF},
         regContent{0x099, 0x1FFF},
-        regContent{0x09a, 0x2200},
+        regContent{0x09a, conval},
         regContent{0x09b, 0x2626},
         regContent{0x09c, 50},
         regContent{0x09d, 50},
@@ -272,7 +272,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x0A0, 0xFEFF},
         regContent{0x0A1, 0x1FFF},
-        regContent{0x0A2, 0x2200},
+        regContent{0x0A2, conval},
         regContent{0x0A3, 0x2626},
         regContent{0x0A4, 50},
         regContent{0x0A5, 50},
@@ -284,7 +284,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x0A8, 0xFBFF},
         regContent{0x0A9, 0x1FFF},
-        regContent{0x0Aa, 0x2200},
+        regContent{0x0Aa, conval},
         regContent{0x0Ab, 0x2626},
         regContent{0x0Ac, 50},
         regContent{0x0Ad, 50},
@@ -296,7 +296,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x0B0, 0xEFFF},
         regContent{0x0B1, 0x1FFF},
-        regContent{0x0B2, 0x2200},
+        regContent{0x0B2, conval},
         regContent{0x0B3, 0x2626},
         regContent{0x0B4, 50},
         regContent{0x0B5, 50},
@@ -308,7 +308,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x0B8, 0xFFFF},
         regContent{0x0B9, 0x1FFE},
-        regContent{0x0Ba, 0x2200},
+        regContent{0x0Ba, conval},
         regContent{0x0Bb, 0x2626},
         regContent{0x0Bc, 50},
         regContent{0x0Bd, 50},
@@ -320,7 +320,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {   
         regContent{0x0C0, 0xFFFF},
         regContent{0x0C1, 0x1FFB},
-        regContent{0x0C2, 0x2200},
+        regContent{0x0C2, conval},
         regContent{0x0C3, 0x2626},
         regContent{0x0C4, 50},
         regContent{0x0C5, 50},
@@ -332,7 +332,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x0C8, 0xFFFF},
         regContent{0x0C9, 0x1FEF},
-        regContent{0x0Ca, 0x2200},
+        regContent{0x0Ca, conval},
         regContent{0x0Cb, 0x2626},
         regContent{0x0Cc, 50},
         regContent{0x0Cd, 50},
@@ -344,7 +344,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {   
         regContent{0x0D0, 0xFFFF},
         regContent{0x0D1, 0x1FBF},
-        regContent{0x0D2, 0x2200},
+        regContent{0x0D2, conval},
         regContent{0x0D3, 0x2626},
         regContent{0x0D4, 50},
         regContent{0x0D5, 50},
@@ -356,7 +356,7 @@ namespace embot { namespace hw { namespace ad7147 {
     {
         regContent{0x0D8, 0xFFFF},
         regContent{0x0D9, 0x1EFF},
-        regContent{0x0Da, 0x2200},
+        regContent{0x0Da, conval},
         regContent{0x0Db, 0x2626},
         regContent{0x0Dc, 50},
         regContent{0x0Dd, 50},
@@ -392,8 +392,7 @@ namespace embot { namespace hw { namespace ad7147 {
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
         
-        
-        uint16_t convalue[2] = {0x2200, 0x2200};
+       
         
 
            
