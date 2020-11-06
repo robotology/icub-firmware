@@ -92,6 +92,7 @@ namespace embot::app::skeleton::os::evthreadcan {
 
 } // namespace embot::app::skeleton::os::evthreadcan {
 
+void thrCAN(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
 
 namespace embot::app::skeleton::os::evthreadcan {
 
@@ -196,7 +197,7 @@ namespace embot::app::skeleton::os::evthreadcan {
         // create the main thread 
         embot::os::EventThread* thr = new embot::os::EventThread;          
         // and start it
-        thr->start(configEV);
+        thr->start(configEV, thrCAN);
         
         return thr;
     }
