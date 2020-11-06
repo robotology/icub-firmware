@@ -45,7 +45,9 @@ namespace embot { namespace app { namespace ctrl {
         tSNSR();
         ~tSNSR();    
         
-        bool start(const Config &config);
+        bool initialise(const Config &config);
+        
+        bool start();
         
         // the result of this call is that:
         // - the given sensor will be acquired somehow, 
@@ -56,6 +58,8 @@ namespace embot { namespace app { namespace ctrl {
         // the result of this call is that:
         // all what start() does is stopped
         bool stop(snsr s);
+        
+        embot::os::Thread * getThread();
         
     private:        
         struct Impl;

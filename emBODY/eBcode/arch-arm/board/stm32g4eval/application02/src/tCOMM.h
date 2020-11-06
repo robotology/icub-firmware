@@ -25,6 +25,9 @@ namespace embot { namespace app { namespace ctrl {
     
     constexpr embot::os::Event evtTXcanframe = embot::core::binary::mask::pos2mask<embot::os::Event>(1); 
     
+    constexpr embot::os::Event evtTRANSMITfaps = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
+
+    
     constexpr embot::core::relTime txTimeout {3*embot::core::time1millisec};
     
     
@@ -46,7 +49,7 @@ namespace embot { namespace app { namespace ctrl {
         // these are called by other threads
         bool add(const embot::prot::can::Frame &frame, const embot::core::relTime timeout = 3*embot::core::time1millisec);
         
-        bool trasmit();
+        bool trasmit();       
         
     private:
     
