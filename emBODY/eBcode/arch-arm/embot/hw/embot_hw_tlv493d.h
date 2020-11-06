@@ -32,12 +32,12 @@ namespace embot { namespace hw { namespace tlv493d {
          
         
     struct Config
-    {   // each sensor uses a separate channel of i2c communication and the same i2c address
-        embot::hw::i2c::Descriptor i2cdes; 
-        
-        constexpr Config(embot::hw::I2C b, std::uint32_t s) : i2cdes(b, s) {}        
-        constexpr Config() : i2cdes(embot::hw::I2C::one, 400000) {}
+    {   
+        embot::hw::i2c::Descriptor i2cdes { embot::hw::i2c::Descriptor{embot::hw::I2C::none, embot::hw::i2c::Speed::none, 0} };        
+        constexpr Config() = default;
+        constexpr Config(embot::hw::I2C b, std::uint32_t s, embot::hw::i2c::ADR a = 0) : i2cdes(b, s, a) {} 
         constexpr Config(const embot::hw::i2c::Descriptor &des) : i2cdes(des) {}
+        constexpr bool isvalid() const { return i2cdes.isvalid(); }
     };
     
     
