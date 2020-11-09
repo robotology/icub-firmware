@@ -218,7 +218,7 @@ namespace embot { namespace hw { namespace ad7147 {
         }   
     }
     
-    constexpr uint16_t conval = 0x2200; // in mtb4 the default is 0x2200. in other places is used 0x2000
+    constexpr uint16_t conval = 0x2000; // in mtb4 the default is 0x2200. in other places is used 0x2000
     
     constexpr std::array<regContent, 8> st0 
     {

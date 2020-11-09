@@ -76,6 +76,7 @@
 #undef macro_enablePERIODICtransmit
 // if enabled the tx trigger evtDATAtransmit comes (also) from the exti trigger
 #undef macro_enableEXTItransmit
+#undef macro_enableEXTItransmitBLUEbutton
 // if defined we print values on the trace port
 #undef  macro_enableTRACE
 // the following specifies what to print
@@ -96,6 +97,7 @@
     #undef  macro_enableSERIAL_string
     // the tx is activated by external trigger only
     #define macro_enableEXTItransmit
+    #undef macro_enableEXTItransmitBLUEbutton
     #undef  macro_enableCYCLEtransmit
     #undef  macro_enablePERIODICtransmit
     #undef macro_enableSLOWtxperiod
@@ -226,11 +228,6 @@ constexpr embot::core::relTime acquisitionPeriod = 10*embot::core::time1millisec
 #endif
 
 
-constexpr embot::hw::BTN buttonBLUE = embot::hw::BTN::one;
-constexpr embot::hw::BTN buttonPB8 = embot::hw::BTN::two;
-    
-constexpr embot::hw::BTN buttonTX = buttonBLUE; //buttonPB8; // but later on: buttonPB8 ore buttonBLUE
-
 embot::tools::Histogram *histoIMU {nullptr};
 //embot::tools::Histogram *histoUSART {nullptr};
 void txrequest(void *p)
@@ -266,6 +263,17 @@ void tMAIN_startup(embot::os::Thread *t, void *param)
 
 #if defined(macro_enableEXTItransmit)
     // init the ext interrupt button
+    
+    constexpr embot::hw::BTN buttonBLUE = embot::hw::BTN::one;
+    constexpr embot::hw::BTN buttonPB8 = embot::hw::BTN::two;
+
+    // value can be: buttonPB8 ore buttonBLUE
+#if defined(macro_enableEXTItransmitBLUEbutton)
+    constexpr embot::hw::BTN buttonTX = buttonBLUE; 
+#else
+    constexpr embot::hw::BTN buttonTX = buttonPB8; 
+#endif
+        
     embot::hw::button::init(buttonTX, {embot::hw::button::Mode::TriggeredOnRelease, {txrequest, t}, 0});
 #endif
     
