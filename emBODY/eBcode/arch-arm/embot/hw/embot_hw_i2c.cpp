@@ -159,6 +159,30 @@ namespace embot { namespace hw { namespace i2c {
                 
         return resOK;
     }
+           
+    
+    bool discover(embot::hw::I2C b, std::vector<ADR> &adrs)
+    {
+        if(false == initialised(b))
+        {
+            return false;    
+        }
+                      
+        adrs.clear();
+        
+        static const uint8_t start = 2;
+        for(int i=start; i<256; i++)
+        {
+            if((i%2) == 1) { continue; }
+            
+            if(true == ping(b, i, 3*embot::core::time1millisec))
+            {
+                adrs.push_back(i);
+            }
+        } 
+
+        return !adrs.empty();        
+    }
     
     
     // -

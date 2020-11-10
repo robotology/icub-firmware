@@ -75,6 +75,8 @@ namespace embot { namespace hw { namespace i2c {
     bool initialised(embot::hw::I2C b);    
     result_t init(embot::hw::I2C b, const Config &config);
     
+    // discovers all chips on the bus. if any, it returns true and fills the vector
+    bool discover(embot::hw::I2C b, std::vector<ADR> &adrs);
     
     // read() and write() operate on a register of the chip.
     // transmit() and receive() operate on the chip without specifying a given register
