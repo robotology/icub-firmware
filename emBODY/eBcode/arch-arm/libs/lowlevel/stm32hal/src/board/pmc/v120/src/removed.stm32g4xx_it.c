@@ -373,6 +373,20 @@ void TIM2_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles I2C1 event interrupt / I2C1 wake-up interrupt through EXTI line 23.
+  */
+void I2C1_EV_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C1_EV_IRQn 0 */
+
+  /* USER CODE END I2C1_EV_IRQn 0 */
+  HAL_I2C_EV_IRQHandler(&hi2c1);
+  /* USER CODE BEGIN I2C1_EV_IRQn 1 */
+
+  /* USER CODE END I2C1_EV_IRQn 1 */
+}
+
+/**
   * @brief This function handles I2C1 error interrupt.
   */
 void I2C1_ER_IRQHandler(void)
@@ -384,6 +398,20 @@ void I2C1_ER_IRQHandler(void)
   /* USER CODE BEGIN I2C1_ER_IRQn 1 */
 
   /* USER CODE END I2C1_ER_IRQn 1 */
+}
+
+/**
+  * @brief This function handles I2C2 event interrupt / I2C2 wake-up interrupt through EXTI line 24.
+  */
+void I2C2_EV_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C2_EV_IRQn 0 */
+
+  /* USER CODE END I2C2_EV_IRQn 0 */
+  HAL_I2C_EV_IRQHandler(&hi2c2);
+  /* USER CODE BEGIN I2C2_EV_IRQn 1 */
+
+  /* USER CODE END I2C2_EV_IRQn 1 */
 }
 
 /**
@@ -473,6 +501,20 @@ void COMP1_2_3_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles I2C4 event interrupt / I2C4 wake-up interrupt through EXTI line 42.
+  */
+void I2C4_EV_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C4_EV_IRQn 0 */
+
+  /* USER CODE END I2C4_EV_IRQn 0 */
+  HAL_I2C_EV_IRQHandler(&hi2c4);
+  /* USER CODE BEGIN I2C4_EV_IRQn 1 */
+
+  /* USER CODE END I2C4_EV_IRQn 1 */
+}
+
+/**
   * @brief This function handles I2C4 error interrupt.
   */
 void I2C4_ER_IRQHandler(void)
@@ -484,6 +526,20 @@ void I2C4_ER_IRQHandler(void)
   /* USER CODE BEGIN I2C4_ER_IRQn 1 */
 
   /* USER CODE END I2C4_ER_IRQn 1 */
+}
+
+/**
+  * @brief This function handles I2C3 event interrupt / I2C3 wake-up interrupt through EXTI line 27.
+  */
+void I2C3_EV_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C3_EV_IRQn 0 */
+
+  /* USER CODE END I2C3_EV_IRQn 0 */
+  HAL_I2C_EV_IRQHandler(&hi2c3);
+  /* USER CODE BEGIN I2C3_EV_IRQn 1 */
+
+  /* USER CODE END I2C3_EV_IRQn 1 */
 }
 
 /**

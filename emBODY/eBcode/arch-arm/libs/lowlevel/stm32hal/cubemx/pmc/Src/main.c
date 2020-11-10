@@ -34,6 +34,12 @@
 #include "usb.h"
 #include "gpio.h"
 
+#define TEST_TLV
+
+#if defined(TEST_TLV)
+#include "test_tlv.h"
+#endif
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -96,6 +102,12 @@ int main(void)
 
   /* USER CODE END SysInit */
 
+#if defined(TEST_TLV)  
+
+    test_tlv_init();
+    for(;;);
+
+#else
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
@@ -133,6 +145,8 @@ int main(void)
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+  
+  #endif
 }
 
 /**
