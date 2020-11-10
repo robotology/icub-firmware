@@ -19,14 +19,14 @@
 
 #if   defined(STM32HAL_BOARD_PMC)
 
-    #undef  EMBOT_ENABLE_hw_bsp_specialize
+    #define  EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_flash
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_can
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_tlv493d
-    #define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
+    //#define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
     //#define EMBOT_ENABLE_hw_button
         
 #else

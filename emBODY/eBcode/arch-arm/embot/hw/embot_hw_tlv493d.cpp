@@ -47,6 +47,7 @@
 #define PII 3.14159265
 
 
+
 #if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
 #include "embot_os_theCallbackManager.h"
 #include "embot_os_Timer.h"
@@ -510,6 +511,12 @@ namespace embot { namespace hw { namespace tlv493d {
 #endif // tests        
     }
     
+
+//#define embot_hw_tlv493d_discover
+#if defined(embot_hw_tlv493d_discover)
+    static std::vector<embot::hw::i2c::ADR> addresses;    
+    volatile bool ff {false};
+#endif
     
     result_t s_sensor_init(TLV493D h)
     {
@@ -528,6 +535,11 @@ namespace embot { namespace hw { namespace tlv493d {
         // 1.a make sure the chip has a good address in the bus         
         if(false == embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], 3*embot::core::time1millisec))
         {
+            #if defined(embot_hw_tlv493d_discover)
+            // discover the boards
+            ff = embot::hw::i2c::discover(s_privatedata.config[index].i2cdes.bus, addresses);
+            ff = ff;
+            #endif
             return resNOK;
         }
                        

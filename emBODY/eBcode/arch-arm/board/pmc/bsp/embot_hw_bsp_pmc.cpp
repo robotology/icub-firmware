@@ -48,7 +48,18 @@ using namespace embot::core::binary;
 #if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
 bool embot::hw::bsp::specialize() { return true; }
 #else   
-bool embot::hw::bsp::specialize() { return true; }
+bool embot::hw::bsp::specialize() 
+{ 
+
+    // power off the J13 and U27
+    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
+    HAL_Delay(10);
+    
+//    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_SET);
+//    HAL_Delay(10);
+
+    return true; 
+}
 #endif  //EMBOT_ENABLE_hw_bsp_specialize
 
 
@@ -582,6 +593,9 @@ namespace embot { namespace hw { namespace i2c {
 
 #if defined(STM32HAL_BOARD_PMC)
 
+extern "C"
+{
+
 void I2C1_EV_IRQHandler(void)
 {
     HAL_I2C_EV_IRQHandler(&hi2c1);
@@ -663,6 +677,7 @@ void DMA2_Channel3_IRQHandler(void)
   HAL_DMA_IRQHandler(&hdma_i2c4_tx);
 }
 
+}
 
 #endif // irq handlers
 
@@ -720,8 +735,15 @@ namespace embot { namespace hw { namespace tlv493d {
     #if defined(STM32HAL_BOARD_PMC)
     
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
-    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC }; 
-    constexpr PROP prop04 { .i2cbus = embot::hw::I2C::two, .i2caddress = 0xBC };    
+//    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC }; 
+//    constexpr PROP prop04 { .i2cbus = embot::hw::I2C::two, .i2caddress = 0xBC };    
+    
+    constexpr PROP propJ4 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E };
+    constexpr PROP propJ5 { .i2cbus = embot::hw::I2C::two, .i2caddress = 0x3E };
+    constexpr PROP propJ6 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x3E }; 
+    constexpr PROP propJ7 { .i2cbus = embot::hw::I2C::four, .i2caddress = 0x3E };  
+    constexpr PROP propJ13alone { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E };
+    constexpr PROP propU27alone { .i2cbus = embot::hw::I2C::two, .i2caddress = 0x3E };
     #else
     constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC };
     constexpr PROP prop02fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x02 };
@@ -735,10 +757,12 @@ namespace embot { namespace hw { namespace tlv493d {
     constexpr BSP thebsp {     
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
         // maskofsupported
-        mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::four),        
+        mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::two) |
+        mask::pos2mask<uint32_t>(TLV493D::three) | mask::pos2mask<uint32_t>(TLV493D::four) |
+        mask::pos2mask<uint32_t>(TLV493D::five) | mask::pos2mask<uint32_t>(TLV493D::six),        
         // properties
         {{
-            &prop01, nullptr, nullptr, &prop04, nullptr, nullptr
+            &propJ4, &propJ5, &propJ6, &propJ7, nullptr, &propU27alone
         }}
 #else
         // maskofsupported
