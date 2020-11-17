@@ -45,7 +45,7 @@ namespace embot { namespace app { namespace application {
             embot::os::Thread*          totask;
             Config() :  
                 sensor(embot::hw::BNO055::one), 
-                sensorconfig(embot::hw::bno055::Config(embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000))), 
+                sensorconfig({}), 
                 tickevent(0), datareadyevent(0), totask(nullptr) 
                 {}
             Config(embot::hw::BNO055 _s, const embot::hw::bno055::Config& _sc, embot::os::Event _te, embot::os::Event _de, embot::os::Thread* _ts) :     

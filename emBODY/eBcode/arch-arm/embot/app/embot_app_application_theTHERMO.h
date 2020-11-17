@@ -50,7 +50,7 @@ namespace embot { namespace app { namespace application {
             embot::os::Thread*           totask;
             Config() :  
                 sensor(embot::hw::SI7051::one), 
-                sensorconfig(embot::hw::si7051::Config(embot::hw::i2c::Descriptor(embot::hw::I2C::one, 400000))),  
+                sensorconfig({}),  
                 tickevent(0), datareadyevent(0), totask(nullptr) 
                 {}
             Config(embot::hw::SI7051 _s, const embot::hw::si7051::Config& _sc, embot::os::Event _te, embot::os::Event _de, embot::os::Thread* _ts) : 

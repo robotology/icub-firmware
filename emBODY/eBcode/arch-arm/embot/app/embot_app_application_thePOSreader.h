@@ -48,7 +48,7 @@ namespace embot { namespace app { namespace application {
         {
             embot::hw::TLV493D           id;
             embot::hw::tlv493d::Config   config; 
-            constexpr Sensor() : id(embot::hw::TLV493D::none), config(embot::hw::I2C::none, 0) {}
+            constexpr Sensor() : id(embot::hw::TLV493D::none), config(embot::hw::tlv493d::Config{embot::hw::tlv493d::Config::startupMODE::resetCHIP}) {}
             constexpr Sensor(embot::hw::TLV493D i, const embot::hw::tlv493d::Config& c) : id(i), config(c) {}
             // mettere altro costruttore etc
             constexpr bool isvalid() const { return true; }
