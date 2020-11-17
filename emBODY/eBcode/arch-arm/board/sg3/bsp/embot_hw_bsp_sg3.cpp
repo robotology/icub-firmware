@@ -83,7 +83,13 @@ namespace embot { namespace hw { namespace gpio {
         // ports
         {{
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, nullptr, nullptr, nullptr
-        }}
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, nullptr,
+            nullptr, nullptr
+        }} 
     };      
     #else
         #error embot::hw::gpio::thebsp must be defined
@@ -506,9 +512,9 @@ namespace embot { namespace hw { namespace i2c {
 namespace embot { namespace hw { namespace i2c {
                   
     #if   defined(STM32HAL_BOARD_SG3)
-    
-    constexpr PROP i2c1p { .handle = &hi2c1 }; //, .handledmatx = &hdma_i2c1_tx, .handledmarx = &hdma_i2c1_rx };
-    constexpr PROP i2c3p { .handle = &hi2c3 }; //, .handledmatx = &hdma_i2c3_tx, .handledmarx = &hdma_i2c3_rx };
+
+    constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::fast400 }; 
+    constexpr PROP i2c3p { &hi2c3, embot::hw::i2c::Speed::fast400 };     
         
     constexpr BSP thebsp {        
         // maskofsupported

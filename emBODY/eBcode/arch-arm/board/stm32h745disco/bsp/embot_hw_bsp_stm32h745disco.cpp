@@ -213,6 +213,12 @@ namespace embot { namespace hw { namespace gpio {
         // ports
         {{
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, [](){__HAL_RCC_GPIOF_CLK_ENABLE();},
+            [](){__HAL_RCC_GPIOG_CLK_ENABLE();}, [](){__HAL_RCC_GPIOH_CLK_ENABLE();}, [](){__HAL_RCC_GPIOI_CLK_ENABLE();},
+            [](){__HAL_RCC_GPIOJ_CLK_ENABLE();}, [](){__HAL_RCC_GPIOK_CLK_ENABLE();}
         }}
     };      
     #else
@@ -378,7 +384,7 @@ namespace embot { namespace hw { namespace button {
         
         void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
-             embot::hw::button::getBSP().onEXTI({nullptr, GPIO_Pin});            
+             embot::hw::button::getBSP().onEXTI({nullptr, GPIO_Pin, nullptr});            
         }        
     }
         
