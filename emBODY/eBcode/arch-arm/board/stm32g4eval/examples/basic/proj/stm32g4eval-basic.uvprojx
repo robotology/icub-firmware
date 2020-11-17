@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H743ZITx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.6.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.2.7.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) IROM2(0x08100000,0x00100000) XRAM(0x30000000,0x00048000) XRAM2(0x38000000,0x00010000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -399,28 +399,9 @@
               <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.nucleoh7.v180.lib</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.g4.stm32g4eval.v111.lib</FileName>
+              <FileName>stm32hal.g4.stm32g4eval.v120.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v111.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v120.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -555,7 +536,7 @@
       <TargetName>basic-stm32g4eval</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
+      <pCCUsed>6150000::V6.15::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -963,9 +944,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>stm32hal.g4.stm32g4eval.v111.lib</FileName>
+              <FileName>stm32hal.g4.stm32g4eval.v120.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v111.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v120.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1116,11 +1097,6 @@
     <Layers>
       <Layer>
         <LayName>&lt;Project Info&gt;</LayName>
-        <LayDesc></LayDesc>
-        <LayUrl></LayUrl>
-        <LayKeys></LayKeys>
-        <LayCat></LayCat>
-        <LayLic></LayLic>
         <LayTarg>0</LayTarg>
         <LayPrjMark>1</LayPrjMark>
       </Layer>

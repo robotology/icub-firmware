@@ -145,7 +145,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
         
         constexpr theFAPreader::Sensor s1 {
             embot::hw::TLV493D::one, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::dontresetCHIP }, 
             evtSNSR01_askdata,
             evtSNSR01_dataready,
             evtSNSR01_noreply,
@@ -154,7 +154,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
         
         constexpr theFAPreader::Sensor s2 {
             embot::hw::TLV493D::two, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::dontresetCHIP }, 
             evtSNSR02_askdata,
             evtSNSR02_dataready,
             evtSNSR02_noreply,
@@ -163,7 +163,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
 
         constexpr theFAPreader::Sensor s3 {
             embot::hw::TLV493D::three, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::dontresetCHIP }, 
             evtSNSR03_askdata,
             evtSNSR03_dataready,
             evtSNSR03_noreply,
@@ -172,7 +172,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
 
         constexpr theFAPreader::Sensor s4 {
             embot::hw::TLV493D::four, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::dontresetCHIP }, 
             evtSNSR04_askdata,
             evtSNSR04_dataready,
             evtSNSR04_noreply,
@@ -181,7 +181,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
         
         constexpr theFAPreader::Sensor s5 {
             embot::hw::TLV493D::five, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::dontresetCHIP }, 
             evtSNSR05_askdata,
             evtSNSR05_dataready,
             evtSNSR05_noreply,
@@ -190,14 +190,15 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
 
         constexpr theFAPreader::Sensor s6 {
             embot::hw::TLV493D::six, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::dontresetCHIP }, 
             evtSNSR06_askdata,
             evtSNSR06_dataready,
             evtSNSR06_noreply,
             0 //5*embot::core::time1millisec // timeout  
         };          
         
-        constexpr std::array<theFAPreader::Sensor,theFAPreader::numberofpositions> sfaps { s1, s2, s3, s4, s5, s6 };
+        constexpr std::array<theFAPreader::Sensor,theFAPreader::numberofpositions> sfapsdaisy { s1, s2, s3, s4, s5, s6 };
+        constexpr std::array<theFAPreader::Sensor,theFAPreader::numberofpositions> sfapsmod2par { s1, s4, s2, s5, s3, s6 };
         //constexpr std::array<theFAPreader::Sensor,theFAPreader::numberofpositions> sfaps { s1, {}, s3, s4, {}, s6 };
         //constexpr std::array<theFAPreader::Sensor,theFAPreader::numberofpositions> sfaps { s6, s5, s4, s3, s2, s1 };
         //constexpr std::array<theFAPreader::Sensor,theFAPreader::numberofpositions> sfaps { s6, {}, s4, s3, {}, s1 };
@@ -229,21 +230,42 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     embot::os::Thread *tComm = embot::app::skeleton::os::evthreadcan::getEVTthread();
     embot::os::Thread *tSnsr = t_snsr->getThread();
     
-    embot::app::application::theFAPreader::Config configfap
+    embot::app::application::theFAPreader::Config configfapmod2par
     {
-        embot::app::application::theFAPreader::AcquisitionMode::mod2parallel,
-        //embot::app::application::theFAPreader::AcquisitionMode::fullyparallel,
-        //embot::app::application::theFAPreader::AcquisitionMode::daisychain,        
+        embot::app::application::theFAPreader::AcquisitionMode::mod2parallel,    
         50*embot::core::time1millisec,  // acquisition time
-        3*embot::core::time1millisec, // timeout for every acquisition step (1 step for fullyparallel, 2 for mod2parallel, n for daisychain)        
+        5*embot::core::time1millisec, // timeout for every acquisition step (1 step for fullyparallel, 2 for mod2parallel, n for daisychain)        
         tSnsr,          // reader thread 
         tComm,          // transmitter thread
-        sfaps,          // vector of configured sensors 
+        sfapsmod2par,
         { evtACQUIREfaps, evtNOREPLYfaps, embot::app::ctrl::evtTRANSMITfaps,  }    // associated events such as ... read sensor1, read sensor2, tranmsit sensors etc.
     };  
 
+    embot::app::application::theFAPreader::Config configfapS4
+    {
+        embot::app::application::theFAPreader::AcquisitionMode::mod2parallel,        
+        100*embot::core::time1millisec,  // acquisition time
+        10*embot::core::time1millisec, // timeout for every acquisition step (1 step for fullyparallel, 2 for mod2parallel, n for daisychain)        
+        tSnsr,          // reader thread 
+        tComm,          // transmitter thread
+        { s4, {}, {}, {}, {}, {} },          // vector of configured sensors 
+        { evtACQUIREfaps, evtNOREPLYfaps, embot::app::ctrl::evtTRANSMITfaps,  }    // associated events such as ... read sensor1, read sensor2, tranmsit sensors etc.
+    };  
+    
+    embot::app::application::theFAPreader::Config configfapdaisy
+    {
+        embot::app::application::theFAPreader::AcquisitionMode::daisychain,         
+        100*embot::core::time1millisec,  // acquisition time
+        10*embot::core::time1millisec, // timeout for every acquisition step (1 step for fullyparallel, 2 for mod2parallel, n for daisychain)        
+        tSnsr,          // reader thread 
+        tComm,          // transmitter thread
+        sfapsdaisy,          // vector of configured sensors 
+        { evtACQUIREfaps, evtNOREPLYfaps, embot::app::ctrl::evtTRANSMITfaps,  }    // associated events such as ... read sensor1, read sensor2, tranmsit sensors etc.
+    };    
     embot::app::application::theFAPreader &thefap = embot::app::application::theFAPreader::getInstance();
-    thefap.initialise(configfap); 
+    thefap.initialise(configfapmod2par);
+    //thefap.initialise(configfapdaisy); 
+    //thefap.initialise(configfapS4);     
         
     // init parser of POS CAN messages and link it to its agent: theFAPreader
     embot::app::application::theCANparserPOS &canparserpos = embot::app::application::theCANparserPOS::getInstance();

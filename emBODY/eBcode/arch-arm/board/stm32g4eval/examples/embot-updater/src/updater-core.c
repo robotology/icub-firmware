@@ -459,7 +459,7 @@ static uint8_t s_uprot_proc_BLINK(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_
     { 
         hal_led_toggle(hal_led2);
 #if defined(EMBOBJ_USE_EMBOT)
-        embot::core::delay(250*embot::core::time1millisec);
+        embot::core::wait(250*embot::core::time1millisec);
 #else
         osal_task_wait(250*1000);
 #endif        

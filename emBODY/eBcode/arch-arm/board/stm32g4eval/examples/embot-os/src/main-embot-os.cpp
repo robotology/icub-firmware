@@ -48,7 +48,7 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
 
     embot::core::print("mainthread-startup: initted driver for tlv493d");  
     // init the tlv493d
-    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
+    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::tlv493d::Config::startupMODE::resetCHIP});
             
     
     embot::core::print("mainthread-startup: started timer which sends evtTick to evthread every = " + embot::core::TimeFormatter(tickperiod).to_string());
