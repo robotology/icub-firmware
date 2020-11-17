@@ -30,6 +30,7 @@ extern "C" {
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
+void test_tlv_changeoftheaddress(void);
 
 void test_tlv_init(void);
 
