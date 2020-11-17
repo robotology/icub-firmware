@@ -5,7 +5,6 @@
  * email:   marco.accame@iit.it
 */
 
-#warning WIP: so far the theFAPreader is very very similar to the thePOSreader but i prefer to be free to develop a new object
 
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface
@@ -377,7 +376,7 @@ struct embot::app::application::theFAPreader::Impl
             }
             
             embot::hw::TLV493D id = config.sensors[n].id;            
-            print(to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+            embot::core::print(to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
     
             #warning in here we use n or ... daisychain_counter??? we use n. even if some n keep non valid values
             tspositions->set(pos, n);
@@ -400,7 +399,7 @@ struct embot::app::application::theFAPreader::Impl
     void acquisition_daisychain_noreply()
     {
         embot::hw::TLV493D id = config.sensors[validIDpositions[daisychain_counter]].id;
-        print("acquisition_daisychain_noreply() of " + to_string(id) + ", index = " + std::to_string(daisychain_counter) + ", @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+        embot::core::print("acquisition_daisychain_noreply() of " + to_string(id) + ", index = " + std::to_string(daisychain_counter) + ", @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
 
         timerTOUT_stop();
         
@@ -544,11 +543,17 @@ struct embot::app::application::theFAPreader::Impl
                 str += " ";
             }                
         }
-        config.reader->setEvent(eventmask); 
-
-        print("acquisition_mod2parallel_start() for " + str + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string());
         
-        timerTOUT_start();        
+        if(0 != eventmask)
+        {        
+            config.reader->setEvent(eventmask); 
+            embot::core::print("acquisition_mod2parallel_start() for " + str + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string());       
+            timerTOUT_start();  
+        } 
+        else        
+        {
+            embot::core::print(std::string("acquisition_mod2parallel_start() does nothing as there are no sensors ") + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+        }    
 
     }
     
@@ -576,7 +581,7 @@ struct embot::app::application::theFAPreader::Impl
         }
         
         embot::hw::TLV493D id = config.sensors[n].id;       
-        print(to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+        embot::core::print(to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
    
         tspositions->set(pos, n);
         
@@ -612,7 +617,7 @@ struct embot::app::application::theFAPreader::Impl
             }            
         }
         
-        print("acquisition_mod2parallel_noreply() of " + str + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());        
+        embot::core::print("acquisition_mod2parallel_noreply() of " + str + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());        
         
         timerTOUT_stop();
         

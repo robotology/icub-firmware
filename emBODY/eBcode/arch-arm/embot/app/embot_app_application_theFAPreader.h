@@ -38,7 +38,7 @@ namespace embot { namespace app { namespace application {
         {
             embot::hw::TLV493D id {embot::hw::TLV493D::none};
             // we can avoid this ... we just ask it to the bps.... we may even not initting them inside here ....
-            embot::hw::tlv493d::Config config {};   // the default non valid configuration 
+            embot::hw::tlv493d::Config config {embot::hw::tlv493d::Config::startupMODE::dontresetCHIP};    
             embot::os::Event askdata {0};           // used to ask the thread to begin acquisition from the sensor (in non-blocking mode)
             embot::os::Event dataready {0};         // used by the hw to alert the thread that the data is available
             embot::os::Event noreply {0};           // SO FAR NOT USED: maybe used to alert the waiting thread that there is mo reply from the sensor after the specified timeout
@@ -48,7 +48,7 @@ namespace embot { namespace app { namespace application {
                     : id(i), config(c), askdata(as), dataready(dr), noreply(nr), timeout(to)  {}
             // i have this ctor is we remove embot::hw::tlv493d::Config
             constexpr Sensor(embot::hw::TLV493D i, embot::os::Event as, embot::os::Event dr, embot::os::Event nr = 0, embot::core::relTime to = 0) 
-                    : id(i), config(embot::hw::i2c::Descriptor{embot::hw::I2C::none, embot::hw::i2c::Speed::none, 0}), askdata(as), dataready(dr), noreply(nr), timeout(to)  {}
+                    : id(i), config(embot::hw::tlv493d::Config::startupMODE::dontresetCHIP), askdata(as), dataready(dr), noreply(nr), timeout(to)  {}
             constexpr bool isvalid() const { return id != embot::hw::TLV493D::none; }
         };
             
