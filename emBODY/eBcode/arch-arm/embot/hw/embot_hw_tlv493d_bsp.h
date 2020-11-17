@@ -14,14 +14,13 @@
 #include "embot_core.h"
 #include "embot_hw_types.h"
 #include "embot_hw_bsp.h"
-
+#include "embot_hw_tlv493d.h"
 
 namespace embot { namespace hw { namespace tlv493d {
     
     struct PROP
-    {   
-        embot::hw::I2C i2cbus {embot::hw::I2C::none};
-        std::uint8_t i2caddress {0};        
+    { 
+        embot::hw::i2c::Descriptor i2cdes {embot::hw::I2C::none, 0};
     };
     
     struct BSP : public embot::hw::bsp::SUPP

@@ -34,20 +34,26 @@ namespace embot { namespace hw { namespace gpio {
         }; // they are GPIO_PIN_0, GPIO_PIN_1, etc. without the need of including stm32hal.h
 
         GPIO_t* stmport {nullptr};  // GPIOA, etc.
-        std::uint16_t stmpin {PROP::stmPINnone};   // GPIO_PIN_0, GPIO_PIN_1, etc.  or ... stmPIN00xx     
+        std::uint16_t stmpin {PROP::stmPINnone};   // GPIO_PIN_0, GPIO_PIN_1, etc.  or ... stmPIN00xx    
+        embot::core::fpWorker clkena {nullptr};    // [](){__HAL_RCC_GPIOA_CLK_ENABLE();} etc.    
         constexpr PROP() : stmport(nullptr), stmpin(0) {}
-        constexpr PROP(GPIO_t* po, std::uint16_t pi) : stmport(po), stmpin(pi) {}
+        constexpr PROP(GPIO_t* po, std::uint16_t pi, embot::core::fpWorker ce) : stmport(po), stmpin(pi), clkena(ce) {}
         constexpr bool isvalid() const { return (nullptr == stmport) ? false : true; }
+        constexpr void clockenable() const { if(nullptr != clkena) { clkena(); } }
     };
     
     struct BSP
     {
         constexpr static std::uint8_t maxnumberofPORTs = embot::core::tointegral(embot::hw::GPIO::PORT::maxnumberof);
-        constexpr BSP(std::array<std::uint16_t, maxnumberofPORTs> msk, std::array<GPIO_t*, maxnumberofPORTs> po) : supportmask2d(msk), ports(po) {}
-        constexpr BSP() : supportmask2d({0}), ports({0}) {}            
+        constexpr BSP(std::array<std::uint16_t, maxnumberofPORTs> msk, 
+                      std::array<GPIO_t*, maxnumberofPORTs> po, 
+                      std::array<embot::core::fpWorker, maxnumberofPORTs> sc) 
+                        : supportmask2d(msk), ports(po), startclocks(sc) {}
+        constexpr BSP() : supportmask2d({0}), ports({0}), startclocks({0}) {}            
           
         std::array<std::uint16_t, maxnumberofPORTs> supportmask2d;
         std::array<GPIO_t*, maxnumberofPORTs> ports;  
+        std::array<embot::core::fpWorker, maxnumberofPORTs> startclocks;
 
         constexpr bool supported(embot::hw::GPIO h) const
         { 
@@ -65,7 +71,7 @@ namespace embot { namespace hw { namespace gpio {
         constexpr PROP getPROP(embot::hw::GPIO h) const 
         { 
             PROP p{}; 
-            if(supported(h)) { p.stmport = ports[embot::core::tointegral(h.port)]; p.stmpin = 1 << embot::core::tointegral(h.pin); }
+            if(supported(h)) { p.stmport = ports[embot::core::tointegral(h.port)]; p.stmpin = 1 << embot::core::tointegral(h.pin); p.clkena = startclocks[embot::core::tointegral(h.port)]; }
             return p;
         }
         

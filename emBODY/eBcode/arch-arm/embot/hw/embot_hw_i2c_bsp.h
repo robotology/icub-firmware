@@ -14,7 +14,7 @@
 #include "embot_core.h"
 #include "embot_hw_types.h"
 #include "embot_hw_bsp.h"
-
+#include "embot_hw_i2c.h"
 
 namespace embot { namespace hw { namespace i2c {
     
@@ -26,7 +26,10 @@ namespace embot { namespace hw { namespace i2c {
     
     struct PROP
     {     
-        I2C_Handle* handle {nullptr};  
+        I2C_Handle* handle {nullptr}; 
+        embot::hw::i2c::Speed speed {embot::hw::i2c::Speed::standard100};
+        constexpr PROP() = default;
+        constexpr PROP(I2C_Handle *h, embot::hw::i2c::Speed s) : handle(h), speed(s) {}          
     };
        
     struct BSP : public embot::hw::bsp::SUPP
@@ -38,6 +41,12 @@ namespace embot { namespace hw { namespace i2c {
         std::array<const PROP*, maxnumberof> properties;    
         constexpr const PROP * getPROP(embot::hw::I2C h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::I2C h) const;
+        constexpr embot::hw::I2C toID(const PROP& p) const
+        { 
+            if(nullptr == p.handle) { return embot::hw::I2C::none; }
+            for(uint8_t i=0; i<maxnumberof; i++) { if(p.handle == properties[i]->handle) return static_cast<embot::hw::I2C>(i); }
+            return embot::hw::I2C::none;
+        }
     };
     
     const BSP& getBSP();

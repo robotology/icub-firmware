@@ -32,7 +32,7 @@
 
 namespace embot { namespace hw { namespace i2c {
     
-    // speeds so far are those
+    // speeds so far are those 
     enum class Speed : uint32_t { standard100 = 100000, fast400 = 400000, fastplus1000 = 1000000, high3400 = 3400000, none = 0 };
     
     // address is always expressed by <= 8 bits
@@ -52,22 +52,19 @@ namespace embot { namespace hw { namespace i2c {
    
           
     struct Config
-    {   
-        std::uint32_t speed {embot::core::tointegral(Speed::fast400)};       
+    {   // so far we cannot initialize I2C with a given speed at runtime   
+        uint8_t speedIStobedone {0};       
         constexpr Config() = default;
-        constexpr Config(std::uint32_t s) : speed(s) {}  
-        constexpr Config(Speed sp) : speed(embot::core::tointegral(sp)) {}
+        constexpr bool isvalid() const { return true; }
     };
     
     struct Descriptor
     {
         embot::hw::I2C bus {embot::hw::I2C::none};
-        Config config {Speed::none};
         ADR adr {0};
         constexpr Descriptor() = default;
-        constexpr Descriptor(embot::hw::I2C b, std::uint32_t s, ADR a = 0) : bus(b), config(s), adr{a} {}
-        constexpr Descriptor(embot::hw::I2C b, Speed s, ADR a = 0) : bus(b), config(s), adr(a) {}
-        constexpr bool isvalid() const { return (embot::hw::I2C::none != bus) && (0 != config.speed); }              
+        constexpr Descriptor(embot::hw::I2C b, ADR a = 0) : bus(b), adr(a) {}
+        constexpr bool isvalid() const { return (embot::hw::I2C::none != bus) && (0 != adr); }              
     };
 
     

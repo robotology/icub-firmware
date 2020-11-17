@@ -41,6 +41,12 @@ namespace embot { namespace hw { namespace can {
         std::array<const PROP*, maxnumberof> properties;    
         constexpr const PROP * getPROP(embot::hw::CAN h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::CAN h) const;
+        constexpr embot::hw::CAN toID(const PROP& p) const
+        { 
+            if(nullptr == p.handle) { return embot::hw::CAN::none; }
+            for(uint8_t i=0; i<maxnumberof; i++) { if(p.handle == properties[i]->handle) return static_cast<embot::hw::CAN>(i); }
+            return embot::hw::CAN::none;
+        }
     };
     
     const BSP& getBSP();                                        

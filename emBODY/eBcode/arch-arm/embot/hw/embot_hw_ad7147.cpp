@@ -93,7 +93,7 @@ namespace embot { namespace hw { namespace ad7147 {
     
     struct PrivateData
     {
-        std::uint8_t i2caddress[embot::core::tointegral(AD7147::maxnumberof)] = {0};   
+        embot::hw::i2c::Descriptor i2cdes[embot::core::tointegral(AD7147::maxnumberof)];   
         Config config[embot::core::tointegral(AD7147::maxnumberof)];        
         Acquisition acquisition[embot::core::tointegral(AD7147::maxnumberof)];
         PrivateData() = default;
@@ -145,11 +145,15 @@ namespace embot { namespace hw { namespace ad7147 {
         uint16_t val {0};
         
         constexpr regContent(uint16_t a, uint16_t v) : reg({a, embot::hw::i2c::Reg::Size::sixteenbits}), val((v>>8) | ((v&0x00ff)<<8)) {} 
+        constexpr regContent() = default; 
         uint16_t getvalue() const
         {
             return (val>>8) | ((val&0x00ff)<<8);
         }  
-
+        void setvalue(uint16_t v)
+        {
+            val = (v>>8) | ((v&0x00ff)<<8);
+        }
         void* getcontent() const
         {
             return const_cast<uint16_t*>(&val);
@@ -362,7 +366,9 @@ namespace embot { namespace hw { namespace ad7147 {
         regContent{0x0Dd, 50},
         regContent{0x0De, 100},
         regContent{0x0Df, 100}   
-    };     
+    };  
+
+    constexpr std::array<const std::array<regContent, 8>*, 12>  theregistersofthe12stages {&st0, &st1, &st2, &st3, &st4, &st5, &st6, &st7, &st8, &st9, &st10, &st11};   
               
     result_t init(AD7147 s, const Config &config)
     {
@@ -382,13 +388,13 @@ namespace embot { namespace hw { namespace ad7147 {
         std::uint8_t index = embot::core::tointegral(s);
                
         // init i2c ..
-        embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::ad7147::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
+        embot::hw::i2c::init(embot::hw::ad7147::getBSP().getPROP(s)->i2cdes.bus, {});
+        if(false == embot::hw::i2c::ping(embot::hw::ad7147::getBSP().getPROP(s)->i2cdes.bus,embot::hw::ad7147::getBSP().getPROP(s)->i2cdes.adr, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
                             
-        s_privatedata.i2caddress[index] = embot::hw::ad7147::getBSP().getPROP(s)->i2caddress;
+        s_privatedata.i2cdes[index] = embot::hw::ad7147::getBSP().getPROP(s)->i2cdes;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
         
@@ -398,70 +404,95 @@ namespace embot { namespace hw { namespace ad7147 {
            
 
 //        // check the device id
-//        if(!send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x017, 0x1471}, sendmode::onlycheck))
+//        if(!send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x017, 0x1471}, sendmode::onlycheck))
 //        {
 //            return resNOK;
 //        }
     
 //    // just for test  
 //    // AMB_COMP_CTRL0
-//    if(!send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x002, 0x0ff0}, sendmode::onlycheck))
+//    if(!send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x002, 0x0ff0}, sendmode::onlycheck))
 //    {
 //        for(;;);
 //    }
 //    
 //    // AMB_COMP_CTRL1
-//    if(!send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x003, 0x0164}, sendmode::onlycheck))
+//    if(!send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x003, 0x0164}, sendmode::onlycheck))
 //    {
 //        for(;;);
 //    }
 //    
 //    // AMB_COMP_CTRL2
-//    if(!send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x004, 0xffff}, sendmode::onlycheck))
+//    if(!send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x004, 0xffff}, sendmode::onlycheck))
 //    {
 //        for(;;);
 //    }
     
     // configure the 12 stages
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st0, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st1, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st2, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st3, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st4, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st5, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st6, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st7, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st8, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st9, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st10, sendmode::pluscheck);
-    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st11, sendmode::pluscheck);
+    std::array<regContent, 8> st {}; // temporary object
+    
+    for(size_t i=0; i<theregistersofthe12stages.size(); i++)
+    {
+        st = *theregistersofthe12stages[i];
+        st[2].setvalue(config.STAGEx_AFE_OFFSET);
+        sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st, sendmode::pluscheck);
+    }
+    
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st0, sendmode::pluscheck);           
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st1, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st2, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st3, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st4, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st5, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st6, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st7, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st8, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st9, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st10, sendmode::pluscheck);
+//    sendstage(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, st11, sendmode::pluscheck);
     
 
     // configure the PWR_CONTROL
-    constexpr uint16_t pw_control_val = 0x00B0; // 0000000010110000
-    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x000, pw_control_val}, sendmode::pluscheck);
+    constexpr uint16_t pw_control_val = 0x00B0; // = 0000000010110000b
+    // 00 0 0 0 0 00 1011 00 00
+    // 00 -> CDC_BIAS = normal operation
+    //    0 -> unused
+    //      0 -> EXT_SOURCE = enable excitation source to CINx pins
+    //        0 -> INT_POL = active low
+    //          0 -> SW_RESET -> DOES NOT reset all registers to default values
+    //            00 -> DECIMATION -> decimate by 256
+    //               1011 -> SEQUENCE_STAGE_NUM = Number of stages in sequence (N + 1) -> 12 conversion stages in sequence 
+    //                    00 -> LP_CONV_DELAY = 200 ms (Low power mode conversion delay)
+    //                       00 -> POWER_MODE = 00 = full power mode (normal operation, CDC conversions approximately every 36 ms)
+    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x000, pw_control_val}, sendmode::pluscheck);
     // configure the AMB_COMP_CTRL0
-    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x002, 0x0000}, sendmode::pluscheck);
+    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x002, 0x0000}, sendmode::pluscheck);
     // configure the AMB_COMP_CTRL1
-    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x003, 0x0000}, sendmode::pluscheck);
+    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x003, 0x0000}, sendmode::pluscheck);
     // configure the AMB_COMP_CTRL2
-    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x004, 0x0000}, sendmode::pluscheck);
+    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x004, 0x0000}, sendmode::pluscheck);
     // configure STAGE_LOW_INT_ENABLE
-    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x005, 0x0000}, sendmode::pluscheck);
+    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x005, 0x0000}, sendmode::pluscheck);
     // configure STAGE_HIGH_INT_ENABLE 
-    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x006, 0x0000}, sendmode::pluscheck);
+    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x006, 0x0000}, sendmode::pluscheck);
     // configure STAGE_COMPLETE_INT_ENABLE 
-    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x007, 0x0400}, sendmode::pluscheck);
+    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x007, 0x0400}, sendmode::pluscheck);
 // the following three *_STATUS register are read only and should not be written !!!!!!!!!!!!!
 //    // configure STAGE_LOW_INT_STATUS 
-//    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x008, 0x0000}, sendmode::pluscheck);
+//    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x008, 0x0000}, sendmode::pluscheck);
 //    // configure STAGE_HIGH_INT_STATUS 
-//    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x009, 0x0000}, sendmode::pluscheck);
+//    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x009, 0x0000}, sendmode::pluscheck);
 //    // configure STAGE_COMPLETE_INT_STATUS 
-//    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x00a, 0x0fff}, sendmode::pluscheck);
+//    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x00a, 0x0fff}, sendmode::pluscheck);
     
     // and now, finally: STAGE_CAL_EN
-    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x001, 0x0fff}, sendmode::pluscheck);
+    // 0x0fff = 0000111111111111b
+    //          00 -> AVG_LP_SKIP Low power mode skip control 00 = use all samples
+    //            00 -> AVG_FP_SKIP Full power mode skip control 00 = skip 3 samples 
+    //              1 -> STAGE11_CAL_EN STAGE11 calibration enable
+    //               1 -> STAGE10_CAL_EN 
+    //                 etc... calibration enabled on all stages.    
+    send(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, regContent{0x001, 0x0fff}, sendmode::pluscheck);
     
        
 #if 0
@@ -490,7 +521,7 @@ namespace embot { namespace hw { namespace ad7147 {
             count = 0;
             s0 = embot::core::now();
             std::memset(readings, 0xff, sizeof(readings));
-            embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_CDC_RESULT_S0, dest, embot::core::Callback{finished, nullptr});
+            embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_CDC_RESULT_S0, dest, embot::core::Callback{finished, nullptr});
             while(!done)
             {
                 count++;
@@ -520,17 +551,17 @@ namespace embot { namespace hw { namespace ad7147 {
         embot::core::Data dest = {data, 2};
         
         // read Device ID Register 0x017
-        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_DeviceID, dest, 10*1000);
-        //embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_DeviceID, dest, embot::core::Callback{});
+        embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_DeviceID, dest, 10*1000);
+        //embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_DeviceID, dest, embot::core::Callback{});
         //embot::core::delay(10*1000);
         
         // ok but in big endian. data[0] contains the msb and data[1] contains the lsb.
-        // data[0] = 0x14 dat[1] = 0x71 and the correct value is [14:4] [3:0] -> 0x 147 1
+        // data[0] = 0x14 dat[1] = 0x71 and the correct value is [15:4] [3:0] -> 0x 147 1
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;
         
         // read default value of AMB_COMP_CTRL0 Register 0x002
-        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL0, dest, 10*1000);
+        embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_AMB_COMP_CTRL0, dest, 10*1000);
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;
         // i read data[0] = 0x0f data[1] = 0xf0
@@ -543,24 +574,24 @@ namespace embot { namespace hw { namespace ad7147 {
         txdata[1] = 0xa1;   // nibble a is: bits 7:4 FP_PROXIMITY_CNT
                             // nibble 1 is: bits 3:0 FF_SKIP_CNT 
         embot::core::Data content = {txdata, 2};
-        embot::hw::i2c::write(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL0, content, 10*1000);
-        //embot::hw::i2c::write16(config.i2cdes.bus, s_privatedata.i2caddress[index], 0x002, content, 10*1000);
+        embot::hw::i2c::write(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_AMB_COMP_CTRL0, content, 10*1000);
+        //embot::hw::i2c::write16(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, 0x002, content, 10*1000);
         
         
         // read back the value of AMB_COMP_CTRL0 Register 0x002
-        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL0, dest, 10*1000);
+        embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_AMB_COMP_CTRL0, dest, 10*1000);
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;        
 
         // read default value of AMB_COMP_CTRL1 Register 0x003
-        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL1, dest, 10*1000);
+        embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_AMB_COMP_CTRL1, dest, 10*1000);
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;
         // i read data[0] = 0x01 data[1] = 0x64
         // default values must be from 15->00: 0x 0 1 6 4
      
         // read default value of AMB_COMP_CTRL2 Register 0x004
-        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL2, dest, 10*1000);
+        embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_AMB_COMP_CTRL2, dest, 10*1000);
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;
         // i read data[0] = 0x01 data[1] = 0x64
@@ -618,7 +649,7 @@ namespace embot { namespace hw { namespace ad7147 {
         {
             return false;
         }      
-        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);         
+        return !embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus);         
     }    
     
     result_t acquisition(AD7147 s, const embot::core::Callback &oncompletion)
@@ -644,7 +675,7 @@ namespace embot { namespace hw { namespace ad7147 {
         embot::core::Data data = embot::core::Data(&s_privatedata.acquisition[index].rxdata[0], sizeof(s_privatedata.acquisition[index].rxdata));
         
         constexpr embot::hw::i2c::Reg reg_CDC_RESULT_S0 {0x00B, embot::hw::i2c::Reg::Size::sixteenbits};
-        return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg_CDC_RESULT_S0, data, cbk);                     
+        return embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg_CDC_RESULT_S0, data, cbk);                     
     }
     
     bool isalive(AD7147 s, embot::core::relTime timeout)
@@ -655,7 +686,7 @@ namespace embot { namespace hw { namespace ad7147 {
         } 
 
         std::uint8_t index = embot::core::tointegral(s);
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
+        return embot::hw::i2c::ping(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, timeout);  
     }
 
     

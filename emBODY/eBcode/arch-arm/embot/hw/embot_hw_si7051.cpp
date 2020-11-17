@@ -103,7 +103,7 @@ namespace embot { namespace hw { namespace si7051 {
     
     struct PrivateData
     {
-        std::uint8_t i2caddress[embot::core::tointegral(SI7051::maxnumberof)];   
+        embot::hw::i2c::Descriptor i2cdes[embot::core::tointegral(SI7051::maxnumberof)];   
         Config config[embot::core::tointegral(SI7051::maxnumberof)];        
         Acquisition acquisition[embot::core::tointegral(SI7051::maxnumberof)];
         PrivateData() { }
@@ -148,14 +148,14 @@ namespace embot { namespace hw { namespace si7051 {
         
         std::uint8_t index = embot::core::tointegral(s);
                 
-        // init i2c ..
-        embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::si7051::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
+        // init i2c with the relevant bus specified by the bsp for this chip
+        embot::hw::i2c::init(embot::hw::si7051::getBSP().getPROP(s)->i2cdes.bus, {});
+        if(false == embot::hw::i2c::ping(embot::hw::si7051::getBSP().getPROP(s)->i2cdes.bus, embot::hw::si7051::getBSP().getPROP(s)->i2cdes.adr, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
         
-        s_privatedata.i2caddress[index] = embot::hw::si7051::getBSP().getPROP(s)->i2caddress;
+        s_privatedata.i2cdes[index] = embot::hw::si7051::getBSP().getPROP(s)->i2cdes;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
         
@@ -191,7 +191,7 @@ namespace embot { namespace hw { namespace si7051 {
             return false;
         }
         
-        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
+        return !embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus);             
     }    
     
     result_t acquisition(SI7051 s, const embot::core::Callback &oncompletion)
@@ -211,7 +211,7 @@ namespace embot { namespace hw { namespace si7051 {
         // ok, now i trigger i2c.
         embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::core::Data data = embot::core::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
-        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerTemperatureRead, data, cbk);
+        embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, registerTemperatureRead, data, cbk);
                 
         return resOK;
     }
@@ -223,7 +223,7 @@ namespace embot { namespace hw { namespace si7051 {
             return false;
         } 
         std::uint8_t index = embot::core::tointegral(s);
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
+        return embot::hw::i2c::ping(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, timeout);  
     }
 
     
