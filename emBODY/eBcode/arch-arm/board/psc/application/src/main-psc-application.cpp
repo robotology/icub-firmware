@@ -105,11 +105,11 @@ constexpr std::array<embot::app::application::thePOSreader::Sensor, embot::app::
 {{
     {
         embot::hw::TLV493D::one,
-        { embot::hw::I2C::one, 400000 }        
+        embot::hw::tlv493d::Config{embot::hw::tlv493d::Config::startupMODE::resetCHIP}        
     },
     {
         embot::hw::TLV493D::two,
-        { embot::hw::I2C::three, 400000 }   
+        embot::hw::tlv493d::Config{embot::hw::tlv493d::Config::startupMODE::resetCHIP}   
     }   
 }};
 

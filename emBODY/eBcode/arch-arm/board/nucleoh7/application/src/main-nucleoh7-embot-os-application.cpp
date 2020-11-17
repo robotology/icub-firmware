@@ -85,6 +85,10 @@
 #undef macro_enableTRACE_activations
 #undef macro_enableTRACE_readings
 
+// section for sensors' enabling
+#define macro_enableSENSOR_bno055
+#define macro_enableSENSOR_ads122c04
+#define macro_enableSENSOR_ad7147
 
 #if defined(macro_APPL_MODE_STANDARD)
 
@@ -95,9 +99,11 @@
     #define macro_enableSERIAL
     #define macro_enableSERIAL_binary
     #undef  macro_enableSERIAL_string
+    //#define macro_enableSERIAL_string
     // the tx is activated by external trigger only
     #define macro_enableEXTItransmit
     #undef macro_enableEXTItransmitBLUEbutton
+    //#define macro_enableEXTItransmitBLUEbutton
     #undef  macro_enableCYCLEtransmit
     #undef  macro_enablePERIODICtransmit
     #undef macro_enableSLOWtxperiod
@@ -193,7 +199,17 @@
 #define macro_enableTRACE_readings
 #endif
 
+// the following configuration for chip ad7147 allows to operate on register STAGEx_AFE_OFFSET
+// see table 36 of datasheet https://www.analog.com/media/en/technical-documentation/data-sheets/AD7147.pdf
+// and comments embot::hw::ad7147::Config for more explanations.
+//constexpr embot::hw::ad7147::Config ad7147config {0x2000};
+//constexpr embot::hw::ad7147::Config ad7147config {34, 0}; // equal to {0x2200} -> it applies a positive AFE offset of 34 * 0.32 pF
+//constexpr embot::hw::ad7147::Config ad7147config {32, 0}; // equal to {0x2000} -> it applies a positive AFE offset of 32 * 0.32 pF
+// from the datasheet the value of positive AFE can be in range [0, 20] pF with steps of 0.32 pF.
+// hence valid values range for first parameter of constructor Config(uint8_t POS_AFE_OFFSET, uint8_t NEG_AFE_OFFSET) is
+// POS_AFE_OFFSET = [0, 62] maybe also 63 (which is 20.16 pF). 
 
+constexpr embot::hw::ad7147::Config ad7147config {32, 0}; // equal to {0x2000} -> it applies a positive AFE offset of 32 * 0.32 pF
 
 static void s_chips_init();
 static void s_imu_start();
@@ -559,33 +575,28 @@ static void s_chips_init()
 #else
  
     constexpr embot::core::relTime timeout = 5*embot::core::time1millisec;
-    constexpr uint32_t i2cspeed400k = 400000;
-    constexpr uint32_t i2cspeed1m = 1000000;
-    
-    constexpr uint32_t i2cspeed = i2cspeed400k;
-    
-    embot::hw::bno055::Config bno055config { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
-    embot::hw::bno055::init(embot::hw::BNO055::one, bno055config); 
-    
+
+#if defined(macro_enableSENSOR_bno055)    
+    embot::hw::bno055::init(embot::hw::BNO055::one, {});     
     constexpr embot::hw::bno055::Mode mode = embot::hw::bno055::Mode::ACCGYRO;
     //constexpr embot::hw::bno055::Mode mode = embot::hw::bno055::Mode::NDOF;
     embot::hw::bno055::set(embot::hw::BNO055::one, mode, timeout);   
+#endif
 
+#if defined(macro_enableSENSOR_ads122c04)        
+    embot::hw::ads122c04::init(embot::hw::ADS122C04::one, {});   
+#endif
+ 
 
-    embot::hw::ads122c04::Config adsconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
-    embot::hw::ads122c04::init(embot::hw::ADS122C04::one, adsconfig);   
-
+#if defined(macro_enableSENSOR_ad7147)        
     volatile embot::hw::result_t rr1 = embot::hw::result_t::NOK;
     volatile embot::hw::result_t rr2 = embot::hw::result_t::NOK;
-//    
-//    //embot::core::delay(500*embot::core::time1millisec);
-    embot::hw::ad7147::Config skconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
-    rr1 = embot::hw::ad7147::init(embot::hw::AD7147::one, skconfig);
-    rr2 = embot::hw::ad7147::init(embot::hw::AD7147::two, skconfig);      
-//        
+    rr1 = embot::hw::ad7147::init(embot::hw::AD7147::one, ad7147config);
+    rr2 = embot::hw::ad7147::init(embot::hw::AD7147::two, ad7147config);           
     rr1 = rr1;
     rr2 = rr2;
-    
+#endif
+        
 #endif
     
 }
@@ -610,7 +621,12 @@ static void s_imu_start()
 {
     imu_start = embot::core::now();
     embot::core::Callback cbk(alertimudataisready, nullptr);
-    embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::A, data, cbk);    
+#if defined(macro_enableSENSOR_bno055)     
+    embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::A, data, cbk); 
+#else
+    data.acc.x = 100; data.acc.y = 200; data.acc.z = 300;
+    cbk.execute();
+#endif    
 }
 
 static void s_imu_get()
@@ -677,16 +693,24 @@ void alertadc02isready(void *p)
 }
 
 static void s_adc_start(embot::hw::ads122c04::Channel chn)
-{  
+{     
     embot::core::Callback cbk((embot::hw::ads122c04::Channel::one == chn) ? alertadc01isready : alertadc02isready, nullptr);
-    embot::hw::ads122c04::acquisition(embot::hw::ADS122C04::one, chn, cbk);   
+#if defined(macro_enableSENSOR_ads122c04)     
+    embot::hw::ads122c04::acquisition(embot::hw::ADS122C04::one, chn, cbk); 
+#else
+    cbk.execute();
+#endif    
 }
 
 static void s_adc_get()
 {
+#if defined(macro_enableSENSOR_ads122c04)    
     embot::hw::ads122c04::Values v {};
     embot::hw::ads122c04::read(embot::hw::ADS122C04::one, v); 
     adc2transmit = {v.v1, v.v2};
+#else
+    adc2transmit = {5000, 6000};
+#endif    
 }
 
 void alertCDC1isready(void *p)
@@ -702,15 +726,23 @@ void alertCDC2isready(void *p)
 static void s_cdc_start(embot::hw::AD7147 cdc)
 {
     embot::core::Callback cbk((embot::hw::AD7147::one == cdc) ? alertCDC1isready : alertCDC2isready, nullptr);    
-    embot::hw::ad7147::acquisition(cdc, cbk);    
+#if defined(macro_enableSENSOR_ad7147)      
+    embot::hw::ad7147::acquisition(cdc, cbk);  
+#else
+    cbk.execute();
+#endif    
 }
 
 static void s_cdc_get(embot::hw::AD7147 cdc)
 {
-#if 1
-    //embot::hw::ad7147::acquisition(cdc, cbk);
+#if 1 // enable true data
+
     embot::hw::ad7147::Values v {};    
+#if defined(macro_enableSENSOR_ad7147)          
     embot::hw::ad7147::read(cdc, v);
+#else
+    v.fill(1);
+#endif        
         
     size_t offset = (embot::hw::AD7147::one == cdc) ? 0 : 12;
 
@@ -720,7 +752,7 @@ static void s_cdc_get(embot::hw::AD7147 cdc)
     }
 
 
-#else    
+#else  // fake data used to test transmission of skin data over the serial link   
     uint16_t values[12] = {0};
     // in here i should read the 12 values directly from the device 
     // but for i di fake acquisition

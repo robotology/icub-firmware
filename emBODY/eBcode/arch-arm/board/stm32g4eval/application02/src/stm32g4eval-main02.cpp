@@ -144,7 +144,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
         
         constexpr theFAPreader::Sensor s1 {
             embot::hw::TLV493D::one, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::resetCHIP }, 
             evtSNSR01_askdata,
             evtSNSR01_dataready,
             evtSNSR01_noreply,
@@ -153,7 +153,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
         
         constexpr theFAPreader::Sensor s2 {
             embot::hw::TLV493D::two, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::resetCHIP }, 
             evtSNSR02_askdata,
             evtSNSR02_dataready,
             evtSNSR02_noreply,
@@ -162,7 +162,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
 
         constexpr theFAPreader::Sensor s3 {
             embot::hw::TLV493D::three, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::resetCHIP }, 
             evtSNSR03_askdata,
             evtSNSR03_dataready,
             evtSNSR03_noreply,
@@ -171,7 +171,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
 
         constexpr theFAPreader::Sensor s4 {
             embot::hw::TLV493D::four, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::resetCHIP }, 
             evtSNSR04_askdata,
             evtSNSR04_dataready,
             evtSNSR04_noreply,
@@ -180,7 +180,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
         
         constexpr theFAPreader::Sensor s5 {
             embot::hw::TLV493D::five, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::resetCHIP }, 
             evtSNSR05_askdata,
             evtSNSR05_dataready,
             evtSNSR05_noreply,
@@ -189,7 +189,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
 
         constexpr theFAPreader::Sensor s6 {
             embot::hw::TLV493D::six, 
-            embot::hw::tlv493d::Config{ embot::hw::i2c::Descriptor{embot::hw::I2C::one, embot::hw::i2c::Speed::standard100} }, 
+            embot::hw::tlv493d::Config{ embot::hw::tlv493d::Config::startupMODE::resetCHIP }, 
             evtSNSR06_askdata,
             evtSNSR06_dataready,
             evtSNSR06_noreply,
