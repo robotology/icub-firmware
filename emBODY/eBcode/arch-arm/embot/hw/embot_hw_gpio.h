@@ -70,7 +70,7 @@ namespace embot { namespace hw { namespace gpio {
     
     bool supported(const embot::hw::GPIO &g);    
     bool initialised(const embot::hw::GPIO g);    
-    result_t init(embot::hw::GPIO &g, const Config &config);
+    result_t init(const embot::hw::GPIO &g, const Config &config);
     
     result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s);
     

@@ -93,7 +93,7 @@ namespace embot { namespace hw { namespace ads122c04 {
     
     struct PrivateData
     {
-        std::uint8_t i2caddress[embot::core::tointegral(ADS122C04::maxnumberof)] = {0};   
+        embot::hw::i2c::Descriptor i2cdes[embot::core::tointegral(AD7147::maxnumberof)];     
         Config config[embot::core::tointegral(ADS122C04::maxnumberof)];        
         Acquisition acquisition[embot::core::tointegral(ADS122C04::maxnumberof)];
         PrivateData() = default;
@@ -433,15 +433,15 @@ mode.
 #if defined(ads122c04_FAKEmode)
 #else        
                 
-        // init i2c ..
-        embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::ads122c04::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
+        // init i2c with the relevant bus specified by the bsp for this chip
+        embot::hw::i2c::init(embot::hw::ads122c04::getBSP().getPROP(s)->i2cdes.bus, {});
+        if(false == embot::hw::i2c::ping(embot::hw::ads122c04::getBSP().getPROP(s)->i2cdes.bus, embot::hw::ads122c04::getBSP().getPROP(s)->i2cdes.adr, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
                        
 #endif        
-        s_privatedata.i2caddress[index] = embot::hw::ads122c04::getBSP().getPROP(s)->i2caddress;
+        s_privatedata.i2cdes[index] = embot::hw::ads122c04::getBSP().getPROP(s)->i2cdes;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
         
@@ -449,7 +449,7 @@ mode.
 #else          
         // we need to perform chip initialization
         
-        _ads_chip.setaddress(config.i2cdes.bus, embot::hw::ads122c04::getBSP().getPROP(s)->i2caddress);
+        _ads_chip.setaddress(embot::hw::ads122c04::getBSP().getPROP(s)->i2cdes.bus, embot::hw::ads122c04::getBSP().getPROP(s)->i2cdes.adr);
         
         volatile result_t res = result_t::NOK;     
         // 1. reset
@@ -498,7 +498,7 @@ mode.
 #if defined(ads122c04_FAKEmode)
         return true;
 #else         
-        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);  
+        return !embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus);  
 #endif        
     }  
 
@@ -612,7 +612,7 @@ mode.
         return true;
 #else 
         std::uint8_t index = embot::core::tointegral(s);
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
+        return embot::hw::i2c::ping(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, timeout);  
 #endif
     }
 

@@ -180,6 +180,7 @@ namespace embot { namespace hw { namespace tlv493d {
 //                      uint8_t tempena = 0b0, uint8_t lpperiod = 0b0, uint8_t parena = 0b0)
         struct config_t
         {
+            enum class adr : uint8_t { zero = 0, one = 1, two = 2, three = 3 }; 
             uint32_t    paritybit   : 1;
             uint32_t    i2caddr     : 2;
             uint32_t    intena      : 1; 
@@ -195,6 +196,10 @@ namespace embot { namespace hw { namespace tlv493d {
             }
             constexpr config_t() :
                 paritybit(0b1), i2caddr(0b00), intena(0b0), fastena(0b1), lowena(0b0), tempena(0b0), lpperiod(0b0), parena(0b0)
+            {
+            }
+            constexpr config_t(adr a) :
+                paritybit(0b1), i2caddr(embot::core::tointegral(a)), intena(0b0), fastena(0b1), lowena(0b0), tempena(0b0), lpperiod(0b0), parena(0b0)
             {
             }
         };
@@ -233,7 +238,7 @@ namespace embot { namespace hw { namespace tlv493d {
     
     struct PrivateData
     {
-        std::uint8_t i2caddress[embot::core::tointegral(TLV493D::maxnumberof)];   
+        embot::hw::i2c::Descriptor i2cdes[embot::core::tointegral(TLV493D::maxnumberof)];   
         Config config[embot::core::tointegral(TLV493D::maxnumberof)];        
         Acquisition acquisition[embot::core::tointegral(TLV493D::maxnumberof)];
         PrivateData() { }
@@ -287,16 +292,17 @@ namespace embot { namespace hw { namespace tlv493d {
         
         
         std::uint8_t index = embot::core::tointegral(h);
+               
         
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)        
         // init peripheral
         embot::hw::tlv493d::getBSP().init(h);                             
-        // init i2c ..
-        embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
+        // init i2c with the relevant bus specified by the bsp for this chip
+        embot::hw::i2c::init(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.bus, {});
 #endif 
         
         // load config etc
-        s_privatedata.i2caddress[index] = embot::hw::tlv493d::getBSP().getPROP(h)->i2caddress;
+        s_privatedata.i2cdes[index] = embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].init(h);
 
@@ -345,7 +351,7 @@ namespace embot { namespace hw { namespace tlv493d {
 #if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)             
         return true;
 #endif         
-        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
+        return !embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus);             
     }    
     
     result_t acquisition(TLV493D h, const embot::core::Callback &oncompletion)
@@ -377,7 +383,7 @@ namespace embot { namespace hw { namespace tlv493d {
         }     
         return resOK;
 #endif         
-        embot::hw::i2c::receive(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], data, cbk);                
+        embot::hw::i2c::receive(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, data, cbk);                
         return resOK;
     }
     
@@ -391,7 +397,7 @@ namespace embot { namespace hw { namespace tlv493d {
         return true;
 #endif        
         std::uint8_t index = embot::core::tointegral(h);
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
+        return embot::hw::i2c::ping(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, timeout);  
     }
 
     
@@ -530,10 +536,10 @@ namespace embot { namespace hw { namespace tlv493d {
         
          
         // 1. reset the chip and wait for some time         
-        s_sensor_reset(h);
+//        s_sensor_reset(h);
            
         // 1.a make sure the chip has a good address in the bus         
-        if(false == embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], 3*embot::core::time1millisec))
+        if(false == embot::hw::i2c::ping(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, 3*embot::core::time1millisec))
         {
             #if defined(embot_hw_tlv493d_discover)
             // discover the boards
@@ -545,15 +551,15 @@ namespace embot { namespace hw { namespace tlv493d {
                        
         // 2. read the registers
         data.load(s_privatedata.acquisition[index].registermap.readmemory, s_privatedata.acquisition[index].registermap.readsize); 
-        //r = embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerToRead, data, embot::core::time1second);
-        r = embot::hw::i2c::receive(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], data, embot::core::time1second);
+        //r = embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, registerToRead, data, embot::core::time1second);
+        r = embot::hw::i2c::receive(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, data, embot::core::time1second);
         r = r;
         
         // 3. impose a mode.
         s_privatedata.acquisition[index].registermap.setWRITE({}); // defconfig
         data.load(s_privatedata.acquisition[index].registermap.writememory, s_privatedata.acquisition[index].registermap.writesize); 
-        //r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerToRead, data, embot::core::time1second);
-        r = embot::hw::i2c::transmit(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], data, embot::core::time1second);
+        //r = embot::hw::i2c::write(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, registerToRead, data, embot::core::time1second);
+        r = embot::hw::i2c::transmit(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, data, embot::core::time1second);
         
         // wait a bit
         embot::hw::sys::delay(10*embot::core::time1millisec);
@@ -571,7 +577,7 @@ namespace embot { namespace hw { namespace tlv493d {
         
         embot::core::Data dummy;
         dummy.clear();
-        volatile result_t r1 = embot::hw::i2c::tx(s_privatedata.config[index].i2cdes.bus, 0x00, dummy, 3*embot::core::time1millisec);             
+        volatile result_t r1 = embot::hw::i2c::tx(s_privatedata.i2cdes[index].bus, 0x00, dummy, 3*embot::core::time1millisec);             
         r1 = r1;
         // extra 3 ms.
         embot::hw::sys::delay(3*embot::core::time1millisec);

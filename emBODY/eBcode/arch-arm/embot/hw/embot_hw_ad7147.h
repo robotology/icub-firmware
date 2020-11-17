@@ -21,11 +21,29 @@ namespace embot { namespace hw { namespace ad7147 {
          
         
     struct Config
-    {   // each sensor may use different i2c addresses, hence they can share teh same i2c bus
-        embot::hw::i2c::Descriptor i2cdes {};        
-        constexpr Config(embot::hw::I2C b, std::uint32_t s) : i2cdes(b, s) {}        
-        constexpr Config() : i2cdes(embot::hw::I2C::one, 400000) {}
-        constexpr Config(const embot::hw::i2c::Descriptor &des) : i2cdes(des) {}
+    {   // the addressing of the sensor is given by the bps
+        uint16_t STAGEx_AFE_OFFSET {0x2000}; // mtb4 uses 0x2200. 
+        // this variable contains the value of the offset applied to every stage as described by following registers 
+        // STAGEx_AFE_OFFSET: see table 36 of datasheet https://www.analog.com/media/en/technical-documentation/data-sheets/AD7147.pdf
+        // where a value of 0xMMLL maps 0xMM into bits [15, 8] and 0xLL into bits [7, 0] of the of the register, so that:
+        // (STAGEx_AFE_OFFSET & 0b1000000000000000) >> 15 -> bits[15]    -> POS_AFE_OFFSET_SWAP
+        // (STAGEx_AFE_OFFSET & 0b0100000000000000) >> 14 -> bits[14]    -> Unused
+        // (STAGEx_AFE_OFFSET & 0b0011111100000000) >> 8  -> bits[13:8]  -> POS_AFE_OFFSET
+        // (STAGEx_AFE_OFFSET & 0b0000000010000000) >> 7  -> bits[7]     -> NEG_AFE_OFFSET_SWAP
+        // (STAGEx_AFE_OFFSET & 0b0000000001000000) >> 6  -> bits[6]     -> Unused
+        // (STAGEx_AFE_OFFSET & 0b0000000000111111) >> 0 ->  bits[5:0]   -> NEG_AFE_OFFSET
+        // for teh case of the mtb4 we have 0x2200 = 0b0010001000000000
+        // POS_AFE_OFFSET_SWAP = 0b0 (if 0 -> POS_AFE_OFFSET applied to CDC positive input)
+        // Unused = 0b
+        // POS_AFE_OFFSET = 0b100010 = 34 -> Positive AFE offset setting = 34 * 0.32 pF
+        // NEG_AFE_OFFSET_SWAP = 0b0 -> (if 0 ->  NEG_AFE_OFFSET applied to CDC negative input)
+        // Unused = 0b
+        // NEG_AFE_OFFSET = 0b000000 = 0 -> Negative AFE offset setting = 0 * 0.32 pF       
+        // instead, if we use 0x2000 = 0b0010000000000000 we ... apply 0b100000 = 32 * 0.32 pF to CDC positive input        
+        constexpr Config() = default;
+        constexpr Config(uint16_t registervalue) : STAGEx_AFE_OFFSET(registervalue) {}
+        constexpr Config(uint8_t POS_AFE_OFFSET, uint8_t NEG_AFE_OFFSET) 
+          : STAGEx_AFE_OFFSET( ((POS_AFE_OFFSET & 0b111111)<<8) | (NEG_AFE_OFFSET & 0b111111) ) {}
     };
     
     

@@ -64,7 +64,7 @@ namespace embot { namespace hw { namespace gpio {
 
     bool supported(GPIO &g) { return false; }
     bool initialised(GPIO &g) { return false; }
-    result_t init(embot::hw::GPIO &g, const Config &config) { return resNOK; }
+    result_t init(const embot::hw::GPIO &g, const Config &config) { return resNOK; }
     result_t configure(const embot::hw::stm32GPIO &g, Mode m, Pull p, Speed s) { return resNOK; }      
     result_t set(const embot::hw::stm32GPIO &g, State s) { return resNOK; }
     result_t toggle(const embot::hw::GPIO &g) { return resNOK; }
@@ -97,7 +97,7 @@ namespace embot { namespace hw { namespace gpio {
     }   
 
 
-    result_t init(embot::hw::GPIO &g, const Config &config)
+    result_t init(const embot::hw::GPIO &g, const Config &config)
     {
         return configure(g, config.mode, config.pull, config.speed);
     }  
@@ -178,6 +178,9 @@ namespace embot { namespace hw { namespace gpio {
    
     result_t _configure(const embot::hw::gpio::PROP &g, Mode m, Pull p, Speed s)
     {
+
+        g.clockenable();
+        
         // caveat: for pins HAL_GPIO_* use u16, and all macros are u16, whereas LL_GPIO_* use u32 
         if(m == Mode::OUTPUTopendrain)
         {

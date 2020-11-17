@@ -14,13 +14,13 @@
 #include "embot_core.h"
 #include "embot_hw_types.h"
 #include "embot_hw_bsp.h"
-
+#include "embot_hw_i2c.h"
 
 namespace embot { namespace hw { namespace si7051 {
     
     struct PROP
     {   
-        std::uint8_t i2caddress {0};  
+        embot::hw::i2c::Descriptor i2cdes {embot::hw::I2C::none, 0};  
     };
     
     struct BSP : public embot::hw::bsp::SUPP

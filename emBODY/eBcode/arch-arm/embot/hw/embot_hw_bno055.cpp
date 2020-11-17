@@ -114,7 +114,7 @@ namespace embot { namespace hw { namespace bno055 {
     
     struct PrivateData
     {    
-        std::uint8_t i2caddress[embot::core::tointegral(BNO055::maxnumberof)];
+        embot::hw::i2c::Descriptor i2cdes[embot::core::tointegral(BNO055::maxnumberof)];
         Config config[embot::core::tointegral(BNO055::maxnumberof)];        
         Acquisition acquisition[embot::core::tointegral(BNO055::maxnumberof)];
         PrivateData() { }
@@ -165,16 +165,16 @@ namespace embot { namespace hw { namespace bno055 {
         
                         
         // init i2c ..
-        embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
+        embot::hw::i2c::init(embot::hw::bno055::getBSP().getPROP(s)->i2cdes.bus, {});
         
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bno055::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
+        if(false == embot::hw::i2c::ping(embot::hw::bno055::getBSP().getPROP(s)->i2cdes.bus, embot::hw::bno055::getBSP().getPROP(s)->i2cdes.adr, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
         
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
-        s_privatedata.i2caddress[index] = embot::hw::bno055::getBSP().getPROP(s)->i2caddress;
+        s_privatedata.i2cdes[index] = embot::hw::bno055::getBSP().getPROP(s)->i2cdes;
         
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(s));
                 
@@ -190,7 +190,7 @@ namespace embot { namespace hw { namespace bno055 {
             return false;
         } 
         std::uint8_t index = embot::core::tointegral(s);
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
+        return embot::hw::i2c::ping(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, timeout);  
     }        
 
 
@@ -245,7 +245,7 @@ namespace embot { namespace hw { namespace bno055 {
             return false;
         }
         
-        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
+        return !embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus);             
     }
     
     
@@ -267,7 +267,7 @@ namespace embot { namespace hw { namespace bno055 {
                        
         // now i trigger i2c.
         embot::core::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
-        return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);        
+        return embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);        
     } 
     
     
@@ -289,7 +289,7 @@ namespace embot { namespace hw { namespace bno055 {
                        
         // now i trigger i2c.
         embot::core::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
-        return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(Register::DATASET_START), s_privatedata.acquisition[index].data, cbk);        
+        return embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, static_cast<std::uint8_t>(Register::DATASET_START), s_privatedata.acquisition[index].data, cbk);        
     } 
     
 
@@ -343,7 +343,7 @@ namespace embot { namespace hw { namespace bno055 {
         
         // i2c must not be used by another device (eg. termometer or ...).
         embot::core::relTime remaining = timeout;
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus, timeout, remaining))
+        if(true == embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus, timeout, remaining))
         {
             return resNOK;
         }
@@ -369,7 +369,7 @@ namespace embot { namespace hw { namespace bno055 {
         std::uint8_t index = embot::core::tointegral(s);
 
         // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
+        if(true == embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus))
         {
             return resNOK;
         } 
@@ -395,7 +395,7 @@ namespace embot { namespace hw { namespace bno055 {
         
         // i2c must not be used by another device (eg. termometer or ...).
         embot::core::relTime remaining = timeout;
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus, timeout, remaining))
+        if(true == embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus, timeout, remaining))
         {
             return resNOK;
         }
@@ -410,7 +410,7 @@ namespace embot { namespace hw { namespace bno055 {
         s_privatedata.acquisition[index].startread(data);   
         
         // ok, now i trigger i2c in blocking mode
-        result_t r = embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, timeout);
+        result_t r = embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, timeout);
         s_privatedata.acquisition[index].stop();
         
         return r;      
@@ -427,7 +427,7 @@ namespace embot { namespace hw { namespace bno055 {
         std::uint8_t index = embot::core::tointegral(s);
         
         // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
+        if(true == embot::hw::i2c::isbusy(s_privatedata.i2cdes[index].bus))
         {
             return resNOK;
         } 
@@ -441,7 +441,7 @@ namespace embot { namespace hw { namespace bno055 {
                        
         // ok, now i trigger i2c.
         embot::core::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
-        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);
+        embot::hw::i2c::read(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);
                 
         return resOK;        
     }
@@ -466,7 +466,7 @@ namespace embot { namespace hw { namespace bno055 {
 //    {
 //        std::uint8_t index = embot::core::tointegral(s);   
 //        embot::core::Data data(&val, 1);        
-//        result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg, data, timeout);                
+//        result_t r = embot::hw::i2c::write(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg, data, timeout);                
 //        return r;
 //    }
 
@@ -475,7 +475,7 @@ namespace embot { namespace hw { namespace bno055 {
     {
         std::uint8_t index = embot::core::tointegral(s);   
         s_privatedata.acquisition[index].startwrite(val);        
-        result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg, s_privatedata.acquisition[index].data, timeout);  
+        result_t r = embot::hw::i2c::write(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg, s_privatedata.acquisition[index].data, timeout);  
         s_privatedata.acquisition[index].stop();        
         return r;
     }
@@ -486,7 +486,7 @@ namespace embot { namespace hw { namespace bno055 {
         std::uint8_t index = embot::core::tointegral(s);   
         s_privatedata.acquisition[index].startwrite(val, oncompletion);   
         embot::core::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);        
-        result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg, s_privatedata.acquisition[index].data, cbk);  
+        result_t r = embot::hw::i2c::write(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg, s_privatedata.acquisition[index].data, cbk);  
       
         return r;
     }

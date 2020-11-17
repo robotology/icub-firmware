@@ -20,8 +20,7 @@ namespace embot { namespace hw { namespace ad7147 {
                                   
     struct PROP
     {   
-        embot::hw::I2C i2cbus {embot::hw::I2C::none};
-        std::uint8_t i2caddress {0};        
+        embot::hw::i2c::Descriptor i2cdes {embot::hw::I2C::none, 0};        
     };
     
     struct BSP : public embot::hw::bsp::SUPP

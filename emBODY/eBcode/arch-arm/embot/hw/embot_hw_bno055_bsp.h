@@ -15,14 +15,16 @@
 #include "embot_hw_types.h"
 #include "embot_hw_bsp.h"
 
+#include "embot_hw_bno055.h"
 
 namespace embot { namespace hw { namespace bno055 {
                                   
     struct PROP
     { 
-        std::uint8_t i2caddress {0};
+        embot::hw::i2c::Descriptor i2cdes {embot::hw::I2C::none, 0};
         embot::hw::GPIO boot {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};        
         embot::hw::GPIO reset {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};   
+        constexpr PROP(const embot::hw::i2c::Descriptor &d, const embot::hw::GPIO &b, const embot::hw::GPIO &r) : i2cdes(d), boot(b), reset(r) {}
     };
     
     struct BSP : public embot::hw::bsp::SUPP
