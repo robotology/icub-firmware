@@ -56,6 +56,8 @@ void read_no_reg(uint8_t addr, void *pointer, uint8_t capacity);
 
 void discovery(I2C_HandleTypeDef *bus, uint8_t *addresses, uint8_t sizeofaddresses, uint8_t *numof);
 
+void change_address_i2c2();
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -76,6 +78,85 @@ uint8_t numI2C3 = 0;
 uint8_t foundsI2C4[32] = {0};
 uint8_t numI2C4 = 0;
 
+void test_tlv_changeoftheaddress(void)
+{   
+    change_address_i2c2();    
+}
+
+typedef enum { led_01 = 0, led_02 = 1, led_03 = 2, led_04 = 3, led_05 = 4, led_06 = 5, led_07 = 6, led_numberof = 7, led_all = 31 } led_t;
+typedef enum {led_off = 0, led_on = 1 } led_status_t;
+
+void set_led(led_t l, led_status_t status)
+{
+    static const GPIO_PinState ON = GPIO_PIN_RESET;
+    static const GPIO_PinState OFF = GPIO_PIN_SET;
+    static uint16_t pins[] = { LED1_Pin, LED2_Pin, LED3_Pin, LED4_Pin, LED5_Pin, LED6_Pin, LED7_Pin };  
+    static GPIO_TypeDef * ports[] = { LED1_GPIO_Port, LED2_GPIO_Port, LED3_GPIO_Port, LED4_GPIO_Port, LED5_GPIO_Port, LED6_GPIO_Port, LED7_GPIO_Port };    
+    
+    GPIO_PinState st = (status == led_on) ? ON : OFF;
+    
+    if(led_all == l)
+    {            
+        for(uint8_t n=0; n<led_numberof; n++)
+        {
+            HAL_GPIO_WritePin(ports[n], pins[n], st);
+        }
+    }
+    else if(l < led_numberof)
+    {
+        HAL_GPIO_WritePin(ports[l], pins[l], st);
+    }
+    
+}
+
+
+    led_status_t prev[4] = {led_off};
+    led_status_t curr[4] = {led_off};
+    
+    
+void startup_adr()
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    // i2c1
+    // power down j11
+    HAL_GPIO_WritePin(GPIOE, MAGVCC1_Pin, GPIO_PIN_RESET);
+    HAL_Delay(10); 
+    
+    // sda-i2c1 PB9 low 
+    __HAL_RCC_GPIOB_CLK_ENABLE();    
+    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_NOPULL; 
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);    
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
+    HAL_Delay(10);
+    // power up j11
+    HAL_GPIO_WritePin(GPIOE, MAGVCC1_Pin, GPIO_PIN_SET);    
+    HAL_Delay(10);  
+    
+    
+    // i2c2
+    // power down u27
+    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_RESET);
+    HAL_Delay(10); 
+    
+    // sda-i2c2 PA8 low 
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_NOPULL; 
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+    HAL_Delay(10);
+    // power up u27
+    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_SET);    
+    HAL_Delay(10);    
+    
+
+}    
+    
 void test_tlv_init(void)
 {
     volatile HAL_StatusTypeDef status = HAL_ERROR;
@@ -84,12 +165,33 @@ void test_tlv_init(void)
     
     // power off and on again. wait 3 ms
     
-   
-    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
-    HAL_Delay(20);
-    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_SET);
-    HAL_Delay(20);
     
+    set_led(led_all, led_off);
+    set_led(led_01, led_on);
+    set_led(led_02, led_on);
+    set_led(led_03, led_on);
+    set_led(led_04, led_on);
+    set_led(led_05, led_on);
+    set_led(led_06, led_on);
+    set_led(led_07, led_on);
+    set_led(led_all, led_off);
+    
+   
+//    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
+//    HAL_Delay(20);
+
+#if 0
+//    HAL_GPIO_WritePin(GPIOE, MAGVCC1_Pin, GPIO_PIN_SET);
+//    HAL_Delay(20);
+//    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_SET);
+//    HAL_Delay(20);
+//    HAL_GPIO_WritePin(GPIOE, MAGVCC1_Pin, GPIO_PIN_SET);
+//    HAL_Delay(20);  
+#else
+    startup_adr();
+#endif
+
+
     
     // init dma + i2c
     
@@ -100,10 +202,53 @@ void test_tlv_init(void)
     MX_I2C4_Init();    
     HAL_Delay(20);
     
-    discovery(&hi2c1, foundsI2C1, sizeof(foundsI2C1), &numI2C1);
-    discovery(&hi2c2, foundsI2C2, sizeof(foundsI2C2), &numI2C2);
-    discovery(&hi2c3, foundsI2C3, sizeof(foundsI2C3), &numI2C3);
-    discovery(&hi2c4, foundsI2C4, sizeof(foundsI2C4), &numI2C4);
+    uint8_t first = 1;
+    
+    volatile uint8_t changed = 0;
+ 
+    for(;;)
+    {
+        HAL_Delay(100);
+        discovery(&hi2c1, foundsI2C1, sizeof(foundsI2C1), &numI2C1);
+        discovery(&hi2c2, foundsI2C2, sizeof(foundsI2C2), &numI2C2);
+        discovery(&hi2c3, foundsI2C3, sizeof(foundsI2C3), &numI2C3);
+        discovery(&hi2c4, foundsI2C4, sizeof(foundsI2C4), &numI2C4);
+        
+        memcpy(prev, curr, sizeof(curr));
+        
+        if(numI2C3 == 0)
+        {
+            changed = 1;
+            changed = changed;
+        }
+        
+        curr[0] = (0 == numI2C1) ? led_off : led_on;
+        curr[1] = (0 == numI2C2) ? led_off : led_on;
+        curr[2] = (0 == numI2C3) ? led_off : led_on;
+        curr[3] = (0 == numI2C4) ? led_off : led_on;
+
+        
+        set_led(led_04, curr[0]); // J4
+        set_led(led_03, curr[1]); // J5
+        set_led(led_02, curr[2]); // J6
+        set_led(led_01, curr[3]); // J7
+        
+        if((1 != first) && (0 != memcmp(prev, curr, sizeof(prev))))
+        {
+            set_led(led_07, led_on);
+            HAL_Delay(500);
+            set_led(led_07, led_off);  
+            HAL_Delay(500);
+            set_led(led_07, led_on);  
+            HAL_Delay(500);
+            set_led(led_07, led_off);             
+        }
+        
+        if(1 == first)
+        {
+            first = 0;
+        }
+    }
     
     for(;;);
     
@@ -250,6 +395,139 @@ void discovery(I2C_HandleTypeDef *bus, uint8_t *addrs, uint8_t sizeofaddrs, uint
     
     
     
+}
+typedef enum { dev_j4 = 0, dev_j13 = 1, dev_j5 = 2, dev_u27 = 3 } dev_t;
+
+void address_default(dev_t dev)
+{
+    
+    I2C_HandleTypeDef *bus = NULL;
+    
+    if(dev_u27 == dev)
+    {
+        bus = &hi2c2;   
+        
+        // now i switch device on.
+        MX_GPIO_Init();   
+
+        
+        // init i2c2
+        MX_DMA_Init();
+        MX_I2C2_Init(); 
+        HAL_Delay(20); 
+        
+
+        
+        HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_RESET);
+        HAL_Delay(20);
+        HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_SET);
+        HAL_Delay(20);   
+
+        // now i discover on i2c2
+        discovery(&hi2c2, foundsI2C2, sizeof(foundsI2C2), &numI2C2);
+        // now i reset the chip by sending zero
+        HAL_I2C_Master_Transmit(bus, 0, NULL, 0, 3);
+        HAL_Delay(20);
+        // now i discover again: i expect the default address 0xBC, but i read 0x3E
+        discovery(&hi2c2, foundsI2C2, sizeof(foundsI2C2), &numI2C2);
+    }
+    
+    for(;;);
+            
+}
+
+void address_other(dev_t dev)
+{
+    
+    I2C_HandleTypeDef *bus = NULL;
+    
+    if(dev_u27 == dev)
+    {
+        bus = &hi2c2;   
+        
+        // init i2c2
+//        MX_DMA_Init();
+//        MX_I2C2_Init(); 
+//        HAL_Delay(20); 
+        
+        // chip off
+        MX_GPIO_Init();        
+        HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_RESET);
+        HAL_Delay(20);
+        
+        // i config gpio (I2C2_SDA) sul port PB9 (PA8) come GPIO Out Open-Drain forzando lo stato LOW in uscita.
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+        GPIO_InitTypeDef GPIO_InitStruct = {0};
+        GPIO_InitStruct.Pin = GPIO_PIN_8;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+        GPIO_InitStruct.Pull = GPIO_NOPULL; //GPIO_PULLUP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+        
+//        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+        HAL_Delay(20);
+
+        // now i put MAGVCC2 high
+        HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_SET);
+        HAL_Delay(20);
+        
+        // init i2c2
+        MX_DMA_Init();
+        MX_I2C2_Init(); 
+        HAL_Delay(20);         
+
+        // now i discover on i2c2. i expect 0x3e
+        discovery(&hi2c2, foundsI2C2, sizeof(foundsI2C2), &numI2C2);
+
+    }
+    
+    for(;;);
+            
+}
+
+void change_address_i2c2()
+{
+    // 1. power off u27. chip on j5 gets address 0xBC
+    // 2. put sda pin low
+    // 3. power on u27
+    // 4. discover i2c2
+    
+  
+    HAL_Delay(20);
+    MX_GPIO_Init();
+
+    // power down u27
+    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_RESET);
+    HAL_Delay(5); 
+    
+    // sda PA8 low 
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_NOPULL; 
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+    HAL_Delay(10);
+    // power down and up u27
+//    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_RESET);
+//    HAL_Delay(5); 
+    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_SET);    
+    HAL_Delay(10);
+
+    // init i2c2
+    MX_DMA_Init();
+    MX_I2C2_Init(); 
+    HAL_Delay(20);
+    // and discover
+    discovery(&hi2c2, foundsI2C2, sizeof(foundsI2C2), &numI2C2);
+    for(;;);
+    
+    // 2. set sda 
+//    address_other(dev_u27);
+//    address_default(dev_u27);
 }
 
 

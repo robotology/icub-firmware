@@ -104,6 +104,7 @@ int main(void)
 
 #if defined(TEST_TLV)  
 
+    //test_tlv_changeoftheaddress();
     test_tlv_init();
     for(;;);
 
