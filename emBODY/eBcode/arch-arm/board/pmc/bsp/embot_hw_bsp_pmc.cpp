@@ -23,6 +23,7 @@
 
 #include "embot_core_binary.h"
 #include "embot_core.h"
+#include "embot_hw_sys.h"
 
 #if defined(USE_STM32HAL)
     #include "stm32hal.h"
@@ -45,19 +46,138 @@ using namespace embot::core::binary;
 // - specialize the bsp
 // --------------------------------------------------------------------------------------------------------------------
 
+void i2c_address_assignment_to_tlv493d_chips_stm32hal()
+{
+    // i2c address assignment for fap boards and internal tlv493d.
+    // faps on J4, J5, J6 and J7 shall have 0xBC. they are respectively on I2C1, I2C2, I2C3 and I2C4
+    // fap on J11 and internal tlv493d U27 shall have 0x3E. they are respectively on I2C1 and I2C2
+    
+    // i proceed as if the call of MX_GPIO_Init() was not done.
+    // 1. init of PE10 (power of J11) and of PE11 (power of U27). cube-mx uses MAGVCC1_Pin and MAGVCC2_Pin respectively
+    // 2. power them off ...
+    // 3. init the sda-i2c1 PB9 and sda-i2c2 PA8
+    // ...
+    
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    
+    // init power control pins for J11 and U27. they are PE10 and PE11
+    __HAL_RCC_GPIOE_CLK_ENABLE();
+    GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);  
+
+    // power off both J11 and U27 and wait
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10 | GPIO_PIN_11, GPIO_PIN_RESET);
+    HAL_Delay(10);
+    
+    // init i2c1-sda (PB9) as output and put it low. then power up J11
+    __HAL_RCC_GPIOB_CLK_ENABLE();    
+    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_NOPULL; 
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);    
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
+    HAL_Delay(10);
+    // power up J11 so that it can have address 0x3E
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);    
+    HAL_Delay(10);  
+
+    // init i2c2-sda (PA8) as output and put it low. then power up J11
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull = GPIO_NOPULL; 
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);    
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+    HAL_Delay(10);
+    // power up u27 so that it can have address 0x3E
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);    
+    HAL_Delay(10);      
+    
+}
+
+#include "embot_hw_led_bsp.h"
+void i2c_address_assignment_to_tlv493d_chips()
+{
+    // i2c address assignment for fap boards and internal tlv493d.
+    // faps on J4, J5, J6 and J7 shall have 0xBC. they are respectively on I2C1, I2C2, I2C3 and I2C4
+    // fap on J11 and internal tlv493d U27 shall have 0x3E. they are respectively on I2C1 and I2C2
+    
+    // i proceed as if the call of MX_GPIO_Init() was not done.
+    // 1. init of PE10 (power of J11) and of PE11 (power of U27). cube-mx uses MAGVCC1_Pin and MAGVCC2_Pin respectively
+    // 2. power them off ...
+    // 3. init the sda-i2c1 PB9 and sda-i2c2 PA8
+    // ...
+    
+    
+    using namespace embot::hw;
+    
+    constexpr GPIO gpioMAGVCC1 {GPIO::PORT::E, GPIO::PIN::ten};
+    constexpr GPIO gpioMAGVCC2 {GPIO::PORT::E, GPIO::PIN::eleven};    
+    constexpr GPIO gpioI2C1sda {GPIO::PORT::B, GPIO::PIN::nine};
+    constexpr GPIO gpioI2C2sda {GPIO::PORT::A, GPIO::PIN::eight};
+    
+    
+//    constexpr embot::hw::led::PROP LED7p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::nine}  };        
+//    gpio::init(LED7p.gpio, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});  
+//    gpio::set(LED7p.gpio, LED7p.off);
+//    gpio::set(LED7p.gpio, LED7p.on);
+    
+    // init the pins which controls power on/off of the two sensors
+    gpio::init(gpioMAGVCC1, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});    
+    gpio::init(gpioMAGVCC2, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});
+    // set them low to power off both J11 and U27
+    gpio::set(gpioMAGVCC1, gpio::State::RESET);
+    gpio::set(gpioMAGVCC2, gpio::State::RESET);
+        
+    // init the sda pins for i2c1 and i2c2
+    gpio::init(gpioI2C1sda, {gpio::Mode::OUTPUTopendrain, gpio::Pull::nopull, gpio::Speed::veryhigh});
+    gpio::init(gpioI2C2sda, {gpio::Mode::OUTPUTopendrain, gpio::Pull::nopull, gpio::Speed::veryhigh});
+    // and set them low
+    gpio::set(gpioI2C1sda, gpio::State::RESET);
+    gpio::set(gpioI2C2sda, gpio::State::RESET);
+    
+    // wait a bit to stabilize ... 
+    // cannot use embot::core::wait() now because the rtos is not started yet. 
+    sys::delay(10*embot::core::time1millisec);
+    
+    // and now ... power up J11 and U27 so that they can have address 0x3E
+    gpio::set(gpioMAGVCC1, gpio::State::SET);
+    gpio::set(gpioMAGVCC2, gpio::State::SET);
+    // wait a bit so that the chips are read to use.
+    sys::delay(10*embot::core::time1millisec);
+        
+}
+
+void leds_off()
+{
+    using namespace embot::hw;
+    const led::BSP &b = led::getBSP();
+    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three, LED::four, LED::five, LED::six, LED::seven , LED::eight};
+    for(const auto &l : leds)
+    {
+        const led::PROP *p = b.getPROP(l);
+        if(nullptr != p)
+        {
+            gpio::init(p->gpio, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});  
+            gpio::set(p->gpio, p->off);
+        }
+    }    
+}
+
 #if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
 bool embot::hw::bsp::specialize() { return true; }
 #else   
 bool embot::hw::bsp::specialize() 
 { 
 
-    // power off the J13 and U27
-    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
-    HAL_Delay(10);
+    i2c_address_assignment_to_tlv493d_chips();
+    leds_off();
     
-//    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_SET);
-//    HAL_Delay(10);
-
     return true; 
 }
 #endif  //EMBOT_ENABLE_hw_bsp_specialize
@@ -93,6 +213,7 @@ namespace embot { namespace hw { namespace gpio {
 namespace embot { namespace hw { namespace gpio {
  
     #if defined(STM32HAL_BOARD_PMC)
+    
     const BSP thebsp {        
         // supportmask2d
         {{
@@ -101,6 +222,11 @@ namespace embot { namespace hw { namespace gpio {
         // ports
         {{
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, nullptr
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, [](){__HAL_RCC_GPIOF_CLK_ENABLE();},
+            [](){__HAL_RCC_GPIOG_CLK_ENABLE();}, nullptr
         }}
     };      
     #else
@@ -232,8 +358,7 @@ namespace embot { namespace hw { namespace can {
                
     #if   defined(STM32HAL_BOARD_PMC)
         
-    constexpr PROP can1p = { .handle = &hfdcan1 }; 
-//    constexpr PROP can2p = { .handle = &hfdcan2 };    
+    constexpr PROP can1p = { .handle = &hfdcan1 };  
         
     constexpr BSP thebsp {        
         // maskofsupported
@@ -244,14 +369,6 @@ namespace embot { namespace hw { namespace can {
         }}        
     };
     
-//    constexpr BSP thebsp {        
-//        // maskofsupported
-//        mask::pos2mask<uint32_t>(CAN::one) | mask::pos2mask<uint32_t>(CAN::two),        
-//        // properties
-//        {{
-//            &can1p, &can2p           
-//        }}        
-//    };
     
     void BSP::init(embot::hw::CAN h) const 
     {
@@ -282,10 +399,6 @@ namespace embot { namespace hw { namespace can {
             }
 
         }
-//        else if(h == CAN::two)
-//        {            
-//            MX_FDCAN2_Init();
-//        }
     }
     
     #else
@@ -542,10 +655,10 @@ namespace embot { namespace hw { namespace i2c {
                   
     #if   defined(STM32HAL_BOARD_PMC)
     
-    constexpr PROP i2c1p { .handle = &hi2c1 };
-    constexpr PROP i2c2p { .handle = &hi2c2 };
-    constexpr PROP i2c3p { .handle = &hi2c3 };
-    constexpr PROP i2c4p { .handle = &hi2c4 };
+    constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::standard100 };
+    constexpr PROP i2c2p { &hi2c2, embot::hw::i2c::Speed::standard100 };
+    constexpr PROP i2c3p { &hi2c3, embot::hw::i2c::Speed::standard100 };
+    constexpr PROP i2c4p { &hi2c4, embot::hw::i2c::Speed::standard100 };
 
         
     constexpr BSP thebsp {        
@@ -635,7 +748,6 @@ void I2C4_ER_IRQHandler(void)
 {
     HAL_I2C_ER_IRQHandler(&hi2c4);
 }
-
 
 void DMA1_Channel4_IRQHandler(void)
 {
@@ -735,15 +847,14 @@ namespace embot { namespace hw { namespace tlv493d {
     #if defined(STM32HAL_BOARD_PMC)
     
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
-//    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC }; 
-//    constexpr PROP prop04 { .i2cbus = embot::hw::I2C::two, .i2caddress = 0xBC };    
+
+    constexpr PROP propJ4  { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0xBC} };
+    constexpr PROP propJ5  { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0xBC} };
+    constexpr PROP propJ6  { embot::hw::i2c::Descriptor{embot::hw::I2C::three, 0xBC} }; 
+    constexpr PROP propJ7  { embot::hw::i2c::Descriptor{embot::hw::I2C::four,  0xBC} };  
+    constexpr PROP propJ11 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
+    constexpr PROP propU27 { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0x3E} };
     
-    constexpr PROP propJ4 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E };
-    constexpr PROP propJ5 { .i2cbus = embot::hw::I2C::two, .i2caddress = 0x3E };
-    constexpr PROP propJ6 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x3E }; 
-    constexpr PROP propJ7 { .i2cbus = embot::hw::I2C::four, .i2caddress = 0x3E };  
-    constexpr PROP propJ13alone { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E };
-    constexpr PROP propU27alone { .i2cbus = embot::hw::I2C::two, .i2caddress = 0x3E };
     #else
     constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC };
     constexpr PROP prop02fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x02 };
@@ -762,7 +873,7 @@ namespace embot { namespace hw { namespace tlv493d {
         mask::pos2mask<uint32_t>(TLV493D::five) | mask::pos2mask<uint32_t>(TLV493D::six),        
         // properties
         {{
-            &propJ4, &propJ5, &propJ6, &propJ7, nullptr, &propU27alone
+            &propJ4, &propJ5, &propJ6, &propJ7, &propJ11, &propU27
         }}
 #else
         // maskofsupported
@@ -793,74 +904,6 @@ namespace embot { namespace hw { namespace tlv493d {
 // - support map: end of embot::hw::tlv493d
 
 
-// - support map: begin of embot::hw::multisda
-
-#include "embot_hw_multisda_bsp.h"
-
-#if   !defined(EMBOT_ENABLE_hw_multisda)
-
-namespace embot { namespace hw { namespace multisda {
-    
-    constexpr BSP thebsp { };
-
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-#endif // multisda
-
-// - support map: end of embot::hw::multisda
-
-
-// - support map: begin of embot::hw::ads122c04
-
-#include "embot_hw_ads122c04_bsp.h"
-
-#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_ads122c04)
-
-namespace embot { namespace hw { namespace ads122c04 {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::ADS122C04 h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-#endif // ads122c04
-
-// - support map: end of embot::hw::ads122c04
-
-
-
-// - support map: begin of embot::hw::ad7147
-
-#include "embot_hw_ad7147_bsp.h"
-
-#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_ad7147)
-
-namespace embot { namespace hw { namespace ad7147 {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::AD7147 h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-#endif // ad7147
-
-// - support map: end of embot::hw::ad7147
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

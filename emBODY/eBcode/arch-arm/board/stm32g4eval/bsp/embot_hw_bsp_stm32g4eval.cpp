@@ -90,6 +90,11 @@ namespace embot { namespace hw { namespace gpio {
         // ports
         {{
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, nullptr
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, [](){__HAL_RCC_GPIOF_CLK_ENABLE();},
+            [](){__HAL_RCC_GPIOG_CLK_ENABLE();}, nullptr
         }}
     };   
     #else
@@ -371,7 +376,7 @@ namespace embot { namespace hw { namespace i2c {
                   
     #if   defined(STM32HAL_BOARD_STM32G4EVAL)
     
-    constexpr PROP i2c3p { .handle = &hi2c3 };
+    constexpr PROP i2c3p { &hi2c3, embot::hw::i2c::Speed::fast400 };
         
     constexpr BSP thebsp {        
         // maskofsupported   
@@ -457,13 +462,13 @@ namespace embot { namespace hw { namespace tlv493d {
 namespace embot { namespace hw { namespace tlv493d {
            
     #if defined(STM32HAL_BOARD_STM32G4EVAL)
-    
-    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC };
-    constexpr PROP prop02fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x02 };
-    constexpr PROP prop03fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x03 };
-    constexpr PROP prop04fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x04 };
-    constexpr PROP prop05fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x05 };
-    constexpr PROP prop06fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x06 };
+         
+    constexpr PROP prop01 { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0xBC} };
+    constexpr PROP prop02fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x02} };
+    constexpr PROP prop03fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x03} };
+    constexpr PROP prop04fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x04} };
+    constexpr PROP prop05fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x05} };
+    constexpr PROP prop06fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x06} };
 
 
     constexpr BSP thebsp {     

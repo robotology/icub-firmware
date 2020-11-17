@@ -83,6 +83,12 @@ namespace embot { namespace hw { namespace gpio {
         // ports
         {{
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, nullptr, nullptr, nullptr
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, nullptr,
+            nullptr, nullptr
         }}
     };      
     #else
@@ -415,7 +421,7 @@ namespace embot { namespace hw { namespace si7051 {
         
     // actually the strain2 has another chip mounted, which is in the same i2c bus as the bno.
     // for now we don't support it
-    constexpr PROP prop01 { .i2caddress = 0x80 }; 
+    constexpr PROP prop01 { embot::hw::i2c::Descriptor{embot::hw::I2C::one, 0x80} }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
@@ -710,8 +716,8 @@ namespace embot { namespace hw { namespace i2c {
                   
     #if   defined(STM32HAL_BOARD_STRAIN2)
     
-    constexpr PROP i2c1p { .handle = &hi2c1 }; 
-    constexpr PROP i2c2p { .handle = &hi2c2 }; 
+    constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::fast400 }; 
+    constexpr PROP i2c2p { &hi2c2, embot::hw::i2c::Speed::fast400 }; 
         
     constexpr BSP thebsp {        
         // maskofsupported
@@ -823,7 +829,11 @@ namespace embot { namespace hw { namespace bno055 {
     #if defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2)
     
     // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
-    constexpr PROP prop01 { .i2caddress = 0x52, .boot = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen }, .reset = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve } }; 
+    constexpr PROP prop01 {
+        { embot::hw::I2C::two, 0x52 },
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen },   // .boot
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve }      // .reset
+    };
 
     constexpr BSP thebsp {        
         // maskofsupported

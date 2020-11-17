@@ -83,6 +83,12 @@ namespace embot { namespace hw { namespace gpio {
         // ports
         {{
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, nullptr, nullptr, nullptr
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, nullptr,
+            nullptr, nullptr
         }}
     };      
     #else
@@ -614,8 +620,8 @@ namespace embot { namespace hw { namespace i2c {
                   
     #if   defined(STM32HAL_BOARD_PSC)
     
-    constexpr PROP i2c1p { .handle = &hi2c1 }; 
-    constexpr PROP i2c3p { .handle = &hi2c3 }; 
+    constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::fast400 }; 
+    constexpr PROP i2c3p { &hi2c3, embot::hw::i2c::Speed::fast400 }; 
         
     constexpr BSP thebsp {        
         // maskofsupported
@@ -731,8 +737,8 @@ namespace embot { namespace hw { namespace tlv493d {
     
     #if defined(STM32HAL_BOARD_PSC)
         
-    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E }; 
-    constexpr PROP prop02 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x3E }; 
+    constexpr PROP prop01 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} }; 
+    constexpr PROP prop02 { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x3E} }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
@@ -827,10 +833,10 @@ namespace embot { namespace hw { namespace multisda {
 
     static const BSP thebsp { 
         // clk = 
-        { I2C_CLK_GPIO_Port, I2C_CLK_Pin },
+        { I2C_CLK_GPIO_Port, I2C_CLK_Pin, nullptr },
         // sda
         {{  
-            { I2C_SDA0_GPIO_Port, I2C_SDA0_Pin }, { I2C_SDA1_GPIO_Port, I2C_SDA1_Pin }, { I2C_SDA2_GPIO_Port, I2C_SDA2_Pin }, { I2C_SDA3_GPIO_Port, I2C_SDA3_Pin }            
+            { I2C_SDA0_GPIO_Port, I2C_SDA0_Pin, nullptr }, { I2C_SDA1_GPIO_Port, I2C_SDA1_Pin, nullptr }, { I2C_SDA2_GPIO_Port, I2C_SDA2_Pin, nullptr }, { I2C_SDA3_GPIO_Port, I2C_SDA3_Pin, nullptr }            
         }}
     };
     

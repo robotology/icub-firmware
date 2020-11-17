@@ -83,7 +83,13 @@ namespace embot { namespace hw { namespace gpio {
         // ports
         {{
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, nullptr, nullptr, nullptr
-        }}
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, nullptr,
+            nullptr, nullptr
+        }}            
     };      
     #else
         #error embot::hw::gpio::thebsp must be defined
@@ -381,7 +387,7 @@ namespace embot { namespace hw { namespace si7051 {
     #if   defined(STM32HAL_BOARD_MTB4)
     
     // the mtb4 has only one si7051 chip
-    constexpr PROP prop01 { .i2caddress = 0x80 }; 
+    constexpr PROP prop01 { embot::hw::i2c::Descriptor{embot::hw::I2C::one, 0x80} }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
@@ -580,8 +586,8 @@ namespace embot { namespace hw { namespace i2c {
                   
     #if   defined(STM32HAL_BOARD_MTB4)
     
-    constexpr PROP i2c1p { .handle = &hi2c1 }; 
-    constexpr PROP i2c2p { .handle = &hi2c2 }; 
+    constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::fast400 }; 
+    constexpr PROP i2c2p { &hi2c2, embot::hw::i2c::Speed::fast400 }; 
                 
     constexpr BSP thebsp {        
         // maskofsupported
@@ -694,7 +700,13 @@ namespace embot { namespace hw { namespace bno055 {
     #if defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2)
     
     // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
-    constexpr PROP prop01 { .i2caddress = 0x52, .boot = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen }, .reset = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve } }; 
+    constexpr PROP prop01 {
+        { embot::hw::I2C::two, 0x52 },
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen },   // .boot
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve }      // .reset
+    };
+    
+//    constexpr PROP prop01 { .i2caddress = 0x52, .boot = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen }, .reset = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve } }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
@@ -780,10 +792,10 @@ namespace embot { namespace hw { namespace multisda {
 
     static const BSP thebsp { 
         // clk = 
-        { SCK0_GPIO_Port, SCK0_Pin },
+        { SCK0_GPIO_Port, SCK0_Pin, nullptr },
         // sda
         {{  
-            { SDA0_GPIO_Port, SDA0_Pin }, { SDA1_GPIO_Port, SDA1_Pin }, { SDA2_GPIO_Port, SDA2_Pin }, { SDA3_GPIO_Port, SDA3_Pin }            
+            { SDA0_GPIO_Port, SDA0_Pin, nullptr }, { SDA1_GPIO_Port, SDA1_Pin, nullptr }, { SDA2_GPIO_Port, SDA2_Pin, nullptr }, { SDA3_GPIO_Port, SDA3_Pin, nullptr }            
         }}
     };
     

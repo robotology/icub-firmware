@@ -83,7 +83,13 @@ namespace embot { namespace hw { namespace gpio {
         // ports
         {{
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, nullptr, nullptr, nullptr
-        }}
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, nullptr,
+            nullptr, nullptr
+        }}        
     };      
     #else
         #error embot::hw::gpio::thebsp must be defined
@@ -241,7 +247,7 @@ namespace embot { namespace hw { namespace button {
         
         void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
-             embot::hw::button::getBSP().onEXTI({nullptr, GPIO_Pin});            
+             embot::hw::button::getBSP().onEXTI({nullptr, GPIO_Pin, nullptr});            
         }        
     }
            
@@ -627,7 +633,7 @@ namespace embot { namespace hw { namespace i2c {
                   
     #if   defined(STM32HAL_BOARD_NUCLEOH7)
     
-    constexpr PROP i2c1p { .handle = &hi2c1 };
+    constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::fast400 };
         
     constexpr BSP thebsp {        
         // maskofsupported   
@@ -712,7 +718,12 @@ namespace embot { namespace hw { namespace bno055 {
     
     #if defined(STM32HAL_BOARD_NUCLEOH7)
     
-    constexpr PROP prop01 { .i2caddress = 0x52, .boot = { embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none }, .reset = { embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none } }; 
+    constexpr PROP prop01 {
+        { embot::hw::I2C::one, 0x52 },
+        { embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none },   // .boot
+        { embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none }      // .reset
+    };
+    
 
     constexpr BSP thebsp {        
         // maskofsupported
@@ -763,7 +774,7 @@ namespace embot { namespace hw { namespace ads122c04 {
     
     #if defined(STM32HAL_BOARD_NUCLEOH7)
             
-    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = (0x40<<1) }; 
+    constexpr PROP prop01 { embot::hw::i2c::Descriptor{embot::hw::I2C::one, 0x40<<1} };
 
     constexpr BSP thebsp {        
         // maskofsupported
@@ -815,8 +826,8 @@ namespace embot { namespace hw { namespace ad7147 {
     
     #if defined(STM32HAL_BOARD_NUCLEOH7)
             
-    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x58 }; 
-    constexpr PROP prop02 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x5A }; 
+    constexpr PROP prop01 { embot::hw::i2c::Descriptor{embot::hw::I2C::one, 0x58} };
+    constexpr PROP prop02 { embot::hw::i2c::Descriptor{embot::hw::I2C::one, 0x5A} };
 
     constexpr BSP thebsp {        
         // maskofsupported
