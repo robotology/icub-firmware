@@ -87,6 +87,21 @@ void embot::app::ctrl::tCOMM::userdefOnEventANYother(embot::os::Thread *t, embot
         embot::app::application::theFAPreader &thefap = embot::app::application::theFAPreader::getInstance(); 
 #if !defined(TEST_NO_CAN)   
         thefap.get(outframes);
+#if 0        
+        if(outframes.size() > 0)
+        {
+            std::string str = std::string("tCAN: ") + std::to_string(outframes.size()) + " angles to TX = [ ";
+            for(size_t i=0; i<outframes.size(); i++)
+            {
+                int16_t v = static_cast<int16_t>(outframes[i].data[2]) + (static_cast<int16_t>(outframes[i].data[3]) << 8);
+                str += std::to_string(v/10);
+                str += " ";
+            }
+            str += "] DEG @ ";
+            str +=  embot::core::TimeFormatter(embot::core::now()).to_string();  
+            embot::core::print(str);           
+        }
+#endif        
 #else
         testframes.clear();
         thefap.get(testframes);  
