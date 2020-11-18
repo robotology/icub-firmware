@@ -20,9 +20,11 @@
 namespace embot { namespace hw { namespace ad7147 {
          
         
+    // the ad7147 supports 12 taxels (values, stages, ...).
+    constexpr size_t numberofTaxels {12};
+        
     struct Config
-    {   // the addressing of the sensor is given by the bps
-        uint16_t STAGEx_AFE_OFFSET {0x2000}; // mtb4 uses 0x2200. 
+    {   
         // this variable contains the value of the offset applied to every stage as described by following registers 
         // STAGEx_AFE_OFFSET: see table 36 of datasheet https://www.analog.com/media/en/technical-documentation/data-sheets/AD7147.pdf
         // where a value of 0xMMLL maps 0xMM into bits [15, 8] and 0xLL into bits [7, 0] of the of the register, so that:
@@ -39,23 +41,29 @@ namespace embot { namespace hw { namespace ad7147 {
         // NEG_AFE_OFFSET_SWAP = 0b0 -> (if 0 ->  NEG_AFE_OFFSET applied to CDC negative input)
         // Unused = 0b
         // NEG_AFE_OFFSET = 0b000000 = 0 -> Negative AFE offset setting = 0 * 0.32 pF       
-        // instead, if we use 0x2000 = 0b0010000000000000 we ... apply 0b100000 = 32 * 0.32 pF to CDC positive input        
+        // instead, if we use 0x2000 = 0b0010000000000000 we ... apply 0b100000 = 32 * 0.32 pF to CDC positive input     
+        uint16_t STAGEx_AFE_OFFSET {0x2000}; // mtb4 uses 0x2200. 
+        
         constexpr Config() = default;
+        // this constructor uses teh raw value of the register 
         constexpr Config(uint16_t registervalue) : STAGEx_AFE_OFFSET(registervalue) {}
+        // this constructor uses the two values of the positive and negative offsets. each in range [0, 63]     
         constexpr Config(uint8_t POS_AFE_OFFSET, uint8_t NEG_AFE_OFFSET) 
           : STAGEx_AFE_OFFSET( ((POS_AFE_OFFSET & 0b111111)<<8) | (NEG_AFE_OFFSET & 0b111111) ) {}
     };
-    
-    
-    using Values = std::array<std::uint16_t, 12>; 
+       
+    // it keeps the values of the 12 stages
+    using Values = std::array<std::uint16_t, numberofTaxels>; 
     
     
     bool supported(embot::hw::AD7147 s);    
     bool initialised(embot::hw::AD7147 s);    
     result_t init(embot::hw::AD7147 s, const Config &config);
-        
     
-    // after that init() returns resOK we can check if it is alive. we can specify a timeout
+    // after init() returns resOK, if needed we can configure the chip in a different way.
+    result_t configure(AD7147 s, const Config &config);
+            
+    // after init() returns resOK we can check if it is alive. we can specify a timeout
     bool isalive(embot::hw::AD7147 s, embot::core::relTime timeout = 3*embot::core::time1millisec);
     
     // we must check that nobody is using the sensor, maybe in non-blocking mode some time earlier
@@ -63,8 +71,7 @@ namespace embot { namespace hw { namespace ad7147 {
     
     // we check isacquiring() but also if any other device is using i2c bus
     bool canacquire(embot::hw::AD7147 s);    
-    
-    
+        
     // we start acquisition
     // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
     result_t acquisition(embot::hw::AD7147 s, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
