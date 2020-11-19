@@ -56,7 +56,130 @@
 
 #include "EOtheSTRAIN_hid.h"
 
+#if defined(EOTHESERVICES_disable_theSTRAIN)
 
+    // provide empty implementation, so that we dont need to change the caller of the API
+    
+    extern EOtheSTRAIN* eo_strain_Initialise(void) 
+    {   
+        return NULL; 
+    }
+
+    extern EOtheSTRAIN* eo_strain_GetHandle(void)   
+    { 
+        return NULL; 
+    }
+
+    extern eOmn_serv_state_t eo_strain_GetServiceState(EOtheSTRAIN *p) 
+    { 
+        return eomn_serv_state_notsupported; 
+    }
+    
+    // in some cases, we need to alert the pc104 that the board does not support this service
+    extern eOresult_t eo_strain_SendReport(EOtheSTRAIN *p)
+    {
+        static const char s_eobj_ownname[] = "EOtheSTRAIN";
+        eOerrmanDescriptor_t errdes = {};
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_strain_failed_notsupported);  
+        errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress = 0;
+        errdes.par16 = errdes.par64 = 0;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+        return eores_OK;
+    }
+
+
+    extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    {
+        // we alert the host that the verification of the service has failed
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, eomn_serv_state_failureofverify);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        } 
+        
+        // we tell that the reason is that this service is not supported
+        eo_strain_SendReport(NULL);
+               
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg)
+    {
+        eo_strain_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_strain_Start(EOtheSTRAIN *p)
+    {
+        eo_strain_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_strain_SetRegulars(EOtheSTRAIN *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+    {
+        eo_strain_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_strain_Transmission(EOtheSTRAIN *p, eObool_t on)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_strain_Config(EOtheSTRAIN *p, eOas_inertial3_config_t* config)
+    {
+        eo_strain_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperation_fun_t overrideonfullscaleready)
+    {
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg)
+    {
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
+    {
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
+    {
+        return eores_NOK_generic;
+    }
+    
+    extern uint8_t eo_strain_GetDataRate(EOtheSTRAIN *p)
+    {
+        return 0;
+    }
+
+    extern eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p)
+    {
+        return eores_NOK_generic;
+    }
+    
+#elif !defined(EOTHESERVICES_disable_theSTRAIN)
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -1149,6 +1272,9 @@ static void s_eo_strain_send_diagnostic_on_transmissioninterruption(void)
 #endif
 
 }
+
+#endif // #elif !defined(EOTHESERVICES_disable_theSTRAIN)
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

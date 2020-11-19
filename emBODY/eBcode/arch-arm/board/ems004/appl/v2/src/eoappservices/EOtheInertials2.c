@@ -59,6 +59,106 @@
 
 #include "EOtheInertials2_hid.h"
 
+#if defined(EOTHESERVICES_disable_theInertials2)
+
+    // provide empty implementation, so that we dont need to change the caller of the API
+    
+    extern EOtheInertials2* eo_inertials2_Initialise(void) 
+    {   
+        return NULL; 
+    }
+
+    extern EOtheInertials2* eo_inertials2_GetHandle(void)   
+    { 
+        return NULL; 
+    }
+
+    extern eOmn_serv_state_t eo_inertials2_GetServiceState(EOtheInertials2 *p) 
+    { 
+        return eomn_serv_state_notsupported; 
+    }
+    
+    // in some cases, we need to alert the pc104 that the board does not support this service
+    extern eOresult_t eo_inertials2_SendReport(EOtheInertials2 *p)
+    {
+        static const char s_eobj_ownname[] = "EOtheInertials2";
+        eOerrmanDescriptor_t errdes = {};
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_failed_notsupported);  
+        errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress = 0;
+        errdes.par16 = errdes.par64 = 0;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+        return eores_OK;
+    }
+
+
+    extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    {
+        // we alert the host that the verification of the service has failed
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, eomn_serv_state_failureofverify);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        } 
+        
+        // we tell that the reason is that this service is not supported
+        eo_inertials2_SendReport(NULL);
+               
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_inertials2_Activate(EOtheInertials2 *p, const eOmn_serv_configuration_t * servcfg)
+    {
+        eo_inertials2_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_inertials2_Deactivate(EOtheInertials2 *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_inertials2_Start(EOtheInertials2 *p)
+    {
+        eo_inertials2_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_inertials2_SetRegulars(EOtheInertials2 *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+    {
+        eo_inertials2_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_inertials2_Tick(EOtheInertials2 *p, eObool_t resetstatus)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_inertials2_Stop(EOtheInertials2 *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_inertials2_Transmission(EOtheInertials2 *p, eObool_t on)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_inertials2_Config(EOtheInertials2 *p, eOas_inertial_config_t* config)
+    {
+        eo_inertials2_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial_type_t type, eOcanframe_t *frame, eOcanport_t port)
+    {
+        return eores_NOK_generic;
+    }
+
+
+#elif !defined(EOTHESERVICES_disable_theInertials2)
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -1491,7 +1591,7 @@ static void s_eo_inertials2_presenceofcanboards_tick(EOtheInertials2 *p)
 }
 
 
-
+#endif // #elif !defined(EOTHESERVICES_disable_theInertials2)
 
 
 // --------------------------------------------------------------------------------------------------------------------

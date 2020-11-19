@@ -34,7 +34,7 @@
 #include "EOtheCANmapping.h"
 #include "EOtheCANprotocol.h"
 #include "math.h"
-
+#include "EOtheServices_hid.h"
 
 #include "EOMtheEMSappl.h"
 
@@ -52,6 +52,175 @@
 
 #include "EOtheMC4boards_hid.h"
 
+#if defined(EOTHESERVICES_disable_theMC4boards)
+
+    // provide empty implementation, so that we dont need to change the caller of the API
+    
+    extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config2_t *cfg2) 
+    {   
+        return NULL; 
+    }
+
+    extern eOresult_t eo_mc4boards_LoadShifts(EOtheMC4boards *p, eOmc_mc4shifts_t shifts)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_mc4boards_LoadBroadcastFlags(EOtheMC4boards *p, uint16_t flags)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern EOtheMC4boards* eo_mc4boards_GetHandle(void) 
+    {   
+        return NULL; 
+    }
+
+    extern eObool_t eo_mc4boards_AreThere(EOtheMC4boards *p)
+    {
+        return eobool_false;
+    }
+
+    extern eOresult_t eo_mc4boards_BroadcastStart(EOtheMC4boards *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
+    {
+        return eores_NOK_generic;
+    }
+
+
+
+    extern eOresult_t eo_mc4boards_Convert_encoderfactor_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_factor_t factor)
+    {
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_mc4boards_Convert_encoderoffset_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_offset_t offset)
+    {
+        return eores_NOK_generic;
+    }
+
+
+    extern void eo_mc4boards_Convert_maxJointPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max)
+    {
+    }
+    
+    extern void eo_mc4boards_Convert_minJointPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min)
+    {
+    }
+    
+    extern icubCanProto_position_t eo_mc4boards_Convert_maxJointPos_Get(EOtheMC4boards *p, uint8_t joint)
+    {
+        return 0;
+    }
+    
+    extern icubCanProto_position_t eo_mc4boards_Convert_minJointPos_Get(EOtheMC4boards *p, uint8_t joint)
+    {
+        return 0;
+    }
+    
+    extern void eo_mc4boards_Convert_maxMotorPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max)
+    {
+    }
+    
+    extern void eo_mc4boards_Convert_minMotorPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min)
+    {
+    }
+    
+    extern icubCanProto_position_t eo_mc4boards_Convert_maxMotorPos_Get(EOtheMC4boards *p, uint8_t joint)
+    {
+        return 0;
+    }
+    
+    extern icubCanProto_position_t eo_mc4boards_Convert_minMotorPos_Get(EOtheMC4boards *p, uint8_t joint)
+    {
+        return 0;
+    }
+    
+    extern eOmeas_position_t eo_mc4boards_Convert_Position_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t pos)
+    {
+        return 0;
+    }
+    
+    extern icubCanProto_position_t eo_mc4boards_Convert_Position_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_position_t pos)
+    {
+        return 0;
+    }
+    
+
+
+    extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel, eOmc4boards_velocitycontext_t context)
+    {
+        return 0;
+    }
+    
+    extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
+    {
+        return 0;
+    }
+    
+
+    extern eOmeas_acceleration_t eo_mc4boards_Convert_Acceleration_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
+    {
+        return 0;
+    }
+    
+    extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
+    {
+        return 0;
+    }
+    
+
+    extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN_abs__NEW(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
+    {
+        return 0;
+    }
+    
+
+
+    extern icubCanProto_stiffness_t eo_mc4boards_Convert_impedanceStiffness_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_stiffness_t stiff)
+    {
+        return 0;
+    }
+    
+    extern eOmeas_stiffness_t eo_mc4boards_Convert_impedanceStiffness_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_stiffness_t s_stiff)
+    {
+        return 0;
+    }
+    
+
+    extern icubCanProto_damping_t eo_mc4boards_Convert_impedanceDamping_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_damping_t i_damping)
+    {
+        return 0;
+    }
+    
+    extern eOmeas_damping_t eo_mc4boards_Convert_impedanceDamping_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_damping_t s_damping)
+    {
+        return 0;
+    }
+    
+
+    extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_torque_t i_torque)
+    {
+        return 0;
+    }
+    
+    extern eOmeas_torque_t eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_torque_t s_torque)
+    {
+        return 0;
+    }
+    
+
+
+#elif !defined(EOTHESERVICES_disable_theMC4boards)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -781,6 +950,9 @@ static eObool_t s_eo_mc4boards_foundone(void)
 
     return(found);
 }   
+
+
+#endif // #elif !defined(EOTHESERVICES_disable_theMC4boards)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

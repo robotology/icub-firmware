@@ -58,6 +58,8 @@
 
 #include "testRTC.h"
 
+#include "EOtheMemoryPool.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -312,7 +314,7 @@ extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmn
     eOmn_serv_category_t category = (eOmn_serv_category_t)command->category;
     const eOmn_serv_configuration_t *config = &command->parameter.configuration;
     eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;
-        
+    
     switch(operation)
     {
         case eomn_serv_operation_verifyactivate:
@@ -661,6 +663,17 @@ static void s_eo_services_initialise(EOtheServices *p)
     errdes.par16            = 0x0000;
     errdes.par64            = 0;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);     
+ 
+#if 0
+    // reading of how much memory we have used so far    
+    volatile uint32_t stop = 0;
+    stop = eo_mempool_SizeOfAllocated(eo_mempool_GetHandle());
+    char strr[128] = {0};
+    snprintf(strr, sizeof(strr), "mempool has used %d bytes", stop);
+    eo_errman_Trace(eo_errman_GetHandle(), strr, s_eobj_ownname);
+    
+    stop = stop;
+#endif    
 }
 
 
@@ -837,6 +850,7 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
             }
+            #warning mettere un risultato ko in modo da avvisare
             eo_inertials2_Verify(eo_inertials2_GetHandle(), config, s_services_callback_afterverify_inertial, eobool_true);            
         } break; 
         
