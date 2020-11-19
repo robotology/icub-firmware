@@ -21,6 +21,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOtheServices_hid.h"
 #include "EoMotionControl.h"
 #include "EOtheEntities.h"
 #include "EOtheMemoryPool.h"
@@ -43,6 +44,30 @@
 
 #include "EOCurrentsWatchdog_hid.h"
 
+#if defined(EOTHESERVICES_disable_CurrentsWatchdog)
+
+
+    extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
+    {
+        return NULL;
+    }
+
+    extern EOCurrentsWatchdog* eo_currents_watchdog_GetHandle(void)
+    {
+        return NULL;
+    }
+
+    extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, int16_t *currents)
+    {
+    }
+        
+
+    extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p, uint8_t motor)
+    {
+        return eores_NOK_generic;
+    }
+    
+#elif !defined(EOTHESERVICES_disable_CurrentsWatchdog)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -481,6 +506,7 @@ EO_static_inline eObool_t s_eo_currents_watchdog_averageCalc_collectDataIsComple
 
 #endif //REMOVE_TO_AVOID_COMPILATION_WARNING
 
+#endif // #elif !defined(EOTHESERVICES_disable_CurrentsWatchdog)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

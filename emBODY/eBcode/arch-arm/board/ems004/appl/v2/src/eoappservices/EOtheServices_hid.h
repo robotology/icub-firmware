@@ -67,6 +67,11 @@ extern "C" {
 //#define EOTHESERVICES_disable_theSKIN
 //#define EOTHESERVICES_disable_thePSC
 //#define EOTHESERVICES_disable_theMC4boards
+#define EOTHESERVICES_disable_theMotionController
+#define EOTHESERVICES_disable_theEncoderReader
+#define EOTHESERVICES_disable_CurrentsWatchdog
+#define EOTHESERVICES_disable_theMAIS
+#define EOTHESERVICES_disable_thePSC
 
 #if defined(EOTHESERVICES_disable_theInertials2) && defined(EOTHESERVICES_disable_theInertials3)
     #define EOTHESERVICES_disable_theMEMs

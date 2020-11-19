@@ -61,6 +61,87 @@
 
 #include "EOtheEncoderReader_hid.h"
 
+#if defined(EOTHESERVICES_disable_theEncoderReader)
+
+    // provide empty implementation, so that we dont need to change the caller of the API
+    
+    extern EOtheEncoderReader* eo_encoderreader_Initialise(void) 
+    {   
+        return NULL; 
+    }
+
+    extern EOtheEncoderReader* eo_encoderreader_GetHandle(void)   
+    { 
+        return NULL; 
+    }
+   
+    // in some cases, we need to alert the pc104 that the board does not support this service
+    extern eOresult_t eo_encoderreader_SendReport(EOtheEncoderReader *p)
+    {
+        static const char s_eobj_ownname[] = "EOtheEncoderReader";
+        eOerrmanDescriptor_t errdes = {};
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_notsupported);  
+        errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress = 0;
+        errdes.par16 = errdes.par64 = 0;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+        return eores_OK;
+    }
+
+
+    extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    {
+        // we alert the host that the verification of the service has failed
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, eomn_serv_state_failureofverify);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        } 
+        
+        // we tell that the reason is that this service is not supported
+        eo_encoderreader_SendReport(NULL);
+               
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes)
+    {
+        eo_encoderreader_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p)
+    {
+        return eobool_false;
+    }
+  
+    extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint8_t position, eOmc_encoder_descriptor_t *encoder)
+    {
+         return eores_NOK_generic;        
+    }
+    
+    
+#elif !defined(EOTHESERVICES_disable_theEncoderReader)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -587,6 +668,8 @@ static void s_eo_encoderreader_read_encoders(void* p)
 //    pp = pp/eo_appEncReader_stream_position_numberof;
 //    return((eo_appEncReader_stream_number_t)pp);  
 //}
+
+#endif // #elif !defined(EOTHESERVICES_disable_theEncoderReader)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

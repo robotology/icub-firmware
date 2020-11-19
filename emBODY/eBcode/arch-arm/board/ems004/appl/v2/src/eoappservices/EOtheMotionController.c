@@ -40,7 +40,6 @@
 
 #include "EOMtheEMSappl.h"
 
-//#include "EOmcController.h"
 #include "Controller.h"
 
 #include "hal_sys.h"
@@ -68,6 +67,105 @@
 
 #include "EOtheMotionController_hid.h"
 
+
+#if defined(EOTHESERVICES_disable_theMotionController)
+
+    // provide empty implementation, so that we dont need to change the caller of the API
+    
+    extern EOtheMotionController* eo_motioncontrol_Initialise(void) 
+    {   
+        return NULL; 
+    }
+
+    extern EOtheMotionController* eo_motioncontrol_GetHandle(void)   
+    { 
+        return NULL; 
+    }
+
+    extern eOmn_serv_state_t eo_motioncontrol_GetServiceState(EOtheMotionController *p) 
+    { 
+        return eomn_serv_state_notsupported; 
+    }
+    
+    // in some cases, we need to alert the pc104 that the board does not support this service
+    extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p)
+    {
+        static const char s_eobj_ownname[] = "EOtheMotionController";
+        eOerrmanDescriptor_t errdes = {};
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_failed_notsupported);  
+        errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress = 0;
+        errdes.par16 = errdes.par64 = 0;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+        return eores_OK;
+    }
+
+
+    extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    {
+        // we alert the host that the verification of the service has failed
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, eomn_serv_state_failureofverify);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        } 
+        
+        // we tell that the reason is that this service is not supported
+        eo_motioncontrol_SendReport(NULL);
+               
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg)
+    {
+        eo_motioncontrol_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
+    {
+        eo_motioncontrol_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+    {
+        eo_motioncontrol_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_motioncontrol_Transmission(EOtheMotionController *p, eObool_t on)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_motioncontrol_AddRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+    {
+        return eores_NOK_generic;
+    }
+    
+    extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController *p)
+    {
+        return eo_motcon_mode_NONE;
+    }
+    
+    
+#elif !defined(EOTHESERVICES_disable_theMotionController)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -2003,6 +2101,8 @@ static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eO
     }
     return res;
 }    
+
+#endif // #elif !defined(EOTHESERVICES_disable_theMotionController)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
