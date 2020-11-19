@@ -34,6 +34,7 @@
 #include "EOtheSharedHW.h"
 #include "EOaction.h"
 
+#include "EOtheServices_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -50,6 +51,52 @@
 
 #include "EOtheMEMS_hid.h"
 
+
+#if defined(EOTHESERVICES_disable_theMEMs)
+
+    // provide empty implementation, so that we dont need to change the caller of the API
+
+    extern EOtheMEMS* eo_mems_Initialise(const eOmems_cfg_t *cfg)
+    {
+        return NULL;
+    }
+
+    extern EOtheMEMS* eo_mems_GetHandle(void)
+    {
+        return NULL;
+    }
+
+    extern eObool_t eo_mems_IsSensorSupported(EOtheMEMS *p, eOmems_sensor_t sensor)
+    {
+        return eobool_false;
+    }
+
+    extern eOresult_t eo_mems_Config(EOtheMEMS *p, eOmems_sensor_cfg_t *cfg)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_mems_Start(EOtheMEMS *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_mems_SetAlert(EOtheMEMS *p, EOMtask *task, eOevent_t event)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltime_t timeout, eOmems_sensor_t *sensor, uint16_t* remaining)
+    {
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_mems_Stop(EOtheMEMS *p)
+    {
+        return eores_NOK_generic;
+    }
+
+#elif !defined(EOTHESERVICES_disable_theMEMs)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -513,7 +560,7 @@ static eObool_t s_eo_mems_deinit_gyro(void)
     return(ok);
 }
 
-
+#endif // #elif !defined(EOTHESERVICES_disable_theMEMs)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

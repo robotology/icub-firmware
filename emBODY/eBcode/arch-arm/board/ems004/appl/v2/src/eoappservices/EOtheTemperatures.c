@@ -60,6 +60,110 @@
 #include "EOtheTemperatures_hid.h"
 
 
+#if defined(EOTHESERVICES_disable_theTemperatures)
+
+    // provide empty implementation, so that we dont need to change the caller of the API
+    
+    extern EOtheTemperatures* eo_temperatures_Initialise(void) 
+    {   
+        return NULL; 
+    }
+
+    extern EOtheTemperatures* eo_temperatures_GetHandle(void)   
+    { 
+        return NULL; 
+    }
+
+    extern eOmn_serv_state_t eo_temperatures_GetServiceState(EOtheTemperatures *p) 
+    { 
+        return eomn_serv_state_notsupported; 
+    }
+    
+    // in some cases, we need to alert the pc104 that the board does not support this service
+    extern eOresult_t eo_temperatures_SendReport(EOtheTemperatures *p)
+    {
+        static const char s_eobj_ownname[] = "EOtheTemperatures";
+        eOerrmanDescriptor_t errdes = {};
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_temperatures_failed_notsupported);  
+        errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress = 0;
+        errdes.par16 = errdes.par64 = 0;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+        return eores_OK;
+    }
+
+
+    extern eOresult_t eo_temperatures_Verify(EOtheTemperatures *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    {
+        // we alert the host that the verification of the service has failed
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, eomn_serv_state_failureofverify);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        } 
+        
+        // we tell that the reason is that this service is not supported
+        eo_temperatures_SendReport(NULL);
+               
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_temperatures_Activate(EOtheTemperatures *p, const eOmn_serv_configuration_t * servcfg)
+    {
+        eo_temperatures_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_temperatures_Deactivate(EOtheTemperatures *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_temperatures_Start(EOtheTemperatures *p)
+    {
+        eo_temperatures_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_temperatures_SetRegulars(EOtheTemperatures *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+    {
+        eo_temperatures_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_temperatures_Tick(EOtheTemperatures *p, eObool_t resetstatus)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_temperatures_Stop(EOtheTemperatures *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_temperatures_Transmission(EOtheTemperatures *p, eObool_t on)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_temperatures_Config(EOtheTemperatures *p, eOas_temperature_config_t* config)
+    {
+        eo_temperatures_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_temperatures_AcceptCANframe(EOtheTemperatures *p, eOas_temperature_type_t type, eOcanframe_t *frame, eOcanport_t port)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eObool_t eocanprotASperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_THERMOMETER_MSG(eOcanframe_t *frame, eOcanport_t port)
+    {   
+        return(eobool_false);
+    } 
+    
+#elif !defined(EOTHESERVICES_disable_theTemperatures)
+
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -1495,7 +1599,7 @@ static void s_eo_temperatures_chip_configure(EOtheTemperatures *p)
 }
 
 
-
+#endif // #elif !defined(EOTHESERVICES_disable_theTemperatures)
 
 
 // --------------------------------------------------------------------------------------------------------------------

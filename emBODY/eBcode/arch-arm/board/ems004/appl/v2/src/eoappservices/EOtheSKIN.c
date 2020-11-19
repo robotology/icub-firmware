@@ -58,6 +58,121 @@
 #include "EOtheSKIN_hid.h"
 
 
+#if defined(EOTHESERVICES_disable_theSKIN)
+
+    // provide empty implementation, so that we dont need to change the caller of the API
+    
+    extern EOtheSKIN* eo_skin_Initialise(void) 
+    {   
+        return NULL; 
+    }
+
+    extern EOtheSKIN* eo_skin_GetHandle(void)   
+    { 
+        return NULL; 
+    }
+
+    extern eOmn_serv_state_t eo_skin_GetServiceState(EOtheSKIN *p) 
+    { 
+        return eomn_serv_state_notsupported; 
+    }
+    
+    // in some cases, we need to alert the pc104 that the board does not support this service
+    extern eOresult_t eo_skin_SendReport(EOtheSKIN *p)
+    {
+        static const char s_eobj_ownname[] = "EOtheSKIN";
+        eOerrmanDescriptor_t errdes = {};
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_failed_notsupported);  
+        errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress = 0;
+        errdes.par16 = errdes.par64 = 0;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+        return eores_OK;
+    }
+
+
+    extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    {
+        // we alert the host that the verification of the service has failed
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, eomn_serv_state_failureofverify);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        } 
+        
+        // we tell that the reason is that this service is not supported
+        eo_skin_SendReport(NULL);
+               
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg)
+    {
+        eo_skin_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_Start(EOtheSKIN *p)
+    {
+        eo_skin_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_SetRegulars(EOtheSKIN *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+    {
+        eo_skin_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t resetstatus)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_Stop(EOtheSKIN *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_Transmission(EOtheSKIN *p, eObool_t on)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_Config(EOtheSKIN *p, eOas_inertial3_config_t* config)
+    {
+        eo_skin_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode_t mode)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk_cmd_boardsCfg_t *brdcfg)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, eOsk_cmd_trianglesCfg_t *trgcfg)
+    {
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port)
+    {
+        return eores_NOK_generic;
+    }
+
+
+#elif !defined(EOTHESERVICES_disable_theSKIN)
+
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -1323,6 +1438,8 @@ static eObool_t s_eo_skin_isID32relevant(uint32_t id32)
     
     return(eobool_false); 
 }
+
+#endif // #elif !defined(EOTHESERVICES_disable_theSKIN)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

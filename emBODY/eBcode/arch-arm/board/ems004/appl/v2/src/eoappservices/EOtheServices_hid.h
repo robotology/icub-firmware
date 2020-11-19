@@ -43,6 +43,37 @@ extern "C" {
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
 #include "EOtheServices.h"
+    
+ 
+
+// - macros which enable/disable the code for the services ------------------------------------------------------------    
+    
+#include "EOtheMotionController.h"
+#include "EOtheSTRAIN.h"
+#include "EOtheMAIS.h"
+#include "EOtheSKIN.h"
+#include "EOtheInertials2.h"
+#include "EOtheInertials3.h"
+#include "EOtheTemperatures.h"
+#include "EOthePSC.h"
+
+// so far, i write them in here. later on we think of a board file or else...
+#if 0
+//#define EOTHESERVICES_disable_theInertials2
+//#define EOTHESERVICES_disable_theInertials3
+//#define EOTHESERVICES_disable_theTemperatures
+//#define EOTHESERVICES_disable_theMAIS
+//#define EOTHESERVICES_disable_theSTRAIN
+//#define EOTHESERVICES_disable_theSKIN
+//#define EOTHESERVICES_disable_thePSC
+//#define EOTHESERVICES_disable_theMC4boards
+
+#if defined(EOTHESERVICES_disable_theInertials2) && defined(EOTHESERVICES_disable_theInertials3)
+    #define EOTHESERVICES_disable_theMEMs
+#endif
+
+#endif
+
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------

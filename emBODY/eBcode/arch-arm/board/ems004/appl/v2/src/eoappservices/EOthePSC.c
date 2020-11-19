@@ -55,6 +55,105 @@
 
 #include "EOthePSC_hid.h"
 
+#if defined(EOTHESERVICES_disable_thePSC)
+
+    // provide empty implementation, so that we dont need to change the caller of the API
+    
+    extern EOthePSC* eo_psc_Initialise(void) 
+    {   
+        return NULL; 
+    }
+
+    extern EOthePSC* eo_psc_GetHandle(void)   
+    { 
+        return NULL; 
+    }
+
+    extern eOmn_serv_state_t eo_psc_GetServiceState(EOthePSC *p) 
+    { 
+        return eomn_serv_state_notsupported; 
+    }
+    
+    // in some cases, we need to alert the pc104 that the board does not support this service
+    extern eOresult_t eo_psc_SendReport(EOthePSC *p)
+    {
+        static const char s_eobj_ownname[] = "EOthePSC";
+        eOerrmanDescriptor_t errdes = {};
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_psc_failed_notsupported);  
+        errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress = 0;
+        errdes.par16 = errdes.par64 = 0;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+        return eores_OK;
+    }
+
+
+    extern eOresult_t eo_psc_Verify(EOthePSC *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    {
+        // we alert the host that the verification of the service has failed
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, eomn_serv_state_failureofverify);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        } 
+        
+        // we tell that the reason is that this service is not supported
+        eo_psc_SendReport(NULL);
+               
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_psc_Activate(EOthePSC *p, const eOmn_serv_configuration_t * servcfg)
+    {
+        eo_psc_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_psc_Deactivate(EOthePSC *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_psc_Start(EOthePSC *p)
+    {
+        eo_psc_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_psc_SetRegulars(EOthePSC *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+    {
+        eo_psc_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_psc_Tick(EOthePSC *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_psc_Stop(EOthePSC *p)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_psc_Transmission(EOthePSC *p, eObool_t on)
+    {
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_psc_Config(EOthePSC *p, eOas_psc_config_t* config)
+    {
+        eo_psc_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+    
+    extern eOresult_t eo_psc_AcceptCANframe(EOthePSC *p, eOcanframe_t *frame, eOcanport_t port)
+    {
+        return eores_NOK_generic;
+    }
+
+
+#elif !defined(EOTHESERVICES_disable_thePSC)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -1168,6 +1267,7 @@ static eOresult_t s_eo_psc_OnServiceAlreadyActive(EOthePSC *p, const eOmn_serv_c
     return((eobool_true == verificationOK) ? (eores_OK) : (eores_NOK_generic));      
 }       
         
+#endif // #elif !defined(EOTHESERVICES_disable_thePSC)        
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
