@@ -96,7 +96,10 @@
         return eores_NOK_generic;
     }
 
-
+    extern eOresult_t eo_mc4boards_AcceptCANframe(EOtheMC4boards *p, eOcanframe_t *frame, eOcanport_t port, eOmc4boards_canframe_t cftype)
+    {
+        return eores_NOK_generic;
+    }
 
     extern eOresult_t eo_mc4boards_Convert_encoderfactor_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_factor_t factor)
     {
@@ -582,6 +585,11 @@ extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
     return(eores_OK);       
 }
 
+extern eOresult_t eo_mc4boards_AcceptCANframe(EOtheMC4boards *p, eOcanframe_t *frame, eOcanport_t port, eOmc4boards_canframe_t cftype)
+{
+    return eores_OK;
+}
+    
 
 extern eOresult_t eo_mc4boards_Convert_encoderfactor_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_factor_t factor)
 {

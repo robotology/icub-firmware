@@ -98,7 +98,13 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p);
 
 extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
 
+typedef enum 
+{   // put in here the types of motioncontrol can frames
 
+    eo_motcon_canframe_unknown = 255    
+} eOmotioncontroller_canframe_t;
+
+extern eOresult_t eo_motioncontrol_AcceptCANframe(EOtheMotionController *p, eOcanframe_t *frame, eOcanport_t port, eOmotioncontroller_canframe_t cftype);
 
 
 /** @}            

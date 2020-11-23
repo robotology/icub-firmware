@@ -55,9 +55,11 @@ extern "C" {
 typedef struct EOtheMAIS_hid EOtheMAIS;
 
 
-//typedef eOresult_t (*eOmais_onendofoperation_fun_t) (EOtheMAIS* p, eObool_t operationisok);
-
-
+typedef enum 
+{
+    processHES0TO6      = 0,    
+    processHES7TO14     = 1     
+} maisProcessMode_t;
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -92,15 +94,14 @@ extern uint8_t eo_mais_GetNumberOfOwners(EOtheMAIS *p); // start() increments ow
 // it enables/disables transmission of the mais board. _Start() just starts the service, not the transmission
 extern eOresult_t eo_mais_Transmission(EOtheMAIS *p, eObool_t on);
 
-
+extern eOresult_t eo_mais_AcceptCANframe(EOtheMAIS *p, eOcanframe_t *frame, eOcanport_t port, maisProcessMode_t mode);
 
 // we can call them if _Activate() was called. they are used by the callbacks of eth protocol if robotInterface uses a mais device.
 extern eOresult_t eo_mais_Set(EOtheMAIS *p, eOas_mais_config_t* maiscfg);
 extern eOresult_t eo_mais_SetMode(EOtheMAIS *p, eOas_maismode_t mode);
+extern eObool_t eo_mais_isAlive(EOtheMAIS *p); // checks if the mais regularly transmits
 extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate);
 extern eOresult_t eo_mais_SetResolution(EOtheMAIS *p, eOas_maisresolution_t resolution);
-extern eOresult_t eo_mais_notifymeOnNewReceivedData(EOtheMAIS *p);
-extern eObool_t eo_mais_isAlive(EOtheMAIS *p);
 
 
 

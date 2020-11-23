@@ -150,7 +150,7 @@
         return eores_NOK_generic;
     }
     
-    extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial3_type_t type, eOcanframe_t *frame, eOcanport_t port)
+    extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOcanframe_t *frame, eOcanport_t port, eOas_inertial3_type_t type)
     {
         return eores_NOK_generic;
     }
@@ -1060,7 +1060,7 @@ extern eOresult_t eo_inertials3_Config(EOtheInertials3 *p, eOas_inertial3_config
 }
 
 
-extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial3_type_t type, eOcanframe_t *frame, eOcanport_t port)
+extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOcanframe_t *frame, eOcanport_t port, eOas_inertial3_type_t type)
 {
     if(NULL == p)
     {
