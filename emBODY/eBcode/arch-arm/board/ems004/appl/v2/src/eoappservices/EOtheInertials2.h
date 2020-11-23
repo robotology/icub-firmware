@@ -91,7 +91,7 @@ extern eOresult_t eo_inertials2_Transmission(EOtheInertials2 *p, eObool_t on);
 
 // we can call them if _Activate() was called. they are used by the callbacks of eth protocol
 extern eOresult_t eo_inertials2_Config(EOtheInertials2 *p, eOas_inertial_config_t* config);
-extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial_type_t type, eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOcanframe_t *frame, eOcanport_t port, eOas_inertial_type_t type);
 
 
 /** @}            

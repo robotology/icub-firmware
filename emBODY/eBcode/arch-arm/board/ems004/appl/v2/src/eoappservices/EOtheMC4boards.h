@@ -95,6 +95,14 @@ extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p);
 
 extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p);
 
+typedef enum 
+{   // put in here the types of motioncontrol can frames
+
+    eo_mc4_canframe_unknown = 255    
+} eOmc4boards_canframe_t;
+
+extern eOresult_t eo_mc4boards_AcceptCANframe(EOtheMC4boards *p, eOcanframe_t *frame, eOcanport_t port, eOmc4boards_canframe_t cftype);
+
 
 
 extern eOresult_t eo_mc4boards_Convert_encoderfactor_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_factor_t factor);

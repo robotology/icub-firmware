@@ -54,6 +54,13 @@ extern "C" {
 typedef struct EOtheSTRAIN_hid EOtheSTRAIN;
 
 
+typedef enum 
+{
+    processForce    = 0,    // keep it 0 so that we index teh array in position 0*3 = 0
+    processTorque   = 1,    // keep it 1 so taht we index teh array in position 1*3 = 3
+    processDebugForce = 2,
+    processDebugTorque = 3
+} strainProcessMode_t;
 
 //typedef eOresult_t (*eOstrain_onendofoperation_fun_t) (EOtheSTRAIN* p, eObool_t operationisok);
    
@@ -89,6 +96,7 @@ extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p);
 // it enables/disables transmission of the strain board. _Start() just starts the service, not the transmission
 extern eOresult_t eo_strain_Transmission(EOtheSTRAIN *p, eObool_t on);
 
+extern eOresult_t eo_strain_AcceptCANframe(EOtheSTRAIN *p, eOcanframe_t *frame, eOcanport_t port, strainProcessMode_t mode);
 
 // we can call them if _Activate() was called. they are used by the callbacks of eth protocol
 extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperation_fun_t overrideonfullscaleready);
@@ -97,7 +105,6 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode);
 extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate);
 extern uint8_t eo_strain_GetDataRate(EOtheSTRAIN *p);
 
-extern eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p);
 
 
 /** @}            

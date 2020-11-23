@@ -164,6 +164,11 @@
         return eo_motcon_mode_NONE;
     }
     
+    extern eOresult_t eo_motioncontrol_AcceptCANframe(EOtheMotionController *p, eOcanframe_t *frame, eOcanport_t port, eOmotioncontroller_canframe_t cftype)
+    {
+        return eores_NOK_generic;
+    }
+    
     
 #elif !defined(EOTHESERVICES_disable_theMotionController)
 
@@ -1285,6 +1290,12 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     // eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Stop()", s_eobj_ownname);
     
     return(eores_OK);    
+}
+
+
+extern eOresult_t eo_motioncontrol_AcceptCANframe(EOtheMotionController *p, eOcanframe_t *frame, eOcanport_t port, eOmotioncontroller_canframe_t cftype)
+{
+    return eores_OK;
 }
 
 

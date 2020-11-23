@@ -59,6 +59,7 @@ extern "C" {
 
 // so far, i write them in here. later on we think of a board file or else...
 #if 0
+
 //#define EOTHESERVICES_disable_theInertials2
 //#define EOTHESERVICES_disable_theInertials3
 //#define EOTHESERVICES_disable_theTemperatures
@@ -67,15 +68,13 @@ extern "C" {
 //#define EOTHESERVICES_disable_theSKIN
 //#define EOTHESERVICES_disable_thePSC
 //#define EOTHESERVICES_disable_theMC4boards
-#define EOTHESERVICES_disable_theMotionController
-#define EOTHESERVICES_disable_theEncoderReader
-#define EOTHESERVICES_disable_CurrentsWatchdog
-#define EOTHESERVICES_disable_theMAIS
-#define EOTHESERVICES_disable_thePSC
+//#define EOTHESERVICES_disable_theMotionController
+//#define EOTHESERVICES_disable_theEncoderReader
+//#define EOTHESERVICES_disable_CurrentsWatchdog
 
-#if defined(EOTHESERVICES_disable_theInertials2) && defined(EOTHESERVICES_disable_theInertials3)
-    #define EOTHESERVICES_disable_theMEMs
-#endif
+//#if defined(EOTHESERVICES_disable_theInertials2) && defined(EOTHESERVICES_disable_theInertials3)
+//    #define EOTHESERVICES_disable_theMEMs
+//#endif
 
 #endif
 
