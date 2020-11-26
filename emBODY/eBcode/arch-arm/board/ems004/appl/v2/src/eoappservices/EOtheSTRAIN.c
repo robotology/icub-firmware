@@ -137,10 +137,10 @@
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_strain_Transmission(EOtheSTRAIN *p, eObool_t on)
-    {
-        return eores_NOK_generic;
-    }
+//    extern eOresult_t eo_strain_Transmission(EOtheSTRAIN *p, eObool_t on)
+//    {
+//        return eores_NOK_generic;
+//    }
     
     extern eOresult_t eo_strain_AcceptCANframe(EOtheSTRAIN *p, eOcanframe_t *frame, eOcanport_t port, strainProcessMode_t mode)
     {
@@ -198,7 +198,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#if !defined(USE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES)
+ #define USE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -228,6 +231,10 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
 static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame, eOcanport_t port, strainProcessMode_t mode);
 
 static eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p);
+
+void s_eo_strain_processfullscalecanframe(eOcanframe_t *frame, eOcanport_t port);
+
+static eObool_t s_eo_thestrain_apply_fullscale_value(uint8_t channel, uint16_t *value, eOas_strain_t* strain);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -662,35 +669,35 @@ extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
 
 
 
-extern eOresult_t eo_strain_Transmission(EOtheSTRAIN *p, eObool_t on)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    if(eobool_false == p->service.active)
-    {   // nothing to do because object must be first activated
-        return(eores_OK);
-    } 
+//extern eOresult_t eo_strain_Transmission(EOtheSTRAIN *p, eObool_t on)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    if(eobool_false == p->service.active)
+//    {   // nothing to do because object must be first activated
+//        return(eores_OK);
+//    } 
 
-    if(eobool_false == p->service.started)
-    {   // not running, thus we do nothing
-        return(eores_OK);
-    }     
-    
-    // we force transmission
-    if(eobool_true == on)
-    {
-        s_eo_strain_TXstart(p);
-    }
-    else
-    {
-        s_eo_strain_TXstop(p);
-    }
-    
-    return(eores_OK);        
-}
+//    if(eobool_false == p->service.started)
+//    {   // not running, thus we do nothing
+//        return(eores_OK);
+//    }     
+//    
+//    // we force transmission
+//    if(eobool_true == on)
+//    {
+//        s_eo_strain_TXstart(p);
+//    }
+//    else
+//    {
+//        s_eo_strain_TXstop(p);
+//    }
+//    
+//    return(eores_OK);        
+//}
 
 extern eOresult_t eo_strain_AcceptCANframe(EOtheSTRAIN *p, eOcanframe_t *frame, eOcanport_t port, strainProcessMode_t mode)
 {
@@ -710,6 +717,11 @@ extern eOresult_t eo_strain_AcceptCANframe(EOtheSTRAIN *p, eOcanframe_t *frame, 
             eo_array_Assign((EOarray*)(&p->strain->status.uncalibratedvalues), (processDebugForce == mode) ? 0 : 3, &(frame->data[0]), 3);
         }        
     }
+    else if(processFullScale == mode)
+    {
+        s_eo_strain_processfullscalecanframe(frame, port);
+    }
+    
     return eores_OK;
 }
 
@@ -943,7 +955,7 @@ extern void eoprot_fun_INIT_as_strain_status(const EOnv* nv)
 // value of the specified channel inside the relevant position of strain->status.fullscale.
 // in this function is implemented the chain of requests from channel 0 up to 5 with successive signalling to robotinterface
 // VERY IMPORTANT: the function must return eobool_true
-extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel, uint16_t *value, eOas_strain_t* strain)
+static eObool_t s_eo_thestrain_apply_fullscale_value(uint8_t channel, uint16_t *value, eOas_strain_t* strain)
 {
     const eObool_t ret = eobool_true;
     EOtheSTRAIN *p = eo_strain_GetHandle();
@@ -1450,9 +1462,14 @@ static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame,
                         lower_saturations[5]++;
                     else if (torque_info->saturationInChannel_5 == saturationHIGH)
                         upper_saturations[5]++;
-                } break;                
+                } break;  
                 
+                default:
+                {                   
+                } break;                
             }
+            
+
         }
         else
         {
@@ -1496,6 +1513,39 @@ static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame,
             }
          }                     
     }
+}
+
+
+void s_eo_strain_processfullscalecanframe(eOcanframe_t *frame, eOcanport_t port)
+{
+    // get the strain
+    eOas_strain_t *strain = s_eo_thestrain.strain;
+    eOprotIndex_t index = EOK_uint08dummy;
+    
+    //if(NULL == (strain = (eOas_strain_t*) s_eocanprotASpolling_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
+    if(NULL == strain)
+    {
+        return;  
+    }    
+    
+    // now i get the channel and the data to be put inside the strain.
+    uint8_t channel = frame->data[1];
+#if defined(USE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES)    
+    uint16_t *data = (uint16_t *)&(frame->data[2]);
+#else
+    // MSB is in data[2], LSB in data[3]
+    uint16_t value = (uint16_t)(frame->data[3]) + (uint16_t)(frame->data[2] << 8);
+    uint16_t *data = &value;
+#endif    
+    // i put data into the array at the specified location. the check vs channel being lower than capacity 6 of array is done inside
+    EOarray* array = (EOarray*)&strain->status.fullscale;
+    eo_array_Assign(array, channel, data, 1);
+    
+    // ok ... done the basic stuff. i have put inside the array the data it arrives in the correct position.
+    
+    // now we alert someone that the message has arrived for the given channel. 
+    s_eo_thestrain_apply_fullscale_value(channel, data, strain);
+
 }
 
 
