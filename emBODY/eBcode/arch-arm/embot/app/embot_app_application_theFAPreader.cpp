@@ -1063,6 +1063,7 @@ bool embot::app::application::theFAPreader::initialise(const Config &config)
     
     pImpl->numofvalidsensors = 0;
     
+    std::string str {};
     pImpl->globaleventmask = pImpl->config.events.acquire | pImpl->config.events.noreply;
     pImpl->maxTOUT = pImpl->config.acquisitiontimeout;
     for(uint8_t n=0; n<numberofpositions; n++)
@@ -1093,7 +1094,11 @@ bool embot::app::application::theFAPreader::initialise(const Config &config)
                 pImpl->validIDpositions.push_back(n);
                 pImpl->numofvalidsensors++;
                 embot::core::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[n].id));
-                pImpl->globaleventmask |= (pImpl->config.sensors[n].askdata | pImpl->config.sensors[n].dataready | pImpl->config.sensors[n].noreply);                
+                pImpl->globaleventmask |= (pImpl->config.sensors[n].askdata | pImpl->config.sensors[n].dataready | pImpl->config.sensors[n].noreply);   
+
+                embot::hw::TLV493D id = config.sensors[n].id;            
+                str += to_string(id);
+                str += " ";                
             }
             
         }            
@@ -1119,6 +1124,8 @@ bool embot::app::application::theFAPreader::initialise(const Config &config)
 //        embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();
 //        theleds.get(embot::hw::LED::one).wave(&ledwave);  
 //    }
+                
+    embot::core::print("theFAPreader::initialise() -> found: " + str);
 
 #if defined(CONTINUOUS_ACQUISITION)
     embot::core::print("theFAPreader::initialise() -> starting acquisition @ " + std::to_string(pImpl->periodAcquisition/1000) + " ms");
