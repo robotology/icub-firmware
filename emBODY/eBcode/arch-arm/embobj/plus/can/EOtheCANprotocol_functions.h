@@ -63,10 +63,6 @@ extern "C" {
 
 // - analog sensors: polling
 
-// this function is weakly defined. it must be redefined to implement the chain of requests from channel 0 up to channel 5
-// with successive action of ... for instance informing robotinterface.
-extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel,  uint16_t *data, eOas_strain_t* strain);
-
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_TXMODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_CANDATARATE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
