@@ -68,7 +68,7 @@ void i2c_address_assignment_to_tlv493d_chips_stm32hal()
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);  
 
-    // power off both J11 and U27 and wait
+    // power off both J13 and U27 and wait
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10 | GPIO_PIN_11, GPIO_PIN_RESET);
     HAL_Delay(10);
     
@@ -81,7 +81,7 @@ void i2c_address_assignment_to_tlv493d_chips_stm32hal()
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);    
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
     HAL_Delay(10);
-    // power up J11 so that it can have address 0x3E
+    // power up J13 so that it can have address 0x3E
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);    
     HAL_Delay(10);  
 
