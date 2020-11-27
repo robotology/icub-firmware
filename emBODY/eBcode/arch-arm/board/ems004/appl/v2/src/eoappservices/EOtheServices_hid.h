@@ -56,6 +56,7 @@ extern "C" {
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
 #include "EOthePSC.h"
+#include "EOthePOS.h"
 
 // so far, i write them in here. later on we think of a board file or else...
 #if 0
@@ -126,7 +127,8 @@ typedef enum
     eo_service_inertials3   = 5,
     eo_service_temperatures = 6,
     eo_service_psc          = 7,
-    eo_service_none         = 8
+    eo_service_pos          = 8,
+    eo_service_none         = 255
 } eOservice_type_t;
 
 typedef struct

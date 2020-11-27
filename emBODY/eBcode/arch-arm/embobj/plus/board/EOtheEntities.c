@@ -82,6 +82,7 @@ static EOtheEntities s_eo_theentities =
     EO_INIT(.inertials      ) {NULL},
     EO_INIT(.inertials3     ) {NULL},
     EO_INIT(.pscs           ) {NULL},
+    EO_INIT(.poss           ) {NULL},
     EO_INIT(.numofjoints    ) 0,
     EO_INIT(.numofmotors    ) 0,
     EO_INIT(.numofskins     ) 0,
@@ -90,7 +91,8 @@ static EOtheEntities s_eo_theentities =
     EO_INIT(.numoftemperatures) 0,
     EO_INIT(.numofinertials ) 0,
     EO_INIT(.numofinertials3 ) 0,
-    EO_INIT(.numofpscs ) 0.
+    EO_INIT(.numofpscs ) 0,
+    EO_INIT(.numofposs ) 0
 };
 
 //static const char s_eobj_ownname[] = "EOtheEntities";
@@ -568,6 +570,33 @@ extern eOas_psc_t * eo_entities_GetPSC(EOtheEntities *p, eOprotIndex_t id)
     return(s_eo_theentities.pscs[id]);
 }
 
+
+extern eOresult_t eo_entities_SetNumOfPOSs(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_poss)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofposs = num;
+    
+    return(eores_OK);   
+}
+
+extern uint8_t eo_entities_NumOfPOSs(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofposs);    
+}
+
+extern eOas_pos_t * eo_entities_GetPOS(EOtheEntities *p, eOprotIndex_t id)
+{
+    if(id >= s_eo_theentities.numofposs)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theentities.poss[id]);
+}
 
 extern eOresult_t eo_entities_SetNumOfStrains(EOtheEntities *p, uint8_t num)
 {

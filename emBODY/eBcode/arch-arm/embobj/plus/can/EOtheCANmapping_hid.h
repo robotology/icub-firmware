@@ -58,6 +58,7 @@ enum
     eocanmap_inertials_maxnumberof      = 1,
     eocanmap_inertials3_maxnumberof     = 1,
     eocanmap_pscs_maxnumberof           = 1,
+    eocanmap_poses_maxnumberof          = 1,
     eocanmap_skins_maxnumberof          = 2     // we may have up to 2 skins on an eth board
 };
 
@@ -74,11 +75,12 @@ enum
     eocanmap_inertial_boards_maxnumberof      = 1,
     eocanmap_inertial3_boards_maxnumberof     = 1,
     eocanmap_psc_boards_maxnumberof           = 3,    // we use exactly three psc boards to have the 6 values of the psc entity
+    eocanmap_pos_boards_maxnumberof           = 3,    // we use only one pmc board but we may use 3 psc boards also
     eocanmap_skin_boards_maxnumberof          = 8     // we can use up to 8 can mtb/mtb4 boards to represent a single sk-skin index. we can increase this at cost of some ram
 };
 
 
-enum { eocanmap_entities_maxnumberof = 9 };
+enum { eocanmap_entities_maxnumberof = 10 };
 
 extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en);
 
@@ -124,16 +126,6 @@ struct EOtheCANmapping_hid
 {
 	eOcanmap_cfg_t                  config;
     eOcanmap_board_extended_t***    canmapping;         // [can][adr] -> pointer to 
-//    eOcanmap_board_extended_t****   entitylocation;     // [ep][ent][index]-> pointer to
-//    eOcanmap_board_extended_t***    skinlocation;       // [index]-> array[] of up to eocanmap_skin_boards_maxnumberof = 8 pointers to 
-//    eOcanmap_board_extended_t***    psclocation;        // [index]-> array[] of up to eocanmap_psc_boards_maxnumberof = 3 pointers to
-//    uint8_t                         numofskinboardsindex[eocanmap_skins_maxnumberof];
-//    uint8_t                         numofpscboardsindex[eocanmap_pscs_maxnumberof];
-//    eOcanmap_arrayof_locations_t    arrayofboardlocations;
-    
-//    eOcanmap_board_extended_t****   entitylocation2board;    // [posEPEN][index][brdindex] -> pointer to a eOcanmap_board_extended_t, where posEPEN comes from eocanmap_posOfEPEN()
-//    uint8_t**                       entitylocation2size;     // [posEPEN][index] -> number of boards inside entitylocation2board[posEPEN][index]  
-
     EOarray**                       arrayOfBRDEXTptr[eocanmap_entities_maxnumberof];  // [posEPEN][index] -> eoarray * which holds a variable number of possible pointers to board.     
 };
 

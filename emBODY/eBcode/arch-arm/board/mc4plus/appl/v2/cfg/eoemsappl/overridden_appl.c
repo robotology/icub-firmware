@@ -48,6 +48,7 @@
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
 #include "EOthePSC.h"
+#include "EOthePOS.h"
 #include "EOtheETHmonitor.h"
 #include "EOVtheCallbackManager.h"
 
@@ -183,8 +184,8 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     // stop tx activity of services that may have been started by callback function
     
     // strain... no strain in here
-//    eo_strain_Stop(eo_strain_GetHandle());
-//    eo_strain_Deactivate(eo_strain_GetHandle());
+    eo_strain_Stop(eo_strain_GetHandle());
+    eo_strain_Deactivate(eo_strain_GetHandle());
         
     // skin
     eo_skin_Stop(eo_skin_GetHandle());
@@ -209,6 +210,10 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     // psc
     eo_psc_Stop(eo_psc_GetHandle());
     eo_psc_Deactivate(eo_psc_GetHandle());
+    
+    // pos
+    eo_pos_Stop(eo_pos_GetHandle());
+    eo_pos_Deactivate(eo_pos_GetHandle());    
 }
 
 
@@ -259,6 +264,10 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     // psc
     eo_psc_Stop(eo_psc_GetHandle());
     eo_psc_Deactivate(eo_psc_GetHandle());
+    
+    // pos
+    eo_pos_Stop(eo_pos_GetHandle());
+    eo_pos_Deactivate(eo_pos_GetHandle());      
 }
 
 

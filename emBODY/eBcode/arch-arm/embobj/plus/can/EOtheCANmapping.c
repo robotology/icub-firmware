@@ -165,6 +165,7 @@ static EOarray* s_eo_canmap_array_temperatures[eocanmap_temperatures_maxnumberof
 static EOarray* s_eo_canmap_array_inertials[eocanmap_inertials_maxnumberof] = { NULL };
 static EOarray* s_eo_canmap_array_inertials3[eocanmap_inertials3_maxnumberof] = { NULL };
 static EOarray* s_eo_canmap_array_pscs[eocanmap_pscs_maxnumberof] = { NULL };
+static EOarray* s_eo_canmap_array_poses[eocanmap_poses_maxnumberof] = { NULL };
 
 static EOarray* s_eo_canmap_array_skins[eocanmap_skins_maxnumberof] = { NULL };
 
@@ -179,7 +180,10 @@ static EOtheCANmapping s_eo_canmap_singleton =
     EO_INIT(.arrayOfBRDEXTptr) 
     { 
         s_eo_canmap_array_joints, s_eo_canmap_array_motors,
-        s_eo_canmap_array_strains, s_eo_canmap_array_maises, s_eo_canmap_array_temperatures, s_eo_canmap_array_inertials, s_eo_canmap_array_inertials3, s_eo_canmap_array_pscs, 
+        
+        s_eo_canmap_array_strains, s_eo_canmap_array_maises, s_eo_canmap_array_temperatures, 
+        s_eo_canmap_array_inertials, s_eo_canmap_array_inertials3, s_eo_canmap_array_pscs, s_eo_canmap_array_poses,
+        
         s_eo_canmap_array_skins
     }
 };
@@ -255,7 +259,13 @@ extern EOtheCANmapping * eo_canmap_Initialise(const eOcanmap_cfg_t *canmapcfg)
     m = eocanmap_posOfEPEN(eoprot_endpoint_analogsensors, eoprot_entity_as_psc);
     for(uint8_t n=0; n<eocanmap_pscs_maxnumberof; n++)
     {
-        s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_skin_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
+        s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_psc_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
+    }
+
+    m = eocanmap_posOfEPEN(eoprot_endpoint_analogsensors, eoprot_entity_as_pos);
+    for(uint8_t n=0; n<eocanmap_poses_maxnumberof; n++)
+    {
+        s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_pos_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
     }
     
     m = eocanmap_posOfEPEN(eoprot_endpoint_skin, eoprot_entity_sk_skin);
@@ -567,7 +577,8 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
         return eores_NOK_generic;
     }
     
-    // ok: i get the board array which contains pointers to eOcanmap_board_extended_t in such a number as needed by the entity (all need 1 apart skin (<=8) and psc (=8))
+    // ok: i get the board array which contains pointers to eOcanmap_board_extended_t in such a number 
+    // as needed by the entity (all need 1 apart skin (<=8) and psc (=8) and pos)
     EOarray *boardsEPENINDEX = s_eo_canmap_singleton.arrayOfBRDEXTptr[epen][index];   
     
     if(NULL == boardsEPENINDEX)
@@ -626,7 +637,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
     return(eores_OK);
 }
 
-// marco.accame on 2 apr 2019: first implementation is ... teh same as the previuos one.
+// marco.accame on 2 apr 2019: first implementation is ... the same as the previuos one.
 extern eOresult_t eo_canmap_GetEntityArrayOfLocations(EOtheCANmapping *p, eOprotID32_t id32, EOarray *arrayoflocs, eObrd_cantype_t *boardtype)
 {
     if(NULL == arrayoflocs)
@@ -653,7 +664,8 @@ extern eOresult_t eo_canmap_GetEntityArrayOfLocations(EOtheCANmapping *p, eOprot
         return eores_NOK_generic;
     }
     
-    // ok: i get the board array which contains pointers to eOcanmap_board_extended_t in such a number as needed by the entity (all need 1 apart skin (<=8) and psc (=8))
+    // ok: i get the board array which contains pointers to eOcanmap_board_extended_t 
+    // in such a number as needed by the entity (all need 1 apart skin (<=8) and psc (=8) and pos )
     EOarray *boardsEPENINDEX = s_eo_canmap_singleton.arrayOfBRDEXTptr[epen][index];   
     
     if(NULL == boardsEPENINDEX)
@@ -712,22 +724,23 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
         return eobool_false;
     }
     
-    // epen: the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-skin
+    // epen: the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-pos-skin
     // brd: 
     static const uint32_t tableB[] = // [epen]
     {
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc),                                    // joint
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc),                                    // motor
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),         // joint
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),         // motor
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // strain
         (1 << eobrd_cantype_mais),                                                              // mais
         (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2),                               // temperature
         (1 << eobrd_cantype_mtb),                                                               // inertial
         (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_rfe),    // inertial3
         (1 << eobrd_cantype_psc),                                                               // psc
+        (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_psc),                                    // pos
         (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc)         // skin
     }; EO_VERIFYsizeof(tableB, sizeof(const uint32_t)*(eocanmap_entities_maxnumberof))
     
-    // is is safe to use brd because it is can hence it is < 32
+    // it is safe to use brd because it is can hence it is < 32
     return eo_common_word_bitcheck(tableB[epen], brd);    
 }    
    
@@ -736,7 +749,7 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-EO_VERIFYproposition(eocanmap_posOfEPEN__pos, (eoprot_entities_numberof == 14))
+EO_VERIFYproposition(eocanmap_posOfEPEN__pos, (eoprot_entities_numberof == 15))
 // if error: change the magic number and put the new entity in the pos[][] map
 
 extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en)
@@ -750,8 +763,8 @@ extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en)
     {
         {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf},  // ep->management [none, ...]
         {0,     1, 0xf, 0xf, 0xf, 0xf, 0xf},  // ep->mc [joi, mot, none, ...]
-        {2,     3,   4,   5,   6,   7, 0xf},  // ep->as [str, mai, tem, ine, ine3, psc]
-        {8,   0xf, 0xf, 0xf, 0xf, 0xf, 0xf}   // ep->sk [sk, none]
+        {2,     3,   4,   5,   6,   7,   8},  // ep->as [str, mai, tem, ine, ine3, psc, pos]
+        {9,   0xf, 0xf, 0xf, 0xf, 0xf, 0xf}   // ep->sk [sk, none]
     }; EO_VERIFYsizeof(pos, sizeof(const uint8_t)*(eoprot_endpoints_numberof)*(eoprot_entities_maxnumberofsupported))
 
     // the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-skin
@@ -771,10 +784,14 @@ extern uint8_t eocanmap_maxINDEX(eOprotEndpoint_t ep, eOprotEntity_t en)
         return 0;
     } 
     
-    static const uint8_t numI[] = // [epen] the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-skin
+    static const uint8_t numI[] = // [epen] the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-pmc-skin
     {
         eocanmap_joints_maxnumberof, eocanmap_motors_maxnumberof, 
-        eocanmap_strains_maxnumberof, eocanmap_maises_maxnumberof, eocanmap_temperatures_maxnumberof, eocanmap_inertials_maxnumberof, eocanmap_inertials3_maxnumberof, eocanmap_pscs_maxnumberof,
+        
+        eocanmap_strains_maxnumberof, eocanmap_maises_maxnumberof, eocanmap_temperatures_maxnumberof, 
+        eocanmap_inertials_maxnumberof, eocanmap_inertials3_maxnumberof, eocanmap_pscs_maxnumberof, 
+        eocanmap_poses_maxnumberof,
+        
         eocanmap_skins_maxnumberof
     }; EO_VERIFYsizeof(numI, sizeof(const uint8_t)*(eocanmap_entities_maxnumberof))
     
@@ -790,10 +807,14 @@ extern uint8_t eocanmap_maxBOARDnumber(eOprotEndpoint_t ep, eOprotEntity_t en)
         return 0;
     } 
     
-    static const uint8_t numB[] = // [epen] the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-skin
+    static const uint8_t numB[] = // [epen] the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-pos-skin
     {
         eocanmap_joint_boards_maxnumberof, eocanmap_motor_boards_maxnumberof, 
-        eocanmap_strain_boards_maxnumberof, eocanmap_mais_boards_maxnumberof, eocanmap_temperature_boards_maxnumberof, eocanmap_inertial_boards_maxnumberof, eocanmap_inertial3_boards_maxnumberof, eocanmap_psc_boards_maxnumberof,
+        
+        eocanmap_strain_boards_maxnumberof, eocanmap_mais_boards_maxnumberof, eocanmap_temperature_boards_maxnumberof, 
+        eocanmap_inertial_boards_maxnumberof, eocanmap_inertial3_boards_maxnumberof, eocanmap_psc_boards_maxnumberof, 
+        eocanmap_pos_boards_maxnumberof,
+        
         eocanmap_skin_boards_maxnumberof
     }; EO_VERIFYsizeof(numB, sizeof(const uint8_t)*(eocanmap_entities_maxnumberof))
     
@@ -837,6 +858,7 @@ static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard,
         return;
     }
     
+    #warning TODO-pmc-motion-control: look at in here
     if((eobrd_mc4 == theboard->board.props.type) && (eoprot_endpoint_motioncontrol == ep) && (eobrd_caninsideindex_second == des->location.insideindex))
     {
         // we store in second position nibble-1
@@ -871,6 +893,7 @@ static void s_eo_canmap_entities_rem(eOcanmap_board_extended_t * theboard, uint8
         return;
     }
     
+    #warning TODO-pmc-motion-control: look at in here
     if((eobrd_mc4 == theboard->board.props.type) && (eoprot_endpoint_motioncontrol == ep) && (eobrd_caninsideindex_second == des->location.insideindex))
     {
         // we store in second position nibble-1
@@ -891,6 +914,7 @@ static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * 
 {//ok
     eOprotIndex_t index = EOK_uint08dummy;
 
+    #warning TODO-pmc-motion-control: look at in here
     if(theboard->board.props.type == eobrd_cantype_foc) 
     {   // if 1foc it is always in nibble-0 
         index = theboard->board.entities2.compactIndicesOf & 0x0F;

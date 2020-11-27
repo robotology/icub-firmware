@@ -38,6 +38,7 @@
 #include "EOtheSTRAIN.h"
 #include "EOtheTemperatures.h"
 #include "EOthePSC.h"
+#include "EOthePOS.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -96,7 +97,9 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__USERDEF(eOcanframe_t *f
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__POS(eOcanframe_t *frame, eOcanport_t port)
 {
-    eo_psc_AcceptCANframe(eo_psc_GetHandle(), frame, port);    
+    // either one or the other is active.
+    eo_psc_AcceptCANframe(eo_psc_GetHandle(), frame, port);
+    eo_pos_AcceptCANframe(eo_pos_GetHandle(), frame, port);    
     return(eores_OK);  
 }
 
