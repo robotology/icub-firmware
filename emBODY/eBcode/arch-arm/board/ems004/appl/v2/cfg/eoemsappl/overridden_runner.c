@@ -36,6 +36,7 @@
 #include "EOtheMais.h"
 #include "EOtheStrain.h"
 #include "EOthePSC.h"
+#include "EOthePOS.h"
 #include "EOtheETHmonitor.h"
 
 #include "testRTC.h"
@@ -130,6 +131,7 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     eo_mais_Tick(eo_mais_GetHandle());
     eo_strain_Tick(eo_strain_GetHandle());
     eo_psc_Tick(eo_psc_GetHandle());
+    eo_pos_Tick(eo_pos_GetHandle());
     
     // however, we could also tick others ....
     // TODO: see if i can move all the _Tick() in the do phase.

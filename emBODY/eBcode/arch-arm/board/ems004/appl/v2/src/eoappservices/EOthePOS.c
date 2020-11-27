@@ -1,21 +1,9 @@
+
 /*
- * Copyright (C) 2019 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2020 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
- * website: www.robotcub.org
- * Permission is granted to copy, distribute, and/or modify this program
- * under the terms of the GNU General Public License, version 2 or any
- * later version published by the Free Software Foundation.
- *
- * A copy of the license can be found at
- * http://www.robotcub.org/icub/license/gpl.txt
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details
 */
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -45,7 +33,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOthePSC.h"
+#include "EOthePOS.h"
 
 
 
@@ -53,33 +41,33 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOthePSC_hid.h"
+#include "EOthePOS_hid.h"
 
-#if defined(EOTHESERVICES_disable_thePSC)
+#if defined(EOTHESERVICES_disable_thePOS)
 
     // provide empty implementation, so that we dont need to change the caller of the API
     
-    extern EOthePSC* eo_psc_Initialise(void) 
+    extern EOthePOS* eo_pos_Initialise(void) 
     {   
         return NULL; 
     }
 
-    extern EOthePSC* eo_psc_GetHandle(void)   
+    extern EOthePOS* eo_pos_GetHandle(void)   
     { 
         return NULL; 
     }
 
-    extern eOmn_serv_state_t eo_psc_GetServiceState(EOthePSC *p) 
+    extern eOmn_serv_state_t eo_pos_GetServiceState(EOthePOS *p) 
     { 
         return eomn_serv_state_notsupported; 
     }
     
     // in some cases, we need to alert the pc104 that the board does not support this service
-    extern eOresult_t eo_psc_SendReport(EOthePSC *p)
+    extern eOresult_t eo_pos_SendReport(EOthePOS *p)
     {
-        static const char s_eobj_ownname[] = "EOthePSC";
+        static const char s_eobj_ownname[] = "EOthePOS";
         eOerrmanDescriptor_t errdes = {};
-        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_psc_failed_notsupported);  
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_pos_failed_notsupported);  
         errdes.sourcedevice = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress = 0;
         errdes.par16 = errdes.par64 = 0;
@@ -88,72 +76,72 @@
     }
 
 
-    extern eOresult_t eo_psc_Verify(EOthePSC *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    extern eOresult_t eo_pos_Verify(EOthePOS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
     {
         // we alert the host that the verification of the service has failed
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, eomn_serv_state_failureofverify);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, eomn_serv_state_failureofverify);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
         } 
         
         // we tell that the reason is that this service is not supported
-        eo_psc_SendReport(NULL);
+        eo_pos_SendReport(NULL);
                
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_psc_Activate(EOthePSC *p, const eOmn_serv_configuration_t * servcfg)
+    extern eOresult_t eo_pos_Activate(EOthePOS *p, const eOmn_serv_configuration_t * servcfg)
     {
-        eo_psc_SendReport(NULL);
+        eo_pos_SendReport(NULL);
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_psc_Deactivate(EOthePSC *p)
-    {
-        return eores_NOK_generic;
-    }
-
-    extern eOresult_t eo_psc_Start(EOthePSC *p)
-    {
-        eo_psc_SendReport(NULL);
-        return eores_NOK_generic;
-    }
-
-    extern eOresult_t eo_psc_SetRegulars(EOthePSC *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
-    {
-        eo_psc_SendReport(NULL);
-        return eores_NOK_generic;
-    }
-
-    extern eOresult_t eo_psc_Tick(EOthePSC *p)
+    extern eOresult_t eo_pos_Deactivate(EOthePOS *p)
     {
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_psc_Stop(EOthePSC *p)
+    extern eOresult_t eo_pos_Start(EOthePOS *p)
+    {
+        eo_pos_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_pos_SetRegulars(EOthePOS *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+    {
+        eo_pos_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_pos_Tick(EOthePOS *p)
     {
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_psc_Transmission(EOthePSC *p, eObool_t on)
+    extern eOresult_t eo_pos_Stop(EOthePOS *p)
     {
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_psc_Config(EOthePSC *p, eOas_psc_config_t* config)
+    extern eOresult_t eo_pos_Transmission(EOthePOS *p, eObool_t on)
     {
-        eo_psc_SendReport(NULL);
+        return eores_NOK_generic;
+    }
+
+    extern eOresult_t eo_pos_Config(EOthePOS *p, eOas_pos_config_t* config)
+    {
+        eo_pos_SendReport(NULL);
         return eores_NOK_generic;
     }
     
-    extern eOresult_t eo_psc_AcceptCANframe(EOthePSC *p, eOcanframe_t *frame, eOcanport_t port)
+    extern eOresult_t eo_pos_AcceptCANframe(EOthePOS *p, eOcanframe_t *frame, eOcanport_t port)
     {
         return eores_NOK_generic;
     }
 
 
-#elif !defined(EOTHESERVICES_disable_thePSC)
+#elif !defined(EOTHESERVICES_disable_thePOS)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -176,41 +164,41 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eo_psc_presenceofcanboards_reset(EOthePSC *p);
+static void s_eo_pos_presenceofcanboards_reset(EOthePOS *p);
 
-static eOresult_t s_eo_psc_TXstart(EOthePSC *p);
+static eOresult_t s_eo_pos_TXstart(EOthePOS *p);
 
-static eOresult_t s_eo_psc_TXstop(EOthePSC *p);
+static eOresult_t s_eo_pos_TXstop(EOthePOS *p);
 
-static eOresult_t s_eo_psc_onstop_search4canboards(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok);
+static eOresult_t s_eo_pos_onstop_search4canboards(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok);
 
-static void s_eo_psc_send_periodic_error_report(void *par);
+static void s_eo_pos_send_periodic_error_report(void *par);
 
-static eObool_t s_eo_psc_isID32relevant(uint32_t id32);
+static eObool_t s_eo_pos_isID32relevant(uint32_t id32);
 
-static void s_eo_psc_transmission(EOthePSC *p, eObool_t on, uint8_t period);
+static void s_eo_pos_transmission(EOthePOS *p, eObool_t on, uint8_t period);
 
-static void s_eo_psc_boards_configure(EOthePSC *p);
+static void s_eo_pos_boards_configure(EOthePOS *p);
 
-static void s_eo_psc_presenceofcanboards_reset(EOthePSC *p);
-static void s_eo_psc_presenceofcanboards_build(EOthePSC *p);
-static void s_eo_psc_presenceofcanboards_start(EOthePSC *p);
-static void s_eo_psc_presenceofcanboards_touch(EOthePSC *p, eObrd_canlocation_t loc);
-static void s_eo_psc_presenceofcanboards_tick(EOthePSC *p);
+static void s_eo_pos_presenceofcanboards_reset(EOthePOS *p);
+static void s_eo_pos_presenceofcanboards_build(EOthePOS *p);
+static void s_eo_pos_presenceofcanboards_start(EOthePOS *p);
+static void s_eo_pos_presenceofcanboards_touch(EOthePOS *p, eObrd_canlocation_t loc);
+static void s_eo_pos_presenceofcanboards_tick(EOthePOS *p);
 
-static eOresult_t s_eo_psc_OnServiceAlreadyActive(EOthePSC *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify);
+static eOresult_t s_eo_pos_OnServiceAlreadyActive(EOthePOS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const eOas_psc_config_t s_eo_default_pscconfig =
+static const eOas_pos_config_t s_eo_default_posconfig =
 {
     .datarate = 50
 };
 
-static EOthePSC s_eo_thepsc = 
+static EOthePOS s_eo_thepos = 
 {
     EO_INIT(.service) 
     {
@@ -242,10 +230,10 @@ static EOthePSC s_eo_thepsc =
     }, 
 
     .configured = eobool_false,
-    .pscconfig = {0},
+    .posconfig = {0},
 
     EO_INIT(.id32)                      eo_prot_ID32dummy,  
-    EO_INIT(.psc)                       NULL,
+    EO_INIT(.pos)                       NULL,
     EO_INIT(.id32ofregulars)            NULL,
     EO_INIT(.numberofowners)            0,
     
@@ -258,7 +246,7 @@ static EOthePSC s_eo_thepsc =
     .isalive                    = eobool_false
 };
 
-static const char s_eobj_ownname[] = "EOthePSC";
+static const char s_eobj_ownname[] = "EOthePOS";
 
 #define REM_WDT
 
@@ -266,12 +254,12 @@ static const char s_eobj_ownname[] = "EOthePSC";
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#warning TODO: increase eOas_pos_boardinfos_maxnumber if you want to support more than one can board
+enum { eOas_pos_boardinfos_maxnumber = 1 };
 
-enum { eOas_psc_boardinfos_maxnumber = 1 };
-
-extern EOthePSC* eo_psc_Initialise(void)
+extern EOthePOS* eo_pos_Initialise(void)
 {
-    EOthePSC* p = &s_eo_thepsc;
+    EOthePOS* p = &s_eo_thepos;
 
     if(eobool_true == p->service.initted)
     {
@@ -280,54 +268,54 @@ extern EOthePSC* eo_psc_Initialise(void)
     
     p->service.servconfig.type = eomn_serv_NONE;
     
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_psc_maxnumberofCANboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_pos_maxnumberofCANboards, NULL, NULL, NULL, NULL);
     
-    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_psc_maxnumberofCANboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_pos_maxnumberofCANboards, NULL, NULL, NULL, NULL);
     
-    p->sharedcan.discoverytargets = eo_array_New(eOas_psc_boardinfos_maxnumber, sizeof(eOcandiscovery_target_t),  NULL);
+    p->sharedcan.discoverytargets = eo_array_New(eOas_pos_boardinfos_maxnumber, sizeof(eOcandiscovery_target_t),  NULL);
     
     p->configured = eobool_false;
     
-    p->id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_psc, 0, eoprot_tag_none);
+    p->id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_pos, 0, eoprot_tag_none);
         
-    s_eo_psc_presenceofcanboards_reset(p);
+    s_eo_pos_presenceofcanboards_reset(p);
     
-    p->psc = NULL;
-    p->id32ofregulars = eo_array_New(psc_maxRegulars, sizeof(uint32_t), NULL);
+    p->pos = NULL;
+    p->id32ofregulars = eo_array_New(pos_maxRegulars, sizeof(uint32_t), NULL);
     p->numberofowners = 0;
     
 
-    memcpy(&p->pscconfig, &s_eo_default_pscconfig, sizeof(eOas_psc_config_t));
+    memcpy(&p->posconfig, &s_eo_default_posconfig, sizeof(eOas_pos_config_t));
     
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
     p->diagnostics.errorDescriptor.sourceaddress = 0;
     p->diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-    p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_psc_not_verified_yet);  
+    p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_pos_not_verified_yet);  
         
     p->service.initted = eobool_true;    
     p->service.active = eobool_false;
     p->service.started = eobool_false;
     p->transmissionisactive = eobool_false;
     p->service.state = eomn_serv_state_idle;    
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);
        
     return(p);   
 }
 
 
-extern EOthePSC* eo_psc_GetHandle(void)
+extern EOthePOS* eo_pos_GetHandle(void)
 {
-    if(eobool_true == s_eo_thepsc.service.initted)
+    if(eobool_true == s_eo_thepos.service.initted)
     {
-        return(&s_eo_thepsc);
+        return(&s_eo_thepos);
     }
     
     return(NULL);
 }
 
 
-extern eOmn_serv_state_t eo_psc_GetServiceState(EOthePSC *p)
+extern eOmn_serv_state_t eo_pos_GetServiceState(EOthePOS *p)
 {
     if(NULL == p)
     {
@@ -338,7 +326,7 @@ extern eOmn_serv_state_t eo_psc_GetServiceState(EOthePSC *p)
 }
 
 
-extern eOresult_t eo_psc_SendReport(EOthePSC *p)
+extern eOresult_t eo_pos_SendReport(EOthePOS *p)
 {
     if(NULL == p)
     {
@@ -351,7 +339,7 @@ extern eOresult_t eo_psc_SendReport(EOthePSC *p)
     
     switch(errorvalue)
     {
-        case eoerror_value_CFG_psc_failed_candiscovery:
+        case eoerror_value_CFG_pos_failed_candiscovery:
         {
             eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());            
         } break;
@@ -366,14 +354,14 @@ extern eOresult_t eo_psc_SendReport(EOthePSC *p)
 }
 
 
-extern eOresult_t eo_psc_Verify(EOthePSC *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_pos_Verify(EOthePOS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_psc_Verify()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_pos_Verify()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
-        s_eo_thepsc.service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, s_eo_thepsc.service.state);
+        s_eo_thepos.service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, s_eo_thepos.service.state);
         
         if(NULL != onverify)
         {
@@ -382,10 +370,10 @@ extern eOresult_t eo_psc_Verify(EOthePSC *p, const eOmn_serv_configuration_t * s
         return(eores_NOK_nullpointer);
     }  
     
-    if(eomn_serv_AS_psc != servcfg->type)
+    if(eomn_serv_AS_pos != servcfg->type)
     {
         p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -396,12 +384,12 @@ extern eOresult_t eo_psc_Verify(EOthePSC *p, const eOmn_serv_configuration_t * s
 
     if(eobool_true == p->service.active)
     {   // if already active: we dont deactivate-reactivate. we just check that the running service is ok with the new servcfg 
-        return s_eo_psc_OnServiceAlreadyActive(p, servcfg, onverify);
+        return s_eo_pos_OnServiceAlreadyActive(p, servcfg, onverify);
     }     
  
     
     p->service.state = eomn_serv_state_verifying;   
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);
 
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);      
@@ -411,22 +399,24 @@ extern eOresult_t eo_psc_Verify(EOthePSC *p, const eOmn_serv_configuration_t * s
 
     eOcandiscovery_target_t trgt = {0};
      
-    trgt.info.type = eobrd_cantype_psc;
-    trgt.info.protocol.major = servcfg->data.as.psc.version.protocol.major; 
-    trgt.info.protocol.minor = servcfg->data.as.psc.version.protocol.minor;
-    trgt.info.firmware.major = servcfg->data.as.psc.version.firmware.major; 
-    trgt.info.firmware.minor = servcfg->data.as.psc.version.firmware.minor;
-    trgt.info.firmware.build = servcfg->data.as.psc.version.firmware.build;    
-    for(uint8_t i=0; i<eo_psc_maxnumberofCANboards; i++)
+    #warning TODO: adapt to ths case of multiple can boards
+    trgt.info.type = eobrd_cantype_pmc; // servcfg->data.as.pos.boardsInfo.canprop[0].type;
+    trgt.info.protocol.major = servcfg->data.as.pos.version.protocol.major; 
+    trgt.info.protocol.minor = servcfg->data.as.pos.version.protocol.minor;
+    trgt.info.firmware.major = servcfg->data.as.pos.version.firmware.major; 
+    trgt.info.firmware.minor = servcfg->data.as.pos.version.firmware.minor;
+    trgt.info.firmware.build = servcfg->data.as.pos.version.firmware.build;  
+    for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
-        trgt.canmap[servcfg->data.as.psc.boardInfo.canloc[i].port] |= (0x0001 << servcfg->data.as.psc.boardInfo.canloc[i].addr); 
+        trgt.canmap[servcfg->data.as.pos.boardInfo.canloc[i].port] |= (0x0001 << servcfg->data.as.pos.boardInfo.canloc[i].addr);
+        //trgt.canmap[servcfg->data.as.pos.boardsInfo.canprop[i].location.port] |= (0x0001 << servcfg->data.as.pos.boardsInfo.canprop[i].location.addr); 
     }
 
     // force a cleaned discoverytargets before we add the target
     eo_array_Reset(p->sharedcan.discoverytargets);    
     eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);
     
-    p->sharedcan.ondiscoverystop.function = s_eo_psc_onstop_search4canboards;
+    p->sharedcan.ondiscoverystop.function = s_eo_pos_onstop_search4canboards;
     p->sharedcan.ondiscoverystop.parameter = (void*)servcfg;
         
     // start discovery    
@@ -435,7 +425,7 @@ extern eOresult_t eo_psc_Verify(EOthePSC *p, const eOmn_serv_configuration_t * s
     return(eores_OK);   
 }
 
-extern uint8_t eo_psc_GetNumberOfOwners(EOthePSC *p)
+extern uint8_t eo_pos_GetNumberOfOwners(EOthePOS *p)
 {
     if(NULL == p)
     {
@@ -445,9 +435,9 @@ extern uint8_t eo_psc_GetNumberOfOwners(EOthePSC *p)
     return(p->numberofowners);   
 }
 
-extern eOresult_t eo_psc_Deactivate(EOthePSC *p)
+extern eOresult_t eo_pos_Deactivate(EOthePOS *p)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_psc_Deactivate()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_pos_Deactivate()", s_eobj_ownname);
     
     if(NULL == p)
     {
@@ -458,15 +448,15 @@ extern eOresult_t eo_psc_Deactivate(EOthePSC *p)
     {
         // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
         p->service.state = eomn_serv_state_idle; 
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);
         return(eores_OK);        
     } 
     
     // we call the Stop() which decrements numberofowners and does its stop operations only if numberofowners is 0/
-    // in such a case: is send stop messages to psc, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object       
+    // in such a case: is send stop messages to pos, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object       
     if(eobool_true == p->service.started)
     {
-        eo_psc_Stop(p);
+        eo_pos_Stop(p);
     }
     
     // _Stop() has decremented numberofowners and we can _Deactivate() only when there is no owner anymore
@@ -475,16 +465,16 @@ extern eOresult_t eo_psc_Deactivate(EOthePSC *p)
         return(eores_OK); 
     }
     
-    eo_psc_SetRegulars(p, NULL, NULL);
+    eo_pos_SetRegulars(p, NULL, NULL);
     
-    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_psc, p->sharedcan.entitydescriptor); 
+    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_pos, p->sharedcan.entitydescriptor); 
     
     eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties);
      
     
-    eo_entities_SetNumOfPSCs(eo_entities_GetHandle(), 0);
+    eo_entities_SetNumOfPOSs(eo_entities_GetHandle(), 0);
     
-    p->psc = NULL;
+    p->pos = NULL;
     
     memset(&p->service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
     p->service.servconfig.type = eomn_serv_NONE;
@@ -498,41 +488,41 @@ extern eOresult_t eo_psc_Deactivate(EOthePSC *p)
     
     p->service.active = eobool_false;    
     p->service.state = eomn_serv_state_idle; 
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);
     
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_psc_Activate(EOthePSC *p, const eOmn_serv_configuration_t * servcfg)
+extern eOresult_t eo_pos_Activate(EOthePOS *p, const eOmn_serv_configuration_t * servcfg)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_psc_Activate()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_pos_Activate()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
         return(eores_NOK_nullpointer);
     }    
     
-    if(eomn_serv_AS_psc != servcfg->type)
+    if(eomn_serv_AS_pos != servcfg->type)
     {
         return(eores_NOK_generic);
     }    
     
     if(eobool_true == p->service.active)
     {   // we dont activate if already active. 
-        return s_eo_psc_OnServiceAlreadyActive(p, servcfg, NULL);
+        return s_eo_pos_OnServiceAlreadyActive(p, servcfg, NULL);
     }   
     
-    eo_entities_SetNumOfPSCs(eo_entities_GetHandle(), 1);
+    eo_entities_SetNumOfPOSs(eo_entities_GetHandle(), 1);
     
 
-    if(0 == eo_entities_NumOfPSCs(eo_entities_GetHandle()))
+    if(0 == eo_entities_NumOfPOSs(eo_entities_GetHandle()))
     {
         p->service.active = eobool_false;
         return(eores_NOK_generic);
     }
     
-    p->psc = eo_entities_GetPSC(eo_entities_GetHandle(), 0);    
+    p->pos = eo_entities_GetPOS(eo_entities_GetHandle(), 0);    
     
     
     // now service config stuff
@@ -540,7 +530,7 @@ extern eOresult_t eo_psc_Activate(EOthePSC *p, const eOmn_serv_configuration_t *
 
     
     // now i build maps for check of presence    
-    s_eo_psc_presenceofcanboards_build(p);
+    s_eo_pos_presenceofcanboards_build(p);
 
            
     
@@ -548,28 +538,28 @@ extern eOresult_t eo_psc_Activate(EOthePSC *p, const eOmn_serv_configuration_t *
     // now i must build data for the board and entity for EOtheCANmapping object
     
     // boards
-    for(uint8_t i=0; i<eo_psc_maxnumberofCANboards; i++)
+    for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
         eObrd_canproperties_t prop = {0};
-        prop.type = eobrd_cantype_psc;
-        prop.location.port = servcfg->data.as.psc.boardInfo.canloc[i].port;
-        prop.location.addr = servcfg->data.as.psc.boardInfo.canloc[i].addr;
+        prop.type = eobrd_cantype_pmc;
+        prop.location.port = servcfg->data.as.pos.boardInfo.canloc[i].port;
+        prop.location.addr = servcfg->data.as.pos.boardInfo.canloc[i].addr;
         prop.location.insideindex = eobrd_caninsideindex_none;
-        prop.requiredprotocol.major = servcfg->data.as.psc.version.protocol.major;
-        prop.requiredprotocol.minor = servcfg->data.as.psc.version.protocol.minor;
+        prop.requiredprotocol.major = servcfg->data.as.pos.version.protocol.major;
+        prop.requiredprotocol.minor = servcfg->data.as.pos.version.protocol.minor;
         
         eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
     }
        
     
     // entity
-    for(uint8_t i=0; i<eo_psc_maxnumberofCANboards; i++)
+    for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
         eOcanmap_entitydescriptor_t des = {0};
-        des.location.port = servcfg->data.as.psc.boardInfo.canloc[i].port;
-        des.location.addr = servcfg->data.as.psc.boardInfo.canloc[i].addr;
+        des.location.port = servcfg->data.as.pos.boardInfo.canloc[i].port;
+        des.location.addr = servcfg->data.as.pos.boardInfo.canloc[i].addr;
         des.location.insideindex = eobrd_caninsideindex_none;
-        des.index = entindex00; // we have only one psc        
+        des.index = entindex00; // we have only one pos        
         
         eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);
     }
@@ -578,17 +568,17 @@ extern eOresult_t eo_psc_Activate(EOthePSC *p, const eOmn_serv_configuration_t *
     eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties);  
     
     // load the entity 
-    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_psc, p->sharedcan.entitydescriptor);   
+    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_pos, p->sharedcan.entitydescriptor);   
 
     #warning TBD: non preparo la mappa, configuro le board
     // build the maps that can translate a received can message into the correct place of the six values.
     // the location of the board will be used as an index in a map for the positions 0, 1, 2, 3, 4, 5
-    // by that i dont need to send any particular configuration to the psc boards to fill the label by themselves.
-//    s_eo_psc_build_maps(p, 0xffffffff);
+    // by that i dont need to send any particular configuration to the pos boards to fill the label by themselves.
+//    s_eo_pos_build_maps(p, 0xffffffff);
     
     p->service.active = eobool_true;    
     p->service.state = eomn_serv_state_activated;   
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);        
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);        
 
     
     return(eores_OK);   
@@ -596,9 +586,9 @@ extern eOresult_t eo_psc_Activate(EOthePSC *p, const eOmn_serv_configuration_t *
 
  
     
-extern eOresult_t eo_psc_Start(EOthePSC *p)
+extern eOresult_t eo_pos_Start(EOthePOS *p)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_psc_Start()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_pos_Start()", s_eobj_ownname);
     
     if(NULL == p)
     {
@@ -619,13 +609,13 @@ extern eOresult_t eo_psc_Start(EOthePSC *p)
     p->numberofowners = 1; // dont increment. just set to 1.
     p->service.started = eobool_true;    
     p->service.state = eomn_serv_state_started; 
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);   
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);   
     
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_psc_SetRegulars(EOthePSC *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+extern eOresult_t eo_pos_SetRegulars(EOthePOS *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
 {
     if(NULL == p)
     {
@@ -637,13 +627,13 @@ extern eOresult_t eo_psc_SetRegulars(EOthePSC *p, eOmn_serv_arrayof_id32_t* arra
         return(eores_OK);
     }  
     
-    return(eo_service_hid_SetRegulars(p->id32ofregulars, arrayofid32, s_eo_psc_isID32relevant, numberofthem));
+    return(eo_service_hid_SetRegulars(p->id32ofregulars, arrayofid32, s_eo_pos_isID32relevant, numberofthem));
 }
 
 
-extern eOresult_t eo_psc_Stop(EOthePSC *p)
+extern eOresult_t eo_pos_Stop(EOthePOS *p)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_psc_Stop()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_pos_Stop()", s_eobj_ownname);
     
     if(NULL == p)
     {
@@ -672,20 +662,20 @@ extern eOresult_t eo_psc_Stop(EOthePSC *p)
         return(eores_OK);
     }    
      
-    s_eo_psc_TXstop(p);
+    s_eo_pos_TXstop(p);
        
     p->service.started = eobool_false;
     p->service.state = eomn_serv_state_activated;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);       
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);       
     
-    // remove all regulars related to psc entity ... no, dont do that
-    //eo_psc_SetRegulars(p, NULL, NULL);    
+    // remove all regulars related to pos entity ... no, dont do that
+    //eo_pos_SetRegulars(p, NULL, NULL);    
 
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_psc_Transmission(EOthePSC *p, eObool_t on)
+extern eOresult_t eo_pos_Transmission(EOthePOS *p, eObool_t on)
 {
     if(NULL == p)
     {
@@ -708,12 +698,12 @@ extern eOresult_t eo_psc_Transmission(EOthePSC *p, eObool_t on)
     } 
     
     if(eobool_true == on)
-    {   // we activate tx according to config of psc
-        s_eo_psc_TXstart(p); 
+    {   // we activate tx according to config of pos
+        s_eo_pos_TXstart(p); 
     }
     else
     {
-        s_eo_psc_TXstop(p);
+        s_eo_pos_TXstop(p);
     }
     
     return(eores_OK);      
@@ -721,7 +711,7 @@ extern eOresult_t eo_psc_Transmission(EOthePSC *p, eObool_t on)
 
 
 
-extern eOresult_t eo_psc_Tick(EOthePSC *p)
+extern eOresult_t eo_pos_Tick(EOthePOS *p)
 {
     if(NULL == p)
     {
@@ -745,18 +735,18 @@ extern eOresult_t eo_psc_Tick(EOthePSC *p)
 
     if(eobool_true == p->transmissionisactive)
     {
-        s_eo_psc_presenceofcanboards_tick(p);
+        s_eo_pos_presenceofcanboards_tick(p);
     }    
     
-    // now we dont do anything becase psc does not need any action because everything is done by the can parser
-    // motor controller performs watchdog check using eo_psc_isAlive
+    // now we dont do anything becase pos does not need any action because everything is done by the can parser
+    // motor controller performs watchdog check using eo_pos_isAlive
     
     return(eores_OK);       
 }
 
 
 
-extern eOresult_t eo_psc_Config(EOthePSC *p, eOas_psc_config_t* config)
+extern eOresult_t eo_pos_Config(EOthePOS *p, eOas_pos_config_t* config)
 {
     if((NULL == p) || (NULL == config))
     {
@@ -777,42 +767,42 @@ extern eOresult_t eo_psc_Config(EOthePSC *p, eOas_psc_config_t* config)
     // ok, now we do something. 
     
     
-    p->pscconfig.datarate = config->datarate;
+    p->posconfig.datarate = config->datarate;
     
     
-    uint8_t originalrate = p->pscconfig.datarate;
-    if(p->pscconfig.datarate < 5)
+    uint8_t originalrate = p->posconfig.datarate;
+    if(p->posconfig.datarate < 5)
     {
-        p->pscconfig.datarate = 5;        
+        p->posconfig.datarate = 5;        
     }
     
-    if(p->pscconfig.datarate > 200)
+    if(p->posconfig.datarate > 200)
     {
-        p->pscconfig.datarate = 200;          
+        p->posconfig.datarate = 200;          
     }
 
-    if(originalrate != p->pscconfig.datarate)
+    if(originalrate != p->posconfig.datarate)
     {
         eOerrmanDescriptor_t errdes = {0};
         errdes.sourcedevice       = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress      = 0;
-        errdes.par16              = (originalrate << 8) | (p->pscconfig.datarate);
+        errdes.par16              = (originalrate << 8) | (p->posconfig.datarate);
         errdes.par64              = 0;        
-        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_psc_changed_requestedrate);
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_pos_changed_requestedrate);
         p->diagnostics.errorType = eo_errortype_warning;                
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &errdes);        
     }   
 
     // we receive three can frames every datarate ms. we check the presence at every tick of teh controller
     // which is 1 ms, hence ... a checkrate = datarate is ok. we add a factor 2 for safety
-    p->not_heardof_checkrate = p->pscconfig.datarate * 2;    
+    p->not_heardof_checkrate = p->posconfig.datarate * 2;    
     
     p->configured = eobool_true;
            
     return(eores_OK);     
 }
 
-extern eOresult_t eo_psc_AcceptCANframe(EOthePSC *p, eOcanframe_t *frame, eOcanport_t port)
+extern eOresult_t eo_pos_AcceptCANframe(EOthePOS *p, eOcanframe_t *frame, eOcanport_t port)
 {
     if(NULL == p)
     {
@@ -836,9 +826,9 @@ extern eOresult_t eo_psc_AcceptCANframe(EOthePSC *p, eOcanframe_t *frame, eOcanp
     }  
     
     
-    // i get the content of the frame and i fill the status of the psc
+    // i get the content of the frame and i fill the status of the pos
    
-    EOarray *array = (EOarray*)&p->psc->status.arrayofdata;
+    EOarray *array = (EOarray*)&p->pos->status.arrayofdata;
     if(frame->data[0] == icubCanProto_pos_decideg)
     {
         uint8_t firstlabel = frame->data[1] >> 4;
@@ -861,14 +851,14 @@ extern eOresult_t eo_psc_AcceptCANframe(EOthePSC *p, eOcanframe_t *frame, eOcanp
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
     loc.insideindex = eobrd_caninsideindex_none;
     
-    s_eo_psc_presenceofcanboards_touch(p, loc);
+    s_eo_pos_presenceofcanboards_touch(p, loc);
     
     return(eores_OK);      
 }
 
 
 
-extern eObool_t eo_psc_isAlive(EOthePSC *p)
+extern eObool_t eo_pos_isAlive(EOthePOS *p)
 {
     if(NULL == p)
     {
@@ -883,24 +873,24 @@ extern eObool_t eo_psc_isAlive(EOthePSC *p)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-// -- in here .... so that all things related to PSC are in a unique place
+// -- in here .... so that all things related to POS are in a unique place
 
 
-extern void eoprot_fun_INIT_as_psc_config(const EOnv* nv)
+extern void eoprot_fun_INIT_as_pos_config(const EOnv* nv)
 {
-    eOas_psc_config_t* psccfg = (eOas_psc_config_t*) eo_nv_RAM(nv);
+    eOas_pos_config_t* poscfg = (eOas_pos_config_t*) eo_nv_RAM(nv);
     
-    psccfg->datarate = 10;
+    poscfg->datarate = 10;
 }
 
 
-extern void eoprot_fun_INIT_as_psc_status(const EOnv* nv)
+extern void eoprot_fun_INIT_as_pos_status(const EOnv* nv)
 {
-    eOas_psc_status_t *status = (eOas_psc_status_t*) eo_nv_RAM(nv);  
+    eOas_pos_status_t *status = (eOas_pos_status_t*) eo_nv_RAM(nv);  
     
-    uint8_t capacity    = eOas_psc_data_maxnumber;
-    uint8_t size        = eOas_psc_data_maxnumber;
-    EOarray* array = eo_array_New(capacity, sizeof(eOas_psc_data_t), &status->arrayofdata);
+    uint8_t capacity    = eOas_pos_data_maxnumber;
+    uint8_t size        = eOas_pos_data_maxnumber;
+    EOarray* array = eo_array_New(capacity, sizeof(eOas_pos_data_t), &status->arrayofdata);
     eo_array_Resize(array, size);
 }
 
@@ -910,43 +900,43 @@ extern void eoprot_fun_INIT_as_psc_status(const EOnv* nv)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static eOresult_t s_eo_psc_TXstart(EOthePSC *p)
+static eOresult_t s_eo_pos_TXstart(EOthePOS *p)
 { 
     if(eobool_false == p->configured)
     {   // dont have a configured service
         return(eores_OK);
     }   
 
-    s_eo_psc_boards_configure(p); 
+    s_eo_pos_boards_configure(p); 
 
-    s_eo_psc_transmission(p, eobool_true, p->pscconfig.datarate);
+    s_eo_pos_transmission(p, eobool_true, p->posconfig.datarate);
     
     
     p->transmissionisactive = eobool_true;
-    s_eo_psc_presenceofcanboards_start(p);    
+    s_eo_pos_presenceofcanboards_start(p);    
     
    return(eores_OK);      
 }
 
 
-static eOresult_t s_eo_psc_TXstop(EOthePSC *p)
+static eOresult_t s_eo_pos_TXstop(EOthePOS *p)
 {
     if(eobool_false == p->configured)
     {   // nothing to do because we dont have a configured service 
         return(eores_OK);
     }     
     
-    // stop the psc
-    s_eo_psc_transmission(p, eobool_false, p->pscconfig.datarate);
+    // stop the pos
+    s_eo_pos_transmission(p, eobool_false, p->posconfig.datarate);
     
 
     p->transmissionisactive = eobool_false;
-    s_eo_psc_presenceofcanboards_reset(p);
+    s_eo_pos_presenceofcanboards_reset(p);
                
     return(eores_OK);
 }
 
-static void s_eo_psc_transmission(EOthePSC *p, eObool_t on, uint8_t period)
+static void s_eo_pos_transmission(EOthePOS *p, eObool_t on, uint8_t period)
 {
 
     icubCanProto_POS_TRANSMIT_t transmit = {0};
@@ -962,43 +952,43 @@ static void s_eo_psc_transmission(EOthePSC *p, eObool_t on, uint8_t period)
 
 
 
-static eOresult_t s_eo_psc_onstop_search4canboards(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
+static eOresult_t s_eo_pos_onstop_search4canboards(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
 {  
-    eo_errman_Trace(eo_errman_GetHandle(), "called: s_eo_psc_onstop_search4canboards()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: s_eo_pos_onstop_search4canboards()", s_eobj_ownname);
     
-    EOthePSC* p = &s_eo_thepsc;
+    EOthePOS* p = &s_eo_thepos;
     
     const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
     
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);   
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);   
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_psc, p->service.state);   
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);   
     }    
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))
     {
-        eo_psc_Activate(&s_eo_thepsc, servcfg);        
+        eo_pos_Activate(&s_eo_thepos, servcfg);        
     }
     
     p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.sourceaddress    = 0;
-    p->diagnostics.errorDescriptor.par16            = (servcfg->data.as.psc.boardInfo.canloc[0].addr) | (servcfg->data.as.psc.boardInfo.canloc[0].port << 8);
-    p->diagnostics.errorDescriptor.par64            = (servcfg->data.as.psc.version.firmware.minor << 0) | (servcfg->data.as.psc.version.firmware.major << 8) |
-                                                      (servcfg->data.as.psc.version.protocol.minor << 16) | (servcfg->data.as.psc.version.protocol.major << 24);    
+    p->diagnostics.errorDescriptor.par16            = (servcfg->data.as.pos.boardInfo.canloc[0].addr) | (servcfg->data.as.pos.boardInfo.canloc[0].port << 8);
+    p->diagnostics.errorDescriptor.par64            = (servcfg->data.as.pos.version.firmware.minor << 0) | (servcfg->data.as.pos.version.firmware.major << 8) |
+                                                      (servcfg->data.as.pos.version.protocol.minor << 16) | (servcfg->data.as.pos.version.protocol.major << 24);    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
-    eo_action_SetCallback(act, s_eo_psc_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+    eo_action_SetCallback(act, s_eo_pos_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
     
     if(eobool_true == searchisok)
     {           
         p->diagnostics.errorType = eo_errortype_debug;
-        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_psc_ok);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_pos_ok);
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
         if((0 != p->diagnostics.repetitionOKcase) && (0 != p->diagnostics.reportPeriod))
@@ -1039,7 +1029,7 @@ static eOresult_t s_eo_psc_onstop_search4canboards(void *par, EOtheCANdiscovery2
         
         p->diagnostics.errorDescriptor.par64 = ((uint64_t)maskofmissingCAN1) | ((uint64_t)maskofmissingCAN2<<16) | ((uint64_t)maskofincompatibleCAN1<<32) | ((uint64_t)maskofincompatibleCAN2<<32);
         
-        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_psc_failed_candiscovery);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_pos_failed_candiscovery);
         p->diagnostics.errorType = eo_errortype_error;                
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
@@ -1052,21 +1042,21 @@ static eOresult_t s_eo_psc_onstop_search4canboards(void *par, EOtheCANdiscovery2
     
     if(NULL != p->service.onverify)
     {
-        p->service.onverify(&s_eo_thepsc, searchisok); 
+        p->service.onverify(&s_eo_thepos, searchisok); 
     }    
     
     return(eores_OK);   
 }
 
 
-static void s_eo_psc_send_periodic_error_report(void *par)
+static void s_eo_pos_send_periodic_error_report(void *par)
 {
-    EOthePSC* p = (EOthePSC*) par;
+    EOthePOS* p = (EOthePOS*) par;
     
     eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
     
-    if(eoerror_value_CFG_psc_failed_candiscovery == eoerror_code2value(p->diagnostics.errorDescriptor.code))
-    {   // if i dont find the psc, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
+    if(eoerror_value_CFG_pos_failed_candiscovery == eoerror_code2value(p->diagnostics.errorDescriptor.code))
+    {   // if i dont find the pos, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
         eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
     }
     
@@ -1081,9 +1071,9 @@ static void s_eo_psc_send_periodic_error_report(void *par)
 }
 
 
-static eObool_t s_eo_psc_isID32relevant(uint32_t id32)
+static eObool_t s_eo_pos_isID32relevant(uint32_t id32)
 {
-    static const uint32_t mask0 = (((uint32_t)eoprot_endpoint_analogsensors) << 24) | (((uint32_t)eoprot_entity_as_psc) << 16);
+    static const uint32_t mask0 = (((uint32_t)eoprot_endpoint_analogsensors) << 24) | (((uint32_t)eoprot_entity_as_pos) << 16);
     
     if((id32 & mask0) == mask0)
     {
@@ -1095,7 +1085,7 @@ static eObool_t s_eo_psc_isID32relevant(uint32_t id32)
 
 
 
-static void s_eo_psc_boards_configure(EOthePSC *p)
+static void s_eo_pos_boards_configure(EOthePOS *p)
 {
     icubCanProto_POS_CONFIG_t posconfig; // = {0};
     
@@ -1112,20 +1102,20 @@ static void s_eo_psc_boards_configure(EOthePSC *p)
     posconfig.setting.decideg[0].zero =             posconfig.setting.decideg[1].zero = 0;
     posconfig.setting.decideg[0].rotation =         posconfig.setting.decideg[1].rotation = icubCanProto_pos_rot_none;
     
-    for(uint8_t i=0; i<eo_psc_maxnumberofCANboards; i++)
+    for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
         posconfig.setting.decideg[0].label = 2*i;
         posconfig.setting.decideg[1].label = 2*i+1;
         
-        // we send a config with no compensation but with labels already fixed for the position of the psc array.         
-        eObrd_canlocation_t loc = p->service.servconfig.data.as.psc.boardInfo.canloc[i];        
+        // we send a config with no compensation but with labels already fixed for the position of the pos array.         
+        eObrd_canlocation_t loc = p->service.servconfig.data.as.pos.boardInfo.canloc[i];        
         eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);
     }    
 }
 
 
 
-static void s_eo_psc_presenceofcanboards_reset(EOthePSC *p)
+static void s_eo_pos_presenceofcanboards_reset(EOthePOS *p)
 {
     memset(p->not_heardof_target, 0, sizeof(p->not_heardof_target));
     memset(p->not_heardof_status, 0, sizeof(p->not_heardof_status));
@@ -1133,19 +1123,19 @@ static void s_eo_psc_presenceofcanboards_reset(EOthePSC *p)
     p->isalive = eobool_true;
 }
 
-static void s_eo_psc_presenceofcanboards_build(EOthePSC *p)
+static void s_eo_pos_presenceofcanboards_build(EOthePOS *p)
 {
-    s_eo_psc_presenceofcanboards_reset(p);
+    s_eo_pos_presenceofcanboards_reset(p);
   
-    for(uint8_t i=0; i<eo_psc_maxnumberofCANboards; i++)
+    for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
-        eObrd_canlocation_t loc = p->service.servconfig.data.as.psc.boardInfo.canloc[i]; 
+        eObrd_canlocation_t loc = p->service.servconfig.data.as.pos.boardInfo.canloc[i]; 
         eo_common_hlfword_bitset(&p->not_heardof_target[loc.port], loc.addr);
     }    
 }
 
 
-static void s_eo_psc_presenceofcanboards_start(EOthePSC *p)
+static void s_eo_pos_presenceofcanboards_start(EOthePOS *p)
 {
     memcpy(p->not_heardof_status, p->not_heardof_target, sizeof(p->not_heardof_status));
     p->not_heardof_counter = 0;
@@ -1153,13 +1143,13 @@ static void s_eo_psc_presenceofcanboards_start(EOthePSC *p)
 }
 
 
-static void s_eo_psc_presenceofcanboards_touch(EOthePSC *p, eObrd_canlocation_t loc)
+static void s_eo_pos_presenceofcanboards_touch(EOthePOS *p, eObrd_canlocation_t loc)
 {
     eo_common_hlfword_bitclear(&p->not_heardof_status[loc.port], loc.addr);
 }
 
 
-static void s_eo_psc_presenceofcanboards_tick(EOthePSC *p)
+static void s_eo_pos_presenceofcanboards_tick(EOthePOS *p)
 {
     if((p->not_heardof_counter++) > p->not_heardof_checkrate)
     {        
@@ -1186,54 +1176,54 @@ static void s_eo_psc_presenceofcanboards_tick(EOthePSC *p)
     }
 }
 
-static eOresult_t s_eo_psc_OnServiceAlreadyActive(EOthePSC *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify)
+static eOresult_t s_eo_pos_OnServiceAlreadyActive(EOthePOS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify)
 {    
     
-    // it means that some other object has activated the psc. it can be either EOtheMotionController or EOtheServices upon request from embObjPSC
-    // ... we dont want to interfere, thus we cannot call eo_psc_Deactivate().  
+    // it means that some other object has activated the pos. it can be either EOtheMotionController or EOtheServices upon request from embObjPOS
+    // ... we dont want to interfere, thus we cannot call eo_pos_Deactivate().  
     // we just verify that the eOmn_serv_configuration_t* in argument is the same of (or compatible with) the one already used for activation.
     
     eObool_t verificationOK = eobool_false;
     
     eObool_t iscompatible = eobool_true;
     
-    for(uint8_t i=0; i<eo_psc_maxnumberofCANboards; i++)
+    for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
     
-        if(servcfg->data.as.psc.boardInfo.canloc[i].port != p->service.servconfig.data.as.psc.boardInfo.canloc[i].port)
+        if(servcfg->data.as.pos.boardInfo.canloc[i].port != p->service.servconfig.data.as.pos.boardInfo.canloc[i].port)
         {
             iscompatible = eobool_false;
         }
-        if(servcfg->data.as.psc.boardInfo.canloc[i].addr != p->service.servconfig.data.as.psc.boardInfo.canloc[i].addr)
+        if(servcfg->data.as.pos.boardInfo.canloc[i].addr != p->service.servconfig.data.as.pos.boardInfo.canloc[i].addr)
         {
             iscompatible = eobool_false;
         } 
     }
 
-    if((servcfg->data.as.psc.version.protocol.major != 0) || (servcfg->data.as.psc.version.protocol.minor != 0))
+    if((servcfg->data.as.pos.version.protocol.major != 0) || (servcfg->data.as.pos.version.protocol.minor != 0))
     {
         // check also the protocol
-        if(servcfg->data.as.psc.version.protocol.major != p->service.servconfig.data.as.psc.version.protocol.major)
+        if(servcfg->data.as.pos.version.protocol.major != p->service.servconfig.data.as.pos.version.protocol.major)
         {
             iscompatible = eobool_false;
         }
-        if(servcfg->data.as.psc.version.protocol.minor != p->service.servconfig.data.as.psc.version.protocol.minor)
+        if(servcfg->data.as.pos.version.protocol.minor != p->service.servconfig.data.as.pos.version.protocol.minor)
         {
             iscompatible = eobool_false;
         }
     }
-    if((servcfg->data.as.psc.version.firmware.major != 0) || (servcfg->data.as.psc.version.firmware.minor != 0)  || (servcfg->data.as.psc.version.firmware.build != 0))
+    if((servcfg->data.as.pos.version.firmware.major != 0) || (servcfg->data.as.pos.version.firmware.minor != 0)  || (servcfg->data.as.pos.version.firmware.build != 0))
     {
         // check also the firmaware
-        if(servcfg->data.as.psc.version.firmware.major != p->service.servconfig.data.as.psc.version.firmware.major)
+        if(servcfg->data.as.pos.version.firmware.major != p->service.servconfig.data.as.pos.version.firmware.major)
         {
             iscompatible = eobool_false;
         }
-        if(servcfg->data.as.psc.version.firmware.minor != p->service.servconfig.data.as.psc.version.firmware.minor)
+        if(servcfg->data.as.pos.version.firmware.minor != p->service.servconfig.data.as.pos.version.firmware.minor)
         {
             iscompatible = eobool_false;
         }
-        if(servcfg->data.as.psc.version.firmware.build != p->service.servconfig.data.as.psc.version.firmware.build)
+        if(servcfg->data.as.pos.version.firmware.build != p->service.servconfig.data.as.pos.version.firmware.build)
         {
             iscompatible = eobool_false;
         }
@@ -1250,7 +1240,7 @@ static eOresult_t s_eo_psc_OnServiceAlreadyActive(EOthePSC *p, const eOmn_serv_c
         p->diagnostics.errorType = eo_errortype_error;
         p->diagnostics.errorDescriptor.par16 = 0;
         p->diagnostics.errorDescriptor.par64 = 0;
-        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_psc_failed_verify_because_active);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_pos_failed_verify_because_active);
         p->diagnostics.errorDescriptor.sourceaddress = 0;
         p->diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard; 
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor); 
@@ -1265,7 +1255,7 @@ static eOresult_t s_eo_psc_OnServiceAlreadyActive(EOthePSC *p, const eOmn_serv_c
     return((eobool_true == verificationOK) ? (eores_OK) : (eores_NOK_generic));      
 }       
         
-#endif // #elif !defined(EOTHESERVICES_disable_thePSC)        
+#endif // #elif !defined(EOTHESERVICES_disable_thePOS)        
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

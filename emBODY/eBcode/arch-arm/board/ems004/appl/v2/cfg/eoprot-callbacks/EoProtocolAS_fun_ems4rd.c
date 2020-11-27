@@ -59,6 +59,7 @@
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
 #include "EOthePSC.h"
+#include "EOthePOS.h"
 
 #include "EOMtheEMStransceiver.h"
 
@@ -261,6 +262,28 @@ extern void eoprot_fun_UPDT_as_psc_cmmnds_enable(const EOnv* nv, const eOropdesc
     }
 }
 
+
+extern void eoprot_fun_UPDT_as_pos_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_pos_config_t *cfg = (eOas_pos_config_t*)rd->data;    
+    eo_pos_Config(eo_pos_GetHandle(), cfg);    
+}
+
+
+extern void eoprot_fun_UPDT_as_pos_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_pos_commands_t *cmd = (eOas_pos_commands_t*)rd->data;  
+
+    if(0 == cmd->enable)
+    {
+        eo_pos_Stop(eo_pos_GetHandle());    
+    }
+    else
+    {
+        eo_pos_Start(eo_pos_GetHandle());    
+        eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);
+    }
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
