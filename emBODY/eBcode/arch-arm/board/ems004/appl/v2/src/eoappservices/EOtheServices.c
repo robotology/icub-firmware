@@ -1176,7 +1176,6 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
             res = eo_psc_SetRegulars(eo_psc_GetHandle(), arrayofid32, &number);
         } break;
 
-
         case eomn_serv_category_pos:
         {
             res = eo_pos_SetRegulars(eo_pos_GetHandle(), arrayofid32, &number);

@@ -906,6 +906,7 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlo
         case eobrd_cantype_mtb4:
         case eobrd_cantype_rfe:
         case eobrd_cantype_psc:
+        case eobrd_cantype_pmc:
         case eobrd_cantype_sg3:
         {
             found = eobool_true;

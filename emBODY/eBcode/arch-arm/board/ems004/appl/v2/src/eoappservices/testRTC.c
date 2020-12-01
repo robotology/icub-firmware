@@ -42,6 +42,10 @@
 
 #include "EOVtheCallbackManager.h"
 
+#include "EOarray.h"
+
+#include "EoProtocolAS.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -59,7 +63,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+// empty section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -99,6 +103,11 @@ static void s_services_test_inertials_init(void);
 static void s_services_test_inertials_multiplesteps(void *arg);
 static void s_services_test_inertials_stop(void *par);
 
+
+static void s_services_test_pos_init(void);
+static void s_services_test_pos_multiplesteps(void *arg);
+static void s_services_test_pos_stop(void *par);
+
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -109,7 +118,7 @@ static void s_services_test_inertials_stop(void *par);
 
 // in here we decide if we want to test mc or inertials ...
 //static const eOmn_serv_category_t s_service_under_test = eomn_serv_category_mc; 
-static const eOmn_serv_category_t s_service_under_test = eomn_serv_category_inertials;
+static const eOmn_serv_category_t s_service_under_test = eomn_serv_category_pos;
 
 
 // the rest are service variables
@@ -202,7 +211,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfi
 
 static void s_eo_services_test_initialise(void)
 {
-    
+     
     switch(s_service_under_test)
     {
         default:
@@ -216,9 +225,14 @@ static void s_eo_services_test_initialise(void)
             s_services_test_inertials_init();            
         } break;
 
+        case eomn_serv_category_pos:
+        {
+            s_services_test_pos_init();            
+        } break;
     }       
     
-    eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+    EOVtaskDerived * t = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
+    eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, t);    
     eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);     
 }
 
@@ -280,7 +294,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
     .filler     = {0},
     .data.mc.foc_based = 
     {
-        .boardtype4mccontroller = eomc_ctrlboard_SHOULDER,
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
@@ -410,7 +423,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
     .filler     = {0},
     .data.mc.foc_based = 
     {
-        .boardtype4mccontroller = eomc_ctrlboard_SHOULDER,
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
@@ -541,7 +553,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
     .filler     = {0},
     .data.mc.foc_based = 
     {
-        .boardtype4mccontroller = eomc_ctrlboard_SHOULDER,
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
@@ -672,7 +683,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
     .filler     = {0},
     .data.mc.foc_based = 
     {
-        .boardtype4mccontroller = eomc_ctrlboard_SHOULDER,
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
@@ -899,92 +909,55 @@ static void s_services_test_mc_multiplesteps(void *arg)
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// inertials mems gyro
+// pos
 
-#include "EOtheInertials2.h"
+#include "EOthePOS.h"
 
 
-static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_gyro =
+static const eOmn_serv_configuration_t s_serv_config_as_pos =
 {   
-    .type       = eomn_serv_AS_inertials,
-    .filler     = {0},
-    .data.as.inertial = 
+    .type = eomn_serv_AS_pos,
+    .filler = {0},
+    .data.as.pos = 
     {
-        .mtbversion    =
+        .version = 
         {
-            .firmware   = { .major = 2, .minor = 17, .build = 0 },
-            .protocol   = { .major = 1, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
-        },
-        
-        .arrayofsensors =
-        {
-            .head   = 
+            .firmware = 
             {
-                .capacity       = eOas_inertials_maxnumber,
-                .itemsize       = sizeof(eOas_inertial_descriptor_t),
-                .size           = 2,
-                .internalmem    = 0                    
+                .major = 1, .minor = 0, .build = 0
             },
-            .data   =
+            .protocol = 
             {
-                {   // mtb
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 7 }
-                },                                
-                {   // gyro ....
-                    .type   = eoas_inertial_gyros_ems_st_l3g4200d,
-                    .on.eth = { .place = eobrd_place_eth, .id = 0 }
-                }              
-            }                
-        }
-    }    
+                .major = 2, .minor = 0
+            }
+        },
+        .boardInfo = 
+        {
+            .canloc = 
+            {
+                { 
+                    .port = eOcanport1, 
+                    .addr = 1, 
+                    .insideindex = eobrd_caninsideindex_none, 
+                    .dummy = 0 
+                }        
+            }
+        }        
+        
+    }
 };
 
-static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_accel =
-{   
-    .type       = eomn_serv_AS_inertials,
-    .filler     = {0},
-    .data.as.inertial = 
-    {
-        .mtbversion    =
-        {
-            .firmware   = { .major = 2, .minor = 17, .build = 0 },
-            .protocol   = { .major = 1, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
-        },
-        
-        .arrayofsensors =
-        {
-            .head   = 
-            {
-                .capacity       = eOas_inertials_maxnumber,
-                .itemsize       = sizeof(eOas_inertial_descriptor_t),
-                .size           = 2,
-                .internalmem    = 0                    
-            },
-            .data   =
-            {
-                {   // mtb
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 7 }
-                },                                
-                {   // gyro ....
-                    .type   = eoas_inertial_accel_ems_st_lis3x,
-                    .on.eth = { .place = eobrd_place_eth, .id = 0 }
-                }              
-            }                
-        }
-    }    
-};
 
-static void s_services_test_inertials_init(void)
+
+static void s_services_test_pos_init(void)
 {
-    s_test_config_ok = &s_serv_config_as_inertial_test_gyro; 
-    s_test_config_ko = &s_serv_config_as_inertial_test_accel;
-    s_service_tick = s_services_test_inertials_multiplesteps;    
+    s_test_config_ok = &s_serv_config_as_pos; 
+    s_test_config_ko = &s_serv_config_as_pos;
+    s_service_tick = s_services_test_pos_multiplesteps;    
 }
 
 
-static void s_services_test_inertials_multiplesteps(void *arg)
+static void s_services_test_pos_multiplesteps(void *arg)
 {
     // this is a test for fully working activate() /  deactivate()
     static uint8_t step = 0;
@@ -1008,17 +981,39 @@ static void s_services_test_inertials_multiplesteps(void *arg)
         eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);              
     }
     else if(3 == step)
-    {   // inertials config  
-        eOas_inertial_config_t config = {0};
+    {   // pos config  
+        
+        eOas_pos_config_t config = {0};
         config.datarate = 10; // ms
-        config.enabled = 0x3; // enable the first two
-        eo_inertials2_Config(eo_inertials2_GetHandle(), &config);
+
+        eo_pos_Config(eo_pos_GetHandle(), &config);
         
         services_stop_ANY_service_now = 0;
-        eo_action_SetCallback(s_act, s_services_test_mc_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+        eo_action_SetCallback(s_act, s_services_test_pos_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
         eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
     }
     else if(4 == step)
+    {   // regsig  
+        
+        s_command.category = s_service_under_test;
+        s_command.operation = eomn_serv_operation_regsig_load;
+        memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
+        
+        eOmn_serv_arrayof_id32_t id32s = {};
+        EOarray* ar = eo_array_New(eOmn_serv_capacity_arrayof_id32, 4, &s_command.parameter.arrayofid32);   
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_pos, 0, eoprot_tag_as_pos_status);
+        eo_array_PushBack(ar, &id32);  
+                      
+            
+        // ok, we have received a command for a given service. we ask the object theservices to manage the thing
+        
+        eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);  
+        
+        services_stop_ANY_service_now = 0;
+        eo_action_SetCallback(s_act, s_services_test_pos_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
+    }
+    else if(5 == step)
     {   // service start        
         s_services_test_start(arg);
         
@@ -1026,25 +1021,27 @@ static void s_services_test_inertials_multiplesteps(void *arg)
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
         eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
     }
-    else if(5 == step)
-    {   // inertials enable        
-        eo_inertials2_Transmission(eo_inertials2_GetHandle(), eobool_true);
+    else if(6 == step)
+    {   // tx enable        
+        eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);
         
         services_stop_ANY_service_now = 0;
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
         eo_timer_Start(s_timer, eok_abstimeNOW, 30*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);   
     }  
-    else if(6 == step)
+    else if(7 == step)
     {
         s_services_test_stop_everything(NULL);
     }
 }
 
 
-static void s_services_test_inertials_stop(void *par)
+static void s_services_test_pos_stop(void *par)
 {   
     s_services_test_stop_everything(NULL);   
 }
+
+
 
 
 
