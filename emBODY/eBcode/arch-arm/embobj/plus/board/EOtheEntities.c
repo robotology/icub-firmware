@@ -212,13 +212,22 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
         s_eo_theentities.inertials3[i] = (eOas_inertial3_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, (eOprotIndex_t)i);
     } 
 
-
+    // psc
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_psc);
-    s_eo_theentities.numofinertials3 = 0;
+    s_eo_theentities.numofpscs = 0;
     if(max>eoprotwrap_max_pscs) max = eoprotwrap_max_pscs;
     for(i=0; i<max; i++)
     {
         s_eo_theentities.pscs[i] = (eOas_psc_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_psc, (eOprotIndex_t)i);
+    } 
+    
+    // pos
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_pos);
+    s_eo_theentities.numofposs = 0;
+    if(max>eoprotwrap_max_poss) max = eoprotwrap_max_poss;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theentities.poss[i] = (eOas_pos_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_pos, (eOprotIndex_t)i);
     } 
     
     return(eores_OK);

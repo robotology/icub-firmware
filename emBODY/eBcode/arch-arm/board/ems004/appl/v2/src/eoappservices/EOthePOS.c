@@ -248,6 +248,67 @@ static EOthePOS s_eo_thepos =
 
 static const char s_eobj_ownname[] = "EOthePOS";
 
+
+const eOmn_serv_config_data_as_pos_t eo_pos_servconf_data_as_pos = 
+{
+    .version = 
+    {
+        .firmware = 
+        {
+            .major = 1, .minor = 1, .build = 0
+        },
+        .protocol = 
+        {
+            .major = 1, .minor = 1
+        }
+    },
+    .boardInfo = 
+    {
+        .canloc = 
+        {
+            { 
+                .port = eOcanport1, 
+                .addr = 1, 
+                .insideindex = eobrd_caninsideindex_none, 
+                .dummy = 0 
+            }        
+        }
+    }
+};
+
+const eOmn_serv_configuration_t eo_pos_servconf = 
+{
+    .type = eomn_serv_AS_pos,
+    .filler = {0},
+    .data.as.pos = 
+    {
+        .version = 
+        {
+            .firmware = 
+            {
+                .major = 1, .minor = 1, .build = 0
+            },
+            .protocol = 
+            {
+                .major = 1, .minor = 1
+            }
+        },
+        .boardInfo = 
+        {
+            .canloc = 
+            {
+                { 
+                    .port = eOcanport1, 
+                    .addr = 1, 
+                    .insideindex = eobrd_caninsideindex_none, 
+                    .dummy = 0 
+                }        
+            }
+        }        
+        
+    }
+};
+
 #define REM_WDT
 
 // --------------------------------------------------------------------------------------------------------------------
