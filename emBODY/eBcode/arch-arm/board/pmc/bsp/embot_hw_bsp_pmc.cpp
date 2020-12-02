@@ -855,13 +855,13 @@ namespace embot { namespace hw { namespace tlv493d {
     constexpr PROP propJ11 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
     constexpr PROP propU27 { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0x3E} };
     
-    #else
-    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC };
-    constexpr PROP prop02fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x02 };
-    constexpr PROP prop03fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x03 };
-    constexpr PROP prop04fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x04 };
-    constexpr PROP prop05fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x05 };
-    constexpr PROP prop06fake { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x06 };  
+#else
+    constexpr PROP propJ4  { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0xBC} };
+    constexpr PROP propJ5  { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0xBC} };
+    constexpr PROP propJ6  { embot::hw::i2c::Descriptor{embot::hw::I2C::three, 0xBC} }; 
+    constexpr PROP propJ7  { embot::hw::i2c::Descriptor{embot::hw::I2C::four,  0xBC} };  
+    constexpr PROP propJ11 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
+    constexpr PROP propU27 { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0x3E} };
 #endif
     
     
@@ -877,11 +877,12 @@ namespace embot { namespace hw { namespace tlv493d {
         }}
 #else
         // maskofsupported
-        mask::pos2mask<uint32_t>(TLV493D::one) |  mask::pos2mask<uint32_t>(TLV493D::two) |  mask::pos2mask<uint32_t>(TLV493D::three) |
-        mask::pos2mask<uint32_t>(TLV493D::four) |  mask::pos2mask<uint32_t>(TLV493D::five) |  mask::pos2mask<uint32_t>(TLV493D::six),        
+        mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::two) |
+        mask::pos2mask<uint32_t>(TLV493D::three) | mask::pos2mask<uint32_t>(TLV493D::four) |
+        mask::pos2mask<uint32_t>(TLV493D::five) | mask::pos2mask<uint32_t>(TLV493D::six),        
         // properties
         {{
-            &prop01, &prop02fake, &prop03fake, &prop04fake, &prop05fake, &prop06fake 
+            &propJ4, &propJ5, &propJ6, &propJ7, &propJ11, &propU27
         }}
 #endif        
     };

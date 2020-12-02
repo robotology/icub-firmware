@@ -63,15 +63,23 @@ constexpr uint32_t emulatedMODE_maskofUNresponsivesensors = 0;  // every sensor 
 
 Position emulatedMODE_getposition(TLV493D h)
 {
-    static std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> pos {0, 1000, 2000, 3000, 4000, 5000}; 
+    static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> min {    0,  4500,  9000, 13500, 18000, 22500};
+    static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> max { 4500,  9000, 13500, 18000, 22500, 27000};
+    static std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> pos (min); //{0, 1000, 2000, 3000, 4000, 5000}; 
+    
     if(false == supported(h))
     {
         return 0;        
     }
     
     Position p = pos[embot::core::tointegral(h)];
+    
     pos[embot::core::tointegral(h)] += 100;
-    if(pos[embot::core::tointegral(h)] >= 36000) pos[embot::core::tointegral(h)] = 0;
+    if(pos[embot::core::tointegral(h)] >= max[embot::core::tointegral(h)])
+    {
+        pos[embot::core::tointegral(h)] = min[embot::core::tointegral(h)];
+    }
+    
     return p;
 }
 
