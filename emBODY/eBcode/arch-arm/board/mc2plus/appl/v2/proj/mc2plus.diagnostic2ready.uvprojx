@@ -10,13 +10,13 @@
       <TargetName>mc2plus</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
+      <pCCUsed>6150000::V6.15::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.14.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.15.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -336,7 +336,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DUSE_MC2PLUS -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
+              <MiscControls>-DEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_MC2PLUS -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
               <Define>CER R1_HAND DIAGNOSTIC2_enabled DIAGNOSTIC2_receive_from_daemon DIAGNOSTIC2_send_to_yarprobotinterface _noDIAGNOSTIC2_send_to_daemon</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\services\embenv\api;..\cfg\boardcfg;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\embobj\plus\can;..\..\..\..\..\embobj\plus\can\config-can-protocol;..\..\..\..\..\embobj\plus\mc;..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks;..\..\..\..\ems004\appl\v2\src\eoappservices;..\..\..\..\..\embot\cif;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core</IncludePath>
@@ -903,6 +903,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOthePSC.c</FilePath>
             </File>
+            <File>
+              <FileName>EOthePOS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOthePOS.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1335,7 +1340,7 @@
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.14.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.15.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2222,6 +2227,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOthePSC.c</FilePath>
             </File>
+            <File>
+              <FileName>EOthePOS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOthePOS.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2588,11 +2598,6 @@
     <Layers>
       <Layer>
         <LayName>&lt;Project Info&gt;</LayName>
-        <LayDesc></LayDesc>
-        <LayUrl></LayUrl>
-        <LayKeys></LayKeys>
-        <LayCat></LayCat>
-        <LayLic></LayLic>
         <LayTarg>0</LayTarg>
         <LayPrjMark>1</LayPrjMark>
       </Layer>
