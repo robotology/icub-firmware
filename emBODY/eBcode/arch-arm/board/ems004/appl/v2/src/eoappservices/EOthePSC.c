@@ -122,7 +122,11 @@
 
     extern eOresult_t eo_psc_SetRegulars(EOthePSC *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
     {
-        eo_psc_SendReport(NULL);
+        if(NULL != arrayofid32)
+        {
+            eo_psc_SendReport(NULL);
+        }
+        
         return eores_NOK_generic;
     }
 

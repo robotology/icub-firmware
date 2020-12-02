@@ -122,7 +122,10 @@
 
     extern eOresult_t eo_mais_SetRegulars(EOtheMAIS *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
     {
-        eo_mais_SendReport(NULL);
+        if(NULL != arrayofid32)
+        {
+            eo_mais_SendReport(NULL);
+        }
         return eores_NOK_generic;
     }
 

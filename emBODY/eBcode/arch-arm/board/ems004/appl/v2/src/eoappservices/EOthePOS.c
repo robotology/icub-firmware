@@ -110,7 +110,10 @@
 
     extern eOresult_t eo_pos_SetRegulars(EOthePOS *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
     {
-        eo_pos_SendReport(NULL);
+        if(NULL != arrayofid32)
+        {
+            eo_pos_SendReport(NULL);
+        }
         return eores_NOK_generic;
     }
 
