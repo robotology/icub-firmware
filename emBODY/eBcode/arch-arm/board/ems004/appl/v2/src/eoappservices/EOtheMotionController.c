@@ -135,7 +135,10 @@
 
     extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
     {
-        eo_motioncontrol_SendReport(NULL);
+        if(NULL != arrayofid32)
+        {
+            eo_motioncontrol_SendReport(NULL);
+        }
         return eores_NOK_generic;
     }
 

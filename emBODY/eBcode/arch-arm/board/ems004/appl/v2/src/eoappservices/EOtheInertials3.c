@@ -125,7 +125,7 @@
 
     extern eOresult_t eo_inertials3_SetRegulars(EOtheInertials3 *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
     {
-        eo_inertials3_SendReport(NULL);
+        //eo_inertials3_SendReport(NULL);
         return eores_NOK_generic;
     }
 

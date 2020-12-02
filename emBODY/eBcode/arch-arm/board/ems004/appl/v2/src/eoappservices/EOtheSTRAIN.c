@@ -123,7 +123,10 @@
 
     extern eOresult_t eo_strain_SetRegulars(EOtheSTRAIN *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
     {
-        eo_strain_SendReport(NULL);
+        if(NULL != arrayofid32)
+        {
+            eo_strain_SendReport(NULL);
+        }
         return eores_NOK_generic;
     }
 
