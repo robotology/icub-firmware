@@ -846,7 +846,7 @@ bool embot::app::application::theFAPreader::Impl::acquisition_get(std::vector<em
         str += std::to_string(v/10);
         str += " DEG ";
         
-        info.loadDeciDeg(static_cast<embot::prot::can::analog::posLABEL>(n), 1, values);
+        info.loadDeciDeg(static_cast<embot::prot::can::analog::posLABEL>(embot::core::tointegral(id)), 1, values);
            
         msg.load(info);
         msg.get(frame);
