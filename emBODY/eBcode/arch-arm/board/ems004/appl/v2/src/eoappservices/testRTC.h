@@ -49,7 +49,7 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-#define TESTRTC_IS_ACTIVE
+//#define TESTRTC_IS_ACTIVE
 
 
    
