@@ -68,13 +68,17 @@ typedef struct
     eOmn_serv_configuration_t               servconfigpsc;
     EOthePSC*                               thepsc;     
     
+    // for mc4plus-faps & mc4plus-pmc
+    eOmn_serv_configuration_t               servconfigpos;
+    EOthePOS*                               thepos;  
+    
     // for everything apart mc4can
     EOconstarray*                           jomodescriptors; // points to service.servconfig.data.mc.xxx_based.arrayofjomodescriptors, where xxx is: foc, mc4plus, mc4plusmais
     MController*                            thecontroller;
     EOtheEncoderReader*                     theencoderreader;   
         
     
-    // for mc4plus, mc2plus, mc4plus-mais, mc2pluspsc
+    // for mc4plus, mc2plus, mc4plus-mais, mc2pluspsc, mc4plus-faps
     int16_t                                 pwmvalue[hal_motors_number];    // at most i can manage 4 motors
     hal_motor_t                             pwmport[hal_motors_number];
     hal_dma_current_t                       currents[hal_motors_number];    // in ma
