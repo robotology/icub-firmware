@@ -126,6 +126,8 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port);
 
 static eObool_t s_eo_read_psc_for_port(EOappEncReader *p, eObrd_portpsc_t port, eOencoderreader_valueInfo_t *valueInfo);
 
+static eObool_t s_eo_read_pos_for_port(EOappEncReader *p, eObrd_portpos_t port, eOencoderreader_valueInfo_t *valueInfo);
+
 static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodertype(eOmc_encoder_t encodertype);
 
 
@@ -706,6 +708,16 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             } break;    
 
 
+            case eomc_enc_pos:
+            {
+                eObool_t ret = s_eo_read_pos_for_port(p, (eObrd_portpos_t)prop.descriptor->port, prop.valueinfo); 
+  
+                if(eobool_false == ret)
+                {   // the port is not correct for a POS.
+                    prop.valueinfo->errortype = encreader_err_POS_GENERIC;              
+                }                           
+               
+            } break;    
             
             default:
             {   // we have not recognised any valid encoder type
@@ -741,6 +753,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 case encreader_err_ABSANALOG_GENERIC:
                 case encreader_err_MAIS_GENERIC:
                 case encreader_err_PSC_GENERIC:
+                case encreader_err_POS_GENERIC:
                 case encreader_err_AMO_GENERIC:
                 case encreader_err_SPICHAINOF2_GENERIC:
                 case encreader_err_SPICHAINOF3_GENERIC:
@@ -759,12 +772,6 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
     // now the return value. we return always OK          
     return eores_OK;
 }
-
-
-
-
-
-
 
 
 
@@ -1239,16 +1246,21 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
         {  
             hal_quadencoder_init((hal_quadencoder_t)jmcfg->encoder1des.port);            
         }
+
         
         if(jmcfg->encoder2des.type == eomc_enc_qenc)
         { 
             hal_quadencoder_init((hal_quadencoder_t)jmcfg->encoder2des.port);           
         }
         
-        // for adh: do things ...
+        // marco.accame on 3 dec 2020: i see that in here it is manages only the case eomc_enc_qenc. 
+        // but there are others ...
         
-        //  for mais-based encoder ... do nothing because wa get direct access to mais memory
-       
+        // for eomc_enc_roie, eomc_enc_absanalog, eomc_enc_hallmotor
+        // marco.accame on 3 dec 2020: well, so far nothing was done so i assume it is ok.
+        
+        // for eomc_enc_mais, eomc_enc_psc, eomc_enc_pos 
+        // we verify, activate, start with the proper service. that should be done elsewhere ...              
     }
 }
 
@@ -1461,7 +1473,7 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
     return(val_raw);
 }
 
-// it returns hal_NA32 if ... port is not valid. it returns 0 if we dont have values from the PSC
+
 static eObool_t s_eo_read_psc_for_port(EOappEncReader *p, eObrd_portpsc_t port, eOencoderreader_valueInfo_t *valueInfo)
 {
     eObool_t ret=eobool_false;
@@ -1469,14 +1481,21 @@ static eObool_t s_eo_read_psc_for_port(EOappEncReader *p, eObrd_portpsc_t port, 
     // get the psc status and then read its values
     eOas_psc_t *psc = eo_entities_GetPSC(eo_entities_GetHandle(), 0); 
     if(NULL == psc)
-    {   // it is possible to have NULL if we call the encoder-reader before we have called eo_mais_Activate(). theus, the motion-controller must verify and activate MAIS before the encoders.
+    {   // it is possible to have NULL if we call EOtheEncoderReader before we have called eo_psc_Activate(). 
+        // thus, EOtheMotionController must verify and activate PSC service before the encoders.
         return(ret);
     }
     
     eOas_psc_arrayof_data_t* array = &psc->status.arrayofdata;
     
     if(array->head.size != eOas_psc_data_maxnumber)
-        return(ret); //VALE: are you sure that if no readings the array is empty??
+    {
+        return(ret); 
+        // VALE: are you sure that if no readings the array is empty? 
+        // marco.accame: 
+        // the array must have size = eOas_psc_data_maxnumber because inside eoprot_fun_INIT_as_psc_status() defined in EOthePSC.c 
+        // we init the array to have that size, that capacity and all items = 0. Then the size is never changed.
+    }
     
     if(eobrd_portpsc_finger0 == port)
     {
@@ -1497,18 +1516,93 @@ static eObool_t s_eo_read_psc_for_port(EOappEncReader *p, eObrd_portpsc_t port, 
         ret=eobool_true;
     }
     
-//    static uint32_t noflood = 0;
-//    static char str[128] = {0};
-//    if (++noflood > 100)
-//    {   
-//        noflood = 0;
-//        
-//        snprintf(str, sizeof(str), "values are: %d", array->data[0].value);
-//                    
-//        eo_errman_Trace(eo_errman_GetHandle(), str, NULL);
-//    }
     return ret;
 }
+
+
+static eObool_t s_eo_read_pos_for_port(EOappEncReader *p, eObrd_portpos_t port, eOencoderreader_valueInfo_t *valueInfo)
+{
+    eObool_t ret = eobool_false;
+    
+    valueInfo->value[0] = 0;
+    valueInfo->composedof = 1;
+
+    // get the pos status and then read its values
+    eOas_pos_t *pos = eo_entities_GetPOS(eo_entities_GetHandle(), 0); 
+    if(NULL == pos)
+    {   // it is possible to have NULL if we call the encoder-reader before we have called eo_mais_Activate(). theus, the motion-controller must verify and activate MAIS before the encoders.
+        return(ret);
+    }
+    
+    EOarray *array = (EOarray*)&pos->status.arrayofdata;
+    
+    // with that i verify that the array has valid items, 
+    // so that eo_array_At(array, n) w/ n = [0, eOas_pos_data_maxnumber-1] shall always return a valid pointer
+    // i am sure that the following is always false because the function eoprot_fun_INIT_as_pos_status() 
+    // [defined inside EOthePOS.c and called at initialization of the endpoint analogsensors inside EOtheServices.c with eo_nvset_LoadEP()]
+    // inits the array to have capacity = size = eOas_pos_data_maxnumber
+    if(eo_array_Size(array) != eOas_pos_data_maxnumber)
+    {
+        return ret;
+    }
+           
+    switch(port)
+    {
+        case eobrd_portpos_hand_thumb:
+        {
+            eOas_pos_data_t *data0 = (eOas_pos_data_t*) eo_array_At(array, 0);
+            if(NULL != data0)
+            {
+                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data0->value);
+                valueInfo->composedof = 1;
+                ret = eobool_true; 
+            }                
+        } break;
+
+        case eobrd_portpos_hand_index:
+        {
+            eOas_pos_data_t *data1 = (eOas_pos_data_t*) eo_array_At(array, 1);
+            if(NULL != data1)
+            {
+                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data1->value);
+                valueInfo->composedof = 1;
+                ret = eobool_true; 
+            }                
+        } break;    
+
+        case eobrd_portpos_hand_medium:
+        {
+            eOas_pos_data_t *data2 = (eOas_pos_data_t*) eo_array_At(array, 2);
+            if(NULL != data2)
+            {
+                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data2->value);
+                valueInfo->composedof = 1;
+                ret = eobool_true;  
+            }                
+        } break;      
+
+        case eobrd_portpos_hand_pinky:
+        {
+            eOas_pos_data_t *data3 = (eOas_pos_data_t*) eo_array_At(array, 3);
+            if(NULL != data3)
+            {
+                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data3->value);
+                valueInfo->composedof = 1;
+                ret = eobool_true; 
+            }                
+        } break;  
+
+        default:
+        {
+            valueInfo->value[0] = 0;    
+            valueInfo->composedof = 0;  
+            ret = eobool_false;            
+        } break;        
+    }
+
+    return ret;
+}
+
 
 
 static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodertype(eOmc_encoder_t encodertype)
