@@ -69,7 +69,8 @@ typedef enum
     encreader_err_SPICHAINOF2_GENERIC   = 7,
     encreader_err_SPICHAINOF3_GENERIC   = 8,
     encreader_err_AMO_GENERIC           = 9,
-    encreader_err_PSC_GENERIC           = 10,    
+    encreader_err_PSC_GENERIC           = 10,  
+    encreader_err_POS_GENERIC           = 11,    
     encreader_err_GENERIC               = 14,    
     encreader_err_NOTCONNECTED          = 15 /* this error happens when the encoder type is none or encoder is not local, for example it is connected to 2foc board */
 } eOencoderreader_errortype_t;
@@ -95,7 +96,6 @@ typedef struct
 extern EOtheEncoderReader* eo_encoderreader_Initialise(void);
 
 extern EOtheEncoderReader* eo_encoderreader_GetHandle(void);
-
 
 
 // it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
