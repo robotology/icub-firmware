@@ -24,6 +24,9 @@
 
 #include "embot_app_application_theFAPreader.h"
 
+#if defined(USE_PZMdriver) 
+#include "lr17_encoder.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -131,8 +134,10 @@ struct embot::app::ctrl::tSNSR::Impl
     static void snsr_startup(embot::os::Thread *t, void *param)
     {
         embot::app::ctrl::tSNSR::Impl *impl = reinterpret_cast<embot::app::ctrl::tSNSR::Impl*>(param);
-        
 
+#if defined(USE_PZMdriver)         
+        lr17_encoder_init();
+#endif
     }
     
     static void snsr_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)

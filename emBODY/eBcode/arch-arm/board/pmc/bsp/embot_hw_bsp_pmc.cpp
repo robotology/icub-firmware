@@ -174,8 +174,9 @@ bool embot::hw::bsp::specialize() { return true; }
 #else   
 bool embot::hw::bsp::specialize() 
 { 
-
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
     i2c_address_assignment_to_tlv493d_chips();
+#endif    
     leds_off();
     
     return true; 

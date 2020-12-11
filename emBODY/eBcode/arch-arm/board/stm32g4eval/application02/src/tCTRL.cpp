@@ -24,6 +24,10 @@
 
 #include "embot_app_PZdriver.h"
 
+#if defined(USE_PZMdriver) 
+#include "piezo.h"
+#include "tables.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -103,7 +107,11 @@ struct embot::app::ctrl::tCTRL::Impl
             impl->_pzdrivers[i]->init({pzm, impl->_pzlut});
             impl->_pzdrivers[i]->start();
         }
-  
+
+#if defined(USE_PZMdriver)        
+        piezoMotorCfg_t pzm = { delta_8192, 8192 };
+        piezoInit( &pzm, &pzm, &pzm);
+#endif  
     }
     
     static void ctrl_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
