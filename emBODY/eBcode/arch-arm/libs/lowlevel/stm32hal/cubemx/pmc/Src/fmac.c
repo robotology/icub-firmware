@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : FMAC.c
-  * Description        : This file provides code for the configuration
-  *                      of the FMAC instances.
+  * @file    fmac.c
+  * @brief   This file provides code for the configuration
+  *          of the FMAC instances.
   ******************************************************************************
   * @attention
   *
