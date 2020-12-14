@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : USB.h
-  * Description        : This file provides code for the configuration
-  *                      of the USB instances.
+  * @file    usb.h
+  * @brief   This file contains all the function prototypes for
+  *          the usb.c file
   ******************************************************************************
   * @attention
   *
@@ -17,10 +17,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __usb_H
-#define __usb_H
+#ifndef __USB_H__
+#define __USB_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -45,14 +46,7 @@ void MX_USB_PCD_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ usb_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __USB_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

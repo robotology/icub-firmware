@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : USB.c
-  * Description        : This file provides code for the configuration
-  *                      of the USB instances.
+  * @file    usb.c
+  * @brief   This file provides code for the configuration
+  *          of the USB instances.
   ******************************************************************************
   * @attention
   *

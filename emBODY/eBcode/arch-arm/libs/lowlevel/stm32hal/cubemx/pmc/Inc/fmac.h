@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : FMAC.h
-  * Description        : This file provides code for the configuration
-  *                      of the FMAC instances.
+  * @file    fmac.h
+  * @brief   This file contains all the function prototypes for
+  *          the fmac.c file
   ******************************************************************************
   * @attention
   *
@@ -17,10 +17,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __fmac_H
-#define __fmac_H
+#ifndef __FMAC_H__
+#define __FMAC_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -45,14 +46,7 @@ void MX_FMAC_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ fmac_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __FMAC_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
