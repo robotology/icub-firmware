@@ -374,7 +374,11 @@ namespace embot { namespace hw { namespace can {
     void BSP::init(embot::hw::CAN h) const 
     {
         if(h == CAN::one)
-        {            
+        { 
+            // at first make sure these pins are reset
+            HAL_GPIO_WritePin(GPIOD, CAN1_STDBY_Pin|CAN1_SHDN_Pin, GPIO_PIN_RESET);
+            HAL_Delay(1);
+            
             // for 80 mhz (from a project by st)
             hfdcan1.Instance = FDCAN1;
             hfdcan1.Init.ClockDivider = FDCAN_CLOCK_DIV1;
