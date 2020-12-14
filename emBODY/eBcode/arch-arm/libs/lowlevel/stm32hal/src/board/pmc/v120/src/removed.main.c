@@ -34,6 +34,12 @@
 #include "usb.h"
 #include "gpio.h"
 
+#define TEST_TLV
+
+#if defined(TEST_TLV)
+#include "test_tlv.h"
+#endif
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -96,6 +102,13 @@ int main(void)
 
   /* USER CODE END SysInit */
 
+#if defined(TEST_TLV)  
+
+    //test_tlv_changeoftheaddress();
+    test_tlv_init();
+    for(;;);
+
+#else
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
@@ -119,6 +132,7 @@ int main(void)
   MX_SPI4_Init();
   MX_TIM2_Init();
   MX_TIM5_Init();
+  MX_TIM7_Init();
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
 
@@ -133,6 +147,8 @@ int main(void)
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+  
+  #endif
 }
 
 /**
@@ -178,7 +194,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
@@ -218,7 +234,10 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-
+  __disable_irq();
+  while (1)
+  {
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 
@@ -234,7 +253,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

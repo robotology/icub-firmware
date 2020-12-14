@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : CORDIC.c
-  * Description        : This file provides code for the configuration
-  *                      of the CORDIC instances.
+  * @file    cordic.c
+  * @brief   This file provides code for the configuration
+  *          of the CORDIC instances.
   ******************************************************************************
   * @attention
   *
