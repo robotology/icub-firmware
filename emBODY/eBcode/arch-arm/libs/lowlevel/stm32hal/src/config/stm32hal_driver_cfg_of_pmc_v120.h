@@ -110,7 +110,7 @@
 /**
   * @brief This is the list of modules where register callback can be used
   */
-#define USE_HAL_ADC_REGISTER_CALLBACKS        0U
+#define USE_HAL_ADC_REGISTER_CALLBACKS        1U
 #define USE_HAL_COMP_REGISTER_CALLBACKS       1U
 #define USE_HAL_CORDIC_REGISTER_CALLBACKS     0U
 #define USE_HAL_CRYP_REGISTER_CALLBACKS       0U

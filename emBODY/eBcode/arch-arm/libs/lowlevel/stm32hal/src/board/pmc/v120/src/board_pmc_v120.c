@@ -112,7 +112,8 @@ extern void stm32hal_board_init(void)
   MX_SPI4_Init();
   MX_TIM2_Init();
   MX_TIM5_Init();
-  //MX_USB_PCD_Init();
+  MX_TIM7_Init();
+//  MX_USB_PCD_Init();
   
 }
 
@@ -182,7 +183,7 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
