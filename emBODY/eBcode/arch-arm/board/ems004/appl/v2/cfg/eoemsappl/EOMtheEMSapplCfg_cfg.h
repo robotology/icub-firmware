@@ -84,7 +84,7 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        12
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          25
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          15
 //  <o> hour            <0-23> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         10
 //  <o> minute          <0-59> 
