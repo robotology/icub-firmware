@@ -584,7 +584,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 }
                 break;
             }  
-            
+ 
+            // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to aea because the encoder is absolute and has only one component 
+            case eomc_enc_pos:
             case eomc_enc_aea:
             {
                 o->absEncoder[k].type = eomc_enc_aea;
