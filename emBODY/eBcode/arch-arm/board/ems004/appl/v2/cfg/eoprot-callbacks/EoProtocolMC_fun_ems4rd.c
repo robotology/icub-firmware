@@ -154,7 +154,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     // now we see if it is a mc4can or a 2foc or a mc4plus    
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
         
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_config_joint(jxx, cfg);
     }
@@ -253,7 +253,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_config_minjerk_pid(jxx, pid);
     }
@@ -271,7 +271,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidvelocity(const EOnv* nv, const eO
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         //MController_config_direct_pid(jxx, pid);
     }
@@ -290,7 +290,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_motor_config_torque_PID(jxx, pid);
     }
@@ -310,7 +310,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const e
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_config_motor_friction(jxx, mparams);
     }
@@ -325,7 +325,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_config_joint_impedance(jxx, impedance);
     } // mark
@@ -405,7 +405,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_userlimits(const EOnv* nv, const eOr
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_config_joint_pos_limits(jxx, limitsofjoint->min, limitsofjoint->max);
     }
@@ -484,7 +484,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_config_joint_vel_ref_timeout(jxx, *time);
     } // marker
@@ -505,7 +505,7 @@ extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* 
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
    
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         // do nothing
     } // marker
@@ -570,7 +570,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
     joint->status.core.modes.ismotiondone = eobool_false;
 
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {        
         switch(setpoint->type)
         { 
@@ -787,7 +787,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
 {
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
         MController_stop_joint(jxx);
@@ -826,7 +826,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_calibrate(jxx, calibrator);        
     } 
@@ -1177,7 +1177,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_set_control_mode(jxx, (eOmc_controlmode_command_t)(*controlmode));        
     }    
@@ -1206,7 +1206,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_set_interaction_mode(jxx, *interaction);
     } // marker
@@ -1245,7 +1245,7 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_update_joint_torque_fbk(jxx, *torque);
     } // marker
@@ -1275,7 +1275,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_gearbox_M2J(const EOnv* nv, const eO
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_config_motor_gearbox_M2J(jxx, *gbxratio);
     }
@@ -1291,7 +1291,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const e
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         MController_config_motor_encoder(jxx, *rotenc);
     }
@@ -1316,7 +1316,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
         return;           
     }
-    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))   
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))   
     {
         MController_config_motor(mxx, mconfig);
         eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
@@ -1378,7 +1378,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 
         return;
     }
-    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         // TODOALE
         return;
@@ -1453,7 +1453,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
 
         MController_motor_config_max_currents(mxx, currentLimits);
     }
-    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
         // now for the case of mc4plus, the watchdog updates the current limits inside ems controller. 
@@ -1480,7 +1480,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         *pwm_limit = MController_config_motor_pwm_limit(mxx, *pwm_limit);
     }
