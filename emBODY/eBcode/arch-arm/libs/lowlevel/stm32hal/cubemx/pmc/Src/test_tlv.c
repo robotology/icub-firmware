@@ -114,14 +114,18 @@ void set_led(led_t l, led_status_t status)
     led_status_t curr[4] = {led_off};
     
     
+//#define REMOVE_U27
+//#define REMOVE_J13
+    
 void startup_adr()
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     // i2c1
-    // power down j11
+    // power down j13
     HAL_GPIO_WritePin(GPIOE, MAGVCC1_Pin, GPIO_PIN_RESET);
     HAL_Delay(10); 
-    
+
+#if !defined(REMOVE_J13)     
     // sda-i2c1 PB9 low 
     __HAL_RCC_GPIOB_CLK_ENABLE();    
     GPIO_InitStruct.Pin = GPIO_PIN_9;
@@ -131,16 +135,17 @@ void startup_adr()
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);    
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
     HAL_Delay(10);
-    // power up j11
+    // power up j13
     HAL_GPIO_WritePin(GPIOE, MAGVCC1_Pin, GPIO_PIN_SET);    
     HAL_Delay(10);  
-    
+#endif    
     
     // i2c2
     // power down u27
     HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_RESET);
     HAL_Delay(10); 
     
+#if !defined(REMOVE_U27)        
     // sda-i2c2 PA8 low 
     __HAL_RCC_GPIOA_CLK_ENABLE();
     GPIO_InitStruct.Pin = GPIO_PIN_8;
@@ -153,58 +158,165 @@ void startup_adr()
     // power up u27
     HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin, GPIO_PIN_SET);    
     HAL_Delay(10);    
-    
 
-}    
-    
-void test_tlv_init(void)
-{
-    volatile HAL_StatusTypeDef status = HAL_ERROR;
-    
-    MX_GPIO_Init();
-    
-    // power off and on again. wait 3 ms
-    
-    
-    set_led(led_all, led_off);
-    set_led(led_01, led_on);
-    set_led(led_02, led_on);
-    set_led(led_03, led_on);
-    set_led(led_04, led_on);
-    set_led(led_05, led_on);
-    set_led(led_06, led_on);
-    set_led(led_07, led_on);
-    set_led(led_all, led_off);
-    
-   
-//    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
-//    HAL_Delay(20);
-
-#if 0
-//    HAL_GPIO_WritePin(GPIOE, MAGVCC1_Pin, GPIO_PIN_SET);
-//    HAL_Delay(20);
-//    HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_SET);
-//    HAL_Delay(20);
-//    HAL_GPIO_WritePin(GPIOE, MAGVCC1_Pin, GPIO_PIN_SET);
-//    HAL_Delay(20);  
-#else
-    startup_adr();
 #endif
 
+}   
 
+
+void oldies(void)
+{
     
-    // init dma + i2c
+        
     
-    MX_DMA_Init();
-    MX_I2C1_Init(); 
-    MX_I2C2_Init(); 
-    MX_I2C3_Init();
-    MX_I2C4_Init();    
-    HAL_Delay(20);
+//    set_address(x3E);   
+//    discover();
+    
+//    set_address(xBC);   
+//    discover();    
+    
+    // ping the chip @ address 0x3E
+    
+    static const uint8_t tlvadr = 0x3E; // 0xBC
+    static const uint32_t timeout = 5;
+    
+//    status = HAL_I2C_IsDeviceReady(&hi2c2, tlvadr, 3, timeout);
+ //   status = status;
+    
+        
+    // reset
+    volatile HAL_StatusTypeDef r = HAL_I2C_Master_Transmit(&hi2c2, 0, NULL,0, 5);
+    r = r;
+    HAL_Delay(5);
+    
+    
+    HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(&hi2c2, tlvadr, 3, timeout);
+    status = status;
+    
+    discover();
+}
+
+
+
+void setTLVleds(void)
+{
+    typedef enum { posJ5 = 0, posJ6 = 1, posJ7 = 2, posJ13 = 3, posJ4 = 4, posU27 = 5, posNUM = 6 } posTLV_t;     
+    static const led_t ledmap[posNUM] = { led_01, led_02, led_03, led_04, led_05, led_06 };
+    
+    static uint8_t presence[posNUM] = {0, 0, 0, 0, 0, 0};
+    
+    memset(presence, 0, sizeof(presence));
+
+    // i2c1: J4 + J13
+    for(uint8_t i=0; i<numI2C1; i++)
+    {
+        if(0xBC == foundsI2C1[i])
+        {   // J4
+            presence[posJ4] = 1;                               
+        }
+        else if(0x3E == foundsI2C1[i])
+        {   // J13
+            presence[posJ13] = 1;               
+        }
+    }
+
+    // i2c2: J5 + U27
+    for(uint8_t i=0; i<numI2C2; i++)
+    {
+        if(0xBC == foundsI2C2[i])
+        {   // J5
+            presence[posJ5] = 1;                               
+        }
+        else if(0x3E == foundsI2C2[i])
+        {   // U27
+            presence[posU27] = 1;               
+        }
+    }
+
+    // i2c3: J6
+    for(uint8_t i=0; i<numI2C3; i++)
+    {
+        if(0xBC == foundsI2C3[i])
+        {   // J6
+            presence[posJ6] = 1;                               
+        }
+    }  
+
+    // i2c4: J7
+    for(uint8_t i=0; i<numI2C4; i++)
+    {
+        if(0xBC == foundsI2C4[i])
+        {   // J7
+            presence[posJ7] = 1;                               
+        }
+    } 
+    
+    for(uint8_t i=0; i<posNUM; i++)
+    {
+        set_led(ledmap[i], (1 == presence[i]) ? led_on : led_off);
+    }
+    
+}
+
+void toggle_1hz_led7()
+{
+    static led_status_t st = led_off;
+    static uint32_t prev = 0;
+    
+    uint32_t now = HAL_GetTick();
+    if((now - prev) < 500)
+    {
+        return;
+    }
+    
+    prev = now;
+    
+    set_led(led_07, st);
+    st = (led_off == st) ? led_on : led_off;
+}
+
+
+void test_presence_of_tlvs(void)
+{
+    uint64_t count = 0;
+    
+    for(uint8_t n=0; n<5 ; n++)
+    {
+        set_led(led_07, led_on);
+        HAL_Delay(50);
+        set_led(led_07, led_off);
+        HAL_Delay(50);
+    }
+    
+    for(;;)
+    {  
+        HAL_Delay(100);
+        
+        count ++;
+        
+        if(count >= 50)
+        {
+            NVIC_SystemReset();
+        }
+        
+        discovery(&hi2c1, foundsI2C1, sizeof(foundsI2C1), &numI2C1);
+        discovery(&hi2c2, foundsI2C2, sizeof(foundsI2C2), &numI2C2);
+        discovery(&hi2c3, foundsI2C3, sizeof(foundsI2C3), &numI2C3);
+        discovery(&hi2c4, foundsI2C4, sizeof(foundsI2C4), &numI2C4);
+        
+        setTLVleds();
+        toggle_1hz_led7();
+    }    
+    
+}
+
+void test_presence_of_i2cs(void)
+{
     
     uint8_t first = 1;
     
     volatile uint8_t changed = 0;
+       
  
     for(;;)
     {
@@ -248,35 +360,44 @@ void test_tlv_init(void)
         {
             first = 0;
         }
-    }
+    }    
     
-    for(;;);
+}
     
-//    set_address(x3E);   
-//    discover();
+void test_tlv_init(void)
+{
+    volatile HAL_StatusTypeDef status = HAL_ERROR;
     
-//    set_address(xBC);   
-//    discover();    
-    
-    // ping the chip @ address 0x3E
-    
-    static const uint8_t tlvadr = 0x3E; // 0xBC
-    static const uint32_t timeout = 5;
-    
-//    status = HAL_I2C_IsDeviceReady(&hi2c2, tlvadr, 3, timeout);
- //   status = status;
-    
+    MX_GPIO_Init();
         
-    // reset
-    volatile HAL_StatusTypeDef r = HAL_I2C_Master_Transmit(&hi2c2, 0, NULL,0, 5);
-    r = r;
-    HAL_Delay(5);
+    set_led(led_all, led_off);
+    set_led(led_01, led_on);
+    set_led(led_02, led_on);
+    set_led(led_03, led_on);
+    set_led(led_04, led_on);
+    set_led(led_05, led_on);
+    set_led(led_06, led_on);
+    set_led(led_07, led_on);
+    set_led(led_all, led_off);
+       
+    startup_adr();
+
+
+
     
+    // init dma + i2c
     
-    status = HAL_I2C_IsDeviceReady(&hi2c2, tlvadr, 3, timeout);
-    status = status;
+    MX_DMA_Init();
+    MX_I2C1_Init(); 
+    MX_I2C2_Init(); 
+    MX_I2C3_Init();
+    MX_I2C4_Init();    
+    HAL_Delay(20);
     
-        discover();
+    //test_presence_of_i2cs();
+    test_presence_of_tlvs();
+    
+    for(;;);       
     
 }
 
