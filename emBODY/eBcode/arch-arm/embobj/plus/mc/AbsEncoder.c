@@ -130,6 +130,8 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
             //snprintf(message, sizeof(message), "ABSE aea:tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
         }break; 
 
+        // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to ... amo and psc
+        case(eomc_enc_pos):
         case(eomc_enc_amo):
         case(eomc_enc_psc):
         {
@@ -342,6 +344,8 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
     
     switch(o->type)
     {
+        // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to aea and other absolute encoders 
+        case eomc_enc_pos:
         case eomc_enc_aea:
         case eomc_enc_amo:
         case eomc_enc_psc:
