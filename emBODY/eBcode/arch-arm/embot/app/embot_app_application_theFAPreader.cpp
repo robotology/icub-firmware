@@ -67,6 +67,8 @@ std::string to_string(embot::hw::TLV493D id)
 
 //#define DEBUG_COMPENSATE_SENSOR
 
+#define EMBOT_FAPREADER_compensatereadings
+
 #define CONTINUOUS_ACQUISITION
     
 struct embot::app::application::theFAPreader::Impl
@@ -816,6 +818,7 @@ bool embot::app::application::theFAPreader::Impl::process(embot::os::EventMask e
     return true;    
 }
 
+
 bool embot::app::application::theFAPreader::Impl::acquisition_get(std::vector<embot::prot::can::Frame> &replies)
 {   
             
@@ -830,6 +833,7 @@ bool embot::app::application::theFAPreader::Impl::acquisition_get(std::vector<em
     for(uint8_t i=0; i<validIDpositions.size(); i++)
     {
         uint8_t n = validIDpositions[i];
+        embot::hw::TLV493D id = config.sensors[n].id;
         
         embot::prot::can::analog::periodic::Message_POS msg;
         embot::prot::can::analog::periodic::Message_POS::Info info;  
@@ -837,10 +841,39 @@ bool embot::app::application::theFAPreader::Impl::acquisition_get(std::vector<em
         info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
         
         // so far i load one value in one packet ...
+        
+#if defined(EMBOT_FAPREADER_compensatereadings)     
+        
+        #warning EMBOT_FAPREADER_compensatereadings is defined: we compensate values for a specific hand to be in range [0, 90]
+
+        constexpr std::array<int16_t, numberofpositions> offsets = { 218, 92, 148, 165, 0, 0 };
+        constexpr int16_t correction = 10;
+        constexpr std::array<int16_t, numberofpositions> rotations = { 0, 0, 180, 0, 0, 0 };
+        //constexpr std::array<embot::hw::tlv493d::Position, numberofpositions> offsets = { 0, 0, 0, 0, 0, 0 };
+        
+        int16_t v = +10000;
+        if(0xffff != positions[n])
+        {
+            int16_t r = (positions[n]/100+rotations[embot::core::tointegral(id)]) % 360;
+            int16_t t = - (r);
+            v = (720 + t) % 360;
+            v = v - (offsets[embot::core::tointegral(id)]-correction);
+//            if(v < 0) v = 0;
+//            else if (v > 180) v = 180;
+            v *= 10;
+            
+//            v = transform(positions[n], embot::core::tointegral(id));
+//            v *= 10;
+        }
+        std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
+        
+#else  
+
         int16_t v =  (0xffff == positions[n]) ? +10000 : positions[n]/10;
         std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
         
-        embot::hw::TLV493D id = config.sensors[n].id; 
+#endif        
+
         str += to_string(id);
         str += " = ";
         str += std::to_string(v/10);
