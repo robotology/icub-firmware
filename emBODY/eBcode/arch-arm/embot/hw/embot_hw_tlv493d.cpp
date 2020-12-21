@@ -61,6 +61,9 @@ constexpr uint32_t emulatedMODE_maskofUNresponsivesensors = 0;  // every sensor 
 //    embot::core::binary::mask::pos2mask<uint32_t>(embot::hw::TLV493D::two) | 
 //    embot::core::binary::mask::pos2mask<uint32_t>(embot::hw::TLV493D::six);
 
+#define SINUSOID
+
+#if defined(CHAINSAW)
 Position emulatedMODE_getposition(TLV493D h)
 {
     static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> min {    0,  4500,  9000, 13500, 18000, 22500};
@@ -82,6 +85,44 @@ Position emulatedMODE_getposition(TLV493D h)
     
     return p;
 }
+#elif defined(SINUSOID)
+
+#include <math.h>
+constexpr double pie = 3.14159265;
+
+Position emulatedMODE_getposition(TLV493D h)
+{
+    static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> min {  500,  500,  500,   500,  500, 500};
+    static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> max { 8500,  8500, 8500, 8500, 8500, 8500};
+    static std::array<uint16_t, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> step {0, 0, 0, 0, 0, 0}; 
+    
+    if(false == supported(h))
+    {
+        return 0;        
+    }
+    
+    int16_t p = step[embot::core::tointegral(h)];
+    
+    step[embot::core::tointegral(h)] += 1;
+    if(step[embot::core::tointegral(h)] >= 360)
+    {
+        step[embot::core::tointegral(h)] = 0;
+    }
+    
+    // now i compute teh sine and i move in range [0, 1]
+    double v = (sin(p*pie/180.0) + 1.0) / 2.0;
+    
+    // now in p i put the range
+    
+    v = min[embot::core::tointegral(h)] + v*(max[embot::core::tointegral(h)] - min[embot::core::tointegral(h)]);
+    
+    Position pos = static_cast<Position>(v);
+    return pos;
+}
+
+#else
+#error pls define a waveform
+#endif
 
 }}}
 
