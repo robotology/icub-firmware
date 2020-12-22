@@ -4,6 +4,7 @@ void(*lr17_encoder_cb)(void *arg) = NULL;
 void *lr17_encoder_cb_arg;
 
 volatile int lr17_encoder_val = 0;
+volatile bool lr17_isvalid = false;
 
 uint16_t lr17_encoder_buf;
 
@@ -17,7 +18,9 @@ static void lr17_spi_cb(SPI_HandleTypeDef *spi);
 bool lr17_encoder_init()
 {
     HAL_SPI_RegisterCallback(&hspi4, HAL_SPI_RX_COMPLETE_CB_ID, lr17_spi_cb);
-
+    lr17_isvalid = false;
+    lr17_encoder_val = 0;
+    
     return true;
 }
 
@@ -45,7 +48,7 @@ bool lr17_encoder_acquire(void(*cb)(void *arg), void *arg)
 bool lr17_encoder_get(int *angle)
 {
     *angle = lr17_encoder_val;
-    return true;
+    return lr17_isvalid;
 }
 
 /*******************************************************************************************************************//**
@@ -54,8 +57,19 @@ bool lr17_encoder_get(int *angle)
  */
 static void lr17_spi_cb(SPI_HandleTypeDef *spi)
 {
+    lr17_isvalid = (0xffff == lr17_encoder_buf) ? false : true;
+    
 	lr17_encoder_val =
 		(lr17_encoder_buf & 0x7fff);
     if (lr17_encoder_cb)
         lr17_encoder_cb(lr17_encoder_cb_arg);
 }
+
+
+
+void SPI4_IRQHandler(void)
+{
+    HAL_SPI_IRQHandler(&hspi4);
+}
+
+
