@@ -87,6 +87,7 @@ int main(void)
 #include "embot_app_application_theCANtracer.h"
 
 #include "embot_app_application_theFAPreader.h"
+#include "embot_app_application_thePOSreader2.h"
 #include "embot_app_application_theCANparserPOS.h"
 #include "embot_hw_tlv493d.h"
 
