@@ -53,17 +53,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-std::string to_string(embot::hw::TLV493D id)
-{
-    constexpr std::array<const char *, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> TLV493D_map =
-    { 
-        "TLV493D::one", "TLV493D::two", "TLV493D::three", "TLV493D::four", "TLV493D::five", "TLV493D::six"
-    };
-    uint8_t pos = embot::core::tointegral(id);
-    return (pos < TLV493D_map.size()) ? TLV493D_map[pos] : "TLV493D::none";    
-}
-
-
 
 //#define DEBUG_COMPENSATE_SENSOR
 
@@ -378,7 +367,7 @@ struct embot::app::application::theFAPreader::Impl
             }
             
             embot::hw::TLV493D id = config.sensors[n].id;            
-            print(to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+            print(embot::hw::tlv493d::to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
     
             #warning in here we use n or ... daisychain_counter??? we use n. even if some n keep non valid values
             tspositions->set(pos, n);
@@ -401,7 +390,7 @@ struct embot::app::application::theFAPreader::Impl
     void acquisition_daisychain_noreply()
     {
         embot::hw::TLV493D id = config.sensors[validIDpositions[daisychain_counter]].id;
-        print("acquisition_daisychain_noreply() of " + to_string(id) + ", index = " + std::to_string(daisychain_counter) + ", @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+        print("acquisition_daisychain_noreply() of " + embot::hw::tlv493d::to_string(id) + ", index = " + std::to_string(daisychain_counter) + ", @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
 
         timerTOUT_stop();
         
@@ -439,7 +428,7 @@ struct embot::app::application::theFAPreader::Impl
             eventmask |= config.sensors[n].askdata;  
             embot::core::binary::bit::set(acquisition_fullyparallel_maskofrequests, n);
             embot::hw::TLV493D id = config.sensors[n].id;            
-            str += to_string(id);
+            str += embot::hw::tlv493d::to_string(id);
             str += " ";
         }
         config.reader->setEvent(eventmask); 
@@ -453,7 +442,7 @@ struct embot::app::application::theFAPreader::Impl
     void acquisition_fullyparallel_on_askdata(uint8_t n)
     {
         embot::hw::TLV493D id = config.sensors[n].id;
-        print("acquisition_fp_on_askdata(" + std::to_string(n) + ") for " + to_string(id) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+        print("acquisition_fp_on_askdata(" + std::to_string(n) + ") for " + embot::hw::tlv493d::to_string(id) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
 //        print("acquisition_fp_on_askdata(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
         // config a callback which sends the dataready event
         cbkdataarray[n] = {this, n};
@@ -474,7 +463,7 @@ struct embot::app::application::theFAPreader::Impl
         }
         
         embot::hw::TLV493D id = config.sensors[n].id;       
-        print(to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+        print(embot::hw::tlv493d::to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
   
         tspositions->set(pos, n);
         
@@ -497,7 +486,7 @@ struct embot::app::application::theFAPreader::Impl
             if(embot::core::binary::bit::check(maskOFmissing, n))
             {
                 embot::hw::TLV493D id = config.sensors[n].id;
-                str += to_string(id);
+                str += embot::hw::tlv493d::to_string(id);
                 str += " ";
             }            
         }
@@ -541,7 +530,7 @@ struct embot::app::application::theFAPreader::Impl
                 eventmask |= config.sensors[n].askdata;
                 embot::core::binary::bit::set(acquisition_mod2parallel_maskofrequests, n); 
                 embot::hw::TLV493D id = config.sensors[n].id;            
-                str += to_string(id);
+                str += embot::hw::tlv493d::to_string(id);
                 str += " ";
             }                
         }
@@ -562,7 +551,7 @@ struct embot::app::application::theFAPreader::Impl
     void acquisition_mod2parallel_on_askdata(uint8_t n)
     {
         embot::hw::TLV493D id = config.sensors[n].id;
-        print("acquisition_mod2parallel_on_askdata(" + std::to_string(n) + ") for " + to_string(id) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+        print("acquisition_mod2parallel_on_askdata(" + std::to_string(n) + ") for " + embot::hw::tlv493d::to_string(id) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
 //        print("acquisition_mod2parallel_on_askdata(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
         // config a callback which sends the dataready event
         cbkdataarray[n] = {this, n};
@@ -583,7 +572,7 @@ struct embot::app::application::theFAPreader::Impl
         }
         
         embot::hw::TLV493D id = config.sensors[n].id;       
-        print(to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+        print(embot::hw::tlv493d::to_string(id) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
    
         tspositions->set(pos, n);
         
@@ -614,7 +603,7 @@ struct embot::app::application::theFAPreader::Impl
             {
                 tspositions->set(0xffff, n);
                 embot::hw::TLV493D id = config.sensors[n].id;
-                str += to_string(id);
+                str += embot::hw::tlv493d::to_string(id);
                 str += " ";
             }            
         }
@@ -874,7 +863,7 @@ bool embot::app::application::theFAPreader::Impl::acquisition_get(std::vector<em
         
 #endif        
 
-        str += to_string(id);
+        str += embot::hw::tlv493d::to_string(id);
         str += " = ";
         str += std::to_string(v/10);
         str += " DEG ";
@@ -1130,7 +1119,7 @@ bool embot::app::application::theFAPreader::initialise(const Config &config)
                 pImpl->globaleventmask |= (pImpl->config.sensors[n].askdata | pImpl->config.sensors[n].dataready | pImpl->config.sensors[n].noreply);   
 
                 embot::hw::TLV493D id = config.sensors[n].id;            
-                str += to_string(id);
+                str += embot::hw::tlv493d::to_string(id);
                 str += " ";                
             }
             
