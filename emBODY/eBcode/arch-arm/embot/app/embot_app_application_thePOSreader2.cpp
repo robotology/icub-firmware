@@ -57,7 +57,6 @@
 #include "embot_hw_tlv493d.h"
 #include "lr17_encoder.h"
 
-//#define DEBUG_COMPENSATE_SENSOR
 
 #define EMBOT_POSREADER2_compensatereadings
 
@@ -159,7 +158,7 @@ struct embot::app::application::thePOSreader2::Impl
     
     void print(const std::string &str)
     {
-        embot::core::print(str);
+ //       embot::core::print(str);
     }
     
 
@@ -901,13 +900,13 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
         
         #warning EMBOT_POSREADER2_compensatereadings is defined: we compensate values for a specific hand to be in range [0, 90]
 
-        constexpr std::array<int16_t, numberofpositions> offsets = { 218, 92, 148, 165, 0, 0 };
+        constexpr std::array<int16_t, numberofpositions> offsets = { 218, 92, 148, 165, 0, 0, 0 };
         constexpr int16_t correction = 10;
-        constexpr std::array<int16_t, numberofpositions> rotations = { 0, 0, 180, 0, 0, 0 };
-        //constexpr std::array<Position, numberofpositions> offsets = { 0, 0, 0, 0, 0, 0 };
+        constexpr std::array<int16_t, numberofpositions> rotations = { 0, 0, 180, 0, 0, 0, 0 };
+        //constexpr std::array<Position, numberofpositions> offsets = { 0, 0, 0, 0, 0, 0, 0 };
         
-        int16_t v = +10000;
-        if(0xffff != positions[n])
+        int16_t v = valueOfPositionACQUISITIONnotvalid / 10;
+        if(valueOfPositionACQUISITIONnotvalid != positions[n])
         {
             int16_t r = (positions[n]/100+rotations[embot::core::tointegral(sensor_getPOSlabel(config.sensors[n]))]) % 360;
             int16_t t = - (r);
@@ -939,7 +938,7 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
         msg.load(info);
         msg.get(frame);
         replies.push_back(frame); 
-        if(0xffff == positions[n])
+        if(valueOfPositionACQUISITIONnotvalid == positions[n])
         {
             embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
             tr.print("FAP" + std::to_string(n) + "err", replies);
