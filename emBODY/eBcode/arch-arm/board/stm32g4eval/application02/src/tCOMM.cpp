@@ -13,6 +13,7 @@
 #include "embot_hw_can.h"
 
 #include "embot_app_application_theFAPreader.h"
+#include "embot_app_application_thePOSreader2.h"
 #include "embot_app_application_theCANparserPOS.h"
 
 
@@ -83,10 +84,15 @@ void embot::app::ctrl::tCOMM::userdefOnEventANYother(embot::os::Thread *t, embot
     static volatile embot::core::Time ttt = 0;
    
     if(true == embot::core::binary::mask::check(eventmask, evtTRANSMITfaps))
-    {       
-        embot::app::application::theFAPreader &thefap = embot::app::application::theFAPreader::getInstance(); 
+    {  
+#if defined(USE_thePOSreader2)
+        embot::app::application::thePOSreader2 &thereader = embot::app::application::thePOSreader2::getInstance(); 
+#else        
+        embot::app::application::theFAPreader &thereader = embot::app::application::theFAPreader::getInstance(); 
+#endif
+        
 #if !defined(TEST_NO_CAN)   
-        thefap.get(outframes);
+        thereader.get(outframes);
 #if 0        
         if(outframes.size() > 0)
         {
