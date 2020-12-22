@@ -29,6 +29,13 @@ namespace embot { namespace hw {
     
     // list of IDs for peripherals, drivers, ...
     
+    enum ANY : std::uint8_t { none = 31,
+                              one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, nine = 8, ten = 9, 
+                              eleven = 10, twelve = 11, thirteen = 12, fourteen = 13, fifteen = 14, sixteen = 15, seventeen = 16, 
+                              eighteen = 17, nineteen = 18, twenty = 19, twentyone = 20, twentytwo = 21, tweentythree = 22, 
+                              twentyfour = 23
+                            };
+    
     enum class CLOCK : std::uint8_t { syscore = 0, pclk1 = 1, pclk2 = 2, none = 31, maxnumberof = 3 };
     
     enum class LED : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 31, maxnumberof = 8 };
