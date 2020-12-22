@@ -162,6 +162,16 @@ using namespace embot::hw;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+std::string embot::hw::tlv493d::to_string(embot::hw::TLV493D id)
+{
+    constexpr std::array<const char *, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> TLV493D_map =
+    { 
+        "TLV493D::one", "TLV493D::two", "TLV493D::three", "TLV493D::four", "TLV493D::five", "TLV493D::six"
+    };
+    uint8_t pos = embot::core::tointegral(id);
+    return (pos < TLV493D_map.size()) ? TLV493D_map[pos] : "TLV493D::none";    
+}
+
 
 #if !defined(EMBOT_ENABLE_hw_tlv493d)
 

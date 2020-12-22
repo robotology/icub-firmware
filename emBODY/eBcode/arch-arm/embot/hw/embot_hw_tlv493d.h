@@ -24,12 +24,13 @@
 
 #include "embot_core.h"
 #include "embot_hw.h"
-
+#include "embot_hw_types.h"
 
 #include "embot_hw_i2c.h"
 
 namespace embot { namespace hw { namespace tlv493d {
-         
+
+    
         
     struct Config
     { 
@@ -42,6 +43,8 @@ namespace embot { namespace hw { namespace tlv493d {
     
     
     using Position = std::int32_t; // the measurement units is: 0.01 degrees
+    
+    std::string to_string(embot::hw::TLV493D id);
             
     bool supported(embot::hw::TLV493D h);    
     bool initialised(embot::hw::TLV493D h);    
