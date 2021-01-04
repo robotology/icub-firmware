@@ -896,7 +896,13 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
         
         // so far i load one value in one packet ...
         
-#if defined(EMBOT_POSREADER2_compensatereadings)     
+#if !defined(EMBOT_POSREADER2_compensatereadings) | defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+        
+        // we dont compensate
+        int16_t v =  (0xffff == positions[n]) ? +10000 : positions[n]/10;
+        std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
+        
+#else
         
         #warning EMBOT_POSREADER2_compensatereadings is defined: we compensate values for a specific hand to be in range [0, 90]
 
@@ -919,11 +925,6 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
 //            v = transform(positions[n], embot::core::tointegral(sensor_getPOSlabel(config.sensors[n])));
 //            v *= 10;
         }
-        std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
-        
-#else  
-
-        int16_t v =  (0xffff == positions[n]) ? +10000 : positions[n]/10;
         std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
         
 #endif        
