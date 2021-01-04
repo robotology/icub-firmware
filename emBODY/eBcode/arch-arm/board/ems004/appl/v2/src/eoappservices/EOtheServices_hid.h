@@ -74,13 +74,19 @@ extern "C" {
 //#define EOTHESERVICES_disable_theEncoderReader
 //#define EOTHESERVICES_disable_CurrentsWatchdog
 
+#endif
+
+#if defined(EOTHESERVICES_customize_handV3)
+
+    #define EOTHESERVICES_disable_theInertials2
+    #define EOTHESERVICES_disable_theInertials3
+
+#endif
+
+
 #if defined(EOTHESERVICES_disable_theInertials2) && defined(EOTHESERVICES_disable_theInertials3)
     #define EOTHESERVICES_disable_theMEMs
 #endif
-
-#endif
-
-
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
