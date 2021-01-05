@@ -30,6 +30,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+
+#include "testframework.h"
+#include "stdio.h"
+
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,6 +103,10 @@ int main(void)
   MX_FDCAN1_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  
+  testframework_init();
+  
+  char text[64] = {0};
 
   /* USER CODE END 2 */
 
@@ -106,6 +115,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+      
+      HAL_Delay(100);
+      uint32_t now = HAL_GetTickFreq();
+      testframework_tick();
+      uint32_t duration = HAL_GetTickFreq() - now;
+      snprintf(text, sizeof(char), "duration = %d ms", duration);
+      testframework_puts(text);
 
     /* USER CODE BEGIN 3 */
   }
