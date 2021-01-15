@@ -6,7 +6,7 @@
 
 #include <p33FJ128MC802.h>
 #include <string.h>
-
+#include "stdint.h"
 #include "ecan.h"
 #include "system.h"
 #include "faults.h"
@@ -823,15 +823,6 @@ void __attribute__((interrupt, no_auto_psv)) _DMA2Interrupt(void)
 
 
 //VALE
-
-typedef     char                    int8_t;
-typedef     unsigned char           uint8_t;
-typedef     signed int              int16_t;
-typedef     unsigned int            uint16_t;
-typedef     signed long             int32_t;
-typedef     unsigned long           uint32_t;    
-typedef     signed long long        int64_t;
-typedef     unsigned long long      uint64_t; 
 
     
 extern void hal_can_receptionfilter_set(unsigned char mask_num, unsigned long mask_val, unsigned char identifier_num,
