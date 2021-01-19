@@ -33,7 +33,7 @@ void QEinit(int resolution, int motor_num_poles,char use_index)
     // Continue operation during sleep
     QEICONbits.QEISIDL = 0;
     // QEA and QEB eventually swapped
-    
+
     if (resolution < 0)
     {
         QEICONbits.SWPAB = 1;
@@ -44,7 +44,7 @@ void QEinit(int resolution, int motor_num_poles,char use_index)
         QEICONbits.SWPAB = 0;
         QE_RESOLUTION = resolution;
     }
-    
+
     QE_ERR_THR = ((long)QE_RESOLUTION * (long)gEncoderConfig.tolerance) / 3600;
     gEncoderConfig.elettr_deg_per_rev = 360*motor_num_poles;
 
@@ -75,7 +75,7 @@ void QEinit(int resolution, int motor_num_poles,char use_index)
     // 2   0       1       2       0       1       2       0       1       2       0
     //                       |                       |                       |
     //                     round                   round                   round
-    
+
     // Reset position counter.
     IFS3bits.QEI1IF = 0;
     POSCNT = 0;
@@ -119,12 +119,12 @@ inline void QEcountErrorClear()
 
 inline int QEgetElettrDeg() __attribute__((always_inline));
 inline int QEgetElettrDeg()
-{   
+{
     int degrees = gEncoderConfig.offset + __builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
-    
+
     while (degrees >= 360) degrees -= 360;
     while (degrees <    0) degrees += 360;
-    
+
     return degrees;
 }
 
@@ -141,11 +141,11 @@ inline int QEgetPos() __attribute__((always_inline));
 inline int QEgetPos()
 {
     int poscnt = (int)POSCNT;
-  
+
     if (!qe_moved)
     {
         int poscnt_delta = poscnt - poscnt_old;
-    
+
         if (abs(poscnt_delta) > 32)
         {
             poscnt_old = poscnt;
@@ -170,38 +170,38 @@ inline int QEgetPos()
 // QE zero crossing interrupt manager
 void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
 {
-    static int updn_old = -1;  
-    
+    static int updn_old = -1;
+
     int poscnt = (int)POSCNT;
-    
+
     if (qe_ready)
     {
-        if ((poscnt<-QE_ERR_THR || poscnt>QE_ERR_THR) && 
-            (poscnt<QE_RESOLUTION-QE_ERR_THR || poscnt>QE_RESOLUTION+QE_ERR_THR) && 
+        if ((poscnt<-QE_ERR_THR || poscnt>QE_ERR_THR) &&
+            (poscnt<QE_RESOLUTION-QE_ERR_THR || poscnt>QE_RESOLUTION+QE_ERR_THR) &&
             (poscnt<-QE_RESOLUTION-QE_ERR_THR || poscnt>-QE_RESOLUTION+QE_ERR_THR))
         {
             gEncoderError.dirty = TRUE;
         }
     }
-    
+
     dataA = gEncoderConfig.offset;
     dataB = POSCNT;
-            
+
     newencdata = TRUE;
-    
+
     POSCNT = QEICONbits.UPDN ? 0 : 0xFFFF;
-    
+
     qe_ready = TRUE;
-    
+
     if (!qe_moved && updn_old == QEICONbits.UPDN)
     {
         gEncoderError.phase_broken = TRUE;
     }
-    
+
     updn_old = QEICONbits.UPDN;
     poscnt_old = (int)POSCNT;
     qe_moved = FALSE;
-    
+
     // clear interrupt flag
     IFS3bits.QEI1IF = 0;
 }
