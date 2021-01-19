@@ -622,6 +622,7 @@ static void Motor_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_t mas
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);    
 }
 
+
 BOOL Motor_check_faults(Motor* o) //
 {
     if (o->control_mode == icubCanProto_controlmode_hwFault)
@@ -670,8 +671,18 @@ BOOL Motor_check_faults(Motor* o) //
         {
             o->can_dead = FALSE;
         }
+
+        // No HW fault triggered by this warnings
+        if (++o->diagnostics_refresh_warning > 5*CTRL_LOOP_FREQUENCY_INT) {
+            if (o->qe_state.bits.dirty) {
+                Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_dirty, 0);
+            }
+            if (o->qe_state.bits.phase_broken) {
+                Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_phase, 0);
+            }
+        }
     }
-    
+
     if (!o->fault_state.bits.ExternalFaultAsserted && !o->hardware_fault)
     {
         o->fault_state_prec.bitmask = 0;
@@ -747,24 +758,15 @@ BOOL Motor_check_faults(Motor* o) //
                 
         if (o->fault_state.bits.EncoderFault && !o->fault_state_prec.bits.EncoderFault)
         {
-            if (o->qe_state.bits.dirty)
-            {
-                Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_dirty, 0);
-            }
-        
             if (o->qe_state.bits.index_broken)
             {
                 Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_index, 0);
             }
 
-            if (o->qe_state.bits.phase_broken)
-            {
-                Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_phase, 0);
-            }
-            
             fault_state.bits.EncoderFault = FALSE;
         }
-    
+				
+
         if (can_dead && !o->can_dead)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_can_no_answer, 0);

@@ -207,6 +207,7 @@ typedef struct //Motor
     BOOL wrong_ctrl_mode;
     
     uint16_t diagnostics_refresh;
+    uint16_t diagnostics_refresh_warning;
     MotorFaultState fault_state_prec;
     MotorFaultState fault_state;
     QEState qe_state;
