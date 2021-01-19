@@ -371,7 +371,7 @@ int alignRotor(volatile int* IqRef)
             {
                 // phase is broken
                 *IqRef = IqRef_fake = 0;
-                QE_RISE_ERROR(phase_broken);
+                gEncoderError.phase_broken = TRUE;
                 sAlignInProgress = 0;
             }
             
@@ -620,8 +620,6 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                     if (sector_stored_old != sector)
                     {
                         gEncoderError.phase_broken = TRUE;
-                        SysError.EncoderFault = TRUE;
-                        FaultConditionsHandler();
                     }
                 }
                 else
@@ -642,8 +640,6 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                     if (sector_stored_old != sector)
                     {
                         gEncoderError.phase_broken = TRUE;
-                        SysError.EncoderFault = TRUE;
-                        FaultConditionsHandler();
                     }
                 }
                 else
