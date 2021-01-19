@@ -181,8 +181,6 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
             (poscnt<-QE_RESOLUTION-QE_ERR_THR || poscnt>-QE_RESOLUTION+QE_ERR_THR))
         {
             gEncoderError.dirty = TRUE;
-            SysError.EncoderFault = TRUE;
-            FaultConditionsHandler();
         }
     }
     
@@ -198,8 +196,6 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
     if (!qe_moved && updn_old == QEICONbits.UPDN)
     {
         gEncoderError.phase_broken = TRUE;
-        SysError.EncoderFault = TRUE;
-        FaultConditionsHandler();
     }
     
     updn_old = QEICONbits.UPDN;
