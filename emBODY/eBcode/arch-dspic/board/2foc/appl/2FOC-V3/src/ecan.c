@@ -6,7 +6,7 @@
 
 #include <p33FJ128MC802.h>
 #include <string.h>
-#include "stdint.h"
+#include <stdint.h>
 #include "ecan.h"
 #include "system.h"
 #include "faults.h"
@@ -81,7 +81,7 @@ void ECANClkInit(void)
   // Phase Segment 2 = 6Tq
   // Propagation Delay = 5Tq
   // Sync Segment = 1Tq
-  // CiCFG1<BRP> =(FCAN /(2 ×N×FBAUD))– 1
+  // CiCFG1<BRP> =(FCAN /(2 Ã—NÃ—FBAUD))â€“ 1
   // Bit rate of 1Mbps
   C1CFG1bits.BRP = BRP_VAL ;
   // Phase Segment 1 time is 8 Tq
