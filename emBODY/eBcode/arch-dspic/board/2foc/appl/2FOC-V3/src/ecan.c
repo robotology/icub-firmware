@@ -8,8 +8,8 @@
 #include <string.h>
 #include <stdint.h>
 #include "ecan.h"
-#include "system.h"
-#include "faults.h"
+#include "System.h"
+#include "Faults.h"
 
 volatile int CAN_BusOff = 0;
 

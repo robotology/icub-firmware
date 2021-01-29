@@ -15,7 +15,7 @@
 #include "System.h"
 #include "UserTypes.h"
 #include "qep.h"
-#include "faults.h"
+#include "Faults.h"
 #include "ecan.h"
 #include "crc16.h"
 #include "DHES.h"

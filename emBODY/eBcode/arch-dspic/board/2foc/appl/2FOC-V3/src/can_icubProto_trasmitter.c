@@ -21,8 +21,8 @@
 #include "can_icubProto.h"
 #include "UserParms.h"
 #include "can_icubProto_trasmitter.h"
-#include "system.h"
-#include "faults.h"
+#include "System.h"
+#include "Faults.h"
 #include "2FOC.h"
 #include "qep.h"
 
