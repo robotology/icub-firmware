@@ -20,7 +20,7 @@
 #define __ICUB_ICUBPROTO_PARSER_H
 
 #include "ecan.h"
-#include "DSP.h"
+//#include "DSP.h"
 //#include "DS402.h"
 
 //NOTE: removed because they dont't belong to icub can proto, but are use only for debug porpouse.
