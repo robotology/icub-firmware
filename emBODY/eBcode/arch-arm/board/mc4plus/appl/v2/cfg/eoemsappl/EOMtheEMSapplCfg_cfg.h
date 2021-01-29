@@ -76,7 +76,7 @@ extern "C" {
 //  <o> minor           <0-255> 
 
 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          28
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          29
 
 
 //  </h>version
