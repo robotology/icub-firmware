@@ -64,7 +64,7 @@
 
 ; External references
           .include "MeasCurr.inc"
-          .include "Park.inc"
+          .include "park.inc"
 
           .global   _MeasAndCompIaIcCalculateIb
           .global   MeasAndCompIaIcCalculateIb

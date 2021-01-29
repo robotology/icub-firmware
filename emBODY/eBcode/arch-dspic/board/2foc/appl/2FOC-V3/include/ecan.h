@@ -2,8 +2,8 @@
 #define __ecan_H
 
 #include "UserTypes.h" 
-#include "status.h" 
-#include "faults.h"
+#include "Status.h"
+#include "Faults.h"
 
 // max message parsed in each CAN interrupt
 #define MAX_RX_INT                  5
