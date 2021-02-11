@@ -16,6 +16,9 @@
 #include "embot_app_application_thePOSreader2.h"
 #include "embot_app_application_theCANparserPOS.h"
 
+#include "embot_app_application_theCANparserMC.h"
+#include "embot_app_application_thePZMdriver.h"
+
 
 //#define TEST_NO_CAN
 
@@ -50,6 +53,7 @@ void embot::app::ctrl::tCOMM::userdefStartup(embot::os::Thread *t, void *param) 
     
     // init of can basic paser
     embot::app::application::theCANparserBasic::getInstance().initialise({});
+        
 }
 
 
@@ -74,7 +78,12 @@ void embot::app::ctrl::tCOMM::userdefOnEventRXcanframe(embot::os::Thread *t, emb
     {
         // in here the thread tCOMM has called the parser which calls methods of theFAPreader which for instance
         // configure and start acquisition with a given rate.
-    }    
+    }
+    else if(true == embot::app::application::theCANparserMC::getInstance().process(frame, outframes))
+    {
+        // in here the thread tCOMM has called the parser which calls methods of theFAPreader which for instance
+        // configure and start acquisition with a given rate.
+    }     
 
 }
 
@@ -85,11 +94,7 @@ void embot::app::ctrl::tCOMM::userdefOnEventANYother(embot::os::Thread *t, embot
    
     if(true == embot::core::binary::mask::check(eventmask, evtTRANSMITfaps))
     {  
-#if defined(USE_thePOSreader2)
         embot::app::application::thePOSreader2 &thereader = embot::app::application::thePOSreader2::getInstance(); 
-#else        
-        embot::app::application::theFAPreader &thereader = embot::app::application::theFAPreader::getInstance(); 
-#endif
         
 #if !defined(TEST_NO_CAN)   
         thereader.get(outframes);

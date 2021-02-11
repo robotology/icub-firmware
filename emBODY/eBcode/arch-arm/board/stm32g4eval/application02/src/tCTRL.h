@@ -46,7 +46,9 @@ namespace embot { namespace app { namespace ctrl {
         tCTRL();
         ~tCTRL();    
         
-        bool start(const Config &config);
+        bool initialise(const Config &config);
+        
+        embot::os::Thread * getThread();
         
     private:        
         struct Impl;
