@@ -88,6 +88,37 @@ struct embot::app::application::thePOSreader2::Impl
         return "UNKNOWN";
     } 
     
+    embot::hw::LED sensor_to_led(const Sensor &snsr)
+    {
+        static constexpr std::array<embot::hw::LED, 6> tlvleds 
+        { 
+            embot::hw::LED::five,   // J4 which has ANY::one = 0
+            embot::hw::LED::one,    // J5 which has ANY::two = 1 
+            embot::hw::LED::two,    // J6 which has ANY::three = 2
+            embot::hw::LED::three,  // J7 which has ANY::four = 3
+            embot::hw::LED::four,   // J13 which has ANY::five = 4
+            embot::hw::LED::six     // U27 which has ANY::six = 5
+        };
+        
+        if(embot::hw::ANY::none == snsr.id)
+        {
+            return embot::hw::LED::none;
+        }
+        
+        if(sensorType::tlv == snsr.type)
+        {
+            uint8_t pos = embot::core::tointegral(snsr.id);
+            return (pos < tlvleds.size()) ? tlvleds[pos] : embot::hw::LED::none;
+        }
+        else if(sensorType::lr17 == snsr.type)
+        {
+            return embot::hw::LED::none;
+        }
+        
+            
+        return embot::hw::LED::none;
+    }     
+    
  
     bool sensor_init(const Sensor &snsr)
     { 
@@ -939,10 +970,17 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
         msg.load(info);
         msg.get(frame);
         replies.push_back(frame); 
+        
+        embot::hw::LED led = sensor_to_led(config.sensors[n]);
         if(valueOfPositionACQUISITIONnotvalid == positions[n])
         {
+            embot::hw::led::off(led);
             embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
-            tr.print("FAP" + std::to_string(n) + "err", replies);
+            tr.print("FAP" + std::to_string(n) + "err", replies); 
+        }
+        else
+        {
+            embot::hw::led::on(led);
         }
     }
 
@@ -1172,7 +1210,10 @@ bool embot::app::application::thePOSreader2::initialise(const Config &config)
                 pImpl->globaleventmask |= (pImpl->config.sensors[n].askdata | pImpl->config.sensors[n].dataready | pImpl->config.sensors[n].noreply);   
          
                 str += pImpl->sensor_to_string(config.sensors[n]);
-                str += " ";                
+                str += " ";        
+
+                embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
+                embot::hw::led::on(l);
             }
             
         }            
@@ -1186,7 +1227,8 @@ bool embot::app::application::thePOSreader2::initialise(const Config &config)
     pImpl->acquisitionchain_start(true);
 #endif
 
-     
+    // asfidanken
+    //start(100*1000);
     return true;
 }
 
