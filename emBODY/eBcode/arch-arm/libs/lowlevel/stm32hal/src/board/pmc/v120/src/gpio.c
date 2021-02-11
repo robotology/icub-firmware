@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -57,7 +57,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, J9_27_Pin|J9_28_Pin|J9_26_Pin|J9_24_Pin
                           |J9_29_Pin|J9_25_Pin|J9_23_Pin|J9_30_Pin
-                          |MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
+                          |TP11_Pin|MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, LED1_Pin|LED2_Pin|J9_13_Pin|J9_12_Pin
@@ -67,21 +67,27 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOD, CAN1_STDBY_Pin|CAN1_SHDN_Pin|LED5_Pin|LED4_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, TP8_Pin|J9_20_Pin|J9_19_Pin|J9_22_Pin
+                          |J9_21_Pin|TP9_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, J9_33_Pin|J9_31_Pin|J9_32_Pin|VPPEN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOF, TP13_Pin|TP12_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, LED6_Pin|LED7_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, J9_20_Pin|J9_19_Pin|J9_22_Pin|J9_21_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DAC_SYNCEN_GPIO_Port, DAC_SYNCEN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
-                           PEPin PEPin PEPin PEPin */
+                           PEPin PEPin PEPin PEPin
+                           PEPin */
   GPIO_InitStruct.Pin = J9_27_Pin|J9_28_Pin|J9_26_Pin|J9_24_Pin
-                          |J9_29_Pin|J9_25_Pin|J9_23_Pin|J9_30_Pin;
+                          |J9_29_Pin|J9_25_Pin|J9_23_Pin|J9_30_Pin
+                          |TP11_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -102,10 +108,13 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PBPin PBPin */
-  GPIO_InitStruct.Pin = TP8_Pin|TP9_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  /*Configure GPIO pins : PBPin PBPin PBPin PBPin
+                           PBPin PBPin */
+  GPIO_InitStruct.Pin = TP8_Pin|J9_20_Pin|J9_19_Pin|J9_22_Pin
+                          |J9_21_Pin|TP9_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PCPin PCPin PCPin */
@@ -117,8 +126,9 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PFPin PFPin */
   GPIO_InitStruct.Pin = TP13_Pin|TP12_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PG10 */
@@ -140,19 +150,6 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = TP11_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(TP11_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PBPin PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = J9_20_Pin|J9_19_Pin|J9_22_Pin|J9_21_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = DAC_SYNCEN_Pin;

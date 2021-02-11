@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -42,7 +42,7 @@ void MX_I2C1_Init(void)
 {
 
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x10909CEC;
+  hi2c1.Init.Timing = 0x30909DEC;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -73,7 +73,7 @@ void MX_I2C2_Init(void)
 {
 
   hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x10909CEC;
+  hi2c2.Init.Timing = 0x30909DEC;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -104,7 +104,7 @@ void MX_I2C3_Init(void)
 {
 
   hi2c3.Instance = I2C3;
-  hi2c3.Init.Timing = 0x10909CEC;
+  hi2c3.Init.Timing = 0x30909DEC;
   hi2c3.Init.OwnAddress1 = 0;
   hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -135,7 +135,7 @@ void MX_I2C4_Init(void)
 {
 
   hi2c4.Instance = I2C4;
-  hi2c4.Init.Timing = 0x10909CEC;
+  hi2c4.Init.Timing = 0x30909DEC;
   hi2c4.Init.OwnAddress1 = 0;
   hi2c4.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c4.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;

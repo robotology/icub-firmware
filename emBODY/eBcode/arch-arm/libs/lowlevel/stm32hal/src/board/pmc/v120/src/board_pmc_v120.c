@@ -93,19 +93,23 @@ extern void stm32hal_board_init(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_ADC1_Init();
+  // piezo begin
   MX_COMP1_Init();
   MX_COMP2_Init();
   MX_COMP3_Init();
-  MX_CORDIC_Init();
-  MX_CRC_Init();
+  // piezo end 
+  
+//  MX_CORDIC_Init();
+//  MX_CRC_Init();
 //  MX_FDCAN1_Init();
-  MX_FMAC_Init();
+//  MX_FMAC_Init();
 //  MX_I2C1_Init();
 //  MX_I2C2_Init();
 //  MX_I2C3_Init();
 //  MX_I2C4_Init();
   MX_RNG_Init();
-  MX_RTC_Init();
+//  MX_RTC_Init();
+  // piezo begin
   MX_SPI1_Init();
   MX_SPI2_Init();
   MX_SPI3_Init();
@@ -113,7 +117,10 @@ extern void stm32hal_board_init(void)
   MX_TIM2_Init();
   MX_TIM5_Init();
   MX_TIM7_Init();
+  // piezo end
 //  MX_USB_PCD_Init();
+
+  // in here we can deinit the GPIOs we dont use
   
 }
 
@@ -182,7 +189,7 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
