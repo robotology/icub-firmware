@@ -28,6 +28,9 @@
     #define EMBOT_ENABLE_hw_tlv493d
     //#define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
     //#define EMBOT_ENABLE_hw_button
+    
+    //#define EMBOT_ENABLE_hw_tlv493d_U27off
+    //#define EMBOT_ENABLE_hw_tlv493d_J13off
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_PMC ...

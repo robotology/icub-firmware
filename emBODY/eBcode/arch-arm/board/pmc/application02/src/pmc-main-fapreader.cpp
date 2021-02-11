@@ -93,6 +93,7 @@ int main(void)
 
 
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 #include "embot_hw_sys.h"
 
 #include "tSNSR.h"
@@ -280,10 +281,14 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
 {
     // inside the init thread: put the init of many things ...  
     // led manager
-    static const std::initializer_list<embot::hw::LED> alltheleds = {embot::hw::LED::one};  
+    static const std::initializer_list<embot::hw::LED> alltheleds = 
+    {
+        embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three, 
+        embot::hw::LED::four, embot::hw::LED::five, embot::hw::LED::six, embot::hw::LED::seven
+    };  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(alltheleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
+    theleds.get(embot::hw::LED::seven).pulse(embot::core::time1second); 
     
     volatile static uint32_t clockspeed = 0;
     
@@ -304,6 +309,24 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
 
 #if defined(USE_thePOSreader2)
 
+    #if defined(EMBOT_ENABLE_hw_tlv493d_U27off) && defined(EMBOT_ENABLE_hw_tlv493d_J13off)
+        
+        
+    constexpr std::array<thePOSreader2::Sensor,thePOSreader2::numberofpositions> sposmod2par4FINGERS { s1, s2, s3, s4 };    
+    embot::app::application::thePOSreader2::Config configmod2par4FINGERS
+    {
+        embot::app::application::thePOSreader2::AcquisitionMode::mod2parallel,    
+        50*embot::core::time1millisec,  // acquisition time
+        5*embot::core::time1millisec, // timeout for every acquisition step (1 step for fullyparallel, 2 for mod2parallel, n for daisychain)        
+        tSnsr,          // reader thread 
+        tComm,          // transmitter thread
+        sposmod2par4FINGERS,
+        { evtACQUIREfaps, evtNOREPLYfaps, embot::app::ctrl::evtTRANSMITfaps,  }    // associated events such as ... read sensor1, read sensor2, tranmsit sensors etc.
+    };  
+
+    embot::app::application::thePOSreader2 &thepos = embot::app::application::thePOSreader2::getInstance();
+    thepos.initialise(configmod2par4FINGERS);          
+    #else          
     embot::app::application::thePOSreader2::Config configmod2par
     {
         embot::app::application::thePOSreader2::AcquisitionMode::mod2parallel,    
@@ -317,7 +340,8 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
 
     embot::app::application::thePOSreader2 &thepos = embot::app::application::thePOSreader2::getInstance();
     thepos.initialise(configmod2par);  
-
+    #endif
+    
     // init parser of POS CAN messages and link it to its agent: thePOSreader2
     embot::app::application::theCANparserPOS &canparserpos = embot::app::application::theCANparserPOS::getInstance();
     embot::app::application::theCANparserPOS::Config configparserpos { &thepos };
