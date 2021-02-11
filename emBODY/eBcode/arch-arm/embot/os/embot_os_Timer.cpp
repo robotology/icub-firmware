@@ -57,7 +57,7 @@ namespace embot { namespace os { namespace timertools {
         TMR(Timer *own)   
         {
             owner = own;
-            reset(Timer::Status::idle);
+            reset(Timer::Status::idle, true);
             rtostimer = embot::os::rtos::timer_new();
         }
         
@@ -67,27 +67,47 @@ namespace embot { namespace os { namespace timertools {
             // do reverse deallocation and cleaning
             embot::os::rtos::timer_delete(rtostimer);
             rtostimer = nullptr;
-            reset(Timer::Status::idle);              
+            reset(Timer::Status::idle, true);              
             canexecuteaction = false;  
             owner = nullptr;            
         }
         
-        void reset(Timer::Status st)
+        void reset(Timer::Status st, bool alsoconfig)
         {
-            tconfig.clear();
             sta = st;
             canexecuteaction = false;
             onemoretime = false;
-            tconfig.onexpiry.clear();
+            if(alsoconfig)
+            {
+                tconfig.clear();
+                tconfig.onexpiry.clear();
+            }
         }
         
         Timer::Status getstatus()
         {
             return sta;
         }
+
+        bool load(const Timer::Config &config)
+        {            
+            // config must be valid 
+            if(false == config.isvalid())
+            {
+                return false;
+            }
+            
+            // make sure the timer is stopped
+            stop();
+            
+            // copy the config
+            tconfig = config;
+                                                    
+            return true;
+        }  
         
         
-        bool start(const Timer::Config &config)
+        bool start(const Timer::Config &config, bool forcerestart)
         {            
             // config must be valid 
             if(false == config.isvalid())
@@ -97,8 +117,9 @@ namespace embot { namespace os { namespace timertools {
                                                     
             bool ret = false;
                         
-            // start it only if it is not counting
-            if(Timer::Status::counting != getstatus())
+            // start it only if it is not counting. if we have forcerestart we re-start it anyway
+            // both osal and cmsisos2 allow to restart a running timer
+            if((true == forcerestart) || (Timer::Status::counting != getstatus()))
             {
                 tconfig = config;
                              
@@ -124,6 +145,12 @@ namespace embot { namespace os { namespace timertools {
                     
             return ret;
         }  
+        
+        bool start()
+        {
+            constexpr bool forcerestart = true;
+            return start(tconfig, forcerestart);
+        }
 
         // keep it simple. it is executed by osal inside the systick  and by cmsisos2 inside a small thread
 #if defined(EMBOT_USE_rtos_cmsisos2)        
@@ -165,7 +192,7 @@ namespace embot { namespace os { namespace timertools {
           
             if(false == onemoretime)
             {
-                reset(Timer::Status::idle);   
+                reset(Timer::Status::idle, false);   
                 canexecuteaction = false;   
             }
             
@@ -210,9 +237,19 @@ embot::os::Timer::~Timer()
     delete pImpl;
 }
 
-bool embot::os::Timer::start(const Config &config)
+bool embot::os::Timer::start(const Config &config, bool forcerestart)
 {
-    return pImpl->tmr->start(config);
+    return pImpl->tmr->start(config, forcerestart);
+}
+
+bool embot::os::Timer::load(const Config &config)
+{
+    return pImpl->tmr->load(config);
+}
+
+bool embot::os::Timer::start()
+{
+    return pImpl->tmr->start();
 }
 
 bool embot::os::Timer::stop()
@@ -255,7 +292,7 @@ bool embot::os::Timer::execute()
         if(true == pImpl->tmr->onemoretime)
         {
             pImpl->tmr->onemoretime = false;
-            pImpl->tmr->reset(Timer::Status::idle);   
+            pImpl->tmr->reset(Timer::Status::idle, false);   
         }
     }
     return canexecute;

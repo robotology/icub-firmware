@@ -39,7 +39,7 @@ namespace embot { namespace os {
         
         struct Config
         {
-            core::relTime countdown {0};          // time to count before execute the action
+            core::relTime   countdown {0};          // time to count before execute the action
             os::Action      onexpiry {};            // the action executed at expiry of the countdown
             Mode            mode {Mode::oneshot};   // the mode. we allow one shot, infinite shots or a limited number
             std::uint32_t   numofshots {0};         // in case of limited number this number tells how many. not zero....
@@ -62,12 +62,20 @@ namespace embot { namespace os {
       
         Timer();
         ~Timer();
-        bool start(const Config &config); 
-        bool stop();  
-        bool execute(); // to be called by the TimerManager only. if a brave user calls it ... it does nothing because ... black magic woman      
         
+    
+        bool start(const Config &config, bool forcerestart = false); // standard mode: it loads a config and starts the timer      
+        
+        bool load(const Config &config); // it just loads a config w/out starting anything. if Status::counting it stops the timer before loading config 
+        bool start(); // it start/restart the loaded config 
+
+        bool stop(); // it stops the timer. it does not unload the config 
+                          
         Status getStatus() const;              
         const Config& getConfig() const;
+        
+    public: 
+        bool execute(); // to be called by the TimerManager only. if a brave user calls it ... it does nothing because ... black magic woman   
                 
 
     private:        
