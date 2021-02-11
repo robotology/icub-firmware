@@ -22,12 +22,9 @@
 
 #include <array>
 
-#include "embot_app_PZdriver.h"
+//#include "embot_app_PZdriver.h"
 
-#if defined(USE_PZMdriver) 
-#include "piezo.h"
-#include "tables.h"
-#endif
+#include "embot_app_application_thePZMdriver.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -39,20 +36,13 @@ struct embot::app::ctrl::tCTRL::Impl
 {  
     Config _config {};  
 
-    static constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);        
+    static constexpr embot::os::Event evtTick = embot::os::bitpos2event(0);        
 
     embot::os::EventThread * evt {nullptr};
     embot::os::Timer *tmr {nullptr};
     
     bool _active {true};
     
-    // one lut
-    embot::app::myPZlut *_pzlut {nullptr};
-    // three drivers, one per motor
-    std::array<embot::app::PZdriver*, embot::core::tointegral(embot::hw::PZM::maxnumberof)> _pzdrivers {nullptr};
-    // three setpoints, one per motor
-    std::array<embot::app::PZdriver::setpoint_t, embot::core::tointegral(embot::hw::PZM::maxnumberof)> _setpoints {0};
-
     
     Impl() 
     {
@@ -64,7 +54,7 @@ struct embot::app::ctrl::tCTRL::Impl
         // ...
     }
     
-    bool start(const Config &config)
+    bool initialise(const Config &config)
     {
         _config = config;
         // ...
@@ -85,11 +75,11 @@ struct embot::app::ctrl::tCTRL::Impl
         // and start it
         evt->start(configEV);        
         
-        // and activate the timer.
-        tmr = new embot::os::Timer;   
-        embot::os::Action act(embot::os::EventToThread(evtTick, evt));
-        embot::os::Timer::Config cfg{_config.period, act, embot::os::Timer::Mode::forever, 0};
-        tmr->start(cfg);       
+//        // and activate the timer.
+//        tmr = new embot::os::Timer;   
+//        embot::os::Action act(embot::os::EventToThread(evtTick, evt));
+//        embot::os::Timer::Config cfg{_config.period, act, embot::os::Timer::Mode::forever, 0};
+//        tmr->start(cfg);       
         
         return true;
     } 
@@ -98,20 +88,20 @@ struct embot::app::ctrl::tCTRL::Impl
     {
         embot::app::ctrl::tCTRL::Impl *impl = reinterpret_cast<embot::app::ctrl::tCTRL::Impl*>(param);
         
-        impl->_pzlut = new embot::app::myPZlut;
-        
-        for(int i=0; i<impl->_pzdrivers.size(); i++)
-        {
-            embot::hw::PZM pzm = static_cast<embot::hw::PZM>(i);
-            impl->_pzdrivers[i] = new embot::app::PZdriver;
-            impl->_pzdrivers[i]->init({pzm, impl->_pzlut});
-            impl->_pzdrivers[i]->start();
-        }
+//        impl->_pzlut = new embot::app::myPZlut;
+//        
+//        for(int i=0; i<impl->_pzdrivers.size(); i++)
+//        {
+//            embot::hw::PZM pzm = static_cast<embot::hw::PZM>(i);
+//            impl->_pzdrivers[i] = new embot::app::PZdriver;
+//            impl->_pzdrivers[i]->init({pzm, impl->_pzlut});
+//            impl->_pzdrivers[i]->start();
+//        }
 
-#if defined(USE_PZMdriver)        
-        piezoMotorCfg_t pzm = { delta_8192, 8192 };
-        piezoInit( &pzm, &pzm, &pzm);
-#endif  
+//#if defined(USE_PZMdriver)        
+//        piezoMotorCfg_t pzm = { delta_8192, 8192 };
+//        piezoInit( &pzm, &pzm, &pzm);
+//#endif  
     }
     
     static void ctrl_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
@@ -128,17 +118,19 @@ struct embot::app::ctrl::tCTRL::Impl
             embot::core::TimeFormatter tf(embot::core::now());        
             embot::core::print("tCTRL::onevent() -> evtTick received @ time = " + tf.to_string());  
 
-            if(true == impl->_active)
-            {
-                impl->get_data();
-                
-                impl->run_matlab();
-                
-                impl->apply_results();
-            }
+//            if(true == impl->_active)
+//            {
+//                impl->get_data();
+//                
+//                impl->run_matlab();
+//                
+//                impl->apply_results();
+//            }
         }
         
         // other possible events ...
+        
+        embot::app::application::thePZMdriver::getInstance().process(eventmask);
         
     }
     
@@ -154,27 +146,27 @@ struct embot::app::ctrl::tCTRL::Impl
             
     void run_matlab()
     {
-        // just tick the control
-        
-        
-        // get the values for the PZ drivers
-        
+//        // just tick the control
+//        
+//        
+//        // get the values for the PZ drivers
+//        
 
-        static uint32_t value {0};       
-        _setpoints[0] = value;
-        _setpoints[1] = value+1;
-        _setpoints[2] = value+2;        
-        value += 16;    
+//        static uint32_t value {0};       
+//        _setpoints[0] = value;
+//        _setpoints[1] = value+1;
+//        _setpoints[2] = value+2;        
+//        value += 16;    
     }
             
     void apply_results()
     {
         // give the values to the PZ drivers
-        
-        for(int i=0; i<_pzdrivers.size(); i++)
-        {
-            _pzdrivers[i]->set(_setpoints[i]);
-        }
+//        
+//        for(int i=0; i<_pzdrivers.size(); i++)
+//        {
+//            _pzdrivers[i]->set(_setpoints[i]);
+//        }
 
     }
         
@@ -201,11 +193,15 @@ embot::app::ctrl::tCTRL::~tCTRL()
     delete pImpl;
 }
 
-bool embot::app::ctrl::tCTRL::start(const Config &config)
+bool embot::app::ctrl::tCTRL::initialise(const Config &config)
 {
-    return pImpl->start(config);
+    return pImpl->initialise(config);
 }
 
+embot::os::Thread * embot::app::ctrl::tCTRL::getThread()
+{
+    return pImpl->evt;
+}
 
 
 

@@ -148,11 +148,8 @@ struct embot::app::ctrl::tSNSR::Impl
             return;
         }
         
-#if defined(USE_thePOSreader2)
         embot::app::application::thePOSreader2 &thereader = embot::app::application::thePOSreader2::getInstance(); 
-#else        
-        embot::app::application::theFAPreader &thereader = embot::app::application::theFAPreader::getInstance(); 
-#endif 
+
         thereader.process(eventmask);
         
 //        embot::app::ctrl::tSNSR::Impl *impl = reinterpret_cast<embot::app::ctrl::tSNSR::Impl*>(param);
