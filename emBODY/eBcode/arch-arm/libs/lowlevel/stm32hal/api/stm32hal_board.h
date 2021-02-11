@@ -369,7 +369,31 @@ extern void stm32hal_board_init(void);
         #error unsupported driver version for pmc
     #endif
 
+#elif   defined(STM32HAL_BOARD_AMCBLDC) 
 
+    // one case: v120
+    #if (STM32HAL_DRIVER_VERSION == 0x120)
+
+        #include "../src/config/stm32hal_driver_cfg_of_amcbldc_v120.h"
+
+        #include "../src/board/amcbldc/v120/inc/main.h"
+        #include "../src/board/amcbldc/v120/inc/adc.h"
+        #include "../src/board/amcbldc/v120/inc/cordic.h"
+        #include "../src/board/amcbldc/v120/inc/dma.h"
+        #include "../src/board/amcbldc/v120/inc/fdcan.h"
+        #include "../src/board/amcbldc/v120/inc/fmac.h"
+        #include "../src/board/amcbldc/v120/inc/gpio.h"
+        #include "../src/board/amcbldc/v120/inc/i2c.h"
+        #include "../src/board/amcbldc/v120/inc/rng.h"
+        #include "../src/board/amcbldc/v120/inc/tim.h"
+        #include "../src/board/amcbldc/v120/inc/usb.h"
+        
+        #include "../src/board/amcbldc/v120/inc/stm32g4xx_it.h"        
+
+    #else
+        #error unsupported driver version for amcbldc
+    #endif
+    
 #elif   defined(STM32HAL_BOARD_STM32H745DISCO) 
 
     // one case only: v190

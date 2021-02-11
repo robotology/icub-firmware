@@ -129,7 +129,17 @@ extern "C" {
         #endif        
         #define STM32HAL_DRIVER_VERSION 0x120   
     #endif
+    
+#elif   defined(STM32HAL_BOARD_AMCBLDC)
 
+    // one possible driver: v120. default is the 120 ...
+
+    #if !defined(STM32HAL_DRIVER_V120)
+        #define STM32HAL_DRIVER_V120
+    #endif        
+    #define STM32HAL_DRIVER_VERSION 0x120   
+
+    
 #elif   defined(STM32HAL_BOARD_STM32H745DISCO)
 
     // only one possible driver

@@ -28,7 +28,8 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32g4xx_hal.h"
+//#include "stm32g4xx_hal.h"
+#include "stm32hal.h" // IIT-EXT
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
