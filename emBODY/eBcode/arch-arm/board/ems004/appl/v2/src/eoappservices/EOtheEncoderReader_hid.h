@@ -47,13 +47,18 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct                          
+{   
+    eOarray_head_t                      head;
+    eOmc_jomo_descriptor_t              data[eo_encoderreader_max_jomos];
+} eOencoderreader_jomodescriptors_t;   
 
 struct EOtheEncoderReader_hid
 {
     eOservice_core_t                        service;
     eOservice_diagnostics_t                 diagnostics;
     
-    eOmc_arrayof_4jomodescriptors_t         arrayofjomodes;
+    eOencoderreader_jomodescriptors_t       arrayofjomodes; // contains items of type eOmc_jomo_descriptor_t
     EOtimer*                                waitreadtimer;
     uint8_t                                 numofjomos;
     uint8_t                                 numofencoders;

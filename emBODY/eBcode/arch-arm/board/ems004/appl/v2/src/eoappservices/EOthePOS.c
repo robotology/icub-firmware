@@ -272,8 +272,7 @@ const eOmn_serv_config_data_as_pos_t eo_pos_servconf_data_as_pos =
             { 
                 .port = eOcanport1, 
                 .addr = 1, 
-                .insideindex = eobrd_caninsideindex_none, 
-                .dummy = 0 
+                .insideindex = eobrd_caninsideindex_none
             }        
         }
     }
@@ -303,8 +302,7 @@ const eOmn_serv_configuration_t eo_pos_servconf =
                 { 
                     .port = eOcanport1, 
                     .addr = 1, 
-                    .insideindex = eobrd_caninsideindex_none, 
-                    .dummy = 0 
+                    .insideindex = eobrd_caninsideindex_none
                 }        
             }
         }        
@@ -318,7 +316,7 @@ const eOmn_serv_configuration_t eo_pos_servconf =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning TODO: increase eOas_pos_boardinfos_maxnumber if you want to support more than one can board
+//#warning TODO: increase eOas_pos_boardinfos_maxnumber if you want to support more than one can board
 enum { eOas_pos_boardinfos_maxnumber = 1 };
 
 extern EOthePOS* eo_pos_Initialise(void)
@@ -463,7 +461,7 @@ extern eOresult_t eo_pos_Verify(EOthePOS *p, const eOmn_serv_configuration_t * s
 
     eOcandiscovery_target_t trgt = {0};
      
-    #warning TODO: adapt to ths case of multiple can boards
+    //#warning TODO: adapt to the case of multiple can boards
     trgt.info.type = eobrd_cantype_pmc; // servcfg->data.as.pos.boardsInfo.canprop[0].type;
     trgt.info.protocol.major = servcfg->data.as.pos.version.protocol.major; 
     trgt.info.protocol.minor = servcfg->data.as.pos.version.protocol.minor;

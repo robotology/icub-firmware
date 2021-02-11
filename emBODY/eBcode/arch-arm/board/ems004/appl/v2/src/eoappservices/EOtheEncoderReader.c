@@ -89,7 +89,7 @@
     }
 
 
-    extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
     {
         // we alert the host that the verification of the service has failed
         eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, eomn_serv_state_failureofverify);
@@ -104,7 +104,7 @@
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes)
+    extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes)
     {
         eo_encoderreader_SendReport(NULL);
         return eores_NOK_generic;
@@ -169,7 +169,7 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
 static void s_eo_encodereader_send_periodic_error_report(void *p);
 
 
-static void s_eo_encoderreader_init_ereader(const eOmc_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg);
+static void s_eo_encoderreader_init_ereader(EOconstarray * jomodes, eOcallback_t callback, void* arg);
 
 static void s_eo_encoderreader_read_encoders(void* p);
 
@@ -231,8 +231,8 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
     
     s_eo_theencoderreader.reader = eo_appEncReader_Initialise(); 
     
-    // we need it so that we have initialisation of an empty array
-    EOarray* array = eo_array_New(4, sizeof(eOmc_jomo_descriptor_t), &s_eo_theencoderreader.arrayofjomodes);
+    // we need it so that we have initialisation of an empty array of capacity ... eo_encoderreader_max_jomos
+    EOarray* array = eo_array_New(eo_encoderreader_max_jomos, sizeof(eOmc_jomo_descriptor_t), &s_eo_theencoderreader.arrayofjomodes);
 
     
     s_eo_theencoderreader.diagnostics.reportTimer = eo_timer_New();
@@ -259,12 +259,17 @@ extern EOtheEncoderReader* eo_encoderreader_GetHandle(void)
 }
 
 
-extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
     if((NULL == p) || (NULL == jomodes))
     {
         return(eores_NOK_nullpointer);
     }  
+    
+    if(eo_constarray_Size(jomodes) > eo_encoderreader_max_jomos)
+    {
+        return eores_NOK_generic;
+    }    
  
 // DONT Deactivate ... we may want just to check again ....    
 //    if(eobool_true == s_eo_theencoderreader.service.active)
@@ -321,19 +326,25 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
 }
 
 
-extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes)
+extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes)
 {
     if((NULL == p) || (NULL == jomodes))
     {
         return(eores_NOK_nullpointer);
-    }    
+    } 
+
+    if(eo_constarray_Size(jomodes) > eo_encoderreader_max_jomos)
+    {
+        return eores_NOK_generic;
+    }
     
     if(eobool_true == s_eo_theencoderreader.service.active)
     {
         eo_encoderreader_Deactivate(p);        
     }   
  
-    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmc_arrayof_4jomodescriptors_t));
+    // jomodes contains items of type eOmc_jomo_descriptor_t
+    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(s_eo_theencoderreader.arrayofjomodes));
   
     s_eo_encoderreader_init_ereader(jomodes, NULL, NULL);
       
@@ -484,9 +495,8 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
 
 static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t readingisok)
 {
-    const eOmc_arrayof_4jomodescriptors_t * jomodes = (const eOmc_arrayof_4jomodescriptors_t *)par;
+    EOconstarray * jomodes = (EOconstarray *)par;
     
-    EOconstarray* carray = eo_constarray_Load((const EOarray*)jomodes);    
 
 #if defined(EO_ENCODERREADER_ACTIVATE_EVEN_IF_READING_FAILS)
     eObool_t activateit = s_eo_theencoderreader.service.activateafterverify; 
@@ -589,9 +599,9 @@ static void s_eo_encodereader_send_periodic_error_report(void *p)
 }
 
 
-static void s_eo_encoderreader_init_ereader(const eOmc_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg)
-{   
-    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmc_arrayof_4jomodescriptors_t));
+static void s_eo_encoderreader_init_ereader(EOconstarray * jomodes, eOcallback_t callback, void* arg)
+{    
+    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(s_eo_theencoderreader.arrayofjomodes));
     
     EOconstarray* carray = eo_constarray_Load((const EOarray*)&s_eo_theencoderreader.arrayofjomodes);
 
@@ -599,7 +609,7 @@ static void s_eo_encoderreader_init_ereader(const eOmc_arrayof_4jomodescriptors_
     s_eo_theencoderreader.numofjomos = numofjomos;
 
     
-    eo_appEncReader_Activate(s_eo_theencoderreader.reader, &s_eo_theencoderreader.arrayofjomodes);    
+    eo_appEncReader_Activate(s_eo_theencoderreader.reader, carray);    
     
     // to enable the diagnostics ... use on equal to eobool_true
     eo_appEncReader_Diagnostics_Enable(s_eo_theencoderreader.reader, eobool_false);

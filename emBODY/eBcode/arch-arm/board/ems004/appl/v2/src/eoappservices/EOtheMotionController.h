@@ -54,8 +54,8 @@ extern "C" {
 typedef struct EOtheMotionController_hid EOtheMotionController;
 
 
-enum { eo_motcon_standardJOMOs = 4, eo_motcon_maxJOMOs = 12 };
-
+enum { eo_motcon_standardJOMOs = 4, eo_motcon_extendedJOMOs = 7, eo_motcon_maxJOMOs = 12 };
+enum { eo_motcon_standardENCOs = 6, eo_motcon_extendedENCOs = 7 };
 
 typedef enum
 {
