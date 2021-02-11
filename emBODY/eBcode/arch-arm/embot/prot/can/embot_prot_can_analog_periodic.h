@@ -252,6 +252,16 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
                 //for(auto &v : values) { *d++ = v; }
                 for(uint8_t i=0; i<n; i++) { d[i] = values[i]; }
             }
+            // at most three deciDeg in data[6]
+            void loadDeciMilliMeter(const posLABEL startl, const uint8_t n, const std::array<deciMilliMeter, 3> &values) 
+            {
+                descriptor.type = posTYPE::linearDeciMilliMeter;
+                descriptor.startlabel = startl;
+                descriptor.labelsnumberof = n;
+                deciMilliMeter *d = reinterpret_cast<deciMilliMeter*>(data);
+                //for(auto &v : values) { *d++ = v; }
+                for(uint8_t i=0; i<n; i++) { d[i] = values[i]; }
+            }            
         };
         
         Info info;
