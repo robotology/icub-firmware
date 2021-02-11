@@ -260,7 +260,7 @@ namespace embot { namespace prot { namespace can { namespace analog {
     enum class imuSensor { acc = 0, mag = 1, gyr = 2, eul = 3, qua = 4, lia = 5, grv = 6, status = 15, none = 16 };
     
        
-    enum class posTYPE : uint8_t { angleDeciDeg = 0, unknown = 255 };   
+    enum class posTYPE : uint8_t { angleDeciDeg = 0, linearDeciMilliMeter = 1, unknown = 255 };   
     
     enum class posLABEL : uint8_t { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, eight = 8, 
                                     nine = 9, ten = 10, eleven = 11, twelve = 12, thirteen = 13, fourteen = 14, fifteen = 15 };
@@ -272,10 +272,11 @@ namespace embot { namespace prot { namespace can { namespace analog {
         std::uint8_t    labelsnumberof : 4; // the number of values stored inside data[]. they must have consecutive labels      
         posDES() : type(posTYPE::angleDeciDeg), startlabel(posLABEL::zero), labelsnumberof(2) {} 
         void reset() { type = posTYPE::angleDeciDeg; startlabel = posLABEL::zero; labelsnumberof = 2; }
-        bool isvalid() const { if((type == posTYPE::angleDeciDeg) && (labelsnumberof>0)) { return true; } else { return false; } }        
-        };  // it must be stored in 16 bits: 8 bits for type, 4 bits for startlable, 4 bits for labelsnumberof
+        bool isvalid() const { if(((type == posTYPE::angleDeciDeg) || (type == posTYPE::linearDeciMilliMeter)) && (labelsnumberof>0)) { return true; } else { return false; } }        
+        };  // it must be stored in 16 bits: 8 bits for type, 4 bits for startlabel, 4 bits for labelsnumberof
     
     using deciDeg = std::int16_t;
+    using deciMilliMeter = std::int16_t; // +/- 32k ~= +/- 3200 mm = +/- 3.2 m
     
     float deciDeg_export(const deciDeg d); 
     deciDeg deciDeg_import(const float f);
