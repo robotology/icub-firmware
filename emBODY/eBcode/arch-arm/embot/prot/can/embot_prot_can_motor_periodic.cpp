@@ -55,7 +55,8 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         
     CMD convert(std::uint8_t cmd)
     {
-        constexpr std::uint16_t mcpermask16 = (1 << static_cast<std::uint8_t>(CMD::PRINT));
+        constexpr std::uint16_t mcpermask16 =   (1 << static_cast<std::uint8_t>(CMD::PRINT))                            |
+                                                (1 << static_cast<std::uint8_t>(CMD::EMSTO2FOC_DESIRED_CURRENT))        ;
 
         if(cmd > 15)
         {
@@ -127,7 +128,26 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
-    }  
+    } 
+
+
+    bool Message_EMSTO2FOC_DESIRED_CURRENT::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::EMSTO2FOC_DESIRED_CURRENT) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        // little endian
+        info.current[0] = static_cast<std::uint16_t>(candata.datainframe[0]) | (static_cast<std::uint16_t>(candata.datainframe[1]) << 8);
+        info.current[1] = static_cast<std::uint16_t>(candata.datainframe[2]) | (static_cast<std::uint16_t>(candata.datainframe[3]) << 8);
+        info.current[2] = static_cast<std::uint16_t>(candata.datainframe[4]) | (static_cast<std::uint16_t>(candata.datainframe[5]) << 8);
+        info.current[3] = static_cast<std::uint16_t>(candata.datainframe[6]) | (static_cast<std::uint16_t>(candata.datainframe[7]) << 8);        
+      
+        return true;         
+    }      
 
 }}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {
     
