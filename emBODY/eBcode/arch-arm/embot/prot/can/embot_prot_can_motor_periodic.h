@@ -35,7 +35,8 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
     enum class CMD { 
         none = 0xfe, 
         
-        PRINT = 6 
+        PRINT = 6,
+        EMSTO2FOC_DESIRED_CURRENT = 15        
     };
 
     // NOTES
@@ -84,6 +85,24 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         std::uint8_t framecounter;    
         std::uint8_t nchars;           
         static std::uint8_t textIDmod4;  // 0, 1, 2, 3, 0, 1, 2, etc      
+    }; 
+
+    
+    class Message_EMSTO2FOC_DESIRED_CURRENT : public Message
+    {
+        public:
+            
+        struct Info
+        {
+            int16_t current[4] {0};   
+            Info() = default;
+        };
+        
+        Info info {};
+        
+        Message_EMSTO2FOC_DESIRED_CURRENT() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);                        
     }; 
 
     
