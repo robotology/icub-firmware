@@ -40,7 +40,7 @@ typedef struct EOthePOS_hid EOthePOS;
 
 enum { eo_pos_maxnumberofCANboards = 1 }; 
 
-#warning TBD: but we may need less than 3
+//#warning TBD: but we may need less than 3
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------

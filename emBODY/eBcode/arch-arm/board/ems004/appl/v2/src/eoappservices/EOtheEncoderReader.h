@@ -47,6 +47,8 @@ extern "C" {
 
 #include "EOtheServices.h"
 
+#include "EOconstarray.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -56,6 +58,11 @@ extern "C" {
 typedef struct EOtheEncoderReader_hid EOtheEncoderReader;
 
 
+// we can manage at most 7 jomos, even if typically we manage only 4 or ... 7
+// hence the used EOconstarray * jomodes has type:
+// - const eOmc_arrayof_4jomodescriptors_t 
+// - const eOmc_arrayof_7jomodescriptors_t
+enum { eo_encoderreader_max_jomos = 7 };
 
 typedef enum
 {
@@ -98,12 +105,13 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void);
 extern EOtheEncoderReader* eo_encoderreader_GetHandle(void);
 
 
+
 // it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
 // (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_encoderreader_Activate().
-extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 // it activates the service by loading the service configuration
-extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes);
+extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes);
 
 // it deactivates service.
 extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p);

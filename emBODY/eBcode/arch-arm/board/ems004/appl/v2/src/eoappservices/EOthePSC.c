@@ -584,7 +584,7 @@ extern eOresult_t eo_psc_Activate(EOthePSC *p, const eOmn_serv_configuration_t *
     // load the entity 
     eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_psc, p->sharedcan.entitydescriptor);   
 
-    #warning TBD: non preparo la mappa, configuro le board
+    //#warning TBD: non preparo la mappa, configuro le board
     // build the maps that can translate a received can message into the correct place of the six values.
     // the location of the board will be used as an index in a map for the positions 0, 1, 2, 3, 4, 5
     // by that i dont need to send any particular configuration to the psc boards to fill the label by themselves.

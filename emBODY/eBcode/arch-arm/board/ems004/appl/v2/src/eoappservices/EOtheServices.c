@@ -871,7 +871,7 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
             }
-            #warning mettere un risultato ko in modo da avvisare
+            //#warning mettere un risultato ko in modo da avvisare
             eo_inertials2_Verify(eo_inertials2_GetHandle(), config, s_services_callback_afterverify_inertial, eobool_true);            
         } break; 
         

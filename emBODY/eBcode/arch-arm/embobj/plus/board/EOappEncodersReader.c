@@ -114,6 +114,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p);
 static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmc_position_t pos);
 static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo);
 static uint32_t s_eo_appEncReader_psc_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw);
+static uint32_t s_eo_appEncReader_pos_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw);
 static uint32_t s_eo_appEncReader_hallAdc_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo);
 
 static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port);
@@ -252,12 +253,17 @@ extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p)
 }
 
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof_4jomodescriptors_t *arrayofjomodes)
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes)
 {
     if((NULL == p) || (NULL == arrayofjomodes))
     {
         return(eores_NOK_nullpointer);
-    }   
+    } 
+
+    if(eo_constarray_Size(arrayofjomodes) > eOappEncReader_jomos_maxnumberof)
+    {
+        return eores_NOK_generic;
+    }        
 
     EOconstarray* carray = eo_constarray_Load((const EOarray*)arrayofjomodes);
     
@@ -267,13 +273,7 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof
     }    
 
     // ok, now the rest of the things
-    
-    // basic check ...
-    if(eo_constarray_Size(carray) > eOappEncReader_jomos_maxnumberof)
-    {
-        return(eores_NOK_generic);
-    }
-    
+        
     // 1. prepare the config
     p->config.numofjomos = eo_constarray_Size(carray);
         
@@ -1304,6 +1304,14 @@ static uint32_t s_eo_appEncReader_psc_rescale2icubdegrees(EOappEncReader* p, int
     return EOMEAS_DEG2IDG(((float)(val_raw))/10);
 }
 
+static uint32_t s_eo_appEncReader_pos_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw)
+{
+    // currently the user can't configure the conversion factor of pos.
+    // The pos-based boards send decidegree values in int16
+    
+    return EOMEAS_DEG2IDG(((float)(val_raw))/10);
+}
+
 
 static uint32_t s_eo_appEncReader_hallAdc_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo)
 {
@@ -1556,51 +1564,25 @@ static eObool_t s_eo_read_pos_for_port(EOappEncReader *p, eObrd_portpos_t port, 
     }
            
     switch(port)
-    {
+    {        
         case eobrd_portpos_hand_thumb:
-        {
-            eOas_pos_data_t *data0 = (eOas_pos_data_t*) eo_array_At(array, 0);
-            if(NULL != data0)
-            {
-                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data0->value);
-                valueInfo->composedof = 1;
-                ret = eobool_true; 
-            }                
-        } break;
-
         case eobrd_portpos_hand_index:
-        {
-            eOas_pos_data_t *data1 = (eOas_pos_data_t*) eo_array_At(array, 1);
-            if(NULL != data1)
-            {
-                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data1->value);
-                valueInfo->composedof = 1;
-                ret = eobool_true; 
-            }                
-        } break;    
-
         case eobrd_portpos_hand_medium:
+        case eobrd_portpos_hand_pinky:            
+        case eobrd_portpos_hand_thumbmetacarpus:
+        case eobrd_portpos_hand_thumbrotation:
+        case eobrd_portpos_hand_indexadduction:
         {
-            eOas_pos_data_t *data2 = (eOas_pos_data_t*) eo_array_At(array, 2);
-            if(NULL != data2)
+            uint8_t index = port;
+            eOas_pos_data_t *data = (eOas_pos_data_t*) eo_array_At(array, index);
+            if(NULL != data)
             {
-                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data2->value);
-                valueInfo->composedof = 1;
-                ret = eobool_true;  
-            }                
-        } break;      
-
-        case eobrd_portpos_hand_pinky:
-        {
-            eOas_pos_data_t *data3 = (eOas_pos_data_t*) eo_array_At(array, 3);
-            if(NULL != data3)
-            {
-                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data3->value);
+                valueInfo->value[0] = s_eo_appEncReader_pos_rescale2icubdegrees(p, data->value);
                 valueInfo->composedof = 1;
                 ret = eobool_true; 
             }                
-        } break;  
-
+        } break;   
+                
         default:
         {
             valueInfo->value[0] = 0;    
@@ -1611,7 +1593,6 @@ static eObool_t s_eo_read_pos_for_port(EOappEncReader *p, eObrd_portpos_t port, 
 
     return ret;
 }
-
 
 
 static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodertype(eOmc_encoder_t encodertype)
