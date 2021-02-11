@@ -12,6 +12,7 @@
 #define _EMBOT_OS_COMMON_H_
 
 #include "embot_core.h"
+#include "embot_core_binary.h"
 
 
 namespace embot { namespace os {
@@ -54,6 +55,14 @@ namespace embot { namespace os {
         //system220 = 48, system230i = 48+1, system240i = 48+2, system250 = 48+3,                   // realtime
                 
     };
+    
+    constexpr Event bitpos2event(uint8_t bitpos)
+    {
+        if(bitpos > 32)
+            return 0;
+        
+        return embot::core::binary::mask::pos2mask<embot::os::Event>(bitpos);
+    }
         
     
 }}
