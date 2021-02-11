@@ -32,13 +32,16 @@ namespace embot { namespace app { namespace application {
     public:
         static thePOSreader2& getInstance();
     
-        using Position = int32_t; // the measurement units is: 0.01 degrees
+        // the measurement units is:
+        // centideg = 0.01 degrees for sensorType::tlv and sensorType::lr17
+        // micrometer = 0.001 mm for sensorType::qe
+        using Position = int32_t; 
     
-        static constexpr Position valueOfPositionACQUISITIONnotvalid {1000*100}; // 1000 degrees
+        static constexpr Position valueOfPositionACQUISITIONnotvalid {1000*100}; // 1000 degrees or 
         
-        static constexpr std::uint8_t numberofpositions = 7;
+        static constexpr std::uint8_t numberofpositions = 9; // if 7 ... upto the lr17. if 9 ... also the two qe
     
-        enum class sensorType { tlv = 0, lr17 = 1, none = 255 }; 
+        enum class sensorType { tlv = 0, lr17 = 1, qe = 2, none = 255 }; 
         
         struct Sensor
         {
