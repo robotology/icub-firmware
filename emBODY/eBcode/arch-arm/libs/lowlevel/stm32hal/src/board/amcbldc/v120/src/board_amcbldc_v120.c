@@ -102,7 +102,7 @@ extern void stm32hal_board_init(void)
   MX_CORDIC_Init();
   MX_FMAC_Init();
   MX_RNG_Init();
-  MX_USB_PCD_Init();
+  //MX_USB_PCD_Init();
 
   
 }

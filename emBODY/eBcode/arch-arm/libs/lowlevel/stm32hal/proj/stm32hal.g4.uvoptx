@@ -3690,7 +3690,7 @@
 
   <Group>
     <GroupName>board-amcbldc-v120</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3710,7 +3710,7 @@
       <GroupNumber>10</GroupNumber>
       <FileNumber>237</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\board\amcbldc\v120\src\adc.c</PathWithFileName>
