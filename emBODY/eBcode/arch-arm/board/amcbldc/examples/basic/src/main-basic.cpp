@@ -34,7 +34,7 @@ int main(void)
     {
         HAL_Delay(500);
         led_toggle();
-        itm_puts("led toggled");
+        itm_puts("led toggled @ 1 Hz");
     }  
 }
 
@@ -48,9 +48,11 @@ int main(void)
 static volatile uint64_t s_1mstickcount = 0; // it must be volatile
 constexpr uint32_t s_rate1khz = 1000;
 
+extern "C" {
 void SysTick_Handler(void)
 {
     s_1mstickcount++;
+}
 }
 
 static void stm32hal_tick1msecinit()
