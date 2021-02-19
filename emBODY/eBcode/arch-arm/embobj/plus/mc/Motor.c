@@ -269,6 +269,7 @@ void Motor_init(Motor* o) //
     o->fault_state_prec.bitmask = 0;
     o->fault_state.bitmask = 0;
     o->diagnostics_refresh = 0;
+    o->err_counter = 0;
     
     WatchDog_init(&o->control_mode_req_wdog);
     WatchDog_init(&o->can_2FOC_alive_wdog);
@@ -607,6 +608,7 @@ void Motor_force_idle(Motor* o) //
     o->fault_state_prec.bitmask = 0;
     o->fault_state.bitmask = 0;
     o->diagnostics_refresh = 0;
+    o->err_counter = 0;
     
     o->hardware_fault = FALSE;
 }
@@ -622,6 +624,7 @@ static void Motor_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_t mas
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);    
 }
 
+#define ERROR_COUNTER_MAX                 10
 
 BOOL Motor_check_faults(Motor* o) //
 {
@@ -673,12 +676,24 @@ BOOL Motor_check_faults(Motor* o) //
         }
 
         // No HW fault triggered by this warnings
-        if (++o->diagnostics_refresh_warning > 5*CTRL_LOOP_FREQUENCY_INT) {
-            if (o->qe_state.bits.dirty) {
-                Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_dirty, 0);
+        if (++o->diagnostics_refresh_warning > 5*CTRL_LOOP_FREQUENCY_INT ) {
+            if (o->err_counter < ERROR_COUNTER_MAX) // we are still below the maximum number of error messages
+            {
+                if (o->qe_state.bits.dirty) {
+                    Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_dirty, 0);
+                    ++o->err_counter;
+                }
+                if (o->qe_state.bits.phase_broken) {
+                    Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_phase, 0);
+                    ++o->err_counter;
+                }
             }
-            if (o->qe_state.bits.phase_broken) {
-                Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_phase, 0);
+            else // if the maximum number of error messages has been received
+            {
+                if (!o->qe_state.bits.dirty && !o->qe_state.bits.phase_broken) // if not more errors detected, reset counter
+                {
+                    o->err_counter = 0;
+                }
             }
         }
     }
