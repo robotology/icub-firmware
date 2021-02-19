@@ -218,7 +218,7 @@ typedef struct //Motor
 
     HardStopCalibData hardstop_calibdata;
 
-    uint16_t err_counter;
+    uint16_t qencoder_err_counter;
 
     // 2FOC specific data
     WatchDog can_2FOC_alive_wdog;
