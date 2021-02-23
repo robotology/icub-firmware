@@ -56,8 +56,14 @@ void PID_config(PID* o, eOmc_PID_t* config)
     
     o->stiction_up   = rescaler*config->stiction_up_val;
     o->stiction_down = rescaler*config->stiction_down_val;
-  
+
+#ifdef FINGER_MK3  
+    o->out_max_close = config->limitonoutput;
+    o->out_max_open = 0.2f*o->out_max_close;
+#else
     o->out_max = config->limitonoutput;
+#endif
+
     o->out_lpf = 0.0f;
     o->out = 0.0f;
     
@@ -127,7 +133,32 @@ float PID_do_out(PID* o, float En)
     // offset
     out += o->Ko;
     
+#ifdef FINGER_MK3
+    if (o->Kp > ZERO)
+    {
+        if (out > ZERO)
+        {
+            LIMIT(out, o->out_max_close);
+        }
+        else
+        {
+            LIMIT(out, o->out_max_open);
+        }
+    }
+    else
+    {
+        if (out < ZERO)
+        {
+            LIMIT(out, o->out_max_close);
+        }
+        else
+        {
+            LIMIT(out, o->out_max_open);
+        }
+    }
+#else
     LIMIT(out, o->out_max);
+#endif
     
     switch (o->filter)
     {

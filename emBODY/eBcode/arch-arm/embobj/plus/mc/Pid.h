@@ -49,7 +49,13 @@ typedef struct //PID
     float stiction_up;
     float stiction_down;
   
+#ifdef FINGER_MK3
+    float out_max_open;
+    float out_max_close;
+#else
     float out_max;
+#endif
+
     float out_lpf;
     float out;
     

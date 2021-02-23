@@ -188,6 +188,10 @@ typedef struct // Joint
     
     jointCalibrationData running_calibration;
     
+#ifdef FINGER_MK3
+    CTRL_UNITS ZTau;
+    CTRL_UNITS Ke;
+#endif 
 } Joint;
 
 extern Joint* Joint_new(uint8_t n);

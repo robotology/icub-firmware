@@ -119,6 +119,11 @@ void Joint_init(Joint* o)
     
     o->not_reversible = FALSE;
     
+#ifdef FINGER_MK3
+    o->ZTau = 560.0f*1.2f; // PWM/mNm * mNm;
+    o->Ke = 0.05f;
+#endif
+
     Joint_reset_calibration_data(o);
 }
 
@@ -640,6 +645,15 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
                             o->output = PID_do_out(pid, o->pos_err);
                         }
                     }
+                    
+#ifdef FINGER_MK3
+                    CTRL_UNITS omega = o->vel_fbk;
+                    if (omega < ZERO) omega = -omega;
+                    
+                    CTRL_UNITS pwm_lim_trq = o->ZTau + o->Ke*omega;
+                    
+                    LIMIT(o->output, pwm_lim_trq);
+#endif
                 }
             }
             else
