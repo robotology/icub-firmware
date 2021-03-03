@@ -626,6 +626,19 @@ static void Motor_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_t mas
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);    
 }
 
+static void Motor_send_diagnostic(eOerrmanErrorType_t errortype, uint8_t id, eOerror_value_MC_t err_id, uint64_t mask)
+{
+    static eOerrmanDescriptor_t descriptor = {0}; 
+    // but also not static can be fine as well. as long as we have enough stack size. 
+    // eOerrmanDescriptor_t is 16 bytes big    
+    descriptor.par16 = id;
+    descriptor.par64 = mask;
+    descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+    descriptor.sourceaddress = 0;
+    descriptor.code = eoerror_code_get(eoerror_category_MotionControl, err_id);
+    eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, NULL, &descriptor);    
+}
+
 #define ERROR_COUNTER_MAX                 10
 
 BOOL Motor_check_faults(Motor* o) //
@@ -695,6 +708,7 @@ BOOL Motor_check_faults(Motor* o) //
                 if (!o->qe_state.bits.dirty && !o->qe_state.bits.phase_broken) // if not more errors detected, reset counter
                 {
                     o->qencoder_err_counter = 0;
+                    Motor_send_diagnostic(eo_errortype_warning, o->ID, eoerror_value_MC_motor_qencoder_phase_disappeared, 0);
                 }
             }
             o->diagnostics_refresh_warning = 0; //restart the counter for the warnings
