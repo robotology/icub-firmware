@@ -288,8 +288,11 @@ extern hal_result_t hal_mux_deinit(hal_mux_t id)
     }
 #endif
     s_hal_mux_initted_reset(id);
+#if !defined(SPIENC_DEINIT_DEALLOCATE_HEAP)
+#else
     hal_heap_delete((void**)&(s_hal_mux_theinternals.items[HAL_mux_id2index(id)]));
     //hal_heap_delete((void**)&intitem);
+#endif
 
     return(hal_res_OK);
 }

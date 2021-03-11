@@ -133,6 +133,41 @@ extern hl_fifo_t* hl_fifo_new(uint8_t capacity, uint8_t sizeofitem, uint8_t *ite
     return(fifo);    
 }
 
+extern hl_fifo_t* hl_fifo_new2(hl_fifo_t *fifo, uint8_t capacity, uint8_t sizeofitem, uint8_t *iteminitval)
+{
+    if(NULL == fifo)
+    {
+        return hl_fifo_new(capacity, sizeofitem, iteminitval);
+    }
+    
+    // else we already have a fifo which we should ... either reinit (if capacity and sizeoitem are the same) or realloc.
+    if((0 == capacity) || (0 == sizeofitem))
+    {
+        // as it is ...
+        return(fifo);
+    }
+    
+    if(((sizeofitem*capacity) == (fifo->sizeofitem*fifo->capacity)) && (NULL != fifo->data))
+    {
+        // no realloc is required. i just ... reinit things 
+        uint8_t *dataforfifo = fifo->data;
+        hl_fifo_init(fifo, capacity, sizeofitem, dataforfifo, iteminitval);
+    }
+    else if(NULL != fifo->data)
+    {
+        // need to realloc fifo->data
+        hl_sys_heap_delete(fifo->data);
+        fifo->data = NULL;
+        uint8_t *dataforfifo = hl_sys_heap_new(sizeofitem*capacity);
+        dataforfifo = hl_sys_heap_new(sizeofitem*capacity);
+        hl_fifo_init(fifo, capacity, sizeofitem, dataforfifo, iteminitval);
+    }
+            
+    return fifo;
+          
+}
+
+
 extern void hl_fifo_delete(hl_fifo_t *fifo)
 {
     if(NULL == fifo)
