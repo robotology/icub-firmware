@@ -93,6 +93,278 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(TESTethboardsfix)
+static const eOmn_serv_configuration_t s_serv_config_strain_generic =
+{   
+    .type       = eomn_serv_AS_strain,
+    .filler     = {0},
+    .data.as.strain = 
+    {
+        .boardtype =
+        {
+            .type = eobrd_strain2,
+            .firmware = {2, 0, 10},
+            .protocol = {2, 0}
+        },
+        .canloc = 
+        {
+            .port = eOcanport1, 
+            .addr = 13, 
+            .insideindex = eobrd_caninsideindex_none, 
+            .dummy = 0             
+        }
+    }
+};
+
+static const eOmn_serv_configuration_t s_serv_config_mc_mc4plus_eb24 =
+{   
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmc_jomo_descriptor_t),
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0
+                    .actuator.pwm    =
+                    {
+                        .port           = eobrd_port_mc4plusP5,
+                        .dummy          = 0                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_qenc,
+                        .port   = eobrd_port_mc4plusP5,  
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_qenc,
+                        .port   = eobrd_port_mc4plusP5,  
+                        .pos    = eomc_pos_atmotor
+                    }
+                },
+                { // joint 1
+                    .actuator.pwm    =
+                    {
+                        .port           = eobrd_port_mc4plusP2,
+                        .dummy          = 0                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_mc4plusP10, 
+                        .pos    = eomc_pos_atjoint                            
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_qenc,
+                        .port   = eobrd_port_mc4plusP2,  
+                        .pos    = eomc_pos_atmotor
+                    }
+                },                    
+                { // joint 2
+                    .actuator.pwm    =
+                    {
+                        .port           = eobrd_port_mc4plusP4,
+                        .dummy          = 0                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_mc4plusP11, 
+                        .pos    = eomc_pos_atjoint      
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_qenc,
+                        .port   = eobrd_port_mc4plusP4,  
+                        .pos    = eomc_pos_atmotor
+                    }
+                },               
+                { // joint 3
+                    .actuator.pwm    =
+                    {
+                        .port           = eobrd_port_mc4plusP3,
+                        .dummy          = 0                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_absanalog,
+                        .port   = eobrd_port_mc4plusP3,    
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                }                    
+            }   
+        },  
+        .jomocoupling       =
+        {
+            .joint2set      = 
+            {   // 3 sets: set0 = {0}, set1 = {1, 2}, set2 = {3} 
+                0, 1, 1, 2 
+            },
+            .joint2motor    = 
+            {   // tbd
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(-1.0f),   EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) }        
+            },
+            .encoder2joint  = 
+            {   // nearly identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f), EO_COMMON_FLOAT_TO_Q17_14(0.0f), EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f), EO_COMMON_FLOAT_TO_Q17_14(0.0f), EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f), EO_COMMON_FLOAT_TO_Q17_14(0.0f), EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f), EO_COMMON_FLOAT_TO_Q17_14(0.0f), EO_COMMON_FLOAT_TO_Q17_14(0.0f) } 
+            }  
+        }        
+    }
+};
+
+static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
+{   // eb1 / eb3
+    .type       = eomn_serv_MC_foc,
+    .filler     = {0},
+    .data.mc.foc_based = 
+    {
+        .version   =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }
+        },
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmc_jomo_descriptor_t),
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 1,
+                        .insideindex    = eobrd_caninsideindex_first                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP6, // hal_encoder1   
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },
+                { // joint 1
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 2,
+                        .insideindex    = eobrd_caninsideindex_first                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP7, // hal_encoder4
+                        .pos    = eomc_pos_atjoint                            
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },                    
+                { // joint 2
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 3,
+                        .insideindex    = eobrd_caninsideindex_first                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP8, // hal_encoder2  
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },               
+                { // joint 3
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 4,
+                        .insideindex    = eobrd_caninsideindex_first                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP9,    // hal_encoder5 
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                }                    
+            }   
+        },  
+        .jomocoupling       =
+        {
+            .joint2set      = 
+            {   // each joint is on a different set 
+                0, 1, 2, 3 
+            },
+            .joint2motor    = 
+            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            },
+            .encoder2joint  = 
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+            }  
+        }        
+    }
+};
+
+#endif // TESTethboardsfix
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
@@ -411,6 +683,61 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
 }
 
+
+#if defined(TESTethboardsfix)
+
+
+static eOmn_service_cmmnds_command_t s_command = {0};
+
+volatile uint32_t count = 0;
+volatile uint8_t thisstep = 0;
+extern void eoprot_fun_UPDT_mn_appl_cmmnds_timeset(const EOnv* nv, const eOropdescriptor_t* rd) 
+{
+    eOabstime_t *timeset = (eOabstime_t *)nv->ram;
+    
+    
+    static const uint8_t period = 4;
+    static const eOmn_serv_operation_t ops[4] = 
+    { 
+        eomn_serv_operation_verifyactivate, 
+        eomn_serv_operation_start, 
+        eomn_serv_operation_stop, 
+        eomn_serv_operation_deactivate
+    };
+    
+    
+    s_command.operation = ops[count % period];
+    
+    if(count >=8)
+    {
+        thisstep = 1;
+    }
+
+    // strain service: it is ok in both ems and mc4plus
+//    s_command.category = eomn_serv_category_strain;
+//    memcpy(&s_command.parameter.configuration, &s_serv_config_strain_generic, sizeof(eOmn_serv_configuration_t));
+       
+    
+    s_command.category = eomn_serv_category_mc;
+    #if defined(USE_EMS4RD)
+    memcpy(&s_command.parameter.configuration, &s_serv_config_mc_eb1_eb3_zeroprotocol, sizeof(eOmn_serv_configuration_t));
+    #else
+    memcpy(&s_command.parameter.configuration, &s_serv_config_mc_mc4plus_eb24, sizeof(eOmn_serv_configuration_t));   
+    #endif    
+    
+    
+    eOmn_service_cmmnds_command_t *command = &s_command;
+    
+    count ++;
+    
+    // ok, we have received a command for a given service. we ask the object theservices to manage the thing
+    
+    eo_services_ProcessCommand(eo_services_GetHandle(), command);    
+    
+}
+
+#else // not TESTethboardsfix
+
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_timeset(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
     eOabstime_t *timeset = (eOabstime_t *)nv->ram;
@@ -483,6 +810,8 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_timeset(const EOnv* nv, const eOropde
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, msg, NULL, &descriptor); 
               
 }
+
+#endif // TESTethboardsfix
 
 
 extern void eoprot_fun_UPDT_mn_service_cmmnds_command(const EOnv* nv, const eOropdescriptor_t* rd)
