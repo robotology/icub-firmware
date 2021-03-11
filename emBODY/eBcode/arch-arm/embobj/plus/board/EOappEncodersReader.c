@@ -69,6 +69,10 @@
 #define CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(type)        ((eomc_enc_spichainof2 == (type)) || (eomc_enc_spichainof3 == (type)))
 
 
+#if defined(TESTethboardsfix)
+    #define FAKE_AEA
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -528,8 +532,12 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             {
                 hal_spiencoder_position_t spiRawValue = 0; 
                 hal_spiencoder_errors_flags flags = {0};
-                
-                if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+#if defined(FAKE_AEA)                
+                spiRawValue = 0;
+                uint32_t ticks = (spiRawValue >> 6) & 0x0FFF;
+                prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos); 
+#else                
+                if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))                    
                 {   // ok, the hal reads correctly
                     if(eobool_true == s_eo_appEncReader_IsValidValue_AEA(&spiRawValue, &prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
@@ -553,7 +561,8 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 {   // we dont even have a valid reading from hal
                     prop.valueinfo->errortype = encreader_err_AEA_READING;
                     errorparam = 0xffff;                                         
-                }                
+                }   
+#endif                
                
             } break; 
             
