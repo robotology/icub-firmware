@@ -90,9 +90,18 @@ extern uint32_t hal_quadencoder_get_counter(hal_quadencoder_t id);
   */
 extern void hal_quadencoder_reset_counter(hal_quadencoder_t id);
 
+/** @fn         hal_quadencoder_deinit_indexes_flags(void)
+    @brief      This function deinitialize the interrupt line of the index for the quadrature encoder 
+   @param       none
+   @retval      none
+  */
+extern void hal_quadencoder_deinit_indexes_flags(void);
 
 /** @fn         hal_quadencoder_init_indexes_flags(void)
     @brief      This function initialize the interrupt line (which is not mandatory) of the index for the quadrature encoder 
+                The funtion has a protecion vs multiple initializations. That is important because in its inside we configure
+                the start of an IRQ Handler which cannot be configured if it is running. To do a proper re-init call
+                hal_quadencoder_deinit_indexes_flags() first.
    @param       none
    @retval      none
   */
