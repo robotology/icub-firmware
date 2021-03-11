@@ -223,7 +223,8 @@ extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg)
     if(NULL == intitem)
     {
         // the internal item
-        intitem = s_hl_spi_theinternals.items[HL_spi_id2index(id)] = hl_sys_heap_new(sizeof(hl_spi_internal_item_t));   
+        intitem = s_hl_spi_theinternals.items[HL_spi_id2index(id)] = hl_sys_heap_new(sizeof(hl_spi_internal_item_t));  
+        memset(intitem, 0, sizeof(hl_spi_internal_item_t));        
     }
     
     // set config
@@ -400,9 +401,13 @@ extern hl_result_t hl_spi_deinit(hl_spi_t id)
     SPI_I2S_DeInit(SPIx);
             
     s_hl_spi_initted_reset(id);
-    //hal_heap_delete((void**)&(s_hl_spi_theinternals.items[HL_spi_id2index(id)]));
+    
+#if !defined(SPIENC_DEINIT_DEALLOCATE_HEAP)
+#else
+    // deallocation of internal pointers: none.
     hl_sys_heap_delete((void*)s_hl_spi_theinternals.items[HL_spi_id2index(id)]);
     memset(&s_hl_spi_theinternals.items[HL_spi_id2index(id)], 0, sizeof(hl_spi_internal_item_t*));
+#endif
     return hl_res_OK;
 }
 

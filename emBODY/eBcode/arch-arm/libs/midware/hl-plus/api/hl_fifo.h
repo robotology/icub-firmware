@@ -98,6 +98,10 @@ struct hl_fifo_hid_t
  **/
 extern hl_fifo_t* hl_fifo_new(uint8_t capacity, uint8_t sizeofitem, uint8_t *iteminitval);
 
+// if fifo is NULL then it is just a hl_fifo_new(capacity, sizeofitem, iteminitval). else it reshapes the fifo. 
+// it reallocates RAM only if required: if (capacity*sizeofitem) and (fifo->capacity*fifo->sizeofitem) differ 
+extern hl_fifo_t* hl_fifo_new2(hl_fifo_t *fifo, uint8_t capacity, uint8_t sizeofitem, uint8_t *iteminitval);
+
 
 /** @fn         extern void hl_fifo_delete(hl_fifo_t *fifo)
     @brief      It releases all memory related to the fifo.
