@@ -775,7 +775,8 @@ struct embot::app::application::theSTRAIN::Impl
     
     StrainRuntimeData runtimedata;
     StrainConfigData configdata;
-    
+
+		adc2ft_ns::adc2ft_class adc2ft; // Instance of model class		
 
     Impl() 
     {
@@ -1375,15 +1376,19 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     
     const embot::dsp::q15::matrix& handleCalibMatrixQ15 = configdata.transformer_matrix_handle(set2use);     
     const embot::dsp::q15::matrix& handleCalibTareQ15 = configdata.transformer_tare_handle(set2use);   
+		//Move to the correct place Luca
+		std::memcpy(adc2ft.rtP.calibration_matrix,handleCalibMatrixQ15.data,sizeof(adc2ft.rtP.calibration_matrix));     
+		std::memcpy(adc2ft.rtP.calibration_offsets,handleCalibTareQ15.data,sizeof(adc2ft.rtP.calibration_offsets));     
+		//Move to the correct place end Luca
         
-    embot::dsp::Q15 q15tmpvector[6];
-    embot::dsp::q15::matrix tmpQ15vector(6, 1, q15tmpvector);
-    
-    
-    embot::dsp::q15::add(runtimedata.adcvalueQ15vector, handleCalibTareQ15, tmpQ15vector, q15saturated);
-    embot::dsp::q15::multiply(handleCalibMatrixQ15, tmpQ15vector, runtimedata.forcetorqueQ15vector, q15saturated);
-    embot::dsp::q15::add(runtimedata.forcetorqueQ15vector, runtimedata.currtareQ15vector, runtimedata.forcetorqueQ15vector, q15saturated);
-    
+	  // Remove Luca
+    //embot::dsp::Q15 q15tmpvector[6];
+    //embot::dsp::q15::matrix tmpQ15vector(6, 1, q15tmpvector);
+    //embot::dsp::q15::add(runtimedata.adcvalueQ15vector, handleCalibTareQ15, tmpQ15vector, q15saturated);
+    //embot::dsp::q15::multiply(handleCalibMatrixQ15, tmpQ15vector, runtimedata.forcetorqueQ15vector, q15saturated);
+    //embot::dsp::q15::add(runtimedata.forcetorqueQ15vector, runtimedata.currtareQ15vector, runtimedata.forcetorqueQ15vector, q15saturated);
+    // Remove Luca
+		
     // copy 
     
     // now in forcetorqueQ15vector (runtimedata.data.forcetorque[]) we have the result ... 
@@ -1395,8 +1400,13 @@ bool embot::app::application::theSTRAIN::Impl::processing()
    
     if(false == runtimedata.data.adcsaturation)
     {
-        runtimedata.data.force.set(embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[0]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[1]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[2]));
-        runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[3]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[4]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[5]));
+			for(size_t index=0;index<6;++index)	
+				adc2ft.rtU.adc[index] = runtimedata.data.adcvalue[index];
+
+				adc2ft.step();
+			
+				runtimedata.data.force.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[0]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[1]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[2]));
+   			runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[3]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[4]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[5]));
     }
     else
     {

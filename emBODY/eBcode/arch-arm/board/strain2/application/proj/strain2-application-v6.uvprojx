@@ -17,7 +17,7 @@
           <Device>STM32L433RCTx</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32L4xx_DFP.2.5.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0000C000) IRAM2(0x10000000,0x00004000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -397,6 +397,26 @@
               <FileName>embot_app_skeleton_os_evthreadcan.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_evthreadcan.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\MBDcode\adc2ft.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\MBDcode\adc2ft.h</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\MBDcode\adc2ft_data.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rtwtypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\MBDcode\rtwtypes.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -876,7 +896,7 @@
           <Device>STM32L433RCTx</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32L4xx_DFP.2.5.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0000C000) IRAM2(0x10000000,0x00004000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1256,6 +1276,26 @@
               <FileName>embot_app_skeleton_os_evthreadcan.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_evthreadcan.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\MBDcode\adc2ft.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\MBDcode\adc2ft.h</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\MBDcode\adc2ft_data.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rtwtypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\MBDcode\rtwtypes.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1735,7 +1775,7 @@
           <Device>STM32L433RCTx</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32L4xx_DFP.2.5.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0000C000) IRAM2(0x10000000,0x00004000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2115,6 +2155,26 @@
               <FileName>embot_app_skeleton_os_evthreadcan.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_evthreadcan.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\MBDcode\adc2ft.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\MBDcode\adc2ft.h</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\MBDcode\adc2ft_data.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rtwtypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\MBDcode\rtwtypes.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2632,7 +2692,7 @@
           <Device>STM32L433RCTx</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32L4xx_DFP.2.5.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0000C000) IRAM2(0x10000000,0x00004000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -3012,6 +3072,26 @@
               <FileName>embot_app_skeleton_os_evthreadcan.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_evthreadcan.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\MBDcode\adc2ft.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\MBDcode\adc2ft.h</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\MBDcode\adc2ft_data.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rtwtypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\MBDcode\rtwtypes.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3590,7 +3670,7 @@
   <LayerInfo>
     <Layers>
       <Layer>
-        <LayName>&lt;Project Info&gt;</LayName>
+        <LayName>strain2-application-v6</LayName>
         <LayTarg>0</LayTarg>
         <LayPrjMark>1</LayPrjMark>
       </Layer>
