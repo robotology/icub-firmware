@@ -655,7 +655,7 @@ extern hal_result_t hal_spi_deinit(hal_spi_t id)
     }
     
     // memset intitem to zero
-    memset(intitem, 0, sizeof(hal_spi_internal_item_t);
+    memset(intitem, 0, sizeof(hal_spi_internal_item_t));
     
     // and now delete it.
     hal_heap_delete((void**)&(s_hal_spi_theinternals.items[HAL_spi_id2index(id)]));
