@@ -40,6 +40,10 @@
 //#include "EOtheMAIS.h"
 #include "EOtheSTRAIN.h"
 
+#if defined(TESTRTC_IS_ACTIVE)
+#include "testRTC.h"
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,7 +117,10 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     
     //eo_mais_Tick(eo_mais_GetHandle());
     eo_strain_Tick(eo_strain_GetHandle());
-    
+ 
+#if defined(TESTRTC_IS_ACTIVE)     
+    testRTC_RUN_tick();
+#endif     
 }
 
 
