@@ -277,7 +277,7 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arra
     // 1. prepare the config
     p->config.numofjomos = eo_constarray_Size(carray);
         
-    
+    #warning attenzione. si fa il loop su eOappEncReader_jomos_maxnumberof o su 4 o su eo_constarray_Size(carray) ?? controllo su jomodes != NULL forse.
     for(uint8_t i=0; i<eOappEncReader_jomos_maxnumberof; i++)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);

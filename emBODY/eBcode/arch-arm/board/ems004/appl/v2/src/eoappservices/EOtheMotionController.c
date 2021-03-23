@@ -639,7 +639,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         // at first i verify the pos. then, function s_eo_motioncontrol_onendofverify_pos() shall either issue a pos error or start verification of encoders (if mode is eo_motcon_mode_mc4pluspos)     
         eo_pos_Verify(eo_pos_GetHandle(), &p->ctrlobjs.servconfigpos, s_eo_motioncontrol_onendofverify_pos, eobool_true);          
     }
-    else if(eo_motcon_mode_mc4pluspmc != servcfg->type)
+    else if(eo_motcon_mode_mc4pluspmc == servcfg->type)
     {
         // we shall always use this jomodescriptors in the form of a EOconstarray. it is a pointer to the actual data inside p->service.servconfig
         p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4pluspmc.arrayof7jomodescriptors);

@@ -525,7 +525,8 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
     // in par64 = [N15|N14|N13|N12|N11|N10|N09|N08|N07|N06|N05|N04|N03|N02|N01|N00] i put:
     // in nibbles N00-N03 i put error codes of primary
     // in nibbles N04-N07 i put error codes of secondary
-    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 = 0;    
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 = 0;  
+    #warning se abbiamo s_eo_theencoderreader.numofjomos = 7 allora non possiamo usare un i che vada oltre 3 ... verificare       
     for(uint8_t i=0; i<s_eo_theencoderreader.numofjomos; i++)
     {
         uint64_t value = 0;
