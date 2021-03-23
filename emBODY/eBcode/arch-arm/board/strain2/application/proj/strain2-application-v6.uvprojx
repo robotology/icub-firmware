@@ -401,22 +401,22 @@
             <File>
               <FileName>adc2ft.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\MBDcode\adc2ft.cpp</FilePath>
+              <FilePath>..\src\adc2ft.cpp</FilePath>
             </File>
             <File>
               <FileName>adc2ft.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\MBDcode\adc2ft.h</FilePath>
+              <FilePath>..\src\adc2ft.h</FilePath>
             </File>
             <File>
               <FileName>adc2ft_data.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\MBDcode\adc2ft_data.cpp</FilePath>
+              <FilePath>..\src\adc2ft_data.cpp</FilePath>
             </File>
             <File>
               <FileName>rtwtypes.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\MBDcode\rtwtypes.h</FilePath>
+              <FilePath>..\src\rtwtypes.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1280,22 +1280,22 @@
             <File>
               <FileName>adc2ft.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\MBDcode\adc2ft.cpp</FilePath>
+              <FilePath>..\src\adc2ft.cpp</FilePath>
             </File>
             <File>
               <FileName>adc2ft.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\MBDcode\adc2ft.h</FilePath>
+              <FilePath>..\src\adc2ft.h</FilePath>
             </File>
             <File>
               <FileName>adc2ft_data.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\MBDcode\adc2ft_data.cpp</FilePath>
+              <FilePath>..\src\adc2ft_data.cpp</FilePath>
             </File>
             <File>
               <FileName>rtwtypes.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\MBDcode\rtwtypes.h</FilePath>
+              <FilePath>..\src\rtwtypes.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2159,22 +2159,22 @@
             <File>
               <FileName>adc2ft.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\MBDcode\adc2ft.cpp</FilePath>
+              <FilePath>..\src\adc2ft.cpp</FilePath>
             </File>
             <File>
               <FileName>adc2ft.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\MBDcode\adc2ft.h</FilePath>
+              <FilePath>..\src\adc2ft.h</FilePath>
             </File>
             <File>
               <FileName>adc2ft_data.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\MBDcode\adc2ft_data.cpp</FilePath>
+              <FilePath>..\src\adc2ft_data.cpp</FilePath>
             </File>
             <File>
               <FileName>rtwtypes.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\MBDcode\rtwtypes.h</FilePath>
+              <FilePath>..\src\rtwtypes.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3076,22 +3076,22 @@
             <File>
               <FileName>adc2ft.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\MBDcode\adc2ft.cpp</FilePath>
+              <FilePath>..\src\adc2ft.cpp</FilePath>
             </File>
             <File>
               <FileName>adc2ft.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\MBDcode\adc2ft.h</FilePath>
+              <FilePath>..\src\adc2ft.h</FilePath>
             </File>
             <File>
               <FileName>adc2ft_data.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\MBDcode\adc2ft_data.cpp</FilePath>
+              <FilePath>..\src\adc2ft_data.cpp</FilePath>
             </File>
             <File>
               <FileName>rtwtypes.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\MBDcode\rtwtypes.h</FilePath>
+              <FilePath>..\src\rtwtypes.h</FilePath>
             </File>
           </Files>
         </Group>

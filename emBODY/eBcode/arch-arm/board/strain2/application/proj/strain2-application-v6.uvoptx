@@ -1241,7 +1241,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\MBDcode\adc2ft.cpp</PathWithFileName>
+      <PathWithFileName>..\src\adc2ft.cpp</PathWithFileName>
       <FilenameWithoutPath>adc2ft.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1253,7 +1253,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\MBDcode\adc2ft.h</PathWithFileName>
+      <PathWithFileName>..\src\adc2ft.h</PathWithFileName>
       <FilenameWithoutPath>adc2ft.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1265,7 +1265,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\MBDcode\adc2ft_data.cpp</PathWithFileName>
+      <PathWithFileName>..\src\adc2ft_data.cpp</PathWithFileName>
       <FilenameWithoutPath>adc2ft_data.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1277,7 +1277,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\MBDcode\rtwtypes.h</PathWithFileName>
+      <PathWithFileName>..\src\rtwtypes.h</PathWithFileName>
       <FilenameWithoutPath>rtwtypes.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

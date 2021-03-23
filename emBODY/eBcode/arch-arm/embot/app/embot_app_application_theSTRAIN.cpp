@@ -1401,13 +1401,14 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     if(false == runtimedata.data.adcsaturation)
     {
 			for(size_t index=0;index<6;++index)	
+			{
 				adc2ft.rtU.adc[index] = runtimedata.data.adcvalue[index];
-
-				adc2ft.step();
+			}
+			adc2ft.step();
 			
-				runtimedata.data.force.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[0]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[1]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[2]));
-   			runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[3]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[4]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[5]));
-    }
+			runtimedata.data.force.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[0]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[1]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[2]));
+			runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[3]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[4]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[5]));
+		}
     else
     {
         // we dont update so that in runtimedata.data.torque and runtimedata.data.force there are always valid values
