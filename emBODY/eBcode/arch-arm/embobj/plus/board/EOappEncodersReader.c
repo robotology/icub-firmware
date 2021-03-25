@@ -277,12 +277,15 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arra
     // 1. prepare the config
     p->config.numofjomos = eo_constarray_Size(carray);
         
-    #warning attenzione. si fa il loop su eOappEncReader_jomos_maxnumberof o su 4 o su eo_constarray_Size(carray) ?? controllo su jomodes != NULL forse.
-    for(uint8_t i=0; i<eOappEncReader_jomos_maxnumberof; i++)
+
+    for(uint8_t i=0; i<p->config.numofjomos; i++)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
-        p->config.jomoconfig[i].encoder1des = jomodes->encoder1;
-        p->config.jomoconfig[i].encoder2des = jomodes->encoder2;
+        if(NULL != jomodes)
+        {
+            p->config.jomoconfig[i].encoder1des = jomodes->encoder1;
+            p->config.jomoconfig[i].encoder2des = jomodes->encoder2;
+        }
     }
 
     
@@ -1247,7 +1250,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
 {    
     uint8_t i = 0;
     
-    for(i=0; i< eOappEncReader_jomos_maxnumberof; i++)
+    for(i=0; i<p->config.numofjomos; i++)
     {
         eOappEncReader_jomoconfig_t* jmcfg = &p->config.jomoconfig[i];
         
@@ -1255,8 +1258,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
         {  
             hal_quadencoder_init((hal_quadencoder_t)jmcfg->encoder1des.port);            
         }
-
-        
+       
         if(jmcfg->encoder2des.type == eomc_enc_qenc)
         { 
             hal_quadencoder_init((hal_quadencoder_t)jmcfg->encoder2des.port);           
@@ -1297,7 +1299,7 @@ static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, ui
 
 static uint32_t s_eo_appEncReader_psc_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw)
 {
-    #warning currently we don't use the encoder factor for psc
+    //#warning currently we don't use the encoder factor for psc
     //currently the user can't configure the conversion factor of psc.
     //The psc boards send dec degree value in int16
     
