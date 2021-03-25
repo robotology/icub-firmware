@@ -98,9 +98,9 @@ static void s_services_test_mc_stop(void *par);
 
 
 
-static void s_services_test_inertials_init(void);
-static void s_services_test_inertials_multiplesteps(void *arg);
-static void s_services_test_inertials_stop(void *par);
+//static void s_services_test_inertials_init();
+//static void s_services_test_inertials_multiplesteps(void *arg);
+//static void s_services_test_inertials_stop(void *par);
 
 
 static void s_services_test_pos_init(void);
@@ -222,10 +222,10 @@ static void s_eo_services_test_initialise(void)
             s_services_test_mc_init();             
         } break;
         
-        case eomn_serv_category_inertials:
-        {
-            s_services_test_inertials_init();            
-        } break;
+//        case eomn_serv_category_inertials:
+//        {
+//            s_services_test_inertials_init();            
+//        } break;
 
         case eomn_serv_category_pos:
         {
@@ -288,8 +288,230 @@ static void s_services_test_stop_everything(void *arg)
 // motion control ....
 
 
-// eo_motcon_mode_mc4plusfaps
+//eo_motcon_mode_mc4pluspmc
+static const eOmn_serv_configuration_t s_serv_config_mc_mc4pluspmc =
+{   
+    .type       = eomn_serv_MC_mc4pluspmc,
+    .filler     = {0},
+    .data.mc.mc4pluspmc = 
+    {
+        .pos   =
+        {
+            .version = 
+            {
+                .firmware = 
+                {
+                    .major = 0, .minor = 0, .build = 0
+                },
+                .protocol = 
+                {
+                    .major = 0, .minor = 0
+                }
+            },
+            .boardInfo = 
+            {
+                .canloc = 
+                {
+                    { 
+                        .port = eOcanport1, 
+                        .addr = 1, 
+                        .insideindex = eobrd_caninsideindex_none
+                    }        
+                }
+            }        
+            
+        },
+        .filler                 = {0},
+        .arrayof7jomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 7,
+                .itemsize       = sizeof(eOmc_jomo_descriptor_t),
+                .size           = 7,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0
+                    .actuator.pwm    =
+                    {
+                        .port           = eobrd_port_mc4plusP2,
+                        .dummy          = 0                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_pos,
+                        .port   = eobrd_portpos_hand_thumb,  
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },
+                { // joint 1
+                    .actuator.pwm    =
+                    {
+                        .port           = eobrd_port_mc4plusP3,
+                        .dummy          = 0                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_pos,
+                        .port   = eobrd_portpos_hand_index, 
+                        .pos    = eomc_pos_atjoint                            
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },                    
+                { // joint 2
+                    .actuator.pwm    =
+                    {
+                        .port           = eobrd_port_mc4plusP4,
+                        .dummy          = 0                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_pos,
+                        .port   = eobrd_portpos_hand_medium,  
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },               
+                { // joint 3
+                    .actuator.pwm    =
+                    {
+                        .port           = eobrd_port_mc4plusP5,
+                        .dummy          = 0                             
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_pos,
+                        .port   = eobrd_portpos_hand_pinky,    
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },
+                { // joint 4
+                    .actuator.pmc    =
+                    {
+                        .canloc = 
+                        {
+                            .port = eOcanport1, 
+                            .addr = 1, 
+                            .insideindex = eobrd_caninsideindex_none  
+                        }                      
+                    },                       
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_pos,
+                        .port   = eobrd_portpos_hand_thumbmetacarpus,  
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },
+                { // joint 5
+                    .actuator.pmc    =
+                    {
+                        .canloc = 
+                        {
+                            .port = eOcanport1, 
+                            .addr = 1, 
+                            .insideindex = eobrd_caninsideindex_none  
+                        }                      
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_pos,
+                        .port   = eobrd_portpos_hand_thumbrotation,  
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                },
+                { // joint 6
+                    .actuator.pmc    =
+                    {
+                        .canloc = 
+                        {
+                            .port = eOcanport1, 
+                            .addr = 1, 
+                            .insideindex = eobrd_caninsideindex_none  
+                        }                      
+                    },
+                    .encoder1         =
+                    {
+                        .type   = eomc_enc_pos,
+                        .port   = eobrd_portpos_hand_indexadduction,  
+                        .pos    = eomc_pos_atjoint
+                    },
+                    .encoder2    =
+                    {
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
+                    }
+                }                      
+            }   
+        }, 
+        .dummy = 0,        
+        .arrayof7jointsets = 
+        {
+            .head   = 
+            {
+                .capacity       = 7,
+                .itemsize       = sizeof(eOmc_jointset_configuration_t),
+                .size           = 7,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // 0                    
+                },
+                { // 1
+                }, 
+                { // 2
+                },
+                { // 3
+                },  
+                { // 4
+                },
+                { // 5
+                }, 
+                { // 7
+                }                 
+            }           
+        }
+    }
+};
 
+// eo_motcon_mode_mc4plusfaps
 static const eOmn_serv_configuration_t s_serv_config_mc_mc4plusfaps =
 {   
     .type       = eomn_serv_MC_mc4plusfaps,
@@ -316,8 +538,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_mc4plusfaps =
                     { 
                         .port = eOcanport1, 
                         .addr = 1, 
-                        .insideindex = eobrd_caninsideindex_none, 
-                        .dummy = 0 
+                        .insideindex = eobrd_caninsideindex_none
                     }        
                 }
             }        
@@ -962,8 +1183,10 @@ static void s_services_test_mc_init(void)
     //s_test_config_ko = &s_serv_config_mc_eb1_fake_inc;
     //s_test_config_ok = &s_serv_config_mc_eb1_eb3_zeroprotocol; 
      
-    s_test_config_ko = &s_serv_config_mc_mc4plusfaps;
-    s_test_config_ok = &s_serv_config_mc_mc4plusfaps;      
+//    s_test_config_ko = &s_serv_config_mc_mc4plusfaps;
+//    s_test_config_ok = &s_serv_config_mc_mc4plusfaps;     
+    s_test_config_ko = &s_serv_config_mc_mc4pluspmc;
+    s_test_config_ok = &s_serv_config_mc_mc4pluspmc;
     s_service_tick = s_services_test_mc_multiplesteps;    
 }
 
@@ -1090,8 +1313,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_pos =
                 { 
                     .port = eOcanport1, 
                     .addr = 1, 
-                    .insideindex = eobrd_caninsideindex_none, 
-                    .dummy = 0 
+                    .insideindex = eobrd_caninsideindex_none
                 }        
             }
         }        
@@ -1202,6 +1424,4 @@ static void s_services_test_pos_stop(void *par)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
 

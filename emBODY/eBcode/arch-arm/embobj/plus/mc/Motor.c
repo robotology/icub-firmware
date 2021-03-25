@@ -31,6 +31,14 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+// -- here is new code for the pmc board
+
+static void Motor_stop_PMC(Motor *o);
+static void Motor_config_PMC(Motor* o, eOmc_motor_config_t* config);
+static void Motor_set_control_mode_PMC(Motor *o, icubCanProto_controlmode_t control_mode);
+void Motor_config_encoder_PMC(Motor* o, int32_t resolution);
+
+static void pmc_motor_disable(eObrd_canlocation_t canloc);
 
 /////////////////////////////////////////////////////////
 // Motor
@@ -324,7 +332,23 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
 
         o->control_mode = icubCanProto_controlmode_idle;
         hal_motor_disable((hal_motor_t)o->actuatorPort);
-    }    
+    } 
+    else if (o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        // marco.accame on 08 jan 2021.
+        // this motor is on the pmc board. so far i treat it as if it were on the 2foc
+        Motor_config_PMC(o, config);
+        
+        // marco.accame on 08 jan 2021. so far i dont use teh watchdog, hence ...
+        // i just do what Motor_new_state_req(o, icubCanProto_controlmode_idle); does but w/out watchdog
+        o->control_mode = icubCanProto_controlmode_idle;
+        
+        // WatchDog_set_base_time_msec(&o->can_2FOC_alive_wdog, CAN_ALIVE_TIMEOUT);
+        // WatchDog_rearm(&o->can_2FOC_alive_wdog);    
+        // WatchDog_set_base_time_msec(&o->control_mode_req_wdog, CTRL_REQ_TIMEOUT);        
+        //Motor_new_state_req(o, icubCanProto_controlmode_idle);
+
+    }     
 }
 
 void Motor_config_encoder(Motor* o, int32_t resolution)
@@ -343,6 +367,13 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
         cmdMotorConfig.value = o->can_motor_config;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);  
     }
+    else if(o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        // nothing so far
+        // TODO: eo_canserv_SendCommandToEntity() must be configured to send messages to the specific board
+        // also: define a new message for pmc. because it has three joints and not two.
+        Motor_config_encoder_PMC(o, resolution);
+    }
 }
 
 void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params)
@@ -352,6 +383,11 @@ void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_p
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
         Motor_config_max_currents_2FOC(o, current_params);
+    }
+    else if(o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        //Motor_config_currents_PMC(o, current_params);
+        // nothing so far
     }
 }
 
@@ -404,6 +440,10 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
     
     if(o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
+        o->not_calibrated = FALSE;
+    }
+    else if(o->HARDWARE_TYPE == HARDWARE_PMC)
+    {   
         o->not_calibrated = FALSE;
     }
 }
@@ -550,6 +590,13 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
 
         o->control_mode = control_mode;
     }
+    else if (o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        Motor_set_control_mode_PMC(o, control_mode);
+        o->control_mode = control_mode;
+        // so far we dont manage any watchdog
+        // Motor_new_state_req(o, control_mode);
+    }
     else
     {
         return FALSE;
@@ -586,6 +633,15 @@ void Motor_set_idle(Motor* o) //
             o->control_mode = icubCanProto_controlmode_idle;
         }
     }
+    else if (o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        Motor_set_control_mode_PMC(o, icubCanProto_controlmode_idle);
+        if (o->control_mode != icubCanProto_controlmode_hwFault)
+        {
+            o->control_mode = icubCanProto_controlmode_idle;
+        }
+        //Motor_new_state_req(o, icubCanProto_controlmode_idle);
+    }
 }
 
 void Motor_force_idle(Motor* o) //
@@ -600,6 +656,11 @@ void Motor_force_idle(Motor* o) //
     {
         hal_motor_disable((hal_motor_t)o->actuatorPort);
         
+        o->control_mode = icubCanProto_controlmode_idle;
+    }
+    else if (o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        Motor_set_control_mode_PMC(o, icubCanProto_controlmode_forceIdle);
         o->control_mode = icubCanProto_controlmode_idle;
     }
     
@@ -650,6 +711,11 @@ BOOL Motor_check_faults(Motor* o) //
     
     if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
+        o->fault_state.bits.ExternalFaultAsserted = hal_motor_externalfaulted();
+    }
+    else if(o->HARDWARE_TYPE == HARDWARE_PMC)
+    {   
+        // we retrieve the external fault from the mc4plus
         o->fault_state.bits.ExternalFaultAsserted = hal_motor_externalfaulted();
     }
     
@@ -731,6 +797,10 @@ BOOL Motor_check_faults(Motor* o) //
     {
         hal_motor_disable((hal_motor_t)o->actuatorPort);
     }
+    else if (o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        pmc_motor_disable(o->canloc);
+    }
 
     // DIAGNOSTICS MESSAGES
     
@@ -797,8 +867,8 @@ BOOL Motor_check_faults(Motor* o) //
 
             fault_state.bits.EncoderFault = FALSE;
         }
-				
-
+            
+    
         if (can_dead && !o->can_dead)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_can_no_answer, 0);
@@ -901,16 +971,23 @@ void Motor_update_state_fbk(Motor* o, void* state) //
     */
 }
 
-void Motor_actuate(Motor* motor, uint8_t N) //
+void Motor_actuate(MC_ACTUATION_t act, Motor* motor, uint8_t N) //
 {
-    if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
+    if(act == ACT_TYPE_MC4pPMC)
     {
-        int16_t output[MAX_JOINTS_PER_BOARD];
-    
-        for (int m=0; m<N; ++m)
+        // first 4 motors are local and are managed by mc4plus board
+        for (int m=0; m<4; ++m)
         {
-            output[motor[m].actuatorPort] = motor[m].output;
-            //output[m] = motor[m].output;
+            motor[m].pwm_fbk = motor[m].output;
+            hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
+        }
+        // last 3 motors are on pmc and are managed by can messages
+        // so far i use the ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
+        int16_t output[3];
+    
+        for (int m=0; m<3; ++m)
+        {
+            output[m] = motor[m+4].output;
         }
     
         eOcanprot_command_t command = {0};
@@ -920,18 +997,44 @@ void Motor_actuate(Motor* motor, uint8_t N) //
     
         eObrd_canlocation_t location = {0};
         location.port = eOcanport1;
-        location.addr = 0;
+        location.addr = 0xf;
         location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
 
         // and i send the command
-        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location); 
+        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location);         
     }
-    else if (motor->HARDWARE_TYPE == HARDWARE_MC4p)
+    else
     {
-        for (int m=0; m<N; ++m)
+        if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
         {
-            motor[m].pwm_fbk = motor[m].output;
-            hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
+            int16_t output[MAX_JOINTS_PER_BOARD];
+        
+            for (int m=0; m<N; ++m)
+            {
+                output[motor[m].actuatorPort] = motor[m].output;
+                //output[m] = motor[m].output;
+            }
+        
+            eOcanprot_command_t command = {0};
+            command.clas = eocanprot_msgclass_periodicMotorControl;    
+            command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
+            command.value = output;
+        
+            eObrd_canlocation_t location = {0};
+            location.port = eOcanport1;
+            location.addr = 0;
+            location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
+
+            // and i send the command
+            eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location); 
+        }
+        else if (motor->HARDWARE_TYPE == HARDWARE_MC4p)
+        {
+            for (int m=0; m<N; ++m)
+            {
+                motor[m].pwm_fbk = motor[m].output;
+                hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
+            }
         }
     }
 }  
@@ -1137,7 +1240,10 @@ int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit)
     {
         if (pwm_limit > 3360) pwm_limit = 3360; 
     }
-    
+    else if (o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        if (pwm_limit > 3360) pwm_limit = 3360; 
+    }    
     o->pwm_max = pwm_limit;
     
     return o->pwm_max;
@@ -1153,7 +1259,10 @@ BOOL Motor_is_external_fault(Motor* o)
     {
         return hal_motor_externalfaulted();
     }
-    
+    else if (o->HARDWARE_TYPE == HARDWARE_PMC)
+    {
+        return FALSE;
+    }    
     return FALSE;
 }
 
@@ -1206,5 +1315,98 @@ void Motor_reset(Motor *o)
 
     //o->control_mode = ???
     //o->control_mode_req;
+}
+
+// - here is the new code for the pmc board
+
+static void Motor_stop_PMC(Motor *o)
+{
+    pmc_motor_disable(o->canloc);
+}
+
+static void Motor_config_PMC(Motor* o, eOmc_motor_config_t* config)
+{  
+#if 1
+    // marco.accame on 08 jan 2021: so far, we dont configure the motors on the pmc. we just stop them moving
+    Motor_stop_PMC(o);
+#else   
+    #error marco.accame: add code for motor config
+    static const uint16_t pmc_HAS_QE        = 0x0001;
+    static const uint16_t pmc_HAS_HALL      = 0x0002;
+    static const uint16_t pmc_HAS_TSENS     = 0x0004;
+    static const uint16_t pmc_USE_INDEX     = 0x0008;
+    static const uint16_t pmc_HAS_SPEED_QE  = 0x0010;
+    static const uint16_t pmc_ENA_VERBOSE   = 0x0020;
+    
+    o->can_motor_config[0] = 0;
+    
+    if (config->hasRotorEncoder)        o->can_motor_config[0] |= pmc_HAS_QE;
+    if (config->hasHallSensor)          o->can_motor_config[0] |= pmc_HAS_HALL;
+    if (config->hasRotorEncoderIndex)   o->can_motor_config[0] |= pmc_USE_INDEX;
+    if (config->hasTempSensor)          o->can_motor_config[0] |= pmc_HAS_TSENS;
+    if (config->hasSpeedEncoder)        o->can_motor_config[0] |= pmc_HAS_SPEED_QE;
+    if (config->verbose)                o->can_motor_config[0] |= pmc_ENA_VERBOSE;
+    
+    *(int16_t*)(o->can_motor_config+1) = config->rotorEncoderResolution;
+    *(int16_t*)(o->can_motor_config+3) = config->rotorIndexOffset;
+    
+    o->can_motor_config[5] = config->motorPoles;
+    
+    o->can_motor_config[6] = (int)(o->enc_tolerance*10.0f);
+
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
+    
+    Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
+    Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
+        
+    eOcanprot_command_t cmdMaxCurrent;
+    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+    cmdMaxCurrent.value = &(config->currentLimits);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
+
+    eOcanprot_command_t cmdMotorConfig;
+    cmdMotorConfig.clas = eocanprot_msgclass_pollingMotorControl;
+    cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
+    cmdMotorConfig.value = o->can_motor_config;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);
+#endif    
+}
+
+static void Motor_set_control_mode_PMC(Motor *o, icubCanProto_controlmode_t control_mode)
+{
+#if 1
+    if((control_mode == icubCanProto_controlmode_idle) || 
+       (control_mode == icubCanProto_controlmode_forceIdle) ||
+       (control_mode == icubCanProto_controlmode_hwFault)
+      )
+    {
+        Motor_stop_PMC(o);
+        #warning add a proper message, but maybe not
+    }
+    else
+    {
+        #warning add a proper message, but maybe not
+    }
+    // which contains [mskofmotors][ctrl0][ctrl1][ctrl2][ctrl3]
+#else
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
+    eOcanprot_command_t command = {0};
+    command.clas = eocanprot_msgclass_pollingMotorControl;
+    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
+    command.value = &control_mode;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+#endif
+}
+
+static void pmc_motor_disable(eObrd_canlocation_t canloc)
+{
+    #warning add a proper message which sends the velocity = 0
+    #warning maybe in the pmc we should put a timeout for the velocity control
+}
+
+void Motor_config_encoder_PMC(Motor* o, int32_t resolution)
+{
+    // so far nothing ??
 }
 
