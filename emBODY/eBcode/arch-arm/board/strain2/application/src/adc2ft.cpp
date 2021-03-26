@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'adc2ft'.
 //
-// Model version                  : 2.32
+// Model version                  : 2.35
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Mar 22 12:06:40 2021
+// C/C++ source code generated on : Fri Mar 26 15:38:30 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -75,8 +75,19 @@ namespace adc2ft_ns
   {
     int32_T i;
     int32_T i_0;
-    real32_T tmp[6];
-    real32_T tmp_0;
+    real32_T tmp[36];
+    real32_T tmp_0[6];
+    real32_T tmp_1;
+
+    // Product: '<Root>/Divide1' incorporates:
+    //   Constant: '<Root>/Constant2'
+    //   Constant: '<Root>/Constant3'
+
+    for (i = 0; i < 36; i++) {
+      tmp[i] = static_cast<real32_T>(rtP.calibration_matrix[i]) / 32768.0F;
+    }
+
+    // End of Product: '<Root>/Divide1'
 
     // Product: '<Root>/Divide' incorporates:
     //   Constant: '<Root>/Constant'
@@ -87,26 +98,23 @@ namespace adc2ft_ns
     //   Sum: '<Root>/Sum1'
 
     for (i = 0; i < 6; i++) {
-      tmp[i] = static_cast<real32_T>(rtU.adc[i] - static_cast<uint16_T>
+      tmp_0[i] = static_cast<real32_T>(rtU.adc[i] - static_cast<uint16_T>
         (rtP.calibration_offsets[i] + 32768U)) / 32768.0F;
     }
 
     // End of Product: '<Root>/Divide'
 
     // Outport: '<Root>/ft_q15' incorporates:
-    //   Constant: '<Root>/Constant2'
     //   DataTypeConversion: '<Root>/Data Type Conversion1'
-    //   DataTypeConversion: '<Root>/Data Type Conversion3'
     //   Product: '<Root>/Product'
 
     for (i = 0; i < 6; i++) {
-      tmp_0 = 0.0F;
+      tmp_1 = 0.0F;
       for (i_0 = 0; i_0 < 6; i_0++) {
-        tmp_0 += static_cast<real32_T>(rtP.calibration_matrix[6 * i_0 + i]) *
-          tmp[i_0];
+        tmp_1 += tmp[6 * i_0 + i] * tmp_0[i_0];
       }
 
-      rtY.ft_q15[i] = static_cast<int16_T>(std::floor(tmp_0 * 32768.0F));
+      rtY.ft_q15[i] = static_cast<int16_T>(std::floor(tmp_1 * 32768.0F));
     }
 
     // End of Outport: '<Root>/ft_q15'
