@@ -403,6 +403,7 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/stm32h745disco/v190/inc/gpio.h"
         #include "../src/board/stm32h745disco/v190/inc/main.h"
+        #include "../src/board/stm32h745disco/v190/inc/eth.h"
 
         #include "../src/board/stm32h745disco/v190/inc/stm32h7xx_it.h"
 

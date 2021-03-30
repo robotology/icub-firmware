@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -123,7 +123,7 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef* ethHandle)
     PC5     ------> ETH_RXD1
     PB0     ------> ETH_RXD2
     */
-    GPIO_InitStruct.Pin = MII_TX_EN_Pin|MII_TXD1_Pin|MII_TXD0_Pin;
+    GPIO_InitStruct.Pin = MII_TX_EN_Pin|GPIO_PIN_12|GPIO_PIN_13;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -137,12 +137,12 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef* ethHandle)
     GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
     HAL_GPIO_Init(MII_TXD3_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = MII_RX_ER_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-    HAL_GPIO_Init(MII_RX_ER_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = MII_MDC_Pin|MII_TXD2_Pin|MII_TX_CLK_Pin|MII_RXD0_Pin
                           |MII_RXD1_Pin;
@@ -152,7 +152,7 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef* ethHandle)
     GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = MII_CRS_Pin|MII_COL_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -173,6 +173,9 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef* ethHandle)
     GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+    /* ETH interrupt Init */
+    HAL_NVIC_SetPriority(ETH_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(ETH_IRQn);
   /* USER CODE BEGIN ETH_MspInit 1 */
 
   /* USER CODE END ETH_MspInit 1 */
@@ -211,21 +214,23 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* ethHandle)
     PC5     ------> ETH_RXD1
     PB0     ------> ETH_RXD2
     */
-    HAL_GPIO_DeInit(GPIOG, MII_TX_EN_Pin|MII_TXD1_Pin|MII_TXD0_Pin);
+    HAL_GPIO_DeInit(GPIOG, MII_TX_EN_Pin|GPIO_PIN_12|GPIO_PIN_13);
 
     HAL_GPIO_DeInit(MII_TXD3_GPIO_Port, MII_TXD3_Pin);
 
-    HAL_GPIO_DeInit(MII_RX_ER_GPIO_Port, MII_RX_ER_Pin);
+    HAL_GPIO_DeInit(GPIOI, GPIO_PIN_10);
 
     HAL_GPIO_DeInit(GPIOC, MII_MDC_Pin|MII_TXD2_Pin|MII_TX_CLK_Pin|MII_RXD0_Pin
                           |MII_RXD1_Pin);
 
-    HAL_GPIO_DeInit(GPIOH, MII_CRS_Pin|MII_COL_Pin);
+    HAL_GPIO_DeInit(GPIOH, GPIO_PIN_2|GPIO_PIN_3);
 
     HAL_GPIO_DeInit(GPIOA, MII_MDIO_Pin|MII_RX_CLK_Pin|MII_RX_DV_Pin);
 
     HAL_GPIO_DeInit(GPIOB, MII_RXD3_Pin|MII_RXD2_Pin);
 
+    /* ETH interrupt Deinit */
+    HAL_NVIC_DisableIRQ(ETH_IRQn);
   /* USER CODE BEGIN ETH_MspDeInit 1 */
 
   /* USER CODE END ETH_MspDeInit 1 */

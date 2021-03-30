@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -19,16 +19,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "eth.h"
-#include "fdcan.h"
-#include "ltdc.h"
-#include "quadspi.h"
-#include "sai.h"
-#include "sdmmc.h"
-#include "usart.h"
-#include "usb_otg.h"
-#include "gpio.h"
-#include "fmc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -106,17 +96,6 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_ETH_Init();
-  MX_FDCAN1_Init();
-  MX_FDCAN2_Init();
-  MX_FMC_Init();
-  MX_LTDC_Init();
-  MX_QUADSPI_Init();
-  MX_SAI2_Init();
-  MX_SDMMC1_MMC_Init();
-  MX_USART3_UART_Init();
-  MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
