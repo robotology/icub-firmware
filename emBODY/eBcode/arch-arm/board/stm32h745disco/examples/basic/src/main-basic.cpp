@@ -48,10 +48,17 @@ int main(void)
 static volatile uint64_t s_1mstickcount = 0; // it must be volatile
 constexpr uint32_t s_rate1khz = 1000;
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 void SysTick_Handler(void)
 {
     s_1mstickcount++;
 }
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 static void stm32hal_tick1msecinit()
 {
