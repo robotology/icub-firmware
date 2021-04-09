@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.35
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Fri Mar 26 15:38:30 2021
+// C/C++ source code generated on : Fri Apr  9 11:28:08 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,8 +22,8 @@
 #define RTW_HEADER_adc2ft_h_
 #include <cmath>
 #include "rtwtypes.h"
-#include "rtw_continuous.h"
-#include "rtw_solver.h"
+//#include "rtw_continuous.h"
+//#include "rtw_solver.h"
 
 // Model Code Variants
 
@@ -57,7 +57,7 @@ namespace adc2ft_ns
       int16_T calibration_matrix[36];  // Variable: A
                                           //  Referenced by: '<Root>/Constant2'
 
-      uint16_T calibration_offsets[6]; // Variable: offsets
+      int16_T calibration_offsets[6];  // Variable: offsets
                                           //  Referenced by: '<Root>/Constant1'
 
     };
@@ -97,12 +97,6 @@ namespace adc2ft_ns
     RT_MODEL rtM;
   };
 }
-
-//-
-//  These blocks were eliminated from the model due to optimizations:
-//
-//  Block '<Root>/Divide2' : Unused code path elimination
-
 
 //-
 //  The generated code includes comments that allow you to trace directly
