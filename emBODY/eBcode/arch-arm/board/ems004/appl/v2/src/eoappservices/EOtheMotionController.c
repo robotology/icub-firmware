@@ -1203,7 +1203,6 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         // marco.accame: maybe it is better to move it inside eo_appEncReader_Activate()
         s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt();
         
-        #warning VERIFY i suspect that in here we do multiple mallocs
         eo_currents_watchdog_Initialise();
         
         p->service.active = eobool_true;
@@ -1305,7 +1304,6 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         // marco.accame: maybe it is better to move it inside eo_appEncReader_Activate()
         s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt();
         
-        #warning VERIFY i suspect that in here we do multiple mallocs
         eo_currents_watchdog_Initialise();
         
         p->service.active = eobool_true;
