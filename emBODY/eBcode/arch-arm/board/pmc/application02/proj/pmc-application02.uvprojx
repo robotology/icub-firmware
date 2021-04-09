@@ -336,7 +336,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DUSE_thePOSreader2_qe -DUSE_PZMdriver -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal </MiscControls>
+              <MiscControls>-DEMBOT_HW_BSP_PMC_emulates_SNSR_PZM -DUSE_thePOSreader2_qe -DUSE_PZMdriver -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal </MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_PMC STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask-;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core-;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\..\..\stm32g4eval\application02\src;..\..\drivers\encoder;..\..\drivers\piezo;..\..\drivers\piezo\tables\generated</IncludePath>

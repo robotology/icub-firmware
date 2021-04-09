@@ -43,11 +43,15 @@
 
 #include "embot_os_theScheduler.h"
 
-//#undef USE_PZMdriver
-
 #if defined(USE_PZMdriver) 
 #include "piezo.h"
 #include "tables.h"
+#endif
+
+#include "embot_hw_bsp_pmc_config.h"
+
+#if defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)
+    #warning EMBOT_ENABLE_hw_pzm_emulatedMODE is defined, the thePZMdriver will use a fake PZM driver 
 #endif
 
 
@@ -261,20 +265,20 @@ bool embot::app::application::thePZMdriver::process(embot::os::EventMask evtmask
         {          
             piezoSetStepFrequency(static_cast<piezoMotor_t>(i), vels[i]);            
         }
-        embot::core::print(std::string("@ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + ": PZ = " + std::to_string(vels[0]) + " " +  std::to_string(vels[1]) + " " + std::to_string(vels[2]));       
+//        embot::core::print(std::string("@ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + ": PZ = " + std::to_string(vels[0]) + " " +  std::to_string(vels[1]) + " " + std::to_string(vels[2]));       
 
         for(int i=0; i<pImpl->_PZMstate.size(); i++)
         { 
             piezoGetState(static_cast<piezoMotor_t>(i), &pImpl->_PZMstate[i]);   
         } 
-        embot::core::print(std::string("@ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + ": PZM status = " + std::to_string(pImpl->_PZMstate[0]) + " " +  std::to_string(pImpl->_PZMstate[1]) + " " + std::to_string(pImpl->_PZMstate[2]));                       
+//        embot::core::print(std::string("@ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + ": PZM status = " + std::to_string(pImpl->_PZMstate[0]) + " " +  std::to_string(pImpl->_PZMstate[1]) + " " + std::to_string(pImpl->_PZMstate[2]));                       
 #else
-        embot::core::print(std::string("@ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + ": PZ = " + std::to_string(vels[0]) + " " +  std::to_string(vels[1]) + " " + std::to_string(vels[2]));
+//        embot::core::print(std::string("@ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + ": PZ = " + std::to_string(vels[0]) + " " +  std::to_string(vels[1]) + " " + std::to_string(vels[2]));
 #endif  
 
         if(starttimer)
         {
-            embot::core::print("started timer");
+//            embot::core::print("started timer");
             pImpl->timerDISABLEsetpoint->start();
         }        
     }

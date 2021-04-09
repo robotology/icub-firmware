@@ -16,6 +16,14 @@
 //#include "leds.h"
 //#include "cmsis_os.h"
 
+// to see EMBOT_ENABLE_hw_pzm_emulatedMODE
+#include "embot_hw_bsp_pmc_config.h"
+
+#if defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)
+    #warning EMBOT_ENABLE_hw_pzm_emulatedMODE is defined, the hw driver of the piezo is disabled  
+#endif
+
+
 #if (USE_HAL_COMP_REGISTER_CALLBACKS != 1)
     #error Flag COMP in menu "Project Manager -> Advanced Settings -> Register CallBack" in CubeMx must be ENABLED
 #endif
@@ -454,6 +462,9 @@ void restore_hack()
  */
 HAL_StatusTypeDef piezoInit(piezoMotorCfg_t *cfgM1, piezoMotorCfg_t *cfgM2, piezoMotorCfg_t *cfgM3)
 {
+#if defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)    
+    return HAL_OK;   
+#else    
     int _shift;
     int i;
     int spi_presc_reg, spi_presc;
@@ -574,6 +585,7 @@ HAL_StatusTypeDef piezoInit(piezoMotorCfg_t *cfgM1, piezoMotorCfg_t *cfgM2, piez
     HAL_SPI_Transmit_DMA(&hspi1,(void *)(dmaBuffer1), sizeof(dmaBuffer1)/(sizeof(uint16_t)));
 
     return HAL_OK;
+#endif    
 }
 
 /*******************************************************************************************************************//**
@@ -587,6 +599,9 @@ HAL_StatusTypeDef piezoInit(piezoMotorCfg_t *cfgM1, piezoMotorCfg_t *cfgM2, piez
  */
 HAL_StatusTypeDef piezoSetStepFrequency(piezoMotor_t motor, int32_t freq)
 {
+#if defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)
+    return HAL_OK;
+#else    
     /* Check arguments */
     HAL_StatusTypeDef result = HAL_ERROR;
     if ((motor < 3u) && (freq >= -PIEZO_MAXFREQ) && (freq <= PIEZO_MAXFREQ) && (piezoFreqConst != 0))
@@ -597,6 +612,7 @@ HAL_StatusTypeDef piezoSetStepFrequency(piezoMotor_t motor, int32_t freq)
         result = HAL_OK;
     }
     return result;
+#endif    
 }
 
 
@@ -725,11 +741,19 @@ HAL_StatusTypeDef piezoGetMode(piezoMotor_t motor, piezoMode_t *mode)
  */
 HAL_StatusTypeDef piezoGetState(piezoMotor_t motor, piezoMotorState_t *state)
 {
+#if defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)
+    if ((motor < 0) || (motor > 2u))
+        return HAL_ERROR;
+
+    *state = STATE_NORMAL;
+    return HAL_OK;
+#else    
     if ((motor < 0) || (motor > 2u))
         return HAL_ERROR;
 
     *state = pStatusTable[motor]->state;
     return HAL_OK;
+#endif    
 }
 
 /*******************************************************************************************************************//**

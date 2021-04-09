@@ -47,8 +47,10 @@
 #define PII 3.14159265
 
 
-
 #if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+
+#warning EMBOT_ENABLE_hw_tlv493d_emulatedMODE is defined, the hw driver of the tlv will give fake values
+
 #include "embot_os_theCallbackManager.h"
 #include "embot_os_Timer.h"
 
@@ -87,15 +89,26 @@ Position emulatedMODE_getposition(TLV493D h)
 }
 #elif defined(SINUSOID)
 
+
 #include <math.h>
 constexpr double pie = 3.14159265;
 
+#define USE_DIFFERENT_SINUSOIDS
+
 Position emulatedMODE_getposition(TLV493D h)
 {
+#if defined(USE_DIFFERENT_SINUSOIDS) 
+    // use different waveforms 
+    static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> min {  500,  500,  500,   500,  500, 500};
+    static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> max { 1500,  2500, 3500, 4500, 5500, 6500};
+    static std::array<uint16_t, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> step {0, 20, 40, 60, 80, 100};         
+#else
+    // use the same waveform for every sensor    
     static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> min {  500,  500,  500,   500,  500, 500};
     static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> max { 8500,  8500, 8500, 8500, 8500, 8500};
     static std::array<uint16_t, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> step {0, 0, 0, 0, 0, 0}; 
-    
+#endif
+
     if(false == supported(h))
     {
         return 0;        
@@ -109,11 +122,10 @@ Position emulatedMODE_getposition(TLV493D h)
         step[embot::core::tointegral(h)] = 0;
     }
     
-    // now i compute teh sine and i move in range [0, 1]
+    // now i compute the sine and i move in range [0, 1]
     double v = (sin(p*pie/180.0) + 1.0) / 2.0;
     
-    // now in p i put the range
-    
+    // now i rescale it in the range [min, max]    
     v = min[embot::core::tointegral(h)] + v*(max[embot::core::tointegral(h)] - min[embot::core::tointegral(h)]);
     
     Position pos = static_cast<Position>(v);
