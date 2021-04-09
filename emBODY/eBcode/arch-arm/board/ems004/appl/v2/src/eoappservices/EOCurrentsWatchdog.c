@@ -161,6 +161,15 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
     // get the number of used motors
     s_eo_currents_watchdog.numberofmotors = eo_entities_NumOfMotors(eo_entities_GetHandle());
     
+    // currents are measured only for the 4 DC motors driven by the mc4plus board.
+    // however, on the mc4plus we may manage 7 logical motors w/ the eo_motcon_mode_mc4pluspmc
+    // hence we need to limit this case to 4 (maxmotors)
+    
+    if(s_eo_currents_watchdog.numberofmotors > maxmotors)
+    {
+        s_eo_currents_watchdog.numberofmotors = maxmotors;
+    }
+    
     if((0 == s_eo_currents_watchdog.numberofmotors) || ( s_eo_currents_watchdog.numberofmotors > maxmotors))
     {
         s_eo_currents_watchdog.numberofmotors = 0;
