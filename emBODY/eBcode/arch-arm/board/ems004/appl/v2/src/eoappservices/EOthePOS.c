@@ -891,7 +891,7 @@ extern eOresult_t eo_pos_AcceptCANframe(EOthePOS *p, eOcanframe_t *frame, eOcanp
     // i get the content of the frame and i fill the status of the pos
    
     EOarray *array = (EOarray*)&p->pos->status.arrayofdata;
-    if(frame->data[0] == icubCanProto_pos_decideg)
+    if((frame->data[0] == icubCanProto_pos_decideg) || (frame->data[0] == icubCanProto_pos_decimillimeter))
     {
         uint8_t firstlabel = frame->data[1] >> 4;
         uint8_t numberofvalues = frame->data[1] & 0xf;
