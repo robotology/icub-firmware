@@ -52,6 +52,20 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_bsp_pmc_config.h"
+
+#if defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+    #warning EMBOT_ENABLE_hw_tlv493d_emulatedMODE is defined, the thePOSreader2 will use fake tlv readings
+#endif
+
+#if defined(EMBOT_ENABLE_hw_qe_emulatedMODE)
+    #warning EMBOT_ENABLE_hw_qe_emulatedMODE is defined, the thePOSreader2 will use fake qe readings
+#endif
+
+#if defined(EMBOT_ENABLE_hw_lr17_emulatedMODE)
+    #warning EMBOT_ENABLE_hw_lr17_emulatedMODE is defined, the thePOSreader2 will use fake lr17 readings 
+#endif
+
 
 // the sensors are tlv and lr17 and qe
 #include "embot_hw_tlv493d.h"
@@ -996,16 +1010,20 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
                    
             // so far i load one value in one packet ...
             
-    #if !defined(EMBOT_POSREADER2_compensatereadings) | defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
-            
+    #if !defined(EMBOT_POSREADER2_compensatereadings) || defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+             
+            #warning we DONT compensate values of tlv and lr17 encoders for a given hand
             // we dont compensate
             int16_t v =  (valueOfPositionACQUISITIONnotvalid == positions[n]) ? +10000 : positions[n]/10;
             std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
             
     #else
             
-            #warning EMBOT_POSREADER2_compensatereadings is defined: we compensate values for a specific hand to be in range [0, 90]
-
+            #warning we compensate values of tlv and lr17 encoders for a specific hand to be in range [0, 90]
+            // this code is tunes for teh first prototype of our hand mk3. 
+            // we should somehow get the calibration parameters from an xml file.
+            // they could be applied in here, so that the pos service uses calibrate values that the yarpscope
+            // show them correctly, or we can apply them to the motion control part (in our case the mc4plus)
             constexpr std::array<int16_t, numberofpositions> offsets = { 218, 92, 148, 165, 0, 0, 0, 0, 0 };
             constexpr int16_t correction = 10;
             constexpr std::array<int16_t, numberofpositions> rotations = { 0, 0, 180, 0, 0, 0, 0, 0, 0 };
@@ -1025,6 +1043,16 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
     //            v = transform(positions[n], embot::core::tointegral(sensor_getPOSlabel(config.sensors[n])));
     //            v *= 10;
             }
+            
+            #warning calibration of thumb metacarpus is to be done here
+            if(config.sensors[n].id == embot::hw::ANY::five)
+            {
+                // its our thumb metacarpus
+                int16_t r = positions[n]/100;
+                int16_t t = r - 72;
+                v = 10 * t;
+            }
+            
             std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
             
     #endif        
@@ -1040,6 +1068,8 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
             msg.get(frame);
             replies.push_back(frame); 
         
+            // in here we manage a wrong measure. in addition to so far we just send a canprint message
+            // and 
             embot::hw::LED led = sensor_to_led(config.sensors[n]);
             if(valueOfPositionACQUISITIONnotvalid == positions[n])
             {
