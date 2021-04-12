@@ -1470,9 +1470,9 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
         command.value = &overloadcurrent;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
         
-        #warning CHECK: we send twice the same can message ..................
-        // but also we need to send the values anyway inside the MController which sends again the
-        // can message but this time with peakCurrent
+        // marco.accame on 12apr2021 CHECK: we send twice the same can message. is it correct?
+        // - in here w/ overloadcurrent. 
+        // - but also inside the MController which sends again the can message w/ peakCurrent
         MController_motor_config_max_currents(mxx, currentLimits);
     }  
     else if(eo_motcon_mode_mc4pluspmc == mcmode)  

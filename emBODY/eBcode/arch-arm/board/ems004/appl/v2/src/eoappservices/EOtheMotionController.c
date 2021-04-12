@@ -462,12 +462,16 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
             onverify(p, eobool_false); 
         }        
         return(eores_NOK_nullpointer);
-    }    
+    }
+
     
     if((eo_motcon_mode_foc != servcfg->type) && (eo_motcon_mode_mc4 != servcfg->type) &&
        (eo_motcon_mode_mc4plus != servcfg->type) && (eo_motcon_mode_mc4plusmais != servcfg->type) &&
-       (eo_motcon_mode_mc2pluspsc != servcfg->type) && (eo_motcon_mode_mc4plusfaps != servcfg->type) &&
-       (eo_motcon_mode_mc4pluspmc != servcfg->type)
+       (eo_motcon_mode_mc2pluspsc != servcfg->type) && (eo_motcon_mode_mc4plusfaps != servcfg->type) 
+#if defined(EOTHESERVICES_customize_handV3_7joints) 
+       // we accept this mode only if we have compiled w/ macro EOTHESERVICES_customize_handV3_7joints w/ extends memory to 7 joints         
+       && (eo_motcon_mode_mc4pluspmc != servcfg->type)
+#endif    
       )
     {
         p->service.state = eomn_serv_state_failureofverify;
@@ -823,8 +827,11 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
     if((eo_motcon_mode_foc != servcfg->type) && (eo_motcon_mode_mc4 != servcfg->type) &&
        (eo_motcon_mode_mc4plus != servcfg->type) && (eo_motcon_mode_mc4plusmais != servcfg->type) &&
-       (eo_motcon_mode_mc2pluspsc != servcfg->type) && (eo_motcon_mode_mc4plusfaps != servcfg->type) &&
-       (eo_motcon_mode_mc4pluspmc != servcfg->type)
+       (eo_motcon_mode_mc2pluspsc != servcfg->type) && (eo_motcon_mode_mc4plusfaps != servcfg->type) 
+#if defined(EOTHESERVICES_customize_handV3_7joints) 
+       // we accept this mode only if we have compiled w/ macro EOTHESERVICES_customize_handV3_7joints w/ extends memory to 7 joints         
+       && (eo_motcon_mode_mc4pluspmc != servcfg->type)
+#endif       
       )
     {
         return(eores_NOK_generic);
@@ -1451,7 +1458,8 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
        (eo_motcon_mode_mc4pluspmc == p->service.servconfig.type)
       )
     {
-        uint8_t numOfPWMs = 4; // p->numofjomos is not always ok because mc4pluspmc has 7 jomos 
+        // p->numofjomos is not always ok because mc4pluspmc has 7 jomos. hence we use the min between hal_motors_number and p->numofjomos
+        uint8_t numOfPWMs = (p->numofjomos <= hal_motors_number) ? (p->numofjomos) : (hal_motors_number);
         for(uint8_t i=0; i<numOfPWMs; i++)
         {
             p->ctrlobjs.currents[i] = hal_adc_get_current_motor_mA(p->ctrlobjs.pwmport[i]);

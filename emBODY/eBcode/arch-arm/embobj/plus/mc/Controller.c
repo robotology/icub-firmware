@@ -198,7 +198,8 @@ void MController_deinit()
 static uint8_t getNumberOfSets(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
 {
     uint8_t n=0;
-    // marco.accame on 08jan2021: it must not be MAX_JOINTS_PER_BOARD because ... if we redefine it to be 7 then we go out of memory
+    // marco.accame on 12 apr 2021: 
+    // this function works with a eOmc_4jomo_coupling_t argument which manages 4 joints. hence we must use 4 and not MAX_JOINTS_PER_BOARD (which could be redefined)
     static const int NJ = 4; 
     for(uint8_t i=0; i<NJ; i++)
     {
@@ -214,7 +215,8 @@ static uint8_t getNumberOfSets(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
 static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo,  EOconstarray* carray)
 {
     MController *o = smc;
-    // marco.accame on 08jan2021: it must not be MAX_JOINTS_PER_BOARD because ... if we redefine it to be 7 then we go out of memory
+    // marco.accame on 12 apr 2021: 
+    // this function works with a eOmc_4jomo_coupling_t argument which manages 4 joints. hence we must use 4 and not MAX_JOINTS_PER_BOARD (which could be redefined)
     static const int NJ = 4; 
     for(uint8_t i=0; i<NJ; i++)
     {
@@ -279,10 +281,13 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo, 
     }
 }
 
+
+#if defined(EOTHESERVICES_customize_handV3_7joints)
+
+// version of updateEntity2SetMaps() for the case of 7 joints
 static void jomo7_updateEntity2SetMaps(EOconstarray* arrayof7jointsets, EOconstarray* arrayof7jomodescriptors)
-{   // const eOmc_4jomo_coupling_t *jomoCouplingInfo, EOconstarray* carray
-    
-    // in here we have ... 7 jointsets, hence each joints i mapped into a different set
+{       
+    // in here we need to manage 7 jointsets. to simplify: each joint is mapped into a different set
     
     MController *o = smc;
     // marco.accame on 08jan2021: it must not be MAX_JOINTS_PER_BOARD because ... if we redefine it to be >7 then we go out of memory
@@ -351,6 +356,7 @@ static void jomo7_updateEntity2SetMaps(EOconstarray* arrayof7jointsets, EOconsta
     }
 }
 
+#endif
 
 static void copyMatrix4X4(float **dst, const eOmc_4x4_matrix_t src)
 {
@@ -580,6 +586,9 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
 }
 
 
+#if defined(EOTHESERVICES_customize_handV3_7joints)
+
+// version of get_jomo_coupling_info() for the case of 7 joints
 static void jomo7_get_jomo_coupling_info(EOconstarray* arrayof7jointsets, EOconstarray* arrayof7jomodescriptors)
 {
 
@@ -652,6 +661,8 @@ static void jomo7_get_jomo_coupling_info(EOconstarray* arrayof7jointsets, EOcons
 //    send_debug_message(message,0,0,0);
     //debug_dump_coupling_data(jomoCouplingInfo);
 }
+
+#endif
 
 
 eOmc_encoder_t MController_getTypeofEncoderAtJoint(const eOmc_jomo_descriptor_t *jomodes)
