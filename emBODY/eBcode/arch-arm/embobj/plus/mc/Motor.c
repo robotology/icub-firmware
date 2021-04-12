@@ -31,14 +31,18 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+#if defined(EOTHESERVICES_customize_handV3_7joints)
+
 // -- here is new code for the pmc board
 
 static void Motor_stop_PMC(Motor *o);
 static void Motor_config_PMC(Motor* o, eOmc_motor_config_t* config);
 static void Motor_set_control_mode_PMC(Motor *o, icubCanProto_controlmode_t control_mode);
 void Motor_config_encoder_PMC(Motor* o, int32_t resolution);
-
 static void pmc_motor_disable(eObrd_canlocation_t canloc);
+
+#endif
+
 
 /////////////////////////////////////////////////////////
 // Motor
@@ -335,6 +339,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     } 
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
     {
+#if defined(EOTHESERVICES_customize_handV3_7joints)        
         // marco.accame on 08 jan 2021.
         // this motor is on the pmc board. so far i treat it as if it were on the 2foc
         Motor_config_PMC(o, config);
@@ -347,7 +352,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
         // WatchDog_rearm(&o->can_2FOC_alive_wdog);    
         // WatchDog_set_base_time_msec(&o->control_mode_req_wdog, CTRL_REQ_TIMEOUT);        
         //Motor_new_state_req(o, icubCanProto_controlmode_idle);
-
+#endif
     }     
 }
 
@@ -369,10 +374,9 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
     }
     else if(o->HARDWARE_TYPE == HARDWARE_PMC)
     {
-        // nothing so far
-        // TODO: eo_canserv_SendCommandToEntity() must be configured to send messages to the specific board
-        // also: define a new message for pmc. because it has three joints and not two.
+#if defined(EOTHESERVICES_customize_handV3_7joints)
         Motor_config_encoder_PMC(o, resolution);
+#endif        
     }
 }
 
@@ -592,7 +596,9 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
     }
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
     {
+#if defined(EOTHESERVICES_customize_handV3_7joints)        
         Motor_set_control_mode_PMC(o, control_mode);
+#endif        
         o->control_mode = control_mode;
         // so far we dont manage any watchdog
         // Motor_new_state_req(o, control_mode);
@@ -635,7 +641,9 @@ void Motor_set_idle(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
     {
+#if defined(EOTHESERVICES_customize_handV3_7joints)        
         Motor_set_control_mode_PMC(o, icubCanProto_controlmode_idle);
+#endif        
         if (o->control_mode != icubCanProto_controlmode_hwFault)
         {
             o->control_mode = icubCanProto_controlmode_idle;
@@ -660,7 +668,9 @@ void Motor_force_idle(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
     {
+#if defined(EOTHESERVICES_customize_handV3_7joints)        
         Motor_set_control_mode_PMC(o, icubCanProto_controlmode_forceIdle);
+#endif        
         o->control_mode = icubCanProto_controlmode_idle;
     }
     
@@ -799,7 +809,9 @@ BOOL Motor_check_faults(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
     {
+#if defined(EOTHESERVICES_customize_handV3_7joints)        
         pmc_motor_disable(o->canloc);
+#endif        
     }
 
     // DIAGNOSTICS MESSAGES
@@ -1317,6 +1329,9 @@ void Motor_reset(Motor *o)
     //o->control_mode_req;
 }
 
+
+#if defined(EOTHESERVICES_customize_handV3_7joints)
+
 // - here is the new code for the pmc board
 
 static void Motor_stop_PMC(Motor *o)
@@ -1382,11 +1397,11 @@ static void Motor_set_control_mode_PMC(Motor *o, icubCanProto_controlmode_t cont
       )
     {
         Motor_stop_PMC(o);
-        #warning add a proper message, but maybe not
+        //#warning we dont need to send a proper can message to the pmc. we just stop its piezo motors
     }
     else
     {
-        #warning add a proper message, but maybe not
+        //#warning add a proper message, but maybe not
     }
     // which contains [mskofmotors][ctrl0][ctrl1][ctrl2][ctrl3]
 #else
@@ -1410,3 +1425,4 @@ void Motor_config_encoder_PMC(Motor* o, int32_t resolution)
     // so far nothing ??
 }
 
+#endif

@@ -525,17 +525,23 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
     // in par64 = [N15|N14|N13|N12|N11|N10|N09|N08|N07|N06|N05|N04|N03|N02|N01|N00] i put:
     // in nibbles N00-N03 i put error codes of primary
     // in nibbles N04-N07 i put error codes of secondary
-    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 = 0;  
-    #warning se abbiamo s_eo_theencoderreader.numofjomos = 7 allora non possiamo usare un i che vada oltre 3 ... verificare       
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 = 0;    
     for(uint8_t i=0; i<s_eo_theencoderreader.numofjomos; i++)
     {
-        uint64_t value = 0;
-        //eOmc_jomo_descriptor_t *jdes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
-        //uint8_t port = jdes->encoder1.port;
-        value = (s_eo_theencoderreader.errors2[0][i] & 0xf) << (i*4);
-        s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= value; 
-        value = (s_eo_theencoderreader.errors2[1][i] & 0xf) << (16+i*4);
-        s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= value; 
+#if defined(EOTHESERVICES_customize_handV3_7joints)
+        #warning the case of EOTHESERVICES_customize_handV3_7joints allows EOtheEncoderReader to send diagnostics of encoders of only 4 joints
+        // i can put in here info of up to 4 joints at maximum. so, we cannot manage info of the encoders of the last 3 joints 
+#endif        
+        if(i < 4) 
+        {
+            uint64_t value = 0;
+            //eOmc_jomo_descriptor_t *jdes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
+            //uint8_t port = jdes->encoder1.port;
+            value = (s_eo_theencoderreader.errors2[0][i] & 0xf) << (i*4);
+            s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= value; 
+            value = (s_eo_theencoderreader.errors2[1][i] & 0xf) << (16+i*4);
+            s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= value; 
+        }
     }
     
 
