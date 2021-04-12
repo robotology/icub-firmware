@@ -85,6 +85,8 @@ int main(void)
 
 
 #undef DEBUG_atstartup_tx_FTdata
+//#define DEBUG_atstartup_tx_FTdata 1
+
 #undef ENABLE_IHAVEJUSTSTARTED
 
 #include "embot_hw_led.h"

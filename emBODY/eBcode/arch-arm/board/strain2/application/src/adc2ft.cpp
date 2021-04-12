@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'adc2ft'.
 //
-// Model version                  : 2.35
+// Model version                  : 2.36
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Fri Apr  9 11:28:08 2021
+// C/C++ source code generated on : Mon Apr 12 16:07:41 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -82,20 +82,22 @@ namespace adc2ft_ns
     // Product: '<Root>/Product' incorporates:
     //   Constant: '<Root>/Constant'
     //   Constant: '<Root>/Constant1'
+    //   Constant: '<Root>/Constant3'
     //   DataTypeConversion: '<Root>/Data Type Conversion'
+    //   DataTypeConversion: '<Root>/Data Type Conversion2'
     //   Inport: '<Root>/adc'
     //   Product: '<Root>/Divide'
+    //   Product: '<Root>/Divide2'
     //   Sum: '<Root>/Sum'
-    //   Sum: '<Root>/Sum1'
 
     for (i = 0; i < 6; i++) {
-      tmp[i] = static_cast<real32_T>(rtU.adc[i] - static_cast<int16_T>
-        (rtP.calibration_offsets[i] + 32767)) / 32767.0F;
+      tmp[i] = (static_cast<real32_T>(rtP.calibration_offsets[i]) / 32768.0F +
+                -1.0F) + static_cast<real32_T>(rtU.adc[i]) / 32768.0F;
     }
 
     // Product: '<Root>/Divide1' incorporates:
+    //   Constant: '<Root>/Constant'
     //   Constant: '<Root>/Constant2'
-    //   Constant: '<Root>/Constant3'
 
     for (i = 0; i < 36; i++) {
       tmp_0[i] = static_cast<real32_T>(rtP.calibration_matrix[i]) / 32768.0F;

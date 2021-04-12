@@ -1379,6 +1379,19 @@ bool embot::app::application::theSTRAIN::Impl::processing()
 		//Move to the correct place Luca
 		std::memcpy(adc2ft.rtP.calibration_matrix,handleCalibMatrixQ15.data,sizeof(adc2ft.rtP.calibration_matrix));     
 		std::memcpy(adc2ft.rtP.calibration_offsets,handleCalibTareQ15.data,sizeof(adc2ft.rtP.calibration_offsets));     
+	
+		//Luca
+		uint16_t a=adc2ft.rtP.calibration_offsets[0];
+		uint16_t b=handleCalibTareQ15.data[0];
+		if(a!=b)
+		{
+			int pippo=0;
+			pippo++;
+			printf("");
+		}
+		
+		//Luca
+	
 		//Move to the correct place end Luca
         
 	  // Remove Luca
