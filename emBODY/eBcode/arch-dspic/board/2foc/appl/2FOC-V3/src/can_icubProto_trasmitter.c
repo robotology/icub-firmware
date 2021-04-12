@@ -56,6 +56,7 @@ extern volatile int dataA;
 extern volatile int dataB;
 extern volatile int dataC;
 extern volatile int dataD;
+extern volatile char IKs;
 
 extern volatile tMotorConfig MotorConfig;
 
@@ -79,7 +80,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     
     //payload.w[1] = POSCNT;
 
-    payload.w[1] = (VqRef>>5);
+    payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
 
     //payload.b[2] = 0;
     //payload.b[3] = 0;
