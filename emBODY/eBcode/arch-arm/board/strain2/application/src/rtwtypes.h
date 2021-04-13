@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'adc2ft'.
 //
-// Model version                  : 2.36
+// Model version                  : 2.41
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Apr 12 16:07:41 2021
+// C/C++ source code generated on : Tue Apr 13 09:39:18 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'adc2ft'.
 //
-// Model version                  : 2.36
+// Model version                  : 2.41
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Apr 12 16:07:41 2021
+// C/C++ source code generated on : Tue Apr 13 09:39:18 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -75,48 +75,77 @@ namespace adc2ft_ns
   {
     int32_T i;
     int32_T i_0;
-    real32_T tmp_0[36];
-    real32_T tmp[6];
+    real32_T tmp[36];
+    real32_T tmp_0[6];
     real32_T tmp_1[6];
+    real32_T tmp_2;
+    for (i = 0; i < 36; i++) {
+      // Product: '<Root>/Divide1' incorporates:
+      //   Constant: '<Root>/Constant'
+      //   Constant: '<Root>/Constant2'
+
+      rtDW.Divide1[i] = static_cast<real32_T>(rtP.calibration_matrix[i]) /
+        32768.0F;
+    }
+
+    for (i = 0; i < 6; i++) {
+      // DataTypeConversion: '<Root>/Data Type Conversion' incorporates:
+      //   Inport: '<Root>/adc'
+
+      rtDW.DataTypeConversion[i] = static_cast<real32_T>(rtU.adc[i]);
+
+      // DataTypeConversion: '<Root>/Data Type Conversion2' incorporates:
+      //   Constant: '<Root>/Constant1'
+
+      rtDW.DataTypeConversion2[i] = static_cast<real32_T>
+        (rtP.calibration_offsets[i]);
+
+      // Sum: '<Root>/Sum' incorporates:
+      //   Constant: '<Root>/Constant'
+      //   DataTypeConversion: '<Root>/Data Type Conversion'
+      //   DataTypeConversion: '<Root>/Data Type Conversion2'
+
+      rtDW.Sum[i] = (rtDW.DataTypeConversion[i] - 32768.0F) +
+        rtDW.DataTypeConversion2[i];
+
+      // Product: '<Root>/Divide' incorporates:
+      //   Constant: '<Root>/Constant'
+      //   Sum: '<Root>/Sum'
+
+      rtDW.Divide[i] = 3.05175781E-5F * rtDW.Sum[i];
+    }
 
     // Product: '<Root>/Product' incorporates:
-    //   Constant: '<Root>/Constant'
-    //   Constant: '<Root>/Constant1'
-    //   Constant: '<Root>/Constant3'
-    //   DataTypeConversion: '<Root>/Data Type Conversion'
-    //   DataTypeConversion: '<Root>/Data Type Conversion2'
-    //   Inport: '<Root>/adc'
     //   Product: '<Root>/Divide'
-    //   Product: '<Root>/Divide2'
-    //   Sum: '<Root>/Sum'
+    //   Product: '<Root>/Divide1'
 
-    for (i = 0; i < 6; i++) {
-      tmp[i] = (static_cast<real32_T>(rtP.calibration_offsets[i]) / 32768.0F +
-                -1.0F) + static_cast<real32_T>(rtU.adc[i]) / 32768.0F;
+    for (i_0 = 0; i_0 < 36; i_0++) {
+      tmp[i_0] = rtDW.Divide1[i_0];
     }
 
-    // Product: '<Root>/Divide1' incorporates:
-    //   Constant: '<Root>/Constant'
-    //   Constant: '<Root>/Constant2'
-
-    for (i = 0; i < 36; i++) {
-      tmp_0[i] = static_cast<real32_T>(rtP.calibration_matrix[i]) / 32768.0F;
-    }
-
-    // End of Product: '<Root>/Divide1'
     for (i = 0; i < 6; i++) {
-      // Product: '<Root>/Product'
+      tmp_0[i] = rtDW.Divide[i];
       tmp_1[i] = 0.0F;
+    }
+
+    for (i = 0; i < 6; i++) {
       for (i_0 = 0; i_0 < 6; i_0++) {
-        tmp_1[i] += tmp_0[6 * i + i_0] * tmp[i_0];
+        tmp_2 = tmp_1[i];
+        tmp_2 += tmp[6 * i + i_0] * tmp_0[i_0];
+        tmp_1[i] = tmp_2;
       }
+
+      // Product: '<Root>/Product'
+      rtDW.Product[i] = tmp_1[i];
 
       // Outport: '<Root>/ft_q15' incorporates:
       //   DataTypeConversion: '<Root>/Data Type Conversion1'
       //   Product: '<Root>/Product'
 
-      rtY.ft_q15[i] = static_cast<int16_T>(std::floor(tmp_1[i] * 32768.0F));
+      rtY.ft_q15[i] = static_cast<int16_T>(std::floor(rtDW.Product[i] * 32768.0F));
     }
+
+    // End of Product: '<Root>/Product'
   }
 
   // Model initialize function
@@ -129,6 +158,7 @@ namespace adc2ft_ns
   adc2ft_class::adc2ft_class() :
     rtU(),
     rtY(),
+    rtDW(),
     rtM()
   {
     // Currently there is no constructor body generated.

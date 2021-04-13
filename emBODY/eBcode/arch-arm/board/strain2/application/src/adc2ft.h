@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'adc2ft'.
 //
-// Model version                  : 2.36
+// Model version                  : 2.41
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Apr 12 16:07:41 2021
+// C/C++ source code generated on : Tue Apr 13 09:39:18 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,8 +22,8 @@
 #define RTW_HEADER_adc2ft_h_
 #include <cmath>
 #include "rtwtypes.h"
-//#include "rtw_continuous.h"
-//#include "rtw_solver.h"
+#include "rtw_continuous.h"
+#include "rtw_solver.h"
 
 // Model Code Variants
 
@@ -42,6 +42,16 @@ namespace adc2ft_ns
   class adc2ft_class {
     // public data and function members
    public:
+    // Block signals and states (default storage) for system '<Root>'
+    struct DW {
+      real32_T Divide1[36];            // '<Root>/Divide1'
+      real32_T DataTypeConversion[6];  // '<Root>/Data Type Conversion'
+      real32_T DataTypeConversion2[6]; // '<Root>/Data Type Conversion2'
+      real32_T Sum[6];                 // '<Root>/Sum'
+      real32_T Divide[6];              // '<Root>/Divide'
+      real32_T Product[6];             // '<Root>/Product'
+    };
+
     // External inputs (root inport signals with default storage)
     struct ExtU {
       uint16_T adc[6];                 // '<Root>/adc'
@@ -93,6 +103,9 @@ namespace adc2ft_ns
 
     // private data and function members
    private:
+    // Block signals and states
+    DW rtDW;
+
     // Real-Time Model
     RT_MODEL rtM;
   };
