@@ -34,6 +34,8 @@ namespace embot { namespace hw { namespace flash {
     
     bool isaddressvalid(std::uint32_t address);    
     std::uint32_t address2page(std::uint32_t address); // returns [0, maxNumOfPAGEs). if address not valid, it returns an unreliable number.
+    std::uint32_t page2address(std::uint32_t page);
+    std::uint32_t address2offset(std::uint32_t address);
     
     bool erase(std::uint32_t page);
     bool erase(std::uint32_t address, std::uint32_t size);
