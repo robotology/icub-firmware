@@ -68,6 +68,8 @@ namespace embot { namespace hw { namespace flash {
     
     bool isaddressvalid(std::uint32_t address) { return false; }    
     std::uint32_t address2page(std::uint32_t address) { return 0; }
+    std::uint32_t page2address(std::uint32_t page) { return 0; }
+    std::uint32_t address2offset(std::uint32_t address){ return 0; }
     
     bool erase(std::uint32_t page) { return false; }
     bool erase(std::uint32_t address, std::uint32_t size) { return false; }
@@ -108,7 +110,25 @@ namespace embot { namespace hw { namespace flash {
         
         return ((address - part.address) % part.pagesize);
     }
-
+    
+    std::uint32_t page2address(std::uint32_t page)
+    {
+        const embot::hw::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+        
+        uint32_t adr = part.pagesize*page;
+        
+        if(false == isaddressvalid(adr))
+        {
+            return 0;
+        }
+        return adr;
+    }
+    
+    std::uint32_t address2offset(std::uint32_t address)
+    {
+        const embot::hw::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+        return address % part.pagesize;
+    }
     
     bool erase(std::uint32_t page)
     {

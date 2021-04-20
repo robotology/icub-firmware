@@ -47,6 +47,8 @@ struct embot::hw::FlashStorage::Impl
     uint32_t pagesize;
     bool bufferisexternal;
     
+    static constexpr size_t maxSupportedPAGEsize = 2048; // it can be lower than the actual pagesize on FLASH
+    
     Impl(std::uint32_t _pagestart, std::uint32_t _pagesize, std::uint64_t * _buffer = nullptr) 
     {
         pagestart = _pagestart; 
@@ -54,12 +56,12 @@ struct embot::hw::FlashStorage::Impl
         {
              pagestart = embot::hw::flash::getpartition(embot::hw::FLASH::sharedstorage).address;
         }
-        pagenumber = (pagestart - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) / 2048; 
+        pagenumber = (pagestart - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) / embot::hw::flash::getpartition(embot::hw::FLASH::whole).pagesize; 
         
         pagesize = _pagesize;
-        if(pagesize > 2048)
+        if(pagesize > maxSupportedPAGEsize)
         {
-            pagesize = 2048;
+            pagesize = maxSupportedPAGEsize;
         }
         if(0 == pagesize)
         {

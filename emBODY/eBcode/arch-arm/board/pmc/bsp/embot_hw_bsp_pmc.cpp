@@ -162,7 +162,7 @@ void i2c_address_assignment_to_tlv493d_chips()
 #endif
 }
 
-void leds_off()
+void leds_init_off()
 {
     using namespace embot::hw;
     const led::BSP &b = led::getBSP();
@@ -178,6 +178,50 @@ void leds_off()
     }    
 }
 
+void leds_set(bool on)
+{
+    using namespace embot::hw;
+    const led::BSP &b = led::getBSP();
+    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three, LED::four, LED::five, LED::six, LED::seven , LED::eight};
+    for(const auto &l : leds)
+    {
+        const led::PROP *p = b.getPROP(l);
+        if(nullptr != p)
+        {
+            gpio::set(p->gpio, on ? p->on : p->off);
+        }
+    }    
+}
+
+void verify_flash_bank()
+{
+    FLASH_OBProgramInitTypeDef odb = {0};   
+    HAL_FLASHEx_OBGetConfig(&odb);
+    
+    uint8_t detectedbanks = ((odb.USERConfig & FLASH_OPTR_DBANK) == FLASH_OPTR_DBANK) ? 2 : 1;
+
+#if defined(EMBOT_ENABLE_hw_flash_SINGLEBANK)
+    constexpr uint8_t expectedbanks = 1;
+#else
+    constexpr uint8_t expectedbanks = 2;
+#endif
+    
+    if(expectedbanks != detectedbanks)
+    {
+        embot::core::print("number of banks is not as expected: detected " + std::to_string(detectedbanks));
+        embot::core::print("cannot continue");
+        
+        leds_init_off();
+        for(;;)
+        {
+            leds_set(true);
+            HAL_Delay(250);
+            leds_set(false);
+            HAL_Delay(250);
+        }
+    }        
+}
+
 #if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
 bool embot::hw::bsp::specialize() { return true; }
 #else   
@@ -185,8 +229,11 @@ bool embot::hw::bsp::specialize()
 { 
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
     i2c_address_assignment_to_tlv493d_chips();
-#endif    
-    leds_off();
+#endif  
+    leds_init_off();
+    
+    verify_flash_bank();
+
     
     return true; 
 }
@@ -477,21 +524,19 @@ namespace embot { namespace hw { namespace flash {
      
    #if   defined(STM32HAL_BOARD_PMC)
 
-// acemor          
-        // application @ 128k
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ 128k
-        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
- 
-#if 0     
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000+(256+2)*1014,               (128)*1024,          2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(256*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(0*1024),     (252)*1024,         2*1024}};   // application @ 080k
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
-#endif
+   #if defined(EMBOT_ENABLE_hw_flash_SINGLEBANK)
+        // the stm32g4 has a page size of 4k when its flash is configured as single bank
+        constexpr uint32_t pagesize = 4*1024;
+   #else
+   // the stm32g4 has a page size of 2k when its flash is configured as two banks
+        constexpr uint32_t pagesize = 2*1024;
+   #endif
+        // application @ 128k, single bank
+        constexpr PROP whole                {{0x08000000,               (512)*1024,         pagesize}}; 
+        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         pagesize}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           pagesize}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     pagesize}};   // application @ 128k
+        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           pagesize}};   // applicationstorage: on top of application            
 
 
     #else
