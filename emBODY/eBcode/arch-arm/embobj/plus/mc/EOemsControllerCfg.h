@@ -36,23 +36,14 @@ extern "C" {
  // - public #define  --------------------------------------------------------------------------------------------------
 
 
-//#define MC_ENABLE_TRACE_PRINT
-    
-//// used by  MController::actuation_type  
-//#define ACT_TYPE_UNKNOWN     0
-//#define ACT_TYPE_2FOC        1
-//#define ACT_TYPE_MC4p        2
-//#define ACT_TYPE_MC4pPMC     3
-//    
-//// used by Motor::HARDWARE_TYPE
-//// typically, given a MController::actuation_type all the motors share the same Motor::HARDWARE_TYPE
-//// however, for the case of ACT_TYPE_MC4pPMC we have motors in mixed values of Motor::HARDWARE_TYPE
+#if !defined(EOTHESERVICES_customize_handV3_7joints)
 
-//#define HARDWARE_UNKNOWN     0
-//#define HARDWARE_2FOC        1
-//#define HARDWARE_MC4p        2
-//#define HARDWARE_PMC         3    
+#define UNKNOWN              0
 
+#define HARDWARE_2FOC        1
+#define HARDWARE_MC4p        2
+
+#else
 
 // used by  MController::actuation_type  
 typedef enum {
@@ -71,6 +62,8 @@ typedef enum {
     HARDWARE_MC4p       = 2,
     HARDWARE_PMC        = 3
 } MC_MOTOR_HARDWARE_t;
+
+#endif
 
 //#define NOT_AVAIL_MOTOR 0
 //#define PWM_INPUT_MOTOR 1
@@ -93,15 +86,15 @@ typedef enum {
 //#define EMS_PERIOD CTRL_LOOP_PERIOD
 //#define EMS_FREQUENCY_INT32 1000
 //#define EMS_FREQUENCY_FLOAT CTRL_LOOP_FREQUENCY
-  
-#if defined(EOTHESERVICES_customize_handV3_7joints)
-    #define MAX_ENCODS_PER_BOARD 8
-    #define MAX_JOINTS_PER_BOARD 7
-    #define MAX_MOTORS_PER_BOARD 7
-#else
+
+#if !defined(EOTHESERVICES_customize_handV3_7joints)
     #define MAX_ENCODS_PER_BOARD 8
     #define MAX_JOINTS_PER_BOARD 4
     #define MAX_MOTORS_PER_BOARD 4
+#else
+    #define MAX_ENCODS_PER_BOARD 8
+    #define MAX_JOINTS_PER_BOARD 7
+    #define MAX_MOTORS_PER_BOARD 7
 #endif
 
 #define TICKS_PER_REVOLUTION      65536
