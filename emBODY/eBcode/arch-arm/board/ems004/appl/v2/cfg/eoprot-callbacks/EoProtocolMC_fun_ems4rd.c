@@ -1454,39 +1454,52 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
     eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
 
     eOmc_current_limits_params_t *currentLimits = (eOmc_current_limits_params_t*)rd->data;
-    eOmeas_current_t overloadcurrent = currentLimits->overloadCurrent;
+    eOmeas_current_t curr = currentLimits->overloadCurrent;
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
+    // marco.accame on 22 apr 2021: detected ERROR
+    // it is wrong the way the CAN frame of type ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT is
+    // managed, both in here and inside MController_motor_config_max_currents().
+    // because:
+    // 1. ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT requires command.value to be a pointer 
+    //    to eOmc_current_limits_params_t and in here we have a pointer to eOmc_current_limits_params_t::overloadCurrent
+    // 2. also MController_motor_config_max_currents() in its internals sends a CAN frame
+    //    of type ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT but in a wrong way because
+    //    it uses eOmc_current_limits_params_t::peakCurrent instead
+    // luckily, the MController from inside Motor_config_2FOC() sends correctly the 
+    // current limits using the correct argument eOmc_current_limits_params_t.    
+    // so far I prefer just to log this error. 
+    
+   
     // foc-base and mc4based should send overloadCurrent to can-boards
 
 
     if(eo_motcon_mode_foc == mcmode)
     {
-        //  send the can message to relevant board for the overloadcurrent
+        //  send the can message to relevant board
         eOcanprot_command_t command = {0};
         command.clas = eocanprot_msgclass_pollingMotorControl;
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-        command.value = &overloadcurrent;
+        command.value = &curr;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-        
-        // marco.accame on 12apr2021 CHECK: we send twice the same can message. is it correct?
-        // - in here w/ overloadcurrent. 
-        // - but also inside the MController which sends again the can message w/ peakCurrent
+
         MController_motor_config_max_currents(mxx, currentLimits);
-    }  
-    else if(eo_motcon_mode_mc4pluspmc == mcmode)  
-    {
-        eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
-        MController_motor_config_max_currents(mxx, currentLimits);
-    }        
-    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || 
-           (eo_motcon_mode_mc4plusfaps == mcmode))
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
         eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
         // now for the case of mc4plus, the watchdog updates the current limits inside ems controller. 
         // we should re-evaluate the situation after refactoring of mc-controller
     }
+    else if(eo_motcon_mode_mc4pluspmc == mcmode)  
+    {
+        eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+        // marco.accame on 22 apr 2021: ERROR
+        // MController_motor_config_max_currents() does not form correctly the CAN frame because it uses 
+        // eOmc_current_limits_params_t::peakCurrent instead
+        MController_motor_config_max_currents(mxx, currentLimits);
+    }     
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         // just send the can message to relevant board
@@ -1494,7 +1507,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
         eOcanprot_command_t command = {0};
         command.clas = eocanprot_msgclass_pollingMotorControl;
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-        command.value = &overloadcurrent;
+        command.value = &curr;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
     }
 }
