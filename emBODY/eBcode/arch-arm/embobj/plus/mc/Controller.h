@@ -19,6 +19,10 @@
 #ifndef MC_CONTROLLER___
 #define MC_CONTROLLER___
 
+#ifdef WRIST_MK2
+#include "JointSet.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,8 +35,9 @@ extern "C" {
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
+#ifndef WRIST_MK2
 #include "JointSet.h"
-
+#endif
 typedef struct //MController
 {
     uint8_t nEncods;

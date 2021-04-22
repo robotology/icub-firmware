@@ -59,14 +59,18 @@ extern "C" {
 #include "EOthePOS.h"
 
 // so far, i write them in here. later on we think of a board file or else...
-#if 0
+#if 1
 
+#ifdef WRIST_MK2
 #define EOTHESERVICES_disable_theInertials2
-//#define EOTHESERVICES_disable_theInertials3
-//#define EOTHESERVICES_disable_theTemperatures
+#define EOTHESERVICES_disable_theInertials3
+#define EOTHESERVICES_disable_theTemperatures
+#endif
 //#define EOTHESERVICES_disable_theMAIS
 //#define EOTHESERVICES_disable_theSTRAIN
-//#define EOTHESERVICES_disable_theSKIN
+#ifdef WRIST_MK2
+#define EOTHESERVICES_disable_theSKIN
+#endif
 //#define EOTHESERVICES_disable_thePSC
 ////#define EOTHESERVICES_disable_thePOS
 //#define EOTHESERVICES_disable_theMC4boards

@@ -113,7 +113,7 @@ typedef struct //State2FocMsg
     //QEState qe_state;
     uint8_t qe_state;
     
-    uint16_t pwm_fbk;
+    int16_t pwm_fbk;
     
     //FaultState fault_state;
     uint32_t fault_state;

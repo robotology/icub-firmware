@@ -102,9 +102,9 @@ void Trajectory_set_pos_end(Trajectory *o, /*float x0,*/ float xStar, float velA
     
     if (o->bVelocityMove || (o->vTimer < o->vT)) Trajectory_velocity_stop(o);
 
-    //LIMIT2(o->pos_min, xStar, o->pos_max)
+    LIMIT2(o->pos_min, xStar, o->pos_max)
     
-    //LIMIT(velAvg, o->vel_max)
+    LIMIT(velAvg, o->vel_max)
     
     ///////////
     //o->xX = x0;
