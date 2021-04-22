@@ -33,7 +33,6 @@ extern "C" {
 
 #include "WatchDog.h"
 #include "Pid.h"
-    
 
 typedef struct //CanOdometry2FocMsg
 {
@@ -146,13 +145,21 @@ typedef struct //Motor
     // consts
     uint8_t ID;
     uint8_t actuatorPort;
-    eObrd_canlocation_t canloc;
-
+#if !defined(EOTHESERVICES_customize_handV3_7joints)
+    // UNKNOWN              0
+    // HARDWARE_2FOC        1
+    // HARDWARE_MC4p        2
+    uint8_t HARDWARE_TYPE;
+#else    
+    eObrd_canlocation_t canloc; // it keeps the can location of the motor 
+    
     // HARDWARE_UNKNOWN     0
     // HARDWARE_2FOC        1
     // HARDWARE_MC4p        2
     // HARDWARE_PMC         3
-    uint8_t HARDWARE_TYPE;
+    uint8_t HARDWARE_TYPE; // it can have the above values
+#endif
+
 
     CTRL_UNITS GEARBOX;
 
@@ -262,7 +269,11 @@ extern void Motor_update_state_fbk(Motor* o, void* state_msg); //
 extern void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* data); //
 extern void Motor_do_calibration_hard_stop(Motor* o); //
 
-extern void Motor_actuate(MC_ACTUATION_t act, Motor* o, uint8_t N); //
+#if !defined(EOTHESERVICES_customize_handV3_7joints)
+extern void Motor_actuate(Motor* o, uint8_t N); //
+#else
+extern void Motor_actuate(MC_ACTUATION_t act, Motor* o, uint8_t N); // it needs on meore parameter
+#endif
 
 extern void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref);
 extern void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref);

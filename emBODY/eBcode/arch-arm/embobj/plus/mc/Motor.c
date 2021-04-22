@@ -336,10 +336,10 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
 
         o->control_mode = icubCanProto_controlmode_idle;
         hal_motor_disable((hal_motor_t)o->actuatorPort);
-    } 
+    }    
+#if defined(EOTHESERVICES_customize_handV3_7joints)   
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
-    {
-#if defined(EOTHESERVICES_customize_handV3_7joints)        
+    {      
         // marco.accame on 08 jan 2021.
         // this motor is on the pmc board. so far i treat it as if it were on the 2foc
         Motor_config_PMC(o, config);
@@ -352,8 +352,8 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
         // WatchDog_rearm(&o->can_2FOC_alive_wdog);    
         // WatchDog_set_base_time_msec(&o->control_mode_req_wdog, CTRL_REQ_TIMEOUT);        
         //Motor_new_state_req(o, icubCanProto_controlmode_idle);
-#endif
-    }     
+    }
+#endif         
 }
 
 void Motor_config_encoder(Motor* o, int32_t resolution)
@@ -372,12 +372,12 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
         cmdMotorConfig.value = o->can_motor_config;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);  
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)    
     else if(o->HARDWARE_TYPE == HARDWARE_PMC)
     {
-#if defined(EOTHESERVICES_customize_handV3_7joints)
-        Motor_config_encoder_PMC(o, resolution);
-#endif        
+        Motor_config_encoder_PMC(o, resolution);      
     }
+#endif      
 }
 
 void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params)
@@ -388,11 +388,13 @@ void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_p
     {
         Motor_config_max_currents_2FOC(o, current_params);
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)       
     else if(o->HARDWARE_TYPE == HARDWARE_PMC)
     {
         //Motor_config_currents_PMC(o, current_params);
         // nothing so far
     }
+#endif    
 }
 
 //extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
@@ -446,10 +448,12 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
     {
         o->not_calibrated = FALSE;
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)       
     else if(o->HARDWARE_TYPE == HARDWARE_PMC)
     {   
         o->not_calibrated = FALSE;
     }
+#endif    
 }
 
 BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
@@ -594,15 +598,15 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
 
         o->control_mode = control_mode;
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)      
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
-    {
-#if defined(EOTHESERVICES_customize_handV3_7joints)        
-        Motor_set_control_mode_PMC(o, control_mode);
-#endif        
+    {      
+        Motor_set_control_mode_PMC(o, control_mode);      
         o->control_mode = control_mode;
         // so far we dont manage any watchdog
         // Motor_new_state_req(o, control_mode);
     }
+#endif      
     else
     {
         return FALSE;
@@ -639,17 +643,19 @@ void Motor_set_idle(Motor* o) //
             o->control_mode = icubCanProto_controlmode_idle;
         }
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)     
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
     {
-#if defined(EOTHESERVICES_customize_handV3_7joints)        
+       
         Motor_set_control_mode_PMC(o, icubCanProto_controlmode_idle);
-#endif        
+      
         if (o->control_mode != icubCanProto_controlmode_hwFault)
         {
             o->control_mode = icubCanProto_controlmode_idle;
         }
         //Motor_new_state_req(o, icubCanProto_controlmode_idle);
     }
+#endif  
 }
 
 void Motor_force_idle(Motor* o) //
@@ -666,13 +672,13 @@ void Motor_force_idle(Motor* o) //
         
         o->control_mode = icubCanProto_controlmode_idle;
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)      
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
-    {
-#if defined(EOTHESERVICES_customize_handV3_7joints)        
-        Motor_set_control_mode_PMC(o, icubCanProto_controlmode_forceIdle);
-#endif        
+    {      
+        Motor_set_control_mode_PMC(o, icubCanProto_controlmode_forceIdle);    
         o->control_mode = icubCanProto_controlmode_idle;
     }
+#endif   
     
     o->can_dead = FALSE;
     o->wrong_ctrl_mode = FALSE;
@@ -723,11 +729,13 @@ BOOL Motor_check_faults(Motor* o) //
     {
         o->fault_state.bits.ExternalFaultAsserted = hal_motor_externalfaulted();
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)       
     else if(o->HARDWARE_TYPE == HARDWARE_PMC)
     {   
         // we retrieve the external fault from the mc4plus
         o->fault_state.bits.ExternalFaultAsserted = hal_motor_externalfaulted();
     }
+#endif
     
     if (o->fault_state.bits.ExternalFaultAsserted)
     {
@@ -807,13 +815,13 @@ BOOL Motor_check_faults(Motor* o) //
     {
         hal_motor_disable((hal_motor_t)o->actuatorPort);
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)      
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
-    {
-#if defined(EOTHESERVICES_customize_handV3_7joints)        
-        pmc_motor_disable(o->canloc);
-#endif        
+    {      
+        pmc_motor_disable(o->canloc);       
     }
-
+#endif 
+    
     // DIAGNOSTICS MESSAGES
     
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)
@@ -879,8 +887,8 @@ BOOL Motor_check_faults(Motor* o) //
 
             fault_state.bits.EncoderFault = FALSE;
         }
-            
-    
+				
+
         if (can_dead && !o->can_dead)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_can_no_answer, 0);
@@ -983,6 +991,42 @@ void Motor_update_state_fbk(Motor* o, void* state) //
     */
 }
 
+#if !defined(EOTHESERVICES_customize_handV3_7joints)
+void Motor_actuate(Motor* motor, uint8_t N) //
+{
+    if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        int16_t output[MAX_JOINTS_PER_BOARD];
+    
+        for (int m=0; m<N; ++m)
+        {
+            output[motor[m].actuatorPort] = motor[m].output;
+            //output[m] = motor[m].output;
+        }
+    
+        eOcanprot_command_t command = {0};
+        command.clas = eocanprot_msgclass_periodicMotorControl;    
+        command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
+        command.value = output;
+    
+        eObrd_canlocation_t location = {0};
+        location.port = eOcanport1;
+        location.addr = 0;
+        location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
+
+        // and i send the command
+        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location); 
+    }
+    else if (motor->HARDWARE_TYPE == HARDWARE_MC4p)
+    {
+        for (int m=0; m<N; ++m)
+        {
+            motor[m].pwm_fbk = motor[m].output;
+            hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
+        }
+    }
+}  
+#else
 void Motor_actuate(MC_ACTUATION_t act, Motor* motor, uint8_t N) //
 {
     if(act == ACT_TYPE_MC4pPMC)
@@ -1050,6 +1094,7 @@ void Motor_actuate(MC_ACTUATION_t act, Motor* motor, uint8_t N) //
         }
     }
 }  
+#endif
 
 // Motor
 /////////////////////////////////////////////////////////
@@ -1252,10 +1297,12 @@ int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit)
     {
         if (pwm_limit > 3360) pwm_limit = 3360; 
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)       
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
     {
         if (pwm_limit > 3360) pwm_limit = 3360; 
-    }    
+    }  
+#endif    
     o->pwm_max = pwm_limit;
     
     return o->pwm_max;
@@ -1271,10 +1318,12 @@ BOOL Motor_is_external_fault(Motor* o)
     {
         return hal_motor_externalfaulted();
     }
+#if defined(EOTHESERVICES_customize_handV3_7joints)       
     else if (o->HARDWARE_TYPE == HARDWARE_PMC)
     {
         return FALSE;
-    }    
+    } 
+#endif    
     return FALSE;
 }
 
