@@ -52,14 +52,13 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-//#warning WE........... could save ram (2 x 332) if we used servconfigENC instead of servconfigmais + servconfigpsc + servconfigpos
 
 
 typedef struct
 {
     
     // for mc4can only
-    EOtheMC4boards*                         themc4boards;     
+    EOtheMC4boards*                         themc4boards; 
     
     // for mc4can and mc4plus-mais
     eOmn_serv_configuration_t               servconfigmais;
@@ -83,8 +82,7 @@ typedef struct
     int16_t                                 pwmvalue[hal_motors_number];    // at most i can manage 4 motors
     hal_motor_t                             pwmport[hal_motors_number];
     hal_dma_current_t                       currents[hal_motors_number];    // in ma
-    int16_t                                 voltage;                        // in mv      
-    
+    int16_t                                 voltage;                        // in mv       
 } eOmotioncontroller_objs_t;
 
 
