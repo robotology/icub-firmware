@@ -216,12 +216,19 @@ bool embot::app::application::theIMU::Impl::stop()
 bool embot::app::application::theIMU::Impl::fill(embot::prot::can::inertial::periodic::Message_DIGITAL_ACCELEROMETER::Info &info)
 {
     bool ret = true;
-    
-    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.x = imuacquisition.data.acc.x;
-    info.y = imuacquisition.data.acc.y;
-    info.z = imuacquisition.data.acc.z;
-         
+	
+	  info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress(); 
+	
+	//this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
+		#if defined(STM32HAL_BOARD_STRAIN2)
+			info.x = -(imuacquisition.data.acc.y);
+			info.y = imuacquisition.data.acc.x;
+			info.z = imuacquisition.data.acc.z;         
+		#else
+			info.x = imuacquisition.data.acc.x;
+			info.y = imuacquisition.data.acc.y;
+			info.z = imuacquisition.data.acc.z;        	
+		#endif   
     return ret;    
 }
 
@@ -231,10 +238,17 @@ bool embot::app::application::theIMU::Impl::fill(embot::prot::can::inertial::per
     bool ret = true;
 
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.x = imuacquisition.data.gyr.x;
-    info.y = imuacquisition.data.gyr.y;
-    info.z = imuacquisition.data.gyr.z;
-    
+	
+	//this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
+		#if defined(STM32HAL_BOARD_STRAIN2)
+			info.x = -(imuacquisition.data.gyr.y);
+			info.y = imuacquisition.data.gyr.x;
+			info.z = imuacquisition.data.gyr.z;	
+		#else
+			info.x = imuacquisition.data.gyr.x;
+			info.y = imuacquisition.data.gyr.y;
+			info.z = imuacquisition.data.gyr.z;    
+		#endif
     return ret;    
 }
 
@@ -355,7 +369,16 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
         {
             // generate a acc message with canrevisitedconfig.imuinfo.counter
             info.sensor = embot::prot::can::analog::imuSensor::acc;
-            info.value = imuacquisition.data.acc;
+
+					// remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
+					// https://github.com/icub-tech-iit/fix/issues/780   
+					#if defined(STM32HAL_BOARD_STRAIN2)
+            info.value.x = -(imuacquisition.data.acc.y);
+            info.value.y = imuacquisition.data.acc.x;
+            info.value.z = imuacquisition.data.acc.z;
+          #else
+						info.value = imuacquisition.data.acc;
+					#endif					
             
             msg.load(info);
             msg.get(frame);
@@ -366,8 +389,15 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
         {
             // generate a mag message with canrevisitedconfig.counter
             info.sensor = embot::prot::can::analog::imuSensor::mag;
+										// remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
+					// https://github.com/icub-tech-iit/fix/issues/780   
+					#if defined(STM32HAL_BOARD_STRAIN2)
+            info.value.x = -(imuacquisition.data.mag.y);
+            info.value.y = imuacquisition.data.mag.x;
+            info.value.z = imuacquisition.data.mag.z;
+          #else
             info.value = imuacquisition.data.mag;
-            
+          #endif
             msg.load(info);
             msg.get(frame);
             replies.push_back(frame);           
@@ -377,7 +407,16 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
         {
             // generate a gyr message with canrevisitedconfig.counter
             info.sensor = embot::prot::can::analog::imuSensor::gyr;
-            info.value = imuacquisition.data.gyr;
+
+					// remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
+					// https://github.com/icub-tech-iit/fix/issues/780   
+					#if defined(STM32HAL_BOARD_STRAIN2)
+            info.value.x = -(imuacquisition.data.gyr.y);
+            info.value.y = imuacquisition.data.gyr.x;
+            info.value.z = imuacquisition.data.gyr.z;
+          #else
+						info.value = imuacquisition.data.gyr;
+					#endif					
             
             msg.load(info);
             msg.get(frame);

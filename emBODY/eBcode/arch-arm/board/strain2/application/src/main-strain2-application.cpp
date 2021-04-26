@@ -13,7 +13,7 @@
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 { 
-    embot::prot::can::versionOfAPPLICATION {2, 0, 10},
+    embot::prot::can::versionOfAPPLICATION {2, 0, 12},
     embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
@@ -85,6 +85,8 @@ int main(void)
 
 
 #undef DEBUG_atstartup_tx_FTdata
+//#define DEBUG_atstartup_tx_FTdata 1
+
 #undef ENABLE_IHAVEJUSTSTARTED
 
 #include "embot_hw_led.h"
