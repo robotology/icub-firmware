@@ -923,7 +923,9 @@ static void s_former_POL_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
     frame->id_type      = eocanframeID_std11bits;
     frame->frame_type   = eocanframetype_data; 
     frame->size         = len;
-    frame->data[0]      = EOCANPROT_CREATE_POLLING_MC_DATA0(descriptor->loc.insideindex, type);    
+    // marco.accame on 26 apr 2021: the mc control uses only inside index 0 or 1. it is better to ensure this rule to avoid wrongly formed can frames
+    uint8_t canlegalinsideindex = (eobrd_caninsideindex_second == descriptor->loc.insideindex) ? 1 : 0; // only 0 or 1. 1 only if we want the second index 
+    frame->data[0]      = EOCANPROT_CREATE_POLLING_MC_DATA0(canlegalinsideindex, type);    
 }
 
 
