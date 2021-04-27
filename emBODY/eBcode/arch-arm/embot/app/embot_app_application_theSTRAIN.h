@@ -30,7 +30,7 @@
 #include <vector>
 #include <memory>
 
-#include "../../board/strain2/application/src/adc2ft.h"
+#include "adc2ft.h"
 
 namespace embot { namespace app { namespace application {
            

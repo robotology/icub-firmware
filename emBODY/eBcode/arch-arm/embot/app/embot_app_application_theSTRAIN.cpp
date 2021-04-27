@@ -776,7 +776,7 @@ struct embot::app::application::theSTRAIN::Impl
     StrainRuntimeData runtimedata;
     StrainConfigData configdata;
 
-		adc2ft_ns::adc2ft_class adc2ft; // Instance of model class		
+        adc2ft_ns::adc2ft_class adc2ft; // Instance of model class        
 
     Impl() 
     {
@@ -1371,25 +1371,25 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     
     const embot::dsp::q15::matrix& handleCalibMatrixQ15 = configdata.transformer_matrix_handle(set2use);     
     const embot::dsp::q15::matrix& handleCalibTareQ15 = configdata.transformer_tare_handle(set2use);   
-		//Move to the correct place Luca
-		std::memcpy(adc2ft.rtP.calibration_matrix,handleCalibMatrixQ15.data,sizeof(adc2ft.rtP.calibration_matrix));     
-		std::memcpy(adc2ft.rtP.calibration_offsets,handleCalibTareQ15.data,sizeof(adc2ft.rtP.calibration_offsets));     
-        	
+        //Move to the correct place Luca
+        std::memcpy(adc2ft.rtP.calibration_matrix,handleCalibMatrixQ15.data,sizeof(adc2ft.rtP.calibration_matrix));     
+        std::memcpy(adc2ft.rtP.calibration_offsets,handleCalibTareQ15.data,sizeof(adc2ft.rtP.calibration_offsets));     
+            
     // now in forcetorqueQ15vector (runtimedata.data.forcetorque[]) we have the result ... 
     
     // if we did have saturation ... we send old safe data.
    
     if(false == runtimedata.data.adcsaturation)
     {
-			for(size_t index=0;index<6;++index)	
-			{
-				adc2ft.rtU.adc[index] = runtimedata.data.adcvalue[index];
-			}
-			adc2ft.step();//From MBD design
-			
-			runtimedata.data.force.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[0]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[1]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[2]));
-			runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[3]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[4]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[5]));      
-		}
+            for(size_t index=0;index<6;++index)    
+            {
+                adc2ft.rtU.adc[index] = runtimedata.data.adcvalue[index];
+            }
+            adc2ft.step();//From MBD design
+            
+            runtimedata.data.force.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[0]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[1]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[2]));
+            runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[3]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[4]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[5]));      
+        }
     else
     {
         // we dont update so that in runtimedata.data.torque and runtimedata.data.force there are always valid values
