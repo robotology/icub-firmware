@@ -775,7 +775,8 @@ struct embot::app::application::theSTRAIN::Impl
     
     StrainRuntimeData runtimedata;
     StrainConfigData configdata;
-    
+
+        adc2ft_ns::adc2ft_class adc2ft; // Instance of model class        
 
     Impl() 
     {
@@ -1363,41 +1364,32 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     std::uint8_t set2use = runtimedata.set2use_get();
     
     // in adcvalue[] we performed adc acquisition, in value[] we put the q15 values and we also have checkd vs adc saturation
-    
-    
-    // now prepare calib data: it will be inside the triples: runtimedata.data.torque and runtimedata.data.force 
-    
         
-    // apply formula: forcetorque = M * (adcvalue + calibtare) + currtare
-    // default values are: M = IdentityMatrix(0x7fff); calibtare = Vector(0); currtare = Vector(0)
-    
+    // now prepare calib data: it will be inside the triples: runtimedata.data.torque and runtimedata.data.force 
+       
     bool q15saturated =  false;
     
     const embot::dsp::q15::matrix& handleCalibMatrixQ15 = configdata.transformer_matrix_handle(set2use);     
     const embot::dsp::q15::matrix& handleCalibTareQ15 = configdata.transformer_tare_handle(set2use);   
-        
-    embot::dsp::Q15 q15tmpvector[6];
-    embot::dsp::q15::matrix tmpQ15vector(6, 1, q15tmpvector);
-    
-    
-    embot::dsp::q15::add(runtimedata.adcvalueQ15vector, handleCalibTareQ15, tmpQ15vector, q15saturated);
-    embot::dsp::q15::multiply(handleCalibMatrixQ15, tmpQ15vector, runtimedata.forcetorqueQ15vector, q15saturated);
-    embot::dsp::q15::add(runtimedata.forcetorqueQ15vector, runtimedata.currtareQ15vector, runtimedata.forcetorqueQ15vector, q15saturated);
-    
-    // copy 
-    
+        //Move to the correct place Luca
+        std::memcpy(adc2ft.rtP.calibration_matrix,handleCalibMatrixQ15.data,sizeof(adc2ft.rtP.calibration_matrix));     
+        std::memcpy(adc2ft.rtP.calibration_offsets,handleCalibTareQ15.data,sizeof(adc2ft.rtP.calibration_offsets));     
+            
     // now in forcetorqueQ15vector (runtimedata.data.forcetorque[]) we have the result ... 
     
     // if we did have saturation ... we send old safe data.
    
-    // if we are ok, we use what in runtimedata.data.forcetorque[] to compute safe data and data to send
-    // data2send = safedata = 0x8000 + forcetorque
-   
     if(false == runtimedata.data.adcsaturation)
     {
-        runtimedata.data.force.set(embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[0]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[1]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[2]));
-        runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[3]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[4]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[5]));
-    }
+            for(size_t index=0;index<6;++index)    
+            {
+                adc2ft.rtU.adc[index] = runtimedata.data.adcvalue[index];
+            }
+            adc2ft.step();//From MBD design
+            
+            runtimedata.data.force.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[0]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[1]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[2]));
+            runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[3]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[4]),embot::dsp::q15::Q15toU16(adc2ft.rtY.ft_q15[5]));      
+        }
     else
     {
         // we dont update so that in runtimedata.data.torque and runtimedata.data.force there are always valid values

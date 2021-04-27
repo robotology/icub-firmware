@@ -30,6 +30,8 @@
 #include <vector>
 #include <memory>
 
+#include "adc2ft.h"
+
 namespace embot { namespace app { namespace application {
            
     class theSTRAIN : public CANagentSTRAIN
