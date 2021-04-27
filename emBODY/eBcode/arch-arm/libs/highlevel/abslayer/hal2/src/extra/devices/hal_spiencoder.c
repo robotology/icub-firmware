@@ -820,10 +820,13 @@ extern hal_result_t hal_spiencoder_deinit(hal_spiencoder_t id)
     
     //Reset the flag associated to the encoder
     s_hal_spiencoder_initted_reset(id);
-    
+
+#if !defined(SPIENC_DEINIT_DEALLOCATE_HEAP)
+#else    
     //Dealloc all the associated memory
     hal_heap_delete((void**)&(s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)]));
     //hal_heap_delete((void**)&intitem);
+#endif
 
     return(hal_res_OK);
 }

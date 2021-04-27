@@ -73,7 +73,7 @@ typedef struct
     EOthePOS*                               thepos;  
     
     // for everything apart mc4can
-    EOconstarray*                           jomodescriptors; // points to service.servconfig.data.mc.xxx_based.arrayofjomodescriptors, where xxx is: foc, mc4plus, mc4plusmais
+    EOconstarray*                           jomodescriptors; // points to the jomodescriptor inside EOtheMotionController_hid::service::servconfig etc. 
     MController*                            thecontroller;
     EOtheEncoderReader*                     theencoderreader;   
         

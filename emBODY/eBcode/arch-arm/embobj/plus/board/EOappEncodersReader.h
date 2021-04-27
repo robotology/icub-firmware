@@ -57,7 +57,7 @@ typedef struct EOappEncReader_hid  EOappEncReader;
 
 
 // the value is referred to the maximum number of joint-motors directly managed by this object.
-enum { eOappEncReader_jomos_maxnumberof = 4 }; 
+enum { eOappEncReader_jomos_maxnumberof = 7 }; 
 
 // the value is referred to the maximum number of encoders directly managed by this object. 
 enum { eOappEncReader_encoders_maxnumberof = 2*eOappEncReader_jomos_maxnumberof }; 
@@ -72,7 +72,7 @@ extern EOappEncReader* eo_appEncReader_Initialise(void);
 
 extern EOappEncReader* eo_appEncReader_GetHandle(void);
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof_4jomodescriptors_t *arrayofjomodes);
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes);
 
 extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p);
 

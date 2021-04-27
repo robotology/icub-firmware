@@ -50,17 +50,17 @@ void i2c_address_assignment_to_tlv493d_chips_stm32hal()
 {
     // i2c address assignment for fap boards and internal tlv493d.
     // faps on J4, J5, J6 and J7 shall have 0xBC. they are respectively on I2C1, I2C2, I2C3 and I2C4
-    // fap on J11 and internal tlv493d U27 shall have 0x3E. they are respectively on I2C1 and I2C2
+    // fap on J13 and internal tlv493d U27 shall have 0x3E. they are respectively on I2C1 and I2C2
     
     // i proceed as if the call of MX_GPIO_Init() was not done.
-    // 1. init of PE10 (power of J11) and of PE11 (power of U27). cube-mx uses MAGVCC1_Pin and MAGVCC2_Pin respectively
+    // 1. init of PE10 (power of J13) and of PE11 (power of U27). cube-mx uses MAGVCC1_Pin and MAGVCC2_Pin respectively
     // 2. power them off ...
     // 3. init the sda-i2c1 PB9 and sda-i2c2 PA8
     // ...
     
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     
-    // init power control pins for J11 and U27. they are PE10 and PE11
+    // init power control pins for J13 and U27. they are PE10 and PE11
     __HAL_RCC_GPIOE_CLK_ENABLE();
     GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -72,7 +72,7 @@ void i2c_address_assignment_to_tlv493d_chips_stm32hal()
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10 | GPIO_PIN_11, GPIO_PIN_RESET);
     HAL_Delay(10);
     
-    // init i2c1-sda (PB9) as output and put it low. then power up J11
+    // init i2c1-sda (PB9) as output and put it low. then power up J13
     __HAL_RCC_GPIOB_CLK_ENABLE();    
     GPIO_InitStruct.Pin = GPIO_PIN_9;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
@@ -85,7 +85,7 @@ void i2c_address_assignment_to_tlv493d_chips_stm32hal()
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);    
     HAL_Delay(10);  
 
-    // init i2c2-sda (PA8) as output and put it low. then power up J11
+    // init i2c2-sda (PA8) as output and put it low. then power up J13
     __HAL_RCC_GPIOA_CLK_ENABLE();
     GPIO_InitStruct.Pin = GPIO_PIN_8;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
@@ -105,15 +105,15 @@ void i2c_address_assignment_to_tlv493d_chips()
 {
     // i2c address assignment for fap boards and internal tlv493d.
     // faps on J4, J5, J6 and J7 shall have 0xBC. they are respectively on I2C1, I2C2, I2C3 and I2C4
-    // fap on J11 and internal tlv493d U27 shall have 0x3E. they are respectively on I2C1 and I2C2
+    // fap on J13 and internal tlv493d U27 shall have 0x3E. they are respectively on I2C1 and I2C2
     
     // i proceed as if the call of MX_GPIO_Init() was not done.
-    // 1. init of PE10 (power of J11) and of PE11 (power of U27). cube-mx uses MAGVCC1_Pin and MAGVCC2_Pin respectively
+    // 1. init of PE10 (power of J13) and of PE11 (power of U27). cube-mx uses MAGVCC1_Pin and MAGVCC2_Pin respectively
     // 2. power them off ...
     // 3. init the sda-i2c1 PB9 and sda-i2c2 PA8
     // ...
     
-#if defined(EMBOT_ENABLE_hw_tlv493d_U27off) & defined(EMBOT_ENABLE_hw_tlv493d_J13off)
+#if defined(EMBOT_ENABLE_hw_tlv493d_U27off) && defined(EMBOT_ENABLE_hw_tlv493d_J13off)
     
 #else    
     using namespace embot::hw;
@@ -132,7 +132,7 @@ void i2c_address_assignment_to_tlv493d_chips()
     // init the pins which controls power on/off of the two sensors
     gpio::init(gpioMAGVCC1, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});    
     gpio::init(gpioMAGVCC2, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});
-    // set them low to power off both J11 and U27
+    // set them low to power off both J13 and U27
     gpio::set(gpioMAGVCC1, gpio::State::RESET);
     gpio::set(gpioMAGVCC2, gpio::State::RESET);
         
@@ -147,8 +147,8 @@ void i2c_address_assignment_to_tlv493d_chips()
     // cannot use embot::core::wait() now because the rtos is not started yet. 
     sys::delay(10*embot::core::time1millisec);
     
-    // and now ... power up J11 and U27 so that they can have address 0x3E
-#if defined(EMBOT_ENABLE_hw_tlv493d_J11off)
+    // and now ... power up J13 and U27 so that they can have address 0x3E
+#if defined(EMBOT_ENABLE_hw_tlv493d_J13off)
 #else    
     gpio::set(gpioMAGVCC1, gpio::State::SET);
 #endif
@@ -162,7 +162,7 @@ void i2c_address_assignment_to_tlv493d_chips()
 #endif
 }
 
-void leds_off()
+void leds_init_off()
 {
     using namespace embot::hw;
     const led::BSP &b = led::getBSP();
@@ -178,6 +178,50 @@ void leds_off()
     }    
 }
 
+void leds_set(bool on)
+{
+    using namespace embot::hw;
+    const led::BSP &b = led::getBSP();
+    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three, LED::four, LED::five, LED::six, LED::seven , LED::eight};
+    for(const auto &l : leds)
+    {
+        const led::PROP *p = b.getPROP(l);
+        if(nullptr != p)
+        {
+            gpio::set(p->gpio, on ? p->on : p->off);
+        }
+    }    
+}
+
+void verify_flash_bank()
+{
+    FLASH_OBProgramInitTypeDef odb = {0};   
+    HAL_FLASHEx_OBGetConfig(&odb);
+    
+    uint8_t detectedbanks = ((odb.USERConfig & FLASH_OPTR_DBANK) == FLASH_OPTR_DBANK) ? 2 : 1;
+
+#if defined(EMBOT_ENABLE_hw_flash_SINGLEBANK)
+    constexpr uint8_t expectedbanks = 1;
+#else
+    constexpr uint8_t expectedbanks = 2;
+#endif
+    
+    if(expectedbanks != detectedbanks)
+    {
+        embot::core::print("number of banks is not as expected: detected " + std::to_string(detectedbanks));
+        embot::core::print("cannot continue");
+        
+        leds_init_off();
+        for(;;)
+        {
+            leds_set(true);
+            HAL_Delay(250);
+            leds_set(false);
+            HAL_Delay(250);
+        }
+    }        
+}
+
 #if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
 bool embot::hw::bsp::specialize() { return true; }
 #else   
@@ -185,8 +229,11 @@ bool embot::hw::bsp::specialize()
 { 
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
     i2c_address_assignment_to_tlv493d_chips();
-#endif    
-    leds_off();
+#endif  
+    leds_init_off();
+    
+    verify_flash_bank();
+
     
     return true; 
 }
@@ -477,21 +524,19 @@ namespace embot { namespace hw { namespace flash {
      
    #if   defined(STM32HAL_BOARD_PMC)
 
-// acemor          
-        // application @ 128k
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ 128k
-        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
- 
-#if 0     
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000+(256+2)*1014,               (128)*1024,          2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(256*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(0*1024),     (252)*1024,         2*1024}};   // application @ 080k
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
-#endif
+   #if defined(EMBOT_ENABLE_hw_flash_SINGLEBANK)
+        // the stm32g4 has a page size of 4k when its flash is configured as single bank
+        constexpr uint32_t pagesize = 4*1024;
+   #else
+   // the stm32g4 has a page size of 2k when its flash is configured as two banks
+        constexpr uint32_t pagesize = 2*1024;
+   #endif
+        // application @ 128k, single bank
+        constexpr PROP whole                {{0x08000000,               (512)*1024,         pagesize}}; 
+        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         pagesize}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           pagesize}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     pagesize}};   // application @ 128k
+        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           pagesize}};   // applicationstorage: on top of application            
 
 
     #else
@@ -868,7 +913,7 @@ namespace embot { namespace hw { namespace tlv493d {
     constexpr PROP propJ5  { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0xBC} };
     constexpr PROP propJ6  { embot::hw::i2c::Descriptor{embot::hw::I2C::three, 0xBC} }; 
     constexpr PROP propJ7  { embot::hw::i2c::Descriptor{embot::hw::I2C::four,  0xBC} };  
-    constexpr PROP propJ11 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
+    constexpr PROP propJ13 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
     constexpr PROP propU27 { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0x3E} };
     
 #else
@@ -876,7 +921,7 @@ namespace embot { namespace hw { namespace tlv493d {
     constexpr PROP propJ5  { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0xBC} };
     constexpr PROP propJ6  { embot::hw::i2c::Descriptor{embot::hw::I2C::three, 0xBC} }; 
     constexpr PROP propJ7  { embot::hw::i2c::Descriptor{embot::hw::I2C::four,  0xBC} };  
-    constexpr PROP propJ11 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
+    constexpr PROP propJ13 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
     constexpr PROP propU27 { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0x3E} };
 #endif
     
@@ -889,7 +934,7 @@ namespace embot { namespace hw { namespace tlv493d {
         mask::pos2mask<uint32_t>(TLV493D::five) | mask::pos2mask<uint32_t>(TLV493D::six),        
         // properties
         {{
-            &propJ4, &propJ5, &propJ6, &propJ7, &propJ11, &propU27
+            &propJ4, &propJ5, &propJ6, &propJ7, &propJ13, &propU27
         }}
 #else
         // maskofsupported
@@ -898,7 +943,7 @@ namespace embot { namespace hw { namespace tlv493d {
         mask::pos2mask<uint32_t>(TLV493D::five) | mask::pos2mask<uint32_t>(TLV493D::six),        
         // properties
         {{
-            &propJ4, &propJ5, &propJ6, &propJ7, &propJ11, &propU27
+            &propJ4, &propJ5, &propJ6, &propJ7, &propJ13, &propU27
         }}
 #endif        
     };

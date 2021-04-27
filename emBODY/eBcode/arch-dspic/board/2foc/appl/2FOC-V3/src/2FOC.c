@@ -136,7 +136,6 @@ _FICD(ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 //#define CALIBRATION
 
 #define BOARD_CAN_ADDR_DEFAULT 0xE
-#define VOLT_REF_SHIFT 5 // for a PWM resolution of 1000
 #define PWM_50_DUTY_CYC (LOOPINTCY/2)
 
 #define isDriveEnabled() bDriveEnabled

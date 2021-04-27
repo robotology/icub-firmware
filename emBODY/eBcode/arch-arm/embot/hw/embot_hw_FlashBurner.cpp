@@ -32,6 +32,7 @@
 #include "stm32hal.h" 
 #include "embot_hw_bsp.h"
 #include "embot_hw_flash.h"
+#include "embot_hw_flash_bsp.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -61,29 +62,11 @@ struct embot::hw::FlashBurner::Impl
     
     bool isallerased;
 
-    
-    // maybe move it to namespace hw ...
-    static const uint32_t PAGEsize = 2048;
+    // by this, the PAGEsize is made dependent on the bsp. it is initted in the ctor 
+    uint32_t PAGEsize = 2048; 
     
     static const uint32_t noPAGE = 0xffffffff;
-    
-    // other things ...
-    
-    static uint32_t address2page(std::uint32_t address)
-    {
-        return (address - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) / PAGEsize;
-    }
-    
-    static uint32_t page2address(std::uint32_t page)
-    {
-        return PAGEsize*page;
-    }
-    
-    static uint32_t address2offset(std::uint32_t address)
-    {
-        return address % PAGEsize;
-    }
-    
+        
     bool eraseall()
     {
         if(isallerased)
@@ -91,8 +74,8 @@ struct embot::hw::FlashBurner::Impl
             return true;
         }
         
-        uint32_t firstpage = address2page(start);
-        uint32_t numofpages = address2page(start+size) - firstpage;
+        uint32_t firstpage = embot::hw::flash::address2page(start);
+        uint32_t numofpages = embot::hw::flash::address2page(start+size) - firstpage;
             
         FLASH_EraseInitTypeDef erase = {0};
         erase.TypeErase = FLASH_TYPEERASE_PAGES;
@@ -121,7 +104,7 @@ struct embot::hw::FlashBurner::Impl
         
         HAL_FLASH_Unlock();
         
-        uint32_t tmpadr = page2address(buffer.page);
+        uint32_t tmpadr = embot::hw::flash::page2address(buffer.page);
         uint32_t n64bitwords = PAGEsize / 8;
         for(uint32_t i=0; i<n64bitwords; i++)
         {
@@ -148,6 +131,9 @@ struct embot::hw::FlashBurner::Impl
         {
              start = embot::hw::flash::getpartition(embot::hw::FLASH::application).address; //embot::hw::sys::addressOfApplication;
         }
+        
+        // init the page size used by the flash 
+        PAGEsize = embot::hw::flash::getBSP().getPROP(embot::hw::FLASH::whole)->partition.pagesize;
         
         size = _size;
         
@@ -240,10 +226,10 @@ bool embot::hw::FlashBurner::add(std::uint32_t address, std::uint32_t size, cons
     
     // i put data inside the buffer.    
     
-    uint32_t currpagenum = pImpl->address2page(address);
-    uint32_t curroffset = pImpl->address2offset(address); 
+    uint32_t currpagenum = embot::hw::flash::address2page(address);
+    uint32_t curroffset = embot::hw::flash::address2offset(address); 
     
-    bool dataallinside1page = (pImpl->address2page(address+size-1) == currpagenum);
+    bool dataallinside1page = (embot::hw::flash::address2page(address+size-1) == currpagenum);
     bool dataisinanewpage = (currpagenum != pImpl->buffer.page);
     
     

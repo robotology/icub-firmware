@@ -47,13 +47,29 @@ extern "C" {
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+// we can manage at most 7 jomos, even if typically we manage only 4 or ... 7
+// hence the used EOconstarray * jomodes can contain one of the following types:
+// - const eOmc_arrayof_4jomodescriptors_t 
+// - const eOmc_arrayof_7jomodescriptors_t
+
+#if defined(EOTHESERVICES_customize_handV3_7joints)
+enum { eo_encoderreader_max_jomos = 7 };
+#else
+enum { eo_encoderreader_max_jomos = 4 };
+#endif
+
+typedef struct                          
+{   
+    eOarray_head_t                      head;
+    eOmc_jomo_descriptor_t              data[eo_encoderreader_max_jomos];
+} eOencoderreader_jomodescriptors_t;   
 
 struct EOtheEncoderReader_hid
 {
     eOservice_core_t                        service;
     eOservice_diagnostics_t                 diagnostics;
     
-    eOmc_arrayof_4jomodescriptors_t         arrayofjomodes;
+    eOencoderreader_jomodescriptors_t       arrayofjomodes; // contains items of type eOmc_jomo_descriptor_t
     EOtimer*                                waitreadtimer;
     uint8_t                                 numofjomos;
     uint8_t                                 numofencoders;

@@ -91,10 +91,13 @@ extern uint8_t eocanmap_maxBOARDnumber(eOprotEndpoint_t ep, eOprotEntity_t en); 
 typedef struct
 {
     uint16_t bitmapOfPresence;      // it holds in its bits the info about presence of a given endpoint-entity .... use eocanmap_posOfEPEN(ep, en) for bit position
-    uint8_t  dummy;
-    uint8_t  compactIndicesOf;      // it holds the index of MC and SK in compact form ... nibble 0 contains either SK or MC. if mc4can: nibble 1 contains internalindex1
-                                    // marco.accame on 02apr2019: we multiplex sk with mc information because a can board cannot do both. in case there will be a board 
-                                    // with more entities with more than one index ... use the dummy byte  
+    uint16_t compactIndicesOf;      // it holds the indices of MC and SK entities in compact form. all entities have zero index apart those on mc and sk.
+                                    // marco.accame on 18jan2021: compactIndicesOf holds up to 4 indices in its 4 nibbles. 
+                                    // as a can board has either SK or MC entities ...
+                                    // we hold in nibble-0 the index of the MC or SK entity located on the can board at eobrd_caninsideindex_first 
+                                    // we hold in nibble-1 the index of MC entity loacted on the can board at eobrd_caninsideindex_second
+                                    // we hold in nibble-2 the index of MC entity loacted on the can board at eobrd_caninsideindex_third
+                                    // we hold in nibble-3 the index of MC entity loacted on the can board at eobrd_caninsideindex_fourth    
 } eOcanmap_entities2_t; EO_VERIFYsizeof(eOcanmap_entities2_t, 4)
 
 

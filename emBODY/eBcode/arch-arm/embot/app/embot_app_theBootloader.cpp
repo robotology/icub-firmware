@@ -169,7 +169,7 @@ embot::app::theBootloader::evalRes embot::app::theBootloader::eval()
     embot::os::init({});
              
     static const embot::os::InitThread::Config initconfig { 4*2048, embot::app::theBootloader::Impl::init, nullptr };
-    static const embot::os::IdleThread::Config idleconfig { 512, nullptr, nullptr, embot::app::theBootloader::Impl::onidle };
+    static const embot::os::IdleThread::Config idleconfig { 2*1024, nullptr, nullptr, embot::app::theBootloader::Impl::onidle };
     static const embot::core::Callback onOSerror = { embot::app::theBootloader::Impl::userdefonOSerror, nullptr };
     
     embot::os::theScheduler::Config cfg { 

@@ -49,6 +49,7 @@
 #include "EOtheTemperatures.h"
 #include "EOthePSC.h"
 #include "EOthePOS.h"
+#include "EOtheSTRAIN.h"
 #include "EOtheETHmonitor.h"
 #include "EOVtheCallbackManager.h"
 

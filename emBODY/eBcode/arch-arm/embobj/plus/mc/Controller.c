@@ -62,6 +62,14 @@ static char invert_matrix(float** M, float** I, char n);
 //    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 //}
 
+#if !defined(EOTHESERVICES_customize_handV3_7joints)
+#else
+
+// marco.accame on 22 apr 2021: i put in here declarations of static functions used only by the case of 7 joints
+static void jomo7_updateEntity2SetMaps(EOconstarray* arrayof7jointsets, EOconstarray* arrayof7jomodescriptors);
+static void jomo7_get_jomo_coupling_info(EOconstarray* arrayof7jointsets, EOconstarray* arrayof7jomodescriptors);     
+
+#endif
 
 static char s_trace_string[128] = {0};
 
@@ -200,7 +208,14 @@ void MController_deinit()
 static uint8_t getNumberOfSets(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
 {
     uint8_t n=0;
+#if !defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)
     for(uint8_t i=0; i<MAX_JOINTS_PER_BOARD; i++)
+#else    
+    // marco.accame on 12 apr 2021: 
+    // this function works with a eOmc_4jomo_coupling_t argument which manages 4 joints. hence we must use 4 and not MAX_JOINTS_PER_BOARD (which could be redefined)
+    static const int NJ = 4; 
+    for(uint8_t i=0; i<NJ; i++)
+#endif    
     {
         if((jomoCouplingInfo->joint2set[i] != eomc_jointSetNum_none) && (jomoCouplingInfo->joint2set[i] > n))
         {
@@ -214,7 +229,14 @@ static uint8_t getNumberOfSets(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
 static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo,  EOconstarray* carray)
 {
     MController *o = smc;
+#if !defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)
     for(uint8_t i=0; i<MAX_JOINTS_PER_BOARD; i++)
+#else    
+    // marco.accame on 12 apr 2021: 
+    // this function works with a eOmc_4jomo_coupling_t argument which manages 4 joints. hence we must use 4 and not MAX_JOINTS_PER_BOARD (which could be redefined)
+    static const int NJ = 4; 
+    for(uint8_t i=0; i<NJ; i++)
+#endif    
     {
         if(eomc_jointSetNum_none == jomoCouplingInfo->joint2set[i])
             continue; //leave init values
@@ -278,6 +300,11 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo, 
 }
 
 
+
+#if defined(MC_ENABLE_TRACE_PRINT)
+
+static char s_trace_string[128] = {0};
+
 static void debug_printsMatrix4X4(float **m)
 {
     snprintf(s_trace_string, sizeof(s_trace_string), "----- START -----");
@@ -310,6 +337,9 @@ static void debug_printsMatrix4X6(float **m)
 
 }
 
+#endif // #if defined(MC_ENABLE_TRACE_PRINT)
+
+
 static void copyMatrix4X4(float **dst, const eOmc_4x4_matrix_t src)
 {
     int N = MAX_JOINTS_PER_BOARD <= 4 ? MAX_JOINTS_PER_BOARD : 4;
@@ -337,6 +367,8 @@ static void copyMatrix4X6(float **dst, const eOmc_4x6_matrix_t src)
         }
     }
 }
+
+#if defined(MC_ENABLE_TRACE_PRINT)
 
 extern void debug_dump_coupling_data(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
 {
@@ -392,6 +424,8 @@ extern void debug_dump_coupling_data(const eOmc_4jomo_coupling_t *jomoCouplingIn
 
 
 }
+
+#endif // #if defined(MC_ENABLE_TRACE_PRINT)
 
 static void update_jointAndMotor_withJointset_constraints(void)
 {
@@ -522,36 +556,64 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         case eomn_serv_MC_foc:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.foc_based.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.foc_based.arrayofjomodescriptors.head.size;
+#if !defined(EOTHESERVICES_customize_handV3_7joints)            
             o->actuation_type = HARDWARE_2FOC;
+#else
+            o->actuation_type = ACT_TYPE_2FOC;
+#endif            
             jomoCouplingInfo = &(brd_cfg->data.mc.foc_based.jomocoupling);
             break;
         
         case eomn_serv_MC_mc4plusmais:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
+#if !defined(EOTHESERVICES_customize_handV3_7joints)            
             o->actuation_type = HARDWARE_MC4p;
+#else
+            o->actuation_type = ACT_TYPE_MC4p;
+#endif 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusmais_based.jomocoupling);
             break;
         
         case eomn_serv_MC_mc4plus:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
+#if !defined(EOTHESERVICES_customize_handV3_7joints)            
             o->actuation_type = HARDWARE_MC4p;
+#else
+            o->actuation_type = ACT_TYPE_MC4p;
+#endif
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
             break;
         case eomn_serv_MC_mc2pluspsc:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors.head.size; 
+#if !defined(EOTHESERVICES_customize_handV3_7joints)            
             o->actuation_type = HARDWARE_MC4p; 
+#else
+            o->actuation_type = ACT_TYPE_MC4p;
+#endif 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc2pluspsc.jomocoupling);            
             break;
         case eomn_serv_MC_mc4plusfaps:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors.head.size; 
+#if !defined(EOTHESERVICES_customize_handV3_7joints)            
             o->actuation_type = HARDWARE_MC4p; 
+#else
+            o->actuation_type = ACT_TYPE_MC4p;
+#endif 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusfaps.jomocoupling);            
             break;
-        
+#if !defined(EOTHESERVICES_customize_handV3_7joints) 
+#else           
+        case eomn_serv_MC_mc4pluspmc:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4pluspmc.arrayof7jomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4pluspmc.arrayof7jomodescriptors.head.size; 
+            o->actuation_type = ACT_TYPE_MC4pPMC; 
+            jomoCouplingInfo = NULL;       
+            break;
+#endif        
         default:
             return;
     }
@@ -630,10 +692,42 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             }
         };
 
+#if !defined(EOTHESERVICES_customize_handV3_7joints) 
 
-        
         o->motor[k].HARDWARE_TYPE = o->actuation_type;
         
+#else
+       
+        // marco.accame: each motor has an hardware type which depends on actuation_type
+        switch(o->actuation_type)
+        {
+            case ACT_TYPE_2FOC: 
+            {
+                o->motor[k].HARDWARE_TYPE = HARDWARE_2FOC;
+            } break;
+            
+            case ACT_TYPE_MC4p: 
+            {
+                o->motor[k].HARDWARE_TYPE = HARDWARE_MC4p;
+            } break;    
+
+            case ACT_TYPE_MC4pPMC: 
+            {
+                // marco.accame on 07 jan 2021. 
+                // the info about which actuator type the k-th motor is should be put inside jomodes[k].actuator
+                // ... but so far eOmc_actuator_descriptor_t does not contain the actuatore type 
+                // because we have always had (until 7 jan 2021) a set of joints with uniform actuation type.
+                // so we use magic numbers ...
+                o->motor[k].HARDWARE_TYPE = (k <= 3) ? (HARDWARE_MC4p) : (HARDWARE_PMC);
+            } break;   
+
+            default:
+            {
+                o->motor[k].HARDWARE_TYPE = HARDWARE_UNKNOWN;
+            } break;
+        }
+#endif
+                
         switch(o->motor[k].HARDWARE_TYPE)
         {
             case HARDWARE_MC4p:
@@ -644,15 +738,53 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 o->motor[k].actuatorPort = jomodes->actuator.foc.canloc.addr-1;
                 break;
 
+#if !defined(EOTHESERVICES_customize_handV3_7joints) 
+#else
+            case HARDWARE_PMC:
+                o->motor[k].actuatorPort = jomodes->actuator.pmc.canloc.addr-1;
+                o->motor[k].canloc = jomodes->actuator.pmc.canloc;
+                break;
+#endif 
+           
             default:
                 return;
         }
         
         o->joint[k].eo_joint_ptr = eo_entities_GetJoint(eo_entities_GetHandle(), k);
     }
-    
-    
+
+#if !defined(EOTHESERVICES_customize_handV3_7joints) 
+
     get_jomo_coupling_info(jomoCouplingInfo, carray);
+    
+#else 
+   
+    if(NULL != jomoCouplingInfo)
+    {   // we use the eOmc_4jomo_coupling_t pointer passed by yarprobotinterface
+        get_jomo_coupling_info(jomoCouplingInfo, carray);
+    }
+    else 
+    {
+        // we obtain the required information (mainly eOmc_jointset_configuration_t[], coupling matrices) from the actuation_type
+        // so far only ACT_TYPE_MC4pPMC is a special case
+        
+        switch(o->actuation_type)
+        {
+            case ACT_TYPE_MC4pPMC:
+            {
+                EOconstarray* carrayof7jointsets = eo_constarray_Load((EOarray*)&(brd_cfg->data.mc.mc4pluspmc.arrayof7jointsets));
+                jomo7_get_jomo_coupling_info(carrayof7jointsets, carray);                              
+            } break;
+            
+            default:
+            {
+                return;
+            } break;
+        }
+        
+    }
+    
+#endif
     
     //Now i need to check if encoder2joint matrix is identity matrix or not.
     //If it is an identity matrix, it means this jointset doesn't use encoders coupling, else otherwise.
@@ -662,6 +794,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     float **Sje_aux = NULL;
     
     eOboolvalues_t isIdentityMatrix = eobool_true;
+    // marco.accame on 08 jan 2021: 
+    // even for the case of EOTHESERVICES_customize_handV3_7joints it is ok to use 
+    // MAX_JOINTS_PER_BOARD and MAX_ENCODS_PER_BOARD because the matrices are allocated upon their values
     for (int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
     {
         for (int k=0; k<MAX_ENCODS_PER_BOARD; ++k)
@@ -1633,7 +1768,12 @@ void MController_do()
         JointSet_do(smc->jointSet+s);
     }
     
+
+#if !defined(EOTHESERVICES_customize_handV3_7joints)
     Motor_actuate(smc->motor, smc->nJoints);
+#else    
+    Motor_actuate(smc->actuation_type, smc->motor, smc->nJoints);
+#endif    
 }
 
 BOOL MController_set_control_mode(uint8_t j, eOmc_controlmode_command_t control_mode) //
@@ -1960,5 +2100,161 @@ void MController_motor_raise_fault_i2t(int m)
 {
     Motor_raise_fault_i2t(smc->motor+m);
 }
+
+
+#if !defined(EOTHESERVICES_customize_handV3_7joints)
+#else
+
+// i put in here definition of static funtions used only for the case of 7 joints
+
+// version of updateEntity2SetMaps() for the case of 7 joints
+static void jomo7_updateEntity2SetMaps(EOconstarray* arrayof7jointsets, EOconstarray* arrayof7jomodescriptors)
+{       
+    // in here we need to manage 7 jointsets. to simplify: each joint is mapped into a different set
+    
+    MController *o = smc;
+    // marco.accame on 08jan2021: it must not be MAX_JOINTS_PER_BOARD because ... if we redefine it to be >7 then we go out of memory
+    enum { NJ = 7}; 
+    static const uint8_t mapofjoint2set[NJ] = {0, 1, 2, 3, 4, 5, 6};
+    for(uint8_t i=0; i<NJ; i++)
+    {
+        if(eomc_jointSetNum_none == mapofjoint2set[i])
+            continue; // leave init values
+        o->j2s[i] = o->m2s[i] = mapofjoint2set[i];
+    }
+    
+    //in the following code I fill data in e2s vector.
+    //in almost all boards, for each joint j:  (o->j2s[j] == o->e2s[j]== o->m2s[j] == jomoCouplingInfo->joint2set[j] ) is true
+    //but in CER HAND board we have only two joints and three encoder of each joint; therefore the e2s={0,0,0, 1,1,1}
+    //The following code fills data in e2s vecotor keeping in mind the CER hand board expection.
+    uint8_t currentpos = 0;
+    const eOmc_jomo_descriptor_t *jomodes ;
+    for(uint8_t j=0; j<o->nJoints; j++)
+    {
+        jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(arrayof7jomodescriptors, j);
+        uint8_t multi_enc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
+        //VALE2: horrible work around about multi_encs
+        if (multi_enc == 0) //when in encoder1 xml group there is none.
+            multi_enc = 1;
+        for(uint8_t i=currentpos; i<currentpos+multi_enc; i++)
+        {
+            o->e2s[i] = mapofjoint2set[j];
+        }
+        currentpos += multi_enc;
+    }
+    
+    //currently all joint of same board have the the same number of multiple encoder. so i use j0
+    jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(arrayof7jomodescriptors, 0);
+    o->multi_encs = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
+    //VALE: horrible work around about multi_encs
+    if (o->multi_encs == 0) //when in encoder1 xml group there is none.
+        o->multi_encs = 1;
+    o->nEncods = o->multi_encs * o->nJoints;
+    
+    for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
+    
+    for (int e=0; e<o->nEncods; ++e)
+    {
+        int s = o->e2s[e];
+
+        o->eos[s][(o->enc_set_dim[s])++] = e;
+    }
+    
+    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+ 
+    for (int m=0; m<o->nJoints; ++m)
+    {
+        int s = o->m2s[m];
+
+        o->mos[s][(o->set_dim[s])++] = m;
+    }
+    
+    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+ 
+    for (int j=0; j<o->nJoints; ++j)
+    {
+        int s = o->j2s[j];
+
+        o->jos[s][(o->set_dim[s])++] = j;
+    }
+}
+
+
+// version of get_jomo_coupling_info() for the case of 7 joints
+static void jomo7_get_jomo_coupling_info(EOconstarray* arrayof7jointsets, EOconstarray* arrayof7jomodescriptors)
+{
+
+    MController *o = smc;
+    
+    o->nSets = eo_constarray_Size(arrayof7jointsets);
+
+    // o->Jmj, o->Jjm, o->Sjm, o->Smj are all identity.
+    // o->Sje is identity in its squared part 
+
+    
+    for(int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
+    {
+        for(int j=0; j<MAX_JOINTS_PER_BOARD; ++j)
+        {
+            float v = (i==j) ? 1.0f : 0.0f;
+            o->Jmj[i][j] = o->Jjm[i][j] = o->Sjm[i][j] = o->Smj[i][j] = v;
+        }
+        for(int e=0; e<MAX_ENCODS_PER_BOARD; ++e)
+        {
+            float v = (i==e) ? 1.0f : 0.0f;
+            o->Sje[i][e] = v;
+        }
+    }
+                  
+
+    jomo7_updateEntity2SetMaps(arrayof7jointsets, arrayof7jomodescriptors);
+       
+    for(int s=0; s<o->nSets; s++)
+    {        
+        const eOmc_jointset_configuration_t *item = (eOmc_jointset_configuration_t*) eo_constarray_At(arrayof7jointsets, s);
+        if(NULL != item)
+        {
+            //#error implement motor input configuration 
+            //o->jointSet[s].CAN_DO_TRQ_CTRL = item->candotorquecontrol;
+            //o->jointSet[s].default_motor_input = item->pidoutputtype;
+            
+            o->jointSet[s].olooop_ctrl_out_type = item->pid_output_types.pwm_ctrl_out_type;
+            o->jointSet[s].curent_ctrl_out_type = item->pid_output_types.cur_ctrl_out_type;
+            
+            o->jointSet[s].torque_ctrl_out_type = item->pid_output_types.torque_ctrl_out_type;
+            o->jointSet[s].postrj_ctrl_out_type = item->pid_output_types.postrj_ctrl_out_type;
+            o->jointSet[s].veltrj_ctrl_out_type = item->pid_output_types.veltrj_ctrl_out_type;
+            o->jointSet[s].mixtrj_ctrl_out_type = item->pid_output_types.mixtrj_ctrl_out_type;
+            o->jointSet[s].posdir_ctrl_out_type = item->pid_output_types.posdir_ctrl_out_type;
+            o->jointSet[s].veldir_ctrl_out_type = item->pid_output_types.veldir_ctrl_out_type;
+            
+            o->jointSet[s].USE_SPEED_FBK_FROM_MOTORS = item->usespeedfeedbackfrommotors;
+            o->jointSet[s].special_constraint = (eOmc_jsetconstraint_t)item->constraints.type;
+            o->jointSet[s].special_limit = item->constraints.param1;
+            //NOTE: item->constraints.param2 is not used currently. It is reserved for future use
+            
+        
+#ifdef R1_HAND_MKII
+            o->jointSet[s].special_constraint = eomc_jsetconstraint_cerhand2;
+            o->jointSet[s].special_limit = 500;
+#endif
+        }
+    }   
+        
+    // marco.accame on 7 jan 2021: 
+    // this funtion calls update_jointAndMotor_withJointset_constraints() which just evals the special constraints
+    // whiich we dont support for the jomo7 mode ... 
+    // so, shall i keep ir or shall i keep it not? i keep it even if it does nothing    
+    update_jointAndMotor_withJointSet_configuration();
+    
+//    char message[180];
+//    snprintf(message, sizeof(message), "J2S:%d %d %d %d;T:%d,%d,%d,%d", o->j2s[0], o->j2s[1], o->j2s[2], o->j2s[3],
+//        o->jointSet[0].MOTOR_CONTROL_TYPE, o->jointSet[1].MOTOR_CONTROL_TYPE, o->jointSet[2].MOTOR_CONTROL_TYPE, o->jointSet[3].MOTOR_CONTROL_TYPE);
+//    send_debug_message(message,0,0,0);
+    //debug_dump_coupling_data(jomoCouplingInfo);
+}
+
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////

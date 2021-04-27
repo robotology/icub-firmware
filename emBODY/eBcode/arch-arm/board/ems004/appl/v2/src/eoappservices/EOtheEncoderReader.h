@@ -47,6 +47,8 @@ extern "C" {
 
 #include "EOtheServices.h"
 
+#include "EOconstarray.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -54,7 +56,6 @@ extern "C" {
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef struct EOtheEncoderReader_hid EOtheEncoderReader;
-
 
 
 typedef enum
@@ -98,12 +99,12 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void);
 extern EOtheEncoderReader* eo_encoderreader_GetHandle(void);
 
 
-// it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
-// (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_encoderreader_Activate().
-extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+// it verifies if the service as defined in the configuration is possible, it executes a callback
+// (which may send a confirmation to the entity which asked fot verification), and then it may activate the service by calling  eo_encoderreader_Activate().
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 // it activates the service by loading the service configuration
-extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes);
+extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes);
 
 // it deactivates service.
 extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p);

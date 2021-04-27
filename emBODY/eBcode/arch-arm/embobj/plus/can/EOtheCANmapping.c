@@ -77,6 +77,8 @@ static void s_eo_canmap_entities_clear(eOcanmap_board_extended_t * theboard);
 
 static eObool_t s_eo_canmap_entities_noneispresent(const eOcanmap_board_extended_t * theboard);
 
+static void s_eo_canmap_entities_index_set(eOcanmap_board_extended_t * theboard, uint8_t ep, eObrd_caninsideindex_t insideindex2use, uint8_t index);
+
 static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des);
 
 static void s_eo_canmap_entities_rem(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des);
@@ -832,12 +834,82 @@ extern uint8_t eocanmap_maxBOARDnumber(eOprotEndpoint_t ep, eOprotEntity_t en)
 static void s_eo_canmap_entities_clear(eOcanmap_board_extended_t * theboard)
 {//ok
     theboard->board.entities2.bitmapOfPresence = 0;
-    theboard->board.entities2.compactIndicesOf = 0xff;
+    theboard->board.entities2.compactIndicesOf = 0xffff; // or: entindexNONE | (entindexNONE<<4) | (entindexNONE<<8) | (entindexNONE<<12); 
 }
 
 static eObool_t s_eo_canmap_entities_noneispresent(const eOcanmap_board_extended_t * theboard)
 {//ok
     return (0 == theboard->board.entities2.bitmapOfPresence) ? (eobool_true) : (eobool_false);
+}
+
+static void s_eo_canmap_entities_index_set(eOcanmap_board_extended_t * theboard, uint8_t ep, eObrd_caninsideindex_t insideindex2use, uint8_t index)
+{//ok    
+    // decide where to store the value (nibble-0 , -1, -2, -3) according to endpoint and board 
+    uint8_t nib = 0;
+    
+    if(eoprot_endpoint_motioncontrol == ep)
+    {
+        // we can have: 
+        // - mc4can: first insideindex in nib-0 or second in nib-1
+        // - 1foc: first insideindex in nib-0
+        // - pmc: first insideindex in nib-0, or second in nib-1, or third in nib-2  
+
+        if(eobrd_mc4 == theboard->board.props.type)  
+        {   
+            nib = (eobrd_caninsideindex_none == insideindex2use) ? 0 : insideindex2use;
+        }
+        else if(eobrd_foc == theboard->board.props.type)
+        {
+            nib = 0;
+        }
+        else if(eobrd_pmc == theboard->board.props.type)
+        {
+            nib = (eobrd_caninsideindex_none == insideindex2use) ? 0 : insideindex2use;
+        }
+    }
+    else
+    {
+        // for skin we put the index always in nib-0 
+        nib = 0;         
+    }
+    
+    
+    switch(nib)
+    {
+        default:
+        case 0:
+        {
+            uint16_t tmp = index;
+            uint16_t val = (tmp     ) & 0x000F;
+            theboard->board.entities2.compactIndicesOf &= 0xFFF0;   // clear nib-0
+            theboard->board.entities2.compactIndicesOf |= val;      // set nib-0             
+        } break;
+        
+        case 1:
+        {
+            uint16_t tmp = index;
+            uint16_t val = (tmp << 4) & 0x00F0;
+            theboard->board.entities2.compactIndicesOf &= 0xFF0F;   // clear nib-1
+            theboard->board.entities2.compactIndicesOf |= val;      // set nib-1                
+        } break;
+        
+        case 2:
+        {
+            uint16_t tmp = index;
+            uint16_t val = (tmp << 8) & 0x0F00;
+            theboard->board.entities2.compactIndicesOf &= 0xF0FF;   // clear nib-2
+            theboard->board.entities2.compactIndicesOf |= val;      // set nib-2                
+        } break; 
+
+        case 3:
+        {
+            uint16_t tmp = index;
+            uint16_t val = (tmp << 12) & 0xF000;
+            theboard->board.entities2.compactIndicesOf &= 0x0FFF;   // clear nib-3
+            theboard->board.entities2.compactIndicesOf |= val;      // set nib-3                
+        } break;                 
+    }
+    
 }
 
 static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des)
@@ -857,23 +929,14 @@ static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard,
     {
         return;
     }
-    
-    #warning TODO-pmc-motion-control: look at in here
-    if((eobrd_mc4 == theboard->board.props.type) && (eoprot_endpoint_motioncontrol == ep) && (eobrd_caninsideindex_second == des->location.insideindex))
-    {
-        // we store in second position nibble-1
-        uint8_t val = (des->index << 4) & 0xF0;
-        theboard->board.entities2.compactIndicesOf &= 0x0F; // clear nib-1
-        theboard->board.entities2.compactIndicesOf |= val;  // set nib-1              
-    }
-    else
-    {
-        // all other cases of motioncontrol and for skin: we store in first position nibble-0
-        uint8_t val = des->index & 0x0F;
-        theboard->board.entities2.compactIndicesOf &= 0xF0; // clear nib-0
-        theboard->board.entities2.compactIndicesOf |= val;  // set nib-0      
-    }    
+        
+    // filter the values contained inside the 3 bits of insideindex so that we have a valid eObrd_caninsideindex_t value
+    eObrd_caninsideindex_t insideindex2use = (des->location.insideindex <= eobrd_caninsideindex_fourth) ? des->location.insideindex : eobrd_caninsideindex_none;  
+    // set it
+    s_eo_canmap_entities_index_set(theboard, ep, insideindex2use, des->index);
+        
 }
+
 
 static void s_eo_canmap_entities_rem(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des)
 {//ok
@@ -893,49 +956,56 @@ static void s_eo_canmap_entities_rem(eOcanmap_board_extended_t * theboard, uint8
         return;
     }
     
-    #warning TODO-pmc-motion-control: look at in here
-    if((eobrd_mc4 == theboard->board.props.type) && (eoprot_endpoint_motioncontrol == ep) && (eobrd_caninsideindex_second == des->location.insideindex))
-    {
-        // we store in second position nibble-1
-        uint8_t val = (entindexNONE << 4) & 0xF0;
-        theboard->board.entities2.compactIndicesOf &= 0x0F; // clear nib-1
-        theboard->board.entities2.compactIndicesOf |= val;  // set nib-1              
-    }
-    else
-    {
-        // all other cases of motioncontrol and for skin: we store in first position nibble-0
-        uint8_t val = entindexNONE & 0x0F;
-        theboard->board.entities2.compactIndicesOf &= 0xF0; // clear nib-0
-        theboard->board.entities2.compactIndicesOf |= val;  // set nib-0      
-    }
+    // filter the values contained inside the 3 bits of insideindex so that we have a valid eObrd_caninsideindex_t value
+    eObrd_caninsideindex_t insideindex2use = (des->location.insideindex <= eobrd_caninsideindex_fourth) ? des->location.insideindex : eobrd_caninsideindex_none;  
+    // set it w/ entindexNONE
+    s_eo_canmap_entities_index_set(theboard, ep, insideindex2use, entindexNONE);
+    
 }
 
 static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc)
 {//ok
     eOprotIndex_t index = EOK_uint08dummy;
 
-    #warning TODO-pmc-motion-control: look at in here
+
     if(theboard->board.props.type == eobrd_cantype_foc) 
     {   // if 1foc it is always in nibble-0 
-        index = theboard->board.entities2.compactIndicesOf & 0x0F;
+        index = theboard->board.entities2.compactIndicesOf & 0x000F;
     }
     else if(theboard->board.props.type == eobrd_cantype_mc4)
     {   // if mc4, index depends on value of loc.insideindex. it can be only first or second. if loc.insideindex is none or even else: nothing is done
                     
         if(eobrd_caninsideindex_first == loc.insideindex)
         {
-            index = theboard->board.entities2.compactIndicesOf & 0x0F;
+            index = theboard->board.entities2.compactIndicesOf & 0x000F;
         }
         else if(eobrd_caninsideindex_second == loc.insideindex)
         {
-            index = (theboard->board.entities2.compactIndicesOf >> 4) & 0x0F;
+            index = (theboard->board.entities2.compactIndicesOf >> 4) & 0x000F;
         }
     }      
+    else if(theboard->board.props.type == eobrd_cantype_pmc)
+    {   // if pmc, index depends on value of loc.insideindex. it can be only first or second or thirs. if loc.insideindex is none or even else: nothing is done
+                    
+        if(eobrd_caninsideindex_first == loc.insideindex)
+        {
+            index = theboard->board.entities2.compactIndicesOf & 0x000F;
+        }
+        else if(eobrd_caninsideindex_second == loc.insideindex)
+        {
+            index = (theboard->board.entities2.compactIndicesOf >> 4) & 0x000F;
+        }
+        else if(eobrd_caninsideindex_third == loc.insideindex)
+        {
+            index = (theboard->board.entities2.compactIndicesOf >> 8) & 0x000F;
+        }
+    }
     
     if(entindexNONE == index)
     {  
         index = EOK_uint08dummy;
     }
+    
     return index; 
 }
 
@@ -943,12 +1013,13 @@ static eOprotIndex_t s_eo_canmap_sk_index_get(const eOcanmap_board_extended_t * 
 {//ok
     eOprotIndex_t index = EOK_uint08dummy;
     
-    index = theboard->board.entities2.compactIndicesOf & 0x0F;    
+    index = theboard->board.entities2.compactIndicesOf & 0x000F;    
 
     if(entindexNONE == index)
     {   // in case some board.entities.indexof[0] or board.entities.indexof[1] has a entindexNONE value we must be sure to return EOK_uint08dummy
         index = EOK_uint08dummy;
     }
+    
     return index; 
 }
 
@@ -1012,15 +1083,23 @@ static eObrd_caninsideindex_t s_eo_canmap_entities_caninsideindex_get(const eOca
 {//ok
     eObrd_caninsideindex_t inside = eobrd_caninsideindex_none;
     
-    uint8_t tmp = board->entities2.compactIndicesOf;
+    uint16_t tmp = board->entities2.compactIndicesOf;
     
-    if(index == (tmp & 0x0F))
+    if(index == (tmp & 0x000F))
     {
         inside = eobrd_caninsideindex_first; // for 1foc we could use eobrd_caninsideindex_none, but it is ok even in this way
     }
-    else if(index == ((tmp >> 4) & 0x0F))
+    else if(index == ((tmp >> 4) & 0x000F))
     {
         inside = eobrd_caninsideindex_second;
+    } 
+    else if(index == ((tmp >> 8) & 0x000F))
+    {
+        inside = eobrd_caninsideindex_third;
+    }  
+    else if(index == ((tmp >> 12) & 0x000F))
+    {
+        inside = eobrd_caninsideindex_fourth;
     } 
     
     return inside;

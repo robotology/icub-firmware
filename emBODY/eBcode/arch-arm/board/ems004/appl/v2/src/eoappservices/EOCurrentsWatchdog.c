@@ -104,6 +104,21 @@ EO_static_inline eObool_t s_eo_currents_watchdog_averageCalc_collectDataIsComple
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#if defined(EOCURRENTSWATCHDOG_CORRECT_THE_INITIALISE_BUG)
+static EOCurrentsWatchdog s_eo_currents_watchdog = 
+{
+    EO_INIT(.themotors)         {NULL, NULL, NULL, NULL},
+    EO_INIT(.numberofmotors)    0,
+    //EO_INIT(.filter_reg)       NULL,
+    EO_INIT(.nominalCurrent2)   {0, 0, 0, 0},
+    EO_INIT(.I2T_threshold)     {0, 0, 0, 0},
+    EO_INIT(.avgCurrent)        {0, 0, 0, 0},
+    EO_INIT(.accomulatorEp)     {0, 0, 0, 0},
+    EO_INIT(.initted)           eobool_false,
+    EO_INIT(.motorinI2Tfault)   {eobool_false, eobool_false, eobool_false, eobool_false}
+};
+#else
 static EOCurrentsWatchdog s_eo_currents_watchdog = 
 {
     EO_INIT(.themotors)         NULL,
@@ -116,11 +131,12 @@ static EOCurrentsWatchdog s_eo_currents_watchdog =
     EO_INIT(.initted)           eobool_false,
     EO_INIT(.motorinI2Tfault)   NULL
 };
+#endif
 
 static uint16_t suppliedVoltage_counter = 0;
 static eOmc_controller_t *nv_controller_ptr = NULL;
 #define SUMMPLIED_VOLTAGE_COUNTER_MAX 500
-//static const char s_eobj_ownname[] = "EOCurrentsWatchdog";
+static const char s_eobj_ownname[] = "EOCurrentsWatchdog";
 
 static int16_t maxReadCurrent[4] ={15, 15, 15, 15};//15 mA is the cureent with no load see datasheet of motor (debug only)
 
@@ -132,6 +148,66 @@ static int16_t maxReadCurrent[4] ={15, 15, 15, 15};//15 mA is the cureent with n
 
 extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
 {
+
+#if defined(EOCURRENTSWATCHDOG_CORRECT_THE_INITIALISE_BUG)   
+    
+    uint8_t m = 0;
+    
+    
+    // marco.accame on 09 mar 2021
+    // the folloing part could go inside a eo_currents_watchdog_Activate()
+    // as in here there is just a preparation of static ram. 
+    
+    // get the number of used motors
+    s_eo_currents_watchdog.numberofmotors = eo_entities_NumOfMotors(eo_entities_GetHandle());
+    
+    // currents are measured only for the 4 DC motors driven by the mc4plus board.
+    // however, on the mc4plus we may manage 7 logical motors w/ the eo_motcon_mode_mc4pluspmc
+    // hence we need to limit this case to 4 (maxmotors)
+    
+    if(s_eo_currents_watchdog.numberofmotors > maxmotors)
+    {
+        s_eo_currents_watchdog.numberofmotors = maxmotors;
+    }
+    
+    if((0 == s_eo_currents_watchdog.numberofmotors) || ( s_eo_currents_watchdog.numberofmotors > maxmotors))
+    {
+        s_eo_currents_watchdog.numberofmotors = 0;
+        return(&s_eo_currents_watchdog);
+    }
+
+
+    // retrieve pointers to motors   
+    for(m=0; m<s_eo_currents_watchdog.numberofmotors; m++)
+    {
+        s_eo_currents_watchdog.themotors[m] = eo_entities_GetMotor(eo_entities_GetHandle(), m);
+    }
+           
+    memset(s_eo_currents_watchdog.nominalCurrent2, 0, sizeof(s_eo_currents_watchdog.nominalCurrent2));
+    
+    memset(s_eo_currents_watchdog.I2T_threshold, 0, sizeof(s_eo_currents_watchdog.I2T_threshold));
+    
+    memset(s_eo_currents_watchdog.avgCurrent, 0, sizeof(s_eo_currents_watchdog.avgCurrent));
+
+    memset(s_eo_currents_watchdog.accomulatorEp, 0, sizeof(s_eo_currents_watchdog.accomulatorEp));
+    
+    memset(s_eo_currents_watchdog.motorinI2Tfault, 0, sizeof(s_eo_currents_watchdog.motorinI2Tfault)); //all motors are not in I2t fault
+
+    s_eo_currents_watchdog.initted = eobool_true;
+    
+    suppliedVoltage_counter = 0;
+    nv_controller_ptr = (eOmc_controller_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_controller, 0);
+    
+    if(nv_controller_ptr == NULL)
+    {
+        eo_errman_Trace(eo_errman_GetHandle(), "eo_currents_watchdog_Initialise(): NULL nv_controller_ptr", s_eobj_ownname);
+        s_eo_currents_watchdog.numberofmotors = 0;
+        return &s_eo_currents_watchdog;
+    }
+    
+#else
+    
+    
     uint8_t m;
     //reserve memory for the number of thresholds needed
     s_eo_currents_watchdog.numberofmotors = eo_entities_NumOfMotors(eo_entities_GetHandle());
@@ -170,7 +246,8 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
     if(nv_controller_ptr == NULL)
         return NULL;
     
-    
+#endif 
+  
     return(&s_eo_currents_watchdog);
 }
 
@@ -223,6 +300,18 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, in
     {
         return;
     }
+
+#if defined(EOCURRENTSWATCHDOG_CORRECT_THE_INITIALISE_BUG)     
+    if(0 == s_eo_currents_watchdog.numberofmotors)
+    {
+        return;
+    }
+    
+    if(NULL == currents)
+    {
+        return;
+    }
+#endif
     
     int16_t current_value = 0;
 

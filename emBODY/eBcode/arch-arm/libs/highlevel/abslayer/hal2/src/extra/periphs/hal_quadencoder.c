@@ -742,6 +742,20 @@ extern uint32_t hal_quadencoder_get_counter(hal_quadencoder_t id)
     return(temp); 
 }
 
+static uint8_t indexes_initted = 0;
+
+extern void hal_quadencoder_deinit_indexes_flags(void)
+{
+    
+    NVIC_InitTypeDef NVIC_InitStructure1;
+    NVIC_InitStructure1.NVIC_IRQChannel =  EXTI15_10_IRQn;
+    NVIC_InitStructure1.NVIC_IRQChannelPreemptionPriority = 0x0F;
+    NVIC_InitStructure1.NVIC_IRQChannelSubPriority = 0x0F;
+    NVIC_InitStructure1.NVIC_IRQChannelCmd = DISABLE;
+    NVIC_Init(&NVIC_InitStructure1); 
+    
+    indexes_initted = 0;   
+}
 
 extern void hal_quadencoder_init_indexes_flags(void)
 {
@@ -750,6 +764,30 @@ extern void hal_quadencoder_init_indexes_flags(void)
         return;
     }
     
+    // marco.accame on 9 mar 2021: fix initialization of a hw peripheral with an active IRQ Handler. 
+    // as a general rule, we should avoid touching the configuration of a peripheral which already 
+    // has an active IRQ Handler because it may give undefined behaviour. 
+    // that is what happened before this fix. the mc service calls this function
+    // multiple times and w/out protection that causes bad effects
+    //  
+    // to fix we must either:
+    // 1. init just once and never init again.
+    // 2. make sure the IRQ is stopped, configure peripheral and then start IRQ
+    //    (maybe also add a hal_quadencoder_deinit_indexes_flags() function which stops IRQ)
+    // 
+    // 
+    // solution
+    // i tested both solutions and both work: the calling application does not crash anymore.
+    // now hal_quadencoder_init_indexes_flags() has a protection vs multiple initializations
+    // and also there is a function which may deinit. 
+    // it will be up to the user to use deinit() and then init() or call only init() as it is now   
+    // done in EOtheMotionControl service
+           
+    if(1 == indexes_initted)
+    {
+       return;
+    }
+   
     // in future we should do it per quad-enc, thus .... 
     
   // Indexes  //
@@ -787,6 +825,10 @@ extern void hal_quadencoder_init_indexes_flags(void)
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
+  
+  
+    indexes_initted = 1;
+
 }
 
 

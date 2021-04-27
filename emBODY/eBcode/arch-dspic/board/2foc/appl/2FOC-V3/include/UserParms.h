@@ -18,6 +18,7 @@
 //#define UDEF_CURRENT_MAX 4000 // 4 A
 #define UDEF_SPEED_MAX  32767
 #define UDEF_PWM_MAX    25600 // 800*32 = 80%
+#define VOLT_REF_SHIFT 5 // for a PWM resolution of 1000
 
 //
 // Quadrature (incremental) Encoders parameters

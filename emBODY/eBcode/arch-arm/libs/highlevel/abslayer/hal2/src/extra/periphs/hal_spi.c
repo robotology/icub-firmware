@@ -624,11 +624,46 @@ extern hal_result_t hal_spi_deinit(hal_spi_t id)
         return hal_res_NOK_generic;
     }
     
-    s_hal_spi_initted_reset(id);
+#if !defined(SPIENC_DEINIT_DEALLOCATE_HEAP)
+    #warning SPIENC_DEINIT_DEALLOCATE_HEAP is not active so that we avoid runtime deallocation / allocation
+#else  
+    #warning SPIENC_DEINIT_DEALLOCATE_HEAP is active
+         
+    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
     
+    // we deallocate the pointers inside intitem 
+         
+    if(NULL != intitem->rxFIFOisrframe)
+    {
+        hl_fifo_delete(intitem->rxFIFOisrframe);
+        intitem->rxFIFOisrframe = NULL;
+    }
+    if(NULL != intitem->txFIFOisrframe)
+    {
+        hl_fifo_delete(intitem->txFIFOisrframe);
+        intitem->txFIFOisrframe = NULL;
+    } 
+    if(NULL != intitem->fiforx)
+    {
+        hl_fifo_delete(intitem->fiforx);
+        intitem->fiforx = NULL;
+    }  
+    if(NULL != intitem->userdeftxframe)
+    {
+        hal_heap_delete((void**)&(intitem->userdeftxframe));
+        intitem->userdeftxframe = NULL;
+    }
+    
+    // memset intitem to zero
+    memset(intitem, 0, sizeof(hal_spi_internal_item_t));
+    
+    // and now delete it.
     hal_heap_delete((void**)&(s_hal_spi_theinternals.items[HAL_spi_id2index(id)]));
-    //hal_heap_delete((void**)&intitem);
-    
+#endif 
+
+    // we mark this spi as un-initted
+    s_hal_spi_initted_reset(id); 
+      
     return (hal_res_OK);
 }
 
@@ -919,14 +954,33 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // --------------------------------------------------------------------------------------
     // init the spi internals data structure
     
+    // marco.accame on 09mar2021 
+    // in here we implement the following policy:
+    // we allocate only if we find that pointers are either NULL or dont point to the required space
+    // in this way, multiple cycles of init() / deinit() may save some runtime allocations.
+    // to avoid as much as possible runtime allocations you should undefine macro SPIENC_DEINIT_DEALLOCATE_HEAP
+    // so that deinit() does not remove memory and at the next init() the pointers are still active.
+    
+    // we use it to understand if we need to reallocate some memory or not
+    size_t prevsizeoftxframe = 0;
+    
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
         intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)] = hal_heap_new(sizeof(hal_spi_internal_item_t));
         // minimal initialisation of the internal item
-        // nothing to init.      
-    }      
-    
+        // nothing to init. just reset everything even if hal_heap_new() already does it
+        memset(intitem, 0, sizeof(hal_spi_internal_item_t)); 
+        prevsizeoftxframe = 0;       
+    }
+    else
+    {
+        // we have an intitem from a previous call of s_hal_spi_init(). 
+        // DONT memset(): intitem surely points to RAM alloated in a previous init()
+        // i get the size of tx frame in the previous initialization 
+        prevsizeoftxframe = intitem->config.maxsizeofframe * intitem->sizeofword;
+    } 
+
     // - the config   
     memcpy(&intitem->config, cfg, sizeof(hal_spi_cfg_t));
     hal_spi_cfg_t *usedcfg = NULL;
@@ -935,30 +989,50 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // only frame-based
     intitem->sizeofframe = usedcfg->maxsizeofframe;
     intitem->sizeofword = (hal_spi_datasize_16bit == usedcfg->datasize) ? (2) : (1);
+    size_t sizeoftxframe = usedcfg->maxsizeofframe * intitem->sizeofword;
  
-    volatile uint8_t sss = intitem->sizeofword;
-    sss = sss;
-    
+   
     // - the isr rx frame (heap allocation)  
-#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)    
-    intitem->rxFIFOisrframe = hl_fifo_new(usedcfg->maxsizeofframe, intitem->sizeofword, NULL);
-#else    
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)
+    
+    // we use hl_fifo_new2() because ... if does not alloc memory if the fifo is already ok.
+    // it allocate ram only if th fifo is NULL, it realloc it if its required space has changed
+    intitem->rxFIFOisrframe = hl_fifo_new2(intitem->rxFIFOisrframe, usedcfg->maxsizeofframe, intitem->sizeofword, NULL);
+    
+#else 
+    #error -> you are using a not-tested mode: check vs this pointer being NULL ...    
     intitem->rxBUFFERisrframe = (uint8_t*)hal_heap_new(usedcfg->maxsizeofframe * intitem->sizeofword);    
-#endif 
+#endif
+ 
     // reset counter
     intitem->rxWORDScounter = 0;
         
     // - the isr tx frame (heap allocation)
-#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)      
-    intitem->txFIFOisrframe = hl_fifo_new(usedcfg->maxsizeofframe, intitem->sizeofword, NULL);
-    intitem->userdeftxframe = (uint8_t*)hal_heap_new(usedcfg->maxsizeofframe * intitem->sizeofword);
-#else    
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO) 
+    // we use hl_fifo_new2() because ... if does not alloc memory if the fifo is already ok.
+    // it allocate ram only if th fifo is NULL, it realloc it if its required space has changed
+    intitem->txFIFOisrframe = hl_fifo_new2(intitem->txFIFOisrframe, usedcfg->maxsizeofframe, intitem->sizeofword, NULL);
+    
+    // the userdeftxframe must be allocated if NULL and reallocated if its required space has changed   
+    if((NULL == intitem->userdeftxframe))
+    {
+        intitem->userdeftxframe = (uint8_t*)hal_heap_new(sizeoftxframe);
+    }
+    else if(sizeoftxframe != prevsizeoftxframe)
+    {
+        // must reallocate.       
+        hal_heap_delete((void**)&(intitem->userdeftxframe));
+        intitem->userdeftxframe = (uint8_t*)hal_heap_new(sizeoftxframe);                
+    }    
+#else 
+    #error -> you are using a not-tested mode: check vs this pointer being NULL ...    
     intitem->txBUFFERisrframe = (uint8_t*)hal_heap_new(usedcfg->maxsizeofframe * intitem->sizeofword);    
 #endif
 
     // - the fifo of rx frames. but only if it is needed ... we dont need it if ...
-    intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->maxsizeofframe * intitem->sizeofword, NULL);
-        
+    #warning grosso come una casa: verifica la frase precedente
+    intitem->fiforx = hl_fifo_new2(intitem->fiforx, usedcfg->capacityofrxfifoofframes, usedcfg->maxsizeofframe * intitem->sizeofword, NULL);
+    
     // - the id
     intitem->id = id;
 

@@ -69,6 +69,10 @@
 #define CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(type)        ((eomc_enc_spichainof2 == (type)) || (eomc_enc_spichainof3 == (type)))
 
 
+#if defined(TESTethboardsfix)
+    #define FAKE_AEA
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
@@ -110,6 +114,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p);
 static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmc_position_t pos);
 static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo);
 static uint32_t s_eo_appEncReader_psc_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw);
+static uint32_t s_eo_appEncReader_pos_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw);
 static uint32_t s_eo_appEncReader_hallAdc_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo);
 
 static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port);
@@ -248,12 +253,17 @@ extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p)
 }
 
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof_4jomodescriptors_t *arrayofjomodes)
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes)
 {
     if((NULL == p) || (NULL == arrayofjomodes))
     {
         return(eores_NOK_nullpointer);
-    }   
+    } 
+
+    if(eo_constarray_Size(arrayofjomodes) > eOappEncReader_jomos_maxnumberof)
+    {
+        return eores_NOK_generic;
+    }        
 
     EOconstarray* carray = eo_constarray_Load((const EOarray*)arrayofjomodes);
     
@@ -263,22 +273,19 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof
     }    
 
     // ok, now the rest of the things
-    
-    // basic check ...
-    if(eo_constarray_Size(carray) > eOappEncReader_jomos_maxnumberof)
-    {
-        return(eores_NOK_generic);
-    }
-    
+        
     // 1. prepare the config
     p->config.numofjomos = eo_constarray_Size(carray);
         
-    
-    for(uint8_t i=0; i<eOappEncReader_jomos_maxnumberof; i++)
+
+    for(uint8_t i=0; i<p->config.numofjomos; i++)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
-        p->config.jomoconfig[i].encoder1des = jomodes->encoder1;
-        p->config.jomoconfig[i].encoder2des = jomodes->encoder2;
+        if(NULL != jomodes)
+        {
+            p->config.jomoconfig[i].encoder1des = jomodes->encoder1;
+            p->config.jomoconfig[i].encoder2des = jomodes->encoder2;
+        }
     }
 
     
@@ -528,8 +535,12 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             {
                 hal_spiencoder_position_t spiRawValue = 0; 
                 hal_spiencoder_errors_flags flags = {0};
-                
-                if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+#if defined(FAKE_AEA)                
+                spiRawValue = 0;
+                uint32_t ticks = (spiRawValue >> 6) & 0x0FFF;
+                prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos); 
+#else                
+                if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))                    
                 {   // ok, the hal reads correctly
                     if(eobool_true == s_eo_appEncReader_IsValidValue_AEA(&spiRawValue, &prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
@@ -553,7 +564,8 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 {   // we dont even have a valid reading from hal
                     prop.valueinfo->errortype = encreader_err_AEA_READING;
                     errorparam = 0xffff;                                         
-                }                
+                }   
+#endif                
                
             } break; 
             
@@ -1238,7 +1250,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
 {    
     uint8_t i = 0;
     
-    for(i=0; i< eOappEncReader_jomos_maxnumberof; i++)
+    for(i=0; i<p->config.numofjomos; i++)
     {
         eOappEncReader_jomoconfig_t* jmcfg = &p->config.jomoconfig[i];
         
@@ -1246,8 +1258,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
         {  
             hal_quadencoder_init((hal_quadencoder_t)jmcfg->encoder1des.port);            
         }
-
-        
+       
         if(jmcfg->encoder2des.type == eomc_enc_qenc)
         { 
             hal_quadencoder_init((hal_quadencoder_t)jmcfg->encoder2des.port);           
@@ -1288,9 +1299,17 @@ static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, ui
 
 static uint32_t s_eo_appEncReader_psc_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw)
 {
-    #warning currently we don't use the encoder factor for psc
+    //#warning currently we don't use the encoder factor for psc
     //currently the user can't configure the conversion factor of psc.
     //The psc boards send dec degree value in int16
+    
+    return EOMEAS_DEG2IDG(((float)(val_raw))/10);
+}
+
+static uint32_t s_eo_appEncReader_pos_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw)
+{
+    // currently the user can't configure the conversion factor of pos.
+    // The pos-based boards send decidegree values in int16
     
     return EOMEAS_DEG2IDG(((float)(val_raw))/10);
 }
@@ -1547,51 +1566,25 @@ static eObool_t s_eo_read_pos_for_port(EOappEncReader *p, eObrd_portpos_t port, 
     }
            
     switch(port)
-    {
+    {        
         case eobrd_portpos_hand_thumb:
-        {
-            eOas_pos_data_t *data0 = (eOas_pos_data_t*) eo_array_At(array, 0);
-            if(NULL != data0)
-            {
-                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data0->value);
-                valueInfo->composedof = 1;
-                ret = eobool_true; 
-            }                
-        } break;
-
         case eobrd_portpos_hand_index:
-        {
-            eOas_pos_data_t *data1 = (eOas_pos_data_t*) eo_array_At(array, 1);
-            if(NULL != data1)
-            {
-                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data1->value);
-                valueInfo->composedof = 1;
-                ret = eobool_true; 
-            }                
-        } break;    
-
         case eobrd_portpos_hand_medium:
+        case eobrd_portpos_hand_pinky:            
+        case eobrd_portpos_hand_thumbmetacarpus:
+        case eobrd_portpos_hand_thumbrotation:
+        case eobrd_portpos_hand_indexadduction:
         {
-            eOas_pos_data_t *data2 = (eOas_pos_data_t*) eo_array_At(array, 2);
-            if(NULL != data2)
+            uint8_t index = port;
+            eOas_pos_data_t *data = (eOas_pos_data_t*) eo_array_At(array, index);
+            if(NULL != data)
             {
-                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data2->value);
-                valueInfo->composedof = 1;
-                ret = eobool_true;  
-            }                
-        } break;      
-
-        case eobrd_portpos_hand_pinky:
-        {
-            eOas_pos_data_t *data3 = (eOas_pos_data_t*) eo_array_At(array, 3);
-            if(NULL != data3)
-            {
-                valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, data3->value);
+                valueInfo->value[0] = s_eo_appEncReader_pos_rescale2icubdegrees(p, data->value);
                 valueInfo->composedof = 1;
                 ret = eobool_true; 
             }                
-        } break;  
-
+        } break;   
+                
         default:
         {
             valueInfo->value[0] = 0;    
@@ -1602,7 +1595,6 @@ static eObool_t s_eo_read_pos_for_port(EOappEncReader *p, eObrd_portpos_t port, 
 
     return ret;
 }
-
 
 
 static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodertype(eOmc_encoder_t encodertype)

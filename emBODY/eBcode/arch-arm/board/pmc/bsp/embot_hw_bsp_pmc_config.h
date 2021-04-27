@@ -10,11 +10,6 @@
 #ifndef _EMBOT_HW_BSP_PMC_CONFIG_H_
 #define _EMBOT_HW_BSP_PMC_CONFIG_H_
 
-#include "embot_core.h"
-#include "embot_hw_types.h"
-#include "embot_hw_bsp.h"
-
-#include "stm32hal.h"
 
 
 #if   defined(STM32HAL_BOARD_PMC)
@@ -22,11 +17,20 @@
     #define  EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_flash
+    #define EMBOT_ENABLE_hw_flash_SINGLEBANK
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_can
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_tlv493d
-    //#define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
+    
+    // if we use emulatedMode we dont use the real HW
+#if defined(EMBOT_HW_BSP_PMC_emulates_SNSR_PZM)    
+    #define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
+    #define EMBOT_ENABLE_hw_qe_emulatedMODE
+    #define EMBOT_ENABLE_hw_lr17_emulatedMODE
+    #define EMBOT_ENABLE_hw_pzm_emulatedMODE
+#endif    
+
     //#define EMBOT_ENABLE_hw_button
     
     //#define EMBOT_ENABLE_hw_tlv493d_U27off
