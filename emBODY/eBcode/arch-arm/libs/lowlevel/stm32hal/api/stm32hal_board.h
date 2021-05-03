@@ -399,7 +399,7 @@ extern void stm32hal_board_init(void);
 
     // one case only: v190
     #if (STM32HAL_DRIVER_VERSION == 0x190)
-
+    
         #include "../src/config/stm32hal_driver_cfg_of_stm32h745disco_v190.h"
 
         #include "../src/board/stm32h745disco/v190/inc/gpio.h"

@@ -427,6 +427,9 @@ HAL_StatusTypeDef HAL_ETH_DeInit(ETH_HandleTypeDef *heth)
   return HAL_OK;
 }
 
+#if defined(STM32HAL_removeWEAK_ETH)
+    #warning macro STM32HAL_removeWEAK_ETH is defined, removing HAL_ETH_MspInit()
+#else    
 /**
   * @brief  Initializes the ETH MSP.
   * @param  heth: pointer to a ETH_HandleTypeDef structure that contains
@@ -441,7 +444,11 @@ __weak void HAL_ETH_MspInit(ETH_HandleTypeDef *heth)
   the HAL_ETH_MspInit could be implemented in the user file
   */
 }
+#endif
 
+#if defined(STM32HAL_removeWEAK_ETH)
+    #warning macro STM32HAL_removeWEAK_ETH is defined, removing HAL_ETH_MspDeInit()
+#else 
 /**
   * @brief  DeInitializes ETH MSP.
   * @param  heth: pointer to a ETH_HandleTypeDef structure that contains
@@ -456,6 +463,7 @@ __weak void HAL_ETH_MspDeInit(ETH_HandleTypeDef *heth)
   the HAL_ETH_MspDeInit could be implemented in the user file
   */
 }
+#endif
 
 #if (USE_HAL_ETH_REGISTER_CALLBACKS == 1)
 /**
@@ -1465,6 +1473,7 @@ HAL_StatusTypeDef HAL_ETH_BuildRxDescriptors(ETH_HandleTypeDef *heth)
   return HAL_OK;
 }
 
+#warning marco.accame: custom changes to HAL_ETH_IRQHandler() .... look at MARTINO Begin
 
 /**
   * @brief  This function handles ETH interrupt request.
@@ -1479,6 +1488,13 @@ void HAL_ETH_IRQHandler(ETH_HandleTypeDef *heth)
   {
     if(__HAL_ETH_DMA_GET_IT_SOURCE(heth, ETH_DMACIER_RIE))
     {
+			/* MARTINO Begin 
+				 Pending bits cleared here, instead after RX Callback. It is 
+				 mandatory, especially when the rx interrupt duration is too long (FRAME_QUEUE active / ~15us)
+				 It differs from original relase by STM 
+			*/
+			__HAL_ETH_DMA_CLEAR_IT(heth, ETH_DMACSR_RI | ETH_DMACSR_NIS);
+			/* MARTINO End */
 
 #if (USE_HAL_ETH_REGISTER_CALLBACKS == 1)
       /*Call registered Receive complete callback*/
@@ -1487,9 +1503,13 @@ void HAL_ETH_IRQHandler(ETH_HandleTypeDef *heth)
       /* Receive complete callback */
       HAL_ETH_RxCpltCallback(heth);
 #endif  /* USE_HAL_ETH_REGISTER_CALLBACKS */
-
-      /* Clear the Eth DMA Rx IT pending bits */
-      __HAL_ETH_DMA_CLEAR_IT(heth, ETH_DMACSR_RI | ETH_DMACSR_NIS);
+	
+			/* MARTINO Begin: commented */
+			#if (1)
+				/* Clear the Eth DMA Rx IT pending bits */
+			//__HAL_ETH_DMA_CLEAR_IT(heth, ETH_DMACSR_RI | ETH_DMACSR_NIS);
+			#endif
+			/* MARTINO End */
     }
   }
 
@@ -1655,6 +1675,9 @@ void HAL_ETH_IRQHandler(ETH_HandleTypeDef *heth)
 #endif
 }
 
+#if defined(STM32HAL_removeWEAK_ETH)
+    #warning macro STM32HAL_removeWEAK_ETH is defined, removing HAL_ETH_TxCpltCallback()
+#else
 /**
   * @brief  Tx Transfer completed callbacks.
   * @param  heth: pointer to a ETH_HandleTypeDef structure that contains
@@ -1669,7 +1692,12 @@ __weak void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *heth)
   the HAL_ETH_TxCpltCallback could be implemented in the user file
   */
 }
+#endif
 
+
+#if defined(STM32HAL_removeWEAK_ETH)
+    #warning macro STM32HAL_removeWEAK_ETH is defined, removing HAL_ETH_RxCpltCallback()
+#else
 /**
   * @brief  Rx Transfer completed callbacks.
   * @param  heth: pointer to a ETH_HandleTypeDef structure that contains
@@ -1684,6 +1712,7 @@ __weak void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
   the HAL_ETH_RxCpltCallback could be implemented in the user file
   */
 }
+#endif
 
 /**
   * @brief  Ethernet DMA transfer error callbacks
@@ -1700,6 +1729,7 @@ __weak void HAL_ETH_DMAErrorCallback(ETH_HandleTypeDef *heth)
   */
 }
 
+
 /**
 * @brief  Ethernet MAC transfer error callbacks
   * @param  heth: pointer to a ETH_HandleTypeDef structure that contains
@@ -1715,6 +1745,9 @@ __weak void HAL_ETH_MACErrorCallback(ETH_HandleTypeDef *heth)
   */
 }
 
+#if defined(STM32HAL_removeWEAK_ETH)
+    #warning macro STM32HAL_removeWEAK_ETH is defined, removing HAL_ETH_PMTCallback()
+#else
 /**
   * @brief  Ethernet Power Management module IT callback
   * @param  heth: pointer to a ETH_HandleTypeDef structure that contains
@@ -1729,6 +1762,7 @@ __weak void HAL_ETH_PMTCallback(ETH_HandleTypeDef *heth)
   the HAL_ETH_PMTCallback could be implemented in the user file
   */
 }
+#endif
 
 /**
   * @brief  Energy Efficient Etherent IT callback

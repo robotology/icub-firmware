@@ -143,7 +143,7 @@ Error_Handler();
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-//  MX_ETH_Init();
+  MX_ETH_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -157,6 +157,9 @@ Error_Handler();
 //    /* USER CODE BEGIN 3 */
 //  }
 //  /* USER CODE END 3 */
+
+	/* Core clock update */
+	SystemCoreClockUpdate();
 }
 
 
