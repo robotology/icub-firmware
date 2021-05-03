@@ -1,0 +1,7 @@
+=================================================================
+						HISTORY
+=================================================================
+
+17-02-2021 - Martino Sykora
+	Primo rilascio ufficiale della libreria IPAL-LWIP, descritta nel documento
+	docs/IPALLW_Report_di_consegna_V_100.pdf

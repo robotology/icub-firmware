@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package schemaVersion="1.6" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="PACK.xsd">
+  <vendor>lwIP</vendor>
+  <name>lwIP</name>
+  <description>lwIP is a light-weight implementation of the TCP/IP protocol suite</description>
+  <!-- web download link -->
+  <url>http://www.keil.com/pack/</url>
+  <releases>
+    <release version="2.1.2" date="2020-07-13">
+      Removed robust mutex attribute from CMSIS-RTOS2 abstraction
+    </release>
+    <release version="2.1.1" date="2020-04-22">
+      Updated Ethernet Driver (semaphore protection for multi-threading)
+    </release>
+    <release version="2.1.0" date="2019-12-03">
+      Release of lwIP in a PACK containing lwIP Version 2.1.2.
+      Added support for FreeRTOS
+      Enhanced lwIP components:
+       - added Core variants (IPv4, IPv6, IPv4/IPv6)
+       - added RTOS abstraction layer (CMSIS-RTOS2 and FreeRTOS)
+       - added Ethernet Driver using CMSIS Ethernet Driver
+       - added Serial I/O Driver using CMSIS USART Driver
+       - updated lwIP option template file (lwipopts.h)
+      Updated examples
+    </release>
+    <release version="2.0.0" date="2018-02-21">
+      Release of lwIP in a PACK containing lwIP Version 2.0.3.
+    </release>
+    <release version="1.4.1">
+      Initial release of lwIP in a PACK containing lwIP Version 1.4.1.
+    </release>
+  </releases>
+  <conditions>
+    <condition id="Network Core">
+      <description>Network Core component</description>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="CORE"/>
+    </condition>
+    <condition id="Network Core with Driver Ethernet">
+      <description>Network Core with Ethernet Driver</description>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="CORE"/>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="Driver" Csub="Ethernet"/>
+    </condition>
+    <condition id="Network Core with Driver SIO">
+      <description>Network Core with Serial I/O Driver</description>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="CORE"/>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="Driver" Csub="SIO"/>
+    </condition>
+    <condition id="Network with CMSIS-RTOS2">
+      <description>Network with CMSIS-RTOS2 OS abstraction</description>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="CORE"/>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="API"/>
+      <require Cclass="CMSIS" Cgroup="RTOS2"/>
+    </condition>
+    <condition id="Network with FreeRTOS">
+      <description>Network with FreeRTOS OS abstraction</description>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="CORE"/>
+      <require Cbundle="lwIP" Cclass="Network" Cgroup="API"/>
+      <require Cbundle="FreeRTOS" Cclass="RTOS" Cgroup="Core"/>
+    </condition>
+    <condition id="lwIP without RTOS">
+      <description>lwIP used without OS (NO_SYS)</description>
+      <deny Cbundle="lwIP" Cclass="Network" Cgroup="RTOS"/>
+    </condition>
+    <condition id="ETH Driver Single-file">
+      <description>Ethernet Driver: MAC with built-in PHY</description>
+      <require Cclass="CMSIS Driver" Cgroup="Ethernet" Capiversion="2.1.0"/>
+      <deny    Cclass="CMSIS Driver" Cgroup="Ethernet MAC"/>
+      <deny    Cclass="CMSIS Driver" Cgroup="Ethernet PHY"/>
+    </condition>
+    <condition id="ETH Driver Single- and Multi-file">
+      <description>Ethernet Driver: MAC with built-in PHY and MAC and PHY separate</description>
+      <require Cclass="CMSIS Driver" Cgroup="Ethernet" Capiversion="2.1.0"/>
+      <require Cclass="CMSIS Driver" Cgroup="Ethernet MAC" Capiversion="2.1.0"/>
+      <require Cclass="CMSIS Driver" Cgroup="Ethernet PHY" Capiversion="2.0.0"/>
+    </condition>
+    <condition id="ETH Driver Multi-file">
+      <description>Ethernet Driver: MAC and PHY</description>
+      <deny    Cclass="CMSIS Driver" Cgroup="Ethernet"/>
+      <require Cclass="CMSIS Driver" Cgroup="Ethernet MAC" Capiversion="2.1.0"/>
+      <require Cclass="CMSIS Driver" Cgroup="Ethernet PHY" Capiversion="2.0.0"/>
+    </condition>
+    <condition id="CMSIS Driver Ethernet">
+      <description>CMSIS Ethernet Driver</description>
+      <accept condition="ETH Driver Single- and Multi-file"/>
+      <accept condition="ETH Driver Single-file"/>
+      <accept condition="ETH Driver Multi-file"/>
+    </condition>
+    <condition id="CMSIS Driver USART">
+      <description>CMSIS USART Driver</description>
+      <require Cclass="CMSIS Driver" Cgroup="USART" Capiversion="2.1.0"/>
+    </condition>
+  </conditions>
+
+  <components>
+    <bundle Cbundle="lwIP" Cclass="Network" Cversion="2.1.2">
+      <description>lwIP (Lightweight IP stack)</description>
+      <doc>lwip/doc/doxygen/output/index.html</doc>
+      <component Cgroup="CORE" Cvariant="IPv4" isDefaultVariant="true">
+        <description>Network Core (IPv4)</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_Core                /* Network Core */
+          #define RTE_Network_IPv4                /* Network IPv4 Stack */
+        </RTE_Components_h>
+        <files>
+          <file category="header"  name="rte/config/lwipopts.h" attr="config" version="2.1.2"/>
+          <file category="include" name="rte/include/"/>
+          <file category="include" name="lwip/src/include/"/>
+          <file category="source"  name="lwip/src/core/init.c"/>
+          <file category="source"  name="lwip/src/core/def.c"/>
+          <file category="source"  name="lwip/src/core/dns.c"/>
+          <file category="source"  name="lwip/src/core/inet_chksum.c"/>
+          <file category="source"  name="lwip/src/core/ip.c"/>
+          <file category="source"  name="lwip/src/core/mem.c"/>
+          <file category="source"  name="lwip/src/core/memp.c"/>
+          <file category="source"  name="lwip/src/core/netif.c"/>
+          <file category="source"  name="lwip/src/core/pbuf.c"/>
+          <file category="source"  name="lwip/src/core/raw.c"/>
+          <file category="source"  name="lwip/src/core/stats.c"/>
+          <file category="source"  name="lwip/src/core/sys.c"/>
+          <file category="source"  name="lwip/src/core/altcp.c"/>
+          <file category="source"  name="lwip/src/core/altcp_alloc.c"/>
+          <file category="source"  name="lwip/src/core/altcp_tcp.c"/>
+          <file category="source"  name="lwip/src/core/tcp.c"/>
+          <file category="source"  name="lwip/src/core/tcp_in.c"/>
+          <file category="source"  name="lwip/src/core/tcp_out.c"/>
+          <file category="source"  name="lwip/src/core/timeouts.c"/>
+          <file category="source"  name="lwip/src/core/udp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/autoip.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/dhcp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/etharp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/icmp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/igmp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/ip4_frag.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/ip4.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/ip4_addr.c"/>
+          <file category="include" name="ports/no_os/include/" condition="lwIP without RTOS"/>
+        </files>
+      </component>
+      <component Cgroup="CORE" Cvariant="IPv6">
+        <description>Network Core (IPv6)</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_Core                /* Network Core */
+          #define RTE_Network_IPv6                /* Network IPv6 Stack */
+        </RTE_Components_h>
+        <files>
+          <file category="header"  name="rte/config/lwipopts.h" attr="config" version="2.1.2"/>
+          <file category="include" name="rte/include/"/>
+          <file category="include" name="lwip/src/include/"/>
+          <file category="source"  name="lwip/src/core/init.c"/>
+          <file category="source"  name="lwip/src/core/def.c"/>
+          <file category="source"  name="lwip/src/core/dns.c"/>
+          <file category="source"  name="lwip/src/core/inet_chksum.c"/>
+          <file category="source"  name="lwip/src/core/ip.c"/>
+          <file category="source"  name="lwip/src/core/mem.c"/>
+          <file category="source"  name="lwip/src/core/memp.c"/>
+          <file category="source"  name="lwip/src/core/netif.c"/>
+          <file category="source"  name="lwip/src/core/pbuf.c"/>
+          <file category="source"  name="lwip/src/core/raw.c"/>
+          <file category="source"  name="lwip/src/core/stats.c"/>
+          <file category="source"  name="lwip/src/core/sys.c"/>
+          <file category="source"  name="lwip/src/core/altcp.c"/>
+          <file category="source"  name="lwip/src/core/altcp_alloc.c"/>
+          <file category="source"  name="lwip/src/core/altcp_tcp.c"/>
+          <file category="source"  name="lwip/src/core/tcp.c"/>
+          <file category="source"  name="lwip/src/core/tcp_in.c"/>
+          <file category="source"  name="lwip/src/core/tcp_out.c"/>
+          <file category="source"  name="lwip/src/core/timeouts.c"/>
+          <file category="source"  name="lwip/src/core/udp.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/dhcp6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/ethip6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/icmp6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/inet6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/ip6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/ip6_addr.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/ip6_frag.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/mld6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/nd6.c"/>
+          <file category="include" name="ports/no_os/include/" condition="lwIP without RTOS"/>
+        </files>
+      </component>
+      <component Cgroup="CORE" Cvariant="IPv4/IPv6">
+        <description>Network Core (IPv4/IPv6)</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_Core                /* Network Core */
+          #define RTE_Network_IPv4                /* Network IPv4 Stack */
+          #define RTE_Network_IPv6                /* Network IPv6 Stack */
+        </RTE_Components_h>
+        <files>
+          <file category="header"  name="rte/config/lwipopts.h" attr="config" version="2.1.2"/>
+          <file category="include" name="rte/include/"/>
+          <file category="include" name="lwip/src/include/"/>
+          <file category="source"  name="lwip/src/core/init.c"/>
+          <file category="source"  name="lwip/src/core/def.c"/>
+          <file category="source"  name="lwip/src/core/dns.c"/>
+          <file category="source"  name="lwip/src/core/inet_chksum.c"/>
+          <file category="source"  name="lwip/src/core/ip.c"/>
+          <file category="source"  name="lwip/src/core/mem.c"/>
+          <file category="source"  name="lwip/src/core/memp.c"/>
+          <file category="source"  name="lwip/src/core/netif.c"/>
+          <file category="source"  name="lwip/src/core/pbuf.c"/>
+          <file category="source"  name="lwip/src/core/raw.c"/>
+          <file category="source"  name="lwip/src/core/stats.c"/>
+          <file category="source"  name="lwip/src/core/sys.c"/>
+          <file category="source"  name="lwip/src/core/altcp.c"/>
+          <file category="source"  name="lwip/src/core/altcp_alloc.c"/>
+          <file category="source"  name="lwip/src/core/altcp_tcp.c"/>
+          <file category="source"  name="lwip/src/core/tcp.c"/>
+          <file category="source"  name="lwip/src/core/tcp_in.c"/>
+          <file category="source"  name="lwip/src/core/tcp_out.c"/>
+          <file category="source"  name="lwip/src/core/timeouts.c"/>
+          <file category="source"  name="lwip/src/core/udp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/autoip.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/dhcp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/etharp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/icmp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/igmp.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/ip4_frag.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/ip4.c"/>
+          <file category="source"  name="lwip/src/core/ipv4/ip4_addr.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/dhcp6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/ethip6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/icmp6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/inet6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/ip6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/ip6_addr.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/ip6_frag.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/mld6.c"/>
+          <file category="source"  name="lwip/src/core/ipv6/nd6.c"/>
+          <file category="include" name="ports/no_os/include/" condition="lwIP without RTOS"/>
+        </files>
+      </component>
+      <component Cgroup="RTOS" Cvariant="CMSIS-RTOS2" condition="Network with CMSIS-RTOS2">
+        <description>OS abstraction layer (CMSIS-RTOS2)</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_RTOS                /* Network RTOS */
+          #define RTE_Network_CMSIS_RTOS2         /* Network CMSIS-RTOS2 */
+        </RTE_Components_h>
+        <files>
+          <file category="include" name="ports/cmsis-rtos/include/"/>
+          <file category="source"  name="ports/cmsis-rtos/sys_arch.c"/>
+        </files>
+      </component>
+      <component Cgroup="RTOS" Cvariant="FreeRTOS" condition="Network with FreeRTOS">
+        <description>OS abstraction layer (FreeRTOS)</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_RTOS                /* Network RTOS */
+          #define RTE_Network_FreeRTOS            /* Network FreeRTOS */
+        </RTE_Components_h>
+        <files>
+          <file category="include" name="ports/freertos/include/"/>
+          <file category="source"  name="ports/freertos/sys_arch.c"/>
+        </files>
+      </component>
+      <component Cgroup="Interface" Csub="Ethernet" condition="Network Core with Driver Ethernet">
+        <description>Network Ethernet Interface</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_Interface_Ethernet  /* Network Interface Ethernet */
+        </RTE_Components_h>
+        <files>
+          <file category="source"  name="lwip/src/netif/ethernet.c"/>
+        </files>
+      </component>
+      <component Cgroup="Interface" Csub="PPP" condition="Network Core with Driver SIO">
+        <description>Network PPP over Serial Interface</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_Interface_PPP       /* Network Interface PPP */
+        </RTE_Components_h>
+        <files>
+          <file category="source" name="lwip/src/netif/ppp/auth.c"/>
+          <file category="source" name="lwip/src/netif/ppp/ccp.c"/>
+          <file category="source" name="lwip/src/netif/ppp/chap-md5.c"/>
+          <file category="source" name="lwip/src/netif/ppp/chap-new.c"/>
+          <file category="source" name="lwip/src/netif/ppp/chap_ms.c"/>
+          <file category="source" name="lwip/src/netif/ppp/demand.c"/>
+          <file category="source" name="lwip/src/netif/ppp/eap.c"/>
+          <file category="source" name="lwip/src/netif/ppp/ecp.c"/>
+          <file category="source" name="lwip/src/netif/ppp/eui64.c"/>
+          <file category="source" name="lwip/src/netif/ppp/fsm.c"/>
+          <file category="source" name="lwip/src/netif/ppp/ipcp.c"/>
+          <file category="source" name="lwip/src/netif/ppp/ipv6cp.c"/>
+          <file category="source" name="lwip/src/netif/ppp/lcp.c"/>
+          <file category="source" name="lwip/src/netif/ppp/magic.c"/>
+          <file category="source" name="lwip/src/netif/ppp/mppe.c"/>
+          <file category="source" name="lwip/src/netif/ppp/multilink.c"/>
+          <file category="source" name="lwip/src/netif/ppp/ppp.c"/>
+          <file category="source" name="lwip/src/netif/ppp/pppapi.c"/>
+          <file category="source" name="lwip/src/netif/ppp/pppcrypt.c"/>
+          <file category="source" name="lwip/src/netif/ppp/pppoe.c"/>
+          <file category="source" name="lwip/src/netif/ppp/pppol2tp.c"/>
+          <file category="source" name="lwip/src/netif/ppp/pppos.c"/>
+          <file category="source" name="lwip/src/netif/ppp/upap.c"/>
+          <file category="source" name="lwip/src/netif/ppp/utils.c"/>
+          <file category="source" name="lwip/src/netif/ppp/vj.c"/>
+          <file category="source" name="lwip/src/netif/ppp/polarssl/arc4.c"/>
+          <file category="source" name="lwip/src/netif/ppp/polarssl/des.c"/>
+          <file category="source" name="lwip/src/netif/ppp/polarssl/md4.c"/>
+          <file category="source" name="lwip/src/netif/ppp/polarssl/md5.c"/>
+          <file category="source" name="lwip/src/netif/ppp/polarssl/sha1.c"/>
+        </files>
+      </component>
+      <component Cgroup="Interface" Csub="SLIP" condition="Network Core with Driver SIO">
+        <description>Network SLIP Interface</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_Interface_SLIP      /* Network Interface SLIP */
+        </RTE_Components_h>
+        <files>
+          <file category="source" name="lwip/src/netif/slipif.c"/>
+        </files>
+      </component>
+      <component Cgroup="Driver" Csub="Ethernet" Cvariant="CMSIS Driver" condition="CMSIS Driver Ethernet">
+        <description>Ethernet Interface using CMSIS Ethernet Driver</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_Driver_Ethernet     /* Network Driver Ethernet */
+        </RTE_Components_h>
+        <files>
+          <file category="header" name="ports/cmsis-driver/config/ethif_config.h" attr="config" version="1.0.0"/>
+          <file category="header" name="ports/cmsis-driver/netif/ethernetif.h"/>
+          <file category="source" name="ports/cmsis-driver/netif/ethernetif.c"/>
+        </files>
+      </component>
+      <component Cgroup="Driver" Csub="SIO" Cvariant="CMSIS Driver" condition="CMSIS Driver USART">
+        <description>Serial I/O Interface using CMSIS USART Driver</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_Driver_SIO          /* Network Driver SIO */
+        </RTE_Components_h>
+        <files>
+          <file category="header" name="ports/cmsis-driver/config/sio_config.h" attr="config" version="1.0.0"/>
+          <file category="source" name="ports/cmsis-driver/sio/sio.c"/>
+        </files>
+      </component>
+      <component Cgroup="API" condition="Network Core">
+        <description>Network high-level wrapper API</description>
+        <RTE_Components_h>
+          <!-- the following content goes into file 'RTE_Components.h' -->
+          #define RTE_Network_API                 /* Network API */
+        </RTE_Components_h>
+        <files>
+          <file category="source" name="lwip/src/api/api_lib.c"/>
+          <file category="source" name="lwip/src/api/api_msg.c"/>
+          <file category="source" name="lwip/src/api/if_api.c"/>
+          <file category="source" name="lwip/src/api/err.c"/>
+          <file category="source" name="lwip/src/api/netbuf.c"/>
+          <file category="source" name="lwip/src/api/netdb.c"/>
+          <file category="source" name="lwip/src/api/netifapi.c"/>
+          <file category="source" name="lwip/src/api/sockets.c"/>
+          <file category="source" name="lwip/src/api/tcpip.c"/>
+        </files>
+      </component>
+    </bundle>
+  </components>
+
+  <examples>
+    <!-- MCBSTM32F200 Development Board -->
+    <example name="HTTP Server (Raw)" doc="abstract.txt" folder="examples/MCBSTM32F200/httpd">
+      <description>lwIP HTTP Server Demo with Raw API</description>
+      <board name="MCBSTM32F200" vendor="Keil"/>
+      <project>
+        <environment name="uv" load="httpd.uvprojx"/>
+      </project>
+      <attributes>
+        <category>Middleware</category>
+        <category>Network</category>
+        <keyword>Web Server</keyword>
+        <keyword>HTTP</keyword>
+      </attributes>
+    </example>
+    <!-- MCB4300 Development Board -->
+    <example name="HTTP Server (Raw)" doc="abstract.txt" folder="examples/MCB4300/httpd">
+      <description>lwIP HTTP Server Demo with Raw API</description>
+      <board name="MCB4300" vendor="Keil"/>
+      <project>
+        <environment name="uv" load="httpd.uvprojx"/>
+      </project>
+      <attributes>
+        <category>Middleware</category>
+        <category>Network</category>
+        <keyword>Web Server</keyword>
+        <keyword>HTTP</keyword>
+      </attributes>
+    </example>
+    <!-- V2M-MPS2 Development Board -->
+    <example name="HTTP Server (Raw)" doc="abstract.txt" folder="examples/V2M-MPS2/httpd">
+      <description>lwIP HTTP Server Demo with Raw API</description>
+      <board name="V2M-MPS2 (IoT)" vendor="ARM"/>
+      <project>
+        <environment name="uv" load="httpd.uvprojx"/>
+      </project>
+      <attributes>
+        <category>Middleware</category>
+        <category>Network</category>
+        <keyword>Web Server</keyword>
+        <keyword>HTTP</keyword>
+      </attributes>
+    </example>
+  </examples>
+
+</package>
