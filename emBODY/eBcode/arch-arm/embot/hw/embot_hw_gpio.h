@@ -66,6 +66,7 @@ namespace embot { namespace hw { namespace gpio {
         Pull pull {Pull::nopull};
         Speed speed {Speed::medium};
         constexpr Config(Mode m, Pull p, Speed s) : mode(m), pull(p), speed(s) {}
+        constexpr Config() = default; 
     };
     
     bool supported(const embot::hw::GPIO &g);    
