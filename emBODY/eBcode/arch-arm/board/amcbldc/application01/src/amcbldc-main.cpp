@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2019 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2021 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -17,8 +17,8 @@ constexpr embot::app::theCANboardInfo::applicationInfo applInfo
     embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
-constexpr std::uint16_t threadIDLEstacksize = 2048;
-constexpr std::uint16_t threadINITstacksize = 2048;
+constexpr std::uint16_t threadIDLEstacksize = 4096;
+constexpr std::uint16_t threadINITstacksize = 4096;
 constexpr std::uint16_t threadEVNTstacksize = 4096;
 constexpr std::uint8_t maxINPcanframes = 16;
 constexpr std::uint8_t maxOUTcanframes = 48;
@@ -99,6 +99,12 @@ int main(void)
 #include "embot_app_application_theMCagent.h"
 
 
+#include "embot_hw_sys.h"
+
+// maybe move API and implementation of the ctrl thread in dedicated files
+void s_start_CTRL_thread();
+
+
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
 constexpr embot::core::relTime tickperiod = 2000*embot::core::time1millisec;
 
@@ -138,9 +144,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     
     // init of can basic paser
     embot::app::application::theCANparserBasic::getInstance().initialise({});
-        
-    
-                   
+                              
     // init agent of mc
     embot::app::application::theMCagent &themcagent = embot::app::application::theMCagent::getInstance();
     themcagent.initialise({});
@@ -148,9 +152,17 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     // init canparser mc and link it to its agent
     embot::app::application::theCANparserMC &canparsermc = embot::app::application::theCANparserMC::getInstance();
     embot::app::application::theCANparserMC::Config configparsermc { &themcagent };
-    canparsermc.initialise(configparsermc);   
+    canparsermc.initialise(configparsermc);  
+
+
+    // set priority of the can thread
+    evthr->setPriority(embot::os::Priority::high40);
         
+    // start the control thread
+    s_start_CTRL_thread();
     
+    embot::core::print("");
+    embot::core::print("Quitting the os::Thread::InitThread and starting the os::theScheduler");          
 }
 
 
@@ -158,14 +170,13 @@ void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
 {
     // inside startup of evnt thread: put the init of many things ... 
        
-    embot::core::print("userdefStartup(): start a timer which sends a tick event");
+    //embot::core::print("userdefStartup(): start a timer which sends a tick event");
        
     // start a timer which sends a tick event
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
-    tmr->start(cfg);     
-      
+    tmr->start(cfg);          
 }
 
 
@@ -197,12 +208,139 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
     
     if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
     {
-
-     
+   
     }   
     
 }
 
+
+// the CTRL thread is a embot::os::EventThread, so it executes:
+// - only once its _startup() function, where we start a timer which 
+//   triggers a tick event every 1 ms (for now 100 ms)
+// - and then its _onevent() when an event is sent to it. 
+
+
+// in the _startup() and _onevent() functions we can add what we want. 
+
+// so far, we need to measure the excution time of some test code, so, we need two functions:
+void test_init();
+void test_tick();
+// which init and tick the following:
+// - two functions: amcbldc::testcode::init(), amcbldc::testcode::tick()
+// - a class embot::app::scope::Signal which measures the duration of the above tick() by using
+//   - either a print of duration time
+//   - or a GPIO rised and lowred which can be measured with a true oscilloscope, 
+//   - or the Event Viewer tool visible by opening `Debug / OS Support / ....`.
+// here are the required include files
+#include "amcbldc_codetotest.h"
+#include "embot_app_scope.h"
+
+// just to see some GPIO transformations
+#include "embot_hw_gpio_bsp.h"
+
+// finally, from here there is the preparation of the t_CTRL thread
+
+embot::os::EventThread *t_CTRL {nullptr};
+void tCTRL_startup(embot::os::Thread *t, void *param);
+void tCTRL_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param);
+// we use function tCTRL() so that we can see string "thrCTRL" in the window OS Support / Event Viewer
+void thrCTRL(void* p) { embot::os::Thread *t = reinterpret_cast<embot::os::Thread*>(p); t->run(); }
+
+constexpr embot::os::Event evt_CTRL_tick {embot::os::bitpos2event(1)};
+embot::os::Timer * tCTRL_tickTimer {nullptr};
+constexpr embot::core::relTime tCTRL_tickperiod {100*embot::core::time1millisec}; 
+
+    
+void s_start_CTRL_thread()
+{        
+    t_CTRL = new embot::os::EventThread;
+    
+    embot::os::EventThread::Config tConfig { 
+        6*1024, 
+        embot::os::Priority::high47, 
+        tCTRL_startup,
+        nullptr,
+        100*embot::core::time1millisec, // or also ... timeout embot::core::reltimeWaitForever
+        tCTRL_onevent,
+        "thrCTRL"
+    };
+    
+    t_CTRL->start(tConfig, thrCTRL);      
+}
+
+void tCTRL_startup(embot::os::Thread *t, void *param)
+{    
+    embot::core::print("tCTRL_startup(): starts a timer which sends a tick event every " + embot::core::TimeFormatter(tCTRL_tickperiod).to_string());
+    
+    // start a timer which ticks the thread CTRL
+    tCTRL_tickTimer = new embot::os::Timer;
+    embot::os::Action act(embot::os::EventToThread(evt_CTRL_tick, t));
+    embot::os::Timer::Config cfg{tCTRL_tickperiod, act, embot::os::Timer::Mode::forever, 0};
+    tCTRL_tickTimer->start(cfg);  
+
+    embot::core::print("tCTRL_startup(): at every tick we shall execute a test action w/ measure of its duration");
+
+    // ok, now all the rest
+    test_init();    
+}
+
+
+void tCTRL_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
+{
+    
+    if(0 == eventmask)
+    {   // timeout ... 
+        return;
+    }
+    
+    
+    if(true == embot::core::binary::mask::check(eventmask, evt_CTRL_tick))
+    {        
+//        embot::core::print(std::string("tCTRL_onevent(evt_CTRL_tick): @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());                 
+        test_tick();
+    }       
+    
+}
+
+
+
+
+constexpr embot::app::scope::SignalType signaltype = embot::app::scope::SignalType::EViewer;
+//constexpr embot::app::scope::SignalType signaltype = embot::app::scope::SignalType::Print;
+//constexpr embot::app::scope::SignalType signaltype = embot::app::scope::SignalType::GPIO;
+
+embot::app::scope::Signal * signal {nullptr}; 
+
+void test_init()
+{     
+    // initialize the code to test
+    amcbldc::codetotest::init();
+
+    // initialize the tool which measure the duration of the code to test
+    if(embot::app::scope::SignalType::EViewer == signaltype)
+    {       
+        signal = new embot::app::scope::SignalEViewer({amcbldc::codetotest::tick, embot::app::scope::SignalEViewer::Config::LABEL::one});
+    }
+    else if(embot::app::scope::SignalType::Print == signaltype)
+    {
+        signal = new embot::app::scope::SignalPrint({"TOCK"});
+    }
+    else if(embot::app::scope::SignalType::GPIO == signaltype)
+    {
+        constexpr embot::hw::GPIO gpioLED3 = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen};
+        //constexpr embot::hw::GPIO gpioI2Cscl = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::six}; // to attach it to the scope
+        signal = new embot::app::scope::SignalGPIO({gpioLED3, embot::hw::gpio::State::RESET});
+    }
+    
+}
+
+
+void test_tick()
+{    
+    signal->on();    
+    amcbldc::codetotest::tick();
+    signal->off();    
+}
 
 
 
