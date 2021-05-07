@@ -339,7 +339,7 @@
               <MiscControls>-DUSE_PC104_ADDRESSING -Dembotapp_UDPDEMOBASIC -DmodifiedCMSISETH -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_cmsisos2</MiscControls>
               <Define>AC6 IPAL_USE_RTOS_MINIMAL USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\abslayer\ipal\api-so-far-not-used;..\..\ipal-lwip\ipal\ipal_api;..\drv;..\..\ipal-lwip\cmsis\driver;..\src;..\..\good-ipal\eth_interface;..\..\ipal-lwip\ipal\rtos;..\..\ipal-lwip\ipal\rtos\include</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\abslayer\ipal\api-so-far-not-used;..\..\ipal-lwip\ipal\ipal_api;..\drv;..\..\ipal-lwip\cmsis\driver;..\src;..\..\ipal-lwip\ipal\eth_interface;..\..\ipal-lwip\ipal\rtos;..\..\ipal-lwip\ipal\rtos\include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

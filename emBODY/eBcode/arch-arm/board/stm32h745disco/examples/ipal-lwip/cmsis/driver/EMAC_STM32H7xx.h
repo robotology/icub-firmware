@@ -38,14 +38,14 @@
 #include "Driver_ETH_MAC.h"
 
 #if defined(modifiedCMSISETH)
-#warning modifiedCMSISETH removed it because it does not find it
+#warning modifiedCMSISETH modified it because we use stm32hal.h
 #include "stm32hal.h"
 #else
 #include "stm32h7xx_hal.h"
 #endif
 
 #if defined(modifiedCMSISETH)
-#warning modifiedCMSISETH removed it because it does not find it
+#warning modifiedCMSISETH removed it because we use cube-mx files
 #else
 #include "RTE_Components.h"
 #include "MX_Device.h"
