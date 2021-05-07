@@ -59,6 +59,7 @@ void leds_off()
         if(nullptr != p)
         {
             gpio::init(p->gpio, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::medium});  
+            gpio::set(p->gpio, p->on);
             gpio::set(p->gpio, p->off);
         }
     }    
@@ -358,22 +359,19 @@ namespace embot { namespace hw { namespace flash {
      
    #if   defined(STM32HAL_BOARD_AMCBLDC)
 
-// acemor          
-        // application @ 128k
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ 128k
-        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
- 
-#if 0     
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000+(256+2)*1014,               (128)*1024,          2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(256*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(0*1024),     (252)*1024,         2*1024}};   // application @ 080k
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
-#endif
-
+   #if defined(EMBOT_ENABLE_hw_flash_SINGLEBANK)
+        // the stm32g4 has a page size of 4k when its flash is configured as single bank
+        constexpr uint32_t pagesize = 4*1024;
+   #else
+        // the stm32g4 has a page size of 2k when its flash is configured as two banks
+        constexpr uint32_t pagesize = 2*1024;
+   #endif
+        // application @ 128k, single bank
+        constexpr PROP whole                {{0x08000000,               (512)*1024,         pagesize}}; 
+        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         pagesize}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           pagesize}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     pagesize}};   // application @ 128k
+        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           pagesize}};   // applicationstorage: on top of application            
 
     #else
         #error embot::hw::flash::thebsp must be defined    

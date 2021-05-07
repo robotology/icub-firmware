@@ -37,7 +37,7 @@ namespace embot { namespace hw { namespace gpio {
         std::uint16_t stmpin {PROP::stmPINnone};   // GPIO_PIN_0, GPIO_PIN_1, etc.  or ... stmPIN00xx    
         embot::core::fpWorker clkena {nullptr};    // [](){__HAL_RCC_GPIOA_CLK_ENABLE();} etc.    
         constexpr PROP() : stmport(nullptr), stmpin(0) {}
-        constexpr PROP(GPIO_t* po, std::uint16_t pi, embot::core::fpWorker ce) : stmport(po), stmpin(pi), clkena(ce) {}
+        constexpr PROP(GPIO_t* po, std::uint16_t pi, embot::core::fpWorker ce = nullptr) : stmport(po), stmpin(pi), clkena(ce) {}
         constexpr bool isvalid() const { return (nullptr == stmport) ? false : true; }
         constexpr void clockenable() const { if(nullptr != clkena) { clkena(); } }
     };
