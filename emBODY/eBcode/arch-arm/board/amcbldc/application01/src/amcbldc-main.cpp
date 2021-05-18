@@ -260,7 +260,7 @@ void s_start_CTRL_thread()
         embot::os::Priority::high47, 
         tCTRL_startup,
         nullptr,
-        100*embot::core::time1millisec, // or also ... timeout embot::core::reltimeWaitForever
+        200*embot::core::time1millisec, // or also ... timeout embot::core::reltimeWaitForever
         tCTRL_onevent,
         "thrCTRL"
     };

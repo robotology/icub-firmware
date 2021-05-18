@@ -22,20 +22,41 @@
 #include "embot_hw_sys.h"
 #include <array>
 
+#define TEST_FOC
+
+#if defined(TEST_FOC)
+// foc code
+#include "Current_FOC.h"               // Model's header file
+#include "rtwtypes.h"
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - code
 // --------------------------------------------------------------------------------------------------------------------
 
+
+
     
 namespace amcbldc { namespace codetotest {
-           
+    
+#if defined(TEST_FOC)    
+    Current_FOCModelClass Current_FOC_Obj;// Instance of model class
+#endif
+    
     void init() 
     {
-        // nothing needed
+#if defined(TEST_FOC)        
+        // Initialize model
+        Current_FOC_Obj.initialize();
+#endif        
     }
         
     void tick()
     {
+#if defined(TEST_FOC)
+        // Step the model
+        Current_FOC_Obj.step();
+#else        
         static constexpr std::array<embot::core::relTime, 5> usec = 
         {   
             100*embot::core::time1microsec, 
@@ -47,7 +68,8 @@ namespace amcbldc { namespace codetotest {
         static uint8_t index {0};
         
         index = (index+1) % usec.size();
-        embot::hw::sys::delay(usec[index]);                
+        embot::hw::sys::delay(usec[index]);        
+#endif        
     }
     
 } } // namespace amcbldc { namespace codetotest {
