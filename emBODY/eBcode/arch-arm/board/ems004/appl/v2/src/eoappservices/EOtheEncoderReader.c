@@ -619,7 +619,7 @@ static void s_eo_encoderreader_init_ereader(EOconstarray * jomodes, eOcallback_t
     eo_appEncReader_Activate(s_eo_theencoderreader.reader, carray);    
     
     // to enable the diagnostics ... use on equal to eobool_true
-    eo_appEncReader_Diagnostics_Enable(s_eo_theencoderreader.reader, eobool_false);
+    eo_appEncReader_Diagnostics_Enable(s_eo_theencoderreader.reader, eobool_true);
 }
 
 
