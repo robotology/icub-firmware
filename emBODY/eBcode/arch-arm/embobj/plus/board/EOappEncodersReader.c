@@ -449,24 +449,25 @@ extern eOresult_t eo_appEncReader_Diagnostics_Tick(EOappEncReader *p)
                 eo_ledpulser_Start(eo_ledpulser_GetHandle(), p->diagnostics.config.errorled, eok_reltime100ms, 1);
             }
             
-            // we transmit a diagnostics message for encoder1 and/or encoder2
-            if(0 != p->diagnostics.par16[0])
+            // we transmit a diagnostics message for encoder1 
+            if((0 != p->diagnostics.par16[0]) || (0 != p->diagnostics.par64[0]))
             {
                 errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.par16            = p->diagnostics.par16[0];
                 errdes.par64            = p->diagnostics.par64[0];
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);   
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);   
             }  
-            if(0 != p->diagnostics.par16[1])
+            // we transmit a diagnostics message for encoder2
+            if((0 != p->diagnostics.par16[1]) || (0 != p->diagnostics.par64[1]))
             {
                 errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 1;
                 errdes.par16            = p->diagnostics.par16[1];
                 errdes.par64            = p->diagnostics.par64[1];
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);   
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);   
             }             
         }
         
@@ -526,6 +527,9 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
         } 
         
         // ok, we have a connected encoder. we see what type it is and we perform the proper acquisition
+        // we also retrieve its diagnostic
+        hal_spiencoder_diagnostic_t diagn = {0};
+        diagn.type = hal_spiencoder_diagnostic_type_none;
         
         switch(prop.descriptor->type)
         {
@@ -534,18 +538,20 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             case eomc_enc_aea:
             {
                 hal_spiencoder_position_t spiRawValue = 0; 
-                hal_spiencoder_errors_flags flags = {0};
+                // hal_spiencoder_errors_flags flags = {0};
+
 #if defined(FAKE_AEA)                
                 spiRawValue = 0;
                 uint32_t ticks = (spiRawValue >> 6) & 0x0FFF;
                 prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos); 
-#else                
-                if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))                    
+#else        
+                // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))                
                 {   // ok, the hal reads correctly
                     if(eobool_true == s_eo_appEncReader_IsValidValue_AEA(&spiRawValue, &prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
 
-                        // marco.accame: hal_spiencoder_get_value() gives back a value in uint32_t with only 18 bits of information (internally masked with 0x03FFFF).
+                        // marco.accame: hal_spiencoder_get_value2() gives back a value in uint32_t with only 18 bits of information (internally masked with 0x03FFFF).
                         // only the 12 most significant bits contain a position reading. to obtain the ticks we should do:
                         // ticks = (spiRawValue >> 6) & 0x0FFF;
                         // the resolution is now 4096 ticks per revolution.
@@ -573,9 +579,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             case eomc_enc_amo:
             {
                 hal_spiencoder_position_t spiRawValue = 0; 
-                hal_spiencoder_errors_flags flags = {0};
+                // hal_spiencoder_errors_flags flags = {0};
                 
-                if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+                // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))
                 {   // the spi raw reading is ok. i just need to rescale it.                   
                     //spiRawValue = (spiRawValue>>4) & 0xFFFF; marco.accame on 07jun17: why is there this comment? shall we remove it?
                     
@@ -589,15 +596,18 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     errorparam = 0; // we shall expand it later on...
                 }
                 
+                // and now ... use diagn
+                
             } break;
 
 
             case eomc_enc_spichainof2:
             {
                 hal_spiencoder_position_t spiRawValue = 0; 
-                hal_spiencoder_errors_flags flags = {0};
+                // hal_spiencoder_errors_flags flags = {0};
                 
-                if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+                // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))    
                 {   // ok, the hal reads correctly
                     if(eobool_true == s_eo_appEncReader_IsValidValue_SPICHAIN2(&spiRawValue, &prop.valueinfo->errortype))
                     {   // the hal value is valid. i just need to rescale it.
@@ -625,9 +635,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             case eomc_enc_spichainof3:
             {
                 hal_spiencoder_position_t arrayof3[3] = {0};
-                hal_spiencoder_errors_flags flags = {0};
+                // hal_spiencoder_errors_flags flags = {0};
                 
-                if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, arrayof3, &flags))
+                // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, arrayof3, &flags))
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, arrayof3, &diagn))    
                 {   // ok, the hal reads correctly
                     if(eobool_true == s_eo_appEncReader_IsValidValue_SPICHAIN3(arrayof3, &prop.valueinfo->errortype))
                     {   // the hal value is valid. i just need to rescale it.
@@ -741,39 +752,59 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
         }
         
         // now we see if there is any diagnostics to send up. we eval the errortype
+        // we have only one diagnostics for the 4 joints.
+        // in par16[0] and par64[0] we put info of the 4 primary encoders.
+        // in par16[1] and par64[1] we put info of the 4 secondary encoders.
+        // so far we use prop.valueinfo->errortype but we may use also diagn for the amo
 
         eObool_t filldiagnostics = eo_common_byte_bitcheck(p->diagnostics.config.jomomask, jomo);        
         if(eobool_true == filldiagnostics)
-        {   
-            switch(prop.valueinfo->errortype)
+        {
+            if(eomc_enc_amo == prop.descriptor->type)
             {
-                case encreader_err_NONE:
-                case encreader_err_NOTCONNECTED:
-                {   // we do nothing because reading is ok or is not done
-                } break;
-                
-                default:
-                case encreader_err_GENERIC:
-                {   // we dont know what is happening ... we just set the flag in par16[i].
-                    p->diagnostics.par16[i] |= (encreader_err_GENERIC<<(4*jomo));       // shift by nibbles ..                    
-                } break;
-                
-                case encreader_err_AEA_READING:               
-                case encreader_err_AEA_PARITY:
-                case encreader_err_AEA_CHIP:
-                case encreader_err_QENC_GENERIC:
-                case encreader_err_ABSANALOG_GENERIC:
-                case encreader_err_MAIS_GENERIC:
-                case encreader_err_PSC_GENERIC:
-                case encreader_err_POS_GENERIC:
-                case encreader_err_AMO_GENERIC:
-                case encreader_err_SPICHAINOF2_GENERIC:
-                case encreader_err_SPICHAINOF3_GENERIC:
-                {   // in such cases, we report the errortype and the errorparam that someone has prepared 
-                    p->diagnostics.par16[i] |= (prop.valueinfo->errortype<<(4*jomo));   // shift by nibbles ..
-                    p->diagnostics.par64[i] &= (errorparam<<(16*jomo));                 // shift by two bytes              
-                } break;                                
-            }            
+                // in here we send up a message only on the basis of diagn
+                if(hal_spiencoder_diagnostic_type_none != diagn.type)
+                {
+                    // select only a nibble from diagn.type and shift the nibble up so that we can fit 4 nibbles, one for each joint
+                    p->diagnostics.par16[i] |= ((0x0f & diagn.type)<<(4*jomo));  
+                    // select only 2 bytes: 1 from from diagn.type and one from diagn.info.value
+                    uint64_t word = (0x0ff & diagn.type) | ((0xff & diagn.info.value) << 8);
+                    // copy the word in correct position so that we have [word-enc3 | word-enc2 | word-enc1 | word-enc0]
+                    p->diagnostics.par64[i] |= (word << (16*jomo));                                         
+                }
+            }
+            else
+            {    
+                switch(prop.valueinfo->errortype)
+                {
+                    case encreader_err_NONE:
+                    case encreader_err_NOTCONNECTED:
+                    {   // we do nothing because reading is ok or is not done
+                    } break;
+                    
+                    default:
+                    case encreader_err_GENERIC:
+                    {   // we dont know what is happening ... we just set the flag in par16[i].
+                        p->diagnostics.par16[i] |= (encreader_err_GENERIC<<(4*jomo));       // shift by nibbles ..                    
+                    } break;
+                    
+                    case encreader_err_AEA_READING:               
+                    case encreader_err_AEA_PARITY:
+                    case encreader_err_AEA_CHIP:
+                    case encreader_err_QENC_GENERIC:
+                    case encreader_err_ABSANALOG_GENERIC:
+                    case encreader_err_MAIS_GENERIC:
+                    case encreader_err_PSC_GENERIC:
+                    case encreader_err_POS_GENERIC:
+                    case encreader_err_AMO_GENERIC:
+                    case encreader_err_SPICHAINOF2_GENERIC:
+                    case encreader_err_SPICHAINOF3_GENERIC:
+                    {   // in such cases, we report the errortype and the errorparam that someone has prepared 
+                        p->diagnostics.par16[i] |= (prop.valueinfo->errortype<<(4*jomo));   // shift by nibbles ..
+                        p->diagnostics.par64[i] &= (errorparam<<(16*jomo));                 // shift by two bytes              
+                    } break;                                
+                } 
+            }                
         }
         
         // ok, we now go to next encoder or ... we terminate the for() loop
