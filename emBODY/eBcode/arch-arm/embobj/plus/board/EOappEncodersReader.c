@@ -1060,9 +1060,10 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
 	hal_spiencoder_cfg_t config;
     config.priority = hal_int_priorityNONE;
     config.callback_on_rx = NULL; 
-    config.arg = NULL;;
-    config.reg_address = 0;
+    config.arg = NULL;
     config.sdata_precheck = hal_false;
+    config.reg_addresses[0] = config.reg_addresses[1] = 0;
+
     
     for(uint8_t i=0; i < hal_spiencoder_streams_number; i++)
     {
@@ -1075,8 +1076,9 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             config.callback_on_rx       = NULL;
             config.arg                  = NULL;
             config.type				    = hal_spiencoder_typeAEA;
-            config.reg_address	        = 0; // not meaningful
-            config.sdata_precheck       = hal_false;            
+            config.sdata_precheck       = hal_false;  
+            config.reg_addresses[0]	    = 0;
+            config.reg_addresses[1]	    = 0;            
         }
         else if(hal_spiencoder_typeAMO == thestream->type)
         {
@@ -1084,8 +1086,9 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             config.callback_on_rx       = NULL;
             config.arg                  = NULL;
             config.type			        = hal_spiencoder_typeAMO;
-            config.reg_address		    = 0x77;
-            config.sdata_precheck	    = hal_false;            
+            config.sdata_precheck	    = hal_false;  
+            config.reg_addresses[0]	    = 0x76;
+            config.reg_addresses[0]	    = 0x77;            
         }
         else if(hal_spiencoder_typeCHAINof2 == thestream->type)
         {
@@ -1093,8 +1096,9 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             config.callback_on_rx = s_eo_appEncReader_stopSPIread; 
             config.arg = (void*) thestream; 
             config.type = hal_spiencoder_typeCHAINof2; 
-            config.reg_address = 0; 
-            config.sdata_precheck = hal_false;
+            config.sdata_precheck       = hal_false;  
+            config.reg_addresses[0]	    = 0;
+            config.reg_addresses[1]	    = 0;  
             
             hal_spiencoder_init(thestream->id[0], &config);
             // if the stream is chainof2 we init only one encoder
@@ -1106,8 +1110,9 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             config.callback_on_rx = s_eo_appEncReader_stopSPIread; 
             config.arg = (void*) thestream; 
             config.type = hal_spiencoder_typeCHAINof3; 
-            config.reg_address = 0; 
-            config.sdata_precheck = hal_false;
+            config.sdata_precheck       = hal_false;  
+            config.reg_addresses[0]	    = 0;
+            config.reg_addresses[1]	    = 0;  
             
             hal_spiencoder_init(thestream->id[0], &config);
             // if the stream is chainof3 we init only one encoder

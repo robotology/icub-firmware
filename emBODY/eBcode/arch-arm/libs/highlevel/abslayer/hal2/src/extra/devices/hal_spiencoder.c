@@ -77,8 +77,8 @@ const hal_spiencoder_cfg_t hal_spiencoder_cfg_default =
     .callback_on_rx =   NULL,
     .arg =              NULL, 
     .type =             hal_spiencoder_typeNONE, 
-    .reg_address =      NULL, 
-    .sdata_precheck =   hal_false
+    .sdata_precheck =   hal_false,
+    .reg_addresses =    {0, 0} 
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -97,6 +97,7 @@ typedef struct
     uint8_t                     rxframes[3][4];     // 3 possible frames received. The size of everyone is the maximum possible
     uint16_t                    rxframechain[3];    // 1 frame of 2 words of 16 bits
     hl_chip_ams_as5055a_channel_t chainchannel;
+    volatile uint8_t            amo_regaddr;
 } hal_spiencoder_internal_item_t;
 
 
@@ -649,8 +650,8 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
                 return(hal_res_NOK_generic);    
             }
         }
-        // check the value of the status registers: 
-        if(0x76 == intitem->config.reg_address)
+        // check the value of the status register: 
+        if(0x76 == intitem->amo_regaddr)
         {   
             // STATUS0
             // datasheeet (Rev F1, Page 58/69) shows only bits [4, 0], so i mask them 
@@ -662,7 +663,7 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
                 diagn->info.value = regval;                
             }            
         }
-        else if(0x77 == intitem->config.reg_address)
+        else if(0x77 == intitem->amo_regaddr)
         {
             // STATUS1
             // datasheeet (Rev F1, Page 58/69) shows the 8 bits are used 
@@ -758,7 +759,7 @@ extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder
             }
         }
         //Check errors for reg: 0x76
-        if ((intitem->config.reg_address) == 0x76)
+        if ((intitem->amo_regaddr) == 0x76)
         {                
             if(((intitem->rxframes[2][2]) & 0x0F) != 0x00)
             {
@@ -770,7 +771,7 @@ extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder
             }
         }
         //Check errors for reg: 0x77
-        else if ((intitem->config.reg_address) == 0x77)
+        else if ((intitem->amo_regaddr) == 0x77)
         {
             if(((intitem->rxframes[2][2]) & 0x08) != 0x00)
             {
@@ -1004,13 +1005,24 @@ static hal_result_t s_hal_spiencoder_read_register_init_t2(hal_spiencoder_t id)
 {
     hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
-    if (intitem->config.reg_address == NULL)
+    static volatile uint8_t counter = 0;    
+    counter ++;
+    counter = counter % 2;
+    
+    intitem->amo_regaddr = intitem->config.reg_addresses[counter];
+    
+    if(0 == intitem->amo_regaddr)
     {
-        return (hal_res_NOK_generic);
+        // marco.accame on 24 may 2021: i prefer to impose reading of a register than to return.
+        // i fear that s_hal_spiencoder_onreceiv_reg_init() is not invoked and that ... eventually
+        // the intitem->config.callback_on_rx(intitem->config.arg); is never called.
+        // so: i force teh reading anyways
+        intitem->amo_regaddr = 0x76;
+        //return(hal_res_NOK_generic);
     }
         
     //Not const, cause it could change every time...
-    uint8_t txframe_rinit[2] = {0x97, intitem->config.reg_address};
+    uint8_t txframe_rinit[2] = {0x97, intitem->amo_regaddr};
     
     //Enable CHIPSELECT
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valLOW);

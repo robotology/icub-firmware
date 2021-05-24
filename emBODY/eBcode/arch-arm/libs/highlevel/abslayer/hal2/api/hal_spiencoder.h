@@ -143,8 +143,11 @@ typedef struct
     void (*callback_on_rx)(void *arg);          /**< callback called when a new value for the encoder is available   */
     void*                       arg;            /**< argument of the callback: contains pointer to latest encoder value  */
     hal_spiencoder_type_t       type;           /**< Encoder model. type 1: AEA, type 2: AMO Board, type 3: DAISY CHAIN of 2 encoders */
-    uint8_t                     reg_address;    /**< Address of the register to be read to validate the sensor data (not meaningful for AEA board) */
     hal_bool_t                  sdata_precheck; /**< If hal_true, performs a validity check on the sensor data transmission before the real reading (not meaningful for AEA board)  */
+    uint8_t                     reg_addresses[2]; // array of addresses of registers of AMO to read in daisy chain.
+                                                  // for AMO if any value is 0x00 then it is filled with 0x77.
+                                                  // valid values: {0x76, 0x77} reads status1 and status2 in two times, {0x77, 0x77} reads always status2,
+                                                  //               {0x76, 0x76} reads always status.    
 } hal_spiencoder_cfg_t;
 
 
