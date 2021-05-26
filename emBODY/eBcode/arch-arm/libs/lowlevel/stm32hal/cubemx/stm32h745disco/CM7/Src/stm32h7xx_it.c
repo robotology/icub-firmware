@@ -156,7 +156,9 @@ void DebugMon_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
-
+#if defined(USE_STM32HAL)
+    // dont need it
+#else    
 /**
   * @brief This function handles Ethernet global interrupt.
   */
@@ -170,6 +172,7 @@ void ETH_IRQHandler(void)
 
   /* USER CODE END ETH_IRQn 1 */
 }
+#endif
 
 /* USER CODE BEGIN 1 */
 

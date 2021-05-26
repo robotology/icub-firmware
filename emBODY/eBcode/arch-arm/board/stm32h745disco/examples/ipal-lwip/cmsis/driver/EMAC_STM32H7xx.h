@@ -39,7 +39,11 @@
 
 #if defined(modifiedCMSISETH)
 #warning modifiedCMSISETH modified it because we use stm32hal.h
+#if defined(USE_STM32HAL)
 #include "stm32hal.h"
+#else
+#include "stm32h7xx_hal.h"
+#endif
 #else
 #include "stm32h7xx_hal.h"
 #endif

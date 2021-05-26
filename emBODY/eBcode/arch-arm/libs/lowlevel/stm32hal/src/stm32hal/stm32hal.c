@@ -166,6 +166,31 @@ void HAL_IncTick(void)
 //  uwTick++;
 }
 
+//#define USE_ANOTHER_TICK
+
+#if defined(USE_ANOTHER_TICK)
+
+#include "cmsisos2.h"
+
+uint32_t HAL_GetTick(void) 
+{
+  static uint32_t ticks;
+         uint32_t i;
+
+  if (osKernelGetState() == osKernelRunning) {
+    return ((uint32_t)osKernelGetTickCount ());
+  }
+
+  /* If Kernel is not running wait approximately 1 ms then increment
+     and return auxiliary tick counter value */
+  for (i = (SystemCoreClock >> 4U); i > 0U; i--) {
+    __NOP(); __NOP();
+  }
+  return ++ticks;
+}
+
+#else
+
 uint32_t HAL_GetTick(void)
 {
 //  return uwTick;
@@ -179,6 +204,7 @@ uint32_t HAL_GetTick(void)
     return tick;
 }
 
+#endif
 
 void HAL_Delay(uint32_t Delay)
 {

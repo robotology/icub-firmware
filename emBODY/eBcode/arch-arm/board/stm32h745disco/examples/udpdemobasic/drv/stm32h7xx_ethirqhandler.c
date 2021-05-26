@@ -1,5 +1,9 @@
 
+#if defined(USE_STM32HAL)
 #include "stm32hal.h"
+#else
+#include "eth.h"
+#endif
 //extern ETH_HandleTypeDef heth;
 
 /******************************************************************************/

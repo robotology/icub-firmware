@@ -18,8 +18,13 @@
 #include <stdbool.h>
 
 #warning changes into stm32hal
-//#include "stm32h7xx_hal.h"
+#if defined(USE_STM32HAL)
 #include "stm32hal.h"
+#else
+#include "stm32h7xx_hal.h"
+#endif
+//#include "stm32h7xx_hal.h"
+//#include "stm32hal.h"
 
 #warning removed because it is wrong
 //extern ETH_HandleTypeDef *heth;

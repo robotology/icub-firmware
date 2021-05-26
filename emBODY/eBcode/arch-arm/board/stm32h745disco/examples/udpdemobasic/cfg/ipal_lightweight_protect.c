@@ -31,6 +31,9 @@ int32_t kernel_restorelock(int32_t l) { return osKernelRestoreLock(l); }
 #include "osal.h"
 int32_t kernel_lock()   { osal_system_scheduling_suspend(); return 0; }
 int32_t kernel_restorelock(int32_t l) { osal_system_scheduling_restart(); return 0; }
+#else
+int32_t kernel_lock()   { return 0; }
+int32_t kernel_restorelock(int32_t l) { return 0; }
 #endif
 
 
