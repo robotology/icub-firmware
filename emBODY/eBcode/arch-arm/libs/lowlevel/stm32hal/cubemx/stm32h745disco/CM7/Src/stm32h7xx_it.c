@@ -156,7 +156,7 @@ void DebugMon_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
-#if defined(USE_STM32HAL)
+#if defined(CUBEMXIPALDEMO)
     // dont need it
 #else    
 /**

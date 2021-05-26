@@ -1161,7 +1161,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DmodifiedCMSISETH -DUSE_PC104_ADDRESSING -DAC6 -DIPAL_USE_RTOS_MINIMAL</MiscControls>
+              <MiscControls>-DCUBEMXIPALDEMO -DmodifiedCMSISETH -DUSE_PC104_ADDRESSING -DAC6 -DIPAL_USE_RTOS_MINIMAL</MiscControls>
               <Define>CORE_CM7,USE_HAL_DRIVER,STM32H745xx</Define>
               <Undefine></Undefine>
               <IncludePath>../CM7/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../start_of_new_include_paths;..\..\..\..\..\..\board\stm32h745disco\examples\ipal-lwip\ipal\ipal_api;..\..\..\..\..\..\board\stm32h745disco\examples\udpdemobasic\drv;..\..\..\..\..\..\board\stm32h745disco\examples\ipal-lwip\cmsis\driver;..\..\..\..\..\..\board\stm32h745disco\examples\ipal-lwip\ipal\eth_interface;..\..\..\..\..\..\board\stm32h745disco\examples\ipal-lwip\ipal\rtos;..\..\..\..\..\..\board\stm32h745disco\examples\ipal-lwip\ipal\rtos\include</IncludePath>
