@@ -41,7 +41,7 @@ extern "C" {
 #include "hal_spiencoder.h"
 #include "hal_gpio.h"
 #include "EOtheLEDpulser.h"
-
+#include "EOtheErrorManager.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -50,6 +50,7 @@ extern "C" {
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
+
 
 typedef struct
 {                                       
@@ -99,6 +100,19 @@ typedef struct
 } eo_appEncReader_diagnostics_t;
 
 
+enum { amodiag_numOfJoints = 2 };
+
+typedef struct
+{   // only for an encoder at joint of type AMO and onty for the first two joints j0 and/or j1.
+    eObool_t                                enabled;
+    hal_spiencoder_position_t               vals[amodiag_numOfJoints]; // raw value of the first and secnds
+    uint16_t                                regs[amodiag_numOfJoints]; // first and seconds joint
+    uint8_t                                 cnts[amodiag_numOfJoints]; // for the two joints
+    eOerrmanDescriptor_t                    one; // first message type
+    eOerrmanDescriptor_t                    two; // secnd message type
+} eo_appEncReader_amodiag_t;
+
+
 struct EOappEncReader_hid
 {
     eObool_t                                initted;
@@ -110,6 +124,7 @@ struct EOappEncReader_hid
     eo_appEncReader_diagnostics_t           diagnostics;
     float                                   maisConversionFactors[eOappEncReader_jomos_maxnumberof];
     eOappEncReader_hallAdc_conversionData_t hallAdcConversionData;
+    eo_appEncReader_amodiag_t               amodiag;
 }; 
 
 

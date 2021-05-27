@@ -139,6 +139,12 @@ static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodert
 
 static eOresult_t s_eo_appEncReader_Diagnostics_Config(EOappEncReader *p, eo_appEncReader_diagnostics_cfg_t* cfg);
 
+// interface of amo diagnostics.
+// they operate w/ s_eo_theappencreader.amodiag
+static void s_eo_appEncReader_amodiag_Init();
+static void s_eo_appEncReader_amodiag_Enable(eObool_t enable);
+static void s_eo_appEncReader_amodiag_Update(uint8_t jomo, hal_spiencoder_position_t amorawvalue, eOencoderProperties_t *prop, hal_spiencoder_diagnostic_t *dia);
+static void s_eo_appEncReader_amodiag_Tick();
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -171,10 +177,20 @@ static EOappEncReader s_eo_theappencreader =
     {
         EO_INIT(.factors            ) {1.0f, 1.0f, 1.0f, 1.0f},
         EO_INIT(.offsets            ) {0,   0,   0,   0}
+    },
+    EO_INIT(.amodiag)
+    {
+        EO_INIT(.enabled)           eobool_true,
+        EO_INIT(.vals)              { 0, 0 },
+        EO_INIT(.regs)              { 0, 0 },
+        EO_INIT(.cnts)              { 0, 0},
+        EO_INIT(.one)               { 0, 0, 0, 0, 0 },
+        EO_INIT(.two)               { 0, 0, 0, 0, 0 }       
     }
 };
 
-
+// by default amodiag is enabled.
+static const eObool_t s_amodiag_enable = eobool_true;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -204,9 +220,13 @@ extern EOappEncReader* eo_appEncReader_Initialise(void)
     memset(&s_eo_theappencreader.config, 0, sizeof(s_eo_theappencreader.config));
     
     s_eo_clear_SPI_streams(&s_eo_theappencreader);   
-
     
-    // nothing else to do in here. everything else must be done with a proper configuration
+    
+    // amodiag is an extra respect to the legacy diagnostics.
+    // in here i just init it and sets its enable state to s_amodiag_enable    
+    s_eo_appEncReader_amodiag_Init();
+    s_eo_appEncReader_amodiag_Enable(s_amodiag_enable);
+    
     
     s_eo_theappencreader.initted = eobool_true;
     return(&s_eo_theappencreader);
@@ -432,7 +452,11 @@ extern eOresult_t eo_appEncReader_Diagnostics_Tick(EOappEncReader *p)
     {
         return(eores_NOK_nullpointer);
     }
+
+    // this is amodiag, the diagnostics dedicated to amo encoder
+    s_eo_appEncReader_amodiag_Tick();
     
+    // this is the legacy diagnostics for all types of encoders
     if(0 != p->diagnostics.config.jomomask)
     {
         eOerrmanDescriptor_t errdes = {0};
@@ -597,7 +621,11 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 }
                 
                 // and now ... use diagn
+                // for legacy diagnostics
                 
+                // and calls the following for amodiag                
+                s_eo_appEncReader_amodiag_Update(jomo, spiRawValue, &prop, &diagn);
+               
             } break;
 
 
@@ -1674,7 +1702,111 @@ static eOresult_t s_eo_appEncReader_Diagnostics_Config(EOappEncReader *p, eo_app
     p->diagnostics.par64[0] = p->diagnostics.par64[1] = 0;  
 
     return(eores_OK);
+
 }
+
+// in here are the methods for amodiag
+
+static void s_eo_appEncReader_amodiag_Init()
+{
+    s_eo_theappencreader.amodiag.enabled = eobool_false;
+    memset(&s_eo_theappencreader.amodiag.vals, 0, sizeof(s_eo_theappencreader.amodiag.vals));
+    memset(&s_eo_theappencreader.amodiag.regs, 0, sizeof(s_eo_theappencreader.amodiag.regs)); 
+    memset(&s_eo_theappencreader.amodiag.cnts, 0, sizeof(s_eo_theappencreader.amodiag.cnts)); 
+    
+    s_eo_theappencreader.amodiag.one.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag05);
+    s_eo_theappencreader.amodiag.one.sourcedevice = eo_errman_sourcedevice_localboard;
+    s_eo_theappencreader.amodiag.one.sourceaddress = s_eo_theappencreader.amodiag.one.par16 = s_eo_theappencreader.amodiag.one.par64 = 0;
+    
+    s_eo_theappencreader.amodiag.two.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag06);
+    s_eo_theappencreader.amodiag.two.sourcedevice = eo_errman_sourcedevice_localboard;
+    s_eo_theappencreader.amodiag.two.sourceaddress = s_eo_theappencreader.amodiag.two.par16 = s_eo_theappencreader.amodiag.two.par64 = 0;   
+}
+
+static void s_eo_appEncReader_amodiag_Enable(eObool_t enable)
+{
+    s_eo_theappencreader.amodiag.enabled = enable;
+}
+
+static void s_eo_appEncReader_amodiag_Update(uint8_t jomo, hal_spiencoder_position_t amorawvalue, eOencoderProperties_t *prop, hal_spiencoder_diagnostic_t* dia)
+{   
+    if(eobool_false == s_eo_theappencreader.amodiag.enabled)
+    {
+        return;
+    }
+    
+
+    if((eomc_enc_amo == prop->descriptor->type) && (jomo < amodiag_numOfJoints)) // we could add also: && (eomc_pos_atjoint == prop->descriptor.type) 
+    {
+        s_eo_theappencreader.amodiag.vals[jomo] = amorawvalue;
+        
+        // ok, jomo is 0 or 1, it has an amo encoder
+        if(hal_spiencoder_diagnostic_type_amo_status0 == dia->type)
+        {
+            uint16_t reg = dia->info.value;
+            s_eo_theappencreader.amodiag.regs[jomo] |= reg;
+        }
+        else if(hal_spiencoder_diagnostic_type_amo_status1 == dia->type)
+        {
+            uint16_t reg = dia->info.value;
+            reg <<= 8;
+            s_eo_theappencreader.amodiag.regs[jomo] |= reg;
+        }
+        
+        s_eo_theappencreader.amodiag.cnts[jomo]++;        
+        
+    }
+   
+}        
+
+static void s_eo_appEncReader_amodiag_Tick()
+{
+
+    if(eobool_false == s_eo_theappencreader.amodiag.enabled)
+    {
+        return;
+    }
+    
+    // amo diagnostics
+    // we evaluate, fill, send. we do that for two joints
+    for(uint8_t j=0; j<amodiag_numOfJoints; j++)
+    {
+        if(0 == (s_eo_theappencreader.amodiag.cnts[j]%2))
+        {
+            // we have reached two consecutive readings, so we have both status0 and status1 
+            // if the content of the registers is non-zero we transmit. then we reset
+            uint16_t regs = s_eo_theappencreader.amodiag.regs[j];
+            if(0 != regs)
+            {
+                // reset
+                s_eo_theappencreader.amodiag.regs[j] = 0;
+                
+                // and transmit one and two w/ par16 being teh value of the registers and sourceaddress the joint number 
+                s_eo_theappencreader.amodiag.one.sourceaddress = s_eo_theappencreader.amodiag.two.sourceaddress = j;
+                s_eo_theappencreader.amodiag.one.par16 = s_eo_theappencreader.amodiag.two.par16 = regs;                
+                
+                // i also need eOmc_motor_status_t and eOmc_joint_status_t
+                // in one.par64 i put [amo_measure, eOmc_motor_status_t::basic::mot_current]
+                // in two.par64 i put [eOmc_motor_status_t::basic::mot_pwm, eOmc_joint_status_t::core::measures::meas_position]
+                eOmc_motor_status_t *ms = eo_entities_GetMotorStatus(eo_entities_GetHandle(), j);
+                eOmc_joint_status_t *js = eo_entities_GetJointStatus(eo_entities_GetHandle(), j);
+                
+                uint64_t amo_measure = s_eo_theappencreader.amodiag.vals[j];
+                uint64_t mot_current = ms->basic.mot_current;
+                s_eo_theappencreader.amodiag.one.par64 = (amo_measure << 32) | mot_current;
+                
+                uint64_t mot_pwm = ms->basic.mot_pwm;
+                uint64_t meas_position = js->core.measures.meas_position;
+                s_eo_theappencreader.amodiag.two.par64 = (mot_pwm << 32) | meas_position;   
+
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &s_eo_theappencreader.amodiag.one); 
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &s_eo_theappencreader.amodiag.two);                 
+            }
+        }
+        
+    }
+       
+}// 
 
 
 // --------------------------------------------------------------------------------------------------------------------
