@@ -98,6 +98,7 @@ typedef struct
     uint16_t                    rxframechain[3];    // 1 frame of 2 words of 16 bits
     hl_chip_ams_as5055a_channel_t chainchannel;
     volatile uint8_t            amo_regaddr;
+    volatile uint8_t            counter;
 } hal_spiencoder_internal_item_t;
 
 
@@ -236,7 +237,7 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     }
     // Copy configuration in a protected memory
     memcpy(&intitem->config, cfg, sizeof(hal_spiencoder_cfg_t));   
-     
+    intitem->counter = 0; 
     
     // configure the required mux port and spi port (using the configuration of the board for the selected encoder)
     // "hal_spiencoder__theboardconfig" struct is defined inside the board modules 
@@ -655,7 +656,7 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
         {   
             // STATUS0
             // datasheeet (Rev F1, Page 58/69) shows only bits [4, 0], so i mask them 
-            uint8_t regval = 0x1F & intitem->rxframes[2][2];
+            uint8_t regval = 0xFF & intitem->rxframes[2][2];
             // if 0 -> no errors
             if(0 != regval)
             {
@@ -1005,11 +1006,9 @@ static hal_result_t s_hal_spiencoder_read_register_init_t2(hal_spiencoder_t id)
 {
     hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
-    static volatile uint8_t counter = 0;    
-    counter ++;
-    counter = counter % 2;
     
-    intitem->amo_regaddr = intitem->config.reg_addresses[counter];
+    intitem->counter ++;
+    intitem->amo_regaddr = intitem->config.reg_addresses[intitem->counter%2];
     
     if(0 == intitem->amo_regaddr)
     {

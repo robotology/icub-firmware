@@ -1088,7 +1088,7 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             config.type			        = hal_spiencoder_typeAMO;
             config.sdata_precheck	    = hal_false;  
             config.reg_addresses[0]	    = 0x76;
-            config.reg_addresses[0]	    = 0x77;            
+            config.reg_addresses[1]	    = 0x77;            
         }
         else if(hal_spiencoder_typeCHAINof2 == thestream->type)
         {
