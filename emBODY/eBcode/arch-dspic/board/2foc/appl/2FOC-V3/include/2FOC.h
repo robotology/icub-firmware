@@ -47,6 +47,7 @@ typedef union
         unsigned has_index:1;
         unsigned has_speed_qe:1;
         unsigned verbose:1;
+        unsigned fullcalib:1;
     };
 
     unsigned int bitmask;
