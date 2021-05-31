@@ -189,8 +189,6 @@ static EOappEncReader s_eo_theappencreader =
     }
 };
 
-// by default amodiag is enabled.
-static const eObool_t s_amodiag_enable = eobool_true;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -223,11 +221,9 @@ extern EOappEncReader* eo_appEncReader_Initialise(void)
     
     
     // amodiag is an extra respect to the legacy diagnostics.
-    // in here i just init it and sets its enable state to s_amodiag_enable    
+    // in here i just init it. later i will set its enable state
     s_eo_appEncReader_amodiag_Init();
-    s_eo_appEncReader_amodiag_Enable(s_amodiag_enable);
-    
-    
+        
     s_eo_theappencreader.initted = eobool_true;
     return(&s_eo_theappencreader);
 }
@@ -273,7 +269,7 @@ extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p)
 }
 
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes)
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes, eOmn_serv_diagn_mode_t dm)
 {
     if((NULL == p) || (NULL == arrayofjomodes))
     {
@@ -317,6 +313,12 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arra
     
         
     s_eo_theappencreader.active = eobool_true;    
+    
+    // to enable the diagnostics ... use on equal to eobool_true
+    
+    s_eo_appEncReader_amodiag_Enable((eOmn_serv_diagn_mode_MC_AMO == dm) ? eobool_true: eobool_false);     
+    eo_appEncReader_Diagnostics_Enable(p, (eOmn_serv_diagn_mode_MC_ENC == dm) ? eobool_true: eobool_false);
+    
     return(eores_OK);
 }
 

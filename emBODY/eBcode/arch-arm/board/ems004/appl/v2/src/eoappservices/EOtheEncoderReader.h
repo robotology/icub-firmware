@@ -101,10 +101,10 @@ extern EOtheEncoderReader* eo_encoderreader_GetHandle(void);
 
 // it verifies if the service as defined in the configuration is possible, it executes a callback
 // (which may send a confirmation to the entity which asked fot verification), and then it may activate the service by calling  eo_encoderreader_Activate().
-extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify, eOmn_serv_diagn_mode_t dm);
 
 // it activates the service by loading the service configuration
-extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes);
+extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes, eOmn_serv_diagn_mode_t dm);
 
 // it deactivates service.
 extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p);

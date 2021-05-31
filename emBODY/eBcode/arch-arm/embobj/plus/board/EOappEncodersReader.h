@@ -72,7 +72,7 @@ extern EOappEncReader* eo_appEncReader_Initialise(void);
 
 extern EOappEncReader* eo_appEncReader_GetHandle(void);
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes);
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes, eOmn_serv_diagn_mode_t dm);
 
 extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p);
 
