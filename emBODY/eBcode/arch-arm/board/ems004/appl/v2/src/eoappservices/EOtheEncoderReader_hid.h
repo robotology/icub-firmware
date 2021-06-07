@@ -76,7 +76,7 @@ struct EOtheEncoderReader_hid
     uint8_t                                 failuremask2[2];
     eOencoderreader_errortype_t             errors2[2][eOappEncReader_jomos_maxnumberof];
     EOappEncReader*                         reader;
-    eOmn_serv_diagn_mode_t                  diagnosticsmode;
+    eOmn_serv_diagn_cfg_t                   diagnosticsconfig;
 }; 
 
 

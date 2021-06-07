@@ -44,6 +44,7 @@
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
+#include "EOVtheSystem.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -142,7 +143,7 @@ static eOresult_t s_eo_appEncReader_Diagnostics_Config(EOappEncReader *p, eo_app
 // interface of amo diagnostics.
 // they operate w/ s_eo_theappencreader.amodiag
 static void s_eo_appEncReader_amodiag_Init();
-static void s_eo_appEncReader_amodiag_Enable(eObool_t enable);
+static void s_eo_appEncReader_amodiag_Config(eOmn_serv_diagn_cfg_t dc);
 static void s_eo_appEncReader_amodiag_Update(uint8_t jomo, hal_spiencoder_position_t amorawvalue, eOencoderProperties_t *prop, hal_spiencoder_diagnostic_t *dia);
 static void s_eo_appEncReader_amodiag_Tick();
 
@@ -181,6 +182,7 @@ static EOappEncReader s_eo_theappencreader =
     EO_INIT(.amodiag)
     {
         EO_INIT(.enabled)           eobool_true,
+        EO_INIT(.minimuminterval)   {(100*1000), (100*1000)},
         EO_INIT(.vals)              { 0, 0 },
         EO_INIT(.regs)              { 0, 0 },
         EO_INIT(.cnts)              { 0, 0},
@@ -269,7 +271,7 @@ extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p)
 }
 
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes, eOmn_serv_diagn_mode_t dm)
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arrayofjomodes, eOmn_serv_diagn_cfg_t dc)
 {
     if((NULL == p) || (NULL == arrayofjomodes))
     {
@@ -316,8 +318,8 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arra
     
     // to enable the diagnostics ... use on equal to eobool_true
     
-    s_eo_appEncReader_amodiag_Enable((eOmn_serv_diagn_mode_MC_AMO == dm) ? eobool_true: eobool_false);     
-    eo_appEncReader_Diagnostics_Enable(p, (eOmn_serv_diagn_mode_MC_ENC == dm) ? eobool_true: eobool_false);
+    s_eo_appEncReader_amodiag_Config(dc);     
+    eo_appEncReader_Diagnostics_Enable(p, (eomn_serv_diagn_mode_MC_ENC == dc.mode) ? eobool_true: eobool_false);
     
     return(eores_OK);
 }
@@ -1712,6 +1714,10 @@ static eOresult_t s_eo_appEncReader_Diagnostics_Config(EOappEncReader *p, eo_app
 static void s_eo_appEncReader_amodiag_Init()
 {
     s_eo_theappencreader.amodiag.enabled = eobool_false;
+    for(uint8_t i=0; i<amodiag_numOfJoints; i++)
+    {
+        s_eo_theappencreader.amodiag.minimuminterval[i] = 250*eok_reltime1ms;
+    }
     memset(&s_eo_theappencreader.amodiag.vals, 0, sizeof(s_eo_theappencreader.amodiag.vals));
     memset(&s_eo_theappencreader.amodiag.regs, 0, sizeof(s_eo_theappencreader.amodiag.regs)); 
     memset(&s_eo_theappencreader.amodiag.cnts, 0, sizeof(s_eo_theappencreader.amodiag.cnts)); 
@@ -1725,9 +1731,10 @@ static void s_eo_appEncReader_amodiag_Init()
     s_eo_theappencreader.amodiag.two.sourceaddress = s_eo_theappencreader.amodiag.two.par16 = s_eo_theappencreader.amodiag.two.par64 = 0;   
 }
 
-static void s_eo_appEncReader_amodiag_Enable(eObool_t enable)
+static void s_eo_appEncReader_amodiag_Config(eOmn_serv_diagn_cfg_t dc)
 {
-    s_eo_theappencreader.amodiag.enabled = enable;
+    s_eo_theappencreader.amodiag.enabled = (eomn_serv_diagn_mode_MC_AMO== dc.mode) ? eobool_true : eobool_false;
+    s_eo_theappencreader.amodiag.minimuminterval[0] = s_eo_theappencreader.amodiag.minimuminterval[1] = eok_reltime1ms * dc.par16;
 }
 
 static void s_eo_appEncReader_amodiag_Update(uint8_t jomo, hal_spiencoder_position_t amorawvalue, eOencoderProperties_t *prop, hal_spiencoder_diagnostic_t* dia)
@@ -1763,6 +1770,8 @@ static void s_eo_appEncReader_amodiag_Update(uint8_t jomo, hal_spiencoder_positi
 
 static void s_eo_appEncReader_amodiag_Tick()
 {
+    static uint16_t numoferrorsbewteentransmissions[amodiag_numOfJoints] = {0, 0};
+    static eOabstime_t previoustransmission[amodiag_numOfJoints] = {0, 0};
 
     if(eobool_false == s_eo_theappencreader.amodiag.enabled)
     {
@@ -1782,27 +1791,47 @@ static void s_eo_appEncReader_amodiag_Tick()
             {
                 // reset
                 s_eo_theappencreader.amodiag.regs[j] = 0;
+                // increment
+                numoferrorsbewteentransmissions[j]++;
                 
-                // and transmit one and two w/ par16 being teh value of the registers and sourceaddress the joint number 
-                s_eo_theappencreader.amodiag.one.sourceaddress = s_eo_theappencreader.amodiag.two.sourceaddress = j;
-                s_eo_theappencreader.amodiag.one.par16 = s_eo_theappencreader.amodiag.two.par16 = regs;                
+                // decide if we can transmit
+                eObool_t time2transmit = eobool_false;               
+                eOabstime_t now = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+                int64_t delta = now - previoustransmission[j];
+                if(delta >= s_eo_theappencreader.amodiag.minimuminterval[j])
+                {
+                    time2transmit = eobool_true;
+                    previoustransmission[j] = now;
+                }
                 
-                // i also need eOmc_motor_status_t and eOmc_joint_status_t
-                // in one.par64 i put [amo_measure, eOmc_motor_status_t::basic::mot_current]
-                // in two.par64 i put [eOmc_motor_status_t::basic::mot_pwm, eOmc_joint_status_t::core::measures::meas_position]
-                eOmc_motor_status_t *ms = eo_entities_GetMotorStatus(eo_entities_GetHandle(), j);
-                eOmc_joint_status_t *js = eo_entities_GetJointStatus(eo_entities_GetHandle(), j);
-                
-                uint64_t amo_measure = s_eo_theappencreader.amodiag.vals[j];
-                uint64_t mot_current = ms->basic.mot_current;
-                s_eo_theappencreader.amodiag.one.par64 = (amo_measure << 32) | mot_current;
-                
-                uint64_t mot_pwm = ms->basic.mot_pwm;
-                uint64_t meas_position = js->core.measures.meas_position;
-                s_eo_theappencreader.amodiag.two.par64 = (mot_pwm << 32) | meas_position;   
 
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &s_eo_theappencreader.amodiag.one); 
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &s_eo_theappencreader.amodiag.two);                 
+                if(eobool_true == time2transmit)
+                {
+                                
+                    // and transmit one and two w/ par16 being teh value of the registers and sourceaddress the joint number 
+                    s_eo_theappencreader.amodiag.one.sourceaddress = s_eo_theappencreader.amodiag.two.sourceaddress = j;
+                    s_eo_theappencreader.amodiag.one.par16 = regs;                
+                    s_eo_theappencreader.amodiag.two.par16 = numoferrorsbewteentransmissions[j];
+                    
+                    // i also need eOmc_motor_status_t and eOmc_joint_status_t
+                    // in one.par64 i put [amo_measure, eOmc_motor_status_t::basic::mot_current]
+                    // in two.par64 i put [eOmc_motor_status_t::basic::mot_pwm, eOmc_joint_status_t::core::measures::meas_position]
+                    eOmc_motor_status_t *ms = eo_entities_GetMotorStatus(eo_entities_GetHandle(), j);
+                    eOmc_joint_status_t *js = eo_entities_GetJointStatus(eo_entities_GetHandle(), j);
+                    
+                    uint64_t amo_measure = s_eo_theappencreader.amodiag.vals[j];
+                    uint64_t mot_current = (NULL != ms) ? ms->basic.mot_current : 0;
+                    s_eo_theappencreader.amodiag.one.par64 = (amo_measure << 32) | (mot_current & 0xffffffff);
+                    
+                    uint64_t mot_pwm = (NULL != ms) ? ms->basic.mot_pwm : 0;
+                    uint64_t meas_position = (NULL != js) ? js->core.measures.meas_position : 0;
+                    s_eo_theappencreader.amodiag.two.par64 = (mot_pwm << 32) | (meas_position & 0xffffffff);   
+
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &s_eo_theappencreader.amodiag.one); 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &s_eo_theappencreader.amodiag.two);   
+                    
+                    numoferrorsbewteentransmissions[j] = 0;
+                }                
             }
         }
         

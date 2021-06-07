@@ -533,9 +533,11 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         p->sharedcan.ondiscoverystop.function = s_eo_motioncontrol_onstop_search4focs;
         p->sharedcan.ondiscoverystop.parameter = (void*)&p->service.servconfig;
         
-        eOmn_serv_diagn_mode_t dm = p->service.servconfig.diagnosticsmode;
+        eOmn_serv_diagn_cfg_t dc = {0, 0};
+        dc.mode = p->service.servconfig.diagnosticsmode;
+        dc.par16 = p->service.servconfig.diagnosticsparam;
         // 2. at first i verify the encoders. then, function s_eo_motioncontrol_foc_onendofverify_encoder() shall either issue an encoder error or start discovery of foc boards
-        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_foc_onendofverify_encoder, eobool_true, dm); 
+        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_foc_onendofverify_encoder, eobool_true, dc); 
         
     }
     else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
@@ -592,8 +594,10 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         p->service.onverify = onverify;
         p->service.activateafterverify = activateafterverify;
         
-        eOmn_serv_diagn_mode_t dm = p->service.servconfig.diagnosticsmode;
-        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plus_onendofverify_encoder, eobool_true, dm);           
+        eOmn_serv_diagn_cfg_t dc = {0, 0};
+        dc.mode = p->service.servconfig.diagnosticsmode;
+        dc.par16 = p->service.servconfig.diagnosticsparam;
+        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plus_onendofverify_encoder, eobool_true, dc);           
     }
     else if(eo_motcon_mode_mc4plusmais == p->service.servconfig.type)
     {
@@ -905,8 +909,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor);        
 
             // init the encoders
-            eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;
-            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dm);
+            eOmn_serv_diagn_cfg_t dc = {0, 0};
+            dc.mode = servcfg->diagnosticsmode;
+            dc.par16 = servcfg->diagnosticsparam;
+            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
 
             
             // init the emscontroller.
@@ -1103,8 +1109,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
 
             // d. init the encoders    
-            eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;            
-            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dm);
+            eOmn_serv_diagn_cfg_t dc = {0, 0};
+            dc.mode = servcfg->diagnosticsmode;
+            dc.par16 = servcfg->diagnosticsparam;            
+            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
 
             
             // e. activate interrupt line for quad_enc indexes check
@@ -1157,8 +1165,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
 
         // d. init the encoders 
-        eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;        
-        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dm);
+        eOmn_serv_diagn_cfg_t dc = {0, 0};
+        dc.mode = servcfg->diagnosticsmode;
+        dc.par16 = servcfg->diagnosticsparam;        
+        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
 
             
         // e. activate interrupt line for quad_enc indexes check (Even if we are on mc2plus, we use the same funcion of mc4plus)   
@@ -1208,8 +1218,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
 
         // d. init the encoders  
-        eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;
-        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dm);
+        eOmn_serv_diagn_cfg_t dc = {0, 0};
+        dc.mode = servcfg->diagnosticsmode;
+        dc.par16 = servcfg->diagnosticsparam;
+        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
 
             
         // e. activate interrupt line for quad_enc indexes check   
@@ -1309,8 +1321,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
 
         // d. init the encoders  
-        eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;        
-        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dm);
+        eOmn_serv_diagn_cfg_t dc = {0, 0};
+        dc.mode = servcfg->diagnosticsmode;
+        dc.par16 = servcfg->diagnosticsparam; 
+        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
 
             
         // e. activate interrupt line for quad_enc indexes check   
@@ -1888,7 +1902,10 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
         {
             // the array of jomo descriptots is already pointed by p->ctrlobjs.jomodescriptors
             eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;
-            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS, eobool_true, dm);             
+            eOmn_serv_diagn_cfg_t dc = {0, 0};
+            dc.mode = servcfg->diagnosticsmode;
+            dc.par16 = servcfg->diagnosticsparam;
+            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS, eobool_true, dc);             
         }
     } 
     else
@@ -1944,8 +1961,10 @@ static eOresult_t s_eo_motioncontrol_onendofverify_psc(EOaService* s, eObool_t o
         // so here I need only to verify encoder readings, that is psc boards can read valid values
         
         // the array of jomo descriptors is already pointed by p->ctrlobjs.jomodescriptors
-        eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;
-        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder, eobool_true, dm);             
+        eOmn_serv_diagn_cfg_t dc = {0, 0};
+        dc.mode = servcfg->diagnosticsmode;
+        dc.par16 = servcfg->diagnosticsparam;
+        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder, eobool_true, dc);             
     } 
     else
     {
@@ -2002,13 +2021,17 @@ static eOresult_t s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t o
         // the array of jomo descriptor is already pointed by p->ctrlobjs.jomodescriptors
         if(eo_motcon_mode_mc4plusfaps == servcfg->type)
         {
-            eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;
-            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder, eobool_true, dm);   
+            eOmn_serv_diagn_cfg_t dc = {0, 0};
+            dc.mode = servcfg->diagnosticsmode;
+            dc.par16 = servcfg->diagnosticsparam;
+            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder, eobool_true, dc);   
         } 
         else if(eo_motcon_mode_mc4pluspmc == servcfg->type)
         {
-            eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;
-            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder, eobool_true, dm);
+            eOmn_serv_diagn_cfg_t dc = {0, 0};
+            dc.mode = servcfg->diagnosticsmode;
+            dc.par16 = servcfg->diagnosticsparam;
+            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder, eobool_true, dc);
         }
     } 
     else
