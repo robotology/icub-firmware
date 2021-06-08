@@ -89,7 +89,7 @@
     }
 
 
-    extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+    extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify, eOmn_serv_diagn_mode_t dm)
     {
         // we alert the host that the verification of the service has failed
         eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, eomn_serv_state_failureofverify);
@@ -104,7 +104,7 @@
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes)
+    extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes, eOmn_serv_diagn_mode_t dm)
     {
         eo_encoderreader_SendReport(NULL);
         return eores_NOK_generic;
@@ -146,8 +146,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+//#define EOTHEENCODERREADER_enableAMOdiagnostics
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
@@ -169,7 +169,7 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
 static void s_eo_encodereader_send_periodic_error_report(void *p);
 
 
-static void s_eo_encoderreader_init_ereader(EOconstarray * jomodes, eOcallback_t callback, void* arg);
+static void s_eo_encoderreader_init_ereader(EOconstarray * jomodes, eOmn_serv_diagn_cfg_t dc, eOcallback_t callback, void* arg);
 
 static void s_eo_encoderreader_read_encoders(void* p);
 
@@ -209,7 +209,12 @@ static EOtheEncoderReader s_eo_theencoderreader =
     EO_INIT(.numofencoders)             0,
     EO_INIT(.failuremask2)              {0},
     EO_INIT(.errors2)                   {{encreader_err_NONE}, {encreader_err_NONE}},
-    EO_INIT(.reader)                    NULL
+    EO_INIT(.reader)                    NULL,
+    EO_INIT(.diagnosticsconfig)         
+    {
+        EO_INIT(.mode)          eomn_serv_diagn_mode_NONE, 
+        EO_INIT(.par16)         250
+    }
 };
 
 static const char s_eobj_ownname[] = "EOtheEncoderReader";
@@ -259,7 +264,7 @@ extern EOtheEncoderReader* eo_encoderreader_GetHandle(void)
 }
 
 
-extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify, eOmn_serv_diagn_cfg_t dc)
 {
     if((NULL == p) || (NULL == jomodes))
     {
@@ -280,11 +285,15 @@ extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * 
     // make sure the timer is not running
     eo_timer_Stop(s_eo_theencoderreader.diagnostics.reportTimer);   
     
-    
     s_eo_theencoderreader.service.onverify = onverify;
     s_eo_theencoderreader.service.activateafterverify = activateafterverify;
-                    
-    s_eo_encoderreader_init_ereader(jomodes, NULL, NULL);
+    
+#if defined(EOTHEENCODERREADER_enableAMOdiagnostics)
+    dc.mode = eomn_serv_diagn_mode_MC_AMO;
+    dc.par16 = 250;
+#endif    
+    s_eo_theencoderreader.diagnosticsconfig = dc;                    
+    s_eo_encoderreader_init_ereader(jomodes, dc, NULL, NULL);
     
     eo_appEncReader_StartRead(s_eo_theencoderreader.reader);
     
@@ -317,6 +326,7 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
     // make sure the timer is not running
     eo_timer_Stop(s_eo_theencoderreader.diagnostics.reportTimer);  
    
+    s_eo_theencoderreader.diagnosticsconfig.mode = eomn_serv_diagn_mode_NONE;
     eo_appEncReader_Deactivate(s_eo_theencoderreader.reader);
     
     s_eo_theencoderreader.service.active = eobool_false;
@@ -326,7 +336,7 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
 }
 
 
-extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes)
+extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray * jomodes, eOmn_serv_diagn_cfg_t dc)
 {
     if((NULL == p) || (NULL == jomodes))
     {
@@ -345,8 +355,13 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, EOconstarray 
  
     // jomodes contains items of type eOmc_jomo_descriptor_t
     memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(s_eo_theencoderreader.arrayofjomodes));
-  
-    s_eo_encoderreader_init_ereader(jomodes, NULL, NULL);
+    
+#if defined(EOTHEENCODERREADER_enableAMOdiagnostics)
+    dc.mode = eomn_serv_diagn_mode_MC_AMO;
+    dc.par16 = 250;
+#endif       
+    s_eo_theencoderreader.diagnosticsconfig = dc;    
+    s_eo_encoderreader_init_ereader(jomodes, dc, NULL, NULL);
       
     eo_appEncReader_StartRead(s_eo_theencoderreader.reader);
                      
@@ -506,7 +521,8 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
     
     if(eobool_true == activateit)
     {      
-        eo_encoderreader_Activate(&s_eo_theencoderreader, jomodes);        
+        eOmn_serv_diagn_cfg_t dc = s_eo_theencoderreader.diagnosticsconfig;
+        eo_encoderreader_Activate(&s_eo_theencoderreader, jomodes, dc);        
     }
 
     s_eo_theencoderreader.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
@@ -606,7 +622,7 @@ static void s_eo_encodereader_send_periodic_error_report(void *p)
 }
 
 
-static void s_eo_encoderreader_init_ereader(EOconstarray * jomodes, eOcallback_t callback, void* arg)
+static void s_eo_encoderreader_init_ereader(EOconstarray * jomodes, eOmn_serv_diagn_cfg_t dc, eOcallback_t callback, void* arg)
 {    
     memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(s_eo_theencoderreader.arrayofjomodes));
     
@@ -614,12 +630,8 @@ static void s_eo_encoderreader_init_ereader(EOconstarray * jomodes, eOcallback_t
 
     uint8_t numofjomos = eo_constarray_Size(carray);
     s_eo_theencoderreader.numofjomos = numofjomos;
-
     
-    eo_appEncReader_Activate(s_eo_theencoderreader.reader, carray);    
-    
-    // to enable the diagnostics ... use on equal to eobool_true
-    eo_appEncReader_Diagnostics_Enable(s_eo_theencoderreader.reader, eobool_false);
+    eo_appEncReader_Activate(s_eo_theencoderreader.reader, carray, dc);        
 }
 
 

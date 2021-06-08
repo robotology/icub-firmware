@@ -103,14 +103,35 @@ typedef struct
 } hal_spiencoder_errors_flags;
 
 
+typedef union
+{
+    hal_spiencoder_errors_flags     flags; 
+    uint32_t                        value; // contains bits whose meaning is specified by hal_spiencoder_diagnostic_type_t  
+} hal_spiencoder_diagnostic_info_t;
+
+typedef enum
+{
+    hal_spiencoder_diagnostic_type_none = 0,        // there is no diagnostic info available
+    hal_spiencoder_diagnostic_type_flags = 1,       // field flags contains the legacy hal_spiencoder_errors_flags used since may 2021
+    hal_spiencoder_diagnostic_type_amo_status0 = 2, // field info contains values of register status0 (adr 0x76) of AMO
+    hal_spiencoder_diagnostic_type_amo_status1 = 3, // field info contains values of register status1 (adr 0x77) of AMO 
+    hal_spiencoder_diagnostic_type_amo_notconn = 4
+} hal_spiencoder_diagnostic_type_t;
+
 typedef struct
 {
-    uint8_t         type;           // use hal_spiencoder_type_t
-    uint8_t         flags;          // use the bitwise OR of enum hal_spi_encoder_flag_t 
-    uint16_t        value0;         // used for aea, amo, first of chain
-    uint16_t        value1;         // used for second of chain
-    uint16_t        value2;         // used for third of chain
-} hal_spiencoder_value_t;
+    uint8_t                             type; // use only values inside hal_spiencoder_diagnostic_type_t
+    hal_spiencoder_diagnostic_info_t    info;
+} hal_spiencoder_diagnostic_t;
+
+//typedef struct
+//{
+//    uint8_t         type;           // use hal_spiencoder_type_t
+//    uint8_t         flags;          // use the bitwise OR of enum hal_spi_encoder_flag_t 
+//    uint16_t        value0;         // used for aea, amo, first of chain
+//    uint16_t        value1;         // used for second of chain
+//    uint16_t        value2;         // used for third of chain
+//} hal_spiencoder_value_t;
 
 
 /** @typedef    typedef struct hal_spiencoder_cfg_t;
@@ -122,8 +143,11 @@ typedef struct
     void (*callback_on_rx)(void *arg);          /**< callback called when a new value for the encoder is available   */
     void*                       arg;            /**< argument of the callback: contains pointer to latest encoder value  */
     hal_spiencoder_type_t       type;           /**< Encoder model. type 1: AEA, type 2: AMO Board, type 3: DAISY CHAIN of 2 encoders */
-    uint8_t                     reg_address;    /**< Address of the register to be read to validate the sensor data (not meaningful for AEA board) */
     hal_bool_t                  sdata_precheck; /**< If hal_true, performs a validity check on the sensor data transmission before the real reading (not meaningful for AEA board)  */
+    uint8_t                     reg_addresses[2]; // array of addresses of registers of AMO to read in daisy chain.
+                                                  // for AMO if any value is 0x00 then it is filled with 0x77.
+                                                  // valid values: {0x76, 0x77} reads status1 and status2 in two times, {0x77, 0x77} reads always status2,
+                                                  //               {0x76, 0x76} reads always status.    
 } hal_spiencoder_cfg_t;
 
 
@@ -212,14 +236,15 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id);
   */
 extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_errors_flags* e_flags);
 
+extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_diagnostic_t* diagn);
 
-/** @fn         extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_value_t* value)
-    @brief      This function reads data previously acquired by a call of hal_spiencoder_start().
-    @param      encoder         the encoder
-    @param      val             contains the position readings plus all the error flags.
-    @return     hal_res_NOK_generic on error else hal_res_OK
-  */
-extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_value_t* val);
+///** @fn         extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_value_t* value)
+//    @brief      This function reads data previously acquired by a call of hal_spiencoder_start().
+//    @param      encoder         the encoder
+//    @param      val             contains the position readings plus all the error flags.
+//    @return     hal_res_NOK_generic on error else hal_res_OK
+//  */
+//extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_value_t* val);
 
 
 /* Testing API (only for AMO board). It's possible to use ONLY the above functions, without losing features */
