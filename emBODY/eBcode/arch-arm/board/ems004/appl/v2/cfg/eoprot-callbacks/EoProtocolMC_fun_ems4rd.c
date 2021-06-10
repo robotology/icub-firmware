@@ -1329,15 +1329,13 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
         
     if(eo_motcon_mode_foc == mcmode)
     {
-        MController_config_motor(mxx, mconfig);
-
+        eo_motioncontrol_ConfigMotor(eo_motioncontrol_GetHandle(), mxx, mconfig);
         return;           
     }
     else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || 
            (eo_motcon_mode_mc4plusfaps == mcmode) || (eo_motcon_mode_mc4pluspmc == mcmode))   
     {
-        MController_config_motor(mxx, mconfig);
-        eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+        eo_motioncontrol_ConfigMotor(eo_motioncontrol_GetHandle(), mxx, mconfig);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {

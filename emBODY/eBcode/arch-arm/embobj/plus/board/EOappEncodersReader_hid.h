@@ -103,8 +103,9 @@ typedef struct
 enum { amodiag_numOfJoints = 2 };
 
 typedef struct
-{   // only for an encoder at joint of type AMO and onty for the first two joints j0 and/or j1.
+{   // only for an encoder at joint of type AMO and only for the first two joints j0 and/or j1.
     eObool_t                                enabled;
+    eOmn_serv_diagn_cfg_t                   config;
     eOreltime_t                             minimuminterval[amodiag_numOfJoints];
     hal_spiencoder_position_t               vals[amodiag_numOfJoints]; // raw value of the first and secnds
     uint16_t                                regs[amodiag_numOfJoints]; // first and seconds joint

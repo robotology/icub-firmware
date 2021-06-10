@@ -109,6 +109,8 @@ typedef enum
 extern eOresult_t eo_motioncontrol_AcceptCANframe(EOtheMotionController *p, eOcanframe_t *frame, eOcanport_t port, eOmotioncontroller_canframe_t cftype);
 
 
+extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t num, eOmc_motor_config_t *mc);
+
 /** @}            
     end of group eo_EOtheMotionController
  **/

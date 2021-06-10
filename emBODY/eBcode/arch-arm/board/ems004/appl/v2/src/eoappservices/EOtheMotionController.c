@@ -173,6 +173,12 @@
     }
     
     
+    extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t num, eOmc_motor_config_t *mc)
+    {
+        return eores_NOK_generic;
+    }
+    
+    
 #elif !defined(EOTHESERVICES_disable_theMotionController)
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -232,6 +238,10 @@ static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32);
 static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionController *p);
 
 static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eOencoderreader_valueInfo_t *encoder);
+
+static void s_delaymotorconfig_init(EOtheMotionController *p);
+static void s_delaymotorconfig_eval(EOtheMotionController *p);
+static void s_delaymotor_startafter(EOtheMotionController *p, uint8_t num, eOmc_motor_config_t *mc, eOreltime_t delay);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -294,8 +304,13 @@ static EOtheMotionController s_eo_themotcon =
         EO_INIT(.voltage)               0
     },
 
-    EO_INIT(.id32ofregulars)            NULL
+    EO_INIT(.id32ofregulars)            NULL,
+    
+    EO_INIT(.motor_delayer)             { {NULL, NULL, 0}, {NULL, NULL, 0}, {NULL, NULL, 0}, {NULL, NULL, 0} },
+    EO_INIT(.motor_delayer_flags)       0    
 };
+
+
 
 static const char s_eobj_ownname[] = "EOtheMotionController";
 
@@ -351,6 +366,9 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     p->service.started = eobool_false;
     p->service.state = eomn_serv_state_idle;    
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
+    
+    
+    s_delaymotorconfig_init(p);
     
     return(p);
 }
@@ -1472,6 +1490,10 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
     }
     
     
+    // in here we ... see descriotion in s_delaymotorconfig_eval()
+    s_delaymotorconfig_eval(p);
+    
+    
     // first of all check current limits
     if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type) ||
        (eo_motcon_mode_mc2pluspsc == p->service.servconfig.type) || (eo_motcon_mode_mc4plusfaps == p->service.servconfig.type) ||
@@ -1572,6 +1594,33 @@ extern eOresult_t eo_motioncontrol_AcceptCANframe(EOtheMotionController *p, eOca
 }
 
 
+extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t num, eOmc_motor_config_t *mc)
+{
+
+    eOmotioncontroller_mode_t mcmode = eo_motioncontrol_GetMode(p);
+    if(eo_motcon_mode_foc == mcmode)
+    {
+        // in here ... if we have AMOyarp ... we delay the application
+        if((eomn_serv_diagn_mode_MC_AMOyarp == p->service.servconfig.diagnosticsmode) && (p->service.servconfig.diagnosticsparam > 0))
+        {
+            // start a timer with duration eok_reltime1ms* p->service.servconfig.diagnosticsparam
+            s_delaymotor_startafter(p, num, mc, eok_reltime1ms*p->service.servconfig.diagnosticsparam);
+        }
+        else
+        {
+            // config motor straigth away
+            MController_config_motor(num, mc);
+        }
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || 
+           (eo_motcon_mode_mc4plusfaps == mcmode) || (eo_motcon_mode_mc4pluspmc == mcmode))   
+    {
+        MController_config_motor(num, mc);
+        eo_currents_watchdog_UpdateCurrentLimits(eo_currents_watchdog_GetHandle(), num);
+    }
+    
+    return eores_OK;
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -2595,7 +2644,83 @@ static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eO
         //do nothing;
     }
     return res;
-}    
+}   
+
+
+static void s_delaymotorconfig_init(EOtheMotionController *p)
+{
+    // must allocate the timers
+    for(uint8_t i=0; i<eo_motcon_standardJOMOs; i++)
+    {
+        if(NULL == p->motor_delayer[i].tmr)
+        {
+            p->motor_delayer[i].tmr = eo_timer_New();
+        }
+        p->motor_delayer[i].mc = NULL;
+    }    
+}
+
+// it checks if a flag is set and init the motor. the flag is set because a timer did that.
+static void s_delaymotorconfig_eval(EOtheMotionController *p)
+{
+    if(eomn_serv_diagn_mode_MC_AMOyarp != p->service.servconfig.diagnosticsmode)
+    {
+        return;
+    }
+    
+    if(0 == p->motor_delayer_flags)
+    {
+        return;
+    }
+    
+    for(uint8_t i=0; i<eo_motcon_standardJOMOs; i++)
+    {
+        if(eobool_true == eo_common_byte_bitcheck(p->motor_delayer_flags, i))
+        {
+            motorDelayer_t *md = &p->motor_delayer[i];
+            if((NULL != md) && (NULL != md->mc) && (md->num < eo_motcon_standardJOMOs))
+            {
+                MController_config_motor(md->num, md->mc);
+            }
+            
+            eo_common_byte_bitclear(&p->motor_delayer_flags, i);
+        }
+    }
+    
+}
+
+// this is the one executed by the EOtimer
+static void s_delaymotorconfig_alert(void *p)
+{
+    motorDelayer_t *md = (motorDelayer_t*)p;
+    if((NULL != md->mc) && (md->num < eo_motcon_standardJOMOs))
+    {
+         // set a flag so that at the next eo_motioncontrol_Tick() we an execute the relevant call
+        eo_common_byte_bitset(&s_eo_themotcon.motor_delayer_flags, md->num); 
+    }
+}
+
+static void s_delaymotor_startafter(EOtheMotionController *p, uint8_t num, eOmc_motor_config_t *mc, eOreltime_t delay)
+{
+    if((num >= eo_motcon_standardJOMOs) || (NULL == mc))
+    {
+        return;
+    }
+    
+    // configure the motordelayer 
+    motorDelayer_t *md = &p->motor_delayer[num];
+    md->mc = mc;
+    md->num = num;
+    // preparing the action: 
+    // we start the timer
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;    
+    eo_action_SetCallback(act, s_delaymotorconfig_alert, md, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+    // start the timer
+    eo_timer_Start(md->tmr, eok_abstimeNOW, delay, eo_tmrmode_ONESHOT, act);
+}
+
+ 
 
 #endif // #elif !defined(EOTHESERVICES_disable_theMotionController)
 
