@@ -160,7 +160,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
     
     if (absposcnt > maxCountfbk) maxCountfbk = absposcnt;
     
-    if (qe_index_found)
+    if (qe_index_found && (UPDNold != -1))
     {
         if (UPDNold == QEICONbits.UPDN)
         {
