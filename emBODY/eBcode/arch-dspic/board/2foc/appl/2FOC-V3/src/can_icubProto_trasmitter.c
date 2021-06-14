@@ -50,15 +50,20 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 extern volatile long VqRef;
 extern volatile int  IqRef;
 
-extern volatile BOOL newencdata;
-
-extern volatile int dataA;
-extern volatile int dataB;
-extern volatile int dataC;
-extern volatile int dataD;
+extern volatile int calibOffsetfbk;
+extern volatile int poscntfbk;
+extern volatile int rotorAfbk;
+extern volatile int rotorBfbk;
 extern volatile char IKs;
 
 extern volatile tMotorConfig MotorConfig;
+
+extern volatile int Iafbk;
+extern volatile int Icfbk;
+extern volatile int ElDegfbk;
+extern volatile int iQprot;
+extern volatile int maxCountfbk;
+extern volatile int Vqfbk;
 
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
@@ -78,12 +83,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     payload.b[0] = gControlMode;
     payload.b[1] = gEncoderError.bitmask;
     
-    //payload.w[1] = POSCNT;
-
     payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
-
-    //payload.b[2] = 0;
-    //payload.b[3] = 0;
 
     payload.b[4] = SysError.b[0];
     payload.b[5] = SysError.b[1];
@@ -94,21 +94,47 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 
     ECANSend(msgid, 8, &payload);
 
-    if (MotorConfig.verbose)
+    if (MotorConfig.fullcalib)
     {
-        if (newencdata)
-        {
-            payload.w[0] = dataA;
-            payload.w[1] = dataB;
-            payload.w[2] = dataC;
-            payload.w[3] = dataD;
+        static int noflood = 0;
         
-            newencdata = FALSE;
+        if (++noflood > 2000)
+        {
+            noflood = 0;
+            
+            payload.w[0] = calibOffsetfbk;
+            payload.w[1] = poscntfbk;
+            payload.w[2] = rotorAfbk;
+            payload.w[3] = rotorBfbk;
         
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
             ECANSend(msgid, 8, &payload);
         }
+    }
+    else if (MotorConfig.verbose)
+    {
+        // diagnostics for iCub3
+        payload.b[0] = Iafbk>>8;
+        payload.b[1] = Icfbk>>8;
+        payload.b[2] = Vqfbk/10;
+        payload.b[3] = (int)(VqRef>>IKs)/10;
+                
+        payload.w[2] = maxCountfbk;
+        
+        switch (iQprot)
+        {
+            case -1: payload.w[3] = 0x8000 | ElDegfbk; 
+                     break;
+            case  1: payload.w[3] = 0x4000 | ElDegfbk; 
+                     break;
+            default: payload.w[3] = ElDegfbk; 
+                     break;
+        }
+            
+        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+   
+        ECANSend(msgid, 8, &payload);
     }
 }
 

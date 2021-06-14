@@ -33,9 +33,9 @@ volatile extern tQEError gEncoderError;
 #define QE_RISE_ERROR(e) gEncoderError.e=TRUE; SysError.EncoderFault=TRUE; FaultConditionsHandler()
 #define QE_ELETTR_DEG_PER_REV() (gEncoderConfig.elettr_deg_per_rev)
 
-extern volatile BOOL qe_ready;
+extern volatile BOOL qe_index_found;
 extern volatile int QE_RESOLUTION;
-#define QEready() qe_ready
+#define QEIndexFound() qe_index_found
 
 extern void QEinit(int qe_resolution,int motor_num_poles,char use_index);
 extern unsigned int QEgetRaw();

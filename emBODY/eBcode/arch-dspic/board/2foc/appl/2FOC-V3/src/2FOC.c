@@ -187,7 +187,7 @@ volatile int speed_error_old = 0;
 volatile long Is = 0;
 volatile int iQerror_old = 0;
 volatile int iDerror_old = 0;
-volatile char limit = 0;
+volatile int iQprot = 0;
 
 static const int PWM_MAX = 8*PWM_50_DUTY_CYC/10; // = 80%
 
@@ -246,7 +246,7 @@ void ZeroControlReferences()
     Is = 0;
     iQerror_old = 0;
     iDerror_old = 0;
-    limit = 0;
+    iQprot = 0;
     // TODO: zero position and sensored torque references
 }
 
@@ -339,12 +339,8 @@ BOOL updateOdometry()
     return FALSE;
 }
 
-volatile int dataA = 0;
-volatile int dataB = 0;
-volatile int dataC = 0;
-volatile int dataD = 0;
-
-extern volatile BOOL newencdata;
+volatile int rotorAfbk = 0;
+volatile int rotorBfbk = 0;
 
 int alignRotor(volatile int* IqRef)
 {
@@ -356,24 +352,12 @@ int alignRotor(volatile int* IqRef)
 
     static int IqRef_fake = 0;
 
-    static BOOL moved = FALSE;
-
-    if (abs((int)POSCNT) > 32) moved = TRUE;
-
     const int ENCODER_1_5_REV = (3*QE_ELETTR_DEG_PER_REV())/2;
 
     if (sAlignInProgress < 3)
     {
-        if (QEready())
+        if (QEIndexFound())
         {
-            if (!moved)
-            {
-                // phase is broken
-                *IqRef = IqRef_fake = 0;
-                gEncoderError.phase_broken = TRUE;
-                sAlignInProgress = 0;
-            }
-
             sAlignInProgress = gEncoderConfig.full_calibration ? 3 : 0;
             gEncoderError.uncalibrated = 0;
             QEcountErrorClear();
@@ -484,8 +468,8 @@ int alignRotor(volatile int* IqRef)
                 while (angle >= 360) angle -= 360;
                 while (angle <    0) angle += 360;
 
-                dataC = rotorA;
-                dataD = rotorB;
+                rotorAfbk = rotorA;
+                rotorBfbk = rotorB;
 
                 gEncoderConfig.offset = encoder_fake_0 + (deltaA + deltaB)/2 + 90 - angle;
 
@@ -529,8 +513,11 @@ int alignRotor(volatile int* IqRef)
 
 // DMA0 IRQ Service Routine used for FOC loop
 
-extern volatile int dataC;
-extern volatile int dataD;
+volatile int Iafbk = 0;
+volatile int Icfbk = 0;
+volatile int ElDegfbk = 0;
+volatile int CurLimfbk = 0;
+volatile int Vqfbk = 0;
 
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
@@ -556,6 +543,9 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     // Calculate ParkParm.qIa, qIb, qIc
     MeasAndCompIaIcCalculateIb();
 
+    Iafbk = ParkParm.qIa;
+    Icfbk = ParkParm.qIc;
+    
     ParkParm.qIb = -ParkParm.qIa-ParkParm.qIc;
 
     ParkParm.qIa /= 3;
@@ -576,6 +566,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         else
         {
             enc = QEgetElettrDeg();
+            ElDegfbk = enc;
         }
     }
 
@@ -685,28 +676,6 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
             case 5: HI(qIc,Vc) LO(qIa,Va) NE(qIb,Vb) break; // 0 1 1   3 -> 5
             case 6: HI(qIc,Vc) LO(qIb,Vb) NE(qIa,Va) break; // 0 0 1   1 -> 6
         }
-
-        /*
-        switch (sector) // R1 right wheel
-        {
-            case 1: HI(qIc,Vc) LO(qIa,Va) NE(qIb,Vb) break; // 0 1 1   3 -> 5
-            case 2: HI(qIc,Vc) LO(qIb,Vb) NE(qIa,Va) break; // 0 0 1   1 -> 6
-            case 3: HI(qIa,Va) LO(qIb,Vb) NE(qIc,Vc) break; // 1 0 1   5 -> 1
-            case 4: HI(qIa,Va) LO(qIc,Vc) NE(qIb,Vb) break; // 1 0 0   4 -> 2
-            case 5: HI(qIb,Vb) LO(qIc,Vc) NE(qIa,Va) break; // 1 1 0   6 -> 3
-            case 6: HI(qIb,Vb) LO(qIa,Va) NE(qIc,Vc) break; // 0 1 0   2 -> 4
-        }
-
-        switch (sector) // R1 left wheel
-        {
-            case 1: HI(qIb,Vb) LO(qIc,Vc) NE(qIa,Va) break; // 1 1 0   6 -> 3
-            case 2: HI(qIb,Vb) LO(qIa,Va) NE(qIc,Vc) break; // 0 1 0   2 -> 4
-            case 3: HI(qIc,Vc) LO(qIa,Va) NE(qIb,Vb) break; // 0 1 1   3 -> 5
-            case 4: HI(qIc,Vc) LO(qIb,Vb) NE(qIa,Va) break; // 0 0 1   1 -> 6
-            case 5: HI(qIa,Va) LO(qIb,Vb) NE(qIc,Vc) break; // 1 0 1   5 -> 1
-            case 6: HI(qIa,Va) LO(qIc,Vc) NE(qIb,Vb) break; // 1 0 0   4 -> 2
-        }
-        */
     }
 
     BOOL negative_sec = sector%2;
@@ -755,9 +724,6 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         I2Tdata.IQMeasured = /* sqrt3/2 */  (int)(__builtin_mulss((*iH-*iL),cosT)>>15)+3*(int)(__builtin_mulss(  *i0    ,sinT)>>15);
         I2Tdata.IDMeasured = /* 3/2 */      (int)(__builtin_mulss(   *i0   ,cosT)>>15)-  (int)(__builtin_mulss((*iH-*iL),sinT)>>15);
     }
-
-    //dataC = I2Tdata.IQMeasured;
-    //dataD = gQEVelocity ? __builtin_divsd(((long)dataC)<<16, gQEVelocity) : 0;
 
     if (!sAlignInProgress)
     {
@@ -864,30 +830,30 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     {
         if (I2Tdata.IQMeasured > Ipeak)
         {
-            limit =  1;
+            iQprot =  1;
         }
         else if (I2Tdata.IQMeasured < -Ipeak)
         {
-            limit = -1;
+            iQprot = -1;
         }
 
-        if (limit)
+        if (iQprot)
         {
-            if (limit == 1)
+            if (iQprot == 1)
             {
                 int iQerror =  Ipeak-I2Tdata.IQMeasured;
                 VqL += __builtin_mulss(iQerror-iQerror_old,IKp) + __builtin_mulss(iQerror+iQerror_old,IKi);
                 iQerror_old = iQerror;
 
-                if (VqL >= 0) { VqL = 0; limit = 0; iQerror_old = 0; }
+                if (VqL >= 0) { VqL = 0; iQprot = 0; iQerror_old = 0; }
             }
-            else if (limit == -1)
+            else if (iQprot == -1)
             {
                 int iQerror = -Ipeak-I2Tdata.IQMeasured;
                 VqL += __builtin_mulss(iQerror-iQerror_old,IKp) + __builtin_mulss(iQerror+iQerror_old,IKi);
                 iQerror_old = iQerror;
 
-                if (VqL <= 0) { VqL = 0; limit = 0; iQerror_old = 0; }
+                if (VqL <= 0) { VqL = 0; iQprot = 0; iQerror_old = 0; }
             }
 
             Vq = (int)((VqRef+VqL)>>IKs);
@@ -955,15 +921,18 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
             FaultConditionsHandler();
         }
     }
+    
+    Vqfbk = Vq;
 
     // Re-scale Vq, Vd with respect to the PWM resolution and fullscale.
-    Vq = Vq/(1000/PWM_50_DUTY_CYC);
-    Vd = Vd/(1000/PWM_50_DUTY_CYC);
+    if (PWM_50_DUTY_CYC!=1000)
+    {
+        Vq /= 2;
+        Vd /= 2;
+    }
 
     //
     ////////////////////////////////////////////////////////////////////////////
-
-
 
     ////////////////////////////////////////////////////////////////////////////
     // inv transform and PWM drive
