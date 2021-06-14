@@ -1962,9 +1962,13 @@ void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
 //    
 //    count++;
     
+    #ifndef WRIST_MK2
     Joint *j_ptr= smc->joint+j;
     
     Joint_get_state(j_ptr, joint_state);
+    #else
+    JointSet_get_state(&(smc->jointSet[0]), j, joint_state);
+    #endif
     
     AbsEncoder* enc_ptr = smc->absEncoder + j*smc->multi_encs;
     
@@ -2038,7 +2042,11 @@ void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms)
 
 BOOL MController_set_joint_pos_ref(int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
+#ifndef WRIST_MK2
     return Joint_set_pos_ref(smc->joint+j, pos_ref, vel_ref);
+#else
+	return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, vel_ref);
+#endif
 }
 
 BOOL MController_set_joint_vel_ref(int j, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
@@ -2073,7 +2081,11 @@ BOOL MController_set_joint_cur_ref(int j, CTRL_UNITS cur_ref)
 
 void MController_stop_joint(int j)
 {
+#ifdef WRIST_MK2
+	JointSet_stop(&(smc->jointSet[0]), j);
+#else
     Joint_stop(smc->joint+j);
+#endif
 }
 
 void MController_config_motor_gearbox_M2J(int m, float32_t gearbox_M2J)
