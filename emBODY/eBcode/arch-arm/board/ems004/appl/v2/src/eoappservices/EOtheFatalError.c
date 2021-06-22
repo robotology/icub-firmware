@@ -62,6 +62,11 @@ static const char * s_get_fatalerrorstring(uint8_t h, uint8_t ec);
 
 static void s_test(fatal_error_descriptor_t *des);
 
+static void s_save_standard(fatal_error_descriptor_t *des);
+static void s_info_standard(EOtheFatalError *p);
+
+static void s_save_hardfault(fatal_error_descriptor_t *des);
+static void s_info_hardfault(EOtheFatalError *p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -140,75 +145,19 @@ extern void eo_fatalerror_AtStartup(EOtheFatalError *p)
         ee_sharserv_ipc_userdefdata_clr();        
         if((detectedsize <= sharserv_base_ipc_userdefdata_maxsize) && (fatal_error_signature == p->detectedfatalerror.message.signature))
         {
-            // it is of the correct size. i use it to send a diagnostic message
-            uint16_t par16 = 0;
-            uint64_t par64 = p->detectedfatalerror.params.par64;             
-
-            p->errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
-            p->errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-            p->errdes.sourceaddress    = 0;
-            p->errdes.par16            = par16;
-            p->errdes.par64            = par64;
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "RESTARTED after FATAL error", s_eobj_ownname, &p->errdes);
-            
-            // further information is in here
-            char str[64] = {0};
-            
-            snprintf(str, sizeof(str), "@ %d ms", 
-                    p->detectedfatalerror.message.millisecondsfromstart
-            );
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);
-            
-            snprintf(str, sizeof(str), "handler %s, code 0x%x", 
-                    s_fatalerror2string(p->detectedfatalerror.message.handlertype),
-                    p->detectedfatalerror.message.handlererrorcode
-            );
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);            
-
-
-            snprintf(str, sizeof(str), "type %s", 
-                    s_get_fatalerrorstring(p->detectedfatalerror.message.handlertype, p->detectedfatalerror.message.handlererrorcode)
-            );
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);                 
-
-                  
-            
-            osal_task_id_t tid = p->detectedfatalerror.message.idofthelastscheduledthread;  
-            uint8_t ipsr = p->detectedfatalerror.message.ipsr;            
-            const char * nameofthread = s_get_threadstring(p->detectedfatalerror.message.forfutureuse, tid);
-            const char * nameofirqhan = s_get_irqhandlerstring(ipsr);
-             
-            snprintf(str, sizeof(str), "IRQHan %s Thread %s", 
-                    nameofirqhan,
-                    nameofthread
-            );            
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);
-            
-            snprintf(str, sizeof(str), "ipsr %d, tid %d", 
-                    ipsr,
-                    tid
-            );
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);
+            if(fatalerror_handler_hw_HardFault == p->detectedfatalerror.message.handlertype)
+            {
+               s_info_hardfault(p); 
+            }
+            else
+            {
+                s_info_standard(p);
+            }
         }                        
     }            
     
 }
 
-#if 0
-
-    [par16, par64] -> 10 bytes
-    [ 1B  1B  1B  1B  1B  1B  4B ]   
-      ffu1
-          ffu0
-              idthread   
-                  IPSR
-                      errcode
-                          handlercode
-                              millitimeoflife
-    0x23 12
-    0x02 00 64 11 00001602
-
-#endif
 
 extern fatal_error_descriptor_t * eo_fatalerror_GetDescriptor(EOtheFatalError *p)
 {
@@ -222,17 +171,16 @@ extern void eo_fatalerror_Restart(EOtheFatalError *p, fatal_error_descriptor_t *
     {
         des = &s_eo_thefatalerror.descriptor;
     }
-
-    osal_task_id_t tid = 0;    
-    const char *thrname = s_get_threadinfo(des, &tid);
     
-    s_eo_thefatalerror.tobewritten.message.millisecondsfromstart = s_getmillitime();
-    s_eo_thefatalerror.tobewritten.message.handlertype = des->handlertype;
-    s_eo_thefatalerror.tobewritten.message.handlererrorcode = des->handlererrorcode;
-    s_eo_thefatalerror.tobewritten.message.ipsr = hal_sys_get_IPSR();
-    s_eo_thefatalerror.tobewritten.message.idofthelastscheduledthread = tid;    
-    snprintf(s_eo_thefatalerror.tobewritten.message.forfutureuse, sizeof(s_eo_thefatalerror.tobewritten.message.forfutureuse), "%s", thrname);
-    s_eo_thefatalerror.tobewritten.message.signature = fatal_error_signature;
+    if(fatalerror_handler_hw_HardFault == des->handlertype)
+    {
+        s_save_hardfault(des);
+    }
+    else
+    {
+        s_save_standard(des);
+    }
+
     
     // write in ipc memory and ... restart
     ee_sharserv_ipc_userdefdata_set((uint8_t*)&s_eo_thefatalerror.tobewritten, sizeof(s_eo_thefatalerror.tobewritten));
@@ -466,6 +414,150 @@ static uint32_t s_getmillitime(void)
     uint64_t ms = oosiit_time * osal_info_get_tick() / 1000;
     
     return ms;
+}
+
+static void s_save_standard(fatal_error_descriptor_t *des)
+{
+    osal_task_id_t tid = 0;    
+    const char *thrname = s_get_threadinfo(des, &tid);
+    
+    s_eo_thefatalerror.tobewritten.message.millisecondsfromstart = s_getmillitime();
+    s_eo_thefatalerror.tobewritten.message.handlertype = des->handlertype;
+    s_eo_thefatalerror.tobewritten.message.handlererrorcode = des->handlererrorcode;
+    s_eo_thefatalerror.tobewritten.message.ipsr = hal_sys_get_IPSR();
+    s_eo_thefatalerror.tobewritten.message.idofthelastscheduledthread = tid;    
+    snprintf(s_eo_thefatalerror.tobewritten.message.forfutureuse, sizeof(s_eo_thefatalerror.tobewritten.message.forfutureuse), "%s", thrname);
+    s_eo_thefatalerror.tobewritten.message.signature = fatal_error_signature;    
+}
+
+static void s_info_standard(EOtheFatalError *p)
+{
+    // it is of the correct size. i use it to send a diagnostic message
+    uint16_t par16 = 0;
+    uint64_t par64 = p->detectedfatalerror.params.par64;             
+
+    p->errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    p->errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    p->errdes.sourceaddress    = 0;
+    p->errdes.par16            = par16;
+    p->errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "RESTARTED after FATAL error", s_eobj_ownname, &p->errdes);
+    
+    // further information is in here
+    char str[64] = {0};
+    
+    snprintf(str, sizeof(str), "@ %d ms", 
+            p->detectedfatalerror.message.millisecondsfromstart
+    );
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);
+    
+    snprintf(str, sizeof(str), "handler %s, code 0x%x", 
+            s_fatalerror2string(p->detectedfatalerror.message.handlertype),
+            p->detectedfatalerror.message.handlererrorcode
+    );
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);            
+
+
+    snprintf(str, sizeof(str), "type %s", 
+            s_get_fatalerrorstring(p->detectedfatalerror.message.handlertype, p->detectedfatalerror.message.handlererrorcode)
+    );
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);                 
+
+          
+    
+    osal_task_id_t tid = p->detectedfatalerror.message.idofthelastscheduledthread;  
+    uint8_t ipsr = p->detectedfatalerror.message.ipsr;            
+    const char * nameofthread = s_get_threadstring(p->detectedfatalerror.message.forfutureuse, tid);
+    const char * nameofirqhan = s_get_irqhandlerstring(ipsr);
+     
+    snprintf(str, sizeof(str), "IRQHan %s Thread %s", 
+            nameofirqhan,
+            nameofthread
+    );            
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);
+    
+    snprintf(str, sizeof(str), "ipsr %d, tid %d", 
+            ipsr,
+            tid
+    );
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);    
+}
+
+static void s_save_hardfault(fatal_error_descriptor_t *des)
+{
+//    s_save_standard(des);  
+    osal_task_id_t tid = 0;    
+    const char *thrname = s_get_threadinfo(des, &tid);
+    
+    s_eo_thefatalerror.tobewritten.message.millisecondsfromstart = s_getmillitime();
+    s_eo_thefatalerror.tobewritten.message.handlertype = des->handlertype;
+    s_eo_thefatalerror.tobewritten.message.handlererrorcode = 0; // 1 B
+    s_eo_thefatalerror.tobewritten.message.ipsr = hal_sys_get_IPSR();
+    s_eo_thefatalerror.tobewritten.message.idofthelastscheduledthread = tid;    
+    
+    
+    volatile uint32_t CFSR = *(volatile uint32_t *) 0xE000ED28;
+
+    s_eo_thefatalerror.tobewritten.message.forfutureuse[0] = CFSR & 0xff; 
+    s_eo_thefatalerror.tobewritten.message.forfutureuse[1] = (CFSR >> 8) & 0xff;
+    s_eo_thefatalerror.tobewritten.message.forfutureuse[2] = (CFSR >> 16) & 0xff;
+    s_eo_thefatalerror.tobewritten.message.forfutureuse[3] = (CFSR >> 24) & 0xff;
+    
+    //volatile uint32_t HFSR = *(volatile uint32_t *) 0xE000ED2C;
+       
+    s_eo_thefatalerror.tobewritten.message.signature = fatal_error_signature;     
+}
+
+static void s_info_hardfault(EOtheFatalError *p)
+{
+    // it is of the correct size. i use it to send a diagnostic message
+    uint16_t par16 = 0;
+    uint64_t par64 = p->detectedfatalerror.params.par64;             
+
+    p->errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    p->errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    p->errdes.sourceaddress    = 0;
+    p->errdes.par16            = par16;
+    p->errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "RESTARTED after FATAL error", s_eobj_ownname, &p->errdes);
+    
+    // further information is in here
+    char str[64] = {0};
+    
+    snprintf(str, sizeof(str), "@ %d ms", 
+            p->detectedfatalerror.message.millisecondsfromstart
+    );
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);
+    
+    snprintf(str, sizeof(str), "handler %s, code 0x%x", 
+            s_fatalerror2string(p->detectedfatalerror.message.handlertype),
+            p->detectedfatalerror.message.handlererrorcode
+    );
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);            
+
+
+    snprintf(str, sizeof(str), "type %s", 
+            s_get_fatalerrorstring(p->detectedfatalerror.message.handlertype, p->detectedfatalerror.message.handlererrorcode)
+    );
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);                 
+              
+    osal_task_id_t tid = p->detectedfatalerror.message.idofthelastscheduledthread;  
+    uint8_t ipsr = p->detectedfatalerror.message.ipsr;            
+         
+    snprintf(str, sizeof(str), "ipsr %d, tid %d", 
+            ipsr,
+            tid
+    );
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes); 
+
+    uint32_t CFSR = ((uint32_t)(p->detectedfatalerror.message.forfutureuse[0])       )    | 
+                    ((uint32_t)(p->detectedfatalerror.message.forfutureuse[1]) << 8  )    |
+                    ((uint32_t)(p->detectedfatalerror.message.forfutureuse[2]) << 16 )    |
+                    ((uint32_t)(p->detectedfatalerror.message.forfutureuse[3]) << 24 )    ;
+    snprintf(str, sizeof(str), "CFSR 0x%x", 
+            CFSR
+    );            
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);    
 }
 
 
