@@ -129,7 +129,7 @@ extern EOMtheEMSconfigurator * eom_emsconfigurator_Initialise(const eOemsconfigu
     s_emsconfigurator_singleton.task = eom_task_New(eom_mtask_EventDriven, cfg->taskpriority, cfg->taskstacksize, 
                                                     s_eom_emsconfigurator_task_startup, s_eom_emsconfigurator_task_run,  
                                                     (eOevent_t)0, timeout, NULL, 
-                                                    tskEMScfg, "tskEMScfg");
+                                                    tskEMScfg, "cfgST");
  
                                                    
     #if defined(EVIEWER_ENABLED)    

@@ -72,6 +72,7 @@ struct EOMtask_hid
     eOreltime_t             ustime;
     eOevent_t               waitmask;
     void                    *extdata; 
+    char                    nameof[16];
 }; 
 
 

@@ -390,7 +390,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           0, ipnetcfg->procmaxidletime,
                                           NULL,
                                           tIPNETproc, 
-                                          "ipnet.proc");
+                                          "ipPRC");
 
 #define IPNET_TICK_PERIODIC                                          
 #if defined(IPNET_TICK_PERIODIC) 
@@ -400,7 +400,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           0, s_eom_theipnet.ipcfg.sys_timetick,
                                           NULL, 
                                           tIPNETtick,
-                                          "ipnet.tick");
+                                          "ipTCK");
 
 #else
     // and task which ticks the timers. it is an event based task with timeout. 
@@ -411,7 +411,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           0, s_eom_theipnet.ipcfg.sys_timetick,
                                           NULL, 
                                           tIPNETtick,
-                                          "ipnet.tick");  
+                                          "ipTCK");  
 
 #endif
 

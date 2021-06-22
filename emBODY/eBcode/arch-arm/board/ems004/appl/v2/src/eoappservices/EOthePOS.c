@@ -29,6 +29,8 @@
 
 #include "EOVtheCallbackManager.h"
 
+//#include "EOtheFatalError.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -252,63 +254,7 @@ static EOthePOS s_eo_thepos =
 static const char s_eobj_ownname[] = "EOthePOS";
 
 
-const eOmn_serv_config_data_as_pos_t eo_pos_servconf_data_as_pos = 
-{
-    .version = 
-    {
-        .firmware = 
-        {
-            .major = 1, .minor = 1, .build = 0
-        },
-        .protocol = 
-        {
-            .major = 1, .minor = 1
-        }
-    },
-    .boardInfo = 
-    {
-        .canloc = 
-        {
-            { 
-                .port = eOcanport1, 
-                .addr = 1, 
-                .insideindex = eobrd_caninsideindex_none
-            }        
-        }
-    }
-};
 
-const eOmn_serv_configuration_t eo_pos_servconf = 
-{
-    .type = eomn_serv_AS_pos,
-    .filler = {0},
-    .data.as.pos = 
-    {
-        .version = 
-        {
-            .firmware = 
-            {
-                .major = 1, .minor = 1, .build = 0
-            },
-            .protocol = 
-            {
-                .major = 1, .minor = 1
-            }
-        },
-        .boardInfo = 
-        {
-            .canloc = 
-            {
-                { 
-                    .port = eOcanport1, 
-                    .addr = 1, 
-                    .insideindex = eobrd_caninsideindex_none
-                }        
-            }
-        }        
-        
-    }
-};
 
 #define REM_WDT
 
@@ -774,7 +720,9 @@ extern eOresult_t eo_pos_Transmission(EOthePOS *p, eObool_t on)
 
 
 extern eOresult_t eo_pos_Tick(EOthePOS *p)
-{
+{   
+    // eo_fatalerror_Test(eo_fatalerror_GetHandle(), NULL);
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);

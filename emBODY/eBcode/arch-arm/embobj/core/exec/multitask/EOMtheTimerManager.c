@@ -142,7 +142,7 @@ extern EOMtheTimerManager * eom_timerman_Initialise(const eOmtimerman_cfg_t *tmr
                                               eok_reltimeINFINITE,                                  // timeoutorperiod
                                               NULL,
                                               sys_timerman,                               // nameofthetask_fn
-                                              "timerman");                              
+                                              "tmrman");                              
     
     
    

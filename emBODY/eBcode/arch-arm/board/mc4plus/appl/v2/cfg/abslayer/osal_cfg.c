@@ -27,20 +27,21 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdio.h"
-#include "string.h"
+#undef DONTUSE_EOtheFatalError
+
+#if !defined(DONTUSE_EOtheFatalError)
+    #include "EOtheFatalError.h"
+#else
+    #include "EOtheErrorManager.h"
+    #include "EoError.h"
+    #include "hal_trace.h"
+    #include "hal_sys.h"
+    #include "hal_led.h"
+#endif
+
+
 #include "osal.h"
 #include "osal_arch_arm.h"
-#include "hal_trace.h"
-#include "stdlib.h"
-
-#include "hal_led.h"
-#include "hal_sys.h"
-
-#include "EOtheErrorManager.h"
-#include "EoError.h"
-
-#include "embOBJporting.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -112,6 +113,14 @@ const osal_cfg_t *osal_cfgMINEX = &osal_cfg;
 
 static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, const char * errormsg)
 {
+#if !defined(DONTUSE_EOtheFatalError)        
+    fatal_error_descriptor_t *des = eo_fatalerror_GetDescriptor(eo_fatalerror_GetHandle());
+    des->handlertype = fatalerror_handler_osal;
+    des->handlererrorcode = errorcode;
+    des->param = task;
+    eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
+#else 
+    #warning DONTUSE_EOtheFatalError is defined, are you sure?    
     uint8_t tskid = 0;
     char str[64];    
     osal_task_id_get((osal_task_t*)task, &tskid);
@@ -163,7 +172,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
             hal_led_toggle(hal_led5);  
         }
     }    
-   
+#endif   
 }
 
 static void s_osal_cfg_on_idle(void)

@@ -27,12 +27,16 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdlib.h"
-#include "hal_core.h"
+#undef DONTUSE_EOtheFatalError
 
-#include "EOtheErrorManager.h"
-#include "EoError.h"
-
+#if !defined(DONTUSE_EOtheFatalError)
+    #include "EOtheFatalError.h"
+#else
+    #include "EOtheErrorManager.h"
+    #include "EoError.h"
+    #include "hal_trace.h"
+    #include "hal_led.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -85,6 +89,15 @@ const hal_core_cfg_t *hal_coreCFGptr = &hal_cfg;
 
 static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char * errormsg)
 {
+#if !defined(DONTUSE_EOtheFatalError)    
+    // in here there is just a test of emission of ipc data w/ a restart
+    fatal_error_descriptor_t *des = eo_fatalerror_GetDescriptor(eo_fatalerror_GetHandle());
+    des->handlertype = fatalerror_handler_hal;
+    des->handlererrorcode = errorcode;
+    des->param = NULL;
+    eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
+#else    
+    #warning DONTUSE_EOtheFatalError is defined, are you sure?    
     if(eobool_true == eo_errman_IsErrorHandlerConfigured(eo_errman_GetHandle()))
     {
         // ok ... use the error manager, either in its simple form or in its networked form
@@ -135,6 +148,7 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
             hal_led_toggle(hal_led5);  
         }
     }
+#endif       
 }
 
 #include "osal_base.h"
@@ -148,7 +162,60 @@ static void myheap_delete(void* mem)
     osal_base_memory_del(mem);
 }
 
+#if !defined(DONTUSE_EOtheFatalError)
 
+void hw_handler(fatal_error_handler_t feh)
+{
+    fatal_error_descriptor_t *des = eo_fatalerror_GetDescriptor(eo_fatalerror_GetHandle());
+    des->handlertype = feh;
+    des->handlererrorcode = 100;
+    des->forfutureuse0 = 0x12;
+    des->forfutureuse1 = 0x23;
+    des->param = NULL;
+    eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
+}
+
+void NMI_Handler(void)
+{
+    hw_handler(fatalerror_handler_hw_NMI);
+}
+
+void HardFault_Handler(void)
+{
+    hw_handler(fatalerror_handler_hw_HardFault);
+}
+
+void MemManage_Handler(void)
+{
+    hw_handler(fatalerror_handler_hw_MemManage);
+}
+
+void BusFault_Handler(void)
+{
+    hw_handler(fatalerror_handler_hw_BusFault);
+}
+
+void UsageFault_Handler(void)
+{
+    hw_handler(fatalerror_handler_hw_UsageFault);
+}
+
+void DebugMon_Handler(void)
+{
+    hw_handler(fatalerror_handler_hw_DebugMon);
+}
+
+void Default_Handler(void)
+{
+    hw_handler(fatalerror_handler_hw_Default);
+}
+
+void RTC_Alarm_IRQHandler(void)
+{
+    hw_handler(fatalerror_handler_hw_Default);
+}
+
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
