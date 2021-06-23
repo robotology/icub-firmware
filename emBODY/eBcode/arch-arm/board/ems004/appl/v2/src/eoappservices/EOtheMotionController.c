@@ -1950,7 +1950,6 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
         else // mc4plusmais: verify encoders
         {
             // the array of jomo descriptots is already pointed by p->ctrlobjs.jomodescriptors
-            eOmn_serv_diagn_mode_t dm = servcfg->diagnosticsmode;
             eOmn_serv_diagn_cfg_t dc = {0, 0};
             dc.mode = servcfg->diagnosticsmode;
             dc.par16 = servcfg->diagnosticsparam;

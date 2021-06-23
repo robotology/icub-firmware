@@ -61,6 +61,15 @@ extern "C" {
 #if EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 255
     #undef EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD
 #endif
+
+
+#if defined(EOTHESERVICES_customize_handV3_7joints)
+    #define VERSION_MAJOR_OFFSET  70
+#elif defined(EOTHESERVICES_customize_handV3)
+    #define VERSION_MAJOR_OFFSET  30
+#else
+    #define VERSION_MAJOR_OFFSET 0
+#endif
       
 // </h>Choice of EMS board
 
@@ -72,7 +81,7 @@ extern "C" {
 
 //  <h> version
 //  <o> major           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          3
+#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          (VERSION_MAJOR_OFFSET+3)
 //  <o> minor           <0-255> 
 
 
