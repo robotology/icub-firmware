@@ -10,7 +10,7 @@
       <TargetName>ems4rd</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6140001::V6.14.1::ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -907,6 +907,11 @@
               <FileName>EOthePOS.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOthePOS.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheFatalError.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheFatalError.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2326,6 +2331,11 @@
               <FileName>EOthePOS.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOthePOS.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheFatalError.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheFatalError.c</FilePath>
             </File>
           </Files>
         </Group>

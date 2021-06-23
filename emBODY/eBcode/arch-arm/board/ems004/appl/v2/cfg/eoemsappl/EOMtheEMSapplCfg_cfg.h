@@ -61,6 +61,12 @@ extern "C" {
 #if EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD == 255
     #undef EOMTHEEMSAPPLCFG_ID_OF_EMSBOARD
 #endif
+
+#if defined(WRIST_MK2)
+    #define VERSION_MAJOR_OFFSET  20
+#else
+    #define VERSION_MAJOR_OFFSET 0
+#endif
       
 // </h>Choice of EMS board
 
@@ -72,7 +78,7 @@ extern "C" {
 
 //  <h> version
 //  <o> major           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          3
+#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          (VERSION_MAJOR_OFFSET+3)
 //  <o> minor           <0-255> 
 //  <o> minor           <0-255>
 #define EOMTHEEMSAPPLCFG_VERSION_MINOR          42
