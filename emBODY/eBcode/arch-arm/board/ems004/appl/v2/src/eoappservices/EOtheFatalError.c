@@ -60,6 +60,8 @@ static uint32_t s_getmillitime(void);
 static const char * s_get_threadinfo(const fatal_error_descriptor_t *des, osal_task_id_t *tid);
 static const char * s_get_fatalerrorstring(uint8_t h, uint8_t ec);
 
+static const char * s_tid_to_threadname(osal_task_id_t tid);
+
 static void s_test(fatal_error_descriptor_t *des);
 
 static void s_save_standard(fatal_error_descriptor_t *des);
@@ -295,9 +297,7 @@ extern void * oosiit_tsk_self(void);
 extern uint8_t oosiit_tsk_get_id(void * tp);
 
 static const char * s_get_threaname_mode2(const fatal_error_descriptor_t *des, osal_task_id_t *ptid)
-{
-    const char * thrname = NULL; 
-    
+{   
 //    osal_task_id_t tid1 = 0;
 //    osal_task_id_get(osal_task_get(osal_callerAUTOdetect), &tid1); 
 //    volatile  osal_task_id_t tid2 = tid1;
@@ -305,8 +305,28 @@ static const char * s_get_threaname_mode2(const fatal_error_descriptor_t *des, o
     
     osal_task_id_t tid = oosiit_tsk_get_id(oosiit_tsk_self());    
     *ptid = tid;
-
     
+    return s_tid_to_threadname(tid);
+
+}
+
+static const char * s_get_threadinfo(const fatal_error_descriptor_t *des, osal_task_id_t *tid)
+{
+    // how to get the name of the thread?
+    // there are several ways.
+    // the quickest and cleanest way is to get it directly from the EOMtask through the osal_task_t.
+    // see function s_get_threaname_mode1()
+    // however, i have experienced that this mode does not work when we have a stack overflow
+    // because the stack memory is close by the RAM used for description of osal_task_t and EOMtask.
+    // so, i have implemented a second way, where we look for a private look up table
+    
+    return(s_get_threaname_mode2(des, tid));
+}
+
+static const char * s_tid_to_threadname(osal_task_id_t tid)
+{
+    const char * thrname = NULL; 
+        
     for(uint8_t i=0; i<maxthreads; i++)
     {
         if(s_eo_thefatalerror.threads[i].tid == tid)
@@ -328,20 +348,7 @@ static const char * s_get_threaname_mode2(const fatal_error_descriptor_t *des, o
         thrname = "tUNKN";
     }
 
-   return thrname;
-}
-
-static const char * s_get_threadinfo(const fatal_error_descriptor_t *des, osal_task_id_t *tid)
-{
-    // how to get the name of the thread?
-    // there are several ways.
-    // the quickest and cleanest way is to get it directly from the EOMtask through the osal_task_t.
-    // see function s_get_threaname_mode1()
-    // however, i have experienced that this mode does not work when we have a stack overflow
-    // because the stack memory is close by the RAM used for description of osal_task_t and EOMtask.
-    // so, i have implemented a second way, where we look for a private look up table
-    
-    return(s_get_threaname_mode2(des, tid));
+   return thrname;        
 }
 
 static const char * s_get_irqhandlerstring(uint8_t ipsr)
@@ -543,6 +550,15 @@ static void s_info_hardfault(EOtheFatalError *p)
               
     osal_task_id_t tid = p->detectedfatalerror.message.idofthelastscheduledthread;  
     uint8_t ipsr = p->detectedfatalerror.message.ipsr;            
+    const char * nameofthread = s_tid_to_threadname(tid);
+    const char * nameofirqhan = s_get_irqhandlerstring(ipsr);
+     
+    snprintf(str, sizeof(str), "IRQHan %s Thread %s", 
+            nameofirqhan,
+            nameofthread
+    );            
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);
+    
          
     snprintf(str, sizeof(str), "ipsr %d, tid %d", 
             ipsr,
