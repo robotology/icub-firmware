@@ -260,6 +260,8 @@ extern eOresult_t eom_task_PriorityGet(EOMtask *p, uint8_t *prio);
  **/
 extern eOresult_t eom_task_PrioritySet(EOMtask *p, uint8_t prio);
 
+extern const char * eom_task_GetName(EOMtask *p);
+
 
 /** @}            
     end of group eom_task  

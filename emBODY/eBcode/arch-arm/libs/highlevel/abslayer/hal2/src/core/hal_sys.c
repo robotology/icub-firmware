@@ -159,6 +159,11 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
     return(hal_res_OK);   
 }
 
+extern uint32_t hal_sys_get_IPSR(void)
+{
+    return __get_IPSR();
+}
+
 extern uint32_t hal_sys_stack_get_totalsize(void)
 {
     return(hl_sys_stack_totalsize_get());   

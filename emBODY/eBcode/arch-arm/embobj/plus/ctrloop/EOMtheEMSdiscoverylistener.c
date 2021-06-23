@@ -172,7 +172,7 @@ extern EOMtheEMSdiscoverylistener * eom_emsdiscoverylistener_Initialise(const eO
     s_emsdiscoverylistener_singleton.task = eom_task_New(eom_mtask_EventDriven, cfg->taskpriority, cfg->taskstacksize, 
                                                     s_eom_emsdiscoverylistener_task_startup, s_eom_emsdiscoverylistener_task_run,  
                                                     (eOevent_t)0, eok_reltimeINFINITE, NULL, 
-                                                    tskEMScfg, "tskEMSlis");
+                                                    tskEMScfg, "listener");
  
                                                    
     

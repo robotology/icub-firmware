@@ -61,6 +61,8 @@
 
 #include "EOtheMemoryPool.h"
 
+#include "EOtheFatalError.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -613,6 +615,17 @@ static void s_eo_services_initialise(EOtheServices *p)
         //    b. make sure that when we use a get entity, we use EOtheEntities which does not address joints beyond those configured
         
     }   // A.
+    
+    
+    
+    {   // A.1 evaluate if there was a restart due to fatal errors
+
+        eo_fatalerror_Initialise();
+        eo_fatalerror_AtStartup(eo_fatalerror_GetHandle());
+       
+        // eo_fatalerror_Test(eo_fatalerror_GetHandle(), NULL);
+       
+    }
     
     {   // B. the entities: only initted but not started or activated yets
         

@@ -27,16 +27,21 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtheErrorManager.h"
-#include "EoError.h"
+#undef DONTUSE_EOtheFatalError
+
+#if !defined(DONTUSE_EOtheFatalError)
+    #include "EOtheFatalError.h"
+#else
+    #include "EOtheErrorManager.h"
+    #include "EoError.h"
+    #include "hal_trace.h"
+    #include "hal_led.h"
+#endif
 
 
 #include "ipal.h"
-
-
 #include "hal.h"
 #include "osal.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -169,7 +174,14 @@ static void onethframerx(void)
 
 static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
 {
-
+#if !defined(DONTUSE_EOtheFatalError)        
+    fatal_error_descriptor_t *des = eo_fatalerror_GetDescriptor(eo_fatalerror_GetHandle());
+    des->handlertype = fatalerror_handler_ipal;
+    des->handlererrorcode = errorcode;
+    des->param = NULL;
+    eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
+#else
+    #warning DONTUSE_EOtheFatalError is defined, are you sure?
     char str[256];
     
     if(eobool_true == eo_errman_IsErrorHandlerConfigured(eo_errman_GetHandle()))
@@ -218,6 +230,7 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
             hal_led_toggle(hal_led5);  
         }
     }
+#endif    
 }
 
 

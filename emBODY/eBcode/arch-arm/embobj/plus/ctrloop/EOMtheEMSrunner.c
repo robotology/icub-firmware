@@ -271,7 +271,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   s_eom_emsrunner_taskRX_startup, s_eom_emsrunner_taskRX_run,  
                                                                   (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
-                                                                  tskEMSrunRX, "tskEMSrunRX");
+                                                                  tskEMSrunRX, "runRX");
  
     s_theemsrunner.task[eo_emsrunner_taskid_runDO] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runDO], 
@@ -279,7 +279,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   s_eom_emsrunner_taskDO_startup, s_eom_emsrunner_taskDO_run,  
                                                                   (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
-                                                                  tskEMSrunDO, "tskEMSrunDO"); 
+                                                                  tskEMSrunDO, "runDO"); 
                                                                   
     s_theemsrunner.task[eo_emsrunner_taskid_runTX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runTX], 
@@ -287,7 +287,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   s_eom_emsrunner_taskTX_startup, s_eom_emsrunner_taskTX_run,  
                                                                   (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
-                                                                  tskEMSrunTX, "tskEMSrunTX");                                                              
+                                                                  tskEMSrunTX, "runTX");                                                              
      
 #if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
     eventviewer_load(ev_meas_rx_start, meas_rx_start);

@@ -34,6 +34,8 @@
 
 #include "stdio.h"
 
+#include "EOtheFatalError.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -110,6 +112,16 @@ static char s_eom_task_count = 0;
 
 #undef PRINT_TASK_ADDITIONAL_INFO
 
+extern const char * eom_task_GetName(EOMtask *p)
+{
+    if(NULL == p)
+    {
+        return "null";
+    }
+    
+    return p->nameof;
+}
+
 extern EOMtask * eom_task_New1(void)
 {
     EOMtask *retptr = NULL;
@@ -150,6 +162,8 @@ extern eOresult_t eom_task_Init1(EOMtask *p, eOmtaskType_t type, uint8_t priorit
     
     
     retptr->extdata = extdata;
+    
+    snprintf(retptr->nameof, sizeof(retptr->nameof), "%s", NULL != name ? name : "unnamed");
 
                           
     // initialisations which depend on the type of task
@@ -351,6 +365,8 @@ extern eOresult_t eom_task_Init1(EOMtask *p, eOmtaskType_t type, uint8_t priorit
     // osaltask must not be NULL, thus i check it.
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osaltask), "eom_task_New(): osal gives NULL osaltask", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
+    eo_fatalerror_RegisterThread(eo_fatalerror_GetHandle(), retptr->osaltask, retptr->nameof);
+    
     s_eom_task_count ++;
 #if defined(PRINT_TASK_ADDITIONAL_INFO)
     char str[128] = {0};
@@ -425,6 +441,7 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
 
 	retptr->extdata = extdata;
 
+    snprintf(retptr->nameof, sizeof(retptr->nameof), "%s", NULL != name ? name : "unnamed");
                           
     // initialisations which depend on the type of task
     switch(type)
@@ -625,6 +642,8 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
     // osaltask must not be NULL, thus i check it.
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osaltask), "eom_task_New(): osal gives NULL osaltask", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
+    eo_fatalerror_RegisterThread(eo_fatalerror_GetHandle(), retptr->osaltask, retptr->nameof);
+    
     s_eom_task_count ++;
 #if defined(PRINT_TASK_ADDITIONAL_INFO)
     char str[128] = {0};

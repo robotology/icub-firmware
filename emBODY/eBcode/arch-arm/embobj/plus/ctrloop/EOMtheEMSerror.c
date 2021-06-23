@@ -132,7 +132,7 @@ extern EOMtheEMSerror * eom_emserror_Initialise(const eOemserror_cfg_t *cfg)
     s_emserror_singleton.task = eom_task_New(eom_mtask_EventDriven, cfg->taskpriority, cfg->taskstacksize, 
                                                     s_eom_emserror_task_startup, s_eom_emserror_task_run,  
                                                     (eOevent_t)0, timeout, NULL, 
-                                                    tskEMSerr, "tskEMSerr");
+                                                    tskEMSerr, "error");
     
     s_emserror_singleton.timer = eo_timer_New();
         

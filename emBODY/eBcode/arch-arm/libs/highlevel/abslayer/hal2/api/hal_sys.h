@@ -250,7 +250,7 @@ extern void hal_sys_atomic_bitwiseOR(volatile uint32_t *value, uint32_t mask);
  **/
 extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask);
 
- 
+extern uint32_t hal_sys_get_IPSR(void); 
 
 /** @}            
     end of group doxy_group_hal_sys  

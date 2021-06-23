@@ -183,7 +183,7 @@ extern EOMtheEMSbackdoor * eom_emsbackdoor_Initialise(const eOemsbackdoor_cfg_t 
     s_emsbackdoor_singleton.task = eom_task_New(eom_mtask_EventDriven, cfg->taskpriority, cfg->taskstacksize, 
                                                     s_eom_emsbackdoor_task_startup, s_eom_emsbackdoor_task_run,  
                                                     (eOevent_t)0, eok_reltimeINFINITE, NULL, 
-                                                    tskEMSbackdoor, "tskEMSbackdoor");
+                                                    tskEMSbackdoor, "bckdoor");
  
  
  
