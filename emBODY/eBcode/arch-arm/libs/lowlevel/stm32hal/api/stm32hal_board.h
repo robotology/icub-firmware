@@ -379,6 +379,7 @@ extern void stm32hal_board_init(void);
         #include "../src/board/amcbldc/v120/inc/main.h"
         #include "../src/board/amcbldc/v120/inc/adc.h"
         #include "../src/board/amcbldc/v120/inc/cordic.h"
+        #include "../src/board/amcbldc/v120/inc/crc.h"
         #include "../src/board/amcbldc/v120/inc/dma.h"
         #include "../src/board/amcbldc/v120/inc/fdcan.h"
         #include "../src/board/amcbldc/v120/inc/fmac.h"
