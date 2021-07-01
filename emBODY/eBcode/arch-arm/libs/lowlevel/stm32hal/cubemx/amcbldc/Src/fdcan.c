@@ -26,8 +26,8 @@
 
 FDCAN_HandleTypeDef hfdcan2;
 
-/* FDCAN2 init function */
-void MX_FDCAN2_Init(void)
+// for 160 mHz
+void MX_FDCAN2_Init_160mhz(void)
 {
 
   hfdcan2.Instance = FDCAN2;
@@ -53,6 +53,36 @@ void MX_FDCAN2_Init(void)
   }
 
 }
+
+/* FDCAN2 init function */
+void MX_FDCAN2_Init(void)
+{
+
+  hfdcan2.Instance = FDCAN2;
+  hfdcan2.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
+  hfdcan2.Init.Mode = FDCAN_MODE_NORMAL;
+  hfdcan2.Init.AutoRetransmission = ENABLE;
+  hfdcan2.Init.TransmitPause = ENABLE;
+  hfdcan2.Init.ProtocolException = DISABLE;
+  hfdcan2.Init.NominalPrescaler = 7;
+  hfdcan2.Init.NominalSyncJumpWidth = 10;
+  hfdcan2.Init.NominalTimeSeg1 = 13;
+  hfdcan2.Init.NominalTimeSeg2 = 10;
+  hfdcan2.Init.DataPrescaler = 7;
+  hfdcan2.Init.DataSyncJumpWidth = 10;
+  hfdcan2.Init.DataTimeSeg1 = 13;
+  hfdcan2.Init.DataTimeSeg2 = 10;
+  hfdcan2.Init.StdFiltersNbr = 1;
+  hfdcan2.Init.ExtFiltersNbr = 0;
+  hfdcan2.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+  if (HAL_FDCAN_Init(&hfdcan2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
+
 
 void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
 {

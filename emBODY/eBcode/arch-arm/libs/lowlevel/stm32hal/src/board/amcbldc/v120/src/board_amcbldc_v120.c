@@ -92,16 +92,17 @@ extern void stm32hal_board_init(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_ADC1_Init();
-  MX_ADC2_Init();
-  MX_FDCAN2_Init();
-  MX_TIM1_Init();
-  MX_TIM3_Init();
-  MX_I2C4_Init();
-  MX_TIM2_Init();
-  MX_CORDIC_Init();
-  MX_FMAC_Init();
+  //MX_ADC1_Init();
+  //MX_ADC2_Init();
+  //MX_FDCAN2_Init();
+  //MX_TIM1_Init();
+  //MX_TIM3_Init();
+  //MX_I2C4_Init();
+  //MX_TIM2_Init();
+  //MX_CORDIC_Init();
+  //MX_FMAC_Init();
   MX_RNG_Init();
+  //MX_CRC_Init();
   //MX_USB_PCD_Init();
 
 // extra: set led off  
@@ -153,9 +154,9 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
-  RCC_OscInitStruct.PLL.PLLN = 20;
+  RCC_OscInitStruct.PLL.PLLN = 21;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV6;
+  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -180,7 +181,7 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
                               |RCC_PERIPHCLK_RNG|RCC_PERIPHCLK_ADC12
                               |RCC_PERIPHCLK_FDCAN;
   PeriphClkInit.I2c4ClockSelection = RCC_I2C4CLKSOURCE_PCLK1;
-  PeriphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PCLK1;
+  PeriphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
   PeriphClkInit.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
   PeriphClkInit.Adc12ClockSelection = RCC_ADC12CLKSOURCE_SYSCLK;

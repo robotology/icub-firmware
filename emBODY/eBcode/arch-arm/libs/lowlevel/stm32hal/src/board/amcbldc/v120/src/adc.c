@@ -148,6 +148,10 @@ void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_14;
   sConfig.Rank = ADC_REGULAR_RANK_11;
+  sConfig.OffsetNumber = ADC_OFFSET_4;
+  sConfig.Offset = 1862;
+  sConfig.OffsetSign = ADC_OFFSET_SIGN_NEGATIVE;
+  sConfig.OffsetSaturation = DISABLE;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -163,6 +167,8 @@ void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_TEMPSENSOR_ADC1;
   sConfig.Rank = ADC_REGULAR_RANK_13;
+  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  sConfig.Offset = 0;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -210,8 +216,10 @@ void MX_ADC2_Init(void)
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
-  sConfig.OffsetNumber = ADC_OFFSET_NONE;
-  sConfig.Offset = 0;
+  sConfig.OffsetNumber = ADC_OFFSET_1;
+  sConfig.Offset = 1862;
+  sConfig.OffsetSign = ADC_OFFSET_SIGN_NEGATIVE;
+  sConfig.OffsetSaturation = DISABLE;
   if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -227,6 +235,7 @@ void MX_ADC2_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_4;
   sConfig.Rank = ADC_REGULAR_RANK_3;
+  sConfig.OffsetNumber = ADC_OFFSET_2;
   if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -242,6 +251,7 @@ void MX_ADC2_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_5;
   sConfig.Rank = ADC_REGULAR_RANK_5;
+  sConfig.OffsetNumber = ADC_OFFSET_3;
   if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
   {
     Error_Handler();

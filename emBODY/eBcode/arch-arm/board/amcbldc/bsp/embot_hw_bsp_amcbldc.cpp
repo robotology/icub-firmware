@@ -270,31 +270,32 @@ namespace embot { namespace hw { namespace can {
             HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
             HAL_Delay(1);
 
-//            MX_FDCAN2_Init();
+            // yes: CAN::one is mapped into FDCAN2
+            MX_FDCAN2_Init();
                         
-            // for 80 mhz (from a project by st)
-            hfdcan2.Instance = FDCAN2;
-            hfdcan2.Init.ClockDivider = FDCAN_CLOCK_DIV2;
-            hfdcan2.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
-            hfdcan2.Init.Mode = FDCAN_MODE_NORMAL;
-            hfdcan2.Init.AutoRetransmission = ENABLE;
-            hfdcan2.Init.TransmitPause = ENABLE;
-            hfdcan2.Init.ProtocolException = DISABLE;
-            hfdcan2.Init.NominalPrescaler = 1;
-            hfdcan2.Init.NominalSyncJumpWidth = 16;
-            hfdcan2.Init.NominalTimeSeg1 = 63;
-            hfdcan2.Init.NominalTimeSeg2 = 16;
-            hfdcan2.Init.DataPrescaler = 1;
-            hfdcan2.Init.DataSyncJumpWidth = 4;
-            hfdcan2.Init.DataTimeSeg1 = 5;
-            hfdcan2.Init.DataTimeSeg2 = 4;
-            hfdcan2.Init.StdFiltersNbr = 1;
-            hfdcan2.Init.ExtFiltersNbr = 0;
-            hfdcan2.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
-            if(HAL_FDCAN_Init(&hfdcan2) != HAL_OK)
-            {
-                Error_Handler();
-            }
+//            // for 80 mhz (from a project by st)
+//            hfdcan2.Instance = FDCAN2;
+//            hfdcan2.Init.ClockDivider = FDCAN_CLOCK_DIV2;
+//            hfdcan2.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
+//            hfdcan2.Init.Mode = FDCAN_MODE_NORMAL;
+//            hfdcan2.Init.AutoRetransmission = ENABLE;
+//            hfdcan2.Init.TransmitPause = ENABLE;
+//            hfdcan2.Init.ProtocolException = DISABLE;
+//            hfdcan2.Init.NominalPrescaler = 1;
+//            hfdcan2.Init.NominalSyncJumpWidth = 16;
+//            hfdcan2.Init.NominalTimeSeg1 = 63;
+//            hfdcan2.Init.NominalTimeSeg2 = 16;
+//            hfdcan2.Init.DataPrescaler = 1;
+//            hfdcan2.Init.DataSyncJumpWidth = 4;
+//            hfdcan2.Init.DataTimeSeg1 = 5;
+//            hfdcan2.Init.DataTimeSeg2 = 4;
+//            hfdcan2.Init.StdFiltersNbr = 1;
+//            hfdcan2.Init.ExtFiltersNbr = 0;
+//            hfdcan2.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+//            if(HAL_FDCAN_Init(&hfdcan2) != HAL_OK)
+//            {
+//                Error_Handler();
+//            }
 
         }
     }
@@ -477,36 +478,21 @@ namespace embot { namespace hw { namespace i2c {
                   
     #if   defined(STM32HAL_BOARD_AMCBLDC)
     
-    constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::standard100 };
-    constexpr PROP i2c2p { &hi2c2, embot::hw::i2c::Speed::standard100 };
-    constexpr PROP i2c3p { &hi2c3, embot::hw::i2c::Speed::standard100 };
     constexpr PROP i2c4p { &hi2c4, embot::hw::i2c::Speed::standard100 };
 
         
     constexpr BSP thebsp {        
         // maskofsupported   
-        mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two) | mask::pos2mask<uint32_t>(I2C::three) | mask::pos2mask<uint32_t>(I2C::four),         
+        mask::pos2mask<uint32_t>(I2C::four),         
         // properties
         {{       
-            &i2c1p, &i2c2p, &i2c3p, &i2c4p
+            nullptr, nullptr, nullptr, &i2c4p
         }}        
     }; 
 
     void BSP::init(embot::hw::I2C h) const
     {
-        if(h == I2C::one)
-        {            
-            MX_I2C1_Init();
-        } 
-        else if(h == I2C::two)
-        {            
-            MX_I2C2_Init();
-        } 
-        else if(h == I2C::three)
-        {            
-            MX_I2C3_Init();
-        } 
-        else if(h == I2C::four)
+        if(h == I2C::four)
         {            
             MX_I2C4_Init();
         }        
@@ -531,36 +517,6 @@ namespace embot { namespace hw { namespace i2c {
 extern "C"
 {
 
-void I2C1_EV_IRQHandler(void)
-{
-    HAL_I2C_EV_IRQHandler(&hi2c1);
-}
-
-void I2C1_ER_IRQHandler(void)
-{
-    HAL_I2C_ER_IRQHandler(&hi2c1);
-}
-
-void I2C2_EV_IRQHandler(void)
-{
-    HAL_I2C_EV_IRQHandler(&hi2c2);
-}
-
-void I2C2_ER_IRQHandler(void)
-{
-    HAL_I2C_ER_IRQHandler(&hi2c2);
-}
-
-void I2C3_EV_IRQHandler(void)
-{
-    HAL_I2C_EV_IRQHandler(&hi2c3);
-}
-
-void I2C3_ER_IRQHandler(void)
-{
-    HAL_I2C_ER_IRQHandler(&hi2c3);
-}
-
 void I2C4_EV_IRQHandler(void)
 {
     HAL_I2C_EV_IRQHandler(&hi2c4);
@@ -571,36 +527,7 @@ void I2C4_ER_IRQHandler(void)
     HAL_I2C_ER_IRQHandler(&hi2c4);
 }
 
-void DMA1_Channel4_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
-}
-
-void DMA1_Channel5_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_i2c1_tx);
-}
-
-void DMA1_Channel6_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_i2c2_rx);
-}
-
-void DMA1_Channel7_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_i2c2_tx);
-}
-
-void DMA1_Channel8_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_i2c3_rx);
-}
-
-void DMA2_Channel1_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_i2c3_tx);
-}
-
+#error TODO: add DMA for I2C in cubemx
 void DMA2_Channel2_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(&hdma_i2c4_rx);

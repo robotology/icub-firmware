@@ -2084,6 +2084,11 @@
               <FilePath>..\src\board\amcbldc\v120\src\cordic.c</FilePath>
             </File>
             <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\crc.c</FilePath>
+            </File>
+            <File>
               <FileName>dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\dma.c</FilePath>
@@ -2114,11 +2119,6 @@
               <FilePath>..\src\board\amcbldc\v120\src\rng.c</FilePath>
             </File>
             <File>
-              <FileName>stm32g4xx_hal_msp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
               <FileName>tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\tim.c</FilePath>
@@ -2127,6 +2127,11 @@
               <FileName>usb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\usb.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4351,6 +4356,11 @@
               <FilePath>..\src\board\amcbldc\v120\src\cordic.c</FilePath>
             </File>
             <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\crc.c</FilePath>
+            </File>
+            <File>
               <FileName>dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\dma.c</FilePath>
@@ -4381,11 +4391,6 @@
               <FilePath>..\src\board\amcbldc\v120\src\rng.c</FilePath>
             </File>
             <File>
-              <FileName>stm32g4xx_hal_msp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
               <FileName>tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\tim.c</FilePath>
@@ -4394,6 +4399,11 @@
               <FileName>usb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\usb.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6618,6 +6628,11 @@
               <FilePath>..\src\board\amcbldc\v120\src\cordic.c</FilePath>
             </File>
             <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\crc.c</FilePath>
+            </File>
+            <File>
               <FileName>dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\dma.c</FilePath>
@@ -6648,11 +6663,6 @@
               <FilePath>..\src\board\amcbldc\v120\src\rng.c</FilePath>
             </File>
             <File>
-              <FileName>stm32g4xx_hal_msp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
               <FileName>tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\tim.c</FilePath>
@@ -6661,6 +6671,11 @@
               <FileName>usb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\usb.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -8816,6 +8831,11 @@
               <FilePath>..\src\board\amcbldc\v120\src\cordic.c</FilePath>
             </File>
             <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\crc.c</FilePath>
+            </File>
+            <File>
               <FileName>dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\dma.c</FilePath>
@@ -8846,11 +8866,6 @@
               <FilePath>..\src\board\amcbldc\v120\src\rng.c</FilePath>
             </File>
             <File>
-              <FileName>stm32g4xx_hal_msp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
               <FileName>tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\tim.c</FilePath>
@@ -8859,6 +8874,11 @@
               <FileName>usb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\usb.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -8940,7 +8960,7 @@
       <TargetName>amcbldc-v120</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6150000::V6.15::ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -11083,6 +11103,11 @@
               <FilePath>..\src\board\amcbldc\v120\src\cordic.c</FilePath>
             </File>
             <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\crc.c</FilePath>
+            </File>
+            <File>
               <FileName>dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\dma.c</FilePath>
@@ -11111,11 +11136,6 @@
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v120\src\rng.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32g4xx_hal_msp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>
@@ -11177,6 +11197,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>stm32g4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v120\src\stm32g4xx_hal_msp.c</FilePath>
             </File>
           </Files>
         </Group>
