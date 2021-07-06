@@ -628,7 +628,59 @@ namespace embot { namespace hw { namespace tlv493d {
 
 // - support map: end of embot::hw::tlv493d
 
+// - support map: begin of embot::hw::motor
 
+#include "embot_hw_motor_bsp.h"
+
+#if !defined(EMBOT_ENABLE_hw_motor)
+
+namespace embot { namespace hw { namespace motor {
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::MOTOR h) const {}    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+#else
+
+namespace embot { namespace hw { namespace motor {
+           
+#if defined(STM32HAL_BOARD_AMCBLDC)
+    
+    
+    constexpr PROP propM1  { 0 };
+    
+    constexpr BSP thebsp {     
+
+        // maskofsupported
+        mask::pos2mask<uint32_t>(MOTOR::one),        
+        // properties
+        {{
+            &propM1
+        }}
+  
+    };
+    
+    void BSP::init(embot::hw::MOTOR h) const {}
+        
+    #else
+        #error embot::hw::motor::thebsp must be defined    
+    #endif
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+              
+}}} // namespace embot { namespace hw { namespace motor {
+
+#endif // motor
+
+// - support map: end of embot::hw::motor
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

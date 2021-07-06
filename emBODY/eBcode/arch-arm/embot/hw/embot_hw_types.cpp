@@ -141,6 +141,12 @@ static_assert(embot::core::tointegral(embot::hw::AD7147::maxnumberof) < 8*sizeof
 static_assert(embot::core::tointegral(embot::hw::AD7147::maxnumberof) < embot::core::tointegral(embot::hw::AD7147::none), "AD7147::maxnumberof must be higher that AD7147::none, so that we can optimise code");
 
 
+// - check of values for embot::hw::motor
+
+static_assert(embot::core::tointegral(embot::hw::MOTOR::none) < 8*sizeof(embot::hw::bsp::SUPP::supportedmask), "MOTOR::none must be less than 32 to be able to address a std::uint32_t mask");
+static_assert(embot::core::tointegral(embot::hw::MOTOR::maxnumberof) < 8*sizeof(embot::hw::bsp::SUPP::supportedmask), "MOTOR::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+static_assert(embot::core::tointegral(embot::hw::MOTOR::maxnumberof) < embot::core::tointegral(embot::hw::MOTOR::none), "MOTOR::maxnumberof must be higher that MOTOR::none, so that we can optimise code");
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

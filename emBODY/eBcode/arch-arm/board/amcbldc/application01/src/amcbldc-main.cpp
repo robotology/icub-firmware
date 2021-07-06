@@ -101,6 +101,7 @@ int main(void)
 
 #include "embot_hw_sys.h"
 
+
 // maybe move API and implementation of the ctrl thread in dedicated files
 void s_start_CTRL_thread();
 
@@ -238,6 +239,9 @@ void test_tick();
 // just to see some GPIO transformations
 #include "embot_hw_gpio_bsp.h"
 
+// i also use motors
+#include "embot_hw_motor.h"
+
 // finally, from here there is the preparation of the t_CTRL thread
 
 embot::os::EventThread *t_CTRL {nullptr};
@@ -269,7 +273,11 @@ void s_start_CTRL_thread()
 }
 
 void tCTRL_startup(embot::os::Thread *t, void *param)
-{    
+{   
+
+    embot::core::print("tCTRL_startup(): init embot::hw::MOTOR::one");
+    embot::hw::motor::init(embot::hw::MOTOR::one, {});
+        
     embot::core::print("tCTRL_startup(): starts a timer which sends a tick event every " + embot::core::TimeFormatter(tCTRL_tickperiod).to_string());
     
     // start a timer which ticks the thread CTRL

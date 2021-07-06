@@ -67,6 +67,8 @@ namespace embot { namespace hw {
     enum class ADS122C04 : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };
     
     enum class AD7147 : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
+    
+    enum class MOTOR : std::uint8_t { one = 0, two = 1, three = 2, four = 3, none = 31, maxnumberof = 4 };
   
   
     // definition of more complex data structures
