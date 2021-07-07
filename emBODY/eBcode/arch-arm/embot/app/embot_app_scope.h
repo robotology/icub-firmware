@@ -30,7 +30,26 @@ namespace embot { namespace app { namespace scope {
         virtual ~Signal() {};    // cannot delete from interface but only from derived object
     };
     
-    enum class SignalType { Print, EViewer, GPIO };
+    enum class SignalType { Dummy, Print, EViewer, GPIO };
+
+    // this implementation does nothing
+    class SignalDummy: public Signal
+    {
+    public:
+               
+        struct Config
+        {  
+            uint32_t nothing {0};
+            Config() = default;
+            bool isvalid() const { return true; }
+        };
+                    
+        SignalDummy(const Config &cfg) {};
+        virtual ~SignalDummy() {};
+    
+        virtual void on() override {};
+        virtual void off() override {};        
+    };  
     
     // this implementation prints out
     class SignalPrint: public Signal
