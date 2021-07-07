@@ -252,7 +252,7 @@ void thrCTRL(void* p) { embot::os::Thread *t = reinterpret_cast<embot::os::Threa
 
 constexpr embot::os::Event evt_CTRL_tick {embot::os::bitpos2event(1)};
 embot::os::Timer * tCTRL_tickTimer {nullptr};
-constexpr embot::core::relTime tCTRL_tickperiod {100*embot::core::time1millisec}; 
+constexpr embot::core::relTime tCTRL_tickperiod {1000*embot::core::time1millisec}; 
 
     
 void s_start_CTRL_thread()
@@ -273,11 +273,7 @@ void s_start_CTRL_thread()
 }
 
 void tCTRL_startup(embot::os::Thread *t, void *param)
-{   
-
-    embot::core::print("tCTRL_startup(): init embot::hw::MOTOR::one");
-    embot::hw::motor::init(embot::hw::MOTOR::one, {});
-        
+{           
     embot::core::print("tCTRL_startup(): starts a timer which sends a tick event every " + embot::core::TimeFormatter(tCTRL_tickperiod).to_string());
     
     // start a timer which ticks the thread CTRL
@@ -312,8 +308,8 @@ void tCTRL_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p
 
 
 
-
-constexpr embot::app::scope::SignalType signaltype = embot::app::scope::SignalType::EViewer;
+constexpr embot::app::scope::SignalType signaltype = embot::app::scope::SignalType::Dummy;
+//constexpr embot::app::scope::SignalType signaltype = embot::app::scope::SignalType::EViewer;
 //constexpr embot::app::scope::SignalType signaltype = embot::app::scope::SignalType::Print;
 //constexpr embot::app::scope::SignalType signaltype = embot::app::scope::SignalType::GPIO;
 
@@ -325,7 +321,11 @@ void test_init()
     amcbldc::codetotest::init();
 
     // initialize the tool which measure the duration of the code to test
-    if(embot::app::scope::SignalType::EViewer == signaltype)
+    if(embot::app::scope::SignalType::Dummy == signaltype)
+    {       
+        signal = new embot::app::scope::SignalDummy({});
+    }
+    else if(embot::app::scope::SignalType::EViewer == signaltype)
     {       
         signal = new embot::app::scope::SignalEViewer({amcbldc::codetotest::tick, embot::app::scope::SignalEViewer::Config::LABEL::one});
     }
