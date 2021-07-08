@@ -252,7 +252,7 @@ void thrCTRL(void* p) { embot::os::Thread *t = reinterpret_cast<embot::os::Threa
 
 constexpr embot::os::Event evt_CTRL_tick {embot::os::bitpos2event(1)};
 embot::os::Timer * tCTRL_tickTimer {nullptr};
-constexpr embot::core::relTime tCTRL_tickperiod {1000*embot::core::time1millisec}; 
+constexpr embot::core::relTime tCTRL_tickperiod {100*embot::core::time1millisec}; 
 
     
 void s_start_CTRL_thread()

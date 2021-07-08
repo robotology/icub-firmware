@@ -69,19 +69,37 @@ namespace amcbldc { namespace codetotest {
         
         static embot::hw::motor::Pwm pwm = 0;
         static uint8_t cnt = 0;
-        constexpr embot::hw::motor::Pwm step {100};
+        constexpr embot::hw::motor::Pwm step {500};
+        constexpr embot::core::relTime period {2000*embot::core::time1millisec};
+        static embot::core::Time prevcommutation = 0;
         
-        embot::core::print("@ " + embot::core::TimeFormatter(embot::core::now()).to_string() + " amcbldc::codetotest::tick(): embot::hw::motor::setpwm(embot::hw::MOTOR::one, " + std::to_string(pwm) + ")");
+        embot::core::Time now = embot::core::now();
         
-        embot::hw::motor::setpwm(embot::hw::MOTOR::one, pwm);
+        embot::hw::motor::Position pos {0};        
+        //embot::hw::motor::getencoder(embot::hw::MOTOR::one, pos); 
+        embot::hw::motor::gethallcounter(embot::hw::MOTOR::one, pos); 
+        constexpr uint8_t npoles = 7;
+        constexpr uint8_t nhall = 6;
+        constexpr float resolutionhalltick = 360.0 / (npoles*nhall);        
+        float deg = pos*resolutionhalltick;        
         
-        switch(cnt)
+        embot::core::print("@ " + embot::core::TimeFormatter(now).to_string() + " amcbldc::codetotest::tick(): hall [cnt, deg] = [" + std::to_string(pos) + ", " + std::to_string(deg) + "]");
+
+        if((now - prevcommutation) >= period)
         {
-            case 0:     {   cnt = 1;    pwm = step;    } break;
-            case 1:     {   cnt = 2;    pwm = 0;       } break;
-            case 2:     {   cnt = 3;    pwm = -step;   } break;
-            case 4: 
-            default:    {   cnt = 0;    pwm = 0;       } break;
+            prevcommutation = now;
+            embot::core::print("@ " + embot::core::TimeFormatter(now).to_string() + " amcbldc::codetotest::tick(): embot::hw::motor::setpwm(embot::hw::MOTOR::one, " + std::to_string(pwm) + ")");
+            
+            embot::hw::motor::setpwm(embot::hw::MOTOR::one, pwm);
+            
+            switch(cnt)
+            {
+                case 0:     {   cnt = 1;    pwm = step;    } break;
+                case 1:     {   cnt = 2;    pwm = 0;       } break;
+                case 2:     {   cnt = 3;    pwm = -step;   } break;
+                case 4: 
+                default:    {   cnt = 0;    pwm = 0;       } break;
+            }
         }
         
 #else        
