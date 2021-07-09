@@ -66,29 +66,34 @@ namespace amcbldc { namespace codetotest {
         Current_FOC_Obj.step();
         
 #elif defined(TEST_MOTOR)
+
+#undef TEST_MOTOR_BUT_DONTMOVEIT
         
         static embot::hw::motor::Pwm pwm = 0;
         static uint8_t cnt = 0;
         constexpr embot::hw::motor::Pwm step {500};
-        constexpr embot::core::relTime period {2000*embot::core::time1millisec};
+        constexpr embot::core::relTime period {1000*embot::core::time1millisec};
         static embot::core::Time prevcommutation = 0;
         
         embot::core::Time now = embot::core::now();
         
-        embot::hw::motor::Position pos {0};        
-        //embot::hw::motor::getencoder(embot::hw::MOTOR::one, pos); 
-        embot::hw::motor::gethallcounter(embot::hw::MOTOR::one, pos); 
+        embot::hw::motor::Position hall {0};       
+        embot::hw::motor::Position enco {0};            
+        embot::hw::motor::getencoder(embot::hw::MOTOR::one, enco); 
+        embot::hw::motor::gethallcounter(embot::hw::MOTOR::one, hall); 
         constexpr uint8_t npoles = 7;
         constexpr uint8_t nhall = 6;
         constexpr float resolutionhalltick = 360.0 / (npoles*nhall);        
-        float deg = pos*resolutionhalltick;        
+        float deghall = hall*resolutionhalltick;        
         
-        embot::core::print("@ " + embot::core::TimeFormatter(now).to_string() + " amcbldc::codetotest::tick(): hall [cnt, deg] = [" + std::to_string(pos) + ", " + std::to_string(deg) + "]");
+        embot::core::print("@ " + embot::core::TimeFormatter(now).to_string() + ": [encmod4, hallcnt, halldeg] = [" + std::to_string(enco) + ", " + std::to_string(hall) + ", " + std::to_string(deghall) + "]");
 
+#if defined(TEST_MOTOR_BUT_DONTMOVEIT)
+#else        
         if((now - prevcommutation) >= period)
         {
             prevcommutation = now;
-            embot::core::print("@ " + embot::core::TimeFormatter(now).to_string() + " amcbldc::codetotest::tick(): embot::hw::motor::setpwm(embot::hw::MOTOR::one, " + std::to_string(pwm) + ")");
+            embot::core::print("@ " + embot::core::TimeFormatter(now).to_string() + ": embot::hw::motor::setpwm(embot::hw::MOTOR::one, " + std::to_string(pwm) + ")");
             
             embot::hw::motor::setpwm(embot::hw::MOTOR::one, pwm);
             
@@ -101,6 +106,7 @@ namespace amcbldc { namespace codetotest {
                 default:    {   cnt = 0;    pwm = 0;       } break;
             }
         }
+#endif        
         
 #else        
         static constexpr std::array<embot::core::relTime, 5> usec = 
