@@ -23,7 +23,7 @@
 #include <array>
 
 //#define TEST_FOC
-#define TEST_MOTOR
+//#define TEST_MOTOR
 
 #if defined(TEST_FOC)
 // foc code
@@ -109,18 +109,18 @@ namespace amcbldc { namespace codetotest {
 #endif        
         
 #else        
-        static constexpr std::array<embot::core::relTime, 5> usec = 
-        {   
-            100*embot::core::time1microsec, 
-            200*embot::core::time1microsec, 
-            300*embot::core::time1microsec, 
-            400*embot::core::time1microsec, 
-            500*embot::core::time1microsec
-        }; 
-        static uint8_t index {0};
-        
-        index = (index+1) % usec.size();
-        embot::hw::sys::delay(usec[index]);        
+//        static constexpr std::array<embot::core::relTime, 5> usec = 
+//        {   
+//            100*embot::core::time1microsec, 
+//            200*embot::core::time1microsec, 
+//            300*embot::core::time1microsec, 
+//            400*embot::core::time1microsec, 
+//            500*embot::core::time1microsec
+//        }; 
+//        static uint8_t index {0};
+//        
+//        index = (index+1) % usec.size();
+//        embot::hw::sys::delay(usec[index]);        
 #endif        
     }
     
