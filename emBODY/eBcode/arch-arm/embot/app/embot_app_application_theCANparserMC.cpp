@@ -37,7 +37,10 @@ struct embot::app::application::theCANparserMC::Impl
         dummyCANagentMC() {}
         virtual ~dummyCANagentMC() {}
             
-        virtual bool get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info) {  return true; }          
+        virtual bool get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info) {  return true; }  
+        virtual bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) { return true; } 
+        virtual bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) { return true; }
+        
     };
     
     dummyCANagentMC dummyagent;
@@ -67,6 +70,9 @@ struct embot::app::application::theCANparserMC::Impl
     
     
     bool process_get_ems2foc_desired_current(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies); 
+    bool process_set_controlmode(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    bool process_get_controlmode(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+
 };
 
 
@@ -106,6 +112,21 @@ bool embot::app::application::theCANparserMC::Impl::process(const embot::prot::c
  
         } break;
 
+        case embot::prot::can::Clas::pollingMotorControl:
+        {
+                    
+            if(static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_CONTROL_MODE) == cmd)
+            {
+                txframe = process_set_controlmode(frame, replies);
+                recognised = true;
+            }
+            else if(static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_CONTROL_MODE) == cmd)
+            {
+                txframe = process_get_controlmode(frame, replies);
+                recognised = true;
+            }
+ 
+        } break;
         
         default:
         {
@@ -131,6 +152,35 @@ bool embot::app::application::theCANparserMC::Impl::process_get_ems2foc_desired_
     return false;        
 }
 
+
+bool embot::app::application::theCANparserMC::Impl::process_set_controlmode(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    embot::prot::can::motor::polling::Message_SET_CONTROL_MODE msg;
+    msg.load(frame);
+    
+    config.agent->get(msg.info);
+    
+    return false;        
+}
+
+bool embot::app::application::theCANparserMC::Impl::process_get_controlmode(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    embot::prot::can::motor::polling::Message_GET_CONTROL_MODE msg;
+    msg.load(frame);
+    
+    embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo replyinfo;
+      
+    config.agent->get(msg.info, replyinfo);
+
+    embot::prot::can::Frame frame0;
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
+    {
+        replies.push_back(frame0);
+        return true;
+    }  
+    
+    return false;         
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - the class

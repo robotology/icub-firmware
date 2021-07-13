@@ -24,7 +24,9 @@ namespace embot { namespace app { namespace application {
     {
     public:
         // interface
-        virtual bool get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info) = 0;        
+        virtual bool get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info) = 0;  
+        virtual bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) = 0;      
+        virtual bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) = 0;
        
     public:
         virtual ~CANagentMC() {};         
