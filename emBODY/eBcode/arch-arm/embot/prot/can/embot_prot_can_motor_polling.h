@@ -32,9 +32,11 @@
 namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
     
     // the supported commands    
-    enum class CMD { 
+    enum class CMD : uint8_t { 
         none = 0xfe, 
      
+        GET_CONTROL_MODE = 0x07,
+        SET_CONTROL_MODE = 0x09,
         SET_BOARD_ID = 50, GET_FIRMWARE_VERSION = 91 
     };
     
@@ -57,7 +59,22 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
     
 }}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
 
-           
+namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
+   
+    // some required types
+
+    enum class MotIndex : uint8_t { one = 0, two = 1, none = 254 };
+    MotIndex toMotIndex(uint8_t v);
+    uint8_t convert(MotIndex mo);  
+    std::string tostring(MotIndex mo);    
+    
+    enum class ControlMode : uint8_t { Idle = 0x00, Current = 0x06, SpeedVoltage = 0x0A, OpenLoop = 0x50, none = 254 };         
+    ControlMode toControlMode(uint8_t v);
+    uint8_t convert(ControlMode cm); 
+    std::string tostring(ControlMode cm);      
+
+}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
+          
 
 namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
             
@@ -80,6 +97,53 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
             embot::prot::can::shared::Message_SET_ID(Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::SET_BOARD_ID)) {}
        
     }; 
+    
+    
+    class Message_SET_CONTROL_MODE : public Message
+    {
+        public:
+                                   
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};
+            ControlMode controlmode {ControlMode::Idle};            
+            Info() = default;
+        };
+        
+        Info info {};
+        
+        Message_SET_CONTROL_MODE() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };
+    
+    class Message_GET_CONTROL_MODE : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};             
+            Info() = default;
+        };
+        
+        struct ReplyInfo
+        {
+            MotIndex motorindex {MotIndex::one};
+            ControlMode controlmode {ControlMode::Idle};            
+            ReplyInfo() = default;
+        };        
+        
+        Info info {};
+        
+        Message_GET_CONTROL_MODE() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };      
 
     
 }}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace polling {

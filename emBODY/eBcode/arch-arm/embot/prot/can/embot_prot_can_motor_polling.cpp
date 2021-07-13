@@ -57,6 +57,8 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         static const std::uint64_t mcpollmask256[4] = 
         {
             // bits 0-63
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_CONTROL_MODE))              |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_CONTROL_MODE))              |
             (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ID)),
             // bits 64-127
             (1ULL << (static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)-64)),
@@ -86,6 +88,191 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
       
     // fill with other future Messages. 
     
+    MotIndex motorpollingframe2motindex(const embot::prot::can::Frame &frame)
+    {  
+        return static_cast<MotIndex>(frame.data[0] >> 7);
+    }
+    
+    MotIndex toMotIndex(uint8_t v)
+    {
+        MotIndex m {MotIndex::none};
+        
+        switch(v)
+        {
+            case 0:
+            {
+                m = MotIndex::one;
+            } break;
+
+            case 1:
+            {
+                m = MotIndex::two;
+            } break;
+            
+            default:
+            {
+                m = MotIndex::none;
+            } break;
+
+        }  
+
+        return m;        
+    }
+    
+    uint8_t convert(MotIndex mo)
+    {
+        return embot::core::tointegral(mo);
+    }
+           
+    std::string tostring(MotIndex mo)
+    {
+        switch(mo)
+        {
+            case MotIndex::one:
+            {
+                return "one";
+            } break;
+
+            case MotIndex::two:
+            {
+                return "two";
+            } break;
+            
+            default:
+            {
+                return "none";
+            } break;
+
+        } 
+
+        return "none";
+    }        
+    
+    ControlMode toControlMode(uint8_t v)
+    {
+        ControlMode cm {ControlMode::none};
+        
+        switch(v)
+        {
+            case 0x00:
+            {
+                cm = ControlMode::Idle;
+            } break;
+
+            case 0x06:
+            {
+                cm = ControlMode::Current;
+            } break;
+            
+            case 0x0A:
+            {
+                cm = ControlMode::SpeedVoltage;
+            } break;            
+            
+            case 0x50:
+            {
+                cm = ControlMode::OpenLoop;
+            } break;   
+
+            default:
+            {
+                cm = ControlMode::none;
+            } break;
+
+        }  
+
+        return cm;        
+    }
+    
+    uint8_t convert(ControlMode cm)
+    {
+        return embot::core::tointegral(cm);
+    }
+    
+    std::string tostring(ControlMode cm)
+    {
+
+        switch(cm)
+        {
+            case ControlMode::Idle:
+            {
+                return "Idle";
+            } break;
+
+            case ControlMode::Current:
+            {
+                return "Current";
+            } break;
+            
+            case ControlMode::SpeedVoltage:
+            {
+                return "SpeedVoltage";
+            } break;
+
+            case ControlMode::OpenLoop:
+            {
+                return "OpenLoop";
+            } break;
+
+            default:
+            {
+                return "none";
+            } break;
+
+        } 
+
+        return "none";
+    }        
+    
+    
+    bool Message_GET_CONTROL_MODE::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_CONTROL_MODE) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_CONTROL_MODE::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+        dd[0] = convert(replyinfo.controlmode); 
+                       
+        std::uint8_t datalen = 1;
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_CONTROL_MODE), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }      
+        
+    
+    bool Message_SET_CONTROL_MODE::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_CONTROL_MODE) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.controlmode = toControlMode(candata.datainframe[0]);
+                      
+        return true;         
+    }                    
+        
+    bool Message_SET_CONTROL_MODE::reply()
+    {
+        return false;
+    } 
     
     
 }}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
