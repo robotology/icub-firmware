@@ -100,7 +100,7 @@ int main(void)
 
 
 #include "embot_hw_sys.h"
-
+#include "embot_hw_motor.h"
 
 // maybe move API and implementation of the ctrl thread in dedicated files
 void s_start_CTRL_thread();
@@ -155,6 +155,8 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     embot::app::application::theCANparserMC::Config configparsermc { &themcagent };
     canparsermc.initialise(configparsermc);  
 
+    // init motor
+    embot::hw::motor::init(embot::hw::MOTOR::one, {});
 
     // set priority of the can thread
     evthr->setPriority(embot::os::Priority::high40);

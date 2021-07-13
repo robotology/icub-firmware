@@ -71,7 +71,8 @@ struct embot::app::application::thePZMdriver::Impl
     
     std::array<piezoMotorState_t, numberofmotors> _PZMstate {STATE_NOT_INIT, STATE_NOT_INIT, STATE_NOT_INIT};
 
-
+    embot::prot::can::motor::polling::ControlMode cm {embot::prot::can::motor::polling::ControlMode::Idle}; 
+    
     embot::os::Timer *timerDISABLEsetpoint {nullptr};    
 
        
@@ -301,7 +302,28 @@ bool embot::app::application::thePZMdriver::get(const embot::prot::can::motor::p
     return true;    
 }
 
+bool embot::app::application::thePZMdriver::get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info)
+{   
+//    embot::core::print("received SET_CONTROL_MODE[]: " + embot::prot::can::motor::polling::tostring(info.controlmode) + " for motindex " + embot::prot::can::motor::polling::tostring(info.motorindex));
 
+    pImpl->cm = info.controlmode;
+
+// we dont support it yet.    
+//    if(embot::prot::can::motor::polling::ControlMode::Idle == pImpl->cm)
+//    {
+//        pImpl->pwm = 0;
+//        embot::hw::motor::setpwm(embot::hw::MOTOR::one, 0);
+//    }
+    return true;    
+}
+
+bool embot::app::application::thePZMdriver::get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo)
+{    
+//    embot::core::print("received GET_CONTROL_MODE[]: for motindex " + embot::prot::can::motor::polling::tostring(info.motorindex));
+    replyinfo.motorindex = info.motorindex;
+    replyinfo.controlmode =  pImpl->cm;
+    return true;    
+}
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
