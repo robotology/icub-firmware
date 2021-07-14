@@ -206,7 +206,6 @@ void s_shared_start()
 }
 
 #include "embot_hw_sys.h"
-#include "embot_hw_motor.h"
 
 embot::os::EventThread *t_COMM {nullptr};
 embot::os::EventThread *t_CTRL {nullptr};
@@ -415,7 +414,7 @@ void tCTRL_startup(embot::os::Thread *t, void *param)
     
     outctrlframes.reserve(5);
 
-    // init agent of mc
+    // init agent of mc. it also init motor
     embot::app::application::theMCagent2 &themcagent2 = embot::app::application::theMCagent2::getInstance();
     themcagent2.initialise({});
 
@@ -424,8 +423,6 @@ void tCTRL_startup(embot::os::Thread *t, void *param)
     embot::app::application::theCANparserMC::Config configparsermc { &themcagent2 };
     canparsermc.initialise(configparsermc);  
 
-    // init motor
-    embot::hw::motor::init(embot::hw::MOTOR::one, {});
         
 //    embot::core::print("tCTRL_startup(): starts a timer which sends a tick event every " + embot::core::TimeFormatter(tCTRL_tickperiod).to_string());
     
@@ -493,17 +490,17 @@ void tCTRL_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p
 }
 
 
-// interface for the model-based-designed control
+// interface for the model-based-designed control which is inside embot::app::application::theMCagent2
 
 // called just once at startup
 void mbd_mc_init()
 {     
-    // fill it w/ mbd code
+    embot::app::application::theMCagent2::getInstance().initialise({});
 }
 
 // called in asynch mode when a can frame arrives. 
 // it must:
-// - processe the frame, 
+// - process the frame, 
 // - do actions, 
 // - fill in the reply can frames
 void mbd_mc_canparse(const embot::prot::can::Frame &rxframe,
@@ -511,7 +508,6 @@ void mbd_mc_canparse(const embot::prot::can::Frame &rxframe,
 {
     // now we use the c++ parser / agent
     embot::app::application::theCANparserMC::getInstance().process(rxframe, outframes);
-    // fill it w/ mbd code
 }
 
 // called every 1 ms and always after mbd_mc_canparse(). 

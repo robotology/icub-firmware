@@ -31,16 +31,60 @@ struct embot::app::application::theMCagent2::Impl
 {   
     Config config {};
         
+    bool initted {false};
+        
+    embot::hw::motor::Position encoder {0};
+    embot::hw::motor::Position hallcounter {0};
+        
     embot::hw::motor::Pwm pwm {0};
     embot::prot::can::motor::polling::ControlMode cm {embot::prot::can::motor::polling::ControlMode::Idle};    
+    bool applychanges {false};
     
     Impl() = default;  
+    
+    bool initialise()
+    {
+        if(true == initted)
+        {
+            return true;
+        }    
+        // init motor
+        embot::hw::motor::init(embot::hw::MOTOR::one, {});
+
+        // call MBD.init
+            
+        initted = true;
+        return true;   
+    }
 
     bool tick(std::vector<embot::prot::can::Frame> &outframes)
     {
+        if(true == applychanges)
+        {
+            // in case we change control mode to idle, i impose pwm = 0;
+            // in case i change the pwm ... well, we manage that in HERE
+            if(embot::prot::can::motor::polling::ControlMode::Idle == cm)
+            {
+                pwm = 0; //  i force pwm = 0               
+            }
+            
+            // HERE
+            embot::hw::motor::setpwm(embot::hw::MOTOR::one, pwm);
+             
+            applychanges = false;      
+        }
+        
+        
         if(embot::prot::can::motor::polling::ControlMode::Idle != cm)
         {
             // add status of motor...
+            
+            embot::hw::motor::getencoder(embot::hw::MOTOR::one, encoder);
+            embot::hw::motor::gethallcounter(embot::hw::MOTOR::one, hallcounter);
+            
+            
+            // do whatever the MBD needs 
+            // call MBD.tick
  
             embot::prot::can::Frame frame {};   
                             
@@ -51,12 +95,13 @@ struct embot::app::application::theMCagent2::Impl
             info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
             info.current = pwm;
             info.velocity = 1; 
-            info.position = 2;                
+            info.position = encoder;                
             
             msg.load(info);
             msg.get(frame);
             outframes.push_back(frame);              
         }
+        
         return true;
     }    
 };
@@ -86,8 +131,8 @@ embot::app::application::theMCagent2::~theMCagent2() { }
         
 bool embot::app::application::theMCagent2::initialise(const Config &config)
 {
-    pImpl->config = config;
-    return true;
+    pImpl->config = config;   
+    return pImpl->initialise();
 }
 
 bool embot::app::application::theMCagent2::tick(std::vector<embot::prot::can::Frame> &outframes)
@@ -103,10 +148,8 @@ bool embot::app::application::theMCagent2::get(const embot::prot::can::motor::pe
     embot::core::print("received EMSTO2FOC_DESIRED_CURRENT[]: " + std::to_string(info.current[0]) + ", " + std::to_string(info.current[1]) + ", " + std::to_string(info.current[2]));
  
     pImpl->pwm = info.current[0];  
-    if(embot::prot::can::motor::polling::ControlMode::Idle != pImpl->cm)
-    {
-        embot::hw::motor::setpwm(embot::hw::MOTOR::one, pImpl->pwm);
-    }
+    pImpl->applychanges = true;
+    
     return true;    
 }
 
@@ -116,12 +159,8 @@ bool embot::app::application::theMCagent2::get(const embot::prot::can::motor::po
     embot::core::print("received SET_CONTROL_MODE[]: " + embot::prot::can::motor::polling::tostring(info.controlmode) + " for motindex " + embot::prot::can::motor::polling::tostring(info.motorindex));
 
     pImpl->cm = info.controlmode;
+    pImpl->applychanges = true;
     
-    if(embot::prot::can::motor::polling::ControlMode::Idle == pImpl->cm)
-    {
-        pImpl->pwm = 0;
-        embot::hw::motor::setpwm(embot::hw::MOTOR::one, 0);
-    }
     return true;    
 }
 
