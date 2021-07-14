@@ -35,6 +35,7 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
     enum class CMD { 
         none = 0xfe, 
         
+        FOC = 0,
         PRINT = 6,
         EMSTO2FOC_DESIRED_CURRENT = 15        
     };
@@ -104,6 +105,26 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
             
         bool load(const embot::prot::can::Frame &inframe);                        
     }; 
+    
+    class Message_FOC : public Message
+    {
+        public:
+            
+        struct Info
+        {
+            uint8_t canaddress {0};
+            int16_t current {0};
+            int16_t velocity {0};
+            int32_t position {0};
+            Info() = default;
+        };
+        
+        Info info {};
+        
+        Message_FOC() = default;       
+        bool load(const Info& inf);            
+        bool get(embot::prot::can::Frame &outframe);    
+    };        
 
     
 }}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {    
