@@ -1,0 +1,43 @@
+;#! armcc -E
+; the above must be on teh first line of teh scatter file ...
+
+; Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+; Author:  Marco Accame
+; email:   marco.accame@iit.it
+; website: www.robotcub.org
+; Permission is granted to copy, distribute, and/or modify this program
+; under the terms of the GNU General Public License, version 2 or any
+; later version published by the Free Software Foundation.
+;
+; A copy of the license can be found at
+; http://www.robotcub.org/icub/license/gpl.txt
+;
+; This program is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+; Public License for more details
+; due to a bug in linker (in some older versions), you may need to put the whole path ... thus change it by hand
+;#include "D:\#inhere\sdl\embedded\arm\embody\body\embenv\envcom\eEmemorymap.h"
+;#include "..\..\cfg\eEmemorymap.h"
+
+
+; flash starts from 0x08000000 and its size is 512k = 0x80000
+; applications starts at offset 128k = 0x20000 -> at 0x08020000
+; its size is 128k + (256-4)k = 380k = 0x5F000
+; about ram: we allow a memory hole of 0x20 at start of RAM. then we use all RAM size - 0x20
+; we have 128k = 0x20000 -> 0x1FFE0
+; RW_IRAM1 0x20000020 0x1FFE0  {  ; RW data
+LR_IROM1 0x08020000 0x0005F000  {    ; load region size_region
+  ER_IROM1 0x08020000 0x0005F000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  RW_IRAM1 0x20000020 0x1FFE0  {  ; RW data
+   .ANY (+RW +ZI)
+  }
+}  
+
+
+
+
