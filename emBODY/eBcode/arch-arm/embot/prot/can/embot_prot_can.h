@@ -39,6 +39,16 @@ namespace embot { namespace prot { namespace can {
         {
             if(nullptr != d) { std::memmove(data, d, size); }
         }
+        
+        bool copyto(uint32_t &i, uint8_t &si, uint8_t *da) const
+        {
+            if(nullptr != da) 
+            {
+                i = id; si = size; std::memmove(da, data, std::min(size, static_cast<std::uint8_t>(8)));
+                return true;
+            }
+            return false;
+        }
     };
 
     
