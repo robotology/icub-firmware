@@ -98,6 +98,16 @@ bool embot::app::application::theMBDagent::tick(std::vector<embot::prot::can::Fr
 
 // interface to CANagentMBD
 
+bool embot::app::application::theMBDagent::onrecognisedframe(void *p)
+{
+    embot::core::print("theMBDagent is called because theCNAparserMBD has recognised a frame");
+    // use it as you like.
+    
+    
+    
+    return true;
+}
+
 bool embot::app::application::theMBDagent::get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info)
 {
     embot::core::print("theMBDagent (legacy mode) received EMSTO2FOC_DESIRED_CURRENT[]: " + std::to_string(info.current[0]) + ", " + std::to_string(info.current[1]) + ", " + std::to_string(info.current[2]));

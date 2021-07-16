@@ -23,7 +23,10 @@ namespace embot { namespace app { namespace application {
     class CANagentMBD
     {
     public:
-        // interface: so far the CANagentMBD keeps actions for these three can frames. just for debug 
+        
+        // this one is called by the parser every time a frame is recognised
+        virtual bool onrecognisedframe(void *p) = 0; 
+        // legacy interface: so far the CANagentMBD keeps actions for these three can frames. just for debug 
         virtual bool get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info) = 0;  
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) = 0;      
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) = 0;

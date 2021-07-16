@@ -359,21 +359,6 @@ void mbd_mc_init();
 void mbd_mc_canparse(const embot::prot::can::Frame &rxframe, std::vector<embot::prot::can::Frame> &outframes);
 void mbd_mc_tick(std::vector<embot::prot::can::Frame> &outframes);
 
-// which init and tick the following:
-// - two functions: amcbldc::testcode::init(), amcbldc::testcode::tick()
-// - a class embot::app::scope::Signal which measures the duration of the above tick() by using
-//   - either a print of duration time
-//   - or a GPIO rised and lowred which can be measured with a true oscilloscope, 
-//   - or the Event Viewer tool visible by opening `Debug / OS Support / ....`.
-// here are the required include files
-//#include "amcbldc_codetotest.h"
-//#include "embot_app_scope.h"
-
-// just to see some GPIO transformations
-//#include "embot_hw_gpio_bsp.h"
-
-// i also use motors
-#include "embot_hw_motor.h"
 
 // finally, from here there is the preparation of the t_CTRL thread
 
@@ -417,7 +402,7 @@ void tCTRL_startup(embot::os::Thread *t, void *param)
 
     // init canparser mc and link it to its agent
     embot::app::application::theCANparserMBD &canparsermbd = embot::app::application::theCANparserMBD::getInstance();
-    embot::app::application::theCANparserMBD::Config configparsermbd { nullptr };
+    embot::app::application::theCANparserMBD::Config configparsermbd { &thembdagent };
     canparsermbd.initialise(configparsermbd);  
 
         

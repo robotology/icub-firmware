@@ -36,19 +36,20 @@
 
 struct embot::app::application::theCANparserMBD::Impl
 {   
-    class dummyCANagentMC : public CANagentMBD 
+    class dummyCANagentMBD : public CANagentMBD 
     {
     public:
-        dummyCANagentMC() {}
-        virtual ~dummyCANagentMC() {}
+        dummyCANagentMBD() {}
+        virtual ~dummyCANagentMBD() {}
             
+        virtual bool onrecognisedframe(void *p) { return true; }    
         virtual bool get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info) {  return true; }  
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) { return true; } 
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) { return true; }
         
     };
     
-    dummyCANagentMC dummyagent;
+    dummyCANagentMBD dummyagent;
     
     Config config;
         
@@ -114,6 +115,8 @@ bool embot::app::application::theCANparserMBD::Impl::process(const embot::prot::
         
     // if the frame is recognised, the function must return true
     recognised = true;
+    // and alert its agent
+    config.agent->onrecognisedframe(nullptr);
         
     if(replyisrequired)
     {
