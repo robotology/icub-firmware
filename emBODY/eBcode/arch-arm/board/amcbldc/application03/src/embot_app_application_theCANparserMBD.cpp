@@ -22,6 +22,10 @@
 
 #include "embot_app_theCANboardInfo.h"
 
+#include "can_decoder.h"
+
+#include "can_rx_raw2struct.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -47,8 +51,43 @@ struct embot::app::application::theCANparserMBD::Impl
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) { return true; } 
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) { return true; }
         
+				
     };
     
+		// Internal Variables For CAN Decoder
+    MCControlModes rtb_mode;
+    CANErrorTypes rtb_type;
+    uint16_T rtb_peak;
+    uint16_T rtb_overload;
+    int16_T rtb_nominal;
+    int16_T rtb_current_o;
+    boolean_T rtb_motor;
+    boolean_T rtb_motor_e;
+    boolean_T rtb_control_mode;
+    boolean_T rtb_current_limit;
+    boolean_T rtb_desired_current;
+    boolean_T rtb_event;
+		
+		// Input Variables For Packet Formatter
+		uint8_T formatter_available;
+		uint8_T packet_length;
+		uint16_T packet_ID;
+		uint8_T packet_payload[8];
+		
+		// Output Variables For Packet Formatter/Input Variables For Decoder
+		uint8_T decoder_available;
+		CANClassTypes packet_CLS;
+		uint8_T packet_SRC;
+		uint8_T packet_DST_TYP;
+		uint8_T packet_LEN;
+		boolean_T packet_M;
+		uint8_T packet_OPC;
+		uint8_T packet_ARG[7];	
+		
+		
+		can_messaging::CAN_RX_raw2struct can_packet_formatter;
+		can_messaging::CAN_Decoder can_decoder;
+		
     dummyCANagentMBD dummyagent;
     
     Config config;
@@ -89,8 +128,13 @@ bool embot::app::application::theCANparserMBD::Impl::initialise(const Config &cf
     
     config = cfg;
     
-    #warning VALENTINA VASCO: add in here initialization code for MBD CAN modem 
-    
+    #warning VALENTINA VASCO: add in here initialization code for MBD CAN modem
+		
+		can_decoder.init(&rtb_motor, &rtb_mode, &rtb_motor_e, &rtb_nominal,
+      &rtb_peak, &rtb_overload, &rtb_current_o, &rtb_control_mode,
+      &rtb_current_limit, &rtb_desired_current, &rtb_event, &rtb_type);
+		
+		
     
     return true;
 }
@@ -112,7 +156,25 @@ bool embot::app::application::theCANparserMBD::Impl::process(const embot::prot::
     frame.copyto(rx_id, rx_size, rx_data);     
        
     #warning VALENTINA VASCO: add in here MBD CAN decoding. if any reply is required, push it back inside replies 
-        
+			
+		formatter_available = 1;
+		
+		packet_length = (uint8_T)rx_size;
+		
+		packet_ID = (uint16_T)rx_id;
+		
+		for (int i=0;i<rx_size;i++) {
+			packet_payload[i] = (uint8_T)rx_data[i];
+		}
+		
+		can_packet_formatter.step(&formatter_available, &packet_length, &packet_ID, &packet_payload[0],
+															&decoder_available, &packet_CLS, &packet_SRC, &packet_DST_TYP, &packet_LEN, &packet_M, &packet_OPC, &packet_ARG[0]);
+		
+		can_decoder.step(&decoder_available, &packet_CLS, &packet_SRC, &packet_DST_TYP, &packet_LEN, &packet_M, &packet_OPC, &packet_ARG[0],
+										&rtb_motor, &rtb_mode, &rtb_motor_e, &rtb_nominal, &rtb_peak, &rtb_overload, &rtb_current_o, &rtb_control_mode, &rtb_current_limit, &rtb_desired_current, &rtb_event, &rtb_type);
+    
+		#warning VALENTINA VASCO: here you print the variables to see if the decoder worked correctly
+    
     // if the frame is recognised, the function must return true
     recognised = true;
     // and alert its agent
