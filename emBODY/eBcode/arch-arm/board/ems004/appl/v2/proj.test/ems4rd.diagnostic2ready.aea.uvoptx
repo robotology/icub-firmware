@@ -75,7 +75,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -392,10 +392,14 @@
 
   <Target>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <TargetName>ems4rd-ulpro</TargetName>
 =======
     <TargetName>ems4rd</TargetName>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+    <TargetName>ems4rd-ulpro</TargetName>
+>>>>>>> d91e9051a (added project for AEA3 test.)
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -448,7 +452,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -494,10 +498,14 @@
           <Number>0</Number>
           <Key>ARMRTXEVENTFLAGS</Key>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <Name>-L200 -Z18 -C0 -M1 -T1</Name>
 =======
           <Name>-L200 -Z15 -C0 -M1 -T1</Name>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <Name>-L200 -Z18 -C0 -M1 -T1</Name>
+>>>>>>> d91e9051a (added project for AEA3 test.)
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -536,6 +544,7 @@
         </SetRegEntry>
       </TargetDriverDllRegistry>
 <<<<<<< HEAD
+<<<<<<< HEAD
       <Breakpoint/>
 =======
       <Breakpoint>
@@ -573,37 +582,53 @@
         </Bp>
       </Breakpoint>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+      <Breakpoint/>
+>>>>>>> d91e9051a (added project for AEA3 test.)
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <ItemText>value,0x0A</ItemText>
 =======
           <ItemText>p</ItemText>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <ItemText>value,0x0A</ItemText>
+>>>>>>> d91e9051a (added project for AEA3 test.)
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <ItemText>counter</ItemText>
 =======
           <ItemText>s_eo_thefatalerror</ItemText>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <ItemText>counter</ItemText>
+>>>>>>> d91e9051a (added project for AEA3 test.)
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <ItemText>intitem</ItemText>
 =======
           <ItemText>tsk</ItemText>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <ItemText>intitem</ItemText>
+>>>>>>> d91e9051a (added project for AEA3 test.)
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
+<<<<<<< HEAD
 <<<<<<< HEAD
           <ItemText>diag</ItemText>
 =======
@@ -639,6 +664,9 @@
           <WinNumber>1</WinNumber>
           <ItemText>thrname</ItemText>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <ItemText>diag</ItemText>
+>>>>>>> d91e9051a (added project for AEA3 test.)
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -714,10 +742,14 @@
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <aSer4>1</aSer4>
 =======
         <aSer4>0</aSer4>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+        <aSer4>1</aSer4>
+>>>>>>> d91e9051a (added project for AEA3 test.)
         <StkLoc>1</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -2115,10 +2147,14 @@
   <Group>
     <GroupName>abslayer-cfg</GroupName>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <tvExp>1</tvExp>
 =======
     <tvExp>0</tvExp>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+    <tvExp>1</tvExp>
+>>>>>>> d91e9051a (added project for AEA3 test.)
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2739,10 +2775,14 @@
   <Group>
     <GroupName>eo-emsappl</GroupName>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <tvExp>1</tvExp>
 =======
     <tvExp>0</tvExp>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+    <tvExp>1</tvExp>
+>>>>>>> d91e9051a (added project for AEA3 test.)
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2895,10 +2935,14 @@
   <Group>
     <GroupName>eo-emsappl-cfg</GroupName>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <tvExp>1</tvExp>
 =======
     <tvExp>0</tvExp>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+    <tvExp>1</tvExp>
+>>>>>>> d91e9051a (added project for AEA3 test.)
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3035,10 +3079,14 @@
   <Group>
     <GroupName>appl-services</GroupName>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <tvExp>1</tvExp>
 =======
     <tvExp>0</tvExp>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+    <tvExp>1</tvExp>
+>>>>>>> d91e9051a (added project for AEA3 test.)
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3603,10 +3651,14 @@
   <Group>
     <GroupName>eo-protocol</GroupName>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <tvExp>0</tvExp>
 =======
     <tvExp>1</tvExp>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+    <tvExp>0</tvExp>
+>>>>>>> d91e9051a (added project for AEA3 test.)
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3987,10 +4039,14 @@
   <Group>
     <GroupName>eo-board</GroupName>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <tvExp>1</tvExp>
 =======
     <tvExp>0</tvExp>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+    <tvExp>1</tvExp>
+>>>>>>> d91e9051a (added project for AEA3 test.)
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

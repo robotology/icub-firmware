@@ -59,12 +59,6 @@ extern "C" {
 #include "EOthePOS.h"
 
 // so far, i write them in here. later on we think of a board file or else...
-#if 1
-#if defined(AEA3_SUPPORT)
-#define EOTHESERVICES_disable_theInertials2
-#define EOTHESERVICES_disable_theInertials3
-#define EOTHESERVICES_disable_theTemperatures
-#endif
 
 #ifdef WRIST_MK2
 #define EOTHESERVICES_disable_theInertials2

@@ -343,10 +343,14 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
 <<<<<<< HEAD
+<<<<<<< HEAD
               <MiscControls>-DTEST_AEA3 -DEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_EMS4RD -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
 =======
               <MiscControls>-DEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_EMS4RD -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+              <MiscControls>-DTEST_AEA3 -DEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_EMS4RD -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
+>>>>>>> d91e9051a (added project for AEA3 test.)
               <Define>DIAGNOSTIC2_enabled DIAGNOSTIC2_receive_from_daemon DIAGNOSTIC2_send_to_yarprobotinterface _no_DIAGNOSTIC2_send_to_daemon</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\cfg\eoprot-boards;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\plus\can;..\..\..\..\..\embobj\plus\can\config-can-mapping;..\..\..\..\..\embobj\plus\can\config-can-protocol;..\..\..\..\..\embobj\plus\board;..\..\..\..\mc4plus\appl\v2\src\eoappservices;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embot;..\..\..\..\..\embot\cif;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth</IncludePath>
@@ -1435,11 +1439,15 @@
     </Target>
     <Target>
 <<<<<<< HEAD
+<<<<<<< HEAD
       <TargetName>ems4rd-ulpro</TargetName>
 =======
       <TargetName>ems4rd</TargetName>
 >>>>>>> 3888e1667 (ems: added test project for the aea3):emBODY/eBcode/arch-arm/board/ems004/appl/v2/proj.test/ems4rd.diagnostic2ready.aea.uvprojx
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+      <TargetName>ems4rd-ulpro</TargetName>
+>>>>>>> d91e9051a (added project for AEA3 test.)
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
@@ -1693,10 +1701,14 @@
             <Ra3Chk>0</Ra3Chk>
             <Im1Chk>1</Im1Chk>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <Im2Chk>1</Im2Chk>
 =======
             <Im2Chk>0</Im2Chk>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+            <Im2Chk>1</Im2Chk>
+>>>>>>> d91e9051a (added project for AEA3 test.)
             <OnChipMemories>
               <Ocm1>
                 <Type>0</Type>
@@ -1799,6 +1811,9 @@
           <Cads>
             <interw>1</interw>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d91e9051a (added project for AEA3 test.)
             <Optim>3</Optim>
             <oTime>1</oTime>
 =======
@@ -1827,6 +1842,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d91e9051a (added project for AEA3 test.)
               <MiscControls>-DTEST_AEA3 -DEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_EMS4RD -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
               <Define>DIAGNOSTIC2_enabled DIAGNOSTIC2_receive_from_daemon DIAGNOSTIC2_send_to_yarprobotinterface _no_DIAGNOSTIC2_send_to_daemon</Define>
               <Undefine></Undefine>
@@ -4782,10 +4800,14 @@
         <targetInfos>
           <targetInfo excluded="1" name="ems-stlink3" versionMatchMode=""/>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <targetInfo excluded="1" name="ems4rd-ulpro" versionMatchMode=""/>
 =======
           <targetInfo excluded="1" name="ems4rd" versionMatchMode=""/>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <targetInfo excluded="1" name="ems4rd-ulpro" versionMatchMode=""/>
+>>>>>>> d91e9051a (added project for AEA3 test.)
           <targetInfo excluded="1" name="ems4rd-zero" versionMatchMode=""/>
         </targetInfos>
       </component>
