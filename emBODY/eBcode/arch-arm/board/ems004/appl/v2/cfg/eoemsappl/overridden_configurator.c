@@ -104,6 +104,74 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
     eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
 }
 
+#if defined(TEST_AEA3)
+
+#include <hal_spiencoder.h>
+
+hal_spiencoder_cfg_t cfgaea = {0};
+
+void cbk(void *p)
+{
+    static volatile uint32_t v = 0;
+    v++;
+}
+
+hal_spiencoder_diagnostic_t diag = {0};
+
+extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
+{
+
+    static volatile uint32_t counter = 0;
+	
+    static hal_spiencoder_position_t value = 0;
+
+    if(0 == counter)
+    {
+        // init aea
+        memmove(&cfgaea, &hal_spiencoder_cfg_default, sizeof(hal_spiencoder_cfg_default));
+
+        cfgaea.callback_on_rx       = cbk;
+        cfgaea.priority     	    = hal_int_priority05;
+        cfgaea.arg                  = NULL;
+        cfgaea.type				    = hal_spiencoder_typeAEA;
+        cfgaea.sdata_precheck       = hal_false;  
+        cfgaea.reg_addresses[0]	    = 0;
+        cfgaea.reg_addresses[1]	    = 0; 
+        
+        hal_spiencoder_init(hal_spiencoder1, &cfgaea);
+        // start reading
+        hal_spiencoder_read_start(hal_spiencoder1);
+        
+        diag.type = hal_spiencoder_diagnostic_type_none;
+
+    }
+    else if(0 == (counter % 10))
+    {
+        // retrieve the reading
+        
+        hal_result_t r = hal_spiencoder_get_value2(hal_spiencoder1, &value, &diag);
+        
+        // print value
+        char str[64] = {0};
+        if(hal_res_OK == r)
+        { 
+            snprintf(str, sizeof(str), "value = %d", value);
+        }
+        else
+        {
+            snprintf(str, sizeof(str), "aea error");
+        }
+        
+        eo_errman_Trace(eo_errman_GetHandle(), str, "test aea"); 
+        
+        // start reading
+        hal_spiencoder_read_start(hal_spiencoder1);
+    }
+	
+    // 
+    counter++;
+}
+#endif
 
 
 #undef TEST_000
