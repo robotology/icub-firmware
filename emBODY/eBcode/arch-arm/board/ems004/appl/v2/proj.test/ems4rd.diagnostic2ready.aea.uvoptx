@@ -75,7 +75,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -121,10 +121,14 @@
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <Name>-U005700373137510539383538 -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(2BA01477) -L00(0) -TO131075 -TC168000000 -TT10000000 -TP21 -TDS800D -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F407IG$CMSIS\Flash\STM32F4xx_1024.FLM)</Name>
 =======
           <Name>-UV0153FBE -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("") -D00(00000000) -L00(0) -TO131075 -TC168000000 -TT10000000 -TP21 -TDS800D -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000 -FP0($$Device:STM32F407IG$CMSIS\Flash\STM32F4xx_1024.FLM)</Name>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <Name>-U005700373137510539383538 -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(2BA01477) -L00(0) -TO131075 -TC168000000 -TT10000000 -TP21 -TDS800D -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_1024.FLM -FS08000000 -FL0100000 -FP0($$Device:STM32F407IG$CMSIS\Flash\STM32F4xx_1024.FLM)</Name>
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -140,10 +144,14 @@
           <Number>0</Number>
           <Key>DLGUARM</Key>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <Name>(105=-1,-1,-1,-1,0)</Name>
 =======
           <Name></Name>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <Name>(105=-1,-1,-1,-1,0)</Name>
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -176,6 +184,7 @@
           <Number>0</Number>
           <Type>0</Type>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <LineNumber>152</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>134457828</Address>
@@ -184,12 +193,18 @@
           <EnabledFlag>1</EnabledFlag>
           <Address>134411634</Address>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <LineNumber>152</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134457828</Address>
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
+<<<<<<< HEAD
 <<<<<<< HEAD
           <Filename>..\cfg\eoemsappl\overridden_configurator.c</Filename>
           <ExecCommand></ExecCommand>
@@ -215,6 +230,11 @@
           <ExecCommand></ExecCommand>
           <Expression></Expression>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <Filename>..\cfg\eoemsappl\overridden_configurator.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\ems004\../cfg/eoemsappl/overridden_configurator.c\152</Expression>
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -269,13 +289,19 @@
           <ItemText>thrname</ItemText>
         </Ww>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
           <ItemText>value</ItemText>
         </Ww>
+<<<<<<< HEAD
 =======
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -299,10 +325,14 @@
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <ItemText>0x2001b320</ItemText>
 =======
           <ItemText>0x20007468</ItemText>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+          <ItemText>0x2001b320</ItemText>
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
@@ -337,10 +367,14 @@
         <trace>0</trace>
         <periodic>0</periodic>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <aLwin>1</aLwin>
 =======
         <aLwin>0</aLwin>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+        <aLwin>1</aLwin>
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -358,10 +392,14 @@
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <aSer4>1</aSer4>
 =======
         <aSer4>0</aSer4>
 >>>>>>> 3888e1667 (ems: added test project for the aea3)
+=======
+        <aSer4>1</aSer4>
+>>>>>>> 562eb54da (Added support for aea3. Code cleaup is work in progress (look at TODO marker))
         <StkLoc>1</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -452,7 +490,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
