@@ -138,6 +138,7 @@ static void s_hal_spiencoder_onreceiv_reg_data(void* p);
 
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t1(uint8_t* frame);
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* frame);
+static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* frame);
 
 
 
@@ -162,7 +163,8 @@ static const hal_spi_cfg_t s_hal_spiencoder_spicfg_master =
     .onframesreceived           = NULL,
     .argonframesreceived        = NULL,
     .cpolarity                  = hal_spi_cpolarity_high,
-    .datacapture                = hal_spi_datacapture_1edge
+    .datacapture                = hal_spi_datacapture_1edge,
+    .gpio_cfg_flags             = hal_spi_gpio_cfg_sckmosi_pullup
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -291,6 +293,21 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     else if(hal_spiencoder_typeAEA == intitem->config.type)
     {
         // no change from default
+        initSPI = hal_true;        
+    }
+    else if(hal_spiencoder_typeAEA3 == intitem->config.type) 
+    {
+        // 14 MSB + 2 LSB_zero_padded --> 2 Byte
+        //spicfg.maxsizeofframe = 2;
+        spicfg.cpolarity = hal_spi_cpolarity_low;
+        spicfg.datacapture = hal_spi_datacapture_2edge;
+        spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_nopull; // nopull
+        
+        
+        // TODO: setup properly the maxspeed (default 1000*1000)
+        // maximum clock rate supported on SPI for AEA3: 25 MHz
+        spicfg.maxspeed = 1000*100; 
+		        
         initSPI = hal_true;        
     }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
@@ -459,8 +476,32 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
         hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
 
         // when the frame is received, then the isr will call s_hal_spiencoder_onreceiv() to copy the frame into local memory,
-        // so that hal_spiencoder_get_value() can be called to retrieve teh encoder value
-    }    
+        // so that hal_spiencoder_get_value() can be called to retrieve the encoder value
+    }
+    else if(intitem->config.type == hal_spiencoder_typeAEA3) // Encoder type 4 (AEA3)
+    {
+        // TODO: implement the reading logic for AEA3
+        
+        static const uint8_t txframe_dummy_aea3[3] = {0x00, 0x00, 0x00};
+        // Mux enabled
+        hal_mux_enable(intitem->muxid, intitem->muxsel);
+        
+        // SPI: set the callback function
+        hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
+        
+        // SPI: set the sizeofframe for this transmission (1)
+        hal_spi_set_sizeofframe(intitem->spiid, 3);
+        
+        // SPI: set the isrtxframe
+        hal_spi_set_isrtxframe(intitem->spiid, txframe_dummy_aea3);
+        //----------------
+
+        // SPI start to receive (only one frame)
+        hal_spi_start(intitem->spiid, 1);
+        
+        // when the frame is received, then the isr will call s_hal_spiencoder_onreceiv() to copy the frame into local memory,
+        // so that hal_spiencoder_get_value() can be called to retrieve the encoder value
+    }
     else if(intitem->config.type == hal_spiencoder_typeAMO)    // Encoder type 2 (AMO)
     {        
         // Enabling the MUX
@@ -576,129 +617,6 @@ extern hal_result_t hal_spiencoder_read_start_t2(hal_spiencoder_t id, uint8_t re
     return(hal_res_OK);
 }
 
-
-extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_diagnostic_t* diagn)
-{
-    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
-    
-#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_spiencoder_initted_is(id))
-    {
-        return(hal_res_NOK_generic);
-    }
-#endif
-        
-#if !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
-    if((NULL == pos) || (NULL == diagn))
-    {
-        return(hal_res_NOK_nullpointer);
-    }
-#endif
-    
-    // for now we clear the diagnistic type and info. then, dependinding on the type of encoder we fill something
-    diagn->type = hal_spiencoder_diagnostic_type_none;
-    diagn->info.value = 0;
-    
-    //Encoder type 1 (AEA)
-    if (intitem->config.type == hal_spiencoder_typeAEA)
-    {
-        diagn->type = hal_spiencoder_diagnostic_type_none; 
-        // for the AEA we use legacy diagnostic mode w/ flags even if it is not used by higher layers
-        
-        // Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
-        // Here I check the bits which should validate the data. In fact, AEA frame consists of 18 bits:
-        // - first 12 MSB bits of positional data
-        // - last 6 LSB bits of validity checks
-        // In particular I check OCF, COF and LIN, which must have particular values (1,0,0) to validate the frame
-        // Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
-        if((intitem->rxframes[1][1] & 0x07) != 0x04)
-        {
-            //Everything 0xFF, SPI is not working
-            if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF))
-            { 
-                diagn->type = hal_spiencoder_diagnostic_type_flags;                
-                diagn->info.flags.tx_error = 1;
-                return(hal_res_NOK_generic);
-            }
-            if (((intitem->rxframes[1][1] & 0x01) != 0x00) || ((intitem->rxframes[1][1] & 0x02) != 0x00))
-            {
-                diagn->type = hal_spiencoder_diagnostic_type_flags;
-                diagn->info.flags.data_error = 1;
-            }
-            if ((intitem->rxframes[1][1] & 0x04) != 0x04)
-            {
-                diagn->type = hal_spiencoder_diagnostic_type_flags;
-                diagn->info.flags.data_notready = 1;
-            }
-        }
-        
-        *pos = intitem->position;
-    }
-    else if (intitem->config.type == hal_spiencoder_typeAMO)
-    {
-        diagn->type = hal_spiencoder_diagnostic_type_none;
-        // for the AMO we use new diagnostic mode
-        
-        // Check if SPI connection is working
-        // Here I check only the first bytes received for all the communications, which should be = to the different
-        // opcode used
-        if((intitem->rxframes[0][0] != 0xF5) || (intitem->rxframes[1][0] != 0xA6) || (intitem->rxframes[2][0] != 0xAD))
-        {
-            if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF) && ((intitem->rxframes[1][3]) == 0xFF))
-            {
-                diagn->type = hal_spiencoder_diagnostic_type_amo_notconn;
-                diagn->info.value = 0;
-                return(hal_res_NOK_generic);    
-            }
-        }
-        // check the value of the status register: 
-        if(0x76 == intitem->amo_regaddr)
-        {   
-            // STATUS0
-            // datasheeet (Rev F1, Page 58/69) shows only bits [4, 0], so i mask them 
-            uint8_t regval = 0xFF & intitem->rxframes[2][2];
-            // if 0 -> no errors
-            if(0 != regval)
-            {
-                diagn->type = hal_spiencoder_diagnostic_type_amo_status0;
-                diagn->info.value = regval;                
-            }            
-        }
-        else if(0x77 == intitem->amo_regaddr)
-        {
-            // STATUS1
-            // datasheeet (Rev F1, Page 58/69) shows the 8 bits are used 
-            uint8_t regval = 0xFF & intitem->rxframes[2][2];
-            // if 0 -> no errors
-            if(0 != regval)
-            {
-                diagn->type = hal_spiencoder_diagnostic_type_amo_status1;
-                diagn->info.value = regval;                
-            }            
-        }
-        
-        *pos = intitem->position;
-    }
-    else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
-    {
-        hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_read_only, &intitem->rxframechain[0], &intitem->rxframechain[1], NULL);        
-        intitem->position = intitem->rxframechain[0] | (intitem->rxframechain[1] << 16);  
-        
-        *pos = intitem->position; 
-    }
-    else if(hal_spiencoder_typeCHAINof3 == intitem->config.type)
-    {
-        hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_read_only, &intitem->rxframechain[0], &intitem->rxframechain[1], &intitem->rxframechain[2]);        
-
-        
-        pos[0] = intitem->rxframechain[0];
-        pos[1] = intitem->rxframechain[1]; 
-        pos[2] = intitem->rxframechain[2]; 
-    }  
-    
-    return(hal_res_OK);      
-}
-
 // Get the last value saved with a read_start
 extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_errors_flags* e_flags)
 {
@@ -803,6 +721,208 @@ extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder
     }    
     return(hal_res_OK);        
 }
+
+extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_diagnostic_t* diagn)
+{
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_spiencoder_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+        
+#if !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
+    if((NULL == pos) || (NULL == diagn))
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+#endif
+    
+    // for now we clear the diagnistic type and info. then, dependinding on the type of encoder we fill something
+    diagn->type = hal_spiencoder_diagnostic_type_none;
+    diagn->info.value = 0;
+    
+    //Encoder type 1 (AEA)
+    if (intitem->config.type == hal_spiencoder_typeAEA)
+    {
+        diagn->type = hal_spiencoder_diagnostic_type_none; 
+        // for the AEA we use legacy diagnostic mode w/ flags even if it is not used by higher layers
+        
+        // Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
+        // Here I check the bits which should validate the data. In fact, AEA frame consists of 18 bits:
+        // - first 12 MSB bits of positional data
+        // - last 6 LSB bits of validity checks
+        // In particular I check OCF, COF and LIN, which must have particular values (1,0,0) to validate the frame
+        // Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
+        if((intitem->rxframes[1][1] & 0x07) != 0x04)
+        {
+            //Everything 0xFF, SPI is not working
+            if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF))
+            { 
+                diagn->type = hal_spiencoder_diagnostic_type_flags;                
+                diagn->info.flags.tx_error = 1;
+                return(hal_res_NOK_generic);
+            }
+            if (((intitem->rxframes[1][1] & 0x01) != 0x00) || ((intitem->rxframes[1][1] & 0x02) != 0x00))
+            {
+                diagn->type = hal_spiencoder_diagnostic_type_flags;
+                diagn->info.flags.data_error = 1;
+            }
+            if ((intitem->rxframes[1][1] & 0x04) != 0x04)
+            {
+                diagn->type = hal_spiencoder_diagnostic_type_flags;
+                diagn->info.flags.data_notready = 1;
+            }
+        }
+        
+        *pos = intitem->position;
+    }
+    else if (intitem->config.type == hal_spiencoder_typeAEA3)
+    {
+        // TODO: implement the logic for AEA3
+        
+        diagn->type = hal_spiencoder_diagnostic_type_none;
+        // for the AEA we use legacy diagnostic mode w/ flags even if it is not used by higher layers
+        
+        // AEA3 frame consists of 16 bits:
+        // - first 14 MSB bits of positional data
+        // - last 2 LSB bits zero padded
+        
+        // TODO: How could we check the zero padded bits (tip: intitem->rxframes[1][2] & 0x3F) != 0x00 ??)
+        if ((intitem->rxframes[1][2] & 0x3F) != 0x00)
+        {
+            diagn->type = hal_spiencoder_diagnostic_type_flags;
+            diagn->info.flags.data_error = 1;
+        }
+        
+        // Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
+        
+        *pos = intitem->position;
+    }
+    else if (intitem->config.type == hal_spiencoder_typeAMO)
+    {
+        diagn->type = hal_spiencoder_diagnostic_type_none;
+        // for the AMO we use new diagnostic mode
+        
+        // Check if SPI connection is working
+        // Here I check only the first bytes received for all the communications, which should be = to the different
+        // opcode used
+        if((intitem->rxframes[0][0] != 0xF5) || (intitem->rxframes[1][0] != 0xA6) || (intitem->rxframes[2][0] != 0xAD))
+        {
+            if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF) && ((intitem->rxframes[1][3]) == 0xFF))
+            {
+                diagn->type = hal_spiencoder_diagnostic_type_amo_notconn;
+                diagn->info.value = 0;
+                return(hal_res_NOK_generic);    
+            }
+        }
+        // check the value of the status register: 
+        if(0x76 == intitem->amo_regaddr)
+        {   
+            // STATUS0
+            // datasheeet (Rev F1, Page 58/69) shows only bits [4, 0], so i mask them 
+            uint8_t regval = 0xFF & intitem->rxframes[2][2];
+            // if 0 -> no errors
+            if(0 != regval)
+            {
+                diagn->type = hal_spiencoder_diagnostic_type_amo_status0;
+                diagn->info.value = regval;                
+            }            
+        }
+        else if(0x77 == intitem->amo_regaddr)
+        {
+            // STATUS1
+            // datasheeet (Rev F1, Page 58/69) shows the 8 bits are used 
+            uint8_t regval = 0xFF & intitem->rxframes[2][2];
+            // if 0 -> no errors
+            if(0 != regval)
+            {
+                diagn->type = hal_spiencoder_diagnostic_type_amo_status1;
+                diagn->info.value = regval;                
+            }            
+        }
+        
+        *pos = intitem->position;
+    }
+    else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
+    {
+        hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_read_only, &intitem->rxframechain[0], &intitem->rxframechain[1], NULL);        
+        intitem->position = intitem->rxframechain[0] | (intitem->rxframechain[1] << 16);  
+        
+        *pos = intitem->position; 
+    }
+    else if(hal_spiencoder_typeCHAINof3 == intitem->config.type)
+    {
+        hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_read_only, &intitem->rxframechain[0], &intitem->rxframechain[1], &intitem->rxframechain[2]);        
+
+        
+        pos[0] = intitem->rxframechain[0];
+        pos[1] = intitem->rxframechain[1]; 
+        pos[2] = intitem->rxframechain[2]; 
+    }  
+    
+    return(hal_res_OK);      
+}
+
+// TODO: remove hal_spiencoder_get_value3, it is used only for test/debug AEA3
+extern hal_result_t hal_spiencoder_get_value3(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_position_t* raw_buff_val_1, hal_spiencoder_position_t* raw_buff_val_2, hal_spiencoder_position_t* raw_buff_val_3, hal_spiencoder_diagnostic_t* diagn)
+{
+    
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_spiencoder_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+        
+#if !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
+    if((NULL == raw_buff_val_1) || (NULL == raw_buff_val_2) || (NULL == diagn))
+    {
+        return(hal_res_NOK_nullpointer);
+    }
+#endif
+    
+    // for now we clear the diagnistic type and info. then, dependinding on the type of encoder we fill something
+    diagn->type = hal_spiencoder_diagnostic_type_none;
+    diagn->info.value = 0;
+    
+    if (intitem->config.type == hal_spiencoder_typeAEA3)
+    {   
+        diagn->type = hal_spiencoder_diagnostic_type_none;
+        // for the AEA we use legacy diagnostic mode w/ flags even if it is not used by higher layers
+        
+        // AEA3 frame consists of 16 bits:
+        // - first 14 MSB bits of positional data
+        // - last 2 LSB bits zero padded
+        
+        /*
+        if ((intitem->rxframes[1][1] & 0x03) != 0x00)
+        {
+            diagn->type = hal_spiencoder_diagnostic_type_flags;
+            diagn->info.flags.data_error = 1;
+            return(hal_res_NOK_generic);
+        }
+        */
+        
+        // Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
+        
+        *raw_buff_val_1 = intitem->rxframes[1][0];
+        *raw_buff_val_2 = intitem->rxframes[1][1];
+        *raw_buff_val_3 = intitem->rxframes[1][2];
+        
+        *pos = intitem->position;
+    }
+
+    
+    return(hal_res_OK);      
+}
+
+
+
 
 // Get the last values saved with a read_start_t2
 extern hal_result_t hal_spiencoder_get_value_t2(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_bool_t* val, uint16_t* reg)
@@ -1100,7 +1220,18 @@ static void s_hal_spiencoder_onreceiv(void* p)
     hal_spi_get(intitem->spiid, intitem->rxframes[1], NULL);
     
     // Formatting result and saving in position field
-    intitem->position = s_hal_spiencoder_frame2position_t1(intitem->rxframes[1]);
+    if(intitem->config.type == hal_spiencoder_typeAEA)
+    {
+        intitem->position = s_hal_spiencoder_frame2position_t1(intitem->rxframes[1]);
+    }
+    else if(intitem->config.type == hal_spiencoder_typeAEA3)
+    {
+        intitem->position = s_hal_spiencoder_frame2position_t4(intitem->rxframes[1]);
+    }
+    else 
+    {
+        intitem->position = 0;
+    }
         
     // ok. now i call the callbcak on execution of encoder
     
@@ -1256,6 +1387,16 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* fra
     pos = ((frame[1] << 16) | (frame[2] << 8) | (frame[3]));
     pos = pos >> 4;
     pos = pos & 0x0FFFFF;
+    return(pos);
+}
+
+// Formatting the result for encoder type 4 (AEA3)
+static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* frame)
+{
+    // AEA3 offers 14 bit of resolution (6 bit + 8 bit)
+    // the first bit is masked because it is necessary only for the SCK.
+    uint32_t pos = ((frame[0] & 0x7F) << 7) | frame[1];
+    
     return(pos);
 }
 

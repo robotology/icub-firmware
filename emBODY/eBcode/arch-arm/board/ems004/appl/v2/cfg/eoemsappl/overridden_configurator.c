@@ -133,7 +133,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
         cfgaea.callback_on_rx       = cbk;
         cfgaea.priority     	    = hal_int_priority05;
         cfgaea.arg                  = NULL;
-        cfgaea.type				    = hal_spiencoder_typeAEA;
+        cfgaea.type				    = hal_spiencoder_typeAEA3;
         cfgaea.sdata_precheck       = hal_false;  
         cfgaea.reg_addresses[0]	    = 0;
         cfgaea.reg_addresses[1]	    = 0; 
