@@ -31,7 +31,7 @@ namespace embot { namespace app { namespace application {
         };
                 
         bool initialise(const Config &config);   
-        bool tick(std::vector<embot::prot::can::Frame> &outframes);
+        bool tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);
                 
         // interface to CANagentMBD
         virtual bool onrecognisedframe(void *p); 

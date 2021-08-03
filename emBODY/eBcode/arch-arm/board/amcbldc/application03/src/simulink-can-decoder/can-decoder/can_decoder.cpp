@@ -32,7 +32,7 @@ const uint8_T can_decoder_IN_Home = 1U;
 const uint8_T can_decoder_IN_Home_o = 2U;
 const int32_T event_ev_error_mode_unrecognize = 0;
 
-uint8_T rtP_CAN_ID_AMC = 3U;
+uint8_T rtP_CAN_ID_AMC = 1U;
 
 namespace can_messaging
 {
