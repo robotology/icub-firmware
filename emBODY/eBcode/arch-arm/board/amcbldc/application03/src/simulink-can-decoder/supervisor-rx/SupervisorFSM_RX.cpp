@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 2.33
+// Model version                  : 2.34
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:15 2021
+// C/C++ source code generated on : Wed Aug  4 14:12:54 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -556,7 +556,36 @@ void SupervisorFSM_RXModelClass::step(const BoardState
 
   // Chart: '<Root>/Chart'
   SupervisorFSM_RX_DW.sfEvent = SupervisorFSM_RX_CALL_EVENT;
+  SupervisorFSM_RX_DW.ErrorsRx_event_prev =
+    SupervisorFSM_RX_DW.ErrorsRx_event_start;
+  SupervisorFSM_RX_DW.ErrorsRx_event_start = BusConversion_InsertedFor_Cha_g;
+  SupervisorFSM_RX_DW.EventsRx_control_mode_prev =
+    SupervisorFSM_RX_DW.EventsRx_control_mode_start;
+  SupervisorFSM_RX_DW.EventsRx_control_mode_start =
+    BusConversion_InsertedFor_Cha_p;
+  SupervisorFSM_RX_DW.EventsRx_current_limit_prev =
+    SupervisorFSM_RX_DW.EventsRx_current_limit_start;
+  SupervisorFSM_RX_DW.EventsRx_current_limit_start =
+    BusConversion_InsertedFor_Cha_0;
+  SupervisorFSM_RX_DW.EventsRx_desired_current_prev =
+    SupervisorFSM_RX_DW.EventsRx_desired_current_start;
+  SupervisorFSM_RX_DW.EventsRx_desired_current_start =
+    BusConversion_InsertedFor_Cha_1;
   if (SupervisorFSM_RX_DW.is_active_c3_SupervisorFSM_RX == 0U) {
+    SupervisorFSM_RX_DW.ErrorsRx_event_prev = BusConversion_InsertedFor_Cha_g;
+    SupervisorFSM_RX_DW.ErrorsRx_event_start = BusConversion_InsertedFor_Cha_g;
+    SupervisorFSM_RX_DW.EventsRx_control_mode_prev =
+      BusConversion_InsertedFor_Cha_p;
+    SupervisorFSM_RX_DW.EventsRx_control_mode_start =
+      BusConversion_InsertedFor_Cha_p;
+    SupervisorFSM_RX_DW.EventsRx_current_limit_prev =
+      BusConversion_InsertedFor_Cha_0;
+    SupervisorFSM_RX_DW.EventsRx_current_limit_start =
+      BusConversion_InsertedFor_Cha_0;
+    SupervisorFSM_RX_DW.EventsRx_desired_current_prev =
+      BusConversion_InsertedFor_Cha_1;
+    SupervisorFSM_RX_DW.EventsRx_desired_current_start =
+      BusConversion_InsertedFor_Cha_1;
     SupervisorFSM_RX_DW.is_active_c3_SupervisorFSM_RX = 1U;
     SupervisorFSM_RX_DW.is_active_FAULT_HANDLER = 1U;
     SupervisorFSM_RX_DW.is_FAULT_HANDLER = SupervisorFSM_RX_IN_NO_FAULT;
@@ -578,13 +607,20 @@ void SupervisorFSM_RXModelClass::step(const BoardState
 
     if ((SupervisorFSM_RX_DW.is_active_CAN_RX_HANDLER != 0U) &&
         (SupervisorFSM_RX_DW.is_CAN_RX_HANDLER == 1) &&
-        (!BusConversion_InsertedFor_Cha_g)) {
-      if (BusConversion_InsertedFor_Cha_p || BusConversion_InsertedFor_Cha_0 ||
-          BusConversion_InsertedFor_Cha_1) {
-        if (BusConversion_InsertedFor_Cha_p) {
+        (SupervisorFSM_RX_DW.ErrorsRx_event_prev ==
+         SupervisorFSM_RX_DW.ErrorsRx_event_start)) {
+      if ((SupervisorFSM_RX_DW.EventsRx_control_mode_prev !=
+           SupervisorFSM_RX_DW.EventsRx_control_mode_start) ||
+          (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
+           SupervisorFSM_RX_DW.EventsRx_current_limit_start) ||
+          (SupervisorFSM_RX_DW.EventsRx_desired_current_prev !=
+           SupervisorFSM_RX_DW.EventsRx_desired_current_start)) {
+        if (SupervisorFSM_RX_DW.EventsRx_control_mode_prev !=
+            SupervisorFSM_RX_DW.EventsRx_control_mode_start) {
           SupervisorFSM_RX_B.Flags_o.control_mode = SupervisorFSM_RX_convert
             (SupervisorFSM_RX_B.BusConversion_InsertedFor_Cha_h.control_mode.mode);
-        } else if (BusConversion_InsertedFor_Cha_0) {
+        } else if (SupervisorFSM_RX_DW.EventsRx_desired_current_prev !=
+                   SupervisorFSM_RX_DW.EventsRx_desired_current_start) {
           b_previousEvent = SupervisorFSM_RX_DW.sfEvent;
           SupervisorFSM_RX_DW.sfEvent = Superv_event_SetCurrentLimitEvt;
           if (SupervisorFSM_RX_DW.is_active_FAULT_HANDLER != 0U) {
@@ -592,7 +628,8 @@ void SupervisorFSM_RXModelClass::step(const BoardState
           }
 
           SupervisorFSM_RX_DW.sfEvent = b_previousEvent;
-        } else if (BusConversion_InsertedFor_Cha_1) {
+        } else if (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
+                   SupervisorFSM_RX_DW.EventsRx_current_limit_start) {
           SupervisorFSM_RX_B.Targets_n.motorcurrent.current =
             SupervisorFSM_RX_B.BusConversion_InsertedFor_Cha_h.desired_current.current;
         }

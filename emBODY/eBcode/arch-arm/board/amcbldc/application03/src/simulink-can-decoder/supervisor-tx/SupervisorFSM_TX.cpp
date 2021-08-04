@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 2.41
+// Model version                  : 2.43
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Aug  3 16:24:53 2021
+// C/C++ source code generated on : Wed Aug  4 14:13:07 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,17 +21,12 @@
 
 // System initialize for referenced model: 'SupervisorFSM_TX'
 void SupervisorFSM_TXModelClass::init(real32_T *rty_MessagesTx_foc_current,
-  real32_T *rty_MessagesTx_foc_position, real32_T *rty_MessagesTx_foc_velocity,
-  boolean_T *rty_EventsTx_foc)
+  real32_T *rty_MessagesTx_foc_position, real32_T *rty_MessagesTx_foc_velocity)
 {
   // SystemInitialize for Chart: '<Root>/Chart'
   SupervisorFSM_TX_B.MessagesTx.foc.current = 0.0F;
   SupervisorFSM_TX_B.MessagesTx.foc.position = 0.0F;
   SupervisorFSM_TX_B.MessagesTx.foc.velocity = 0.0F;
-  SupervisorFSM_TX_B.EventsTx.foc = false;
-
-  // SystemInitialize for SignalConversion generated from: '<Root>/EventsTx'
-  *rty_EventsTx_foc = SupervisorFSM_TX_B.EventsTx.foc;
 
   // SystemInitialize for SignalConversion generated from: '<Root>/MessagesTx'
   *rty_MessagesTx_foc_current = SupervisorFSM_TX_B.MessagesTx.foc.current;
@@ -72,15 +67,15 @@ void SupervisorFSM_TXModelClass::step(const real32_T
     SupervisorFSM_TX_B.MessagesTx.foc.current = rtb_motorsensors_current;
     SupervisorFSM_TX_B.MessagesTx.foc.velocity = rtb_motorsensors_omega;
     SupervisorFSM_TX_B.MessagesTx.foc.position = rtb_jointpositions_position;
-    SupervisorFSM_TX_B.EventsTx.foc = true;
-  } else {
-    SupervisorFSM_TX_B.EventsTx.foc = false;
+    SupervisorFSM_TX_DW.ev_focEventCounter++;
+  }
+
+  if (SupervisorFSM_TX_DW.ev_focEventCounter > 0U) {
+    *rty_EventsTx_foc = !*rty_EventsTx_foc;
+    SupervisorFSM_TX_DW.ev_focEventCounter--;
   }
 
   // End of Chart: '<Root>/Chart'
-
-  // SignalConversion generated from: '<Root>/EventsTx'
-  *rty_EventsTx_foc = SupervisorFSM_TX_B.EventsTx.foc;
 
   // SignalConversion generated from: '<Root>/MessagesTx'
   *rty_MessagesTx_foc_current = SupervisorFSM_TX_B.MessagesTx.foc.current;

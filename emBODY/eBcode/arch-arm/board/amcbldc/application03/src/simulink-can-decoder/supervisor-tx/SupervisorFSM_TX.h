@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 2.40
+// Model version                  : 2.43
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:29 2021
+// C/C++ source code generated on : Wed Aug  4 14:13:07 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -31,11 +31,11 @@ class SupervisorFSM_TXModelClass {
   // Block signals for model 'SupervisorFSM_TX'
   struct B_SupervisorFSM_TX_T {
     BUS_MESSAGES_TX MessagesTx;        // '<Root>/Chart'
-    BUS_EVENTS_TX EventsTx;            // '<Root>/Chart'
   };
 
   // Block states (default storage) for model 'SupervisorFSM_TX'
   struct DW_SupervisorFSM_TX_T {
+    uint32_T ev_focEventCounter;       // '<Root>/Chart'
     uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/Chart'
   };
 
@@ -54,8 +54,7 @@ class SupervisorFSM_TXModelClass {
 
   // Initial conditions function
   void init(real32_T *rty_MessagesTx_foc_current, real32_T
-            *rty_MessagesTx_foc_position, real32_T *rty_MessagesTx_foc_velocity,
-            boolean_T *rty_EventsTx_foc);
+            *rty_MessagesTx_foc_position, real32_T *rty_MessagesTx_foc_velocity);
 
   // Constructor
   SupervisorFSM_TXModelClass();

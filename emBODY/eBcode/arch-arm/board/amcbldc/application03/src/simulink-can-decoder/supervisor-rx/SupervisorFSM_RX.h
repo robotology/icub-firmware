@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 2.33
+// Model version                  : 2.34
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:15 2021
+// C/C++ source code generated on : Wed Aug  4 14:12:54 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -51,6 +51,14 @@ class SupervisorFSM_RXModelClass {
     uint8_T is_active_FAULT_HANDLER;   // '<Root>/Chart'
     uint8_T is_CAN_RX_HANDLER;         // '<Root>/Chart'
     uint8_T is_active_CAN_RX_HANDLER;  // '<Root>/Chart'
+    boolean_T ErrorsRx_event_prev;     // '<Root>/Chart'
+    boolean_T ErrorsRx_event_start;    // '<Root>/Chart'
+    boolean_T EventsRx_control_mode_prev;// '<Root>/Chart'
+    boolean_T EventsRx_control_mode_start;// '<Root>/Chart'
+    boolean_T EventsRx_current_limit_prev;// '<Root>/Chart'
+    boolean_T EventsRx_current_limit_start;// '<Root>/Chart'
+    boolean_T EventsRx_desired_current_prev;// '<Root>/Chart'
+    boolean_T EventsRx_desired_current_start;// '<Root>/Chart'
   };
 
   // Real-time Model Data Structure

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 2.40
+// Model version                  : 2.43
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:29 2021
+// C/C++ source code generated on : Wed Aug  4 14:13:07 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -148,6 +148,17 @@ struct BUS_MESSAGES_RX
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
+#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
+
+// Aggregate of all events specifying types of transmitted messages.
+struct BUS_EVENTS_TX
+{
+  boolean_T foc;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
 #define DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
 
@@ -173,17 +184,6 @@ struct BUS_MSG_FOC
 struct BUS_MESSAGES_TX
 {
   BUS_MSG_FOC foc;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
-
-// Aggregate of all events specifying types of transmitted messages.
-struct BUS_EVENTS_TX
-{
-  boolean_T foc;
 };
 
 #endif

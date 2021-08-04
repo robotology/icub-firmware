@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.314
+// Model version                  : 1.315
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:44 2021
+// C/C++ source code generated on : Wed Aug  4 14:13:17 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -43,6 +43,11 @@ namespace can_messaging
   class CAN_Encoder {
     // public data and function members
    public:
+    // Block states (default storage) for model 'can_encoder'
+    struct DW_can_encoder_T {
+      boolean_T DelayInput1_DSTATE;    // '<S2>/Delay Input1'
+    };
+
     // Invariant block signals for model 'can_encoder'
     struct ConstB_can_encoder_h_T {
       uint8_T lengths;                 // '<S1>/lengths'
@@ -52,6 +57,9 @@ namespace can_messaging
     struct RT_MODEL_can_encoder_T {
       const char_T **errorStatus;
     };
+
+    // Block states
+    DW_can_encoder_T can_encoder_DW;
 
     // model initialize function
     void initialize();
@@ -102,7 +110,8 @@ extern const can_messaging::CAN_Encoder::ConstB_can_encoder_h_T
 //
 //  '<Root>' : 'can_encoder'
 //  '<S1>'   : 'can_encoder/CAN_Encoder'
-//  '<S2>'   : 'can_encoder/CAN_Encoder/MATLAB Function'
+//  '<S2>'   : 'can_encoder/CAN_Encoder/Detect Change'
+//  '<S3>'   : 'can_encoder/CAN_Encoder/MATLAB Function'
 
 #endif                                 // RTW_HEADER_can_encoder_h_
 

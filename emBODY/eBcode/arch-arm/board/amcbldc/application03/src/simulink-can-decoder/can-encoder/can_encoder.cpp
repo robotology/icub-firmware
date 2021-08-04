@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.314
+// Model version                  : 1.315
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:44 2021
+// C/C++ source code generated on : Wed Aug  4 14:13:17 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,11 +18,6 @@
 //
 #include "can_encoder.h"
 #include "can_encoder_private.h"
-
-// Model block global parameters (default storage)
-real32_T rtP_CAN_ANGLE_DEG2ICUB = 182.044449F;
-
-uint16_T rtP_CAN_ID_HOST = 0U;
 
 namespace can_messaging
 {
@@ -126,8 +121,24 @@ namespace can_messaging
     // Constant: '<S1>/Constant'
     *rty_pck_tx_packets_ID = rtP_CAN_ID_HOST;
 
-    // DataTypeConversion: '<S1>/Data Type Conversion'
-    *rty_pck_tx_available = *rtu_events_tx_foc;
+    // DataTypeConversion: '<S1>/Data Type Conversion' incorporates:
+    //   RelationalOperator: '<S2>/FixPt Relational Operator'
+    //   UnitDelay: '<S2>/Delay Input1'
+    //
+    //  Block description for '<S2>/Delay Input1':
+    //
+    //   Store in Global RAM
+
+    *rty_pck_tx_available = (*rtu_events_tx_foc !=
+      can_encoder_DW.DelayInput1_DSTATE);
+
+    // Update for UnitDelay: '<S2>/Delay Input1'
+    //
+    //  Block description for '<S2>/Delay Input1':
+    //
+    //   Store in Global RAM
+
+    can_encoder_DW.DelayInput1_DSTATE = *rtu_events_tx_foc;
 
     // End of Outputs for SubSystem: '<Root>/CAN_Encoder'
   }
@@ -142,7 +153,8 @@ namespace can_messaging
   }
 
   // Constructor
-  CAN_Encoder::CAN_Encoder()
+  CAN_Encoder::CAN_Encoder() :
+    can_encoder_DW()
   {
     // Currently there is no constructor body generated.
   }

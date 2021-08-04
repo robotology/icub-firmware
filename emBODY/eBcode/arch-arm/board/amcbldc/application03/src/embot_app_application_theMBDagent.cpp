@@ -137,9 +137,6 @@ bool embot::app::application::theMBDagent::Impl::initialise()
         return true;
     }   
 
-    // something in here?
-    
-    #warning MBD::init()
 		can_decoder.init(&rtb_motor, &rtb_mode, &rtb_motor_e, &rtb_nominal,
 											&rtb_peak, &rtb_overload, &rtb_current_o, &rtb_control_mode,
 											&rtb_current_limit, &rtb_desired_current, &rtb_event, &rtb_type);
@@ -148,7 +145,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 		supervisor_rx.init(&supervisor_control_mode, &pid_reset,
 												&position, &velocity, &current, &voltage);
 		
-		supervisor_tx.init(&current, &position, &velocity, &foc);
+		supervisor_tx.init(&current, &position, &velocity);
 		
 		can_encoder.initialize();
 		
@@ -158,14 +155,6 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 
 bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 {
-    
-    // something in here?
-    
-    #warning in here you put code ticked every 1 ms which ... does thing.
-    // i use the input frames as i like (...)
-    // i tick the mbd supervisor
-    
-    #warning MBD::tick(inpframes, outframes);
 
 		uint8_t rx_data[8] {0};
 		uint8_t rx_size {0};
@@ -178,8 +167,6 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 				formatter_available = 1;
 				embot::prot::can::Frame last_frame = inpframes.back();
 				last_frame.copyto(rx_id, rx_size, rx_data);
-				//embot::core::print("A message has been received");
-			  //embot::core::print("The messsage has data ID: " + std::to_string(rx_id) + ", Size: " + std::to_string(rx_size) + ", first byte: " + std::to_string(rx_data[0]));
 		}
 		
 		packet_length = (uint8_T)rx_size;
@@ -214,8 +201,6 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 		supervisor_tx.step(&joint_position, &omega, &motor_sensors_current, &rtb_mode, 
 												&foc_current, &foc_position, &foc_velocity, &event_foc);
 		
-		//embot::core::print("joint_position: " + std::to_string(joint_position) + ", foc_position: " + std::to_string(foc_position) + ", foc_current: " + std::to_string(foc_current) + 
-		//", event_foc: " + std::to_string(event_foc) + ", control mode: " + std::to_string(rtb_mode));
 		
 		can_encoder.step(&foc_current, &foc_position, &foc_velocity, &event_foc,
 										&output_available, &output_id, &output_data[0]);
@@ -235,12 +220,6 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 		 	embot::core::print("Event Set Control Mode: True  | Value of supervisor control mode variable: " + control_mode_string);
 		}
 		
-		// embot::core::print("available: " + std::to_string(output_available) + ", id: " + std::to_string(output_id) + ", data: [" + std::to_string(output_data[0]) + "," + 
-		// std::to_string(output_data[1]) + "," + std::to_string(output_data[2]) + "," + std::to_string(output_data[3]) + "," + std::to_string(output_data[4]) + "," + 
-		// std::to_string(output_data[5]) + "," + std::to_string(output_data[6]) + "," + std::to_string(output_data[7]) + "]"); 
-		
-		
-    // bool rep {false};
     if(output_available)
     {
         uint8_t data[8] = {0};
@@ -289,7 +268,6 @@ bool embot::app::application::theMBDagent::tick(const std::vector<embot::prot::c
 bool embot::app::application::theMBDagent::onrecognisedframe(void *p)
 {
     embot::core::print("theMBDagent is called because theCNAparserMBD has recognised a frame");
-    // use it as you like.
     
     
     

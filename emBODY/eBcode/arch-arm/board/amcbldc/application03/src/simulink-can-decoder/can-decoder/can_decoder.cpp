@@ -33,6 +33,8 @@ const uint8_T can_decoder_IN_Home_o = 2U;
 const int32_T event_ev_error_mode_unrecognize = 0;
 
 uint8_T rtP_CAN_ID_AMC = 1U;
+real32_T rtP_CAN_ANGLE_DEG2ICUB = 182.044449F;
+uint16_T rtP_CAN_ID_HOST = 0U;
 
 namespace can_messaging
 {
