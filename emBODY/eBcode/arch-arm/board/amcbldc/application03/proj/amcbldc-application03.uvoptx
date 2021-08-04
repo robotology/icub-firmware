@@ -1518,7 +1518,7 @@
 
   <Group>
     <GroupName>mbd</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1529,8 +1529,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\Double2MultiWord.cpp</PathWithFileName>
-      <FilenameWithoutPath>Double2MultiWord.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\div_s32.cpp</PathWithFileName>
+      <FilenameWithoutPath>div_s32.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1541,32 +1541,32 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\Double2MultiWord.h</PathWithFileName>
-      <FilenameWithoutPath>Double2MultiWord.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\div_s32.h</PathWithFileName>
+      <FilenameWithoutPath>div_s32.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>61</FileNumber>
-      <FileType>5</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\multiword_types.h</PathWithFileName>
-      <FilenameWithoutPath>multiword_types.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\Double2MultiWord.cpp</PathWithFileName>
+      <FilenameWithoutPath>Double2MultiWord.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>62</FileNumber>
-      <FileType>8</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\MultiWordIor.cpp</PathWithFileName>
-      <FilenameWithoutPath>MultiWordIor.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\Double2MultiWord.h</PathWithFileName>
+      <FilenameWithoutPath>Double2MultiWord.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1577,104 +1577,104 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\MultiWordIor.h</PathWithFileName>
-      <FilenameWithoutPath>MultiWordIor.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\multiword_types.h</PathWithFileName>
+      <FilenameWithoutPath>multiword_types.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>64</FileNumber>
-      <FileType>5</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\rtwtypes.h</PathWithFileName>
-      <FilenameWithoutPath>rtwtypes.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\MultiWordIor.cpp</PathWithFileName>
+      <FilenameWithoutPath>MultiWordIor.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>65</FileNumber>
-      <FileType>8</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\uMultiWord2Double.cpp</PathWithFileName>
-      <FilenameWithoutPath>uMultiWord2Double.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\MultiWordIor.h</PathWithFileName>
+      <FilenameWithoutPath>MultiWordIor.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>66</FileNumber>
-      <FileType>5</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\uMultiWord2Double.h</PathWithFileName>
-      <FilenameWithoutPath>uMultiWord2Double.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</PathWithFileName>
+      <FilenameWithoutPath>rt_nonfinite.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>67</FileNumber>
-      <FileType>8</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\uMultiWordShl.cpp</PathWithFileName>
-      <FilenameWithoutPath>uMultiWordShl.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\rt_nonfinite.h</PathWithFileName>
+      <FilenameWithoutPath>rt_nonfinite.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>68</FileNumber>
-      <FileType>5</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\uMultiWordShl.h</PathWithFileName>
-      <FilenameWithoutPath>uMultiWordShl.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\rtGetInf.cpp</PathWithFileName>
+      <FilenameWithoutPath>rtGetInf.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>69</FileNumber>
-      <FileType>8</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\div_s32.cpp</PathWithFileName>
-      <FilenameWithoutPath>div_s32.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\rtGetInf.h</PathWithFileName>
+      <FilenameWithoutPath>rtGetInf.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>70</FileNumber>
-      <FileType>5</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\div_s32.h</PathWithFileName>
-      <FilenameWithoutPath>div_s32.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\rtGetNaN.cpp</PathWithFileName>
+      <FilenameWithoutPath>rtGetNaN.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>15</GroupNumber>
       <FileNumber>71</FileNumber>
-      <FileType>8</FileType>
+      <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\rt_nonfinite.cpp</PathWithFileName>
-      <FilenameWithoutPath>rt_nonfinite.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\rtGetNaN.h</PathWithFileName>
+      <FilenameWithoutPath>rtGetNaN.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1685,8 +1685,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\rt_nonfinite.h</PathWithFileName>
-      <FilenameWithoutPath>rt_nonfinite.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\rtwtypes.h</PathWithFileName>
+      <FilenameWithoutPath>rtwtypes.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1697,8 +1697,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\rtGetInf.cpp</PathWithFileName>
-      <FilenameWithoutPath>rtGetInf.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</PathWithFileName>
+      <FilenameWithoutPath>uMultiWord2Double.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1709,8 +1709,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\rtGetInf.h</PathWithFileName>
-      <FilenameWithoutPath>rtGetInf.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\uMultiWord2Double.h</PathWithFileName>
+      <FilenameWithoutPath>uMultiWord2Double.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1721,8 +1721,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\rtGetNaN.cpp</PathWithFileName>
-      <FilenameWithoutPath>rtGetNaN.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</PathWithFileName>
+      <FilenameWithoutPath>uMultiWordShl.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1733,8 +1733,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\sharedutils\rtGetNaN.h</PathWithFileName>
-      <FilenameWithoutPath>rtGetNaN.h</FilenameWithoutPath>
+      <PathWithFileName>..\src\model-based-design\sharedutils\uMultiWordShl.h</PathWithFileName>
+      <FilenameWithoutPath>uMultiWordShl.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1742,7 +1742,7 @@
 
   <Group>
     <GroupName>mbd::can-decoder</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1753,7 +1753,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-decoder\can_decoder.cpp</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-decoder\can_decoder.cpp</PathWithFileName>
       <FilenameWithoutPath>can_decoder.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1765,7 +1765,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-decoder\can_decoder.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-decoder\can_decoder.h</PathWithFileName>
       <FilenameWithoutPath>can_decoder.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1777,7 +1777,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-decoder\can_decoder_private.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-decoder\can_decoder_private.h</PathWithFileName>
       <FilenameWithoutPath>can_decoder_private.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1789,7 +1789,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-decoder\can_decoder_types.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-decoder\can_decoder_types.h</PathWithFileName>
       <FilenameWithoutPath>can_decoder_types.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1809,7 +1809,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct.cpp</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.cpp</PathWithFileName>
       <FilenameWithoutPath>can_rx_raw2struct.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1821,7 +1821,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.h</PathWithFileName>
       <FilenameWithoutPath>can_rx_raw2struct.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1833,7 +1833,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct_private.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_private.h</PathWithFileName>
       <FilenameWithoutPath>can_rx_raw2struct_private.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1845,7 +1845,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct_types.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_types.h</PathWithFileName>
       <FilenameWithoutPath>can_rx_raw2struct_types.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1865,7 +1865,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX.cpp</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_RX.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1877,7 +1877,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.h</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_RX.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1889,7 +1889,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX_private.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_private.h</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_RX_private.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1901,7 +1901,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX_types.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_types.h</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_RX_types.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1910,7 +1910,7 @@
 
   <Group>
     <GroupName>mbd::supervisor-tx</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1921,7 +1921,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX.cpp</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.cpp</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_TX.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1933,7 +1933,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.h</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_TX.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1945,7 +1945,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX_private.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_private.h</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_TX_private.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1957,7 +1957,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX_types.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_types.h</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_TX_types.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1966,7 +1966,7 @@
 
   <Group>
     <GroupName>mbd::can-encoder</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1977,7 +1977,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-encoder\can_encoder.cpp</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-encoder\can_encoder.cpp</PathWithFileName>
       <FilenameWithoutPath>can_encoder.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1989,7 +1989,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-encoder\can_encoder.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-encoder\can_encoder.h</PathWithFileName>
       <FilenameWithoutPath>can_encoder.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2001,7 +2001,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-encoder\can_encoder_private.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-encoder\can_encoder_private.h</PathWithFileName>
       <FilenameWithoutPath>can_encoder_private.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2013,7 +2013,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\simulink-can-decoder\can-encoder\can_encoder_types.h</PathWithFileName>
+      <PathWithFileName>..\src\model-based-design\can-encoder\can_encoder_types.h</PathWithFileName>
       <FilenameWithoutPath>can_encoder_types.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

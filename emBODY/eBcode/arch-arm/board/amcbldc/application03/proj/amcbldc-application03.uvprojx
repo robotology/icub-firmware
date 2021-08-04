@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\FOCode\BLDC_FOC_Code\Current_FOC_ert_rtw;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\src\motorhal;..\src\control-foc\_sharedutils;..\..\..\..\..\..\eBcode\arch-arm\board\amcbldc\application02\src\control-foc\_sharedutils;..\src\simulink-can-decoder\sharedutils;..\src\simulink-can-decoder\can-decoder;..\src\simulink-can-decoder\can-raw2struct;..\src\simulink-can-decoder\supervisor-rx;..\src\simulink-can-decoder\supervisor-tx;..\src\simulink-can-decoder\can-encoder</IncludePath>
+              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\FOCode\BLDC_FOC_Code\Current_FOC_ert_rtw;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\src\motorhal;..\src\control-foc\_sharedutils;..\..\..\..\..\..\eBcode\arch-arm\board\amcbldc\application02\src\control-foc\_sharedutils;..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -808,7 +808,7 @@
                   <MiscControls></MiscControls>
                   <Define></Define>
                   <Undefine></Undefine>
-                  <IncludePath>..\src\simulink-can-decoder\sharedutils;..\src\simulink-can-decoder\can-decoder;..\src\simulink-can-decoder\can-raw2struct;..\src\simulink-can-decoder\supervisor-rx;..\src\simulink-can-decoder\supervisor-tx;..\src\simulink-can-decoder\can-encoder</IncludePath>
+                  <IncludePath>..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder</IncludePath>
                 </VariousControls>
               </Cads>
               <Aads>
@@ -883,94 +883,94 @@
           <GroupName>mbd</GroupName>
           <Files>
             <File>
-              <FileName>Double2MultiWord.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\Double2MultiWord.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>Double2MultiWord.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\Double2MultiWord.h</FilePath>
-            </File>
-            <File>
-              <FileName>multiword_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\multiword_types.h</FilePath>
-            </File>
-            <File>
-              <FileName>MultiWordIor.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\MultiWordIor.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>MultiWordIor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\MultiWordIor.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtwtypes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtwtypes.h</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWord2Double.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWord2Double.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWord2Double.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWord2Double.h</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWordShl.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWordShl.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWordShl.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWordShl.h</FilePath>
-            </File>
-            <File>
               <FileName>div_s32.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\div_s32.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\div_s32.cpp</FilePath>
             </File>
             <File>
               <FileName>div_s32.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\div_s32.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\div_s32.h</FilePath>
+            </File>
+            <File>
+              <FileName>Double2MultiWord.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\Double2MultiWord.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Double2MultiWord.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\Double2MultiWord.h</FilePath>
+            </File>
+            <File>
+              <FileName>multiword_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\multiword_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>MultiWordIor.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\MultiWordIor.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>MultiWordIor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\MultiWordIor.h</FilePath>
             </File>
             <File>
               <FileName>rt_nonfinite.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rt_nonfinite.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_nonfinite.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rt_nonfinite.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.h</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetInf.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetInf.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.h</FilePath>
             </File>
             <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetNaN.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetNaN.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetNaN.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtwtypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtwtypes.h</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWord2Double.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWord2Double.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.h</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWordShl.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWordShl.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -980,22 +980,22 @@
             <File>
               <FileName>can_decoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder.cpp</FilePath>
             </File>
             <File>
               <FileName>can_decoder.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder.h</FilePath>
             </File>
             <File>
               <FileName>can_decoder_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder_private.h</FilePath>
             </File>
             <File>
               <FileName>can_decoder_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1005,22 +1005,22 @@
             <File>
               <FileName>can_rx_raw2struct.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.h</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1030,22 +1030,22 @@
             <File>
               <FileName>SupervisorFSM_RX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX_private.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_private.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX_types.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1055,22 +1055,22 @@
             <File>
               <FileName>SupervisorFSM_TX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX_private.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_private.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1080,22 +1080,22 @@
             <File>
               <FileName>can_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>can_encoder.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
             </File>
             <File>
               <FileName>can_encoder_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
             </File>
             <File>
               <FileName>can_encoder_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1981,94 +1981,94 @@
           <GroupName>mbd</GroupName>
           <Files>
             <File>
-              <FileName>Double2MultiWord.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\Double2MultiWord.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>Double2MultiWord.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\Double2MultiWord.h</FilePath>
-            </File>
-            <File>
-              <FileName>multiword_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\multiword_types.h</FilePath>
-            </File>
-            <File>
-              <FileName>MultiWordIor.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\MultiWordIor.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>MultiWordIor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\MultiWordIor.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtwtypes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtwtypes.h</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWord2Double.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWord2Double.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWord2Double.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWord2Double.h</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWordShl.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWordShl.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWordShl.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWordShl.h</FilePath>
-            </File>
-            <File>
               <FileName>div_s32.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\div_s32.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\div_s32.cpp</FilePath>
             </File>
             <File>
               <FileName>div_s32.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\div_s32.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\div_s32.h</FilePath>
+            </File>
+            <File>
+              <FileName>Double2MultiWord.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\Double2MultiWord.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Double2MultiWord.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\Double2MultiWord.h</FilePath>
+            </File>
+            <File>
+              <FileName>multiword_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\multiword_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>MultiWordIor.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\MultiWordIor.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>MultiWordIor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\MultiWordIor.h</FilePath>
             </File>
             <File>
               <FileName>rt_nonfinite.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rt_nonfinite.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_nonfinite.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rt_nonfinite.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.h</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetInf.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetInf.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.h</FilePath>
             </File>
             <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetNaN.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetNaN.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetNaN.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtwtypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtwtypes.h</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWord2Double.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWord2Double.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.h</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWordShl.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWordShl.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2078,22 +2078,22 @@
             <File>
               <FileName>can_decoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder.cpp</FilePath>
             </File>
             <File>
               <FileName>can_decoder.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder.h</FilePath>
             </File>
             <File>
               <FileName>can_decoder_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder_private.h</FilePath>
             </File>
             <File>
               <FileName>can_decoder_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2103,22 +2103,22 @@
             <File>
               <FileName>can_rx_raw2struct.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.h</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2128,22 +2128,22 @@
             <File>
               <FileName>SupervisorFSM_RX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX_private.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_private.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX_types.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2153,22 +2153,22 @@
             <File>
               <FileName>SupervisorFSM_TX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX_private.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_private.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2178,22 +2178,22 @@
             <File>
               <FileName>can_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>can_encoder.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
             </File>
             <File>
               <FileName>can_encoder_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
             </File>
             <File>
               <FileName>can_encoder_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3079,94 +3079,94 @@
           <GroupName>mbd</GroupName>
           <Files>
             <File>
-              <FileName>Double2MultiWord.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\Double2MultiWord.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>Double2MultiWord.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\Double2MultiWord.h</FilePath>
-            </File>
-            <File>
-              <FileName>multiword_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\multiword_types.h</FilePath>
-            </File>
-            <File>
-              <FileName>MultiWordIor.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\MultiWordIor.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>MultiWordIor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\MultiWordIor.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtwtypes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtwtypes.h</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWord2Double.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWord2Double.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWord2Double.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWord2Double.h</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWordShl.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWordShl.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>uMultiWordShl.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\uMultiWordShl.h</FilePath>
-            </File>
-            <File>
               <FileName>div_s32.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\div_s32.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\div_s32.cpp</FilePath>
             </File>
             <File>
               <FileName>div_s32.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\div_s32.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\div_s32.h</FilePath>
+            </File>
+            <File>
+              <FileName>Double2MultiWord.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\Double2MultiWord.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Double2MultiWord.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\Double2MultiWord.h</FilePath>
+            </File>
+            <File>
+              <FileName>multiword_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\multiword_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>MultiWordIor.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\MultiWordIor.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>MultiWordIor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\MultiWordIor.h</FilePath>
             </File>
             <File>
               <FileName>rt_nonfinite.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rt_nonfinite.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_nonfinite.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rt_nonfinite.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.h</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetInf.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetInf.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.h</FilePath>
             </File>
             <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetNaN.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetNaN.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\sharedutils\rtGetNaN.h</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtwtypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtwtypes.h</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWord2Double.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWord2Double.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.h</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWordShl.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>uMultiWordShl.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3176,22 +3176,22 @@
             <File>
               <FileName>can_decoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder.cpp</FilePath>
             </File>
             <File>
               <FileName>can_decoder.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder.h</FilePath>
             </File>
             <File>
               <FileName>can_decoder_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder_private.h</FilePath>
             </File>
             <File>
               <FileName>can_decoder_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-decoder\can_decoder_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-decoder\can_decoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3201,22 +3201,22 @@
             <File>
               <FileName>can_rx_raw2struct.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.h</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
             </File>
             <File>
               <FileName>can_rx_raw2struct_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3226,22 +3226,22 @@
             <File>
               <FileName>SupervisorFSM_RX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX_private.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_private.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-rx\SupervisorFSM_RX_types.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3251,22 +3251,22 @@
             <File>
               <FileName>SupervisorFSM_TX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX_private.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_private.h</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_TX_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
+              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3276,22 +3276,22 @@
             <File>
               <FileName>can_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder.cpp</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>can_encoder.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
             </File>
             <File>
               <FileName>can_encoder_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder_private.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
             </File>
             <File>
               <FileName>can_encoder_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\simulink-can-decoder\can-encoder\can_encoder_types.h</FilePath>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
