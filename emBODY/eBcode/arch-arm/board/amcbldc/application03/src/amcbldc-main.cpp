@@ -357,7 +357,7 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
 // so far, we need to measure the excution time of some test code, so, we need two functions:
 void mbd_mc_init();
 void mbd_mc_canparse(const embot::prot::can::Frame &rxframe, std::vector<embot::prot::can::Frame> &outframes);
-void mbd_mc_tick(std::vector<embot::prot::can::Frame> &outframes);
+void mbd_mc_tick(std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);
 
 
 // finally, from here there is the preparation of the t_CTRL thread
@@ -390,11 +390,14 @@ void s_start_CTRL_thread()
 }
 
 std::vector<embot::prot::can::Frame> outctrlframes {};
+std::vector<embot::prot::can::Frame> inputframes {};
+
     
 void tCTRL_startup(embot::os::Thread *t, void *param)
 {
     
     outctrlframes.reserve(5);
+    inputframes.reserve(5);
 
     // init agent of mc. it also init motor
     embot::app::application::theMBDagent &thembdagent = embot::app::application::theMBDagent::getInstance();
@@ -433,24 +436,24 @@ void tCTRL_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p
     
     if(true == embot::core::binary::mask::check(eventmask, evt_CTRL_canmcdecode))
     {
-        size_t remaining {0};
-        embot::prot::can::Frame frame {};
-        if(true == shared->getrx(frame, remaining))
+        size_t num = shared->sizeofrx();
+        
+        for(int i=0; i<num; i++)
         {
-            mbd_mc_canparse(frame, outctrlframes);
-            //embot::app::application::theCANparserMC::getInstance().process(frame, outctrlframes);
-        }
-
-        if(remaining > 0)
-        {
-            t->setEvent(evt_CTRL_canmcdecode);
-        }            
+            size_t remaining {0};
+            embot::prot::can::Frame frame {};
+            if(true == shared->getrx(frame, remaining))
+            {
+                inputframes.push_back(frame);
+            }
+        }           
     }    
     
     if(true == embot::core::binary::mask::check(eventmask, evt_CTRL_tick))
     {        
 //        embot::core::print(std::string("tCTRL_onevent(evt_CTRL_tick): @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());                 
-        mbd_mc_tick(outctrlframes);
+        mbd_mc_tick(inputframes, outctrlframes);
+       
     } 
 
     
@@ -495,11 +498,42 @@ void mbd_mc_canparse(const embot::prot::can::Frame &rxframe,
 // called every 1 ms and always after mbd_mc_canparse(). 
 // it may add can frames to be transmitted, e.g., those containing
 // the status of the control
-void mbd_mc_tick(std::vector<embot::prot::can::Frame> &outframes)
+void mbd_mc_tick(std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 { 
     // now we use the c++ agent to tick control and get an output 
-    // vector of frames to transmit    
-    embot::app::application::theMBDagent::getInstance().tick(outframes);
+    // vector of frames to transmit  
+
+//    size_t num = shared->sizeofrx();
+//    
+//    for(int i=0; i<num; i++)
+//    {
+//        size_t remaining {0};
+//        embot::prot::can::Frame frame {};
+//        if(true == shared->getrx(frame, remaining))
+//        {
+//            mbd_mc_canparse(frame, outctrlframes);
+//            //embot::app::application::theCANparserMC::getInstance().process(frame, outctrlframes);
+//        }
+//    }
+//    
+//    std::vector<embot::prot::can::Frame> inpframes {};
+
+//    size_t num = shared->sizeofrx();
+//    
+//    for(int i=0; i<num; i++)
+//    {
+//        size_t remaining {0};
+//        embot::prot::can::Frame frame {};
+//        if(true == shared->getrx(frame, remaining))
+//        {
+//            inpframes.push_back(frame);
+//        }
+//    }
+   
+        
+    embot::app::application::theMBDagent::getInstance().tick(inpframes, outframes);
+    inputframes.clear();
+    
 }
 
 

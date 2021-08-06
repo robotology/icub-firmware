@@ -47,8 +47,11 @@ struct embot::app::application::theCANparserMBD::Impl
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) { return true; } 
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) { return true; }
         
+				
     };
     
+
+		
     dummyCANagentMBD dummyagent;
     
     Config config;
@@ -88,9 +91,7 @@ bool embot::app::application::theCANparserMBD::Impl::initialise(const Config &cf
     }
     
     config = cfg;
-    
-    #warning VALENTINA VASCO: add in here initialization code for MBD CAN modem 
-    
+		
     
     return true;
 }
@@ -110,9 +111,8 @@ bool embot::app::application::theCANparserMBD::Impl::process(const embot::prot::
     uint32_t tx_id {0};
     
     frame.copyto(rx_id, rx_size, rx_data);     
-       
-    #warning VALENTINA VASCO: add in here MBD CAN decoding. if any reply is required, push it back inside replies 
-        
+      		
+		
     // if the frame is recognised, the function must return true
     recognised = true;
     // and alert its agent
