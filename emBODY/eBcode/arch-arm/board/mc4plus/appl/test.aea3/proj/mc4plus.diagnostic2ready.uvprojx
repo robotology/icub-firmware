@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>mc4plus</TargetName>
+      <TargetName>mc4plus-test-aea3</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
@@ -385,7 +385,7 @@
           <Files>
             <File>
               <FileName>eom_emsappl_main.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\main\eom_emsappl_main.cpp</FilePath>
             </File>
           </Files>
@@ -411,7 +411,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>abslayer-cfg</GroupName>
+          <GroupName>abslayer-cfg-test-aea3</GroupName>
           <Files>
             <File>
               <FileName>hal_core_cfg.h</FileName>
@@ -751,7 +751,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-emsappl-cfg</GroupName>
+          <GroupName>eo-emsappl-cfg-test-aea3</GroupName>
           <Files>
             <File>
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
@@ -1714,7 +1714,7 @@
           <Files>
             <File>
               <FileName>eom_emsappl_main.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\main\eom_emsappl_main.cpp</FilePath>
             </File>
           </Files>
@@ -1740,7 +1740,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>abslayer-cfg</GroupName>
+          <GroupName>abslayer-cfg-test-aea3</GroupName>
           <Files>
             <File>
               <FileName>hal_core_cfg.h</FileName>
@@ -2080,7 +2080,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-emsappl-cfg</GroupName>
+          <GroupName>eo-emsappl-cfg-test-aea3</GroupName>
           <Files>
             <File>
               <FileName>EOMtheEMSapplCfg_cfg.h</FileName>
