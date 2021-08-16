@@ -295,21 +295,23 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         // no change from default
         initSPI = hal_true;        
     }
+#if defined(AEA3_SUPPORT)
     else if(hal_spiencoder_typeAEA3 == intitem->config.type) 
     {
         // 14 MSB + 2 LSB_zero_padded --> 2 Byte
         //spicfg.maxsizeofframe = 2;
         spicfg.cpolarity = hal_spi_cpolarity_low;
         spicfg.datacapture = hal_spi_datacapture_2edge;
-        spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_nopull; // nopull
+        spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_nopull;
         
         
         // TODO: setup properly the maxspeed (default 1000*1000)
         // maximum clock rate supported on SPI for AEA3: 25 MHz
-        spicfg.maxspeed = 1000*100; 
-		        
+        spicfg.maxspeed = 1000*100;
+
         initSPI = hal_true;        
     }
+#endif
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {     
         spicfg.capacityofrxfifoofframes = 1;        // we need to manage only one frame at a time
@@ -478,6 +480,7 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
         // when the frame is received, then the isr will call s_hal_spiencoder_onreceiv() to copy the frame into local memory,
         // so that hal_spiencoder_get_value() can be called to retrieve the encoder value
     }
+#if defined(AEA3_SUPPORT)
     else if(intitem->config.type == hal_spiencoder_typeAEA3) // Encoder type 4 (AEA3)
     {
         // TODO: implement the reading logic for AEA3
@@ -502,6 +505,7 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
         // when the frame is received, then the isr will call s_hal_spiencoder_onreceiv() to copy the frame into local memory,
         // so that hal_spiencoder_get_value() can be called to retrieve the encoder value
     }
+#endif
     else if(intitem->config.type == hal_spiencoder_typeAMO)    // Encoder type 2 (AMO)
     {        
         // Enabling the MUX
@@ -779,10 +783,9 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
         
         *pos = intitem->position;
     }
+#if defined(AEA3_SUPPORT)
     else if (intitem->config.type == hal_spiencoder_typeAEA3)
     {
-        // TODO: implement the logic for AEA3
-        
         diagn->type = hal_spiencoder_diagnostic_type_none;
         // for the AEA we use legacy diagnostic mode w/ flags even if it is not used by higher layers
         
@@ -796,11 +799,10 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
             diagn->type = hal_spiencoder_diagnostic_type_flags;
             diagn->info.flags.data_error = 1;
         }
-        
-        // Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
-        
+
         *pos = intitem->position;
     }
+#endif
     else if (intitem->config.type == hal_spiencoder_typeAMO)
     {
         diagn->type = hal_spiencoder_diagnostic_type_none;
@@ -1391,14 +1393,16 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* fra
 }
 
 // Formatting the result for encoder type 4 (AEA3)
+#if defined(AEA3_SUPPORT)
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* frame)
 {
     // AEA3 offers 14 bit of resolution (6 bit + 8 bit)
-    // the first bit is masked because it is necessary only for the SCK.
+    // the first bit is masked because it is necessary only to trig the SCK.
     uint32_t pos = ((frame[0] & 0x7F) << 7) | (frame[1] >> 1);
     
     return(pos);
 }
+#endif
 
 #if !defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
 static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg, uint8_t *txframe, uint8_t sizeofframe)

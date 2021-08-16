@@ -107,7 +107,9 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
 #include <hal_spiencoder.h>
 #include <hal_trace.h>
 
-hal_spiencoder_cfg_t cfgaea = {0};
+#include "hal_motor.h"
+#include "hal_quadencoder.h"
+
 
 void cbk(void *p)
 {
@@ -115,11 +117,13 @@ void cbk(void *p)
     v++;
 }
 
+hal_spiencoder_cfg_t cfgaea = {0};
 hal_spiencoder_diagnostic_t diag = {0};
 static hal_spiencoder_position_t raw_buff_0 = 0;
 static hal_spiencoder_position_t raw_buff_1 = 0;
 static hal_spiencoder_position_t raw_buff_2 = 0;
 static hal_spiencoder_position_t raw_value = 0;
+
 
 unsigned char reverse_byte(unsigned char x)
 {
@@ -165,13 +169,10 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
 {
 
     static volatile uint32_t counter = 0;
-	
     // static hal_spiencoder_position_t raw_value = 0;
     
-    // if you want to use the Logic Analyzer, move these 2 variables to the global space variables.
-    //static hal_spiencoder_position_t raw_buff_val_1 = 0;
-    //static hal_spiencoder_position_t raw_buff_val_2 = 0;
-
+    static hal_result_t res;
+    
     if(0 == counter)
     {
         // init aea
@@ -186,16 +187,39 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
         cfgaea.reg_addresses[1]	    = 0; 
         
         hal_spiencoder_init(hal_spiencoder1, &cfgaea);
+        
         // start reading
         hal_spiencoder_read_start(hal_spiencoder1);
         
         //hal_spiencoder_read_start(hal_spiencoder2);   // TODO: read both AEA2 and AEA3
         
         diag.type = hal_spiencoder_diagnostic_type_none;
+        
+        // -----------------------------------------------------------------------------
+        // init DC encoder motor
+        //hal_quadencoder_init(hal_quadencoder3);
+        /*
+        res = hal_motor_init(hal_motorALL, NULL);
+        char str_res[64] = {0};
+        
+        if(hal_res_OK != res)
+        {
+            snprintf(str_res, sizeof(str_res), "MOTORS DEVICE INIT FAILED");
+            return;
+        }
+        else
+        {
+            snprintf(str_res, sizeof(str_res), "MOTORS DEVICE INIT SUCCESS");
+        }
+        hal_trace_puts(str_res);
+
+        // start DC motor
+        */
 
     }
     else if(0 == (counter % 1))
     {
+        
         // retrieve the reading
         
         hal_result_t r = hal_spiencoder_get_value2(hal_spiencoder1, &raw_value, &diag);
@@ -230,6 +254,8 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
         
         // start reading
         hal_spiencoder_read_start(hal_spiencoder1);
+        
+        //hal_motor_pwmset(hal_motorALL ,10);
     }
 	
     // 
