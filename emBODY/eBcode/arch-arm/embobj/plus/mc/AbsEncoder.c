@@ -102,7 +102,7 @@ void AbsEncoder_destroy(AbsEncoder* o)
 //this function set spikes limits values based of encoder type
 void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
 {
-    //char message[150];
+    char message[150]; // TODO: comment
     switch(o->type)
     {
         case(eomc_enc_mais):
@@ -114,6 +114,7 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
         }break;
 
         case(eomc_enc_aea):
+        case(eomc_enc_aea3):
         case(eomc_enc_spichainof2):
         case(eomc_enc_spichainof3):
         {
@@ -127,7 +128,7 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
             
             o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
             
-            //snprintf(message, sizeof(message), "ABSE aea:tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
+            snprintf(message, sizeof(message), "ABSE aea:tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit); // TODO: comment
         }break; 
 
         // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to ... amo and psc
@@ -347,6 +348,7 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
         // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to aea and other absolute encoders 
         case eomc_enc_pos:
         case eomc_enc_aea:
+        case eomc_enc_aea3:
         case eomc_enc_amo:
         case eomc_enc_psc:
             AbsEncoder_position_init_aea(o, position);

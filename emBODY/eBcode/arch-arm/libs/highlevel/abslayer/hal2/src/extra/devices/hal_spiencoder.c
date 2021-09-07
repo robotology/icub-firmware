@@ -1398,7 +1398,8 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* fra
 {
     // AEA3 offers 14 bit of resolution (6 bit + 8 bit)
     // the first bit is masked because it is necessary only to trig the SCK.
-    uint32_t pos = ((frame[0] & 0x7F) << 7) | (frame[1] >> 1);
+    //uint32_t pos = ((frame[0] & 0x7F) << 7) | (frame[1] >> 1);             // in this way we get the right raw value yet (already shifted correctly)
+    uint32_t pos = ((frame[0] & 0x7F) << 16) | (frame[1] << 8) | (frame[2]); // in this way we have also the six zero padded bits 
     
     return(pos);
 }

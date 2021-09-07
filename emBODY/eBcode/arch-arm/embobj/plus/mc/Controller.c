@@ -660,6 +660,13 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 o->absEncoder[k].type = eomc_enc_aea;
                 o->absEncoder[k].fake = FALSE;
                 break;
+            }        
+            
+            case eomc_enc_aea3:
+            {
+                o->absEncoder[k].type = eomc_enc_aea3;
+                o->absEncoder[k].fake = FALSE;
+                break;
             }
             
             case eomc_enc_mais:

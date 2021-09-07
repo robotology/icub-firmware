@@ -65,8 +65,8 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define CHECK_ENC_IS_ON_SPI(type)                       ((eomc_enc_aea == (type)) || (eomc_enc_amo == (type)) || (eomc_enc_spichainof2 == (type)) || (eomc_enc_spichainof3 == (type)))
-#define CHECK_ENC_IS_ON_STREAMED_SPI_WITHOTHERS(type)   ((eomc_enc_aea == (type)) || (eomc_enc_amo == (type)))
+#define CHECK_ENC_IS_ON_SPI(type)                       ((eomc_enc_aea3 == (type)) || (eomc_enc_aea == (type)) || (eomc_enc_amo == (type)) || (eomc_enc_spichainof2 == (type)) || (eomc_enc_spichainof3 == (type)))
+#define CHECK_ENC_IS_ON_STREAMED_SPI_WITHOTHERS(type)   ((eomc_enc_aea3 == (type)) || (eomc_enc_aea == (type)) || (eomc_enc_amo == (type)))
 #define CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(type)        ((eomc_enc_spichainof2 == (type)) || (eomc_enc_spichainof3 == (type)))
 
 
@@ -110,6 +110,7 @@ static void s_eo_deconfigure_SPI_encoders(EOappEncReader *p);
 static eObool_t s_eo_configure_SPI_encoders(EOappEncReader *p);
 
 static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOencoderreader_errortype_t *error);
+static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencoderreader_errortype_t *error);
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOencoderreader_errortype_t *error);
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN3(uint32_t *valueraw, eOencoderreader_errortype_t *error);
 
@@ -565,7 +566,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
         
         switch(prop.descriptor->type)
         {
-            // they are eomc_enc_aea, eomc_enc_amo, eomc_enc_spichainof2, eomc_enc_spichainof3, eomc_enc_qenc, eomc_enc_absanalog, eomc_enc_mais
+            // they are eomc_enc_aea3, eomc_enc_aea, eomc_enc_amo, eomc_enc_spichainof2, eomc_enc_spichainof3, eomc_enc_qenc, eomc_enc_absanalog, eomc_enc_mais
             
             case eomc_enc_aea:
             {
@@ -596,6 +597,43 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     {   // we have a valid raw value from hal but ... it is not valid after a check                        
                         prop.valueinfo->errortype = prop.valueinfo->errortype;
                         errorparam = (spiRawValue >> 6) & 0x0FFF;                                           
+                    }                    
+                }
+                else
+                {   // we dont even have a valid reading from hal
+                    prop.valueinfo->errortype = encreader_err_AEA_READING;
+                    errorparam = 0xffff;                                         
+                }   
+#endif                
+               
+            } break; 
+
+            case eomc_enc_aea3:
+            {
+                hal_spiencoder_position_t spiRawValue = 0; 
+                // hal_spiencoder_errors_flags flags = {0};
+
+#if defined(FAKE_AEA)                
+                spiRawValue = 0;
+                uint32_t ticks = (spiRawValue >> 9) & 0x3FFF;
+                prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos); 
+#else        
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))                
+                {   // ok, the hal reads correctly
+                                                            
+                    // TODO: check validy for aea3
+                    if(eobool_true == s_eo_appEncReader_IsValidValue_AEA3(&spiRawValue, &prop.valueinfo->errortype))
+                    {   // the spi raw reading from hal is valid. i just need to rescale it.
+                        // the resolution is 16384 ticks per revolution.
+                        
+                        // GOOD VALUE:
+                        uint32_t ticks = (spiRawValue >> 9) & 0x3FFF;
+                        prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos);                           
+                    }
+                    else
+                    {   // we have a valid raw value from hal but ... it is not valid after a check                        
+                        prop.valueinfo->errortype = prop.valueinfo->errortype;
+                        errorparam = (spiRawValue >> 9) & 0x3FFF;                                           
                     }                    
                 }
                 else
@@ -1136,6 +1174,16 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             config.reg_addresses[0]	    = 0;
             config.reg_addresses[1]	    = 0;            
         }
+        if(hal_spiencoder_typeAEA3 == thestream->type)
+        {
+            config.priority     	    = hal_int_priority05;
+            config.callback_on_rx       = NULL;
+            config.arg                  = NULL;
+            config.type				    = hal_spiencoder_typeAEA3;
+            config.sdata_precheck       = hal_false;  
+            config.reg_addresses[0]	    = 0;
+            config.reg_addresses[1]	    = 0;            
+        }
         else if(hal_spiencoder_typeAMO == thestream->type)
         {
             config.priority      	    = hal_int_priority05;
@@ -1247,6 +1295,16 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOencoder
 
     }
     
+    return(eobool_true);
+}
+
+static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencoderreader_errortype_t *error)
+{
+    if((*valueraw & 0x3F) != 0x00)
+    {
+        *error = encreader_err_AEA_CHIP;
+        return(eobool_false);
+    }
     return(eobool_true);
 }
 
@@ -1696,6 +1754,7 @@ static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodert
     switch(encodertype)
     {
         case eomc_enc_aea:              ret = hal_spiencoder_typeAEA;       break;
+        case eomc_enc_aea3:              ret = hal_spiencoder_typeAEA3;       break;
         case eomc_enc_amo:              ret = hal_spiencoder_typeAMO;       break;
         case eomc_enc_spichainof2:      ret = hal_spiencoder_typeCHAINof2;  break;
         case eomc_enc_spichainof3:      ret = hal_spiencoder_typeCHAINof3;  break;

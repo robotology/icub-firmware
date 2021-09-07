@@ -230,7 +230,8 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
         char str[64] = {0};
         if(hal_res_OK == r)
         { 
-            snprintf(str, sizeof(str), "%d, %f", raw_value, ((360.0 *  raw_value) / (1024.0*16)));
+            hal_spiencoder_position_t raw_value_shifted =  raw_value >> 9; // sensor return 16 bits --> only 14 are valid
+            snprintf(str, sizeof(str), "%d, %d, %f", raw_value, raw_value_shifted, ((360.0 *  raw_value_shifted) / (1024.0*16)));
             
             // TODO: remove
             //uint8_t s0 = raw_buff_0;
