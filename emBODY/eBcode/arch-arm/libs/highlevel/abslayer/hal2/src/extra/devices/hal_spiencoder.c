@@ -138,7 +138,9 @@ static void s_hal_spiencoder_onreceiv_reg_data(void* p);
 
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t1(uint8_t* frame);
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* frame);
+#if defined(AEA3_SUPPORT)
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* frame);
+#endif
 
 
 
@@ -210,7 +212,7 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         return(hal_res_NOK_generic);
     }
     
-    // Set the default config if cfc is NULL
+    // Set the default config if cfg is NULL
     if(NULL == cfg)
     {
         cfg = &hal_spiencoder_cfg_default;
@@ -891,7 +893,7 @@ extern hal_result_t hal_spiencoder_get_value3(hal_spiencoder_t id, hal_spiencode
     // for now we clear the diagnistic type and info. then, dependinding on the type of encoder we fill something
     diagn->type = hal_spiencoder_diagnostic_type_none;
     diagn->info.value = 0;
-    
+#if defined(AEA3_SUPPORT)
     if (intitem->config.type == hal_spiencoder_typeAEA3)
     {   
         diagn->type = hal_spiencoder_diagnostic_type_none;
@@ -918,6 +920,7 @@ extern hal_result_t hal_spiencoder_get_value3(hal_spiencoder_t id, hal_spiencode
         
         *pos = intitem->position;
     }
+#endif
 
     
     return(hal_res_OK);      
@@ -1226,10 +1229,12 @@ static void s_hal_spiencoder_onreceiv(void* p)
     {
         intitem->position = s_hal_spiencoder_frame2position_t1(intitem->rxframes[1]);
     }
+#if defined(AEA3_SUPPORT)
     else if(intitem->config.type == hal_spiencoder_typeAEA3)
     {
         intitem->position = s_hal_spiencoder_frame2position_t4(intitem->rxframes[1]);
     }
+#endif
     else 
     {
         intitem->position = 0;
@@ -1370,7 +1375,7 @@ static void s_hal_spiencoder_onreceiv_reg_data(void* p)
     }
 }
 
-// Formatting the result for encoder type 1
+// Formatting the result for encoder type 1 (AEA)
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t1(uint8_t* frame)
 {
     uint32_t pos = 0;
