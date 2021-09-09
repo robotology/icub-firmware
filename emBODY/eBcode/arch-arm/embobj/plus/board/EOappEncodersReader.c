@@ -611,13 +611,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             case eomc_enc_aea3:
             {
                 hal_spiencoder_position_t spiRawValue = 0; 
-                // hal_spiencoder_errors_flags flags = {0};
-
-#if defined(FAKE_AEA)                
-                spiRawValue = 0;
-                uint32_t ticks = (spiRawValue >> 9) & 0x3FFF;
-                prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos); 
-#else        
+  
                 if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))                
                 {   // ok, the hal reads correctly
                                                             
@@ -638,10 +632,9 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 }
                 else
                 {   // we dont even have a valid reading from hal
-                    prop.valueinfo->errortype = encreader_err_AEA_READING;
+                    prop.valueinfo->errortype = encreader_err_AEA_READING; // TODO: do we need to add ad-hoc error for AEA3?
                     errorparam = 0xffff;                                         
                 }   
-#endif                
                
             } break; 
             
@@ -1174,7 +1167,7 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             config.reg_addresses[0]	    = 0;
             config.reg_addresses[1]	    = 0;            
         }
-        if(hal_spiencoder_typeAEA3 == thestream->type)
+        else if(hal_spiencoder_typeAEA3 == thestream->type)
         {
             config.priority     	    = hal_int_priority05;
             config.callback_on_rx       = NULL;
