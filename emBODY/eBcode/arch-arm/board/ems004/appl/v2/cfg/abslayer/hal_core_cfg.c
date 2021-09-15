@@ -94,6 +94,7 @@ static void s_hal_core_cfg_on_fatalerror(hal_fatalerror_t errorcode, const char 
     des->handlertype = fatalerror_handler_hal;
     des->handlererrorcode = errorcode;
     des->param = NULL;
+    des->mpucontext = NULL;
     eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
 #else    
     #warning DONTUSE_EOtheFatalError is defined, are you sure?
@@ -165,6 +166,18 @@ static void myheap_delete(void* mem)
 
 #if !defined(DONTUSE_EOtheFatalError)
 
+void hw_handler_hf(fatal_error_handler_t feh, uint32_t *arg)
+{
+    fatal_error_descriptor_t *des = eo_fatalerror_GetDescriptor(eo_fatalerror_GetHandle());
+    des->handlertype = feh;
+    des->handlererrorcode = 100;
+    des->forfutureuse0 = 0x12;
+    des->forfutureuse1 = 0x23;
+    des->param = NULL;
+    des->mpucontext = arg;
+    eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
+}
+
 void hw_handler(fatal_error_handler_t feh)
 {
     fatal_error_descriptor_t *des = eo_fatalerror_GetDescriptor(eo_fatalerror_GetHandle());
@@ -173,6 +186,7 @@ void hw_handler(fatal_error_handler_t feh)
     des->forfutureuse0 = 0x12;
     des->forfutureuse1 = 0x23;
     des->param = NULL;
+    des->mpucontext = NULL;
     eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
 }
 
@@ -181,10 +195,10 @@ void NMI_Handler(void)
     hw_handler(fatalerror_handler_hw_NMI);
 }
 
-void HardFault_Handler(void)
-{
-    hw_handler(fatalerror_handler_hw_HardFault);
-}
+//void HardFault_Handler(void)
+//{
+//    hw_handler(fatalerror_handler_hw_HardFault);
+//}
 
 void MemManage_Handler(void)
 {
@@ -214,6 +228,81 @@ void Default_Handler(void)
 void RTC_Alarm_IRQHandler(void)
 {
     hw_handler(fatalerror_handler_hw_Default);
+}
+
+// from ... 
+// https://stackoverflow.com/questions/57286072/how-can-i-save-the-call-stack-from-an-exception-handler-in-cortex-m4
+void McuHardFault_HandlerC(uint32_t *hardfault_args)
+{
+//    static volatile uint32_t stacked_r0 __attribute__((unused));
+//    static volatile uint32_t stacked_r1 __attribute__((unused));
+//    static volatile uint32_t stacked_r2 __attribute__((unused));
+//    static volatile uint32_t stacked_r3 __attribute__((unused));
+//    static volatile uint32_t stacked_r12 __attribute__((unused));
+//    static volatile uint32_t stacked_lr __attribute__((unused));
+//    static volatile uint32_t stacked_pc __attribute__((unused));
+//    static volatile uint32_t stacked_psr __attribute__((unused));
+//    static volatile uint32_t _CFSR __attribute__((unused));
+//    static volatile uint32_t _HFSR __attribute__((unused));
+//    static volatile uint32_t _DFSR __attribute__((unused));
+//    static volatile uint32_t _AFSR __attribute__((unused));
+//    static volatile uint32_t _BFAR __attribute__((unused));
+//    static volatile uint32_t _MMAR __attribute__((unused));
+//    stacked_r0 = ((uint32_t)hardfault_args[0]);
+//    stacked_r1 = ((uint32_t)hardfault_args[1]);
+//    stacked_r2 = ((uint32_t)hardfault_args[2]);
+//    stacked_r3 = ((uint32_t)hardfault_args[3]);
+//    stacked_r12 = ((uint32_t)hardfault_args[4]);
+//    stacked_lr = ((uint32_t)hardfault_args[5]);
+//    stacked_pc = ((uint32_t)hardfault_args[6]);
+//    stacked_psr = ((uint32_t)hardfault_args[7]);
+
+//    /* Configurable Fault Status Register */
+//    /* Consists of MMSR, BFSR and UFSR */
+//    _CFSR = (*((volatile uint32_t *)(0xE000ED28)));
+
+//    /* Hard Fault Status Register */
+//    _HFSR = (*((volatile uint32_t *)(0xE000ED2C)));
+
+//    /* Debug Fault Status Register */
+//    _DFSR = (*((volatile uint32_t *)(0xE000ED30)));
+
+//    /* Auxiliary Fault Status Register */
+//    _AFSR = (*((volatile uint32_t *)(0xE000ED3C)));
+
+
+//    /* Read the Fault Address Registers. */
+//    /* These may not contain valid values. */
+//    /* Check BFARVALID/MMARVALID to see */
+//    /* if they are valid values */
+//    /* MemManage Fault Address Register */
+//    _MMAR = (*((volatile uint32_t *)(0xE000ED34)));
+//    /* Bus Fault Address Register */
+//    _BFAR = (*((volatile uint32_t *)(0xE000ED38)));
+
+    // marco.accame: must now pass all the above variables to this function
+    hw_handler_hf(fatalerror_handler_hw_HardFault, hardfault_args);
+    //__asm("BKPT #0\n") ; /* cause the debugger to stop */
+}
+
+void HardFault_Handler(void) __attribute__((naked));
+void HardFault_Handler(void)
+{
+  __asm volatile (
+    ".syntax unified              \n"  /* needed for the 'adds r1,#2' below */
+    " movs r0,#4                  \n"  /* load bit mask into R0 */
+    " mov r1, lr                  \n"  /* load link register into R1 */
+    " tst r0, r1                  \n"  /* compare with bitmask */
+    " beq _MSP                    \n"  /* if bitmask is set: stack pointer is in PSP. Otherwise in MSP */
+    " mrs r0, psp                 \n"  /* otherwise: stack pointer is in PSP */
+    " b _GetPC                    \n"  /* go to part which loads the PC */
+  "_MSP:                          \n"  /* stack pointer is in MSP register */
+    " mrs r0, msp                 \n"  /* load stack pointer into R0 */
+  "_GetPC:                        \n"  /* find out where the hard fault happened */
+    " ldr r1,[r0,#24]             \n"  /* load program counter into R1. R1 contains address of the next instruction where the hard fault happened */
+    " b McuHardFault_HandlerC   \n"    /* decode more information. R0 contains pointer to stack frame */
+  );
+    //hw_handler(fatalerror_handler_hw_HardFault);
 }
 
 #endif

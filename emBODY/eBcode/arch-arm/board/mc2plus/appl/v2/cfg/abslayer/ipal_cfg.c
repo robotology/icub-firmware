@@ -180,6 +180,7 @@ static void s_ipal_cfg_on_fatal_error(ipal_fatalerror_t errorcode, const char * 
     des->handlertype = fatalerror_handler_ipal;
     des->handlererrorcode = errorcode;
     des->param = NULL;
+    des->mpucontext = NULL;
     eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
 #else
     #warning DONTUSE_EOtheFatalError is defined, are you sure?

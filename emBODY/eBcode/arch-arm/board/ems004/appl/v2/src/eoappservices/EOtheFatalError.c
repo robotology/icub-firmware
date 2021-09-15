@@ -69,6 +69,8 @@ static void s_info_standard(EOtheFatalError *p);
 
 static void s_save_hardfault(fatal_error_descriptor_t *des);
 static void s_info_hardfault(EOtheFatalError *p);
+static void s_save_mpustate(fatal_error_descriptor_t *des);
+static void s_info_mpustate(EOtheFatalError *p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -78,7 +80,7 @@ static EOtheFatalError s_eo_thefatalerror =
 {
     .initted            = eobool_false,
     .threadcount        = 0,
-    .descriptor         = {0},
+    .descriptor         = {0, 0, 0, 0, NULL, NULL},
     .tobewritten        = {0},
     .detectedfatalerror = {0},
     .errdes             = {0},
@@ -86,7 +88,8 @@ static EOtheFatalError s_eo_thefatalerror =
     {
         {0, ""}, {0, ""}, {0, ""}, {0, ""}, {0, ""}, {0, ""}, {0, ""}, {0, ""},
         {0, ""}, {0, ""}, {0, ""}, {0, ""}, {0, ""}, {0, ""}, {0, ""}, {0, ""}
-    }
+    },
+    .mpustate = {{0, {0, 0, 0}, 0}, {0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0}}
 };
 
 static const char s_eobj_ownname[] = "EOtheFatalError";
@@ -150,10 +153,12 @@ extern void eo_fatalerror_AtStartup(EOtheFatalError *p)
             if(fatalerror_handler_hw_HardFault == p->detectedfatalerror.message.handlertype)
             {
                s_info_hardfault(p); 
+               s_info_mpustate(p);
             }
             else
             {
                 s_info_standard(p);
+                s_info_mpustate(p);
             }
         }                        
     }            
@@ -177,10 +182,12 @@ extern void eo_fatalerror_Restart(EOtheFatalError *p, fatal_error_descriptor_t *
     if(fatalerror_handler_hw_HardFault == des->handlertype)
     {
         s_save_hardfault(des);
+        s_save_mpustate(des);
     }
     else
     {
         s_save_standard(des);
+        s_save_mpustate(des);
     }
 
     
@@ -575,6 +582,126 @@ static void s_info_hardfault(EOtheFatalError *p)
     );            
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);    
 }
+
+static void s_save_mpustate(fatal_error_descriptor_t *des)
+{
+    volatile fatal_error_mpustate_cm4_t *pHFmore = (volatile fatal_error_mpustate_cm4_t*) 0x10000000;
+    volatile uint32_t * hardfault_args = (volatile uint32_t *) des->mpucontext;
+
+    pHFmore->header.signature = fatal_error_signature;
+    pHFmore->header.dummy[0] = 0;
+    pHFmore->header.dummy[1] = 1;
+    pHFmore->header.dummy[2] = 2;
+    pHFmore->header.tbd0 = 0;
+    
+    if(NULL == hardfault_args)
+    {
+        pHFmore->context.r0 = pHFmore->context.r1 = pHFmore->context.r2 = pHFmore->context.r3 = 
+        pHFmore->context.r12 = pHFmore->context.lr = pHFmore->context.pc = pHFmore->context.psr = 0;
+    }
+    else 
+    {        
+        pHFmore->context.r0 = hardfault_args[0];
+        pHFmore->context.r1 = hardfault_args[1];
+        pHFmore->context.r2 = hardfault_args[2];
+        pHFmore->context.r3 = hardfault_args[3];        
+        pHFmore->context.r12 = hardfault_args[4];
+        pHFmore->context.lr = hardfault_args[5];
+        pHFmore->context.pc = hardfault_args[6];
+        pHFmore->context.psr = hardfault_args[7];
+    }
+    
+    pHFmore->sysregs.ICSR = (*((volatile uint32_t *)(0xE000ED04)));
+    pHFmore->sysregs.SHCSR = (*((volatile uint32_t *)(0xE000ED24)));
+    pHFmore->sysregs.CFSR = (*((volatile uint32_t *)(0xE000ED28)));
+    pHFmore->sysregs.HFSR = (*((volatile uint32_t *)(0xE000ED2C)));
+    pHFmore->sysregs.DFSR = (*((volatile uint32_t *)(0xE000ED30)));   
+    pHFmore->sysregs.MMFAR = (*((volatile uint32_t *)(0xE000ED34)));
+    pHFmore->sysregs.BFAR = (*((volatile uint32_t *)(0xE000ED38)));
+    pHFmore->sysregs.AFSR = (*((volatile uint32_t *)(0xE000ED3C)));
+}
+
+static void s_info_mpustate(EOtheFatalError *p)
+{
+    // it is of the correct size. i use it to send a diagnostic message
+    uint16_t par16 = 0;
+    uint64_t par64 = p->detectedfatalerror.params.par64;     
+
+    volatile fatal_error_mpustate_cm4_t *pHFmore = (volatile fatal_error_mpustate_cm4_t*) 0x10000000;    
+
+    p->errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    p->errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    p->errdes.sourceaddress    = 0;
+    p->errdes.par16            = par16;
+    p->errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "MORE INFO", s_eobj_ownname, &p->errdes);
+
+    // further information is in here
+    char str[64] = {0};
+        
+    if(fatal_error_signature != pHFmore->header.signature)
+    {
+        snprintf(str, sizeof(str), "mpu state invalid sign = 0x%08x",
+            pHFmore->header.signature
+        );
+        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);        
+    }
+    else
+    {
+        // caveat the string can be at most 48 characters 
+        
+        // System control registers. 
+        
+        snprintf(str, sizeof(str), "ICSR = 0x%08x SHCSR = 0x%08x", 
+            pHFmore->sysregs.ICSR, pHFmore->sysregs.SHCSR
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+    
+        snprintf(str, sizeof(str), "CFSR = 0x%08x HFSR = 0x%08x", 
+            pHFmore->sysregs.CFSR, pHFmore->sysregs.HFSR
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+
+        snprintf(str, sizeof(str), "DFSR = 0x%08x MMFAR = 0x%08x", 
+            pHFmore->sysregs.DFSR, pHFmore->sysregs.MMFAR
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+ 
+        snprintf(str, sizeof(str), "BFAR = 0x%08x AFSR = 0x%08x", 
+            pHFmore->sysregs.BFAR, pHFmore->sysregs.AFSR
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+           
+        // execution registers
+
+        snprintf(str, sizeof(str), "r0 = 0x%08x r1 = 0x%08x", 
+            pHFmore->context.r0, pHFmore->context.r1
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+    
+        snprintf(str, sizeof(str), "r2 = 0x%08x r3 = 0x%08x", 
+            pHFmore->context.r2, pHFmore->context.r3
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+
+        snprintf(str, sizeof(str), "r12 = 0x%08x lr = 0x%08x", 
+            pHFmore->context.r12, pHFmore->context.lr
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+ 
+        snprintf(str, sizeof(str), "pc = 0x%08x psr = 0x%08x", 
+            pHFmore->context.pc, pHFmore->context.psr
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+        
+    }
+    
+    // and now i reset memory bank area
+    memset((fatal_error_mpustate_cm4_t *)pHFmore, 0, sizeof(fatal_error_mpustate_cm4_t));
+    
+}
+
 
 
 // error tests

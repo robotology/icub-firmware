@@ -56,7 +56,8 @@ typedef struct
     uint8_t handlererrorcode;   
     uint8_t forfutureuse0;
     uint8_t forfutureuse1;  
-    void *param;     
+    void *param; 
+    void *mpucontext;     
 } fatal_error_descriptor_t;
 
 

@@ -119,6 +119,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
     des->handlertype = fatalerror_handler_osal;
     des->handlererrorcode = errorcode;
     des->param = task;
+    des->mpucontext = NULL;
     eo_fatalerror_Restart(eo_fatalerror_GetHandle(), des);
 #else 
     #warning DONTUSE_EOtheFatalError is defined, are you sure?
