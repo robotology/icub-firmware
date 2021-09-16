@@ -309,7 +309,7 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         
         // TODO: setup properly the maxspeed (default 1000*1000)
         // maximum clock rate supported on SPI for AEA3: 25 MHz
-        spicfg.maxspeed = 1000*100;
+        //spicfg.maxspeed = 1000*100;
 
         initSPI = hal_true;        
     }

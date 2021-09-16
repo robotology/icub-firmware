@@ -60,7 +60,7 @@ extern "C" {
 
 // so far, i write them in here. later on we think of a board file or else...
 #if 1
-#if defined(TEST_AEA3)
+#if defined(AEA3_SUPPORT)
 #define EOTHESERVICES_disable_theInertials2
 #define EOTHESERVICES_disable_theInertials3
 #define EOTHESERVICES_disable_theTemperatures
