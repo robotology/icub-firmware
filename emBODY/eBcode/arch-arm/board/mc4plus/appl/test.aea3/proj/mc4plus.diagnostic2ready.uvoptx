@@ -167,41 +167,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>1529</LineNumber>
+          <LineNumber>1703</LineNumber>
           <EnabledFlag>0</EnabledFlag>
-          <Address>134420502</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMotionController.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\mc4plus\../../../../ems004/appl/v2/src/eoappservices/EOtheMotionController.c\1529</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>460</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>134362124</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\mc\AbsEncoder.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\mc4plus\../../../../../embobj/plus/mc/AbsEncoder.c\460</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>1707</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>134380304</Address>
+          <Address>134380276</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -210,23 +178,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\..\..\..\..\embobj\plus\mc\Controller.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\mc4plus\../../../../../embobj/plus/mc/Controller.c\1707</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>489</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134406100</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheEncoderReader.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\mc4plus\../../../../ems004/appl/v2/src/eoappservices/EOtheEncoderReader.c\489</Expression>
+          <Expression>\\mc4plus\../../../../../embobj/plus/mc/Controller.c\1703</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -239,6 +191,11 @@
           <count>1</count>
           <WinNumber>1</WinNumber>
           <ItemText>o</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>o-&gt;pos_err</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -637,7 +594,7 @@
 
   <Group>
     <GroupName>abslayer-cfg-test-aea3</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
