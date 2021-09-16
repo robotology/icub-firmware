@@ -71,6 +71,7 @@ static void s_save_hardfault(fatal_error_descriptor_t *des);
 static void s_info_hardfault(EOtheFatalError *p);
 static void s_save_mpustate(fatal_error_descriptor_t *des);
 static void s_info_mpustate(EOtheFatalError *p);
+static void s_set_divide_by_zero_trap(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -107,6 +108,8 @@ extern EOtheFatalError* eo_fatalerror_Initialise(void)
     {
         return(p);
     }
+    
+    s_set_divide_by_zero_trap();
     
 //    eo_errman_Trace(eo_errman_GetHandle(), "eo_fatalerror_Initialise() starts", s_eobj_ownname); 
        
@@ -161,7 +164,23 @@ extern void eo_fatalerror_AtStartup(EOtheFatalError *p)
                 s_info_mpustate(p);
             }
         }                        
-    }            
+    } 
+
+// test code for dive by zero    
+//    volatile uint32_t value = 0;
+//    volatile uint32_t tmp = 10;
+//    tmp = tmp / value;  
+//   
+//    value = value;
+  
+// test code for access to non existing memory    
+//    volatile unsigned int* pp;
+//    volatile unsigned int n;
+//    pp = (unsigned int*)0xCCCCCCCC;
+//    n = *pp;
+//    
+//    n = n;
+
     
 }
 
@@ -495,6 +514,12 @@ static void s_info_standard(EOtheFatalError *p)
             tid
     );
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);    
+}
+
+static void s_set_divide_by_zero_trap(void)
+{
+    volatile uint32_t *pCCR = (volatile uint32_t *) 0xE000ED14;
+    (*pCCR) |= 0x00000010;
 }
 
 static void s_save_hardfault(fatal_error_descriptor_t *des)
