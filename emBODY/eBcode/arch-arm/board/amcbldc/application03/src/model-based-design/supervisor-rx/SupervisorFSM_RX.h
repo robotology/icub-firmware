@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 2.34
+// Model version                  : 2.44
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Wed Aug  4 14:12:54 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:16 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -28,37 +28,28 @@
 class SupervisorFSM_RXModelClass {
   // public data and function members
  public:
-  // Block signals for model 'SupervisorFSM_RX'
-  struct B_SupervisorFSM_RX_T {
-    MotorSensors BusConversion_InsertedFor_Chart;
-    Targets Targets_n;                 // '<Root>/Chart'
-    BUS_MESSAGES_RX BusConversion_InsertedFor_Cha_h;
-    InternalMessages BusConversion_InsertedFor_Cha_i;
-    Flags Flags_o;                     // '<Root>/Chart'
-  };
-
   // Block states (default storage) for model 'SupervisorFSM_RX'
   struct DW_SupervisorFSM_RX_T {
-    int32_T sfEvent;                   // '<Root>/Chart'
-    uint16_T CurrLimit;                // '<Root>/Chart'
-    uint8_T is_active_c3_SupervisorFSM_RX;// '<Root>/Chart'
-    uint8_T is_CONTROL_MODE_HANDLER;   // '<Root>/Chart'
-    uint8_T is_active_CONTROL_MODE_HANDLER;// '<Root>/Chart'
-    uint8_T is_Not_Configured;         // '<Root>/Chart'
-    uint8_T is_Motor_ON;               // '<Root>/Chart'
-    uint8_T is_Motor_OFF;              // '<Root>/Chart'
-    uint8_T is_FAULT_HANDLER;          // '<Root>/Chart'
-    uint8_T is_active_FAULT_HANDLER;   // '<Root>/Chart'
-    uint8_T is_CAN_RX_HANDLER;         // '<Root>/Chart'
-    uint8_T is_active_CAN_RX_HANDLER;  // '<Root>/Chart'
-    boolean_T ErrorsRx_event_prev;     // '<Root>/Chart'
-    boolean_T ErrorsRx_event_start;    // '<Root>/Chart'
-    boolean_T EventsRx_control_mode_prev;// '<Root>/Chart'
-    boolean_T EventsRx_control_mode_start;// '<Root>/Chart'
-    boolean_T EventsRx_current_limit_prev;// '<Root>/Chart'
-    boolean_T EventsRx_current_limit_start;// '<Root>/Chart'
-    boolean_T EventsRx_desired_current_prev;// '<Root>/Chart'
-    boolean_T EventsRx_desired_current_start;// '<Root>/Chart'
+    int32_T sfEvent;                   // '<Root>/SupervisorFSM_RX'
+    uint16_T CurrLimit;                // '<Root>/SupervisorFSM_RX'
+    uint8_T is_active_c3_SupervisorFSM_RX;// '<Root>/SupervisorFSM_RX'
+    uint8_T is_CONTROL_MODE_HANDLER;   // '<Root>/SupervisorFSM_RX'
+    uint8_T is_active_CONTROL_MODE_HANDLER;// '<Root>/SupervisorFSM_RX'
+    uint8_T is_Not_Configured;         // '<Root>/SupervisorFSM_RX'
+    uint8_T is_Motor_ON;               // '<Root>/SupervisorFSM_RX'
+    uint8_T is_Motor_OFF;              // '<Root>/SupervisorFSM_RX'
+    uint8_T is_FAULT_HANDLER;          // '<Root>/SupervisorFSM_RX'
+    uint8_T is_active_FAULT_HANDLER;   // '<Root>/SupervisorFSM_RX'
+    uint8_T is_CAN_RX_HANDLER;         // '<Root>/SupervisorFSM_RX'
+    uint8_T is_active_CAN_RX_HANDLER;  // '<Root>/SupervisorFSM_RX'
+    boolean_T ErrorsRx_event_prev;     // '<Root>/SupervisorFSM_RX'
+    boolean_T ErrorsRx_event_start;    // '<Root>/SupervisorFSM_RX'
+    boolean_T EventsRx_control_mode_prev;// '<Root>/SupervisorFSM_RX'
+    boolean_T EventsRx_control_mode_start;// '<Root>/SupervisorFSM_RX'
+    boolean_T EventsRx_current_limit_prev;// '<Root>/SupervisorFSM_RX'
+    boolean_T EventsRx_current_limit_start;// '<Root>/SupervisorFSM_RX'
+    boolean_T EventsRx_desired_current_prev;// '<Root>/SupervisorFSM_RX'
+    boolean_T EventsRx_desired_current_start;// '<Root>/SupervisorFSM_RX'
   };
 
   // Real-time Model Data Structure
@@ -67,41 +58,13 @@ class SupervisorFSM_RXModelClass {
   };
 
   // model step function
-  void step(const BoardState *rtu_InternalMessages_State, const BoardCommand
-            *rtu_InternalMessages_Command, const real32_T rtu_MotorSensors_Iabc
-            [3], const real32_T *rtu_MotorSensors_angle, const real32_T
-            *rtu_MotorSensors_omega, const real32_T
-            *rtu_MotorSensors_temperature, const real32_T
-            *rtu_MotorSensors_voltage, const real32_T
-            *rtu_MotorSensors_threshold_curr, const real32_T
-            *rtu_MotorSensors_threshold_cu_k, const real32_T
-            *rtu_MotorSensors_threshold_volt, const real32_T
-            *rtu_MotorSensors_threshold_vo_k, const real32_T
-            *rtu_MotorSensors_threshold_temp, const real32_T
-            *rtu_MotorSensors_threshold_te_c, const real32_T
-            *rtu_MotorSensors_current, const boolean_T *rtu_ErrorsRx_event,
-            const boolean_T *rtu_EventsRx_control_mode, const boolean_T
-            *rtu_EventsRx_current_limit, const boolean_T
-            *rtu_EventsRx_desired_current, const boolean_T
-            *rtu_MessagesRx_control_mode_mot, const MCControlModes
-            *rtu_MessagesRx_control_mode_mod, const boolean_T
-            *rtu_MessagesRx_current_limit_mo, const int16_T
-            *rtu_MessagesRx_current_limit_no, const uint16_T
-            *rtu_MessagesRx_current_limit_pe, const uint16_T
-            *rtu_MessagesRx_current_limit_ov, const int16_T
-            *rtu_MessagesRx_desired_current_, ControlModes
-            *rty_Flags_control_mode, boolean_T *rty_Flags_PID_reset, real32_T
-            *rty_Targets_jointpositions_posi, real32_T
-            *rty_Targets_jointvelocities_vel, real32_T
-            *rty_Targets_motorcurrent_curren, real32_T
-            *rty_Targets_motorvoltage_voltag);
+  void step(const InternalMessages &arg_Internal_Messages, const MotorSensors &
+            arg_MotorSensors, const BUS_EVENTS_RX &arg_EventsRx, const
+            BUS_MESSAGES_RX &arg_MessagesRx, const BUS_CAN_RX_ERRORS &
+            arg_ErrorsRx, Flags &arg_Flags, Targets &arg_Targets);
 
   // Initial conditions function
-  void init(ControlModes *rty_Flags_control_mode, boolean_T *rty_Flags_PID_reset,
-            real32_T *rty_Targets_jointpositions_posi, real32_T
-            *rty_Targets_jointvelocities_vel, real32_T
-            *rty_Targets_motorcurrent_curren, real32_T
-            *rty_Targets_motorvoltage_voltag);
+  void init(Flags *arg_Flags, Targets *arg_Targets);
 
   // Constructor
   SupervisorFSM_RXModelClass();
@@ -117,9 +80,6 @@ class SupervisorFSM_RXModelClass {
 
   // private data and function members
  private:
-  // Block signals
-  B_SupervisorFSM_RX_T SupervisorFSM_RX_B;
-
   // Block states
   DW_SupervisorFSM_RX_T SupervisorFSM_RX_DW;
 
@@ -127,8 +87,12 @@ class SupervisorFSM_RXModelClass {
   RT_MODEL_SupervisorFSM_RX_T SupervisorFSM_RX_M;
 
   // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
-  void Supervisor_CONTROL_MODE_HANDLER(void);
-  void SupervisorFSM_RX_FAULT_HANDLER(void);
+  void Supervisor_CONTROL_MODE_HANDLER(const InternalMessages
+    *arg_Internal_Messages, const MotorSensors *arg_MotorSensors, const
+    BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags);
+  void SupervisorFSM_RX_FAULT_HANDLER(const InternalMessages
+    *arg_Internal_Messages, const MotorSensors *arg_MotorSensors, const
+    BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags);
   ControlModes SupervisorFSM_RX_convert(MCControlModes mccontrolmode);
 };
 
@@ -147,7 +111,7 @@ class SupervisorFSM_RXModelClass {
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'SupervisorFSM_RX'
-//  '<S1>'   : 'SupervisorFSM_RX/Chart'
+//  '<S1>'   : 'SupervisorFSM_RX/SupervisorFSM_RX'
 
 #endif                                 // RTW_HEADER_SupervisorFSM_RX_h_
 

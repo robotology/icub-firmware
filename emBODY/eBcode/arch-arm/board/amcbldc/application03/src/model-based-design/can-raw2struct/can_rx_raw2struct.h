@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_rx_raw2struct'.
 //
-// Model version                  : 1.310
+// Model version                  : 1.315
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:51 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:51 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -36,17 +36,7 @@ namespace can_messaging
     };
 
     // model step function
-    void step(const uint8_T *rtu_pck_rx_raw_available, const uint8_T
-              *rtu_pck_rx_raw_lengths, const uint16_T *rtu_pck_rx_raw_packets_ID,
-              const uint8_T rtu_pck_rx_raw_packets_PAYLOAD[8], uint8_T
-              *rty_pck_rx_struct_available, CANClassTypes
-              *rty_pck_rx_struct_packets_ID_CL, uint8_T
-              *rty_pck_rx_struct_packets_ID_SR, uint8_T
-              *rty_pck_rx_struct_packets_ID_DS, uint8_T
-              *rty_pck_rx_struct_packets_PAYLO, boolean_T
-              *rty_pck_rx_struct_packets_PAY_f, uint8_T
-              *rty_pck_rx_struct_packets_PAY_k, uint8_T
-              rty_pck_rx_struct_packets_PAY_h[7]);
+    void step(const BUS_CAN &arg_pck_rx_raw, BUS_CAN_RX &arg_pck_rx_struct);
 
     // Constructor
     CAN_RX_raw2struct();
