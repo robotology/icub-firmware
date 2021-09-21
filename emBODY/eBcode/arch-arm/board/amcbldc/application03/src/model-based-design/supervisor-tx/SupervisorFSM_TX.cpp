@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 2.43
+// Model version                  : 2.50
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Wed Aug  4 14:13:07 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:29 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,71 +20,42 @@
 #include "SupervisorFSM_TX_private.h"
 
 // System initialize for referenced model: 'SupervisorFSM_TX'
-void SupervisorFSM_TXModelClass::init(real32_T *rty_MessagesTx_foc_current,
-  real32_T *rty_MessagesTx_foc_position, real32_T *rty_MessagesTx_foc_velocity)
+void SupervisorFSM_TXModelClass::init(BUS_MESSAGES_TX *arg_MessagesTx,
+  BUS_EVENTS_TX *arg_EventsTx)
 {
-  // SystemInitialize for Chart: '<Root>/Chart'
-  SupervisorFSM_TX_B.MessagesTx.foc.current = 0.0F;
-  SupervisorFSM_TX_B.MessagesTx.foc.position = 0.0F;
-  SupervisorFSM_TX_B.MessagesTx.foc.velocity = 0.0F;
+  // SystemInitialize for Chart: '<Root>/SupervisorFSM_TX'
+  arg_MessagesTx->foc.current = 0.0F;
+  arg_MessagesTx->foc.position = 0.0F;
+  arg_MessagesTx->foc.velocity = 0.0F;
 
-  // SystemInitialize for SignalConversion generated from: '<Root>/MessagesTx'
-  *rty_MessagesTx_foc_current = SupervisorFSM_TX_B.MessagesTx.foc.current;
-
-  // SystemInitialize for SignalConversion generated from: '<Root>/MessagesTx'
-  *rty_MessagesTx_foc_position = SupervisorFSM_TX_B.MessagesTx.foc.position;
-
-  // SystemInitialize for SignalConversion generated from: '<Root>/MessagesTx'
-  *rty_MessagesTx_foc_velocity = SupervisorFSM_TX_B.MessagesTx.foc.velocity;
+  // SystemInitialize for BusCreator: '<Root>/BUS_EVENTS_TX'
+  arg_EventsTx->foc = SupervisorFSM_TX_B.ev_foc;
 }
 
 // Output and update for referenced model: 'SupervisorFSM_TX'
-void SupervisorFSM_TXModelClass::step(const real32_T
-  *rtu_SensorsData_jointpositions_, const real32_T
-  *rtu_SensorsData_motorsensors_om, const real32_T
-  *rtu_SensorsData_motorsensors_cu, const MCControlModes
-  *rtu_MessagesRx_control_mode_mod, real32_T *rty_MessagesTx_foc_current,
-  real32_T *rty_MessagesTx_foc_position, real32_T *rty_MessagesTx_foc_velocity,
-  boolean_T *rty_EventsTx_foc)
+void SupervisorFSM_TXModelClass::step(const SensorsData &arg_SensorsData, const
+  BUS_MESSAGES_RX &arg_MessagesRx, BUS_MESSAGES_TX &arg_MessagesTx,
+  BUS_EVENTS_TX &arg_EventsTx)
 {
-  real32_T rtb_jointpositions_position;
-  real32_T rtb_motorsensors_current;
-  real32_T rtb_motorsensors_omega;
-
-  // BusCreator generated from: '<Root>/Chart'
-  rtb_jointpositions_position = *rtu_SensorsData_jointpositions_;
-
-  // BusCreator generated from: '<Root>/Chart'
-  rtb_motorsensors_omega = *rtu_SensorsData_motorsensors_om;
-  rtb_motorsensors_current = *rtu_SensorsData_motorsensors_cu;
-
-  // Chart: '<Root>/Chart' incorporates:
-  //   BusCreator generated from: '<Root>/Chart'
-
+  // Chart: '<Root>/SupervisorFSM_TX'
   if (SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX == 0U) {
     SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX = 1U;
-  } else if (*rtu_MessagesRx_control_mode_mod != MCControlModes_Idle) {
-    SupervisorFSM_TX_B.MessagesTx.foc.current = rtb_motorsensors_current;
-    SupervisorFSM_TX_B.MessagesTx.foc.velocity = rtb_motorsensors_omega;
-    SupervisorFSM_TX_B.MessagesTx.foc.position = rtb_jointpositions_position;
+  } else if (arg_MessagesRx.control_mode.mode != MCControlModes_Idle) {
+    arg_MessagesTx.foc.current = arg_SensorsData.motorsensors.current;
+    arg_MessagesTx.foc.velocity = arg_SensorsData.motorsensors.omega;
+    arg_MessagesTx.foc.position = arg_SensorsData.jointpositions.position;
     SupervisorFSM_TX_DW.ev_focEventCounter++;
   }
 
   if (SupervisorFSM_TX_DW.ev_focEventCounter > 0U) {
-    *rty_EventsTx_foc = !*rty_EventsTx_foc;
+    SupervisorFSM_TX_B.ev_foc = !SupervisorFSM_TX_B.ev_foc;
     SupervisorFSM_TX_DW.ev_focEventCounter--;
   }
 
-  // End of Chart: '<Root>/Chart'
+  // End of Chart: '<Root>/SupervisorFSM_TX'
 
-  // SignalConversion generated from: '<Root>/MessagesTx'
-  *rty_MessagesTx_foc_current = SupervisorFSM_TX_B.MessagesTx.foc.current;
-
-  // SignalConversion generated from: '<Root>/MessagesTx'
-  *rty_MessagesTx_foc_position = SupervisorFSM_TX_B.MessagesTx.foc.position;
-
-  // SignalConversion generated from: '<Root>/MessagesTx'
-  *rty_MessagesTx_foc_velocity = SupervisorFSM_TX_B.MessagesTx.foc.velocity;
+  // BusCreator: '<Root>/BUS_EVENTS_TX'
+  arg_EventsTx.foc = SupervisorFSM_TX_B.ev_foc;
 }
 
 // Constructor

@@ -49,75 +49,23 @@ struct embot::app::application::theMBDagent::Impl
     bool initialise();
     bool tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);    
 		
-				// Variables For CAN Decoder
-    MCControlModes rtb_mode;
-    CANErrorTypes rtb_type;
-    uint16_T rtb_peak;
-    uint16_T rtb_overload;
-    int16_T rtb_nominal;
-    int16_T rtb_current_o;
-    boolean_T rtb_motor;
-    boolean_T rtb_motor_e;
-    boolean_T rtb_control_mode;
-    boolean_T rtb_current_limit;
-    boolean_T rtb_desired_current;
-    boolean_T rtb_event;
+		BUS_CAN bus_can;
 		
-		// Input Variables For Packet Formatter
-		uint8_T formatter_available;
-		uint8_T packet_length;
-		uint16_T packet_ID;
-		uint8_T packet_payload[8];
+		BUS_CAN_RX bus_can_rx;
+		BUS_MESSAGES_RX bus_messages_rx;
+		BUS_EVENTS_RX bus_events_rx;
+		BUS_CAN_RX_ERRORS bus_can_rx_errors;
 		
-		// Output Variables For Packet Formatter/Input Variables For Decoder
-		uint8_T decoder_available;
-		CANClassTypes packet_CLS;
-		uint8_T packet_SRC;
-		uint8_T packet_DST_TYP;
-		uint8_T packet_LEN;
-		boolean_T packet_M;
-		uint8_T packet_OPC;
-		uint8_T packet_ARG[7];
-
-		// Variables For Supervisor RX
-		const BoardState board_state_gnd = BoardState_HardwareConfigured;
-		const BoardCommand board_command_gnd = BoardCommand_ForceIdle;
-		ControlModes supervisor_control_mode;
-		boolean_T pid_reset;
-		real32_T position;
-		real32_T velocity;
-		real32_T current;
-		real32_T voltage;
+		SensorsData sensors_data;
+		MotorSensors motor_sensors;
 		
-		// JointPositions
-		real32_T joint_position {0};
+		Flags flags;
+		Targets targets;
 		
-		// MotorSensors
-		real32_T iabc[3] {0,0,0};
-		real32_T angle {0};
-		real32_T omega {0};
-		real32_T temperature {1};
-		real32_T motor_sensors_voltage {0};
-		real32_T current_threshold {0};
-		real32_T cu_k_threshold {2};
-		real32_T voltage_threshold {0};
-		real32_T vo_k_threshold {2};
-		real32_T temperature_threshold {0};
-		real32_T te_c_threshold {2};
-		real32_T motor_sensors_current {1};
+		BUS_MESSAGES_TX bus_messages_tx;
+		BUS_EVENTS_TX bus_events_tx;
 		
-		
-		// Variables For Supervisor TX
-		boolean_T foc;
-		real32_T foc_current;
-		real32_T foc_position;
-		real32_T foc_velocity;
-		boolean_T event_foc;
-		
-		// Variables For CAN Encoder 
-		uint8_T output_available;
-		uint16_T output_id;
-		uint8_T output_data[8];
+		BUS_CAN output;
 		
 		can_messaging::CAN_RX_raw2struct can_packet_formatter;
 		can_messaging::CAN_Decoder can_decoder;
@@ -126,6 +74,8 @@ struct embot::app::application::theMBDagent::Impl
 		SupervisorFSM_TXModelClass supervisor_tx;
 		
 		can_messaging::CAN_Encoder can_encoder;
+		
+		
 		
 };
         
@@ -137,15 +87,20 @@ bool embot::app::application::theMBDagent::Impl::initialise()
         return true;
     }   
 
-		can_decoder.init(&rtb_motor, &rtb_mode, &rtb_motor_e, &rtb_nominal,
-											&rtb_peak, &rtb_overload, &rtb_current_o, &rtb_control_mode,
-											&rtb_current_limit, &rtb_desired_current, &rtb_event, &rtb_type);
+		sensors_data.jointpositions.position = 0;
+		
+		motor_sensors.temperature = 1;
+		motor_sensors.threshold.current_high = 2;
+		motor_sensors.threshold.voltage_high = 2;
+		motor_sensors.threshold.temperature_high = 2;
+		motor_sensors.current = 1;
 		
 		
-		supervisor_rx.init(&supervisor_control_mode, &pid_reset,
-												&position, &velocity, &current, &voltage);
+		can_decoder.init(&bus_messages_rx, &bus_events_rx, &bus_can_rx_errors);
 		
-		supervisor_tx.init(&current, &position, &velocity);
+		supervisor_rx.init(&flags, &targets);
+		
+		supervisor_tx.init(&bus_messages_tx, &bus_events_tx);
 		
 		can_encoder.initialize();
 		
@@ -162,68 +117,59 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 		
 		
 		if (inpframes.size() == 0) {
-				formatter_available = 0;
+				bus_can.available = 0;
 		} else {
-				formatter_available = 1;
+				bus_can.available = 1;
 				embot::prot::can::Frame last_frame = inpframes.back();
 				last_frame.copyto(rx_id, rx_size, rx_data);
 		}
 		
-		packet_length = (uint8_T)rx_size;
+		bus_can.lengths = (uint8_T)rx_size;
 		
-		packet_ID = (uint16_T)rx_id;
+		bus_can.packets.ID = (uint16_T)rx_id;
 		
 		for (int i=0;i<rx_size;i++) {
-			packet_payload[i] = (uint8_T)rx_data[i];
+			bus_can.packets.PAYLOAD[i] = (uint8_T)rx_data[i];
 		}
 		
-		can_packet_formatter.step(&formatter_available, &packet_length, &packet_ID, &packet_payload[0],
-															&decoder_available, &packet_CLS, &packet_SRC, &packet_DST_TYP, &packet_LEN, &packet_M, &packet_OPC, &packet_ARG[0]);
+		can_packet_formatter.step(bus_can, bus_can_rx);
 		
 		
-		can_decoder.step(&decoder_available, &packet_CLS, &packet_SRC, &packet_DST_TYP, &packet_LEN, &packet_M, &packet_OPC, &packet_ARG[0],
-										&rtb_motor, &rtb_mode, &rtb_motor_e, &rtb_nominal, &rtb_peak, &rtb_overload, &rtb_current_o, &rtb_control_mode, &rtb_current_limit, &rtb_desired_current, &rtb_event, &rtb_type);
+		can_decoder.step(bus_can_rx, bus_messages_rx, bus_events_rx, bus_can_rx_errors);
 		
-    supervisor_rx.step((const BoardState*)board_state_gnd, (const BoardCommand*)board_command_gnd,
-												&iabc[0], &angle, &omega, &temperature, &motor_sensors_voltage,
-												&current_threshold, &cu_k_threshold, &voltage_threshold, &vo_k_threshold, &temperature_threshold, &te_c_threshold,
-												&motor_sensors_current,
-												&rtb_event, &rtb_control_mode, &rtb_current_limit, &rtb_desired_current,
-												&rtb_motor, &rtb_mode, &rtb_motor_e, &rtb_nominal, &rtb_peak, &rtb_overload, &rtb_current_o,
-												&supervisor_control_mode, &pid_reset, &position, &velocity, &current, &voltage);
+		InternalMessages internal_messages;
 		
-		joint_position=joint_position + 1;
+    supervisor_rx.step(internal_messages, motor_sensors, bus_events_rx, bus_messages_rx, bus_can_rx_errors, flags, targets);
 		
-		if (joint_position > 2000) {
-			joint_position = 0;
+		
+		sensors_data.jointpositions.position++;
+		
+		if (sensors_data.jointpositions.position > 2000) {
+			sensors_data.jointpositions.position = 0;
 		}
 		
-		supervisor_tx.step(&joint_position, &omega, &motor_sensors_current, &rtb_mode, 
-												&foc_current, &foc_position, &foc_velocity, &event_foc);
 		
+		supervisor_tx.step(sensors_data, bus_messages_rx, bus_messages_tx, bus_events_tx);
 		
-		can_encoder.step(&foc_current, &foc_position, &foc_velocity, &event_foc,
-										&output_available, &output_id, &output_data[0]);
+		can_encoder.step(bus_messages_tx, bus_events_tx, output);
 		
+//		std::string control_mode_string {"Not Configured"};
 		
-		std::string control_mode_string {"Not Configured"};
+//		if (supervisor_control_mode == 1) {
+//			control_mode_string = "Idle";
+//		} else if (supervisor_control_mode == 5) {
+//			control_mode_string = "Velocity";
+//		}
+//		
+//		if (rtb_control_mode == 0) {
+//		 	embot::core::print("Event Set Control Mode: False | Value of supervisor control mode variable: " + control_mode_string);
+//		} else {
+//		 	embot::core::print("Event Set Control Mode: True  | Value of supervisor control mode variable: " + control_mode_string);
+//		}
 		
-		if (supervisor_control_mode == 1) {
-			control_mode_string = "Idle";
-		} else if (supervisor_control_mode == 5) {
-			control_mode_string = "Velocity";
-		}
-		
-		if (rtb_control_mode == 0) {
-		 	embot::core::print("Event Set Control Mode: False | Value of supervisor control mode variable: " + control_mode_string);
-		} else {
-		 	embot::core::print("Event Set Control Mode: True  | Value of supervisor control mode variable: " + control_mode_string);
-		}
-		
-    if(output_available)
+    if(output.available)
     {
-        uint8_t data[8] = {0};
-        embot::prot::can::Frame fr {output_id, 8, output_data};
+        embot::prot::can::Frame fr {output.packets.ID, 8, output.packets.PAYLOAD};
     
         outframes.push_back(fr);
     }

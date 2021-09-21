@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 2.34
+// Model version                  : 2.44
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Wed Aug  4 14:12:54 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:16 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -87,33 +87,7 @@ struct MotorSensors
   real32_T voltage;
   Thresholds threshold;
   real32_T current;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_CANErrorTypes_
-#define DEFINED_TYPEDEF_FOR_CANErrorTypes_
-
-typedef enum {
-  CANErrorTypes_No_Error = 0,          // Default value
-  CANErrorTypes_Packet_Not4Us,
-  CANErrorTypes_Packet_Unrecognized,
-  CANErrorTypes_Packet_Malformed,
-  CANErrorTypes_Packet_MultiFunctionsDetected,
-  CANErrorTypes_Mode_Unrecognized
-} CANErrorTypes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_
-
-// Specifies the CAN error types.
-struct BUS_CAN_RX_ERRORS
-{
-  // True if an error has been detected.
-  boolean_T event;
-  CANErrorTypes type;
+  uint8_T hallABC;
 };
 
 #endif
@@ -200,6 +174,33 @@ struct BUS_MESSAGES_RX
   BUS_MSG_CONTROL_MODE control_mode;
   BUS_MSG_CURRENT_LIMIT current_limit;
   BUS_MSG_DESIRED_CURRENT desired_current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CANErrorTypes_
+#define DEFINED_TYPEDEF_FOR_CANErrorTypes_
+
+typedef enum {
+  CANErrorTypes_No_Error = 0,          // Default value
+  CANErrorTypes_Packet_Not4Us,
+  CANErrorTypes_Packet_Unrecognized,
+  CANErrorTypes_Packet_Malformed,
+  CANErrorTypes_Packet_MultiFunctionsDetected,
+  CANErrorTypes_Mode_Unrecognized
+} CANErrorTypes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_
+
+// Specifies the CAN error types.
+struct BUS_CAN_RX_ERRORS
+{
+  // True if an error has been detected.
+  boolean_T event;
+  CANErrorTypes type;
 };
 
 #endif

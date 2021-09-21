@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.315
+// Model version                  : 1.322
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Wed Aug  4 14:13:17 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:44 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,104 +22,100 @@
 namespace can_messaging
 {
   // Output and update for referenced model: 'can_encoder'
-  void CAN_Encoder::step(const real32_T *rtu_messages_tx_foc_current, const
-    real32_T *rtu_messages_tx_foc_position, const real32_T
-    *rtu_messages_tx_foc_velocity, const boolean_T *rtu_events_tx_foc, uint8_T
-    *rty_pck_tx_available, uint16_T *rty_pck_tx_packets_ID, uint8_T
-    rty_pck_tx_packets_PAYLOAD[8])
+  void CAN_Encoder::step(const BUS_MESSAGES_TX &arg_messages_tx, const
+    BUS_EVENTS_TX &arg_events_tx, BUS_CAN &arg_pck_tx)
   {
     int32_T rtb_DataTypeConversion2;
-    real32_T rtb_Gain;
+    real32_T u;
     int16_T rtb_DataTypeConversion1;
     int16_T rtb_DataTypeConversion3;
 
     // Outputs for Atomic SubSystem: '<Root>/CAN_Encoder'
     // DataTypeConversion: '<S1>/Data Type Conversion1'
-    rtb_Gain = *rtu_messages_tx_foc_current;
-    if (rtb_Gain < 0.0F) {
-      rtb_Gain = std::ceil(rtb_Gain);
+    if (arg_messages_tx.foc.current < 0.0F) {
+      u = std::ceil(arg_messages_tx.foc.current);
     } else {
-      rtb_Gain = std::floor(rtb_Gain);
+      u = std::floor(arg_messages_tx.foc.current);
     }
 
-    if (rtIsNaNF(rtb_Gain) || rtIsInfF(rtb_Gain)) {
-      rtb_Gain = 0.0F;
+    if (rtIsNaNF(u) || rtIsInfF(u)) {
+      u = 0.0F;
     } else {
-      rtb_Gain = std::fmod(rtb_Gain, 65536.0F);
+      u = std::fmod(u, 65536.0F);
     }
 
-    rtb_DataTypeConversion1 = static_cast<int16_T>(rtb_Gain < 0.0F ?
-      static_cast<int32_T>(static_cast<int16_T>(-static_cast<int16_T>(
-      static_cast<uint16_T>(-rtb_Gain)))) : static_cast<int32_T>
-      (static_cast<int16_T>(static_cast<uint16_T>(rtb_Gain))));
+    rtb_DataTypeConversion1 = static_cast<int16_T>(u < 0.0F ? static_cast<
+      int32_T>(static_cast<int16_T>(-static_cast<int16_T>(static_cast<uint16_T>(
+      -u)))) : static_cast<int32_T>(static_cast<int16_T>(static_cast<uint16_T>(u))));
 
     // End of DataTypeConversion: '<S1>/Data Type Conversion1'
 
-    // Gain: '<S1>/Gain1'
-    rtb_Gain = rtP_CAN_ANGLE_DEG2ICUB * *rtu_messages_tx_foc_position;
-
-    // DataTypeConversion: '<S1>/Data Type Conversion2'
-    if (rtb_Gain < 0.0F) {
-      rtb_Gain = std::ceil(rtb_Gain);
-    } else {
-      rtb_Gain = std::floor(rtb_Gain);
-    }
-
-    if (rtIsNaNF(rtb_Gain) || rtIsInfF(rtb_Gain)) {
-      rtb_Gain = 0.0F;
-    } else {
-      rtb_Gain = std::fmod(rtb_Gain, 4.2949673E+9F);
-    }
-
-    rtb_DataTypeConversion2 = rtb_Gain < 0.0F ? -static_cast<int32_T>(
-      static_cast<uint32_T>(-rtb_Gain)) : static_cast<int32_T>
-      (static_cast<uint32_T>(rtb_Gain));
-
-    // End of DataTypeConversion: '<S1>/Data Type Conversion2'
-
     // Gain: '<S1>/Gain'
-    rtb_Gain = rtP_CAN_ANGLE_DEG2ICUB * *rtu_messages_tx_foc_velocity;
+    u = rtP_CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.velocity;
 
     // DataTypeConversion: '<S1>/Data Type Conversion3'
-    if (rtb_Gain < 0.0F) {
-      rtb_Gain = std::ceil(rtb_Gain);
+    if (u < 0.0F) {
+      u = std::ceil(u);
     } else {
-      rtb_Gain = std::floor(rtb_Gain);
+      u = std::floor(u);
     }
 
-    if (rtIsNaNF(rtb_Gain) || rtIsInfF(rtb_Gain)) {
-      rtb_Gain = 0.0F;
+    if (rtIsNaNF(u) || rtIsInfF(u)) {
+      u = 0.0F;
     } else {
-      rtb_Gain = std::fmod(rtb_Gain, 65536.0F);
+      u = std::fmod(u, 65536.0F);
     }
 
-    rtb_DataTypeConversion3 = static_cast<int16_T>(rtb_Gain < 0.0F ?
+    rtb_DataTypeConversion3 = static_cast<int16_T>(u < 0.0F ?
       static_cast<int32_T>(static_cast<int16_T>(-static_cast<int16_T>(
-      static_cast<uint16_T>(-rtb_Gain)))) : static_cast<int32_T>
-      (static_cast<int16_T>(static_cast<uint16_T>(rtb_Gain))));
+      static_cast<uint16_T>(-u)))) : static_cast<int32_T>(static_cast<int16_T>(
+      static_cast<uint16_T>(u))));
 
     // End of DataTypeConversion: '<S1>/Data Type Conversion3'
 
+    // Gain: '<S1>/Gain1'
+    u = rtP_CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.position;
+
+    // DataTypeConversion: '<S1>/Data Type Conversion2'
+    if (u < 0.0F) {
+      u = std::ceil(u);
+    } else {
+      u = std::floor(u);
+    }
+
+    if (rtIsNaNF(u) || rtIsInfF(u)) {
+      u = 0.0F;
+    } else {
+      u = std::fmod(u, 4.2949673E+9F);
+    }
+
+    rtb_DataTypeConversion2 = u < 0.0F ? -static_cast<int32_T>
+      (static_cast<uint32_T>(-u)) : static_cast<int32_T>(static_cast<uint32_T>(u));
+
+    // End of DataTypeConversion: '<S1>/Data Type Conversion2'
+
     // MATLAB Function: '<S1>/MATLAB Function'
-    rty_pck_tx_packets_PAYLOAD[0] = static_cast<uint8_T>(rtb_DataTypeConversion1
+    arg_pck_tx.packets.PAYLOAD[0] = static_cast<uint8_T>(rtb_DataTypeConversion1
       & 255);
-    rty_pck_tx_packets_PAYLOAD[1] = static_cast<uint8_T>
+    arg_pck_tx.packets.PAYLOAD[1] = static_cast<uint8_T>
       ((rtb_DataTypeConversion1 & 32767) >> 8);
-    rty_pck_tx_packets_PAYLOAD[2] = static_cast<uint8_T>(rtb_DataTypeConversion3
+    arg_pck_tx.packets.PAYLOAD[2] = static_cast<uint8_T>(rtb_DataTypeConversion3
       & 255);
-    rty_pck_tx_packets_PAYLOAD[3] = static_cast<uint8_T>
+    arg_pck_tx.packets.PAYLOAD[3] = static_cast<uint8_T>
       ((rtb_DataTypeConversion3 & 32767) >> 8);
-    rty_pck_tx_packets_PAYLOAD[4] = static_cast<uint8_T>(rtb_DataTypeConversion2
+    arg_pck_tx.packets.PAYLOAD[4] = static_cast<uint8_T>(rtb_DataTypeConversion2
       & 255);
-    rty_pck_tx_packets_PAYLOAD[5] = static_cast<uint8_T>
+    arg_pck_tx.packets.PAYLOAD[5] = static_cast<uint8_T>
       ((rtb_DataTypeConversion2 & 65280) >> 8);
-    rty_pck_tx_packets_PAYLOAD[6] = static_cast<uint8_T>
+    arg_pck_tx.packets.PAYLOAD[6] = static_cast<uint8_T>
       ((rtb_DataTypeConversion2 & 16711680) >> 16);
-    rty_pck_tx_packets_PAYLOAD[7] = static_cast<uint8_T>
+    arg_pck_tx.packets.PAYLOAD[7] = static_cast<uint8_T>
       ((rtb_DataTypeConversion2 & MAX_int32_T) >> 24);
 
-    // Constant: '<S1>/Constant'
-    *rty_pck_tx_packets_ID = rtP_CAN_ID_HOST;
+    // BusCreator: '<S1>/Bus Creator1' incorporates:
+    //   Constant: '<S1>/Constant'
+
+    arg_pck_tx.packets.ID = rtP_CAN_ID_HOST;
 
     // DataTypeConversion: '<S1>/Data Type Conversion' incorporates:
     //   RelationalOperator: '<S2>/FixPt Relational Operator'
@@ -129,8 +125,13 @@ namespace can_messaging
     //
     //   Store in Global RAM
 
-    *rty_pck_tx_available = (*rtu_events_tx_foc !=
+    arg_pck_tx.available = (arg_events_tx.foc !=
       can_encoder_DW.DelayInput1_DSTATE);
+
+    // BusCreator: '<S1>/Bus Creator' incorporates:
+    //   Constant: '<S1>/lengths'
+
+    arg_pck_tx.lengths = 8U;
 
     // Update for UnitDelay: '<S2>/Delay Input1'
     //
@@ -138,7 +139,7 @@ namespace can_messaging
     //
     //   Store in Global RAM
 
-    can_encoder_DW.DelayInput1_DSTATE = *rtu_events_tx_foc;
+    can_encoder_DW.DelayInput1_DSTATE = arg_events_tx.foc;
 
     // End of Outputs for SubSystem: '<Root>/CAN_Encoder'
   }

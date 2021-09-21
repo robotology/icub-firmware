@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 1.267
+// Model version                  : 1.280
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:37 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:37 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -40,13 +40,9 @@ namespace can_messaging
    public:
     // Block signals for model 'can_decoder'
     struct B_can_decoder_T {
-      BUS_CAN_PACKET_RX BusConversion_InsertedFor_Decod;
-      BUS_MESSAGES_RX BusCreator2;     // '<S1>/Bus Creator2'
       BUS_MSG_DESIRED_CURRENT msg_desired_current;// '<S1>/Decoding Logic'
       BUS_MSG_CURRENT_LIMIT msg_set_current_limit;// '<S1>/Decoding Logic'
       BUS_MSG_CONTROL_MODE msg_set_control_mode;// '<S1>/Decoding Logic'
-      BUS_EVENTS_RX BusCreator1;       // '<S1>/Bus Creator1'
-      BUS_CAN_RX_ERRORS BusCreator3;   // '<S1>/Bus Creator3'
       CANErrorTypes error_type;        // '<S1>/Decoding Logic'
       boolean_T ev_set_control_mode;   // '<S1>/Decoding Logic'
       boolean_T ev_set_current_limit;  // '<S1>/Decoding Logic'
@@ -62,6 +58,7 @@ namespace can_messaging
       uint32_T ev_desired_currentEventCounter;// '<S1>/Decoding Logic'
       uint32_T ev_errorEventCounter;   // '<S1>/Decoding Logic'
       uint16_T cmd_processed;          // '<S1>/Decoding Logic'
+      uint8_T is_active_c3_can_decoder;// '<S1>/Decoding Logic'
       uint8_T is_SET_CONTROL_MODE;     // '<S1>/Decoding Logic'
       uint8_T is_active_SET_CONTROL_MODE;// '<S1>/Decoding Logic'
       uint8_T is_DESIRED_CURRENT;      // '<S1>/Decoding Logic'
@@ -70,6 +67,7 @@ namespace can_messaging
       uint8_T is_active_SET_CURRENT_LIMIT;// '<S1>/Decoding Logic'
       uint8_T is_ERROR_HANDLING;       // '<S1>/Decoding Logic'
       uint8_T is_active_ERROR_HANDLING;// '<S1>/Decoding Logic'
+      boolean_T ev_async;              // '<S1>/Decoding Logic'
     };
 
     // Real-time Model Data Structure
@@ -84,38 +82,12 @@ namespace can_messaging
     DW_can_decoder_T can_decoder_DW;
 
     // model step function
-    void step(const uint8_T *rtu_pck_rx_available, const CANClassTypes
-              *rtu_pck_rx_packets_ID_CLS, const uint8_T
-              *rtu_pck_rx_packets_ID_SRC, const uint8_T
-              *rtu_pck_rx_packets_ID_DST_TYP, const uint8_T
-              *rtu_pck_rx_packets_PAYLOAD_LEN, const boolean_T
-              *rtu_pck_rx_packets_PAYLOAD_CMD_, const uint8_T
-              *rtu_pck_rx_packets_PAYLOAD_CM_k, const uint8_T
-              rtu_pck_rx_packets_PAYLOAD_ARG[7], boolean_T
-              *rty_messages_rx_control_mode_mo, MCControlModes
-              *rty_messages_rx_control_mode__g, boolean_T
-              *rty_messages_rx_current_limit_m, int16_T
-              *rty_messages_rx_current_limit_n, uint16_T
-              *rty_messages_rx_current_limit_p, uint16_T
-              *rty_messages_rx_current_limit_o, int16_T
-              *rty_messages_rx_desired_current, boolean_T
-              *rty_events_rx_control_mode, boolean_T
-              *rty_events_rx_current_limit, boolean_T
-              *rty_events_rx_desired_current, boolean_T *rty_errors_rx_event,
-              CANErrorTypes *rty_errors_rx_type);
+    void step(const BUS_CAN_RX &arg_pck_rx, BUS_MESSAGES_RX &arg_messages_rx,
+              BUS_EVENTS_RX &arg_events_rx, BUS_CAN_RX_ERRORS &arg_errors_rx);
 
     // Initial conditions function
-    void init(boolean_T *rty_messages_rx_control_mode_mo, MCControlModes
-              *rty_messages_rx_control_mode__g, boolean_T
-              *rty_messages_rx_current_limit_m, int16_T
-              *rty_messages_rx_current_limit_n, uint16_T
-              *rty_messages_rx_current_limit_p, uint16_T
-              *rty_messages_rx_current_limit_o, int16_T
-              *rty_messages_rx_desired_current, boolean_T
-              *rty_events_rx_control_mode, boolean_T
-              *rty_events_rx_current_limit, boolean_T
-              *rty_events_rx_desired_current, boolean_T *rty_errors_rx_event,
-              CANErrorTypes *rty_errors_rx_type);
+    void init(BUS_MESSAGES_RX *arg_messages_rx, BUS_EVENTS_RX *arg_events_rx,
+              BUS_CAN_RX_ERRORS *arg_errors_rx);
 
     // Constructor
     CAN_Decoder();
@@ -137,7 +109,7 @@ namespace can_messaging
     // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
     int32_T can_de_safe_cast_to_MCStreaming(int32_T input);
     real_T can_decoder_merge_2bytes(real_T bl, real_T bh);
-    void can_decoder_ERROR_HANDLING(const uint8_T *rtu_pck_rx_available);
+    void can_decoder_ERROR_HANDLING(const BUS_CAN_RX *arg_pck_rx);
     real_T can_d_is_controlmode_recognized(real_T mode);
     int32_T can_safe_cast_to_MCControlModes(int32_T input);
   };

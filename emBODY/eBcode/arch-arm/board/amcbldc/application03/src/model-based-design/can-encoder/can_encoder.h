@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.315
+// Model version                  : 1.322
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Wed Aug  4 14:13:17 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:44 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -48,11 +48,6 @@ namespace can_messaging
       boolean_T DelayInput1_DSTATE;    // '<S2>/Delay Input1'
     };
 
-    // Invariant block signals for model 'can_encoder'
-    struct ConstB_can_encoder_h_T {
-      uint8_T lengths;                 // '<S1>/lengths'
-    };
-
     // Real-time Model Data Structure
     struct RT_MODEL_can_encoder_T {
       const char_T **errorStatus;
@@ -65,11 +60,8 @@ namespace can_messaging
     void initialize();
 
     // model step function
-    void step(const real32_T *rtu_messages_tx_foc_current, const real32_T
-              *rtu_messages_tx_foc_position, const real32_T
-              *rtu_messages_tx_foc_velocity, const boolean_T *rtu_events_tx_foc,
-              uint8_T *rty_pck_tx_available, uint16_T *rty_pck_tx_packets_ID,
-              uint8_T rty_pck_tx_packets_PAYLOAD[8]);
+    void step(const BUS_MESSAGES_TX &arg_messages_tx, const BUS_EVENTS_TX &
+              arg_events_tx, BUS_CAN &arg_pck_tx);
 
     // Constructor
     CAN_Encoder();
@@ -89,10 +81,6 @@ namespace can_messaging
     RT_MODEL_can_encoder_T can_encoder_M;
   };
 }
-
-// Invariant block signals (default storage)
-extern const can_messaging::CAN_Encoder::ConstB_can_encoder_h_T
-  can_encoder_ConstB;
 
 //-
 //  The generated code includes comments that allow you to trace directly

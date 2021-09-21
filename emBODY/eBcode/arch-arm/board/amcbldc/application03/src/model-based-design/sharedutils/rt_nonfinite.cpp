@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.314
+// Model version                  : 1.322
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Jul 20 13:35:44 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:44 2021
 //
 
 //

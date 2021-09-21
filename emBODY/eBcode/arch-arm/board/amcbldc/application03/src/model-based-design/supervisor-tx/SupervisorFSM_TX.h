@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 2.43
+// Model version                  : 2.50
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Wed Aug  4 14:13:07 2021
+// C/C++ source code generated on : Mon Sep 20 12:43:29 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -30,13 +30,13 @@ class SupervisorFSM_TXModelClass {
  public:
   // Block signals for model 'SupervisorFSM_TX'
   struct B_SupervisorFSM_TX_T {
-    BUS_MESSAGES_TX MessagesTx;        // '<Root>/Chart'
+    boolean_T ev_foc;                  // '<Root>/SupervisorFSM_TX'
   };
 
   // Block states (default storage) for model 'SupervisorFSM_TX'
   struct DW_SupervisorFSM_TX_T {
-    uint32_T ev_focEventCounter;       // '<Root>/Chart'
-    uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/Chart'
+    uint32_T ev_focEventCounter;       // '<Root>/SupervisorFSM_TX'
+    uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
   };
 
   // Real-time Model Data Structure
@@ -45,16 +45,12 @@ class SupervisorFSM_TXModelClass {
   };
 
   // model step function
-  void step(const real32_T *rtu_SensorsData_jointpositions_, const real32_T
-            *rtu_SensorsData_motorsensors_om, const real32_T
-            *rtu_SensorsData_motorsensors_cu, const MCControlModes
-            *rtu_MessagesRx_control_mode_mod, real32_T
-            *rty_MessagesTx_foc_current, real32_T *rty_MessagesTx_foc_position,
-            real32_T *rty_MessagesTx_foc_velocity, boolean_T *rty_EventsTx_foc);
+  void step(const SensorsData &arg_SensorsData, const BUS_MESSAGES_RX &
+            arg_MessagesRx, BUS_MESSAGES_TX &arg_MessagesTx, BUS_EVENTS_TX &
+            arg_EventsTx);
 
   // Initial conditions function
-  void init(real32_T *rty_MessagesTx_foc_current, real32_T
-            *rty_MessagesTx_foc_position, real32_T *rty_MessagesTx_foc_velocity);
+  void init(BUS_MESSAGES_TX *arg_MessagesTx, BUS_EVENTS_TX *arg_EventsTx);
 
   // Constructor
   SupervisorFSM_TXModelClass();
@@ -95,7 +91,7 @@ class SupervisorFSM_TXModelClass {
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'SupervisorFSM_TX'
-//  '<S1>'   : 'SupervisorFSM_TX/Chart'
+//  '<S1>'   : 'SupervisorFSM_TX/SupervisorFSM_TX'
 
 #endif                                 // RTW_HEADER_SupervisorFSM_TX_h_
 
