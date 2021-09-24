@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.322
+// Model version                  : 1.327
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:44 2021
+// C/C++ source code generated on : Tue Sep 21 16:48:15 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -33,8 +33,8 @@ extern real32_T rtP_CAN_ANGLE_DEG2ICUB;// Variable: CAN_ANGLE_DEG2ICUB
                                           //    '<S1>/Gain'
                                           //    '<S1>/Gain1'
 
-extern uint16_T rtP_CAN_ID_HOST;       // Variable: CAN_ID_HOST
-                                          //  Referenced by: '<S1>/Constant'
+extern uint8_T rtP_CAN_ID_AMC;         // Variable: CAN_ID_AMC
+                                          //  Referenced by: '<S1>/Constant1'
 
 
 // Class declaration for model can_encoder
@@ -100,6 +100,7 @@ namespace can_messaging
 //  '<S1>'   : 'can_encoder/CAN_Encoder'
 //  '<S2>'   : 'can_encoder/CAN_Encoder/Detect Change'
 //  '<S3>'   : 'can_encoder/CAN_Encoder/MATLAB Function'
+//  '<S4>'   : 'can_encoder/CAN_Encoder/format_can_id'
 
 #endif                                 // RTW_HEADER_can_encoder_h_
 
