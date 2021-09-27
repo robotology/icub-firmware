@@ -123,7 +123,7 @@ struct embot::app::application::theMBDagent::Impl
 		SupervisorFSM_TXModelClass supervisor_tx;
 		
 		control_outerModelClass control_outer;
-		static control_focModelClass control_foc;
+		control_focModelClass control_foc;
 		
 		can_messaging::CAN_Encoder can_encoder;
 		
@@ -180,7 +180,6 @@ struct embot::app::application::theMBDagent::Impl
             &(y->rty_Iq_fbk_current)
         );*/
         
-				//#warning setpwmUVW not found
         embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, y->rty_Vabc_PWM_ticks[0], y->rty_Vabc_PWM_ticks[1], y->rty_Vabc_PWM_ticks[2]);
     }
 };
@@ -224,8 +223,8 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 		embot::hw::motor::setADCcallback(embot::hw::MOTOR::one, inner_foc_callback, &rtu_control_foc, &rty_control_foc);
             
     control_outer.initialize();
-			#warning control_foc is not initialized because the follwing line doesn't compile
-    //embot::app::application::theMBDagent::Impl::control_foc.initialize();
+			
+    control_foc.initialize();
     
 			initted = true;        
     return initted;   
