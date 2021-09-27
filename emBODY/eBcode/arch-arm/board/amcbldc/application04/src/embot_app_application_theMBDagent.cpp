@@ -13,7 +13,7 @@
 #include "embot_app_application_theMBDagent.h"
 
 
-
+#include <string>
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -27,6 +27,9 @@
 
 #include "SupervisorFSM_RX.h"
 #include "SupervisorFSM_TX.h"
+
+#include "control_outer.h"
+#include "control_foc.h"
 
 #include "can_encoder.h"
 
@@ -61,6 +64,52 @@ struct embot::app::application::theMBDagent::Impl
 		
 		Flags flags;
 		Targets targets;
+		ConfigurationParameters config_params;
+		
+		struct OuterOutputs {
+			boolean_T velocity_enable;
+			boolean_T current_enable;
+			boolean_T out_enable;
+			real32_T motor_current;
+		};
+		
+		struct rtu_control_foc_T
+    {
+        boolean_T rtu_Flags_PID_reset = false;
+        
+        real32_T rtu_Config_motorconfig_Kp =    5.f;
+        real32_T rtu_Config_motorconfig_Ki = 1250.f;
+        
+        real32_T rtu_Config_motorconfig_Kbemf  = 0.f;
+        real32_T rtu_Config_motorconfig_Rphase = 0.f;
+        
+        real32_T rtu_Config_motorconfig_Vmax = 12.f;
+        real32_T rtu_Config_motorconfig_Vcc  = 24.f;
+        
+        real32_T rtu_Sensors_motorsensors_Iabc[3] = {0,0,0};
+        real32_T rtu_Sensors_motorsensors_angl_k = 0;
+        real32_T rtu_Sensors_motorsensors_omeg_k = 0;
+        uint8_T rtu_Sensors_motorsensors_hall_e  = 0;
+        
+        real32_T rtu_Targets_motorcurrent_curr_c = 0;
+        real32_T rtu_Targets_motorvoltage_volt_e = 0;
+        real32_T rtu_OuterOutputs_motorcurrent_d = 0;
+        
+        boolean_T rtu_OuterOutputs_vel_en = 0;
+        boolean_T rtu_OuterOutputs_cur_en = 0;
+        boolean_T rtu_OuterOutputs_out_en = 0;
+    };
+		
+		struct rty_control_foc_T
+    {
+        uint16_T rty_Vabc_PWM_ticks[3];
+        real32_T rty_Iq_fbk_current;
+    };
+		
+		rtu_control_foc_T rtu_control_foc;
+		rty_control_foc_T rty_control_foc;
+		
+		OuterOutputs outer_outputs;
 		
 		BUS_MESSAGES_TX bus_messages_tx;
 		BUS_EVENTS_TX bus_events_tx;
@@ -73,10 +122,67 @@ struct embot::app::application::theMBDagent::Impl
 		SupervisorFSM_RXModelClass supervisor_rx;
 		SupervisorFSM_TXModelClass supervisor_tx;
 		
+		control_outerModelClass control_outer;
+		static control_focModelClass control_foc;
+		
 		can_messaging::CAN_Encoder can_encoder;
 		
 		
-		
+		static void inner_foc_callback(int16_T Iuvw[3], void* rtu, void* rty)
+    {
+        rtu_control_foc_T* u = (rtu_control_foc_T*)rtu;
+        rty_control_foc_T* y = (rty_control_foc_T*)rty;
+         
+				#warning gethallstatus not found
+        //embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, u->rtu_Sensors_motorsensors_hall_e);
+        
+        embot::hw::motor::Position electricalAngle;
+        embot::hw::motor::getencoder(embot::hw::MOTOR::one, electricalAngle);
+        
+        u->rtu_Sensors_motorsensors_angl_k = real32_T(electricalAngle)*0.0054931640625f;
+        
+        static int noflood = 27000;
+        if (++noflood > 28000)
+        {
+            noflood = 0;
+            static char msg[64];
+            
+            sprintf(msg, "FOC %d %f\n", 
+            u->rtu_Sensors_motorsensors_hall_e,u->rtu_Sensors_motorsensors_angl_k);
+            
+            embot::core::print(msg);
+        }
+        
+        u->rtu_Sensors_motorsensors_Iabc[0] = 0.001f*Iuvw[0];
+        u->rtu_Sensors_motorsensors_Iabc[1] = 0.001f*Iuvw[1];
+        u->rtu_Sensors_motorsensors_Iabc[2] = 0.001f*Iuvw[2];
+        
+        #warning there is an extra argument called rtu_Sensors_motorsensors_hall_e not part of the generated function
+				/*control_foc.control_foc_ISR(
+            &(u->rtu_Flags_PID_reset), 
+            &(u->rtu_Config_motorconfig_Kp), 
+            &(u->rtu_Config_motorconfig_Ki), 
+            &(u->rtu_Config_motorconfig_Kbemf), 
+            &(u->rtu_Config_motorconfig_Rphase), 
+            &(u->rtu_Config_motorconfig_Vmax), 
+            &(u->rtu_Config_motorconfig_Vcc), 
+            u->rtu_Sensors_motorsensors_Iabc[0],
+            &(u->rtu_Sensors_motorsensors_angl_k),        
+            &(u->rtu_Sensors_motorsensors_omeg_k), 
+            &(u->rtu_Sensors_motorsensors_hall_e), 
+            &(u->rtu_Targets_motorcurrent_curr_c), 
+            &(u->rtu_Targets_motorvoltage_volt_e), 
+            &(u->rtu_OuterOutputs_vel_en), 
+            &(u->rtu_OuterOutputs_cur_en), 
+            &(u->rtu_OuterOutputs_out_en), 
+            &(u->rtu_OuterOutputs_motorcurrent_d), 
+            y->rty_Vabc_PWM_ticks,
+            &(y->rty_Iq_fbk_current)
+        );*/
+        
+				#warning setpwmUVW not found
+        // embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, y->rty_Vabc_PWM_ticks[0], y->rty_Vabc_PWM_ticks[1], y->rty_Vabc_PWM_ticks[2]);
+    }
 };
         
 
@@ -95,6 +201,14 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 		motor_sensors.threshold.temperature_high = 2;
 		motor_sensors.current = 1;
 		
+		config_params.PosLoopPID.P = 5.f;
+		config_params.PosLoopPID.I = 1250.f;
+		
+		config_params.VelLoopPID.P = 5.f;
+		config_params.VelLoopPID.I = 1250.f;
+		
+		config_params.DirLoopPID.P = 5.f;
+		config_params.DirLoopPID.I = 1250.f;
 		
 		can_decoder.init(&bus_messages_rx, &bus_events_rx, &bus_can_rx_errors);
 		
@@ -103,6 +217,8 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 		supervisor_tx.init(&bus_messages_tx, &bus_events_tx);
 		
 		can_encoder.initialize();
+		
+		control_outer.initialize();
 		
     initted = true;        
     return initted;   
@@ -137,10 +253,35 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 		
 		can_decoder.step(bus_can_rx, bus_messages_rx, bus_events_rx, bus_can_rx_errors);
 		
+		
 		InternalMessages internal_messages;
 		
     supervisor_rx.step(internal_messages, motor_sensors, bus_events_rx, bus_messages_rx, bus_can_rx_errors, flags, targets);
 		
+		control_outer.step(&flags.control_mode, &flags.PID_reset, 
+												&config_params.velocitylimits.limits[0],
+												&config_params.motorconfig.reduction,
+												&config_params.motorconfig.has_speed_sens,
+												&config_params.PosLoopPID.P,
+												&config_params.PosLoopPID.I,
+												&config_params.PosLoopPID.D,
+												&config_params.PosLoopPID.N,
+												&config_params.VelLoopPID.P,
+												&config_params.VelLoopPID.I,
+												&config_params.VelLoopPID.D,
+												&config_params.VelLoopPID.N,
+												&config_params.DirLoopPID.P,
+												&config_params.DirLoopPID.I,
+												&config_params.DirLoopPID.D,
+												&config_params.DirLoopPID.N,
+												&sensors_data.jointpositions.position,
+												&sensors_data.motorsensors.omega,
+												&targets.jointpositions.position,
+												&targets.jointvelocities.velocity,
+												&outer_outputs.velocity_enable,
+												&outer_outputs.current_enable,
+												&outer_outputs.out_enable,
+												&outer_outputs.motor_current);		
 		
 		sensors_data.jointpositions.position++;
 		

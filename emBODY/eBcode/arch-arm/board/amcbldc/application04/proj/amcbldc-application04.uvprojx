@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\FOCode\BLDC_FOC_Code\Current_FOC_ert_rtw;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\src\motorhal;..\src\control-foc\_sharedutils;..\..\..\..\..\..\eBcode\arch-arm\board\amcbldc\application02\src\control-foc\_sharedutils;..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder</IncludePath>
+              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\FOCode\BLDC_FOC_Code\Current_FOC_ert_rtw;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\src\motorhal;..\src\control-foc\_sharedutils;..\..\..\..\..\..\eBcode\arch-arm\board\amcbldc\application02\src\control-foc\_sharedutils;..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder;..\src\model-based-design\control-outer;..\src\model-based-design\control-foc;..\..\..\..\libs\highlevel\abslayer\hal2\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -808,7 +808,7 @@
                   <MiscControls></MiscControls>
                   <Define></Define>
                   <Undefine></Undefine>
-                  <IncludePath>..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder</IncludePath>
+                  <IncludePath>..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder;..\src\model-based-design\control-outer;..\src\model-based-design\control-foc</IncludePath>
                 </VariousControls>
               </Cads>
               <Aads>
@@ -1111,6 +1111,66 @@
               <FileName>can_encoder_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::control-outer</GroupName>
+          <Files>
+            <File>
+              <FileName>control_outer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer_types.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::control-foc</GroupName>
+          <Files>
+            <File>
+              <FileName>control_foc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>FOCInnerLoop.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-foc\FOCInnerLoop.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>FOCInnerLoop.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\FOCInnerLoop.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2228,6 +2288,66 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>mbd::control-outer</GroupName>
+          <Files>
+            <File>
+              <FileName>control_outer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer_types.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::control-foc</GroupName>
+          <Files>
+            <File>
+              <FileName>control_foc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>FOCInnerLoop.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-foc\FOCInnerLoop.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>FOCInnerLoop.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\FOCInnerLoop.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -3337,6 +3457,66 @@
               <FileName>can_encoder_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::control-outer</GroupName>
+          <Files>
+            <File>
+              <FileName>control_outer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_outer_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-outer\control_outer_types.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::control-foc</GroupName>
+          <Files>
+            <File>
+              <FileName>control_foc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>control_foc_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\control_foc_types.h</FilePath>
+            </File>
+            <File>
+              <FileName>FOCInnerLoop.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\control-foc\FOCInnerLoop.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>FOCInnerLoop.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\control-foc\FOCInnerLoop.h</FilePath>
             </File>
           </Files>
         </Group>
