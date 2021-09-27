@@ -11,6 +11,8 @@
 #include "motorhal_config.h"
 #endif
  
+ #include "embot_core.h"
+ 
 #if defined(USE_STM32HAL) 
 // API
 #include "encoder.h"
@@ -48,7 +50,10 @@
 /* Coversion factor from encoder step value to elctrical angle. It is given by:
  * encoderConvFactor = 65536 * number_of_poles / number_of_encoder_steps
  */
-static int16_t encoderConvFactor = 112;   
+static int16_t encoderConvFactor = 112;
+static volatile uint16_t electricalOffset = 0;
+static volatile bool encoderCalibrated = false;
+static volatile uint16_t encoderForcedValue = 0;
 
 
 /* Callbacks **********************************************************************************************************/
@@ -60,9 +65,8 @@ static int16_t encoderConvFactor = 112;
  */
 void encoderIndexCallback(TIM_HandleTypeDef *htim)
 {
-    /**************
-     * TO BE DONE *
-     **************/
+    //++encoderIndex;
+    embot::core::print("Index!!!");
 }
 
 
@@ -127,7 +131,12 @@ HAL_StatusTypeDef encoderInit(void)
 
     /* Start timers in encoder mode */
     if (HAL_OK != HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL)) return HAL_ERROR;
+    
     __HAL_TIM_SET_COUNTER(&htim2, 0);
+    
+    //HAL_TIMEx_DisableEncoderIndex(&htim2);
+
+    //HAL_TIMEx_EnableEncoderFirstIndex(&htim2);
     return HAL_OK;
 }
 
@@ -150,8 +159,43 @@ uint32_t encoderGetCounter(void)
  */
 uint16_t encoderGetElectricalAngle(void)
 {
+    if (encoderCalibrated) return electricalOffset + (__HAL_TIM_GET_COUNTER(&htim2) * encoderConvFactor) & 0xFFFF;
+    
+    return encoderForcedValue;
+}
+
+uint16_t encoderGetUncalibrated(void)
+{
     return (__HAL_TIM_GET_COUNTER(&htim2) * encoderConvFactor) & 0xFFFF;
 }
 
+/*******************************************************************************************************************//**
+ * @brief   Set encoder electrical-angle offset
+ * @param   uint16_t    Encoder offset
+ * @return  void
+ */
+
+void encoderForce(uint16_t value)
+{
+    encoderForcedValue = value;
+}
+
+void encoderCalibrate(uint16_t offset)
+{
+    char msg[32];
+    
+    sprintf(msg,"offset=%d\n",offset);
+    
+    embot::core::print(msg);
+    
+    electricalOffset = offset;
+    
+    encoderCalibrated = true;
+}
+
+uint16_t encoderGetElectricalOffset()
+{
+    return electricalOffset;
+}
 
 /* END OF FILE ********************************************************************************************************/

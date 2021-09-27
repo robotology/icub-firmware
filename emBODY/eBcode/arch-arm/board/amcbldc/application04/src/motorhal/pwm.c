@@ -12,6 +12,8 @@
 #include "motorhal_config.h"
 #endif
 
+ #include "embot_core.h"
+
 #if defined(USE_STM32HAL) 
 // API
 #include "pwm.h"
@@ -68,25 +70,55 @@
 
 /* Current value of the Hall sensors */ 
 static volatile uint8_t  hallStatus = 0;
-static volatile int16_t  pwmStatus = 0;
+static volatile uint8_t  hallStatus_old = 0;
 static volatile int32_t  hallCounter = 0;
 static volatile uint16_t hallAngle = 0;
-static volatile int16_t hallCurrentPhase = 0;
-static volatile int16_t hallCurrent = 0;
+
+static volatile bool calibrating = true;
+
+struct adc_callback_set_T
+{
+    void (*callback_fn)(int16_t Iuvw[3], void* rtu, void* rty) = NULL;
+    void* rtu = NULL;
+    void* rty = NULL;
+};
+
+static volatile adc_callback_set_T adc_callback_set;
+
+void setADC_cb(void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty)
+{
+    adc_callback_set.callback_fn = fn_cb;
+    adc_callback_set.rtu = rtu;
+    adc_callback_set.rty = rty;
+}
 
 #if defined(USE_STM32HAL) && defined(__cplusplus)
 constexpr uint16_t hallAngleTable[] =
 {
     /* ABC  (°)  */
     /* LLL ERROR */ 0,
-    /* LLH  300  */ static_cast<uint16_t>(300.0 * 65536.0 / 360.0 + 0.5), /* 54613 */
-    /* LHL  180  */ static_cast<uint16_t>(180.0 * 65536.0 / 360.0 + 0.5), /* 32768 */
-    /* LHH  240  */ static_cast<uint16_t>(240.0 * 65536.0 / 360.0 + 0.5), /* 43690 */
-    /* HLL   60  */ static_cast<uint16_t>( 60.0 * 65536.0 / 360.0 + 0.5), /* 10923 */
-    /* HLH    0  */ static_cast<uint16_t>(  0.0 * 65536.0 / 360.0 + 0.5), /*     0 */
-    /* HHL  120  */ static_cast<uint16_t>(120.0 * 65536.0 / 360.0 + 0.5), /* 21845 */
+    /* LLH  300  */ static_cast<uint16_t>(270.0 * 65536.0 / 360.0 + 0.5), /* 54613 */
+    /* LHL  180  */ static_cast<uint16_t>(150.0 * 65536.0 / 360.0 + 0.5), /* 32768 */
+    /* LHH  240  */ static_cast<uint16_t>(210.0 * 65536.0 / 360.0 + 0.5), /* 43690 */
+    /* HLL   60  */ static_cast<uint16_t>( 30.0 * 65536.0 / 360.0 + 0.5), /* 10923 */
+    /* HLH    0  */ static_cast<uint16_t>(330.0 * 65536.0 / 360.0 + 0.5), /*     0 */
+    /* HHL  120  */ static_cast<uint16_t>( 90.0 * 65536.0 / 360.0 + 0.5), /* 21845 */
     /* HHH ERROR */ static_cast<uint16_t>(0)
 };
+
+constexpr int16_t hallSectorTable[] =
+{
+    /* ABC  (°)  */
+    /* LLL ERROR */ 0,
+    /* LLH  270  */ 4, /* 54613 */
+    /* LHL  150  */ 2, /* 32768 */
+    /* LHH  210  */ 3, /* 43690 */
+    /* HLL   30  */ 0, /* 10923 */
+    /* HLH  -30  */ 5, /*     0 */
+    /* HHL   90  */ 1, /* 21845 */
+    /* HHH ERROR */ static_cast<uint16_t>(0)
+};
+
 #else
 static const uint16_t hallAngleTable[] =
 {
@@ -132,188 +164,97 @@ static const uint16_t hallAngleTable[] =
  *      LOW means that PHASEx is in LOW state (ENx = 1, PWMx = 0)
  *      PWM means that PHASEx is modulated with the pwm value (ENx = 1, PWMx = pwm)
  */
-static void hallSetPWM(int16_t pwm)
+
+static uint8_t updateHallStatus(void)
 {
-#ifdef USE_HALL_SENSORS
-    /* Remeber previous value */
-    uint8_t hall = hallStatus;
-#endif
+    hallStatus_old = hallStatus;
+    static int8_t calibration_step = 0;
+    
+    static uint16_t border[6]={0};
+    static uint8_t border_flag = 0;
     
     /* Read current value of HALL1, HALL2 and HALL3 signals in bits 2..0 */
     hallStatus = (((HALL1_GPIO_Port->IDR & HALL1_Pin) >> MSB(HALL1_Pin)) << 2)
                | (((HALL2_GPIO_Port->IDR & HALL2_Pin) >> MSB(HALL2_Pin)) << 1)
                | (((HALL3_GPIO_Port->IDR & HALL3_Pin) >> MSB(HALL3_Pin)) << 0);
-
-#ifdef USE_HALL_SENSORS
-    /* Current hall sensors status */
-    switch (hallStatus)
-    {
-        case 0x05:
-            /* PHASE1=pwm, PHASE2=-pwm, PHASE3=hiz */
-            EN1_GPIO_Port->BSRR = EN1_Pin | EN2_Pin | (EN3_Pin<<16) ;
-            /* CW rotation */
-            if (pwm >= 0)
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-                hallCurrentPhase = HALL_CURRENT_PHASE1;
-            }
-            /* CCW rotation */
-            else
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, -pwm);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-                hallCurrentPhase = HALL_CURRENT_PHASE2;
-            }
-            /* Verify previous HALL sensors status */
-            if      (hall == 0x01) ++hallCounter;
-            else if (hall == 0x04) --hallCounter;
-            break;
-
-        case 0x04:
-            /* PHASE1=pwm, PHASE2=hiz, PHASE3=-pwm */
-            EN1_GPIO_Port->BSRR = EN1_Pin | (EN2_Pin<<16) | EN3_Pin ;
-            /* CW rotation */
-            if (pwm >= 0)
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwm);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-                hallCurrentPhase = HALL_CURRENT_PHASE1;
-            }
-            /* CCW rotation */
-            else
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, -pwm);
-                hallCurrentPhase = HALL_CURRENT_PHASE3;
-            }
-            /* Verify previous HALL sensors status */
-            if      (hall == 0x05) ++hallCounter;
-            else if (hall == 0x06) --hallCounter;
-            break;
-
-        case 0x06:
-            /* PHASE1=hiz, PHASE2=pwm, PHASE3=-pwm */
-            EN1_GPIO_Port->BSRR = (EN1_Pin<<16) | EN2_Pin | EN3_Pin;
-            /* CW rotation */
-            if (pwm >= 0)
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, pwm);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-                hallCurrentPhase = HALL_CURRENT_PHASE2;
-            }
-            /* CCW rotation */
-            else
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, -pwm);
-                hallCurrentPhase = HALL_CURRENT_PHASE3;
-            }
-            /* Verify previous HALL sensors status */
-            if      (hall == 0x04) ++hallCounter;
-            else if (hall == 0x02) --hallCounter;
-            break;
-
-        case 0x02:
-            /* PHASE1=-pwm, PHASE2=pwm, PHASE3=hiz */
-            EN1_GPIO_Port->BSRR = EN1_Pin | EN2_Pin | (EN3_Pin<<16) ;
-            /* CW rotation */
-            if (pwm >= 0)
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, pwm);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-                hallCurrentPhase = HALL_CURRENT_PHASE2;
-            }
-            /* CCW rotation */
-            else
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, -pwm);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-                hallCurrentPhase = HALL_CURRENT_PHASE1;
-            }
-            /* Verify previous HALL sensors status */
-            if      (hall == 0x06) ++hallCounter;
-            else if (hall == 0x03) --hallCounter;
-            break;
-
-        case 0x03:
-            /* PHASE1=-pwm, PHASE2=hiz, PHASE3=pwm */
-            EN1_GPIO_Port->BSRR = EN1_Pin | (EN2_Pin<<16) | EN3_Pin ;
-            /* CW rotation */
-            if (pwm >= 0)
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, pwm);
-                hallCurrentPhase = HALL_CURRENT_PHASE3;
-            }
-            /* CCW rotation */
-            else
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, -pwm);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-                hallCurrentPhase = HALL_CURRENT_PHASE1;
-            }
-            /* Verify previous HALL sensors status */
-            if      (hall == 0x02) ++hallCounter;
-            else if (hall == 0x01) --hallCounter;
-            break;
-
-        case 0x01:
-            /* PHASE1=hiz, PHASE2=-pwm, PHASE3=pwm */
-            EN1_GPIO_Port->BSRR = (EN1_Pin<<16) | EN2_Pin | EN3_Pin;
-            /* CW rotation */
-            if (pwm >= 0)
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, pwm);
-                hallCurrentPhase = HALL_CURRENT_PHASE3;
-            }
-            /* CCW rotation */
-            else
-            {
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, -pwm);
-                __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-                hallCurrentPhase = HALL_CURRENT_PHASE2;
-            }
-            /* Verify previous HALL sensors status */
-            if      (hall == 0x03) ++hallCounter;
-            else if (hall == 0x05) --hallCounter;
-            break;
-
-        default:
-            /* ERROR: forbitten combination */
-#if defined(HALCONFIG_DONTUSE_LED) 
-#else 
-        ledSet(LED2, 0);
-#endif        
-            EN1_GPIO_Port->BSRR = ((EN3_Pin|EN2_Pin|EN1_Pin)<<16);
-            __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-            __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-            __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-            pwm = 0;
-            break;
-    }
-#endif
     
-    /* Update pwm status */
-    pwmStatus = pwm;
-
-    /* Update angle */
-    hallAngle = hallAngleTable[hallStatus];
+    int16_t sector = hallSectorTable[hallStatus];
+    static int16_t sector_old = sector;
+    
+    uint16_t angle = hallAngleTable[hallStatus];
+    
+    if (!hallStatus_old)
+    {            
+        hallCounter = 0;
+    
+        encoderForce(angle);
+    }
+    else
+    {
+        bool forward = ((sector-sector_old+6)%6)==1;
+        
+        if (forward) // forward
+        {
+            ++hallCounter;
+            
+            angle -= 5461; // -30 deg
+        }
+        else
+        {
+            --hallCounter;
+            
+            angle += 5461; // +30 deg
+        }
+        
+        if (calibration_step == 0)
+        {
+            encoderForce(angle);
+            
+            if (hallCounter < -50 || hallCounter > 50) // > npoles*6
+            {
+                // now the optical encoder is Index calibrated
+                calibration_step = 1;
+            }
+        }
+        else if (calibration_step == 1)
+        {
+            encoderForce(angle);
+            
+            uint8_t s = forward ? sector : (sector+1)%6;
+            
+            border[s] = encoderGetUncalibrated();
+            
+            border_flag |= 1<<s;
+            
+            if (border_flag == 63)
+            {
+                calibration_step = 2;
+                
+                int32_t offset = int16_t(border[0]);
+                offset += int16_t(border[1]-10923);
+                offset += int16_t(border[2]-21845);
+                offset += int16_t(border[3]-32768);
+                offset += int16_t(border[4]-43691);
+                offset += int16_t(border[5]-54613);
+                
+                offset /= 6;
+                     
+                embot::core::print("CALIBRATED\n");
+            
+                encoderCalibrate(-int16_t(offset));
+            }
+        }
+        //else if (calibration_step == 2)
+        //{   
+        //    encoderCalibrate(angle);
+        //}
+    }
+    
+    sector_old = sector;
+    hallStatus_old = hallStatus;
+    
+    return hallStatus;
 }
-
 
 /* Callback functions *************************************************************************************************/
 
@@ -334,8 +275,7 @@ static void pwmMotorFault_cb(TIM_HandleTypeDef *htim)
         __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
         __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
         __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
-        /* Null output voltage */
-        pwmStatus = 0;
+
         /* Advertise the fault */
 #if defined(HALCONFIG_DONTUSE_LED) 
 #else         
@@ -355,8 +295,7 @@ static void hallStatusChange_cb(TIM_HandleTypeDef *htim)
     /* Check TIM3 already initialized */
     if (TIM3 == htim->Instance)
     {
-        /* Generate the correct PWM configuration following the pwmStatus pattern */
-        hallSetPWM(pwmStatus);
+        updateHallStatus();
     }
 }
 
@@ -368,18 +307,36 @@ static void hallStatusChange_cb(TIM_HandleTypeDef *htim)
  */
 void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3)
 {
-    switch (hallCurrentPhase)
+    int16_t I[3];
+    
+    I[0] = raw2mAmps(i1);
+    I[1] = raw2mAmps(i2);
+    I[2] = raw2mAmps(i3);
+    
+    if (calibrating)
     {
-        case HALL_CURRENT_PHASE1:
-            hallCurrent = i1;
-            break;
-        case HALL_CURRENT_PHASE2:
-            hallCurrent = i2;
-            break;
-        case HALL_CURRENT_PHASE3:
-            hallCurrent = i3;
-            break;
-    }        
+        static int16_t counter = 0;
+        
+        if (counter < 1000)
+        {
+            ++counter;
+            
+            analogMovingAverage(i1, i2, i3);
+        }
+        else
+        {            
+            analogSetOffsetIph1(analogCph1() + analogGetOffsetIph1());
+            analogSetOffsetIph2(analogCph2() + analogGetOffsetIph2());
+            analogSetOffsetIph3(analogCph3() + analogGetOffsetIph3());
+            
+            calibrating = false;
+        }
+    }
+    
+    if (adc_callback_set.callback_fn && adc_callback_set.rtu && adc_callback_set.rty)
+    {
+        adc_callback_set.callback_fn(I, adc_callback_set.rtu, adc_callback_set.rty); 
+    }
 }
 
 
@@ -410,7 +367,9 @@ HAL_StatusTypeDef pwmInit(void)
     __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_BREAK);
 
     /* Reset the PWM value */
-    hallSetPWM(pwmStatus);
+    pwmSet(0, 0 ,0);
+    
+    updateHallStatus();
 
     /* Start TIM1 as 3-phase PWM generator */
     if (HAL_OK != HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1) ||
@@ -444,7 +403,7 @@ HAL_StatusTypeDef hallInit(void)
 
     /* Init angle */
     hallAngle = hallAngleTable[hallStatus];
-   
+    
     /* Start position counter */
     hallCounter = 0;
 
@@ -503,17 +462,6 @@ uint16_t hallGetStatus(void)
 
 
 /*******************************************************************************************************************//**
- * @brief   Read the phase current in hall 6-step mode
- * @param   void
- * @return  int16_t     Current in mA
- */
-int16_t hallGetCurrent(void)
-{
-    return hallStatus;
-}
-
-
-/*******************************************************************************************************************//**
  * @brief   Enter or Exit the SLEEP mode of the motor driver
  * @param   enable  It can assume one of the following values:
  *                  ENABLE      Motor driver in SLEEP mode: Power dissipation is limited but PWM is not allowed
@@ -552,9 +500,7 @@ HAL_StatusTypeDef pwmResetFault(void)
     pwmSleep(DISABLE);
     if (GPIO_PIN_SET == HAL_GPIO_ReadPin(nMFAULT_GPIO_Port, nMFAULT_Pin))
     {
-#ifdef USE_ENCODER_SENSORS
         pwmPhaseEnable(PWM_PHASE_ALL);
-#endif
         __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_BREAK);
         __HAL_TIM_CLEAR_IT(&htim1, TIM_IT_BREAK);
         __HAL_TIM_MOE_ENABLE(&htim1); HAL_Delay(10);
@@ -580,6 +526,8 @@ HAL_StatusTypeDef pwmResetFault(void)
  */
 void pwmSet(uint16_t u, uint16_t v, uint16_t w)
 {
+    if (calibrating) u = v = w = 0;
+    
     /* Saturate arguments */
     if (u > (uint16_t)MAX_PWM) u = MAX_PWM;
     if (v > (uint16_t)MAX_PWM) v = MAX_PWM;
@@ -616,25 +564,6 @@ void pwmPhaseEnable(uint16_t mask)
 void pwmPhaseDisable(uint16_t mask)
 {
     EN1_GPIO_Port->BSRR = ((uint32_t)mask & PWM_PHASE_ALL) << 16u;
-}
-
-/*******************************************************************************************************************//**
- * @brief   
- * @param   
- * @return  Function result
- */
-HAL_StatusTypeDef pwmSetValue(int32_t pwm)
-{
-    if ((pwm >= -(int32_t)MAX_PWM) && (pwm <= (int32_t)MAX_PWM))
-    {
-#ifdef USE_HALL_SENSORS
-        __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_CC1|TIM_IT_CC2|TIM_IT_CC3);
-        hallSetPWM(pwm);
-        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC1|TIM_IT_CC2|TIM_IT_CC3);
-#endif
-        return HAL_OK;
-    }
-    return HAL_ERROR;
 }
 
 #if defined(HALCONFIG_DONTUSE_TESTS)

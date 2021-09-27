@@ -133,8 +133,8 @@ struct embot::app::application::theMBDagent::Impl
         rtu_control_foc_T* u = (rtu_control_foc_T*)rtu;
         rty_control_foc_T* y = (rty_control_foc_T*)rty;
          
-				#warning gethallstatus not found
-        //embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, u->rtu_Sensors_motorsensors_hall_e);
+				//#warning gethallstatus not found
+        embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, u->rtu_Sensors_motorsensors_hall_e);
         
         embot::hw::motor::Position electricalAngle;
         embot::hw::motor::getencoder(embot::hw::MOTOR::one, electricalAngle);
@@ -180,8 +180,8 @@ struct embot::app::application::theMBDagent::Impl
             &(y->rty_Iq_fbk_current)
         );*/
         
-				#warning setpwmUVW not found
-        // embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, y->rty_Vabc_PWM_ticks[0], y->rty_Vabc_PWM_ticks[1], y->rty_Vabc_PWM_ticks[2]);
+				//#warning setpwmUVW not found
+        embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, y->rty_Vabc_PWM_ticks[0], y->rty_Vabc_PWM_ticks[1], y->rty_Vabc_PWM_ticks[2]);
     }
 };
         
@@ -215,12 +215,19 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 		supervisor_rx.init(&flags, &targets);
 		
 		supervisor_tx.init(&bus_messages_tx, &bus_events_tx);
-		
+				
 		can_encoder.initialize();
 		
-		control_outer.initialize();
+		// init motor
+		embot::hw::motor::init(embot::hw::MOTOR::one, {});
 		
-    initted = true;        
+		embot::hw::motor::setADCcallback(embot::hw::MOTOR::one, inner_foc_callback, &rtu_control_foc, &rty_control_foc);
+            
+    control_outer.initialize();
+			#warning control_foc is not initialized because the follwing line doesn't compile
+    //embot::app::application::theMBDagent::Impl::control_foc.initialize();
+    
+			initted = true;        
     return initted;   
 }
 

@@ -68,6 +68,9 @@ extern int32_t  analogSetOffsetIph2(int32_t offs);
 extern int32_t  analogGetOffsetIph3(void);
 extern int32_t  analogSetOffsetIph3(int32_t offs);
 
+extern int16_t raw2mAmps(int16_t raw);
+extern void analogMovingAverage(int16_t i1, int16_t i2, int16_t i3);
+
 extern void analogTest(void);
 
 #ifdef __cplusplus

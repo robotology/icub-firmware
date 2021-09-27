@@ -75,9 +75,9 @@ extern void pwmPhaseEnable(uint16_t mask);
 extern void pwmPhaseDisable(uint16_t mask);
 
 extern void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3);
-extern HAL_StatusTypeDef pwmSetValue(int32_t pwm); /* DEPRECATED */
 
 extern void pwmTest(void);
+extern void setADC_cb(void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty);
 
 
 #ifdef __cplusplus
