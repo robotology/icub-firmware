@@ -60,7 +60,6 @@ struct embot::app::application::theMBDagent::Impl
 		BUS_CAN_RX_ERRORS bus_can_rx_errors;
 		
 		SensorsData sensors_data;
-		MotorSensors motor_sensors;
 		
 		Flags flags;
 		Targets targets;
@@ -127,17 +126,17 @@ struct embot::app::application::theMBDagent::Impl
 		
 		can_messaging::CAN_Encoder can_encoder;
 		
-		
+		InternalMessages internal_messages;
+        
 		static void inner_foc_callback(int16_T Iuvw[3], void* rtu, void* rty)
     {
         rtu_control_foc_T* u = (rtu_control_foc_T*)rtu;
         rty_control_foc_T* y = (rty_control_foc_T*)rty;
          
-				//#warning gethallstatus not found
         embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, u->rtu_Sensors_motorsensors_hall_e);
         
         embot::hw::motor::Position electricalAngle;
-        embot::hw::motor::getencoder(embot::hw::MOTOR::one, electricalAngle);
+        embot::hw::motor::getencoder(embot::hw::MOTOR::one, electricalAngle); 
         
         u->rtu_Sensors_motorsensors_angl_k = real32_T(electricalAngle)*0.0054931640625f;
         
@@ -194,12 +193,12 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 
 		sensors_data.jointpositions.position = 0;
 		
-		motor_sensors.temperature = 1;
-		motor_sensors.threshold.current_high = 2;
-		motor_sensors.threshold.voltage_high = 2;
-		motor_sensors.threshold.temperature_high = 2;
-		motor_sensors.current = 1;
-		
+    sensors_data.motorsensors.temperature = 1;
+    sensors_data.motorsensors.threshold.current_high = 2;
+    sensors_data.motorsensors.threshold.voltage_high = 2;
+    sensors_data.motorsensors.threshold.temperature_high = 2;
+    sensors_data.motorsensors.current = 1;
+
 		config_params.PosLoopPID.P = 5.f;
 		config_params.PosLoopPID.I = 1250.f;
 		
@@ -260,9 +259,9 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 		can_decoder.step(bus_can_rx, bus_messages_rx, bus_events_rx, bus_can_rx_errors);
 		
 		
-		InternalMessages internal_messages;
 		
-    supervisor_rx.step(internal_messages, motor_sensors, bus_events_rx, bus_messages_rx, bus_can_rx_errors, flags, targets);
+		
+    supervisor_rx.step(internal_messages, sensors_data.motorsensors, bus_events_rx, bus_messages_rx, bus_can_rx_errors, flags, targets);
 		
 		control_outer.step(&flags.control_mode, &flags.PID_reset, 
 												&config_params.velocitylimits.limits[0],
