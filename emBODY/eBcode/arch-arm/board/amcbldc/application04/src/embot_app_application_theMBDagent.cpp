@@ -122,18 +122,18 @@ struct embot::app::application::theMBDagent::Impl
 		SupervisorFSM_TXModelClass supervisor_tx;
 		
 		control_outerModelClass control_outer;
-		control_focModelClass control_foc;
+        static control_focModelClass control_foc;
 		
 		can_messaging::CAN_Encoder can_encoder;
 		
 		InternalMessages internal_messages;
         
-		static void inner_foc_callback(int16_T Iuvw[3], void* rtu, void* rty)
+     static void inner_foc_callback(int16_T Iuvw[3], void* rtu, void* rty)
     {
         rtu_control_foc_T* u = (rtu_control_foc_T*)rtu;
         rty_control_foc_T* y = (rty_control_foc_T*)rty;
-         
-        embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, u->rtu_Sensors_motorsensors_hall_e);
+         //Currently we don't read hall sensor
+        //embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, u->rtu_Sensors_motorsensors_hall_e);
         
         embot::hw::motor::Position electricalAngle;
         embot::hw::motor::getencoder(embot::hw::MOTOR::one, electricalAngle); 
@@ -156,8 +156,7 @@ struct embot::app::application::theMBDagent::Impl
         u->rtu_Sensors_motorsensors_Iabc[1] = 0.001f*Iuvw[1];
         u->rtu_Sensors_motorsensors_Iabc[2] = 0.001f*Iuvw[2];
         
-        #warning there is an extra argument called rtu_Sensors_motorsensors_hall_e not part of the generated function
-				/*control_foc.control_foc_ISR(
+        control_foc.control_foc_ISR(
             &(u->rtu_Flags_PID_reset), 
             &(u->rtu_Config_motorconfig_Kp), 
             &(u->rtu_Config_motorconfig_Ki), 
@@ -165,10 +164,9 @@ struct embot::app::application::theMBDagent::Impl
             &(u->rtu_Config_motorconfig_Rphase), 
             &(u->rtu_Config_motorconfig_Vmax), 
             &(u->rtu_Config_motorconfig_Vcc), 
-            u->rtu_Sensors_motorsensors_Iabc[0],
+            &(u->rtu_Sensors_motorsensors_Iabc[0]),
             &(u->rtu_Sensors_motorsensors_angl_k),        
             &(u->rtu_Sensors_motorsensors_omeg_k), 
-            &(u->rtu_Sensors_motorsensors_hall_e), 
             &(u->rtu_Targets_motorcurrent_curr_c), 
             &(u->rtu_Targets_motorvoltage_volt_e), 
             &(u->rtu_OuterOutputs_vel_en), 
@@ -177,7 +175,7 @@ struct embot::app::application::theMBDagent::Impl
             &(u->rtu_OuterOutputs_motorcurrent_d), 
             y->rty_Vabc_PWM_ticks,
             &(y->rty_Iq_fbk_current)
-        );*/
+        );
         
         embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, y->rty_Vabc_PWM_ticks[0], y->rty_Vabc_PWM_ticks[1], y->rty_Vabc_PWM_ticks[2]);
     }
@@ -323,7 +321,7 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
     return true;
 }    
 
-
+control_focModelClass embot::app::application::theMBDagent::Impl::control_foc;
 // --------------------------------------------------------------------------------------------------------------------
 // - the class
 // --------------------------------------------------------------------------------------------------------------------
