@@ -72,41 +72,39 @@ struct embot::app::application::theMBDagent::Impl
 			real32_T motor_current;
 		};
 		
-		struct rtu_control_foc_T
-    {
-        boolean_T rtu_Flags_PID_reset = false;
-        
-        real32_T rtu_Config_motorconfig_Kp =    5.f;
-        real32_T rtu_Config_motorconfig_Ki = 1250.f;
-        
-        real32_T rtu_Config_motorconfig_Kbemf  = 0.f;
-        real32_T rtu_Config_motorconfig_Rphase = 0.f;
-        
-        real32_T rtu_Config_motorconfig_Vmax = 12.f;
-        real32_T rtu_Config_motorconfig_Vcc  = 24.f;
-        
-        real32_T rtu_Sensors_motorsensors_Iabc[3] = {0,0,0};
-        real32_T rtu_Sensors_motorsensors_angl_k = 0;
-        real32_T rtu_Sensors_motorsensors_omeg_k = 0;
-        uint8_T rtu_Sensors_motorsensors_hall_e  = 0;
-        
-        real32_T rtu_Targets_motorcurrent_curr_c = 0;
-        real32_T rtu_Targets_motorvoltage_volt_e = 0;
-        real32_T rtu_OuterOutputs_motorcurrent_d = 0;
-        
-        boolean_T rtu_OuterOutputs_vel_en = 0;
-        boolean_T rtu_OuterOutputs_cur_en = 0;
-        boolean_T rtu_OuterOutputs_out_en = 0;
-    };
+		struct FOC_inputs
+        {
+            boolean_T pid_reset;
+            
+            real32_T motorconfig_kp;
+            real32_T motorconfig_ki;
+            
+            real32_T motorconfig_Kbemf;
+            real32_T motorconfig_Rphase;
+            
+            real32_T motorconfig_Vmax;
+            real32_T motorconfig_Vcc;
+            
+            real32_T motorsensors_Iabc[3];
+            real32_T motorsensors_angle;
+            real32_T motorsensors_omega;
+            
+            real32_T motorcurrent_current;
+            real32_T motorvoltage_voltage;
+            real32_T OuterOutputs_desiredcurrent;
+            
+            boolean_T velocity_enable;
+            boolean_T current_enable;
+            boolean_T output_enable;
+        };
 		
-		struct rty_control_foc_T
-    {
-        uint16_T rty_Vabc_PWM_ticks[3];
-        real32_T rty_Iq_fbk_current;
-    };
+		struct FOC_outputs
+        {
+            uint16_T Vabc_PWM_ticks[3];
+            real32_T Iq_fbk_current;
+        };
 		
-		rtu_control_foc_T rtu_control_foc;
-		rty_control_foc_T rty_control_foc;
+		
 		
 		OuterOutputs outer_outputs;
 		
@@ -122,7 +120,10 @@ struct embot::app::application::theMBDagent::Impl
 		SupervisorFSM_TXModelClass supervisor_tx;
 		
 		control_outerModelClass control_outer;
-        static control_focModelClass control_foc;
+		static control_focModelClass control_foc;
+        
+        static FOC_inputs foc_inputs;
+        static FOC_outputs foc_outputs;
 		
 		can_messaging::CAN_Encoder can_encoder;
 		
@@ -130,55 +131,74 @@ struct embot::app::application::theMBDagent::Impl
         
      static void inner_foc_callback(int16_T Iuvw[3], void* rtu, void* rty)
     {
-        rtu_control_foc_T* u = (rtu_control_foc_T*)rtu;
-        rty_control_foc_T* y = (rty_control_foc_T*)rty;
+            FOC_inputs* u = (FOC_inputs*)rtu;
+            FOC_outputs* y = (FOC_outputs*)rty;
          //Currently we don't read hall sensor
         //embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, u->rtu_Sensors_motorsensors_hall_e);
         
         embot::hw::motor::Position electricalAngle;
         embot::hw::motor::getencoder(embot::hw::MOTOR::one, electricalAngle); 
         
-        u->rtu_Sensors_motorsensors_angl_k = real32_T(electricalAngle)*0.0054931640625f;
+        u->motorsensors_angle = real32_T(electricalAngle)*0.0054931640625f;
+        u->motorsensors_Iabc[0] = 0.001f*Iuvw[0];
+        u->motorsensors_Iabc[1] = 0.001f*Iuvw[1];
+        u->motorsensors_Iabc[2] = 0.001f*Iuvw[2];
         
-        static int noflood = 27000;
-        if (++noflood > 28000)
-        {
-            noflood = 0;
-            static char msg[64];
-            
-            sprintf(msg, "FOC %d %f\n", 
-            u->rtu_Sensors_motorsensors_hall_e,u->rtu_Sensors_motorsensors_angl_k);
-            
-            embot::core::print(msg);
-        }
-        
-        u->rtu_Sensors_motorsensors_Iabc[0] = 0.001f*Iuvw[0];
-        u->rtu_Sensors_motorsensors_Iabc[1] = 0.001f*Iuvw[1];
-        u->rtu_Sensors_motorsensors_Iabc[2] = 0.001f*Iuvw[2];
-        
+//        control_foc.control_foc_ISR(
+//            &(u->rtu_Flags_PID_reset), 
+//            &(u->rtu_Config_motorconfig_Kp), 
+//            &(u->rtu_Config_motorconfig_Ki), 
+//            &(u->rtu_Config_motorconfig_Kbemf), 
+//            &(u->rtu_Config_motorconfig_Rphase), 
+//            &(u->rtu_Config_motorconfig_Vmax), 
+//            &(u->rtu_Config_motorconfig_Vcc), 
+//            &(u->rtu_Sensors_motorsensors_Iabc[0]),
+//            &(u->rtu_Sensors_motorsensors_angl_k),        
+//            &(u->rtu_Sensors_motorsensors_omeg_k), 
+//            &(u->rtu_Targets_motorcurrent_curr_c), 
+//            &(u->rtu_Targets_motorvoltage_volt_e), 
+//            &(u->rtu_OuterOutputs_vel_en), 
+//            &(u->rtu_OuterOutputs_cur_en), 
+//            &(u->rtu_OuterOutputs_out_en), 
+//            &(u->rtu_OuterOutputs_motorcurrent_d), 
+//            y->rty_Vabc_PWM_ticks,
+//            &(y->rty_Iq_fbk_current)
+//        );
+
         control_foc.control_foc_ISR(
-            &(u->rtu_Flags_PID_reset), 
-            &(u->rtu_Config_motorconfig_Kp), 
-            &(u->rtu_Config_motorconfig_Ki), 
-            &(u->rtu_Config_motorconfig_Kbemf), 
-            &(u->rtu_Config_motorconfig_Rphase), 
-            &(u->rtu_Config_motorconfig_Vmax), 
-            &(u->rtu_Config_motorconfig_Vcc), 
-            &(u->rtu_Sensors_motorsensors_Iabc[0]),
-            &(u->rtu_Sensors_motorsensors_angl_k),        
-            &(u->rtu_Sensors_motorsensors_omeg_k), 
-            &(u->rtu_Targets_motorcurrent_curr_c), 
-            &(u->rtu_Targets_motorvoltage_volt_e), 
-            &(u->rtu_OuterOutputs_vel_en), 
-            &(u->rtu_OuterOutputs_cur_en), 
-            &(u->rtu_OuterOutputs_out_en), 
-            &(u->rtu_OuterOutputs_motorcurrent_d), 
-            y->rty_Vabc_PWM_ticks,
-            &(y->rty_Iq_fbk_current)
-        );
+              &(u->pid_reset),
+              &(u->motorconfig_kp),
+              &(u->motorconfig_ki),
+              &(u->motorconfig_Kbemf),
+              &(u->motorconfig_Rphase),
+              &(u->motorconfig_Vmax),
+              &(u->motorconfig_Vcc),
+              &(u->motorsensors_Iabc[0]),
+              &(u->motorsensors_angle),
+              &(u->motorsensors_omega),
+              &(u->motorcurrent_current),
+              &(u->motorvoltage_voltage),
+              &(u->velocity_enable),
+              &(u->current_enable),
+              &(u->output_enable),
+              &(u->OuterOutputs_desiredcurrent),
+              y->Vabc_PWM_ticks,
+              &(y->Iq_fbk_current));
+              
+        embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, y->Vabc_PWM_ticks[0], y->Vabc_PWM_ticks[1], y->Vabc_PWM_ticks[2]);
         
-        embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, y->rty_Vabc_PWM_ticks[0], y->rty_Vabc_PWM_ticks[1], y->rty_Vabc_PWM_ticks[2]);
+        static char msg2[64];
+        static uint32_t counter;
+        if(counter % 1000 == 0){
+        sprintf(msg2, "PWM [%d, %d, %d] ---[%.3f]--- [%.3f, %.3f, %d]\n",  y->Vabc_PWM_ticks[0], y->Vabc_PWM_ticks[1], y->Vabc_PWM_ticks[2], y->Iq_fbk_current, u->motorcurrent_current, u->OuterOutputs_desiredcurrent, u->output_enable);
+            //sprintf(msg2, "[%d]\n", u->output_enable);
+            embot::core::print(msg2);
+            counter = 0;
+        }
+        counter++;
+        
     }
+    
 };
         
 
@@ -188,9 +208,13 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     {
         return true;
     }   
-
-		sensors_data.jointpositions.position = 0;
-		
+    
+    foc_inputs.motorconfig_kp = 9;
+    foc_inputs.motorconfig_ki = 500;
+    foc_inputs.motorconfig_Vmax = 7;
+    foc_inputs.motorconfig_Vcc = 24;
+    
+	sensors_data.jointpositions.position = 0;
     sensors_data.motorsensors.temperature = 1;
     sensors_data.motorsensors.threshold.current_high = 2;
     sensors_data.motorsensors.threshold.voltage_high = 2;
@@ -217,7 +241,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 		// init motor
 		embot::hw::motor::init(embot::hw::MOTOR::one, {});
 		
-		embot::hw::motor::setADCcallback(embot::hw::MOTOR::one, inner_foc_callback, &rtu_control_foc, &rty_control_foc);
+		embot::hw::motor::setADCcallback(embot::hw::MOTOR::one, inner_foc_callback, &foc_inputs, &foc_outputs);
             
     control_outer.initialize();
 			
@@ -257,9 +281,12 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 		can_decoder.step(bus_can_rx, bus_messages_rx, bus_events_rx, bus_can_rx_errors);
 		
 		
-		
-		
     supervisor_rx.step(internal_messages, sensors_data.motorsensors, bus_events_rx, bus_messages_rx, bus_can_rx_errors, flags, targets);
+        
+//        static char msg2[64];
+//        sprintf(msg2, "[%.3f, %.3f -- %d, %d]\n", targets.motorcurrent.current, targets.motorvoltage.voltage, bus_can_rx_errors.event, bus_events_rx.desired_current);
+//        sprintf(msg2, "[%d, %d]\n", flags.control_mode, outer_outputs.out_enable);
+//        embot::core::print(msg2);
 		
 		control_outer.step(&flags.control_mode, &flags.PID_reset, 
 												&config_params.velocitylimits.limits[0],
@@ -284,8 +311,22 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 												&outer_outputs.velocity_enable,
 												&outer_outputs.current_enable,
 												&outer_outputs.out_enable,
-												&outer_outputs.motor_current);		
+												&outer_outputs.motor_current);	
+
+
 		
+        foc_inputs.pid_reset = flags.PID_reset;
+        foc_inputs.motorconfig_Kbemf = config_params.motorconfig.Kbemf;
+        foc_inputs.motorconfig_Rphase = config_params.motorconfig.Rphase;
+        foc_inputs.motorsensors_angle = sensors_data.motorsensors.angle;
+        foc_inputs.motorsensors_omega = sensors_data.motorsensors.omega;
+        foc_inputs.motorcurrent_current = targets.motorcurrent.current;
+        foc_inputs.motorvoltage_voltage = targets.motorvoltage.voltage;
+        foc_inputs.OuterOutputs_desiredcurrent = outer_outputs.motor_current;
+        foc_inputs.velocity_enable = outer_outputs.velocity_enable;
+        foc_inputs.current_enable = outer_outputs.current_enable;
+        foc_inputs.output_enable = outer_outputs.out_enable;
+        
 		sensors_data.jointpositions.position++;
 		
 		if (sensors_data.jointpositions.position > 2000) {
@@ -294,8 +335,12 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 		
 		
 		supervisor_tx.step(sensors_data, bus_messages_rx, bus_messages_tx, bus_events_tx);
+        
 		
 		can_encoder.step(bus_messages_tx, bus_events_tx, output);
+        
+        
+        
 		
 //		std::string control_mode_string {"Not Configured"};
 		
@@ -322,6 +367,8 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 }    
 
 control_focModelClass embot::app::application::theMBDagent::Impl::control_foc;
+embot::app::application::theMBDagent::Impl::FOC_inputs embot::app::application::theMBDagent::Impl::foc_inputs;
+embot::app::application::theMBDagent::Impl::FOC_outputs embot::app::application::theMBDagent::Impl::foc_outputs;
 // --------------------------------------------------------------------------------------------------------------------
 // - the class
 // --------------------------------------------------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.44
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:16 2021
+// C/C++ source code generated on : Wed Sep 29 15:20:53 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -500,8 +500,8 @@ void SupervisorFSM_RXModelClass::step(const InternalMessages &
             SupervisorFSM_RX_DW.EventsRx_control_mode_start) {
           arg_Flags.control_mode = SupervisorFSM_RX_convert
             (arg_MessagesRx.control_mode.mode);
-        } else if (SupervisorFSM_RX_DW.EventsRx_desired_current_prev !=
-                   SupervisorFSM_RX_DW.EventsRx_desired_current_start) {
+        } else if (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
+                   SupervisorFSM_RX_DW.EventsRx_current_limit_start) {
           b_previousEvent = SupervisorFSM_RX_DW.sfEvent;
           SupervisorFSM_RX_DW.sfEvent = Superv_event_SetCurrentLimitEvt;
           if (SupervisorFSM_RX_DW.is_active_FAULT_HANDLER != 0U) {
@@ -510,8 +510,8 @@ void SupervisorFSM_RXModelClass::step(const InternalMessages &
           }
 
           SupervisorFSM_RX_DW.sfEvent = b_previousEvent;
-        } else if (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
-                   SupervisorFSM_RX_DW.EventsRx_current_limit_start) {
+        } else if (SupervisorFSM_RX_DW.EventsRx_desired_current_prev !=
+                   SupervisorFSM_RX_DW.EventsRx_desired_current_start) {
           arg_Targets.motorcurrent.current =
             arg_MessagesRx.desired_current.current;
         }
