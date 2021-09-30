@@ -186,6 +186,8 @@ static uint8_t updateHallStatus(void)
     if (!hallStatus_old)
     {            
         hallCounter = 0;
+        
+        encoderReset();
     
         encoderForce(angle);
     }
@@ -205,16 +207,16 @@ static uint8_t updateHallStatus(void)
             
             angle += 5461; // +30 deg
         }
-        
+  
         if (calibration_step == 0)
         {
             encoderForce(angle);
             
-            if (hallCounter < -50 || hallCounter > 50) // > npoles*6
-            {
+            //if (hallCounter < -50 || hallCounter > 50) // > npoles*6
+            //{
                 // now the optical encoder is Index calibrated
                 calibration_step = 1;
-            }
+            //}
         }
         else if (calibration_step == 1)
         {
@@ -359,7 +361,7 @@ HAL_StatusTypeDef pwmInit(void)
     if (0 == (MainConf.pwm.mode & PWM_CONF_MODE_MASK))
     {
         MainConf.pwm.mode = PWM_CONF_MODE_HALL;
-        MainConf.pwm.poles = 7;
+        MainConf.pwm.poles = 8;//7; // // //
     }
         
     /* Register the required TIM1 callback functions */

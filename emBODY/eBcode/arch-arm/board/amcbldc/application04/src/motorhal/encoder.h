@@ -45,6 +45,7 @@ typedef struct
 
 extern HAL_StatusTypeDef encoderInit(void);
 extern uint32_t encoderGetCounter(void);
+extern void encoderReset();
 
 extern uint16_t encoderGetElectricalAngle(void);
 extern void encoderForce(uint16_t value);

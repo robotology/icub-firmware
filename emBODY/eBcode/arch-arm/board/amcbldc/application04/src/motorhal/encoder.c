@@ -50,7 +50,7 @@
 /* Coversion factor from encoder step value to elctrical angle. It is given by:
  * encoderConvFactor = 65536 * number_of_poles / number_of_encoder_steps
  */
-static int16_t encoderConvFactor = 112;
+static const int16_t encoderConvFactor = 64;
 static volatile uint16_t electricalOffset = 0;
 static volatile bool encoderCalibrated = false;
 static volatile uint16_t encoderForcedValue = 0;
@@ -88,11 +88,11 @@ HAL_StatusTypeDef encoderInit(void)
         MainConf.encoder.mode   = TIM_ENCODERMODE_TI12;
         MainConf.encoder.filter = 4;
         MainConf.encoder.idxpos = TIM_ENCODERINDEX_POSITION_00;
-        MainConf.encoder.nsteps = 4096;
+        MainConf.encoder.nsteps = 1024;
     }
 
     /* Forced, for now */
-    encoderConvFactor = 112;   
+    // encoderConvFactor = 112;   
     
     /* Re-configure TIM2 base, IC1 and IC2 */
     htim2.Instance = TIM2;
@@ -118,6 +118,7 @@ HAL_StatusTypeDef encoderInit(void)
     if (HAL_OK != HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig)) return HAL_ERROR;
 
     /* Configure the INDEX mode */
+    /*
     sEncoderIndexConfig.Polarity = TIM_ENCODERINDEX_POLARITY_NONINVERTED;
     sEncoderIndexConfig.Prescaler = TIM_ENCODERINDEX_PRESCALER_DIV1;
     sEncoderIndexConfig.Filter = MainConf.encoder.filter;
@@ -125,18 +126,17 @@ HAL_StatusTypeDef encoderInit(void)
     sEncoderIndexConfig.Position = MainConf.encoder.idxpos;
     sEncoderIndexConfig.Direction = TIM_ENCODERINDEX_DIRECTION_UP_DOWN;
     if (HAL_OK != HAL_TIMEx_ConfigEncoderIndex(&htim2, &sEncoderIndexConfig)) return HAL_ERROR;
-
+    */
     /* Register the callback function used to signal the activation of the Index pulse */
-    if (HAL_OK != HAL_TIM_RegisterCallback(&htim2, HAL_TIM_ENCODER_INDEX_CB_ID, encoderIndexCallback)) return HAL_ERROR;
+    //if (HAL_OK != HAL_TIM_RegisterCallback(&htim2, HAL_TIM_ENCODER_INDEX_CB_ID, encoderIndexCallback)) return HAL_ERROR;
+
+    HAL_TIMEx_DisableEncoderIndex(&htim2);
 
     /* Start timers in encoder mode */
     if (HAL_OK != HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL)) return HAL_ERROR;
     
     __HAL_TIM_SET_COUNTER(&htim2, 0);
-    
-    //HAL_TIMEx_DisableEncoderIndex(&htim2);
-
-    //HAL_TIMEx_EnableEncoderFirstIndex(&htim2);
+  
     return HAL_OK;
 }
 
@@ -151,6 +151,11 @@ uint32_t encoderGetCounter(void)
     return (uint32_t)__HAL_TIM_GET_COUNTER(&htim2);
 }
 
+
+void encoderReset()
+{
+    __HAL_TIM_SET_COUNTER(&htim2, 0);
+}
 
 /*******************************************************************************************************************//**
  * @brief   Read encoder value and convert to electrical-angle
