@@ -59,7 +59,7 @@ struct embot::app::application::theMBDagent::Impl
 		BUS_EVENTS_RX bus_events_rx;
 		BUS_CAN_RX_ERRORS bus_can_rx_errors;
 		
-		SensorsData sensors_data;
+		static SensorsData sensors_data;
 		
 		Flags flags;
 		Targets targets;
@@ -140,11 +140,22 @@ struct embot::app::application::theMBDagent::Impl
         embot::hw::motor::Position electricalAngle;
         embot::hw::motor::getencoder(embot::hw::MOTOR::one, electricalAngle); 
         
+        static uint16_t electricalAngleOld = electricalAngle;
+        int16_t delta = electricalAngle - electricalAngleOld;
+        electricalAngleOld = electricalAngle;
+        static real32_T speed = 0;
+        speed = 0.9f*speed + 0.1f*(static_cast<real32_T>(delta));
+        
         u->motorsensors_angle = real32_T(electricalAngle)*0.0054931640625f;
         u->motorsensors_Iabc[0] = 0.001f*Iuvw[0];
         u->motorsensors_Iabc[1] = 0.001f*Iuvw[1];
         u->motorsensors_Iabc[2] = 0.001f*Iuvw[2];
         
+        sensors_data.motorsensors.current = static_cast<real32_T>(0.001f*Iuvw[0]);
+        sensors_data.jointpositions.position = static_cast<real32_T>(electricalAngle * 0.0054931640625f) / 8;
+        sensors_data.motorsensors.omega = speed;
+        
+
 //        control_foc.control_foc_ISR(
 //            &(u->rtu_Flags_PID_reset), 
 //            &(u->rtu_Config_motorconfig_Kp), 
@@ -208,7 +219,9 @@ struct embot::app::application::theMBDagent::Impl
         static uint32_t counter;
         if(counter % 1000 == 0)
         {
-            sprintf(msg2, "PWM[%d, %d, %d] - trg[%.3f] - srs[%.3f, %.3f, %.3f] - en[%d]\n",  y->Vabc_PWM_ticks[0], y->Vabc_PWM_ticks[1], y->Vabc_PWM_ticks[2], u->motorcurrent_current, u->motorsensors_Iabc[0],  u->motorsensors_Iabc[1],  u->motorsensors_Iabc[2] , u->output_enable);
+            
+            sprintf(msg2, "[%.3f, %.3f]\n", sensors_data.jointpositions.position, sensors_data.motorsensors.omega);
+            //sprintf(msg2, "PWM[%d, %d, %d] - trg[%.3f] - srs[%.3f, %.3f, %.3f] - en[%d]\n",  y->Vabc_PWM_ticks[0], y->Vabc_PWM_ticks[1], y->Vabc_PWM_ticks[2], u->motorcurrent_current, u->motorsensors_Iabc[0],  u->motorsensors_Iabc[1],  u->motorsensors_Iabc[2] , u->output_enable);
             //sprintf(msg2, "[%d]\n", u->output_enable);
             embot::core::print(msg2);
             counter = 0;
@@ -236,10 +249,9 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     
 	sensors_data.jointpositions.position = 0;
     sensors_data.motorsensors.temperature = 1;
-    sensors_data.motorsensors.threshold.current_high = 2;
-    sensors_data.motorsensors.threshold.voltage_high = 2;
-    sensors_data.motorsensors.threshold.temperature_high = 2;
-    sensors_data.motorsensors.current = 1;
+    sensors_data.motorsensors.threshold.current_high = 100;
+    sensors_data.motorsensors.threshold.voltage_high = 100;
+    sensors_data.motorsensors.threshold.temperature_high = 100;
 
 //		config_params.PosLoopPID.P = 5.f;
 //		config_params.PosLoopPID.I = 1250.f;
@@ -346,17 +358,9 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
         foc_inputs.velocity_enable = outer_outputs.velocity_enable;
         foc_inputs.current_enable = outer_outputs.current_enable;
         foc_inputs.output_enable = outer_outputs.out_enable;
-        
-		sensors_data.jointpositions.position++;
-		
-		if (sensors_data.jointpositions.position > 2000) {
-			sensors_data.jointpositions.position = 0;
-		}
-		
-		
+	
 		supervisor_tx.step(sensors_data, bus_messages_rx, bus_messages_tx, bus_events_tx);
-        
-		
+ 
 		can_encoder.step(bus_messages_tx, bus_events_tx, output);
         
         
@@ -390,6 +394,7 @@ bool embot::app::application::theMBDagent::Impl::motor_enabled_prev;
 control_focModelClass embot::app::application::theMBDagent::Impl::control_foc;
 embot::app::application::theMBDagent::Impl::FOC_inputs embot::app::application::theMBDagent::Impl::foc_inputs;
 embot::app::application::theMBDagent::Impl::FOC_outputs embot::app::application::theMBDagent::Impl::foc_outputs;
+SensorsData embot::app::application::theMBDagent::Impl::sensors_data;
 // --------------------------------------------------------------------------------------------------------------------
 // - the class
 // --------------------------------------------------------------------------------------------------------------------
