@@ -124,6 +124,7 @@ struct embot::app::application::theMBDagent::Impl
         
         static FOC_inputs foc_inputs;
         static FOC_outputs foc_outputs;
+        static bool motor_enabled_prev;
 		
 		can_messaging::CAN_Encoder can_encoder;
 		
@@ -185,12 +186,29 @@ struct embot::app::application::theMBDagent::Impl
               y->Vabc_PWM_ticks,
               &(y->Iq_fbk_current));
               
+        bool output_enable_b = static_cast<bool>(u->output_enable);
+        if(motor_enabled_prev != output_enable_b)
+        {
+            if(output_enable_b)
+            {
+                embot::hw::motor::motorEnable(embot::hw::MOTOR::one);
+            }
+            else
+            {
+                embot::hw::motor::motorDisable(embot::hw::MOTOR::one);
+            }
+        }
+        
+        motor_enabled_prev = output_enable_b;
+        
+        
         embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, y->Vabc_PWM_ticks[0], y->Vabc_PWM_ticks[1], y->Vabc_PWM_ticks[2]);
         
         static char msg2[64];
         static uint32_t counter;
-        if(counter % 1000 == 0){
-        sprintf(msg2, "PWM [%d, %d, %d] ---[%.3f]--- [%.3f, %.3f, %d]\n",  y->Vabc_PWM_ticks[0], y->Vabc_PWM_ticks[1], y->Vabc_PWM_ticks[2], y->Iq_fbk_current, u->motorcurrent_current, u->OuterOutputs_desiredcurrent, u->output_enable);
+        if(counter % 1000 == 0)
+        {
+            sprintf(msg2, "PWM[%d, %d, %d] - trg[%.3f] - srs[%.3f, %.3f, %.3f] - en[%d]\n",  y->Vabc_PWM_ticks[0], y->Vabc_PWM_ticks[1], y->Vabc_PWM_ticks[2], u->motorcurrent_current, u->motorsensors_Iabc[0],  u->motorsensors_Iabc[1],  u->motorsensors_Iabc[2] , u->output_enable);
             //sprintf(msg2, "[%d]\n", u->output_enable);
             embot::core::print(msg2);
             counter = 0;
@@ -210,6 +228,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     }   
     
     foc_inputs.motorconfig_kp = 9;
+    motor_enabled_prev = false;
     foc_inputs.motorconfig_ki = 500;
     foc_inputs.motorconfig_Vmax = 7;
     foc_inputs.motorconfig_Vcc = 24;
@@ -366,6 +385,7 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
     return true;
 }    
 
+bool embot::app::application::theMBDagent::Impl::motor_enabled_prev;
 control_focModelClass embot::app::application::theMBDagent::Impl::control_foc;
 embot::app::application::theMBDagent::Impl::FOC_inputs embot::app::application::theMBDagent::Impl::foc_inputs;
 embot::app::application::theMBDagent::Impl::FOC_outputs embot::app::application::theMBDagent::Impl::foc_outputs;
