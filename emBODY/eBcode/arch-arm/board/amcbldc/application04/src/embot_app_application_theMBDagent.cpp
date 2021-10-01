@@ -227,10 +227,11 @@ bool embot::app::application::theMBDagent::Impl::initialise()
         return true;
     }   
     
-    foc_inputs.motorconfig_kp = 9;
     motor_enabled_prev = false;
+    
+    foc_inputs.motorconfig_kp = 2;
     foc_inputs.motorconfig_ki = 500;
-    foc_inputs.motorconfig_Vmax = 7;
+    foc_inputs.motorconfig_Vmax = 9;
     foc_inputs.motorconfig_Vcc = 24;
     
 	sensors_data.jointpositions.position = 0;
@@ -240,14 +241,14 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     sensors_data.motorsensors.threshold.temperature_high = 2;
     sensors_data.motorsensors.current = 1;
 
-		config_params.PosLoopPID.P = 5.f;
-		config_params.PosLoopPID.I = 1250.f;
-		
-		config_params.VelLoopPID.P = 5.f;
-		config_params.VelLoopPID.I = 1250.f;
-		
-		config_params.DirLoopPID.P = 5.f;
-		config_params.DirLoopPID.I = 1250.f;
+//		config_params.PosLoopPID.P = 5.f;
+//		config_params.PosLoopPID.I = 1250.f;
+//		
+//		config_params.VelLoopPID.P = 5.f;
+//		config_params.VelLoopPID.I = 1250.f;
+//		
+//		config_params.DirLoopPID.P = 5.f;
+//		config_params.DirLoopPID.I = 1250.f;
 		
 		can_decoder.init(&bus_messages_rx, &bus_events_rx, &bus_can_rx_errors);
 		
