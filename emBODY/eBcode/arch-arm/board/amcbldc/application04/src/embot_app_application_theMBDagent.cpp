@@ -340,7 +340,7 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
         foc_inputs.motorconfig_Rphase = config_params.motorconfig.Rphase;
         foc_inputs.motorsensors_angle = sensors_data.motorsensors.angle;
         foc_inputs.motorsensors_omega = sensors_data.motorsensors.omega;
-        foc_inputs.motorcurrent_current = targets.motorcurrent.current;
+        foc_inputs.motorcurrent_current = targets.motorcurrent.current*0.001;
         foc_inputs.motorvoltage_voltage = targets.motorvoltage.voltage;
         foc_inputs.OuterOutputs_desiredcurrent = outer_outputs.motor_current;
         foc_inputs.velocity_enable = outer_outputs.velocity_enable;
