@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.322
+// Model version                  : 1.327
 // Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:44 2021
+// C/C++ source code generated on : Tue Sep 21 16:48:15 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -112,10 +112,15 @@ namespace can_messaging
     arg_pck_tx.packets.PAYLOAD[7] = static_cast<uint8_T>
       ((rtb_DataTypeConversion2 & MAX_int32_T) >> 24);
 
-    // BusCreator: '<S1>/Bus Creator1' incorporates:
-    //   Constant: '<S1>/Constant'
+    // MATLAB Function: '<S1>/format_can_id' incorporates:
+    //   Constant: '<S1>/Constant1'
+    //   Constant: '<S1>/Motor Control Streaming'
+    //   Constant: '<S1>/TYPE2FOC'
 
-    arg_pck_tx.packets.ID = rtP_CAN_ID_HOST;
+    arg_pck_tx.packets.ID = 256U;
+    arg_pck_tx.packets.ID = static_cast<uint16_T>(rtP_CAN_ID_AMC << 4 |
+      arg_pck_tx.packets.ID);
+    arg_pck_tx.packets.ID = static_cast<uint16_T>(arg_pck_tx.packets.ID | 15);
 
     // DataTypeConversion: '<S1>/Data Type Conversion' incorporates:
     //   RelationalOperator: '<S2>/FixPt Relational Operator'
