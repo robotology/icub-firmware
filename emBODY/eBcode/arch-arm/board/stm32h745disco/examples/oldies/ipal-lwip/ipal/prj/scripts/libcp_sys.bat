@@ -1,0 +1,1 @@
+copy .\Objects\sys\ipal_lwip_sys.lib ..\lib\ipal_lwip_sys.lib

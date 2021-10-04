@@ -39,6 +39,8 @@ extern "C" {
 
 #include "ipal_arp.h"
 #include "ipal_base.h"
+#include "ipal_base_cfg2.h"
+#include "ipal_hal_eth.h"
 #include "ipal_dhcp.h"
 #include "ipal_ftp.h"
 #include "ipal_igmp.h"
