@@ -557,23 +557,6 @@ namespace embot { namespace hw { namespace eth {
 
     #if defined(HAL_ETH_MODULE_ENABLED)
 
-        #if defined(STM32HAL_removeWEAK_ETH)
-
-        #if defined(embotapp_UDPDEMOBASIC)
-            //#warning this demo keeps the definitions of the functions somewere else (see EMAC_STM32H7xxx.c)
-        #else
-        extern "C"
-        {
-            void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth) {}
-            void HAL_ETH_PMTCallback(ETH_HandleTypeDef *heth) {}
-            void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *heth) {}
-         
-        }
-        #endif
-        
-        #else
-            #error add the handler
-        #endif        
 
     #endif //#if defined(HAL_ETH_MODULE_ENABLED)
             

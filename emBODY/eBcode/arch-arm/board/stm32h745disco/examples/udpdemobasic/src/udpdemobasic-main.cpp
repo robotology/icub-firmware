@@ -121,7 +121,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
 #include "ipal_cfg2.h"
 
 
-embot::prot::eth::IPv4 myIPaddress {"10.0.1.1"};
+embot::prot::eth::IPv4 myIPaddress {"10.0.1.99"};
 
 // for now IPALtick is not a dedicated periodic thread (as in EOtheIPnet) but a callback executed at expiry of a timer
 embot::os::Timer *ipalTickTimer {nullptr};
@@ -156,17 +156,6 @@ embot::os::EventThread *tUDPcomm {nullptr};
 constexpr embot::os::Event evt_RXframe {2};
 constexpr embot::os::Event evt_TXframe {4};
 
-
-// needed by the ipal somewhere 
-void eom_lwip_set_rx_event(void)
-{
-   tIPALproc->setEvent(evt_RXframe); 
-}
-
-void eom_lwip_set_tx_event(void)
-{
-   tIPALproc->setEvent(evt_TXframe); 
-}
 
 
 //void setevtCONNECT(void *p)
@@ -259,7 +248,7 @@ static ipal_cfg2_extfn_t cfg2fn;
 
 void alertIPALprocThread(void)
 {
-    embot::core::print("YES: I received an ETH frame. Now I wake up the processing thread"); 
+    //embot::core::print("YES: I received an ETH frame. Now I wake up the processing thread"); 
     tIPALproc->setEvent(evt_RXframe);        
 }
 
@@ -280,17 +269,14 @@ static void s_ipal_start()
     
     ipal_cfg2.extfn2 = &cfg2fn;
     	
-	/* Getsize */
-    uint32_t ipal_mem_size = 0;
-	if(ipal_base_memory_getsize2(&ipal_cfg2, &ipal_mem_size) > 0)
-	{
-		/* Allocate memory */
-//        #warning marco.accame: in here it must be allocated the required memory. is there a change of behaviour?
-//		__nop();
-	}
-	
-	/* Initializes IPAL base */
-    if(ipal_res_NOK_generic == ipal_base_initialise2(&ipal_cfg2, NULL))
+    uint32_t *data04aligned = nullptr;
+    uint32_t size04aligned = 0;
+	ipal_base_memory_getsize2(&ipal_cfg2, &size04aligned);
+    if(size04aligned > 0)
+    {
+        data04aligned = new uint32_t[size04aligned/4];
+    }  
+    if(ipal_res_NOK_generic == ipal_base_initialise2(&ipal_cfg2, data04aligned))
     {     
         embot::core::print("ipal_base_initialise2(): failed"); 
     }
@@ -305,7 +291,8 @@ static void s_ipal_start()
     // later on we may use a dedicated thread tIPALtick
     ipalTickTimer = new embot::os::Timer;
     embot::os::Action act(embot::os::CallbackToThread(s_IPALtick, nullptr, nullptr));
-    embot::os::Timer::Config cfg{10*embot::core::time1millisec, act, embot::os::Timer::Mode::forever, 0};
+    //embot::os::Timer::Config cfg{10*embot::core::time1millisec, act, embot::os::Timer::Mode::forever, 0};
+    embot::os::Timer::Config cfg{ipal_cfg2.system->sys_timetick, act, embot::os::Timer::Mode::forever, 0};
     ipalTickTimer->start(cfg);       
 
 }

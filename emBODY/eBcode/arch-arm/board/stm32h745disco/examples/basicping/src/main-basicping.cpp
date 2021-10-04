@@ -47,6 +47,7 @@ int main(void)
 	ipal_sys_start();
     
     volatile uint32_t prevtick = 0;
+    const uint32_t tickperiodms = ipal_cfg2.system->sys_timetick / 1000;
 #endif    
         
     for(;;)
@@ -55,8 +56,8 @@ int main(void)
 #if defined(ICUBTECH_USE_IPAL)      
         ipal_sys_process_communication();
         volatile uint32_t now = HAL_GetTick();		 
-		// Every 10 ms invokes the periodic ipal timer_tick function
-        if((now - prevtick) >= 10)
+		// Every 10 ms invokes the periodic ipal timer_tick function        
+        if((now - prevtick) >= tickperiodms)
         {
             prevtick = now;
             ipal_sys_timetick_increment();
