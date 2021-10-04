@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : ETH.h
-  * Description        : This file provides code for the configuration
-  *                      of the ETH instances.
+  * @file    eth.h
+  * @brief   This file contains all the function prototypes for
+  *          the eth.c file
   ******************************************************************************
   * @attention
   *
@@ -17,14 +17,16 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __eth_H
-#define __eth_H
+#ifndef __ETH_H__
+#define __ETH_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "string.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -45,14 +47,7 @@ void MX_ETH_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ eth_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __ETH_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
