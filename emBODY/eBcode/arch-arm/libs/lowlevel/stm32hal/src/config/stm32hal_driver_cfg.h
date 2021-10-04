@@ -145,6 +145,15 @@ extern "C" {
         #include "../src/config/stm32hal_driver_cfg_of_stm32h745disco_v190.h"   
         // we also need some ll includes contained in the driver section
         #include "../src/driver/stm32h7-v190/inc/stm32h7xx_ll_gpio.h"
+    #elif (STM32HAL_DRIVER_VERSION == 0x1A0)
+        #define USE_FULL_LL_DRIVER
+        // keep out of the compilation the weak functions of HAL_ETH
+        // they will be defined inside EMAC_STM32H7xx.c
+        #define STM32HAL_removeWEAK_ETH
+        #define STM32HAL_improveHANDLER_ETH
+        #include "../src/config/stm32hal_driver_cfg_of_stm32h745disco_v1A0.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_ll_gpio.h"
     #else
         #error unknown driver version
     #endif

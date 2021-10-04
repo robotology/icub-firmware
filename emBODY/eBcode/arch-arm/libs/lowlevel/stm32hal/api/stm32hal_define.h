@@ -252,6 +252,11 @@ extern "C" {
     #if !defined(STM32HAL_STM32H7)
     #define STM32HAL_STM32H7
     #endif  
+	
+	// so far we use only the core CM7 for it
+    #if !defined(CORE_CM7)
+    #define CORE_CM7
+    #endif  	
     
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}

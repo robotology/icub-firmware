@@ -397,7 +397,7 @@ extern void stm32hal_board_init(void);
     
 #elif   defined(STM32HAL_BOARD_STM32H745DISCO) 
 
-    // one case only: v190
+    // two cases: v190 and v1A0
     #if (STM32HAL_DRIVER_VERSION == 0x190)
     
         #include "../src/config/stm32hal_driver_cfg_of_stm32h745disco_v190.h"
@@ -408,6 +408,18 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/stm32h745disco/v190/inc/stm32h7xx_it.h"
 
+    #elif (STM32HAL_DRIVER_VERSION == 0x1A0)
+    
+        #include "../src/config/stm32hal_driver_cfg_of_stm32h745disco_v1A0.h"
+
+        #include "../src/board/stm32h745disco/v1A0/inc/gpio.h"
+        #include "../src/board/stm32h745disco/v1A0/inc/main.h"
+        #include "../src/board/stm32h745disco/v1A0/inc/eth.h"
+
+        #include "../src/board/stm32h745disco/v1A0/inc/stm32h7xx_it.h"
+        #include "../src/board/stm32h745disco/v1A0/drv/Driver_ETH_MAC.h"
+        #include "../src/board/stm32h745disco/v1A0/drv/Driver_ETH_PHY.h"
+		
     #else
         #error unsupported driver version for stm32h745disco
     #endif

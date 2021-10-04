@@ -142,11 +142,15 @@ extern "C" {
     
 #elif   defined(STM32HAL_BOARD_STM32H745DISCO)
 
-    // only one possible driver
-    #if !defined(STM32HAL_DRIVER_V190)
-        #define STM32HAL_DRIVER_V190
+    // two possible drivers: v190 and v1A0. default is the 1A0 ...
+    #if defined(STM32HAL_DRIVER_V190)    
+        #define STM32HAL_DRIVER_VERSION 0x190  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V1A0)
+            #define STM32HAL_DRIVER_V1A0
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x1A0   
     #endif
-    #define STM32HAL_DRIVER_VERSION 0x190
 
     
 #else
@@ -191,8 +195,10 @@ extern "C" {
     #if     defined(STM32HAL_DRIVER_V180)    
         #include "../src/driver/stm32h7-v180/inc/stm32h7xx_hal.h"       
     #elif   defined(STM32HAL_DRIVER_V190)    
-        #include "../src/driver/stm32h7-v190/inc/stm32h7xx_hal.h"       
-    #else        
+        #include "../src/driver/stm32h7-v190/inc/stm32h7xx_hal.h"        
+    #elif   defined(STM32HAL_DRIVER_V1A0)    
+        #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_hal.h"       
+    #else  		
         #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
     #endif
 
