@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32H745XIHx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.7.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.2.8.0</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>4</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-DUSE_PC104_ADDRESSING -Dembotapp_UDPDEMOBASIC -DmodifiedCMSISETH -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_cmsisos2</MiscControls>
-              <Define>AC6 IPAL_USE_RTOS_MINIMAL USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\abslayer\ipal\api-so-far-not-used;..\..\ipal-lwip\ipal\ipal_api;..\drv;..\..\ipal-lwip\cmsis\driver;..\src;..\..\ipal-lwip\ipal\eth_interface;..\..\ipal-lwip\ipal\rtos;..\..\ipal-lwip\ipal\rtos\include</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\src;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\cfg;..\..\bsp-ipal</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -370,7 +370,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x38000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\stm32h7disco_ipal_lwip_keil_ac5.sct</ScatterFile>
+            <ScatterFile>..\..\bsp-ipal\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -394,9 +394,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.stm32h745disco.v190.lib</FileName>
+              <FileName>stm32hal.h7.stm32h745disco.v1A0.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v190.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v1A0.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -404,9 +404,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.stm32h745disco.CM7.s</FileName>
+              <FileName>startup_stm32h745xx_CM7.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.stm32h745disco.CM7.s</FilePath>
+              <FilePath>..\cfg\startup_stm32h745xx_CM7.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -687,137 +687,37 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>ipal</GroupName>
+          <GroupName>ipal-lib</GroupName>
           <Files>
             <File>
-              <FileName>ipal.fake.cm4.lib</FileName>
+              <FileName>ipal.lwip.h7.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\ipal-lwip\ipal\lib\ipal.fake.cm4.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>ipal_lwip_sys_minimal.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\ipal-lwip\ipal\lib\ipal_lwip_sys_minimal.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.lwip.h7.lib</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>ipal-config</GroupName>
+          <GroupName>ipal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>ipal_cfg_legacy.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ipal_cfg_legacy.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>ipal_app_cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ipal_app_cfg.c</FilePath>
-            </File>
-            <File>
-              <FileName>ipal_lightweight_protect.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ipal_lightweight_protect.c</FilePath>
+              <FileName>ipal_cfg2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\ipal_cfg2.cpp</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>ipal-hw-driver</GroupName>
+          <GroupName>bsp-ipal</GroupName>
           <Files>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\drv\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
               <FileName>stm32h7xx_ethirqhandler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\drv\stm32h7xx_ethirqhandler.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eth-cmsis-driver</GroupName>
-          <Files>
-            <File>
-              <FileName>EMAC_STM32H7xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\ipal-lwip\cmsis\driver\EMAC_STM32H7xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>PHY_LAN8740A.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\ipal-lwip\cmsis\driver\PHY_LAN8740A.c</FilePath>
+              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -905,8 +805,8 @@
         <TargetCommonOption>
           <Device>STM32H745XIHx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.7.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.2.8.0</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1225,10 +1125,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Dembotapp_UDPDEMOBASIC -DmodifiedCMSISETH -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>TLX_LWIP IPAL_USE_RTOS_MINIMAL USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
+              <MiscControls>-DUSE_PC104_ADDRESSING -Dembotapp_UDPDEMOBASIC -DmodifiedCMSISETH -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\abslayer\ipal\api-so-far-not-used;..\..\ipal-lwip\ipal\ipal_api;..\drv;..\..\ipal-lwip\cmsis\driver;..\..\good-ipal\eth_interface;..\src;..\..\..\..\..\libs\midware\eventviewer\api;..\..\ipal-lwip\ipal\rtos;..\..\ipal-lwip\ipal\rtos\include</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\src;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\cfg;..\..\bsp-ipal;..\..\..\..\..\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1259,7 +1159,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\stm32h7disco_ipal_lwip_keil_ac5.sct</ScatterFile>
+            <ScatterFile>..\..\bsp-ipal\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -1283,9 +1183,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.stm32h745disco.v190.lib</FileName>
+              <FileName>stm32hal.h7.stm32h745disco.v1A0.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v190.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v1A0.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1293,9 +1193,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.stm32h745disco.CM7.s</FileName>
+              <FileName>startup_stm32h745xx_CM7.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.stm32h745disco.CM7.s</FilePath>
+              <FilePath>..\cfg\startup_stm32h745xx_CM7.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1525,137 +1425,37 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>ipal</GroupName>
+          <GroupName>ipal-lib</GroupName>
           <Files>
             <File>
-              <FileName>ipal.fake.cm4.lib</FileName>
+              <FileName>ipal.lwip.h7.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\ipal-lwip\ipal\lib\ipal.fake.cm4.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>ipal_lwip_sys_minimal.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\ipal-lwip\ipal\lib\ipal_lwip_sys_minimal.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.lwip.h7.lib</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>ipal-config</GroupName>
+          <GroupName>ipal-cfg</GroupName>
           <Files>
             <File>
-              <FileName>ipal_cfg_legacy.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ipal_cfg_legacy.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>ipal_app_cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ipal_app_cfg.c</FilePath>
-            </File>
-            <File>
-              <FileName>ipal_lightweight_protect.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ipal_lightweight_protect.c</FilePath>
+              <FileName>ipal_cfg2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\ipal_cfg2.cpp</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>ipal-hw-driver</GroupName>
+          <GroupName>bsp-ipal</GroupName>
           <Files>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\drv\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
               <FileName>stm32h7xx_ethirqhandler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\drv\stm32h7xx_ethirqhandler.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eth-cmsis-driver</GroupName>
-          <Files>
-            <File>
-              <FileName>EMAC_STM32H7xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\ipal-lwip\cmsis\driver\EMAC_STM32H7xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>PHY_LAN8740A.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\ipal-lwip\cmsis\driver\PHY_LAN8740A.c</FilePath>
+              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
             </File>
           </Files>
         </Group>

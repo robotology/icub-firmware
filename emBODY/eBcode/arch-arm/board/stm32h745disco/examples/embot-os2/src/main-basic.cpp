@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2020 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2021 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -14,7 +14,7 @@
 #include "embot_hw_led.h"
 #include "embot_hw_button.h"
 #include "embot_hw_sys.h"
-#include "embot_hw_can.h"
+
 
 #include "embot_os_theScheduler.h"
 #include "embot_os_theTimerManager.h"
@@ -26,7 +26,6 @@
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::os::Event evtBTNreleased = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
-constexpr embot::os::Event evRXcanframe = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
 
 
 
@@ -40,17 +39,6 @@ void btncallback(void *p)
     t->setEvent(evtBTNreleased);
 }
 
-static void canalerteventhread(void *arg)
-{
-    embot::os::EventThread* evtsk = reinterpret_cast<embot::os::EventThread*>(arg);
-    if(nullptr != evtsk)
-    {
-        evtsk->setEvent(evRXcanframe);
-    }
-}
-
-
-std::vector<embot::hw::can::Frame> outframes;
 
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {   
@@ -71,17 +59,7 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     embot::core::print("mainthread-startup: activated button which sends evtBTNreleased to evthread when released if pressed for more than " + embot::core::TimeFormatter(debounce).to_string());
     // init the ext interrupt button
     embot::hw::button::init(buttonBLUE, {embot::hw::button::Mode::TriggeredOnDebouncedRelease, {btncallback, t}, debounce});     
-    
-    // initting can
-    
-    outframes.reserve(8);
-    
-    embot::hw::can::Config canconfig; 
-    canconfig.rxcapacity = 8;
-    canconfig.txcapacity = 8;
-    canconfig.onrxframe = embot::core::Callback(canalerteventhread, t); 
-    embot::hw::can::init(embot::hw::CAN::one, canconfig);
-    //embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());    
+
 }
 
 
@@ -104,45 +82,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::core::print("evthread-onevent: evtBTNreleased received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
 
-        // tx a can frame.
-        uint8_t data[] = {0x10, 0x11};
-        embot::hw::can::Frame frame {0x321, 2, data};
-        outframes.push_back(frame);
-        
-        std::uint8_t num = outframes.size();
-        
-        for(std::uint8_t i=0; i<num; i++)
-        {
-            embot::hw::can::put(embot::hw::CAN::one, {outframes[i].id, outframes[i].size, outframes[i].data});                                       
-        }
-        
-        outframes.clear();
-        
-        embot::hw::can::transmit(embot::hw::CAN::one);   
     }
-
-    if(true == embot::core::binary::mask::check(eventmask, evRXcanframe)) 
-    {    
-        embot::core::TimeFormatter tf(embot::core::now());        
-        embot::core::print("evthread-onevent: evRXcanframe received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
-
-        embot::hw::can::Frame canframe;
-        std::uint8_t remaining = 0;
-        if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, canframe, remaining))
-        {                    
-            // use the cas frame ....
-            
-//            embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
-//            if(true == canparser.process({canframe.id, canframe.size, canframe.data}, outframes))
-//            {
-//            }
-            
-            if(remaining > 0)
-            {
-                t->setEvent(evRXcanframe);                 
-            }
-        }                
-    }    
 
 }
 
@@ -175,13 +115,12 @@ void initSystem(embot::os::Thread *t, void* initparam)
     theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
     embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 50, std::bitset<64>(0b010101));
     theleds.get(embot::hw::LED::two).wave(&ledwave); 
-    //theleds.get(embot::hw::LED::two).pulse(embot::core::time1second); 
     
 #define START_EXAMPLE_THREADS
  
 #if defined(START_EXAMPLE_THREADS)
     
-    embot::core::print("INIT: creating two: example threads, one event-based and one periodic");
+    embot::core::print("INIT: creating two example threads, one event-based and one periodic");
     
     embot::os::EventThread::Config cc { 
         2*1024, 
@@ -264,7 +203,7 @@ int main(void)
     // 2 i start the scheduler
         
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
-    constexpr embot::os::IdleThread::Config idlecfg = { 512, nullptr, nullptr, onIdle };
+    constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
     constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
     

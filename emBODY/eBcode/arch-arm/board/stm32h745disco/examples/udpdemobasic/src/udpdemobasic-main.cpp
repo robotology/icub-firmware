@@ -118,10 +118,8 @@ void initSystem(embot::os::Thread *t, void* initparam)
 #include "ipal.h"
 #include "embot_prot_eth.h"
 #include "main-embot.h"
+#include "ipal_cfg2.h"
 
-// we use ipalcfg as configured in section ipal-config
-extern const ipal_cfg_t *ipal_cfgMINE;
-const ipal_cfg_t* ipalcfg = ipal_cfgMINE;
 
 embot::prot::eth::IPv4 myIPaddress {"10.0.1.1"};
 
@@ -251,14 +249,23 @@ void tIPALproc_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, voi
     if(true == embot::core::binary::mask::check(eventmask, evt_RXframe))
     {
         cnt[4]++;
+        //tIPALproc->setEvent(evt_TXframe); 
 //        embot::core::print(std::string("tIPALproc_onevent(evt_RXframe): @ ") + embot::core::TimeFormatter(embot::core::now()).to_string()); 
     }   
                
 }
 
+static ipal_cfg2_extfn_t cfg2fn;
+
+void alertIPALprocThread(void)
+{
+    embot::core::print("YES: I received an ETH frame. Now I wake up the processing thread"); 
+    tIPALproc->setEvent(evt_RXframe);        
+}
+
 static void s_ipal_start()
 {
-    myIPaddress = {ipalcfg->eth_ip};
+    myIPaddress = {ipal_cfg2.eth->eth_ip};
     
     embot::core::print(std::string("ipal: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
                        " starting with IP addr " + myIPaddress.to_string()); 
@@ -267,10 +274,15 @@ static void s_ipal_start()
     // static void net_thread(void *argument) 
     
 //	ipal_result_t res = ipal_res_NOK_generic;	
-	
+    
+    std::memmove(&cfg2fn, ipal_cfg2.extfn2, sizeof(ipal_cfg2_extfn_t));
+    cfg2fn.signal_rx_frame = alertIPALprocThread;
+    
+    ipal_cfg2.extfn2 = &cfg2fn;
+    	
 	/* Getsize */
     uint32_t ipal_mem_size = 0;
-	if(ipal_base_memory_getsize(ipalcfg, &ipal_mem_size) > 0)
+	if(ipal_base_memory_getsize2(&ipal_cfg2, &ipal_mem_size) > 0)
 	{
 		/* Allocate memory */
 //        #warning marco.accame: in here it must be allocated the required memory. is there a change of behaviour?
@@ -278,9 +290,9 @@ static void s_ipal_start()
 	}
 	
 	/* Initializes IPAL base */
-    if(ipal_res_NOK_generic == ipal_base_initialise(ipalcfg, NULL))
+    if(ipal_res_NOK_generic == ipal_base_initialise2(&ipal_cfg2, NULL))
     {     
-        embot::core::print("ipal_base_initialise(): failed"); 
+        embot::core::print("ipal_base_initialise2(): failed"); 
     }
          
 	/* Starts IPAL */ 
@@ -430,7 +442,7 @@ void tUDPcomm_startup(embot::os::Thread *t, void *param)
 	}
 #endif
 
-	if(ipal_res_OK != ipal_udpsocket_bind(ipal_udp_socket, ipal_cfgMINE->eth_ip, localport))
+	if(ipal_res_OK != ipal_udpsocket_bind(ipal_udp_socket, ipal_cfg2.eth->eth_ip, localport))
 	{
         embot::core::print(std::string("Failed Binding UDP socket ...: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string()); 		
 		udp_comm_app_error_handling();

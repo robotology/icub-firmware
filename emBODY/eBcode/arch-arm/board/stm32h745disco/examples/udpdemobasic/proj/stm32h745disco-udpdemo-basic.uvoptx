@@ -182,7 +182,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -508,8 +508,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v190.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.h7.stm32h745disco.v190.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v1A0.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.h7.stm32h745disco.v1A0.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -528,8 +528,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\stm32hal.h7.startup.stm32h745disco.CM7.s</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.h7.startup.stm32h745disco.CM7.s</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\startup_stm32h745xx_CM7.s</PathWithFileName>
+      <FilenameWithoutPath>startup_stm32h745xx_CM7.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -865,7 +865,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -884,7 +884,7 @@
   </Group>
 
   <Group>
-    <GroupName>ipal</GroupName>
+    <GroupName>ipal-lib</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -896,128 +896,60 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\ipal-lwip\ipal\lib\ipal.fake.cm4.lib</PathWithFileName>
-      <FilenameWithoutPath>ipal.fake.cm4.lib</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>30</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\ipal-lwip\ipal\lib\ipal_lwip_sys_minimal.lib</PathWithFileName>
-      <FilenameWithoutPath>ipal_lwip_sys_minimal.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.lwip.h7.lib</PathWithFileName>
+      <FilenameWithoutPath>ipal.lwip.h7.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
   </Group>
 
   <Group>
-    <GroupName>ipal-config</GroupName>
-    <tvExp>0</tvExp>
+    <GroupName>ipal-cfg</GroupName>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>31</FileNumber>
-      <FileType>1</FileType>
+      <FileNumber>30</FileNumber>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\ipal_cfg_legacy.c</PathWithFileName>
-      <FilenameWithoutPath>ipal_cfg_legacy.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>32</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\ipal_app_cfg.c</PathWithFileName>
-      <FilenameWithoutPath>ipal_app_cfg.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>11</GroupNumber>
-      <FileNumber>33</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\ipal_lightweight_protect.c</PathWithFileName>
-      <FilenameWithoutPath>ipal_lightweight_protect.c</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\ipal_cfg2.cpp</PathWithFileName>
+      <FilenameWithoutPath>ipal_cfg2.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
   </Group>
 
   <Group>
-    <GroupName>ipal-hw-driver</GroupName>
-    <tvExp>0</tvExp>
+    <GroupName>bsp-ipal</GroupName>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>34</FileNumber>
+      <FileNumber>31</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\drv\ipal_hal_eth_stm32h7.c</PathWithFileName>
+      <PathWithFileName>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</PathWithFileName>
       <FilenameWithoutPath>ipal_hal_eth_stm32h7.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>12</GroupNumber>
-      <FileNumber>35</FileNumber>
+      <FileNumber>32</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\drv\stm32h7xx_ethirqhandler.c</PathWithFileName>
+      <PathWithFileName>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</PathWithFileName>
       <FilenameWithoutPath>stm32h7xx_ethirqhandler.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>eth-cmsis-driver</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>36</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\ipal-lwip\cmsis\driver\EMAC_STM32H7xx.c</PathWithFileName>
-      <FilenameWithoutPath>EMAC_STM32H7xx.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>13</GroupNumber>
-      <FileNumber>37</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\ipal-lwip\cmsis\driver\PHY_LAN8740A.c</PathWithFileName>
-      <FilenameWithoutPath>PHY_LAN8740A.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
