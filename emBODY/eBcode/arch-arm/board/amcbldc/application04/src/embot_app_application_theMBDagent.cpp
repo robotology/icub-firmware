@@ -200,9 +200,9 @@ struct embot::app::application::theMBDagent::Impl
         
 #warning workaround. Fix this parameter in model design. 
     
-        sensors_data.jointpositions.position = static_cast<real32_T>(electricalAngle * 0.0054931640625f); // iCubDegree
-        sensors_data.motorsensors.omega = 0; //  speed * 80 / 3; // Frequency = 80/3. Angular velocity --> iCubDegree/ms
-              
+        sensors_data.jointpositions.position = static_cast<real32_T>(electricalAngle * 0.0054931640625f); // iCubDegree -> deg
+        sensors_data.motorsensors.omega =  speed * 80 / 3 * 0.0054931640625f; // Frequency = 80/3. Angular velocity --> iCubDegree/ms
+                                                                              // * 0.0054931640625f ==> icubDegree -> Deg
         // enable/disable the motor
         bool output_enable_b = static_cast<bool>(u->output_enable);
         if(motor_enabled_prev != output_enable_b)
