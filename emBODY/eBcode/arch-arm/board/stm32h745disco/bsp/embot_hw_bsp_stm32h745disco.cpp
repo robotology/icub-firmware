@@ -153,25 +153,27 @@ namespace embot { namespace hw { namespace led {
     
     #if   defined(STM32HAL_BOARD_STM32H745DISCO)
        
-    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::J, embot::hw::GPIO::PIN::two}  };  
-    constexpr PROP led2p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::I, embot::hw::GPIO::PIN::thirteen}  };  
-
+    
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::I, embot::hw::GPIO::PIN::thirteen}  };  
+    constexpr PROP led2p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::J, embot::hw::GPIO::PIN::two}  };  
+    constexpr PROP led3p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::three}  };  
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two),        
+        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) | mask::pos2mask<uint32_t>(LED::three),        
         // properties
         {{
-            &led1p, &led2p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+            &led1p, &led2p, &led3p, nullptr, nullptr, nullptr, nullptr, nullptr            
         }}        
     };
     
-    void clock_enable_J() { __HAL_RCC_GPIOJ_CLK_ENABLE(); }
     void clock_enable_I() { __HAL_RCC_GPIOI_CLK_ENABLE(); }
+    void clock_enable_J() { __HAL_RCC_GPIOJ_CLK_ENABLE(); }
+    void clock_enable_D() { __HAL_RCC_GPIOD_CLK_ENABLE(); }
     void BSP::init(embot::hw::LED h) const 
     {
         // activate the clock if cube-mx didn't do that
-        constexpr std::array<embot::core::fpWorker, 2> clockenable { clock_enable_J, clock_enable_I };
+        constexpr std::array<embot::core::fpWorker, 3> clockenable { clock_enable_I, clock_enable_J, clock_enable_D};
         
         uint8_t i = embot::core::tointegral(h);
         if(i < clockenable.size())
@@ -525,6 +527,43 @@ namespace embot { namespace hw { namespace flash {
 // - support map: end of embot::hw::flash
 
 
+// - support map: begin of embot::hw::eth
+
+//#include "embot_hw_can_eth.h"
+
+#if   !defined(EMBOT_ENABLE_hw_eth)
+
+namespace embot { namespace hw { namespace eth {
+    
+    
+}}}
+
+#else
+
+namespace embot { namespace hw { namespace eth {
+               
+    #if   defined(STM32HAL_BOARD_STM32H745DISCO)
+    
+    // it has HAL_ETH_MODULE_ENABLED  
+    // in here we add ....
+
+    #else
+        #error embot::hw::eth::thebsp must be defined    
+    #endif
+
+              
+}}} // namespace embot { namespace hw { namespace eth {
+    
+
+    #if defined(HAL_ETH_MODULE_ENABLED)
+
+
+    #endif //#if defined(HAL_ETH_MODULE_ENABLED)
+            
+#endif // EMBOT_ENABLE_hw_eth
+
+
+// - support map: end of embot::hw::eth
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

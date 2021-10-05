@@ -135,8 +135,14 @@ static void led_toggle()
     HAL_GPIO_TogglePin(GPIOLED, PinLED);  
 #endif    
 }
-      
-
+ 
+// this macro is seen through stm32hal.h
+#if defined(STM32HAL_removeWEAK_ETH)
+// others, required because they have been removed from stm32hal.h7.stm32h745disco.lib
+void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth) {}
+void HAL_ETH_PMTCallback(ETH_HandleTypeDef *heth) {}
+void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *heth) {}
+#endif
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

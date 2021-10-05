@@ -1,0 +1,1 @@
+copy .\Objects\SYS_MINIMAL_FQ\ipal_lwip_sys_minimal_fq.lib ..\lib\ipal_lwip_sys_minimal_fq.lib

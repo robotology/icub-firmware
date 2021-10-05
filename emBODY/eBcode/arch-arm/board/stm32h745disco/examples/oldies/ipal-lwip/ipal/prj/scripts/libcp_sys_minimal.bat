@@ -1,0 +1,1 @@
+copy .\Objects\SYS_MINIMAL\ipal_lwip_sys_minimal.lib ..\lib\ipal_lwip_sys_minimal.lib

@@ -180,7 +180,7 @@ static uint8_t *ipaddr = NULL;
 
 extern void eupdater_init(void)
 {
-    const ipal_cfg_t* ipalcfg = NULL;
+    const ipal_cfg2_t* pipalcfg2 = NULL;
     eOmipnet_cfg_addr_t* eomipnet_addr;
 #ifndef _USE_IPADDR_FROM_IPAL_CFG_
     const eEipnetwork_t *ipnet = NULL;
@@ -198,13 +198,13 @@ extern void eupdater_init(void)
     };
 
 #if !defined(_MAINTAINER_APPL_)
-    ipalcfg = eupdater_ipal_cfg;
+    pipalcfg2 = &ipal_cfg2;
 #else
     ipalcfg = emaintainer_ipal_cfg;
 #endif    
     
     
-    ipaddr  = (uint8_t*)&(ipalcfg->eth_ip);
+    ipaddr  = (uint8_t*)&(pipalcfg2->eth->eth_ip);
         
     // eeprom is used for shared services but is initted also inside there
     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
@@ -230,7 +230,7 @@ extern void eupdater_init(void)
 #endif        
     {
         eomipnet_addr = NULL;
-        ipaddr = (uint8_t*)&(ipalcfg->eth_ip);
+        ipaddr = (uint8_t*)&(pipalcfg2->eth->eth_ip);
     }
  
 #ifdef PARSE_ETH_ISR   
@@ -257,13 +257,17 @@ extern void eupdater_init(void)
     
     //static const eOmipnet_cfg_t *cfg2use = &eom_ipnet_DefaultCfg;
     static const eOmipnet_cfg_t *cfg2use = &eom_ipnet_Cfg;
-    
+
+#if 1
+     #error TODO: provide API for eom_ipnet_Initialise() w/ ipal_cfg2_t
+#else         
     eom_ipnet_Initialise(cfg2use,
                          ipalcfg, 
                          eomipnet_addr,
                          &eom_ipnet_dtgskt_MyCfg
                          );
-    
+#endif
+     
     // init the leds   
 //    hal_led_init(hal_led0, NULL);
 //    hal_led_init(hal_led1, NULL);

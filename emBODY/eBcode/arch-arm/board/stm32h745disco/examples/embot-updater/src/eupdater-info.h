@@ -49,6 +49,7 @@ extern "C" {
 
 #include "ipal_base.h"
 #include "EOMtheSystem.h"
+#include "ipal_cfg2.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -62,8 +63,6 @@ extern "C" {
 extern const eEmoduleExtendedInfo_t     eupdater_modinfo_extended;
 
 extern const eOmsystem_cfg_t            eupdater_syscfg;
-
-extern const ipal_cfg_t*  const         eupdater_ipal_cfg;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------

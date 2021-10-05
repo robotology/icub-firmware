@@ -46,6 +46,10 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+#if !defined(__ipalVERIFYsizeof)
+#define __ipalVERIFYsizeof(sname, ssize) typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : (-1)];
+#endif
+
 
 /** @def        IPAL_macaddr(m0, m1, m2, m3, m4, m5)
     @brief      Gives back in IPAL format the MAC-48 address represented by m0-m1-m2-m3-m4-m5 

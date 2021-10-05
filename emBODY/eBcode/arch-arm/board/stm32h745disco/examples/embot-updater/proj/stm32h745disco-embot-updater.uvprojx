@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32H745XIHx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.7.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.2.8.0</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -381,15 +381,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>main</GroupName>
-        </Group>
-        <Group>
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.stm32h745disco.v190.lib</FileName>
+              <FileName>stm32hal.h7.stm32h745disco.v1A0.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v190.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v1A0.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -721,17 +718,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>abslayer</GroupName>
+          <GroupName>ipal</GroupName>
           <Files>
             <File>
-              <FileName>ipal.base.medium.cm4.lib</FileName>
+              <FileName>ipal.lwip.h7.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.lwip.h7.lib</FilePath>
             </File>
             <File>
-              <FileName>ipal_cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ipal_cfg.c</FilePath>
+              <FileName>ipal_cfg2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\ipal_cfg2.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1026,6 +1023,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>bsp-ipal</GroupName>
+          <Files>
+            <File>
+              <FileName>ipal_hal_eth_stm32h7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_ethirqhandler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1103,14 +1115,14 @@
       <TargetName>ethdemo-osal</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6150000::V6.15::ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745XIHx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.7.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.2.8.0</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1429,10 +1441,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_osal </MiscControls>
-              <Define>USE_ZERO_OFFSET EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_osal</MiscControls>
+              <Define>USE_ZERO_OFFSET EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\..\bsp-ipal;..\cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1454,7 +1466,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -1463,7 +1475,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\stm32h745disco-application0offset.sct</ScatterFile>
+            <ScatterFile>..\..\bsp-ipal\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -1474,15 +1486,12 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>main</GroupName>
-        </Group>
-        <Group>
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.stm32h745disco.v190.lib</FileName>
+              <FileName>stm32hal.h7.stm32h745disco.v1A0.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v190.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.stm32h745disco.v1A0.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1763,17 +1772,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>abslayer</GroupName>
+          <GroupName>ipal</GroupName>
           <Files>
             <File>
-              <FileName>ipal.base.medium.cm4.lib</FileName>
+              <FileName>ipal.lwip.h7.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.lwip.h7.lib</FilePath>
             </File>
             <File>
-              <FileName>ipal_cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\cfg\ipal_cfg.c</FilePath>
+              <FileName>ipal_cfg2.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\ipal_cfg2.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2064,6 +2073,21 @@
               <FileName>embot_hw_bsp_stm32h745disco.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_stm32h745disco.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>bsp-ipal</GroupName>
+          <Files>
+            <File>
+              <FileName>ipal_hal_eth_stm32h7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_ethirqhandler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
             </File>
           </Files>
         </Group>
