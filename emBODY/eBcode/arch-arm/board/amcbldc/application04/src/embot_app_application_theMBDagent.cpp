@@ -140,20 +140,17 @@ struct embot::app::application::theMBDagent::Impl
         embot::hw::motor::Position electricalAngle;
         embot::hw::motor::getencoder(embot::hw::MOTOR::one, electricalAngle); 
         
+        static real32_T speed = 0;
         static uint16_t electricalAngleOld = electricalAngle;
         int16_t delta = electricalAngle - electricalAngleOld;
         electricalAngleOld = electricalAngle;
-        static real32_T speed = 0;
+
         speed = 0.9f*speed + 0.1f*(static_cast<real32_T>(delta));
         
         u->motorsensors_angle = real32_T(electricalAngle)*0.0054931640625f;
         u->motorsensors_Iabc[0] = 0.001f*Iuvw[0];
         u->motorsensors_Iabc[1] = 0.001f*Iuvw[1];
         u->motorsensors_Iabc[2] = 0.001f*Iuvw[2];
-        
-        sensors_data.motorsensors.current = static_cast<real32_T>(0.001f*Iuvw[0]);
-        sensors_data.jointpositions.position = static_cast<real32_T>(electricalAngle * 0.0054931640625f) / 8;
-        sensors_data.motorsensors.omega = speed;
         
 
 //        control_foc.control_foc_ISR(
@@ -197,6 +194,16 @@ struct embot::app::application::theMBDagent::Impl
               y->Vabc_PWM_ticks,
               &(y->Iq_fbk_current));
               
+        // save sensor data
+        sensors_data.motorsensors.current = y->Iq_fbk_current*1000; // *0.001f in order to have A
+        //sensors_data.motorsensors.angle = static_cast<real32_T>(electricalAngle * 0.0054931640625f);
+        
+#warning workaround. Fix this parameter in model design. 
+    
+        sensors_data.jointpositions.position = static_cast<real32_T>(electricalAngle * 0.0054931640625f); // iCubDegree
+        sensors_data.motorsensors.omega = 0; //  speed * 80 / 3; // Frequency = 80/3. Angular velocity --> iCubDegree/ms
+              
+        // enable/disable the motor
         bool output_enable_b = static_cast<bool>(u->output_enable);
         if(motor_enabled_prev != output_enable_b)
         {
@@ -220,7 +227,7 @@ struct embot::app::application::theMBDagent::Impl
         if(counter % 1000 == 0)
         {
             
-            sprintf(msg2, "[%.3f, %.3f]\n", sensors_data.jointpositions.position, sensors_data.motorsensors.omega);
+            //sprintf(msg2, "[%.3f, %.3f]\n", sensors_data.jointpositions.position, sensors_data.motorsensors.omega);
             //sprintf(msg2, "PWM[%d, %d, %d] - trg[%.3f] - srs[%.3f, %.3f, %.3f] - en[%d]\n",  y->Vabc_PWM_ticks[0], y->Vabc_PWM_ticks[1], y->Vabc_PWM_ticks[2], u->motorcurrent_current, u->motorsensors_Iabc[0],  u->motorsensors_Iabc[1],  u->motorsensors_Iabc[2] , u->output_enable);
             //sprintf(msg2, "[%d]\n", u->output_enable);
             embot::core::print(msg2);
