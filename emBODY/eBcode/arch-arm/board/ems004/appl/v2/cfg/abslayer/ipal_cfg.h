@@ -24,6 +24,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+ 
+#include "ipal.h"
     
 extern const ipal_cfg_t    ipal_cfg;
 
