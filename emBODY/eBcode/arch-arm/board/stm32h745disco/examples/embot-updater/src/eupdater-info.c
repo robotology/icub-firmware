@@ -45,7 +45,6 @@
 
 
 extern const hal_cfg_t hal_cfg;
-extern const ipal_cfg_t ipal_cfg;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -86,7 +85,8 @@ extern const ipal_cfg_t ipal_cfg;
 #if defined(USE_ZERO_OFFSET)
 #if __ARMCOMPILER_VERSION > 6000000
 #warning CAVEAT: we map in flash @ 0x08000200 in a non-parametric mode
-const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((section(".ARM.__at_0x08000200"))) =   
+//const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((section(".ARM.__at_0x08000200"))) =
+const eEmoduleExtendedInfo_t eupdater_modinfo_extended =
 #else    
 const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ROMSTART+EENV_MODULEINFO_OFFSET))) = 
 #endif
@@ -170,8 +170,6 @@ const eOmsystem_cfg_t eupdater_syscfg =
     .osalcfg            = NULL,
     .fsalcfg            = NULL
 };
-
-const ipal_cfg_t* const eupdater_ipal_cfg = &ipal_cfg;
 
 
 // --------------------------------------------------------------------------------------------------------------------

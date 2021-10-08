@@ -233,10 +233,28 @@ static EOMtheIPnet s_eom_theipnet =
     EO_INIT(.dgramsocketready2tx)   NULL,      
     EO_INIT(.taskwakeuponrxframe)   eobool_false,
     EO_INIT(.active)                eobool_false
+#if defined(IPAL_use_cfg2)  
+    ,EO_INIT(.ipcfg2) 
+    {
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+    },
+    EO_INIT(.ipcfg2_eth) 
+    {
+        0, 0, 0, 0, 
+        {0, 0, 0, 0, 0, 0, 0}, 
+        NULL, NULL, NULL, NULL, NULL, NULL
+    },
+    EO_INIT(.ipcfg2_extfn2) 
+    {
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        0, 0
+    }     
+#else    
 //    ,EO_INIT(.ipcfg)
 //    {
 //        0
 //    } 
+#endif    
 };
 
 
@@ -246,7 +264,7 @@ static EOMtheIPnet s_eom_theipnet =
 // --------------------------------------------------------------------------------------------------------------------
 
 extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
-                                          const ipal_cfg_t *ipcfg, 
+                                          const ipal_cfg_any_t *ipcfg, 
                                           const eOmipnet_cfg_addr_t *addrcfg,
                                           const eOmipnet_cfg_dtgskt_t *dtgskcfg 
                                          ) 
@@ -350,6 +368,36 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
         s_eom_theipnet.dgramsocketready2tx = NULL;
     }
 
+#if defined(IPAL_use_cfg2) 
+    
+    // i init the ipconfig so that it points to external pointers.
+    const ipal_cfg2_t *source = (const ipal_cfg2_t *)ipcfg;
+    memmove(&s_eom_theipnet.ipcfg2, source, sizeof(ipal_cfg2_t)); 
+    memmove(&s_eom_theipnet.ipcfg2_eth, source->eth, sizeof(ipal_cfg2_eth_t));
+    memmove(&s_eom_theipnet.ipcfg2_extfn2, source->extfn2, sizeof(ipal_cfg2_extfn_t));
+    // i use local copies only of what i want to change or what i really need.
+    // at first i copy, then i link to s_eom_theipnet.ipcfg2...    
+    s_eom_theipnet.ipcfg2.eth = &s_eom_theipnet.ipcfg2_eth;    
+    s_eom_theipnet.ipcfg2.extfn2 = &s_eom_theipnet.ipcfg2_extfn2;     
+    // change s_eom_theipnet.ipcfg to reflect changes passed as parameters, such as macaddr, ipaddr, ipmask
+    if(NULL != addrcfg)
+    {
+        if(0x0000000000000000 != addrcfg->macaddr)
+        {
+            s_eom_theipnet.ipcfg2.eth->eth_mac = addrcfg->macaddr;
+        }
+        
+        if(0x00000000 != addrcfg->ipaddr)
+        {
+            s_eom_theipnet.ipcfg2.eth->eth_ip = addrcfg->ipaddr;       
+        }    
+    
+        if(0x00000000 != addrcfg->ipmask)
+        {
+            s_eom_theipnet.ipcfg2.eth->eth_mask = addrcfg->ipmask;
+        } 
+    }
+#else    
     // i init the ipconfig
     memcpy((uint8_t*)&s_eom_theipnet.ipcfg, (uint8_t*)ipcfg, sizeof(ipal_cfg_t)); 
      
@@ -371,7 +419,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
             s_eom_theipnet.ipcfg.eth_mask = addrcfg->ipmask;
         } 
     }
-    
+#endif    
     
     // complete other things    
     s_eom_theipnet.rxpacket     = eo_packet_New(0); // zero capacity .... because we want to assign data later on
@@ -391,13 +439,18 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           NULL,
                                           tIPNETproc, 
                                           "ipPRC");
+#if defined(IPAL_use_cfg2) 
+    ipal_reltime_t timetick = s_eom_theipnet.ipcfg2.system->sys_timetick;
+#else
+    ipal_reltime_t timetick = s_eom_theipnet.ipcfg.sys_timetick;
+#endif
 
 #define IPNET_TICK_PERIODIC                                          
 #if defined(IPNET_TICK_PERIODIC) 
     // and task which ticks the timers. it is a periodic task
     s_eom_theipnet.tsktick = eom_task_New(eom_mtask_Periodic, ipnetcfg->tickpriority, ipnetcfg->tickstacksize,
                                           s_eom_ipnet_tsktick_startup, s_eom_ipnet_tsktick_forever,
-                                          0, s_eom_theipnet.ipcfg.sys_timetick,
+                                          0, timetick,
                                           NULL, 
                                           tIPNETtick,
                                           "ipTCK");
@@ -453,7 +506,13 @@ extern eOipv4addr_t eom_ipnet_GetIPaddress(EOMtheIPnet *ip)
         return(0);
     }
     
-    return(s_eom_theipnet.ipcfg.eth_ip);
+#if defined(IPAL_use_cfg2) 
+    eOipv4addr_t ipv4 = s_eom_theipnet.ipcfg2.eth->eth_ip;
+#else
+    eOipv4addr_t ipv4 = s_eom_theipnet.ipcfg.eth_ip;
+#endif
+
+    return(ipv4);
 }
 
 extern eOresult_t eom_ipnet_Activate(EOMtheIPnet *ip)
@@ -1272,6 +1331,29 @@ static void s_eom_ipnet_ipal_start(void)
     uint32_t ram32sizeip;
     uint32_t *ram32dataip = NULL;
 
+#if defined(IPAL_use_cfg2) 
+
+    // initialise the ipal
+    ipal_base_memory_getsize2(&s_eom_theipnet.ipcfg2, &ram32sizeip);
+    if(0 != ram32sizeip)
+    {
+        ram32dataip = (uint32_t*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, ram32sizeip, 1);
+    }
+
+    if(eobool_true == s_eom_theipnet.taskwakeuponrxframe)
+    {
+        s_eom_theipnet.ipcfg2.extfn2->signal_rx_frame = e_eom_ipnet_signal_new_frame_is_available;
+    }
+    else
+    {
+        s_eom_theipnet.ipcfg2.extfn2->signal_rx_frame = NULL;
+    }
+
+    ipal_base_initialise2(&s_eom_theipnet.ipcfg2, ram32dataip);
+    
+    
+#else
+
     // initialise the ipal
     ipal_base_memory_getsize(&s_eom_theipnet.ipcfg, &ram32sizeip);
     if(0 != ram32sizeip)
@@ -1289,6 +1371,8 @@ static void s_eom_ipnet_ipal_start(void)
     }
 
     ipal_base_initialise(&s_eom_theipnet.ipcfg, ram32dataip);
+    
+#endif    
     
     // start the ipal
     ipal_sys_start();       

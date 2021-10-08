@@ -88,7 +88,6 @@ typedef enum
 } ipal_result_t;
 
 
-
 /** @typedef    typedef enum ipal_ipstack_t 
     @brief      ipal_ipstack_t contains all possible TCP/IP stacks supported by IPAL
  **/ 
@@ -195,6 +194,16 @@ typedef struct
     uint16_t    size;       /**< size of data       */
     uint8_t*    data;       /**< pointer to data    */
 } ipal_packet_t;
+
+
+/** @typedef    typedef void ipal_cfg_any_t 
+    @brief      it is to be used as only as ipal_cfg_any_t*. 
+                it can represent either a ipal_cfg_t* or a ipal_cfg2_t*
+                the former is the traditional format for ipal configuration, whereas the
+                latter is the more recent. in order to let understand that a module must
+                interpret ipal_cfg_any_t* as a ipal_cfg2_t*, the IPAL_use_cfg2 macro must be defined
+ **/ 
+typedef void ipal_cfg_any_t;
 
 
 /** @typedef    typedef struct ipal_fn_cfg_t

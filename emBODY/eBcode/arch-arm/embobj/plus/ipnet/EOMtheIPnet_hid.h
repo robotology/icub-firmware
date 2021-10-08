@@ -124,7 +124,13 @@ struct EOMtheIPnet_hid
 #endif
     eObool_t                        taskwakeuponrxframe;    /*< tells to send an evt to tskproc when there is a received eth frame */
     eObool_t                        active;
-    ipal_cfg_t                      ipcfg;                  /*< the ipal configuration */
+#if defined(IPAL_use_cfg2)    
+    ipal_cfg2_t                     ipcfg2; 
+    ipal_cfg2_eth_t                 ipcfg2_eth;
+    ipal_cfg2_extfn_t               ipcfg2_extfn2;
+#else
+    ipal_cfg_t                      ipcfg;
+#endif    
 }; 
 
 

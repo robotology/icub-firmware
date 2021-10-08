@@ -89,9 +89,6 @@ const eOmempool_alloc_config_t eom_thesystem_mempool_alloc_config_heaposal =
     },
     EO_INIT(.heap)
     {
-//        EO_INIT(.allocate)      osal_base_memory_new,
-//        EO_INIT(.reallocate)    osal_base_memory_realloc,
-//        EO_INIT(.release)       osal_base_memory_del
         EO_INIT(.allocate)      embot::os::rtos::memory_new,
         EO_INIT(.reallocate)    embot::os::rtos::memory_realloc,
         EO_INIT(.release)       embot::os::rtos::memory_delete        
@@ -191,7 +188,7 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
 
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg), "eom_sys_Initialise(): NULL syscfg", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
     // verify that we have a valid halcfg
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->halcfg), "eom_sys_Initialise(): NULL halcfg", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+//    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->halcfg), "eom_sys_Initialise(): NULL halcfg", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
 //    eo_errman_Assert(eo_errman_GetHandle(), (NULL != syscfg->osalcfg), "eom_sys_Initialise(): NULL osalcfg", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
 
     // mpoolcfg can be NULL: in such a case we use eo_mempool_alloc_dynamic mode
@@ -238,7 +235,7 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
 //    osal_base_initialise(s_eom_system.osalcfg, ram08data);
 
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
-    constexpr embot::os::IdleThread::Config idlecfg = { 512, nullptr, nullptr, onIdle };
+    constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
     constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
     
@@ -268,7 +265,7 @@ extern void eom_sys_Start(EOMtheSystem *p, eOvoid_fp_void_t userinit_fn)
 
 extern uint32_t eom_sys_GetHeapSize(EOMtheSystem *p)
 {
-    if(NULL == s_eom_system.thevsys)
+    if((NULL == s_eom_system.thevsys) || (NULL == s_eom_system.halcfg))
     {
         return(0);
     }

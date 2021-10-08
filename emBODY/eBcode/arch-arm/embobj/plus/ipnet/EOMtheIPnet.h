@@ -44,10 +44,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOMtask.h"
-
 #include "ipal.h"
-
-
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -109,10 +106,10 @@ typedef struct
 
 typedef struct
 {
-    eOmipnet_cfg_t          ipnetcfg;
-    const ipal_cfg_t*       ipalcfg; 
-    eOmipnet_cfg_addr_t*    addrcfg;
-    eOmipnet_cfg_dtgskt_t   dtgskcfg;
+    eOmipnet_cfg_t              ipnetcfg;
+    const ipal_cfg_any_t*       ipalcfg; // it accepts a ipal_cfg_t* or a ipal_cfg2_t* (only if IPAL_use_cfg2 is defined) 
+    eOmipnet_cfg_addr_t*        addrcfg;
+    eOmipnet_cfg_dtgskt_t       dtgskcfg;
 } eOmipnet_whole_cfg_t;
 
 
@@ -152,7 +149,8 @@ extern const eOmipnet_cfg_addr_t eom_ipnet_addr_DefaultCfg; // = {0, 0, 0};
     @param      stacksize       The stack size in bytes of the worker task
     @param      maxidle         The maximum time that the worker task waits for an event before processing the IPAL
     @param      taskwakeuponrxframe     If eobool_true, the worker task is waken up by the Ethernet ISR at teh reception of a frame.
-    @param      ipcfg           The configuration of the IPAL
+    @param      ipcfg           The configuration of the IPAL. It can be either a ipal_cfg_t* or a ipal_cfg2_t, but
+                                this latter only if macro IPAL_use_cfg2 is defined.
     @param      macaddr         If non-zero, it overrides the MAC address contained in ipcfg. Use eo_common_macaddr() to
                                 specify a non-zero MAC address.
     @param      ipaddr          If non-zero, it overrides the IP address contained in ipcfg. Use eo_common_ipv4ddr() to
@@ -163,7 +161,7 @@ extern const eOmipnet_cfg_addr_t eom_ipnet_addr_DefaultCfg; // = {0, 0, 0};
     @return     The handle to the RTOS net IP.
  **/
 extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
-                                          const ipal_cfg_t *ipcfg, 
+                                          const ipal_cfg_any_t *ipcfg, 
                                           const eOmipnet_cfg_addr_t *addrcfg,
                                           const eOmipnet_cfg_dtgskt_t *dtgskcfg
                                           ); 
