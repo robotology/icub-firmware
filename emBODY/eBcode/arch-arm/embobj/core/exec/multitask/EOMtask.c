@@ -34,7 +34,9 @@
 
 #include "stdio.h"
 
+#if !defined(EOMTASK_dont_register_thread_for_FATALERROR)
 #include "EOtheFatalError.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -364,9 +366,9 @@ extern eOresult_t eom_task_Init1(EOMtask *p, eOmtaskType_t type, uint8_t priorit
 
     // osaltask must not be NULL, thus i check it.
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osaltask), "eom_task_New(): osal gives NULL osaltask", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
-
+#if !defined(EOMTASK_dont_register_thread_for_FATALERROR)
     eo_fatalerror_RegisterThread(eo_fatalerror_GetHandle(), retptr->osaltask, retptr->nameof);
-    
+#endif    
     s_eom_task_count ++;
 #if defined(PRINT_TASK_ADDITIONAL_INFO)
     char str[128] = {0};
@@ -641,9 +643,9 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
 
     // osaltask must not be NULL, thus i check it.
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osaltask), "eom_task_New(): osal gives NULL osaltask", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
-
+#if !defined(EOMTASK_dont_register_thread_for_FATALERROR)
     eo_fatalerror_RegisterThread(eo_fatalerror_GetHandle(), retptr->osaltask, retptr->nameof);
-    
+#endif    
     s_eom_task_count ++;
 #if defined(PRINT_TASK_ADDITIONAL_INFO)
     char str[128] = {0};
