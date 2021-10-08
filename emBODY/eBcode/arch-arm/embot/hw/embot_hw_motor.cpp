@@ -128,9 +128,14 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_init(MOTOR h);
     Position s_hw_getencoder(MOTOR h);
-    Position s_hw_gethallcounter(MOTOR h);    
-    result_t s_hw_setpwm(MOTOR h, Pwm v);
-              
+    Position s_hw_gethallcounter(MOTOR h);
+    
+    uint8_t s_hw_gethallstatus(MOTOR h);
+    result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w);
+    result_t s_hw_setADCcallback(MOTOR h, void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty);
+    result_t s_hw_motorEnable(MOTOR h);
+    result_t s_hw_motorDisable(MOTOR h);
+
     result_t init(MOTOR h, const Config &config)
     {
         if(false == supported(h))
@@ -171,8 +176,25 @@ namespace embot { namespace hw { namespace motor {
         return resOK;
     }
 
+    result_t motorEnable(MOTOR h)
+    {
+        if(false == supported(h))
+        {
+            return resNOK;
+        }
+        
+        return s_hw_motorEnable(h);
+    }
     
-
+    result_t motorDisable(MOTOR h)
+    {
+        if(false == supported(h))
+        {
+            return resNOK;
+        }
+        
+        return s_hw_motorDisable(h);
+    }
     
     result_t getencoder(MOTOR h, Position &position)
     {
@@ -203,9 +225,28 @@ namespace embot { namespace hw { namespace motor {
         return resOK;               
     }
     
-    result_t setpwm(MOTOR h, Pwm v)
+    result_t gethallstatus(MOTOR h, uint8_t &hs)
     {
-        return s_hw_setpwm(h, v);
+        if(false == initialised(h))
+        {
+            return resNOK;
+        } 
+        
+        //std::uint8_t index = embot::core::tointegral(h);
+        //position = s_privatedata.tbdef[index].position;
+        hs = s_hw_gethallstatus(h);
+        
+        return resOK;               
+    }
+    
+    result_t setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
+    {
+        return s_hw_setpwmUVW(h, u, v, w);
+    }
+    
+    result_t setADCcallback(MOTOR h, void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty)
+    {
+        return s_hw_setADCcallback(h, fn_cb, rtu, rty);
     }
     
 // in here is the part for low level hw of the amcbldc
@@ -241,8 +282,8 @@ namespace embot { namespace hw { namespace motor {
         
         analogInit();
         encoderInit();
-        pwmInit();
         hallInit();
+        pwmInit();
 
         HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
         HAL_Delay(10); 
@@ -256,7 +297,7 @@ namespace embot { namespace hw { namespace motor {
     
     Position s_hw_getencoder(MOTOR h)
     {
-        return encoderGetCounter();
+        return encoderGetElectricalAngle();
     }
 
     Position s_hw_gethallcounter(MOTOR h)
@@ -264,10 +305,32 @@ namespace embot { namespace hw { namespace motor {
         return hallGetCounter();
     }
     
-    result_t s_hw_setpwm(MOTOR h, Pwm v)
+    uint8_t s_hw_gethallstatus(MOTOR h)
+    {
+        return hallGetStatus();
+    }
+    
+    result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
     {        
-        HAL_StatusTypeDef r = pwmSetValue(v);
-        return (HAL_OK == r) ? resOK : resNOK;
+        pwmSet(u, v, w);
+        return resOK;
+    }
+    
+    result_t s_hw_setADCcallback(MOTOR h, void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty)
+    {
+        setADC_cb(fn_cb, rtu, rty);
+        return resOK;
+    }
+    
+    result_t s_hw_motorEnable(MOTOR h)
+    {
+        pwmPhaseEnable(PWM_PHASE_ALL);
+        return resOK;
+    }
+    result_t s_hw_motorDisable(MOTOR h)
+    {
+        pwmPhaseDisable(PWM_PHASE_ALL);
+        return resOK;
     }
     
 #endif    

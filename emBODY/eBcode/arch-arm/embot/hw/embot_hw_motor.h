@@ -44,7 +44,11 @@ namespace embot { namespace hw { namespace motor {
     result_t getencoder(embot::hw::MOTOR h, Position &position);
     result_t gethallcounter(embot::hw::MOTOR h, Position &position);
     
-    result_t setpwm(MOTOR h, Pwm v);
+    result_t gethallstatus(embot::hw::MOTOR h, uint8_t &hs);
+    result_t setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w);
+    result_t setADCcallback(MOTOR h, void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty);
+    result_t motorEnable(MOTOR h);
+    result_t motorDisable(MOTOR h);
     
 }}} // namespace embot { namespace hw { namespace motor {
     
