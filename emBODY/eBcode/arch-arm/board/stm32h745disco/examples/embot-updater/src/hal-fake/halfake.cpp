@@ -20,25 +20,25 @@
 
 // eth
 
-extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
-{
-    return hal_res_OK;
-}
+//extern hal_result_t hal_eth_init(const hal_eth_cfg_t *cfg)
+//{
+//    return hal_res_OK;
+//}
 
-extern hal_result_t hal_eth_enable(void)
-{
-    return hal_res_OK;
-}
+//extern hal_result_t hal_eth_enable(void)
+//{
+//    return hal_res_OK;
+//}
 
-extern hal_result_t hal_eth_disable(void)
-{
-    return hal_res_OK;
-}
+//extern hal_result_t hal_eth_disable(void)
+//{
+//    return hal_res_OK;
+//}
 
-extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
-{
-    return hal_res_OK;
-}
+//extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
+//{
+//    return hal_res_OK;
+//}
 
 
 // led

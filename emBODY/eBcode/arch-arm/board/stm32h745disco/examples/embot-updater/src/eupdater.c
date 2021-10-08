@@ -258,15 +258,13 @@ extern void eupdater_init(void)
     //static const eOmipnet_cfg_t *cfg2use = &eom_ipnet_DefaultCfg;
     static const eOmipnet_cfg_t *cfg2use = &eom_ipnet_Cfg;
 
-#if 1
-     #error TODO: provide API for eom_ipnet_Initialise() w/ ipal_cfg2_t
-#else         
+       
     eom_ipnet_Initialise(cfg2use,
-                         ipalcfg, 
+                         pipalcfg2, 
                          eomipnet_addr,
                          &eom_ipnet_dtgskt_MyCfg
                          );
-#endif
+
      
     // init the leds   
 //    hal_led_init(hal_led0, NULL);

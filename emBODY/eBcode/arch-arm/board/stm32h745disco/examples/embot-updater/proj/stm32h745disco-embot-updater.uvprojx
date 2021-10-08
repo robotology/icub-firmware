@@ -10,7 +10,7 @@
       <TargetName>ethdemo-cmsisos2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -336,7 +336,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_cmsisos2</MiscControls>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_cmsisos2 -DIPAL_use_cfg2</MiscControls>
               <Define>USE_ZERO_OFFSET EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp</IncludePath>
@@ -361,7 +361,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -370,7 +370,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\stm32h745disco-application0offset.sct</ScatterFile>
+            <ScatterFile>..\..\bsp-ipal\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -394,9 +394,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.stm32h745disco.CM7.s</FileName>
+              <FileName>startup_stm32h745xx_CM7.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.stm32h745disco.CM7.s</FilePath>
+              <FilePath>..\cfg\startup_stm32h745xx_CM7.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1315,7 +1315,7 @@
             <Ra1Chk>0</Ra1Chk>
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
-            <Im1Chk>0</Im1Chk>
+            <Im1Chk>1</Im1Chk>
             <Im2Chk>1</Im2Chk>
             <OnChipMemories>
               <Ocm1>
@@ -1405,13 +1405,13 @@
               </OCR_RVCT8>
               <OCR_RVCT9>
                 <Type>0</Type>
-                <StartAddress>0x38000000</StartAddress>
-                <Size>0x10000</Size>
+                <StartAddress>0x20000000</StartAddress>
+                <Size>0x20000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x24000000</StartAddress>
-                <Size>0x80000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x10000</Size>
               </OCR_RVCT10>
             </OnChipMemories>
             <RvctStartVector></RvctStartVector>
@@ -1441,8 +1441,8 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>USE_ZERO_OFFSET EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V1A0</Define>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2</MiscControls>
+              <Define>CORE_CM7  USE_ZERO_OFFSET EMBOBJ_USE_EMBOT USE_STM32HAL STM32H745xx STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\..\bsp-ipal;..\cfg</IncludePath>
             </VariousControls>
@@ -1457,7 +1457,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <ClangAsOpt>4</ClangAsOpt>
+            <ClangAsOpt>1</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -1499,9 +1499,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.stm32h745disco.CM7.s</FileName>
+              <FileName>startup_stm32h745xx_CM7.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.stm32h745disco.CM7.s</FilePath>
+              <FilePath>..\cfg\startup_stm32h745xx_CM7.s</FilePath>
             </File>
           </Files>
         </Group>
