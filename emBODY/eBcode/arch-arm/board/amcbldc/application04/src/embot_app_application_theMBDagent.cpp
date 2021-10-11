@@ -51,90 +51,91 @@ struct embot::app::application::theMBDagent::Impl
     
     bool initialise();
     bool tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);    
-		
-		BUS_CAN bus_can;
-		
-		BUS_CAN_RX bus_can_rx;
-		BUS_MESSAGES_RX bus_messages_rx;
-		BUS_EVENTS_RX bus_events_rx;
-		BUS_CAN_RX_ERRORS bus_can_rx_errors;
-		
-		static SensorsData sensors_data;
-		
-		Flags flags;
-		Targets targets;
-		ConfigurationParameters config_params;
-		
-		struct OuterOutputs {
-			boolean_T velocity_enable;
-			boolean_T current_enable;
-			boolean_T out_enable;
-			real32_T motor_current;
-		};
-		
-		struct FOC_inputs
-        {
-            boolean_T pid_reset;
-            
-            real32_T motorconfig_kp;
-            real32_T motorconfig_ki;
-            
-            real32_T motorconfig_Kbemf;
-            real32_T motorconfig_Rphase;
-            
-            real32_T motorconfig_Vmax;
-            real32_T motorconfig_Vcc;
-            
-            real32_T motorsensors_Iabc[3];
-            real32_T motorsensors_angle;
-            real32_T motorsensors_omega;
-            
-            real32_T motorcurrent_current;
-            real32_T motorvoltage_voltage;
-            real32_T OuterOutputs_desiredcurrent;
-            
-            boolean_T velocity_enable;
-            boolean_T current_enable;
-            boolean_T output_enable;
-        };
-		
-		struct FOC_outputs
-        {
-            uint16_T Vabc_PWM_ticks[3];
-            real32_T Iq_fbk_current;
-        };
-		
-		
-		
-		OuterOutputs outer_outputs;
-		
-		BUS_MESSAGES_TX bus_messages_tx;
-		BUS_EVENTS_TX bus_events_tx;
-		
-		BUS_CAN output;
-		
-		can_messaging::CAN_RX_raw2struct can_packet_formatter;
-		can_messaging::CAN_Decoder can_decoder;
-		
-		SupervisorFSM_RXModelClass supervisor_rx;
-		SupervisorFSM_TXModelClass supervisor_tx;
-		
-		control_outerModelClass control_outer;
-		static control_focModelClass control_foc;
         
-        static FOC_inputs foc_inputs;
-        static FOC_outputs foc_outputs;
-        static bool motor_enabled_prev;
-		
-		can_messaging::CAN_Encoder can_encoder;
-		
-		InternalMessages internal_messages;
-        
-     static void inner_foc_callback(int16_T Iuvw[3], void* rtu, void* rty)
+    BUS_CAN bus_can;
+    
+    BUS_CAN_RX bus_can_rx;
+    BUS_MESSAGES_RX bus_messages_rx;
+    BUS_EVENTS_RX bus_events_rx;
+    BUS_CAN_RX_ERRORS bus_can_rx_errors;
+    
+    static SensorsData sensors_data;
+    
+    Flags flags;
+    Targets targets;
+    ConfigurationParameters config_params;
+    
+    struct OuterOutputs 
     {
-            FOC_inputs* u = (FOC_inputs*)rtu;
-            FOC_outputs* y = (FOC_outputs*)rty;
-         //Currently we don't read hall sensor
+        boolean_T velocity_enable;
+        boolean_T current_enable;
+        boolean_T out_enable;
+        real32_T motor_current;
+    };
+        
+    struct FOC_inputs
+    {
+        boolean_T pid_reset;
+        
+        real32_T motorconfig_kp;
+        real32_T motorconfig_ki;
+        
+        real32_T motorconfig_Kbemf;
+        real32_T motorconfig_Rphase;
+        
+        real32_T motorconfig_Vmax;
+        real32_T motorconfig_Vcc;
+        
+        real32_T motorsensors_Iabc[3];
+        real32_T motorsensors_angle;
+        real32_T motorsensors_omega;
+        
+        real32_T motorcurrent_current;
+        real32_T motorvoltage_voltage;
+        real32_T OuterOutputs_desiredcurrent;
+        
+        boolean_T velocity_enable;
+        boolean_T current_enable;
+        boolean_T output_enable;
+    };
+        
+    struct FOC_outputs
+    {
+        uint16_T Vabc_PWM_ticks[3];
+        real32_T Iq_fbk_current;
+    };
+        
+        
+        
+    OuterOutputs outer_outputs;
+    
+    BUS_MESSAGES_TX bus_messages_tx;
+    BUS_EVENTS_TX bus_events_tx;
+    
+    BUS_CAN output;
+    
+    can_messaging::CAN_RX_raw2struct can_packet_formatter;
+    can_messaging::CAN_Decoder can_decoder;
+    
+    SupervisorFSM_RXModelClass supervisor_rx;
+    SupervisorFSM_TXModelClass supervisor_tx;
+    
+    control_outerModelClass control_outer;
+    static control_focModelClass control_foc;
+    
+    static FOC_inputs foc_inputs;
+    static FOC_outputs foc_outputs;
+    static bool motor_enabled_prev;
+    
+    can_messaging::CAN_Encoder can_encoder;
+    
+    InternalMessages internal_messages;
+        
+    static void inner_foc_callback(int16_T Iuvw[3], void* rtu, void* rty)
+    {
+        FOC_inputs* u = (FOC_inputs*)rtu;
+        FOC_outputs* y = (FOC_outputs*)rty;
+        //Currently we don't read hall sensor
         //embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, u->rtu_Sensors_motorsensors_hall_e);
         
         embot::hw::motor::Position electricalAngle;
@@ -254,139 +255,143 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     foc_inputs.motorconfig_Vmax = 9;
     foc_inputs.motorconfig_Vcc = 24;
     
-	sensors_data.jointpositions.position = 0;
+    sensors_data.jointpositions.position = 0;
     sensors_data.motorsensors.temperature = 1;
     sensors_data.motorsensors.threshold.current_high = 100;
     sensors_data.motorsensors.threshold.voltage_high = 100;
     sensors_data.motorsensors.threshold.temperature_high = 100;
 
-//		config_params.PosLoopPID.P = 5.f;
-//		config_params.PosLoopPID.I = 1250.f;
-//		
-//		config_params.VelLoopPID.P = 5.f;
-//		config_params.VelLoopPID.I = 1250.f;
-//		
-//		config_params.DirLoopPID.P = 5.f;
-//		config_params.DirLoopPID.I = 1250.f;
-		
-		can_decoder.init(&bus_messages_rx, &bus_events_rx, &bus_can_rx_errors);
-		
-		supervisor_rx.init(&flags, &targets);
-		
-		supervisor_tx.init(&bus_messages_tx, &bus_events_tx);
-				
-		can_encoder.initialize();
-		
-		// init motor
-		embot::hw::motor::init(embot::hw::MOTOR::one, {});
-		
-		embot::hw::motor::setADCcallback(embot::hw::MOTOR::one, inner_foc_callback, &foc_inputs, &foc_outputs);
+//        config_params.PosLoopPID.P = 5.f;
+//        config_params.PosLoopPID.I = 1250.f;
+//        
+//        config_params.VelLoopPID.P = 5.f;
+//        config_params.VelLoopPID.I = 1250.f;
+//        
+//        config_params.DirLoopPID.P = 5.f;
+//        config_params.DirLoopPID.I = 1250.f;
+        
+    can_decoder.init(&bus_messages_rx, &bus_events_rx, &bus_can_rx_errors);
+    
+    supervisor_rx.init(&flags, &targets);
+    
+    supervisor_tx.init(&bus_messages_tx, &bus_events_tx);
+            
+    can_encoder.initialize();
+    
+    // init motor
+    embot::hw::motor::init(embot::hw::MOTOR::one, {});
+    
+    embot::hw::motor::setADCcallback(embot::hw::MOTOR::one, inner_foc_callback, &foc_inputs, &foc_outputs);
             
     control_outer.initialize();
-			
+            
     control_foc.initialize();
     
-			initted = true;        
+            initted = true;        
     return initted;   
 }
 
 bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 {
 
-		uint8_t rx_data[8] {0};
-		uint8_t rx_size {0};
-		uint32_t rx_id {0};
-		
-		
-		if (inpframes.size() == 0) {
-				bus_can.available = 0;
-		} else {
-				bus_can.available = 1;
-				embot::prot::can::Frame last_frame = inpframes.back();
-				last_frame.copyto(rx_id, rx_size, rx_data);
-		}
-		
-		bus_can.lengths = (uint8_T)rx_size;
-		
-		bus_can.packets.ID = (uint16_T)rx_id;
-		
-		for (int i=0;i<rx_size;i++) {
-			bus_can.packets.PAYLOAD[i] = (uint8_T)rx_data[i];
-		}
-		
-		can_packet_formatter.step(bus_can, bus_can_rx);
-		
-		
-		can_decoder.step(bus_can_rx, bus_messages_rx, bus_events_rx, bus_can_rx_errors);
-		
-		
+    uint8_t rx_data[8] {0};
+    uint8_t rx_size {0};
+    uint32_t rx_id {0};
+    
+    
+    if (inpframes.size() == 0) 
+    {
+        bus_can.available = 0;
+    } 
+    else 
+    {
+        bus_can.available = 1;
+        embot::prot::can::Frame last_frame = inpframes.back();
+        last_frame.copyto(rx_id, rx_size, rx_data);
+    }
+    
+    bus_can.lengths = (uint8_T)rx_size;
+    
+    bus_can.packets.ID = (uint16_T)rx_id;
+    
+    for (int i=0;i<rx_size;i++) 
+    {
+        bus_can.packets.PAYLOAD[i] = (uint8_T)rx_data[i];
+    }
+    
+    can_packet_formatter.step(bus_can, bus_can_rx);
+        
+        
+    can_decoder.step(bus_can_rx, bus_messages_rx, bus_events_rx, bus_can_rx_errors);
+        
+        
     supervisor_rx.step(internal_messages, sensors_data.motorsensors, bus_events_rx, bus_messages_rx, bus_can_rx_errors, flags, targets);
         
 //        static char msg2[64];
 //        sprintf(msg2, "[%.3f, %.3f -- %d, %d]\n", targets.motorcurrent.current, targets.motorvoltage.voltage, bus_can_rx_errors.event, bus_events_rx.desired_current);
 //        sprintf(msg2, "[%d, %d]\n", flags.control_mode, outer_outputs.out_enable);
 //        embot::core::print(msg2);
-		
-		control_outer.step(&flags.control_mode, &flags.PID_reset, 
-												&config_params.velocitylimits.limits[0],
-												&config_params.motorconfig.reduction,
-												&config_params.motorconfig.has_speed_sens,
-												&config_params.PosLoopPID.P,
-												&config_params.PosLoopPID.I,
-												&config_params.PosLoopPID.D,
-												&config_params.PosLoopPID.N,
-												&config_params.VelLoopPID.P,
-												&config_params.VelLoopPID.I,
-												&config_params.VelLoopPID.D,
-												&config_params.VelLoopPID.N,
-												&config_params.DirLoopPID.P,
-												&config_params.DirLoopPID.I,
-												&config_params.DirLoopPID.D,
-												&config_params.DirLoopPID.N,
-												&sensors_data.jointpositions.position,
-												&sensors_data.motorsensors.omega,
-												&targets.jointpositions.position,
-												&targets.jointvelocities.velocity,
-												&outer_outputs.velocity_enable,
-												&outer_outputs.current_enable,
-												&outer_outputs.out_enable,
-												&outer_outputs.motor_current);	
+        
+    control_outer.step(&flags.control_mode, &flags.PID_reset, 
+                                                &config_params.velocitylimits.limits[0],
+                                                &config_params.motorconfig.reduction,
+                                                &config_params.motorconfig.has_speed_sens,
+                                                &config_params.PosLoopPID.P,
+                                                &config_params.PosLoopPID.I,
+                                                &config_params.PosLoopPID.D,
+                                                &config_params.PosLoopPID.N,
+                                                &config_params.VelLoopPID.P,
+                                                &config_params.VelLoopPID.I,
+                                                &config_params.VelLoopPID.D,
+                                                &config_params.VelLoopPID.N,
+                                                &config_params.DirLoopPID.P,
+                                                &config_params.DirLoopPID.I,
+                                                &config_params.DirLoopPID.D,
+                                                &config_params.DirLoopPID.N,
+                                                &sensors_data.jointpositions.position,
+                                                &sensors_data.motorsensors.omega,
+                                                &targets.jointpositions.position,
+                                                &targets.jointvelocities.velocity,
+                                                &outer_outputs.velocity_enable,
+                                                &outer_outputs.current_enable,
+                                                &outer_outputs.out_enable,
+                                                &outer_outputs.motor_current);    
 
 
-		
-        foc_inputs.pid_reset = flags.PID_reset;
-        foc_inputs.motorconfig_Kbemf = config_params.motorconfig.Kbemf;
-        foc_inputs.motorconfig_Rphase = config_params.motorconfig.Rphase;
-        foc_inputs.motorsensors_angle = sensors_data.motorsensors.angle;
-        foc_inputs.motorsensors_omega = sensors_data.motorsensors.omega;
-        foc_inputs.motorcurrent_current = targets.motorcurrent.current*0.001;
-        foc_inputs.motorvoltage_voltage = targets.motorvoltage.voltage;
-        foc_inputs.OuterOutputs_desiredcurrent = outer_outputs.motor_current;
-        foc_inputs.velocity_enable = outer_outputs.velocity_enable;
-        foc_inputs.current_enable = outer_outputs.current_enable;
-        foc_inputs.output_enable = outer_outputs.out_enable;
-	
-		supervisor_tx.step(sensors_data, bus_messages_rx, bus_messages_tx, bus_events_tx);
- 
-		can_encoder.step(bus_messages_tx, bus_events_tx, output);
+    
+    foc_inputs.pid_reset = flags.PID_reset;
+    foc_inputs.motorconfig_Kbemf = config_params.motorconfig.Kbemf;
+    foc_inputs.motorconfig_Rphase = config_params.motorconfig.Rphase;
+    foc_inputs.motorsensors_angle = sensors_data.motorsensors.angle;
+    foc_inputs.motorsensors_omega = sensors_data.motorsensors.omega;
+    foc_inputs.motorcurrent_current = targets.motorcurrent.current*0.001;
+    foc_inputs.motorvoltage_voltage = targets.motorvoltage.voltage;
+    foc_inputs.OuterOutputs_desiredcurrent = outer_outputs.motor_current;
+    foc_inputs.velocity_enable = outer_outputs.velocity_enable;
+    foc_inputs.current_enable = outer_outputs.current_enable;
+    foc_inputs.output_enable = outer_outputs.out_enable;
+
+    supervisor_tx.step(sensors_data, bus_messages_rx, bus_messages_tx, bus_events_tx);
+
+    can_encoder.step(bus_messages_tx, bus_events_tx, output);
         
         
         
-		
-//		std::string control_mode_string {"Not Configured"};
-		
-//		if (supervisor_control_mode == 1) {
-//			control_mode_string = "Idle";
-//		} else if (supervisor_control_mode == 5) {
-//			control_mode_string = "Velocity";
-//		}
-//		
-//		if (rtb_control_mode == 0) {
-//		 	embot::core::print("Event Set Control Mode: False | Value of supervisor control mode variable: " + control_mode_string);
-//		} else {
-//		 	embot::core::print("Event Set Control Mode: True  | Value of supervisor control mode variable: " + control_mode_string);
-//		}
-		
+        
+//        std::string control_mode_string {"Not Configured"};
+        
+//        if (supervisor_control_mode == 1) {
+//            control_mode_string = "Idle";
+//        } else if (supervisor_control_mode == 5) {
+//            control_mode_string = "Velocity";
+//        }
+//        
+//        if (rtb_control_mode == 0) {
+//             embot::core::print("Event Set Control Mode: False | Value of supervisor control mode variable: " + control_mode_string);
+//        } else {
+//             embot::core::print("Event Set Control Mode: True  | Value of supervisor control mode variable: " + control_mode_string);
+//        }
+        
     if(output.available)
     {
         embot::prot::can::Frame fr {output.packets.ID, 8, output.packets.PAYLOAD};
