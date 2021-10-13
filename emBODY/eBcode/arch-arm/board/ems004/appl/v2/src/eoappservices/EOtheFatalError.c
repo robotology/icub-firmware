@@ -72,6 +72,8 @@ static void s_info_hardfault(EOtheFatalError *p);
 static void s_save_mpustate(fatal_error_descriptor_t *des);
 static void s_info_mpustate(EOtheFatalError *p);
 static void s_set_divide_by_zero_trap(void);
+static void s_set_separate_handlers(void);
+static void s_disable_writebuffering(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -110,6 +112,8 @@ extern EOtheFatalError* eo_fatalerror_Initialise(void)
     }
     
     s_set_divide_by_zero_trap();
+    s_set_separate_handlers();
+    s_disable_writebuffering();
     
 //    eo_errman_Trace(eo_errman_GetHandle(), "eo_fatalerror_Initialise() starts", s_eobj_ownname); 
        
@@ -519,7 +523,22 @@ static void s_info_standard(EOtheFatalError *p)
 static void s_set_divide_by_zero_trap(void)
 {
     volatile uint32_t *pCCR = (volatile uint32_t *) 0xE000ED14;
-    (*pCCR) |= 0x00000010;
+    (*pCCR) |= 0x00000010;    
+}
+
+static void s_set_separate_handlers(void)
+{    
+    volatile uint32_t *pSHCSR = (volatile uint32_t *) 0xE000ED24;
+    #define SCB_SHCSR_USGFAULTENA_Msk (0x01 << 18)
+    #define SCB_SHCSR_BUSFAULTENA_Msk (0x01 << 17)
+    #define SCB_SHCSR_MEMFAULTENA_Msk (0x01 << 16)
+    (*pSHCSR) |= (SCB_SHCSR_USGFAULTENA_Msk | SCB_SHCSR_BUSFAULTENA_Msk | SCB_SHCSR_MEMFAULTENA_Msk);
+}
+
+static void s_disable_writebuffering(void)
+{
+    volatile uint32_t *ACTLR = (volatile uint32_t *)0xE000E008;
+    (*ACTLR) |= 2;
 }
 
 static void s_save_hardfault(fatal_error_descriptor_t *des)
