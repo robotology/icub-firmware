@@ -615,7 +615,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))                
                 {   // ok, the hal reads correctly
                                                             
-                    // TODO: check validy for aea3
+                    // check validy for aea3
                     if(eobool_true == s_eo_appEncReader_IsValidValue_AEA3(&spiRawValue, &prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
                         // the resolution is 16384 ticks per revolution.

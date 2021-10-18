@@ -241,9 +241,6 @@ extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder
 
 extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_diagnostic_t* diagn);
 
-// TODO: Remove
-extern hal_result_t hal_spiencoder_get_value3(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_position_t* raw_buff_val_1, hal_spiencoder_position_t* raw_buff_val_2, hal_spiencoder_position_t* raw_buff_val_3, hal_spiencoder_diagnostic_t* diagn);
-
 ///** @fn         extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_value_t* value)
 //    @brief      This function reads data previously acquired by a call of hal_spiencoder_start().
 //    @param      encoder         the encoder

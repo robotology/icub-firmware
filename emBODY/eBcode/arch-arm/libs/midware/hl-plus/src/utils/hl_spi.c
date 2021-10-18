@@ -560,9 +560,7 @@ static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
                                             hl_gpio_init_t* mosiinit, hl_gpio_altf_t* mosialtf,
                                             uint16_t gpio_mask 
                                         )
-{
-    //static const uint8_t GPIO_PuPd_VALUE = (gpio_mask == 0) ? GPIO_PuPd_UP : GPIO_PuPd_NOPULL; // TODO: edited for AEA3 previusely was GPIO_PuPd_UP
-    
+{    
     static const hl_gpio_init_t s_hl_spi_sckmosi_master_gpio_init = 
     {
 #if     defined(HL_USE_MPU_ARCH_STM32F1)

@@ -102,7 +102,7 @@ void AbsEncoder_destroy(AbsEncoder* o)
 //this function set spikes limits values based of encoder type
 void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
 {
-    char message[150]; // TODO: comment
+    //char message[150];
     switch(o->type)
     {
         case(eomc_enc_mais):
@@ -119,7 +119,6 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
         case(eomc_enc_spichainof3):
         {
             int32_t toleranceIDeg =(int32_t)((o->toleranceCfg * 65535.0f) / 360.0f) ;
-            #define AEA_MIN_SPIKE 16 //iDegree 
             /* Note: AEA has 12 bits of resolution, so we pad with four zero to transform from AEA unit to iDegree */
             if(toleranceIDeg < AEA_MIN_SPIKE)
                 o->spike_mag_limit = AEA_MIN_SPIKE * o->div;
@@ -128,7 +127,7 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
             
             o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
             
-            snprintf(message, sizeof(message), "ABSE aea:tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit); // TODO: comment
+            //snprintf(message, sizeof(message), "ABSE aea:tol %.3f, div %.3f spikel %d", o->toleranceCfg, o->div, o->spike_mag_limit);
         }break; 
 
         // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to ... amo and psc
