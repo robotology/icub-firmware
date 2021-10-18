@@ -199,20 +199,20 @@ void NMI_Handler(void)
 //    hw_handler(fatalerror_handler_hw_HardFault);
 //}
 
-void MemManage_Handler(void)
-{
-    hw_handler(fatalerror_handler_hw_MemManage);
-}
+//void MemManage_Handler(void)
+//{
+//    hw_handler(fatalerror_handler_hw_MemManage);
+//}
 
-void BusFault_Handler(void)
-{
-    hw_handler(fatalerror_handler_hw_BusFault);
-}
+//void BusFault_Handler(void)
+//{
+//    hw_handler(fatalerror_handler_hw_BusFault);
+//}
 
-void UsageFault_Handler(void)
-{
-    hw_handler(fatalerror_handler_hw_UsageFault);
-}
+//void UsageFault_Handler(void)
+//{
+//    hw_handler(fatalerror_handler_hw_UsageFault);
+//}
 
 void DebugMon_Handler(void)
 {
@@ -250,6 +250,78 @@ void HardFault_Handler(void)
   "_GetPC:                        \n"  /* find out where the hard fault happened */
     " ldr r1,[r0,#24]             \n"  /* load program counter into R1. R1 contains address of the next instruction where the hard fault happened */
     " b McuHardFault_HandlerC   \n"    /* decode more information. R0 contains pointer to stack frame */
+  );
+}
+
+void McuBusFault_HandlerC(uint32_t *hardfault_args)
+{
+    hw_handler_hf(fatalerror_handler_hw_BusFault, hardfault_args);
+}
+
+void BusFault_Handler(void) __attribute__((naked));
+void BusFault_Handler(void)
+{
+  __asm volatile (
+    ".syntax unified              \n"  /* needed for the 'adds r1,#2' below */
+    " movs r0,#4                  \n"  /* load bit mask into R0 */
+    " mov r1, lr                  \n"  /* load link register into R1 */
+    " tst r0, r1                  \n"  /* compare with bitmask */
+    " beq _MSP1                   \n"  /* if bitmask is set: stack pointer is in PSP. Otherwise in MSP */
+    " mrs r0, psp                 \n"  /* otherwise: stack pointer is in PSP */
+    " b _GetPC1                   \n"  /* go to part which loads the PC */
+  "_MSP1:                         \n"  /* stack pointer is in MSP register */
+    " mrs r0, msp                 \n"  /* load stack pointer into R0 */
+  "_GetPC1:                       \n"  /* find out where the hard fault happened */
+    " ldr r1,[r0,#24]             \n"  /* load program counter into R1. R1 contains address of the next instruction where the hard fault happened */
+    " b McuBusFault_HandlerC      \n"  /* decode more information. R0 contains pointer to stack frame */
+  );
+}
+
+void McuMemManage_HandlerC(uint32_t *hardfault_args)
+{
+    hw_handler_hf(fatalerror_handler_hw_MemManage, hardfault_args);
+}
+
+void MemManage_Handler(void) __attribute__((naked));
+void MemManage_Handler(void)
+{
+  __asm volatile (
+    ".syntax unified              \n"  /* needed for the 'adds r1,#2' below */
+    " movs r0,#4                  \n"  /* load bit mask into R0 */
+    " mov r1, lr                  \n"  /* load link register into R1 */
+    " tst r0, r1                  \n"  /* compare with bitmask */
+    " beq _MSP2                   \n"  /* if bitmask is set: stack pointer is in PSP. Otherwise in MSP */
+    " mrs r0, psp                 \n"  /* otherwise: stack pointer is in PSP */
+    " b _GetPC2                   \n"  /* go to part which loads the PC */
+  "_MSP2:                         \n"  /* stack pointer is in MSP register */
+    " mrs r0, msp                 \n"  /* load stack pointer into R0 */
+  "_GetPC2:                       \n"  /* find out where the hard fault happened */
+    " ldr r1,[r0,#24]             \n"  /* load program counter into R1. R1 contains address of the next instruction where the hard fault happened */
+    " b McuMemManage_HandlerC     \n"    /* decode more information. R0 contains pointer to stack frame */
+  );
+}
+
+void McuUsageFault_HandlerC(uint32_t *hardfault_args)
+{
+    hw_handler_hf(fatalerror_handler_hw_UsageFault, hardfault_args);
+}
+
+void UsageFault_Handler(void) __attribute__((naked));
+void UsageFault_Handler(void)
+{
+  __asm volatile (
+    ".syntax unified              \n"  /* needed for the 'adds r1,#2' below */
+    " movs r0,#4                  \n"  /* load bit mask into R0 */
+    " mov r1, lr                  \n"  /* load link register into R1 */
+    " tst r0, r1                  \n"  /* compare with bitmask */
+    " beq _MSP3                   \n"  /* if bitmask is set: stack pointer is in PSP. Otherwise in MSP */
+    " mrs r0, psp                 \n"  /* otherwise: stack pointer is in PSP */
+    " b _GetPC3                   \n"  /* go to part which loads the PC */
+  "_MSP3:                         \n"  /* stack pointer is in MSP register */
+    " mrs r0, msp                 \n"  /* load stack pointer into R0 */
+  "_GetPC3:                       \n"  /* find out where the hard fault happened */
+    " ldr r1,[r0,#24]             \n"  /* load program counter into R1. R1 contains address of the next instruction where the hard fault happened */
+    " b McuUsageFault_HandlerC    \n"    /* decode more information. R0 contains pointer to stack frame */
   );
 }
 

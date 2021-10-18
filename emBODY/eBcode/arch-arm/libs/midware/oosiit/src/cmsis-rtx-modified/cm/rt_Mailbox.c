@@ -81,6 +81,8 @@ OS_RESULT rt_mbx_send (OS_ID mailbox, void *p_msg, U16 timeout) {
     *p_TCB->msg = p_msg;
     rt_ret_val (p_TCB, OS_R_MBX);
 #endif
+        FATALERR_RT_set(FT_0, 21);
+        FATALERR_RT_set(FT_1, 0);
     rt_rmv_dly (p_TCB);
     rt_dispatch (p_TCB);
   }
@@ -144,6 +146,8 @@ OS_RESULT rt_mbx_wait (OS_ID mailbox, void **message, U16 timeout) {
       if (++p_MCB->first == p_MCB->size) {
         p_MCB->first = 0U;
       }
+        FATALERR_RT_set(FT_0, 22);
+        FATALERR_RT_set(FT_1, 0);
       rt_rmv_dly (p_TCB);
       rt_dispatch (p_TCB);
     }
@@ -257,7 +261,8 @@ void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
         p_CB->first = 0U;
       }
       p_TCB->state = READY;
-      rt_rmv_dly (p_TCB);
+        FATALERR_RT_set(FT_0, 23);
+        FATALERR_RT_set(FT_1, 0);      rt_rmv_dly (p_TCB);
       rt_put_prio (&os_rdy, p_TCB);
       break;
     case 1:
@@ -270,6 +275,8 @@ void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
       rt_ret_val (p_TCB, OS_R_MBX);
 #endif
       p_TCB->state = READY;
+        FATALERR_RT_set(FT_0, 24);
+        FATALERR_RT_set(FT_1, 0);
       rt_rmv_dly (p_TCB);
       rt_put_prio (&os_rdy, p_TCB);
       break;

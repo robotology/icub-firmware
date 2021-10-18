@@ -105,6 +105,8 @@ void rt_evt_set (U16 event_flags, OS_TID task_id) {
     if (p_tcb->events & event_flags) {
       p_tcb->waits  &= p_tcb->events;
 wkup: p_tcb->events &= ~event_flags;
+        FATALERR_RT_set(FT_0, 25);
+        FATALERR_RT_set(FT_1, 0);
       rt_rmv_dly (p_tcb);
       p_tcb->state   = READY;
 #ifdef __CMSIS_RTOS
@@ -173,6 +175,8 @@ void rt_evt_psh (P_TCB p_CB, U16 set_flags) {
     if (p_CB->events & event_flags) {
       p_CB->waits  &= p_CB->events;
 rdy:  p_CB->events &= ~event_flags;
+        FATALERR_RT_set(FT_0, 26);
+        FATALERR_RT_set(FT_1, 0);
       rt_rmv_dly (p_CB);
       p_CB->state   = READY;
 #ifdef __CMSIS_RTOS

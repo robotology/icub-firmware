@@ -1028,6 +1028,8 @@ void iitchanged_rt_evt_set (EVENT_t event_flags, OS_TPTR taskp) {
     if (p_tcb->events & event_flags) {
       p_tcb->waits  &= p_tcb->events;
 wkup: p_tcb->events &= ~event_flags;
+        FATALERR_RT_set(FT_0, 1);
+        FATALERR_RT_set(FT_1, 0);
       rt_rmv_dly (p_tcb);
       p_tcb->state   = READY;
 #ifdef __CMSIS_RTOS
@@ -1095,6 +1097,8 @@ void iitchanged_rt_evt_psh (U32 arg_u32, U32 set_flags) {
     if (p_CB->events & event_flags) {
       p_CB->waits  &= p_CB->events;
 rdy:  p_CB->events &= ~event_flags;
+        FATALERR_RT_set(FT_0, 2);
+        FATALERR_RT_set(FT_1, 0);
       rt_rmv_dly (p_CB);
       p_CB->state   = READY;
 #ifdef __CMSIS_RTOS
@@ -1150,6 +1154,8 @@ OS_RESULT rt_iit_mbx_delete (OS_ID mailbox)
                 *p_TCB->msg = NULL;
                 rt_ret_val (p_TCB, OS_R_OBJDELETED);
             }
+            FATALERR_RT_set(FT_0, 3);
+            FATALERR_RT_set(FT_1, 0);
             rt_rmv_dly (p_TCB);
             rt_dispatch (p_TCB);               
         }
@@ -1158,6 +1164,8 @@ OS_RESULT rt_iit_mbx_delete (OS_ID mailbox)
             // a task is waiting to send a message: the mbx cannot accept it, thus we return an error 
             p_TCB = rt_get_first ((P_XCB)p_MCB);
             rt_ret_val(p_TCB, OS_R_OBJDELETED);
+            FATALERR_RT_set(FT_0, 4);
+            FATALERR_RT_set(FT_1, 0);
             rt_rmv_dly (p_TCB);
             rt_dispatch (p_TCB);
         }
@@ -1191,6 +1199,8 @@ OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
     *p_TCB->msg = p_msg;
     rt_ret_val (p_TCB, OS_R_MBX);
 #endif
+    FATALERR_RT_set(FT_0, 5);
+    FATALERR_RT_set(FT_1, 0);
     rt_rmv_dly (p_TCB);
     rt_dispatch (p_TCB);
   }
@@ -1253,6 +1263,8 @@ OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout)
       if (++p_MCB->first == p_MCB->size) {
         p_MCB->first = 0U;
       }
+        FATALERR_RT_set(FT_0, 6);
+        FATALERR_RT_set(FT_1, 0);
       rt_rmv_dly (p_TCB);
       rt_dispatch (p_TCB);
     }
@@ -1358,6 +1370,8 @@ OS_RESULT rt_iit_sem_set (OS_ID semaphore, U8 ntokens) {
 #else
     rt_ret_val(p_TCB, OS_R_SEM);
 #endif
+    FATALERR_RT_set(FT_0, 7);
+    FATALERR_RT_set(FT_1, 0);  
     rt_rmv_dly (p_TCB);
     rt_dispatch (p_TCB);
     //os_tsk.run->ret_val = OS_R_OK;
@@ -1383,6 +1397,8 @@ OS_RESULT iitchanged_rt_sem_send (OS_ID semaphore) {
 #else
     rt_ret_val(p_TCB, OS_R_SEM);
 #endif
+        FATALERR_RT_set(FT_0, 8);
+        FATALERR_RT_set(FT_1, 0);      
     rt_rmv_dly (p_TCB);
     rt_dispatch (p_TCB);
   }
@@ -1435,6 +1451,8 @@ void iitchanged_rt_sem_psh (void *p) {
   if (p_CB->p_lnk != NULL) {
     /* A task is waiting for token */
     p_TCB = rt_get_first ((P_XCB)p_CB);
+        FATALERR_RT_set(FT_0, 9);
+        FATALERR_RT_set(FT_1, 0);      
     rt_rmv_dly (p_TCB);
     p_TCB->state   = READY;
 #ifdef __CMSIS_RTOS
@@ -1463,6 +1481,8 @@ OS_RESULT rt_iit_sem_delete (OS_ID semaphore) {
     /* A task is waiting for token */
     p_TCB = rt_get_first ((P_XCB)p_SCB);
     rt_ret_val(p_TCB, OS_R_OBJDELETED);
+        FATALERR_RT_set(FT_0, 10);
+        FATALERR_RT_set(FT_1, 0);      
     rt_rmv_dly(p_TCB);
     p_TCB->state = READY;
     rt_put_prio (&os_rdy, p_TCB);
@@ -1717,6 +1737,8 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
 #else
         rt_ret_val(p_TCB, OS_R_MUT); 
 #endif
+        FATALERR_RT_set(FT_0, 11);
+        FATALERR_RT_set(FT_1, 0);          
         rt_rmv_dly (p_TCB);
         p_TCB->state = READY;
         rt_put_prio (&os_rdy, p_TCB);
@@ -1771,6 +1793,8 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
 //    }
 //    task_context = os_active_TCB[task_id-1];
     rt_rmv_list (task_context);
+        FATALERR_RT_set(FT_0, 12);
+        FATALERR_RT_set(FT_1, 0);      
     rt_rmv_dly (task_context);
     p_MCB = task_context->p_mlnk;
     while (p_MCB) {
@@ -1783,6 +1807,8 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
 #else
         rt_ret_val (p_TCB, OS_R_MUT); 
 #endif
+        FATALERR_RT_set(FT_0, 13);
+        FATALERR_RT_set(FT_1, 0);          
         rt_rmv_dly (p_TCB);
         p_TCB->state = READY;
         rt_put_prio (&os_rdy, p_TCB);
