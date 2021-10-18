@@ -36,6 +36,24 @@
 
 #include "osal.h"
 
+#if defined(FATALERR_trace_TMRMAN)
+extern volatile uint32_t FATALERR_tmrman[8];
+#define FT_0 0
+#define FT_1 1
+#define FT_2 2
+#define FT_3 3
+#define FT_4 4
+#define FT_5 5
+// in here we use up to FT_5
+//#define FT_6 6
+//#define FT_7 7
+#define FATALERR_TM_set(a, b)           FATALERR_tmrman[(a)] = (uint32_t)(b)
+#define FATALERR_TM_setcond(a, b, c)    FATALERR_tmrman[(a)] = (c) ? ((uint32_t)(b)) : (0)
+#else
+#define FATALERR_TM_set(a, b) 
+#define FATALERR_TM_setcond(a, b, c) 
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -182,24 +200,34 @@ static void s_eom_timerman_OnExpiry(osal_timer_t *osaltmr, void *tmr)
 #ifdef _EOM_TIMERMAN_EVENTS_DIRECTLY_SENT_BY_OSAL_
 
     EOtimer *t = (EOtimer*)tmr;
+    FATALERR_TM_set(FT_0, 32);
+    FATALERR_TM_set(FT_3, t);
+    FATALERR_TM_setcond(FT_4, &(t->onexpiry), NULL != t);  
 
     if(eo_actypeEvent == t->onexpiry.actiontype)
     {
+        FATALERR_TM_set(FT_0, 33);
         if(NULL != t->onexpiry.data.evt.totask)
         {
+            FATALERR_TM_set(FT_0, 34);
             osal_eventflag_set(t->onexpiry.data.evt.event, ((EOMtask*)t->onexpiry.data.evt.totask)->osaltask, osal_callerISR);
+            FATALERR_TM_set(FT_0, 35); 
         }
 
         if(EOTIMER_MODE_ONESHOT == t->mode) 
         {
+            FATALERR_TM_set(FT_0, 36); 
             // sets dummy values for the timer, which is completed 
             eo_timer_hid_Reset_but_not_osaltime(t, eo_tmrstat_Completed); 
             //t->osaltimer = osaltimer;   
+            FATALERR_TM_set(FT_0, 37); 
         }
     }
     else
     {
+        FATALERR_TM_set(FT_0, 38); 
         eom_task_isrSendMessage(s_eom_thetimermanager.tskproc, (eOmessage_t)tmr);
+        FATALERR_TM_set(FT_0, 39); 
     }
 
 
@@ -215,13 +243,17 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
 {
     eOresult_t res = eores_NOK_generic;
     
+    FATALERR_TM_set(FT_0, 64); 
+    
     if((NULL == tm) || (NULL == t)) 
     {
+        FATALERR_TM_set(FT_0, 65);
         return(eores_NOK_nullpointer);    
     }
     
     if(NULL != t->envir.osaltimer)
     {
+        FATALERR_TM_set(FT_0, 66); 
         // this timer has already been created ..... return error
         return(eores_NOK_generic);
     }
@@ -233,9 +265,12 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
 //         return(eores_NOK_generic);
 //    }
     
+    FATALERR_TM_set(FT_0, 67);
     // create the osal timer
     t->envir.osaltimer = osal_timer_new();
     t->status = EOTIMER_STATUS_IDLE;
+    
+    FATALERR_TM_set(FT_0, 68); 
     
     // it may be that osal does not have any more timers available.
     if(NULL != t->envir.osaltimer)
@@ -244,6 +279,7 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
     }
     else
     {
+        FATALERR_TM_set(FT_0, 69);
         res = eores_NOK_generic;
     }
     
@@ -259,14 +295,17 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
 static eOresult_t s_eom_timerman_OnDelTimer(EOVtheTimerManager* tm, EOtimer *t) 
 {
     //eOresult_t res = eores_NOK_generic;
+    FATALERR_TM_set(FT_0, 96); 
     
     if((NULL == tm) || (NULL == t)) 
     {
+        FATALERR_TM_set(FT_0, 97); 
         return(eores_NOK_nullpointer);    
     }
     
     if(NULL == t->envir.osaltimer)
     {
+        FATALERR_TM_set(FT_0, 98); 
         // this timer has already been deleted 
         return(eores_OK);
     }
@@ -278,8 +317,10 @@ static eOresult_t s_eom_timerman_OnDelTimer(EOVtheTimerManager* tm, EOtimer *t)
 //         return(eores_NOK_generic);
 //    }
     
+    FATALERR_TM_set(FT_0, 99); 
     // delete the osal timer
     osal_timer_delete((osal_timer_t*)t->envir.osaltimer);
+    FATALERR_TM_set(FT_0, 100);
     t->status = EOTIMER_STATUS_IDLE;
     t->envir.osaltimer = NULL;
         
@@ -298,31 +339,38 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     osal_timer_timing_t   timing;
     osal_timer_onexpiry_t onexpi;
 
+    FATALERR_TM_set(FT_0, 128); 
     
     if((NULL == tm) || (NULL == t)) 
     {
+        FATALERR_TM_set(FT_0, 129);
         return(eores_NOK_nullpointer);    
     }
     
     if(EOTIMER_STATUS_RUNNING == t->status)
     {
+        FATALERR_TM_set(FT_0, 130);
         // this timer is already running ..... return error
         return(eores_NOK_generic);
     }
 
     if(NULL == t->envir.osaltimer)
     {
+        FATALERR_TM_set(FT_0, 131);
         // this timer does not have a osal timer ..... return error
         return(eores_NOK_generic);
     }
 
-    
+    FATALERR_TM_set(FT_0, 132);
 //    if(eores_OK != eov_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE)) 
     if(eores_OK != eom_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE))
     {
+        FATALERR_TM_set(FT_0, 133); 
         // cannot lock it ... bye bye
          return(eores_NOK_generic);
     }
+    
+    FATALERR_TM_set(FT_0, 134);
     
     // start the osal timer
     timing.startat  = t->startat; 
@@ -331,8 +379,9 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     onexpi.cbk      = s_eom_timerman_OnExpiry;
     onexpi.par      = t;
 
+    FATALERR_TM_set(FT_0, 135); 
     res = (eOresult_t)osal_timer_start((osal_timer_t*)t->envir.osaltimer, &timing, &onexpi, osal_callerTSK);
-    
+    FATALERR_TM_set(FT_0, 136); 
     if(eores_OK == res)
     {
         t->status   = EOTIMER_STATUS_RUNNING;
@@ -342,10 +391,11 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
         t->status   = EOTIMER_STATUS_IDLE;
     }
     
-    
+    FATALERR_TM_set(FT_0, 137); 
     // unlock the manager
     //eov_mutex_Release((EOMmutex*)tm->mutex);
     eom_mutex_Release((EOMmutex*)tm->mutex);
+    FATALERR_TM_set(FT_0, 138);
 
     return(res);  
    
@@ -354,37 +404,43 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
 
 static eOresult_t s_eom_timerman_RemTimer(EOVtheTimerManager* tm, EOtimer *t) 
 {
-    //osal_timer_t osaltimer = NULL;
+    FATALERR_TM_set(FT_0, 196);
 
     if((NULL == tm) || (NULL == t)) 
     {
-         return(eores_NOK_nullpointer);
+        FATALERR_TM_set(FT_0, 197);
+        return(eores_NOK_nullpointer);
     }
   
-
+    FATALERR_TM_set(FT_0, 198);
   
     //if(eores_OK != eov_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE)) 
     if(eores_OK != eom_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE))
     {
+        FATALERR_TM_set(FT_0, 199);
         return(eores_NOK_generic);
     }
 
     // store it ... for later
     //osaltimer = t->envir.osaltimer;
     
+    FATALERR_TM_set(FT_0, 200);
     // stop the osal timer. operation is null safe.
     osal_timer_stop((osal_timer_t*)t->envir.osaltimer, osal_callerTSK);
 
-        
+    FATALERR_TM_set(FT_0, 201);    
     // reset the values of the timer but do not set envir.osaltimer to NULL
     eo_timer_hid_Reset_but_not_osaltime(t, eo_tmrstat_Idle);
     // thus reassign the value of osaltimer
     //t->osaltimer = osaltimer;
-
+    FATALERR_TM_set(FT_0, 202);
+    
     // unlock the manager
     // eov_mutex_Release((EOMmutex*)tm->mutex);
     eom_mutex_Release((EOMmutex*)tm->mutex);
 
+    FATALERR_TM_set(FT_0, 203);
+    
     return(eores_OK);
 }
 
@@ -404,7 +460,14 @@ void sys_timerman(void *p)
  
 static void s_eom_timerman_tskproc_forever(EOMtask *rt, uint32_t msg)
 {
+    FATALERR_TM_set(FT_0, 0);
+    FATALERR_TM_set(FT_1, 0);
+    FATALERR_TM_set(FT_2, 0);
+    FATALERR_TM_set(FT_3, 0);
+    FATALERR_TM_set(FT_4, 0);
+    FATALERR_TM_set(FT_5, 0);    
     s_eom_timerman_ProcessExpiry(msg);
+    FATALERR_TM_set(FT_0, 255);
 }
  
 
@@ -419,38 +482,54 @@ static void s_eom_timerman_ProcessExpiry(eOmessage_t msg)
     // important ... the message contains the pointer to the target EOtimer
     EOtimer *t = (EOtimer *) msg; 
     //osal_timer_t osaltimer = NULL;
+
+    FATALERR_TM_set(FT_0, 1);
+    FATALERR_TM_set(FT_1, t);
     
     // we dont have a valid pointer to a EOtimer
     if(NULL == t)
     {
+        FATALERR_TM_set(FT_0, 2);
         return;
     }
 
     //osaltimer = t->osaltimer;
- 
+    FATALERR_TM_set(FT_0, 3);
+    FATALERR_TM_set(FT_2, &(t->onexpiry));
+
     // get the mutex of the timer manager.  
     if(eores_OK != eom_mutex_Take((EOMmutex*)s_eom_thetimermanager.tmrman->mutex, eok_reltimeINFINITE)) 
     {
+        FATALERR_TM_set(FT_0, 4);
         return;
     }
+
+    FATALERR_TM_set(FT_0, 5);
+    FATALERR_TM_set(FT_5, eo_action_GetType(&t->onexpiry));
     
     // 1. perform the action
 
     eo_action_Execute(&t->onexpiry, eok_reltimeZERO);
 
-                
+    FATALERR_TM_set(FT_0, 6);
+    
     // 2. clear if one shot
     if(EOTIMER_MODE_ONESHOT == t->mode) 
     {
+        FATALERR_TM_set(FT_0, 7);
         // sets dummy values for the timer, which is completed 
         eo_timer_hid_Reset_but_not_osaltime(t, eo_tmrstat_Completed); 
         // but do not erase the osaltimer.
         //t->osaltimer = osaltimer;   
+        FATALERR_TM_set(FT_0, 8);
     }
 
-
+    FATALERR_TM_set(FT_0, 9);
+    
     // release the mutex of the timer manager
     eom_mutex_Release((EOMmutex*)s_eom_thetimermanager.tmrman->mutex);
+
+    FATALERR_TM_set(FT_0, 10);
     
     return;
 }

@@ -43,6 +43,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+#if defined(FATALERR_trace_TMRMAN)
+volatile uint32_t FATALERR_tmrman[8] = {0};
+#endif
+
+#if defined(FATALERR_trace_RTOS)
+volatile uint32_t FATALERR_rtos[8] = {0};
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,6 +82,11 @@ static void s_info_mpustate(EOtheFatalError *p);
 static void s_set_divide_by_zero_trap(void);
 static void s_set_separate_handlers(void);
 static void s_disable_writebuffering(void);
+
+static void s_save_tmrman(void);
+static void s_save_rtos(void);
+static void s_info_tmrman(EOtheFatalError *p);
+static void s_info_rtos(EOtheFatalError *p);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -160,13 +173,14 @@ extern void eo_fatalerror_AtStartup(EOtheFatalError *p)
             if(fatalerror_handler_hw_HardFault == p->detectedfatalerror.message.handlertype)
             {
                s_info_hardfault(p); 
-               s_info_mpustate(p);
             }
             else
             {
-                s_info_standard(p);
-                s_info_mpustate(p);
+                s_info_standard(p);                
             }
+            s_info_mpustate(p);
+            s_info_tmrman(p);
+            s_info_rtos(p);
         }                        
     } 
 
@@ -205,14 +219,15 @@ extern void eo_fatalerror_Restart(EOtheFatalError *p, fatal_error_descriptor_t *
     if(fatalerror_handler_hw_HardFault == des->handlertype)
     {
         s_save_hardfault(des);
-        s_save_mpustate(des);
     }
     else
     {
         s_save_standard(des);
-        s_save_mpustate(des);
     }
 
+    s_save_mpustate(des);
+    s_save_tmrman();
+    s_save_rtos();
     
     // write in ipc memory and ... restart
     ee_sharserv_ipc_userdefdata_set((uint8_t*)&s_eo_thefatalerror.tobewritten, sizeof(s_eo_thefatalerror.tobewritten));
@@ -663,6 +678,124 @@ static void s_save_mpustate(fatal_error_descriptor_t *des)
     pHFmore->sysregs.MMFAR = (*((volatile uint32_t *)(0xE000ED34)));
     pHFmore->sysregs.BFAR = (*((volatile uint32_t *)(0xE000ED38)));
     pHFmore->sysregs.AFSR = (*((volatile uint32_t *)(0xE000ED3C)));
+}
+
+static void s_save_tmrman(void)
+{
+#if defined(FATALERR_trace_TMRMAN)
+    volatile uint32_t *pTMRMAN = (volatile uint32_t*) (0x10000000+128);
+    for(int i=0; i<8; i++)
+    {
+        pTMRMAN[i] = FATALERR_tmrman[i];
+    }
+#endif    
+}
+
+static void s_save_rtos(void)
+{  
+#if defined(FATALERR_trace_RTOS)
+    volatile uint32_t *pRTOS = (volatile uint32_t*) (0x10000000+256);
+    for(int i=0; i<8; i++)
+    {
+        pRTOS[i] = FATALERR_rtos[i];
+    }
+#endif      
+}
+
+static void s_info_tmrman(EOtheFatalError *p)
+{
+#if defined(FATALERR_trace_TMRMAN)   
+    
+    volatile uint32_t *pTMRMAN = (volatile uint32_t*) (0x10000000+128);
+    
+    uint16_t par16 = 0;
+    uint64_t par64 = p->detectedfatalerror.params.par64;     
+
+    p->errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    p->errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    p->errdes.sourceaddress    = 0;
+    p->errdes.par16            = par16;
+    p->errdes.par64            = par64;
+
+    // further information is in here
+    char str[64] = {0};
+        
+
+    // caveat the string can be at most 48 characters 
+    
+    // System control registers. 
+    
+    snprintf(str, sizeof(str), "TM0 = 0x%08x TM1 = 0x%08x", 
+        pTMRMAN[0], pTMRMAN[1]
+    );        
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+
+    snprintf(str, sizeof(str), "TM2 = 0x%08x TM3 = 0x%08x", 
+        pTMRMAN[2], pTMRMAN[3]
+    );         
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+
+    snprintf(str, sizeof(str), "TM4 = 0x%08x TM5 = 0x%08x", 
+        pTMRMAN[4], pTMRMAN[5]
+    );         
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+
+    snprintf(str, sizeof(str), "TM6 = 0x%08x TM6 = 0x%08x", 
+        pTMRMAN[6], pTMRMAN[7]
+    );       
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+       
+    // and now i reset memory area
+    memset((uint32_t *)pTMRMAN, 0, sizeof(FATALERR_tmrman));  
+#endif    
+}
+
+static void s_info_rtos(EOtheFatalError *p)
+{
+#if defined(FATALERR_trace_RTOS)   
+    
+    volatile uint32_t *pRTOS = (volatile uint32_t*) (0x10000000+256);
+    
+    uint16_t par16 = 0;
+    uint64_t par64 = p->detectedfatalerror.params.par64;     
+
+    p->errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    p->errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    p->errdes.sourceaddress    = 0;
+    p->errdes.par16            = par16;
+    p->errdes.par64            = par64;
+
+    // further information is in here
+    char str[64] = {0};
+        
+
+    // caveat the string can be at most 48 characters 
+    
+    // System control registers. 
+    
+    snprintf(str, sizeof(str), "RT0 = 0x%08x RT1 = 0x%08x", 
+        pRTOS[0], pRTOS[1]
+    );        
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+
+    snprintf(str, sizeof(str), "RT2 = 0x%08x RT3 = 0x%08x", 
+        pRTOS[2], pRTOS[3]
+    );         
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+
+    snprintf(str, sizeof(str), "RT4 = 0x%08x RT5 = 0x%08x", 
+        pRTOS[4], pRTOS[5]
+    );         
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+
+    snprintf(str, sizeof(str), "RT6 = 0x%08x RT6 = 0x%08x", 
+        pRTOS[6], pRTOS[7]
+    );       
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes);   
+       
+    // and now i reset memory area
+    memset((uint32_t *)pRTOS, 0, sizeof(FATALERR_tmrman));  
+#endif     
 }
 
 static void s_info_mpustate(EOtheFatalError *p)

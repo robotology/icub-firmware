@@ -684,6 +684,15 @@ static void s_eo_services_initialise(EOtheServices *p)
     errdes.par16            = 0x0000;
     errdes.par64            = 0;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);     
+    
+#if 0    
+    // test the EOtheFatalError 
+    volatile uint32_t value = 32;
+    volatile uint32_t divider = 0;
+    volatile uint32_t result = 0;
+    value++;
+    result = value / divider;    
+#endif
  
 #if 0
     // reading of how much memory we have used so far    
