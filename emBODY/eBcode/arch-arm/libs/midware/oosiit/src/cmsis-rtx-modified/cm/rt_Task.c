@@ -279,6 +279,8 @@ OS_RESULT rt_tsk_delete (OS_TID task_id) {
 #else
         rt_ret_val (p_TCB, OS_R_MUT); 
 #endif
+        FATALERR_RT_set(FT_0, 14);
+        FATALERR_RT_set(FT_1, 0);          
         rt_rmv_dly (p_TCB);
         p_TCB->state = READY;
         rt_put_prio (&os_rdy, p_TCB);
@@ -315,6 +317,8 @@ OS_RESULT rt_tsk_delete (OS_TID task_id) {
     }
     task_context = os_active_TCB[task_id-1U];
     rt_rmv_list (task_context);
+        FATALERR_RT_set(FT_0, 15);
+        FATALERR_RT_set(FT_1, 0);    
     rt_rmv_dly (task_context);
     p_MCB = task_context->p_mlnk;
     while (p_MCB) {
@@ -327,6 +331,8 @@ OS_RESULT rt_tsk_delete (OS_TID task_id) {
 #else
         rt_ret_val (p_TCB, OS_R_MUT); 
 #endif
+        FATALERR_RT_set(FT_0, 16);
+        FATALERR_RT_set(FT_1, 0);          
         rt_rmv_dly (p_TCB);
         p_TCB->state = READY;
         rt_put_prio (&os_rdy, p_TCB);

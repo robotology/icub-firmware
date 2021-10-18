@@ -104,6 +104,8 @@ OS_RESULT rt_sem_send (OS_ID semaphore) {
 #else
     rt_ret_val(p_TCB, OS_R_SEM);
 #endif
+        FATALERR_RT_set(FT_0, 17);
+        FATALERR_RT_set(FT_1, 0);      
     rt_rmv_dly (p_TCB);
     rt_dispatch (p_TCB);
   }
@@ -162,6 +164,8 @@ void rt_sem_psh (P_SCB p_CB) {
   if (p_CB->p_lnk != NULL) {
     /* A task is waiting for token */
     p_TCB = rt_get_first ((P_XCB)p_CB);
+        FATALERR_RT_set(FT_0, 18);
+        FATALERR_RT_set(FT_1, 0);      
     rt_rmv_dly (p_TCB);
     p_TCB->state   = READY;
 #ifdef __CMSIS_RTOS

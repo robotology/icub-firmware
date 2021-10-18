@@ -112,6 +112,8 @@ OS_RESULT rt_mut_delete (OS_ID mutex) {
     /* A task is waiting for mutex. */
     p_TCB = rt_get_first ((P_XCB)p_MCB);
     rt_ret_val(p_TCB, 0U/*osOK*/);
+        FATALERR_RT_set(FT_0, 19);
+        FATALERR_RT_set(FT_1, 0);      
     rt_rmv_dly(p_TCB);
     p_TCB->state = READY;
     rt_put_prio (&os_rdy, p_TCB);
@@ -183,6 +185,8 @@ OS_RESULT rt_mut_release (OS_ID mutex) {
 #else
     rt_ret_val(p_TCB, OS_R_MUT); 
 #endif
+        FATALERR_RT_set(FT_0, 20);
+        FATALERR_RT_set(FT_1, 0);      
     rt_rmv_dly (p_TCB);
     /* A waiting task becomes the owner of this mutex. */
     p_MCB->level  = 1U;

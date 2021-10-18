@@ -34,6 +34,23 @@
 
 #include <stdint.h>
 
+#if defined(FATALERR_trace_RTOS)
+extern volatile uint32_t FATALERR_rtos[8];
+#define FT_0 0
+#define FT_1 1
+#define FT_2 2
+#define FT_3 3
+#define FT_4 4
+#define FT_5 5
+#define FT_6 6
+#define FT_7 7
+#define FATALERR_RT_set(a, b)           FATALERR_rtos[(a)] = (uint32_t)(b)
+#define FATALERR_RT_setcond(a, b, c)    FATALERR_rtos[(a)] = (c) ? ((uint32_t)(b)) : (0)
+#else
+#define FATALERR_RT_set(a, b)
+#define FATALERR_RT_setcond(a, b, c) 
+#endif
+
 /* Error Codes */
 #define OS_ERR_STK_OVF          1U
 #define OS_ERR_FIFO_OVF         2U

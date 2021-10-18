@@ -271,28 +271,43 @@ void rt_rmv_list (P_TCB p_task) {
   }
 }
 
-
 /*--------------------------- rt_rmv_dly ------------------------------------*/
 
 void rt_rmv_dly (P_TCB p_task) {
   /* Remove task identified with "p_task" from delay list if enqueued.      */
   P_TCB p_b;
-
+    
+    FATALERR_RT_set(FT_1, 1);
+    FATALERR_RT_set(FT_2, p_task);
+    FATALERR_RT_setcond(FT_3, p_task->p_blnk, NULL != p_task);
+    
   p_b = p_task->p_blnk;
+    FATALERR_RT_set(FT_1, 2);
   if (p_b != NULL) {
     /* Task is really enqueued */
+      FATALERR_RT_set(FT_1, 3);
+      FATALERR_RT_set(FT_4, p_task->p_dlnk);
     p_b->p_dlnk = p_task->p_dlnk;
+      FATALERR_RT_set(FT_1, 4);
     if (p_task->p_dlnk != NULL) {
       /* 'p_task' is in the middle of list */
+        FATALERR_RT_set(FT_1, 5);
       p_b->delta_time += p_task->delta_time;
+        FATALERR_RT_set(FT_1, 6);
+        FATALERR_RT_set(FT_5, p_b->delta_time);
+        FATALERR_RT_set(FT_6, p_task->p_dlnk->p_blnk);
       p_task->p_dlnk->p_blnk = p_b;
+        FATALERR_RT_set(FT_1, 7);
       p_task->p_dlnk = NULL;
+        FATALERR_RT_set(FT_1, 8);
     }
     else {
       /* 'p_task' is at the end of list */
+        FATALERR_RT_set(FT_1, 9);
       p_b->delta_time = 0U;
     }
     p_task->p_blnk = NULL;
+    FATALERR_RT_set(FT_1, 10);
   }
 }
 
