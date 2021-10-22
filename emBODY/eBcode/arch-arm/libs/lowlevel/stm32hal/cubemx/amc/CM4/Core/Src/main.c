@@ -33,6 +33,26 @@
 
 /* USER CODE END Includes */
 
+int itm_puts(const char* str) 
+{    
+
+    if(NULL == str)
+    {
+        return(0);
+    }
+
+    uint32_t ch;
+    int num = 0;
+    while('\0' != (ch = *str))
+    {
+        ITM_SendChar(ch);
+        str++;
+        num++;
+    }
+     
+    ITM_SendChar('\n');
+    return(++num);    
+}
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
@@ -133,6 +153,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      itm_puts("toggled");
         HAL_Delay(500);
         HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_15);
     /* USER CODE END WHILE */

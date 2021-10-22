@@ -424,6 +424,24 @@ extern void stm32hal_board_init(void);
         #error unsupported driver version for stm32h745disco
     #endif
 
+#elif   defined(STM32HAL_BOARD_AMC) 
+
+    // one case: v1A0
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+    
+        #include "../src/config/stm32hal_driver_cfg_of_amc_v1A0.h"
+
+        #include "../src/board/amc/v1A0/inc/gpio.h"
+        #include "../src/board/amc/v1A0/inc/main.h"
+        #include "../src/board/amc/v1A0/inc/eth.h"
+
+        #include "../src/board/amc/v1A0/inc/stm32h7xx_it.h"
+        #include "../src/board/amc/v1A0/drv/Driver_ETH_MAC.h"
+        #include "../src/board/amc/v1A0/drv/Driver_ETH_PHY.h"
+		
+    #else
+        #error unsupported driver version for amc
+    #endif
     
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${B}

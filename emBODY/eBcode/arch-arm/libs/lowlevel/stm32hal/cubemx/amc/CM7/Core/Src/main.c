@@ -69,6 +69,27 @@ static void MPU_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+int itm_puts(const char* str) 
+{    
+
+    if(NULL == str)
+    {
+        return(0);
+    }
+
+    uint32_t ch;
+    int num = 0;
+    while('\0' != (ch = *str))
+    {
+        ITM_SendChar(ch);
+        str++;
+        num++;
+    }
+     
+    ITM_SendChar('\n');
+    return(++num);    
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -166,6 +187,7 @@ Error_Handler();
       HAL_Delay(500);
       HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_13);
       HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_15);
+      itm_puts("toggled");
 
     /* USER CODE BEGIN 3 */
   }
