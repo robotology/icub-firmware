@@ -26,9 +26,9 @@
 #endif
 
 
-#if defined(EMBOT_USE_rtos_cmsisos2)
-#error CAVEAT: this project does not run if EMBOT_USE_rtos_cmsisos2 is defined
-#endif
+//#if defined(EMBOT_USE_rtos_cmsisos2)
+//#error CAVEAT: this project does not run if EMBOT_USE_rtos_cmsisos2 is defined
+//#endif
 
 
 

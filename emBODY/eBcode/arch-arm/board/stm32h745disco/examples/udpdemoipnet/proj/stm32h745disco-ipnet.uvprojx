@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>ethdemo-cmsisos2</TargetName>
+      <TargetName>ipnetdemo-cmsisos2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
@@ -336,10 +336,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_cmsisos2 -DIPAL_use_cfg2</MiscControls>
-              <Define>USE_ZERO_OFFSET EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_cmsisos2 -DIPAL_use_cfg2</MiscControls>
+              <Define>EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\..\bsp-ipal;..\cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1285,7 +1285,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register  -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2</MiscControls>
-              <Define>CORE_CM7 EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V1A0</Define>
+              <Define>EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\..\bsp-ipal;..\cfg</IncludePath>
             </VariousControls>

@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>ipnetdemo-osal</TargetName>
+    <TargetName>ipnetdemo-osal-segger</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -75,7 +75,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -299,7 +299,7 @@
   </Target>
 
   <Target>
-    <TargetName>ethdemo-cmsisos2-segger</TargetName>
+    <TargetName>ipnetdemo-cmsisos2-segger</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -536,7 +536,7 @@
   </Target>
 
   <Target>
-    <TargetName>ethdemo-cmsisos2-stlinkv3</TargetName>
+    <TargetName>ipnetdemo-cmsisos2-stlinkv3</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -589,7 +589,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
