@@ -81,7 +81,6 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {    
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::core::print("evthread-onevent: evtBTNreleased received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
-
     }
 
 }
@@ -93,6 +92,11 @@ void onIdle(embot::os::Thread *t, void* idleparam)
     i++;
 }
 
+void tMAIN(void *p)
+{
+    embot::os::Thread* t = reinterpret_cast<embot::os::Thread*>(p);
+    t->run();
+}
 
 void initSystem(embot::os::Thread *t, void* initparam)
 {
@@ -116,59 +120,6 @@ void initSystem(embot::os::Thread *t, void* initparam)
     embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 50, std::bitset<64>(0b010101));
     theleds.get(embot::hw::LED::two).wave(&ledwave); 
     
-#define START_EXAMPLE_THREADS
- 
-#if defined(START_EXAMPLE_THREADS)
-    
-    embot::core::print("INIT: creating two example threads, one event-based and one periodic");
-    
-    embot::os::EventThread::Config cc { 
-        2*1024, 
-        embot::os::Priority::normal24, 
-        [](embot::os::Thread *t, void *param) { 
-            static uint32_t zz{0};
-            zz++;
-        },
-        nullptr,
-        10*embot::core::time1second,
-        [](embot::os::Thread *t, embot::os::EventMask eventmask, void *param) { 
-            static uint32_t xx{0};
-            xx++;
-            
-            if(0 == eventmask)
-            {   // timeout ...  
-                embot::core::TimeFormatter tf(embot::core::now());        
-                embot::core::print("event-based thread: waiting timeout @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));                
-                return;
-            }           
-            
-        }
-    };
-
-    embot::os::EventThread *eth {nullptr};    
-    eth = new embot::os::EventThread;
-    eth->start(cc);
-
-    embot::os::PeriodicThread::Config pc { 
-        1024, 
-        embot::os::Priority::normal25, 
-        nullptr, nullptr,
-        5000*embot::core::time1millisec,
-        [](embot::os::Thread *t, void *param) { 
-            
-            embot::core::TimeFormatter tf(embot::core::now());        
-            embot::core::print("periodic thread: exec @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));     
-            
-        },
-        "testPeriodic00"
-    };
-
-    embot::os::PeriodicThread *pth {nullptr};
-    pth = new embot::os::PeriodicThread;
-    pth->start(pc);
-
-#endif
-    
     
     embot::core::print("INIT: creating the main thread. it will reveives one periodic tick event and one upon pressure of the blue button");  
     
@@ -186,8 +137,8 @@ void initSystem(embot::os::Thread *t, void* initparam)
     // create the main thread 
     embot::os::EventThread *thr {nullptr};
     thr = new embot::os::EventThread;          
-    // and start it
-    thr->start(configEV); 
+    // and start it. w/ osal it will be displayed w/ label tMAIN
+    thr->start(configEV, tMAIN); 
     
 
     embot::core::print("quitting the INIT thread. Normal scheduling starts");    

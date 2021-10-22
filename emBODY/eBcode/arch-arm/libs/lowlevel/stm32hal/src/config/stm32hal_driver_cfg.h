@@ -149,7 +149,7 @@ extern "C" {
         #define USE_FULL_LL_DRIVER
         // keep out of the compilation the weak functions of HAL_ETH
         // they will be defined inside EMAC_STM32H7xx.c
-        #define STM32HAL_removeWEAK_ETH
+        //#define STM32HAL_removeWEAK_ETH
         #define STM32HAL_improveHANDLER_ETH
         #include "../src/config/stm32hal_driver_cfg_of_stm32h745disco_v1A0.h"   
         // we also need some ll includes contained in the driver section

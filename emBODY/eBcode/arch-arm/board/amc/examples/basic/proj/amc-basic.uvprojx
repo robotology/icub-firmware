@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\bsp-basic</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -387,6 +387,11 @@
               <FileName>main-basic.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>../src/main-basic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_basic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp-basic\bsp_basic.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -745,7 +750,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\bsp-basic</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -793,6 +798,11 @@
               <FileName>main-basic.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>../src/main-basic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_basic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp-basic\bsp_basic.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1151,7 +1161,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\bsp-basic</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1199,6 +1209,11 @@
               <FileName>main-basic.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>../src/main-basic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_basic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp-basic\bsp_basic.cpp</FilePath>
             </File>
           </Files>
         </Group>

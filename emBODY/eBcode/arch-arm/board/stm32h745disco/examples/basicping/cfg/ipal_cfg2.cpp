@@ -10,8 +10,7 @@
 
 // external dependencies
 #include "ipal_hal_eth_stm32h7.h"
-
-extern int itm_puts(const char *str);
+#include "bsp_basic.h"
     
 
 static void ipal_app_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
@@ -23,7 +22,7 @@ static void ipal_app_on_fatal_error(ipal_fatalerror_t errorcode, const char * er
     volatile const char * m = errormsg;
     m = errormsg;
     
-    itm_puts(errormsg);
+    bsp_basic_itm_puts(errormsg);
     
 	for(;;)
     {
@@ -31,6 +30,7 @@ static void ipal_app_on_fatal_error(ipal_fatalerror_t errorcode, const char * er
        m = errormsg;
     }
 }
+
 
 /* ===============================================================================================
  * IPAL CONFIGURATION
@@ -94,7 +94,8 @@ static const ipal_cfg2_igmp_t igmpcfg2 =
 void ipal_app_usr_on_rx_frame(void)
 {
     static volatile uint32_t rxnum = 0;
-    rxnum++;    
+    rxnum++;  
+    bsp_basic_itm_puts("eth frame received");    
 }
 
 void ipal_app_usr_on_tx_frame(void)

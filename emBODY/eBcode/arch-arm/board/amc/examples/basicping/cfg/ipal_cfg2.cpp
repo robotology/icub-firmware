@@ -10,8 +10,7 @@
 
 // external dependencies
 #include "ipal_hal_eth_stm32h7.h"
-
-extern int itm_puts(const char *str);
+#include "bsp_basic.h"
     
 
 static void ipal_app_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
@@ -23,7 +22,7 @@ static void ipal_app_on_fatal_error(ipal_fatalerror_t errorcode, const char * er
     volatile const char * m = errormsg;
     m = errormsg;
     
-    itm_puts(errormsg);
+    bsp_basic_itm_puts(errormsg);
     
 	for(;;)
     {

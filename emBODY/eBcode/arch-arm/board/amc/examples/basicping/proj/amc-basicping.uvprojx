@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DICUBTECH_USE_IPAL</MiscControls>
               <Define>CORE_CM7 USE_HAL_DRIVER STM32H745xx USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\..\bsp-ipal;..\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\..\bsp-ipal;..\cfg;..\..\bsp-basic</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -387,6 +387,11 @@
               <FileName>main-basicping.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>../src/main-basicping.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_basic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp-basic\bsp_basic.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -780,7 +785,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DICUBTECH_USE_IPAL</MiscControls>
               <Define>CORE_CM7 USE_HAL_DRIVER STM32H745xx USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\..\bsp-ipal;..\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\..\bsp-ipal;..\cfg;..\..\bsp-basic</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -828,6 +833,11 @@
               <FileName>main-basicping.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>../src/main-basicping.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_basic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp-basic\bsp_basic.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1221,7 +1231,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DICUBTECH_USE_IPAL</MiscControls>
               <Define>CORE_CM7 USE_HAL_DRIVER STM32H745xx USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\..\bsp-ipal;..\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\..\bsp-ipal;..\cfg;..\..\bsp-basic</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1269,6 +1279,11 @@
               <FileName>main-basicping.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>../src/main-basicping.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_basic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp-basic\bsp_basic.cpp</FilePath>
             </File>
           </Files>
         </Group>

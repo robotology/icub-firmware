@@ -7,13 +7,9 @@
 // marco.accame@iit.it
 // this project uses the embobj c objects which wrap the embot c++ objects
 // it uses a fake stm32hal 
-// the updater works fine if EMBOT_USE_rtos_osal is used, but at dato of 9 sept 2020 does not work with EMBOT_USE_rtos_cmsisos2
+// its purpose is to see if we can reuse embobj code for the eupdater
 
-#if defined(EMBOT_USE_rtos_cmsisos2)
 
-#warning CAVEAT: this project does not run if EMBOT_USE_rtos_cmsisos2 is defined
-
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
