@@ -19,7 +19,7 @@
 #endif
 
 #if defined(CMSISOS2_ICUB_CHANGES)
-#include "../src/RTOS2/RTX/Config/RTX_Config.h"
+#include "../src/cmsis5/cmsis/RTOS2/RTX/Config/RTX_Config.h"
 #else
 #include "RTX_Config.h"
 #endif
