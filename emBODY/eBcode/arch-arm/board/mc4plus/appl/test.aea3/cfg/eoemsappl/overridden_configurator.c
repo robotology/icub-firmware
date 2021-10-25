@@ -118,7 +118,7 @@ void cbk(void *p)
 hal_spiencoder_cfg_t cfgaea = {0};
 hal_spiencoder_diagnostic_t diag = {0};
 
-static hal_spiencoder_position_t raw_value = 0;
+hal_spiencoder_position_t raw_value = 0;
 
 // This function is called every 10 ms (see eom_emsconfigurator_Initialise)
 extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
