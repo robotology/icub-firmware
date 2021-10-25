@@ -10,7 +10,7 @@
     <aExt>*.s*; *.src; *.a*</aExt>
     <oExt>*.obj; *.o</oExt>
     <lExt>*.lib</lExt>
-    <tExt>*.txt; *.h; *.inc</tExt>
+    <tExt>*.txt; *.h; *.inc; *.md</tExt>
     <pExt>*.plm</pExt>
     <CppX>*.cpp</CppX>
     <nMigrate>0</nMigrate>
@@ -405,7 +405,7 @@
         <LExpSel>0</LExpSel>
       </OPTXL>
       <OPTFL>
-        <tvExp>0</tvExp>
+        <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
@@ -1547,7 +1547,7 @@
 
   <Group>
     <GroupName>Core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1558,7 +1558,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_kernel.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</PathWithFileName>
       <FilenameWithoutPath>rtx_kernel.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1570,7 +1570,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_thread.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</PathWithFileName>
       <FilenameWithoutPath>rtx_thread.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1582,7 +1582,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_delay.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</PathWithFileName>
       <FilenameWithoutPath>rtx_delay.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1594,7 +1594,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_timer.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</PathWithFileName>
       <FilenameWithoutPath>rtx_timer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1606,7 +1606,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_evflags.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</PathWithFileName>
       <FilenameWithoutPath>rtx_evflags.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1618,7 +1618,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_mutex.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</PathWithFileName>
       <FilenameWithoutPath>rtx_mutex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1630,7 +1630,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_semaphore.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</PathWithFileName>
       <FilenameWithoutPath>rtx_semaphore.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1642,7 +1642,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_memory.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</PathWithFileName>
       <FilenameWithoutPath>rtx_memory.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1654,7 +1654,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_mempool.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</PathWithFileName>
       <FilenameWithoutPath>rtx_mempool.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1666,7 +1666,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</PathWithFileName>
       <FilenameWithoutPath>rtx_msgqueue.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1678,7 +1678,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_system.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</PathWithFileName>
       <FilenameWithoutPath>rtx_system.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1690,7 +1690,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_evr.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</PathWithFileName>
       <FilenameWithoutPath>rtx_evr.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1702,7 +1702,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\Source\os_systick.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</PathWithFileName>
       <FilenameWithoutPath>os_systick.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1711,7 +1711,7 @@
 
   <Group>
     <GroupName>Handlers</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1722,7 +1722,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</PathWithFileName>
       <FilenameWithoutPath>irq_cm0.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1734,7 +1734,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</PathWithFileName>
       <FilenameWithoutPath>irq_cm3.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1746,7 +1746,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</PathWithFileName>
       <FilenameWithoutPath>irq_cm4f.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1758,7 +1758,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</PathWithFileName>
       <FilenameWithoutPath>irq_armv8mbl.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1770,7 +1770,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</PathWithFileName>
       <FilenameWithoutPath>irq_armv8mml.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1790,7 +1790,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\src\RTOS2\RTX\Source\rtx_lib.c</PathWithFileName>
+      <PathWithFileName>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</PathWithFileName>
       <FilenameWithoutPath>rtx_lib.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1807,14 +1807,6 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-  </Group>
-
-  <Group>
-    <GroupName>::CMSIS</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>1</RteFlg>
   </Group>
 
 </ProjectOpt>

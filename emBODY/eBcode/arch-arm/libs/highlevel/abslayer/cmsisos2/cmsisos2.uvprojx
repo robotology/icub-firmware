@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>ARMCM0</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M0") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -386,67 +386,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -456,12 +456,12 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
             </File>
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -504,7 +504,7 @@
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -547,7 +547,7 @@
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -590,7 +590,7 @@
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -638,7 +638,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -646,9 +646,6 @@
               <FilePath>.\src\extra\extra.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -662,7 +659,7 @@
         <TargetCommonOption>
           <Device>ARMCM3</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M3") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1032,67 +1029,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1102,7 +1099,7 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1145,12 +1142,12 @@
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
             </File>
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1193,7 +1190,7 @@
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1236,7 +1233,7 @@
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1284,7 +1281,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -1293,22 +1290,19 @@
             </File>
           </Files>
         </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
-        </Group>
       </Groups>
     </Target>
     <Target>
       <TargetName>CM4F_LE</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
+      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>ARMCM4_FP</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1631,7 +1625,7 @@
               <MiscControls></MiscControls>
               <Define>EVR_RTX_DISABLE CMSISOS2_ICUB_CHANGES</Define>
               <Undefine></Undefine>
-              <IncludePath>.\src\RTOS2\Include;.\src\RTOS2\RTX\Config;.\src\RTOS2\RTX\Include;.\api;.\src\RTOS2\RTX\Source</IncludePath>
+              <IncludePath>.\src\cmsis5\cmsis\RTOS2\Include;.\src\cmsis5\cmsis\RTOS2\RTX\Config;.\src\cmsis5\cmsis\RTOS2\RTX\Include;.\api;.\src\cmsis5\cmsis\RTOS2\RTX\Source;.\src\rte;.\src\cmsis5\cmsis\core\include;.\src\cmsis5\device\arm\armcm4\include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1678,67 +1672,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1748,7 +1742,7 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1791,7 +1785,7 @@
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1834,12 +1828,12 @@
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
             </File>
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1882,7 +1876,7 @@
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1930,7 +1924,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -1938,9 +1932,6 @@
               <FilePath>.\src\extra\extra.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -1954,7 +1945,7 @@
         <TargetCommonOption>
           <Device>ARMv8MBL</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("ARMV8MBL") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2324,67 +2315,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2394,7 +2385,7 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2437,7 +2428,7 @@
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2480,7 +2471,7 @@
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2523,12 +2514,12 @@
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
             </File>
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2576,7 +2567,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -2584,9 +2575,6 @@
               <FilePath>.\src\extra\extra.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -2600,7 +2588,7 @@
         <TargetCommonOption>
           <Device>ARMv8MBL</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("ARMV8MBL") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2970,67 +2958,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3040,7 +3028,7 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3083,7 +3071,7 @@
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3126,7 +3114,7 @@
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3169,12 +3157,12 @@
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
             </File>
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3222,7 +3210,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -3230,9 +3218,6 @@
               <FilePath>.\src\extra\extra.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -3246,7 +3231,7 @@
         <TargetCommonOption>
           <Device>ARMv8MML</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("ARMV8MML") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -3616,67 +3601,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3686,7 +3671,7 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3729,7 +3714,7 @@
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3772,7 +3757,7 @@
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3815,7 +3800,7 @@
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3858,7 +3843,7 @@
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -3868,7 +3853,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -3876,9 +3861,6 @@
               <FilePath>.\src\extra\extra.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -3892,7 +3874,7 @@
         <TargetCommonOption>
           <Device>ARMv8MML</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("ARMV8MML") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -4262,67 +4244,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4332,7 +4314,7 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -4375,7 +4357,7 @@
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -4418,7 +4400,7 @@
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -4461,7 +4443,7 @@
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -4504,7 +4486,7 @@
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -4514,7 +4496,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -4522,9 +4504,6 @@
               <FilePath>.\src\extra\extra.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -4538,7 +4517,7 @@
         <TargetCommonOption>
           <Device>ARMv8MML_SP</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("ARMV8MML") FPU3(SFPU) CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -4908,67 +4887,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4978,7 +4957,7 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -5021,7 +5000,7 @@
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -5064,7 +5043,7 @@
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -5107,7 +5086,7 @@
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -5150,7 +5129,7 @@
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -5160,7 +5139,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -5168,9 +5147,6 @@
               <FilePath>.\src\extra\extra.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -5184,7 +5160,7 @@
         <TargetCommonOption>
           <Device>ARMv8MML_SP</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.8.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("ARMV8MML") FPU3(SFPU) CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -5554,67 +5530,67 @@
             <File>
               <FileName>rtx_kernel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_kernel.c</FilePath>
             </File>
             <File>
               <FileName>rtx_thread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_thread.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_thread.c</FilePath>
             </File>
             <File>
               <FileName>rtx_delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_delay.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_delay.c</FilePath>
             </File>
             <File>
               <FileName>rtx_timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_timer.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_timer.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evflags.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evflags.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mutex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mutex.c</FilePath>
             </File>
             <File>
               <FileName>rtx_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_semaphore.c</FilePath>
             </File>
             <File>
               <FileName>rtx_memory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_memory.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_memory.c</FilePath>
             </File>
             <File>
               <FileName>rtx_mempool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_mempool.c</FilePath>
             </File>
             <File>
               <FileName>rtx_msgqueue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_msgqueue.c</FilePath>
             </File>
             <File>
               <FileName>rtx_system.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_system.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_system.c</FilePath>
             </File>
             <File>
               <FileName>rtx_evr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_evr.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_evr.c</FilePath>
             </File>
             <File>
               <FileName>os_systick.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\Source\os_systick.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\Source\os_systick.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5624,7 +5600,7 @@
             <File>
               <FileName>irq_cm0.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm0.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -5667,7 +5643,7 @@
             <File>
               <FileName>irq_cm3.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm3.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -5710,7 +5686,7 @@
             <File>
               <FileName>irq_cm4f.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_cm4f.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -5753,7 +5729,7 @@
             <File>
               <FileName>irq_armv8mbl.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mbl.s</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -5796,7 +5772,7 @@
             <File>
               <FileName>irq_armv8mml.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\ARM\irq_armv8mml.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -5806,7 +5782,7 @@
             <File>
               <FileName>rtx_lib.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\RTOS2\RTX\Source\rtx_lib.c</FilePath>
+              <FilePath>.\src\cmsis5\cmsis\RTOS2\RTX\Source\rtx_lib.c</FilePath>
             </File>
             <File>
               <FileName>extra.c</FileName>
@@ -5815,31 +5791,13 @@
             </File>
           </Files>
         </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
-        </Group>
       </Groups>
     </Target>
   </Targets>
 
   <RTE>
     <apis/>
-    <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.4.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
-        <targetInfos>
-          <targetInfo name="ARMv8MBL_LE"/>
-          <targetInfo name="ARMv8MBL_NS_LE"/>
-          <targetInfo name="ARMv8MML_LE"/>
-          <targetInfo name="ARMv8MML_NS_LE"/>
-          <targetInfo name="ARMv8MML_SP_LE"/>
-          <targetInfo name="ARMv8MML_SP_NS_LE"/>
-          <targetInfo name="CM0_LE"/>
-          <targetInfo name="CM3_LE"/>
-          <targetInfo name="CM4F_LE"/>
-        </targetInfos>
-      </component>
-    </components>
+    <components/>
     <files/>
   </RTE>
 
@@ -5847,11 +5805,6 @@
     <Layers>
       <Layer>
         <LayName>&lt;Project Info&gt;</LayName>
-        <LayDesc></LayDesc>
-        <LayUrl></LayUrl>
-        <LayKeys></LayKeys>
-        <LayCat></LayCat>
-        <LayLic></LayLic>
         <LayTarg>0</LayTarg>
         <LayPrjMark>1</LayPrjMark>
       </Layer>

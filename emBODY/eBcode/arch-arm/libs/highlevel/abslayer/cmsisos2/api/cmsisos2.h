@@ -23,8 +23,8 @@ extern "C"
     #endif
 
     // original api from cmsis-rtos2 using rtx
-    #include "../src/RTOS2/Include/cmsis_os2.h"
-    #include "../src/RTOS2/RTX/Include/rtx_os.h"
+    #include "../src/cmsis5/cmsis/RTOS2/Include/cmsis_os2.h"
+    #include "../src/cmsis5/cmsis/RTOS2/RTX/Include/rtx_os.h"
 
     // extras
     typedef uint64_t cmsisos2_abstime_t;    // expressed in us

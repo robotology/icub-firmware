@@ -122,7 +122,7 @@ cmsisos2_abstime_t cmsisos2_sys_abstime(void) {
   uint32_t c64m = 0;
   uint32_t c64l = 0;
     
-  if (IsIrqMode() || IsIrqMasked()) {
+  if (IsException() || IsIrqMasked()) {
     count = svcRtxKernelGetSysTimerCount_U64(&c64l, &c64m);
   } else {
     count =  __svcKernelGetSysTimerCount_U64(&c64l, &c64m);
@@ -185,7 +185,7 @@ SVC0_1(Cmsisos2_del, uint32_t, void*)
 void * cmsisos2_memory_new(size_t size)
 {
     void *p = NULL;
-    if(IsIrqMode() || IsIrqMasked()) 
+    if(IsException() || IsIrqMasked()) 
     {   // inside isr
         p = svcRtxCmsisos2_new(size);
     } 
@@ -202,7 +202,7 @@ void * cmsisos2_memory_new(size_t size)
 
 void cmsisos2_memory_delete(void *p)
 {
-    if(IsIrqMode() || IsIrqMasked()) 
+    if(IsException() || IsIrqMasked()) 
     {   // inside isr
         svcRtxCmsisos2_del(p);
     } 
@@ -219,7 +219,7 @@ void cmsisos2_memory_delete(void *p)
 void * cmsisos2_memory_realloc(void *p, size_t size)
 {
     void *p1 = NULL;
-    if(IsIrqMode() || IsIrqMasked()) 
+    if(IsException() || IsIrqMasked()) 
     {   // inside isr
         p1 = svcRtxCmsisos2_realloc(p, size);
     } 

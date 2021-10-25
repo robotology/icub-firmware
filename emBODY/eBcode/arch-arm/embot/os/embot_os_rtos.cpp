@@ -380,6 +380,8 @@ namespace embot { namespace os { namespace rtos {
             _internals.cfg->thread_stack_size = 0;
             _internals.cfg->idle_thread_attr = nullptr;  // to be allocated 
             _internals.cfg->timer_thread_attr = nullptr; // to be allocated 
+            _internals.cfg->timer_thread = nullptr; // to be initted
+            _internals.cfg->timer_setup = nullptr; // to be initted            
             _internals.cfg->timer_mq_attr = nullptr;     // to be allocated 
             _internals.cfg->timer_mq_mcnt = 0;           // tbc
             
@@ -408,6 +410,10 @@ namespace embot { namespace os { namespace rtos {
             _thr_timer_props.prepare([](void*p){}, nullptr, osPriorityRealtime7, timerstacksize);
             thread_props_Internals* i_tm = reinterpret_cast<thread_props_Internals*>(_thr_timer_props.getInternals());
             _internals.cfg->timer_thread_attr = i_tm->attr;
+            // also, in RTOS2 version 5.8.0 we need to specify extra functions. 
+            // if we keep them nullptr then we assign internally w/ the default one.
+            _internals.cfg->timer_thread = nullptr; 
+            _internals.cfg->timer_setup = nullptr; 
                                                
             // timer mq: prepare memory and assign it to cfg (aka osRtxConfig)
             constexpr size_t timerqueuelength = 32; // or 32, 34, etc...
@@ -1236,7 +1242,7 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
         const char * errstr = (code < 6) ? message[code] : message[0];
         void * thread = nullptr;
         
-        if(osRtxErrorStackUnderflow == code)
+        if(osRtxErrorStackOverflow == code)
         {
             thread = object_id;
             embot::os::Thread *t = embot::os::rtos::scheduler_getassociated(thread);
@@ -1258,7 +1264,8 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
     return 0;
     
 //// OS Error Codes
-//#define osRtxErrorStackUnderflow        1U  ///< Stack overflow, i.e. stack pointer below its lower memory limit for descending stacks. (thread_id=object_id)
+//#define osRtxErrorStackUnderflow        1U  ///< \deprecated Superseded by \ref osRtxErrorStackOverflow.
+//#define osRtxErrorStackOverflow         1U  ///< Stack overflow, i.e. stack pointer below its lower memory limit for descending stacks.
 //#define osRtxErrorISRQueueOverflow      2U  ///< ISR Queue overflow detected when inserting object. (object_id)
 //#define osRtxErrorTimerQueueOverflow    3U  ///< User Timer Callback Queue overflow detected for timer. (timer_id=object_id)
 //#define osRtxErrorClibSpace             4U  ///< Standard C/C++ library libspace not available: increase OS_THREAD_LIBSPACE_NUM. (thread_id=object_id)
