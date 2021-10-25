@@ -182,7 +182,7 @@ namespace embot { namespace hw { namespace sys {
     constexpr std::uint32_t maxRANDmask = 0x3ff; // 1023    
     std::uint32_t random()
     {
-#if defined(HAL_RNG_MODULE_ENABLED)   
+#if defined(HAL_RNG_MODULE_ENABLED) && !defined(EMBOT_ENABLE_hw_sys_emulateRAND)
         std::uint32_t v = 0;        
         HAL_RNG_GenerateRandomNumber(&hrng, &v);
 #else
