@@ -75,6 +75,8 @@ typedef enum {
 
 #define AEA_DEFAULT_SPIKE_MAG_LIMIT   112 // 7*16 = 7*65536/resolution 
 #define AEA_DEFAULT_SPIKE_CNT_LIMIT 32767 // no hardware error on spikes
+
+// #define AEA3_DEFAULT_SPIKE_MAG_LIMIT   28 // 16+8+4 (the last three lsb byte could be invalid)
     
 #define MAIS_DEFAULT_SPIKE_MAG_LIMIT   112 // 7*16 = 7*65536/resolution 
 #define MAIS_DEFAULT_SPIKE_CNT_LIMIT 32767 // no hardware error on spikes

@@ -34,6 +34,7 @@
 
 
 #define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)
+#define AEA3_MIN_SPIKE 4 //2 bitsof zero padding(aea3 use 14 bits)
           
 
 AbsEncoder* AbsEncoder_new(uint8_t n)
@@ -114,7 +115,6 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
         }break;
 
         case(eomc_enc_aea):
-        case(eomc_enc_aea3):
         case(eomc_enc_spichainof2):
         case(eomc_enc_spichainof3):
         {
@@ -128,7 +128,20 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
             o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
             
             //snprintf(message, sizeof(message), "ABSE aea:tol %.3f, div %.3f spikel %d", o->toleranceCfg, o->div, o->spike_mag_limit);
-        }break; 
+        }break;
+        case(eomc_enc_aea3):
+        {
+            int32_t toleranceIDeg =(int32_t)((o->toleranceCfg * 65535.0f) / 360.0f) ;
+            /* Note: AEA3 has 14 bits of resolution, so we pad with four zero to transform from AEA unit to iDegree */
+            if(toleranceIDeg < AEA3_MIN_SPIKE)
+                o->spike_mag_limit = AEA3_MIN_SPIKE * o->div;
+            else
+                o->spike_mag_limit = toleranceIDeg *o->div;
+            
+            o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+            
+            //snprintf(message, sizeof(message), "ABSE aea:tol %.3f, div %.3f spikel %d", o->toleranceCfg, o->div, o->spike_mag_limit);
+        }break;
 
         // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to ... amo and psc
         case(eomc_enc_pos):
