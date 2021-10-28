@@ -20,6 +20,7 @@
 
 #if defined(OSAL_USE_rtos_cmsisos2)
 #include "embot_os_rtos.h"
+#include "cmsisos2.h"
 #else
 #include "osiit.h"
 #endif
@@ -83,12 +84,12 @@ enum {osal_task_signature = 0x33};
 
 struct osal_task_opaque_t 
 {   // 4+1+1+2+4+4 = 16 bytes
-    void*           rtostsk;
-    uint8_t         signtsk;
-    uint8_t         prio;
-    uint16_t        stksize;
-    uint64_t        *stkdata;
-    void            *ext;
+    embot::os::rtos::thread_t*  rtostsk;
+    uint8_t                     signtsk;
+    uint8_t                     prio;
+    uint16_t                    stksize;
+    uint64_t                    *stkdata;
+    void                        *ext;
 };
 
 
@@ -571,10 +572,10 @@ extern void osal_system_ticks_abstime_set(osal_abstime_t tot)
  
 }
 
-#warning NOTE: suboptimal implemenattion 
 extern osal_abstime_t osal_system_ticks_abstime_get(void)
 {
-    return embot::os::rtos::scheduler_timeget();
+    return cmsisos2_sys_abstime_milliresolution();
+//    return embot::os::rtos::scheduler_timeget();
  //   return((uint64_t)s_osal_usec_in_tick * oosiit_time_get());     
 }
 
@@ -585,7 +586,7 @@ extern osal_abstime_t osal_system_abstime_get(void)
 //    return(oosiit_microtime_get());     
 }
 
-#warning NOTE: suboptimal implemenattion 
+//#warning NOTE: suboptimal implemenattion 
 extern osal_nanotime_t osal_system_nanotime_get(void)
 {
     return 1000*embot::os::rtos::scheduler_timeget();
@@ -667,45 +668,31 @@ extern osal_task_t * osal_task_new1(osal_task_properties_t *tskprop)
     return(osal_task_new(tskprop->function, tskprop->param, tskprop->priority, tskprop->stacksize));
 }
 
+static uint8_t s_priority_osal_to_cmsisos2(uint8_t p)
+{
+    // there is not a 1 to 1 relation ....
+    return p;
+}
+
+static uint8_t s_priority_cmsisos2_to_osal(uint8_t p)
+{
+    // there is not a 1 to 1 relation ....
+    return p;
+}
 
 extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t prio, uint16_t stksize)
 {
-    uint64_t *stack = NULL;
     osal_task_t* retval = NULL;    
-    void *rtostsk = NULL;
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_task_properties_t tskprop;
-#endif      
 
     if((0 == stksize) || (prio<osal_prio_usrtsk_min) || (prio>osal_prio_usrtsk_max) || (NULL == run_fn))
     {
-        //return(NULL);
         s_osal_error(osal_error_incorrectparameter, "osal: incorr param in osal_task_new()");
     }
 
     // protect vs concurrent call
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
     
-//     // can we proceed in getting the task? if dynamic mode yes. if static mode ... lets see
-//     if(NULL != s_osal_task_data)
-//     {
-//         if(s_osal_task_next >= s_osal_task_maxnum)
-//         {
-//             // cannot get a task
-//             s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_task_t (static mode) in osal_task_new()");
-//             osal_mutex_release(s_osal_mutex_api_protection);
-//             return(NULL);        
-//         }
-//         retval = &s_osal_task_data[s_osal_task_next++];
-//     }
-//     else
-//     {
-//         retval = osal_base_memory_new(sizeof(osal_task_t)); 
-//     }
-//     
-    retval = s_osal_taskobj_new();    
+    retval = reinterpret_cast<osal_task_t*>(osal_base_memory_new(sizeof(osal_task_t)));
     if(NULL == retval)
     {
         s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_task_t in osal_task_new()");
@@ -713,46 +700,19 @@ extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t
         return(NULL);        
     }
        
-    
-    // get the stack  
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    stack = oosiit_memory_getstack(stksize);    
-#endif      
-    
-    if(NULL == stack)
-    {
-        // cannot get a stack
-        s_osal_error(osal_error_missingmemory, "osal: missing mem for stack in osal_task_new()");
-        osal_mutex_release(s_osal_mutex_api_protection);
-        //return(NULL);
-    }
-    // increment used stacksize
-    s_resources_used[osal_info_entity_globalstack] += stksize;
+    uint32_t tmp = (stksize+7)/8;
+    stksize *= 8;
+    uint8_t cmsisos2prio = s_priority_osal_to_cmsisos2(prio);
+    embot::os::rtos::thread_props_t props {};
+    props.prepare(run_fn, run_arg, cmsisos2prio, stksize);        
+    embot::os::rtos::thread_t * rtostsk = embot::os::rtos::thread_new(props);
         
-
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    // get a oosiit task
-    tskprop.function        = run_fn;
-    tskprop.param           = run_arg;
-    tskprop.priority        = osal_prio_systsk_usrwhencreated; // use priority osal_prio_systsk_usrwhencreated = 1 to avoid that the run_fn starts straigth away
-    tskprop.stacksize       = stksize;
-    tskprop.stackdata       = stack;
-    tskprop.extdata         = retval; // by crating teh task w/ this argument i avoid calling oosiit_tsk_set_extdata(rtostsk, retval) after
-    
-    rtostsk = oosiit_tsk_create(&tskprop);    
-#endif       
-
-
     if(NULL == rtostsk)
     {
         // cannot get a task
         s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos task in osal_task_new()");
         osal_mutex_release(s_osal_mutex_api_protection);
-        //return(NULL);
+        return(NULL);
     }
     
     // ok. i can increment the tasks.
@@ -762,23 +722,19 @@ extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t
     // init the returning osal task
     retval->rtostsk    = rtostsk;
     retval->signtsk    = osal_task_signature;
+    #warning TODO: decide if we want cmsisos2prio or prio in here
     retval->prio       = prio;
     retval->stksize    = stksize;
-    retval->stkdata    = stack;
+    #warning TODO: decide if we really need stack in here 
+    // in case, we need a ned method props.getstack() or thread_getstack()
+    retval->stkdata    = NULL;
     retval->ext        = NULL;
     
-    // store inside the rtostsk the pointer to the osal task
-    //oosiit_tsk_set_extdata(rtostsk, retval);
-
     // can release now
-    osal_mutex_release(s_osal_mutex_api_protection);
-
+    osal_mutex_release(s_osal_mutex_api_protection); 
+    
     // the destiny of the task is now given to the scheduler. it can start now if prio is higher than the priority of the caller  
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_tsk_setprio(rtostsk, prio);
-#endif      
+    embot::os::rtos::thread_setpriority(rtostsk, embot::os::priority::convert(cmsisos2prio));    
     
     return(retval);
 }
@@ -787,59 +743,35 @@ extern osal_task_t * osal_task_new(void (*run_fn)(void*), void *run_arg, uint8_t
 
 extern osal_result_t osal_task_wait(osal_reltime_t time)
 {
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    if(0 == time)
-    {
-        oosiit_tsk_pass();
-    }
-    else
-    {
-        oosiit_dly_wait(s_osal_delay2tick(time));
-    }   
-#endif      
-
+    constexpr embot::os::rtos::thread_t * running = nullptr;
+    // nullptr is fine in here because thread_sleep does not use this argument
+    embot::os::rtos::thread_sleep(running, time);
     return(osal_res_OK);
 }
 
 extern osal_result_t osal_task_pass(void)
 {
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_tsk_pass();
-#endif      
-    
+    osThreadYield();    
     return(osal_res_OK);
 }
 
 extern osal_result_t osal_task_period_set(osal_reltime_t period)
 {
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_itv_set(s_osal_period2tick(period));
-#endif      
-    
+    embot::os::rtos::thread_period_set(embot::os::rtos::scheduler_thread_running(), period);    
     return(osal_res_OK);
 }
 
 
 extern osal_result_t osal_task_period_wait(void)
 {
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_itv_wait();
-#endif      
-    
+    constexpr embot::core::relTime period = 0; // is ok like that. thread_period_wait() does not use the value
+    embot::os::rtos::thread_period_wait(embot::os::rtos::scheduler_thread_running(), period);
     return(osal_res_OK);
 }
 
 extern osal_result_t osal_task_delete(osal_task_t *tsk)
 {
-    void* rtostsk = NULL;
+    embot::os::rtos::thread_t* rtostsk = NULL;
     
     if(NULL == tsk)
     {
@@ -858,10 +790,10 @@ extern osal_result_t osal_task_delete(osal_task_t *tsk)
     rtostsk = tsk->rtostsk;
     
     s_resources_used[osal_info_entity_task] --;
-    if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
-    {
-        s_resources_used[osal_info_entity_globalstack] -= tsk->stksize;
-    }
+//    if(osal_memmode_dynamic == s_osal_osal_cfg.memorymodel)
+//    {
+//        s_resources_used[osal_info_entity_globalstack] -= tsk->stksize;
+//    }
     
     // reset the data pointed by tsk so that another task calling osal_tsk_* functions with the same tsk
     // exits gracefully ... until the same memory is used for something else....    
@@ -870,21 +802,13 @@ extern osal_result_t osal_task_delete(osal_task_t *tsk)
     tsk->prio           = 0;
     tsk->stksize        = 0;
     tsk->stkdata        = NULL;
-    tsk->ext            = NULL;       
-    
-    s_osal_taskobj_del(tsk);      
- 
-    osal_mutex_release(s_osal_mutex_api_protection);
+    tsk->ext            = NULL;     
 
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    // MUST be the last operation because ... in case of auto-delete the function
-    // oosiit_tsk_delete() internally forces a contex switch and current task is not executed anymore
-    // thus isntructions after oosiit_tsk_delete() are not executed 
-    oosiit_tsk_delete(rtostsk);     
-    // in case of auto-delete any instruction after this comment is not executed .....      
-#endif      
+    osal_base_memory_del(tsk);    
+    
+    osal_mutex_release(s_osal_mutex_api_protection);
+    
+    embot::os::rtos::thread_delete(rtostsk);
     
     return(osal_res_OK);    
 }
@@ -907,12 +831,7 @@ extern osal_result_t osal_task_priority_get(osal_task_t *tsk, uint8_t *prio)
 }
 
 extern osal_result_t osal_task_priority_set(osal_task_t *tsk, uint8_t prio)
-{
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning in cmsisos2 teh priorities are not teh same...
-#else
-    
-#endif      
+{    
     if(NULL == tsk)
     {
         return(osal_res_NOK_nullpointer);
@@ -933,18 +852,16 @@ extern osal_result_t osal_task_priority_set(osal_task_t *tsk, uint8_t prio)
         return(osal_res_NOK_generic);
     }      
 
+    uint8_t cmsisos2prio = s_priority_osal_to_cmsisos2(prio);
     tsk->prio = prio;
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_tsk_setprio(tsk->rtostsk, prio);
-#endif  
+    embot::os::rtos::thread_setpriority(tsk->rtostsk, embot::os::priority::convert(cmsisos2prio));
     
     osal_mutex_release(s_osal_mutex_api_protection);
 
     return(osal_res_OK);
 }
 
+#warning TODO: the osal_task_id_t is missing ....
 extern osal_result_t osal_task_id_get(osal_task_t *tsk, osal_task_id_t *id)
 {
     if((NULL == tsk) || (NULL == id))
@@ -957,12 +874,8 @@ extern osal_result_t osal_task_id_get(osal_task_t *tsk, osal_task_id_t *id)
         return(osal_res_NOK_generic);
     } 
     
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    *id = oosiit_tsk_get_id(tsk->rtostsk);
-#endif      
-    
+    *id = 0;
+         
     return(osal_res_OK);
 }
 
@@ -1004,7 +917,8 @@ extern void* osal_task_extdata_get(osal_task_t *tsk)
     return(tsk->ext);
 }
 
-
+#warning i want to get teh pointer to the running osal_task_t, not of the rtos theread
+#warning TO BE SOLVED
 extern osal_task_t * osal_task_get(osal_caller_t caller)
 {    
 //     osal_task_t* retval = NULL;
@@ -1021,6 +935,7 @@ extern osal_task_t * osal_task_get(osal_caller_t caller)
     
 }
 
+#warning do we use it?
 extern void * osal_task_stack_get1(osal_task_t *tsk, uint16_t *size)
 {
     if(NULL == tsk)
@@ -1041,49 +956,23 @@ extern void * osal_task_stack_get1(osal_task_t *tsk, uint16_t *size)
     return(tsk->stkdata);
 }
 
+// messagequeue
+
 extern osal_messagequeue_t * osal_messagequeue_new(uint16_t maxmsg)
 {
-    osal_messagequeue_t *retptr = NULL;
-
     if(maxmsg == 0)
     {
         s_osal_error(osal_error_incorrectparameter, "osal: incorr param in osal_messagequeue_new()");
-        //return(NULL);
+        return(NULL);
     }
     
-    
-//     retptr = osal_base_memory_new(sizeof(osal_messagequeue_t));
-//     
-//     if(NULL == retptr)
-//     {
-//         s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_messagequeue_t in osal_messagequeue_new()");
-//         //return(NULL);
-//     }
-//     
-//   
-//     retptr->rtosmbx = oosiit_mbx_create(maxmsg);
-//     retptr->signmbx = osal_messagequeue_signature;
-
-//     if(NULL == retptr->rtosmbx)
-//     {
-//         s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos msg queue in osal_messagequeue_new()");
-//         //return(NULL);
-//     }
-    
-    
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-    void* rtosobj = NULL;
-#else
-    void* rtosobj = oosiit_mbx_create(maxmsg);    
-#endif      
-    
-    if(NULL == rtosobj)
+    embot::os::rtos::messagequeue_t * mq = embot::os::rtos::messagequeue_new(maxmsg);   
+  
+    if(NULL == mq)
     {
-        s_osal_error(osal_error_missingmemory, "osal: missing mem for rtos obj in osal_messagequeue_new()");
-        //return(NULL);
-    }        
-    retptr = (osal_messagequeue_t*)s_osal_osalobj_new(rtosobj, osal_messagequeue_signature);
+        s_osal_error(osal_error_missingmemory, "osal: missing mem for osal_messagequeue_t in osal_messagequeue_new()");
+        return(NULL);
+    }
     
 
     // protect he because the osiit_* calls are already protected as they are executes by svc
@@ -1094,52 +983,24 @@ extern osal_messagequeue_t * osal_messagequeue_new(uint16_t maxmsg)
 
     osal_mutex_release(s_osal_mutex_api_protection);
 
-    return(retptr);
+    return reinterpret_cast<osal_messagequeue_t*>(mq);
 }
 
+#warning see osal_messagequeue_get() 
 
 extern osal_result_t osal_messagequeue_get(osal_messagequeue_t *mq, osal_message_t *pmsg, osal_reltime_t tout, osal_caller_t caller)
 {
-    osal_result_t res = osal_res_NOK_timeout; 
-
-    void *p = NULL;
+    osal_result_t res = osal_res_OK; 
 
     if((NULL == mq) || (NULL == pmsg))
     {
         return(osal_res_NOK_nullpointer);
     }
     
-   
-    void* rtosobj = NULL;
-    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
-    {
-        return(osal_res_NOK_generic);
-    }
+    embot::os::Message msg = embot::os::rtos::messagequeue_get(reinterpret_cast<embot::os::rtos::messagequeue_t*>(mq), tout);
     
+    *pmsg = (osal_message_t)msg;
 
-    *pmsg = (osal_message_t)0;
-
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    // any caller ...    
-    oosiit_result_t rr;
-    rr = oosiit_mbx_retrieve(rtosobj, &p, s_osal_timeout2tick(tout));    
-  
-    
-    *pmsg = (osal_message_t)p;
-    
-    switch(rr)
-    {
-        case oosiit_res_OK:         res = osal_res_OK;              break;
-        case oosiit_res_MBX:        res = osal_res_OK;              break;
-//        case oosiit_res_TMO:        res = (osal_callerTSK == caller) ? (osal_res_NOK_timeout) : (osal_res_NOK_isrnowait);             break;
-        case oosiit_res_TMO:        res = osal_res_NOK_timeout;     break;
-        case oosiit_res_NOK: 
-//        case oosiit_res_OBJDEL:
-        default:                    res = osal_res_NOK_nullpointer; break; 
-    }
-#endif        
     return(res);
 }
 
@@ -1153,20 +1014,11 @@ extern osal_message_t osal_messagequeue_getquick(osal_messagequeue_t *mq, osal_r
         return((osal_message_t)0);
     }
     
-    void* rtosobj = NULL;
-    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
-    {
-        return((osal_message_t)0);
-    }    
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    // any caller
-    oosiit_mbx_retrieve(rtosobj, &p, s_osal_timeout2tick(tout));    
-#endif      
+    embot::os::Message msg = embot::os::rtos::messagequeue_get(reinterpret_cast<embot::os::rtos::messagequeue_t*>(mq), tout); 
     
-    return((osal_message_t)p);
+    return((osal_message_t)msg);
 }
+
 
 extern uint16_t osal_messagequeue_available(osal_messagequeue_t *mq, osal_caller_t caller)
 {
@@ -1175,18 +1027,7 @@ extern uint16_t osal_messagequeue_available(osal_messagequeue_t *mq, osal_caller
         return(0);
     }
     
-    void* rtosobj = NULL;
-    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
-    {
-        return(0);
-    }      
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-    return NULL;
-#else
-    return( oosiit_mbx_available(rtosobj) )
-#endif  
-    ;    
+    return 0;
 }
 
 
@@ -1197,17 +1038,7 @@ extern uint16_t osal_messagequeue_size(osal_messagequeue_t *mq, osal_caller_t ca
         return(0);
     }
     
-    void* rtosobj = NULL;
-    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
-    {
-        return(0);
-    }      
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-    return NULL;
-#else
-    return( oosiit_mbx_used(rtosobj) );
-#endif  
+    return embot::os::rtos::messagequeue_size(reinterpret_cast<embot::os::rtos::messagequeue_t*>(mq));
         
 }
 
@@ -1219,29 +1050,10 @@ extern osal_result_t osal_messagequeue_put(osal_messagequeue_t *mq, osal_message
         return(osal_res_NOK_nullpointer);
     }
     
-    void* rtosobj = NULL;
-    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
-    { 
-        return(osal_res_NOK_generic);
-    }    
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-    return osal_res_OK;
-#else
-    oosiit_result_t rr;
-    rr = oosiit_mbx_send(rtosobj, (void*)msg, s_osal_timeout2tick(tout));
+    bool rr = embot::os::rtos::messagequeue_put(reinterpret_cast<embot::os::rtos::messagequeue_t*>(mq), msg, tout);
     
-    
+    return (rr) ? osal_res_OK : osal_res_NOK_timeout;
 
-    if(rr == oosiit_res_OK)
-    {
-        return(osal_res_OK);
-    }
-    else
-    {
-        return(osal_res_NOK_timeout);
-    }
-#endif  
 }
 
 extern osal_result_t osal_messagequeue_delete(osal_messagequeue_t *mq)
@@ -1251,20 +1063,7 @@ extern osal_result_t osal_messagequeue_delete(osal_messagequeue_t *mq)
         return(osal_res_NOK_nullpointer); 
     }
 
-    void* rtosobj = NULL;
-    if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
-    { 
-        return(osal_res_NOK_generic);
-    } 
-    
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_mbx_delete(rtosobj);
-#endif      
-    
-    
-    s_osal_rtosobj_clr((osal_obj_t*)mq);
+    embot::os::rtos::messagequeue_delete(reinterpret_cast<embot::os::rtos::messagequeue_t*>(mq));
         
     osal_mutex_take(s_osal_mutex_api_protection, OSAL_reltimeINFINITE);
     s_resources_used[osal_info_entity_messagequeue] --;
@@ -1279,17 +1078,11 @@ extern osal_result_t osal_eventflag_set(osal_eventflag_t flag, osal_task_t * tot
     {
         return(osal_res_NOK_nullpointer);
     }
-
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_evt_set(flag, totask->rtostsk);
-#endif      
     
+    bool rr = embot::os::rtos::event_set(totask->rtostsk, flag);
 
     return(osal_res_OK);
 }
-
 
 extern osal_result_t osal_eventflag_get(osal_eventflag_t waitmsk, osal_eventflag_waitmode_t waitmode, osal_eventflag_t *rxmsk, osal_reltime_t tout)
 {
@@ -1302,39 +1095,25 @@ extern osal_result_t osal_eventflag_get(osal_eventflag_t waitmsk, osal_eventflag
 
     *rxmsk = 0;
     
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-#else
-    oosiit_result_t rr;
-    rr = oosiit_evt_wait(waitmsk, s_osal_timeout2tick(tout), (osal_waitALLflags == waitmode) ? (oosiit_evt_wait_mode_all) : (oosiit_evt_wait_mode_any));        
+    // osal_waitANYflag or osal_waitALLflags
+    uint32_t options = (osal_waitANYflag == waitmode) ? osFlagsWaitAny : osFlagsWaitAll;
+    uint32_t flags = (osal_waitANYflag == waitmode) ? 0x7fffffff : waitmsk;  
     
-    if(oosiit_res_EVT == rr)
+    uint32_t r =  osThreadFlagsWait(flags, options, cmsisos2_sys_reltime2tick(tout));
+    if(osFlagsErrorTimeout == r)
     {
-         res = osal_res_OK;
-         *rxmsk = (osal_waitALLflags == waitmode) ? (waitmsk) : (oosiit_evt_get());
+        return osal_res_NOK_timeout;
     }
-#endif  
-    return(res);
-
+    
+    *rxmsk = r;
+    return osal_res_OK;    
+    
 }
 
 
 extern osal_eventflag_t osal_eventflag_getany(osal_reltime_t tout)
-{
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning add code for OSAL_USE_rtos_cmsisos2
-    return osal_res_OK;
-#else
-    if(oosiit_res_EVT == oosiit_evt_wait(0xFFFFFFFF, s_osal_timeout2tick(tout), oosiit_evt_wait_mode_any))
-    {
-        return(oosiit_evt_get());
-    }
-    else
-    {
-        return(0);
-    }    
-#endif  
-
+{   
+    return embot::os::rtos::event_get(tout);
 }
 
 
@@ -1398,15 +1177,30 @@ extern osal_result_t osal_semaphore_set(osal_semaphore_t *sem, uint8_t tokens)
     {
         return(osal_res_NOK_nullpointer); 
     }
-
-#if defined(OSAL_USE_rtos_cmsisos2)
-    #warning PROBLEM: osal_semaphore_set() cannot be implemented w/ cmsisos2
-#else
-    oosiit_sem_set(rtosobj, tokens);
-#endif      
     
-    // ok, all done
-    return(osal_res_OK);
+    
+    osRtxSemaphore_t *ss = (osRtxSemaphore_t*)sem;    
+    
+    if(tokens > ss->max_tokens)
+    {
+        return(osal_res_NOK_generic);
+    }
+
+    if(tokens == ss->tokens)
+    {
+        return(osal_res_OK);
+    }
+    
+    if(NULL == ss->thread_list)
+    {
+        ss->tokens = tokens;
+        return(osal_res_OK);
+    }
+    
+    // problems: we have a thread waiting ... for now i invalidate that
+    
+    s_osal_error(osal_error_incorrectparameter, "osal: osal_semaphore_set() cannot set because a thread is waiting");
+    return(osal_res_NOK_generic);
 }
 
 
