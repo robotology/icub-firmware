@@ -1237,22 +1237,48 @@ OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
   return (OS_R_OK);
 }
 
+#if defined(FATALERR_trace_RTOS)
+// i use it in here to avoid stack 
+uint32_t ft_tmp0 = 0;
+uint32_t ft_tmp1 = 0;
+uint32_t ft_tmp2 = 0;
+#endif
 
 // in here we just use TIME_t for type of timeout and use iitchanged_rt_block() 
 OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout) {
   /* Receive a message; possibly wait for it */
   P_MCB p_MCB = mailbox;
   P_TCB p_TCB;
+    
+    FATALERR_RT2_set(FT_0, 3);
+    FATALERR_RT2_set(FT_3, mailbox);
+    FATALERR_RT2_set(FT_4, message);
+    FATALERR_RT2_set(FT_5, timeout);
+    #if defined(FATALERR_trace_RTOS)
+    ft_tmp0 = (uint32_t)p_MCB->cb_type | ((uint32_t)p_MCB->state << 8) | ((uint32_t)p_MCB->isr_st << 16); 
+    ft_tmp1 = (uint32_t)p_MCB->first | ((uint32_t)p_MCB->last << 16);
+    ft_tmp2 = (uint32_t)p_MCB->count | ((uint32_t)p_MCB->size << 16);    
+    #endif
+    FATALERR_RT2_set(FT_6, ft_tmp0);
+    FATALERR_RT2_set(FT_7, p_MCB->p_lnk);
+    FATALERR_RT2_set(FT_8, ft_tmp1);
+    FATALERR_RT2_set(FT_9, ft_tmp2);
+    FATALERR_RT2_set(FT_10, p_MCB->msg);
+    FATALERR_RT2_set(FT_0, 4);
 
   /* If a message is available in the fifo buffer */
   /* remove it from the fifo buffer and return. */
   if (p_MCB->count) {
     *message = p_MCB->msg[p_MCB->last];
+      FATALERR_RT2_set(FT_0, 5);
     if (++p_MCB->last == p_MCB->size) {
       p_MCB->last = 0U;
+        FATALERR_RT2_set(FT_0, 6);
     }
     if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 2U)) {
       /* A task is waiting to send message */
+        FATALERR_RT2_set(FT_0, 7);
+        FATALERR_RT2_set(FT_11, p_MCB);
       p_TCB = rt_get_first ((P_XCB)p_MCB);
 #ifdef __CMSIS_RTOS
       rt_ret_val(p_TCB, 0U/*osOK*/);

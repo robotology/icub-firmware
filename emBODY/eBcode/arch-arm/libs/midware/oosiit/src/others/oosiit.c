@@ -989,10 +989,12 @@ extern oosiit_result_t oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** messa
     
     if(0 != __get_IPSR()) 
     {   // inside isr
+        FATALERR_RT2_set(FT_0, 3);
         return(isr_oosiit_mbx_retrieve(mailbox, message));
     } 
     else if(1 == s_oosiit_started)
     {   // call svc
+         FATALERR_RT2_set(FT_0, 4);
          return(__svc_oosiit_mbx_retrieve(mailbox, message, timeout));
     }
     else

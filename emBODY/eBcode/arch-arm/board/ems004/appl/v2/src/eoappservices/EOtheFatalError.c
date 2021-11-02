@@ -49,6 +49,7 @@ volatile uint32_t FATALERR_tmrman[8] = {0};
 
 #if defined(FATALERR_trace_RTOS)
 volatile uint32_t FATALERR_rtos[8] = {0};
+volatile uint32_t FATALERR_rtos2[16] = {0};
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -699,6 +700,12 @@ static void s_save_rtos(void)
     {
         pRTOS[i] = FATALERR_rtos[i];
     }
+    
+    volatile uint32_t *pRTOS2 = (volatile uint32_t*) (0x10000000+384);
+    for(int i=0; i<8; i++)
+    {
+        pRTOS2[i] = FATALERR_rtos2[i];
+    }    
 #endif      
 }
 
@@ -755,6 +762,7 @@ static void s_info_rtos(EOtheFatalError *p)
 #if defined(FATALERR_trace_RTOS)   
     
     volatile uint32_t *pRTOS = (volatile uint32_t*) (0x10000000+256);
+    volatile uint32_t *pOS = (volatile uint32_t*) (0x10000000+384);
     
     uint16_t par16 = 0;
     uint64_t par64 = p->detectedfatalerror.params.par64;     
@@ -771,8 +779,19 @@ static void s_info_rtos(EOtheFatalError *p)
 
     // caveat the string can be at most 48 characters 
     
-    // System control registers. 
-    
+    // RTOS
+
+    for(int i=0; i<8; i++)
+    {
+        int f0 = 2*i;
+        int f1 = 2*i+1;
+        snprintf(str, sizeof(str), "OS%02d = 0x%08x OS%02d = 0x%08x", 
+            f0, pOS[f0], f1, pOS[f1]
+        );        
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, s_eobj_ownname, &p->errdes); 
+    }
+
+    // the others  
     snprintf(str, sizeof(str), "RT0 = 0x%08x RT1 = 0x%08x", 
         pRTOS[0], pRTOS[1]
     );        
