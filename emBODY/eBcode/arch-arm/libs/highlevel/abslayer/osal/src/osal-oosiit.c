@@ -1056,12 +1056,14 @@ extern osal_message_t osal_messagequeue_getquick(osal_messagequeue_t *mq, osal_r
 
     if(NULL == mq)
     {
+        FATALERR_RT2_set(FT_0, 256);
         return((osal_message_t)0);
     }
     
     void* rtosobj = NULL;
     if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
     {
+        FATALERR_RT2_set(FT_0, 257);
         return((osal_message_t)0);
     }   
 
@@ -1071,6 +1073,8 @@ extern osal_message_t osal_messagequeue_getquick(osal_messagequeue_t *mq, osal_r
     // any caller
     oosiit_mbx_retrieve(rtosobj, &p, s_osal_timeout2tick(tout));
 
+    FATALERR_RT2_set(FT_0, 255);
+    FATALERR_RT2_set(FT_15, p);
     
     return((osal_message_t)p);
 }

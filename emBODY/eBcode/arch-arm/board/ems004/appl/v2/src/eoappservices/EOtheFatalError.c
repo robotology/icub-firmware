@@ -702,7 +702,7 @@ static void s_save_rtos(void)
     }
     
     volatile uint32_t *pRTOS2 = (volatile uint32_t*) (0x10000000+384);
-    for(int i=0; i<8; i++)
+    for(int i=0; i<16; i++)
     {
         pRTOS2[i] = FATALERR_rtos2[i];
     }    
