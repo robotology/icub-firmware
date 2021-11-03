@@ -621,13 +621,13 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                         // the resolution is 16384 ticks per revolution.
                         
                         // GOOD VALUE:
-                        uint32_t ticks = (spiRawValue >> 9) & 0x3FFF;
+                        uint32_t ticks = (spiRawValue >> 1) & 0x3FFF;
                         prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos);                           
                     }
                     else
                     {   // we have a valid raw value from hal but ... it is not valid after a check                        
                         prop.valueinfo->errortype = prop.valueinfo->errortype;
-                        errorparam = (spiRawValue >> 9) & 0x3FFF;                                           
+                        errorparam = (spiRawValue >> 1) & 0x3FFF;                                           
                     }                    
                 }
                 else
@@ -1175,7 +1175,7 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             config.type				    = hal_spiencoder_typeAEA3;
             config.sdata_precheck       = hal_false;  
             config.reg_addresses[0]	    = 0;
-            config.reg_addresses[1]	    = 0;            
+            config.reg_addresses[1]	    = 0;
         }
         else if(hal_spiencoder_typeAMO == thestream->type)
         {
@@ -1293,11 +1293,12 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOencoder
 
 static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencoderreader_errortype_t *error)
 {
-    if((*valueraw & 0x3F) != 0x00)
-    {
-        *error = encreader_err_AEA_CHIP;
-        return(eobool_false);
-    }
+    // TODO: fix
+//    if((*valueraw & 0x01) != 0x00)
+//    {
+//        *error = encreader_err_AEA_CHIP;
+//        return(eobool_false);
+//    }
     return(eobool_true);
 }
 

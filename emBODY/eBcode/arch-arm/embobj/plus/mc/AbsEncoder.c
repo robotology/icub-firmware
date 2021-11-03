@@ -491,7 +491,7 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
     
     o->delta = 0;
     
-    int16_t check = position - o->position_last;
+    int32_t check = position - o->position_last;
     
     o->position_last = position;
 

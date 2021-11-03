@@ -304,6 +304,8 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         spicfg.cpolarity = hal_spi_cpolarity_low;
         spicfg.datacapture = hal_spi_datacapture_2edge;
         spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_nopull;
+        spicfg.maxsizeofframe = 2;                  // each frame is done of two words
+        spicfg.datasize = hal_spi_datasize_16bit;   // and each word is of 16 bits
         
         initSPI = hal_true;
     }
@@ -479,15 +481,15 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
 #if defined(AEA3_SUPPORT)
     else if(intitem->config.type == hal_spiencoder_typeAEA3) // Encoder type 4 (AEA3)
     {        
-        static const uint8_t txframe_dummy_aea3[3] = {0x00, 0x00, 0x00};
+        static const uint8_t txframe_dummy_aea3[2] = {0x00,0x00};
         // Mux enabled
         hal_mux_enable(intitem->muxid, intitem->muxsel);
         
         // SPI: set the callback function
         hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
         
-        // SPI: set the sizeofframe for this transmission (3)
-        hal_spi_set_sizeofframe(intitem->spiid, 3);
+        // SPI: set the sizeofframe for this transmission
+        hal_spi_set_sizeofframe(intitem->spiid, 1);
         
         // SPI: set the isrtxframe
         hal_spi_set_isrtxframe(intitem->spiid, txframe_dummy_aea3);
@@ -781,18 +783,18 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
     else if (intitem->config.type == hal_spiencoder_typeAEA3)
     {
         diagn->type = hal_spiencoder_diagnostic_type_none;
-        // for the AEA we use legacy diagnostic mode w/ flags even if it is not used by higher layers
         
         // AEA3 frame consists of 16 bits:
         // - first 14 MSB bits of positional data
         // - last 2 LSB bits zero padded
         
+        // TODO: fix
         // Check for zero padded bits (This could be a rendundant check, beacuse it already exists in EOappEncoreReader)
-        if ((intitem->rxframes[1][2] & 0x3F) != 0x00)
-        {
-            diagn->type = hal_spiencoder_diagnostic_type_flags;
-            diagn->info.flags.data_error = 1;
-        }
+        //if ((intitem->rxframes[1][0] & 0x01) != 0x00)
+        //{
+        //    diagn->type = hal_spiencoder_diagnostic_type_flags;
+        //    diagn->info.flags.data_error = 1;
+        //}
 
         *pos = intitem->position;
     }
@@ -1152,7 +1154,7 @@ static void s_hal_spiencoder_onreceiv(void* p)
     //hal_spi_stop(intitem->spiid);
     hal_mux_disable(intitem->muxid);
     
-    // ok ... now i get the frame of three bytes.
+    // ok ... now i get the frame of "framesize*numberOfFrame" bytes.
     
     // hal_spi_get collects data directly from the fifo associated to the receveing packets
     // gets all the items inside the fifo (in this case)
@@ -1337,8 +1339,11 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* fra
 {
     // AEA3 offers 14 bit of resolution (6 bit + 8 bit)
     // the first bit is masked because it is necessary only to trig the SCK.
-    //uint32_t pos = ((frame[0] & 0x7F) << 7) | (frame[1] >> 1);             // in this way we get the right raw value yet (already shifted correctly)
-    uint32_t pos = ((frame[0] & 0x7F) << 16) | (frame[1] << 8) | (frame[2]); // in this way we have also the six zero padded bits 
+    //uint32_t pos = ((frame[0] & 0x7F) << 7) | (frame[1] >> 1);               // in this way we get the right raw value yet (already shifted correctly)
+    //uint32_t pos = ((frame[0] & 0x7F) << 16) | (frame[1] << 8) | (frame[2]); // in this way we have also the six zero padded bits 
+    
+    
+    uint16_t pos = (((frame[1] & 0x7F) << 8 )| frame[0]); // in this way we are reading 16 bits (1 bit dummy + 14 bit valid + 1 bit zero padded). The dummy bit has been masked.
     
     return(pos);
 }
