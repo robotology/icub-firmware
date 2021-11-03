@@ -152,15 +152,15 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
         char str[64] = {0};
         if(hal_res_OK == r)
         { 
-            hal_spiencoder_position_t raw_value_shifted =  raw_value >> 9; // sensor return 16 bits --> only 14 are valid
+            hal_spiencoder_position_t raw_value_shifted =  raw_value >> 1; // sensor return 16 bits --> only 14 are valid
             snprintf(str, sizeof(str), "%d, %d, %f", raw_value, raw_value_shifted, ((360.0 *  raw_value_shifted) / (1024.0*16)));  // (360*value)/(2^14)
-            
-            hal_trace_puts(str);
         }
         else
         {
             snprintf(str, sizeof(str), "aea error during hal_spiencoder_get_value2");
         }
+
+        hal_trace_puts(str);
                 
         // start reading
         hal_spiencoder_read_start(hal_spiencoder1);
