@@ -467,6 +467,8 @@ void AbsEncoder_still_check_reset(AbsEncoder* o)
     o->partial_space = 0;
 }
 
+//#include <hal_trace.h>
+
 void AbsEncoder_update(AbsEncoder* o, uint16_t position)
 {
     if (!o) return;
@@ -493,9 +495,13 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
     
     int32_t check = position - o->position_last;
     
+//    char str_absEnc[64] = {0};
+//    snprintf(str_absEnc, sizeof(str_absEnc), "pos: %d \t pos_last: %d \t spike_mag_lim: %d \t check: %d", position, o->position_last, o->spike_mag_limit, check);
+//    hal_trace_puts(str_absEnc);
+    
     o->position_last = position;
 
-    if( (o->spike_mag_limit == 0) || (-o->spike_mag_limit <= check && check <= o->spike_mag_limit))
+    if( (o->spike_mag_limit == 0) || (-o->spike_mag_limit <= check && check <= o->spike_mag_limit) || (abs(check) >= (65535/2)))
     {
         int16_t delta = position - o->position_sure;
 
