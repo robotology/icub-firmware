@@ -36,6 +36,7 @@
 
 #if defined(FATALERR_trace_RTOS)
 extern volatile uint32_t FATALERR_rtos[8];
+extern volatile uint32_t FATALERR_rtos2[16];
 #define FT_0 0
 #define FT_1 1
 #define FT_2 2
@@ -44,11 +45,23 @@ extern volatile uint32_t FATALERR_rtos[8];
 #define FT_5 5
 #define FT_6 6
 #define FT_7 7
+#define FT_8 8
+#define FT_9 9
+#define FT_10 10
+#define FT_11 11
+#define FT_12 12
+#define FT_13 13
+#define FT_14 14
+#define FT_15 15
 #define FATALERR_RT_set(a, b)           FATALERR_rtos[(a)] = (uint32_t)(b)
 #define FATALERR_RT_setcond(a, b, c)    FATALERR_rtos[(a)] = (c) ? ((uint32_t)(b)) : (0)
+#define FATALERR_RT2_set(a, b)          FATALERR_rtos2[(a)] = (uint32_t)(b)
+#define FATALERR_RT2_setcond(a, b, c)   FATALERR_rtos2[(a)] = (c) ? ((uint32_t)(b)) : (0)
 #else
 #define FATALERR_RT_set(a, b)
 #define FATALERR_RT_setcond(a, b, c) 
+#define FATALERR_RT2_set(a, b)          
+#define FATALERR_RT2_setcond(a, b, c)   FATALERR_rtos2[(a)] = (c) ? ((uint32_t)(b)) : (0)
 #endif
 
 /* Error Codes */

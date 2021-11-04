@@ -206,8 +206,11 @@ OS_RESULT isr_mbx_receive (OS_ID mailbox, void **message) {
   /* Receive a message in the interrupt function. The interrupt function   */
   /* should not wait for a message since this would block the rtx os.      */
   P_MCB p_MCB = mailbox;
+    
+    FATALERR_RT2_set(FT_0, 33);
 
   if (p_MCB->count) {
+      FATALERR_RT2_set(FT_0, 34);
     /* A message is available in the fifo buffer. */
     *message = p_MCB->msg[p_MCB->last];
     if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 2U)) {
@@ -262,7 +265,8 @@ void rt_mbx_psh (P_MCB p_CB, void *p_msg) {
       }
       p_TCB->state = READY;
         FATALERR_RT_set(FT_0, 23);
-        FATALERR_RT_set(FT_1, 0);      rt_rmv_dly (p_TCB);
+        FATALERR_RT_set(FT_1, 0);      
+      rt_rmv_dly (p_TCB);
       rt_put_prio (&os_rdy, p_TCB);
       break;
     case 1:

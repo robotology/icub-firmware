@@ -35,6 +35,10 @@
 
 #include "stdio.h"
 
+#if defined(FATALERR_trace_RTOS)
+#include "oosiit.h"
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -1046,22 +1050,31 @@ extern osal_result_t osal_messagequeue_get(osal_messagequeue_t *mq, osal_message
 
 extern osal_message_t osal_messagequeue_getquick(osal_messagequeue_t *mq, osal_reltime_t tout, osal_caller_t caller)
 {
+    FATALERR_RT2_set(FT_0, 1);
+    FATALERR_RT2_set(FT_1, mq);
     void *p = NULL;
 
     if(NULL == mq)
     {
+        FATALERR_RT2_set(FT_0, 256);
         return((osal_message_t)0);
     }
     
     void* rtosobj = NULL;
     if(NULL == (rtosobj = s_osal_rtosobj_get((osal_obj_t*)mq, osal_messagequeue_signature)))
     {
+        FATALERR_RT2_set(FT_0, 257);
         return((osal_message_t)0);
-    }    
+    }   
+
+    FATALERR_RT2_set(FT_0, 2);
+    FATALERR_RT2_set(FT_2, rtosobj);    
     
     // any caller
     oosiit_mbx_retrieve(rtosobj, &p, s_osal_timeout2tick(tout));
 
+    FATALERR_RT2_set(FT_0, 255);
+    FATALERR_RT2_set(FT_15, p);
     
     return((osal_message_t)p);
 }

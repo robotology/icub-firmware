@@ -989,10 +989,12 @@ extern oosiit_result_t oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** messa
     
     if(0 != __get_IPSR()) 
     {   // inside isr
+        FATALERR_RT2_set(FT_0, 31); // unlikely path
         return(isr_oosiit_mbx_retrieve(mailbox, message));
     } 
     else if(1 == s_oosiit_started)
     {   // call svc
+         FATALERR_RT2_set(FT_0, 30); // detected path
          return(__svc_oosiit_mbx_retrieve(mailbox, message, timeout));
     }
     else
@@ -2190,6 +2192,7 @@ static __INLINE void* isr_oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
 
 static __INLINE oosiit_result_t isr_oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** message)
 {
+    FATALERR_RT2_set(FT_0, 32);
     int32_t r = isr_mbx_receive(mailbox, message);
     
     if(OS_R_OK == r)
