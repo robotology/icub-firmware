@@ -102,7 +102,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
     eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
 }
 
-// simone.girardi on 18 oct 2016: with the following macro enabled we can test the reading on aea3 encoder.
+// simone.girardi on 8 Nov 2021: with the following macro enabled we can test the reading on aea3 encoder.
 // with a minimum effort we can use it to test other similar encoders (e.g. aea1, aea2 ...)  as well.
 #if defined(TEST_AEA3)
 

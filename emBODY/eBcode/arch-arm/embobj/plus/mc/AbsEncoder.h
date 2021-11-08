@@ -121,6 +121,22 @@ extern void AbsEncoder_calibrate_absolute(AbsEncoder* o, int32_t offset, int32_t
 extern void AbsEncoder_calibrate_fake(AbsEncoder* o);
 
 //extern void AbsEncoder_update(AbsEncoder* o, int32_t position);
+
+/** @brief Updates the velocity based on current joint's position.
+ *
+ *  If the encoder has not been initialized yet or it is a fake encoder, 
+ *  or the state-bits are not configured, the function has no effect.
+ *  Despite an iCubDegree value is stored in a uint32_t, an int16_t variable
+ *  is used to avoid that a fictional spike will be triggered due to the wraparound.
+ *  It is a safe workaround as long as we accept an offset of few degrees when 
+ *  a real spike rises within the range [-spike_mag_limit, spike_mag_limit] (iCubDegree).
+ *  If a spike will be detected it will rise a warning that AEA encoder has spikes.
+ *  
+ *
+ *  @param o The absolute encoder.
+ *  @param position the current position (iCubDegree) just read from the encoder.
+ *  @return Void.
+ */
 extern void AbsEncoder_update(AbsEncoder* o, uint16_t position);
 extern void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type);
 
