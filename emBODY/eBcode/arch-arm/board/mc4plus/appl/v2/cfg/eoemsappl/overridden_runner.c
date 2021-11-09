@@ -132,7 +132,7 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     // so far we tick only the motion control.
     eo_motioncontrol_Tick(eo_motioncontrol_GetHandle());
     
-	eo_mais_Tick(eo_mais_GetHandle());
+    eo_mais_Tick(eo_mais_GetHandle());
     eo_strain_Tick(eo_strain_GetHandle());
     eo_psc_Tick(eo_psc_GetHandle());
     eo_pos_Tick(eo_pos_GetHandle());

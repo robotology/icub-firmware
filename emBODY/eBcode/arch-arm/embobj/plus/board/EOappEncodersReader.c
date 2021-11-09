@@ -1291,9 +1291,10 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOencoder
     return(eobool_true);
 }
 
+
 static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencoderreader_errortype_t *error)
 {
-    // TODO: fix
+    // TODO: fix ( there are no way to check the validity when using the AEA3 in SSI mode )
 //    if((*valueraw & 0x01) != 0x00)
 //    {
 //        *error = encreader_err_AEA_CHIP;
