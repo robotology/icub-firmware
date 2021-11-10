@@ -1,0 +1,18 @@
+_lightupLed: CODE, 1501 0 85
+___ftpack: CODE, 1404 0 97
+_ConfigureOscillator: CODE, 1928 0 3
+_main: CODE, 1586 0 83
+_displayCharge: CODE, 152 0 431
+___lwtoft: CODE, 1859 0 21
+_I2cInitSlave: CODE, 1808 0 27
+_InitApp: CODE, 1773 0 35
+__initialization: CODE, 1669 0 51
+_isr: CODE, 4 0 146
+_measureBattery: CODE, 583 0 337
+_readButton: CODE, 1723 0 50
+_read_adc: CODE, 1835 0 24
+___ftmul: CODE, 920 0 180
+_blink: CODE, 1896 0 16
+___fttol: CODE, 1269 0 135
+___ftdiv: CODE, 1100 0 169
+Total: 1890
