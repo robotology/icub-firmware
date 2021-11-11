@@ -61,7 +61,7 @@
 ;#include "hal_core_cfg.h"
     
 
-Stack_Size      EQU     0x00002000
+Stack_Size      EQU     0x00002C00
 ;Stack_Size      EQU     HAL_SYS_CFG_STACKSIZE
                 EXPORT  Stack_Size
 

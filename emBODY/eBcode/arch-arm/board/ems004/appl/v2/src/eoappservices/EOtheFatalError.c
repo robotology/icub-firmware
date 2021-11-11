@@ -180,8 +180,8 @@ extern void eo_fatalerror_AtStartup(EOtheFatalError *p)
                 s_info_standard(p);                
             }
             s_info_mpustate(p);
-            s_info_tmrman(p);
             s_info_rtos(p);
+            s_info_tmrman(p);
         }                        
     } 
 
