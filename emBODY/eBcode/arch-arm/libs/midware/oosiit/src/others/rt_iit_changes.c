@@ -1252,18 +1252,19 @@ OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout)
     
     FATALERR_RT2_set(FT_0, 3);
     FATALERR_RT2_set(FT_3, p_MCB);
-    FATALERR_RT2_set(FT_4, message);
-    FATALERR_RT2_set(FT_5, timeout);
+    FATALERR_RT2_set(FT_4, &p_MCB);
+    FATALERR_RT2_set(FT_5, message);
+    FATALERR_RT2_set(FT_6, timeout);
     #if defined(FATALERR_trace_RTOS)
     ft_tmp0 = (uint32_t)p_MCB->cb_type | ((uint32_t)p_MCB->state << 8) | ((uint32_t)p_MCB->isr_st << 16); 
     ft_tmp1 = (uint32_t)p_MCB->first | ((uint32_t)p_MCB->last << 16);
     ft_tmp2 = (uint32_t)p_MCB->count | ((uint32_t)p_MCB->size << 16);    
     #endif
-    FATALERR_RT2_set(FT_6, ft_tmp0);
-    FATALERR_RT2_set(FT_7, p_MCB->p_lnk);
-    FATALERR_RT2_set(FT_8, ft_tmp1);
-    FATALERR_RT2_set(FT_9, ft_tmp2);
-    FATALERR_RT2_set(FT_10, p_MCB->msg);
+    FATALERR_RT2_set(FT_7, ft_tmp0);
+    FATALERR_RT2_set(FT_8, p_MCB->p_lnk);
+    FATALERR_RT2_set(FT_9, ft_tmp1);
+    FATALERR_RT2_set(FT_10, ft_tmp2);
+    FATALERR_RT2_set(FT_11, p_MCB->msg);
     FATALERR_RT2_set(FT_0, 4);
       
 
@@ -1278,17 +1279,17 @@ OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout)
     }
     if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 2U)) {
       /* A task is waiting to send message */
-        FATALERR_RT2_set(FT_11, p_MCB);
+        FATALERR_RT2_set(FT_12, p_MCB);
         FATALERR_RT2_set(FT_0, 7);
       p_TCB = rt_get_first ((P_XCB)p_MCB);
-        FATALERR_RT2_set(FT_12, p_TCB);
+        FATALERR_RT2_set(FT_13, p_TCB);
         FATALERR_RT2_set(FT_0, 9);
 #ifdef __CMSIS_RTOS
       rt_ret_val(p_TCB, 0U/*osOK*/);
 #else
       rt_ret_val(p_TCB, OS_R_OK);
 #endif
-        FATALERR_RT2_set(FT_13, p_TCB->msg);
+        FATALERR_RT2_set(FT_14, p_TCB->msg);
         FATALERR_RT2_set(FT_0, 10);
       p_MCB->msg[p_MCB->first] = p_TCB->msg;
       if (++p_MCB->first == p_MCB->size) {

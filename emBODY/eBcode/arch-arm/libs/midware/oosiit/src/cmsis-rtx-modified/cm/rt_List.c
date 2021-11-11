@@ -98,7 +98,7 @@ P_TCB rt_get_first (P_XCB p_CB) {
   P_TCB p_first;
 
   p_first = p_CB->p_lnk;
-    FATALERR_RT2_set(FT_14, p_first);
+    FATALERR_RT2_set(FT_15, p_first);
     FATALERR_RT2_set(FT_0, 8);
   p_CB->p_lnk = p_first->p_lnk;
   if ((p_CB->cb_type == SCB) || (p_CB->cb_type == MCB) || (p_CB->cb_type == MUCB)) {
