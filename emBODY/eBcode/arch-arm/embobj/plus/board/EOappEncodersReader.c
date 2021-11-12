@@ -623,6 +623,20 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     //spiRawValue = (spiRawValue>>4) & 0xFFFF; marco.accame on 07jun17: why is there this comment? shall we remove it?
                     
                     // GOOD VALUE
+                    
+                    eOmc_joint_t *joint = (eOmc_joint_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jomo);
+                    
+                    int16_t sectors = (int16_t)(joint->config.gearbox_E2J + 0.5f);
+                    
+                    if (sectors == 32)
+                    {
+                        spiRawValue = (spiRawValue >> 1) & 0x3FFF;
+                    }
+                    else if (sectors == 64)
+                    {
+                        spiRawValue = spiRawValue & 0x3FFF;
+                    }
+                    
                     prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(spiRawValue, jomo, (eOmc_position_t)prop.descriptor->pos);
                 }
                 else
