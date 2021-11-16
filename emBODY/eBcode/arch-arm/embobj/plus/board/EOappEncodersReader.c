@@ -1749,7 +1749,7 @@ static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodert
     switch(encodertype)
     {
         case eomc_enc_aea:              ret = hal_spiencoder_typeAEA;       break;
-        case eomc_enc_aea3:              ret = hal_spiencoder_typeAEA3;       break;
+        case eomc_enc_aea3:             ret = hal_spiencoder_typeAEA3;       break;
         case eomc_enc_amo:              ret = hal_spiencoder_typeAMO;       break;
         case eomc_enc_spichainof2:      ret = hal_spiencoder_typeCHAINof2;  break;
         case eomc_enc_spichainof3:      ret = hal_spiencoder_typeCHAINof3;  break;

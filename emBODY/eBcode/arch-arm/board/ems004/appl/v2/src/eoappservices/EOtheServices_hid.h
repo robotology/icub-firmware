@@ -59,6 +59,7 @@ extern "C" {
 #include "EOthePOS.h"
 
 // so far, i write them in here. later on we think of a board file or else...
+#if 1
 
 #ifdef WRIST_MK2
 #define EOTHESERVICES_disable_theInertials2

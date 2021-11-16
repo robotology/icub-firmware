@@ -50,7 +50,9 @@ extern "C" {
 #include "hal_spi.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
+#if !defined(AEA3_SUPPORT)
+    #define AEA3_SUPPORT
+#endif
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
