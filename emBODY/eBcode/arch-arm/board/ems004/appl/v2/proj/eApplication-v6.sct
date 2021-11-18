@@ -28,12 +28,12 @@ LR_IROM1 0x08020000 0x60000  {    ; load region size_region
    *(InRoot$$Sections)
    .ANY (+RO)
   }
-  RW_IRAM1 0x20000000 0x1FFC0  {  ; RW data
+  RW_IRAM1 0x20000000 0x1FFC0  {    ; RW data - memory hole of 064B on top for ipc
    .ANY (+RW +ZI)
   }
-;  RW_IRAM2 0x10000000 0x10000  {  ; RW data
-;   .ANY (+RW +ZI)
-;  }  
+  RW_IRAM2 0x10000200 0xFE00  {     ; RW data - memory hole of 512B at start for fatal error on restart 
+   .ANY (+RW +ZI)
+  }  
 } 
 
 
