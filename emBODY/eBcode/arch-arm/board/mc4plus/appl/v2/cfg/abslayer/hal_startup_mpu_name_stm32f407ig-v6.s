@@ -61,7 +61,7 @@
 ;#include "hal_core_cfg.h"
     
 
-Stack_Size      EQU     0x00003000
+Stack_Size      EQU     0x00002C00
 ;Stack_Size      EQU     HAL_SYS_CFG_STACKSIZE
                 EXPORT  Stack_Size
 
@@ -74,7 +74,7 @@ __initial_sp
 ;   o  Heap Size (in Bytes) 0x0-0xFFFFFFFF:8
 ; </h>
 
-Heap_Size       EQU     0x0001FC00
+Heap_Size       EQU     0x00018000
 ;Heap_Size       EQU     HAL_SYS_CFG_HEAPSIZE
                 EXPORT Heap_Size
 
