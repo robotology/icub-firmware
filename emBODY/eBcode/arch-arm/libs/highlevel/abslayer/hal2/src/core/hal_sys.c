@@ -156,6 +156,23 @@ extern hal_result_t hal_sys_init(const hal_sys_cfg_t* cfg)
     // see page 114 of joseph yiu's book.
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     
+    // marco.accame on 23 nov 2021: _HAL_TAG_USE_OF_NVIC_PRIORITIES 
+    // the HAL system uses NVIC_PriorityGroup_4 so that we have 16 pre-emption priorities and 0 subpriorities
+    // this is done by design: 
+    // - we set NVIC_PriorityGroup_4 in here (and it is forbidden to change it afterwards!!)
+    // - we defined hal_interrupt_priority_t to contain values only from 0 to 15.
+    // the RTOS uses the lowest two priorities which it finds on the system, so in here priorities
+    // 14 and 15 are reserved to the RTOS which assigns 15 to SysTick_Handler() and PendSV_Handler() 
+    // and 14 to SVC_Handler().
+    // it is very important never and ever change priority group expecially after the start of the RTOS because
+    // that may cause crashes as described in https://developer.arm.com/documentation/ka003146/latest
+    // why is that? because a change in priority grouping can change the correct rules of preemption of the
+    // SVC, PendSV and SysTick among themselves and vs other IRQs and there can be a wrong assignment of the 
+    // thread stack in the context switch done by PendSV and/or SysTick. See for that a note by the guru  Joseph Yiu:
+    // https://community.arm.com/support-forums/f/architectures-and-processors-forum/9485/cortex-m-rtos-related-exceptions-and-concepts?pifragment-22341=104        
+    // 
+    // so in HAL we must use only priorities in range [0, 13].
+        
     return(hal_res_OK);   
 }
 

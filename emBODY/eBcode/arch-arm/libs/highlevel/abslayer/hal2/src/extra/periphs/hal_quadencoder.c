@@ -746,11 +746,13 @@ static uint8_t indexes_initted = 0;
 
 extern void hal_quadencoder_deinit_indexes_flags(void)
 {
-    
+    // marco.accame on 23 nov 2021: as descrived in note tagged _HAL_TAG_USE_OF_NVIC_PRIORITIES
+    // allowed priorities are in range [0, 13]
+    // so in here we use 13 as lowest allowed priority, even if it is a disable    
     NVIC_InitTypeDef NVIC_InitStructure1;
     NVIC_InitStructure1.NVIC_IRQChannel =  EXTI15_10_IRQn;
-    NVIC_InitStructure1.NVIC_IRQChannelPreemptionPriority = 0x0F;
-    NVIC_InitStructure1.NVIC_IRQChannelSubPriority = 0x0F;
+    NVIC_InitStructure1.NVIC_IRQChannelPreemptionPriority = 13;
+    NVIC_InitStructure1.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure1.NVIC_IRQChannelCmd = DISABLE;
     NVIC_Init(&NVIC_InitStructure1); 
     
@@ -818,11 +820,14 @@ extern void hal_quadencoder_init_indexes_flags(void)
   EXTI_InitStructure.EXTI_LineCmd = ENABLE;
   EXTI_Init(&EXTI_InitStructure);
 
+    // marco.accame on 23 nov 2021: as descrived in note tagged _HAL_TAG_USE_OF_NVIC_PRIORITIES
+    // allowed priorities are in range [0, 13]
+    // so in here we use 13 as lowest allowed priority
   /* Enable and set EXTI Line0 Interrupt to the lowest priority */
   NVIC_InitTypeDef NVIC_InitStructure;
   NVIC_InitStructure.NVIC_IRQChannel =  EXTI15_10_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 13;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
   
