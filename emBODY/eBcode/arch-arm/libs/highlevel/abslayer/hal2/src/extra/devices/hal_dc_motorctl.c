@@ -357,10 +357,14 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
 
     // Init the ADC to have current values: now disabled cause this feedback is not needed 
 	//hal_adc_ADC1_ADC3_current_init();
-    
+
+#if 0
+    // marco.accame on 23 nov 2021: as descrived in note tagged _HAL_TAG_USE_OF_NVIC_PRIORITIES
+    // we cannot change priority group
 	/* Configure one bit for preemption priority */
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-  
+//    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+#endif
+
     /* Enable the ADC Interrupt: now disabled cause this feedback is not needed */
     /*
     NVIC_InitStructure.NVIC_IRQChannel = ADC_IRQn;
@@ -369,10 +373,13 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
     */
-  
+
+    // marco.accame on 23 nov 2021: as descrived in note tagged _HAL_TAG_USE_OF_NVIC_PRIORITIES
+    // allowed priorities are in range [0, 13]
+    // but ... better keeping priority 1 only for the ETH, so we move it up to 4 
     /* Enable the Update Interrupt */
     NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_TIM10_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 4; // was 1;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
@@ -381,10 +388,14 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
 
     //Set the motor not in fault before activating the interrupts
     s_hal_motor_theinternals.externalfaultpressed = hal_false;
+
+    // marco.accame on 23 nov 2021: as descrived in note tagged _HAL_TAG_USE_OF_NVIC_PRIORITIES
+    // allowed priorities are in range [0, 13]
+    // but ... as ETH has priority 1 we use 3 in here.
     
     /* Enable the TIM1 BRK Interrupt */
     NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM9_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3; // it was 0;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure); 
@@ -395,7 +406,7 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
     // in this situation, if I enable the TIM8Break IRQ it detects ALWAYS a fault situation, preventing the normal behaviour of the board
 #if (ACTIVE_INTERRUPTS_CHANNELS == 2)
     NVIC_InitStructure.NVIC_IRQChannel = TIM8_BRK_TIM12_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3; // it was 0;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);

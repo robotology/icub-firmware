@@ -190,16 +190,20 @@ void as5048_init(uint8_t sensorID)
 	  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
 	  SPI_InitStructure.SPI_CRCPolynomial = 7;
 	  SPI_Init(SPI3, &SPI_InitStructure);
-	
-	
+
+#if 0
+    // marco.accame on 23 nov 2021: as descrived in note tagged _HAL_TAG_USE_OF_NVIC_PRIORITIES
+    // we cannot change priority group
 	  /* Configure the Priority Group to 1 bit */                
-	  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	  
-	  /* Configure the SPI interrupt priority */
-	  NVIC_InitStructure.NVIC_IRQChannel = SPI3_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+#endif	
+
+    // marco.accame: removed the following because NVIC_Init() is already commented out  
+//	  /* Configure the SPI interrupt priority */
+//	  NVIC_InitStructure.NVIC_IRQChannel = SPI3_IRQn;
+//	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+//	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	
 	
 	  //NVIC_Init(&NVIC_InitStructure);
@@ -265,15 +269,19 @@ void as5048_init(uint8_t sensorID)
 	  SPI_InitStructure.SPI_CRCPolynomial = 7;
 	  SPI_Init(SPI2, &SPI_InitStructure);
 	
-	
+#if 0
+    // marco.accame on 23 nov 2021: as descrived in note tagged _HAL_TAG_USE_OF_NVIC_PRIORITIES
+    // we cannot change priority group
 	  /* Configure the Priority Group to 1 bit */                
-	  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	  
-	  /* Configure the SPI interrupt priority */
-	  NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+#endif
+
+    // marco.accame: removed the following because NVIC_Init() is already commented out  
+//	  /* Configure the SPI interrupt priority */
+//	  NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
+//	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+//	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	
 	
 	  // NVIC_Init(&NVIC_InitStructure);
