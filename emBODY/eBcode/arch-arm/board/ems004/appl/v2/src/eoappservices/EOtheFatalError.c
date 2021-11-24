@@ -339,6 +339,25 @@ static const char * s_get_threaname_mode1(fatal_error_descriptor_t *des)
     return(eom_task_GetName(tsk));    
 }
 
+#if defined(OSAL_USE_rtos_cmsisos2)
+
+static const char * s_get_threaname_mode2(const fatal_error_descriptor_t *des, osal_task_id_t *ptid)
+{   
+//    osal_task_id_t tid1 = 0;
+//    osal_task_id_get(osal_task_get(osal_callerAUTOdetect), &tid1); 
+//    volatile  osal_task_id_t tid2 = tid1;
+//    tid2 = tid2;    
+    
+    osal_task_id_t tid = 0;
+    
+    osal_task_id_get(osal_task_get(osal_callerAUTOdetect), &tid);
+   
+    *ptid = tid;
+    
+    return s_tid_to_threadname(tid);
+
+}
+#else
 extern void * oosiit_tsk_self(void);
 extern uint8_t oosiit_tsk_get_id(void * tp);
 
@@ -355,6 +374,7 @@ static const char * s_get_threaname_mode2(const fatal_error_descriptor_t *des, o
     return s_tid_to_threadname(tid);
 
 }
+#endif
 
 static const char * s_get_threadinfo(const fatal_error_descriptor_t *des, osal_task_id_t *tid)
 {
@@ -461,12 +481,16 @@ static const char * s_get_threadstring(const char *s, osal_task_id_t tid)
 
 static uint32_t s_getmillitime(void)
 {
+#if defined(OSAL_USE_rtos_cmsisos2)
+    return 0;
+#else
     // using oosiit_time and osal_info_get_tick() we DONT call the SVC handler, 
     // so we have better possibility of success even in case of fatal disaster...
     extern volatile uint64_t oosiit_time;
     uint64_t ms = oosiit_time * osal_info_get_tick() / 1000;
-    
+  
     return ms;
+#endif    
 }
 
 static void s_save_standard(fatal_error_descriptor_t *des)
