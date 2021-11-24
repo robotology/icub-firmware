@@ -76,7 +76,7 @@ constexpr embot::hw::LED otherLED = embot::hw::LED::three;
 static void s_ipal_start();
 static void s_start_IPALproc_thread();
 static void s_start_UDPcomm_thread();
-
+static void s_start_ETHmonitor_thread();
 
 void onIdle(embot::os::Thread *t, void* idleparam)
 {
@@ -110,7 +110,11 @@ void initSystem(embot::os::Thread *t, void* initparam)
         
     // also starting the communication thread UDPcomm
     // it is a thread similar to tecnologix's udp_comm_app_thread
-    s_start_UDPcomm_thread();    
+    s_start_UDPcomm_thread();  
+
+
+    // also starting a periodic thread where we can ask the status of the eth switch
+    s_start_ETHmonitor_thread();         
 
     embot::core::print("quitting the INIT thread. Normal scheduling starts");    
 }
@@ -150,7 +154,8 @@ embot::os::EventThread *tIPALproc {nullptr};
 embot::os::PeriodicThread *tIPALtick {nullptr};
 // the UDP comm is an event based thread 
 embot::os::EventThread *tUDPcomm {nullptr};
-
+// the ETH mon is a periodic thread 
+embot::os::PeriodicThread *tETHmon {nullptr};
 
 //constexpr embot::os::Event evt_CONNECT {1};
 constexpr embot::os::Event evt_RXframe {2};
@@ -299,6 +304,32 @@ static void s_ipal_start()
 
 
 
+
+
+// thread tETHmon
+
+void tETHmon_startup(embot::os::Thread *t, void *param);
+void tETHmon_onperiod(embot::os::Thread *t, void *param);
+void t_ETHmon(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
+ 
+static void s_start_ETHmonitor_thread()
+{        
+    tETHmon = new embot::os::PeriodicThread;
+    
+    embot::os::PeriodicThread::Config tConfig { 
+        6*1024, 
+        embot::os::Priority::high47, 
+        tETHmon_startup,                // the startup function
+        nullptr,                        // it param
+        100*embot::core::time1millisec, // the period
+        tETHmon_onperiod,
+        "tETHmon"
+    };
+    
+    tETHmon->start(tConfig, t_ETHmon);      
+}
+
+
 // thread tUDPcomm
 
 void tUDPcomm_startup(embot::os::Thread *t, void *param);
@@ -323,7 +354,7 @@ static void s_start_UDPcomm_thread()
 }
 
 
-// in here we have teccnologix's udp_comm_app_thread() split into startup() and forever loop
+// in here we have tecnologix's udp_comm_app_thread() split into startup() and forever loop
 
 
 constexpr uint32_t UDP_APP_MAX_PAYLOAD = 1034;
@@ -580,6 +611,28 @@ static void udp_rcv_cb_func(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *pkt
 	}
     
 #endif    
+}
+
+// code for the periodic thread tETHmon
+void tETHmon_startup(embot::os::Thread *t, void *param)
+{
+    embot::core::print(std::string("calling tETHmon_startup() @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());   
+
+    // add in here initialization code for the driver which asks the ETH switch
+}
+
+
+void tETHmon_onperiod(embot::os::Thread *t, void *param)
+{
+    embot::core::print(std::string("calling tETHmon_onperiod() @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());   
+
+     // add in here code which asks the ETH switch about its status
+    
+    bool link0isup = false;    
+    bool link1isup = false;
+    std::string msg = std::string("ETH link 0 is ") + (link0isup ? "UP" : "DOWN") + " ETH link 1 is " + (link1isup ? "UP" : "DOWN");
+    
+    embot::core::print(msg + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
 }
 
 
