@@ -46,7 +46,10 @@ extern "C"
     void * cmsisos2_memory_realloc(void *p, size_t size);
     void cmsisos2_memory_delete(void *p);
 
+    // it calls standard osMutexNew() but ... 
+    // if the OS is not started yet it just inits the memory (which MUST be non NULL)
 
+    osMutexId_t cmsisos2_osMutexNew (const osMutexAttr_t *attr);
 
 #ifdef  __cplusplus
 }

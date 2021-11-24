@@ -4,6 +4,7 @@
     #define CMSISOS2_ICUB_CHANGES_remove_static_system_configuration
 //    #warning CMSISOS2_ICUB_CHANGES: defined macro RTX_NO_MULTITHREAD_CLIB
     #define RTX_NO_MULTITHREAD_CLIB
+    #define CMSISOS2_ICUB_CHANGES_remove_others
 #endif
 
 /*
@@ -550,6 +551,9 @@ extern const uint8_t * const irqRtxLibRef;
 extern void * const osRtxUserSVC[];
 __WEAK void * const osRtxUserSVC[1] = { (void *)0 };
 
+#if defined(CMSISOS2_ICUB_CHANGES_remove_others)
+
+#else
 
 // OS Sections
 // ===========
@@ -620,6 +624,7 @@ __attribute__((section(".rodata"))) =
   &__os_msgqueue_cb_end__
 };
 
+#endif // CMSISOS2_ICUB_CHANGES_remove_others
 
 // OS Initialization
 // =================
@@ -632,7 +637,13 @@ __attribute__((section(".rodata"))) =
 //lint -esym(765,_platform_post_stackheap_init) "Global scope"
 extern void _platform_post_stackheap_init (void);
 __WEAK void _platform_post_stackheap_init (void) {
+#if defined(CMSISOS2_ICUB_CHANGES_remove_others)
+    // marco.accame: i have removed osKernelInitialize() from here because ...
+    // the OS must start inside the main() after we have filled osRtxConfig w/ all
+    // the proper values we want
+#else    
   (void)osKernelInitialize();
+#endif  
 }
 #endif
 
