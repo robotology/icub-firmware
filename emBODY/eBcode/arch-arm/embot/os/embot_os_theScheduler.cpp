@@ -133,9 +133,10 @@ struct embot::os::theScheduler::Impl
         // init part
         
         config = cfg;
-        
+        // timerstacksize can be now configured. it is used by cmsisos2 only. 
+        constexpr uint16_t timerstacksize {2*1024};
         props.prepare(config.timing.ticktime, 
-                      config.behaviour.initconfig.stacksize, config.behaviour.idleconfig.stacksize, 
+                      config.behaviour.initconfig.stacksize, config.behaviour.idleconfig.stacksize, timerstacksize,
                       osIdleThread, launcher, osOnError);
                 
         embot::os::rtos::scheduler_init(props);
