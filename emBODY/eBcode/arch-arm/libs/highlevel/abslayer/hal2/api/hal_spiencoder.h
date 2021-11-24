@@ -50,7 +50,9 @@ extern "C" {
 #include "hal_spi.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
+#if !defined(AEA3_SUPPORT)
+    #define AEA3_SUPPORT
+#endif
   
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
@@ -82,6 +84,9 @@ typedef enum
     hal_spiencoder_typeAMO      = 1, 
     hal_spiencoder_typeCHAINof2 = 2,
     hal_spiencoder_typeCHAINof3 = 3,
+#if defined(AEA3_SUPPORT)
+    hal_spiencoder_typeAEA3     = 4,
+#endif
     hal_spiencoder_typeNONE     = 255
 } hal_spiencoder_type_t;
 
@@ -142,7 +147,7 @@ typedef struct
     hal_interrupt_priority_t    priority;       /**< the priority if the ISR underlying the encoder */
     void (*callback_on_rx)(void *arg);          /**< callback called when a new value for the encoder is available   */
     void*                       arg;            /**< argument of the callback: contains pointer to latest encoder value  */
-    hal_spiencoder_type_t       type;           /**< Encoder model. type 1: AEA, type 2: AMO Board, type 3: DAISY CHAIN of 2 encoders */
+    hal_spiencoder_type_t       type;           /**< Encoder model. type 1: AEA, type 2: AMO Board, type 3: DAISY CHAIN of 2 encoders, type 4: AEA3 */
     hal_bool_t                  sdata_precheck; /**< If hal_true, performs a validity check on the sensor data transmission before the real reading (not meaningful for AEA board)  */
     uint8_t                     reg_addresses[2]; // array of addresses of registers of AMO to read in daisy chain.
                                                   // for AMO if any value is 0x00 then it is filled with 0x77.

@@ -137,6 +137,14 @@ typedef enum
 } hal_spi_datasize_t;
 
 
+typedef enum
+{
+    hal_spi_gpio_cfg_sckmosi_pullup     = 0,
+    hal_spi_gpio_cfg_sckmosi_nopull     = 1
+} hal_spi_gpio_cfg_t;
+
+
+
 /** @typedef    typedef enum hal_spi_cfg_t 
     @brief      hal_spi_cfg_t contains the configuration for spi
  **/
@@ -156,7 +164,8 @@ typedef struct
     hal_callback_t          onframesreceived;      /**< if not NULL and direction is not hal_spi_dir_txonly it is called by the ISR when all the frames are received */
     void*                   argonframesreceived;
     hal_spi_cpolarity_t     cpolarity;    
-    hal_spi_datacapture_t   datacapture;    
+    hal_spi_datacapture_t   datacapture;
+    uint16_t                gpio_cfg_flags;     /* bit 1 assume values defined in hal_spi_gpio_cfg_t (only for AEA and AMO) can be either 0 or 1: if 0 SCK MOSI is pullUP else 1 is NoPull */
 } hal_spi_cfg_t;
 
  

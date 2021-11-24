@@ -127,7 +127,7 @@ static hl_boolval_t s_hl_spi_initted_is(hl_spi_t id);
 
 
 // hw related initialisation which may change with different versions of stm32fx mpus
-static void s_hl_spi_hw_gpio_init(hl_spi_t id, hl_spi_mode_t spimode);
+static void s_hl_spi_hw_gpio_init(hl_spi_t id, hl_spi_mode_t spimode, uint16_t gpio_altf_mask);
 static void s_hl_spi_hw_clock_init(hl_spi_t id);
 static hl_result_t s_hl_spi_hw_registers_init(hl_spi_t id);
 
@@ -136,7 +136,8 @@ static hl_result_t s_hl_spi_hw_registers_init(hl_spi_t id);
 static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
                                             hl_gpio_init_t* sckinit, hl_gpio_altf_t* sckaltf, 
                                             hl_gpio_init_t* misoinit, hl_gpio_altf_t* misoaltf,
-                                            hl_gpio_init_t* mosiinit, hl_gpio_altf_t* mosialtf
+                                            hl_gpio_init_t* mosiinit, hl_gpio_altf_t* mosialtf,
+                                            uint16_t gpio_mask
                                         );
 
 
@@ -195,7 +196,7 @@ extern uint32_t hl_spi_speedofbus_get(hl_spi_t id)
 }
 
 
-extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg)
+extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg, uint16_t gpio_cfg_mask)
 {
     hl_spi_internal_item_t* intitem = s_hl_spi_theinternals.items[HL_spi_id2index(id)];
 
@@ -245,7 +246,7 @@ extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg)
     s_hl_spi_hw_clock_init(id);
     
     // init gpios
-    s_hl_spi_hw_gpio_init(id, cfg->mode);    
+    s_hl_spi_hw_gpio_init(id, cfg->mode, gpio_cfg_mask);    
     
     // init registers
     s_hl_spi_hw_registers_init(id); 
@@ -453,7 +454,7 @@ static hl_boolval_t s_hl_spi_initted_is(hl_spi_t id)
 }
 
 
-static void s_hl_spi_hw_gpio_init(hl_spi_t id, hl_spi_mode_t spimode)
+static void s_hl_spi_hw_gpio_init(hl_spi_t id, hl_spi_mode_t spimode, uint16_t gpio_altf_mask)
 {
 
     hl_gpio_init_t gpio_init_sck;    
@@ -461,9 +462,9 @@ static void s_hl_spi_hw_gpio_init(hl_spi_t id, hl_spi_mode_t spimode)
     hl_gpio_init_t gpio_init_miso;
     hl_gpio_altf_t gpio_altf_miso;   
     hl_gpio_init_t gpio_init_mosi;
-    hl_gpio_altf_t gpio_altf_mosi;       
+    hl_gpio_altf_t gpio_altf_mosi;
 
-    s_hl_spi_fill_gpio_init_altf(id, spimode, &gpio_init_sck, &gpio_altf_sck, &gpio_init_miso, &gpio_altf_miso, &gpio_init_mosi, &gpio_altf_mosi);
+    s_hl_spi_fill_gpio_init_altf(id, spimode, &gpio_init_sck, &gpio_altf_sck, &gpio_init_miso, &gpio_altf_miso, &gpio_init_mosi, &gpio_altf_mosi, gpio_altf_mask);
     
     hl_gpio_init(&gpio_init_sck);
     hl_gpio_altf(&gpio_altf_sck);
@@ -556,9 +557,10 @@ static hl_result_t s_hl_spi_hw_registers_init(hl_spi_t id)
 static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
                                             hl_gpio_init_t* sckinit, hl_gpio_altf_t* sckaltf, 
                                             hl_gpio_init_t* misoinit, hl_gpio_altf_t* misoaltf,
-                                            hl_gpio_init_t* mosiinit, hl_gpio_altf_t* mosialtf
+                                            hl_gpio_init_t* mosiinit, hl_gpio_altf_t* mosialtf,
+                                            uint16_t gpio_mask 
                                         )
-{
+{    
     static const hl_gpio_init_t s_hl_spi_sckmosi_master_gpio_init = 
     {
 #if     defined(HL_USE_MPU_ARCH_STM32F1)
@@ -579,6 +581,9 @@ static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
             .gpio_otype     = GPIO_OType_PP,
             .gpio_pupd      = GPIO_PuPd_UP
         }
+        
+        
+        
 #else //defined(HL_USE_MPU_ARCH_*)
     #error ERR --> choose a HL_USE_MPU_ARCH_*
 #endif 
@@ -665,6 +670,11 @@ static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
         memcpy(sckinit, &s_hl_spi_sckmosi_master_gpio_init, sizeof(hl_gpio_init_t));   
         memcpy(misoinit, &s_hl_spi_miso_master_gpio_init, sizeof(hl_gpio_init_t));
         memcpy(mosiinit, &s_hl_spi_sckmosi_master_gpio_init, sizeof(hl_gpio_init_t));
+        
+        if(gpio_mask == 1) // NOPULL is used for AEA3
+        {
+            sckinit->mode.gpio_pupd = GPIO_PuPd_NOPULL; 
+        }        
     }
     else
     {

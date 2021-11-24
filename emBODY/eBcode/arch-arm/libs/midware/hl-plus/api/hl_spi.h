@@ -156,9 +156,11 @@ extern uint32_t hl_spi_speedofbus_get(hl_spi_t id);
     @brief      This function configures SPI. 
     @param      id              identifies SPI id 
     @param      cfg             the configuration of the SPI peripheral
+    @param      gpio_cfg_mask   the gpio flag for the sckmosi configuration (introduced to support AEA3)
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
-extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg);
+extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg, uint16_t gpio_cfg_mask);
+
 
 
 /** @fn         extern hl_boolval_t hl_spi_supported_is(hl_spi_t id)

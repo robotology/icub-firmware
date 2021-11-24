@@ -498,7 +498,8 @@ static hl_result_t s_hl_chip_ams_as5055a_hw_init(const hl_chip_ams_as5055a_cfg_t
         spiconfig.advcfg = &s_hl_chip_ams_as5055a_spiadvancedconfig;
         
         // 3. call hl_spi_init
-        hl_result_t r = hl_spi_init(cfg->spiid, &spiconfig);      // the gpio, the clock, the peripheral: everything apart isr and start
+        // Simone Girardi: 0 param stands for hal_spi_gpio_cfg_sckmosi_pullup (default for AEA)
+        hl_result_t r = hl_spi_init(cfg->spiid, &spiconfig, 0);      // the gpio, the clock, the peripheral: everything apart isr and start. 
         if(hl_res_OK != r)
         {
             return(r);

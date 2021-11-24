@@ -33,7 +33,8 @@
 // AbsEncoder
 
 
-#define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)
+#define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)   [ X X X X X X X X X X 1 0 0 0 0] (2^4)
+#define AEA3_MIN_SPIKE 4 //2 bitsof zero padding(aea3 use 14 bits)  [ X X X X X X X X X X X X 1 0 0] (2^2)
           
 
 AbsEncoder* AbsEncoder_new(uint8_t n)
@@ -118,7 +119,6 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
         case(eomc_enc_spichainof3):
         {
             int32_t toleranceIDeg =(int32_t)((o->toleranceCfg * 65535.0f) / 360.0f) ;
-            #define AEA_MIN_SPIKE 16 //iDegree 
             /* Note: AEA has 12 bits of resolution, so we pad with four zero to transform from AEA unit to iDegree */
             if(toleranceIDeg < AEA_MIN_SPIKE)
                 o->spike_mag_limit = AEA_MIN_SPIKE * o->div;
@@ -127,8 +127,21 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
             
             o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
             
-            //snprintf(message, sizeof(message), "ABSE aea:tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
-        }break; 
+            //snprintf(message, sizeof(message), "ABSE aea:tol %.3f, div %.3f spikel %d", o->toleranceCfg, o->div, o->spike_mag_limit);
+        }break;
+        case(eomc_enc_aea3):
+        {
+            int32_t toleranceIDeg =(int32_t)((o->toleranceCfg * 65535.0f) / 360.0f) ;
+            /* Note: AEA3 has 14 bits of resolution, so we pad with two zero to transform from AEA unit to iDegree */
+            if(toleranceIDeg < AEA3_MIN_SPIKE)
+                o->spike_mag_limit = AEA3_MIN_SPIKE * o->div;
+            else
+                o->spike_mag_limit = toleranceIDeg *o->div;
+            
+            o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+            
+            //snprintf(message, sizeof(message), "ABSE aea:tol %.3f, div %.3f spikel %d", o->toleranceCfg, o->div, o->spike_mag_limit);
+        }break;
 
         // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to ... amo and psc
         case(eomc_enc_pos):
@@ -347,6 +360,7 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
         // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to aea and other absolute encoders 
         case eomc_enc_pos:
         case eomc_enc_aea:
+        case eomc_enc_aea3:
         case eomc_enc_amo:
         case eomc_enc_psc:
             AbsEncoder_position_init_aea(o, position);
@@ -453,6 +467,7 @@ void AbsEncoder_still_check_reset(AbsEncoder* o)
     o->partial_space = 0;
 }
 
+
 void AbsEncoder_update(AbsEncoder* o, uint16_t position)
 {
     if (!o) return;
@@ -477,10 +492,12 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
     
     o->delta = 0;
     
+    // int16_t is used to avoid that a fictional spike will be triggered due to the wraparound 
     int16_t check = position - o->position_last;
     
     o->position_last = position;
 
+    // Check if there is a spike
     if( (o->spike_mag_limit == 0) || (-o->spike_mag_limit <= check && check <= o->spike_mag_limit))
     {
         int16_t delta = position - o->position_sure;
@@ -506,6 +523,7 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
     }
     else
     {
+        // There is a spike
         o->spike_cnt++;
        
         o->velocity = (7*o->velocity) >> 3;

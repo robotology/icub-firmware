@@ -59,7 +59,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_SYS_VERIFY_STACK_HEAP_SIZES
+//#define HAL_SYS_VERIFY_STACK_HEAP_SIZES
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
