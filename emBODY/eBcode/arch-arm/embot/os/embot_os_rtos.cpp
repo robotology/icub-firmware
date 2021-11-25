@@ -131,6 +131,17 @@ namespace embot { namespace os { namespace rtos {
         {
             _internals.attr->priority = static_cast<osPriority_t>(priority);
         }
+ 
+        uint8_t getprio() const
+        {
+            return _internals.attr->priority;
+        }
+        
+        void * getstack(uint16_t &size) const
+        {
+            size = _internals.attr->stack_size;
+            return _internals.attr->stack_mem;
+        }
     }; 
 
 #elif defined(EMBOT_USE_rtos_osal)
@@ -166,6 +177,18 @@ namespace embot { namespace os { namespace rtos {
         {
            _internals.props.priority = priority; 
         }
+
+        uint8_t getprio() const
+        {
+           return _internals.props.priority; 
+        }
+        
+        //#warning TODO: solve it       
+        void * getstack(uint16_t &size) const
+        {
+            size = _internals.props.stacksize;
+            return nullptr;
+        }
         
         bool isvalid() const
         {
@@ -199,6 +222,16 @@ namespace embot { namespace os { namespace rtos {
     {
         pImpl->setprio(priority);
     } 
+
+    uint8_t thread_props_t::getprio() const
+    {
+        return pImpl->getprio();
+    } 
+    
+    void * thread_props_t::getstack (uint16_t &size) const
+    {
+        return pImpl->getstack(size);
+    }
     
     void * thread_props_t::getInternals()
     {
@@ -363,7 +396,10 @@ namespace embot { namespace os { namespace rtos {
         osMessageQueueMemory _thr_timer_mq_mem {};            
                
         Impl(scheduler_props_t *o) { owner = o; }        
-        ~Impl() {}
+        ~Impl() {
+            //#warning solve this. we must not call the destructor
+            for(;;);
+        }
                                 
         void clear()
         {
@@ -386,8 +422,8 @@ namespace embot { namespace os { namespace rtos {
             _internals.cfg->timer_mq_mcnt = 0;           // tbc
             
         }
-                 
-        void prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
+  
+        void prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, uint16_t timerstacksize,
                      embot::core::fpWorker onidle, embot::core::fpWorker oninit, fpOnOSerror onerror)
         {
             
@@ -406,7 +442,7 @@ namespace embot { namespace os { namespace rtos {
             _internals.cfg->idle_thread_attr = i_id->attr;
             
             // timer thread: prepare memory and assign it to cfg (aka osRtxConfig)
-            constexpr uint16_t timerstacksize = 1024;
+//            constexpr uint16_t timerstacksize = 2*1024;
             _thr_timer_props.prepare([](void*p){}, nullptr, osPriorityRealtime7, timerstacksize);
             thread_props_Internals* i_tm = reinterpret_cast<thread_props_Internals*>(_thr_timer_props.getInternals());
             _internals.cfg->timer_thread_attr = i_tm->attr;
@@ -458,6 +494,16 @@ namespace embot { namespace os { namespace rtos {
             return _internals.initted;
         }  
 
+        void * getinitstack(uint16_t &size) const
+        {
+            return _internals.init_props.getstack(size);
+        }  
+        
+        void * getidlestack(uint16_t &size) const
+        {
+            return _thr_idle_props.getstack(size);
+        }  
+        
         bool releaseinit()
         {
             _internals.init_props.release();
@@ -507,7 +553,7 @@ namespace embot { namespace os { namespace rtos {
             _internals.cfg.extfn.usr_on_idle = nullptr;    
         }
                 
-        void prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
+        void prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, uint16_t timerstacksize,
                  embot::core::fpWorker onidle, embot::core::fpWorker oninit, fpOnOSerror onerror)
         {
         
@@ -519,12 +565,27 @@ namespace embot { namespace os { namespace rtos {
             _internals.cfg.extfn.usr_on_fatal_error = reinterpret_cast<fpOnOSALerror>(onerror);
             _internals.cfg.extfn.usr_on_idle = onidle; 
             _internals.oninit = oninit;
+            //timerstacksize is not used by osal
         }  
 
         bool isvalid() const
         {
             return true;
         }
+        
+        //#warning TODO: solve it
+        void * getinitstack(uint16_t &stacksize) const
+        {
+            stacksize = _internals.cfg.launcherstacksize;
+            return nullptr; //_internals.init_props.getstack();
+        }  
+        
+        //#warning TODO: solve it
+        void * getidlestack(uint16_t &stacksize) const
+        {
+            stacksize = _internals.cfg.idlestacksize;
+            return nullptr; //_thr_idle_props.getstack();
+        } 
         
         bool releaseinit()
         {
@@ -546,10 +607,10 @@ namespace embot { namespace os { namespace rtos {
     }
 
     
-    void scheduler_props_t::prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
+    void scheduler_props_t::prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, uint16_t timerstacksize,
                  embot::core::fpWorker onidle, embot::core::fpWorker oninit, fpOnOSerror onerror)
     {
-        pImpl->prepare(ticktime, initstacksize, idlestacksize, onidle, oninit, onerror);
+        pImpl->prepare(ticktime, initstacksize, idlestacksize, timerstacksize, onidle, oninit, onerror);
     }  
 
     void * scheduler_props_t::getInternals()
@@ -560,6 +621,16 @@ namespace embot { namespace os { namespace rtos {
     bool scheduler_props_t::isvalid() const
     {
         return true;
+    }
+    
+    void * scheduler_props_t::getidlestack(uint16_t &size) const
+    {
+        return pImpl->getidlestack(size);
+    }
+
+    void * scheduler_props_t::getinitstack(uint16_t &size) const
+    {
+        return pImpl->getinitstack(size);
     }
     
     bool scheduler_props_t::release(Resource res)
@@ -856,7 +927,16 @@ namespace embot { namespace os { namespace rtos {
         return (osal_res_OK == r) ? (true) : (false); 
 #endif        
     }
-    
+
+#define USE_LAMBDA_PERIOD_CBK  
+#if defined(USE_LAMBDA_PERIOD_CBK)  
+#else
+    // useful for debugging w/ breakpoint
+    void period_cbk(void *p)
+    {
+        event_set(p, 0x1);
+    }
+#endif    
     void thread_period_set(thread_t *osthread, embot::core::relTime period)
     {
 #if defined(EMBOT_USE_rtos_cmsisos2)
@@ -866,8 +946,11 @@ namespace embot { namespace os { namespace rtos {
         if(0 != period)
         {
             timer_t *tmr = timer_new();
+#if defined(USE_LAMBDA_PERIOD_CBK)            
             timer_start(tmr, timerMode::forever, period, [](void *p){ event_set(p, 0x1); }, osthread);
-            
+#else
+            timer_start(tmr, timerMode::forever, period, period_cbk, osthread);
+#endif            
             mapoftimers.insert(std::pair<thread_t*, timer_t *>(osthread, tmr)); 
         }
         else
@@ -895,7 +978,7 @@ namespace embot { namespace os { namespace rtos {
     void thread_period_wait(thread_t *osthread, embot::core::relTime period)
     {
 #if defined(EMBOT_USE_rtos_cmsisos2)
-        event_get(cmsisos_reltimeforever);       
+        event_get(embot::core::reltimeWaitForever);       
 #elif defined(EMBOT_USE_rtos_osal)      
         osal_task_period_wait();
 #endif        
@@ -1006,6 +1089,122 @@ namespace embot { namespace os { namespace rtos {
 #endif    
     }
     
+    uint8_t messagequeue_available(messagequeue_t *mq)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        return osMessageQueueGetSpace(mq);
+#elif defined(EMBOT_USE_rtos_osal)     
+        return osal_messagequeue_available(reinterpret_cast<osal_messagequeue_t*>(mq), osal_callerAUTOdetect);
+#endif                  
+    }
+
+
+    // -- callbackqueue section
+   
+#if defined(EMBOT_USE_rtos_osal)
+    struct cq_t
+    {
+        osal_messagequeue_t *call {nullptr};
+        osal_messagequeue_t *arg {nullptr};
+        osal_mutex_t *mtx {nullptr};
+    };
+
+#endif    
+    callbackqueue_t * callbackqueue_new(uint8_t length)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)        
+        constexpr uint32_t sizeofcbk = sizeof(embot::core::Callback);
+
+        if(0 == length)
+        {
+            return nullptr;
+        }
+        osMessageQueueMemory *mem = new osMessageQueueMemory;
+        mem->prepare(length, sizeofcbk);
+        return osMessageQueueNew(length, sizeofcbk, mem->attribute());
+        
+#elif defined(EMBOT_USE_rtos_osal)  
+        cq_t *cqo = new cq_t;
+        cqo->mtx = osal_mutex_new();
+        cqo->call = osal_messagequeue_new(length);
+        cqo->arg = osal_messagequeue_new(length);        
+        return cqo;
+#endif       
+    }
+    
+    void callbackqueue_delete(callbackqueue_t *cq)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        osMessageQueueMemory *mem = reinterpret_cast<osMessageQueueMemory*>(cq);
+        osMessageQueueDelete(cq);
+        delete mem;
+#elif defined(EMBOT_USE_rtos_osal)  
+        cq_t *cqo =  reinterpret_cast<cq_t*>(cq);  
+        osal_mutex_take(cqo->mtx, OSAL_reltimeINFINITE);         
+        osal_messagequeue_delete(cqo->call);
+        osal_messagequeue_delete(cqo->arg);
+        osal_mutex_release(cqo->mtx); 
+        osal_mutex_delete(cqo->mtx); 
+        delete cqo;
+#endif        
+    }
+
+    bool callbackqueue_put(callbackqueue_t *cq, const embot::core::Callback &callback, embot::core::relTime timeout)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)        
+        osStatus_t r = osMessageQueuePut(cq, &callback, 0, cmsisos2_sys_reltime2tick(timeout));
+        return (osOK == r) ? (true) : (false);
+#elif defined(EMBOT_USE_rtos_osal)  
+        cq_t *cqo =  reinterpret_cast<cq_t*>(cq); 
+//        osal_mutex_take(cqo->mtx, timeout);        
+        osal_result_t r = osal_messagequeue_put(cqo->call, reinterpret_cast<osal_message_t>(callback.call), static_cast<osal_reltime_t>(timeout), osal_callerAUTOdetect);
+        r = osal_messagequeue_put(cqo->arg, reinterpret_cast<osal_message_t>(callback.arg), static_cast<osal_reltime_t>(timeout), osal_callerAUTOdetect);
+//        osal_mutex_release(cqo->mtx);
+        return (osal_res_OK == r) ? (true) : (false);
+#endif        
+    }
+
+    embot::core::Callback callbackqueue_get(callbackqueue_t *cq,  embot::core::relTime timeout)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        embot::core::Callback cbk {};
+        osStatus_t r = osMessageQueueGet(cq, &cbk, nullptr, cmsisos2_sys_reltime2tick(timeout));  
+        if(osErrorTimeout == r)
+        {
+            return cbk;
+        }
+        return cbk;
+#elif defined(EMBOT_USE_rtos_osal)  
+        cq_t *cqo =  reinterpret_cast<cq_t*>(cq); 
+        embot::core::Callback cbk {}; 
+//        osal_mutex_take(cqo->mtx, timeout);            
+        cbk.call = reinterpret_cast<embot::core::fpCaller>(osal_messagequeue_getquick(cqo->call, static_cast<osal_reltime_t>(timeout), osal_callerAUTOdetect));
+        cbk.arg  = reinterpret_cast<void*>(osal_messagequeue_getquick(cqo->arg, static_cast<osal_reltime_t>(timeout), osal_callerAUTOdetect));
+//        osal_mutex_release(cqo->mtx);
+        return cbk;
+#endif    
+    }
+    
+    uint8_t callbackqueue_size(callbackqueue_t *cq)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        return osMessageQueueGetCount(cq);
+#elif defined(EMBOT_USE_rtos_osal) 
+        cq_t *cqo =  reinterpret_cast<cq_t*>(cq);        
+        return osal_messagequeue_size(cqo->call, osal_callerAUTOdetect);
+#endif    
+    }
+    
+    uint8_t callbackqueue_available(callbackqueue_t *cq)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        return osMessageQueueGetSpace(cq);
+#elif defined(EMBOT_USE_rtos_osal)
+        cq_t *cqo =  reinterpret_cast<cq_t*>(cq);        
+        return osal_messagequeue_available(cqo->call, osal_callerAUTOdetect);
+#endif                  
+    }
+    
     // -- timer section
     
     
@@ -1034,6 +1233,19 @@ namespace embot { namespace os { namespace rtos {
 #endif        
     }
 
+    bool timer_running(timer_t *t)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)       
+        
+        return (1 == osTimerIsRunning(t)) ? true : false;   
+        
+#elif defined(EMBOT_USE_rtos_osal) 
+        
+        osal_result_t r = osal_timer_isactive(reinterpret_cast<osal_timer_t*>(t), osal_callerAUTOdetect);    
+        return (osal_res_OK == r) ? true : false;
+        
+#endif        
+    }
 
     bool timer_start(timer_t *t, timerMode mode, embot::core::relTime countdown, fpOnTimerExpiry onexpiry, void* param)
     {
@@ -1162,8 +1374,7 @@ namespace embot { namespace os { namespace rtos {
 #elif defined(EMBOT_USE_rtos_osal)       
         osal_semaphore_delete(reinterpret_cast<osal_semaphore_t*>(s));
 #endif         
-    }
-    
+    } 
     void * memory_new(size_t size)
     {
 #if defined(EMBOT_USE_rtos_cmsisos2)
@@ -1176,8 +1387,7 @@ namespace embot { namespace os { namespace rtos {
     void * memory_realloc(void *mem, size_t size)
     {
 #if defined(EMBOT_USE_rtos_cmsisos2)
-//        return cmsisos2_memory_realloc(mem, size);
-        return realloc(mem, size);
+        return cmsisos2_memory_realloc(mem, size);
 #elif defined(EMBOT_USE_rtos_osal)       
         return osal_base_memory_realloc(mem, size);
 #endif 
@@ -1186,8 +1396,7 @@ namespace embot { namespace os { namespace rtos {
     void memory_delete(void *mem)
     {
 #if defined(EMBOT_USE_rtos_cmsisos2)
- //       cmsisos2_memory_delete(mem);
-        free(mem);
+        cmsisos2_memory_delete(mem);
 #elif defined(EMBOT_USE_rtos_osal)       
         osal_base_memory_del(mem);
 #endif 
@@ -1298,7 +1507,7 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
     // #define EMBOT_HEAP_redefine_heapoperators
 
     #define EMBOT_HEAP_PROTECTION_use_OSsupport
-    //#define EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport
+    #define EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport
         
     #if defined(EMBOT_HEAP_PROTECTION_use_OSsupport) & !defined(EMBOT_HEAP_redefine_heapoperators)
         #define EMBOT_HEAP_redefine_heapoperators
@@ -1314,7 +1523,7 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
     // with the same mechanisms as osal.
     
     // the same mechanism of osal ( ... ) does not work on all applications.
-    // for this reason we swithc using only the EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport
+    // for this reason we switch using only the EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport
 
     // i have experienced problems with EMBOT_HEAP_PROTECTION_use_OSsupport
     // when running the application of a strain2 (but on the stm32g4eval it is ok).
@@ -1323,9 +1532,9 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
     // this latter is also the only mode which RTX V5 use
     
 
-    //#define EMBOT_HEAP_redefine_heapoperators
+    #define EMBOT_HEAP_redefine_heapoperators
     
-    //#define EMBOT_HEAP_PROTECTION_use_OSsupport
+    #define EMBOT_HEAP_PROTECTION_use_OSsupport
     #define EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport  
     
     
@@ -1464,33 +1673,46 @@ void operator delete (void* ptr) noexcept
 
     
 #elif defined(EMBOT_USE_rtos_cmsisos2)
-    
+
+  
     // it is implemented in here.
     // we get it from rtx_lib.c of cmsis os2
-
-    // static mutext allocator
-    void * mutex_new_static()
-    {
-        constexpr uint8_t nsysmtx = 4;
-        static embot::os::rtos::osMutexMemory sysmtx[nsysmtx]; 
-        static uint8_t syscnt = 0;
-        
-        if(syscnt >= nsysmtx)
-        {
-            return nullptr;
-        }
-        embot::os::rtos::osMutexMemory *mem = &sysmtx[syscnt++];
-        mem->prepare();
-        return osMutexNew(mem->attribute());                
-    } 
-
-    extern "C" {      
+  
+// also inside cmsis_armclang.h  
+#ifndef   __USED
+  #define __USED                                 __attribute__((used))
+#endif
     
-        #if ( !defined(RTX_NO_MULTITHREAD_CLIB) && \
-         ( defined(__CC_ARM) || \
-          (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))) && \
-          !defined(__MICROLIB))
-          
+// C/C++ Standard Library Multithreading Interface
+// ===============================================
+
+#if ( !defined(RTX_NO_MULTITHREAD_CLIB) && \
+     ( defined(__CC_ARM) || \
+      (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))) && \
+      !defined(__MICROLIB))
+      
+        // static mutex allocator: made by icubtech
+        void * mutex_new_static()
+        {
+            constexpr uint8_t nsysmtx = 4;
+            static embot::os::rtos::osMutexMemory sysmtx[nsysmtx]; 
+            static uint8_t syscnt = 0;
+            
+            if(syscnt >= nsysmtx)
+            {
+                return nullptr;
+            }
+            embot::os::rtos::osMutexMemory *mem = &sysmtx[syscnt++];
+            mem->prepare();
+            // marco.accame: cmsisos2_osMutexNew() calls the standard osMutexNew() but ... 
+            // if the OS is not started yet it just inits the memory (which MUST be non NULL)
+            // without calling the SVC, so we can safely use it also in here which is code that
+            // is called before main() when WE DO NOT want that the OS is started yet.
+            // for this reason i removed osKernelInitialize() from inside
+            // _platform_post_stackheap_init(). see file rtx_lib.c inside cmsisos2.uvprojx
+            return cmsisos2_osMutexNew(mem->attribute());                
+        } 
+
         #define OS_THREAD_LIBSPACE_NUM 4
         #define LIBSPACE_SIZE 96
       
@@ -1511,9 +1733,9 @@ void operator delete (void* ptr) noexcept
           }
           return (uint32_t)os_kernel_active;
         }
-
+    // EXTERN C
+    extern "C" {
         // Provide libspace for current thread
-        __attribute__((used))
         void *__user_perthread_libspace (void);
         void *__user_perthread_libspace (void) {
           osThreadId_t id;
@@ -1530,7 +1752,7 @@ void operator delete (void* ptr) noexcept
               }
             }
             if (n == (uint32_t)OS_THREAD_LIBSPACE_NUM) {
-              (void)osRtxErrorNotify(osRtxErrorClibSpace, id);
+              (void)osRtxKernelErrorNotify(osRtxErrorClibSpace, id);
             }
           } else {
             n = OS_THREAD_LIBSPACE_NUM;
@@ -1547,26 +1769,29 @@ void operator delete (void* ptr) noexcept
         //lint -e970 "Use of 'int' outside of a typedef"
         //lint -e818 "Pointer 'm' could be declared as pointing to const"
 
-
         // Initialize mutex
-        __attribute__((used))
+        __USED
         int _mutex_initialize(mutex *m);
         int _mutex_initialize(mutex *m) {
-          volatile int result = 0;
+          int result;
 
-        //  *m = osMutexNew(NULL);
-            *m = mutex_new_static();
+          // marco.accame: removed osMutexNew() from original code of rtx_lib.c 
+          // because we dont want to use an rtos function when it is not started yet
+          // the cmsis os starts the os before main() but we cannot do that if we jump
+          // from the bootloader. 
+          // *m = osMutexNew(NULL);
+          *m = mutex_new_static();
           if (*m != NULL) {
             result = 1;
           } else {
             result = 0;
-            (void)osRtxErrorNotify(osRtxErrorClibMutex, m);
+            (void)osRtxKernelErrorNotify(osRtxErrorClibMutex, m);
           }
           return result;
         }
-
+        
         // Acquire mutex
-        __attribute__((used))
+        __USED
         void _mutex_acquire(mutex *m);
         void _mutex_acquire(mutex *m) {
           if (os_kernel_is_active() != 0U) {
@@ -1575,7 +1800,7 @@ void operator delete (void* ptr) noexcept
         }
 
         // Release mutex
-        __attribute__((used))
+        __USED
         void _mutex_release(mutex *m);
         void _mutex_release(mutex *m) {
           if (os_kernel_is_active() != 0U) {
@@ -1584,14 +1809,17 @@ void operator delete (void* ptr) noexcept
         }
 
         // Free mutex
-        __attribute__((used))
+        __USED
         void _mutex_free(mutex *m);
         void _mutex_free(mutex *m) {
           (void)osMutexDelete(*m);
         }
-        
-        #endif // #if ( !defined(RTX_NO_MULTITHREAD_CLIB) ...
-    } //extern "C"
+                
+    // EXTERN C        
+    } //extern "C"  
+
+#endif // #if ( !defined(RTX_NO_MULTITHREAD_CLIB) ...        
+
 
 #endif // #elif defined(EMBOT_USE_rtos_cmsisos2)
 

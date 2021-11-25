@@ -71,7 +71,7 @@ namespace embot { namespace os { namespace priority {
         
     constexpr bool isvalid(uint8_t v)
     {
-        if((embot::core::tointegral(Priority::schedIdle) == v) || (embot::core::tointegral(Priority::schedIdle) == v))
+        if((embot::core::tointegral(Priority::schedIdle) == v) || (embot::core::tointegral(Priority::schedInit) == v))
         {
             return true;
         }

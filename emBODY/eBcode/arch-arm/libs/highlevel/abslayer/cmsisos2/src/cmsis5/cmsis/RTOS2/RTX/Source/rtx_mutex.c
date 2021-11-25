@@ -25,6 +25,28 @@
 
 #include "rtx_lib.h"
 
+#if defined(CMSISOS2_ICUB_CHANGES)
+#include "cmsisos2.h"
+static osMutexId_t svcRtxMutexNew (const osMutexAttr_t *attr);
+// marco.accame: it calls standard osMutexNew() but ... if the OS is not started yet we 
+//               just inits the memory (which MUST be non NULL)
+extern osMutexId_t cmsisos2_osMutexNew (const osMutexAttr_t *attr)
+{
+    osMutexId_t r = NULL;
+    if(osRtxKernelRunning == osRtxInfo.kernel.state)
+    {
+        r = osMutexNew(attr);
+    }
+    else if(NULL != attr)
+    {
+        EvrRtxMutexNew(attr);
+        r = svcRtxMutexNew(attr);
+    }
+    
+    return r;
+}
+#endif
+
 
 //  OS Runtime Object Memory Usage
 #ifdef RTX_OBJ_MEM_USAGE

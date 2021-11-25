@@ -718,12 +718,26 @@ void embot::os::ValueThread::run()
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
+// by defining macro CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE we implement 
+// embot::os::CallbackThread with a single embot::os::rtos::callbackqueue_t object 
+// which contains an entire embot::core::Callback (8 bytes). 
+// the benefit is that we use an RTOS atomic operation when we manage the callback
+// if we dont define it, we use two embot::os::rtos::messagequeue_t, 
+// one for embot::core::Callback::call and one for embot::core::Callback::arg
+// this latter mode has worked for long time, but the former is better
+
+#define CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE
+
 struct embot::os::CallbackThread::Impl
 {    
     CallbackThread * parentThread {nullptr};
-    embot::os::rtos::thread_t *rtosthread {nullptr};    
+    embot::os::rtos::thread_t *rtosthread {nullptr};
+#if defined(CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE)
+    embot::os::rtos::callbackqueue_t *oscallbackqueue {nullptr};
+#else    
     embot::os::rtos::messagequeue_t *osfunctionqueue {nullptr};
-    embot::os::rtos::messagequeue_t *osargumentqueue {nullptr};
+    embot::os::rtos::messagequeue_t *osargumentqueue {nullptr};    
+#endif    
     Config config {64, Priority::minimum, nullptr, nullptr, embot::core::reltimeWaitForever, 2, dummyAfter, "cbkThread"};    
     embot::os::rtos::thread_props_t rtosthreadproperties {};
     
@@ -731,8 +745,12 @@ struct embot::os::CallbackThread::Impl
     {
         parentThread = parent;
         rtosthread = nullptr;
+#if defined(CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE)      
+        oscallbackqueue = nullptr;
+#else        
         osfunctionqueue = nullptr;
-        osargumentqueue = nullptr;  
+        osargumentqueue = nullptr;         
+#endif        
     }
     
     ~Impl()
@@ -743,7 +761,14 @@ struct embot::os::CallbackThread::Impl
             embot::os::rtos::thread_delete(rtosthread);     
             rtosthread = nullptr;
         }
-        
+
+#if defined(CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE) 
+        if(nullptr != oscallbackqueue)
+        {
+            embot::os::rtos::callbackqueue_delete(oscallbackqueue);
+            oscallbackqueue = nullptr;
+        } 
+#else        
         if(nullptr != osfunctionqueue)
         {
             embot::os::rtos::messagequeue_delete(osfunctionqueue);
@@ -754,11 +779,52 @@ struct embot::os::CallbackThread::Impl
         {
             embot::os::rtos::messagequeue_delete(osargumentqueue);
             osargumentqueue = nullptr;
-        }
+        }       
+#endif        
+        
     }
     
     static void dummyAfter(Thread *t, core::Callback &m, void *p) {}
-      
+
+#if defined(CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE)   
+
+    static embot::core::Callback os_get_callback(embot::os::rtos::callbackqueue_t *cq,  embot::core::relTime tout)
+    {
+        return embot::os::rtos::callbackqueue_get(cq, tout);
+    }
+    
+    static void os_callbackdriven_loop(void *p) 
+    {        
+        CallbackThread *t = reinterpret_cast<CallbackThread*>(p);
+        const embot::core::relTime tout = t->pImpl->config.timeout; 
+        const Thread::fpStartup startup = t->pImpl->config.startup;
+        const Thread::fpAfterCallback after = (nullptr != t->pImpl->config.aftercallback) ? (t->pImpl->config.aftercallback) : (dummyAfter);
+        void * param = t->pImpl->config.param;
+        embot::os::rtos::callbackqueue_t *Q = t->pImpl->oscallbackqueue;
+       
+        embot::core::Callback cbk {};
+       
+
+        // exec the startup
+        if(nullptr != startup)
+        {
+            startup(t, param);
+        }
+        
+        // start the forever loop
+        for(;;)
+        {
+            // the order is important in here.... dont exchange the following two lines .....
+            cbk = os_get_callback(Q, tout); 
+            // it executes only if it is valid 
+            cbk.execute();
+            after(t, cbk, param);
+        }
+
+    }
+
+#else
+    
     // embot::os::rtos::messagequeue_get() returns a osal_message_t which is a uint32_t* which may hold a simple integer or a pointer to larger data
     // in case of os_get_caller() the content is a pointer to function        
     static embot::core::fpCaller os_get_caller(embot::os::rtos::messagequeue_t *mq,  embot::core::relTime tout)
@@ -800,8 +866,57 @@ struct embot::os::CallbackThread::Impl
             // it executes only if it is valid 
             cbk.execute();
             after(t, cbk, param);
-        }   
+        } 
+    }
 
+#endif
+
+    bool _start(const Config &cfg, embot::core::fpCaller eviewername)
+    {
+        if(false == cfg.isvalid())
+        {
+            return false;
+        }
+        
+        config = cfg;    
+        
+        config.stacksize = (config.stacksize+7)/8;
+        config.stacksize *= 8;
+
+#if defined(CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE)
+        oscallbackqueue = embot::os::rtos::callbackqueue_new(config.queuesize);
+#else    
+        osargumentqueue = embot::os::rtos::messagequeue_new(config.queuesize); 
+        osfunctionqueue = embot::os::rtos::messagequeue_new(config.queuesize); 
+#endif
+    
+        rtosthreadproperties.prepare(   (nullptr != eviewername) ? eviewername : os_callbackdriven_loop, 
+                                        parentThread, 
+                                        embot::core::tointegral(config.priority), 
+                                        config.stacksize);
+       
+        rtosthread = embot::os::rtos::thread_new(rtosthreadproperties);    
+        embot::os::rtos::scheduler_associate(rtosthread, parentThread);
+    
+        return true;            
+    }
+
+    bool _setcallback(const embot::core::Callback &callback, core::relTime timeout)
+    {
+        if(false == callback.isvalid())
+        {
+            return false;
+        }
+
+#if defined(CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE)
+        return embot::os::rtos::callbackqueue_put(oscallbackqueue, callback, timeout);
+#else    
+        if(true == embot::os::rtos::messagequeue_put(osargumentqueue, reinterpret_cast<embot::os::Message>(callback.arg), timeout))
+        {
+            return embot::os::rtos::messagequeue_put(osfunctionqueue, reinterpret_cast<embot::os::Message>(callback.call), timeout);
+        }    
+        return false;
+#endif            
     }
     
 };
@@ -837,7 +952,6 @@ embot::os::Priority embot::os::CallbackThread::getPriority() const
     return pImpl->config.priority;
 }
 
-
 bool embot::os::CallbackThread::setPriority(embot::os::Priority priority)
 {
     pImpl->config.priority = priority;
@@ -869,43 +983,38 @@ bool embot::os::CallbackThread::setValue(embot::os::Value value, core::relTime t
 
 bool embot::os::CallbackThread::setCallback(const embot::core::Callback &callback, core::relTime timeout)
 {
-    if(false == callback.isvalid())
-    {
-        return false;
-    }
-    
-    if(true == embot::os::rtos::messagequeue_put(pImpl->osargumentqueue, reinterpret_cast<embot::os::Message>(callback.arg), timeout))
-    {
-        return embot::os::rtos::messagequeue_put(pImpl->osfunctionqueue, reinterpret_cast<embot::os::Message>(callback.call), timeout);
-    }
-    
-    return false;
+    return pImpl->_setcallback(callback, timeout);
 }
 
 bool embot::os::CallbackThread::start(const Config &cfg, embot::core::fpCaller eviewername)
-{    
-    if(false == cfg.isvalid())
-    {
-        return false;
-    }
-    
-    pImpl->config = cfg;    
-    
-    pImpl->config.stacksize = (pImpl->config.stacksize+7)/8;
-    pImpl->config.stacksize *= 8;
-    
-    pImpl->osargumentqueue = embot::os::rtos::messagequeue_new(pImpl->config.queuesize); 
-    pImpl->osfunctionqueue = embot::os::rtos::messagequeue_new(pImpl->config.queuesize); 
-    
-    pImpl->rtosthreadproperties.prepare((nullptr != eviewername) ? eviewername : pImpl->os_callbackdriven_loop, 
-                                        this, 
-                                        embot::core::tointegral(pImpl->config.priority), 
-                                        pImpl->config.stacksize);
-       
-    pImpl->rtosthread = embot::os::rtos::thread_new(pImpl->rtosthreadproperties);    
-    embot::os::rtos::scheduler_associate(pImpl->rtosthread, this);
-    
-    return true;    
+{  
+    return pImpl->_start(cfg, eviewername);
+//    if(false == cfg.isvalid())
+//    {
+//        return false;
+//    }
+//    
+//    pImpl->config = cfg;    
+//    
+//    pImpl->config.stacksize = (pImpl->config.stacksize+7)/8;
+//    pImpl->config.stacksize *= 8;
+
+//#if defined(CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE)
+//    pImpl->oscallbackqueue = embot::os::rtos::callbackqueue_new(pImpl->config.queuesize);
+//#else    
+//    pImpl->osargumentqueue = embot::os::rtos::messagequeue_new(pImpl->config.queuesize); 
+//    pImpl->osfunctionqueue = embot::os::rtos::messagequeue_new(pImpl->config.queuesize); 
+//#endif
+//    
+//    pImpl->rtosthreadproperties.prepare((nullptr != eviewername) ? eviewername : pImpl->os_callbackdriven_loop, 
+//                                        this, 
+//                                        embot::core::tointegral(pImpl->config.priority), 
+//                                        pImpl->config.stacksize);
+//       
+//    pImpl->rtosthread = embot::os::rtos::thread_new(pImpl->rtosthreadproperties);    
+//    embot::os::rtos::scheduler_associate(pImpl->rtosthread, this);
+//    
+//    return true;        
 }
 
 

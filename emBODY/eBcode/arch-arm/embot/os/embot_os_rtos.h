@@ -25,6 +25,7 @@ namespace embot { namespace os { namespace rtos {
     using timer_t = void;
     using mutex_t = void;
     using semaphore_t = void;
+    using callbackqueue_t = void;
    
     // -- scheduler section
                 
@@ -36,10 +37,13 @@ namespace embot { namespace os { namespace rtos {
         ~scheduler_props_t();  
                      
         void prepare(embot::core::Time ticktime, 
-                     uint16_t initstacksize, uint16_t idlestacksize, 
+                     uint16_t initstacksize, uint16_t idlestacksize, uint16_t timerstacksize,
                      embot::core::fpWorker onidle, embot::core::fpWorker oninit, fpOnOSerror onerror);
         
         bool isvalid() const;
+        
+        void * getinitstack(uint16_t &size) const;
+        void * getidlestack(uint16_t &size) const;
         
         enum class Resource { InitMemory = 0 };
         bool release(Resource res = Resource::InitMemory);
@@ -91,7 +95,10 @@ namespace embot { namespace os { namespace rtos {
         void prepare(embot::core::fpCaller function, void* param, uint8_t priority, uint16_t stacksize);          
         bool isvalid() const;
         
-        void setprio(uint8_t priority);     
+        void setprio(uint8_t priority); 
+        uint8_t getprio() const;         
+
+        void * getstack(uint16_t &size) const;
 
         bool release();        
         
@@ -136,6 +143,23 @@ namespace embot { namespace os { namespace rtos {
     bool messagequeue_put(messagequeue_t *mq, embot::os::Message message, embot::core::relTime timeout);
 
     uint8_t messagequeue_size(messagequeue_t *mq);
+    
+    uint8_t messagequeue_available(messagequeue_t *mq);
+    
+    
+    // -- callbackqueue section
+
+    callbackqueue_t * callbackqueue_new(uint8_t length);
+    
+    void callbackqueue_delete(callbackqueue_t *cq);
+    
+    embot::core::Callback callbackqueue_get(callbackqueue_t *cq,  embot::core::relTime timeout);
+
+    bool callbackqueue_put(callbackqueue_t *cq, const embot::core::Callback &callback, embot::core::relTime timeout);
+
+    uint8_t callbackqueue_size(callbackqueue_t *cq);
+    
+    uint8_t callbackqueue_available(callbackqueue_t *cq);    
 
     // -- timer section
     
@@ -149,6 +173,8 @@ namespace embot { namespace os { namespace rtos {
     #elif defined(EMBOT_USE_rtos_cmsisos2)
     using fpOnTimerExpiry = embot::core::fpCaller;
     #endif    
+    
+    bool timer_running(timer_t *t);
     
     bool timer_start(timer_t *t, timerMode mode, embot::core::relTime countdown, fpOnTimerExpiry onexpiry, void* param);
 
