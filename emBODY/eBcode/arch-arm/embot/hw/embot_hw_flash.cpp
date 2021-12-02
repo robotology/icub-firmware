@@ -108,14 +108,14 @@ namespace embot { namespace hw { namespace flash {
             return maxNumOfPAGEs;
         }
         
-        return ((address - part.address) % part.pagesize);
+        return ((address - part.address) / part.pagesize);
     }
     
     std::uint32_t page2address(std::uint32_t page)
     {
         const embot::hw::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
-        
-        uint32_t adr = part.pagesize*page;
+
+        uint32_t adr = part.address + part.pagesize*page;
         
         if(false == isaddressvalid(adr))
         {
