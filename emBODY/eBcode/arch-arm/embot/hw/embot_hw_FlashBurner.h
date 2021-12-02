@@ -41,7 +41,7 @@ namespace embot { namespace hw {
         // it forces a write of the content of the buffer.
         bool flush();
         
-        //bool erase();
+        bool erase();
         
         bool isAddressValid(std::uint32_t address);
       
