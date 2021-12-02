@@ -1218,8 +1218,7 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     
     motor_status->basic.mot_current  = o->Iqq_fbk; //o->Iqq_peak_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
-    
-    
+    motor_status->fault_state_mask   = o->fault_state.bitmask;
 }
 
 void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
