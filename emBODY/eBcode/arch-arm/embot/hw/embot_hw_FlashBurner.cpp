@@ -109,7 +109,10 @@ struct embot::hw::FlashBurner::Impl
         for(uint32_t i=0; i<n64bitwords; i++)
         {
 #if !defined(TEST_DONT_USE_FLASH)            
-            HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, tmpadr, buffer.data[i]);
+            if(isaddressvalid(tmpadr))
+            {                
+                HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, tmpadr, buffer.data[i]);
+            }
 #endif
             tmpadr += 8;
         }
@@ -134,7 +137,7 @@ struct embot::hw::FlashBurner::Impl
         
         // init the page size used by the flash 
         PAGEsize = embot::hw::flash::getBSP().getPROP(embot::hw::FLASH::whole)->partition.pagesize;
-        
+        _buffersize = PAGEsize;
         size = _size;
         
         buffer.page = noPAGE;
@@ -176,6 +179,15 @@ struct embot::hw::FlashBurner::Impl
             delete[] buffer.data;
         }
     }
+
+    bool isaddressvalid(std::uint32_t address)
+    {
+        if((address < start) || (address > (start+size)) )
+        {
+            return false;
+        }
+        return true;
+    }    
 };
 
 
@@ -198,11 +210,7 @@ embot::hw::FlashBurner::~FlashBurner()
 
 bool embot::hw::FlashBurner::isAddressValid(std::uint32_t address)
 {
-    if((address < pImpl->start) || (address > (pImpl->start+pImpl->size)) )
-    {
-        return false;
-    }
-    return true;
+    return pImpl->isaddressvalid(address);
 }
 
 
@@ -290,12 +298,12 @@ bool embot::hw::FlashBurner::flush()
 }
 
 
-#if 0
+
 bool embot::hw::FlashBurner::erase()
 { 
     return pImpl->eraseall();
 }
-#endif
+
 
 
 

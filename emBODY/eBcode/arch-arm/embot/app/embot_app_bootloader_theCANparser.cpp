@@ -394,11 +394,16 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_board(const embot::p
     embot::prot::can::bootloader::Message_BOARD msg;
     msg.load(frame);
     
-    // get the eraseeeprom info.    
+    // get the eraseeeprom info. we erase eeprom at the end    
     eraseAPPLstorage = (1 == msg.info.eepromerase) ? (true) : (false);
     
-    // we may erase flash (and eeprom now) but ... we wait.
-            
+    // we erase flash now so that when the bursts of {address, data, data, data} arrive, then
+    // the flash is ready to be written. that is required for some boards whose flash erase operation
+    // is slow but it is ok for every board.  
+    // NOTE THIS: flashburner->erase() is guaranteed to erase only once.
+
+    flashburner->erase();
+          
     if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         replies.push_back(reply);
