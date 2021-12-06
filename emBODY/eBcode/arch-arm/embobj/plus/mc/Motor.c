@@ -705,7 +705,7 @@ static void Motor_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_t mas
     
     eOmc_motor_status_t *mstatus = NULL;
     mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), id);
-    mstatus->fault_state_mask = eoerror_code_get(eoerror_category_MotionControl, err_id);
+    mstatus->fault_state_mask = descriptor.code;
 }
 
 
@@ -849,21 +849,18 @@ BOOL Motor_check_faults(Motor* o) //
         if (o->fault_state.bits.ExternalFaultAsserted && !o->fault_state_prec.bits.ExternalFaultAsserted)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_external_fault, 0);
-            //Motor_set_error_on_status(o->ID, eoerror_value_MC_motor_external_fault);
             fault_state.bits.ExternalFaultAsserted = FALSE;
         }
         
         if (o->fault_state.bits.OverCurrentFailure && !o->fault_state_prec.bits.OverCurrentFailure)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_overcurrent, 0);
-            //Motor_set_error_on_status(o->ID, eoerror_value_MC_motor_overcurrent);
             fault_state.bits.OverCurrentFailure = FALSE;
         }
         
         if (o->fault_state.bits.I2TFailure && !o->fault_state_prec.bits.I2TFailure)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_i2t_limit, 0);
-            //Motor_set_error_on_status(o->ID, eoerror_value_MC_motor_i2t_limit);
             fault_state.bits.I2TFailure = FALSE;
         }
         
@@ -871,7 +868,6 @@ BOOL Motor_check_faults(Motor* o) //
          || (o->fault_state.bits.DHESInvalidValue && !o->fault_state_prec.bits.DHESInvalidValue))
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_hallsensors, 0);
-            //Motor_set_error_on_status(o->ID, eoerror_value_MC_motor_hallsensors);
             fault_state.bits.DHESInvalidSequence = FALSE;
             fault_state.bits.DHESInvalidValue = FALSE;
         }
@@ -879,7 +875,6 @@ BOOL Motor_check_faults(Motor* o) //
         if (o->fault_state.bits.CANInvalidProtocol && !o->fault_state_prec.bits.CANInvalidProtocol)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_can_invalid_prot, 0);
-            //Motor_set_error_on_status(o->ID, eoerror_value_MC_motor_can_invalid_prot);
             fault_state.bits.CANInvalidProtocol = FALSE;
         }
         
@@ -1230,9 +1225,7 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     motor_status->basic.mot_acceleration = 0; // not implemented  
     
     motor_status->basic.mot_current  = o->Iqq_fbk; //o->Iqq_peak_fbk;    
-    motor_status->basic.mot_pwm      = o->pwm_fbk;
-    //motor_status->fault_state_mask     = o->fault_state.bitmask;
- 
+    motor_status->basic.mot_pwm      = o->pwm_fbk; 
 }
 
 void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //

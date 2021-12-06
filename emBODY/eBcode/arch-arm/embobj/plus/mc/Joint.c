@@ -412,8 +412,8 @@ BOOL Joint_check_faults(Joint* o)
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
             
             eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(),  o->ID);
-            mstatus->fault_state_mask = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
+            mstatus->fault_state_mask = descriptor.code;
         }
         
         if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
@@ -427,8 +427,8 @@ BOOL Joint_check_faults(Joint* o)
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
             
             eOmc_motor_status_t *mstatus = NULL;
-            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(),  o->ID);
-            mstatus->fault_state_mask = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
+            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
+            mstatus->fault_state_mask = descriptor.code;
         }
         
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
@@ -923,7 +923,6 @@ void Joint_get_state(Joint* o, eOmc_joint_status_t* joint_state)
     joint_state->core.modes.interactionmodestatus    = o->interaction_mode;
     joint_state->core.modes.controlmodestatus        = o->control_mode;
     joint_state->core.modes.ismotiondone             = Trajectory_is_done(&o->trajectory);
-    //joint_state->core.modes.fault_state_mask              = o->fault_state.bitmask;
     joint_state->core.measures.meas_position         = o->pos_fbk;           
     joint_state->core.measures.meas_velocity         = o->vel_fbk;        
     joint_state->core.measures.meas_acceleration     = o->acc_fbk;      
