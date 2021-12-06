@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: can_rx_raw2struct.h
 //
 // Code generated for Simulink model 'can_rx_raw2struct'.
 //
-// Model version                  : 1.315
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:51 2021
+// Model version                  : 2.2
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:42 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,9 +25,10 @@
 #include <stddef.h>
 
 // Class declaration for model can_rx_raw2struct
-namespace can_messaging
+namespace amc_bldc_codegen
 {
-  class CAN_RX_raw2struct {
+  class CAN_RX_raw2struct
+  {
     // public data and function members
    public:
     // Real-time Model Data Structure
@@ -38,25 +39,25 @@ namespace can_messaging
     // model step function
     void step(const BUS_CAN &arg_pck_rx_raw, BUS_CAN_RX &arg_pck_rx_struct);
 
+    // Real-Time Model get method
+    amc_bldc_codegen::CAN_RX_raw2struct::RT_MODEL_can_rx_raw2struct_T * getRTM();
+
+    //member function to setup error status pointer
+    void setErrorStatusPointer(const char_T **rt_errorStatus);
+
     // Constructor
     CAN_RX_raw2struct();
 
     // Destructor
     ~CAN_RX_raw2struct();
 
-    // Real-Time Model get method
-    can_messaging::CAN_RX_raw2struct::RT_MODEL_can_rx_raw2struct_T * getRTM();
-
-    //member function to setup error status pointer
-    void setErrorStatusPointer(const char_T **rt_errorStatus);
-
     // private data and function members
    private:
-    // Real-Time Model
-    RT_MODEL_can_rx_raw2struct_T can_rx_raw2struct_M;
-
     // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
     CANClassTypes c_convert_to_enum_CANClassTypes(int32_T input);
+
+    // Real-Time Model
+    RT_MODEL_can_rx_raw2struct_T can_rx_raw2struct_M;
   };
 }
 

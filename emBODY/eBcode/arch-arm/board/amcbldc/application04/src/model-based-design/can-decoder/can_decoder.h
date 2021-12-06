@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: can_decoder.h
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 1.280
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:37 2021
+// Model version                  : 2.9
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Thu Dec  2 09:38:30 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,20 +22,26 @@
 #include <stddef.h>
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
-
-// Shared type includes
-#include "multiword_types.h"
 #include <stddef.h>
 
-// Model block global parameters (default storage)
-extern uint8_T rtP_CAN_ID_AMC;         // Variable: CAN_ID_AMC
+//
+//  Exported Global Parameters
+//
+//  Note: Exported global parameters are tunable parameters with an exported
+//  global storage class designation.  Code generation will declare the memory for
+//  these parameters and exports their symbols.
+//
+
+extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  Referenced by: '<S1>/Constant'
+                                          //  4 bits defining the ID of the AMC_BLDC board.
 
 
 // Class declaration for model can_decoder
-namespace can_messaging
+namespace amc_bldc_codegen
 {
-  class CAN_Decoder {
+  class CAN_Decoder
+  {
     // public data and function members
    public:
     // Block signals for model 'can_decoder'
@@ -75,19 +81,25 @@ namespace can_messaging
       const char_T **errorStatus;
     };
 
-    // Block signals
-    B_can_decoder_T can_decoder_B;
-
-    // Block states
-    DW_can_decoder_T can_decoder_DW;
+    // Initial conditions function
+    void init(BUS_MESSAGES_RX *arg_messages_rx, BUS_EVENTS_RX *arg_events_rx,
+              BUS_CAN_RX_ERRORS *arg_errors_rx);
 
     // model step function
     void step(const BUS_CAN_RX &arg_pck_rx, BUS_MESSAGES_RX &arg_messages_rx,
               BUS_EVENTS_RX &arg_events_rx, BUS_CAN_RX_ERRORS &arg_errors_rx);
 
-    // Initial conditions function
-    void init(BUS_MESSAGES_RX *arg_messages_rx, BUS_EVENTS_RX *arg_events_rx,
-              BUS_CAN_RX_ERRORS *arg_errors_rx);
+    // Real-Time Model get method
+    amc_bldc_codegen::CAN_Decoder::RT_MODEL_can_decoder_T * getRTM();
+
+    //member function to setup error status pointer
+    void setErrorStatusPointer(const char_T **rt_errorStatus);
+
+    // Block signals
+    B_can_decoder_T can_decoder_B;
+
+    // Block states
+    DW_can_decoder_T can_decoder_DW;
 
     // Constructor
     CAN_Decoder();
@@ -95,23 +107,18 @@ namespace can_messaging
     // Destructor
     ~CAN_Decoder();
 
-    // Real-Time Model get method
-    can_messaging::CAN_Decoder::RT_MODEL_can_decoder_T * getRTM();
-
-    //member function to setup error status pointer
-    void setErrorStatusPointer(const char_T **rt_errorStatus);
-
     // private data and function members
    private:
-    // Real-Time Model
-    RT_MODEL_can_decoder_T can_decoder_M;
-
     // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
     int32_T can_de_safe_cast_to_MCStreaming(int32_T input);
-    real_T can_decoder_merge_2bytes(real_T bl, real_T bh);
+    int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh);
     void can_decoder_ERROR_HANDLING(const BUS_CAN_RX *arg_pck_rx);
-    real_T can_d_is_controlmode_recognized(real_T mode);
+    boolean_T can_d_is_controlmode_recognized(int32_T mode);
     int32_T can_safe_cast_to_MCControlModes(int32_T input);
+    uint16_T can_decod_merge_2bytes_unsigned(uint16_T bl, uint16_T bh);
+
+    // Real-Time Model
+    RT_MODEL_can_decoder_T can_decoder_M;
   };
 }
 

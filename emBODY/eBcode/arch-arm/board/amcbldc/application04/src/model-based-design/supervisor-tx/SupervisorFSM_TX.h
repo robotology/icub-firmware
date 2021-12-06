@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: SupervisorFSM_TX.h
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 2.50
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:29 2021
+// Model version                  : 3.9
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:23 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,56 +25,62 @@
 #include <stddef.h>
 
 // Class declaration for model SupervisorFSM_TX
-class SupervisorFSM_TXModelClass {
-  // public data and function members
- public:
-  // Block signals for model 'SupervisorFSM_TX'
-  struct B_SupervisorFSM_TX_T {
-    boolean_T ev_foc;                  // '<Root>/SupervisorFSM_TX'
+namespace amc_bldc_codegen
+{
+  class SupervisorFSM_TX
+  {
+    // public data and function members
+   public:
+    // Block signals for model 'SupervisorFSM_TX'
+    struct B_SupervisorFSM_TX_T {
+      boolean_T ev_foc;                // '<Root>/SupervisorFSM_TX'
+    };
+
+    // Block states (default storage) for model 'SupervisorFSM_TX'
+    struct DW_SupervisorFSM_TX_T {
+      uint32_T ev_focEventCounter;     // '<Root>/SupervisorFSM_TX'
+      uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
+    };
+
+    // Real-time Model Data Structure
+    struct RT_MODEL_SupervisorFSM_TX_T {
+      const char_T **errorStatus;
+    };
+
+    // Initial conditions function
+    void init(BUS_MESSAGES_TX *arg_MessagesTx, BUS_EVENTS_TX *arg_EventsTx)
+      const;
+
+    // model step function
+    void step(const BUS_MESSAGES_RX &arg_MessagesRx, const SensorsData &
+              arg_SensorsData, const EstimatedData &arg_EstimatedData, const
+              ControlOutputs &arg_Input, BUS_MESSAGES_TX &arg_MessagesTx,
+              BUS_EVENTS_TX &arg_EventsTx);
+
+    // Real-Time Model get method
+    amc_bldc_codegen::SupervisorFSM_TX::RT_MODEL_SupervisorFSM_TX_T * getRTM();
+
+    //member function to setup error status pointer
+    void setErrorStatusPointer(const char_T **rt_errorStatus);
+
+    // Block signals
+    B_SupervisorFSM_TX_T SupervisorFSM_TX_B;
+
+    // Block states
+    DW_SupervisorFSM_TX_T SupervisorFSM_TX_DW;
+
+    // Constructor
+    SupervisorFSM_TX();
+
+    // Destructor
+    ~SupervisorFSM_TX();
+
+    // private data and function members
+   private:
+    // Real-Time Model
+    RT_MODEL_SupervisorFSM_TX_T SupervisorFSM_TX_M;
   };
-
-  // Block states (default storage) for model 'SupervisorFSM_TX'
-  struct DW_SupervisorFSM_TX_T {
-    uint32_T ev_focEventCounter;       // '<Root>/SupervisorFSM_TX'
-    uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
-  };
-
-  // Real-time Model Data Structure
-  struct RT_MODEL_SupervisorFSM_TX_T {
-    const char_T **errorStatus;
-  };
-
-  // model step function
-  void step(const SensorsData &arg_SensorsData, const BUS_MESSAGES_RX &
-            arg_MessagesRx, BUS_MESSAGES_TX &arg_MessagesTx, BUS_EVENTS_TX &
-            arg_EventsTx);
-
-  // Initial conditions function
-  void init(BUS_MESSAGES_TX *arg_MessagesTx, BUS_EVENTS_TX *arg_EventsTx);
-
-  // Constructor
-  SupervisorFSM_TXModelClass();
-
-  // Destructor
-  ~SupervisorFSM_TXModelClass();
-
-  // Real-Time Model get method
-  SupervisorFSM_TXModelClass::RT_MODEL_SupervisorFSM_TX_T * getRTM();
-
-  //member function to setup error status pointer
-  void setErrorStatusPointer(const char_T **rt_errorStatus);
-
-  // private data and function members
- private:
-  // Block signals
-  B_SupervisorFSM_TX_T SupervisorFSM_TX_B;
-
-  // Block states
-  DW_SupervisorFSM_TX_T SupervisorFSM_TX_DW;
-
-  // Real-Time Model
-  RT_MODEL_SupervisorFSM_TX_T SupervisorFSM_TX_M;
-};
+}
 
 //-
 //  The generated code includes comments that allow you to trace directly

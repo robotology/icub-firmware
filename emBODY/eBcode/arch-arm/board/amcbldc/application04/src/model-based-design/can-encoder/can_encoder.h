@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: can_encoder.h
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.327
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Sep 21 16:48:15 2021
+// Model version                  : 2.2
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Thu Dec  2 09:38:47 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,20 +27,30 @@
 #include "rt_nonfinite.h"
 #include "rtGetInf.h"
 
-// Model block global parameters (default storage)
-extern real32_T rtP_CAN_ANGLE_DEG2ICUB;// Variable: CAN_ANGLE_DEG2ICUB
+//
+//  Exported Global Parameters
+//
+//  Note: Exported global parameters are tunable parameters with an exported
+//  global storage class designation.  Code generation will declare the memory for
+//  these parameters and exports their symbols.
+//
+
+extern real32_T CAN_ANGLE_DEG2ICUB;    // Variable: CAN_ANGLE_DEG2ICUB
                                           //  Referenced by:
                                           //    '<S1>/Gain'
                                           //    '<S1>/Gain1'
+                                          //  2^16/360
 
-extern uint8_T rtP_CAN_ID_AMC;         // Variable: CAN_ID_AMC
-                                          //  Referenced by: '<S1>/Constant1'
+extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
+                                          //  Referenced by: '<S1>/Constant'
+                                          //  4 bits defining the ID of the AMC_BLDC board.
 
 
 // Class declaration for model can_encoder
-namespace can_messaging
+namespace amc_bldc_codegen
 {
-  class CAN_Encoder {
+  class CAN_Encoder
+  {
     // public data and function members
    public:
     // Block states (default storage) for model 'can_encoder'
@@ -53,9 +63,6 @@ namespace can_messaging
       const char_T **errorStatus;
     };
 
-    // Block states
-    DW_can_encoder_T can_encoder_DW;
-
     // model initialize function
     void initialize();
 
@@ -63,17 +70,20 @@ namespace can_messaging
     void step(const BUS_MESSAGES_TX &arg_messages_tx, const BUS_EVENTS_TX &
               arg_events_tx, BUS_CAN &arg_pck_tx);
 
+    // Real-Time Model get method
+    amc_bldc_codegen::CAN_Encoder::RT_MODEL_can_encoder_T * getRTM();
+
+    //member function to setup error status pointer
+    void setErrorStatusPointer(const char_T **rt_errorStatus);
+
+    // Block states
+    DW_can_encoder_T can_encoder_DW;
+
     // Constructor
     CAN_Encoder();
 
     // Destructor
     ~CAN_Encoder();
-
-    // Real-Time Model get method
-    can_messaging::CAN_Encoder::RT_MODEL_can_encoder_T * getRTM();
-
-    //member function to setup error status pointer
-    void setErrorStatusPointer(const char_T **rt_errorStatus);
 
     // private data and function members
    private:
@@ -99,8 +109,8 @@ namespace can_messaging
 //  '<Root>' : 'can_encoder'
 //  '<S1>'   : 'can_encoder/CAN_Encoder'
 //  '<S2>'   : 'can_encoder/CAN_Encoder/Detect Change'
-//  '<S3>'   : 'can_encoder/CAN_Encoder/MATLAB Function'
-//  '<S4>'   : 'can_encoder/CAN_Encoder/format_can_id'
+//  '<S3>'   : 'can_encoder/CAN_Encoder/format_can_id'
+//  '<S4>'   : 'can_encoder/CAN_Encoder/format_foc_pck'
 
 #endif                                 // RTW_HEADER_can_encoder_h_
 
