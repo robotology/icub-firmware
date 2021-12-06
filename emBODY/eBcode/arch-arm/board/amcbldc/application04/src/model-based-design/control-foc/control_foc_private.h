@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: control_foc_private.h
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 1.128
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:59 2021
+// Model version                  : 2.70
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:48 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,9 +37,9 @@
 #define rtmSetErrorStatusPointer(rtm, val) ((rtm)->errorStatus = (val))
 #endif
 
-extern const real32_T rtCP_pooled_UMvRVJ73F4lr[6];
+extern const real32_T rtCP_pooled_CR3CzT1ZXe0P[6];
 
-#define rtCP_IaIbIc0_Gain              rtCP_pooled_UMvRVJ73F4lr  // Computed Parameter: rtCP_IaIbIc0_Gain
+#define rtCP_IaIbIc0_Gain              rtCP_pooled_CR3CzT1ZXe0P  // Computed Parameter: rtCP_IaIbIc0_Gain
                                                                  //  Referenced by: '<S1>/Ia+Ib+Ic=0'
 
 #endif                                 // RTW_HEADER_control_foc_private_h_

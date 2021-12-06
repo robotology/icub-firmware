@@ -1,8 +1,8 @@
-/* Copyright 2015 The MathWorks, Inc. */
+/* Copyright 2015-2021 The MathWorks, Inc. */
 
 /****************************************************
 *                                                   *   
-* wrapper fuctions for CMSIS  functions             *
+* Wrapper functions for CMSIS functions             *
 *                                                   *  
 ****************************************************/
 
@@ -71,14 +71,5 @@
 #define mw_arm_shift_q15(pSrc, shiftBits, pDst, blockSize) arm_shift_q15 ((q15_t *)pSrc, shiftBits,(q15_t *)pDst, blockSize)
 #define mw_arm_shift_q31(pSrc, shiftBits, pDst, blockSize) arm_shift_q31 ((q31_t *)pSrc, shiftBits, (q31_t *)pDst, blockSize)
 #define mw_arm_shift_q7(pSrc, shiftBits, pDst, blockSize) arm_shift_q7 ((q7_t *)pSrc, shiftBits, (q7_t *)pDst, blockSize)
-
-/* Wrapper function prototypes for Matrix Addition */
-void mw_arm_mat_add_f32(real32_T * pSrcA, real32_T * pSrcB, real32_T * pDst, uint16_t nRows, uint16_t nCols);
-void mw_arm_mat_add_q15(int16_T * pSrcA, int16_T * pSrcB, int16_T * pDst, uint16_t nRows, uint16_t nCols);
-void mw_arm_mat_add_q31(int32_T * pSrcA, int32_T * pSrcB, int32_T * pDst, uint16_t nRows, uint16_t nCols);
-/* Wrapper function prototypes for Matrix Subtraction */
-void mw_arm_mat_sub_f32(real32_T * pSrcA, real32_T * pSrcB, real32_T * pDst, uint16_t nRows, uint16_t nCols);
-void mw_arm_mat_sub_q15(int16_T * pSrcA, int16_T * pSrcB, int16_T * pDst, uint16_t nRows, uint16_t nCols);
-void mw_arm_mat_sub_q31(int32_T * pSrcA, int32_T * pSrcB, int32_T * pDst, uint16_t nRows, uint16_t nCols);
 
 #endif

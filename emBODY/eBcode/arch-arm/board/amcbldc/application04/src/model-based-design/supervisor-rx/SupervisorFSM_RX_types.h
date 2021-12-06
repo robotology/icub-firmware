@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: SupervisorFSM_RX_types.h
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 2.44
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Wed Sep 29 15:20:53 2021
+// Model version                  : 3.99
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:11 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,56 +21,13 @@
 #include "rtwtypes.h"
 
 // Model Code Variants
-#ifndef DEFINED_TYPEDEF_FOR_BoardState_
-#define DEFINED_TYPEDEF_FOR_BoardState_
+#ifndef DEFINED_TYPEDEF_FOR_JointPositions_
+#define DEFINED_TYPEDEF_FOR_JointPositions_
 
-typedef enum {
-  BoardState_HardwareConfigured = 0,   // Default value
-  BoardState_ControllerConfigured,
-  BoardState_FaultPressed,
-  BoardState_HwFault
-} BoardState;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BoardCommand_
-#define DEFINED_TYPEDEF_FOR_BoardCommand_
-
-typedef enum {
-  BoardCommand_ForceIdle = 0,          // Default value
-  BoardCommand_SetIdle,
-  BoardCommand_SetPosition,
-  BoardCommand_SetCurrent,
-  BoardCommand_SetVelocity,
-  BoardCommand_SetVoltage,
-  BoardCommand_SetTorque,
-  BoardCommand_Reset
-} BoardCommand;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_InternalMessages_
-#define DEFINED_TYPEDEF_FOR_InternalMessages_
-
-struct InternalMessages
+struct JointPositions
 {
-  BoardState State;
-  BoardCommand Command;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
-#define DEFINED_TYPEDEF_FOR_Thresholds_
-
-struct Thresholds
-{
-  real32_T current_low;
-  real32_T current_high;
-  real32_T voltage_low;
-  real32_T voltage_high;
-  real32_T temperature_low;
-  real32_T temperature_high;
+  // joint positions
+  real32_T position;
 };
 
 #endif
@@ -78,16 +35,74 @@ struct Thresholds
 #ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
 #define DEFINED_TYPEDEF_FOR_MotorSensors_
 
+// electrical angle = angle * num_poles
 struct MotorSensors
 {
   real32_T Iabc[3];
   real32_T angle;
-  real32_T omega;
   real32_T temperature;
   real32_T voltage;
-  Thresholds threshold;
   real32_T current;
   uint8_T hallABC;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
+#define DEFINED_TYPEDEF_FOR_SensorsData_
+
+struct SensorsData
+{
+  // position encoders
+  JointPositions jointpositions;
+  MotorSensors motorsensors;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
+#define DEFINED_TYPEDEF_FOR_MotorCurrent_
+
+struct MotorCurrent
+{
+  // motor current
+  real32_T current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlOutputs_
+#define DEFINED_TYPEDEF_FOR_ControlOutputs_
+
+struct ControlOutputs
+{
+  // control effort
+  real32_T Vabc[3];
+
+  // quadrature current
+  MotorCurrent Iq_fbk;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_JointVelocities_
+#define DEFINED_TYPEDEF_FOR_JointVelocities_
+
+struct JointVelocities
+{
+  // joint velocities
+  real32_T velocity;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocities
+  JointVelocities jointvelocities;
 };
 
 #endif
@@ -205,6 +220,17 @@ struct BUS_CAN_RX_ERRORS
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BoardState_
+#define DEFINED_TYPEDEF_FOR_BoardState_
+
+typedef enum {
+  BoardState_NotConfigured = 0,        // Default value
+  BoardState_Configured,
+  BoardState_Fault
+} BoardState;
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_ControlModes_
 #define DEFINED_TYPEDEF_FOR_ControlModes_
 
@@ -229,42 +255,6 @@ struct Flags
 {
   // control mode
   ControlModes control_mode;
-
-  // PID reset
-  boolean_T PID_reset;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_JointPositions_
-#define DEFINED_TYPEDEF_FOR_JointPositions_
-
-struct JointPositions
-{
-  // joint positions
-  real32_T position;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_JointVelocities_
-#define DEFINED_TYPEDEF_FOR_JointVelocities_
-
-struct JointVelocities
-{
-  // joint velocities
-  real32_T velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
-#define DEFINED_TYPEDEF_FOR_MotorCurrent_
-
-struct MotorCurrent
-{
-  // motor current
-  real32_T current;
 };
 
 #endif
@@ -289,6 +279,97 @@ struct Targets
   JointVelocities jointvelocities;
   MotorCurrent motorcurrent;
   MotorVoltage motorvoltage;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_JointLimits_
+#define DEFINED_TYPEDEF_FOR_JointLimits_
+
+struct JointLimits
+{
+  // joint limits
+  real32_T limits[2];
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_VelocityLimits_
+#define DEFINED_TYPEDEF_FOR_VelocityLimits_
+
+struct VelocityLimits
+{
+  // velocity limits
+  real32_T limits[2];
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfig_
+#define DEFINED_TYPEDEF_FOR_MotorConfig_
+
+struct MotorConfig
+{
+  real32_T Imin;
+  real32_T Imax;
+  boolean_T has_hall_sens;
+  uint8_T pole_pairs;
+  real32_T reduction;
+  real32_T Kp;
+  real32_T Ki;
+  boolean_T has_speed_sens;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Vmax;
+  real32_T Vcc;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PIDConfig_
+#define DEFINED_TYPEDEF_FOR_PIDConfig_
+
+struct PIDConfig
+{
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
+#define DEFINED_TYPEDEF_FOR_Thresholds_
+
+struct Thresholds
+{
+  real32_T current_low;
+  real32_T current_high;
+  real32_T voltage_low;
+  real32_T voltage_high;
+  real32_T temperature_low;
+  real32_T temperature_high;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+#define DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+
+struct ConfigurationParameters
+{
+  JointLimits jointlimits;
+  VelocityLimits velocitylimits;
+  MotorConfig motorconfig;
+  PIDConfig PosLoopPID;
+  PIDConfig VelLoopPID;
+  PIDConfig DirLoopPID;
+  Thresholds thresholds;
 };
 
 #endif

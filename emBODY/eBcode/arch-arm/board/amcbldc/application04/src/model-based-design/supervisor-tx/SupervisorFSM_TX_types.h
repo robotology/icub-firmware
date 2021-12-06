@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: SupervisorFSM_TX_types.h
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 2.50
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:29 2021
+// Model version                  : 3.9
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:23 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -32,32 +32,16 @@ struct JointPositions
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
-#define DEFINED_TYPEDEF_FOR_Thresholds_
-
-struct Thresholds
-{
-  real32_T current_low;
-  real32_T current_high;
-  real32_T voltage_low;
-  real32_T voltage_high;
-  real32_T temperature_low;
-  real32_T temperature_high;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
 #define DEFINED_TYPEDEF_FOR_MotorSensors_
 
+// electrical angle = angle * num_poles
 struct MotorSensors
 {
   real32_T Iabc[3];
   real32_T angle;
-  real32_T omega;
   real32_T temperature;
   real32_T voltage;
-  Thresholds threshold;
   real32_T current;
   uint8_T hallABC;
 };
@@ -72,6 +56,28 @@ struct SensorsData
   // position encoders
   JointPositions jointpositions;
   MotorSensors motorsensors;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_JointVelocities_
+#define DEFINED_TYPEDEF_FOR_JointVelocities_
+
+struct JointVelocities
+{
+  // joint velocities
+  real32_T velocity;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocities
+  JointVelocities jointvelocities;
 };
 
 #endif
@@ -145,6 +151,31 @@ struct BUS_MESSAGES_RX
   BUS_MSG_CONTROL_MODE control_mode;
   BUS_MSG_CURRENT_LIMIT current_limit;
   BUS_MSG_DESIRED_CURRENT desired_current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
+#define DEFINED_TYPEDEF_FOR_MotorCurrent_
+
+struct MotorCurrent
+{
+  // motor current
+  real32_T current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlOutputs_
+#define DEFINED_TYPEDEF_FOR_ControlOutputs_
+
+struct ControlOutputs
+{
+  // control effort
+  real32_T Vabc[3];
+
+  // quadrature current
+  MotorCurrent Iq_fbk;
 };
 
 #endif

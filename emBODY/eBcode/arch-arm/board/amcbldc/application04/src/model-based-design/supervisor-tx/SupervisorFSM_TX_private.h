@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: SupervisorFSM_TX_private.h
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 2.50
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:29 2021
+// Model version                  : 3.9
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:23 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

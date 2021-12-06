@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: rt_nonfinite.cpp
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.322
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:44 2021
+// Model version                  : 2.2
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:36 2021
 //
 
 //

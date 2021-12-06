@@ -3,28 +3,24 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: FOCInnerLoop.h
+// File: AMC_BLDC_private.h
 //
-// Code generated for Simulink model 'control_foc'.
+// Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 2.70
+// Model version                  : 3.76
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Dec  1 10:58:48 2021
+// C/C++ source code generated on : Thu Dec  2 09:39:37 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_FOCInnerLoop_h_
-#define RTW_HEADER_FOCInnerLoop_h_
-#include <cmath>
+#ifndef RTW_HEADER_AMC_BLDC_private_h_
+#define RTW_HEADER_AMC_BLDC_private_h_
 #include "rtwtypes.h"
-#include "control_foc_types.h"
-#include "rtGetNaN.h"
-#include "rt_nonfinite.h"
-#include "arm_math.h"
-#endif                                 // RTW_HEADER_FOCInnerLoop_h_
+#include "zero_crossing_types.h"
+#endif                                 // RTW_HEADER_AMC_BLDC_private_h_
 
 //
 // File trailer for generated code.

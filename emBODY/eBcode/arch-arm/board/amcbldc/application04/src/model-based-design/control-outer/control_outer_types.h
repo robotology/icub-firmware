@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: control_outer_types.h
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 1.100
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:44:08 2021
+// Model version                  : 2.23
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:55 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -45,9 +45,6 @@ struct Flags
 {
   // control mode
   ControlModes control_mode;
-
-  // PID reset
-  boolean_T PID_reset;
 };
 
 #endif
@@ -112,32 +109,6 @@ struct PIDConfig
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ConfigurationParameters_
-#define DEFINED_TYPEDEF_FOR_ConfigurationParameters_
-
-struct ConfigurationParameters
-{
-  JointLimits jointlimits;
-  VelocityLimits velocitylimits;
-  MotorConfig motorconfig;
-  PIDConfig PosLoopPID;
-  PIDConfig VelLoopPID;
-  PIDConfig DirLoopPID;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_JointPositions_
-#define DEFINED_TYPEDEF_FOR_JointPositions_
-
-struct JointPositions
-{
-  // joint positions
-  real32_T position;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_Thresholds_
 #define DEFINED_TYPEDEF_FOR_Thresholds_
 
@@ -153,31 +124,29 @@ struct Thresholds
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
-#define DEFINED_TYPEDEF_FOR_MotorSensors_
+#ifndef DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+#define DEFINED_TYPEDEF_FOR_ConfigurationParameters_
 
-struct MotorSensors
+struct ConfigurationParameters
 {
-  real32_T Iabc[3];
-  real32_T angle;
-  real32_T omega;
-  real32_T temperature;
-  real32_T voltage;
-  Thresholds threshold;
-  real32_T current;
-  uint8_T hallABC;
+  JointLimits jointlimits;
+  VelocityLimits velocitylimits;
+  MotorConfig motorconfig;
+  PIDConfig PosLoopPID;
+  PIDConfig VelLoopPID;
+  PIDConfig DirLoopPID;
+  Thresholds thresholds;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
-#define DEFINED_TYPEDEF_FOR_SensorsData_
+#ifndef DEFINED_TYPEDEF_FOR_JointPositions_
+#define DEFINED_TYPEDEF_FOR_JointPositions_
 
-struct SensorsData
+struct JointPositions
 {
-  // position encoders
-  JointPositions jointpositions;
-  MotorSensors motorsensors;
+  // joint positions
+  real32_T position;
 };
 
 #endif
@@ -224,6 +193,45 @@ struct Targets
   JointVelocities jointvelocities;
   MotorCurrent motorcurrent;
   MotorVoltage motorvoltage;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
+#define DEFINED_TYPEDEF_FOR_MotorSensors_
+
+// electrical angle = angle * num_poles
+struct MotorSensors
+{
+  real32_T Iabc[3];
+  real32_T angle;
+  real32_T temperature;
+  real32_T voltage;
+  real32_T current;
+  uint8_T hallABC;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
+#define DEFINED_TYPEDEF_FOR_SensorsData_
+
+struct SensorsData
+{
+  // position encoders
+  JointPositions jointpositions;
+  MotorSensors motorsensors;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocities
+  JointVelocities jointvelocities;
 };
 
 #endif

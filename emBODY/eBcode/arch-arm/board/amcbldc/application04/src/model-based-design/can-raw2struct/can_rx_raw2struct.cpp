@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: can_rx_raw2struct.cpp
 //
 // Code generated for Simulink model 'can_rx_raw2struct'.
 //
-// Model version                  : 1.315
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Mon Sep 20 12:43:51 2021
+// Model version                  : 2.2
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Wed Dec  1 10:58:42 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,7 +19,7 @@
 #include "can_rx_raw2struct.h"
 #include "can_rx_raw2struct_private.h"
 
-namespace can_messaging
+namespace amc_bldc_codegen
 {
   // Function for MATLAB Function: '<S1>/RAW2STRUCT Decoding Logic'
   CANClassTypes CAN_RX_raw2struct::c_convert_to_enum_CANClassTypes(int32_T input)
@@ -37,7 +37,7 @@ namespace can_messaging
   }
 }
 
-namespace can_messaging
+namespace amc_bldc_codegen
 {
   // Output and update for referenced model: 'can_rx_raw2struct'
   void CAN_RX_raw2struct::step(const BUS_CAN &arg_pck_rx_raw, BUS_CAN_RX &
@@ -91,7 +91,8 @@ namespace can_messaging
   }
 
   // Constructor
-  CAN_RX_raw2struct::CAN_RX_raw2struct()
+  CAN_RX_raw2struct::CAN_RX_raw2struct() :
+    can_rx_raw2struct_M()
   {
     // Currently there is no constructor body generated.
   }
@@ -103,7 +104,7 @@ namespace can_messaging
   }
 
   // Real-Time Model get method
-  can_messaging::CAN_RX_raw2struct::RT_MODEL_can_rx_raw2struct_T
+  amc_bldc_codegen::CAN_RX_raw2struct::RT_MODEL_can_rx_raw2struct_T
     * CAN_RX_raw2struct::getRTM()
   {
     return (&can_rx_raw2struct_M);

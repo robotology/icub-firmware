@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: can_encoder.cpp
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 1.327
-// Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
-// C/C++ source code generated on : Tue Sep 21 16:48:15 2021
+// Model version                  : 2.2
+// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
+// C/C++ source code generated on : Thu Dec  2 09:38:47 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,7 +19,7 @@
 #include "can_encoder.h"
 #include "can_encoder_private.h"
 
-namespace can_messaging
+namespace amc_bldc_codegen
 {
   // Output and update for referenced model: 'can_encoder'
   void CAN_Encoder::step(const BUS_MESSAGES_TX &arg_messages_tx, const
@@ -51,7 +51,7 @@ namespace can_messaging
     // End of DataTypeConversion: '<S1>/Data Type Conversion1'
 
     // Gain: '<S1>/Gain'
-    u = rtP_CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.velocity;
+    u = CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.velocity;
 
     // DataTypeConversion: '<S1>/Data Type Conversion3'
     if (u < 0.0F) {
@@ -74,7 +74,7 @@ namespace can_messaging
     // End of DataTypeConversion: '<S1>/Data Type Conversion3'
 
     // Gain: '<S1>/Gain1'
-    u = rtP_CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.position;
+    u = CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.position;
 
     // DataTypeConversion: '<S1>/Data Type Conversion2'
     if (u < 0.0F) {
@@ -94,7 +94,7 @@ namespace can_messaging
 
     // End of DataTypeConversion: '<S1>/Data Type Conversion2'
 
-    // MATLAB Function: '<S1>/MATLAB Function'
+    // MATLAB Function: '<S1>/format_foc_pck'
     arg_pck_tx.packets.PAYLOAD[0] = static_cast<uint8_T>(rtb_DataTypeConversion1
       & 255);
     arg_pck_tx.packets.PAYLOAD[1] = static_cast<uint8_T>
@@ -113,12 +113,12 @@ namespace can_messaging
       ((rtb_DataTypeConversion2 & MAX_int32_T) >> 24);
 
     // MATLAB Function: '<S1>/format_can_id' incorporates:
-    //   Constant: '<S1>/Constant1'
+    //   Constant: '<S1>/Constant'
     //   Constant: '<S1>/Motor Control Streaming'
     //   Constant: '<S1>/TYPE2FOC'
 
     arg_pck_tx.packets.ID = 256U;
-    arg_pck_tx.packets.ID = static_cast<uint16_T>(rtP_CAN_ID_AMC << 4 |
+    arg_pck_tx.packets.ID = static_cast<uint16_T>(CAN_ID_AMC << 4 |
       arg_pck_tx.packets.ID);
     arg_pck_tx.packets.ID = static_cast<uint16_T>(arg_pck_tx.packets.ID | 15);
 
@@ -160,7 +160,8 @@ namespace can_messaging
 
   // Constructor
   CAN_Encoder::CAN_Encoder() :
-    can_encoder_DW()
+    can_encoder_DW(),
+    can_encoder_M()
   {
     // Currently there is no constructor body generated.
   }
@@ -172,7 +173,7 @@ namespace can_messaging
   }
 
   // Real-Time Model get method
-  can_messaging::CAN_Encoder::RT_MODEL_can_encoder_T * CAN_Encoder::getRTM()
+  amc_bldc_codegen::CAN_Encoder::RT_MODEL_can_encoder_T * CAN_Encoder::getRTM()
   {
     return (&can_encoder_M);
   }
