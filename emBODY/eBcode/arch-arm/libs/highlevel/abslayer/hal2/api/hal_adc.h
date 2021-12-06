@@ -98,10 +98,12 @@ typedef uint32_t hal_dma_voltage_t; // in positive milliV. value hal_NA32 is the
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+// marco.accame on 06dec2021: cleaned the un-used code
+//extern hal_result_t hal_adc_dma_init(void);
+//extern hal_result_t hal_adc_dma_common_init(void);
+//extern hal_result_t hal_adc_dma_single_init(hal_adc_t adc);
 
-extern hal_result_t hal_adc_dma_init(void);
-extern hal_result_t hal_adc_dma_common_init(void);
-extern hal_result_t hal_adc_dma_single_init(hal_adc_t adc);
+
 extern hal_result_t hal_adc_common_structure_init(void);
 
 /*  Init ADC1 and ADC 3 for:
@@ -119,34 +121,34 @@ extern hal_result_t hal_adc_dma_init_ADC1_ADC3_hall_sensor_current(void);
 */
 extern hal_result_t hal_adc_dma_init_ADC2_tvaux_tvin_temperature (void);
 
-extern hal_result_t hal_adc_ADC1_ADC3_current_init(void);
+//extern hal_result_t hal_adc_ADC1_ADC3_current_init(void);
 
 //use it if initialized all the ADCs with hal_adc_dma_init()
-extern uint16_t hal_adc_get(uint16_t ADC_type, uint16_t channel );
+//extern uint16_t hal_adc_get(uint16_t ADC_type, uint16_t channel );
 
 //use it if initialized ADC1 and ADC3 with hal_adc_ADC1_ADC3_current_init ()
-extern int16_t hal_adc_get_current(uint16_t channel);
+//extern int16_t hal_adc_get_current(uint16_t channel);
 
 //use them if initialized ADC2 with hal_adc_dma_init_ADC2_tvaux_tvin_temperature ()
-extern uint16_t hal_adc_get_tvaux_tvin_temperature_raw(uint16_t channel);
-extern uint32_t hal_adc_get_tvaux_tvin_mV(uint16_t channel);
+//extern uint16_t hal_adc_get_tvaux_tvin_temperature_raw(uint16_t channel);
+//extern uint32_t hal_adc_get_tvaux_tvin_mV(uint16_t channel);
 extern uint32_t hal_adc_get_supplyVoltage_mV(void); //return supplied voltage to the board
 
 //use them if initialized ADC1 and ADC3 with hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
-extern uint16_t hal_adc_get_hall_sensor_analog_input_raw(uint8_t motor);
+//extern uint16_t hal_adc_get_hall_sensor_analog_input_raw(uint8_t motor);
 
 // returns hal_NA32 if argument is not supported or ... 
 extern hal_dma_voltage_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor);
 
 //use them if initialized ADC1 and ADC3 with hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
-extern uint16_t hal_adc_get_current_motor_raw(uint8_t motor);
+//extern uint16_t hal_adc_get_current_motor_raw(uint8_t motor);
 
 // returns hal_NA16 if argument is not supported
 extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor);
 
 /* NEW API */
 //general init for ADC
-extern hal_result_t hal_adc_init(hal_adc_t adc, const hal_adc_cfg_t *cfg);
+//extern hal_result_t hal_adc_init(hal_adc_t adc, const hal_adc_cfg_t *cfg);
 
 /** @}            
     end of group doxy_group_hal_adc  

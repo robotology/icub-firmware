@@ -59,6 +59,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
+// marco.accame on 03dec2021: 
+// i will move some static variables on the heap because ... if we use the CCM bank and the linker
+// assigns memory starting 0x10000000 to those static variables, then the DMA will not be able to work.
+// the original design of this module was to use heap memory allocated inside s_hal_adc_theinternals
+// and not static variables. 
+// moreover: i will correct the configuration for the DMA memory address so that is has the correct form
+// = (uint32_t) &uhADC2ConvertedValue[0];
+// moreover: cleaned up un-used code
+
+#define HAL_ADC_REMOVE_UNUSED_CODE
+#define HAL_ADC_MUST_USE_HEAP
+
+
 #define HAL_adc_id2index(t)              ((uint8_t)((t)))
 #define HAL_adc_id2stmADC(p)             (s_hal_adc_stmADCmap[HAL_adc_id2index(p)])
 
@@ -146,9 +160,11 @@ static void s_hal_adc_initted_reset(hal_adc_t id);
 static hal_boolval_t s_hal_adc_initted_is(hal_adc_t id);
 
 static void s_hal_adc_current_OffsetCalibration(void);
+
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 static void s_hal_adc_current_OffsetCalibration_old(void);
 static void s_hal_adc_current_StartInjectedConv(void);
-
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -163,23 +179,91 @@ static hal_adc_theinternals_t s_hal_adc_theinternals =
 // it must be defined in order to use hl_spi.
 const hl_adc_mapping_t* hl_adc_map = NULL;
 
+
+#if defined(HAL_ADC_MUST_USE_HEAP)
+
+// use this struct which holds required RAM.
+
+typedef struct 
+{
+    uint16_t AnalogMotorsInput[8];
+    uint16_t uhCur[4]; 
+    int16_t  hCurOffset[4]; 
+    uint16_t uhADC2ConvertedValue[3];        
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
+    uint16_t uhADCConvertedValue[12];   
+    uint16_t uhAN1;
+    uint16_t uhAN2;
+    uint16_t uhAN3;
+    uint16_t uhAN4;
+    uint16_t uhTVIN;
+    uint16_t uhTVAUX;   
+    uint32_t uwVBATVoltage;
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)       
+} hal_adc_data_t;
+
+
+// this pointer holds RAM. it requires allocation
+static hal_adc_data_t* s_hal_adc_data = NULL;
+
+void s_hal_adc_data_init(void)
+{
+    // we do it only once ...
+    if(NULL == s_hal_adc_data)
+    {
+        s_hal_adc_data = hal_heap_new(sizeof(hal_adc_data_t));        
+    }
+}
+
+static uint8_t s_hal_adc_data_initted()
+{
+    return (NULL == s_hal_adc_data) ? 0 : 1; 
+}
+
+// by this macro S_HAL_ADC_DATA() we access the members of the struct
+
+#define S_HAL_ADC_DATA(a) s_hal_adc_data->a
+
+#else
+
+// we use static data
+
 //converted data containers
 // RAW data coming from ADC channels is 12bit unsigned
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 static uint16_t uhADCConvertedValue[12];
+#endif
 static uint16_t uhADC2ConvertedValue[3];
 static uint16_t AnalogMotorsInput[8]; // = {0}; should be 0 anyway
-
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 static uint16_t uhAN1 = 0;
 static uint16_t uhAN2 = 0;
 static uint16_t uhAN3 = 0;
 static uint16_t uhAN4 = 0;
 static uint16_t uhTVIN = 0;
 static uint16_t uhTVAUX = 0;
-
+#endif
 static uint16_t uhCur[4] = {0,0,0,0};
 static int16_t  hCurOffset[4]= {0,0,0,0};
-
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 static uint32_t uwVBATVoltage = 0;
+#endif
+
+void s_hal_adc_data_init(void)
+{
+}
+
+static uint8_t s_hal_adc_data_initted()
+{
+    return 1; 
+}
+
+// by this macro S_HAL_ADC_DATA() we access the bunch of static variables
+#define S_HAL_ADC_DATA(a) a 
+
+#endif // #if defined(HAL_ADC_MUST_USE_HEAP)
+
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -225,7 +309,7 @@ extern hal_result_t hal_adc_dma_init()
   DMA_DeInit(DMA2_Stream0);
   DMA_InitStructure.DMA_Channel = DMA_CHANNEL0;// | DMA_CHANNEL1;  
   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)ADC_CDR_ADDRESS; //ADC1_DR_ADDRESS;
-  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) &uhADCConvertedValue;
+  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) & S_HAL_ADC_DATA(uhADCConvertedValue)[0];
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
   DMA_InitStructure.DMA_BufferSize = 12;
   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -329,6 +413,11 @@ extern hal_result_t hal_adc_dma_init()
   //ADC_SoftwareStartConv(ADC3);
   return hal_res_OK;
 }
+
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE
+
+
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 
 //Init with Injected Conversions (must be paired with the dc_motorctl initialization)
 // here the conversions are triggered with TIMER1, which is initialized only in hal_dc_motorctl.c
@@ -452,7 +541,7 @@ extern hal_result_t hal_adc_dma_common_init()
   DMA_DeInit(DMA2_Stream0);
   DMA_InitStructure.DMA_Channel = DMA_CHANNEL0;// | DMA_CHANNEL1;  
   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)ADC_CDR_ADDRESS; //ADC1_DR_ADDRESS;
-  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) &uhADCConvertedValue;
+  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) & S_HAL_ADC_DATA(uhADCConvertedValue)[0];
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
   DMA_InitStructure.DMA_BufferSize = 12;
   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -591,13 +680,17 @@ return hal_res_OK;
     
 }
 
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
+
 
 extern hal_result_t hal_adc_common_structure_init()
 {
     if(hal_true == s_hal_adc_none_supported_is())
     {
         return(hal_res_NOK_generic);
-    }    
+    }
+
+    s_hal_adc_data_init();    
     
   ADC_CommonInitTypeDef ADC_CommonInitStructure;
   
@@ -619,6 +712,8 @@ extern hal_result_t hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
         return(hal_res_NOK_generic);
     }
     
+    s_hal_adc_data_init();
+    
       ADC_InitTypeDef       ADC_InitStructure;
       ADC_CommonInitTypeDef ADC_CommonInitStructure;
       DMA_InitTypeDef       DMA_InitStructure;
@@ -637,7 +732,7 @@ extern hal_result_t hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
       DMA_DeInit(DMA_STREAM0);
       DMA_InitStructure.DMA_Channel = DMA_CHANNEL0;
       DMA_InitStructure.DMA_PeripheralBaseAddr = ADC1_DR_ADDRESS; 
-      DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) &AnalogMotorsInput;//(uint32_t) --> address is defined in 32bit
+      DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) & S_HAL_ADC_DATA(AnalogMotorsInput)[0];//(uint32_t) --> address is defined in 32bit
       DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
       DMA_InitStructure.DMA_BufferSize = 4;
       DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -657,7 +752,7 @@ extern hal_result_t hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
       DMA_DeInit(DMA_STREAM2);
       DMA_InitStructure.DMA_Channel = DMA_CHANNEL2;
       DMA_InitStructure.DMA_PeripheralBaseAddr = ADC3_DR_ADDRESS;
-      DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)  &AnalogMotorsInput[4];
+      DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)  & S_HAL_ADC_DATA(AnalogMotorsInput)[4];
       DMA_Init(DMA_STREAM2, &DMA_InitStructure);
       DMA_Cmd(DMA_STREAM2, ENABLE);
          
@@ -744,6 +839,8 @@ extern hal_result_t hal_adc_dma_init_ADC2_tvaux_tvin_temperature ()
         return(hal_res_NOK_generic);
     }
     
+    s_hal_adc_data_init();
+    
   ADC_InitTypeDef       ADC_InitStructure;
   ADC_CommonInitTypeDef ADC_CommonInitStructure;
   DMA_InitTypeDef       DMA_InitStructure;
@@ -760,7 +857,7 @@ extern hal_result_t hal_adc_dma_init_ADC2_tvaux_tvin_temperature ()
   DMA_DeInit(DMA_STREAM1);
   DMA_InitStructure.DMA_Channel = DMA_CHANNEL1; // | DMA_CHANNEL1;  
   DMA_InitStructure.DMA_PeripheralBaseAddr = ADC2_DR_ADDRESS;
-  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)  &uhADC2ConvertedValue;
+  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)  & S_HAL_ADC_DATA(uhADC2ConvertedValue)[0];
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
   DMA_InitStructure.DMA_BufferSize = 3;
   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -826,13 +923,15 @@ extern hal_result_t hal_adc_dma_init_ADC2_tvaux_tvin_temperature ()
   return hal_res_OK;
 }
 
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
+// marco.accame on 03dec2021: ??? potential out of memory ... i remove this function as it is not used
 extern uint16_t hal_adc_get(uint16_t ADC_TYPE, uint16_t channel)
 {   
     if ((ADC_TYPE < 1) || (ADC_TYPE > 3) || (channel > hal_adc_max_channels))
         return 0;
     
     //data saved here using DMA
-	return	uhADCConvertedValue[((ADC_TYPE-1))+(channel*3)];
+	return	S_HAL_ADC_DATA(uhADCConvertedValue)[((ADC_TYPE-1))+(channel*3)];
 }
 
 extern uint16_t hal_adc_get_tvaux_tvin_temperature_raw(uint16_t channel)
@@ -840,8 +939,11 @@ extern uint16_t hal_adc_get_tvaux_tvin_temperature_raw(uint16_t channel)
 	if (channel > 2)
         return 0;
       
-    return	uhADC2ConvertedValue[channel];
+    return	S_HAL_ADC_DATA(uhADC2ConvertedValue)[channel];
 }
+
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
+
 
 /*
 Vale: tvin ==> input voltage. (Voltage supply to the board, from 12V to 50V. Usually 12V.
@@ -852,8 +954,13 @@ extern uint32_t hal_adc_get_tvaux_tvin_mV(uint16_t channel)
 {    
 	if (channel > 1)
         return 0;
+    
+    if(0 == s_hal_adc_data_initted())
+    {
+        return 0;
+    }
    
-    uint32_t result = uhADC2ConvertedValue[channel];
+    uint32_t result = S_HAL_ADC_DATA(uhADC2ConvertedValue)[channel];
     
     //rescaling from 0mV to 3300mV and applying the reduction factor
     switch (channel)
@@ -874,11 +981,13 @@ extern uint32_t hal_adc_get_supplyVoltage_mV(void)
     return(hal_adc_get_tvaux_tvin_mV(1));
 }
 
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
+
 extern int16_t hal_adc_get_current(uint16_t channel)
 {
     if (channel > 3)
         return 0;
-	return	uhCur[channel];
+	return	S_HAL_ADC_DATA(uhCur)[channel];
 }
 
 extern uint16_t hal_adc_get_hall_sensor_analog_input_raw(uint8_t motor)
@@ -894,8 +1003,11 @@ extern uint16_t hal_adc_get_hall_sensor_analog_input_raw(uint8_t motor)
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
-	return	AnalogMotorsInput[motor*2];
+	return	S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2];
 }
+
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
+
 
 extern hal_dma_voltage_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor)
 {
@@ -904,15 +1016,21 @@ extern hal_dma_voltage_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor)
         return(hal_NA32);
     }
     
+    if(0 == s_hal_adc_data_initted())
+    {
+        return hal_NA32;
+    }    
+    
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
     //rescaling from 0mV to 3300mV and applying the reduction factor
-    uint32_t result = (1000 * (1.0/AN_REDUCTION_FACTOR)  * VOLTAGE_FULLSCALE * AnalogMotorsInput[motor*2])  / ADC_CHANNEL_RESOLUTION;
+    uint32_t result = (1000 * (1.0/AN_REDUCTION_FACTOR)  * VOLTAGE_FULLSCALE * S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2])  / ADC_CHANNEL_RESOLUTION;
   
 	return	result;
 }
 
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 extern uint16_t hal_adc_get_current_motor_raw(uint8_t motor)
 {
     // marco.accame: best thing is to verify vs initialisation of the assocaited adc peripheral, but for now we accept this check.
@@ -924,8 +1042,9 @@ extern uint16_t hal_adc_get_current_motor_raw(uint8_t motor)
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
-	return	(uint16_t)(AnalogMotorsInput[motor*2 + 1] - hCurOffset[motor]);
+	return	(uint16_t)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]);
 }
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 
 extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor)
 {
@@ -936,15 +1055,22 @@ extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor)
     {
         return(hal_NA16);
     }
+    
+    if(0 == s_hal_adc_data_initted())
+    {
+        return hal_NA16;
+    }       
 
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
     //rescaling from -5000mA to 5000mA and applying the reduction factor
-    int16_t result = (int16_t)(CURRENT_SCALE * (float)(AnalogMotorsInput[motor*2 + 1] - hCurOffset[motor]));
+    int16_t result = (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
     
 	return	result;
 }
+
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 
 /*-------------------NEW APIs BEGIN-------------------------------------------*/
 
@@ -1004,7 +1130,7 @@ extern hal_result_t hal_adc_init(hal_adc_t id, const hal_adc_cfg_t *cfg)
           DMA_DeInit(DMA_STREAM1);
           DMA_InitStructure.DMA_Channel = DMA_CHANNEL1; // | DMA_CHANNEL1;  
           DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)ADC2_DR_ADDRESS; // which address? --> now is set the ADC2 Data Register addr
-          DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) &uhADC2ConvertedValue;
+          DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) & S_HAL_ADC_DATA(uhADC2ConvertedValue)[0];
           DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
           DMA_InitStructure.DMA_BufferSize = 3;
           DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
@@ -1094,6 +1220,8 @@ extern hal_result_t hal_adc_init(hal_adc_t id, const hal_adc_cfg_t *cfg)
 
 /*-------------------NEW APIs END-------------------------------------------*/
 
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -1103,6 +1231,11 @@ static void s_hal_adc_current_OffsetCalibration(void)
 {
   uint8_t conv_index;
   static uint8_t attempts = 0;
+    
+    if(0 == s_hal_adc_data_initted())
+    {
+        return;
+    }   
   
   //I want EOC flag only at the end of the all the group of conversions, for both ADCs    
   ADC_EOCOnEachRegularChannelCmd(ADC1, DISABLE);
@@ -1122,31 +1255,33 @@ static void s_hal_adc_current_OffsetCalibration(void)
     while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)) { attempts ++; if (attempts>=100) break;} 
     attempts = 0;
 
-    offset[0] +=  AnalogMotorsInput[1];
-    offset[1] +=  AnalogMotorsInput[3];
+    offset[0] +=  S_HAL_ADC_DATA(AnalogMotorsInput)[1];
+    offset[1] +=  S_HAL_ADC_DATA(AnalogMotorsInput)[3];
     
     ADC_ClearFlag(ADC1, ADC_FLAG_EOC);
     
     while (!ADC_GetFlagStatus(ADC3, ADC_FLAG_EOC)) { attempts ++; if (attempts>=100) break;}
     attempts = 0;
     
-    offset[2] +=  AnalogMotorsInput[5];
-    offset[3] +=  AnalogMotorsInput[7];
+    offset[2] +=  S_HAL_ADC_DATA(AnalogMotorsInput)[5];
+    offset[3] +=  S_HAL_ADC_DATA(AnalogMotorsInput)[7];
       
     ADC_ClearFlag(ADC3, ADC_FLAG_EOC);
   }
   
-  hCurOffset[0] = (offset[0] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
-  hCurOffset[1] = (offset[1] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
-  hCurOffset[2] = (offset[2] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
-  hCurOffset[3] = (offset[3] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
+  S_HAL_ADC_DATA(hCurOffset)[0] = (offset[0] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
+  S_HAL_ADC_DATA(hCurOffset)[1] = (offset[1] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
+  S_HAL_ADC_DATA(hCurOffset)[2] = (offset[2] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
+  S_HAL_ADC_DATA(hCurOffset)[3] = (offset[3] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
   
-  //hCurOffset[0] = (hCurOffset[0] >> 4) - ADC_CHANNEL_RESOLUTION/2; // offset is the difference between the initial values and saturationvalue/2 (which represents 0mA)
-  //hCurOffset[1] = (hCurOffset[1] >> 4) - ADC_CHANNEL_RESOLUTION/2;
-  //hCurOffset[2] = (hCurOffset[2] >> 4) - ADC_CHANNEL_RESOLUTION/2;
-  //hCurOffset[3] = (hCurOffset[3] >> 4) - ADC_CHANNEL_RESOLUTION/2;
+  //S_HAL_ADC_DATA(hCurOffset)[0] = (S_HAL_ADC_DATA(hCurOffset)[0] >> 4) - ADC_CHANNEL_RESOLUTION/2; // offset is the difference between the initial values and saturationvalue/2 (which represents 0mA)
+  //S_HAL_ADC_DATA(hCurOffset)[1] = (S_HAL_ADC_DATA(hCurOffset)[1] >> 4) - ADC_CHANNEL_RESOLUTION/2;
+  //S_HAL_ADC_DATA(hCurOffset)[2] = (S_HAL_ADC_DATA(hCurOffset)[2] >> 4) - ADC_CHANNEL_RESOLUTION/2;
+  //S_HAL_ADC_DATA(hCurOffset)[3] = (S_HAL_ADC_DATA(hCurOffset)[3] >> 4) - ADC_CHANNEL_RESOLUTION/2;
 
 }
+
+#if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
 
 #if 0
 static void s_hal_adc_current_OffsetCalibration(void)
@@ -1224,10 +1359,10 @@ static void s_hal_adc_current_OffsetCalibration_old(void)
   {
     while((!ADC_GetFlagStatus(ADC1,ADC_FLAG_JEOC)) || (!ADC_GetFlagStatus(ADC3,ADC_FLAG_JEOC))) { } // ---> added
     
-   	hCurOffset[0] += (ADC_GetInjectedConversionValue(ADC1,ADC_InjectedChannel_3)>>5);
-    hCurOffset[1] += (ADC_GetInjectedConversionValue(ADC1,ADC_InjectedChannel_2)>>5);     
-	hCurOffset[2] += (ADC_GetInjectedConversionValue(ADC3,ADC_InjectedChannel_3)>>5);
-    hCurOffset[3] += (ADC_GetInjectedConversionValue(ADC3,ADC_InjectedChannel_2)>>5);    
+   	S_HAL_ADC_DATA(hCurOffset)[0] += (ADC_GetInjectedConversionValue(ADC1,ADC_InjectedChannel_3)>>5);
+    S_HAL_ADC_DATA(hCurOffset)[1] += (ADC_GetInjectedConversionValue(ADC1,ADC_InjectedChannel_2)>>5);     
+	S_HAL_ADC_DATA(hCurOffset)[2] += (ADC_GetInjectedConversionValue(ADC3,ADC_InjectedChannel_3)>>5);
+    S_HAL_ADC_DATA(hCurOffset)[3] += (ADC_GetInjectedConversionValue(ADC3,ADC_InjectedChannel_2)>>5);    
      
     /* Clear the ADC1 JEOC pending flag */ //need to re-do this for every cycle because the interrupt routine is not active yet
     ADC_ClearFlag(ADC1, ADC_FLAG_JEOC);    
@@ -1238,6 +1373,7 @@ static void s_hal_adc_current_OffsetCalibration_old(void)
   }
   s_hal_adc_current_StartInjectedConv();  
 }
+
 /*******************************************************************************
 * Function Name  : hal_adc_currentConfig
 * Description    : This function configure ADC1 for 2 shunt current 
@@ -1271,6 +1407,10 @@ static void s_hal_adc_current_StartInjectedConv(void)
   ADC_ITConfig(ADC1, ADC_IT_JEOC, ENABLE);
   ADC_ITConfig(ADC3, ADC_IT_JEOC, ENABLE);  //---> added
 }
+
+#endif // #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
+
+
 /*******************************************************************************
 * Function Name  : ADC1_IRQHandler
 * Description    : This function handles ADC1, ADC2 and ADC3 global interrupts requests. 
@@ -1286,6 +1426,11 @@ void ADC_IRQHandler(void)
   int16_t deadtime= 0;//; MOTOR_DEADTIME+0;
   int16_t Cur[4]={0,0,0,0};	
   //if(ADC_GetITStatus(ADC1, ADC_IT_JEOC) == SET))
+  
+    if(0 == s_hal_adc_data_initted())
+    {
+        return;
+    }   
   
   // finished conversion for ADC1
   if((ADC1->SR & ADC_FLAG_JEOC) == ADC_FLAG_JEOC)
@@ -1307,20 +1452,20 @@ void ADC_IRQHandler(void)
 		if (pwm[0]>deadtime)
 		{
          // store the value inside the output array
-		 Cur[0]=(Cur[0]>>1)+((ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_3)-hCurOffset[0])>>1) ;
-//       uhCur[0]=(int16_t)(((pwm[0]-deadtime)*Cur[0])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
-         uhCur[0]=Cur[0];
+		 Cur[0]=(Cur[0]>>1)+((ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_3)-S_HAL_ADC_DATA(hCurOffset)[0])>>1) ;
+//       S_HAL_ADC_DATA(uhCur)[0]=(int16_t)(((pwm[0]-deadtime)*Cur[0])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
+         S_HAL_ADC_DATA(uhCur)[0]=Cur[0];
 		}
-		else  uhCur[0]=0;
+		else  S_HAL_ADC_DATA(uhCur)[0]=0;
 
 		if (pwm[1]>deadtime)
 		{
         // store the value inside the output array
-	    Cur[1]=(Cur[1]>>1)+((ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_2)-hCurOffset[1])>>1);
-//   uhCur[1]=(int16_t)(((pwm[1]-deadtime)*Cur[1])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
-		uhCur[1]=Cur[1];
+	    Cur[1]=(Cur[1]>>1)+((ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_2)-S_HAL_ADC_DATA(hCurOffset)[1])>>1);
+//   S_HAL_ADC_DATA(uhCur)[1]=(int16_t)(((pwm[1]-deadtime)*Cur[1])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
+		S_HAL_ADC_DATA(uhCur)[1]=Cur[1];
 		}
-		else  uhCur[1]=0;
+		else  S_HAL_ADC_DATA(uhCur)[1]=0;
     }
   }
   
@@ -1348,19 +1493,19 @@ void ADC_IRQHandler(void)
 		
 		if (pwm[2]>deadtime)
 		{
-		Cur[2]=(Cur[2]>>1)+((ADC_GetInjectedConversionValue(ADC3, ADC_InjectedChannel_3)-hCurOffset[2])>>1) ;
-//		uhCur[2]=(int16_t)(((pwm[2]-deadtime)*Cur[2])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
-	 	uhCur[2]=Cur[2];
+		Cur[2]=(Cur[2]>>1)+((ADC_GetInjectedConversionValue(ADC3, ADC_InjectedChannel_3)-S_HAL_ADC_DATA(hCurOffset)[2])>>1) ;
+//		S_HAL_ADC_DATA(uhCur)[2]=(int16_t)(((pwm[2]-deadtime)*Cur[2])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
+	 	S_HAL_ADC_DATA(uhCur)[2]=Cur[2];
 		}
-		else  uhCur[2]=0;
+		else  S_HAL_ADC_DATA(uhCur)[2]=0;
 
 		if (pwm[3]>deadtime)
 		{
-		Cur[3]=(Cur[3]>>1)+((ADC_GetInjectedConversionValue(ADC3, ADC_InjectedChannel_2)-hCurOffset[3])>>1);
-//	uhCur[3]=(int16_t)(((pwm[3]-deadtime)*Cur[3])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
-        uhCur[3]=Cur[3];
+		Cur[3]=(Cur[3]>>1)+((ADC_GetInjectedConversionValue(ADC3, ADC_InjectedChannel_2)-S_HAL_ADC_DATA(hCurOffset)[3])>>1);
+//	S_HAL_ADC_DATA(uhCur)[3]=(int16_t)(((pwm[3]-deadtime)*Cur[3])/(3360-deadtime<<1)); //PWM_PERIOD-2*deadtime  6720-168 =
+        S_HAL_ADC_DATA(uhCur)[3]=Cur[3];
 		}
-		else  uhCur[3]=0;
+		else  S_HAL_ADC_DATA(uhCur)[3]=0;
     }
   }
 	//if(ADC_GetITStatus(ADC1, ADC_IT_AWD) == SET)
