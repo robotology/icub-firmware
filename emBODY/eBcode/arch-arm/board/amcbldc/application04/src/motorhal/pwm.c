@@ -97,25 +97,38 @@ constexpr uint16_t hallAngleTable[] =
 {
     /* ABC  (°)  */
     /* LLL ERROR */ 0,
-    /* LLH  300  */ static_cast<uint16_t>(270.0 * 65536.0 / 360.0 + 0.5), /* 54613 */
-    /* LHL  180  */ static_cast<uint16_t>(150.0 * 65536.0 / 360.0 + 0.5), /* 32768 */
-    /* LHH  240  */ static_cast<uint16_t>(210.0 * 65536.0 / 360.0 + 0.5), /* 43690 */
-    /* HLL   60  */ static_cast<uint16_t>( 30.0 * 65536.0 / 360.0 + 0.5), /* 10923 */
-    /* HLH    0  */ static_cast<uint16_t>(330.0 * 65536.0 / 360.0 + 0.5), /*     0 */
-    /* HHL  120  */ static_cast<uint16_t>( 90.0 * 65536.0 / 360.0 + 0.5), /* 21845 */
+    /* LLH  300  */ static_cast<uint16_t>(120.0 * 65536.0 / 360.0 + 0.5), /* 54613 */
+    /* LHL  180  */ static_cast<uint16_t>(0.0 * 65536.0 / 360.0 + 0.5), /* 32768 */
+    /* LHH  240  */ static_cast<uint16_t>(60.0 * 65536.0 / 360.0 + 0.5), /* 43690 */
+    /* HLL   60  */ static_cast<uint16_t>(240.0 * 65536.0 / 360.0 + 0.5), /* 10923 */
+    /* HLH    0  */ static_cast<uint16_t>(180.0 * 65536.0 / 360.0 + 0.5), /*     0 */
+    /* HHL  120  */ static_cast<uint16_t>(300.0 * 65536.0 / 360.0 + 0.5), /* 21845 */
     /* HHH ERROR */ static_cast<uint16_t>(0)
 };
+
+//constexpr int16_t hallSectorTable[] =
+//{
+//    /* ABC  (°)  */
+//    /* LLL ERROR */ 0,
+//    /* LLH  270  */ 4, /* 54613 */
+//    /* LHL  150  */ 2, /* 32768 */
+//    /* LHH  210  */ 3, /* 43690 */
+//    /* HLL   30  */ 0, /* 10923 */
+//    /* HLH  -30  */ 5, /*     0 */
+//    /* HHL   90  */ 1, /* 21845 */
+//    /* HHH ERROR */ static_cast<uint16_t>(0)
+//};
 
 constexpr int16_t hallSectorTable[] =
 {
     /* ABC  (°)  */
     /* LLL ERROR */ 0,
-    /* LLH  270  */ 4, /* 54613 */
-    /* LHL  150  */ 2, /* 32768 */
-    /* LHH  210  */ 3, /* 43690 */
-    /* HLL   30  */ 0, /* 10923 */
-    /* HLH  -30  */ 5, /*     0 */
-    /* HHL   90  */ 1, /* 21845 */
+    /* LLH  270  */ 1, /* 54613 */
+    /* LHL  150  */ 5, /* 32768 */
+    /* LHH  210  */ 0, /* 43690 */
+    /* HLL   30  */ 3, /* 10923 */
+    /* HLH  -30  */ 2, /*     0 */
+    /* HHL   90  */ 4, /* 21845 */
     /* HHH ERROR */ static_cast<uint16_t>(0)
 };
 
@@ -164,6 +177,10 @@ static const uint16_t hallAngleTable[] =
  *      LOW means that PHASEx is in LOW state (ENx = 1, PWMx = 0)
  *      PWM means that PHASEx is modulated with the pwm value (ENx = 1, PWMx = pwm)
  */
+ 
+#define DECODE_HALLSTATUS (((HALL1_GPIO_Port->IDR & HALL1_Pin) >> MSB(HALL1_Pin)) << 1)  \
+                        | (((HALL2_GPIO_Port->IDR & HALL2_Pin) >> MSB(HALL2_Pin)) << 0)  \
+                        | (((HALL3_GPIO_Port->IDR & HALL3_Pin) >> MSB(HALL3_Pin)) << 2)
 
 static uint8_t updateHallStatus(void)
 {
@@ -174,15 +191,26 @@ static uint8_t updateHallStatus(void)
     static uint8_t border_flag = 0;
     
     /* Read current value of HALL1, HALL2 and HALL3 signals in bits 2..0 */
-    hallStatus = (((HALL1_GPIO_Port->IDR & HALL1_Pin) >> MSB(HALL1_Pin)) << 2)
-               | (((HALL2_GPIO_Port->IDR & HALL2_Pin) >> MSB(HALL2_Pin)) << 1)
-               | (((HALL3_GPIO_Port->IDR & HALL3_Pin) >> MSB(HALL3_Pin)) << 0);
+    hallStatus = DECODE_HALLSTATUS;
+    
+    //static char msg3[64];
+    //static uint32_t counter;
+    //if(counter % 1000 == 0)
+    //{
+    //    sprintf(msg3, "[%d]\n", hallStatus);
+    //    embot::core::print(msg3);
+    //    counter = 0;
+    //}
+    //counter++;
     
     int16_t sector = hallSectorTable[hallStatus];
     static int16_t sector_old = sector;
     
     uint16_t angle = hallAngleTable[hallStatus];
     
+    hallAngle = angle;
+    
+    // To disable the encoder reading, comment the following if then else
     if (!hallStatus_old)
     {            
         hallCounter = 0;
@@ -251,7 +279,8 @@ static uint8_t updateHallStatus(void)
         //    encoderCalibrate(angle);
         //}
     }
-    
+
+    // update the old sector and hall status
     sector_old = sector;
     hallStatus_old = hallStatus;
     
@@ -361,7 +390,7 @@ HAL_StatusTypeDef pwmInit(void)
     if (0 == (MainConf.pwm.mode & PWM_CONF_MODE_MASK))
     {
         MainConf.pwm.mode = PWM_CONF_MODE_HALL;
-        MainConf.pwm.poles = 8;//7; // // //
+        MainConf.pwm.poles = 4;//7; // // //
     }
         
     /* Register the required TIM1 callback functions */
@@ -399,9 +428,7 @@ HAL_StatusTypeDef pwmInit(void)
 HAL_StatusTypeDef hallInit(void)
 {
     /* Read value of HALL1, HALL2 and HALL3 signals in bits 2..0 */
-    hallStatus = (((HALL1_GPIO_Port->IDR & HALL1_Pin) >> MSB(HALL1_Pin)) << 2)
-               | (((HALL2_GPIO_Port->IDR & HALL2_Pin) >> MSB(HALL2_Pin)) << 1)
-               | (((HALL3_GPIO_Port->IDR & HALL3_Pin) >> MSB(HALL3_Pin)) << 0);
+    hallStatus = DECODE_HALLSTATUS;
 
     /* Init angle */
     hallAngle = hallAngleTable[hallStatus];

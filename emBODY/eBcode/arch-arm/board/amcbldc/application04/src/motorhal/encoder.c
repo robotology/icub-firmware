@@ -50,7 +50,7 @@
 /* Coversion factor from encoder step value to elctrical angle. It is given by:
  * encoderConvFactor = 65536 * number_of_poles / number_of_encoder_steps
  */
-static const int16_t encoderConvFactor = 64;
+static const int16_t encoderConvFactor = 16;
 static volatile uint16_t electricalOffset = 0;
 static volatile bool encoderCalibrated = false;
 static volatile uint16_t encoderForcedValue = 0;
@@ -88,7 +88,7 @@ HAL_StatusTypeDef encoderInit(void)
         MainConf.encoder.mode   = TIM_ENCODERMODE_TI12;
         MainConf.encoder.filter = 4;
         MainConf.encoder.idxpos = TIM_ENCODERINDEX_POSITION_00;
-        MainConf.encoder.nsteps = 1024;
+        MainConf.encoder.nsteps = 16000; //14400; //1024;
     }
 
     /* Forced, for now */
@@ -106,7 +106,7 @@ HAL_StatusTypeDef encoderInit(void)
     sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
     sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
     sConfig.IC1Filter = MainConf.encoder.filter;
-    sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
+    sConfig.IC2Polarity = /*TIM_ICPOLARITY_FALLING;*/TIM_ICPOLARITY_RISING;
     sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
     sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
     sConfig.IC2Filter = MainConf.encoder.filter;
