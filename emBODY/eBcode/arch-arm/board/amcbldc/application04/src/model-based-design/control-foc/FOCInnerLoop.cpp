@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.70
+// Model version                  : 2.75
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Dec  1 10:58:48 2021
+// C/C++ source code generated on : Tue Dec  7 09:16:21 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,9 +22,12 @@
 #include "control_foc.h"
 #include "control_foc_private.h"
 
+
+#include "embot_core.h"
+
 namespace amc_bldc_codegen
 {
-  // System initialize for function-call system: '<Root>/FOC inner loop'
+  // System initialize for atomic system: '<Root>/FOC inner loop'
   void control_foc::FOCInnerLoop_Init()
   {
     // InitializeConditions for UnitDelay: '<S3>/Delay Input1'
@@ -36,7 +39,7 @@ namespace amc_bldc_codegen
     control_foc_DW.DelayInput1_DSTATE = ControlModes_Idle;
   }
 
-  // Output and update for function-call system: '<Root>/FOC inner loop'
+  // Output and update for atomic system: '<Root>/FOC inner loop'
   void control_foc::FOCInnerLoop(const Flags *rtu_Flags, const
     ConfigurationParameters *rtu_ConfigurationParameters, const SensorsData
     *rtu_Sensors, const EstimatedData *rtu_Estimates, const Targets *rtu_Targets,
@@ -61,13 +64,23 @@ namespace amc_bldc_codegen
     } else {
       rtb_Unary_Minus = rtu_Targets->motorcurrent.current;
     }
+    
+//    static char msg[64] = {0};
+//    static uint32_t counter;
+//    if(counter % 1000 == 0)
+//    {
+//      sprintf(msg, "[FOCInnerLoop]: %.3f\n", rtb_Unary_Minus);
+//      embot::core::print(msg);
+//      counter = 0;
+//    }
+//    counter++;
 
     // End of Switch: '<S1>/Switch3'
 
     // Sum: '<S1>/Add' incorporates:
     //   Product: '<S1>/Product1'
     //   Product: '<S1>/Product2'
-
+    
     rtb_Add = rtb_Unary_Minus * rtu_ConfigurationParameters->motorconfig.Rphase
       + rtu_Estimates->jointvelocities.velocity *
       rtu_ConfigurationParameters->motorconfig.Kbemf;
@@ -404,6 +417,16 @@ namespace amc_bldc_codegen
       rty_FOCOutputs->Vabc[1] = 0.0F;
       rty_FOCOutputs->Vabc[2] = 0.0F;
     }
+    
+    static char msg[64] = {0};
+    static uint32_t counter;
+    if(counter % 26666 == 0)
+    {
+      sprintf(msg, "[FOCInnerLoop]: %.3f -- %.3f -- %.3f -- %.3f\n", rty_FOCOutputs->Vabc[0], rty_FOCOutputs->Vabc[1], rty_FOCOutputs->Vabc[2], rtb_IaIbIc0[1]);
+      embot::core::print(msg);
+      counter = 0;
+    }
+    counter++;
 
     // End of Switch: '<S1>/Switch2'
 
@@ -422,7 +445,7 @@ namespace amc_bldc_codegen
     //   Store in Global RAM
 
     control_foc_DW.DelayInput1_DSTATE = rtu_Flags->control_mode;
-
+    
     // Update for DiscreteIntegrator: '<S44>/Integrator'
     control_foc_DW.Integrator_DSTATE = 1.78571427E-5F * rtb_sum_alpha +
       rtb_SumFdbk;

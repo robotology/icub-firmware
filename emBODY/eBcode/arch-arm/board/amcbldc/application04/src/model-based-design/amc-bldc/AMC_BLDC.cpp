@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.76
+// Model version                  : 3.93
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu Dec  2 09:39:37 2021
+// C/C++ source code generated on : Tue Dec  7 09:16:47 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -29,126 +29,269 @@ uint8_T CAN_ID_AMC = 3U;               // Variable: CAN_ID_AMC
                                           //    '<S3>/CAN_Decoder'
                                           //    '<S3>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
+//#include "embot_core.h"
+//#include <hal_trace.h>
+//#include <stdio.h>
 
+ 
 namespace amc_bldc_codegen
 {
   // Model step function for TID0
-  void AMC_BLDC::step_FOC()            // Explicit Task: FOC.ISR
+  void AMC_BLDC::step_FOC()      // Sample time: [3.5714285714285717E-5s, 0.0s]
   {
-    real32_T rtb_velocity;
+    // local block i/o variables
+    ControlOutputs rtb_FOC;
+    ControlOuterOutputs rtb_TmpRTBAtFOCInport6;
+    EstimatedData rtb_RTBInsertedForAdapter_Inser;
+    SensorsData rtb_BusConversion_InsertedFor_F;
+    int8_T wrBufIdx;
 
-    // RateTransition generated from: '<S1>/Adapter1' incorporates:
+    // BusCreator generated from: '<S1>/FOC' incorporates:
     //   Inport: '<Root>/SensorsData_jointpositions_position'
-
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.jointpositions.position =
-      AMC_BLDC_U.SensorsData_jointpositions_posi;
-
-    // RateTransition generated from: '<S1>/Adapter1' incorporates:
     //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.motorsensors.Iabc[0] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.motorsensors.Iabc[1] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.motorsensors.Iabc[2] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
-
-    // RateTransition generated from: '<S1>/Adapter1' incorporates:
     //   Inport: '<Root>/SensorsData_motorsensors_angle'
-
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.motorsensors.angle =
-      AMC_BLDC_U.SensorsData_motorsensors_angle;
-
-    // RateTransition generated from: '<S1>/Adapter1' incorporates:
+    //   Inport: '<Root>/SensorsData_motorsensors_current'
+    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
     //   Inport: '<Root>/SensorsData_motorsensors_temperature'
-
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.motorsensors.temperature =
-      AMC_BLDC_U.SensorsData_motorsensors_temper;
-
-    // RateTransition generated from: '<S1>/Adapter1' incorporates:
     //   Inport: '<Root>/SensorsData_motorsensors_voltage'
 
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.motorsensors.voltage =
+    rtb_BusConversion_InsertedFor_F.jointpositions.position =
+      AMC_BLDC_U.SensorsData_jointpositions_posi;
+    rtb_BusConversion_InsertedFor_F.motorsensors.Iabc[0] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
+    rtb_BusConversion_InsertedFor_F.motorsensors.Iabc[1] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
+    rtb_BusConversion_InsertedFor_F.motorsensors.Iabc[2] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
+    rtb_BusConversion_InsertedFor_F.motorsensors.angle =
+      AMC_BLDC_U.SensorsData_motorsensors_angle;
+    rtb_BusConversion_InsertedFor_F.motorsensors.temperature =
+      AMC_BLDC_U.SensorsData_motorsensors_temper;
+    rtb_BusConversion_InsertedFor_F.motorsensors.voltage =
       AMC_BLDC_U.SensorsData_motorsensors_voltag;
-
-    // RateTransition generated from: '<S1>/Adapter1' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_current'
-
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.motorsensors.current =
+    rtb_BusConversion_InsertedFor_F.motorsensors.current =
       AMC_BLDC_U.SensorsData_motorsensors_curren;
-
-    // RateTransition generated from: '<S1>/Adapter1' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
-
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.motorsensors.hallABC =
+    rtb_BusConversion_InsertedFor_F.motorsensors.hallABC =
       AMC_BLDC_U.SensorsData_motorsensors_hallAB;
 
     // RateTransition generated from: '<S1>/Adapter5'
-    rtb_velocity = AMC_BLDC_DW.RTBInsertedForAdapter_InsertedF;
+    rtw_mutex_lock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_de =
+      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_d;
+    rtw_mutex_unlock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    rtb_RTBInsertedForAdapter_Inser =
+      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_j[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_de];
 
-    // BusCreator generated from: '<S1>/FOC'
-    AMC_BLDC_B.BusConversion_InsertedFor_FOC_i.jointvelocities.velocity =
-      rtb_velocity;
+    // RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_lock(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    AMC_BLDC_DW.TmpRTBAtFOCInport6_RDBuf =
+      AMC_BLDC_DW.TmpRTBAtFOCInport6_LstBufWR;
+    rtw_mutex_unlock(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    rtb_TmpRTBAtFOCInport6 =
+      AMC_BLDC_DW.TmpRTBAtFOCInport6_Buf[AMC_BLDC_DW.TmpRTBAtFOCInport6_RDBuf];
 
-    // RateTransition generated from: '<S1>/Adapter2'
-    AMC_BLDC_B.RTBInsertedForAdapter_Insert_io =
-      AMC_BLDC_B.RTBInsertedForAdapter_Insert_hb;
-
-    // RateTransition generated from: '<S1>/Adapter3'
-    AMC_BLDC_B.RTBInsertedForAdapter_InsertedF =
-      AMC_BLDC_B.RTBInsertedForAdapter_Inserte_k;
-
-    // RateTransition generated from: '<S1>/Adapter4'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_b =
-      AMC_BLDC_B.RTBInsertedForAdapter_Inserte_e;
+    // ModelReference: '<S1>/FOC'
+    AMC_BLDC_B.Flags_k.control_mode = ControlModes_Current;
+    FOCMDLOBJ1.step(&AMC_BLDC_B.Flags_k, &AMC_BLDC_B.ConfigurationParameters_m,
+                    &rtb_BusConversion_InsertedFor_F,
+                    &rtb_RTBInsertedForAdapter_Inser, &AMC_BLDC_B.Targets_n,
+                    &rtb_TmpRTBAtFOCInport6, &rtb_FOC);
+                    
+    // TODO: remove
+//    static char msg_t1[64] = {};
+//    static uint32_t counter_t1;
+//    if(counter_t1 % 1000 == 0)
+//    {
+//        sprintf(msg_t1, "[AMC_BLDC]: %f --> %p\n", AMC_BLDC_B.ConfigurationParameters_m.motorconfig.Vcc, &AMC_BLDC_B.ConfigurationParameters_m);
+//        //snprintf(msg_t1, "%f --> %p\n", sizeof(msg_t1), AMC_BLDC_B.ConfigurationParameters_m.motorconfig.Vcc, &AMC_BLDC_B.ConfigurationParameters_m);
+//        embot::core::print(msg_t1);
+//        //hal_trace_puts(msg_t1);
+//        counter_t1 = 0;
+//    }
+//    counter_t1++;
 
     // RateTransition generated from: '<S1>/Adapter'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_m = AMC_BLDC_B.OuterControl;
-
-    // HiddenFcnCallGenerator: '<S1>/FOC'
-    // ModelReference generated from: '<S1>/FOC'
-    FOCMDLOBJ8.control_foc_ISR(&AMC_BLDC_B.RTBInsertedForAdapter_Insert_io,
-      &AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
-      &AMC_BLDC_B.BusConversion_InsertedFor_FOC_a,
-      &AMC_BLDC_B.BusConversion_InsertedFor_FOC_i,
-      &AMC_BLDC_B.RTBInsertedForAdapter_Inserte_b,
-      &AMC_BLDC_B.RTBInsertedForAdapter_Inserte_m, &AMC_BLDC_B.FOC);
-
-    // End of Outputs for HiddenFcnCallGenerator: '<S1>/FOC'
-
-    // RateTransition generated from: '<S4>/Adapter1'
-    if (AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_h == 0) {
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p[0] = AMC_BLDC_B.FOC.Vabc[0];
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p[1] = AMC_BLDC_B.FOC.Vabc[1];
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p[2] = AMC_BLDC_B.FOC.Vabc[2];
+    rtw_mutex_lock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l +
+      1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
     }
 
-    // End of RateTransition generated from: '<S4>/Adapter1'
-
-    // RateTransition generated from: '<S4>/Adapter6'
-    if (AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l == 0) {
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[0] = AMC_BLDC_B.FOC.Vabc[0];
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[1] = AMC_BLDC_B.FOC.Vabc[1];
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[2] = AMC_BLDC_B.FOC.Vabc[2];
+    if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_lf) {
+      wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+      if (wrBufIdx == 3) {
+        wrBufIdx = 0;
+      }
     }
 
-    // End of RateTransition generated from: '<S4>/Adapter6'
+    rtw_mutex_unlock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    switch (wrBufIdx) {
+     case 0:
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedF = rtb_FOC;
+      break;
 
-    // Outport: '<Root>/ControlOutputs_Vabc'
-    AMC_BLDC_Y.ControlOutputs_Vabc[0] = AMC_BLDC_B.FOC.Vabc[0];
-    AMC_BLDC_Y.ControlOutputs_Vabc[1] = AMC_BLDC_B.FOC.Vabc[1];
-    AMC_BLDC_Y.ControlOutputs_Vabc[2] = AMC_BLDC_B.FOC.Vabc[2];
+     case 1:
+      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m = rtb_FOC;
+      break;
 
-    // Outport: '<Root>/ControlOutputs_Iq_fbk_current'
-    AMC_BLDC_Y.ControlOutputs_Iq_fbk_current = AMC_BLDC_B.FOC.Iq_fbk.current;
+     case 2:
+      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_b = rtb_FOC;
+      break;
+    }
+
+    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l = wrBufIdx;
+
+    // End of RateTransition generated from: '<S1>/Adapter'
   }
 
   // Model step function for TID1
-  void AMC_BLDC::step_CAN_RX_raw2struct() // Explicit Task: CAN_RX_raw2struct.D1 
+  void AMC_BLDC::step_Time()           // Sample time: [0.001s, 0.0s]
   {
     // local block i/o variables
-    BUS_CAN_RX rtb_pck_rx_struct;
+    ControlOuterOutputs rtb_OuterControl;
     BUS_CAN rtb_BusConversion_InsertedFor_C;
+    SensorsData rtb_BusConversion_InsertedFor_O;
+    int8_T wrBufIdx;
+
+    // BusCreator generated from: '<S1>/OuterControl' incorporates:
+    //   Inport: '<Root>/SensorsData_jointpositions_position'
+    //   Inport: '<Root>/SensorsData_motorsensors_angle'
+    //   Inport: '<Root>/SensorsData_motorsensors_current'
+    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
+    //   Inport: '<Root>/SensorsData_motorsensors_temperature'
+    //   Inport: '<Root>/SensorsData_motorsensors_voltage'
+
+    rtb_BusConversion_InsertedFor_O.jointpositions.position =
+      AMC_BLDC_U.SensorsData_jointpositions_posi;
+    rtb_BusConversion_InsertedFor_O.motorsensors.angle =
+      AMC_BLDC_U.SensorsData_motorsensors_angle;
+    rtb_BusConversion_InsertedFor_O.motorsensors.temperature =
+      AMC_BLDC_U.SensorsData_motorsensors_temper;
+    rtb_BusConversion_InsertedFor_O.motorsensors.voltage =
+      AMC_BLDC_U.SensorsData_motorsensors_voltag;
+    rtb_BusConversion_InsertedFor_O.motorsensors.current =
+      AMC_BLDC_U.SensorsData_motorsensors_curren;
+    rtb_BusConversion_InsertedFor_O.motorsensors.hallABC =
+      AMC_BLDC_U.SensorsData_motorsensors_hallAB;
+
+    // BusCreator generated from: '<S2>/Estimation_Velocity' incorporates:
+    //   Inport: '<Root>/SensorsData_jointpositions_position'
+
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.jointpositions.position =
+      AMC_BLDC_U.SensorsData_jointpositions_posi;
+
+    // BusCreator generated from: '<S1>/OuterControl' incorporates:
+    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
+
+    rtb_BusConversion_InsertedFor_O.motorsensors.Iabc[0] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
+
+    // BusCreator generated from: '<S2>/Estimation_Velocity' incorporates:
+    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
+
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.motorsensors.Iabc[0] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
+
+    // BusCreator generated from: '<S1>/OuterControl' incorporates:
+    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
+
+    rtb_BusConversion_InsertedFor_O.motorsensors.Iabc[1] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
+
+    // BusCreator generated from: '<S2>/Estimation_Velocity' incorporates:
+    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
+
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.motorsensors.Iabc[1] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
+
+    // BusCreator generated from: '<S1>/OuterControl' incorporates:
+    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
+
+    rtb_BusConversion_InsertedFor_O.motorsensors.Iabc[2] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
+
+    // BusCreator generated from: '<S2>/Estimation_Velocity' incorporates:
+    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
+    //   Inport: '<Root>/SensorsData_motorsensors_angle'
+    //   Inport: '<Root>/SensorsData_motorsensors_current'
+    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
+    //   Inport: '<Root>/SensorsData_motorsensors_temperature'
+    //   Inport: '<Root>/SensorsData_motorsensors_voltage'
+
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.motorsensors.Iabc[2] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.motorsensors.angle =
+      AMC_BLDC_U.SensorsData_motorsensors_angle;
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.motorsensors.temperature =
+      AMC_BLDC_U.SensorsData_motorsensors_temper;
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.motorsensors.voltage =
+      AMC_BLDC_U.SensorsData_motorsensors_voltag;
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.motorsensors.current =
+      AMC_BLDC_U.SensorsData_motorsensors_curren;
+    AMC_BLDC_B.BusConversion_InsertedFor_Estim.motorsensors.hallABC =
+      AMC_BLDC_U.SensorsData_motorsensors_hallAB;
+
+    // ModelReference: '<S2>/Estimation_Velocity' incorporates:
+    //   Outport: '<Root>/EstimatedData'
+
+    Estimation_VelocityMDLOBJ3.step(AMC_BLDC_B.BusConversion_InsertedFor_Estim,
+      AMC_BLDC_Y.EstimatedData_p);
+
+    // RateTransition generated from: '<S1>/Adapter'
+    rtw_mutex_lock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_lf =
+      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l;
+    rtw_mutex_unlock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    switch (AMC_BLDC_DW.RTBInsertedForAdapter_Insert_lf) {
+     case 0:
+      // Outport: '<Root>/ControlOutputs'
+      AMC_BLDC_Y.ControlOutputs_p = AMC_BLDC_DW.RTBInsertedForAdapter_InsertedF;
+      break;
+
+     case 1:
+      // Outport: '<Root>/ControlOutputs'
+      AMC_BLDC_Y.ControlOutputs_p = AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m;
+      break;
+
+     case 2:
+      // Outport: '<Root>/ControlOutputs'
+      AMC_BLDC_Y.ControlOutputs_p = AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_b;
+      break;
+    }
+
+    // End of RateTransition generated from: '<S1>/Adapter'
+
+    // BusCreator generated from: '<S4>/SupervisorFSM_RX' incorporates:
+    //   Inport: '<Root>/SensorsData_jointpositions_position'
+
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.jointpositions.position =
+      AMC_BLDC_U.SensorsData_jointpositions_posi;
+
+    // BusCreator generated from: '<S4>/SupervisorFSM_RX' incorporates:
+    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
+    //   Inport: '<Root>/SensorsData_motorsensors_angle'
+    //   Inport: '<Root>/SensorsData_motorsensors_current'
+    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
+    //   Inport: '<Root>/SensorsData_motorsensors_temperature'
+    //   Inport: '<Root>/SensorsData_motorsensors_voltage'
+
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.Iabc[0] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.Iabc[1] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.Iabc[2] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.angle =
+      AMC_BLDC_U.SensorsData_motorsensors_angle;
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.temperature =
+      AMC_BLDC_U.SensorsData_motorsensors_temper;
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.voltage =
+      AMC_BLDC_U.SensorsData_motorsensors_voltag;
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.current =
+      AMC_BLDC_U.SensorsData_motorsensors_curren;
+    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.hallABC =
+      AMC_BLDC_U.SensorsData_motorsensors_hallAB;
 
     // BusCreator generated from: '<S3>/CAN_RX_raw2struct' incorporates:
     //   Inport: '<Root>/PacketsRx_available'
@@ -167,462 +310,217 @@ namespace amc_bldc_codegen
     // End of BusCreator generated from: '<S3>/CAN_RX_raw2struct'
 
     // ModelReference: '<S3>/CAN_RX_raw2struct'
-    CAN_RX_raw2structMDLOBJ5.step(rtb_BusConversion_InsertedFor_C,
-      rtb_pck_rx_struct);
+    CAN_RX_raw2structMDLOBJ6.step(rtb_BusConversion_InsertedFor_C,
+      AMC_BLDC_B.pck_rx_struct);
 
-    // RateTransition generated from: '<S3>/CAN_Decoder'
-    AMC_BLDC_B.TmpRTBAtCAN_DecoderInport1 = rtb_pck_rx_struct;
-  }
-
-  // Model step function for TID2
-  void AMC_BLDC::step_CAN_Decoder()    // Explicit Task: CAN_Decoder.D1
-  {
     // ModelReference: '<S3>/CAN_Decoder'
-    CAN_DecoderMDLOBJ3.step(AMC_BLDC_B.TmpRTBAtCAN_DecoderInport1,
-      AMC_BLDC_B.CAN_Decoder_o1, AMC_BLDC_B.CAN_Decoder_o2,
-      AMC_BLDC_B.CAN_Decoder_o3);
-
-    // RateTransition generated from: '<S4>/Adapter2'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_i = AMC_BLDC_B.CAN_Decoder_o1;
-
-    // RateTransition generated from: '<S4>/Adapter3'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_o = AMC_BLDC_B.CAN_Decoder_o3;
-
-    // RateTransition generated from: '<S4>/Adapter5'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_f = AMC_BLDC_B.CAN_Decoder_o1;
-
-    // RateTransition generated from: '<S4>/Adapter'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inser_mdo = AMC_BLDC_B.CAN_Decoder_o2;
-  }
-
-  // Model step function for TID3
-  void AMC_BLDC::step_FOC_transitions() // Sample time: [0.001s, 0.0s]
-  {
-    // RateTransition generated from: '<S1>/OuterControl' incorporates:
-    //   Inport: '<Root>/SensorsData_jointpositions_position'
-    //   Inport: '<Root>/SensorsData_motorsensors_angle'
-    //   Inport: '<Root>/SensorsData_motorsensors_current'
-    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
-    //   Inport: '<Root>/SensorsData_motorsensors_temperature'
-    //   Inport: '<Root>/SensorsData_motorsensors_voltage'
-
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.jointpositions.position =
-      AMC_BLDC_U.SensorsData_jointpositions_posi;
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.motorsensors.angle =
-      AMC_BLDC_U.SensorsData_motorsensors_angle;
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.motorsensors.temperature =
-      AMC_BLDC_U.SensorsData_motorsensors_temper;
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.motorsensors.voltage =
-      AMC_BLDC_U.SensorsData_motorsensors_voltag;
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.motorsensors.current =
-      AMC_BLDC_U.SensorsData_motorsensors_curren;
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.motorsensors.hallABC =
-      AMC_BLDC_U.SensorsData_motorsensors_hallAB;
-
-    // RateTransition generated from: '<S2>/Estimation_Velocity' incorporates:
-    //   Inport: '<Root>/SensorsData_jointpositions_position'
-    //   Inport: '<Root>/SensorsData_motorsensors_angle'
-    //   Inport: '<Root>/SensorsData_motorsensors_current'
-    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
-    //   Inport: '<Root>/SensorsData_motorsensors_temperature'
-    //   Inport: '<Root>/SensorsData_motorsensors_voltage'
-
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.jointpositions.position =
-      AMC_BLDC_U.SensorsData_jointpositions_posi;
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.motorsensors.angle =
-      AMC_BLDC_U.SensorsData_motorsensors_angle;
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.motorsensors.temperature =
-      AMC_BLDC_U.SensorsData_motorsensors_temper;
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.motorsensors.voltage =
-      AMC_BLDC_U.SensorsData_motorsensors_voltag;
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.motorsensors.current =
-      AMC_BLDC_U.SensorsData_motorsensors_curren;
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.motorsensors.hallABC =
-      AMC_BLDC_U.SensorsData_motorsensors_hallAB;
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_jointpositions_position'
-
-    AMC_BLDC_B.position_o = AMC_BLDC_U.SensorsData_jointpositions_posi;
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_angle'
-
-    AMC_BLDC_B.angle_o = AMC_BLDC_U.SensorsData_motorsensors_angle;
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_temperature'
-
-    AMC_BLDC_B.temperature_i = AMC_BLDC_U.SensorsData_motorsensors_temper;
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_voltage'
-
-    AMC_BLDC_B.voltage_g = AMC_BLDC_U.SensorsData_motorsensors_voltag;
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_current'
-
-    AMC_BLDC_B.current_l = AMC_BLDC_U.SensorsData_motorsensors_curren;
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
-
-    AMC_BLDC_B.hallABC_c = AMC_BLDC_U.SensorsData_motorsensors_hallAB;
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_jointpositions_position'
-
-    AMC_BLDC_B.position = AMC_BLDC_U.SensorsData_jointpositions_posi;
-
-    // RateTransition generated from: '<S1>/OuterControl' incorporates:
-    //   BusCreator generated from: '<S1>/OuterControl'
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.motorsensors.Iabc[0] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
-
-    // RateTransition generated from: '<S2>/Estimation_Velocity' incorporates:
-    //   BusCreator generated from: '<S2>/Estimation_Velocity'
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.motorsensors.Iabc[0] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.Iabc_p[0] = AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.Iabc[0] = AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
-
-    // RateTransition generated from: '<S1>/OuterControl' incorporates:
-    //   BusCreator generated from: '<S1>/OuterControl'
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.motorsensors.Iabc[1] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
-
-    // RateTransition generated from: '<S2>/Estimation_Velocity' incorporates:
-    //   BusCreator generated from: '<S2>/Estimation_Velocity'
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.motorsensors.Iabc[1] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.Iabc_p[1] = AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.Iabc[1] = AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
-
-    // RateTransition generated from: '<S1>/OuterControl' incorporates:
-    //   BusCreator generated from: '<S1>/OuterControl'
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.TmpRTBAtOuterControlInport4.motorsensors.Iabc[2] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
-
-    // RateTransition generated from: '<S2>/Estimation_Velocity' incorporates:
-    //   BusCreator generated from: '<S2>/Estimation_Velocity'
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo.motorsensors.Iabc[2] =
-      AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
-
-    // RateTransition generated from: '<S4>/Adapter4' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.Iabc_p[2] = AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
-
-    AMC_BLDC_B.Iabc[2] = AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_angle'
-
-    AMC_BLDC_B.angle = AMC_BLDC_U.SensorsData_motorsensors_angle;
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_temperature'
-
-    AMC_BLDC_B.temperature = AMC_BLDC_U.SensorsData_motorsensors_temper;
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_voltage'
-
-    AMC_BLDC_B.voltage = AMC_BLDC_U.SensorsData_motorsensors_voltag;
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_current'
-
-    AMC_BLDC_B.current = AMC_BLDC_U.SensorsData_motorsensors_curren;
-
-    // RateTransition generated from: '<S4>/Component' incorporates:
-    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
-
-    AMC_BLDC_B.hallABC = AMC_BLDC_U.SensorsData_motorsensors_hallAB;
-  }
-
-  // Model step function for TID4
-  void AMC_BLDC::step_Estimation_Velocity() // Explicit Task: Estimation_Velocity.D1 
-  {
-    // local block i/o variables
-    EstimatedData rtb_Estimation_Velocity;
-
-    // ModelReference: '<S2>/Estimation_Velocity'
-    Estimation_VelocityMDLOBJ2.step(AMC_BLDC_B.TmpRTBAtEstimation_VelocityInpo,
-      rtb_Estimation_Velocity);
-
-    // Outport: '<Root>/EstimatedData' incorporates:
-    //   RateTransition generated from: '<S2>/Adapter'
-
-    AMC_BLDC_Y.EstimatedData_p = rtb_Estimation_Velocity;
-  }
-
-  // Model step function for TID5
-  void AMC_BLDC::step_SupervisorFSM_RX() // Explicit Task: SupervisorFSM_RX.D1
-  {
-    real32_T rtb_Vabc[3];
-    real32_T rtb_current_f;
-
-    // BusCreator generated from: '<S4>/SupervisorFSM_RX'
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.jointpositions.position =
-      AMC_BLDC_B.position;
-
-    // BusCreator generated from: '<S4>/SupervisorFSM_RX'
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.Iabc[0] =
-      AMC_BLDC_B.Iabc[0];
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.Iabc[1] =
-      AMC_BLDC_B.Iabc[1];
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.Iabc[2] =
-      AMC_BLDC_B.Iabc[2];
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.angle =
-      AMC_BLDC_B.angle;
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.temperature =
-      AMC_BLDC_B.temperature;
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.voltage =
-      AMC_BLDC_B.voltage;
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.current =
-      AMC_BLDC_B.current;
-    AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.hallABC =
-      AMC_BLDC_B.hallABC;
-
-    // RateTransition generated from: '<S4>/Adapter1'
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_h = 1;
-    rtb_Vabc[0] = AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p[0];
-    rtb_Vabc[1] = AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p[1];
-    rtb_Vabc[2] = AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p[2];
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_h = 0;
-
-    // RateTransition generated from: '<S4>/Adapter1'
-    rtb_current_f = AMC_BLDC_B.FOC.Iq_fbk.current;
-
-    // BusCreator generated from: '<S4>/SupervisorFSM_RX'
-    AMC_BLDC_B.BusConversion_InsertedFor_Sup_j.Iq_fbk.current = rtb_current_f;
-
-    // BusCreator generated from: '<S4>/SupervisorFSM_RX'
-    AMC_BLDC_B.BusConversion_InsertedFor_Sup_j.Vabc[0] = rtb_Vabc[0];
-    AMC_BLDC_B.BusConversion_InsertedFor_Sup_j.Vabc[1] = rtb_Vabc[1];
-    AMC_BLDC_B.BusConversion_InsertedFor_Sup_j.Vabc[2] = rtb_Vabc[2];
-
-    // ModelReference: '<S4>/SupervisorFSM_RX'
-    SupervisorFSM_RXMDLOBJ6.step(AMC_BLDC_B.RTBInsertedForAdapter_Inser_mdo,
-      AMC_BLDC_B.RTBInsertedForAdapter_Inserte_i,
-      AMC_BLDC_B.RTBInsertedForAdapter_Inserte_o,
-      AMC_BLDC_B.RTBInsertedForAdapter_Insert_il,
-      AMC_BLDC_B.BusConversion_InsertedFor_Super,
-      AMC_BLDC_B.BusConversion_InsertedFor_Sup_j, AMC_BLDC_B.Targets_n,
-      AMC_BLDC_B.ConfigurationParameters_m, AMC_BLDC_B.Flags_k);
-
-    // RateTransition generated from: '<S4>/Adapter12'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_k =
-      AMC_BLDC_B.ConfigurationParameters_m;
-
-    // RateTransition generated from: '<S4>/Adapter8'
-    AMC_BLDC_B.RTBInsertedForAdapter_Insert_hb = AMC_BLDC_B.Flags_k;
-
-    // RateTransition generated from: '<S4>/Adapter9'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_e = AMC_BLDC_B.Targets_n;
-  }
-
-  // Model step function for TID6
-  void AMC_BLDC::step_OuterControl()   // Explicit Task: OuterControl.D1
-  {
-    // ModelReference: '<S1>/OuterControl' incorporates:
+    CAN_DecoderMDLOBJ4.step(AMC_BLDC_B.pck_rx_struct, AMC_BLDC_B.CAN_Decoder_o1,
+      AMC_BLDC_B.CAN_Decoder_o2, AMC_BLDC_B.CAN_Decoder_o3);
+
+    // ModelReference: '<S4>/SupervisorFSM_RX' incorporates:
+    //   Outport: '<Root>/ControlOutputs'
     //   Outport: '<Root>/EstimatedData'
 
-    OuterControlMDLOBJ1.step(AMC_BLDC_B.RTBInsertedForAdapter_Insert_hb,
-      AMC_BLDC_B.RTBInsertedForAdapter_Inserte_k,
-      AMC_BLDC_B.RTBInsertedForAdapter_Inserte_e,
-      AMC_BLDC_B.TmpRTBAtOuterControlInport4, AMC_BLDC_Y.EstimatedData_p,
-      AMC_BLDC_B.OuterControl);
+    SupervisorFSM_RXMDLOBJ7.step(AMC_BLDC_B.CAN_Decoder_o2,
+      AMC_BLDC_B.CAN_Decoder_o1, AMC_BLDC_B.CAN_Decoder_o3,
+      AMC_BLDC_Y.EstimatedData_p, AMC_BLDC_B.BusConversion_InsertedFor_Super,
+      AMC_BLDC_Y.ControlOutputs_p, AMC_BLDC_B.Targets_n,
+      AMC_BLDC_B.ConfigurationParameters_m, AMC_BLDC_B.Flags_k);
+
+    // ModelReference: '<S1>/OuterControl' incorporates:
+    //   Outport: '<Root>/EstimatedData'
+    
+    AMC_BLDC_B.Flags_k.control_mode = ControlModes_Current;
+
+    OuterControlMDLOBJ2.step(AMC_BLDC_B.Flags_k,
+      AMC_BLDC_B.ConfigurationParameters_m, AMC_BLDC_B.Targets_n,
+      rtb_BusConversion_InsertedFor_O, AMC_BLDC_Y.EstimatedData_p,
+      rtb_OuterControl);
+
+    // RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_lock(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.TmpRTBAtFOCInport6_LstBufWR + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+
+    if (wrBufIdx == AMC_BLDC_DW.TmpRTBAtFOCInport6_RDBuf) {
+      wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+      if (wrBufIdx == 3) {
+        wrBufIdx = 0;
+      }
+    }
+
+    rtw_mutex_unlock(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    AMC_BLDC_DW.TmpRTBAtFOCInport6_Buf[wrBufIdx] = rtb_OuterControl;
+    AMC_BLDC_DW.TmpRTBAtFOCInport6_LstBufWR = wrBufIdx;
+
+    // End of RateTransition generated from: '<S1>/FOC'
+
+    // BusCreator generated from: '<S4>/SupervisorFSM_TX' incorporates:
+    //   Inport: '<Root>/SensorsData_jointpositions_position'
+    //   Inport: '<Root>/SensorsData_motorsensors_Iabc'
+    //   Inport: '<Root>/SensorsData_motorsensors_angle'
+    //   Inport: '<Root>/SensorsData_motorsensors_current'
+    //   Inport: '<Root>/SensorsData_motorsensors_hallABC'
+    //   Inport: '<Root>/SensorsData_motorsensors_temperature'
+    //   Inport: '<Root>/SensorsData_motorsensors_voltage'
+
+    rtb_BusConversion_InsertedFor_O.jointpositions.position =
+      AMC_BLDC_U.SensorsData_jointpositions_posi;
+    rtb_BusConversion_InsertedFor_O.motorsensors.Iabc[0] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[0];
+    rtb_BusConversion_InsertedFor_O.motorsensors.Iabc[1] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[1];
+    rtb_BusConversion_InsertedFor_O.motorsensors.Iabc[2] =
+      AMC_BLDC_U.SensorsData_motorsensors_Iabc[2];
+    rtb_BusConversion_InsertedFor_O.motorsensors.angle =
+      AMC_BLDC_U.SensorsData_motorsensors_angle;
+    rtb_BusConversion_InsertedFor_O.motorsensors.temperature =
+      AMC_BLDC_U.SensorsData_motorsensors_temper;
+    rtb_BusConversion_InsertedFor_O.motorsensors.voltage =
+      AMC_BLDC_U.SensorsData_motorsensors_voltag;
+    rtb_BusConversion_InsertedFor_O.motorsensors.current =
+      AMC_BLDC_U.SensorsData_motorsensors_curren;
+    rtb_BusConversion_InsertedFor_O.motorsensors.hallABC =
+      AMC_BLDC_U.SensorsData_motorsensors_hallAB;
+
+    // ModelReference: '<S4>/SupervisorFSM_TX' incorporates:
+    //   Outport: '<Root>/ControlOutputs'
+    //   Outport: '<Root>/EstimatedData'
+
+    SupervisorFSM_TXMDLOBJ8.step(AMC_BLDC_B.CAN_Decoder_o1,
+      rtb_BusConversion_InsertedFor_O, AMC_BLDC_Y.EstimatedData_p,
+      AMC_BLDC_Y.ControlOutputs_p, AMC_BLDC_B.MessagesTx,
+      AMC_BLDC_B.SupervisorFSM_TX_o2);
+
+    // ModelReference: '<S3>/CAN_Encoder' incorporates:
+    //   Outport: '<Root>/PacketsTx'
+
+    CAN_EncoderMDLOBJ5.step(AMC_BLDC_B.MessagesTx,
+      AMC_BLDC_B.SupervisorFSM_TX_o2, AMC_BLDC_Y.PacketsTx);
 
     // RateTransition generated from: '<S1>/Adapter5' incorporates:
     //   Outport: '<Root>/EstimatedData'
 
-    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedF =
-      AMC_BLDC_Y.EstimatedData_p.jointvelocities.velocity;
+    rtw_mutex_lock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_d +
+      1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
 
-    // RateTransition generated from: '<S4>/Adapter11' incorporates:
-    //   Outport: '<Root>/EstimatedData'
+    if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_de) {
+      wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+      if (wrBufIdx == 3) {
+        wrBufIdx = 0;
+      }
+    }
 
-    AMC_BLDC_B.sensorsdata = AMC_BLDC_Y.EstimatedData_p;
+    rtw_mutex_unlock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_j[wrBufIdx] =
+      AMC_BLDC_Y.EstimatedData_p;
+    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_d = wrBufIdx;
 
-    // RateTransition generated from: '<S4>/Component1' incorporates:
-    //   Outport: '<Root>/EstimatedData'
-
-    AMC_BLDC_B.RTBInsertedForAdapter_Insert_il = AMC_BLDC_Y.EstimatedData_p;
-  }
-
-  // Model step function for TID7
-  void AMC_BLDC::step_SupervisorFSM_TX() // Explicit Task: SupervisorFSM_TX.D1
-  {
-    ControlOutputs rtb_BusConversion_InsertedFor_l;
-    SensorsData rtb_BusConversion_InsertedFor_S;
-    real32_T rtb_current_m;
-
-    // BusCreator generated from: '<S4>/SupervisorFSM_TX'
-    rtb_BusConversion_InsertedFor_S.jointpositions.position =
-      AMC_BLDC_B.position_o;
-    rtb_BusConversion_InsertedFor_S.motorsensors.Iabc[0] = AMC_BLDC_B.Iabc_p[0];
-    rtb_BusConversion_InsertedFor_S.motorsensors.Iabc[1] = AMC_BLDC_B.Iabc_p[1];
-    rtb_BusConversion_InsertedFor_S.motorsensors.Iabc[2] = AMC_BLDC_B.Iabc_p[2];
-    rtb_BusConversion_InsertedFor_S.motorsensors.angle = AMC_BLDC_B.angle_o;
-    rtb_BusConversion_InsertedFor_S.motorsensors.temperature =
-      AMC_BLDC_B.temperature_i;
-    rtb_BusConversion_InsertedFor_S.motorsensors.voltage = AMC_BLDC_B.voltage_g;
-    rtb_BusConversion_InsertedFor_S.motorsensors.current = AMC_BLDC_B.current_l;
-    rtb_BusConversion_InsertedFor_S.motorsensors.hallABC = AMC_BLDC_B.hallABC_c;
-
-    // RateTransition generated from: '<S4>/Adapter6'
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l = 1;
-    rtb_BusConversion_InsertedFor_l.Vabc[0] =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[0];
-    rtb_BusConversion_InsertedFor_l.Vabc[1] =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[1];
-    rtb_BusConversion_InsertedFor_l.Vabc[2] =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[2];
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l = 0;
-
-    // RateTransition generated from: '<S4>/Adapter6'
-    rtb_current_m = AMC_BLDC_B.FOC.Iq_fbk.current;
-
-    // BusCreator generated from: '<S4>/SupervisorFSM_TX'
-    rtb_BusConversion_InsertedFor_l.Iq_fbk.current = rtb_current_m;
-
-    // ModelReference: '<S4>/SupervisorFSM_TX'
-    SupervisorFSM_TXMDLOBJ7.step(AMC_BLDC_B.RTBInsertedForAdapter_Inserte_f,
-      rtb_BusConversion_InsertedFor_S, AMC_BLDC_B.sensorsdata,
-      rtb_BusConversion_InsertedFor_l, AMC_BLDC_B.MessagesTx,
-      AMC_BLDC_B.SupervisorFSM_TX_o2);
-
-    // RateTransition generated from: '<S4>/Adapter10'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_h = AMC_BLDC_B.MessagesTx;
-
-    // RateTransition generated from: '<S4>/Adapter7'
-    AMC_BLDC_B.RTBInsertedForAdapter_Insert_it = AMC_BLDC_B.SupervisorFSM_TX_o2;
-  }
-
-  // Model step function for TID8
-  void AMC_BLDC::step_CAN_Encoder()    // Explicit Task: CAN_Encoder.D1
-  {
-    // ModelReference: '<S3>/CAN_Encoder' incorporates:
-    //   Outport: '<Root>/PacketsTx'
-
-    CAN_EncoderMDLOBJ4.step(AMC_BLDC_B.RTBInsertedForAdapter_Inserte_h,
-      AMC_BLDC_B.RTBInsertedForAdapter_Insert_it, AMC_BLDC_Y.PacketsTx);
+    // End of RateTransition generated from: '<S1>/Adapter5'
   }
 
   // Model initialize function
   void AMC_BLDC::initialize()
   {
+    // Model Initialize function for ModelReference Block: '<S1>/FOC'
+
+    // Set error status pointer for ModelReference Block: '<S1>/FOC'
+    FOCMDLOBJ1.setErrorStatusPointer(rtmGetErrorStatusPointer((&AMC_BLDC_M)));
+    FOCMDLOBJ1.initialize();
+
     // Model Initialize function for ModelReference Block: '<S1>/OuterControl'
 
     // Set error status pointer for ModelReference Block: '<S1>/OuterControl'
-    OuterControlMDLOBJ1.setErrorStatusPointer(rtmGetErrorStatusPointer
+    OuterControlMDLOBJ2.setErrorStatusPointer(rtmGetErrorStatusPointer
       ((&AMC_BLDC_M)));
-    OuterControlMDLOBJ1.initialize();
+    OuterControlMDLOBJ2.initialize();
 
     // Model Initialize function for ModelReference Block: '<S2>/Estimation_Velocity' 
 
     // Set error status pointer for ModelReference Block: '<S2>/Estimation_Velocity' 
-    Estimation_VelocityMDLOBJ2.setErrorStatusPointer(rtmGetErrorStatusPointer
+    Estimation_VelocityMDLOBJ3.setErrorStatusPointer(rtmGetErrorStatusPointer
       ((&AMC_BLDC_M)));
-    Estimation_VelocityMDLOBJ2.initialize();
+    Estimation_VelocityMDLOBJ3.initialize();
 
     // Model Initialize function for ModelReference Block: '<S3>/CAN_Decoder'
 
     // Set error status pointer for ModelReference Block: '<S3>/CAN_Decoder'
-    CAN_DecoderMDLOBJ3.setErrorStatusPointer(rtmGetErrorStatusPointer
+    CAN_DecoderMDLOBJ4.setErrorStatusPointer(rtmGetErrorStatusPointer
       ((&AMC_BLDC_M)));
 
     // Model Initialize function for ModelReference Block: '<S3>/CAN_Encoder'
 
     // Set error status pointer for ModelReference Block: '<S3>/CAN_Encoder'
-    CAN_EncoderMDLOBJ4.setErrorStatusPointer(rtmGetErrorStatusPointer
+    CAN_EncoderMDLOBJ5.setErrorStatusPointer(rtmGetErrorStatusPointer
       ((&AMC_BLDC_M)));
-    CAN_EncoderMDLOBJ4.initialize();
+    CAN_EncoderMDLOBJ5.initialize();
 
     // Model Initialize function for ModelReference Block: '<S3>/CAN_RX_raw2struct' 
 
     // Set error status pointer for ModelReference Block: '<S3>/CAN_RX_raw2struct' 
-    CAN_RX_raw2structMDLOBJ5.setErrorStatusPointer(rtmGetErrorStatusPointer
+    CAN_RX_raw2structMDLOBJ6.setErrorStatusPointer(rtmGetErrorStatusPointer
       ((&AMC_BLDC_M)));
 
     // Model Initialize function for ModelReference Block: '<S4>/SupervisorFSM_RX' 
 
     // Set error status pointer for ModelReference Block: '<S4>/SupervisorFSM_RX' 
-    SupervisorFSM_RXMDLOBJ6.setErrorStatusPointer(rtmGetErrorStatusPointer
+    SupervisorFSM_RXMDLOBJ7.setErrorStatusPointer(rtmGetErrorStatusPointer
       ((&AMC_BLDC_M)));
 
     // Model Initialize function for ModelReference Block: '<S4>/SupervisorFSM_TX' 
 
     // Set error status pointer for ModelReference Block: '<S4>/SupervisorFSM_TX' 
-    SupervisorFSM_TXMDLOBJ7.setErrorStatusPointer(rtmGetErrorStatusPointer
+    SupervisorFSM_TXMDLOBJ8.setErrorStatusPointer(rtmGetErrorStatusPointer
       ((&AMC_BLDC_M)));
 
-    // Model Initialize function for ModelReference Block: '<S1>/FOC'
+    // Start for RateTransition generated from: '<S1>/Adapter5'
+    rtw_mutex_init(&AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
 
-    // Set error status pointer for ModelReference Block: '<S1>/FOC'
-    FOCMDLOBJ8.setErrorStatusPointer(rtmGetErrorStatusPointer((&AMC_BLDC_M)));
-    FOCMDLOBJ8.initialize();
+    // Start for RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_init(&AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
 
-    // SystemInitialize for ModelReference generated from: '<S1>/FOC'
-    FOCMDLOBJ8.init();
+    // Start for RateTransition generated from: '<S1>/Adapter'
+    rtw_mutex_init(&AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+
+    // SystemInitialize for ModelReference: '<S1>/FOC'
+    FOCMDLOBJ1.init();
 
     // SystemInitialize for ModelReference: '<S1>/OuterControl'
-    OuterControlMDLOBJ1.init();
+    OuterControlMDLOBJ2.init();
 
     // SystemInitialize for ModelReference: '<S2>/Estimation_Velocity'
-    Estimation_VelocityMDLOBJ2.init();
+    Estimation_VelocityMDLOBJ3.init();
 
     // SystemInitialize for ModelReference: '<S3>/CAN_Decoder'
-    CAN_DecoderMDLOBJ3.init(&AMC_BLDC_B.CAN_Decoder_o1,
+    CAN_DecoderMDLOBJ4.init(&AMC_BLDC_B.CAN_Decoder_o1,
       &AMC_BLDC_B.CAN_Decoder_o2, &AMC_BLDC_B.CAN_Decoder_o3);
 
     // SystemInitialize for ModelReference: '<S4>/SupervisorFSM_RX'
-    SupervisorFSM_RXMDLOBJ6.init(&AMC_BLDC_B.Flags_k, &AMC_BLDC_B.Targets_n,
+    SupervisorFSM_RXMDLOBJ7.init(&AMC_BLDC_B.Flags_k, &AMC_BLDC_B.Targets_n,
       &AMC_BLDC_B.ConfigurationParameters_m);
 
     // SystemInitialize for ModelReference: '<S4>/SupervisorFSM_TX'
-    SupervisorFSM_TXMDLOBJ7.init(&AMC_BLDC_B.MessagesTx,
+    SupervisorFSM_TXMDLOBJ8.init(&AMC_BLDC_B.MessagesTx,
       &AMC_BLDC_B.SupervisorFSM_TX_o2);
   }
 
   // Model terminate function
   void AMC_BLDC::terminate()
   {
-    // (no terminate code required)
+    // Terminate for RateTransition generated from: '<S1>/Adapter5'
+    rtw_mutex_destroy(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+
+    // Terminate for RateTransition generated from: '<S1>/FOC'
+    rtw_mutex_destroy(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+
+    // Terminate for RateTransition generated from: '<S1>/Adapter'
+    rtw_mutex_destroy(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
   }
 
   // Constructor

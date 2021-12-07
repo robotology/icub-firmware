@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.76
+// Model version                  : 3.93
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu Dec  2 09:39:37 2021
+// C/C++ source code generated on : Tue Dec  7 09:16:47 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -331,19 +331,6 @@ struct BUS_CAN
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
-
-// Aggregate of all events specifying types of received messages.
-struct BUS_EVENTS_RX
-{
-  boolean_T control_mode;
-  boolean_T current_limit;
-  boolean_T desired_current;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
 #define DEFINED_TYPEDEF_FOR_MCControlModes_
 
@@ -413,6 +400,19 @@ struct BUS_MESSAGES_RX
   BUS_MSG_CONTROL_MODE control_mode;
   BUS_MSG_CURRENT_LIMIT current_limit;
   BUS_MSG_DESIRED_CURRENT desired_current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+
+// Aggregate of all events specifying types of received messages.
+struct BUS_EVENTS_RX
+{
+  boolean_T control_mode;
+  boolean_T current_limit;
+  boolean_T desired_current;
 };
 
 #endif

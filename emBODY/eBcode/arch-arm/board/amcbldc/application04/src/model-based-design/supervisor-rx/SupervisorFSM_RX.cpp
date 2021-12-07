@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.99
+// Model version                  : 3.103
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Dec  1 10:58:11 2021
+// C/C++ source code generated on : Tue Dec  7 09:15:45 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -39,8 +39,8 @@ const uint8_T SupervisorFSM_RX_IN_Position = 5U;
 const uint8_T SupervisorFSM_RX_IN_Velocity = 6U;
 const uint8_T SupervisorFSM_RX_IN_Voltage = 7U;
 const uint8_T SupervisorFSM__IN_ButtonPressed = 1U;
-const uint8_T SupervisorFSM__IN_NotConfigured = 3U;
-const uint8_T SupervisorFS_IN_NotConfigured_o = 4U;
+const uint8_T SupervisorFSM__IN_NotConfigured = 4U;
+const uint8_T SupervisorFS_IN_NotConfigured_o = 3U;
 const uint8_T SupervisorF_IN_OverCurrentFault = 3U;
 const int32_T SupervisorF_event_setLimitEvent = 8;
 namespace amc_bldc_codegen
@@ -216,7 +216,7 @@ namespace amc_bldc_codegen
           SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx) &&
           (!SupervisorFS_isConfigurationSet())) {
         SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
-          SupervisorFS_IN_NotConfigured_o;
+          SupervisorFSM__IN_NotConfigured;
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_NotConfigured;
@@ -277,7 +277,7 @@ namespace amc_bldc_codegen
       }
       break;
 
-     case SupervisorFS_IN_NotConfigured_o:
+     case SupervisorFSM__IN_NotConfigured:
       if (SupervisorFSM_RX_IsBoardReady() && SupervisorFS_isConfigurationSet())
       {
         SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_Idle;
@@ -584,17 +584,21 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.EventsRx_current_limit_start =
         arg_EventsRx.current_limit;
       SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX = 1U;
+      arg_Output.motorconfig.Kp = 2.0F / 5.0F;
+      arg_Output.motorconfig.Ki = 500.0F / 5.0F;
+      arg_Output.motorconfig.Vmax = 9.0F;
+      arg_Output.motorconfig.Vcc = 24.0F;
       SupervisorFSM_RX_DW.is_active_CAN_RX_HANDLER = 1U;
       SupervisorFSM_RX_DW.is_active_EVENT_DISPATCHER = 1U;
       SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
       SupervisorFSM_RX_DW.is_active_CONTROL_MODE_HANDLER = 1U;
       SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
-        SupervisorFS_IN_NotConfigured_o;
+        SupervisorFSM__IN_NotConfigured;
       arg_Flags.control_mode = ControlModes_NotConfigured;
       SupervisorFSM_RX_DW.is_active_LIMITS_HANDLER = 1U;
       SupervisorFSM_RX_DW.is_LIMITS_HANDLER = SupervisorFSM_RX_IN_Home;
       SupervisorFSM_RX_DW.is_active_STATE_HANDLER = 1U;
-      SupervisorFSM_RX_DW.is_STATE_HANDLER = SupervisorFSM__IN_NotConfigured;
+      SupervisorFSM_RX_DW.is_STATE_HANDLER = SupervisorFS_IN_NotConfigured_o;
       SupervisorFSM_RX_DW.BoardSt = BoardState_NotConfigured;
       SupervisorFSM_RX_DW.is_active_FAULT_HANDLER = 1U;
       SupervisorFSM_RX_DW.is_active_FaultBottomPressed = 1U;
@@ -623,8 +627,8 @@ namespace amc_bldc_codegen
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           } else if (SupervisorFSM_RX_DW.EventsRx_desired_current_prev !=
                      SupervisorFSM_RX_DW.EventsRx_desired_current_start) {
-            arg_Targets.motorcurrent.current =
-              arg_MessagesRx.desired_current.current;
+            arg_Targets.motorcurrent.current = 0.001F * static_cast<real32_T>
+              (arg_MessagesRx.desired_current.current);
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           } else if (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
                      SupervisorFSM_RX_DW.EventsRx_current_limit_start) {
@@ -676,7 +680,7 @@ namespace amc_bldc_codegen
           if (SupervisorFSM_RX_DW.sfEvent == Supe_event_OutOfBoardFaultEvent) {
             if (!SupervisorFSM_isBoardConfigured()) {
               SupervisorFSM_RX_DW.is_STATE_HANDLER =
-                SupervisorFSM__IN_NotConfigured;
+                SupervisorFS_IN_NotConfigured_o;
               SupervisorFSM_RX_DW.BoardSt = BoardState_NotConfigured;
             } else {
               SupervisorFSM_RX_DW.is_STATE_HANDLER =
@@ -686,7 +690,7 @@ namespace amc_bldc_codegen
           }
           break;
 
-         case SupervisorFSM__IN_NotConfigured:
+         case SupervisorFS_IN_NotConfigured_o:
           if (SupervisorFSM_RX_DW.sfEvent == Superviso_event_BoardFaultEvent) {
             SupervisorFSM_RX_DW.is_STATE_HANDLER = SupervisorFSM_RX_IN_Fault;
             SupervisorFSM_RX_DW.BoardSt = BoardState_Fault;

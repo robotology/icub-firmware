@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.70
+// Model version                  : 2.75
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Dec  1 10:58:48 2021
+// C/C++ source code generated on : Tue Dec  7 09:16:21 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -35,6 +35,31 @@ typedef enum {
   ControlModes_Torque,
   ControlModes_HwFaultCM
 } ControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
+#define DEFINED_TYPEDEF_FOR_MotorCurrent_
+
+struct MotorCurrent
+{
+  // motor current
+  real32_T current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlOutputs_
+#define DEFINED_TYPEDEF_FOR_ControlOutputs_
+
+struct ControlOutputs
+{
+  // control effort
+  real32_T Vabc[3];
+
+  // quadrature current
+  MotorCurrent Iq_fbk;
+};
 
 #endif
 
@@ -201,17 +226,6 @@ struct EstimatedData
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
-#define DEFINED_TYPEDEF_FOR_MotorCurrent_
-
-struct MotorCurrent
-{
-  // motor current
-  real32_T current;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_MotorVoltage_
 #define DEFINED_TYPEDEF_FOR_MotorVoltage_
 
@@ -245,20 +259,6 @@ struct ControlOuterOutputs
   boolean_T cur_en;
   boolean_T out_en;
   MotorCurrent motorcurrent;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ControlOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOutputs_
-
-struct ControlOutputs
-{
-  // control effort
-  real32_T Vabc[3];
-
-  // quadrature current
-  MotorCurrent Iq_fbk;
 };
 
 #endif

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.99
+// Model version                  : 3.103
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Dec  1 10:58:11 2021
+// C/C++ source code generated on : Tue Dec  7 09:15:45 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,8 +37,6 @@ namespace amc_bldc_codegen
       BoardState BoardSt;              // '<Root>/SupervisorFSM_RX'
       uint16_T CurrentLimit;           // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_c2_SupervisorFSM_RX;// '<Root>/SupervisorFSM_RX'
-      uint8_T is_STATE_HANDLER;        // '<Root>/SupervisorFSM_RX'
-      uint8_T is_active_STATE_HANDLER; // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_CAN_RX_HANDLER;// '<Root>/SupervisorFSM_RX'
       uint8_T is_EVENT_DISPATCHER;     // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_EVENT_DISPATCHER;// '<Root>/SupervisorFSM_RX'
@@ -46,6 +44,8 @@ namespace amc_bldc_codegen
       uint8_T is_active_CONTROL_MODE_HANDLER;// '<Root>/SupervisorFSM_RX'
       uint8_T is_LIMITS_HANDLER;       // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_LIMITS_HANDLER;// '<Root>/SupervisorFSM_RX'
+      uint8_T is_STATE_HANDLER;        // '<Root>/SupervisorFSM_RX'
+      uint8_T is_active_STATE_HANDLER; // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_FAULT_HANDLER; // '<Root>/SupervisorFSM_RX'
       uint8_T is_OverCurrent;          // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_OverCurrent;   // '<Root>/SupervisorFSM_RX'
