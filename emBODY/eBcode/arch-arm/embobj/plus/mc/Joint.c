@@ -413,7 +413,7 @@ BOOL Joint_check_faults(Joint* o)
             
             eOmc_motor_status_t *mstatus = NULL;
             mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            mstatus->fault_state_mask = descriptor.code;
+            mstatus->mc_fault_state = descriptor.code;
         }
         
         if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
@@ -428,7 +428,7 @@ BOOL Joint_check_faults(Joint* o)
             
             eOmc_motor_status_t *mstatus = NULL;
             mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            mstatus->fault_state_mask = descriptor.code;
+            mstatus->mc_fault_state = descriptor.code;
         }
         
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
