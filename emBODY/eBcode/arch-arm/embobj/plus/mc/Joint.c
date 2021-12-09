@@ -428,7 +428,10 @@ BOOL Joint_check_faults(Joint* o)
             
             eOmc_motor_status_t *mstatus = NULL;
             mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            mstatus->mc_fault_state = descriptor.code;
+            if (NULL != mstatus)
+            {
+                mstatus->mc_fault_state = descriptor.code;
+            }
         }
         
         o->fault_state_prec.bitmask = o->fault_state.bitmask;

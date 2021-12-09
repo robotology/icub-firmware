@@ -692,7 +692,10 @@ static void AbsEncoder_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_
     
     eOmc_motor_status_t *mstatus = NULL;
     mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), id);
-    mstatus->mc_fault_state = descriptor.code;
+    if (NULL != mstatus)
+    {
+        mstatus->mc_fault_state = descriptor.code;
+    }
 }
 
 BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
