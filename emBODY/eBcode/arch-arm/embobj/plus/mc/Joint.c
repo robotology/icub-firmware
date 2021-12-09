@@ -413,7 +413,10 @@ BOOL Joint_check_faults(Joint* o)
             
             eOmc_motor_status_t *mstatus = NULL;
             mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-            mstatus->mc_fault_state = descriptor.code;
+            if (NULL != mstatus)
+            {
+                mstatus->mc_fault_state = descriptor.code;
+            }
         }
         
         if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
