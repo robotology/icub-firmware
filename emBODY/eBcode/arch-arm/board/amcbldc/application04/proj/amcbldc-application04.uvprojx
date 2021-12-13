@@ -947,6 +947,11 @@
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
             </File>
+            <File>
+              <FileName>rtw_mutex.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2130,6 +2135,11 @@
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
             </File>
+            <File>
+              <FileName>rtw_mutex.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3312,6 +3322,11 @@
               <FileName>rtw_mutex.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_mutex.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.cpp</FilePath>
             </File>
           </Files>
         </Group>

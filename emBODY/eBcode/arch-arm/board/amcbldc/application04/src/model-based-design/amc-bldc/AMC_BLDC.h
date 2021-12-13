@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.93
+// Model version                  : 3.96
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec  7 09:16:47 2021
+// C/C++ source code generated on : Mon Dec 13 08:28:36 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -103,9 +103,9 @@ namespace amc_bldc_codegen
       ControlOutputs RTBInsertedForAdapter_Inserte_b;// synthesized block
       ControlOuterOutputs TmpRTBAtFOCInport6_Buf[3];// synthesized block
       EstimatedData RTBInsertedForAdapter_Inserte_j[3];// synthesized block
-      void* RTBInsertedForAdapter_Inserte_c;// synthesized block
-      void* TmpRTBAtFOCInport6_d0_SEMAPHORE;// synthesized block
-      void* RTBInsertedForAdapter_Inserte_g;// synthesized block
+      void* RTBInsertedForAdapter_Insert_mf;// synthesized block
+      void* TmpRTBAtFOCInport6_SEMAPHORE;// synthesized block
+      void* RTBInsertedForAdapter_Insert_bb;// synthesized block
       int8_T RTBInsertedForAdapter_Inserte_d;// synthesized block
       int8_T RTBInsertedForAdapter_Insert_de;// synthesized block
       int8_T TmpRTBAtFOCInport6_LstBufWR;// synthesized block

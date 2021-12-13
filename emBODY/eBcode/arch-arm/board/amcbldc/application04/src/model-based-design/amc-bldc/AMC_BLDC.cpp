@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.93
+// Model version                  : 3.96
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec  7 09:16:47 2021
+// C/C++ source code generated on : Mon Dec 13 08:28:36 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -29,11 +29,8 @@ uint8_T CAN_ID_AMC = 3U;               // Variable: CAN_ID_AMC
                                           //    '<S3>/CAN_Decoder'
                                           //    '<S3>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
-//#include "embot_core.h"
-//#include <hal_trace.h>
-//#include <stdio.h>
+#include "embot_core.h"
 
- 
 namespace amc_bldc_codegen
 {
   // Model step function for TID0
@@ -75,43 +72,29 @@ namespace amc_bldc_codegen
       AMC_BLDC_U.SensorsData_motorsensors_hallAB;
 
     // RateTransition generated from: '<S1>/Adapter5'
-    rtw_mutex_lock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    rtw_mutex_lock();
     AMC_BLDC_DW.RTBInsertedForAdapter_Insert_de =
       AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_d;
-    rtw_mutex_unlock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    rtw_mutex_unlock();
     rtb_RTBInsertedForAdapter_Inser =
       AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_j[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_de];
 
     // RateTransition generated from: '<S1>/FOC'
-    rtw_mutex_lock(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    rtw_mutex_lock();
     AMC_BLDC_DW.TmpRTBAtFOCInport6_RDBuf =
       AMC_BLDC_DW.TmpRTBAtFOCInport6_LstBufWR;
-    rtw_mutex_unlock(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    rtw_mutex_unlock();
     rtb_TmpRTBAtFOCInport6 =
       AMC_BLDC_DW.TmpRTBAtFOCInport6_Buf[AMC_BLDC_DW.TmpRTBAtFOCInport6_RDBuf];
 
     // ModelReference: '<S1>/FOC'
-    AMC_BLDC_B.Flags_k.control_mode = ControlModes_Current;
     FOCMDLOBJ1.step(&AMC_BLDC_B.Flags_k, &AMC_BLDC_B.ConfigurationParameters_m,
                     &rtb_BusConversion_InsertedFor_F,
                     &rtb_RTBInsertedForAdapter_Inser, &AMC_BLDC_B.Targets_n,
                     &rtb_TmpRTBAtFOCInport6, &rtb_FOC);
-                    
-    // TODO: remove
-//    static char msg_t1[64] = {};
-//    static uint32_t counter_t1;
-//    if(counter_t1 % 1000 == 0)
-//    {
-//        sprintf(msg_t1, "[AMC_BLDC]: %f --> %p\n", AMC_BLDC_B.ConfigurationParameters_m.motorconfig.Vcc, &AMC_BLDC_B.ConfigurationParameters_m);
-//        //snprintf(msg_t1, "%f --> %p\n", sizeof(msg_t1), AMC_BLDC_B.ConfigurationParameters_m.motorconfig.Vcc, &AMC_BLDC_B.ConfigurationParameters_m);
-//        embot::core::print(msg_t1);
-//        //hal_trace_puts(msg_t1);
-//        counter_t1 = 0;
-//    }
-//    counter_t1++;
 
     // RateTransition generated from: '<S1>/Adapter'
-    rtw_mutex_lock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    rtw_mutex_lock();
     wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l +
       1);
     if (wrBufIdx == 3) {
@@ -125,7 +108,7 @@ namespace amc_bldc_codegen
       }
     }
 
-    rtw_mutex_unlock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    rtw_mutex_unlock();
     switch (wrBufIdx) {
      case 0:
       AMC_BLDC_DW.RTBInsertedForAdapter_InsertedF = rtb_FOC;
@@ -148,6 +131,7 @@ namespace amc_bldc_codegen
   // Model step function for TID1
   void AMC_BLDC::step_Time()           // Sample time: [0.001s, 0.0s]
   {
+    
     // local block i/o variables
     ControlOuterOutputs rtb_OuterControl;
     BUS_CAN rtb_BusConversion_InsertedFor_C;
@@ -239,10 +223,10 @@ namespace amc_bldc_codegen
       AMC_BLDC_Y.EstimatedData_p);
 
     // RateTransition generated from: '<S1>/Adapter'
-    rtw_mutex_lock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    rtw_mutex_lock();
     AMC_BLDC_DW.RTBInsertedForAdapter_Insert_lf =
       AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l;
-    rtw_mutex_unlock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    rtw_mutex_unlock();
     switch (AMC_BLDC_DW.RTBInsertedForAdapter_Insert_lf) {
      case 0:
       // Outport: '<Root>/ControlOutputs'
@@ -329,8 +313,6 @@ namespace amc_bldc_codegen
 
     // ModelReference: '<S1>/OuterControl' incorporates:
     //   Outport: '<Root>/EstimatedData'
-    
-    AMC_BLDC_B.Flags_k.control_mode = ControlModes_Current;
 
     OuterControlMDLOBJ2.step(AMC_BLDC_B.Flags_k,
       AMC_BLDC_B.ConfigurationParameters_m, AMC_BLDC_B.Targets_n,
@@ -338,7 +320,7 @@ namespace amc_bldc_codegen
       rtb_OuterControl);
 
     // RateTransition generated from: '<S1>/FOC'
-    rtw_mutex_lock(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    rtw_mutex_lock();
     wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.TmpRTBAtFOCInport6_LstBufWR + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -351,7 +333,7 @@ namespace amc_bldc_codegen
       }
     }
 
-    rtw_mutex_unlock(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    rtw_mutex_unlock();
     AMC_BLDC_DW.TmpRTBAtFOCInport6_Buf[wrBufIdx] = rtb_OuterControl;
     AMC_BLDC_DW.TmpRTBAtFOCInport6_LstBufWR = wrBufIdx;
 
@@ -403,7 +385,7 @@ namespace amc_bldc_codegen
     // RateTransition generated from: '<S1>/Adapter5' incorporates:
     //   Outport: '<Root>/EstimatedData'
 
-    rtw_mutex_lock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    rtw_mutex_lock();
     wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_d +
       1);
     if (wrBufIdx == 3) {
@@ -417,7 +399,7 @@ namespace amc_bldc_codegen
       }
     }
 
-    rtw_mutex_unlock(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    rtw_mutex_unlock();
     AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_j[wrBufIdx] =
       AMC_BLDC_Y.EstimatedData_p;
     AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_d = wrBufIdx;
@@ -480,13 +462,13 @@ namespace amc_bldc_codegen
       ((&AMC_BLDC_M)));
 
     // Start for RateTransition generated from: '<S1>/Adapter5'
-    rtw_mutex_init(&AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    rtw_mutex_init();
 
     // Start for RateTransition generated from: '<S1>/FOC'
-    rtw_mutex_init(&AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    rtw_mutex_init();
 
     // Start for RateTransition generated from: '<S1>/Adapter'
-    rtw_mutex_init(&AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    rtw_mutex_init();
 
     // SystemInitialize for ModelReference: '<S1>/FOC'
     FOCMDLOBJ1.init();
@@ -514,13 +496,13 @@ namespace amc_bldc_codegen
   void AMC_BLDC::terminate()
   {
     // Terminate for RateTransition generated from: '<S1>/Adapter5'
-    rtw_mutex_destroy(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c);
+    rtw_mutex_destroy();
 
     // Terminate for RateTransition generated from: '<S1>/FOC'
-    rtw_mutex_destroy(AMC_BLDC_DW.TmpRTBAtFOCInport6_d0_SEMAPHORE);
+    rtw_mutex_destroy();
 
     // Terminate for RateTransition generated from: '<S1>/Adapter'
-    rtw_mutex_destroy(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g);
+    rtw_mutex_destroy();
   }
 
   // Constructor

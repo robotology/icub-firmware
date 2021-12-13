@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.103
+// Model version                  : 3.105
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec  7 09:15:45 2021
+// C/C++ source code generated on : Mon Dec 13 08:27:35 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,6 +18,7 @@
 //
 #ifndef RTW_HEADER_SupervisorFSM_RX_h_
 #define RTW_HEADER_SupervisorFSM_RX_h_
+#include <cmath>
 #include <cstring>
 #include <stddef.h>
 #include "rtwtypes.h"

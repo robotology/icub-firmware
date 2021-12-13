@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.103
+// Model version                  : 3.105
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec  7 09:15:45 2021
+// C/C++ source code generated on : Mon Dec 13 08:27:35 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -584,8 +584,8 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.EventsRx_current_limit_start =
         arg_EventsRx.current_limit;
       SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX = 1U;
-      arg_Output.motorconfig.Kp = 2.0F / 5.0F;
-      arg_Output.motorconfig.Ki = 500.0F / 5.0F;
+      arg_Output.motorconfig.Kp = 0.4F;
+      arg_Output.motorconfig.Ki = 100.0F;
       arg_Output.motorconfig.Vmax = 9.0F;
       arg_Output.motorconfig.Vcc = 24.0F;
       SupervisorFSM_RX_DW.is_active_CAN_RX_HANDLER = 1U;
@@ -747,7 +747,7 @@ namespace amc_bldc_codegen
             break;
 
            case SupervisorFSM_RX_IN_NoFault:
-            if (arg_ControlOutputs.Iq_fbk.current >=
+            if (std::abs(arg_ControlOutputs.Iq_fbk.current) >=
                 SupervisorFSM_RX_DW.CurrentLimit) {
               SupervisorFSM_RX_DW.is_OverCurrent =
                 SupervisorF_IN_OverCurrentFault;
@@ -765,7 +765,7 @@ namespace amc_bldc_codegen
             break;
 
            case SupervisorF_IN_OverCurrentFault:
-            if (arg_ControlOutputs.Iq_fbk.current <
+            if (std::abs(arg_ControlOutputs.Iq_fbk.current) <
                 SupervisorFSM_RX_DW.CurrentLimit) {
               SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
 

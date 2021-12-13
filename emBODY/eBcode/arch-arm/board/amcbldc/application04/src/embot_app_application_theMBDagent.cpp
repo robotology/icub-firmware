@@ -67,7 +67,7 @@ struct embot::app::application::theMBDagent::Impl
         int16_t delta = electricalAngle - electricalAngleOld;
         electricalAngleOld = electricalAngle;
 
-        position = position + delta / 4; // TODO: clarify (position + delta) / 4 or position + (delta / 4)?
+        position = position + delta / 4;
         
         u->SensorsData_motorsensors_angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
         
@@ -146,11 +146,22 @@ struct embot::app::application::theMBDagent::Impl
 //                                     u->SensorsData_motorsensors_Iabc[2],  \
 //                                     u->SensorsData_motorsensors_angle,    \
 //                                     y->ControlOutputs_p.Iq_fbk.current);
-            
+//            sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f", \
+//                                     Vabc0,  \
+//                                     Vabc1,  \
+//                                     Vabc2,  \
+//                                     u->SensorsData_motorsensors_Iabc[0],  \
+//                                     u->SensorsData_motorsensors_Iabc[1],  \
+//                                     u->SensorsData_motorsensors_Iabc[2],  \
+//                                     u->SensorsData_motorsensors_angle,    \
+//                                     y->ControlOutputs_p.Iq_fbk.current);
+            //sprintf(msg2, "%d,%d,%.3f,%.3f,%.3f", delta, position, y->EstimatedData_p.jointvelocities.velocity, u->SensorsData_motorsensors_angle, y->ControlOutputs_p.Iq_fbk.current);
+
 //            embot::core::print(msg2);
             counter = 0;
         }
         counter++;
+        
 #endif
     }
 };
