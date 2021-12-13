@@ -32,8 +32,6 @@
 #include "EoError.h"
 #include "EOtheEntities.h"
 
-#include "AbsEncoder.h"
-
 #if defined(EOTHESERVICES_customize_handV3_7joints)
 
 // -- here is new code for the pmc board
