@@ -813,7 +813,19 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         eo_vector_Clear(p->sharedcan.entitydescriptor);
         eo_vector_Clear(p->sharedcan.boardproperties);   
         eo_array_Reset(p->sharedcan.discoverytargets);                
-    }      
+    }
+    
+    // Reset the communicated fault state to dummy for each motor
+    uint8_t n_motors = eo_entities_NumOfMotors(eo_entities_GetHandle());
+    
+    for(uint8_t mId = 0; mId < n_motors; mId++)
+    {
+       eOmc_motor_status_t *mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), mId);
+       if (NULL != mstatus)
+       {
+           mstatus->mc_fault_state = eoerror_code_dummy;
+       }
+    }
     
     p->numofjomos = 0;
     eo_entities_SetNumOfJoints(eo_entities_GetHandle(), 0);
@@ -1665,6 +1677,9 @@ extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
 {
     eOmc_motor_status_t *sta = (eOmc_motor_status_t*)eo_nv_RAM(nv);
     memmove(sta, &s_motor_default_value.status, sizeof(eOmc_motor_status_t));
+    
+    // Initialize the fault state to dummy since code zero is assigned to unspecified system error
+    sta->mc_fault_state = eoerror_code_dummy;
 }
 
 
