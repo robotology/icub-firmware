@@ -1228,10 +1228,10 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     motor_status->basic.mot_current  = o->Iqq_fbk; //o->Iqq_peak_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
     
-//    if (Motor_is_motor_joint_fault_over(o))
-//    {
-//        motor_status->mc_fault_state = eoerror_code_dummy;
-//    }
+    if (Motor_is_motor_joint_fault_over(o))
+    {
+        motor_status->mc_fault_state = eoerror_code_dummy;
+    }
 }
 
 void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
@@ -1391,26 +1391,20 @@ void Motor_reset(Motor *o)
 }
 
 
-//BOOL Motor_is_motor_joint_fault_over(Motor* o)
-//{
-//    BOOL ret = TRUE;
-//    
-//    ret &= !Motor_is_in_fault(o);
-//    
-//    eOmc_joint_status_t* jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), o->ID);    
-//    
-//    if (NULL != jstatus)
-//    {
-//        ret &= (jstatus->core.modes.controlmodestatus != eomc_ctrlmval_hwFault);
-//    }
-//        
-//    return ret;
-//}
-
-void Motor_set_fault_state_dummy(Motor* o)
+BOOL Motor_is_motor_joint_fault_over(Motor* o)
 {
-    eOmc_motor_status_t* mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
-    mstatus->mc_fault_state = eoerror_code_dummy;
+    BOOL ret = TRUE;
+    
+    ret &= !Motor_is_in_fault(o);
+    
+    eOmc_joint_status_t* jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), o->ID);    
+    
+    if (NULL != jstatus)
+    {
+        ret &= (jstatus->core.modes.controlmodestatus != eomc_ctrlmval_hwFault);
+    }
+        
+    return ret;
 }
 
 #if defined(EOTHESERVICES_customize_handV3_7joints)

@@ -289,12 +289,6 @@ BOOL JointSet_do_check_faults(JointSet* o)
     BOOL fault = FALSE;
     o->external_fault = FALSE;
     
-    // Set to dummy the fault state communicated to embObj before checking for new faults
-    for(int k=0; k<N; ++k)
-    {
-        Motor_set_fault_state_dummy(o->motor+o->motors_of_set[k]);
-    }
-    
     for (int k=0; k<N; ++k)
     {
         if (Joint_check_faults(o->joint+o->joints_of_set[k]))
