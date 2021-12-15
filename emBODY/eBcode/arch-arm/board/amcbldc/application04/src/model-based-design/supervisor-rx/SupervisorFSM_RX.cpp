@@ -584,8 +584,8 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.EventsRx_current_limit_start =
         arg_EventsRx.current_limit;
       SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX = 1U;
-      arg_Output.motorconfig.Kp = 2;//0.4F;
-      arg_Output.motorconfig.Ki = 0;//100.0F;
+      arg_Output.motorconfig.Kp = 0.4F;
+      arg_Output.motorconfig.Ki = 100.0F;
       arg_Output.motorconfig.Vmax = 9.0F;
       arg_Output.motorconfig.Vcc = 24.0F;
       SupervisorFSM_RX_DW.is_active_CAN_RX_HANDLER = 1U;
