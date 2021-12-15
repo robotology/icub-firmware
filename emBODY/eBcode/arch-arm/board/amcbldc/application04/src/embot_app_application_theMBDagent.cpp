@@ -24,7 +24,6 @@
 // include mdb 
 #include "AMC_BLDC.h"
 
-//TODO: remove
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
@@ -44,14 +43,11 @@ struct embot::app::application::theMBDagent::Impl
     bool initialise();
     bool tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);
     
-    
     static amc_bldc_codegen::AMC_BLDC amc_bldc;
-    
+     
     // Called at rate ~26.6 KHz inside the FOC controller
     static void inner_foc_callback(int16_T Iuvw[3], void* rtu, void* rty)
     {
-        //auto start = embot::core::now();
-        
         amc_bldc_codegen::AMC_BLDC::ExtU_AMC_BLDC_T* u = (amc_bldc_codegen::AMC_BLDC::ExtU_AMC_BLDC_T*) rtu;
         amc_bldc_codegen::AMC_BLDC::ExtY_AMC_BLDC_T* y = (amc_bldc_codegen::AMC_BLDC::ExtY_AMC_BLDC_T*) rty;
         
@@ -98,8 +94,6 @@ struct embot::app::application::theMBDagent::Impl
         int32_T Vabc2 = static_cast<int32_T>(y->ControlOutputs_p.Vabc[2] * 163.83F);
         
         embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, Vabc0, Vabc1, Vabc2);
-
-        //auto end = embot::core::now();
        
 #define DEBUG_PARAMS // TODO: remove
 #ifdef DEBUG_PARAMS
@@ -120,14 +114,10 @@ struct embot::app::application::theMBDagent::Impl
                                      y->ControlOutputs_p.Iq_fbk.current);
             
             //sprintf(msg2, "%d,%d,%.3f,%.3f,%.3f", delta, position, y->EstimatedData_p.jointvelocities.velocity, u->SensorsData_motorsensors_angle, y->ControlOutputs_p.Iq_fbk.current);
-            
-            
-            //embot::core::print(embot::core::TimeFormatter(end - start).to_string());
             //embot::core::print(msg2);
             counter = 0;
         }
         counter++;
-        
 #endif
     }
 };
@@ -185,8 +175,6 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
     
     #warning: Temp workaround, duplicated logic for out_en (see inside OuterController)
         
-    //amc_bldc.AMC_BLDC_B.Flags_k.control_mode = ControlModes_Current; TODO: remove
-
         
     if(amc_bldc.AMC_BLDC_B.Flags_k.control_mode == ControlModes_NotConfigured     || \
              amc_bldc.AMC_BLDC_B.Flags_k.control_mode == ControlModes_Idle        || \
