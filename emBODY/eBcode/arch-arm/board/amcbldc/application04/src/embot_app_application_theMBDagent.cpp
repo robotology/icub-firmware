@@ -95,7 +95,7 @@ struct embot::app::application::theMBDagent::Impl
         
         embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, Vabc0, Vabc1, Vabc2);
        
-#define DEBUG_PARAMS // TODO: remove
+//#define DEBUG_PARAMS // TODO: remove
 #ifdef DEBUG_PARAMS
         
         static char msg2[64];
