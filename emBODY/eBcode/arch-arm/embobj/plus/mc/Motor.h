@@ -295,6 +295,8 @@ extern BOOL Motor_is_external_fault(Motor* o);
 extern BOOL Motor_is_in_fault(Motor* o);
 extern BOOL Motor_is_running(Motor* o);
 
+extern BOOL Motor_is_motor_joint_fault_over(Motor* o);
+
 //BOOL Motor_clear_ext_fault(Motor *o);
 
 ////////////////////////////////////////////////////////////////////////////

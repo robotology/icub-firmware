@@ -30,6 +30,7 @@
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"
+#include "EOtheEntities.h"
 
 #if defined(EOTHESERVICES_customize_handV3_7joints)
 
@@ -701,7 +702,15 @@ static void Motor_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_t mas
     descriptor.sourceaddress = 0;
     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, err_id);
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);    
+    
+    eOmc_motor_status_t *mstatus = NULL;
+    mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), id);
+    if (NULL != mstatus)
+    {
+        mstatus->mc_fault_state = descriptor.code;
+    }
 }
+
 
 static void Motor_send_diagnostic(eOerrmanErrorType_t errortype, uint8_t id, eOerror_value_MC_t err_id, uint64_t mask)
 {
@@ -1219,7 +1228,10 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     motor_status->basic.mot_current  = o->Iqq_fbk; //o->Iqq_peak_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
     
-    
+    if (Motor_is_motor_joint_fault_over(o))
+    {
+        motor_status->mc_fault_state = eoerror_code_dummy;
+    }
 }
 
 void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
@@ -1378,6 +1390,22 @@ void Motor_reset(Motor *o)
     //o->control_mode_req;
 }
 
+
+BOOL Motor_is_motor_joint_fault_over(Motor* o)
+{
+    BOOL ret = TRUE;
+    
+    ret &= !Motor_is_in_fault(o);
+    
+    eOmc_joint_status_t* jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), o->ID);    
+    
+    if (NULL != jstatus)
+    {
+        ret &= (jstatus->core.modes.controlmodestatus != eomc_ctrlmval_hwFault);
+    }
+        
+    return ret;
+}
 
 #if defined(EOTHESERVICES_customize_handV3_7joints)
 

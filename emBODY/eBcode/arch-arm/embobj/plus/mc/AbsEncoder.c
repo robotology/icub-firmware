@@ -21,6 +21,8 @@
 #include "EoError.h"
 #include "EOtheErrorManager.h"
 
+#include "EOtheEntities.h"
+
 #include "EOMtheEMSrunner.h"
 
 #include "EOemsControllerCfg.h"
@@ -687,6 +689,13 @@ static void AbsEncoder_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_
     descriptor.sourceaddress = 0;
     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, err_id);
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+    
+    eOmc_motor_status_t *mstatus = NULL;
+    mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), id);
+    if (NULL != mstatus)
+    {
+        mstatus->mc_fault_state = descriptor.code;
+    }
 }
 
 BOOL AbsEncoder_is_in_fault(AbsEncoder* o)

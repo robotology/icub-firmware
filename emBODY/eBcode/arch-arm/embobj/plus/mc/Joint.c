@@ -25,6 +25,8 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+#include "EOtheEntities.h"
+
 static void Joint_set_inner_control_flags(Joint* o);
 
 Joint* Joint_new(uint8_t n)
@@ -408,6 +410,13 @@ BOOL Joint_check_faults(Joint* o)
             descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+            
+            eOmc_motor_status_t *mstatus = NULL;
+            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
+            if (NULL != mstatus)
+            {
+                mstatus->mc_fault_state = descriptor.code;
+            }
         }
         
         if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
@@ -419,6 +428,13 @@ BOOL Joint_check_faults(Joint* o)
             descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+            
+            eOmc_motor_status_t *mstatus = NULL;
+            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
+            if (NULL != mstatus)
+            {
+                mstatus->mc_fault_state = descriptor.code;
+            }
         }
         
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
@@ -916,7 +932,7 @@ void Joint_get_state(Joint* o, eOmc_joint_status_t* joint_state)
     joint_state->core.measures.meas_position         = o->pos_fbk;           
     joint_state->core.measures.meas_velocity         = o->vel_fbk;        
     joint_state->core.measures.meas_acceleration     = o->acc_fbk;      
-    joint_state->core.measures.meas_torque           = o->trq_fbk;
+    joint_state->core.measures.meas_torque           = o->trq_fbk;    
 }
 
 BOOL Joint_get_pid_state(Joint* o, eOmc_joint_status_ofpid_t* pid_state)
