@@ -284,14 +284,6 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
                        config_params,
                        flags);
     
-    #warning Actually the CURRENT CONTROL MODE is forced
-    flags.control_mode = ControlModes_Current; // TODO: temp fix remove
-        
-    //static char msg2[64];
-    //sprintf(msg2, "[%.3f, %.3f -- %d, %d ------- %.3f]\n", targets.motorcurrent.current, targets.motorvoltage.voltage, bus_can_rx_errors.event, bus_events_rx.desired_current, sensors_data.motorsensors.current);
-    //        sprintf(msg2, "[%d, %d]\n", flags.control_mode, outer_outputs.out_enable);
-    //embot::core::print(msg2);
-    
     control_outer.step(flags,
                        config_params,
                        targets,
