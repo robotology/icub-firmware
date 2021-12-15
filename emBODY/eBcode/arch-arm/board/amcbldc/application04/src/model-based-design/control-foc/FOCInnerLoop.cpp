@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.75
+// Model version                  : 2.70
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:42 2021
+// C/C++ source code generated on : Wed Dec  1 10:58:48 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -24,7 +24,7 @@
 
 namespace amc_bldc_codegen
 {
-  // System initialize for atomic system: '<Root>/FOC inner loop'
+  // System initialize for function-call system: '<Root>/FOC inner loop'
   void control_foc::FOCInnerLoop_Init()
   {
     // InitializeConditions for UnitDelay: '<S3>/Delay Input1'
@@ -36,7 +36,7 @@ namespace amc_bldc_codegen
     control_foc_DW.DelayInput1_DSTATE = ControlModes_Idle;
   }
 
-  // Output and update for atomic system: '<Root>/FOC inner loop'
+  // Output and update for function-call system: '<Root>/FOC inner loop'
   void control_foc::FOCInnerLoop(const Flags *rtu_Flags, const
     ConfigurationParameters *rtu_ConfigurationParameters, const SensorsData
     *rtu_Sensors, const EstimatedData *rtu_Estimates, const Targets *rtu_Targets,
