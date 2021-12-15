@@ -9,7 +9,7 @@
 //
 // Model version                  : 3.96
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 13 08:28:36 2021
+// C/C++ source code generated on : Tue Dec 14 19:26:07 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -29,7 +29,6 @@ uint8_T CAN_ID_AMC = 3U;               // Variable: CAN_ID_AMC
                                           //    '<S3>/CAN_Decoder'
                                           //    '<S3>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
-#include "embot_core.h"
 
 namespace amc_bldc_codegen
 {
@@ -131,7 +130,6 @@ namespace amc_bldc_codegen
   // Model step function for TID1
   void AMC_BLDC::step_Time()           // Sample time: [0.001s, 0.0s]
   {
-    
     // local block i/o variables
     ControlOuterOutputs rtb_OuterControl;
     BUS_CAN rtb_BusConversion_InsertedFor_C;

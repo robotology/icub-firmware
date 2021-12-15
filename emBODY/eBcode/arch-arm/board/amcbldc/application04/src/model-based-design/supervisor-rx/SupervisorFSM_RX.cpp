@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.105
+// Model version                  : 3.106
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 13 08:27:35 2021
+// C/C++ source code generated on : Tue Dec 14 19:25:07 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -584,8 +584,8 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.EventsRx_current_limit_start =
         arg_EventsRx.current_limit;
       SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX = 1U;
-      arg_Output.motorconfig.Kp = 0.4F;
-      arg_Output.motorconfig.Ki = 100.0F;
+      arg_Output.motorconfig.Kp = 2;//0.4F;
+      arg_Output.motorconfig.Ki = 0;//100.0F;
       arg_Output.motorconfig.Vmax = 9.0F;
       arg_Output.motorconfig.Vcc = 24.0F;
       SupervisorFSM_RX_DW.is_active_CAN_RX_HANDLER = 1U;
@@ -639,8 +639,8 @@ namespace amc_bldc_codegen
                 (SupervisorFSM_RX_DW.sfEvent == SupervisorF_event_setLimitEvent)
                 && (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
                     SupervisorFSM_RX_DW.EventsRx_current_limit_start)) {
-              SupervisorFSM_RX_DW.CurrentLimit =
-                arg_MessagesRx.current_limit.overload;
+              SupervisorFSM_RX_DW.CurrentLimit = 0.001F * static_cast<real32_T>
+                (arg_MessagesRx.current_limit.overload);
               SupervisorFSM_RX_DW.IsCurrentLimitSet = true;
               SupervisorFSM_RX_DW.is_LIMITS_HANDLER = SupervisorFSM_RX_IN_Home;
             }
@@ -660,8 +660,8 @@ namespace amc_bldc_codegen
             (SupervisorFSM_RX_DW.sfEvent == SupervisorF_event_setLimitEvent) &&
             (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
              SupervisorFSM_RX_DW.EventsRx_current_limit_start)) {
-          SupervisorFSM_RX_DW.CurrentLimit =
-            arg_MessagesRx.current_limit.overload;
+          SupervisorFSM_RX_DW.CurrentLimit = 0.001F * static_cast<real32_T>
+            (arg_MessagesRx.current_limit.overload);
           SupervisorFSM_RX_DW.IsCurrentLimitSet = true;
           SupervisorFSM_RX_DW.is_LIMITS_HANDLER = SupervisorFSM_RX_IN_Home;
         }

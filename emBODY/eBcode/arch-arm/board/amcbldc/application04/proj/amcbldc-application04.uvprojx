@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1186,6 +1186,16 @@
               <FileName>AMC_BLDC_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\amc-bldc\AMC_BLDC_types.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::tools</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2378,6 +2388,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>embot::tools</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -3562,6 +3582,16 @@
               <FileName>AMC_BLDC_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\amc-bldc\AMC_BLDC_types.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::tools</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>

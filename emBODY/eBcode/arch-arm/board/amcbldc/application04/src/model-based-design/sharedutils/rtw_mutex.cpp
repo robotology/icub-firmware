@@ -17,5 +17,10 @@
 
 #include "rtw_mutex.h"
 
-void rtw_mutex_lock(void){}
-void rtw_mutex_unlock(void){}
+void rtw_mutex_lock(void) {
+
+}
+
+void rtw_mutex_unlock(void) {
+    
+}

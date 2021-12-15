@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.105
+// Model version                  : 3.106
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 13 08:27:35 2021
+// C/C++ source code generated on : Tue Dec 14 19:25:07 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -34,9 +34,9 @@ namespace amc_bldc_codegen
    public:
     // Block states (default storage) for model 'SupervisorFSM_RX'
     struct DW_SupervisorFSM_RX_T {
+      real32_T CurrentLimit;           // '<Root>/SupervisorFSM_RX'
       int32_T sfEvent;                 // '<Root>/SupervisorFSM_RX'
       BoardState BoardSt;              // '<Root>/SupervisorFSM_RX'
-      uint16_T CurrentLimit;           // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_c2_SupervisorFSM_RX;// '<Root>/SupervisorFSM_RX'
       uint8_T is_active_CAN_RX_HANDLER;// '<Root>/SupervisorFSM_RX'
       uint8_T is_EVENT_DISPATCHER;     // '<Root>/SupervisorFSM_RX'
