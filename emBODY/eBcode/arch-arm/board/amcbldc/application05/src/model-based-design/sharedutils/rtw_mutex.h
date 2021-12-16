@@ -18,9 +18,50 @@
 #ifndef RTW_MUTEX_H
 #define RTW_MUTEX_H
 
+#define RTW_MUTEX_USE_INLINE
+
+#if !defined(RTW_MUTEX_USE_INLINE)
+
 #define rtw_mutex_init()
 void rtw_mutex_lock(void);
 void rtw_mutex_unlock(void);
 #define rtw_mutex_destroy()
 
+#else
+
+#include "stm32hal.h"
+
+#define rtw_mutex_init()
+#define rtw_mutex_destroy()
+
+inline bool IsException(void) 
+{
+    return(__get_IPSR() != 0U);
+}
+
+inline void rtw_mutex_lock(void) 
+{    
+    if(false == IsException())
+    {
+        NVIC_DisableIRQ(DMA1_Channel2_IRQn);  
+            
+    }  
+}
+
+inline void rtw_mutex_unlock(void) 
+{
+    if(false == IsException())
+    {       
+        NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+    }  
+}
+
 #endif
+
+
+
+#endif // RTW_MUTEX_H
+
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
