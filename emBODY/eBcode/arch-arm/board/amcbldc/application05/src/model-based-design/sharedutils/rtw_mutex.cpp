@@ -17,6 +17,8 @@
 
 #include "rtw_mutex.h"
 
+#if !defined(RTW_MUTEX_USE_INLINE)
+
 
 // marco.accame: this code provides protection vs concurrent access between
 // a user thread and the DMA IRQHandler for DMA1 Channel2. the mechanism
@@ -73,12 +75,14 @@ void rtw_mutex_unlock(void)
 
 
 // static funtions
-static bool IsException(void) 
+bool IsException(void) 
 {
     return(__get_IPSR() != 0U);
 }
 
-
+#else
+    // implementation moved to the .h file
+#endif
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
