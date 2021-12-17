@@ -128,13 +128,16 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_init(MOTOR h);
     Position s_hw_getencoder(MOTOR h);
-    Position s_hw_gethallcounter(MOTOR h);
+    Position s_hw_gethallcounter(MOTOR h);    
+    result_t s_hw_setpwm(MOTOR h, Pwm v);
+    
     
     uint8_t s_hw_gethallstatus(MOTOR h);
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w);
-    result_t s_hw_setADCcallback(MOTOR h, void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty);
+//    result_t s_hw_setADCcallback(MOTOR h, void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty);
     result_t s_hw_motorEnable(MOTOR h);
     result_t s_hw_motorDisable(MOTOR h);
+    result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner);
 
     result_t init(MOTOR h, const Config &config)
     {
@@ -224,6 +227,11 @@ namespace embot { namespace hw { namespace motor {
         
         return resOK;               
     }
+
+    result_t setpwm(MOTOR h, Pwm v)
+    {
+        return s_hw_setpwm(h, v);
+    } 
     
     result_t gethallstatus(MOTOR h, uint8_t &hs)
     {
@@ -244,9 +252,14 @@ namespace embot { namespace hw { namespace motor {
         return s_hw_setpwmUVW(h, u, v, w);
     }
     
-    result_t setADCcallback(MOTOR h, void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty)
+//    result_t setADCcallback(MOTOR h, void (*fn_cb)(void *, int16_t[3], void*, void*), void * owner, void* rtu, void* rty)
+//    {
+//        return s_hw_setADCcallback(h, fn_cb, owner, rtu, rty);
+//    }
+    
+    result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
     {
-        return s_hw_setADCcallback(h, fn_cb, rtu, rty);
+        return s_hw_setCallbackOnCurrents(h, callback, owner);
     }
     
 // in here is the part for low level hw of the amcbldc
@@ -258,6 +271,9 @@ namespace embot { namespace hw { namespace motor {
     }
 
 #else
+    
+    // even for the amcbldc we may have several generations of drivers.
+    // we use macro EMBOT_AMCBLDC_APPxx to discriminate amongst them.
     
     #include "encoder.h"
     #include "pwm.h"
@@ -304,6 +320,17 @@ namespace embot { namespace hw { namespace motor {
     {
         return hallGetCounter();
     }
+
+    
+    result_t s_hw_setpwm(MOTOR h, Pwm v)
+    { 
+        HAL_StatusTypeDef r = HAL_ERROR;
+#if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)         
+        r = pwmSetValue(v);
+#endif  
+        return (HAL_OK == r) ? resOK : resNOK;      
+    }
+
     
     uint8_t s_hw_gethallstatus(MOTOR h)
     {
@@ -316,11 +343,44 @@ namespace embot { namespace hw { namespace motor {
         return resOK;
     }
     
-    result_t s_hw_setADCcallback(MOTOR h, void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty)
+//    result_t s_hw_setADCcallback(MOTOR h, void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty)
+//    {
+//#if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)
+//        return resNOK;
+//#else       
+//        setADC_cb(fn_cb, owner, rtu, rty);
+//        return resOK;
+//#endif   
+//    }
+    
+    
+    static_assert(sizeof(pwmCurrents_t) == sizeof(embot::hw::motor::Currents), "embot::hw::motor::Currents and pwmCurrents_t differs");
+    static_assert(sizeof(pwmCurrents_t::u) == sizeof(embot::hw::motor::Currents::u), "embot::hw::motor::Currents and pwmCurrents_t differs");
+    static_assert(sizeof(pwmCurrents_t::v) == sizeof(embot::hw::motor::Currents::v), "embot::hw::motor::Currents and pwmCurrents_t differs");
+    static_assert(sizeof(pwmCurrents_t::w) == sizeof(embot::hw::motor::Currents::w), "embot::hw::motor::Currents and pwmCurrents_t differs");
+
+    
+    result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
     {
-        setADC_cb(fn_cb, rtu, rty);
+#if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)
+        return resNOK;
+#else 
+        
+        #warning TO DO: aggiustare i progetti diversi da EMBOT_AMCBLDC_APP05
+
+        if((nullptr == callback))
+        {
+            return resNOK;
+        }      
+        
+        pwm_ADC_callback_t cbk {};
+        cbk.callback = reinterpret_cast<pwm_fp_adc_callback_t>(callback);
+        cbk.owner = owner;
+        set_ADC_callback(&cbk);
         return resOK;
+#endif          
     }
+
     
     result_t s_hw_motorEnable(MOTOR h)
     {

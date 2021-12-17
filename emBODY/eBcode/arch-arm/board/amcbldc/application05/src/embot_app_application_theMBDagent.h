@@ -40,6 +40,9 @@ namespace embot { namespace app { namespace application {
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info);
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo);
         
+        void on();
+        void off();
+        
     private:
         theMBDagent(); 
         ~theMBDagent(); 

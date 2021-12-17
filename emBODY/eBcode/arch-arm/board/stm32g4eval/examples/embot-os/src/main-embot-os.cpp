@@ -23,6 +23,7 @@
 #include "embot_os_theCallbackManager.h"
 #include "embot_app_theLEDmanager.h"
 #include "embot_tools.h"
+#include "embot_app_scope.h"
 
 #define enableTRACE_all
 
@@ -33,6 +34,11 @@ constexpr embot::os::Event evtRead = embot::core::binary::mask::pos2mask<embot::
 constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 constexpr embot::hw::BTN buttonBLUE = embot::hw::BTN::one;
+
+//embot::tools::Histogram *histoFOCperiod {nullptr};
+//embot::tools::PeriodValidator *validFOCperiod {nullptr};
+
+embot::app::scope::SignalHisto *signalhisto {nullptr};
 
 void btncallback(void *p)
 {
@@ -45,7 +51,36 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     volatile uint32_t c = embot::hw::sys::clock(embot::hw::CLOCK::syscore);
     c = c;
     
-
+//    constexpr std::uint64_t focperiodlimitLOW {0};      // from 0 usec
+//    constexpr std::uint64_t focperiodlimitHIGH {48};    // up to 48 usec
+//    constexpr std::uint64_t focperiodSTEP {1};          // in steps of 1 usec
+    
+    constexpr std::uint64_t focperiodlimitLOW {1000*1000-50};          // from 0 usec
+    constexpr std::uint64_t focperiodlimitHIGH {1000*1000+50};        // up to 48 usec
+    constexpr std::uint64_t focperiodSTEP {1};          // in steps of 1 usec
+    
+//    histoFOCperiod = new embot::tools::Histogram;
+//    histoFOCperiod->init({focperiodlimitLOW, focperiodlimitHIGH, focperiodSTEP});
+//    
+//    constexpr embot::core::Time period2validate { embot::core::time1second };
+//    constexpr embot::core::Time periodlimitlow { embot::core::time1second - 50 };
+//    constexpr embot::core::Time periodlimithigh { embot::core::time1second + 50 };
+//    embot::tools::PeriodValidator::Config pvc1sec { period2validate, 3*period2validate, 0, {periodlimitlow, periodlimithigh, 1} };
+//    
+//    constexpr embot::core::Time period2validate1 { 40 * embot::core::time1microsec };
+//    constexpr embot::core::Time periodlimitlow1 { 0 };
+//    constexpr embot::core::Time periodlimithigh1 { 48 * embot::core::time1microsec };
+//    embot::tools::PeriodValidator::Config pvcfoc { period2validate1, 3*period2validate1, 0, { periodlimitlow1, periodlimithigh1, embot::core::time1microsec } };
+    
+//    validFOCperiod = new embot::tools::PeriodValidator;
+//    
+//    validFOCperiod->init(pvc1sec);
+//    validFOCperiod->init(pvcfoc);
+    
+    
+    embot::app::scope::SignalHisto::Config shcfg {0, 100*embot::core::time1microsec, embot::core::time1microsec};
+    signalhisto = new embot::app::scope::SignalHisto(shcfg);    
+    
     embot::core::print("mainthread-startup: initted driver for tlv493d");  
     // init the tlv493d
     embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::tlv493d::Config::startupMODE::resetCHIP});
@@ -61,7 +96,6 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     // init the ext interrupt button
     embot::hw::button::init(buttonBLUE, {embot::hw::button::Mode::TriggeredOnRelease, {btncallback, t}, 0});
     
-    
 }
 
 void alertdataisready00(void *p)
@@ -72,15 +106,76 @@ void alertdataisready00(void *p)
 
 embot::hw::tlv493d::Position position = 0;
 
+const embot::tools::Histogram::Values * vv {nullptr};
+
+std::array<uint64_t, 100> vals {};
+
 void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {   
     if(0 == eventmask)
     {   // timeout ...         
         return;
     }
+    
+    
+    signalhisto->on();
+    embot::core::wait(30);
+    signalhisto->off();
+    
+    vv = signalhisto->histogram()->getvalues();
+    
+    for(int i=0; i<vv->inside.size(); i++)
+    {
+        if(i < vals.size())
+        {
+            vals[i] = vv->inside[i];
+        }
+    }
+    
 
     if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
     {
+        
+    static uint8_t st = 0;
+//    if(0 != st)
+//    {
+//        embot::core::wait(st*10);
+//    }        
+    st++;
+    st %= 3;
+    
+//    static volatile std::uint64_t prev {0};
+//    std::uint64_t volatile nnow = static_cast<std::uint64_t>(embot::core::now());
+//    if(0 != prev)
+//    {
+//        volatile std::uint64_t delta = nnow - prev;
+//        histoFOCperiod->add(delta + st);
+//    }
+//    prev = nnow;
+//    
+//    vv = histoFOCperiod->getvalues();
+//    for(int i=0; i<vv->inside.size(); i++)
+//    {
+//        if(i < vals.size())
+//        {
+//            vals[i] = vv->inside[i];
+//        }
+//    }
+//    
+//    embot::core::Time focdelta {0};
+//    validFOCperiod->tick(embot::core::now(), focdelta);
+//    
+
+//    vv = validFOCperiod->histogram()->getvalues();
+//    for(int i=0; i<vv->inside.size(); i++)
+//    {
+//        if(i < vals.size())
+//        {
+//            vals[i] = vv->inside[i];
+//        }
+//    }
+    
+    
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
@@ -201,7 +296,7 @@ int main(void)
     // 2 i start the scheduler
         
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
-    constexpr embot::os::IdleThread::Config idlecfg = { 512, nullptr, nullptr, onIdle };
+    constexpr embot::os::IdleThread::Config idlecfg = { 1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
     constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
     

@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>amcbldc-app01-osal-ulpro</TargetName>
+    <TargetName>amcbldc-app02-osal-ulpro</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>

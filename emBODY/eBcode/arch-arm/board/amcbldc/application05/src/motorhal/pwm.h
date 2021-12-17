@@ -52,6 +52,14 @@ typedef struct
     uint32_t    poles;
 } pwmConfTypeDef;
 
+// we keep int32_t even if the adc gets only int16_t values
+typedef struct
+{
+    int32_t     u;
+    int32_t     v;
+    int32_t     w;    
+} pwmCurrents_t;
+
 
 /* Exported variables ------------------------------------------------------------------------------------------------*/
 
@@ -74,10 +82,43 @@ extern void pwmSet(uint16_t u, uint16_t v, uint16_t w);
 extern void pwmPhaseEnable(uint16_t mask);
 extern void pwmPhaseDisable(uint16_t mask);
 
-extern void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3);
+extern HAL_StatusTypeDef pwmSetValue(int32_t pwm); /* DEPRECATED: it returns HAL_ERROR */
 
 extern void pwmTest(void);
-extern void setADC_cb(void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty);
+//extern void setADC_cb(void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty);
+
+// a function of this type is used by the ADC IRQ Handler to report the measured currents to higher levels
+// we need two param to to the job:
+// - owner: is a pointer to the high level calling module. we need it so that inside the callback
+//   we just reinterpret_cast<> it to the calling class 
+// - currents: is a pointer to the three currents. the memory pointed by currents belongs to owner
+//   so that the caller of the callback will just copy the memory of the ADC (typically DMA memory)
+//   straigth away to destination to avoid corruptions. 
+typedef void (*pwm_fp_adc_callback_t) (void *owner, const pwmCurrents_t * const currents);
+
+
+typedef struct 
+{
+    pwm_fp_adc_callback_t   callback;
+    void*                   owner; 
+} pwm_ADC_callback_t;
+
+// this funtion sets the callback of the ADC. we need to specify the callback itself but also 
+// the owner of the callback (useful if it is a static method of a class) and the destination of
+// the currents.
+// and in here is explained the mechanism of the ADC:
+// the ADC uses DMA to gets its values. the DMA peridically calls function pwmSetCurrents_cb() 
+// at half transfer and at end transfer. this function performs calibration if required, and
+// calls a user-defined function which we can set with set_ADC_callback() so that the values
+// of currents can be used by other software modules.
+
+extern void set_ADC_callback(pwm_ADC_callback_t *cbk);
+
+// this function must be used only inside the file analog.c ..... 
+// it is called at the completion of dma transfer (both half and full). then this function may call a user defined
+// callback spefified by set_ADC_callback().
+// to do: i may remove it from the public API to avoid confusion 
+extern void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3);
 
 
 #ifdef __cplusplus
