@@ -76,20 +76,45 @@ static volatile uint16_t hallAngle = 0;
 
 static volatile bool calibrating = true;
 
-struct adc_callback_set_T
+//struct adc_callback_set_T
+//{
+//    void (*callback_fn)(void *owner, int16_t Iuvw[3], void* rtu, void* rty);
+//    void *owner;
+//    void* rtu;
+//    void* rty;
+//};
+
+//static volatile adc_callback_set_T adc_callback_set =
+//{
+//    NULL, NULL, NULL, NULL    
+//};
+
+static void s_pwm_dummy_adc_callback(void *owner, const pwmCurrents_t * const currents) {}
+static pwmCurrents_t s_pwm_dummy_currents = {0};
+    
+static volatile pwm_ADC_callback_t s_pwm_ADC_cbk = 
 {
-    void (*callback_fn)(int16_t Iuvw[3], void* rtu, void* rty) = NULL;
-    void* rtu = NULL;
-    void* rty = NULL;
+    .callback = s_pwm_dummy_adc_callback,
+    .owner = NULL
 };
 
-static volatile adc_callback_set_T adc_callback_set;
 
-void setADC_cb(void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty)
+//void setADC_cb(void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty)
+//{
+//    adc_callback_set.callback_fn = fn_cb;
+//    adc_callback_set.owner = owner;
+//    adc_callback_set.rtu = rtu;
+//    adc_callback_set.rty = rty;
+//}
+
+
+extern void set_ADC_callback(pwm_ADC_callback_t *cbk)
 {
-    adc_callback_set.callback_fn = fn_cb;
-    adc_callback_set.rtu = rtu;
-    adc_callback_set.rty = rty;
+    if(NULL != cbk)
+    {
+        s_pwm_ADC_cbk.callback = (NULL != cbk->callback) ? cbk->callback : s_pwm_dummy_adc_callback;
+        s_pwm_ADC_cbk.owner = cbk->owner;     
+    }
 }
 
 #if defined(USE_STM32HAL) && defined(__cplusplus)
@@ -337,13 +362,13 @@ static void hallStatusChange_cb(TIM_HandleTypeDef *htim)
  * @return  void
  */
 void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3)
-{
-    int16_t I[3];
-    
-    I[0] = raw2mAmps(i1);
-    I[1] = raw2mAmps(i2);
-    I[2] = raw2mAmps(i3);
-    
+{   
+    static pwmCurrents_t currents = {0};
+    // as soon as possible: copy the currents
+    currents.u = raw2mAmps(i1);
+    currents.v = raw2mAmps(i2);
+    currents.w = raw2mAmps(i3); 
+        
     if (calibrating)
     {
         static int16_t counter = 0;
@@ -364,10 +389,7 @@ void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3)
         }
     }
     
-    if (adc_callback_set.callback_fn && adc_callback_set.rtu && adc_callback_set.rty)
-    {
-        adc_callback_set.callback_fn(I, adc_callback_set.rtu, adc_callback_set.rty); 
-    }
+    s_pwm_ADC_cbk.callback(s_pwm_ADC_cbk.owner, &currents);    
 }
 
 
@@ -593,6 +615,16 @@ void pwmPhaseEnable(uint16_t mask)
 void pwmPhaseDisable(uint16_t mask)
 {
     EN1_GPIO_Port->BSRR = ((uint32_t)mask & PWM_PHASE_ALL) << 16u;
+}
+
+/*******************************************************************************************************************//**
+ * @brief   
+ * @param   
+ * @return  Function result
+ */
+HAL_StatusTypeDef pwmSetValue(int32_t pwm)
+{
+    return HAL_ERROR;
 }
 
 #if defined(HALCONFIG_DONTUSE_TESTS)

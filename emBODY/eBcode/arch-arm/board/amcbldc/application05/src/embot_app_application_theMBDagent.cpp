@@ -138,23 +138,25 @@ constexpr bool useDUMMYforTICK {true};
 struct embot::app::application::theMBDagent::Impl
 {
     Impl() = default;  
-    
-    // the MBD generated class. it can stay non static.
-    amc_bldc_codegen::AMC_BLDC amc_bldc {};  
-    
+        
     // the initialization code
     bool initialise();
         
     // the code called @ 1 kHz (aka every 1000 usec) inside a high priority thread
     bool tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);
-    
+
     // the code called @ 80/3 kHz (aka every 37.5 usec) inside the DMA1_Channel2_IRQHandler()
     // it must be static because we use it as a callback
     static void onCurrents_FOC_innerloop(void *owner, const embot::hw::motor::Currents * const currents);        
-    
+
+    // the objects whiche measure the duration of the two above functions
     Measure *measureFOC {nullptr};
-    Measure *measureTick {nullptr};     
-        
+    Measure *measureTick {nullptr}; 
+    
+    // the MBD generated class. it can stay non static.
+    amc_bldc_codegen::AMC_BLDC amc_bldc {};  
+    
+                
     // all the rest, which may or may not be required anymore
     Config config {};
     bool initted {false};
@@ -185,7 +187,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     }
     
     // create the measure for the tick
-    if(true == useDUMMYforFOC)
+    if(true == useDUMMYforTICK)
     {
         measureTick = new MeasureDummy;
     }
