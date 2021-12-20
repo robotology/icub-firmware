@@ -353,12 +353,13 @@ namespace embot { namespace hw { namespace motor {
 //#endif   
 //    }
     
-    
+#if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)
+#else    
     static_assert(sizeof(pwmCurrents_t) == sizeof(embot::hw::motor::Currents), "embot::hw::motor::Currents and pwmCurrents_t differs");
     static_assert(sizeof(pwmCurrents_t::u) == sizeof(embot::hw::motor::Currents::u), "embot::hw::motor::Currents and pwmCurrents_t differs");
     static_assert(sizeof(pwmCurrents_t::v) == sizeof(embot::hw::motor::Currents::v), "embot::hw::motor::Currents and pwmCurrents_t differs");
     static_assert(sizeof(pwmCurrents_t::w) == sizeof(embot::hw::motor::Currents::w), "embot::hw::motor::Currents and pwmCurrents_t differs");
-
+#endif
     
     result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
     {
