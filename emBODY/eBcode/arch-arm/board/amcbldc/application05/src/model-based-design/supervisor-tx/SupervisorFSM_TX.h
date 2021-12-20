@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.10
+// Model version                  : 3.14
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:18 2021
+// C/C++ source code generated on : Mon Dec 20 14:32:19 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -55,7 +55,8 @@ namespace amc_bldc_codegen
     void step(const BUS_MESSAGES_RX &arg_MessagesRx, const SensorsData &
               arg_SensorsData, const EstimatedData &arg_EstimatedData, const
               ControlOutputs &arg_Input, BUS_MESSAGES_TX &arg_MessagesTx,
-              BUS_EVENTS_TX &arg_EventsTx);
+              BUS_EVENTS_TX &arg_EventsTx, ConfigurationParameters
+              *arg_ControlOutputs1);
 
     // Real-Time Model get method
     amc_bldc_codegen::SupervisorFSM_TX::RT_MODEL_SupervisorFSM_TX_T * getRTM();

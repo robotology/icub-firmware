@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.29
+// Model version                  : 2.34
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:56 2021
+// C/C++ source code generated on : Mon Dec 20 14:33:00 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,7 +37,7 @@ namespace amc_bldc_codegen
    public:
     // Block states (default storage) for model 'estimation_velocity'
     struct DW_estimation_velocity_T {
-      real32_T DelayLine_Buff[16];     // '<Root>/Delay Line'
+      real32_T DelayLine_Buff[15];     // '<Root>/Delay Line'
       real32_T Delay_DSTATE[16];       // '<Root>/Delay'
       int32_T DelayLine_BUFF_OFFSET;   // '<Root>/Delay Line'
       uint32_T CircBufIdx;             // '<Root>/Delay'
@@ -58,7 +58,7 @@ namespace amc_bldc_codegen
 
     // model step function
     void step(const SensorsData &arg_SensorsData, EstimatedData &
-              arg_EstimatedData);
+              arg_EstimatedData, ConfigurationParameters *arg_SensorsData1);
 
     // Real-Time Model get method
     amc_bldc_codegen::estimation_velocity::RT_MODEL_estimation_velocity_T
@@ -95,7 +95,6 @@ namespace amc_bldc_codegen
 //  Block '<S2>/Check Signal Attributes' : Unused code path elimination
 //  Block '<S3>/Check Signal Attributes' : Unused code path elimination
 //  Block '<S4>/Check Signal Attributes' : Unused code path elimination
-//  Block '<Root>/Manual Switch' : Eliminated due to constant selection input
 
 
 //-

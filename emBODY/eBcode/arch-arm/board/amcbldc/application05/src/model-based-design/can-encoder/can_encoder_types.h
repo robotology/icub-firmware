@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.3
+// Model version                  : 2.4
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:30 2021
+// C/C++ source code generated on : Mon Dec 20 14:32:32 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,7 +27,7 @@
 // Fields of a FOC message.
 struct BUS_MSG_FOC
 {
-  // Current feedback in mA.
+  // Current feedback in A.
   real32_T current;
 
   // Position feedback in deg.

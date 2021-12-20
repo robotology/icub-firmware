@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.29
+// Model version                  : 2.34
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:56 2021
+// C/C++ source code generated on : Mon Dec 20 14:33:00 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -334,37 +334,121 @@ namespace amc_bldc_codegen
 
   // Output and update for referenced model: 'estimation_velocity'
   void estimation_velocity::step(const SensorsData &arg_SensorsData,
-    EstimatedData &arg_EstimatedData)
+    EstimatedData &arg_EstimatedData, ConfigurationParameters *arg_SensorsData1)
   {
     int32_T jpvt[2];
+    int32_T i;
+    int32_T i_0;
+    int32_T rankA;
     real32_T b_A[32];
+    real32_T rtb_DelayLine[16];
+    real32_T rtb_QRSolver_0[2];
     real32_T tau[2];
+    real32_T tol;
+
+    // S-Function (sdspsreg2): '<Root>/Delay Line'
+    for (rankA = 0; rankA < 15 - estimation_velocity_DW.DelayLine_BUFF_OFFSET;
+         rankA++) {
+      rtb_DelayLine[rankA] =
+        estimation_velocity_DW.DelayLine_Buff[estimation_velocity_DW.DelayLine_BUFF_OFFSET
+        + rankA];
+    }
+
+    for (rankA = 0; rankA < estimation_velocity_DW.DelayLine_BUFF_OFFSET; rankA
+         ++) {
+      rtb_DelayLine[(rankA - estimation_velocity_DW.DelayLine_BUFF_OFFSET) + 15]
+        = estimation_velocity_DW.DelayLine_Buff[rankA];
+    }
+
+    rtb_DelayLine[15] = arg_SensorsData.jointpositions.position;
 
     // MATLABSystem: '<S1>/QR Solver' incorporates:
     //   Constant: '<S1>/Constant'
 
-    estimation_velocity_xgeqp3(rtCP_Constant_Value, b_A, tau, jpvt);
+    estimation_velocity_xgeqp3(rtCP_Constant_Value_c, b_A, tau, jpvt);
+    rankA = 0;
+    tol = 1.90734863E-5F * std::abs(b_A[0]);
+    while ((rankA < 2) && (!(std::abs(b_A[(rankA << 4) + rankA]) <= tol))) {
+      rankA++;
+    }
 
-    // Gain: '<Root>/Gain' incorporates:
+    for (i_0 = 0; i_0 < 2; i_0++) {
+      real32_T tau_0;
+      tau_0 = tau[i_0];
+      rtb_QRSolver_0[i_0] = 0.0F;
+      if (tau_0 != 0.0F) {
+        tol = rtb_DelayLine[i_0];
+        for (i = i_0 + 2; i < 17; i++) {
+          tol += b_A[((i_0 << 4) + i) - 1] * rtb_DelayLine[i - 1];
+        }
+
+        tol *= tau_0;
+        if (tol != 0.0F) {
+          rtb_DelayLine[i_0] -= tol;
+          for (i = i_0 + 2; i < 17; i++) {
+            rtb_DelayLine[i - 1] -= b_A[((i_0 << 4) + i) - 1] * tol;
+          }
+        }
+      }
+    }
+
+    for (i = 0; i < rankA; i++) {
+      rtb_QRSolver_0[jpvt[i] - 1] = rtb_DelayLine[i];
+    }
+
+    for (i_0 = rankA; i_0 >= 1; i_0--) {
+      int32_T rtb_QRSolver_tmp;
+      int32_T rtb_QRSolver_tmp_0;
+      rtb_QRSolver_tmp = jpvt[i_0 - 1] - 1;
+      rtb_QRSolver_tmp_0 = (i_0 - 1) << 4;
+      rtb_QRSolver_0[rtb_QRSolver_tmp] /= b_A[(rtb_QRSolver_tmp_0 + i_0) - 1];
+      i = i_0 - 2;
+      for (int32_T bIndx = 0; bIndx <= i; bIndx++) {
+        rtb_QRSolver_0[jpvt[0] - 1] -= rtb_QRSolver_0[rtb_QRSolver_tmp] *
+          b_A[rtb_QRSolver_tmp_0];
+      }
+    }
+
+    // MultiPortSwitch: '<Root>/Index Vector' incorporates:
+    //   Constant: '<Root>/Constant'
     //   Delay: '<Root>/Delay'
+    //   Gain: '<Root>/Gain'
+    //   MATLABSystem: '<S1>/QR Solver'
+    //   S-Function (sdspsreg2): '<Root>/Delay Line'
     //   Sum: '<Root>/Sum'
 
-    arg_EstimatedData.jointvelocities.velocity =
-      (arg_SensorsData.jointpositions.position -
-       estimation_velocity_DW.Delay_DSTATE[estimation_velocity_DW.CircBufIdx]) *
-      62.5F;
+    switch (arg_SensorsData1->estimationconfig.velocity_mode) {
+     case EstimationVelocityModes_Disabled:
+      arg_EstimatedData.jointvelocities.velocity = 0.0F;
+      break;
+
+     case EstimationVelocityModes_MovingAverage:
+      arg_EstimatedData.jointvelocities.velocity =
+        (arg_SensorsData.jointpositions.position -
+         estimation_velocity_DW.Delay_DSTATE[estimation_velocity_DW.CircBufIdx])
+        * 62.5F;
+      break;
+
+     default:
+      arg_EstimatedData.jointvelocities.velocity = rtb_QRSolver_0[0];
+      break;
+    }
+
+    // End of MultiPortSwitch: '<Root>/Index Vector'
 
     // Update for S-Function (sdspsreg2): '<Root>/Delay Line'
     estimation_velocity_DW.DelayLine_Buff[estimation_velocity_DW.DelayLine_BUFF_OFFSET]
       = arg_SensorsData.jointpositions.position;
     estimation_velocity_DW.DelayLine_BUFF_OFFSET++;
-    while (estimation_velocity_DW.DelayLine_BUFF_OFFSET >= 16) {
-      estimation_velocity_DW.DelayLine_BUFF_OFFSET -= 16;
+    while (estimation_velocity_DW.DelayLine_BUFF_OFFSET >= 15) {
+      estimation_velocity_DW.DelayLine_BUFF_OFFSET -= 15;
     }
 
     // End of Update for S-Function (sdspsreg2): '<Root>/Delay Line'
 
-    // Update for Delay: '<Root>/Delay'
+    // Update for Delay: '<Root>/Delay' incorporates:
+    //   S-Function (sdspsreg2): '<Root>/Delay Line'
+
     estimation_velocity_DW.Delay_DSTATE[estimation_velocity_DW.CircBufIdx] =
       arg_SensorsData.jointpositions.position;
     if (estimation_velocity_DW.CircBufIdx < 15U) {

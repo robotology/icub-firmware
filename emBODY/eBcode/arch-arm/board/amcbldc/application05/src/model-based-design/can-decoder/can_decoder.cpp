@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 2.10
+// Model version                  : 2.11
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:24 2021
+// C/C++ source code generated on : Mon Dec 20 14:32:26 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -151,10 +151,10 @@ namespace amc_bldc_codegen
     can_decoder_B.msg_set_control_mode.motor = false;
     can_decoder_B.msg_set_control_mode.mode = MCControlModes_Idle;
     can_decoder_B.msg_set_current_limit.motor = false;
-    can_decoder_B.msg_set_current_limit.nominal = 0;
-    can_decoder_B.msg_set_current_limit.peak = 0U;
-    can_decoder_B.msg_set_current_limit.overload = 0U;
-    can_decoder_B.msg_desired_current.current = 0;
+    can_decoder_B.msg_set_current_limit.nominal = 0.0F;
+    can_decoder_B.msg_set_current_limit.peak = 0.0F;
+    can_decoder_B.msg_set_current_limit.overload = 0.0F;
+    can_decoder_B.msg_desired_current.current = 0.0F;
 
     // SystemInitialize for BusCreator: '<S1>/Bus Creator1'
     arg_events_rx->control_mode = can_decoder_B.ev_set_control_mode;
@@ -276,10 +276,10 @@ namespace amc_bldc_codegen
            (can_de_safe_cast_to_MCStreaming(arg_pck_rx.packets.ID.DST_TYP) ==
             static_cast<int32_T>(MCStreaming_Desired_Current)))) {
         if (arg_pck_rx.packets.PAYLOAD.LEN == 8) {
-          can_decoder_B.msg_desired_current.current =
-            can_decoder_merge_2bytes_signed(static_cast<uint16_T>
-            (arg_pck_rx.packets.PAYLOAD.ARG[5]), static_cast<uint16_T>
-            (arg_pck_rx.packets.PAYLOAD.ARG[6]));
+          can_decoder_B.msg_desired_current.current = 0.001F *
+            static_cast<real32_T>(can_decoder_merge_2bytes_signed(static_cast<
+            uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[5]), static_cast<uint16_T>
+            (arg_pck_rx.packets.PAYLOAD.ARG[6])));
           b_previousEvent = can_decoder_DW.cmd_processed + 1;
           if (can_decoder_DW.cmd_processed + 1 > 65535) {
             b_previousEvent = 65535;
@@ -311,18 +311,18 @@ namespace amc_bldc_codegen
               if (arg_pck_rx.packets.PAYLOAD.LEN == 8) {
                 can_decoder_B.msg_set_current_limit.motor =
                   arg_pck_rx.packets.PAYLOAD.CMD.M;
-                can_decoder_B.msg_set_current_limit.nominal =
-                  can_decoder_merge_2bytes_signed(static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[1]), static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[2]));
-                can_decoder_B.msg_set_current_limit.peak =
-                  can_decod_merge_2bytes_unsigned(static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[3]), static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[4]));
-                can_decoder_B.msg_set_current_limit.overload =
-                  can_decod_merge_2bytes_unsigned(static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[5]), static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[6]));
+                can_decoder_B.msg_set_current_limit.nominal = 0.001F *
+                  static_cast<real32_T>(can_decoder_merge_2bytes_signed(
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[1]),
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[2])));
+                can_decoder_B.msg_set_current_limit.peak = 0.001F *
+                  static_cast<real32_T>(can_decod_merge_2bytes_unsigned(
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[3]),
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[4])));
+                can_decoder_B.msg_set_current_limit.overload = 0.001F *
+                  static_cast<real32_T>(can_decod_merge_2bytes_unsigned(
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[5]),
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[6])));
                 b_previousEvent = can_decoder_DW.cmd_processed + 1;
                 if (can_decoder_DW.cmd_processed + 1 > 65535) {
                   b_previousEvent = 65535;

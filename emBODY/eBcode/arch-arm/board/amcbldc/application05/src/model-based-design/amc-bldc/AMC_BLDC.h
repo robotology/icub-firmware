@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.96
+// Model version                  : 3.123
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:26:07 2021
+// C/C++ source code generated on : Mon Dec 20 14:33:12 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -64,13 +64,13 @@
 //
 
 extern real32_T CAN_ANGLE_DEG2ICUB;    // Variable: CAN_ANGLE_DEG2ICUB
-                                          //  Referenced by: '<S3>/CAN_Encoder'
+                                          //  Referenced by: '<S4>/CAN_Encoder'
                                           //  2^16/360
 
 extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  Referenced by:
-                                          //    '<S3>/CAN_Decoder'
-                                          //    '<S3>/CAN_Encoder'
+                                          //    '<S4>/CAN_Decoder'
+                                          //    '<S4>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 
@@ -83,21 +83,22 @@ namespace amc_bldc_codegen
    public:
     // Block signals (default storage)
     struct B_AMC_BLDC_T {
-      ConfigurationParameters ConfigurationParameters_m;// '<S4>/SupervisorFSM_RX' 
+      ConfigurationParameters ConfigurationParameters_m;// '<S5>/SupervisorFSM_RX' 
       SensorsData BusConversion_InsertedFor_Estim;
       SensorsData BusConversion_InsertedFor_Super;
-      BUS_CAN_RX pck_rx_struct;        // '<S3>/CAN_RX_raw2struct'
-      Targets Targets_n;               // '<S4>/SupervisorFSM_RX'
-      BUS_MESSAGES_RX CAN_Decoder_o1;  // '<S3>/CAN_Decoder'
-      BUS_MESSAGES_TX MessagesTx;      // '<S4>/SupervisorFSM_TX'
-      Flags Flags_k;                   // '<S4>/SupervisorFSM_RX'
-      BUS_EVENTS_TX SupervisorFSM_TX_o2;// '<S4>/SupervisorFSM_TX'
-      BUS_EVENTS_RX CAN_Decoder_o2;    // '<S3>/CAN_Decoder'
-      BUS_CAN_RX_ERRORS CAN_Decoder_o3;// '<S3>/CAN_Decoder'
+      BUS_CAN_RX pck_rx_struct;        // '<S4>/CAN_RX_raw2struct'
+      Targets Targets_n;               // '<S5>/SupervisorFSM_RX'
+      BUS_MESSAGES_RX CAN_Decoder_o1;  // '<S4>/CAN_Decoder'
+      BUS_MESSAGES_TX MessagesTx;      // '<S5>/SupervisorFSM_TX'
+      Flags Flags_k;                   // '<S5>/SupervisorFSM_RX'
+      BUS_EVENTS_TX SupervisorFSM_TX_o2;// '<S5>/SupervisorFSM_TX'
+      BUS_EVENTS_RX CAN_Decoder_o2;    // '<S4>/CAN_Decoder'
+      BUS_CAN_RX_ERRORS CAN_Decoder_o3;// '<S4>/CAN_Decoder'
     };
 
     // Block states (default storage) for system '<Root>'
     struct DW_AMC_BLDC_T {
+      ConfigurationParameters ZOHBlockInsertedForAdapter_Inse;// synthesized block 
       ControlOutputs RTBInsertedForAdapter_InsertedF;// synthesized block
       ControlOutputs RTBInsertedForAdapter_Inserte_m;// synthesized block
       ControlOutputs RTBInsertedForAdapter_Inserte_b;// synthesized block
@@ -187,28 +188,28 @@ namespace amc_bldc_codegen
 
     // private data and function members
    private:
-    // model instance variable for '<S1>/FOC'
+    // model instance variable for '<S2>/FOC'
     amc_bldc_codegen::control_foc FOCMDLOBJ1;
 
-    // model instance variable for '<S1>/OuterControl'
+    // model instance variable for '<S2>/OuterControl'
     amc_bldc_codegen::control_outer OuterControlMDLOBJ2;
 
-    // model instance variable for '<S2>/Estimation_Velocity'
+    // model instance variable for '<S3>/Estimation_Velocity'
     amc_bldc_codegen::estimation_velocity Estimation_VelocityMDLOBJ3;
 
-    // model instance variable for '<S3>/CAN_Decoder'
+    // model instance variable for '<S4>/CAN_Decoder'
     amc_bldc_codegen::CAN_Decoder CAN_DecoderMDLOBJ4;
 
-    // model instance variable for '<S3>/CAN_Encoder'
+    // model instance variable for '<S4>/CAN_Encoder'
     amc_bldc_codegen::CAN_Encoder CAN_EncoderMDLOBJ5;
 
-    // model instance variable for '<S3>/CAN_RX_raw2struct'
+    // model instance variable for '<S4>/CAN_RX_raw2struct'
     amc_bldc_codegen::CAN_RX_raw2struct CAN_RX_raw2structMDLOBJ6;
 
-    // model instance variable for '<S4>/SupervisorFSM_RX'
+    // model instance variable for '<S5>/SupervisorFSM_RX'
     amc_bldc_codegen::SupervisorFSM_RX SupervisorFSM_RXMDLOBJ7;
 
-    // model instance variable for '<S4>/SupervisorFSM_TX'
+    // model instance variable for '<S5>/SupervisorFSM_TX'
     amc_bldc_codegen::SupervisorFSM_TX SupervisorFSM_TXMDLOBJ8;
 
     // Real-Time Model
@@ -231,16 +232,17 @@ namespace amc_bldc_codegen
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'AMC_BLDC'
-//  '<S1>'   : 'AMC_BLDC/Control'
-//  '<S2>'   : 'AMC_BLDC/Estimation'
-//  '<S3>'   : 'AMC_BLDC/Messaging'
-//  '<S4>'   : 'AMC_BLDC/Supervision'
-//  '<S5>'   : 'AMC_BLDC/Control/Adapter'
-//  '<S6>'   : 'AMC_BLDC/Control/Adapter1'
-//  '<S7>'   : 'AMC_BLDC/Control/Adapter2'
-//  '<S8>'   : 'AMC_BLDC/Control/Adapter3'
-//  '<S9>'   : 'AMC_BLDC/Control/Adapter4'
-//  '<S10>'  : 'AMC_BLDC/Control/Adapter5'
+//  '<S1>'   : 'AMC_BLDC/Adapter'
+//  '<S2>'   : 'AMC_BLDC/Control'
+//  '<S3>'   : 'AMC_BLDC/Estimation'
+//  '<S4>'   : 'AMC_BLDC/Messaging'
+//  '<S5>'   : 'AMC_BLDC/Supervision'
+//  '<S6>'   : 'AMC_BLDC/Control/Adapter'
+//  '<S7>'   : 'AMC_BLDC/Control/Adapter1'
+//  '<S8>'   : 'AMC_BLDC/Control/Adapter2'
+//  '<S9>'   : 'AMC_BLDC/Control/Adapter3'
+//  '<S10>'  : 'AMC_BLDC/Control/Adapter4'
+//  '<S11>'  : 'AMC_BLDC/Control/Adapter5'
 
 #endif                                 // RTW_HEADER_AMC_BLDC_h_
 

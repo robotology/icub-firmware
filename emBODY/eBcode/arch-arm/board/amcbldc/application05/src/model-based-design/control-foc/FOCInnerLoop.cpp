@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.75
+// Model version                  : 2.79
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:42 2021
+// C/C++ source code generated on : Mon Dec 20 14:32:45 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -158,49 +158,49 @@ namespace amc_bldc_codegen
     // Signum: '<S34>/SignPreSat'
     if (rtb_algDD_o2_n < 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv1'
-      rtb_Switch2 = -1.0F;
+      rtb_Gain2 = -1.0F;
     } else if (rtb_algDD_o2_n > 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv1'
-      rtb_Switch2 = 1.0F;
+      rtb_Gain2 = 1.0F;
     } else if (rtb_algDD_o2_n == 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv1'
-      rtb_Switch2 = 0.0F;
+      rtb_Gain2 = 0.0F;
     } else {
       // DataTypeConversion: '<S34>/DataTypeConv1'
-      rtb_Switch2 = (rtNaNF);
+      rtb_Gain2 = (rtNaNF);
     }
 
     // End of Signum: '<S34>/SignPreSat'
 
     // DataTypeConversion: '<S34>/DataTypeConv1'
-    if (rtIsNaNF(rtb_Switch2)) {
-      rtb_Switch2 = 0.0F;
+    if (rtIsNaNF(rtb_Gain2)) {
+      rtb_Gain2 = 0.0F;
     } else {
-      rtb_Switch2 = std::fmod(rtb_Switch2, 256.0F);
+      rtb_Gain2 = std::fmod(rtb_Gain2, 256.0F);
     }
 
     // Signum: '<S34>/SignPreIntegrator'
     if (rtb_sum_alpha < 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv2'
-      rtb_Gain2 = -1.0F;
+      rtb_Switch2 = -1.0F;
     } else if (rtb_sum_alpha > 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv2'
-      rtb_Gain2 = 1.0F;
+      rtb_Switch2 = 1.0F;
     } else if (rtb_sum_alpha == 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv2'
-      rtb_Gain2 = 0.0F;
+      rtb_Switch2 = 0.0F;
     } else {
       // DataTypeConversion: '<S34>/DataTypeConv2'
-      rtb_Gain2 = (rtNaNF);
+      rtb_Switch2 = (rtNaNF);
     }
 
     // End of Signum: '<S34>/SignPreIntegrator'
 
     // DataTypeConversion: '<S34>/DataTypeConv2'
-    if (rtIsNaNF(rtb_Gain2)) {
-      rtb_Gain2 = 0.0F;
+    if (rtIsNaNF(rtb_Switch2)) {
+      rtb_Switch2 = 0.0F;
     } else {
-      rtb_Gain2 = std::fmod(rtb_Gain2, 256.0F);
+      rtb_Switch2 = std::fmod(rtb_Switch2, 256.0F);
     }
 
     // Switch: '<S34>/Switch' incorporates:
@@ -212,14 +212,14 @@ namespace amc_bldc_codegen
     //   RelationalOperator: '<S34>/Equal1'
     //   RelationalOperator: '<S34>/NotEqual'
 
-    if ((0.0F * rtb_SumFdbk != rtb_algDD_o2_n) && ((rtb_Switch2 < 0.0F ?
+    if ((0.0F * rtb_SumFdbk != rtb_algDD_o2_n) && ((rtb_Gain2 < 0.0F ?
           static_cast<int32_T>(static_cast<int8_T>(-static_cast<int8_T>(
-             static_cast<uint8_T>(-rtb_Switch2)))) : static_cast<int32_T>(
-           static_cast<int8_T>(static_cast<uint8_T>(rtb_Switch2)))) ==
-         (rtb_Gain2 < 0.0F ? static_cast<int32_T>(static_cast<int8_T>(-
-            static_cast<int8_T>(static_cast<uint8_T>(-rtb_Gain2)))) :
+             static_cast<uint8_T>(-rtb_Gain2)))) : static_cast<int32_T>(
+           static_cast<int8_T>(static_cast<uint8_T>(rtb_Gain2)))) ==
+         (rtb_Switch2 < 0.0F ? static_cast<int32_T>(static_cast<int8_T>(-
+            static_cast<int8_T>(static_cast<uint8_T>(-rtb_Switch2)))) :
           static_cast<int32_T>(static_cast<int8_T>(static_cast<uint8_T>
-            (rtb_Gain2)))))) {
+            (rtb_Switch2)))))) {
       rtb_sum_alpha = 0.0F;
     }
 
@@ -343,11 +343,7 @@ namespace amc_bldc_codegen
     // End of Outputs for SubSystem: '<S1>/Inverse Park Transform'
 
     // Switch: '<S1>/Switch2' incorporates:
-    //   AlgorithmDescriptorDelegate generated from: '<S6>/a16'
     //   Constant: '<S1>/Constant1'
-    //   Gain: '<S1>/Gain1'
-    //   Product: '<S1>/Divide'
-    //   Sum: '<S1>/Sum1'
 
     if (rtu_OuterOutputs->out_en) {
       // Outputs for Atomic SubSystem: '<S1>/Inverse Park Transform'
@@ -391,14 +387,56 @@ namespace amc_bldc_codegen
       // End of MinMax: '<S1>/Min'
 
       // Outputs for Atomic SubSystem: '<S1>/Inverse Park Transform'
-      rty_FOCOutputs->Vabc[0] = (rtb_IaIbIc0[0] - rtb_SinCos_o1) /
+      // Gain: '<S1>/Gain1' incorporates:
+      //   AlgorithmDescriptorDelegate generated from: '<S6>/a16'
+      //   Product: '<S1>/Divide'
+      //   Sum: '<S1>/Sum1'
+
+      rtb_Switch2 = (rtb_IaIbIc0[0] - rtb_SinCos_o1) /
         rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F;
 
       // End of Outputs for SubSystem: '<S1>/Inverse Park Transform'
-      rty_FOCOutputs->Vabc[1] = (rtb_SinCos_o2 - rtb_SinCos_o1) /
+
+      // Saturate: '<S1>/Saturation'
+      if (rtb_Switch2 > 100.0F) {
+        rty_FOCOutputs->Vabc[0] = 100.0F;
+      } else if (rtb_Switch2 < 0.0F) {
+        rty_FOCOutputs->Vabc[0] = 0.0F;
+      } else {
+        rty_FOCOutputs->Vabc[0] = rtb_Switch2;
+      }
+
+      // Gain: '<S1>/Gain1' incorporates:
+      //   Product: '<S1>/Divide'
+      //   Sum: '<S1>/Sum1'
+
+      rtb_Switch2 = (rtb_SinCos_o2 - rtb_SinCos_o1) /
         rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F;
-      rty_FOCOutputs->Vabc[2] = (rtb_Gain2 - rtb_SinCos_o1) /
+
+      // Saturate: '<S1>/Saturation'
+      if (rtb_Switch2 > 100.0F) {
+        rty_FOCOutputs->Vabc[1] = 100.0F;
+      } else if (rtb_Switch2 < 0.0F) {
+        rty_FOCOutputs->Vabc[1] = 0.0F;
+      } else {
+        rty_FOCOutputs->Vabc[1] = rtb_Switch2;
+      }
+
+      // Gain: '<S1>/Gain1' incorporates:
+      //   Product: '<S1>/Divide'
+      //   Sum: '<S1>/Sum1'
+
+      rtb_Switch2 = (rtb_Gain2 - rtb_SinCos_o1) /
         rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F;
+
+      // Saturate: '<S1>/Saturation'
+      if (rtb_Switch2 > 100.0F) {
+        rty_FOCOutputs->Vabc[2] = 100.0F;
+      } else if (rtb_Switch2 < 0.0F) {
+        rty_FOCOutputs->Vabc[2] = 0.0F;
+      } else {
+        rty_FOCOutputs->Vabc[2] = rtb_Switch2;
+      }
     } else {
       rty_FOCOutputs->Vabc[0] = 0.0F;
       rty_FOCOutputs->Vabc[1] = 0.0F;

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 2.10
+// Model version                  : 2.11
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:24 2021
+// C/C++ source code generated on : Mon Dec 20 14:32:26 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -159,14 +159,14 @@ struct BUS_MSG_CURRENT_LIMIT
   // Motor selector.
   boolean_T motor;
 
-  // Nominal current in mA.
-  int16_T nominal;
+  // Nominal current in A.
+  real32_T nominal;
 
-  // Peak current in mA.
-  uint16_T peak;
+  // Peak current in A.
+  real32_T peak;
 
-  // Overload current in mA.
-  uint16_T overload;
+  // Overload current in A.
+  real32_T overload;
 };
 
 #endif
@@ -177,8 +177,8 @@ struct BUS_MSG_CURRENT_LIMIT
 // Fields of a DESIRED_CURRENT message.
 struct BUS_MSG_DESIRED_CURRENT
 {
-  // Nominal current in mA.
-  int16_T current;
+  // Nominal current in A.
+  real32_T current;
 };
 
 #endif

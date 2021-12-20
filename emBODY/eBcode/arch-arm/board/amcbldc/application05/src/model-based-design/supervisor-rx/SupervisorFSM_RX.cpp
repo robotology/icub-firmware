@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.106
+// Model version                  : 3.113
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:07 2021
+// C/C++ source code generated on : Mon Dec 20 14:32:07 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -498,10 +498,6 @@ namespace amc_bldc_codegen
     arg_Targets->jointvelocities.velocity = 0.0F;
     arg_Targets->motorcurrent.current = 0.0F;
     arg_Targets->motorvoltage.voltage = 0.0F;
-    arg_Output->jointlimits.limits[0] = 0.0F;
-    arg_Output->velocitylimits.limits[0] = 0.0F;
-    arg_Output->jointlimits.limits[1] = 0.0F;
-    arg_Output->velocitylimits.limits[1] = 0.0F;
     arg_Output->motorconfig.Imin = 0.0F;
     arg_Output->motorconfig.Imax = 0.0F;
     arg_Output->motorconfig.has_hall_sens = false;
@@ -509,11 +505,12 @@ namespace amc_bldc_codegen
     arg_Output->motorconfig.reduction = 0.0F;
     arg_Output->motorconfig.Kp = 0.0F;
     arg_Output->motorconfig.Ki = 0.0F;
-    arg_Output->motorconfig.has_speed_sens = false;
     arg_Output->motorconfig.Kbemf = 0.0F;
     arg_Output->motorconfig.Rphase = 0.0F;
     arg_Output->motorconfig.Vmax = 0.0F;
     arg_Output->motorconfig.Vcc = 0.0F;
+    arg_Output->estimationconfig.velocity_mode =
+      EstimationVelocityModes_Disabled;
     arg_Output->PosLoopPID.OutMax = 0.0F;
     arg_Output->PosLoopPID.OutMin = 0.0F;
     arg_Output->PosLoopPID.P = 0.0F;
@@ -538,12 +535,18 @@ namespace amc_bldc_codegen
     arg_Output->DirLoopPID.N = 0.0F;
     arg_Output->DirLoopPID.I0 = 0.0F;
     arg_Output->DirLoopPID.D0 = 0.0F;
-    arg_Output->thresholds.current_low = 0.0F;
-    arg_Output->thresholds.current_high = 0.0F;
-    arg_Output->thresholds.voltage_low = 0.0F;
-    arg_Output->thresholds.voltage_high = 0.0F;
-    arg_Output->thresholds.temperature_low = 0.0F;
-    arg_Output->thresholds.temperature_high = 0.0F;
+    arg_Output->thresholds.jntPosMin = 0.0F;
+    arg_Output->thresholds.jntPosMax = 0.0F;
+    arg_Output->thresholds.hardwareJntPosMin = 0.0F;
+    arg_Output->thresholds.hardwareJntPosMax = 0.0F;
+    arg_Output->thresholds.rotorPosMin = 0.0F;
+    arg_Output->thresholds.rotorPosMax = 0.0F;
+    arg_Output->thresholds.jntVelMax = 0.0F;
+    arg_Output->thresholds.velocityTimeout = 0U;
+    arg_Output->thresholds.motorNominalCurrents = 0.0F;
+    arg_Output->thresholds.motorPeakCurrents = 0.0F;
+    arg_Output->thresholds.motorOverloadCurrents = 0.0F;
+    arg_Output->thresholds.motorPwmLimit = 0U;
   }
 
   // Output and update for referenced model: 'SupervisorFSM_RX'
@@ -584,10 +587,26 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.EventsRx_current_limit_start =
         arg_EventsRx.current_limit;
       SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX = 1U;
+      arg_Output.motorconfig.pole_pairs = 4U;
       arg_Output.motorconfig.Kp = 0.4F;
       arg_Output.motorconfig.Ki = 100.0F;
       arg_Output.motorconfig.Vmax = 9.0F;
       arg_Output.motorconfig.Vcc = 24.0F;
+      arg_Output.motorconfig.reduction = 1.0F;
+      arg_Output.estimationconfig.velocity_mode =
+        EstimationVelocityModes_MovingAverage;
+      arg_Output.thresholds.jntPosMin = 1.0F;
+      arg_Output.thresholds.jntPosMax = 359.0F;
+      arg_Output.thresholds.hardwareJntPosMin = 0.0F;
+      arg_Output.thresholds.hardwareJntPosMax = 360.0F;
+      arg_Output.thresholds.rotorPosMin = 0.0F;
+      arg_Output.thresholds.rotorPosMax = 0.0F;
+      arg_Output.thresholds.jntVelMax = 100.0F;
+      arg_Output.thresholds.velocityTimeout = 10U;
+      arg_Output.thresholds.motorNominalCurrents = 100.0F;
+      arg_Output.thresholds.motorPeakCurrents = 100.0F;
+      arg_Output.thresholds.motorOverloadCurrents = 100.0F;
+      arg_Output.thresholds.motorPwmLimit = 32000U;
       SupervisorFSM_RX_DW.is_active_CAN_RX_HANDLER = 1U;
       SupervisorFSM_RX_DW.is_active_EVENT_DISPATCHER = 1U;
       SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
@@ -627,8 +646,8 @@ namespace amc_bldc_codegen
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           } else if (SupervisorFSM_RX_DW.EventsRx_desired_current_prev !=
                      SupervisorFSM_RX_DW.EventsRx_desired_current_start) {
-            arg_Targets.motorcurrent.current = 0.001F * static_cast<real32_T>
-              (arg_MessagesRx.desired_current.current);
+            arg_Targets.motorcurrent.current =
+              arg_MessagesRx.desired_current.current;
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           } else if (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
                      SupervisorFSM_RX_DW.EventsRx_current_limit_start) {
@@ -639,7 +658,7 @@ namespace amc_bldc_codegen
                 (SupervisorFSM_RX_DW.sfEvent == SupervisorF_event_setLimitEvent)
                 && (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
                     SupervisorFSM_RX_DW.EventsRx_current_limit_start)) {
-              SupervisorFSM_RX_DW.CurrentLimit = 0.001F * static_cast<real32_T>
+              arg_Output.thresholds.motorOverloadCurrents = std::abs
                 (arg_MessagesRx.current_limit.overload);
               SupervisorFSM_RX_DW.IsCurrentLimitSet = true;
               SupervisorFSM_RX_DW.is_LIMITS_HANDLER = SupervisorFSM_RX_IN_Home;
@@ -660,7 +679,7 @@ namespace amc_bldc_codegen
             (SupervisorFSM_RX_DW.sfEvent == SupervisorF_event_setLimitEvent) &&
             (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
              SupervisorFSM_RX_DW.EventsRx_current_limit_start)) {
-          SupervisorFSM_RX_DW.CurrentLimit = 0.001F * static_cast<real32_T>
+          arg_Output.thresholds.motorOverloadCurrents = std::abs
             (arg_MessagesRx.current_limit.overload);
           SupervisorFSM_RX_DW.IsCurrentLimitSet = true;
           SupervisorFSM_RX_DW.is_LIMITS_HANDLER = SupervisorFSM_RX_IN_Home;
@@ -748,7 +767,7 @@ namespace amc_bldc_codegen
 
            case SupervisorFSM_RX_IN_NoFault:
             if (std::abs(arg_ControlOutputs.Iq_fbk.current) >=
-                SupervisorFSM_RX_DW.CurrentLimit) {
+                arg_Output.thresholds.motorOverloadCurrents) {
               SupervisorFSM_RX_DW.is_OverCurrent =
                 SupervisorF_IN_OverCurrentFault;
 
@@ -766,7 +785,7 @@ namespace amc_bldc_codegen
 
            case SupervisorF_IN_OverCurrentFault:
             if (std::abs(arg_ControlOutputs.Iq_fbk.current) <
-                SupervisorFSM_RX_DW.CurrentLimit) {
+                arg_Output.thresholds.motorOverloadCurrents) {
               SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
 
               // MotorFaultFlags.overCurrent=0;

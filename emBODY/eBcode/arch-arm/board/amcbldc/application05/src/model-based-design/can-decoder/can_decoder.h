@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 2.10
+// Model version                  : 2.11
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:24 2021
+// C/C++ source code generated on : Mon Dec 20 14:32:26 2021
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -46,8 +46,8 @@ namespace amc_bldc_codegen
    public:
     // Block signals for model 'can_decoder'
     struct B_can_decoder_T {
-      BUS_MSG_DESIRED_CURRENT msg_desired_current;// '<S1>/Decoding Logic'
       BUS_MSG_CURRENT_LIMIT msg_set_current_limit;// '<S1>/Decoding Logic'
+      BUS_MSG_DESIRED_CURRENT msg_desired_current;// '<S1>/Decoding Logic'
       BUS_MSG_CONTROL_MODE msg_set_control_mode;// '<S1>/Decoding Logic'
       CANErrorTypes error_type;        // '<S1>/Decoding Logic'
       boolean_T ev_set_control_mode;   // '<S1>/Decoding Logic'
