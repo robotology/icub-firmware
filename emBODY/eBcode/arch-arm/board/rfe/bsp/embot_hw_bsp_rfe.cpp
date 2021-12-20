@@ -692,7 +692,7 @@ namespace embot { namespace hw { namespace bno055 {
     
     // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
     constexpr PROP prop01 {
-        { embot::hw::I2C::two, 0x50 },
+        { embot::hw::I2C::one, 0x50 },
         { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::fourteen },   // .boot
         { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::fifteen }      // .reset
     };
