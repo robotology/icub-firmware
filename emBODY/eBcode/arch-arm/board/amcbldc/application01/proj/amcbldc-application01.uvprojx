@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.2.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.1.3.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -336,10 +336,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DEMBOT_AMCBLDC_APP01</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\FOCode\BLDC_FOC_Code\Current_FOC_ert_rtw;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\src\motorhal</IncludePath>
+              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\FOCode\BLDC_FOC_Code\Current_FOC_ert_rtw;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\src\motorhal;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -758,6 +758,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -904,7 +909,7 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.2.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.1.3.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1646,6 +1651,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1792,7 +1802,7 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.2.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.1.3.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2533,6 +2543,11 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>

@@ -131,6 +131,47 @@ struct embot::app::scope::SignalEViewer::Impl
                       
 };
 
+
+// -----
+
+struct embot::app::scope::SignalHisto::Impl
+{   
+    static constexpr embot::core::Time maxtimefilter {600*embot::core::time1second};
+    Impl() { }
+    
+    Config config {};
+        
+    embot::core::Time start {0};
+    embot::core::Time stop {0};
+    embot::core::relTime delta {0};
+    
+    embot::tools::Histogram* histo {nullptr};
+    
+    void init(const Config &cfg)
+    {        
+        config = cfg;        
+        histo = new embot::tools::Histogram;
+        histo->init(config.hcfg);        
+    }    
+    
+    void on()
+    {
+        start = embot::core::now();
+    }
+    
+    void off() 
+    {
+        stop = embot::core::now();
+        delta = stop - start;
+        // add delta in histogram 
+        if(delta < maxtimefilter)
+        {
+            histo->add(delta); 
+        }            
+    }
+                          
+};
+
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
@@ -211,6 +252,39 @@ void embot::app::scope::SignalEViewer::off()
 {   
     pImpl->off();
 }
+
+
+// ---
+
+embot::app::scope::SignalHisto::SignalHisto(const Config &cfg) 
+: pImpl(new Impl)
+{   
+    pImpl->init(cfg);
+}
+
+embot::app::scope::SignalHisto::~SignalHisto()
+{   
+    delete pImpl;
+}
+
+
+void embot::app::scope::SignalHisto::on() 
+{   
+    pImpl->on();
+}
+
+
+void embot::app::scope::SignalHisto::off() 
+{   
+    pImpl->off();
+}
+
+const embot::tools::Histogram * embot::app::scope::SignalHisto::histogram() const
+{
+    return pImpl->histo;
+}
+
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

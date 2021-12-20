@@ -44,11 +44,27 @@ namespace embot { namespace hw { namespace motor {
     result_t getencoder(embot::hw::MOTOR h, Position &position);
     result_t gethallcounter(embot::hw::MOTOR h, Position &position);
     
+    result_t setpwm(MOTOR h, Pwm v);
+        
     result_t gethallstatus(embot::hw::MOTOR h, uint8_t &hs);
     result_t setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w);
-    result_t setADCcallback(MOTOR h, void (*fn_cb)(int16_t[3], void*, void*), void* rtu, void* rty);
+//    result_t setADCcallback(MOTOR h, void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty);
     result_t motorEnable(MOTOR h);
     result_t motorDisable(MOTOR h);
+    
+    
+    // so far, we keep int32_t as it is more general. even if lower levels may propagate them as int16_t
+    struct Currents
+    {
+        std::int32_t u {0};
+        std::int32_t v {0};
+        std::int32_t w {0};
+        constexpr Currents() = default;
+    };
+    
+    using fpOnCurrents = void (*)(void *owner, const Currents * const currents);
+    
+    result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner);
     
 }}} // namespace embot { namespace hw { namespace motor {
     

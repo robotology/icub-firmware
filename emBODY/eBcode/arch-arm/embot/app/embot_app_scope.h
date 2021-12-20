@@ -15,6 +15,7 @@
 
 #include "embot_core.h"
 #include "embot_hw_gpio.h"
+#include "embot_tools.h"
 
 namespace embot { namespace app { namespace scope {
     
@@ -152,6 +153,33 @@ namespace embot { namespace app { namespace scope {
         struct Impl;
         Impl *pImpl;           
     };
+    
+    
+    // this implementation collects [on, off] duration in a histogram
+    class SignalHisto: public Signal
+    {
+    public:
+               
+        struct Config
+        {   
+            embot::tools::Histogram::Config hcfg {0, 8, 1};
+            Config() = default;
+            Config(embot::core::Time minduration, embot::core::relTime range, embot::core::relTime step = 1) : hcfg({minduration, minduration+range, step}) {}
+            bool isvalid() const { return hcfg.isvalid(); }
+        };
+                    
+        SignalHisto(const Config &cfg);
+        virtual ~SignalHisto();
+    
+        virtual void on() override;
+        virtual void off() override;
+        
+        const embot::tools::Histogram * histogram() const;
+
+    private:        
+        struct Impl;
+        Impl *pImpl;           
+    };         
     
 } } } // namespace embot { namespace app { namespace scope {
 
