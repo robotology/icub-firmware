@@ -1337,7 +1337,6 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     } 
 
 
-    const deciDeg deciDegPOSdescriptor::rotationmap[4] = {0, 1800, 900, -900};    
 
     
     bool Message_POS_CONFIG_SET::load(const embot::prot::can::Frame &inframe)

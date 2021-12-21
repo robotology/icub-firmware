@@ -1242,44 +1242,88 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         bool reply();   // none        
     };  
 
+    struct deciDegCalib
+    {
+        enum class ROT : uint8_t { none = 0, plus180 = 1, plus090 = 2, minus090 = 3 };
+        constexpr static deciDeg rotmap[4] = {0, 1800, 900, -900};
+        bool invertdirection {false};
+        ROT rotation {ROT::none};   
+        deciDeg zero {0};  
+        constexpr deciDegCalib() = default;
+        constexpr deciDegCalib(bool inv, ROT rot, deciDeg zer) : invertdirection(inv), rotation(rot), zero(zer) {}
+        constexpr deciDeg rotateclip(deciDeg v) const { return ( (v+rotmap[static_cast<uint8_t>(rotation)]) % 3600 ); }
+        constexpr deciDeg transform(const deciDeg raw) const
+        {
+            deciDeg z = rotateclip(raw) - rotateclip(zero);
+            return (invertdirection) ? (-z) : (+z);
+        }
+        void reset()
+        {
+            rotation = ROT::none; invertdirection = false; zero = 0;
+        }
+        void load(bool inv, ROT rot, deciDeg zer) 
+        {
+            invertdirection = inv; rotation = rot; zero = zer; 
+        }
+    };
 
+
+    struct deciMilliMeterCalib
+    {
+        bool invert {false};
+        deciMilliMeter zero {0};  
+        constexpr deciMilliMeterCalib() = default;
+        constexpr deciMilliMeterCalib(bool inv, deciMilliMeter zer) : invert(inv), zero(zer) {}
+
+        constexpr deciMilliMeter transform(const deciMilliMeter raw) const
+        {
+            deciMilliMeter z = raw - zero;
+            return (invert) ? (-z) : (+z);
+        }
+        void reset()
+        {
+           invert = false; zero = 0;
+        }
+        void load(bool inv, deciMilliMeter zer) 
+        {
+            invert = inv; zero = zer; 
+        }
+    };
     
     struct deciDegPOSdescriptor
     {   // it assumes to have raw angle values in range [0, 360] expressed as int16_t in deci-degrees. it returns deci-degrees in open range positive and negative
         // this struct can be transmitted in 3 bytes. from lsb: [rotation: 2 bits, invertdirection: 1 bit, label : 4 bits], zero: two bytes in little endian
         // the bytes [0x01, 0x00, 0x00] tells ... no rotation, no inversion of direction, label 1, no zero. 
-        enum class ROT : uint8_t { none = 0, plus180 = 1, plus090 = 2, minus090 = 3 };
-        bool        enabled;            // it must be true if teh sensor is to be considered.      
-        bool        invertdirection;
-        ROT         rotation;   
-        posLABEL    label;              // the label to use when transmitting in streaming the value of POS
-        deciDeg     zero;               // the zero to be applied to the value
-        deciDegPOSdescriptor() { reset(); }
-        void reset() { enabled =  true; rotation = ROT::none; invertdirection = false;  label = posLABEL::zero; zero = 0; }
+        
+        bool enabled {true};                    // it must be true if teh sensor is to be considered.        
+        posLABEL label {posLABEL::zero};        // the label to use when transmitting in streaming the value of POS
+        deciDegCalib calib {};
+        constexpr deciDegPOSdescriptor() = default;
+        constexpr deciDegPOSdescriptor(posLABEL lab, bool ena, const deciDegCalib &ca) : label(lab), enabled(ena), calib(ca) {}
+        void reset() { enabled = true; label = posLABEL::zero; calib.reset(); }
+
         void load(const uint8_t *bytes)
         { 
             enabled = embot::core::binary::bit::check(bytes[0], 7);
-            invertdirection = embot::core::binary::bit::check(bytes[0], 6);
-            rotation = static_cast<ROT>((bytes[0] >> 4) & 0b0011);           
+            bool invertdirection = embot::core::binary::bit::check(bytes[0], 6);
+            deciDegCalib::ROT rotation = static_cast<deciDegCalib::ROT>((bytes[0] >> 4) & 0b0011);           
             label = static_cast<posLABEL>(bytes[0] & 0b1111);
-            zero = static_cast<uint16_t>(bytes[1]) | (static_cast<uint16_t>(bytes[2]) << 8);
+            deciDeg zero = static_cast<int16_t>(bytes[1]) | (static_cast<int16_t>(bytes[2]) << 8);
+            calib.load(invertdirection, rotation, zero);
         }
         void fill(uint8_t *bytes) const 
         {
             if(nullptr != bytes)
             {
                 bytes[0] = 0;
-                bytes[0] = ((enabled & 0b1) << 7) | ((invertdirection & 0b1) << 6) | ((static_cast<uint8_t>(rotation) & 0b11) << 4) | (static_cast<uint8_t>(label) & 0b1111);
-                bytes[1] = zero & 0xff;
-                bytes[2] = (zero >> 8);                
+                bytes[0] = ((enabled & 0b1) << 7) | ((calib.invertdirection & 0b1) << 6) | ((static_cast<uint8_t>(calib.rotation) & 0b11) << 4) | (static_cast<uint8_t>(label) & 0b1111);
+                bytes[1] = calib.zero & 0xff;
+                bytes[2] = (calib.zero >> 8);                
             }            
         }
-        static const deciDeg rotationmap[4]; // = {0, 1800, 900, -900};
-        deciDeg rotateclip(deciDeg v) const { return ( (v+rotationmap[static_cast<uint8_t>(rotation)]) % 3600 ); }
-        deciDeg transform(const deciDeg raw) const
+        constexpr deciDeg transform(const deciDeg raw) const
         {
-            deciDeg z = rotateclip(raw) - rotateclip(zero);
-            return (invertdirection) ? (-z) : (+z);
+            return calib.transform(raw);
         }
         //uint8_t getlabel() const { return static_cast<uint8_t>(label); } 
     };    
