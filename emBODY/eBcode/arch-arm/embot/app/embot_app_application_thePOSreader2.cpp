@@ -992,70 +992,199 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
 
     std::string str;    
     
+//    for(uint8_t i=0; i<validIDpositions.size(); i++)
+//    {
+//        uint8_t n = validIDpositions[i];
+//        
+//        embot::prot::can::analog::periodic::Message_POS msg;
+//        embot::prot::can::analog::periodic::Message_POS::Info info;  
+//    
+//        info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
+//        
+//        
+//        sensorType st = config.sensors[n].type;
+//        
+//        if((sensorType::tlv == st) || (sensorType::lr17 == st))
+//        {            
+//            // we have rotational sensor
+//                   
+//            // so far i load one value in one packet ...
+//            
+//    #if !defined(EMBOT_POSREADER2_compensatereadings) || defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+//             
+//            #warning we DONT compensate values of tlv and lr17 encoders for a given hand
+//            // we dont compensate
+//            int16_t v =  (valueOfPositionACQUISITIONnotvalid == positions[n]) ? +10000 : positions[n]/10;
+//            std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
+//            
+//    #else
+//            
+//            #warning we compensate values of tlv and lr17 encoders for a specific hand to be in range [0, 90]
+//            // this code is tunes for teh first prototype of our hand mk3. 
+//            // we should somehow get the calibration parameters from an xml file.
+//            // they could be applied in here, so that the pos service uses calibrate values that the yarpscope
+//            // show them correctly, or we can apply them to the motion control part (in our case the mc4plus)
+//            constexpr std::array<int16_t, numberofpositions> offsets = { 218, 92, 148, 165, 0, 0, 0, 0, 0 };
+//            constexpr int16_t correction = 10;
+//            constexpr std::array<int16_t, numberofpositions> rotations = { 0, 0, 180, 0, 0, 0, 0, 0, 0 };
+//            //constexpr std::array<Position, numberofpositions> offsets = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+//            
+//            int16_t v = valueOfPositionACQUISITIONnotvalid / 10;
+//            if(valueOfPositionACQUISITIONnotvalid != positions[n])
+//            {
+//                // tlv reads in units of 0.01 deg.
+//                // so i move into deg: positions[n]/100
+//                // then i apply rotation[?] w/: +rotations[embot::core::tointegral(sensor_getPOSlabel(config.sensors[n]))]
+//                // what is ?: is 0, 1, 2, 3, 4, 5, etc whwnre 0 is eobrd_portpos_hand_thumb, 1 is eobrd_portpos_hand_index etc.
+//                // so, the ruke is: i set offsets[] and rotations[] to be zero. 
+//                // i start the pos service and i look at teh ports.
+//                // se il valore associato al thum che ha label = 0 richidere un offset allora metto il valore in offsets[0],
+//                // se richidere una inversione allora metto rotations[0] = 180, altrikenti 0.
+//                // e cosi'via con gli altri index = 1 etc.
+//                // posso fare cosi' perhche rotations e offset sono orfinati a label.
+//                // 
+//                int16_t r = (positions[n]/100+rotations[embot::core::tointegral(sensor_getPOSlabel(config.sensors[n]))]) % 360;
+//                int16_t t = - (r);
+//                v = (720 + t) % 360;
+//                v = v - (offsets[embot::core::tointegral(sensor_getPOSlabel(config.sensors[n]))]-correction);
+//    //            if(v < 0) v = 0;
+//    //            else if (v > 180) v = 180;
+//                v *= 10;
+//                
+//    //            v = transform(positions[n], embot::core::tointegral(sensor_getPOSlabel(config.sensors[n])));
+//    //            v *= 10;
+//            }
+//            
+//            #warning calibration of thumb metacarpus is to be done here
+//            if(config.sensors[n].id == embot::hw::ANY::five)
+//            {
+//                // its our thumb metacarpus
+//                int16_t r = positions[n]/100;
+//                int16_t t = r - 72;
+//                v = 10 * t;
+//            }
+//            
+//            std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
+//            
+//    #endif        
+
+//            str += sensor_to_string(config.sensors[n]);
+//            str += " = ";
+//            str += std::to_string(v/10);
+//            str += " DEG ";
+//            
+//            info.loadDeciDeg(sensor_getPOSlabel(config.sensors[n]), 1, values);
+//               
+//            msg.load(info);
+//            msg.get(frame);
+//            replies.push_back(frame); 
+//        
+//            // in here we manage a wrong measure. in addition to so far we just send a canprint message
+//            // and 
+//            embot::hw::LED led = sensor_to_led(config.sensors[n]);
+//            if(valueOfPositionACQUISITIONnotvalid == positions[n])
+//            {
+//                embot::hw::led::off(led);
+//                embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+//                tr.print("FAP" + std::to_string(n) + "err", replies);
+//            }
+//            else
+//            {
+//                embot::hw::led::on(led);
+//            }
+//            
+//        }
+//        else if(sensorType::qe == st)
+//        {
+//            
+//            // we have a linear sensor which measure micro-meters (0.001 mm) and we need to convert in 0.1 mm ->
+//            constexpr int convFactor {100};
+//            // we dont compensate
+//            int16_t v =  (valueOfPositionACQUISITIONnotvalid == positions[n]) ? 0xffff : positions[n]/convFactor;
+//            std::array<embot::prot::can::analog::deciMilliMeter, 3> values = { v, 0, 0}; 
+
+//            str += sensor_to_string(config.sensors[n]);
+//            str += " = ";
+//            str += std::to_string(v/10);
+//            str += " mm ";
+//            
+//            info.loadDeciMilliMeter(sensor_getPOSlabel(config.sensors[n]), 1, values);
+//               
+//            msg.load(info);
+//            msg.get(frame);
+//            replies.push_back(frame); 
+//            
+//            embot::hw::LED led = sensor_to_led(config.sensors[n]);
+//            if(valueOfPositionACQUISITIONnotvalid == positions[n])
+//            {
+//                embot::hw::led::off(led);
+//                embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+//                tr.print("QE" + std::to_string(n) + "err", replies);
+//            }            
+//            else
+//            {
+//                embot::hw::led::on(led);
+//            }            
+//        }        
+//    }
+
+    
     for(uint8_t i=0; i<validIDpositions.size(); i++)
     {
+        embot::prot::can::analog::periodic::Message_POS msg {};
+        embot::prot::can::analog::periodic::Message_POS::Info info {};  
+        info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress(); 
+        
+        // we get the index n from the array<> Config::sensors. we have n = i only if every sensor inside Config::sensors was ok.
         uint8_t n = validIDpositions[i];
-        
-        embot::prot::can::analog::periodic::Message_POS msg;
-        embot::prot::can::analog::periodic::Message_POS::Info info;  
-    
-        info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
-        
-        
+        // we gets some properties
         sensorType st = config.sensors[n].type;
+        calibParams cp = config.sensors[n].calibpars;
+        bool isrotational = (sensorType::tlv == st) || (sensorType::lr17 == st);
+        //bool isrotational = (cp.postype == embot::prot::can::analog::posTYPE::angleDeciDeg);
+        Position rawvalue = positions[n];
+                     
         
-        if((sensorType::tlv == st) || (sensorType::lr17 == st))
-        {            
-            // we have rotational sensor
-                   
-            // so far i load one value in one packet ...
+        // now we transform the values        
+        if(true == isrotational)
+        {
+            embot::prot::can::analog::deciDeg v = valueOfPositionACQUISITIONnotvalid / 10;
             
-    #if !defined(EMBOT_POSREADER2_compensatereadings) || defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
-             
+        #if !defined(EMBOT_POSREADER2_compensatereadings) || defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+                 
             #warning we DONT compensate values of tlv and lr17 encoders for a given hand
             // we dont compensate
-            int16_t v =  (valueOfPositionACQUISITIONnotvalid == positions[n]) ? +10000 : positions[n]/10;
-            std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
+            v = (valueOfPositionACQUISITIONnotvalid == rawvalue) ? +10000 : rawvalue/10;                
+        
             
-    #else
+        #elif defined(EMBOT_POSREADER2_compensatereadings) && !defined(EMBOT_POSREADER2_compensatereadings_mode1)
+            // we compensate in the old legacy way. but we can do better maybe w/ EMBOT_POSREADER2_compensatereadings_mode1
             
-            #warning we compensate values of tlv and lr17 encoders for a specific hand to be in range [0, 90]
-            // this code is tunes for teh first prototype of our hand mk3. 
-            // we should somehow get the calibration parameters from an xml file.
-            // they could be applied in here, so that the pos service uses calibrate values that the yarpscope
-            // show them correctly, or we can apply them to the motion control part (in our case the mc4plus)
-            constexpr std::array<int16_t, numberofpositions> offsets = { 218, 92, 148, 165, 0, 0, 0, 0, 0 };
-            constexpr int16_t correction = 10;
-            constexpr std::array<int16_t, numberofpositions> rotations = { 0, 0, 180, 0, 0, 0, 0, 0, 0 };
-            //constexpr std::array<Position, numberofpositions> offsets = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            //#warning we compensate values of tlv and lr17 encoders for a specific hand to be in range [0, 90]            
             
-            int16_t v = valueOfPositionACQUISITIONnotvalid / 10;
-            if(valueOfPositionACQUISITIONnotvalid != positions[n])
+            if(valueOfPositionACQUISITIONnotvalid != rawvalue)
             {
-                int16_t r = (positions[n]/100+rotations[embot::core::tointegral(sensor_getPOSlabel(config.sensors[n]))]) % 360;
-                int16_t t = - (r);
-                v = (720 + t) % 360;
-                v = v - (offsets[embot::core::tointegral(sensor_getPOSlabel(config.sensors[n]))]-correction);
-    //            if(v < 0) v = 0;
-    //            else if (v > 180) v = 180;
-                v *= 10;
-                
-    //            v = transform(positions[n], embot::core::tointegral(sensor_getPOSlabel(config.sensors[n])));
-    //            v *= 10;
+                // ok, compensate to embot::prot::can::analog::posTYPE::angleDeciDeg
+                // for now i transform everything in degrees. yes, i know i lose resolution
+//                int16_t rawdegrees = rawvalue/100;
+//                int16_t rotationdegrees = (false == cp.decidegdes.rotation) ? 0 : 180;
+//                int16_t offsetdegrees = cp.offset/10;
+//                constexpr int16_t correctiondegrees = 10;
+//                int16_t r = (rawdegrees + rotationdegrees ) % 360;
+//                int16_t t = - (r); // we change direction
+//                v = (720 + t) % 360;
+//                v = v - (offsetdegrees - correctiondegrees);
+//                // transform in decidegrees
+//                v *= 10;
+
+                embot::prot::can::analog::deciDeg decideg_not_compensated = rawvalue/10;                
+                v = cp.decidegcalib.transform(decideg_not_compensated);
             }
             
-            #warning calibration of thumb metacarpus is to be done here
-            if(config.sensors[n].id == embot::hw::ANY::five)
-            {
-                // its our thumb metacarpus
-                int16_t r = positions[n]/100;
-                int16_t t = r - 72;
-                v = 10 * t;
-            }
-            
+        #endif      
+
+            // now we transmit v as a deciDeg
             std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
-            
-    #endif        
 
             str += sensor_to_string(config.sensors[n]);
             str += " = ";
@@ -1068,10 +1197,9 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
             msg.get(frame);
             replies.push_back(frame); 
         
-            // in here we manage a wrong measure. in addition to so far we just send a canprint message
-            // and 
+            // finally, in here we manage a wrong measure. in addition to led off we also send a canprint message
             embot::hw::LED led = sensor_to_led(config.sensors[n]);
-            if(valueOfPositionACQUISITIONnotvalid == positions[n])
+            if(valueOfPositionACQUISITIONnotvalid == rawvalue)
             {
                 embot::hw::led::off(led);
                 embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
@@ -1080,12 +1208,10 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
             else
             {
                 embot::hw::led::on(led);
-            }
-            
+            }            
         }
         else if(sensorType::qe == st)
-        {
-            
+        {            
             // we have a linear sensor which measure micro-meters (0.001 mm) and we need to convert in 0.1 mm ->
             constexpr int convFactor {100};
             // we dont compensate
@@ -1116,7 +1242,7 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
             }            
         }        
     }
-
+    
     print("thePOSreader2 transmits: " + str + embot::core::TimeFormatter(embot::core::now()).to_string());
 
              

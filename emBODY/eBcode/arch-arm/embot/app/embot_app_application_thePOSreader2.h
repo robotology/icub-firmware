@@ -43,18 +43,32 @@ namespace embot { namespace app { namespace application {
     
         enum class sensorType { tlv = 0, lr17 = 1, qe = 2, none = 255 }; 
         
+        
+        struct calibParams
+        {
+            embot::prot::can::analog::posTYPE postype {embot::prot::can::analog::posTYPE::angleDeciDeg};
+            embot::prot::can::analog::polling::deciDegCalib decidegcalib {};
+            embot::prot::can::analog::polling::deciMilliMeterCalib decimillicalib {};
+            constexpr calibParams() = default;
+            constexpr calibParams(const embot::prot::can::analog::polling::deciDegCalib &ddcal) 
+                                    : postype(embot::prot::can::analog::posTYPE::angleDeciDeg), decidegcalib(ddcal) {}
+            constexpr calibParams(const embot::prot::can::analog::polling::deciMilliMeterCalib &dmcal) 
+                                    : postype(embot::prot::can::analog::posTYPE::linearDeciMilliMeter), decimillicalib(dmcal) {}    
+        };
+
         struct Sensor
         {
             sensorType type {sensorType::none};
             embot::hw::ANY id {embot::hw::ANY::none};
             embot::prot::can::analog::posLABEL label {embot::prot::can::analog::posLABEL::zero};
+            calibParams calibpars {};
             embot::os::Event askdata {0};           // used to ask the thread to begin acquisition from the sensor (in non-blocking mode)
             embot::os::Event dataready {0};         // used by the hw to alert the thread that the data is available
             embot::os::Event noreply {0};           // SO FAR NOT USED: maybe used to alert the waiting thread that there is no reply from the sensor after the specified timeout
             embot::core::relTime timeout {0};       // SO FAR NOT USED: the time allowed for this sensor before we can emit the noreply event. 
             constexpr Sensor() = default;
-            constexpr Sensor(sensorType ty, embot::hw::ANY i, embot::prot::can::analog::posLABEL la, embot::os::Event as, embot::os::Event dr,  embot::os::Event nr = 0, embot::core::relTime to = 0) 
-                    : type(ty), id(i), label(la), askdata(as), dataready(dr), noreply(nr), timeout(to)  {}
+            constexpr Sensor(sensorType ty, embot::hw::ANY i, embot::prot::can::analog::posLABEL la, const calibParams &cp, embot::os::Event as, embot::os::Event dr,  embot::os::Event nr = 0, embot::core::relTime to = 0) 
+                    : type(ty), id(i), label(la), calibpars(cp), askdata(as), dataready(dr), noreply(nr), timeout(to)  {}
             constexpr bool isvalid() const { return type != sensorType::none; }
         };
                    

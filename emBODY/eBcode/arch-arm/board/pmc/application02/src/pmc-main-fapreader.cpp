@@ -155,88 +155,95 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
 
     using namespace embot::app::application;
 
+    constexpr thePOSreader2::Sensor s1 {
+        thePOSreader2::sensorType::tlv, embot::hw::ANY::one, // propJ4
+        embot::prot::can::analog::posLABEL::zero, // as eobrd_portpos_hand_thumb = 0
+        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 2180}},
+        evtSNSR01_askdata,
+        evtSNSR01_dataready,
+        evtSNSR01_noreply,
+        5*embot::core::time1millisec // timeout  
+    };
+    
+    constexpr thePOSreader2::Sensor s2 {
+        thePOSreader2::sensorType::tlv, embot::hw::ANY::two,    // propJ5
+        embot::prot::can::analog::posLABEL::one,  // as eobrd_portpos_hand_index = 1
+        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 920}},
+        evtSNSR02_askdata,
+        evtSNSR02_dataready,
+        evtSNSR02_noreply,
+        0 // 5*embot::core::time1millisec // timeout  
+    };  
 
+    constexpr thePOSreader2::Sensor s3 {
+        thePOSreader2::sensorType::tlv, embot::hw::ANY::three,  // propJ6
+        embot::prot::can::analog::posLABEL::two, // as eobrd_portpos_hand_medium = 2
+        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::plus180, 1480}},
+        evtSNSR03_askdata,
+        evtSNSR03_dataready,
+        evtSNSR03_noreply,
+        0 //5*embot::core::time1millisec // timeout  
+    };  
 
-        constexpr thePOSreader2::Sensor s1 {
-            thePOSreader2::sensorType::tlv, embot::hw::ANY::one, // propJ4
-            embot::prot::can::analog::posLABEL::zero, // as eobrd_portpos_hand_thumb = 0
-            evtSNSR01_askdata,
-            evtSNSR01_dataready,
-            evtSNSR01_noreply,
-            5*embot::core::time1millisec // timeout  
-        };
-        
-        constexpr thePOSreader2::Sensor s2 {
-            thePOSreader2::sensorType::tlv, embot::hw::ANY::two,    // propJ5
-            embot::prot::can::analog::posLABEL::one,  // as eobrd_portpos_hand_index = 1
-            evtSNSR02_askdata,
-            evtSNSR02_dataready,
-            evtSNSR02_noreply,
-            0 // 5*embot::core::time1millisec // timeout  
-        };  
+    constexpr thePOSreader2::Sensor s4 {
+        thePOSreader2::sensorType::tlv, embot::hw::ANY::four,  // propJ7
+        embot::prot::can::analog::posLABEL::three,  // as eobrd_portpos_hand_pinky = 3
+        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 1650}},
+        evtSNSR04_askdata,
+        evtSNSR04_dataready,
+        evtSNSR04_noreply,
+        0 //5*embot::core::time1millisec // timeout  
+    }; 
+    
+    constexpr thePOSreader2::Sensor s5 {
+        thePOSreader2::sensorType::tlv, embot::hw::ANY::five,  // propJ13
+        embot::prot::can::analog::posLABEL::four, // as eobrd_portpos_hand_thumbmetacarpus = 4
+        {embot::prot::can::analog::polling::deciDegCalib({})},
+        evtSNSR05_askdata,
+        evtSNSR05_dataready,
+        evtSNSR05_noreply,
+        0 //5*embot::core::time1millisec // timeout  
+    };   
 
-        constexpr thePOSreader2::Sensor s3 {
-            thePOSreader2::sensorType::tlv, embot::hw::ANY::three,  // propJ6
-            embot::prot::can::analog::posLABEL::two, // as eobrd_portpos_hand_medium = 2
-            evtSNSR03_askdata,
-            evtSNSR03_dataready,
-            evtSNSR03_noreply,
-            0 //5*embot::core::time1millisec // timeout  
-        };  
+    constexpr thePOSreader2::Sensor s6 {
+        thePOSreader2::sensorType::tlv, embot::hw::ANY::six, // propU27
+        embot::prot::can::analog::posLABEL::six, // as eobrd_portpos_hand_indexadduction = 6
+        {embot::prot::can::analog::polling::deciDegCalib({})},
+        evtSNSR06_askdata,
+        evtSNSR06_dataready,
+        evtSNSR06_noreply,
+        0 //5*embot::core::time1millisec // timeout  
+    };     
 
-        constexpr thePOSreader2::Sensor s4 {
-            thePOSreader2::sensorType::tlv, embot::hw::ANY::four,  // propJ7
-            embot::prot::can::analog::posLABEL::three,  // as eobrd_portpos_hand_pinky = 3
-            evtSNSR04_askdata,
-            evtSNSR04_dataready,
-            evtSNSR04_noreply,
-            0 //5*embot::core::time1millisec // timeout  
-        }; 
-        
-        constexpr thePOSreader2::Sensor s5 {
-            thePOSreader2::sensorType::tlv, embot::hw::ANY::five,  // propJ13
-            embot::prot::can::analog::posLABEL::four, // as eobrd_portpos_hand_thumbmetacarpus = 4
-            evtSNSR05_askdata,
-            evtSNSR05_dataready,
-            evtSNSR05_noreply,
-            0 //5*embot::core::time1millisec // timeout  
-        };   
+    constexpr thePOSreader2::Sensor s7 {
+        thePOSreader2::sensorType::lr17, embot::hw::ANY::one, // absolute encoder on motor on J1
+        embot::prot::can::analog::posLABEL::five,  // as eobrd_portpos_hand_thumbrotation = 5
+        {embot::prot::can::analog::polling::deciDegCalib({})},
+        evtSNSR07_askdata,
+        evtSNSR07_dataready,
+        evtSNSR07_noreply,
+        0 //5*embot::core::time1millisec // timeout  
+    };   
 
-        constexpr thePOSreader2::Sensor s6 {
-            thePOSreader2::sensorType::tlv, embot::hw::ANY::six, // propU27
-            embot::prot::can::analog::posLABEL::six, // as eobrd_portpos_hand_indexadduction = 6
-            evtSNSR06_askdata,
-            evtSNSR06_dataready,
-            evtSNSR06_noreply,
-            0 //5*embot::core::time1millisec // timeout  
-        };     
+    constexpr thePOSreader2::Sensor s8 {
+        thePOSreader2::sensorType::qe, embot::hw::ANY::one, // incremental linear encoder or motor on J2 (Index Adduction)
+        embot::prot::can::analog::posLABEL::seven,  // not mapped yet to any eObrd_portpos_t item. it is ... linear motor position of Index Adduction
+        {embot::prot::can::analog::polling::deciMilliMeterCalib({false, 0})},
+        evtSNSR08_askdata,
+        evtSNSR08_dataready,
+        evtSNSR08_noreply,
+        0 //5*embot::core::time1millisec // timeout  
+    };          
 
-        constexpr thePOSreader2::Sensor s7 {
-            thePOSreader2::sensorType::lr17, embot::hw::ANY::one, // absolute encoder on motor on J1
-            embot::prot::can::analog::posLABEL::five,  // as eobrd_portpos_hand_thumbrotation = 5
-            evtSNSR07_askdata,
-            evtSNSR07_dataready,
-            evtSNSR07_noreply,
-            0 //5*embot::core::time1millisec // timeout  
-        };   
-
-        constexpr thePOSreader2::Sensor s8 {
-            thePOSreader2::sensorType::qe, embot::hw::ANY::one, // incremental linear encoder or motor on J2 (Index Adduction)
-            embot::prot::can::analog::posLABEL::seven,  // not mapped yet to any eObrd_portpos_t item. it is ... linear motor position of Index Adduction
-            evtSNSR08_askdata,
-            evtSNSR08_dataready,
-            evtSNSR08_noreply,
-            0 //5*embot::core::time1millisec // timeout  
-        };          
-
-        constexpr thePOSreader2::Sensor s9 {
-            thePOSreader2::sensorType::qe, embot::hw::ANY::two, // // incremental linear encoder or motor on J3 (Thumb Metacarpus movement)
-            embot::prot::can::analog::posLABEL::eight,  // not mapped yet to any eObrd_portpos_t item. it is ... linear motor position of Thumb Metacarpus movement
-            evtSNSR09_askdata,
-            evtSNSR09_dataready,
-            evtSNSR09_noreply,
-            0 //5*embot::core::time1millisec // timeout  
-        };          
+    constexpr thePOSreader2::Sensor s9 {
+        thePOSreader2::sensorType::qe, embot::hw::ANY::two, // // incremental linear encoder or motor on J3 (Thumb Metacarpus movement)
+        embot::prot::can::analog::posLABEL::eight,  // not mapped yet to any eObrd_portpos_t item. it is ... linear motor position of Thumb Metacarpus movement
+        {embot::prot::can::analog::polling::deciMilliMeterCalib({false, 0})},
+        evtSNSR09_askdata,
+        evtSNSR09_dataready,
+        evtSNSR09_noreply,
+        0 //5*embot::core::time1millisec // timeout  
+    };          
     
 #if defined(USE_thePOSreader2_qe)      
     constexpr std::array<thePOSreader2::Sensor, thePOSreader2::numberofpositions> sposmod2par { s1, s4, s2, s5, s3, s6, s7, s8, s9 };
