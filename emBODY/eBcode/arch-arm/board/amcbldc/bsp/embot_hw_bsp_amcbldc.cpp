@@ -202,10 +202,11 @@ namespace embot { namespace hw { namespace led {
 
 // - support map: begin of embot::hw::button
 
+#include "embot_hw_button.h"
+#include "embot_hw_button_bsp.h"
+#include "embot_hw_gpio_bsp.h"
 
 #if !defined(EMBOT_ENABLE_hw_button)
-
-#include "embot_hw_button_bsp.h"
 
 namespace embot { namespace hw { namespace button {
     
@@ -220,7 +221,71 @@ namespace embot { namespace hw { namespace button {
 }}}
 
 #else
+
+namespace embot { namespace hw { namespace button {
     
+    #if   defined(STM32HAL_BOARD_AMCBLDC)
+    
+    // this button is attached directly to PB7 (SDA connector).
+    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::seven}, 
+                             .pull = embot::hw::gpio::Pull::pulldown, .irqn = EXTI9_5_IRQn  };  
+ 
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(BTN::one),        
+        // properties
+        {{
+            &btn1p           
+        }}        
+    };
+    
+    
+    void BSP::init(embot::hw::BTN h) const {}
+    
+    void BSP::onEXTI(const embot::hw::gpio::PROP &p) const
+    {
+        const embot::hw::GPIO gpio = embot::hw::gpio::getBSP().getGPIO(p);
+        switch(gpio.pin)
+        {
+            case embot::hw::GPIO::PIN::seven:
+            {
+                embot::hw::button::onexti(BTN::one);
+            } break;    
+
+            default:
+            {
+            } break;           
+        }              
+    }
+    
+    // we put in here the IRQHandlers + the exti callback
+
+    extern "C" {
+    
+        void EXTI9_5_IRQHandler(void)
+        {
+            HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
+        }
+        
+        
+        void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+        {
+             embot::hw::button::getBSP().onEXTI({nullptr, GPIO_Pin, nullptr});            
+        }        
+    }
+           
+    #else
+        #error embot::hw::bsp::button::thebsp must be defined    
+    #endif
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
 #endif // button
 
 // - support map: end of embot::hw::button

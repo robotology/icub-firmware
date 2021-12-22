@@ -17,6 +17,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_button.h"
 #include "embot_hw_motor.h"
 #include "embot_app_theCANboardInfo.h"
 #include "embot_app_scope.h"
@@ -28,6 +29,8 @@
 
 
 //#define TEST_DURATION_FOC
+
+#define DISABLE_EXTFAULT
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -165,7 +168,11 @@ struct embot::app::application::theMBDagent::Impl
     embot::hw::motor::Pwm pwm {0};
     embot::prot::can::motor::polling::ControlMode cm {embot::prot::can::motor::polling::ControlMode::Idle};
     bool applychanges {false};
-            
+    
+    static constexpr embot::hw::BTN buttonEXTfault {embot::hw::BTN::one};
+    static void onEXTFAULTpressed(void *owner);  
+    volatile bool EXTFAULTisPRESSED {false};    
+    volatile embot::core::Time EXTFAULTpressedtime {0};
 };
 
       
@@ -196,6 +203,18 @@ bool embot::app::application::theMBDagent::Impl::initialise()
         measureTick = new MeasureHisto({0, 400*embot::core::time1microsec, 1});
     }
     
+    // init the external fault. we use a hw::button because we dont have a hw::switch
+    // if the HW is well filtered and the push is clean, then we can just 
+    // call cbkOnEXTfault_pressed.execute() if the button is pressed.
+    // in the callback we set the FAULT on and in the ::tick() we must somehow set it off w/ polling
+    // 
+
+#if defined(DISABLE_EXTFAULT)
+#else    
+    embot::core::Callback cbkOnEXTFAULT_pressed {onEXTFAULTpressed, this};
+    embot::hw::button::init(buttonEXTfault, {embot::hw::button::Mode::TriggeredOnPress, cbkOnEXTFAULT_pressed, 0});
+#endif
+    
     // init control
     amc_bldc.initialize();
     
@@ -211,10 +230,38 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     return initted;
 }
 
+
+void embot::app::application::theMBDagent::Impl::onEXTFAULTpressed(void *owner)
+{
+    Impl * impl = reinterpret_cast<Impl*>(owner);
+    if(nullptr == impl)
+    {
+        return;
+    }
+    
+    impl->EXTFAULTpressedtime = embot::core::now();
+
+    // ok ... in case the debouncing is not required because the HW filters the spikes aways...
+    // we just set the bool variable EXTFAULTisPRESSED and disable the motor
+    // then it will be the ::tick() and the :;onCurrents_FOC_innerloop() that will manage EXTFAULTisPRESSED 
+    impl->EXTFAULTisPRESSED = true;
+    
+#if defined(DISABLE_EXTFAULT)
+#else     
+    embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, 0, 0, 0); 
+    embot::hw::motor::enable(embot::hw::MOTOR::one, false);   
+#endif 
+    
+    // if the transition high->low and viceversa is noisy, then we could set EXTFAULTisPRESSED to true 
+    // inside ::tick() a few ms after EXTFAULTpressedtime 
+}
+
 // Called every 1 ms
 bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 {    
     measureTick->start();
+    
+    // remember to manage EXTFAULTisPRESSED ............
     
     uint8_t rx_data[8] {0};
     uint8_t rx_size {0};
@@ -298,6 +345,8 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
 #if defined(TEST_DURATION_FOC)        
     embot::hw::sys::delay(25);
 #else   
+    
+    // remember to manage impl->EXTFAULTisPRESSED ............
 
     // retrieve the current value of the Hall sensors 
     embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_hallAB);
