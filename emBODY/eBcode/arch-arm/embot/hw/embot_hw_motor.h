@@ -32,9 +32,11 @@ namespace embot { namespace hw { namespace motor {
             
     bool supported(embot::hw::MOTOR h);    
     bool initialised(embot::hw::MOTOR h);    
-    result_t init(embot::hw::MOTOR h, const Config &config);
+    result_t init(embot::hw::MOTOR h, const Config &config);        
+    
+    bool enabled(MOTOR h);
+    result_t enable(MOTOR h, bool on);
         
- 
     // whatever else we shall need
     
     // Position and Pwm are to be defined yet.
@@ -48,7 +50,7 @@ namespace embot { namespace hw { namespace motor {
         
     result_t gethallstatus(embot::hw::MOTOR h, uint8_t &hs);
     result_t setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w);
-//    result_t setADCcallback(MOTOR h, void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty);
+
     result_t motorEnable(MOTOR h);
     result_t motorDisable(MOTOR h);
     

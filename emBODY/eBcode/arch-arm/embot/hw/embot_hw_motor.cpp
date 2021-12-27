@@ -87,6 +87,7 @@ namespace embot { namespace hw { namespace motor {
               
     // initialised mask       
     static std::uint32_t initialisedmask = 0;
+    static std::uint32_t enabledmask = 0;
     
     bool supported(MOTOR h)
     {
@@ -98,7 +99,15 @@ namespace embot { namespace hw { namespace motor {
         return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(h));
     }    
     
-         
+    bool enabled(MOTOR h)
+    {
+        return embot::core::binary::bit::check(enabledmask, embot::core::tointegral(h));
+    }
+    
+    result_t enable(MOTOR h, bool on)
+    {
+        return (true == on) ? motorEnable(h) : motorDisable(h);
+    }
 
     struct TBDef
     {
@@ -150,8 +159,7 @@ namespace embot { namespace hw { namespace motor {
         {
             return resOK;
         }
-        
-        
+                
         std::uint8_t index = embot::core::tointegral(h);
                
         
@@ -181,20 +189,24 @@ namespace embot { namespace hw { namespace motor {
 
     result_t motorEnable(MOTOR h)
     {
-        if(false == supported(h))
+        if(false == initialised(h))
         {
             return resNOK;
         }
+        
+        embot::core::binary::bit::set(enabledmask, embot::core::tointegral(h));
         
         return s_hw_motorEnable(h);
     }
     
     result_t motorDisable(MOTOR h)
     {
-        if(false == supported(h))
+        if(false == initialised(h))
         {
             return resNOK;
         }
+        
+        embot::core::binary::bit::clear(enabledmask, embot::core::tointegral(h));
         
         return s_hw_motorDisable(h);
     }
@@ -251,12 +263,7 @@ namespace embot { namespace hw { namespace motor {
     {
         return s_hw_setpwmUVW(h, u, v, w);
     }
-    
-//    result_t setADCcallback(MOTOR h, void (*fn_cb)(void *, int16_t[3], void*, void*), void * owner, void* rtu, void* rty)
-//    {
-//        return s_hw_setADCcallback(h, fn_cb, owner, rtu, rty);
-//    }
-    
+       
     result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
     {
         return s_hw_setCallbackOnCurrents(h, callback, owner);
