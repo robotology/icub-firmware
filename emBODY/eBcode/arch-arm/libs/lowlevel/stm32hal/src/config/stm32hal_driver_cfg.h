@@ -14,8 +14,19 @@ extern "C" {
 #include "stm32hal_driver.h" 
 
 #if     defined(STM32HAL_BOARD_NUCLEO64)
-    
-    #include "../src/config/stm32hal_driver_cfg_of_nucleo64.h" 
+
+    #if     (STM32HAL_DRIVER_VERSION == 0x1D2)
+        #include "../src/config/stm32hal_driver_cfg_of_nucleo64_v1D2.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32l4-v1D2/inc/stm32l4xx_ll_gpio.h"
+    #elif   (STM32HAL_DRIVER_VERSION == 0x172)
+        #include "../src/config/stm32hal_driver_cfg_of_nucleo64.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32l4-v172/inc/stm32l4xx_ll_gpio.h"
+    #else
+        #error unknown driver version
+    #endif
+
     
 #elif   defined(STM32HAL_BOARD_MTB4)
 

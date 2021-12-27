@@ -38,11 +38,16 @@ extern "C" {
   
 #if     defined(STM32HAL_BOARD_NUCLEO64)
 
-    // only one possible driver
-    #if !defined(STM32HAL_DRIVER_V172)
-        #define STM32HAL_DRIVER_V172
-    #endif
-    #define STM32HAL_DRIVER_VERSION 0x172
+   
+    // two possible drivers. default is the 1D2 ...
+    #if     defined(STM32HAL_DRIVER_V172)    
+        #define STM32HAL_DRIVER_VERSION 0x172  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V1D2)
+            #define STM32HAL_DRIVER_V1D2
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x1D2   
+    #endif    
     
 #elif   defined(STM32HAL_BOARD_MTB4)
 
@@ -194,6 +199,8 @@ extern "C" {
         #include "../src/driver/stm32l4-v190/inc/stm32l4xx_hal.h"
     #elif   defined(STM32HAL_DRIVER_V1B0)        
         #include "../src/driver/stm32l4-v1B0/inc/stm32l4xx_hal.h"
+    #elif   defined(STM32HAL_DRIVER_V1D2)        
+        #include "../src/driver/stm32l4-v1D2/inc/stm32l4xx_hal.h"        
     #else
         #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
     #endif
