@@ -66,6 +66,7 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/nucleo64/v1D2/inc/gpio.h"
         #include "../src/board/nucleo64/v1D2/inc/main.h"
+        #include "../src/board/nucleo64/v1D2/inc/rng.h"
         
     #else
         #error unsupported driver version for nucleo64

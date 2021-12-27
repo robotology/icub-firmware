@@ -84,10 +84,13 @@ extern void stm32hal_board_init(void)
     HAL_Init();
     SystemClock_Config();
     MX_GPIO_Init();
+    MX_RNG_Init();
     
     return;
 
-#if 1    
+#if 0    
+
+  /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
 
@@ -109,6 +112,7 @@ extern void stm32hal_board_init(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_RNG_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -118,9 +122,6 @@ extern void stm32hal_board_init(void)
   while (1)
   {
     /* USER CODE END WHILE */
-      
-      HAL_Delay(1000);
-      HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
     /* USER CODE BEGIN 3 */
   }

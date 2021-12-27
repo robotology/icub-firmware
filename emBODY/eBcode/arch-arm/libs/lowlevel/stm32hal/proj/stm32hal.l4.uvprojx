@@ -3277,6 +3277,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7148,6 +7153,11 @@
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -11450,6 +11460,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -15391,6 +15406,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -19331,6 +19351,11 @@
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -23342,6 +23367,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -27282,6 +27312,11 @@
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -31377,6 +31412,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -35248,6 +35288,11 @@
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -39258,6 +39303,11 @@
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\nucleo64\v1D2\src\stm32l4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\nucleo64\v1D2\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
