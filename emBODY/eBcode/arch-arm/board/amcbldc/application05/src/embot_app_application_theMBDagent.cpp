@@ -24,7 +24,7 @@
 #include "embot_hw_sys.h"
 #include <array>
 
-// include mdb 
+// mdb components
 #include "AMC_BLDC.h"
 
 
@@ -156,10 +156,16 @@ struct embot::app::application::theMBDagent::Impl
     Measure *measureFOC {nullptr};
     Measure *measureTick {nullptr}; 
     
-    // the MBD generated class. it can stay non static.
+    // the MBD generated classes + other glue code.
+    // MBD-gen-begin ->
+    
     amc_bldc_codegen::AMC_BLDC amc_bldc {};  
     
                 
+    // <- MBD-gen-end
+    //
+
+
     // all the rest, which may or may not be required anymore
     Config config {};
     bool initted {false};
@@ -203,7 +209,8 @@ bool embot::app::application::theMBDagent::Impl::initialise()
         measureTick = new MeasureHisto({0, 400*embot::core::time1microsec, 1});
     }
     
-    // init the external fault. we use a hw::button because we dont have a hw::switch
+    // init the external fault. 
+    // we use a hw::button because we dont have a hw::switch
     // if the HW is well filtered and the push is clean, then we can just 
     // call cbkOnEXTfault_pressed.execute() if the button is pressed.
     // in the callback we set the FAULT on and in the ::tick() we must somehow set it off w/ polling
@@ -215,7 +222,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     embot::hw::button::init(buttonEXTfault, {embot::hw::button::Mode::TriggeredOnPress, cbkOnEXTFAULT_pressed, 0});
 #endif
     
-    // init control
+    // init MBD
     amc_bldc.initialize();
     
     // init motor
@@ -224,9 +231,9 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     // assign the callback to the current availability
     embot::hw::motor::setCallbackOnCurrents(embot::hw::MOTOR::one, Impl::onCurrents_FOC_innerloop, this);
     
-    initted = true;
     already_enabled = false;
 
+    initted = true;
     return initted;
 }
 
@@ -344,7 +351,7 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
    
 #if defined(TEST_DURATION_FOC)        
     embot::hw::sys::delay(25);
-#else   
+#else
     
     // remember to manage impl->EXTFAULTisPRESSED ............
 
