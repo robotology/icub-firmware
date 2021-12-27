@@ -394,9 +394,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.nucleo64.v1D2.lib</FileName>
+              <FileName>stm32hal.l4.nucleo64.v1D2.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.nucleo64.v1D2.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.nucleo64.v1D2.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1076,9 +1076,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.nucleo64.v1D2.lib</FileName>
+              <FileName>stm32hal.l4.nucleo64.v1D2.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.nucleo64.v1D2.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.nucleo64.v1D2.lib</FilePath>
             </File>
           </Files>
         </Group>

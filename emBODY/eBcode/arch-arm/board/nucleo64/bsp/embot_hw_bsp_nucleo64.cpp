@@ -190,7 +190,7 @@ namespace embot { namespace hw { namespace button {
     #if   defined(STM32HAL_BOARD_NUCLEO64)
     
     // this button is the blue one on the board
-    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}, 
+    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}, 
                              .pull = embot::hw::gpio::Pull::nopull, .irqn = EXTI15_10_IRQn  };  
 //    // this button is attached directly to PB8 w/out any filter. it is pressed when PB8 is connected to 3V3
 //    constexpr PROP btn2p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::eight}, 

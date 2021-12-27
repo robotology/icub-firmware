@@ -73,7 +73,12 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
     {      
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
+        embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));  
+        if(true == embot::hw::button::pressed(buttonBLUE))
+        {
+           embot::core::print("pressed"); 
+        }
+            
     }
     
 
