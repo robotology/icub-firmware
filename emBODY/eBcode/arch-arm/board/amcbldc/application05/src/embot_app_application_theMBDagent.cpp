@@ -30,7 +30,8 @@
 
 //#define TEST_DURATION_FOC
 
-#define DISABLE_EXTFAULT
+//#define EXTFAULT_enabled
+#define EXTFAULT_handler_will_disable_motor
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -176,9 +177,11 @@ struct embot::app::application::theMBDagent::Impl
     bool applychanges {false};
     
     static constexpr embot::hw::BTN buttonEXTfault {embot::hw::BTN::one};
-    static void onEXTFAULTpressed(void *owner);  
-    volatile bool EXTFAULTisPRESSED {false};    
+    static void onEXTFAULTpressedreleased(void *owner);  
+    volatile bool EXTFAULTisPRESSED {false};   
+    volatile bool prevEXTFAULTisPRESSED {false};    
     volatile embot::core::Time EXTFAULTpressedtime {0};
+    volatile embot::core::Time EXTFAULTreleasedtime {0};
 };
 
       
@@ -210,16 +213,17 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     }
     
     // init the external fault. 
-    // we use a hw::button because we dont have a hw::switch
-    // if the HW is well filtered and the push is clean, then we can just 
-    // call cbkOnEXTfault_pressed.execute() if the button is pressed.
-    // in the callback we set the FAULT on and in the ::tick() we must somehow set it off w/ polling
-    // 
+    // we call cbkOnEXTfault.execute() when the button is pressed or released.
+    // in the callback we set EXTFAULTisPRESSED true or false depending on value of
+    // embot::hw::button::pressed(buttonEXTfault)
+    // we also disable the motors if true. 
 
-#if defined(DISABLE_EXTFAULT)
-#else    
-    embot::core::Callback cbkOnEXTFAULT_pressed {onEXTFAULTpressed, this};
-    embot::hw::button::init(buttonEXTfault, {embot::hw::button::Mode::TriggeredOnPress, cbkOnEXTFAULT_pressed, 0});
+#if defined(EXTFAULT_enabled)
+    embot::core::Callback cbkOnEXTFAULT {onEXTFAULTpressedreleased, this};
+    embot::hw::button::init(buttonEXTfault, {embot::hw::button::Mode::TriggeredOnPressAndRelease, cbkOnEXTFAULT, 0});
+    prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
+#else
+    prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = false;    
 #endif
     
     // init MBD
@@ -238,7 +242,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
 }
 
 
-void embot::app::application::theMBDagent::Impl::onEXTFAULTpressed(void *owner)
+void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void *owner)
 {
     Impl * impl = reinterpret_cast<Impl*>(owner);
     if(nullptr == impl)
@@ -246,21 +250,20 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressed(void *owner)
         return;
     }
     
-    impl->EXTFAULTpressedtime = embot::core::now();
-
-    // ok ... in case the debouncing is not required because the HW filters the spikes aways...
-    // we just set the bool variable EXTFAULTisPRESSED and disable the motor
-    // then it will be the ::tick() and the :;onCurrents_FOC_innerloop() that will manage EXTFAULTisPRESSED 
-    impl->EXTFAULTisPRESSED = true;
+    impl->EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
     
-#if defined(DISABLE_EXTFAULT)
-#else     
-    embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, 0, 0, 0); 
-    embot::hw::motor::enable(embot::hw::MOTOR::one, false);   
-#endif 
-    
-    // if the transition high->low and viceversa is noisy, then we could set EXTFAULTisPRESSED to true 
-    // inside ::tick() a few ms after EXTFAULTpressedtime 
+    if(true == impl->EXTFAULTisPRESSED)
+    {
+        impl->EXTFAULTpressedtime = embot::core::now();
+#if defined(EXTFAULT_handler_will_disable_motor) 
+        embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, 0, 0, 0); 
+        embot::hw::motor::enable(embot::hw::MOTOR::one, false);   
+#endif         
+    }
+    else
+    {
+        impl->EXTFAULTreleasedtime = embot::core::now();
+    }
 }
 
 // Called every 1 ms
@@ -268,7 +271,12 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
 {    
     measureTick->start();
     
-    // remember to manage EXTFAULTisPRESSED ............
+    if(prevEXTFAULTisPRESSED != EXTFAULTisPRESSED)
+    {
+        prevEXTFAULTisPRESSED = EXTFAULTisPRESSED;  
+        // and manage the transitions [pressed -> unpressed] or vice-versa and use also
+        // EXTFAULTpressedtime and / or EXTFAULTreleasedtime and 
+    }
     
     uint8_t rx_data[8] {0};
     uint8_t rx_size {0};
