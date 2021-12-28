@@ -192,19 +192,20 @@ namespace embot { namespace hw { namespace button {
     // this button is the blue one on the board
     constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}, 
                              .pull = embot::hw::gpio::Pull::nopull, .irqn = EXTI15_10_IRQn  };  
-//    // this button is attached directly to PB8 w/out any filter. it is pressed when PB8 is connected to 3V3
-//    constexpr PROP btn2p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::eight}, 
-//                             .pull = embot::hw::gpio::Pull::pulldown, .irqn = EXTI9_5_IRQn  };  
+    // this button is attached directly to PB9 w/out any filter. it is pressed when PB9 is connected to 3V3
+    // on the board, PB9 can also be SDA.
+    constexpr PROP btn2p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::nine}, 
+                             .pull = embot::hw::gpio::Pull::pulldown, .irqn = EXTI9_5_IRQn  };  
  
         
     constexpr BSP thebsp {        
         // maskofsupported
-//        mask::pos2mask<uint32_t>(BTN::one) | mask::pos2mask<uint32_t>(BTN::two),
-        mask::pos2mask<uint32_t>(BTN::one),        
+        mask::pos2mask<uint32_t>(BTN::one) | mask::pos2mask<uint32_t>(BTN::two),
+//        mask::pos2mask<uint32_t>(BTN::one),        
         // properties
         {{
-//            &btn1p, &btn2p
-            &btn1p              
+            &btn1p, &btn2p
+//            &btn1p              
         }}        
     };
     
@@ -221,10 +222,10 @@ namespace embot { namespace hw { namespace button {
                 embot::hw::button::onexti(BTN::one);
             } break;
             
-//            case embot::hw::GPIO::PIN::eight:
-//            {
-//                embot::hw::button::onexti(BTN::two);
-//            } break;    
+            case embot::hw::GPIO::PIN::nine:
+            {
+                embot::hw::button::onexti(BTN::two);
+            } break;    
 
             default:
             {
@@ -237,10 +238,10 @@ namespace embot { namespace hw { namespace button {
 
     extern "C" {
     
-//        void EXTI9_5_IRQHandler(void)
-//        {
-//            HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
-//        }
+        void EXTI9_5_IRQHandler(void)
+        {
+            HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
+        }
         
         void EXTI15_10_IRQHandler(void)
         {
