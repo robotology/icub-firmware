@@ -31,17 +31,23 @@ namespace embot { namespace hw { namespace button {
     
     enum class Mode : uint8_t 
     { 
-        Polling = 0,                    // the gpio is read directly in order to assess if the button is pressed: you must call pressed()
-        TriggeredOnPress = 1,           // triggered on press of the button with the aid of an IRQHandler 
-        TriggeredOnRelease = 2,         // triggered on release of the button with the aid of an IRQhandler
-        TriggeredOnDebouncedRelease = 3 // same as TriggeredOnRelease but triggered only if a a given time has passed in pressed mode
+        Polling = 0,                    // the gpio is read directly in order to assess if the button is pressed: 
+                                        // you must call pressed()
+        TriggeredOnPress = 1,           // triggered on press of the button with the aid of an IRQHandler: 
+                                        // it is called Config::callback
+        TriggeredOnRelease = 2,         // triggered on release of the button with the aid of an IRQhandler:
+                                        // it is called Config::callback
+        TriggeredOnPressAndRelease = 3, // triggered on press and on release of the button with the aid of an IRQhandler:
+                                        // it is called Config::callback. use pressed() to check in which case you are 
+        TriggeredOnDebouncedRelease = 4 // same as TriggeredOnRelease but triggered only if the button stayed in pressed mode
+                                        // for the time expressed in Config::debouncetime
     };
     
     struct Config
     {   
         Mode mode {Mode::Polling};    
-        embot::core::Callback callback {nullptr, nullptr}; // not used for Mode::Polling   
-        embot::core::Time debouncetime {100*embot::core::time1millisec};           
+        embot::core::Callback callback {nullptr, nullptr};                  // not used for Mode::Polling   
+        embot::core::relTime debouncetime {100*embot::core::time1millisec}; // used only for Mode::TriggeredOnDebouncedRelease            
         constexpr Config() = default;   
         constexpr Config(Mode mo, const embot::core::Callback &ca, embot::core::Time de) : mode(mo), callback(ca), debouncetime(de) {}         
     };    

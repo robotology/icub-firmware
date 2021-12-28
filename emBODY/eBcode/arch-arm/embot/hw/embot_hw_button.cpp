@@ -131,7 +131,8 @@ namespace embot { namespace hw { namespace button {
             embot::hw::gpio::configure(btnbsp.getPROP(btn)->gpio, embot::hw::gpio::Mode::INPUT, btnbsp.getPROP(btn)->pull, embot::hw::gpio::Speed::medium);
         }
         else if((cfg.mode == embot::hw::button::Mode::TriggeredOnPress) || 
-                (cfg.mode == embot::hw::button::Mode::TriggeredOnRelease) || 
+                (cfg.mode == embot::hw::button::Mode::TriggeredOnRelease) ||
+                (cfg.mode == embot::hw::button::Mode::TriggeredOnPressAndRelease) ||       
                 (cfg.mode == embot::hw::button::Mode::TriggeredOnDebouncedRelease))
         {
             // we have to write code in here which depends on the pin and on PROP.pressed
@@ -145,7 +146,7 @@ namespace embot { namespace hw { namespace button {
             {
                 mode = (btnbsp.getPROP(btn)->pressed == embot::hw::gpio::State::SET) ? embot::hw::gpio::Mode::EXTIfalling : embot::hw::gpio::Mode::EXTIrising;
             }
-            else
+            else // TriggeredOnPressAndRelease + TriggeredOnDebouncedRelease
             {
                 mode = embot::hw::gpio::Mode::EXTIrisingfalling;
             }
@@ -207,15 +208,17 @@ namespace embot { namespace hw { namespace button {
         
         const embot::hw::button::Config & cfg = s_privatedata.config[embot::core::tointegral(btn)];
         
-        if((cfg.mode == embot::hw::button::Mode::TriggeredOnPress) || (cfg.mode == embot::hw::button::Mode::TriggeredOnRelease))
+        if((cfg.mode == embot::hw::button::Mode::TriggeredOnPress) || 
+           (cfg.mode == embot::hw::button::Mode::TriggeredOnRelease) ||
+           (cfg.mode == embot::hw::button::Mode::TriggeredOnPressAndRelease))
         {
-            // i call it w/out checking if we are still pressed or released because ... exti is configured on one direction only
+            // i call it w/out checking if we are pressed or released because ... 
+            // exti is configured in the correct mode and we dont filter any spurious pulses 
             cfg.callback.execute(); 
         }
         else if(cfg.mode == embot::hw::button::Mode::TriggeredOnDebouncedRelease)
-        {
-            
-            // exti is configured for two directions... i must sample. then there may be spurious pulses both risong and falling. i try to filter them out
+        {            
+            // exti is configured for two directions... i must sample. then there may be spurious pulses both rising and falling. i try to filter them out
             if(false == embot::core::binary::bit::check(s_privatedata.countingmask, embot::core::tointegral(btn)))
             {   
                 // i am not counting time. i see if i can start the counting of time by checking if i am in pressed state                
