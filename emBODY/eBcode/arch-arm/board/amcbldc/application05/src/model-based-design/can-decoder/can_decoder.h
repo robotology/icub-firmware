@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 2.11
+// Model version                  : 2.27
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 20 14:32:26 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:42 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -46,6 +46,7 @@ namespace amc_bldc_codegen
    public:
     // Block signals for model 'can_decoder'
     struct B_can_decoder_T {
+      BUS_MSG_CURRENT_PID msg_set_current_pid;// '<S1>/Decoding Logic'
       BUS_MSG_CURRENT_LIMIT msg_set_current_limit;// '<S1>/Decoding Logic'
       BUS_MSG_DESIRED_CURRENT msg_desired_current;// '<S1>/Decoding Logic'
       BUS_MSG_CONTROL_MODE msg_set_control_mode;// '<S1>/Decoding Logic'
@@ -54,6 +55,7 @@ namespace amc_bldc_codegen
       boolean_T ev_set_current_limit;  // '<S1>/Decoding Logic'
       boolean_T ev_desired_current;    // '<S1>/Decoding Logic'
       boolean_T ev_error;              // '<S1>/Decoding Logic'
+      boolean_T ev_set_current_pid;    // '<S1>/Decoding Logic'
     };
 
     // Block states (default storage) for model 'can_decoder'
@@ -63,14 +65,15 @@ namespace amc_bldc_codegen
       uint32_T ev_set_current_limitEventCounte;// '<S1>/Decoding Logic'
       uint32_T ev_desired_currentEventCounter;// '<S1>/Decoding Logic'
       uint32_T ev_errorEventCounter;   // '<S1>/Decoding Logic'
+      uint32_T ev_set_current_pidEventCounter;// '<S1>/Decoding Logic'
       uint16_T cmd_processed;          // '<S1>/Decoding Logic'
       uint8_T is_active_c3_can_decoder;// '<S1>/Decoding Logic'
       uint8_T is_SET_CONTROL_MODE;     // '<S1>/Decoding Logic'
       uint8_T is_active_SET_CONTROL_MODE;// '<S1>/Decoding Logic'
       uint8_T is_DESIRED_CURRENT;      // '<S1>/Decoding Logic'
       uint8_T is_active_DESIRED_CURRENT;// '<S1>/Decoding Logic'
-      uint8_T is_SET_CURRENT_LIMIT;    // '<S1>/Decoding Logic'
-      uint8_T is_active_SET_CURRENT_LIMIT;// '<S1>/Decoding Logic'
+      uint8_T is_SET_CURRENT;          // '<S1>/Decoding Logic'
+      uint8_T is_active_SET_CURRENT;   // '<S1>/Decoding Logic'
       uint8_T is_ERROR_HANDLING;       // '<S1>/Decoding Logic'
       uint8_T is_active_ERROR_HANDLING;// '<S1>/Decoding Logic'
       boolean_T ev_async;              // '<S1>/Decoding Logic'

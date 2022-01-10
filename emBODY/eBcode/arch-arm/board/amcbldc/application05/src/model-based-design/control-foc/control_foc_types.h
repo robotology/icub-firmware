@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.79
+// Model version                  : 2.85
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 20 14:32:45 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:57 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -38,6 +38,46 @@ typedef enum {
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_JointPositions_
+#define DEFINED_TYPEDEF_FOR_JointPositions_
+
+struct JointPositions
+{
+  // joint positions
+  real32_T position;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
+#define DEFINED_TYPEDEF_FOR_MotorSensors_
+
+struct MotorSensors
+{
+  real32_T Iabc[3];
+
+  // electrical angle = angle * pole_pairs
+  real32_T angle;
+  real32_T temperature;
+  real32_T voltage;
+  real32_T current;
+  uint8_T hallABC;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
+#define DEFINED_TYPEDEF_FOR_SensorsData_
+
+struct SensorsData
+{
+  // position encoders
+  JointPositions jointpositions;
+  MotorSensors motorsensors;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_Flags_
 #define DEFINED_TYPEDEF_FOR_Flags_
 
@@ -61,6 +101,10 @@ struct MotorConfig
   real32_T reduction;
   real32_T Kp;
   real32_T Ki;
+  real32_T Kd;
+
+  // Shift factor.
+  uint8_T Ks;
   real32_T Kbemf;
   real32_T Rphase;
   real32_T Vmax;
@@ -175,46 +219,6 @@ struct ConfigurationParameters
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_JointPositions_
-#define DEFINED_TYPEDEF_FOR_JointPositions_
-
-struct JointPositions
-{
-  // joint positions
-  real32_T position;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
-#define DEFINED_TYPEDEF_FOR_MotorSensors_
-
-struct MotorSensors
-{
-  real32_T Iabc[3];
-
-  // electrical angle = angle * pole_pairs
-  real32_T angle;
-  real32_T temperature;
-  real32_T voltage;
-  real32_T current;
-  uint8_T hallABC;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
-#define DEFINED_TYPEDEF_FOR_SensorsData_
-
-struct SensorsData
-{
-  // position encoders
-  JointPositions jointpositions;
-  MotorSensors motorsensors;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_JointVelocities_
 #define DEFINED_TYPEDEF_FOR_JointVelocities_
 
@@ -281,6 +285,20 @@ struct ControlOuterOutputs
   boolean_T cur_en;
   boolean_T out_en;
   MotorCurrent motorcurrent;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+#define DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+
+struct FOCSlowInputs
+{
+  Flags flags;
+  ConfigurationParameters configurationparameters;
+  EstimatedData estimateddata;
+  Targets targets;
+  ControlOuterOutputs controlouteroutputs;
 };
 
 #endif

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.79
+// Model version                  : 2.85
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 20 14:32:45 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:57 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -31,14 +31,14 @@ namespace amc_bldc_codegen
   }
 
   // Output and update for referenced model: 'control_foc'
-  void control_foc::step(const Flags *rtu_Flags, const ConfigurationParameters
-    *rtu_ConfigurationParameters, const SensorsData *rtu_Sensors, const
-    EstimatedData *rtu_Estimates, const Targets *rtu_Targets, const
-    ControlOuterOutputs *rtu_OuterOutputs, ControlOutputs *rty_FOCOutputs)
+  void control_foc::step(const SensorsData *rtu_Sensors, const FOCSlowInputs
+    *rtu_FOCSlowInputs, ControlOutputs *rty_FOCOutputs)
   {
     // Outputs for Atomic SubSystem: '<Root>/FOC inner loop'
-    FOCInnerLoop(rtu_Flags, rtu_ConfigurationParameters, rtu_Sensors,
-                 rtu_Estimates, rtu_Targets, rtu_OuterOutputs, rty_FOCOutputs);
+    FOCInnerLoop(&rtu_FOCSlowInputs->flags,
+                 &rtu_FOCSlowInputs->configurationparameters, rtu_Sensors,
+                 &rtu_FOCSlowInputs->estimateddata, &rtu_FOCSlowInputs->targets,
+                 &rtu_FOCSlowInputs->controlouteroutputs, rty_FOCOutputs);
 
     // End of Outputs for SubSystem: '<Root>/FOC inner loop'
   }
@@ -50,11 +50,14 @@ namespace amc_bldc_codegen
 
     // initialize non-finites
     rt_InitInfAndNaN(sizeof(real_T));
+    control_foc_PrevZCX.FilterDifferentiatorTF_Reset_ZC = POS_ZCSIG;
+    control_foc_PrevZCX.FilterDifferentiatorTF_Reset__m = POS_ZCSIG;
   }
 
   // Constructor
   control_foc::control_foc() :
     control_foc_DW(),
+    control_foc_PrevZCX(),
     control_foc_M()
   {
     // Currently there is no constructor body generated.

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.113
+// Model version                  : 3.125
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 20 14:32:07 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -117,6 +117,7 @@ struct BUS_EVENTS_RX
   boolean_T control_mode;
   boolean_T current_limit;
   boolean_T desired_current;
+  boolean_T current_pid;
 };
 
 #endif
@@ -181,6 +182,30 @@ struct BUS_MSG_DESIRED_CURRENT
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
+
+// Fields of a CURRENT_PID message.
+struct BUS_MSG_CURRENT_PID
+{
+  // Motor selector.
+  boolean_T motor;
+
+  // Proportional gain.
+  real32_T Kp;
+
+  // Integral gain.
+  real32_T Ki;
+
+  // Derivative gain.
+  real32_T Kd;
+
+  // Shift factor.
+  uint8_T Ks;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
 #define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
 
@@ -190,6 +215,7 @@ struct BUS_MESSAGES_RX
   BUS_MSG_CONTROL_MODE control_mode;
   BUS_MSG_CURRENT_LIMIT current_limit;
   BUS_MSG_DESIRED_CURRENT desired_current;
+  BUS_MSG_CURRENT_PID current_pid;
 };
 
 #endif
@@ -296,6 +322,10 @@ struct MotorConfig
   real32_T reduction;
   real32_T Kp;
   real32_T Ki;
+  real32_T Kd;
+
+  // Shift factor.
+  uint8_T Ks;
   real32_T Kbemf;
   real32_T Rphase;
   real32_T Vmax;

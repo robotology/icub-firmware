@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 2.31
+// Model version                  : 2.35
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 20 14:32:52 2021
+// C/C++ source code generated on : Mon Jan 10 17:05:04 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -31,6 +31,15 @@ namespace amc_bldc_codegen
     //   Store in Global RAM
 
     control_outer_DW.DelayInput1_DSTATE = ControlModes_Idle;
+
+    // InitializeConditions for DiscreteIntegrator: '<S49>/Integrator'
+    control_outer_DW.Integrator_PrevResetState = 2;
+
+    // InitializeConditions for DiscreteIntegrator: '<S99>/Integrator'
+    control_outer_DW.Integrator_PrevResetState_n = 2;
+
+    // InitializeConditions for DiscreteIntegrator: '<S151>/Integrator'
+    control_outer_DW.Integrator_PrevResetState_c = 2;
   }
 
   // Output and update for referenced model: 'control_outer'
@@ -119,10 +128,8 @@ namespace amc_bldc_codegen
     //   Product: '<S42>/Divide'
     //   Sum: '<S42>/SumNum'
 
-    if ((((control_outer_PrevZCX.FilterDifferentiatorTF_Reset_ZC == 1) !=
-          rtb_FixPtRelationalOperator) &&
-         (control_outer_PrevZCX.FilterDifferentiatorTF_Reset_ZC != 3)) ||
-        rtb_FixPtRelationalOperator) {
+    if (rtb_FixPtRelationalOperator &&
+        (control_outer_PrevZCX.FilterDifferentiatorTF_Reset_ZC != 1)) {
       control_outer_DW.FilterDifferentiatorTF_states = 0.0F;
     }
 
@@ -151,8 +158,8 @@ namespace amc_bldc_codegen
       rtb_SignPreIntegrator * arg_ConfigurationParameters.PosLoopPID.I;
 
     // DiscreteIntegrator: '<S49>/Integrator'
-    if (rtb_FixPtRelationalOperator ||
-        (control_outer_DW.Integrator_PrevResetState != 0)) {
+    if (rtb_FixPtRelationalOperator &&
+        (control_outer_DW.Integrator_PrevResetState <= 0)) {
       control_outer_DW.Integrator_DSTATE = 0.0F;
     }
 
@@ -198,10 +205,8 @@ namespace amc_bldc_codegen
     //   Product: '<S92>/Divide'
     //   Sum: '<S92>/SumNum'
 
-    if ((((control_outer_PrevZCX.FilterDifferentiatorTF_Reset__m == 1) !=
-          rtb_FixPtRelationalOperator) &&
-         (control_outer_PrevZCX.FilterDifferentiatorTF_Reset__m != 3)) ||
-        rtb_FixPtRelationalOperator) {
+    if (rtb_FixPtRelationalOperator &&
+        (control_outer_PrevZCX.FilterDifferentiatorTF_Reset__m != 1)) {
       control_outer_DW.FilterDifferentiatorTF_states_i = 0.0F;
     }
 
@@ -229,8 +234,8 @@ namespace amc_bldc_codegen
        rtb_SignPreIntegrator)) + rtb_IProdOut;
 
     // DiscreteIntegrator: '<S99>/Integrator'
-    if (rtb_FixPtRelationalOperator ||
-        (control_outer_DW.Integrator_PrevResetState_n != 0)) {
+    if (rtb_FixPtRelationalOperator &&
+        (control_outer_DW.Integrator_PrevResetState_n <= 0)) {
       control_outer_DW.Integrator_DSTATE_i = 0.0F;
     }
 
@@ -318,10 +323,8 @@ namespace amc_bldc_codegen
     //   Product: '<S144>/Divide'
     //   Sum: '<S144>/SumNum'
 
-    if ((((control_outer_PrevZCX.FilterDifferentiatorTF_Reset__e == 1) !=
-          rtb_FixPtRelationalOperator) &&
-         (control_outer_PrevZCX.FilterDifferentiatorTF_Reset__e != 3)) ||
-        rtb_FixPtRelationalOperator) {
+    if (rtb_FixPtRelationalOperator &&
+        (control_outer_PrevZCX.FilterDifferentiatorTF_Reset__e != 1)) {
       control_outer_DW.FilterDifferentiatorTF_states_c = 0.0F;
     }
 
@@ -431,8 +434,8 @@ namespace amc_bldc_codegen
     // End of Switch: '<S140>/Switch'
 
     // DiscreteIntegrator: '<S151>/Integrator'
-    if (rtb_FixPtRelationalOperator ||
-        (control_outer_DW.Integrator_PrevResetState_c != 0)) {
+    if (rtb_FixPtRelationalOperator &&
+        (control_outer_DW.Integrator_PrevResetState_c <= 0)) {
       control_outer_DW.Integrator_DSTATE_b = 0.0F;
     }
 
@@ -507,9 +510,9 @@ namespace amc_bldc_codegen
 
     // initialize non-finites
     rt_InitInfAndNaN(sizeof(real_T));
-    control_outer_PrevZCX.FilterDifferentiatorTF_Reset_ZC = UNINITIALIZED_ZCSIG;
-    control_outer_PrevZCX.FilterDifferentiatorTF_Reset__m = UNINITIALIZED_ZCSIG;
-    control_outer_PrevZCX.FilterDifferentiatorTF_Reset__e = UNINITIALIZED_ZCSIG;
+    control_outer_PrevZCX.FilterDifferentiatorTF_Reset_ZC = POS_ZCSIG;
+    control_outer_PrevZCX.FilterDifferentiatorTF_Reset__m = POS_ZCSIG;
+    control_outer_PrevZCX.FilterDifferentiatorTF_Reset__e = POS_ZCSIG;
   }
 
   // Constructor

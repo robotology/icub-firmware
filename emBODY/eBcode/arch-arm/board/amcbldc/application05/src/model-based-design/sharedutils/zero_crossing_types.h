@@ -5,11 +5,11 @@
 //
 // File: zero_crossing_types.h
 //
-// Code generated for Simulink model 'control_outer'.
+// Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.31
+// Model version                  : 2.85
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 20 14:32:52 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:57 2022
 //
 #ifndef ZERO_CROSSING_TYPES_H
 #define ZERO_CROSSING_TYPES_H

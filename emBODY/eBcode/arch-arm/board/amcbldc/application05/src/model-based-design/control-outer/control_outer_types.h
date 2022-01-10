@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 2.31
+// Model version                  : 2.35
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Dec 20 14:32:52 2021
+// C/C++ source code generated on : Mon Jan 10 17:05:04 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -61,6 +61,10 @@ struct MotorConfig
   real32_T reduction;
   real32_T Kp;
   real32_T Ki;
+  real32_T Kd;
+
+  // Shift factor.
+  uint8_T Ks;
   real32_T Kbemf;
   real32_T Rphase;
   real32_T Vmax;
