@@ -14,12 +14,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details
 */
-
-// TODO: temporary disabled the mutex
-
-#ifndef RTW_MUTEX_H
-#define RTW_MUTEX_H
-
 #include "stm32hal.h"
 
 #define rtw_mutex_init()
@@ -46,11 +40,5 @@ inline void rtw_mutex_unlock(void)
         NVIC_EnableIRQ(DMA1_Channel2_IRQn);
     }  
 }
-#else
-    #define rtw_mutex_init()
-    #define rtw_mutex_destroy()
-    #define rtw_mutex_lock() 
-    #define rtw_mutex_unlock()
-#endif // RTW_MUTEX_H
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
