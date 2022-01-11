@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.106
+// Model version                  : 3.125
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:07 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -35,10 +35,11 @@ struct JointPositions
 #ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
 #define DEFINED_TYPEDEF_FOR_MotorSensors_
 
-// electrical angle = angle * num_poles
 struct MotorSensors
 {
   real32_T Iabc[3];
+
+  // electrical angle = angle * pole_pairs
   real32_T angle;
   real32_T temperature;
   real32_T voltage;
@@ -116,6 +117,7 @@ struct BUS_EVENTS_RX
   boolean_T control_mode;
   boolean_T current_limit;
   boolean_T desired_current;
+  boolean_T current_pid;
 };
 
 #endif
@@ -156,14 +158,14 @@ struct BUS_MSG_CURRENT_LIMIT
   // Motor selector.
   boolean_T motor;
 
-  // Nominal current in mA.
-  int16_T nominal;
+  // Nominal current in A.
+  real32_T nominal;
 
-  // Peak current in mA.
-  uint16_T peak;
+  // Peak current in A.
+  real32_T peak;
 
-  // Overload current in mA.
-  uint16_T overload;
+  // Overload current in A.
+  real32_T overload;
 };
 
 #endif
@@ -174,8 +176,32 @@ struct BUS_MSG_CURRENT_LIMIT
 // Fields of a DESIRED_CURRENT message.
 struct BUS_MSG_DESIRED_CURRENT
 {
-  // Nominal current in mA.
-  int16_T current;
+  // Nominal current in A.
+  real32_T current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
+
+// Fields of a CURRENT_PID message.
+struct BUS_MSG_CURRENT_PID
+{
+  // Motor selector.
+  boolean_T motor;
+
+  // Proportional gain.
+  real32_T Kp;
+
+  // Integral gain.
+  real32_T Ki;
+
+  // Derivative gain.
+  real32_T Kd;
+
+  // Shift factor.
+  uint8_T Ks;
 };
 
 #endif
@@ -189,6 +215,7 @@ struct BUS_MESSAGES_RX
   BUS_MSG_CONTROL_MODE control_mode;
   BUS_MSG_CURRENT_LIMIT current_limit;
   BUS_MSG_DESIRED_CURRENT desired_current;
+  BUS_MSG_CURRENT_PID current_pid;
 };
 
 #endif
@@ -283,28 +310,6 @@ struct Targets
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_JointLimits_
-#define DEFINED_TYPEDEF_FOR_JointLimits_
-
-struct JointLimits
-{
-  // joint limits
-  real32_T limits[2];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_VelocityLimits_
-#define DEFINED_TYPEDEF_FOR_VelocityLimits_
-
-struct VelocityLimits
-{
-  // velocity limits
-  real32_T limits[2];
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_MotorConfig_
 #define DEFINED_TYPEDEF_FOR_MotorConfig_
 
@@ -317,11 +322,35 @@ struct MotorConfig
   real32_T reduction;
   real32_T Kp;
   real32_T Ki;
-  boolean_T has_speed_sens;
+  real32_T Kd;
+
+  // Shift factor.
+  uint8_T Ks;
   real32_T Kbemf;
   real32_T Rphase;
   real32_T Vmax;
   real32_T Vcc;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfig_
+#define DEFINED_TYPEDEF_FOR_EstimationConfig_
+
+struct EstimationConfig
+{
+  EstimationVelocityModes velocity_mode;
 };
 
 #endif
@@ -348,12 +377,50 @@ struct PIDConfig
 
 struct Thresholds
 {
-  real32_T current_low;
-  real32_T current_high;
-  real32_T voltage_low;
-  real32_T voltage_high;
-  real32_T temperature_low;
-  real32_T temperature_high;
+  // It shall be greater than hardwareJntPosMin
+  real32_T jntPosMin;
+
+  // It shall be smaller than hardwareJntPosMax
+  real32_T jntPosMax;
+
+  // Imposed by hardware constraint
+  real32_T hardwareJntPosMin;
+
+  // Imposed by hardware constraint
+  real32_T hardwareJntPosMax;
+
+  // If robotMin == rotorMax == 0, there's no check
+  real32_T rotorPosMin;
+
+  // If robotMin == rotorMax == 0, there's no check
+  real32_T rotorPosMax;
+
+  // Can be only non-negative
+  real32_T jntVelMax;
+
+  // Timeout on reception of velocity setpoint
+  // Can be only non-negative
+  uint32_T velocityTimeout;
+
+  // Current that can be kept for an indefinite period of time w/o damaging the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorNominalCurrents;
+
+  // Current that can be applied for a short period of time
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorPeakCurrents;
+
+  // Currents over this threshold can instantaneously damages the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorOverloadCurrents;
+
+  // Expressed in ticks
+  // Max value is 32000
+  // Can be only non-negative
+  uint32_T motorPwmLimit;
 };
 
 #endif
@@ -363,9 +430,8 @@ struct Thresholds
 
 struct ConfigurationParameters
 {
-  JointLimits jointlimits;
-  VelocityLimits velocitylimits;
   MotorConfig motorconfig;
+  EstimationConfig estimationconfig;
   PIDConfig PosLoopPID;
   PIDConfig VelLoopPID;
   PIDConfig DirLoopPID;

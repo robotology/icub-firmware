@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.3
+// Model version                  : 2.6
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:30 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:47 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -31,11 +31,14 @@ namespace amc_bldc_codegen
     int16_T rtb_DataTypeConversion3;
 
     // Outputs for Atomic SubSystem: '<Root>/CAN_Encoder'
+    // Gain: '<S1>/Gain2'
+    u = 1000.0F * arg_messages_tx.foc.current;
+
     // DataTypeConversion: '<S1>/Data Type Conversion1'
-    if (arg_messages_tx.foc.current < 0.0F) {
-      u = std::ceil(arg_messages_tx.foc.current);
+    if (u < 0.0F) {
+      u = std::ceil(u);
     } else {
-      u = std::floor(arg_messages_tx.foc.current);
+      u = std::floor(u);
     }
 
     if (rtIsNaNF(u) || rtIsInfF(u)) {

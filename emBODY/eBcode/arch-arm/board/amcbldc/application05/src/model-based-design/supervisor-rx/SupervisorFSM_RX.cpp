@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.106
+// Model version                  : 3.125
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:07 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -45,18 +45,6 @@ const uint8_T SupervisorF_IN_OverCurrentFault = 3U;
 const int32_T SupervisorF_event_setLimitEvent = 8;
 namespace amc_bldc_codegen
 {
-  // Function for Chart: '<Root>/SupervisorFSM_RX'
-  boolean_T SupervisorFSM_RX::SupervisorFSM_RX_IsBoardReady(void) const
-  {
-    return SupervisorFSM_RX_DW.BoardSt == BoardState_Configured;
-  }
-
-  // Function for Chart: '<Root>/SupervisorFSM_RX'
-  boolean_T SupervisorFSM_RX::SupervisorFS_isConfigurationSet(void) const
-  {
-    return SupervisorFSM_RX_DW.IsCurrentLimitSet;
-  }
-
   // Function for Chart: '<Root>/SupervisorFSM_RX'
   ControlModes SupervisorFSM_RX::SupervisorFSM_RX_convert(MCControlModes
     mccontrolmode)
@@ -98,32 +86,12 @@ namespace amc_bldc_codegen
   }
 
   // Function for Chart: '<Root>/SupervisorFSM_RX'
-  boolean_T SupervisorFSM_RX::SupervisorFS_IsNewCtrl_Velocity(const
-    BUS_MESSAGES_RX *arg_MessagesRx)
-  {
-    boolean_T out;
-    out = (SupervisorFSM_RX_convert(arg_MessagesRx->control_mode.mode) ==
-           ControlModes_Velocity);
-    return out;
-  }
-
-  // Function for Chart: '<Root>/SupervisorFSM_RX'
   boolean_T SupervisorFSM_RX::SupervisorFS_IsNewCtrl_Position(const
     BUS_MESSAGES_RX *arg_MessagesRx)
   {
     boolean_T out;
     out = (SupervisorFSM_RX_convert(arg_MessagesRx->control_mode.mode) ==
            ControlModes_Position);
-    return out;
-  }
-
-  // Function for Chart: '<Root>/SupervisorFSM_RX'
-  boolean_T SupervisorFSM_RX::SupervisorFSM_IsNewCtrl_Voltage(const
-    BUS_MESSAGES_RX *arg_MessagesRx)
-  {
-    boolean_T out;
-    out = (SupervisorFSM_RX_convert(arg_MessagesRx->control_mode.mode) ==
-           ControlModes_Voltage);
     return out;
   }
 
@@ -138,46 +106,50 @@ namespace amc_bldc_codegen
   }
 
   // Function for Chart: '<Root>/SupervisorFSM_RX'
-  void SupervisorFSM_RX::Supervisor_CONTROL_MODE_HANDLER(const SensorsData
-    *arg_SensorsData, const ControlOutputs *arg_ControlOutputs, const
-    BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets)
+  boolean_T SupervisorFSM_RX::SupervisorFSM_IsNewCtrl_Voltage(const
+    BUS_MESSAGES_RX *arg_MessagesRx)
   {
-    boolean_T guard1 = false;
-    boolean_T guard2 = false;
-    boolean_T guard3 = false;
-    boolean_T guard4 = false;
-    boolean_T guard5 = false;
-    guard1 = false;
-    guard2 = false;
-    guard3 = false;
-    guard4 = false;
-    guard5 = false;
-    switch (SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER) {
-     case SupervisorFSM_RX_IN_Current:
-      if (SupervisorFSM_RX_DW.sfEvent == Superviso_event_MotorFaultEvent) {
-        SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
-          SupervisorFSM_RX_IN_HWFault;
+    boolean_T out;
+    out = (SupervisorFSM_RX_convert(arg_MessagesRx->control_mode.mode) ==
+           ControlModes_Voltage);
+    return out;
+  }
 
-        // Chart: '<Root>/SupervisorFSM_RX'
-        arg_Flags->control_mode = ControlModes_HwFaultCM;
-      } else if ((SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent)
-                 && (!SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx)) &&
-                 (!SupervisorFS_IsNewCtrl_Position(arg_MessagesRx))) {
+  // Function for Chart: '<Root>/SupervisorFSM_RX'
+  boolean_T SupervisorFSM_RX::SupervisorFS_IsNewCtrl_Velocity(const
+    BUS_MESSAGES_RX *arg_MessagesRx)
+  {
+    boolean_T out;
+    out = (SupervisorFSM_RX_convert(arg_MessagesRx->control_mode.mode) ==
+           ControlModes_Velocity);
+    return out;
+  }
+
+  // Function for Chart: '<Root>/SupervisorFSM_RX'
+  void SupervisorFSM_RX::SupervisorFSM_RX_Current(const SensorsData
+    *arg_SensorsData, const BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags,
+    Targets *arg_Targets)
+  {
+    if (SupervisorFSM_RX_DW.sfEvent == Superviso_event_MotorFaultEvent) {
+      SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_HWFault;
+      arg_Flags->control_mode = ControlModes_HwFaultCM;
+      rtw_disableMotor();
+    } else {
+      boolean_T guard1 = false;
+      guard1 = false;
+      if ((SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent) &&
+          (!SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx)) &&
+          (!SupervisorFS_IsNewCtrl_Position(arg_MessagesRx))) {
         if (!SupervisorFSM_IsNewCtrl_Current(arg_MessagesRx)) {
           if (SupervisorFSM_IsNewCtrl_Voltage(arg_MessagesRx)) {
-            // Chart: '<Root>/SupervisorFSM_RX'
             arg_Targets->motorvoltage.voltage =
               arg_SensorsData->motorsensors.voltage;
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
               SupervisorFSM_RX_IN_Voltage;
-
-            // Chart: '<Root>/SupervisorFSM_RX'
             arg_Flags->control_mode = ControlModes_Voltage;
           } else if (SupervisorFS_IsNewCtrl_Velocity(arg_MessagesRx)) {
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
               SupervisorFSM_RX_IN_Velocity;
-
-            // Chart: '<Root>/SupervisorFSM_RX'
             arg_Flags->control_mode = ControlModes_Velocity;
             arg_Targets->jointvelocities.velocity = 0.0F;
           } else {
@@ -192,16 +164,13 @@ namespace amc_bldc_codegen
           if (SupervisorFS_IsNewCtrl_Position(arg_MessagesRx)) {
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
               SupervisorFSM_RX_IN_Position;
-
-            // Chart: '<Root>/SupervisorFSM_RX'
             arg_Flags->control_mode = ControlModes_Position;
             arg_Targets->jointpositions = arg_SensorsData->jointpositions;
           } else if (SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx)) {
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
               SupervisorFSM_RX_IN_Idle;
-
-            // Chart: '<Root>/SupervisorFSM_RX'
             arg_Flags->control_mode = ControlModes_Idle;
+            rtw_disableMotor();
           } else {
             guard1 = true;
           }
@@ -209,6 +178,45 @@ namespace amc_bldc_codegen
           guard1 = true;
         }
       }
+
+      if (guard1) {
+        SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
+          SupervisorFSM_RX_IN_Current;
+        arg_Flags->control_mode = ControlModes_Current;
+      }
+    }
+  }
+
+  // Function for Chart: '<Root>/SupervisorFSM_RX'
+  boolean_T SupervisorFSM_RX::SupervisorFSM_RX_IsBoardReady(void) const
+  {
+    return SupervisorFSM_RX_DW.BoardSt == BoardState_Configured;
+  }
+
+  // Function for Chart: '<Root>/SupervisorFSM_RX'
+  boolean_T SupervisorFSM_RX::SupervisorFS_isConfigurationSet(void) const
+  {
+    return SupervisorFSM_RX_DW.IsCurrentLimitSet;
+  }
+
+  // Function for Chart: '<Root>/SupervisorFSM_RX'
+  void SupervisorFSM_RX::Supervisor_CONTROL_MODE_HANDLER(const SensorsData
+    *arg_SensorsData, const ControlOutputs *arg_ControlOutputs, const
+    BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets)
+  {
+    boolean_T guard1 = false;
+    boolean_T guard2 = false;
+    boolean_T guard3 = false;
+    boolean_T guard4 = false;
+    guard1 = false;
+    guard2 = false;
+    guard3 = false;
+    guard4 = false;
+    switch (SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER) {
+     case SupervisorFSM_RX_IN_Current:
+      // Chart: '<Root>/SupervisorFSM_RX'
+      SupervisorFSM_RX_Current(arg_SensorsData, arg_MessagesRx, arg_Flags,
+        arg_Targets);
       break;
 
      case SupervisorFSM_RX_IN_HWFault:
@@ -220,11 +228,13 @@ namespace amc_bldc_codegen
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_NotConfigured;
+        rtw_disableMotor();
       } else if ((SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent)
                  && SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx)) {
         // Chart: '<Root>/SupervisorFSM_RX'
         SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_Idle;
         arg_Flags->control_mode = ControlModes_Idle;
+        rtw_disableMotor();
       }
       break;
 
@@ -235,9 +245,11 @@ namespace amc_bldc_codegen
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_HwFaultCM;
+        rtw_disableMotor();
       } else if (SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent)
       {
         if (!SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx)) {
+          rtw_enableMotor();
           if (SupervisorFS_IsNewCtrl_Position(arg_MessagesRx)) {
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
               SupervisorFSM_RX_IN_Position;
@@ -269,10 +281,10 @@ namespace amc_bldc_codegen
             arg_Flags->control_mode = ControlModes_Velocity;
             arg_Targets->jointvelocities.velocity = 0.0F;
           } else {
-            guard2 = true;
+            guard1 = true;
           }
         } else {
-          guard2 = true;
+          guard1 = true;
         }
       }
       break;
@@ -284,6 +296,7 @@ namespace amc_bldc_codegen
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_Idle;
+        rtw_disableMotor();
       } else if (SupervisorFSM_RX_DW.sfEvent == Superviso_event_MotorFaultEvent)
       {
         SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
@@ -291,6 +304,7 @@ namespace amc_bldc_codegen
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_HwFaultCM;
+        rtw_disableMotor();
       }
       break;
 
@@ -301,6 +315,7 @@ namespace amc_bldc_codegen
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_HwFaultCM;
+        rtw_disableMotor();
       } else if ((SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent)
                  && (!SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx)) &&
                  (!SupervisorFS_IsNewCtrl_Position(arg_MessagesRx))) {
@@ -329,10 +344,10 @@ namespace amc_bldc_codegen
           arg_Flags->control_mode = ControlModes_Velocity;
           arg_Targets->jointvelocities.velocity = 0.0F;
         } else {
-          guard3 = true;
+          guard2 = true;
         }
       } else {
-        guard3 = true;
+        guard2 = true;
       }
       break;
 
@@ -343,6 +358,7 @@ namespace amc_bldc_codegen
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_HwFaultCM;
+        rtw_disableMotor();
       } else if (SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent)
       {
         if (!SupervisorFS_IsNewCtrl_Velocity(arg_MessagesRx)) {
@@ -376,11 +392,12 @@ namespace amc_bldc_codegen
 
             // Chart: '<Root>/SupervisorFSM_RX'
             arg_Flags->control_mode = ControlModes_Idle;
+            rtw_disableMotor();
           } else {
-            guard4 = true;
+            guard3 = true;
           }
         } else {
-          guard4 = true;
+          guard3 = true;
         }
       }
       break;
@@ -392,6 +409,7 @@ namespace amc_bldc_codegen
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_HwFaultCM;
+        rtw_disableMotor();
       } else if ((SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent)
                  && SupervisorFS_IsNewCtrl_Velocity(arg_MessagesRx)) {
         if ((!SupervisorFSM_IsNewCtrl_Voltage(arg_MessagesRx)) &&
@@ -403,7 +421,7 @@ namespace amc_bldc_codegen
           arg_Flags->control_mode = ControlModes_Velocity;
           arg_Targets->jointvelocities.velocity = 0.0F;
         } else {
-          guard5 = true;
+          guard4 = true;
         }
       } else if (SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent)
       {
@@ -429,24 +447,25 @@ namespace amc_bldc_codegen
 
             // Chart: '<Root>/SupervisorFSM_RX'
             arg_Flags->control_mode = ControlModes_Idle;
+            rtw_disableMotor();
           } else {
-            guard5 = true;
+            guard4 = true;
           }
         } else {
-          guard5 = true;
+          guard4 = true;
         }
       }
       break;
     }
 
-    if (guard5) {
+    if (guard4) {
       SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_Voltage;
 
       // Chart: '<Root>/SupervisorFSM_RX'
       arg_Flags->control_mode = ControlModes_Voltage;
     }
 
-    if (guard4) {
+    if (guard3) {
       SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_Velocity;
 
       // Chart: '<Root>/SupervisorFSM_RX'
@@ -454,27 +473,22 @@ namespace amc_bldc_codegen
       arg_Targets->jointvelocities.velocity = 0.0F;
     }
 
-    if (guard3) {
+    if (guard2) {
       if (SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent) {
         SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_Idle;
 
         // Chart: '<Root>/SupervisorFSM_RX'
         arg_Flags->control_mode = ControlModes_Idle;
+        rtw_disableMotor();
       }
     }
 
-    if (guard2) {
+    if (guard1) {
       SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_Idle;
 
       // Chart: '<Root>/SupervisorFSM_RX'
       arg_Flags->control_mode = ControlModes_Idle;
-    }
-
-    if (guard1) {
-      SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_Current;
-
-      // Chart: '<Root>/SupervisorFSM_RX'
-      arg_Flags->control_mode = ControlModes_Current;
+      rtw_disableMotor();
     }
   }
 
@@ -498,10 +512,6 @@ namespace amc_bldc_codegen
     arg_Targets->jointvelocities.velocity = 0.0F;
     arg_Targets->motorcurrent.current = 0.0F;
     arg_Targets->motorvoltage.voltage = 0.0F;
-    arg_Output->jointlimits.limits[0] = 0.0F;
-    arg_Output->velocitylimits.limits[0] = 0.0F;
-    arg_Output->jointlimits.limits[1] = 0.0F;
-    arg_Output->velocitylimits.limits[1] = 0.0F;
     arg_Output->motorconfig.Imin = 0.0F;
     arg_Output->motorconfig.Imax = 0.0F;
     arg_Output->motorconfig.has_hall_sens = false;
@@ -509,11 +519,14 @@ namespace amc_bldc_codegen
     arg_Output->motorconfig.reduction = 0.0F;
     arg_Output->motorconfig.Kp = 0.0F;
     arg_Output->motorconfig.Ki = 0.0F;
-    arg_Output->motorconfig.has_speed_sens = false;
+    arg_Output->motorconfig.Kd = 0.0F;
+    arg_Output->motorconfig.Ks = 0U;
     arg_Output->motorconfig.Kbemf = 0.0F;
     arg_Output->motorconfig.Rphase = 0.0F;
     arg_Output->motorconfig.Vmax = 0.0F;
     arg_Output->motorconfig.Vcc = 0.0F;
+    arg_Output->estimationconfig.velocity_mode =
+      EstimationVelocityModes_Disabled;
     arg_Output->PosLoopPID.OutMax = 0.0F;
     arg_Output->PosLoopPID.OutMin = 0.0F;
     arg_Output->PosLoopPID.P = 0.0F;
@@ -538,12 +551,18 @@ namespace amc_bldc_codegen
     arg_Output->DirLoopPID.N = 0.0F;
     arg_Output->DirLoopPID.I0 = 0.0F;
     arg_Output->DirLoopPID.D0 = 0.0F;
-    arg_Output->thresholds.current_low = 0.0F;
-    arg_Output->thresholds.current_high = 0.0F;
-    arg_Output->thresholds.voltage_low = 0.0F;
-    arg_Output->thresholds.voltage_high = 0.0F;
-    arg_Output->thresholds.temperature_low = 0.0F;
-    arg_Output->thresholds.temperature_high = 0.0F;
+    arg_Output->thresholds.jntPosMin = 0.0F;
+    arg_Output->thresholds.jntPosMax = 0.0F;
+    arg_Output->thresholds.hardwareJntPosMin = 0.0F;
+    arg_Output->thresholds.hardwareJntPosMax = 0.0F;
+    arg_Output->thresholds.rotorPosMin = 0.0F;
+    arg_Output->thresholds.rotorPosMax = 0.0F;
+    arg_Output->thresholds.jntVelMax = 0.0F;
+    arg_Output->thresholds.velocityTimeout = 0U;
+    arg_Output->thresholds.motorNominalCurrents = 0.0F;
+    arg_Output->thresholds.motorPeakCurrents = 0.0F;
+    arg_Output->thresholds.motorOverloadCurrents = 0.0F;
+    arg_Output->thresholds.motorPwmLimit = 0U;
   }
 
   // Output and update for referenced model: 'SupervisorFSM_RX'
@@ -558,6 +577,9 @@ namespace amc_bldc_codegen
     SupervisorFSM_RX_DW.EventsRx_control_mode_prev =
       SupervisorFSM_RX_DW.EventsRx_control_mode_start;
     SupervisorFSM_RX_DW.EventsRx_control_mode_start = arg_EventsRx.control_mode;
+    SupervisorFSM_RX_DW.EventsRx_current_pid_prev =
+      SupervisorFSM_RX_DW.EventsRx_current_pid_start;
+    SupervisorFSM_RX_DW.EventsRx_current_pid_start = arg_EventsRx.current_pid;
     SupervisorFSM_RX_DW.ErrorsRx_event_prev =
       SupervisorFSM_RX_DW.ErrorsRx_event_start;
     SupervisorFSM_RX_DW.ErrorsRx_event_start = arg_ErrorsRx.event;
@@ -573,6 +595,8 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.EventsRx_control_mode_prev = arg_EventsRx.control_mode;
       SupervisorFSM_RX_DW.EventsRx_control_mode_start =
         arg_EventsRx.control_mode;
+      SupervisorFSM_RX_DW.EventsRx_current_pid_prev = arg_EventsRx.current_pid;
+      SupervisorFSM_RX_DW.EventsRx_current_pid_start = arg_EventsRx.current_pid;
       SupervisorFSM_RX_DW.ErrorsRx_event_prev = arg_ErrorsRx.event;
       SupervisorFSM_RX_DW.ErrorsRx_event_start = arg_ErrorsRx.event;
       SupervisorFSM_RX_DW.EventsRx_desired_current_prev =
@@ -584,10 +608,28 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.EventsRx_current_limit_start =
         arg_EventsRx.current_limit;
       SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX = 1U;
-      arg_Output.motorconfig.Kp = 0.4F;
-      arg_Output.motorconfig.Ki = 100.0F;
+      arg_Output.motorconfig.pole_pairs = 4U;
+      arg_Output.motorconfig.Kp = 2.0F;
+      arg_Output.motorconfig.Ki = 500.0F;
+      arg_Output.motorconfig.Kd = 0.0F;
+      arg_Output.motorconfig.Ks = 0U;
       arg_Output.motorconfig.Vmax = 9.0F;
       arg_Output.motorconfig.Vcc = 24.0F;
+      arg_Output.motorconfig.reduction = 1.0F;
+      arg_Output.estimationconfig.velocity_mode =
+        EstimationVelocityModes_MovingAverage;
+      arg_Output.thresholds.jntPosMin = 1.0F;
+      arg_Output.thresholds.jntPosMax = 359.0F;
+      arg_Output.thresholds.hardwareJntPosMin = 0.0F;
+      arg_Output.thresholds.hardwareJntPosMax = 360.0F;
+      arg_Output.thresholds.rotorPosMin = 0.0F;
+      arg_Output.thresholds.rotorPosMax = 0.0F;
+      arg_Output.thresholds.jntVelMax = 100.0F;
+      arg_Output.thresholds.velocityTimeout = 10U;
+      arg_Output.thresholds.motorNominalCurrents = 100.0F;
+      arg_Output.thresholds.motorPeakCurrents = 100.0F;
+      arg_Output.thresholds.motorOverloadCurrents = 100.0F;
+      arg_Output.thresholds.motorPwmLimit = 32000U;
       SupervisorFSM_RX_DW.is_active_CAN_RX_HANDLER = 1U;
       SupervisorFSM_RX_DW.is_active_EVENT_DISPATCHER = 1U;
       SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
@@ -595,6 +637,7 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
         SupervisorFSM__IN_NotConfigured;
       arg_Flags.control_mode = ControlModes_NotConfigured;
+      rtw_disableMotor();
       SupervisorFSM_RX_DW.is_active_LIMITS_HANDLER = 1U;
       SupervisorFSM_RX_DW.is_LIMITS_HANDLER = SupervisorFSM_RX_IN_Home;
       SupervisorFSM_RX_DW.is_active_STATE_HANDLER = 1U;
@@ -614,8 +657,13 @@ namespace amc_bldc_codegen
             (SupervisorFSM_RX_DW.is_EVENT_DISPATCHER == 1) &&
             (SupervisorFSM_RX_DW.ErrorsRx_event_prev ==
              SupervisorFSM_RX_DW.ErrorsRx_event_start)) {
-          if (SupervisorFSM_RX_DW.EventsRx_control_mode_prev !=
-              SupervisorFSM_RX_DW.EventsRx_control_mode_start) {
+          if (SupervisorFSM_RX_DW.EventsRx_desired_current_prev !=
+              SupervisorFSM_RX_DW.EventsRx_desired_current_start) {
+            arg_Targets.motorcurrent.current =
+              arg_MessagesRx.desired_current.current;
+            SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
+          } else if (SupervisorFSM_RX_DW.EventsRx_control_mode_prev !=
+                     SupervisorFSM_RX_DW.EventsRx_control_mode_start) {
             c_previousEvent = SupervisorFSM_RX_DW.sfEvent;
             SupervisorFSM_RX_DW.sfEvent = Super_event_setControlModeEvent;
             if (SupervisorFSM_RX_DW.is_active_CONTROL_MODE_HANDLER != 0U) {
@@ -624,11 +672,6 @@ namespace amc_bldc_codegen
             }
 
             SupervisorFSM_RX_DW.sfEvent = c_previousEvent;
-            SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
-          } else if (SupervisorFSM_RX_DW.EventsRx_desired_current_prev !=
-                     SupervisorFSM_RX_DW.EventsRx_desired_current_start) {
-            arg_Targets.motorcurrent.current = 0.001F * static_cast<real32_T>
-              (arg_MessagesRx.desired_current.current);
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           } else if (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
                      SupervisorFSM_RX_DW.EventsRx_current_limit_start) {
@@ -639,13 +682,20 @@ namespace amc_bldc_codegen
                 (SupervisorFSM_RX_DW.sfEvent == SupervisorF_event_setLimitEvent)
                 && (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
                     SupervisorFSM_RX_DW.EventsRx_current_limit_start)) {
-              SupervisorFSM_RX_DW.CurrentLimit = 0.001F * static_cast<real32_T>
+              arg_Output.thresholds.motorOverloadCurrents = std::abs
                 (arg_MessagesRx.current_limit.overload);
               SupervisorFSM_RX_DW.IsCurrentLimitSet = true;
               SupervisorFSM_RX_DW.is_LIMITS_HANDLER = SupervisorFSM_RX_IN_Home;
             }
 
             SupervisorFSM_RX_DW.sfEvent = c_previousEvent;
+            SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
+          } else if (SupervisorFSM_RX_DW.EventsRx_current_pid_prev !=
+                     SupervisorFSM_RX_DW.EventsRx_current_pid_start) {
+            arg_Output.motorconfig.Kp = arg_MessagesRx.current_pid.Kp;
+            arg_Output.motorconfig.Ki = arg_MessagesRx.current_pid.Ki;
+            arg_Output.motorconfig.Kd = arg_MessagesRx.current_pid.Kd;
+            arg_Output.motorconfig.Ks = arg_MessagesRx.current_pid.Ks;
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           }
         }
@@ -660,7 +710,7 @@ namespace amc_bldc_codegen
             (SupervisorFSM_RX_DW.sfEvent == SupervisorF_event_setLimitEvent) &&
             (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
              SupervisorFSM_RX_DW.EventsRx_current_limit_start)) {
-          SupervisorFSM_RX_DW.CurrentLimit = 0.001F * static_cast<real32_T>
+          arg_Output.thresholds.motorOverloadCurrents = std::abs
             (arg_MessagesRx.current_limit.overload);
           SupervisorFSM_RX_DW.IsCurrentLimitSet = true;
           SupervisorFSM_RX_DW.is_LIMITS_HANDLER = SupervisorFSM_RX_IN_Home;
@@ -748,7 +798,7 @@ namespace amc_bldc_codegen
 
            case SupervisorFSM_RX_IN_NoFault:
             if (std::abs(arg_ControlOutputs.Iq_fbk.current) >=
-                SupervisorFSM_RX_DW.CurrentLimit) {
+                arg_Output.thresholds.motorOverloadCurrents) {
               SupervisorFSM_RX_DW.is_OverCurrent =
                 SupervisorF_IN_OverCurrentFault;
 
@@ -766,7 +816,7 @@ namespace amc_bldc_codegen
 
            case SupervisorF_IN_OverCurrentFault:
             if (std::abs(arg_ControlOutputs.Iq_fbk.current) <
-                SupervisorFSM_RX_DW.CurrentLimit) {
+                arg_Output.thresholds.motorOverloadCurrents) {
               SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
 
               // MotorFaultFlags.overCurrent=0;

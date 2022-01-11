@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.96
+// Model version                  : 3.174
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:26:07 2021
+// C/C++ source code generated on : Mon Jan 10 17:05:21 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -29,9 +29,9 @@
 #include "can_rx_raw2struct.h"
 #include "can_decoder.h"
 #include "SupervisorFSM_RX.h"
-#include "control_outer.h"
 #include "SupervisorFSM_TX.h"
 #include "can_encoder.h"
+#include "control_outer.h"
 #include "rtw_mutex.h"
 
 // Macros for accessing real-time model data structure
@@ -64,13 +64,13 @@
 //
 
 extern real32_T CAN_ANGLE_DEG2ICUB;    // Variable: CAN_ANGLE_DEG2ICUB
-                                          //  Referenced by: '<S3>/CAN_Encoder'
+                                          //  Referenced by: '<S6>/CAN_Encoder'
                                           //  2^16/360
 
 extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  Referenced by:
-                                          //    '<S3>/CAN_Decoder'
-                                          //    '<S3>/CAN_Encoder'
+                                          //    '<S6>/CAN_Decoder'
+                                          //    '<S6>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 
@@ -83,35 +83,54 @@ namespace amc_bldc_codegen
    public:
     // Block signals (default storage)
     struct B_AMC_BLDC_T {
-      ConfigurationParameters ConfigurationParameters_m;// '<S4>/SupervisorFSM_RX' 
+      BUS_MESSAGES_RX CAN_Decoder_o1;  // '<S6>/CAN_Decoder'
       SensorsData BusConversion_InsertedFor_Estim;
       SensorsData BusConversion_InsertedFor_Super;
-      BUS_CAN_RX pck_rx_struct;        // '<S3>/CAN_RX_raw2struct'
-      Targets Targets_n;               // '<S4>/SupervisorFSM_RX'
-      BUS_MESSAGES_RX CAN_Decoder_o1;  // '<S3>/CAN_Decoder'
-      BUS_MESSAGES_TX MessagesTx;      // '<S4>/SupervisorFSM_TX'
-      Flags Flags_k;                   // '<S4>/SupervisorFSM_RX'
-      BUS_EVENTS_TX SupervisorFSM_TX_o2;// '<S4>/SupervisorFSM_TX'
-      BUS_EVENTS_RX CAN_Decoder_o2;    // '<S3>/CAN_Decoder'
-      BUS_CAN_RX_ERRORS CAN_Decoder_o3;// '<S3>/CAN_Decoder'
+      BUS_CAN_RX pck_rx_struct;        // '<S6>/CAN_RX_raw2struct'
+      Targets Targets_n;               // '<S7>/SupervisorFSM_RX'
+      ControlOutputs RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter1'
+      BUS_MESSAGES_TX MessagesTx;      // '<S7>/SupervisorFSM_TX'
+      Flags Flags_k;                   // '<S7>/SupervisorFSM_RX'
+      BUS_EVENTS_TX SupervisorFSM_TX_o2;// '<S7>/SupervisorFSM_TX'
+      BUS_EVENTS_RX CAN_Decoder_o2;    // '<S6>/CAN_Decoder'
+      BUS_CAN_RX_ERRORS CAN_Decoder_o3;// '<S6>/CAN_Decoder'
     };
 
     // Block states (default storage) for system '<Root>'
     struct DW_AMC_BLDC_T {
-      ControlOutputs RTBInsertedForAdapter_InsertedF;// synthesized block
-      ControlOutputs RTBInsertedForAdapter_Inserte_m;// synthesized block
-      ControlOutputs RTBInsertedForAdapter_Inserte_b;// synthesized block
-      ControlOuterOutputs TmpRTBAtFOCInport6_Buf[3];// synthesized block
-      EstimatedData RTBInsertedForAdapter_Inserte_j[3];// synthesized block
+      ConfigurationParameters ZOHBlockInsertedForAdapter_Inse;// synthesized block 
+      ConfigurationParameters RTBInsertedForAdapter_InsertedF[3];// synthesized block 
+      Targets RTBInsertedForAdapter_Inserte_m[3];// synthesized block
+      ControlOutputs RTBInsertedForAdapter_Inserte_d;// synthesized block
+      ControlOutputs RTBInsertedForAdapter_Inserte_j;// synthesized block
+      ControlOutputs RTBInsertedForAdapter_Inserte_o;// synthesized block
+      ControlOuterOutputs RTBInsertedForAdapter_Inserte_i[3];// synthesized block 
+      Flags RTBInsertedForAdapter_Inserte_l[3];// synthesized block
+      EstimatedData RTBInsertedForAdapter_Inserte_k[3];// synthesized block
       void* RTBInsertedForAdapter_Insert_mf;// synthesized block
-      void* TmpRTBAtFOCInport6_SEMAPHORE;// synthesized block
-      void* RTBInsertedForAdapter_Insert_bb;// synthesized block
-      int8_T RTBInsertedForAdapter_Inserte_d;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_de;// synthesized block
-      int8_T TmpRTBAtFOCInport6_LstBufWR;// synthesized block
-      int8_T TmpRTBAtFOCInport6_RDBuf; // synthesized block
-      int8_T RTBInsertedForAdapter_Inserte_l;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_lf;// synthesized block
+      void* RTBInsertedForAdapter_Inserte_b;// synthesized block
+      void* RTBInsertedForAdapter_Inserte_f;// synthesized block
+      void* RTBInsertedForAdapter_Inserte_e;// synthesized block
+      void* RTBInsertedForAdapter_Inserte_c;// synthesized block
+      void* RTBInsertedForAdapter_Inserte_h;// synthesized block
+      void* RTBInsertedForAdapter_Insert_mp;// synthesized block
+      real32_T RTBInsertedForAdapter_Insert_ce[3];// synthesized block
+      real32_T RTBInsertedForAdapter_Insert_ki[3];// synthesized block
+      real32_T RTBInsertedForAdapter_Insert_o4[3];// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_hj;// synthesized block
+      int8_T RTBInsertedForAdapter_Inserte_p;// synthesized block
+      int8_T RTBInsertedForAdapter_Inser_mpz;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_m3;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_b2;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_ko;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_jj;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_mb;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_p5;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_bw;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_js;// synthesized block
+      int8_T RTBInsertedForAdapter_Inserte_a;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_hm;// synthesized block
+      int8_T RTBInsertedForAdapter_Insert_ol;// synthesized block
     };
 
     // External inputs (root inport signals with default storage)
@@ -132,6 +151,7 @@ namespace amc_bldc_codegen
     // External outputs (root outports fed by signals with default storage)
     struct ExtY_AMC_BLDC_T {
       ControlOutputs ControlOutputs_p; // '<Root>/ControlOutputs'
+      ConfigurationParameters ConfigurationParameters_p;// '<Root>/ConfigurationParameters' 
       EstimatedData EstimatedData_p;   // '<Root>/EstimatedData'
       BUS_CAN PacketsTx;               // '<Root>/PacketsTx'
     };
@@ -187,28 +207,28 @@ namespace amc_bldc_codegen
 
     // private data and function members
    private:
-    // model instance variable for '<S1>/FOC'
-    amc_bldc_codegen::control_foc FOCMDLOBJ1;
+    // model instance variable for '<S5>/Estimation_Velocity'
+    amc_bldc_codegen::estimation_velocity Estimation_VelocityMDLOBJ1;
 
-    // model instance variable for '<S1>/OuterControl'
-    amc_bldc_codegen::control_outer OuterControlMDLOBJ2;
+    // model instance variable for '<Root>/FOC'
+    amc_bldc_codegen::control_foc FOCMDLOBJ2;
 
-    // model instance variable for '<S2>/Estimation_Velocity'
-    amc_bldc_codegen::estimation_velocity Estimation_VelocityMDLOBJ3;
+    // model instance variable for '<S6>/CAN_Decoder'
+    amc_bldc_codegen::CAN_Decoder CAN_DecoderMDLOBJ3;
 
-    // model instance variable for '<S3>/CAN_Decoder'
-    amc_bldc_codegen::CAN_Decoder CAN_DecoderMDLOBJ4;
+    // model instance variable for '<S6>/CAN_Encoder'
+    amc_bldc_codegen::CAN_Encoder CAN_EncoderMDLOBJ4;
 
-    // model instance variable for '<S3>/CAN_Encoder'
-    amc_bldc_codegen::CAN_Encoder CAN_EncoderMDLOBJ5;
+    // model instance variable for '<S6>/CAN_RX_raw2struct'
+    amc_bldc_codegen::CAN_RX_raw2struct CAN_RX_raw2structMDLOBJ5;
 
-    // model instance variable for '<S3>/CAN_RX_raw2struct'
-    amc_bldc_codegen::CAN_RX_raw2struct CAN_RX_raw2structMDLOBJ6;
+    // model instance variable for '<Root>/OuterControl'
+    amc_bldc_codegen::control_outer OuterControlMDLOBJ6;
 
-    // model instance variable for '<S4>/SupervisorFSM_RX'
+    // model instance variable for '<S7>/SupervisorFSM_RX'
     amc_bldc_codegen::SupervisorFSM_RX SupervisorFSM_RXMDLOBJ7;
 
-    // model instance variable for '<S4>/SupervisorFSM_TX'
+    // model instance variable for '<S7>/SupervisorFSM_TX'
     amc_bldc_codegen::SupervisorFSM_TX SupervisorFSM_TXMDLOBJ8;
 
     // Real-Time Model
@@ -231,16 +251,13 @@ namespace amc_bldc_codegen
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'AMC_BLDC'
-//  '<S1>'   : 'AMC_BLDC/Control'
-//  '<S2>'   : 'AMC_BLDC/Estimation'
-//  '<S3>'   : 'AMC_BLDC/Messaging'
-//  '<S4>'   : 'AMC_BLDC/Supervision'
-//  '<S5>'   : 'AMC_BLDC/Control/Adapter'
-//  '<S6>'   : 'AMC_BLDC/Control/Adapter1'
-//  '<S7>'   : 'AMC_BLDC/Control/Adapter2'
-//  '<S8>'   : 'AMC_BLDC/Control/Adapter3'
-//  '<S9>'   : 'AMC_BLDC/Control/Adapter4'
-//  '<S10>'  : 'AMC_BLDC/Control/Adapter5'
+//  '<S1>'   : 'AMC_BLDC/Adapter'
+//  '<S2>'   : 'AMC_BLDC/Adapter1'
+//  '<S3>'   : 'AMC_BLDC/Adapter2'
+//  '<S4>'   : 'AMC_BLDC/Adapter3'
+//  '<S5>'   : 'AMC_BLDC/Estimation'
+//  '<S6>'   : 'AMC_BLDC/Messaging'
+//  '<S7>'   : 'AMC_BLDC/Supervision'
 
 #endif                                 // RTW_HEADER_AMC_BLDC_h_
 

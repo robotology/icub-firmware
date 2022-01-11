@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.10
+// Model version                  : 3.15
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:18 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:36 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -38,7 +38,7 @@ namespace amc_bldc_codegen
   void SupervisorFSM_TX::step(const BUS_MESSAGES_RX &arg_MessagesRx, const
     SensorsData &arg_SensorsData, const EstimatedData &arg_EstimatedData, const
     ControlOutputs &arg_Input, BUS_MESSAGES_TX &arg_MessagesTx, BUS_EVENTS_TX &
-    arg_EventsTx)
+    arg_EventsTx, ConfigurationParameters *arg_ControlOutputs1)
   {
     // Chart: '<Root>/SupervisorFSM_TX'
     if (SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX == 0U) {
@@ -46,7 +46,7 @@ namespace amc_bldc_codegen
     } else if (arg_MessagesRx.control_mode.mode != MCControlModes_Idle) {
       arg_MessagesTx.foc.current = arg_Input.Iq_fbk.current;
       arg_MessagesTx.foc.velocity = arg_EstimatedData.jointvelocities.velocity;
-      arg_MessagesTx.foc.position = arg_SensorsData.motorsensors.angle;
+      arg_MessagesTx.foc.position = arg_SensorsData.jointpositions.position;
       SupervisorFSM_TX_DW.ev_focEventCounter++;
     }
 

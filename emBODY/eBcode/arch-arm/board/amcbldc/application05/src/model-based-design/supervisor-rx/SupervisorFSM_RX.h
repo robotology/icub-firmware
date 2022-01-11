@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.106
+// Model version                  : 3.125
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:07 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,6 +25,9 @@
 #include "SupervisorFSM_RX_types.h"
 #include <stddef.h>
 
+// user code (top of header file)
+#include "rtw_enable_disable_motors.h"
+
 // Class declaration for model SupervisorFSM_RX
 namespace amc_bldc_codegen
 {
@@ -34,7 +37,6 @@ namespace amc_bldc_codegen
    public:
     // Block states (default storage) for model 'SupervisorFSM_RX'
     struct DW_SupervisorFSM_RX_T {
-      real32_T CurrentLimit;           // '<Root>/SupervisorFSM_RX'
       int32_T sfEvent;                 // '<Root>/SupervisorFSM_RX'
       BoardState BoardSt;              // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_c2_SupervisorFSM_RX;// '<Root>/SupervisorFSM_RX'
@@ -55,6 +57,8 @@ namespace amc_bldc_codegen
       boolean_T IsCurrentLimitSet;     // '<Root>/SupervisorFSM_RX'
       boolean_T EventsRx_control_mode_prev;// '<Root>/SupervisorFSM_RX'
       boolean_T EventsRx_control_mode_start;// '<Root>/SupervisorFSM_RX'
+      boolean_T EventsRx_current_pid_prev;// '<Root>/SupervisorFSM_RX'
+      boolean_T EventsRx_current_pid_start;// '<Root>/SupervisorFSM_RX'
       boolean_T ErrorsRx_event_prev;   // '<Root>/SupervisorFSM_RX'
       boolean_T ErrorsRx_event_start;  // '<Root>/SupervisorFSM_RX'
       boolean_T EventsRx_desired_current_prev;// '<Root>/SupervisorFSM_RX'
@@ -98,19 +102,21 @@ namespace amc_bldc_codegen
     // private data and function members
    private:
     // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
-    boolean_T SupervisorFSM_RX_IsBoardReady(void) const;
-    boolean_T SupervisorFS_isConfigurationSet(void) const;
     ControlModes SupervisorFSM_RX_convert(MCControlModes mccontrolmode);
     boolean_T SupervisorFSM_RX_IsNewCtrl_Idle(const BUS_MESSAGES_RX
       *arg_MessagesRx);
-    boolean_T SupervisorFS_IsNewCtrl_Velocity(const BUS_MESSAGES_RX
-      *arg_MessagesRx);
     boolean_T SupervisorFS_IsNewCtrl_Position(const BUS_MESSAGES_RX
-      *arg_MessagesRx);
-    boolean_T SupervisorFSM_IsNewCtrl_Voltage(const BUS_MESSAGES_RX
       *arg_MessagesRx);
     boolean_T SupervisorFSM_IsNewCtrl_Current(const BUS_MESSAGES_RX
       *arg_MessagesRx);
+    boolean_T SupervisorFSM_IsNewCtrl_Voltage(const BUS_MESSAGES_RX
+      *arg_MessagesRx);
+    boolean_T SupervisorFS_IsNewCtrl_Velocity(const BUS_MESSAGES_RX
+      *arg_MessagesRx);
+    void SupervisorFSM_RX_Current(const SensorsData *arg_SensorsData, const
+      BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets);
+    boolean_T SupervisorFSM_RX_IsBoardReady(void) const;
+    boolean_T SupervisorFS_isConfigurationSet(void) const;
     void Supervisor_CONTROL_MODE_HANDLER(const SensorsData *arg_SensorsData,
       const ControlOutputs *arg_ControlOutputs, const BUS_MESSAGES_RX
       *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets);

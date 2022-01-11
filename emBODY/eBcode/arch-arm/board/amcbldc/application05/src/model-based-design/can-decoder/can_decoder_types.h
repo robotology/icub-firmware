@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 2.10
+// Model version                  : 2.27
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:24 2021
+// C/C++ source code generated on : Mon Jan 10 17:04:42 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -119,6 +119,7 @@ struct BUS_EVENTS_RX
   boolean_T control_mode;
   boolean_T current_limit;
   boolean_T desired_current;
+  boolean_T current_pid;
 };
 
 #endif
@@ -159,14 +160,14 @@ struct BUS_MSG_CURRENT_LIMIT
   // Motor selector.
   boolean_T motor;
 
-  // Nominal current in mA.
-  int16_T nominal;
+  // Nominal current in A.
+  real32_T nominal;
 
-  // Peak current in mA.
-  uint16_T peak;
+  // Peak current in A.
+  real32_T peak;
 
-  // Overload current in mA.
-  uint16_T overload;
+  // Overload current in A.
+  real32_T overload;
 };
 
 #endif
@@ -177,8 +178,32 @@ struct BUS_MSG_CURRENT_LIMIT
 // Fields of a DESIRED_CURRENT message.
 struct BUS_MSG_DESIRED_CURRENT
 {
-  // Nominal current in mA.
-  int16_T current;
+  // Nominal current in A.
+  real32_T current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
+
+// Fields of a CURRENT_PID message.
+struct BUS_MSG_CURRENT_PID
+{
+  // Motor selector.
+  boolean_T motor;
+
+  // Proportional gain.
+  real32_T Kp;
+
+  // Integral gain.
+  real32_T Ki;
+
+  // Derivative gain.
+  real32_T Kd;
+
+  // Shift factor.
+  uint8_T Ks;
 };
 
 #endif
@@ -192,6 +217,7 @@ struct BUS_MESSAGES_RX
   BUS_MSG_CONTROL_MODE control_mode;
   BUS_MSG_CURRENT_LIMIT current_limit;
   BUS_MSG_DESIRED_CURRENT desired_current;
+  BUS_MSG_CURRENT_PID current_pid;
 };
 
 #endif
@@ -228,7 +254,8 @@ struct BUS_CAN_RX_ERRORS
 
 typedef enum {
   MCOPC_Set_Control_Mode = 9,          // Default value
-  MCOPC_Set_Current_Limit = 72
+  MCOPC_Set_Current_Limit = 72,
+  MCOPC_Set_Current_PID = 101
 } MCOPC;
 
 #endif

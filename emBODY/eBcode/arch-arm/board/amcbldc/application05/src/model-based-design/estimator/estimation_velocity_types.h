@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.29
+// Model version                  : 2.35
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Dec 14 19:25:56 2021
+// C/C++ source code generated on : Mon Jan 10 17:05:10 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -35,10 +35,11 @@ struct JointPositions
 #ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
 #define DEFINED_TYPEDEF_FOR_MotorSensors_
 
-// electrical angle = angle * num_poles
 struct MotorSensors
 {
   real32_T Iabc[3];
+
+  // electrical angle = angle * pole_pairs
   real32_T angle;
   real32_T temperature;
   real32_T voltage;
@@ -56,6 +57,136 @@ struct SensorsData
   // position encoders
   JointPositions jointpositions;
   MotorSensors motorsensors;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfig_
+#define DEFINED_TYPEDEF_FOR_MotorConfig_
+
+struct MotorConfig
+{
+  real32_T Imin;
+  real32_T Imax;
+  boolean_T has_hall_sens;
+  uint8_T pole_pairs;
+  real32_T reduction;
+  real32_T Kp;
+  real32_T Ki;
+  real32_T Kd;
+
+  // Shift factor.
+  uint8_T Ks;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Vmax;
+  real32_T Vcc;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfig_
+#define DEFINED_TYPEDEF_FOR_EstimationConfig_
+
+struct EstimationConfig
+{
+  EstimationVelocityModes velocity_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PIDConfig_
+#define DEFINED_TYPEDEF_FOR_PIDConfig_
+
+struct PIDConfig
+{
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
+#define DEFINED_TYPEDEF_FOR_Thresholds_
+
+struct Thresholds
+{
+  // It shall be greater than hardwareJntPosMin
+  real32_T jntPosMin;
+
+  // It shall be smaller than hardwareJntPosMax
+  real32_T jntPosMax;
+
+  // Imposed by hardware constraint
+  real32_T hardwareJntPosMin;
+
+  // Imposed by hardware constraint
+  real32_T hardwareJntPosMax;
+
+  // If robotMin == rotorMax == 0, there's no check
+  real32_T rotorPosMin;
+
+  // If robotMin == rotorMax == 0, there's no check
+  real32_T rotorPosMax;
+
+  // Can be only non-negative
+  real32_T jntVelMax;
+
+  // Timeout on reception of velocity setpoint
+  // Can be only non-negative
+  uint32_T velocityTimeout;
+
+  // Current that can be kept for an indefinite period of time w/o damaging the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorNominalCurrents;
+
+  // Current that can be applied for a short period of time
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorPeakCurrents;
+
+  // Currents over this threshold can instantaneously damages the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorOverloadCurrents;
+
+  // Expressed in ticks
+  // Max value is 32000
+  // Can be only non-negative
+  uint32_T motorPwmLimit;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+#define DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+
+struct ConfigurationParameters
+{
+  MotorConfig motorconfig;
+  EstimationConfig estimationconfig;
+  PIDConfig PosLoopPID;
+  PIDConfig VelLoopPID;
+  PIDConfig DirLoopPID;
+  Thresholds thresholds;
 };
 
 #endif

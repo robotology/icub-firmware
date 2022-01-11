@@ -305,24 +305,6 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
     }
     
     
-    #warning: Temp workaround, duplicated logic for out_en (see inside OuterController)
-        
-        
-    if(amc_bldc.AMC_BLDC_B.Flags_k.control_mode == ControlModes_NotConfigured     || \
-             amc_bldc.AMC_BLDC_B.Flags_k.control_mode == ControlModes_Idle        || \
-             amc_bldc.AMC_BLDC_B.Flags_k.control_mode == ControlModes_HwFaultCM)
-    {
-        embot::hw::motor::motorDisable(embot::hw::MOTOR::one);
-        already_enabled = false;
-    }
-    else
-    {
-        if(!already_enabled){
-            embot::hw::motor::motorEnable(embot::hw::MOTOR::one);
-        }
-        already_enabled = true;
-    }
-    
     // -----------------------------------------------------------------------------
     // Model Step Function (1 ms)
     // -----------------------------------------------------------------------------
