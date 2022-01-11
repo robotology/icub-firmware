@@ -237,6 +237,8 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     
     already_enabled = false;
 
+    CAN_ID_AMC = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
+
     initted = true;
     return initted;
 }
