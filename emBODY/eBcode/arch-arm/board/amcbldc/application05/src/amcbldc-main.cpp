@@ -257,8 +257,8 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
 
        
-    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b000001));
-    theleds.get(embot::hw::LED::two).wave(&ledwave);     
+//    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b000001));
+//    theleds.get(embot::hw::LED::two).wave(&ledwave);     
 
     
     // init of can basic paser

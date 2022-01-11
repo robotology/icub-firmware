@@ -22,6 +22,7 @@
 #include "embot_app_theCANboardInfo.h"
 #include "embot_app_scope.h"
 #include "embot_hw_sys.h"
+#include "embot_app_theLEDmanager.h"
 #include <array>
 
 // mdb components
@@ -30,7 +31,7 @@
 
 //#define TEST_DURATION_FOC
 
-//#define EXTFAULT_enabled
+#define EXTFAULT_enabled
 #define EXTFAULT_handler_will_disable_motor
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -226,6 +227,15 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = false;    
 #endif
     
+    if(true == EXTFAULTisPRESSED)
+    {
+        embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).on();
+    }
+    else 
+    {
+        embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).off();
+    }
+    
     // init MBD
     amc_bldc.initialize();
     
@@ -278,6 +288,15 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
         prevEXTFAULTisPRESSED = EXTFAULTisPRESSED;  
         // and manage the transitions [pressed -> unpressed] or vice-versa and use also
         // EXTFAULTpressedtime and / or EXTFAULTreleasedtime and 
+        
+        if(true == EXTFAULTisPRESSED)
+        {
+            embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).on();
+        }
+        else
+        {
+            embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).off();
+        }
     }
     
     uint8_t rx_data[8] {0};
