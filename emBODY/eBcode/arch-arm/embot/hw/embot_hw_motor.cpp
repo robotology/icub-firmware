@@ -225,7 +225,7 @@ namespace embot { namespace hw { namespace motor {
         }
         
         // if we are faulted we cannot enable, so i force on to false    
-        if(false == faulted(h))
+        if(true == faulted(h))
         {
             on = false;
         }
