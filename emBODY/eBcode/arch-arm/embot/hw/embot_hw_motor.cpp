@@ -85,9 +85,10 @@ namespace embot { namespace hw { namespace motor {
 
 namespace embot { namespace hw { namespace motor {
               
-    // initialised mask       
+    // masks       
     static std::uint32_t initialisedmask = 0;
     static std::uint32_t enabledmask = 0;
+    static std::uint32_t faultedmask = 0;
     
     bool supported(MOTOR h)
     {
@@ -103,12 +104,13 @@ namespace embot { namespace hw { namespace motor {
     {
         return embot::core::binary::bit::check(enabledmask, embot::core::tointegral(h));
     }
-    
-    result_t enable(MOTOR h, bool on)
+        
+    bool faulted(MOTOR h)
     {
-        return (true == on) ? motorEnable(h) : motorDisable(h);
+        return embot::core::binary::bit::check(faultedmask, embot::core::tointegral(h));
     }
 
+    
     struct TBDef
     {
         static constexpr std::uint8_t rxdatasize = 8;
@@ -141,13 +143,41 @@ namespace embot { namespace hw { namespace motor {
     result_t s_hw_setpwm(MOTOR h, Pwm v);
     
     
-    uint8_t s_hw_gethallstatus(MOTOR h);
+    HallStatus s_hw_gethallstatus(MOTOR h);
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w);
-//    result_t s_hw_setADCcallback(MOTOR h, void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty);
     result_t s_hw_motorEnable(MOTOR h);
     result_t s_hw_motorDisable(MOTOR h);
     result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner);
-
+    
+    result_t fault(MOTOR h, bool on)
+    {        
+        if(false == supported(h))
+        {
+            return resNOK;
+        }
+        
+        // we always must be able to set the fault on / off, also when we are not initialised yet.
+        // because the fault(h, true/false) can be called also before init(h, {});
+        
+        if(true == on)
+        {
+            embot::core::binary::bit::set(faultedmask, embot::core::tointegral(h));
+            // we disable the action of the motor
+            setpwm(h, 0, 0, 0);
+            s_hw_motorDisable(h);
+            // and we also disable ...
+            enable(h, false);
+        }
+        else
+        {
+            embot::core::binary::bit::clear(faultedmask, embot::core::tointegral(h));  
+            // we dont enable the action of the motor. that must be done explicitly
+        }
+        
+        return resNOK;
+    }    
+    
+    
     result_t init(MOTOR h, const Config &config)
     {
         if(false == supported(h))
@@ -161,8 +191,7 @@ namespace embot { namespace hw { namespace motor {
         }
                 
         std::uint8_t index = embot::core::tointegral(h);
-               
-        
+                       
 #if !defined(EMBOT_ENABLE_hw_motor_emulatedMODE)        
         // init peripheral
         embot::hw::motor::getBSP().init(h);                             
@@ -186,30 +215,54 @@ namespace embot { namespace hw { namespace motor {
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(h));                
         return resOK;
     }
+   
+    result_t enable(MOTOR h, bool on)
+    {
+        // we must be at least initialised ...
+        if(false == initialised(h))
+        {
+            return resNOK;
+        }
+        
+        // if we are faulted we cannot enable, so i force on to false    
+        if(false == faulted(h))
+        {
+            on = false;
+        }
+        
+        result_t r = resNOK;
+        if(true == on)
+        { 
+            embot::core::binary::bit::set(enabledmask, embot::core::tointegral(h));
+            s_hw_setpwmUVW(h, 0, 0, 0);
+            r = s_hw_motorEnable(h);
+        }
+        else
+        {
+            embot::core::binary::bit::clear(enabledmask, embot::core::tointegral(h));
+            s_hw_setpwmUVW(h, 0, 0, 0);
+            r = s_hw_motorDisable(h);            
+        }   
+        
+        return r;        
+                
+//        // then, we enable only if we are not faulted, else ... we set pwm to zero and disable motors anyway        
+//        result_t r = resNOK;
+//        if((true == on) && (false == faulted(h)))
+//        { 
+//            embot::core::binary::bit::set(enabledmask, embot::core::tointegral(h));
+//            r = s_hw_motorEnable(h);
+//        }
+//        else
+//        {
+//            embot::core::binary::bit::clear(enabledmask, embot::core::tointegral(h));
+//            s_hw_setpwmUVW(h, 0, 0, 0);
+//            r = s_hw_motorDisable(h);            
+//        }
+//        return r;
+        
+    }    
 
-    result_t motorEnable(MOTOR h)
-    {
-        if(false == initialised(h))
-        {
-            return resNOK;
-        }
-        
-        embot::core::binary::bit::set(enabledmask, embot::core::tointegral(h));
-        
-        return s_hw_motorEnable(h);
-    }
-    
-    result_t motorDisable(MOTOR h)
-    {
-        if(false == initialised(h))
-        {
-            return resNOK;
-        }
-        
-        embot::core::binary::bit::clear(enabledmask, embot::core::tointegral(h));
-        
-        return s_hw_motorDisable(h);
-    }
     
     result_t getencoder(MOTOR h, Position &position)
     {
@@ -218,8 +271,6 @@ namespace embot { namespace hw { namespace motor {
             return resNOK;
         } 
         
-        //std::uint8_t index = embot::core::tointegral(h);
-        //position = s_privatedata.tbdef[index].position;
         position = s_hw_getencoder(h);
         
         return resOK;               
@@ -233,34 +284,54 @@ namespace embot { namespace hw { namespace motor {
             return resNOK;
         } 
         
-        //std::uint8_t index = embot::core::tointegral(h);
-        //position = s_privatedata.tbdef[index].position;
         position = s_hw_gethallcounter(h);
         
         return resOK;               
     }
-
-    result_t setpwm(MOTOR h, Pwm v)
-    {
-        return s_hw_setpwm(h, v);
-    } 
     
-    result_t gethallstatus(MOTOR h, uint8_t &hs)
+    result_t gethallstatus(MOTOR h, HallStatus &hs)
     {
         if(false == initialised(h))
         {
             return resNOK;
         } 
         
-        //std::uint8_t index = embot::core::tointegral(h);
-        //position = s_privatedata.tbdef[index].position;
         hs = s_hw_gethallstatus(h);
         
         return resOK;               
     }
-    
-    result_t setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
+
+    result_t setpwm(MOTOR h, Pwm v)
     {
+// if faulted() we are not enabled() ... so we dont need this extra check        
+//        if(true == faulted(h))
+//        {
+//            s_hw_setpwm(h, 0);
+//            return resNOK;
+//        }
+        
+        if(false == enabled(h))
+        {
+            return resNOK;
+        }
+        
+        return s_hw_setpwm(h, v);
+    } 
+    
+    result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w)
+    {
+// if faulted() we are not enabled() ... so we dont need this extra check          
+//        if(true == faulted(h))
+//        {
+//            s_hw_setpwmUVW(h, 0, 0, 0);
+//            return resNOK;
+//        }
+        
+        if(false == enabled(h))
+        {
+            return resNOK;
+        }
+        
         return s_hw_setpwmUVW(h, u, v, w);
     }
        
@@ -327,8 +398,13 @@ namespace embot { namespace hw { namespace motor {
     {
         return hallGetCounter();
     }
+        
+    HallStatus s_hw_gethallstatus(MOTOR h)
+    {
+        return hallGetStatus();
+    }
 
-    
+
     result_t s_hw_setpwm(MOTOR h, Pwm v)
     { 
         HAL_StatusTypeDef r = HAL_ERROR;
@@ -337,12 +413,6 @@ namespace embot { namespace hw { namespace motor {
 #endif  
         return (HAL_OK == r) ? resOK : resNOK;      
     }
-
-    
-    uint8_t s_hw_gethallstatus(MOTOR h)
-    {
-        return hallGetStatus();
-    }
     
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
     {        
@@ -350,15 +420,6 @@ namespace embot { namespace hw { namespace motor {
         return resOK;
     }
     
-//    result_t s_hw_setADCcallback(MOTOR h, void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty)
-//    {
-//#if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)
-//        return resNOK;
-//#else       
-//        setADC_cb(fn_cb, owner, rtu, rty);
-//        return resOK;
-//#endif   
-//    }
     
 #if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)
 #else    
@@ -373,9 +434,7 @@ namespace embot { namespace hw { namespace motor {
 #if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)
         return resNOK;
 #else 
-        
-        #warning TO DO: aggiustare i progetti diversi da EMBOT_AMCBLDC_APP05
-
+       
         if((nullptr == callback))
         {
             return resNOK;
@@ -388,13 +447,13 @@ namespace embot { namespace hw { namespace motor {
         return resOK;
 #endif          
     }
-
-    
+   
     result_t s_hw_motorEnable(MOTOR h)
     {
         pwmPhaseEnable(PWM_PHASE_ALL);
         return resOK;
     }
+    
     result_t s_hw_motorDisable(MOTOR h)
     {
         pwmPhaseDisable(PWM_PHASE_ALL);
