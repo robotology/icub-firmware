@@ -16,18 +16,28 @@
 */
 
 #include "rtw_enable_disable_motors.h"
+
 #ifdef STM32HAL_BOARD_AMCBLDC
-#include "pwm.h"
+
+#ifndef __cplusplus
+    #error this file must be compiled in C++ mode when deployed on the amcbldc target
+#endif
+// we use embot::hw
+#include "embot_hw_motor.h"
 #endif /* STM32HAL_BOARD_AMCBLDC */
 
-void rtw_enableMotor(){
-    #ifdef STM32HAL_BOARD_AMCBLDC
-    pwmPhaseEnable(PWM_PHASE_ALL);
-    #endif /* STM32HAL_BOARD_AMCBLDC */
+void rtw_enableMotor()
+{
+#ifdef STM32HAL_BOARD_AMCBLDC
+    embot::hw::motor::enable(embot::hw::MOTOR::one, true);
+#endif /* STM32HAL_BOARD_AMCBLDC */
 }
 
-void rtw_disableMotor(){
-    #ifdef STM32HAL_BOARD_AMCBLDC
-    pwmPhaseDisable(PWM_PHASE_ALL);
-    #endif /* STM32HAL_BOARD_AMCBLDC */
+void rtw_disableMotor()
+{
+#ifdef STM32HAL_BOARD_AMCBLDC
+    embot::hw::motor::enable(embot::hw::MOTOR::one, false);
+#endif /* STM32HAL_BOARD_AMCBLDC */
 }
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
