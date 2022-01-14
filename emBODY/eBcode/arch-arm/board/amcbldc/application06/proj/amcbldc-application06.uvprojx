@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>amcbldc-app05-osal-ulpro</TargetName>
+      <TargetName>amcbldc-app06-osal-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
@@ -3610,7 +3610,7 @@
         <targetInfos>
           <targetInfo excluded="1" name="amcbldc-app01-cmsisos2-ulpro" versionMatchMode=""/>
           <targetInfo excluded="1" name="amcbldc-app01-osal-stlink" versionMatchMode=""/>
-          <targetInfo excluded="1" name="amcbldc-app05-osal-ulpro" versionMatchMode=""/>
+          <targetInfo excluded="1" name="amcbldc-app06-osal-ulpro" versionMatchMode=""/>
         </targetInfos>
       </component>
     </components>
