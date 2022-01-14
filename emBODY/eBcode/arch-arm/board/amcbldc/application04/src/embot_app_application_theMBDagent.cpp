@@ -22,6 +22,7 @@
 #include "embot_app_theCANboardInfo.h"
 #include "embot_app_scope.h"
 #include "embot_hw_sys.h"
+#include "embot_app_theLEDmanager.h"
 #include <array>
 
 // mdb components
@@ -273,6 +274,19 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = false;    
 #endif
     
+    if(true == EXTFAULTisPRESSED)
+    {
+#if defined(EXTFAULT_handler_will_disable_motor)         
+        embot::hw::motor::fault(embot::hw::MOTOR::one, true);
+#endif        
+        embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).on();
+    }
+    else 
+    {
+        embot::hw::motor::fault(embot::hw::MOTOR::one, false);
+        embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).off();
+    }
+    
     // init MBD
     motor_enabled_prev = false;
     
@@ -331,12 +345,12 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void 
     {
         impl->EXTFAULTpressedtime = embot::core::now();
 #if defined(EXTFAULT_handler_will_disable_motor) 
-        embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, 0, 0, 0); 
-        embot::hw::motor::enable(embot::hw::MOTOR::one, false);   
+        embot::hw::motor::fault(embot::hw::MOTOR::one, true);
 #endif         
     }
     else
     {
+        embot::hw::motor::fault(embot::hw::MOTOR::one, false);
         impl->EXTFAULTreleasedtime = embot::core::now();
     }
 }
@@ -351,6 +365,15 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
         prevEXTFAULTisPRESSED = EXTFAULTisPRESSED;  
         // and manage the transitions [pressed -> unpressed] or vice-versa and use also
         // EXTFAULTpressedtime and / or EXTFAULTreleasedtime and 
+        
+        if(true == EXTFAULTisPRESSED)
+        {
+            embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).on();
+        }
+        else
+        {
+            embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).off();
+        }
     }
     
     uint8_t rx_data[8] {0};
@@ -493,11 +516,11 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
         {
             if(output_enable_b)
             {
-                embot::hw::motor::motorEnable(embot::hw::MOTOR::one);
+                embot::hw::motor::enable(embot::hw::MOTOR::one, true);
             }
             else
             {
-                embot::hw::motor::motorDisable(embot::hw::MOTOR::one);
+                embot::hw::motor::enable(embot::hw::MOTOR::one, false);
             }
         }
         
@@ -508,7 +531,7 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
         int32_T Vabc1 = static_cast<int32_T>(impl->foc_outputs.foc_outputs.Vabc[1] * 163.83F);
         int32_T Vabc2 = static_cast<int32_T>(impl->foc_outputs.foc_outputs.Vabc[2] * 163.83F);
         
-        embot::hw::motor::setpwmUVW(embot::hw::MOTOR::one, Vabc0, Vabc1, Vabc2);
+        embot::hw::motor::setpwm(embot::hw::MOTOR::one, Vabc0, Vabc1, Vabc2);
        
 #define DEBUG_PARAMS // TODO: remove
 #ifdef DEBUG_PARAMS
