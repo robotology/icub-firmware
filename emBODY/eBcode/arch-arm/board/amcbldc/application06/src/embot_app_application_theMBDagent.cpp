@@ -183,6 +183,8 @@ struct embot::app::application::theMBDagent::Impl
     volatile bool prevEXTFAULTisPRESSED {false};    
     volatile embot::core::Time EXTFAULTpressedtime {0};
     volatile embot::core::Time EXTFAULTreleasedtime {0};
+    
+    bool addMCstatus(std::vector<embot::prot::can::Frame> &outframes);
 };
 
       
@@ -343,6 +345,12 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
         embot::prot::can::Frame fr {amc_bldc.AMC_BLDC_Y.PacketsTx.packets.ID, 8, amc_bldc.AMC_BLDC_Y.PacketsTx.packets.PAYLOAD};
         outframes.push_back(fr);
     }
+    
+    bool txstatus = false;
+    if(true == txstatus)
+    {
+        addMCstatus(outframes);
+    }
 
     measureTick->stop();
     
@@ -447,6 +455,26 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
 }
 
 
+bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::prot::can::Frame> &outframes)
+{
+    #include "embot_prot_can_motor_polling.h"
+    embot::prot::can::motor::polling::ControlMode ctrlmode {embot::prot::can::motor::polling::ControlMode::Idle};
+    
+    embot::prot::can::motor::periodic::Message_STATUS msg {};
+    embot::prot::can::motor::periodic::Message_STATUS::Info info {};
+
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
+    info.controlmode = embot::prot::can::motor::polling::convert(ctrlmode);
+    // etc
+        
+    msg.load(info);
+          
+    embot::prot::can::Frame frame0;
+    msg.get(frame0);
+    outframes.push_back(frame0);
+        
+    return true;
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - the class

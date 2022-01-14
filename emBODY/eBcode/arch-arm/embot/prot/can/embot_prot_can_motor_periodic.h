@@ -36,6 +36,7 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         none = 0xfe, 
         
         FOC = 0,
+        STATUS = 3,
         PRINT = 6,
         EMSTO2FOC_DESIRED_CURRENT = 15        
     };
@@ -126,6 +127,27 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         bool get(embot::prot::can::Frame &outframe);    
     };        
 
+    
+    class Message_STATUS : public Message
+    {
+        public:
+            
+        struct Info
+        {
+            uint8_t canaddress {0};
+            uint8_t controlmode {0};
+            uint8_t quadencoderstate {0};
+            int16_t pwmfeedback {0};
+            uint32_t faultstate {0};
+            Info() = default;
+        };
+        
+        Info info {};
+        
+        Message_STATUS() = default;       
+        bool load(const Info& inf);            
+        bool get(embot::prot::can::Frame &outframe);    
+    };        
     
 }}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {    
 

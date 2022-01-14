@@ -56,6 +56,7 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
     CMD convert(std::uint8_t cmd)
     {
         constexpr std::uint16_t mcpermask16 =   (1 << static_cast<std::uint8_t>(CMD::FOC))                              |
+                                                (1 << static_cast<std::uint8_t>(CMD::STATUS))                           |
                                                 (1 << static_cast<std::uint8_t>(CMD::PRINT))                            |
                                                 (1 << static_cast<std::uint8_t>(CMD::EMSTO2FOC_DESIRED_CURRENT))        ;
 
@@ -178,8 +179,33 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
                     
         return true;
     } 
+ 
     
-
+    bool Message_STATUS::load(const Info& inf)
+    {
+        info = inf;  
+        return true;
+    }
+            
+    bool Message_STATUS::get(embot::prot::can::Frame &outframe)
+    {
+        std::uint8_t data08[8] = {0};
+        data08[0] = static_cast<std::uint8_t>(info.controlmode);
+        data08[1] = static_cast<std::uint8_t>(info.quadencoderstate);
+        data08[2] = static_cast<std::uint8_t>((info.pwmfeedback & 0x00ff));
+        data08[3] = static_cast<std::uint8_t>((info.pwmfeedback & 0xff00) >> 8);  
+        data08[4] = static_cast<std::uint8_t>((info.faultstate & 0x000000ff));
+        data08[5] = static_cast<std::uint8_t>((info.faultstate & 0x0000ff00) >> 8);  
+        data08[6] = static_cast<std::uint8_t>((info.faultstate & 0x00ff0000) >> 16);
+        data08[7] = static_cast<std::uint8_t>((info.faultstate & 0xff000000) >> 24);
+        std::uint8_t size = 8;        
+        
+        Message::set(info.canaddress, 0xf, Clas::periodicMotorControl, static_cast<std::uint8_t>(CMD::STATUS), data08, size);
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
+                    
+        return true;
+    } 
+    
 }}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {
     
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
