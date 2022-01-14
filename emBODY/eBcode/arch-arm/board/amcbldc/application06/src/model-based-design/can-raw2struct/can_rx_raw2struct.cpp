@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_rx_raw2struct'.
 //
-// Model version                  : 2.5
+// Model version                  : 2.7
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:51 2022
+// C/C++ source code generated on : Fri Jan 14 15:25:44 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -43,8 +43,6 @@ namespace amc_bldc_codegen
   void CAN_RX_raw2struct::step(const BUS_CAN &arg_pck_rx_raw, BUS_CAN_RX &
     arg_pck_rx_struct)
   {
-    int32_T i;
-    uint32_T qY;
     uint8_T minval;
 
     // Outputs for Atomic SubSystem: '<Root>/CAN_RX_RAW2STRUCT'
@@ -71,19 +69,9 @@ namespace amc_bldc_codegen
       & 128U) != 0U);
     arg_pck_rx_struct.packets.PAYLOAD.CMD.OPC = static_cast<uint8_T>
       (arg_pck_rx_raw.packets.PAYLOAD[0] & 127);
-    for (i = 0; i < 7; i++) {
-      arg_pck_rx_struct.packets.PAYLOAD.ARG[i] = 0U;
-    }
-
-    qY = arg_pck_rx_struct.packets.PAYLOAD.LEN - 1U;
-    if (arg_pck_rx_struct.packets.PAYLOAD.LEN - 1U >
-        arg_pck_rx_struct.packets.PAYLOAD.LEN) {
-      qY = 0U;
-    }
-
-    for (i = 1; i - 1 < static_cast<uint8_T>(qY); i++) {
-      arg_pck_rx_struct.packets.PAYLOAD.ARG[static_cast<uint8_T>(i) - 1] =
-        arg_pck_rx_raw.packets.PAYLOAD[static_cast<uint8_T>(i)];
+    for (int32_T i = 0; i < 8; i++) {
+      arg_pck_rx_struct.packets.PAYLOAD.ARG[i] =
+        arg_pck_rx_raw.packets.PAYLOAD[i];
     }
 
     // End of MATLAB Function: '<S1>/RAW2STRUCT Decoding Logic'

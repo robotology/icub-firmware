@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.174
+// Model version                  : 3.203
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:05:21 2022
+// C/C++ source code generated on : Fri Jan 14 15:26:10 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -406,6 +406,12 @@ namespace amc_bldc_codegen
     AMC_BLDC_B.BusConversion_InsertedFor_Super.motorsensors.hallABC =
       rtb_hallABC;
 
+    // BusCreator generated from: '<S7>/SupervisorFSM_RX' incorporates:
+    //   Inport: '<Root>/ExternalFlags_fault_button'
+
+    AMC_BLDC_B.BusConversion_InsertedFor_Sup_j.fault_button =
+      AMC_BLDC_U.ExternalFlags_fault_button;
+
     // ModelReference: '<S7>/SupervisorFSM_RX' incorporates:
     //   Outport: '<Root>/ConfigurationParameters'
     //   Outport: '<Root>/EstimatedData'
@@ -414,7 +420,8 @@ namespace amc_bldc_codegen
       AMC_BLDC_B.CAN_Decoder_o1, AMC_BLDC_B.CAN_Decoder_o3,
       AMC_BLDC_Y.EstimatedData_p, AMC_BLDC_B.BusConversion_InsertedFor_Super,
       AMC_BLDC_B.RTBInsertedForAdapter_InsertedF, AMC_BLDC_B.Targets_n,
-      AMC_BLDC_Y.ConfigurationParameters_p, AMC_BLDC_B.Flags_k);
+      AMC_BLDC_Y.ConfigurationParameters_p, AMC_BLDC_B.Flags_k,
+      &AMC_BLDC_B.BusConversion_InsertedFor_Sup_j);
 
     // BusCreator generated from: '<S7>/SupervisorFSM_TX'
     rtb_BusConversion_InsertedFor_S.jointpositions.position = rtb_position;

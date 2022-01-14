@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.174
+// Model version                  : 3.203
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:05:21 2022
+// C/C++ source code generated on : Fri Jan 14 15:26:10 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -317,16 +317,13 @@ struct ControlOutputs
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+#ifndef DEFINED_TYPEDEF_FOR_ExternalFlags_
+#define DEFINED_TYPEDEF_FOR_ExternalFlags_
 
-// Aggregate of all events specifying types of received messages.
-struct BUS_EVENTS_RX
+struct ExternalFlags
 {
-  boolean_T control_mode;
-  boolean_T current_limit;
-  boolean_T desired_current;
-  boolean_T current_pid;
+  // External Fault Button (1 == pressed)
+  boolean_T fault_button;
 };
 
 #endif
@@ -425,6 +422,20 @@ struct BUS_MESSAGES_RX
   BUS_MSG_CURRENT_LIMIT current_limit;
   BUS_MSG_DESIRED_CURRENT desired_current;
   BUS_MSG_CURRENT_PID current_pid;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+
+// Aggregate of all events specifying types of received messages.
+struct BUS_EVENTS_RX
+{
+  boolean_T control_mode;
+  boolean_T current_limit;
+  boolean_T desired_current;
+  boolean_T current_pid;
 };
 
 #endif
@@ -579,8 +590,8 @@ struct BUS_CAN_PAYLOAD_RX
   uint8_T LEN;
   BUS_CAN_CMD CMD;
 
-  // 7 bytes for the command argument.
-  uint8_T ARG[7];
+  // 8 bytes for the command argument in order to account also message of type streaming. 
+  uint8_T ARG[8];
 };
 
 #endif

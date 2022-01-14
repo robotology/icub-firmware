@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 2.27
+// Model version                  : 2.40
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:42 2022
+// C/C++ source code generated on : Fri Jan 14 15:25:35 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -41,16 +41,6 @@ namespace amc_bldc_codegen
     }
 
     return y;
-  }
-
-  // Function for Chart: '<S1>/Decoding Logic'
-  int16_T CAN_Decoder::can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh)
-  {
-    int16_T sw;
-    uint16_T x;
-    x = static_cast<uint16_T>(static_cast<uint16_T>(bh << 8) | bl);
-    std::memcpy((void *)&sw, (void *)&x, (uint32_T)((size_t)1 * sizeof(int16_T)));
-    return sw;
   }
 
   // Function for Chart: '<S1>/Decoding Logic'
@@ -133,12 +123,21 @@ namespace amc_bldc_codegen
   }
 
   // Function for Chart: '<S1>/Decoding Logic'
+  int16_T CAN_Decoder::can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh)
+  {
+    int16_T sw;
+    uint16_T x;
+    x = static_cast<uint16_T>(static_cast<uint16_T>(bh << 8) | bl);
+    std::memcpy((void *)&sw, (void *)&x, (uint32_T)((size_t)1 * sizeof(int16_T)));
+    return sw;
+  }
+
+  // Function for Chart: '<S1>/Decoding Logic'
   uint16_T CAN_Decoder::can_decod_merge_2bytes_unsigned(uint16_T bl, uint16_T bh)
   {
     return static_cast<uint16_T>(static_cast<uint16_T>(bh << 8) | bl);
   }
 }
-          #include "embot_core.h"
 
 namespace amc_bldc_codegen
 {
@@ -199,8 +198,8 @@ namespace amc_bldc_codegen
       can_decoder_DW.is_SET_CONTROL_MODE = can_decoder_IN_Home;
       can_decoder_DW.is_active_DESIRED_CURRENT = 1U;
       can_decoder_DW.is_DESIRED_CURRENT = can_decoder_IN_Home;
-      can_decoder_DW.is_active_SET_CURRENT = 1U;
-      can_decoder_DW.is_SET_CURRENT = can_decoder_IN_Home;
+      can_decoder_DW.is_active_SET_CURRENT_OPTIONS = 1U;
+      can_decoder_DW.is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
       can_decoder_DW.is_active_ERROR_HANDLING = 1U;
       can_decoder_DW.ev_async = false;
       can_decoder_DW.is_ERROR_HANDLING = can_decoder_IN_Home_a;
@@ -217,12 +216,12 @@ namespace amc_bldc_codegen
                 (MCOPC_Set_Control_Mode)) {
               if (arg_pck_rx.packets.PAYLOAD.LEN >= 2) {
                 if (can_d_is_controlmode_recognized(static_cast<int32_T>
-                     (arg_pck_rx.packets.PAYLOAD.ARG[0]))) {
+                     (arg_pck_rx.packets.PAYLOAD.ARG[1]))) {
                   can_decoder_B.msg_set_control_mode.motor =
                     arg_pck_rx.packets.PAYLOAD.CMD.M;
                   can_decoder_B.msg_set_control_mode.mode =
                     static_cast<MCControlModes>(can_safe_cast_to_MCControlModes
-                    (arg_pck_rx.packets.PAYLOAD.ARG[0]));
+                    (arg_pck_rx.packets.PAYLOAD.ARG[1]));
                   b_previousEvent = can_decoder_DW.cmd_processed + 1;
                   if (can_decoder_DW.cmd_processed + 1 > 65535) {
                     b_previousEvent = 65535;
@@ -283,11 +282,20 @@ namespace amc_bldc_codegen
                CANClassTypes_Motor_Control_Streaming) &&
            (can_de_safe_cast_to_MCStreaming(arg_pck_rx.packets.ID.DST_TYP) ==
             static_cast<int32_T>(MCStreaming_Desired_Current)))) {
-        if (arg_pck_rx.packets.PAYLOAD.LEN == 8) {
-          can_decoder_B.msg_desired_current.current = 0.001F *
-            static_cast<real32_T>(can_decoder_merge_2bytes_signed(static_cast<
-            uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[5]), static_cast<uint16_T>
-            (arg_pck_rx.packets.PAYLOAD.ARG[6])));
+        if ((arg_pck_rx.packets.PAYLOAD.LEN == 8) && (CAN_ID_AMC <= 4)) {
+          b_previousEvent = (CAN_ID_AMC - 1) << 1;
+          if (b_previousEvent < 0) {
+            b_previousEvent = 0;
+          } else if (b_previousEvent > 255) {
+            b_previousEvent = 255;
+          }
+
+          can_decoder_B.msg_desired_current.current = static_cast<real32_T>
+            (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+              (arg_pck_rx.packets.PAYLOAD.ARG[static_cast<uint8_T>
+               (b_previousEvent)]), static_cast<uint16_T>
+              (arg_pck_rx.packets.PAYLOAD.ARG[static_cast<uint8_T>
+               (b_previousEvent) + 1]))) * 0.001F;
           b_previousEvent = can_decoder_DW.cmd_processed + 1;
           if (can_decoder_DW.cmd_processed + 1 > 65535) {
             b_previousEvent = 65535;
@@ -296,26 +304,6 @@ namespace amc_bldc_codegen
           can_decoder_DW.cmd_processed = static_cast<uint16_T>(b_previousEvent);
           can_decoder_DW.ev_desired_currentEventCounter++;
           can_decoder_DW.is_DESIRED_CURRENT = can_decoder_IN_Home;
-          
-
-          static char msg[64] = {};
-          static uint32_t counter;
-          if(counter % 1000 == 0)
-          {
-            sprintf(msg, "%.3f -- %d %d %d %d %d %d", \
-                                    can_decoder_B.msg_desired_current.current, \
-                                    arg_pck_rx.packets.PAYLOAD.ARG[1], \
-                                    arg_pck_rx.packets.PAYLOAD.ARG[2], \
-                                    arg_pck_rx.packets.PAYLOAD.ARG[3], \
-                                    arg_pck_rx.packets.PAYLOAD.ARG[4], \
-                                    arg_pck_rx.packets.PAYLOAD.ARG[5], \
-                                    arg_pck_rx.packets.PAYLOAD.ARG[6]);
-            embot::core::print(msg);
-            counter = 0;
-          }
-          counter++;
-          
-          
         } else {
           b_previousEvent = can_decoder_DW.sfEvent;
           can_decoder_DW.sfEvent = ca_event_ev_error_pck_malformed;
@@ -328,10 +316,10 @@ namespace amc_bldc_codegen
         }
       }
 
-      if ((can_decoder_DW.is_active_SET_CURRENT != 0U) &&
-          (can_decoder_DW.is_SET_CURRENT == 1) && ((arg_pck_rx.available > 0) &&
-           (arg_pck_rx.packets.ID.CLS == CANClassTypes_Motor_Control_Command)))
-      {
+      if ((can_decoder_DW.is_active_SET_CURRENT_OPTIONS != 0U) &&
+          (can_decoder_DW.is_SET_CURRENT_OPTIONS == 1) && ((arg_pck_rx.available
+            > 0) && (arg_pck_rx.packets.ID.CLS ==
+                     CANClassTypes_Motor_Control_Command))) {
         if (arg_pck_rx.packets.ID.DST_TYP == CAN_ID_AMC) {
           if (arg_pck_rx.packets.PAYLOAD.LEN >= 1) {
             boolean_T guard1 = false;
@@ -343,16 +331,16 @@ namespace amc_bldc_codegen
                   arg_pck_rx.packets.PAYLOAD.CMD.M;
                 can_decoder_B.msg_set_current_limit.nominal = 0.001F *
                   static_cast<real32_T>(can_decoder_merge_2bytes_signed(
-                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[1]),
-                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[2])));
-                can_decoder_B.msg_set_current_limit.peak = 0.001F * static_cast<
-                  real32_T>(can_decod_merge_2bytes_unsigned(static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[3]), static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[4])));
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[2]),
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[3])));
+                can_decoder_B.msg_set_current_limit.peak = 0.001F *
+                  static_cast<real32_T>(can_decod_merge_2bytes_unsigned(
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[4]),
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[5])));
                 can_decoder_B.msg_set_current_limit.overload = 0.001F *
                   static_cast<real32_T>(can_decod_merge_2bytes_unsigned(
-                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[5]),
-                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[6])));
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[6]),
+                  static_cast<uint16_T>(arg_pck_rx.packets.PAYLOAD.ARG[7])));
                 b_previousEvent = can_decoder_DW.cmd_processed + 1;
                 if (can_decoder_DW.cmd_processed + 1 > 65535) {
                   b_previousEvent = 65535;
@@ -361,7 +349,7 @@ namespace amc_bldc_codegen
                 can_decoder_DW.cmd_processed = static_cast<uint16_T>
                   (b_previousEvent);
                 can_decoder_DW.ev_set_current_limitEventCounte++;
-                can_decoder_DW.is_SET_CURRENT = can_decoder_IN_Home;
+                can_decoder_DW.is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
               } else {
                 guard1 = true;
               }
@@ -372,18 +360,18 @@ namespace amc_bldc_codegen
                   arg_pck_rx.packets.PAYLOAD.CMD.M;
                 can_decoder_B.msg_set_current_pid.Kp =
                   can_decoder_merge_2bytes_signed(static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[0]), static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[1]));
+                  (arg_pck_rx.packets.PAYLOAD.ARG[1]), static_cast<uint16_T>
+                  (arg_pck_rx.packets.PAYLOAD.ARG[2]));
                 can_decoder_B.msg_set_current_pid.Ki =
                   can_decoder_merge_2bytes_signed(static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[2]), static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[3]));
+                  (arg_pck_rx.packets.PAYLOAD.ARG[3]), static_cast<uint16_T>
+                  (arg_pck_rx.packets.PAYLOAD.ARG[4]));
                 can_decoder_B.msg_set_current_pid.Kd =
                   can_decoder_merge_2bytes_signed(static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[4]), static_cast<uint16_T>
-                  (arg_pck_rx.packets.PAYLOAD.ARG[5]));
+                  (arg_pck_rx.packets.PAYLOAD.ARG[5]), static_cast<uint16_T>
+                  (arg_pck_rx.packets.PAYLOAD.ARG[6]));
                 can_decoder_B.msg_set_current_pid.Ks =
-                  arg_pck_rx.packets.PAYLOAD.ARG[6];
+                  arg_pck_rx.packets.PAYLOAD.ARG[7];
                 b_previousEvent = can_decoder_DW.cmd_processed + 1;
                 if (can_decoder_DW.cmd_processed + 1 > 65535) {
                   b_previousEvent = 65535;
@@ -392,12 +380,12 @@ namespace amc_bldc_codegen
                 can_decoder_DW.cmd_processed = static_cast<uint16_T>
                   (b_previousEvent);
                 can_decoder_DW.ev_set_current_pidEventCounter++;
-                can_decoder_DW.is_SET_CURRENT = can_decoder_IN_Home;
+                can_decoder_DW.is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
               } else {
                 guard1 = true;
               }
             } else {
-              can_decoder_DW.is_SET_CURRENT = can_decoder_IN_Home;
+              can_decoder_DW.is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
             }
 
             if (guard1) {
@@ -408,7 +396,7 @@ namespace amc_bldc_codegen
               }
 
               can_decoder_DW.sfEvent = b_previousEvent;
-              can_decoder_DW.is_SET_CURRENT = can_decoder_IN_Home;
+              can_decoder_DW.is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
             }
           } else {
             b_previousEvent = can_decoder_DW.sfEvent;
@@ -418,7 +406,7 @@ namespace amc_bldc_codegen
             }
 
             can_decoder_DW.sfEvent = b_previousEvent;
-            can_decoder_DW.is_SET_CURRENT = can_decoder_IN_Home;
+            can_decoder_DW.is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
           }
         } else {
           b_previousEvent = can_decoder_DW.sfEvent;
@@ -428,7 +416,7 @@ namespace amc_bldc_codegen
           }
 
           can_decoder_DW.sfEvent = b_previousEvent;
-          can_decoder_DW.is_SET_CURRENT = can_decoder_IN_Home;
+          can_decoder_DW.is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
         }
       }
 

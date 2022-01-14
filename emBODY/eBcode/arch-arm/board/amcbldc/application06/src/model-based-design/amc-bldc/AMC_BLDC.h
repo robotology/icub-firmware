@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.174
+// Model version                  : 3.203
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:05:21 2022
+// C/C++ source code generated on : Fri Jan 14 15:26:10 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -91,6 +91,7 @@ namespace amc_bldc_codegen
       ControlOutputs RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter1'
       BUS_MESSAGES_TX MessagesTx;      // '<S7>/SupervisorFSM_TX'
       Flags Flags_k;                   // '<S7>/SupervisorFSM_RX'
+      ExternalFlags BusConversion_InsertedFor_Sup_j;
       BUS_EVENTS_TX SupervisorFSM_TX_o2;// '<S7>/SupervisorFSM_TX'
       BUS_EVENTS_RX CAN_Decoder_o2;    // '<S6>/CAN_Decoder'
       BUS_CAN_RX_ERRORS CAN_Decoder_o3;// '<S6>/CAN_Decoder'
@@ -142,6 +143,7 @@ namespace amc_bldc_codegen
       real32_T SensorsData_motorsensors_voltag;// '<Root>/B_-1_-1'
       real32_T SensorsData_motorsensors_curren;// '<Root>/B_-1_-1'
       uint8_T SensorsData_motorsensors_hallAB;// '<Root>/B_-1_-1'
+      boolean_T ExternalFlags_fault_button;// '<Root>/B_-1_-1'
       uint8_T PacketsRx_available;     // '<Root>/B_-1_-1'
       uint8_T PacketsRx_lengths;       // '<Root>/B_-1_-1'
       uint16_T PacketsRx_packets_ID;   // '<Root>/B_-1_-1'

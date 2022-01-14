@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.6
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:47 2022
+// C/C++ source code generated on : Thu Jan 13 15:52:40 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -118,12 +118,10 @@ namespace amc_bldc_codegen
     // MATLAB Function: '<S1>/format_can_id' incorporates:
     //   Constant: '<S1>/Constant'
     //   Constant: '<S1>/Motor Control Streaming'
-    //   Constant: '<S1>/TYPE2FOC'
 
     arg_pck_tx.packets.ID = 256U;
     arg_pck_tx.packets.ID = static_cast<uint16_T>(CAN_ID_AMC << 4 |
       arg_pck_tx.packets.ID);
-    arg_pck_tx.packets.ID = static_cast<uint16_T>(arg_pck_tx.packets.ID | 15);
 
     // DataTypeConversion: '<S1>/Data Type Conversion' incorporates:
     //   RelationalOperator: '<S2>/FixPt Relational Operator'

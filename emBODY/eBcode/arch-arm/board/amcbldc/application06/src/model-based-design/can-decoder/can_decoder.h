@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 2.27
+// Model version                  : 2.40
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:42 2022
+// C/C++ source code generated on : Fri Jan 14 15:25:35 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -72,8 +72,8 @@ namespace amc_bldc_codegen
       uint8_T is_active_SET_CONTROL_MODE;// '<S1>/Decoding Logic'
       uint8_T is_DESIRED_CURRENT;      // '<S1>/Decoding Logic'
       uint8_T is_active_DESIRED_CURRENT;// '<S1>/Decoding Logic'
-      uint8_T is_SET_CURRENT;          // '<S1>/Decoding Logic'
-      uint8_T is_active_SET_CURRENT;   // '<S1>/Decoding Logic'
+      uint8_T is_SET_CURRENT_OPTIONS;  // '<S1>/Decoding Logic'
+      uint8_T is_active_SET_CURRENT_OPTIONS;// '<S1>/Decoding Logic'
       uint8_T is_ERROR_HANDLING;       // '<S1>/Decoding Logic'
       uint8_T is_active_ERROR_HANDLING;// '<S1>/Decoding Logic'
       boolean_T ev_async;              // '<S1>/Decoding Logic'
@@ -114,10 +114,10 @@ namespace amc_bldc_codegen
    private:
     // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
     int32_T can_de_safe_cast_to_MCStreaming(int32_T input);
-    int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh);
     void can_decoder_ERROR_HANDLING(const BUS_CAN_RX *arg_pck_rx);
     boolean_T can_d_is_controlmode_recognized(int32_T mode);
     int32_T can_safe_cast_to_MCControlModes(int32_T input);
+    int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh);
     uint16_T can_decod_merge_2bytes_unsigned(uint16_T bl, uint16_T bh);
 
     // Real-Time Model
