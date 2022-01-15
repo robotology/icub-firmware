@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.6
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:47 2022
+// C/C++ source code generated on : Thu Jan 13 14:09:57 2022
 //
 #ifndef RTW_HEADER_rt_nonfinite_h_
 #define RTW_HEADER_rt_nonfinite_h_

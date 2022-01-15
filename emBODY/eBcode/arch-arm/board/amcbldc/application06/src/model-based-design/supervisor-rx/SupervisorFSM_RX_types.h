@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.125
+// Model version                  : 3.144
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:29 2022
+// C/C++ source code generated on : Fri Jan 14 15:25:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -61,6 +61,17 @@ struct SensorsData
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_ExternalFlags_
+#define DEFINED_TYPEDEF_FOR_ExternalFlags_
+
+struct ExternalFlags
+{
+  // External Fault Button (1 == pressed)
+  boolean_T fault_button;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
 #define DEFINED_TYPEDEF_FOR_MotorCurrent_
 
@@ -82,42 +93,6 @@ struct ControlOutputs
 
   // quadrature current
   MotorCurrent Iq_fbk;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_JointVelocities_
-#define DEFINED_TYPEDEF_FOR_JointVelocities_
-
-struct JointVelocities
-{
-  // joint velocities
-  real32_T velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // velocities
-  JointVelocities jointvelocities;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
-
-// Aggregate of all events specifying types of received messages.
-struct BUS_EVENTS_RX
-{
-  boolean_T control_mode;
-  boolean_T current_limit;
-  boolean_T desired_current;
-  boolean_T current_pid;
 };
 
 #endif
@@ -216,6 +191,42 @@ struct BUS_MESSAGES_RX
   BUS_MSG_CURRENT_LIMIT current_limit;
   BUS_MSG_DESIRED_CURRENT desired_current;
   BUS_MSG_CURRENT_PID current_pid;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_JointVelocities_
+#define DEFINED_TYPEDEF_FOR_JointVelocities_
+
+struct JointVelocities
+{
+  // joint velocities
+  real32_T velocity;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocities
+  JointVelocities jointvelocities;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+
+// Aggregate of all events specifying types of received messages.
+struct BUS_EVENTS_RX
+{
+  boolean_T control_mode;
+  boolean_T current_limit;
+  boolean_T desired_current;
+  boolean_T current_pid;
 };
 
 #endif

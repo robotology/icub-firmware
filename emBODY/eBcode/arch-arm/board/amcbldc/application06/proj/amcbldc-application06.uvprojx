@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.3.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.1.4.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>2</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -824,14 +824,14 @@
           <GroupName>mbd</GroupName>
           <Files>
             <File>
+              <FileName>rt_hypotf_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
+            </File>
+            <File>
               <FileName>rt_nonfinite.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_nonfinite.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.h</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.cpp</FileName>
@@ -839,24 +839,24 @@
               <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
-              <FileName>rtGetInf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.h</FilePath>
-            </File>
-            <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
-              <FileName>rtGetNaN.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.h</FilePath>
-            </File>
-            <File>
               <FileName>rtwtypes.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtwtypes.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_mutex.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
               <FileName>const_params.cpp</FileName>
@@ -874,24 +874,39 @@
               <FilePath>..\src\model-based-design\sharedutils\zero_crossing_types.h</FilePath>
             </File>
             <File>
-              <FileName>rt_hypotf_snf.cpp</FileName>
+              <FileName>uMultiWord2Double.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</FilePath>
             </File>
             <File>
-              <FileName>rt_hypotf_snf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_mutex.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileName>uMultiWordShl.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::can-encoder</GroupName>
+          <Files>
+            <File>
+              <FileName>can_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -992,31 +1007,6 @@
               <FileName>SupervisorFSM_TX_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>mbd::can-encoder</GroupName>
-          <Files>
-            <File>
-              <FileName>can_encoder.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder_private.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1214,7 +1204,7 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.3.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.1.4.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2022,14 +2012,14 @@
           <GroupName>mbd</GroupName>
           <Files>
             <File>
+              <FileName>rt_hypotf_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
+            </File>
+            <File>
               <FileName>rt_nonfinite.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_nonfinite.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.h</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.cpp</FileName>
@@ -2037,24 +2027,24 @@
               <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
-              <FileName>rtGetInf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.h</FilePath>
-            </File>
-            <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
-              <FileName>rtGetNaN.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.h</FilePath>
-            </File>
-            <File>
               <FileName>rtwtypes.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtwtypes.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_mutex.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
               <FileName>const_params.cpp</FileName>
@@ -2072,24 +2062,39 @@
               <FilePath>..\src\model-based-design\sharedutils\zero_crossing_types.h</FilePath>
             </File>
             <File>
-              <FileName>rt_hypotf_snf.cpp</FileName>
+              <FileName>uMultiWord2Double.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</FilePath>
             </File>
             <File>
-              <FileName>rt_hypotf_snf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_mutex.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileName>uMultiWordShl.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::can-encoder</GroupName>
+          <Files>
+            <File>
+              <FileName>can_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2190,31 +2195,6 @@
               <FileName>SupervisorFSM_TX_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>mbd::can-encoder</GroupName>
-          <Files>
-            <File>
-              <FileName>can_encoder.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder_private.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2412,7 +2392,7 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.3.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.1.4.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -3220,14 +3200,14 @@
           <GroupName>mbd</GroupName>
           <Files>
             <File>
+              <FileName>rt_hypotf_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
+            </File>
+            <File>
               <FileName>rt_nonfinite.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_nonfinite.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.h</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.cpp</FileName>
@@ -3235,24 +3215,24 @@
               <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
-              <FileName>rtGetInf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.h</FilePath>
-            </File>
-            <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
-              <FileName>rtGetNaN.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.h</FilePath>
-            </File>
-            <File>
               <FileName>rtwtypes.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtwtypes.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_mutex.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
+            </File>
+            <File>
+              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
               <FileName>const_params.cpp</FileName>
@@ -3270,24 +3250,39 @@
               <FilePath>..\src\model-based-design\sharedutils\zero_crossing_types.h</FilePath>
             </File>
             <File>
-              <FileName>rt_hypotf_snf.cpp</FileName>
+              <FileName>uMultiWord2Double.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</FilePath>
             </File>
             <File>
-              <FileName>rt_hypotf_snf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_mutex.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_mutex.h</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_enable_disable_motors.c</FileName>
+              <FileName>uMultiWordShl.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
+              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::can-encoder</GroupName>
+          <Files>
+            <File>
+              <FileName>can_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder_private.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
+            </File>
+            <File>
+              <FileName>can_encoder_types.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3388,31 +3383,6 @@
               <FileName>SupervisorFSM_TX_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX_types.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>mbd::can-encoder</GroupName>
-          <Files>
-            <File>
-              <FileName>can_encoder.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder_private.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder_private.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_encoder_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder_types.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_rx_raw2struct'.
 //
-// Model version                  : 2.5
+// Model version                  : 2.7
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:51 2022
+// C/C++ source code generated on : Fri Jan 14 15:25:44 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -104,8 +104,8 @@ struct BUS_CAN_PAYLOAD_RX
   uint8_T LEN;
   BUS_CAN_CMD CMD;
 
-  // 7 bytes for the command argument.
-  uint8_T ARG[7];
+  // 8 bytes for the command argument in order to account also message of type streaming. 
+  uint8_T ARG[8];
 };
 
 #endif

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.125
+// Model version                  : 3.144
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:29 2022
+// C/C++ source code generated on : Fri Jan 14 15:25:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -23,6 +23,9 @@
 #include <stddef.h>
 #include "rtwtypes.h"
 #include "SupervisorFSM_RX_types.h"
+
+// Shared type includes
+#include "multiword_types.h"
 #include <stddef.h>
 
 // user code (top of header file)
@@ -52,9 +55,11 @@ namespace amc_bldc_codegen
       uint8_T is_active_FAULT_HANDLER; // '<Root>/SupervisorFSM_RX'
       uint8_T is_OverCurrent;          // '<Root>/SupervisorFSM_RX'
       uint8_T is_active_OverCurrent;   // '<Root>/SupervisorFSM_RX'
-      uint8_T is_FaultBottomPressed;   // '<Root>/SupervisorFSM_RX'
-      uint8_T is_active_FaultBottomPressed;// '<Root>/SupervisorFSM_RX'
+      uint8_T is_FaultButtonPressed;   // '<Root>/SupervisorFSM_RX'
+      uint8_T is_active_FaultButtonPressed;// '<Root>/SupervisorFSM_RX'
       boolean_T IsCurrentLimitSet;     // '<Root>/SupervisorFSM_RX'
+      boolean_T isFaultButtonPressed;  // '<Root>/SupervisorFSM_RX'
+      boolean_T isInOverCurrent;       // '<Root>/SupervisorFSM_RX'
       boolean_T EventsRx_control_mode_prev;// '<Root>/SupervisorFSM_RX'
       boolean_T EventsRx_control_mode_start;// '<Root>/SupervisorFSM_RX'
       boolean_T EventsRx_current_pid_prev;// '<Root>/SupervisorFSM_RX'
@@ -65,6 +70,8 @@ namespace amc_bldc_codegen
       boolean_T EventsRx_desired_current_start;// '<Root>/SupervisorFSM_RX'
       boolean_T EventsRx_current_limit_prev;// '<Root>/SupervisorFSM_RX'
       boolean_T EventsRx_current_limit_start;// '<Root>/SupervisorFSM_RX'
+      boolean_T ExternalFlags_fault_button_prev;// '<Root>/SupervisorFSM_RX'
+      boolean_T ExternalFlags_fault_button_star;// '<Root>/SupervisorFSM_RX'
     };
 
     // Real-time Model Data Structure
@@ -82,7 +89,7 @@ namespace amc_bldc_codegen
               EstimatedData &arg_EstimatedData, const SensorsData &
               arg_SensorsData, const ControlOutputs &arg_ControlOutputs, Targets
               &arg_Targets, ConfigurationParameters &arg_Output, Flags &
-              arg_Flags);
+              arg_Flags, ExternalFlags *arg_SensorsData1);
 
     // Real-Time Model get method
     amc_bldc_codegen::SupervisorFSM_RX::RT_MODEL_SupervisorFSM_RX_T * getRTM();
@@ -117,10 +124,12 @@ namespace amc_bldc_codegen
       BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets);
     boolean_T SupervisorFSM_RX_IsBoardReady(void) const;
     boolean_T SupervisorFS_isConfigurationSet(void) const;
+    boolean_T SupervisorFSM_IsInHardwareFault(void) const;
     void Supervisor_CONTROL_MODE_HANDLER(const SensorsData *arg_SensorsData,
       const ControlOutputs *arg_ControlOutputs, const BUS_MESSAGES_RX
       *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets);
     boolean_T SupervisorFSM_isBoardConfigured(void);
+    real32_T SupervisorFSM_RX_ConvertPid(real32_T in, uint8_T shift);
 
     // Real-Time Model
     RT_MODEL_SupervisorFSM_RX_T SupervisorFSM_RX_M;

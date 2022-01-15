@@ -245,6 +245,8 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     // init MBD
     amc_bldc.initialize();
     
+    amc_bldc.AMC_BLDC_U.ExternalFlags_fault_button = EXTFAULTisPRESSED;
+    
     // init motor
     embot::hw::motor::init(embot::hw::MOTOR::one, {});
     
@@ -293,7 +295,9 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
     {
         prevEXTFAULTisPRESSED = EXTFAULTisPRESSED;  
         // and manage the transitions [pressed -> unpressed] or vice-versa and use also
-        // EXTFAULTpressedtime and / or EXTFAULTreleasedtime and 
+        // EXTFAULTpressedtime and / or EXTFAULTreleasedtime and
+
+        amc_bldc.AMC_BLDC_U.ExternalFlags_fault_button = EXTFAULTisPRESSED;        
         
         if(true == EXTFAULTisPRESSED)
         {
@@ -457,7 +461,6 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
 
 bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::prot::can::Frame> &outframes)
 {
-    #include "embot_prot_can_motor_polling.h"
     embot::prot::can::motor::polling::ControlMode ctrlmode {embot::prot::can::motor::polling::ControlMode::Idle};
     
     embot::prot::can::motor::periodic::Message_STATUS msg {};
@@ -465,6 +468,7 @@ bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::
 
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     info.controlmode = embot::prot::can::motor::polling::convert(ctrlmode);
+    info.faultstate = (true == EXTFAULTisPRESSED) ? 0x00000001 : 0x00000000;
     // etc
         
     msg.load(info);

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.125
+// Model version                  : 3.144
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 10 17:04:29 2022
+// C/C++ source code generated on : Fri Jan 14 15:25:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,15 +18,15 @@
 //
 #include "SupervisorFSM_RX.h"
 #include "SupervisorFSM_RX_private.h"
+#include "uMultiWord2Double.h"
+#include "uMultiWordShl.h"
 
 // Named constants for Chart: '<Root>/SupervisorFSM_RX'
-const int32_T S_event_FaultButtonPressedEvent = 1;
-const int32_T S_event_FaultButtonRelasedEvent = 2;
-const int32_T Supe_event_OutOfBoardFaultEvent = 4;
-const int32_T Super_event_setControlModeEvent = 6;
+const int32_T Supe_event_OutOfBoardFaultEvent = 2;
+const int32_T Super_event_setControlModeEvent = 4;
 const uint8_T Superviso_IN_LimitNonConfigured = 1U;
 const int32_T Superviso_event_BoardFaultEvent = 0;
-const int32_T Superviso_event_MotorFaultEvent = 3;
+const int32_T Superviso_event_MotorFaultEvent = 1;
 const int32_T SupervisorFSM_RX_CALL_EVENT = -1;
 const uint8_T SupervisorFSM_RX_IN_Configured = 1U;
 const uint8_T SupervisorFSM_RX_IN_Current = 1U;
@@ -42,7 +42,7 @@ const uint8_T SupervisorFSM__IN_ButtonPressed = 1U;
 const uint8_T SupervisorFSM__IN_NotConfigured = 4U;
 const uint8_T SupervisorFS_IN_NotConfigured_o = 3U;
 const uint8_T SupervisorF_IN_OverCurrentFault = 3U;
-const int32_T SupervisorF_event_setLimitEvent = 8;
+const int32_T SupervisorF_event_setLimitEvent = 6;
 namespace amc_bldc_codegen
 {
   // Function for Chart: '<Root>/SupervisorFSM_RX'
@@ -200,6 +200,13 @@ namespace amc_bldc_codegen
   }
 
   // Function for Chart: '<Root>/SupervisorFSM_RX'
+  boolean_T SupervisorFSM_RX::SupervisorFSM_IsInHardwareFault(void) const
+  {
+    return SupervisorFSM_RX_DW.isFaultButtonPressed ||
+      SupervisorFSM_RX_DW.isInOverCurrent;
+  }
+
+  // Function for Chart: '<Root>/SupervisorFSM_RX'
   void SupervisorFSM_RX::Supervisor_CONTROL_MODE_HANDLER(const SensorsData
     *arg_SensorsData, const ControlOutputs *arg_ControlOutputs, const
     BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets)
@@ -222,7 +229,8 @@ namespace amc_bldc_codegen
      case SupervisorFSM_RX_IN_HWFault:
       if ((SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent) &&
           SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx) &&
-          (!SupervisorFS_isConfigurationSet())) {
+          (!SupervisorFS_isConfigurationSet()) &&
+          (!SupervisorFSM_IsInHardwareFault())) {
         SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
           SupervisorFSM__IN_NotConfigured;
 
@@ -230,7 +238,8 @@ namespace amc_bldc_codegen
         arg_Flags->control_mode = ControlModes_NotConfigured;
         rtw_disableMotor();
       } else if ((SupervisorFSM_RX_DW.sfEvent == Super_event_setControlModeEvent)
-                 && SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx)) {
+                 && SupervisorFSM_RX_IsNewCtrl_Idle(arg_MessagesRx) &&
+                 (!SupervisorFSM_IsInHardwareFault())) {
         // Chart: '<Root>/SupervisorFSM_RX'
         SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER = SupervisorFSM_RX_IN_Idle;
         arg_Flags->control_mode = ControlModes_Idle;
@@ -497,6 +506,25 @@ namespace amc_bldc_codegen
   {
     return true;
   }
+
+  // Function for Chart: '<Root>/SupervisorFSM_RX'
+  real32_T SupervisorFSM_RX::SupervisorFSM_RX_ConvertPid(real32_T in, uint8_T
+    shift)
+  {
+    uint64m_T tmp;
+    uint32_T qY;
+    static const uint64m_T tmp_0 = { { 1U, 0U }// chunks
+    };
+
+    qY = 15U - shift;
+    if (15U - shift > 15U) {
+      qY = 0U;
+    }
+
+    uMultiWordShl(&tmp_0.chunks[0U], 2, qY, &tmp.chunks[0U], 2);
+    return in * static_cast<real32_T>(uMultiWord2Double(&tmp.chunks[0U], 2, 0)) /
+      32768.0F;
+  }
 }
 
 namespace amc_bldc_codegen
@@ -570,7 +598,8 @@ namespace amc_bldc_codegen
     BUS_MESSAGES_RX &arg_MessagesRx, const BUS_CAN_RX_ERRORS &arg_ErrorsRx,
     const EstimatedData &arg_EstimatedData, const SensorsData &arg_SensorsData,
     const ControlOutputs &arg_ControlOutputs, Targets &arg_Targets,
-    ConfigurationParameters &arg_Output, Flags &arg_Flags)
+    ConfigurationParameters &arg_Output, Flags &arg_Flags, ExternalFlags
+    *arg_SensorsData1)
   {
     // Chart: '<Root>/SupervisorFSM_RX'
     SupervisorFSM_RX_DW.sfEvent = SupervisorFSM_RX_CALL_EVENT;
@@ -591,6 +620,10 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.EventsRx_current_limit_start;
     SupervisorFSM_RX_DW.EventsRx_current_limit_start =
       arg_EventsRx.current_limit;
+    SupervisorFSM_RX_DW.ExternalFlags_fault_button_prev =
+      SupervisorFSM_RX_DW.ExternalFlags_fault_button_star;
+    SupervisorFSM_RX_DW.ExternalFlags_fault_button_star =
+      arg_SensorsData1->fault_button;
     if (SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX == 0U) {
       SupervisorFSM_RX_DW.EventsRx_control_mode_prev = arg_EventsRx.control_mode;
       SupervisorFSM_RX_DW.EventsRx_control_mode_start =
@@ -607,6 +640,10 @@ namespace amc_bldc_codegen
         arg_EventsRx.current_limit;
       SupervisorFSM_RX_DW.EventsRx_current_limit_start =
         arg_EventsRx.current_limit;
+      SupervisorFSM_RX_DW.ExternalFlags_fault_button_prev =
+        arg_SensorsData1->fault_button;
+      SupervisorFSM_RX_DW.ExternalFlags_fault_button_star =
+        arg_SensorsData1->fault_button;
       SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX = 1U;
       arg_Output.motorconfig.pole_pairs = 7U;
       arg_Output.motorconfig.Kp = 2.0F;
@@ -644,8 +681,9 @@ namespace amc_bldc_codegen
       SupervisorFSM_RX_DW.is_STATE_HANDLER = SupervisorFS_IN_NotConfigured_o;
       SupervisorFSM_RX_DW.BoardSt = BoardState_NotConfigured;
       SupervisorFSM_RX_DW.is_active_FAULT_HANDLER = 1U;
-      SupervisorFSM_RX_DW.is_active_FaultBottomPressed = 1U;
-      SupervisorFSM_RX_DW.is_FaultBottomPressed = SupervisorFSM_RX_IN_NoFault;
+      SupervisorFSM_RX_DW.is_active_FaultButtonPressed = 1U;
+      SupervisorFSM_RX_DW.is_FaultButtonPressed = SupervisorFSM_RX_IN_NoFault;
+      SupervisorFSM_RX_DW.isFaultButtonPressed = false;
 
       // MotorFaultFlags.FautltButtonPressed=0;
       SupervisorFSM_RX_DW.is_active_OverCurrent = 1U;
@@ -692,9 +730,12 @@ namespace amc_bldc_codegen
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           } else if (SupervisorFSM_RX_DW.EventsRx_current_pid_prev !=
                      SupervisorFSM_RX_DW.EventsRx_current_pid_start) {
-            arg_Output.motorconfig.Kp = arg_MessagesRx.current_pid.Kp;
-            arg_Output.motorconfig.Ki = arg_MessagesRx.current_pid.Ki;
-            arg_Output.motorconfig.Kd = arg_MessagesRx.current_pid.Kd;
+            arg_Output.motorconfig.Kp = SupervisorFSM_RX_ConvertPid
+              (arg_MessagesRx.current_pid.Kp, arg_MessagesRx.current_pid.Ks);
+            arg_Output.motorconfig.Ki = SupervisorFSM_RX_ConvertPid
+              (arg_MessagesRx.current_pid.Ki, arg_MessagesRx.current_pid.Ks);
+            arg_Output.motorconfig.Kd = SupervisorFSM_RX_ConvertPid
+              (arg_MessagesRx.current_pid.Kd, arg_MessagesRx.current_pid.Ks);
             arg_Output.motorconfig.Ks = arg_MessagesRx.current_pid.Ks;
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           }
@@ -754,25 +795,29 @@ namespace amc_bldc_codegen
       }
 
       if (SupervisorFSM_RX_DW.is_active_FAULT_HANDLER != 0U) {
-        if (SupervisorFSM_RX_DW.is_active_FaultBottomPressed != 0U) {
-          switch (SupervisorFSM_RX_DW.is_FaultBottomPressed) {
+        if (SupervisorFSM_RX_DW.is_active_FaultButtonPressed != 0U) {
+          switch (SupervisorFSM_RX_DW.is_FaultButtonPressed) {
            case SupervisorFSM__IN_ButtonPressed:
-            if (SupervisorFSM_RX_DW.sfEvent == S_event_FaultButtonRelasedEvent)
-            {
-              SupervisorFSM_RX_DW.is_FaultBottomPressed =
+            if ((SupervisorFSM_RX_DW.ExternalFlags_fault_button_prev !=
+                 SupervisorFSM_RX_DW.ExternalFlags_fault_button_star) &&
+                (!SupervisorFSM_RX_DW.ExternalFlags_fault_button_star)) {
+              SupervisorFSM_RX_DW.is_FaultButtonPressed =
                 SupervisorFSM_RX_IN_NoFault;
+              SupervisorFSM_RX_DW.isFaultButtonPressed = false;
 
               // MotorFaultFlags.FautltButtonPressed=0;
             }
             break;
 
            case SupervisorFSM_RX_IN_NoFault:
-            if (SupervisorFSM_RX_DW.sfEvent == S_event_FaultButtonPressedEvent)
-            {
-              SupervisorFSM_RX_DW.is_FaultBottomPressed =
+            if ((SupervisorFSM_RX_DW.ExternalFlags_fault_button_prev !=
+                 SupervisorFSM_RX_DW.ExternalFlags_fault_button_star) &&
+                SupervisorFSM_RX_DW.ExternalFlags_fault_button_star) {
+              SupervisorFSM_RX_DW.is_FaultButtonPressed =
                 SupervisorFSM__IN_ButtonPressed;
 
               // MotorFaultFlags.FautltButtonPressed=1;
+              SupervisorFSM_RX_DW.isFaultButtonPressed = true;
               c_previousEvent = SupervisorFSM_RX_DW.sfEvent;
               SupervisorFSM_RX_DW.sfEvent = Superviso_event_MotorFaultEvent;
               if (SupervisorFSM_RX_DW.is_active_CONTROL_MODE_HANDLER != 0U) {
@@ -791,6 +836,7 @@ namespace amc_bldc_codegen
            case Superviso_IN_LimitNonConfigured:
             if (SupervisorFS_isConfigurationSet()) {
               SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
+              SupervisorFSM_RX_DW.isInOverCurrent = false;
 
               // MotorFaultFlags.overCurrent=0;
             }
@@ -803,6 +849,7 @@ namespace amc_bldc_codegen
                 SupervisorF_IN_OverCurrentFault;
 
               // MotorFaultFlags.overCurrent=1;
+              SupervisorFSM_RX_DW.isInOverCurrent = true;
               c_previousEvent = SupervisorFSM_RX_DW.sfEvent;
               SupervisorFSM_RX_DW.sfEvent = Superviso_event_MotorFaultEvent;
               if (SupervisorFSM_RX_DW.is_active_CONTROL_MODE_HANDLER != 0U) {
@@ -818,6 +865,7 @@ namespace amc_bldc_codegen
             if (std::abs(arg_ControlOutputs.Iq_fbk.current) <
                 arg_Output.thresholds.motorOverloadCurrents) {
               SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
+              SupervisorFSM_RX_DW.isInOverCurrent = false;
 
               // MotorFaultFlags.overCurrent=0;
             }

@@ -31,8 +31,8 @@
 
 //#define TEST_DURATION_FOC
 
-#define EXTFAULT_enabled
-#define EXTFAULT_handler_will_disable_motor
+//#define EXTFAULT_enabled
+//#define EXTFAULT_handler_will_disable_motor
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -427,14 +427,14 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
                                  Vabc0,  \
                                  Vabc1,  \
                                  Vabc2,  \
-                                 u->SensorsData_motorsensors_Iabc[0],  \
-                                 u->SensorsData_motorsensors_Iabc[1],  \
-                                 u->SensorsData_motorsensors_Iabc[2],  \
-                                 u->SensorsData_motorsensors_angle,    \
-                                 y->ControlOutputs_p.Iq_fbk.current);
+                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[0],  \
+                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[1],  \
+                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[2],  \
+                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_angle,    \
+                                 impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current);
         
         //sprintf(msg2, "%d,%d,%.3f,%.3f,%.3f", delta, position, y->EstimatedData_p.jointvelocities.velocity, u->SensorsData_motorsensors_angle, y->ControlOutputs_p.Iq_fbk.current);
-        //embot::core::print(msg2);
+        embot::core::print(msg2);
         counter = 0;
     }
     counter++;
