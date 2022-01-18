@@ -148,7 +148,7 @@ struct embot::app::application::theMBDagent::Impl
     bool initialise();
         
     // the code called @ 1 kHz (aka every 1000 usec) inside a high priority thread
-    bool tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);
+    bool tick(std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);
 
     // the code called @ 80/3 kHz (aka every 37.5 usec) inside the DMA1_Channel2_IRQHandler()
     // it must be static because we use it as a callback
@@ -194,6 +194,8 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     {
         return true;
     }
+    
+    embot::core::print("embot::app::application::theMBDagent::Impl::initialise()");
     
     // create the measure for the foc
     if(true == useDUMMYforFOC)
@@ -287,7 +289,7 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void 
 }
 
 // Called every 1 ms
-bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
+bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 {    
     measureTick->start();
     
@@ -314,16 +316,26 @@ bool embot::app::application::theMBDagent::Impl::tick(const std::vector<embot::p
     uint32_t rx_id {0};
     
     // check for CAN input frame
-    if (inpframes.size() == 0) 
+    size_t ninputframes = inpframes.size();
+    if(0 == ninputframes) 
     {
         amc_bldc.AMC_BLDC_U.PacketsRx_available = 0;
     } 
     else
-    {
-        // retrieve the CAN frame
+    {   
+        // retrieve the CAN frames, use them, remove them from the vector
+        // so far we consume only one frame every tick
+        size_t consumedframes {1};
         amc_bldc.AMC_BLDC_U.PacketsRx_available = 1;
-        embot::prot::can::Frame last_frame = inpframes.back();
-        last_frame.copyto(rx_id, rx_size, rx_data);
+        // get the first
+        embot::prot::can::Frame frame = inpframes.front();
+        // copy it
+        frame.copyto(rx_id, rx_size, rx_data);
+//        embot::core::print(std::string("size = ") + std::to_string(ninputframes) + ", d[0] = " + std::to_string(rx_data[0]) + 
+//                           ", consumed = " + std::to_string(consumedframes) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+        
+        // clean up the first consumedframes positions
+        inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);     
     }
     
     // save the CAN frame into the input structure of the model
@@ -505,7 +517,7 @@ bool embot::app::application::theMBDagent::initialise(const Config &config)
     return pImpl->initialise();
 }
 
-bool embot::app::application::theMBDagent::tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
+bool embot::app::application::theMBDagent::tick(std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 {
     return pImpl->tick(inpframes, outframes);
 }
