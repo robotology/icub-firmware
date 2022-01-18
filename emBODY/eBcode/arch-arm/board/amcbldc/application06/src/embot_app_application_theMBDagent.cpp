@@ -334,17 +334,41 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         embot::prot::can::Frame frame = inpframes.front();
         // copy it
         frame.copyto(rx_id, rx_size, rx_data);
-        //        embot::core::print(std::string("size = ") + std::to_string(ninputframes) + ", d[0] = " + std::to_string(rx_data[0]) + 
-        //                           ", consumed = " + std::to_string(consumedframes) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());     
-
-        if(my_index < 10) 
+        
+        if((rx_data[0] == 0x65) && (rx_id == 0x1))
         {
-            dbg_msg[my_index++] = rx_data[0]; 
+            amc_bldc.AMC_BLDC_U.PacketsRx_available = 0;    // TODO: FIX IN MBD
         }
-        else{
-            my_index = 100;
-            my_index = my_index;
-        }
+        
+//        if(rx_id == 0x10F)
+//        {
+//            static char msg2[64];
+//            static uint32_t counter;
+//            if(counter % 100 == 0)
+//            {
+//                sprintf(msg2, "%x %x", rx_data[1], rx_data[0]);
+//                embot::core::print(msg2);
+//                counter = 0;
+//            }
+//            counter++;
+//        }
+        
+//        static uint32_t cnt = 0;
+//        if((++cnt % 500) == 1)
+//        {
+//            embot::core::print(std::string("size = ") + std::to_string(ninputframes) + ", d[0] = " + std::to_string(rx_data[0]) + 
+//                           ", consumed = " + std::to_string(consumedframes) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+//        }
+     
+
+//        if(my_index < 10) 
+//        {
+//            dbg_msg[my_index++] = rx_data[0]; 
+//        }
+//        else{
+//            my_index = 100;
+//            my_index = my_index;
+//        }
 
         // clean up the first consumedframes positions
         inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);
@@ -456,10 +480,11 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     
     static char msg2[64];
     static uint32_t counter;
-    if(counter % 10 == 0)
+    if(counter % 1000 == 0)
     {
         //sprintf(msg2, "%d -- %d -- %.3f -- %.3f\n", delta, position, u->SensorsData_motorsensors_angle, y->ControlOutputs_p.Iq_fbk.current);
-        sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", \
+        sprintf(msg2, "%d %d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", \
+                                 impl->amc_bldc.AMC_BLDC_Y.Flags_p.control_mode, \
                                  Vabc0,  \
                                  Vabc1,  \
                                  Vabc2,  \
@@ -494,6 +519,8 @@ uint8_t remapControlMode(uint8_t controlMode)
         case 4: 
             return MCControlModes_Current;
             break;
+        case 6:
+            return MCControlModes_OpenLoop;
         default: 
             return 0x99; // TODO: Fix!
             break;
