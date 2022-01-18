@@ -142,6 +142,8 @@ constexpr bool useDUMMYforTICK {true};
 
 struct embot::app::application::theMBDagent::Impl
 {
+    uint8_t dbg_msg[10] {0xFF};
+    volatile int my_index = 0;
     Impl() = default;  
         
     // the initialization code
@@ -315,6 +317,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     uint8_t rx_size {0};
     uint32_t rx_id {0};
     
+    
     // check for CAN input frame
     size_t ninputframes = inpframes.size();
     if(0 == ninputframes) 
@@ -331,11 +334,20 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         embot::prot::can::Frame frame = inpframes.front();
         // copy it
         frame.copyto(rx_id, rx_size, rx_data);
-//        embot::core::print(std::string("size = ") + std::to_string(ninputframes) + ", d[0] = " + std::to_string(rx_data[0]) + 
-//                           ", consumed = " + std::to_string(consumedframes) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-        
+        //        embot::core::print(std::string("size = ") + std::to_string(ninputframes) + ", d[0] = " + std::to_string(rx_data[0]) + 
+        //                           ", consumed = " + std::to_string(consumedframes) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());     
+
+        if(my_index < 10) 
+        {
+            dbg_msg[my_index++] = rx_data[0]; 
+        }
+        else{
+            my_index = 100;
+            my_index = my_index;
+        }
+
         // clean up the first consumedframes positions
-        inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);     
+        inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);
     }
     
     // save the CAN frame into the input structure of the model
@@ -362,7 +374,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         outframes.push_back(fr);
     }
     
-    bool txstatus = false;
+    bool txstatus = amc_bldc.AMC_BLDC_Y.Flags_p.DBG;
     if(true == txstatus)
     {
         addMCstatus(outframes);
@@ -470,6 +482,24 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     impl->measureFOC->stop();
 }
 
+uint8_t remapControlMode(uint8_t controlMode)
+{
+    switch(controlMode){
+        case 0: 
+            return 0xb0; // NotConfigured
+            break;
+        case 1: 
+            return MCControlModes_Idle;
+            break;
+        case 4: 
+            return MCControlModes_Current;
+            break;
+        default: 
+            return 0x99; // TODO: Fix!
+            break;
+    }
+}
+
 
 bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::prot::can::Frame> &outframes)
 {
@@ -479,7 +509,7 @@ bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::
     embot::prot::can::motor::periodic::Message_STATUS::Info info {};
 
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.controlmode = embot::prot::can::motor::polling::convert(ctrlmode);
+    info.controlmode = remapControlMode(amc_bldc.AMC_BLDC_Y.Flags_p.control_mode);         
     info.faultstate = (true == EXTFAULTisPRESSED) ? 0x00000001 : 0x00000000;
     // etc
         
@@ -488,7 +518,27 @@ bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::
     embot::prot::can::Frame frame0;
     msg.get(frame0);
     outframes.push_back(frame0);
-        
+    
+//    static uint32_t counter;
+//    if(counter % 10 == 0)
+//    {        
+//        static char msg2[64];
+//        static uint32_t counter;
+//        sprintf(msg2, "%d,%d,%d,%d,%d,%d,%d,%d,%d", \
+//                                frame0.id,  \
+//                                frame0.data[0],  \
+//                                frame0.data[1],  \
+//                                frame0.data[2],   \
+//                                frame0.data[3],   \
+//                                frame0.data[4],   \
+//                                frame0.data[5],   \
+//                                frame0.data[6],   \
+//                                frame0.data[7]);
+//        embot::core::print(msg2);
+//        counter = 0;
+//    }
+//    counter++;
+    
     return true;
 }
 
