@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.35
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu Jan 13 14:10:17 2022
+// C/C++ source code generated on : Fri Jan 14 20:51:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -45,6 +45,7 @@ struct Flags
 {
   // control mode
   ControlModes control_mode;
+  boolean_T DBG;
 };
 
 #endif

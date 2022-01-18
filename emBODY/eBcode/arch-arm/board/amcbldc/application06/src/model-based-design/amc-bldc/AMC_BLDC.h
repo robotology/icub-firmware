@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.203
+// Model version                  : 3.204
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Jan 14 15:26:10 2022
+// C/C++ source code generated on : Fri Jan 14 20:51:39 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -90,7 +90,6 @@ namespace amc_bldc_codegen
       Targets Targets_n;               // '<S7>/SupervisorFSM_RX'
       ControlOutputs RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter1'
       BUS_MESSAGES_TX MessagesTx;      // '<S7>/SupervisorFSM_TX'
-      Flags Flags_k;                   // '<S7>/SupervisorFSM_RX'
       ExternalFlags BusConversion_InsertedFor_Sup_j;
       BUS_EVENTS_TX SupervisorFSM_TX_o2;// '<S7>/SupervisorFSM_TX'
       BUS_EVENTS_RX CAN_Decoder_o2;    // '<S6>/CAN_Decoder'
@@ -154,6 +153,7 @@ namespace amc_bldc_codegen
     struct ExtY_AMC_BLDC_T {
       ControlOutputs ControlOutputs_p; // '<Root>/ControlOutputs'
       ConfigurationParameters ConfigurationParameters_p;// '<Root>/ConfigurationParameters' 
+      Flags Flags_p;                   // '<Root>/Flags'
       EstimatedData EstimatedData_p;   // '<Root>/EstimatedData'
       BUS_CAN PacketsTx;               // '<Root>/PacketsTx'
     };
