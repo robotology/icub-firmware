@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.144
+// Model version                  : 3.145
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Jan 14 15:25:19 2022
+// C/C++ source code generated on : Fri Jan 14 20:50:46 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -293,6 +293,7 @@ struct Flags
 {
   // control mode
   ControlModes control_mode;
+  boolean_T DBG;
 };
 
 #endif
