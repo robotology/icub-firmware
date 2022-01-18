@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -855,7 +855,7 @@
             </File>
             <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>8</FileType>
+              <FileType>1</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
@@ -2043,7 +2043,7 @@
             </File>
             <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>8</FileType>
+              <FileType>1</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
@@ -3231,7 +3231,7 @@
             </File>
             <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>8</FileType>
+              <FileType>1</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
