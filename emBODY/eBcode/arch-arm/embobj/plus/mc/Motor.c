@@ -1005,6 +1005,13 @@ void Motor_actuate(Motor* motor, uint8_t N) //
 {
     if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
     {
+        // To be sure that amc_bldc/2foc can process all sent messages, we are sending 1 setpoint every 2ms
+        static uint8_t cnt = 0;
+        if((++cnt % 2) == 1)
+        {
+            return;
+        }
+        
         int16_t output[MAX_JOINTS_PER_BOARD] = {0};
     
         for (int m=0; m<N; ++m)
@@ -1146,20 +1153,21 @@ void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
         //o->outOfLimitsSignaled = FALSE;
     }
 }
+#include <hal_trace.h>
 
 void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref)
 {
     if (o->pos_min != o->pos_max)
     {        
-        if ((o->pos_raw_cal_fbk < o->pos_min) && (Iqq_ref < 0))
-        {
-            o->output = o->Iqq_ref = 0;
-        }
-        else if ((o->pos_raw_cal_fbk > o->pos_max) && (Iqq_ref > 0))
-        {
-            o->output = o->Iqq_ref = 0;
-        }
-        else
+//        if ((o->pos_raw_cal_fbk < o->pos_min) && (Iqq_ref < 0))           // CHIEDERE A VALE GAGGE
+//        {
+//            o->output = o->Iqq_ref = 0;
+//        }
+//        else if ((o->pos_raw_cal_fbk > o->pos_max) && (Iqq_ref > 0))
+//        {
+//            o->output = o->Iqq_ref = 0;
+//        }
+//        else
         {
             o->output = o->Iqq_ref = CUT(Iqq_ref, o->Iqq_max);
         }
