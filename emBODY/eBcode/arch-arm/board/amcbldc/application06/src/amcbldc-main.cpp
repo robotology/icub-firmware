@@ -396,8 +396,8 @@ std::vector<embot::prot::can::Frame> inputframes {};
 void tCTRL_startup(embot::os::Thread *t, void *param)
 {
     
-    outctrlframes.reserve(5);
-    inputframes.reserve(5);
+    outctrlframes.reserve(8);
+    inputframes.reserve(16);
 
     // init agent of mc. it also init motor
     embot::app::application::theMBDagent &thembdagent = embot::app::application::theMBDagent::getInstance();
@@ -500,40 +500,10 @@ void mbd_mc_canparse(const embot::prot::can::Frame &rxframe,
 // the status of the control
 void mbd_mc_tick(std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 { 
-    // now we use the c++ agent to tick control and get an output 
-    // vector of frames to transmit  
 
-//    size_t num = shared->sizeofrx();
-//    
-//    for(int i=0; i<num; i++)
-//    {
-//        size_t remaining {0};
-//        embot::prot::can::Frame frame {};
-//        if(true == shared->getrx(frame, remaining))
-//        {
-//            mbd_mc_canparse(frame, outctrlframes);
-//            //embot::app::application::theCANparserMC::getInstance().process(frame, outctrlframes);
-//        }
-//    }
-//    
-//    std::vector<embot::prot::can::Frame> inpframes {};
-
-//    size_t num = shared->sizeofrx();
-//    
-//    for(int i=0; i<num; i++)
-//    {
-//        size_t remaining {0};
-//        embot::prot::can::Frame frame {};
-//        if(true == shared->getrx(frame, remaining))
-//        {
-//            inpframes.push_back(frame);
-//        }
-//    }
-   
-        
+    size_t consumedframes {0};    
     embot::app::application::theMBDagent::getInstance().tick(inpframes, outframes);
-    inputframes.clear();
-    
+    // the vector inpframes is cleared inside 
 }
 
 
