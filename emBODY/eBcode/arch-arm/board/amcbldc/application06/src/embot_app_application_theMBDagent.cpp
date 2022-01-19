@@ -142,8 +142,6 @@ constexpr bool useDUMMYforTICK {true};
 
 struct embot::app::application::theMBDagent::Impl
 {
-    uint8_t dbg_msg[10] {0xFF};
-    volatile int my_index = 0;
     Impl() = default;  
         
     // the initialization code
@@ -359,17 +357,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
 //            embot::core::print(std::string("size = ") + std::to_string(ninputframes) + ", d[0] = " + std::to_string(rx_data[0]) + 
 //                           ", consumed = " + std::to_string(consumedframes) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
 //        }
-     
-
-//        if(my_index < 10) 
-//        {
-//            dbg_msg[my_index++] = rx_data[0]; 
-//        }
-//        else{
-//            my_index = 100;
-//            my_index = my_index;
-//        }
-
+        
         // clean up the first consumedframes positions
         inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);
     }
@@ -482,7 +470,6 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     static uint32_t counter;
     if(counter % 1000 == 0)
     {
-        //sprintf(msg2, "%d -- %d -- %.3f -- %.3f\n", delta, position, u->SensorsData_motorsensors_angle, y->ControlOutputs_p.Iq_fbk.current);
         sprintf(msg2, "%d %d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", \
                                  impl->amc_bldc.AMC_BLDC_Y.Flags_p.control_mode, \
                                  Vabc0,  \
@@ -494,8 +481,6 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
                                  impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_angle,    \
                                  impl->amc_bldc.AMC_BLDC_B.Targets_n.motorcurrent.current,    \
                                  impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current);
-        
-        //sprintf(msg2, "%d,%d,%.3f,%.3f,%.3f", delta, position, y->EstimatedData_p.jointvelocities.velocity, u->SensorsData_motorsensors_angle, y->ControlOutputs_p.Iq_fbk.current);
         embot::core::print(msg2);
         counter = 0;
     }
@@ -545,26 +530,6 @@ bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::
     embot::prot::can::Frame frame0;
     msg.get(frame0);
     outframes.push_back(frame0);
-    
-//    static uint32_t counter;
-//    if(counter % 10 == 0)
-//    {        
-//        static char msg2[64];
-//        static uint32_t counter;
-//        sprintf(msg2, "%d,%d,%d,%d,%d,%d,%d,%d,%d", \
-//                                frame0.id,  \
-//                                frame0.data[0],  \
-//                                frame0.data[1],  \
-//                                frame0.data[2],   \
-//                                frame0.data[3],   \
-//                                frame0.data[4],   \
-//                                frame0.data[5],   \
-//                                frame0.data[6],   \
-//                                frame0.data[7]);
-//        embot::core::print(msg2);
-//        counter = 0;
-//    }
-//    counter++;
     
     return true;
 }
