@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -33,26 +33,6 @@
 
 /* USER CODE END Includes */
 
-int itm_puts(const char* str) 
-{    
-
-    if(NULL == str)
-    {
-        return(0);
-    }
-
-    uint32_t ch;
-    int num = 0;
-    while('\0' != (ch = *str))
-    {
-        ITM_SendChar(ch);
-        str++;
-        num++;
-    }
-     
-    ITM_SendChar('\n');
-    return(++num);    
-}
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
@@ -60,6 +40,7 @@ int itm_puts(const char* str)
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 
 #ifndef HSEM_ID_0
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
@@ -85,6 +66,27 @@ int itm_puts(const char* str)
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+int itm_puts(const char* str) 
+{    
+
+    if(NULL == str)
+    {
+        return(0);
+    }
+
+    uint32_t ch;
+    int num = 0;
+    while('\0' != (ch = *str))
+    {
+        ITM_SendChar(ch);
+        str++;
+        num++;
+    }
+     
+    ITM_SendChar('\n');
+    return(++num);    
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -98,6 +100,7 @@ int main(void)
   /* USER CODE END 1 */
 
 /* USER CODE BEGIN Boot_Mode_Sequence_1 */
+  
   /*HW semaphore Clock enable*/
   __HAL_RCC_HSEM_CLK_ENABLE();
   /* Activate HSEM notification for Cortex-M4*/
@@ -130,22 +133,25 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_I2C1_Init();
-  MX_I2C2_Init();
-  MX_I2C3_Init();
-  MX_I2C4_Init();
-  MX_SPI1_Init();
-  MX_SPI2_Init();
-  MX_SPI3_Init();
-  MX_TIM4_Init();
-  MX_TIM5_Init();
-  MX_ADC1_Init();
-  MX_ADC2_Init();
-  MX_DAC1_Init();
-  MX_TIM1_Init();
-  MX_TIM16_Init();
+//  MX_DMA_Init();
+//  MX_I2C1_Init();
+//  MX_I2C2_Init();
+//  MX_I2C3_Init();
+//  MX_I2C4_Init();
+//  MX_SPI1_Init();
+//  MX_SPI2_Init();
+//  MX_SPI3_Init();
+//  MX_TIM4_Init();
+//  MX_TIM5_Init();
+//  MX_ADC1_Init();
+//  MX_ADC2_Init();
+//  MX_DAC1_Init();
+//  MX_TIM1_Init();
+//  MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
+  
+    HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_2);
+    HAL_Delay(500);
 
   /* USER CODE END 2 */
 
@@ -153,11 +159,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      itm_puts("toggled");
-        HAL_Delay(500);
-        HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_15);
     /* USER CODE END WHILE */
-
+    HAL_Delay(500);
+      HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_2);
+      HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_3);
+//      itm_puts("cm4 toggles");
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -69,6 +69,30 @@ static void MPU_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+int itm_puts(const char* str) 
+{    
+
+    if(NULL == str)
+    {
+        return(0);
+    }
+
+    uint32_t ch;
+    int num = 0;
+    while('\0' != (ch = *str))
+    {
+        ITM_SendChar(ch);
+        str++;
+        num++;
+    }
+     
+    ITM_SendChar('\n');
+    return(++num);    
+}
+
+#define THEREMUSTBE_NOCODEIN_CM4CORE
+
+
 /* USER CODE END 0 */
 
 /**
@@ -93,6 +117,8 @@ int main(void)
   /* Enable D-Cache---------------------------------------------------------*/
   SCB_EnableDCache();
 
+#if defined(THEREMUSTBE_NOCODEIN_CM4CORE)
+#else    
 /* USER CODE BEGIN Boot_Mode_Sequence_1 */
   /* Wait until CPU2 boots and enters in stop mode or timeout*/
   timeout = 0xFFFF;
@@ -102,6 +128,8 @@ int main(void)
   Error_Handler();
   }
 /* USER CODE END Boot_Mode_Sequence_1 */
+#endif
+
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -142,6 +170,29 @@ Error_Handler();
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+
+#if defined(THEREMUSTBE_NOCODEIN_CM4CORE)
+
+  // marco.accame: let cm7 init the leds ...
+  #define nLED1_Pin GPIO_PIN_13
+  #define nLED2_Pin GPIO_PIN_15
+  #define nLED3_Pin GPIO_PIN_2
+  #define nLED4_Pin GPIO_PIN_3
+  #define nLED5_Pin GPIO_PIN_4
+  #define nLED6_Pin GPIO_PIN_5
+  HAL_GPIO_WritePin(GPIOH, nLED1_Pin|nLED2_Pin|nLED3_Pin|nLED5_Pin
+                          |nLED4_Pin|nLED6_Pin, GPIO_PIN_SET);
+       
+  GPIO_InitTypeDef GPIO_InitStruct = {0};       
+  GPIO_InitStruct.Pin = nLED1_Pin|nLED2_Pin|nLED3_Pin|nLED5_Pin
+                          |nLED4_Pin|nLED6_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);  
+
+#endif
+
 //  MX_DMA_Init();
 //  MX_RTC_Init();
 //  MX_CRC_Init();
@@ -156,17 +207,21 @@ Error_Handler();
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  
+  itm_puts("cm7 starts toggling leds");
+  
   HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_15);
   HAL_Delay(500);
-  
+    
   while (1)
   {
     /* USER CODE END WHILE */
-      
-      HAL_Delay(500);
+
+    HAL_Delay(500);
       HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_13);
       HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_15);
-
+      itm_puts("cm7 toggles");
+      
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -209,7 +264,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLM = 2;
   RCC_OscInitStruct.PLL.PLLN = 64;
   RCC_OscInitStruct.PLL.PLLP = 2;
-  RCC_OscInitStruct.PLL.PLLQ = 20;
+  RCC_OscInitStruct.PLL.PLLQ = 8;
   RCC_OscInitStruct.PLL.PLLR = 2;
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
@@ -249,7 +304,8 @@ void PeriphCommonClock_Config(void)
   /** Initializes the peripherals clock
   */
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB|RCC_PERIPHCLK_ADC
-                              |RCC_PERIPHCLK_FDCAN;
+                              |RCC_PERIPHCLK_SPI3|RCC_PERIPHCLK_SPI2
+                              |RCC_PERIPHCLK_SPI1;
   PeriphClkInitStruct.PLL2.PLL2M = 5;
   PeriphClkInitStruct.PLL2.PLL2N = 50;
   PeriphClkInitStruct.PLL2.PLL2P = 5;
@@ -266,7 +322,7 @@ void PeriphCommonClock_Config(void)
   PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_0;
   PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
   PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
-  PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL2;
+  PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
   PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_PLL3;
   PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL3;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)

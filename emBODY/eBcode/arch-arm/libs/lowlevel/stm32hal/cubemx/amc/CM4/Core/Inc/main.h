@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -91,6 +91,8 @@ void Error_Handler(void);
 #define JTMS_SWDIO_GPIO_Port GPIOA
 #define TP2_Pin GPIO_PIN_8
 #define TP2_GPIO_Port GPIOA
+#define TP4_Pin GPIO_PIN_13
+#define TP4_GPIO_Port GPIOC
 #define TRACECLK_Pin GPIO_PIN_2
 #define TRACECLK_GPIO_Port GPIOE
 #define SPI1_nSEL_Pin GPIO_PIN_10
@@ -159,6 +161,8 @@ void Error_Handler(void);
 #define SPI2_MOSI_GPIO_Port GPIOB
 #define SPI2_MISO_Pin GPIO_PIN_14
 #define SPI2_MISO_GPIO_Port GPIOB
+#define TP3_Pin GPIO_PIN_0
+#define TP3_GPIO_Port GPIOC
 #define SPI3_nXEN_Pin GPIO_PIN_10
 #define SPI3_nXEN_GPIO_Port GPIOD
 #define SPI1_nXEN_Pin GPIO_PIN_8

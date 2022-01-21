@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -49,11 +49,12 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOE_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOH, nLED1_Pin|nLED2_Pin|nLED3_Pin|nLED5_Pin
-                          |nLED4_Pin|nLED6_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOC, TP4_Pin|MOT_EN3_Pin|MOT_EN2_Pin|MOT_EN4_Pin
+                          |MOT_EN1_Pin|TP3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, MOT_EN3_Pin|MOT_EN2_Pin|MOT_EN4_Pin|MOT_EN1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOH, nLED1_Pin|nLED2_Pin|nLED3_Pin|nLED5_Pin
+                          |nLED4_Pin|nLED6_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, I2C3_XEN_Pin|I2C4_XEN_Pin|I2C2_XEN_Pin|I2C1_XEN_Pin, GPIO_PIN_RESET);
@@ -66,6 +67,13 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, MOT_nRESET_Pin|MOT_nSLEEP_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PCPin PCPin */
+  GPIO_InitStruct.Pin = TP4_Pin|TP3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PHPin PHPin PHPin PHPin
                            PHPin PHPin */
