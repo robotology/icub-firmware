@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -45,13 +45,13 @@ void MX_FDCAN1_Init(void)
   hfdcan1.Init.TransmitPause = DISABLE;
   hfdcan1.Init.ProtocolException = ENABLE;
   hfdcan1.Init.NominalPrescaler = 1;
-  hfdcan1.Init.NominalSyncJumpWidth = 10;
-  hfdcan1.Init.NominalTimeSeg1 = 39;
-  hfdcan1.Init.NominalTimeSeg2 = 10;
+  hfdcan1.Init.NominalSyncJumpWidth = 20;
+  hfdcan1.Init.NominalTimeSeg1 = 79;
+  hfdcan1.Init.NominalTimeSeg2 = 20;
   hfdcan1.Init.DataPrescaler = 1;
-  hfdcan1.Init.DataSyncJumpWidth = 3;
-  hfdcan1.Init.DataTimeSeg1 = 6;
-  hfdcan1.Init.DataTimeSeg2 = 3;
+  hfdcan1.Init.DataSyncJumpWidth = 8;
+  hfdcan1.Init.DataTimeSeg1 = 11;
+  hfdcan1.Init.DataTimeSeg2 = 8;
   hfdcan1.Init.MessageRAMOffset = 0;
   hfdcan1.Init.StdFiltersNbr = 0;
   hfdcan1.Init.ExtFiltersNbr = 1;
@@ -93,13 +93,13 @@ void MX_FDCAN2_Init(void)
   hfdcan2.Init.TransmitPause = DISABLE;
   hfdcan2.Init.ProtocolException = ENABLE;
   hfdcan2.Init.NominalPrescaler = 1;
-  hfdcan2.Init.NominalSyncJumpWidth = 10;
-  hfdcan2.Init.NominalTimeSeg1 = 39;
-  hfdcan2.Init.NominalTimeSeg2 = 10;
+  hfdcan2.Init.NominalSyncJumpWidth = 20;
+  hfdcan2.Init.NominalTimeSeg1 = 79;
+  hfdcan2.Init.NominalTimeSeg2 = 20;
   hfdcan2.Init.DataPrescaler = 1;
-  hfdcan2.Init.DataSyncJumpWidth = 4;
-  hfdcan2.Init.DataTimeSeg1 = 6;
-  hfdcan2.Init.DataTimeSeg2 = 3;
+  hfdcan2.Init.DataSyncJumpWidth = 8;
+  hfdcan2.Init.DataTimeSeg1 = 11;
+  hfdcan2.Init.DataTimeSeg2 = 8;
   hfdcan2.Init.MessageRAMOffset = 1280;
   hfdcan2.Init.StdFiltersNbr = 0;
   hfdcan2.Init.ExtFiltersNbr = 1;
@@ -130,11 +130,21 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(fdcanHandle->Instance==FDCAN1)
   {
   /* USER CODE BEGIN FDCAN1_MspInit 0 */
 
   /* USER CODE END FDCAN1_MspInit 0 */
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
+    PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
     /* FDCAN1 clock enable */
     HAL_RCC_FDCAN_CLK_ENABLED++;
     if(HAL_RCC_FDCAN_CLK_ENABLED==1){
@@ -175,6 +185,16 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
   /* USER CODE BEGIN FDCAN2_MspInit 0 */
 
   /* USER CODE END FDCAN2_MspInit 0 */
+
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
+    PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
     /* FDCAN2 clock enable */
     HAL_RCC_FDCAN_CLK_ENABLED++;
     if(HAL_RCC_FDCAN_CLK_ENABLED==1){

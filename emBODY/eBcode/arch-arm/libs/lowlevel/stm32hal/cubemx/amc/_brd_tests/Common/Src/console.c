@@ -162,6 +162,27 @@ char coGetChar( void )
     }
 }
 
+int itm_puts(const char* str) 
+{    
+
+    if(NULL == str)
+    {
+        return(0);
+    }
+
+    uint32_t ch;
+    int num = 0;
+    while('\0' != (ch = *str))
+    {
+        ITM_SendChar(ch);
+        str++;
+        num++;
+    }
+     
+    ITM_SendChar('\n');
+    return(++num);    
+}
+
 /******************************************************************************************************************//**
  * @brief  Prints an ANSI-OEM (ASCII) string to the console device. The function translates the '\n' character into the
  *         '\r' '\n' sequence.
@@ -172,9 +193,10 @@ char *coPutString( const char *str )
 {
     if (NULL != str)
     {
-        char ch ;
-        const char *pc ;
-        for (pc = str ; ('\0' != (ch = *(pc++))) ; ) coPutChar( ch ) ;
+        itm_puts(str);
+//        char ch ;
+//        const char *pc ;
+//        for (pc = str ; ('\0' != (ch = *(pc++))) ; ) coPutChar( ch ) ;
     }
     return (char *)str ;
 }

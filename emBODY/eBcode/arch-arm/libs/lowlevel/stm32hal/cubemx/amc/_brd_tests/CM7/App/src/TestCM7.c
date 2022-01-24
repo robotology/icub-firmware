@@ -34,9 +34,12 @@ __attribute__((noreturn)) void TestCM7(void const * argument)
     /* Init code for ADC3 */
     AdcInit();
     /* Init code for the console device */
-    coInit();
+//    coInit();
     /* Wait for the link established */
-    coGetChar();
+//    coGetChar();
+    
+    EeTest();
+    for (;;);
 
 __info:
     /* Give some INFO */
