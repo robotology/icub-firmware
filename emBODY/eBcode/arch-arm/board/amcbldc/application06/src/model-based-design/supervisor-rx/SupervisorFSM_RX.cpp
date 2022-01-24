@@ -203,7 +203,7 @@ namespace amc_bldc_codegen
   // Function for Chart: '<Root>/SupervisorFSM_RX'
   boolean_T SupervisorFSM_RX::SupervisorFS_isConfigurationSet(void) const
   {
-    return true; //SupervisorFSM_RX_DW.IsCurrentLimitSet;
+    return SupervisorFSM_RX_DW.IsCurrentLimitSet;
   }
 
   // Function for Chart: '<Root>/SupervisorFSM_RX'
