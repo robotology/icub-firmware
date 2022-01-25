@@ -184,12 +184,6 @@ namespace amc_bldc_codegen
         SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
           SupervisorFSM_RX_IN_Current;
         arg_Flags->control_mode = ControlModes_Current;
-          
-                    static char msg[64];
-          static uint32_t counter;
-            sprintf(msg, "[SupervisorFSM_RX_Current]: %d", arg_Flags->control_mode);
-          embot::core::print(msg);
-          
       }
     }
   }
@@ -343,14 +337,7 @@ namespace amc_bldc_codegen
 
           // Chart: '<Root>/SupervisorFSM_RX'
           arg_Flags->control_mode = ControlModes_Current;
-            
-          static char msg[64];
-          static uint32_t counter;
-            sprintf(msg, "[SupervisorFSM_RX_IN_Position]: %d", arg_Flags->control_mode);
-          embot::core::print(msg);
-            
-            
-            
+
         } else if (SupervisorFSM_IsNewCtrl_Voltage(arg_MessagesRx)) {
           // Chart: '<Root>/SupervisorFSM_RX'
           arg_Targets->motorvoltage.voltage =
@@ -403,11 +390,6 @@ namespace amc_bldc_codegen
 
             // Chart: '<Root>/SupervisorFSM_RX'
             arg_Flags->control_mode = ControlModes_Current;
-              
-                        static char msg[64];
-          static uint32_t counter;
-            sprintf(msg, "[SupervisorFSM_RX_IN_Velocity]: %d", arg_Flags->control_mode);
-          embot::core::print(msg);
               
           } else if (SupervisorFS_IsNewCtrl_Position(arg_MessagesRx)) {
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
@@ -463,14 +445,7 @@ namespace amc_bldc_codegen
               SupervisorFSM_RX_IN_Current;
 
             // Chart: '<Root>/SupervisorFSM_RX'
-            arg_Flags->control_mode = ControlModes_Current;
-              
-              
-                                     static char msg[64];
-          static uint32_t counter;
-            sprintf(msg, "[SupervisorFSM_RX_IN_Voltage]: %d", arg_Flags->control_mode);
-          embot::core::print(msg); 
-              
+            arg_Flags->control_mode = ControlModes_Current; 
               
           } else if (SupervisorFS_IsNewCtrl_Position(arg_MessagesRx)) {
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
