@@ -333,11 +333,6 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         // copy it
         frame.copyto(rx_id, rx_size, rx_data);
         
-        if((rx_data[0] == 0x65) && (rx_id == 0x1))
-        {
-            amc_bldc.AMC_BLDC_U.PacketsRx_available = 0;    // TODO: FIX IN MBD
-        }
-        
 //        if(rx_id == 0x10F)
 //        {
 //            static char msg2[64];
