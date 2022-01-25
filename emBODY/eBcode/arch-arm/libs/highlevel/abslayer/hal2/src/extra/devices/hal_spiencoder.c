@@ -684,6 +684,14 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
         // - first 14 MSB bits of positional data
         // - last 2 LSB bits zero padded
         
+        //Everything 0xFF, SPI is not working
+        if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF))
+        { 
+            diagn->type = hal_spiencoder_diagnostic_type_flags;                
+            diagn->info.flags.tx_error = 1;
+            return(hal_res_NOK_generic);
+        }
+        
         // TODO: fix
         // Check for zero padded bits (This could be a rendundant check, beacuse it already exists in EOappEncoreReader)
         //if ((intitem->rxframes[1][0] & 0x01) != 0x00)
