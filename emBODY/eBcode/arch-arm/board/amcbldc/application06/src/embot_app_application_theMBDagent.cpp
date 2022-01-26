@@ -501,6 +501,9 @@ uint8_t remapControlMode(uint8_t controlMode)
             break;
         case 6:
             return MCControlModes_OpenLoop;
+        case ControlModes_HwFaultCM:
+            return 0xa0;
+            break;
         default: 
             return 0x99; // TODO: Fix!
             break;
