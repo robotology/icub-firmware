@@ -83,17 +83,24 @@ namespace embot { namespace hw { namespace gpio {
     
     
     // initialised mask. there must be one for each of PORT::maxnumberof     
-    //static std::array<std::uint16_t, embot::core::tointegral(PORT::maxnumberof)> initialised2dmask = {0};
+    static std::array<std::uint32_t, embot::core::tointegral(embot::hw::GPIO::PORT::maxnumberof)> initialised2dmask = {0};
     
 
-    bool supported(GPIO &g)
+    bool supported(const GPIO &g)
     {
         return embot::hw::gpio::getBSP().supported(g);
     }
     
-    bool initialised(GPIO &g)
+    bool initialised(const GPIO &g)
     {
-        return true; 
+        uint8_t i = embot::core::tointegral(g.port);
+        if(i < embot::core::tointegral(embot::hw::GPIO::PORT::maxnumberof))
+        {   // i dont do control vs j < embot::core::tointegral(embot::hw::GPIO::PIN::maxnumberof)
+            // because initialised2dmask is an array of uint32_t and embot::hw::GPIO::PIN at max is 31 by design  
+            uint8_t j = embot::core::tointegral(g.pin);
+            return embot::core::binary::bit::check(initialised2dmask[i], j);
+        }
+        return false; 
     }   
 
 
@@ -101,6 +108,19 @@ namespace embot { namespace hw { namespace gpio {
     {
         return configure(g, config.mode, config.pull, config.speed);
     }  
+    
+    result_t deinit(const embot::hw::GPIO &g)
+    {
+        embot::hw::gpio::PROP gg = embot::hw::gpio::getBSP().getPROP(g);    
+        if(!gg.isvalid())
+        {
+            return resNOK;
+        }  
+        HAL_GPIO_DeInit(gg.stmport, gg.stmpin);   
+        
+        embot::core::binary::bit::clear(initialised2dmask[embot::core::tointegral(g.port)], embot::core::tointegral(g.pin));
+        return resOK;
+    }
 
     result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s)
     {        
@@ -110,6 +130,7 @@ namespace embot { namespace hw { namespace gpio {
             return resNOK;
         }            
         _configure(gg, m, p, s);
+        embot::core::binary::bit::set(initialised2dmask[embot::core::tointegral(g.port)], embot::core::tointegral(g.pin));
         return resOK;
     }  
     

@@ -575,5 +575,180 @@ namespace embot { namespace hw { namespace eth {
 
 // - support map: end of embot::hw::eth
 
+
+// - support map: begin of embot::hw::eeprom
+
+#include "embot_hw_eeprom.h"
+#include "embot_hw_eeprom_bsp.h"
+
+#if !defined(EMBOT_ENABLE_hw_eeprom)
+
+namespace embot { namespace hw { namespace eeprom {
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::EEPROM h) const {}
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+#else
+
+namespace embot { namespace hw { namespace eeprom {
+    
+    #if defined(STM32HAL_BOARD_AMC)
+        
+    // ...
+    constexpr PROP ee1p = { embot::hw::eeprom::Type::spiM95512DF, 
+                            {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::thirteen}, 
+                            {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eight}, 
+                            {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::twelve},
+                             embot::hw::SPI::six
+                          };  
+    constexpr PROP ee2p = { embot::hw::eeprom::Type::chipM95512DF, 
+                            {   
+                                embot::hw::SPI::six,
+                                {
+                                    {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eight},    // nS
+                                    {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::twelve},   // nW
+                                    {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::thirteen}, // nHOLD
+                                    {
+                                        embot::hw::gpio::Mode::OUTPUTpushpull,
+                                        embot::hw::gpio::Pull::nopull,
+                                        embot::hw::gpio::Speed::veryhigh
+                                    }
+                                }
+                            }   
+                          };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(EEPROM::one) | mask::pos2mask<uint32_t>(EEPROM::two),        
+        // properties
+        {{
+            &ee1p, &ee2p            
+        }}        
+    };
+    
+    
+    void BSP::init(embot::hw::EEPROM h) const {}
+    
+    #else
+        #error embot::hw::bsp::eeprom::thebsp must be defined    
+    #endif
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+#endif // eeprom
+
+// - support map: end of embot::hw::eeprom
+
+
+// - support map: begin of embot::hw::spi
+
+#include "embot_hw_spi.h"
+#include "embot_hw_spi_bsp.h"
+
+#if !defined(EMBOT_ENABLE_hw_spi)
+
+namespace embot { namespace hw { namespace spi {
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::SPI h) const {}
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+#else
+
+namespace embot { namespace hw { namespace spi {
+    
+    #if defined(STM32HAL_BOARD_AMC)
+        
+    // ...
+    constexpr PROP spi6p = { &hspi6, 12500000 };  
+    
+    static_assert(spi6p.speed == 12.5*1000000, "SPI::six is now 12.5Mhz and must be changed inside MX_SPI6_Init()");
+    // SPI::six is used @ 12.Mhz by a M95512-DFMC6 EEPROM and must be < 16MHz
+    
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(SPI::six),        
+        // properties
+        {{
+            nullptr, nullptr, nullptr, nullptr, nullptr, &spi6p            
+        }}        
+    };
+    
+    
+    bool BSP::init(embot::hw::SPI h) const
+    {
+        // marco.accame: in here ... MX_SPI6_Ini() calls HAL_SPI_Init() and imposes the speed 
+        // and the low level configuration specified inside cube-mx. 
+        // it is quick and easy BUT: if we want to attach to the same bus more than one type 
+        // of spi sensors (e.g., aea, aea3, AksIM-2, ...) then we must be able to call HAL_SPI_Init()
+        // with the parameters we want.
+        // conclusion: we shall move HAL_SPI_Init() out of BSP::init() and inside embot::hw::spi::init()
+        if(h == SPI::six)
+        {            
+            MX_SPI6_Init();
+            // HAL_SPI_MspInit(&hspi6); // it is called inside HAL_SPI_Init()
+            return true;
+        } 
+
+        return false;
+        // the new rule could be:
+        // if we return true .... non extra init is required inside embot::hw::spi
+        // else ... we call HAL_SPI_Init() inside embot::hw::spi::init()
+        // w/ SPI_InitTypeDef values from embot::hw::spi::Config. we dont need to 
+        // have the pins in there as they are initted by HAL_SPI_MspInit.       
+    }
+
+    bool BSP::deinit(embot::hw::SPI h) const
+    {
+        if(h == SPI::six)
+        {
+            HAL_SPI_DeInit(&hspi6);
+            // HAL_SPI_MspDeInit(&hspi6); // // it is called inside HAL_SPI_DeInit()
+            return true;
+        }  
+
+        return false;        
+    }
+    
+    #else
+        #error embot::hw::bsp::spi::thebsp must be defined    
+    #endif
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+extern "C"
+{
+    void SPI6_IRQHandler(void)
+    {
+        HAL_SPI_IRQHandler(&hspi6);
+    }
+}
+
+#endif // spi
+
+// - support map: end of embot::hw::spi
+
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

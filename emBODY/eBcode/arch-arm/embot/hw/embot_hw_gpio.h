@@ -44,34 +44,41 @@ namespace embot { namespace hw { namespace gpio {
         //EVTrising = 9,
         //EVTfalling = 10,
         //EVTrisingfalling = 11
+        none = 255
     };
      
     // look at GPIO_pull_define
     enum class Pull : std::uint8_t { 
         nopull = 0, 
         pullup = 1, 
-        pulldown = 2 
+        pulldown = 2,
+        none = 255
     };
     
     enum class Speed : uint8_t {
         low = 0,
         medium = 1,
         high = 2,
-        veryhigh = 3
+        veryhigh = 3,
+        none = 255
     };   
 
     struct Config
     {
-        Mode mode {Mode::OUTPUTopendrain};
-        Pull pull {Pull::nopull};
-        Speed speed {Speed::medium};
+        Mode mode {Mode::none};
+        Pull pull {Pull::none};
+        Speed speed {Speed::none};
         constexpr Config(Mode m, Pull p, Speed s) : mode(m), pull(p), speed(s) {}
         constexpr Config() = default; 
+        constexpr bool isvalid() const { 
+            return (mode != Mode::none) && (pull != Pull::none) && (speed != Speed::none);
+        }            
     };
     
     bool supported(const embot::hw::GPIO &g);    
     bool initialised(const embot::hw::GPIO g);    
     result_t init(const embot::hw::GPIO &g, const Config &config);
+    result_t deinit(const embot::hw::GPIO &g);
     
     result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s);
     

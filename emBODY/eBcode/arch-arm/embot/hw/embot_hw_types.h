@@ -10,10 +10,10 @@
 #ifndef _EMBOT_HW_TYPES_H_
 #define _EMBOT_HW_TYPES_H_
 
-#include "embot_hw.h"
+
 #include "embot_core.h"
 #include "embot_core_binary.h"
-
+#include "embot_hw.h"
 
 
 namespace embot { namespace hw {
@@ -70,7 +70,10 @@ namespace embot { namespace hw {
     
     enum class MOTOR : std::uint8_t { one = 0, two = 1, three = 2, four = 3, none = 31, maxnumberof = 4 };
   
-  
+    enum class EEPROM : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
+    
+    enum class SPI : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 31, maxnumberof = 6 };
+    
     // definition of more complex data structures
     
     struct GPIO
@@ -82,8 +85,8 @@ namespace embot { namespace hw {
         PORT port {PORT::none};
         PIN pin {PIN::none};
         
-        constexpr GPIO(PORT po, PIN pi) : port(po), pin(pi) {}
-        constexpr GPIO() : port(PORT::none), pin(PIN::none) {}            
+        constexpr GPIO() = default; 
+        constexpr GPIO(PORT po, PIN pi) : port(po), pin(pi) {}          
         constexpr bool isvalid() const { return (PORT::none == port) ? false : true; }       
     };
     
