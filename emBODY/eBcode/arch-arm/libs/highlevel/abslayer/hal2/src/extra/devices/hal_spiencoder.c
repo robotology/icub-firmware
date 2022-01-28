@@ -692,8 +692,8 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
             return(hal_res_NOK_generic);
         }
         
-        // TODO: fix
         // Check for zero padded bits (This could be a rendundant check, beacuse it already exists in EOappEncoreReader)
+        // Simone Girardi 28/01/22 after some tests the zero padded bit is not reliable due to the (noise) flickering 
         //if ((intitem->rxframes[1][0] & 0x01) != 0x00)
         //{
         //    diagn->type = hal_spiencoder_diagnostic_type_flags;
