@@ -415,18 +415,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>248</LineNumber>
+          <LineNumber>81</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134238326</Address>
+          <Address>134242064</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\main-embot-os-hw.cpp</Filename>
+          <Filename>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\h7disco\../src/main-embot-os-hw.cpp\248</Expression>
+          <Expression>\\h7disco\../../../../../embot/hw/embot_hw_chip_M95512DF.cpp\81</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -449,6 +449,16 @@
           <count>3</count>
           <WinNumber>1</WinNumber>
           <ItemText>initialised2dmask</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>done</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>ciao</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -1715,6 +1725,18 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os_theScheduler.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>6</GroupNumber>
+      <FileNumber>22</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_chip_M95512DF.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -1730,7 +1752,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>22</FileNumber>
+      <FileNumber>23</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1742,7 +1764,7 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>23</FileNumber>
+      <FileNumber>24</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1754,25 +1776,13 @@
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
-      <FileNumber>24</FileNumber>
+      <FileNumber>25</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\embot\os\embot_os_theCallbackManager.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_os_theCallbackManager.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>7</GroupNumber>
-      <FileNumber>25</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_os_theScheduler.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -167,8 +167,7 @@ int main(void)
 #if defined(TEST_EMBOT_HW_EEPROM)
 #include "embot_hw_eeprom.h"
 
-//constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
-constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::two};
+constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
 
 #endif
 
@@ -192,6 +191,20 @@ void test_embot_hw_init()
 //    if(embot::hw::resOK == embot::hw::eeprom::init(eeprom2test, {});
 
     embot::hw::eeprom::init(eeprom2test, {});
+    
+     
+    uint32_t ciao[3] = {1, 2, 3};
+    void *arg {ciao}; 
+    auto lambda = [](void *p){ 
+         
+        uint32_t *data = reinterpret_cast<uint32_t*>(p);
+        data[1] = 7;
+    };
+    embot::core::Callback cbk1 {lambda, &ciao};
+    
+    cbk1.execute();
+    
+    ciao[1] = ciao[1];
 
 #endif
     

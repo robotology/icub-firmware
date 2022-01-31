@@ -45,6 +45,62 @@ using namespace embot::core::binary;
 // - specialize the bsp
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(EMBOT_ENABLE_hw_spi_123)    
+#include "embot_hw_gpio.h"
+// it select spi1 / spi2 / spi3 in connector J5
+void prepare_connector_j5_spi123()
+{
+    constexpr embot::hw::gpio::Config out 
+    {
+        embot::hw::gpio::Mode::OUTPUTpushpull, 
+        embot::hw::gpio::Pull::nopull,
+        embot::hw::gpio::Speed::medium
+    };
+    
+    constexpr embot::hw::gpio::State stateSPI[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::SET};
+    
+    constexpr embot::hw::GPIO X1ENspi1[2] = 
+    {
+        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::zero},
+        {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::eight}
+    };
+
+    constexpr embot::hw::GPIO X2ENspi2[2] = 
+    {
+        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::one},
+        {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::nine}
+    };    
+    
+    constexpr embot::hw::GPIO X3ENspi3[2] = 
+    {
+        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::two},
+        {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::ten}
+    };     
+       
+    // spi1
+    for(uint8_t i=0; i<2; i++)
+    {
+        embot::hw::gpio::init(X1ENspi1[i], out);
+        embot::hw::gpio::set(X1ENspi1[i], stateSPI[i]);
+    }  
+    
+    // spi2
+    for(uint8_t i=0; i<2; i++)
+    {
+        embot::hw::gpio::init(X2ENspi2[i], out);
+        embot::hw::gpio::set(X2ENspi2[i], stateSPI[i]);
+    }  
+    
+    // spi3
+    for(uint8_t i=0; i<2; i++)
+    {
+        embot::hw::gpio::init(X3ENspi3[i], out);
+        embot::hw::gpio::set(X3ENspi3[i], stateSPI[i]);
+    }  
+    
+}
+#endif
+
 #if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
 bool embot::hw::bsp::specialize() { return true; }
 #else   
@@ -54,6 +110,11 @@ bool embot::hw::bsp::specialize() { return true; }
        
     bool embot::hw::bsp::specialize()
     {
+
+#if defined(EMBOT_ENABLE_hw_spi_123)        
+        // 1. prepare spi1, spi2, spi3
+        prepare_connector_j5_spi123();
+#endif        
         return true;
     }
 
@@ -600,16 +661,11 @@ namespace embot { namespace hw { namespace eeprom {
     
     #if defined(STM32HAL_BOARD_AMC)
         
-    // ...
-    constexpr PROP ee1p = { embot::hw::eeprom::Type::spiM95512DF, 
-                            {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::thirteen}, 
-                            {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eight}, 
-                            {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::twelve},
-                             embot::hw::SPI::six
-                          };  
-    constexpr PROP ee2p = { embot::hw::eeprom::Type::chipM95512DF, 
+    constexpr PROP ee1p = { embot::hw::eeprom::Type::chipM95512DF, 
                             {   
-                                embot::hw::SPI::six,
+                                embot::hw::SPI::six, 
+                                //{},
+                                {embot::hw::spi::Prescaler::eight, embot::hw::spi::DataSize::eight, embot::hw::spi::Mode::zero},
                                 {
                                     {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eight},    // nS
                                     {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::twelve},   // nW
@@ -625,10 +681,10 @@ namespace embot { namespace hw { namespace eeprom {
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(EEPROM::one) | mask::pos2mask<uint32_t>(EEPROM::two),        
+        mask::pos2mask<uint32_t>(EEPROM::one),        
         // properties
         {{
-            &ee1p, &ee2p            
+            &ee1p, nullptr            
         }}        
     };
     
@@ -674,24 +730,29 @@ namespace embot { namespace hw { namespace spi {
 namespace embot { namespace hw { namespace spi {
     
     #if defined(STM32HAL_BOARD_AMC)
-        
-    // ...
-    constexpr PROP spi6p = { &hspi6, 12500000 };  
     
-    static_assert(spi6p.speed == 12.5*1000000, "SPI::six is now 12.5Mhz and must be changed inside MX_SPI6_Init()");
+    // for spi1,2,3,4: define a hspix, fill it properly in here, define the pins, fill them inside the HAL_SPI_MspInit() and HAL_SPI_MspDeInit() ...
+//    constexpr PROP spi1p = { &hspi1, 50*1000*1000}; 
+//    constexpr PROP spi2p = { &hspi2, 50*1000*1000};
+//    constexpr PROP spi3p = { &hspi3, 50*1000*1000};
+//    constexpr PROP spi4p = { &hspi4, 100*1000*1000};
+    constexpr PROP spi6p = { &hspi6, 100*1000*1000}; 
+    constexpr PROP spi5p = { &hspi5, 100*1000*1000};    
+    
+    static_assert(spi6p.clockrate == 100*1000*1000, "SPI::six is now 12.5Mhz and must be changed inside MX_SPI6_Init()");
     // SPI::six is used @ 12.Mhz by a M95512-DFMC6 EEPROM and must be < 16MHz
     
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(SPI::six),        
+        mask::pos2mask<uint32_t>(SPI::five) | mask::pos2mask<uint32_t>(SPI::six),        
         // properties
         {{
-            nullptr, nullptr, nullptr, nullptr, nullptr, &spi6p            
+            nullptr, nullptr, nullptr, nullptr, &spi5p, &spi6p            
         }}        
     };
     
     
-    bool BSP::init(embot::hw::SPI h) const
+    bool BSP::init(embot::hw::SPI h, const Config &config) const
     {
         // marco.accame: in here ... MX_SPI6_Ini() calls HAL_SPI_Init() and imposes the speed 
         // and the low level configuration specified inside cube-mx. 
@@ -699,12 +760,46 @@ namespace embot { namespace hw { namespace spi {
         // of spi sensors (e.g., aea, aea3, AksIM-2, ...) then we must be able to call HAL_SPI_Init()
         // with the parameters we want.
         // conclusion: we shall move HAL_SPI_Init() out of BSP::init() and inside embot::hw::spi::init()
-        if(h == SPI::six)
-        {            
-            MX_SPI6_Init();
-            // HAL_SPI_MspInit(&hspi6); // it is called inside HAL_SPI_Init()
+        if(h == SPI::five)
+        { 
+            MX_SPI5_Init();
+        }
+        else if(h == SPI::six)
+        { 
+            if(false == config.isvalid())
+            {                
+                MX_SPI6_Init();
+                // HAL_SPI_MspInit(&hspi6); // it is called inside HAL_SPI_Init()
+            }
+            else
+            {                                
+                hspi6.Instance = SPI6;
+                hspi6.Init.Mode = SPI_MODE_MASTER;
+                hspi6.Init.Direction = SPI_DIRECTION_2LINES;
+                hspi6.Init.DataSize = datasize2stm32(config.datasize);;
+                hspi6.Init.CLKPolarity = mode2stm32clkpolarity(config.mode);
+                hspi6.Init.CLKPhase = mode2stm32clkphase(config.mode);
+                hspi6.Init.NSS = SPI_NSS_SOFT;
+                hspi6.Init.BaudRatePrescaler = prescaler2stm32baudrateprescaler(config.prescaler);
+                hspi6.Init.FirstBit = SPI_FIRSTBIT_MSB;
+                hspi6.Init.TIMode = SPI_TIMODE_DISABLE;
+                hspi6.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+                hspi6.Init.CRCPolynomial = 0x0;
+                hspi6.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+                hspi6.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
+                hspi6.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
+                hspi6.Init.TxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
+                hspi6.Init.RxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
+                hspi6.Init.MasterSSIdleness = SPI_MASTER_SS_IDLENESS_00CYCLE;
+                hspi6.Init.MasterInterDataIdleness = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
+                hspi6.Init.MasterReceiverAutoSusp = SPI_MASTER_RX_AUTOSUSP_DISABLE;
+                hspi6.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_DISABLE;
+                hspi6.Init.IOSwap = SPI_IO_SWAP_DISABLE;
+                HAL_SPI_Init(&hspi6);                             
+            }
             return true;
         } 
+
 
         return false;
         // the new rule could be:
@@ -716,7 +811,11 @@ namespace embot { namespace hw { namespace spi {
 
     bool BSP::deinit(embot::hw::SPI h) const
     {
-        if(h == SPI::six)
+        if(h == SPI::five)
+        { 
+            HAL_SPI_DeInit(&hspi5);
+        }
+        else if(h == SPI::six)
         {
             HAL_SPI_DeInit(&hspi6);
             // HAL_SPI_MspDeInit(&hspi6); // // it is called inside HAL_SPI_DeInit()

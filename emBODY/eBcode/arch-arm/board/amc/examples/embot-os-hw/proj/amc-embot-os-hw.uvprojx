@@ -579,6 +579,11 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -602,11 +607,6 @@
               <FileName>embot_os_theCallbackManager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\os\embot_os_theCallbackManager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_os_theTimerManager.cpp</FileName>
@@ -959,7 +959,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1225,6 +1225,11 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -1248,11 +1253,6 @@
               <FileName>embot_os_theCallbackManager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\os\embot_os_theCallbackManager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_os_theTimerManager.cpp</FileName>
@@ -1922,6 +1922,11 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -1945,11 +1950,6 @@
               <FileName>embot_os_theCallbackManager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\os\embot_os_theCallbackManager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_os_theTimerManager.cpp</FileName>
@@ -2619,6 +2619,11 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -2642,11 +2647,6 @@
               <FileName>embot_os_theCallbackManager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\os\embot_os_theCallbackManager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_os_theTimerManager.cpp</FileName>
@@ -3316,6 +3316,11 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -3339,11 +3344,6 @@
               <FileName>embot_os_theCallbackManager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\os\embot_os_theCallbackManager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_os_theTimerManager.cpp</FileName>
@@ -3962,6 +3962,11 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -3985,11 +3990,6 @@
               <FileName>embot_os_theCallbackManager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\os\embot_os_theCallbackManager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_os_theTimerManager.cpp</FileName>
