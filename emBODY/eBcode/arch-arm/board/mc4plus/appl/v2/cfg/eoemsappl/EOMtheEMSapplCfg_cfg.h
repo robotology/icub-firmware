@@ -87,22 +87,22 @@ extern "C" {
 //  <o> minor           <0-255> 
 
 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          46
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          47
 
 
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2030>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2021
+#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2022
 //  <o> month           <1-12>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        1
 //  <o> day             <1-31>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          15
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          28
 //  <o> hour            <0-23>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         16
 //  <o> minute          <0-59>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          35
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          50
 
 //  </h>build date
 
