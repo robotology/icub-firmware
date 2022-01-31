@@ -19,8 +19,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_HW_BUTTON_H_
-#define _EMBOT_HW_BUTTON_H_
+#ifndef __EMBOT_HW_BUTTON_H_
+#define __EMBOT_HW_BUTTON_H_
 
 #include "embot_core.h"
 #include "embot_hw_types.h"

@@ -23,6 +23,12 @@
     #define EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
+    #define EMBOT_ENABLE_hw_eeprom
+//    #define EMBOT_ENABLE_hw_eeprom_emulatedMODE
+    
+    #define EMBOT_ENABLE_hw_spi
+//    #define EMBOT_ENABLE_hw_spi_123
+    
 //    #define EMBOT_ENABLE_hw_button
 //    #define EMBOT_ENABLE_hw_can
     #undef EMBOT_ENABLE_hw_flash
