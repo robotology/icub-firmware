@@ -62,36 +62,7 @@ You can use the following code, as long as the settings for SPI are specified by
 ```c++
 #include "embot_hw_chip_M95512DF.h"
 
-embot::hw::chip::M95512DF *chipM95512DF {nullptr};
-constexpr embot::hw::chip::M95512DF::Config cfg 
-{
-    embot::hw::SPI::six,  // the spi bus
-    {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eight},    // nS
-    {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::twelve},   // nW
-    {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::thirteen}  // nHOLD        
-};
-constexpr embot::hw::chip::M95512DF::ADR adr {64};
-uint8_t bytes2write[8] {1, 2, 3, 4, 5, 6, 7, 8};
-const embot::core::Data data2write {bytes2write, sizeof(bytes2write)};
-uint8_t bytes2read[4] {0};
-embot::core::Data data2read {bytes2read, sizeof(bytes2read)}; 
-       
-chipM95512DF = new embot::hw::chip::M95512DF;
-bool ok {false};
-if(true == chipM95512DF->init(cfg))
-{         
-    if(true == chipM95512DF->write(adr, data2write))
-    {
-        if(true == chipM95512DF->read(adr+1, data2read))
-        {
-            ok = (bytes2read[0] == bytes2write[1]) ? true : false;
-        }
-    }                   
-}
-
-delete chipM95512DF;
-
-embot::core::print(ok ? "test chipM95512DF: OK" : "test chipM95512DF: KO");
+bool ok = embot::hw::chip::M95512DF::testof_M95512DF();
 
 ```
 
@@ -142,11 +113,12 @@ namespace embot { namespace hw { namespace chip {
                                 
         struct Config
         {   // contains: spi bus and pin control            
-            embot::hw::SPI spi {embot::hw::SPI::none}; 
+            embot::hw::SPI spi {embot::hw::SPI::none};
+            embot::hw::spi::Config spicfg {};
             PinControl pincontrol {};                
             constexpr Config() = default;
-            constexpr Config(embot::hw::SPI s, const PinControl &pc) 
-                : spi(s), pincontrol(pc) {}   
+                constexpr Config(embot::hw::SPI s, const embot::hw::spi::Config &sc, const PinControl &pc) 
+                : spi(s), spicfg(sc), pincontrol(pc) {}   
             constexpr bool isvalid() const { 
                 return embot::hw::spi::supported(spi) && pincontrol.isvalid(); 
             }
@@ -175,7 +147,7 @@ namespace embot { namespace hw { namespace chip {
 #if defined(EMBOT_HW_CHIP_M95512DF_enable_test)    
 namespace embot { namespace hw { namespace chip {
     // it tests the chip and offers an example of use
-    void testof_M95512DF();
+    bool testof_M95512DF();
 }}}
 #endif
 

@@ -17,7 +17,7 @@
 
 namespace embot { namespace hw { namespace eeprom {
     
-    using ADR = uint16_t;
+    using ADR = uint32_t;
         
     struct Config
     {   
@@ -29,10 +29,12 @@ namespace embot { namespace hw { namespace eeprom {
 
     bool supported(EEPROM ee);    
     bool initialised(EEPROM ee);        
-    result_t init(EEPROM ee, const Config &cfg);
+    result_t init(EEPROM ee, const Config &cfg);    
     
     const Config & config(EEPROM ee);    
     
+    // it gets the size of the initialised eepprom.it returns 0 if initialised() is false 
+    size_t size(EEPROM ee);
     
     // BLOCKING READ. 
     // it reads starting from address adr a total of destination.capacity bytes and waits until a timeout. 

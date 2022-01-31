@@ -20,7 +20,33 @@
 namespace embot { namespace hw { namespace spi {
     
 #if   defined(HAL_SPI_MODULE_ENABLED)    
+    
     using SPI_Handle = SPI_HandleTypeDef;
+    
+    constexpr uint32_t mode2stm32clkpolarity(const Mode m)
+    {
+        if(Mode::none == m) { return SPI_POLARITY_LOW; }
+        bool polhigh = embot::core::binary::bit::check(embot::core::tointegral(m), 1);
+        return (true == polhigh) ? SPI_POLARITY_HIGH : SPI_POLARITY_LOW;
+    }
+    
+    constexpr uint32_t mode2stm32clkphase(const Mode m)
+    {
+        if(Mode::none == m) { return SPI_PHASE_1EDGE; }
+        bool phaedge2 = embot::core::binary::bit::check(embot::core::tointegral(m), 0);
+        return (true == phaedge2) ? SPI_PHASE_2EDGE : SPI_PHASE_1EDGE;;
+    }
+    
+    constexpr uint32_t datasize2stm32(DataSize d)
+    {
+        return embot::core::tointegral(d);
+    }
+    
+    constexpr uint32_t prescaler2stm32baudrateprescaler(Prescaler p)
+    {
+        return static_cast<uint32_t>(p) << 28;
+    }
+    
 #else
     using SPI_Handle = void;
 #endif
@@ -28,10 +54,17 @@ namespace embot { namespace hw { namespace spi {
     struct PROP
     {     
         SPI_Handle* handle {nullptr}; 
-        embot::hw::spi::Speed speed {12500};
+        uint32_t clockrate {0};
         constexpr PROP() = default;
-        constexpr PROP(SPI_Handle *h, embot::hw::spi::Speed s) : handle(h), speed(s) {}
-        constexpr PROP(SPI_Handle *h) : handle(h) {}            
+        constexpr PROP(SPI_Handle *h, uint32_t c) : handle(h), clockrate(c) {}
+        constexpr PROP(SPI_Handle *h) : handle(h) {} 
+        constexpr Speed prescalertospeed(Prescaler p) const { return clockrate >> (1+embot::core::tointegral(p)); } 
+        constexpr Prescaler speedtoprescaler(Speed s) const
+        { 
+            if(s > clockrate/2) return Prescaler::none; 
+            for(uint8_t i=0; i<8; i++) { if((clockrate >> (i+1))<=s) return static_cast<Prescaler>(i); }
+            return Prescaler::none;
+        }; 
     };
        
     struct BSP : public embot::hw::bsp::SUPP
@@ -42,7 +75,7 @@ namespace embot { namespace hw { namespace spi {
             
         std::array<const PROP*, maxnumberof> properties;    
         constexpr const PROP * getPROP(embot::hw::SPI h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
-        bool init(embot::hw::SPI h) const;
+        bool init(embot::hw::SPI h, const Config &config) const;
         bool deinit(embot::hw::SPI h) const;
         constexpr embot::hw::SPI toID(const PROP& p) const
         { 

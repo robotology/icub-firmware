@@ -21,7 +21,7 @@
 
 namespace embot { namespace hw { namespace eeprom {
     
-    enum class Type { none, chipM95512DF, flashEMULATED, heapTEST, spiM95512DF };
+    enum class Type { none, chipM95512DF, flashEMULATED, heapTEST}; //, spiM95512DF };
 
     struct nonePROP
     {
@@ -29,15 +29,15 @@ namespace embot { namespace hw { namespace eeprom {
         constexpr nonePROP() = default;           
     };
     
-    struct spiPROP
-    {
-        embot::hw::SPI bus {embot::hw::SPI::none};
-        embot::hw::GPIO hold {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};
-        embot::hw::GPIO sel {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};   
-        embot::hw::GPIO wp {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};   
-        constexpr spiPROP(const embot::hw::GPIO &h,  const embot::hw::GPIO &s, const embot::hw::GPIO &w, embot::hw::SPI b) : bus(b), hold(h), sel(s), wp(w) {}; 
-        constexpr spiPROP() = default;           
-    };
+//    struct spiPROP
+//    {
+//        embot::hw::SPI bus {embot::hw::SPI::none};
+//        embot::hw::GPIO hold {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};
+//        embot::hw::GPIO sel {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};   
+//        embot::hw::GPIO wp {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};   
+//        constexpr spiPROP(const embot::hw::GPIO &h,  const embot::hw::GPIO &s, const embot::hw::GPIO &w, embot::hw::SPI b) : bus(b), hold(h), sel(s), wp(w) {}; 
+//        constexpr spiPROP() = default;           
+//    };
 
     
     struct flashPROP
@@ -60,12 +60,12 @@ namespace embot { namespace hw { namespace eeprom {
         embot::hw::chip::M95512DF::Config chipM95512DFcfg;
         flashPROP flash;    
         heapPROP heap;
-        spiPROP spi;
+//        spiPROP spi;
         constexpr multiPROP() : none(0) {}; 
         constexpr multiPROP(const embot::hw::chip::M95512DF::Config &cc) : chipM95512DFcfg(cc) {};
         constexpr multiPROP(const flashPROP &fl) : flash(fl) {}; 
         constexpr multiPROP(const heapPROP &hp) : heap(hp) {};
-        constexpr multiPROP(const spiPROP &sp) : spi(sp) {};
+//        constexpr multiPROP(const spiPROP &sp) : spi(sp) {};
     };
     
     struct PROP
@@ -75,8 +75,8 @@ namespace embot { namespace hw { namespace eeprom {
         constexpr PROP() = default;
         constexpr PROP(embot::hw::eeprom::Type t, const embot::hw::chip::M95512DF::Config &cc)
             : type(Type::chipM95512DF), multi(cc) {}
-        constexpr PROP(embot::hw::eeprom::Type t, const embot::hw::GPIO &h,  const embot::hw::GPIO &s, const embot::hw::GPIO &w, embot::hw::SPI b) 
-            : type(Type::spiM95512DF), multi({h, s, w, b}) {};
+//        constexpr PROP(embot::hw::eeprom::Type t, const embot::hw::GPIO &h,  const embot::hw::GPIO &s, const embot::hw::GPIO &w, embot::hw::SPI b) 
+//            : type(Type::spiM95512DF), multi({h, s, w, b}) {};
         constexpr PROP(embot::hw::eeprom::Type t, const embot::hw::Partition &pa) 
             : type(Type::flashEMULATED), multi(pa) {};
         constexpr PROP(embot::hw::eeprom::Type t, size_t s) 

@@ -19,7 +19,7 @@
 #if defined(EMBOT_HW_CHIP_M95512DF_enable_test)    
 
 // it tests the chip and offers an example of use
-void embot::hw::chip::testof_M95512DF()
+bool embot::hw::chip::testof_M95512DF()
 {    
     // this configuration tells about which spi bus to use, which are the control pins
     // and their low level GPIO configuration
@@ -34,6 +34,8 @@ void embot::hw::chip::testof_M95512DF()
     constexpr embot::hw::chip::M95512DF::Config cfg 
     {
         embot::hw::SPI::six,  // the spi bus
+        //{}, // dummy spi config
+        {embot::hw::spi::Prescaler::eight, embot::hw::spi::DataSize::eight, embot::hw::spi::Mode::zero},
         {   // the control pins
             {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eight},    // nS
             {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::twelve},   // nW
@@ -48,11 +50,11 @@ void embot::hw::chip::testof_M95512DF()
     
     // address in EEPROM, data to write, destination for data to read
     constexpr embot::hw::chip::M95512DF::ADR adr {64};
-    uint8_t bytes2write[8] {1, 2, 3, 4, 5, 6, 7, 8};
-    const embot::core::Data data2write {bytes2write, sizeof(bytes2write)};
+    static constexpr uint8_t bytes2write[8] {1, 2, 3, 4, 5, 6, 7, 8};
+    constexpr embot::core::Data data2write {bytes2write, sizeof(bytes2write)};
     uint8_t bytes2read[4] {0};
     embot::core::Data data2read {bytes2read, sizeof(bytes2read)}; 
-    
+        
     // step 01: create the object
     embot::hw::chip::M95512DF *chipM95512DF = new embot::hw::chip::M95512DF;
     
@@ -80,6 +82,8 @@ void embot::hw::chip::testof_M95512DF()
     
     // step 07: delete the object: the destructor also deinits
     delete chipM95512DF;
+    
+    return ok;
 }
 
 
@@ -100,9 +104,12 @@ void embot::hw::chip::testof_M95512DF()
 #include "embot_hw_gpio.h"
 #include "embot_hw_spi.h"
 
+//#define SPI_USE_NON_BLOCKING
+
 using namespace std;
 
 using namespace embot::hw;
+
 
     
 struct embot::hw::chip::M95512DF::Impl
@@ -212,7 +219,7 @@ bool embot::hw::chip::M95512DF::Impl::init(const Config &cfg)
     
     hold(false);
     writeprotect(false);
-    if(resOK == embot::hw::spi::init(_config.spi, {}))
+    if(resOK == embot::hw::spi::init(_config.spi, _config.spicfg))
     {
         _initted =  true;
     }
@@ -314,14 +321,36 @@ void embot::hw::chip::M95512DF::Impl::writeprotect(bool enable)
     embot::hw::gpio::set(_config.pincontrol.nW, enable ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET);
 }    
 
+#if defined(SPI_USE_NON_BLOCKING)
+volatile bool done {false};
+void oncompletion(void *p)
+{ 
+    done = true;
+}
+#endif
+
 bool embot::hw::chip::M95512DF::Impl::send(const embot::core::Data &data)
 {
-    return (resOK == embot::hw::spi::write(_config.spi, data, deftimeout)) ? true : false;            
+#if defined(SPI_USE_NON_BLOCKING)
+    done = false;
+    embot::hw::spi::write(_config.spi, data, {oncompletion, nullptr});    
+    for(;;) { if(done) break; }
+    return true;  
+#else    
+    return (resOK == embot::hw::spi::write(_config.spi, data, deftimeout)) ? true : false;   
+#endif    
 }
 
 bool embot::hw::chip::M95512DF::Impl::recv(embot::core::Data &dd)
 {
-    return (resOK == embot::hw::spi::read(_config.spi, dd, deftimeout)) ? true : false;            
+#if defined(SPI_USE_NON_BLOCKING)
+    done = false;
+    embot::hw::spi::read(_config.spi, dd, {oncompletion, nullptr});
+    for(;;) { if(done) break; }
+    return true;    
+#else    
+    return (resOK == embot::hw::spi::read(_config.spi, dd, deftimeout)) ? true : false;  
+#endif    
 }
 
 bool embot::hw::chip::M95512DF::Impl::cmd(CMD c)
