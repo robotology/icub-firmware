@@ -310,8 +310,9 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     
     o->temperature_max = config->temperatureLimit;
 
-    o->pos_min = config->limitsofrotor.min;
-    o->pos_max = config->limitsofrotor.max;    
+    // TODO: Fix
+    o->pos_min = 0; //config->limitsofrotor.min;
+    o->pos_max = 0; //config->limitsofrotor.max;    
     o->vel_max = config->maxvelocityofmotor;
     
     o->Iqq_max = config->pidcurrent.limitonoutput;
@@ -1153,21 +1154,20 @@ void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
         //o->outOfLimitsSignaled = FALSE;
     }
 }
-#include <hal_trace.h>
 
 void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref)
-{
+{   
     if (o->pos_min != o->pos_max)
     {        
-//        if ((o->pos_raw_cal_fbk < o->pos_min) && (Iqq_ref < 0))           // CHIEDERE A VALE GAGGE
-//        {
-//            o->output = o->Iqq_ref = 0;
-//        }
-//        else if ((o->pos_raw_cal_fbk > o->pos_max) && (Iqq_ref > 0))
-//        {
-//            o->output = o->Iqq_ref = 0;
-//        }
-//        else
+        if ((o->pos_raw_cal_fbk < o->pos_min) && (Iqq_ref < 0))
+        {
+            o->output = o->Iqq_ref = 0;
+        }
+        else if ((o->pos_raw_cal_fbk > o->pos_max) && (Iqq_ref > 0))
+        {
+            o->output = o->Iqq_ref = 0;
+        }
+        else
         {
             o->output = o->Iqq_ref = CUT(Iqq_ref, o->Iqq_max);
         }
