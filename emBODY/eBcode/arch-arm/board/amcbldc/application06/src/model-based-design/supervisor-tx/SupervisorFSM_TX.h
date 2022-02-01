@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.15
+// Model version                  : 3.27
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu Jan 13 14:09:44 2022
+// C/C++ source code generated on : Mon Jan 31 18:31:42 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -34,11 +34,13 @@ namespace amc_bldc_codegen
     // Block signals for model 'SupervisorFSM_TX'
     struct B_SupervisorFSM_TX_T {
       boolean_T ev_foc;                // '<Root>/SupervisorFSM_TX'
+      boolean_T ev_status;             // '<Root>/SupervisorFSM_TX'
     };
 
     // Block states (default storage) for model 'SupervisorFSM_TX'
     struct DW_SupervisorFSM_TX_T {
       uint32_T ev_focEventCounter;     // '<Root>/SupervisorFSM_TX'
+      uint32_T ev_statusEventCounter;  // '<Root>/SupervisorFSM_TX'
       uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
     };
 
@@ -52,11 +54,11 @@ namespace amc_bldc_codegen
       const;
 
     // model step function
-    void step(const BUS_MESSAGES_RX &arg_MessagesRx, const SensorsData &
-              arg_SensorsData, const EstimatedData &arg_EstimatedData, const
-              ControlOutputs &arg_Input, BUS_MESSAGES_TX &arg_MessagesTx,
-              BUS_EVENTS_TX &arg_EventsTx, ConfigurationParameters
-              *arg_ControlOutputs1);
+    void step(const Flags &arg_Flags, const SensorsData &arg_SensorsData, const
+              EstimatedData &arg_EstimatedData, const ControlOutputs &
+              arg_ControlOutputs, const ConfigurationParameters &
+              arg_ConfigurationParameters, BUS_MESSAGES_TX &arg_MessagesTx,
+              BUS_EVENTS_TX &arg_EventsTx);
 
     // Real-Time Model get method
     amc_bldc_codegen::SupervisorFSM_TX::RT_MODEL_SupervisorFSM_TX_T * getRTM();
@@ -78,6 +80,9 @@ namespace amc_bldc_codegen
 
     // private data and function members
    private:
+    // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
+    MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode);
+
     // Real-Time Model
     RT_MODEL_SupervisorFSM_TX_T SupervisorFSM_TX_M;
   };

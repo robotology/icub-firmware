@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.145
+// Model version                  : 3.156
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Jan 14 20:50:46 2022
+// C/C++ source code generated on : Mon Jan 31 18:31:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -30,6 +30,18 @@
 
 // user code (top of header file)
 #include "rtw_enable_disable_motors.h"
+
+//
+//  Exported Global Parameters
+//
+//  Note: Exported global parameters are tunable parameters with an exported
+//  global storage class designation.  Code generation will declare the memory for
+//  these parameters and exports their symbols.
+//
+
+extern ConfigurationParameters InitConfParams;// Variable: InitConfParams
+                                                 //  Referenced by: '<Root>/SupervisorFSM_RX'
+
 
 // Class declaration for model SupervisorFSM_RX
 namespace amc_bldc_codegen
@@ -81,15 +93,16 @@ namespace amc_bldc_codegen
 
     // Initial conditions function
     void init(Flags *arg_Flags, Targets *arg_Targets, ConfigurationParameters
-              *arg_Output);
+              *arg_ConfigurationParameters);
 
     // model step function
-    void step(const BUS_EVENTS_RX &arg_EventsRx, const BUS_MESSAGES_RX &
-              arg_MessagesRx, const BUS_CAN_RX_ERRORS &arg_ErrorsRx, const
-              EstimatedData &arg_EstimatedData, const SensorsData &
-              arg_SensorsData, const ControlOutputs &arg_ControlOutputs, Targets
-              &arg_Targets, ConfigurationParameters &arg_Output, Flags &
-              arg_Flags, ExternalFlags *arg_SensorsData1);
+    void step(const BUS_EVENTS_RX_MULTIPLE &arg_EventsRx, const
+              BUS_MESSAGES_RX_MULTIPLE &arg_MessagesRx, const
+              BUS_CAN_RX_ERRORS_MULTIPLE &arg_ErrorsRx, const EstimatedData &
+              arg_EstimatedData, const SensorsData &arg_SensorsData, const
+              ControlOutputs &arg_ControlOutputs, const ExternalFlags &
+              arg_ExternalFlags, Targets &arg_Targets, ConfigurationParameters &
+              arg_ConfigurationParameters, Flags &arg_Flags);
 
     // Real-Time Model get method
     amc_bldc_codegen::SupervisorFSM_RX::RT_MODEL_SupervisorFSM_RX_T * getRTM();
@@ -110,23 +123,24 @@ namespace amc_bldc_codegen
    private:
     // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
     ControlModes SupervisorFSM_RX_convert(MCControlModes mccontrolmode);
-    boolean_T SupervisorFSM_RX_IsNewCtrl_Idle(const BUS_MESSAGES_RX
+    boolean_T SupervisorFSM_RX_IsNewCtrl_Idle(const BUS_MESSAGES_RX_MULTIPLE
       *arg_MessagesRx);
-    boolean_T SupervisorFS_IsNewCtrl_Position(const BUS_MESSAGES_RX
+    boolean_T SupervisorFS_IsNewCtrl_Position(const BUS_MESSAGES_RX_MULTIPLE
       *arg_MessagesRx);
-    boolean_T SupervisorFSM_IsNewCtrl_Current(const BUS_MESSAGES_RX
+    boolean_T SupervisorFSM_IsNewCtrl_Current(const BUS_MESSAGES_RX_MULTIPLE
       *arg_MessagesRx);
-    boolean_T SupervisorFSM_IsNewCtrl_Voltage(const BUS_MESSAGES_RX
+    boolean_T SupervisorFSM_IsNewCtrl_Voltage(const BUS_MESSAGES_RX_MULTIPLE
       *arg_MessagesRx);
-    boolean_T SupervisorFS_IsNewCtrl_Velocity(const BUS_MESSAGES_RX
+    boolean_T SupervisorFS_IsNewCtrl_Velocity(const BUS_MESSAGES_RX_MULTIPLE
       *arg_MessagesRx);
     void SupervisorFSM_RX_Current(const SensorsData *arg_SensorsData, const
-      BUS_MESSAGES_RX *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets);
+      BUS_MESSAGES_RX_MULTIPLE *arg_MessagesRx, Flags *arg_Flags, Targets
+      *arg_Targets);
     boolean_T SupervisorFSM_RX_IsBoardReady(void) const;
     boolean_T SupervisorFS_isConfigurationSet(void) const;
     boolean_T SupervisorFSM_IsInHardwareFault(void) const;
     void Supervisor_CONTROL_MODE_HANDLER(const SensorsData *arg_SensorsData,
-      const ControlOutputs *arg_ControlOutputs, const BUS_MESSAGES_RX
+      const ControlOutputs *arg_ControlOutputs, const BUS_MESSAGES_RX_MULTIPLE
       *arg_MessagesRx, Flags *arg_Flags, Targets *arg_Targets);
     boolean_T SupervisorFSM_isBoardConfigured(void);
     real32_T SupervisorFSM_RX_ConvertPid(real32_T in, uint8_T shift);

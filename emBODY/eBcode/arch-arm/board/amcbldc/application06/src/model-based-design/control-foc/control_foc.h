@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.85
+// Model version                  : 2.87
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Jan 14 20:51:10 2022
+// C/C++ source code generated on : Mon Jan 31 18:32:04 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -39,22 +39,22 @@ namespace amc_bldc_codegen
    public:
     // Block states (default storage) for model 'control_foc'
     struct DW_control_foc_T {
-      real32_T FilterDifferentiatorTF_states;// '<S39>/Filter Differentiator TF' 
-      real32_T Integrator_DSTATE;      // '<S46>/Integrator'
-      real32_T FilterDifferentiatorTF_states_l;// '<S91>/Filter Differentiator TF' 
+      real32_T FilterDifferentiatorTF_states;// '<S91>/Filter Differentiator TF' 
       real32_T UnitDelay_DSTATE;       // '<S1>/Unit Delay'
-      real32_T Integrator_DSTATE_m;    // '<S98>/Integrator'
+      real32_T Integrator_DSTATE;      // '<S98>/Integrator'
+      real32_T FilterDifferentiatorTF_states_k;// '<S39>/Filter Differentiator TF' 
+      real32_T Integrator_DSTATE_o;    // '<S46>/Integrator'
       ControlModes DelayInput1_DSTATE; // '<S3>/Delay Input1'
-      real32_T FilterDifferentiatorTF_tmp;// '<S39>/Filter Differentiator TF'
-      real32_T FilterDifferentiatorTF_tmp_m;// '<S91>/Filter Differentiator TF'
-      int8_T Integrator_PrevResetState;// '<S46>/Integrator'
-      int8_T Integrator_PrevResetState_k;// '<S98>/Integrator'
+      real32_T FilterDifferentiatorTF_tmp;// '<S91>/Filter Differentiator TF'
+      real32_T FilterDifferentiatorTF_tmp_c;// '<S39>/Filter Differentiator TF'
+      int8_T Integrator_PrevResetState;// '<S98>/Integrator'
+      int8_T Integrator_PrevResetState_k;// '<S46>/Integrator'
     };
 
     // Zero-crossing (trigger) state for model 'control_foc'
     struct PrevZCX_control_foc_T {
-      ZCSigState FilterDifferentiatorTF_Reset_ZC;// '<S39>/Filter Differentiator TF' 
-      ZCSigState FilterDifferentiatorTF_Reset__m;// '<S91>/Filter Differentiator TF' 
+      ZCSigState FilterDifferentiatorTF_Reset_ZC;// '<S91>/Filter Differentiator TF' 
+      ZCSigState FilterDifferentiatorTF_Reset__o;// '<S39>/Filter Differentiator TF' 
     };
 
     // Real-time Model Data Structure

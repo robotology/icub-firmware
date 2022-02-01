@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.85
+// Model version                  : 2.87
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Jan 14 20:51:10 2022
+// C/C++ source code generated on : Mon Jan 31 18:32:04 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -51,7 +51,7 @@ namespace amc_bldc_codegen
     // initialize non-finites
     rt_InitInfAndNaN(sizeof(real_T));
     control_foc_PrevZCX.FilterDifferentiatorTF_Reset_ZC = POS_ZCSIG;
-    control_foc_PrevZCX.FilterDifferentiatorTF_Reset__m = POS_ZCSIG;
+    control_foc_PrevZCX.FilterDifferentiatorTF_Reset__o = POS_ZCSIG;
   }
 
   // Constructor

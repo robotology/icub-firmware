@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.35
+// Model version                  : 2.36
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu Jan 13 14:10:25 2022
+// C/C++ source code generated on : Mon Jan 31 18:32:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -57,8 +57,8 @@ namespace amc_bldc_codegen
     void init();
 
     // model step function
-    void step(const SensorsData &arg_SensorsData, EstimatedData &
-              arg_EstimatedData, ConfigurationParameters *arg_SensorsData1);
+    void step(const SensorsData &arg_SensorsData, const ConfigurationParameters
+              &arg_ConfigurationParameters, EstimatedData &arg_EstimatedData);
 
     // Real-Time Model get method
     amc_bldc_codegen::estimation_velocity::RT_MODEL_estimation_velocity_T

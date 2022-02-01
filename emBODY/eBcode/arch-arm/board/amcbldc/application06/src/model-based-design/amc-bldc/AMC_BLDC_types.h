@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.204
+// Model version                  : 3.268
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Jan 14 20:51:39 2022
+// C/C++ source code generated on : Tue Feb  1 17:28:15 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -85,7 +85,8 @@ struct Flags
 {
   // control mode
   ControlModes control_mode;
-  boolean_T DBG;
+  boolean_T enable_sending_msg_status;
+  boolean_T fault_button;
 };
 
 #endif
@@ -309,7 +310,10 @@ struct FOCSlowInputs
 
 struct ControlOutputs
 {
-  // control effort
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
   real32_T Vabc[3];
 
   // quadrature current
@@ -336,7 +340,10 @@ typedef enum {
   MCControlModes_Idle = 0,             // Default value
   MCControlModes_OpenLoop = 80,
   MCControlModes_SpeedVoltage = 10,
-  MCControlModes_Current = 6
+  MCControlModes_SpeedCurrent = 11,
+  MCControlModes_Current = 6,
+  MCControlModes_NotConfigured = 176,
+  MCControlModes_HWFault = 160
 } MCControlModes;
 
 #endif
@@ -427,6 +434,16 @@ struct BUS_MESSAGES_RX
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_MULTIPLE_
+
+struct BUS_MESSAGES_RX_MULTIPLE
+{
+  BUS_MESSAGES_RX messages[4];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
 #define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
 
@@ -437,6 +454,16 @@ struct BUS_EVENTS_RX
   boolean_T current_limit;
   boolean_T desired_current;
   boolean_T current_pid;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_MULTIPLE_
+
+struct BUS_EVENTS_RX_MULTIPLE
+{
+  BUS_EVENTS_RX events[4];
 };
 
 #endif
@@ -468,6 +495,16 @@ struct BUS_CAN_RX_ERRORS
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_MULTIPLE_
+
+struct BUS_CAN_RX_ERRORS_MULTIPLE
+{
+  BUS_CAN_RX_ERRORS errors[4];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
 #define DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
 
@@ -486,6 +523,63 @@ struct BUS_MSG_FOC
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_FLAGS_TX_
+#define DEFINED_TYPEDEF_FOR_BUS_FLAGS_TX_
+
+struct BUS_FLAGS_TX
+{
+  boolean_T dirty;
+  boolean_T stuck;
+  boolean_T index_broken;
+  boolean_T phase_broken;
+  real32_T not_calibrated;
+  boolean_T ExternalFaultAsserted;
+  boolean_T UnderVoltageFailure;
+  boolean_T OverVoltageFailure;
+  boolean_T OverCurrentFailure;
+  boolean_T DHESInvalidValue;
+  boolean_T AS5045CSumError;
+  boolean_T DHESInvalidSequence;
+  boolean_T CANInvalidProtocol;
+  boolean_T CAN_BufferOverRun;
+  boolean_T SetpointExpired;
+  boolean_T CAN_TXIsPasv;
+  boolean_T CAN_RXIsPasv;
+  boolean_T CAN_IsWarnTX;
+  boolean_T CAN_IsWarnRX;
+  boolean_T OverHeating;
+  boolean_T ADCCalFailure;
+  boolean_T I2TFailure;
+  boolean_T EMUROMFault;
+  boolean_T EMUROMCRCFault;
+  boolean_T EncoderFault;
+  boolean_T FirmwareSPITimingError;
+  boolean_T AS5045CalcError;
+  boolean_T FirmwarePWMFatalError;
+  boolean_T CAN_TXWasPasv;
+  boolean_T CAN_RXWasPasv;
+  boolean_T CAN_RTRFlagActive;
+  boolean_T CAN_WasWarn;
+  boolean_T CAN_DLCError;
+  boolean_T SiliconRevisionFault;
+  boolean_T PositionLimitUpper;
+  boolean_T PositionLimitLower;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_STATUS_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_STATUS_
+
+struct BUS_MSG_STATUS
+{
+  MCControlModes control_mode;
+  real32_T pwm_fbk;
+  BUS_FLAGS_TX flags;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_TX_
 #define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_TX_
 
@@ -493,6 +587,7 @@ struct BUS_MSG_FOC
 struct BUS_MESSAGES_TX
 {
   BUS_MSG_FOC foc;
+  BUS_MSG_STATUS status;
 };
 
 #endif
@@ -504,6 +599,7 @@ struct BUS_MESSAGES_TX
 struct BUS_EVENTS_TX
 {
   boolean_T foc;
+  boolean_T status;
 };
 
 #endif
@@ -528,10 +624,20 @@ struct BUS_CAN_PACKET
 
 struct BUS_CAN
 {
-  // Number of available output packets.
-  uint8_T available;
-  uint8_T lengths;
-  BUS_CAN_PACKET packets;
+  // If true, the packet is available to be processed.
+  boolean_T available;
+  uint8_T length;
+  BUS_CAN_PACKET packet;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
+
+struct BUS_CAN_MULTIPLE
+{
+  BUS_CAN packets[4];
 };
 
 #endif
@@ -608,19 +714,6 @@ struct BUS_CAN_PACKET_RX
 
   // PAYLOAD of the CAN packet.
   BUS_CAN_PAYLOAD_RX PAYLOAD;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_RX_
-
-// Specifies the CAN input.
-struct BUS_CAN_RX
-{
-  // Number of available input packets.
-  uint8_T available;
-  BUS_CAN_PACKET_RX packets;
 };
 
 #endif
