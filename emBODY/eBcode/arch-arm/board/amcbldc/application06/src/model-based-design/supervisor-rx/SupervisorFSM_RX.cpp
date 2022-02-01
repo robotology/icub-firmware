@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.144
+// Model version                  : 3.145
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Jan 14 15:25:19 2022
+// C/C++ source code generated on : Fri Jan 14 20:50:46 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,7 @@
 #include "SupervisorFSM_RX_private.h"
 #include "uMultiWord2Double.h"
 #include "uMultiWordShl.h"
+                        #include "embot_core.h"
 
 // Named constants for Chart: '<Root>/SupervisorFSM_RX'
 const int32_T Supe_event_OutOfBoardFaultEvent = 2;
@@ -336,6 +337,7 @@ namespace amc_bldc_codegen
 
           // Chart: '<Root>/SupervisorFSM_RX'
           arg_Flags->control_mode = ControlModes_Current;
+
         } else if (SupervisorFSM_IsNewCtrl_Voltage(arg_MessagesRx)) {
           // Chart: '<Root>/SupervisorFSM_RX'
           arg_Targets->motorvoltage.voltage =
@@ -388,6 +390,7 @@ namespace amc_bldc_codegen
 
             // Chart: '<Root>/SupervisorFSM_RX'
             arg_Flags->control_mode = ControlModes_Current;
+              
           } else if (SupervisorFS_IsNewCtrl_Position(arg_MessagesRx)) {
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
               SupervisorFSM_RX_IN_Position;
@@ -442,7 +445,8 @@ namespace amc_bldc_codegen
               SupervisorFSM_RX_IN_Current;
 
             // Chart: '<Root>/SupervisorFSM_RX'
-            arg_Flags->control_mode = ControlModes_Current;
+            arg_Flags->control_mode = ControlModes_Current; 
+              
           } else if (SupervisorFS_IsNewCtrl_Position(arg_MessagesRx)) {
             SupervisorFSM_RX_DW.is_CONTROL_MODE_HANDLER =
               SupervisorFSM_RX_IN_Position;
@@ -536,6 +540,7 @@ namespace amc_bldc_codegen
     // SystemInitialize for Chart: '<Root>/SupervisorFSM_RX'
     SupervisorFSM_RX_DW.sfEvent = SupervisorFSM_RX_CALL_EVENT;
     arg_Flags->control_mode = ControlModes_NotConfigured;
+    arg_Flags->DBG = false;
     arg_Targets->jointpositions.position = 0.0F;
     arg_Targets->jointvelocities.velocity = 0.0F;
     arg_Targets->motorcurrent.current = 0.0F;
@@ -699,6 +704,7 @@ namespace amc_bldc_codegen
               SupervisorFSM_RX_DW.EventsRx_desired_current_start) {
             arg_Targets.motorcurrent.current =
               arg_MessagesRx.desired_current.current;
+            arg_Flags.DBG = true;
             SupervisorFSM_RX_DW.is_EVENT_DISPATCHER = SupervisorFSM_RX_IN_Home;
           } else if (SupervisorFSM_RX_DW.EventsRx_control_mode_prev !=
                      SupervisorFSM_RX_DW.EventsRx_control_mode_start) {

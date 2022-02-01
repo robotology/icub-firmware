@@ -293,6 +293,9 @@ void Motor_init(Motor* o) //
     //o->outOfLimitsSignaled = FALSE;
 }
 
+// TODO: Fix
+//#define DEBUG_workaround_amcbldc
+
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
 {
     // const init
@@ -311,7 +314,8 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     o->temperature_max = config->temperatureLimit;
 
     o->pos_min = config->limitsofrotor.min;
-    o->pos_max = config->limitsofrotor.max;    
+    o->pos_max = config->limitsofrotor.max;
+
     o->vel_max = config->maxvelocityofmotor;
     
     o->Iqq_max = config->pidcurrent.limitonoutput;
@@ -1005,6 +1009,16 @@ void Motor_actuate(Motor* motor, uint8_t N) //
 {
     if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
     {
+        // TODO: Fix. Temporary workaround!
+        #ifdef DEBUG_workaround_amcbldc
+        // To be sure that amc_bldc/2foc can process all sent messages, we are sending 1 setpoint every 2ms
+        static uint8_t cnt = 0;
+        if((++cnt % 2) == 1)
+        {
+            return;
+        }
+        #endif
+        
         int16_t output[MAX_JOINTS_PER_BOARD] = {0};
     
         for (int m=0; m<N; ++m)
@@ -1148,7 +1162,7 @@ void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
 }
 
 void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref)
-{
+{   
     if (o->pos_min != o->pos_max)
     {        
         if ((o->pos_raw_cal_fbk < o->pos_min) && (Iqq_ref < 0))
