@@ -316,12 +316,6 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     o->pos_min = config->limitsofrotor.min;
     o->pos_max = config->limitsofrotor.max;
 
-    // TODO: Fix
-    #ifdef DEBUG_workaround_amcbldc
-    o->pos_min = 0;
-    o->pos_max = 0;
-    #endif
-
     o->vel_max = config->maxvelocityofmotor;
     
     o->Iqq_max = config->pidcurrent.limitonoutput;
