@@ -275,6 +275,8 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void 
     }
     
     impl->EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
+    impl->amc_bldc.AMC_BLDC_U.ExternalFlags_p.fault_button = impl->EXTFAULTisPRESSED;
+    
     
     if(true == impl->EXTFAULTisPRESSED)
     {
@@ -322,8 +324,10 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     size_t ninputframes = inpframes.size();
     if(0 == ninputframes) 
     {
-        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].available = false;            //TODO: check if correct
-        //amc_bldc.AMC_BLDC_U.PacketsRx.packets[1].available = false;
+        #pragma unroll
+        for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++) {
+            amc_bldc.AMC_BLDC_U.PacketsRx.packets[i].available = false;
+        }
     } 
     else
     {   
@@ -337,7 +341,6 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         // copy it
         frame.copyto(rx_id, rx_size, rx_data);
         
-        
 //        static uint32_t cnt = 0;
 //        if((++cnt % 500) == 1)
 //        {
@@ -347,25 +350,26 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         
         // clean up the first consumedframes positions
         inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);
-    }
-    
-    // save the first CAN frame into the input structure of the model
-    amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].available = true;
-    amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].length = (uint8_T)rx_size;
-    amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].packet.ID = (uint16_T)rx_id;
-    
-    // Actually, we fill the payload of the first packet only. Later we manage the case of multi packets.
-    #pragma unroll
-    for (uint8_t i = 0; i < rx_size; i++) 
-    {
-        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].packet.PAYLOAD[i] = (uint8_T)rx_data[i];
-        //amc_bldc.AMC_BLDC_U.PacketsRx_packets_PAYLOAD[i] = (uint8_T)rx_data[i];
-    }
-    
-    // remember that we can deal with only one packet yet at this stage
-    #pragma unroll
-    for (uint8_t i = 1; i < maxNumberOfPacketsCAN; i++) {
-      amc_bldc.AMC_BLDC_U.PacketsRx.packets[i].available = false;
+        
+        
+        // save the first CAN frame into the input structure of the model (TODO: we'll manage the other packets soon)
+        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].available = true;
+        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].length = (uint8_T)rx_size;
+        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].packet.ID = (uint16_T)rx_id;
+        
+        
+        // Actually, we fill the payload of the first packet only. Later we manage the case of multi packets.
+        #pragma unroll
+        for (uint8_t i = 0; i < rx_size; i++) 
+        {
+            amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].packet.PAYLOAD[i] = (uint8_T)rx_data[i];
+        }
+        
+        // remember that we can deal with only one packet yet at this stage
+        #pragma unroll
+        for (uint8_t i = 1; i < maxNumberOfPacketsCAN; i++) {
+            amc_bldc.AMC_BLDC_U.PacketsRx.packets[i].available = false;
+        }
     }
     
     
@@ -376,23 +380,16 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     amc_bldc.step_Time();
     
     
-    // if there is an output available, send it through the CAN
+    // if there an output is available, send it to the CAN Netowork
     for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++)
     {
         if (amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].available)
         {
-            //CAN_TX(PacketsTx.packets[i].packet, PacketsTx.packets[i].length);
-            embot::prot::can::Frame fr {amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].packet.ID, 8, amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].packet.PAYLOAD};
+            embot::prot::can::Frame fr {amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].packet.ID, amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].length, amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].packet.PAYLOAD};
             outframes.push_back(fr);
         }
     }
     
-    bool txstatus = amc_bldc.AMC_BLDC_Y.Flags_p.enable_sending_msg_status;
-    if(true == txstatus)
-    {
-        addMCstatus(outframes);
-    }
-
     measureTick->stop();
     
     
@@ -491,51 +488,6 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
 #endif // #if defined(TEST_DURATION_FOC) 
 
     impl->measureFOC->stop();
-}
-
-uint8_t remapControlMode(uint8_t controlMode)
-{
-    switch(controlMode){
-        case 0: 
-            return 0xb0; // NotConfigured
-            break;
-        case 1: 
-            return MCControlModes_Idle;
-            break;
-        case 4: 
-            return MCControlModes_Current;
-            break;
-        case 6:
-            return MCControlModes_OpenLoop;
-        case ControlModes_HwFaultCM:
-            return MCControlModes_HWFault;
-            break;
-        default: 
-            return 0x99; // TODO: Fix!
-            break;
-    }
-}
-
-
-bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::prot::can::Frame> &outframes)
-{
-    embot::prot::can::motor::polling::ControlMode ctrlmode {embot::prot::can::motor::polling::ControlMode::Idle};
-    
-    embot::prot::can::motor::periodic::Message_STATUS msg {};
-    embot::prot::can::motor::periodic::Message_STATUS::Info info {};
-
-    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.controlmode = remapControlMode(amc_bldc.AMC_BLDC_Y.Flags_p.control_mode);         
-    info.faultstate = (true == EXTFAULTisPRESSED) ? 0x00000001 : 0x00000000;
-    // etc
-        
-    msg.load(info);
-          
-    embot::prot::can::Frame frame0;
-    msg.get(frame0);
-    outframes.push_back(frame0);
-    
-    return true;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
