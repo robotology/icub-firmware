@@ -67,8 +67,9 @@ CKL idles high        |___|             |___|
 
 namespace embot { namespace hw { namespace spi {
     
+    // note: SSEL is in here defined but ... is not initialised or used (yet) in this driver.
     enum class Signal { MISO = 0, MOSI = 1, SCLK = 2, SSEL = 3, NumberOf = 4 };
-    constexpr size_t NumberOfSignals {embot::core::tointegral(Signal::NumberOf)};
+    constexpr size_t SignalsNumberOf {embot::core::tointegral(Signal::NumberOf)};
        
     // speed is expressed by an integer in bps. it depends on the used prescaler.
     using Speed = uint32_t;
@@ -102,17 +103,15 @@ namespace embot { namespace hw { namespace spi {
         zero = 0,   // (polarity, phase) = (0, 0) = (SPI_POLARITY_LOW, SPI_PHASE_1EDGE)
         one = 1,    // (polarity, phase) = (0, 1) = (SPI_POLARITY_LOW, SPI_PHASE_2EDGE)
         two = 2,    // (polarity, phase) = (1, 0) = (SPI_POLARITY_HIGH, SPI_PHASE_1EDGE)
-        three = 3,  // (polarity, phase) = (1, 1) = (SPI_POLARITY_HIGH, SPI_PHASE_2EDGE) 
-//        none = 255 
+        three = 3   // (polarity, phase) = (1, 1) = (SPI_POLARITY_HIGH, SPI_PHASE_2EDGE) 
     };
           
-
     struct GPIOspecials
     {
-        std::array<embot::hw::gpio::Pull, NumberOfSignals> pulls {  embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, 
+        std::array<embot::hw::gpio::Pull, SignalsNumberOf> pulls {  embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, 
                                                                     embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull };
         constexpr GPIOspecials() = default;
-        constexpr GPIOspecials(const std::array<embot::hw::gpio::Pull, NumberOfSignals> &p) : pulls(p) {}
+        constexpr GPIOspecials(const std::array<embot::hw::gpio::Pull, SignalsNumberOf> &p) : pulls(p) {}
         void clear() { for( auto &v : pulls) v = embot::hw::gpio::Pull::none; } 
     };
           
@@ -126,17 +125,15 @@ namespace embot { namespace hw { namespace spi {
         constexpr Config(Prescaler p, DataSize d, Mode m, const GPIOspecials &g) : prescaler(p), datasize(d), mode(m), gpiospecials(g) {};
         constexpr Config(Prescaler p, DataSize d, Mode m) : prescaler(p), datasize(d), mode(m) {};
         constexpr bool isvalid() const { return (Prescaler::none != prescaler) && (DataSize::none != datasize); }
-        //constexpr bool isvalid() const { return (Prescaler::none != prescaler) && (DataSize::none != datasize) && (Mode::none != mode); }
         void clear() { prescaler = Prescaler::none; datasize = DataSize::none; mode = Mode::zero; gpiospecials.clear(); } 
     };
     
     // utilities
-//    constexpr bool mode2clockprops(const Mode m, ClockPolarity &polarity, ClockPhase &phase);    
-    constexpr Mode clockprops2mode(ClockPolarity polarity, ClockPhase phase);
-    
+    constexpr Mode clockprops2mode(ClockPolarity polarity, ClockPhase phase);    
     constexpr ClockPolarity mode2clockpolarity(const Mode m);
     constexpr ClockPhase mode2clockphase(const Mode m);
-        
+
+    // standard api
     bool supported(embot::hw::SPI b);    
     bool initialised(embot::hw::SPI b);    
     result_t init(embot::hw::SPI b, const Config &config);

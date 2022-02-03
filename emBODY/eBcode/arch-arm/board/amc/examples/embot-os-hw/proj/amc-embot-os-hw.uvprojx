@@ -588,6 +588,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1233,6 +1238,11 @@
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1931,6 +1941,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2627,6 +2642,11 @@
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3325,6 +3345,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3970,6 +3995,11 @@
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
           </Files>
         </Group>

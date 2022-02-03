@@ -22,17 +22,18 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
     
 #if   defined(HAL_SPI_MODULE_ENABLED)        
     using SPI_Handle = SPI_HandleTypeDef;
+    using SPI_Device = SPI_TypeDef;
 #else
     using SPI_Handle = void;
 #endif
         
     struct PROP
-    {     
+    {
         SPI_Handle* handle {nullptr}; 
         uint32_t clockrate {0};
-        std::array<embot::hw::GPIO, NumberOfSignals> pinout { {} };
+        std::array<embot::hw::GPIO, SignalsNumberOf> pinout { {} };
         constexpr PROP() = default;
-        constexpr PROP(SPI_Handle *h, uint32_t c, std::array<embot::hw::GPIO, NumberOfSignals> p) : handle(h), clockrate(c), pinout(p) {}
+        constexpr PROP(SPI_Handle *h, uint32_t c, std::array<embot::hw::GPIO, SignalsNumberOf> p) : handle(h), clockrate(c), pinout(p) {}
         constexpr PROP(SPI_Handle *h) : handle(h) {} 
         constexpr Speed prescalertospeed(Prescaler p) const { return clockrate >> (1+embot::core::tointegral(p)); } 
         constexpr Prescaler speedtoprescaler(Speed s) const
@@ -66,13 +67,15 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
     
     const BSP& getBSP();
     
-    
+    // sadly I cannot put a SPI_TypeDef* inside a constexpr data staructure, so i need this funtion to get SPI1 / SPI2 etc
+    SPI_Device* getDEVICE(embot::hw::SPI h);
+        
 namespace utils {
         
     struct ExtendedConfig
     {
-        std::array<embot::hw::gpio::Pull, NumberOfSignals> _pulls { embot::hw::gpio::Pull::none, embot::hw::gpio::Pull::none, embot::hw::gpio::Pull::none };
-        std::array<embot::hw::GPIO, NumberOfSignals> _pinout {};
+        std::array<embot::hw::gpio::Pull, SignalsNumberOf> _pulls { embot::hw::gpio::Pull::none, embot::hw::gpio::Pull::none, embot::hw::gpio::Pull::none };
+        std::array<embot::hw::GPIO, SignalsNumberOf> _pinout {};
         ExtendedConfig() = default;
         
         void load(embot::hw::SPI h, const Config &cfg)
@@ -87,9 +90,9 @@ namespace utils {
             for(auto &g : _pinout) g = {};
         }
         
-        uint32_t pull(const embot::hw::spi::Signal s, const uint32_t defvalue) const
+        uint32_t pull(const embot::hw::spi::Signal s, const uint32_t defvalue = 0) const
         {
-            if(embot::core::tointegral(s) >= NumberOfSignals)
+            if(embot::core::tointegral(s) >= SignalsNumberOf)
             {
                 return defvalue;
             }                   
@@ -97,9 +100,9 @@ namespace utils {
             return (embot::hw::gpio::Pull::none != pu) ? embot::core::tointegral(pu) : defvalue;
         }
         
-        uint32_t pin(const embot::hw::spi::Signal s, const uint32_t defvalue) const
+        uint32_t pin(const embot::hw::spi::Signal s, const uint32_t defvalue = 0) const
         {
-            if(embot::core::tointegral(s) >= NumberOfSignals)
+            if(embot::core::tointegral(s) >= SignalsNumberOf)
             {
                 return defvalue;
             }              
@@ -107,9 +110,9 @@ namespace utils {
             return (gg.isvalid()) ? gg.stmpin : defvalue;
         }
 
-        embot::hw::gpio::GPIO_t* port(const embot::hw::spi::Signal s, embot::hw::gpio::GPIO_t* defvalue) const
+        embot::hw::gpio::GPIO_t* port(const embot::hw::spi::Signal s, embot::hw::gpio::GPIO_t* defvalue = nullptr) const
         {
-            if(embot::core::tointegral(s) >= NumberOfSignals)
+            if(embot::core::tointegral(s) >= SignalsNumberOf)
             {
                 return defvalue;
             }              
@@ -119,7 +122,7 @@ namespace utils {
         
         embot::hw::GPIO gpio(const embot::hw::spi::Signal s) const
         {
-            if(embot::core::tointegral(s) >= NumberOfSignals)
+            if(embot::core::tointegral(s) >= SignalsNumberOf)
             {
                 return {};
             }  
