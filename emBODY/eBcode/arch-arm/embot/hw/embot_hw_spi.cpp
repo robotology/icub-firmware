@@ -45,6 +45,33 @@ using namespace embot::hw;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+namespace embot { namespace hw { namespace spi {
+    
+//    constexpr bool mode2clockprops(const Mode m, ClockPolarity &polarity, ClockPhase &phase)
+//    {
+////        if(Mode::none == m) { return false; }
+//        phase = (false == embot::core::binary::bit::check(embot::core::tointegral(m), 0)) ? ClockPhase::edge1 : ClockPhase::edge2;
+//        polarity = (false == embot::core::binary::bit::check(embot::core::tointegral(m), 1)) ? ClockPolarity::low : ClockPolarity::high;
+//        return true;
+//    }
+
+    constexpr Mode clockprops2mode(ClockPolarity polarity, ClockPhase phase)
+    {
+        constexpr Mode map[2][2] = { {Mode::zero, Mode::one}, {Mode::two, Mode::three} };  
+        return map[embot::core::tointegral(polarity)][embot::core::tointegral(phase)];
+    } 
+    
+    constexpr ClockPolarity mode2clockpolarity(const Mode m)
+    {
+        return (false == embot::core::binary::bit::check(embot::core::tointegral(m), 1)) ? ClockPolarity::low : ClockPolarity::high;
+    }
+    
+    constexpr ClockPhase mode2clockphase(const Mode m)
+    {
+        return (false == embot::core::binary::bit::check(embot::core::tointegral(m), 0)) ? ClockPhase::edge1 : ClockPhase::edge2;
+    }
+    
+}}}
 
 #if !defined(HAL_SPI_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_spi)
 
@@ -116,7 +143,7 @@ namespace embot { namespace hw { namespace spi {
     
     bool supported(embot::hw::SPI p)
     {
-        return embot::hw::spi::getBSP().supported(p);
+        return embot::hw::spi::bsp::getBSP().supported(p);
     }
 
     
@@ -144,7 +171,7 @@ namespace embot { namespace hw { namespace spi {
         }
         
         
-        bool bspinit = embot::hw::spi::getBSP().init(b, config);
+        bool bspinit = embot::hw::spi::bsp::getBSP().init(b, config);
         if(false == bspinit)
         {
             // do init in here
@@ -152,7 +179,7 @@ namespace embot { namespace hw { namespace spi {
         
         std::uint8_t index = embot::core::tointegral(b);
         s_privatedata.config[index] = config;
-        s_privatedata.handles[index] = embot::hw::spi::getBSP().getPROP(b)->handle;
+        s_privatedata.handles[index] = embot::hw::spi::bsp::getBSP().getPROP(b)->handle;
         
         // set callbacks on rx and tx and error
         HAL_SPI_RegisterCallback(s_privatedata.handles[index], HAL_SPI_TX_COMPLETE_CB_ID, s_SPI_TX_completed);
@@ -184,7 +211,7 @@ namespace embot { namespace hw { namespace spi {
         s_privatedata.config[index] = {};
         s_privatedata.handles[index] = nullptr;
             
-        bool bspdeinit = embot::hw::spi::getBSP().deinit(b);
+        bool bspdeinit = embot::hw::spi::bsp::getBSP().deinit(b);
         if(false == bspdeinit)
         {
             // do deinit in here
@@ -531,7 +558,7 @@ namespace embot { namespace hw { namespace spi {
 
     void s_SPI_TX_completed(SPI_HandleTypeDef *hspi)
     {
-        embot::hw::SPI id = embot::hw::spi::getBSP().toID({hspi});
+        embot::hw::SPI id = embot::hw::spi::bsp::getBSP().toID({hspi});
         if(embot::hw::SPI::none == id)
         {
             return;
@@ -542,7 +569,7 @@ namespace embot { namespace hw { namespace spi {
     
     void s_SPI_rx_completed(SPI_HandleTypeDef *hspi)
     {   
-        embot::hw::SPI id = embot::hw::spi::getBSP().toID({hspi});
+        embot::hw::SPI id = embot::hw::spi::bsp::getBSP().toID({hspi});
         if(embot::hw::SPI::none == id)
         {
             return;
@@ -553,7 +580,7 @@ namespace embot { namespace hw { namespace spi {
 
     void s_SPI_TXrx_completed(SPI_HandleTypeDef *hspi)
     {
-        embot::hw::SPI id = embot::hw::spi::getBSP().toID({hspi});
+        embot::hw::SPI id = embot::hw::spi::bsp::getBSP().toID({hspi});
         if(embot::hw::SPI::none == id)
         {
             return;

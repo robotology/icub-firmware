@@ -13,6 +13,8 @@
 
 #include "embot_core.h"
 #include "embot_hw_types.h"
+#include "embot_hw_gpio.h"
+#include <array>
 
 
 #if 0
@@ -64,6 +66,9 @@ CKL idles high        |___|             |___|
 #endif  
 
 namespace embot { namespace hw { namespace spi {
+    
+    enum class Signal { MISO = 0, MOSI = 1, SCLK = 2, SSEL = 3, NumberOf = 4 };
+    constexpr size_t NumberOfSignals {embot::core::tointegral(Signal::NumberOf)};
        
     // speed is expressed by an integer in bps. it depends on the used prescaler.
     using Speed = uint32_t;
@@ -98,33 +103,39 @@ namespace embot { namespace hw { namespace spi {
         one = 1,    // (polarity, phase) = (0, 1) = (SPI_POLARITY_LOW, SPI_PHASE_2EDGE)
         two = 2,    // (polarity, phase) = (1, 0) = (SPI_POLARITY_HIGH, SPI_PHASE_1EDGE)
         three = 3,  // (polarity, phase) = (1, 1) = (SPI_POLARITY_HIGH, SPI_PHASE_2EDGE) 
-        none = 255 
+//        none = 255 
     };
           
-    
-    constexpr bool mode2clockprops(const Mode m, ClockPolarity &polarity, ClockPhase &phase)
+
+    struct GPIOspecials
     {
-        if(Mode::none == m) { return false; }
-        phase = (false == embot::core::binary::bit::check(embot::core::tointegral(m), 0)) ? ClockPhase::edge1 : ClockPhase::edge2;
-        polarity = (false == embot::core::binary::bit::check(embot::core::tointegral(m), 1)) ? ClockPolarity::low : ClockPolarity::high;
-        return true;
-    }
-    
-    constexpr Mode clockprops2mode(ClockPolarity polarity, ClockPhase phase)
-    {
-        constexpr Mode map[2][2] = { {Mode::zero, Mode::one}, {Mode::two, Mode::three} };  
-        return map[embot::core::tointegral(polarity)][embot::core::tointegral(phase)];
-    }    
+        std::array<embot::hw::gpio::Pull, NumberOfSignals> pulls {  embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, 
+                                                                    embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull };
+        constexpr GPIOspecials() = default;
+        constexpr GPIOspecials(const std::array<embot::hw::gpio::Pull, NumberOfSignals> &p) : pulls(p) {}
+        void clear() { for( auto &v : pulls) v = embot::hw::gpio::Pull::none; } 
+    };
           
     struct Config
     {      
         Prescaler prescaler {Prescaler::none};  
         DataSize datasize {DataSize::none};
-        Mode mode {Mode::none};     
+        Mode mode {Mode::zero};  
+        GPIOspecials gpiospecials {};      
         constexpr Config() = default;
+        constexpr Config(Prescaler p, DataSize d, Mode m, const GPIOspecials &g) : prescaler(p), datasize(d), mode(m), gpiospecials(g) {};
         constexpr Config(Prescaler p, DataSize d, Mode m) : prescaler(p), datasize(d), mode(m) {};
-        constexpr bool isvalid() const { return (Prescaler::none != prescaler) && (DataSize::none != datasize) && (Mode::none != mode); }
+        constexpr bool isvalid() const { return (Prescaler::none != prescaler) && (DataSize::none != datasize); }
+        //constexpr bool isvalid() const { return (Prescaler::none != prescaler) && (DataSize::none != datasize) && (Mode::none != mode); }
+        void clear() { prescaler = Prescaler::none; datasize = DataSize::none; mode = Mode::zero; gpiospecials.clear(); } 
     };
+    
+    // utilities
+//    constexpr bool mode2clockprops(const Mode m, ClockPolarity &polarity, ClockPhase &phase);    
+    constexpr Mode clockprops2mode(ClockPolarity polarity, ClockPhase phase);
+    
+    constexpr ClockPolarity mode2clockpolarity(const Mode m);
+    constexpr ClockPhase mode2clockphase(const Mode m);
         
     bool supported(embot::hw::SPI b);    
     bool initialised(embot::hw::SPI b);    
