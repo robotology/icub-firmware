@@ -400,7 +400,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     
     // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
     // TODO: When should perform the following update within the mbd after a SET_MOTOR_CONFIG message has been received
-    MainConf.pwm.poles = InitConfParams.motorconfig.pole_pairs;
+    MainConf.pwm.poles = amc_bldc.AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
     
     measureTick->stop();
     
@@ -443,7 +443,7 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     electricalAngleOld = electricalAngle;
     
     // calculate the current joint position
-    position = position + delta / InitConfParams.motorconfig.pole_pairs;  // the motor has 14 poles, hence 7 pole pairs
+    position = position + delta / impl->amc_bldc.AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;  // the motor has 14 poles, hence 7 pole pairs
     
     impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
     
