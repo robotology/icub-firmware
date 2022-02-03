@@ -25,6 +25,9 @@
 #include "embot_app_theLEDmanager.h"
 #include <array>
 
+// hal components
+#include "motorhal_config.h"
+
 // mdb components
 #include "AMC_BLDC.h"
 
@@ -260,7 +263,12 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     already_enabled = false;
 
     CAN_ID_AMC = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-
+    
+    // init motor configuration parameters
+    InitConfParams.motorconfig.pole_pairs = MainConf.pwm.poles;
+    //InitConfParams.motorconfig.has_hall_sens...
+    //auto todo... = MainConf.encoder.nsteps = 16000;  TODO: fix (this values depends on pole_pairs and actually it is missing in mbd)
+    
     initted = true;
     return initted;
 }
@@ -390,6 +398,10 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         }
     }
     
+    // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
+    // TODO: When should perform the following update within the mbd after a SET_MOTOR_CONFIG message has been received
+    MainConf.pwm.poles = InitConfParams.motorconfig.pole_pairs;
+    
     measureTick->stop();
     
     
@@ -431,7 +443,7 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     electricalAngleOld = electricalAngle;
     
     // calculate the current joint position
-    position = position + delta / 7;  // the motor has 14 poles, hence 7 pole pairs
+    position = position + delta / InitConfParams.motorconfig.pole_pairs;  // the motor has 14 poles, hence 7 pole pairs
     
     impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
     
