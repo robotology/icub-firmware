@@ -187,8 +187,6 @@ struct embot::app::application::theMBDagent::Impl
     volatile embot::core::Time EXTFAULTpressedtime {0};
     volatile embot::core::Time EXTFAULTreleasedtime {0};
     
-    bool addMCstatus(std::vector<embot::prot::can::Frame> &outframes);
-    
     static constexpr uint8_t maxNumberOfPacketsCAN {4}; 
 };
 
