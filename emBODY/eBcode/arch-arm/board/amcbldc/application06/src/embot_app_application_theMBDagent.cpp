@@ -25,6 +25,9 @@
 #include "embot_app_theLEDmanager.h"
 #include <array>
 
+// hal components
+#include "motorhal_config.h"
+
 // mdb components
 #include "AMC_BLDC.h"
 
@@ -185,6 +188,8 @@ struct embot::app::application::theMBDagent::Impl
     volatile embot::core::Time EXTFAULTreleasedtime {0};
     
     bool addMCstatus(std::vector<embot::prot::can::Frame> &outframes);
+    
+    static constexpr uint8_t maxNumberOfPacketsCAN {4}; 
 };
 
       
@@ -247,7 +252,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     // init MBD
     amc_bldc.initialize();
     
-    amc_bldc.AMC_BLDC_U.ExternalFlags_fault_button = EXTFAULTisPRESSED;
+    amc_bldc.AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;
     
     // init motor
     embot::hw::motor::init(embot::hw::MOTOR::one, {});
@@ -258,7 +263,12 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     already_enabled = false;
 
     CAN_ID_AMC = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-
+    
+    // init motor configuration parameters
+    InitConfParams.motorconfig.pole_pairs = MainConf.pwm.poles;
+    //InitConfParams.motorconfig.has_hall_sens...
+    //auto todo... = MainConf.encoder.nsteps = 16000;  TODO: fix (this values depends on pole_pairs and actually it is missing in mbd)
+    
     initted = true;
     return initted;
 }
@@ -273,6 +283,8 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void 
     }
     
     impl->EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
+    impl->amc_bldc.AMC_BLDC_U.ExternalFlags_p.fault_button = impl->EXTFAULTisPRESSED;
+    
     
     if(true == impl->EXTFAULTisPRESSED)
     {
@@ -299,7 +311,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         // and manage the transitions [pressed -> unpressed] or vice-versa and use also
         // EXTFAULTpressedtime and / or EXTFAULTreleasedtime and
 
-        amc_bldc.AMC_BLDC_U.ExternalFlags_fault_button = EXTFAULTisPRESSED;        
+        amc_bldc.AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;        
         
         if(true == EXTFAULTisPRESSED)
         {
@@ -311,40 +323,31 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         }
     }
     
-    uint8_t rx_data[8] {0};
-    uint8_t rx_size {0};
-    uint32_t rx_id {0};
+    uint8_t rx_data[8] {0}; // payload content
+    uint8_t rx_size {0};    // size of payload
+    uint32_t rx_id {0};     // frame ID
     
     
     // check for CAN input frame
     size_t ninputframes = inpframes.size();
     if(0 == ninputframes) 
     {
-        amc_bldc.AMC_BLDC_U.PacketsRx_available = 0;
+        #pragma unroll
+        for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++) {
+            amc_bldc.AMC_BLDC_U.PacketsRx.packets[i].available = false;
+        }
     } 
     else
     {   
         // retrieve the CAN frames, use them, remove them from the vector
         // so far we consume only one frame every tick
         size_t consumedframes {1};
-        amc_bldc.AMC_BLDC_U.PacketsRx_available = 1;
+
         // get the first
         embot::prot::can::Frame frame = inpframes.front();
+
         // copy it
         frame.copyto(rx_id, rx_size, rx_data);
-        
-//        if(rx_id == 0x10F)
-//        {
-//            static char msg2[64];
-//            static uint32_t counter;
-//            if(counter % 100 == 0)
-//            {
-//                sprintf(msg2, "%x %x", rx_data[1], rx_data[0]);
-//                embot::core::print(msg2);
-//                counter = 0;
-//            }
-//            counter++;
-//        }
         
 //        static uint32_t cnt = 0;
 //        if((++cnt % 500) == 1)
@@ -355,15 +358,26 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         
         // clean up the first consumedframes positions
         inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);
-    }
-    
-    // save the CAN frame into the input structure of the model
-    amc_bldc.AMC_BLDC_U.PacketsRx_lengths = (uint8_T)rx_size;
-    amc_bldc.AMC_BLDC_U.PacketsRx_packets_ID = (uint16_T)rx_id;
-    
-    for (int i=0;i<rx_size;i++) 
-    {
-        amc_bldc.AMC_BLDC_U.PacketsRx_packets_PAYLOAD[i] = (uint8_T)rx_data[i];
+        
+        
+        // save the first CAN frame into the input structure of the model (TODO: we'll manage the other packets soon)
+        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].available = true;
+        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].length = (uint8_T)rx_size;
+        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].packet.ID = (uint16_T)rx_id;
+        
+        
+        // Actually, we fill the payload of the first packet only. Later we manage the case of multi packets.
+        #pragma unroll
+        for (uint8_t i = 0; i < rx_size; i++) 
+        {
+            amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].packet.PAYLOAD[i] = (uint8_T)rx_data[i];
+        }
+        
+        // remember that we can deal with only one packet yet at this stage
+        #pragma unroll
+        for (uint8_t i = 1; i < maxNumberOfPacketsCAN; i++) {
+            amc_bldc.AMC_BLDC_U.PacketsRx.packets[i].available = false;
+        }
     }
     
     
@@ -374,19 +388,20 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     amc_bldc.step_Time();
     
     
-    // if there is an output available, send it through the CAN
-    if(amc_bldc.AMC_BLDC_Y.PacketsTx.available)
+    // if there an output is available, send it to the CAN Netowork
+    for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++)
     {
-        embot::prot::can::Frame fr {amc_bldc.AMC_BLDC_Y.PacketsTx.packets.ID, 8, amc_bldc.AMC_BLDC_Y.PacketsTx.packets.PAYLOAD};
-        outframes.push_back(fr);
+        if (amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].available)
+        {
+            embot::prot::can::Frame fr {amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].packet.ID, amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].length, amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].packet.PAYLOAD};
+            outframes.push_back(fr);
+        }
     }
     
-    bool txstatus = amc_bldc.AMC_BLDC_Y.Flags_p.DBG;
-    if(true == txstatus)
-    {
-        addMCstatus(outframes);
-    }
-
+    // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
+    // TODO: When should perform the following update within the mbd after a SET_MOTOR_CONFIG message has been received
+    MainConf.pwm.poles = amc_bldc.AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
+    
     measureTick->stop();
     
     
@@ -414,7 +429,7 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     // remember to manage impl->EXTFAULTisPRESSED ............
 
     // retrieve the current value of the Hall sensors 
-    embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_hallAB);
+    embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.hallABC);
     
     // retrieve the current value of the encoder
     embot::hw::motor::Position electricalAngle {0};
@@ -428,14 +443,14 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     electricalAngleOld = electricalAngle;
     
     // calculate the current joint position
-    position = position + delta / 7;  // the motor has 14 poles, hence 7 pole pairs
+    position = position + delta / impl->amc_bldc.AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;  // the motor has 14 poles, hence 7 pole pairs
     
-    impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
+    impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
     
     // convert the current from mA to A
-    impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[0] = 0.001f*currs.u;
-    impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[1] = 0.001f*currs.v;
-    impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[2] = 0.001f*currs.w;
+    impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0] = 0.001f*currs.u;
+    impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1] = 0.001f*currs.v;
+    impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2] = 0.001f*currs.w;
     
     // -----------------------------------------------------------------------------
     // FOC Step Function (~26.6 KHz)
@@ -448,7 +463,7 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     
 #warning workaround. Fix this parameter in model design. 
 
-    impl->amc_bldc.AMC_BLDC_U.SensorsData_jointpositions_posi = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
+    impl->amc_bldc.AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
     //sensors_data.motorsensors.omega =  speed * 80 / 3 * 0.0054931640625f; // Frequency = 80/3. Angular velocity --> iCubDegree/ms
                                                                             // * 0.0054931640625f ==> icubDegree -> Deg    
     // Set the voltages
@@ -485,51 +500,6 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
 #endif // #if defined(TEST_DURATION_FOC) 
 
     impl->measureFOC->stop();
-}
-
-uint8_t remapControlMode(uint8_t controlMode)
-{
-    switch(controlMode){
-        case 0: 
-            return 0xb0; // NotConfigured
-            break;
-        case 1: 
-            return MCControlModes_Idle;
-            break;
-        case 4: 
-            return MCControlModes_Current;
-            break;
-        case 6:
-            return MCControlModes_OpenLoop;
-        case ControlModes_HwFaultCM:
-            return 0xa0;
-            break;
-        default: 
-            return 0x99; // TODO: Fix!
-            break;
-    }
-}
-
-
-bool embot::app::application::theMBDagent::Impl::addMCstatus(std::vector<embot::prot::can::Frame> &outframes)
-{
-    embot::prot::can::motor::polling::ControlMode ctrlmode {embot::prot::can::motor::polling::ControlMode::Idle};
-    
-    embot::prot::can::motor::periodic::Message_STATUS msg {};
-    embot::prot::can::motor::periodic::Message_STATUS::Info info {};
-
-    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.controlmode = remapControlMode(amc_bldc.AMC_BLDC_Y.Flags_p.control_mode);         
-    info.faultstate = (true == EXTFAULTisPRESSED) ? 0x00000001 : 0x00000000;
-    // etc
-        
-    msg.load(info);
-          
-    embot::prot::can::Frame frame0;
-    msg.get(frame0);
-    outframes.push_back(frame0);
-    
-    return true;
 }
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.145
+// Model version                  : 3.156
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Jan 14 20:50:46 2022
+// C/C++ source code generated on : Mon Jan 31 18:31:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -88,7 +88,10 @@ struct MotorCurrent
 
 struct ControlOutputs
 {
-  // control effort
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
   real32_T Vabc[3];
 
   // quadrature current
@@ -104,7 +107,10 @@ typedef enum {
   MCControlModes_Idle = 0,             // Default value
   MCControlModes_OpenLoop = 80,
   MCControlModes_SpeedVoltage = 10,
-  MCControlModes_Current = 6
+  MCControlModes_SpeedCurrent = 11,
+  MCControlModes_Current = 6,
+  MCControlModes_NotConfigured = 176,
+  MCControlModes_HWFault = 160
 } MCControlModes;
 
 #endif
@@ -195,6 +201,16 @@ struct BUS_MESSAGES_RX
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_MULTIPLE_
+
+struct BUS_MESSAGES_RX_MULTIPLE
+{
+  BUS_MESSAGES_RX messages[4];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_JointVelocities_
 #define DEFINED_TYPEDEF_FOR_JointVelocities_
 
@@ -231,6 +247,16 @@ struct BUS_EVENTS_RX
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_MULTIPLE_
+
+struct BUS_EVENTS_RX_MULTIPLE
+{
+  BUS_EVENTS_RX events[4];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_CANErrorTypes_
 #define DEFINED_TYPEDEF_FOR_CANErrorTypes_
 
@@ -258,66 +284,12 @@ struct BUS_CAN_RX_ERRORS
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BoardState_
-#define DEFINED_TYPEDEF_FOR_BoardState_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_MULTIPLE_
 
-typedef enum {
-  BoardState_NotConfigured = 0,        // Default value
-  BoardState_Configured,
-  BoardState_Fault
-} BoardState;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
-
-typedef enum {
-  ControlModes_NotConfigured = 0,      // Default value
-  ControlModes_Idle,
-  ControlModes_Position,
-  ControlModes_PositionDirect,
-  ControlModes_Current,
-  ControlModes_Velocity,
-  ControlModes_Voltage,
-  ControlModes_Torque,
-  ControlModes_HwFaultCM
-} ControlModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
-
-struct Flags
+struct BUS_CAN_RX_ERRORS_MULTIPLE
 {
-  // control mode
-  ControlModes control_mode;
-  boolean_T DBG;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorVoltage_
-#define DEFINED_TYPEDEF_FOR_MotorVoltage_
-
-struct MotorVoltage
-{
-  // motor voltage
-  real32_T voltage;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
-
-struct Targets
-{
-  JointPositions jointpositions;
-  JointVelocities jointvelocities;
-  MotorCurrent motorcurrent;
-  MotorVoltage motorvoltage;
+  BUS_CAN_RX_ERRORS errors[4];
 };
 
 #endif
@@ -448,6 +420,71 @@ struct ConfigurationParameters
   PIDConfig VelLoopPID;
   PIDConfig DirLoopPID;
   Thresholds thresholds;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BoardState_
+#define DEFINED_TYPEDEF_FOR_BoardState_
+
+typedef enum {
+  BoardState_NotConfigured = 0,        // Default value
+  BoardState_Configured,
+  BoardState_Fault
+} BoardState;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
+
+typedef enum {
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_Torque,
+  ControlModes_HwFaultCM
+} ControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
+
+struct Flags
+{
+  // control mode
+  ControlModes control_mode;
+  boolean_T enable_sending_msg_status;
+  boolean_T fault_button;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorVoltage_
+#define DEFINED_TYPEDEF_FOR_MotorVoltage_
+
+struct MotorVoltage
+{
+  // motor voltage
+  real32_T voltage;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Targets_
+#define DEFINED_TYPEDEF_FOR_Targets_
+
+struct Targets
+{
+  JointPositions jointpositions;
+  JointVelocities jointvelocities;
+  MotorCurrent motorcurrent;
+  MotorVoltage motorvoltage;
 };
 
 #endif

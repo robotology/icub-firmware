@@ -936,31 +936,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>mbd::can-raw2struct</GroupName>
-          <Files>
-            <File>
-              <FileName>can_rx_raw2struct.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct_private.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>mbd::supervisor-rx</GroupName>
           <Files>
             <File>
@@ -2124,31 +2099,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>mbd::can-raw2struct</GroupName>
-          <Files>
-            <File>
-              <FileName>can_rx_raw2struct.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct_private.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>mbd::supervisor-rx</GroupName>
           <Files>
             <File>
@@ -3308,31 +3258,6 @@
               <FileName>can_decoder_types.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\src\model-based-design\can-decoder\can_decoder_types.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>mbd::can-raw2struct</GroupName>
-          <Files>
-            <File>
-              <FileName>can_rx_raw2struct.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct_private.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_private.h</FilePath>
-            </File>
-            <File>
-              <FileName>can_rx_raw2struct_types.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\can-raw2struct\can_rx_raw2struct_types.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -49,7 +49,7 @@
 typedef struct
 {
     uint32_t    mode;
-    uint32_t    poles;
+    uint8_t    poles;
 } pwmConfTypeDef;
 
 // we keep int32_t even if the adc gets only int16_t values

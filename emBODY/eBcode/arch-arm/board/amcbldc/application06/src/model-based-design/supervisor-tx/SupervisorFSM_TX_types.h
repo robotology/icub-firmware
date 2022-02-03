@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.15
+// Model version                  : 3.27
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu Jan 13 14:09:44 2022
+// C/C++ source code generated on : Mon Jan 31 18:31:42 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -83,100 +83,32 @@ struct EstimatedData
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
-#define DEFINED_TYPEDEF_FOR_MCControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
 
 typedef enum {
-  MCControlModes_Idle = 0,             // Default value
-  MCControlModes_OpenLoop = 80,
-  MCControlModes_SpeedVoltage = 10,
-  MCControlModes_Current = 6
-} MCControlModes;
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_Torque,
+  ControlModes_HwFaultCM
+} ControlModes;
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CONTROL_MODE_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_CONTROL_MODE_
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
 
-// Fields of a CONTROL_MODE message.
-struct BUS_MSG_CONTROL_MODE
+struct Flags
 {
-  // Motor selector.
-  boolean_T motor;
-
-  // Control mode.
-  MCControlModes mode;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_LIMIT_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_LIMIT_
-
-// Fields of a CURRENT_LIMIT message.
-struct BUS_MSG_CURRENT_LIMIT
-{
-  // Motor selector.
-  boolean_T motor;
-
-  // Nominal current in A.
-  real32_T nominal;
-
-  // Peak current in A.
-  real32_T peak;
-
-  // Overload current in A.
-  real32_T overload;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_CURRENT_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_CURRENT_
-
-// Fields of a DESIRED_CURRENT message.
-struct BUS_MSG_DESIRED_CURRENT
-{
-  // Nominal current in A.
-  real32_T current;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
-
-// Fields of a CURRENT_PID message.
-struct BUS_MSG_CURRENT_PID
-{
-  // Motor selector.
-  boolean_T motor;
-
-  // Proportional gain.
-  real32_T Kp;
-
-  // Integral gain.
-  real32_T Ki;
-
-  // Derivative gain.
-  real32_T Kd;
-
-  // Shift factor.
-  uint8_T Ks;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
-
-// Aggregate of all CAN received messages.
-struct BUS_MESSAGES_RX
-{
-  BUS_MSG_CONTROL_MODE control_mode;
-  BUS_MSG_CURRENT_LIMIT current_limit;
-  BUS_MSG_DESIRED_CURRENT desired_current;
-  BUS_MSG_CURRENT_PID current_pid;
+  // control mode
+  ControlModes control_mode;
+  boolean_T enable_sending_msg_status;
+  boolean_T fault_button;
 };
 
 #endif
@@ -197,7 +129,10 @@ struct MotorCurrent
 
 struct ControlOutputs
 {
-  // control effort
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
   real32_T Vabc[3];
 
   // quadrature current
@@ -343,6 +278,7 @@ struct ConfigurationParameters
 struct BUS_EVENTS_TX
 {
   boolean_T foc;
+  boolean_T status;
 };
 
 #endif
@@ -365,6 +301,78 @@ struct BUS_MSG_FOC
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
+#define DEFINED_TYPEDEF_FOR_MCControlModes_
+
+typedef enum {
+  MCControlModes_Idle = 0,             // Default value
+  MCControlModes_OpenLoop = 80,
+  MCControlModes_SpeedVoltage = 10,
+  MCControlModes_SpeedCurrent = 11,
+  MCControlModes_Current = 6,
+  MCControlModes_NotConfigured = 176,
+  MCControlModes_HWFault = 160
+} MCControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_FLAGS_TX_
+#define DEFINED_TYPEDEF_FOR_BUS_FLAGS_TX_
+
+struct BUS_FLAGS_TX
+{
+  boolean_T dirty;
+  boolean_T stuck;
+  boolean_T index_broken;
+  boolean_T phase_broken;
+  real32_T not_calibrated;
+  boolean_T ExternalFaultAsserted;
+  boolean_T UnderVoltageFailure;
+  boolean_T OverVoltageFailure;
+  boolean_T OverCurrentFailure;
+  boolean_T DHESInvalidValue;
+  boolean_T AS5045CSumError;
+  boolean_T DHESInvalidSequence;
+  boolean_T CANInvalidProtocol;
+  boolean_T CAN_BufferOverRun;
+  boolean_T SetpointExpired;
+  boolean_T CAN_TXIsPasv;
+  boolean_T CAN_RXIsPasv;
+  boolean_T CAN_IsWarnTX;
+  boolean_T CAN_IsWarnRX;
+  boolean_T OverHeating;
+  boolean_T ADCCalFailure;
+  boolean_T I2TFailure;
+  boolean_T EMUROMFault;
+  boolean_T EMUROMCRCFault;
+  boolean_T EncoderFault;
+  boolean_T FirmwareSPITimingError;
+  boolean_T AS5045CalcError;
+  boolean_T FirmwarePWMFatalError;
+  boolean_T CAN_TXWasPasv;
+  boolean_T CAN_RXWasPasv;
+  boolean_T CAN_RTRFlagActive;
+  boolean_T CAN_WasWarn;
+  boolean_T CAN_DLCError;
+  boolean_T SiliconRevisionFault;
+  boolean_T PositionLimitUpper;
+  boolean_T PositionLimitLower;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_STATUS_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_STATUS_
+
+struct BUS_MSG_STATUS
+{
+  MCControlModes control_mode;
+  real32_T pwm_fbk;
+  BUS_FLAGS_TX flags;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_TX_
 #define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_TX_
 
@@ -372,6 +380,7 @@ struct BUS_MSG_FOC
 struct BUS_MESSAGES_TX
 {
   BUS_MSG_FOC foc;
+  BUS_MSG_STATUS status;
 };
 
 #endif
