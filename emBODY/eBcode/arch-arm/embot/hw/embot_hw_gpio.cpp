@@ -202,6 +202,8 @@ namespace embot { namespace hw { namespace gpio {
 
         g.clockenable();
         
+#warning evaluate to use HAL_GPIO_Init() for all modes ...
+    
         // caveat: for pins HAL_GPIO_* use u16, and all macros are u16, whereas LL_GPIO_* use u32 
         if(m == Mode::OUTPUTopendrain)
         {

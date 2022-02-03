@@ -32,8 +32,12 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 #if defined(TEST_EMBOT_HW)
 
+#define TEST_EMBOT_HW_SPI123
+
 #define TEST_EMBOT_HW_EEPROM
 #define TEST_EMBOT_HW_CHIP_M95512DF
+
+#define TEST_EMBOT_HW_CHIP_AS5045
 
 void test_embot_hw_init();
 void test_embot_hw_tick();
@@ -164,6 +168,10 @@ int main(void)
 
 #if defined(TEST_EMBOT_HW)
 
+#if defined(TEST_EMBOT_HW_SPI123)
+#include "embot_hw_spi.h"
+#endif
+
 #if defined(TEST_EMBOT_HW_EEPROM)
 #include "embot_hw_eeprom.h"
 
@@ -172,19 +180,77 @@ constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
 #endif
 
 #if defined(TEST_EMBOT_HW_CHIP_M95512DF)
-
     #include "embot_hw_chip_M95512DF.h"
-
 #endif
+#if defined(TEST_EMBOT_HW_CHIP_AS5045)
+    #include "embot_hw_chip_AS5045.h"
+#endif
+
+void done1(void* p)
+{
+    embot::core::print("SPI::one cbk called");
+}
+void done2(void* p)
+{
+    embot::core::print("SPI::two cbk called");
+}
+void done3(void* p)
+{
+    embot::core::print("SPI::three cbk called");
+}
 
 void test_embot_hw_init()
 {
+    
+#if defined(TEST_EMBOT_HW_SPI123)
+    
+    embot::hw::spi::Config spi1cfg =
+    { 
+        embot::hw::spi::Prescaler::eight, 
+        embot::hw::spi::DataSize::eight, 
+        embot::hw::spi::Mode::zero,
+        { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::none} }
+    };
+    embot::hw::spi::init(embot::hw::SPI::one, spi1cfg);
+    embot::hw::spi::init(embot::hw::SPI::two, spi1cfg);
+    embot::hw::spi::init(embot::hw::SPI::three, spi1cfg);
+    
+    static uint8_t spirxdata[4] = {0};
+    embot::core::Data rxdata { spirxdata, sizeof(spirxdata) };   
+    embot::hw::result_t r {embot::hw::resNOK};
+
+    memset(spirxdata, 0, sizeof(spirxdata));    
+    r = embot::hw::spi::read(embot::hw::SPI::one, rxdata, 5*embot::core::time1millisec);    
+    embot::core::print("SPI1 test: " + std::string(r==embot::hw::resNOK ? "KO ":"OK ") + std::to_string(spirxdata[0]) );
+    spirxdata[0] = spirxdata[0];
+    embot::hw::spi::read(embot::hw::SPI::one, rxdata, {done1, nullptr}); 
+    
+    memset(spirxdata, 0, sizeof(spirxdata));    
+    r = embot::hw::spi::read(embot::hw::SPI::two, rxdata, 5*embot::core::time1millisec);    
+    embot::core::print("SPI2 test: " + std::string(r==embot::hw::resNOK ? "KO ":"OK ") + std::to_string(spirxdata[0]) );
+    spirxdata[0] = spirxdata[0];  
+    embot::hw::spi::read(embot::hw::SPI::two, rxdata, {done2, nullptr});    
+    
+    
+    memset(spirxdata, 0, sizeof(spirxdata));    
+    r = embot::hw::spi::read(embot::hw::SPI::three, rxdata, 5*embot::core::time1millisec);    
+    embot::core::print("SPI3 test: " + std::string(r==embot::hw::resNOK ? "KO ":"OK ") + std::to_string(spirxdata[0]) );
+    spirxdata[0] = spirxdata[0];   
+    embot::hw::spi::read(embot::hw::SPI::three, rxdata, {done3, nullptr});     
+#endif    
+
+#if defined(TEST_EMBOT_HW_CHIP_AS5045)
+
+    embot::hw::chip::testof_AS5045();    
+
+#endif
+    
 
 #if defined(TEST_EMBOT_HW_CHIP_M95512DF)
 
     embot::hw::chip::testof_M95512DF();    
 
-#endif
+#endif    
     
 #if defined(TEST_EMBOT_HW_EEPROM)
     
@@ -237,6 +303,8 @@ void test_embot_hw_tick()
     {
         shift++;
     }
+    
+    
     
 #if defined(TEST_EMBOT_HW_EEPROM)
     

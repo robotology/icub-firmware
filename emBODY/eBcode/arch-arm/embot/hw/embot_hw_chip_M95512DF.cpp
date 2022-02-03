@@ -35,7 +35,12 @@ bool embot::hw::chip::testof_M95512DF()
     {
         embot::hw::SPI::six,  // the spi bus
         //{}, // dummy spi config
-        {embot::hw::spi::Prescaler::eight, embot::hw::spi::DataSize::eight, embot::hw::spi::Mode::zero},
+        { 
+            embot::hw::spi::Prescaler::eight, 
+            embot::hw::spi::DataSize::eight, 
+            embot::hw::spi::Mode::zero,
+            { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::none} }
+        },
         {   // the control pins
             {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eight},    // nS
             {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::twelve},   // nW
@@ -50,7 +55,7 @@ bool embot::hw::chip::testof_M95512DF()
     
     // address in EEPROM, data to write, destination for data to read
     constexpr embot::hw::chip::M95512DF::ADR adr {64};
-    static constexpr uint8_t bytes2write[8] {1, 2, 3, 4, 5, 6, 7, 8};
+    static uint8_t bytes2write[8] {1, 2, 3, 4, 5, 6, 7, 8};
     constexpr embot::core::Data data2write {bytes2write, sizeof(bytes2write)};
     uint8_t bytes2read[4] {0};
     embot::core::Data data2read {bytes2read, sizeof(bytes2read)}; 
