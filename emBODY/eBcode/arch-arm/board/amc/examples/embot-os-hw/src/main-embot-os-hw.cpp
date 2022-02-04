@@ -15,6 +15,7 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_led.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_can.h"
 
 
 #include "embot_os_theScheduler.h"
@@ -32,12 +33,14 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 #if defined(TEST_EMBOT_HW)
 
-#define TEST_EMBOT_HW_SPI123
+//#define TEST_EMBOT_HW_SPI123
 
-#define TEST_EMBOT_HW_EEPROM
-#define TEST_EMBOT_HW_CHIP_M95512DF
+//#define TEST_EMBOT_HW_EEPROM
+//#define TEST_EMBOT_HW_CHIP_M95512DF
 
-#define TEST_EMBOT_HW_CHIP_AS5045
+//#define TEST_EMBOT_HW_CHIP_AS5045
+
+#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1
 
 void test_embot_hw_init();
 void test_embot_hw_tick();
@@ -79,6 +82,162 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
 
 }
 
+#if defined(TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1)
+
+constexpr embot::core::relTime canTXperiod = 1000*embot::core::time1millisec;
+
+constexpr embot::os::Event evtCAN1tx = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
+constexpr embot::os::Event evtCAN1rx = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
+constexpr embot::os::Event evtCAN2rx = evtCAN1rx;
+
+void alerteventbasedthread(void *arg)
+{
+    embot::os::EventThread* evthr = reinterpret_cast<embot::os::EventThread*>(arg);
+    if(nullptr != evthr)
+    {
+        evthr->setEvent(evtCAN1rx);
+    }
+}
+
+void can1_startup(embot::os::Thread *t, void *param)
+{   
+    volatile uint32_t c = embot::hw::sys::clock(embot::hw::CLOCK::syscore);
+    c = c;
+    
+    // start can1 driver
+    
+    embot::hw::can::Config canconfig {};   
+    canconfig.onrxframe = embot::core::Callback(alerteventbasedthread, t); 
+    embot::hw::can::init(embot::hw::CAN::one, canconfig);
+    embot::hw::can::setfilters(embot::hw::CAN::one, 1);   
+    embot::hw::can::enable(embot::hw::CAN::one);        
+    
+    // start a command to periodically tx a frame
+    embot::os::Timer *tmr = new embot::os::Timer;   
+    embot::os::Action act(embot::os::EventToThread(evtCAN1tx, t));
+    embot::os::Timer::Config cfg{canTXperiod, act, embot::os::Timer::Mode::forever, 0};
+    tmr->start(cfg);
+    
+    embot::core::print("can1-startup: started CAN1 driver");    
+      
+}
+
+
+void can1_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
+{   
+    if(0 == eventmask)
+    {   // timeout ...         
+        return;
+    }
+    
+    embot::core::TimeFormatter tf(embot::core::now());
+
+    if(true == embot::core::binary::mask::check(eventmask, evtCAN1tx)) 
+    {              
+        embot::core::print("can1-onevent: evtCAN1tx received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));       
+        uint8_t payload[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+        embot::hw::can::put(embot::hw::CAN::one, {2, 8, payload}); 
+        embot::hw::can::transmit(embot::hw::CAN::one);
+    }
+    
+    if(true == embot::core::binary::mask::check(eventmask, evtCAN1rx)) 
+    {              
+        embot::core::print("can1-onevent: evtCAN1rx received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));       
+        embot::hw::can::Frame hwframe {};
+        std::uint8_t remainingINrx = 0;
+        if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, hwframe, remainingINrx))
+        {  
+            embot::core::print("decoded: [id size {payload} ] = " + 
+                                std::to_string(hwframe.id) + ", " +
+                                std::to_string(hwframe.size) + ", [" +
+                                std::to_string(hwframe.data[0]) + ", " +
+                                std::to_string(hwframe.data[1]) + ", " +
+                                std::to_string(hwframe.data[3]) + ", ...} ]"
+            );       
+                                  
+            if(remainingINrx > 0)
+            {
+                t->setEvent(evtCAN1rx);                 
+            }
+        }         
+    
+    }
+    
+}
+
+
+void can2_startup(embot::os::Thread *t, void *param)
+{   
+    volatile uint32_t c = embot::hw::sys::clock(embot::hw::CLOCK::syscore);
+    c = c;
+    
+    // start can2 driver
+    
+    embot::hw::can::Config canconfig {};   
+    canconfig.onrxframe = embot::core::Callback(alerteventbasedthread, t); 
+    embot::hw::can::init(embot::hw::CAN::two, canconfig);
+    embot::hw::can::setfilters(embot::hw::CAN::two, 2);   
+    embot::hw::can::enable(embot::hw::CAN::two);        
+    
+    embot::core::print("can2-startup: started CAN2 driver");    
+      
+}
+
+
+void can2_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
+{   
+    if(0 == eventmask)
+    {   // timeout ...         
+        return;
+    }
+    
+    embot::core::TimeFormatter tf(embot::core::now());
+
+    if(true == embot::core::binary::mask::check(eventmask, evtCAN2rx)) 
+    {              
+        embot::core::print("can2-onevent: evtCAN2rx received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));       
+        embot::hw::can::Frame hwframe {};
+        std::uint8_t remainingINrx = 0;
+        if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::two, hwframe, remainingINrx))
+        {  
+            embot::core::print("decoded: [id size {payload} ] = " + 
+                                std::to_string(hwframe.id) + ", " +
+                                std::to_string(hwframe.size) + ", [" +
+                                std::to_string(hwframe.data[0]) + ", " +
+                                std::to_string(hwframe.data[1]) + ", " +
+                                std::to_string(hwframe.data[3]) + ", ...} ]"
+                                ); 
+
+            embot::core::print("sending back a short reply");
+            
+            uint8_t payload[3] = { 10, 11, 12 };
+            embot::hw::can::put(embot::hw::CAN::two, {1, 3, payload}); 
+            embot::hw::can::transmit(embot::hw::CAN::two);     
+                                  
+            if(remainingINrx > 0)
+            {
+                t->setEvent(evtCAN2rx);                 
+            }
+        }         
+    
+    }
+    
+}
+
+
+void tCAN1(void *p)
+{
+    embot::os::Thread* t = reinterpret_cast<embot::os::Thread*>(p);
+    t->run();
+}
+
+void tCAN2(void *p)
+{
+    embot::os::Thread* t = reinterpret_cast<embot::os::Thread*>(p);
+    t->run();
+}
+
+#endif // #if defined(TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1)
 
 void onIdle(embot::os::Thread *t, void* idleparam)
 {
@@ -91,6 +250,7 @@ void tMAIN(void *p)
     embot::os::Thread* t = reinterpret_cast<embot::os::Thread*>(p);
     t->run();
 }
+
 
 void initSystem(embot::os::Thread *t, void* initparam)
 {
@@ -133,6 +293,45 @@ void initSystem(embot::os::Thread *t, void* initparam)
     thr = new embot::os::EventThread;          
     // and start it. w/ osal it will be displayed w/ label tMAIN
     thr->start(configEV, tMAIN); 
+ 
+#if defined(TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1)
+    
+    embot::core::print("initting two threads, each one managing a different embot::hw::CAN");    
+    
+    embot::os::EventThread::Config configEVcan1 { 
+        4*1024, 
+        embot::os::Priority::normal24, 
+        can1_startup,
+        nullptr,
+        50*embot::core::time1millisec,
+        can1_onevent,
+        "can1ThreadEvt"
+    };
+               
+    // create the can1 thread 
+    embot::os::EventThread *thrcan1 {nullptr};
+    thrcan1 = new embot::os::EventThread;          
+    // and start it. w/ osal it will be displayed w/ label tMAIN
+    thrcan1->start(configEVcan1, tCAN1); 
+    
+    
+    embot::os::EventThread::Config configEVcan2 { 
+        4*1024, 
+        embot::os::Priority::normal25, 
+        can2_startup,
+        nullptr,
+        50*embot::core::time1millisec,
+        can2_onevent,
+        "can2ThreadEvt"
+    };
+               
+    // create the can2 thread 
+    embot::os::EventThread *thrcan2 {nullptr};
+    thrcan2 = new embot::os::EventThread;          
+    // and start it. w/ osal it will be displayed w/ label tMAIN
+    thrcan2->start(configEVcan1, tCAN2);    
+    
+#endif // #if defined(TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1)
     
     embot::core::print("quitting the INIT thread. Normal scheduling starts");    
 }
