@@ -335,7 +335,6 @@ namespace embot { namespace hw { namespace can {
 
 #else
     
-#error support for hw_can in embot::hw::bsp is yet to be done
 
 namespace embot { namespace hw { namespace can {
                
@@ -344,116 +343,157 @@ namespace embot { namespace hw { namespace can {
     
     // it has HAL_FDCAN_MODULE_ENABLED
     
-    FDCAN_HandleTypeDef hfdcan;
-    
-    /**
-      * @brief  Configures the FDCAN.
-      * @param  None
-      * @retval None
-      */
-    static void my_FDCAN1_Config(void)
-    {
-      FDCAN_FilterTypeDef sFilterConfig;
+//    FDCAN_HandleTypeDef hfdcan;
+//    
+//    /**
+//      * @brief  Configures the FDCAN.
+//      * @param  None
+//      * @retval None
+//      */
+//    static void my_FDCAN1_Config(void)
+//    {
+//      FDCAN_FilterTypeDef sFilterConfig;
 
-      /* Bit time configuration:
-        fdcan_ker_ck               = 40 MHz
-        Time_quantum (tq)          = 25 ns
-        Synchronization_segment    = 1 tq
-        Propagation_segment        = 23 tq
-        Phase_segment_1            = 8 tq
-        Phase_segment_2            = 8 tq
-        Synchronization_Jump_width = 8 tq
-        Bit_length                 = 40 tq = 1 µs
-        Bit_rate                   = 1 MBit/s
-      */
-      hfdcan.Instance = FDCAN1;
-      hfdcan.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
-      hfdcan.Init.Mode = FDCAN_MODE_NORMAL;
-      hfdcan.Init.AutoRetransmission = ENABLE;
-      hfdcan.Init.TransmitPause = DISABLE;
-      hfdcan.Init.ProtocolException = ENABLE;
-      hfdcan.Init.NominalPrescaler = 0x1; /* tq = NominalPrescaler x (1/fdcan_ker_ck) */
-      hfdcan.Init.NominalSyncJumpWidth = 0x8;
-      hfdcan.Init.NominalTimeSeg1 = 0x1F; /* NominalTimeSeg1 = Propagation_segment + Phase_segment_1 */
-      hfdcan.Init.NominalTimeSeg2 = 0x8;
-      hfdcan.Init.MessageRAMOffset = 0;
-      hfdcan.Init.StdFiltersNbr = 1;
-      hfdcan.Init.ExtFiltersNbr = 0;
-      hfdcan.Init.RxFifo0ElmtsNbr = 1;
-      hfdcan.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
-      hfdcan.Init.RxFifo1ElmtsNbr = 0;
-      hfdcan.Init.RxBuffersNbr = 0;
-      hfdcan.Init.TxEventsNbr = 0;
-      hfdcan.Init.TxBuffersNbr = 0;
-      hfdcan.Init.TxFifoQueueElmtsNbr = 1;
-      hfdcan.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
-      hfdcan.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
-      if (HAL_FDCAN_Init(&hfdcan) != HAL_OK)
-      {
-        /* Initialization Error */
-        Error_Handler();
-      }
-
-//#define DO_THE_REST_IN_embot_hw_can
-#if !defined(DO_THE_REST_IN_embot_hw_can)
-      /* Configure Rx filter */
-      sFilterConfig.IdType = FDCAN_STANDARD_ID;
-      sFilterConfig.FilterIndex = 0;
-      sFilterConfig.FilterType = FDCAN_FILTER_MASK;
-      sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
-      sFilterConfig.FilterID1 = 0x321;
-      sFilterConfig.FilterID2 = 0x7FF;
-      if (HAL_FDCAN_ConfigFilter(&hfdcan, &sFilterConfig) != HAL_OK)
-      {
-        /* Filter configuration Error */
-        Error_Handler();
-      }
-
-//      /* Start the FDCAN module */
-//      if (HAL_FDCAN_Start(&hfdcan) != HAL_OK)
+//      /* Bit time configuration:
+//        fdcan_ker_ck               = 40 MHz
+//        Time_quantum (tq)          = 25 ns
+//        Synchronization_segment    = 1 tq
+//        Propagation_segment        = 23 tq
+//        Phase_segment_1            = 8 tq
+//        Phase_segment_2            = 8 tq
+//        Synchronization_Jump_width = 8 tq
+//        Bit_length                 = 40 tq = 1 µs
+//        Bit_rate                   = 1 MBit/s
+//      */
+//      hfdcan.Instance = FDCAN1;
+//      hfdcan.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
+//      hfdcan.Init.Mode = FDCAN_MODE_NORMAL;
+//      hfdcan.Init.AutoRetransmission = ENABLE;
+//      hfdcan.Init.TransmitPause = DISABLE;
+//      hfdcan.Init.ProtocolException = ENABLE;
+//      hfdcan.Init.NominalPrescaler = 0x1; /* tq = NominalPrescaler x (1/fdcan_ker_ck) */
+//      hfdcan.Init.NominalSyncJumpWidth = 0x8;
+//      hfdcan.Init.NominalTimeSeg1 = 0x1F; /* NominalTimeSeg1 = Propagation_segment + Phase_segment_1 */
+//      hfdcan.Init.NominalTimeSeg2 = 0x8;
+//      hfdcan.Init.MessageRAMOffset = 0;
+//      hfdcan.Init.StdFiltersNbr = 1;
+//      hfdcan.Init.ExtFiltersNbr = 0;
+//      hfdcan.Init.RxFifo0ElmtsNbr = 1;
+//      hfdcan.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
+//      hfdcan.Init.RxFifo1ElmtsNbr = 0;
+//      hfdcan.Init.RxBuffersNbr = 0;
+//      hfdcan.Init.TxEventsNbr = 0;
+//      hfdcan.Init.TxBuffersNbr = 0;
+//      hfdcan.Init.TxFifoQueueElmtsNbr = 1;
+//      hfdcan.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+//      hfdcan.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
+//      if (HAL_FDCAN_Init(&hfdcan) != HAL_OK)
 //      {
-//        /* Start Error */
+//        /* Initialization Error */
 //        Error_Handler();
 //      }
 
-//      if (HAL_FDCAN_ActivateNotification(&hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+////#define DO_THE_REST_IN_embot_hw_can
+//#if !defined(DO_THE_REST_IN_embot_hw_can)
+//      /* Configure Rx filter */
+//      sFilterConfig.IdType = FDCAN_STANDARD_ID;
+//      sFilterConfig.FilterIndex = 0;
+//      sFilterConfig.FilterType = FDCAN_FILTER_MASK;
+//      sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
+//      sFilterConfig.FilterID1 = 0x321;
+//      sFilterConfig.FilterID2 = 0x7FF;
+//      if (HAL_FDCAN_ConfigFilter(&hfdcan, &sFilterConfig) != HAL_OK)
 //      {
-//        /* Notification Error */
+//        /* Filter configuration Error */
 //        Error_Handler();
 //      }
 
-//      /* Prepare Tx Header */
-//      TxHeader.Identifier = 0x321;
-//      TxHeader.IdType = FDCAN_STANDARD_ID;
-//      TxHeader.TxFrameType = FDCAN_DATA_FRAME;
-//      TxHeader.DataLength = FDCAN_DLC_BYTES_2;
-//      TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
-//      TxHeader.BitRateSwitch = FDCAN_BRS_OFF;
-//      TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
-//      TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
-//      TxHeader.MessageMarker = 0;
-#endif      
-      
-    }        
+////      /* Start the FDCAN module */
+////      if (HAL_FDCAN_Start(&hfdcan) != HAL_OK)
+////      {
+////        /* Start Error */
+////        Error_Handler();
+////      }
+
+////      if (HAL_FDCAN_ActivateNotification(&hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+////      {
+////        /* Notification Error */
+////        Error_Handler();
+////      }
+
+////      /* Prepare Tx Header */
+////      TxHeader.Identifier = 0x321;
+////      TxHeader.IdType = FDCAN_STANDARD_ID;
+////      TxHeader.TxFrameType = FDCAN_DATA_FRAME;
+////      TxHeader.DataLength = FDCAN_DLC_BYTES_2;
+////      TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+////      TxHeader.BitRateSwitch = FDCAN_BRS_OFF;
+////      TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
+////      TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+////      TxHeader.MessageMarker = 0;
+//#endif      
+//      
+//    }        
     
-    constexpr PROP can1p = { .handle = &hfdcan }; 
-    //constexpr PROP can2p = { .handle = &hfdcan2 };    
+    constexpr PROP can1p = { .handle = &hfdcan1 }; 
+    constexpr PROP can2p = { .handle = &hfdcan2 };    
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(CAN::one),        
+        mask::pos2mask<uint32_t>(CAN::one) | mask::pos2mask<uint32_t>(CAN::two),        
         // properties
         {{
-            &can1p           
+            &can1p, &can2p           
         }}        
     };
+    
+        
+    void hwdriver_init(embot::hw::CAN h)
+    {
+        constexpr std::array<embot::hw::GPIO, 2> candrivergpiosstandby = { {
+            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::four},     // CAN1_STBY_GPIO_Port, CAN1_STBY_Pin
+            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::five}      // CAN2_STBY_GPIO_Port, CAN2_STBY_Pin
+        } }; 
+
+        constexpr embot::hw::GPIO candrivergpioshutdown = 
+            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::zero};     // CAN_SHDN_GPIO_Port, CAN_SHDN_Pin, GPIO_PIN_RESET    
+        
+        constexpr embot::hw::gpio::Config cfg {
+            embot::hw::gpio::Mode::OUTPUTpushpull, 
+            embot::hw::gpio::Pull::nopull, 
+            embot::hw::gpio::Speed::medium };
+        
+        //static bool initted {false};
+        
+        // init the pins
+        embot::hw::gpio::init(candrivergpiosstandby[embot::core::tointegral(h)], cfg);
+        embot::hw::gpio::init(candrivergpioshutdown, cfg);
+        
+        // move them to reset state
+        embot::hw::gpio::set(candrivergpiosstandby[embot::core::tointegral(h)], embot::hw::gpio::State::RESET);
+        embot::hw::gpio::set(candrivergpioshutdown, embot::hw::gpio::State::RESET);
+        HAL_Delay(10);
+    }
     
     void BSP::init(embot::hw::CAN h) const 
     {
         if(h == CAN::one)
         {            
-            my_FDCAN1_Config();
+            MX_FDCAN1_Init();
+            // Activate the external driver out of STANDBY
+            //HAL_GPIO_WritePin(CAN1_STBY_GPIO_Port, CAN1_STBY_Pin, GPIO_PIN_RESET);
         }
+        else if(h == CAN::two)
+        {
+            MX_FDCAN2_Init();
+            // Activate the external driver out of STANDBY
+            //HAL_GPIO_WritePin(CAN2_STBY_GPIO_Port, CAN2_STBY_Pin, GPIO_PIN_RESET);
+        }
+        // Activate both driver out of SHUTDOWN mode 
+        //HAL_GPIO_WritePin(CAN_SHDN_GPIO_Port, CAN_SHDN_Pin, GPIO_PIN_RESET);
+        //HAL_Delay(10);
+        
+        hwdriver_init(h);
     }
         
     #else
@@ -474,7 +514,24 @@ namespace embot { namespace hw { namespace can {
 
         void FDCAN1_IT0_IRQHandler(void)
         {
-            HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan);
+            HAL_FDCAN_IRQHandler(&hfdcan1);
+        } 
+
+        void FDCAN2_IT0_IRQHandler(void)
+        {
+            HAL_FDCAN_IRQHandler(&hfdcan2);
+        } 
+        
+            
+        void FDCAN1_IT1_IRQHandler(void)
+        {
+            HAL_FDCAN_IRQHandler(&hfdcan1);
+        }          
+
+
+        void FDCAN2_IT1_IRQHandler(void)
+        {
+            HAL_FDCAN_IRQHandler(&hfdcan2);
         } 
     
     #else
@@ -698,14 +755,14 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
     }
     
     
-    SPI_HandleTypeDef hspi1;
-    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi1 = { {
-        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine},     // miso
-        {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::seven},    // mosi
-        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eleven},   // sckl
-        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::ten}       // ssel
-    } };
-    constexpr PROP spi1p = { &hspi1, 50*1000*1000, pinoutspi1 }; 
+SPI_HandleTypeDef hspi1;
+constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi1 = { {
+    {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine},     // miso
+    {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::seven},    // mosi
+    {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eleven},   // sckl
+    {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::ten}       // ssel
+} };
+constexpr PROP spi1p = { &hspi1, 50*1000*1000, pinoutspi1 }; 
     
     
     SPI_HandleTypeDef hspi2;

@@ -443,6 +443,7 @@ extern void stm32hal_board_init(void);
         #include "../src/board/amc/v1A0/inc/main.h"
         #include "../src/board/amc/v1A0/inc/eth.h"
         #include "../src/board/amc/v1A0/inc/spi.h"
+        #include "../src/board/amc/v1A0/inc/fdcan.h"
 
         #include "../src/board/amc/v1A0/inc/stm32h7xx_it.h"
         #include "../src/board/amc/v1A0/drv/Driver_ETH_MAC.h"

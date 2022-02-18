@@ -579,11 +579,6 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -598,6 +593,11 @@
         <Group>
           <GroupName>embot-os</GroupName>
           <Files>
+            <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_os.cpp</FileName>
               <FileType>8</FileType>
@@ -1230,11 +1230,6 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -1249,6 +1244,11 @@
         <Group>
           <GroupName>embot-os</GroupName>
           <Files>
+            <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_os.cpp</FileName>
               <FileType>8</FileType>
@@ -1932,11 +1932,6 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -1951,6 +1946,11 @@
         <Group>
           <GroupName>embot-os</GroupName>
           <Files>
+            <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_os.cpp</FileName>
               <FileType>8</FileType>
@@ -2634,11 +2634,6 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -2653,6 +2648,11 @@
         <Group>
           <GroupName>embot-os</GroupName>
           <Files>
+            <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_os.cpp</FileName>
               <FileType>8</FileType>
@@ -3336,11 +3336,6 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -3355,6 +3350,11 @@
         <Group>
           <GroupName>embot-os</GroupName>
           <Files>
+            <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_os.cpp</FileName>
               <FileType>8</FileType>
@@ -3987,11 +3987,6 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_os_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_chip_M95512DF.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
@@ -4006,6 +4001,11 @@
         <Group>
           <GroupName>embot-os</GroupName>
           <Files>
+            <File>
+              <FileName>embot_os_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_theScheduler.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_os.cpp</FileName>
               <FileType>8</FileType>

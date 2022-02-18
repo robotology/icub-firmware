@@ -2218,6 +2218,16 @@
               <FileType>1</FileType>
               <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_spi_ex.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32hal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\stm32hal\stm32hal.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_fdcan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_fdcan.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4697,6 +4707,16 @@
               <FileName>stm32h7xx_hal_spi_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32hal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\stm32hal\stm32hal.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_fdcan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_fdcan.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -7178,6 +7198,16 @@
               <FileType>1</FileType>
               <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_spi_ex.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32hal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\stm32hal\stm32hal.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_fdcan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_fdcan.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9657,6 +9687,16 @@
               <FileName>stm32h7xx_hal_spi_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32hal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\stm32hal\stm32hal.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_fdcan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_fdcan.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -12275,6 +12315,16 @@
               <FileName>stm32h7xx_hal_spi_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_spi_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32hal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\stm32hal\stm32hal.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_fdcan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_fdcan.c</FilePath>
             </File>
           </Files>
         </Group>

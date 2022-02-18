@@ -30,7 +30,7 @@
 //    #define EMBOT_ENABLE_hw_spi_123
     
 //    #define EMBOT_ENABLE_hw_button
-//    #define EMBOT_ENABLE_hw_can
+    #define EMBOT_ENABLE_hw_can
     #undef EMBOT_ENABLE_hw_flash
 //    #define EMBOT_ENABLE_hw_eth
     #define EMBOT_ENABLE_hw_eth_phytimeout
