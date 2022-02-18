@@ -447,16 +447,53 @@ namespace embot { namespace hw { namespace can {
         }}        
     };
     
+        
+    void hwdriver_init(embot::hw::CAN h)
+    {
+        constexpr std::array<embot::hw::GPIO, 2> candrivergpiosstandby = { {
+            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::four},     // CAN1_STBY_GPIO_Port, CAN1_STBY_Pin
+            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::five}      // CAN2_STBY_GPIO_Port, CAN2_STBY_Pin
+        } }; 
+
+        constexpr embot::hw::GPIO candrivergpioshutdown = 
+            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::zero};     // CAN_SHDN_GPIO_Port, CAN_SHDN_Pin, GPIO_PIN_RESET    
+        
+        constexpr embot::hw::gpio::Config cfg {
+            embot::hw::gpio::Mode::OUTPUTpushpull, 
+            embot::hw::gpio::Pull::nopull, 
+            embot::hw::gpio::Speed::medium };
+        
+        //static bool initted {false};
+        
+        // init the pins
+        embot::hw::gpio::init(candrivergpiosstandby[embot::core::tointegral(h)], cfg);
+        embot::hw::gpio::init(candrivergpioshutdown, cfg);
+        
+        // move them to reset state
+        embot::hw::gpio::set(candrivergpiosstandby[embot::core::tointegral(h)], embot::hw::gpio::State::RESET);
+        embot::hw::gpio::set(candrivergpioshutdown, embot::hw::gpio::State::RESET);
+        HAL_Delay(10);
+    }
+    
     void BSP::init(embot::hw::CAN h) const 
     {
         if(h == CAN::one)
         {            
             MX_FDCAN1_Init();
+            // Activate the external driver out of STANDBY
+            //HAL_GPIO_WritePin(CAN1_STBY_GPIO_Port, CAN1_STBY_Pin, GPIO_PIN_RESET);
         }
         else if(h == CAN::two)
         {
             MX_FDCAN2_Init();
+            // Activate the external driver out of STANDBY
+            //HAL_GPIO_WritePin(CAN2_STBY_GPIO_Port, CAN2_STBY_Pin, GPIO_PIN_RESET);
         }
+        // Activate both driver out of SHUTDOWN mode 
+        //HAL_GPIO_WritePin(CAN_SHDN_GPIO_Port, CAN_SHDN_Pin, GPIO_PIN_RESET);
+        //HAL_Delay(10);
+        
+        hwdriver_init(h);
     }
         
     #else
