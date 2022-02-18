@@ -153,21 +153,23 @@ void can1_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *pa
         
         constexpr uint8_t burstsize = 2;
 
-if(burstsize < 2)
-{    
-        embot::core::print("tCAN1: will now transmit on CAN1 1 frame w/ data[0] = " + std::to_string(payload[0])); 
-        embot::hw::can::put(embot::hw::CAN::one, {2, 8, payload}); 
-}
-else
-        embot::core::print("tCAN1: will now transmit on CAN1 a burst of " + std::to_string(burstsize) + " frames w/ data[0] = " + std::to_string(payload[0]) + " and decreasing sizes"); 
-        embot::hw::can::Frame hwtxframe {2, 8, payload};
-        for(uint8_t n=0; n<burstsize; n++)
+        if(burstsize < 2)
+        {    
+            embot::core::print("tCAN1: will now transmit on CAN1 1 frame w/ data[0] = " + std::to_string(payload[0])); 
+            embot::hw::can::put(embot::hw::CAN::one, {2, 8, payload}); 
+        }
+        else
         {
-            hwtxframe.size = 8-n;
-            embot::core::print("tCAN1: tx frame w/ size = " + std::to_string(hwtxframe.size));
-            embot::hw::can::put(embot::hw::CAN::one, hwtxframe);  
+            embot::core::print("tCAN1: will now transmit on CAN1 a burst of " + std::to_string(burstsize) + " frames w/ data[0] = " + std::to_string(payload[0]) + " and decreasing sizes"); 
+            embot::hw::can::Frame hwtxframe {2, 8, payload};
+            for(uint8_t n=0; n<burstsize; n++)
+            {
+                hwtxframe.size = 8-n;
+                embot::core::print("tCAN1: tx frame w/ size = " + std::to_string(hwtxframe.size));
+                embot::hw::can::put(embot::hw::CAN::one, hwtxframe);  
+            }   
         }            
-        
+            
         embot::hw::can::transmit(embot::hw::CAN::one);
         embot::core::print(" ");
 #endif        
