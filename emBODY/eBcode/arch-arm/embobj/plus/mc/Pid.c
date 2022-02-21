@@ -86,10 +86,14 @@ void PID_config(PID* o, eOmc_PID_t* config)
     
 }
 
-void PID_config_friction(PID *o, float Kbemf, float Ktau)
+void PID_config_friction(PID *o, float Kbemf, float Ktau, eOmc_FrictionParams_t friction)
 {
     o->Kbemf = Kbemf;
     o->Ktau  = Ktau;
+    o->viscous_up_val = friction.viscous_up_val;
+    o->viscous_down_val = friction.viscous_down_val;
+    o->coulomb_up_val = friction.coulomb_up_val;
+    o->coulomb_down_val = friction.coulomb_down_val;
 }
 
 void PID_config_filter(PID *o, uint8_t filter)
@@ -177,5 +181,7 @@ float PID_do_out(PID* o, float En)
 
 float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
 {
+    // TODO: return value using the new friction parameters
+    //return o->Ktau*(o->coulomb_up_val + o->viscous_up_val*vel_fbk + o->Kff*trq_ref);
     return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
 }

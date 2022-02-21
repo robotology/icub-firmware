@@ -1501,7 +1501,7 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     MController_motor_config_torque_PID(j, &(config->pidtorque));
     
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
-    Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);   
+    Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value, config->motor_params.friction);
     
     Joint_config(o->joint+j, j, config);
     
@@ -1517,9 +1517,9 @@ void MController_config_motor(int m, eOmc_motor_config_t* config) //
     Motor_config(smc->motor+m, m, config);
 }
 
-void MController_config_motor_friction(int m, eOmc_motor_params_t* friction) //
+void MController_config_motor_friction(int m, eOmc_motor_params_t* params) //
 {
-    Motor_config_friction(smc->motor+m, friction->bemf_value, friction->ktau_value);
+    Motor_config_friction(smc->motor+m, params->bemf_value, params->ktau_value, params->friction);
 }
 
 void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance) //
