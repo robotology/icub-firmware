@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.87
+// Model version                  : 2.89
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 31 18:32:04 2022
+// C/C++ source code generated on : Tue Feb 22 10:22:27 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -50,11 +50,10 @@ namespace amc_bldc_codegen
   {
     real32_T rtb_IaIbIc0[2];
     real32_T rtb_Add;
+    real32_T rtb_DProdOut;
     real32_T rtb_FilterDifferentiatorTF;
-    real32_T rtb_FilterDifferentiatorTF_a;
     real32_T rtb_FilterDifferentiatorTF_f;
     real32_T rtb_PProdOut_k;
-    real32_T rtb_Saturation1;
     real32_T rtb_SinCos_o1;
     real32_T rtb_SinCos_o2;
     real32_T rtb_Unary_Minus;
@@ -63,22 +62,15 @@ namespace amc_bldc_codegen
     real32_T rtb_sum_alpha;
     real32_T rtb_sum_beta;
     real32_T tmp;
+    real32_T u0;
     boolean_T rtb_FixPtRelationalOperator;
-
-    // Switch: '<S1>/Switch3'
-    if (rtu_OuterOutputs->vel_en) {
-      rtb_PProdOut_k = rtu_OuterOutputs->motorcurrent.current;
-    } else {
-      rtb_PProdOut_k = rtu_Targets->motorcurrent.current;
-    }
-
-    // End of Switch: '<S1>/Switch3'
 
     // Sum: '<S1>/Add' incorporates:
     //   Product: '<S1>/Product1'
     //   Product: '<S1>/Product2'
 
-    rtb_Add = rtb_PProdOut_k * rtu_ConfigurationParameters->motorconfig.Rphase +
+    rtb_Add = rtu_OuterOutputs->motorcurrent.current *
+      rtu_ConfigurationParameters->motorconfig.Rphase +
       rtu_Estimates->jointvelocities.velocity *
       rtu_ConfigurationParameters->motorconfig.Kbemf;
 
@@ -102,11 +94,11 @@ namespace amc_bldc_codegen
     // End of Outputs for SubSystem: '<S1>/Clarke Transform'
 
     // Gain: '<S1>/deg2rad'
-    rtb_Saturation1 = 0.0174532924F * rtu_Sensors->motorsensors.angle;
+    rtb_Unary_Minus = 0.0174532924F * rtu_Sensors->motorsensors.angle;
 
     // Trigonometry: '<S1>/SinCos'
-    rtb_SinCos_o1 = std::sin(rtb_Saturation1);
-    rtb_SinCos_o2 = std::cos(rtb_Saturation1);
+    rtb_SinCos_o1 = std::sin(rtb_Unary_Minus);
+    rtb_SinCos_o2 = std::cos(rtb_Unary_Minus);
 
     // Outputs for Atomic SubSystem: '<S1>/Park Transform'
     // Switch: '<S115>/Switch' incorporates:
@@ -126,17 +118,13 @@ namespace amc_bldc_codegen
     // Sum: '<S1>/Sum' incorporates:
     //   AlgorithmDescriptorDelegate generated from: '<S8>/a16'
 
-    rtb_PProdOut_k -= rtb_IaIbIc0[1];
+    rtb_Unary_Minus = rtu_OuterOutputs->motorcurrent.current - rtb_IaIbIc0[1];
 
     // End of Outputs for SubSystem: '<S1>/Park Transform'
 
     // Product: '<S103>/PProd Out'
-    rtb_algDD_o1_p = rtb_PProdOut_k *
+    rtb_algDD_o1_p = rtb_Unary_Minus *
       rtu_ConfigurationParameters->motorconfig.Kp;
-
-    // Product: '<S95>/IProd Out'
-    rtb_Saturation1 = rtb_PProdOut_k *
-      rtu_ConfigurationParameters->motorconfig.Ki;
 
     // RelationalOperator: '<S3>/FixPt Relational Operator' incorporates:
     //   UnitDelay: '<S3>/Delay Input1'
@@ -158,7 +146,7 @@ namespace amc_bldc_codegen
 
     control_foc_PrevZCX.FilterDifferentiatorTF_Reset_ZC =
       rtb_FixPtRelationalOperator;
-    control_foc_DW.FilterDifferentiatorTF_tmp = rtb_PProdOut_k *
+    control_foc_DW.FilterDifferentiatorTF_tmp = rtb_Unary_Minus *
       rtu_ConfigurationParameters->motorconfig.Kd - -0.999634385F *
       control_foc_DW.FilterDifferentiatorTF_states;
 
@@ -167,18 +155,19 @@ namespace amc_bldc_codegen
     //   DiscreteTransferFcn: '<S91>/Filter Differentiator TF'
     //   Product: '<S91>/DenCoefOut'
 
-    rtb_PProdOut_k = (control_foc_DW.FilterDifferentiatorTF_tmp +
+    rtb_algDD_o2_n = (control_foc_DW.FilterDifferentiatorTF_tmp +
                       -control_foc_DW.FilterDifferentiatorTF_states) *
       0.999817193F * 10.0F;
 
     // Sum: '<S110>/SumI1' incorporates:
+    //   Product: '<S95>/IProd Out'
     //   Sum: '<S108>/Sum Fdbk'
     //   Sum: '<S109>/SumI3'
     //   UnitDelay: '<S1>/Unit Delay'
 
     rtb_FilterDifferentiatorTF = (control_foc_DW.UnitDelay_DSTATE -
-      ((rtb_algDD_o1_p + control_foc_DW.Integrator_DSTATE) + rtb_PProdOut_k)) +
-      rtb_Saturation1;
+      ((rtb_algDD_o1_p + control_foc_DW.Integrator_DSTATE) + rtb_algDD_o2_n)) +
+      rtb_Unary_Minus * rtu_ConfigurationParameters->motorconfig.Ki;
 
     // DiscreteIntegrator: '<S98>/Integrator'
     if (rtb_FixPtRelationalOperator && (control_foc_DW.Integrator_PrevResetState
@@ -187,7 +176,7 @@ namespace amc_bldc_codegen
     }
 
     // DiscreteIntegrator: '<S98>/Integrator'
-    rtb_algDD_o2_n = 1.82857148E-5F * rtb_FilterDifferentiatorTF +
+    rtb_DProdOut = 1.82857148E-5F * rtb_FilterDifferentiatorTF +
       control_foc_DW.Integrator_DSTATE;
 
     // Switch: '<S1>/Switch1' incorporates:
@@ -195,10 +184,10 @@ namespace amc_bldc_codegen
     //   Sum: '<S1>/Sum2'
 
     if (rtu_OuterOutputs->cur_en) {
-      rtb_Saturation1 = ((rtb_algDD_o1_p + rtb_algDD_o2_n) + rtb_PProdOut_k) +
+      rtb_algDD_o2_n = ((rtb_algDD_o1_p + rtb_DProdOut) + rtb_algDD_o2_n) +
         rtb_Add;
     } else {
-      rtb_Saturation1 = rtu_Targets->motorvoltage.voltage;
+      rtb_algDD_o2_n = rtu_Targets->motorvoltage.voltage;
     }
 
     // End of Switch: '<S1>/Switch1'
@@ -209,16 +198,16 @@ namespace amc_bldc_codegen
     //   RelationalOperator: '<S9>/UpperRelop'
     //   Switch: '<S9>/Switch'
 
-    if (rtb_Saturation1 > rtu_ConfigurationParameters->motorconfig.Vmax) {
+    if (rtb_algDD_o2_n > rtu_ConfigurationParameters->motorconfig.Vmax) {
       rtb_algDD_o1_p = rtu_ConfigurationParameters->motorconfig.Vmax;
-    } else if (rtb_Saturation1 < -rtu_ConfigurationParameters->motorconfig.Vmax)
+    } else if (rtb_algDD_o2_n < -rtu_ConfigurationParameters->motorconfig.Vmax)
     {
       // Switch: '<S9>/Switch' incorporates:
       //   Gain: '<S1>/Gain2'
 
       rtb_algDD_o1_p = -rtu_ConfigurationParameters->motorconfig.Vmax;
     } else {
-      rtb_algDD_o1_p = rtb_Saturation1;
+      rtb_algDD_o1_p = rtb_algDD_o2_n;
     }
 
     // End of Switch: '<S9>/Switch2'
@@ -226,7 +215,7 @@ namespace amc_bldc_codegen
     // Gain: '<S1>/Gain3' incorporates:
     //   Product: '<S1>/Divide1'
 
-    rtb_Saturation1 = rtb_algDD_o1_p /
+    rtb_algDD_o2_n = rtb_algDD_o1_p /
       rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F;
 
     // Outputs for Atomic SubSystem: '<S1>/Park Transform'
@@ -280,21 +269,19 @@ namespace amc_bldc_codegen
 
     if (rtb_FilterDifferentiatorTF_f >=
         rtu_ConfigurationParameters->motorconfig.Vmax) {
-      rtb_FilterDifferentiatorTF_a =
-        rtu_ConfigurationParameters->motorconfig.Vmax;
+      rtb_Unary_Minus = rtu_ConfigurationParameters->motorconfig.Vmax;
     } else if (rtb_FilterDifferentiatorTF_f >
                -rtu_ConfigurationParameters->motorconfig.Vmax) {
       // Switch: '<S37>/Switch1'
-      rtb_FilterDifferentiatorTF_a = rtb_FilterDifferentiatorTF_f;
+      rtb_Unary_Minus = rtb_FilterDifferentiatorTF_f;
     } else {
-      rtb_FilterDifferentiatorTF_a =
-        -rtu_ConfigurationParameters->motorconfig.Vmax;
+      rtb_Unary_Minus = -rtu_ConfigurationParameters->motorconfig.Vmax;
     }
 
     // End of Switch: '<S37>/Switch'
 
     // Sum: '<S37>/Diff'
-    rtb_sum_alpha = rtb_FilterDifferentiatorTF_f - rtb_FilterDifferentiatorTF_a;
+    rtb_sum_alpha = rtb_FilterDifferentiatorTF_f - rtb_Unary_Minus;
 
     // Outputs for Atomic SubSystem: '<S1>/Park Transform'
     // Product: '<S43>/IProd Out' incorporates:
@@ -309,26 +296,25 @@ namespace amc_bldc_codegen
     // Signum: '<S34>/SignPreSat'
     if (rtb_sum_alpha < 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv1'
-      rtb_FilterDifferentiatorTF_a = -1.0F;
+      u0 = -1.0F;
     } else if (rtb_sum_alpha > 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv1'
-      rtb_FilterDifferentiatorTF_a = 1.0F;
+      u0 = 1.0F;
     } else if (rtb_sum_alpha == 0.0F) {
       // DataTypeConversion: '<S34>/DataTypeConv1'
-      rtb_FilterDifferentiatorTF_a = 0.0F;
+      u0 = 0.0F;
     } else {
       // DataTypeConversion: '<S34>/DataTypeConv1'
-      rtb_FilterDifferentiatorTF_a = (rtNaNF);
+      u0 = (rtNaNF);
     }
 
     // End of Signum: '<S34>/SignPreSat'
 
     // DataTypeConversion: '<S34>/DataTypeConv1'
-    if (rtIsNaNF(rtb_FilterDifferentiatorTF_a)) {
-      rtb_FilterDifferentiatorTF_a = 0.0F;
+    if (rtIsNaNF(u0)) {
+      u0 = 0.0F;
     } else {
-      rtb_FilterDifferentiatorTF_a = std::fmod(rtb_FilterDifferentiatorTF_a,
-        256.0F);
+      u0 = std::fmod(u0, 256.0F);
     }
 
     // Signum: '<S34>/SignPreIntegrator'
@@ -364,14 +350,13 @@ namespace amc_bldc_codegen
     //   RelationalOperator: '<S34>/Equal1'
     //   RelationalOperator: '<S34>/NotEqual'
 
-    if ((0.0F * rtb_FilterDifferentiatorTF_f != rtb_sum_alpha) &&
-        ((rtb_FilterDifferentiatorTF_a < 0.0F ? static_cast<int32_T>(
-           static_cast<int8_T>(-static_cast<int8_T>(static_cast<uint8_T>
-             (-rtb_FilterDifferentiatorTF_a)))) : static_cast<int32_T>(
-           static_cast<int8_T>(static_cast<uint8_T>(rtb_FilterDifferentiatorTF_a))))
-         == (tmp < 0.0F ? static_cast<int32_T>(static_cast<int8_T>(-static_cast<
-            int8_T>(static_cast<uint8_T>(-tmp)))) : static_cast<int32_T>(
-           static_cast<int8_T>(static_cast<uint8_T>(tmp)))))) {
+    if ((0.0F * rtb_FilterDifferentiatorTF_f != rtb_sum_alpha) && ((u0 < 0.0F ?
+          static_cast<int32_T>(static_cast<int8_T>(-static_cast<int8_T>(
+             static_cast<uint8_T>(-u0)))) : static_cast<int32_T>
+          (static_cast<int8_T>(static_cast<uint8_T>(u0)))) == (tmp < 0.0F ?
+          static_cast<int32_T>(static_cast<int8_T>(-static_cast<int8_T>(
+             static_cast<uint8_T>(-tmp)))) : static_cast<int32_T>
+          (static_cast<int8_T>(static_cast<uint8_T>(tmp)))))) {
       rtb_FilterDifferentiatorTF_f = 0.0F;
     } else {
       rtb_FilterDifferentiatorTF_f = rtb_Unary_Minus;
@@ -440,81 +425,60 @@ namespace amc_bldc_codegen
 
       rtb_SinCos_o2 = 0.5F * rtb_IaIbIc0[0];
 
-      // End of Outputs for SubSystem: '<S1>/Inverse Park Transform'
-
-      // Sum: '<S5>/add_c'
-      rtb_PProdOut_k = (0.0F - rtb_SinCos_o2) - rtb_SinCos_o1;
-
-      // Sum: '<S5>/add_b'
-      rtb_SinCos_o2 = rtb_SinCos_o1 - rtb_SinCos_o2;
-
-      // Outputs for Atomic SubSystem: '<S1>/Inverse Park Transform'
-      // MinMax: '<S1>/Min' incorporates:
+      // Sum: '<S1>/Sum1' incorporates:
       //   AlgorithmDescriptorDelegate generated from: '<S6>/a16'
-
-      if ((rtb_IaIbIc0[0] <= rtb_SinCos_o2) || rtIsNaNF(rtb_SinCos_o2)) {
-        rtb_SinCos_o1 = rtb_IaIbIc0[0];
-      } else {
-        rtb_SinCos_o1 = rtb_SinCos_o2;
-      }
-
-      // End of Outputs for SubSystem: '<S1>/Inverse Park Transform'
-      if ((!(rtb_SinCos_o1 <= rtb_PProdOut_k)) && (!rtIsNaNF(rtb_PProdOut_k))) {
-        rtb_SinCos_o1 = rtb_PProdOut_k;
-      }
-
-      // End of MinMax: '<S1>/Min'
-
-      // Outputs for Atomic SubSystem: '<S1>/Inverse Park Transform'
-      // Gain: '<S1>/Gain1' incorporates:
-      //   AlgorithmDescriptorDelegate generated from: '<S6>/a16'
+      //   Constant: '<S1>/Constant2'
+      //   Gain: '<S1>/Gain1'
       //   Product: '<S1>/Divide'
-      //   Sum: '<S1>/Sum1'
 
-      rtb_FilterDifferentiatorTF_a = (rtb_IaIbIc0[0] - rtb_SinCos_o1) /
-        rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F;
+      u0 = rtb_IaIbIc0[0] / rtu_ConfigurationParameters->motorconfig.Vcc *
+        100.0F + 50.0F;
 
       // End of Outputs for SubSystem: '<S1>/Inverse Park Transform'
 
       // Saturate: '<S1>/Saturation'
-      if (rtb_FilterDifferentiatorTF_a > 100.0F) {
+      if (u0 > 100.0F) {
         rty_FOCOutputs->Vabc[0] = 100.0F;
-      } else if (rtb_FilterDifferentiatorTF_a < 0.0F) {
+      } else if (u0 < 0.0F) {
         rty_FOCOutputs->Vabc[0] = 0.0F;
       } else {
-        rty_FOCOutputs->Vabc[0] = rtb_FilterDifferentiatorTF_a;
+        rty_FOCOutputs->Vabc[0] = u0;
       }
 
-      // Gain: '<S1>/Gain1' incorporates:
+      // Sum: '<S1>/Sum1' incorporates:
+      //   Constant: '<S1>/Constant2'
+      //   Gain: '<S1>/Gain1'
       //   Product: '<S1>/Divide'
-      //   Sum: '<S1>/Sum1'
+      //   Sum: '<S5>/add_b'
 
-      rtb_FilterDifferentiatorTF_a = (rtb_SinCos_o2 - rtb_SinCos_o1) /
-        rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F;
+      u0 = (rtb_SinCos_o1 - rtb_SinCos_o2) /
+        rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F + 50.0F;
 
       // Saturate: '<S1>/Saturation'
-      if (rtb_FilterDifferentiatorTF_a > 100.0F) {
+      if (u0 > 100.0F) {
         rty_FOCOutputs->Vabc[1] = 100.0F;
-      } else if (rtb_FilterDifferentiatorTF_a < 0.0F) {
+      } else if (u0 < 0.0F) {
         rty_FOCOutputs->Vabc[1] = 0.0F;
       } else {
-        rty_FOCOutputs->Vabc[1] = rtb_FilterDifferentiatorTF_a;
+        rty_FOCOutputs->Vabc[1] = u0;
       }
 
-      // Gain: '<S1>/Gain1' incorporates:
+      // Sum: '<S1>/Sum1' incorporates:
+      //   Constant: '<S1>/Constant2'
+      //   Gain: '<S1>/Gain1'
       //   Product: '<S1>/Divide'
-      //   Sum: '<S1>/Sum1'
+      //   Sum: '<S5>/add_c'
 
-      rtb_FilterDifferentiatorTF_a = (rtb_PProdOut_k - rtb_SinCos_o1) /
-        rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F;
+      u0 = ((0.0F - rtb_SinCos_o2) - rtb_SinCos_o1) /
+        rtu_ConfigurationParameters->motorconfig.Vcc * 100.0F + 50.0F;
 
       // Saturate: '<S1>/Saturation'
-      if (rtb_FilterDifferentiatorTF_a > 100.0F) {
+      if (u0 > 100.0F) {
         rty_FOCOutputs->Vabc[2] = 100.0F;
-      } else if (rtb_FilterDifferentiatorTF_a < 0.0F) {
+      } else if (u0 < 0.0F) {
         rty_FOCOutputs->Vabc[2] = 0.0F;
       } else {
-        rty_FOCOutputs->Vabc[2] = rtb_FilterDifferentiatorTF_a;
+        rty_FOCOutputs->Vabc[2] = u0;
       }
     } else {
       rty_FOCOutputs->Vabc[0] = 0.0F;
@@ -533,15 +497,15 @@ namespace amc_bldc_codegen
     // End of Outputs for SubSystem: '<S1>/Park Transform'
 
     // Saturate: '<S1>/Saturation1'
-    if (rtb_Saturation1 > 100.0F) {
+    if (rtb_algDD_o2_n > 100.0F) {
       // BusCreator: '<S1>/Bus Creator'
       rty_FOCOutputs->Vq = 100.0F;
-    } else if (rtb_Saturation1 < -100.0F) {
+    } else if (rtb_algDD_o2_n < -100.0F) {
       // BusCreator: '<S1>/Bus Creator'
       rty_FOCOutputs->Vq = -100.0F;
     } else {
       // BusCreator: '<S1>/Bus Creator'
-      rty_FOCOutputs->Vq = rtb_Saturation1;
+      rty_FOCOutputs->Vq = rtb_algDD_o2_n;
     }
 
     // End of Saturate: '<S1>/Saturation1'
@@ -565,7 +529,7 @@ namespace amc_bldc_codegen
 
     // Update for DiscreteIntegrator: '<S98>/Integrator'
     control_foc_DW.Integrator_DSTATE = 1.82857148E-5F *
-      rtb_FilterDifferentiatorTF + rtb_algDD_o2_n;
+      rtb_FilterDifferentiatorTF + rtb_DProdOut;
     control_foc_DW.Integrator_PrevResetState = static_cast<int8_T>
       (rtb_FixPtRelationalOperator);
 
