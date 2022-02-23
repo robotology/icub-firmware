@@ -49,10 +49,10 @@ typedef struct //PID
     float stiction_up;
     float stiction_down;
 
-    float viscous_up_val;
-    float viscous_down_val;
-    float coulomb_up_val;
-    float coulomb_down_val;
+    float viscous_pos_val;
+    float viscous_neg_val;
+    float coulomb_pos_val;
+    float coulomb_neg_val;
 
 #ifdef FINGER_MK3
     float out_max_open;
