@@ -504,7 +504,7 @@ extern "C" {
 
 //  <o> max size of output datagrams <64-1500>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1408
+#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1416
 
 //  </h>datagrams in socket
 
@@ -555,7 +555,7 @@ extern "C" {
 
 //  <o> capacity of the ropframe of regular rops    <16-1440:8>
 //  <i> default: 768
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  924
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  1024
 
 //  <o> capacity of the ropframe of occasional rops    <16-1440:8>
 //  <i> default: 128
@@ -563,7 +563,7 @@ extern "C" {
 
 //  <o> capacity of the ropframe of reply rops    <16-1440:8>
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  356
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  264
 
 
 
