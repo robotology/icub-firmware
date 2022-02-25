@@ -375,9 +375,10 @@ namespace embot { namespace hw { namespace motor {
         memset(&MainConf, 0, sizeof(MainConf));
         
         analogInit();
+        pwmInit(); // pwmInit() shall be called before encoderInit() as the latter uses specific PWM quantities
         encoderInit();
         hallInit();
-        pwmInit();
+
 
         HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
         HAL_Delay(10); 
