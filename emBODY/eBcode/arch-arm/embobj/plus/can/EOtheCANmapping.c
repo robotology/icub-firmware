@@ -269,6 +269,12 @@ extern EOtheCANmapping * eo_canmap_Initialise(const eOcanmap_cfg_t *canmapcfg)
     {
         s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_pos_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
     }
+
+    m = eocanmap_posOfEPEN(eoprot_endpoint_analogsensors, eoprot_entity_as_ft);
+    for(uint8_t n=0; n<eocanmap_fts_maxnumberof; n++)
+    {
+        s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_ft_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
+    }
     
     m = eocanmap_posOfEPEN(eoprot_endpoint_skin, eoprot_entity_sk_skin);
     for(uint8_t n=0; n<eocanmap_skins_maxnumberof; n++)
@@ -739,6 +745,7 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
         (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_rfe),    // inertial3
         (1 << eobrd_cantype_psc),                                                               // psc
         (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_psc),                                    // pos
+        (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // ft
         (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc)         // skin
     }; EO_VERIFYsizeof(tableB, sizeof(const uint32_t)*(eocanmap_entities_maxnumberof))
     
@@ -751,22 +758,22 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-EO_VERIFYproposition(eocanmap_posOfEPEN__pos, (eoprot_entities_numberof == 15))
+EO_VERIFYproposition(eocanmap_posOfEPEN__pos, (eoprot_entities_numberof == 16))
 // if error: change the magic number and put the new entity in the pos[][] map
 
 extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en)
 {
     enum { // keep in magic numbers. it is a check if any of the eoprot_xxx value changes
         s0 = 4, // eoprot_endpoints_numberof
-        s1 = 7  // eoprot_entities_maxnumberofsupported
+        s1 = 8  // eoprot_entities_maxnumberofsupported
     };
     
     static const uint8_t pos[s0][s1] = // pos[eoprot_endpoints_numberof][eoprot_entities_maxnumberofsupported] = 
     {
-        {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf},  // ep->management [none, ...]
-        {0,     1, 0xf, 0xf, 0xf, 0xf, 0xf},  // ep->mc [joi, mot, none, ...]
-        {2,     3,   4,   5,   6,   7,   8},  // ep->as [str, mai, tem, ine, ine3, psc, pos]
-        {9,   0xf, 0xf, 0xf, 0xf, 0xf, 0xf}   // ep->sk [sk, none]
+        {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf},   // ep->management [none, ...]
+        {0,     1, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf},   // ep->mc [joi, mot, none, ...]
+        {2,     3,   4,   5,   6,   7,   8,   9},   // ep->as [str, mai, tem, ine, ine3, psc, pos, ft]
+        {10,  0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf}    // ep->sk [sk, none]
     }; EO_VERIFYsizeof(pos, sizeof(const uint8_t)*(eoprot_endpoints_numberof)*(eoprot_entities_maxnumberofsupported))
 
     // the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-skin
@@ -792,7 +799,7 @@ extern uint8_t eocanmap_maxINDEX(eOprotEndpoint_t ep, eOprotEntity_t en)
         
         eocanmap_strains_maxnumberof, eocanmap_maises_maxnumberof, eocanmap_temperatures_maxnumberof, 
         eocanmap_inertials_maxnumberof, eocanmap_inertials3_maxnumberof, eocanmap_pscs_maxnumberof, 
-        eocanmap_poses_maxnumberof,
+        eocanmap_poses_maxnumberof, eocanmap_fts_maxnumberof,
         
         eocanmap_skins_maxnumberof
     }; EO_VERIFYsizeof(numI, sizeof(const uint8_t)*(eocanmap_entities_maxnumberof))
@@ -815,7 +822,7 @@ extern uint8_t eocanmap_maxBOARDnumber(eOprotEndpoint_t ep, eOprotEntity_t en)
         
         eocanmap_strain_boards_maxnumberof, eocanmap_mais_boards_maxnumberof, eocanmap_temperature_boards_maxnumberof, 
         eocanmap_inertial_boards_maxnumberof, eocanmap_inertial3_boards_maxnumberof, eocanmap_psc_boards_maxnumberof, 
-        eocanmap_pos_boards_maxnumberof,
+        eocanmap_pos_boards_maxnumberof, eocanmap_ft_boards_maxnumberof,
         
         eocanmap_skin_boards_maxnumberof
     }; EO_VERIFYsizeof(numB, sizeof(const uint8_t)*(eocanmap_entities_maxnumberof))

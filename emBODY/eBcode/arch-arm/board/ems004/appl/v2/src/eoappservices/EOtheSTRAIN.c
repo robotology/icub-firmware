@@ -302,9 +302,9 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     p->service.servconfig.type = eomn_serv_NONE;
     
     
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), 1, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), 1, NULL, 0, NULL, NULL);
     
-    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
+    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, 0, NULL, NULL);
     
     p->sharedcan.discoverytargets = eo_array_New(1, sizeof(eOcandiscovery_target_t),  NULL);
     
@@ -708,6 +708,11 @@ extern eOresult_t eo_strain_AcceptCANframe(EOtheSTRAIN *p, eOcanframe_t *frame, 
     {
         return(eores_NOK_nullpointer);
     }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    }      
     
     if((processForce == mode) || (processTorque == mode))
     {    

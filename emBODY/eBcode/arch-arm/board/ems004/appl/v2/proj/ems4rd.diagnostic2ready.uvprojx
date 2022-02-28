@@ -757,7 +757,7 @@
             </File>
             <File>
               <FileName>overridden_runner.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoemsappl\overridden_runner.c</FilePath>
             </File>
             <File>
@@ -817,7 +817,7 @@
             </File>
             <File>
               <FileName>EOtheServices.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
             </File>
             <File>
@@ -914,6 +914,11 @@
               <FileName>EOtheFatalError.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheFatalError.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theFTservice.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eoappservices\embot_app_eth_theFTservice.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1142,7 +1147,7 @@
             </File>
             <File>
               <FileName>EoProtocolAS_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
             </File>
             <File>
@@ -2129,7 +2134,7 @@
             </File>
             <File>
               <FileName>overridden_runner.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoemsappl\overridden_runner.c</FilePath>
             </File>
             <File>
@@ -2189,7 +2194,7 @@
             </File>
             <File>
               <FileName>EOtheServices.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
             </File>
             <File>
@@ -2286,6 +2291,11 @@
               <FileName>EOtheFatalError.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheFatalError.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theFTservice.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eoappservices\embot_app_eth_theFTservice.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2583,7 +2593,7 @@
             </File>
             <File>
               <FileName>EoProtocolAS_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
             </File>
             <File>
@@ -3570,7 +3580,7 @@
             </File>
             <File>
               <FileName>overridden_runner.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoemsappl\overridden_runner.c</FilePath>
             </File>
             <File>
@@ -3630,7 +3640,7 @@
             </File>
             <File>
               <FileName>EOtheServices.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
             </File>
             <File>
@@ -3727,6 +3737,11 @@
               <FileName>EOtheFatalError.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheFatalError.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theFTservice.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eoappservices\embot_app_eth_theFTservice.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -4024,7 +4039,7 @@
             </File>
             <File>
               <FileName>EoProtocolAS_fun_ems4rd.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
             </File>
             <File>

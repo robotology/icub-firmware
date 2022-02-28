@@ -162,6 +162,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES(eOcanpro
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanframe_t *frame, eOcanport_t port)
 {
     eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processFullScale);
+#warning add also a call to embot::application::theFTsensors::process(const eOcanframe_t *frame, const eOcanport_t port)
     return(eores_OK);
 }
 

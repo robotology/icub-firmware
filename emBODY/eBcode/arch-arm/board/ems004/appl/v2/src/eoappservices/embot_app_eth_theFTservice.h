@@ -1,0 +1,95 @@
+
+
+/*
+ * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+*/
+
+// - include guard ----------------------------------------------------------------------------------------------------
+
+#ifndef __EMBOT_APP_APPLICATION_THEFTSERVICE_H_
+#define __EMBOT_APP_APPLICATION_THEFTSERVICE_H_
+
+#include "embot_core.h"
+
+#include "EOtheServices.h"
+#include "EoCommon.h"
+#include "EoProtocol.h"
+
+#include <vector>
+#include <memory>
+
+namespace embot { namespace app { namespace eth {
+    
+           
+    class theFTservice
+    {
+    public:
+        static theFTservice& getInstance();
+                
+    public:
+        
+        static constexpr size_t maxSensors {eOas_ft_sensors_maxnumber}; 
+        static constexpr size_t maxRegulars {maxSensors};
+        
+        struct Config
+        {
+            uint32_t tbd {0};
+            constexpr Config() = default;
+            constexpr Config(uint32_t t) : tbd(t) {}
+            constexpr bool isvalid() const { return (666 == tbd) ? false : true; }
+        }; 
+        
+        struct canFrameDescriptor
+        {
+            enum class Type : uint8_t { unspecified, fullscale, force, torque };
+            eOcanport_t port {eOcanport1};
+            eOcanframe_t *frame {nullptr};
+            Type type {Type::unspecified};
+            
+            canFrameDescriptor() = default;
+            
+            canFrameDescriptor(eOcanport_t p, eOcanframe_t *f, Type t) : port(p), frame(f), type(t) {};
+        };
+        
+        
+        bool initialise(const Config &config); 
+               
+        eOmn_serv_state_t GetServiceState() const;      
+        
+        bool SendReport();  
+        
+        eOresult_t Verify(const eOmn_serv_configuration_t * servcfg, 
+                          eOservice_onendofoperation_fun_t onverify, 
+                          bool activateafterverify); 
+        
+        eOresult_t Activate(const eOmn_serv_configuration_t * servcfg);   
+        
+        eOresult_t Deactivate();        
+        eOresult_t Start();        
+        eOresult_t Stop();        
+        eOresult_t SetRegulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);        
+        eOresult_t Tick();  
+        // processes a CAN frame coming from the sensor        
+        eOresult_t AcceptCANframe(const canFrameDescriptor &canframedescriptor);               
+        // processes a ROP coming from icub-main
+        bool process(const EOnv* nv, const eOropdescriptor_t* rd);
+                     
+    private:
+        theFTservice(); 
+        ~theFTservice(); 
+
+    private:    
+        struct Impl;
+        std::unique_ptr<Impl> pImpl;     
+    };       
+
+
+}}} // namespace embot { namespace app { namespace eth
+
+
+#endif  // include-guard
+
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------

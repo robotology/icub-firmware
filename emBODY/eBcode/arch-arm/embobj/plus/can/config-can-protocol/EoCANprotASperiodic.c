@@ -108,6 +108,8 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEB
 {
     // this can frame is from strain only ... i dont do the check that the board must be a strain
     eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processDebugForce);
+#warning add also a call to embot::application::theFTsensors::process(const eOcanframe_t *frame, const eOcanport_t port)
+
     return(eores_OK);    
 }
 
@@ -115,6 +117,8 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DE
 {
     // this can frame is from strain only ... i dont do the check that the board must be a strain
     eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processDebugTorque);
+#warning add also a call to embot::application::theFTsensors::process(const eOcanframe_t *frame, const eOcanport_t port)
+    
     return(eores_OK);    
 }
 
@@ -131,6 +135,8 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__FORCE_VECTOR(eOcanframe
     // this can frame is from strain only ... i dont do the check that the board must be a strain
     // process force
     eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processForce);
+#warning add also a call to embot::application::theFTsensors::process(const eOcanframe_t *frame, const eOcanport_t port)
+    
     return(eores_OK);
 }
 
@@ -148,6 +154,8 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__TORQUE_VECTOR(eOcanfram
     // this can frame is from strain only ... i dont do the check that the board must be a strain
     // process torque
     eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processTorque);
+#warning add also a call to embot::application::theFTsensors::process(const eOcanframe_t *frame, const eOcanport_t port)
+    
     return(eores_OK);
 }
 
