@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.49
+// Model version                  : 2.53
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 31 18:31:57 2022
+// C/C++ source code generated on : Thu Feb 17 15:05:37 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -43,136 +43,107 @@ namespace amc_bldc_codegen
   {
     BUS_CAN rtb_BusCreator_d;
     BUS_CAN rtb_BusCreator_j;
-    int32_T rtb_DataTypeConversion2;
-    real32_T u;
-    int16_T rtb_DataTypeConversion3;
-    int16_T rtb_DataTypeConversion3_e;
+    int32_T i;
+    real32_T tmp_0;
+    int16_T rtb_DataTypeConversion1_0;
+    int16_T rtb_DataTypeConversion_0;
     uint16_T rtb_pkt_id;
+    uint8_T b_tmp[4];
+    uint8_T tmp[2];
 
     // Outputs for Atomic SubSystem: '<Root>/CAN_Encoder'
-    // DataTypeConversion: '<S4>/Data Type Conversion3'
-    if (arg_messages_tx.status.pwm_fbk < 0.0F) {
-      u = std::ceil(arg_messages_tx.status.pwm_fbk);
+    // DataTypeConversion: '<S4>/Data Type Conversion'
+    if (arg_messages_tx.status.pwm_fbk < 32768.0F) {
+      if (arg_messages_tx.status.pwm_fbk >= -32768.0F) {
+        rtb_DataTypeConversion_0 = static_cast<int16_T>
+          (arg_messages_tx.status.pwm_fbk);
+      } else {
+        rtb_DataTypeConversion_0 = MIN_int16_T;
+      }
     } else {
-      u = std::floor(arg_messages_tx.status.pwm_fbk);
+      rtb_DataTypeConversion_0 = MAX_int16_T;
     }
-
-    if (rtIsNaNF(u) || rtIsInfF(u)) {
-      u = 0.0F;
-    } else {
-      u = std::fmod(u, 65536.0F);
-    }
-
-    rtb_DataTypeConversion3 = static_cast<int16_T>(u < 0.0F ?
-      static_cast<int32_T>(static_cast<int16_T>(-static_cast<int16_T>(
-      static_cast<uint16_T>(-u)))) : static_cast<int32_T>(static_cast<int16_T>(
-      static_cast<uint16_T>(u))));
-
-    // End of DataTypeConversion: '<S4>/Data Type Conversion3'
 
     // MATLAB Function: '<S4>/format_status_pck' incorporates:
     //   BusCreator: '<S4>/Bus Creator'
     //   Concatenate: '<S1>/Vector Concatenate'
+    //   DataTypeConversion: '<S4>/Data Type Conversion'
 
     arg_pck_tx.packets[0].packet.PAYLOAD[0] = static_cast<uint8_T>
       (arg_messages_tx.status.control_mode);
     arg_pck_tx.packets[0].packet.PAYLOAD[1] = 0U;
-    arg_pck_tx.packets[0].packet.PAYLOAD[2] = static_cast<uint8_T>
-      (rtb_DataTypeConversion3 & 255);
-    arg_pck_tx.packets[0].packet.PAYLOAD[3] = static_cast<uint8_T>
-      ((rtb_DataTypeConversion3 & 32767) >> 8);
+    std::memcpy((void *)&tmp[0], (void *)&rtb_DataTypeConversion_0, (uint32_T)
+                ((size_t)2 * sizeof(uint8_T)));
+    arg_pck_tx.packets[0].packet.PAYLOAD[2] = tmp[0];
+    arg_pck_tx.packets[0].packet.PAYLOAD[3] = tmp[1];
     arg_pck_tx.packets[0].packet.PAYLOAD[4] =
       arg_messages_tx.status.flags.ExternalFaultAsserted;
     arg_pck_tx.packets[0].packet.PAYLOAD[5] = 0U;
     arg_pck_tx.packets[0].packet.PAYLOAD[6] = 0U;
     arg_pck_tx.packets[0].packet.PAYLOAD[7] = 0U;
 
-    // Gain: '<S2>/Gain2'
-    u = 1000.0F * arg_messages_tx.foc.current;
+    // DataTypeConversion: '<S2>/Data Type Conversion' incorporates:
+    //   Gain: '<S2>/Gain2'
 
-    // DataTypeConversion: '<S2>/Data Type Conversion1'
-    if (u < 0.0F) {
-      u = std::ceil(u);
+    tmp_0 = 1000.0F * arg_messages_tx.foc.current;
+    if (tmp_0 < 32768.0F) {
+      if (tmp_0 >= -32768.0F) {
+        rtb_DataTypeConversion_0 = static_cast<int16_T>(tmp_0);
+      } else {
+        rtb_DataTypeConversion_0 = MIN_int16_T;
+      }
     } else {
-      u = std::floor(u);
+      rtb_DataTypeConversion_0 = MAX_int16_T;
     }
 
-    if (rtIsNaNF(u) || rtIsInfF(u)) {
-      u = 0.0F;
+    // DataTypeConversion: '<S2>/Data Type Conversion1' incorporates:
+    //   Gain: '<S2>/Gain'
+
+    tmp_0 = CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.velocity;
+    if (tmp_0 < 32768.0F) {
+      if (tmp_0 >= -32768.0F) {
+        rtb_DataTypeConversion1_0 = static_cast<int16_T>(tmp_0);
+      } else {
+        rtb_DataTypeConversion1_0 = MIN_int16_T;
+      }
     } else {
-      u = std::fmod(u, 65536.0F);
+      rtb_DataTypeConversion1_0 = MAX_int16_T;
     }
 
-    rtb_DataTypeConversion3 = static_cast<int16_T>(u < 0.0F ?
-      static_cast<int32_T>(static_cast<int16_T>(-static_cast<int16_T>(
-      static_cast<uint16_T>(-u)))) : static_cast<int32_T>(static_cast<int16_T>(
-      static_cast<uint16_T>(u))));
+    // DataTypeConversion: '<S2>/Data Type Conversion2' incorporates:
+    //   Gain: '<S2>/Gain1'
 
-    // End of DataTypeConversion: '<S2>/Data Type Conversion1'
-
-    // Gain: '<S2>/Gain'
-    u = CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.velocity;
-
-    // DataTypeConversion: '<S2>/Data Type Conversion3'
-    if (u < 0.0F) {
-      u = std::ceil(u);
+    tmp_0 = CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.position;
+    if (tmp_0 < 2.14748365E+9F) {
+      if (tmp_0 >= -2.14748365E+9F) {
+        i = static_cast<int32_T>(tmp_0);
+      } else {
+        i = MIN_int32_T;
+      }
     } else {
-      u = std::floor(u);
+      i = MAX_int32_T;
     }
-
-    if (rtIsNaNF(u) || rtIsInfF(u)) {
-      u = 0.0F;
-    } else {
-      u = std::fmod(u, 65536.0F);
-    }
-
-    rtb_DataTypeConversion3_e = static_cast<int16_T>(u < 0.0F ?
-      static_cast<int32_T>(static_cast<int16_T>(-static_cast<int16_T>(
-      static_cast<uint16_T>(-u)))) : static_cast<int32_T>(static_cast<int16_T>(
-      static_cast<uint16_T>(u))));
-
-    // End of DataTypeConversion: '<S2>/Data Type Conversion3'
-
-    // Gain: '<S2>/Gain1'
-    u = CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.position;
-
-    // DataTypeConversion: '<S2>/Data Type Conversion2'
-    if (u < 0.0F) {
-      u = std::ceil(u);
-    } else {
-      u = std::floor(u);
-    }
-
-    if (rtIsNaNF(u) || rtIsInfF(u)) {
-      u = 0.0F;
-    } else {
-      u = std::fmod(u, 4.2949673E+9F);
-    }
-
-    rtb_DataTypeConversion2 = u < 0.0F ? -static_cast<int32_T>
-      (static_cast<uint32_T>(-u)) : static_cast<int32_T>(static_cast<uint32_T>(u));
-
-    // End of DataTypeConversion: '<S2>/Data Type Conversion2'
 
     // MATLAB Function: '<S2>/format_foc_pck' incorporates:
     //   BusCreator: '<S2>/Bus Creator'
+    //   DataTypeConversion: '<S2>/Data Type Conversion'
+    //   DataTypeConversion: '<S2>/Data Type Conversion1'
+    //   DataTypeConversion: '<S2>/Data Type Conversion2'
 
-    rtb_BusCreator_d.packet.PAYLOAD[0] = static_cast<uint8_T>
-      (rtb_DataTypeConversion3 & 255);
-    rtb_BusCreator_d.packet.PAYLOAD[1] = static_cast<uint8_T>
-      ((rtb_DataTypeConversion3 & 32767) >> 8);
-    rtb_BusCreator_d.packet.PAYLOAD[2] = static_cast<uint8_T>
-      (rtb_DataTypeConversion3_e & 255);
-    rtb_BusCreator_d.packet.PAYLOAD[3] = static_cast<uint8_T>
-      ((rtb_DataTypeConversion3_e & 32767) >> 8);
-    rtb_BusCreator_d.packet.PAYLOAD[4] = static_cast<uint8_T>
-      (rtb_DataTypeConversion2 & 255);
-    rtb_BusCreator_d.packet.PAYLOAD[5] = static_cast<uint8_T>
-      ((rtb_DataTypeConversion2 & 65280) >> 8);
-    rtb_BusCreator_d.packet.PAYLOAD[6] = static_cast<uint8_T>
-      ((rtb_DataTypeConversion2 & 16711680) >> 16);
-    rtb_BusCreator_d.packet.PAYLOAD[7] = static_cast<uint8_T>
-      ((rtb_DataTypeConversion2 & MAX_int32_T) >> 24);
+    std::memcpy((void *)&tmp[0], (void *)&rtb_DataTypeConversion_0, (uint32_T)
+                ((size_t)2 * sizeof(uint8_T)));
+    rtb_BusCreator_d.packet.PAYLOAD[0] = tmp[0];
+    rtb_BusCreator_d.packet.PAYLOAD[1] = tmp[1];
+    std::memcpy((void *)&tmp[0], (void *)&rtb_DataTypeConversion1_0, (uint32_T)
+                ((size_t)2 * sizeof(uint8_T)));
+    rtb_BusCreator_d.packet.PAYLOAD[2] = tmp[0];
+    rtb_BusCreator_d.packet.PAYLOAD[3] = tmp[1];
+    std::memcpy((void *)&b_tmp[0], (void *)&i, (uint32_T)((size_t)4 * sizeof
+      (uint8_T)));
+    rtb_BusCreator_d.packet.PAYLOAD[4] = b_tmp[0];
+    rtb_BusCreator_d.packet.PAYLOAD[5] = b_tmp[1];
+    rtb_BusCreator_d.packet.PAYLOAD[6] = b_tmp[2];
+    rtb_BusCreator_d.packet.PAYLOAD[7] = b_tmp[3];
 
     // MATLAB Function: '<S8>/format_can_id' incorporates:
     //   Constant: '<S4>/Constant'
@@ -214,9 +185,8 @@ namespace amc_bldc_codegen
     rtb_BusCreator_j.available = false;
     rtb_BusCreator_j.length = 0U;
     rtb_BusCreator_j.packet.ID = 0U;
-    for (rtb_DataTypeConversion2 = 0; rtb_DataTypeConversion2 < 8;
-         rtb_DataTypeConversion2++) {
-      rtb_BusCreator_j.packet.PAYLOAD[rtb_DataTypeConversion2] = 0U;
+    for (i = 0; i < 8; i++) {
+      rtb_BusCreator_j.packet.PAYLOAD[i] = 0U;
     }
 
     // End of BusCreator: '<S3>/Bus Creator'
@@ -227,15 +197,6 @@ namespace amc_bldc_codegen
     arg_pck_tx.packets[3] = rtb_BusCreator_j;
 
     // End of Outputs for SubSystem: '<Root>/CAN_Encoder'
-  }
-
-  // Model initialize function
-  void CAN_Encoder::initialize()
-  {
-    // Registration code
-
-    // initialize non-finites
-    rt_InitInfAndNaN(sizeof(real_T));
   }
 
   // Constructor

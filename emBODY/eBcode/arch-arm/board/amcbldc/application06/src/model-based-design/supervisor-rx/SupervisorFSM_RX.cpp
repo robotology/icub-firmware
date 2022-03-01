@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.156
+// Model version                  : 3.157
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 31 18:31:29 2022
+// C/C++ source code generated on : Fri Feb 25 14:12:58 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -707,6 +707,10 @@ namespace amc_bldc_codegen
                 (SupervisorFSM_RX_DW.sfEvent == SupervisorF_event_setLimitEvent)
                 && (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
                     SupervisorFSM_RX_DW.EventsRx_current_limit_start)) {
+              arg_ConfigurationParameters.thresholds.motorNominalCurrents = std::
+                abs(arg_MessagesRx.messages[0].current_limit.nominal);
+              arg_ConfigurationParameters.thresholds.motorPeakCurrents = std::
+                abs(arg_MessagesRx.messages[0].current_limit.peak);
               arg_ConfigurationParameters.thresholds.motorOverloadCurrents = std::
                 abs(arg_MessagesRx.messages[0].current_limit.overload);
               SupervisorFSM_RX_DW.IsCurrentLimitSet = true;
@@ -742,6 +746,10 @@ namespace amc_bldc_codegen
             (SupervisorFSM_RX_DW.sfEvent == SupervisorF_event_setLimitEvent) &&
             (SupervisorFSM_RX_DW.EventsRx_current_limit_prev !=
              SupervisorFSM_RX_DW.EventsRx_current_limit_start)) {
+          arg_ConfigurationParameters.thresholds.motorNominalCurrents = std::abs
+            (arg_MessagesRx.messages[0].current_limit.nominal);
+          arg_ConfigurationParameters.thresholds.motorPeakCurrents = std::abs
+            (arg_MessagesRx.messages[0].current_limit.peak);
           arg_ConfigurationParameters.thresholds.motorOverloadCurrents = std::
             abs(arg_MessagesRx.messages[0].current_limit.overload);
           SupervisorFSM_RX_DW.IsCurrentLimitSet = true;

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.49
+// Model version                  : 2.53
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 31 18:31:57 2022
+// C/C++ source code generated on : Thu Feb 17 15:05:37 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,14 +18,11 @@
 //
 #ifndef RTW_HEADER_can_encoder_h_
 #define RTW_HEADER_can_encoder_h_
-#include <cmath>
 #include <cstring>
 #include <stddef.h>
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
 #include <stddef.h>
-#include "rt_nonfinite.h"
-#include "rtGetInf.h"
 
 //
 //  Exported Global Parameters
@@ -59,9 +56,6 @@ namespace amc_bldc_codegen
     struct RT_MODEL_can_encoder_T {
       const char_T **errorStatus;
     };
-
-    // model initialize function
-    void initialize();
 
     // model step function
     void step(const BUS_MESSAGES_TX &arg_messages_tx, const BUS_EVENTS_TX &

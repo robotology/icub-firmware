@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 2.35
+// Model version                  : 2.41
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 31 18:32:12 2022
+// C/C++ source code generated on : Thu Feb 17 15:06:28 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -24,21 +24,21 @@ namespace amc_bldc_codegen
   // System initialize for referenced model: 'control_outer'
   void control_outer::init(void)
   {
-    // InitializeConditions for UnitDelay: '<S1>/Delay Input1'
+    // InitializeConditions for UnitDelay: '<S2>/Delay Input1'
     //
-    //  Block description for '<S1>/Delay Input1':
+    //  Block description for '<S2>/Delay Input1':
     //
     //   Store in Global RAM
 
-    control_outer_DW.DelayInput1_DSTATE = ControlModes_Idle;
+    control_outer_DW.DelayInput1_DSTATE_f = ControlModes_Idle;
 
-    // InitializeConditions for DiscreteIntegrator: '<S49>/Integrator'
+    // InitializeConditions for DiscreteIntegrator: '<S53>/Integrator'
     control_outer_DW.Integrator_PrevResetState = 2;
 
-    // InitializeConditions for DiscreteIntegrator: '<S99>/Integrator'
+    // InitializeConditions for DiscreteIntegrator: '<S103>/Integrator'
     control_outer_DW.Integrator_PrevResetState_n = 2;
 
-    // InitializeConditions for DiscreteIntegrator: '<S151>/Integrator'
+    // InitializeConditions for DiscreteIntegrator: '<S155>/Integrator'
     control_outer_DW.Integrator_PrevResetState_c = 2;
   }
 
@@ -53,80 +53,80 @@ namespace amc_bldc_codegen
     real32_T rtb_DProdOut_f;
     real32_T rtb_FilterDifferentiatorTF;
     real32_T rtb_FilterDifferentiatorTF_n;
-    real32_T rtb_IProdOut;
     real32_T rtb_PProdOut;
     real32_T rtb_PProdOut_o;
-    real32_T rtb_Saturation;
-    real32_T rtb_SignPreIntegrator;
+    real32_T rtb_Sum1;
     real32_T rtb_Switch2;
-    real32_T tmp;
+    real32_T rtb_Switch2_o;
+    real32_T rtb_Uk1;
+    real32_T rtb_UnitDelay1;
     boolean_T rtb_Compare;
+    boolean_T rtb_Compare_m;
     boolean_T rtb_FixPtRelationalOperator;
 
     // Abs: '<Root>/Abs'
     rtb_Abs = std::abs(arg_ConfigurationParameters.thresholds.jntVelMax);
 
-    // RelationalOperator: '<S8>/Compare' incorporates:
-    //   Constant: '<S8>/Constant'
+    // RelationalOperator: '<S12>/Compare' incorporates:
+    //   Constant: '<S12>/Constant'
 
-    arg_OuterOutputs.vel_en = (arg_Flags.control_mode != ControlModes_Current);
+    rtb_Compare_m = (arg_Flags.control_mode != ControlModes_Current);
 
-    // RelationalOperator: '<S6>/Compare' incorporates:
-    //   Constant: '<S6>/Constant'
+    // RelationalOperator: '<S10>/Compare' incorporates:
+    //   Constant: '<S10>/Constant'
 
     arg_OuterOutputs.cur_en = (arg_Flags.control_mode != ControlModes_Voltage);
 
-    // Logic: '<S2>/NOR' incorporates:
-    //   Constant: '<S11>/Constant'
-    //   Constant: '<S12>/Constant'
-    //   Constant: '<S9>/Constant'
-    //   RelationalOperator: '<S11>/Compare'
-    //   RelationalOperator: '<S12>/Compare'
-    //   RelationalOperator: '<S9>/Compare'
+    // Logic: '<S3>/NOR' incorporates:
+    //   Constant: '<S13>/Constant'
+    //   Constant: '<S15>/Constant'
+    //   Constant: '<S16>/Constant'
+    //   RelationalOperator: '<S13>/Compare'
+    //   RelationalOperator: '<S15>/Compare'
+    //   RelationalOperator: '<S16>/Compare'
 
     arg_OuterOutputs.out_en = ((!(arg_Flags.control_mode ==
       ControlModes_NotConfigured)) && (!(arg_Flags.control_mode ==
       ControlModes_Idle)) && (!(arg_Flags.control_mode == ControlModes_HwFaultCM)));
 
-    // Sum: '<S3>/Sum3'
-    rtb_SignPreIntegrator = arg_Targets.jointpositions.position -
+    // Sum: '<S4>/Sum3'
+    rtb_UnitDelay1 = arg_Targets.jointpositions.position -
       arg_Sensors.jointpositions.position;
 
-    // Product: '<S54>/PProd Out'
-    rtb_PProdOut = rtb_SignPreIntegrator *
-      arg_ConfigurationParameters.PosLoopPID.P;
+    // Product: '<S58>/PProd Out'
+    rtb_PProdOut = rtb_UnitDelay1 * arg_ConfigurationParameters.PosLoopPID.P;
 
-    // SampleTimeMath: '<S44>/Tsamp'
+    // SampleTimeMath: '<S48>/Tsamp'
     //
-    //  About '<S44>/Tsamp':
+    //  About '<S48>/Tsamp':
     //   y = u * K where K = ( w * Ts )
 
-    rtb_IProdOut = arg_ConfigurationParameters.PosLoopPID.N * 0.0005F;
+    rtb_Switch2_o = arg_ConfigurationParameters.PosLoopPID.N * 0.0005F;
 
-    // Math: '<S42>/Reciprocal' incorporates:
-    //   Constant: '<S42>/Constant'
-    //   Sum: '<S42>/SumDen'
+    // Math: '<S46>/Reciprocal' incorporates:
+    //   Constant: '<S46>/Constant'
+    //   Sum: '<S46>/SumDen'
     //
-    //  About '<S42>/Reciprocal':
+    //  About '<S46>/Reciprocal':
     //   Operator: reciprocal
 
-    rtb_Switch2 = 1.0F / (rtb_IProdOut + 1.0F);
+    rtb_Switch2 = 1.0F / (rtb_Switch2_o + 1.0F);
 
-    // RelationalOperator: '<S1>/FixPt Relational Operator' incorporates:
-    //   UnitDelay: '<S1>/Delay Input1'
+    // RelationalOperator: '<S2>/FixPt Relational Operator' incorporates:
+    //   UnitDelay: '<S2>/Delay Input1'
     //
-    //  Block description for '<S1>/Delay Input1':
+    //  Block description for '<S2>/Delay Input1':
     //
     //   Store in Global RAM
 
     rtb_FixPtRelationalOperator = (arg_Flags.control_mode !=
-      control_outer_DW.DelayInput1_DSTATE);
+      control_outer_DW.DelayInput1_DSTATE_f);
 
-    // DiscreteTransferFcn: '<S42>/Filter Differentiator TF' incorporates:
-    //   Constant: '<S42>/Constant'
-    //   Product: '<S41>/DProd Out'
-    //   Product: '<S42>/Divide'
-    //   Sum: '<S42>/SumNum'
+    // DiscreteTransferFcn: '<S46>/Filter Differentiator TF' incorporates:
+    //   Constant: '<S46>/Constant'
+    //   Product: '<S45>/DProd Out'
+    //   Product: '<S46>/Divide'
+    //   Sum: '<S46>/SumNum'
 
     if (rtb_FixPtRelationalOperator &&
         (control_outer_PrevZCX.FilterDifferentiatorTF_Reset_ZC != 1)) {
@@ -135,75 +135,73 @@ namespace amc_bldc_codegen
 
     control_outer_PrevZCX.FilterDifferentiatorTF_Reset_ZC =
       rtb_FixPtRelationalOperator;
-    control_outer_DW.FilterDifferentiatorTF_tmp = rtb_SignPreIntegrator *
-      arg_ConfigurationParameters.PosLoopPID.D - (rtb_IProdOut - 1.0F) *
+    control_outer_DW.FilterDifferentiatorTF_tmp = rtb_UnitDelay1 *
+      arg_ConfigurationParameters.PosLoopPID.D - (rtb_Switch2_o - 1.0F) *
       rtb_Switch2 * control_outer_DW.FilterDifferentiatorTF_states;
 
-    // Product: '<S52>/NProd Out' incorporates:
-    //   DiscreteTransferFcn: '<S42>/Filter Differentiator TF'
-    //   Product: '<S42>/DenCoefOut'
+    // Product: '<S56>/NProd Out' incorporates:
+    //   DiscreteTransferFcn: '<S46>/Filter Differentiator TF'
+    //   Product: '<S46>/DenCoefOut'
 
     rtb_Switch2 = (control_outer_DW.FilterDifferentiatorTF_tmp +
                    -control_outer_DW.FilterDifferentiatorTF_states) *
       rtb_Switch2 * arg_ConfigurationParameters.PosLoopPID.N;
 
-    // Sum: '<S61>/SumI1' incorporates:
-    //   Product: '<S46>/IProd Out'
-    //   Sum: '<S59>/Sum Fdbk'
-    //   Sum: '<S60>/SumI3'
+    // Sum: '<S65>/SumI1' incorporates:
+    //   Product: '<S50>/IProd Out'
+    //   Sum: '<S63>/Sum Fdbk'
+    //   Sum: '<S64>/SumI3'
     //   UnitDelay: '<Root>/Unit Delay'
 
     rtb_DProdOut = (control_outer_DW.UnitDelay_DSTATE - ((rtb_PProdOut +
-      control_outer_DW.Integrator_DSTATE) + rtb_Switch2)) +
-      rtb_SignPreIntegrator * arg_ConfigurationParameters.PosLoopPID.I;
+      control_outer_DW.Integrator_DSTATE) + rtb_Switch2)) + rtb_UnitDelay1 *
+      arg_ConfigurationParameters.PosLoopPID.I;
 
-    // DiscreteIntegrator: '<S49>/Integrator'
+    // DiscreteIntegrator: '<S53>/Integrator'
     if (rtb_FixPtRelationalOperator &&
         (control_outer_DW.Integrator_PrevResetState <= 0)) {
       control_outer_DW.Integrator_DSTATE = 0.0F;
     }
 
-    // DiscreteIntegrator: '<S49>/Integrator'
+    // DiscreteIntegrator: '<S53>/Integrator'
     rtb_FilterDifferentiatorTF = 0.0005F * rtb_DProdOut +
       control_outer_DW.Integrator_DSTATE;
 
-    // RelationalOperator: '<S7>/Compare' incorporates:
-    //   Constant: '<S7>/Constant'
+    // RelationalOperator: '<S11>/Compare' incorporates:
+    //   Constant: '<S11>/Constant'
 
     rtb_Compare = (arg_Flags.control_mode == ControlModes_Position);
 
-    // Product: '<S104>/PProd Out'
-    rtb_PProdOut_o = rtb_SignPreIntegrator *
-      arg_ConfigurationParameters.DirLoopPID.P;
+    // Product: '<S108>/PProd Out'
+    rtb_PProdOut_o = rtb_UnitDelay1 * arg_ConfigurationParameters.DirLoopPID.P;
 
-    // Product: '<S96>/IProd Out'
-    rtb_IProdOut = rtb_SignPreIntegrator *
-      arg_ConfigurationParameters.DirLoopPID.I;
+    // Product: '<S100>/IProd Out'
+    rtb_Switch2_o = rtb_UnitDelay1 * arg_ConfigurationParameters.DirLoopPID.I;
 
-    // Product: '<S91>/DProd Out'
-    rtb_DProdOut_f = rtb_SignPreIntegrator *
-      arg_ConfigurationParameters.DirLoopPID.D;
+    // Product: '<S95>/DProd Out'
+    rtb_DProdOut_f = rtb_UnitDelay1 * arg_ConfigurationParameters.DirLoopPID.D;
 
-    // SampleTimeMath: '<S94>/Tsamp'
+    // SampleTimeMath: '<S98>/Tsamp'
     //
-    //  About '<S94>/Tsamp':
+    //  About '<S98>/Tsamp':
     //   y = u * K where K = ( w * Ts )
 
-    rtb_Saturation = arg_ConfigurationParameters.DirLoopPID.N * 0.0005F;
+    rtb_Uk1 = arg_ConfigurationParameters.DirLoopPID.N * 0.0005F;
 
-    // Math: '<S92>/Reciprocal' incorporates:
-    //   Constant: '<S92>/Constant'
-    //   Sum: '<S92>/SumDen'
+    // Math: '<S96>/Reciprocal' incorporates:
+    //   Constant: '<S96>/Constant'
+    //   Sum: '<S96>/SumDen'
     //
-    //  About '<S92>/Reciprocal':
+    //  About '<S96>/Reciprocal':
     //   Operator: reciprocal
 
-    rtb_SignPreIntegrator = 1.0F / (rtb_Saturation + 1.0F);
+    rtb_UnitDelay1 = 1.0F / (rtb_Uk1 + 1.0F);
 
-    // DiscreteTransferFcn: '<S92>/Filter Differentiator TF' incorporates:
-    //   Constant: '<S92>/Constant'
-    //   Product: '<S92>/Divide'
-    //   Sum: '<S92>/SumNum'
+    // DiscreteTransferFcn: '<S96>/Filter Differentiator TF' incorporates:
+    //   Constant: '<S96>/Constant'
+    //   DiscreteTransferFcn: '<S46>/Filter Differentiator TF'
+    //   Product: '<S96>/Divide'
+    //   Sum: '<S96>/SumNum'
 
     if (rtb_FixPtRelationalOperator &&
         (control_outer_PrevZCX.FilterDifferentiatorTF_Reset__m != 1)) {
@@ -212,116 +210,120 @@ namespace amc_bldc_codegen
 
     control_outer_PrevZCX.FilterDifferentiatorTF_Reset__m =
       rtb_FixPtRelationalOperator;
-    control_outer_DW.FilterDifferentiatorTF_tmp_m = rtb_DProdOut_f -
-      (rtb_Saturation - 1.0F) * rtb_SignPreIntegrator *
-      control_outer_DW.FilterDifferentiatorTF_states_i;
+    control_outer_DW.FilterDifferentiatorTF_tmp_m = rtb_DProdOut_f - (rtb_Uk1 -
+      1.0F) * rtb_UnitDelay1 * control_outer_DW.FilterDifferentiatorTF_states_i;
 
-    // Product: '<S102>/NProd Out' incorporates:
-    //   DiscreteTransferFcn: '<S92>/Filter Differentiator TF'
-    //   Product: '<S92>/DenCoefOut'
+    // Product: '<S106>/NProd Out' incorporates:
+    //   DiscreteTransferFcn: '<S96>/Filter Differentiator TF'
+    //   Product: '<S96>/DenCoefOut'
 
-    rtb_SignPreIntegrator = (control_outer_DW.FilterDifferentiatorTF_tmp_m +
-      -control_outer_DW.FilterDifferentiatorTF_states_i) * rtb_SignPreIntegrator
-      * arg_ConfigurationParameters.DirLoopPID.N;
+    rtb_UnitDelay1 = (control_outer_DW.FilterDifferentiatorTF_tmp_m +
+                      -control_outer_DW.FilterDifferentiatorTF_states_i) *
+      rtb_UnitDelay1 * arg_ConfigurationParameters.DirLoopPID.N;
 
-    // Sum: '<S111>/SumI1' incorporates:
-    //   Sum: '<S109>/Sum Fdbk'
-    //   Sum: '<S110>/SumI3'
+    // Sum: '<S115>/SumI1' incorporates:
+    //   Sum: '<S113>/Sum Fdbk'
+    //   Sum: '<S114>/SumI3'
     //   UnitDelay: '<Root>/Unit Delay'
 
     rtb_FilterDifferentiatorTF_n = (control_outer_DW.UnitDelay_DSTATE -
-      ((rtb_PProdOut_o + control_outer_DW.Integrator_DSTATE_i) +
-       rtb_SignPreIntegrator)) + rtb_IProdOut;
+      ((rtb_PProdOut_o + control_outer_DW.Integrator_DSTATE_i) + rtb_UnitDelay1))
+      + rtb_Switch2_o;
 
-    // DiscreteIntegrator: '<S99>/Integrator'
+    // DiscreteIntegrator: '<S103>/Integrator'
     if (rtb_FixPtRelationalOperator &&
         (control_outer_DW.Integrator_PrevResetState_n <= 0)) {
       control_outer_DW.Integrator_DSTATE_i = 0.0F;
     }
 
-    // DiscreteIntegrator: '<S99>/Integrator'
+    // DiscreteIntegrator: '<S103>/Integrator'
     rtb_DProdOut_f = 0.0005F * rtb_FilterDifferentiatorTF_n +
       control_outer_DW.Integrator_DSTATE_i;
 
     // Switch: '<Root>/Switch3' incorporates:
     //   Constant: '<Root>/Constant1'
-    //   Constant: '<S10>/Constant'
-    //   Constant: '<S13>/Constant'
-    //   Logic: '<S2>/OR'
-    //   RelationalOperator: '<S10>/Compare'
-    //   RelationalOperator: '<S13>/Compare'
+    //   Constant: '<S14>/Constant'
+    //   Constant: '<S17>/Constant'
+    //   Logic: '<S3>/OR'
+    //   RelationalOperator: '<S14>/Compare'
+    //   RelationalOperator: '<S17>/Compare'
 
     if (rtb_Compare || (arg_Flags.control_mode == ControlModes_PositionDirect) ||
         (arg_Flags.control_mode == ControlModes_Velocity)) {
-      // Switch: '<S3>/Switch5' incorporates:
-      //   Sum: '<S108>/Sum'
-      //   Sum: '<S58>/Sum'
+      // Switch: '<S4>/Switch5' incorporates:
+      //   Sum: '<S112>/Sum'
+      //   Sum: '<S62>/Sum'
 
       if (rtb_Compare) {
-        rtb_IProdOut = (rtb_PProdOut + rtb_FilterDifferentiatorTF) + rtb_Switch2;
+        rtb_UnitDelay1 = (rtb_PProdOut + rtb_FilterDifferentiatorTF) +
+          rtb_Switch2;
       } else {
-        rtb_IProdOut = (rtb_PProdOut_o + rtb_DProdOut_f) + rtb_SignPreIntegrator;
+        rtb_UnitDelay1 += rtb_PProdOut_o + rtb_DProdOut_f;
       }
 
-      // End of Switch: '<S3>/Switch5'
+      // End of Switch: '<S4>/Switch5'
     } else {
-      rtb_IProdOut = 0.0F;
+      rtb_UnitDelay1 = 0.0F;
     }
 
     // End of Switch: '<Root>/Switch3'
 
     // Sum: '<Root>/Sum2'
-    rtb_IProdOut += arg_Targets.jointvelocities.velocity;
+    rtb_Switch2_o = rtb_UnitDelay1 + arg_Targets.jointvelocities.velocity;
 
-    // Switch: '<S4>/Switch2' incorporates:
-    //   Gain: '<Root>/Gain'
-    //   RelationalOperator: '<S4>/LowerRelop1'
-    //   RelationalOperator: '<S4>/UpperRelop'
-    //   Switch: '<S4>/Switch'
+    // Switch: '<S5>/Switch2' incorporates:
+    //   RelationalOperator: '<S5>/LowerRelop1'
 
-    if (rtb_IProdOut > rtb_Abs) {
+    if (rtb_Switch2_o > rtb_Abs) {
       rtb_Switch2 = rtb_Abs;
-    } else if (rtb_IProdOut < -rtb_Abs) {
-      // Switch: '<S4>/Switch' incorporates:
-      //   Gain: '<Root>/Gain'
-
-      rtb_Switch2 = -rtb_Abs;
     } else {
-      rtb_Switch2 = rtb_IProdOut;
+      // Gain: '<Root>/Gain'
+      rtb_Switch2 = -rtb_Abs;
+
+      // Switch: '<S5>/Switch' incorporates:
+      //   Gain: '<Root>/Gain'
+      //   RelationalOperator: '<S5>/UpperRelop'
+
+      if (!(rtb_Switch2_o < -rtb_Abs)) {
+        rtb_Switch2 = rtb_Switch2_o;
+      }
+
+      // End of Switch: '<S5>/Switch'
     }
 
-    // End of Switch: '<S4>/Switch2'
+    // End of Switch: '<S5>/Switch2'
 
     // Product: '<Root>/Product2' incorporates:
     //   Sum: '<Root>/Sum1'
 
-    rtb_IProdOut = (rtb_Switch2 - arg_Estimates.jointvelocities.velocity) *
+    rtb_Switch2_o = (rtb_Switch2 - arg_Estimates.jointvelocities.velocity) *
       arg_ConfigurationParameters.motorconfig.reduction;
 
-    // Product: '<S156>/PProd Out'
-    rtb_Saturation = rtb_IProdOut * arg_ConfigurationParameters.VelLoopPID.P;
+    // Product: '<S160>/PProd Out'
+    rtb_Abs = rtb_Switch2_o * arg_ConfigurationParameters.VelLoopPID.P;
 
-    // SampleTimeMath: '<S146>/Tsamp'
+    // SampleTimeMath: '<S150>/Tsamp'
     //
-    //  About '<S146>/Tsamp':
+    //  About '<S150>/Tsamp':
     //   y = u * K where K = ( w * Ts )
 
-    rtb_SignPreIntegrator = arg_ConfigurationParameters.VelLoopPID.N * 0.0005F;
+    rtb_Uk1 = arg_ConfigurationParameters.VelLoopPID.N * 0.0005F;
 
-    // Math: '<S144>/Reciprocal' incorporates:
-    //   Constant: '<S144>/Constant'
-    //   Sum: '<S144>/SumDen'
+    // Math: '<S148>/Reciprocal' incorporates:
+    //   Constant: '<S148>/Constant'
+    //   Sum: '<S148>/SumDen'
     //
-    //  About '<S144>/Reciprocal':
+    //  About '<S148>/Reciprocal':
     //   Operator: reciprocal
 
-    rtb_Abs = 1.0F / (rtb_SignPreIntegrator + 1.0F);
+    rtb_UnitDelay1 = 1.0F / (rtb_Uk1 + 1.0F);
 
-    // DiscreteTransferFcn: '<S144>/Filter Differentiator TF' incorporates:
-    //   Constant: '<S144>/Constant'
-    //   Product: '<S143>/DProd Out'
-    //   Product: '<S144>/Divide'
-    //   Sum: '<S144>/SumNum'
+    // DiscreteTransferFcn: '<S148>/Filter Differentiator TF' incorporates:
+    //   Constant: '<S148>/Constant'
+    //   DiscreteTransferFcn: '<S46>/Filter Differentiator TF'
+    //   Product: '<S147>/DProd Out'
+    //   Product: '<S148>/Divide'
+    //   Sum: '<S148>/SumNum'
 
     if (rtb_FixPtRelationalOperator &&
         (control_outer_PrevZCX.FilterDifferentiatorTF_Reset__e != 1)) {
@@ -330,144 +332,261 @@ namespace amc_bldc_codegen
 
     control_outer_PrevZCX.FilterDifferentiatorTF_Reset__e =
       rtb_FixPtRelationalOperator;
-    control_outer_DW.FilterDifferentiatorTF_tmp_p = rtb_IProdOut *
-      arg_ConfigurationParameters.VelLoopPID.D - (rtb_SignPreIntegrator - 1.0F) *
-      rtb_Abs * control_outer_DW.FilterDifferentiatorTF_states_c;
+    control_outer_DW.FilterDifferentiatorTF_tmp_p = rtb_Switch2_o *
+      arg_ConfigurationParameters.VelLoopPID.D - (rtb_Uk1 - 1.0F) *
+      rtb_UnitDelay1 * control_outer_DW.FilterDifferentiatorTF_states_c;
 
-    // Product: '<S154>/NProd Out' incorporates:
-    //   DiscreteTransferFcn: '<S144>/Filter Differentiator TF'
-    //   Product: '<S144>/DenCoefOut'
+    // Product: '<S158>/NProd Out' incorporates:
+    //   DiscreteTransferFcn: '<S148>/Filter Differentiator TF'
+    //   Product: '<S148>/DenCoefOut'
 
-    rtb_Abs = (control_outer_DW.FilterDifferentiatorTF_tmp_p +
-               -control_outer_DW.FilterDifferentiatorTF_states_c) * rtb_Abs *
-      arg_ConfigurationParameters.VelLoopPID.N;
+    rtb_PProdOut = (control_outer_DW.FilterDifferentiatorTF_tmp_p +
+                    -control_outer_DW.FilterDifferentiatorTF_states_c) *
+      rtb_UnitDelay1 * arg_ConfigurationParameters.VelLoopPID.N;
 
-    // Sum: '<S161>/Sum Fdbk'
-    rtb_SignPreIntegrator = (rtb_Saturation +
-      control_outer_DW.Integrator_DSTATE_b) + rtb_Abs;
+    // Sum: '<S165>/Sum Fdbk'
+    rtb_Uk1 = (rtb_Abs + control_outer_DW.Integrator_DSTATE_b) + rtb_PProdOut;
 
-    // Gain: '<S140>/ZeroGain'
-    rtb_PProdOut = 0.0F * rtb_SignPreIntegrator;
+    // DeadZone: '<S146>/DeadZone' incorporates:
+    //   Saturate: '<S163>/Saturation'
 
-    // DeadZone: '<S142>/DeadZone'
-    if (rtb_SignPreIntegrator > 100.0F) {
-      rtb_SignPreIntegrator -= 100.0F;
-    } else if (rtb_SignPreIntegrator >= -100.0F) {
-      rtb_SignPreIntegrator = 0.0F;
+    if (rtb_Uk1 > 100.0F) {
+      rtb_UnitDelay1 = rtb_Uk1 - 100.0F;
+      rtb_PProdOut_o = 100.0F;
     } else {
-      rtb_SignPreIntegrator -= -100.0F;
+      if (rtb_Uk1 >= -100.0F) {
+        rtb_UnitDelay1 = 0.0F;
+      } else {
+        rtb_UnitDelay1 = rtb_Uk1 - -100.0F;
+      }
+
+      if (rtb_Uk1 < -100.0F) {
+        rtb_PProdOut_o = -100.0F;
+      } else {
+        rtb_PProdOut_o = rtb_Uk1;
+      }
     }
 
-    // End of DeadZone: '<S142>/DeadZone'
+    // End of DeadZone: '<S146>/DeadZone'
 
-    // Product: '<S148>/IProd Out'
-    rtb_IProdOut *= arg_ConfigurationParameters.VelLoopPID.I;
+    // Sum: '<S167>/SumI1' incorporates:
+    //   Product: '<S152>/IProd Out'
+    //   Sum: '<S166>/SumI3'
+    //   UnitDelay: '<Root>/Unit Delay1'
 
-    // Signum: '<S140>/SignPreSat'
-    if (rtb_SignPreIntegrator < 0.0F) {
-      // DataTypeConversion: '<S140>/DataTypeConv1'
+    rtb_Switch2_o = rtb_Switch2_o * arg_ConfigurationParameters.VelLoopPID.I +
+      (control_outer_DW.UnitDelay1_DSTATE - rtb_PProdOut_o);
+
+    // Signum: '<S144>/SignPreSat'
+    if (rtb_UnitDelay1 < 0.0F) {
+      // DataTypeConversion: '<S144>/DataTypeConv1'
       rtb_PProdOut_o = -1.0F;
-    } else if (rtb_SignPreIntegrator > 0.0F) {
-      // DataTypeConversion: '<S140>/DataTypeConv1'
+    } else if (rtb_UnitDelay1 > 0.0F) {
+      // DataTypeConversion: '<S144>/DataTypeConv1'
       rtb_PProdOut_o = 1.0F;
-    } else if (rtb_SignPreIntegrator == 0.0F) {
-      // DataTypeConversion: '<S140>/DataTypeConv1'
+    } else if (rtb_UnitDelay1 == 0.0F) {
+      // DataTypeConversion: '<S144>/DataTypeConv1'
       rtb_PProdOut_o = 0.0F;
     } else {
-      // DataTypeConversion: '<S140>/DataTypeConv1'
+      // DataTypeConversion: '<S144>/DataTypeConv1'
       rtb_PProdOut_o = (rtNaNF);
     }
 
-    // End of Signum: '<S140>/SignPreSat'
+    // End of Signum: '<S144>/SignPreSat'
 
-    // DataTypeConversion: '<S140>/DataTypeConv1'
+    // DataTypeConversion: '<S144>/DataTypeConv1'
     if (rtIsNaNF(rtb_PProdOut_o)) {
       rtb_PProdOut_o = 0.0F;
     } else {
       rtb_PProdOut_o = std::fmod(rtb_PProdOut_o, 256.0F);
     }
 
-    // Signum: '<S140>/SignPreIntegrator'
-    if (rtb_IProdOut < 0.0F) {
-      // DataTypeConversion: '<S140>/DataTypeConv2'
-      tmp = -1.0F;
-    } else if (rtb_IProdOut > 0.0F) {
-      // DataTypeConversion: '<S140>/DataTypeConv2'
-      tmp = 1.0F;
-    } else if (rtb_IProdOut == 0.0F) {
-      // DataTypeConversion: '<S140>/DataTypeConv2'
-      tmp = 0.0F;
+    // Signum: '<S144>/SignPreIntegrator'
+    if (rtb_Switch2_o < 0.0F) {
+      // DataTypeConversion: '<S144>/DataTypeConv2'
+      rtb_Sum1 = -1.0F;
+    } else if (rtb_Switch2_o > 0.0F) {
+      // DataTypeConversion: '<S144>/DataTypeConv2'
+      rtb_Sum1 = 1.0F;
+    } else if (rtb_Switch2_o == 0.0F) {
+      // DataTypeConversion: '<S144>/DataTypeConv2'
+      rtb_Sum1 = 0.0F;
     } else {
-      // DataTypeConversion: '<S140>/DataTypeConv2'
-      tmp = (rtNaNF);
+      // DataTypeConversion: '<S144>/DataTypeConv2'
+      rtb_Sum1 = (rtNaNF);
     }
 
-    // End of Signum: '<S140>/SignPreIntegrator'
+    // End of Signum: '<S144>/SignPreIntegrator'
 
-    // DataTypeConversion: '<S140>/DataTypeConv2'
-    if (rtIsNaNF(tmp)) {
-      tmp = 0.0F;
+    // DataTypeConversion: '<S144>/DataTypeConv2'
+    if (rtIsNaNF(rtb_Sum1)) {
+      rtb_Sum1 = 0.0F;
     } else {
-      tmp = std::fmod(tmp, 256.0F);
+      rtb_Sum1 = std::fmod(rtb_Sum1, 256.0F);
     }
 
-    // Switch: '<S140>/Switch' incorporates:
-    //   Constant: '<S140>/Constant1'
-    //   DataTypeConversion: '<S140>/DataTypeConv1'
-    //   DataTypeConversion: '<S140>/DataTypeConv2'
-    //   Logic: '<S140>/AND3'
-    //   RelationalOperator: '<S140>/Equal1'
-    //   RelationalOperator: '<S140>/NotEqual'
+    // Switch: '<S144>/Switch' incorporates:
+    //   Constant: '<S144>/Constant1'
+    //   DataTypeConversion: '<S144>/DataTypeConv1'
+    //   DataTypeConversion: '<S144>/DataTypeConv2'
+    //   Gain: '<S144>/ZeroGain'
+    //   Logic: '<S144>/AND3'
+    //   RelationalOperator: '<S144>/Equal1'
+    //   RelationalOperator: '<S144>/NotEqual'
 
-    if ((rtb_PProdOut != rtb_SignPreIntegrator) && ((rtb_PProdOut_o < 0.0F ?
+    if ((0.0F * rtb_Uk1 != rtb_UnitDelay1) && ((rtb_PProdOut_o < 0.0F ?
           static_cast<int32_T>(static_cast<int8_T>(-static_cast<int8_T>(
              static_cast<uint8_T>(-rtb_PProdOut_o)))) : static_cast<int32_T>(
-           static_cast<int8_T>(static_cast<uint8_T>(rtb_PProdOut_o)))) == (tmp <
-          0.0F ? static_cast<int32_T>(static_cast<int8_T>(-static_cast<int8_T>(
-             static_cast<uint8_T>(-tmp)))) : static_cast<int32_T>
-          (static_cast<int8_T>(static_cast<uint8_T>(tmp)))))) {
-      rtb_PProdOut = 0.0F;
+           static_cast<int8_T>(static_cast<uint8_T>(rtb_PProdOut_o)))) ==
+         (rtb_Sum1 < 0.0F ? static_cast<int32_T>(static_cast<int8_T>(-
+            static_cast<int8_T>(static_cast<uint8_T>(-rtb_Sum1)))) :
+          static_cast<int32_T>(static_cast<int8_T>(static_cast<uint8_T>(rtb_Sum1))))))
+    {
+      rtb_PProdOut_o = 0.0F;
     } else {
-      rtb_PProdOut = rtb_IProdOut;
+      rtb_PProdOut_o = rtb_Switch2_o;
     }
 
-    // End of Switch: '<S140>/Switch'
+    // End of Switch: '<S144>/Switch'
 
-    // DiscreteIntegrator: '<S151>/Integrator'
+    // DiscreteIntegrator: '<S155>/Integrator'
     if (rtb_FixPtRelationalOperator &&
         (control_outer_DW.Integrator_PrevResetState_c <= 0)) {
       control_outer_DW.Integrator_DSTATE_b = 0.0F;
     }
 
-    // DiscreteIntegrator: '<S151>/Integrator'
-    rtb_IProdOut = 0.0005F * rtb_PProdOut + control_outer_DW.Integrator_DSTATE_b;
+    // DiscreteIntegrator: '<S155>/Integrator'
+    rtb_UnitDelay1 = 0.0005F * rtb_PProdOut_o +
+      control_outer_DW.Integrator_DSTATE_b;
 
-    // Sum: '<S160>/Sum'
-    rtb_Abs += rtb_Saturation + rtb_IProdOut;
+    // Switch: '<Root>/Switch1'
+    if (rtb_Compare_m) {
+      // Sum: '<S164>/Sum'
+      rtb_Uk1 = (rtb_Abs + rtb_UnitDelay1) + rtb_PProdOut;
 
-    // Saturate: '<S158>/Saturation'
-    if (rtb_Abs > 100.0F) {
-      // BusCreator: '<Root>/Bus Creator2'
-      arg_OuterOutputs.motorcurrent.current = 100.0F;
-    } else if (rtb_Abs < -100.0F) {
-      // BusCreator: '<Root>/Bus Creator2'
-      arg_OuterOutputs.motorcurrent.current = -100.0F;
+      // Saturate: '<S162>/Saturation'
+      if (rtb_Uk1 > 100.0F) {
+        rtb_Uk1 = 100.0F;
+      } else if (rtb_Uk1 < -100.0F) {
+        rtb_Uk1 = -100.0F;
+      }
+
+      // End of Saturate: '<S162>/Saturation'
     } else {
-      // BusCreator: '<Root>/Bus Creator2'
-      arg_OuterOutputs.motorcurrent.current = rtb_Abs;
+      rtb_Uk1 = arg_Targets.motorcurrent.current;
     }
 
-    // End of Saturate: '<S158>/Saturation'
+    // End of Switch: '<Root>/Switch1'
 
-    // Update for UnitDelay: '<S1>/Delay Input1'
+    // Signum: '<S1>/Sign'
+    if (rtb_Uk1 < 0.0F) {
+      rtb_Abs = -1.0F;
+    } else if (rtb_Uk1 > 0.0F) {
+      rtb_Abs = 1.0F;
+    } else if (rtb_Uk1 == 0.0F) {
+      rtb_Abs = 0.0F;
+    } else {
+      rtb_Abs = (rtNaNF);
+    }
+
+    // End of Signum: '<S1>/Sign'
+
+    // Sum: '<S1>/Sum' incorporates:
+    //   Abs: '<S1>/Abs'
+
+    rtb_Switch2_o = std::abs(rtb_Uk1) -
+      arg_ConfigurationParameters.thresholds.motorPeakCurrents;
+
+    // Saturate: '<S1>/Saturation'
+    if (rtb_Switch2_o <= 0.0F) {
+      // Saturate: '<S1>/Saturation'
+      rtb_PProdOut = 0.0F;
+    } else {
+      // Saturate: '<S1>/Saturation'
+      rtb_PProdOut = rtb_Switch2_o;
+    }
+
+    // End of Saturate: '<S1>/Saturation'
+
+    // Logic: '<S1>/Logical Operator' incorporates:
+    //   Constant: '<S7>/Constant'
+    //   RelationalOperator: '<S7>/Compare'
+    //   RelationalOperator: '<S8>/FixPt Relational Operator'
+    //   UnitDelay: '<S8>/Delay Input1'
     //
-    //  Block description for '<S1>/Delay Input1':
+    //  Block description for '<S8>/Delay Input1':
     //
     //   Store in Global RAM
 
-    control_outer_DW.DelayInput1_DSTATE = arg_Flags.control_mode;
+    rtb_Compare = ((rtb_Abs != control_outer_DW.DelayInput1_DSTATE) ||
+                   (rtb_Switch2_o <= 0.0F));
 
-    // Update for DiscreteTransferFcn: '<S42>/Filter Differentiator TF'
+    // DiscreteFilter: '<S1>/Discrete Filter'
+    if ((((control_outer_PrevZCX.DiscreteFilter_Reset_ZCE == 1) != rtb_Compare) &&
+         (control_outer_PrevZCX.DiscreteFilter_Reset_ZCE != 3)) || rtb_Compare)
+    {
+      control_outer_DW.DiscreteFilter_states = 0.0F;
+      control_outer_DW.DiscreteFilter_denStates = 0.0F;
+    }
+
+    control_outer_PrevZCX.DiscreteFilter_Reset_ZCE = rtb_Compare;
+    rtb_Sum1 = (0.997506261F * rtb_PProdOut + -0.997506261F *
+                control_outer_DW.DiscreteFilter_states) - -0.995012462F *
+      control_outer_DW.DiscreteFilter_denStates;
+    control_outer_DW.DiscreteFilter_tmp = rtb_Sum1;
+
+    // End of DiscreteFilter: '<S1>/Discrete Filter'
+
+    // Switch: '<S9>/Switch2' incorporates:
+    //   RelationalOperator: '<S9>/LowerRelop1'
+
+    if (rtb_Uk1 > arg_ConfigurationParameters.thresholds.motorPeakCurrents) {
+      rtb_Switch2_o = arg_ConfigurationParameters.thresholds.motorPeakCurrents;
+    } else {
+      // Gain: '<S1>/Gain'
+      rtb_Switch2_o = -arg_ConfigurationParameters.thresholds.motorPeakCurrents;
+
+      // Switch: '<S9>/Switch' incorporates:
+      //   Gain: '<S1>/Gain'
+      //   RelationalOperator: '<S9>/UpperRelop'
+
+      if (!(rtb_Uk1 < -arg_ConfigurationParameters.thresholds.motorPeakCurrents))
+      {
+        rtb_Switch2_o = rtb_Uk1;
+      }
+
+      // End of Switch: '<S9>/Switch'
+    }
+
+    // End of Switch: '<S9>/Switch2'
+
+    // Saturate: '<S1>/Saturation1'
+    if (rtb_Sum1 <= 0.0F) {
+      rtb_Sum1 = 0.0F;
+    }
+
+    // End of Saturate: '<S1>/Saturation1'
+
+    // Sum: '<S1>/Sum1' incorporates:
+    //   Product: '<S1>/Product'
+
+    rtb_Sum1 = rtb_Abs * rtb_Sum1 + rtb_Switch2_o;
+
+    // BusCreator: '<Root>/Bus Creator2'
+    arg_OuterOutputs.motorcurrent.current = rtb_Sum1;
+
+    // BusCreator: '<Root>/Bus Creator1'
+    arg_OuterOutputs.vel_en = rtb_Compare_m;
+
+    // Update for UnitDelay: '<S2>/Delay Input1'
+    //
+    //  Block description for '<S2>/Delay Input1':
+    //
+    //   Store in Global RAM
+
+    control_outer_DW.DelayInput1_DSTATE_f = arg_Flags.control_mode;
+
+    // Update for DiscreteTransferFcn: '<S46>/Filter Differentiator TF'
     control_outer_DW.FilterDifferentiatorTF_states =
       control_outer_DW.FilterDifferentiatorTF_tmp;
 
@@ -477,30 +596,51 @@ namespace amc_bldc_codegen
     control_outer_DW.UnitDelay_DSTATE = rtb_Switch2 -
       arg_Targets.jointvelocities.velocity;
 
-    // Update for DiscreteIntegrator: '<S49>/Integrator'
+    // Update for DiscreteIntegrator: '<S53>/Integrator'
     control_outer_DW.Integrator_DSTATE = 0.0005F * rtb_DProdOut +
       rtb_FilterDifferentiatorTF;
     control_outer_DW.Integrator_PrevResetState = static_cast<int8_T>
       (rtb_FixPtRelationalOperator);
 
-    // Update for DiscreteTransferFcn: '<S92>/Filter Differentiator TF'
+    // Update for DiscreteTransferFcn: '<S96>/Filter Differentiator TF'
     control_outer_DW.FilterDifferentiatorTF_states_i =
       control_outer_DW.FilterDifferentiatorTF_tmp_m;
 
-    // Update for DiscreteIntegrator: '<S99>/Integrator'
+    // Update for DiscreteIntegrator: '<S103>/Integrator' incorporates:
+    //   DiscreteIntegrator: '<S53>/Integrator'
+
     control_outer_DW.Integrator_DSTATE_i = 0.0005F *
       rtb_FilterDifferentiatorTF_n + rtb_DProdOut_f;
     control_outer_DW.Integrator_PrevResetState_n = static_cast<int8_T>
       (rtb_FixPtRelationalOperator);
 
-    // Update for DiscreteTransferFcn: '<S144>/Filter Differentiator TF'
+    // Update for DiscreteTransferFcn: '<S148>/Filter Differentiator TF'
     control_outer_DW.FilterDifferentiatorTF_states_c =
       control_outer_DW.FilterDifferentiatorTF_tmp_p;
 
-    // Update for DiscreteIntegrator: '<S151>/Integrator'
-    control_outer_DW.Integrator_DSTATE_b = 0.0005F * rtb_PProdOut + rtb_IProdOut;
+    // Update for UnitDelay: '<Root>/Unit Delay1'
+    control_outer_DW.UnitDelay1_DSTATE = rtb_Sum1;
+
+    // Update for DiscreteIntegrator: '<S155>/Integrator' incorporates:
+    //   DiscreteIntegrator: '<S53>/Integrator'
+
+    control_outer_DW.Integrator_DSTATE_b = 0.0005F * rtb_PProdOut_o +
+      rtb_UnitDelay1;
     control_outer_DW.Integrator_PrevResetState_c = static_cast<int8_T>
       (rtb_FixPtRelationalOperator);
+
+    // Update for UnitDelay: '<S8>/Delay Input1'
+    //
+    //  Block description for '<S8>/Delay Input1':
+    //
+    //   Store in Global RAM
+
+    control_outer_DW.DelayInput1_DSTATE = rtb_Abs;
+
+    // Update for DiscreteFilter: '<S1>/Discrete Filter'
+    control_outer_DW.DiscreteFilter_states = rtb_PProdOut;
+    control_outer_DW.DiscreteFilter_denStates =
+      control_outer_DW.DiscreteFilter_tmp;
   }
 
   // Model initialize function
@@ -513,6 +653,7 @@ namespace amc_bldc_codegen
     control_outer_PrevZCX.FilterDifferentiatorTF_Reset_ZC = POS_ZCSIG;
     control_outer_PrevZCX.FilterDifferentiatorTF_Reset__m = POS_ZCSIG;
     control_outer_PrevZCX.FilterDifferentiatorTF_Reset__e = POS_ZCSIG;
+    control_outer_PrevZCX.DiscreteFilter_Reset_ZCE = UNINITIALIZED_ZCSIG;
   }
 
   // Constructor
