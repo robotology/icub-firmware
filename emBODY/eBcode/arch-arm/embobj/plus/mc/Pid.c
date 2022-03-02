@@ -183,21 +183,9 @@ float PID_do_out(PID* o, float En)
 
 float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
 {
-    // TODO: return value using the new friction parameters (do we need to put it under macro?)
-    
-    // eOerrmanDescriptor_t errdes = {0};
-
-    // errdes.code             = 0;
-    // errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    // errdes.sourceaddress    = 0;
-    // errdes.par16            = 0;
-    // errdes.par64            = 0;
-    
-    // char str[100];
-    // snprintf(str, sizeof(str), "FRICTION PARAMETERS: %.3f %.3f %.3f %.3f", o->viscous_pos_val, o->viscous_neg_val, o->coulomb_pos_val, o->coulomb_neg_val);
-    
-    // eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, NULL);
-    
+#ifdef USE_VISCOUS_COULOMB 
     return o->Ktau*(o->coulomb_pos_val + o->viscous_pos_val*vel_fbk + o->Kff*trq_ref);
-    //return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
+#else
+    return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
+#endif // USE_VISCOUS_COULOMB
 }
