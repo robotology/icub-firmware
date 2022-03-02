@@ -53,7 +53,8 @@ extern "C" {
 #if defined(TESTRTC_IS_ACTIVE)
     // only one
     //#define TESTRTC_MC
-    #define TESTRTC_POS
+    //#define TESTRTC_POS
+    #define TESTRTC_FT
 #endif    
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
