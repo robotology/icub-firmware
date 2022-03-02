@@ -762,7 +762,7 @@
             </File>
             <File>
               <FileName>overridden_appl.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoemsappl\overridden_appl.c</FilePath>
             </File>
             <File>
@@ -1187,12 +1187,12 @@
           <Files>
             <File>
               <FileName>EoCANprotASperiodic.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASpolling.c</FilePath>
             </File>
             <File>
@@ -1691,7 +1691,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_EMS4RD -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
+              <MiscControls>-DTESTRTC_IS_ACTIVE -DxEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_EMS4RD -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
               <Define>DIAGNOSTIC2_enabled DIAGNOSTIC2_receive_from_daemon DIAGNOSTIC2_send_to_yarprobotinterface _no_DIAGNOSTIC2_send_to_daemon</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\libs\midware\eventviewer\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\cfg\eoprot-boards;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\plus\can;..\..\..\..\..\embobj\plus\can\config-can-mapping;..\..\..\..\..\embobj\plus\can\config-can-protocol;..\..\..\..\..\embobj\plus\board;..\..\..\..\mc4plus\appl\v2\src\eoappservices;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embot;..\..\..\..\..\embot\cif;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth</IncludePath>
@@ -2139,7 +2139,7 @@
             </File>
             <File>
               <FileName>overridden_appl.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoemsappl\overridden_appl.c</FilePath>
             </File>
             <File>
@@ -2633,12 +2633,12 @@
           <Files>
             <File>
               <FileName>EoCANprotASperiodic.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASpolling.c</FilePath>
             </File>
             <File>
@@ -3585,7 +3585,7 @@
             </File>
             <File>
               <FileName>overridden_appl.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\eoemsappl\overridden_appl.c</FilePath>
             </File>
             <File>
@@ -4079,12 +4079,12 @@
           <Files>
             <File>
               <FileName>EoCANprotASperiodic.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASpolling.c</FilePath>
             </File>
             <File>

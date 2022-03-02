@@ -92,10 +92,18 @@ static void s_services_test_stop(void *arg);
 static void s_services_test_stop_everything(void *arg);
 
 
+
+#if defined(TESTRTC_MC)
+
 static void s_services_test_mc_init(void);
 static void s_services_test_mc_multiplesteps(void *arg);
 static void s_services_test_mc_stop(void *par);
 
+#else
+static void s_services_test_mc_init(void) {}
+static void s_services_test_mc_multiplesteps(void *arg) {}
+static void s_services_test_mc_stop(void *par) {}
+#endif // #if defined(TESTRTC_MC)
 
 
 //static void s_services_test_inertials_init();
@@ -103,9 +111,18 @@ static void s_services_test_mc_stop(void *par);
 //static void s_services_test_inertials_stop(void *par);
 
 
+
+#if defined(TESTRTC_POS)
+
 static void s_services_test_pos_init(void);
 static void s_services_test_pos_multiplesteps(void *arg);
 static void s_services_test_pos_stop(void *par);
+
+#else
+static void s_services_test_pos_init(void) {}
+static void s_services_test_pos_multiplesteps(void *arg) {}
+static void s_services_test_pos_stop(void *par) {}    
+#endif // #if defined(TESTRTC_POS)
 
 #endif
 
@@ -287,12 +304,14 @@ static void s_services_test_stop_everything(void *arg)
 // -----------------------------------------------------------------------------------------------------------
 // motion control ....
 
+#if defined(TESTRTC_MC)
 
 //eo_motcon_mode_mc4pluspmc
 static const eOmn_serv_configuration_t s_serv_config_mc_mc4pluspmc =
 {   
     .type       = eomn_serv_MC_mc4pluspmc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.mc4pluspmc = 
     {
         .pos   =
@@ -515,7 +534,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_mc4pluspmc =
 static const eOmn_serv_configuration_t s_serv_config_mc_mc4plusfaps =
 {   
     .type       = eomn_serv_MC_mc4plusfaps,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.mc4plusfaps = 
     {
         .pos   =
@@ -661,7 +681,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_mc4plusfaps =
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
 {   // eb1 / eb3
     .type       = eomn_serv_MC_foc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.foc_based = 
     {
         .version   =
@@ -790,7 +811,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
 {   // eb1 / eb3
     .type       = eomn_serv_MC_foc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.foc_based = 
     {
         .version   =
@@ -920,7 +942,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
 {   // eb1 / eb3
     .type       = eomn_serv_MC_foc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.foc_based = 
     {
         .version   =
@@ -1050,7 +1073,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
 {   // eb1 / eb3
     .type       = eomn_serv_MC_foc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.foc_based = 
     {
         .version   =
@@ -1177,7 +1201,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
 };
 
 
-
 static void s_services_test_mc_init(void)
 {
     //s_test_config_ko = &s_serv_config_mc_eb1_fake_inc;
@@ -1283,8 +1306,13 @@ static void s_services_test_mc_multiplesteps(void *arg)
 }
 
 
+#endif // #if defined(TESTRTC_MC)
+
 // --------------------------------------------------------------------------------------------------------------------
 // pos
+
+
+#if defined(TESTRTC_POS)
 
 #include "EOthePOS.h"
 
@@ -1292,7 +1320,8 @@ static void s_services_test_mc_multiplesteps(void *arg)
 static const eOmn_serv_configuration_t s_serv_config_as_pos =
 {   
     .type = eomn_serv_AS_pos,
-    .filler = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.as.pos = 
     {
         .version = 
@@ -1417,6 +1446,7 @@ static void s_services_test_pos_stop(void *par)
 
 
 
+#endif // #if defined(TESTRTC_MC)
 
 
 #endif // TESTRTC_IS_ACTIVE

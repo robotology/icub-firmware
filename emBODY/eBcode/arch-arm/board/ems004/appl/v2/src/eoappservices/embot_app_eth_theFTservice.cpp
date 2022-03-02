@@ -12,6 +12,9 @@
 
 #include "embot_app_eth_theFTservice.h"
 
+#if !defined(USE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES)
+ #define USE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -25,12 +28,23 @@
 #include "EoError.h"
 #include "EOVtheCallbackManager.h"
 #include "EOtheCANservice.h"
+#include "embot_core_binary.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace embot::app::eth {
+    
+    const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc)
+    {
+        std::memset(&rd, 0, sizeof(rd));
+        rd.id32 = id32;
+        rd.data = reinterpret_cast<uint8_t*>(data);
+        rd.size = size;
+        rd.ropcode = rpc;
+        return &rd;
+    }
     
     
 constexpr eOservice_core_t dummy_service_core 
@@ -64,32 +78,38 @@ constexpr eOservice_cantools_t dummy_service_cantools
     .command = {0}, 
 };
 
-struct theFSdiscovery
+// it implements the request of the fullscales (6 values for each board / entity) 
+struct FSquery
 {
     struct Item
     {
         eOprotIndex_t index {0};
-        eObrd_canlocation_t loc {};
-        eOas_ft_t *ft {nullptr};            
+        //eObrd_canlocation_t loc {};
+        //eOas_ft_t *ft {nullptr}; 
+        //Item(eOprotIndex_t i, eObrd_canlocation_t c, eOas_ft_t *f) : index(i), loc(c), ft(f) {}   
+        //Item(eOprotIndex_t i) : index(i), loc({}), ft(nullptr) {}
+        Item(eOprotIndex_t i) : index(i) {}            
     };
+    
     std::vector<Item> items;
     uint8_t rxfullscales {0};
     uint8_t maxfullscales {0};
     bool querying {false};
     uint8_t fsindex {0};
+    EOtimer *tmr {nullptr};
+    EOaction_strg astrg = {0};
+    EOaction *act = {nullptr};
     embot::core::Callback ONok {};
-    embot::core::Callback ONko {};
+    embot::core::Callback ONtimeout {};
     embot::core::relTime timeout {50*embot::core::time1millisec};
     static constexpr size_t maxboards {theFTservice::maxSensors};
-    theFSdiscovery() = default;
+    FSquery() = default;
     
-    void initialise(const embot::core::Callback &onOK, const embot::core::Callback &onTOUT, 
-                    embot::core::relTime tout = 50*embot::core::time1millisec)
+    void initialise()
     {
         items.reserve(maxboards);
-        ONok = onOK;
-        ONko = onTOUT;
-        timeout = tout;
+        tmr = eo_timer_New();
+        act = reinterpret_cast<EOaction*>(&astrg);
     }
     
     void reset()
@@ -105,9 +125,24 @@ struct theFSdiscovery
         items.push_back(item);
     }
     
-    void start()
+    static void ontout(void* p)
     {
+        FSquery *fsq = reinterpret_cast<FSquery*>(p);
+        fsq->querying = false;
+        eo_timer_Stop(fsq->tmr);
+        fsq->ONtimeout.execute();
+    }        
+    
+    void start(const embot::core::Callback &onOK, const embot::core::Callback &onTOUT, 
+                embot::core::relTime tout = 50*embot::core::time1millisec)
+    {
+        ONok = onOK;
+        ONtimeout = onTOUT;
+        timeout = tout;
+        
         // init timer w/ timeout (i will do it ...)
+        eo_action_SetCallback(act, ontout, this, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+        eo_timer_Start(tmr, eok_abstimeNOW, timeout, eo_tmrmode_ONESHOT, act);
         
         // set the number of fullscales i will receive
         rxfullscales = 0;
@@ -116,7 +151,7 @@ struct theFSdiscovery
         querying = true;
         // send the first burst
         fsindex = 0;
-        askfullscales();
+        askfullscales();   
     }
     
     void askfullscales()
@@ -149,17 +184,25 @@ struct theFSdiscovery
             return false;
         }
         
-        ft->status.fullscale[chnl] = fsvalue;
+        if((nullptr != ft) && (chnl < eoas_ft_6axis))
+        {
+            ft->status.fullscale[chnl] = fsvalue;
+        }
+        
         rxfullscales++;
+        
         if(rxfullscales == maxfullscales)
         {
+            eo_timer_Stop(tmr);
             querying = false;
             ONok.execute();
+            reset();
         }
         
         return true;
     }        
 };
+
 
 struct embot::app::eth::theFTservice::Impl
 {
@@ -179,8 +222,9 @@ struct embot::app::eth::theFTservice::Impl
     // theFTnetvariables[i] holds pointer to the network variable of the whole eOas_ft_t w/ i index
     // BEWARE: or nullptr if the protocol configure less than maxSensors ft sensors. see xxx    
     std::array<eOas_ft_t*, maxSensors> theFTnetvariables {nullptr, nullptr, nullptr, nullptr};    
+    std::array<eObrd_cantype_t, maxSensors> theFTboards {eobrd_cantype_none, eobrd_cantype_none, eobrd_cantype_none, eobrd_cantype_none};
     
-    theFSdiscovery theFSdiscodance {};
+    FSquery fullscalequery {};
     
     // methods
     
@@ -192,10 +236,7 @@ struct embot::app::eth::theFTservice::Impl
     // done
     bool SendReport();
       
-    // done BUT .... must do request of fullscales before we call onverify()
-    // the idea is to have a struct FSquery w/ .start(cfg), processcanframe(),
-    // success(), failure() plus a timer w/ a timeout of 100 ms
-    // now we have the fake .... getfullscale_start() etc.    
+    // done    
     eOresult_t Verify(const eOmn_serv_configuration_t * servcfg, 
                 eOservice_onendofoperation_fun_t onverify, 
                 bool activateafterverify);
@@ -220,22 +261,27 @@ struct embot::app::eth::theFTservice::Impl
     // done
     eOresult_t Tick(); 
        
-    
+    // done
     eOresult_t AcceptCANframe(const canFrameDescriptor &canframedescriptor);
-       
+    eOresult_t processfullscale(const canFrameDescriptor &cfd);   
     
-    bool process(const EOnv* nv, const eOropdescriptor_t* rd);
+    bool process(const eOropdescriptor_t* rd, const EOnv* nv);
     
-    // service functions
+    bool set(eOprotIndex_t index, const eOas_ft_config_t *ftc);
+    bool enable(eOprotIndex_t index, const uint8_t *cmdenable);
     
-    void getfullscale_start();
-    void getfullscale_continue();
-    void getfullscale_stop();
-    void getfullscale_failure();
+    // service functions    
         
-    void s_eo_strain_SendTXmode();
+    void s_eo_strain_SetDataRate();   
+    void s_eo_strain_SendTXmode();    
+    void s_eo_strain_SetDataRate(eOprotIndex_t index, uint8_t millisec);
+    void s_eo_strain_SendTXmode(eOprotIndex_t index,  bool transmit);
     void s_eo_strain_TXstop();
     void s_ft_saturation_handler(const canFrameDescriptor &cfd, eOprotIndex_t index);
+    void s_eo_temperature_TXstop(); //bool on, uint8_t periodsec);
+    void s_eo_temperature_config(eOprotIndex_t index);
+    void s_eo_temperature_TX(eOprotIndex_t index, bool on);
+    
     
     // they must be static
     static eOresult_t onstop_search_for_ft_boards(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok);
@@ -243,7 +289,8 @@ struct embot::app::eth::theFTservice::Impl
     static void send_periodic_error_report(void *par);    
     static constexpr eObool_t ft_isID32relevant(uint32_t id32);
     
-    static void onFSdiscoveryOK(void *par);
+    static void onFSqueryOK(void *par);
+    static void onFSqueryTIMEOUT(void *par);
 
 };
 
@@ -278,20 +325,11 @@ bool embot::app::eth::theFTservice::Impl::initialise()
     service.state = eomn_serv_state_idle;  
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);   
 
-
-    // build pointers to the eOas_ft_t used by protocol: theFTnetvariables    
-    // in embobj standard they are managed by EOtheEntities, but ... if they have local scope i prefer to do it in here 
-//    for(uint8_t i = 0; i<theFTnetvariables.size(); i++)
-//    {
-//        void *vpft = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_ft, static_cast<eOprotIndex_t>(i));
-//        theFTnetvariables[i] = reinterpret_cast<eOas_ft_t*>(vpft);
-//    }
-    for(uint8_t i = 0; i<theFTnetvariables.size(); i++)
-    {
-        theFTnetvariables[i] = nullptr;
-    }
-    
-    theFSdiscodance.initialise({}, {});
+    // clear data used by this class
+    for(auto &item : theFTnetvariables) item = nullptr;
+    for(auto &item : theFTboards) item = eobrd_cantype_none;
+      
+    fullscalequery.initialise();
     
     initted = true;
     return initted;
@@ -310,7 +348,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Tick()
         return(eores_OK);
     }     
 
-// add in here a check vs correct arrival of can frames.
+    // add in here a check vs correct arrival of can frames.
               
     return eores_OK;
 }
@@ -338,6 +376,7 @@ bool embot::app::eth::theFTservice::Impl::SendReport()
     return true;
 }
 
+
 eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configuration_t * servcfg, 
                 eOservice_onendofoperation_fun_t onverify, 
                 bool activateafterverify)
@@ -349,7 +388,6 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
         eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
         if(NULL != onverify)
         {
-            #warning USE a handle to the object w/ methods .... 
             onverify(nullptr, eobool_false); 
         }                 
         return(eores_NOK_nullpointer);
@@ -384,34 +422,33 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
     
 #if 0    
 
-    eOcandiscovery_target_t trgt = {0};
-
-    #warning for now I assume that we have only one board type ... 
-    // in case we really have n board types, have a look at eo_inertials3_Verify()
-    // basically: we must push multiple times eo_array_PushBack(sharedcan.discoverytargets, &trgt); 
-    // w/ a trgt holding one type only of board.
-    
-    EOconstarray *carray = eo_constarray_Load(reinterpret_cast<const EOarray*>(&servcfg->data.as.ft.arrayofsensors));
-   
-    const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, 0));
-    trgt.info.type = sd->boardinfo.type;
-    trgt.info.protocol = sd->boardinfo.protocol;
-    trgt.info.firmware = sd->boardinfo.firmware;  
-    trgt.canmap[sd->canloc.port] = 0x0001 << sd->canloc.addr; 
-    
-    // force a cleaned discoverytargets before we add the target
-    eo_array_Reset(sharedcan.discoverytargets);
-    eo_array_PushBack(sharedcan.discoverytargets, &trgt);
-    
-    tmpservcfg = servcfg;
-    sharedcan.ondiscoverystop.function = onstop_search_for_ft_boards;
-    sharedcan.ondiscoverystop.parameter = (void*) this; //(void*)servcfg;
-    
-    // start discovery
-    eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), sharedcan.discoverytargets, &sharedcan.ondiscoverystop);   
+//    eOcandiscovery_target_t trgt = {0};
+// 
+//    #warning for now I assume that we have only one board type ... 
+//    // in case we really have n board types, have a look at eo_inertials3_Verify()
+//    // basically: we must push multiple times eo_array_PushBack(sharedcan.discoverytargets, &trgt); 
+//    // w/ a trgt holding one type only of board.
+//    
+//    EOconstarray *carray = eo_constarray_Load(reinterpret_cast<const EOarray*>(&servcfg->data.as.ft.arrayofsensors));
+//   
+//    const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, 0));
+//    trgt.info.type = sd->boardinfo.type;
+//    trgt.info.protocol = sd->boardinfo.protocol;
+//    trgt.info.firmware = sd->boardinfo.firmware;  
+//    trgt.canmap[sd->canloc.port] = 0x0001 << sd->canloc.addr; 
+//    
+//    // force a cleaned discoverytargets before we add the target
+//    eo_array_Reset(sharedcan.discoverytargets);
+//    eo_array_PushBack(sharedcan.discoverytargets, &trgt);
+//    
+//    tmpservcfg = servcfg;
+//    sharedcan.ondiscoverystop.function = onstop_search_for_ft_boards;
+//    sharedcan.ondiscoverystop.parameter = (void*) this; //(void*)servcfg;
+//    
+//    // start discovery
+//    eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), sharedcan.discoverytargets, &sharedcan.ondiscoverystop);   
     
 #else
-    // from EOtheInertials3
     
     // now we deal with sensors on can:
     // step-1: check vs max number of can boards in config
@@ -435,6 +472,28 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
         }          
         return(eores_NOK_generic);
     }
+    
+    // check that all the boards in the descriptor are ok: the must have the correct type but also there must not be doubles (same address)
+    uint16_t canmap[2] = {0, 0};
+    for(uint8_t s=0; s<numofsensors; s++)
+    {
+        const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, s));
+        bool alreadyused = embot::core::binary::bit::check(canmap[sd->canloc.port], sd->canloc.addr);
+      
+        if((true == alreadyused) || (eobool_false == eoas_ft_isboardvalid(static_cast<eObrd_cantype_t>(sd->boardinfo.type))))
+        {
+            // double board in descriptor or invalid type ....
+            service.state = eomn_serv_state_failureofverify;
+            eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+            if(NULL != onverify)
+            {
+                onverify(nullptr, eobool_false); 
+            }          
+            return(eores_NOK_generic);            
+        }
+        embot::core::binary::bit::set(canmap[sd->canloc.port], sd->canloc.addr);
+    }
+    
     
     // force a cleaned discoverytargets before we add the target
     eo_array_Reset(sharedcan.discoverytargets);
@@ -497,6 +556,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
     return eores_OK;
 }
 
+
 eOresult_t embot::app::eth::theFTservice::Impl::Activate(const eOmn_serv_configuration_t * servcfg)
 {
     if(NULL == servcfg)
@@ -514,8 +574,6 @@ eOresult_t embot::app::eth::theFTservice::Impl::Activate(const eOmn_serv_configu
         Deactivate();        
     }   
     
-    // we dont use EOtheEntities but .... theFTnetvariables
-            
     memcpy(&service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));
                 
     // now... use the servcfg    
@@ -523,32 +581,31 @@ eOresult_t embot::app::eth::theFTservice::Impl::Activate(const eOmn_serv_configu
     uint8_t numofsensors = eo_constarray_Size(carray);
     
     // marco.accame on 25 feb 2022: for now i dont do any more verification on the sanity of the servconfig.
-    // we already did it in Verify()
+    // we already did whatever we could inside Verify()
     
-    // we must load all the boards into can mapping    
+    // in here we do: 
+    // - load boards in can mapping, and also in theFTboards
+    // - load entities, one for board in strict order 
+    // - init the theFTnetvariables
+ 
+    // we must load all the boards into can mapping, entities etc    
     for(uint8_t s=0; s<numofsensors; s++)
     {
         const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, s));
+        
         if((nullptr != sd) && (eobool_true == eoas_ft_isboardvalid(static_cast<eObrd_cantype_t>(sd->boardinfo.type))))
-        {
+        {  // even if it is a useless check because we did it before inside Verify()
+            
+            // preparation for loading can boards into EOtheCANmapping
             eObrd_canproperties_t prop = {0};
             prop.type = sd->boardinfo.type;
             prop.location.port = sd->canloc.port; 
             prop.location.addr = sd->canloc.addr; 
             prop.location.insideindex = eobrd_caninsideindex_none;
-            prop.requiredprotocol = sd->boardinfo.protocol; 
-           
-            eo_vector_PushBack(sharedcan.boardproperties, &prop);                      
-        }                
-    }               
-    eo_canmap_LoadBoards(eo_canmap_GetHandle(), sharedcan.boardproperties);  
-
-    // load the entities: one sd is one index of entity ft. also prepare the memory
-    for(uint8_t s=0; s<numofsensors; s++)
-    {
-        const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, s));
-        if((nullptr != sd) && (eobool_true == eoas_ft_isboardvalid(static_cast<eObrd_cantype_t>(sd->boardinfo.type))))
-        {
+            prop.requiredprotocol = sd->boardinfo.protocol;            
+            eo_vector_PushBack(sharedcan.boardproperties, &prop); 
+            
+            // preparation for loading entities into EOtheCANmapping
             eOcanmap_entitydescriptor_t des = {0};
             des.location.port = sd->canloc.port;
             des.location.addr = sd->canloc.addr;
@@ -556,12 +613,16 @@ eOresult_t embot::app::eth::theFTservice::Impl::Activate(const eOmn_serv_configu
             des.index = static_cast<eOcanmap_entityindex_t>(s);  
             eo_vector_PushBack(sharedcan.entitydescriptor, &des);   
 
+            // data used by this class         
             void *vpft = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_ft, static_cast<eOprotIndex_t>(s));
-            theFTnetvariables[s] = reinterpret_cast<eOas_ft_t*>(vpft);            
+            theFTnetvariables[s] = reinterpret_cast<eOas_ft_t*>(vpft);
+            theFTboards[s] = static_cast<eObrd_cantype_t>(sd->boardinfo.type);             
         }                
     }
-    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_ft, sharedcan.entitydescriptor);
     
+    eo_canmap_LoadBoards(eo_canmap_GetHandle(), sharedcan.boardproperties);  
+    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_ft, sharedcan.entitydescriptor);
+  
     
     // ok, service is active now
 
@@ -592,15 +653,14 @@ eOresult_t embot::app::eth::theFTservice::Impl::Deactivate()
     
     SetRegulars(nullptr, nullptr);
     
-    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_ft, sharedcan.entitydescriptor); 
-    
-    // clear the ...
-    for(uint8_t i = 0; i<theFTnetvariables.size(); i++)
-    {
-        theFTnetvariables[i] = nullptr;
-    }
-    
+    // deconfig EOtheCANmapping
+    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_ft, sharedcan.entitydescriptor);     
     eo_canmap_UnloadBoards(eo_canmap_GetHandle(), sharedcan.boardproperties);
+    
+    // clear data used by this class
+    for(auto &item : theFTnetvariables) item = nullptr;
+    for(auto &item : theFTboards) item = eobrd_cantype_none;
+
          
     memset(&service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
     service.servconfig.type = eomn_serv_NONE;
@@ -610,8 +670,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Deactivate()
     eo_array_Reset(sharedcan.discoverytargets);
     
     // make sure the timer is not running
-    eo_timer_Stop(diagnostics.reportTimer);    
-    
+    eo_timer_Stop(diagnostics.reportTimer);       
     
     service.active = eobool_false;    
     service.state = eomn_serv_state_idle; 
@@ -637,17 +696,16 @@ eOresult_t embot::app::eth::theFTservice::Impl::Start()
     service.state = eomn_serv_state_started; 
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
     
-    // start() does not force the tx of the board. 
-    // this function just config the strain tx mode according to values in ft.config, whose initial values are asfidanken
-    // unless someone has changed the strain.config with eth protocol messages 
-    s_eo_strain_SendTXmode();   
-          
+    // Start() does not force the tx from any CAN sensor boards.
+    // the activation of transmission is done at reception of command set<eOas_ft_commands_t::enable, 1>
+    // managed inside process(const EOnv* nv, const eOropdescriptor_t* rd)
+                
     return eores_OK;
 }
  
+
 eOresult_t embot::app::eth::theFTservice::Impl::Stop()
-{
-     
+{     
     if(eobool_false == service.active)
     {   // nothing to do because object must be first activated
         return(eores_OK);
@@ -658,14 +716,15 @@ eOresult_t embot::app::eth::theFTservice::Impl::Stop()
         return(eores_OK);
     }  
     
+    // Stop() forces the end of the tx from the CAN sensor boards
     s_eo_strain_TXstop();   
+    s_eo_temperature_TXstop();
 
     service.started = eobool_false;
     service.state = eomn_serv_state_activated;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);    
     
-    // remove all regulars related to ft entity ... no, dont do that.
-    //SetRegulars(NULL, NULL);  
+    // we dont remove all regulars related to ft entity because Deactivate() does that.
     
     return eores_OK;
 }
@@ -679,13 +738,77 @@ eOresult_t embot::app::eth::theFTservice::Impl::SetRegulars(eOmn_serv_arrayof_id
     
     return(eo_service_hid_SetRegulars(id32ofregulars, arrayofid32, ft_isID32relevant, numberofthem));
 }
+
+eOresult_t embot::app::eth::theFTservice::Impl::processfullscale(const canFrameDescriptor &cfd)
+{
+
+    if(eobool_true == service.active)
+    {   
+        return(eores_OK);
+    }  
+         
+    eObrd_canlocation_t loc = {};
+    loc.port = cfd.port;
+    loc.addr = EOCANPROT_FRAME_GET_SOURCE(cfd.frame);
+    loc.insideindex = eobrd_caninsideindex_first;
+    // 1 get ... and call
+    //fullscalequery.tick(index, ft, );
+        
+    // now... use tmpservcfg    
+    EOconstarray *carray = eo_constarray_Load(reinterpret_cast<const EOarray*>(&tmpservcfg->data.as.ft.arrayofsensors));    
+    uint8_t numofsensors = eo_constarray_Size(carray);
+    // we must load all the boards into can mapping, entities etc    
+    eOprotIndex_t index = EOK_uint08dummy;
+    eOas_ft_t *ft = nullptr;
+    for(uint8_t s=0; s<numofsensors; s++)
+    {
+        const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, s));
+        if((nullptr != sd) && (sd->canloc.port == loc.port) && (sd->canloc.addr == loc.addr))
+        {
+            index = s;
+            ft = reinterpret_cast<eOas_ft_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_ft, static_cast<eOprotIndex_t>(s)));
+ 
+            break;
+        }
+    }
     
+    if(nullptr == ft)
+    {
+        return eores_NOK_generic;
+    }
+    
+    // we have index and ft and we use them
+    
+    // now i get the channel and the data to be put inside the strain.  
+    uint8_t channel = cfd.frame->data[1];
+#if defined(USE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES)    
+    uint16_t *data = (uint16_t *)&(cfd.frame->data[2]);
+    uint16_t value = *data;
+#else
+    // MSB is in data[2], LSB in data[3]
+    uint16_t value = (uint16_t)(frame->data[3]) + (uint16_t)(frame->data[2] << 8);
+    uint16_t *data = &value;
+#endif  
+    
+    fullscalequery.tick(index, ft, channel, value);
+    
+    return eores_OK;
+}
+
 
 eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDescriptor &cfd)
 {
+    // we accept can frames only if we are activated.
+    // the only exception is for fullscales.
     
+    if(canFrameDescriptor::Type::fullscale == cfd.type)
+    {
+        return processfullscale(cfd);
+    }
+    
+    // object must be first activated otherwise we cannot use EOtheCANmapping, theFTnetvariables, theFTboards  
     if(eobool_false == service.active)
-    {   // nothing to do because object must be first activated
+    {   
         return(eores_OK);
     }   
     
@@ -707,7 +830,11 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
     }
     
     eOas_ft_t *ft = theFTnetvariables[index];
-    
+    if(nullptr == ft)
+    {   
+        // something is wrong
+        return eores_NOK_generic;
+    }
     
     switch(cfd.type)
     {
@@ -727,24 +854,14 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
                 ft->status.timedvalue.values[i+offset] = vv;
             }
             
+            ft->status.timedvalue.age = embot::core::now();
             s_ft_saturation_handler(cfd, index);
-
-            
-            
-           
-            // ora: vedi se e' modo calibrato oppure no e copia con o senza transpfrmazione
-            // ma nella entity corretta.
-            #warning add saturation handler ...
-//                       eo_array_Assign((EOarray*)(&strain->status.calibratedvalues), (processForce == mode) ? 0 : 3, &(frame->data[0]), 3);
-
-            
+                                   
         } break;   
 
         case canFrameDescriptor::Type::fullscale:
-        {
-            
-            #warning fullscaleEngine.tick(index, ft, cfd.frame);
-            
+        { 
+            // nothing to do because we processed elsewhere
         } break;  
 
         default:
@@ -756,6 +873,81 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
     
     return eores_OK;
 }
+
+//eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDescriptor &cfd)
+//{
+//// we want to be able to receive can frame containing fullscale even before the object is active.    
+////    if(eobool_false == service.active)
+////    {   // nothing to do because object must be first activated
+////        return(eores_OK);
+////    }   
+//    
+//    // 1. get a loc,
+//    // depending on cfd.type ....
+//    // fullscale
+//    // force
+//    // torque
+
+//    eObrd_canlocation_t loc = {};
+//    loc.port = cfd.port;
+//    loc.addr = EOCANPROT_FRAME_GET_SOURCE(cfd.frame);
+//    loc.insideindex = eobrd_caninsideindex_first;
+
+//        #warning ...... to use the canmap we need to be activated.
+//    eOprotIndex_t index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_analogsensors, eoprot_entity_as_ft); 
+//    if(EOK_uint08dummy == index)
+//    {
+//        return eores_NOK_generic;
+//    }
+//    
+//    eOas_ft_t *ft = theFTnetvariables[index];
+//    if(nullptr == ft)
+//    {   // we are not activated yet
+//        ft = reinterpret_cast<eOas_ft_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_ft, static_cast<eOprotIndex_t>(index)));
+//        if(nullptr == ft)
+//        {   // something is wrong
+//            return eores_NOK_generic;
+//        }    
+//    }
+//    
+//    switch(cfd.type)
+//    {
+//        case canFrameDescriptor::Type::force:
+//        case canFrameDescriptor::Type::torque:
+//        {
+//            uint8_t offset = (canFrameDescriptor::Type::force == cfd.type) ? 0 : 3;
+//            
+//            #warning verifica che il fullscale sia a posto come little endianess ....
+//            for(uint8_t i=0; i<3; i++)
+//            {
+//                float32_t vv = (static_cast<uint16_t>(cfd.frame->data[2*i+1]) << 8) + static_cast<uint16_t>(cfd.frame->data[2*i]) - static_cast<uint16_t>(0x8000);
+//                if(eoas_ft_mode_calibrated == ft->config.mode) 
+//                {
+//                    vv = vv * static_cast<float32_t>(ft->status.fullscale[i+offset]) / static_cast<float32_t>(0x8000);
+//                }
+//                ft->status.timedvalue.values[i+offset] = vv;
+//            }
+//            
+//            s_ft_saturation_handler(cfd, index);
+//                                   
+//        } break;   
+
+//        case canFrameDescriptor::Type::fullscale:
+//        {
+//            
+//            fullscalequery.tick(index, ft, );
+//            
+//        } break;  
+
+//        default:
+//        {
+//            
+//        } break;        
+//    }
+
+//    
+//    return eores_OK;
+//}
 
 void embot::app::eth::theFTservice::Impl::s_ft_saturation_handler(const canFrameDescriptor &cfd, eOprotIndex_t index)
 {
@@ -877,7 +1069,7 @@ eOmn_serv_state_t embot::app::eth::theFTservice::Impl::GetServiceState() const
     return service.state;
 }
 
-bool embot::app::eth::theFTservice::Impl::process(const EOnv* nv, const eOropdescriptor_t* rd)
+bool embot::app::eth::theFTservice::Impl::process(const eOropdescriptor_t* rd, const EOnv* nv)
 {
     // it can be ... 
     // at first get index and tag.
@@ -890,17 +1082,15 @@ bool embot::app::eth::theFTservice::Impl::process(const EOnv* nv, const eOropdes
         {
             // in here we need to get the configuration and ...
             eOas_ft_config_t *cfg = reinterpret_cast<eOas_ft_config_t*>(rd->data);
-            // we use it for index 0 or 1 or 2 or 3
-            #warning FILL IT
-            
+            set(index, cfg);            
         } break;
         
         case eoprot_tag_as_ft_cmmnds_enable:
         {
-            // in here we either start or stop ....
+            // in here we either start or stop depending on value 1 or 0 of ...
             // eOas_ft_commands_t::enable
-            uint8_t enable = *reinterpret_cast<uint8_t*>(rd->data);
-            #warning FILL IT
+            uint8_t * cmdenable = reinterpret_cast<uint8_t*>(rd->data);
+            enable(index, cmdenable);
         } break;
         
         default:
@@ -909,12 +1099,94 @@ bool embot::app::eth::theFTservice::Impl::process(const EOnv* nv, const eOropdes
         } break;
         
     }
-        
-    
+            
     return true;
 }
 
 
+bool embot::app::eth::theFTservice::Impl::set(eOprotIndex_t index, const eOas_ft_config_t *ftc)
+{    
+    // ... the ETH protocol mechanism already writes inside the relevant memory the new values
+    // inside ftc we just have have them, which are also inside theFTnetvariables[index]->config
+    // however, ... if the method set() is called by theServiceValidator we also must copy what inside ftc
+    // but ... beware of nullptr
+    
+    if(nullptr == ftc)
+    {
+        return false;
+    }  
+
+    if(eobool_false == service.active)
+    {   
+        return false;
+    }     
+    
+    eOas_ft_config_t *theNVptr = (nullptr != theFTnetvariables[index]) ? &theFTnetvariables[index]->config : nullptr;
+
+    if(nullptr == theNVptr)
+    {
+        return false;
+    }
+    
+    if(ftc != theNVptr)
+    {
+        // print something on trace ....
+        std::memmove(theNVptr, ftc, sizeof(eOas_ft_config_t));
+    }
+    
+    // in here I just will
+    // - send command to strain / strain2 with ftdatarate
+    // - in future ... impose a given calibrationset
+    
+    s_eo_strain_SetDataRate(index, ftc->ftdatarate);
+    
+    // enable the temperature sensor, even if we shall no enable it
+    if(eobrd_cantype_strain2 == theFTboards[index])
+    {
+        s_eo_temperature_config(index);
+    }
+        
+    return true;
+}
+
+
+bool embot::app::eth::theFTservice::Impl::enable(eOprotIndex_t index, const uint8_t *cmdenable)
+{
+    if(nullptr == cmdenable)
+    {
+        return false;
+    }    
+
+    if(eobool_false == service.active)
+    {   
+        return false;
+    } 
+    
+    uint8_t *theNVptr = (nullptr != theFTnetvariables[index]) ? &theFTnetvariables[index]->cmmnds.enable : nullptr;
+    
+    if(nullptr == theNVptr)
+    {
+        return false;
+    }
+    
+    if(cmdenable != theNVptr)
+    {
+        // print something on trace ....
+        std::memmove(theNVptr, cmdenable, sizeof(uint8_t));
+    }  
+
+    // in here i will start / stop tx of FT data
+    
+    s_eo_strain_SendTXmode(index, (1 == *cmdenable) ? true : false); 
+    
+    // and also of temperature data
+    if(eobrd_cantype_strain2 == theFTboards[index])
+    {
+        s_eo_temperature_TX(index, (1 == *cmdenable) ? true : false);
+    }
+    
+    return true;
+}
 
 eOresult_t embot::app::eth::theFTservice::Impl::onstop_search_for_ft_boards(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
 {   
@@ -982,16 +1254,25 @@ eOresult_t embot::app::eth::theFTservice::Impl::onstop_search_for_ft_boards(void
 eOresult_t embot::app::eth::theFTservice::Impl::onstop_search_for_ft_boards_we_get_fullscale(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
 {   
     embot::app::eth::theFTservice::Impl *p = reinterpret_cast<embot::app::eth::theFTservice::Impl*>(par);
-    const eOmn_serv_configuration_t * servcfg = p->tmpservcfg;
-    
+    const eOmn_serv_configuration_t * servcfg = p->tmpservcfg;    
+
 
     if(eobool_true == searchisok)
     {
-        p->getfullscale_start();
+        p->fullscalequery.reset();
         
-        p->theFSdiscodance.reset();
-        p->theFSdiscodance.add({});
-        p->theFSdiscodance.start();    
+        EOconstarray *carray = eo_constarray_Load(reinterpret_cast<const EOarray*>(&servcfg->data.as.ft.arrayofsensors));    
+        // the number of sensor descriptors 
+        uint8_t numofsensors = eo_constarray_Size(carray);
+ 
+        for(uint8_t i=0; i<numofsensors; i++)
+        {
+            p->fullscalequery.add({static_cast<eOprotIndex_t>(i)});
+        }
+               
+        embot::core::Callback onOK {onFSqueryOK, p};
+        embot::core::Callback onTIMEOUT {onFSqueryTIMEOUT, p};
+        p->fullscalequery.start(onOK, onTIMEOUT);    
     }
     else
     {   
@@ -1062,6 +1343,36 @@ constexpr eObool_t embot::app::eth::theFTservice::Impl::ft_isID32relevant(uint32
     return(eobool_false); 
 }
 
+void embot::app::eth::theFTservice::Impl::s_eo_strain_SetDataRate()
+{   
+    sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
+    sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+    
+    for(uint8_t protindex = 0; protindex<theFTnetvariables.size(); protindex++)
+    {
+        if(nullptr != theFTnetvariables[protindex])
+        {
+            // it means that we have the entity index activated
+            // we get the mode from the entity ram and we send the command
+            uint8_t datarate = theFTnetvariables[protindex]->config.ftdatarate;
+            sharedcan.command.value = &datarate;
+            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, protindex, eoprot_tag_none);
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32);
+        }
+    }
+
+}
+
+void embot::app::eth::theFTservice::Impl::s_eo_strain_SetDataRate(eOprotIndex_t index, uint8_t millisec)
+{ 
+    uint8_t datarate = millisec;    
+    sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
+    sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+    sharedcan.command.value = &datarate;
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, index, eoprot_tag_none);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32);
+}
+
 void embot::app::eth::theFTservice::Impl::s_eo_strain_SendTXmode()
 {        
     // we send the relevant can message to all the boards. remember: they are either strain or strain2 so have the same commands
@@ -1085,6 +1396,34 @@ void embot::app::eth::theFTservice::Impl::s_eo_strain_SendTXmode()
     }
 }
 
+void embot::app::eth::theFTservice::Impl::s_eo_strain_SendTXmode(eOprotIndex_t index, bool transmit)
+{ 
+    if(nullptr == theFTnetvariables[index])
+    {
+        return;
+    }
+    eOas_ft_mode_t mode = static_cast<eOas_ft_mode_t>(theFTnetvariables[index]->config.mode);
+    
+    // now, depending on the pair {transmit, mode} we choose the eOas_strainmode_t value to send to the strain / strain2 board
+    // amongst these three: 
+    // eoas_strainmode_acquirebutdonttx (if transmit is false), 
+    // eoas_strainmode_txuncalibrateddatacontinuously, 
+    // eoas_strainmode_txcalibrateddatacontinuously
+    
+    eOas_strainmode_t strainmode = eoas_strainmode_acquirebutdonttx;
+    
+    if(true == transmit)
+    {
+        strainmode = (eoas_ft_mode_raw == mode) ? eoas_strainmode_txuncalibrateddatacontinuously : eoas_strainmode_txcalibrateddatacontinuously;
+    }
+    
+    sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
+    sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    sharedcan.command.value = &strainmode;
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, index, eoprot_tag_none);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32);
+}
+
 void embot::app::eth::theFTservice::Impl::s_eo_strain_TXstop()
 {             
     // set txmode
@@ -1105,7 +1444,69 @@ void embot::app::eth::theFTservice::Impl::s_eo_strain_TXstop()
     }
 }
 
-void embot::app::eth::theFTservice::Impl::onFSdiscoveryOK(void *par)
+void embot::app::eth::theFTservice::Impl::s_eo_temperature_TX(eOprotIndex_t index, bool on) 
+{
+    if(nullptr == theFTnetvariables[index])
+    {
+        return;
+    }
+
+    if(true == on)
+    {
+        s_eo_temperature_config(index);
+    }
+    
+    // start / stop its transmission
+    icubCanProto_thermo_transmit_t ttransmit = {0};
+    ttransmit.periodsec = (true == on) ? (static_cast<uint8_t>(theFTnetvariables[index]->config.tempdatarate)) : (0);
+
+    sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
+    sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT;
+    sharedcan.command.value = &ttransmit; 
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, index, eoprot_tag_none);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32);    
+}
+
+
+void embot::app::eth::theFTservice::Impl::s_eo_temperature_config(eOprotIndex_t index) 
+{
+    if(nullptr == theFTnetvariables[index])
+    {
+        return;
+    }
+
+    icubCanProto_thermo_config_t tconfig = {0};
+    eo_common_byte_bitset(&tconfig.sensormask, icubCanProto_thermo_t1); // only the first (and only) sensor
+
+    // configure sensor
+    sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
+    sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET;
+    sharedcan.command.value = &tconfig;
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, index, eoprot_tag_none);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32);
+}
+
+
+void embot::app::eth::theFTservice::Impl::s_eo_temperature_TXstop()
+{
+    icubCanProto_thermo_transmit_t ttransmit = {0};
+    ttransmit.periodsec = 0;
+    sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
+    sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT;
+    sharedcan.command.value = &ttransmit; 
+    
+    for(uint8_t index = 0; index<theFTboards.size(); index++) 
+    {
+        if(eobrd_cantype_strain2 == theFTboards[index])
+        {            
+            eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, index, eoprot_tag_none);
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32); 
+        }
+    }        
+}
+
+
+void embot::app::eth::theFTservice::Impl::onFSqueryOK(void *par)
 {
     embot::app::eth::theFTservice::Impl *p = reinterpret_cast<embot::app::eth::theFTservice::Impl*>(par);
     
@@ -1145,101 +1546,38 @@ void embot::app::eth::theFTservice::Impl::onFSdiscoveryOK(void *par)
 }
 
 
-void embot::app::eth::theFTservice::Impl::getfullscale_start()
+
+void embot::app::eth::theFTservice::Impl::onFSqueryTIMEOUT(void *par)
 {
-    // it must .... start a request to the first ft sensor board. when everything is over, we call onverify();
+    embot::app::eth::theFTservice::Impl *p = reinterpret_cast<embot::app::eth::theFTservice::Impl*>(par);
     
-    
-    // fake ....  for now i just assume we dont ask the fullscale.
-    // we just set them to be = 10.
+    const eOmn_serv_configuration_t * servcfg = p->tmpservcfg;
 
-    for(uint8_t protindex = 0; protindex<theFTnetvariables.size(); protindex++)
-    {
-        if(nullptr != theFTnetvariables[protindex])
-        {
-            for(uint8_t x=0; x<eoas_ft_6axis; x++)
-            {
-                theFTnetvariables[protindex]->status.fullscale[x] = 10;
-            }
-        }
-
-    }    
+    p->service.state = eomn_serv_state_failureofverify;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, p->service.state);
     
-    getfullscale_stop();
-    
-}
-
-void embot::app::eth::theFTservice::Impl::getfullscale_continue()
-{
-    
-}
-
-void embot::app::eth::theFTservice::Impl::getfullscale_stop()
-{
-    const eOmn_serv_configuration_t * servcfg = tmpservcfg;
-
-    service.state = eomn_serv_state_verified;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
-   
-    if(eobool_true == service.activateafterverify)
-    {
-        Activate(servcfg);        
-    }
-    
-    diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
-    diagnostics.errorDescriptor.sourceaddress    = 0;
-    diagnostics.errorDescriptor.par16            = 0;
-    diagnostics.errorDescriptor.par64            = 0;    
+    p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+    p->diagnostics.errorDescriptor.sourceaddress    = 0;
+    p->diagnostics.errorDescriptor.par16            = 0;
+    p->diagnostics.errorDescriptor.par64            = 0;    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
-    eo_action_SetCallback(act, send_periodic_error_report, this, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
-              
-    diagnostics.errorType = eo_errortype_debug;
-    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_ft_ok);
-    eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
-    
-    if((0 != diagnostics.repetitionOKcase) && (0 != diagnostics.reportPeriod))
-    {
-        diagnostics.errorCallbackCount = diagnostics.repetitionOKcase;        
-        eo_timer_Start(diagnostics.reportTimer, eok_abstimeNOW, diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
-    }
-         
-    if(NULL != service.onverify)
-    {
-        service.onverify(nullptr, eobool_true); 
-    }     
-    
-}
-
-void embot::app::eth::theFTservice::Impl::getfullscale_failure()
-{
-    const eOmn_serv_configuration_t * servcfg = tmpservcfg;
-
-    service.state = eomn_serv_state_failureofverify;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
-    
-    diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
-    diagnostics.errorDescriptor.sourceaddress    = 0;
-    diagnostics.errorDescriptor.par16            = 0;
-    diagnostics.errorDescriptor.par64            = 0;    
-    EOaction_strg astrg = {0};
-    EOaction *act = (EOaction*)&astrg;
-    eo_action_SetCallback(act, send_periodic_error_report, this, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+    eo_action_SetCallback(act, send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
         
     
-    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_ft_failed_fullscales);
-    diagnostics.errorType = eo_errortype_error;                
-    eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
+    p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_ft_failed_fullscales);
+    p->diagnostics.errorType = eo_errortype_error;                
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
     
-    if(0 != diagnostics.reportPeriod)
+    if(0 != p->diagnostics.reportPeriod)
     {
-        diagnostics.errorCallbackCount = EOK_int08dummy;
-        eo_timer_Start(diagnostics.reportTimer, eok_abstimeNOW, diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+        p->diagnostics.errorCallbackCount = EOK_int08dummy;
+        eo_timer_Start(p->diagnostics.reportTimer, eok_abstimeNOW, p->diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
     }
           
-    if(NULL != service.onverify)
+    if(NULL != p->service.onverify)
     {
-        service.onverify(nullptr, eobool_false); 
+        p->service.onverify(nullptr, eobool_false); 
     }      
 }
 
@@ -1325,9 +1663,19 @@ eOresult_t embot::app::eth::theFTservice::AcceptCANframe(const canFrameDescripto
     return pImpl->AcceptCANframe(canframedescriptor);
 }
 
-bool embot::app::eth::theFTservice::process(const EOnv* nv, const eOropdescriptor_t* rd)
+bool embot::app::eth::theFTservice::process(const eOropdescriptor_t* rd, const EOnv* nv)
 {
-    return pImpl->process(nv, rd);
+    return pImpl->process(rd, nv);
+}
+
+bool embot::app::eth::theFTservice::set(eOprotIndex_t index, const eOas_ft_config_t *ftc)
+{
+    return pImpl->set(index, ftc);
+}
+
+bool embot::app::eth::theFTservice::enable(eOprotIndex_t index, const uint8_t *cmdenable)
+{
+    return pImpl->enable(index, cmdenable);
 }
 
 
@@ -1339,12 +1687,12 @@ extern "C"
     
     extern void eoprot_fun_UPDT_as_ft_config(const EOnv* nv, const eOropdescriptor_t* rd)
     {
-        embot::app::eth::theFTservice::getInstance().process(nv, rd);
+        embot::app::eth::theFTservice::getInstance().process(rd, nv);
     }
 
     extern void eoprot_fun_UPDT_as_ft_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
     {
-        embot::app::eth::theFTservice::getInstance().process(nv, rd);
+        embot::app::eth::theFTservice::getInstance().process(rd, nv);
     }  
 
 
@@ -1356,7 +1704,7 @@ extern "C"
         ftcfg->ftdatarate = 10; // ms
         ftcfg->calibrationset = 0;
         ftcfg->mode = eoas_ft_mode_calibrated;
-        ftcfg->tempdatarate = 1; // sec
+        ftcfg->tempdatarate = 0; // sec
     }
 
 

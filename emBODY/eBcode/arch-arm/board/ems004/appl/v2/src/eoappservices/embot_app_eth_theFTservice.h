@@ -21,8 +21,9 @@
 #include <memory>
 
 namespace embot { namespace app { namespace eth {
+        
+    const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
     
-           
     class theFTservice
     {
     public:
@@ -71,10 +72,21 @@ namespace embot { namespace app { namespace eth {
         eOresult_t Stop();        
         eOresult_t SetRegulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);        
         eOresult_t Tick();  
+        
         // processes a CAN frame coming from the sensor        
-        eOresult_t AcceptCANframe(const canFrameDescriptor &canframedescriptor);               
-        // processes a ROP coming from icub-main
-        bool process(const EOnv* nv, const eOropdescriptor_t* rd);
+        eOresult_t AcceptCANframe(const canFrameDescriptor &canframedescriptor);  
+      
+        // it can be called by the ETH callbacks eoprot_fun_UPDT_as_ft_*(EOnv* nv, eOropdescriptor_t* rd) 
+        // in such a case use its nv and rd argument
+        // but it can be called by any other module to emulate reception of a ROP.
+        // in such a case, use nv = nullptr and the embot::app::eth::fill(eOropdescriptor_t ...) function
+        bool process(const eOropdescriptor_t* rd, const EOnv* nv = nullptr);
+       
+        
+        // this one is called inside process() when the tag is eoprot_tag_as_ft_config (or by theServiceTester)
+        bool set(eOprotIndex_t index, const eOas_ft_config_t *ftc);
+        // this one is called inside process() when the tag is eoprot_tag_as_ft_cmmnds_enable (or by theServiceTester)
+        bool enable(eOprotIndex_t index, const uint8_t *cmdenable);
                      
     private:
         theFTservice(); 

@@ -708,11 +708,12 @@ extern eOresult_t eo_strain_AcceptCANframe(EOtheSTRAIN *p, eOcanframe_t *frame, 
     {
         return(eores_NOK_nullpointer);
     }
-    
-    if(eobool_false == p->service.active)
-    {   // nothing to do because object must be first activated
-        return(eores_OK);
-    }      
+
+    // marco.accame: i prefer not to change ...    
+//    if(eobool_false == p->service.active)
+//    {   // nothing to do because object must be first activated
+//        return(eores_OK);
+//    }      
     
     if((processForce == mode) || (processTorque == mode))
     {    
