@@ -184,7 +184,8 @@ float PID_do_out(PID* o, float En)
 float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
 {
 #ifdef USE_VISCOUS_COULOMB 
-    return o->Ktau*(o->coulomb_pos_val + o->viscous_pos_val*vel_fbk + o->Kff*trq_ref);
+    //return o->Ktau*(o->coulomb_pos_val + o->viscous_pos_val*vel_fbk + o->Kff*trq_ref);
+    return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
 #else
     return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
 #endif // USE_VISCOUS_COULOMB
