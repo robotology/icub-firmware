@@ -210,12 +210,23 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14(eOcanframe_t *
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__THERMOMETER_MEASURE(eOcanframe_t *frame, eOcanport_t port)
 {
+    embot::app::eth::theFTservice::canFrameDescriptor cfd 
+    { 
+        port, 
+        frame, 
+        embot::app::eth::theFTservice::canFrameDescriptor::Type::temperature
+    };
+    embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
+    
+    
     if(eobool_true == eocanprotASperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_THERMOMETER_MSG(frame, port))
     {
         return(eores_OK);
     }    
 
-    eo_temperatures_AcceptCANframe(eo_temperatures_GetHandle(), eoas_temperature_t1, frame, port);    
+    eo_temperatures_AcceptCANframe(eo_temperatures_GetHandle(), eoas_temperature_t1, frame, port); 
+
+    
     return(eores_OK);    
 }
 

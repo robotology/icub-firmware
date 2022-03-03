@@ -663,7 +663,7 @@ static void s_eom_emsappl_errormamager_customise(void)
     eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emsappl_OnError);
 #else    
     // init the embot::core and diagnostic
-    static const embot_cif_core_Config ccfg = { .timeinit = NULL, .timeget = osal_system_abstime_get};
+    static const embot_cif_core_Config ccfg = { .timeinit = NULL, .timeget = osal_system_abstime_get, .print = hal_trace_puts};
     embot_cif_core_Init(&ccfg);    
     embot_cif_diagnostic_Init();
     // this calls the legacy or the new one depending on internal macros 

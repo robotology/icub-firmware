@@ -240,9 +240,12 @@ extern void testRTC_CFG_tick(void)
 
 
 #if defined(TESTRTC_IS_ACTIVE) 
-extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
+extern "C"
 {
-    testRTC_CFG_tick();
+    extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
+    {
+        testRTC_CFG_tick();
+    }
 }
 #endif
 
@@ -1518,7 +1521,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
                 .canloc = 
                 {
                     .port = eOcanport1, 
-                    .addr = 1, 
+                    .addr = 13, 
                     .insideindex = eobrd_caninsideindex_none                    
                 },
                 .ffu = 0
@@ -1593,7 +1596,7 @@ static void s_services_test_ft_init(void)
 {
     s_test_config_ok = &s_serv_config_as_ft; 
     s_test_config_ko = &s_serv_config_as_ft;
-    s_service_tick = s_services_test_ft_multiplesteps;   
+    s_service_tick = NULL; //s_services_test_ft_multiplesteps;   
     functor.actor = actor_none;
     functor.action = NULL;
     functor.par = NULL;  
@@ -1630,10 +1633,10 @@ void serv_STOP(void *p)
 
 void serv_VERIFYACTIVATE(void *p)
 {
-    const eOmn_serv_configuration_t* cfg = (const eOmn_serv_configuration_t*) p;
+    //const eOmn_serv_configuration_t* cfg = (const eOmn_serv_configuration_t*) p;
     s_command.category = s_service_under_test;
     s_command.operation = eomn_serv_operation_verifyactivate;
-    memcpy(&s_command.parameter.configuration, cfg, sizeof(eOmn_serv_configuration_t));         
+    memcpy(&s_command.parameter.configuration, s_test_config_ok, sizeof(eOmn_serv_configuration_t));         
     eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);   
 }
 
@@ -1644,7 +1647,7 @@ void serv_CONFIG(void *p)
         .mode = eoas_ft_mode_calibrated,
         .ftdatarate = 100,
         .calibrationset = 0,
-        .tempdatarate = 0
+        .tempdatarate = 1
     }; 
     
     eOropdescriptor_t ropdes = {};
@@ -1692,14 +1695,9 @@ void serv_REGULARS(void *p)
 void serv_START(void *p)
 {       
     s_command.category = s_service_under_test;
-    s_command.operation = eomn_serv_operation_regsig_load;
-    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
-    
-    eOmn_serv_arrayof_id32_t id32s = {};
-    EOarray* ar = eo_array_New(eOmn_serv_capacity_arrayof_id32, 4, &s_command.parameter.arrayofid32);   
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, 0, eoprot_tag_as_ft_status_timedvalue);
-    eo_array_PushBack(ar, &id32);  
-    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
+    s_command.operation = eomn_serv_operation_start;
+    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));        
+    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);          
 }
 
 
@@ -1707,7 +1705,9 @@ void serv_START(void *p)
 
 static void s_services_test_ft_step()
 {
-    eOreltime_t delta = 3*eok_reltime1sec;
+    eOreltime_t delta = 1*eok_reltime1sec;
+    eOreltime_t runTXtime = 10*eok_reltime1sec;
+    
     
     
     if(0 == step2use)
@@ -1719,34 +1719,34 @@ static void s_services_test_ft_step()
     else if(1 == step2use)
     {
         // CFG ask to CFG -> VERIFY_ACTIVATE(okconfig)
-        functor_fill(actor_cfg, serv_VERIFYACTIVATE, &s_test_config_ok);        
+        functor_fill(actor_cfg, serv_VERIFYACTIVATE, NULL);        
         sendevent2cfgby(delta);        
     }
+//    else if(2 == step2use)
+//    {
+//        // CFG asks to CFG -> VERIFY_ACTIVATE(okconfig)
+//        functor_fill(actor_cfg, serv_VERIFYACTIVATE, &s_test_config_ok);        
+//        sendevent2cfgby(delta);        
+//    }    
     else if(2 == step2use)
-    {
-        // CFG asks to CFG -> VERIFY_ACTIVATE(okconfig)
-        functor_fill(actor_cfg, serv_VERIFYACTIVATE, &s_test_config_ok);        
-        sendevent2cfgby(delta);        
-    }    
-    else if(3 == step2use)
     {
         // CFG asks to CFG -> CFG()
         functor_fill(actor_cfg, serv_CONFIG, NULL);        
         sendevent2cfgby(delta);        
     }     
-    else if(4 == step2use)
+    else if(3 == step2use)
     {
         // CFG asks to CFG -> REGULARS()
         functor_fill(actor_cfg, serv_REGULARS, NULL);        
         sendevent2cfgby(delta);        
     }     
-    else if(5 == step2use)
+    else if(4 == step2use)
     {
         // CFG asks to CFG -> START()
         functor_fill(actor_cfg, serv_START, NULL);        
         sendevent2cfgby(delta);        
     } 
-    else if(6 == step2use)
+    else if(5 == step2use)
     {
         // we are still inside CFG which has just executed serv_START()
         // but we stay in CFG for short time because the START sends the application in RUN mode
@@ -1757,19 +1757,22 @@ static void s_services_test_ft_step()
         
         functor_fill(actor_none, NULL, NULL);
         
+        // this timer will force the TX enable on CAN
         EOVtaskDerived * t = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
         eo_action_SetCallback(s_act, fillfunctorTX, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
         eo_timer_Start(s_timer, eok_abstimeNOW, delta, eo_tmrmode_ONESHOT, s_act);
        
         // next time we execute inside RUN ....         
     } 
-    else if(7 == step2use)
+    else if(6 == step2use)
     {
+        // we have just started TX on CAN
         functor_fill(actor_none, NULL, NULL);
         
+        // this timer will force the stop of the service
         EOVtaskDerived * t = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
         eo_action_SetCallback(s_act, fillfunctorSTOP, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
-        eo_timer_Start(s_timer, eok_abstimeNOW, delta, eo_tmrmode_ONESHOT, s_act);
+        eo_timer_Start(s_timer, eok_abstimeNOW, runTXtime, eo_tmrmode_ONESHOT, s_act);
     }
     
     step2use++;

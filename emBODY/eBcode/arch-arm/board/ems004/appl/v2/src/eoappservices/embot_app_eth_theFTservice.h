@@ -34,6 +34,29 @@ namespace embot { namespace app { namespace eth {
         static constexpr size_t maxSensors {eOas_ft_sensors_maxnumber}; 
         static constexpr size_t maxRegulars {maxSensors};
         
+        static constexpr eOas_ft_status_t defaultFTstatus 
+        {
+            .timedvalue = 
+            {
+                .age = 0,
+                .info = 0,
+                .ffu = 0,
+                .temperature = -2731, // ~ zero kelvin
+                .values = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}                 
+            },
+            .fullscale = {1, 1, 1, 1, 1, 1},
+            .mode = 0,
+            .filler = {0, 0, 0}
+        };
+
+        static constexpr eOas_ft_config_t defaultFTconfig 
+        {
+            .mode = eoas_ft_mode_calibrated,
+            .ftdatarate = 10,
+            .calibrationset = 0,
+            .tempdatarate = 0
+        };
+        
         struct Config
         {
             uint32_t tbd {0};
@@ -44,7 +67,7 @@ namespace embot { namespace app { namespace eth {
         
         struct canFrameDescriptor
         {
-            enum class Type : uint8_t { unspecified, fullscale, force, torque };
+            enum class Type : uint8_t { unspecified, fullscale, force, torque, temperature };
             eOcanport_t port {eOcanport1};
             eOcanframe_t *frame {nullptr};
             Type type {Type::unspecified};

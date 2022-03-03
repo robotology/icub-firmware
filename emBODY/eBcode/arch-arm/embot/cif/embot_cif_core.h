@@ -31,8 +31,9 @@ extern "C" {
 
 typedef struct
 {  
-    eOvoid_fp_void_t    timeinit;
-    eOuint64_fp_void_t  timeget;    
+    eOvoid_fp_void_t        timeinit;
+    eOuint64_fp_void_t      timeget;
+    eOint_fp_constcharp     print;    
 } embot_cif_core_Config;
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
