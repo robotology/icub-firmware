@@ -35,7 +35,8 @@ typedef struct
     uint16_t    mode;
     uint16_t    filter;
     uint16_t    idxpos;
-    uint16_t    nsteps;
+    uint16_t    resolution;
+    uint16_t    has_hall_sens;
 } encoderConfTypeDef;
 
 

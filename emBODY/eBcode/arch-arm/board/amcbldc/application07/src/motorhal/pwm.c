@@ -73,6 +73,7 @@ static volatile uint8_t  hallStatus = 0;
 static volatile uint8_t  hallStatus_old = 0;
 static volatile int32_t  hallCounter = 0;
 static volatile uint16_t hallAngle = 0;
+static volatile uint8_t  hallOrder[3];
 
 static volatile bool calibrating = true;
 
@@ -137,12 +138,12 @@ constexpr uint16_t hallAngleTable[] =
 {
     /* ABC  (°)  */
     /* LLL ERROR */ 0,
-    /* LLH  300  */ static_cast<uint16_t>(0.0 * 65536.0 / 360.0 + 0.5), /* 54613 */
-    /* LHL  180  */ static_cast<uint16_t>(120.0 * 65536.0 / 360.0 + 0.5), /* 32768 */
-    /* LHH  240  */ static_cast<uint16_t>(60.0 * 65536.0 / 360.0 + 0.5), /* 43690 */
-    /* HLL   60  */ static_cast<uint16_t>(240.0 * 65536.0 / 360.0 + 0.5), /* 10923 */
-    /* HLH    0  */ static_cast<uint16_t>(300.0 * 65536.0 / 360.0 + 0.5), /*     0 */
-    /* HHL  120  */ static_cast<uint16_t>(180.0 * 65536.0 / 360.0 + 0.5), /* 21845 */
+    /* LLH  240  */ static_cast<uint16_t>(240.0 * 65536.0 / 360.0), /* 43690 */
+    /* LHL  120  */ static_cast<uint16_t>(120.0 * 65536.0 / 360.0), /* 21845 */
+    /* LHH  180  */ static_cast<uint16_t>(180.0 * 65536.0 / 360.0), /* 32768 */
+    /* HLL    0  */ static_cast<uint16_t>(  0.0 * 65536.0 / 360.0), /*     0 */
+    /* HLH  300  */ static_cast<uint16_t>(300.0 * 65536.0 / 360.0), /* 54613 */
+    /* HHL   60  */ static_cast<uint16_t>( 60.0 * 65536.0 / 360.0), /* 10922 */
     /* HHH ERROR */ static_cast<uint16_t>(0)
 };
 #endif // USE_KOLLMORGEN_SETUP
@@ -163,14 +164,14 @@ constexpr uint16_t hallAngleTable[] =
 constexpr int16_t hallSectorTable[] =
 {
     /* ABC  (°)  */
-    /* LLL ERROR */ 0,
-    /* LLH  270  */ 1, /* 54613 */
-    /* LHL  150  */ 5, /* 32768 */
-    /* LHH  210  */ 0, /* 43690 */
-    /* HLL   30  */ 3, /* 10923 */
-    /* HLH  -30  */ 2, /*     0 */
-    /* HHL   90  */ 4, /* 21845 */
-    /* HHH ERROR */ static_cast<uint16_t>(0)
+    /* LLL ERROR */ static_cast<int16_t>(0),
+    /* LLH  240  */ static_cast<int16_t>(4), /* 43690 */
+    /* LHL  120  */ static_cast<int16_t>(2), /* 21845 */
+    /* LHH  180  */ static_cast<int16_t>(3), /* 32768 */
+    /* HLL    0  */ static_cast<int16_t>(0), /*     0 */
+    /* HLH  300  */ static_cast<int16_t>(5), /* 54613 */
+    /* HHL   60  */ static_cast<int16_t>(1), /* 10922 */
+    /* HHH ERROR */ static_cast<int16_t>(0)
 };
 
 #else
@@ -219,15 +220,9 @@ static const uint16_t hallAngleTable[] =
  *      PWM means that PHASEx is modulated with the pwm value (ENx = 1, PWMx = pwm)
  */
  
-#ifdef USE_KOLLMORGEN_SETUP
-#define DECODE_HALLSTATUS (((HALL1_GPIO_Port->IDR & HALL1_Pin) >> MSB(HALL1_Pin)) << 1)  \
-                        | (((HALL2_GPIO_Port->IDR & HALL2_Pin) >> MSB(HALL2_Pin)) << 0)  \
-                        | (((HALL3_GPIO_Port->IDR & HALL3_Pin) >> MSB(HALL3_Pin)) << 2)
-#else
-#define DECODE_HALLSTATUS (((HALL1_GPIO_Port->IDR & HALL1_Pin) >> MSB(HALL1_Pin)) << 0)  \
-                        | (((HALL2_GPIO_Port->IDR & HALL2_Pin) >> MSB(HALL2_Pin)) << 1)  \
-                        | (((HALL3_GPIO_Port->IDR & HALL3_Pin) >> MSB(HALL3_Pin)) << 2)
-#endif
+#define DECODE_HALLSTATUS (((HALL1_GPIO_Port->IDR & HALL1_Pin) >> MSB(HALL1_Pin)) << hallOrder[0])  \
+                        | (((HALL2_GPIO_Port->IDR & HALL2_Pin) >> MSB(HALL2_Pin)) << hallOrder[1])  \
+                        | (((HALL3_GPIO_Port->IDR & HALL3_Pin) >> MSB(HALL3_Pin)) << hallOrder[2])
 
 static uint8_t updateHallStatus(void)
 {
@@ -240,20 +235,10 @@ static uint8_t updateHallStatus(void)
     /* Read current value of HALL1, HALL2 and HALL3 signals in bits 2..0 */
     hallStatus = DECODE_HALLSTATUS;
     
-    //static char msg3[64];
-    //static uint32_t counter;
-    //if(counter % 1000 == 0)
-    //{
-    //    sprintf(msg3, "[%d]\n", hallStatus);
-    //    embot::core::print(msg3);
-    //    counter = 0;
-    //}
-    //counter++;
-    
-    int16_t sector = hallSectorTable[hallStatus];
+    int16_t sector = (MainConf.pwm.sector_offset + hallSectorTable[hallStatus]) % 6;
     static int16_t sector_old = sector;
     
-    uint16_t angle = hallAngleTable[hallStatus];
+    uint16_t angle = MainConf.pwm.hall_offset + hallAngleTable[hallStatus];
     
     hallAngle = angle;
 
@@ -460,9 +445,9 @@ HAL_StatusTypeDef pwmInit(void)
     {
         MainConf.pwm.mode = PWM_CONF_MODE_HALL;
 #ifdef USE_KOLLMORGEN_SETUP
-        MainConf.pwm.poles = 4;//7; // // //
+        MainConf.pwm.num_polar_couples = 4;//7; // // //
 #else
-        MainConf.pwm.poles = 7; // // //
+        MainConf.pwm.num_polar_couples = 7; // // //
 #endif
     }
         
@@ -500,11 +485,15 @@ HAL_StatusTypeDef pwmInit(void)
  */
 HAL_StatusTypeDef hallInit(void)
 {
+    hallOrder[0] = 0;
+    hallOrder[1] = MainConf.pwm.swapBC ? 2 : 1;
+    hallOrder[2] = MainConf.pwm.swapBC ? 1 : 2;
+    
     /* Read value of HALL1, HALL2 and HALL3 signals in bits 2..0 */
     hallStatus = DECODE_HALLSTATUS;
 
     /* Init angle */
-    hallAngle = hallAngleTable[hallStatus];
+    hallAngle = MainConf.pwm.hall_offset + hallAngleTable[hallStatus];
     
     /* Start position counter */
     hallCounter = 0;

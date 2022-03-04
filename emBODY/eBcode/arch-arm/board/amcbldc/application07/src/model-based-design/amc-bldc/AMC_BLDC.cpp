@@ -46,7 +46,7 @@ ConfigurationParameters InitConfParams = {
     false,
     true,
     false,
-    16000,
+    0,
     0,
     0U,
     7U,

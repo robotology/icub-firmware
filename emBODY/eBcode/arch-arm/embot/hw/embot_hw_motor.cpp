@@ -371,8 +371,20 @@ namespace embot { namespace hw { namespace motor {
         MX_FMAC_Init();
         MX_CRC_Init();   
 
-        // step 2: what giorgio zini does
+        // step 2: motor+sensors configuration
         memset(&MainConf, 0, sizeof(MainConf));
+        
+        MainConf.encoder.mode   = TIM_ENCODERMODE_TI12;
+        MainConf.encoder.filter = 4;
+        MainConf.encoder.idxpos = TIM_ENCODERINDEX_POSITION_00;
+        MainConf.encoder.resolution = 0; // Wrist Mk2 does not have quadrature encoder
+        MainConf.encoder.has_hall_sens = 1;
+        
+        MainConf.pwm.mode = PWM_CONF_MODE_HALL;
+        MainConf.pwm.num_polar_couples = 7;
+        MainConf.pwm.hall_offset = (120 * 65536)/360;
+        MainConf.pwm.sector_offset = 4; // TODO verify correctness
+        MainConf.pwm.swapBC = 1;
         
         analogInit();
         pwmInit(); // pwmInit() shall be called before encoderInit() as the latter uses specific PWM quantities

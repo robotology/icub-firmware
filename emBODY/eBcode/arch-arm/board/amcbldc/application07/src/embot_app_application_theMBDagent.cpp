@@ -398,9 +398,6 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     
     AMC_BLDC_step_Time();
     
-    
-    
-
     // if there an output is available, send it to the CAN Netowork
     for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++)
     {
@@ -417,7 +414,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     
     // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
     // TODO: We should perform the following update inside the architectural model after a SET_MOTOR_CONFIG message has been received
-    MainConf.pwm.poles = AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
+    MainConf.pwm.num_polar_couples = AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
     
     measureTick->stop();
     
