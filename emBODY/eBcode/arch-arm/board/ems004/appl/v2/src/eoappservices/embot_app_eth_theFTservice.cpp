@@ -33,6 +33,218 @@
 
 namespace embot::app::eth {
     
+// it implements the request of the fullscales (6 values for each board / entity) 
+struct FSquery2
+{
+    struct Item
+    {
+        eOprotIndex_t index {0};
+        eObrd_canlocation_t loc {};
+        eOas_ft_t *ft {nullptr}; 
+        Item(eOprotIndex_t i, eObrd_canlocation_t c) : index(i), loc(c) 
+        {
+            ft = reinterpret_cast<eOas_ft_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_ft, static_cast<eOprotIndex_t>(index))); 
+        } 
+        ~Item() 
+        {
+            index = 0; loc = {}; ft = nullptr;
+        }    
+    };
+    
+    std::vector<Item> items;
+    uint8_t rxfullscales {0};
+    uint8_t maxfullscales {0};
+    bool querying {false};
+    uint8_t currchannel {0};
+    uint8_t curritem {0};
+    EOtimer *tmr {nullptr};
+    EOaction_strg astrg = {0};
+    EOaction *act = {nullptr};
+    embot::core::Callback ONok {};
+    embot::core::Callback ONtimeout {};
+    embot::core::relTime timeout {100*embot::core::time1millisec};
+    static constexpr size_t maxboards {theFTservice::maxSensors};
+    
+    static constexpr bool parallelmode {false};
+    static constexpr bool fakequery {false};
+    
+    FSquery2() = default;
+    
+    ~FSquery2() 
+    {
+        if(nullptr != tmr)
+        {
+            eo_timer_Delete(tmr);
+        }
+    }
+    
+    void initialise()
+    {
+        items.reserve(maxboards);
+        tmr = eo_timer_New();
+        act = reinterpret_cast<EOaction*>(&astrg);
+    }
+    
+    void reset()
+    {
+        items.clear();
+        maxfullscales = rxfullscales = 0;
+        currchannel = curritem = 0;
+        querying = false;
+    }
+    
+    void add(const Item &item)
+    {
+        if(nullptr != item.ft)
+        {
+            items.push_back(item);
+        }
+    }
+    
+    static void ontout(void* p)
+    {
+        FSquery2 *fsq = reinterpret_cast<FSquery2*>(p);
+        fsq->querying = false;
+        eo_timer_Stop(fsq->tmr);
+        fsq->ONtimeout.execute();
+    }        
+    
+    void start(const embot::core::Callback &onOK, const embot::core::Callback &onTOUT, 
+                embot::core::relTime tout = 100*embot::core::time1millisec)
+    {
+        ONok = onOK;
+        ONtimeout = onTOUT;
+        timeout = tout;        
+        
+        // set the number of fullscales i will receive
+        rxfullscales = 0;
+        maxfullscales = 6 * items.size();
+    
+        querying = true;
+        
+        if((0 == items.size()) || (false == fakequery))
+        {
+            ontermination();
+            return;
+        }
+
+        if(true == parallelmode)
+        {
+            // send all request now
+            askfullscales(); 
+        }  
+        else
+        {    
+            // sequential mode: send the requests one at a time
+            currchannel = curritem = 0;   
+            askfullscale(curritem, currchannel);
+        }  
+
+        
+        // init timer w/ timeout 
+        eo_action_SetCallback(act, ontout, this, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+        eo_timer_Start(tmr, eok_abstimeNOW, timeout, eo_tmrmode_ONESHOT, act);        
+    }
+
+
+    void askfullscale(uint8_t i, uint8_t c)
+    {
+        // send a message
+        eOcanprot_command_t command {};
+        uint8_t channel = c;
+        command.clas = eocanprot_msgclass_pollingAnalogSensor;
+        command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
+        command.value = &channel;
+        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, items[i].loc);               
+    }
+    
+    void askfullscales()
+    {
+        for(uint8_t i=0; i<items.size(); i++)
+        {
+            for(uint8_t c=0; c<eoas_ft_6axis; c++)
+            {
+                askfullscale(i, c);
+            }
+        }
+    }
+ 
+    void ontermination()
+    {
+        eo_timer_Stop(tmr);
+        querying = false;
+        ONok.execute();
+        reset();
+    }        
+    
+    bool tick(eObrd_canlocation_t loc, uint8_t chnl, uint16_t fsvalue)
+    {
+        if(false == querying)
+        {
+            return false;
+        }
+        
+        if(chnl >= eoas_ft_6axis)
+        {
+            return false;
+        }
+        
+        // search for loc
+        uint8_t index {255};
+        for(uint8_t i=0; i< items.size(); i++)
+        {
+            if((items[i].loc.port == loc.port) && (items[i].loc.addr == loc.addr))
+            {
+                index = i;
+                break;
+            }
+        }
+        
+        if(255 == index)
+        {            
+            return false;
+        }
+            
+        // ok, i use the value
+        items[index].ft->status.fullscale[chnl] = fsvalue;
+
+        // check if it is over
+        rxfullscales++;        
+        if(rxfullscales == maxfullscales)
+        {
+            ontermination();
+        }
+        else if(false == parallelmode)
+        {
+            currchannel++;
+            if(eoas_ft_6axis == currchannel)
+            {
+                currchannel = 0;
+                curritem++;
+                // by uncommenting it we make continuous ... boh
+//                    if(curritem == items.size())
+//                    {
+//                        curritem = 0;
+//                    }
+            }
+            
+            // i ask again ...
+            if(curritem < items.size())
+            {
+                askfullscale(curritem, currchannel); 
+            }                    
+            
+        }
+                
+        return true;
+    }        
+};
+
+
+} // namespace embot::app::eth {
+
+namespace embot::app::eth {
+    
     const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc)
     {
         std::memset(&rd, 0, sizeof(rd));
@@ -288,7 +500,7 @@ struct embot::app::eth::theFTservice::Impl
     std::array<eOas_ft_t*, maxSensors> theFTnetvariables {nullptr, nullptr, nullptr, nullptr};    
     std::array<eObrd_cantype_t, maxSensors> theFTboards {eobrd_cantype_none, eobrd_cantype_none, eobrd_cantype_none, eobrd_cantype_none};
     
-    FSquery fullscalequery {};
+    FSquery2 fullscalequery2 {};
     
     // methods
     
@@ -393,7 +605,7 @@ bool embot::app::eth::theFTservice::Impl::initialise()
     for(auto &item : theFTnetvariables) item = nullptr;
     for(auto &item : theFTboards) item = eobrd_cantype_none;
       
-    fullscalequery.initialise();
+    fullscalequery2.initialise();
     
     initted = true;
     return initted;
@@ -831,7 +1043,6 @@ eOresult_t embot::app::eth::theFTservice::Impl::SetRegulars(eOmn_serv_arrayof_id
 
 eOresult_t embot::app::eth::theFTservice::Impl::processfullscale(const canFrameDescriptor &cfd)
 {
-
     if(eobool_true == service.active)
     {   
         return(eores_OK);
@@ -841,42 +1052,65 @@ eOresult_t embot::app::eth::theFTservice::Impl::processfullscale(const canFrameD
     loc.port = cfd.port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(cfd.frame);
     loc.insideindex = eobrd_caninsideindex_first;
-    // 1 get ... and call
-    //fullscalequery.tick(index, ft, );
         
-    // now... use tmpservcfg    
-    EOconstarray *carray = eo_constarray_Load(reinterpret_cast<const EOarray*>(&tmpservcfg->data.as.ft.arrayofsensors));    
-    uint8_t numofsensors = eo_constarray_Size(carray);
-    // we must load all the boards into can mapping, entities etc    
-    eOprotIndex_t index = EOK_uint08dummy;
-    eOas_ft_t *ft = nullptr;
-    for(uint8_t s=0; s<numofsensors; s++)
-    {
-        const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, s));
-        if((nullptr != sd) && (sd->canloc.port == loc.port) && (sd->canloc.addr == loc.addr))
-        {
-            index = s;
-            ft = reinterpret_cast<eOas_ft_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_ft, static_cast<eOprotIndex_t>(s)));
- 
-            break;
-        }
-    }
-    
-    if(nullptr == ft)
-    {
-        return eores_NOK_generic;
-    }
-    
-    // we have index and ft and we use them
-    
     // now i get the channel and the data to be put inside the strain.  
     uint8_t channel = cfd.frame->data[1];
     uint16_t value = (static_cast<uint16_t>(cfd.frame->data[2]) << 8) + static_cast<uint16_t>(cfd.frame->data[3]);
     
-    fullscalequery.tick(index, ft, channel, value);
+        // 1 get ... and call
+    fullscalequery2.tick(loc, channel, value);
     
     return eores_OK;
 }
+
+//eOresult_t embot::app::eth::theFTservice::Impl::processfullscale(const canFrameDescriptor &cfd)
+//{
+
+//    if(eobool_true == service.active)
+//    {   
+//        return(eores_OK);
+//    }  
+//         
+//    eObrd_canlocation_t loc = {};
+//    loc.port = cfd.port;
+//    loc.addr = EOCANPROT_FRAME_GET_SOURCE(cfd.frame);
+//    loc.insideindex = eobrd_caninsideindex_first;
+//    // 1 get ... and call
+//    //fullscalequery.tick(index, ft, );
+//        
+//    // now... use tmpservcfg    
+//    EOconstarray *carray = eo_constarray_Load(reinterpret_cast<const EOarray*>(&tmpservcfg->data.as.ft.arrayofsensors));    
+//    uint8_t numofsensors = eo_constarray_Size(carray);
+//    // we must load all the boards into can mapping, entities etc    
+//    eOprotIndex_t index = EOK_uint08dummy;
+//    eOas_ft_t *ft = nullptr;
+//    for(uint8_t s=0; s<numofsensors; s++)
+//    {
+//        const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, s));
+//        if((nullptr != sd) && (sd->canloc.port == loc.port) && (sd->canloc.addr == loc.addr))
+//        {
+//            index = s;
+//            ft = reinterpret_cast<eOas_ft_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_ft, static_cast<eOprotIndex_t>(s)));
+// 
+//            break;
+//        }
+//    }
+//    
+//    if(nullptr == ft)
+//    {
+//        return eores_NOK_generic;
+//    }
+//    
+//    // we have index and ft and we use them
+//    
+//    // now i get the channel and the data to be put inside the strain.  
+//    uint8_t channel = cfd.frame->data[1];
+//    uint16_t value = (static_cast<uint16_t>(cfd.frame->data[2]) << 8) + static_cast<uint16_t>(cfd.frame->data[3]);
+//    
+//    fullscalequery.tick(index, ft, channel, value);
+//    
+//    return eores_OK;
+//}
 
 
 eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDescriptor &cfd)
@@ -948,7 +1182,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
         case canFrameDescriptor::Type::temperature:
         {
             ft->status.timedvalue.temperature = (static_cast<uint16_t>(cfd.frame->data[2]) << 8) + static_cast<uint16_t>(cfd.frame->data[1]);
-            embot::core::print("T = " + std::to_string(ft->status.timedvalue.temperature/10.0) + " C");        
+            //embot::core::print("T = " + std::to_string(ft->status.timedvalue.temperature/10.0) + " C");        
         }
 
         default:
@@ -1346,7 +1580,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::onstop_search_for_ft_boards_we_g
 
     if(eobool_true == searchisok)
     {
-        p->fullscalequery.reset();
+        p->fullscalequery2.reset();
         
         EOconstarray *carray = eo_constarray_Load(reinterpret_cast<const EOarray*>(&servcfg->data.as.ft.arrayofsensors));    
         // the number of sensor descriptors 
@@ -1354,13 +1588,17 @@ eOresult_t embot::app::eth::theFTservice::Impl::onstop_search_for_ft_boards_we_g
  
         for(uint8_t s=0; s<numofsensors; s++)
         {
-            const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, s));
-            p->fullscalequery.add({static_cast<eOprotIndex_t>(s), sd->canloc});
+            const eOas_ft_sensordescriptor_t *sd = reinterpret_cast<const eOas_ft_sensordescriptor_t*>(eo_constarray_At(carray, s));            
+            // just for debug: we add the board to the query of the fullscale only if the ffu is not 255
+            if(sd->ffu != 255)
+            {
+                p->fullscalequery2.add({static_cast<eOprotIndex_t>(s), sd->canloc});
+            }
         }
                
         embot::core::Callback onOK {onFSqueryOK, p};
         embot::core::Callback onTIMEOUT {onFSqueryTIMEOUT, p};
-        p->fullscalequery.start(onOK, onTIMEOUT);    
+        p->fullscalequery2.start(onOK, onTIMEOUT);    
     }
     else
     {   
@@ -1765,6 +2003,9 @@ bool embot::app::eth::theFTservice::enable(eOprotIndex_t index, const uint8_t *c
 {
     return pImpl->enable(index, cmdenable);
 }
+
+
+// other objects
 
 
 // - extern C functions ....

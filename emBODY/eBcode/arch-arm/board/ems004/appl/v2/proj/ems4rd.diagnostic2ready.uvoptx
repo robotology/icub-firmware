@@ -2025,23 +2025,23 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>228</LineNumber>
+          <LineNumber>408</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
+          <Address>134422224</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</Filename>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\embobj\plus\can\EOtheCANservice.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\ems004\../../../../../embobj/plus/can/EOtheCANservice.c\408</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>222</LineNumber>
+          <LineNumber>399</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -2050,57 +2050,9 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</Filename>
+          <Filename>..\..\..\..\..\embobj\plus\can\EOtheCANmapping.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>951</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134393744</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\eoappservices\embot_app_eth_theFTservice.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../src/eoappservices/embot_app_eth_theFTservice.cpp\951</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>226</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134476422</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../../../embobj/plus/can/config-can-protocol/EoCANprotASperiodic.c\226</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>213</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134476388</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../../../embobj/plus/can/config-can-protocol/EoCANprotASperiodic.c\213</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -2119,17 +2071,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>fsvalue,0x0A</ItemText>
+          <ItemText>ft,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>timeout,0x0A</ItemText>
+          <ItemText>vectorof_entitydescriptors</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>ft-&gt;status.timedvalue,0x0A</ItemText>
+          <ItemText>loc</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

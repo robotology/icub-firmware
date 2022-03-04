@@ -168,6 +168,7 @@ static EOarray* s_eo_canmap_array_inertials[eocanmap_inertials_maxnumberof] = { 
 static EOarray* s_eo_canmap_array_inertials3[eocanmap_inertials3_maxnumberof] = { NULL };
 static EOarray* s_eo_canmap_array_pscs[eocanmap_pscs_maxnumberof] = { NULL };
 static EOarray* s_eo_canmap_array_poses[eocanmap_poses_maxnumberof] = { NULL };
+static EOarray* s_eo_canmap_array_fts[eocanmap_fts_maxnumberof] = { NULL };
 
 static EOarray* s_eo_canmap_array_skins[eocanmap_skins_maxnumberof] = { NULL };
 
@@ -185,6 +186,7 @@ static EOtheCANmapping s_eo_canmap_singleton =
         
         s_eo_canmap_array_strains, s_eo_canmap_array_maises, s_eo_canmap_array_temperatures, 
         s_eo_canmap_array_inertials, s_eo_canmap_array_inertials3, s_eo_canmap_array_pscs, s_eo_canmap_array_poses,
+        s_eo_canmap_array_fts,
         
         s_eo_canmap_array_skins
     }
@@ -414,7 +416,8 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
     //   hence: numofcanlocations = 12, maxnumofentities = 12 (as jomo entity)
     // - for skin of board eb2 which has only one entity and uses 7 can boards we have 7 can locations. 
     //   hence: hence: numofcanlocations = 7, maxnumofentities = 2 (as skin entity)
-    
+    // - for analog-ft we have up to 4 boards, each with at most one entity, so (4, 4) ??? 
+    #warning marco.accame on 4 marzo 2022: to be clarified
     uint8_t numofcanlocations = eo_constvector_Size(vectorof_entitydescriptors);
     uint8_t maxnumofentities = eocanmap_maxINDEX(ep, entity);
     
@@ -876,7 +879,8 @@ static void s_eo_canmap_entities_index_set(eOcanmap_board_extended_t * theboard,
     }
     else
     {
-        // for skin we put the index always in nib-0 
+        #warning marco.accame on 4 marzo 2022: to be clarified
+        // for skin or analog-as we put the index always in nib-0 
         nib = 0;         
     }
     
@@ -930,9 +934,13 @@ static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard,
     
     // 1. set presence of this entity    
     eo_common_hlfword_bitset(&theboard->board.entities2.bitmapOfPresence, pos);
-    
-    // 2. store the entity index, but only for mc and sk
-    if((eoprot_endpoint_motioncontrol != ep) && (eoprot_endpoint_skin != ep))
+
+#warning marco.accame on 4 marzo 2022: to be clarified
+//#warning non sono sicuro .... ma forse si anche per ft-as perche' una certa board puo' avere ... index = 0 / 1 / 2 / 3
+    // 2. store the entity index, but only for mc and sk and as-ft
+    uint8_t isASFT = ((eoprot_endpoint_analogsensors == ep) && (eoprot_entity_as_ft == en)) ? 1 : 0;
+//    if((eoprot_endpoint_motioncontrol != ep) && (eoprot_endpoint_skin != ep) && (1 != isASFT))
+    if((eoprot_endpoint_motioncontrol != ep) && (eoprot_endpoint_skin != ep) && (1 != isASFT))
     {
         return;
     }

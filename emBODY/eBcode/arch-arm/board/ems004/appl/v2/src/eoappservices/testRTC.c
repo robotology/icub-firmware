@@ -1495,6 +1495,8 @@ static void s_services_test_pos_stop(void *par)
 
 #include "embot_app_eth_theFTservice.h"
 
+constexpr size_t numberofFTs {2};
+
 static const eOmn_serv_configuration_t s_serv_config_as_ft =
 {   
     .type = eomn_serv_AS_ft,
@@ -1506,7 +1508,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
         {
             .capacity       = eOas_ft_sensors_maxnumber,
             .itemsize       = sizeof(eOas_ft_sensordescriptor_t),
-            .size           = 1,
+            .size           = numberofFTs,
             .internalmem    = 0                    
         },
         .data   =
@@ -1529,17 +1531,17 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
             {   // 1
                 .boardinfo =
                 {
-                    .type = eobrd_none, 
+                    .type = eobrd_strain2, 
                     .firmware = {0, 0, 0},
-                    .protocol = {0, 0}                    
+                    .protocol = {0, 0}                      
                 },
                 .canloc = 
                 {
                     .port = eOcanport1, 
-                    .addr = 2, 
+                    .addr = 1, 
                     .insideindex = eobrd_caninsideindex_none                    
                 },
-                .ffu = 0
+                .ffu = 255
             },
             {   // 2
                 .boardinfo =
@@ -1642,31 +1644,55 @@ void serv_VERIFYACTIVATE(void *p)
 
 void serv_CONFIG(void *p)
 {       
-    eOas_ft_config_t ftconfig =
+    eOas_ft_config_t ftconfig[4] =
     {
-        .mode = eoas_ft_mode_calibrated,
-        .ftdatarate = 100,
-        .calibrationset = 0,
-        .tempdatarate = 1
+        {
+            .mode = eoas_ft_mode_calibrated,
+            .ftdatarate = 100,
+            .calibrationset = 0,
+            .tempdatarate = 1
+        },
+        {
+            .mode = eoas_ft_mode_raw,
+            .ftdatarate = 100,
+            .calibrationset = 0,
+            .tempdatarate = 0
+        }, 
+        {
+            .mode = eoas_ft_mode_raw,
+            .ftdatarate = 100,
+            .calibrationset = 0,
+            .tempdatarate = 0
+        },
+        {
+            .mode = eoas_ft_mode_raw,
+            .ftdatarate = 100,
+            .calibrationset = 0,
+            .tempdatarate = 0
+        }            
     }; 
     
-    eOropdescriptor_t ropdes = {};
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, 0, eoprot_tag_as_ft_config);
+    for(uint8_t i=0; i<numberofFTs; i++)
+    {
+        eOropdescriptor_t ropdes = {};
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, i, eoprot_tag_as_ft_config);
 
-    embot::app::eth::fill(ropdes, id32, &ftconfig, sizeof(ftconfig));    
+        embot::app::eth::fill(ropdes, id32, &ftconfig[i], sizeof(ftconfig));    
 
-    embot::app::eth::theFTservice::getInstance().process(&ropdes);    
+        embot::app::eth::theFTservice::getInstance().process(&ropdes);   
+    }        
 }
 
 void serv_TXstart(void *p)
-{       
-    uint8_t enable = 1;  
-    eOropdescriptor_t ropdes = {};
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, 0, eoprot_tag_as_ft_cmmnds_enable);
-
-    embot::app::eth::fill(ropdes, id32, &enable, sizeof(enable));    
-
-    embot::app::eth::theFTservice::getInstance().process(&ropdes);  
+{  
+    for(uint8_t i=0; i<numberofFTs; i++)
+    {
+        uint8_t enable = 1;  
+        eOropdescriptor_t ropdes = {};
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, i, eoprot_tag_as_ft_cmmnds_enable);
+        embot::app::eth::fill(ropdes, id32, &enable, sizeof(enable));    
+        embot::app::eth::theFTservice::getInstance().process(&ropdes);  
+    }
 }
 
 void fillfunctorTX(void *p)
@@ -1685,10 +1711,14 @@ void serv_REGULARS(void *p)
     s_command.operation = eomn_serv_operation_regsig_load;
     memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
     
+
     eOmn_serv_arrayof_id32_t id32s = {};
-    EOarray* ar = eo_array_New(eOmn_serv_capacity_arrayof_id32, 4, &s_command.parameter.arrayofid32);   
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, 0, eoprot_tag_as_ft_status_timedvalue);
-    eo_array_PushBack(ar, &id32);  
+    EOarray* ar = eo_array_New(eOmn_serv_capacity_arrayof_id32, 4, &s_command.parameter.arrayofid32);
+    for(uint8_t i=0; i<numberofFTs; i++)
+    {        
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, i, eoprot_tag_as_ft_status_timedvalue);
+        eo_array_PushBack(ar, &id32); 
+    }        
     eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
 }
 
