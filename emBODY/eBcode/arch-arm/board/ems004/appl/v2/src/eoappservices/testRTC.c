@@ -1518,15 +1518,15 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
                 {
                     .type = eobrd_strain2, 
                     .firmware = {0, 0, 0},
-                    .protocol = {2, 0}                      
+                    .protocol = {0, 0}                      
                 },
                 .canloc = 
                 {
                     .port = eOcanport1, 
-                    .addr = 13, 
+                    .addr = 1, 
                     .insideindex = eobrd_caninsideindex_none                    
                 },
-                .ffu = 0
+                .ffu = 255
             },
             {   // 1
                 .boardinfo =
@@ -1538,10 +1538,10 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
                 .canloc = 
                 {
                     .port = eOcanport1, 
-                    .addr = 1, 
+                    .addr = 13, 
                     .insideindex = eobrd_caninsideindex_none                    
                 },
-                .ffu = 255
+                .ffu = 0
             },
             {   // 2
                 .boardinfo =
@@ -1738,7 +1738,7 @@ static void s_services_test_ft_step()
     eOreltime_t delta = 1*eok_reltime1sec;
     eOreltime_t runTXtime = 10*eok_reltime1sec;
     
-    
+    //step2use = 1;
     
     if(0 == step2use)
     {

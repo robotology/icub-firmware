@@ -89,6 +89,9 @@ static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * 
 
 static eOprotIndex_t s_eo_canmap_sk_index_get(const eOcanmap_board_extended_t * theboard);
 
+
+static eOprotIndex_t s_eo_canmap_as_ft_index_get(const eOcanmap_board_extended_t * theboard);
+
 static eObrd_caninsideindex_t s_eo_canmap_entities_caninsideindex_get(const eOcanmap_board_t *board, const eOprotIndex_t index);
 
 static eObrd_canlocation_t s_eo_canmap_compute_location(const eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t entity, uint8_t index);
@@ -416,8 +419,9 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
     //   hence: numofcanlocations = 12, maxnumofentities = 12 (as jomo entity)
     // - for skin of board eb2 which has only one entity and uses 7 can boards we have 7 can locations. 
     //   hence: hence: numofcanlocations = 7, maxnumofentities = 2 (as skin entity)
-    // - for analog-ft we have up to 4 boards, each with at most one entity, so (4, 4) ??? 
-    #warning marco.accame on 4 marzo 2022: to be clarified
+    // - for analog-ft we have up to 4 entities each one located on a different board (strain or strain2).
+    //   hence, numofcanlocations = [1, 2, 3, 4] and maxnumofentities = 4.
+    #warning marco.accame on 4 marzo 2022: to be clarified ...
     uint8_t numofcanlocations = eo_constvector_Size(vectorof_entitydescriptors);
     uint8_t maxnumofentities = eocanmap_maxINDEX(ep, entity);
     
@@ -454,7 +458,7 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
         
         uint8_t epen = eocanmap_posOfEPEN(ep, entity);        
         EOarray *boardsEPENINDEX = s_eo_canmap_singleton.arrayOfBRDEXTptr[epen][des->index];        
-        eo_array_PushBack(boardsEPENINDEX, &boardext);            
+        eo_array_PushBack(boardsEPENINDEX, &boardext);        
     }
     
     return(eores_OK);     
@@ -879,7 +883,6 @@ static void s_eo_canmap_entities_index_set(eOcanmap_board_extended_t * theboard,
     }
     else
     {
-        #warning marco.accame on 4 marzo 2022: to be clarified
         // for skin or analog-as we put the index always in nib-0 
         nib = 0;         
     }
@@ -1038,6 +1041,21 @@ static eOprotIndex_t s_eo_canmap_sk_index_get(const eOcanmap_board_extended_t * 
     return index; 
 }
 
+static eOprotIndex_t s_eo_canmap_as_ft_index_get(const eOcanmap_board_extended_t * theboard)
+{//ok
+    eOprotIndex_t index = EOK_uint08dummy;
+    
+    // the index is only one per board, so it is stored in nibble 0
+    index = theboard->board.entities2.compactIndicesOf & 0x000F;    
+
+    if(entindexNONE == index)
+    {   // in case some board.entities.indexof[0] or board.entities.indexof[1] has a entindexNONE value we must be sure to return EOK_uint08dummy
+        index = EOK_uint08dummy;
+    }
+    
+    return index; 
+}
+
 static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc, uint8_t ep, uint8_t entity)
 {//ok
     eOprotIndex_t index = EOK_uint08dummy;
@@ -1056,7 +1074,7 @@ static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extende
         return index;
     }
     
-    // 2. yes, we have it. now we retrieve it. all entities have zero index apart those on mc and sk
+    // 2. yes, we have it. now we retrieve it. all entities have zero index apart those on mc and sk and as-ft
     if(eoprot_endpoint_motioncontrol == ep)
     {
         index = s_eo_canmap_mc_index_get(theboard, loc);
@@ -1065,8 +1083,12 @@ static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extende
     {
         index = s_eo_canmap_sk_index_get(theboard);
     }
+    else if((eoprot_endpoint_analogsensors == ep) && (eoprot_entity_as_ft == entity))
+    {
+        index = s_eo_canmap_as_ft_index_get(theboard);
+    }
     else
-    {   
+    {  
         index = 0;
     }
     

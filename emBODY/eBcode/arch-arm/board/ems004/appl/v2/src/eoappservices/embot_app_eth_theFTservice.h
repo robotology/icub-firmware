@@ -105,7 +105,7 @@ namespace embot { namespace app { namespace eth {
         // in such a case, use nv = nullptr and the embot::app::eth::fill(eOropdescriptor_t ...) function
         bool process(const eOropdescriptor_t* rd, const EOnv* nv = nullptr);
        
-        
+    private:        
         // this one is called inside process() when the tag is eoprot_tag_as_ft_config (or by theServiceTester)
         bool set(eOprotIndex_t index, const eOas_ft_config_t *ftc);
         // this one is called inside process() when the tag is eoprot_tag_as_ft_cmmnds_enable (or by theServiceTester)

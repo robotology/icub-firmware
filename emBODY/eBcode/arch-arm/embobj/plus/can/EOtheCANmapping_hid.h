@@ -76,8 +76,8 @@ enum
     eocanmap_inertial_boards_maxnumberof      = 1,
     eocanmap_inertial3_boards_maxnumberof     = 1,
     eocanmap_psc_boards_maxnumberof           = 3,    // we use exactly three psc boards to have the 6 values of the psc entity
-    eocanmap_pos_boards_maxnumberof           = 3,    // we use only one pmc board but we may use 3 psc boards also
-    eocanmap_ft_boards_maxnumberof            = 4,    // we use one board to represent a single ft index and we have 4 indices at max
+    eocanmap_pos_boards_maxnumberof           = 3,    // we use only 1 pmc board but we may use 3 psc boards
+    eocanmap_ft_boards_maxnumberof            = 1,    // we use uonly 1 board (strain or strain2) to represent a single ft index. we have 4 indices at max, but each index goes on a different board.
     eocanmap_skin_boards_maxnumberof          = 8     // we can use up to 8 can mtb/mtb4 boards to represent a single sk-skin index. we can increase this at cost of some ram
 };
 
