@@ -87,7 +87,7 @@ extern "C" {
 //  <o> minor           <0-255> 
 
 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          47
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          48
 
 
 //  </h>version
@@ -96,13 +96,13 @@ extern "C" {
 //  <o> year            <2010-2030>
 #define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2022
 //  <o> month           <1-12>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        1
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        3
 //  <o> day             <1-31>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          28
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          2
 //  <o> hour            <0-23>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         16
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         21
 //  <o> minute          <0-59>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          50
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          11
 
 //  </h>build date
 
@@ -504,7 +504,7 @@ extern "C" {
 
 //  <o> max size of output datagrams <64-1500>
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1408
+#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1416
 
 //  </h>datagrams in socket
 
@@ -555,15 +555,15 @@ extern "C" {
 
 //  <o> capacity of the ropframe of regular rops    <16-1440:8>
 //  <i> default: 768
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  1024  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  1024
 
 //  <o> capacity of the ropframe of occasional rops    <16-1440:8>
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY  128  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY  128
 
 //  <o> capacity of the ropframe of reply rops    <16-1440:8>
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  256  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  264
 
 
 

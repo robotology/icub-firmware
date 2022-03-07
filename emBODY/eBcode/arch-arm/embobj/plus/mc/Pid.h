@@ -48,7 +48,12 @@ typedef struct //PID
     
     float stiction_up;
     float stiction_down;
-  
+
+    float viscous_pos_val;
+    float viscous_neg_val;
+    float coulomb_pos_val;
+    float coulomb_neg_val;
+
 #ifdef FINGER_MK3
     float out_max_open;
     float out_max_close;
@@ -65,7 +70,7 @@ typedef struct //PID
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
 extern void PID_config(PID* o, eOmc_PID_t* config);
-extern void PID_config_friction(PID *o, float Kbemf, float Ktau);
+extern void PID_config_friction(PID *o, float Kbemf, float Ktau, eOmc_FrictionParams_t friction);
 extern void PID_config_filter(PID *o, uint8_t filter);
 
 extern void PID_reset(PID* o);

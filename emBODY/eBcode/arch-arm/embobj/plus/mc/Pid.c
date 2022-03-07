@@ -86,10 +86,14 @@ void PID_config(PID* o, eOmc_PID_t* config)
     
 }
 
-void PID_config_friction(PID *o, float Kbemf, float Ktau)
+void PID_config_friction(PID *o, float Kbemf, float Ktau, eOmc_FrictionParams_t friction)
 {
     o->Kbemf = Kbemf;
     o->Ktau  = Ktau;
+    o->viscous_pos_val = friction.viscous_pos_val;
+    o->viscous_neg_val = friction.viscous_neg_val;
+    o->coulomb_pos_val = friction.coulomb_pos_val;
+    o->coulomb_neg_val = friction.coulomb_neg_val;
 }
 
 void PID_config_filter(PID *o, uint8_t filter)
@@ -175,7 +179,14 @@ float PID_do_out(PID* o, float En)
     return o->out_lpf;
 }
 
+#include "EOtheErrorManager.h"
+
 float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
 {
+#ifdef USE_VISCOUS_COULOMB 
+    //return o->Ktau*(o->coulomb_pos_val + o->viscous_pos_val*vel_fbk + o->Kff*trq_ref);
     return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
+#else
+    return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
+#endif // USE_VISCOUS_COULOMB
 }

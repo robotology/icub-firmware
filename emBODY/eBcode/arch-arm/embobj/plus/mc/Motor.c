@@ -437,9 +437,9 @@ void Motor_config_filter(Motor* o, uint8_t filter) //
     PID_config_filter(&o->trqPID, filter);
 }
 
-void Motor_config_friction(Motor* o, float Bemf, float Ktau) //
+void Motor_config_friction(Motor* o, float Bemf, float Ktau, eOmc_FrictionParams_t friction) //
 {
-    PID_config_friction(&o->trqPID, Bemf, Ktau);
+    PID_config_friction(&o->trqPID, Bemf, Ktau, friction);
 }
 
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
