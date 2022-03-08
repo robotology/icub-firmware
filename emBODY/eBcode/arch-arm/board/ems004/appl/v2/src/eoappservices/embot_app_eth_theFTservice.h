@@ -21,7 +21,8 @@
 #include <memory>
 
 namespace embot { namespace app { namespace eth {
-        
+      
+    // fills a given eOropdescriptor_t w/ whatever is required to be given to theFTservice::process()   
     const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
     
     class theFTservice
@@ -34,6 +35,7 @@ namespace embot { namespace app { namespace eth {
         static constexpr size_t maxSensors {eOas_ft_sensors_maxnumber}; 
         static constexpr size_t maxRegulars {maxSensors};
         
+        // default status of the FT sensors
         static constexpr eOas_ft_status_t defaultFTstatus 
         {
             .timedvalue = 
@@ -49,6 +51,7 @@ namespace embot { namespace app { namespace eth {
             .filler = {0, 0, 0}
         };
 
+        // default configuration of the FT sensors
         static constexpr eOas_ft_config_t defaultFTconfig 
         {
             .mode = eoas_ft_mode_calibrated,
@@ -78,11 +81,11 @@ namespace embot { namespace app { namespace eth {
         };
         
         
-        bool initialise(const Config &config); 
+        eOresult_t initialise(const Config &config); 
                
         eOmn_serv_state_t GetServiceState() const;      
         
-        bool SendReport();  
+        eOresult_t SendReport();  
         
         eOresult_t Verify(const eOmn_serv_configuration_t * servcfg, 
                           eOservice_onendofoperation_fun_t onverify, 
@@ -103,7 +106,7 @@ namespace embot { namespace app { namespace eth {
         // in such a case use its nv and rd argument
         // but it can be called by any other module to emulate reception of a ROP.
         // in such a case, use nv = nullptr and the embot::app::eth::fill(eOropdescriptor_t ...) function
-        bool process(const eOropdescriptor_t* rd, const EOnv* nv = nullptr);
+        eOresult_t process(const eOropdescriptor_t* rd, const EOnv* nv = nullptr);
        
     private:        
         // this one is called inside process() when the tag is eoprot_tag_as_ft_config (or by theServiceTester)

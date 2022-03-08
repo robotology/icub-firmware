@@ -1495,7 +1495,7 @@ static void s_services_test_pos_stop(void *par)
 
 #include "embot_app_eth_theFTservice.h"
 
-constexpr size_t numberofFTs {2};
+constexpr size_t numberofFTs {1};
 
 static const eOmn_serv_configuration_t s_serv_config_as_ft =
 {   
@@ -1518,15 +1518,15 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
                 {
                     .type = eobrd_strain2, 
                     .firmware = {0, 0, 0},
-                    .protocol = {0, 0}                      
+                    .protocol = {2, 0}                      
                 },
                 .canloc = 
                 {
                     .port = eOcanport1, 
-                    .addr = 1, 
+                    .addr = 13, 
                     .insideindex = eobrd_caninsideindex_none                    
                 },
-                .ffu = 255
+                .ffu = 0
             },
             {   // 1
                 .boardinfo =
@@ -1538,7 +1538,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
                 .canloc = 
                 {
                     .port = eOcanport1, 
-                    .addr = 13, 
+                    .addr = 1, 
                     .insideindex = eobrd_caninsideindex_none                    
                 },
                 .ffu = 0
