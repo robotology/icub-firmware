@@ -481,19 +481,28 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     
     static char msg2[64];
     static uint32_t counter;
-    if(counter % 1000 == 0)
+    if(counter % 10 == 0)
     {
-        sprintf(msg2, "%d %d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", \
-                                 impl->amc_bldc.AMC_BLDC_Y.Flags_p.control_mode, \
+        sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", \
                                  Vabc0,  \
                                  Vabc1,  \
                                  Vabc2,  \
-                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[0],  \
-                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[1],  \
-                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_Iabc[2],  \
-                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_angle,    \
-                                 impl->amc_bldc.AMC_BLDC_B.Targets_n.motorcurrent.current,    \
-                                 impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current);
+                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
+                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
+                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2],       \
+                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.angle,         \
+                                 impl->amc_bldc.AMC_BLDC_Y.EstimatedData_p.jointvelocities.velocity, \
+                                 impl->amc_bldc.AMC_BLDC_B.Targets_n.motorcurrent.current,           \
+                                 impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current,          \
+                                 impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Vq);
+
+//        sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f", \
+//                                 Vabc0,  \
+//                                 Vabc1,  \
+//                                 Vabc2,  \
+//                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
+//                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
+//                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2]);
         embot::core::print(msg2);
         counter = 0;
     }
