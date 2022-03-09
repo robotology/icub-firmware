@@ -8,39 +8,90 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_APP_ETH_THEFTSERVICE_H_
-#define __EMBOT_APP_ETH_THEFTSERVICE_H_
+#ifndef __EMBOT_APP_ETH_CANMONITOR_H_
+#define __EMBOT_APP_ETH_CANMONITOR_H_
 
 #include "embot_core.h"
 #include "embot_core_binary.h"
 
 #include "EOtheServices.h"
 #include "EoCommon.h"
-#include "EoProtocol.h"
 
-#include <vector>
 #include <memory>
-
 
 namespace embot { namespace app { namespace eth {
 
 #if 0
     
-#if 0
+### Description of object `CANmonitor`
+
+The `CANmonitor` object can be used by any service to monitor the presence of the CAN boards it requires.
+So far it is based on regular checks of the received CAN loactions during a particular time interval.
+The CAN addresses of the frames received and processed by the service are used to touch the object,
+which contains a list of CAN locations it must monitor. If any of these CAN locations did not touch
+the object in the timeframe configured with `Config::rateofcheck`, then `CANmonitor` changes its internal
+state and emits the relevant diagnostic messages. The messages are emitted with a policy defined at configuration
+time by `Config::reportmode` and `Config::rateofregularreport`.
+
+More details of its behaviour are in the following figures and table.    
+    
+```
+              --- every 1 ms --------------------------------
+             |                                               |
+             v                                               | 
+        -----------             -----------             -----------  
+       | Thread RX | --------> | Thread DO | --------> | Thread TX |
+        -----------             -----------             -----------
+             |                       |                       .
+  Service.AcceptCANframe()           |                       .
+             |                       |                       .
+             | touch(loc)            |                       .
+             v                       |                       .
+     --------------------      Service.Tick()                .
+    |     CANmonitor     |           |                       .
+    | ------------------ | tick()    |                       .
+    |  eval State and    | <---------                        .
+    |  touched CAN       |                                   .
+    |  locations, send   |                                   .
+    |  diagnostics if    |. . . [diagnostics message] . . . .
+    |  needed            |
+     --------------------   
+```  
+
+**Figure 1**. How an object `CANmonitor` works. If the service receives
+a relevant CAN frame it calls `CANmonitor::touch()` with its CAN location.
+The service regularly calls `CANmonitor::tick()` and every `Config::rateofcheck`
+it evaluates its `State` and the touched CAN locations. That makes the `State` evolve 
+as in following figure 2 and may produce diagnostics messages as described by next table 1. 
+
+
 
 ```
-  --                              --
- |  |                            |  |
- |  V                            |  V
-[ OK ] --> [ justLOST ] ---> [ stillLOST ]
-  ^           ^   |               |
-  |           |   v          	  |
-   ------- [ justFOUND ] <--------
+   --  
+  |  |  
+  |  v  
+[[ OK ]] --> [ justFOUND ] <-------
+   |            ^   |              |
+   |            |   v          	   |
+    -------> [ justLOST ] --> [[ stillLOST ]]
+                                   |  ^
+                                   |  |
+                                    -- 
 ```
-**Figure**. Possible transitions for CANmonitor::State. If all boards transmit we stay inside `OK`. Else,
+**Figure 2**. Possible transitions for `CANmonitor::State`. If all boards transmit we stay inside `OK`. Else,
 if some is missing we go through `justLOST` and then we end up in `stillLOST` until they all reappear.
-In such a case we go through `justFOUND` and then in `OK` again. If some boards keep on disappearing 
-and reappearing it is possible to jump between `justFOUND` and `justLOST` states.     
+When all boards reappear we go through `justFOUND` and we end up in `OK` again. Transitions between `justFOUND` 
+and `justLOST` states may happen if some boards keep on disappearing and reappearing.   
+
+
+| State       | emits                                 | when                                                         |
+| ----------- | ------------------------------------- | ------------------------------------------------------------ |
+| `OK`        | `canservices_boards_regularcontact`   | Every `Config::rateofregularreport` if configured with `Report::ALL` |
+| `justLOST`  | `canservices_boards_lostcontact`      | At check time if previous state was `OK` and if configured with `Report::ALL` or `Report::justLOSTjustFOUND` or `Report::justLOSTjustFOUNDstillLOST` |
+| `stillLOST` | `canservices_boards_stillnocontact`   | Every `Config::rateofregularreport` if configured with `Report::ALL` or `Report::justLOSTjustFOUNDstillLOST` |
+| `justFOUND` | `canservices_boards_retrievedcontact` | At check time if previous state was `justLOST`  or `stiilLOST` and if configured with `Report::ALL` or `Report::justLOSTjustFOUND` or `Report::justLOSTjustFOUNDstillLOST` |
+
+**Table 1**. It contains the rules for emissione of diagnostics messages.
 
 #endif    
     
@@ -115,7 +166,7 @@ and reappearing it is possible to jump between `justFOUND` and `justLOST` states
         CANmonitor();
         ~CANmonitor();       
         
-        bool load(const Config &cfg);    
+        bool configure(const Config &cfg);    
         
         bool start();
         bool stop();
@@ -127,109 +178,7 @@ and reappearing it is possible to jump between `justFOUND` and `justLOST` states
         Impl *pImpl;    
     };    
     
-#endif        
-      
-    // fills a given eOropdescriptor_t w/ whatever is required to be given to theFTservice::process()   
-    const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
-    
-    class theFTservice
-    {
-    public:
-        static theFTservice& getInstance();
-                
-    public:
         
-        static constexpr size_t maxSensors {eOas_ft_sensors_maxnumber}; 
-        static constexpr size_t maxRegulars {maxSensors};
-        
-        // default status of the FT sensors
-        static constexpr eOas_ft_status_t defaultFTstatus 
-        {
-            .timedvalue = 
-            {
-                .age = 0,
-                .info = 0,
-                .ffu = 0,
-                .temperature = -2731, // ~ zero kelvin
-                .values = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}                 
-            },
-            .fullscale = {1, 1, 1, 1, 1, 1},
-            .mode = 0,
-            .filler = {0, 0, 0}
-        };
-
-        // default configuration of the FT sensors
-        static constexpr eOas_ft_config_t defaultFTconfig 
-        {
-            .mode = eoas_ft_mode_calibrated,
-            .ftdatarate = 10,
-            .calibrationset = 0,
-            .tempdatarate = 0
-        };
-        
-        struct Config
-        {
-            uint32_t tbd {0};
-            constexpr Config() = default;
-            constexpr Config(uint32_t t) : tbd(t) {}
-            constexpr bool isvalid() const { return (666 == tbd) ? false : true; }
-        }; 
-        
-        struct canFrameDescriptor
-        {
-            enum class Type : uint8_t { unspecified, fullscale, force, torque, temperature };
-            eOcanport_t port {eOcanport1};
-            eOcanframe_t *frame {nullptr};
-            Type type {Type::unspecified};
-            
-            canFrameDescriptor() = default;
-            
-            canFrameDescriptor(eOcanport_t p, eOcanframe_t *f, Type t) : port(p), frame(f), type(t) {};
-        };
-        
-        
-        eOresult_t initialise(const Config &config); 
-               
-        eOmn_serv_state_t GetServiceState() const;      
-        
-        eOresult_t SendReport();  
-        
-        eOresult_t Verify(const eOmn_serv_configuration_t * servcfg, 
-                          eOservice_onendofoperation_fun_t onverify, 
-                          bool activateafterverify); 
-        
-        eOresult_t Activate(const eOmn_serv_configuration_t * servcfg);   
-        
-        eOresult_t Deactivate();        
-        eOresult_t Start();        
-        eOresult_t Stop();        
-        eOresult_t SetRegulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);        
-        eOresult_t Tick();  
-        
-        // processes a CAN frame coming from the sensor        
-        eOresult_t AcceptCANframe(const canFrameDescriptor &canframedescriptor);  
-      
-        // it can be called by the ETH callbacks eoprot_fun_UPDT_as_ft_*(EOnv* nv, eOropdescriptor_t* rd) 
-        // in such a case use its nv and rd argument
-        // but it can be called by any other module to emulate reception of a ROP.
-        // in such a case, use nv = nullptr and the embot::app::eth::fill(eOropdescriptor_t ...) function
-        eOresult_t process(const eOropdescriptor_t* rd, const EOnv* nv = nullptr);
-       
-    private:        
-        // this one is called inside process() when the tag is eoprot_tag_as_ft_config (or by theServiceTester)
-        bool set(eOprotIndex_t index, const eOas_ft_config_t *ftc);
-        // this one is called inside process() when the tag is eoprot_tag_as_ft_cmmnds_enable (or by theServiceTester)
-        bool enable(eOprotIndex_t index, const uint8_t *cmdenable);
-                     
-    private:
-        theFTservice(); 
-        ~theFTservice(); 
-
-    private:    
-        struct Impl;
-        std::unique_ptr<Impl> pImpl;     
-    };       
-
 
 }}} // namespace embot { namespace app { namespace eth
 
