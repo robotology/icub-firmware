@@ -53,15 +53,36 @@ struct embot::app::eth::CANmonitor::Impl
     }
     
     bool configure(const Config &cfg);
+    bool add(eObrd_canlocation_t loc);
+    bool rem(eObrd_canlocation_t loc);
+    bool setcheckrate(embot::core::relTime r);
+    
     bool start();
     bool stop();
     bool tick();
     bool touch(eObrd_canlocation_t loc);
     
+    static constexpr bool enablelog {false};
+    void log(const std::string &str)
+    {
+        if(enablelog)
+        {
+            alwayslog(str);  
+        }            
+    }
+    
+    void alwayslog(const std::string &str)
+    {
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::core::print(str + " @ " + tf.to_string());         
+    }
+    
 };
 
 bool embot::app::eth::CANmonitor::Impl::configure(const Config &cfg)
 {
+//    log("configure()");
+    
     _config = cfg;
     active = false;
     
@@ -78,6 +99,8 @@ bool embot::app::eth::CANmonitor::Impl::configure(const Config &cfg)
 
 bool embot::app::eth::CANmonitor::Impl::start()
 {
+//    log("start()");
+    
     boards2touch = _config.target;
     state = State::OK;
     allboardsarealive = true;
@@ -87,7 +110,8 @@ bool embot::app::eth::CANmonitor::Impl::start()
 }
 
 bool embot::app::eth::CANmonitor::Impl::stop()
-{
+{  
+//    log("stop()");  
     boards2touch.clear();
     state = State::OK;
     allboardsarealive = false;
@@ -108,12 +132,12 @@ bool embot::app::eth::CANmonitor::Impl::tick()
     bool forcereport = false;
     embot::core::Time timenow = embot::core::now();
     
-    if((timeoflastcheck + _config.rateofcheck) > timenow)
+    if((timeoflastcheck + _config.rateofcheck) < timenow)
     {
         checknow = true;
     }
     
-    if((timeoflastreport + _config.rateofregularreport) > timenow)
+    if((timeoflastreport + _config.rateofregularreport) < timenow)
     {
         regularreportnow = true;
     }  
@@ -175,6 +199,7 @@ bool embot::app::eth::CANmonitor::Impl::tick()
     // is the report enabled given the current state and the configured mode? and is it required a forced report or a regular report?
     if((true == reportenabled(state, _config.reportmode)) && ((true == forcereport) || (true == regularreportnow)))
     {
+//        log("tick(reporting)");
         timeoflastreport = timenow;
         
         switch(state)
@@ -231,10 +256,33 @@ bool embot::app::eth::CANmonitor::Impl::touch(eObrd_canlocation_t loc)
         return true;
     }
     
-    boards2touch.clear(loc);
+    if(_config.target.check(loc))
+    {
+        boards2touch.clear(loc);
+    }
+    
     return true;
 }
 
+
+bool embot::app::eth::CANmonitor::Impl::add(eObrd_canlocation_t loc)
+{
+    _config.target.set(loc);
+    return true;
+}
+
+bool embot::app::eth::CANmonitor::Impl::rem(eObrd_canlocation_t loc)
+{
+    _config.target.clear(loc);
+    return true;
+}
+
+
+bool embot::app::eth::CANmonitor::Impl::setcheckrate(embot::core::relTime r)
+{
+    _config.rateofcheck = r;
+    return true;
+}
 
 embot::app::eth::CANmonitor::CANmonitor()
 : pImpl(new Impl())
@@ -270,6 +318,21 @@ bool embot::app::eth::CANmonitor::tick()
 bool embot::app::eth::CANmonitor::touch(eObrd_canlocation_t loc)
 {
     return pImpl->touch(loc);
+}
+
+bool embot::app::eth::CANmonitor::add(eObrd_canlocation_t loc)
+{
+    return pImpl->add(loc);
+}
+
+bool embot::app::eth::CANmonitor::rem(eObrd_canlocation_t loc)
+{
+    return pImpl->rem(loc);
+}
+
+bool embot::app::eth::CANmonitor::setcheckrate(embot::core::relTime r)
+{
+    return pImpl->setcheckrate(r);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

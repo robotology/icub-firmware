@@ -26,6 +26,8 @@
 #include "EOVtheCallbackManager.h"
 #include "EOtheCANservice.h"
 #include "embot_core_binary.h"
+#include "EOtheCANmapping.h"
+#include "embot_app_eth_CANmonitor.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -317,6 +319,19 @@ struct embot::app::eth::theFTservice::Impl
     
     // this object performs the query of the full scales for all the FT sensors
     FSquery2 fullscalequery2 {};
+        
+    // this object performs the monitoring of presence of CAN boards
+    CANmonitor canmonitor {};
+    static constexpr CANmonitor::Config defaultcanmonitorconfig { 
+        {}, // the map is left empty
+        100*embot::core::time1millisec, 
+        CANmonitor::Report::ALL,  
+        10*embot::core::time1second,
+        s_eobj_ownname,
+        eomn_serv_category_ft
+    };
+            
+    embot::core::Time debugtimeft {0};    
     
     // methods used by theFTservice 
     
@@ -432,6 +447,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Tick()
     }     
 
     // add in here a check vs correct arrival of can frames.
+    canmonitor.tick();
               
     return eores_OK;
 }
@@ -730,6 +746,12 @@ eOresult_t embot::app::eth::theFTservice::Impl::Start()
     // Start() does not force the tx from any CAN sensor boards.
     // the activation of transmission is done at reception of command set<eOas_ft_commands_t::enable, 1>
     // managed inside process(const EOnv* nv, const eOropdescriptor_t* rd)
+    
+    // we configure it w/ an empty target. and we start it. we shall add boards when the tx is enabled
+    CANmonitor::Config cfg = defaultcanmonitorconfig;
+    cfg.target.clear();
+    canmonitor.configure(cfg);
+    canmonitor.start();
                 
     return eores_OK;
 }
@@ -749,7 +771,9 @@ eOresult_t embot::app::eth::theFTservice::Impl::Stop()
         return(eores_OK);
     }  
     
-    // Stop() forces the end of the tx from the CAN sensor boards
+    // Stop() forces the end of the tx from all the CAN sensor boards
+    // and of the activities of the CAN monitor
+    canmonitor.stop();
     can_forcetorque_TXstop();   
     can_temperature_TXstop();
 
@@ -823,6 +847,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
     {
         return eores_NOK_generic;
     }
+    
+    canmonitor.touch(loc);
     
     eOas_ft_t *ft = theFTnetvariables[index];
     if(nullptr == ft)
@@ -1103,13 +1129,36 @@ bool embot::app::eth::theFTservice::Impl::enable(eOprotIndex_t index, const uint
 
     // in here i will start / stop tx of FT data
     
-    can_forcetorque_TX(index, (1 == *cmdenable) ? true : false); 
+    bool on = (1 == *cmdenable) ? true : false;
+    
+    can_forcetorque_TX(index, on); 
     
     // and also of temperature data
     if(eobrd_cantype_strain2 == theFTboards[index])
     {
-        can_temperature_TX(index, (1 == *cmdenable) ? true : false);
-    }
+        can_temperature_TX(index, on);
+    }  
+
+    // i also need to add / rem the can location to the canmonitor. 
+    // NOTE: i do that only for FT, not for temperature because it is FT che comanda
+    eObrd_canlocation_t loc {};
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, index, eoprot_tag_none);
+    if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &loc, NULL, NULL))
+    {
+        if(true == on)
+        {
+            canmonitor.add(loc);
+            
+            // i adjust rate according to actual rate w/ a safety factor
+            constexpr uint16_t percentgain = 100;
+            embot::core::relTime checkrate = 10*(100+percentgain) * theFTnetvariables[index]->config.ftdatarate;
+            canmonitor.setcheckrate(checkrate);
+        }
+        else
+        {
+            canmonitor.rem(loc);
+        }
+    }    
     
     return true;
 }
@@ -1673,255 +1722,6 @@ extern "C"
 } // extern "C"
 
 
-#if 0
-// presence of can boards
-
-struct embot::app::eth::CANmonitor::Impl
-{   
-    Config _config {};
-    bool active {false};
-    
-    State state {State::OK}; 
-    
-    embot::core::Time timeoflastcheck {0};
-    embot::core::Time timeoflastreport {0};
-    embot::core::Time timeofdisappearance {0};
-    
-    MAP boards2touch {0, 0};
-
-    bool transmissionisactive {false};
-    bool allboardsarealive {false};    
-    eOerrmanDescriptor_t errdes = {0};
-    
-    Impl() = default;
-
-    
-    ~Impl()
-    {
-
-    }
-    
-    bool load(const Config &cfg);
-    bool start();
-    bool stop();
-    bool tick();
-    bool touch(eObrd_canlocation_t loc);
-    
-};
-
-bool embot::app::eth::CANmonitor::Impl::load(const Config &cfg)
-{
-    _config = cfg;
-    active = false;
-    
-    stop();
-    
-    errdes.sourcedevice       = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress      = _config.servicecategory;
-    errdes.par16              = 0;
-    errdes.par64              = 0;
-       
-    return true;
-}
-
-
-bool embot::app::eth::CANmonitor::Impl::start()
-{
-    boards2touch = _config.target;
-    state = State::OK;
-    allboardsarealive = true;
-    active = true;
-    timeoflastcheck = timeoflastreport = embot::core::now();
-    return true;
-}
-
-bool embot::app::eth::CANmonitor::Impl::stop()
-{
-    boards2touch.clear();
-    state = State::OK;
-    allboardsarealive = false;
-    active = false;
-    timeoflastcheck = timeoflastreport = 0;
-    return true;
-}
-
-bool embot::app::eth::CANmonitor::Impl::tick()
-{
-    if(false == active)       
-    {
-        return true;
-    }
-    
-    bool checknow = false;
-    bool regularreportnow = false;
-    bool forcereport = false;
-    embot::core::Time timenow = embot::core::now();
-    
-    if((timeoflastcheck + _config.rateofcheck) > timenow)
-    {
-        checknow = true;
-    }
-    
-    if((timeoflastreport + _config.rateofregularreport) > timenow)
-    {
-        regularreportnow = true;
-    }  
-        
-    MAP boards2report {};
-    
-    if(true == checknow)
-    {
-        timeoflastcheck = timenow;
-        
-        bool allboardstouched = boards2touch.empty();
-        
-        if(allboardsarealive)
-        {
-            if(allboardstouched)
-            {   // it is the case in which everything goes fine: the boards keeps on transmitting 
-                state = State::OK;
-                boards2report = _config.target; // if we report we report the target
-                forcereport = false; // we dont force a report
-                boards2touch = _config.target; // re-init the boards2touch for new touches
-                
-                allboardsarealive = true;
-            }
-            else
-            {   // we have just lost contact w/ some boards
-                state = State::justLOST;
-                timeofdisappearance = timenow;
-                boards2report = boards2touch; // if we report we report what we miss
-                forcereport = true; // and we force a report
-                boards2touch = _config.target; // re-init the boards2touch for new touches
-                
-                allboardsarealive = false; // there are some boards which are not alive anymore
-            }
-        }
-        else
-        {
-            if(allboardstouched)
-            {   // we have just recovered from a MISSING situation
-                state = State::justFOUND;
-                boards2report = _config.target; // if we report we report the target
-                forcereport = true; // and we force a report
-                boards2touch = _config.target; // re-init the boards2touch for new touches
-                
-                allboardsarealive = true; // all alive again
-            }
-            else
-            {   // sad story: we dont have recovered yet. some boards are still missing
-                state = State::stillLOST;
-                boards2report = boards2touch; // if we report we report what we miss
-                forcereport = false; // we dont force a report
-                boards2touch = _config.target; // re-init the boards2touch for new touches
-                
-                allboardsarealive = false; // there are some boards which are not alive anymore               
-            }            
-        }
-    }
-         
-
-    // is the report enabled given the current state and the configured mode? and is it required a forced report or a regular report?
-    if((true == reportenabled(state, _config.reportmode)) && ((true == forcereport) || (true == regularreportnow)))
-    {
-        timeoflastreport = timenow;
-        
-        switch(state)
-        {
-            case State::OK:
-            {
-
-                errdes.par16 = 0;
-                errdes.par64 = boards2report.getcompact();        
-                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_regularcontact);              
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, _config.ownername, &errdes); 
-                  
-            } break;
-            
-            case State::justLOST:
-            {
-                errdes.par16 = 0;
-                errdes.par64 = boards2report.getcompact();        
-                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_lostcontact);              
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, _config.ownername, &errdes);
-                
-            } break;                
-
-            case State::justFOUND:
-            {
-                uint64_t mspassed = (timenow-timeofdisappearance)/1000;
-                errdes.par16 = 0;
-                errdes.par64 = (mspassed << 32) | boards2report.getcompact();        
-                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_retrievedcontact);              
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, _config.ownername, &errdes);
-                
-            } break; 
-
-            case State::stillLOST:
-            {
-                uint64_t mspassed = (timenow-timeofdisappearance)/1000;
-                errdes.par16 = 0;
-                errdes.par64 = (mspassed << 32) | boards2report.getcompact();        
-                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_stillnocontact);              
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, _config.ownername, &errdes);
-            } break;                  
-        }           
-    }
-            
-    
-    return true;
-}
-
-
-bool embot::app::eth::CANmonitor::Impl::touch(eObrd_canlocation_t loc)
-{
-    if(false == active)       
-    {
-        return true;
-    }
-    
-    boards2touch.clear(loc);
-    return true;
-}
-
-
-embot::app::eth::CANmonitor::CANmonitor()
-: pImpl(new Impl())
-{ 
-
-}
-
-embot::app::eth::CANmonitor::~CANmonitor()
-{   
-    delete pImpl;
-}
-
-bool embot::app::eth::CANmonitor::load(const Config &cfg)
-{
-    return pImpl->load(cfg);
-}
-
-bool embot::app::eth::CANmonitor::start()
-{
-    return pImpl->start();
-}
-
-bool embot::app::eth::CANmonitor::stop()
-{
-    return pImpl->stop();
-}
-
-bool embot::app::eth::CANmonitor::tick()
-{
-    return pImpl->tick();
-}
-
-bool embot::app::eth::CANmonitor::touch(eObrd_canlocation_t loc)
-{
-    return pImpl->touch(loc);
-}
-
-#endif
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

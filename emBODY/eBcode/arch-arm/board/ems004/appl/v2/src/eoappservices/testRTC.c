@@ -1648,25 +1648,25 @@ void serv_CONFIG(void *p)
     {
         {
             .mode = eoas_ft_mode_calibrated,
-            .ftdatarate = 100,
+            .ftdatarate = 50,
             .calibrationset = 0,
             .tempdatarate = 1
         },
         {
             .mode = eoas_ft_mode_raw,
-            .ftdatarate = 100,
+            .ftdatarate = 50,
             .calibrationset = 0,
             .tempdatarate = 0
         }, 
         {
             .mode = eoas_ft_mode_raw,
-            .ftdatarate = 100,
+            .ftdatarate = 50,
             .calibrationset = 0,
             .tempdatarate = 0
         },
         {
             .mode = eoas_ft_mode_raw,
-            .ftdatarate = 100,
+            .ftdatarate = 50,
             .calibrationset = 0,
             .tempdatarate = 0
         }            
@@ -1736,7 +1736,7 @@ void serv_START(void *p)
 static void s_services_test_ft_step()
 {
     eOreltime_t delta = 1*eok_reltime1sec;
-    eOreltime_t runTXtime = 10*eok_reltime1sec;
+    eOreltime_t runTXtime = 600*eok_reltime1sec;
     
     //step2use = 1;
     

@@ -138,11 +138,16 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
         }
         
         struct MAP
-        {
+        {   // we dont want any cl.addr 0 or 15 inside mask[] -> see MAP() and set()
+            static constexpr uint16_t validmask {0x7ffe};
             uint16_t mask[eOcanports_number] = {0x0000, 0x0000};
-            constexpr MAP(uint16_t mc1, uint16_t mc2) { mask[eOcanport1] = mc1; mask[eOcanport2] = mc2; }
-            constexpr MAP() =  default;
-            void set(eObrd_canlocation_t cl) { embot::core::binary::bit::set(mask[cl.port], cl.addr); }
+            constexpr MAP(uint16_t mc1, uint16_t mc2) { mask[eOcanport1] = mc1 & validmask; mask[eOcanport2] = mc2 & validmask; }
+            constexpr MAP() = default;
+            void set(eObrd_canlocation_t cl) 
+            { 
+                embot::core::binary::bit::set(mask[cl.port], cl.addr); 
+                mask[cl.port] &= validmask;
+            }
             void clear(eObrd_canlocation_t cl) { embot::core::binary::bit::clear(mask[cl.port], cl.addr); }
             constexpr bool check(eObrd_canlocation_t cl) const { return embot::core::binary::bit::check(mask[cl.port], cl.addr); }
             void clear() { mask[eOcanport1] = mask[eOcanport2] = 0; }
@@ -160,13 +165,21 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
             const char *ownername {"dummy"}; // for printing the name of the owner 
             eOmn_serv_category_t servicecategory {eomn_serv_category_unknown}; // for reporting the service owning the CANmonitor
             
+            constexpr Config(const MAP &map, embot::core::relTime rc, Report rm, embot::core::relTime rr, const char *o, eOmn_serv_category_t s)
+            {
+                target = map; rateofcheck = rc; reportmode = rm; ownername = o; servicecategory = s; 
+            }  
+            
             Config() = default;
         };
       
         CANmonitor();
         ~CANmonitor();       
         
-        bool configure(const Config &cfg);    
+        bool configure(const Config &cfg);  
+        bool add(eObrd_canlocation_t cl);
+        bool rem(eObrd_canlocation_t cl);
+        bool setcheckrate(embot::core::relTime r);        
         
         bool start();
         bool stop();
