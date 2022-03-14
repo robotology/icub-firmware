@@ -58,6 +58,7 @@
 #include "EOtheSharedHW.h"
 
 #include "testRTC.h"
+#include "servicetester.h"
 
 #include "EOtheMemoryPool.h"
 
@@ -224,6 +225,8 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
 
 #if defined(TESTRTC_IS_ACTIVE)    
     testRTC_init();
+#elif defined(enableSERVICE_TESTER)
+    servicetester_init();
 #endif
     
     eo_errman_Trace(eo_errman_GetHandle(), "eo_services_Initialise() is over", s_eobj_ownname);

@@ -100,7 +100,15 @@ bool embot::app::eth::CANmonitor::Impl::configure(const Config &cfg)
 bool embot::app::eth::CANmonitor::Impl::start()
 {
 //    log("start()");
+    // i start only if ...
+    // _config.rateofcheck is != 0;
+    // and i start also if _config.target is empty, 
     
+    if(0 == _config.rateofcheck)
+    {
+        return false;
+    }
+
     boards2touch = _config.target;
     state = State::OK;
     allboardsarealive = true;
@@ -206,39 +214,39 @@ bool embot::app::eth::CANmonitor::Impl::tick()
         {
             case State::OK:
             {
-
+//                alwayslog("OK");
                 errdes.par16 = 0;
                 errdes.par64 = boards2report.getcompact();        
-                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_regularcontact);              
+                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_monitor_regularcontact);              
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, _config.ownername, &errdes); 
-                  
             } break;
             
             case State::justLOST:
             {
+//                alwayslog("jLOST");
                 errdes.par16 = 0;
                 errdes.par64 = boards2report.getcompact();        
-                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_lostcontact);              
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, _config.ownername, &errdes);
-                
+                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_monitor_lostcontact);              
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, _config.ownername, &errdes);                
             } break;                
 
             case State::justFOUND:
             {
+//                alwayslog("JFOUND");
                 uint64_t mspassed = (timenow-timeofdisappearance)/1000;
                 errdes.par16 = 0;
                 errdes.par64 = (mspassed << 32) | boards2report.getcompact();        
-                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_retrievedcontact);              
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, _config.ownername, &errdes);
-                
+                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_monitor_retrievedcontact);              
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, _config.ownername, &errdes);                
             } break; 
 
             case State::stillLOST:
             {
+//                alwayslog("sLOST");
                 uint64_t mspassed = (timenow-timeofdisappearance)/1000;
                 errdes.par16 = 0;
                 errdes.par64 = (mspassed << 32) | boards2report.getcompact();        
-                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_stillnocontact);              
+                errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_monitor_stillnocontact);              
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, _config.ownername, &errdes);
             } break;                  
         }           

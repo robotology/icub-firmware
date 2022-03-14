@@ -261,8 +261,7 @@ const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *dat
     rd.ropcode = rpc;
     return &rd;
 }
-
-    
+ 
 constexpr eOservice_core_t dummy_service_core 
 {
     .initted = eobool_false,
@@ -749,7 +748,11 @@ eOresult_t embot::app::eth::theFTservice::Impl::Start()
     
     // we configure it w/ an empty target. and we start it. we shall add boards when the tx is enabled
     CANmonitor::Config cfg = defaultcanmonitorconfig;
+    // use ...
     cfg.target.clear();
+    cfg.rateofcheck = embot::core::time1millisec * service.servconfig.data.as.ft.canmonitorconfig.checkrate;
+    cfg.rateofregularreport = embot::core::time1millisec * service.servconfig.data.as.ft.canmonitorconfig.periodicreportrate;
+    cfg.reportmode = static_cast<CANmonitor::Report>(service.servconfig.data.as.ft.canmonitorconfig.reportmode);
     canmonitor.configure(cfg);
     canmonitor.start();
                 
@@ -808,7 +811,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::can_forcetorque_processfullscale
     eObrd_canlocation_t loc = {};
     loc.port = cfd.port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(cfd.frame);
-    loc.insideindex = eobrd_caninsideindex_first;
+    loc.insideindex = eobrd_caninsideindex_none;
         
     // now i get the channel and the data to be put inside the strain.  
     uint8_t channel = cfd.frame->data[1];
@@ -840,7 +843,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
     eObrd_canlocation_t loc = {};
     loc.port = cfd.port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(cfd.frame);
-    loc.insideindex = eobrd_caninsideindex_first;
+    loc.insideindex = eobrd_caninsideindex_none;
 
     eOprotIndex_t index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_analogsensors, eoprot_entity_as_ft); 
     if(EOK_uint08dummy == index)
@@ -1090,6 +1093,10 @@ bool embot::app::eth::theFTservice::Impl::set(eOprotIndex_t index, const eOas_ft
     
     // impose datarate to the FT sensor board 
     can_forcetorque_Config(index, ftc->ftdatarate);
+    
+    // copy mode into status
+    theFTnetvariables[index]->status.mode = ftc->mode;
+    
     
     // config the temperature sensor in teh FT sensor board, even if we shall no enable it
     if(eobrd_cantype_strain2 == theFTboards[index])
@@ -1636,7 +1643,6 @@ eOresult_t embot::app::eth::theFTservice::Verify(const eOmn_serv_configuration_t
     return pImpl->Verify(servcfg, onverify, activateafterverify); 
 }
 
-
 eOmn_serv_state_t embot::app::eth::theFTservice::GetServiceState() const
 {
     return pImpl->GetServiceState();
@@ -1720,7 +1726,6 @@ extern "C"
     }    
     
 } // extern "C"
-
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

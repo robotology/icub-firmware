@@ -42,6 +42,7 @@
 #include "embot_app_eth_theFTservice.h"
 
 #include "testRTC.h"
+#include "servicetester.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -118,7 +119,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     
 #if defined(TESTRTC_IS_ACTIVE)     
     testRTC_RUN_tick();
-#endif    
+#elif defined(enableSERVICE_TESTER)
+    servicetester_runtick();
+#endif  
 }
 
 

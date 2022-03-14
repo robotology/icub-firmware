@@ -117,10 +117,10 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
         };  
         
         enum class Report : uint8_t { 
-            NONE,                       // no report (diagnostics message) is ever sent.
-            justLOSTjustFOUND,          // only asynch report is sent at entering State::justLOST and State::justLOSTjustFOUND
-            justLOSTjustFOUNDstillLOST, // as in Report::justLOSTjustFOUND plus report every Config::rateofregularreport when we are in State::stillLOST
-            ALL                         // as in Report::justLOSTjustFOUNDstillLOST plus report every Config::rateofregularreport when we are in State::OK 
+            NEVER = 0,                      // no report (diagnostics message) is ever sent.
+            justLOSTjustFOUND = 1,          // only asynch report is sent at entering State::justLOST and State::justLOSTjustFOUND
+            justLOSTjustFOUNDstillLOST = 2, // as in Report::justLOSTjustFOUND plus report every Config::rateofregularreport when we are in State::stillLOST
+            ALL = 3                         // as in Report::justLOSTjustFOUNDstillLOST plus report every Config::rateofregularreport when we are in State::OK 
         };     
 
         // it tells when the report is enabled given the State and the Report mode
@@ -130,7 +130,7 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
             switch(s)
             {
                 case State::justLOST: 
-                case State::justFOUND: { e = (Report::NONE != r); } break;
+                case State::justFOUND: { e = (Report::NEVER != r); } break;
                 case State::stillLOST: { e = (Report::ALL == r) || ((Report::justLOSTjustFOUNDstillLOST == r)); } break;
                 case State::OK: { e = (Report::ALL == r); } break;
             }
@@ -151,7 +151,7 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
             void clear(eObrd_canlocation_t cl) { embot::core::binary::bit::clear(mask[cl.port], cl.addr); }
             constexpr bool check(eObrd_canlocation_t cl) const { return embot::core::binary::bit::check(mask[cl.port], cl.addr); }
             void clear() { mask[eOcanport1] = mask[eOcanport2] = 0; }
-            constexpr bool empty() const { return ((0 == mask[eOcanport1]) && (0 == mask[eOcanport1])); }
+            constexpr bool empty() const { return ((0 == mask[eOcanport1]) && (0 == mask[eOcanport2])); }
             constexpr uint32_t getcompact() const { return (static_cast<uint32_t>(mask[eOcanport1]) << 16) | static_cast<uint32_t>(mask[eOcanport2]); }
         };
                 
@@ -159,7 +159,7 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
         {
             MAP target {}; // the boards to monitor
             embot::core::relTime rateofcheck {100*embot::core::time1millisec};      // how often we verify
-            Report reportmode {Report::NONE};   // tells which states can be reported
+            Report reportmode {Report::NEVER};   // tells which states can be reported
             embot::core::relTime rateofregularreport {10*embot::core::time1second}; // how often we send reports for State::OK or State::stillLOST
             
             const char *ownername {"dummy"}; // for printing the name of the owner 

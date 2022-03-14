@@ -1502,6 +1502,12 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
     .type = eomn_serv_AS_ft,
     .diagnosticsmode = eomn_serv_diagn_mode_NONE,
     .diagnosticsparam = 0,
+    .data.as.ft.canmonitorconfig = 
+    {
+        .checkrate = 100,
+        .reportmode = eobrd_canmonitor_reportmode_ALL,
+        .periodicreportrate = 10*1000      
+    },    
     .data.as.ft.arrayofsensors = 
     {
         .head   = 
