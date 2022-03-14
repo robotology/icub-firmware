@@ -38,6 +38,14 @@
 #include "EOtheETHmonitor.h"
 #include "EOtheSTRAIN.h"
 
+#include "embot_app_eth_theFTservice.h"
+
+#if defined(TESTRTC_IS_ACTIVE)
+#include "testRTC.h"
+#elif defined(enableSERVICE_TESTER)
+#include "servicetester.h"
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -121,6 +129,10 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     eo_motioncontrol_Tick(eo_motioncontrol_GetHandle());
     
 	eo_mais_Tick(eo_mais_GetHandle());
+    
+    // ft service
+    embot::app::eth::theFTservice::getInstance().Tick();
+    
 	eo_psc_Tick(eo_psc_GetHandle());
     // however, we could also tick others ....
     // TODO: see if i can move all the _Tick() in the do phase.

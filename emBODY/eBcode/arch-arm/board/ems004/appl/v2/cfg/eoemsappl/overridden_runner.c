@@ -41,8 +41,13 @@
 
 #include "embot_app_eth_theFTservice.h"
 
+#if defined(TESTRTC_IS_ACTIVE)
 #include "testRTC.h"
+#elif defined(enableSERVICE_TESTER)
 #include "servicetester.h"
+#endif
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

@@ -57,8 +57,11 @@
 
 #include "EOtheSharedHW.h"
 
+#if defined(TESTRTC_IS_ACTIVE)
 #include "testRTC.h"
+#elif defined(enableSERVICE_TESTER)
 #include "servicetester.h"
+#endif
 
 #include "EOtheMemoryPool.h"
 
