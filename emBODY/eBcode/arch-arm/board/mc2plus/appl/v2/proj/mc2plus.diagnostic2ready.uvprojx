@@ -336,7 +336,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_MC2PLUS -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
+              <MiscControls>-DXenableTHESERVICETESTER -DEOTHESERVICES_disable_thePOS -Wno-pragma-pack -Wno-deprecated-register -DUSE_MC2PLUS -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
               <Define>CER R1_HAND DIAGNOSTIC2_enabled DIAGNOSTIC2_receive_from_daemon DIAGNOSTIC2_send_to_yarprobotinterface _noDIAGNOSTIC2_send_to_daemon</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\services\embenv\api;..\cfg\boardcfg;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\embobj\plus\can;..\..\..\..\..\embobj\plus\can\config-can-protocol;..\..\..\..\..\embobj\plus\mc;..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks;..\..\..\..\ems004\appl\v2\src\eoappservices;..\..\..\..\..\embot\cif;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core</IncludePath>
@@ -924,9 +924,14 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_CANmonitor.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_eth_theFTserviceTester.cpp</FileName>
+              <FileName>embot_app_eth_theServiceTester.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_theFTserviceTester.cpp</FilePath>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_theServiceTester.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>servicetester.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\servicetester.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2268,9 +2273,14 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_CANmonitor.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_eth_theFTserviceTester.cpp</FileName>
+              <FileName>embot_app_eth_theServiceTester.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_theFTserviceTester.cpp</FilePath>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_theServiceTester.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>servicetester.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\servicetester.cpp</FilePath>
             </File>
           </Files>
         </Group>

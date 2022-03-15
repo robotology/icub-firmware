@@ -354,6 +354,8 @@ struct embot::app::eth::theFTservice::Impl
     // methods used to manage ETH commands. called by process() but also by the theFTservice
     bool set(eOprotIndex_t index, const eOas_ft_config_t *ftc);
     bool enable(eOprotIndex_t index, const uint8_t *cmdenable);
+    
+    const theServiceTester::Config & servicetesterconfig() const;
 
 private:  
     
@@ -750,8 +752,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::Start()
     CANmonitor::Config cfg = defaultcanmonitorconfig;
     // use ...
     cfg.target.clear();
-    cfg.rateofcheck = embot::core::time1millisec * service.servconfig.data.as.ft.canmonitorconfig.checkrate;
-    cfg.rateofregularreport = embot::core::time1millisec * service.servconfig.data.as.ft.canmonitorconfig.periodicreportrate;
+    cfg.periodofcheck = embot::core::time1millisec * service.servconfig.data.as.ft.canmonitorconfig.periodofcheck;
+    cfg.periodofreport = embot::core::time1millisec * service.servconfig.data.as.ft.canmonitorconfig.periodofreport;
     cfg.reportmode = static_cast<CANmonitor::Report>(service.servconfig.data.as.ft.canmonitorconfig.reportmode);
     canmonitor.configure(cfg);
     canmonitor.start();
@@ -913,7 +915,7 @@ void embot::app::eth::theFTservice::Impl::can_forcetorque_saturation_handler(con
     
     counter[index] ++;
     
-    uint8_t ftTXrate = ft->config.ftdatarate; // in ms
+    uint8_t ftTXrate = ft->config.ftperiod; // in ms
     uint32_t numberofmessagesin1second = 2000*ftTXrate; // ft sends 2 msgs (1 for force and 1 for torque) every ftTXrate milli.
     
 
@@ -1092,7 +1094,7 @@ bool embot::app::eth::theFTservice::Impl::set(eOprotIndex_t index, const eOas_ft
     }
     
     // impose datarate to the FT sensor board 
-    can_forcetorque_Config(index, ftc->ftdatarate);
+    can_forcetorque_Config(index, ftc->ftperiod);
     
     // copy mode into status
     theFTnetvariables[index]->status.mode = ftc->mode;
@@ -1154,12 +1156,11 @@ bool embot::app::eth::theFTservice::Impl::enable(eOprotIndex_t index, const uint
     {
         if(true == on)
         {
-            canmonitor.add(loc);
-            
-            // i adjust rate according to actual rate w/ a safety factor
-            constexpr uint16_t percentgain = 100;
-            embot::core::relTime checkrate = 10*(100+percentgain) * theFTnetvariables[index]->config.ftdatarate;
-            canmonitor.setcheckrate(checkrate);
+            canmonitor.add(loc);            
+//            // i adjust rate according to actual rate w/ a safety factor
+//            constexpr uint16_t percentgain = 100;
+//            embot::core::relTime periodofcheck = 10*(100+percentgain) * theFTnetvariables[index]->config.ftperiod;
+//            canmonitor.setcheckrate(periodofcheck);
         }
         else
         {
@@ -1411,7 +1412,7 @@ void embot::app::eth::theFTservice::Impl::can_temperature_TX(eOprotIndex_t index
     
     // start / stop its transmission
     icubCanProto_thermo_transmit_t ttransmit = {0};
-    ttransmit.periodsec = (true == on) ? (static_cast<uint8_t>(theFTnetvariables[index]->config.tempdatarate)) : (0);
+    ttransmit.periodsec = (true == on) ? (static_cast<uint8_t>(theFTnetvariables[index]->config.temperatureperiod)) : (0);
 
     sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT;
@@ -1597,6 +1598,180 @@ void embot::app::eth::theFTservice::Impl::debug_CANMAPPING(EOconstarray *carray)
 #endif // #if defined(DEBUG_CANMAPPING) 
 }
 
+#if defined(enableTHESERVICETESTER)
+
+constexpr size_t numberofFTs2test {2};
+
+constexpr eOmn_serv_configuration_t s_serv_config_as_ft_001 =
+{   
+    .type = eomn_serv_AS_ft,
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
+    .data = 
+    { .as = { .ft = {
+        .canmonitorconfig = 
+        {
+            .periodofcheck = 100,
+            .reportmode = eobrd_canmonitor_reportmode_ALL,
+            .periodofreport = 10*1000        
+        },
+        .arrayofsensors = 
+        {
+            .head   = 
+            {
+                .capacity       = eOas_ft_sensors_maxnumber,
+                .itemsize       = sizeof(eOas_ft_sensordescriptor_t),
+                .size           = numberofFTs2test,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                {   // 0
+                    .boardinfo =
+                    {
+                        .type = eobrd_strain2, 
+                        .firmware = {0, 0, 0},
+                        .protocol = {2, 0}                      
+                    },
+                    .canloc = 
+                    {
+                        .port = eOcanport1, 
+                        .addr = 13, 
+                        .insideindex = eobrd_caninsideindex_none                    
+                    },
+                    .ffu = 0
+                },
+                {   // 1
+                    .boardinfo =
+                    {
+                        .type = eobrd_strain2, 
+                        .firmware = {0, 0, 0},
+                        .protocol = {2, 0}                      
+                    },
+                    .canloc = 
+                    {
+                        .port = eOcanport2, 
+                        .addr = 13, 
+                        .insideindex = eobrd_caninsideindex_none                    
+                    },
+                    .ffu = 0
+                },
+                {   // 2
+                    .boardinfo =
+                    {
+                        .type = eobrd_none, 
+                        .firmware = {0, 0, 0},
+                        .protocol = {0, 0}                    
+                    },
+                    .canloc = 
+                    {
+                        .port = eOcanport1, 
+                        .addr = 2, 
+                        .insideindex = eobrd_caninsideindex_none                    
+                    },
+                    .ffu = 0
+                },
+                {   // 3
+                    .boardinfo =
+                    {
+                        .type = eobrd_none, 
+                        .firmware = {0, 0, 0},
+                        .protocol = {0, 0}                    
+                    },
+                    .canloc = 
+                    {
+                        .port = eOcanport1, 
+                        .addr = 2, 
+                        .insideindex = eobrd_caninsideindex_none                    
+                    },
+                    .ffu = 0
+                }            
+            }
+        }
+    }}}    
+};
+
+eOas_ft_config_t ftconfig[eOas_ft_sensors_maxnumber] =
+{
+    {
+        .mode = eoas_ft_mode_calibrated,
+        .ftperiod = 50,
+        .calibrationset = 0,
+        .temperatureperiod = 1
+    },
+    {
+        .mode = eoas_ft_mode_raw,
+        .ftperiod = 50,
+        .calibrationset = 0,
+        .temperatureperiod = 0
+    }, 
+    {
+        .mode = eoas_ft_mode_raw,
+        .ftperiod = 50,
+        .calibrationset = 0,
+        .temperatureperiod = 0
+    },
+    {
+        .mode = eoas_ft_mode_raw,
+        .ftperiod = 50,
+        .calibrationset = 0,
+        .temperatureperiod = 0
+    }            
+}; 
+
+void setconfig()
+{
+    for(uint8_t i=0; i<numberofFTs2test; i++)
+    {
+        eOropdescriptor_t ropdes = {};
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, i, eoprot_tag_as_ft_config);
+        embot::app::eth::fill(ropdes, id32, &ftconfig[i], sizeof(ftconfig));    
+        embot::app::eth::theFTservice::getInstance().process(&ropdes);   
+    }       
+}
+
+void txstart()
+{
+    for(uint8_t i=0; i<numberofFTs2test; i++)
+    {
+        uint8_t enable = 1;  
+        eOropdescriptor_t ropdes = {};
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, i, eoprot_tag_as_ft_cmmnds_enable);
+        embot::app::eth::fill(ropdes, id32, &enable, sizeof(enable));    
+        embot::app::eth::theFTservice::getInstance().process(&ropdes);  
+    }       
+}
+
+constexpr embot::app::eth::theServiceTester::Config FTservtestconfig =
+{
+    eomn_serv_category_ft,
+    &s_serv_config_as_ft_001,
+    setconfig,
+    txstart,
+    numberofFTs2test, // 2    
+    {{ 
+        EOPROT_ID_GET(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, 0, eoprot_tag_as_ft_status_timedvalue), 
+        EOPROT_ID_GET(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, 1, eoprot_tag_as_ft_status_timedvalue),
+        EOPROT_ID_GET(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, 2, eoprot_tag_as_ft_status_timedvalue),
+        EOPROT_ID_GET(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, 3, eoprot_tag_as_ft_status_timedvalue),
+        eo_prot_ID32dummy, eo_prot_ID32dummy, eo_prot_ID32dummy, eo_prot_ID32dummy
+    }}   
+};
+
+const theServiceTester::Config & embot::app::eth::theFTservice::Impl::servicetesterconfig() const
+{
+   return FTservtestconfig;
+}
+
+#else
+
+const theServiceTester::Config & embot::app::eth::theFTservice::Impl::servicetesterconfig() const
+{
+   static constexpr embot::app::eth::theServiceTester::Config FTservtestconfig {};
+   return FTservtestconfig;
+}
+
+#endif
 
 } // namespace embot::app::eth {
 
@@ -1693,6 +1868,10 @@ bool embot::app::eth::theFTservice::enable(eOprotIndex_t index, const uint8_t *c
     return pImpl->enable(index, cmdenable);
 }
 
+const embot::app::eth::theServiceTester::Config & embot::app::eth::theFTservice::servicetesterconfig() const
+{
+    return pImpl->servicetesterconfig();
+}
 
 // other objects
 

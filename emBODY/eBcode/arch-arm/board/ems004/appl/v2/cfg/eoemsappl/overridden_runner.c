@@ -43,7 +43,7 @@
 
 #if defined(TESTRTC_IS_ACTIVE)
 #include "testRTC.h"
-#elif defined(enableSERVICE_TESTER)
+#elif defined(enableTHESERVICETESTER)
 #include "servicetester.h"
 #endif
 
@@ -124,7 +124,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     
 #if defined(TESTRTC_IS_ACTIVE)     
     testRTC_RUN_tick();
-#elif defined(enableSERVICE_TESTER)
+#elif defined(enableTHESERVICETESTER)
     servicetester_runtick();
 #endif  
 }

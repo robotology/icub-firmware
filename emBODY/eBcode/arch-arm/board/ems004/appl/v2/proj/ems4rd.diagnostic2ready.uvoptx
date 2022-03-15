@@ -2038,24 +2038,19 @@
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>loc</ItemText>
+          <ItemText>impl</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>boards2touch</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>_config,0x0A</ItemText>
+          <ItemText>config</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>0xE000ED14</ItemText>
+          <ItemText>s_serv_config_as_ft_001</ItemText>
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
@@ -3408,8 +3403,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eoappservices\embot_app_eth_theFTserviceTester.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_eth_theFTserviceTester.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\eoappservices\servicetester.cpp</PathWithFileName>
+      <FilenameWithoutPath>servicetester.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -3420,8 +3415,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eoappservices\servicetester.cpp</PathWithFileName>
-      <FilenameWithoutPath>servicetester.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\eoappservices\embot_app_eth_theServiceTester.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_eth_theServiceTester.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

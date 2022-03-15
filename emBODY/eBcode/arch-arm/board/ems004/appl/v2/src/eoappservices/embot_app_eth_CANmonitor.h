@@ -29,9 +29,9 @@ The `CANmonitor` object can be used by any service to monitor the presence of th
 So far it is based on regular checks of the received CAN loactions during a particular time interval.
 The CAN addresses of the frames received and processed by the service are used to touch the object,
 which contains a list of CAN locations it must monitor. If any of these CAN locations did not touch
-the object in the timeframe configured with `Config::rateofcheck`, then `CANmonitor` changes its internal
+the object in the timeframe configured with `Config::periodofcheck`, then `CANmonitor` changes its internal
 state and emits the relevant diagnostic messages. The messages are emitted with a policy defined at configuration
-time by `Config::reportmode` and `Config::rateofregularreport`.
+time by `Config::reportmode` and `Config::periodofreport`.
 
 More details of its behaviour are in the following figures and table.    
     
@@ -60,7 +60,7 @@ More details of its behaviour are in the following figures and table.
 
 **Figure 1**. How an object `CANmonitor` works. If the service receives
 a relevant CAN frame it calls `CANmonitor::touch()` with its CAN location.
-The service regularly calls `CANmonitor::tick()` and every `Config::rateofcheck`
+The service regularly calls `CANmonitor::tick()` and every `Config::periodofcheck`
 it evaluates its `State` and the touched CAN locations. That makes the `State` evolve 
 as in following figure 2 and may produce diagnostics messages as described by next table 1. 
 
@@ -86,9 +86,9 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
 
 | State       | emits                                 | when                                                         |
 | ----------- | ------------------------------------- | ------------------------------------------------------------ |
-| `OK`        | `canservices_boards_regularcontact`   | Every `Config::rateofregularreport` if configured with `Report::ALL` |
+| `OK`        | `canservices_boards_regularcontact`   | Every `Config::periodofreport` if configured with `Report::ALL` |
 | `justLOST`  | `canservices_boards_lostcontact`      | At check time if previous state was `OK` and if configured with `Report::ALL` or `Report::justLOSTjustFOUND` or `Report::justLOSTjustFOUNDstillLOST` |
-| `stillLOST` | `canservices_boards_stillnocontact`   | Every `Config::rateofregularreport` if configured with `Report::ALL` or `Report::justLOSTjustFOUNDstillLOST` |
+| `stillLOST` | `canservices_boards_stillnocontact`   | Every `Config::periodofreport` if configured with `Report::ALL` or `Report::justLOSTjustFOUNDstillLOST` |
 | `justFOUND` | `canservices_boards_retrievedcontact` | At check time if previous state was `justLOST`  or `stiilLOST` and if configured with `Report::ALL` or `Report::justLOSTjustFOUND` or `Report::justLOSTjustFOUNDstillLOST` |
 
 **Table 1**. It contains the rules for emissione of diagnostics messages.
@@ -119,8 +119,8 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
         enum class Report : uint8_t { 
             NEVER = 0,                      // no report (diagnostics message) is ever sent.
             justLOSTjustFOUND = 1,          // only asynch report is sent at entering State::justLOST and State::justLOSTjustFOUND
-            justLOSTjustFOUNDstillLOST = 2, // as in Report::justLOSTjustFOUND plus report every Config::rateofregularreport when we are in State::stillLOST
-            ALL = 3                         // as in Report::justLOSTjustFOUNDstillLOST plus report every Config::rateofregularreport when we are in State::OK 
+            justLOSTjustFOUNDstillLOST = 2, // as in Report::justLOSTjustFOUND plus report every Config::periodofreport when we are in State::stillLOST
+            ALL = 3                         // as in Report::justLOSTjustFOUNDstillLOST plus report every Config::periodofreport when we are in State::OK 
         };     
 
         // it tells when the report is enabled given the State and the Report mode
@@ -158,16 +158,16 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
         struct Config
         {
             MAP target {}; // the boards to monitor
-            embot::core::relTime rateofcheck {100*embot::core::time1millisec};      // how often we verify
+            embot::core::relTime periodofcheck {100*embot::core::time1millisec};      // how often we verify
             Report reportmode {Report::NEVER};   // tells which states can be reported
-            embot::core::relTime rateofregularreport {10*embot::core::time1second}; // how often we send reports for State::OK or State::stillLOST
+            embot::core::relTime periodofreport {10*embot::core::time1second}; // how often we send reports for State::OK or State::stillLOST
             
             const char *ownername {"dummy"}; // for printing the name of the owner 
             eOmn_serv_category_t servicecategory {eomn_serv_category_unknown}; // for reporting the service owning the CANmonitor
             
             constexpr Config(const MAP &map, embot::core::relTime rc, Report rm, embot::core::relTime rr, const char *o, eOmn_serv_category_t s)
             {
-                target = map; rateofcheck = rc; reportmode = rm; ownername = o; servicecategory = s; 
+                target = map; periodofcheck = rc; reportmode = rm; ownername = o; servicecategory = s; 
             }  
             
             Config() = default;
@@ -179,7 +179,7 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
         bool configure(const Config &cfg);  
         bool add(eObrd_canlocation_t cl);
         bool rem(eObrd_canlocation_t cl);
-        bool setcheckrate(embot::core::relTime r);        
+        bool setcheckperiod(embot::core::relTime r);        
         
         bool start();
         bool stop();

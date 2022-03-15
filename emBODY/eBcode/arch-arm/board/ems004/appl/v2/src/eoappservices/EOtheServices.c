@@ -59,7 +59,7 @@
 
 #if defined(TESTRTC_IS_ACTIVE)
 #include "testRTC.h"
-#elif defined(enableSERVICE_TESTER)
+#elif defined(enableTHESERVICETESTER)
 #include "servicetester.h"
 #endif
 
@@ -228,7 +228,7 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
 
 #if defined(TESTRTC_IS_ACTIVE)    
     testRTC_init();
-#elif defined(enableSERVICE_TESTER)
+#elif defined(enableTHESERVICETESTER)
     servicetester_init();
 #endif
     

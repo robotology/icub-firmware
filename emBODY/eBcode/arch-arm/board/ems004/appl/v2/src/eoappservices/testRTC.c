@@ -1504,9 +1504,9 @@ static const eOmn_serv_configuration_t s_serv_config_as_ft =
     .diagnosticsparam = 0,
     .data.as.ft.canmonitorconfig = 
     {
-        .checkrate = 100,
+        .periodofcheck = 100,
         .reportmode = eobrd_canmonitor_reportmode_ALL,
-        .periodicreportrate = 10*1000      
+        .periodofreport = 10*1000      
     },    
     .data.as.ft.arrayofsensors = 
     {
@@ -1654,27 +1654,27 @@ void serv_CONFIG(void *p)
     {
         {
             .mode = eoas_ft_mode_calibrated,
-            .ftdatarate = 50,
+            .ftperiod = 50,
             .calibrationset = 0,
-            .tempdatarate = 1
+            .temperatureperiod = 1
         },
         {
             .mode = eoas_ft_mode_raw,
-            .ftdatarate = 50,
+            .ftperiod = 50,
             .calibrationset = 0,
-            .tempdatarate = 0
+            .temperatureperiod = 0
         }, 
         {
             .mode = eoas_ft_mode_raw,
-            .ftdatarate = 50,
+            .ftperiod = 50,
             .calibrationset = 0,
-            .tempdatarate = 0
+            .temperatureperiod = 0
         },
         {
             .mode = eoas_ft_mode_raw,
-            .ftdatarate = 50,
+            .ftperiod = 50,
             .calibrationset = 0,
-            .tempdatarate = 0
+            .temperatureperiod = 0
         }            
     }; 
     

@@ -17,6 +17,7 @@
 #include "EOtheServices.h"
 #include "EoCommon.h"
 #include "EoProtocol.h"
+#include "embot_app_eth_theServiceTester.h"
 
 #include <vector>
 #include <memory>
@@ -96,10 +97,12 @@ namespace embot { namespace app { namespace eth {
         static constexpr eOas_ft_config_t defaultFTconfig 
         {
             .mode = eoas_ft_mode_calibrated,
-            .ftdatarate = 10,
+            .ftperiod = 10,
             .calibrationset = 0,
-            .tempdatarate = 0
-        };        
+            .temperatureperiod = 1
+        };  
+
+        const theServiceTester::Config & servicetesterconfig() const;        
        
     private:        
         // this one is called inside process() when the tag is eoprot_tag_as_ft_config (or by theServiceTester)

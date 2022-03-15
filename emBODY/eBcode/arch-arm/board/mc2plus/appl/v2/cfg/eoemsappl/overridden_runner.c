@@ -42,7 +42,7 @@
 
 #if defined(TESTRTC_IS_ACTIVE)
 #include "testRTC.h"
-#elif defined(enableSERVICE_TESTER)
+#elif defined(enableTHESERVICETESTER)
 #include "servicetester.h"
 #endif
 

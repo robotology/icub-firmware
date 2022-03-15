@@ -55,7 +55,7 @@ struct embot::app::eth::CANmonitor::Impl
     bool configure(const Config &cfg);
     bool add(eObrd_canlocation_t loc);
     bool rem(eObrd_canlocation_t loc);
-    bool setcheckrate(embot::core::relTime r);
+    bool setcheckperiod(embot::core::relTime r);
     
     bool start();
     bool stop();
@@ -101,10 +101,10 @@ bool embot::app::eth::CANmonitor::Impl::start()
 {
 //    log("start()");
     // i start only if ...
-    // _config.rateofcheck is != 0;
+    // _config.periodofcheck is != 0;
     // and i start also if _config.target is empty, 
     
-    if(0 == _config.rateofcheck)
+    if(0 == _config.periodofcheck)
     {
         return false;
     }
@@ -140,12 +140,12 @@ bool embot::app::eth::CANmonitor::Impl::tick()
     bool forcereport = false;
     embot::core::Time timenow = embot::core::now();
     
-    if((timeoflastcheck + _config.rateofcheck) < timenow)
+    if((timeoflastcheck + _config.periodofcheck) < timenow)
     {
         checknow = true;
     }
     
-    if((timeoflastreport + _config.rateofregularreport) < timenow)
+    if((timeoflastreport + _config.periodofreport) < timenow)
     {
         regularreportnow = true;
     }  
@@ -286,9 +286,9 @@ bool embot::app::eth::CANmonitor::Impl::rem(eObrd_canlocation_t loc)
 }
 
 
-bool embot::app::eth::CANmonitor::Impl::setcheckrate(embot::core::relTime r)
+bool embot::app::eth::CANmonitor::Impl::setcheckperiod(embot::core::relTime r)
 {
-    _config.rateofcheck = r;
+    _config.periodofcheck = r;
     return true;
 }
 
@@ -338,9 +338,9 @@ bool embot::app::eth::CANmonitor::rem(eObrd_canlocation_t loc)
     return pImpl->rem(loc);
 }
 
-bool embot::app::eth::CANmonitor::setcheckrate(embot::core::relTime r)
+bool embot::app::eth::CANmonitor::setcheckperiod(embot::core::relTime r)
 {
-    return pImpl->setcheckrate(r);
+    return pImpl->setcheckperiod(r);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
