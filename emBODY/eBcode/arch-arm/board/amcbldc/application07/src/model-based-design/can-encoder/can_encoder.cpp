@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.53
+// Model version                  : 2.55
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu Feb 17 15:05:37 2022
+// C/C++ source code generated on : Wed Mar  9 12:12:40 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -97,9 +97,9 @@ namespace amc_bldc_codegen
     }
 
     // DataTypeConversion: '<S2>/Data Type Conversion1' incorporates:
-    //   Gain: '<S2>/Gain'
+    //   Gain: '<S2>/Gain1'
 
-    tmp_0 = CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.velocity;
+    tmp_0 = CAN_ANGLE_DEG2ICUB / 1000.0F * arg_messages_tx.foc.velocity;
     if (tmp_0 < 32768.0F) {
       if (tmp_0 >= -32768.0F) {
         rtb_DataTypeConversion1_0 = static_cast<int16_T>(tmp_0);
@@ -111,7 +111,7 @@ namespace amc_bldc_codegen
     }
 
     // DataTypeConversion: '<S2>/Data Type Conversion2' incorporates:
-    //   Gain: '<S2>/Gain1'
+    //   Gain: '<S2>/Gain3'
 
     tmp_0 = CAN_ANGLE_DEG2ICUB * arg_messages_tx.foc.position;
     if (tmp_0 < 2.14748365E+9F) {

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.53
+// Model version                  : 2.55
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu Feb 17 15:05:37 2022
+// C/C++ source code generated on : Wed Mar  9 12:12:40 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -34,8 +34,8 @@
 
 extern real32_T CAN_ANGLE_DEG2ICUB;    // Variable: CAN_ANGLE_DEG2ICUB
                                           //  Referenced by:
-                                          //    '<S2>/Gain'
                                           //    '<S2>/Gain1'
+                                          //    '<S2>/Gain3'
                                           //  2^16/360
 
 extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
