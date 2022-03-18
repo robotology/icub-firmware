@@ -45,6 +45,7 @@
 #include "EOarray.h"
 
 #include "EoProtocolAS.h"
+#include "EOMmutex.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -76,6 +77,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+typedef enum { actor_none = 0, actor_cfg = 1, actor_run = 2 } actor_t;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -92,10 +94,18 @@ static void s_services_test_stop(void *arg);
 static void s_services_test_stop_everything(void *arg);
 
 
+
+#if defined(TESTRTC_MC)
+
 static void s_services_test_mc_init(void);
 static void s_services_test_mc_multiplesteps(void *arg);
 static void s_services_test_mc_stop(void *par);
 
+#else
+static void s_services_test_mc_init(void) {}
+static void s_services_test_mc_multiplesteps(void *arg) {}
+static void s_services_test_mc_stop(void *par) {}
+#endif // #if defined(TESTRTC_MC)
 
 
 //static void s_services_test_inertials_init();
@@ -103,10 +113,31 @@ static void s_services_test_mc_stop(void *par);
 //static void s_services_test_inertials_stop(void *par);
 
 
+
+#if defined(TESTRTC_POS)
+
 static void s_services_test_pos_init(void);
 static void s_services_test_pos_multiplesteps(void *arg);
 static void s_services_test_pos_stop(void *par);
 
+#else
+static void s_services_test_pos_init(void) {}
+static void s_services_test_pos_multiplesteps(void *arg) {}
+static void s_services_test_pos_stop(void *par) {}    
+#endif // #if defined(TESTRTC_POS)
+
+
+#if defined(TESTRTC_FT)
+
+static void s_services_test_ft_init(void);
+static void s_services_test_ft_multiplesteps(void *arg);
+static void s_services_test_ft_stop(void *par);
+
+#else
+static void s_services_test_ft_init(void) {}
+static void s_services_test_ft_multiplesteps(void *arg) {}
+static void s_services_test_ft_stop(void *par) {}    
+#endif // #if defined(TESTRTC_FT)
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -120,6 +151,8 @@ static void s_services_test_pos_stop(void *par);
 static const eOmn_serv_category_t s_service_under_test = eomn_serv_category_mc; 
 #elif defined(TESTRTC_POS)
 static const eOmn_serv_category_t s_service_under_test = eomn_serv_category_pos;
+#elif defined(TESTRTC_FT)
+static const eOmn_serv_category_t s_service_under_test = eomn_serv_category_ft;
 #endif
 
 
@@ -141,6 +174,10 @@ static const eOmn_serv_configuration_t* s_test_config_ko = NULL;
 static EOaction_strg s_astrg = {0};
 static EOaction *s_act = (EOaction*)&s_astrg;
 
+#if defined(TESTRTC_FT) 
+void s_services_test_ft_tick(actor_t a);
+#endif
+
 #endif
 
 
@@ -151,7 +188,7 @@ static EOaction *s_act = (EOaction*)&s_astrg;
 extern void testRTC_init(void)
 {
 #if defined(TESTRTC_IS_ACTIVE)
-    
+        
     if(NULL == s_timer)
     {
         s_timer = eo_timer_New();
@@ -168,24 +205,31 @@ extern void testRTC_RUN_tick(void)
 {
 #if defined(TESTRTC_IS_ACTIVE)
 
+#if defined(TESTRTC_FT) 
+        s_services_test_ft_tick(actor_run);
+#else  
     if(1 == services_stop_ANY_service_now)
     {
         services_stop_ANY_service_now = 0;
         s_services_test_stop(NULL);
     }
-    
+#endif    
 #endif    
 }
 
 extern void testRTC_CFG_tick(void)
 {
 #if defined(TESTRTC_IS_ACTIVE)
+
+#if defined(TESTRTC_FT) 
+        s_services_test_ft_tick(actor_cfg);
+#else    
     
     if(NULL != s_service_tick)
     {
         s_service_tick(NULL);
     }
-    
+#endif    
 #endif    
 }
 
@@ -196,9 +240,12 @@ extern void testRTC_CFG_tick(void)
 
 
 #if defined(TESTRTC_IS_ACTIVE) 
-extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
+extern "C"
 {
-    testRTC_CFG_tick();
+    extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
+    {
+        testRTC_CFG_tick();
+    }
 }
 #endif
 
@@ -231,11 +278,18 @@ static void s_eo_services_test_initialise(void)
         {
             s_services_test_pos_init();            
         } break;
+        
+        case eomn_serv_category_ft:
+        {
+            s_services_test_ft_init();            
+        } break;        
     }       
-    
+
+#if !defined(TESTRTC_FT)    
     EOVtaskDerived * t = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
     eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, t);    
-    eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);     
+    eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
+#endif    
 }
 
 
@@ -287,12 +341,14 @@ static void s_services_test_stop_everything(void *arg)
 // -----------------------------------------------------------------------------------------------------------
 // motion control ....
 
+#if defined(TESTRTC_MC)
 
 //eo_motcon_mode_mc4pluspmc
 static const eOmn_serv_configuration_t s_serv_config_mc_mc4pluspmc =
 {   
     .type       = eomn_serv_MC_mc4pluspmc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.mc4pluspmc = 
     {
         .pos   =
@@ -515,7 +571,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_mc4pluspmc =
 static const eOmn_serv_configuration_t s_serv_config_mc_mc4plusfaps =
 {   
     .type       = eomn_serv_MC_mc4plusfaps,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.mc4plusfaps = 
     {
         .pos   =
@@ -661,7 +718,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_mc4plusfaps =
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
 {   // eb1 / eb3
     .type       = eomn_serv_MC_foc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.foc_based = 
     {
         .version   =
@@ -790,7 +848,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
 {   // eb1 / eb3
     .type       = eomn_serv_MC_foc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.foc_based = 
     {
         .version   =
@@ -920,7 +979,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
 {   // eb1 / eb3
     .type       = eomn_serv_MC_foc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.foc_based = 
     {
         .version   =
@@ -1050,7 +1110,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
 {   // eb1 / eb3
     .type       = eomn_serv_MC_foc,
-    .filler     = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.mc.foc_based = 
     {
         .version   =
@@ -1177,7 +1238,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
 };
 
 
-
 static void s_services_test_mc_init(void)
 {
     //s_test_config_ko = &s_serv_config_mc_eb1_fake_inc;
@@ -1283,8 +1343,13 @@ static void s_services_test_mc_multiplesteps(void *arg)
 }
 
 
+#endif // #if defined(TESTRTC_MC)
+
 // --------------------------------------------------------------------------------------------------------------------
 // pos
+
+
+#if defined(TESTRTC_POS)
 
 #include "EOthePOS.h"
 
@@ -1292,7 +1357,8 @@ static void s_services_test_mc_multiplesteps(void *arg)
 static const eOmn_serv_configuration_t s_serv_config_as_pos =
 {   
     .type = eomn_serv_AS_pos,
-    .filler = {0},
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
     .data.as.pos = 
     {
         .version = 
@@ -1417,6 +1483,441 @@ static void s_services_test_pos_stop(void *par)
 
 
 
+#endif // #if defined(TESTRTC_POS)
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// ft
+
+
+#if defined(TESTRTC_FT)
+
+#include "embot_app_eth_theFTservice.h"
+
+constexpr size_t numberofFTs {1};
+
+static const eOmn_serv_configuration_t s_serv_config_as_ft =
+{   
+    .type = eomn_serv_AS_ft,
+    .diagnosticsmode = eomn_serv_diagn_mode_NONE,
+    .diagnosticsparam = 0,
+    .data.as.ft.canmonitorconfig = 
+    {
+        .periodofcheck = 100,
+        .reportmode = eobrd_canmonitor_reportmode_ALL,
+        .periodofreport = 10*1000      
+    },    
+    .data.as.ft.arrayofsensors = 
+    {
+        .head   = 
+        {
+            .capacity       = eOas_ft_sensors_maxnumber,
+            .itemsize       = sizeof(eOas_ft_sensordescriptor_t),
+            .size           = numberofFTs,
+            .internalmem    = 0                    
+        },
+        .data   =
+        {
+            {   // 0
+                .boardinfo =
+                {
+                    .type = eobrd_strain2, 
+                    .firmware = {0, 0, 0},
+                    .protocol = {2, 0}                      
+                },
+                .canloc = 
+                {
+                    .port = eOcanport1, 
+                    .addr = 13, 
+                    .insideindex = eobrd_caninsideindex_none                    
+                },
+                .ffu = 0
+            },
+            {   // 1
+                .boardinfo =
+                {
+                    .type = eobrd_strain2, 
+                    .firmware = {0, 0, 0},
+                    .protocol = {0, 0}                      
+                },
+                .canloc = 
+                {
+                    .port = eOcanport1, 
+                    .addr = 1, 
+                    .insideindex = eobrd_caninsideindex_none                    
+                },
+                .ffu = 0
+            },
+            {   // 2
+                .boardinfo =
+                {
+                    .type = eobrd_none, 
+                    .firmware = {0, 0, 0},
+                    .protocol = {0, 0}                    
+                },
+                .canloc = 
+                {
+                    .port = eOcanport1, 
+                    .addr = 2, 
+                    .insideindex = eobrd_caninsideindex_none                    
+                },
+                .ffu = 0
+            },
+            {   // 3
+                .boardinfo =
+                {
+                    .type = eobrd_none, 
+                    .firmware = {0, 0, 0},
+                    .protocol = {0, 0}                    
+                },
+                .canloc = 
+                {
+                    .port = eOcanport1, 
+                    .addr = 2, 
+                    .insideindex = eobrd_caninsideindex_none                    
+                },
+                .ffu = 0
+            }            
+        }
+     } 
+};
+
+static uint8_t step2use = 0;
+static uint8_t action_run = 0;
+
+
+typedef struct 
+{
+    EOMmutex *mtx;
+    actor_t actor;
+    eOvoid_fp_voidp_t action;
+    void * par;    
+} functor_t;
+
+volatile functor_t functor = { .mtx = NULL, .actor = actor_none, .action = NULL, .par = NULL };
+
+
+static void s_services_test_ft_step();
+
+static void s_services_test_ft_init(void)
+{
+    s_test_config_ok = &s_serv_config_as_ft; 
+    s_test_config_ko = &s_serv_config_as_ft;
+    s_service_tick = NULL; //s_services_test_ft_multiplesteps;   
+    functor.actor = actor_none;
+    functor.action = NULL;
+    functor.par = NULL;  
+    functor.mtx = eom_mutex_New();
+    
+    step2use = 0;
+    s_services_test_ft_step();
+}
+
+void sendevent2cfgby(eOreltime_t delta)
+{
+    EOVtaskDerived * t = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
+    eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, t);    
+    eo_timer_Start(s_timer, eok_abstimeNOW, delta, eo_tmrmode_ONESHOT, s_act);     
+}
+
+
+void functor_fill(actor_t actor, eOvoid_fp_voidp_t action, void *par)
+{
+    eom_mutex_Take(functor.mtx, eok_reltimeINFINITE);
+    functor.actor = actor;
+    functor.action = action;
+    functor.par = par;
+    eom_mutex_Release(functor.mtx);        
+}
+
+void serv_STOP(void *p)
+{
+    s_command.category = s_service_under_test;
+    s_command.operation = eomn_serv_operation_stop;
+    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
+    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);           
+}
+
+void serv_VERIFYACTIVATE(void *p)
+{
+    //const eOmn_serv_configuration_t* cfg = (const eOmn_serv_configuration_t*) p;
+    s_command.category = s_service_under_test;
+    s_command.operation = eomn_serv_operation_verifyactivate;
+    memcpy(&s_command.parameter.configuration, s_test_config_ok, sizeof(eOmn_serv_configuration_t));         
+    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);   
+}
+
+void serv_CONFIG(void *p)
+{       
+    eOas_ft_config_t ftconfig[4] =
+    {
+        {
+            .mode = eoas_ft_mode_calibrated,
+            .ftperiod = 50,
+            .calibrationset = 0,
+            .temperatureperiod = 1
+        },
+        {
+            .mode = eoas_ft_mode_raw,
+            .ftperiod = 50,
+            .calibrationset = 0,
+            .temperatureperiod = 0
+        }, 
+        {
+            .mode = eoas_ft_mode_raw,
+            .ftperiod = 50,
+            .calibrationset = 0,
+            .temperatureperiod = 0
+        },
+        {
+            .mode = eoas_ft_mode_raw,
+            .ftperiod = 50,
+            .calibrationset = 0,
+            .temperatureperiod = 0
+        }            
+    }; 
+    
+    for(uint8_t i=0; i<numberofFTs; i++)
+    {
+        eOropdescriptor_t ropdes = {};
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, i, eoprot_tag_as_ft_config);
+
+        embot::app::eth::fill(ropdes, id32, &ftconfig[i], sizeof(ftconfig));    
+
+        embot::app::eth::theFTservice::getInstance().process(&ropdes);   
+    }        
+}
+
+void serv_TXstart(void *p)
+{  
+    for(uint8_t i=0; i<numberofFTs; i++)
+    {
+        uint8_t enable = 1;  
+        eOropdescriptor_t ropdes = {};
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, i, eoprot_tag_as_ft_cmmnds_enable);
+        embot::app::eth::fill(ropdes, id32, &enable, sizeof(enable));    
+        embot::app::eth::theFTservice::getInstance().process(&ropdes);  
+    }
+}
+
+void fillfunctorTX(void *p)
+{
+    functor_fill(actor_run, serv_TXstart, NULL);
+}
+
+void fillfunctorSTOP(void *p)
+{
+    functor_fill(actor_run, serv_STOP, NULL);
+}
+
+void serv_REGULARS(void *p)
+{       
+    s_command.category = s_service_under_test;
+    s_command.operation = eomn_serv_operation_regsig_load;
+    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
+    
+
+    eOmn_serv_arrayof_id32_t id32s = {};
+    EOarray* ar = eo_array_New(eOmn_serv_capacity_arrayof_id32, 4, &s_command.parameter.arrayofid32);
+    for(uint8_t i=0; i<numberofFTs; i++)
+    {        
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_ft, i, eoprot_tag_as_ft_status_timedvalue);
+        eo_array_PushBack(ar, &id32); 
+    }        
+    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
+}
+
+void serv_START(void *p)
+{       
+    s_command.category = s_service_under_test;
+    s_command.operation = eomn_serv_operation_start;
+    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));        
+    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);          
+}
+
+
+
+
+static void s_services_test_ft_step()
+{
+    eOreltime_t delta = 1*eok_reltime1sec;
+    eOreltime_t runTXtime = 600*eok_reltime1sec;
+    
+    //step2use = 1;
+    
+    if(0 == step2use)
+    {
+        // INIT asks to CFG -> STOP()
+        functor_fill(actor_cfg, serv_STOP, NULL);        
+        sendevent2cfgby(delta);         
+    }
+    else if(1 == step2use)
+    {
+        // CFG ask to CFG -> VERIFY_ACTIVATE(okconfig)
+        functor_fill(actor_cfg, serv_VERIFYACTIVATE, NULL);        
+        sendevent2cfgby(delta);        
+    }
+//    else if(2 == step2use)
+//    {
+//        // CFG asks to CFG -> VERIFY_ACTIVATE(okconfig)
+//        functor_fill(actor_cfg, serv_VERIFYACTIVATE, &s_test_config_ok);        
+//        sendevent2cfgby(delta);        
+//    }    
+    else if(2 == step2use)
+    {
+        // CFG asks to CFG -> CFG()
+        functor_fill(actor_cfg, serv_CONFIG, NULL);        
+        sendevent2cfgby(delta);        
+    }     
+    else if(3 == step2use)
+    {
+        // CFG asks to CFG -> REGULARS()
+        functor_fill(actor_cfg, serv_REGULARS, NULL);        
+        sendevent2cfgby(delta);        
+    }     
+    else if(4 == step2use)
+    {
+        // CFG asks to CFG -> START()
+        functor_fill(actor_cfg, serv_START, NULL);        
+        sendevent2cfgby(delta);        
+    } 
+    else if(5 == step2use)
+    {
+        // we are still inside CFG which has just executed serv_START()
+        // but we stay in CFG for short time because the START sends the application in RUN mode
+        // so, ... next request will be done to RUN
+        // CFG asks to RUN -> TX()
+        // we exec a callback by delta time which:
+        // - fills the functor for the sake of the run thread
+        
+        functor_fill(actor_none, NULL, NULL);
+        
+        // this timer will force the TX enable on CAN
+        EOVtaskDerived * t = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
+        eo_action_SetCallback(s_act, fillfunctorTX, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, delta, eo_tmrmode_ONESHOT, s_act);
+       
+        // next time we execute inside RUN ....         
+    } 
+    else if(6 == step2use)
+    {
+        // we have just started TX on CAN
+        functor_fill(actor_none, NULL, NULL);
+        
+        // this timer will force the stop of the service
+        EOVtaskDerived * t = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
+        eo_action_SetCallback(s_act, fillfunctorSTOP, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, runTXtime, eo_tmrmode_ONESHOT, s_act);
+    }
+    
+    step2use++;
+}
+
+void s_services_test_ft_tick(actor_t a)
+{
+    // we execute only if .... 
+    eom_mutex_Take(functor.mtx, eok_reltimeINFINITE);
+    if(a == functor.actor)
+    {
+        if(NULL != functor.action)
+        {
+            functor.action(functor.par);
+        }
+        functor_fill(actor_none, NULL, NULL);
+        s_services_test_ft_step();        
+    }
+    eom_mutex_Release(functor.mtx);        
+}
+
+
+//static void s_services_test_ft_multiplesteps(void *arg)
+//{
+//    // this is a test for fully working activate() /  deactivate()
+//    static uint8_t step = 0;
+//    
+//    step++;
+//    
+//    if(1 == step)
+//    {
+//        s_services_test_stop(arg);
+//        
+//        services_stop_ANY_service_now = 0;
+//        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+//        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+//    }
+//    else if(2 == step)
+//    {   // verify-activate
+//        s_services_test_verifyactivate(s_test_config_ok);
+//        
+//        services_stop_ANY_service_now = 0;
+//        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+//        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);              
+//    }
+//    else if(3 == step)
+//    {   // pos config  
+//        
+//        eOas_pos_config_t config = {0};
+//        config.datarate = 10; // ms
+
+//        eo_pos_Config(eo_pos_GetHandle(), &config);
+//        
+//        services_stop_ANY_service_now = 0;
+//        eo_action_SetCallback(s_act, s_services_test_pos_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+//        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
+//    }
+//    else if(4 == step)
+//    {   // regsig  
+//        
+//        s_command.category = s_service_under_test;
+//        s_command.operation = eomn_serv_operation_regsig_load;
+//        memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
+//        
+//        eOmn_serv_arrayof_id32_t id32s = {};
+//        EOarray* ar = eo_array_New(eOmn_serv_capacity_arrayof_id32, 4, &s_command.parameter.arrayofid32);   
+//        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_pos, 0, eoprot_tag_as_pos_status);
+//        eo_array_PushBack(ar, &id32);  
+//                      
+//            
+//        // ok, we have received a command for a given service. we ask the object theservices to manage the thing
+//        
+//        eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);  
+//        
+//        services_stop_ANY_service_now = 0;
+//        eo_action_SetCallback(s_act, s_services_test_pos_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+//        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
+//    }
+//    else if(5 == step)
+//    {   // service start        
+//        s_services_test_start(arg);
+//        
+//        services_stop_ANY_service_now = 0;
+//        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+//        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+//    }
+//    else if(6 == step)
+//    {   // tx enable        
+//        eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);
+//        
+//        services_stop_ANY_service_now = 0;
+//        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+//        eo_timer_Start(s_timer, eok_abstimeNOW, 30*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);   
+//    }  
+//    else if(7 == step)
+//    {
+//        s_services_test_stop_everything(NULL);
+//    }
+//}
+
+
+//static void s_services_test_pos_stop(void *par)
+//{   
+//    s_services_test_stop_everything(NULL);   
+//}
+
+
+
+#endif // #if defined(TESTRTC_FT)
 
 
 #endif // TESTRTC_IS_ACTIVE

@@ -57,11 +57,17 @@
 
 #include "EOtheSharedHW.h"
 
+#if defined(TESTRTC_IS_ACTIVE)
 #include "testRTC.h"
+#elif defined(enableTHESERVICETESTER)
+#include "servicetester.h"
+#endif
 
 #include "EOtheMemoryPool.h"
 
 #include "EOtheFatalError.h"
+
+#include "embot_app_eth_theFTservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -126,6 +132,7 @@ static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok
 static eOresult_t s_services_callback_afterverify_skin(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_mais(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_strain(EOaService* p, eObool_t operationisok);
+static eOresult_t s_services_callback_afterverify_ft(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_inertial(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_temperatures(EOaService* p, eObool_t operationisok);
@@ -221,6 +228,8 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
 
 #if defined(TESTRTC_IS_ACTIVE)    
     testRTC_init();
+#elif defined(enableTHESERVICETESTER)
+    servicetester_init();
 #endif
     
     eo_errman_Trace(eo_errman_GetHandle(), "eo_services_Initialise() is over", s_eobj_ownname);
@@ -267,6 +276,11 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
         {
             state = eo_strain_GetServiceState(eo_strain_GetHandle());   
         } break;
+
+        case eomn_serv_category_ft:
+        {
+            state = embot::app::eth::theFTservice::getInstance().GetServiceState();           
+        } break;  
         
         case eomn_serv_category_inertials:
         {
@@ -632,7 +646,8 @@ static void s_eo_services_initialise(EOtheServices *p)
         eo_entities_Initialise();
         eo_canmap_Initialise(NULL);
         eo_canprot_Initialise(NULL);
-        eo_strain_Initialise();  
+        eo_strain_Initialise(); 
+        embot::app::eth::theFTservice::getInstance().initialise({});        
         eo_mais_Initialise();        
         eo_motioncontrol_Initialise();    
         eo_skin_Initialise(); 
@@ -825,6 +840,18 @@ static eOresult_t s_services_callback_afterverify_strain(EOaService* p, eObool_t
     return(eores_OK);
 }
 
+static eOresult_t s_services_callback_afterverify_ft(EOaService* p, eObool_t operationisok)
+{
+    if(eobool_false == operationisok)
+    {
+        embot::app::eth::theFTservice::getInstance().SendReport();
+        embot::app::eth::theFTservice::getInstance().Deactivate();
+    }
+    
+    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_ft, eomn_serv_AS_ft, eo_service_ft);
+      
+    return(eores_OK);
+}
 
 static eOresult_t s_services_callback_afterverify_skin(EOaService* p, eObool_t operationisok)
 {   
@@ -960,6 +987,18 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
             eo_strain_Verify(eo_strain_GetHandle(), config, s_services_callback_afterverify_strain, eobool_true);
         } break;
 
+        case eomn_serv_category_ft: 
+        {
+            if(eobool_true == uselocalconfig)  
+            {
+                config = NULL;
+                
+                errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_ft_using_onboard_config);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
+            }                
+            embot::app::eth::theFTservice::getInstance().Verify(config, s_services_callback_afterverify_ft, eobool_true);
+        } break;        
+        
         case eomn_serv_category_mais: 
         {
             if(eobool_true == uselocalconfig)  
@@ -1168,6 +1207,11 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
             res = eo_strain_SetRegulars(eo_strain_GetHandle(), arrayofid32, &number);
         } break;
 
+        case eomn_serv_category_ft:
+        {
+            res = embot::app::eth::theFTservice::getInstance().SetRegulars(arrayofid32, &number);
+        } break;
+        
         case eomn_serv_category_mais:
         {
             res = eo_mais_SetRegulars(eo_mais_GetHandle(), arrayofid32, &number);
@@ -1264,6 +1308,11 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
             res = eo_strain_Start(eo_strain_GetHandle());
         } break;
 
+        case eomn_serv_category_ft:
+        {
+            res = embot::app::eth::theFTservice::getInstance().Start();
+        } break;
+        
         case eomn_serv_category_mais:
         {
             res = eo_mais_Start(eo_mais_GetHandle());
@@ -1347,6 +1396,17 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             }
         } break;
 
+        case eomn_serv_category_ft:
+        {
+            res = embot::app::eth::theFTservice::getInstance().Stop();
+            embot::app::eth::theFTservice::getInstance().SetRegulars(nullptr, numofregulars);
+            p->running[eomn_serv_category_ft] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {
+                embot::app::eth::theFTservice::getInstance().Deactivate();
+            }
+        } break;
+        
         case eomn_serv_category_mais:
         {
             res = eores_OK; // prefer not to stop mais in order to avoid problems with the mc4can boards going in hw fault .... 
@@ -1449,6 +1509,14 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             if(eobool_true == and_deactivate)
             {
                 eo_strain_Deactivate(eo_strain_GetHandle());
+            }
+
+            embot::app::eth::theFTservice::getInstance().Stop();
+            embot::app::eth::theFTservice::getInstance().SetRegulars(NULL, NULL);
+            p->running[eomn_serv_category_ft] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {
+                embot::app::eth::theFTservice::getInstance().Deactivate();
             }
             
             eo_skin_Stop(eo_skin_GetHandle());

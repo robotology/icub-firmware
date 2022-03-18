@@ -1581,7 +1581,7 @@ static void s_eo_inertials2_presenceofcanboards_tick(EOtheInertials2 *p)
             eOerrmanDescriptor_t errdes = {0};
             errdes.sourcedevice       = eo_errman_sourcedevice_localboard;
             errdes.sourceaddress      = 0;
-            errdes.par16              = eobrd_mtb;
+            errdes.par16              = eomn_serv_category_inertials;
             errdes.par64              = (p->not_heardof_status[0] << 16) | p->not_heardof_status[1];        
             errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_lostcontact);
             p->diagnostics.errorType = eo_errortype_warning;                

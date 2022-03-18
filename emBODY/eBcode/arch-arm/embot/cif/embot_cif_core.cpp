@@ -20,14 +20,23 @@
 #include "embot_core.h"
 
 
-#warning MEMO: do we need to call embot::os::init() instead?
-#warning MEMO: do we need to redefine new / delete / new[] / delete[] as well?   
+embot_cif_core_Config config {};
+    
+int pprint(const std::string &str)
+{
+    if(nullptr != config.print)
+    {
+        return config.print(str.c_str());
+    }
+    return 0;
+}
     
 extern void embot_cif_core_Init(const embot_cif_core_Config *cfg)
 {
     if((nullptr != cfg) && (nullptr != cfg->timeget))
     {
-        embot::core::init({{cfg->timeinit, cfg->timeget}});
+        config = *cfg;
+        embot::core::init({{config.timeinit, config.timeget}, {pprint}});
     }
 }
     

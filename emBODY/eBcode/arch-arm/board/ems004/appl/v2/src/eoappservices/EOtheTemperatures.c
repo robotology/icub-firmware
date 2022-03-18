@@ -1517,7 +1517,7 @@ static void s_eo_temperatures_presenceofcanboards_tick(EOtheTemperatures *p)
             eOerrmanDescriptor_t errdes = {0};
             errdes.sourcedevice       = eo_errman_sourcedevice_localboard;
             errdes.sourceaddress      = 0;
-            errdes.par16              = eobrd_unknown;
+            errdes.par16              = eomn_serv_category_temperatures;
             errdes.par64              = (p->not_heardof_status[0] << 16) | p->not_heardof_status[1];        
             errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_lostcontact);
             p->diagnostics.errorType = eo_errortype_warning;                

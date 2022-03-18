@@ -40,8 +40,12 @@
 //#include "EOtheMAIS.h"
 #include "EOtheSTRAIN.h"
 
+#include "embot_app_eth_theFTservice.h"
+
 #if defined(TESTRTC_IS_ACTIVE)
 #include "testRTC.h"
+#elif defined(enableTHESERVICETESTER)
+#include "servicetester.h"
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,12 +119,11 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
     eo_canserv_ParseAll(eo_canserv_GetHandle());    
     
-    //eo_mais_Tick(eo_mais_GetHandle());
-    eo_strain_Tick(eo_strain_GetHandle());
- 
 #if defined(TESTRTC_IS_ACTIVE)     
     testRTC_RUN_tick();
-#endif     
+#elif defined(enableTHESERVICETESTER)
+    servicetester_runtick();
+#endif    
 }
 
 
@@ -134,6 +137,10 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     
     eo_mais_Tick(eo_mais_GetHandle());
     eo_strain_Tick(eo_strain_GetHandle());
+    
+    // ft service
+    embot::app::eth::theFTservice::getInstance().Tick();
+    
     eo_psc_Tick(eo_psc_GetHandle());
     eo_pos_Tick(eo_pos_GetHandle());
     

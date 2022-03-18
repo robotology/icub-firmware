@@ -53,6 +53,7 @@
 #include "EOtheETHmonitor.h"
 #include "EOVtheCallbackManager.h"
 
+#include "embot_app_eth_theFTservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -184,9 +185,13 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     
     // stop tx activity of services that may have been started by callback function
     
-    // strain... no strain in here
+    // strain... 
     eo_strain_Stop(eo_strain_GetHandle());
     eo_strain_Deactivate(eo_strain_GetHandle());
+    
+    // ft service
+    embot::app::eth::theFTservice::getInstance().Stop();
+    embot::app::eth::theFTservice::getInstance().Deactivate();    
         
     // skin
     eo_skin_Stop(eo_skin_GetHandle());
@@ -238,10 +243,14 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
         
     // stop tx activity of services that may have been started by callback function
     
-    // strain... no strain in here
-//    eo_strain_Stop(eo_strain_GetHandle());
-//    eo_strain_Deactivate(eo_strain_GetHandle());
-        
+    // strain... 
+    eo_strain_Stop(eo_strain_GetHandle());
+    eo_strain_Deactivate(eo_strain_GetHandle());
+
+    // ft service
+    embot::app::eth::theFTservice::getInstance().Stop();
+    embot::app::eth::theFTservice::getInstance().Deactivate();
+    
     // skin
     eo_skin_Stop(eo_skin_GetHandle());
     eo_skin_Deactivate(eo_skin_GetHandle());
