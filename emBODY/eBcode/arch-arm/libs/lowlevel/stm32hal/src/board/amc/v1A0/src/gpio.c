@@ -69,6 +69,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
 //  HAL_GPIO_WritePin(GPIOF, ETH_nSEL_Pin|EE_nHOLD_Pin, GPIO_PIN_SET);
+  // tecnologix ETH PF6
   HAL_GPIO_WritePin(GPIOF, ETH_nSEL_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
@@ -77,6 +78,8 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
 //  HAL_GPIO_WritePin(EE_nWP_GPIO_Port, EE_nWP_Pin, GPIO_PIN_RESET);
 
+  // tecnologix ETH PE0 PE1
+  /*Configure GPIO pins : PE0 PE1 */
   /*Configure GPIO pins : PEPin PEPin */
   GPIO_InitStruct.Pin = ETH_nPME_Pin|ETH_nIRQ_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
@@ -90,6 +93,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
+  // tecnologix ETH PA8
+  /*Configure GPIO pin : PA8 */
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = TP2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -112,18 +117,34 @@ void MX_GPIO_Init(void)
 //  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 //  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
+  // tecnologix ETH PF6
   /*Configure GPIO pins : PFPin PFPin PFPin */
   GPIO_InitStruct.Pin = ETH_nSEL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+  
+  // tecnologix ??
+//  /*Configure GPIO pin : PH1 */
+//  GPIO_InitStruct.Pin = GPIO_PIN_1;
+//  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+//  GPIO_InitStruct.Pull = GPIO_NOPULL;
+//  HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PtPin */
+//  /*Configure GPIO pin : PtPin */
+//  GPIO_InitStruct.Pin = ETH_nRST_Pin;
+//  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+//  GPIO_InitStruct.Pull = GPIO_NOPULL;
+//  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+//  HAL_GPIO_Init(ETH_nRST_GPIO_Port, &GPIO_InitStruct);
+
+  // tecnologix uses ... OUTPUT_PP + FREQ_LOW
+  /*Configure GPIO pin : ETH_nRST_Pin */
   GPIO_InitStruct.Pin = ETH_nRST_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(ETH_nRST_GPIO_Port, &GPIO_InitStruct);
 }
 

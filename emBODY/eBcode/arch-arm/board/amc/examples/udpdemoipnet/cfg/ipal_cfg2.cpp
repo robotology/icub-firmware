@@ -9,7 +9,7 @@
 #include "ipal_cfg2.h"
 
 // external dependencies
-#include "ipal_hal_eth_stm32h7.h"
+#include "embot_hw_eth.h"
 
 #include "embot_core.h"
     
@@ -49,7 +49,7 @@ static const ipal_cfg2_support_t suppcfg2 =
 
 static const ipal_cfg2_system_t syscfg2 = 
 {
-    .sys_timetick = 50*embot::core::time1millisec,
+    .sys_timetick = 10000,
     .sys_mempoolsize = 0,
     .filler = {0, 0}        
 };
@@ -61,12 +61,12 @@ static const ipal_cfg2_eth_t ethcfg2 =
     .eth_mask = IPAL_ipv4addr(255, 255, 255, 0),
     .eth_isrpriority = 0,
     .filler = {0, 0, 0, 0, 0, 0, 0},
-    .hal_eth_init = ipal_hal_eth_stm32h7_init,
-    .hal_eth_enable = ipal_hal_eth_stm32h7_enable,
-    .hal_eth_disable = ipal_hal_eth_stm32h7_disable,
-    .hal_eth_sendframe = ipal_hal_eth_stm32h7_sendframe,
-    .get_frame_size = ipal_hal_eth_stm32h7_get_frame_size,
-    .get_frame = ipal_hal_eth_stm32h7_get_frame    
+    .hal_eth_init = embot::hw::eth::init,
+    .hal_eth_enable = embot::hw::eth::enable,
+    .hal_eth_disable = embot::hw::eth::disable,
+    .hal_eth_sendframe = embot::hw::eth::sendframe,
+    .get_frame_size = embot::hw::eth::get_frame_size,
+    .get_frame = embot::hw::eth::get_frame       
 };
 
 static const ipal_cfg2_arp_t arpcfg2 =

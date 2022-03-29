@@ -173,10 +173,10 @@ namespace embot { namespace hw { namespace led {
     
     constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::thirteen}  };  
     constexpr PROP led2p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::fifteen}  };  
-    constexpr PROP led3p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::two}  }; 
-    constexpr PROP led4p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::three}  };     
-    constexpr PROP led5p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::four}  }; 
-    constexpr PROP led6p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::five}  }; 
+    constexpr PROP led3p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::two}  }; 
+    constexpr PROP led4p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::three}  };     
+    constexpr PROP led5p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::four}  }; 
+    constexpr PROP led6p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::five}  }; 
     
     constexpr BSP thebsp {        
         // maskofsupported
@@ -609,47 +609,6 @@ namespace embot { namespace hw { namespace flash {
 // - support map: end of embot::hw::flash
 
 
-// - support map: begin of embot::hw::eth
-
-//#include "embot_hw_can_eth.h"
-
-#if   !defined(EMBOT_ENABLE_hw_eth)
-
-namespace embot { namespace hw { namespace eth {
-    
-    
-}}}
-
-#else
-    
-#error support for hw_eth in embot::hw::bsp is yet to be done
-
-namespace embot { namespace hw { namespace eth {
-               
-    #if   defined(STM32HAL_BOARD_AMC)
-    
-    // it has HAL_ETH_MODULE_ENABLED  
-    // in here we add ....
-
-    #else
-        #error embot::hw::eth::thebsp must be defined    
-    #endif
-
-              
-}}} // namespace embot { namespace hw { namespace eth {
-    
-
-    #if defined(HAL_ETH_MODULE_ENABLED)
-
-
-    #endif //#if defined(HAL_ETH_MODULE_ENABLED)
-            
-#endif // EMBOT_ENABLE_hw_eth
-
-
-// - support map: end of embot::hw::eth
-
-
 // - support map: begin of embot::hw::eeprom
 
 #include "embot_hw_eeprom.h"
@@ -731,16 +690,16 @@ namespace embot { namespace hw { namespace eeprom {
 
 #if !defined(EMBOT_ENABLE_hw_spi)
 
-namespace embot { namespace hw { namespace spi {
+namespace embot { namespace hw { namespace spi { namespace bsp {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::SPI h) const {}
+    bool BSP::init(embot::hw::SPI h, const Config &config) const { return true;}
     const BSP& getBSP() 
     {
         return thebsp;
     }
     
-}}}
+}}}}
 
 #else
 
@@ -755,14 +714,14 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
     }
     
     
-SPI_HandleTypeDef hspi1;
-constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi1 = { {
-    {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine},     // miso
-    {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::seven},    // mosi
-    {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eleven},   // sckl
-    {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::ten}       // ssel
-} };
-constexpr PROP spi1p = { &hspi1, 50*1000*1000, pinoutspi1 }; 
+    SPI_HandleTypeDef hspi1;
+    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi1 = { {
+        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine},     // miso
+        {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::seven},    // mosi
+        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eleven},   // sckl
+        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::ten}       // ssel
+    } };
+    constexpr PROP spi1p = { &hspi1, 50*1000*1000, pinoutspi1 }; 
     
     
     SPI_HandleTypeDef hspi2;
@@ -784,7 +743,12 @@ constexpr PROP spi1p = { &hspi1, 50*1000*1000, pinoutspi1 };
     constexpr PROP spi3p = { &hspi3, 50*1000*1000, pinoutspi3 };       
     
 
-    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi5 = { { {}, {}, {}, {} } };
+    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi5 = { {
+        {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::eight},    // miso
+        {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::eleven},   // mosi
+        {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::six},      // sckl
+        {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none}   // ssel
+    } };
     constexpr PROP spi5p = { &hspi5, 100*1000*1000, pinoutspi5 };   
     
     constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi6 = { {
@@ -1338,6 +1302,11 @@ extern "C"
     void SPI3_IRQHandler(void)
     {
         HAL_SPI_IRQHandler(&embot::hw::spi::bsp::hspi3);
+    }
+
+    void SPI5_IRQHandler(void)
+    {
+        HAL_SPI_IRQHandler(&hspi5);
     }
     
     void SPI6_IRQHandler(void)

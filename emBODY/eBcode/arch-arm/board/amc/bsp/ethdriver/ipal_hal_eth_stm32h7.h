@@ -11,7 +11,7 @@
 #endif
 
 #include "ipal.h"
-// even if only ipal_base.h woul be enough
+// even if only ipal_base.h would be enough
  
 /* ============================================================================================
  * FUNCTION PROTOTYPES

@@ -156,6 +156,7 @@ namespace embot { namespace hw { namespace spi {
 
     bool isbusy(embot::hw::SPI b, embot::core::relTime timeout, embot::core::relTime &remaining);
     bool isbusy(embot::hw::SPI b);
+    bool clear(embot::hw::SPI b);
     
     result_t read(embot::hw::SPI b, embot::core::Data &destination, embot::core::relTime timeout);
     result_t write(embot::hw::SPI b, const embot::core::Data &source, embot::core::relTime timeout);

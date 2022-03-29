@@ -33,7 +33,8 @@
     #define EMBOT_ENABLE_hw_can
     #undef EMBOT_ENABLE_hw_flash
 //    #define EMBOT_ENABLE_hw_eth
-    #define EMBOT_ENABLE_hw_eth_phytimeout
+
+    #define EMBOT_ENABLE_hw_eth
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMC ...

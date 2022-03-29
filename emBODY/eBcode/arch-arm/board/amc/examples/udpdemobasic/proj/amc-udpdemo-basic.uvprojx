@@ -573,6 +573,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_eth.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -638,6 +653,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -661,17 +681,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>bsp-ipal</GroupName>
+          <GroupName>embot::hw::eth::bsp</GroupName>
           <Files>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
-              <FileName>stm32h7xx_ethirqhandler.c</FileName>
+              <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1010,7 +1035,7 @@
               <MiscControls>-DUSE_PC104_ADDRESSING -Dembotapp_UDPDEMOBASIC -DmodifiedCMSISETH -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\src;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\cfg;..\..\bsp-ipal;..\..\..\..\..\libs\midware\eventviewer\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\src;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\cfg;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp\ethdriver</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1041,7 +1066,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\..\bsp-ipal\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
+            <ScatterFile>..\..\..\bsp\ethdriver\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -1244,6 +1269,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_eth.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1309,6 +1349,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1332,17 +1377,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>bsp-ipal</GroupName>
+          <GroupName>embot::hw::eth::bsp</GroupName>
           <Files>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
-              <FileName>stm32h7xx_ethirqhandler.c</FileName>
+              <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1915,6 +1965,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_eth.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1980,6 +2045,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2003,17 +2073,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>bsp-ipal</GroupName>
+          <GroupName>embot::hw::eth::bsp</GroupName>
           <Files>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
-              <FileName>stm32h7xx_ethirqhandler.c</FileName>
+              <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2637,6 +2712,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_eth.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2702,6 +2792,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2725,17 +2820,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>bsp-ipal</GroupName>
+          <GroupName>embot::hw::eth::bsp</GroupName>
           <Files>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
-              <FileName>stm32h7xx_ethirqhandler.c</FileName>
+              <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3359,6 +3459,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_eth.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3424,6 +3539,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3447,17 +3567,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>bsp-ipal</GroupName>
+          <GroupName>embot::hw::eth::bsp</GroupName>
           <Files>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
-              <FileName>stm32h7xx_ethirqhandler.c</FileName>
+              <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4081,6 +4206,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_eth.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4146,6 +4286,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4169,17 +4314,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>bsp-ipal</GroupName>
+          <GroupName>embot::hw::eth::bsp</GroupName>
           <Files>
             <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
-              <FileName>stm32h7xx_ethirqhandler.c</FileName>
+              <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
           </Files>
         </Group>

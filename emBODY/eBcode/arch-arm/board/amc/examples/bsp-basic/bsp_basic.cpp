@@ -9,8 +9,11 @@
 #include "bsp_basic.h"
 
 #include "stdint.h"
+#if defined(USE_STM32HAL)
 #include "stm32hal.h"
-
+#else
+#include "stm32h7xx_hal.h" 
+#endif
 
 int bsp_basic_itm_puts(const char* str) 
 {    

@@ -102,6 +102,7 @@ int main(void)
 static void s_init_ipnet();
 static void s_init_ledmanager();
 static void s_init_server();
+static void s_start_ETHmonitor_thread();
 
 static void s_initialiser(void)
 {
@@ -111,10 +112,13 @@ static void s_initialiser(void)
     s_init_ipnet();
     
     // we init the emBOT object embot::app::theLEDmanager
-//    s_init_ledmanager();
+    s_init_ledmanager();
     
     // we also start a new thread which manages a udp socket
     s_init_server();
+    
+    // also starting a periodic thread where we can ask the status of the eth switch
+    s_start_ETHmonitor_thread();
 }
 
 
@@ -336,6 +340,10 @@ static void serverthread_onvalue(embot::os::Thread *t, embot::os::Value v, void 
     }
     
 }
+
+#define MIRROR_COMMAND
+
+#include <string.h>
     
 bool parser(EOpacket *rxpkt, EOpacket *txpkt)
 {    
@@ -347,15 +355,29 @@ bool parser(EOpacket *rxpkt, EOpacket *txpkt)
     uint16_t size {0};
         
     eo_packet_Payload_Get(s_rxpkt_ethcmd, &pData, &size);
+    
+    std::string nn = embot::core::TimeFormatter(embot::core::now()).to_string();
         
-    embot::core::print(std::string("UDP server: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
+    embot::core::print(std::string("UDP server: @ ") + nn + 
                         " received a packet from " + embot::prot::eth::IPv4(remaddr).to_string() + ":" + std::to_string(remport)
                        );
         
     embot::core::print(std::string("size = ") + std::to_string(size) + ", string = " + std::string(reinterpret_cast<char*>(pData))
                        );
     
+#if !defined(MIRROR_COMMAND)    
     return false;
+#else
+    
+    char replybuffer[128] = {0};
+    snprintf(replybuffer, sizeof(replybuffer), "@ %s -> RX = %s", nn.c_str(), pData);
+    // copy payload of rx packet inside tx packet
+    //eo_packet_Payload_Set(txpkt, pData, size);
+    eo_packet_Payload_Set(txpkt, reinterpret_cast<uint8_t*>(replybuffer), strlen(replybuffer));
+    // assign destination: same ip address of sender, port 3333
+    eo_packet_Destination_Set(txpkt, remaddr, remport);
+    return true;
+#endif    
 }
 
 // blocking call
@@ -480,6 +502,88 @@ static void s_used_errman_OnError(eOerrmanErrorType_t errtype, const char *info,
 #endif    
 }
 
+// thread tETHmon
+
+// the ETH mon is a periodic thread 
+embot::os::PeriodicThread *tETHmon {nullptr};
+
+void tETHmon_startup(embot::os::Thread *t, void *param);
+void tETHmon_onperiod(embot::os::Thread *t, void *param);
+void t_ETHmon(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
+ 
+static void s_start_ETHmonitor_thread()
+{        
+    tETHmon = new embot::os::PeriodicThread;
+    
+    embot::os::PeriodicThread::Config tConfig { 
+        6*1024, 
+        embot::os::Priority::belownorm17, 
+        tETHmon_startup,                // the startup function
+        nullptr,                        // it param
+        1000*embot::core::time1millisec, // the period
+        tETHmon_onperiod,
+        "tETHmon"
+    };
+    
+    tETHmon->start(tConfig, t_ETHmon);      
+}
+
+//#define USE_KS
+
+#if defined(USE_KS)
+#include "embot_hw_chip_KSZ8563.h"
+embot::hw::chip::KSZ8563 *eths {nullptr}; 
+#else
+#include "embot_hw_eth.h"
+#endif
+
+// code for the periodic thread tETHmon
+void tETHmon_startup(embot::os::Thread *t, void *param)
+{
+    embot::core::print(std::string("calling tETHmon_startup() @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());   
+
+#if defined(USE_KS)   
+    eths = new embot::hw::chip::KSZ8563;
+    eths->init({});
+#else
+#endif        
+    // add in here initialization code for the driver which asks the ETH switch
+}
+
+
+void tETHmon_onperiod(embot::os::Thread *t, void *param)
+{
+//    embot::core::print(std::string("calling tETHmon_onperiod() @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());   
+
+     // add in here code which asks the ETH switch about its status
+
+    static bool prevlink1isup = false;    
+    static bool prevlink2isup = false;
+    
+    bool link1isup = false;    
+    bool link2isup = false;
+
+#if defined(USE_KS)    
+    embot::hw::chip::KSZ8563::Link lnk1 { embot::hw::chip::KSZ8563::Link::DOWN };
+    embot::hw::chip::KSZ8563::Link lnk2 { embot::hw::chip::KSZ8563::Link::DOWN };
+    eths->read(embot::hw::chip::KSZ8563::PHY::one, lnk1);
+    eths->read(embot::hw::chip::KSZ8563::PHY::two, lnk2);
+    
+    link1isup = (embot::hw::chip::KSZ8563::Link::UP == lnk1) ? true : false;
+    link2isup = (embot::hw::chip::KSZ8563::Link::UP == lnk2) ? true : false;
+#else    
+    link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one);
+    link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two);
+#endif
+    
+    if((prevlink1isup != link1isup) || ((prevlink2isup != link2isup)))
+    {            
+        std::string msg = std::string("ETH link 1 is ") + (link1isup ? "UP" : "DOWN") + " ETH link 2 is " + (link2isup ? "UP" : "DOWN");
+        embot::core::print(msg + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+    }
+    prevlink1isup = link1isup;
+    prevlink2isup = link2isup;
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

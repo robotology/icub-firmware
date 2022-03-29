@@ -29,31 +29,20 @@
 
 #include <string.h>
 
+
+
+#include "Driver_ETH_MAC.h"
 #if defined(USE_STM32HAL)
-
-// this is the stm32hal adaptation
-
-// #include "cmsis_compiler.h"
 #include "stm32hal.h"
-
-#include "Driver_ETH_MAC.h"
-// #include "stm32h7xx_hal.h"
-
-// #include "RTE_Components.h" ??
- #include "MX_Device.h" 
-
 #else
-// this is the original part
-
 #include "cmsis_compiler.h"
-
-#include "Driver_ETH_MAC.h"
 #include "stm32h7xx_hal.h"
+#endif
 
-#include "RTE_Components.h"
-#include "MX_Device.h"
+//#include "RTE_Components.h"
 
-#endif // #if defined(USE_STM32HAL)
+//#warning MARCO.ACCAME: be careful, maybe we really need it
+#include "mx_resources.h"
 
 #ifndef      __MEMORY_AT
   #if     (defined (__CC_ARM))
