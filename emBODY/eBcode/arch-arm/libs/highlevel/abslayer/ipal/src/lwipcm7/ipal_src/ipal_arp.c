@@ -73,7 +73,8 @@ ipal_result_t ipal_arp_resolve(ipal_ipv4addr_t ip, ipal_arp_cachemode_t cm, uint
 	/* If not resolved yet, or ARP frame is forced, send an ARP request, otherwise return OK (already in ARP table) */
 	if ((ipal_arp_isresolved(ip) == ipal_res_NOK_generic)||forcearpframe)
 	{
-		ret = ipal_arp_request(ip, cm);
+		ipal_arp_request(ip, cm);
+        ret = ipal_arp_isresolved(ip);
 	}
 	
 	return ret;
