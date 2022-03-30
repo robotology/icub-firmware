@@ -174,7 +174,17 @@ static void s_init_ipnet()
     
 }
 
+
 #include "embot_app_theLEDmanager.h"
+
+//constexpr embot::hw::LED pulseLED {embot::hw::LED::one};
+//constexpr embot::hw::LED connectionLED {embot::hw::LED::three};
+
+constexpr embot::hw::LED pulseLED {embot::hw::LED::three};
+constexpr embot::hw::LED connectionLED {embot::hw::LED::five};
+
+constexpr embot::hw::LED j6LED {embot::hw::LED::one};
+constexpr embot::hw::LED j7LED {embot::hw::LED::two};
 
 static void s_init_ledmanager()
 {
@@ -187,7 +197,7 @@ static void s_init_ledmanager()
     theleds.init(allleds);   
 
     // and we pulse the first led
-    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second, 0);  
+    theleds.get(pulseLED).pulse(embot::core::time1second, 0);   
 }
 
 embot::os::ValueThread *serverthread {nullptr};
@@ -201,7 +211,7 @@ static void s_init_server()
     embot::core::print("INIT: creating the server thread. it manages a server socket");  
     
     constexpr uint16_t stacksize{6*1024};
-    constexpr embot::core::relTime timeout {100*embot::core::time1millisec};
+    constexpr embot::core::relTime timeout {1000*embot::core::time1millisec};
     constexpr uint8_t valueQsize {4};
     embot::os::ValueThread::Config configServer { 
         stacksize, 
@@ -241,7 +251,28 @@ void alertserverthread(void *p)
     serverthread->setValue(valueFROMsocket);
 }
 
+static bool host_connected {false};
+
 bool s_connectsocket2host(const embot::prot::eth::IPv4& hostaddress, EOsocketDatagram *skt, embot::core::relTime timeout);
+
+void s_checkconnection(embot::core::relTime tout = 3000*embot::core::time1millisec)
+{
+    static bool firstime = true;  
+    bool prev = host_connected;   
+    
+    s_connectsocket2host(hostIPaddress, s_skt_ethcmd, tout);
+    
+    
+    if(firstime || (host_connected != prev))
+    {
+        embot::core::print( std::string("UDP server: @ ") 
+                            + embot::core::TimeFormatter(embot::core::now()).to_string() + 
+                            ((host_connected) ? " connected to host " : " FAILED connection to host ")
+                            + embot::prot::eth::IPv4(hostIPaddress).to_string() 
+                          );   
+    }  
+    firstime = false;    
+}
 
 static void serverthread_startup(embot::os::Thread *t, void *p)
 {
@@ -271,19 +302,10 @@ static void serverthread_startup(embot::os::Thread *t, void *p)
                   " a UDP socket is listening at " + embot::prot::eth::IPv4(localIPaddress).to_string() + ":" + std::to_string(serverPort) 
                   ); 
 
-    // we also want to connect to the host
-    if(true == s_connectsocket2host(hostIPaddress, s_skt_ethcmd, 3000*embot::core::time1millisec))
-    {
-        embot::core::print(std::string("UDP server: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
-                          " connected to host " + embot::prot::eth::IPv4(hostIPaddress).to_string() 
-                          );    
-    }
-    else
-    {
-        embot::core::print(std::string("UDP server: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
-                          " FAILED connection to host " + embot::prot::eth::IPv4(hostIPaddress).to_string() 
-                          );  
-    }    
+    host_connected = false;
+    
+    s_checkconnection(3000*embot::core::time1millisec);
+  
 }
 
 bool parser(EOpacket *rxpkt, EOpacket *txpkt);
@@ -292,6 +314,8 @@ static void serverthread_onvalue(embot::os::Thread *t, embot::os::Value v, void 
 {
     if(v == 0)
     {
+        // we check the connection
+        s_checkconnection(10*embot::core::time1millisec);
         return;
     }
     
@@ -325,7 +349,7 @@ static void serverthread_onvalue(embot::os::Thread *t, embot::os::Value v, void 
                 // if in here we have received a valid udp packet and we have just stopped the countdown inside the parser 
                 
                 // transmit a pkt back to the host. the call blocks until success or timeout expiry
-                if(true == s_connectsocket2host({remaddr}, socket, 1000*embot::core::time1millisec))
+                if(true == s_connectsocket2host({remaddr}, socket, 100*embot::core::time1millisec))
                 {
                     eo_socketdtg_Put(socket, s_txpkt_ethcmd);
                 }
@@ -333,7 +357,7 @@ static void serverthread_onvalue(embot::os::Thread *t, embot::os::Value v, void 
             else
             {   
                 // this attempt is still-blocking, but it blocks for less time
-                s_connectsocket2host({remaddr}, socket, 250*embot::core::time1millisec);
+                s_connectsocket2host({remaddr}, socket, 10*embot::core::time1millisec);
             }
         }            
         
@@ -383,8 +407,8 @@ bool parser(EOpacket *rxpkt, EOpacket *txpkt)
 // blocking call
 bool s_connectsocket2host(const embot::prot::eth::IPv4& hostaddress, EOsocketDatagram *skt, embot::core::relTime timeout)
 {
-    static bool host_connected {false};
     static embot::prot::eth::IPv4 host_ipaddress {};
+    static bool lediswaving = false;    
 
     // eOipv4addr_t and embot::prot::eth::IPv4 have the same memory layout
     if((false == host_connected) || (hostaddress.v != host_ipaddress.v))
@@ -405,17 +429,23 @@ bool s_connectsocket2host(const embot::prot::eth::IPv4& hostaddress, EOsocketDat
     
     if(true == host_connected)
     {  
-        // embot::hw::LED::three signals that the board is connected
+        // connectionLED signals that the board is connected
         embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance(); 
-        theleds.get(embot::hw::LED::three).on();
+        if(true == lediswaving)
+        {
+            theleds.get(connectionLED).stop();
+        }
+        theleds.get(connectionLED).on();
+        lediswaving = false;
     }
-    else
+    else if(false == lediswaving)
     {
-        // pulse embot::hw::LED::three
+        lediswaving = true;
+        // pulse connectionLED
         embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
-        //theleds.get(embot::hw::LED::three).pulse(200*embot::core::time1millisec, 0);           
+        //theleds.get(connectionLED).pulse(200*embot::core::time1millisec, 0);           
         embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b010101));
-        theleds.get(embot::hw::LED::three).wave(&ledwave); 
+        theleds.get(connectionLED).wave(&ledwave); 
     }
     
     return host_connected;
@@ -520,7 +550,7 @@ static void s_start_ETHmonitor_thread()
         embot::os::Priority::belownorm17, 
         tETHmon_startup,                // the startup function
         nullptr,                        // it param
-        1000*embot::core::time1millisec, // the period
+        200*embot::core::time1millisec, // the period
         tETHmon_onperiod,
         "tETHmon"
     };
@@ -575,6 +605,10 @@ void tETHmon_onperiod(embot::os::Thread *t, void *param)
     link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one);
     link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two);
 #endif
+
+    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();
+    (link1isup) ? theleds.get(j6LED).on() : theleds.get(j6LED).off();
+    (link2isup) ? theleds.get(j7LED).on() : theleds.get(j7LED).off();
     
     if((prevlink1isup != link1isup) || ((prevlink2isup != link2isup)))
     {            

@@ -138,7 +138,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2</MiscControls>
               <Define>EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\cfg;..\..\..\bsp\ethdriver</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;--..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\cfg;..\..\..\bsp\ethdriver</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -470,7 +470,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-hw</GroupName>
+          <GroupName>embot::hw</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp.cpp</FileName>
@@ -637,7 +637,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-os</GroupName>
+          <GroupName>embot::os</GroupName>
           <Files>
             <File>
               <FileName>embot_os.cpp</FileName>
@@ -682,7 +682,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-app</GroupName>
+          <GroupName>embot::app</GroupName>
           <Files>
             <File>
               <FileName>embot_app_theLEDmanager.cpp</FileName>
@@ -1277,78 +1277,6 @@
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
         </Group>
       </Groups>
     </Target>
@@ -1867,7 +1795,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-hw</GroupName>
+          <GroupName>embot::hw</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp.cpp</FileName>
@@ -2034,7 +1962,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-os</GroupName>
+          <GroupName>embot::os</GroupName>
           <Files>
             <File>
               <FileName>embot_os.cpp</FileName>
@@ -2079,7 +2007,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-app</GroupName>
+          <GroupName>embot::app</GroupName>
           <Files>
             <File>
               <FileName>embot_app_theLEDmanager.cpp</FileName>
@@ -2317,78 +2245,6 @@
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
         </Group>
       </Groups>
     </Target>
@@ -2725,7 +2581,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_cmsisos2 -DIPAL_use_cfg2</MiscControls>
               <Define>EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\..\bsp-ipal;..\cfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\cfg;..\..\..\bsp\ethdriver</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2756,7 +2612,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\..\bsp-ipal\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
+            <ScatterFile>.\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -2907,7 +2763,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-hw</GroupName>
+          <GroupName>embot::hw</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp.cpp</FileName>
@@ -3074,7 +2930,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-os</GroupName>
+          <GroupName>embot::os</GroupName>
           <Files>
             <File>
               <FileName>embot_os.cpp</FileName>
@@ -3119,7 +2975,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot-app</GroupName>
+          <GroupName>embot::app</GroupName>
           <Files>
             <File>
               <FileName>embot_app_theLEDmanager.cpp</FileName>
@@ -3358,94 +3214,13 @@
             </File>
           </Files>
         </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
-        </Group>
       </Groups>
     </Target>
   </Targets>
 
   <RTE>
     <apis/>
-    <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.5.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.8.0"/>
-        <targetInfos>
-          <targetInfo excluded="1" name="ipnetdemo-cmsisos2-segger" versionMatchMode=""/>
-          <targetInfo excluded="1" name="ipnetdemo-cmsisos2-stlinkv3" versionMatchMode=""/>
-          <targetInfo excluded="1" name="ipnetdemo-osal-stlink" versionMatchMode=""/>
-        </targetInfos>
-      </component>
-    </components>
+    <components/>
     <files/>
   </RTE>
 

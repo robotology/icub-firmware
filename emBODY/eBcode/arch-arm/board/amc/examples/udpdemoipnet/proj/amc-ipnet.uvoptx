@@ -130,12 +130,12 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U005700373137510539383538 -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(6BA02477) -L00(0) -TO131091 -TC400000000 -TT10000000 -TP21 -TDS8021 -TDT0 -TDC1F -TIEFFFFFFFF -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-U005700373137510539383538 -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(6BA02477) -L00(0) -TO131091 -TC400000000 -TT10000000 -TP21 -TDS8021 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>ARMRTXEVENTFLAGS</Key>
-          <Name>-L200 -Z19 -C0 -M1 -T1</Name>
+          <Name>-L200 -Z0 -C0 -M1 -T1</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -223,6 +223,12 @@
       <pszMrulep></pszMrulep>
       <pSingCmdsp></pSingCmdsp>
       <pMultCmdsp></pMultCmdsp>
+      <SystemViewers>
+        <Entry>
+          <Name>OS Support\Event Viewer</Name>
+          <WinId>35905</WinId>
+        </Entry>
+      </SystemViewers>
       <DebugDescription>
         <Enable>1</Enable>
         <EnableFlashSeq>0</EnableFlashSeq>
@@ -579,7 +585,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("") -D00(00000000) -L00(0) -TO131091 -TC400000000 -TT10000000 -TP21 -TDS8021 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-U005700373137510539383538 -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(6BA02477) -L00(0) -TO131089 -TC400000000 -TT10000000 -TP21 -TDS8021 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -599,7 +605,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name></Name>
+          <Name>(105=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint/>
@@ -661,7 +667,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -678,7 +684,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -856,8 +862,8 @@
   </Group>
 
   <Group>
-    <GroupName>embot-hw</GroupName>
-    <tvExp>0</tvExp>
+    <GroupName>embot::hw</GroupName>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1008,7 +1014,7 @@
   </Group>
 
   <Group>
-    <GroupName>embot-os</GroupName>
+    <GroupName>embot::os</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1112,7 +1118,7 @@
   </Group>
 
   <Group>
-    <GroupName>embot-app</GroupName>
+    <GroupName>embot::app</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1593,7 +1599,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1657,14 +1663,6 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
-  </Group>
-
-  <Group>
-    <GroupName>::CMSIS</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>1</RteFlg>
   </Group>
 
 </ProjectOpt>

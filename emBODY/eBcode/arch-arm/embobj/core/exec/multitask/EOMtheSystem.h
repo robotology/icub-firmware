@@ -50,7 +50,12 @@ extern "C" {
 #include "EOtheErrorManager.h"
 #include "EOMtheTimerManager.h"
 #include "EOMtheCallbackManager.h"
+
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_STM32HAL) 
+//#include "stm32hal.h"
+#else
 #include "hal.h"
+#endif
 
 #if !defined(EMBOBJ_USE_EMBOT)
 #include "osal.h"
@@ -71,7 +76,11 @@ extern "C" {
 typedef struct
 {
     uint32_t                    codespaceoffset;
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_STM32HAL)  
+    const void*                 halcfg;    
+#else
     const hal_core_cfg_t*       halcfg;
+#endif    
 #if !defined(EMBOBJ_USE_EMBOT)    
     const osal_cfg_t*           osalcfg;
 #else    

@@ -35,8 +35,11 @@
 #include "string.h"
 #include "stdio.h"
 
-
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_STM32HAL)
+#include "embot_hw_sys.h"
+#else
 #include "hal.h"
+#endif
 
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem_hid.h" 
@@ -170,6 +173,15 @@ uint64_t get_nano()
     return 1000*embot::core::now();
 }
 
+void irq_disable()
+{
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_STM32HAL)
+    embot::hw::sys::irq_disable();
+#else    
+    hal_sys_irq_disable();
+#endif    
+}
+
 extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg, 
                                          const eOmempool_cfg_t *mpoolcfg, 
                                          const eOerrman_cfg_t *errmancfg,
@@ -203,7 +215,7 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
                                                   (eOres_fp_voidfpvoid_t)s_eom_sys_start, s_eom_gettask, 
                                                   get_now, set_now, 
                                                   get_nano,
-                                                  hal_sys_irq_disable);
+                                                  irq_disable);
 
     s_eom_system.halcfg     = syscfg->halcfg;
     s_eom_system.osalcfg    = syscfg->osalcfg;
@@ -265,11 +277,16 @@ extern void eom_sys_Start(EOMtheSystem *p, eOvoid_fp_void_t userinit_fn)
 
 extern uint32_t eom_sys_GetHeapSize(EOMtheSystem *p)
 {
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_STM32HAL) 
+    return 0;
+#else    
     if((NULL == s_eom_system.thevsys) || (NULL == s_eom_system.halcfg))
     {
         return(0);
     }
+      
 	return(s_eom_system.halcfg->syscfg.heapsize);
+#endif    
 }
 
 

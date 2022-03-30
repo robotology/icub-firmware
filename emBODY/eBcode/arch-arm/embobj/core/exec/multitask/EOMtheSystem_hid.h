@@ -61,11 +61,15 @@ struct EOMtheSystem_hid
     EOVtheSystem                *thevsys;
 
     // other stuff
-    const hal_cfg_t             *halcfg;
-#if !defined(EMBOBJ_USE_EMBOT)    
-    const osal_cfg_t            *osalcfg;
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_STM32HAL)  
+    const void                  *halcfg;
 #else    
+    const hal_cfg_t             *halcfg;
+#endif 
+#if defined(EMBOBJ_USE_EMBOT)    
     const void                  *osalcfg;
+#else    
+    const osal_cfg_t            *osalcfg;
 #endif    
     const eOmtimerman_cfg_t     *tmrmancfg;
     const eOmcallbackman_cfg_t  *cbkmancfg;

@@ -51,7 +51,13 @@
 #endif // #if !defined(EMBOBJ_USE_EMBOT)
 
 #include "ipal.h"
-#include "hal_sys.h"
+
+//#if defined(EMBOBJ_USE_EMBOT) & defined(USE_STM32HAL)
+//#include "embot_hw_sys.h"
+//#else
+//#include "hal_sys.h"
+//#endif
+
 
 
 
