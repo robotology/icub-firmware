@@ -59,6 +59,10 @@ namespace embot { namespace hw { namespace sys {
     // forces the cpu to exec instructions to reach a given delay
     void delay(embot::core::relTime t);    
     
+    // added just for backwards compatibility w/ hal ... use w/ wisdom
+    void irq_disable();
+    void irq_enable();
+    
 }}} // namespace embot { namespace hw { namespace sys {
 
 
