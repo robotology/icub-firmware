@@ -215,7 +215,7 @@ namespace embot { namespace hw { namespace eth {
         return embot::hw::eth::bsp::getBSP().islinkup(phy);
     }  
 
-    uint32_t getnumberoferrors(embot::hw::PHY phy, embot::hw::eth::ERR e)
+    uint64_t getnumberoferrors(embot::hw::PHY phy, embot::hw::eth::ERR e)
     {
         return embot::hw::eth::bsp::getBSP().errors(phy, e);
     }    

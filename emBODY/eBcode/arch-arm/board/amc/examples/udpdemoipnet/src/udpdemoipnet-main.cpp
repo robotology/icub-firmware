@@ -535,15 +535,15 @@ static void s_used_errman_OnError(eOerrmanErrorType_t errtype, const char *info,
 // thread tETHmon
 
 // the ETH mon is a periodic thread 
-embot::os::PeriodicThread *tETHmon {nullptr};
+embot::os::PeriodicThread *threadETHmon {nullptr};
 
 void tETHmon_startup(embot::os::Thread *t, void *param);
 void tETHmon_onperiod(embot::os::Thread *t, void *param);
-void t_ETHmon(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
+void tETHmon(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
  
 static void s_start_ETHmonitor_thread()
 {        
-    tETHmon = new embot::os::PeriodicThread;
+    threadETHmon = new embot::os::PeriodicThread;
     
     embot::os::PeriodicThread::Config tConfig { 
         6*1024, 
@@ -555,7 +555,7 @@ static void s_start_ETHmonitor_thread()
         "tETHmon"
     };
     
-    tETHmon->start(tConfig, t_ETHmon);      
+    threadETHmon->start(tConfig, tETHmon);      
 }
 
 //#define USE_KS
@@ -592,6 +592,8 @@ void tETHmon_onperiod(embot::os::Thread *t, void *param)
     
     bool link1isup = false;    
     bool link2isup = false;
+    uint64_t crcerrors1 {0};
+    uint64_t crcerrors2 {0};
 
 #if defined(USE_KS)    
     embot::hw::chip::KSZ8563::Link lnk1 { embot::hw::chip::KSZ8563::Link::DOWN };
@@ -604,6 +606,9 @@ void tETHmon_onperiod(embot::os::Thread *t, void *param)
 #else    
     link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one);
     link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two);
+    
+    crcerrors1 = embot::hw::eth::getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::crc);
+    crcerrors2 = embot::hw::eth::getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::crc);
 #endif
 
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();
@@ -612,9 +617,22 @@ void tETHmon_onperiod(embot::os::Thread *t, void *param)
     
     if((prevlink1isup != link1isup) || ((prevlink2isup != link2isup)))
     {            
-        std::string msg = std::string("ETH link 1 is ") + (link1isup ? "UP" : "DOWN") + " ETH link 2 is " + (link2isup ? "UP" : "DOWN");
+        std::string msg = std::string("ETH link 1 (J6) is ") + (link1isup ? "UP" : "DOWN") + " ETH link 2 (J7) is " + (link2isup ? "UP" : "DOWN");
         embot::core::print(msg + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
     }
+    
+    if(0 != crcerrors1)
+    {
+        std::string msg = std::string("ETH link 1 (J6) has CRC errors: ") + std::to_string(crcerrors1);
+        embot::core::print(msg + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+    }
+    
+    if(0 != crcerrors2)
+    {
+        std::string msg = std::string("ETH link 2 (J7) has CRC errors: ") + std::to_string(crcerrors2);
+        embot::core::print(msg + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+    }
+    
     prevlink1isup = link1isup;
     prevlink2isup = link2isup;
 }

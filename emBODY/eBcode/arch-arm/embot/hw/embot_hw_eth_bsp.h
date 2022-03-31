@@ -59,7 +59,7 @@ namespace embot { namespace hw { namespace eth { namespace bsp {
         void get_frame(size_t length, uint8_t* frame) const; 
         uint64_t get_mac() const;    
         bool islinkup(embot::hw::PHY phy) const;
-        uint32_t errors(embot::hw::PHY phy, embot::hw::eth::ERR e) const;        
+        uint64_t errors(embot::hw::PHY phy, embot::hw::eth::ERR e) const;        
         
     };
     

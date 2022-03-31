@@ -123,6 +123,11 @@ namespace embot { namespace hw { namespace eth { namespace bsp {
     {
         embot::hw::chip::KSZ8563::PHY::one, embot::hw::chip::KSZ8563::PHY::two
     };
+    
+    static constexpr embot::hw::chip::KSZ8563::PORT ports[2] = 
+    {
+        embot::hw::chip::KSZ8563::PORT::one, embot::hw::chip::KSZ8563::PORT::two
+    };    
         
     bool BSP::islinkup(embot::hw::PHY phy) const
     {
@@ -137,14 +142,27 @@ namespace embot { namespace hw { namespace eth { namespace bsp {
         return (embot::hw::chip::KSZ8563::Link::UP == lnk) ? true : false;       
     }
     
-    uint32_t BSP::errors(embot::hw::PHY phy, ERR e) const
+    uint64_t BSP::errors(embot::hw::PHY phy, ERR e) const
     {
         if(nullptr == ethswitch)
         {            
             return 0;
-        }    
-
-        return 0; // so far
+        }  
+                
+        static constexpr embot::hw::chip::KSZ8563::MIB mibs[1] =
+        {
+            embot::hw::chip::KSZ8563::MIB::RxCRCerror
+        };
+        static constexpr embot::hw::chip::KSZ8563::PORT ports[3] =
+        {
+            embot::hw::chip::KSZ8563::PORT::one, 
+            embot::hw::chip::KSZ8563::PORT::two,
+            embot::hw::chip::KSZ8563::PORT::three
+        };
+        static embot::hw::chip::KSZ8563::MIBdata data {};
+        ethswitch->read(ports[embot::core::tointegral(phy)], mibs[embot::core::tointegral(e)], data);
+        
+        return data.value();
     }
 
     #else

@@ -99,6 +99,9 @@ struct embot::hw::chip::KSZ8563::Impl
     bool read(PHY phy, Link &link, embot::core::relTime timeout);
     //bool read0(PHY phy, Link &link, embot::core::relTime timeout);
     
+    bool read(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout);
+
+    
     void initpincontrol();
     void chipselect(bool enable);
     
@@ -231,6 +234,33 @@ bool embot::hw::chip::KSZ8563::Impl::read(PHY phy, Link &link, embot::core::relT
 //} 
 
 
+bool embot::hw::chip::KSZ8563::Impl::read(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout)
+{   
+    constexpr MIBdata mibdata {MIBdata::Size::bits30, false, 7, 0};
+    constexpr MIBdata mibdataok {MIBdata::Size::bits30, false, 0, 0};
+    data = mibdataok;
+    
+#if 0
+    we need three stages:
+    
+    1. write to `Port MIB Control and Status Register`:
+       - bit 25 = 1,
+       - bits [23; 16] w/ the mib index
+    2. read back the `Port MIB Control and Status Register` until its bit 25 is 0
+    3. read the `Port MIB Data Register` whuihc will contain the value32
+       other values are in the previous `Port MIB Control and Status Register`.
+    
+    we need to use out timeout budget for all these oeprations. i cannot use a forever loop
+    in step2 w/out a timeout....
+    
+    this part is yet to be done.    
+    
+    
+#endif
+    
+    
+    return true;
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -264,6 +294,10 @@ bool embot::hw::chip::KSZ8563::read(PHY phy, Link &link, embot::core::relTime ti
     return pImpl->read(phy, link, timeout);
 }
 
+bool embot::hw::chip::KSZ8563::read(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout)
+{
+    return pImpl->read(port, mib, data, timeout);
+}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

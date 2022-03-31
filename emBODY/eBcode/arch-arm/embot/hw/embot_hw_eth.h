@@ -25,7 +25,7 @@
 
 namespace embot { namespace hw { namespace eth {
     
-
+    enum class PORT : uint8_t { one = 0, two = 1, three = 2, none = 31, maxnumberof = 3 };
     enum class ERR : uint8_t { crc = 0 };
     
     // standard api
@@ -50,7 +50,7 @@ namespace embot { namespace hw { namespace eth {
 
     bool islinkup(embot::hw::PHY phy);
     
-    uint32_t getnumberoferrors(embot::hw::PHY phy, ERR e);
+    uint64_t getnumberoferrors(embot::hw::PHY phy, ERR e);
     
 }}} // namespace embot { namespace hw { namespace eth {
     
