@@ -64,7 +64,7 @@ shell-1 $ ping 10.0.1.99
 On the PC we use `netcat` to start a UDP client/server as in **Listing 2**.
 
 ```bash
-shell-1a $ netcat -u 10.0.1.1 -p 11111 3333
+shell-1a $ netcat -u 10.0.1.99 -p 11111 3333
 ```
 **Listing 2**. This command must be invoked on a shell of the Linux PC. It starts a communication channel towards the ems board w/ address `10.0.1.99` and sends UDP frames to port 3333. The content of the frames are the characters digited before hitting `Enter`.  
 
@@ -78,7 +78,7 @@ The UDP server on Linux receives the frame and prints it on the shell.
 It is also possible to transmit bursts of UDP frames with the following command. 
 
 ```bash
-shell-1b $ for i in {1..10}; do echo "test-$i"| netcat -w 0 -u 10.0.1.1 -p 31111 3333; sleep 0.1; done
+shell-1b $ for i in {1..10}; do echo "test-$i"| netcat -w 0 -u 10.0.1.99 -p 31111 3333; sleep 0.1; done
 ```
 **Listing 3**. This command must be invoked on a separate shell of the Linux PC. It sends ten UDP frames to `10.0.1.1:3333`, one every 100 ms.  
 
