@@ -309,10 +309,19 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
     }
     else
     {
-        // i pass the frame to another thread
-        shared->addrx(frame);
-        // i alert the thread
-        t_CTRL->setEvent(evt_CTRL_canmcdecode);
+        bool valid {false};
+        if(0 == embot::prot::can::frame2sender(frame))
+        {
+        valid = true;
+        }
+
+        if(valid)
+        {
+            // i pass the frame to another thread
+            shared->addrx(frame);
+            // i alert the thread
+            t_CTRL->setEvent(evt_CTRL_canmcdecode);
+        }
     }
 
 }

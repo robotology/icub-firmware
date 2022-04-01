@@ -264,7 +264,7 @@ void Joint_update_status_reference(Joint* o)
 
 }
 
-static void Joint_send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+static void Joint_send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {
 
     eOerrmanDescriptor_t errdes = {0};
