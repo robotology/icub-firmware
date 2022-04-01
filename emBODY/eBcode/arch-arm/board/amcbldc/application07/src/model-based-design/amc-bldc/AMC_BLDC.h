@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.268
+// Model version                  : 3.271
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Mar 16 14:14:12 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:41 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -24,12 +24,19 @@
 #include "AMC_BLDC_types.h"
 
 // Child system includes
+#define control_foc_MDLREF_HIDE_CHILD_
 #include "control_foc.h"
+#define estimation_velocity_MDLREF_HIDE_CHILD_
 #include "estimation_velocity.h"
+#define can_decoder_MDLREF_HIDE_CHILD_
 #include "can_decoder.h"
+#define SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_RX.h"
+#define SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_TX.h"
+#define can_encoder_MDLREF_HIDE_CHILD_
 #include "can_encoder.h"
+#define control_outer_MDLREF_HIDE_CHILD_
 #include "control_outer.h"
 #include "rtw_mutex.h"
 
@@ -54,6 +61,121 @@
 #define rtmTaskCounter(rtm, idx)       ((rtm)->Timing.TaskCounters.TID[(idx)])
 #endif
 
+// Block signals (default storage)
+struct B_AMC_BLDC_T {
+  BUS_MESSAGES_RX_MULTIPLE CAN_Decoder_o1;// '<S6>/CAN_Decoder'
+  BUS_MESSAGES_TX MessagesTx;          // '<S7>/SupervisorFSM_TX'
+  SensorsData RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter3'
+  Targets Targets_n;                   // '<S7>/SupervisorFSM_RX'
+  BUS_EVENTS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
+  BUS_CAN_RX_ERRORS_MULTIPLE CAN_Decoder_o3;// '<S6>/CAN_Decoder'
+  ControlOutputs RTBInsertedForAdapter_Inserte_a;// '<Root>/Adapter1'
+  BUS_EVENTS_TX SupervisorFSM_TX_o2;   // '<S7>/SupervisorFSM_TX'
+};
+
+// Block states (default storage) for system '<Root>'
+struct DW_AMC_BLDC_T {
+  ConfigurationParameters ZOHBlockInsertedForAdapter_Inse;// synthesized block
+  ConfigurationParameters RTBInsertedForAdapter_InsertedF[3];// synthesized block 
+  SensorsData RTBInsertedForAdapter_Inserte_e;// synthesized block
+  SensorsData RTBInsertedForAdapter_Inserte_c;// synthesized block
+  SensorsData RTBInsertedForAdapter_Inserte_j;// synthesized block
+  Targets RTBInsertedForAdapter_Inserte_m[3];// synthesized block
+  ControlOutputs RTBInsertedForAdapter_Inserte_d;// synthesized block
+  ControlOutputs RTBInsertedForAdapter_Insert_j2;// synthesized block
+  ControlOutputs RTBInsertedForAdapter_Inserte_o;// synthesized block
+  ControlOuterOutputs RTBInsertedForAdapter_Inserte_i[3];// synthesized block
+  Flags RTBInsertedForAdapter_Inserte_l[3];// synthesized block
+  EstimatedData RTBInsertedForAdapter_Inserte_k[3];// synthesized block
+  void* RTBInsertedForAdapter_Insert_mf;// synthesized block
+  void* RTBInsertedForAdapter_Inserte_b;// synthesized block
+  void* RTBInsertedForAdapter_Inserte_f;// synthesized block
+  void* RTBInsertedForAdapter_Insert_ey;// synthesized block
+  void* RTBInsertedForAdapter_Insert_ci;// synthesized block
+  void* RTBInsertedForAdapter_Inserte_h;// synthesized block
+  void* RTBInsertedForAdapter_Insert_bz;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_hj;// synthesized block
+  int8_T RTBInsertedForAdapter_Inserte_p;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_mp;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_m3;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_b2;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_ko;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_jj;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_mb;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_p5;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_bw;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_js;// synthesized block
+  int8_T RTBInsertedForAdapter_Inserte_a;// synthesized block
+  int8_T RTBInsertedForAdapter_Inserte_g;// synthesized block
+  int8_T RTBInsertedForAdapter_Insert_pa;// synthesized block
+};
+
+// External inputs (root inport signals with default storage)
+struct ExtU_AMC_BLDC_T {
+  SensorsData SensorsData_p;           // '<Root>/B_-1_-1'
+  ExternalFlags ExternalFlags_p;       // '<Root>/B_-1_-1'
+  BUS_CAN_MULTIPLE PacketsRx;          // '<Root>/B_-1_-1'
+};
+
+// External outputs (root outports fed by signals with default storage)
+struct ExtY_AMC_BLDC_T {
+  ControlOutputs ControlOutputs_p;     // '<Root>/ControlOutputs'
+  ConfigurationParameters ConfigurationParameters_p;// '<Root>/ConfigurationParameters' 
+  Flags Flags_p;                       // '<Root>/Flags'
+  EstimatedData EstimatedData_p;       // '<Root>/EstimatedData'
+  BUS_CAN_MULTIPLE PacketsTx;          // '<Root>/PacketsTx'
+};
+
+// Real-time Model Data Structure
+struct tag_RTM_AMC_BLDC_T {
+  const char_T *errorStatus;
+
+  //
+  //  Timing:
+  //  The following substructure contains information regarding
+  //  the timing information for the model.
+
+  struct {
+    struct {
+      uint32_T TID[3];
+    } TaskCounters;
+  } Timing;
+};
+
+// Block signals (default storage)
+#ifdef __cplusplus
+
+extern "C" {
+
+#endif
+
+  extern struct B_AMC_BLDC_T AMC_BLDC_B;
+
+#ifdef __cplusplus
+
+}
+#endif
+
+// Block states (default storage)
+extern struct DW_AMC_BLDC_T AMC_BLDC_DW;
+
+#ifdef __cplusplus
+
+extern "C" {
+
+#endif
+
+  // External inputs (root inport signals with default storage)
+  extern struct ExtU_AMC_BLDC_T AMC_BLDC_U;
+
+  // External outputs (root outports fed by signals with default storage)
+  extern struct ExtY_AMC_BLDC_T AMC_BLDC_Y;
+
+#ifdef __cplusplus
+
+}
+#endif
+
 //
 //  Exported Global Parameters
 //
@@ -76,157 +198,37 @@ extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 
-// Class declaration for model AMC_BLDC
-namespace amc_bldc_codegen
-{
-  class AMC_BLDC
-  {
-    // public data and function members
-   public:
-    // Block signals (default storage)
-    struct B_AMC_BLDC_T {
-      BUS_MESSAGES_RX_MULTIPLE CAN_Decoder_o1;// '<S6>/CAN_Decoder'
-      BUS_MESSAGES_TX MessagesTx;      // '<S7>/SupervisorFSM_TX'
-      SensorsData RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter3'
-      Targets Targets_n;               // '<S7>/SupervisorFSM_RX'
-      BUS_EVENTS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
-      BUS_CAN_RX_ERRORS_MULTIPLE CAN_Decoder_o3;// '<S6>/CAN_Decoder'
-      ControlOutputs RTBInsertedForAdapter_Inserte_a;// '<Root>/Adapter1'
-      BUS_EVENTS_TX SupervisorFSM_TX_o2;// '<S7>/SupervisorFSM_TX'
-    };
+#ifdef __cplusplus
 
-    // Block states (default storage) for system '<Root>'
-    struct DW_AMC_BLDC_T {
-      ConfigurationParameters ZOHBlockInsertedForAdapter_Inse;// synthesized block 
-      ConfigurationParameters RTBInsertedForAdapter_InsertedF[3];// synthesized block 
-      SensorsData RTBInsertedForAdapter_Inserte_e;// synthesized block
-      SensorsData RTBInsertedForAdapter_Inserte_c;// synthesized block
-      SensorsData RTBInsertedForAdapter_Inserte_j;// synthesized block
-      Targets RTBInsertedForAdapter_Inserte_m[3];// synthesized block
-      ControlOutputs RTBInsertedForAdapter_Inserte_d;// synthesized block
-      ControlOutputs RTBInsertedForAdapter_Insert_j2;// synthesized block
-      ControlOutputs RTBInsertedForAdapter_Inserte_o;// synthesized block
-      ControlOuterOutputs RTBInsertedForAdapter_Inserte_i[3];// synthesized block 
-      Flags RTBInsertedForAdapter_Inserte_l[3];// synthesized block
-      EstimatedData RTBInsertedForAdapter_Inserte_k[3];// synthesized block
-      void* RTBInsertedForAdapter_Insert_mf;// synthesized block
-      void* RTBInsertedForAdapter_Inserte_b;// synthesized block
-      void* RTBInsertedForAdapter_Inserte_f;// synthesized block
-      void* RTBInsertedForAdapter_Insert_ey;// synthesized block
-      void* RTBInsertedForAdapter_Insert_ci;// synthesized block
-      void* RTBInsertedForAdapter_Inserte_h;// synthesized block
-      void* RTBInsertedForAdapter_Insert_bz;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_hj;// synthesized block
-      int8_T RTBInsertedForAdapter_Inserte_p;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_mp;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_m3;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_b2;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_ko;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_jj;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_mb;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_p5;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_bw;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_js;// synthesized block
-      int8_T RTBInsertedForAdapter_Inserte_a;// synthesized block
-      int8_T RTBInsertedForAdapter_Inserte_g;// synthesized block
-      int8_T RTBInsertedForAdapter_Insert_pa;// synthesized block
-    };
+extern "C" {
 
-    // External inputs (root inport signals with default storage)
-    struct ExtU_AMC_BLDC_T {
-      SensorsData SensorsData_p;       // '<Root>/B_-1_-1'
-      ExternalFlags ExternalFlags_p;   // '<Root>/B_-1_-1'
-      BUS_CAN_MULTIPLE PacketsRx;      // '<Root>/B_-1_-1'
-    };
+#endif
 
-    // External outputs (root outports fed by signals with default storage)
-    struct ExtY_AMC_BLDC_T {
-      ControlOutputs ControlOutputs_p; // '<Root>/ControlOutputs'
-      ConfigurationParameters ConfigurationParameters_p;// '<Root>/ConfigurationParameters' 
-      Flags Flags_p;                   // '<Root>/Flags'
-      EstimatedData EstimatedData_p;   // '<Root>/EstimatedData'
-      BUS_CAN_MULTIPLE PacketsTx;      // '<Root>/PacketsTx'
-    };
+  // Model entry point functions
+  extern void AMC_BLDC_initialize(void);
+  extern void AMC_BLDC_step0(void);
+  extern void AMC_BLDC_step_FOC(void);
+  extern void AMC_BLDC_step_Time(void);
+  extern void AMC_BLDC_terminate(void);
 
-    // Real-time Model Data Structure
-    struct RT_MODEL_AMC_BLDC_T {
-      const char_T *errorStatus;
+#ifdef __cplusplus
 
-      //
-      //  Timing:
-      //  The following substructure contains information regarding
-      //  the timing information for the model.
-
-      struct {
-        struct {
-          uint32_T TID[3];
-        } TaskCounters;
-      } Timing;
-    };
-
-    // Real-Time Model get method
-    amc_bldc_codegen::AMC_BLDC::RT_MODEL_AMC_BLDC_T * getRTM();
-
-    // External inputs
-    ExtU_AMC_BLDC_T AMC_BLDC_U;
-
-    // External outputs
-    ExtY_AMC_BLDC_T AMC_BLDC_Y;
-
-    // Block signals
-    B_AMC_BLDC_T AMC_BLDC_B;
-
-    // Block states
-    DW_AMC_BLDC_T AMC_BLDC_DW;
-
-    // model initialize function
-    void initialize();
-
-    // model step function
-    void step0();
-
-    // model step function
-    void step_FOC();
-
-    // model step function
-    void step_Time();
-
-    // model terminate function
-    void terminate();
-
-    // Constructor
-    AMC_BLDC();
-
-    // Destructor
-    ~AMC_BLDC();
-
-    // private data and function members
-   private:
-    // model instance variable for '<S5>/Estimation_Velocity'
-    amc_bldc_codegen::estimation_velocity Estimation_VelocityMDLOBJ1;
-
-    // model instance variable for '<Root>/FOC'
-    amc_bldc_codegen::control_foc FOCMDLOBJ2;
-
-    // model instance variable for '<S6>/CAN_Decoder'
-    amc_bldc_codegen::CAN_Decoder CAN_DecoderMDLOBJ2;
-
-    // model instance variable for '<S6>/CAN_Encoder'
-    amc_bldc_codegen::CAN_Encoder CAN_EncoderMDLOBJ4;
-
-    // model instance variable for '<Root>/OuterControl'
-    amc_bldc_codegen::control_outer OuterControlMDLOBJ5;
-
-    // model instance variable for '<S7>/SupervisorFSM_RX'
-    amc_bldc_codegen::SupervisorFSM_RX SupervisorFSM_RXMDLOBJ6;
-
-    // model instance variable for '<S7>/SupervisorFSM_TX'
-    amc_bldc_codegen::SupervisorFSM_TX SupervisorFSM_TXMDLOBJ7;
-
-    // Real-Time Model
-    RT_MODEL_AMC_BLDC_T AMC_BLDC_M;
-  };
 }
+#endif
+
+// Real-time Model object
+#ifdef __cplusplus
+
+extern "C" {
+
+#endif
+
+  extern RT_MODEL_AMC_BLDC_T *const AMC_BLDC_M;
+
+#ifdef __cplusplus
+
+}
+#endif
 
 //-
 //  The generated code includes comments that allow you to trace directly

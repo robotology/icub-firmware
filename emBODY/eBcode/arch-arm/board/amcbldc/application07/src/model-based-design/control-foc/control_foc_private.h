@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.89
+// Model version                  : 2.96
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Mar 16 14:13:50 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:16 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -38,10 +38,14 @@
 #define rtmSetErrorStatusPointer(rtm, val) ((rtm)->errorStatus = (val))
 #endif
 
-extern const real32_T rtCP_pooled_CR3CzT1ZXe0P[6];
+extern const real32_T rtCP_pooled_IgamRjjg0YgF[6];
 
-#define rtCP_IaIbIc0_Gain              rtCP_pooled_CR3CzT1ZXe0P  // Computed Parameter: rtCP_IaIbIc0_Gain
+#define rtCP_IaIbIc0_Gain              rtCP_pooled_IgamRjjg0YgF  // Computed Parameter: rtCP_IaIbIc0_Gain
                                                                  //  Referenced by: '<S1>/Ia+Ib+Ic=0'
+
+
+// Invariant block signals (default storage)
+extern const ConstB_control_foc_h_T control_foc_ConstB;
 
 #endif                                 // RTW_HEADER_control_foc_private_h_
 

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.89
+// Model version                  : 2.96
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Mar 16 14:13:50 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:16 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -35,34 +35,6 @@ typedef enum {
   ControlModes_Torque,
   ControlModes_HwFaultCM
 } ControlModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
-#define DEFINED_TYPEDEF_FOR_MotorCurrent_
-
-struct MotorCurrent
-{
-  // motor current
-  real32_T current;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ControlOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOutputs_
-
-struct ControlOutputs
-{
-  // control effort (quadrature)
-  real32_T Vq;
-
-  // control effort (3-phases)
-  real32_T Vabc[3];
-
-  // quadrature current
-  MotorCurrent Iq_fbk;
-};
 
 #endif
 
@@ -271,6 +243,17 @@ struct EstimatedData
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
+#define DEFINED_TYPEDEF_FOR_MotorCurrent_
+
+struct MotorCurrent
+{
+  // motor current
+  real32_T current;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_MotorVoltage_
 #define DEFINED_TYPEDEF_FOR_MotorVoltage_
 
@@ -321,6 +304,27 @@ struct FOCSlowInputs
 };
 
 #endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlOutputs_
+#define DEFINED_TYPEDEF_FOR_ControlOutputs_
+
+struct ControlOutputs
+{
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
+  real32_T Vabc[3];
+
+  // quadrature current
+  MotorCurrent Iq_fbk;
+};
+
+#endif
+
+// Forward declaration for rtModel
+typedef struct tag_RTM_control_foc_T RT_MODEL_control_foc_T;
+
 #endif                                 // RTW_HEADER_control_foc_types_h_
 
 //

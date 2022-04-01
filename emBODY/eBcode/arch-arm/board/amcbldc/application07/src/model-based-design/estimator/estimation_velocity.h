@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.36
+// Model version                  : 2.38
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 31 18:32:19 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:31 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,74 +20,63 @@
 #define RTW_HEADER_estimation_velocity_h_
 #include <cmath>
 #include <cstring>
-#include <stddef.h>
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
-#include <stddef.h>
 #include "mw_cmsis.h"
 #include "rtGetInf.h"
 #include "rt_nonfinite.h"
 
-// Class declaration for model estimation_velocity
-namespace amc_bldc_codegen
-{
-  class estimation_velocity
-  {
-    // public data and function members
-   public:
-    // Block states (default storage) for model 'estimation_velocity'
-    struct DW_estimation_velocity_T {
-      real32_T DelayLine_Buff[15];     // '<Root>/Delay Line'
-      real32_T Delay_DSTATE[16];       // '<Root>/Delay'
-      int32_T DelayLine_BUFF_OFFSET;   // '<Root>/Delay Line'
-      uint32_T CircBufIdx;             // '<Root>/Delay'
-      dsp_simulink_QRSolver_estimat_T obj;// '<S1>/QR Solver'
-      boolean_T objisempty;            // '<S1>/QR Solver'
-    };
+// Block states (default storage) for model 'estimation_velocity'
+#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
 
-    // Real-time Model Data Structure
-    struct RT_MODEL_estimation_velocity_T {
-      const char_T **errorStatus;
-    };
+struct DW_estimation_velocity_f_T {
+  real32_T DelayLine_Buff[15];         // '<Root>/Delay Line'
+  real32_T Delay_DSTATE[16];           // '<Root>/Delay'
+  int32_T DelayLine_BUFF_OFFSET;       // '<Root>/Delay Line'
+  uint32_T CircBufIdx;                 // '<Root>/Delay'
+  dsp_simulink_QRSolver_estimat_T obj; // '<S1>/QR Solver'
+  boolean_T objisempty;                // '<S1>/QR Solver'
+};
 
-    // model initialize function
-    void initialize();
+#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
 
-    // Initial conditions function
-    void init();
+#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
 
-    // model step function
-    void step(const SensorsData &arg_SensorsData, const ConfigurationParameters
-              &arg_ConfigurationParameters, EstimatedData &arg_EstimatedData);
+// Real-time Model Data Structure
+struct tag_RTM_estimation_velocity_T {
+  const char_T **errorStatus;
+};
 
-    // Real-Time Model get method
-    amc_bldc_codegen::estimation_velocity::RT_MODEL_estimation_velocity_T
-      * getRTM();
+#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
 
-    //member function to setup error status pointer
-    void setErrorStatusPointer(const char_T **rt_errorStatus);
+#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
 
-    // Block states
-    DW_estimation_velocity_T estimation_velocity_DW;
+struct MdlrefDW_estimation_velocity_T {
+  RT_MODEL_estimation_velocity_T rtm;
+};
 
-    // Constructor
-    estimation_velocity();
+#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
 
-    // Destructor
-    ~estimation_velocity();
+extern void estimation_velocity_Init(void);
+extern void estimation_velocity(const SensorsData *rtu_SensorsData, const
+  ConfigurationParameters *rtu_ConfigurationParameters, EstimatedData
+  *rty_EstimatedData);
 
-    // private data and function members
-   private:
-    // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
-    real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32], int32_T
-      ix0);
-    void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
-      real32_T tau[2], int32_T jpvt[2]);
+// Model reference registration function
+extern void estimation_velocity_initialize(const char_T **rt_errorStatus);
 
-    // Real-Time Model
-    RT_MODEL_estimation_velocity_T estimation_velocity_M;
-  };
-}
+#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
+
+extern MdlrefDW_estimation_velocity_T estimation_velocity_MdlrefDW;
+
+#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
+
+#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
+
+// Block states (default storage)
+extern DW_estimation_velocity_f_T estimation_velocity_DW;
+
+#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
 
 //-
 //  These blocks were eliminated from the model due to optimizations:

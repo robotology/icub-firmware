@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.55
+// Model version                  : 2.56
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Mar  9 12:12:40 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:11 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,10 +19,24 @@
 #ifndef RTW_HEADER_can_encoder_h_
 #define RTW_HEADER_can_encoder_h_
 #include <cstring>
-#include <stddef.h>
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
-#include <stddef.h>
+#ifndef can_encoder_MDLREF_HIDE_CHILD_
+
+// Real-time Model Data Structure
+struct tag_RTM_can_encoder_T {
+  const char_T **errorStatus;
+};
+
+#endif                                 //can_encoder_MDLREF_HIDE_CHILD_
+
+#ifndef can_encoder_MDLREF_HIDE_CHILD_
+
+struct MdlrefDW_can_encoder_T {
+  RT_MODEL_can_encoder_T rtm;
+};
+
+#endif                                 //can_encoder_MDLREF_HIDE_CHILD_
 
 //
 //  Exported Global Parameters
@@ -44,45 +58,24 @@ extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //    '<S4>/Constant'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
+extern void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const
+  BUS_EVENTS_TX *rtu_events_tx, BUS_CAN_MULTIPLE *rty_pck_tx);
 
-// Class declaration for model can_encoder
-namespace amc_bldc_codegen
-{
-  class CAN_Encoder
-  {
-    // public data and function members
-   public:
-    // Real-time Model Data Structure
-    struct RT_MODEL_can_encoder_T {
-      const char_T **errorStatus;
-    };
+// Model reference registration function
+extern void can_encoder_initialize(const char_T **rt_errorStatus);
 
-    // model step function
-    void step(const BUS_MESSAGES_TX &arg_messages_tx, const BUS_EVENTS_TX &
-              arg_events_tx, BUS_CAN_MULTIPLE &arg_pck_tx);
+#ifndef can_encoder_MDLREF_HIDE_CHILD_
 
-    // Real-Time Model get method
-    amc_bldc_codegen::CAN_Encoder::RT_MODEL_can_encoder_T * getRTM();
+extern void can_encoder_format_can_id(uint8_T rtu_class, uint8_T rtu_can_id_amc,
+  uint8_T rtu_dst_typ, uint16_T *rty_pkt_id);
 
-    //member function to setup error status pointer
-    void setErrorStatusPointer(const char_T **rt_errorStatus);
+#endif                                 //can_encoder_MDLREF_HIDE_CHILD_
 
-    // Constructor
-    CAN_Encoder();
+#ifndef can_encoder_MDLREF_HIDE_CHILD_
 
-    // Destructor
-    ~CAN_Encoder();
+extern MdlrefDW_can_encoder_T can_encoder_MdlrefDW;
 
-    // private data and function members
-   private:
-    // private member function(s) for subsystem '<S5>/format_can_id'
-    static void can_encoder_format_can_id(uint8_T rtu_class, uint8_T
-      rtu_can_id_amc, uint8_T rtu_dst_typ, uint16_T *rty_pkt_id);
-
-    // Real-Time Model
-    RT_MODEL_can_encoder_T can_encoder_M;
-  };
-}
+#endif                                 //can_encoder_MDLREF_HIDE_CHILD_
 
 //-
 //  The generated code includes comments that allow you to trace directly
