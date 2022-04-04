@@ -388,6 +388,11 @@
               <FileType>8</FileType>
               <FilePath>..\src\udpdemoipnet-main.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_os_eom.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_eom.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1713,6 +1718,11 @@
               <FileType>8</FileType>
               <FilePath>..\src\udpdemoipnet-main.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_os_eom.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_eom.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2680,6 +2690,11 @@
               <FileName>udpdemoipnet-main.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\udpdemoipnet-main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_os_eom.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\os\embot_os_eom.cpp</FilePath>
             </File>
           </Files>
         </Group>

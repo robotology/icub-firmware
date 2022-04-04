@@ -37,7 +37,7 @@ static void ipal_app_on_fatal_error(ipal_fatalerror_t errorcode, const char * er
  * =============================================================================================== */
  
 
-static const ipal_cfg2_support_t suppcfg2 = 
+constexpr ipal_cfg2_support_t suppcfg2 = 
 {
     .arch_ipstack = ipal_ipstack_iitmod_lwip,
     .memorymodel = ipal_memmodel_static,
@@ -47,14 +47,14 @@ static const ipal_cfg2_support_t suppcfg2 =
     .filler = {0, 0, 0, 0}           
 };
 
-static const ipal_cfg2_system_t syscfg2 = 
+constexpr ipal_cfg2_system_t syscfg2 = 
 {
-    .sys_timetick = 10000,
+    .sys_timetick = 10*embot::core::time1millisec,
     .sys_mempoolsize = 0,
     .filler = {0, 0}        
 };
 
-static const ipal_cfg2_eth_t ethcfg2 =
+constexpr ipal_cfg2_eth_t ethcfg2 =
 {
     .eth_mac = IPAL_mac48addr(0x1E,0x30,0x6C,0xA2,0x45,0x5E),
     .eth_ip = IPAL_ipv4addr(10, 0, 1, 99),
@@ -69,7 +69,7 @@ static const ipal_cfg2_eth_t ethcfg2 =
     .get_frame = embot::hw::eth::get_frame       
 };
 
-static const ipal_cfg2_arp_t arpcfg2 =
+constexpr ipal_cfg2_arp_t arpcfg2 =
 {
     .arp_cachetimeout = 255*embot::core::time1second,
     .arp_retrytimeout = 0,
@@ -79,13 +79,13 @@ static const ipal_cfg2_arp_t arpcfg2 =
     .filler = {0, 0, 0, 0, 0}
 };
 
-static const ipal_cfg2_udp_t udpcfg2 = 
+constexpr ipal_cfg2_udp_t udpcfg2 = 
 {
     .udp_socketnum = 5,
     .filler = {0, 0, 0, 0}   
 };
 
-static const ipal_cfg2_igmp_t igmpcfg2 = 
+constexpr ipal_cfg2_igmp_t igmpcfg2 = 
 {
     .igmp_groupsnum = 1,
     .filler = {0, 0, 0, 0, 0, 0, 0}    
@@ -124,7 +124,7 @@ ipal_result_t osal_mutex_release(void *mutex)
 
 constexpr uint32_t tout = 10;
 
-static const ipal_cfg2_extfn_t extfncfg2 = 
+constexpr ipal_cfg2_extfn_t extfncfg2 = 
 {
     .usr_on_fatal_error = ipal_app_on_fatal_error,
     .signal_rx_frame = ipal_app_usr_on_rx_frame,
