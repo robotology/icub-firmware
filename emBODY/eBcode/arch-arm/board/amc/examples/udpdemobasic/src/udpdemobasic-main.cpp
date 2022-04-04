@@ -321,7 +321,7 @@ static void s_start_ETHmonitor_thread()
         embot::os::Priority::high47, 
         tETHmon_startup,                // the startup function
         nullptr,                        // it param
-        100*embot::core::time1millisec, // the period
+        1000*embot::core::time1millisec, // the period
         tETHmon_onperiod,
         "tETHmon"
     };
@@ -358,7 +358,7 @@ static void s_start_UDPcomm_thread()
 
 
 constexpr uint32_t UDP_APP_MAX_PAYLOAD = 1034;
-uint8_t udp_app_send_payload[UDP_APP_MAX_PAYLOAD] = {0};
+uint8_t udp_app_send_payload[UDP_APP_MAX_PAYLOAD] = "hi there!";
 ipal_packet_t ipal_send_packet = {0};
 
 ipal_udpsocket_t *ipal_udp_socket = nullptr;
@@ -410,7 +410,7 @@ void tUDPcomm_startup(embot::os::Thread *t, void *param)
 	ipal_send_packet.data = udp_app_send_payload;
 #endif
 
-    ipal_send_packet.size = 4;
+    ipal_send_packet.size = 10;
     ipal_send_packet.data = udp_app_send_payload;
     
     
@@ -535,7 +535,8 @@ void tUDPcomm_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void
     }
     
     if(true == embot::core::binary::mask::check(eventmask, evt_ANSWERreceived))
-    {        
+    { 
+        send_datagram();        
         embot::core::print(std::string("tUDPcomm_onevent(evt_ANSWERreceived): @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());         
     }    
     
@@ -547,11 +548,14 @@ void tUDPcomm_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void
 
 volatile bool answer_received = false;
 
+#include <stdio.h>
+
 static void send_datagram()
 {
     
 //    embot::core::print(std::string("sending datagram: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string()); 
     
+
 	if(ipal_res_OK == ipal_udpsocket_send(ipal_udp_socket, &ipal_send_packet))
     {
         embot::core::print(std::string("succesfully sent datagram: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());         
@@ -613,25 +617,52 @@ static void udp_rcv_cb_func(void *arg, ipal_udpsocket_t *skt, ipal_packet_t *pkt
 #endif    
 }
 
+//#define USE_KS
+
+#if defined(USE_KS)
+#include "embot_hw_chip_KSZ8563.h"
+embot::hw::chip::KSZ8563 *eths {nullptr}; 
+#else
+#include "embot_hw_eth.h"
+#endif
+
 // code for the periodic thread tETHmon
 void tETHmon_startup(embot::os::Thread *t, void *param)
 {
     embot::core::print(std::string("calling tETHmon_startup() @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());   
 
+#if defined(USE_KS)   
+    eths = new embot::hw::chip::KSZ8563;
+    eths->init({});
+#else
+#endif        
     // add in here initialization code for the driver which asks the ETH switch
 }
 
 
 void tETHmon_onperiod(embot::os::Thread *t, void *param)
 {
-    embot::core::print(std::string("calling tETHmon_onperiod() @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());   
+//    embot::core::print(std::string("calling tETHmon_onperiod() @ ") + embot::core::TimeFormatter(embot::core::now()).to_string());   
 
      // add in here code which asks the ETH switch about its status
     
-    bool link0isup = false;    
-    bool link1isup = false;
-    std::string msg = std::string("ETH link 0 is ") + (link0isup ? "UP" : "DOWN") + " ETH link 1 is " + (link1isup ? "UP" : "DOWN");
+    bool link1isup = false;    
+    bool link2isup = false;
+
+#if defined(USE_KS)    
+    embot::hw::chip::KSZ8563::Link lnk1 { embot::hw::chip::KSZ8563::Link::DOWN };
+    embot::hw::chip::KSZ8563::Link lnk2 { embot::hw::chip::KSZ8563::Link::DOWN };
+    eths->read(embot::hw::chip::KSZ8563::PHY::one, lnk1);
+    eths->read(embot::hw::chip::KSZ8563::PHY::two, lnk2);
     
+    link1isup = (embot::hw::chip::KSZ8563::Link::UP == lnk1) ? true : false;
+    link2isup = (embot::hw::chip::KSZ8563::Link::UP == lnk2) ? true : false;
+#else    
+    link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one);
+    link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two);
+#endif
+    
+    std::string msg = std::string("ETH link 1 is ") + (link1isup ? "UP" : "DOWN") + " ETH link 2 is " + (link2isup ? "UP" : "DOWN");
     embot::core::print(msg + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
 }
 

@@ -6,7 +6,7 @@
 */
 
 //// for api
-#include "hal.h"
+//#include "hal.h"
 //#include "hal_5v.h"
 
 // for implementation
@@ -18,11 +18,11 @@
 //#include "embot_hw_flash.h"
 
 
-// that is the only required so far
-extern void hal_sys_irq_disable(void) 
-{
-    // nothing so far
-}   
+//// that is the only required so far
+//extern void hal_sys_irq_disable(void) 
+//{
+//    // nothing so far
+//}   
 
 
 // eth

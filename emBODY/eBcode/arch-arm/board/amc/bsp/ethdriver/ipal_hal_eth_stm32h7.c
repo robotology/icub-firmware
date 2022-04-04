@@ -11,6 +11,7 @@
 // for now i add EMBOT_ENABLE_hw_eth_phytimeout simply like that. 
 // later on when this file gets absorbed inside embot::hw::bsp it 
 // will be seen by the inclusion of embot_hw_bsp_config.h 
+#include "ethdriver.h"
 #define EMBOT_ENABLE_hw_eth_phytimeout
 #else
 #include "Driver_ETH_MAC.h"
@@ -144,6 +145,9 @@ static void eth_frame_rx_cb(uint32_t arm_event)
  */
 ipal_result_t ipal_hal_eth_stm32h7_init(ipal_hal_eth_cfg_t *cfg)
 { 
+    
+    MX_ETH_Init();
+    
 	ARM_ETH_MAC_CAPABILITIES cap;
 	ARM_ETH_MAC_ADDR arm_eth_mac_addr;
 	ARM_ETH_LINK_STATE link;
@@ -175,6 +179,9 @@ ipal_result_t ipal_hal_eth_stm32h7_init(ipal_hal_eth_cfg_t *cfg)
 	
   MACDRV->Control (ARM_ETH_MAC_CONTROL_TX, 0);
   MACDRV->Control (ARM_ETH_MAC_CONTROL_RX, 0);
+  
+#if 0
+// it was like that for the development board  
 
   /* Initialize Physical Media Interface */
   if (PHYDRV->Initialize (MACDRV->PHY_Read, MACDRV->PHY_Write) == ARM_DRIVER_OK) {
@@ -215,7 +222,42 @@ ipal_result_t ipal_hal_eth_stm32h7_init(ipal_hal_eth_cfg_t *cfg)
 		link = PHYDRV->GetLinkState();
 	} while (link == ARM_ETH_LINK_DOWN);
 #endif
+
+#else
+    // this is for the amc board
+
+	/* PHY Initialize */
+	if (PHYDRV->Initialize (MACDRV->PHY_Read, MACDRV->PHY_Write) != ARM_DRIVER_OK)
+	{
+		return ipal_res_NOK_generic; 
+	}
+
+	/* MARTINO: Rimossa questa parte. Il fisico parte con le resistenze di bootstrap,
+		 e non occorre aspettare per l'autonegoziazione (il tutto è demandatao a un livello
+		 diagnostico più alto). Che sia collegato o meno,  la IPAL parte, poi sarà la 
+		 diagnostica a comunicare lo stato dei fisici
+	*/
+	#if (0)
+		/* Initialize Physical Media Interface */
+		if (PHYDRV->Initialize (MACDRV->PHY_Read, MACDRV->PHY_Write) == ARM_DRIVER_OK) {
+			PHYDRV->PowerControl (ARM_POWER_FULL);
+			PHYDRV->SetInterface (cap.media_interface);
+			PHYDRV->SetMode (ARM_ETH_PHY_AUTO_NEGOTIATE);
+		}
+		else 
+		{
+			return ipal_res_NOK_generic; 
+		}
+		
+		/* MARTINO: bloccante. Rivedere */
+		do 
+		{
+			link = PHYDRV->GetLinkState();
+		} while (link == ARM_ETH_LINK_DOWN);
+	#endif
 	
+#endif	
+
 	/* Start EMAC DMA */
 	link_info = PHYDRV->GetLinkInfo();
 	

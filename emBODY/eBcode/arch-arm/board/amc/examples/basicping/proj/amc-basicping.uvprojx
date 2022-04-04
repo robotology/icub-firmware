@@ -439,14 +439,24 @@
           <GroupName>bsp-ipal</GroupName>
           <Files>
             <File>
+              <FileName>PHY_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>stm32h7xx_ethirqhandler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\stm32h7xx_ethirqhandler.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -785,7 +795,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DICUBTECH_USE_IPAL</MiscControls>
               <Define>CORE_CM7 USE_HAL_DRIVER STM32H745xx USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\..\bsp-ipal;..\cfg;..\..\bsp-basic</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\cfg;..\..\bsp-basic;..\..\..\bsp\ethdriver</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -816,7 +826,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\..\bsp-ipal\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
+            <ScatterFile>..\..\..\bsp\ethdriver\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -885,14 +895,24 @@
           <GroupName>bsp-ipal</GroupName>
           <Files>
             <File>
+              <FileName>PHY_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>stm32h7xx_ethirqhandler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\stm32h7xx_ethirqhandler.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1231,7 +1251,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DICUBTECH_USE_IPAL</MiscControls>
               <Define>CORE_CM7 USE_HAL_DRIVER STM32H745xx USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\..\bsp-ipal;..\cfg;..\..\bsp-basic</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\src;..\cfg;..\..\bsp-basic;..\..\..\bsp\ethdriver</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1262,7 +1282,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\..\bsp-ipal\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
+            <ScatterFile>..\..\..\bsp\ethdriver\stm32h745xx_flash_CM7-udp.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -1331,14 +1351,24 @@
           <GroupName>bsp-ipal</GroupName>
           <Files>
             <File>
+              <FileName>PHY_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+            </File>
+            <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\ipal_hal_eth_stm32h7.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>stm32h7xx_ethirqhandler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\bsp-ipal\stm32h7xx_ethirqhandler.c</FilePath>
+              <FilePath>..\..\..\bsp\ethdriver\stm32h7xx_ethirqhandler.c</FilePath>
             </File>
           </Files>
         </Group>

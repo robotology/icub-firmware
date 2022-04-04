@@ -231,8 +231,16 @@ namespace embot { namespace hw { namespace sys {
         return(++num);    
     }
 
-    
+    void irq_disable()
+    {
+        __disable_irq();
+    }
 
+    void irq_enable()
+    {
+        __enable_irq();
+    }
+    
 }}} // namespace embot { namespace hw { namespace sys { 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

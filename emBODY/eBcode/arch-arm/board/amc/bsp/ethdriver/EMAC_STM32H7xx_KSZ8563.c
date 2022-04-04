@@ -153,7 +153,7 @@ Configuration tab
 
 /* Tx buffer address (must be AXI SRAM (D1) or AHB SRAM (D2/D3) */
 #ifndef EMAC_TXBUF_ADDRESS
-#define EMAC_TXBUF_ADDRESS      0x30042000
+#define EMAC_TXBUF_ADDRESS      0x30042000   
 #endif
 
 /* Receive/transmit Checksum offload enable */
@@ -166,10 +166,12 @@ Configuration tab
 #define EMAC_TIME_STAMP         0
 #endif
 
-#include "EMAC_STM32H7xx.h"
+#include "EMAC_STM32H7xx_KSZ8563.h"
+#include "arm_acle.h"
+// acemor-rem-ksz8563 #include "itf_reg_ksz8563.h"
 
 /* Driver version */
-#define ARM_ETH_MAC_DRV_VERSION         ARM_DRIVER_VERSION_MAJOR_MINOR(1,3)
+#define ARM_ETH_MAC_DRV_VERSION         ARM_DRIVER_VERSION_MAJOR_MINOR(1,4)
 
 /* External HAL variables */
 extern ETH_HandleTypeDef    heth;
@@ -213,7 +215,8 @@ static EMAC_CTRL Emac;
 static ETH_MACConfigTypeDef       MAC_Config;
 static ETH_MACFilterConfigTypeDef MAC_Filter;
 static ETH_TxPacketConfig         TX_Config;
-static uint8_t                    TX_Buff[ETH_TX_DESC_CNT][ETH_MAX_PACKET_SIZE] __MEMORY_AT(EMAC_TXBUF_ADDRESS);
+static __ALIGNED(32) uint8_t        TX_Buff[ETH_TX_DESC_CNT][ETH_MAX_PACKET_SIZE] __MEMORY_AT(EMAC_TXBUF_ADDRESS); 
+
 
 /**
   \fn          uint32_t crc32_8bit_rev (uint32_t crc32, uint8_t val)
@@ -515,6 +518,7 @@ static int32_t SendFrame (const uint8_t *frame, uint32_t len, uint32_t flags) {
   ETH_DMADescTypeDef *tx_desc;
   uint32_t tx_index;
 
+	
   if ((frame == NULL) || (len == 0U)) {
     return ARM_DRIVER_ERROR_PARAMETER;
   }
@@ -548,9 +552,6 @@ static int32_t SendFrame (const uint8_t *frame, uint32_t len, uint32_t flags) {
   TX_Config.Length   =  Emac.tx_buf.len;
 
   /* Clean and invalidate data cache */
-  if ((SCB->CCR & SCB_CCR_DC_Msk) != 0U) {
-    SCB_CleanInvalidateDCache();
-  }
   HAL_ETH_Transmit_IT (&heth, &TX_Config);
 
   Emac.tx_buf.len = 0;
@@ -582,10 +583,9 @@ static int32_t ReadFrame (uint8_t *frame, uint32_t len) {
     memcpy (frame, Emac.rx_buf.buffer, len);
     Emac.rx_buf.buffer = NULL;
   }
-				
-	/* Return block back to EMAC-DMA */
-	HAL_ETH_BuildRxDescriptors (Emac.h);
-	
+  /* Return block back to EMAC-DMA */
+  HAL_ETH_BuildRxDescriptors (Emac.h);
+
   return (len);
 }
 
@@ -598,10 +598,6 @@ static uint32_t GetRxFrameSize (void) {
   uint32_t len = 0;
 
   /* Clean and invalidate data cache */
-  if ((SCB->CCR & SCB_CCR_DC_Msk) != 0U) {
-    SCB_CleanInvalidateDCache();
-  }
-
   if(HAL_ETH_GetRxDataBuffer(Emac.h, &Emac.rx_buf) == HAL_OK) {
     if (HAL_ETH_GetRxDataLength (Emac.h, &len) == HAL_OK) {
       return (len);
@@ -676,7 +672,7 @@ static int32_t Control (uint32_t control, uint32_t arg) {
       /* Configure 100MBit/10MBit mode */
       switch (arg & ARM_ETH_MAC_SPEED_Msk) {
         case ARM_ETH_MAC_SPEED_10M:
-          MAC_Config.Speed = ETH_SPEED_10M;
+          MAC_Config.Speed = ETH_SPEED_10M;		
           break;
         case ARM_ETH_SPEED_100M:
           MAC_Config.Speed = ETH_SPEED_100M;
@@ -691,7 +687,7 @@ static int32_t Control (uint32_t control, uint32_t arg) {
           MAC_Config.DuplexMode = ETH_FULLDUPLEX_MODE;
           break;
         case ARM_ETH_MAC_DUPLEX_HALF:
-          MAC_Config.DuplexMode = ETH_HALFDUPLEX_MODE;
+          MAC_Config.DuplexMode = ETH_HALFDUPLEX_MODE; 
           break;
         default:
           return ARM_DRIVER_ERROR;
@@ -819,44 +815,44 @@ static int32_t Control (uint32_t control, uint32_t arg) {
   return ARM_DRIVER_OK;
 }
 
-
 /**
-  \fn          int32_t PHY_Read (uint8_t phy_addr, uint8_t reg_addr, uint16_t *data)
-  \brief       Read Ethernet PHY Register through Management Interface.
-  \param[in]   phy_addr  5-bit device address
-  \param[in]   reg_addr  5-bit register address
-  \param[out]  data      Pointer where the result is written to
-  \return      \ref execution_status
+	\fn          int32_t PHY_Read (uint8_t phy_addr, uint8_t reg_addr, uint16_t *data)
+	\brief       Read Ethernet PHY Register through Management Interface.
+	\param[in]   phy_addr  5-bit device address
+	\param[in]   reg_addr  5-bit register address
+	\param[out]  data      Pointer where the result is written to
+	\return      \ref execution_status
 */
-static int32_t PHY_Read (uint8_t phy_addr, uint8_t reg_addr, uint16_t *data) {
-  uint32_t val;
-
-  if (HAL_ETH_ReadPHYRegister (Emac.h, phy_addr, reg_addr, &val) != HAL_OK) {
-    return ARM_DRIVER_ERROR;
-  }
-  *data = (uint16_t)val;
-
-  return ARM_DRIVER_OK;
+static int32_t PHY_Read (uint8_t phy_addr, uint8_t reg_addr, uint16_t *data) 
+{
+	/* Avoid compiler warnings */
+	phy_addr = phy_addr;
+	reg_addr = reg_addr;
+	data = data;
+	
+	/* UNUSED */
+	return 0;
 }
 
 
 /**
-  \fn          int32_t PHY_Write (uint8_t phy_addr, uint8_t reg_addr, uint16_t data)
-  \brief       Write Ethernet PHY Register through Management Interface.
-  \param[in]   phy_addr  5-bit device address
-  \param[in]   reg_addr  5-bit register address
-  \param[in]   data      16-bit data to write
-  \return      \ref execution_status
+	\fn          int32_t PHY_Write (uint8_t phy_addr, uint8_t reg_addr, uint16_t data)
+	\brief       Write Ethernet PHY Register through Management Interface.
+	\param[in]   phy_addr  5-bit device address
+	\param[in]   reg_addr  5-bit register address
+	\param[in]   data      16-bit data to write
+	\return      \ref execution_status
 */
-static int32_t PHY_Write (uint8_t phy_addr, uint8_t reg_addr, uint16_t data) {
-
-  if (HAL_ETH_WritePHYRegister (Emac.h, phy_addr, reg_addr, data) != HAL_OK) {
-    return ARM_DRIVER_ERROR;
-  }
-
-  return ARM_DRIVER_OK;
+static int32_t PHY_Write (uint8_t phy_addr, uint8_t reg_addr, uint16_t data) 
+{
+	/* Avoid compiler warnings */
+	phy_addr = phy_addr;
+	reg_addr = reg_addr;
+	data = data;
+	
+	/* UNUSED */
+	return 0;
 }
-
 
 /* HAL callback: Tx transfer completed (frame sent) */
 void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *heth) {

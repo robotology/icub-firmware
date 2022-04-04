@@ -2,7 +2,7 @@
 
 
 
-In here is a very basic scheme of how the `EOMtheIPnet` and the `EOSocketDatagram` works in the ETH boards such as the `ems`, `mc4plus` and `mc2plus` and how it offer a socket service.
+In here is a very basic scheme of how the `EOMtheIPnet` and the `EOSocketDatagram` work in the ETH boards such as the `ems`, `mc4plus` , `mc2plus` and `amc` and how they offer a socket service.
 
 
 
@@ -119,3 +119,6 @@ eo_socketdtg_Open(skt1, 3333, eo_sktdir_TXRX, eobool_false, NULL, s_action_ethcm
 ```
 
 **Code listing**. An example of  eo_socketdtg_Open() of a socket on port 3333 that is bidirectional, non-blocking and that on reception of a frame ensures that function alertserverthread() is called to alert the owning thread. 
+
+
+

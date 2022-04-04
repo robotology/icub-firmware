@@ -112,9 +112,9 @@ namespace embot { namespace hw { namespace spi {
         volatile bool ongoing {false};
         embot::core::Callback oncompletion {};    
         Transaction() = default;
-        void clear() { direction = Direction::NONE; oncompletion.clear(); ongoing = false; } //recdata.clear(); data2send.clear(); }
+        void clear() { direction = Direction::NONE; ongoing = false; } //recdata.clear(); data2send.clear(); }
         void start(Direction d, const embot::core::Callback &onc) { ongoing = true; direction = d; oncompletion = onc; }
-        void stop(Direction d) { if(d == direction) { oncompletion.execute(); clear(); } }         
+        void stop(Direction d) { if(d == direction) { clear(); oncompletion.execute(); } }         
     };
         
     struct PrivateData
@@ -222,6 +222,15 @@ namespace embot { namespace hw { namespace spi {
         return resOK;
     }        
 
+    bool clear(embot::hw::SPI b)
+    {
+        if(false == initialised(b))
+        {
+            return false;
+        } 
+        s_privatedata.transaction[embot::core::tointegral(b)].clear();
+        return true;
+    }
     
     bool isbusy(SPI b)
     {
