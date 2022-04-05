@@ -990,10 +990,93 @@ static void JointSet_do_current_control(JointSet* o)
     int N = *(o->pN);
         
     BOOL limits_torque_protection = FALSE;
+#ifdef WRIST_MK2
+    if (o->must_park)
+    {
+        JointSet_start_park(o);
+
+        o->must_park = FALSE;
+
+        static char msg[] = "BUONGIORNISSIMO 2";
+
+        JointSet_send_debug_message(msg, 0, 0, 0);
+    }
+
+    if (o->is_parking)
+    {
+        if (JointSet_is_parked(o))
+        {
+            JointSet_stop_park(o);
+        }
+    }
+
+    if (!o->is_parking)
+    {
+        Trajectory_do_step(o->ypr_trajectory,   o->ypr_pos_ref,   o->ypr_vel_ref,   o->ypr_acc_ref  );
+        Trajectory_do_step(o->ypr_trajectory+1, o->ypr_pos_ref+1, o->ypr_vel_ref+1, o->ypr_acc_ref+1);
+        Trajectory_do_step(o->ypr_trajectory+2, o->ypr_pos_ref+2, o->ypr_vel_ref+2, o->ypr_acc_ref+2);
+    }
+    else
+    {
+        o->ypr_pos_ref[0] = o->ypr_vel_ref[0] = o->ypr_acc_ref[0] = ZERO;
+        o->ypr_pos_ref[1] = o->ypr_vel_ref[1] = o->ypr_acc_ref[1] = ZERO;
+        o->ypr_pos_ref[2] = o->ypr_vel_ref[2] = o->ypr_acc_ref[2] = ZERO;
+    }
+
+//    static int noflood = 0;
+//
+//    if (++noflood > 1000)
+//    {
+//        noflood = 0;
+//        int16_t par16 = (int16_t)(o->ypr_pos_ref[0]*ICUB2DEG);
+//        int32_t par32 = (int32_t)(Trajectory_get_target_position(o->ypr_trajectory)*ICUB2DEG);
+//        JointSet_send_debug_message(NULL, 0, par16, par32);
+//    }
+
+    o->wrist_decoupler.rtU.ypr[0] = ICUB2DEG*o->ypr_pos_ref[0];
+    o->wrist_decoupler.rtU.ypr[1] = ICUB2DEG*o->ypr_pos_ref[1];
+    o->wrist_decoupler.rtU.ypr[2] = ICUB2DEG*o->ypr_pos_ref[2];
+
+    o->wrist_decoupler.rtU.theta_meas[0] = ICUB2DEG*(o->joint[0]).pos_fbk + o->arm_pos_off[0];
+    o->wrist_decoupler.rtU.theta_meas[1] = ICUB2DEG*(o->joint[1]).pos_fbk + o->arm_pos_off[1];
+    o->wrist_decoupler.rtU.theta_meas[2] = ICUB2DEG*(o->joint[2]).pos_fbk + o->arm_pos_off[2];
+
+    //////////////////////////
+    o->wrist_decoupler.step();
+    //////////////////////////
+
+    if (o->wrist_decoupler.rtY.singularity)
+    {
+        if (!o->is_parking)
+        {
+            JointSet_start_park(o);
+        }
+    }
+
+    o->ypr_pos_fbk[0] = DEG2ICUB*(o->wrist_decoupler.rtY.ypr_meas[0]);
+    o->ypr_pos_fbk[1] = DEG2ICUB*(o->wrist_decoupler.rtY.ypr_meas[1]);
+    o->ypr_pos_fbk[2] = DEG2ICUB*(o->wrist_decoupler.rtY.ypr_meas[2]);
+
+    CTRL_UNITS arm_pos_ref[3];
+
+    arm_pos_ref[0] = DEG2ICUB*wrap180(o->wrist_decoupler.rtY.theta_star[0] - o->arm_pos_off[0]);
+    arm_pos_ref[1] = DEG2ICUB*wrap180(o->wrist_decoupler.rtY.theta_star[1] - o->arm_pos_off[1]);
+    arm_pos_ref[2] = DEG2ICUB*wrap180(o->wrist_decoupler.rtY.theta_star[2] - o->arm_pos_off[2]);
+
+//    arm_pos_ref[0] = ZERO;
+//    arm_pos_ref[1] = ZERO;
+//    arm_pos_ref[2] = ZERO;
+#endif
         
     for (int js=0; js<N; ++js)
     {
         Joint *pJoint = o->joint+o->joints_of_set[js];
+#ifdef WRIST_MK2
+        if (!o->is_parking)
+        {
+            Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
+        }
+#endif
         
         Joint_do_pwm_or_current_control(pJoint);
        
