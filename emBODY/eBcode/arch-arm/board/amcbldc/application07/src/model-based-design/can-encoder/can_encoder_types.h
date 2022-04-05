@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.55
+// Model version                  : 2.56
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Mar  9 12:12:40 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:11 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -172,6 +172,10 @@ struct BUS_CAN_MULTIPLE
 };
 
 #endif
+
+// Forward declaration for rtModel
+typedef struct tag_RTM_can_encoder_T RT_MODEL_can_encoder_T;
+
 #endif                                 // RTW_HEADER_can_encoder_types_h_
 
 //

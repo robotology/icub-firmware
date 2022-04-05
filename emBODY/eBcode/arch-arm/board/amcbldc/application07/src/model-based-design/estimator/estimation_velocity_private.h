@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.36
+// Model version                  : 2.38
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 31 18:32:19 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:31 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,9 +37,9 @@
 #define rtmSetErrorStatusPointer(rtm, val) ((rtm)->errorStatus = (val))
 #endif
 
-extern const real32_T rtCP_pooled_cBWEzfqKWJF1[32];
+extern const real32_T rtCP_pooled_Az3IVI54Pn7X[32];
 
-#define rtCP_Constant_Value_c          rtCP_pooled_cBWEzfqKWJF1  // Computed Parameter: rtCP_Constant_Value_c
+#define rtCP_Constant_Value_c          rtCP_pooled_Az3IVI54Pn7X  // Computed Parameter: rtCP_Constant_Value_c
                                                                  //  Referenced by: '<S1>/Constant'
 
 #endif                             // RTW_HEADER_estimation_velocity_private_h_

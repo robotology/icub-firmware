@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.268
+// Model version                  : 3.271
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Mar 16 14:14:12 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:41 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -717,6 +717,10 @@ struct BUS_CAN_PACKET_RX
 };
 
 #endif
+
+// Forward declaration for rtModel
+typedef struct tag_RTM_AMC_BLDC_T RT_MODEL_AMC_BLDC_T;
+
 #endif                                 // RTW_HEADER_AMC_BLDC_types_h_
 
 //

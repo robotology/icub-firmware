@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.27
+// Model version                  : 3.29
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Mar 11 17:07:35 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:00 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -384,6 +384,10 @@ struct BUS_MESSAGES_TX
 };
 
 #endif
+
+// Forward declaration for rtModel
+typedef struct tag_RTM_SupervisorFSM_TX_T RT_MODEL_SupervisorFSM_TX_T;
+
 #endif                                 // RTW_HEADER_SupervisorFSM_TX_types_h_
 
 //

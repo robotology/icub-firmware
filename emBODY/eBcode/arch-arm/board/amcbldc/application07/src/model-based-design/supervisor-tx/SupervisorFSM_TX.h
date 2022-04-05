@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.27
+// Model version                  : 3.29
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Mar 11 17:07:35 2022
+// C/C++ source code generated on : Fri Apr  1 11:36:00 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,75 +18,72 @@
 //
 #ifndef RTW_HEADER_SupervisorFSM_TX_h_
 #define RTW_HEADER_SupervisorFSM_TX_h_
-#include <cstring>
-#include <stddef.h>
 #include "rtwtypes.h"
 #include "SupervisorFSM_TX_types.h"
-#include <stddef.h>
 
-// Class declaration for model SupervisorFSM_TX
-namespace amc_bldc_codegen
-{
-  class SupervisorFSM_TX
-  {
-    // public data and function members
-   public:
-    // Block signals for model 'SupervisorFSM_TX'
-    struct B_SupervisorFSM_TX_T {
-      boolean_T ev_foc;                // '<Root>/SupervisorFSM_TX'
-      boolean_T ev_status;             // '<Root>/SupervisorFSM_TX'
-    };
+// Block signals for model 'SupervisorFSM_TX'
+#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-    // Block states (default storage) for model 'SupervisorFSM_TX'
-    struct DW_SupervisorFSM_TX_T {
-      uint32_T ev_focEventCounter;     // '<Root>/SupervisorFSM_TX'
-      uint32_T ev_statusEventCounter;  // '<Root>/SupervisorFSM_TX'
-      uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
-    };
+struct B_SupervisorFSM_TX_c_T {
+  boolean_T ev_foc;                    // '<Root>/SupervisorFSM_TX'
+  boolean_T ev_status;                 // '<Root>/SupervisorFSM_TX'
+};
 
-    // Real-time Model Data Structure
-    struct RT_MODEL_SupervisorFSM_TX_T {
-      const char_T **errorStatus;
-    };
+#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-    // Initial conditions function
-    void init(BUS_MESSAGES_TX *arg_MessagesTx, BUS_EVENTS_TX *arg_EventsTx)
-      const;
+// Block states (default storage) for model 'SupervisorFSM_TX'
+#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-    // model step function
-    void step(const Flags &arg_Flags, const SensorsData &arg_SensorsData, const
-              EstimatedData &arg_EstimatedData, const ControlOutputs &
-              arg_ControlOutputs, const ConfigurationParameters &
-              arg_ConfigurationParameters, BUS_MESSAGES_TX &arg_MessagesTx,
-              BUS_EVENTS_TX &arg_EventsTx);
+struct DW_SupervisorFSM_TX_f_T {
+  uint32_T ev_focEventCounter;         // '<Root>/SupervisorFSM_TX'
+  uint32_T ev_statusEventCounter;      // '<Root>/SupervisorFSM_TX'
+  uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
+};
 
-    // Real-Time Model get method
-    amc_bldc_codegen::SupervisorFSM_TX::RT_MODEL_SupervisorFSM_TX_T * getRTM();
+#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-    //member function to setup error status pointer
-    void setErrorStatusPointer(const char_T **rt_errorStatus);
+#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-    // Block signals
-    B_SupervisorFSM_TX_T SupervisorFSM_TX_B;
+// Real-time Model Data Structure
+struct tag_RTM_SupervisorFSM_TX_T {
+  const char_T **errorStatus;
+};
 
-    // Block states
-    DW_SupervisorFSM_TX_T SupervisorFSM_TX_DW;
+#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-    // Constructor
-    SupervisorFSM_TX();
+#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-    // Destructor
-    ~SupervisorFSM_TX();
+struct MdlrefDW_SupervisorFSM_TX_T {
+  RT_MODEL_SupervisorFSM_TX_T rtm;
+};
 
-    // private data and function members
-   private:
-    // private member function(s) for subsystem '<Root>/TmpModelReferenceSubsystem'
-    MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode);
+#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-    // Real-Time Model
-    RT_MODEL_SupervisorFSM_TX_T SupervisorFSM_TX_M;
-  };
-}
+extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_EVENTS_TX
+  *rty_EventsTx);
+extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
+  EstimatedData *rtu_EstimatedData, const Flags *rtu_Flags, const ControlOutputs
+  *rtu_ControlOutputs, BUS_MESSAGES_TX *rty_MessagesTx, BUS_EVENTS_TX
+  *rty_EventsTx);
+
+// Model reference registration function
+extern void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus);
+
+#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
+
+extern MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_MdlrefDW;
+
+#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
+
+#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
+
+// Block signals (default storage)
+extern B_SupervisorFSM_TX_c_T SupervisorFSM_TX_B;
+
+// Block states (default storage)
+extern DW_SupervisorFSM_TX_f_T SupervisorFSM_TX_DW;
+
+#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
 //-
 //  The generated code includes comments that allow you to trace directly
