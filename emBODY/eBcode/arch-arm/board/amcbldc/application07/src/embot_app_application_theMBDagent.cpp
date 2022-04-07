@@ -22,6 +22,7 @@
 #include "embot_app_theCANboardInfo.h"
 #include "embot_app_scope.h"
 #include "embot_hw_sys.h"
+#include "embot_core.h"
 #include "embot_app_theLEDmanager.h"
 #include <array>
 
@@ -45,6 +46,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
+
 
 namespace embot::app::application {
 
@@ -184,6 +186,16 @@ struct embot::app::application::theMBDagent::Impl
     static constexpr uint8_t maxNumberOfPacketsCAN {4}; 
 };
 
+static int32_t counter = 0;
+static int32_t counter_tx = 0;
+
+
+
+uint32_t cmd_control_mode= 0;
+uint32_t cmd_set_limit = 0;
+uint32_t cmd_set_pid = 0;
+uint32_t count_desired_current=0;
+
       
 bool embot::app::application::theMBDagent::Impl::initialise()
 {
@@ -312,61 +324,56 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         }
     }
     
-    uint8_t rx_data[8] {0}; // payload content
-    uint8_t rx_size {0};    // size of payload
-    uint32_t rx_id {0};     // frame ID
+	
+	//define the max number of CAN pkt managed by Supervisor.
+	// IMPORTANT: please update this value if it change in the definition of BUS_CAN_MULTIPLE in AMC_BLDC_types.h
+    const uint8_t SupervisorRX_maxNumOfCANPkt = 4; 
     
     
-    // check for CAN input frame
-    size_t ninputframes = inpframes.size();
-    if(0 == ninputframes) 
-    {
-        #pragma unroll
-        for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++) {
-            AMC_BLDC_U.PacketsRx.packets[i].available = false;
-        }
-    } 
-    else
-    {   
-        // retrieve the CAN frames, use them, remove them from the vector
-        // so far we consume only one frame every tick
-        size_t consumedframes {1};
-
-        // get the first
-        embot::prot::can::Frame frame = inpframes.front();
-
-        // copy it
-        frame.copyto(rx_id, rx_size, rx_data);
-        
-//        static uint32_t cnt = 0;
-//        if((++cnt % 500) == 1)
-//        {
-//            embot::core::print(std::string("size = ") + std::to_string(ninputframes) + ", d[0] = " + std::to_string(rx_data[0]) + 
-//                           ", consumed = " + std::to_string(consumedframes) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-//        }
-        
-        // clean up the first consumedframes positions
+		
+	// 1. reset all info //ATTENTION!!!!!
+	for (uint8_t i = 0; i < 4; i++) {
+		AMC_BLDC_U.PacketsRx.packets[i].available = false;
+	}
+	
+	// 2. check for CAN input frame
+    size_t cur_size = inpframes.size();
+    size_t ninputframes = cur_size;
+	
+	// 3. limit the number of can pkts per cycle to SupervisorRX_maxNumOfCANPkt 
+	if(ninputframes>SupervisorRX_maxNumOfCANPkt)
+		ninputframes = SupervisorRX_maxNumOfCANPkt;
+	
+	// 4. take ninputframes frames and inset them in the supervisor input queue.
+	for (uint8_t i = 0; i < ninputframes; i++) {
+		
+		uint8_t rx_data[8] {0}; // payload content
+		uint8_t rx_size {0};    // size of payload
+		uint32_t rx_id {0};     // frame ID
+		const size_t consumedframes {1};
+		
+		// get the first
+		embot::prot::can::Frame frame = inpframes.front();
+		// copy it
+        frame.copyto(rx_id, rx_size, rx_data); //IMPROVE!!!!!!!
+		// clean up the first consumedframes positions
         inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);
-        
-        
-        // save the first CAN frame into the input structure of the model (TODO: we'll manage the other packets soon)
-        AMC_BLDC_U.PacketsRx.packets[0].available = true;
-        AMC_BLDC_U.PacketsRx.packets[0].length = (uint8_T)rx_size;
-        AMC_BLDC_U.PacketsRx.packets[0].packet.ID = (uint16_T)rx_id;
-        
-        // Actually, we fill the payload of the first packet only. Later we manage the case of multi packets.
-        #pragma unroll
-        for (uint8_t i = 0; i < rx_size; i++) 
+		 // save the CAN frame into the input structure of the model
+        AMC_BLDC_U.PacketsRx.packets[i].available = true;
+        AMC_BLDC_U.PacketsRx.packets[i].length = (uint8_T)rx_size;
+        AMC_BLDC_U.PacketsRx.packets[i].packet.ID = (uint16_T)rx_id;
+		for (uint8_t d = 0; d < rx_size; d++) 
         {
-            AMC_BLDC_U.PacketsRx.packets[0].packet.PAYLOAD[i] = (uint8_T)rx_data[i];
+            AMC_BLDC_U.PacketsRx.packets[i].packet.PAYLOAD[d] = (uint8_T)rx_data[d];
         }
-        
-        // remember that we can deal with only one packet yet at this stage
-        #pragma unroll
-        for (uint8_t i = 1; i < maxNumberOfPacketsCAN; i++) {
-            AMC_BLDC_U.PacketsRx.packets[i].available = false;
-        }
-    }
+		
+	
+	}//end for
+    
+	
+
+
+    
     
     
     // -----------------------------------------------------------------------------
@@ -375,6 +382,9 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     
     AMC_BLDC_step_Time();
     
+    
+    
+
     // if there an output is available, send it to the CAN Netowork
     for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++)
     {
@@ -382,9 +392,17 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         if (AMC_BLDC_Y.PacketsTx.packets[i].available)
         {
             embot::prot::can::Frame fr {AMC_BLDC_Y.PacketsTx.packets[i].packet.ID, AMC_BLDC_Y.PacketsTx.packets[i].length, AMC_BLDC_Y.PacketsTx.packets[i].packet.PAYLOAD};
-            outframes.push_back(fr);
-        }
-    }
+			outframes.push_back(fr);
+			counter_tx++;
+	
+         
+
+				
+        }//end if
+    } //end for
+    
+	uint32_t out_size = outframes.size();
+
     
     // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
     // TODO: We should perform the following update inside the architectural model after a SET_MOTOR_CONFIG message has been received

@@ -9,7 +9,7 @@
 //
 // Model version                  : 3.271
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Apr  1 11:36:41 2022
+// C/C++ source code generated on : Tue May 17 09:47:01 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -32,7 +32,6 @@
 #include "can_decoder.h"
 #define SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_RX.h"
-#define SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_TX.h"
 #define can_encoder_MDLREF_HIDE_CHILD_
 #include "can_encoder.h"
@@ -66,7 +65,6 @@ struct B_AMC_BLDC_T {
   BUS_MESSAGES_RX_MULTIPLE CAN_Decoder_o1;// '<S6>/CAN_Decoder'
   BUS_MESSAGES_TX MessagesTx;          // '<S7>/SupervisorFSM_TX'
   SensorsData RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter3'
-  Targets Targets_n;                   // '<S7>/SupervisorFSM_RX'
   BUS_EVENTS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
   BUS_CAN_RX_ERRORS_MULTIPLE CAN_Decoder_o3;// '<S6>/CAN_Decoder'
   ControlOutputs RTBInsertedForAdapter_Inserte_a;// '<Root>/Adapter1'
@@ -108,6 +106,7 @@ struct DW_AMC_BLDC_T {
   int8_T RTBInsertedForAdapter_Inserte_a;// synthesized block
   int8_T RTBInsertedForAdapter_Inserte_g;// synthesized block
   int8_T RTBInsertedForAdapter_Insert_pa;// synthesized block
+  MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_InstanceData;// '<S7>/SupervisorFSM_TX' 
 };
 
 // External inputs (root inport signals with default storage)

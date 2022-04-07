@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.158
+// Model version                  : 3.196
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Apr  1 11:35:50 2022
+// C/C++ source code generated on : Thu May  5 17:51:49 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -294,6 +294,36 @@ struct BUS_CAN_RX_ERRORS_MULTIPLE
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
+
+typedef enum {
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_Torque,
+  ControlModes_HwFaultCM
+} ControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
+
+struct Flags
+{
+  // control mode
+  ControlModes control_mode;
+  boolean_T enable_sending_msg_status;
+  boolean_T fault_button;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_MotorConfig_
 #define DEFINED_TYPEDEF_FOR_MotorConfig_
 
@@ -424,47 +454,6 @@ struct ConfigurationParameters
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BoardState_
-#define DEFINED_TYPEDEF_FOR_BoardState_
-
-typedef enum {
-  BoardState_NotConfigured = 0,        // Default value
-  BoardState_Configured,
-  BoardState_Fault
-} BoardState;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
-
-typedef enum {
-  ControlModes_NotConfigured = 0,      // Default value
-  ControlModes_Idle,
-  ControlModes_Position,
-  ControlModes_PositionDirect,
-  ControlModes_Current,
-  ControlModes_Velocity,
-  ControlModes_Voltage,
-  ControlModes_Torque,
-  ControlModes_HwFaultCM
-} ControlModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
-
-struct Flags
-{
-  // control mode
-  ControlModes control_mode;
-  boolean_T enable_sending_msg_status;
-  boolean_T fault_button;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_MotorVoltage_
 #define DEFINED_TYPEDEF_FOR_MotorVoltage_
 
@@ -486,6 +475,41 @@ struct Targets
   MotorCurrent motorcurrent;
   MotorVoltage motorvoltage;
 };
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Setpoint_
+#define DEFINED_TYPEDEF_FOR_Setpoint_
+
+struct Setpoint
+{
+  ControlModes type;
+  real32_T value;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Limits_
+#define DEFINED_TYPEDEF_FOR_Limits_
+
+struct Limits
+{
+  real32_T overload;
+  real32_T peak;
+  real32_T nominal;
+  ControlModes type;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BoardState_
+#define DEFINED_TYPEDEF_FOR_BoardState_
+
+typedef enum {
+  BoardState_NotConfigured = 0,        // Default value
+  BoardState_Configured,
+  BoardState_Fault
+} BoardState;
 
 #endif
 

@@ -13,7 +13,7 @@
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 { 
-    embot::prot::can::versionOfAPPLICATION {1, 0, 6},    
+    embot::prot::can::versionOfAPPLICATION {1, 0, 7},    
     embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
@@ -103,6 +103,7 @@ int main(void)
 #include "embot_hw_bsp.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_can.h"
+#include "embot_core.h"
 
 #include "embot_app_application_theCANparserMBD.h"
 #include "embot_app_application_theMBDagent.h"
@@ -191,7 +192,7 @@ struct shared_t
             f = ff;
             txCANvector.erase(txCANvector.begin());
             remaining = txCANvector.size();
-            ret = true;            
+            ret = true;  
         }
         embot::os::rtos::mutex_release(txm);        
         return ret;
@@ -239,7 +240,7 @@ void mySYS::userdefonOSerror(void *errparam) const
 {
     static int code = 0;
     embot::os::theScheduler::getInstance().getOSerror(code);
-    for(;;);    
+    //for(;;);    
 }
 
 
@@ -308,8 +309,9 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
     {                   
     }
     else
-    {
-        bool valid {false};
+    {		
+
+		bool valid {false};
         if(0 == embot::prot::can::frame2sender(frame))
         {
         valid = true;
