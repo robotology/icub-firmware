@@ -114,6 +114,12 @@ typedef struct // JointSet
 
     TripodCalib tripod_calib;
 
+    // Kalman Filter Parameters
+    BOOL kalman_filter_enabled;
+    float x0[3];
+    float Q[3];
+    float R;
+    float P0;
 } JointSet;
 
 extern JointSet* JointSet_new(uint8_t n); //

@@ -16,7 +16,7 @@
  * Public License foFITNESSr more details
 */
 
-#include "Joint.h"
+#include "Joint_hid.h"
 
 #include "hal_adc.h"
 

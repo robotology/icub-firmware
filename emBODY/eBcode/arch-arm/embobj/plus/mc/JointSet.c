@@ -26,7 +26,7 @@
 #include "EOappEncodersReader.h"
 #include "EOtheEntities.h"
 
-#include "Joint.h"
+#include "Joint_hid.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
@@ -34,6 +34,9 @@
 #include "JointSet.h"
 
 #include "Calibrators.h"
+
+// TODO: Remove after tests on real robot
+//#include <hal_trace.h>
 
 static void JointSet_set_inner_control_flags(JointSet* o);
 
@@ -152,6 +155,30 @@ void JointSet_config //
     o->Jjm = Jjm; o->Sjm = Sjm;
     o->Jmj = Jmj; o->Smj = Smj;
     o->Sje = Sje;
+    
+    // Initialize Kalman Filter
+    // TODO: this will become a parameter from xml config file
+    o->kalman_filter_enabled = FALSE;
+
+    if(o->kalman_filter_enabled)
+    {
+        o->x0[0] = {0};
+        o->x0[1] = {0};
+        o->x0[2] = {0};
+        
+        o->Q[0]  = {1.0e-4};
+        o->Q[1]  = {1.0e-2 };
+        o->Q[2]  = {10};
+        
+        o->R     = 1.0e-4;
+        o->P0    = 9.9e-05;
+        
+        for (int js=0; js < *(o->pN); ++js)
+        {
+            int j = o->joints_of_set[js];
+            o->joint[j].kalman_filter.initialize();
+        }
+    }
 }
 
 void JointSet_do_odometry(JointSet* o) //
@@ -177,7 +204,11 @@ void JointSet_do_odometry(JointSet* o) //
                 m = o->motors_of_set[ms];
         
                 o->joint[j].pos_fbk_from_motors += Sjm[j][m] * (float)o->motor[m].pos_fbk;
-                o->joint[j].vel_fbk_from_motors += Sjm[j][m] * (float)o->motor[m].vel_fbk;
+                
+                if (!o->kalman_filter_enabled) 
+                {
+                    o->joint[j].vel_fbk_from_motors += Sjm[j][m] * (float)o->motor[m].vel_fbk;
+                }
             }
         }
     }
@@ -188,15 +219,23 @@ void JointSet_do_odometry(JointSet* o) //
             j = o->joints_of_set[js];
             
             o->joint[j].pos_fbk_from_motors = (float)o->motor[j].pos_fbk;
-            o->joint[j].vel_fbk_from_motors = (float)o->motor[j].vel_fbk;
+            
+            if (!o->kalman_filter_enabled) 
+            {
+                o->joint[j].vel_fbk_from_motors = (float)o->motor[j].vel_fbk;
+            }
         }
     }
+    
+    float kf_input[MAX_JOINTS_PER_BOARD];
     
     if (!o->Sje) // no encoder coupling
     {
         for (js=0; js<N; ++js)
         {    
             j = o->encoders_of_set[js];
+        
+            kf_input[j] = o->joint[j].pos_fbk_from_motors;
         
             if (AbsEncoder_is_fake(o->absEncoder+j))
             {
@@ -217,8 +256,6 @@ void JointSet_do_odometry(JointSet* o) //
                 }
             }
         }
-        
-        //return;
     }
     else // encoder coupling
     {
@@ -226,12 +263,15 @@ void JointSet_do_odometry(JointSet* o) //
         
         float pos[MAX_ENCODS_PER_BOARD];
         float vel[MAX_ENCODS_PER_BOARD];
+        float mot[MAX_ENCODS_PER_BOARD];
         
         int es, e;
         
         for (es=0; es<E; ++es)
         {    
             e = o->encoders_of_set[es];
+            
+            mot[e] = o->joint[e].pos_fbk_from_motors;
             
             if (AbsEncoder_is_fake(o->absEncoder+e))
             {
@@ -261,6 +301,7 @@ void JointSet_do_odometry(JointSet* o) //
         
             o->joint[j].pos_fbk = ZERO;
             o->joint[j].vel_fbk = ZERO;
+            kf_input[j] = ZERO;
             
             for (es=0; es<E; ++es)
             {
@@ -268,16 +309,45 @@ void JointSet_do_odometry(JointSet* o) //
                 
                 o->joint[j].pos_fbk += Sje[j][e] * pos[e];
                 o->joint[j].vel_fbk += Sje[j][e] * vel[e];
+                
+                if(o->kalman_filter_enabled)
+                {
+                    kf_input[j] += Sje[j][e] * mot[e]; 
+                }
             }
         }
     }
     
-    // accelerations
-    for (js=0; js<N; ++js)
+    if (o->kalman_filter_enabled && o->USE_SPEED_FBK_FROM_MOTORS)
     {
-        j = o->joints_of_set[js];
-        o->joint[j].acc_fbk = CTRL_LOOP_FREQUENCY*(o->joint[j].vel_fbk - o->joint[j].vel_fbk_old);
-        o->joint[j].vel_fbk_old = o->joint[j].vel_fbk;
+        float32_t kf_output[3] = {0, 0, 0};
+        
+        for (js=0; js<N; ++js)
+        {
+            j = o->joints_of_set[js];
+            
+            // estimate joint velocity and acceleration 
+            o->joint[j].kalman_filter.step(o->kalman_filter_enabled, kf_input[j], o->x0, o->P0, o->Q, o->R, kf_output);
+            
+            // save the estimated velocity and acceleration
+            o->joint[j].vel_fbk = kf_output[1];
+            o->joint[j].acc_fbk = kf_output[2];
+
+// TODO: Remove after test on real robot
+//            static uint32_t counter;
+//            static char msg[64] = {0};
+//            snprintf(msg,  sizeof(msg), "%.3f %.3f %.3f", kf_input[j], o->joint[j].vel_fbk, o->joint[j].acc_fbk);
+//            hal_trace_puts(msg);
+        }
+    }
+    else
+    {
+        for (js=0; js<N; ++js)
+        {
+            j = o->joints_of_set[js];
+            o->joint[j].acc_fbk = CTRL_LOOP_FREQUENCY*(o->joint[j].vel_fbk - o->joint[j].vel_fbk_old);
+            o->joint[j].vel_fbk_old = o->joint[j].vel_fbk;
+        }
     }
 }
 
