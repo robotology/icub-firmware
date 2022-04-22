@@ -35,7 +35,7 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 //#define TEST_EMBOT_HW_SPI123
 
-//#define TEST_EMBOT_HW_EEPROM
+#define TEST_EMBOT_HW_EEPROM
 //#define TEST_EMBOT_HW_CHIP_M95512DF
 
 //#define TEST_EMBOT_HW_CHIP_AS5045
@@ -527,6 +527,8 @@ void test_embot_hw_init()
 
 constexpr size_t capacity {2048};
 uint8_t dd[capacity] = {0};
+//constexpr size_t adr2use {128 - 8};
+constexpr size_t adr2use {0};
 
 volatile uint8_t stophere = 0;
 
@@ -561,18 +563,21 @@ void test_embot_hw_tick()
     constexpr embot::core::relTime tout {3*embot::core::time1millisec};
     
     startread = embot::core::now(); 
-    embot::hw::eeprom::read(eeprom2test, 0, data, 3*embot::core::time1millisec);
+    embot::hw::eeprom::read(eeprom2test, adr2use, data, 3*embot::core::time1millisec);
     readtime = embot::core::now() - startread;
     stophere++;
     
     std::memset(dd, cnt, sizeof(dd));
     startwrite = embot::core::now(); 
-    embot::hw::eeprom::write(eeprom2test, 0, data, 3*embot::core::time1millisec);
+    embot::hw::eeprom::write(eeprom2test, adr2use, data, 3*embot::core::time1millisec);
     writetime = embot::core::now() - startwrite;
     stophere++;
     
+//    embot::hw::eeprom::erase(eeprom2test, adr2use+1, 200, 3*embot::core::time1millisec);
+//    embot::hw::eeprom::erase(eeprom2test, 3*embot::core::time1millisec);  
+    
     std::memset(dd, 0, sizeof(dd));
-    embot::hw::eeprom::read(eeprom2test, 0, data, 3*embot::core::time1millisec);
+    embot::hw::eeprom::read(eeprom2test, adr2use, data, 3*embot::core::time1millisec);
      
     stophere++;
     
