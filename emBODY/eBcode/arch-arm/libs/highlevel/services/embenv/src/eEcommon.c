@@ -101,8 +101,8 @@ extern eEresult_t ee_common_ipnetwork_clr(eEipnetwork_t* ntw, uint64_t uniqueid)
     {
         uniqueid = 0x2222;
     }
-    
-    ntw->macaddress  = (((uint64_t)EECOMMON_mac_oui_iit)) | ((uint64_t)((uniqueid) & 0xFFFFFF)<<24);
+    uint32_t macoui2use = EECOMMON_mac_oui_iit_official; // EECOMMON_mac_oui_iit_legacy
+    ntw->macaddress  = (((uint64_t)macoui2use)) | ((uint64_t)((uniqueid) & 0xFFFFFF)<<24);
     ntw->ipaddress   = (uint32_t)EECOMMON_ipaddr_base_iit | EECOMMON_ipaddr_from(0, 0, ip3, ip4); 
     ntw->ipnetmask   = (uint32_t)EECOMMON_ipmask_default_iit; 
     

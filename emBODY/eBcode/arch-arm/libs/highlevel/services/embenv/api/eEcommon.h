@@ -61,7 +61,8 @@ extern "C" {
                                                       (((uint32_t)(ip2) << 8)&0x0000ff00)  | \
                                                       (((uint32_t)(ip1) << 0)&0x000000ff) )
 // the used mac oui                                                     
-#define EECOMMON_mac_oui_iit                        (0x0000000000000002)//(0x0000000000332211)
+#define EECOMMON_mac_oui_iit_legacy                  (0x0000000000000002)//(0x0000000000332211)
+#define EECOMMON_mac_oui_iit_official                (0x00000000000B9A70)
 
 // the default bytes of the address
 #define EECOMMON_ipaddr_def1                        10
