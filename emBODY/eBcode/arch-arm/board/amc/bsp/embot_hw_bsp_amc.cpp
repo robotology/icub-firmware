@@ -620,6 +620,7 @@ namespace embot { namespace hw { namespace eeprom {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::EEPROM h) const {}
+    void BSP::deinit(embot::hw::EEPROM h) const {}
     const BSP& getBSP() 
     {
         return thebsp;
@@ -666,6 +667,7 @@ namespace embot { namespace hw { namespace eeprom {
     
     
     void BSP::init(embot::hw::EEPROM h) const {}
+    void BSP::deinit(embot::hw::EEPROM h) const {}    
     
     #else
         #error embot::hw::bsp::eeprom::thebsp must be defined    
