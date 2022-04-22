@@ -43,11 +43,11 @@ namespace embot { namespace hw { namespace can {
         
     struct Config
     {
-        std::uint8_t                txcapacity      {8};
-        std::uint8_t                rxcapacity      {8};
-        embot::core::Callback     ontxframe       {nullptr, nullptr}; 
-        embot::core::Callback     txqueueempty    {nullptr, nullptr}; 
-        embot::core::Callback     onrxframe       {nullptr, nullptr};
+        std::uint8_t            txcapacity      {8};
+        std::uint8_t            rxcapacity      {8};
+        embot::core::Callback   ontxframe       {nullptr, nullptr}; 
+        embot::core::Callback   txqueueempty    {nullptr, nullptr}; 
+        embot::core::Callback   onrxframe       {nullptr, nullptr};
         Config() = default;
     };
     
