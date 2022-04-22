@@ -40,7 +40,7 @@
 
 #include "hal.h"
 
-#if defined(SHALBASE_USE_EMBOT_HW)
+#if defined(USE_EMBOT_HW)
 #include "embot_hw_sys.h"
 #include "embot_hw_eeprom.h"
 #endif
@@ -408,7 +408,7 @@ extern eEresult_t shalbase_ipc_jump2addr_clr(void)
 
 extern eEresult_t shalbase_system_canjump(uint32_t addr)
 {
-#if defined(SHALBASE_USE_EMBOT_HW)
+#if defined(USE_EMBOT_HW)
     return((true == embot::hw::sys::canjump2address(addr)) ? (ee_res_OK) : (ee_res_NOK_generic));
 #else    
     return((hal_res_OK == hal_sys_canexecuteataddress(addr)) ? (ee_res_OK) : (ee_res_NOK_generic));
@@ -458,7 +458,7 @@ extern eEresult_t shalbase_system_jumpnow(uint32_t addr)
 
 extern eEresult_t shalbase_system_restart(void)
 {
-#if defined(SHALBASE_USE_EMBOT_HW)
+#if defined(USE_EMBOT_HW)
     embot::hw::sys::irq_disable();
     embot::hw::sys::reset();
 #else    
@@ -496,7 +496,7 @@ extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint
     }
     else if(ee_strg_eeprom == strg->type)
     {
-#if defined(SHALBASE_USE_EMBOT_HW)
+#if defined(USE_EMBOT_HW)
     embot::core::Data dd {data, size};
     embot::hw::eeprom::read(embot::hw::EEPROM::one, strg->addr, dd, 5*embot::core::time1millisec);
 #else        
@@ -534,7 +534,7 @@ extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data
     }
     else if(ee_strg_eeprom == strg->type)
     {
-#if defined(SHALBASE_USE_EMBOT_HW)
+#if defined(USE_EMBOT_HW)
         embot::core::Data dd {const_cast<void*>(data), size};
         embot::hw::eeprom::write(embot::hw::EEPROM::one, strg->addr, dd, 5*embot::core::time1millisec);       
 #else        
@@ -570,7 +570,7 @@ extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t s
     }
     else if(ee_strg_eeprom == strg->type)
     {
-#if defined(SHALBASE_USE_EMBOT_HW)
+#if defined(USE_EMBOT_HW)
         embot::hw::eeprom::erase(embot::hw::EEPROM::one, strg->addr, size, 5*embot::core::time1millisec);
 #else
         res = hal_eeprom_erase(hal_eeprom_i2c_01, strg->addr, size);
@@ -669,7 +669,7 @@ extern void shalbase_entrypoint(void)
 
 static void s_shalbase_jump_to(uint32_t appaddr)
 {
-#if defined(SHALBASE_USE_EMBOT_HW)
+#if defined(USE_EMBOT_HW)
     embot::hw::sys::jump2address2(appaddr);
 #else    
     hal_sys_executenowataddress(appaddr);
@@ -694,7 +694,7 @@ static void s_shalbase_storage_init(const eEstorageType_t strgtype)
     }
     else if(ee_strg_eeprom == strgtype)
     {
-#if defined(SHALBASE_USE_EMBOT_HW)
+#if defined(USE_EMBOT_HW)
         embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
 #else        
         res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
