@@ -40,6 +40,11 @@
 
 #include "hal.h"
 
+#if defined(SHALBASE_USE_EMBOT_HW)
+#include "embot_hw_sys.h"
+#include "embot_hw_eeprom.h"
+#endif
+
 #include "string.h"
 #include "eEmemorymap.h" 
 
@@ -152,6 +157,8 @@ static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribut
 #if defined(STM32HAL_BOARD_STM32H745DISCO)
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored = {0};
 //static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x24000000")));
+#elif defined(STM32HAL_BOARD_AMC)
+static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored __attribute__((section(EENV_SHARSERV_BASE_RAMADDR_AT)));       
 #elif defined(STM32HAL_BOARD_STM32G4EVAL)
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x20000000")));
 #else
@@ -401,7 +408,11 @@ extern eEresult_t shalbase_ipc_jump2addr_clr(void)
 
 extern eEresult_t shalbase_system_canjump(uint32_t addr)
 {
+#if defined(SHALBASE_USE_EMBOT_HW)
+    return((true == embot::hw::sys::canjump2address(addr)) ? (ee_res_OK) : (ee_res_NOK_generic));
+#else    
     return((hal_res_OK == hal_sys_canexecuteataddress(addr)) ? (ee_res_OK) : (ee_res_NOK_generic));
+#endif    
 }
 
 extern eEresult_t shalbase_system_canjump_to_proc(uint32_t addr, eEmoduleInfo_t *procinfo)
@@ -447,9 +458,13 @@ extern eEresult_t shalbase_system_jumpnow(uint32_t addr)
 
 extern eEresult_t shalbase_system_restart(void)
 {
+#if defined(SHALBASE_USE_EMBOT_HW)
+    embot::hw::sys::irq_disable();
+    embot::hw::sys::reset();
+#else    
     hal_sys_irq_disable();
     hal_sys_systemreset();
-
+#endif
     // it never returns
     return(ee_res_NOK_generic);  
 }
@@ -481,8 +496,12 @@ extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint
     }
     else if(ee_strg_eeprom == strg->type)
     {
+#if defined(SHALBASE_USE_EMBOT_HW)
+    embot::core::Data dd {data, size};
+    embot::hw::eeprom::read(embot::hw::EEPROM::one, strg->addr, dd, 5*embot::core::time1millisec);
+#else        
         res = hal_eeprom_read(hal_eeprom_i2c_01, strg->addr, size, data);
-        res =  res;
+#endif
     }
 
     return(ee_res_OK);  
@@ -515,8 +534,12 @@ extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data
     }
     else if(ee_strg_eeprom == strg->type)
     {
+#if defined(SHALBASE_USE_EMBOT_HW)
+        embot::core::Data dd {const_cast<void*>(data), size};
+        embot::hw::eeprom::write(embot::hw::EEPROM::one, strg->addr, dd, 5*embot::core::time1millisec);       
+#else        
         res = hal_eeprom_write(hal_eeprom_i2c_01, strg->addr, size, (void*)data);
-        res =  res;
+#endif
     } 
     
     return(ee_res_OK);       
@@ -547,9 +570,11 @@ extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t s
     }
     else if(ee_strg_eeprom == strg->type)
     {
-        //#warning add hal_eeprom_clear
+#if defined(SHALBASE_USE_EMBOT_HW)
+        embot::hw::eeprom::erase(embot::hw::EEPROM::one, strg->addr, size, 5*embot::core::time1millisec);
+#else
         res = hal_eeprom_erase(hal_eeprom_i2c_01, strg->addr, size);
-        res =  res;
+#endif
     }    
 
     return(ee_res_OK); 
@@ -644,7 +669,11 @@ extern void shalbase_entrypoint(void)
 
 static void s_shalbase_jump_to(uint32_t appaddr)
 {
+#if defined(SHALBASE_USE_EMBOT_HW)
+    embot::hw::sys::jump2address2(appaddr);
+#else    
     hal_sys_executenowataddress(appaddr);
+#endif    
 }
 
 
@@ -665,8 +694,11 @@ static void s_shalbase_storage_init(const eEstorageType_t strgtype)
     }
     else if(ee_strg_eeprom == strgtype)
     {
+#if defined(SHALBASE_USE_EMBOT_HW)
+        embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+#else        
         res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
-        res =  res;
+#endif
     }
     
 // removed:   hal_sys_irq_enable();
