@@ -42,7 +42,10 @@ namespace embot { namespace hw {
             
     enum class CAN : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2};
             
-    enum class FLASH : std::uint8_t { whole = 0, bootloader = 1, application = 2, sharedstorage = 3, applicationstorage = 4, none = 31, maxnumberof = 5 };
+    enum class FLASH : std::uint8_t {   whole = 0, 
+                                        bootloader = 1, application = 2, sharedstorage = 3, applicationstorage = 4, // for use by can boards
+                                        eloader = 1, eupdater = 2, eapplication00 = 3, eapplication01 = 4,          // for use by eth boards
+                                        none = 31, maxnumberof = 5 };
     
     enum class BTN : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 31, maxnumberof = 8 };
     

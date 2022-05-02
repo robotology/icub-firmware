@@ -46,6 +46,8 @@ namespace embot { namespace hw { namespace eeprom {
     { return false; }
     result_t init(EEPROM ee, const Config &config)                                                      
     { return resNOK; }
+    result_t deinit(EEPROM ee)                                                      
+    { return resNOK; }
     const Config & config(EEPROM ee)                                                                    
     { static Config cfg {}; return cfg; }  
     size_t size(EEPROM ee)
@@ -53,7 +55,11 @@ namespace embot { namespace hw { namespace eeprom {
     result_t read(EEPROM ee, ADR adr, embot::core::Data &destination, embot::core::relTime timeout)
     { return resNOK; }
     result_t write(EEPROM ee, ADR adr, const embot::core::Data &content, embot::core::relTime timeout)
-    { return resNOK; }    
+    { return resNOK; } 
+    result_t erase(EEPROM ee, embot::core::relTime timeout)
+    { return resNOK; } 
+    result_t erase(EEPROM ee, ADR adr, size_t size, embot::core::relTime timeout)  
+    { return resNOK; }     
 
 }}} // namespace embot { namespace hw { namespace eeprom {
 
@@ -132,7 +138,44 @@ namespace embot { namespace hw { namespace eeprom {
         return resOK;        
     }
     
+    result_t deinit(EEPROM ee)
+    {
+        if(false == initialised(ee))
+        {
+            return resOK;
+        }  
 
+        const embot::hw::eeprom::BSP &eeprombsp = embot::hw::eeprom::getBSP();
+        
+        embot::hw::eeprom::Type type = eeprombsp.getPROP(ee)->type;
+        
+        if(type != embot::hw::eeprom::Type::chipM95512DF)
+        {
+            return resNOK;
+        }
+        
+        uint8_t index = embot::core::tointegral(ee);
+                               
+        // bsp specific deinitialization                    
+        eeprombsp.deinit(ee);  
+
+        // but ... true deinitialization is in here
+        
+        if(embot::hw::eeprom::Type::chipM95512DF == type)
+        {
+            s_privatedata.chipM95512DF[index]->deinit();
+            delete s_privatedata.chipM95512DF[index];
+            s_privatedata.chipM95512DF[index] = nullptr;
+        }
+        
+        s_privatedata.config[index] = {};
+        s_privatedata.type[index] = embot::hw::eeprom::Type::none;        
+                
+        embot::core::binary::bit::clear(initialisedmask, index);
+                
+        return resOK;        
+    }
+    
     const Config & config(EEPROM ee)
     {
         return s_privatedata.config[embot::core::tointegral(ee)];
@@ -201,6 +244,48 @@ namespace embot { namespace hw { namespace eeprom {
         
         return resOK;          
     }
+    
+    result_t erase(EEPROM ee, embot::core::relTime timeout)
+    {
+        if(!initialised(ee))
+        {
+            return resNOK;
+        } 
+        
+        uint8_t index = embot::core::tointegral(ee);
+                 
+        if(embot::hw::eeprom::Type::chipM95512DF == s_privatedata.type[index])
+        {
+            s_privatedata.chipM95512DF[index]->erase();
+        }
+        else
+        {
+            // placeholder for future types
+        }
+        
+        return resOK;                         
+    }
+    
+    result_t erase(EEPROM ee, ADR adr, size_t size, embot::core::relTime timeout)
+    {
+        if(!initialised(ee))
+        {
+            return resNOK;
+        } 
+        
+        uint8_t index = embot::core::tointegral(ee);
+                 
+        if(embot::hw::eeprom::Type::chipM95512DF == s_privatedata.type[index])
+        {
+            s_privatedata.chipM95512DF[index]->erase(adr, size);
+        }
+        else
+        {
+            // placeholder for future types
+        }
+        
+        return resOK;                          
+    }    
 
     
 }}} // namespace embot { namespace hw { namespace eeprom 

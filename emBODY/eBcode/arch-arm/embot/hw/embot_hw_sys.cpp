@@ -164,10 +164,53 @@ namespace embot { namespace hw { namespace sys {
         return;                 
     }
     
+    void jump2address2(std::uint32_t address)
+    {        
+        if(false == canjump2address(address))
+        {
+            return;
+        }
+        
+        // as found in https://developer.arm.com/documentation/ka001423/1-0
+        // it seems that allows the application to use IRQ handlers and RTOS
+        
+        // make sure that the address argument is safely copied into memory before we change the stack
+        volatile uint32_t flashstart = address;
+        static volatile std::uint32_t resetlocation = 0;
+        resetlocation = *(volatile std::uint32_t*) (flashstart + 4);
+        // now change everything
+        __disable_irq();
+        memset((uint32_t *)NVIC->ICER, 0xFF, sizeof(NVIC->ICER));
+        SysTick->CTRL = 0;
+        SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;
+        SCB->VTOR = FLASH_BASE | (flashstart & (uint32_t)0x1FFFFF80);
+        __set_MSP( ((unsigned int *)(SCB->VTOR))[0] );
+        __set_CONTROL( 0 );
+        __enable_irq();
+        
+        // and jump
+        void (*reset_fn)(void) = NULL;
+        reset_fn = (void (*)(void)) resetlocation;        
+        reset_fn();  
+        
+        // never in here.
+        return;          
+    }
+    
     void relocatevectortable(std::uint32_t offset)
     {
         SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);        
     }
+    
+    uint64_t uniqueid()
+    {
+        uint64_t r = 0;
+    #if defined(STM32H7)    
+        r = HAL_GetUIDw0() | static_cast<uint64_t>(HAL_GetUIDw1()) << 32;
+        r += HAL_GetUIDw2();
+    #endif    
+        return r;        
+    }    
 
 //    embot::core::Time now()
 //    {

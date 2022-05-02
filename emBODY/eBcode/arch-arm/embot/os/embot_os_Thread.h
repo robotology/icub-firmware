@@ -44,6 +44,15 @@ namespace embot { namespace os {
         using fpOnPeriod = void (*)(Thread *, void *);
         using fpAfterCallback = void (*)(Thread *, core::Callback &, void *);
         
+        struct Props
+        {
+            Priority priority {Priority::none};
+            uint16_t stacksize {0};
+            constexpr Props() = default;            
+            constexpr Props(Priority p, uint16_t s) : priority(p), stacksize(s) {}
+            constexpr bool isvalid() const { return (stacksize > 0) && (Priority::none != priority); }                
+        };
+        
         struct BaseConfig
         {
             std::uint16_t stacksize {256};          // the stack used by the task. it cannot be 0. reasonable value is >= 256

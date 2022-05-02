@@ -29,7 +29,8 @@ namespace embot { namespace hw { namespace eeprom {
 
     bool supported(EEPROM ee);    
     bool initialised(EEPROM ee);        
-    result_t init(EEPROM ee, const Config &cfg);    
+    result_t init(EEPROM ee, const Config &cfg);  
+    result_t deinit(EEPROM ee);    
     
     const Config & config(EEPROM ee);    
     
@@ -48,6 +49,9 @@ namespace embot { namespace hw { namespace eeprom {
     // operation fails if write() returns resNOKtimeout (the timeout has expired) or resNOK (the operation was not even started).
     result_t write(EEPROM ee, ADR adr, const embot::core::Data &content, embot::core::relTime timeout);
        
+    result_t erase(EEPROM ee, embot::core::relTime timeout);
+    result_t erase(EEPROM ee, ADR adr, size_t size, embot::core::relTime timeout);
+    
 }}} // namespace embot { namespace hw { namespace eeprom 
 
 

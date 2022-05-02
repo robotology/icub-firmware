@@ -566,7 +566,7 @@ namespace embot { namespace hw { namespace flash {
 
 #else
     
-#error support for hw_flash in embot::hw::bsp is yet to be done
+#warning support for hw_flash in embot::hw::bsp is yet to be tested
 
 namespace embot { namespace hw { namespace flash {
      
@@ -574,11 +574,11 @@ namespace embot { namespace hw { namespace flash {
 
 // acemor          
         // application @ tbdk we have 1024 k of flash. so far we use only 512 k
-        constexpr PROP whole                {{0x08000000,               (1024)*1024,        2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ tbdk
-        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
+        constexpr PROP whole                {{0x08000000,               (2*1024)*1024,      128*1024}}; 
+        constexpr PROP eloader              {{0x08000000,               (128)*1024,         128*1024}};   // bootloader
+        constexpr PROP eupdater             {{0x08000000+(128*1024),    (256)*1024,         128*1024}};   // sharedstorage: on top of bootloader
+        constexpr PROP eapplication00       {{0x08000000+(384*1024),    (512)*1024,         128*1024}};   // application @ tbdk
+        constexpr PROP eapplication01       {{0x08100000+(128*1024),   (256)*1024,          128*1024}};   // applicationstorage: on top of application            
 
     #else
         #error embot::hw::flash::thebsp must be defined    
@@ -587,11 +587,11 @@ namespace embot { namespace hw { namespace flash {
 
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
+        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::eloader) | mask::pos2mask<uint32_t>(FLASH::eupdater) |
+        mask::pos2mask<uint32_t>(FLASH::eapplication00) | mask::pos2mask<uint32_t>(FLASH::eapplication01),        
         // properties
         {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
+            &whole, &eloader, &eupdater, &eapplication00, &eapplication01            
         }}        
     };
     
@@ -620,6 +620,7 @@ namespace embot { namespace hw { namespace eeprom {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::EEPROM h) const {}
+    void BSP::deinit(embot::hw::EEPROM h) const {}
     const BSP& getBSP() 
     {
         return thebsp;
@@ -666,6 +667,7 @@ namespace embot { namespace hw { namespace eeprom {
     
     
     void BSP::init(embot::hw::EEPROM h) const {}
+    void BSP::deinit(embot::hw::EEPROM h) const {}    
     
     #else
         #error embot::hw::bsp::eeprom::thebsp must be defined    

@@ -133,6 +133,8 @@ namespace embot { namespace hw { namespace chip {
                
         bool read(ADR adr, embot::core::Data &data);        
         bool write(ADR adr, const embot::core::Data &data); 
+        bool erase();
+        bool erase(ADR adr, size_t size); 
 
     private:        
         struct Impl;

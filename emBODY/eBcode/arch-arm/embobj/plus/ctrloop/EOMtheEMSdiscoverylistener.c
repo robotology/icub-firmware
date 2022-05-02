@@ -93,7 +93,7 @@ typedef enum
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void tskEMScfg(void *p);
+extern void tskEMSlis(void *p);
 
 static void s_eom_emsdiscoverylistener_task_startup(EOMtask *p, uint32_t t);
 static void s_eom_emsdiscoverylistener_task_run(EOMtask *p, uint32_t t);

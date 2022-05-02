@@ -39,6 +39,10 @@
 
 #include "eEmemorymap.h"
 
+#if defined(USE_EMBOT_HW)
+#include "embot_hw_sys.h"
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -360,7 +364,11 @@ static void s_eo_armenv_sharedservices_synchronise(void)
     {
         eEboardInfo_t boardinfo;
         memcpy(&boardinfo, s_the_armenv.brdinfo, sizeof(eEboardInfo_t));
-        boardinfo.uniqueid = hal_uniqueid_id64bit_get();
+#if defined(USE_EMBOT_HW)        
+        boardinfo.uniqueid = embot::hw::sys::uniqueid();
+#else 
+        boardinfo.uniqueid = hal_uniqueid_id64bit_get();  
+#endif        
         if(ee_res_OK != ee_sharserv_info_boardinfo_synchronise(&boardinfo))
         {
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "s_eo_armenv_sharedservices_synchronise(): cannot sync brdinfo", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);

@@ -40,9 +40,11 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 //#define TEST_EMBOT_HW_CHIP_AS5045
 
-#define TEST_EMBOT_HW_CAN
-#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1
-#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1_BURST
+//#define TEST_EMBOT_HW_FLASH
+
+//#define TEST_EMBOT_HW_CAN
+//#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1
+//#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1_BURST
 //#define TEST_EMBOT_HW_CAN_gateway_CAN2toCAN1
 //#define TEST_EMBOT_HW_CAN_gateway_CAN1toCAN2
 
@@ -416,6 +418,11 @@ int main(void)
 
 #if defined(TEST_EMBOT_HW)
 
+#if defined(TEST_EMBOT_HW_FLASH)
+#include "embot_hw_flash.h"
+#include "embot_hw_flash_bsp.h"
+#endif
+
 #if defined(TEST_EMBOT_HW_SPI123)
 #include "embot_hw_spi.h"
 #endif
@@ -449,6 +456,10 @@ void done3(void* p)
 
 void test_embot_hw_init()
 {
+#if defined(TEST_EMBOT_HW_FLASH)
+    
+
+#endif
     
 #if defined(TEST_EMBOT_HW_SPI123)
     
@@ -525,21 +536,67 @@ void test_embot_hw_init()
     
 }
 
+#if defined(TEST_EMBOT_HW_EEPROM)
 constexpr size_t capacity {2048};
 uint8_t dd[capacity] = {0};
+//constexpr size_t adr2use {128 - 8};
+constexpr size_t adr2use {0};
 
 volatile uint8_t stophere = 0;
 
 embot::core::Time startread {0};
 embot::core::Time readtime {0};
 embot::core::Time startwrite {0};
+#endif
+
+
+#if defined(TEST_EMBOT_HW_FLASH)
+
 embot::core::Time writetime {0};
+embot::core::Time erasetime {0};
+embot::core::Time start{0};
+
+constexpr uint64_t d2flash[1024/8] =
+{
+    0x1122334455667788,
+    0x99aabbccddeeff00,
+    0x1122334455667788,
+    0x99aabbccddeeff00,
+    0x1122334455667788,
+    0x99aabbccddeeff00,
+    0x1122334455667788,
+    0x99aabbccddeeff00    
+};
+
+#endif
 
 void test_embot_hw_tick()
 {
     static uint8_t cnt = 0;
     cnt++;
     
+#if defined(TEST_EMBOT_HW_FLASH)
+    const embot::hw::flash::BSP &flashbsp = embot::hw::flash::getBSP();
+    size_t adrflash = flashbsp.getPROP(embot::hw::FLASH::eapplication01)->partition.address;
+    size_t sizeflash = flashbsp.getPROP(embot::hw::FLASH::eapplication01)->partition.maxsize;
+    
+    start = embot::core::now();    
+    embot::hw::flash::erase(adrflash, sizeflash);
+    erasetime = embot::core::now() - start;
+
+    start = embot::core::now();    
+    embot::hw::flash::write(adrflash, sizeof(d2flash), d2flash);
+    writetime = embot::core::now() - start;
+//    embot::hw::flash::write(adrflash+2*sizeof(d2flash), sizeof(d2flash), d2flash);
+//    embot::hw::flash::write(adrflash+3*sizeof(d2flash), sizeof(d2flash), d2flash);
+    
+    embot::core::print(std::string("erased sector + written: ") + std::to_string(sizeof(d2flash)) + ". erase time = " + embot::core::TimeFormatter(erasetime).to_string() + ", write time = " + embot::core::TimeFormatter(writetime).to_string());
+ 
+#endif    
+    
+    
+#if defined(TEST_EMBOT_HW_EEPROM)
+
     static uint8_t shift = 0;
     size_t numberofbytes = capacity >> shift;
     
@@ -553,26 +610,26 @@ void test_embot_hw_tick()
     }
     
     
-    
-#if defined(TEST_EMBOT_HW_EEPROM)
-    
     std::memset(dd, 0, sizeof(dd));
     embot::core::Data data {dd, numberofbytes};
     constexpr embot::core::relTime tout {3*embot::core::time1millisec};
     
     startread = embot::core::now(); 
-    embot::hw::eeprom::read(eeprom2test, 0, data, 3*embot::core::time1millisec);
+    embot::hw::eeprom::read(eeprom2test, adr2use, data, 3*embot::core::time1millisec);
     readtime = embot::core::now() - startread;
     stophere++;
     
     std::memset(dd, cnt, sizeof(dd));
     startwrite = embot::core::now(); 
-    embot::hw::eeprom::write(eeprom2test, 0, data, 3*embot::core::time1millisec);
+    embot::hw::eeprom::write(eeprom2test, adr2use, data, 3*embot::core::time1millisec);
     writetime = embot::core::now() - startwrite;
     stophere++;
     
+//    embot::hw::eeprom::erase(eeprom2test, adr2use+1, 200, 3*embot::core::time1millisec);
+//    embot::hw::eeprom::erase(eeprom2test, 3*embot::core::time1millisec);  
+    
     std::memset(dd, 0, sizeof(dd));
-    embot::hw::eeprom::read(eeprom2test, 0, data, 3*embot::core::time1millisec);
+    embot::hw::eeprom::read(eeprom2test, adr2use, data, 3*embot::core::time1millisec);
      
     stophere++;
     

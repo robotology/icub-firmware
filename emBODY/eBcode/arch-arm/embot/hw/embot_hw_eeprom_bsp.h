@@ -101,6 +101,7 @@ namespace embot { namespace hw { namespace eeprom {
         std::array<const PROP*, maxnumberof> properties;    
         constexpr const PROP * getPROP(embot::hw::EEPROM h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::EEPROM h) const;
+        void deinit(embot::hw::EEPROM h) const;
     };
     
     const BSP& getBSP();

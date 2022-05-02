@@ -41,6 +41,7 @@ namespace embot { namespace hw { namespace sys {
     
     // it jumps to an image. if it returns ... means that canjump2address() id false
     void jump2address(std::uint32_t address); 
+    void jump2address2(std::uint32_t address); 
     
     // relocates the vector table
     void relocatevectortable(std::uint32_t offset);
@@ -49,6 +50,9 @@ namespace embot { namespace hw { namespace sys {
     std::uint32_t random();    
     std::uint32_t minrandom();
     std::uint32_t maxrandom();
+    
+    // get a unique id
+    uint64_t uniqueid();
     
     // prints on the trace port. 
     // [[deprecated( "use embot::core::print()" )]] 

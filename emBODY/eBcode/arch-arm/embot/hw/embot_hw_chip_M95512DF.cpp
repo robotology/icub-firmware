@@ -128,6 +128,8 @@ struct embot::hw::chip::M95512DF::Impl
     static constexpr embot::core::relTime deftimeout {100*embot::core::time1millisec}; 
     static constexpr embot::core::relTime writetimeout {5*embot::core::time1millisec};    
     
+    static constexpr uint32_t dummypage[pagelength/sizeof(size_t)] = {0};
+    
     bool _initted {false};
     Config _config {};
     
@@ -137,7 +139,9 @@ struct embot::hw::chip::M95512DF::Impl
     bool init(const Config &cfg);   
     bool deinit();
     bool write(ADR adr, const embot::core::Data &data);
-    bool read(ADR adr, embot::core::Data &data);        
+    bool read(ADR adr, embot::core::Data &data);  
+    bool erase(); 
+    bool erase(ADR adr, size_t size);     
     void writeprotect(bool enable);
 
 private:
@@ -310,6 +314,43 @@ bool embot::hw::chip::M95512DF::Impl::read(ADR adr, embot::core::Data &data)
     return r;
 } 
    
+
+bool embot::hw::chip::M95512DF::Impl::erase()
+{
+    constexpr uint32_t npages {storagesize/pagelength};
+    embot::core::Data dd {const_cast<uint32_t*>(dummypage), sizeof(dummypage)};
+    ADR adr {0};
+    for(size_t i=0; i<npages; i++)
+    {        
+        write(adr, dd);
+        adr += dd.capacity;
+    }   
+    return true;
+} 
+
+
+bool embot::hw::chip::M95512DF::Impl::erase(ADR adr, size_t size)
+{
+    // better erase by page   
+    embot::core::Data dd {const_cast<uint32_t*>(dummypage), sizeof(dummypage)};
+    
+    int s = size;
+    int a = adr;
+    // we write by page, even if not at exact start of page ...
+    for(;;)
+    {
+        dd.capacity = std::min(pagelength, static_cast<size_t>(s));
+        write(a, dd);
+        a += dd.capacity;
+        s -= dd.capacity;
+        if((s <= 0) || (a >= storagesize))
+        {
+            break;
+        }
+    }
+
+    return true;
+} 
     
 void embot::hw::chip::M95512DF::Impl::chipselect(bool enable)
 {
@@ -457,7 +498,15 @@ bool embot::hw::chip::M95512DF::write(ADR adr, const embot::core::Data &data)
     return pImpl->write(adr, data);
 }
 
+bool embot::hw::chip::M95512DF::erase()
+{
+    return pImpl->erase();
+}
 
+bool embot::hw::chip::M95512DF::erase(ADR adr, size_t size)
+{
+    return pImpl->erase(adr, size);
+}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
