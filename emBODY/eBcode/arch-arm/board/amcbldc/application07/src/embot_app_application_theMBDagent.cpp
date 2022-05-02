@@ -166,20 +166,9 @@ struct embot::app::application::theMBDagent::Impl
     Measure *measureFOC {nullptr};
     Measure *measureTick {nullptr}; 
     
-    // the MBD generated classes + other glue code.
-    // MBD-gen-begin ->
-    
-    //amc_bldc_codegen::AMC_BLDC amc_bldc {};  
-    
-                
-    // <- MBD-gen-end
-    //
-
-
     // all the rest, which may or may not be required anymore
     Config config {};
     bool initted {false};
-    bool already_enabled {false};
         
     embot::hw::motor::Pwm pwm {0};
     embot::prot::can::motor::polling::ControlMode cm {embot::prot::can::motor::polling::ControlMode::Idle};
@@ -254,10 +243,8 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     
     // init MBD
     AMC_BLDC_initialize();
-    //amc_bldc.initialize();
     
     AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;
-    //amc_bldc.AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;
     
     // init motor
     embot::hw::motor::init(embot::hw::MOTOR::one, {});
@@ -265,11 +252,9 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     // assign the callback to the current availability
     embot::hw::motor::setCallbackOnCurrents(embot::hw::MOTOR::one, Impl::onCurrents_FOC_innerloop, this);
     
-    already_enabled = false;
-
     CAN_ID_AMC = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     
-    // init motor configuration parameters
+    // init motor configuration parameters from hal
     InitConfParams.motorconfig.pole_pairs = MainConf.pwm.poles;
     //InitConfParams.motorconfig.has_hall_sens...
     //auto todo... = MainConf.encoder.nsteps = 16000;  TODO: fix (this values depends on pole_pairs and actually it is missing in mbd)
@@ -289,8 +274,6 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void 
     
     impl->EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
     AMC_BLDC_U.ExternalFlags_p.fault_button = impl->EXTFAULTisPRESSED;
-    //impl->amc_bldc.AMC_BLDC_U.ExternalFlags_p.fault_button = impl->EXTFAULTisPRESSED;
-    
     
     if(true == impl->EXTFAULTisPRESSED)
     {
@@ -318,7 +301,6 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         // EXTFAULTpressedtime and / or EXTFAULTreleasedtime and
 
         AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;        
-        //amc_bldc.AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;        
         
         if(true == EXTFAULTisPRESSED)
         {
@@ -342,7 +324,6 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         #pragma unroll
         for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++) {
             AMC_BLDC_U.PacketsRx.packets[i].available = false;
-            //amc_bldc.AMC_BLDC_U.PacketsRx.packets[i].available = false;
         }
     } 
     else
@@ -372,24 +353,18 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         AMC_BLDC_U.PacketsRx.packets[0].available = true;
         AMC_BLDC_U.PacketsRx.packets[0].length = (uint8_T)rx_size;
         AMC_BLDC_U.PacketsRx.packets[0].packet.ID = (uint16_T)rx_id;
-//        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].available = true;
-//        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].length = (uint8_T)rx_size;
-//        amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].packet.ID = (uint16_T)rx_id;
-        
         
         // Actually, we fill the payload of the first packet only. Later we manage the case of multi packets.
         #pragma unroll
         for (uint8_t i = 0; i < rx_size; i++) 
         {
             AMC_BLDC_U.PacketsRx.packets[0].packet.PAYLOAD[i] = (uint8_T)rx_data[i];
-            //amc_bldc.AMC_BLDC_U.PacketsRx.packets[0].packet.PAYLOAD[i] = (uint8_T)rx_data[i];
         }
         
         // remember that we can deal with only one packet yet at this stage
         #pragma unroll
         for (uint8_t i = 1; i < maxNumberOfPacketsCAN; i++) {
             AMC_BLDC_U.PacketsRx.packets[i].available = false;
-            //amc_bldc.AMC_BLDC_U.PacketsRx.packets[i].available = false;
         }
     }
     
@@ -399,8 +374,6 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     // -----------------------------------------------------------------------------
     
     AMC_BLDC_step_Time();
-    //amc_bldc.step_Time();
-    
     
     // if there an output is available, send it to the CAN Netowork
     for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++)
@@ -409,15 +382,13 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         if (AMC_BLDC_Y.PacketsTx.packets[i].available)
         {
             embot::prot::can::Frame fr {AMC_BLDC_Y.PacketsTx.packets[i].packet.ID, AMC_BLDC_Y.PacketsTx.packets[i].length, AMC_BLDC_Y.PacketsTx.packets[i].packet.PAYLOAD};
-            //embot::prot::can::Frame fr {amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].packet.ID, amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].length, amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].packet.PAYLOAD};
             outframes.push_back(fr);
         }
     }
     
     // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
-    // TODO: When should perform the following update within the mbd after a SET_MOTOR_CONFIG message has been received
+    // TODO: We should perform the following update inside the architectural model after a SET_MOTOR_CONFIG message has been received
     MainConf.pwm.poles = AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
-    //MainConf.pwm.poles = amc_bldc.AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
     
     measureTick->stop();
     
@@ -447,7 +418,6 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
 
     // retrieve the current value of the Hall sensors 
     embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, AMC_BLDC_U.SensorsData_p.motorsensors.hallABC);
-    //embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.hallABC);
     
     // retrieve the current value of the encoder
     embot::hw::motor::Position electricalAngle {0};
@@ -461,47 +431,33 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     electricalAngleOld = electricalAngle;
     
     // calculate the current joint position
-    position = position + delta / AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;  // the motor has 14 poles, hence 7 pole pairs
-    //position = position + delta / impl->amc_bldc.AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;  // the motor has 14 poles, hence 7 pole pairs
+    position = position + delta / AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
     
     AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
-    //impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
     
     // convert the current from mA to A
     AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0] = 0.001f*currs.u;
     AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1] = 0.001f*currs.v;
     AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2] = 0.001f*currs.w;
-//    impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0] = 0.001f*currs.u;
-//    impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1] = 0.001f*currs.v;
-//    impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2] = 0.001f*currs.w;
     
     // -----------------------------------------------------------------------------
     // FOC Step Function (~26.6 KHz)
     // -----------------------------------------------------------------------------
     
     AMC_BLDC_step_FOC();
-    //impl->amc_bldc.step_FOC();
     
-    // save sensor data
-    //impl->amc_bldc.AMC_BLDC_U.SensorsData_motorsensors_curren = impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current * 1000; // *0.001f in order to have mA
+    // -----------------------------------------------------------------------------
     
-#warning workaround. Fix this parameter in model design. 
-
     AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
-    //impl->amc_bldc.AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
-    //sensors_data.motorsensors.omega =  speed * 80 / 3 * 0.0054931640625f; // Frequency = 80/3. Angular velocity --> iCubDegree/ms
-                                                                            // * 0.0054931640625f ==> icubDegree -> Deg    
+
     // Set the voltages
     int32_T Vabc0 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[0] * 163.83F);
     int32_T Vabc1 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[1] * 163.83F);
     int32_T Vabc2 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[2] * 163.83F);
-//    int32_T Vabc0 = static_cast<int32_T>(impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Vabc[0] * 163.83F);
-//    int32_T Vabc1 = static_cast<int32_T>(impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Vabc[1] * 163.83F);
-//    int32_T Vabc2 = static_cast<int32_T>(impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Vabc[2] * 163.83F);
     
     embot::hw::motor::setpwm(embot::hw::MOTOR::one, Vabc0, Vabc1, Vabc2);
    
-//#define DEBUG_PARAMS //
+//#define DEBUG_PARAMS
 #ifdef DEBUG_PARAMS
     
     static char msg2[64];
@@ -512,22 +468,22 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
                                  Vabc0,  \
                                  Vabc1,  \
                                  Vabc2,  \
-                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
-                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
-                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2],       \
-                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.angle,         \
-                                 impl->amc_bldc.AMC_BLDC_Y.EstimatedData_p.jointvelocities.velocity, \
-                                 impl->amc_bldc.AMC_BLDC_B.Targets_n.motorcurrent.current,           \
-                                 impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current,          \
-                                 impl->amc_bldc.AMC_BLDC_Y.ControlOutputs_p.Vq);
+                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
+                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
+                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2],       \
+                                 AMC_BLDC_U.SensorsData_p.motorsensors.angle,         \
+                                 AMC_BLDC_Y.EstimatedData_p.jointvelocities.velocity, \
+                                 AMC_BLDC_B.Targets_n.motorcurrent.current,           \
+                                 AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current,          \
+                                 AMC_BLDC_Y.ControlOutputs_p.Vq);
 
 //        sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f", \
 //                                 Vabc0,  \
 //                                 Vabc1,  \
 //                                 Vabc2,  \
-//                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
-//                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
-//                                 impl->amc_bldc.AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2]);
+//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
+//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
+//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2]);
         embot::core::print(msg2);
         counter = 0;
     }
