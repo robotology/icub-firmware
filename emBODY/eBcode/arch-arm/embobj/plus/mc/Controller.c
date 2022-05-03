@@ -29,7 +29,7 @@
 
 #include "EOtheEntities.h"
 
-#include "Joint.h"
+#include "Joint_hid.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
