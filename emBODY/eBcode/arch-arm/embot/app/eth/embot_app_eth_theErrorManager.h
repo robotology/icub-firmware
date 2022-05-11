@@ -84,6 +84,7 @@ namespace embot { namespace app { namespace eth {
         bool initialise(const Config &config);        
         bool trace(const std::string &str);
         bool emit(Severity sev, const Caller &caller, const Descriptor &des, const std::string &str);
+        bool set(fpOnEmit onemit);
                      
     private:
         theErrorManager(); 
@@ -93,8 +94,16 @@ namespace embot { namespace app { namespace eth {
         struct Impl;
         std::unique_ptr<Impl> pImpl;     
     }; 
+    
+    constexpr theErrorManager::Severity sevTRACE { theErrorManager::Severity::trace };
+    constexpr theErrorManager::Severity sevINFO { theErrorManager::Severity::info };
+    constexpr theErrorManager::Severity sevDEBUG { theErrorManager::Severity::debug };
+    constexpr theErrorManager::Severity sevWARNING { theErrorManager::Severity::warning };
+    constexpr theErrorManager::Severity sevERROR { theErrorManager::Severity::error };
+    constexpr theErrorManager::Severity sevFATAL { theErrorManager::Severity::fatal };
 
-
+    bool emit(theErrorManager::Severity sev, const theErrorManager::Caller &caller, const theErrorManager::Descriptor &des, const std::string &str);
+    
 }}} // namespace embot { namespace app { namespace eth
 
 
