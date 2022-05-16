@@ -97,12 +97,13 @@ namespace embot { namespace app { namespace eth {
     struct SocketAddress
     {
         IPaddress addr {10, 0, 1, 99};
-        Port port {3333};
+        Port port {0};
         constexpr SocketAddress(const IPaddress &a, const Port &p) : addr(a), port(p) {}
         constexpr SocketAddress() = default;
         std::string to_string() const {
             return addr.to_string() + ":" + std::to_string(port);
         }
+        constexpr bool isvalid() const { return 0 != port; }
     };
  
     struct SocketSize

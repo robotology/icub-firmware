@@ -10,6 +10,10 @@
 
 #include "theApplication_config.h"
 
+#define REDIRECT_ERRORMANAGER_OVER_BACKDOOR
+
+#include "embot_app_eth_theBackdoor.h"
+
 
 namespace embot { namespace app { namespace eth {
     
@@ -20,6 +24,44 @@ namespace embot { namespace app { namespace eth {
         cnt++; 
     }
 
+    
+    embot::os::EventThread *thr {nullptr};
+    
+    void startup(embot::os::Thread *t, void *p)
+    {
+        embot::core::print("startup: ....");
+    }
+    
+    void onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p)
+    {
+        if(0 == eventmask)
+        {   // timeout ...   
+
+            embot::core::TimeFormatter tf(embot::core::now());        
+            std::string str = "onevent: timeout @ time = " + tf.to_string();               
+            //embot::core::print(str);
+                    
+            embot::app::eth::emit(sevINFO, {"testThread", t}, {}, str);
+            
+            return;
+        }
+
+        // eval other events
+        
+    }
+    
+    void tTEST(void *p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
+    
+    void emit_over_backdoor(theErrorManager::Severity sev, const theErrorManager::Caller &caller, const theErrorManager::Descriptor &des, const std::string &str);
+    
+    void bkdoor_onrx(EOpacket *rxp)
+    {
+        uint8_t *data {nullptr};
+        uint16_t size {0};
+        eo_packet_Payload_Get(rxp, &data, &size);
+        embot::core::print("theBackdoor-> " + std::string(reinterpret_cast<char*>(data)));                       
+    }
+    
     // user defined worker called by INIT thread just before start of scheduling
     void theApplication_Config_inituserdefined(void *p)
     {
@@ -27,6 +69,48 @@ namespace embot { namespace app { namespace eth {
         volatile uint32_t ciao {0};
         ciao++;
         embot::core::print("hello world... you can ping me now");
+        
+        
+        // in here i start whatever i want
+        
+        // for example: 
+        // - the object theBackdoor
+        // - an EventThread periodically activated by its timeout
+
+        // add the backdoor
+        constexpr embot::app::eth::theBackdoor::Config bkdconfig =
+        {
+            { embot::os::Priority::belownorm23, 2*1024 },   // thread
+            { {2, 64, 2, 512}, 6666 },                      // socket.size, socket.localport
+            {embot::app::eth::IPlocalhost, 6666},           // hostaddress 
+            bkdoor_onrx,                                    // onreception does ... nothing so far          
+        };
+        
+        embot::app::eth::theBackdoor::getInstance().initialise(bkdconfig);
+
+
+        constexpr embot::core::relTime timeout {5*1000*embot::core::time1millisec};
+
+        embot::os::EventThread::Config tCfg { 
+            6*1024, 
+            embot::os::Priority::belownorm23, 
+            startup, nullptr,
+            timeout,
+            onevent,
+            "tTEST"
+        };
+           
+            
+        // create the test thread 
+        thr = new embot::os::EventThread;          
+        // and start it
+        thr->start(tCfg, tTEST);
+        
+#if defined(REDIRECT_ERRORMANAGER_OVER_BACKDOOR)        
+        // now link theErrorManager to send onto the theBackdoor
+        embot::app::eth::theErrorManager::getInstance().set(emit_over_backdoor);
+#endif
+        
     }
     
     void theApplication_Config_errorman_onemit(theErrorManager::Severity sev, const theErrorManager::Caller &caller, const theErrorManager::Descriptor &des, const std::string &str)
@@ -55,6 +139,38 @@ namespace embot { namespace app { namespace eth {
         }        
         
     }
+    
+    void emit_over_backdoor(theErrorManager::Severity sev, const theErrorManager::Caller &caller, const theErrorManager::Descriptor &des, const std::string &str)
+    {
+        // form a string and then send it to the ...
+
+        std::string timenow = embot::core::TimeFormatter(embot::core::now()).to_string();
+        std::string eobjstr = (true == caller.isvalid()) ? caller.objectname : "OBJ";
+        std::string threadname = (true == caller.isvalid()) ? caller.owner->getName() : "THR";
+        std::string severity = theErrorManager::to_cstring(sev);
+        
+        std::string out = std::string("[") + severity + "] @" + timenow + " (" + eobjstr + ", " + threadname + "): " + str + "\n";
+        
+        static EOpacket *pkt {nullptr};
+        
+        if(nullptr == pkt)
+        {
+            pkt = eo_packet_New(500); // max size
+        }
+        
+        uint8_t *data = reinterpret_cast<uint8_t *>(const_cast<char*>(out.c_str()));
+        eo_packet_Payload_Set(pkt, data, strlen(out.c_str()));
+        eo_packet_Addressing_Set(pkt, EO_COMMON_IPV4ADDR(10, 0, 1, 104), 6666);
+        
+        embot::app::eth::theBackdoor::getInstance().transmit(pkt);
+      
+//        if(theErrorManager::Severity::fatal == sev)
+//        {
+//            for(;;);
+//        }            
+        
+    }
+    
             
 }}}
 

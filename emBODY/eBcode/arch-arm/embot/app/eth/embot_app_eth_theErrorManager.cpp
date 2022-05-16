@@ -18,7 +18,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
-
+#include "embot_os_rtos.h"
 
 
 
@@ -31,6 +31,7 @@
 struct embot::app::eth::theErrorManager::Impl
 { 
     Config _config {};    
+    embot::os::rtos::mutex_t *mtx {nullptr};
     Impl() = default;      
     
     bool initialise(const Config &config); 
@@ -58,7 +59,8 @@ bool embot::app::eth::theErrorManager::Impl::initialise(const Config &config)
     {
         _config.onemit = onemitdummy;
     }
-    embot::core::print("embot::app::eth::theErrorManager::Impl::initialise()");
+    // create the mutex
+    mtx = embot::os::rtos::mutex_new();
     return true;
 }
 
@@ -115,6 +117,29 @@ bool embot::app::eth::theErrorManager::emit(Severity sev, const Caller &caller, 
 {
     return pImpl->emit(sev, caller, des, str);
 }
+
+
+bool embot::app::eth::theErrorManager::set(fpOnEmit onemit)
+{
+    if(nullptr == onemit)
+    {
+        return false;
+    }
+    
+    // a mutex is required in here to avoid damage
+    embot::os::rtos::mutex_take(pImpl->mtx, embot::core::reltimeWaitForever);
+    pImpl->_config.onemit = onemit;
+    embot::os::rtos::mutex_release(pImpl->mtx);
+    
+    return true;    
+}
+
+bool embot::app::eth::emit(theErrorManager::Severity sev, const theErrorManager::Caller &caller, const theErrorManager::Descriptor &des, const std::string &str)    
+{
+    return embot::app::eth::theErrorManager::getInstance().emit(sev, caller, des, str);
+}
+
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
 
