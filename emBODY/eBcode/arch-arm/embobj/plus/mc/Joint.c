@@ -121,6 +121,13 @@ void Joint_init(Joint* o)
     
     o->not_reversible = FALSE;
     
+    // initialize Kalman Filter parameters
+    o->kalman_filter_enabled = false;
+    memset(o->x0, 0, sizeof(float)*3);
+    memset(o->Q, 0, sizeof(float)*3);
+    o->R = 0;
+    o->P0 = 0;
+    
 #ifdef FINGER_MK3
     o->ZTau = 560.0f*1.2f; // PWM/mNm * mNm;
     o->Ke = 0.05f;
@@ -179,6 +186,19 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->Kadmitt = ZERO;
     
     o->dead_zone = config->deadzone;
+    
+    // copy Kalman Filter parameters configuration.
+    o->kalman_filter_enabled = config->kalman_params.enabled;
+    if(o->kalman_filter_enabled)
+    {
+            memcpy(o->x0, config->kalman_params.x0, sizeof(float)*3);
+            memcpy(o->Q, config->kalman_params.Q, sizeof(float)*3);
+            o->R = config->kalman_params.R;
+            o->P0 = config->kalman_params.P0;
+        
+            // Initialize Kalman Filter for the joint
+            o->kalman_filter.initialize();
+    }
     
 //    eOerrmanDescriptor_t errdes = {0};
 //    char message[150];

@@ -18,6 +18,13 @@ struct Joint_hid // Joint
     
     CTRL_UNITS dead_zone;
     
+    // Kalman Filter Parameters
+    BOOL kalman_filter_enabled;
+    float x0[3];
+    float Q[3];
+    float R;
+    float P0;
+    
     CTRL_UNITS pos_min;
     CTRL_UNITS pos_max;
     CTRL_UNITS vel_max;
