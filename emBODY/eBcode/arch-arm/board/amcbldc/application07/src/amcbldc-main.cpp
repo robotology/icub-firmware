@@ -309,9 +309,9 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
     {                   
     }
     else
-    {		
+    {
 
-		bool valid {false};
+        bool valid {false};
         if(0 == embot::prot::can::frame2sender(frame))
         {
         valid = true;
