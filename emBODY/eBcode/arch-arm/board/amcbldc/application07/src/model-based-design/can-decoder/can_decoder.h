@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 2.88
+// Model version                  : 2.95
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Apr  1 11:36:06 2022
+// C/C++ source code generated on : Thu May 26 11:44:31 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,11 +27,7 @@
 
 struct DW_DecodingLogic_can_decoder_T {
   int32_T sfEvent;                     // '<S2>/Decoding Logic'
-  uint32_T ev_set_control_modeEventCounter;// '<S2>/Decoding Logic'
-  uint32_T ev_set_current_limitEventCounte;// '<S2>/Decoding Logic'
-  uint32_T ev_desired_currentEventCounter;// '<S2>/Decoding Logic'
   uint32_T ev_errorEventCounter;       // '<S2>/Decoding Logic'
-  uint32_T ev_set_current_pidEventCounter;// '<S2>/Decoding Logic'
   uint16_T cmd_processed;              // '<S2>/Decoding Logic'
   uint8_T is_active_c3_can_decoder;    // '<S2>/Decoding Logic'
   uint8_T is_SET_CONTROL_MODE;         // '<S2>/Decoding Logic'
@@ -60,8 +56,8 @@ struct B_CoreSubsys_can_decoder_T {
   boolean_T ev_set_control_mode;       // '<S2>/Decoding Logic'
   boolean_T ev_set_current_limit;      // '<S2>/Decoding Logic'
   boolean_T ev_desired_current;        // '<S2>/Decoding Logic'
-  boolean_T ev_error;                  // '<S2>/Decoding Logic'
   boolean_T ev_set_current_pid;        // '<S2>/Decoding Logic'
+  boolean_T ev_error;                  // '<S2>/Decoding Logic'
 };
 
 #endif                                 //can_decoder_MDLREF_HIDE_CHILD_
@@ -70,6 +66,7 @@ struct B_CoreSubsys_can_decoder_T {
 #ifndef can_decoder_MDLREF_HIDE_CHILD_
 
 struct DW_CoreSubsys_can_decoder_T {
+  boolean_T DelayInput1_DSTATE;        // '<S5>/Delay Input1'
   DW_DecodingLogic_can_decoder_T sf_DecodingLogic;// '<S2>/Decoding Logic'
 };
 
@@ -137,16 +134,16 @@ extern void can_decoder_DecodingLogic_Init(BUS_MSG_CONTROL_MODE
   CANErrorTypes *rty_error_type, BUS_MSG_DESIRED_CURRENT
   *rty_msg_desired_current, BUS_MSG_CURRENT_PID *rty_msg_set_current_pid,
   boolean_T *rty_ev_set_control_mode, boolean_T *rty_ev_set_current_limit,
-  boolean_T *rty_ev_desired_current, boolean_T *rty_ev_error, boolean_T
-  *rty_ev_set_current_pid, DW_DecodingLogic_can_decoder_T *localDW);
+  boolean_T *rty_ev_desired_current, boolean_T *rty_ev_set_current_pid,
+  boolean_T *rty_ev_error, DW_DecodingLogic_can_decoder_T *localDW);
 extern void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
   BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST, BUS_MSG_CONTROL_MODE
   *rty_msg_set_control_mode, BUS_MSG_CURRENT_LIMIT *rty_msg_set_current_limit,
   CANErrorTypes *rty_error_type, BUS_MSG_DESIRED_CURRENT
   *rty_msg_desired_current, BUS_MSG_CURRENT_PID *rty_msg_set_current_pid,
   boolean_T *rty_ev_set_control_mode, boolean_T *rty_ev_set_current_limit,
-  boolean_T *rty_ev_desired_current, boolean_T *rty_ev_error, boolean_T
-  *rty_ev_set_current_pid, DW_DecodingLogic_can_decoder_T *localDW);
+  boolean_T *rty_ev_desired_current, boolean_T *rty_ev_set_current_pid,
+  boolean_T *rty_ev_error, DW_DecodingLogic_can_decoder_T *localDW);
 
 #endif                                 //can_decoder_MDLREF_HIDE_CHILD_
 
@@ -185,7 +182,8 @@ extern DW_can_decoder_f_T can_decoder_DW;
 //  '<S2>'   : 'can_decoder/Cycling Decoder/CAN_Decoder'
 //  '<S3>'   : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT'
 //  '<S4>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Decoding Logic'
-//  '<S5>'   : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT/RAW2STRUCT Decoding Logic'
+//  '<S5>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Detect Change'
+//  '<S6>'   : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT/RAW2STRUCT Decoding Logic'
 
 #endif                                 // RTW_HEADER_can_decoder_h_
 

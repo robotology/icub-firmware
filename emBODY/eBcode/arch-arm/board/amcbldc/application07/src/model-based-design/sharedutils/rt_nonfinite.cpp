@@ -5,11 +5,11 @@
 //
 // File: rt_nonfinite.cpp
 //
-// Code generated for Simulink model 'can_encoder'.
+// Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.49
+// Model version                  : 2.87
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Mon Jan 31 18:31:57 2022
+// C/C++ source code generated on : Tue Feb  8 09:37:47 2022
 //
 
 //

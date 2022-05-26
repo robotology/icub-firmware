@@ -9,7 +9,7 @@
 //
 // Model version                  : 3.271
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Apr  1 11:36:41 2022
+// C/C++ source code generated on : Thu May 26 11:45:03 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -66,7 +66,6 @@ struct B_AMC_BLDC_T {
   BUS_MESSAGES_RX_MULTIPLE CAN_Decoder_o1;// '<S6>/CAN_Decoder'
   BUS_MESSAGES_TX MessagesTx;          // '<S7>/SupervisorFSM_TX'
   SensorsData RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter3'
-  Targets Targets_n;                   // '<S7>/SupervisorFSM_RX'
   BUS_EVENTS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
   BUS_CAN_RX_ERRORS_MULTIPLE CAN_Decoder_o3;// '<S6>/CAN_Decoder'
   ControlOutputs RTBInsertedForAdapter_Inserte_a;// '<Root>/Adapter1'

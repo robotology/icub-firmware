@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.56
+// Model version                  : 2.57
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Apr  1 11:36:11 2022
+// C/C++ source code generated on : Thu May 26 11:44:36 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,6 +21,17 @@
 #include <cstring>
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
+
+// Block states (default storage) for model 'can_encoder'
+#ifndef can_encoder_MDLREF_HIDE_CHILD_
+
+struct DW_can_encoder_f_T {
+  boolean_T DelayInput1_DSTATE;        // '<S9>/Delay Input1'
+  boolean_T DelayInput1_DSTATE_c;      // '<S5>/Delay Input1'
+};
+
+#endif                                 //can_encoder_MDLREF_HIDE_CHILD_
+
 #ifndef can_encoder_MDLREF_HIDE_CHILD_
 
 // Real-time Model Data Structure
@@ -77,6 +88,13 @@ extern MdlrefDW_can_encoder_T can_encoder_MdlrefDW;
 
 #endif                                 //can_encoder_MDLREF_HIDE_CHILD_
 
+#ifndef can_encoder_MDLREF_HIDE_CHILD_
+
+// Block states (default storage)
+extern DW_can_encoder_f_T can_encoder_DW;
+
+#endif                                 //can_encoder_MDLREF_HIDE_CHILD_
+
 //-
 //  The generated code includes comments that allow you to trace directly
 //  back to the appropriate location in the model.  The basic format
@@ -96,12 +114,14 @@ extern MdlrefDW_can_encoder_T can_encoder_MdlrefDW;
 //  '<S2>'   : 'can_encoder/CAN_Encoder/FOC'
 //  '<S3>'   : 'can_encoder/CAN_Encoder/NotUsed'
 //  '<S4>'   : 'can_encoder/CAN_Encoder/STATUS'
-//  '<S5>'   : 'can_encoder/CAN_Encoder/FOC/format_can_id'
-//  '<S6>'   : 'can_encoder/CAN_Encoder/FOC/format_foc_pck'
-//  '<S7>'   : 'can_encoder/CAN_Encoder/FOC/format_can_id/format_can_id'
-//  '<S8>'   : 'can_encoder/CAN_Encoder/STATUS/format_can_id'
-//  '<S9>'   : 'can_encoder/CAN_Encoder/STATUS/format_status_pck'
-//  '<S10>'  : 'can_encoder/CAN_Encoder/STATUS/format_can_id/format_can_id'
+//  '<S5>'   : 'can_encoder/CAN_Encoder/FOC/Detect Change'
+//  '<S6>'   : 'can_encoder/CAN_Encoder/FOC/format_can_id'
+//  '<S7>'   : 'can_encoder/CAN_Encoder/FOC/format_foc_pck'
+//  '<S8>'   : 'can_encoder/CAN_Encoder/FOC/format_can_id/format_can_id'
+//  '<S9>'   : 'can_encoder/CAN_Encoder/STATUS/Detect Change'
+//  '<S10>'  : 'can_encoder/CAN_Encoder/STATUS/format_can_id'
+//  '<S11>'  : 'can_encoder/CAN_Encoder/STATUS/format_status_pck'
+//  '<S12>'  : 'can_encoder/CAN_Encoder/STATUS/format_can_id/format_can_id'
 
 #endif                                 // RTW_HEADER_can_encoder_h_
 

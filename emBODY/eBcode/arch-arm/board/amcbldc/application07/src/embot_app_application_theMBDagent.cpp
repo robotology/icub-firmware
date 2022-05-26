@@ -22,6 +22,7 @@
 #include "embot_app_theCANboardInfo.h"
 #include "embot_app_scope.h"
 #include "embot_hw_sys.h"
+#include "embot_core.h"
 #include "embot_app_theLEDmanager.h"
 #include <array>
 
@@ -45,6 +46,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
+
 
 namespace embot::app::application {
 
@@ -181,8 +183,16 @@ struct embot::app::application::theMBDagent::Impl
     volatile embot::core::Time EXTFAULTpressedtime {0};
     volatile embot::core::Time EXTFAULTreleasedtime {0};
     
-    static constexpr uint8_t maxNumberOfPacketsCAN {4}; 
+    static constexpr uint8_t maxNumberOfPacketsCAN {4};  //define the max number of CAN pkt managed
+
+    #ifdef PRINT_HISTO_DEBUG 
+    void printHistogram_rxPkt(size_t cur_size); //cur_size is the currente queue size
+    static constexpr uint8_t numOfBins {11}; //size of queue of the CAN drive plus 1 (in case any packet is received)
+    uint32_t bin[numOfBins]{0};
+    #endif
+
 };
+
 
       
 bool embot::app::application::theMBDagent::Impl::initialise()
@@ -311,63 +321,35 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
             embot::app::theLEDmanager::getInstance().get(embot::hw::LED::two).off();
         }
     }
-    
-    uint8_t rx_data[8] {0}; // payload content
-    uint8_t rx_size {0};    // size of payload
-    uint32_t rx_id {0};     // frame ID
-    
-    
-    // check for CAN input frame
-    size_t ninputframes = inpframes.size();
-    if(0 == ninputframes) 
-    {
-        #pragma unroll
-        for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++) {
-            AMC_BLDC_U.PacketsRx.packets[i].available = false;
-        }
-    } 
-    else
-    {   
-        // retrieve the CAN frames, use them, remove them from the vector
-        // so far we consume only one frame every tick
-        size_t consumedframes {1};
-
-        // get the first
-        embot::prot::can::Frame frame = inpframes.front();
-
-        // copy it
-        frame.copyto(rx_id, rx_size, rx_data);
         
-//        static uint32_t cnt = 0;
-//        if((++cnt % 500) == 1)
-//        {
-//            embot::core::print(std::string("size = ") + std::to_string(ninputframes) + ", d[0] = " + std::to_string(rx_data[0]) + 
-//                           ", consumed = " + std::to_string(consumedframes) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-//        }
-        
-        // clean up the first consumedframes positions
-        inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);
-        
-        
-        // save the first CAN frame into the input structure of the model (TODO: we'll manage the other packets soon)
-        AMC_BLDC_U.PacketsRx.packets[0].available = true;
-        AMC_BLDC_U.PacketsRx.packets[0].length = (uint8_T)rx_size;
-        AMC_BLDC_U.PacketsRx.packets[0].packet.ID = (uint16_T)rx_id;
-        
-        // Actually, we fill the payload of the first packet only. Later we manage the case of multi packets.
-        #pragma unroll
-        for (uint8_t i = 0; i < rx_size; i++) 
-        {
-            AMC_BLDC_U.PacketsRx.packets[0].packet.PAYLOAD[i] = (uint8_T)rx_data[i];
-        }
-        
-        // remember that we can deal with only one packet yet at this stage
-        #pragma unroll
-        for (uint8_t i = 1; i < maxNumberOfPacketsCAN; i++) {
-            AMC_BLDC_U.PacketsRx.packets[i].available = false;
-        }
+    // 1. reset all info 
+    for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++) {
+        AMC_BLDC_U.PacketsRx.packets[i].available = false;
     }
     
+    // 2. check for CAN input frame
+    size_t cur_size = inpframes.size();
+    size_t ninputframes = cur_size;
+    
+    // 3. limit the number of can pkts per cycle to maxNumberOfPacketsCAN 
+    if(ninputframes>maxNumberOfPacketsCAN)
+        ninputframes = maxNumberOfPacketsCAN;
+    
+    // 4. take ninputframes frames and inset them in the supervisor input queue.
+    for (uint8_t i = 0; i < ninputframes; i++) {
+        
+        uint32_t rx_id {0};     // frame ID
+        const size_t consumedframes {1};
+        
+        // get the first
+        embot::prot::can::Frame frame = inpframes.front();
+        // copy it
+        frame.copyto(rx_id, AMC_BLDC_U.PacketsRx.packets[i].length, AMC_BLDC_U.PacketsRx.packets[i].packet.PAYLOAD); 
+        AMC_BLDC_U.PacketsRx.packets[i].available = true;
+        AMC_BLDC_U.PacketsRx.packets[i].packet.ID = (uint16_T)rx_id;
+        // clean up the first consumedframes positions
+        inpframes.erase(inpframes.begin(), inpframes.begin()+consumedframes);
+    }//end for
     
     // -----------------------------------------------------------------------------
     // Model Step Function (1 ms)
@@ -375,6 +357,9 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     
     AMC_BLDC_step_Time();
     
+    
+    
+
     // if there an output is available, send it to the CAN Netowork
     for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++)
     {
@@ -383,8 +368,11 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
         {
             embot::prot::can::Frame fr {AMC_BLDC_Y.PacketsTx.packets[i].packet.ID, AMC_BLDC_Y.PacketsTx.packets[i].length, AMC_BLDC_Y.PacketsTx.packets[i].packet.PAYLOAD};
             outframes.push_back(fr);
-        }
-    }
+        }//end if
+    } //end for
+    
+    uint32_t out_size = outframes.size();
+
     
     // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
     // TODO: We should perform the following update inside the architectural model after a SET_MOTOR_CONFIG message has been received
@@ -494,6 +482,37 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
 
     impl->measureFOC->stop();
 }
+
+#ifdef PRINT_HISTO_DEBUG 
+void embot::app::application::theMBDagent::Impl::printHistogram_rxPkt(size_t cur_size)
+{
+    if(cur_size<numOfBins)
+    {
+        bin[cur_size] ++;
+    }
+    else
+    {
+        //error;Currently this situation is not possible
+    }
+        
+    static uint32_t cnt = 0;
+    if((++cnt % 500) == 1)
+    {
+        embot::core::print(std::string("bin[0] = ") + std::to_string(bin[0]) + ", bin[1] = " + std::to_string(bin[1]) + 
+                            std::string(", bin[2] = ") + std::to_string(bin[2]) + ", bin[3] = " + std::to_string(bin[3]) +
+                            std::string(", bin[4] = ") + std::to_string(bin[4]) + ", bin[5] = " + std::to_string(bin[5]) +
+                            std::string(", bin[6] = ") + std::to_string(bin[6]) + ", bin[7] = " + std::to_string(bin[7]) +
+                            std::string(", bin[8] = ") + std::to_string(bin[8]) + ", bin[9] = " + std::to_string(bin[9]) +
+                            std::string(", bin[10] = ") + std::to_string(bin[10]) +
+                            " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+
+        for(uint8_t j=0; j<numOfBins; j++)
+        {
+            bin[j]=0;
+        }
+    }
+}
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - the class

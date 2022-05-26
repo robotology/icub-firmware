@@ -9,7 +9,7 @@
 //
 // Model version                  : 3.271
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Fri Apr  1 11:36:41 2022
+// C/C++ source code generated on : Thu May 26 11:45:03 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -273,6 +273,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
 void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
 {
   // local block i/o variables
+  Targets rtb_SupervisorFSM_RX_o2;
   ControlOuterOutputs rtb_OuterControl;
   ConfigurationParameters *rtb_ZOHBlockInsertedForAdapte_0;
   int8_T wrBufIdx;
@@ -358,7 +359,8 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
                    &AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a,
                    &AMC_BLDC_B.CAN_Decoder_o1, &AMC_BLDC_B.CAN_Decoder_o2,
                    &AMC_BLDC_B.CAN_Decoder_o3, &AMC_BLDC_Y.Flags_p,
-                   &AMC_BLDC_B.Targets_n, &AMC_BLDC_Y.ConfigurationParameters_p);
+                   &rtb_SupervisorFSM_RX_o2,
+                   &AMC_BLDC_Y.ConfigurationParameters_p);
 
   // ModelReference: '<S7>/SupervisorFSM_TX' incorporates:
   //   Outport: '<Root>/ConfigurationParameters'
@@ -382,7 +384,7 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   //   Outport: '<Root>/Flags'
 
   control_outer(&AMC_BLDC_Y.Flags_p, &AMC_BLDC_Y.ConfigurationParameters_p,
-                &AMC_BLDC_B.Targets_n,
+                &rtb_SupervisorFSM_RX_o2,
                 &AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
                 &AMC_BLDC_Y.EstimatedData_p, &rtb_OuterControl);
 
@@ -460,7 +462,8 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   }
 
   rtw_mutex_unlock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[wrBufIdx] = AMC_BLDC_B.Targets_n;
+  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[wrBufIdx] =
+    rtb_SupervisorFSM_RX_o2;
   AMC_BLDC_DW.RTBInsertedForAdapter_Insert_jj = wrBufIdx;
 
   // RateTransition generated from: '<Root>/Adapter2' incorporates:
@@ -554,7 +557,6 @@ void AMC_BLDC_initialize(void)
 
   // SystemInitialize for ModelReference: '<Root>/OuterControl' incorporates:
   //   Outport: '<Root>/ConfigurationParameters'
-  //   Outport: '<Root>/EstimatedData'
   //   Outport: '<Root>/Flags'
 
   control_outer_Init();
@@ -562,15 +564,12 @@ void AMC_BLDC_initialize(void)
   // SystemInitialize for ModelReference: '<S7>/SupervisorFSM_RX' incorporates:
   //   Inport: '<Root>/ExternalFlags'
   //   Outport: '<Root>/ConfigurationParameters'
-  //   Outport: '<Root>/EstimatedData'
   //   Outport: '<Root>/Flags'
 
-  SupervisorFSM_RX_Init(&AMC_BLDC_Y.Flags_p, &AMC_BLDC_B.Targets_n,
-                        &AMC_BLDC_Y.ConfigurationParameters_p);
+  SupervisorFSM_RX_Init(&AMC_BLDC_Y.Flags_p);
 
   // SystemInitialize for ModelReference: '<S7>/SupervisorFSM_TX' incorporates:
   //   Outport: '<Root>/ConfigurationParameters'
-  //   Outport: '<Root>/EstimatedData'
   //   Outport: '<Root>/Flags'
 
   SupervisorFSM_TX_Init(&AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2);
