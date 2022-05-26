@@ -61,14 +61,250 @@ using namespace embot::hw;
 
 namespace embot { namespace hw { namespace timer {
     
-    bool supported(embot::hw::TIMER t)                                                                  { return false; }
-    bool initialised(embot::hw::TIMER t)                                                                { return false; }
-    result_t init(embot::hw::TIMER t, const Config &config)                                             { return resNOK; }
-    bool isrunning(embot::hw::TIMER t)                                                                  { return false; }
-    result_t start(embot::hw::TIMER t, const Mode &mode)                                                { return resNOK; }
-    result_t stop(embot::hw::TIMER t)                                                                   { return resNOK; }
+    bool supported(embot::hw::TIMER t)                                                                  
+    { return false; }
+    bool initialised(embot::hw::TIMER t)                                                                
+    { return false; }
+    result_t init(embot::hw::TIMER t, const Config &config)       
+    { return resNOK; }
+    result_t deinit(embot::hw::TIMER t)       
+    { return resNOK; }
+    result_t configure(embot::hw::TIMER t, const Config &config)       
+    { return resNOK; }    
+    bool isrunning(embot::hw::TIMER t)                                                                  
+    { return false; }
+    result_t start(embot::hw::TIMER t)                                                
+    { return resNOK; }
+    result_t stop(embot::hw::TIMER t)                                                                   
+    { return resNOK; }
+    Status status(embot::hw::TIMER t)
+    { return Status::none; }
+    void execute(embot::hw::TIMER t)
+    {}
     
 }}} // namespace embot { namespace hw { namespace timer {
+
+#elif defined(EMBOT_ENABLE_hw_timer_emulated)
+
+#warning EMBOT_ENABLE_hw_timer_emulated is defined. it uses embot::os::Timer, so Config::time must be multiple of 1 ms
+
+#include "embot_os_Timer.h"
+#include "embot_os_theCallbackManager.h"
+
+namespace embot { namespace hw { namespace timer {
+              
+    // initialised mask: one variable for all the timers      
+    static std::uint32_t initialisedmask = 0;
+    
+    bool supported(TIMER t)
+    {
+        return embot::hw::timer::getBSP().supported(t);
+    }
+    
+    bool initialised(TIMER t)
+    {
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(t));
+    }    
+
+    struct TIMERprop
+    {        
+        bool                isrunning {false};
+        TIMER               t {TIMER::none};    
+        Config              config {};
+        embot::os::Timer*   ostimer {nullptr};
+        Status              status {Status::none};
+        void deinit()
+        {
+            isrunning = false;
+            t = TIMER::none;
+            config = {};    
+            if(nullptr != ostimer)
+            {
+                ostimer->stop();
+                delete ostimer;
+            }
+            status = Status::none;                
+        }
+    };
+    
+    struct propsOFalltimers
+    {
+        TIMERprop prop[embot::core::tointegral(embot::hw::TIMER::maxnumberof)];
+        
+        TIMERprop & get(TIMER t)
+        {
+            return prop[embot::core::tointegral(t)];
+        }        
+    };
+
+    static propsOFalltimers s_properties;
+        
+    void execute(void *p)
+    {
+        TIMERprop * prop = reinterpret_cast<TIMERprop*>(p);
+        // the timer callback executes this code. now we do actions depending on what is inside s_privatedata.         
+        if(false == initialised(prop->t))
+        {
+            return;
+        }
+               
+        prop->config.onexpiry.execute();
+       
+        if(Mode::oneshot == prop->config.mode)
+        {
+            prop->status = Status::expired;
+            stop(prop->t); // still required to update teh status of the embot::hw::TIMER
+        }
+    }    
+    
+    result_t init(TIMER t, const Config &config)
+    {
+        if(false == supported(t))
+        {
+            return resNOK;
+        }
+        
+        if(true == initialised(t))
+        {
+            return resOK;
+        }
+        
+        // init peripheral... actually it is done inside general bsp
+        // the emulated doe not do anything
+        // embot::hw::timer::getBSP().init(t);
+             
+        TIMERprop &prop = s_properties.get(t);    
+        prop.t = t;        
+        prop.isrunning = false;
+        prop.config = config;
+        prop.status = Status::idle;
+        if(nullptr == prop.ostimer)
+        {
+            prop.ostimer = new embot::os::Timer;
+        }
+        
+        // VERY IMPORTANT: keep it in here before configure...
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(t));
+        
+        return configure(t, config);    
+    }
+
+    result_t deinit(embot::hw::TIMER t)
+    {
+        if(false == initialised(t))
+        {
+            return resNOK;
+        }
+    
+        if(true == isrunning(t))
+        {
+            stop(t);
+        }
+
+        TIMERprop &prop = s_properties.get(t); 
+        prop.deinit();
+        
+        embot::core::binary::bit::clear(initialisedmask, embot::core::tointegral(t));
+        
+        return resOK;
+    }
+
+
+    result_t configure(TIMER t, const Config &config)
+    {
+        if(false == initialised(t))
+        {
+            return resNOK;
+        }
+    
+        if(true == isrunning(t))
+        {
+            stop(t);
+        }
+        
+        TIMERprop &prop = s_properties.get(t); 
+        prop.config = config;
+        //mx_timx_init(t, config.time);      
+        prop.isrunning = false;
+        
+        return resOK;        
+    }
+        
+
+    bool isrunning(TIMER t)
+    { 
+        if(false == initialised(t))
+        {
+            return false;
+        }
+        
+        TIMERprop &prop = s_properties.get(t); 
+        return prop.isrunning;
+    }
+ 
+ 
+    result_t start(TIMER t)
+    {
+        if(false == initialised(t))
+        {
+            return resNOK;
+        }
+        
+
+        TIMERprop &prop = s_properties.get(t); 
+        
+        if(true == prop.isrunning)
+        {
+            stop(t);
+        }
+        
+        prop.isrunning = true;
+        prop.status = Status::running;
+     
+        // ok: the timer starts.
+        //const embot::hw::timer::PROP * stm32props = embot::hw::timer::getBSP().getPROP(t);
+        //TIM_HandleTypeDef* phandletimx = reinterpret_cast<TIM_HandleTypeDef*>(stm32props->handle);
+        //HAL_TIM_Base_Start_IT(phandletimx);
+ //       prop.ostimer.
+        embot::os::Timer::Mode mode = (prop.config.mode == Mode::periodic) ? (embot::os::Timer::Mode::forever) : (embot::os::Timer::Mode::oneshot);
+        embot::os::Action act(embot::os::CallbackToThread(execute, &prop, embot::os::theCallbackManager::getInstance().thread()));
+        embot::os::Timer::Config cfg(prop.config.time, act, mode, 0);  
+        prop.ostimer->start(cfg);
+        return resOK;        
+    } 
+    
+    result_t stop(TIMER t)
+    {
+        if(false == initialised(t))
+        {
+            return resNOK;
+        }
+        
+            
+        // stop it anyway        
+        TIMERprop &prop = s_properties.get(t);
+        prop.ostimer->stop();
+        prop.isrunning = false;
+        if(prop.status != Status::expired)
+        {
+            prop.status = Status::idle;       
+        }            
+        return resOK;              
+    }    
+    
+    Status status(embot::hw::TIMER t)
+    { 
+        if(false == initialised(t))
+        {
+            return Status::none;
+        }    
+         
+        TIMERprop &prop = s_properties.get(t);
+        
+        return prop.status;
+    }
+    
+}}}
 
 #else
 
@@ -76,11 +312,6 @@ namespace embot { namespace hw { namespace timer {
 #error pls verify embot::hw::timer for STM32H7 
 #endif
 
-// there are two parts: 
-// 1. the cpp driver under namespace embot::hw::onewire
-// 2. the functions which stm library required to be redefined: IRQ handlers and callbacks 
-
-// the implementation uses just a few timers: TIM6 and TIM7 which are compacted in a small array
 
 void hal_error_handler()
 {
@@ -105,7 +336,6 @@ namespace embot { namespace hw { namespace timer {
     bool initialised(TIMER t)
     {
         return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(t));
-        //return embot::core::binary::bit::check(initialisedmask, static_cast<std::uint8_t>(t));
     }    
     
     // stm32 specific support
@@ -174,11 +404,7 @@ namespace embot { namespace hw { namespace timer {
         }
 
     }        
-
-//#if (STM32HAL_DRIVER_VERSION >= 0x183)    
-//    #warning look at the differences with the timer config. 
-//    // so far only TIM6 is guaranteed to work. also ... the callbacks now are embedded in stm32 ... 
-//#endif    
+ 
         
     void mx_timx_init(TIMER t, std::uint32_t time)
     {
@@ -236,7 +462,6 @@ namespace embot { namespace hw { namespace timer {
 
            
 
-
     struct TIMERprop
     {        
         bool                isrunning;
@@ -250,7 +475,6 @@ namespace embot { namespace hw { namespace timer {
         TIMERprop & get(TIMER t)
         {
             return prop[embot::core::tointegral(t)];
-            //return prop[static_cast<std::uint8_t>(t)];
         }        
     };
 

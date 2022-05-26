@@ -1322,5 +1322,62 @@ extern "C"
 // - support map: end of embot::hw::spi
 
 
+
+// - support map: begin of embot::hw::timer
+
+#include "embot_hw_timer_bsp.h"
+
+#if   !defined(HAL_TIM_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_timer)
+
+namespace embot { namespace hw { namespace timer {
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::TIMER h) const {}    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+#elif defined(EMBOT_ENABLE_hw_timer_emulated)
+
+namespace embot { namespace hw { namespace timer {
+    
+    #if defined(STM32HAL_BOARD_AMC)    
+    
+    constexpr PROP tim01p = { };
+    constexpr PROP tim02p = { };
+    constexpr PROP tim03p = { };
+    constexpr PROP tim04p = { };  
+    constexpr PROP tim05p = { };
+    constexpr PROP tim06p = { };  
+    
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TIMER::one) | mask::pos2mask<uint32_t>(TIMER::two) | 
+        mask::pos2mask<uint32_t>(TIMER::three) | mask::pos2mask<uint32_t>(TIMER::four) |
+        mask::pos2mask<uint32_t>(TIMER::four) | mask::pos2mask<uint32_t>(TIMER::five),        
+        // properties
+        {{
+            &tim01p, &tim02p, &tim03p, &tim04p, &tim05p, &tim06p, nullptr, nullptr,     // from 1 to 8
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16             
+        }}        
+    };
+    
+    void BSP::init(embot::hw::TIMER h) const {}
+    
+    #else
+        #error embot::hw::timer::thebsp must be defined    
+    #endif
+        
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }    
+}}}
+
+#endif // timer
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
