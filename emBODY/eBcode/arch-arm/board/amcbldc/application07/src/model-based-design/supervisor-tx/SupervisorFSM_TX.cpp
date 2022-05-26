@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.31
+// Model version                  : 3.29
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue May 24 10:00:43 2022
+// C/C++ source code generated on : Wed Apr  6 09:04:03 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,6 +18,14 @@
 //
 #include "SupervisorFSM_TX.h"
 #include "SupervisorFSM_TX_private.h"
+
+MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_MdlrefDW;
+
+// Block signals (default storage)
+B_SupervisorFSM_TX_c_T SupervisorFSM_TX_B;
+
+// Block states (default storage)
+DW_SupervisorFSM_TX_f_T SupervisorFSM_TX_DW;
 
 // Forward declaration for local functions
 static MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode);
@@ -57,7 +65,7 @@ static MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode)
 
 // System initialize for referenced model: 'SupervisorFSM_TX'
 void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_EVENTS_TX
-  *rty_EventsTx, B_SupervisorFSM_TX_c_T *localB)
+  *rty_EventsTx)
 {
   // SystemInitialize for Chart: '<Root>/SupervisorFSM_TX'
   rty_MessagesTx->foc.current = 0.0F;
@@ -103,54 +111,60 @@ void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_EVENTS_TX
   rty_MessagesTx->status.flags.PositionLimitLower = false;
 
   // SystemInitialize for BusCreator: '<Root>/BUS_EVENTS_TX'
-  rty_EventsTx->foc = localB->ev_foc;
-  rty_EventsTx->status = localB->ev_status;
+  rty_EventsTx->foc = SupervisorFSM_TX_B.ev_foc;
+  rty_EventsTx->status = SupervisorFSM_TX_B.ev_status;
 }
 
 // Output and update for referenced model: 'SupervisorFSM_TX'
 void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
                       *rtu_EstimatedData, const Flags *rtu_Flags, const
                       ControlOutputs *rtu_ControlOutputs, BUS_MESSAGES_TX
-                      *rty_MessagesTx, BUS_EVENTS_TX *rty_EventsTx,
-                      B_SupervisorFSM_TX_c_T *localB, DW_SupervisorFSM_TX_f_T
-                      *localDW)
+                      *rty_MessagesTx, BUS_EVENTS_TX *rty_EventsTx)
 {
   // Chart: '<Root>/SupervisorFSM_TX'
-  if (localDW->is_active_c3_SupervisorFSM_TX == 0U) {
-    localDW->is_active_c3_SupervisorFSM_TX = 1U;
-  } else if (rtu_Flags->enable_sending_msg_status) {
-    rty_MessagesTx->foc.current = rtu_ControlOutputs->Iq_fbk.current;
-    rty_MessagesTx->foc.velocity = rtu_EstimatedData->jointvelocities.velocity;
-    rty_MessagesTx->foc.position = rtu_SensorsData->jointpositions.position;
-    localDW->ev_focEventCounter++;
-    rty_MessagesTx->status.control_mode = SupervisorFSM_TX_convert
-      (rtu_Flags->control_mode);
-    rty_MessagesTx->status.pwm_fbk = rtu_ControlOutputs->Vq;
-    rty_MessagesTx->status.flags.ExternalFaultAsserted = rtu_Flags->fault_button;
-    localDW->ev_statusEventCounter++;
+  if (SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX == 0U) {
+    SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX = 1U;
+  } else {
+    if (rtu_Flags->control_mode != ControlModes_Idle) {
+      rty_MessagesTx->foc.current = rtu_ControlOutputs->Iq_fbk.current;
+      rty_MessagesTx->foc.velocity = rtu_EstimatedData->jointvelocities.velocity;
+      rty_MessagesTx->foc.position = rtu_SensorsData->jointpositions.position;
+      SupervisorFSM_TX_DW.ev_focEventCounter++;
+    }
+
+    if (rtu_Flags->enable_sending_msg_status) {
+      rty_MessagesTx->status.control_mode = SupervisorFSM_TX_convert
+        (rtu_Flags->control_mode);
+      rty_MessagesTx->status.pwm_fbk = rtu_ControlOutputs->Vq;
+      rty_MessagesTx->status.flags.ExternalFaultAsserted =
+        rtu_Flags->fault_button;
+      SupervisorFSM_TX_DW.ev_statusEventCounter++;
+    }
   }
 
-  if (localDW->ev_focEventCounter > 0U) {
-    localB->ev_foc = !localB->ev_foc;
-    localDW->ev_focEventCounter--;
+  if (SupervisorFSM_TX_DW.ev_focEventCounter > 0U) {
+    SupervisorFSM_TX_B.ev_foc = !SupervisorFSM_TX_B.ev_foc;
+    SupervisorFSM_TX_DW.ev_focEventCounter--;
   }
 
-  if (localDW->ev_statusEventCounter > 0U) {
-    localB->ev_status = !localB->ev_status;
-    localDW->ev_statusEventCounter--;
+  if (SupervisorFSM_TX_DW.ev_statusEventCounter > 0U) {
+    SupervisorFSM_TX_B.ev_status = !SupervisorFSM_TX_B.ev_status;
+    SupervisorFSM_TX_DW.ev_statusEventCounter--;
   }
 
   // End of Chart: '<Root>/SupervisorFSM_TX'
 
   // BusCreator: '<Root>/BUS_EVENTS_TX'
-  rty_EventsTx->foc = localB->ev_foc;
-  rty_EventsTx->status = localB->ev_status;
+  rty_EventsTx->foc = SupervisorFSM_TX_B.ev_foc;
+  rty_EventsTx->status = SupervisorFSM_TX_B.ev_status;
 }
 
 // Model initialize function
-void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_SupervisorFSM_TX_T *const SupervisorFSM_TX_M)
+void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus)
 {
+  RT_MODEL_SupervisorFSM_TX_T *const SupervisorFSM_TX_M =
+    &(SupervisorFSM_TX_MdlrefDW.rtm);
+
   // Registration code
 
   // initialize error status

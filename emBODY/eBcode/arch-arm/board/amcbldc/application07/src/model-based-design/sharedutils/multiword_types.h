@@ -7,22 +7,23 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.196
+// Model version                  : 3.156
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue May 24 10:00:34 2022
+// C/C++ source code generated on : Tue Feb  8 09:36:53 2022
 //
+
 #ifndef MULTIWORD_TYPES_H
 #define MULTIWORD_TYPES_H
 #include "rtwtypes.h"
 
-//
-//  MultiWord supporting definitions
-
+/*
+ * MultiWord supporting definitions
+ */
 typedef long int long_T;
 
-//
-//  MultiWord types
-
+/*
+ * MultiWord types
+ */
 typedef struct {
   uint32_T chunks[2];
 } int64m_T;
@@ -41,7 +42,7 @@ typedef struct {
   uint64m_T im;
 } cuint64m_T;
 
-#endif                                 // MULTIWORD_TYPES_H
+#endif                                 /* MULTIWORD_TYPES_H */
 
 //
 // File trailer for generated code.

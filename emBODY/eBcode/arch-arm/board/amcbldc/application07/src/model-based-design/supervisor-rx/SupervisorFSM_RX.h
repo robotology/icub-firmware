@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.196
+// Model version                  : 3.199
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue May 24 10:00:34 2022
+// C/C++ source code generated on : Thu May 26 11:44:17 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -36,9 +36,9 @@ struct B_SupervisorFSM_RX_c_T {
   Thresholds thresholds;               // '<S3>/Chart'
   MotorConfig Motorconfig;             // '<S1>/CAN Event Dispatcher'
   Targets targets;                     // '<S4>/Chart1'
-  Limits newLimit;                     // '<S1>/CAN Event Dispatcher'
-  Setpoint newSetpoint;                // '<S1>/CAN Event Dispatcher'
-  Setpoint newSetpoint_p;              // '<S2>/ControlMode_SM_motor0'
+  SV_Limits newLimit;                  // '<S1>/CAN Event Dispatcher'
+  SV_Setpoint newSetpoint;             // '<S1>/CAN Event Dispatcher'
+  SV_Setpoint newSetpoint_p;           // '<S2>/ControlMode_SM_motor0'
   int32_T messageIndex;                // '<Root>/SupervisorFSM_RX'
   ControlModes requiredControlMode;    // '<S1>/CAN Event Dispatcher'
   ControlModes controlModeDefined;     // '<S2>/ControlMode_SM_motor0'
@@ -59,7 +59,7 @@ struct B_SupervisorFSM_RX_c_T {
 #ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 
 struct DW_SupervisorFSM_RX_f_T {
-  Setpoint newSetpoint;                // '<S4>/Chart1'
+  SV_Setpoint newSetpoint;             // '<S4>/Chart1'
   uint8_T is_active_c2_SupervisorFSM_RX;// '<Root>/SupervisorFSM_RX'
   uint8_T is_INIT_CONFIGURATION_PARAMETER;// '<Root>/SupervisorFSM_RX'
   uint8_T is_active_INIT_CONFIGURATION_PA;// '<Root>/SupervisorFSM_RX'

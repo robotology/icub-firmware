@@ -9,7 +9,7 @@
 //
 // Model version                  : 3.271
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue May 24 10:01:18 2022
+// C/C++ source code generated on : Thu May 26 11:45:03 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -32,6 +32,7 @@
 #include "can_decoder.h"
 #define SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_RX.h"
+#define SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_TX.h"
 #define can_encoder_MDLREF_HIDE_CHILD_
 #include "can_encoder.h"
@@ -106,7 +107,6 @@ struct DW_AMC_BLDC_T {
   int8_T RTBInsertedForAdapter_Inserte_a;// synthesized block
   int8_T RTBInsertedForAdapter_Inserte_g;// synthesized block
   int8_T RTBInsertedForAdapter_Insert_pa;// synthesized block
-  MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_InstanceData;// '<S7>/SupervisorFSM_TX' 
 };
 
 // External inputs (root inport signals with default storage)

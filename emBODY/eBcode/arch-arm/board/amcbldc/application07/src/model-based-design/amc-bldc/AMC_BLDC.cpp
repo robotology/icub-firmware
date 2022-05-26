@@ -9,7 +9,7 @@
 //
 // Model version                  : 3.271
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue May 24 10:01:18 2022
+// C/C++ source code generated on : Thu May 26 11:45:03 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -363,15 +363,14 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
                    &AMC_BLDC_Y.ConfigurationParameters_p);
 
   // ModelReference: '<S7>/SupervisorFSM_TX' incorporates:
+  //   Outport: '<Root>/ConfigurationParameters'
   //   Outport: '<Root>/EstimatedData'
   //   Outport: '<Root>/Flags'
 
   SupervisorFSM_TX(&AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
                    &AMC_BLDC_Y.EstimatedData_p, &AMC_BLDC_Y.Flags_p,
                    &AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a,
-                   &AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2,
-                   &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtb),
-                   &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtdw));
+                   &AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2);
 
   // ModelReference: '<S6>/CAN_Encoder' incorporates:
   //   Outport: '<Root>/PacketsTx'
@@ -517,8 +516,7 @@ void AMC_BLDC_initialize(void)
   SupervisorFSM_RX_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
 
   // Model Initialize function for ModelReference Block: '<S7>/SupervisorFSM_TX' 
-  SupervisorFSM_TX_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
-    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtm));
+  SupervisorFSM_TX_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
 
   // Start for RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_init();
@@ -570,9 +568,11 @@ void AMC_BLDC_initialize(void)
 
   SupervisorFSM_RX_Init(&AMC_BLDC_Y.Flags_p);
 
-  // SystemInitialize for ModelReference: '<S7>/SupervisorFSM_TX'
-  SupervisorFSM_TX_Init(&AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2,
-                        &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtb));
+  // SystemInitialize for ModelReference: '<S7>/SupervisorFSM_TX' incorporates:
+  //   Outport: '<Root>/ConfigurationParameters'
+  //   Outport: '<Root>/Flags'
+
+  SupervisorFSM_TX_Init(&AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2);
 }
 
 // Model terminate function

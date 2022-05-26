@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.196
+// Model version                  : 3.199
 // Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue May 24 10:00:34 2022
+// C/C++ source code generated on : Thu May 26 11:44:17 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -478,10 +478,10 @@ struct Targets
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Setpoint_
-#define DEFINED_TYPEDEF_FOR_Setpoint_
+#ifndef DEFINED_TYPEDEF_FOR_SV_Setpoint_
+#define DEFINED_TYPEDEF_FOR_SV_Setpoint_
 
-struct Setpoint
+struct SV_Setpoint
 {
   ControlModes type;
   real32_T value;
@@ -489,10 +489,10 @@ struct Setpoint
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Limits_
-#define DEFINED_TYPEDEF_FOR_Limits_
+#ifndef DEFINED_TYPEDEF_FOR_SV_Limits_
+#define DEFINED_TYPEDEF_FOR_SV_Limits_
 
-struct Limits
+struct SV_Limits
 {
   real32_T overload;
   real32_T peak;
