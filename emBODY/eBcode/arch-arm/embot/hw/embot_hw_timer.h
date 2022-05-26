@@ -29,21 +29,26 @@
 namespace embot { namespace hw { namespace timer {
  
 
-    enum class Mode { oneshot = 0, periodic = 1};    
+    enum class Mode : uint8_t { oneshot = 0, periodic = 1};   
+
+    enum class Status : uint8_t { none = 0, idle = 1, running = 2, expired = 3 };  
     
     struct Config
     {
-        embot::core::relTime      time;               
-        Mode                        mode;             
-        embot::core::Callback     onexpiry;
-        Config() : time(embot::core::time1millisec), mode(Mode::periodic), onexpiry(nullptr, 0) {}         
+        embot::core::relTime time {embot::core::time1millisec};               
+        Mode mode {Mode::periodic};             
+        embot::core::Callback onexpiry {};
+        constexpr Config() = default;
+        constexpr Config(embot::core::relTime t, Mode m, const embot::core::Callback &e ) : time(t), mode(m), onexpiry(e) {}         
     };
     
     
     bool supported(embot::hw::TIMER t);    
     bool initialised(embot::hw::TIMER t);    
     result_t init(embot::hw::TIMER t, const Config &config);
+    result_t deinit(embot::hw::TIMER t);
     
+    // configure() allows to change the configuration after the init()
     result_t configure(embot::hw::TIMER t, const Config &config);
     
     bool isrunning(embot::hw::TIMER t);
@@ -52,7 +57,9 @@ namespace embot { namespace hw { namespace timer {
     
     result_t stop(embot::hw::TIMER t);
     
-    // for use of the IRQhandler only 
+    Status status(embot::hw::TIMER t);
+    
+    // execute() must be placed inside the IRQHandler of the timer
     void execute(embot::hw::TIMER t);
  
 }}} // namespace embot { namespace hw { namespace timer { 
