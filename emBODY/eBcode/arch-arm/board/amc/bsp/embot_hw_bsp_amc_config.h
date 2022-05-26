@@ -35,6 +35,8 @@
 //    #define EMBOT_ENABLE_hw_eth
 
     #define EMBOT_ENABLE_hw_eth
+    #define EMBOT_ENABLE_hw_timer
+    #define EMBOT_ENABLE_hw_timer_emulated
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMC ...
