@@ -331,31 +331,50 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 				
 		}
 	
-			constexpr embot::hw::GPIO GP1 {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::zero};
-			constexpr embot::hw::GPIO GP2 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four};
-  		constexpr embot::hw::GPIO GP3 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five};
-			constexpr embot::hw::GPIO GP4 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::six};
-			constexpr embot::hw::GPIO GP5 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::seven};
-			constexpr embot::hw::GPIO GP6 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight};
-
-
-		static void testGPIO(){
-
-			embot::hw::gpio::set(GP1, embot::hw::gpio::State::SET); 
-			embot::core::wait(1* embot::core::time1second);			
-			embot::hw::gpio::set(GP2, embot::hw::gpio::State::SET); 
-			embot::core::wait(1* embot::core::time1second);
-			embot::hw::gpio::set(GP3, embot::hw::gpio::State::SET); 
-			embot::core::wait(1* embot::core::time1second);
-			embot::hw::gpio::set(GP4, embot::hw::gpio::State::SET); 
-			embot::core::wait(1* embot::core::time1second);
-			embot::hw::gpio::set(GP5, embot::hw::gpio::State::SET); 
-			embot::core::wait(1* embot::core::time1second);
-			embot::hw::gpio::set(GP6, embot::hw::gpio::State::SET); 
-			embot::core::wait(1* embot::core::time1second);
 		
-
-
+		constexpr embot::hw::gpio::Config out {
+			embot::hw::gpio::Mode::OUTPUTpushpull,
+			embot::hw::gpio::Pull::pullup,
+			embot::hw::gpio::Speed::high
+		};
+		
+		constexpr embot::hw::GPIO GP1 {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::zero};
+		constexpr embot::hw::GPIO GP2 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four};
+  	constexpr embot::hw::GPIO GP3 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five};
+		constexpr embot::hw::GPIO GP4 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::six};
+		constexpr embot::hw::GPIO GP5 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::seven};
+		constexpr embot::hw::GPIO GP6 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight};
+			
+		static void initGPIO(){
+			embot::hw::gpio::init(GP1, {out});
+			embot::hw::gpio::init(GP2, {out});
+			embot::hw::gpio::init(GP3, {out});
+			embot::hw::gpio::init(GP4, {out});
+			embot::hw::gpio::init(GP5, {out});
+			embot::hw::gpio::init(GP6, {out});
+				
+			embot::hw::gpio::set(GP1, embot::hw::gpio::State::SET); 
+			embot::hw::gpio::set(GP2, embot::hw::gpio::State::SET); 
+			embot::hw::gpio::set(GP3, embot::hw::gpio::State::SET); 
+			embot::hw::gpio::set(GP4, embot::hw::gpio::State::SET); 
+			embot::hw::gpio::set(GP5, embot::hw::gpio::State::SET); 
+			embot::hw::gpio::set(GP6, embot::hw::gpio::State::SET); 
+		}
+		
+		
+		static void testGPIO(){
+			embot::hw::gpio::set(GP2, embot::hw::gpio::State::RESET); 
+			embot::core::wait(1* embot::core::time1second);			
+			embot::hw::gpio::set(GP6, embot::hw::gpio::State::RESET); 
+			embot::core::wait(1* embot::core::time1second);
+			embot::hw::gpio::set(GP5, embot::hw::gpio::State::RESET); 
+			embot::core::wait(1* embot::core::time1second);
+			embot::hw::gpio::set(GP4, embot::hw::gpio::State::RESET); 
+			embot::core::wait(1* embot::core::time1second);
+			embot::hw::gpio::set(GP3, embot::hw::gpio::State::RESET); 
+			embot::core::wait(1* embot::core::time1second);
+			embot::hw::gpio::set(GP1, embot::hw::gpio::State::RESET); 
+			embot::core::wait(1* embot::core::time1second);
 		}
 
 		static void testCAN(){
@@ -373,6 +392,8 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 
 
 		}		
+		
+		
     static void eventhread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p)
     {
         if(0 == eventmask)
@@ -391,15 +412,13 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 										
 					switch(canframe.data[0]){
 
-						//Check revisione fw collaudo
-			      
+						//Check revisione fw collaudo			      
 						case 0x00 :  embot::core::wait(300* embot::core::time1millisec); getFirmwareVersion(); break;
 
 						//Test led rosso e blu spenti
 						case 0x01 :  embot::core::wait(300* embot::core::time1millisec); testLeds(0); break;
 						
-
-						//Test led rosso e blu spenti
+						//Test led rosso e blu accesi
 						case 0x02 :  embot::core::wait(300* embot::core::time1millisec); testLeds(1); break;
 	
 						//Test sensore temperatura
@@ -409,7 +428,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
   					case 0x04 : embot::core::wait(300* embot::core::time1millisec);	 testBNO055(); break;
 
 						//Test GPIO
-  					case 0x05 : embot::core::wait(300* embot::core::time1millisec);	 testGPIO(); break;
+  					case 0x05 : initGPIO(); embot::core::wait(300* embot::core::time1millisec);	 testGPIO(); break;
 						
 						//Test CAN
   					case 0x06 : embot::core::wait(300* embot::core::time1millisec);	 testCAN(); break;
