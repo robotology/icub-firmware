@@ -165,7 +165,18 @@ extern "C" {
     #endif        
     #define STM32HAL_DRIVER_VERSION 0x1A0   
 
+#elif   defined(STM32HAL_BOARD_MTB4C)
 
+    // two possible drivers. default is the 190 ...
+    #if     defined(STM32HAL_DRIVER_V172)    
+        #define STM32HAL_DRIVER_VERSION 0x172  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V190)
+            #define STM32HAL_DRIVER_V190
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x190   
+    #endif
+    
 #else
     #error STM32HAL: the STM32HAL_BOARD_${B} is undefined
 #endif
