@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DEMBOT_AMCBLDC_APP05</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\FOCode\BLDC_FOC_Code\Current_FOC_ert_rtw;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\src\motorhal;..\src\control-foc\_sharedutils;..\..\..\..\..\..\eBcode\arch-arm\board\amcbldc\application02\src\control-foc\_sharedutils;..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder;..\src\model-based-design\control-outer;..\src\model-based-design\control-foc;..\src\model-based-design\estimator;..\src\model-based-design\amc-bldc;..\src\model-based-design\filter_current;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
+              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\FOCode\BLDC_FOC_Code\Current_FOC_ert_rtw;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\src\motorhal;..\src\control-foc\_sharedutils;..\..\..\..\..\..\eBcode\arch-arm\board\amcbldc\application02\src\control-foc\_sharedutils;..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder;..\src\model-based-design\control-outer;..\src\model-based-design\control-foc;..\src\model-based-design\estimator;..\src\model-based-design\amc-bldc;..\src\model-based-design\filter-current;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1061,22 +1061,22 @@
             <File>
               <FileName>filter_current.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current.cpp</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current.cpp</FilePath>
             </File>
             <File>
               <FileName>filter_current.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current.h</FilePath>
             </File>
             <File>
               <FileName>filter_current_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current_private.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current_private.h</FilePath>
             </File>
             <File>
               <FileName>filter_current_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current_types.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2234,22 +2234,22 @@
             <File>
               <FileName>filter_current.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current.cpp</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current.cpp</FilePath>
             </File>
             <File>
               <FileName>filter_current.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current.h</FilePath>
             </File>
             <File>
               <FileName>filter_current_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current_private.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current_private.h</FilePath>
             </File>
             <File>
               <FileName>filter_current_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current_types.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current_types.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3407,22 +3407,22 @@
             <File>
               <FileName>filter_current.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current.cpp</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current.cpp</FilePath>
             </File>
             <File>
               <FileName>filter_current.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current.h</FilePath>
             </File>
             <File>
               <FileName>filter_current_private.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current_private.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current_private.h</FilePath>
             </File>
             <File>
               <FileName>filter_current_types.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\model-based-design\filter_current\filter_current_types.h</FilePath>
+              <FilePath>..\src\model-based-design\filter-current\filter_current_types.h</FilePath>
             </File>
           </Files>
         </Group>
