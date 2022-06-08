@@ -132,14 +132,17 @@ struct MeasureHisto : public Measure
     void report()
     {            
         beyond = vv->beyond;
-                    
+        std::string str (" histo vals: " );            
         for(int i=0; i<vv->inside.size(); i++)
         {
             if(i < vals.size())
             {
                 vals[i] = vv->inside[i];
+                str+= "v[" + std::to_string(i) + "]=" +std::to_string(vals[i]) + ", " ;
             }
-        }            
+        }
+        str+= "\n";
+        embot::core::print(str);               
     }
 
 };
@@ -302,6 +305,22 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void 
 // Called every 1 ms
 bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 {    
+    
+    // measure performance
+    if(false == useDUMMYforTICK) 
+    {
+        static volatile uint64_t cnt {0};
+        constexpr uint64_t nsamples {10*1000};
+        if(nsamples == cnt++)
+        {
+            // place a breakpoint in here and inspect variable vals inside ->report()
+            cnt = 0;
+            MeasureHisto *mh = reinterpret_cast<MeasureHisto*>(measureTick);
+            mh->report();
+        }
+    }  
+
+    
     measureTick->start();
     
     if(prevEXTFAULTisPRESSED != EXTFAULTisPRESSED)
@@ -392,7 +411,22 @@ void embot::app::application::theMBDagent::Impl::onCurrents_FOC_innerloop(void *
     {
         return;
     }    
-        
+    
+    // performance measurement
+    if(true != useDUMMYforFOC) 
+    {
+        static volatile uint64_t cnt {0};
+        constexpr uint64_t nsamples {10*1000};
+        if(nsamples == cnt++)
+        {
+            // place a breakpoint in here and inspect variable vals inside ->report()
+            cnt = 0;
+            MeasureHisto *mh = reinterpret_cast<MeasureHisto*>(impl->measureFOC);
+            mh->report();
+        }
+    }
+
+    
     impl->measureFOC->start();
     
     // 1. copy currents straight away, so that we can use them
