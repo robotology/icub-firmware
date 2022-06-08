@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.199
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu May 26 11:44:17 2022
+// Model version                  : 4.6
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:02:39 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,12 +18,8 @@
 //
 #ifndef RTW_HEADER_SupervisorFSM_RX_h_
 #define RTW_HEADER_SupervisorFSM_RX_h_
-#include <cmath>
 #include "rtwtypes.h"
 #include "SupervisorFSM_RX_types.h"
-
-// Shared type includes
-#include "multiword_types.h"
 
 // user code (top of header file)
 #include "rtw_enable_disable_motors.h"
@@ -32,13 +28,13 @@
 #ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 
 struct B_SupervisorFSM_RX_c_T {
-  ConfigurationParameters ConfigurationParameters_o;// '<Root>/SupervisorFSM_RX' 
+  ConfigurationParameters ConfigurationParameters_b;// '<Root>/SupervisorFSM_RX' 
   Thresholds thresholds;               // '<S3>/Chart'
   MotorConfig Motorconfig;             // '<S1>/CAN Event Dispatcher'
   Targets targets;                     // '<S4>/Chart1'
   SV_Limits newLimit;                  // '<S1>/CAN Event Dispatcher'
   SV_Setpoint newSetpoint;             // '<S1>/CAN Event Dispatcher'
-  SV_Setpoint newSetpoint_p;           // '<S2>/ControlMode_SM_motor0'
+  SV_Setpoint newSetpoint_i;           // '<S2>/ControlMode_SM_motor0'
   int32_T messageIndex;                // '<Root>/SupervisorFSM_RX'
   ControlModes requiredControlMode;    // '<S1>/CAN Event Dispatcher'
   ControlModes controlModeDefined;     // '<S2>/ControlMode_SM_motor0'
@@ -117,8 +113,8 @@ extern ConfigurationParameters InitConfParams;// Variable: InitConfParams
 extern void SupervisorFSM_RX_Init(Flags *rty_Flags);
 extern void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const
   ExternalFlags *rtu_ExternalFlags, const ControlOutputs *rtu_ControlOutputs,
-  const BUS_MESSAGES_RX_MULTIPLE *rtu_MessagesRx, const BUS_EVENTS_RX_MULTIPLE
-  *rtu_EventsRx, const BUS_CAN_RX_ERRORS_MULTIPLE *rtu_ErrorsRx, Flags
+  const BUS_MESSAGES_RX_MULTIPLE *rtu_MessagesRx, const BUS_STATUS_RX_MULTIPLE
+  *rtu_StatusRx, const BUS_CAN_RX_ERRORS_MULTIPLE *rtu_ErrorsRx, Flags
   *rty_Flags, Targets *rty_Targets, ConfigurationParameters
   *rty_ConfigurationParameters);
 

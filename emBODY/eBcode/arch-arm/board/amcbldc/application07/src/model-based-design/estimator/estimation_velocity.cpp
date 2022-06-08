@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.38
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:34 2022
+// Model version                  : 3.3
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:03:13 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -17,10 +17,20 @@
 // Validation result: Not run
 //
 #include "estimation_velocity.h"
-#include "estimation_velocity_private.h"
+#include "estimation_velocity_types.h"
+#include "rtwtypes.h"
+#include <cmath>
+#include <cstring>
+#include "mw_cmsis.h"
 #include "rt_hypotf_snf.h"
+#include "estimation_velocity_private.h"
 
-MdlrefDW_estimation_velocity_T estimation_velocity_MdlrefDW;
+extern "C" {
+
+#include "rt_nonfinite.h"
+
+}
+  MdlrefDW_estimation_velocity_T estimation_velocity_MdlrefDW;
 
 // Block states (default storage)
 DW_estimation_velocity_f_T estimation_velocity_DW;
@@ -68,7 +78,6 @@ static real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32],
 static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
   real32_T tau[2], int32_T jpvt[2])
 {
-  int32_T b_k;
   int32_T ix;
   int32_T lastv;
   real32_T vn1[2];
@@ -78,7 +87,7 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
   real32_T b_atmp;
   real32_T scale;
   real32_T t;
-  for (b_k = 0; b_k < 2; b_k++) {
+  for (int32_T b_k = 0; b_k < 2; b_k++) {
     jpvt[b_k] = b_k + 1;
   }
 
@@ -87,7 +96,7 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
   std::memcpy(&b_A[0], &A[0], sizeof(real32_T) << 5U);
   work[0] = 0.0F;
   work[1] = 0.0F;
-  for (b_k = 0; b_k < 2; b_k++) {
+  for (int32_T b_k = 0; b_k < 2; b_k++) {
     ix = b_k << 4;
     b_atmp = 0.0F;
     scale = 1.29246971E-26F;
@@ -109,7 +118,7 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
     vn1[b_k] = b_atmp;
   }
 
-  for (b_k = 0; b_k < 2; b_k++) {
+  for (int32_T b_k = 0; b_k < 2; b_k++) {
     int32_T i;
     int32_T jy;
     int32_T kend;
@@ -162,16 +171,16 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
 
       if (std::abs(scale) < 9.86076132E-32F) {
         knt = -1;
-        nmip1 = (kend - b_k) - 1;
         do {
           knt++;
+          nmip1 = (kend - b_k) - 1;
           for (lastv = ix; lastv <= nmip1 + 17; lastv++) {
             b_A[lastv - 1] *= 1.01412048E+31F;
           }
 
           scale *= 1.01412048E+31F;
           b_atmp *= 1.01412048E+31F;
-        } while (!(std::abs(scale) >= 9.86076132E-32F));
+        } while ((std::abs(scale) < 9.86076132E-32F) && (knt + 1 < 20));
 
         scale = estimation_velocity_xnrm2(15 - b_k, b_A, kend + 2);
         scale = rt_hypotf_snf(b_atmp, scale);
@@ -249,7 +258,7 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
       if (lastv > 0) {
         int32_T d;
         if (knt + 1 != 0) {
-          if (0 <= knt) {
+          if (knt >= 0) {
             std::memset(&work[0], 0, (knt + 1) * sizeof(real32_T));
           }
 
@@ -339,12 +348,11 @@ void estimation_velocity_Init(void)
 
 // Output and update for referenced model: 'estimation_velocity'
 void estimation_velocity(const SensorsData *rtu_SensorsData, const
-  ConfigurationParameters *rtu_ConfigurationParameters, EstimatedData
-  *rty_EstimatedData)
+  ConfigurationParameters *rtu_ConfigurationParameters, JointVelocities
+  *rty_EstimatedVelocity)
 {
   int32_T jpvt[2];
   int32_T i;
-  int32_T i_0;
   int32_T rankA;
   real32_T b_A[32];
   real32_T rtb_DelayLine[16];
@@ -378,7 +386,7 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
     rankA++;
   }
 
-  for (i_0 = 0; i_0 < 2; i_0++) {
+  for (int32_T i_0 = 0; i_0 < 2; i_0++) {
     real32_T tau_0;
     tau_0 = tau[i_0];
     rtb_QRSolver_0[i_0] = 0.0F;
@@ -402,7 +410,7 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
     rtb_QRSolver_0[jpvt[i] - 1] = rtb_DelayLine[i];
   }
 
-  for (i_0 = rankA; i_0 >= 1; i_0--) {
+  for (int32_T i_0 = rankA; i_0 >= 1; i_0--) {
     int32_T rtb_QRSolver_tmp;
     int32_T rtb_QRSolver_tmp_0;
     rtb_QRSolver_tmp = jpvt[i_0 - 1] - 1;
@@ -425,18 +433,17 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
 
   switch (rtu_ConfigurationParameters->estimationconfig.velocity_mode) {
    case EstimationVelocityModes_Disabled:
-    rty_EstimatedData->jointvelocities.velocity = 0.0F;
+    rty_EstimatedVelocity->velocity = 0.0F;
     break;
 
    case EstimationVelocityModes_MovingAverage:
-    rty_EstimatedData->jointvelocities.velocity =
-      (rtu_SensorsData->jointpositions.position -
-       estimation_velocity_DW.Delay_DSTATE[estimation_velocity_DW.CircBufIdx]) *
+    rty_EstimatedVelocity->velocity = (rtu_SensorsData->jointpositions.position
+      - estimation_velocity_DW.Delay_DSTATE[estimation_velocity_DW.CircBufIdx]) *
       62.5F;
     break;
 
    default:
-    rty_EstimatedData->jointvelocities.velocity = rtb_QRSolver_0[0];
+    rty_EstimatedVelocity->velocity = rtb_QRSolver_0[0];
     break;
   }
 

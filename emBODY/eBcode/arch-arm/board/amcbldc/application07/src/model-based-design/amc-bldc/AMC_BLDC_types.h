@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.271
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu May 26 11:45:03 2022
+// Model version                  : 4.56
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:03:34 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -232,17 +232,6 @@ struct JointVelocities
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // velocities
-  JointVelocities jointvelocities;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
 #define DEFINED_TYPEDEF_FOR_MotorCurrent_
 
@@ -250,6 +239,18 @@ struct MotorCurrent
 {
   // motor current
   real32_T current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocities
+  JointVelocities jointvelocities;
+  MotorCurrent Iq_filtered;
 };
 
 #endif
@@ -287,6 +288,7 @@ struct ControlOuterOutputs
   boolean_T cur_en;
   boolean_T out_en;
   MotorCurrent motorcurrent;
+  real32_T current_limiter;
 };
 
 #endif
@@ -444,11 +446,11 @@ struct BUS_MESSAGES_RX_MULTIPLE
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_
+#define DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_
 
 // Aggregate of all events specifying types of received messages.
-struct BUS_EVENTS_RX
+struct BUS_STATUS_RX
 {
   boolean_T control_mode;
   boolean_T current_limit;
@@ -458,12 +460,12 @@ struct BUS_EVENTS_RX
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_MULTIPLE_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_MULTIPLE_
 
-struct BUS_EVENTS_RX_MULTIPLE
+struct BUS_STATUS_RX_MULTIPLE
 {
-  BUS_EVENTS_RX events[4];
+  BUS_STATUS_RX status[4];
 };
 
 #endif
@@ -592,11 +594,11 @@ struct BUS_MESSAGES_TX
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
+#define DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
 
 // Aggregate of all events specifying types of transmitted messages.
-struct BUS_EVENTS_TX
+struct BUS_STATUS_TX
 {
   boolean_T foc;
   boolean_T status;

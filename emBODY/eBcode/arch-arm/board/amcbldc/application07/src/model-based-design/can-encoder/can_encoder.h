@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.57
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu May 26 11:44:36 2022
+// Model version                  : 3.4
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:02:55 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,20 +18,8 @@
 //
 #ifndef RTW_HEADER_can_encoder_h_
 #define RTW_HEADER_can_encoder_h_
-#include <cstring>
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
-
-// Block states (default storage) for model 'can_encoder'
-#ifndef can_encoder_MDLREF_HIDE_CHILD_
-
-struct DW_can_encoder_f_T {
-  boolean_T DelayInput1_DSTATE;        // '<S9>/Delay Input1'
-  boolean_T DelayInput1_DSTATE_c;      // '<S5>/Delay Input1'
-};
-
-#endif                                 //can_encoder_MDLREF_HIDE_CHILD_
-
 #ifndef can_encoder_MDLREF_HIDE_CHILD_
 
 // Real-time Model Data Structure
@@ -70,7 +58,7 @@ extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 extern void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const
-  BUS_EVENTS_TX *rtu_events_tx, BUS_CAN_MULTIPLE *rty_pck_tx);
+  BUS_STATUS_TX *rtu_status_tx, BUS_CAN_MULTIPLE *rty_pck_tx);
 
 // Model reference registration function
 extern void can_encoder_initialize(const char_T **rt_errorStatus);
@@ -85,13 +73,6 @@ extern void can_encoder_format_can_id(uint8_T rtu_class, uint8_T rtu_can_id_amc,
 #ifndef can_encoder_MDLREF_HIDE_CHILD_
 
 extern MdlrefDW_can_encoder_T can_encoder_MdlrefDW;
-
-#endif                                 //can_encoder_MDLREF_HIDE_CHILD_
-
-#ifndef can_encoder_MDLREF_HIDE_CHILD_
-
-// Block states (default storage)
-extern DW_can_encoder_f_T can_encoder_DW;
 
 #endif                                 //can_encoder_MDLREF_HIDE_CHILD_
 
@@ -114,14 +95,12 @@ extern DW_can_encoder_f_T can_encoder_DW;
 //  '<S2>'   : 'can_encoder/CAN_Encoder/FOC'
 //  '<S3>'   : 'can_encoder/CAN_Encoder/NotUsed'
 //  '<S4>'   : 'can_encoder/CAN_Encoder/STATUS'
-//  '<S5>'   : 'can_encoder/CAN_Encoder/FOC/Detect Change'
-//  '<S6>'   : 'can_encoder/CAN_Encoder/FOC/format_can_id'
-//  '<S7>'   : 'can_encoder/CAN_Encoder/FOC/format_foc_pck'
-//  '<S8>'   : 'can_encoder/CAN_Encoder/FOC/format_can_id/format_can_id'
-//  '<S9>'   : 'can_encoder/CAN_Encoder/STATUS/Detect Change'
-//  '<S10>'  : 'can_encoder/CAN_Encoder/STATUS/format_can_id'
-//  '<S11>'  : 'can_encoder/CAN_Encoder/STATUS/format_status_pck'
-//  '<S12>'  : 'can_encoder/CAN_Encoder/STATUS/format_can_id/format_can_id'
+//  '<S5>'   : 'can_encoder/CAN_Encoder/FOC/format_can_id'
+//  '<S6>'   : 'can_encoder/CAN_Encoder/FOC/format_foc_pck'
+//  '<S7>'   : 'can_encoder/CAN_Encoder/FOC/format_can_id/format_can_id'
+//  '<S8>'   : 'can_encoder/CAN_Encoder/STATUS/format_can_id'
+//  '<S9>'   : 'can_encoder/CAN_Encoder/STATUS/format_status_pck'
+//  '<S10>'  : 'can_encoder/CAN_Encoder/STATUS/format_can_id/format_can_id'
 
 #endif                                 // RTW_HEADER_can_encoder_h_
 

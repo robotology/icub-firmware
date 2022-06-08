@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 3.271
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu May 26 11:45:03 2022
+// Model version                  : 4.56
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:03:34 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,27 +18,10 @@
 //
 #ifndef RTW_HEADER_AMC_BLDC_h_
 #define RTW_HEADER_AMC_BLDC_h_
-#include <stddef.h>
 #include "rtwtypes.h"
-#include "zero_crossing_types.h"
 #include "AMC_BLDC_types.h"
-
-// Child system includes
-#define control_foc_MDLREF_HIDE_CHILD_
-#include "control_foc.h"
-#define estimation_velocity_MDLREF_HIDE_CHILD_
-#include "estimation_velocity.h"
-#define can_decoder_MDLREF_HIDE_CHILD_
-#include "can_decoder.h"
-#define SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-#include "SupervisorFSM_RX.h"
-#define SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-#include "SupervisorFSM_TX.h"
-#define can_encoder_MDLREF_HIDE_CHILD_
-#include "can_encoder.h"
-#define control_outer_MDLREF_HIDE_CHILD_
-#include "control_outer.h"
-#include "rtw_mutex.h"
+#include <stddef.h>
+#include "zero_crossing_types.h"
 
 // Macros for accessing real-time model data structure
 #ifndef rtmGetErrorStatus
@@ -66,10 +49,9 @@ struct B_AMC_BLDC_T {
   BUS_MESSAGES_RX_MULTIPLE CAN_Decoder_o1;// '<S6>/CAN_Decoder'
   BUS_MESSAGES_TX MessagesTx;          // '<S7>/SupervisorFSM_TX'
   SensorsData RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter3'
-  BUS_EVENTS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
+  BUS_STATUS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
   BUS_CAN_RX_ERRORS_MULTIPLE CAN_Decoder_o3;// '<S6>/CAN_Decoder'
   ControlOutputs RTBInsertedForAdapter_Inserte_a;// '<Root>/Adapter1'
-  BUS_EVENTS_TX SupervisorFSM_TX_o2;   // '<S7>/SupervisorFSM_TX'
 };
 
 // Block states (default storage) for system '<Root>'
@@ -80,12 +62,12 @@ struct DW_AMC_BLDC_T {
   SensorsData RTBInsertedForAdapter_Inserte_c;// synthesized block
   SensorsData RTBInsertedForAdapter_Inserte_j;// synthesized block
   Targets RTBInsertedForAdapter_Inserte_m[3];// synthesized block
+  ControlOuterOutputs RTBInsertedForAdapter_Inserte_i[3];// synthesized block
   ControlOutputs RTBInsertedForAdapter_Inserte_d;// synthesized block
   ControlOutputs RTBInsertedForAdapter_Insert_j2;// synthesized block
   ControlOutputs RTBInsertedForAdapter_Inserte_o;// synthesized block
-  ControlOuterOutputs RTBInsertedForAdapter_Inserte_i[3];// synthesized block
-  Flags RTBInsertedForAdapter_Inserte_l[3];// synthesized block
   EstimatedData RTBInsertedForAdapter_Inserte_k[3];// synthesized block
+  Flags RTBInsertedForAdapter_Inserte_l[3];// synthesized block
   void* RTBInsertedForAdapter_Insert_mf;// synthesized block
   void* RTBInsertedForAdapter_Inserte_b;// synthesized block
   void* RTBInsertedForAdapter_Inserte_f;// synthesized block
@@ -111,9 +93,9 @@ struct DW_AMC_BLDC_T {
 
 // External inputs (root inport signals with default storage)
 struct ExtU_AMC_BLDC_T {
-  SensorsData SensorsData_p;           // '<Root>/B_-1_-1'
-  ExternalFlags ExternalFlags_p;       // '<Root>/B_-1_-1'
-  BUS_CAN_MULTIPLE PacketsRx;          // '<Root>/B_-1_-1'
+  SensorsData SensorsData_p;           // '<Root>/SensorsData'
+  ExternalFlags ExternalFlags_p;       // '<Root>/ExternalFlags'
+  BUS_CAN_MULTIPLE PacketsRx;          // '<Root>/PacketsRx'
 };
 
 // External outputs (root outports fed by signals with default storage)
@@ -251,6 +233,8 @@ extern "C" {
 //  '<S5>'   : 'AMC_BLDC/Estimation'
 //  '<S6>'   : 'AMC_BLDC/Messaging'
 //  '<S7>'   : 'AMC_BLDC/Supervision'
+//  '<S8>'   : 'AMC_BLDC/Estimation/Adapter'
+//  '<S9>'   : 'AMC_BLDC/Estimation/Mux'
 
 #endif                                 // RTW_HEADER_AMC_BLDC_h_
 

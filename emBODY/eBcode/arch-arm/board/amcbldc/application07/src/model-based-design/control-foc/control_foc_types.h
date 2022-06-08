@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.96
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:20 2022
+// Model version                  : 3.8
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:03:00 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -232,17 +232,6 @@ struct JointVelocities
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // velocities
-  JointVelocities jointvelocities;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
 #define DEFINED_TYPEDEF_FOR_MotorCurrent_
 
@@ -250,6 +239,18 @@ struct MotorCurrent
 {
   // motor current
   real32_T current;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocities
+  JointVelocities jointvelocities;
+  MotorCurrent Iq_filtered;
 };
 
 #endif
@@ -287,6 +288,7 @@ struct ControlOuterOutputs
   boolean_T cur_en;
   boolean_T out_en;
   MotorCurrent motorcurrent;
+  real32_T current_limiter;
 };
 
 #endif

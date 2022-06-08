@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.57
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu May 26 11:44:36 2022
+// Model version                  : 3.4
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:02:55 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -123,11 +123,11 @@ struct BUS_MESSAGES_TX
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
+#define DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
 
 // Aggregate of all events specifying types of transmitted messages.
-struct BUS_EVENTS_TX
+struct BUS_STATUS_TX
 {
   boolean_T foc;
   boolean_T status;

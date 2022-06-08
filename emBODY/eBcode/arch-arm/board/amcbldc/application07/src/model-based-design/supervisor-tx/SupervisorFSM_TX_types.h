@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.29
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:03 2022
+// Model version                  : 4.9
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:02:45 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -72,6 +72,17 @@ struct JointVelocities
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
+#define DEFINED_TYPEDEF_FOR_MotorCurrent_
+
+struct MotorCurrent
+{
+  // motor current
+  real32_T current;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
 #define DEFINED_TYPEDEF_FOR_EstimatedData_
 
@@ -79,6 +90,7 @@ struct EstimatedData
 {
   // velocities
   JointVelocities jointvelocities;
+  MotorCurrent Iq_filtered;
 };
 
 #endif
@@ -109,17 +121,6 @@ struct Flags
   ControlModes control_mode;
   boolean_T enable_sending_msg_status;
   boolean_T fault_button;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
-#define DEFINED_TYPEDEF_FOR_MotorCurrent_
-
-struct MotorCurrent
-{
-  // motor current
-  real32_T current;
 };
 
 #endif
@@ -271,11 +272,11 @@ struct ConfigurationParameters
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_TX_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
+#define DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
 
 // Aggregate of all events specifying types of transmitted messages.
-struct BUS_EVENTS_TX
+struct BUS_STATUS_TX
 {
   boolean_T foc;
   boolean_T status;

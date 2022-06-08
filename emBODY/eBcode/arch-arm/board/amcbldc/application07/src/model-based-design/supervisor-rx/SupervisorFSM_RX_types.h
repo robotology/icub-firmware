@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 3.199
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu May 26 11:44:17 2022
+// Model version                  : 4.6
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:02:39 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -229,15 +229,16 @@ struct EstimatedData
 {
   // velocities
   JointVelocities jointvelocities;
+  MotorCurrent Iq_filtered;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_
+#define DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_
 
 // Aggregate of all events specifying types of received messages.
-struct BUS_EVENTS_RX
+struct BUS_STATUS_RX
 {
   boolean_T control_mode;
   boolean_T current_limit;
@@ -247,12 +248,12 @@ struct BUS_EVENTS_RX
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_EVENTS_RX_MULTIPLE_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_MULTIPLE_
 
-struct BUS_EVENTS_RX_MULTIPLE
+struct BUS_STATUS_RX_MULTIPLE
 {
-  BUS_EVENTS_RX events[4];
+  BUS_STATUS_RX status[4];
 };
 
 #endif

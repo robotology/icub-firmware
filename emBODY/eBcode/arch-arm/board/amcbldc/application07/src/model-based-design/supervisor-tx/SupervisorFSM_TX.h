@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.29
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:03 2022
+// Model version                  : 4.9
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:02:45 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,6 +37,8 @@ struct B_SupervisorFSM_TX_c_T {
 struct DW_SupervisorFSM_TX_f_T {
   uint32_T ev_focEventCounter;         // '<Root>/SupervisorFSM_TX'
   uint32_T ev_statusEventCounter;      // '<Root>/SupervisorFSM_TX'
+  boolean_T DelayInput1_DSTATE;        // '<S1>/Delay Input1'
+  boolean_T DelayInput1_DSTATE_d;      // '<S2>/Delay Input1'
   uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
 };
 
@@ -59,12 +61,11 @@ struct MdlrefDW_SupervisorFSM_TX_T {
 
 #endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
-extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_EVENTS_TX
-  *rty_EventsTx);
+extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx);
 extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
   EstimatedData *rtu_EstimatedData, const Flags *rtu_Flags, const ControlOutputs
-  *rtu_ControlOutputs, BUS_MESSAGES_TX *rty_MessagesTx, BUS_EVENTS_TX
-  *rty_EventsTx);
+  *rtu_ControlOutputs, BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX
+  *rty_StatusTx);
 
 // Model reference registration function
 extern void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus);
@@ -100,7 +101,9 @@ extern DW_SupervisorFSM_TX_f_T SupervisorFSM_TX_DW;
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'SupervisorFSM_TX'
-//  '<S1>'   : 'SupervisorFSM_TX/SupervisorFSM_TX'
+//  '<S1>'   : 'SupervisorFSM_TX/Detect Change'
+//  '<S2>'   : 'SupervisorFSM_TX/Detect Change1'
+//  '<S3>'   : 'SupervisorFSM_TX/SupervisorFSM_TX'
 
 #endif                                 // RTW_HEADER_SupervisorFSM_TX_h_
 
