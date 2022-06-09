@@ -216,19 +216,20 @@ bool embot::app::application::theIMU::Impl::stop()
 bool embot::app::application::theIMU::Impl::fill(embot::prot::can::inertial::periodic::Message_DIGITAL_ACCELEROMETER::Info &info)
 {
     bool ret = true;
+    
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress(); 
 	
-	  info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress(); 
-	
-	//this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
-		#if defined(STM32HAL_BOARD_STRAIN2)
-			info.x = -(imuacquisition.data.acc.y);
-			info.y = imuacquisition.data.acc.x;
-			info.z = imuacquisition.data.acc.z;         
-		#else
-			info.x = imuacquisition.data.acc.x;
-			info.y = imuacquisition.data.acc.y;
-			info.z = imuacquisition.data.acc.z;        	
-		#endif   
+    //this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
+#if defined(STM32HAL_BOARD_STRAIN2)
+    info.x = -imuacquisition.data.acc.y;
+    info.y = -imuacquisition.data.acc.x;
+    info.z = -imuacquisition.data.acc.z;         
+#else
+    info.x = imuacquisition.data.acc.x;
+    info.y = imuacquisition.data.acc.y;
+    info.z = imuacquisition.data.acc.z;        	
+#endif   
+
     return ret;    
 }
 
@@ -239,16 +240,17 @@ bool embot::app::application::theIMU::Impl::fill(embot::prot::can::inertial::per
 
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
 	
-	//this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
-		#if defined(STM32HAL_BOARD_STRAIN2)
-			info.x = -(imuacquisition.data.gyr.y);
-			info.y = imuacquisition.data.gyr.x;
-			info.z = imuacquisition.data.gyr.z;	
-		#else
-			info.x = imuacquisition.data.gyr.x;
-			info.y = imuacquisition.data.gyr.y;
-			info.z = imuacquisition.data.gyr.z;    
-		#endif
+    //this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
+#if defined(STM32HAL_BOARD_STRAIN2)
+    info.x = -imuacquisition.data.gyr.y;
+    info.y = -imuacquisition.data.gyr.x;
+    info.z = -imuacquisition.data.gyr.z;	
+#else
+    info.x = imuacquisition.data.gyr.x;
+    info.y = imuacquisition.data.gyr.y;
+    info.z = imuacquisition.data.gyr.z;    
+#endif
+
     return ret;    
 }
 
