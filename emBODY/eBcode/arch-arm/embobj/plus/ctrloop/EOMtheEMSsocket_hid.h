@@ -63,6 +63,7 @@ struct EOMtheEMSsocket_hid
     eOipv4addr_t                        hostaddress;
     eObool_t                            connected2host;   
     eObool_t                            active; 
+    EOaction*                           ontxrequest;
 };
 
 

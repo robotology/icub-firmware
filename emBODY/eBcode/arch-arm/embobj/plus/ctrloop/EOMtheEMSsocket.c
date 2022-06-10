@@ -104,7 +104,8 @@ static EOMtheEMSsocket s_emssocket_singleton =
     EO_INIT(.txpkt)                         NULL,
     EO_INIT(.hostaddress)                   EO_COMMON_IPV4ADDR_LOCALHOST,
     EO_INIT(.connected2host)                eobool_false,
-    EO_INIT(.active)                        eobool_false
+    EO_INIT(.active)                        eobool_false,
+    EO_INIT(.ontxrequest)                   NULL
 };
 
 
@@ -142,6 +143,9 @@ extern EOMtheEMSsocket * eom_emssocket_Initialise(const eOemssocket_cfg_t *cfg)
     
     s_emssocket_singleton.active = eobool_false;
     
+    s_emssocket_singleton.ontxrequest = eo_action_New();
+    eo_action_Clear(s_emssocket_singleton.ontxrequest);
+    
     return(&s_emssocket_singleton);
 }
 
@@ -159,7 +163,7 @@ extern EOMtheEMSsocket* eom_emssocket_GetHandle(void)
 }
 
 
-extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononrx, EOaction* withactionontx)
+extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononrx, EOaction* withactionontx, EOaction* ontxrequest)
 {
     eOresult_t res;
     
@@ -182,7 +186,16 @@ extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononr
             p->active = eobool_true;
         }
         
-    }                        
+    }   
+    
+    if(NULL == ontxrequest)
+    {
+        eo_action_Clear(p->ontxrequest);
+    }
+    else
+    {
+        eo_action_Copy(p->ontxrequest, ontxrequest);
+    }     
                             
     return(res);
 }
@@ -323,6 +336,30 @@ extern eOresult_t eom_emssocket_Transmit(EOMtheEMSsocket *p, EOpacket* txpkt, eO
     res = eo_socketdtg_Put(p->socket, txpkt);
     
     return(res);
+}
+
+extern eOresult_t eom_emssocket_TransmissionRequest(EOMtheEMSsocket *p)
+{
+    eOresult_t res;
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->active)
+    {
+        return(eores_NOK_generic);
+    } 
+    
+    if(eobool_true == eo_action_Isvalid(p->ontxrequest))
+    {
+        eo_action_Execute(p->ontxrequest, eok_reltimeINFINITE);
+    }
+    
+    
+    return(res);    
+    
 }
 
 

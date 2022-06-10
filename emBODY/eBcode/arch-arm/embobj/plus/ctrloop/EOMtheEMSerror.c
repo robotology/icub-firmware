@@ -36,9 +36,11 @@
 
 #include "EOVtheSystem.h"
 
-
+#if defined(USE_EMBOT_theHandler)  
+#else
 #include "EOMtheEMSappl.h"
 #include "EOMtheEMSapplCfg.h"
+#endif
 
 #include "EOtheInfoDispatcher.h"
 

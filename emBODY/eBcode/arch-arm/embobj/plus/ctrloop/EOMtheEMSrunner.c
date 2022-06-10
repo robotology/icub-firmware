@@ -36,26 +36,32 @@
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
 
-#include "hal_timer.h"
-#include "osal.h"
-
-
-#include "EOMtask_hid.h" // to retrieve its osaltask pointer
-
-#include "EOVtheIPnet.h"
-
-#include "EOMtheIPnet.h"
-
-#include "EOMtheEMSappl.h"
-
 #include "EOaction.h"
 #include "EOMtheCallbackManager.h"
-
-#include "eventviewer.h"
-
-#include "OPCprotocolManager_Cfg.h"
-
 #include "EoError.h"
+#include "EOVtheSystem.h"
+
+
+#if defined(USE_EMBOT_theHandler)
+#include "embot_app_eth_theHandler.h"
+#else
+#include "OPCprotocolManager_Cfg.h"
+#include "EOMtheEMSappl.h"
+#endif
+
+#if !defined(EMBOBJ_USE_EMBOT)
+#include "osal.h"
+#else
+#include "embot_os_rtos.h"
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+
+#if defined(USE_EMBOT_HW)
+
+#else
+#include "hal_timer.h"
+#endif
+
+
 
 
 
@@ -78,6 +84,10 @@
 // - #define with internal scope
 
 //#define EOM_EMSRUNNER_EVIEW_MEASURES
+
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
+#include "eventviewer.h"
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -190,7 +200,6 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.cfg)                   {0},
     EO_INIT(.task)                  {NULL, NULL, NULL},
     EO_INIT(.event)                 eo_sm_emsappl_EVdummy,
-    EO_INIT(.osaltimer)             NULL,
     EO_INIT(.haltimer_start)        {hal_timer2, hal_timer3, hal_timer4},
     EO_INIT(.haltimer_safestop)     {hal_timer5, hal_timer6, hal_timer7},
     EO_INIT(.numofrxpackets)        0,  
@@ -200,7 +209,6 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.mode)                  eo_emsrunner_mode_softrealtime,
     EO_INIT(.numofpacketsinsidesocket) 0,
     EO_INIT(.waitudptxisdone)       NULL,
-    EO_INIT(.osaltaskipnetexec)     NULL,
     EO_INIT(.usedTXdecimationfactor) 1,
     EO_INIT(.txropsnumberincycle)   {0, 0, 0},
     EO_INIT(.txcan1frames)          0,
@@ -248,14 +256,15 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     eom_emsrunner_SetMode(&s_theemsrunner, cfg->modeatstartup);
     
     s_theemsrunner.event = eo_sm_emsappl_EVdummy;
-    
-    s_theemsrunner.osaltimer = osal_timer_new();
-    eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.osaltimer), "eom_emsrunner_Initialise(): osaltimer is NULL", s_eobj_ownname, NULL);
-    
+       
     s_theemsrunner.numofpacketsinsidesocket = 0;
-    
+
+#if !defined(EMBOBJ_USE_EMBOT)    
     s_theemsrunner.waitudptxisdone = osal_semaphore_new(255, 0);
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_theemsrunner.waitudptxisdone), "eom_emsrunner_Initialise(): waitudptxisdone is NULL", s_eobj_ownname, NULL);
+#else    
+    s_theemsrunner.waitudptxisdone = embot::os::rtos::semaphore_new(255, 0);
+#endif   
     
     
     s_theemsrunner.cycletiming.iterationnumber = 0;    
@@ -435,19 +444,22 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
         return(eores_NOK_nullpointer);
     } 
    
-    // put in here with protection vs double initialisation. 
-    // we could put also in initialise, but i want to avoid that the runner is initialised and there is not an osal task yet for ipnet
-    if(NULL == p->osaltaskipnetexec)
-    {   // compute it only once in life
-        EOMtask * taskipnetexec = eom_ipnet_GetTask(eom_ipnet_GetHandle(), eomipnet_task_proc);
-        p->osaltaskipnetexec = taskipnetexec->osaltask;
-    } 
+//    // put in here with protection vs double initialisation. 
+//    // we could put also in initialise, but i want to avoid that the runner is initialised and there is not an osal task yet for ipnet
+//    if(NULL == p->osaltaskipnetexec)
+//    {   // compute it only once in life
+//        EOMtask * taskipnetexec = eom_ipnet_GetTask(eom_ipnet_GetHandle(), eomipnet_task_proc);
+//        p->osaltaskipnetexec = taskipnetexec->osaltask;
+//    } 
 
     
     p->numofpacketsinsidesocket = 0;      
     p->mode = p->cfg.modeatstartup;    
+#if !defined(EMBOBJ_USE_EMBOT)     
     osal_semaphore_set(s_theemsrunner.waitudptxisdone, 0);    
-    
+#else
+    // already at zero, and embot::os::rtos does not have a semaphore_set(cur)
+#endif    
     // set the ems-transceiver to have a given tx-rate.
     EOtransmitter * transmitter = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));    
     // replies and occasionals are not decimated. only regulars are decimated. in this way we have prompt responses to ask<> rops and we can send up occasionals asap.
@@ -552,7 +564,11 @@ extern eOresult_t eom_emsrunner_SetMode(EOMtheEMSrunner *p, eOemsrunner_mode_t m
 
 extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p)
 {
+#if !defined(EMBOBJ_USE_EMBOT)    
     osal_semaphore_increment(s_theemsrunner.waitudptxisdone, osal_callerTSK);
+#else    
+    embot::os::rtos::semaphore_release(s_theemsrunner.waitudptxisdone);
+#endif    
 }
 
 
@@ -908,7 +924,11 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
         }
        
         // the semaphore is incremented when the task IPnet gives the packet to the IPAL, which in turns directly writes into ETH peripheral
+#if !defined(EMBOBJ_USE_EMBOT)     
         osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
+#else
+        embot::os::rtos::semaphore_acquire(s_theemsrunner.waitudptxisdone, embot::core::reltimeWaitForever);
+#endif        
         s_theemsrunner.numofpacketsinsidesocket--;
         //#warning --> marco.accame: we wait for osal_reltimeINFINITE that the udp packet is sent ... can we think of a timeout???
     }
@@ -948,7 +968,13 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
         eOsmEventsEMSappl_t ev = s_theemsrunner.event;
         s_theemsrunner.event = eo_sm_emsappl_EVdummy;
         // we process the event. it can be either eo_sm_emsappl_EVgo2err or eo_sm_emsappl_EVgo2cfg
+#if defined(USE_EMBOT_theHandler)
+        #warning USE_EMBOT_theHandler is defined
+        embot::app::eth::theHandler::State st = static_cast<embot::app::eth::theHandler::State>(ev);
+        embot::app::eth::theHandler::getInstance().moveto(st);
+#else        
         eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), ev); 
+#endif        
     }
     else
     {                  
@@ -1105,7 +1131,7 @@ static void s_eom_emsrunner_6HALTIMERS_execute_task(void *arg)
     eom_task_isrSetEvent(task2execute, eo_emsrunner_evt_execute);
 
    
-    s_theemsrunner.cycletiming.tasktiming[taskID2execute].timestarted = osal_system_abstime_get();
+    s_theemsrunner.cycletiming.tasktiming[taskID2execute].timestarted = eov_sys_LifeTimeGet(eov_sys_GetHandle());
 }
 
 
@@ -1183,7 +1209,7 @@ static void s_eom_emsrunner_tasktiming_on_exit(eOemsrunner_taskid_t taskid)
     eventviewer_switch_to(prev); 
 #endif
     
-    s_theemsrunner.cycletiming.tasktiming[taskid].timestopped = osal_system_abstime_get();
+    s_theemsrunner.cycletiming.tasktiming[taskid].timestopped = eov_sys_LifeTimeGet(eov_sys_GetHandle());
     s_theemsrunner.cycletiming.tasktiming[taskid].duration[1] = s_theemsrunner.cycletiming.tasktiming[taskid].duration[0]; 
     s_theemsrunner.cycletiming.tasktiming[taskid].duration[0] = s_theemsrunner.cycletiming.tasktiming[taskid].timestopped - s_theemsrunner.cycletiming.tasktiming[taskid].timestarted;
     s_theemsrunner.cycletiming.tasktiming[taskid].isexecuting = eobool_false;      

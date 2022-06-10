@@ -50,6 +50,10 @@ extern "C" {
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
   
+  
+#if defined(USE_EMBOT_appl)   
+#error USE_EMBOT_appl is defined, dont include EOMtheEMSappl.h
+#endif
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 

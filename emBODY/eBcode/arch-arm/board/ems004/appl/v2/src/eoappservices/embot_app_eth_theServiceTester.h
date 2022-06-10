@@ -12,9 +12,13 @@
 
 #include "embot_core.h"
 
-#include "EOtheServices.h"
 #include "EoCommon.h"
 #include "EoProtocol.h"
+#include "EoManagement.h"
+#if defined(USE_EMBOT_theServices)  
+#else
+#include "EOtheServices.h"
+#endif
 
 #include <array>
 #include <memory>

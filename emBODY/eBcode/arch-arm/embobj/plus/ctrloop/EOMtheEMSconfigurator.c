@@ -27,8 +27,11 @@
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
 
+#if defined(USE_EMBOT_theHandler)
+#include "embot_app_eth_theHandler.h"
+#else
 #include "EOMtheEMSappl.h"
-
+#endif
 
 #include "EOMtheEMStransceiver.h"
 #include "EOMtheEMSsocket.h"
@@ -299,7 +302,12 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
 
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2error))
     {
+#if defined(USE_EMBOT_theHandler)
+        #warning USE_EMBOT_theHandler is defined
+        embot::app::eth::theHandler::getInstance().moveto(embot::app::eth::theHandler::State::FATALERROR);        
+#else        
         eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);
+#endif        
         // no other event is managed anymore:
         // a possible received packet shall be managed by the error task
         // a packet to be tx will be transmitted by the error task. 
@@ -415,7 +423,12 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     // moved at the end so that we dont miss any other event sent only to the config task
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2runner))
     {
+#if defined(USE_EMBOT_theHandler)
+        #warning USE_EMBOT_theHandler is defined
+        embot::app::eth::theHandler::getInstance().moveto(embot::app::eth::theHandler::State::RUN);
+#else          
         eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
+#endif        
         return;
     }        
 }

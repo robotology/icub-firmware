@@ -20,14 +20,24 @@
 #include <array>
 
 #include "EoProtocolAS.h"
-#include "EOtheServices_hid.h"
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOVtheCallbackManager.h"
 #include "EOtheCANservice.h"
-#include "embot_core_binary.h"
 #include "EOtheCANmapping.h"
+#include "EOtimer.h"
+#include "EOtheCANdiscovery2.h"
+
+#include "embot_core_binary.h"
 #include "embot_app_eth_CANmonitor.h"
+
+
+#if defined(USE_EMBOT_theServices)
+#include "embot_app_eth_theServices.h"
+#include "embot_app_eth_Service_legacy.h"
+#else 
+#include "EOtheServices_hid.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -382,6 +392,9 @@ private:
     static eOresult_t s_verifyingstate_step2_onstop_search_for_ft_boards_we_get_fullscale(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok);
     static void s_verifyingstate_step3_onFSqueryOK(void *par);
     static void s_verifyingstate_step3_onFSqueryTIMEOUT(void *par);
+    
+    
+    static void synchservice(eOmn_serv_state_t servstate);
 
     
     // other static ones used for callbacks
@@ -422,7 +435,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::initialise()
     service.active = eobool_false;
     service.started = eobool_false;    
     service.state = eomn_serv_state_idle;  
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);   
+    synchservice(service.state);
 
     // clear data used by this class
     for(auto &item : theFTnetvariables) item = nullptr;
@@ -487,7 +500,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
     if(NULL == servcfg)
     {
         service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+        synchservice(service.state);
+
         if(NULL != onverify)
         {
             onverify(nullptr, eobool_false); 
@@ -498,7 +512,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
     if(eomn_serv_AS_ft != servcfg->type)
     {
         service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+        synchservice(service.state);        
+
         if(NULL != onverify)
         {
             onverify(nullptr, eobool_false); 
@@ -512,7 +527,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
     }  
 
     service.state = eomn_serv_state_verifying;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+    synchservice(service.state);
 
     // make sure the timer is not running
     eo_timer_Stop(diagnostics.reportTimer);  
@@ -540,7 +555,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
     {
         // no sensors in descriptor ....
         service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+        synchservice(service.state);
+
         if(NULL != onverify)
         {
             onverify(nullptr, eobool_false); 
@@ -559,7 +575,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
         {
             // double board in descriptor or invalid type ....
             service.state = eomn_serv_state_failureofverify;
-            eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+            synchservice(service.state);
+           
             if(NULL != onverify)
             {
                 onverify(nullptr, eobool_false); 
@@ -658,7 +675,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Activate(const eOmn_serv_configu
 
     service.active = eobool_true;
     service.state = eomn_serv_state_activated; 
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);        
+    synchservice(service.state);
 
     return(eores_OK); 
 }
@@ -672,7 +689,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Deactivate()
     {
         // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
         service.state = eomn_serv_state_idle; 
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+        synchservice(service.state);
         return(eores_OK);        
     } 
     
@@ -720,8 +737,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::Deactivate()
     
     service.active = eobool_false;    
     service.state = eomn_serv_state_idle; 
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
-    
+    synchservice(service.state);
+   
     return(eores_OK);
 }
 
@@ -742,7 +759,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Start()
     
     service.started = eobool_true;    
     service.state = eomn_serv_state_started; 
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+    synchservice(service.state);
     
     // Start() does not force the tx from any CAN sensor boards.
     // the activation of transmission is done at reception of command set<eOas_ft_commands_t::enable, 1>
@@ -784,7 +801,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Stop()
 
     service.started = eobool_false;
     service.state = eomn_serv_state_activated;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);    
+    synchservice(service.state);
     
     // we dont remove all regulars related to ft entity because Deactivate() does that.
     
@@ -799,8 +816,13 @@ eOresult_t embot::app::eth::theFTservice::Impl::SetRegulars(eOmn_serv_arrayof_id
     {   // nothing to do because object must be first activated
         return(eores_OK);
     }  
-    
+#if defined(USE_EMBOT_theServices)
+    auto isok = [](uint32_t id){ return eores_OK == s_ft_isID32relevant(id); };
+    bool r = embot::app::eth::theServices::getInstance().setregulars(id32ofregulars, arrayofid32, isok, numberofthem);
+    return r ? eores_OK : eores_NOK_generic;
+#else    
     return(eo_service_hid_SetRegulars(id32ofregulars, arrayofid32, s_ft_isID32relevant, numberofthem));
+#endif    
 }
 
 eOresult_t embot::app::eth::theFTservice::Impl::can_forcetorque_processfullscale(const canFrameDescriptor &cfd)
@@ -1218,7 +1240,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::verifyingstate_step1_discovery(
     {
         // the service configuration does not contain any board valid to offer ft service 
         service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, service.state);
+        synchservice(service.state);     
         if(NULL != onverify)
         {
             onverify(nullptr, eobool_false); 
@@ -1271,7 +1293,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::s_verifyingstate_step2_onstop_se
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, p->service.state);
+        synchservice(p->service.state);
 
         p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
         p->diagnostics.errorDescriptor.sourceaddress    = 0;
@@ -1467,7 +1489,7 @@ void embot::app::eth::theFTservice::Impl::s_verifyingstate_step3_onFSqueryOK(voi
     const eOmn_serv_configuration_t * servcfg = p->tmpservcfg;
 
     p->service.state = eomn_serv_state_verified;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, p->service.state);
+    synchservice(p->service.state);       
    
     if(eobool_true == p->service.activateafterverify)
     {
@@ -1507,7 +1529,7 @@ void embot::app::eth::theFTservice::Impl::s_verifyingstate_step3_onFSqueryTIMEOU
     const eOmn_serv_configuration_t * servcfg = p->tmpservcfg;
 
     p->service.state = eomn_serv_state_failureofverify;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, p->service.state);
+    synchservice(p->service.state);      
     
     p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.sourceaddress    = 0;
@@ -1532,6 +1554,15 @@ void embot::app::eth::theFTservice::Impl::s_verifyingstate_step3_onFSqueryTIMEOU
     {
         p->service.onverify(nullptr, eobool_false); 
     }      
+}
+
+void embot::app::eth::theFTservice::Impl::synchservice(eOmn_serv_state_t s)
+{
+#if defined(USE_EMBOT_theServices)
+    embot::app::eth::theServices::getInstance().synch(embot::app::eth::Service::Category::ft, static_cast<embot::app::eth::Service::State>(s));
+#else        
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_ft, s);
+#endif      
 }
 
 

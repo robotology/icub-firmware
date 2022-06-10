@@ -44,6 +44,7 @@ extern "C" {
 #include "EoProtocol.h"
 #include "EOtheCANmapping.h"
 #include "EOarray.h"
+#include "EOaction.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -116,6 +117,7 @@ extern eOresult_t eo_candiscovery2_Start2(EOtheCANdiscovery2 *p, EOarray *target
 extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected);
 
 // call it regularly inside the control-loop or upon event received by the configurator task.
+// you can force execution of the _Tick() by setting a proper action w/ _SetTicker() and by calling _Ticker()
 
 extern eOresult_t eo_candiscovery2_Tick(EOtheCANdiscovery2 *p);
 
@@ -133,6 +135,11 @@ extern const EOarray* eo_candiscovery2_GetTargets(EOtheCANdiscovery2 *p);
 
 
 extern const eOcandiscovery_detection_t* eo_candiscovery2_GetDetection(EOtheCANdiscovery2 *p);
+
+
+extern eOresult_t eo_candiscovery2_SetTicker(EOtheCANdiscovery2 *p, EOaction* ticker);
+
+extern eOresult_t eo_candiscovery2_Ticker(EOtheCANdiscovery2 *p);
 
 /** @}            
     end of group eo_EOtheCANdiscovery2

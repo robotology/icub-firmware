@@ -74,7 +74,7 @@ typedef enum
 typedef struct
 {    
     eOcanserv_mode_t    mode;
-    eOreltime_t         canstabilizationtime;           /**< in usec [0, 10*OSAL_reltime1sec], it is the time required for can boards to stabilize
+    eOreltime_t         canstabilizationtime;           /**< in usec [0, 10*eok_reltime1sec], it is the time required for can boards to stabilize
                                                              so that they are able to process can messages. 
                                                              for sensor boards which are powered on by the CAN bus: 5 seconds for bootloader permanence 
                                                              plus some more time for powerup and starting application (use 7*OSAL_reltime1sec).

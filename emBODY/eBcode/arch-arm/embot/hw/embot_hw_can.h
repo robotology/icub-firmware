@@ -30,12 +30,12 @@ namespace embot { namespace hw { namespace can {
     
     struct Frame            
     {
-        std::uint32_t       id          {0};
-        std::uint8_t        size        {0};
-        std::uint8_t        filler[3]   {0};
-        std::uint8_t        data[8]     {0};  
-        Frame() = default;
-        Frame(std::uint32_t i, std::uint8_t s, std::uint8_t *d) : id(i), size(std::min(s, static_cast<std::uint8_t>(8))) 
+        std::uint32_t id {0};
+        std::uint8_t size {0};
+        std::uint8_t filler[3] {0};
+        std::uint8_t data[8] {0};  
+        constexpr Frame() = default;
+        constexpr Frame(std::uint32_t i, std::uint8_t s, std::uint8_t *d) : id(i), size(std::min(s, static_cast<std::uint8_t>(8))) 
         {
             if(nullptr != d) { std::memmove(data, d, size); }
         }
@@ -43,12 +43,15 @@ namespace embot { namespace hw { namespace can {
         
     struct Config
     {
-        std::uint8_t            txcapacity      {8};
-        std::uint8_t            rxcapacity      {8};
-        embot::core::Callback   ontxframe       {nullptr, nullptr}; 
-        embot::core::Callback   txqueueempty    {nullptr, nullptr}; 
-        embot::core::Callback   onrxframe       {nullptr, nullptr};
-        Config() = default;
+        std::uint8_t txcapacity {8};
+        std::uint8_t rxcapacity {8};
+        embot::core::Callback ontxframe {}; 
+        embot::core::Callback txqueueempty {}; 
+        embot::core::Callback onrxframe {};
+        constexpr Config() = default;
+        constexpr Config(uint8_t txc, uint8_t rxc, const embot::core::Callback &otx, 
+                         const embot::core::Callback &etx, const embot::core::Callback &orx)
+                            : txcapacity(txc), rxcapacity(rxc), ontxframe(otx), txqueueempty(etx), onrxframe(orx) {}
     };
     
     bool supported(embot::hw::CAN p);   
@@ -70,6 +73,10 @@ namespace embot { namespace hw { namespace can {
     result_t get(embot::hw::CAN p, Frame &frame, std::uint8_t &remaining);
     
     result_t setfilters(embot::hw::CAN p, std::uint8_t address);
+    
+    enum class Direction : uint8_t { TX = 0, RX = 1 }; 
+    bool lock(embot::hw::CAN p, embot::hw::can::Direction dir);
+    void unlock(embot::hw::CAN p, embot::hw::can::Direction dir, bool lockstatus);
            
 }}} // namespace embot { namespace hw { namespace can {
 

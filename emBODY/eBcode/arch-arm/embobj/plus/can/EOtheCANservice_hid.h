@@ -34,7 +34,13 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+
+#if !defined(EMBOBJ_USE_EMBOT)
 #include "osal.h"
+#else
+#include "embot_os_rtos.h"
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -49,18 +55,26 @@ extern "C" {
 
 typedef struct
 {
-    eObool_t            waitenable;
-    uint8_t             numoftxframe2send;
-    osal_semaphore_t*   semaphore;
+    eObool_t                        waitenable;
+    uint8_t                         numoftxframe2send;
+#if !defined(EMBOBJ_USE_EMBOT)    
+    osal_semaphore_t*               semaphore;
+#else
+    embot::os::rtos::semaphore_t*   semaphore;
+#endif    
 } eOcanserv_txwait_t;
 
 
 
 typedef struct
 {
-    uint8_t             totaltxframes;
-    volatile uint8_t    numoftxframes;
-    osal_semaphore_t*   locksemaphore;
+    uint8_t                         totaltxframes;
+    volatile uint8_t                numoftxframes;
+#if !defined(EMBOBJ_USE_EMBOT)     
+    osal_semaphore_t*               locksemaphore;
+#else
+    embot::os::rtos::semaphore_t*   locksemaphore;
+#endif     
 } eOcanserv_lockdata_t;
 
 

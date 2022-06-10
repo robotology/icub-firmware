@@ -69,7 +69,7 @@ namespace embot { namespace os {
 
 namespace embot { namespace os { namespace priority {
         
-    constexpr bool isvalid(uint8_t v)
+    constexpr bool isvaluevalid(uint8_t v)
     {
         if((embot::core::tointegral(Priority::schedIdle) == v) || (embot::core::tointegral(Priority::schedInit) == v))
         {
@@ -85,7 +85,7 @@ namespace embot { namespace os { namespace priority {
     
     constexpr Priority convert(uint8_t v)
     {   
-        if(true == embot::os::priority::isvalid(v))
+        if(true == embot::os::priority::isvaluevalid(v))
         {
             return static_cast<Priority>(v);
         }

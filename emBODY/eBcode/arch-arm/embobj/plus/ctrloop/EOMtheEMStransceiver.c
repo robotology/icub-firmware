@@ -38,12 +38,19 @@
 #include "EOreceiver_hid.h"    // used only for debug
 
 #include "EOMmutex.h"
-
-#include "OPCprotocolManager_Cfg.h"
-
 #include "EOtheInfoDispatcher.h"
 
+#if defined(USE_EMBOT_theHandler)
+#include "EOMtheEMSsocket.h"
+#else
+#include "EOMtheEMSsocket.h"
+#include "OPCprotocolManager_Cfg.h"
 #include "EOMtheEMSappl.h"
+#endif
+
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -228,7 +235,7 @@ extern eOipv4addr_t eom_emstransceiver_GetIPhost(EOMtheEMStransceiver* p)
 {
     if(NULL == p)
     {
-        return(NULL);
+        return(0);
     }
     
     return(s_emstransceiver_singleton.transceiver->cfg.remipv4addr);    
@@ -242,6 +249,29 @@ extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p)
     }
     
     return(s_emstransceiver_singleton.transceiver);
+}
+
+extern eOresult_t eom_emstransceiver_Transmit_OccasionalROP(EOMtheEMStransceiver *p, eOropdescriptor_t *ropdes)
+{
+    if((NULL == p) || (NULL == ropdes))
+    {
+        return eores_NOK_nullpointer;
+    }
+    
+    eOresult_t res = eores_NOK_generic;   
+
+    // res = eo_transceiver_OccasionalROP_Load(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), ropdes); 
+    
+    res = eo_transceiver_OccasionalROP_Load(s_emstransceiver_singleton.transceiver, ropdes); 
+    
+    if(eores_OK != res)
+    {
+        return res;
+    }
+    
+    res = eom_emssocket_TransmissionRequest(eom_emssocket_GetHandle());
+    
+    return res;   
 }
 
 extern EOnvSet* eom_emstransceiver_GetNVset(EOMtheEMStransceiver* p)
@@ -325,7 +355,12 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     // if we have some more diagnostic to transmit, we do a new tx request.
     if(remaining > 0)
     {
+#if defined(USE_EMBOT_theHandler)
+        #warning USE_EMBOT_theHandler is defined. SOLVED: we use theEMSsocket to ask for transmission
+        eom_emssocket_TransmissionRequest(eom_emssocket_GetHandle());    
+#else        
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
+#endif        
     }        
     
     s_eom_emstransceiver_update_diagnosticsinfo();

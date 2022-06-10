@@ -37,10 +37,14 @@ extern "C" {
 #include "EOMtheEMStransceiver.h"
 #include "EOMtheEMSsocket.h"
 #include "EOMtask.h"
-#include "eOcfg_sm_EMSappl.h"
 #include "EOtimer.h"
+#if !defined(EMBOBJ_USE_EMBOT)    
 #include "osal.h"
-#include "hal.h"
+#else
+#include "embot_os_rtos.h"
+#endif
+
+#include "hal_timer.h"
     
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -84,7 +88,6 @@ struct EOMtheEMSrunner_hid
     eOemsrunner_cfg_t           cfg;
     EOMtask*                    task[eo_emsrunner_task_numberof];
     eOsmEventsEMSappl_t         event;
-    osal_timer_t*               osaltimer;
     hal_timer_t                 haltimer_start[eo_emsrunner_task_numberof];
     hal_timer_t                 haltimer_safestop[eo_emsrunner_task_numberof];
     uint16_t                    numofrxpackets;
@@ -93,8 +96,11 @@ struct EOMtheEMSrunner_hid
     uint16_t                    numoftxrops;
     eOemsrunner_mode_t          mode;
     uint8_t                     numofpacketsinsidesocket;
-    osal_semaphore_t*           waitudptxisdone;
-    osal_task_t*                osaltaskipnetexec;
+#if !defined(EMBOBJ_USE_EMBOT)      
+    osal_semaphore_t*           waitudptxisdone;     
+#else
+    embot::os::rtos::semaphore_t* waitudptxisdone;
+#endif    
     uint8_t                     usedTXdecimationfactor;
     eOtransmitter_ropsnumber_t  txropsnumberincycle;
     uint8_t                     txcan1frames;

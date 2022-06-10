@@ -129,6 +129,7 @@ extern eOipv4addr_t eom_emstransceiver_GetIPhost(EOMtheEMStransceiver* p);
  **/
 extern EOtransceiver* eom_emstransceiver_GetTransceiver(EOMtheEMStransceiver* p);
 
+extern eOresult_t eom_emstransceiver_Transmit_OccasionalROP(EOMtheEMStransceiver *p, eOropdescriptor_t *ropdes);
 
 extern EOnvSet* eom_emstransceiver_GetNVset(EOMtheEMStransceiver* p);
 
