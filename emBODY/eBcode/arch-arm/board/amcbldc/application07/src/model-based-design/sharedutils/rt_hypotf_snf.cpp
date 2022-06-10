@@ -7,15 +7,20 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.36
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Tue Feb  8 09:38:13 2022
+// Model version                  : 3.3
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 15:42:35 2022
 //
 #include "rtwtypes.h"
-#include <cmath>
-#include "mw_cmsis.h"
-#include "rt_nonfinite.h"
 #include "rt_hypotf_snf.h"
+#include <cmath>
+
+extern "C" {
+
+#include "rt_nonfinite.h"
+
+}
+#include "mw_cmsis.h"
 
 real32_T rt_hypotf_snf(real32_T u0, real32_T u1)
 {

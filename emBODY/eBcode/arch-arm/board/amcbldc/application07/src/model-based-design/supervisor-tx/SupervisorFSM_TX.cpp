@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 3.29
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:03 2022
+// Model version                  : 4.9
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:02:45 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -17,6 +17,7 @@
 // Validation result: Not run
 //
 #include "SupervisorFSM_TX.h"
+#include "SupervisorFSM_TX_types.h"
 #include "SupervisorFSM_TX_private.h"
 
 MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_MdlrefDW;
@@ -64,8 +65,7 @@ static MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode)
 }
 
 // System initialize for referenced model: 'SupervisorFSM_TX'
-void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_EVENTS_TX
-  *rty_EventsTx)
+void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx)
 {
   // SystemInitialize for Chart: '<Root>/SupervisorFSM_TX'
   rty_MessagesTx->foc.current = 0.0F;
@@ -109,17 +109,13 @@ void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_EVENTS_TX
   rty_MessagesTx->status.flags.SiliconRevisionFault = false;
   rty_MessagesTx->status.flags.PositionLimitUpper = false;
   rty_MessagesTx->status.flags.PositionLimitLower = false;
-
-  // SystemInitialize for BusCreator: '<Root>/BUS_EVENTS_TX'
-  rty_EventsTx->foc = SupervisorFSM_TX_B.ev_foc;
-  rty_EventsTx->status = SupervisorFSM_TX_B.ev_status;
 }
 
 // Output and update for referenced model: 'SupervisorFSM_TX'
 void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
                       *rtu_EstimatedData, const Flags *rtu_Flags, const
                       ControlOutputs *rtu_ControlOutputs, BUS_MESSAGES_TX
-                      *rty_MessagesTx, BUS_EVENTS_TX *rty_EventsTx)
+                      *rty_MessagesTx, BUS_STATUS_TX *rty_StatusTx)
 {
   // Chart: '<Root>/SupervisorFSM_TX'
   if (SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX == 0U) {
@@ -154,9 +150,41 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
 
   // End of Chart: '<Root>/SupervisorFSM_TX'
 
-  // BusCreator: '<Root>/BUS_EVENTS_TX'
-  rty_EventsTx->foc = SupervisorFSM_TX_B.ev_foc;
-  rty_EventsTx->status = SupervisorFSM_TX_B.ev_status;
+  // RelationalOperator: '<S1>/FixPt Relational Operator' incorporates:
+  //   UnitDelay: '<S1>/Delay Input1'
+  //
+  //  Block description for '<S1>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  rty_StatusTx->foc = (SupervisorFSM_TX_B.ev_foc !=
+                       SupervisorFSM_TX_DW.DelayInput1_DSTATE);
+
+  // RelationalOperator: '<S2>/FixPt Relational Operator' incorporates:
+  //   UnitDelay: '<S2>/Delay Input1'
+  //
+  //  Block description for '<S2>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  rty_StatusTx->status = (SupervisorFSM_TX_B.ev_status !=
+    SupervisorFSM_TX_DW.DelayInput1_DSTATE_d);
+
+  // Update for UnitDelay: '<S1>/Delay Input1'
+  //
+  //  Block description for '<S1>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  SupervisorFSM_TX_DW.DelayInput1_DSTATE = SupervisorFSM_TX_B.ev_foc;
+
+  // Update for UnitDelay: '<S2>/Delay Input1'
+  //
+  //  Block description for '<S2>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  SupervisorFSM_TX_DW.DelayInput1_DSTATE_d = SupervisorFSM_TX_B.ev_status;
 }
 
 // Model initialize function

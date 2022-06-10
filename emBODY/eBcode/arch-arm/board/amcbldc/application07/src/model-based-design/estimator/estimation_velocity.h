@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 2.38
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:34 2022
+// Model version                  : 3.3
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:03:13 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,14 +18,15 @@
 //
 #ifndef RTW_HEADER_estimation_velocity_h_
 #define RTW_HEADER_estimation_velocity_h_
-#include <cmath>
-#include <cstring>
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
-#include "mw_cmsis.h"
 #include "rtGetInf.h"
+
+extern "C" {
+
 #include "rt_nonfinite.h"
 
+}
 // Block states (default storage) for model 'estimation_velocity'
 #ifndef estimation_velocity_MDLREF_HIDE_CHILD_
 
@@ -59,8 +60,8 @@ struct MdlrefDW_estimation_velocity_T {
 
 extern void estimation_velocity_Init(void);
 extern void estimation_velocity(const SensorsData *rtu_SensorsData, const
-  ConfigurationParameters *rtu_ConfigurationParameters, EstimatedData
-  *rty_EstimatedData);
+  ConfigurationParameters *rtu_ConfigurationParameters, JointVelocities
+  *rty_EstimatedVelocity);
 
 // Model reference registration function
 extern void estimation_velocity_initialize(const char_T **rt_errorStatus);

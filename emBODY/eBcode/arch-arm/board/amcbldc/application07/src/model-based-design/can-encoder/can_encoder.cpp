@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 2.57
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Thu May 26 11:44:36 2022
+// Model version                  : 3.4
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:02:55 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -17,17 +17,18 @@
 // Validation result: Not run
 //
 #include "can_encoder.h"
+#include "rtwtypes.h"
+#include "can_encoder_types.h"
+#include <cstring>
+#include <stddef.h>
 #include "can_encoder_private.h"
 
 MdlrefDW_can_encoder_T can_encoder_MdlrefDW;
 
-// Block states (default storage)
-DW_can_encoder_f_T can_encoder_DW;
-
 //
 // Output and update for atomic system:
-//    '<S6>/format_can_id'
-//    '<S10>/format_can_id'
+//    '<S5>/format_can_id'
+//    '<S8>/format_can_id'
 //
 void can_encoder_format_can_id(uint8_T rtu_class, uint8_T rtu_can_id_amc,
   uint8_T rtu_dst_typ, uint16_T *rty_pkt_id)
@@ -38,8 +39,8 @@ void can_encoder_format_can_id(uint8_T rtu_class, uint8_T rtu_can_id_amc,
 }
 
 // Output and update for referenced model: 'can_encoder'
-void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_EVENTS_TX
-                 *rtu_events_tx, BUS_CAN_MULTIPLE *rty_pck_tx)
+void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
+                 *rtu_status_tx, BUS_CAN_MULTIPLE *rty_pck_tx)
 {
   BUS_CAN rtb_BusCreator_d;
   BUS_CAN rtb_BusCreator_j;
@@ -145,7 +146,7 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_EVENTS_TX
   rtb_BusCreator_d.packet.PAYLOAD[6] = b_tmp[2];
   rtb_BusCreator_d.packet.PAYLOAD[7] = b_tmp[3];
 
-  // MATLAB Function: '<S10>/format_can_id' incorporates:
+  // MATLAB Function: '<S8>/format_can_id' incorporates:
   //   Constant: '<S4>/Constant'
   //   Constant: '<S4>/Motor Control Streaming'
   //   Constant: '<S4>/TYPESTATUS'
@@ -156,19 +157,12 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_EVENTS_TX
   //   BusCreator: '<S4>/Bus Creator1'
   //   Concatenate: '<S1>/Vector Concatenate'
   //   Constant: '<S4>/length'
-  //   RelationalOperator: '<S9>/FixPt Relational Operator'
-  //   UnitDelay: '<S9>/Delay Input1'
-  //
-  //  Block description for '<S9>/Delay Input1':
-  //
-  //   Store in Global RAM
 
-  rty_pck_tx->packets[0].available = (rtu_events_tx->status !=
-    can_encoder_DW.DelayInput1_DSTATE);
+  rty_pck_tx->packets[0].available = rtu_status_tx->status;
   rty_pck_tx->packets[0].length = 8U;
   rty_pck_tx->packets[0].packet.ID = rtb_pkt_id;
 
-  // MATLAB Function: '<S6>/format_can_id' incorporates:
+  // MATLAB Function: '<S5>/format_can_id' incorporates:
   //   Constant: '<S2>/Constant'
   //   Constant: '<S2>/Motor Control Streaming'
   //   Constant: '<S2>/TYPE2FOC'
@@ -178,15 +172,8 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_EVENTS_TX
   // BusCreator: '<S2>/Bus Creator' incorporates:
   //   BusCreator: '<S2>/Bus Creator1'
   //   Constant: '<S2>/length'
-  //   RelationalOperator: '<S5>/FixPt Relational Operator'
-  //   UnitDelay: '<S5>/Delay Input1'
-  //
-  //  Block description for '<S5>/Delay Input1':
-  //
-  //   Store in Global RAM
 
-  rtb_BusCreator_d.available = (rtu_events_tx->foc !=
-    can_encoder_DW.DelayInput1_DSTATE_c);
+  rtb_BusCreator_d.available = rtu_status_tx->foc;
   rtb_BusCreator_d.length = 8U;
   rtb_BusCreator_d.packet.ID = rtb_pkt_id;
 
@@ -209,22 +196,6 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_EVENTS_TX
   rty_pck_tx->packets[1] = rtb_BusCreator_d;
   rty_pck_tx->packets[2] = rtb_BusCreator_j;
   rty_pck_tx->packets[3] = rtb_BusCreator_j;
-
-  // Update for UnitDelay: '<S9>/Delay Input1'
-  //
-  //  Block description for '<S9>/Delay Input1':
-  //
-  //   Store in Global RAM
-
-  can_encoder_DW.DelayInput1_DSTATE = rtu_events_tx->status;
-
-  // Update for UnitDelay: '<S5>/Delay Input1'
-  //
-  //  Block description for '<S5>/Delay Input1':
-  //
-  //   Store in Global RAM
-
-  can_encoder_DW.DelayInput1_DSTATE_c = rtu_events_tx->foc;
 
   // End of Outputs for SubSystem: '<Root>/CAN_Encoder'
 }

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.96
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:20 2022
+// Model version                  : 3.8
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:03:00 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -17,9 +17,16 @@
 // Validation result: Not run
 //
 #include "control_foc.h"
+#include "control_foc_types.h"
+#include "FOCInnerLoop.h"
 #include "control_foc_private.h"
 
-MdlrefDW_control_foc_T control_foc_MdlrefDW;
+extern "C" {
+
+#include "rt_nonfinite.h"
+
+}
+  MdlrefDW_control_foc_T control_foc_MdlrefDW;
 
 // Block states (default storage)
 DW_control_foc_f_T control_foc_DW;

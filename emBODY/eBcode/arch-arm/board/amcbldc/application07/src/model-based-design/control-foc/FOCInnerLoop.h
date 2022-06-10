@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.96
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:20 2022
+// Model version                  : 3.8
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:03:00 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,13 +18,8 @@
 //
 #ifndef RTW_HEADER_FOCInnerLoop_h_
 #define RTW_HEADER_FOCInnerLoop_h_
-#include <cmath>
 #include "rtwtypes.h"
-#include "zero_crossing_types.h"
 #include "control_foc_types.h"
-#include "rtGetNaN.h"
-#include "rt_nonfinite.h"
-#include "arm_math.h"
 #ifndef control_foc_MDLREF_HIDE_CHILD_
 
 extern void FOCInnerLoop_Init(void);

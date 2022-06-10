@@ -80,32 +80,56 @@ public:
     virtual void stop() override {};        
 }; 
    
+// how to use it:
+// 1. create a MeasureHisto w/ a proper MeasureHisto::Config 
+// 2. call start() and stop() at the beginning and at the end of the piece of code
+//    of which you want to measure the duration.
+//    the duration will be added in a histogram whose properties are in 
+//    Config::minduration, Config::maxduration, Config::resolution
+// 3. the histogram can be viewed using method MeasureHisto::report(). 
+//    you must place a breakpoint in it and explore the volatile variables {name, beyond, vals}
+//    but you can also enable a print. you can use Config::name to differentiate amongst
+//    multiple instances of MeasureHisto
+// 4. method MeasureHisto::report() can be called at any time, but if Config::reportfrequency is true, 
+//    is is also called at the end of stop() at the rate specified by Config::reportfrequency
 
 struct MeasureHisto : public Measure
-{
-    constexpr static bool enablereport {true};
-    constexpr static uint32_t reportfrequency {10000};
-    
+{    
     struct Config
     {
+        const char *name {"dummy"}; 
         embot::core::relTime minduration {0};
         embot::core::relTime maxduration {100*embot::core::time1microsec};  
         embot::core::relTime resolution {100*embot::core::time1microsec};
-        constexpr Config(embot::core::relTime min, embot::core::relTime max, embot::core::relTime res = embot::core::time1microsec) 
-                        : minduration(min), maxduration(max), resolution(res) {} 
+        bool enablereport {true};
+        uint32_t reportfrequency {10000};
+        constexpr Config() = default;
+        constexpr Config(const char *n, embot::core::relTime min, embot::core::relTime max,
+                         embot::core::relTime res = embot::core::time1microsec,
+                         bool er = true, uint32_t rf = 10000) 
+                         : name(n), minduration(min), maxduration(max), resolution(res), 
+                           enablereport(er), reportfrequency(rf){} 
     };
     
+    Config config {};
+        
     embot::app::scope::SignalHisto *sighisto {nullptr};
     
     const embot::tools::Histogram::Values * vv {nullptr};
     
-    // i use ram ... maybe not best solution. maybe we could also print the histo.
-    std::array<uint64_t, 512> vals {};   
-    uint64_t beyond {0}; 
+    // i use ram ... maybe not best solution. maybe we could also print the histo.   
+    static constexpr size_t nvals {512};
+    volatile uint64_t vals[nvals] {0};        
+    volatile uint64_t beyond {0}; 
     uint32_t counter {0};    
 
-    MeasureHisto(const Config &config)
+    MeasureHisto(const Config &cfg)
     {
+        config = cfg;
+        if(nullptr == config.name)
+        {
+            config.name = "dummy";
+        }
         sighisto = new embot::app::scope::SignalHisto({config.minduration, config.maxduration, config.resolution});      
         vv = sighisto->histogram()->getvalues();        
     }
@@ -119,9 +143,9 @@ struct MeasureHisto : public Measure
     {
         sighisto->off();
         
-        if(enablereport)
+        if(config.enablereport)
         {
-            if(++counter >= reportfrequency)
+            if(++counter >= config.reportfrequency)
             {
                 counter = 0;
                 report();  
@@ -129,17 +153,32 @@ struct MeasureHisto : public Measure
         }        
     }
     
+#define PRINT_REPORT 
+    
     void report()
     {            
         beyond = vv->beyond;
                     
         for(int i=0; i<vv->inside.size(); i++)
         {
-            if(i < vals.size())
+            if(i < nvals)
             {
                 vals[i] = vv->inside[i];
             }
-        }            
+        }
+        // place a breakpoint in here and inspect: beyond and vals[]
+        beyond = beyond; 
+        // but you can also use embot::core::print() to collect values from the printf window
+        // the following code can be easily changed according to needs
+#if defined(PRINT_REPORT)
+        std::string str = std::string("name, beyond, histo = " ) + config.name + ", " + std::to_string(beyond);
+        for(int v=0; v<nvals; v++)
+        {
+            str += ", ";
+            str += std::to_string(vals[v]);
+        }
+        embot::core::print(str);  
+#endif        
     }
 
 };
@@ -211,7 +250,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     }
     else
     {
-        measureFOC = new MeasureHisto({0, 64*embot::core::time1microsec, 1});
+        measureFOC = new MeasureHisto({"foc", 0, 64*embot::core::time1microsec, 1, true, 100*1000});
     }
     
     // create the measure for the tick
@@ -221,7 +260,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     }
     else
     {
-        measureTick = new MeasureHisto({0, 400*embot::core::time1microsec, 1});
+        measureTick = new MeasureHisto({"tick", 0, 400*embot::core::time1microsec, 1, true, 10*1000});
     }
     
     // init the external fault. 

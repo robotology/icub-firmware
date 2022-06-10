@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 2.96
-// Simulink Coder version         : 9.6 (R2021b) 14-May-2021
-// C/C++ source code generated on : Wed Apr  6 09:04:20 2022
+// Model version                  : 3.8
+// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
+// C/C++ source code generated on : Tue Jun  7 16:03:00 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,16 +19,15 @@
 #ifndef RTW_HEADER_control_foc_h_
 #define RTW_HEADER_control_foc_h_
 #include "rtwtypes.h"
-#include "zero_crossing_types.h"
 #include "control_foc_types.h"
-
-// Child system includes
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-#include "FOCInnerLoop.h"
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
-
 #include "rtGetInf.h"
+
+extern "C" {
+
 #include "rt_nonfinite.h"
+
+}
+#include "zero_crossing_types.h"
 
 // Block states (default storage) for model 'control_foc'
 #ifndef control_foc_MDLREF_HIDE_CHILD_
