@@ -372,15 +372,15 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
             // generate a acc message with canrevisitedconfig.imuinfo.counter
             info.sensor = embot::prot::can::analog::imuSensor::acc;
 
-					// remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
-					// https://github.com/icub-tech-iit/fix/issues/780   
-					#if defined(STM32HAL_BOARD_STRAIN2)
-            info.value.x = -(imuacquisition.data.acc.y);
-            info.value.y = imuacquisition.data.acc.x;
-            info.value.z = imuacquisition.data.acc.z;
-          #else
-						info.value = imuacquisition.data.acc;
-					#endif					
+	    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
+	    // https://github.com/icub-tech-iit/fix/issues/780   
+	#if defined(STM32HAL_BOARD_STRAIN2)
+            info.value.x = -imuacquisition.data.acc.y;
+            info.value.y = -imuacquisition.data.acc.x;
+            info.value.z = -imuacquisition.data.acc.z;
+        #else
+	    info.value = imuacquisition.data.acc;
+	#endif					
             
             msg.load(info);
             msg.get(frame);
@@ -391,16 +391,18 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
         {
             // generate a mag message with canrevisitedconfig.counter
             info.sensor = embot::prot::can::analog::imuSensor::mag;
-										// remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
-					// https://github.com/icub-tech-iit/fix/issues/780   
-					#if defined(STM32HAL_BOARD_STRAIN2)
-            info.value.x = -(imuacquisition.data.mag.y);
-            info.value.y = imuacquisition.data.mag.x;
-            info.value.z = imuacquisition.data.mag.z;
-          #else
+	    
+	    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
+	    // https://github.com/icub-tech-iit/fix/issues/780   
+	#if defined(STM32HAL_BOARD_STRAIN2)
+            info.value.x = -imuacquisition.data.mag.y;
+            info.value.y = -imuacquisition.data.mag.x;
+            info.value.z = -imuacquisition.data.mag.z;
+        #else
             info.value = imuacquisition.data.mag;
-          #endif
-            msg.load(info);
+        #endif
+        
+	    msg.load(info);
             msg.get(frame);
             replies.push_back(frame);           
         }        
@@ -410,15 +412,15 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
             // generate a gyr message with canrevisitedconfig.counter
             info.sensor = embot::prot::can::analog::imuSensor::gyr;
 
-					// remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
-					// https://github.com/icub-tech-iit/fix/issues/780   
-					#if defined(STM32HAL_BOARD_STRAIN2)
-            info.value.x = -(imuacquisition.data.gyr.y);
-            info.value.y = imuacquisition.data.gyr.x;
-            info.value.z = imuacquisition.data.gyr.z;
-          #else
-						info.value = imuacquisition.data.gyr;
-					#endif					
+	    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue: 
+	    // https://github.com/icub-tech-iit/fix/issues/780   
+	#if defined(STM32HAL_BOARD_STRAIN2)
+            info.value.x = -imuacquisition.data.gyr.y;
+            info.value.y = -imuacquisition.data.gyr.x;
+            info.value.z = -imuacquisition.data.gyr.z;
+        #else
+	    info.value = imuacquisition.data.gyr;
+	#endif					
             
             msg.load(info);
             msg.get(frame);
