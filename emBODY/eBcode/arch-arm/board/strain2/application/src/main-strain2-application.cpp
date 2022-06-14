@@ -13,7 +13,7 @@
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 { 
-    embot::prot::can::versionOfAPPLICATION {2, 0, 13},
+    embot::prot::can::versionOfAPPLICATION {2, 0, 14},
     embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
