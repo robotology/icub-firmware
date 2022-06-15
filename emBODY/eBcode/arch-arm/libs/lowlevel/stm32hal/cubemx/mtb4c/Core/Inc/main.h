@@ -59,8 +59,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BNO055_BOOT_Pin GPIO_PIN_13
 #define BNO055_BOOT_GPIO_Port GPIOC
-#define BNO055_SELCOM_Pin GPIO_PIN_11
-#define BNO055_SELCOM_GPIO_Port GPIOC
 #define BNO055_INT_Pin GPIO_PIN_10
 #define BNO055_INT_GPIO_Port GPIOC
 #define BNO055_RESET_Pin GPIO_PIN_12
@@ -71,6 +69,8 @@ void Error_Handler(void);
 #define SDA0_GPIO_Port GPIOA
 #define LED_RED_Pin GPIO_PIN_9
 #define LED_RED_GPIO_Port GPIOC
+#define ANALOG_0_Pin GPIO_PIN_0
+#define ANALOG_0_GPIO_Port GPIOC
 #define LED_BLUE_Pin GPIO_PIN_8
 #define LED_BLUE_GPIO_Port GPIOC
 #define SDA3_Pin GPIO_PIN_5

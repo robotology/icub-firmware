@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 // IIT-EXT
 #if defined(USE_STM32HAL)
     #include "stm32hal.h"
@@ -64,8 +65,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BNO055_BOOT_Pin GPIO_PIN_13
 #define BNO055_BOOT_GPIO_Port GPIOC
-#define BNO055_SELCOM_Pin GPIO_PIN_11
-#define BNO055_SELCOM_GPIO_Port GPIOC
 #define BNO055_INT_Pin GPIO_PIN_10
 #define BNO055_INT_GPIO_Port GPIOC
 #define BNO055_RESET_Pin GPIO_PIN_12

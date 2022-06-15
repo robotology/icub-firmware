@@ -111,7 +111,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 
 namespace embot { namespace app { namespace skeleton { namespace os { namespace bootloader {
     
-		const uint8_t  Firmware_vers = 3;
+		const uint8_t  Firmware_vers = 4;
 		const uint8_t  Revision_vers = 0;
 		const uint8_t  Build_number  = 0;
 	
