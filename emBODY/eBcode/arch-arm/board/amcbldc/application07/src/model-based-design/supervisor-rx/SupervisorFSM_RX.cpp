@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 4.6
+// Model version                  : 4.7
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Tue Jun  7 16:02:39 2022
+// C/C++ source code generated on : Wed Jun 15 10:20:52 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -1069,70 +1069,75 @@ void SupervisorFSM_CANMessageHandler(void)
         SupervisorFSM_RX_B.hasMotorConfigChanged = true;
       }
     }
-  } else if (!SupervisorFSM_RX_rtu_ErrorsRx->
-             errors[SupervisorFSM_RX_B.messageIndex - 1].event) {
-    if (SupervisorFSM_RX_rtu_StatusRx->status[SupervisorFSM_RX_B.messageIndex -
-        1].desired_current) {
-      SupervisorFSM_RX_B.newSetpoint.type = ControlModes_Current;
-      SupervisorFSM_RX_B.newSetpoint.value =
-        SupervisorFSM_RX_rtu_MessagesRx->
-        messages[SupervisorFSM_RX_B.messageIndex - 1].desired_current.current;
-      SupervisorFSM_RX_B.enableSendingMsgStatus = true;
-      SupervisorFSM_RX_B.receivedNewSetpoint = true;
+  } else {
+    SupervisorFSM_RX_B.enableSendingMsgStatus =
+      ((SupervisorFSM_RX_B.messageIndex != 1) &&
+       SupervisorFSM_RX_B.enableSendingMsgStatus);
+    if (!SupervisorFSM_RX_rtu_ErrorsRx->errors[SupervisorFSM_RX_B.messageIndex -
+        1].event) {
+      if (SupervisorFSM_RX_rtu_StatusRx->status[SupervisorFSM_RX_B.messageIndex
+          - 1].desired_current) {
+        SupervisorFSM_RX_B.newSetpoint.type = ControlModes_Current;
+        SupervisorFSM_RX_B.newSetpoint.value =
+          SupervisorFSM_RX_rtu_MessagesRx->
+          messages[SupervisorFSM_RX_B.messageIndex - 1].desired_current.current;
+        SupervisorFSM_RX_B.enableSendingMsgStatus = true;
+        SupervisorFSM_RX_B.receivedNewSetpoint = true;
 
-      // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-      SupervisorFSM_R_SetpointHandler();
+        // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
+        SupervisorFSM_R_SetpointHandler();
 
-      // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-    } else if (SupervisorFSM_RX_rtu_StatusRx->
-               status[SupervisorFSM_RX_B.messageIndex - 1].control_mode) {
-      SupervisorFSM_RX_B.requiredControlMode = SupervisorFSM_RX_convert
-        (SupervisorFSM_RX_rtu_MessagesRx->
-         messages[SupervisorFSM_RX_B.messageIndex - 1].control_mode.mode);
-      SupervisorFSM_RX_B.receivedNewSetpoint = false;
+        // End of Outputs for SubSystem: '<Root>/SetpointHandler'
+      } else if (SupervisorFSM_RX_rtu_StatusRx->
+                 status[SupervisorFSM_RX_B.messageIndex - 1].control_mode) {
+        SupervisorFSM_RX_B.requiredControlMode = SupervisorFSM_RX_convert
+          (SupervisorFSM_RX_rtu_MessagesRx->
+           messages[SupervisorFSM_RX_B.messageIndex - 1].control_mode.mode);
+        SupervisorFSM_RX_B.receivedNewSetpoint = false;
 
-      // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
-      Superv_ControlModeHandlerMotor0();
+        // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
+        Superv_ControlModeHandlerMotor0();
 
-      // End of Outputs for SubSystem: '<Root>/Control Mode Handler Motor 0'
-    } else if (SupervisorFSM_RX_rtu_StatusRx->
-               status[SupervisorFSM_RX_B.messageIndex - 1].current_limit) {
-      SupervisorFSM_RX_B.newLimit.type = ControlModes_Current;
-      SupervisorFSM_RX_B.newLimit.peak =
-        SupervisorFSM_RX_rtu_MessagesRx->
-        messages[SupervisorFSM_RX_B.messageIndex - 1].current_limit.peak;
-      SupervisorFSM_RX_B.newLimit.nominal =
-        SupervisorFSM_RX_rtu_MessagesRx->
-        messages[SupervisorFSM_RX_B.messageIndex - 1].current_limit.nominal;
-      SupervisorFSM_RX_B.newLimit.overload =
-        SupervisorFSM_RX_rtu_MessagesRx->
-        messages[SupervisorFSM_RX_B.messageIndex - 1].current_limit.overload;
+        // End of Outputs for SubSystem: '<Root>/Control Mode Handler Motor 0'
+      } else if (SupervisorFSM_RX_rtu_StatusRx->
+                 status[SupervisorFSM_RX_B.messageIndex - 1].current_limit) {
+        SupervisorFSM_RX_B.newLimit.type = ControlModes_Current;
+        SupervisorFSM_RX_B.newLimit.peak =
+          SupervisorFSM_RX_rtu_MessagesRx->
+          messages[SupervisorFSM_RX_B.messageIndex - 1].current_limit.peak;
+        SupervisorFSM_RX_B.newLimit.nominal =
+          SupervisorFSM_RX_rtu_MessagesRx->
+          messages[SupervisorFSM_RX_B.messageIndex - 1].current_limit.nominal;
+        SupervisorFSM_RX_B.newLimit.overload =
+          SupervisorFSM_RX_rtu_MessagesRx->
+          messages[SupervisorFSM_RX_B.messageIndex - 1].current_limit.overload;
 
-      // Outputs for Function Call SubSystem: '<Root>/Limits Handler'
-      SupervisorFSM_RX_LimitsHandler();
+        // Outputs for Function Call SubSystem: '<Root>/Limits Handler'
+        SupervisorFSM_RX_LimitsHandler();
 
-      // End of Outputs for SubSystem: '<Root>/Limits Handler'
-    } else if (SupervisorFSM_RX_rtu_StatusRx->
-               status[SupervisorFSM_RX_B.messageIndex - 1].current_pid) {
-      uint8_T Motorconfig_tmp;
+        // End of Outputs for SubSystem: '<Root>/Limits Handler'
+      } else if (SupervisorFSM_RX_rtu_StatusRx->
+                 status[SupervisorFSM_RX_B.messageIndex - 1].current_pid) {
+        uint8_T Motorconfig_tmp;
 
-      // Selector: '<S1>/Selector2'
-      Motorconfig_tmp = SupervisorFSM_RX_rtu_MessagesRx->
-        messages[SupervisorFSM_RX_B.messageIndex - 1].current_pid.Ks;
-      SupervisorFSM_RX_B.Motorconfig.Kp = SupervisorFSM_RX_ConvertPid
-        (SupervisorFSM_RX_rtu_MessagesRx->
-         messages[SupervisorFSM_RX_B.messageIndex - 1].current_pid.Kp,
-         Motorconfig_tmp);
-      SupervisorFSM_RX_B.Motorconfig.Ki = SupervisorFSM_RX_ConvertPid
-        (SupervisorFSM_RX_rtu_MessagesRx->
-         messages[SupervisorFSM_RX_B.messageIndex - 1].current_pid.Ki,
-         Motorconfig_tmp);
-      SupervisorFSM_RX_B.Motorconfig.Kd = SupervisorFSM_RX_ConvertPid
-        (SupervisorFSM_RX_rtu_MessagesRx->
-         messages[SupervisorFSM_RX_B.messageIndex - 1].current_pid.Kd,
-         Motorconfig_tmp);
-      SupervisorFSM_RX_B.Motorconfig.Ks = Motorconfig_tmp;
-      SupervisorFSM_RX_B.hasMotorConfigChanged = true;
+        // Selector: '<S1>/Selector2'
+        Motorconfig_tmp = SupervisorFSM_RX_rtu_MessagesRx->
+          messages[SupervisorFSM_RX_B.messageIndex - 1].current_pid.Ks;
+        SupervisorFSM_RX_B.Motorconfig.Kp = SupervisorFSM_RX_ConvertPid
+          (SupervisorFSM_RX_rtu_MessagesRx->
+           messages[SupervisorFSM_RX_B.messageIndex - 1].current_pid.Kp,
+           Motorconfig_tmp);
+        SupervisorFSM_RX_B.Motorconfig.Ki = SupervisorFSM_RX_ConvertPid
+          (SupervisorFSM_RX_rtu_MessagesRx->
+           messages[SupervisorFSM_RX_B.messageIndex - 1].current_pid.Ki,
+           Motorconfig_tmp);
+        SupervisorFSM_RX_B.Motorconfig.Kd = SupervisorFSM_RX_ConvertPid
+          (SupervisorFSM_RX_rtu_MessagesRx->
+           messages[SupervisorFSM_RX_B.messageIndex - 1].current_pid.Kd,
+           Motorconfig_tmp);
+        SupervisorFSM_RX_B.Motorconfig.Ks = Motorconfig_tmp;
+        SupervisorFSM_RX_B.hasMotorConfigChanged = true;
+      }
     }
   }
 

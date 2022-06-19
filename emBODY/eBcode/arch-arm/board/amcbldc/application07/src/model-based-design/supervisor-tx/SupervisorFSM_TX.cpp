@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 4.9
+// Model version                  : 4.11
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Tue Jun  7 16:02:45 2022
+// C/C++ source code generated on : Wed Jun 15 10:21:08 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -120,22 +120,16 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
   // Chart: '<Root>/SupervisorFSM_TX'
   if (SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX == 0U) {
     SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX = 1U;
-  } else {
-    if (rtu_Flags->control_mode != ControlModes_Idle) {
-      rty_MessagesTx->foc.current = rtu_ControlOutputs->Iq_fbk.current;
-      rty_MessagesTx->foc.velocity = rtu_EstimatedData->jointvelocities.velocity;
-      rty_MessagesTx->foc.position = rtu_SensorsData->jointpositions.position;
-      SupervisorFSM_TX_DW.ev_focEventCounter++;
-    }
-
-    if (rtu_Flags->enable_sending_msg_status) {
-      rty_MessagesTx->status.control_mode = SupervisorFSM_TX_convert
-        (rtu_Flags->control_mode);
-      rty_MessagesTx->status.pwm_fbk = rtu_ControlOutputs->Vq;
-      rty_MessagesTx->status.flags.ExternalFaultAsserted =
-        rtu_Flags->fault_button;
-      SupervisorFSM_TX_DW.ev_statusEventCounter++;
-    }
+  } else if (rtu_Flags->enable_sending_msg_status) {
+    rty_MessagesTx->foc.current = rtu_ControlOutputs->Iq_fbk.current;
+    rty_MessagesTx->foc.velocity = rtu_EstimatedData->jointvelocities.velocity;
+    rty_MessagesTx->foc.position = rtu_SensorsData->jointpositions.position;
+    SupervisorFSM_TX_DW.ev_focEventCounter++;
+    rty_MessagesTx->status.control_mode = SupervisorFSM_TX_convert
+      (rtu_Flags->control_mode);
+    rty_MessagesTx->status.pwm_fbk = rtu_ControlOutputs->Vq;
+    rty_MessagesTx->status.flags.ExternalFaultAsserted = rtu_Flags->fault_button;
+    SupervisorFSM_TX_DW.ev_statusEventCounter++;
   }
 
   if (SupervisorFSM_TX_DW.ev_focEventCounter > 0U) {
