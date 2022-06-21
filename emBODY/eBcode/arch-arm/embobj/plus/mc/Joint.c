@@ -123,8 +123,8 @@ void Joint_init(Joint* o)
     
     // initialize Kalman Filter parameters
     o->kalman_filter_enabled = false;
-    memset(o->x0, 0, sizeof(float)*3);
-    memset(o->Q, 0, sizeof(float)*3);
+    memset(o->x0, 0, sizeof(o->x0));
+    memset(o->Q, 0, sizeof(o->Q));
     o->R = 0;
     o->P0 = 0;
     
@@ -191,8 +191,8 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->kalman_filter_enabled = config->kalman_params.enabled;
     if(o->kalman_filter_enabled)
     {
-            memcpy(o->x0, config->kalman_params.x0, sizeof(float)*3);
-            memcpy(o->Q, config->kalman_params.Q, sizeof(float)*3);
+            memcpy(o->x0, config->kalman_params.x0, sizeof(o->x0));
+            memcpy(o->Q, config->kalman_params.Q, sizeof(o->Q));
             o->R = config->kalman_params.R;
             o->P0 = config->kalman_params.P0;
         
