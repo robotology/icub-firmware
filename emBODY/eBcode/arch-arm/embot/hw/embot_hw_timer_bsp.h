@@ -30,7 +30,8 @@ namespace embot { namespace hw { namespace timer {
     {   
         TIM_t* TIMx {nullptr};
         TIM_Handle* handle {nullptr};  
-        embot::hw::CLOCK clock {embot::hw::CLOCK::none}; // the clock used by the timer      
+        embot::hw::CLOCK clock {embot::hw::CLOCK::none}; // the clock used by the timer
+        uint32_t speed {0};        
         bool isonepulse {false};
         bool mastermode {false};      
     };
