@@ -309,7 +309,7 @@ namespace embot { namespace hw { namespace timer {
 #else
 
 #if defined(STM32HAL_STM32H7)
-#error pls verify embot::hw::timer for STM32H7 
+//#error pls verify embot::hw::timer for STM32H7 
 #endif
 
 
@@ -351,7 +351,7 @@ namespace embot { namespace hw { namespace timer {
     {        
         // for some timers referencespeed could also be HAL_RCC_GetSysClockFreq() or HAL_RCC_GetPCLK1Freq() or HAL_RCC_GetPCLK2Freq()
         // i embed teh choice into that into embot::hw::sys::clock()
-        uint32_t referencespeed = embot::hw::sys::clock(stm32data->clock);
+        uint32_t referencespeed = (embot::hw::CLOCK::none == stm32data->clock) ? stm32data->speed : embot::hw::sys::clock(stm32data->clock);
         
         effectivetime = time;
 
@@ -429,7 +429,8 @@ namespace embot { namespace hw { namespace timer {
         #if defined(STM32HAL_STM32L4) && (STM32HAL_DRIVER_VERSION >= 0x183)
         phandletimx->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
         #elif defined(STM32HAL_STM32H7)
-        #error verify it
+        #warning TODO: verify it
+        phandletimx->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
         #endif
         
         

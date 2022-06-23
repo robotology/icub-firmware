@@ -16,6 +16,7 @@
 #include "embot_hw_led.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_can.h"
+#include "embot_hw_timer.h"
 
 
 #include "embot_os_theScheduler.h"
@@ -47,6 +48,8 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 //#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1_BURST
 //#define TEST_EMBOT_HW_CAN_gateway_CAN2toCAN1
 //#define TEST_EMBOT_HW_CAN_gateway_CAN1toCAN2
+
+//# define TEST_EMBOT_HW_TIMER
 
 void test_embot_hw_init();
 void test_embot_hw_tick();
@@ -302,7 +305,7 @@ void tMAIN(void *p)
     t->run();
 }
 
-
+// entry point (first running thread)
 void initSystem(embot::os::Thread *t, void* initparam)
 {
     volatile uint32_t cpufreq = embot::hw::sys::clock(embot::hw::CLOCK::syscore);
@@ -313,6 +316,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     
     embot::core::print("INIT: creating the system services: timer manager + callback manager");
     
+    // start the services with default params
     embot::os::theTimerManager::getInstance().start({});     
     embot::os::theCallbackManager::getInstance().start({});  
                     
@@ -454,8 +458,91 @@ void done3(void* p)
     embot::core::print("SPI::three cbk called");
 }
 
+// ---------------------------------------------------------------------------------------------
+
+static std::uint8_t on = 0;
+constexpr embot::os::Event evtTIM_HW = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
+void timer_cbk(void* p)
+{
+    embot::os::EventThread* thr = reinterpret_cast<embot::os::EventThread*>(p);
+    thr->setEvent(evtTIM_HW);
+}
+
+void toggleLED(void*)
+{
+    if(0 == on)
+    {
+        embot::hw::led::off(embot::hw::LED::five); 
+        on = 1;
+    }
+    else 
+    {
+        embot::hw::led::on(embot::hw::LED::five);
+        on = 0;
+    }    
+//    embot::hw::chip::testof_AS5045();
+}
+
+void tim_hw_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
+{
+    if( eventmask == evtTIM_HW)
+    {
+        toggleLED(nullptr);
+    }
+}
+
+
+void tTIMTEST(void *p)
+{
+    embot::os::Thread* t = reinterpret_cast<embot::os::Thread*>(p);
+    t->run();
+}
+
 void test_embot_hw_init()
 {
+#if defined(TEST_EMBOT_HW_TIMER)
+    
+    embot::hw::led::init(embot::hw::LED::five);
+    
+    // 1. Configure and create a thread that will toggle the LED when the event evtTIM_HW is set. 
+    embot::core::print("Creating a thread that manages the timer callback.");
+    
+    embot::os::EventThread::Config configEV { 
+        6*1024, 
+        embot::os::Priority::high40, 
+        nullptr,
+        nullptr,
+        embot::core::reltimeWaitForever,
+        tim_hw_onevent,
+        "timThreadEvt"
+    };
+    
+    embot::os::EventThread *thr {nullptr};
+    thr = new embot::os::EventThread;          
+    thr->start(configEV, tTIMTEST);
+    
+    // 2. Create and initialize the timer with the callback defined above
+    embot::core::Callback tim_hw_cbk { timer_cbk, thr };
+    
+    constexpr embot::core::relTime period {embot::core::time1millisec  * 1};
+//    constexpr embot::core::relTime period {embot::core::time1microsec  * 50};
+//    constexpr embot::core::relTime period {embot::core::time1millisec  * 1000};
+
+    embot::hw::timer::Config timerConfig {
+        period,
+        embot::hw::timer::Mode::periodic, 
+        tim_hw_cbk,
+    };
+    
+    constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::thirteen};
+    //constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::fifteen};
+    //constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::sixteen};
+    embot::hw::timer::init(timer2test, timerConfig);
+
+    // 3. Start the timer
+    embot::hw::timer::start(timer2test);
+#endif
+    
 #if defined(TEST_EMBOT_HW_FLASH)
     
 
