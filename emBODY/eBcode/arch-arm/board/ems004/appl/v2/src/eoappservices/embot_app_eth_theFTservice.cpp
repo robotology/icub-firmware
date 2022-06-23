@@ -279,6 +279,7 @@ constexpr eOservice_core_t dummy_service_core
     .activateafterverify = eobool_false,
     .started = eobool_false,
     .onverify = nullptr,
+    .onverifyarg = nullptr,
     .state = eomn_serv_state_notsupported,
     .tmpcfg = nullptr,
     .servconfig = { .type = eomn_serv_NONE }
@@ -350,6 +351,7 @@ struct embot::app::eth::theFTservice::Impl
     eOresult_t SendReport();   
     eOresult_t Verify(const eOmn_serv_configuration_t * servcfg, 
                 eOservice_onendofoperation_fun_t onverify, 
+                void *arg,
                 bool activateafterverify);
     eOresult_t Activate(const eOmn_serv_configuration_t * servcfg);
     eOresult_t Deactivate();  
@@ -388,6 +390,7 @@ private:
     // step3: if query is OK we activate and send reply back to yarprobotinterface. if KO just reply back.
     eOresult_t verifyingstate_step1_discovery(const eOmn_serv_configuration_t * servcfg, 
                                               eOservice_onendofoperation_fun_t onverify, 
+                                              void *arg,
                                               bool activateafterverify);
     static eOresult_t s_verifyingstate_step2_onstop_search_for_ft_boards_we_get_fullscale(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok);
     static void s_verifyingstate_step3_onFSqueryOK(void *par);
@@ -491,7 +494,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::SendReport()
 
 
 eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configuration_t * servcfg, 
-                eOservice_onendofoperation_fun_t onverify, 
+                eOservice_onendofoperation_fun_t onverify,
+                void *arg,
                 bool activateafterverify)
 {
     
@@ -504,7 +508,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
 
         if(NULL != onverify)
         {
-            onverify(nullptr, eobool_false); 
+            onverify(arg, eobool_false); 
         }                 
         return(eores_NOK_nullpointer);
     }  
@@ -516,7 +520,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
 
         if(NULL != onverify)
         {
-            onverify(nullptr, eobool_false); 
+            onverify(arg, eobool_false); 
         }          
         return(eores_NOK_generic);
     } 
@@ -533,6 +537,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
     eo_timer_Stop(diagnostics.reportTimer);  
     
     service.onverify = onverify;
+    service.onverifyarg = arg;
     service.activateafterverify = activateafterverify;
     
     
@@ -559,7 +564,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
 
         if(NULL != onverify)
         {
-            onverify(nullptr, eobool_false); 
+            onverify(arg, eobool_false); 
         }          
         return(eores_NOK_generic);
     }
@@ -579,7 +584,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
            
             if(NULL != onverify)
             {
-                onverify(nullptr, eobool_false); 
+                onverify(arg, eobool_false); 
             }          
             return(eores_NOK_generic);            
         }
@@ -592,7 +597,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
 
     // C. preparation and launch of verifying step 1: the discovery of the CAN boards
     
-    eOresult_t res = verifyingstate_step1_discovery(servcfg, onverify, activateafterverify);
+    eOresult_t res = verifyingstate_step1_discovery(servcfg, onverify, arg, activateafterverify);
     
     
     // D. we return. the rest of operations required by verify-activate will be done by the callback manager
@@ -852,10 +857,32 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
     // we accept can frames only if we are activated.
     // the only exception is for fullscales.
     
-    if(canFrameDescriptor::Type::fullscale == cfd.type)
+    canFrameDescriptor::Type type = cfd.type;
+    
+    #warning process also Type::autodetect 
+    if(canFrameDescriptor::Type::autodetect == type)
+    {
+        // eval the frame->id and frame->data[0]
+        if(3 == cfd.frame->data[0])
+        {
+           type = canFrameDescriptor::Type::fullscale; 
+        }
+        else if(4 == (cfd.frame->id & 0xf))
+        {
+            type = canFrameDescriptor::Type::force; 
+        }
+        else if(5 == (cfd.frame->id & 0xf))
+        {
+            type = canFrameDescriptor::Type::torque; 
+        }        
+    }
+    
+    if(canFrameDescriptor::Type::fullscale == type)
     {
         return can_forcetorque_processfullscale(cfd);
     }
+    
+    
     
     // object must be first activated otherwise we cannot use EOtheCANmapping, theFTnetvariables, theFTboards  
     if(eobool_false == service.active)
@@ -883,12 +910,12 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
         return eores_NOK_generic;
     }
     
-    switch(cfd.type)
+    switch(type)
     {
         case canFrameDescriptor::Type::force:
         case canFrameDescriptor::Type::torque:
         {
-            uint8_t offset = (canFrameDescriptor::Type::force == cfd.type) ? 0 : 3;            
+            uint8_t offset = (canFrameDescriptor::Type::force == type) ? 0 : 3;            
             for(uint8_t i=0; i<3; i++)
             {
                 float32_t vv = (static_cast<uint16_t>(cfd.frame->data[2*i+1]) << 8) + static_cast<uint16_t>(cfd.frame->data[2*i]) - static_cast<uint16_t>(0x8000);
@@ -1197,6 +1224,7 @@ bool embot::app::eth::theFTservice::Impl::enable(eOprotIndex_t index, const uint
 eOresult_t embot::app::eth::theFTservice::Impl::verifyingstate_step1_discovery(
                 const eOmn_serv_configuration_t * servcfg,
                 eOservice_onendofoperation_fun_t onverify, 
+                void *arg,
                 bool activateafterverify)
 {
     EOconstarray *carray = eo_constarray_Load(reinterpret_cast<const EOarray*>(&servcfg->data.as.ft.arrayofsensors));    
@@ -1243,7 +1271,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::verifyingstate_step1_discovery(
         synchservice(service.state);     
         if(NULL != onverify)
         {
-            onverify(nullptr, eobool_false); 
+            onverify(arg, eobool_false); 
         }          
         return(eores_NOK_generic);
     }
@@ -1316,8 +1344,8 @@ eOresult_t embot::app::eth::theFTservice::Impl::s_verifyingstate_step2_onstop_se
      
         // call onverify
         if(NULL != p->service.onverify)
-        {
-            p->service.onverify(p, eobool_false); 
+        { 
+            p->service.onverify(p->service.onverifyarg, eobool_false);            
         }
         
     }
@@ -1516,7 +1544,7 @@ void embot::app::eth::theFTservice::Impl::s_verifyingstate_step3_onFSqueryOK(voi
          
     if(NULL != p->service.onverify)
     {
-        p->service.onverify(nullptr, eobool_true); 
+        p->service.onverify(p->service.onverifyarg, eobool_true); 
     }     
     
 }
@@ -1552,7 +1580,7 @@ void embot::app::eth::theFTservice::Impl::s_verifyingstate_step3_onFSqueryTIMEOU
           
     if(NULL != p->service.onverify)
     {
-        p->service.onverify(nullptr, eobool_false); 
+        p->service.onverify(p->service.onverifyarg, eobool_false); 
     }      
 }
 
@@ -1844,9 +1872,10 @@ eOresult_t embot::app::eth::theFTservice::SendReport()
 
 eOresult_t embot::app::eth::theFTservice::Verify(const eOmn_serv_configuration_t * servcfg, 
                                                     eOservice_onendofoperation_fun_t onverify, 
+                                                    void *arg,
                                                     bool activateafterverify)
 {
-    return pImpl->Verify(servcfg, onverify, activateafterverify); 
+    return pImpl->Verify(servcfg, onverify, arg, activateafterverify); 
 }
 
 eOmn_serv_state_t embot::app::eth::theFTservice::GetServiceState() const

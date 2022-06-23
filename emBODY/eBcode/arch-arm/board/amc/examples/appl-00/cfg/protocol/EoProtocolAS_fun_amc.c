@@ -1,26 +1,10 @@
-/*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero
- * email:   valentina.gaggero@iit.it
- * website: www.robotcub.org
- * Permission is granted to copy, distribute, and/or modify this program
- * under the terms of the GNU General Public License, version 2 or any
- * later version published by the Free Software Foundation.
- *
- * A copy of the license can be found at
- * http://www.robotcub.org/icub/license/gpl.txt
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details
-*/
 
-/* @file       EoProtocolAS_fun_ems4rd.c
-    @brief      This file keeps the user-defined functions used in every ems board ebx for endpoint as
-    @author     valentina.gaggero@iit.it
-    @date       06/11/2012
-**/
+
+/*
+ * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+*/
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -30,38 +14,36 @@
 #include "stdlib.h" 
 #include "string.h"
 #include "stdio.h"
-#include "hal.h"
 
 #include "EoCommon.h"
 #include "EOarray.h"
 
 #include "EoAnalogSensors.h"
 
-
-#include "EOMtheEMSappl.h"
-
 #include "EOtheCANservice.h"
-
-
 #include "EoProtocol.h"
-
 #include "EoProtocolAS.h"
 
 
-#include "EOtheEntities.h"
+//#include "EOtheEntities.h"
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
 
-#include "EOtheMAIS.h"
-#include "EOtheSTRAIN.h"
-#include "EOtheInertials2.h"
-#include "EOtheInertials3.h"
-#include "EOtheTemperatures.h"
-#include "EOthePSC.h"
-#include "EOthePOS.h"
+#if defined(USE_EMBOT_theServices)
+#include "embot_app_eth_theServices.h"
+#else
+#include "EOtheServices.h"
+#endif
 
-#include "EOMtheEMStransceiver.h"
+#if defined(USE_EMBOT_theHandler)
+#include "theApplication_config.h"
+#include "theHandler_Config.h"
+#include "embot_app_eth_theHandler.h"
+#else
+#include "EOMtheEMSappl.h"
+#include "EOMtheEMSapplCfg.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -111,34 +93,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
-
-extern void eoprot_fun_UPDT_as_mais_config(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    eOas_mais_config_t *cfg = (eOas_mais_config_t*)rd->data;    
-    eo_mais_Set(eo_mais_GetHandle(), cfg);
-}
-
-
-extern void eoprot_fun_UPDT_as_mais_config_mode(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    eOas_maismode_t *maismode = (eOas_maismode_t*)rd->data;
-    eo_mais_SetMode(eo_mais_GetHandle(), *maismode);
-}
-
-
-extern void eoprot_fun_UPDT_as_mais_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    uint8_t *datarate = (uint8_t*)rd->data;
-    eo_mais_SetDataRate(eo_mais_GetHandle(), *datarate);
-}
-
-
-extern void eoprot_fun_UPDT_as_mais_config_resolution(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    eOas_maisresolution_t *resolution = (eOas_maisresolution_t*)rd->data;    
-    eo_mais_SetResolution(eo_mais_GetHandle(), *resolution);  
-}
 
 
 extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescriptor_t* rd)

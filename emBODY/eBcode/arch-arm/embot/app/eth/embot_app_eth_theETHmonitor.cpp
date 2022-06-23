@@ -29,16 +29,23 @@ struct embot::app::eth::theETHmonitor::Impl
     Config _config {};
     bool _initted {false};
     
-    embot::os::PeriodicThread *thr {nullptr};
+    embot::os::PeriodicThread *_thr {nullptr};
 
-//    embot::os::rtos::mutex_t *mtx {nullptr};
+    embot::os::rtos::mutex_t *_mtx {nullptr};
         
     Impl() = default;      
     
     bool initialise(const Config &config);   
+    
+    bool set(const embot::core::Callback &tkr);
+    bool tick();
+    
 
     static void startup(embot::os::Thread *t, void *p);  
-    static void onperiod(embot::os::Thread *t, void *p);    
+    static void onperiod(embot::os::Thread *t, void *p);  
+
+private:
+    bool ticker();        
 };
 
 
@@ -63,7 +70,7 @@ bool embot::app::eth::theETHmonitor::Impl::initialise(const Config &config)
     
  
     // create the mutex
-//    mtx = embot::os::rtos::mutex_new();
+    _mtx = embot::os::rtos::mutex_new();
     
     constexpr embot::core::relTime timeout {1000*embot::core::time1millisec};
 
@@ -78,15 +85,40 @@ bool embot::app::eth::theETHmonitor::Impl::initialise(const Config &config)
        
         
     // create the periodic thread 
-    thr = new embot::os::PeriodicThread;          
+    _thr = new embot::os::PeriodicThread;          
     // and start it
-    thr->start(tCfg, tETHmon);
+    _thr->start(tCfg, tETHmon);
     
     _initted = true;
     return true;
 }
 
+bool embot::app::eth::theETHmonitor::Impl::set(const embot::core::Callback &ticker)
+{
+    embot::os::rtos::mutex_take(_mtx, embot::core::reltimeWaitForever);
+    _config.ticker = ticker;
+    embot::os::rtos::mutex_release(_mtx);  
+    return true;
+}
 
+bool embot::app::eth::theETHmonitor::Impl::ticker()
+{
+    embot::os::rtos::mutex_take(_mtx, embot::core::reltimeWaitForever);
+    _config.ticker.execute();
+    embot::os::rtos::mutex_release(_mtx);  
+    return true;
+}
+
+
+bool embot::app::eth::theETHmonitor::Impl::tick()
+{
+    // in here we check if .... we have any data to put into the error manager
+    return true;
+}
+
+
+
+// the static ones 
 
 void embot::app::eth::theETHmonitor::Impl::startup(embot::os::Thread *t, void *p)
 {
@@ -129,7 +161,16 @@ bool embot::app::eth::theETHmonitor::initialise(const Config &config)
 }
 
 
+bool embot::app::eth::theETHmonitor::set(const embot::core::Callback &ticker)
+{
+    return pImpl->set(ticker);
+}
 
+
+bool embot::app::eth::theETHmonitor::tick()
+{
+    return pImpl->tick();
+}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

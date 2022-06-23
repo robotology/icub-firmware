@@ -55,19 +55,20 @@ namespace embot { namespace app { namespace eth {
         
         struct canFrameDescriptor
         {
-            enum class Type : uint8_t { unspecified, fullscale, force, torque, temperature };
+            enum class Type : uint8_t { unspecified = 0, fullscale = 1, force = 2, torque = 3, temperature = 4, autodetect = 5};
             eOcanport_t port {eOcanport1};
             eOcanframe_t *frame {nullptr};
             Type type {Type::unspecified};            
             canFrameDescriptor() = default;            
-            canFrameDescriptor(eOcanport_t p, eOcanframe_t *f, Type t) : port(p), frame(f), type(t) {};
+            canFrameDescriptor(eOcanport_t p, eOcanframe_t *f, Type t = Type::unspecified) : port(p), frame(f), type(t) {};
         };       
         
         eOresult_t initialise(const Config &config);  
 
         eOmn_serv_state_t GetServiceState() const;        
         eOresult_t Verify(const eOmn_serv_configuration_t * servcfg, 
-                          eOservice_onendofoperation_fun_t onverify, 
+                          eOservice_onendofoperation_fun_t onverify,
+                          void *arg,        
                           bool activateafterverify);         
         eOresult_t Activate(const eOmn_serv_configuration_t * servcfg);           
         eOresult_t Deactivate();        

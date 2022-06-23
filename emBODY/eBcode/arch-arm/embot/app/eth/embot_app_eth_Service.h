@@ -52,11 +52,22 @@ namespace embot { namespace app { namespace eth {
         // pure interface
         public:
         
-        using fpOnEndOfOperation = bool (*)(void *caller, Service *s, eOmn_serv_configuration_t *sc, bool operationisok);
+        using fpOnEndOfOperation = bool (*)(Service *s, const eOmn_serv_configuration_t *sc, bool operationisok);
         
         enum class Category : uint8_t { // the same values as eOmn_serv_category_t
-            mc = 0, ft = 9, test = 200, none = 255 
+            mc = 0, strain = 1, mais = 2, inertials = 3, skin = 4, inertials3 = 5,
+            temperatures = 6, psc = 7, pos = 8, ft = 9, 
+            all = 128, test = 200, unknown = 254, none = 255 
         };
+        static constexpr uint8_t numberOfCategories {10}; 
+        
+        enum class Type : uint8_t { // the same values as eOmn_serv_type_t
+            MC_foc = 1, MC_mc4plus = 3, 
+            AS_ft = 17, 
+            unknown = 254, none = 255 
+        };
+        static constexpr uint8_t numberOfTypes {18};
+
         
         enum class State : uint8_t { // the same values of eOmn_serv_state_t 
             notsupported = 0, idle = 1, verifying = 2, verified = 3, activated = 4, 
@@ -67,8 +78,9 @@ namespace embot { namespace app { namespace eth {
         virtual Category category() const = 0;
         
         virtual State state() const = 0;
+        virtual void set(State s) = 0;
         //virtual bool Verify(const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, bool activateafterverify) = 0;
-        virtual bool verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation, void *caller) = 0;
+        virtual bool verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation) = 0;
         virtual bool activate(const eOmn_serv_configuration_t * servcfg) = 0;
         virtual bool deactivate() = 0; //const eOmn_serv_configuration_t * servcfg) = 0;
         virtual bool start() = 0;

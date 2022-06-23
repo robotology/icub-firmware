@@ -34,7 +34,7 @@ namespace embot { namespace os {
         
         // types used by all derived Thread classes
     
-        enum class Type : std::uint8_t { undefined = 0, eventTrigger = 1, messageTrigger = 3, callbackTrigger = 4, periodicTrigger = 5, valueTrigger = 6, Init = 100, Idle = 101 };
+        enum class Type : std::uint8_t { undefined = 0, eventTrigger = 1, messageTrigger = 3, callbackTrigger = 4, periodicTrigger = 5, valueTrigger = 6, multieventTrigger = 7, Init = 100, Idle = 101 };
                                 
         using fpStartup = void (*)(Thread *, void *);
         using fpOnIdle = void (*)(Thread *, void *);
@@ -216,7 +216,52 @@ namespace embot { namespace os {
         Impl *pImpl;           
     };
     
-     
+    
+    class MultiEventThread: public Thread
+    {
+    public:
+        
+    struct Config : public EventThread::Config
+        {            
+            static constexpr embot::os::EventMask maskofallevents {0x7fffffff}; 
+            embot::os::EventWaitMode waitmode {embot::os::EventWaitMode::ANY};
+            embot::os::EventMask waitmask {maskofallevents};
+
+            Config() = default;
+            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, 
+                             core::relTime ti, Thread::fpOnEvent fpon, 
+                             embot::os::EventWaitMode mo = embot::os::EventWaitMode::ANY, embot::os::EventMask wm = maskofallevents, const char * name = nullptr) 
+                             : EventThread::Config(st, pr, fpst, pa, ti, fpon, name), waitmode(mo), waitmask(wm) {}            
+            bool isvalid() const
+            {   // onevent cannot be nullptr
+                if((nullptr == onevent)) { return false; }  
+                else { return BaseConfig::isvalid(); }
+            }            
+            
+        };
+                    
+        MultiEventThread();
+        virtual ~MultiEventThread();
+    
+        virtual Type getType() const;
+        virtual Priority getPriority() const;
+        virtual bool setPriority(Priority priority);
+        virtual const char * getName() const;
+        
+        virtual bool setEvent(os::Event event);  
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
+                 
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
+        virtual void run();    
+
+    private:        
+        struct Impl;
+        Impl *pImpl;           
+    };
+
+    
     class MessageThread: public Thread
     {
     public:  

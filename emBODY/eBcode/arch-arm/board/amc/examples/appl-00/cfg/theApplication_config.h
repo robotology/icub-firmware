@@ -42,9 +42,9 @@ namespace embot { namespace app { namespace eth {
             {2022, Month::Apr, Day::fourteen, 15, 16}
         },
         .OStick = 1000*embot::core::time1microsec,
-        .OSstacksizeinit = 6*1024,
+        .OSstacksizeinit = 10*1024,
         .OSuserdefinit = {theApplication_Config_inituserdefined, nullptr},
-        .OSstacksizeidle = 2*1024,
+        .OSstacksizeidle = 4*1024,
         .OSonidle = theApplication_Config_onIdle,
         .TMRMANconfig = {1024, 8, embot::os::Priority::system50},
         .CBKMANconfig = {2*1024, 8, embot::os::Priority::system49},

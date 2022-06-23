@@ -22,6 +22,8 @@ namespace embot { namespace os {
     using Message = void *;             
     using Value = uint32_t;             
     class Thread;    
+    
+    enum class EventWaitMode : uint8_t { ALL = 0, ANY = 1 };
   
     // this enum class uses the same values as osPriority_t: {0, 1, 8 -> 55}
     enum class Priority : std::uint8_t {

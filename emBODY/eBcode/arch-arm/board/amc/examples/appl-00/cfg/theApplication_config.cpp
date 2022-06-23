@@ -10,7 +10,7 @@
 
 #include "theApplication_config.h"
 
-#define REDIRECT_ERRORMANAGER_OVER_BACKDOOR
+//#define REDIRECT_ERRORMANAGER_OVER_BACKDOOR
 
 #include "embot_app_eth_theBackdoor.h"
 

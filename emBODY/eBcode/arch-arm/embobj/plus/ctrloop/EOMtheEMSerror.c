@@ -213,6 +213,11 @@ extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, c
     // thus, i have removed the EO_weak keyword so that if anybody has defined it elsewhere the linker gives error.
 }
 
+EO_weak extern void eom_emserror_hid_userdef_OnRXuserdefevent(eOemserror_event_t evt)
+{
+    
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -316,6 +321,16 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
             eo_timer_Start(s_emserror_singleton.timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_FOREVER, act);         
         }
     }
+    
+    if(eobool_true == eo_common_event_check(evt, emserror_evt_userdef01))
+    {
+        eom_emserror_hid_userdef_OnRXuserdefevent(emserror_evt_userdef01);
+    }  
+    
+    if(eobool_true == eo_common_event_check(evt, emserror_evt_userdef02))
+    {
+        eom_emserror_hid_userdef_OnRXuserdefevent(emserror_evt_userdef02);
+    }     
 }
 
 

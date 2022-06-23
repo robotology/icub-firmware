@@ -29,6 +29,8 @@
 
 #if defined(USE_EMBOT_theHandler)
 #include "embot_app_eth_theHandler.h"
+#include "embot_app_eth_theErrorManager.h"
+#include "embot_os_theScheduler.h"
 #else
 #include "EOMtheEMSappl.h"
 #endif
@@ -89,7 +91,6 @@ const eOemsconfigurator_cfg_t eom_emsconfigurator_DefaultCfg =
 extern void usrDef_CFGRecRopframe(void);
 #endif
 
-extern void tskEMScfg(void *p);
 
 static void s_eom_emsconfigurator_task_startup(EOMtask *p, uint32_t t);
 static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t);
@@ -208,7 +209,7 @@ extern eOresult_t eom_emsconfigurator_GracefulStopAndGoTo(EOMtheEMSconfigurator 
 extern void usrDef_CFGRecRopframe(void){}
 #endif
 
-extern void tskEMScfg(void *p)
+void tskEMScfg(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
     eom_task_Start((EOMtask*)p);
@@ -352,6 +353,10 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         if(eores_OK == res)
         {
 
+#if defined(USE_EMBOT_theHandler)
+            embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::info, {s_eobj_ownname, thr}, {}, "RX a frame");    
+#endif 
             #if defined(EVIEWER_ENABLED)    
             evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_CFGRecRopframe);
             #endif

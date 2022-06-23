@@ -68,6 +68,7 @@ struct EOMtheEMSerror_hid
 
 extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt);
 
+extern void eom_emserror_hid_userdef_OnRXuserdefevent(eOemserror_event_t evt);
 
 
 #ifdef __cplusplus

@@ -33,21 +33,37 @@
 
 struct embot::app::eth::theServices::Impl
 {       
-    Config config {};  
-    EOnvSet* nvset {nullptr};   
-    eOmn_service_t *mnservice {nullptr};    
+    Config _config {};  
+    EOnvSet* _nvset {nullptr};   
+    eOmn_service_t *_mnservice {nullptr};
+    std::array<bool, Service::numberOfCategories> _running {false};     
+    
+    // i need a map of objects Service w/ a key given by the Service::Category
+    
+    std::array<Service *, Service::numberOfCategories> _mapfofservices {nullptr};   
 
     Impl(); 
     
-    bool initialise(const Config &cfg);    
+    bool initialise(const Config &cfg);   
 
+    bool load(embot::app::eth::Service *s);    
+    
+    embot::app::eth::Service* get(embot::app::eth::Service::Category cat);
+    embot::app::eth::Service* get(const eOmn_service_cmmnds_command_t *command);
+    
     bool process(eOmn_service_cmmnds_command_t *command);
-    embot::app::eth::Service* get(Service::Category cat); 
-
-    static bool onendverifyactivate(void *caller, Service *s, eOmn_serv_configuration_t *sc, bool ok);
     
     bool setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);
     bool synch(Service::Category category, Service::State state);
+    
+    bool stop();
+    bool tick();
+    
+    bool sendresult(Service *s, const eOmn_service_cmmnds_command_t *command, eOmn_serv_state_t state, bool ok); 
+    
+    // statics
+    static bool onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok);
+
 };
 
 embot::app::eth::theServices::Impl::Impl()
@@ -56,54 +72,44 @@ embot::app::eth::theServices::Impl::Impl()
 
 bool embot::app::eth::theServices::Impl::initialise(const Config &cfg)
 {
-    config = cfg;    
-    nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
-    mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
+    _config = cfg;    
+    _nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+    _mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
+    
+    for(auto &s : _mapfofservices) { s = nullptr; }
+    for(auto &r : _running) { r = false; }
     
     return true;
 } 
 
-
-bool embot::app::eth::theServices::Impl::onendverifyactivate(void *caller, Service *s, eOmn_serv_configuration_t *sc, bool ok)
-{
-    if(false == ok)
+bool embot::app::eth::theServices::Impl::load(Service *s)
+{   
+    embot::app::eth::Service::Category c = s->category();
+    auto index = embot::core::tointegral(c);
+    if(index >= embot::app::eth::Service::numberOfCategories)
     {
-        s->report();
-        s->deactivate();
+        return false;
     }
-    
-    // now i must send back a rop w/ the result of the request
-    // i need
-    eOmn_serv_category_t category {};
-    eOmn_serv_type_t type {};    
+    _mapfofservices[index] = s;
         
-    Impl *impl = reinterpret_cast<Impl*>(caller);
-    // mnservice can be retrieved w/ ...
-    // mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
-    impl->mnservice->status.commandresult.category = category;
-    impl->mnservice->status.commandresult.operation = eomn_serv_operation_verifyactivate;
-    impl->mnservice->status.commandresult.type = type;   
-
-    impl->mnservice->status.commandresult.latestcommandisok = ok ? eobool_true : eobool_false;    
-    impl->mnservice->status.commandresult.data[0] = ok ? eomn_serv_state_activated: eomn_serv_state_failureofverify;        
-    
-//    transmit_rop();  
-
-    eOropdescriptor_t ropdesc {};
-
-    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
-    ropdesc.ropcode = eo_ropcode_sig;
-    ropdesc.id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_service, 0, eoprot_tag_mn_service_status_commandresult);
-    ropdesc.data = nullptr; // so that data from the EOnv is retrieved (which is: p->mnservice->status.commandresult)          
-
-    embot::app::eth::theHandler::getInstance().transmit(ropdesc);
-        
-
-    #warning caller may be removed ...        
-    
     return true;
+} 
+
+embot::app::eth::Service* embot::app::eth::theServices::Impl::get(Service::Category cat)
+{
+    auto index = embot::core::tointegral(cat);
+    if(index >= embot::app::eth::Service::numberOfCategories)
+    {
+        return nullptr;
+    }
+    return _mapfofservices[index];
 }
 
+embot::app::eth::Service* embot::app::eth::theServices::Impl::get(const eOmn_service_cmmnds_command_t *command)
+{
+    embot::app::eth::Service::Category cat = static_cast<embot::app::eth::Service::Category>(command->category);
+    return get(cat);
+}
 
 bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *command)
 {
@@ -113,9 +119,9 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
     }
        
     eOmn_serv_operation_t operation = (eOmn_serv_operation_t)command->operation;
-    eOmn_serv_category_t category = (eOmn_serv_category_t)command->category;
+    eOmn_serv_category_t category = static_cast<eOmn_serv_category_t>(command->category);
     const eOmn_serv_configuration_t *config = &command->parameter.configuration;
-    eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;
+    //eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;
     
     embot::app::eth::Service::Category cat = static_cast<embot::app::eth::Service::Category>(command->category);
     
@@ -123,22 +129,49 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
     // else if it is category_all and we have stop or deactivate we go on   
     // else .... no good
     
-    #warning terminate_all();
+    if((embot::app::eth::Service::Category::all == cat) && (eomn_serv_operation_stop == operation))
+    {
+        stop();        
+        sendresult(nullptr, command, eomn_serv_state_idle, true);
+        return true;
+    }
+    
+    
+    #if 0
+    
+    theftserv = new FTService;
+    theftserv->init();
+    theservices.load(theftserv);
+    
+    Service srv* theServices.get(FTcategory);
+    
+    srv->verify(arg) etc
+    but also
+    tehservices.verify(arg) ???
+    
+    sicuramente 
+    theservices.stop() ferma tutto
+    
+    
+    #endif
 
     embot::app::eth::Service *service = embot::app::eth::get(cat);
     if(nullptr == service)
     {   // category not supported or not available yet
-        // send up ROP w/ failure 
+        #warning TODO: send up ROP w/ failure 
+        sendresult(nullptr, command, eomn_serv_state_notsupported, false);
         return false;
     }
+    
+    eOmn_serv_state_t servstate = static_cast<eOmn_serv_state_t>(_mnservice->status.stateofservice[category]); 
     
     switch(operation)
     {
         case eomn_serv_operation_verifyactivate:
         {
-
-            service->verify(config, true, onendverifyactivate, this);
-//            s_eo_services_process_verifyactivate(category, config);            
+            service->verify(config, true, onendverifyactivate);
+            // we dont send any result. the callback onendverifyactivate() will do it.
+            // for reference it was: s_eo_services_process_verifyactivate(category, config);            
         } break;
         
         case eomn_serv_operation_start:
@@ -148,8 +181,26 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
             // send in RUN mode, 
             // send ROP w/ ok
             
+            // if state is not OK (it must be either started or activated) send error up
+            // else start the service, put in RUN mode and finally send ok up
+            if((eomn_serv_state_started != servstate) && (eomn_serv_state_activated != servstate))
+            {
+                sendresult(service, command, servstate, false);
+            }
+            else
+            {
+                bool ok = service->start();
+                if(ok)
+                {
+                    _running[category] = true;
+                    embot::app::eth::theHandler::getInstance().process(embot::app::eth::theHandler::Command::go2RUN);                        
+                } 
+                servstate = static_cast<eOmn_serv_state_t>(_mnservice->status.stateofservice[category]);                
+                sendresult(service, command, servstate, ok);                
+            }            
+            
 //            service->Start();
- //           s_eo_services_process_start(category);
+            // for reference it was: s_eo_services_process_start(category);
         } break;
         
         case eomn_serv_operation_stop:
@@ -159,26 +210,61 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
             // if none is running send in IDLE mode, 
             // send ROP w/ ok            
 //            s_eo_services_process_stop(category, eobool_true);
+            
+            service->stop();
+            _running[category] = false;
+            uint8_t num {0};
+            service->setregulars(nullptr, num);
+            service->deactivate();                                       
+            bool noserviceisrunning {true};
+            for(auto r : _running) { if(r) noserviceisrunning = false; }
+            if(true == noserviceisrunning)
+            {
+                embot::app::eth::theHandler::getInstance().process(embot::app::eth::theHandler::Command::go2IDLE);
+            }
+            // needed again             
+            servstate = static_cast<eOmn_serv_state_t>(_mnservice->status.stateofservice[category]);              
+            sendresult(service, command, servstate, true);                 
         } break;
         
         case eomn_serv_operation_deactivate:
-        {           
-//            s_eo_services_process_deactivate(category);
+        { 
+            service->deactivate();   
+            bool noserviceisrunning {true};
+            for(auto r : _running) { if(r) noserviceisrunning = false; }
+            if(true == noserviceisrunning)
+            {
+                embot::app::eth::theHandler::getInstance().process(embot::app::eth::theHandler::Command::go2IDLE);
+            } 
+            // needed again            
+            servstate = static_cast<eOmn_serv_state_t>(_mnservice->status.stateofservice[category]);              
+            sendresult(service, command, servstate, true);             
+            // for reference: s_eo_services_process_deactivate(category);
         } break;        
         
         case eomn_serv_operation_regsig_load:
-        {          
-//            s_eo_services_process_regsig(category, arrayofid32);
+        {
+            eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;  
+            uint8_t num {0};
+            service->setregulars(arrayofid32, num);   
+            servstate = static_cast<eOmn_serv_state_t>(_mnservice->status.stateofservice[category]);            
+            sendresult(service, command, servstate, true);              
+            // for reference: eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;            
+            // s_eo_services_process_regsig(category, arrayofid32);
         } break;        
 
         case eomn_serv_operation_regsig_clear:
-        {           
-//            s_eo_services_process_regsig(category, NULL);
+        {      
+            uint8_t num {0};
+            service->setregulars(nullptr, num);
+            servstate = static_cast<eOmn_serv_state_t>(_mnservice->status.stateofservice[category]);            
+            sendresult(service, command, servstate, true);            
+            // for reference: s_eo_services_process_regsig(category, NULL);
         } break;  
         
         default:
         {
-//            s_eo_services_process_failure(operation, category);
+            sendresult(service, command, eomn_serv_state_idle, false);
         } break;
         
     }    
@@ -186,12 +272,6 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
     return true;
 }
 
-embot::app::eth::Service* embot::app::eth::theServices::Impl::get(Service::Category cat)
-{
-    #warning TBD
-    return nullptr;
-   
-}
 
 bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
 {
@@ -286,9 +366,162 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
 
 bool embot::app::eth::theServices::Impl::synch(Service::Category category, Service::State state)
 {
-    #warning TBD
+    auto index = embot::core::tointegral(category);
+    if(index >= Service::numberOfCategories)
+    {
+        return false;
+    }
+    
+    _mnservice->status.stateofservice[index] = embot::core::tointegral(state);
+    Service *s = get(category);
+    if(nullptr != s)
+    {
+        s->set(state);
+    }
+    
     return true;
 }
+
+//extern eOresult_t eo_service_hid_SynchServiceState(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_state_t servstate)
+//{
+//    if(NULL == p)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }   
+//    
+//    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category) || (eomn_serv_category_unknown == category))
+//    {
+//        return(eores_NOK_generic);
+//    }
+//    
+//    p->mnservice->status.stateofservice[category] = servstate;
+//    
+//    return(eores_OK);
+//}
+
+
+bool embot::app::eth::theServices::Impl::stop()
+{
+    for(auto &s : _mapfofservices) 
+    { 
+        if(nullptr != s)
+        {
+            s->stop();
+            uint8_t num {0};
+            s->setregulars(nullptr, num);
+            s->deactivate();
+        }            
+    }
+    
+    for(auto &r : _running) { r = false; }
+    
+    return true;
+}
+
+bool embot::app::eth::theServices::Impl::tick()
+{
+    for(auto &s : _mapfofservices) 
+    { 
+        if(nullptr != s)
+        {
+            s->tick();
+        }            
+    }   
+    return true;
+}
+
+bool embot::app::eth::theServices::Impl::sendresult(Service *s, const eOmn_service_cmmnds_command_t *command, eOmn_serv_state_t state, bool ok)
+{
+    const eOmn_serv_configuration_t *sc = &command->parameter.configuration;
+    eOmn_serv_operation_t operation = (eOmn_serv_operation_t)command->operation;
+    eOmn_serv_category_t category = static_cast<eOmn_serv_category_t>(command->category);
+    eOmn_serv_type_t type = static_cast<eOmn_serv_type_t>(sc->type);    
+        
+    _mnservice->status.commandresult.category = category;
+    _mnservice->status.commandresult.operation = operation;
+    _mnservice->status.commandresult.type = type;   
+
+    _mnservice->status.commandresult.latestcommandisok = ok ? eobool_true : eobool_false;    
+    _mnservice->status.commandresult.data[0] = state;        
+    
+
+    eOropdescriptor_t ropdesc {};
+
+    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+    ropdesc.ropcode = eo_ropcode_sig;
+    ropdesc.id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_service, 0, eoprot_tag_mn_service_status_commandresult);
+    ropdesc.data = nullptr; // so that data from the EOnv is retrieved (which is: p->mnservice->status.commandresult)          
+
+    embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+                
+    return true;
+}
+
+// - static
+
+bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok)
+{
+//    Service *ss = embot::app::eth::theServices::getInstance().get();
+    // ok keeps the result of the verify
+    if((false == ok) && (nullptr != s))
+    {
+        s->report();
+        s->deactivate();
+    }
+    
+    // now i must send back a rop w/ the result of the request
+    // i need
+    eOmn_serv_category_t category = static_cast<eOmn_serv_category_t>(s->category());
+    eOmn_serv_type_t type = static_cast<eOmn_serv_type_t>(sc->type);    
+        
+//    Impl *impl = reinterpret_cast<Impl*>(caller);
+    // mnservice can be retrieved w/ ...
+    eOmn_service_t * mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
+    mnservice->status.commandresult.category = category;
+    mnservice->status.commandresult.operation = eomn_serv_operation_verifyactivate;
+    mnservice->status.commandresult.type = type;   
+
+    mnservice->status.commandresult.latestcommandisok = ok ? eobool_true : eobool_false;    
+    mnservice->status.commandresult.data[0] = ok ? eomn_serv_state_activated: eomn_serv_state_failureofverify;        
+    
+//    transmit_rop();  
+
+    eOropdescriptor_t ropdesc {};
+
+    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+    ropdesc.ropcode = eo_ropcode_sig;
+    ropdesc.id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_service, 0, eoprot_tag_mn_service_status_commandresult);
+    ropdesc.data = nullptr; // so that data from the EOnv is retrieved (which is: p->mnservice->status.commandresult)          
+
+    embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+                
+    return true;
+}
+
+//static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_serv_operation_t operation, eOmn_serv_category_t category)
+//{
+//    p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+//    p->mnservice->status.commandresult.category = category;
+//    p->mnservice->status.commandresult.operation = operation;
+//    p->mnservice->status.commandresult.type = eomn_serv_NONE;
+
+//    send_rop_command_result(); 
+
+//    return(eores_OK);    
+//}
+
+
+//static void send_rop_command_result(void)
+//{
+//    eOropdescriptor_t ropdesc;
+
+//    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+//    ropdesc.ropcode = eo_ropcode_sig;
+//    ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_service, 0, eoprot_tag_mn_service_status_commandresult);
+//    ropdesc.data    = NULL; // so that data from the EOnv is retrieved (which is: p->mnservice->status.commandresult)          
+//    
+//    eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -311,16 +544,25 @@ bool embot::app::eth::theServices::initialise(const Config &cfg)
     return pImpl->initialise(cfg);
 }
 
-bool embot::app::eth::theServices::process(eOmn_service_cmmnds_command_t *command)
+bool embot::app::eth::theServices::load(embot::app::eth::Service *s)
 {
-    return pImpl->process(command);
+    return pImpl->load(s);
 }
-  
-embot::app::eth::Service * embot::app::eth::theServices::get(Service::Category cat)
+
+embot::app::eth::Service* embot::app::eth::theServices::get(embot::app::eth::Service::Category cat)
 {
     return pImpl->get(cat);
 }
 
+embot::app::eth::Service* embot::app::eth::theServices::get(const eOmn_service_cmmnds_command_t *command)
+{
+    return pImpl->get(command);
+}
+
+bool embot::app::eth::theServices::process(eOmn_service_cmmnds_command_t *command)
+{
+    return pImpl->process(command);
+}
 
 bool embot::app::eth::theServices::setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
 {
@@ -332,7 +574,15 @@ bool embot::app::eth::theServices::synch(Service::Category category, Service::St
     return pImpl->synch(category, state);
 }
 
+bool embot::app::eth::theServices::stop()
+{
+    return pImpl->stop();
+}
 
+bool embot::app::eth::theServices::tick()
+{
+    return pImpl->tick();
+}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -35,6 +35,7 @@ struct eOservice_core_t
     eObool_t activateafterverify {eobool_false};
     eObool_t started {eobool_false};
     eOservice_onendofoperation_fun_t onverify {nullptr};
+    void *onverifyarg {nullptr};
     eOmn_serv_state_t state {eomn_serv_state_idle};
     const eOmn_serv_configuration_t* tmpcfg {nullptr};
     eOmn_serv_configuration_t servconfig {};

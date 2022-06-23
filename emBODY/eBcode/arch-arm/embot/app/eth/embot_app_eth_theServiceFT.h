@@ -43,10 +43,14 @@ namespace embot { namespace app { namespace eth {
         
         eOresult_t initialise(const Config &config);  
         
+        Service* service();
+        
         // interface of Service
         Category category() const override;
         State state() const override;
-        bool verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation, void *caller) override;
+        void set(State s) override;
+        
+        bool verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation) override;
         bool activate(const eOmn_serv_configuration_t * servcfg) override;
         bool deactivate() override;
         bool start() override;

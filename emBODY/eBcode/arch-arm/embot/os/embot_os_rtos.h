@@ -11,6 +11,7 @@
 #define _EMBOT_OS_RTOS_H_
 
 #include "embot_os.h"
+#include "embot_os_common.h"
 
 // so far the default is for OSAL
 #if !defined(EMBOT_USE_rtos_cmsisos2) & !defined(EMBOT_USE_rtos_osal)
@@ -131,6 +132,9 @@ namespace embot { namespace os { namespace rtos {
 
     embot::os::EventMask event_get(embot::core::relTime timeout);
     
+    embot::os::EventMask event_wait(const embot::os::EventMask mask, embot::core::relTime timeout);
+
+    embot::os::EventMask event_wait(const embot::os::EventMask mask, embot::os::EventWaitMode ewm, embot::core::relTime timeout);
     
     // -- messagequeue section
 

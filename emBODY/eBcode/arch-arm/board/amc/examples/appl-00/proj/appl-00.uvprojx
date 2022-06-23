@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>3</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -775,6 +775,11 @@
               <FileName>embot_hw_timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1483,7 +1488,7 @@
             </File>
             <File>
               <FileName>EoProtocolAS_fun_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\EoProtocolAS_fun_amc.c</FilePath>
               <FileOption>
                 <CommonProperty>
@@ -1594,12 +1599,12 @@
           <Files>
             <File>
               <FileName>EoCANprotASperiodic_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotASperiodic_amc.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotASpolling_amc.c</FilePath>
             </File>
             <File>
@@ -1722,6 +1727,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theHandler.cpp</FilePath>
             </File>
+            <File>
+              <FileName>theHandler_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\cfg\theHandler_config.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1729,7 +1739,7 @@
           <Files>
             <File>
               <FileName>overridden_appl.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_appl.cpp</FilePath>
               <FileOption>
                 <CommonProperty>
@@ -1787,6 +1797,57 @@
               <FileName>overridden_configurator.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_configurator.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>overridden_error.c</FileName>
@@ -1848,11 +1909,113 @@
               <FileName>overridden_runner.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_runner.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>overridden_sm.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_sm.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -2628,6 +2791,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3080,7 +3248,7 @@
             </File>
             <File>
               <FileName>EoProtocolAS_fun_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\EoProtocolAS_fun_amc.c</FilePath>
             </File>
           </Files>
@@ -3140,12 +3308,12 @@
           <Files>
             <File>
               <FileName>EoCANprotASperiodic_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotASperiodic_amc.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotASpolling_amc.c</FilePath>
             </File>
             <File>
@@ -3268,6 +3436,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theHandler.cpp</FilePath>
             </File>
+            <File>
+              <FileName>theHandler_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\cfg\theHandler_config.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3275,7 +3448,7 @@
           <Files>
             <File>
               <FileName>overridden_appl.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_appl.cpp</FilePath>
             </File>
             <File>
@@ -3295,7 +3468,7 @@
             </File>
             <File>
               <FileName>overridden_sm.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_sm.cpp</FilePath>
             </File>
           </Files>
@@ -4072,6 +4245,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4524,7 +4702,7 @@
             </File>
             <File>
               <FileName>EoProtocolAS_fun_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\EoProtocolAS_fun_amc.c</FilePath>
             </File>
           </Files>
@@ -4584,12 +4762,12 @@
           <Files>
             <File>
               <FileName>EoCANprotASperiodic_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotASperiodic_amc.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotASpolling_amc.c</FilePath>
             </File>
             <File>
@@ -4712,6 +4890,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theHandler.cpp</FilePath>
             </File>
+            <File>
+              <FileName>theHandler_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\cfg\theHandler_config.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4719,7 +4902,7 @@
           <Files>
             <File>
               <FileName>overridden_appl.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_appl.cpp</FilePath>
             </File>
             <File>
@@ -4739,7 +4922,7 @@
             </File>
             <File>
               <FileName>overridden_sm.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_sm.cpp</FilePath>
             </File>
           </Files>
@@ -5516,6 +5699,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_AS5045.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6325,7 +6513,7 @@
             </File>
             <File>
               <FileName>EoProtocolAS_fun_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\EoProtocolAS_fun_amc.c</FilePath>
             </File>
           </Files>
@@ -6385,12 +6573,12 @@
           <Files>
             <File>
               <FileName>EoCANprotASperiodic_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotASperiodic_amc.c</FilePath>
             </File>
             <File>
               <FileName>EoCANprotASpolling_amc.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotASpolling_amc.c</FilePath>
             </File>
             <File>
@@ -6513,6 +6701,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theHandler.cpp</FilePath>
             </File>
+            <File>
+              <FileName>theHandler_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\cfg\theHandler_config.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6520,7 +6713,7 @@
           <Files>
             <File>
               <FileName>overridden_appl.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_appl.cpp</FilePath>
             </File>
             <File>
@@ -6540,7 +6733,7 @@
             </File>
             <File>
               <FileName>overridden_sm.cpp</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_sm.cpp</FilePath>
             </File>
           </Files>

@@ -401,6 +401,9 @@ extern const eOsm_cfg_t * eo_cfg_sm_EMSappl_Get(void)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(USE_EMBOT_theHandler)
+    #warning USE_EMBOT_theHandler is defined. the specification of the EOsm is inside theHandler
+#else
 
 // -- init
 EO_weak extern void eo_cfg_sm_EMSappl_hid_init(EOsm *s)
@@ -467,7 +470,7 @@ EO_weak extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2err(EOsm *s)
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
 
-
+#endif // #if defined(USE_EMBOT_theHandler)
 
 
 // --------------------------------------------------------------------------------------------------------------------

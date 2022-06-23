@@ -30,7 +30,7 @@ namespace embot { namespace app { namespace eth {
                 
     public:
     
-        enum class Caller : std::uint8_t { none, threadCFG, threadRUN };
+//        enum class Caller : std::uint8_t { none, threadCFG, threadRUN };
              
         struct Config
         {
@@ -41,9 +41,16 @@ namespace embot { namespace app { namespace eth {
         };
         
         
-        bool initialise(const Config &config);  
+        bool initialise(const Config &config); 
+        
+        bool load(embot::app::eth::Service *s);
+        embot::app::eth::Service* get(embot::app::eth::Service::Category cat);
+        embot::app::eth::Service* get(const eOmn_service_cmmnds_command_t *command);
+        
         bool process(eOmn_service_cmmnds_command_t *command);
-        embot::app::eth::Service* get(Service::Category cat);     
+        
+        bool stop(); // stop and deactivate every service
+        bool tick(); // tick all activated services        
 
         using fpIsID32relevant = bool (*)(uint32_t id32);
         bool setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);

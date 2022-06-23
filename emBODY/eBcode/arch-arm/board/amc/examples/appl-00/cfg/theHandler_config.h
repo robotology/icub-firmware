@@ -23,6 +23,9 @@
 
 #include "embot_os_common.h"
 #include "embot_hw_timer.h"
+#include "embot_hw_bsp_amc_config.h"
+#include "theApplication_config.h"
+
 
 #include "embot_app_eth_theETHmonitor.h"
 
@@ -74,7 +77,26 @@ namespace embot { namespace app { namespace eth {
     {
         .taskpriority = embot::core::tointegral(embot::os::Priority::abovenorm35),
         .taskstacksize = 2*1024
-    };     
+    };   
+
+
+#if defined(EMBOT_ENABLE_hw_timer_emulated)
+        
+    // 10: period (1ms) -> 10 ms, dostart (0.4ms) -> 4ms, safetx (0.25ms) -> 2.5 ms
+    // 100: period (1ms) -> 100 ms, dostart (0.4ms) -> 40ms, safetx (0.25ms) -> 25 ms
+    constexpr uint32_t sc {(theApplication_Config.OStick == 500*embot::core::time1microsec) ? 10 : 100};
+    
+#else
+    constexpr uint32_t sc {1};
+#endif
+    
+    constexpr embot::core::relTime runner_period = embot::core::time1millisec;
+    constexpr embot::core::relTime runner_execRXafter = 0; // executes at beginning of period
+    constexpr embot::core::relTime runner_safeRXexecutiontime = 300*embot::core::time1microsec;
+    constexpr embot::core::relTime runner_execDOafter = 400*embot::core::time1microsec;
+    constexpr embot::core::relTime runner_safeDOexecutiontime = 200*embot::core::time1microsec;
+    constexpr embot::core::relTime runner_execTXafter = 700*embot::core::time1microsec;
+    constexpr embot::core::relTime runner_safeTXexecutiontime = 250*embot::core::time1microsec;       
 
     constexpr eOemsrunner_cfg_t theHandler_EOMtheEMSrunner_Config
     {
@@ -103,13 +125,13 @@ namespace embot { namespace app { namespace eth {
             hal_timerNONE,
             hal_timerNONE
         },
-        .period = embot::core::time1millisec,
-        .execRXafter = 0, // executes at beginning of period
-        .safeRXexecutiontime = 300*embot::core::time1microsec,
-        .execDOafter = 400*embot::core::time1microsec,
-        .safeDOexecutiontime = 200*embot::core::time1microsec,
-        .execTXafter = 700*embot::core::time1microsec,
-        .safeTXexecutiontime = 250*embot::core::time1microsec,
+        .period = sc*runner_period,
+        .execRXafter = sc*runner_execRXafter, 
+        .safeRXexecutiontime = sc*runner_safeRXexecutiontime,
+        .execDOafter = sc*runner_execDOafter,
+        .safeDOexecutiontime = sc*runner_safeDOexecutiontime,
+        .execTXafter = sc*runner_execTXafter,
+        .safeTXexecutiontime = sc*runner_safeTXexecutiontime,
         .maxnumofRXpackets = 3,
         .maxnumofTXpackets = 1,
         .modeatstartup = eo_emsrunner_mode_besteffort,
@@ -122,7 +144,8 @@ namespace embot { namespace app { namespace eth {
     {
         {embot::os::Priority::belownorm22, 2*1024},
         100*embot::core::time1millisec,
-        60*embot::core::time1second        
+        60*embot::core::time1second,
+        {}        
     };
             
 }}}

@@ -382,6 +382,158 @@ void embot::os::EventThread::run()
 }
 
 
+// - class MultiEventThread
+
+// --------------------------------------------------------------------------------------------------------------------
+// - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
+// --------------------------------------------------------------------------------------------------------------------
+
+struct embot::os::MultiEventThread::Impl
+{    
+    MultiEventThread * parentThread {nullptr};
+    embot::os::rtos::thread_t *rtosthread {nullptr};
+    Config config {64, Priority::minimum, nullptr, nullptr, 
+                   embot::core::reltimeWaitForever, dummyOnEvent, 
+                   embot::os::EventWaitMode::ANY, Config::maskofallevents, "mulevtThread"};
+    embot::os::rtos::thread_props_t rtosthreadproperties {};
+    
+    Impl(MultiEventThread *parent) 
+    {
+        parentThread = parent;
+        rtosthread = nullptr;        
+    }
+    
+    ~Impl()
+    {
+        if(nullptr != rtosthread)
+        {
+            embot::os::rtos::scheduler_deassociate(rtosthread, parentThread);
+            embot::os::rtos::thread_delete(rtosthread); 
+            rtosthread = nullptr;
+        }
+    }
+    
+    static void dummyOnEvent(Thread *t, os::EventMask m, void *p) {}
+              
+                       
+    static void os_multieventdriven_loop(void *p) 
+    {
+        MultiEventThread *t = reinterpret_cast<MultiEventThread*>(p);
+        const embot::core::relTime tout = t->pImpl->config.timeout; 
+        const embot::os::EventMask waitmask = t->pImpl->config.waitmask;
+        const embot::os::EventWaitMode waitmode = t->pImpl->config.waitmode;
+        const Thread::fpStartup startup = t->pImpl->config.startup;
+        const Thread::fpOnEvent onevent = t->pImpl->config.onevent;
+        void * param = t->pImpl->config.param;
+
+        // exec the startup
+        if(nullptr != startup)
+        {
+            startup(t, param);
+        }
+        
+        // start the forever loop
+        for(;;)
+        {
+            onevent(t, embot::os::rtos::event_wait(waitmask, waitmode, tout), param);            
+        }        
+    }
+    
+};
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - all the rest
+// --------------------------------------------------------------------------------------------------------------------
+
+
+embot::os::MultiEventThread::MultiEventThread()
+: pImpl(new Impl(this))
+{   
+    
+}
+
+
+embot::os::MultiEventThread::~MultiEventThread()
+{   
+    delete pImpl;
+}
+
+
+embot::os::Thread::Type embot::os::MultiEventThread::getType() const 
+{
+    return Type::multieventTrigger;
+}
+
+
+embot::os::Priority embot::os::MultiEventThread::getPriority() const
+{   
+    return pImpl->config.priority;
+}
+
+
+bool embot::os::MultiEventThread::setPriority(embot::os::Priority priority)
+{
+    pImpl->config.priority = priority;
+    pImpl->rtosthreadproperties.setprio(embot::core::tointegral(priority));
+
+    return embot::os::rtos::thread_setpriority(pImpl->rtosthread, priority);    
+}
+
+const char * embot::os::MultiEventThread::getName() const
+{
+    return (pImpl->config.name != nullptr) ? pImpl->config.name : "MultiEventThread"; 
+}
+  
+bool embot::os::MultiEventThread::setEvent(embot::os::Event event)
+{
+    return embot::os::rtos::event_set(pImpl->rtosthread, event); 
+}  
+
+
+bool embot::os::MultiEventThread::setMessage(embot::os::Message message, core::relTime timeout)
+{
+    return false;
+}
+
+bool embot::os::MultiEventThread::setValue(embot::os::Value value, core::relTime timeout)
+{
+    return false;
+}
+
+bool embot::os::MultiEventThread::setCallback(const core::Callback &callback, core::relTime timeout)
+{
+    return false;
+}
+
+bool embot::os::MultiEventThread::start(const Config &cfg, embot::core::fpCaller eviewername)
+{    
+    if(false == cfg.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config = cfg;
+    
+    pImpl->config.stacksize = (pImpl->config.stacksize+7)/8;
+    pImpl->config.stacksize *= 8;
+
+    pImpl->rtosthreadproperties.prepare((nullptr != eviewername) ? eviewername : pImpl->os_multieventdriven_loop, 
+                                        this, 
+                                        embot::core::tointegral(pImpl->config.priority), 
+                                        pImpl->config.stacksize);  
+        
+    pImpl->rtosthread = embot::os::rtos::thread_new(pImpl->rtosthreadproperties);
+    embot::os::rtos::scheduler_associate(pImpl->rtosthread, this);   
+    
+    return true;    
+}
+
+void embot::os::MultiEventThread::run()
+{
+    pImpl->os_multieventdriven_loop(this);
+}
+
 // - class MessageThread
 
 // --------------------------------------------------------------------------------------------------------------------

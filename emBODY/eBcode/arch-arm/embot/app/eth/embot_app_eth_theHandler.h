@@ -53,7 +53,7 @@ namespace embot { namespace app { namespace eth {
         
         bool process(Command cmd);
         bool moveto(State state); // maybe remove it from here ...
-        State state() const;
+        State state();
                
         bool transmit();        
         bool transmit(const eOropdescriptor_t &ropdes); 
