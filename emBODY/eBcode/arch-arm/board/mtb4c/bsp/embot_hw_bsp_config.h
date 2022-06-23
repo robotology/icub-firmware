@@ -12,7 +12,7 @@
 
   
 #if   defined(STM32HAL_BOARD_MTB4C)
-    #include "embot_hw_bsp_mtb4_config.h"        
+    #include "embot_hw_bsp_mtb4c_config.h"        
 #else
     #error wrong board
 #endif

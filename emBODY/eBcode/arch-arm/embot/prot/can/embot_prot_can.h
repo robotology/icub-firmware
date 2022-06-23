@@ -52,7 +52,7 @@ namespace embot { namespace prot { namespace can {
     };
 
     
-    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, pmc = 17, amcbldc = 18, none = 254, unknown = 0xff };
+    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, pmc = 17, amcbldc = 18, mtb4c = 19, none = 254, unknown = 0xff };
     
     enum class Process { bootloader = 0, application = 1, unknown = 0xff };
            
