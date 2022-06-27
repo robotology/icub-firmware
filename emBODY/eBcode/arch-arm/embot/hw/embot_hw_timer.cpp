@@ -465,8 +465,9 @@ namespace embot { namespace hw { namespace timer {
 
     struct TIMERprop
     {        
-        bool                isrunning;
-        Config              config;
+        bool                isrunning {false};
+        Config              config {};
+        Status              status {Status::none};
     };
     
     struct propsOFalltimers
@@ -496,6 +497,7 @@ namespace embot { namespace hw { namespace timer {
        
         if(Mode::oneshot == prop.config.mode)
         {
+            prop.status = Status::expired;
             stop(t);
         }
     }    
@@ -518,6 +520,7 @@ namespace embot { namespace hw { namespace timer {
         TIMERprop &prop = s_properties.get(t);        
         prop.isrunning = false;
         prop.config = config;
+        prop.status = Status::idle;
         
         // VERY IMPORTANT: keep it in here before configure...
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(t));
@@ -575,6 +578,7 @@ namespace embot { namespace hw { namespace timer {
         }
         
         prop.isrunning = true;
+        prop.status = Status::running;
      
         // ok: the timer starts.
         const embot::hw::timer::PROP * stm32props = embot::hw::timer::getBSP().getPROP(t);
@@ -600,8 +604,24 @@ namespace embot { namespace hw { namespace timer {
         
         TIMERprop &prop = s_properties.get(t);
         prop.isrunning = false;
+        if(prop.status != Status::expired)
+        {
+            prop.status = Status::idle;       
+        }
                 
         return resOK;              
+    }
+    
+    Status status(embot::hw::TIMER t)
+    { 
+        if(false == initialised(t))
+        {
+            return Status::none;
+        }    
+         
+        TIMERprop &prop = s_properties.get(t);
+        
+        return prop.status;
     }
  
     
