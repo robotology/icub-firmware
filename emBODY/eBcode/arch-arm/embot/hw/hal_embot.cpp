@@ -119,7 +119,7 @@ extern hal_result_t hal_can_received(hal_can_t id, uint8_t *numberof)
     {
         return hal_res_NOK_generic;
     }
-    *numberof = embot::hw::can::outputqueuesize(convert(id));
+    *numberof = embot::hw::can::inputqueuesize(convert(id));
     return hal_res_OK;
 }
 
@@ -144,7 +144,7 @@ extern hal_result_t hal_can_get(hal_can_t id, hal_can_frame_t *frame, uint8_t *r
     frame->id_type = hal_can_frameID_std;
     frame->frame_type = hal_can_frame_data;
     frame->size = fr.size;
-    std::memmove(frame->data, frame->data, sizeof(frame->data));
+    std::memmove(frame->data, fr.data, sizeof(frame->data));
     if(nullptr != remaining)
     {
         *remaining = rem;
@@ -193,7 +193,14 @@ hal_timer_status_t convert(embot::hw::timer::Status s)
 extern hal_result_t hal_timer_init(hal_timer_t id, const hal_timer_cfg_t *cfg, hal_reltime_t *error)
 {
     embot::hw::timer::Config config {cfg->countdown, static_cast<embot::hw::timer::Mode>(cfg->mode), {cfg->callback_on_exp, cfg->arg}};
-    return halresult(embot::hw::timer::init(convert(id), config));
+    if(false == embot::hw::timer::initialised(convert(id)))
+    {
+        return halresult(embot::hw::timer::init(convert(id), config));
+    }
+    else
+    {
+        return halresult(embot::hw::timer::configure(convert(id), config));
+    }
 }
 
 extern hal_result_t hal_timer_start(hal_timer_t id)
