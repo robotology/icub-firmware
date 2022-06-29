@@ -444,15 +444,6 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
         return(eores_NOK_nullpointer);
     } 
    
-//    // put in here with protection vs double initialisation. 
-//    // we could put also in initialise, but i want to avoid that the runner is initialised and there is not an osal task yet for ipnet
-//    if(NULL == p->osaltaskipnetexec)
-//    {   // compute it only once in life
-//        EOMtask * taskipnetexec = eom_ipnet_GetTask(eom_ipnet_GetHandle(), eomipnet_task_proc);
-//        p->osaltaskipnetexec = taskipnetexec->osaltask;
-//    } 
-
-    
     p->numofpacketsinsidesocket = 0;      
     p->mode = p->cfg.modeatstartup;    
 #if !defined(EMBOBJ_USE_EMBOT)     

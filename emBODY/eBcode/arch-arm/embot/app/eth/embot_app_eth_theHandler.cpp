@@ -1106,6 +1106,11 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 }
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p) {}
+    
+#include "EOMtheEMSerror_hid.h"     
+    
+extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt) {} 
+extern void eom_emserror_hid_userdef_OnRXuserdefevent(eOemserror_event_t evt) {}
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

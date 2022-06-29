@@ -198,11 +198,21 @@ extern void tskEMSerr(void *p)
     eom_task_Start((EOMtask*)p);
 } 
 
+#if defined(USE_EMBOT_theHandler)
+#else
 
 EO_weak extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt)
 {
 
 } 
+
+
+EO_weak extern void eom_emserror_hid_userdef_OnRXuserdefevent(eOemserror_event_t evt)
+{
+    
+}
+
+#endif
 
 extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {   
@@ -212,13 +222,6 @@ extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, c
     // the previous overridable function was this eom_emserror_OnError_userdefined_call().
     // thus, i have removed the EO_weak keyword so that if anybody has defined it elsewhere the linker gives error.
 }
-
-EO_weak extern void eom_emserror_hid_userdef_OnRXuserdefevent(eOemserror_event_t evt)
-{
-    
-}
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------

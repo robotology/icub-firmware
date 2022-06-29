@@ -189,6 +189,7 @@ static EOtheEncoderReader s_eo_theencoderreader =
         EO_INIT(.activateafterverify)   eobool_false,
         EO_INIT(.started)               eobool_false,
         EO_INIT(.onverify)              NULL,
+        EO_INIT(.onverifyarg)           NULL,
         EO_INIT(.state)                 eomn_serv_state_notsupported,
         EO_INIT(.tmpcfg)                NULL,
         EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
@@ -286,6 +287,7 @@ extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, EOconstarray * 
     eo_timer_Stop(s_eo_theencoderreader.diagnostics.reportTimer);   
     
     s_eo_theencoderreader.service.onverify = onverify;
+    s_eo_theencoderreader.service.onverifyarg = &s_eo_theencoderreader;
     s_eo_theencoderreader.service.activateafterverify = activateafterverify;
     
 #if defined(EOTHEENCODERREADER_enableAMOdiagnostics)

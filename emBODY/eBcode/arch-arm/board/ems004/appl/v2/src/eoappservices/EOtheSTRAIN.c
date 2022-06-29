@@ -252,6 +252,7 @@ static EOtheSTRAIN s_eo_thestrain =
         EO_INIT(.activateafterverify)   eobool_false,
         EO_INIT(.started)               eobool_false,
         EO_INIT(.onverify)              NULL,
+        EO_INIT(.onverifyarg)           NULL,
         EO_INIT(.state)                 eomn_serv_state_notsupported,
         EO_INIT(.tmpcfg)                NULL,
         EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
@@ -425,6 +426,7 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
     eo_timer_Stop(p->diagnostics.reportTimer);  
     
     p->service.onverify = onverify;
+    p->service.onverifyarg = p;
     p->service.activateafterverify = activateafterverify;
 
     eOcandiscovery_target_t trgt = {0};

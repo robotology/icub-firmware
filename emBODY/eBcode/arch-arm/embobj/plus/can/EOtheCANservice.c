@@ -286,7 +286,7 @@ extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t por
 #if !defined(EMBOBJ_USE_EMBOT)         
         if(osal_res_OK != osal_semaphore_decrement(p->locktilltxall[port].locksemaphore, timeout))
 #else
-        if(true != embot::os::rtos::semaphore_acquire(p->locktilltxall[port].locksemaphore, timeout))
+        if(true != embot::os::rtos::semaphore_acquire(reinterpret_cast<embot::os::rtos::semaphore_t*>(p->locktilltxall[port].locksemaphore), timeout))
 #endif        
         {
             res = eores_NOK_generic;            
@@ -700,7 +700,7 @@ static void s_eo_canserv_ontx_can(void *arg)
 #if !defined(EMBOBJ_USE_EMBOT)  
                 osal_semaphore_increment(locktilltxall->locksemaphore, osal_callerISR);
 #else                
-                embot::os::rtos::semaphore_release(locktilltxall->locksemaphore);
+                embot::os::rtos::semaphore_release(reinterpret_cast<embot::os::rtos::semaphore_t*>(locktilltxall->locksemaphore));
 #endif                
             }        
         }

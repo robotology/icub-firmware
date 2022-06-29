@@ -38,7 +38,7 @@ extern "C" {
 #if !defined(EMBOBJ_USE_EMBOT)
 #include "osal.h"
 #else
-#include "embot_os_rtos.h"
+//#include "embot_os_rtos.h"
 #endif // #if !defined(EMBOBJ_USE_EMBOT)
 
 
@@ -60,7 +60,7 @@ typedef struct
 #if !defined(EMBOBJ_USE_EMBOT)    
     osal_semaphore_t*               semaphore;
 #else
-    embot::os::rtos::semaphore_t*   semaphore;
+    void*                           semaphore;
 #endif    
 } eOcanserv_txwait_t;
 
@@ -73,7 +73,7 @@ typedef struct
 #if !defined(EMBOBJ_USE_EMBOT)     
     osal_semaphore_t*               locksemaphore;
 #else
-    embot::os::rtos::semaphore_t*   locksemaphore;
+    void*                           locksemaphore;
 #endif     
 } eOcanserv_lockdata_t;
 

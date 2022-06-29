@@ -256,6 +256,7 @@ static EOtheMotionController s_eo_themotcon =
         EO_INIT(.activateafterverify)   eobool_false,
         EO_INIT(.started)               eobool_false,
         EO_INIT(.onverify)              NULL,
+        EO_INIT(.onverifyarg)           NULL,
         EO_INIT(.state)                 eomn_serv_state_notsupported,
         EO_INIT(.tmpcfg)                NULL,
         EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
@@ -525,6 +526,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
         
         p->service.onverify = onverify;
+        p->service.onverifyarg = p;
         p->service.activateafterverify = activateafterverify;
 
         // 1. prepare the can discovery for foc boards 
@@ -564,6 +566,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         p->ctrlobjs.jomodescriptors = NULL;
         
         p->service.onverify = onverify;
+        p->service.onverifyarg = p;
         p->service.activateafterverify = activateafterverify;
         
         // 1. prepare the verify of mais
@@ -610,6 +613,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         // for now verify the encoder reader. 
         // we dont verify the pwm actuators. only way to do that is to add a hal_pwm_supported_is()
         p->service.onverify = onverify;
+        p->service.onverifyarg = p;
         p->service.activateafterverify = activateafterverify;
         
         eOmn_serv_diagn_cfg_t dc = {0, 0};
@@ -627,6 +631,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         // s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();       
         
         p->service.onverify = onverify;
+        p->service.onverifyarg = p;
         p->service.activateafterverify = activateafterverify;
         
         // prepare the verify of mais
@@ -643,6 +648,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
            
         
         p->service.onverify = onverify;
+        p->service.onverifyarg = p;
         p->service.activateafterverify = activateafterverify;
         
         // prepare the verify of psc
@@ -658,6 +664,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4plusfaps.arrayofjomodescriptors);
 
         p->service.onverify = onverify;
+        p->service.onverifyarg = p;
         p->service.activateafterverify = activateafterverify;
         
         // prepare the verify of pos service
@@ -673,6 +680,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4pluspmc.arrayof7jomodescriptors);
 
         p->service.onverify = onverify;
+        p->service.onverifyarg = p;
         p->service.activateafterverify = activateafterverify;
         
         // prepare the verify of pos service
@@ -837,6 +845,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     p->service.servconfig.type = eo_motcon_mode_NONE;
         
     p->service.onverify = NULL;
+    p->service.onverifyarg = NULL;
     p->service.activateafterverify = eobool_false;
     p->sharedcan.ondiscoverystop.function = NULL;
     p->sharedcan.ondiscoverystop.parameter = NULL;

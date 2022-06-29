@@ -232,6 +232,7 @@ static EOtheInertials2 s_eo_theinertials2 =
         EO_INIT(.activateafterverify)   eobool_false,
         EO_INIT(.started)               eobool_false,
         EO_INIT(.onverify)              NULL,
+        EO_INIT(.onverifyarg)           NULL,
         EO_INIT(.state)                 eomn_serv_state_notsupported,
         EO_INIT(.tmpcfg)                NULL,
         EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
@@ -434,6 +435,7 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
     eo_timer_Stop(p->diagnostics.reportTimer);    
 
     p->service.onverify = onverify;
+    p->service.onverifyarg = p;
     p->service.activateafterverify = activateafterverify;
     
     // i get all the sensors.
