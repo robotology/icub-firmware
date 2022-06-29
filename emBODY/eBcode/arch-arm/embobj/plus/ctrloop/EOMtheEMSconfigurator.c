@@ -27,8 +27,13 @@
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
 
+#if defined(USE_EMBOT_theHandler)
+#include "embot_app_eth_theHandler.h"
+#include "embot_app_eth_theErrorManager.h"
+#include "embot_os_theScheduler.h"
+#else
 #include "EOMtheEMSappl.h"
-
+#endif
 
 #include "EOMtheEMStransceiver.h"
 #include "EOMtheEMSsocket.h"
@@ -86,7 +91,6 @@ const eOemsconfigurator_cfg_t eom_emsconfigurator_DefaultCfg =
 extern void usrDef_CFGRecRopframe(void);
 #endif
 
-extern void tskEMScfg(void *p);
 
 static void s_eom_emsconfigurator_task_startup(EOMtask *p, uint32_t t);
 static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t);
@@ -205,11 +209,14 @@ extern eOresult_t eom_emsconfigurator_GracefulStopAndGoTo(EOMtheEMSconfigurator 
 extern void usrDef_CFGRecRopframe(void){}
 #endif
 
-extern void tskEMScfg(void *p)
+void tskEMScfg(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
     eom_task_Start((EOMtask*)p);
 } 
+
+#if defined(USE_EMBOT_theHandler)
+#else
 
 EO_weak extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
 {
@@ -247,11 +254,12 @@ EO_weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMthe
 
 }
 
-
 EO_weak extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
 
 }
+
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -299,7 +307,12 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
 
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2error))
     {
+#if defined(USE_EMBOT_theHandler)
+        #warning USE_EMBOT_theHandler is defined
+        embot::app::eth::theHandler::getInstance().moveto(embot::app::eth::theHandler::State::FATALERROR);        
+#else        
         eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);
+#endif        
         // no other event is managed anymore:
         // a possible received packet shall be managed by the error task
         // a packet to be tx will be transmitted by the error task. 
@@ -344,6 +357,10 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         if(eores_OK == res)
         {
 
+#if defined(USE_EMBOT_theHandler)
+            embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::info, {s_eobj_ownname, thr}, {}, "RX a frame");    
+#endif 
             #if defined(EVIEWER_ENABLED)    
             evEntityId_t prev = eventviewer_switch_to(EVIEWER_userDef_CFGRecRopframe);
             #endif
@@ -415,7 +432,12 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     // moved at the end so that we dont miss any other event sent only to the config task
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2runner))
     {
+#if defined(USE_EMBOT_theHandler)
+        #warning USE_EMBOT_theHandler is defined
+        embot::app::eth::theHandler::getInstance().moveto(embot::app::eth::theHandler::State::RUN);
+#else          
         eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
+#endif        
         return;
     }        
 }

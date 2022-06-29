@@ -63,6 +63,7 @@ struct EOtheCANdiscovery2_hid
     uint16_t                        canmapofoverlappedtargets[eOcanports_number];
     eOcandiscovery_onstop_t         onstop;
     eOcandiscovery_detection_t      detection;
+    EOaction                        *ticker;
 }; 
 
 

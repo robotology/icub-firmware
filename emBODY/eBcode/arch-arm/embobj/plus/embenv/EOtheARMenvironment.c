@@ -30,17 +30,15 @@
 
 #include "EOVtheEnvironment_hid.h"
 
-#include "hal.h"
-
-
-#include "hal_uniqueid.h"
-
 #include "eEsharedServices.h" 
 
 #include "eEmemorymap.h"
 
+#include "hal.h"
 #if defined(USE_EMBOT_HW)
 #include "embot_hw_sys.h"
+#else
+#include "hal_uniqueid.h"
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------

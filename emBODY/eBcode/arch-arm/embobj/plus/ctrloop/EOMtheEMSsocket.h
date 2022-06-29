@@ -112,7 +112,7 @@ extern EOMtheEMSsocket * eom_emssocket_GetHandle(void);
     @arg        withactiononrx  pointer to the action to be executed on reception. If NULL, then no action is executed.
     @return     The value eores_NOK_nullpointer if @e p is NULL, eores_OK otherwise.
  **/
-extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononrx, EOaction* withactionontx);
+extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononrx, EOaction* withactionontx, EOaction* ontxrequest);
 
 
 /** @fn         extern eOresult_t eom_emssocket_Close(EOMtheEMSsocket *p)
@@ -130,6 +130,7 @@ extern eOresult_t eom_emssocket_Connect(EOMtheEMSsocket *p, eOipv4addr_t remaddr
 
 extern eOresult_t eom_emssocket_Transmit(EOMtheEMSsocket *p, EOpacket* txpkt, eOreltime_t timeout);   
 
+extern eOresult_t eom_emssocket_TransmissionRequest(EOMtheEMSsocket *p);
 
 
 

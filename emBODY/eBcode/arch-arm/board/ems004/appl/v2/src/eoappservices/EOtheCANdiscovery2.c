@@ -33,18 +33,16 @@
 #include "EOtheCANprotocol.h"
 
 #include "EOaction.h"
-
-#include "EOMtheEMSconfigurator.h"
-
-#include "EOtheEntities.h"
-
-#include "EOMtheEMSappl.h"
-
 #include "EOVtheCallbackManager.h"
-
 #include "EOVtheSystem.h"
 
-#include "hal_trace.h"
+#if defined(USE_EMBOT_theHandler)
+    #warning USE_EMBOT_theHandler is defined. we now use _Ticker()
+#else 
+#include "EOMtheEMSappl.h"
+#include "EOMtheEMSconfigurator.h"
+#endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -85,6 +83,9 @@ const eOcandiscovery_cfg_t eo_candiscovery_default_cfg =
 #define EOCANDISCOVERY2_DIAGNOSTICS_SENDUPOKRESULT
 #define EOCANDISCOVERY2_DIAGNOSTICS_SENDUPDETECTEDBOARDS
 
+#if defined(EOCANDISCOVERY2_TRACE) 
+#include "hal_trace.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -134,7 +135,8 @@ static EOtheCANdiscovery2 s_eo_thecandiscovery2 =
     EO_INIT(.arrayoftargets)                    NULL,
     EO_INIT(.canmapofoverlappedtargets)         {0},
     EO_INIT(.onstop)                            {0},
-    EO_INIT(.detection)                         {0}
+    EO_INIT(.detection)                         {0},
+    EO_INIT(.ticker)                            NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheCANdiscovery2";
@@ -178,7 +180,9 @@ extern EOtheCANdiscovery2* eo_candiscovery2_Initialise(const eOcandiscovery_cfg_
     s_eo_candiscovery2_resetTarget();
     s_eo_candiscovery2_resetDetection();
     s_eo_candiscovery2_resetSearchStatus();
-
+    
+    s_eo_thecandiscovery2.ticker = eo_action_New();
+    eo_action_Clear(s_eo_thecandiscovery2.ticker);
 
     s_eo_thecandiscovery2.initted = eobool_true;
     
@@ -196,6 +200,39 @@ extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void)
     return(&s_eo_thecandiscovery2);
 }
 
+extern eOresult_t eo_candiscovery2_SetTicker(EOtheCANdiscovery2 *p, EOaction* ticker)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }  
+
+    if(NULL == ticker)
+    {
+        eo_action_Clear(p->ticker);
+    }
+    else
+    {
+        eo_action_Copy(p->ticker, ticker);
+    }     
+    
+    return(eores_OK);  
+}
+
+extern eOresult_t eo_candiscovery2_Ticker(EOtheCANdiscovery2 *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }  
+
+    if(eobool_true == eo_action_Isvalid(p->ticker))
+    {
+        eo_action_Execute(p->ticker, eok_reltimeINFINITE);
+    }
+    
+    return(eores_OK);   
+}
 
 extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *target, eOcandiscovery_onstop_t* onstop)
 {    
@@ -820,12 +857,18 @@ static void s_eo_candiscovery2_on_timer_expiry(void *arg)
         
     // ok, ... if we are in run i dont do anything else because i regularly call _Tick() every 1 ms.    
     // however, if in config mode i must alert the processing task to execute a _Tick().
+    
+#if defined(USE_EMBOT_theHandler)
+    #warning USE_EMBOT_theHandler is defined and we execution of _Tick() w/ _Ticker(). Remember to use _SetTicker() properly
+    eo_candiscovery2_Ticker(p);
+#else     
     eOsmStatesEMSappl_t state = eo_sm_emsappl_STerr;
     eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &state);
     if(eo_sm_emsappl_STcfg == state)
     {   // must send an event to the handling task
         eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef01);
-    }    
+    }
+#endif    
 }
 
 

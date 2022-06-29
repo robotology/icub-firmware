@@ -232,6 +232,7 @@ static EOtheInertials3 s_eo_theinertials3 =
         .activateafterverify    = eobool_false,
         .started                = eobool_false,
         .onverify               = NULL,
+        .onverifyarg            = NULL,
         .state                  = eomn_serv_state_notsupported,
         .tmpcfg                 = NULL,
         .servconfig             = { .type = eomn_serv_NONE },
@@ -440,6 +441,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     eo_timer_Stop(p->diagnostics.reportTimer);    
 
     p->service.onverify = onverify;
+    p->service.onverifyarg = p;
     p->service.activateafterverify = activateafterverify;
     
     // i get all the sensors.

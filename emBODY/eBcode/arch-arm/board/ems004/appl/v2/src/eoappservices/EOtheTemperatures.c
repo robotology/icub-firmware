@@ -238,6 +238,7 @@ static EOtheTemperatures s_eo_thetemperature =
         .activateafterverify    = eobool_false,
         .started                = eobool_false,
         .onverify               = NULL,
+        .onverifyarg            = NULL,
         .state                  = eomn_serv_state_notsupported,
         .tmpcfg                 = NULL,
         .servconfig             = { .type = eomn_serv_NONE },
@@ -425,6 +426,7 @@ extern eOresult_t eo_temperatures_Verify(EOtheTemperatures *p, const eOmn_serv_c
     eo_timer_Stop(p->diagnostics.reportTimer);    
 
     p->service.onverify = onverify;
+    p->service.onverifyarg = p,
     p->service.activateafterverify = activateafterverify;
     
     // i get all the sensors.

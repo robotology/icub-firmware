@@ -206,6 +206,11 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
         } break;   
                 
         case eom_mtask_OnAllEventsDriven:
+        {
+            task = new EOMtask;
+            task->thr = new embot::os::MultiEventThread;            
+        } break;
+        
         default:
         {
             for(;;);
@@ -251,6 +256,23 @@ void eom_task_START(EOMtask *p)
                         p,
                         p->config.timeoutORperiod,
                         s_embot_evt_run,
+                        p->config.name              
+                    };
+            res = t->start(c, p->config.nameofthetask_fn);                   
+        } break;
+ 
+        case embot::os::Thread::Type::multieventTrigger:
+        {
+            embot::os::MultiEventThread *t = reinterpret_cast<embot::os::MultiEventThread*>(p->thr);
+            embot::os::MultiEventThread::Config c { 
+                        p->config.stacksize, 
+                        embot::os::priority::convert(p->config.priority),
+                        s_embot_common_start,
+                        p,
+                        p->config.timeoutORperiod,
+                        s_embot_evt_run,
+                        embot::os::EventWaitMode::ALL,
+                        p->config.queuesizeORalleventsmask,
                         p->config.name              
                     };
             res = t->start(c, p->config.nameofthetask_fn);                   
@@ -310,7 +332,7 @@ void eom_task_START(EOMtask *p)
 
     if(false == res)
     {
-        embot::core::print("eom_task_START(): invalid embot::os::EventThread::Config");
+        embot::core::print("eom_task_START(): invalid embot::os::xxxxThread::Config");
         for(;;);
     }    
 }
@@ -509,6 +531,17 @@ static void s_prepare_base_object(EOMtask *p)
     switch(p->thr->getType())
     {
         case embot::os::Thread::Type::eventTrigger:
+        {
+             eov_task_hid_SetVTABLE( p->base, 
+                                    (eOvoid_fp_voidp_uint32_t)p->config.startup_fn, (eOvoid_fp_voidp_uint32_t)p->config.run_fn,
+                                    s_eom_virtual_tsk_set_event, s_eom_virtual_tsk_set_event,
+                                    NULL, NULL,
+                                    NULL, NULL,
+                                    s_eom_virtual_get_id
+                                  );                 
+        } break;
+        
+        case embot::os::Thread::Type::multieventTrigger:
         {
              eov_task_hid_SetVTABLE( p->base, 
                                     (eOvoid_fp_voidp_uint32_t)p->config.startup_fn, (eOvoid_fp_voidp_uint32_t)p->config.run_fn,

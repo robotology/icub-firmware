@@ -615,7 +615,7 @@ static void s_eom_emsappl_theemssocket_defaultopen(void)
     EOaction *onrx = (EOaction*)&astg;
     eo_action_SetEvent(onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task for any newly received packet
-    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, NULL);
 }
 
 static void s_eom_emsappl_theemstransceiver_init(void)
@@ -851,7 +851,7 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
     EOaction *onrx = (EOaction*)&astg;
     eo_action_SetEvent(onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
     // the socket alerts the cfg task for any newly received packet
-    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, NULL);
     
     // if any rx packets already in socket then alert the cfg task
     if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
@@ -883,7 +883,7 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
     EOaction *onrx = (EOaction*)&astg;
     eo_action_SetEvent(onrx, emssocket_evt_packet_received, eom_emserror_GetTask(eom_emserror_GetHandle()));
     // the socket alerts the error task for any newly received packets
-    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, NULL);
     
     // if any rx packets already in socket then alert the err task
     if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
@@ -918,7 +918,7 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
     // the alert is done by a callback, eom_emsrunner_OnUDPpacketTransmitted(), which executed by the sender of the packet directly.
     // this funtion is executed with eo_action_Execute(s->socket->ontransmission) inside the EOMtheIPnet object
     // for this reason we call eo_action_SetCallback(....., exectask = NULL_); IT MUST NOT BE the callback-manager!!!!
-    eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, ontxdone);
+    eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, ontxdone, NULL);
     
     // we activate the runner
     eom_emsrunner_Start(eom_emsrunner_GetHandle());

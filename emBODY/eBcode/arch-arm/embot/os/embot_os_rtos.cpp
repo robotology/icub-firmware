@@ -1022,6 +1022,32 @@ namespace embot { namespace os { namespace rtos {
 #endif        
     }  
 
+//    bool event_wait(const embot::os::EventMask mask, embot::os::EventMask &rxmask, embot::core::relTime timeout)
+//    { 
+//#if defined(EMBOT_USE_rtos_cmsisos2)
+//        rxmask = osThreadFlagsWait(mask, osFlagsWaitAll, cmsisos2_sys_reltime2tick(timeout));
+//        return (mask == rxmask) ? true : false;
+//#elif defined(EMBOT_USE_rtos_osal) 
+//        osal_result_t r = osal_eventflag_get(mask, osal_waitALLflags, &rxmask, static_cast<osal_reltime_t>(timeout));
+//        return (osal_res_OK == r) ? true : false;                  
+//#endif        
+//    }  
+    
+    embot::os::EventMask event_wait(const embot::os::EventMask mask, embot::os::EventWaitMode ewm, embot::core::relTime timeout)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        embot::os::EventMask rxmask {0};
+        static constexpr uint32_t emap[2] = {osFlagsWaitAny, osFlagsWaitAll};
+        rxmask = osThreadFlagsWait(mask, osFlagsWaitAll, cmsisos2_sys_reltime2tick(timeout));
+        return rxmask;
+#elif defined(EMBOT_USE_rtos_osal) 
+        embot::os::EventMask rxmask {0};
+        static constexpr osal_eventflag_waitmode_t emap[2] = {osal_waitALLflags, osal_waitANYflag};
+        osal_eventflag_get(mask, emap[embot::core::tointegral(ewm)], &rxmask, static_cast<osal_reltime_t>(timeout));
+        return rxmask;                  
+#endif         
+    }
+    
     
     // -- messagequeue section
         

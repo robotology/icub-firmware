@@ -32,9 +32,20 @@
 #include "EOtheCANprotocol.h"
 #include "EoProtocol.h"
 
-#include "osal.h"
 #include "hal.h"
+
+#if !defined(EMBOBJ_USE_EMBOT)
+#include "osal.h"
+#else
+#include "embot_os_rtos.h"
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+
+#if defined(USE_EMBOT_HW)
+#include "embot_hw_can.h"
+#else
 #include "hal_mpu_name_stm32f407ig.h"
+#endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -65,7 +76,7 @@
 const eOcanserv_cfg_t eo_canserv_DefaultCfg = 
 {    
     EO_INIT(.mode                   ) eocanserv_mode_ondemand,
-    EO_INIT(.canstabilizationtime   ) 7*OSAL_reltime1sec,
+    EO_INIT(.canstabilizationtime   ) 7*EOK_reltime1sec,
     EO_INIT(.rxqueuesize            ) {64, 64},
     EO_INIT(.txqueuesize            ) {64, 64},
     EO_INIT(.onrxcallback           ) {NULL, NULL},
@@ -218,14 +229,24 @@ extern eOresult_t eo_canserv_TXstart(EOtheCANservice *p, eOcanport_t port, uint8
         return(eores_OK);
     }
     
-    hal_irqn_t irqn = (eOcanport1 == port)? hal_mpu_name_stm32f407ig_CAN1_TX_IRQn : hal_mpu_name_stm32f407ig_CAN2_TX_IRQn;
     uint8_t numofoutframes = 0;
-    
+#if defined(USE_EMBOT_HW)
+    embot::hw::CAN cp = (eOcanport1 == port) ? embot::hw::CAN::one : embot::hw::CAN::two; 
+    bool txIRQenabled = embot::hw::can::lock(cp, embot::hw::can::Direction::TX);
+#else    
+    hal_irqn_t irqn = (eOcanport1 == port)? hal_mpu_name_stm32f407ig_CAN1_TX_IRQn : hal_mpu_name_stm32f407ig_CAN2_TX_IRQn;    
     hal_sys_irqn_disable(irqn);
+#endif  
+    
     hal_can_out_get((hal_can_port_t)port, &numofoutframes);
     p->locktilltxall[port].numoftxframes = numofoutframes; // keep it protected by irq tx disable because this VOLATILE variable is modified by isr    
     p->locktilltxall[port].totaltxframes = numofoutframes;
+
+#if defined(USE_EMBOT_HW)
+    embot::hw::can::unlock(cp, embot::hw::can::Direction::TX, txIRQenabled);
+#else           
     hal_sys_irqn_enable(irqn);
+#endif
     
     if(0 != numofoutframes)
     {
@@ -256,13 +277,19 @@ extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t por
     {   // dont wait ...
         return(eores_OK);
     } 
-    
-    osal_result_t osal_res = osal_res_OK ;   
+
+
+    eOresult_t res = eores_OK; 
     
     if(p->locktilltxall[port].totaltxframes > 0)
     {
-        if(osal_res_OK != (osal_res = osal_semaphore_decrement(p->locktilltxall[port].locksemaphore, timeout)))
-        {            
+#if !defined(EMBOBJ_USE_EMBOT)         
+        if(osal_res_OK != osal_semaphore_decrement(p->locktilltxall[port].locksemaphore, timeout))
+#else
+        if(true != embot::os::rtos::semaphore_acquire(reinterpret_cast<embot::os::rtos::semaphore_t*>(p->locktilltxall[port].locksemaphore), timeout))
+#endif        
+        {
+            res = eores_NOK_generic;            
             uint8_t sizeoftxfifo = 0;
             hal_can_out_get((hal_can_port_t)port, &sizeoftxfifo);
             eOerrmanDescriptor_t errdes = {0};
@@ -276,7 +303,7 @@ extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t por
         }
         p->locktilltxall[port].totaltxframes = 0;
     }
-    return((eOresult_t)osal_res);
+    return res;
 }
 
 extern uint8_t eo_canserv_NumberOfFramesInRXqueue(EOtheCANservice *p, eOcanport_t port)
@@ -622,14 +649,17 @@ static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
     }
     
     eOreltime_t stabilizationtime = p->config.canstabilizationtime;
-    if(stabilizationtime > 10*OSAL_reltime1sec)
+    if(stabilizationtime > 10*eok_reltime1sec)
     {
         stabilizationtime = eo_canserv_DefaultCfg.canstabilizationtime;
     }
 
     // added a wait time so that all can boards which are switched on by hal_can_init() are surely off the bootloader phase
+#if !defined(EMBOBJ_USE_EMBOT)  
     osal_task_wait(stabilizationtime); // 5 seconds for bootloader permanence plus some more time for powerup and starting application
-
+#else
+    embot::os::rtos::thread_sleep(embot::os::rtos::scheduler_thread_running(), stabilizationtime);
+#endif    
       
     return(eores_OK);
 }
@@ -667,7 +697,11 @@ static void s_eo_canserv_ontx_can(void *arg)
             locktilltxall->numoftxframes --;
             if(0 == locktilltxall->numoftxframes)
             {
+#if !defined(EMBOBJ_USE_EMBOT)  
                 osal_semaphore_increment(locktilltxall->locksemaphore, osal_callerISR);
+#else                
+                embot::os::rtos::semaphore_release(reinterpret_cast<embot::os::rtos::semaphore_t*>(locktilltxall->locksemaphore));
+#endif                
             }        
         }
     }    
@@ -691,7 +725,11 @@ static eOresult_t s_eo_canserv_otherdata_init(EOtheCANservice *p)
     {  
         p->locktilltxall[hal_can_port1].totaltxframes = 0;
         p->locktilltxall[hal_can_port1].numoftxframes = 0;
+#if !defined(EMBOBJ_USE_EMBOT)          
         if(NULL == (p->locktilltxall[hal_can_port1].locksemaphore = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/)))
+#else
+        if(NULL == (p->locktilltxall[hal_can_port1].locksemaphore = embot::os::rtos::semaphore_new(255/*maxtokens*/, 0/*current num of token*/)))
+#endif
         {
             return(eores_NOK_generic);
         }
@@ -702,7 +740,11 @@ static eOresult_t s_eo_canserv_otherdata_init(EOtheCANservice *p)
     {  
         p->locktilltxall[hal_can_port2].totaltxframes = 0;
         p->locktilltxall[hal_can_port2].numoftxframes = 0;
+#if !defined(EMBOBJ_USE_EMBOT)         
         if(NULL == (p->locktilltxall[hal_can_port2].locksemaphore = osal_semaphore_new(255/*maxtokens*/, 0/*current num of token*/)))
+#else
+        if(NULL == (p->locktilltxall[hal_can_port2].locksemaphore = embot::os::rtos::semaphore_new(255/*maxtokens*/, 0/*current num of token*/)))
+#endif
         {
             return(eores_NOK_generic);
         }

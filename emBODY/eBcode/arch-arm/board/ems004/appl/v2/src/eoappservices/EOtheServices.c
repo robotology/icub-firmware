@@ -996,7 +996,7 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_ft_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
             }                
-            embot::app::eth::theFTservice::getInstance().Verify(config, s_services_callback_afterverify_ft, eobool_true);
+            embot::app::eth::theFTservice::getInstance().Verify(config, s_services_callback_afterverify_ft, NULL, eobool_true);
         } break;        
         
         case eomn_serv_category_mais: 

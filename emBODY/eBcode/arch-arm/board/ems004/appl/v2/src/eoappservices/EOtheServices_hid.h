@@ -104,6 +104,7 @@ typedef struct
     eObool_t                                activateafterverify;
     eObool_t                                started;
     eOservice_onendofoperation_fun_t        onverify;
+    void*                                   onverifyarg;
     eOmn_serv_state_t                       state;
     const eOmn_serv_configuration_t*        tmpcfg;
     eOmn_serv_configuration_t               servconfig;

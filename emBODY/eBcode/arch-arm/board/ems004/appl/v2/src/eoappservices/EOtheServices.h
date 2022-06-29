@@ -43,7 +43,9 @@ extern "C" {
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
-
+#if defined(USE_EMBOT_theServices)    
+#error USE_EMBOT_theServices is defined, so file EOtheServices.h must not be used 
+#endif
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section

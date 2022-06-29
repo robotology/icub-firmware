@@ -361,6 +361,40 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
     
     return s_filters_set(_candata_array[index].handle, address);
 }
+
+bool can::lock(embot::hw::CAN p, embot::hw::can::Direction dir)
+{
+    if(true == supported(p))
+    {
+        if(embot::hw::can::Direction::TX == dir)
+        {
+            return can::tx_IRQdisable(p);
+        }
+        else
+        {
+            can::RX_IRQdisable(p);
+            return true;
+        }
+    }     
+    
+    return false;
+}
+
+
+void can::unlock(embot::hw::CAN p, embot::hw::can::Direction dir, bool lockstatus)
+{
+    if(true == supported(p))
+    {
+        if(embot::hw::can::Direction::TX == dir)
+        {        
+            can::tx_IRQresume(p, lockstatus);
+        }
+        else
+        {
+            can::RX_IRQenable(p);
+        }
+    } 
+}
   
 
 // - private part which does not depend on stm2hal

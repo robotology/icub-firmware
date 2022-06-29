@@ -22,6 +22,8 @@ namespace embot { namespace os {
     using Message = void *;             
     using Value = uint32_t;             
     class Thread;    
+    
+    enum class EventWaitMode : uint8_t { ALL = 0, ANY = 1 };
   
     // this enum class uses the same values as osPriority_t: {0, 1, 8 -> 55}
     enum class Priority : std::uint8_t {
@@ -69,7 +71,7 @@ namespace embot { namespace os {
 
 namespace embot { namespace os { namespace priority {
         
-    constexpr bool isvalid(uint8_t v)
+    constexpr bool isvaluevalid(uint8_t v)
     {
         if((embot::core::tointegral(Priority::schedIdle) == v) || (embot::core::tointegral(Priority::schedInit) == v))
         {
@@ -85,7 +87,7 @@ namespace embot { namespace os { namespace priority {
     
     constexpr Priority convert(uint8_t v)
     {   
-        if(true == embot::os::priority::isvalid(v))
+        if(true == embot::os::priority::isvaluevalid(v))
         {
             return static_cast<Priority>(v);
         }

@@ -14,8 +14,10 @@
 #include "embot_core.h"
 #include "embot_core_binary.h"
 
-#include "EOtheServices.h"
 #include "EoCommon.h"
+#include "EoBoards.h"
+#include "EoManagement.h"
+
 
 #include <memory>
 
