@@ -215,6 +215,9 @@ void tskEMScfg(void *p)
     eom_task_Start((EOMtask*)p);
 } 
 
+#if defined(USE_EMBOT_theHandler)
+#else
+
 EO_weak extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
 {
     
@@ -251,11 +254,12 @@ EO_weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMthe
 
 }
 
-
 EO_weak extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
 
 }
+
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

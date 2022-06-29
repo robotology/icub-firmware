@@ -1393,11 +1393,11 @@ namespace embot { namespace hw { namespace timer {
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(TIMER::thirteen) | mask::pos2mask<uint32_t>(TIMER::fifteen) | mask::pos2mask<uint32_t>(TIMER::sixteen),        
+        mask::pos2mask<uint32_t>(TIMER::one) | mask::pos2mask<uint32_t>(TIMER::two) | mask::pos2mask<uint32_t>(TIMER::three),        
         // properties
         {{
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,     // from 1 to 8
-            nullptr, nullptr, nullptr, nullptr, &tim13p, nullptr, &tim15p, &tim16p      // from 9 to 16            
+            &tim13p, &tim15p, &tim16p, nullptr, nullptr, nullptr, nullptr, nullptr,     // from 1 to 8
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16            
         }}        
     };
     
@@ -1434,17 +1434,17 @@ extern "C" {
     void TIM8_UP_TIM13_IRQHandler(void)
     {
         #warning TODO: cambiare il modo in cui si chiama la callback. usare le callback di stm32
-        manageInterrupt(embot::hw::TIMER::thirteen, &embot::hw::timer::htim13);
+        manageInterrupt(embot::hw::TIMER::one, &embot::hw::timer::htim13);
     }
     
     void TIM15_IRQHandler(void)
     {
-        manageInterrupt(embot::hw::TIMER::fifteen, &embot::hw::timer::htim15);
+        manageInterrupt(embot::hw::TIMER::two, &embot::hw::timer::htim15);
     }
     
     void TIM16_IRQHandler(void)
     {
-        manageInterrupt(embot::hw::TIMER::sixteen, &embot::hw::timer::htim16);
+        manageInterrupt(embot::hw::TIMER::three, &embot::hw::timer::htim16);
     }
 }
 

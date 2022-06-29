@@ -98,10 +98,6 @@ namespace embot { namespace app { namespace eth {
  
     }; 
     
-    // maybe put it inside theServices
-    
-    Service * get(Service::Category category);
-
 
 }}} // namespace embot { namespace app { namespace eth
 

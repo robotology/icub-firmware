@@ -31,6 +31,7 @@
 
 #include "EOsm.h"
 #include "eOcfg_sm_EMSappl.h"
+#include "eOcfg_sm_EMSappl_hid.h"
 
 #include "theHandler_Config.h"
 
@@ -38,11 +39,17 @@
 
 #include "EOtheCANservice.h"
 #include "EOtheCANdiscovery2.h"
+#include "EOtheCANprotocol.h"
 #include "embot_app_theLEDmanager.h"
 
 #include "embot_app_eth_theServices.h"
 //#include "embot_app_eth_theFTservice.h"
 #include "embot_app_eth_theServiceFT.h"
+
+#include "EOtheEntities.h"
+
+
+#include "EOMtheEMSrunner_hid.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -177,6 +184,44 @@ struct theSM
         // state::FATALERROR
         eom_emserror_Initialise(&embot::app::eth::theHandler_EOMtheEMSerror_Config);
         
+        // some services in here such as
+        
+        {    
+        eo_entities_Initialise();
+        eo_canmap_Initialise(NULL);
+        eo_canprot_Initialise(NULL);
+        }
+        
+        {   // C.  can services and discovery.
+        // so far i do in here what i need without any container
+             
+        // can-services
+        eOcanserv_cfg_t config;   
+        
+        config.mode                 = eocanserv_mode_straight;
+        config.canstabilizationtime = 7*eok_reltime1sec;
+        config.rxqueuesize[0]       = 64;
+        config.rxqueuesize[1]       = 64;
+        config.txqueuesize[0]       = 64;
+        config.txqueuesize[1]       = 64;  
+        config.onrxcallback[0]      = s_can_cbkonrx; 
+        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+        config.onrxcallback[1]      = s_can_cbkonrx; 
+        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+
+            
+        // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
+        eo_canserv_Initialise(&config);   
+        
+        // can-discovery
+        eo_candiscovery2_Initialise(NULL);  
+        EOaction_strg astrg = {0};
+        EOaction *act = (EOaction*)&astrg;
+        eo_action_SetEvent(act, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+        eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), act);
+      
+        } 
+        
         // create and start the state machine
         eo_sm_Start(sm);
         
@@ -207,6 +252,12 @@ struct theSM
     {
         eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef01);
     }    
+
+    static void s_can_cbkonrx(void *arg)
+    {
+        EOMtask *task = (EOMtask *)arg;
+        eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
+    }
     
     static void stateIDLE_onentry()
     {
@@ -218,6 +269,12 @@ struct theSM
         // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());
+        
+        // can discovery
+        EOaction_strg astrg = {0};
+        EOaction *act = (EOaction*)&astrg;
+        eo_action_SetEvent(act, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+        eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), act);
 
         // tell embot::app::eth::theETHmonitor to alert thread of configurator w/ event emsconfigurator_evt_userdef02    
         embot::app::eth::theETHmonitor::getInstance().set({ticker_ethmonitor_idle, nullptr});
@@ -244,6 +301,9 @@ struct theSM
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);    
         eo_canserv_TXstartAll(eo_canserv_GetHandle(), NULL, NULL);
         eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
+        
+        // can discovery
+        eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), nullptr);
 
         // tell the theETHmonitor to alert no task, because the runner will tick it now at every cycle
         embot::app::eth::theETHmonitor::getInstance().set({nullptr, nullptr});
@@ -268,6 +328,12 @@ struct theSM
         // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
+        
+        // can discovery
+        EOaction_strg astrg = {0};
+        EOaction *act = (EOaction*)&astrg;
+        eo_action_SetEvent(act, emsconfigurator_evt_userdef01, eom_emserror_GetTask(eom_emserror_GetHandle()));
+        eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), act);
         
         // tell embot::app::eth::theETHmonitor to alert thread of error w/ event emsconfigurator_evt_userdef02    
         embot::app::eth::theETHmonitor::getInstance().set({ticker_ethmonitor_fatalerror, nullptr});
@@ -407,7 +473,14 @@ struct theSM
         // ABSOLUTELY KEEP IT LAST: wait until can tx started by eo_canserv_TXstartAll() in objectRUN_TX_beforeUDPtx() is all done
         const eOreltime_t timeout = 3*EOK_reltime1ms;
         eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), timeout);   
-    }  
+    }
+
+    static void moveto(EOsm *sm, embot::app::eth::theHandler::State state)
+    {
+        static constexpr eOsmEventsEMSappl_t map2evt[3] = {eo_sm_emsappl_EVgo2cfg, eo_sm_emsappl_EVgo2run, eo_sm_emsappl_EVgo2err};    
+        eOsmEventsEMSappl_t smevt = map2evt[embot::core::tointegral(state)];
+        eo_sm_ProcessEvent(sm, smevt);
+    }        
 //        
 //    private:
 //    ~theSM() {}        
@@ -573,6 +646,7 @@ bool embot::app::eth::theHandler::Impl::moveto(State state)
 {
     // this makes the sm evolve to a new state. it is called by runner etc
     // it is the old eom_emsappl_SM_ProcessEvent
+    theSM::moveto(_sm, state);
     return true;
 }
 
@@ -914,6 +988,11 @@ extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStrans
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSconfigurator", &errdes); 
 }
 
+extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator* p) {}
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p) {}
+extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p) {}
+extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p) {}
+
 
 // - EOMtheEMSrunner: redefinition of userdef functions
 //   formerly inside overridden_runner.c
@@ -1025,6 +1104,8 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
     errdes.sourceaddress    = 0;    
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
 }
+
+extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p) {}
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

@@ -77,6 +77,8 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurat
 
 extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p);
 
+extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p);
+
 void tskEMScfg(void *p);
 
 #ifdef __cplusplus

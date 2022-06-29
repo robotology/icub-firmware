@@ -41,7 +41,11 @@ extern "C" {
 #if !defined(EMBOBJ_USE_EMBOT)    
 #include "osal.h"
 #else
-#include "embot_os_rtos.h"
+//#include "embot_os_rtos.h" 
+// cannot include a c++ file because ... 
+// this file EOMtheEMSrunner_hid.h is used by a .cpp file, so ... __cplusplus is defined, so ... linkage is C style
+// and as embot_os_rtos.h contains C++ only .h files it give errors.
+// so, the easiest solution is to avoid using embot::os::rtos::semaphore_t* and using void* instead
 #endif
 
 #include "hal_timer.h"
@@ -99,7 +103,7 @@ struct EOMtheEMSrunner_hid
 #if !defined(EMBOBJ_USE_EMBOT)      
     osal_semaphore_t*           waitudptxisdone;     
 #else
-    embot::os::rtos::semaphore_t* waitudptxisdone;
+    void*                       waitudptxisdone;
 #endif    
     uint8_t                     usedTXdecimationfactor;
     eOtransmitter_ropsnumber_t  txropsnumberincycle;

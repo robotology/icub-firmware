@@ -44,7 +44,7 @@ namespace embot { namespace app { namespace eth {
         .OStick = 1000*embot::core::time1microsec,
         .OSstacksizeinit = 10*1024,
         .OSuserdefinit = {theApplication_Config_inituserdefined, nullptr},
-        .OSstacksizeidle = 4*1024,
+        .OSstacksizeidle = 8*1024,
         .OSonidle = theApplication_Config_onIdle,
         .TMRMANconfig = {1024, 8, embot::os::Priority::system50},
         .CBKMANconfig = {2*1024, 8, embot::os::Priority::system49},

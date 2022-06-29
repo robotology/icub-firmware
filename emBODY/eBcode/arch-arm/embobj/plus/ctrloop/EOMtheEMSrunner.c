@@ -567,7 +567,7 @@ extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p)
 #if !defined(EMBOBJ_USE_EMBOT)    
     osal_semaphore_increment(s_theemsrunner.waitudptxisdone, osal_callerTSK);
 #else    
-    embot::os::rtos::semaphore_release(s_theemsrunner.waitudptxisdone);
+    embot::os::rtos::semaphore_release(reinterpret_cast<embot::os::rtos::semaphore_t*>(s_theemsrunner.waitudptxisdone));
 #endif    
 }
 
@@ -598,6 +598,9 @@ extern void tskEMSrunTX(void *p)
 } 
 
 
+
+#if defined(USE_EMBOT_theHandler)
+#else
 
 EO_weak extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
 {
@@ -698,6 +701,7 @@ EO_weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunn
     eo_errman_Error(eo_errman_GetHandle(), errortype, str, s_eobj_ownname, &errdes); 
 }
 
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -927,7 +931,7 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 #if !defined(EMBOBJ_USE_EMBOT)     
         osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
 #else
-        embot::os::rtos::semaphore_acquire(s_theemsrunner.waitudptxisdone, embot::core::reltimeWaitForever);
+        embot::os::rtos::semaphore_acquire(reinterpret_cast<embot::os::rtos::semaphore_t*>(s_theemsrunner.waitudptxisdone), embot::core::reltimeWaitForever);
 #endif        
         s_theemsrunner.numofpacketsinsidesocket--;
         //#warning --> marco.accame: we wait for osal_reltimeINFINITE that the udp packet is sent ... can we think of a timeout???

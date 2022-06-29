@@ -22,14 +22,7 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace embot::app::eth {
-    
-    
-    Service * get(Service::Category category)
-    {        
-        return nullptr;
-    }
-}
+
  
 
 

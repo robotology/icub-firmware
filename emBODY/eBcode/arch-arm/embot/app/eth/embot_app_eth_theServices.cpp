@@ -25,6 +25,10 @@
 
 #include "embot_app_eth_theHandler.h"
 
+#include "embot_app_eth_theErrorManager.h"
+#include "embot_os_theScheduler.h"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
@@ -45,6 +49,8 @@ struct embot::app::eth::theServices::Impl
     Impl(); 
     
     bool initialise(const Config &cfg);   
+    
+    void init_step2();
 
     bool load(embot::app::eth::Service *s);    
     
@@ -79,8 +85,106 @@ bool embot::app::eth::theServices::Impl::initialise(const Config &cfg)
     for(auto &s : _mapfofservices) { s = nullptr; }
     for(auto &r : _running) { r = false; }
     
+    
+    init_step2();
+    
     return true;
 } 
+
+#include "EOtheEntities.h"
+#include "EOtheCANmapping.h"
+#include "EOtheCANprotocol.h"
+#include "EOtheCANservice.h"
+
+
+#include "EOconstvector_hid.h"
+static const EOconstvector s_eo_theservices_vectorof_EPcfg_max = 
+{
+    EO_INIT(.capacity )     sizeof(eoprot_arrayof_maxEPcfgOthers)/sizeof(eOprot_EPcfg_t),
+    EO_INIT(.size)          sizeof(eoprot_arrayof_maxEPcfgOthers)/sizeof(eOprot_EPcfg_t),
+    EO_INIT(.item_size)     sizeof(eOprot_EPcfg_t),
+    EO_INIT(.dummy)         0,
+    EO_INIT(.stored_items)  (void*)eoprot_arrayof_maxEPcfgOthers,
+    EO_INIT(.functions)     NULL   
+};
+
+static const EOconstvector * s_eo_theservices_the_vectorof_EPcfgs = &s_eo_theservices_vectorof_EPcfg_max;
+
+
+#include "EOMtask.h"
+#include "EOMtheEMSconfigurator.h"
+static void s_can_cbkonrx(void *arg)
+{
+    EOMtask *task = (EOMtask *)arg;
+    eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
+}
+
+
+#include "EOtheCANdiscovery2.h"
+
+void embot::app::eth::theServices::Impl::init_step2()
+{
+
+    {   // A. protocol: max capabilities
+        
+        // 1. set the board number. the value of the generic board is 99. 
+        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+        //eo_nvset_BRDlocalsetnumber(_nvset, brd);
+        
+        // 2. i initialise the nvset at max capabilities
+        uint16_t numofepcfgs = eo_constvector_Size(s_eo_theservices_the_vectorof_EPcfgs);
+        uint8_t i = 0;
+        for(i=0; i<numofepcfgs; i++)
+        {
+            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) eo_constvector_At(s_eo_theservices_the_vectorof_EPcfgs, i);
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                eo_nvset_LoadEP(_nvset, epcfg, eobool_true);
+            }                        
+        }
+        
+        // 3. the callbacks
+        // marco.accame on 30 sept 2015: so far i define all the callbacks. however:
+        // a. we may decide to define EOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME and thus we must later on to load a proper callback. 
+        //    BUT maybe better not.
+        // b. if not, i MUST later on re-write the callbacks, so that:
+        //    a. we can understand if a service is configured (use proper object) and we something only if it configured.
+        //    b. make sure that when we use a get entity, we use EOtheEntities which does not address joints beyond those configured
+        
+    }   // A.    {   // B. the entities: only initted but not started or activated yets
+     
+//    {    
+//        eo_entities_Initialise();
+//        eo_canmap_Initialise(NULL);
+//        eo_canprot_Initialise(NULL);
+//    }
+
+//    {   // C.  can services and discovery.
+//        // so far i do in here what i need without any container
+//             
+//        // can-services
+//        eOcanserv_cfg_t config;   
+//        
+//        config.mode                 = eocanserv_mode_straight;
+//        config.canstabilizationtime = 7*eok_reltime1sec;
+//        config.rxqueuesize[0]       = 64;
+//        config.rxqueuesize[1]       = 64;
+//        config.txqueuesize[0]       = 64;
+//        config.txqueuesize[1]       = 64;  
+//        config.onrxcallback[0]      = s_can_cbkonrx; 
+//        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+//        config.onrxcallback[1]      = s_can_cbkonrx; 
+//        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+
+//            
+//        // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
+//        eo_canserv_Initialise(&config);   
+//        
+//        // can-discovery
+//        eo_candiscovery2_Initialise(NULL);        
+//    } 
+    
+}
 
 bool embot::app::eth::theServices::Impl::load(Service *s)
 {   
@@ -113,8 +217,10 @@ embot::app::eth::Service* embot::app::eth::theServices::Impl::get(const eOmn_ser
 
 bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *command)
 {
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
     if(nullptr == command)
     {
+        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "(nullptr)");
         return false;
     }
        
@@ -131,6 +237,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
     
     if((embot::app::eth::Service::Category::all == cat) && (eomn_serv_operation_stop == operation))
     {
+        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "stop all");
         stop();        
         sendresult(nullptr, command, eomn_serv_state_idle, true);
         return true;
@@ -154,11 +261,14 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
     
     
     #endif
+    
+    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "some request");
 
-    embot::app::eth::Service *service = embot::app::eth::get(cat);
+    embot::app::eth::Service *service = get(cat);
     if(nullptr == service)
     {   // category not supported or not available yet
         #warning TODO: send up ROP w/ failure 
+        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "cannot get service of type ...");
         sendresult(nullptr, command, eomn_serv_state_notsupported, false);
         return false;
     }
@@ -169,6 +279,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
     {
         case eomn_serv_operation_verifyactivate:
         {
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "verifyactivate");
             service->verify(config, true, onendverifyactivate);
             // we dont send any result. the callback onendverifyactivate() will do it.
             // for reference it was: s_eo_services_process_verifyactivate(category, config);            
@@ -176,6 +287,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
         
         case eomn_serv_operation_start:
         {
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "start");
             // if not ok, send up ROP w/ failure
             // else: service->Start(), mark service started
             // send in RUN mode, 
@@ -205,6 +317,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
         
         case eomn_serv_operation_stop:
         { 
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "stop");
             // if not ok, send up ROP w/ failure
             // else: service->Stop(), service->SetRegulars(0), if requested ->Deactivate(), unmark service started
             // if none is running send in IDLE mode, 
@@ -228,7 +341,8 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
         } break;
         
         case eomn_serv_operation_deactivate:
-        { 
+        {
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "deactivate");            
             service->deactivate();   
             bool noserviceisrunning {true};
             for(auto r : _running) { if(r) noserviceisrunning = false; }
@@ -244,6 +358,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
         
         case eomn_serv_operation_regsig_load:
         {
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "regsigload");
             eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;  
             uint8_t num {0};
             service->setregulars(arrayofid32, num);   
@@ -254,7 +369,8 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
         } break;        
 
         case eomn_serv_operation_regsig_clear:
-        {      
+        {
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "regsigclear");            
             uint8_t num {0};
             service->setregulars(nullptr, num);
             servstate = static_cast<eOmn_serv_state_t>(_mnservice->status.stateofservice[category]);            
@@ -264,6 +380,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
         
         default:
         {
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "default ...");
             sendresult(service, command, eomn_serv_state_idle, false);
         } break;
         
@@ -329,13 +446,13 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
             if(NULL != id32)
             { 
                 // filter them 
-                eObool_t itisrelevant = eobool_true;
+                bool itisrelevant = true;
                 if(nullptr != fpISOK)
                 {
                     itisrelevant = fpISOK(*id32);                   
                 }
                 
-                if(eobool_true == itisrelevant)
+                if(true == itisrelevant)
                 {
                     ropdesc.id32 = *id32;     
                     if(eores_OK == eo_transceiver_RegularROP_Load(boardtransceiver, &ropdesc))
@@ -461,6 +578,8 @@ bool embot::app::eth::theServices::Impl::sendresult(Service *s, const eOmn_servi
 
 bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok)
 {
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+    
 //    Service *ss = embot::app::eth::theServices::getInstance().get();
     // ok keeps the result of the verify
     if((false == ok) && (nullptr != s))
@@ -494,6 +613,8 @@ bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const e
     ropdesc.data = nullptr; // so that data from the EOnv is retrieved (which is: p->mnservice->status.commandresult)          
 
     embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+        
+    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate()", thr}, {}, ok ? "ok": "false");
                 
     return true;
 }

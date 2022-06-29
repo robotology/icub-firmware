@@ -76,7 +76,7 @@ namespace embot { namespace app { namespace eth {
     constexpr eOemserror_cfg_t theHandler_EOMtheEMSerror_Config
     {
         .taskpriority = embot::core::tointegral(embot::os::Priority::abovenorm35),
-        .taskstacksize = 2*1024
+        .taskstacksize = 4*1024
     };   
 
 
