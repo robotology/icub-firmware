@@ -75,6 +75,8 @@ namespace embot { namespace hw {
   
     enum class EEPROM : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
     
+    enum class ENCODER : std::uint8_t { one = 0, two = 1, three = 2, none = 31, maxnumberof = 3 };
+    
     enum class SPI : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 31, maxnumberof = 6 };
     
     enum class EtH : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };

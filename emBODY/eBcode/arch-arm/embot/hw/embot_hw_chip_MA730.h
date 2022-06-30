@@ -1,14 +1,14 @@
 
 /*
  * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Author:  Simone Girardi
+ * email:   simone.girardi@iit.it
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_HW_CHIP_AS5045_H_
-#define __EMBOT_HW_CHIP_AS5045_H_
+#ifndef __EMBOT_HW_CHIP_MA730_H_
+#define __EMBOT_HW_CHIP_MA730_H_
 
 #include "embot_core.h"
 #include "embot_hw_types.h"
@@ -28,9 +28,9 @@ tbd
 You can use the following code, as long as the settings for SPI are specified by the bsp of the board.
 
 ```c++
-#include "embot_hw_chip_AS5045.h"
+#include "embot_hw_chip_MA730.h"
 
-bool ok = embot::hw::chip::AS5045::testof_AS5045();
+bool ok = embot::hw::chip::MA730::testof_MA730();
 
 ```
 
@@ -49,7 +49,7 @@ The interface of the device driver is kept intentionally simple and some feature
 
 namespace embot { namespace hw { namespace chip {
     
-    class AS5045
+    class MA730
     {
       
     public:
@@ -70,7 +70,8 @@ namespace embot { namespace hw { namespace chip {
             Data() = default;
             bool isvalid() const { return status.ok; }
         }; 
-        
+
+                                
         struct Config
         {   // contains: spi bus and ... tbd            
             embot::hw::SPI spi {embot::hw::SPI::none};
@@ -83,19 +84,8 @@ namespace embot { namespace hw { namespace chip {
             }
         }; 
         
-        static constexpr embot::hw::spi::Config standardspiconfig 
-        { 
-            embot::hw::spi::Prescaler::sixtyfour, 
-            embot::hw::spi::DataSize::eight, 
-            embot::hw::spi::Mode::two,
-            { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::nopull,      // | miso | mosi |
-               embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::pullup} }  // | sclk | sel  |
-        };
-                    
-        //static constexpr embot::hw::spi::Config  & getSPIconfig() const;
-        
-        AS5045();
-        ~AS5045();
+        MA730();
+        ~MA730();
 
         bool isinitted() const;
         bool init(const Config &config);  
@@ -113,11 +103,11 @@ namespace embot { namespace hw { namespace chip {
 }}} // namespace embot { namespace hw { namespace chip {
 
 
-#define EMBOT_HW_CHIP_AS5045_enable_test   
-#if defined(EMBOT_HW_CHIP_AS5045_enable_test)    
+#define EMBOT_HW_CHIP_MA730_enable_test   
+#if defined(EMBOT_HW_CHIP_MA730_enable_test)    
 namespace embot { namespace hw { namespace chip {
     // it tests the chip and offers an example of use
-    bool testof_AS5045();
+    bool testof_MA730();
 }}}
 #endif
 

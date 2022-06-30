@@ -44,6 +44,30 @@ using namespace embot::core::binary;
 // --------------------------------------------------------------------------------------------------------------------
 // - specialize the bsp
 // --------------------------------------------------------------------------------------------------------------------
+#if defined(EMBOT_ENABLE_hw_J5_powersupply)
+
+#include "embot_hw_gpio.h"
+void J5power(bool on)
+{
+    constexpr embot::hw::GPIO J5pc {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::five};
+    
+    constexpr embot::hw::gpio::Config J5pcCfg {
+        embot::hw::gpio::Mode::OUTPUTpushpull, 
+        embot::hw::gpio::Pull::nopull, 
+        embot::hw::gpio::Speed::medium
+    };
+    static bool initted {false};
+    
+    if(!initted)
+    {
+        embot::hw::gpio::init(J5pc, J5pcCfg);
+        initted = true;
+    }
+    
+    embot::hw::gpio::set(J5pc, on ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET);        
+    HAL_Delay(10); // wait for 10 ms to stabilize ...
+}
+#endif
 
 #if defined(EMBOT_ENABLE_hw_spi_123_atstartup)    
 #include "embot_hw_gpio.h"
@@ -70,6 +94,10 @@ bool embot::hw::bsp::specialize() { return true; }
 
 #if defined(EMBOT_ENABLE_hw_spi_123_atstartup)        
         prepare_connector_j5_spi123();
+#endif
+
+#if defined(EMBOT_ENABLE_hw_J5_powersupply)
+        J5power(true);
 #endif        
         return true;
     }
@@ -362,7 +390,7 @@ namespace embot { namespace hw { namespace can {
 //        Phase_segment_1            = 8 tq
 //        Phase_segment_2            = 8 tq
 //        Synchronization_Jump_width = 8 tq
-//        Bit_length                 = 40 tq = 1 µs
+//        Bit_length                 = 40 tq = 1 ï¿½s
 //        Bit_rate                   = 1 MBit/s
 //      */
 //      hfdcan.Instance = FDCAN1;
@@ -685,6 +713,73 @@ namespace embot { namespace hw { namespace eeprom {
 // - support map: end of embot::hw::eeprom
 
 
+// - support map: begin of embot::hw::encoder
+
+#include "embot_hw_encoder.h"
+#include "embot_hw_encoder_bsp.h"
+
+#if !defined(EMBOT_ENABLE_hw_encoder)
+
+namespace embot { namespace hw { namespace encoder {
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::ENCODER h) const {}
+    void BSP::deinit(embot::hw::ENCODER h) const {}
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+#else
+
+namespace embot { namespace hw { namespace encoder {
+    
+    #if defined(STM32HAL_BOARD_AMC)
+    
+    // encoder one --> SPI1
+    constexpr PROP e1p = { embot::hw::encoder::Type::chipAS5045, 
+                           embot::hw::SPI::one
+                         };
+
+    // encoder one --> SPI2
+    constexpr PROP e2p = { embot::hw::encoder::Type::chipAS5045, 
+                           embot::hw::SPI::two
+                         };
+    
+    // encoder one --> SPI3
+    constexpr PROP e3p = { embot::hw::encoder::Type::chipAS5045, 
+                           embot::hw::SPI::three
+                         };
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(ENCODER::one) | mask::pos2mask<uint32_t>(ENCODER::two) | mask::pos2mask<uint32_t>(ENCODER::three),
+        // properties
+        {{ &e1p, &e2p, &e3p }}
+    };
+    
+    
+    void BSP::init(embot::hw::ENCODER h) const {}
+    void BSP::deinit(embot::hw::ENCODER h) const {}    
+    
+    #else
+        #error embot::hw::bsp::encoder::thebsp must be defined    
+    #endif
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+#endif // encoder
+
+// - support map: end of embot::hw::encoder
+
+
 // - support map: begin of embot::hw::spi
 
 #include "embot_hw_spi.h"
@@ -778,7 +873,7 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
     void s_J5_SPIpinout(embot::hw::SPI h, bool enable)
     {
         static constexpr embot::hw::gpio::Config out { embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::medium };    
-        static constexpr embot::hw::gpio::State stateSPI[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::SET};
+        static constexpr embot::hw::gpio::State stateSPI[2] = {embot::hw::gpio::State::SET, embot::hw::gpio::State::RESET};
         static constexpr embot::hw::gpio::State stateNONE[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::RESET};
     
         static constexpr size_t spinum {embot::core::tointegral(embot::hw::SPI::three)+1};
@@ -979,21 +1074,21 @@ extern "C"
         */
         GPIO_InitStruct.Pin = extcfg->pin(embot::hw::spi::Signal::MISO, 0);
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::MISO, GPIO_NOPULL);
+        GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::MISO, GPIO_PULLUP);
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
         HAL_GPIO_Init(extcfg->port(embot::hw::spi::Signal::MISO, nullptr), &GPIO_InitStruct);
 
         GPIO_InitStruct.Pin = extcfg->pin(embot::hw::spi::Signal::MOSI, 0);
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::MOSI, GPIO_NOPULL);
+        GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::MOSI, GPIO_PULLUP);
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
         HAL_GPIO_Init(extcfg->port(embot::hw::spi::Signal::MOSI, nullptr), &GPIO_InitStruct);
         
         GPIO_InitStruct.Pin = extcfg->pin(embot::hw::spi::Signal::SCLK, 0); 
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::SCLK, GPIO_NOPULL);;
+        GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::SCLK, GPIO_PULLUP);;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
         HAL_GPIO_Init(extcfg->port(embot::hw::spi::Signal::SCLK, nullptr), &GPIO_InitStruct);        
