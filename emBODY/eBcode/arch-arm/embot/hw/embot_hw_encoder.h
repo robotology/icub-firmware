@@ -36,14 +36,29 @@ namespace embot { namespace hw { namespace encoder {
         constexpr Config() = default;
     };
     
-
+    /**
+     * @brief  This function returns true if the encoder e is supported by the BSP.
+     * @param  e The encoder to use.
+     * @return resOK if the encoder is suppoted, resNOK otherwise.
+     */
     bool supported(ENCODER e);
+    
     bool initialised(ENCODER e);
+    
     result_t init(ENCODER e, const Config &cfg);
+    
     result_t deinit(ENCODER e);
-    result_t start(ENCODER e);
     
     const Config & config(ENCODER e);
+    
+    /**
+     * @brief  This function starts reading of data from the encoder in a non-blocking way.
+     *         When reading is finished, then the callback on reception is invoked, which can
+     *         retrieve the value with embot::hw::encoder::read().
+     * @param  e the encoder to use.
+     * @return resNOK on error else resOK.
+     */
+    result_t start_reading(ENCODER e);
     
     // BLOCKING READ.
     // it reads starting from address adr a total of destination.capacity bytes and waits until a timeout. 
@@ -57,7 +72,7 @@ namespace embot { namespace hw { namespace encoder {
     // operation fails if read() returns resNOKtimeout (the timeout has expired) or resNOK (the operation was not even started)
     
     // TODO:
-    // result_t read(ENCODER e, embot::hw::encoder::Data &destination);
+    result_t read_value(ENCODER e, embot::hw::encoder::Data &destination);
     
     
 }}} // namespace embot { namespace hw { namespace encoder

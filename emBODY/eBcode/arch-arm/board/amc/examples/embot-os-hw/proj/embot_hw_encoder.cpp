@@ -131,7 +131,7 @@ namespace embot { namespace hw { namespace encoder {
         }
         else if(embot::hw::encoder::Type::chipMA730 == cfg.type)
         {
-            // placeholder for AEA3
+            // TODO: placeholder for AEA3
             s_privatedata.chipMA730[index] = new embot::hw::chip::MA730;
         }
         
@@ -185,7 +185,12 @@ namespace embot { namespace hw { namespace encoder {
         return s_privatedata.config[embot::core::tointegral(e)];
     }
     
-    result_t start(ENCODER e)
+    void onreceive()
+    {
+        
+    }
+    
+    result_t start_reading(ENCODER e)
     {
         if(!initialised(e))
         {
@@ -197,6 +202,19 @@ namespace embot { namespace hw { namespace encoder {
         if(embot::hw::encoder::Type::chipAS5045 == s_privatedata.config[index].type)
         {
             // TODO: AEA2
+            
+            // SPI: set the callback function
+            //hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
+            embot::hw::chip::AS5045::Data dd {};
+            embot::core::Callback oncompletion { };
+            s_privatedata.chipAS5045[index]->read(dd, oncompletion);
+            
+            // SPI start to receive (only one frame)
+            //hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
+            
+            // when the frame is received, then the isr will call s_hal_spiencoder_onreceiv() to copy the frame into local memory,
+            // so that hal_spiencoder_get_value() can be called to retrieve the encoder value
+            
             return resOK;
         }
         else if(embot::hw::encoder::Type::chipMA730 == s_privatedata.config[index].type)
@@ -226,7 +244,12 @@ namespace embot { namespace hw { namespace encoder {
             // TODO: temporary save the data read here
             embot::hw::chip::AS5045::Data dd {};
             s_privatedata.chipAS5045[index]->read(dd, timeout);
-            destination.position = dd.position;
+                
+            if(dd.status.ok)
+            {
+                destination.position = dd.position;
+                destination.status = dd.status.ok;
+            }
         }
         else if(embot::hw::encoder::Type::chipMA730 == s_privatedata.config[index].type)
         {
@@ -237,6 +260,24 @@ namespace embot { namespace hw { namespace encoder {
             // placeholder for future types
         }
 
+        return resOK;
+    }
+    
+    // TODO: this should be equivalent to the GET VALUE 2 in hal
+    result_t read_value(ENCODER e, POS &pos/*, hal_spiencoder_diagnostic_t* diagn*/)
+    {   
+        if(!initialised(e))
+        {
+            return resNOK;
+        } 
+        
+        uint8_t index = embot::core::tointegral(e);
+                     
+        if(embot::hw::encoder::Type::chipAS5045 == s_privatedata.config[index].type)
+        {
+            pos = 0; // retrieve the current encoder position from data saved internally.
+        }
+        
         return resOK;
     }
 
