@@ -64,7 +64,7 @@ bool embot::hw::chip::testof_AS5045()
             }
             
             // step 06: print result
-            embot::core::print(ok ? "dummy test chipAS5045: OK --> " + std::to_string(data.position) + " " + std::to_string(data.status.bits) + " " + std::to_string(data.status.ok) : "dummy test chipAS5045: KO");   
+            embot::core::print(ok ? "dummy test chipAS5045: OK --> " + std::to_string(data.position) + " " + std::to_string(data.status.bits) + " " + std::to_string(data.status.ok) : "dummy test chipAS5045: KO");
             
             embot::core::wait(1000); // us
         }         
@@ -163,7 +163,7 @@ bool embot::hw::chip::AS5045::Impl::read(Data &data, embot::core::relTime timeou
 {   
     bool r {false};
     
-    // Using SSI we need to set CSn changes to logic low during the reading
+    // Using SSI we need to set CSn to logic low during the reading
     embot::hw::gpio::set(_sslsegopio, embot::hw::gpio::State::RESET);
     embot::core::Data da {_databuffer, sizeof(_databuffer)};
     
@@ -174,8 +174,16 @@ bool embot::hw::chip::AS5045::Impl::read(Data &data, embot::core::relTime timeou
         
         data.status.bits = ((_databuffer[1] & 0x0f) >> 1); 
         
-        // TODO: if status == 0x4 ==> OK (see AS5045 datasheet)
-        data.status.ok = true;
+        // Status Bit Outputs
+        // Placing the magnet above the chip, angular values increase in clockwise direction by default. 
+        // Data D11:D0 is valid, when the status bits have the following configurations:
+        // |    OCF    |    COF    |    LIN    |    MagInc    |    MagDec    |           Parity           |
+        // |           |           |           |      0       |       0      |                            |
+        // |     1     |     0     |     0     |      0       |       1      | Even checksum of bits 1:15 |
+        // |           |           |           |      1       |       0      |                            |
+        // |           |           |           |      1*)     |      1*)     |                            |
+        data.status.ok = (0x04 == data.status.bits) ? true : false;
+
         r = true;
     }
 
@@ -189,12 +197,24 @@ bool embot::hw::chip::AS5045::Impl::read(Data &data, embot::core::relTime timeou
 void embot::hw::chip::AS5045::Impl::onCompletion(void *p)
 {
     embot::hw::chip::AS5045::Impl *pimpl = reinterpret_cast<embot::hw::chip::AS5045::Impl*>(p);
+    
     if(nullptr != pimpl->_tmpdata)
     {
-       pimpl->_tmpdata->position = pimpl->_databuffer[0] | (pimpl->_databuffer[1] & 0x0f); // to be verified ....
-       pimpl->_tmpdata->status.ok = true;
+       pimpl->_tmpdata->position = (pimpl->_databuffer[0] << 4) | ((pimpl->_databuffer[1] & 0xf0) >> 4 );
+       pimpl->_tmpdata->status.bits = ((pimpl->_databuffer[1] & 0x0f) >> 1);
+        
+       // Status Bit Outputs
+       // Placing the magnet above the chip, angular values increase in clockwise direction by default. 
+       // Data D11:D0 is valid, when the status bits have the following configurations:
+       // |    OCF    |    COF    |    LIN    |    MagInc    |    MagDec    |           Parity           |
+       // |           |           |           |      0       |       0      |                            |
+       // |     1     |     0     |     0     |      0       |       1      | Even checksum of bits 1:15 |
+       // |           |           |           |      1       |       0      |                            |
+       // |           |           |           |      1*)     |      1*)     |                            |
+       pimpl->_tmpdata->status.ok = (0x04 == pimpl->_tmpdata->status.bits) ? true : false;
     }
-    pimpl->_tmponcompletion.execute();
+    
+    pimpl->_tmponcompletion.execute(); // can we add an argument here?
     pimpl->_tmponcompletion.clear();
     pimpl->_tmpdata = nullptr;
 }
@@ -213,7 +233,7 @@ bool embot::hw::chip::AS5045::Impl::read(Data &data, const embot::core::Callback
     }
     
     return r;
-}    
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
