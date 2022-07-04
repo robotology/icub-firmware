@@ -448,6 +448,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -648,6 +653,16 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -997,7 +1012,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1099,11 +1114,35 @@
               <FileName>osal.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+            </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1305,6 +1344,16 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1813,6 +1862,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2013,6 +2067,16 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2521,6 +2585,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2721,6 +2790,16 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3229,6 +3308,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3429,6 +3513,16 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3886,6 +3980,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4086,6 +4185,16 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
