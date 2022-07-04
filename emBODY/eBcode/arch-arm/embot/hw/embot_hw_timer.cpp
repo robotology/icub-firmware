@@ -583,10 +583,10 @@ namespace embot { namespace hw { namespace timer {
         // ok: the timer starts.
         const embot::hw::timer::PROP * stm32props = embot::hw::timer::getBSP().getPROP(t);
         TIM_HandleTypeDef* phandletimx = reinterpret_cast<TIM_HandleTypeDef*>(stm32props->handle);
+        __HAL_TIM_CLEAR_IT(phandletimx, TIM_IT_UPDATE);
         HAL_TIM_Base_Start_IT(phandletimx);
   
-        return resOK;
-        
+        return resOK;       
     } 
     
 

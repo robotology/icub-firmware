@@ -23,6 +23,7 @@
 #include "embot_os_theTimerManager.h"
 #include "embot_os_theCallbackManager.h"
 #include "embot_app_theLEDmanager.h"
+#include "embot_app_scope.h"
 
 #include <vector>
 
@@ -50,6 +51,8 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 //#define TEST_EMBOT_HW_CAN_gateway_CAN1toCAN2
 
 //# define TEST_EMBOT_HW_TIMER
+
+#define TEST_EMBOT_HW_TIMER_ONESHOT
 
 void test_embot_hw_init();
 void test_embot_hw_tick();
@@ -498,8 +501,94 @@ void tTIMTEST(void *p)
     t->run();
 }
 
+#if defined(TEST_EMBOT_HW_TIMER_ONESHOT)
+
+constexpr embot::hw::TIMER timeroneshot2test {embot::hw::TIMER::one};
+constexpr embot::core::relTime timeoneshot {1400*embot::core::time1microsec};
+constexpr embot::core::relTime timeperiodic {1000*embot::core::time1microsec};
+constexpr embot::hw::TIMER timerperiodic2test {embot::hw::TIMER::two};
+
+embot::app::scope::SignalEViewer *sigEVstart {nullptr};
+embot::app::scope::SignalEViewer *sigEV01oneshot {nullptr};
+embot::app::scope::SignalEViewer *sigEV01period {nullptr};
+embot::app::scope::SignalEViewer *sigEV02period {nullptr};
+
+void timer02_on_period(void *p)
+{
+    sigEV02period->on();
+    sigEV02period->off();     
+}
+
+
+void timer01_on_period(void *p)
+{
+    sigEV01period->on();
+    sigEV01period->off();   
+}
+
+void timer01_on_oneshot(void *p)
+{
+    sigEV01oneshot->on();
+    sigEV01oneshot->off();
+    
+    constexpr embot::hw::timer::Config cfg {
+        timeperiodic,
+        embot::hw::timer::Mode::periodic, 
+        {timer01_on_period, nullptr},
+    };
+    
+    embot::hw::timer::configure(timeroneshot2test, cfg);
+
+    // start the timer again
+    embot::hw::timer::start(timeroneshot2test);    
+}
+
+void tmrSTART() {}
+void tmr01ONESHOT() {}
+void tmr01PERIOD() {}
+    
+void tmr02PERIOD() {}
+    
+#endif
+
 void test_embot_hw_init()
 {
+#if defined(TEST_EMBOT_HW_TIMER_ONESHOT)
+
+    // 2. Create and initialize the timer with the callback defined above
+//    embot::core::Callback timer_oneshot_cbk { timer_on_oneshot, nullptr };
+    
+//    constexpr embot::core::relTime timeoneshot {1400*embot::core::time1microsec};
+//    constexpr embot::core::relTime period {embot::core::time1microsec  * 50};
+//    constexpr embot::core::relTime period {embot::core::time1millisec  * 1000};
+    
+    sigEVstart = new embot::app::scope::SignalEViewer({tmrSTART, embot::app::scope::SignalEViewer::Config::LABEL::one});
+    sigEV01oneshot = new embot::app::scope::SignalEViewer({tmr01ONESHOT, embot::app::scope::SignalEViewer::Config::LABEL::two});
+    sigEV01period = new embot::app::scope::SignalEViewer({tmr01PERIOD, embot::app::scope::SignalEViewer::Config::LABEL::three});
+    sigEV02period = new embot::app::scope::SignalEViewer({tmr02PERIOD, embot::app::scope::SignalEViewer::Config::LABEL::four});
+
+        
+    constexpr embot::hw::timer::Config timeroneshotConfig {
+        timeoneshot,
+        embot::hw::timer::Mode::oneshot, 
+        {timer01_on_oneshot, nullptr},
+    };
+    
+    
+    //constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::fifteen};
+    //constexpr embot::hw::TIMER timer2test {embot::hw::TIMER::sixteen};
+    embot::hw::timer::init(timeroneshot2test, timeroneshotConfig);
+    embot::hw::timer::init(timerperiodic2test, {1500, embot::hw::timer::Mode::periodic, {timer02_on_period, nullptr}});
+    
+    sigEVstart->on();
+    sigEVstart->off();
+
+    // 3. Start the timer
+    embot::hw::timer::start(timeroneshot2test);
+    embot::hw::timer::start(timerperiodic2test);
+#endif
+
+    
 #if defined(TEST_EMBOT_HW_TIMER)
     
     embot::hw::led::init(embot::hw::LED::five);

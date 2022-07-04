@@ -44,6 +44,7 @@
 
 #if defined(USE_EMBOT_theHandler)
 #include "embot_app_eth_theHandler.h"
+#include "embot_app_scope.h"
 #else
 #include "OPCprotocolManager_Cfg.h"
 #include "EOMtheEMSappl.h"
@@ -121,22 +122,60 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
 
 #if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
 
-void meas_rx_start(void){}
-void meas_rx_stop(void){}
-void meas_do_start(void){}
-void meas_do_stop(void){}    
-void meas_tx_start(void){}
-void meas_tx_stop(void){}
+//    #define EOM_EMSRUNNER_EVIEW_MEASURES_START
+//    #define EOM_EMSRUNNER_EVIEW_MEASURES_STOP
+    #define EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS
+
+
+    #if defined(EOM_EMSRUNNER_EVIEW_MEASURES_START)
+
+    void meas_rx_start(void){}
+    void meas_do_start(void){} 
+    void meas_tx_start(void){}
+      
+    static const evEntityId_t ev_meas_rx_start = ev_ID_first_usrdef+15; 
+    static const evEntityId_t ev_meas_do_start = ev_ID_first_usrdef+17;   
+    static const evEntityId_t ev_meas_tx_start = ev_ID_first_usrdef+19;         
+    static const evEntityId_t ev_meas_start[3] = {ev_meas_rx_start, ev_meas_do_start, ev_meas_tx_start}; 
     
-static const evEntityId_t ev_meas_rx_start = ev_ID_first_usrdef+15; 
-static const evEntityId_t ev_meas_rx_stop = ev_ID_first_usrdef+16;    
-static const evEntityId_t ev_meas_do_start = ev_ID_first_usrdef+17; 
-static const evEntityId_t ev_meas_do_stop = ev_ID_first_usrdef+18;       
-static const evEntityId_t ev_meas_tx_start = ev_ID_first_usrdef+19; 
-static const evEntityId_t ev_meas_tx_stop = ev_ID_first_usrdef+20; 
+    #endif
+
+    #if defined(EOM_EMSRUNNER_EVIEW_MEASURES_STOP)
     
-//static const evEntityId_t ev_meas_start[3] = {ev_meas_rx_start, ev_meas_do_start, ev_meas_tx_start};    
-static const evEntityId_t ev_meas_stop[3] = {ev_meas_rx_stop, ev_meas_do_stop, ev_meas_tx_stop};
+    void meas_rx_stop(void){}
+    void meas_do_stop(void){}    
+    void meas_tx_stop(void){}
+        
+    static const evEntityId_t ev_meas_rx_stop = ev_ID_first_usrdef+16;    
+    static const evEntityId_t ev_meas_do_stop = ev_ID_first_usrdef+18;       
+    static const evEntityId_t ev_meas_tx_stop = ev_ID_first_usrdef+20;   
+    static const evEntityId_t ev_meas_stop[3] = {ev_meas_rx_stop, ev_meas_do_stop, ev_meas_tx_stop};
+    
+    #endif
+    
+    #if defined(EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS)
+
+    void tmr_all_oneshot_start(void){}
+    void tmr_rx_oneshotexp(void){}    
+    void tmr_do_oneshotexp(void){} 
+    void tmr_tx_oneshotexp(void){} 
+        
+    void tmr_rx_exp(void){} 
+    void tmr_do_exp(void){}   
+    void tmr_tx_exp(void){}
+
+    static const evEntityId_t ev_tmr_all_oneshot_start = ev_ID_first_usrdef+21; 
+    static const evEntityId_t ev_tmr_rx_oneshotexp     = ev_ID_first_usrdef+22; 
+    static const evEntityId_t ev_tmr_do_oneshotexp     = ev_ID_first_usrdef+23; 
+    static const evEntityId_t ev_tmr_tx_oneshotexp     = ev_ID_first_usrdef+24; 
+    static const evEntityId_t ev_tmr_rx_exp            = ev_ID_first_usrdef+25; 
+    static const evEntityId_t ev_tmr_do_exp            = ev_ID_first_usrdef+26; 
+    static const evEntityId_t ev_tmr_tx_exp            = ev_ID_first_usrdef+27;   
+
+    static const evEntityId_t ev_tmr_oneshotexp[3] = {ev_tmr_rx_oneshotexp, ev_tmr_do_oneshotexp, ev_tmr_tx_oneshotexp};
+    static const evEntityId_t ev_tmr_exp[3] = {ev_tmr_rx_exp, ev_tmr_do_exp, ev_tmr_tx_exp};
+    
+    #endif
 
 #endif
 
@@ -280,7 +319,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   s_eom_emsrunner_taskRX_startup, s_eom_emsrunner_taskRX_run,  
                                                                   (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
-                                                                  tskEMSrunRX, "runRX");
+                                                                  tRX, "runRX");
  
     s_theemsrunner.task[eo_emsrunner_taskid_runDO] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runDO], 
@@ -288,7 +327,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   s_eom_emsrunner_taskDO_startup, s_eom_emsrunner_taskDO_run,  
                                                                   (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
-                                                                  tskEMSrunDO, "runDO"); 
+                                                                  tDO, "runDO"); 
                                                                   
     s_theemsrunner.task[eo_emsrunner_taskid_runTX] = eom_task_New(eom_mtask_OnAllEventsDriven, 
                                                                   cfg->taskpriority[eo_emsrunner_taskid_runTX], 
@@ -296,16 +335,31 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
                                                                   s_eom_emsrunner_taskTX_startup, s_eom_emsrunner_taskTX_run,  
                                                                   (eOevent_t)(eo_emsrunner_evt_enable) | (eOevent_t)(eo_emsrunner_evt_execute), 
                                                                   eok_reltimeINFINITE, NULL, 
-                                                                  tskEMSrunTX, "runTX");                                                              
+                                                                  tTX, "runTX");                                                              
      
-#if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_START)
     eventviewer_load(ev_meas_rx_start, meas_rx_start);
-    eventviewer_load(ev_meas_rx_stop, meas_rx_stop);
-    eventviewer_load(ev_meas_do_start, meas_do_start);
-    eventviewer_load(ev_meas_do_stop, meas_do_stop);    
+    eventviewer_load(ev_meas_do_start, meas_do_start);  
     eventviewer_load(ev_meas_tx_start, meas_tx_start);
+#endif
+
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_STOP)
+    eventviewer_load(ev_meas_rx_stop, meas_rx_stop);
+    eventviewer_load(ev_meas_do_stop, meas_do_stop);      
     eventviewer_load(ev_meas_tx_stop, meas_tx_stop);
 #endif
+
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS)
+    eventviewer_load(ev_tmr_all_oneshot_start, tmr_all_oneshot_start);
+    eventviewer_load(ev_tmr_rx_oneshotexp, tmr_rx_oneshotexp);
+    eventviewer_load(ev_tmr_do_oneshotexp, tmr_do_oneshotexp);
+    eventviewer_load(ev_tmr_tx_oneshotexp, tmr_tx_oneshotexp);
+    eventviewer_load(ev_tmr_rx_exp, tmr_rx_exp);
+    eventviewer_load(ev_tmr_do_exp, tmr_do_exp);
+    eventviewer_load(ev_tmr_tx_exp, tmr_tx_exp);
+#endif
+    
+
 
     s_theemsrunner.isrunning = eobool_false;
 
@@ -389,6 +443,45 @@ extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p
     return(ret);   
 }
 
+#if defined(USE_EMBOT_theHandler)
+
+#include "embot_hw_bsp_amc_config.h"
+#include "theApplication_Config.h"
+
+#if defined(EMBOT_ENABLE_hw_timer_emulated)
+        
+    // 10: period (1ms) -> 10 ms, dostart (0.4ms) -> 4ms, safetx (0.25ms) -> 2.5 ms
+    // 100: period (1ms) -> 100 ms, dostart (0.4ms) -> 40ms, safetx (0.25ms) -> 25 ms
+constexpr uint32_t cs {(embot::app::eth::theApplication_Config.OStick == 500*embot::core::time1microsec) ? 10 : 100};
+
+#else
+    constexpr uint32_t cs {1};
+#endif
+    
+extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_timing_t *timing)
+{
+    if((NULL == p) || (NULL == timing))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+    
+    if(eobool_true == s_theemsrunner.cycletiming.cycleisrunning)
+    {
+        return(eores_NOK_generic);        
+    }
+    
+    p->cfg.execRXafter = cs*timing->rxstartafter;
+    p->cfg.safeRXexecutiontime = cs*timing->dostartafter - cs*timing->rxstartafter - cs*timing->safetygap;
+    p->cfg.execDOafter = cs*timing->dostartafter;
+    p->cfg.safeDOexecutiontime = cs*timing->txstartafter - cs*timing->dostartafter - cs*timing->safetygap;
+    p->cfg.execTXafter = cs*timing->txstartafter;
+    p->cfg.safeTXexecutiontime = cs*timing->period - cs*timing->txstartafter + cs*timing->rxstartafter - cs*timing->safetygap;
+    p->cfg.period = cs*timing->period;
+    
+    return(eores_OK);
+}
+
+#else
 
 extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_timing_t *timing)
 {
@@ -413,8 +506,8 @@ extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_
     return(eores_OK);
 }
 
-
-
+#endif
+ 
 extern uint64_t eom_emsrunner_Get_IterationNumber(EOMtheEMSrunner *p)
 {  
     if(NULL == p)
@@ -568,21 +661,21 @@ extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern void tskEMSrunRX(void *p)
+void tRX(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
     eom_task_Start((EOMtask*)p);
 } 
 
 
-extern void tskEMSrunDO(void *p)
+void tDO(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
     eom_task_Start((EOMtask*)p);
 } 
 
 
-extern void tskEMSrunTX(void *p)
+void tTX(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
     eom_task_Start((EOMtask*)p);
@@ -1110,6 +1203,11 @@ static void s_eom_emsrunner_6HALTIMERS_stop(void)
 static void s_eom_emsrunner_6HALTIMERS_execute_task(void *arg)
 {
     eOemsrunner_taskid_t taskID2execute = (eOemsrunner_taskid_t) (int32_t)arg;
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS)
+    evEntityId_t prev = eventviewer_switch_to(ev_tmr_exp[taskID2execute]);      
+    eventviewer_switch_to(prev); 
+#endif    
+    
     EOMtask *task2execute = s_theemsrunner.task[taskID2execute];
            
     eOemsrunner_taskid_t taskIDprevious = (eo_emsrunner_taskid_runRX == taskID2execute) ? (eo_emsrunner_taskid_runTX) : ((eOemsrunner_taskid_t)((uint8_t)taskID2execute-1));
@@ -1171,6 +1269,11 @@ static void s_eom_emsrunner_6HALTIMERS_start_periodic_timer_safestop_check(void 
 static void s_eom_emsrunner_6HALTIMERS_start_periodic_timer_execute_task(void *arg)
 {
     eOemsrunner_taskid_t taskid = (eOemsrunner_taskid_t) (int32_t)arg;
+
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS)
+    evEntityId_t prev = eventviewer_switch_to(ev_tmr_oneshotexp[taskid]);      
+    eventviewer_switch_to(prev); 
+#endif
     
     hal_timer_cfg_t periodic_cfg  = 
     {
@@ -1193,13 +1296,17 @@ static void s_eom_emsrunner_6HALTIMERS_start_periodic_timer_execute_task(void *a
 
 static void s_eom_emsrunner_tasktiming_on_entry(eOemsrunner_taskid_t taskid)
 {
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_START)
+    evEntityId_t prev = eventviewer_switch_to(ev_meas_start[taskid]);      
+    eventviewer_switch_to(prev); 
+#endif
     s_theemsrunner.cycletiming.tasktiming[taskid].isexecuting = eobool_true;   
 }
 
 
 static void s_eom_emsrunner_tasktiming_on_exit(eOemsrunner_taskid_t taskid)
 {
-#if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_STOP)
     evEntityId_t prev = eventviewer_switch_to(ev_meas_stop[taskid]);      
     eventviewer_switch_to(prev); 
 #endif
@@ -1396,6 +1503,11 @@ static void s_eom_emsrunner_6HALTIMERS_start(EOMtheEMSrunner *p)
 
     // finally: we activate the hal timers. it is best to avoid any interruption in here, thus we disable scheduling
     //osal_system_scheduling_suspend();
+
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS)
+    evEntityId_t prev = eventviewer_switch_to(ev_tmr_all_oneshot_start );      
+    eventviewer_switch_to(prev); 
+#endif
     
     hal_timer_start(p->haltimer_start[eo_emsrunner_taskid_runRX]);
     hal_timer_start(p->haltimer_start[eo_emsrunner_taskid_runDO]);

@@ -118,9 +118,9 @@ struct EOMtheEMSrunner_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 // so that we can see it on uvision
-extern void tskEMSrunRX(void *p);
-extern void tskEMSrunDO(void *p);
-extern void tskEMSrunTX(void *p);
+void tRX(void *p);
+void tDO(void *p);
+void tTX(void *p);
 
 
 // default overridable function (weakly defined) for: transceiver error

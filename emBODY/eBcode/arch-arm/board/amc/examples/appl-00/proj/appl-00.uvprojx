@@ -340,7 +340,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2 -DUSE_EMBOT_runner -DUSE_EMBOT_theHandler -DUSE_EMBOT_theServices</MiscControls>
               <Define>USE_EMBOT_HW EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;--..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\cfg;..\..\..\bsp\ethdriver;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\app\eth;.;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\cfg\protocol;..\..\..\..\..\embobj\plus\can;..\..\..\..\ems004\appl\v2\src\eoappservices;..\..\..\..\..\embobj\plus\board</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;--..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\cfg;..\..\..\bsp\ethdriver;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\app\eth;.;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\cfg\protocol;..\..\..\..\..\embobj\plus\can;..\..\..\..\ems004\appl\v2\src\eoappservices;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -502,11 +502,35 @@
               <FileName>osal.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+            </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1971,6 +1995,57 @@
               <FileName>hal_embot.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>2</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>1</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -2322,6 +2397,21 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>scope</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2829,6 +2919,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4490,6 +4585,21 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>scope</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -4997,6 +5107,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6658,6 +6773,21 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>scope</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -7216,6 +7346,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8112,6 +8247,21 @@
               <FileName>overridden_sm.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_sm.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>scope</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -8670,6 +8820,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9569,6 +9724,21 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>scope</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -10072,6 +10242,11 @@
               <FileName>eventviewer.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+            </File>
+            <File>
+              <FileName>osal.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -11377,6 +11552,21 @@
               <FileName>overridden_sm.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\cfg\overridden\overridden_sm.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>scope</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
           </Files>
         </Group>
