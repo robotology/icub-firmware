@@ -30,7 +30,7 @@
 //    #define EMBOT_ENABLE_hw_spi_123
     #define EMBOT_ENABLE_hw_J5_powersupply
     
-//    #define EMBOT_ENABLE_hw_encoder
+    #define EMBOT_ENABLE_hw_encoder
     
 //    #define EMBOT_ENABLE_hw_button
     #define EMBOT_ENABLE_hw_can

@@ -35,7 +35,6 @@
 using namespace std;
 using namespace embot::hw;
 
-
 #if !defined(EMBOT_ENABLE_hw_encoder)
 
 namespace embot { namespace hw { namespace encoder {
@@ -48,15 +47,13 @@ namespace embot { namespace hw { namespace encoder {
     { return resNOK; }
     result_t deinit(ENCODER e)
     { return resNOK; }
-    result_t start(ENCODER e)
-    { return resNOK; }
     const Config & config(ENCODER e)
     { static Config cfg {}; return cfg; }
-    const Data & data(ENCODER e)
-    { static Data data {}; return data; }
-    size_t size(ENCODER e)
-    { return 0; }
-    result_t read(ENCODER e, embot::hw::encoder::Data &destination, embot::core::relTime timeout)
+    result_t startRead(ENCODER e, embot::core::Callback on_completion_userdef)
+    { return resNOK; }
+    result_t getValue(ENCODER e, POS &pos)
+    { return resNOK; }
+    result_t read(ENCODER e, POS &pos, embot::core::relTime timeout)
     { return resNOK; }
 
 }}} // namespace embot { namespace hw { namespace encoder {
@@ -64,20 +61,35 @@ namespace embot { namespace hw { namespace encoder {
 #else
 
 namespace embot { namespace hw { namespace encoder {
-                     
+    
     // initialised mask
     static std::uint32_t initialisedmask = 0;
     
-    struct PrivateData
-    {        
-        Config config[embot::core::tointegral(ENCODER::maxnumberof)] = {};  
-        embot::hw::chip::AS5045 *chipAS5045[embot::core::tointegral(ENCODER::maxnumberof)] = {nullptr};
-        embot::hw::chip::MA730  *chipMA730[embot::core::tointegral(ENCODER::maxnumberof)] = {nullptr};
-        PrivateData() = default;
+    struct privateData
+    {
+        embot::hw::chip::AS5045 *chip_AS5045 = {nullptr};
+        embot::hw::chip::MA730  *chip_MA730 = {nullptr};
+        
+        embot::hw::chip::AS5045::Data as5045_data {};
+        embot::hw::chip::MA730::Data ma730_data {};
+        
+        Config config = {};
+        volatile bool data_is_ready {false};
+
+        privateData() = default;
+        void start() { data_is_ready = false; }
+        void stop() { data_is_ready = true; config.onCompletion.execute(); }
     };
     
-    static PrivateData s_privatedata {};
+    std::array<privateData, embot::core::tointegral(ENCODER::maxnumberof)> _data_array = {};
     
+    void onChipCompletionReading(void *p)
+    {
+        privateData* d = reinterpret_cast<privateData*>(p);
+        
+        // set the data ready to be used and call the userdef callback if exists
+        d->stop();
+    }
     
     bool supported(ENCODER e)
     {
@@ -107,9 +119,9 @@ namespace embot { namespace hw { namespace encoder {
         }
         
         const embot::hw::encoder::BSP &encoderbsp = embot::hw::encoder::getBSP();
-        
         embot::hw::SPI spiBus = encoderbsp.getPROP(e)->spiBus;
         
+        // TODO: safe guard (remove it when AEA3 is completely implemented)
         if(cfg.type != embot::hw::encoder::Type::chipAS5045)
         {
             return resNOK;
@@ -117,7 +129,7 @@ namespace embot { namespace hw { namespace encoder {
         
         uint8_t index = embot::core::tointegral(e);
         
-        s_privatedata.config[index] = cfg;
+        _data_array[index].config = cfg;
                        
         // bsp specific initialization
         encoderbsp.init(e);
@@ -126,13 +138,14 @@ namespace embot { namespace hw { namespace encoder {
         
         if(embot::hw::encoder::Type::chipAS5045 == cfg.type)
         {
-            s_privatedata.chipAS5045[index] = new embot::hw::chip::AS5045;
-            s_privatedata.chipAS5045[index]->init({spiBus, s_privatedata.chipAS5045[index]->standardspiconfig} );
+            _data_array[index].chip_AS5045 = new embot::hw::chip::AS5045;
+            _data_array[index].chip_AS5045->init({spiBus, _data_array[index].chip_AS5045->standardspiconfig} );
         }
         else if(embot::hw::encoder::Type::chipMA730 == cfg.type)
         {
             // TODO: placeholder for AEA3
-            s_privatedata.chipMA730[index] = new embot::hw::chip::MA730;
+            //_data_array[index].chip_MA730 = new embot::hw::chip::MA730;
+            return resNOK;
         }
         
         embot::core::binary::bit::set(initialisedmask, index);
@@ -159,38 +172,34 @@ namespace embot { namespace hw { namespace encoder {
         
         if(embot::hw::encoder::Type::chipAS5045 == type)
         {
-            s_privatedata.chipAS5045[index]->deinit();
-            delete s_privatedata.chipAS5045[index];
-            s_privatedata.chipAS5045[index] = nullptr;
+            _data_array[index].chip_AS5045->deinit();
+            delete _data_array[index].chip_AS5045;
+            _data_array[index].chip_AS5045 = nullptr;
         }
         else if(embot::hw::encoder::Type::chipMA730 == type)
         {
-            s_privatedata.chipMA730[index]->deinit();
-            delete s_privatedata.chipMA730[index];
-            s_privatedata.chipMA730[index] = nullptr;
+            _data_array[index].chip_MA730->deinit();
+            delete _data_array[index].chip_MA730;
+            _data_array[index].chip_MA730 = nullptr;
         }
         
-        s_privatedata.config[index] = {};
-            
+        _data_array[index].config = {};
+        
         // bsp specific deinitialization
         encoderbsp.deinit(e);
-                
+        
         embot::core::binary::bit::clear(initialisedmask, index);
-                
+         
         return resOK;
     }
     
     const Config & config(ENCODER e)
     {
-        return s_privatedata.config[embot::core::tointegral(e)];
+        return _data_array[embot::core::tointegral(e)].config;
     }
     
-    void onreceive()
-    {
-        
-    }
     
-    result_t start_reading(ENCODER e)
+    result_t startRead(ENCODER e, embot::core::Callback on_completion_userdef)
     {
         if(!initialised(e))
         {
@@ -198,73 +207,35 @@ namespace embot { namespace hw { namespace encoder {
         } 
         
         uint8_t index = embot::core::tointegral(e);
-                     
-        if(embot::hw::encoder::Type::chipAS5045 == s_privatedata.config[index].type)
+        
+        if(embot::hw::encoder::Type::chipAS5045 == _data_array[index].config.type)
         {
-            // TODO: AEA2
+            _data_array[index].start();
             
-            // SPI: set the callback function
-            //hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
-            embot::hw::chip::AS5045::Data dd {};
-            embot::core::Callback oncompletion { };
-            s_privatedata.chipAS5045[index]->read(dd, oncompletion);
+            embot::core::Callback cbk { onChipCompletionReading, &_data_array[index] };
             
-            // SPI start to receive (only one frame)
-            //hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
-            
-            // when the frame is received, then the isr will call s_hal_spiencoder_onreceiv() to copy the frame into local memory,
-            // so that hal_spiencoder_get_value() can be called to retrieve the encoder value
-            
-            return resOK;
+            if (true == _data_array[index].chip_AS5045->read(_data_array[index].as5045_data, cbk))
+            {
+                return resOK;
+            }
+            else
+            {
+                return resNOK;
+            }
         }
-        else if(embot::hw::encoder::Type::chipMA730 == s_privatedata.config[index].type)
+        else if(embot::hw::encoder::Type::chipMA730 == _data_array[index].config.type)
         {
             // TODO: AEA3
-            return resOK;
+            return resNOK;
         }
         else
         {
             // invalid encoder
             return resNOK;
         }
-        
-    }
-
-    result_t read(ENCODER e, embot::hw::encoder::Data &destination, embot::core::relTime timeout)
-    {
-        if(!initialised(e))
-        {
-            return resNOK;
-        } 
-        
-        uint8_t index = embot::core::tointegral(e);
-                     
-        if(embot::hw::encoder::Type::chipAS5045 == s_privatedata.config[index].type)
-        {
-            // TODO: temporary save the data read here
-            embot::hw::chip::AS5045::Data dd {};
-            s_privatedata.chipAS5045[index]->read(dd, timeout);
-                
-            if(dd.status.ok)
-            {
-                destination.position = dd.position;
-                destination.status = dd.status.ok;
-            }
-        }
-        else if(embot::hw::encoder::Type::chipMA730 == s_privatedata.config[index].type)
-        {
-            // placeholder for AEA3
-        }
-        else
-        {
-            // placeholder for future types
-        }
-
-        return resOK;
     }
     
-    // TODO: this should be equivalent to the GET VALUE 2 in hal
-    result_t read_value(ENCODER e, POS &pos/*, hal_spiencoder_diagnostic_t* diagn*/)
+    result_t getValue(ENCODER e, POS &pos/*, hal_spiencoder_diagnostic_t* diagn*/)
     {   
         if(!initialised(e))
         {
@@ -272,10 +243,49 @@ namespace embot { namespace hw { namespace encoder {
         } 
         
         uint8_t index = embot::core::tointegral(e);
-                     
-        if(embot::hw::encoder::Type::chipAS5045 == s_privatedata.config[index].type)
+        result_t res { resNOK };
+        
+        if(embot::hw::encoder::Type::chipAS5045 == _data_array[index].config.type)
         {
-            pos = 0; // retrieve the current encoder position from data saved internally.
+            // retrieve the current encoder position from data saved internally.
+            if(_data_array[index].data_is_ready)
+            {
+                pos = _data_array[index].as5045_data.position;
+                res = resOK;
+            }
+        }
+        
+        return res;
+    }
+    
+    // blocking read
+    result_t read(ENCODER e, POS &pos, embot::core::relTime timeout)
+    {
+        if(!initialised(e))
+        {
+            return resNOK;
+        } 
+        
+        uint8_t index = embot::core::tointegral(e);
+                     
+        if(embot::hw::encoder::Type::chipAS5045 == _data_array[index].config.type)
+        {
+            embot::hw::chip::AS5045::Data dd {};
+            _data_array[index].chip_AS5045->read(dd, timeout);
+                
+            if(dd.status.ok)
+            {
+                pos = dd.position;
+                //destination.status = dd.status.ok;
+            }
+        }
+        else if(embot::hw::encoder::Type::chipMA730 == _data_array[index].config.type)
+        {
+            // placeholder for AEA3
+        }
+        else
+        {
+            // placeholder for future types
         }
         
         return resOK;
