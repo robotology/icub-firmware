@@ -920,6 +920,8 @@ void JointSet_do_pwm_control(JointSet* o)
     
         if (o->trq_control_active)
         {   
+            CTRL_UNITS motor_vel_kf_icubdeg_sec = ZERO;
+            
             if (o->Jjm)
             {
                 CTRL_UNITS motor_trq_ref = ZERO;
@@ -933,13 +935,15 @@ void JointSet_do_pwm_control(JointSet* o)
                     // transposed direct Jacobian
                     motor_trq_ref += o->Jjm[j][m]*o->joint[j].trq_ref;
                     motor_trq_fbk += o->Jjm[j][m]*o->joint[j].trq_fbk;
+                    motor_vel_kf_icubdeg_sec += o->Jmj[m][j] * o->joint[j].vel_fbk * o->motor[m].GEARBOX;
                 }
                 
-                motor_pwm_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk);
+                motor_pwm_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk, motor_vel_kf_icubdeg_sec);
             }
             else
             {
-                motor_pwm_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk);
+                motor_vel_kf_icubdeg_sec = o->joint[m].vel_fbk * o->motor[m].GEARBOX;
+                motor_pwm_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk, motor_vel_kf_icubdeg_sec);
             }
         }
         else
@@ -1152,6 +1156,8 @@ static void JointSet_do_current_control(JointSet* o)
     
         if (o->trq_control_active)
         {   
+            CTRL_UNITS motor_vel_kf_icubdeg_sec = ZERO;
+            
             if (o->Jjm)
             {
                 CTRL_UNITS motor_trq_ref = ZERO;
@@ -1165,13 +1171,19 @@ static void JointSet_do_current_control(JointSet* o)
                     // transposed direct Jacobian
                     motor_trq_ref += o->Jjm[j][m]*o->joint[j].trq_ref;
                     motor_trq_fbk += o->Jjm[j][m]*o->joint[j].trq_fbk;
+                    motor_vel_kf_icubdeg_sec += o->Jmj[m][j] * o->joint[j].vel_fbk * o->motor[m].GEARBOX;
                 }
                 
-                motor_current_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk);
+                motor_current_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk, motor_vel_kf_icubdeg_sec);
+                
+                //char info[70];
+                //snprintf(info, 70, "comp %f m:%d", motor_current_ref, m);
+                //JointSet_send_debug_message(info, m, 0, 0);
             }
             else
             {
-                motor_current_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk);
+                motor_vel_kf_icubdeg_sec = o->joint[m].vel_fbk * o->motor[m].GEARBOX;
+                motor_current_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk, motor_vel_kf_icubdeg_sec);
             }
         }
         else
