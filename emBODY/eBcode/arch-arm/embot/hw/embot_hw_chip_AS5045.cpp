@@ -203,7 +203,7 @@ void embot::hw::chip::AS5045::Impl::parseDataBuffer(Data &data)
     // |           |           |           |      1*)     |      1*)     |                            |
     data.status.ok = (0x04 == data.status.bits) ? true : false;
     
-    uint32_t whole_data = (_databuffer[0] | _databuffer[1] | _databuffer[2]) >> 14;
+    uint32_t whole_data = (_databuffer[0] << 10 | _databuffer[1] << 2 | _databuffer[2]);
     data.status.parity = (0 == __builtin_parity(whole_data)) ? Parity::even : Parity::odd;
 }
 
