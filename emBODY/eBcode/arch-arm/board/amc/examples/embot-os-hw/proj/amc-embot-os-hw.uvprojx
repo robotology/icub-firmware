@@ -580,6 +580,16 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_spi.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
@@ -595,9 +605,9 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_timer.cpp</FileName>
+              <FileName>embot_hw_chip_MA730.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1271,6 +1281,16 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_spi.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
@@ -1286,9 +1306,9 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_timer.cpp</FileName>
+              <FileName>embot_hw_chip_MA730.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1994,6 +2014,16 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_spi.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
@@ -2009,9 +2039,9 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_timer.cpp</FileName>
+              <FileName>embot_hw_chip_MA730.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2717,6 +2747,16 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_spi.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
@@ -2732,9 +2772,9 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_timer.cpp</FileName>
+              <FileName>embot_hw_chip_MA730.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3440,6 +3480,16 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_spi.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
@@ -3455,9 +3505,9 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_timer.cpp</FileName>
+              <FileName>embot_hw_chip_MA730.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -4112,6 +4162,16 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_spi.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
@@ -4127,9 +4187,9 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_timer.cpp</FileName>
+              <FileName>embot_hw_chip_MA730.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
           </Files>
         </Group>

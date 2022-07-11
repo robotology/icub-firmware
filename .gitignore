@@ -1,0 +1,76 @@
+# A .gitignore for Keil projects.
+# Taken mostly from http://www.keil.com/support/man/docs/uv4/uv4_b_filetypes.htm
+
+# User-specific uVision files
+#*.uvoptx
+*.uvgui
+*.uvgui.*
+*.uvguix.*
+
+# Listing files
+*.htm
+*.i
+*.lst
+*.scr
+*.map
+# define exception below if needed
+
+
+# Object and HEX files
+*.axf
+*.hex
+*.d
+*.crf
+*.o
+
+# Generated output files
+**/RTE/*
+**/obj/*
+
+# Debugger files
+# define exception below if needed
+#*.ini
+*.dbgconf
+JLinkLog.txt
+JLinkSettings.ini
+
+# Other files
+*.dep
+*.bak
+*.lnp
+
+# Miscellaneous
+*.iex
+.vscode
+
+# To explicitly override the above, define any exceptions here; e.g.:
+# !my_customized_scatter_file.sct
+!mtb_battery/AD7147_Serial2.map
+!loaderDspic30f4011/Bootloader.map
+!loaderDspic30f4013/Bootloader.map
+!emBODY/eBcode/arch-arm/board/bcb/BCB/bcb.map
+!emBODY/eBcode/arch-arm/board/bdc/BDC/bcb.map
+!emBODY/eBcode/arch-arm/board/bdc/BDC/bdc.map
+!mtb3/SKIN/dist/default/production/skin.X.production.map
+!emBODY/eBcode/arch-dspic/board/bmon/appl/BMON.X/dist/HT_PIC16F54/debug/BMON.X.debug.map
+!emBODY/eBcode/arch-dspic/board/bmon/appl/BMON.X/dist/PIC16F1824/production/BMON.X.production.map
+!emBODY/eBcode/arch-dspic/board/bmon/appl/BMON.X/dist/HT_PIC16F54/production/BMON.X.production.map
+
+!emBODY/eBcode/arch-arm/board/bcb/BCB/startup_stm32f10x_md.lst
+!emBODY/eBcode/arch-arm/board/bdc/BDC/startup_stm32f10x_md.lst
+!emBODY/eBcode/arch-arm/board/bat/BAT/MDK-ARM/startup_stm32f407xx.lst
+!emBODY/eBcode/arch-dspic/board/bmon/appl/BMON.X/dist/HT_PIC16F54/debug/BMON.X.debug.lst
+!emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/psc/MDK-ARM/startup_stm32l431xx.lst
+!emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/rfe/MDK-ARM/startup_stm32l452xx.lst
+!emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/sg3/MDK-ARM/startup_stm32l431xx.lst
+!emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/nucleoh7/MDK-ARM/startup_stm32h743xx.lst
+!emBODY/eBcode/arch-dspic/board/bmon/appl/BMON.X/dist/PIC16F1824/production/BMON.X.production.lst
+!emBODY/eBcode/arch-dspic/board/bmon/appl/BMON.X/dist/HT_PIC16F54/production/BMON.X.production.lst
+
+!emBODY/eBcode/arch-arm/board/bcb/BCB/bcb.htm
+!emBODY/eBcode/arch-arm/board/bdc/BDC/bcb.htm
+!emBODY/eBcode/arch-arm/board/bdc/BDC/bdc.htm
+!emBODY/eBcode/arch-arm/board/bcb/BCB/bcb.build_log.htm
+!emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/psc/MDK-ARM/PSC/PSC.build_log.htm
+!emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/sg3/MDK-ARM/3SG/3SG.build_log.htm
+!emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/rfe/MDK-ARM/RFE_MASTER/RFE_MASTER.build_log.htm

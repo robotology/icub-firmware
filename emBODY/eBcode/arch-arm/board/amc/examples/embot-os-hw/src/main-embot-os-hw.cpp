@@ -40,6 +40,7 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 //#define TEST_EMBOT_HW_EEPROM
 //#define TEST_EMBOT_HW_CHIP_M95512DF
 
+//#define TEST_EMBOT_HW_ENCODER
 //#define TEST_EMBOT_HW_CHIP_AS5045
 
 //#define TEST_EMBOT_HW_FLASH
@@ -52,7 +53,7 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 //# define TEST_EMBOT_HW_TIMER
 
-#define TEST_EMBOT_HW_TIMER_ONESHOT
+//#define TEST_EMBOT_HW_TIMER_ONESHOT
 
 void test_embot_hw_init();
 void test_embot_hw_tick();
@@ -401,7 +402,7 @@ int main(void)
 { 
     // steps:
     // 1. i init the embot::os
-    // 2 i start the scheduler
+    // 2. i start the scheduler
         
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
     constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
@@ -411,11 +412,11 @@ int main(void)
     // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
     embot::os::init(osconfig);
     
-    // now i start the os    
+    // now i start the os
     embot::os::start();
 
     // just because i am paranoid (thescheduler.start() never returns)
-    for(;;);    
+    for(;;);
 }
 
 
@@ -441,6 +442,9 @@ constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
 
 #endif
 
+#if defined(TEST_EMBOT_HW_ENCODER)
+    #include "embot_hw_encoder.h"
+#endif
 #if defined(TEST_EMBOT_HW_CHIP_M95512DF)
     #include "embot_hw_chip_M95512DF.h"
 #endif
@@ -512,6 +516,7 @@ embot::app::scope::SignalEViewer *sigEVstart {nullptr};
 embot::app::scope::SignalEViewer *sigEV01oneshot {nullptr};
 embot::app::scope::SignalEViewer *sigEV01period {nullptr};
 embot::app::scope::SignalEViewer *sigEV02period {nullptr};
+embot::app::scope::SignalEViewer *sigEVenc {nullptr};
 
 void timer02_on_period(void *p)
 {
@@ -543,11 +548,17 @@ void timer01_on_oneshot(void *p)
     embot::hw::timer::start(timeroneshot2test);    
 }
 
+void enc_on_read_completion(void *p)
+{
+    sigEVenc->on();
+    sigEVenc->off();
+}
+
 void tmrSTART() {}
 void tmr01ONESHOT() {}
 void tmr01PERIOD() {}
-    
 void tmr02PERIOD() {}
+void readENC() {}
     
 #endif
 
@@ -566,6 +577,8 @@ void test_embot_hw_init()
     sigEV01oneshot = new embot::app::scope::SignalEViewer({tmr01ONESHOT, embot::app::scope::SignalEViewer::Config::LABEL::two});
     sigEV01period = new embot::app::scope::SignalEViewer({tmr01PERIOD, embot::app::scope::SignalEViewer::Config::LABEL::three});
     sigEV02period = new embot::app::scope::SignalEViewer({tmr02PERIOD, embot::app::scope::SignalEViewer::Config::LABEL::four});
+    sigEVenc = new embot::app::scope::SignalEViewer({readENC, embot::app::scope::SignalEViewer::Config::LABEL::five});
+
 
         
     constexpr embot::hw::timer::Config timeroneshotConfig {
@@ -672,14 +685,61 @@ void test_embot_hw_init()
     embot::core::print("SPI3 test: " + std::string(r==embot::hw::resNOK ? "KO ":"OK ") + std::to_string(spirxdata[0]) );
     spirxdata[0] = spirxdata[0];   
     embot::hw::spi::read(embot::hw::SPI::three, rxdata, {done3, nullptr});     
-#endif    
+#endif
 
-#if defined(TEST_EMBOT_HW_CHIP_AS5045)
+
+#if defined(TEST_EMBOT_HW_ENCODER)
+
+    embot::hw::encoder::Config cfgONE   { .type = embot::hw::encoder::Type::chipAS5045 };
+    embot::hw::encoder::Config cfgTWO   { .type = embot::hw::encoder::Type::chipAS5045 };
+    embot::hw::encoder::Config cfgTHREE { .type = embot::hw::encoder::Type::chipAS5045 };
+    
+    embot::hw::ENCODER encoder_ONE = embot::hw::ENCODER::one;
+    embot::hw::ENCODER encoder_TWO = embot::hw::ENCODER::two;
+    embot::hw::ENCODER encoder_THREE = embot::hw::ENCODER::three;
+    
+    uint16_t posONE, posTWO, posTHREE = 0;
+    
+    // init the encoder(s)
+    if( embot::hw::resOK == embot::hw::encoder::init(encoder_ONE, cfgONE) &&
+        embot::hw::resOK == embot::hw::encoder::init(encoder_TWO, cfgTWO) &&
+        embot::hw::resOK == embot::hw::encoder::init(encoder_THREE, cfgTHREE))
+    {
+        for(;;)
+        {
+            sigEVenc->on();
+            sigEVenc->off();
+            
+            // start the encoder reading
+            embot::hw::encoder::startRead(encoder_ONE);
+            embot::hw::encoder::startRead(encoder_TWO);
+            embot::hw::encoder::startRead(encoder_THREE);
+            
+            for(;;)
+            {
+                // try to get the value read when the data is ready
+                if(embot::hw::resOK == embot::hw::encoder::getValue(encoder_ONE, posONE) &&
+                   embot::hw::resOK == embot::hw::encoder::getValue(encoder_TWO, posTWO) &&
+                   embot::hw::resOK == embot::hw::encoder::getValue(encoder_THREE, posTHREE))
+                {
+                    //embot::core::print(std::to_string(posONE) + " | " + 
+                    //                   std::to_string(posTWO) + " | " +
+                    //                   std::to_string(posTHREE));
+                    sigEVenc->on();
+                    sigEVenc->off();
+                    break;
+                }
+            }
+            embot::core::wait(600); // "simulate" DO + TX phase
+        }
+    }
+
+#elif defined(TEST_EMBOT_HW_CHIP_AS5045)
 
     embot::hw::chip::testof_AS5045();    
 
 #endif
-    
+
 
 #if defined(TEST_EMBOT_HW_CHIP_M95512DF)
 
