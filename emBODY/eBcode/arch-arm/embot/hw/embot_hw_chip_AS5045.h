@@ -10,11 +10,7 @@
 #ifndef __EMBOT_HW_CHIP_AS5045_H_
 #define __EMBOT_HW_CHIP_AS5045_H_
 
-#include "embot_core.h"
-#include "embot_hw_types.h"
 #include "embot_hw_spi.h"
-#include "embot_hw_gpio.h"
-
 
 #if 0
 ## Description

@@ -21,10 +21,6 @@
 #include "embot_hw_bsp_config.h"
 #include "embot_hw_encoder_bsp.h"
 
-#include <cstring>
-#include <vector>
-#include "embot_core_binary.h"
-#include "embot_hw_sys.h"
 
 #if defined(USE_STM32HAL)
     #include "stm32hal.h"
@@ -47,8 +43,6 @@ namespace embot { namespace hw { namespace encoder {
     { return resNOK; }
     result_t deinit(ENCODER e)
     { return resNOK; }
-    const Config & config(ENCODER e)
-    { static Config cfg {}; return cfg; }
     result_t startRead(ENCODER e, embot::core::Callback on_completion_userdef)
     { return resNOK; }
     result_t getValue(ENCODER e, POS &pos)
@@ -75,10 +69,12 @@ namespace embot { namespace hw { namespace encoder {
         
         Config config = {};
         volatile bool data_is_ready {false};
+        embot::core::Callback onCompletion {nullptr, nullptr};
+
 
         privateData() = default;
-        void start() { data_is_ready = false; }
-        void stop() { data_is_ready = true; config.onCompletion.execute(); }
+        void start(const embot::core::Callback &cbk) { data_is_ready = false; onCompletion = cbk; }
+        void stop() { data_is_ready = true; onCompletion.execute(); onCompletion.clear();}
     };
     
     std::array<privateData, embot::core::tointegral(ENCODER::maxnumberof)> _data_array = {};
@@ -160,15 +156,15 @@ namespace embot { namespace hw { namespace encoder {
             return resOK;
         }
         
+        uint8_t index = embot::core::tointegral(e);
+        
         const embot::hw::encoder::BSP &encoderbsp = embot::hw::encoder::getBSP();
-        embot::hw::encoder::Type type = encoderbsp.getPROP(e)->type;
+        embot::hw::encoder::Type type = _data_array[index].config.type;
         
         if(type != embot::hw::encoder::Type::chipAS5045)
         {
             return resNOK;
         }
-        
-        uint8_t index = embot::core::tointegral(e);
         
         if(embot::hw::encoder::Type::chipAS5045 == type)
         {
@@ -193,11 +189,6 @@ namespace embot { namespace hw { namespace encoder {
         return resOK;
     }
     
-    const Config & config(ENCODER e)
-    {
-        return _data_array[embot::core::tointegral(e)].config;
-    }
-    
     
     result_t startRead(ENCODER e, embot::core::Callback on_completion_userdef)
     {
@@ -210,7 +201,7 @@ namespace embot { namespace hw { namespace encoder {
         
         if(embot::hw::encoder::Type::chipAS5045 == _data_array[index].config.type)
         {
-            _data_array[index].start();
+            _data_array[index].start(on_completion_userdef);
             
             embot::core::Callback cbk { onChipCompletionReading, &_data_array[index] };
             

@@ -739,19 +739,13 @@ namespace embot { namespace hw { namespace encoder {
     #if defined(STM32HAL_BOARD_AMC)
     
     // encoder one --> SPI1
-    constexpr PROP e1p = { embot::hw::encoder::Type::chipAS5045, 
-                           embot::hw::SPI::one
-                         };
+    constexpr PROP e1p = { embot::hw::SPI::one };
 
     // encoder one --> SPI2
-    constexpr PROP e2p = { embot::hw::encoder::Type::chipAS5045, 
-                           embot::hw::SPI::two
-                         };
+    constexpr PROP e2p = { embot::hw::SPI::two };
     
     // encoder one --> SPI3
-    constexpr PROP e3p = { embot::hw::encoder::Type::chipAS5045, 
-                           embot::hw::SPI::three
-                         };
+    constexpr PROP e3p = { embot::hw::SPI::three };
         
     constexpr BSP thebsp {        
         // maskofsupported

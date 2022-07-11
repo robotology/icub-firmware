@@ -10,10 +10,7 @@
 #ifndef __EMBOT_HW_ENCODER_H_
 #define __EMBOT_HW_ENCODER_H_
 
-#include "embot_core.h"
 #include "embot_hw_types.h"
-#include "embot_hw_encoder_bsp.h"
-
 
 
 namespace embot { namespace hw { namespace encoder {
@@ -22,14 +19,17 @@ namespace embot { namespace hw { namespace encoder {
     using POS = uint16_t;
     
     /**
+     * @brief The list of supported encoders
+     */
+    enum class Type { none, chipAS5045, chipMA730, encoderEMULATED, encoderTEST}; //, spiAS5045 };
+    
+    /**
      * @brief This struct is used both internally and externally.
      *        It allow the user to init a specific encoder and configure an optional callback function.
      *        The callback function is called when the encoder value is ready to be read.
-     * 
      */
     struct Config
     {
-        embot::core::Callback onCompletion {nullptr, nullptr};
         embot::hw::encoder::Type type {embot::hw::encoder::Type::none};
         constexpr Config() = default;
     };
@@ -37,14 +37,14 @@ namespace embot { namespace hw { namespace encoder {
     /**
      * @brief  This function returns true if the encoder e is supported by the BSP.
      * @param  e The encoder to use.
-     * @return resOK if the encoder is supported, resNOK otherwise.
+     * @return true if the encoder is supported, false otherwise.
      */
     bool supported(ENCODER e);
     
     /**
      * @brief  This function returns true if the encoder e is supported by the BSP.
      * @param  e The encoder to use.
-     * @return resOK if the encoder is initialized, resNOK otherwise.
+     * @return true if the encoder is initialized, false otherwise.
      */
     bool initialised(ENCODER e);
     
@@ -66,19 +66,11 @@ namespace embot { namespace hw { namespace encoder {
     result_t deinit(ENCODER e);
     
     /**
-     * @brief This function return the configuration of the encoder e.
-     * 
-     * @param e the encoder to use.
-     * @return const Config& 
-     */
-    const Config & config(ENCODER e);
-    
-    /**
      * @brief  This function starts reading of data from the encoder in a non-blocking way.
      *         When reading is finished, then the callback on reception is invoked, which can
      *         retrieve the value with embot::hw::encoder::read().
      * @param  e the encoder to use.
-     * @param  onCompletion a callback to execute when the data is ready
+     * @param  on_completion_userdef a callback to execute when the data is ready
      * @return resNOK on error else resOK.
      */
      result_t startRead(ENCODER e, embot::core::Callback on_completion_userdef = {});
