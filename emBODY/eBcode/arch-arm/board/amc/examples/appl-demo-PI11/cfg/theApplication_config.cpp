@@ -64,12 +64,6 @@ namespace embot { namespace app { namespace eth {
         // init and start the encoder reading
         embot::hw::encoder::init(encoder_ONE, cfgEncONE);
         embot::hw::encoder::startRead(encoder_ONE);
-        
-        // init can
-        embot::hw::can::Config canconfig {};
-        embot::hw::can::init(embot::hw::CAN::one, canconfig);
-        embot::hw::can::setfilters(embot::hw::CAN::one, 1);   
-        embot::hw::can::enable(embot::hw::CAN::one);
     }
     
     void onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p)
