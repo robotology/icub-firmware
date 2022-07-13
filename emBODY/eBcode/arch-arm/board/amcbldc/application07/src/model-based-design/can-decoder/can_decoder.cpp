@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.7
+// Model version                  : 3.48
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:21:16 2022
+// C/C++ source code generated on : Wed Jul 13 11:27:48 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -17,8 +17,8 @@
 // Validation result: Not run
 //
 #include "can_decoder.h"
-#include "can_decoder_types.h"
 #include "rtwtypes.h"
+#include "can_decoder_types.h"
 #include <cstring>
 #include <stddef.h>
 #include "can_decoder_private.h"
@@ -42,9 +42,9 @@ DW_can_decoder_f_T can_decoder_DW;
 // Forward declaration for local functions
 static int32_T can_de_safe_cast_to_MCStreaming(int32_T input);
 static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
-  CANErrorTypes *rty_error_type, DW_DecodingLogic_can_decoder_T *localDW);
-static boolean_T can_d_is_controlmode_recognized(int32_T mode);
+  B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
 static int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh);
+static boolean_T can_d_is_controlmode_recognized(int32_T mode);
 static int32_T can_safe_cast_to_MCControlModes(int32_T input);
 static uint16_T can_decod_merge_2bytes_unsigned(uint16_T bl, uint16_T bh);
 
@@ -54,7 +54,7 @@ static int32_T can_de_safe_cast_to_MCStreaming(int32_T input)
 {
   int32_T output;
 
-  // Initialize output value to default value for MCStreaming (Desired_Current)
+  // Initialize output value to default value for MCStreaming (Desired_Targets)
   output = 15;
   if ((input == 0) || (input == 15)) {
     // Set output value to input value if it is a member of MCStreaming
@@ -66,7 +66,7 @@ static int32_T can_de_safe_cast_to_MCStreaming(int32_T input)
 
 // Function for Chart: '<S2>/Decoding Logic'
 static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
-  CANErrorTypes *rty_error_type, DW_DecodingLogic_can_decoder_T *localDW)
+  B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW)
 {
   boolean_T guard1 = false;
   guard1 = false;
@@ -78,27 +78,27 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
 
    case can_decoder_IN_Home_b:
     if (localDW->sfEvent == can_d_event_ev_error_pck_not4us) {
-      *rty_error_type = CANErrorTypes_Packet_Not4Us;
+      localB->error_type = CANErrorTypes_Packet_Not4Us;
       localDW->ev_errorEventCounter++;
       guard1 = true;
     } else if (localDW->sfEvent == ca_event_ev_error_pck_malformed) {
-      *rty_error_type = CANErrorTypes_Packet_Malformed;
+      localB->error_type = CANErrorTypes_Packet_Malformed;
       localDW->ev_errorEventCounter++;
       guard1 = true;
     } else if (localDW->sfEvent == event_ev_error_mode_unrecognize) {
-      *rty_error_type = CANErrorTypes_Mode_Unrecognized;
+      localB->error_type = CANErrorTypes_Mode_Unrecognized;
       localDW->ev_errorEventCounter++;
       guard1 = true;
     } else {
       if (!localDW->ev_async) {
         if (rtu_pck_available && (localDW->cmd_processed == 0)) {
-          *rty_error_type = CANErrorTypes_Packet_Unrecognized;
+          localB->error_type = CANErrorTypes_Packet_Unrecognized;
           localDW->ev_errorEventCounter++;
         } else if (localDW->cmd_processed > 1) {
-          *rty_error_type = CANErrorTypes_Packet_MultiFunctionsDetected;
+          localB->error_type = CANErrorTypes_Packet_MultiFunctionsDetected;
           localDW->ev_errorEventCounter++;
         } else {
-          *rty_error_type = CANErrorTypes_No_Error;
+          localB->error_type = CANErrorTypes_No_Error;
         }
       }
 
@@ -116,15 +116,6 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
 }
 
 // Function for Chart: '<S2>/Decoding Logic'
-static boolean_T can_d_is_controlmode_recognized(int32_T mode)
-{
-  return (mode == static_cast<int32_T>(MCControlModes_Idle)) || (mode ==
-    static_cast<int32_T>(MCControlModes_OpenLoop)) || (mode ==
-    static_cast<int32_T>(MCControlModes_SpeedVoltage)) || (mode ==
-    static_cast<int32_T>(MCControlModes_Current));
-}
-
-// Function for Chart: '<S2>/Decoding Logic'
 static int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh)
 {
   int16_T sw;
@@ -132,6 +123,15 @@ static int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh)
   x = static_cast<uint16_T>(static_cast<uint16_T>(bh << 8) | bl);
   std::memcpy((void *)&sw, (void *)&x, (uint32_T)((size_t)1 * sizeof(int16_T)));
   return sw;
+}
+
+// Function for Chart: '<S2>/Decoding Logic'
+static boolean_T can_d_is_controlmode_recognized(int32_T mode)
+{
+  return (mode == static_cast<int32_T>(MCControlModes_Idle)) || (mode ==
+    static_cast<int32_T>(MCControlModes_OpenLoop)) || (mode ==
+    static_cast<int32_T>(MCControlModes_SpeedVoltage)) || (mode ==
+    static_cast<int32_T>(MCControlModes_Current));
 }
 
 static int32_T can_safe_cast_to_MCControlModes(int32_T input)
@@ -156,74 +156,42 @@ static uint16_T can_decod_merge_2bytes_unsigned(uint16_T bl, uint16_T bh)
 }
 
 // System initialize for atomic system: '<S2>/Decoding Logic'
-void can_decoder_DecodingLogic_Init(BUS_MSG_CONTROL_MODE
-  *rty_msg_set_control_mode, BUS_MSG_CURRENT_LIMIT *rty_msg_set_current_limit,
-  CANErrorTypes *rty_error_type, BUS_MSG_DESIRED_CURRENT
-  *rty_msg_desired_current, BUS_MSG_CURRENT_PID *rty_msg_set_current_pid,
-  boolean_T *rty_ev_error, boolean_T *rty_ev_set_control_mode, boolean_T
-  *rty_ev_set_current_limit, boolean_T *rty_ev_desired_current, boolean_T
-  *rty_ev_set_current_pid, DW_DecodingLogic_can_decoder_T *localDW)
+void can_decoder_DecodingLogic_Init(B_DecodingLogic_can_decoder_T *localB,
+  DW_DecodingLogic_can_decoder_T *localDW)
 {
-  static const BUS_MSG_CONTROL_MODE tmp = { false,// motor
-    MCControlModes_Idle                // mode
-  };
-
-  static const BUS_MSG_CURRENT_LIMIT tmp_0 = { false,// motor
-    0.0F,                              // nominal
-    0.0F,                              // peak
-    0.0F                               // overload
-  };
-
-  static const BUS_MSG_DESIRED_CURRENT tmp_1 = { 0.0F// current
-  };
-
-  static const BUS_MSG_CURRENT_PID tmp_2 = { false,// motor
-    0.0F,                              // Kp
-    0.0F,                              // Ki
-    0.0F,                              // Kd
-    0U                                 // Ks
-  };
-
-  *rty_msg_set_control_mode = tmp;
-  *rty_msg_set_current_limit = tmp_0;
-  *rty_error_type = CANErrorTypes_No_Error;
-  *rty_msg_desired_current = tmp_1;
-  *rty_msg_set_current_pid = tmp_2;
-  *rty_ev_error = false;
-  *rty_ev_set_control_mode = false;
-  *rty_ev_set_current_limit = false;
-  *rty_ev_desired_current = false;
-  *rty_ev_set_current_pid = false;
   localDW->sfEvent = can_decoder_CALL_EVENT;
-  rty_msg_set_control_mode->motor = false;
-  rty_msg_set_control_mode->mode = MCControlModes_Idle;
-  rty_msg_set_current_limit->motor = false;
-  rty_msg_set_current_limit->nominal = 0.0F;
-  rty_msg_set_current_limit->peak = 0.0F;
-  rty_msg_set_current_limit->overload = 0.0F;
-  *rty_error_type = CANErrorTypes_No_Error;
-  rty_msg_desired_current->current = 0.0F;
-  rty_msg_set_current_pid->motor = false;
-  rty_msg_set_current_pid->Kp = 0.0F;
-  rty_msg_set_current_pid->Ki = 0.0F;
-  rty_msg_set_current_pid->Kd = 0.0F;
-  rty_msg_set_current_pid->Ks = 0U;
-  *rty_ev_error = false;
-  *rty_ev_set_control_mode = false;
-  *rty_ev_set_current_limit = false;
-  *rty_ev_desired_current = false;
-  *rty_ev_set_current_pid = false;
+  localB->msg_set_control_mode.motor = false;
+  localB->msg_set_control_mode.mode = MCControlModes_Idle;
+  localB->msg_set_current_limit.motor = false;
+  localB->msg_set_current_limit.nominal = 0.0F;
+  localB->msg_set_current_limit.peak = 0.0F;
+  localB->msg_set_current_limit.overload = 0.0F;
+  localB->msg_desired_targets.current = 0.0F;
+  localB->msg_desired_targets.voltage = 0.0F;
+  localB->msg_desired_targets.velocity = 0.0F;
+  localB->msg_set_pid.motor = false;
+  localB->msg_set_pid.Kp = 0.0F;
+  localB->msg_set_pid.Ki = 0.0F;
+  localB->msg_set_pid.Kd = 0.0F;
+  localB->msg_set_pid.Ks = 0U;
+  localB->msg_set_motor_config.has_hall_sens = false;
+  localB->msg_set_motor_config.has_quadrature_encoder = false;
+  localB->msg_set_motor_config.has_speed_quadrature_encoder = false;
+  localB->msg_set_motor_config.has_torque_sens = false;
+  localB->msg_set_motor_config.use_index = false;
+  localB->msg_set_motor_config.enable_verbosity = false;
+  localB->msg_set_motor_config.number_poles = 0U;
+  localB->msg_set_motor_config.encoder_tolerance = 0U;
+  localB->msg_set_motor_config.rotor_encoder_resolution = 0;
+  localB->msg_set_motor_config.rotor_index_offset = 0;
 }
 
 // Output and update for atomic system: '<S2>/Decoding Logic'
 void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
-  BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST, BUS_MSG_CONTROL_MODE
-  *rty_msg_set_control_mode, BUS_MSG_CURRENT_LIMIT *rty_msg_set_current_limit,
-  CANErrorTypes *rty_error_type, BUS_MSG_DESIRED_CURRENT
-  *rty_msg_desired_current, BUS_MSG_CURRENT_PID *rty_msg_set_current_pid,
-  boolean_T *rty_ev_error, boolean_T *rty_ev_set_control_mode, boolean_T
-  *rty_ev_set_current_limit, boolean_T *rty_ev_desired_current, boolean_T
-  *rty_ev_set_current_pid, DW_DecodingLogic_can_decoder_T *localDW)
+  BUS_CAN_PACKET_RX *rtu_pck_input, const ConfigurationParameters
+  *rtu_ConfigurationParameters, uint8_T rtu_CAN_ID_DST, uint8_T
+  rtu_CAN_VOLT_REF_SHIFT, real32_T rtu_CAN_VOLT_REF_GAIN,
+  B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW)
 {
   localDW->sfEvent = can_decoder_CALL_EVENT;
 
@@ -233,22 +201,21 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     localDW->is_active_c3_can_decoder = 1U;
     localDW->is_active_SET_CONTROL_MODE = 1U;
     localDW->is_SET_CONTROL_MODE = can_decoder_IN_Home;
-    localDW->is_active_DESIRED_CURRENT = 1U;
-    localDW->is_DESIRED_CURRENT = can_decoder_IN_Home;
-    localDW->is_active_SET_CURRENT_OPTIONS = 1U;
-    localDW->is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
+    localDW->is_active_DESIRED_TARGETS = 1U;
+    localDW->is_DESIRED_TARGETS = can_decoder_IN_Home;
+    localDW->is_active_SET_OPTIONS = 1U;
+    localDW->is_SET_OPTIONS = can_decoder_IN_Home;
+    localDW->is_active_SET_MOTOR_CONFIG = 1U;
+    localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
     localDW->is_active_ERROR_HANDLING = 1U;
     localDW->ev_async = false;
     localDW->is_ERROR_HANDLING = can_decoder_IN_Home_b;
     localDW->cmd_processed = 0U;
   } else {
-    int32_T tmp;
-    boolean_T tmp_0;
-    tmp_0 = !rtu_pck_available;
-    tmp_0 = !tmp_0;
     if ((localDW->is_active_SET_CONTROL_MODE != 0U) &&
-        (localDW->is_SET_CONTROL_MODE == can_decoder_IN_Home) && (tmp_0 &&
-         (rtu_pck_input->ID.CLS == CANClassTypes_Motor_Control_Command))) {
+        (localDW->is_SET_CONTROL_MODE == can_decoder_IN_Home) &&
+        (rtu_pck_available && (rtu_pck_input->ID.CLS ==
+          CANClassTypes_Motor_Control_Command))) {
       if (rtu_pck_input->ID.DST_TYP == rtu_CAN_ID_DST) {
         if (rtu_pck_input->PAYLOAD.LEN >= 1) {
           if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
@@ -256,20 +223,17 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
             if (rtu_pck_input->PAYLOAD.LEN >= 2) {
               if (can_d_is_controlmode_recognized(static_cast<int32_T>
                    (rtu_pck_input->PAYLOAD.ARG[1]))) {
-                rty_msg_set_control_mode->motor = rtu_pck_input->PAYLOAD.CMD.M;
-                rty_msg_set_control_mode->mode = static_cast<MCControlModes>
+                localB->msg_set_control_mode.motor =
+                  rtu_pck_input->PAYLOAD.CMD.M;
+                localB->msg_set_control_mode.mode = static_cast<MCControlModes>
                   (can_safe_cast_to_MCControlModes(rtu_pck_input->PAYLOAD.ARG[1]));
-                tmp = localDW->cmd_processed + 1;
-                if (localDW->cmd_processed + 1 > 65535) {
-                  tmp = 65535;
-                }
-
-                localDW->cmd_processed = static_cast<uint16_T>(tmp);
+                localDW->cmd_processed = static_cast<uint16_T>
+                  (localDW->cmd_processed + 1);
                 localDW->ev_set_control_modeEventCounter++;
               } else {
                 localDW->sfEvent = event_ev_error_mode_unrecognize;
                 if (localDW->is_active_ERROR_HANDLING != 0U) {
-                  can_decoder_ERROR_HANDLING(true, rty_error_type, localDW);
+                  can_decoder_ERROR_HANDLING(true, localB, localDW);
                 }
 
                 localDW->sfEvent = -1;
@@ -278,7 +242,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
             } else {
               localDW->sfEvent = ca_event_ev_error_pck_malformed;
               if (localDW->is_active_ERROR_HANDLING != 0U) {
-                can_decoder_ERROR_HANDLING(true, rty_error_type, localDW);
+                can_decoder_ERROR_HANDLING(true, localB, localDW);
               }
 
               localDW->sfEvent = -1;
@@ -288,7 +252,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
         } else {
           localDW->sfEvent = ca_event_ev_error_pck_malformed;
           if (localDW->is_active_ERROR_HANDLING != 0U) {
-            can_decoder_ERROR_HANDLING(true, rty_error_type, localDW);
+            can_decoder_ERROR_HANDLING(true, localB, localDW);
           }
 
           localDW->sfEvent = -1;
@@ -297,7 +261,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
       } else {
         localDW->sfEvent = can_d_event_ev_error_pck_not4us;
         if (localDW->is_active_ERROR_HANDLING != 0U) {
-          can_decoder_ERROR_HANDLING(true, rty_error_type, localDW);
+          can_decoder_ERROR_HANDLING(true, localB, localDW);
         }
 
         localDW->sfEvent = -1;
@@ -305,43 +269,43 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
       }
     }
 
-    if ((localDW->is_active_DESIRED_CURRENT != 0U) &&
-        (localDW->is_DESIRED_CURRENT == can_decoder_IN_Home) && (tmp_0 &&
-         (rtu_pck_input->ID.CLS == CANClassTypes_Motor_Control_Streaming) &&
+    if ((localDW->is_active_DESIRED_TARGETS != 0U) &&
+        (localDW->is_DESIRED_TARGETS == can_decoder_IN_Home) &&
+        (rtu_pck_available && (rtu_pck_input->ID.CLS ==
+          CANClassTypes_Motor_Control_Streaming) &&
          (can_de_safe_cast_to_MCStreaming(rtu_pck_input->ID.DST_TYP) ==
-          static_cast<int32_T>(MCStreaming_Desired_Current)))) {
+          static_cast<int32_T>(MCStreaming_Desired_Targets)))) {
       if ((rtu_pck_input->PAYLOAD.LEN == 8) && (rtu_CAN_ID_DST <= 4)) {
-        tmp = (rtu_CAN_ID_DST - 1) << 1;
-        if (tmp < 0) {
-          tmp = 0;
-        }
-
-        rty_msg_desired_current->current = static_cast<real32_T>
-          (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
-            (rtu_pck_input->PAYLOAD.ARG[static_cast<uint8_T>(tmp)]),
-            static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[static_cast<uint8_T>
-             (tmp) + 1]))) * 0.001F;
-        tmp = localDW->cmd_processed + 1;
-        if (localDW->cmd_processed + 1 > 65535) {
-          tmp = 65535;
-        }
-
-        localDW->cmd_processed = static_cast<uint16_T>(tmp);
-        localDW->ev_desired_currentEventCounter++;
+        int16_T tmp_merged;
+        uint8_T idx;
+        idx = static_cast<uint8_T>((rtu_CAN_ID_DST - 1) << 1);
+        tmp_merged = can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+          (rtu_pck_input->PAYLOAD.ARG[idx]), static_cast<uint16_T>
+          (rtu_pck_input->PAYLOAD.ARG[idx + 1]));
+        localB->msg_desired_targets.current = 0.001F * static_cast<real32_T>
+          (tmp_merged);
+        localB->msg_desired_targets.voltage = static_cast<real32_T>(static_cast<
+          int16_T>(tmp_merged >> (rtu_CAN_VOLT_REF_SHIFT -
+          rtu_ConfigurationParameters->CurLoopPID.shift_factor))) /
+          rtu_CAN_VOLT_REF_GAIN;
+        localB->msg_desired_targets.velocity = tmp_merged;
+        localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed +
+          1);
+        localDW->ev_desired_targetsEventCounter++;
       } else {
         localDW->sfEvent = ca_event_ev_error_pck_malformed;
         if (localDW->is_active_ERROR_HANDLING != 0U) {
-          can_decoder_ERROR_HANDLING(true, rty_error_type, localDW);
+          can_decoder_ERROR_HANDLING(true, localB, localDW);
         }
 
         localDW->sfEvent = -1;
-        localDW->is_DESIRED_CURRENT = can_decoder_IN_Home;
+        localDW->is_DESIRED_TARGETS = can_decoder_IN_Home;
       }
     }
 
-    if ((localDW->is_active_SET_CURRENT_OPTIONS != 0U) &&
-        (localDW->is_SET_CURRENT_OPTIONS == can_decoder_IN_Home) && (tmp_0 &&
-         (rtu_pck_input->ID.CLS == CANClassTypes_Motor_Control_Command))) {
+    if ((localDW->is_active_SET_OPTIONS != 0U) && (localDW->is_SET_OPTIONS ==
+         can_decoder_IN_Home) && (rtu_pck_available && (rtu_pck_input->ID.CLS ==
+          CANClassTypes_Motor_Control_Command))) {
       if (rtu_pck_input->ID.DST_TYP == rtu_CAN_ID_DST) {
         if (rtu_pck_input->PAYLOAD.LEN >= 1) {
           boolean_T guard1 = false;
@@ -349,50 +313,49 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
           if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
               (MCOPC_Set_Current_Limit)) {
             if (rtu_pck_input->PAYLOAD.LEN == 8) {
-              rty_msg_set_current_limit->motor = rtu_pck_input->PAYLOAD.CMD.M;
-              rty_msg_set_current_limit->nominal = 0.001F * static_cast<real32_T>
-                (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
-                  (rtu_pck_input->PAYLOAD.ARG[2]), static_cast<uint16_T>
-                  (rtu_pck_input->PAYLOAD.ARG[3])));
-              rty_msg_set_current_limit->peak = 0.001F * static_cast<real32_T>
+              localB->msg_set_current_limit.motor = rtu_pck_input->PAYLOAD.CMD.M;
+              localB->msg_set_current_limit.nominal = 0.001F *
+                static_cast<real32_T>(can_decoder_merge_2bytes_signed(
+                static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[2]),
+                static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[3])));
+              localB->msg_set_current_limit.peak = 0.001F * static_cast<real32_T>
                 (can_decod_merge_2bytes_unsigned(static_cast<uint16_T>
                   (rtu_pck_input->PAYLOAD.ARG[4]), static_cast<uint16_T>
                   (rtu_pck_input->PAYLOAD.ARG[5])));
-              rty_msg_set_current_limit->overload = 0.001F *
+              localB->msg_set_current_limit.overload = 0.001F *
                 static_cast<real32_T>(can_decod_merge_2bytes_unsigned(
                 static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[6]),
                 static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[7])));
-              tmp = localDW->cmd_processed + 1;
-              if (localDW->cmd_processed + 1 > 65535) {
-                tmp = 65535;
-              }
-
-              localDW->cmd_processed = static_cast<uint16_T>(tmp);
+              localDW->cmd_processed = static_cast<uint16_T>
+                (localDW->cmd_processed + 1);
               localDW->ev_set_current_limitEventCounte++;
             } else {
               guard1 = true;
             }
-          } else if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
-                     (MCOPC_Set_Current_PID)) {
+          } else if ((rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
+                      (MCOPC_Set_Current_PID)) ||
+                     (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
+                      (MCOPC_Set_Velocity_PID))) {
             if (rtu_pck_input->PAYLOAD.LEN == 8) {
-              rty_msg_set_current_pid->motor = rtu_pck_input->PAYLOAD.CMD.M;
-              rty_msg_set_current_pid->Kp = can_decoder_merge_2bytes_signed(
+              localB->msg_set_pid.motor = rtu_pck_input->PAYLOAD.CMD.M;
+              localB->msg_set_pid.Kp = can_decoder_merge_2bytes_signed(
                 static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[1]),
                 static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[2]));
-              rty_msg_set_current_pid->Ki = can_decoder_merge_2bytes_signed(
+              localB->msg_set_pid.Ki = can_decoder_merge_2bytes_signed(
                 static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[3]),
                 static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[4]));
-              rty_msg_set_current_pid->Kd = can_decoder_merge_2bytes_signed(
+              localB->msg_set_pid.Kd = can_decoder_merge_2bytes_signed(
                 static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[5]),
                 static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[6]));
-              rty_msg_set_current_pid->Ks = rtu_pck_input->PAYLOAD.ARG[7];
-              tmp = localDW->cmd_processed + 1;
-              if (localDW->cmd_processed + 1 > 65535) {
-                tmp = 65535;
+              localB->msg_set_pid.Ks = rtu_pck_input->PAYLOAD.ARG[7];
+              localDW->cmd_processed = static_cast<uint16_T>
+                (localDW->cmd_processed + 1);
+              if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
+                  (MCOPC_Set_Current_PID)) {
+                localDW->ev_set_current_pidEventCounter++;
+              } else {
+                localDW->ev_set_velocity_pidEventCounter++;
               }
-
-              localDW->cmd_processed = static_cast<uint16_T>(tmp);
-              localDW->ev_set_current_pidEventCounter++;
             } else {
               guard1 = true;
             }
@@ -401,61 +364,137 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
           if (guard1) {
             localDW->sfEvent = ca_event_ev_error_pck_malformed;
             if (localDW->is_active_ERROR_HANDLING != 0U) {
-              can_decoder_ERROR_HANDLING(true, rty_error_type, localDW);
+              can_decoder_ERROR_HANDLING(true, localB, localDW);
             }
 
             localDW->sfEvent = -1;
-            localDW->is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
+            localDW->is_SET_OPTIONS = can_decoder_IN_Home;
           }
         } else {
           localDW->sfEvent = ca_event_ev_error_pck_malformed;
           if (localDW->is_active_ERROR_HANDLING != 0U) {
-            can_decoder_ERROR_HANDLING(true, rty_error_type, localDW);
+            can_decoder_ERROR_HANDLING(true, localB, localDW);
           }
 
           localDW->sfEvent = -1;
-          localDW->is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
+          localDW->is_SET_OPTIONS = can_decoder_IN_Home;
         }
       } else {
         localDW->sfEvent = can_d_event_ev_error_pck_not4us;
         if (localDW->is_active_ERROR_HANDLING != 0U) {
-          can_decoder_ERROR_HANDLING(true, rty_error_type, localDW);
+          can_decoder_ERROR_HANDLING(true, localB, localDW);
         }
 
         localDW->sfEvent = -1;
-        localDW->is_SET_CURRENT_OPTIONS = can_decoder_IN_Home;
+        localDW->is_SET_OPTIONS = can_decoder_IN_Home;
+      }
+    }
+
+    if ((localDW->is_active_SET_MOTOR_CONFIG != 0U) &&
+        (localDW->is_SET_MOTOR_CONFIG == can_decoder_IN_Home) &&
+        (rtu_pck_available && (rtu_pck_input->ID.CLS ==
+          CANClassTypes_Motor_Control_Command))) {
+      if (rtu_pck_input->ID.DST_TYP == rtu_CAN_ID_DST) {
+        if (rtu_pck_input->PAYLOAD.LEN >= 1) {
+          if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
+              (MCOPC_Set_Motor_Config)) {
+            if (rtu_pck_input->PAYLOAD.LEN == 8) {
+              localB->msg_set_motor_config.has_quadrature_encoder =
+                ((rtu_pck_input->PAYLOAD.ARG[1] & 1U) != 0U);
+              localB->msg_set_motor_config.has_hall_sens =
+                ((rtu_pck_input->PAYLOAD.ARG[1] & 2U) != 0U);
+              localB->msg_set_motor_config.has_torque_sens =
+                ((rtu_pck_input->PAYLOAD.ARG[1] & 4U) != 0U);
+              localB->msg_set_motor_config.use_index =
+                ((rtu_pck_input->PAYLOAD.ARG[1] & 8U) != 0U);
+              localB->msg_set_motor_config.has_speed_quadrature_encoder =
+                ((rtu_pck_input->PAYLOAD.ARG[1] & 16U) != 0U);
+              localB->msg_set_motor_config.enable_verbosity =
+                ((rtu_pck_input->PAYLOAD.ARG[1] & 32U) != 0U);
+              localB->msg_set_motor_config.rotor_encoder_resolution =
+                can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+                (rtu_pck_input->PAYLOAD.ARG[2]), static_cast<uint16_T>
+                (rtu_pck_input->PAYLOAD.ARG[3]));
+              localB->msg_set_motor_config.rotor_index_offset =
+                can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+                (rtu_pck_input->PAYLOAD.ARG[4]), static_cast<uint16_T>
+                (rtu_pck_input->PAYLOAD.ARG[5]));
+              localB->msg_set_motor_config.number_poles =
+                rtu_pck_input->PAYLOAD.ARG[6];
+              localB->msg_set_motor_config.encoder_tolerance =
+                rtu_pck_input->PAYLOAD.ARG[7];
+              localDW->cmd_processed = static_cast<uint16_T>
+                (localDW->cmd_processed + 1);
+              localDW->ev_set_motor_configEventCounter++;
+            } else {
+              localDW->sfEvent = ca_event_ev_error_pck_malformed;
+              if (localDW->is_active_ERROR_HANDLING != 0U) {
+                can_decoder_ERROR_HANDLING(true, localB, localDW);
+              }
+
+              localDW->sfEvent = -1;
+              localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
+            }
+          }
+        } else {
+          localDW->sfEvent = ca_event_ev_error_pck_malformed;
+          if (localDW->is_active_ERROR_HANDLING != 0U) {
+            can_decoder_ERROR_HANDLING(true, localB, localDW);
+          }
+
+          localDW->sfEvent = -1;
+          localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
+        }
+      } else {
+        localDW->sfEvent = can_d_event_ev_error_pck_not4us;
+        if (localDW->is_active_ERROR_HANDLING != 0U) {
+          can_decoder_ERROR_HANDLING(true, localB, localDW);
+        }
+
+        localDW->sfEvent = -1;
+        localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
       }
     }
 
     if (localDW->is_active_ERROR_HANDLING != 0U) {
-      can_decoder_ERROR_HANDLING(rtu_pck_available, rty_error_type, localDW);
+      can_decoder_ERROR_HANDLING(rtu_pck_available, localB, localDW);
     }
   }
 
   // End of Chart: '<S2>/Decoding Logic'
   if (localDW->ev_errorEventCounter > 0U) {
-    *rty_ev_error = !*rty_ev_error;
+    localB->ev_error = !localB->ev_error;
     localDW->ev_errorEventCounter--;
   }
 
   if (localDW->ev_set_control_modeEventCounter > 0U) {
-    *rty_ev_set_control_mode = !*rty_ev_set_control_mode;
+    localB->ev_set_control_mode = !localB->ev_set_control_mode;
     localDW->ev_set_control_modeEventCounter--;
   }
 
   if (localDW->ev_set_current_limitEventCounte > 0U) {
-    *rty_ev_set_current_limit = !*rty_ev_set_current_limit;
+    localB->ev_set_current_limit = !localB->ev_set_current_limit;
     localDW->ev_set_current_limitEventCounte--;
   }
 
-  if (localDW->ev_desired_currentEventCounter > 0U) {
-    *rty_ev_desired_current = !*rty_ev_desired_current;
-    localDW->ev_desired_currentEventCounter--;
+  if (localDW->ev_desired_targetsEventCounter > 0U) {
+    localB->ev_desired_targets = !localB->ev_desired_targets;
+    localDW->ev_desired_targetsEventCounter--;
   }
 
   if (localDW->ev_set_current_pidEventCounter > 0U) {
-    *rty_ev_set_current_pid = !*rty_ev_set_current_pid;
+    localB->ev_set_current_pid = !localB->ev_set_current_pid;
     localDW->ev_set_current_pidEventCounter--;
+  }
+
+  if (localDW->ev_set_velocity_pidEventCounter > 0U) {
+    localB->ev_set_velocity_pid = !localB->ev_set_velocity_pid;
+    localDW->ev_set_velocity_pidEventCounter--;
+  }
+
+  if (localDW->ev_set_motor_configEventCounter > 0U) {
+    localB->ev_set_motor_config = !localB->ev_set_motor_config;
+    localDW->ev_set_motor_configEventCounter--;
   }
 }
 
@@ -502,14 +541,8 @@ void can_decoder_Init(void)
 
   // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
   // SystemInitialize for Chart: '<S2>/Decoding Logic'
-  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[0].
-    msg_set_control_mode, &can_decoder_B.CoreSubsys[0].msg_set_current_limit,
-    &can_decoder_B.CoreSubsys[0].error_type, &can_decoder_B.CoreSubsys[0].
-    msg_desired_current, &can_decoder_B.CoreSubsys[0].msg_set_current_pid,
-    &can_decoder_B.CoreSubsys[0].ev_error, &can_decoder_B.CoreSubsys[0].
-    ev_set_control_mode, &can_decoder_B.CoreSubsys[0].ev_set_current_limit,
-    &can_decoder_B.CoreSubsys[0].ev_desired_current, &can_decoder_B.CoreSubsys[0]
-    .ev_set_current_pid, &can_decoder_DW.CoreSubsys[0].sf_DecodingLogic);
+  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[0].sf_DecodingLogic,
+    &can_decoder_DW.CoreSubsys[0].sf_DecodingLogic);
 
   // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
 
@@ -521,14 +554,8 @@ void can_decoder_Init(void)
 
   // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
   // SystemInitialize for Chart: '<S2>/Decoding Logic'
-  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[1].
-    msg_set_control_mode, &can_decoder_B.CoreSubsys[1].msg_set_current_limit,
-    &can_decoder_B.CoreSubsys[1].error_type, &can_decoder_B.CoreSubsys[1].
-    msg_desired_current, &can_decoder_B.CoreSubsys[1].msg_set_current_pid,
-    &can_decoder_B.CoreSubsys[1].ev_error, &can_decoder_B.CoreSubsys[1].
-    ev_set_control_mode, &can_decoder_B.CoreSubsys[1].ev_set_current_limit,
-    &can_decoder_B.CoreSubsys[1].ev_desired_current, &can_decoder_B.CoreSubsys[1]
-    .ev_set_current_pid, &can_decoder_DW.CoreSubsys[1].sf_DecodingLogic);
+  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[1].sf_DecodingLogic,
+    &can_decoder_DW.CoreSubsys[1].sf_DecodingLogic);
 
   // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
 
@@ -540,14 +567,8 @@ void can_decoder_Init(void)
 
   // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
   // SystemInitialize for Chart: '<S2>/Decoding Logic'
-  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[2].
-    msg_set_control_mode, &can_decoder_B.CoreSubsys[2].msg_set_current_limit,
-    &can_decoder_B.CoreSubsys[2].error_type, &can_decoder_B.CoreSubsys[2].
-    msg_desired_current, &can_decoder_B.CoreSubsys[2].msg_set_current_pid,
-    &can_decoder_B.CoreSubsys[2].ev_error, &can_decoder_B.CoreSubsys[2].
-    ev_set_control_mode, &can_decoder_B.CoreSubsys[2].ev_set_current_limit,
-    &can_decoder_B.CoreSubsys[2].ev_desired_current, &can_decoder_B.CoreSubsys[2]
-    .ev_set_current_pid, &can_decoder_DW.CoreSubsys[2].sf_DecodingLogic);
+  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[2].sf_DecodingLogic,
+    &can_decoder_DW.CoreSubsys[2].sf_DecodingLogic);
 
   // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
 
@@ -559,21 +580,16 @@ void can_decoder_Init(void)
 
   // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
   // SystemInitialize for Chart: '<S2>/Decoding Logic'
-  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[3].
-    msg_set_control_mode, &can_decoder_B.CoreSubsys[3].msg_set_current_limit,
-    &can_decoder_B.CoreSubsys[3].error_type, &can_decoder_B.CoreSubsys[3].
-    msg_desired_current, &can_decoder_B.CoreSubsys[3].msg_set_current_pid,
-    &can_decoder_B.CoreSubsys[3].ev_error, &can_decoder_B.CoreSubsys[3].
-    ev_set_control_mode, &can_decoder_B.CoreSubsys[3].ev_set_current_limit,
-    &can_decoder_B.CoreSubsys[3].ev_desired_current, &can_decoder_B.CoreSubsys[3]
-    .ev_set_current_pid, &can_decoder_DW.CoreSubsys[3].sf_DecodingLogic);
+  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[3].sf_DecodingLogic,
+    &can_decoder_DW.CoreSubsys[3].sf_DecodingLogic);
 
   // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
   // End of SystemInitialize for SubSystem: '<Root>/Cycling Decoder'
 }
 
 // Output and update for referenced model: 'can_decoder'
-void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
+void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
+                 ConfigurationParameters *rtu_ConfigurationParameters,
                  BUS_MESSAGES_RX_MULTIPLE *rty_messages_rx,
                  BUS_STATUS_RX_MULTIPLE *rty_status_rx,
                  BUS_CAN_RX_ERRORS_MULTIPLE *rty_errors_rx)
@@ -624,8 +640,10 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
 
     boolean_T rtb_FixPtRelationalOperator;
     boolean_T rtb_FixPtRelationalOperator_a;
-    boolean_T rtb_FixPtRelationalOperator_ba;
     boolean_T rtb_FixPtRelationalOperator_d;
+    boolean_T rtb_FixPtRelationalOperator_e;
+    boolean_T rtb_FixPtRelationalOperator_i;
+    boolean_T rtb_FixPtRelationalOperator_m;
     boolean_T rtb_FixPtRelationalOperator_p;
 
     // End of MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
@@ -634,19 +652,13 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     // Outputs for Atomic SubSystem: '<S1>/CAN_Decoder'
     // Chart: '<S2>/Decoding Logic' incorporates:
     //   Constant: '<S2>/Constant'
+    //   Constant: '<S2>/Constant1'
+    //   Constant: '<S2>/Constant2'
 
     can_decoder_DecodingLogic(can_decoder_B.CoreSubsys[ForEach_itr].
       pck_rx_struct.available, &can_decoder_B.CoreSubsys[ForEach_itr].
-      pck_rx_struct.packet, CAN_ID_AMC, &can_decoder_B.CoreSubsys[ForEach_itr].
-      msg_set_control_mode, &can_decoder_B.CoreSubsys[ForEach_itr].
-      msg_set_current_limit, &can_decoder_B.CoreSubsys[ForEach_itr].error_type,
-      &can_decoder_B.CoreSubsys[ForEach_itr].msg_desired_current,
-      &can_decoder_B.CoreSubsys[ForEach_itr].msg_set_current_pid,
-      &can_decoder_B.CoreSubsys[ForEach_itr].ev_error,
-      &can_decoder_B.CoreSubsys[ForEach_itr].ev_set_control_mode,
-      &can_decoder_B.CoreSubsys[ForEach_itr].ev_set_current_limit,
-      &can_decoder_B.CoreSubsys[ForEach_itr].ev_desired_current,
-      &can_decoder_B.CoreSubsys[ForEach_itr].ev_set_current_pid,
+      pck_rx_struct.packet, rtu_ConfigurationParameters, CAN_ID_AMC, 5, 10.0F,
+      &can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic,
       &can_decoder_DW.CoreSubsys[ForEach_itr].sf_DecodingLogic);
 
     // RelationalOperator: '<S6>/FixPt Relational Operator' incorporates:
@@ -657,8 +669,8 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     rtb_FixPtRelationalOperator = (can_decoder_B.CoreSubsys[ForEach_itr].
-      ev_set_control_mode != can_decoder_DW.CoreSubsys[ForEach_itr].
-      DelayInput1_DSTATE);
+      sf_DecodingLogic.ev_set_control_mode !=
+      can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE);
 
     // RelationalOperator: '<S7>/FixPt Relational Operator' incorporates:
     //   UnitDelay: '<S7>/Delay Input1'
@@ -668,8 +680,8 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     rtb_FixPtRelationalOperator_d = (can_decoder_B.CoreSubsys[ForEach_itr].
-      ev_set_current_limit != can_decoder_DW.CoreSubsys[ForEach_itr].
-      DelayInput1_DSTATE_n);
+      sf_DecodingLogic.ev_set_current_limit !=
+      can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_n);
 
     // RelationalOperator: '<S8>/FixPt Relational Operator' incorporates:
     //   UnitDelay: '<S8>/Delay Input1'
@@ -679,8 +691,8 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     rtb_FixPtRelationalOperator_a = (can_decoder_B.CoreSubsys[ForEach_itr].
-      ev_desired_current != can_decoder_DW.CoreSubsys[ForEach_itr].
-      DelayInput1_DSTATE_nk);
+      sf_DecodingLogic.ev_desired_targets !=
+      can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_nk);
 
     // RelationalOperator: '<S9>/FixPt Relational Operator' incorporates:
     //   UnitDelay: '<S9>/Delay Input1'
@@ -690,8 +702,30 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     rtb_FixPtRelationalOperator_p = (can_decoder_B.CoreSubsys[ForEach_itr].
-      ev_set_current_pid != can_decoder_DW.CoreSubsys[ForEach_itr].
-      DelayInput1_DSTATE_h);
+      sf_DecodingLogic.ev_set_current_pid !=
+      can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_h);
+
+    // RelationalOperator: '<S10>/FixPt Relational Operator' incorporates:
+    //   UnitDelay: '<S10>/Delay Input1'
+    //
+    //  Block description for '<S10>/Delay Input1':
+    //
+    //   Store in Global RAM
+
+    rtb_FixPtRelationalOperator_m = (can_decoder_B.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic.ev_set_velocity_pid !=
+      can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_l);
+
+    // RelationalOperator: '<S11>/FixPt Relational Operator' incorporates:
+    //   UnitDelay: '<S11>/Delay Input1'
+    //
+    //  Block description for '<S11>/Delay Input1':
+    //
+    //   Store in Global RAM
+
+    rtb_FixPtRelationalOperator_e = (can_decoder_B.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic.ev_set_motor_config !=
+      can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_d);
 
     // RelationalOperator: '<S5>/FixPt Relational Operator' incorporates:
     //   UnitDelay: '<S5>/Delay Input1'
@@ -700,8 +734,9 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //
     //   Store in Global RAM
 
-    rtb_FixPtRelationalOperator_ba = (can_decoder_B.CoreSubsys[ForEach_itr].
-      ev_error != can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_j);
+    rtb_FixPtRelationalOperator_i = (can_decoder_B.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic.ev_error != can_decoder_DW.CoreSubsys[ForEach_itr].
+      DelayInput1_DSTATE_j);
 
     // Update for UnitDelay: '<S6>/Delay Input1'
     //
@@ -710,7 +745,7 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE =
-      can_decoder_B.CoreSubsys[ForEach_itr].ev_set_control_mode;
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.ev_set_control_mode;
 
     // Update for UnitDelay: '<S7>/Delay Input1'
     //
@@ -719,7 +754,8 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_n =
-      can_decoder_B.CoreSubsys[ForEach_itr].ev_set_current_limit;
+      can_decoder_B.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic.ev_set_current_limit;
 
     // Update for UnitDelay: '<S8>/Delay Input1'
     //
@@ -728,7 +764,7 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_nk =
-      can_decoder_B.CoreSubsys[ForEach_itr].ev_desired_current;
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.ev_desired_targets;
 
     // Update for UnitDelay: '<S9>/Delay Input1'
     //
@@ -737,7 +773,25 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_h =
-      can_decoder_B.CoreSubsys[ForEach_itr].ev_set_current_pid;
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.ev_set_current_pid;
+
+    // Update for UnitDelay: '<S10>/Delay Input1'
+    //
+    //  Block description for '<S10>/Delay Input1':
+    //
+    //   Store in Global RAM
+
+    can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_l =
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.ev_set_velocity_pid;
+
+    // Update for UnitDelay: '<S11>/Delay Input1'
+    //
+    //  Block description for '<S11>/Delay Input1':
+    //
+    //   Store in Global RAM
+
+    can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_d =
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.ev_set_motor_config;
 
     // Update for UnitDelay: '<S5>/Delay Input1'
     //
@@ -746,19 +800,24 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
     //   Store in Global RAM
 
     can_decoder_DW.CoreSubsys[ForEach_itr].DelayInput1_DSTATE_j =
-      can_decoder_B.CoreSubsys[ForEach_itr].ev_error;
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.ev_error;
 
     // ForEachSliceAssignment generated from: '<S1>/messages_rx' incorporates:
     //   BusCreator: '<S2>/Bus Creator2'
 
     rty_messages_rx->messages[ForEach_itr].control_mode =
-      can_decoder_B.CoreSubsys[ForEach_itr].msg_set_control_mode;
+      can_decoder_B.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic.msg_set_control_mode;
     rty_messages_rx->messages[ForEach_itr].current_limit =
-      can_decoder_B.CoreSubsys[ForEach_itr].msg_set_current_limit;
-    rty_messages_rx->messages[ForEach_itr].desired_current =
-      can_decoder_B.CoreSubsys[ForEach_itr].msg_desired_current;
-    rty_messages_rx->messages[ForEach_itr].current_pid =
-      can_decoder_B.CoreSubsys[ForEach_itr].msg_set_current_pid;
+      can_decoder_B.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic.msg_set_current_limit;
+    rty_messages_rx->messages[ForEach_itr].desired_targets =
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.msg_desired_targets;
+    rty_messages_rx->messages[ForEach_itr].pid =
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.msg_set_pid;
+    rty_messages_rx->messages[ForEach_itr].motor_config =
+      can_decoder_B.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic.msg_set_motor_config;
 
     // ForEachSliceAssignment generated from: '<S1>/events_rx' incorporates:
     //   BusCreator: '<S2>/Bus Creator1'
@@ -767,17 +826,21 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw,
       rtb_FixPtRelationalOperator;
     rty_status_rx->status[ForEach_itr].current_limit =
       rtb_FixPtRelationalOperator_d;
-    rty_status_rx->status[ForEach_itr].desired_current =
+    rty_status_rx->status[ForEach_itr].desired_targets =
       rtb_FixPtRelationalOperator_a;
     rty_status_rx->status[ForEach_itr].current_pid =
       rtb_FixPtRelationalOperator_p;
+    rty_status_rx->status[ForEach_itr].velocity_pid =
+      rtb_FixPtRelationalOperator_m;
+    rty_status_rx->status[ForEach_itr].motor_config =
+      rtb_FixPtRelationalOperator_e;
 
     // ForEachSliceAssignment generated from: '<S1>/errors_rx' incorporates:
     //   BusCreator: '<S2>/Bus Creator3'
 
-    rty_errors_rx->errors[ForEach_itr].event = rtb_FixPtRelationalOperator_ba;
+    rty_errors_rx->errors[ForEach_itr].event = rtb_FixPtRelationalOperator_i;
     rty_errors_rx->errors[ForEach_itr].type =
-      can_decoder_B.CoreSubsys[ForEach_itr].error_type;
+      can_decoder_B.CoreSubsys[ForEach_itr].sf_DecodingLogic.error_type;
 
     // End of Outputs for SubSystem: '<S1>/CAN_Decoder'
   }

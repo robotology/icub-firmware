@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 4.58
+// Model version                  : 4.103
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:22:18 2022
+// C/C++ source code generated on : Wed Jul 13 10:13:31 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -40,15 +40,19 @@
 // Exported block parameters
 ConfigurationParameters InitConfParams = {
   {
-    0.0F,
-    0.0F,
+    true,
+    true,
     false,
+    false,
+    true,
+    false,
+    16000,
+    0,
+    0U,
     7U,
     1.0F,
-    2.0F,
-    500.0F,
     0.0F,
-    0U,
+    0.0F,
     0.0F,
     0.0F,
     24.0F,
@@ -62,12 +66,13 @@ ConfigurationParameters InitConfParams = {
   {
     0.0F,
     0.0F,
+    2.0F,
+    500.0F,
+    0.0F,
+    10.0F,
     0.0F,
     0.0F,
-    0.0F,
-    0.0F,
-    0.0F,
-    0.0F
+    0U
   },
 
   {
@@ -78,7 +83,8 @@ ConfigurationParameters InitConfParams = {
     0.0F,
     0.0F,
     0.0F,
-    0.0F
+    0.0F,
+    0U
   },
 
   {
@@ -89,7 +95,20 @@ ConfigurationParameters InitConfParams = {
     0.0F,
     0.0F,
     0.0F,
-    0.0F
+    0.0F,
+    0U
+  },
+
+  {
+    0.0F,
+    0.0F,
+    0.0F,
+    0.0F,
+    0.0F,
+    0.0F,
+    0.0F,
+    0.0F,
+    0U
   },
 
   {
@@ -359,11 +378,13 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
 
   // End of RateTransition generated from: '<Root>/Adapter3'
 
-  // ModelReference: '<S5>/Estimation_Velocity' incorporates:
-  //   UnitDelay generated from: '<Root>/Adapter'
+  // UnitDelay generated from: '<Root>/Adapter4'
+  AMC_BLDC_B.ZOHBlockInsertedForAdapter_Inse =
+    AMC_BLDC_DW.ZOHBlockInsertedForAdapter_Inse;
 
+  // ModelReference: '<S5>/Estimation_Velocity'
   estimation_velocity(&AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
-                      &AMC_BLDC_DW.ZOHBlockInsertedForAdapter_Inse,
+                      &AMC_BLDC_B.ZOHBlockInsertedForAdapter_Inse,
                       &AMC_BLDC_Y.EstimatedData_p.jointvelocities);
 
   // ModelReference: '<S5>/Filter_Current'
@@ -394,8 +415,9 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   // ModelReference: '<S6>/CAN_Decoder' incorporates:
   //   Inport generated from: '<Root>/In Bus Element2'
 
-  can_decoder(&AMC_BLDC_U.PacketsRx, &AMC_BLDC_B.CAN_Decoder_o1,
-              &AMC_BLDC_B.CAN_Decoder_o2, &AMC_BLDC_B.CAN_Decoder_o3);
+  can_decoder(&AMC_BLDC_U.PacketsRx, &AMC_BLDC_B.ZOHBlockInsertedForAdapter_Inse,
+              &AMC_BLDC_B.CAN_Decoder_o1, &AMC_BLDC_B.CAN_Decoder_o2,
+              &AMC_BLDC_B.CAN_Decoder_o3);
 
   // ModelReference: '<S7>/SupervisorFSM_RX' incorporates:
   //   Inport generated from: '<Root>/In Bus Element'
@@ -425,7 +447,7 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   //   Outport generated from: '<Root>/Out Bus Element1'
 
   can_encoder(&AMC_BLDC_B.MessagesTx, &rtb_SupervisorFSM_TX_o2,
-              &AMC_BLDC_Y.PacketsTx);
+              &AMC_BLDC_B.ZOHBlockInsertedForAdapter_Inse, &AMC_BLDC_Y.PacketsTx);
 
   // ModelReference: '<Root>/OuterControl' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element3'
@@ -515,7 +537,7 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
     rtb_SupervisorFSM_RX_o2;
   AMC_BLDC_DW.RTBInsertedForAdapter_Insert_jj = wrBufIdx;
 
-  // Update for UnitDelay generated from: '<Root>/Adapter' incorporates:
+  // Update for UnitDelay generated from: '<Root>/Adapter4' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element3'
 
   AMC_BLDC_DW.ZOHBlockInsertedForAdapter_Inse =
@@ -598,7 +620,8 @@ void AMC_BLDC_initialize(void)
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
-  SupervisorFSM_RX_Init(&AMC_BLDC_Y.Flags_p);
+  SupervisorFSM_RX_Init(&AMC_BLDC_Y.Flags_p,
+                        &AMC_BLDC_Y.ConfigurationParameters_p);
 
   // SystemInitialize for ModelReference: '<S7>/SupervisorFSM_TX' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element3'

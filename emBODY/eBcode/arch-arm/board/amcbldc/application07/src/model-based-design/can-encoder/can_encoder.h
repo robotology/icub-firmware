@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 3.4
+// Model version                  : 3.26
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:21:23 2022
+// C/C++ source code generated on : Wed Jul 13 11:28:00 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -58,7 +58,8 @@ extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 extern void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const
-  BUS_STATUS_TX *rtu_status_tx, BUS_CAN_MULTIPLE *rty_pck_tx);
+  BUS_STATUS_TX *rtu_status_tx, const ConfigurationParameters
+  *rtu_ConfigurationParameters, BUS_CAN_MULTIPLE *rty_pck_tx);
 
 // Model reference registration function
 extern void can_encoder_initialize(const char_T **rt_errorStatus);
