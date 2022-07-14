@@ -385,9 +385,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>amc-appl-demo-PI11-main.cpp</FileName>
+              <FileName>amc-appl-demo-enc-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\amc-appl-demo-PI11-main.cpp</FilePath>
+              <FilePath>..\src\amc-appl-demo-enc-main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1816,9 +1816,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>amc-appl-demo-PI11-main.cpp</FileName>
+              <FileName>amc-appl-demo-enc-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\amc-appl-demo-PI11-main.cpp</FilePath>
+              <FilePath>..\src\amc-appl-demo-enc-main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2890,9 +2890,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>amc-appl-demo-PI11-main.cpp</FileName>
+              <FileName>amc-appl-demo-enc-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\amc-appl-demo-PI11-main.cpp</FilePath>
+              <FilePath>..\src\amc-appl-demo-enc-main.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3964,9 +3964,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>amc-appl-demo-PI11-main.cpp</FileName>
+              <FileName>amc-appl-demo-enc-main.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\amc-appl-demo-PI11-main.cpp</FilePath>
+              <FilePath>..\src\amc-appl-demo-enc-main.cpp</FilePath>
             </File>
           </Files>
         </Group>

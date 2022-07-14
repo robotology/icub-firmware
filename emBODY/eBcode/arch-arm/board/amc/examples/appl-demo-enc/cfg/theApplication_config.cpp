@@ -91,7 +91,7 @@ namespace embot { namespace app { namespace eth {
             
             
             embot::core::print(str);
-            embot::app::eth::emit(sevINFO, {"testThread", t}, {}, str);
+            //embot::app::eth::emit(sevINFO, {"testThread", t}, {}, str);
             
             return;
         }
@@ -139,7 +139,7 @@ namespace embot { namespace app { namespace eth {
         embot::app::eth::theBackdoor::getInstance().initialise(bkdconfig);
 
 
-        constexpr embot::core::relTime timeout {5*1000*embot::core::time1millisec};
+        constexpr embot::core::relTime timeout {1*embot::core::time1millisec};
 
         embot::os::EventThread::Config tCfg { 
             6*1024, 
