@@ -582,7 +582,7 @@
             <File>
               <FileName>embot_hw_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+              <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_timer.cpp</FileName>
@@ -1283,7 +1283,7 @@
             <File>
               <FileName>embot_hw_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+              <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_timer.cpp</FileName>
@@ -2016,7 +2016,7 @@
             <File>
               <FileName>embot_hw_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+              <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_timer.cpp</FileName>
@@ -2749,7 +2749,7 @@
             <File>
               <FileName>embot_hw_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+              <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_timer.cpp</FileName>
@@ -3482,7 +3482,7 @@
             <File>
               <FileName>embot_hw_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+              <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_timer.cpp</FileName>
@@ -4164,7 +4164,7 @@
             <File>
               <FileName>embot_hw_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\embot_hw_encoder.cpp</FilePath>
+              <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_timer.cpp</FileName>
