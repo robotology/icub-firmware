@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 3.8
+// Model version                  : 3.10
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:21:33 2022
+// C/C++ source code generated on : Wed Jul 13 11:28:11 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -96,21 +96,23 @@ struct Flags
 
 struct MotorConfig
 {
-  real32_T Imin;
-  real32_T Imax;
   boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_torque_sens;
+  boolean_T use_index;
+  boolean_T enable_verbosity;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  uint8_T encoder_tolerance;
   uint8_T pole_pairs;
   real32_T reduction;
-  real32_T Kp;
-  real32_T Ki;
-  real32_T Kd;
-
-  // Shift factor.
-  uint8_T Ks;
   real32_T Kbemf;
   real32_T Rphase;
-  real32_T Vmax;
+  real32_T Imin;
+  real32_T Imax;
   real32_T Vcc;
+  real32_T Vmax;
 };
 
 #endif
@@ -149,6 +151,7 @@ struct PIDConfig
   real32_T N;
   real32_T I0;
   real32_T D0;
+  uint8_T shift_factor;
 };
 
 #endif
@@ -213,6 +216,7 @@ struct ConfigurationParameters
 {
   MotorConfig motorconfig;
   EstimationConfig estimationconfig;
+  PIDConfig CurLoopPID;
   PIDConfig PosLoopPID;
   PIDConfig VelLoopPID;
   PIDConfig DirLoopPID;

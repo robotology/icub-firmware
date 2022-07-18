@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.7
+// Model version                  : 3.48
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:21:16 2022
+// C/C++ source code generated on : Wed Jul 13 11:27:48 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -55,6 +55,140 @@ struct BUS_CAN
 struct BUS_CAN_MULTIPLE
 {
   BUS_CAN packets[4];
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfig_
+#define DEFINED_TYPEDEF_FOR_MotorConfig_
+
+struct MotorConfig
+{
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_torque_sens;
+  boolean_T use_index;
+  boolean_T enable_verbosity;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  uint8_T encoder_tolerance;
+  uint8_T pole_pairs;
+  real32_T reduction;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Imin;
+  real32_T Imax;
+  real32_T Vcc;
+  real32_T Vmax;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfig_
+#define DEFINED_TYPEDEF_FOR_EstimationConfig_
+
+struct EstimationConfig
+{
+  EstimationVelocityModes velocity_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PIDConfig_
+#define DEFINED_TYPEDEF_FOR_PIDConfig_
+
+struct PIDConfig
+{
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+  uint8_T shift_factor;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
+#define DEFINED_TYPEDEF_FOR_Thresholds_
+
+struct Thresholds
+{
+  // It shall be greater than hardwareJntPosMin
+  real32_T jntPosMin;
+
+  // It shall be smaller than hardwareJntPosMax
+  real32_T jntPosMax;
+
+  // Imposed by hardware constraint
+  real32_T hardwareJntPosMin;
+
+  // Imposed by hardware constraint
+  real32_T hardwareJntPosMax;
+
+  // If robotMin == rotorMax == 0, there's no check
+  real32_T rotorPosMin;
+
+  // If robotMin == rotorMax == 0, there's no check
+  real32_T rotorPosMax;
+
+  // Can be only non-negative
+  real32_T jntVelMax;
+
+  // Timeout on reception of velocity setpoint
+  // Can be only non-negative
+  uint32_T velocityTimeout;
+
+  // Current that can be kept for an indefinite period of time w/o damaging the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorNominalCurrents;
+
+  // Current that can be applied for a short period of time
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorPeakCurrents;
+
+  // Currents over this threshold can instantaneously damages the motor
+  // Expressed in [A] as all the internal computations are done this way
+  // Can be only non-negative
+  real32_T motorOverloadCurrents;
+
+  // Expressed in ticks
+  // Max value is 32000
+  // Can be only non-negative
+  uint32_T motorPwmLimit;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+#define DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+
+struct ConfigurationParameters
+{
+  MotorConfig motorconfig;
+  EstimationConfig estimationconfig;
+  PIDConfig CurLoopPID;
+  PIDConfig PosLoopPID;
+  PIDConfig VelLoopPID;
+  PIDConfig DirLoopPID;
+  Thresholds thresholds;
 };
 
 #endif
@@ -110,23 +244,29 @@ struct BUS_MSG_CURRENT_LIMIT
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_CURRENT_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_CURRENT_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_TARGETS_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_TARGETS_
 
-// Fields of a DESIRED_CURRENT message.
-struct BUS_MSG_DESIRED_CURRENT
+// Fields of a DESIRED_TARGETS message.
+struct BUS_MSG_DESIRED_TARGETS
 {
-  // Nominal current in A.
+  // Target current in A.
   real32_T current;
+
+  // Target voltage in %.
+  real32_T voltage;
+
+  // Target veocity in deg/s.
+  real32_T velocity;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_PID_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_PID_
 
 // Fields of a CURRENT_PID message.
-struct BUS_MSG_CURRENT_PID
+struct BUS_MSG_PID
 {
   // Motor selector.
   boolean_T motor;
@@ -146,6 +286,33 @@ struct BUS_MSG_CURRENT_PID
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_MOTOR_CONFIG_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_MOTOR_CONFIG_
+
+struct BUS_MSG_MOTOR_CONFIG
+{
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_torque_sens;
+  boolean_T use_index;
+  boolean_T enable_verbosity;
+
+  // Number of polese of the motor.
+  uint8_T number_poles;
+
+  // Encoder tolerance.
+  uint8_T encoder_tolerance;
+
+  // Resolution of rotor encoder.
+  int16_T rotor_encoder_resolution;
+
+  // Offset of the rotor encoder.
+  int16_T rotor_index_offset;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
 #define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
 
@@ -154,8 +321,9 @@ struct BUS_MESSAGES_RX
 {
   BUS_MSG_CONTROL_MODE control_mode;
   BUS_MSG_CURRENT_LIMIT current_limit;
-  BUS_MSG_DESIRED_CURRENT desired_current;
-  BUS_MSG_CURRENT_PID current_pid;
+  BUS_MSG_DESIRED_TARGETS desired_targets;
+  BUS_MSG_PID pid;
+  BUS_MSG_MOTOR_CONFIG motor_config;
 };
 
 #endif
@@ -178,8 +346,10 @@ struct BUS_STATUS_RX
 {
   boolean_T control_mode;
   boolean_T current_limit;
-  boolean_T desired_current;
+  boolean_T desired_targets;
   boolean_T current_pid;
+  boolean_T velocity_pid;
+  boolean_T motor_config;
 };
 
 #endif
@@ -326,7 +496,9 @@ struct BUS_CAN_RX
 typedef enum {
   MCOPC_Set_Control_Mode = 9,          // Default value
   MCOPC_Set_Current_Limit = 72,
-  MCOPC_Set_Current_PID = 101
+  MCOPC_Set_Current_PID = 101,
+  MCOPC_Set_Velocity_PID = 105,
+  MCOPC_Set_Motor_Config = 119
 } MCOPC;
 
 #endif
@@ -335,7 +507,7 @@ typedef enum {
 #define DEFINED_TYPEDEF_FOR_MCStreaming_
 
 typedef enum {
-  MCStreaming_Desired_Current = 15,    // Default value
+  MCStreaming_Desired_Targets = 15,    // Default value
   MCStreaming_FOC = 0
 } MCStreaming;
 

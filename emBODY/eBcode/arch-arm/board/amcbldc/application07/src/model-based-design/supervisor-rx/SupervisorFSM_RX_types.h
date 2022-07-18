@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 4.7
+// Model version                  : 4.61
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:20:52 2022
+// C/C++ source code generated on : Wed Jul 13 11:27:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -151,23 +151,29 @@ struct BUS_MSG_CURRENT_LIMIT
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_CURRENT_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_CURRENT_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_TARGETS_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_TARGETS_
 
-// Fields of a DESIRED_CURRENT message.
-struct BUS_MSG_DESIRED_CURRENT
+// Fields of a DESIRED_TARGETS message.
+struct BUS_MSG_DESIRED_TARGETS
 {
-  // Nominal current in A.
+  // Target current in A.
   real32_T current;
+
+  // Target voltage in %.
+  real32_T voltage;
+
+  // Target veocity in deg/s.
+  real32_T velocity;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_PID_
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_PID_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_PID_
 
 // Fields of a CURRENT_PID message.
-struct BUS_MSG_CURRENT_PID
+struct BUS_MSG_PID
 {
   // Motor selector.
   boolean_T motor;
@@ -187,6 +193,33 @@ struct BUS_MSG_CURRENT_PID
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_MOTOR_CONFIG_
+#define DEFINED_TYPEDEF_FOR_BUS_MSG_MOTOR_CONFIG_
+
+struct BUS_MSG_MOTOR_CONFIG
+{
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_torque_sens;
+  boolean_T use_index;
+  boolean_T enable_verbosity;
+
+  // Number of polese of the motor.
+  uint8_T number_poles;
+
+  // Encoder tolerance.
+  uint8_T encoder_tolerance;
+
+  // Resolution of rotor encoder.
+  int16_T rotor_encoder_resolution;
+
+  // Offset of the rotor encoder.
+  int16_T rotor_index_offset;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
 #define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
 
@@ -195,8 +228,9 @@ struct BUS_MESSAGES_RX
 {
   BUS_MSG_CONTROL_MODE control_mode;
   BUS_MSG_CURRENT_LIMIT current_limit;
-  BUS_MSG_DESIRED_CURRENT desired_current;
-  BUS_MSG_CURRENT_PID current_pid;
+  BUS_MSG_DESIRED_TARGETS desired_targets;
+  BUS_MSG_PID pid;
+  BUS_MSG_MOTOR_CONFIG motor_config;
 };
 
 #endif
@@ -242,8 +276,10 @@ struct BUS_STATUS_RX
 {
   boolean_T control_mode;
   boolean_T current_limit;
-  boolean_T desired_current;
+  boolean_T desired_targets;
   boolean_T current_pid;
+  boolean_T velocity_pid;
+  boolean_T motor_config;
 };
 
 #endif
@@ -330,21 +366,23 @@ struct Flags
 
 struct MotorConfig
 {
-  real32_T Imin;
-  real32_T Imax;
   boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_torque_sens;
+  boolean_T use_index;
+  boolean_T enable_verbosity;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  uint8_T encoder_tolerance;
   uint8_T pole_pairs;
   real32_T reduction;
-  real32_T Kp;
-  real32_T Ki;
-  real32_T Kd;
-
-  // Shift factor.
-  uint8_T Ks;
   real32_T Kbemf;
   real32_T Rphase;
-  real32_T Vmax;
+  real32_T Imin;
+  real32_T Imax;
   real32_T Vcc;
+  real32_T Vmax;
 };
 
 #endif
@@ -383,6 +421,7 @@ struct PIDConfig
   real32_T N;
   real32_T I0;
   real32_T D0;
+  uint8_T shift_factor;
 };
 
 #endif
@@ -447,6 +486,7 @@ struct ConfigurationParameters
 {
   MotorConfig motorconfig;
   EstimationConfig estimationconfig;
+  PIDConfig CurLoopPID;
   PIDConfig PosLoopPID;
   PIDConfig VelLoopPID;
   PIDConfig DirLoopPID;
@@ -475,17 +515,6 @@ struct Targets
   JointVelocities jointvelocities;
   MotorCurrent motorcurrent;
   MotorVoltage motorvoltage;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_SV_Setpoint_
-#define DEFINED_TYPEDEF_FOR_SV_Setpoint_
-
-struct SV_Setpoint
-{
-  ControlModes type;
-  real32_T value;
 };
 
 #endif

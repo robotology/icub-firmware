@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 3.8
+// Model version                  : 3.10
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:21:33 2022
+// C/C++ source code generated on : Wed Jul 13 11:28:11 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -147,7 +147,36 @@ void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
   // End of Outputs for SubSystem: '<S1>/Park Transform'
 
   // Product: '<S103>/PProd Out'
-  rtb_algDD_o1_p = rtb_Unary_Minus * rtu_ConfigurationParameters->motorconfig.Kp;
+  rtb_algDD_o1_p = rtb_Unary_Minus * rtu_ConfigurationParameters->CurLoopPID.P;
+
+  // SampleTimeMath: '<S93>/Tsamp' incorporates:
+  //   SampleTimeMath: '<S41>/Tsamp'
+  //
+  //  About '<S93>/Tsamp':
+  //   y = u * K where K = ( w * Ts )
+  //
+  //  About '<S41>/Tsamp':
+  //   y = u * K where K = ( w * Ts )
+
+  rtb_FilterDifferentiatorTF_f = rtu_ConfigurationParameters->CurLoopPID.N *
+    1.82857148E-5F;
+
+  // Math: '<S91>/Reciprocal' incorporates:
+  //   Constant: '<S91>/Constant'
+  //   Math: '<S39>/Reciprocal'
+  //   SampleTimeMath: '<S93>/Tsamp'
+  //   Sum: '<S91>/SumDen'
+  //
+  //  About '<S91>/Reciprocal':
+  //   Operator: reciprocal
+  //
+  //  About '<S39>/Reciprocal':
+  //   Operator: reciprocal
+  //
+  //  About '<S93>/Tsamp':
+  //   y = u * K where K = ( w * Ts )
+
+  rtb_sum_beta = 1.0F / (rtb_FilterDifferentiatorTF_f + 1.0F);
 
   // RelationalOperator: '<S3>/FixPt Relational Operator' incorporates:
   //   UnitDelay: '<S3>/Delay Input1'
@@ -160,7 +189,18 @@ void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
     control_foc_DW.DelayInput1_DSTATE);
 
   // DiscreteTransferFcn: '<S91>/Filter Differentiator TF' incorporates:
+  //   Constant: '<S91>/Constant'
+  //   Math: '<S91>/Reciprocal'
   //   Product: '<S90>/DProd Out'
+  //   Product: '<S91>/Divide'
+  //   SampleTimeMath: '<S93>/Tsamp'
+  //   Sum: '<S91>/SumNum'
+  //
+  //  About '<S91>/Reciprocal':
+  //   Operator: reciprocal
+  //
+  //  About '<S93>/Tsamp':
+  //   y = u * K where K = ( w * Ts )
 
   if (rtb_FixPtRelationalOperator &&
       (control_foc_PrevZCX.FilterDifferentiatorTF_Reset_ZC != POS_ZCSIG)) {
@@ -170,17 +210,20 @@ void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
   control_foc_PrevZCX.FilterDifferentiatorTF_Reset_ZC =
     rtb_FixPtRelationalOperator;
   control_foc_DW.FilterDifferentiatorTF_tmp = rtb_Unary_Minus *
-    rtu_ConfigurationParameters->motorconfig.Kd - -0.999634385F *
-    control_foc_DW.FilterDifferentiatorTF_states;
+    rtu_ConfigurationParameters->CurLoopPID.D - (rtb_FilterDifferentiatorTF_f -
+    1.0F) * rtb_sum_beta * control_foc_DW.FilterDifferentiatorTF_states;
 
   // Product: '<S101>/NProd Out' incorporates:
-  //   Constant: '<S1>/Constant'
   //   DiscreteTransferFcn: '<S91>/Filter Differentiator TF'
+  //   Math: '<S91>/Reciprocal'
   //   Product: '<S91>/DenCoefOut'
+  //
+  //  About '<S91>/Reciprocal':
+  //   Operator: reciprocal
 
   rtb_algDD_o2_n = (control_foc_DW.FilterDifferentiatorTF_tmp +
                     -control_foc_DW.FilterDifferentiatorTF_states) *
-    0.999817193F * 10.0F;
+    rtb_sum_beta * rtu_ConfigurationParameters->CurLoopPID.N;
 
   // Sum: '<S110>/SumI1' incorporates:
   //   Product: '<S95>/IProd Out'
@@ -190,7 +233,7 @@ void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
 
   rtb_FilterDifferentiatorTF = (control_foc_DW.UnitDelay_DSTATE -
     ((rtb_algDD_o1_p + control_foc_DW.Integrator_DSTATE) + rtb_algDD_o2_n)) +
-    rtb_Unary_Minus * rtu_ConfigurationParameters->motorconfig.Ki;
+    rtb_Unary_Minus * rtu_ConfigurationParameters->CurLoopPID.I;
 
   // DiscreteIntegrator: '<S98>/Integrator'
   if (rtb_FixPtRelationalOperator && (control_foc_DW.Integrator_PrevResetState <=
@@ -248,14 +291,17 @@ void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
   //   AlgorithmDescriptorDelegate generated from: '<S8>/a16'
   //   Gain: '<S1>/Gain'
 
-  rtb_PProdOut_k = -rtb_IaIbIc0[0] * rtu_ConfigurationParameters->motorconfig.Kp;
+  rtb_PProdOut_k = -rtb_IaIbIc0[0] * rtu_ConfigurationParameters->CurLoopPID.P;
 
   // End of Outputs for SubSystem: '<S1>/Park Transform'
 
   // DiscreteTransferFcn: '<S39>/Filter Differentiator TF' incorporates:
   //   AlgorithmDescriptorDelegate generated from: '<S8>/a16'
+  //   Constant: '<S39>/Constant'
   //   Gain: '<S1>/Gain'
   //   Product: '<S38>/DProd Out'
+  //   Product: '<S39>/Divide'
+  //   Sum: '<S39>/SumNum'
 
   if (rtb_FixPtRelationalOperator &&
       (control_foc_PrevZCX.FilterDifferentiatorTF_Reset__o != POS_ZCSIG)) {
@@ -267,19 +313,18 @@ void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
 
   // Outputs for Atomic SubSystem: '<S1>/Park Transform'
   control_foc_DW.FilterDifferentiatorTF_tmp_c = -rtb_IaIbIc0[0] *
-    rtu_ConfigurationParameters->motorconfig.Kd - -0.999634385F *
-    control_foc_DW.FilterDifferentiatorTF_states_k;
+    rtu_ConfigurationParameters->CurLoopPID.D - (rtb_FilterDifferentiatorTF_f -
+    1.0F) * rtb_sum_beta * control_foc_DW.FilterDifferentiatorTF_states_k;
 
   // End of Outputs for SubSystem: '<S1>/Park Transform'
 
   // Product: '<S49>/NProd Out' incorporates:
-  //   Constant: '<S1>/Constant'
   //   DiscreteTransferFcn: '<S39>/Filter Differentiator TF'
   //   Product: '<S39>/DenCoefOut'
 
   rtb_sum_beta = (control_foc_DW.FilterDifferentiatorTF_tmp_c +
                   -control_foc_DW.FilterDifferentiatorTF_states_k) *
-    0.999817193F * 10.0F;
+    rtb_sum_beta * rtu_ConfigurationParameters->CurLoopPID.N;
 
   // Sum: '<S57>/Sum Fdbk'
   rtb_FilterDifferentiatorTF_f = (rtb_PProdOut_k +
@@ -310,8 +355,7 @@ void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
   //   AlgorithmDescriptorDelegate generated from: '<S8>/a16'
   //   Gain: '<S1>/Gain'
 
-  rtb_Unary_Minus = -rtb_IaIbIc0[0] *
-    rtu_ConfigurationParameters->motorconfig.Ki;
+  rtb_Unary_Minus = -rtb_IaIbIc0[0] * rtu_ConfigurationParameters->CurLoopPID.I;
 
   // End of Outputs for SubSystem: '<S1>/Park Transform'
 

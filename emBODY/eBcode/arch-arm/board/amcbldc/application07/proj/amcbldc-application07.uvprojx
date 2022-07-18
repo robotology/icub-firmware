@@ -883,6 +883,11 @@
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
             </File>
+            <File>
+              <FileName>rt_roundd_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2056,6 +2061,11 @@
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
             </File>
+            <File>
+              <FileName>rt_roundd_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3228,6 +3238,11 @@
               <FileName>uMultiWordShl.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rt_roundd_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
             </File>
           </Files>
         </Group>

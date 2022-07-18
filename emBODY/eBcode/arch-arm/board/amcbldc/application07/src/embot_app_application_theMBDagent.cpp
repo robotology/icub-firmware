@@ -304,7 +304,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     CAN_ID_AMC = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     
     // init motor configuration parameters from hal
-    InitConfParams.motorconfig.pole_pairs = MainConf.pwm.poles;
+    // InitConfParams.motorconfig.pole_pairs = MainConf.pwm.poles;
     //InitConfParams.motorconfig.has_hall_sens...
     //auto todo... = MainConf.encoder.nsteps = 16000;  TODO: fix (this values depends on pole_pairs and actually it is missing in mbd)
     

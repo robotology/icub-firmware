@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 4.7
+// Model version                  : 4.61
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:20:52 2022
+// C/C++ source code generated on : Wed Jul 13 11:27:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -28,25 +28,29 @@
 #ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 
 struct B_SupervisorFSM_RX_c_T {
-  ConfigurationParameters ConfigurationParameters_b;// '<Root>/SupervisorFSM_RX' 
   Thresholds thresholds;               // '<S3>/Chart'
-  MotorConfig Motorconfig;             // '<S1>/CAN Event Dispatcher'
-  Targets targets;                     // '<S4>/Chart1'
+  PIDConfig CurrentPID;                // '<S4>/Chart'
+  PIDConfig VelocityPID;               // '<S4>/Chart'
+  PIDConfig PositionPID;               // '<S4>/Chart'
+  PIDConfig OpenLoopPID;               // '<S4>/Chart'
+  MotorConfig motorConfig;             // '<S1>/CAN Event Dispatcher'
+  Targets targets;                     // '<S5>/Chart1'
+  BUS_MSG_PID newPID;                  // '<S1>/CAN Event Dispatcher'
   SV_Limits newLimit;                  // '<S1>/CAN Event Dispatcher'
-  SV_Setpoint newSetpoint;             // '<S1>/CAN Event Dispatcher'
-  SV_Setpoint newSetpoint_i;           // '<S2>/ControlMode_SM_motor0'
-  int32_T messageIndex;                // '<Root>/SupervisorFSM_RX'
+  BUS_MSG_DESIRED_TARGETS newSetpoint; // '<S1>/CAN Event Dispatcher'
+  EstimationConfig estimationConfig;   // '<S1>/CAN Event Dispatcher'
+  real32_T newSetpoint_i;              // '<S2>/ControlMode_SM_motor0'
+  int32_T messageIndex;                // '<Root>/SupervisorRX State Handler'
   ControlModes requiredControlMode;    // '<S1>/CAN Event Dispatcher'
+  ControlModes newPIDType;             // '<S1>/CAN Event Dispatcher'
   ControlModes controlModeDefined;     // '<S2>/ControlMode_SM_motor0'
-  BoardState BoardSt;                  // '<Root>/SupervisorFSM_RX'
-  boolean_T isInOverCurrent;           // '<Root>/SupervisorFSM_RX'
-  boolean_T isFaultButtonPressed;      // '<Root>/SupervisorFSM_RX'
+  BoardState BoardSt;                  // '<Root>/SupervisorRX State Handler'
+  boolean_T isInOverCurrent;           // '<Root>/SupervisorRX State Handler'
+  boolean_T isFaultButtonPressed;      // '<Root>/SupervisorRX State Handler'
   boolean_T enableSendingMsgStatus;    // '<S1>/CAN Event Dispatcher'
-  boolean_T hasMotorConfigChanged;     // '<S1>/CAN Event Dispatcher'
   boolean_T receivedNewSetpoint;       // '<S1>/CAN Event Dispatcher'
   boolean_T areLimitsSet;              // '<S3>/Chart'
-  boolean_T hasThresholdsChanged;      // '<S3>/Chart'
-  boolean_T hasSetpointChanged;        // '<S4>/Chart1'
+  boolean_T hasSetpointChanged;        // '<S5>/Chart1'
 };
 
 #endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
@@ -55,26 +59,25 @@ struct B_SupervisorFSM_RX_c_T {
 #ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 
 struct DW_SupervisorFSM_RX_f_T {
-  SV_Setpoint newSetpoint;             // '<S4>/Chart1'
-  uint8_T is_active_c2_SupervisorFSM_RX;// '<Root>/SupervisorFSM_RX'
-  uint8_T is_INIT_CONFIGURATION_PARAMETER;// '<Root>/SupervisorFSM_RX'
-  uint8_T is_active_INIT_CONFIGURATION_PA;// '<Root>/SupervisorFSM_RX'
-  uint8_T is_active_FAULT_HANDLER;     // '<Root>/SupervisorFSM_RX'
-  uint8_T is_OverCurrent;              // '<Root>/SupervisorFSM_RX'
-  uint8_T is_active_OverCurrent;       // '<Root>/SupervisorFSM_RX'
-  uint8_T is_FaultButtonPressed;       // '<Root>/SupervisorFSM_RX'
-  uint8_T is_active_FaultButtonPressed;// '<Root>/SupervisorFSM_RX'
-  uint8_T is_STATE_HANDLER;            // '<Root>/SupervisorFSM_RX'
-  uint8_T is_active_STATE_HANDLER;     // '<Root>/SupervisorFSM_RX'
-  uint8_T is_CAN_MESSAGES_FOR_LOOP;    // '<Root>/SupervisorFSM_RX'
-  uint8_T is_active_CAN_MESSAGES_FOR_LOOP;// '<Root>/SupervisorFSM_RX'
+  ConfigurationParameters UnitDelay_DSTATE;// '<Root>/Unit Delay'
+  uint8_T is_active_c2_SupervisorFSM_RX;// '<Root>/SupervisorRX State Handler'
+  uint8_T is_STATE_HANDLER;            // '<Root>/SupervisorRX State Handler'
+  uint8_T is_active_STATE_HANDLER;     // '<Root>/SupervisorRX State Handler'
+  uint8_T is_active_FAULT_HANDLER;     // '<Root>/SupervisorRX State Handler'
+  uint8_T is_OverCurrent;              // '<Root>/SupervisorRX State Handler'
+  uint8_T is_active_OverCurrent;       // '<Root>/SupervisorRX State Handler'
+  uint8_T is_FaultButtonPressed;       // '<Root>/SupervisorRX State Handler'
+  uint8_T is_active_FaultButtonPressed;// '<Root>/SupervisorRX State Handler'
+  uint8_T is_CAN_MESSAGES_FOR_LOOP;    // '<Root>/SupervisorRX State Handler'
+  uint8_T is_active_CAN_MESSAGES_FOR_LOOP;// '<Root>/SupervisorRX State Handler' 
   uint8_T is_active_c11_SupervisorFSM_RX;// '<S1>/CAN Event Dispatcher'
+  uint8_T is_active_c3_SupervisorFSM_RX;// '<S4>/Chart'
   uint8_T is_active_c14_SupervisorFSM_RX;// '<S3>/Chart'
   uint8_T is_active_c12_SupervisorFSM_RX;// '<S2>/ControlMode_SM_motor0'
   uint8_T is_c12_SupervisorFSM_RX;     // '<S2>/ControlMode_SM_motor0'
-  uint8_T is_active_c4_SupervisorFSM_RX;// '<S4>/Chart1'
-  boolean_T ExternalFlags_fault_button_prev;// '<Root>/SupervisorFSM_RX'
-  boolean_T ExternalFlags_fault_button_star;// '<Root>/SupervisorFSM_RX'
+  uint8_T is_active_c4_SupervisorFSM_RX;// '<S5>/Chart1'
+  boolean_T ExternalFlags_fault_button_prev;// '<Root>/SupervisorRX State Handler' 
+  boolean_T ExternalFlags_fault_button_star;// '<Root>/SupervisorRX State Handler' 
 };
 
 #endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
@@ -106,11 +109,12 @@ struct MdlrefDW_SupervisorFSM_RX_T {
 
 extern ConfigurationParameters InitConfParams;// Variable: InitConfParams
                                                  //  Referenced by:
-                                                 //    '<Root>/SupervisorFSM_RX'
                                                  //    '<S1>/CAN Event Dispatcher'
                                                  //    '<S3>/Chart'
+                                                 //    '<S4>/Chart'
 
-extern void SupervisorFSM_RX_Init(Flags *rty_Flags);
+extern void SupervisorFSM_RX_Init(Flags *rty_Flags, ConfigurationParameters
+  *rty_ConfigurationParameters);
 extern void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const
   ExternalFlags *rtu_ExternalFlags, const ControlOutputs *rtu_ControlOutputs,
   const BUS_MESSAGES_RX_MULTIPLE *rtu_MessagesRx, const BUS_STATUS_RX_MULTIPLE
@@ -125,10 +129,11 @@ extern void SupervisorFSM_RX_initialize(const char_T **rt_errorStatus);
 
 extern void Supervisor_SetpointHandler_Init(void);
 extern void SupervisorFSM_R_SetpointHandler(void);
-extern void S_ControlModeHandlerMotor0_Init(void);
 extern void Superv_ControlModeHandlerMotor0(void);
 extern void SupervisorFS_LimitsHandler_Init(void);
 extern void SupervisorFSM_RX_LimitsHandler(void);
+extern void SupervisorFSM_R_PIDHandler_Init(void);
+extern void SupervisorFSM_RX_PIDHandler(void);
 extern void Supervis_CANMessageHandler_Init(void);
 extern void SupervisorFSM_CANMessageHandler(void);
 
@@ -168,12 +173,14 @@ extern DW_SupervisorFSM_RX_f_T SupervisorFSM_RX_DW;
 //  '<S1>'   : 'SupervisorFSM_RX/CAN Message Handler'
 //  '<S2>'   : 'SupervisorFSM_RX/Control Mode Handler Motor 0'
 //  '<S3>'   : 'SupervisorFSM_RX/Limits Handler'
-//  '<S4>'   : 'SupervisorFSM_RX/SetpointHandler'
-//  '<S5>'   : 'SupervisorFSM_RX/SupervisorFSM_RX'
-//  '<S6>'   : 'SupervisorFSM_RX/CAN Message Handler/CAN Event Dispatcher'
-//  '<S7>'   : 'SupervisorFSM_RX/Control Mode Handler Motor 0/ControlMode_SM_motor0'
-//  '<S8>'   : 'SupervisorFSM_RX/Limits Handler/Chart'
-//  '<S9>'   : 'SupervisorFSM_RX/SetpointHandler/Chart1'
+//  '<S4>'   : 'SupervisorFSM_RX/PID Handler'
+//  '<S5>'   : 'SupervisorFSM_RX/SetpointHandler'
+//  '<S6>'   : 'SupervisorFSM_RX/SupervisorRX State Handler'
+//  '<S7>'   : 'SupervisorFSM_RX/CAN Message Handler/CAN Event Dispatcher'
+//  '<S8>'   : 'SupervisorFSM_RX/Control Mode Handler Motor 0/ControlMode_SM_motor0'
+//  '<S9>'   : 'SupervisorFSM_RX/Limits Handler/Chart'
+//  '<S10>'  : 'SupervisorFSM_RX/PID Handler/Chart'
+//  '<S11>'  : 'SupervisorFSM_RX/SetpointHandler/Chart1'
 
 #endif                                 // RTW_HEADER_SupervisorFSM_RX_h_
 

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 4.58
+// Model version                  : 4.103
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jun 15 10:22:18 2022
+// C/C++ source code generated on : Wed Jul 13 10:13:31 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -47,6 +47,7 @@
 // Block signals (default storage)
 struct B_AMC_BLDC_T {
   BUS_MESSAGES_RX_MULTIPLE CAN_Decoder_o1;// '<S6>/CAN_Decoder'
+  ConfigurationParameters ZOHBlockInsertedForAdapter_Inse;// '<Root>/Adapter4'
   BUS_MESSAGES_TX MessagesTx;          // '<S7>/SupervisorFSM_TX'
   SensorsData RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter3'
   BUS_STATUS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
@@ -226,10 +227,10 @@ extern "C" {
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'AMC_BLDC'
-//  '<S1>'   : 'AMC_BLDC/Adapter'
-//  '<S2>'   : 'AMC_BLDC/Adapter1'
-//  '<S3>'   : 'AMC_BLDC/Adapter2'
-//  '<S4>'   : 'AMC_BLDC/Adapter3'
+//  '<S1>'   : 'AMC_BLDC/Adapter1'
+//  '<S2>'   : 'AMC_BLDC/Adapter2'
+//  '<S3>'   : 'AMC_BLDC/Adapter3'
+//  '<S4>'   : 'AMC_BLDC/Adapter4'
 //  '<S5>'   : 'AMC_BLDC/Estimation'
 //  '<S6>'   : 'AMC_BLDC/Messaging'
 //  '<S7>'   : 'AMC_BLDC/Supervision'
