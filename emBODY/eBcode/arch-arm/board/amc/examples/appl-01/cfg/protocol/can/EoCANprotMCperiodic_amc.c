@@ -23,7 +23,7 @@
 
 // but also to retrieve information of other things ...
 
-//#include "Controller.h"
+#include "Controller.h"
 
 
 //#include "EOtheMC4boards.h"
@@ -121,39 +121,37 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__DEBUG(eOcanframe_t *fra
 }
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *frame, eOcanport_t port)
-//{
-//    // this can frame is from 2foc only ... as the name of the message says. i dont do the check that the board must be a 2foc
-//    // i retrieve the motor related to the frame    
-//    eOmc_motor_t *motor = NULL;
-//    eOprotIndex_t motorindex = EOK_uint08dummy;
-//    
-//    if(NULL == (motor = (eOmc_motor_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eobrd_caninsideindex_first, &motorindex)))
-//    {
-//        if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
-//        {   // the board eb5 has an additional 1foc board which sends a can frame of this kind but it does not serve any motor
-//            // or joint. hence, its can address is not recognised by the EOtheCANmapping object.
-//            // for this board we must not issue the error and we must do nothing
-//            return(eores_OK);            
-//        }        
-//        return(eores_OK);  
-//    }    
-//    
-//    // note of marco.accame: the following code is ok as long as the 2foc has been configured to send up in its periodic message 
-//    // current, velocity, and position. if so, frame->data contains: [current:2bytes, velocity:2bytes, position:4bytes]. 
-//    // the following code extract these values. 
-//    motor->status.basic.mot_current  = ((int16_t*)frame->data)[0];
-//    motor->status.basic.mot_velocity = ((int16_t*)frame->data)[1];
-//    motor->status.basic.mot_position = ((int32_t*)frame->data)[1];
-//     
-//    //eo_emsController_AcquireMotorEncoder(motorindex, motor->status.basic.mot_current, motor->status.basic.mot_velocity, motor->status.basic.mot_position);
-
-//    MController_update_motor_odometry_fbk_can(motorindex, frame->data);
-//    
-//    return(eores_OK);
-//}
 {
-    return(eores_NOK_generic); 
+    // this can frame is from 2foc only ... as the name of the message says. i dont do the check that the board must be a 2foc
+    // i retrieve the motor related to the frame    
+    eOmc_motor_t *motor = NULL;
+    eOprotIndex_t motorindex = EOK_uint08dummy;
+    
+    if(NULL == (motor = (eOmc_motor_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eobrd_caninsideindex_first, &motorindex)))
+    {
+        if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
+        {   // the board eb5 has an additional 1foc board which sends a can frame of this kind but it does not serve any motor
+            // or joint. hence, its can address is not recognised by the EOtheCANmapping object.
+            // for this board we must not issue the error and we must do nothing
+            return(eores_OK);            
+        }        
+        return(eores_OK);  
+    }    
+    
+    // note of marco.accame: the following code is ok as long as the 2foc has been configured to send up in its periodic message 
+    // current, velocity, and position. if so, frame->data contains: [current:2bytes, velocity:2bytes, position:4bytes]. 
+    // the following code extract these values. 
+    motor->status.basic.mot_current  = ((int16_t*)frame->data)[0];
+    motor->status.basic.mot_velocity = ((int16_t*)frame->data)[1];
+    motor->status.basic.mot_position = ((int32_t*)frame->data)[1];
+     
+    //eo_emsController_AcquireMotorEncoder(motorindex, motor->status.basic.mot_current, motor->status.basic.mot_velocity, motor->status.basic.mot_position);
+
+    MController_update_motor_odometry_fbk_can(motorindex, frame->data);
+    
+    return(eores_OK);
 }
+
 
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *frame, eOcanport_t port)
@@ -251,50 +249,50 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
 
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *frame, eOcanport_t port)
-//{
-//    // both 2foc and mc4 can send this frame. the parsing is however different because:
-//    // - the 2foc contains info related to one joint only and it is used the EMScontroller to parse the frame,
-//    // - the mc4 contains info related to two joints and we need to parse the frame directly
-//    
-//    eOprotIndex_t jointindex = 0;
-//    eOmc_joint_t *joint = NULL;
-//    eOmc_controlmode_t eomc_controlmode = eomc_controlmode_idle;
-//    eOerrmanDescriptor_t des = {0};
-//    
-//    eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
-//    
-//    
-//    if(eobrd_cantype_foc == boardtype)
-//    {   
-//        // in case we have a 2foc ... i treat the first joint only   
-//        // first joint: use eobrd_caninsideindex_first and gets the first 2 bytes of the frame         
-//        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, eobrd_caninsideindex_first, &jointindex)))
-//        {
-//            if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
-//            {
-//                return(eores_OK);
-//            }
-//            return(eores_OK);        
-//        }        
-//        
-//       
-//        // marco.accame: the variable eomc_controlmode is not used because eo_emsController_ReadMotorstatus() gets directly what it needs,
-//        //               thus no need to perform the conversion 
-//        //res = s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1], &eomc_controlmode);
-//        //if(eores_OK != res)
-//        //{
-//        //    #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
-//        //    return(eores_OK);    
-//        //}
-//        //eo_emsController_ReadMotorstatus(jointindex, frame->data);
-//        MController_update_motor_state_fbk(jointindex, frame->data);
-//        // l'aggiornamento delle nv del giunto sara' fatto nel DO.
-//        // se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
-//        // marco.accame: the previous code contained the following function which does nothing but putting into motor.status.filler04[]
-//        // some flags ... probably for debug. well, we dont do it in here, but if needed we can add it.        
-//        // s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
-//              
-//    }
+{
+    // both 2foc and mc4 can send this frame. the parsing is however different because:
+    // - the 2foc contains info related to one joint only and it is used the EMScontroller to parse the frame,
+    // - the mc4 contains info related to two joints and we need to parse the frame directly
+    
+    eOprotIndex_t jointindex = 0;
+    eOmc_joint_t *joint = NULL;
+    eOmc_controlmode_t eomc_controlmode = eomc_controlmode_idle;
+    eOerrmanDescriptor_t des = {0};
+    
+    eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
+    
+    
+    if(eobrd_cantype_foc == boardtype)
+    {   
+        // in case we have a 2foc ... i treat the first joint only   
+        // first joint: use eobrd_caninsideindex_first and gets the first 2 bytes of the frame         
+        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, eobrd_caninsideindex_first, &jointindex)))
+        {
+            if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
+            {
+                return(eores_OK);
+            }
+            return(eores_OK);        
+        }        
+        
+       
+        // marco.accame: the variable eomc_controlmode is not used because eo_emsController_ReadMotorstatus() gets directly what it needs,
+        //               thus no need to perform the conversion 
+        //res = s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1], &eomc_controlmode);
+        //if(eores_OK != res)
+        //{
+        //    #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        //    return(eores_OK);    
+        //}
+        //eo_emsController_ReadMotorstatus(jointindex, frame->data);
+        MController_update_motor_state_fbk(jointindex, frame->data);
+        // l'aggiornamento delle nv del giunto sara' fatto nel DO.
+        // se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
+        // marco.accame: the previous code contained the following function which does nothing but putting into motor.status.filler04[]
+        // some flags ... probably for debug. well, we dont do it in here, but if needed we can add it.        
+        // s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
+              
+    }
 //    else if(eobrd_cantype_mc4 == boardtype)
 //    {   // we have a mc4, thus we must manage two joints
 //        uint8_t j=0;
@@ -328,12 +326,10 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
 //            }                        
 //        }  
 //    }
-//    
-//    return(eores_OK);    
-//}
-{
-    return(eores_NOK_generic); 
+    
+    return(eores_OK);    
 }
+
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__CURRENT(eOcanframe_t *frame, eOcanport_t port)
 {
@@ -409,76 +405,80 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *
 }
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t *frame, eOcanport_t port)
+//{
+//    // this frame is from mc4 only, thus ...
+//    // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
+//    eOprotIndex_t jointindex = 0;
+//    eOmc_joint_t *joint = NULL;
+//    uint16_t pidpos_error = 0;
+//    uint16_t pidtrq_error = 0;
+//    
+//    
+//    uint8_t j=0;
+//    // the two joints have ...
+//    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
+//    const uint8_t offsetpos[2] = {0, 2};    
+//    const uint8_t offsettrq[2] = {4, 6}; 
+//    for(j=0; j<2; j++)
+//    {
+//        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+//        {
+//            return(eores_OK);        
+//        }
+//        
+//        pidpos_error = *((uint16_t*)&(frame->data[offsetpos[j]]));
+//        pidtrq_error = *((uint16_t*)&(frame->data[offsettrq[j]]));
+//        
+//        if(eomc_controlmode_torque == joint->status.core.modes.controlmodestatus)
+//        {
+//            joint->status.core.ofpid.legacy.error = pidtrq_error;
+//        }
+//        else
+//        {
+//            joint->status.core.ofpid.legacy.error = pidpos_error;
+//        }            
+//    }
+//   
+//    return(eores_OK);
+//}
 {
-    // this frame is from mc4 only, thus ...
-    // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
-    eOprotIndex_t jointindex = 0;
-    eOmc_joint_t *joint = NULL;
-    uint16_t pidpos_error = 0;
-    uint16_t pidtrq_error = 0;
-    
-    
-    uint8_t j=0;
-    // the two joints have ...
-    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
-    const uint8_t offsetpos[2] = {0, 2};    
-    const uint8_t offsettrq[2] = {4, 6}; 
-    for(j=0; j<2; j++)
-    {
-        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
-        {
-            return(eores_OK);        
-        }
-        
-        pidpos_error = *((uint16_t*)&(frame->data[offsetpos[j]]));
-        pidtrq_error = *((uint16_t*)&(frame->data[offsettrq[j]]));
-        
-        if(eomc_controlmode_torque == joint->status.core.modes.controlmodestatus)
-        {
-            joint->status.core.ofpid.legacy.error = pidtrq_error;
-        }
-        else
-        {
-            joint->status.core.ofpid.legacy.error = pidpos_error;
-        }            
-    }
-   
-    return(eores_OK);
+    return(eores_NOK_generic); 
 }
-
 
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcanframe_t *frame, eOcanport_t port)
+//{
+//    // this frame is from mc4 only, thus ...
+//    // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
+//    eOprotIndex_t jointindex = 0;
+//    eOmc_joint_t *joint = NULL;
+//    icubCanProto_interactionmode_t caninteractionmodes[2] = {icubCanProto_interactionmode_stiff, icubCanProto_interactionmode_stiff};
+//       
+//    uint8_t j=0;
+//    // the two joints have ...
+//    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
+//    caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
+//    caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
+//    eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
+//    for(j=0; j<2; j++)
+//    {
+//        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+//        {
+//            return(eores_OK);        
+//        }
+//        
+//        if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(caninteractionmodes[j], &tmp))
+//        {
+//            return(eores_OK);        
+//        }
+//        joint->status.core.modes.interactionmodestatus = tmp;        
+//    }
+//   
+//    return(eores_OK);
+//}
 {
-    // this frame is from mc4 only, thus ...
-    // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
-    eOprotIndex_t jointindex = 0;
-    eOmc_joint_t *joint = NULL;
-    icubCanProto_interactionmode_t caninteractionmodes[2] = {icubCanProto_interactionmode_stiff, icubCanProto_interactionmode_stiff};
-       
-    uint8_t j=0;
-    // the two joints have ...
-    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
-    caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
-    caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
-    eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
-    for(j=0; j<2; j++)
-    {
-        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
-        {
-            return(eores_OK);        
-        }
-        
-        if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(caninteractionmodes[j], &tmp))
-        {
-            return(eores_OK);        
-        }
-        joint->status.core.modes.interactionmodestatus = tmp;        
-    }
-   
-    return(eores_OK);
+    return(eores_NOK_generic); 
 }
-
 
 
 extern eOresult_t eocanprotMCperiodic_former_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)

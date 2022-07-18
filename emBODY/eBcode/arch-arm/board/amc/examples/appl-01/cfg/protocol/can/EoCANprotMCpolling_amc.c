@@ -281,6 +281,11 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
 //    return(eores_OK);
 //}
 {
+    static volatile uint32_t xxx = 0;
+    for(;;)
+    {   // i dont think trhat the foc control mode uses it, but we never know
+        xxx = 0;
+    }
     return(eores_NOK_generic); 
 }
 
@@ -478,6 +483,11 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT(eOcanframe
 //    return(eores_OK);
 //}
 {
+    static volatile uint32_t xxx = 0;
+    for(;;)
+    {   // i dont think trhat the foc control mode uses it, but we never know
+        xxx = 0;
+    }
     return(eores_NOK_generic); 
 }
 
@@ -1052,6 +1062,11 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
 //    return(eores_OK);
 //}
 {
+    static volatile uint32_t xxx = 0;
+    for(;;)
+    {   // i dont think trhat the foc control mode uses it, but we never know
+        xxx = 0;
+    }    
     return(eores_NOK_generic); 
 }
 
@@ -1163,6 +1178,11 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
 //    return(eores_OK);
 //}
 {
+    static volatile uint32_t xxx = 0;
+    for(;;)
+    {   // i dont think trhat the foc control mode uses it, but we never know
+        xxx = 0;
+    }    
     return(eores_NOK_generic); 
 }
 
@@ -1251,6 +1271,11 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
 //    return(eores_OK);
 //}
 {
+    static volatile uint32_t xxx = 0;
+    for(;;)
+    {   // i dont think trhat the foc control mode uses it, but we never know
+        xxx = 0;
+    }    
     return(eores_NOK_generic); 
 }
 
