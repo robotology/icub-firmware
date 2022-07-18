@@ -98,6 +98,36 @@ namespace embot { namespace app { namespace eth {
  
     }; 
     
+    
+    
+    struct ServiceOperation
+    {
+        const eOmn_serv_configuration_t * servcfg {nullptr};
+        embot::app::eth::Service::fpOnEndOfOperation onendoperation {nullptr};   
+        embot::app::eth::Service *service {nullptr};
+        bool activateafterverify {false};
+        
+        ServiceOperation() = default;
+        
+        bool isvalid() { return (nullptr != servcfg) && (nullptr != onendoperation) && (nullptr != service); }
+        void load(embot::app::eth::Service *s, const eOmn_serv_configuration_t *c, embot::app::eth::Service::fpOnEndOfOperation eop, bool act)
+        {
+            service = s;
+            servcfg = c;
+            onendoperation = eop;
+            activateafterverify = act;
+        }
+        
+        void onend()
+        {
+            if(isvalid())
+            {
+               onendoperation(service, servcfg, activateafterverify);
+            }
+        }
+    };
+
+    
 
 }}} // namespace embot { namespace app { namespace eth
 

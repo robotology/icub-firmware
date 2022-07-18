@@ -27,32 +27,32 @@
 namespace embot::app::eth {
 
 
-struct Operation
-{
-    const eOmn_serv_configuration_t * servcfg {nullptr};
-    embot::app::eth::Service::fpOnEndOfOperation onendoperation {nullptr};   
-    embot::app::eth::Service *service {nullptr};
-    bool activateafterverify {false};
-    
-    Operation() = default;
-    
-    bool isvalid() { return (nullptr != servcfg) && (nullptr != onendoperation) && (nullptr != service); }
-    void load(embot::app::eth::Service *s, const eOmn_serv_configuration_t *c, embot::app::eth::Service::fpOnEndOfOperation eop, bool act)
-    {
-        service = s;
-        servcfg = c;
-        onendoperation = eop;
-        activateafterverify = act;
-    }
-    
-    void onend()
-    {
-        if(isvalid())
-        {
-           onendoperation(service, servcfg, activateafterverify);
-        }
-    }
-};
+//struct Operation
+//{
+//    const eOmn_serv_configuration_t * servcfg {nullptr};
+//    embot::app::eth::Service::fpOnEndOfOperation onendoperation {nullptr};   
+//    embot::app::eth::Service *service {nullptr};
+//    bool activateafterverify {false};
+//    
+//    Operation() = default;
+//    
+//    bool isvalid() { return (nullptr != servcfg) && (nullptr != onendoperation) && (nullptr != service); }
+//    void load(embot::app::eth::Service *s, const eOmn_serv_configuration_t *c, embot::app::eth::Service::fpOnEndOfOperation eop, bool act)
+//    {
+//        service = s;
+//        servcfg = c;
+//        onendoperation = eop;
+//        activateafterverify = act;
+//    }
+//    
+//    void onend()
+//    {
+//        if(isvalid())
+//        {
+//           onendoperation(service, servcfg, activateafterverify);
+//        }
+//    }
+//};
 
 // finally the implementation struct
 struct embot::app::eth::theServiceFT::Impl
@@ -62,7 +62,7 @@ struct embot::app::eth::theServiceFT::Impl
     theServiceFT *_owner {nullptr};
     State _state {State::idle};
     
-    Operation _operation {};
+    ServiceOperation _operation {};
     
     // methods used by theServiceFT 
     

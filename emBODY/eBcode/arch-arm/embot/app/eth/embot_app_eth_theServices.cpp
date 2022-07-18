@@ -481,6 +481,104 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
     return true;   
 }
 
+#warning SEE this new implem
+#if 0
+bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, bool clearfirst, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
+{
+    if(nullptr == id32ofregulars)
+    {
+        return false;
+    }
+             
+    uint8_t size = 0;
+    uint8_t i = 0;
+    
+    EOtransceiver* boardtransceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+
+    if(true == clearfirst)
+    {    
+        eOropdescriptor_t ropdesc;
+        memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+        ropdesc.control.plustime        = eobool_false;
+        ropdesc.control.plussign        = eobool_false;
+        ropdesc.ropcode                 = eo_ropcode_sig;
+        ropdesc.id32                    = eo_prot_ID32dummy;    
+        ropdesc.signature               = eo_rop_SIGNATUREdummy;  
+        uint32_t* id32 = NULL;
+        
+        // at first we remove all regulars inside id32ofregulars and we reset it
+        size = eo_array_Size(id32ofregulars);
+        for(i=0; i<size; i++)
+        {
+            id32 = (uint32_t*)eo_array_At(id32ofregulars, i);
+            if(NULL != id32)
+            {
+                ropdesc.id32 = *id32;
+                eo_transceiver_RegularROP_Unload(boardtransceiver, &ropdesc);
+            }       
+        }    
+        eo_array_Reset(id32ofregulars);
+    }    
+    
+    EOarray* id32array = (EOarray*)arrayofid32;   
+        
+    // then i load the new id32s ... if there are any
+    if((NULL != id32array) && (0 != eo_array_Size(id32array)))
+    {
+        // get all the id32 from id32array (but not more than ...) and: 1. push back into id32ofregulars, 2. load the regular
+        size = eo_array_Size(id32array);
+        
+        eOropdescriptor_t ropdesc;
+        memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+        ropdesc.control.plustime    = 0;
+        ropdesc.control.plussign    = 0;
+        ropdesc.ropcode             = eo_ropcode_sig;
+        ropdesc.signature           = eo_rop_SIGNATUREdummy;  
+        uint32_t* id32 = NULL;        
+        
+        for(i=0; i<size; i++)
+        {
+            id32 = (uint32_t*)eo_array_At(id32array, i);
+            if(NULL != id32)
+            { 
+                // filter them 
+                bool itisrelevant = true;
+                if(nullptr != fpISOK)
+                {
+                    itisrelevant = fpISOK(*id32);                   
+                }
+                
+                if(true == itisrelevant)
+                {
+                    ropdesc.id32 = *id32;     
+                    if(eores_OK == eo_transceiver_RegularROP_Load(boardtransceiver, &ropdesc))
+                    {
+                        eo_array_PushBack(id32ofregulars, id32);
+                        if(eobool_true == eo_array_Full(id32ofregulars))
+                        {   // cannot add any more regulars
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        
+                    }
+                   
+                }                
+            }           
+        }
+    }
+    
+    if(nullptr != numberofthem)
+    {
+        *numberofthem = eo_array_Size(id32ofregulars);
+    }
+    
+    return true;   
+}
+
+#endif
+
 bool embot::app::eth::theServices::Impl::synch(Service::Category category, Service::State state)
 {
     auto index = embot::core::tointegral(category);

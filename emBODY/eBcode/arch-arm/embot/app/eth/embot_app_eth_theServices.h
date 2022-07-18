@@ -54,7 +54,7 @@ namespace embot { namespace app { namespace eth {
 
         using fpIsID32relevant = bool (*)(uint32_t id32);
         bool setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);
-            
+        #warning attenzione: setregulars() fa pulizia ed aggiunge. ma con nullptr non fa mai il clear. serve poi un addregulars    
         bool synch(Service::Category category, Service::State state);  
         
     private:
