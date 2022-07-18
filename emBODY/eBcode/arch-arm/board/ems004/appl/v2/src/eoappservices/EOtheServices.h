@@ -42,6 +42,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
+#include "EOaService.h"
 
 #if defined(USE_EMBOT_theServices)    
 #error USE_EMBOT_theServices is defined, so file EOtheServices.h must not be used 
@@ -55,10 +56,8 @@ extern "C" {
 
 typedef struct EOtheServices_hid EOtheServices;
 
-typedef void EOaService;
 
 
-typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t operationisok);
 
 // a service has methods: _Initialise(), _GetHandle(), _Verify(), _Activate(), _Deactivate(), _Start(), _Tick(), _Stop()
    

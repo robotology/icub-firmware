@@ -43,8 +43,11 @@ extern "C" {
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
+#if defined(USE_EMBOT_theServices) 
+#include "EOaService.h"
+#else
 #include "EOtheServices.h"
-
+#endif
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section

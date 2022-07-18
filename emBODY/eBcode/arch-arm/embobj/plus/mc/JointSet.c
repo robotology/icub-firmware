@@ -23,7 +23,11 @@
 #include "EOemsControllerCfg.h"
 #include "EOtheErrorManager.h"
 #include "EoError.h"
+#if defined(USE_EMBOT_theServices) 
+#warning removed some code
+#else
 #include "EOappEncodersReader.h"
+#endif
 #include "EOtheEntities.h"
 
 #include "Joint_hid.h"
@@ -1519,6 +1523,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             break;
         }
         
+#if defined(USE_EMBOT_theServices) 
+#warning removed some code
+#else
+        
+        
         case eomc_calibration_type6_mais:
         {
             // 1) check params are ok
@@ -1651,6 +1660,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
         }
         break;
+
+#endif
 
         case eomc_calibration_type8_tripod_internal_hard_stop:
         case eomc_calibration_type9_tripod_external_hard_stop:
