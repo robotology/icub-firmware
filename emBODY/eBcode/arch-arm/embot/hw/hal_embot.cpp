@@ -219,5 +219,48 @@ extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
     return convert(s);
 }
 
+
+// --- hal_adc
+
+#include "hal_adc.h"
+
+extern hal_dma_voltage_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor)
+{
+    return 0;
+}
+
+
+// --- hal_motor
+
+#include "hal_motor.h"
+
+
+extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
+{
+    return hal_res_NOK_generic;
+}
+
+
+extern hal_result_t hal_motor_enable(hal_motor_t id)
+{
+    return hal_res_NOK_generic;
+}
+
+
+extern hal_result_t hal_motor_disable(hal_motor_t id)
+{
+    return hal_res_NOK_generic;
+}
+
+extern hal_bool_t hal_motor_externalfaulted(void)
+{
+    return hal_false;
+}
+
+extern hal_result_t hal_motor_reenable_break_interrupts(void)
+{
+    return hal_res_NOK_generic;
+}
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
