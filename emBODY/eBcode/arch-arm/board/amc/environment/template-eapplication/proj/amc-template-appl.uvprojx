@@ -766,6 +766,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2177,6 +2182,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3231,6 +3241,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4284,6 +4299,11 @@
               <FileName>embot_hw_eeprom.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
           </Files>
         </Group>
