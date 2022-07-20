@@ -45,7 +45,10 @@
 #include "embot_app_eth_theServices.h"
 //#include "embot_app_eth_theFTservice.h"
 #include "embot_app_eth_theServiceFT.h"
+
+#if defined(USE_EMBOT_theServicesMC)
 #include "embot_app_eth_theServiceMC.h"
+#endif
 
 #include "EOtheEntities.h"
 
@@ -552,9 +555,10 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
         
     embot::app::eth::theServiceFT::getInstance().initialise({});          
     embot::app::eth::theServices::getInstance().load(embot::app::eth::theServiceFT::getInstance().service());
-
+#if defined(USE_EMBOT_theServicesMC)
     embot::app::eth::theServiceMC::getInstance().initialise({});          
     embot::app::eth::theServices::getInstance().load(embot::app::eth::theServiceMC::getInstance().service());  
+#endif
         
 //    // create the state machine and start it
 //    // its configuration comes from eo_cfg_sm_EMSappl_Get()

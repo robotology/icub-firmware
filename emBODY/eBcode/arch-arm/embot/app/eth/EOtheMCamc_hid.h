@@ -22,7 +22,7 @@
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
-//#include "Controller.h"
+#include "Controller.h"
 //#include "EOtheEncoderReader.h"
 
 //#include "EOtheMAIS.h"
@@ -70,7 +70,7 @@ typedef struct
     
     // for everything apart mc4can
     EOconstarray*                           jomodescriptors; // points to the jomodescriptor inside EOtheMotionController_hid::service::servconfig etc. 
-//    MController*                            thecontroller;
+    MController*                            thecontroller;
 //    EOtheEncoderReader*                     theencoderreader;   
         
     

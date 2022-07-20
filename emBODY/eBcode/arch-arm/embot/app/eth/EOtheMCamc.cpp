@@ -393,8 +393,8 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     p->id32ofregulars = eo_array_New(motioncontrol_maxRegulars, sizeof(uint32_t), NULL);
     
-    #warning TODO add the controller
-//    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardENCOs);
+//    #warning TODO add the controller
+    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardENCOs);
   
 //    #warning TODO add the encoder reader
 //    p->ctrlobjs.theencoderreader = eo_encoderreader_Initialise();

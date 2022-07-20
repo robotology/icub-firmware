@@ -219,6 +219,7 @@ extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
     return convert(s);
 }
 
+#if defined(USE_EMBOT_theServicesMC)
 
 // --- hal_adc
 
@@ -261,6 +262,8 @@ extern hal_result_t hal_motor_reenable_break_interrupts(void)
 {
     return hal_res_NOK_generic;
 }
+
+#endif
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
