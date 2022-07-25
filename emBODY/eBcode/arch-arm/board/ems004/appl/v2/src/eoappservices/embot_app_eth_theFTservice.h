@@ -28,16 +28,17 @@
 #include <vector>
 #include <memory>
 
+
 namespace embot { namespace app { namespace eth {
       
       
     // fills a given eOropdescriptor_t w/ whatever is required to be given to theFTservice::process()   
     const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
     
-    class theFTservice // : public theService
+    class theFTservice
     {
     public:
-        static theFTservice& getInstance(); 
+        static theFTservice& getInstance();
                 
     public:
         
