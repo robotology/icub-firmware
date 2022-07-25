@@ -779,7 +779,7 @@ extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en)
     {
         {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf},   // ep->management [none, ...]
         {0,     1, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf},   // ep->mc [joi, mot, none, ...]
-        {2,     3,   4,   5,   6,   7,   8,   9 , 10},   // ep->as [str, mai, tem, ine, ine3, psc, pos, ft, bs]
+        {2,     3,   4,   5,   6,   7,   8,   9 , 11},   // ep->as [str, mai, tem, ine, ine3, psc, pos, ft, bs]
         {10,  0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf}    // ep->sk [sk, none]
     }; EO_VERIFYsizeof(pos, sizeof(const uint8_t)*(eoprot_endpoints_numberof)*(eoprot_entities_maxnumberofsupported))
 

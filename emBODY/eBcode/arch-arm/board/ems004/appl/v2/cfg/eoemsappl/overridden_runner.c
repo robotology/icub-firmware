@@ -146,7 +146,7 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     embot::app::eth::theFTservice::getInstance().Tick();
     
     // bat service
-    embot::app::eth::theBATService::getInstance().Tick();
+    embot::app::eth::theBATservice::getInstance().Tick();
 
     eo_psc_Tick(eo_psc_GetHandle());
     eo_pos_Tick(eo_pos_GetHandle());
