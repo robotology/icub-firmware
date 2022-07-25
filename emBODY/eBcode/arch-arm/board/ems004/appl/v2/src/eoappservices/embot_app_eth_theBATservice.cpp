@@ -344,7 +344,7 @@ eOresult_t embot::app::eth::theBATservice::Impl::Activate(
 
     if ((nullptr != sd) &&
         (eobool_true ==
-         eoas_bms_isboardvalid(static_cast<eObrd_cantype_t>(
+         eoas_battery_isboardvalid(static_cast<eObrd_cantype_t>(
              sd->boardinfo.type)))) { // even if it is a useless check because
                                       // we did it before inside Verify()
 
