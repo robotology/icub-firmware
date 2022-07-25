@@ -141,6 +141,7 @@ typedef enum
     eo_service_psc          = 7,
     eo_service_pos          = 8,
     eo_service_ft           = 9,
+    eo_service_battery      = 10,
     eo_service_none         = 255
 } eOservice_type_t;
 

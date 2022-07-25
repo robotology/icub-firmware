@@ -52,6 +52,7 @@
 #include "EOVtheCallbackManager.h"
 
 #include "embot_app_eth_theFTservice.h"
+#include "embot_app_eth_theBATservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -193,6 +194,10 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     embot::app::eth::theFTservice::getInstance().Stop();
     embot::app::eth::theFTservice::getInstance().Deactivate();
 
+    // bat service
+    embot::app::eth::theBATService::getInstance().Stop();
+    embot::app::eth::theBATService::getInstance().Deactivate();
+
     // skin
     eo_skin_Stop(eo_skin_GetHandle());
     eo_skin_Deactivate(eo_skin_GetHandle());
@@ -252,6 +257,10 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     embot::app::eth::theFTservice::getInstance().Stop();
     embot::app::eth::theFTservice::getInstance().Deactivate();
     
+    // bat service
+    embot::app::eth::theBATService::getInstance().Stop();
+    embot::app::eth::theBATService::getInstance().Deactivate();
+
     // skin
     eo_skin_Stop(eo_skin_GetHandle());
     eo_skin_Deactivate(eo_skin_GetHandle());

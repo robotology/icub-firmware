@@ -1176,6 +1176,77 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicInertialSensor[] =
 
 static const uint8_t s_eo_canprot_functions_periodicInertialSensor_maxnumber = sizeof(s_eo_canprot_functions_periodicInertialSensor) / sizeof(eOcanprot_functions_t);
 
+static 
+
+const eOcanprot_functions_t s_eo_canprot_functions_periodicBattery[] =
+{
+    {   // 000      ICUBCANPROTO_PER_BS_MSG__STATUS
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__STATUS
+    },
+    {   // 001      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
+    }, 
+    {   // 002      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS,
+    },
+    {   // 003      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
+    },
+    {   // 004      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
+    },
+    {   // 005      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
+    },
+    {   // 006
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
+    },
+    {   // 007
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
+    },
+    {   // 008      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
+    },
+    {   // 009      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) NULL
+    },
+    {   // 010      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) NULL
+    },
+    {   // 011      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) NULL
+    }, 
+    {   // 012      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) NULL
+    },
+    {   // 013      
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) NULL
+    },
+    {   // 014
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) NULL
+    },
+    {   // 015
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) NULL
+    } 
+};   EO_VERIFYsizeof(s_eo_canprot_functions_periodicBattery, ((eocanprot_classperiodic_msgtypes_maxnumberof))*sizeof(eOcanprot_functions_t))
+
+static const uint8_t s_eo_canprot_functions_periodicBattery_maxnumber = sizeof(s_eo_canprot_functions_periodicBattery) / sizeof(eOcanprot_functions_t);
 
 
 
@@ -1186,7 +1257,8 @@ const eOcanprot_functions_t * const eo_canprot_lut_functions[] =
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_pollingAnalogSensor,
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicAnalogSensor,
     (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicSkin,
-    (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicInertialSensor
+    (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicInertialSensor,
+    (const eOcanprot_functions_t *)&s_eo_canprot_functions_periodicBattery
 };  EO_VERIFYsizeof(eo_canprot_lut_functions, (eocanprot_msgclass_maxvalue+1)*sizeof(const eOcanprot_functions_t *))  
 
 
@@ -1597,6 +1669,27 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
                 res = eores_NOK_generic;
             }             
         } break;
+
+        case eocanprot_msgclass_periodicBattery:
+        {
+            *index0 = msgclass;
+            if(eobool_true == parsemode)
+            {
+                msgtype = EOCANPROT_FRAME_PERIODIC_GET_TYPE(frame); 
+            }
+            else
+            {
+                msgtype = des->cmd.type;
+            }              
+            
+            *index1 = msgtype;    
+            // marco.accame: at most they are 16 ... we don't remap. if any hole we manage with NULL function pointers. 
+            res = eores_OK;   
+            if(*index1 >= s_eo_canprot_functions_periodicBattery_maxnumber)
+            {   // extra check
+                res = eores_NOK_generic;
+            }             
+        } break;
         
         default:
         {
@@ -1613,8 +1706,4 @@ static eOresult_t s_eo_canprot_get_indices(eOcanframe_t *frame, eOcanprot_descri
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
-
-
 
