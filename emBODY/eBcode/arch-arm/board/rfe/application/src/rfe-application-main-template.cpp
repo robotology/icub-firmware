@@ -22,10 +22,10 @@ constexpr uint32_t numMilli = 50;
 // --------------------------------------------------------------------------------------------------------------------
 // config start
 
-constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
-{ 
-    embot::prot::can::versionOfAPPLICATION {1, 2, 2},    
-    embot::prot::can::versionOfCANPROTOCOL {2, 0}    
+constexpr embot::app::theCANboardInfo::applicationInfo applInfo
+{
+    embot::prot::can::versionOfAPPLICATION {1, 2, 3},
+    embot::prot::can::versionOfCANPROTOCOL {2, 0}
 };
 
 constexpr std::uint16_t threadIDLEstacksize = 512;

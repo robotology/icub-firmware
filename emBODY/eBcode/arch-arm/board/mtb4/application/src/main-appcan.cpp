@@ -12,15 +12,15 @@
 // --------------------------------------------------------------------------------------------------------------------
 // config start
 
-constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
+constexpr embot::app::theCANboardInfo::applicationInfo applInfo
 {
-#if defined(CUSTOMIZATION_MTB4_FOR_TLR) 
-    embot::prot::can::versionOfAPPLICATION {20, 4, 5},    
-    embot::prot::can::versionOfCANPROTOCOL {20, 0} 
-#else    
-    embot::prot::can::versionOfAPPLICATION {1, 4, 6},    
-    embot::prot::can::versionOfCANPROTOCOL {2, 0} 
-#endif    
+#if defined(CUSTOMIZATION_MTB4_FOR_TLR)
+    embot::prot::can::versionOfAPPLICATION {20, 4, 5},
+    embot::prot::can::versionOfCANPROTOCOL {20, 0}
+#else
+    embot::prot::can::versionOfAPPLICATION {1, 4, 7},
+    embot::prot::can::versionOfCANPROTOCOL {2, 0}
+#endif
 };
 
 constexpr std::uint16_t threadIDLEstacksize = 512;

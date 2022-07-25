@@ -11,10 +11,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 // config start
 
-constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
-{ 
-    embot::prot::can::versionOfAPPLICATION {2, 0, 14},
-    embot::prot::can::versionOfCANPROTOCOL {2, 0}    
+constexpr embot::app::theCANboardInfo::applicationInfo applInfo
+{
+    embot::prot::can::versionOfAPPLICATION {2, 0, 15},
+    embot::prot::can::versionOfCANPROTOCOL {2, 0}
 };
 
 constexpr std::uint16_t threadIDLEstacksize = 1*512;
