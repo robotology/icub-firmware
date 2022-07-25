@@ -285,7 +285,7 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
 
         case eomn_serv_category_battery:
         {
-            state = embot::app::eth::theBATService::getInstance().GetServiceState();           
+            state = embot::app::eth::theBATservice::getInstance().GetServiceState();           
         } break; 
         
         case eomn_serv_category_inertials:
@@ -654,7 +654,7 @@ static void s_eo_services_initialise(EOtheServices *p)
         eo_canprot_Initialise(NULL);
         eo_strain_Initialise(); 
         embot::app::eth::theFTservice::getInstance().initialise({});        
-        embot::app::eth::theBATService::getInstance().initialise({});   
+        embot::app::eth::theBATservice::getInstance().initialise({});   
         eo_mais_Initialise();        
         eo_motioncontrol_Initialise();    
         eo_skin_Initialise(); 
@@ -864,8 +864,8 @@ static eOresult_t s_services_callback_afterverify_bat(EOaService* p, eObool_t op
 {
     if(eobool_false == operationisok)
     {
-        embot::app::eth::theBATService::getInstance().SendReport();
-        embot::app::eth::theBATService::getInstance().Deactivate();
+        embot::app::eth::theBATservice::getInstance().SendReport();
+        embot::app::eth::theBATservice::getInstance().Deactivate();
     }
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_battery, eomn_serv_AS_battery, eo_service_battery);
@@ -1028,7 +1028,7 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_bat_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
             }                
-            embot::app::eth::theBATService::getInstance().Verify(config, s_services_callback_afterverify_bat, eobool_true);
+            embot::app::eth::theBATservice::getInstance().Verify(config, s_services_callback_afterverify_bat, eobool_true);
         } break;  
 
         case eomn_serv_category_mais: 
@@ -1246,7 +1246,7 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
         
         case eomn_serv_category_battery:
         {
-            res = embot::app::eth::theBATService::getInstance().SetRegulars(arrayofid32, &number);
+            res = embot::app::eth::theBATservice::getInstance().SetRegulars(arrayofid32, &number);
         } break;
 
         case eomn_serv_category_mais:
@@ -1352,7 +1352,7 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
         
         case eomn_serv_category_battery:
         {
-            res = embot::app::eth::theBATService::getInstance().Start();
+            res = embot::app::eth::theBATservice::getInstance().Start();
         } break;
 
         case eomn_serv_category_mais:
@@ -1451,12 +1451,12 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
 
         case eomn_serv_category_battery:
         {
-            res = embot::app::eth::theBATService::getInstance().Stop();
-            embot::app::eth::theBATService::getInstance().SetRegulars(nullptr, numofregulars);
+            res = embot::app::eth::theBATservice::getInstance().Stop();
+            embot::app::eth::theBATservice::getInstance().SetRegulars(nullptr, numofregulars);
             p->running[eomn_serv_category_battery] = eobool_false;
             if(eobool_true == and_deactivate)
             {
-                embot::app::eth::theBATService::getInstance().Deactivate();
+                embot::app::eth::theBATservice::getInstance().Deactivate();
             }
         } break;        
         
@@ -1572,12 +1572,12 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
                 embot::app::eth::theFTservice::getInstance().Deactivate();
             }
             
-            embot::app::eth::theBATService::getInstance().Stop();
-            embot::app::eth::theBATService::getInstance().SetRegulars(NULL, NULL);
+            embot::app::eth::theBATservice::getInstance().Stop();
+            embot::app::eth::theBATservice::getInstance().SetRegulars(NULL, NULL);
             p->running[eomn_serv_category_battery] = eobool_false;
             if(eobool_true == and_deactivate)
             {
-                embot::app::eth::theBATService::getInstance().Deactivate();
+                embot::app::eth::theBATservice::getInstance().Deactivate();
             }
 
             eo_skin_Stop(eo_skin_GetHandle());

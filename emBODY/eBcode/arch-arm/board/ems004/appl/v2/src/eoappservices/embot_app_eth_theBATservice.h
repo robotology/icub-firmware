@@ -9,8 +9,8 @@
 // - include guard
 // ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_APP_ETH_theBATService_H_
-#define __EMBOT_APP_ETH_theBATService_H_
+#ifndef __EMBOT_APP_ETH_theBATservice_H_
+#define __EMBOT_APP_ETH_theBATservice_H_
 
 #include "embot_core.h"
 #include "embot_core_binary.h"
@@ -18,7 +18,6 @@
 #include "EOtheServices.h"
 #include "EoCommon.h"
 #include "EoProtocol.h"
-#include "embot_app_eth_baseservice.h"
 #include "embot_app_eth_theServiceTester.h"
 
 #include <memory>
@@ -28,7 +27,7 @@ namespace embot {
 namespace app {
 namespace eth {
 
-class theBATService {
+class theBATservice {
 public:
   struct Config {
     uint32_t tbd{0};
@@ -49,7 +48,7 @@ public:
         : port(p), frame(f), type(t){};
   };
 
-  static theBATService &getInstance();
+  static theBATservice &getInstance();
 
   static constexpr size_t maxSensors{1};
   static constexpr size_t maxRegulars{maxSensors};
@@ -101,13 +100,13 @@ private:
   // eoprot_tag_as_bat_cmmnds_enable (or by theServiceTester)
   bool enable(eOprotIndex_t index, const uint8_t *cmdenable);
 
-  theBATService();
-  ~theBATService();
+  theBATservice();
+  ~theBATservice();
   struct Impl;
   std::unique_ptr<Impl> pImpl;
 
-  theBATService(theBATService const &) = delete;
-  theBATService &operator=(theBATService const &) = delete;
+  theBATservice(theBATservice const &) = delete;
+  theBATservice &operator=(theBATservice const &) = delete;
 };
 
 } // namespace eth

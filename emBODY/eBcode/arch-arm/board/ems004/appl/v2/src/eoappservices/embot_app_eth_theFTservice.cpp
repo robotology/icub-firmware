@@ -606,7 +606,6 @@ eOresult_t embot::app::eth::theFTservice::Impl::Verify(const eOmn_serv_configura
 
 }
 
-
 eOresult_t embot::app::eth::theFTservice::Impl::Activate(const eOmn_serv_configuration_t * servcfg)
 {
     eo_errman_Trace(eo_errman_GetHandle(), "::Activate()", s_eobj_ownname);

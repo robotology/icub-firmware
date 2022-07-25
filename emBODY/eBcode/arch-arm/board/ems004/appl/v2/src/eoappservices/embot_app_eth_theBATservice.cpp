@@ -529,9 +529,8 @@ eOresult_t embot::app::eth::theBATservice::Impl::SetRegulars(
     return (eores_OK);
   }
 
-  return (eo_service_hid_SetRegulars(
-      id32ofregulars, arrayofid32,
-      s_battery_isID32relevant , numberofthem));
+  return (eo_service_hid_SetRegulars(id32ofregulars, arrayofid32,
+                                     s_battery_isID32relevant, numberofthem));
 }
 
 eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(

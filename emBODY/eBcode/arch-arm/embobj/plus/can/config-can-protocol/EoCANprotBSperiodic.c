@@ -74,13 +74,13 @@
 #include "embot_core.h"
 extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__STATUS(eOcanframe_t *frame, eOcanport_t port)
 {
-    embot::app::eth::theBATService::canFrameDescriptor cfd 
+    embot::app::eth::theBATservice::canFrameDescriptor cfd 
     { 
         port, 
         frame, 
-		embot::app::eth::theBATService::canFrameDescriptor::Type::unspecified
+		embot::app::eth::theBATservice::canFrameDescriptor::Type::unspecified
     };
-    embot::app::eth::theBATService::getInstance().AcceptCANframe(cfd);
+    embot::app::eth::theBATservice::getInstance().AcceptCANframe(cfd);
     return(eores_OK);
 }
 
