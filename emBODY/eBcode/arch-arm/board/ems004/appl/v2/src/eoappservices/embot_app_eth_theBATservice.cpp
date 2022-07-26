@@ -558,19 +558,22 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(
   switch (cfd.type) {
   case canFrameDescriptor::Type::unspecified: {
     bat->status.timedvalue.temperature =
-        10 * (static_cast<uint16_t>(cfd.frame->data[1]) << 8) +
-        static_cast<uint16_t>(cfd.frame->data[0]);
+        10 * ((static_cast<uint16_t>(cfd.frame->data[7]) << 8) +
+        static_cast<uint16_t>(cfd.frame->data[6]));
     bat->status.timedvalue.charge = static_cast<float32_t>(
-        (static_cast<uint16_t>(cfd.frame->data[3]) << 8) +
-        static_cast<uint16_t>(cfd.frame->data[2]));
-    bat->status.timedvalue.current =
-        0.1 * static_cast<float32_t>(
-                  (static_cast<uint16_t>(cfd.frame->data[5]) << 8) +
-                  static_cast<uint16_t>(cfd.frame->data[4]));
+        (static_cast<uint16_t>(cfd.frame->data[5]) << 8) +
+        static_cast<uint16_t>(cfd.frame->data[4]));
+    int16_t curr = (static_cast<int16_t>(cfd.frame->data[3]) << 8) +
+                  static_cast<int16_t>(cfd.frame->data[2]);
+//    if(0xffff != curr)
+//    {
+        bat->status.timedvalue.current =
+            0.1 * static_cast<float32_t>(curr);
+//    }
     bat->status.timedvalue.voltage =
         0.1 * static_cast<float32_t>(
-                  (static_cast<uint16_t>(cfd.frame->data[7]) << 8) +
-                  static_cast<uint16_t>(cfd.frame->data[6]));
+                  (static_cast<uint16_t>(cfd.frame->data[1]) << 8) +
+                  static_cast<uint16_t>(cfd.frame->data[0]));
     break;
   }
   default:
