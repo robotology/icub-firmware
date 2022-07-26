@@ -565,11 +565,8 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(
         static_cast<uint16_t>(cfd.frame->data[4]));
     int16_t curr = (static_cast<int16_t>(cfd.frame->data[3]) << 8) +
                   static_cast<int16_t>(cfd.frame->data[2]);
-//    if(0xffff != curr)
-//    {
-        bat->status.timedvalue.current =
+    bat->status.timedvalue.current =
             0.1 * static_cast<float32_t>(curr);
-//    }
     bat->status.timedvalue.voltage =
         0.1 * static_cast<float32_t>(
                   (static_cast<uint16_t>(cfd.frame->data[1]) << 8) +
