@@ -219,7 +219,7 @@ bool embot::app::application::theIMU::Impl::fill(embot::prot::can::inertial::per
 
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
 
-    
+
     info.x = imuacquisition.data.acc.x;
     info.y = imuacquisition.data.acc.y;
     info.z = imuacquisition.data.acc.z;
@@ -528,7 +528,7 @@ bool embot::app::application::theIMU::initialise(Config &config)
     embot::hw::bno055::write(pImpl->config.sensor, embot::hw::bno055::Register::AXIS_MAP_SIGN, 0x07, 5*embot::core::time1millisec);
 #endif
     embot::hw::bno055::set(pImpl->config.sensor, embot::hw::bno055::Mode::NDOF, 5*embot::core::time1millisec);
-    
+
 
 
     return true;
