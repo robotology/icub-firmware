@@ -65,7 +65,9 @@ namespace embot { namespace hw { namespace bno055 {
         CALIB_STAT      = 0x35, // 1 byte RO in bit pairs: sys|gyr|acc|mag (3 is fully calib, 0 is not calib)
         ST_RESULT       = 0x36, // 1 byte RO, but only ls nibble: mcu|gyr|mag|acc (1 is ok, 0 is ko)
         OPR_MODE        = 0x3D, 
-        PWR_MODE        = 0x3E
+        PWR_MODE        = 0x3E,
+        AXIS_MAP_CONFIG = 0x41,
+        AXIS_MAP_SIGN   = 0x42
     };  
 
     enum class Set

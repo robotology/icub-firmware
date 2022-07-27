@@ -219,16 +219,10 @@ bool embot::app::application::theIMU::Impl::fill(embot::prot::can::inertial::per
 
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
 
-    //this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
-#if defined(STM32HAL_BOARD_STRAIN2)
-    info.x = -imuacquisition.data.acc.y;
-    info.y = -imuacquisition.data.acc.x;
-    info.z = -imuacquisition.data.acc.z;
-#else
+    
     info.x = imuacquisition.data.acc.x;
     info.y = imuacquisition.data.acc.y;
     info.z = imuacquisition.data.acc.z;
-#endif
 
     return ret;
 }
@@ -240,16 +234,10 @@ bool embot::app::application::theIMU::Impl::fill(embot::prot::can::inertial::per
 
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
 
-    //this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
-#if defined(STM32HAL_BOARD_STRAIN2)
-    info.x = -imuacquisition.data.gyr.y;
-    info.y = -imuacquisition.data.gyr.x;
-    info.z = -imuacquisition.data.gyr.z;
-#else
     info.x = imuacquisition.data.gyr.x;
     info.y = imuacquisition.data.gyr.y;
     info.z = imuacquisition.data.gyr.z;
-#endif
+
 
     return ret;
 }
@@ -371,16 +359,7 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
         {
             // generate a acc message with canrevisitedconfig.imuinfo.counter
             info.sensor = embot::prot::can::analog::imuSensor::acc;
-
-	    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
-	    // https://github.com/icub-tech-iit/fix/issues/780
-	#if defined(STM32HAL_BOARD_STRAIN2)
-            info.value.x = -imuacquisition.data.acc.y;
-            info.value.y = -imuacquisition.data.acc.x;
-            info.value.z = -imuacquisition.data.acc.z;
-    #else
-	    info.value = imuacquisition.data.acc;
-	#endif
+	        info.value = imuacquisition.data.acc;
 
             msg.load(info);
             msg.get(frame);
@@ -392,17 +371,8 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
             // generate a mag message with canrevisitedconfig.counter
             info.sensor = embot::prot::can::analog::imuSensor::mag;
 
-	    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
-	    // https://github.com/icub-tech-iit/fix/issues/780
-	    #if defined(STM32HAL_BOARD_STRAIN2)
-            info.value.x = -imuacquisition.data.mag.y;
-            info.value.y = -imuacquisition.data.mag.x;
-            info.value.z = -imuacquisition.data.mag.z;
-        #else
             info.value = imuacquisition.data.mag;
-        #endif
-
-	    msg.load(info);
+            msg.load(info);
             msg.get(frame);
             replies.push_back(frame);
         }
@@ -411,16 +381,7 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
         {
             // generate a gyr message with canrevisitedconfig.counter
             info.sensor = embot::prot::can::analog::imuSensor::gyr;
-
-	    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
-	    // https://github.com/icub-tech-iit/fix/issues/780
-	    #if defined(STM32HAL_BOARD_STRAIN2)
-            info.value.x = -imuacquisition.data.gyr.y;
-            info.value.y = -imuacquisition.data.gyr.x;
-            info.value.z = -imuacquisition.data.gyr.z;
-        #else
-	    info.value = imuacquisition.data.gyr;
-	    #endif
+            info.value = imuacquisition.data.gyr;
 
             msg.load(info);
             msg.get(frame);
@@ -433,17 +394,13 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
             info.sensor = embot::prot::can::analog::imuSensor::eul;
             // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
             // https://github.com/icub-tech-iit/fix/issues/780 + https://github.com/icub-tech-iit/task-force-miscellanea/issues/126
-        #if defined(STM32HAL_BOARD_STRAIN2)
-            info.value.x = -imuacquisition.data.eul.z;
-            info.value.y = imuacquisition.data.eul.x;
-            info.value.z = -imuacquisition.data.eul.y;
-        #else
+
             // The Bosch euler representation can be either the windows(default) or android, but in YARP
             // we have a different representation(see https://github.com/robotology/yarp/blob/0481f994c6e03897d038c5f1d1078145646a1772/src/libYARP_dev/src/yarp/dev/MultipleAnalogSensorsInterfaces.h#L302-L348)
             info.value.x = imuacquisition.data.eul.z;
             info.value.y = -imuacquisition.data.eul.y;
             info.value.z = imuacquisition.data.eul.x;
-        #endif
+
             msg.load(info);
             msg.get(frame);
             replies.push_back(frame);
@@ -562,7 +519,17 @@ bool embot::app::application::theIMU::initialise(Config &config)
     pImpl->action.load(embot::os::EventToThread(pImpl->config.tickevent, pImpl->config.totask));
 
     embot::hw::bno055::init(pImpl->config.sensor, pImpl->config.sensorconfig);
+    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
+    // https://github.com/icub-tech-iit/fix/issues/780
+    //this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
+#if defined(STM32HAL_BOARD_STRAIN2)
+    // In strain2 we have the P6 configuration reported in bno055 datasheet
+    embot::hw::bno055::write(pImpl->config.sensor, embot::hw::bno055::Register::AXIS_MAP_CONFIG, 0x21, 5*embot::core::time1millisec);
+    embot::hw::bno055::write(pImpl->config.sensor, embot::hw::bno055::Register::AXIS_MAP_SIGN, 0x07, 5*embot::core::time1millisec);
+#endif
     embot::hw::bno055::set(pImpl->config.sensor, embot::hw::bno055::Mode::NDOF, 5*embot::core::time1millisec);
+    
+
 
     return true;
 }
