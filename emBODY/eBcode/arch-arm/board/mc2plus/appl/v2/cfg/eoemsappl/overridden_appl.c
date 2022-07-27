@@ -52,6 +52,7 @@
 #include "EOVtheCallbackManager.h"
 
 #include "embot_app_eth_theFTservice.h"
+#include "embot_app_eth_theBATservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
