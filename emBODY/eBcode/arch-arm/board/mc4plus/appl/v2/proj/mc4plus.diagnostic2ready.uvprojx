@@ -1215,7 +1215,7 @@
           <Files>
             <File>
               <FileName>EoCANprotBSperiodic.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotBSperiodic.c</FilePath>
             </File>
             <File>
@@ -2620,7 +2620,7 @@
           <Files>
             <File>
               <FileName>EoCANprotBSperiodic.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotBSperiodic.c</FilePath>
             </File>
             <File>
@@ -4025,7 +4025,7 @@
           <Files>
             <File>
               <FileName>EoCANprotBSperiodic.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotBSperiodic.c</FilePath>
             </File>
             <File>
