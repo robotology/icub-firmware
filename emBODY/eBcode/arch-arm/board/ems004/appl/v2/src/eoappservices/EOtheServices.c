@@ -68,6 +68,7 @@
 #include "EOtheFatalError.h"
 
 #include "embot_app_eth_theFTservice.h"
+#include "embot_app_eth_theBATservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -281,6 +282,11 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
         {
             state = embot::app::eth::theFTservice::getInstance().GetServiceState();           
         } break;  
+
+        case eomn_serv_category_battery:
+        {
+            state = embot::app::eth::theBATservice::getInstance().GetServiceState();           
+        } break; 
         
         case eomn_serv_category_inertials:
         {
@@ -648,6 +654,7 @@ static void s_eo_services_initialise(EOtheServices *p)
         eo_canprot_Initialise(NULL);
         eo_strain_Initialise(); 
         embot::app::eth::theFTservice::getInstance().initialise({});        
+        embot::app::eth::theBATservice::getInstance().initialise({});   
         eo_mais_Initialise();        
         eo_motioncontrol_Initialise();    
         eo_skin_Initialise(); 
@@ -853,6 +860,19 @@ static eOresult_t s_services_callback_afterverify_ft(EOaService* p, eObool_t ope
     return(eores_OK);
 }
 
+static eOresult_t s_services_callback_afterverify_bat(EOaService* p, eObool_t operationisok)
+{
+    if(eobool_false == operationisok)
+    {
+        embot::app::eth::theBATservice::getInstance().SendReport();
+        embot::app::eth::theBATservice::getInstance().Deactivate();
+    }
+    
+    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_battery, eomn_serv_AS_battery, eo_service_battery);
+      
+    return(eores_OK);
+}
+
 static eOresult_t s_services_callback_afterverify_skin(EOaService* p, eObool_t operationisok)
 {   
     if(eobool_false == operationisok)
@@ -999,6 +1019,18 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
             embot::app::eth::theFTservice::getInstance().Verify(config, s_services_callback_afterverify_ft, NULL, eobool_true);
         } break;        
         
+        case eomn_serv_category_battery: 
+        {
+            if(eobool_true == uselocalconfig)  
+            {
+                config = NULL;
+                
+                errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_bat_using_onboard_config);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
+            }                
+            embot::app::eth::theBATservice::getInstance().Verify(config, s_services_callback_afterverify_bat, eobool_true);
+        } break;  
+
         case eomn_serv_category_mais: 
         {
             if(eobool_true == uselocalconfig)  
@@ -1212,6 +1244,11 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
             res = embot::app::eth::theFTservice::getInstance().SetRegulars(arrayofid32, &number);
         } break;
         
+        case eomn_serv_category_battery:
+        {
+            res = embot::app::eth::theBATservice::getInstance().SetRegulars(arrayofid32, &number);
+        } break;
+
         case eomn_serv_category_mais:
         {
             res = eo_mais_SetRegulars(eo_mais_GetHandle(), arrayofid32, &number);
@@ -1313,6 +1350,11 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
             res = embot::app::eth::theFTservice::getInstance().Start();
         } break;
         
+        case eomn_serv_category_battery:
+        {
+            res = embot::app::eth::theBATservice::getInstance().Start();
+        } break;
+
         case eomn_serv_category_mais:
         {
             res = eo_mais_Start(eo_mais_GetHandle());
@@ -1406,6 +1448,17 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
                 embot::app::eth::theFTservice::getInstance().Deactivate();
             }
         } break;
+
+        case eomn_serv_category_battery:
+        {
+            res = embot::app::eth::theBATservice::getInstance().Stop();
+            embot::app::eth::theBATservice::getInstance().SetRegulars(nullptr, numofregulars);
+            p->running[eomn_serv_category_battery] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {
+                embot::app::eth::theBATservice::getInstance().Deactivate();
+            }
+        } break;        
         
         case eomn_serv_category_mais:
         {
@@ -1519,6 +1572,14 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
                 embot::app::eth::theFTservice::getInstance().Deactivate();
             }
             
+            embot::app::eth::theBATservice::getInstance().Stop();
+            embot::app::eth::theBATservice::getInstance().SetRegulars(NULL, NULL);
+            p->running[eomn_serv_category_battery] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {
+                embot::app::eth::theBATservice::getInstance().Deactivate();
+            }
+
             eo_skin_Stop(eo_skin_GetHandle());
             eo_skin_SetRegulars(eo_skin_GetHandle(), NULL, NULL);
             p->running[eomn_serv_category_skin] = eobool_false;

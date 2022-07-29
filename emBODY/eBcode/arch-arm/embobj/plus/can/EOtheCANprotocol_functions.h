@@ -353,8 +353,12 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
 
 extern eOresult_t eocanprotMCperiodic_former_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
+// - battery: periodic
+
+extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__STATUS(eOcanframe_t *frame, eOcanport_t port);
 
 
+extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS(eOcanframe_t *frame, eOcanport_t port);
 
 // - skin: polling
 // nothing

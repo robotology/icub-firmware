@@ -39,6 +39,7 @@
 #include "EOtheSTRAIN.h"
 
 #include "embot_app_eth_theFTservice.h"
+#include "embot_app_eth_theBATservice.h"
 
 #if defined(TESTRTC_IS_ACTIVE)
 #include "testRTC.h"
@@ -132,6 +133,9 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     
     // ft service
     embot::app::eth::theFTservice::getInstance().Tick();
+
+    // bat service
+    embot::app::eth::theBATservice::getInstance().Tick();    
     
 	eo_psc_Tick(eo_psc_GetHandle());
     // however, we could also tick others ....
