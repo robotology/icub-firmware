@@ -52,6 +52,7 @@ using namespace std;
 //   (b) the API of FDCAN 
 // --------------------------------------------------------------------------------------------------------------------
 
+#undef debug_DISABLE_HAL_FDCAN_ConfigGlobalFilter
 
 #if !defined(EMBOT_ENABLE_hw_can)
 
@@ -132,6 +133,7 @@ namespace embot { namespace hw { namespace can {
     static bool s_registercallbacks(embot::hw::can::CAN_Handle *hcan);
     static bool s_startdriver(embot::hw::can::CAN_Handle *hcan);
     static bool s_filters_init(embot::hw::can::CAN_Handle *hcan);
+    bool s_filters_set_all(embot::hw::can::CAN_Handle *hcan);
     static result_t s_filters_set(embot::hw::can::CAN_Handle *hcan, std::uint8_t address);
     bool s_filters_set_by_class(embot::hw::can::CAN_Handle *hcan, uint8_t filternumber, uint8_t cls, uint8_t src, uint8_t dst);
     
@@ -140,8 +142,10 @@ namespace embot { namespace hw { namespace can {
     void callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)    
     void callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan, uint32_t RxFifo0ITs);
+    // void callbackOnRxFifo1(embot::hw::can::CAN_Handle* hcan, uint32_t RxFifo1ITs);
+    // void callbackOnError(embot::hw::can::CAN_Handle* hcan); 
 #endif     
-    // void callbackOnError(embot::hw::can::CAN_Handle* hcan); // not used, so far
+
         
     static void RX_IRQenable(embot::hw::CAN p);
     static void RX_IRQdisable(embot::hw::CAN p);
@@ -151,6 +155,7 @@ namespace embot { namespace hw { namespace can {
     static void tx_IRQresume(embot::hw::CAN p, const bool previouslyenabled); // previouslyenabled = tx_IRQdisable();
     
     constexpr uint8_t cls_mc_polling = 0;
+    constexpr uint8_t cls_mc_streaming = 1;
     constexpr uint8_t cls_as_polling = 2;
     constexpr uint8_t cls_bootloader = 7;
     
@@ -193,6 +198,7 @@ result_t can::init(embot::hw::CAN p, const Config &config)
               
     // init the filters
     s_filters_init(_candata_array[index].handle);
+    s_filters_set_all(_candata_array[index].handle);
     
     // register the callbacks
     if(false == s_registercallbacks(_candata_array[index].handle))
@@ -554,10 +560,7 @@ void can::callbackOnTXcompletion(embot::hw::can::CAN_Handle* hcan)
 
 #if defined(HAL_CAN_MODULE_ENABLED) 
 void can::callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan)
-#elif defined(HAL_FDCAN_MODULE_ENABLED) 
-void can::callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan, uint32_t RxFifo0ITs)
-#endif
-{   
+{
     // this function is called inside IRQ handler of stm32hal.
     embot::hw::CAN p = toCAN(hcan); 
     
@@ -566,8 +569,34 @@ void can::callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan, uint32_t RxFi
     {
         s_rx_oneframehascome(p, hcan);
     }
-
 }
+#elif defined(HAL_FDCAN_MODULE_ENABLED) 
+void can::callbackOnRXcompletion(embot::hw::can::CAN_Handle* hcan, uint32_t RxFifo0ITs)
+
+{  
+    if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != 0) 
+    {        
+        // this function is called inside IRQ handler of stm32hal.
+        embot::hw::CAN p = toCAN(hcan); 
+        
+        // i need to check that the interrupt is on the peripheral I have initialised. 
+        if( (embot::hw::CAN::none != p) && initialised(p) )
+        {
+            s_rx_oneframehascome(p, hcan);
+        }
+    }
+
+    if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_FULL) != 0)
+    {
+        //embot::core::print("fifo0-full");
+    }
+    
+    if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_MESSAGE_LOST) != 0)
+    {
+         //embot::core::print("fifo0-msglost");
+    }
+}
+#endif
 
 static void can::s_tx_oneframehasgone(embot::hw::CAN p, embot::hw::can::CAN_Handle *hcan)
 {
@@ -624,7 +653,7 @@ static void can::RX_IRQenable(embot::hw::CAN p)
 #if defined(HAL_CAN_MODULE_ENABLED)
     HAL_CAN_ActivateNotification(_candata_array[index].handle, CAN_IT_RX_FIFO0_MSG_PENDING);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    HAL_FDCAN_ActivateNotification(_candata_array[index].handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
+    HAL_FDCAN_ActivateNotification(_candata_array[index].handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_MESSAGE_LOST, 0);
 #endif
 }
 
@@ -635,7 +664,7 @@ static void can::RX_IRQdisable(embot::hw::CAN p)
 #if defined(HAL_CAN_MODULE_ENABLED)
     HAL_CAN_DeactivateNotification(_candata_array[index].handle, CAN_IT_RX_FIFO0_MSG_PENDING);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    HAL_FDCAN_DeactivateNotification(_candata_array[index].handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE); 
+    HAL_FDCAN_DeactivateNotification(_candata_array[index].handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_MESSAGE_LOST); 
 #endif        
 }
 
@@ -706,6 +735,8 @@ static bool can::s_filters_init(embot::hw::can::CAN_Handle *hcan)
     
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
 
+#if defined(debug_DISABLE_HAL_FDCAN_ConfigGlobalFilter)
+
     FDCAN_FilterTypeDef sFilterConfig {};     
     sFilterConfig.IdType = FDCAN_STANDARD_ID;
     sFilterConfig.FilterIndex = 0;  
@@ -719,8 +750,14 @@ static bool can::s_filters_init(embot::hw::can::CAN_Handle *hcan)
         return false;
     }
 
+#else    
+    
+    // marco.accame on 9 aug 2022: we must config the global filter to actually ... filter IDs
+    HAL_FDCAN_ConfigGlobalFilter(hcan, FDCAN_REJECT, FDCAN_REJECT, FDCAN_FILTER_REMOTE, FDCAN_REJECT_REMOTE); // FDCAN_FILTER_REMOTE
+
+#endif
+
     return true;
-  
 #endif    
 }
 
@@ -729,91 +766,6 @@ static result_t can::s_filters_set(embot::hw::can::CAN_Handle *hcan, std::uint8_
 
 #if defined(HAL_CAN_MODULE_ENABLED)
     
-//    CAN_FilterTypeDef sFilterConfig;    
-//    
-//    /* Configure the CAN Filter for message of class as polling */
-//    sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
-//    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-//    sFilterConfig.FilterIdHigh = (0x200 | address) << 5;
-//    sFilterConfig.FilterIdLow = 0x0000;
-//    sFilterConfig.FilterMaskIdHigh = 0x0000;
-//    sFilterConfig.FilterMaskIdLow = 0x0000;
-//    sFilterConfig.FilterFIFOAssignment = 0;
-//    sFilterConfig.FilterActivation = ENABLE;
-//    sFilterConfig.FilterBank = 0;
-//    sFilterConfig.SlaveStartFilterBank = 0; // For single CAN instances, this parameter is meaningless
-
-//    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
-//    {
-//        return resNOK;
-//    }
-//        
-//    sFilterConfig.FilterIdHigh = 0x20F << 5;
-//    sFilterConfig.FilterIdLow = 0x0000;
-//    sFilterConfig.FilterMaskIdHigh = 0x0000;
-//    sFilterConfig.FilterMaskIdLow = 0x0000;
-//    sFilterConfig.FilterActivation = ENABLE;
-//    sFilterConfig.FilterBank = 1;
-//    sFilterConfig.SlaveStartFilterBank = 0; // For single CAN instances, this parameter is meaningless
-//    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
-//    {
-//        return resNOK;
-//    }
-//    
-//     /* Configure the CAN Filter for message of class bootloader */
-//    
-//    sFilterConfig.FilterIdHigh = (0x700 | address) << 5;
-//    sFilterConfig.FilterIdLow = 0x0000;
-//    sFilterConfig.FilterMaskIdHigh = 0x0000;
-//    sFilterConfig.FilterMaskIdLow = 0x0000;
-//    sFilterConfig.FilterActivation = ENABLE;
-//    sFilterConfig.FilterBank = 2;
-//    sFilterConfig.SlaveStartFilterBank = 1; // For single CAN instances, this parameter is meaningless
-
-//    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
-//    {
-//        return resNOK;
-//    }
-//       
-//    sFilterConfig.FilterIdHigh = 0x70F << 5;
-//    sFilterConfig.FilterIdLow = 0x0000;
-//    sFilterConfig.FilterMaskIdHigh = 0x0000;
-//    sFilterConfig.FilterMaskIdLow = 0x0000;
-//    sFilterConfig.FilterActivation = ENABLE;
-//    sFilterConfig.FilterBank = 3;
-//    sFilterConfig.SlaveStartFilterBank = 1; // For single CAN instances, this parameter is meaningless
-//    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
-//    {
-//        return resNOK;
-//    }
-
-//    /* Configure the CAN Filter for message of class mc polling */
-//    sFilterConfig.FilterIdHigh = (0x000 | address) << 5;
-//    sFilterConfig.FilterIdLow = 0x0000;
-//    sFilterConfig.FilterMaskIdHigh = 0x0000;
-//    sFilterConfig.FilterMaskIdLow = 0x0000;
-//    sFilterConfig.FilterActivation = ENABLE;
-//    sFilterConfig.FilterBank = 4;
-//    sFilterConfig.SlaveStartFilterBank = 2; // For single CAN instances, this parameter is meaningless
-
-//    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
-//    {
-//        return resNOK;
-//    }
-//        
-//    sFilterConfig.FilterIdHigh = 0x00F << 5;
-//    sFilterConfig.FilterIdLow = 0x0000;
-//    sFilterConfig.FilterMaskIdHigh = 0x0000;
-//    sFilterConfig.FilterMaskIdLow = 0x0000;
-//    sFilterConfig.FilterActivation = ENABLE;
-//    sFilterConfig.FilterBank = 5;
-//    sFilterConfig.SlaveStartFilterBank = 2; // For single CAN instances, this parameter is meaningless
-//    
-//    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
-//    {
-//        return resNOK;
-//    }
-
     // for CAN driver we need two filters per class
     can::s_filters_set_by_class(hcan, 0, cls_bootloader, 0, address);
     can::s_filters_set_by_class(hcan, 2, cls_as_polling, 0, address); 
@@ -843,12 +795,62 @@ static result_t can::s_filters_set(embot::hw::can::CAN_Handle *hcan, std::uint8_
     can::s_filters_set_by_class(hcan, 0, cls_bootloader, 0, address);
     can::s_filters_set_by_class(hcan, 1, cls_as_polling, 0, address); 
     can::s_filters_set_by_class(hcan, 2, cls_mc_polling, 0, address);    
-        
+    
+    #if 0
+    i also add the reception of mc-streaming received only from address 0
+    #endif
+    
+    can::s_filters_set_by_class(hcan, 3, cls_mc_streaming, 0, 0);
+
 #endif
     
     return resOK;   
 }
 
+bool can::s_filters_set_all(embot::hw::can::CAN_Handle *hcan)
+{
+    
+#if defined(HAL_CAN_MODULE_ENABLED)
+    
+    CAN_FilterTypeDef sFilterConfig;
+
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+    sFilterConfig.FilterIdHigh = 0x0000;
+    sFilterConfig.FilterIdLow = 0x0000;
+    sFilterConfig.FilterMaskIdHigh = 0x0000;
+    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterFIFOAssignment = 0;
+    sFilterConfig.FilterActivation = ENABLE;
+    sFilterConfig.FilterBank = 0;
+    sFilterConfig.SlaveStartFilterBank = 14; // For single CAN instances, this parameter is meaningless
+
+    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
+    {  
+        return false;    
+    } 
+    
+    return true;
+    
+#elif defined(HAL_FDCAN_MODULE_ENABLED)
+
+    FDCAN_FilterTypeDef sFilterConfig {};     
+    sFilterConfig.IdType = FDCAN_STANDARD_ID;
+    sFilterConfig.FilterIndex = 0;  
+    sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0; // Store in Rx FIFO 0 if filter matches
+    sFilterConfig.FilterType = FDCAN_FILTER_RANGE; // from FilterID1 to FilterID2        
+    sFilterConfig.FilterID1 = 0x000;
+    sFilterConfig.FilterID2 = 0x7FF;
+       
+    if(HAL_FDCAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
+    {
+        return false;
+    }
+
+    return true;   
+    
+#endif 
+}
 
 bool can::s_filters_set_by_class(embot::hw::can::CAN_Handle *hcan, uint8_t filternumber, uint8_t cls, uint8_t src, uint8_t dst)
 {
@@ -859,7 +861,8 @@ bool can::s_filters_set_by_class(embot::hw::can::CAN_Handle *hcan, uint8_t filte
 
     sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    // marco.accame on 4 sept 2020: i dont understand why it is shifted by 5 ... but for now i keep it as it s. i will investigate it later
+    // marco.accame on 4 aug 2022:the ID11 is shifted by 5 positions, very likely because in this way the ID11 is paled at start of the U16 boundary
+
     //sFilterConfig.FilterIdHigh = (0x200 | address) << 5;
     sFilterConfig.FilterIdHigh = ((static_cast<uint32_t>(cls)<<8) | (static_cast<uint32_t>(src)<<4) | (dst&0xf)) << 5;
     sFilterConfig.FilterIdLow = 0x0000;
@@ -895,15 +898,25 @@ bool can::s_filters_set_by_class(embot::hw::can::CAN_Handle *hcan, uint8_t filte
 
     // marco.accame on 13 oct 2020: 
     // tests are required to verify if the filters are effective to avoid reception of unwanted frames
+    // marco.accame on 03 aug 2022:
+    // tests done. all is ok
 
     FDCAN_FilterTypeDef sFilterConfig {};     
     sFilterConfig.IdType = FDCAN_STANDARD_ID;
     sFilterConfig.FilterIndex = filternumber;  
-    sFilterConfig.FilterType = FDCAN_FILTER_DUAL; // Dual ID filter for FilterID1 or FilterID2
     sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0; // Store in Rx FIFO 0 if filter matches
-    sFilterConfig.FilterID1 = (static_cast<uint32_t>(cls)<<8) | (static_cast<uint32_t>(src)<<4) | 0x00F; // must be a number between: 0 and 0x7FF, if IdType is FDCAN_STANDARD_ID
-    sFilterConfig.FilterID2 = (static_cast<uint32_t>(cls)<<8) | (static_cast<uint32_t>(src)<<4) | (dst&0xf); // must be a number between: 0 and 0x7FF, if IdType is FDCAN_STANDARD_ID
-
+    if(cls_mc_streaming == cls)
+    {
+        sFilterConfig.FilterType = FDCAN_FILTER_RANGE; // from FilterID1 to FilterID2        
+        sFilterConfig.FilterID1 = (static_cast<uint32_t>(cls)<<8) | (static_cast<uint32_t>(src)<<4) | 0x0; // must be a number between: 0 and 0x7FF, if IdType is FDCAN_STANDARD_ID
+        sFilterConfig.FilterID2 = (static_cast<uint32_t>(cls)<<8) | (static_cast<uint32_t>(src)<<4) | 0xf; // must be a number between: 0 and 0x7FF, if IdType is FDCAN_STANDARD_ID
+    }
+    else
+    {
+        sFilterConfig.FilterType = FDCAN_FILTER_DUAL; // Dual ID filter for FilterID1 or FilterID2        
+        sFilterConfig.FilterID1 = (static_cast<uint32_t>(cls)<<8) | (static_cast<uint32_t>(src)<<4) | 0x00F; // must be a number between: 0 and 0x7FF, if IdType is FDCAN_STANDARD_ID
+        sFilterConfig.FilterID2 = (static_cast<uint32_t>(cls)<<8) | (static_cast<uint32_t>(src)<<4) | (dst&0xf); // must be a number between: 0 and 0x7FF, if IdType is FDCAN_STANDARD_ID
+    }
        
     if(HAL_FDCAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
     {

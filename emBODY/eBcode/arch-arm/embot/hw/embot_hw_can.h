@@ -72,8 +72,15 @@ namespace embot { namespace hw { namespace can {
     
     result_t get(embot::hw::CAN p, Frame &frame, std::uint8_t &remaining);
     
-    result_t setfilters(embot::hw::CAN p, std::uint8_t address);
-    
+    // about filters: after init() every CAN ID is enabled for reception
+    // then, setfilters() allows receptions only of the following CAN IDs sent by node @ 0
+    // bootloader class towards address or towards  0xf (broadcast) 
+    // analog sensor polling class towards address or towards 0xf (broadcast)
+    // motion control polling class towards ID = address or towards ID = 0xf (broadcast) 
+    // for motion control boards only, such as pmc and amcbldc ...
+    // motion control streaming class sent by node @ 0 (but not by other boards)
+    result_t setfilters(embot::hw::CAN p, std::uint8_t address);   
+   
     enum class Direction : uint8_t { TX = 0, RX = 1 }; 
     bool lock(embot::hw::CAN p, embot::hw::can::Direction dir);
     void unlock(embot::hw::CAN p, embot::hw::can::Direction dir, bool lockstatus);
