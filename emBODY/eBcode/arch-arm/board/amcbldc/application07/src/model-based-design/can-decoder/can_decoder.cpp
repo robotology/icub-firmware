@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.48
+// Model version                  : 3.49
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jul 13 11:27:48 2022
+// C/C++ source code generated on : Tue Aug  9 15:18:14 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -337,17 +337,23 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
                      (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
                       (MCOPC_Set_Velocity_PID))) {
             if (rtu_pck_input->PAYLOAD.LEN == 8) {
+              real32_T c;
               localB->msg_set_pid.motor = rtu_pck_input->PAYLOAD.CMD.M;
-              localB->msg_set_pid.Kp = can_decoder_merge_2bytes_signed(
-                static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[1]),
-                static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[2]));
-              localB->msg_set_pid.Ki = can_decoder_merge_2bytes_signed(
-                static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[3]),
-                static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[4]));
-              localB->msg_set_pid.Kd = can_decoder_merge_2bytes_signed(
-                static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[5]),
-                static_cast<uint16_T>(rtu_pck_input->PAYLOAD.ARG[6]));
               localB->msg_set_pid.Ks = rtu_pck_input->PAYLOAD.ARG[7];
+              c = static_cast<real32_T>(0x01 << (15 - localB->msg_set_pid.Ks)) /
+                32768.0F;
+              localB->msg_set_pid.Kp = c * static_cast<real32_T>
+                (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+                  (rtu_pck_input->PAYLOAD.ARG[1]), static_cast<uint16_T>
+                  (rtu_pck_input->PAYLOAD.ARG[2])));
+              localB->msg_set_pid.Ki = c * static_cast<real32_T>
+                (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+                  (rtu_pck_input->PAYLOAD.ARG[3]), static_cast<uint16_T>
+                  (rtu_pck_input->PAYLOAD.ARG[4])));
+              localB->msg_set_pid.Kd = c * static_cast<real32_T>
+                (can_decoder_merge_2bytes_signed(static_cast<uint16_T>
+                  (rtu_pck_input->PAYLOAD.ARG[5]), static_cast<uint16_T>
+                  (rtu_pck_input->PAYLOAD.ARG[6])));
               localDW->cmd_processed = static_cast<uint16_T>
                 (localDW->cmd_processed + 1);
               if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>

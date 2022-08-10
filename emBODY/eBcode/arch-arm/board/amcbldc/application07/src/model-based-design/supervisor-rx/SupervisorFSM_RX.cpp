@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 4.61
+// Model version                  : 4.67
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jul 13 11:27:19 2022
+// C/C++ source code generated on : Tue Aug  9 15:17:46 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,10 +20,7 @@
 #include "rtwtypes.h"
 #include "SupervisorFSM_RX_types.h"
 #include <cmath>
-#include "multiword_types.h"
 #include "rt_roundd_snf.h"
-#include "uMultiWordShl.h"
-#include "uMultiWord2Double.h"
 #include "SupervisorFSM_RX_private.h"
 
 // Named constants for Chart: '<S2>/ControlMode_SM_motor0'
@@ -67,12 +64,6 @@ static boolean_T SupervisorFSM_IsNewCtrl_Current(void);
 static boolean_T SupervisorFS_IsNewCtrl_Position(void);
 static boolean_T SupervisorFSM_RX_IsNewCtrl_Idle(void);
 static void SupervisorFSM_RX_Voltage(void);
-
-// Forward declaration for local functions
-static void SupervisorFSM_RX_ConvertPID(real32_T in_Kp, real32_T in_Ki, real32_T
-  in_Kd, uint8_T in_Ks, real32_T N, real32_T *out_OutMax, real32_T *out_OutMin,
-  real32_T *out_P, real32_T *out_I, real32_T *out_D, real32_T *out_N, real32_T
-  *out_I0, real32_T *out_D0, uint8_T *out_shift_factor);
 
 // Forward declaration for local functions
 static ControlModes SupervisorFSM_RX_convert(MCControlModes mccontrolmode);
@@ -418,23 +409,27 @@ void Superv_ControlModeHandlerMotor0(void)
       break;
 
      case SupervisorFSM_RX_IN_HWFault:
-      SupervisorFSM_RX_B.controlModeDefined = ControlModes_HwFaultCM;
-      if (SupervisorFSM_RX_IsNewCtrl_Idle() && (!SupervisorFS_isConfigurationSet
-           ())) {
-        SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
-          SupervisorFSM__IN_NotConfigured;
-        SupervisorFSM_RX_B.controlModeDefined = ControlModes_NotConfigured;
-        rtw_disableMotor();
-      } else if (SupervisorFSM_RX_IsNewCtrl_Idle()) {
-        SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX = SupervisorFSM_RX_IN_Idle;
-        SupervisorFSM_RX_B.controlModeDefined = ControlModes_Idle;
-        rtw_disableMotor();
+      {
+        boolean_T tmp;
+        SupervisorFSM_RX_B.controlModeDefined = ControlModes_HwFaultCM;
+        tmp = !SupervisorFSM_RX_B.isInOverCurrent;
+        if (tmp && SupervisorFSM_RX_IsNewCtrl_Idle() &&
+            (!SupervisorFS_isConfigurationSet())) {
+          SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
+            SupervisorFSM__IN_NotConfigured;
+          SupervisorFSM_RX_B.controlModeDefined = ControlModes_NotConfigured;
+          rtw_disableMotor();
+        } else if (tmp && SupervisorFSM_RX_IsNewCtrl_Idle()) {
+          SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX = SupervisorFSM_RX_IN_Idle;
+          SupervisorFSM_RX_B.controlModeDefined = ControlModes_Idle;
+          rtw_disableMotor();
 
-        // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-        // this updates the targets value
-        SupervisorFSM_R_SetpointHandler();
+          // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
+          // this updates the targets value
+          SupervisorFSM_R_SetpointHandler();
 
-        // End of Outputs for SubSystem: '<Root>/SetpointHandler'
+          // End of Outputs for SubSystem: '<Root>/SetpointHandler'
+        }
       }
       break;
 
@@ -877,36 +872,6 @@ void SupervisorFSM_RX_LimitsHandler(void)
   // End of Chart: '<S3>/Chart'
 }
 
-// Function for Chart: '<S4>/Chart'
-static void SupervisorFSM_RX_ConvertPID(real32_T in_Kp, real32_T in_Ki, real32_T
-  in_Kd, uint8_T in_Ks, real32_T N, real32_T *out_OutMax, real32_T *out_OutMin,
-  real32_T *out_P, real32_T *out_I, real32_T *out_D, real32_T *out_N, real32_T
-  *out_I0, real32_T *out_D0, uint8_T *out_shift_factor)
-{
-  uint64m_T tmp;
-  real32_T c;
-  uint32_T qY;
-  static const uint64m_T tmp_0 = { { 1U, 0U }// chunks
-  };
-
-  qY = 15U - in_Ks;
-  if (15U - in_Ks > 15U) {
-    qY = 0U;
-  }
-
-  uMultiWordShl(&tmp_0.chunks[0U], 2, qY, &tmp.chunks[0U], 2);
-  c = static_cast<real32_T>(uMultiWord2Double(&tmp.chunks[0U], 2, 0)) / 32768.0F;
-  *out_OutMax = 0.0F;
-  *out_OutMin = 0.0F;
-  *out_P = in_Kp * c;
-  *out_I = in_Ki * c;
-  *out_D = in_Kd * c;
-  *out_N = N;
-  *out_I0 = 0.0F;
-  *out_D0 = 0.0F;
-  *out_shift_factor = in_Ks;
-}
-
 // System initialize for function-call system: '<Root>/PID Handler'
 void SupervisorFSM_R_PIDHandler_Init(void)
 {
@@ -960,15 +925,10 @@ void SupervisorFSM_RX_PIDHandler(void)
     SupervisorFSM_RX_B.VelocityPID = InitConfParams.VelLoopPID;
     switch (SupervisorFSM_RX_B.newPIDType) {
      case ControlModes_Current:
-      SupervisorFSM_RX_ConvertPID(SupervisorFSM_RX_B.newPID.Kp,
-        SupervisorFSM_RX_B.newPID.Ki, SupervisorFSM_RX_B.newPID.Kd,
-        SupervisorFSM_RX_B.newPID.Ks, InitConfParams.CurLoopPID.N,
-        &SupervisorFSM_RX_B.CurrentPID.OutMax,
-        &SupervisorFSM_RX_B.CurrentPID.OutMin, &SupervisorFSM_RX_B.CurrentPID.P,
-        &SupervisorFSM_RX_B.CurrentPID.I, &SupervisorFSM_RX_B.CurrentPID.D,
-        &SupervisorFSM_RX_B.CurrentPID.N, &SupervisorFSM_RX_B.CurrentPID.I0,
-        &SupervisorFSM_RX_B.CurrentPID.D0,
-        &SupervisorFSM_RX_B.CurrentPID.shift_factor);
+      SupervisorFSM_RX_B.CurrentPID.P = SupervisorFSM_RX_B.newPID.Kp;
+      SupervisorFSM_RX_B.CurrentPID.I = SupervisorFSM_RX_B.newPID.Ki;
+      SupervisorFSM_RX_B.CurrentPID.D = SupervisorFSM_RX_B.newPID.Kd;
+      SupervisorFSM_RX_B.CurrentPID.shift_factor = SupervisorFSM_RX_B.newPID.Ks;
       break;
 
      case ControlModes_Position:
@@ -986,29 +946,19 @@ void SupervisorFSM_RX_PIDHandler(void)
       break;
 
      case ControlModes_Velocity:
-      SupervisorFSM_RX_ConvertPID(SupervisorFSM_RX_B.newPID.Kp,
-        SupervisorFSM_RX_B.newPID.Ki, SupervisorFSM_RX_B.newPID.Kd,
-        SupervisorFSM_RX_B.newPID.Ks, InitConfParams.VelLoopPID.N,
-        &SupervisorFSM_RX_B.VelocityPID.OutMax,
-        &SupervisorFSM_RX_B.VelocityPID.OutMin,
-        &SupervisorFSM_RX_B.VelocityPID.P, &SupervisorFSM_RX_B.VelocityPID.I,
-        &SupervisorFSM_RX_B.VelocityPID.D, &SupervisorFSM_RX_B.VelocityPID.N,
-        &SupervisorFSM_RX_B.VelocityPID.I0, &SupervisorFSM_RX_B.VelocityPID.D0,
-        &SupervisorFSM_RX_B.VelocityPID.shift_factor);
+      SupervisorFSM_RX_B.VelocityPID.P = SupervisorFSM_RX_B.newPID.Kp;
+      SupervisorFSM_RX_B.VelocityPID.I = SupervisorFSM_RX_B.newPID.Ki;
+      SupervisorFSM_RX_B.VelocityPID.D = SupervisorFSM_RX_B.newPID.Kd;
+      SupervisorFSM_RX_B.VelocityPID.shift_factor = SupervisorFSM_RX_B.newPID.Ks;
       break;
     }
   } else {
     switch (SupervisorFSM_RX_B.newPIDType) {
      case ControlModes_Current:
-      SupervisorFSM_RX_ConvertPID(SupervisorFSM_RX_B.newPID.Kp,
-        SupervisorFSM_RX_B.newPID.Ki, SupervisorFSM_RX_B.newPID.Kd,
-        SupervisorFSM_RX_B.newPID.Ks, InitConfParams.CurLoopPID.N,
-        &SupervisorFSM_RX_B.CurrentPID.OutMax,
-        &SupervisorFSM_RX_B.CurrentPID.OutMin, &SupervisorFSM_RX_B.CurrentPID.P,
-        &SupervisorFSM_RX_B.CurrentPID.I, &SupervisorFSM_RX_B.CurrentPID.D,
-        &SupervisorFSM_RX_B.CurrentPID.N, &SupervisorFSM_RX_B.CurrentPID.I0,
-        &SupervisorFSM_RX_B.CurrentPID.D0,
-        &SupervisorFSM_RX_B.CurrentPID.shift_factor);
+      SupervisorFSM_RX_B.CurrentPID.P = SupervisorFSM_RX_B.newPID.Kp;
+      SupervisorFSM_RX_B.CurrentPID.I = SupervisorFSM_RX_B.newPID.Ki;
+      SupervisorFSM_RX_B.CurrentPID.D = SupervisorFSM_RX_B.newPID.Kd;
+      SupervisorFSM_RX_B.CurrentPID.shift_factor = SupervisorFSM_RX_B.newPID.Ks;
       break;
 
      case ControlModes_Position:
@@ -1026,15 +976,10 @@ void SupervisorFSM_RX_PIDHandler(void)
       break;
 
      case ControlModes_Velocity:
-      SupervisorFSM_RX_ConvertPID(SupervisorFSM_RX_B.newPID.Kp,
-        SupervisorFSM_RX_B.newPID.Ki, SupervisorFSM_RX_B.newPID.Kd,
-        SupervisorFSM_RX_B.newPID.Ks, InitConfParams.VelLoopPID.N,
-        &SupervisorFSM_RX_B.VelocityPID.OutMax,
-        &SupervisorFSM_RX_B.VelocityPID.OutMin,
-        &SupervisorFSM_RX_B.VelocityPID.P, &SupervisorFSM_RX_B.VelocityPID.I,
-        &SupervisorFSM_RX_B.VelocityPID.D, &SupervisorFSM_RX_B.VelocityPID.N,
-        &SupervisorFSM_RX_B.VelocityPID.I0, &SupervisorFSM_RX_B.VelocityPID.D0,
-        &SupervisorFSM_RX_B.VelocityPID.shift_factor);
+      SupervisorFSM_RX_B.VelocityPID.P = SupervisorFSM_RX_B.newPID.Kp;
+      SupervisorFSM_RX_B.VelocityPID.I = SupervisorFSM_RX_B.newPID.Ki;
+      SupervisorFSM_RX_B.VelocityPID.D = SupervisorFSM_RX_B.newPID.Kd;
+      SupervisorFSM_RX_B.VelocityPID.shift_factor = SupervisorFSM_RX_B.newPID.Ks;
       break;
     }
   }
