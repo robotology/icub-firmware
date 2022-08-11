@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 3.31
+// Model version                  : 3.32
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Wed Jul 13 11:28:25 2022
+// C/C++ source code generated on : Thu Aug 11 17:11:41 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -40,17 +40,17 @@ struct DW_control_outer_f_T {
   real32_T Integrator_DSTATE;          // '<S54>/Integrator'
   real32_T FilterDifferentiatorTF_states_i;// '<S97>/Filter Differentiator TF'
   real32_T Integrator_DSTATE_i;        // '<S104>/Integrator'
-  real32_T FilterDifferentiatorTF_states_c;// '<S149>/Filter Differentiator TF'
+  real32_T FilterDifferentiatorTF_states_c;// '<S147>/Filter Differentiator TF'
   real32_T UnitDelay1_DSTATE;          // '<Root>/Unit Delay1'
-  real32_T Integrator_DSTATE_b;        // '<S156>/Integrator'
+  real32_T Integrator_DSTATE_b;        // '<S154>/Integrator'
   real32_T DiscreteTimeIntegrator_DSTATE;// '<S1>/Discrete-Time Integrator'
   ControlModes DelayInput1_DSTATE;     // '<S2>/Delay Input1'
   real32_T FilterDifferentiatorTF_tmp; // '<S47>/Filter Differentiator TF'
   real32_T FilterDifferentiatorTF_tmp_m;// '<S97>/Filter Differentiator TF'
-  real32_T FilterDifferentiatorTF_tmp_p;// '<S149>/Filter Differentiator TF'
+  real32_T FilterDifferentiatorTF_tmp_p;// '<S147>/Filter Differentiator TF'
   int8_T Integrator_PrevResetState;    // '<S54>/Integrator'
   int8_T Integrator_PrevResetState_n;  // '<S104>/Integrator'
-  int8_T Integrator_PrevResetState_c;  // '<S156>/Integrator'
+  int8_T Integrator_PrevResetState_c;  // '<S154>/Integrator'
   int8_T DiscreteTimeIntegrator_PrevRese;// '<S1>/Discrete-Time Integrator'
   uint8_T DiscreteTimeIntegrator_SYSTEM_E;// '<S1>/Discrete-Time Integrator'
   boolean_T Memory_PreviousInput;      // '<S10>/Memory'
@@ -64,7 +64,7 @@ struct DW_control_outer_f_T {
 struct ZCE_control_outer_T {
   ZCSigState FilterDifferentiatorTF_Reset_ZC;// '<S47>/Filter Differentiator TF' 
   ZCSigState FilterDifferentiatorTF_Reset__m;// '<S97>/Filter Differentiator TF' 
-  ZCSigState FilterDifferentiatorTF_Reset__e;// '<S149>/Filter Differentiator TF' 
+  ZCSigState FilterDifferentiatorTF_Reset__e;// '<S147>/Filter Differentiator TF' 
 };
 
 #endif                                 //control_outer_MDLREF_HIDE_CHILD_
@@ -127,8 +127,8 @@ extern ZCE_control_outer_T control_outer_PrevZCX;
 //  Block '<S65>/Kt' : Eliminated nontunable gain of 1
 //  Block '<S97>/Passthrough for tuning' : Eliminate redundant data type conversion
 //  Block '<S115>/Kt' : Eliminated nontunable gain of 1
-//  Block '<S149>/Passthrough for tuning' : Eliminate redundant data type conversion
-//  Block '<S167>/Kt' : Eliminated nontunable gain of 1
+//  Block '<S147>/Passthrough for tuning' : Eliminate redundant data type conversion
+//  Block '<S165>/Kt' : Eliminated nontunable gain of 1
 
 
 //-
@@ -290,34 +290,32 @@ extern ZCE_control_outer_T control_outer_PrevZCX;
 //  '<S142>' : 'control_outer/Velocity PID control/Tsamp - Ngain'
 //  '<S143>' : 'control_outer/Velocity PID control/postSat Signal'
 //  '<S144>' : 'control_outer/Velocity PID control/preSat Signal'
-//  '<S145>' : 'control_outer/Velocity PID control/Anti-windup/Disc. Clamping Parallel'
-//  '<S146>' : 'control_outer/Velocity PID control/Anti-windup/Disc. Clamping Parallel/Dead Zone'
-//  '<S147>' : 'control_outer/Velocity PID control/Anti-windup/Disc. Clamping Parallel/Dead Zone/Enabled'
-//  '<S148>' : 'control_outer/Velocity PID control/D Gain/External Parameters'
-//  '<S149>' : 'control_outer/Velocity PID control/Filter/Disc. Trapezoidal Filter'
-//  '<S150>' : 'control_outer/Velocity PID control/Filter/Disc. Trapezoidal Filter/Tsamp'
-//  '<S151>' : 'control_outer/Velocity PID control/Filter/Disc. Trapezoidal Filter/Tsamp/Internal Ts'
-//  '<S152>' : 'control_outer/Velocity PID control/Filter ICs/Internal IC - Filter'
-//  '<S153>' : 'control_outer/Velocity PID control/I Gain/External Parameters'
-//  '<S154>' : 'control_outer/Velocity PID control/Ideal P Gain/Passthrough'
-//  '<S155>' : 'control_outer/Velocity PID control/Ideal P Gain Fdbk/Passthrough'
-//  '<S156>' : 'control_outer/Velocity PID control/Integrator/Discrete'
-//  '<S157>' : 'control_outer/Velocity PID control/Integrator ICs/Internal IC'
-//  '<S158>' : 'control_outer/Velocity PID control/N Copy/External Parameters'
-//  '<S159>' : 'control_outer/Velocity PID control/N Gain/External Parameters'
-//  '<S160>' : 'control_outer/Velocity PID control/P Copy/Disabled'
-//  '<S161>' : 'control_outer/Velocity PID control/Parallel P Gain/External Parameters'
-//  '<S162>' : 'control_outer/Velocity PID control/Reset Signal/External Reset'
-//  '<S163>' : 'control_outer/Velocity PID control/Saturation/Enabled'
-//  '<S164>' : 'control_outer/Velocity PID control/Saturation Fdbk/Enabled'
-//  '<S165>' : 'control_outer/Velocity PID control/Sum/Sum_PID'
-//  '<S166>' : 'control_outer/Velocity PID control/Sum Fdbk/Enabled'
-//  '<S167>' : 'control_outer/Velocity PID control/Tracking Mode/Enabled'
-//  '<S168>' : 'control_outer/Velocity PID control/Tracking Mode Sum/Tracking Mode'
-//  '<S169>' : 'control_outer/Velocity PID control/Tsamp - Integral/Passthrough'
-//  '<S170>' : 'control_outer/Velocity PID control/Tsamp - Ngain/Passthrough'
-//  '<S171>' : 'control_outer/Velocity PID control/postSat Signal/Feedback_Path'
-//  '<S172>' : 'control_outer/Velocity PID control/preSat Signal/Feedback_Path'
+//  '<S145>' : 'control_outer/Velocity PID control/Anti-windup/Passthrough'
+//  '<S146>' : 'control_outer/Velocity PID control/D Gain/External Parameters'
+//  '<S147>' : 'control_outer/Velocity PID control/Filter/Disc. Trapezoidal Filter'
+//  '<S148>' : 'control_outer/Velocity PID control/Filter/Disc. Trapezoidal Filter/Tsamp'
+//  '<S149>' : 'control_outer/Velocity PID control/Filter/Disc. Trapezoidal Filter/Tsamp/Internal Ts'
+//  '<S150>' : 'control_outer/Velocity PID control/Filter ICs/Internal IC - Filter'
+//  '<S151>' : 'control_outer/Velocity PID control/I Gain/External Parameters'
+//  '<S152>' : 'control_outer/Velocity PID control/Ideal P Gain/Passthrough'
+//  '<S153>' : 'control_outer/Velocity PID control/Ideal P Gain Fdbk/Passthrough'
+//  '<S154>' : 'control_outer/Velocity PID control/Integrator/Discrete'
+//  '<S155>' : 'control_outer/Velocity PID control/Integrator ICs/Internal IC'
+//  '<S156>' : 'control_outer/Velocity PID control/N Copy/External Parameters'
+//  '<S157>' : 'control_outer/Velocity PID control/N Gain/External Parameters'
+//  '<S158>' : 'control_outer/Velocity PID control/P Copy/Disabled'
+//  '<S159>' : 'control_outer/Velocity PID control/Parallel P Gain/External Parameters'
+//  '<S160>' : 'control_outer/Velocity PID control/Reset Signal/External Reset'
+//  '<S161>' : 'control_outer/Velocity PID control/Saturation/Passthrough'
+//  '<S162>' : 'control_outer/Velocity PID control/Saturation Fdbk/Passthrough'
+//  '<S163>' : 'control_outer/Velocity PID control/Sum/Sum_PID'
+//  '<S164>' : 'control_outer/Velocity PID control/Sum Fdbk/Enabled'
+//  '<S165>' : 'control_outer/Velocity PID control/Tracking Mode/Enabled'
+//  '<S166>' : 'control_outer/Velocity PID control/Tracking Mode Sum/Tracking Mode'
+//  '<S167>' : 'control_outer/Velocity PID control/Tsamp - Integral/Passthrough'
+//  '<S168>' : 'control_outer/Velocity PID control/Tsamp - Ngain/Passthrough'
+//  '<S169>' : 'control_outer/Velocity PID control/postSat Signal/Feedback_Path'
+//  '<S170>' : 'control_outer/Velocity PID control/preSat Signal/Feedback_Path'
 
 #endif                                 // RTW_HEADER_control_outer_h_
 
