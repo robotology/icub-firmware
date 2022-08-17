@@ -35,6 +35,7 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 #if defined(TEST_EMBOT_HW)
 
+
 //#define TEST_EMBOT_HW_SPI123
 
 //#define TEST_EMBOT_HW_EEPROM
@@ -45,11 +46,13 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 //#define TEST_EMBOT_HW_FLASH
 
-//#define TEST_EMBOT_HW_CAN
+#define TEST_EMBOT_HW_CAN
+
 //#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1
 //#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1_BURST
 //#define TEST_EMBOT_HW_CAN_gateway_CAN2toCAN1
 //#define TEST_EMBOT_HW_CAN_gateway_CAN1toCAN2
+#define TEST_EMBOT_HW_CAN_BURST
 
 //# define TEST_EMBOT_HW_TIMER
 
@@ -119,10 +122,12 @@ void can1_startup(embot::os::Thread *t, void *param)
     
     // start can1 driver
     
-    embot::hw::can::Config canconfig {};   
+    embot::hw::can::Config canconfig {};  
+    canconfig.txcapacity = 32;  
+    canconfig.rxcapacity = 32;        
     canconfig.onrxframe = embot::core::Callback(alerteventbasedthread, t); 
     embot::hw::can::init(embot::hw::CAN::one, canconfig);
-    embot::hw::can::setfilters(embot::hw::CAN::one, 1);   
+//    embot::hw::can::setfilters(embot::hw::CAN::one, 1);   
     embot::hw::can::enable(embot::hw::CAN::one);        
     
     // start a command to periodically tx a frame
@@ -149,6 +154,63 @@ void can1_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *pa
 
     if(true == embot::core::binary::mask::check(eventmask, evtCAN1tx)) 
     { 
+#if defined(TEST_EMBOT_HW_CAN_BURST)
+        embot::core::print(" ");
+        embot::core::print("-------------------------------------------------------------------------");
+        embot::core::print("tCAN1 -> START OF transmissions from CAN1 in burst mode ");
+        embot::core::print("-------------------------------------------------------------------------");        
+        embot::core::print("tCAN1: evtCAN1tx received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));       
+        uint8_t payload[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+        
+        constexpr uint8_t burstsize = 12;
+        enum class burstmode { 
+            putall_then_transmit,               // as we do in can boards such as strain2 or in ems when in run state
+            loop_put_transmit_eachtime,         // as we do in ems when in cfg state
+            loop_put_transmit_onlyfirsttime     // a new mode i wnat to test 
+        };
+        constexpr burstmode bm {burstmode::loop_put_transmit_eachtime};
+        constexpr bool getoutputsize {true}; // to verify if a irq tx disable / enable gives problems
+        constexpr embot::core::relTime delay {0}; // 0 10 200 300 400 500 
+
+        embot::core::print("tCAN1: will now transmit on CAN1 a burst of " + std::to_string(burstsize) + " frames w/ data[0] = " + std::to_string(payload[0])); 
+        embot::hw::can::Frame hwtxframe {2, 8, payload};
+        for(uint8_t n=0; n<burstsize; n++)
+        {
+            hwtxframe.data[0]++;
+            embot::hw::can::put(embot::hw::CAN::one, hwtxframe); 
+            if(burstmode::loop_put_transmit_eachtime == bm)
+            {
+                embot::hw::can::transmit(embot::hw::CAN::one);                 
+                if(delay > 0)
+                {
+                    embot::hw::sys::delay(delay);
+                }
+            }  
+
+            if((burstmode::loop_put_transmit_onlyfirsttime == bm) && (0 == n))
+            {
+                embot::hw::can::transmit(embot::hw::CAN::one); 
+                if(delay > 0)
+                {
+                    embot::hw::sys::delay(delay);
+                }
+            }
+
+            if(true == getoutputsize)
+            {
+                embot::hw::can::inputqueuesize(embot::hw::CAN::one);
+            }    
+        }   
+
+        if(burstmode::putall_then_transmit == bm)
+        {
+            embot::hw::can::transmit(embot::hw::CAN::one); 
+        }   
+        
+        embot::core::print(" ");
+
+#endif
+        
 #if defined(TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1)  
         embot::core::print(" ");
         embot::core::print("-------------------------------------------------------------------------");
@@ -224,10 +286,12 @@ void can2_startup(embot::os::Thread *t, void *param)
     
     // start can2 driver
     
-    embot::hw::can::Config canconfig {};   
+    embot::hw::can::Config canconfig {}; 
+    canconfig.txcapacity = 32;  
+    canconfig.rxcapacity = 32;         
     canconfig.onrxframe = embot::core::Callback(alerteventbasedthread, t); 
     embot::hw::can::init(embot::hw::CAN::two, canconfig);
-    embot::hw::can::setfilters(embot::hw::CAN::two, 2);   
+    //embot::hw::can::setfilters(embot::hw::CAN::two, 2);   
     embot::hw::can::enable(embot::hw::CAN::two);        
     
     embot::core::print("tCAN2: started CAN2 driver");    
