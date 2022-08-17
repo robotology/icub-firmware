@@ -150,6 +150,7 @@ namespace embot { namespace hw { namespace can {
     static void RX_IRQenable(embot::hw::CAN p);
     static void RX_IRQdisable(embot::hw::CAN p);
         
+    static bool tx_IRQisEnabled(embot::hw::CAN p);    
     static void tx_IRQenable(embot::hw::CAN p);
     static bool tx_IRQdisable(embot::hw::CAN p); // returns status before disabling it
     static void tx_IRQresume(embot::hw::CAN p, const bool previouslyenabled); // previouslyenabled = tx_IRQdisable();
@@ -317,6 +318,13 @@ result_t can::transmit(embot::hw::CAN p)
         return resNOK;
     } 
     
+    if(true == tx_IRQisEnabled(p))
+    {
+        // marco.accame on 17 aug 2022: if the TX is already ongoing, we dont want to start it again
+        // by calling can::s_tx_start(p) which may find the TX FIFO full and fail by losing Qtx->front().
+        return resOK;     
+    }
+    
     can::s_tx_start(p);     
     return resOK;     
 }
@@ -415,6 +423,15 @@ static void can::s_tx_start(embot::hw::CAN p)
      
     // protect Qtx: i disable tx interrupt but i keep info if it was enabled, so that at the end i re-enable it
     volatile bool isTXenabled = tx_IRQdisable(p);
+           
+    if(true == isTXenabled)
+    {
+        //static volatile uint32_t inhere {0};
+        //inhere++;
+        // the transmissione is already started... must not be in here. 
+        tx_IRQresume(p, isTXenabled);          
+        return;  
+    }
 
     if(true == _candata_array[index].Qtx->empty())
     {
@@ -668,6 +685,18 @@ static void can::RX_IRQdisable(embot::hw::CAN p)
 #endif        
 }
 
+
+static bool can::tx_IRQisEnabled(embot::hw::CAN p)
+{
+    std::uint8_t index = embot::core::tointegral(p);
+    volatile bool enabled = true;
+#if defined(HAL_CAN_MODULE_ENABLED)
+    enabled = ((_candata_array[index].handle->Instance->IER & (CAN_IT_TX_MAILBOX_EMPTY)) == (CAN_IT_TX_MAILBOX_EMPTY));
+#elif defined(HAL_FDCAN_MODULE_ENABLED) 
+    enabled = ((_candata_array[index].handle->Instance->IE & (FDCAN_IT_TX_FIFO_EMPTY)) == (FDCAN_IT_TX_FIFO_EMPTY));   
+#endif    
+    return enabled;    
+}
 
 static void can::tx_IRQenable(embot::hw::CAN p)
 {
