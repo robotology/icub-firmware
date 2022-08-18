@@ -87,6 +87,9 @@ extern eOmn_serv_state_t eo_motioncontrol_GetServiceState(EOtheMotionController 
 extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p);
 extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController *p);
 
+#if defined(USE_EMBOT_theServices)
+extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, void *arg, eObool_t activateafterverify);
+#endif
 
 extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 

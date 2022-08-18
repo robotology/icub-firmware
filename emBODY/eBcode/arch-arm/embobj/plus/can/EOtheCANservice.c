@@ -38,6 +38,8 @@
 #include "osal.h"
 #else
 #include "embot_os_rtos.h"
+#include "embot_app_eth_theErrorManager.h"
+#include "embot_os_theScheduler.h"
 #endif // #if !defined(EMBOBJ_USE_EMBOT)
 
 #if defined(USE_EMBOT_HW)

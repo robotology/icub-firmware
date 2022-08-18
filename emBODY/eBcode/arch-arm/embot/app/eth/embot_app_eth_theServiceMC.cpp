@@ -96,7 +96,7 @@ bool embot::app::eth::theServiceMC::Impl::verify(const eOmn_serv_configuration_t
 {
     _operation.load(_owner, servcfg, onendoperation, activateafterverify);
     //embot::app::eth::theFTservice::getInstance().Verify(servcfg, cbk_afterverify, this, activateafterverify ? eobool_true : eobool_false);
-    eo_motioncontrol_Verify(_eom, servcfg, cbk_afterverify, eobool_true);    
+    eo_motioncontrol_Verify2(_eom, servcfg, cbk_afterverify, this, eobool_true);    
     return true;
 }
 

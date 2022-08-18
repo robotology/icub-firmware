@@ -21,6 +21,11 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOVtheCallbackManager.h"
+#include "embot_app_eth_theErrorManager.h"
+#include "embot_os_theScheduler.h"
+
+#include "EOrop.h"
+#include "EoProtocolMC.h"
 
 #if defined(USE_EMBOT_theServices)  
 #include "embot_app_eth_theServices.h"
@@ -272,7 +277,7 @@ static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eO
         // call onverify
         if(NULL != p->service.onverify)
         {
-            p->service.onverify(p, eobool_false); 
+            p->service.onverify(p->service.onverifyarg, eobool_false); 
         }            
                 
     }  
@@ -337,7 +342,7 @@ static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdisco
            
     if(NULL != p->service.onverify)
     {
-        p->service.onverify(p, searchisok); 
+        p->service.onverify(p->service.onverifyarg, searchisok); 
     }    
     
     return(eores_OK);   
@@ -366,6 +371,20 @@ static void s_eo_motioncontrol_send_periodic_error_report(void *par)
     }
 }
 
+//void OnAsk(const EOnv* nv, const eOropdescriptor_t* rd)
+//{
+//    eOprotEndpoint_t endpoint = eoprot_ID2endpoint(rd->id32);
+//    eOprotEntity_t entity = eoprot_ID2entity(rd->id32);
+//    eOprotIndex_t index = eoprot_ID2index(rd->id32);
+//    eOprotTag_t tag = eoprot_ID2tag(rd->id32);
+//    
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    const char * tagstr = eoprot_TAG2string(endpoint, entity, tag);
+//    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//        std::string("ask<") + tagstr + ", " + std::to_string(index) + ">", {s_eobj_ownname, thr}); 
+//        
+//}
 
 // public functions
 
@@ -377,6 +396,14 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     {
         return(p);
     }
+
+
+//    eOropdescriptor_t tt = eok_ropdesc_basic;
+//    tt.ropcode = eo_ropcode_ask;
+//    tt.id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, 0, eoprot_tag_mc_joint_config);
+//    OnAsk(nullptr, &tt);
+    
+//    eoprot_config_onask_endpoint_set(eoprot_endpoint_motioncontrol, OnAsk);    
 
     p->numofjomos = 0;
 
@@ -413,7 +440,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
 //    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);    
     s_mc_synchservice(p->service.state);
     
-    
+        
     return(p);
 }
 
@@ -510,9 +537,9 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 }
 
 
-extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, void *arg, eObool_t activateafterverify)
 {   
-    //eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Verify()", s_eobj_ownname);
+    //eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Verify2()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -520,7 +547,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         s_mc_synchservice(p->service.state);
         if(NULL != onverify)
         {
-            onverify(p, eobool_false); 
+            onverify(arg, eobool_false); 
         }        
         return(eores_NOK_nullpointer);
     }
@@ -531,7 +558,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         s_mc_synchservice(p->service.state);
         if(NULL != onverify)
         {
-            onverify(p, eobool_false); 
+            onverify(arg, eobool_false); 
         }         
         return(eores_NOK_generic);
     }
@@ -560,7 +587,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
         
         p->service.onverify = onverify;
-        p->service.onverifyarg = p;
+        p->service.onverifyarg = arg;
         p->service.activateafterverify = activateafterverify;
 
         // 1. prepare the can discovery for foc boards 
@@ -995,6 +1022,9 @@ extern eOresult_t eo_motioncontrol_AcceptCANframe(EOtheMotionController *p, eOca
     
 extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t num, eOmc_motor_config_t *mc)
 {
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+    embot::app::eth::theErrorManager::getInstance().trace(
+    std::string("motconfig-eth"), {s_eobj_ownname, thr}); 
 
     eOmotioncontroller_mode_t mcmode = eo_motioncontrol_GetMode(p);
     if(eo_motcon_mode_foc == mcmode)
@@ -1005,6 +1035,55 @@ extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t
     }
    
     return eores_OK;
+}
+
+
+extern "C"
+{
+// - in here i put the functions used to initialise the values in ram of the joints and motors ... better in here rather than elsewhere.
+
+static const eOmc_joint_t s_joint_default_value =
+{   // to simplify we set everything to zero and then we edit eoprot_fun_INIT_mc_joint*() functions 
+    0
+};
+
+
+static const eOmc_motor_t s_motor_default_value =
+{   // to simplify we set everything to zero and then we edit eoprot_fun_INIT_mc_motor*() functions
+    0
+}; 
+
+
+extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
+{
+    eOmc_joint_config_t *cfg = (eOmc_joint_config_t*)eo_nv_RAM(nv);
+    memmove(cfg, &s_joint_default_value.config, sizeof(eOmc_joint_config_t));
+}
+
+extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
+{
+    eOmc_joint_status_t *sta = (eOmc_joint_status_t*)eo_nv_RAM(nv);
+    memmove(sta, &s_joint_default_value.status, sizeof(eOmc_joint_status_t));
+    
+    sta->core.modes.controlmodestatus = eomc_controlmode_notConfigured;
+    sta->core.modes.interactionmodestatus = eOmc_interactionmode_stiff;
+}
+
+extern void eoprot_fun_INIT_mc_motor_config(const EOnv* nv)
+{
+    eOmc_motor_config_t *cfg = (eOmc_motor_config_t*)eo_nv_RAM(nv);
+    memmove(cfg, &s_motor_default_value.config, sizeof(eOmc_motor_config_t));
+}
+
+extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
+{
+    eOmc_motor_status_t *sta = (eOmc_motor_status_t*)eo_nv_RAM(nv);
+    memmove(sta, &s_motor_default_value.status, sizeof(eOmc_motor_status_t));
+    
+    // Initialize the fault state to dummy since code zero is assigned to unspecified system error
+    sta->mc_fault_state = eoerror_code_dummy;
+}    
+    
 }
 
 #elif defined(EOTHESERVICES_disable_theMotionController)   

@@ -52,7 +52,7 @@ namespace embot { namespace app { namespace eth {
             .capacityofrop = 384,//                EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, 
             .capacityofropframeregulars = 1024,//   EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, 
             .capacityofropframeoccasionals = 128, //EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, 
-            .capacityofropframereplies = 264, //     EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, 
+            .capacityofropframereplies = 400, //     EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, 
             .maxnumberofregularrops = 32 //      EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS         
         },
         .transprotection = eo_trans_protection_none,

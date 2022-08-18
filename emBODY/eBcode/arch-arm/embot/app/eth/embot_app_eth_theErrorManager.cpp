@@ -35,7 +35,7 @@ struct embot::app::eth::theErrorManager::Impl
     Impl() = default;      
     
     bool initialise(const Config &config); 
-    bool trace(const std::string &str);   
+    bool trace(const std::string &str, const Caller &caller);   
     bool emit(Severity sev, const Caller &caller, const Descriptor &des, const std::string &str);    
     static void onemitdummy(Severity sev, const Caller &caller, const Descriptor &des, const std::string &str)
     {
@@ -64,9 +64,11 @@ bool embot::app::eth::theErrorManager::Impl::initialise(const Config &config)
     return true;
 }
 
-bool embot::app::eth::theErrorManager::Impl::trace(const std::string &str)
+
+bool embot::app::eth::theErrorManager::Impl::trace(const std::string &str, const Caller &caller)
 {
-    embot::core::print(str);
+    embot::core::TimeFormatter tf(embot::core::now());
+    embot::core::print(caller.to_string() + " @" + tf.to_string() + ": " + str);
     return true;
 }
 
@@ -108,9 +110,9 @@ bool embot::app::eth::theErrorManager::initialise(const Config &config)
     return pImpl->initialise(config);
 }
 
-bool embot::app::eth::theErrorManager::trace(const std::string &str)
+bool embot::app::eth::theErrorManager::trace(const std::string &str, const Caller &caller)
 {
-    return pImpl->trace(str);
+    return pImpl->trace(str, caller);
 }
 
 bool embot::app::eth::theErrorManager::emit(Severity sev, const Caller &caller, const Descriptor &des, const std::string &str)
