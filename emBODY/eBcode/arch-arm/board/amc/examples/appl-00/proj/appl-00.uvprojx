@@ -1804,6 +1804,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotSKperiodic_amc.c</FilePath>
             </File>
+            <File>
+              <FileName>EoCANprotBSperiodic_amc.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\protocol\can\EoCANprotBSperiodic_amc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4145,6 +4150,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotSKperiodic_amc.c</FilePath>
             </File>
+            <File>
+              <FileName>EoCANprotBSperiodic_amc.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\protocol\can\EoCANprotBSperiodic_amc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6352,6 +6362,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotSKperiodic_amc.c</FilePath>
             </File>
+            <File>
+              <FileName>EoCANprotBSperiodic_amc.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\protocol\can\EoCANprotBSperiodic_amc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8132,6 +8147,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotSKperiodic_amc.c</FilePath>
             </File>
+            <File>
+              <FileName>EoCANprotBSperiodic_amc.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\protocol\can\EoCANprotBSperiodic_amc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9605,6 +9625,11 @@
               <FileName>EoCANprotSKperiodic_amc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotSKperiodic_amc.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANprotBSperiodic_amc.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\protocol\can\EoCANprotBSperiodic_amc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -11436,6 +11461,11 @@
               <FileName>EoCANprotSKperiodic_amc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\protocol\can\EoCANprotSKperiodic_amc.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANprotBSperiodic_amc.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\cfg\protocol\can\EoCANprotBSperiodic_amc.c</FilePath>
             </File>
           </Files>
         </Group>
