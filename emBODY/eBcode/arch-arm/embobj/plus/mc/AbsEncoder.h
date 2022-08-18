@@ -25,7 +25,7 @@ extern "C" {
 
 #include "EoCommon.h"
 
-#include "EOtheEncoderReader.h"
+//#include "EOtheEncoderReader.h"
 #include "EoMotionControl.h"
 
 #include "EOemsControllerCfg.h"
@@ -138,7 +138,26 @@ extern void AbsEncoder_calibrate_fake(AbsEncoder* o);
  *  @return Void.
  */
 extern void AbsEncoder_update(AbsEncoder* o, uint16_t position);
-extern void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type);
+
+typedef enum
+{
+    ae_err_NONE                  = 0,
+    ae_err_AEA_READING           = 1,
+    ae_err_AEA_PARITY            = 2,
+    ae_err_AEA_CHIP              = 3,
+//    encreader_err_QENC_GENERIC          = 4,
+//    encreader_err_ABSANALOG_GENERIC     = 5,
+//    encreader_err_MAIS_GENERIC          = 6,
+//    encreader_err_SPICHAINOF2_GENERIC   = 7,
+//    encreader_err_SPICHAINOF3_GENERIC   = 8,
+//    encreader_err_AMO_GENERIC           = 9,
+//    encreader_err_PSC_GENERIC           = 10,  
+//    encreader_err_POS_GENERIC           = 11,    
+    ae_err_GENERIC               = 14,    
+    ae_err_NOTCONNECTED          = 15 /* this error happens when the encoder type is none or encoder is not local, for example it is connected to 2foc board */
+} ae_errortype_t;
+
+extern void AbsEncoder_invalid(AbsEncoder* o, ae_errortype_t error_type);
 
 extern void AbsEncoder_config_resolution(AbsEncoder* o, float resolution);
 extern void AbsEncoder_config_divisor(AbsEncoder* o, float32_t divisor);

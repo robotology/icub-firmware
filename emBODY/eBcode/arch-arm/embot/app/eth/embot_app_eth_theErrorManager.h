@@ -68,7 +68,14 @@ namespace embot { namespace app { namespace eth {
             const char* objectname {nullptr}; 
             embot::os::Thread *owner {nullptr}; 
             constexpr Caller() = default;
+            constexpr Caller(const char* n, embot::os::Thread* t) : objectname(n), owner(t) {} 
             constexpr bool isvalid() const { return (nullptr != objectname) && (nullptr != owner); }
+            std::string to_string() const
+            {
+                const char *obj = (objectname != nullptr) ? objectname : "o?";
+                const char *thr = (nullptr != owner) ? owner->getName() : "t?";
+                return std::string(obj) + ", " + std::string(thr);                
+            }
         };        
 
         using fpOnEmit = void (*)(Severity sev, const Caller &caller, const Descriptor &des, const std::string &str);
@@ -82,7 +89,7 @@ namespace embot { namespace app { namespace eth {
         }; 
                 
         bool initialise(const Config &config);        
-        bool trace(const std::string &str);
+        bool trace(const std::string &str, const Caller &caller);
         bool emit(Severity sev, const Caller &caller, const Descriptor &des, const std::string &str);
         bool set(fpOnEmit onemit);
                      

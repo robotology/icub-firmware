@@ -230,6 +230,8 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
         s_eo_theentities.poss[i] = (eOas_pos_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_pos, (eOprotIndex_t)i);
     } 
     
+    #warning TODO add entity ft .............
+    
     return(eores_OK);
 }
 

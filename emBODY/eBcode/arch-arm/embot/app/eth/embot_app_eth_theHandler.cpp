@@ -46,6 +46,10 @@
 //#include "embot_app_eth_theFTservice.h"
 #include "embot_app_eth_theServiceFT.h"
 
+#if defined(USE_EMBOT_theServicesMC)
+#include "embot_app_eth_theServiceMC.h"
+#endif
+
 #include "EOtheEntities.h"
 
 
@@ -84,7 +88,75 @@ struct theCTRLsocket
 
         return true;        
     }
-    
+#if 1
+//the good one    
+    static bool set(embot::app::eth::theHandler::State s)
+    {
+        EOaction_strg astg = {0};
+        EOaction_strg astg2 = {0};
+        EOMtask *tsk2alert {nullptr};
+        
+        if(embot::app::eth::theHandler::State::IDLE == s)
+        {
+            // open/reopen the ems socket so that it must alert the EOMtheEMSconfigurator upon RX of packets
+            EOaction *onrx = reinterpret_cast<EOaction*>(&astg);
+            tsk2alert = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
+            eo_action_SetEvent(onrx, emssocket_evt_packet_received, tsk2alert);            
+            
+            #warning GROSSO COME UNA CASA: verificare se il ontxrequest (terza action) non debba essere un ... send-evt-tx   
+            EOaction *ontxrequest = reinterpret_cast<EOaction*>(&astg2);
+            eo_action_SetEvent(ontxrequest, emsconfigurator_evt_ropframeTx, tsk2alert);
+                        
+            eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, ontxrequest);
+                      
+            // if any rx packets is already in the socket then alert the cfg task
+            if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
+            {
+                eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);        
+            }
+            
+            // also send a tx request just in case. because cfg state transmit only if requested an we dont want to have missed a previous request.
+            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx);             
+            
+        }
+        else if(embot::app::eth::theHandler::State::RUN == s)
+        {
+            // open/reopen the ems socket so that it must alert the EOMtheEMSrunner upon end of TX of packets
+            EOaction *ontxdone = reinterpret_cast<EOaction*>(&astg);
+            eo_action_SetCallback(ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
+            // the socket does not alert anybody when it receives a pkt, but will alert the sending task, so that it knows that it can stop wait.
+            // the alert is done by a callback, eom_emsrunner_OnUDPpacketTransmitted(), which executed by the sender of the packet directly.
+            // this funtion is executed with eo_action_Execute(s->socket->ontransmission) inside the EOMtheIPnet object
+            // for this reason we call eo_action_SetCallback(....., exectask = NULL_); IT MUST NOT BE the callback-manager!!!!
+            eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, ontxdone, NULL);            
+        }
+        else if(embot::app::eth::theHandler::State::FATALERROR == s)
+        {
+            // open/reopen the ems socket so that it must alert the EOMtheEMSerror upon RX of packets
+            EOaction *onrx = reinterpret_cast<EOaction*>(&astg);
+            tsk2alert = eom_emserror_GetTask(eom_emserror_GetHandle());
+            eo_action_SetEvent(onrx, emssocket_evt_packet_received, tsk2alert);
+
+            EOaction *ontxrequest = reinterpret_cast<EOaction*>(&astg2);
+            eo_action_SetEvent(ontxrequest, emsconfigurator_evt_ropframeTx, tsk2alert);            
+            
+            eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, ontxrequest);
+            
+            // if any rx packets already in socket then alert the err task
+            if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
+            {
+                eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);        
+            }
+            
+            // also send a tx request just in case
+            eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);                 
+        }
+        
+        return true;
+    }
+#else
+// the bad one
+
     static bool set(embot::app::eth::theHandler::State s)
     {
         EOaction_strg astg = {0};
@@ -139,7 +211,8 @@ struct theCTRLsocket
         
         return true;
     }
-    
+
+#endif    
     static bool transmissionrequest()
     {
         eom_emssocket_TransmissionRequest(eom_emssocket_GetHandle());
@@ -183,52 +256,64 @@ struct theSM
         eom_emsrunner_Initialise(&embot::app::eth::theHandler_EOMtheEMSrunner_Config);
         // state::FATALERROR
         eom_emserror_Initialise(&embot::app::eth::theHandler_EOMtheEMSerror_Config);
+ 
+        #warning marco.accame: removed on 5 august 2022        
+//////        // some services in here such as
+//////        #warning TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO: remove from here put just after protocol initialization
+//////        {    
+//////        eo_entities_Initialise();
+//////        eo_canmap_Initialise(NULL);
+//////        eo_canprot_Initialise(NULL);
+//////        }
         
-        // some services in here such as
-        
-        {    
-        eo_entities_Initialise();
-        eo_canmap_Initialise(NULL);
-        eo_canprot_Initialise(NULL);
-        }
-        
-        {   // C.  can services and discovery.
-        // so far i do in here what i need without any container
-             
-        // can-services
-        eOcanserv_cfg_t config;   
-        
-        config.mode                 = eocanserv_mode_straight;
-        config.canstabilizationtime = 7*eok_reltime1sec;
-        config.rxqueuesize[0]       = 64;
-        config.rxqueuesize[1]       = 64;
-        config.txqueuesize[0]       = 64;
-        config.txqueuesize[1]       = 64;  
-        config.onrxcallback[0]      = s_can_cbkonrx; 
-        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
-        config.onrxcallback[1]      = s_can_cbkonrx; 
-        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+//////        {   // C.  can services and discovery.
+//////        // so far i do in here what i need without any container
+//////             
+//////        // can-services
+//////        eOcanserv_cfg_t config;   
+//////        
+//////        config.mode                 = eocanserv_mode_straight;
+//////        config.canstabilizationtime = 7*eok_reltime1sec;
+//////        config.rxqueuesize[0]       = 64;
+//////        config.rxqueuesize[1]       = 64;
+//////        config.txqueuesize[0]       = 64;
+//////        config.txqueuesize[1]       = 64;  
+//////        config.onrxcallback[0]      = s_can_cbkonrx; 
+//////        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+//////        config.onrxcallback[1]      = s_can_cbkonrx; 
+//////        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
 
+//////            
+//////        // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
+//////        eo_canserv_Initialise(&config);   
+//////        
+//////        // can-discovery
+//////        eo_candiscovery2_Initialise(NULL);  
+//////        EOaction_strg astrg = {0};
+//////        EOaction *act = (EOaction*)&astrg;
+//////        eo_action_SetEvent(act, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+//////        eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), act);
+//////      
+//////        } 
             
-        // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
-        eo_canserv_Initialise(&config);   
-        
-        // can-discovery
-        eo_candiscovery2_Initialise(NULL);  
-        EOaction_strg astrg = {0};
-        EOaction *act = (EOaction*)&astrg;
-        eo_action_SetEvent(act, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-        eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), act);
-      
-        } 
-        
+        return true;
+    }
+    
+    static bool start(EOsm *sm)
+    {
+        if(nullptr == sm)
+        {
+            return false;
+        }
+
         // create and start the state machine
         eo_sm_Start(sm);
         
         // led manager is already initialised. i pulse LED::four at 20 hz
         embot::app::theLEDmanager::getInstance().get(statusLED).pulse(embot::core::time1second/20, 0);
+                
         
-        return true;
+        return true;        
     }
     
     static void set(eOmn_appl_state_t s)
@@ -551,6 +636,10 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
         
     embot::app::eth::theServiceFT::getInstance().initialise({});          
     embot::app::eth::theServices::getInstance().load(embot::app::eth::theServiceFT::getInstance().service());
+#if defined(USE_EMBOT_theServicesMC)
+    embot::app::eth::theServiceMC::getInstance().initialise({});          
+    embot::app::eth::theServices::getInstance().load(embot::app::eth::theServiceMC::getInstance().service());  
+#endif
         
 //    // create the state machine and start it
 //    // its configuration comes from eo_cfg_sm_EMSappl_Get()
@@ -559,6 +648,8 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
 //    thesm = eo_sm_New(eo_cfg_sm_EMSappl_Get());
 //    eo_sm_Start(thesm);
         
+        
+    theSM::start(_sm);
         
     // tell the world that we have started
     embot::app::eth::emit(sevTRACE, {"testThread", nullptr}, {}, "embot::app::eth::theHandler::initialise() has started its state machine w/ CFG, RUN, ERR");   
@@ -723,7 +814,7 @@ static void s_manage_fatal(const char *info, const eOerrmanCaller_t *caller, con
 
 extern void xxx_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *errdes)
 {
-    //s_manage_haltrace(errtype, info, caller, errdes);
+    s_manage_haltrace(errtype, info, caller, errdes);
     if(eo_errortype_trace == errtype)
     {   // we dont transmit the trace
         return;
@@ -1171,6 +1262,80 @@ extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSco
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p) {}
 extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p) {}
 extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p) {}
+
+#if 0
+extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
+{
+
+#warning I HAVE REDEFINED THE eom_emsconfigurator_hid_userdef_ProcessTimeout()
+    
+    static volatile uint32_t ccc {0};
+    constexpr size_t burstlength {4}; // must be >= 4
+    static eObrd_canlocation_t loc {.port = eOcanport1, .addr = 1, .insideindex = eobrd_caninsideindex_first};
+    static eOcanprot_command_t commands[burstlength] = {};        
+    static uint8_t data[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+        
+    if(0 == ccc)
+    {
+        // init only once
+        loc.port = eOcanport1;
+        loc.addr = 1;
+        loc.insideindex = eobrd_caninsideindex_first;
+        
+        // i set a default command which is 8-bytes long
+        for(uint8_t i=0; i<burstlength; i++)
+        {
+            commands[1].clas = eocanprot_msgclass_pollingAnalogSensor;
+            commands[1].type = ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET;
+            commands[1].value = data;            
+        }
+        
+        // but ... i specialise only 4 commands
+        commands[0].clas = eocanprot_msgclass_pollingMotorControl;
+        commands[0].type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+        commands[0].value = data;
+        
+        commands[1].clas = eocanprot_msgclass_pollingMotorControl;
+        commands[1].type = ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID;
+        commands[1].value = data;   
+
+        commands[2].clas = eocanprot_msgclass_pollingMotorControl;
+        commands[2].type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+        commands[2].value = data;  
+
+        commands[3].clas = eocanprot_msgclass_pollingMotorControl;
+        commands[3].type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
+        commands[3].value = data;          
+    }
+    
+    ccc++;
+    
+    if(0 != (ccc%100))
+    {
+        return;
+    }
+    
+    constexpr embot::core::relTime maxdly {1000};
+    constexpr uint32_t step {10};
+    volatile eOresult_t r {eores_NOK_generic};
+
+    static int32_t dly {maxdly};
+    for(int i =0; i<4; i++)
+    {        
+        r = eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &commands[i], loc);
+        if((eores_OK == r) && (dly > 0))
+        {
+            embot::core::wait(dly);    
+        }
+        
+    }
+    
+    if((eores_OK == r) && (dly > 0))
+    {
+        dly -= step;        
+    }
+}
+#endif
 
 
 // - EOMtheEMSrunner: redefinition of userdef functions

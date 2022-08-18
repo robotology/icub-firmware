@@ -1739,7 +1739,7 @@ void MController_update_motor_state_fbk(uint8_t m, void* state)
     Motor_update_state_fbk(smc->motor+m, state);
 }
 
-void MController_invalid_absEncoder_fbk(uint8_t e, eOencoderreader_errortype_t error_type) //
+void MController_invalid_absEncoder_fbk(uint8_t e, ae_errortype_t error_type) //
 {
     //AbsEncoder_invalid(smc->absEncoder+e, error_type);
     

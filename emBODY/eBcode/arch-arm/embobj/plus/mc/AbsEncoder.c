@@ -29,7 +29,11 @@
 
 #include "AbsEncoder.h"
 
+#if defined(USE_EMBOT_theServices) 
+#warning removed some code
+#else
 #include "EOtheMAIS.h"
+#endif
 
 /////////////////////////////////////////////////////////
 // AbsEncoder
@@ -402,7 +406,7 @@ void AbsEncoder_timeout(AbsEncoder* o)
     o->valid_first_data_cnt = 0;
 }
 
-void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type)
+void AbsEncoder_invalid(AbsEncoder* o, ae_errortype_t error_type)
 {
     if (!o) return;
     
@@ -423,18 +427,18 @@ void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type)
     
     switch (error_type)
     {
-        case encreader_err_NOTCONNECTED:
-        case encreader_err_NONE:
+        case ae_err_NOTCONNECTED:
+        case ae_err_NONE:
             break;
         
         // all other cases are errors: AEA_PARITY, AEA_CHIP, AEA_READING have their tx_error, chip_error, data_error. all others: are data_error. 
-        case encreader_err_AEA_PARITY:
+        case ae_err_AEA_PARITY:
             o->fault_state.bits.tx_error = TRUE;
             break;
-        case encreader_err_AEA_CHIP:
+        case ae_err_AEA_CHIP:
             o->fault_state.bits.chip_error = TRUE;
             break;        
-        case encreader_err_AEA_READING:
+        case ae_err_AEA_READING:
             o->fault_state.bits.data_error = TRUE;
             break;
         
@@ -700,7 +704,9 @@ static void AbsEncoder_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_
 
 BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
 {
-    
+#if defined(USE_EMBOT_theServices) 
+#warning removed some code
+#else    
     if(eomc_enc_mais == o->type)
     {
         if(!eo_mais_isAlive(eo_mais_GetHandle()))
@@ -708,7 +714,7 @@ BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
             o->hardware_fault = TRUE;
         }
     }
-    
+#endif    
     if (!o->hardware_fault) return FALSE;
     
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)

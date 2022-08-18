@@ -80,13 +80,15 @@ bool embot::app::eth::theServices::Impl::initialise(const Config &cfg)
 {
     _config = cfg;    
     _nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
-    _mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
     
     for(auto &s : _mapfofservices) { s = nullptr; }
     for(auto &r : _running) { r = false; }
     
     
     init_step2();
+    
+    _mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
+
     
     return true;
 } 
@@ -122,6 +124,50 @@ static void s_can_cbkonrx(void *arg)
 
 #include "EOtheCANdiscovery2.h"
 
+#if 0
+// to be used only if we have icub-firmware-shared w/ extra callbacks
+#include "EoProtocolMC.h"
+
+void OnAsk(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOprotEndpoint_t endpoint = eoprot_ID2endpoint(rd->id32);
+    eOprotEntity_t entity = eoprot_ID2entity(rd->id32);
+    eOprotIndex_t index = eoprot_ID2index(rd->id32);
+    eOprotTag_t tag = eoprot_ID2tag(rd->id32);
+    
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+    const char * tagstr = eoprot_TAG2string(endpoint, entity, tag);
+    
+    embot::app::eth::theErrorManager::getInstance().trace(
+        std::string("ask<") + tagstr + ", " + std::to_string(index) + ">", {"the", thr}); 
+     
+    uint32_t idtarget = eoprot_ID_get(1, 0, 0, eoprot_tag_mc_joint_config);
+     
+    static volatile int ciao = 0;        
+    if(idtarget == rd->id32)
+    {
+        ciao ++;
+    }
+        
+}
+
+
+void OnSet(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOprotEndpoint_t endpoint = eoprot_ID2endpoint(rd->id32);
+    eOprotEntity_t entity = eoprot_ID2entity(rd->id32);
+    eOprotIndex_t index = eoprot_ID2index(rd->id32);
+    eOprotTag_t tag = eoprot_ID2tag(rd->id32);
+    
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+    const char * tagstr = eoprot_TAG2string(endpoint, entity, tag);
+    
+    embot::app::eth::theErrorManager::getInstance().trace(
+        std::string("set<") + tagstr + ", " + std::to_string(index) + ">", {"the", thr}); 
+        
+}
+#endif
+
 void embot::app::eth::theServices::Impl::init_step2()
 {
 
@@ -129,7 +175,7 @@ void embot::app::eth::theServices::Impl::init_step2()
         
         // 1. set the board number. the value of the generic board is 99. 
         //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
-        //eo_nvset_BRDlocalsetnumber(_nvset, brd);
+        //eo_nvset_BRDlocalsetnumber(_nvset, 0);
         
         // 2. i initialise the nvset at max capabilities
         uint16_t numofepcfgs = eo_constvector_Size(s_eo_theservices_the_vectorof_EPcfgs);
@@ -143,6 +189,10 @@ void embot::app::eth::theServices::Impl::init_step2()
             }                        
         }
         
+//        eo_entities_Initialise();
+        
+        
+        
         // 3. the callbacks
         // marco.accame on 30 sept 2015: so far i define all the callbacks. however:
         // a. we may decide to define EOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME and thus we must later on to load a proper callback. 
@@ -151,39 +201,54 @@ void embot::app::eth::theServices::Impl::init_step2()
         //    a. we can understand if a service is configured (use proper object) and we something only if it configured.
         //    b. make sure that when we use a get entity, we use EOtheEntities which does not address joints beyond those configured
         
-    }   // A.    {   // B. the entities: only initted but not started or activated yets
+    }   // A.    
      
-//    {    
-//        eo_entities_Initialise();
-//        eo_canmap_Initialise(NULL);
-//        eo_canprot_Initialise(NULL);
-//    }
-
-//    {   // C.  can services and discovery.
-//        // so far i do in here what i need without any container
-//             
-//        // can-services
-//        eOcanserv_cfg_t config;   
-//        
-//        config.mode                 = eocanserv_mode_straight;
-//        config.canstabilizationtime = 7*eok_reltime1sec;
-//        config.rxqueuesize[0]       = 64;
-//        config.rxqueuesize[1]       = 64;
-//        config.txqueuesize[0]       = 64;
-//        config.txqueuesize[1]       = 64;  
-//        config.onrxcallback[0]      = s_can_cbkonrx; 
-//        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
-//        config.onrxcallback[1]      = s_can_cbkonrx; 
-//        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
-
-//            
-//        // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
-//        eo_canserv_Initialise(&config);   
-//        
-//        // can-discovery
-//        eo_candiscovery2_Initialise(NULL);        
-//    } 
+    {  // B. the entities: only initted but not started or activated yets  
+        eo_entities_Initialise();
+        eo_canmap_Initialise(NULL);
+        eo_canprot_Initialise(NULL);
+    }
     
+    
+    {   // C.  can services and discovery.
+    // so far i do in here what i need without any container
+         
+    // can-services
+    eOcanserv_cfg_t config;   
+    
+    config.mode                 = eocanserv_mode_straight;
+    config.canstabilizationtime = 7*eok_reltime1sec;
+    config.rxqueuesize[0]       = 64;
+    config.rxqueuesize[1]       = 64;
+    config.txqueuesize[0]       = 64;
+    config.txqueuesize[1]       = 64;  
+    config.onrxcallback[0]      = s_can_cbkonrx; 
+    config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+    config.onrxcallback[1]      = s_can_cbkonrx; 
+    config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+
+        
+    // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
+    eo_canserv_Initialise(&config);   
+    
+    // can-discovery
+    eo_candiscovery2_Initialise(NULL);  
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    eo_action_SetEvent(act, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
+    eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), act);
+  
+    }     
+
+
+//    eoprot_config_onask_endpoint_set(eoprot_endpoint_management, OnAsk);  
+//    eoprot_config_onask_endpoint_set(eoprot_endpoint_motioncontrol, OnAsk);  
+//    eoprot_config_onask_endpoint_set(eoprot_endpoint_analogsensors, OnAsk);  
+
+//    eoprot_config_onset_endpoint_set(eoprot_endpoint_management, OnSet);  
+//    eoprot_config_onset_endpoint_set(eoprot_endpoint_motioncontrol, OnSet);  
+//    eoprot_config_onset_endpoint_set(eoprot_endpoint_analogsensors, OnSet); 
+
 }
 
 bool embot::app::eth::theServices::Impl::load(Service *s)
@@ -480,6 +545,104 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
     
     return true;   
 }
+
+#warning SEE this new implem
+#if 0
+bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, bool clearfirst, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
+{
+    if(nullptr == id32ofregulars)
+    {
+        return false;
+    }
+             
+    uint8_t size = 0;
+    uint8_t i = 0;
+    
+    EOtransceiver* boardtransceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+
+    if(true == clearfirst)
+    {    
+        eOropdescriptor_t ropdesc;
+        memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+        ropdesc.control.plustime        = eobool_false;
+        ropdesc.control.plussign        = eobool_false;
+        ropdesc.ropcode                 = eo_ropcode_sig;
+        ropdesc.id32                    = eo_prot_ID32dummy;    
+        ropdesc.signature               = eo_rop_SIGNATUREdummy;  
+        uint32_t* id32 = NULL;
+        
+        // at first we remove all regulars inside id32ofregulars and we reset it
+        size = eo_array_Size(id32ofregulars);
+        for(i=0; i<size; i++)
+        {
+            id32 = (uint32_t*)eo_array_At(id32ofregulars, i);
+            if(NULL != id32)
+            {
+                ropdesc.id32 = *id32;
+                eo_transceiver_RegularROP_Unload(boardtransceiver, &ropdesc);
+            }       
+        }    
+        eo_array_Reset(id32ofregulars);
+    }    
+    
+    EOarray* id32array = (EOarray*)arrayofid32;   
+        
+    // then i load the new id32s ... if there are any
+    if((NULL != id32array) && (0 != eo_array_Size(id32array)))
+    {
+        // get all the id32 from id32array (but not more than ...) and: 1. push back into id32ofregulars, 2. load the regular
+        size = eo_array_Size(id32array);
+        
+        eOropdescriptor_t ropdesc;
+        memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+        ropdesc.control.plustime    = 0;
+        ropdesc.control.plussign    = 0;
+        ropdesc.ropcode             = eo_ropcode_sig;
+        ropdesc.signature           = eo_rop_SIGNATUREdummy;  
+        uint32_t* id32 = NULL;        
+        
+        for(i=0; i<size; i++)
+        {
+            id32 = (uint32_t*)eo_array_At(id32array, i);
+            if(NULL != id32)
+            { 
+                // filter them 
+                bool itisrelevant = true;
+                if(nullptr != fpISOK)
+                {
+                    itisrelevant = fpISOK(*id32);                   
+                }
+                
+                if(true == itisrelevant)
+                {
+                    ropdesc.id32 = *id32;     
+                    if(eores_OK == eo_transceiver_RegularROP_Load(boardtransceiver, &ropdesc))
+                    {
+                        eo_array_PushBack(id32ofregulars, id32);
+                        if(eobool_true == eo_array_Full(id32ofregulars))
+                        {   // cannot add any more regulars
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        
+                    }
+                   
+                }                
+            }           
+        }
+    }
+    
+    if(nullptr != numberofthem)
+    {
+        *numberofthem = eo_array_Size(id32ofregulars);
+    }
+    
+    return true;   
+}
+
+#endif
 
 bool embot::app::eth::theServices::Impl::synch(Service::Category category, Service::State state)
 {

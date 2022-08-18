@@ -43,11 +43,15 @@ extern "C" {
 #include "EoCommon.h"
 #include "EoProtocol.h"
 #include "EoMotionControl.h"
-#include "hal_spiencoder.h"
+#include "EOconstarray.h"    
 
+#if defined(USE_EMBOT_theServices)  
+//#include "embot_app_eth_Service.h"
+#error dont use me
+#else
 #include "EOtheServices.h"
+#endif
 
-#include "EOconstarray.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------

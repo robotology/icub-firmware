@@ -15,9 +15,15 @@
 #include "embot_core.h"
 #include "embot_core_binary.h"
 
-#include "EOtheServices.h"
 #include "EoCommon.h"
 #include "EoProtocol.h"
+
+#if defined(USE_EMBOT_theServices)  
+#include "embot_app_eth_Service.h"
+#else
+#include "EOtheServices.h"
+#endif
+
 #include "embot_app_eth_theServiceTester.h"
 
 #include <memory>
