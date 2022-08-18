@@ -286,7 +286,7 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::deactivate()
 
 eOresult_t embot::app::eth::theEncoderReader::Impl::startReading()
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "::Start()", s_eobj_ownname);
+    //eo_errman_Trace(eo_errman_GetHandle(), "::Start()", s_eobj_ownname);
     
     // start the encoder reading
     embot::hw::encoder::startRead(embot::hw::ENCODER::one);
@@ -314,11 +314,6 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoder
         return eores_NOK_generic;
     }
     
-//    if(jomo >= max_number_of_jomos)
-//    {
-//        return eores_NOK_generic;
-//    }
-    
     eOencoderProperties_t encProp[2] = {NULL};
     
     encProp[0].descriptor = &_config.jomo_cfg[jomo].encoder1des;
@@ -333,7 +328,7 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoder
         uint16_t errorparam = 0;
         
         // assign composedof and position
-        prop.valueinfo->composedof = 1; // TODO: Fix eomc_encoder_get_numberofcomponents((eOmc_encoder_t)prop.descriptor->type); 
+        prop.valueinfo->composedof = eomc_encoder_get_numberofcomponents((eOmc_encoder_t)prop.descriptor->type); 
         prop.valueinfo->position = (eOmc_position_t)prop.descriptor->pos;
         
         // so far we assume no errors and we assign 0 to all values
@@ -376,13 +371,13 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoder
                         // the resolution is now 4096 ticks per revolution.
                         
                         // GOOD VALUE:
-                        uint32_t ticks = (spiRawValue >> 6) & 0x0FFF;
+                        uint32_t ticks = spiRawValue; //(spiRawValue >> 6) & 0x0FFF;
                         prop.valueinfo->value[0] = rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos);                           
                     }
                     else
                     {   // we have a valid raw value from hal but ... it is not valid after a check                        
                         prop.valueinfo->errortype = prop.valueinfo->errortype;
-                        errorparam = (spiRawValue >> 6) & 0x0FFF;                                           
+                        errorparam = spiRawValue; //(spiRawValue >> 6) & 0x0FFF;                                           
                     }                    
                 }
                 else
@@ -445,7 +440,7 @@ uint32_t embot::app::eth::theEncoderReader::Impl::rescale2icubdegrees(uint32_t v
     
     if(eomc_pos_atjoint == pos)
     {
-        eOmc_joint_t *joint = nullptr; //(eOmc_joint_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jomo);
+        eOmc_joint_t *joint = (eOmc_joint_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jomo);
                 
         if(nullptr == joint)
         {
@@ -456,7 +451,7 @@ uint32_t embot::app::eth::theEncoderReader::Impl::rescale2icubdegrees(uint32_t v
     }
     else if(eomc_pos_atmotor == pos)
     {
-        eOmc_motor_t *motor = nullptr; //(eOmc_motor_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, jomo);
+        eOmc_motor_t *motor = (eOmc_motor_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, jomo);
                 
         if(nullptr == motor)
         {
@@ -490,28 +485,29 @@ uint32_t embot::app::eth::theEncoderReader::Impl::rescale2icubdegrees(uint32_t v
 
 eObool_t embot::app::eth::theEncoderReader::Impl::isValidValue_AEA(const uint32_t &valueraw, eOencoderreader_errortype_t *error)
 {
-    uint8_t parity_error = 0;
-    uint8_t b = 0;
-    
-    *error = encreader_err_NONE;
-    
-    for (b=0; b<18; ++b)
-    {
-        parity_error ^= (valueraw)>>b;
-    }
-    
-    if (parity_error & 1) 
-    { 
-        *error = encreader_err_AEA_PARITY;
-        return(eobool_false);
-    }
-    
-    if ((0x38 & valueraw) != 0x20)
-    {
-        *error = encreader_err_AEA_CHIP;
-        return(eobool_false);
+// TODO: probably redundant function
+//    uint8_t parity_error = 0;
+//    uint8_t b = 0;
+//    
+//    *error = encreader_err_NONE;
+//    
+//    for (b=0; b<18; ++b)
+//    {
+//        parity_error ^= (valueraw)>>b;
+//    }
+//    
+//    if (parity_error & 1) 
+//    { 
+//        *error = encreader_err_AEA_PARITY;
+//        return(eobool_false);
+//    }
+//    
+//    if ((0x38 & valueraw) != 0x20)
+//    {
+//        *error = encreader_err_AEA_CHIP;
+//        return(eobool_false);
 
-    }
+//    }
     
     return(eobool_true);
 }

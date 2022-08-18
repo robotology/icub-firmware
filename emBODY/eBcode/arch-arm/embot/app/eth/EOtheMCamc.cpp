@@ -1022,9 +1022,9 @@ extern eOresult_t eo_motioncontrol_AcceptCANframe(EOtheMotionController *p, eOca
     
 extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t num, eOmc_motor_config_t *mc)
 {
-    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
-    embot::app::eth::theErrorManager::getInstance().trace(
-    std::string("motconfig-eth"), {s_eobj_ownname, thr}); 
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("motconfig-eth"), {s_eobj_ownname, thr}); 
 
     eOmotioncontroller_mode_t mcmode = eo_motioncontrol_GetMode(p);
     if(eo_motcon_mode_foc == mcmode)
