@@ -747,13 +747,15 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
         (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),         // motor
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // strain
         (1 << eobrd_cantype_mais),                                                              // mais
-        (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2),                               // temperature
+        (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_mtb4c),  // temperature
         (1 << eobrd_cantype_mtb),                                                               // inertial
-        (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_rfe),    // inertial3
+        (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_rfe) |   // inertial3
+			  (1 << eobrd_cantype_mtb4c),                                                             // inertial3
         (1 << eobrd_cantype_psc),                                                               // psc
         (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_psc),                                    // pos
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // ft
-        (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc)         // skin
+        (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc) |       // skin
+			  (1 << eobrd_cantype_mtb4c)  																														// skin
     }; EO_VERIFYsizeof(tableB, sizeof(const uint32_t)*(eocanmap_entities_maxnumberof))
     
     // it is safe to use brd because it is can hence it is < 32
