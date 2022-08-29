@@ -164,7 +164,7 @@ void encoderReset()
  */
 uint16_t encoderGetElectricalAngle(void)
 {
-#ifdef USE_LEGO_SETUP
+#ifdef USE_KOLLMORGEN_SETUP
     if (encoderCalibrated) return electricalOffset + (__HAL_TIM_GET_COUNTER(&htim2) * encoderConvFactor) & 0xFFFF;
     return encoderForcedValue;
 #else

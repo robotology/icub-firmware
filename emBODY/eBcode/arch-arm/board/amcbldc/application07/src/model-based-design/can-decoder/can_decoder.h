@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.49
+// Model version                  : 3.51
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Aug 11 17:11:19 2022
+// C/C++ source code generated on : Mon Aug 29 10:58:43 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -139,6 +139,10 @@ struct MdlrefDW_can_decoder_T {
 //  global storage class designation.  Code generation will declare the memory for
 //  these parameters and exports their symbols.
 //
+
+extern real32_T CAN_ANGLE_ICUB2DEG;    // Variable: CAN_ANGLE_ICUB2DEG
+                                          //  Referenced by: '<S2>/Decoding Logic'
+                                          //  360/2^16
 
 extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  Referenced by: '<S2>/Constant'

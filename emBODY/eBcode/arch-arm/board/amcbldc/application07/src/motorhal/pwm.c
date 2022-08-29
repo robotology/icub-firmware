@@ -119,7 +119,7 @@ extern void set_ADC_callback(pwm_ADC_callback_t *cbk)
 
 #if defined(USE_STM32HAL) && defined(__cplusplus)
 
-#ifdef USE_LEGO_SETUP
+#ifdef USE_KOLLMORGEN_SETUP
 constexpr uint16_t hallAngleTable[] =
 {
     /* ABC  (°)  */
@@ -145,7 +145,7 @@ constexpr uint16_t hallAngleTable[] =
     /* HHL  120  */ static_cast<uint16_t>(180.0 * 65536.0 / 360.0 + 0.5), /* 21845 */
     /* HHH ERROR */ static_cast<uint16_t>(0)
 };
-#endif // USE_LEGO_SETUP
+#endif // USE_KOLLMORGEN_SETUP
 
 //constexpr int16_t hallSectorTable[] =
 //{
@@ -219,7 +219,7 @@ static const uint16_t hallAngleTable[] =
  *      PWM means that PHASEx is modulated with the pwm value (ENx = 1, PWMx = pwm)
  */
  
-#ifdef USE_LEGO_SETUP
+#ifdef USE_KOLLMORGEN_SETUP
 #define DECODE_HALLSTATUS (((HALL1_GPIO_Port->IDR & HALL1_Pin) >> MSB(HALL1_Pin)) << 1)  \
                         | (((HALL2_GPIO_Port->IDR & HALL2_Pin) >> MSB(HALL2_Pin)) << 0)  \
                         | (((HALL3_GPIO_Port->IDR & HALL3_Pin) >> MSB(HALL3_Pin)) << 2)
@@ -257,7 +257,7 @@ static uint8_t updateHallStatus(void)
     
     hallAngle = angle;
 
-#ifdef USE_LEGO_SETUP
+#ifdef USE_KOLLMORGEN_SETUP
     // To disable the encoder reading, comment the following if then else
     if (!hallStatus_old)
     {            
@@ -459,7 +459,7 @@ HAL_StatusTypeDef pwmInit(void)
     if (0 == (MainConf.pwm.mode & PWM_CONF_MODE_MASK))
     {
         MainConf.pwm.mode = PWM_CONF_MODE_HALL;
-#ifdef USE_LEGO_SETUP
+#ifdef USE_KOLLMORGEN_SETUP
         MainConf.pwm.poles = 4;//7; // // //
 #else
         MainConf.pwm.poles = 7; // // //

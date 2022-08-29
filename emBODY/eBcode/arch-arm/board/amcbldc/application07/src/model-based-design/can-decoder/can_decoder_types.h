@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.49
+// Model version                  : 3.51
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Aug 11 17:11:19 2022
+// C/C++ source code generated on : Mon Aug 29 10:58:43 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -74,7 +74,6 @@ struct MotorConfig
   int16_T rotor_index_offset;
   uint8_T encoder_tolerance;
   uint8_T pole_pairs;
-  real32_T reduction;
   real32_T Kbemf;
   real32_T Rphase;
   real32_T Imin;
