@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 4.103
+// Model version                  : 4.105
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Aug 11 17:12:32 2022
+// C/C++ source code generated on : Mon Aug 29 10:59:45 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -172,6 +172,10 @@ extern ConfigurationParameters InitConfParams;// Variable: InitConfParams
 extern real32_T CAN_ANGLE_DEG2ICUB;    // Variable: CAN_ANGLE_DEG2ICUB
                                           //  Referenced by: '<S6>/CAN_Encoder'
                                           //  2^16/360
+
+extern real32_T CAN_ANGLE_ICUB2DEG;    // Variable: CAN_ANGLE_ICUB2DEG
+                                          //  Referenced by: '<S6>/CAN_Decoder'
+                                          //  360/2^16
 
 extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  Referenced by:

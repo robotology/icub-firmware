@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.49
+// Model version                  : 3.51
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Aug 11 17:11:19 2022
+// C/C++ source code generated on : Mon Aug 29 10:58:43 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -288,7 +288,8 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
           int16_T>(tmp_merged >> (rtu_CAN_VOLT_REF_SHIFT -
           rtu_ConfigurationParameters->CurLoopPID.shift_factor))) /
           rtu_CAN_VOLT_REF_GAIN;
-        localB->msg_desired_targets.velocity = tmp_merged;
+        localB->msg_desired_targets.velocity = 1000.0F * static_cast<real32_T>
+          (tmp_merged) * CAN_ANGLE_ICUB2DEG;
         localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed +
           1);
         localDW->ev_desired_targetsEventCounter++;

@@ -9,7 +9,7 @@
 //
 // Model version                  : 4.67
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Aug 11 17:11:00 2022
+// C/C++ source code generated on : Mon Aug 29 10:58:21 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -1066,7 +1066,6 @@ void Supervis_CANMessageHandler_Init(void)
   SupervisorFSM_RX_B.motorConfig.rotor_index_offset = 0;
   SupervisorFSM_RX_B.motorConfig.encoder_tolerance = 0U;
   SupervisorFSM_RX_B.motorConfig.pole_pairs = 0U;
-  SupervisorFSM_RX_B.motorConfig.reduction = 0.0F;
   SupervisorFSM_RX_B.motorConfig.Kbemf = 0.0F;
   SupervisorFSM_RX_B.motorConfig.Rphase = 0.0F;
   SupervisorFSM_RX_B.motorConfig.Imin = 0.0F;
