@@ -41,15 +41,9 @@
 // If the target setup is the KOLLMORGEN motor on RED LEGO platform,
 // you need to enable the macro USE_KOLLMORGEN_SETUP, otherwise
 // it is implied that motor on wrist mk2 is in use
-// 
-// If the target setup is the motor on the WRIST MK2 (Faulhaber),
-// you need to enable the macro EXTFAULT_IS_CONNECTED,
-// AND make sure to disable USE_KOLLMORGEN_SETUP
 
-#ifdef EXTFAULT_IS_CONNECTED
 #define EXTFAULT_enabled
 #define EXTFAULT_handler_will_disable_motor
-#endif // EXTFAULT_IS_CONNECTED 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
