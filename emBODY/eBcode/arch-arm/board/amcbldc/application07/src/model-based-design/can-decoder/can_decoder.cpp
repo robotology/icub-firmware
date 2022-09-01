@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.51
+// Model version                  : 3.52
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Mon Aug 29 10:58:43 2022
+// C/C++ source code generated on : Thu Sep  1 10:27:54 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -361,6 +361,9 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
                   (MCOPC_Set_Current_PID)) {
                 localDW->ev_set_current_pidEventCounter++;
               } else {
+                localB->msg_set_pid.Kp *= 0.001F;
+                localB->msg_set_pid.Ki *= 0.001F;
+                localB->msg_set_pid.Kd *= 0.001F;
                 localDW->ev_set_velocity_pidEventCounter++;
               }
             } else {

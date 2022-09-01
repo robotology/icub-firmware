@@ -9,7 +9,7 @@
 //
 // Model version                  : 4.105
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Mon Aug 29 10:59:45 2022
+// C/C++ source code generated on : Thu Sep  1 10:29:08 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -89,8 +89,8 @@ ConfigurationParameters InitConfParams = {
   {
     0.0F,
     0.0F,
-    1.0F,
-    1.0F,
+    -3.0e-5F,
+    -3.0e-5F,
     0.0F,
     10.0F,
     0.0F,
@@ -117,7 +117,7 @@ ConfigurationParameters InitConfParams = {
     360.0F,
     0.0F,
     0.0F,
-    10000.0F,
+    40000.0F,
     10U,
     2.0F,
     5.0F,
