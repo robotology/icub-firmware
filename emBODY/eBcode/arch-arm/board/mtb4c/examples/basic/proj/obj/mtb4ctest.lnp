@@ -1,8 +1,0 @@
---cpu=Cortex-M4.fp.sp --branchpatch=sdcomp-29491-629360
-".\obj\main-basic.o"
-"..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.mtb4c.v190.lib"
-".\obj\stm32hal.l4.startup.mtb4c.v190.o"
---strict --scatter ".\obj\mtb4ctest.sct"
---diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
---info sizes --info totals --info unused --info veneers
---list ".\lst\mtb4ctest.map" -o .\obj\mtb4ctest.axf
