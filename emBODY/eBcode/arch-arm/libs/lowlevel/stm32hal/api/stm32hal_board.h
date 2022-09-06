@@ -450,6 +450,50 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for amc
     #endif
+
+#elif   defined(STM32HAL_BOARD_MTB4C)
+
+    
+    #if (STM32HAL_DRIVER_VERSION == 0x172)
+        
+        #error not supported
+
+        #include "../src/config/stm32hal_driver_cfg_of_mtb4c.h"
+
+        #include "../src/board/mtb4c/v172/inc/adc.h"
+        #include "../src/board/mtb4c/v172/inc/can.h"
+        #include "../src/board/mtb4c/v172/inc/dma.h"
+        #include "../src/board/mtb4c/v172/inc/gpio.h"
+        #include "../src/board/mtb4c/v172/inc/i2c.h"
+        #include "../src/board/mtb4c/v172/inc/rng.h"
+        #include "../src/board/mtb4c/v172/inc/main.h"
+        #include "../src/board/mtb4c/v172/inc/tim.h"
+        #include "../src/board/mtb4c/v172/inc/usart.h"
+
+
+        #include "../src/board/mtb4c/v172/inc/stm32l4xx_it.h"
+        
+    #elif(STM32HAL_DRIVER_VERSION == 0x190)
+
+        #include "../src/config/stm32hal_driver_cfg_of_mtb4c_v190.h"
+
+        //#include "../src/board/mtb4c/v190/inc/adc.h"
+        #include "../src/board/mtb4c/v190/inc/can.h"
+        #include "../src/board/mtb4c/v190/inc/dma.h"
+        #include "../src/board/mtb4c/v190/inc/gpio.h"
+        #include "../src/board/mtb4c/v190/inc/i2c.h"
+        //#warning add rng.h in cubmx project
+        //#include "../src/board/mtb4c/v190/inc/rng.h"
+        #include "../src/board/mtb4c/v190/inc/main.h"
+        #include "../src/board/mtb4c/v190/inc/tim.h"
+        #include "../src/board/mtb4c/v190/inc/usart.h"
+
+        #include "../src/board/mtb4c/v190/inc/stm32l4xx_it.h"
+
+
+    #else
+        #error unsupported driver version for mtb4c
+    #endif
     
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${B}
