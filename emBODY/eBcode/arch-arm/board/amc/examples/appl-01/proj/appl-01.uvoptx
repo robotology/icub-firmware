@@ -554,7 +554,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP0948199 -O206 -S12 -C0 -P00000000 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO65555 -TC400000000 -TT10000000 -TP18 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-UP0948193 -O206 -S12 -C0 -P00000000 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO65555 -TC400000000 -TT10000000 -TP18 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -569,7 +569,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U002E00303137510A39383538 -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(6BA02477) -L00(0) -TO131091 -TC400000000 -TT10000000 -TP21 -TDS8021 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-U002E00303137510A39383538 -O206 -SF50000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(6BA02477) -L00(0) -TO131091 -TC400000000 -TT10000000 -TP21 -TDS8021 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -592,7 +592,72 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>996</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>82</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_dma.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\h7eth\../src/driver/stm32h7-v1A0/src/stm32h7xx_hal_dma.c\996</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>249</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134718788</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\h7eth\../../../../../embot/hw/embot_hw_gpio.cpp\249</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>1612</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>78</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_dma.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\h7eth\../src/driver/stm32h7-v1A0/src/stm32h7xx_hal_dma.c\1612</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>260</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134719278</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\h7eth\../../../../../embot/hw/embot_hw_gpio.cpp\260</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -619,6 +684,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>s_eo_theentities</ItemText>
         </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -641,7 +711,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -679,7 +749,7 @@
       <pMultCmdsp></pMultCmdsp>
       <DebugDescription>
         <Enable>1</Enable>
-        <EnableFlashSeq>1</EnableFlashSeq>
+        <EnableFlashSeq>0</EnableFlashSeq>
         <EnableLog>0</EnableLog>
         <Protocol>2</Protocol>
         <DbgClock>50000000</DbgClock>
@@ -1381,7 +1451,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1713,7 +1783,7 @@
 
   <Group>
     <GroupName>embot::hw</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1925,7 +1995,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3577,7 +3647,7 @@
 
   <Group>
     <GroupName>mc-controller</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
