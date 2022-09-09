@@ -52,7 +52,8 @@ namespace embot { namespace prot { namespace can {
     };
 
     
-    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, pmc = 17, amcbldc = 18, bms = 19, mtb4c = 20, none = 254, unknown = 0xff };
+    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, 
+                       pmc = 17, amcbldc = 18, bms = 19, mtb4c = 20, mtb4fap = 21, none = 254, unknown = 0xff };
     
     enum class Process { bootloader = 0, application = 1, unknown = 0xff };
            
@@ -95,7 +96,7 @@ namespace embot { namespace prot { namespace can {
     
     enum class Clas { none = 0xfe, 
                       pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, 
-                      periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, periodicForFutureUse = 6, bootloader = 7 };
+                      periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, periodicBattery = 6, bootloader = 7 };
         
     // the commands in each class and the messages which manage their forming / parsing are defined in namespaces ::bootloader, ::motor etc.
       
