@@ -81,7 +81,7 @@ namespace embot { namespace prot { namespace can {
             case Clas::periodicAnalogSensor:        ret = true;     break;
             case Clas::periodicInertialSensor:      ret = true;     break;
             case Clas::periodicSkin:                ret = true;     break;
-            case Clas::periodicForFutureUse:        ret = true;     break;
+            case Clas::periodicBattery:             ret = true;     break;
             default:                                ret = false;    break;            
         }
         return ret;
@@ -207,7 +207,7 @@ namespace embot { namespace prot { namespace can {
             case Clas::periodicAnalogSensor: 
             case Clas::periodicInertialSensor:    
             case Clas::periodicSkin:  
-            case Clas::periodicForFutureUse:
+            case Clas::periodicBattery:
             {
                 // destination is not present, cmd is in 0x0000000F
                 frame.id &= ~0x0000000F;
