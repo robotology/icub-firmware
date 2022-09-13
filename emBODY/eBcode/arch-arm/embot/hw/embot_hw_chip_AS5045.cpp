@@ -165,14 +165,14 @@ bool embot::hw::chip::AS5045::Impl::init(const Config &cfg)
     
     _config = cfg;
 
+     // init sslsel before init the spi
+    _sslsegopio = embot::hw::spi::bsp::getBSP().getPROP(_config.spi)->pinout[embot::core::tointegral(embot::hw::spi::Signal::SSEL)];
+    embot::hw::gpio::init(_sslsegopio, {embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::pullup, embot::hw::gpio::Speed::veryhigh});
+
     if(resOK == embot::hw::spi::init(_config.spi, _config.spicfg))
     {
         _initted =  true;
     }
-    
-    // init sslsel
-    _sslsegopio = embot::hw::spi::bsp::getBSP().getPROP(_config.spi)->pinout[embot::core::tointegral(embot::hw::spi::Signal::SSEL)];
-    embot::hw::gpio::init(_sslsegopio, {embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::pullup, embot::hw::gpio::Speed::veryhigh});
     
     return _initted;
 }
@@ -183,6 +183,9 @@ bool embot::hw::chip::AS5045::Impl::deinit()
     {
         embot::hw::spi::deinit(_config.spi);
         _initted = false;
+        
+        // deinit the sslsel as well
+        embot::hw::gpio::deinit(_sslsegopio);
     }
     
     return !_initted;
@@ -190,9 +193,12 @@ bool embot::hw::chip::AS5045::Impl::deinit()
 
 void embot::hw::chip::AS5045::Impl::parseDataBuffer(Data &data)
 {
-    data.position = (_databuffer[0] << 4) | ((_databuffer[1] & 0xf0) >> 4 );
-    data.status.bits = ((_databuffer[1] & 0x0f) >> 1);
-    
+    // We need to discard the first bit read because the reading is done on the falling edge of sclk
+    // Since the sclk signal starts high, the first time it goes low gives us a reading of 1 bit that
+    // is not part of the angular data value.
+    data.position = ((_databuffer[0] & 0x7F) << 5) | ((_databuffer[1] & 0xf8) >> 3 );
+    data.status.bits = (_databuffer[1] & 0x07);
+
     // Status Bit Outputs
     // Placing the magnet above the chip, angular values increase in clockwise direction by default. 
     // Data D11:D0 is valid, when the status bits have the following configurations:

@@ -84,11 +84,11 @@ namespace embot { namespace hw { namespace chip {
         
         static constexpr embot::hw::spi::Config standardspiconfig
         {
-            embot::hw::spi::Prescaler::sixtyfour,
+            embot::hw::spi::Prescaler::sixtyfour,    // onehundredtwentyeigth
             embot::hw::spi::DataSize::eight,
             embot::hw::spi::Mode::two,
-            { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::nopull,      // | miso | mosi |
-               embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::pullup} }  // | sclk | sel  |
+            { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::pullup,      // | miso | mosi |
+               embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::pullup} }  // | sclk | sel  |
         };
         
         //static constexpr embot::hw::spi::Config  & getSPIconfig() const;
