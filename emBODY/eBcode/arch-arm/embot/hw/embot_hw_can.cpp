@@ -318,12 +318,15 @@ result_t can::transmit(embot::hw::CAN p)
         return resNOK;
     } 
     
+    // TODO: Temporary workaround in order validate this feature without affecting the other CAN baords
+#ifdef STM32HAL_BOARD_AMC
     if(true == tx_IRQisEnabled(p))
     {
         // marco.accame on 17 aug 2022: if the TX is already ongoing, we dont want to start it again
         // by calling can::s_tx_start(p) which may find the TX FIFO full and fail by losing Qtx->front().
         return resOK;     
     }
+#endif
     
     can::s_tx_start(p);     
     return resOK;     
@@ -424,6 +427,8 @@ static void can::s_tx_start(embot::hw::CAN p)
     // protect Qtx: i disable tx interrupt but i keep info if it was enabled, so that at the end i re-enable it
     volatile bool isTXenabled = tx_IRQdisable(p);
            
+    // TODO: Temporary workaround in order validate this feature without affecting the other CAN baords
+#ifdef STM32HAL_BOARD_AMC
     if(true == isTXenabled)
     {
         //static volatile uint32_t inhere {0};
@@ -432,6 +437,7 @@ static void can::s_tx_start(embot::hw::CAN p)
         tx_IRQresume(p, isTXenabled);          
         return;  
     }
+#endif
 
     if(true == _candata_array[index].Qtx->empty())
     {
