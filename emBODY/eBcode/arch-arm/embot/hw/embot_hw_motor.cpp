@@ -138,6 +138,13 @@ namespace embot { namespace hw { namespace motor {
     static PrivateData s_privatedata;
     
     result_t s_hw_init(MOTOR h);
+    result_t s_hw_configure(
+        MOTOR h,
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset);
     Position s_hw_getencoder(MOTOR h);
     Position s_hw_gethallcounter(MOTOR h);    
     result_t s_hw_setpwm(MOTOR h, Pwm v);
@@ -177,6 +184,23 @@ namespace embot { namespace hw { namespace motor {
         return resNOK;
     }    
     
+    result_t config(
+        MOTOR h,         
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset)
+    {
+        return s_hw_configure(h,
+            enc_resolution, 
+            pwm_num_polar_couples, 
+            pwm_has_hall_sens,
+            pwm_swapBC,
+            pwm_hall_offset);
+        
+        return resOK;
+    }
     
     result_t init(MOTOR h, const Config &config)
     {
@@ -373,24 +397,17 @@ namespace embot { namespace hw { namespace motor {
 
         // step 2: motor+sensors configuration
         memset(&MainConf, 0, sizeof(MainConf));
+//        
+//        MainConf.pwm.mode = PWM_CONF_MODE_HALL;
+//        MainConf.pwm.num_polar_couples = 7;
+//        MainConf.pwm.hall_offset = (120 * 65536)/360;
+//        MainConf.pwm.sector_offset = 4; // TODO verify correctness
+//        MainConf.pwm.swapBC = 1;
         
-        MainConf.encoder.mode   = TIM_ENCODERMODE_TI12;
-        MainConf.encoder.filter = 4;
-        MainConf.encoder.idxpos = TIM_ENCODERINDEX_POSITION_00;
-        MainConf.encoder.resolution = 0; // Wrist Mk2 does not have quadrature encoder
-        MainConf.encoder.has_hall_sens = 1;
-        
-        MainConf.pwm.mode = PWM_CONF_MODE_HALL;
-        MainConf.pwm.num_polar_couples = 7;
-        MainConf.pwm.hall_offset = (120 * 65536)/360;
-        MainConf.pwm.sector_offset = 4; // TODO verify correctness
-        MainConf.pwm.swapBC = 1;
-        
-        analogInit();
-        pwmInit(); // pwmInit() shall be called before encoderInit() as the latter uses specific PWM quantities
-        encoderInit();
-        hallInit();
-
+        analogInit();  // done
+        encoderInit(); // done
+        hallInit();    // done
+        pwmInit();
 
         HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
         HAL_Delay(10); 
@@ -400,6 +417,31 @@ namespace embot { namespace hw { namespace motor {
         // or not. we should test it
         
         return resOK; 
+    }
+    
+    result_t s_hw_deinit(MOTOR h)
+    {
+        analogDeinit();
+        encoderDeinit();
+        hallDeinit();
+        
+        return resOK;
+    }
+    
+    result_t s_hw_configure(
+        MOTOR h,
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset)
+    {
+        result_t res = resOK;
+        
+        if (HAL_OK != encoderConfig(enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
+        if (HAL_OK != hallConfig(pwm_swapBC, pwm_hall_offset)) res = resNOK;
+      
+        return res; 
     }
     
     Position s_hw_getencoder(MOTOR h)
@@ -430,6 +472,7 @@ namespace embot { namespace hw { namespace motor {
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
     {        
         pwmSet(u, v, w);
+        
         return resOK;
     }
     

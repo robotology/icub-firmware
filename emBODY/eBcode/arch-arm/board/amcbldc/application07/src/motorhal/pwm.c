@@ -120,20 +120,7 @@ extern void set_ADC_callback(pwm_ADC_callback_t *cbk)
 
 #if defined(USE_STM32HAL) && defined(__cplusplus)
 
-#ifdef USE_KOLLMORGEN_SETUP
-constexpr uint16_t hallAngleTable[] =
-{
-    /* ABC  (°)  */
-    /* LLL ERROR */ 0,
-    /* LLH  300  */ static_cast<uint16_t>(120.0 * 65536.0 / 360.0 + 0.5), /* 54613 */
-    /* LHL  180  */ static_cast<uint16_t>(0.0 * 65536.0 / 360.0 + 0.5), /* 32768 */
-    /* LHH  240  */ static_cast<uint16_t>(60.0 * 65536.0 / 360.0 + 0.5), /* 43690 */
-    /* HLL   60  */ static_cast<uint16_t>(240.0 * 65536.0 / 360.0 + 0.5), /* 10923 */
-    /* HLH    0  */ static_cast<uint16_t>(180.0 * 65536.0 / 360.0 + 0.5), /*     0 */
-    /* HHL  120  */ static_cast<uint16_t>(300.0 * 65536.0 / 360.0 + 0.5), /* 21845 */
-    /* HHH ERROR */ static_cast<uint16_t>(0)
-};
-#else        
+
 constexpr uint16_t hallAngleTable[] =
 {
     /* ABC  (°)  */
@@ -146,33 +133,19 @@ constexpr uint16_t hallAngleTable[] =
     /* HHL   60  */ static_cast<uint16_t>( 60.0 * 65536.0 / 360.0), /* 10922 */
     /* HHH ERROR */ static_cast<uint16_t>(0)
 };
-#endif // USE_KOLLMORGEN_SETUP
 
 //constexpr int16_t hallSectorTable[] =
 //{
 //    /* ABC  (°)  */
-//    /* LLL ERROR */ 0,
-//    /* LLH  270  */ 4, /* 54613 */
-//    /* LHL  150  */ 2, /* 32768 */
-//    /* LHH  210  */ 3, /* 43690 */
-//    /* HLL   30  */ 0, /* 10923 */
-//    /* HLH  -30  */ 5, /*     0 */
-//    /* HHL   90  */ 1, /* 21845 */
-//    /* HHH ERROR */ static_cast<uint16_t>(0)
+//    /* LLL ERROR */ static_cast<int16_t>(0),
+//    /* LLH  240  */ static_cast<int16_t>(4), /* 43690 */
+//    /* LHL  120  */ static_cast<int16_t>(2), /* 21845 */
+//    /* LHH  180  */ static_cast<int16_t>(3), /* 32768 */
+//    /* HLL    0  */ static_cast<int16_t>(0), /*     0 */
+//    /* HLH  300  */ static_cast<int16_t>(5), /* 54613 */
+//    /* HHL   60  */ static_cast<int16_t>(1), /* 10922 */
+//    /* HHH ERROR */ static_cast<int16_t>(0)
 //};
-
-constexpr int16_t hallSectorTable[] =
-{
-    /* ABC  (°)  */
-    /* LLL ERROR */ static_cast<int16_t>(0),
-    /* LLH  240  */ static_cast<int16_t>(4), /* 43690 */
-    /* LHL  120  */ static_cast<int16_t>(2), /* 21845 */
-    /* LHH  180  */ static_cast<int16_t>(3), /* 32768 */
-    /* HLL    0  */ static_cast<int16_t>(0), /*     0 */
-    /* HLH  300  */ static_cast<int16_t>(5), /* 54613 */
-    /* HHL   60  */ static_cast<int16_t>(1), /* 10922 */
-    /* HHH ERROR */ static_cast<int16_t>(0)
-};
 
 #else
 static const uint16_t hallAngleTable[] =
@@ -185,6 +158,19 @@ static const uint16_t hallAngleTable[] =
     /* HLL   60  */  60.0 * 65536.0 / 360.0 + 0.5, /* 10923 */
     /* HLH    0  */   0.0 * 65536.0 / 360.0 + 0.5, /*     0 */
     /* HHL  120  */ 120.0 * 65536.0 / 360.0 + 0.5, /* 21845 */
+    /* HHH ERROR */ 0
+};
+
+static const int16_t hallSectorTable[] =
+{
+    /* ABC  (°)  */
+    /* LLL ERROR */ 0,
+    /* LLH  240  */ 4, /* 43690 */
+    /* LHL  120  */ 2, /* 21845 */
+    /* LHH  180  */ 3, /* 32768 */
+    /* HLL    0  */ 0, /*     0 */
+    /* HLH  300  */ 5, /* 54613 */
+    /* HHL   60  */ 1, /* 10922 */
     /* HHH ERROR */ 0
 };
 #endif
@@ -234,112 +220,84 @@ static uint8_t updateHallStatus(void)
     
     /* Read current value of HALL1, HALL2 and HALL3 signals in bits 2..0 */
     hallStatus = DECODE_HALLSTATUS;
-    
-    int16_t sector = (MainConf.pwm.sector_offset + hallSectorTable[hallStatus]) % 6;
-    static int16_t sector_old = sector;
-    
     uint16_t angle = MainConf.pwm.hall_offset + hallAngleTable[hallStatus];
     
-    hallAngle = angle;
-
-#ifdef USE_KOLLMORGEN_SETUP
-    // To disable the encoder reading, comment the following if then else
-    if (!hallStatus_old)
-    {            
-        hallCounter = 0;
-        
-        encoderReset();
+    //int16_t sector = (MainConf.pwm.sector_offset + hallSectorTable[hallStatus]) % 6;
+    int16_t sector = ((1+(int16_t)(angle)) / 60) % 6;
+    static int16_t sector_old = sector;
     
+    hallAngle = angle;
+    
+    if (MainConf.encoder.resolution == 0) // no encoder
+    {
         encoderForce(angle);
     }
     else
     {
-        bool forward = ((sector-sector_old+6)%6)==1;
-        
-        if (forward) // forward
-        {
-            ++hallCounter;
-            
-            angle -= 5461; // -30 deg
+        if (!hallStatus_old)
+        {            
+            hallCounter = 0;
+            encoderReset();
+            encoderForce(angle);
         }
         else
         {
-            --hallCounter;
-            
-            angle += 5461; // +30 deg
-        }
+            bool forward = ((sector-sector_old+6)%6)==1;
+        
+            if (forward) // forward
+            {
+                ++hallCounter;
+                angle -= 5461; // -30 deg
+            }
+            else
+            {
+                --hallCounter;
+                angle += 5461; // +30 deg
+            }
   
-        if (calibration_step == 0)
-        {
-            encoderForce(angle);
-            
-            //if (hallCounter < -50 || hallCounter > 50) // > npoles*6
-            //{
-                // now the optical encoder is Index calibrated
+            if (calibration_step == 0)
+            {
+                encoderForce(angle);
                 calibration_step = 1;
+            }
+            else if (calibration_step == 1)
+            {
+                encoderForce(angle);
+            
+                uint8_t s = forward ? sector : (sector+1)%6;
+            
+                border[s] = encoderGetUncalibrated();
+            
+                border_flag |= 1<<s;
+            
+                if (border_flag == 63)
+                {
+                    calibration_step = 2;
+                
+                    int32_t offset = int16_t(border[0]);
+                    offset += int16_t(border[1]-10923);
+                    offset += int16_t(border[2]-21845);
+                    offset += int16_t(border[3]-32768);
+                    offset += int16_t(border[4]-43691);
+                    offset += int16_t(border[5]-54613);
+                
+                    offset /= 6;
+                     
+                    embot::core::print("CALIBRATED\n");
+            
+                    encoderCalibrate(-int16_t(offset));
+                }
+            }
+            //else if (calibration_step == 2)
+            //{   
+            //    encoderCalibrate(angle);
             //}
         }
-        else if (calibration_step == 1)
-        {
-            encoderForce(angle);
-            
-            uint8_t s = forward ? sector : (sector+1)%6;
-            
-            border[s] = encoderGetUncalibrated();
-            
-            border_flag |= 1<<s;
-            
-            if (border_flag == 63)
-            {
-                calibration_step = 2;
-                
-                int32_t offset = int16_t(border[0]);
-                offset += int16_t(border[1]-10923);
-                offset += int16_t(border[2]-21845);
-                offset += int16_t(border[3]-32768);
-                offset += int16_t(border[4]-43691);
-                offset += int16_t(border[5]-54613);
-                
-                offset /= 6;
-                     
-                embot::core::print("CALIBRATED\n");
-            
-                encoderCalibrate(-int16_t(offset));
-            }
-        }
-        //else if (calibration_step == 2)
-        //{   
-        //    encoderCalibrate(angle);
-        //}
     }
-#else
-    encoderForce(angle);
-#endif
-
 
     // update the old sector and hall status
     sector_old = sector;
     hallStatus_old = hallStatus;
-    
-//    static uint32_t counter;
-//    static std::array<uint32_t, 128> hall_array;
-//    static std::array<uint32_t, 128> sector_array;
-//    
-//    hall_array[counter] = hallStatus;
-//    sector_array[counter] = sector;
-//    
-//    if (counter == 50) {
-//        static char msg[64] = {};
-
-//        for(int i = 0; i < hall_array.size(); i++){
-//            sprintf(msg, "%d %d", hall_array[i], sector_array[i]);
-//            embot::core::print(msg);
-//        }
-//        counter = 0;
-//    }
-//    counter++;
-    
-
     
     return hallStatus;
 }
@@ -434,6 +392,9 @@ void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3)
  */
 HAL_StatusTypeDef pwmInit(void)
 {
+    /* todo: no HALL sensor motor index startup calibration */    
+    MainConf.pwm.mode = PWM_CONF_MODE_HALL;
+    
     /* Clear any preceeding fault condition */
     pwmReset(ENABLE);
     pwmSleep(DISABLE);
@@ -441,15 +402,11 @@ HAL_StatusTypeDef pwmInit(void)
     pwmReset(DISABLE);
     HAL_Delay(10);
 
-    if (0 == (MainConf.pwm.mode & PWM_CONF_MODE_MASK))
-    {
-        MainConf.pwm.mode = PWM_CONF_MODE_HALL;
-#ifdef USE_KOLLMORGEN_SETUP
-        MainConf.pwm.num_polar_couples = 4;//7; // // //
-#else
-        MainConf.pwm.num_polar_couples = 7; // // //
-#endif
-    }
+//    if (0 == (MainConf.pwm.mode & PWM_CONF_MODE_MASK))
+//    {
+//        MainConf.pwm.mode = PWM_CONF_MODE_HALL;
+//        MainConf.pwm.num_polar_couples = num_polar_couples;
+//    }
         
     /* Register the required TIM1 callback functions */
     HAL_TIM_RegisterCallback(&htim1, HAL_TIM_BREAK_CB_ID, pwmMotorFault_cb);
@@ -458,7 +415,7 @@ HAL_StatusTypeDef pwmInit(void)
     /* Reset the PWM value */
     pwmSet(0, 0 ,0);
     
-    updateHallStatus();
+    //updateHallStatus();
 
     /* Start TIM1 as 3-phase PWM generator */
     if (HAL_OK != HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1) ||
@@ -485,16 +442,6 @@ HAL_StatusTypeDef pwmInit(void)
  */
 HAL_StatusTypeDef hallInit(void)
 {
-    hallOrder[0] = 0;
-    hallOrder[1] = MainConf.pwm.swapBC ? 2 : 1;
-    hallOrder[2] = MainConf.pwm.swapBC ? 1 : 2;
-    
-    /* Read value of HALL1, HALL2 and HALL3 signals in bits 2..0 */
-    hallStatus = DECODE_HALLSTATUS;
-
-    /* Init angle */
-    hallAngle = MainConf.pwm.hall_offset + hallAngleTable[hallStatus];
-    
     /* Start position counter */
     hallCounter = 0;
 
@@ -507,6 +454,27 @@ HAL_StatusTypeDef hallInit(void)
             (HAL_OK == HAL_TIM_Base_Start_IT(&htim3)))? HAL_OK : HAL_ERROR;
 }
 
+HAL_StatusTypeDef hallDeinit(void)
+{
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef hallConfig(uint8_t swapBC, uint16_t pwm_hall_offset)
+{
+    MainConf.pwm.hall_offset = pwm_hall_offset;
+    MainConf.pwm.swapBC = swapBC;
+    
+    hallOrder[0] = 0;
+    hallOrder[1] = MainConf.pwm.swapBC ? 2 : 1;
+    hallOrder[2] = MainConf.pwm.swapBC ? 1 : 2;
+
+    updateHallStatus();
+    
+    /* Start position counter */
+    hallCounter = 0;
+    
+    return HAL_OK;
+}
 
 /*******************************************************************************************************************//**
  * @brief   Read the position counter driven by the Hall sensors

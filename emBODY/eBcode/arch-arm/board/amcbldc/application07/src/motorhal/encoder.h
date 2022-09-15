@@ -35,7 +35,7 @@ typedef struct
     uint16_t    mode;
     uint16_t    filter;
     uint16_t    idxpos;
-    uint16_t    resolution;
+    int16_t     resolution;
     uint16_t    has_hall_sens;
 } encoderConfTypeDef;
 
@@ -45,6 +45,9 @@ typedef struct
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
 extern HAL_StatusTypeDef encoderInit(void);
+extern HAL_StatusTypeDef encoderDeinit(void);
+extern HAL_StatusTypeDef encoderConfig(int16_t resolution, uint8_t num_polar_couples, uint8_t has_hall_sens);
+
 extern uint32_t encoderGetCounter(void);
 extern void encoderReset();
 

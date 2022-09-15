@@ -50,7 +50,7 @@ typedef struct
 {
     uint32_t    mode;
     uint16_t    hall_offset;
-    uint16_t    sector_offset;
+    //uint16_t    sector_offset;
     uint8_t     num_polar_couples;
     uint8_t     swapBC;
 } pwmConfTypeDef;
@@ -71,6 +71,8 @@ typedef struct
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
 extern HAL_StatusTypeDef hallInit(void);
+HAL_StatusTypeDef hallDeinit(void);
+HAL_StatusTypeDef hallConfig(uint8_t swapBC, uint16_t pwm_hall_offset);
 extern int32_t hallGetCounter(void);
 extern void hallSetCounter(int32_t count);
 extern uint16_t hallGetAngle(void);

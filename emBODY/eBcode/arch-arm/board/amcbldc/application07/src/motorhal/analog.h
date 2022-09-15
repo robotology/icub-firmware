@@ -50,6 +50,7 @@ typedef struct
 
 extern int32_t analogConvertCurrent(int32_t raw);
 extern HAL_StatusTypeDef analogInit(void);
+extern HAL_StatusTypeDef analogDeinit(void);
 extern uint32_t analogVcc(void);
 extern uint32_t analogVph1(void);
 extern uint32_t analogVph2(void);
