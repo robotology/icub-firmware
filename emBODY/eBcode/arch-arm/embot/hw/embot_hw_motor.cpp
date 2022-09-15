@@ -384,38 +384,14 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_init(MOTOR h)
     {
-        // step 1: what cube mx does
-        MX_ADC1_Init();
-        MX_ADC2_Init();
-        
-        MX_TIM1_Init();
-        MX_TIM3_Init();
-        MX_TIM2_Init();
-        MX_CORDIC_Init();
-        MX_FMAC_Init();
-        MX_CRC_Init();   
-
-        // step 2: motor+sensors configuration
+        // motor+sensors configuration
         memset(&MainConf, 0, sizeof(MainConf));
-//        
-//        MainConf.pwm.mode = PWM_CONF_MODE_HALL;
-//        MainConf.pwm.num_polar_couples = 7;
-//        MainConf.pwm.hall_offset = (120 * 65536)/360;
-//        MainConf.pwm.sector_offset = 4; // TODO verify correctness
-//        MainConf.pwm.swapBC = 1;
-        
+
         analogInit();  // done
         encoderInit(); // done
         hallInit();    // done
         pwmInit();
 
-        HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
-        HAL_Delay(10); 
-
-
-        // ok, we are now ready to use the driver
-        // or not. we should test it
-        
         return resOK; 
     }
     

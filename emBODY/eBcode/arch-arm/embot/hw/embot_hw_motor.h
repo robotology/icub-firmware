@@ -53,6 +53,12 @@ namespace embot { namespace hw { namespace motor {
     
     result_t fault(MOTOR h, bool on);
     result_t init(embot::hw::MOTOR h, const Config &config);   
+    result_t config(MOTOR h, 
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset);
     // enable(h, true) is effective only if(false == faulted(h))    
     result_t enable(MOTOR h, bool on);
     

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 4.67
+// Model version                  : 4.74
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep  1 10:27:31 2022
+// C/C++ source code generated on : Thu Sep 15 11:03:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -23,6 +23,7 @@
 
 // user code (top of header file)
 #include "rtw_enable_disable_motors.h"
+#include "rtw_motor_config.h"
 
 // Block signals for model 'SupervisorFSM_RX'
 #ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
