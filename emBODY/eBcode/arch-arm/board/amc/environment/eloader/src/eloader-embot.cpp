@@ -15,7 +15,7 @@
 // in here we run the baremetal embot::hw application.
 // for the required get1microtime() we can either use a very naked approach or even the systick
 
-#undef USE_SYSTICK_AS_TIME_BASE
+#define USE_SYSTICK_AS_TIME_BASE
 
 #if defined(USE_SYSTICK_AS_TIME_BASE)
 
@@ -124,14 +124,14 @@ constexpr eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((section(E
                 .version    = 
                 { 
                     .major = 3, 
-                    .minor = 1
+                    .minor = 2
                 },  
                 .builddate  = 
                 {
                     .year  = 2022,
-                    .month = 4,
-                    .day   = 11,
-                    .hour  = 12,
+                    .month = 9,
+                    .day   = 16,
+                    .hour  = 9,
                     .min   = 15
                 }
             },
