@@ -109,12 +109,6 @@ namespace embot { namespace hw { namespace bsp { namespace mtb4 {
 #include "embot_app_application_theCANparserTHERMO.h"
 #include "embot_app_application_theTHERMO.h"
 
-constexpr embot::os::Event evPOSprocess = 0x00000001 << 1;
-constexpr embot::os::Event evIMUtick = 0x00000001 << 3;
-constexpr embot::os::Event evIMUdataready = 0x00000001 << 4;
-constexpr embot::os::Event evTHERMOtick = 0x00000001 << 5;
-constexpr embot::os::Event evTHERMOdataready = 0x00000001 << 6;
-
 
 void mySYS::userdefOnIdle(embot::os::Thread *t, void* idleparam) const
 {
@@ -129,6 +123,92 @@ void mySYS::userdefonOSerror(void *errparam) const
     for(;;);
 }
 
+using namespace embot::app::application;
+
+constexpr embot::os::Event evt_RXcanframe_reserved  = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
+static_assert(evt_RXcanframe_reserved == embot::app::skeleton::os::evthreadcan::evThreadCAN::evRXcanframe, "this evt is reserved");
+
+
+constexpr embot::os::Event evt_POSprocess       = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
+constexpr embot::os::Event evt_IMUtick          = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
+constexpr embot::os::Event evt_IMUdataready     = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
+constexpr embot::os::Event evt_THERMOtick       = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
+constexpr embot::os::Event evt_THERMOdataready  = embot::core::binary::mask::pos2mask<embot::os::Event>(5);
+ 
+constexpr embot::os::Event evt_ACQUIREfaps      = embot::core::binary::mask::pos2mask<embot::os::Event>(10);
+constexpr embot::os::Event evt_NOREPLYfaps      = embot::core::binary::mask::pos2mask<embot::os::Event>(11);
+constexpr embot::os::Event evt_TRANSMITfaps     = embot::core::binary::mask::pos2mask<embot::os::Event>(12);
+
+constexpr embot::os::Event evt_SNSR01_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(13);  
+constexpr embot::os::Event evt_SNSR01_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(14);  
+constexpr embot::os::Event evt_SNSR01_noreply   = 0; //embot::core::binary::mask::pos2mask<embot::os::Event>(15);
+constexpr embot::os::Event evt_SNSR02_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(16);  
+constexpr embot::os::Event evt_SNSR02_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(17);  
+constexpr embot::os::Event evt_SNSR02_noreply   = 0; //embot::core::binary::mask::pos2mask<embot::os::Event>(18);
+constexpr embot::os::Event evt_SNSR03_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(19);  
+constexpr embot::os::Event evt_SNSR03_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(20);  
+constexpr embot::os::Event evt_SNSR03_noreply   = 0; //embot::core::binary::mask::pos2mask<embot::os::Event>(21);
+constexpr embot::os::Event evt_SNSR04_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(22);  
+constexpr embot::os::Event evt_SNSR04_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(23);  
+constexpr embot::os::Event evt_SNSR04_noreply   = 0; //embot::core::binary::mask::pos2mask<embot::os::Event>(24);
+
+
+constexpr theFAPreader2::Sensor s1 {
+    theFAPreader2::sensorType::tlv, 
+    embot::hw::ANY::one,
+    {   
+        embot::prot::can::analog::posLABEL::zero, // as eobrd_portpos_hand_thumb = 0 OR eobrd_portpos_hand_thumbmetacarpus = 4
+        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 0}
+    },
+    evt_SNSR01_askdata,
+    evt_SNSR01_dataready,
+    evt_SNSR01_noreply,
+    5*embot::core::time1millisec // timeout  
+};
+
+constexpr theFAPreader2::Sensor s2 {
+    theFAPreader2::sensorType::tlv,
+    embot::hw::ANY::two, 
+    {         
+        embot::prot::can::analog::posLABEL::one,  // as eobrd_portpos_hand_index = 1 OR eobrd_portpos_hand_indexadduction = 6
+        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 0}
+    },
+    evt_SNSR02_askdata,
+    evt_SNSR02_dataready,
+    evt_SNSR02_noreply,
+    0 // 5*embot::core::time1millisec // timeout  
+};  
+
+constexpr theFAPreader2::Sensor s3 {
+    theFAPreader2::sensorType::tlv, 
+    embot::hw::ANY::three, 
+    {
+        embot::prot::can::analog::posLABEL::two, // as eobrd_portpos_hand_medium = 2
+        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 0}
+    },
+    evt_SNSR03_askdata,
+    evt_SNSR03_dataready,
+    evt_SNSR03_noreply,
+    0 //5*embot::core::time1millisec // timeout  
+};  
+
+constexpr theFAPreader2::Sensor s4 {
+    theFAPreader2::sensorType::tlv, 
+    embot::hw::ANY::four,
+    {  
+        embot::prot::can::analog::posLABEL::three,  // as eobrd_portpos_hand_pinky = 3
+        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 0}
+    },
+    evt_SNSR04_askdata,
+    evt_SNSR04_dataready,
+    evt_SNSR04_noreply,
+    0 //5*embot::core::time1millisec // timeout  
+}; 
+    
+constexpr std::array<theFAPreader2::Sensor, theFAPreader2::numberofpositions> snsrs4 
+{ 
+    s1, s2, s3, s4
+};
 
 void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) const
 {
@@ -144,11 +224,17 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
     embot::app::application::theCANparserBasic::getInstance().initialise({});
 
     // init agent of pos
+    embot::app::application::theFAPreader2::Config configfapreader2
+    {
+        embot::app::application::theFAPreader2::AcquisitionMode::daisychain,    
+        40*embot::core::time1millisec,  // acquisition time
+        5*embot::core::time1millisec,   // timeout for every acquisition step (1 step for fullyparallel, n for daisychain)        
+        evtsk,          // reader thread 
+        evtsk,          // transmitter thread
+        snsrs4,
+        { evt_ACQUIREfaps, evt_NOREPLYfaps, evt_TRANSMITfaps,  }    // associated events such as ... read sensor1, read sensor2, tranmsit sensors etc.
+    };
     embot::app::application::theFAPreader2 &thefapreader2 = embot::app::application::theFAPreader2::getInstance();
-    embot::app::application::theFAPreader2::Config configfapreader2;
-#warning TODO init properly        
-//    configthefapreader2.tickevent = evPOSprocess;
-//    configthefapreader2.totask = evtsk;
     thefapreader2.initialise(configfapreader2);
 
     // init canparser pos and link it to its agent
@@ -158,7 +244,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
 
     // init agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4::imuBOSCH, embot::hw::bsp::mtb4::imuBOSCHconfig, evIMUtick, evIMUdataready, evtsk);
+    embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4::imuBOSCH, embot::hw::bsp::mtb4::imuBOSCHconfig, evt_IMUtick, evt_IMUdataready, evtsk);
     theimu.initialise(configimu);
 
     // init canparser imu and link it to its agent
@@ -168,7 +254,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
 
     // init agent of thermo
     embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4::thermometer, embot::hw::bsp::mtb4::thermometerconfig, evTHERMOtick, evTHERMOdataready, evtsk);
+    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4::thermometer, embot::hw::bsp::mtb4::thermometerconfig, evt_THERMOtick, evt_THERMOdataready, evtsk);
     thethermo.initialise(configthermo);
 
     // init canparser thermo and link it to its agent
@@ -213,29 +299,28 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
     embot::app::application::theFAPreader2 &thefapreader2 = embot::app::application::theFAPreader2::getInstance();
     if(true == thefapreader2.isvalid(eventmask))
     {
-        thefapreader2.process(eventmask);
-        #warning TODO: add a way to retrieve the outframes if any ...
+        thefapreader2.process(eventmask, outframes);
     }
 
-    if(true == embot::core::binary::mask::check(eventmask, evIMUtick))
+    if(true == embot::core::binary::mask::check(eventmask, evt_IMUtick))
     {
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
         theimu.tick(outframes);
     }
 
-    if(true == embot::core::binary::mask::check(eventmask, evIMUdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evt_IMUdataready))
     {
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
         theimu.processdata(outframes);
     }
 
-    if(true == embot::core::binary::mask::check(eventmask, evTHERMOtick))
+    if(true == embot::core::binary::mask::check(eventmask, evt_THERMOtick))
     {
         embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
         thethermo.tick(outframes);
     }
 
-    if(true == embot::core::binary::mask::check(eventmask, evTHERMOdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evt_THERMOdataready))
     {
         embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
         thethermo.processdata(outframes);

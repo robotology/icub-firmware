@@ -1334,9 +1334,17 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         public:
             
         struct Info
-        {   // for now it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
-            posTYPE                 type;    // it contains the type of the sensors. 
-            deciDegPOSdescriptor    descriptor[2]; 
+        {   
+            // for the case of the psc:
+            // - we have two values to configure and they are expressed in deciDeg
+            // - we use type and descriptors[2].
+            // for other boards:
+            // - we also need id.
+            // id tells the ID of the chip in the board associated to descriptor[0]. 
+            // id+1 tells the ID for descriptor[1] if... is .enabled.
+            posID                   id;
+            posTYPE                 type;           // it contains the type of the sensors.   
+            deciDegPOSdescriptor    descriptor[2];  // it is used only if .enabled is 1
             Info() : type(posTYPE::angleDeciDeg) {}            
         };
             

@@ -1348,8 +1348,20 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             return false; 
         }
                 
-        uint8_t t = 0;
-        info.type = (candata.datainframe[0] == static_cast<uint8_t>(posTYPE::angleDeciDeg)) ? (posTYPE::angleDeciDeg) : (posTYPE::unknown);
+        uint8_t ty = candata.datainframe[0] & 0x0f;
+        uint8_t ii = candata.datainframe[0] >> 4;
+        
+        if(ty < embot::core::tointegral(posTYPE::numberof))
+        {
+            info.type = static_cast<posTYPE>(ty);
+        }
+        else
+        {
+            info.type = (ty == static_cast<uint8_t>(posTYPE::none)) ? (posTYPE::none) : (posTYPE::unknown);
+        }
+        
+        info.id = static_cast<posID>(ii);
+  
         info.descriptor[0].load(&candata.datainframe[1]);
         info.descriptor[1].load(&candata.datainframe[4]);
                  

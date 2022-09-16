@@ -64,133 +64,128 @@
 
 #define EMBOT_POSREADER2_compensatereadings
 
-#define CONTINUOUS_ACQUISITION
+//#define CONTINUOUS_ACQUISITION
+
+namespace embot { namespace app { namespace application {
     
-struct embot::app::application::theFAPreader2::Impl
-{      
-    embot::prot::can::analog::posLABEL sensor_getPOSlabel(const Sensor &snsr)
+    struct SensorHelper
     {
-        return snsr.label;     
-    }
-
-    std::string sensor_to_string(const Sensor &snsr)
-    {
-        if(embot::hw::ANY::none == snsr.id)
+        static embot::prot::can::analog::posLABEL getPOSlabel(const theFAPreader2::Sensor &snsr)
         {
-            return "ANY::none";
+            return snsr.params.label;     
         }
-        
-        if(sensorType::tlv == snsr.type)
-        {
-            return embot::hw::tlv493d::to_string(static_cast<embot::hw::TLV493D>(snsr.id));
-        }
-        
-        return "UNKNOWN";
-    } 
 
-
-    embot::hw::LED sensor_to_led(const Sensor &snsr)
-    {
-        static constexpr std::array<embot::hw::LED, numberoftlv> tlvleds 
-        { 
-            embot::hw::LED::five,   // J4 which has ANY::one = 0
-            embot::hw::LED::one,    // J5 which has ANY::two = 1 
-            embot::hw::LED::two,    // J6 which has ANY::three = 2
-            embot::hw::LED::three  // J7 which has ANY::four = 3
-        };
-        
-        if(embot::hw::ANY::none == snsr.id)
+        static std::string to_string(const theFAPreader2::Sensor &snsr)
         {
-            return embot::hw::LED::none;
-        }
-        
-        if(sensorType::tlv == snsr.type)
-        {
-            uint8_t pos = embot::core::tointegral(snsr.id);
-            return (pos < tlvleds.size()) ? tlvleds[pos] : embot::hw::LED::none;
-        }       
-            
-        return embot::hw::LED::none;
-    }     
-             
-    bool sensor_init(const Sensor &snsr)
-    { 
-        bool ret {false};
-        
-        if(embot::hw::ANY::none != snsr.id)
-        {
-            if(sensorType::tlv == snsr.type) 
-            {                
-                if(embot::hw::resOK == embot::hw::tlv493d::init(static_cast<embot::hw::TLV493D>(snsr.id), {embot::hw::tlv493d::Config::startupMODE::dontresetCHIP}))
-                {
-                    ret = true;
-                } 
-                embot::hw::sys::delay(50*embot::core::time1millisec); // why???????
+            if(embot::hw::ANY::none == snsr.id)
+            {
+                return "ANY::none";
             }
-        }
-
-        return ret;
-    }
             
-    void acquisition(const Sensor &snsr, const embot::core::Callback &cbk)
-    {        
-        if(sensorType::tlv == snsr.type)
-        {
-            embot::hw::tlv493d::acquisition(static_cast<embot::hw::TLV493D>(snsr.id), cbk);
-        }
-    }
-    
-    embot::hw::result_t read(const Sensor &snsr, Position &pos)
-    {
-        embot::hw::result_t r = embot::hw::resNOK;
-        
-        if(sensorType::tlv == snsr.type)
-        {
-            r = embot::hw::tlv493d::read(static_cast<embot::hw::TLV493D>(snsr.id), pos);
-        }    
-               
-        if(embot::hw::resOK != r)
-        {
-            pos = valueOfPositionACQUISITIONnotvalid;
+            if(theFAPreader2::sensorType::tlv == snsr.type)
+            {
+                return embot::hw::tlv493d::to_string(static_cast<embot::hw::TLV493D>(snsr.id));
+            }
+            
+            return "UNKNOWN";
         } 
 
-        return r;        
-    }
-       
+
+        static embot::hw::LED to_led(const theFAPreader2::Sensor &snsr)
+        {
+    //        static constexpr std::array<embot::hw::LED, numberoftlv> tlvleds 
+    //        { 
+    //            embot::hw::LED::five,   
+    //            embot::hw::LED::one,     
+    //            embot::hw::LED::two,    
+    //            embot::hw::LED::three   
+    //        };
+    //        
+    //        if(embot::hw::ANY::none == snsr.id)
+    //        {
+    //            return embot::hw::LED::none;
+    //        }
+    //        
+    //        if(sensorType::tlv == snsr.type)
+    //        {
+    //            uint8_t pos = embot::core::tointegral(snsr.id);
+    //            return (pos < tlvleds.size()) ? tlvleds[pos] : embot::hw::LED::none;
+    //        }       
+                
+            return embot::hw::LED::none;
+        }     
+                 
+        static bool init(const theFAPreader2::Sensor &snsr)
+        { 
+            bool ret {false};
+            
+            if(embot::hw::ANY::none != snsr.id)
+            {
+                if(theFAPreader2::sensorType::tlv == snsr.type) 
+                {                
+                    if(embot::hw::resOK == embot::hw::tlv493d::init(static_cast<embot::hw::TLV493D>(snsr.id), {embot::hw::tlv493d::Config::startupMODE::dontresetCHIP}))
+                    {
+                        ret = true;
+                    } 
+                    embot::hw::sys::delay(50*embot::core::time1millisec); // why???????
+                }
+            }
+
+            return ret;
+        }
+                
+        static void acquisition(const theFAPreader2::Sensor &snsr, const embot::core::Callback &cbk)
+        {        
+            if(theFAPreader2::sensorType::tlv == snsr.type)
+            {
+                embot::hw::tlv493d::acquisition(static_cast<embot::hw::TLV493D>(snsr.id), cbk);
+            }
+        }
+        
+        static embot::hw::result_t read(const theFAPreader2::Sensor &snsr, theFAPreader2::Position &pos)
+        {
+            embot::hw::result_t r = embot::hw::resNOK;
+            
+            if(theFAPreader2::sensorType::tlv == snsr.type)
+            {
+                r = embot::hw::tlv493d::read(static_cast<embot::hw::TLV493D>(snsr.id), pos);
+            }    
+                   
+            if(embot::hw::resOK != r)
+            {
+                pos = theFAPreader2::valueOfPositionACQUISITIONnotvalid;
+            } 
+
+            return r;        
+        }        
+        
+    };
+
+     
+    
+}}}
+    
+struct embot::app::application::theFAPreader2::Impl
+{   
+
     void print(const std::string &str)
     {
  //       embot::core::print(str);
-    }
-    
+    }    
 
-    // it contains the configuration that one can send via can to ... set label, direction, rotation, offset.
-    // so far we dont use it ...
-    struct canConfig
-    {
-        std::array<embot::prot::can::analog::polling::deciDegPOSdescriptor, numberofpositions> descriptor;
-        canConfig() { reset(); }
-        void reset()
-        {
-            for(auto &a : descriptor)
-            {
-                a.reset();
-            }
-        }
-    };
-    
-
-    Config config {};
-        
-    uint8_t numofvalidsensors {0};
-    
-    std::vector<uint8_t> validIDpositions {};
-    
-    embot::os::EventMask globaleventmask {0};
-           
+    Config config {};   
+    //std::vector<Sensor *> activeSensors {}; 
+    std::vector<uint8_t> activeSensorsIndex {};             
+    embot::os::EventMask globaleventmask {0};           
     bool ticking {false};
-    std::uint8_t acquisitionmask {0};
-    std::uint8_t sensorstoacquiremask {0};
-    uint8_t sensorspresencemask {0};
+   
+    // if the the sensor inside config.sensors[x] can be initted during initialise() at startup of the board then we set sensors_mask_of_connected
+    // so, to check if a sensor in pos x is usable we use embot::core::binary::bit::check(pImpl->sensors_mask_of_connected, x);
+    // or also we see config.sensors[x].connected is true.
+    uint8_t sensors_mask_of_connected {0};
+    
+    // inside sensors_mask_of_active the bit in position x tells that config.sensors[x] is surely connected and that must be acquired and tranmsitted
+    std::uint8_t sensors_mask_of_active {0};
         
     embot::os::Timer *timerAcquisition {nullptr};
     embot::os::Action actionAcquisition {};        
@@ -202,19 +197,13 @@ struct embot::app::application::theFAPreader2::Impl
     embot::os::Action actionTX {};
     embot::os::Action actionTOUT {};        
         
-    embot::core::relTime periodTX {10*embot::core::time1millisec};
-
-    canConfig canconfig {};
+    embot::core::relTime periodTX {50*embot::core::time1millisec};
     
     static constexpr Position valueOfPositionCHIPnotinitted = 2000*100;         // which will results in 2000 degrees or 20000 decidegrees
     
     embot::os::rtos::mutex_t *_mtxOf_positions {nullptr};
     
-    // the following is for canprotocol
-    std::array<embot::prot::can::analog::deciDeg, 3> decidegvalues {0};
-    //std::array<embot::prot::can::analog::deciMilliMeter, 3> decimillimetervalues {0};
-    
-    
+        
     struct threadsafePositions
     {
         embot::os::rtos::mutex_t *_mtx {nullptr};
@@ -269,36 +258,17 @@ struct embot::app::application::theFAPreader2::Impl
     
     threadsafePositions *tspositions {nullptr};
     
-   
-    Impl() 
-    {   
-        ticking = false;  
-        acquisitionmask = 0;
-        sensorstoacquiremask = 0;
-        sensorspresencemask = 0;
-        periodTX = 10*embot::core::time1millisec;
-        
-        numofvalidsensors = 0;
-
-        timerAcquisition = new embot::os::Timer;  
-        timerTX = new embot::os::Timer; 
-        timerTOUT = new embot::os::Timer;         
-                
-        canconfig.reset(); 
-        
-        for(uint8_t i=0; i<numberofpositions; i++)
+    
+    void updateActiveSensorsIndex()
+    {
+        activeSensorsIndex.clear();
+        for(uint8_t s=0; s<numberofpositions; s++)
         {
-            canconfig.descriptor[i].label = static_cast<embot::prot::can::analog::posLABEL>(i);
+            if(true == embot::core::binary::bit::check(sensors_mask_of_active, s))
+            {
+                activeSensorsIndex.push_back(s);
+            }
         }
-        
-        for(auto &ddv : decidegvalues) 
-        {   
-            ddv = 0;
-        }
-        
-        tspositions = new threadsafePositions;
-        
-        validIDpositions.reserve(numberofpositions);
     }
     
     bool isvalidposition(const Position &po) const
@@ -309,12 +279,30 @@ struct embot::app::application::theFAPreader2::Impl
         }
         return true;        
     }
+    
+   
+    Impl() 
+    {   
+        ticking = false;  
+        sensors_mask_of_connected = 0;
+        sensors_mask_of_active = 0;
+        periodTX = 50*embot::core::time1millisec;
+        
+        timerAcquisition = new embot::os::Timer;  
+        timerTX = new embot::os::Timer; 
+        timerTOUT = new embot::os::Timer;         
+                
+        
+        tspositions = new threadsafePositions;
+        
+        activeSensorsIndex.reserve(numberofpositions);
+    }
    
     bool start();
     bool stop();    
     bool tick(std::vector<embot::prot::can::Frame> &replies);
     bool isvalid(embot::os::EventMask evtmask) const;
-    bool process(embot::os::EventMask evtmask);
+    bool process(embot::os::EventMask evtmask, std::vector<embot::prot::can::Frame> &outframes);
     bool get(std::vector<embot::prot::can::Frame> &frames2transmit);
 
     
@@ -374,8 +362,7 @@ struct embot::app::application::theFAPreader2::Impl
     static void acquisition_daisychain_alert_dataready(void *p)
     {
         embot::app::application::theFAPreader2::Impl *pimpl = reinterpret_cast<embot::app::application::theFAPreader2::Impl*>(p);
-        pimpl->config.reader->setEvent(pimpl->config.sensors[pimpl->validIDpositions[pimpl->daisychain_counter]].dataready);
-//        pimpl->print("acquisition_daisychain_alert_dataready()");
+        pimpl->config.reader->setEvent(pimpl->config.sensors[pimpl->activeSensorsIndex[pimpl->daisychain_counter]].dataready);
     }
     
     
@@ -399,14 +386,14 @@ struct embot::app::application::theFAPreader2::Impl
     // daisychain
         
     volatile uint8_t daisychain_counter {0};
-    
+  
     void acquisition_daisychain_trigger()
     {        
-        if(daisychain_counter <= validIDpositions.size())
+        if(daisychain_counter < activeSensorsIndex.size())
         {
 //            print("acquisition_daisychain_trigger() @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
             // send event to thread for the current daisychained
-            uint8_t n = validIDpositions[daisychain_counter];
+            uint8_t n = activeSensorsIndex[daisychain_counter];
             config.reader->setEvent(config.sensors[n].askdata);           
         }        
     }
@@ -422,54 +409,47 @@ struct embot::app::application::theFAPreader2::Impl
             
     void acquisition_daisychain_on_askdata(uint8_t n)
     {
-//        if(n == daisychain_counter)
-//        {
-//            print("acquisition_daisychain_on_askdata(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-            // config a callback which sends the dataready event
-            embot::core::Callback cbk {acquisition_daisychain_alert_dataready, this};
-            // start acquisition
-            acquisition(config.sensors[n], cbk);
-            
-            timerTOUT_start();
-//        }
+        // print("acquisition_daisychain_on_askdata(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+        // config a callback which sends the dataready event
+        embot::core::Callback cbk {acquisition_daisychain_alert_dataready, this};
+        // start acquisition
+        SensorHelper::acquisition(config.sensors[n], cbk);
+        
+        timerTOUT_start();
     }     
 
     void acquisition_daisychain_on_dataready(uint8_t n)
     {
-//        if(n == daisychain_counter)
-//        {
-            timerTOUT_stop();    
-            
- //           print("acquisition_daisychain_on_dataready(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());            
-            // retrieve data from sensor n
-            Position pos {0};    
-            read(config.sensors[n], pos);
-            
-            //embot::hw::TLV493D id = config.sensors[n].id;            
-            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
-    
-            //#warning in here we use n or ... daisychain_counter??? we use n. even if some n keep non valid values
-            tspositions->set(pos, n);
-            
-            // increment
-            daisychain_counter++;
-            
-            // if not last, trigger a start()
-            if(daisychain_counter < validIDpositions.size())
-            {
-                acquisition_daisychain_trigger();
-            }
-            else
-            {
-                daisychain_counter = 0;
-            }
-//        }
+
+        timerTOUT_stop();    
+        
+//           print("acquisition_daisychain_on_dataready(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());            
+        // retrieve data from sensor n
+        Position pos {0};    
+        SensorHelper::read(config.sensors[n], pos);
+                  
+        print(SensorHelper::to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+
+        tspositions->set(pos, n);
+        
+        // increment
+        daisychain_counter++;
+        
+        // if not last, trigger a start()
+        if(daisychain_counter < activeSensorsIndex.size())
+        {
+            acquisition_daisychain_trigger();
+        }
+        else
+        {
+            daisychain_counter = 0;
+        }
     } 
 
     void acquisition_daisychain_noreply()
     {
-        uint8_t n = validIDpositions[daisychain_counter]; 
-        print("acquisition_daisychain_noreply() of " + sensor_to_string(config.sensors[n]) + ", index = " + std::to_string(daisychain_counter) + ", @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+        uint8_t n = activeSensorsIndex[daisychain_counter];
+        print("acquisition_daisychain_noreply() of " + SensorHelper::to_string(config.sensors[n]) + ", index = " + std::to_string(daisychain_counter) + ", @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
 
         timerTOUT_stop();
         
@@ -482,7 +462,7 @@ struct embot::app::application::theFAPreader2::Impl
         daisychain_counter++;
         
         // if not last, trigger a start()
-        if(daisychain_counter < validIDpositions.size())
+        if(daisychain_counter < activeSensorsIndex.size())
         {
             acquisition_daisychain_trigger();
         }
@@ -501,12 +481,12 @@ struct embot::app::application::theFAPreader2::Impl
         std::string str {};        
         acquisition_fullyparallel_maskofrequests = acquisition_fullyparallel_maskofreplies = 0;
         embot::os::EventMask eventmask = 0;
-        for(uint8_t i=0; i<validIDpositions.size(); i++)
+        for(uint8_t i=0; i<activeSensorsIndex.size(); i++)
         {
-            uint8_t n = validIDpositions[i];
+            uint8_t n = activeSensorsIndex[i];
             eventmask |= config.sensors[n].askdata;  
             embot::core::binary::bit::set(acquisition_fullyparallel_maskofrequests, n);           
-            str += sensor_to_string(config.sensors[n]);
+            str += SensorHelper::to_string(config.sensors[n]);
             str += " ";
         }
         config.reader->setEvent(eventmask); 
@@ -519,13 +499,12 @@ struct embot::app::application::theFAPreader2::Impl
    
     void acquisition_fullyparallel_on_askdata(uint8_t n)
     {
-        print("acquisition_fp_on_askdata(" + std::to_string(n) + ") for " + sensor_to_string(config.sensors[n]) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-//        print("acquisition_fp_on_askdata(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+        print("acquisition_fp_on_askdata(" + std::to_string(n) + ") for " + SensorHelper::to_string(config.sensors[n]) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
         // config a callback which sends the dataready event
         cbkdataarray[n] = {this, n};
         embot::core::Callback cbk {acquisition_parallel_alert_dataready, &cbkdataarray[n]};
         // start acquisition
-        acquisition(config.sensors[n], cbk);
+        SensorHelper::acquisition(config.sensors[n], cbk);
     }     
 
     void acquisition_fullyparallel_on_dataready(uint8_t n)
@@ -533,9 +512,9 @@ struct embot::app::application::theFAPreader2::Impl
 //        print("acquisition_fp_on_dataready(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
         // retrieve data from sensor n
         Position pos {0};
-        read(config.sensors[n], pos);
+        SensorHelper::read(config.sensors[n], pos);
              
-        print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+        print(SensorHelper::to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
   
         tspositions->set(pos, n);
         
@@ -552,12 +531,12 @@ struct embot::app::application::theFAPreader2::Impl
     {
         uint32_t maskOFmissing = acquisition_fullyparallel_maskofrequests ^ acquisition_fullyparallel_maskofreplies;
         std::string str {};
-        for(uint8_t i=0; i<validIDpositions.size(); i++)
+        for(uint8_t i=0; i<activeSensorsIndex.size(); i++)
         {
-            uint8_t n = validIDpositions[i];
+            uint8_t n = activeSensorsIndex[i];
             if(embot::core::binary::bit::check(maskOFmissing, n))
             {
-                str += sensor_to_string(config.sensors[n]);
+                str += SensorHelper::to_string(config.sensors[n]);
                 str += " ";
             }            
         }
@@ -572,132 +551,7 @@ struct embot::app::application::theFAPreader2::Impl
         // for now... i just stop the timer
         
     }      
-
-#if 0
-modparallel
-    
-    uint32_t acquisition_mod2parallel_maskofrequests = 0;
-    uint32_t acquisition_mod2parallel_maskofreplies = 0;    
-    uint8_t mod2_index = 0;
-    uint8_t mod2_number = 0;
-    uint8_t mod2_replies = 0;
-    enum class mod2Mode : uint8_t { even = 0, odd = 1};
-    
-    mod2Mode currmod2mode = mod2Mode::even;
-    void acquisition_mod2parallel_start(mod2Mode mo)
-    {
-        std::string st = ((mo == mod2Mode::odd) ? "odd" : "even");
-        print("acquisition_mod2parallel_start(" + st + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-        currmod2mode = mo;
-        mod2_index = 0;
-        mod2_number = 0;
-        mod2_replies = 0;
-        acquisition_mod2parallel_maskofrequests = acquisition_mod2parallel_maskofreplies = 0;
-        embot::os::EventMask eventmask = 0;
-        std::string str {};
-        for(uint8_t i=0; i<validIDpositions.size(); i++)
-        {
-            if(embot::core::tointegral(mo) == (i%2))
-            {
-                mod2_number++;
-                uint8_t n = validIDpositions[i];
-                eventmask |= config.sensors[n].askdata;
-                embot::core::binary::bit::set(acquisition_mod2parallel_maskofrequests, n);          
-                str += sensor_to_string(config.sensors[n]);
-                str += " ";
-            }                
-        }
-        
-        if(0 != eventmask)
-        {        
-            config.reader->setEvent(eventmask); 
-            print("acquisition_mod2parallel_start() for " + str + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string());       
-            timerTOUT_start();  
-        } 
-        else        
-        {
-            print(std::string("acquisition_mod2parallel_start() does nothing as there are no sensors ") + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
-        }    
-
-    }
-    
-    void acquisition_mod2parallel_on_askdata(uint8_t n)
-    {
-        print("acquisition_mod2parallel_on_askdata(" + std::to_string(n) + ") for " + sensor_to_string(config.sensors[n]) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-//        print("acquisition_mod2parallel_on_askdata(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-        // config a callback which sends the dataready event
-        cbkdataarray[n] = {this, n};
-        embot::core::Callback cbk {acquisition_parallel_alert_dataready, &cbkdataarray[n]};
-        // start acquisition
-        acquisition(config.sensors[n], cbk);
-    }     
-
-    void acquisition_mod2parallel_on_dataready(uint8_t n)
-    {
-        print("acquisition_mod2parallel_on_dataready(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-        // retrieve data from sensor n
-        Position pos {0};
-        read(config.sensors[n], pos);
-      
-        if(config.sensors[n].type == sensorType::qe)
-        {
-            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " uMET @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
-        }
-        else if((config.sensors[n].type == sensorType::lr17) || (config.sensors[n].type == sensorType::tlv))
-        {
-            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
-        }
-        
-        tspositions->set(pos, n);
-        
-        embot::core::binary::bit::set(acquisition_mod2parallel_maskofreplies, n);
-        
-        if(acquisition_mod2parallel_maskofreplies == acquisition_mod2parallel_maskofrequests)
-        {
-            // ok, we have finished one stage. i stop the timer
-            timerTOUT_stop();
-        }        
-        
-        mod2_replies++;        
-        
-        if((mod2_replies == mod2_number) && (currmod2mode == mod2Mode::even))
-        {
-            acquisition_mod2parallel_start(mod2Mode::odd);
-        }
-    }   
-
-    void acquisition_mod2parallel_noreply()
-    {
-        uint32_t maskOFmissing = acquisition_mod2parallel_maskofrequests ^ acquisition_mod2parallel_maskofreplies;
-        std::string str {};
-        for(uint8_t i=0; i<validIDpositions.size(); i++)
-        {
-            uint8_t n = validIDpositions[i];
-            if(embot::core::binary::bit::check(maskOFmissing, n))
-            {
-                tspositions->set(0xffff, n);
-                str += sensor_to_string(config.sensors[n]);
-                str += " ";
-            }            
-        }
-        
-        print("acquisition_mod2parallel_noreply() of " + str + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());        
-        
-        timerTOUT_stop();
-        
-        // then... what to do? 
-        // - i could use the differences between acquisition_md2parallel_maskofreplies and acquisition_mod2parallel_maskofrequests
-        // - i could fill a can print frame to transmit 
-        // for now... i just stop the timer and start the odd if i were in even
-        if((currmod2mode == mod2Mode::even))
-        {
-            acquisition_mod2parallel_start(mod2Mode::odd);
-        }
-        
-    } 
-
-#endif
-    
+   
     bool acquisition_get(std::vector<embot::prot::can::Frame> &replies);    
                       
 };
@@ -706,13 +560,13 @@ modparallel
 // this starts the tx actually
 bool embot::app::application::theFAPreader2::Impl::start()
 { 
-#if !defined(CONTINUOUS_ACQUISITION)
+//#if !defined(CONTINUOUS_ACQUISITION)
     acquisitionchain_start(true);
-#endif  
+//#endif  
 
-#if defined(CONTINUOUS_ACQUISITION)
-    #warning TODO: verify what CONTINUOUS_ACQUISITION does ......
-#endif    
+//#if defined(CONTINUOUS_ACQUISITION)
+//    #warning TODO: verify what CONTINUOUS_ACQUISITION does ......
+//#endif    
     
     embot::os::Timer::Config cfgtx(periodTX, actionTX, embot::os::Timer::Mode::forever);
     timerTX->start(cfgtx);
@@ -723,9 +577,9 @@ bool embot::app::application::theFAPreader2::Impl::start()
 // this stops the tx
 bool embot::app::application::theFAPreader2::Impl::stop()
 {
-#if !defined(CONTINUOUS_ACQUISITION)
+//#if !defined(CONTINUOUS_ACQUISITION)
     acquisitionchain_start(false);
-#endif   
+//#endif   
     
     timerTX->stop();
     ticking = false;    
@@ -751,7 +605,7 @@ bool embot::app::application::theFAPreader2::Impl::isvalid(embot::os::EventMask 
     return (0 == (evtmask & globaleventmask)) ? false : true;    
 }
 
-bool embot::app::application::theFAPreader2::Impl::process(embot::os::EventMask evtmask)
+bool embot::app::application::theFAPreader2::Impl::process(embot::os::EventMask evtmask, std::vector<embot::prot::can::Frame> &outframes)
 {  
     if(false == isvalid(evtmask))
     {
@@ -771,12 +625,7 @@ bool embot::app::application::theFAPreader2::Impl::process(embot::os::EventMask 
             case AcquisitionMode::fullyparallel:
             {
                 acquisition_fullyparallel_start();
-            } break;
-
-//            case AcquisitionMode::mod2parallel:
-//            {
-//                acquisition_mod2parallel_start(mod2Mode::even);
-//            } break;            
+            } break;       
                         
             default:
             {
@@ -798,12 +647,7 @@ bool embot::app::application::theFAPreader2::Impl::process(embot::os::EventMask 
             case AcquisitionMode::fullyparallel:
             {
                 acquisition_fullyparallel_noreply();
-            } break;
-
-//            case AcquisitionMode::mod2parallel:
-//            {
-//                acquisition_mod2parallel_noreply();
-//            } break;            
+            } break;         
                         
             default:
             {
@@ -812,10 +656,10 @@ bool embot::app::application::theFAPreader2::Impl::process(embot::os::EventMask 
     }
     
     // check the events related to the sensors 
-    for(uint8_t i=0; i<validIDpositions.size(); i++)
+    for(uint8_t i=0; i<activeSensorsIndex.size(); i++)
     {
         // the events for asking to the sensor 
-        uint8_t n = validIDpositions[i];
+        uint8_t n = activeSensorsIndex[i];
         
         if(true == embot::core::binary::mask::check(evtmask, config.sensors[n].askdata)) 
         {
@@ -830,21 +674,11 @@ bool embot::app::application::theFAPreader2::Impl::process(embot::os::EventMask 
                 {
                    acquisition_fullyparallel_on_askdata(n);
                 } break;
-                
-//                case AcquisitionMode::mod2parallel:
-//                {
-//                    acquisition_mod2parallel_on_askdata(n);
-//                } break;                 
-                
+                                            
                 default:
                 {
                 } break;
             }       
-//////            if(config.acquisitionmode == AcquisitionMode::daisychain) 
-//////            {
-//////                acquisition_daisychain_on_askdata(config.sensors[n].askdata);
-//////            }                
-////            //acquisition_start(n);
         }
         
         // the events for retrieving the data
@@ -861,23 +695,18 @@ bool embot::app::application::theFAPreader2::Impl::process(embot::os::EventMask 
                 {
                    acquisition_fullyparallel_on_dataready(n);
                 } break;
-
-//                case AcquisitionMode::mod2parallel:
-//                {
-//                    acquisition_mod2parallel_on_dataready(n);
-//                } break;  
                 
                 default:
                 {
                 } break;
             } 
-//////            if(config.acquisitionmode == AcquisitionMode::daisychain) 
-//////            {
-//////                acquisition_daisychain_on_dataready(config.sensors[n].dataready);
-//////            }   
-//////            acquisition_retrieve(n);    
-//////            acquisition_processing(n);
         }
+    }
+    
+    
+    if(true == embot::core::binary::mask::check(evtmask, config.events.transmit))
+    {
+        get(outframes);
     }
 
     return true;    
@@ -895,81 +724,72 @@ bool embot::app::application::theFAPreader2::Impl::acquisition_get(std::vector<e
 
     std::string str;    
     
-    for(uint8_t i=0; i<validIDpositions.size(); i++)
+    for(uint8_t i=0; i<activeSensorsIndex.size(); i++)
     {
         embot::prot::can::analog::periodic::Message_POS msg {};
         embot::prot::can::analog::periodic::Message_POS::Info info {};  
         info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress(); 
         
-        // we get the index n from the array<> Config::sensors. we have n = i only if every sensor inside Config::sensors was ok.
-        uint8_t n = validIDpositions[i];
-        // we gets some properties
-        sensorType st = config.sensors[n].type;
-        calibParams cp = config.sensors[n].calibpars;
-        // bool isrotational = (sensorType::tlv == st) || (sensorType::lr17 == st);
-        constexpr bool isrotational {true};
+        uint8_t n = activeSensorsIndex[i];
         Position rawvalue = positions[n];
-                     
+            
+        // we gets some other properties
+        // sensorType st = config.sensors[n].type;           
+#if defined(EMBOT_POSREADER2_compensatereadings)
+        sensorParams sp = config.sensors[n].params; 
+#endif            
+        constexpr bool isrotational {true};
+                           
         
         // now we transform the values        
         if(true == isrotational)
         {
             embot::prot::can::analog::deciDeg v = valueOfPositionACQUISITIONnotvalid / 10;
             
-        #if !defined(EMBOT_POSREADER2_compensatereadings) || defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
-                 
-            #warning we DONT compensate values of tlv ... but 
-            #warning TODO: add compensation for emulated mode
-            v = (valueOfPositionACQUISITIONnotvalid == rawvalue) ? +10000 : rawvalue/10;                
-        
-            
-        #elif defined(EMBOT_POSREADER2_compensatereadings) && !defined(EMBOT_POSREADER2_compensatereadings_mode1)
-            // we compensate in the old legacy way. but we can do better maybe w/ EMBOT_POSREADER2_compensatereadings_mode1
-            
-            //#warning we compensate values of tlv and lr17 encoders for a specific hand to be in range [0, 90]            
-            
             if(valueOfPositionACQUISITIONnotvalid != rawvalue)
             {
+#if defined(EMBOT_POSREADER2_compensatereadings)        
                 // ok, compensate to embot::prot::can::analog::posTYPE::angleDeciDeg
                 // for now i transform everything in degrees. yes, i know i lose resolution
                 embot::prot::can::analog::deciDeg decideg_not_compensated = rawvalue/10;                
-                v = cp.decidegcalib.transform(decideg_not_compensated);
+                v = sp.calib.transform(decideg_not_compensated);
+#else                
+                v = rawvalue/10; 
+#endif                
             }
-            
-        #endif      
+                   
 
             // now we transmit v as a deciDeg. one can frame at a time
             std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
 
-            str += sensor_to_string(config.sensors[n]);
+            str += SensorHelper::to_string(config.sensors[n]);
             str += " = ";
             str += std::to_string(v/10);
             str += " DEG ";
             
-            info.loadDeciDeg(sensor_getPOSlabel(config.sensors[n]), 1, values);
+            info.loadDeciDeg(SensorHelper::getPOSlabel(config.sensors[n]), 1, values);
                
             msg.load(info);
             msg.get(frame);
             replies.push_back(frame); 
         
             // finally, in here we manage a wrong measure. in addition to led off we also send a canprint message
-            embot::hw::LED led = sensor_to_led(config.sensors[n]);
+//            embot::hw::LED led = sensor_to_led(config.sensors[n]);
             if(valueOfPositionACQUISITIONnotvalid == rawvalue)
             {
-                embot::hw::led::off(led);
+//                embot::hw::led::off(led);
                 embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
                 tr.print("FAP" + std::to_string(n) + "err", replies);
             }
             else
             {
-                embot::hw::led::on(led);
+//                embot::hw::led::on(led);
             }            
         }
      
     }
     
     print("theFAPreader2 transmits: " + str + embot::core::TimeFormatter(embot::core::now()).to_string());
-
              
     return true;           
 }
@@ -997,17 +817,16 @@ embot::app::application::theFAPreader2::theFAPreader2()
     
 embot::app::application::theFAPreader2::~theFAPreader2() { }
 
+
          
 bool embot::app::application::theFAPreader2::initialise(const Config &config)
 {
+
     pImpl->config = config;
     
     // this event triggers a periodic reading. 
     pImpl->actionAcquisition.load(embot::os::EventToThread(pImpl->config.events.acquire, pImpl->config.reader));
-    if(pImpl->config.acquisitionperiod > 10*embot::core::time1millisec)
-    {
-        pImpl->periodAcquisition = pImpl->config.acquisitionperiod;
-    }
+    pImpl->periodAcquisition = std::max(pImpl->config.acquisitionperiod, static_cast<embot::core::relTime>(10*embot::core::time1millisec));
     
     // this event signals a no reply in data reading
     pImpl->actionTOUT.load(embot::os::EventToThread(pImpl->config.events.noreply, pImpl->config.reader));
@@ -1018,52 +837,64 @@ bool embot::app::application::theFAPreader2::initialise(const Config &config)
     pImpl->tspositions->set(pImpl->valueOfPositionCHIPnotinitted, 0);
     pImpl->tspositions->set(pImpl->valueOfPositionCHIPnotinitted, 1);
     
-    pImpl->numofvalidsensors = 0;
     
     std::string str {};
-    pImpl->globaleventmask = pImpl->config.events.acquire | pImpl->config.events.noreply;
+    pImpl->globaleventmask = pImpl->config.events.acquire | pImpl->config.events.noreply | pImpl->config.events.transmit;
     pImpl->maxTOUT = pImpl->config.acquisitiontimeout;
-    for(uint8_t n=0; n<numberofpositions; n++)
+        
+    pImpl->activeSensorsIndex.clear();
+        
+    pImpl->sensors_mask_of_connected = 0;
+        
+    for(uint8_t s=0; s<numberofpositions; s++)
     {
-        if(embot::hw::ANY::none != pImpl->config.sensors[n].id)
+        pImpl->config.sensors[s].connected = false;
+        
+        if(embot::hw::ANY::none != pImpl->config.sensors[s].id)
         {  
-            bool ok = pImpl->sensor_init(config.sensors[n]);
+            bool ok = SensorHelper::init(config.sensors[s]);
             
             if(ok)
             {
-                if((pImpl->config.sensors[n].timeout != 0) && (pImpl->config.sensors[n].noreply != 0))
+                pImpl->config.sensors[s].connected = true;
+                embot::core::binary::bit::set(pImpl->sensors_mask_of_connected, s);
+
+                if((pImpl->config.sensors[s].timeout != 0) && (pImpl->config.sensors[s].noreply != 0))
                 {
-                    pImpl->maxTOUT = std::max(pImpl->maxTOUT, pImpl->config.sensors[n].timeout);
+                    pImpl->maxTOUT = std::max(pImpl->maxTOUT, pImpl->config.sensors[s].timeout);
                 }
-                pImpl->validIDpositions.push_back(n);
-                pImpl->numofvalidsensors++;
-                embot::core::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[n].id));
-                pImpl->globaleventmask |= (pImpl->config.sensors[n].askdata | pImpl->config.sensors[n].dataready | pImpl->config.sensors[n].noreply);   
+
+                pImpl->globaleventmask |= (pImpl->config.sensors[s].askdata | pImpl->config.sensors[s].dataready | pImpl->config.sensors[s].noreply);   
          
-                str += pImpl->sensor_to_string(config.sensors[n]);
+                str += SensorHelper::to_string(config.sensors[s]);
                 str += " ";                
 
-                embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
-                embot::hw::led::on(l);
+//                embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
+//                embot::hw::led::on(l);
             }
             else
             {
-                embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
-                embot::hw::led::off(l);
+//                embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
+//                embot::hw::led::off(l);
             }
             
         }            
     }
     
+    // we also enables for acquisitions all the sensors that are connected and we keep pImpl->config.sensors[s].params we have, until some can message changes them    
+    pImpl->sensors_mask_of_active = pImpl->sensors_mask_of_connected;
+    //and update the activeSensorsIndex
+    pImpl->updateActiveSensorsIndex();
+    
                        
     embot::core::print("theFAPreader2::initialise() -> found: " + str);
 
-#if defined(CONTINUOUS_ACQUISITION)
-    embot::core::print("theFAPreader2::initialise() -> starting acquisition @ " + std::to_string(pImpl->periodAcquisition/1000) + " ms");
-    pImpl->acquisitionchain_start(true);
-#endif
+//#if defined(CONTINUOUS_ACQUISITION)
+//    embot::core::print("theFAPreader2::initialise() -> starting acquisition @ " + std::to_string(pImpl->periodAcquisition/1000) + " ms");
+//    pImpl->acquisitionchain_start(true);
+//#endif
 
-     
+
     return true;
 }
 
@@ -1097,9 +928,9 @@ bool embot::app::application::theFAPreader2::isvalid(embot::os::EventMask evtmas
     return pImpl->isvalid(evtmask);
 }
 
-bool embot::app::application::theFAPreader2::process(embot::os::EventMask evtmask)
+bool embot::app::application::theFAPreader2::process(embot::os::EventMask evtmask, std::vector<embot::prot::can::Frame> &outframes)
 {   
-    return pImpl->process(evtmask);
+    return pImpl->process(evtmask, outframes);
 }
 
 
@@ -1109,15 +940,78 @@ bool embot::app::application::theFAPreader2::process(embot::os::EventMask evtmas
 bool embot::app::application::theFAPreader2::set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info)
 {
     // if ticking: stop it
-    if(true == pImpl->ticking)
+    bool wasticking = pImpl->ticking;
+    if(true == wasticking)
     {
         stop();
     }
     
-    if(info.type == embot::prot::can::analog::posTYPE::angleDeciDeg)
+    // evaluate info.type and info.id
+    
+    if(embot::prot::can::analog::posID::all == info.id)
     {
-        pImpl->canconfig.descriptor[0] = info.descriptor[0];
-        pImpl->canconfig.descriptor[1] = info.descriptor[1];
+        // we do something to every sensor 
+        if(embot::prot::can::analog::posTYPE::none == info.type)
+        {
+            // we disable the acquisition of every sensor and we reset the calibration parameters
+            pImpl->sensors_mask_of_active = 0;
+            for(uint8_t n=0; n<numberofpositions; n++)
+            {
+                pImpl->config.sensors[n].params.reset();         
+            }
+        }
+        else if(embot::prot::can::analog::posTYPE::angleDeciDeg == info.type)
+        {
+            // we set all the sensors we have with info.descriptor[0], as long as its .enabled is true
+            if(true == info.descriptor[0].enabled)
+            {
+                for(uint8_t n=0; n<numberofpositions; n++)
+                {
+                    if(true == embot::core::binary::bit::check(pImpl->sensors_mask_of_connected, n))
+                    {
+                        embot::core::binary::bit::set(pImpl->sensors_mask_of_active, n);
+                        uint8_t la = static_cast<uint8_t>(info.descriptor[0].label);
+                        pImpl->config.sensors[n].params.load(static_cast<embot::prot::can::analog::posLABEL>(la+n), info.descriptor[0].calib);
+                    }
+                }
+            }
+        }
+        
+    }
+    else // info.id is not embot::prot::can::analog::posID::all, so it is a posID::one, or posID::two, or posID::three ... or posID::fourteen
+    {
+        // we do something to the sensor w/ ID = info.id
+        embot::hw::ANY id = static_cast< embot::hw::ANY>(embot::core::tointegral(info.id));
+        for(uint8_t n=0; n<numberofpositions; n++)
+        {
+            // i need to find the id inside the configured sensors which could be found at bootstrap
+            if((id == pImpl->config.sensors[n].id) && (true == embot::core::binary::bit::check(pImpl->sensors_mask_of_connected, n)))
+            {
+                // found it!
+                if((embot::prot::can::analog::posTYPE::angleDeciDeg == info.type) && (true == info.descriptor[0].enabled))
+                {                    
+                    // we surely enable its reading and ... configure to use a given calibration and to transmit its value w/ a given label
+                    embot::core::binary::bit::set(pImpl->sensors_mask_of_active, n);
+                    pImpl->config.sensors[n].params.load(info.descriptor[0].label, info.descriptor[0].calib);
+                }
+                else // if((embot::prot::can::analog::posTYPE::none == info.type) || (false == info.descriptor[0].enabled))
+                {
+                    // we disable its reading and reset calibration and label
+                    embot::core::binary::bit::clear(pImpl->sensors_mask_of_active, n);
+                    pImpl->config.sensors[n].params.reset(); 
+                }
+            }
+        }    
+        
+    }
+    
+    // after we have (maybe) modified sensors_mask_of_active, we must update the vector which contains the sensors to read
+    pImpl->updateActiveSensorsIndex();
+    
+    
+    if(true == wasticking)
+    {
+        start();
     }
     
     return true;    
@@ -1129,8 +1023,8 @@ bool embot::app::application::theFAPreader2::get(const embot::prot::can::analog:
     replyinfo.type = info.type;
     if(info.type == embot::prot::can::analog::posTYPE::angleDeciDeg)
     {
-        replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
-        replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
+//        replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
+//        replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
     }
     
     return true;    
@@ -1150,7 +1044,6 @@ bool embot::app::application::theFAPreader2::set(const embot::prot::can::analog:
     
     return true;    
 }
-
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

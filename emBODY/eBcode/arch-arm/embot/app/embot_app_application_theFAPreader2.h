@@ -9,7 +9,7 @@
 // - include guard ----------------------------------------------------------------------------------------------------
 
 #ifndef _EMBOT_APP_APPLICATION_THEFAPREADER2_H_
-#define _EMBOT_APP_APPLICATION_THEPAPREADER2_H_
+#define _EMBOT_APP_APPLICATION_THEFAPREADER2_H_
 
 
 #include "embot_app_application_theCANparserPOS.h"
@@ -42,33 +42,32 @@ namespace embot { namespace app { namespace application {
         static constexpr std::uint8_t numberoftlv = 4;
     
         enum class sensorType { tlv = 0, /*lr17 = 1, qe = 2, */ none = 255 }; 
-        
-        
-        struct calibParams
+                        
+        struct sensorParams
         {
-            embot::prot::can::analog::posTYPE postype {embot::prot::can::analog::posTYPE::angleDeciDeg};
-            embot::prot::can::analog::polling::deciDegCalib decidegcalib {};
-            //embot::prot::can::analog::polling::deciMilliMeterCalib decimillicalib {};
-            constexpr calibParams() = default;
-            constexpr calibParams(const embot::prot::can::analog::polling::deciDegCalib &ddcal) 
-                                    : postype(embot::prot::can::analog::posTYPE::angleDeciDeg), decidegcalib(ddcal) {}
-            //constexpr calibParams(const embot::prot::can::analog::polling::deciMilliMeterCalib &dmcal) 
-            //                        : postype(embot::prot::can::analog::posTYPE::linearDeciMilliMeter), decimillicalib(dmcal) {}    
-        };
+            embot::prot::can::analog::posLABEL label {embot::prot::can::analog::posLABEL::zero};
+            embot::prot::can::analog::polling::deciDegCalib calib {};
+
+            constexpr sensorParams() = default;
+            constexpr sensorParams(embot::prot::can::analog::posLABEL l, const embot::prot::can::analog::polling::deciDegCalib &c) 
+                                    : label(l), calib(c) {}
+            void reset() { label = embot::prot::can::analog::posLABEL::zero; calib.reset(); } 
+            void load(embot::prot::can::analog::posLABEL l, const embot::prot::can::analog::polling::deciDegCalib &c) { label = l; calib = c; }            
+        };        
 
         struct Sensor
-        {
+        {   
             sensorType type {sensorType::none};
             embot::hw::ANY id {embot::hw::ANY::none};
-            embot::prot::can::analog::posLABEL label {embot::prot::can::analog::posLABEL::zero};
-            calibParams calibpars {};
+            bool connected {false}; // always false unless verified a correct reading
+            sensorParams params {embot::prot::can::analog::posLABEL::zero, {}};
             embot::os::Event askdata {0};           // used to ask the thread to begin acquisition from the sensor (in non-blocking mode)
             embot::os::Event dataready {0};         // used by the hw to alert the thread that the data is available
             embot::os::Event noreply {0};           // SO FAR NOT USED: maybe used to alert the waiting thread that there is no reply from the sensor after the specified timeout
             embot::core::relTime timeout {0};       // SO FAR NOT USED: the time allowed for this sensor before we can emit the noreply event. 
             constexpr Sensor() = default;
-            constexpr Sensor(sensorType ty, embot::hw::ANY i, embot::prot::can::analog::posLABEL la, const calibParams &cp, embot::os::Event as, embot::os::Event dr,  embot::os::Event nr = 0, embot::core::relTime to = 0) 
-                    : type(ty), id(i), label(la), calibpars(cp), askdata(as), dataready(dr), noreply(nr), timeout(to)  {}
+            constexpr Sensor(sensorType ty, embot::hw::ANY i, const sensorParams &pa, embot::os::Event as, embot::os::Event dr,  embot::os::Event nr = 0, embot::core::relTime to = 0) 
+                    : type(ty), id(i), params(pa), askdata(as), dataready(dr), noreply(nr), timeout(to)  {}
             constexpr bool isvalid() const { return type != sensorType::none; }
         };
                    
@@ -109,6 +108,7 @@ namespace embot { namespace app { namespace application {
             embot::core::relTime acquisitiontimeout {0};
             embot::os::Thread* reader {nullptr};        // the thread which processes Events::acquire and every (Sensor::askdata, Sensor::dataready, Sensor::noreply)
             embot::os::Thread* transmitter {nullptr};   // the thread which processes Events::transmit emitted by thread reader or by a timer internal to theFAPreader2
+            // reader can be the same as transmitter
             std::array<Sensor, numberofpositions> sensors {{}};
             Events events {};   
             constexpr Config() = default;
@@ -126,7 +126,7 @@ namespace embot { namespace app { namespace application {
         bool isvalid(embot::os::EventMask evtmask) const;
         
         // this is called by the reader thread when it receives an event mask.        
-        bool process(embot::os::EventMask evtmask);
+        bool process(embot::os::EventMask evtmask, std::vector<embot::prot::can::Frame> &outframes);
         
         // only the transmitter must call it to retrieve the frames 
         bool get(std::vector<embot::prot::can::Frame> &frames2transmit);
