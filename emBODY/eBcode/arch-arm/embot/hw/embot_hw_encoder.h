@@ -21,7 +21,7 @@ namespace embot { namespace hw { namespace encoder {
     /**
      * @brief The list of supported encoders
      */
-    enum class Type { none, chipAS5045, chipMA730, encoderEMULATED, encoderTEST}; //, spiAS5045 };
+    enum class Type { none, chipAS5045, chipMA730, chipMB049, encoderEMULATED, encoderTEST}; //, spiAS5045 };
     
     /**
      * @brief This struct is used both internally and externally.
