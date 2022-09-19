@@ -86,6 +86,7 @@ typedef enum
     hal_spiencoder_typeCHAINof3 = 3,
 #if defined(AEA3_SUPPORT)
     hal_spiencoder_typeAEA3     = 4,
+    hal_spiencoder_typeAksIM2   = 5,
 #endif
     hal_spiencoder_typeNONE     = 255
 } hal_spiencoder_type_t;

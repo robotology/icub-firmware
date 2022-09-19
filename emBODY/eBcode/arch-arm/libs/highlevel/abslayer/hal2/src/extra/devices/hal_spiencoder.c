@@ -141,6 +141,8 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* fra
 #if defined(AEA3_SUPPORT)
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* frame);
 #endif
+static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t5(uint8_t* frame);
+
 
 
 
@@ -304,12 +306,24 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         spicfg.cpolarity = hal_spi_cpolarity_low;
         spicfg.datacapture = hal_spi_datacapture_2edge;
         spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_nopull;
-        spicfg.maxsizeofframe = 2;                  // each frame is done of two words
+        spicfg.maxsizeofframe = 2;                  // each frame is done of two words (TODO: probably 1 is better)
         spicfg.datasize = hal_spi_datasize_16bit;   // and each word is of 16 bits
         
         initSPI = hal_true;
     }
 #endif
+    else if(hal_spiencoder_typeAksIM2 == intitem->config.type)
+    {
+        // 19 MSB + 3 LSB_zero_padded --> 2 Byte
+        spicfg.maxspeed = 4 *1000;
+        spicfg.cpolarity = hal_spi_cpolarity_low;
+        spicfg.datacapture = hal_spi_datacapture_2edge;
+        spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_nopull;
+        spicfg.maxsizeofframe = 6;
+        spicfg.datasize = hal_spi_datasize_8bit;
+        
+        initSPI = hal_true;
+    }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {     
         spicfg.capacityofrxfifoofframes = 1;        // we need to manage only one frame at a time
@@ -502,6 +516,25 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
         // so that hal_spiencoder_get_value() can be called to retrieve the encoder value
     }
 #endif
+    else if(intitem->config.type == hal_spiencoder_typeAksIM2)
+    {
+        static const uint8_t txframe_dummy_aksim2[6] = {0x00}; // TODO: check if 1 element of type uint64 is better
+        // Mux enabled
+        hal_mux_enable(intitem->muxid, intitem->muxsel);
+        
+        // SPI: set the callback function
+        hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
+        
+        // SPI: set the sizeofframe for this transmission
+        hal_spi_set_sizeofframe(intitem->spiid, 1);
+        
+        // SPI: set the isrtxframe
+        hal_spi_set_isrtxframe(intitem->spiid, txframe_dummy_aksim2);
+        //----------------
+
+        // SPI start to receive (only one frame)
+        hal_spi_start(intitem->spiid, 1);
+    }
     else if(intitem->config.type == hal_spiencoder_typeAMO)    // Encoder type 2 (AMO)
     {        
         // Enabling the MUX
@@ -703,6 +736,14 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
         *pos = intitem->position;
     }
 #endif
+    else if (intitem->config.type == hal_spiencoder_typeAksIM2)
+    {
+        diagn->type = hal_spiencoder_diagnostic_type_none;
+        
+        // TODO: Do some checks here...(multiturn, CRC, etc..)
+        
+        *pos = intitem->position;
+    }
     else if (intitem->config.type == hal_spiencoder_typeAMO)
     {
         diagn->type = hal_spiencoder_diagnostic_type_none;
@@ -1179,6 +1220,10 @@ static void s_hal_spiencoder_onreceiv(void* p)
         intitem->position = s_hal_spiencoder_frame2position_t4(intitem->rxframes[1]);
     }
 #endif
+    else if(intitem->config.type == hal_spiencoder_typeAksIM2)
+    {
+        intitem->position = s_hal_spiencoder_frame2position_t5(intitem->rxframes[1]);
+    }
     else 
     {
         intitem->position = 0;
@@ -1322,6 +1367,7 @@ static void s_hal_spiencoder_onreceiv_reg_data(void* p)
 // Formatting the result for encoder type 1 (AEA)
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t1(uint8_t* frame)
 {
+    // simone girardi 09/17/2022: This function returns the whole rawValue (18 bits), not only the position
     uint32_t pos = 0;
     // pos = frame[0] | (frame[1] << 8) | (frame[2] << 16);
     // VALE formatting result
@@ -1348,9 +1394,29 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* fra
     // AEA3 offers 14 bit of resolution
     uint16_t pos = (((frame[1] & 0x7F) << 8 )| frame[0]); // in this way we are reading 16 bits (1 bit dummy + 14 bit valid + 1 bit zero padded). The dummy bit has been masked.
     
-    return(pos);
+    return pos;
 }
 #endif
+
+// Formatting the result for encoder type 5 (AksIM2)
+static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t5(uint8_t* frame)
+{
+    // Encoder position data structure
+    // -------------------------------
+    // b47 : b32 Multiturn counter (if specified in part number) – Left aligned, MSB first. 
+    // b31 : b10 Encoder position + zero padding bits – Left aligned, MSB first. 
+    // b9 Error – If low, the position data is not valid. 
+    // b8 Warning - If low, the position data is valid, but some operating conditions are close to limits. 
+    // b7 : b0 Inverted CRC, 0x97 polynomial
+    
+    uint32_t pos = 0;
+    //data.multiturncounter = (_databuffer[0] << 8) | _databuffer[1]; // TODO: check for the first bit (maybe it must be discarded)
+    pos = (frame[4] << 11) | (frame[5] << 3) | ((frame[6] & 0xe0) >> 5); // the last shift eliminates the non-position values (2) + zero padded bits (3)
+    //data.status.bits = (_databuffer[4] & 0x03);
+    
+    
+    return pos;
+}
 
 #if !defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
 static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg, uint8_t *txframe, uint8_t sizeofframe)
