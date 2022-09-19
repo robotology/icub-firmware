@@ -63,7 +63,8 @@ constexpr uint32_t emulatedMODE_maskofUNresponsivesensors = 0;  // every sensor 
 //    embot::core::binary::mask::pos2mask<uint32_t>(embot::hw::TLV493D::two) | 
 //    embot::core::binary::mask::pos2mask<uint32_t>(embot::hw::TLV493D::six);
 
-#define SINUSOID
+// CHAINSAW, SINUSOID, CONSTANT
+#define CONSTANT
 
 #if defined(CHAINSAW)
 Position emulatedMODE_getposition(TLV493D h)
@@ -129,6 +130,23 @@ Position emulatedMODE_getposition(TLV493D h)
     v = min[embot::core::tointegral(h)] + v*(max[embot::core::tointegral(h)] - min[embot::core::tointegral(h)]);
     
     Position pos = static_cast<Position>(v);
+    return pos;
+}
+
+#elif defined(CONSTANT)
+
+Position emulatedMODE_getposition(TLV493D h)
+{
+    // use a different value for each sensor   
+    constexpr uint32_t deg2pos = 100;
+    static constexpr std::array<Position, embot::core::tointegral(embot::hw::TLV493D::maxnumberof)> value { deg2pos*10, deg2pos*20, deg2pos*30, deg2pos*40, deg2pos*50, deg2pos*60};
+
+    if(false == supported(h))
+    {
+        return 0;        
+    }
+    
+    Position pos = value[embot::core::tointegral(h)];
     return pos;
 }
 
