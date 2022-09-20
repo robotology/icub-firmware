@@ -138,6 +138,7 @@ namespace embot { namespace hw { namespace motor {
     static PrivateData s_privatedata;
     
     result_t s_hw_init(MOTOR h);
+    result_t s_hw_deinit(MOTOR h);
     result_t s_hw_configure(
         MOTOR h,
         int16_t  enc_resolution, 
@@ -211,7 +212,8 @@ namespace embot { namespace hw { namespace motor {
         
         if(true == initialised(h))
         {
-            return resOK;
+            s_hw_deinit(h);
+            //return resOK;
         }
                 
         std::uint8_t index = embot::core::tointegral(h);
