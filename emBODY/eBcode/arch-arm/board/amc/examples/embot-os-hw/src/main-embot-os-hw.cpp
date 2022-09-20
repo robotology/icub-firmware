@@ -43,7 +43,7 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 //#define TEST_EMBOT_HW_ENCODER
 //#define TEST_EMBOT_HW_CHIP_AS5045
-//#define TEST_EMBOT_HW_CHIP_MB049
+#define TEST_EMBOT_HW_CHIP_MB049
 
 //#define TEST_EMBOT_HW_FLASH
 

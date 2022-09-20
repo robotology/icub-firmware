@@ -86,6 +86,7 @@ namespace embot { namespace hw { namespace chip {
             POS position {0};
             uint16_t multiturncounter {0};
             Status status {};
+            uint8_t crc {0};
             Data() = default;
             bool isvalid() const { return status.ok; }
         };
