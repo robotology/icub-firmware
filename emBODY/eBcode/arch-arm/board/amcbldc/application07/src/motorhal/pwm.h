@@ -79,6 +79,7 @@ extern uint16_t hallGetAngle(void);
 extern uint16_t hallGetStatus(void);
 
 extern HAL_StatusTypeDef pwmInit(void);
+extern HAL_StatusTypeDef pwmDeinit(void);
 extern void pwmSleep(FunctionalState enable);
 extern void pwmReset(FunctionalState enable);
 extern HAL_StatusTypeDef pwmResetFault(void);
