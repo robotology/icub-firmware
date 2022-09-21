@@ -94,13 +94,24 @@ typedef struct
     hal_mux_sel_t               muxsel;
     hal_spi_t                   spiid;
     hal_spiencoder_position_t   position;
-    uint8_t                     rxframes[3][4];     // 3 possible frames received. The size of everyone is the maximum possible
+    uint8_t                     rxframes[3][6];     // 3 possible frames received. The size of everyone is the maximum possible
     uint16_t                    rxframechain[3];    // 1 frame of 2 words of 16 bits
     hl_chip_ams_as5055a_channel_t chainchannel;
     volatile uint8_t            amo_regaddr;
     volatile uint8_t            counter;
+    uint16_t                    multiturncounter;
+    uint8_t                     status_bits;
+    uint8_t                     crc;
 } hal_spiencoder_internal_item_t;
 
+
+typedef struct
+{
+    uint16_t                    multiturncounter;
+    hal_spiencoder_position_t   position;
+    uint8_t                     status_bits;
+    uint8_t                     crc;
+} hal_spiencoder_aksim2_data;
 
 typedef struct
 {
@@ -141,7 +152,10 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* fra
 #if defined(AEA3_SUPPORT)
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* frame);
 #endif
-static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t5(uint8_t* frame);
+static void s_hal_spiencoder_parse_data_aksim2(uint8_t* frame, hal_spiencoder_aksim2_data* data);
+
+static uint8_t CRC_SPI_97_64bit(uint64_t dw_InputData);
+
 
 
 
@@ -170,6 +184,25 @@ static const hal_spi_cfg_t s_hal_spiencoder_spicfg_master =
     .datacapture                = hal_spi_datacapture_1edge,
     .gpio_cfg_flags             = hal_spi_gpio_cfg_sckmosi_pullup
 };
+
+//Lookup table for polynome = 0x97
+static const uint8_t ab_CRC8_LUT[256] = {
+    0x00, 0x97, 0xB9, 0x2E, 0xE5, 0x72, 0x5C, 0xCB, 0x5D, 0xCA, 0xE4, 0x73, 0xB8, 0x2F, 0x01, 0x96,
+    0xBA, 0x2D, 0x03, 0x94, 0x5F, 0xC8, 0xE6, 0x71, 0xE7, 0x70, 0x5E, 0xC9, 0x02, 0x95, 0xBB, 0x2C,
+    0xE3, 0x74, 0x5A, 0xCD, 0x06, 0x91, 0xBF, 0x28, 0xBE, 0x29, 0x07, 0x90, 0x5B, 0xCC, 0xE2, 0x75, 
+    0x59, 0xCE, 0xE0, 0x77, 0xBC, 0x2B, 0x05, 0x92, 0x04, 0x93, 0xBD, 0x2A, 0xE1, 0x76, 0x58, 0xCF, 
+    0x51, 0xC6, 0xE8, 0x7F, 0xB4, 0x23, 0x0D, 0x9A, 0x0C, 0x9B, 0xB5, 0x22, 0xE9, 0x7E, 0x50, 0xC7, 
+    0xEB, 0x7C, 0x52, 0xC5, 0x0E, 0x99, 0xB7, 0x20, 0xB6, 0x21, 0x0F, 0x98, 0x53, 0xC4, 0xEA, 0x7D, 
+    0xB2, 0x25, 0x0B, 0x9C, 0x57, 0xC0, 0xEE, 0x79, 0xEF, 0x78, 0x56, 0xC1, 0x0A, 0x9D, 0xB3, 0x24, 
+    0x08, 0x9F, 0xB1, 0x26, 0xED, 0x7A, 0x54, 0xC3, 0x55, 0xC2, 0xEC, 0x7B, 0xB0, 0x27, 0x09, 0x9E, 
+    0xA2, 0x35, 0x1B, 0x8C, 0x47, 0xD0, 0xFE, 0x69, 0xFF, 0x68, 0x46, 0xD1, 0x1A, 0x8D, 0xA3, 0x34, 
+    0x18, 0x8F, 0xA1, 0x36, 0xFD, 0x6A, 0x44, 0xD3, 0x45, 0xD2, 0xFC, 0x6B, 0xA0, 0x37, 0x19, 0x8E, 
+    0x41, 0xD6, 0xF8, 0x6F, 0xA4, 0x33, 0x1D, 0x8A, 0x1C, 0x8B, 0xA5, 0x32, 0xF9, 0x6E, 0x40, 0xD7,
+    0xFB, 0x6C, 0x42, 0xD5, 0x1E, 0x89, 0xA7, 0x30, 0xA6, 0x31, 0x1F, 0x88, 0x43, 0xD4, 0xFA, 0x6D, 
+    0xF3, 0x64, 0x4A, 0xDD, 0x16, 0x81, 0xAF, 0x38, 0xAE, 0x39, 0x17, 0x80, 0x4B, 0xDC, 0xF2, 0x65, 
+    0x49, 0xDE, 0xF0, 0x67, 0xAC, 0x3B, 0x15, 0x82, 0x14, 0x83, 0xAD, 0x3A, 0xF1, 0x66, 0x48, 0xDF, 
+    0x10, 0x87, 0xA9, 0x3E, 0xF5, 0x62, 0x4C, 0xDB, 0x4D, 0xDA, 0xF4, 0x63, 0xA8, 0x3F, 0x11, 0x86, 
+    0xAA, 0x3D, 0x13, 0x84, 0x4F, 0xD8, 0xF6, 0x61, 0xF7, 0x60, 0x4E, 0xD9, 0x12, 0x85, 0xAB, 0x3C};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -305,7 +338,7 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         // 14 MSB + 2 LSB_zero_padded --> 2 Byte
         spicfg.cpolarity = hal_spi_cpolarity_low;
         spicfg.datacapture = hal_spi_datacapture_2edge;
-        spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_nopull;
+        spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_pulldown;
         spicfg.maxsizeofframe = 2;                  // each frame is done of two words (TODO: probably 1 is better)
         spicfg.datasize = hal_spi_datasize_16bit;   // and each word is of 16 bits
         
@@ -315,10 +348,9 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     else if(hal_spiencoder_typeAksIM2 == intitem->config.type)
     {
         // 19 MSB + 3 LSB_zero_padded --> 2 Byte
-        spicfg.maxspeed = 4 *1000;
         spicfg.cpolarity = hal_spi_cpolarity_low;
         spicfg.datacapture = hal_spi_datacapture_2edge;
-        spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_nopull;
+        spicfg.gpio_cfg_flags = hal_spi_gpio_cfg_sckmosi_pulldown;
         spicfg.maxsizeofframe = 6;
         spicfg.datasize = hal_spi_datasize_8bit;
         
@@ -518,7 +550,7 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
 #endif
     else if(intitem->config.type == hal_spiencoder_typeAksIM2)
     {
-        static const uint8_t txframe_dummy_aksim2[6] = {0x00}; // TODO: check if 1 element of type uint64 is better
+        static const uint8_t txframe_dummy_aksim2[6] = {0x00};
         // Mux enabled
         hal_mux_enable(intitem->muxid, intitem->muxsel);
         
@@ -526,7 +558,7 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
         hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
         
         // SPI: set the sizeofframe for this transmission
-        hal_spi_set_sizeofframe(intitem->spiid, 1);
+        hal_spi_set_sizeofframe(intitem->spiid, 6);
         
         // SPI: set the isrtxframe
         hal_spi_set_isrtxframe(intitem->spiid, txframe_dummy_aksim2);
@@ -650,6 +682,30 @@ extern hal_result_t hal_spiencoder_read_start_t2(hal_spiencoder_t id, uint8_t re
     return(hal_res_OK);
 }
 
+static uint8_t CRC_SPI_97_64bit(uint64_t dw_InputData)
+{
+     uint8_t b_Index = 0;
+     uint8_t b_CRC = 0;
+     b_Index = (uint8_t)((dw_InputData >> 56u) & (uint64_t)0x000000FFu);
+     b_CRC = (uint8_t)((dw_InputData >> 48u) & (uint64_t)0x000000FFu);
+     b_Index = b_CRC ^ ab_CRC8_LUT[b_Index];
+     b_CRC = (uint8_t)((dw_InputData >> 40u) & (uint64_t)0x000000FFu);
+     b_Index = b_CRC ^ ab_CRC8_LUT[b_Index];
+     b_CRC = (uint8_t)((dw_InputData >> 32u) & (uint64_t)0x000000FFu);
+     b_Index = b_CRC ^ ab_CRC8_LUT[b_Index];
+     b_CRC = (uint8_t)((dw_InputData >> 24u) & (uint64_t)0x000000FFu);
+     b_Index = b_CRC ^ ab_CRC8_LUT[b_Index];
+     b_CRC = (uint8_t)((dw_InputData >> 16u) & (uint64_t)0x000000FFu);
+     b_Index = b_CRC ^ ab_CRC8_LUT[b_Index];
+     b_CRC = (uint8_t)((dw_InputData >> 8u) & (uint64_t)0x000000FFu);
+     b_Index = b_CRC ^ ab_CRC8_LUT[b_Index];
+     b_CRC = (uint8_t)(dw_InputData & (uint64_t)0x000000FFu);
+     b_Index = b_CRC ^ ab_CRC8_LUT[b_Index];
+     b_CRC = ab_CRC8_LUT[b_Index];
+     
+     return b_CRC; 
+}
+
 
 extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_diagnostic_t* diagn)
 {
@@ -720,7 +776,7 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
         //Everything 0xFF, SPI is not working
         if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF))
         { 
-            diagn->type = hal_spiencoder_diagnostic_type_flags;                
+            diagn->type = hal_spiencoder_diagnostic_type_flags;
             diagn->info.flags.tx_error = 1;
             return(hal_res_NOK_generic);
         }
@@ -740,7 +796,42 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
     {
         diagn->type = hal_spiencoder_diagnostic_type_none;
         
-        // TODO: Do some checks here...(multiturn, CRC, etc..)
+        // aksim2_status_crc description, they are 3 bits:
+        // 100 --> the position data is not valid
+        // 010 --> the position data is valid, but some operating conditions are close to limits.
+        // 001 --> Inverted CRC is invalid
+        diagn->info.aksim2_status_crc = 0;
+        
+        // check status bits
+        if(0x0 == intitem->status_bits || 0x1 == intitem->status_bits)
+        {
+            // Error - the position data is not valid
+            diagn->type = hal_spiencoder_diagnostic_type_aksim2_invalid_data;
+            diagn->info.aksim2_status_crc |= 0x04;
+        }    
+        else if(0x2 == intitem->status_bits)
+        {
+            // Warning - the position data is valid, but some operating conditions are close to limits
+            diagn->type = hal_spiencoder_diagnostic_type_aksim2_close_to_limits;
+            diagn->info.aksim2_status_crc |= 0x02;
+        }
+        
+        // check for CRC errors
+        uint64_t dw_CRCinputData = 0;
+        uint8_t calculated_crc = 0;
+        
+        dw_CRCinputData = ((uint64_t)intitem->rxframes[1][0] << 32) + ((uint64_t)intitem->rxframes[1][1] << 24) +
+                          ((uint64_t)intitem->rxframes[1][2] << 16) + ((uint64_t)intitem->rxframes[1][3] << 8) +
+                          ((uint64_t)intitem->rxframes[1][4]);
+        
+        calculated_crc = ~(CRC_SPI_97_64bit(dw_CRCinputData))& 0xFF; //inverted CRC
+        
+        if(calculated_crc != intitem->crc)
+        {
+            // Error - invalid crc
+            diagn->type = hal_spiencoder_diagnostic_type_aksim2_crc_error;
+            diagn->info.aksim2_status_crc |= 0x01;
+        }
         
         *pos = intitem->position;
     }
@@ -1222,7 +1313,15 @@ static void s_hal_spiencoder_onreceiv(void* p)
 #endif
     else if(intitem->config.type == hal_spiencoder_typeAksIM2)
     {
-        intitem->position = s_hal_spiencoder_frame2position_t5(intitem->rxframes[1]);
+        // parse the data received
+        hal_spiencoder_aksim2_data data;
+        s_hal_spiencoder_parse_data_aksim2(intitem->rxframes[1], &data);
+        
+        // save them into the internal item
+        intitem->multiturncounter = data.multiturncounter;
+        intitem->position = data.position;
+        intitem->status_bits = data.status_bits;
+        intitem->crc = data.crc;
     }
     else 
     {
@@ -1399,23 +1498,20 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t4(uint8_t* fra
 #endif
 
 // Formatting the result for encoder type 5 (AksIM2)
-static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t5(uint8_t* frame)
+static void s_hal_spiencoder_parse_data_aksim2(uint8_t* frame, hal_spiencoder_aksim2_data* data)
 {
     // Encoder position data structure
     // -------------------------------
-    // b47 : b32 Multiturn counter (if specified in part number) – Left aligned, MSB first. 
-    // b31 : b10 Encoder position + zero padding bits – Left aligned, MSB first. 
-    // b9 Error – If low, the position data is not valid. 
+    // b47 : b32 Multiturn counter (if specified in part number) ï¿½ Left aligned, MSB first. 
+    // b31 : b10 Encoder position + zero padding bits ï¿½ Left aligned, MSB first. 
+    // b9 Error ï¿½ If low, the position data is not valid. 
     // b8 Warning - If low, the position data is valid, but some operating conditions are close to limits. 
     // b7 : b0 Inverted CRC, 0x97 polynomial
     
-    uint32_t pos = 0;
-    //data.multiturncounter = (_databuffer[0] << 8) | _databuffer[1]; // TODO: check for the first bit (maybe it must be discarded)
-    pos = (frame[4] << 11) | (frame[5] << 3) | ((frame[6] & 0xe0) >> 5); // the last shift eliminates the non-position values (2) + zero padded bits (3)
-    //data.status.bits = (_databuffer[4] & 0x03);
-    
-    
-    return pos;
+    data->multiturncounter = (frame[0] << 8) | frame[1]; // TODO: check for the first bit (maybe it must be discarded)
+    data->position = (frame[2] << 11) | (frame[3] << 3) | ((frame[4] & 0xe0) >> 5); // the last shift eliminates the non-position values (2) + zero padded bits (3)
+    data->status_bits = (frame[4] & 0x03);
+    data->crc = frame[5];
 }
 
 #if !defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)

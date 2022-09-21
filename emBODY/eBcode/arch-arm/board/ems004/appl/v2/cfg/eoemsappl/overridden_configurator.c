@@ -133,7 +133,7 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
     static hal_result_t res;
     static uint8_t initted = 0;
     
-    if(!initted)
+    if(0 == counter)
     {
         // init spiencoder
         memmove(&cfg, &hal_spiencoder_cfg_default, sizeof(hal_spiencoder_cfg_default));
@@ -156,44 +156,39 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
         hal_spiencoder_init(hal_spiencoder1, &cfg);
         
         diag.type = hal_spiencoder_diagnostic_type_none;
-        initted = 1;
     }
-    else
+    else if(0 == (counter % 10))
     {
-        if(0 == counter % 1000)
-        {
-            // retrieve the reading
-            hal_spiencoder_position_t raw_value = {0};
-            hal_result_t r = hal_spiencoder_get_value2(hal_spiencoder1, &raw_value, &diag);
-            
-            // print value
-            char str[64] = {0};
-            if(hal_res_OK == r)
-            { 
-                #ifdef TEST_AEA3
-                    hal_spiencoder_position_t raw_value_shifted =  raw_value >> 1; // sensor return 16 bits --> only 14 are valid
-                    snprintf(str, sizeof(str), "%d, %d, %f", raw_value, raw_value_shifted, ((360.0 *  raw_value_shifted) / (1024.0*16)));  // (360*value)/(2^14)
-                #elifdef TEST_AEA
-                    hal_spiencoder_position_t raw_value_shifted =  (raw_value >> 6) & 0x0FFF; // sensor return 16 bits --> only 12 are valid
-                    snprintf(str, sizeof(str), "%d, %d, %f", raw_value, raw_value_shifted, ((360.0 *  raw_value_shifted) / (1024.0*4)));  // (360*value)/(2^14)
-                #elifdef TEST_AKSIM2
-                    snprintf(str, sizeof(str), "%d", raw_value); // it now prints only the position Value
-                #endif
-            }
-            else
-            {
-                snprintf(str, sizeof(str), "spiencoder error during hal_spiencoder_get_value2");
-            }
-            
-            hal_trace_puts(str);
-                    
-            // start reading
-            hal_spiencoder_read_start(hal_spiencoder1);
-            
-            counter = 0;
+        // retrieve the reading
+        hal_spiencoder_position_t raw_value = {0};
+        hal_result_t r = hal_spiencoder_get_value2(hal_spiencoder1, &raw_value, &diag);
+        
+        // print value
+        char str[64] = {0};
+        if(hal_res_OK == r)
+        { 
+            #ifdef TEST_AEA3
+                hal_spiencoder_position_t raw_value_shifted =  raw_value >> 1; // sensor return 16 bits --> only 14 are valid
+                snprintf(str, sizeof(str), "%d, %d, %f", raw_value, raw_value_shifted, ((360.0 *  raw_value_shifted) / (1024.0*16)));  // (360*value)/(2^14)
+            #elifdef TEST_AEA
+                hal_spiencoder_position_t raw_value_shifted =  (raw_value >> 6) & 0x0FFF; // sensor return 16 bits --> only 12 are valid
+                snprintf(str, sizeof(str), "%d, %d, %f", raw_value, raw_value_shifted, ((360.0 *  raw_value_shifted) / (1024.0*4)));  // (360*value)/(2^14)
+            #elifdef TEST_AKSIM2
+                snprintf(str, sizeof(str), "%d", raw_value); // it now prints only the position Value
+            #endif
         }
-        counter++;
+        else
+        {
+            snprintf(str, sizeof(str), "spiencoder error during hal_spiencoder_get_value2");
+        }
+        
+        hal_trace_puts(str);
+                
+        // start reading
+        hal_spiencoder_read_start(hal_spiencoder1);
+            
     }
+    counter++;
 }
 #endif
 

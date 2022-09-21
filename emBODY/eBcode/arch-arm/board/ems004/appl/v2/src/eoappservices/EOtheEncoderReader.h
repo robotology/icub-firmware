@@ -74,10 +74,14 @@ typedef enum
     encreader_err_SPICHAINOF2_GENERIC   = 7,
     encreader_err_SPICHAINOF3_GENERIC   = 8,
     encreader_err_AMO_GENERIC           = 9,
-    encreader_err_PSC_GENERIC           = 10,  
-    encreader_err_POS_GENERIC           = 11,    
-    encreader_err_GENERIC               = 14,    
-    encreader_err_NOTCONNECTED          = 15 /* this error happens when the encoder type is none or encoder is not local, for example it is connected to 2foc board */
+    encreader_err_PSC_GENERIC           = 10,
+    encreader_err_POS_GENERIC           = 11,
+    encreader_err_GENERIC               = 14,
+    encreader_err_NOTCONNECTED          = 15, /* this error happens when the encoder type is none or encoder is not local, for example it is connected to 2foc board */
+    encreader_err_AKSIM2_INVALID_DATA   = 16,
+    encreader_err_AKSIM2_CLOSE_TO_LIMITS= 17,
+    encreader_err_AKSIM2_CRC_ERROR      = 18
+
 } eOencoderreader_errortype_t;
 
 typedef struct

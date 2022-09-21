@@ -671,10 +671,10 @@ static void s_hl_spi_fill_gpio_init_altf(   hl_spi_t id, hl_spi_mode_t spimode,
         memcpy(misoinit, &s_hl_spi_miso_master_gpio_init, sizeof(hl_gpio_init_t));
         memcpy(mosiinit, &s_hl_spi_sckmosi_master_gpio_init, sizeof(hl_gpio_init_t));
         
-        if(gpio_mask == 1) // NOPULL is used for AEA3
+        if(gpio_mask == 1) // hal_spi_gpio_cfg_sckmosi_pulldown is used for both AEA3 and AKSIM2
         {
-            sckinit->mode.gpio_pupd = GPIO_PuPd_NOPULL; 
-        }        
+            sckinit->mode.gpio_pupd = GPIO_PuPd_DOWN; 
+        }
     }
     else
     {
