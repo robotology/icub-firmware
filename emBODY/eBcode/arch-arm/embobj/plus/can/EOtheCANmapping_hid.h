@@ -60,6 +60,7 @@ enum
     eocanmap_pscs_maxnumberof           = 1,
     eocanmap_poses_maxnumberof          = 1,
     eocanmap_fts_maxnumberof            = 4,
+    eocanmap_batteries_maxnumberof      = 1,
     eocanmap_skins_maxnumberof          = 2     // we may have up to 2 skins on an eth board
 };
 
@@ -76,14 +77,14 @@ enum
     eocanmap_inertial_boards_maxnumberof      = 1,
     eocanmap_inertial3_boards_maxnumberof     = 1,
     eocanmap_psc_boards_maxnumberof           = 3,    // we use exactly three psc boards to have the 6 values of the psc entity
-    eocanmap_pos_boards_maxnumberof           = 3,    // we use only 1 pmc board but we may use 3 psc boards
-    eocanmap_ft_boards_maxnumberof            = 1,    // we use uonly 1 board (strain or strain2) to represent a single ft index. we have 4 indices at max, but each index goes on a different board.
+    eocanmap_pos_boards_maxnumberof           = 3,    // we use only 1 pmc / mtb4fap boards but we may use 3 psc boards
+    eocanmap_ft_boards_maxnumberof            = 1,    // we use only 1 board (strain or strain2) to represent a single ft index. we have 4 indices at max, but each index goes on a different board.
+    eocanmap_batteries_boards_maxnumberof     = 1,
     eocanmap_skin_boards_maxnumberof          = 8     // we can use up to 8 can mtb/mtb4 boards to represent a single sk-skin index. we can increase this at cost of some ram
 };
 
-#warning VEDERE SE eocanmap_ft_boards_maxnumberof deve essere 1 oppure 4
 
-enum { eocanmap_entities_maxnumberof = 11 };
+enum { eocanmap_entities_maxnumberof = 12 };
 
 extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en);
 

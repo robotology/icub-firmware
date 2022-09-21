@@ -421,7 +421,7 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
     //   hence: hence: numofcanlocations = 7, maxnumofentities = 2 (as skin entity)
     // - for analog-ft we have up to 4 entities each one located on a different board (strain or strain2).
     //   hence, numofcanlocations = [1, 2, 3, 4] and maxnumofentities = 4.
-    #warning marco.accame on 4 marzo 2022: to be clarified ...
+    // #warning marco.accame on 4 marzo 2022: to be clarified ...
     uint8_t numofcanlocations = eo_constvector_Size(vectorof_entitydescriptors);
     uint8_t maxnumofentities = eocanmap_maxINDEX(ep, entity);
     
@@ -739,10 +739,11 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
         return eobool_false;
     }
     
-    // epen: the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-pos-skin
+    // epen: the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-pos-ft-bs-skin
     // brd: 
     static const uint32_t tableB[] = // [epen]
     {
+<<<<<<< HEAD
         (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),         // joint      //TODO : check here for amcbldc
         (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),         // motor
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // strain
@@ -756,6 +757,20 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // ft
         (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc) |       
         (1 << eobrd_cantype_mtb4c)                                                              // skin																	// skin
+=======
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),                                     // joint
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),                                     // motor
+        (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                                                         // strain
+        (1 << eobrd_cantype_mais),                                                                                          // mais
+        (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_mtb4c),                              // temperature
+        (1 << eobrd_cantype_mtb),                                                                                           // inertial
+        (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_rfe) | (1 << eobrd_cantype_mtb4c),   // inertial3
+        (1 << eobrd_cantype_psc),                                                                                           // psc
+        (1 << eobrd_cantype_mtb4fap) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_psc),                                 // pos
+        (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                                                         // ft
+        (1 << eobrd_cantype_bms),                                                                                           // bs
+        (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc) | (1 << eobrd_cantype_mtb4c)        // skin																	// skin
+>>>>>>> fc5c026da (mc4plus: changes to pos service to support mtb4fap board)
     }; EO_VERIFYsizeof(tableB, sizeof(const uint32_t)*(eocanmap_entities_maxnumberof))
     
     // it is safe to use brd because it is can hence it is < 32
@@ -779,13 +794,13 @@ extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en)
     
     static const uint8_t pos[s0][s1] = // pos[eoprot_endpoints_numberof][eoprot_entities_maxnumberofsupported] = 
     {
-        {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf},   // ep->management [none, ...]
-        {0,     1, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf},   // ep->mc [joi, mot, none, ...]
-        {2,     3,   4,   5,   6,   7,   8,   9 , 11},   // ep->as [str, mai, tem, ine, ine3, psc, pos, ft, bs]
-        {10,  0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf}    // ep->sk [sk, none]
+        {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf},     // ep->management [none, ...]
+        {0,     1, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf},     // ep->mc [joi, mot, none, ...]
+        {2,     3,   4,   5,   6,   7,   8,   9 , 10},      // ep->as [str, mai, tem, ine, ine3, psc, pos, ft, bs]
+        {11,  0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf , 0xf}      // ep->sk [sk, none]
     }; EO_VERIFYsizeof(pos, sizeof(const uint8_t)*(eoprot_endpoints_numberof)*(eoprot_entities_maxnumberofsupported))
 
-    // the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-skin
+    // the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-pos-ft-bs-skin
     if((ep >= s0) || (en >= (s1)))
     {
         return 0x0f;
@@ -802,13 +817,13 @@ extern uint8_t eocanmap_maxINDEX(eOprotEndpoint_t ep, eOprotEntity_t en)
         return 0;
     } 
     
-    static const uint8_t numI[] = // [epen] the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-pmc-skin
+    static const uint8_t numI[] = // [epen] the order is joint-motor-strain-mais-temperature-inertial-inertial3-psc-pos-ft-bs-skin
     {
         eocanmap_joints_maxnumberof, eocanmap_motors_maxnumberof, 
         
         eocanmap_strains_maxnumberof, eocanmap_maises_maxnumberof, eocanmap_temperatures_maxnumberof, 
         eocanmap_inertials_maxnumberof, eocanmap_inertials3_maxnumberof, eocanmap_pscs_maxnumberof, 
-        eocanmap_poses_maxnumberof, eocanmap_fts_maxnumberof,
+        eocanmap_poses_maxnumberof, eocanmap_fts_maxnumberof, eocanmap_batteries_maxnumberof,
         
         eocanmap_skins_maxnumberof
     }; EO_VERIFYsizeof(numI, sizeof(const uint8_t)*(eocanmap_entities_maxnumberof))
@@ -831,7 +846,7 @@ extern uint8_t eocanmap_maxBOARDnumber(eOprotEndpoint_t ep, eOprotEntity_t en)
         
         eocanmap_strain_boards_maxnumberof, eocanmap_mais_boards_maxnumberof, eocanmap_temperature_boards_maxnumberof, 
         eocanmap_inertial_boards_maxnumberof, eocanmap_inertial3_boards_maxnumberof, eocanmap_psc_boards_maxnumberof, 
-        eocanmap_pos_boards_maxnumberof, eocanmap_ft_boards_maxnumberof,
+        eocanmap_pos_boards_maxnumberof, eocanmap_ft_boards_maxnumberof, eocanmap_batteries_boards_maxnumberof,
         
         eocanmap_skin_boards_maxnumberof
     }; EO_VERIFYsizeof(numB, sizeof(const uint8_t)*(eocanmap_entities_maxnumberof))

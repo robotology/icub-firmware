@@ -1103,7 +1103,7 @@ static eObool_t s_eo_psc_isID32relevant(uint32_t id32)
 
 static void s_eo_psc_boards_configure(EOthePSC *p)
 {
-    icubCanProto_POS_CONFIG_t posconfig; // = {0};
+    icubCanProto_POS_CONFIG_t posconfig = {0};
     
     p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__POS_CONFIG_SET;
@@ -1113,6 +1113,7 @@ static void s_eo_psc_boards_configure(EOthePSC *p)
     // we have the can location either in the EOtheCANmapping object or in p->service.servconfig
     // we use this latter
     posconfig.type = icubCanProto_pos_decideg;
+    posconfig.id = 0; // we explicity set id = 0 even if the psc board does not manage this field
     posconfig.setting.decideg[0].enabled =          posconfig.setting.decideg[1].enabled = 1;
     posconfig.setting.decideg[0].invertdirection =  posconfig.setting.decideg[1].invertdirection = 0;
     posconfig.setting.decideg[0].zero =             posconfig.setting.decideg[1].zero = 0;

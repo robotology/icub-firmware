@@ -357,7 +357,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__POS_CONFIG_SET(eOcanprot
     s_former_POL_AS_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_AS_CMD__POS_CONFIG_SET);    
 
     icubCanProto_POS_CONFIG_t *cfg = (icubCanProto_POS_CONFIG_t*)descriptor->cmd.value;
-    frame->data[1] = cfg->type & 0xff; 
+    frame->data[1] = (cfg->type & 0xf) | ((cfg->id & 0xf) << 4); 
     if(icubCanProto_pos_decideg == cfg->type)
     {
         frame->data[1] = icubCanProto_pos_decideg;

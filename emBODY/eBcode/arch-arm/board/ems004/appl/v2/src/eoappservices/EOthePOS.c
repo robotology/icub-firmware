@@ -255,10 +255,6 @@ static EOthePOS s_eo_thepos =
 static const char s_eobj_ownname[] = "EOthePOS";
 
 
-
-
-#define REM_WDT
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -394,8 +390,34 @@ extern eOresult_t eo_pos_Verify(EOthePOS *p, const eOmn_serv_configuration_t * s
     if(eobool_true == p->service.active)
     {   // if already active: we dont deactivate-reactivate. we just check that the running service is ok with the new servcfg 
         return s_eo_pos_OnServiceAlreadyActive(p, servcfg, onverify);
-    }     
- 
+    }  
+
+
+    // verify that the config is ok. for instance we can have at max one type of boardtype     
+    eObrd_cantype_t boardtype = servcfg->data.as.pos.config.boardconfig[0].boardinfo.type;
+    // only pmc and psc and mtb4fap can be used
+    eObool_t servcfgisOK = eocanmap_BRDisCompatible(boardtype, eoprot_endpoint_analogsensors, eoprot_entity_as_pos);
+    
+    for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
+    {
+        if(boardtype != servcfg->data.as.pos.config.boardconfig[i].boardinfo.type)
+        {
+            servcfgisOK = eobool_false;
+        }         
+    }
+   
+    if(eobool_false == servcfgisOK) 
+    {       
+        p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        }          
+        return(eores_NOK_generic); 
+    }  
+
+    // ok, start verifying     
     
     p->service.state = eomn_serv_state_verifying;   
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_pos, p->service.state);
@@ -409,17 +431,16 @@ extern eOresult_t eo_pos_Verify(EOthePOS *p, const eOmn_serv_configuration_t * s
 
     eOcandiscovery_target_t trgt = {0};
      
-    //#warning TODO: adapt to the case of multiple can boards
-    trgt.info.type = eobrd_cantype_pmc; // servcfg->data.as.pos.boardsInfo.canprop[0].type;
-    trgt.info.protocol.major = servcfg->data.as.pos.version.protocol.major; 
-    trgt.info.protocol.minor = servcfg->data.as.pos.version.protocol.minor;
-    trgt.info.firmware.major = servcfg->data.as.pos.version.firmware.major; 
-    trgt.info.firmware.minor = servcfg->data.as.pos.version.firmware.minor;
-    trgt.info.firmware.build = servcfg->data.as.pos.version.firmware.build;  
+    //#warning TODO: in case we can use more than one board type, .... modify for its case
+    trgt.info.type = servcfg->data.as.pos.config.boardconfig[0].boardinfo.type;
+    trgt.info.protocol.major = servcfg->data.as.pos.config.boardconfig[0].boardinfo.protocol.major; 
+    trgt.info.protocol.minor = servcfg->data.as.pos.config.boardconfig[0].boardinfo.protocol.minor;
+    trgt.info.firmware.major = servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.major; 
+    trgt.info.firmware.minor = servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.minor;
+    trgt.info.firmware.build = servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.build;  
     for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
-        trgt.canmap[servcfg->data.as.pos.boardInfo.canloc[i].port] |= (0x0001 << servcfg->data.as.pos.boardInfo.canloc[i].addr);
-        //trgt.canmap[servcfg->data.as.pos.boardsInfo.canprop[i].location.port] |= (0x0001 << servcfg->data.as.pos.boardsInfo.canprop[i].location.addr); 
+        trgt.canmap[servcfg->data.as.pos.config.boardconfig[i].canloc.port] |= (0x0001 << servcfg->data.as.pos.config.boardconfig[i].canloc.addr);
     }
 
     // force a cleaned discoverytargets before we add the target
@@ -551,12 +572,12 @@ extern eOresult_t eo_pos_Activate(EOthePOS *p, const eOmn_serv_configuration_t *
     for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
         eObrd_canproperties_t prop = {0};
-        prop.type = eobrd_cantype_pmc;
-        prop.location.port = servcfg->data.as.pos.boardInfo.canloc[i].port;
-        prop.location.addr = servcfg->data.as.pos.boardInfo.canloc[i].addr;
+        prop.type = servcfg->data.as.pos.config.boardconfig[i].boardinfo.type;
+        prop.location.port = servcfg->data.as.pos.config.boardconfig[i].canloc.port;
+        prop.location.addr = servcfg->data.as.pos.config.boardconfig[i].canloc.addr;
         prop.location.insideindex = eobrd_caninsideindex_none;
-        prop.requiredprotocol.major = servcfg->data.as.pos.version.protocol.major;
-        prop.requiredprotocol.minor = servcfg->data.as.pos.version.protocol.minor;
+        prop.requiredprotocol.major = servcfg->data.as.pos.config.boardconfig[i].boardinfo.protocol.major;
+        prop.requiredprotocol.minor = servcfg->data.as.pos.config.boardconfig[i].boardinfo.protocol.minor;
         
         eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
     }
@@ -566,8 +587,8 @@ extern eOresult_t eo_pos_Activate(EOthePOS *p, const eOmn_serv_configuration_t *
     for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
         eOcanmap_entitydescriptor_t des = {0};
-        des.location.port = servcfg->data.as.pos.boardInfo.canloc[i].port;
-        des.location.addr = servcfg->data.as.pos.boardInfo.canloc[i].addr;
+        des.location.port = servcfg->data.as.pos.config.boardconfig[i].canloc.port;
+        des.location.addr = servcfg->data.as.pos.config.boardconfig[i].canloc.addr;
         des.location.insideindex = eobrd_caninsideindex_none;
         des.index = entindex00; // we have only one pos        
         
@@ -990,9 +1011,9 @@ static eOresult_t s_eo_pos_onstop_search4canboards(void *par, EOtheCANdiscovery2
     
     p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.sourceaddress    = 0;
-    p->diagnostics.errorDescriptor.par16            = (servcfg->data.as.pos.boardInfo.canloc[0].addr) | (servcfg->data.as.pos.boardInfo.canloc[0].port << 8);
-    p->diagnostics.errorDescriptor.par64            = (servcfg->data.as.pos.version.firmware.minor << 0) | (servcfg->data.as.pos.version.firmware.major << 8) |
-                                                      (servcfg->data.as.pos.version.protocol.minor << 16) | (servcfg->data.as.pos.version.protocol.major << 24);    
+    p->diagnostics.errorDescriptor.par16            = (servcfg->data.as.pos.config.boardconfig[0].canloc.addr) | (servcfg->data.as.pos.config.boardconfig[0].canloc.port << 8);
+    p->diagnostics.errorDescriptor.par64            = (servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.minor << 0) | (servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.major << 8) |
+                                                      (servcfg->data.as.pos.config.boardconfig[0].boardinfo.protocol.minor << 16) | (servcfg->data.as.pos.config.boardconfig[0].boardinfo.protocol.major << 24);    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     eo_action_SetCallback(act, s_eo_pos_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
@@ -1099,29 +1120,48 @@ static eObool_t s_eo_pos_isID32relevant(uint32_t id32)
 
 static void s_eo_pos_boards_configure(EOthePOS *p)
 {
-    icubCanProto_POS_CONFIG_t posconfig; // = {0};
+    icubCanProto_POS_CONFIG_t posconfig = {0};
     
     p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__POS_CONFIG_SET;
     p->sharedcan.command.value = &posconfig;
     
-    // now we send a command to each board. 
+    // now we send to each board the configuration of the sensors to read where we specify:
+    // id of the sensor.the label associated to it, the type of sensor it is, its calibration
+    // we get these values inside service.servconfig.data.as.pos.config.boardconfig[i]     
     // we have the can location either in the EOtheCANmapping object or in p->service.servconfig
     // we use this latter
-    posconfig.type = icubCanProto_pos_decideg;
-    posconfig.setting.decideg[0].enabled =          posconfig.setting.decideg[1].enabled = 1;
-    posconfig.setting.decideg[0].invertdirection =  posconfig.setting.decideg[1].invertdirection = 0;
-    posconfig.setting.decideg[0].zero =             posconfig.setting.decideg[1].zero = 0;
-    posconfig.setting.decideg[0].rotation =         posconfig.setting.decideg[1].rotation = icubCanProto_pos_rot_none;
     
     for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
-        posconfig.setting.decideg[0].label = 2*i;
-        posconfig.setting.decideg[1].label = 2*i+1;
+        eObrd_canlocation_t loc = p->service.servconfig.data.as.pos.config.boardconfig[i].canloc;
         
-        // we send a config with no compensation but with labels already fixed for the position of the pos array.         
-        eObrd_canlocation_t loc = p->service.servconfig.data.as.pos.boardInfo.canloc[i];        
+        // at first we send a reset of every sensor in the board
+        // we do that by setting ID = all and type = NONE.
+        posconfig.type = icubCanProto_pos_none;
+        posconfig.id = icubCanProto_pos_chipid_all;
+        
         eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);
+        
+        // then we configure every sensor in the board. 
+        // we use one message for each sensor, so we set decideg[1].enabled = 0
+        posconfig.setting.decideg[1].enabled = 0;
+        for(uint8_t s=0; s<eOas_pos_sensorsinboard_maxnumber; s++)
+        {
+            eoas_pos_SensorConfig_t *sc = &(p->service.servconfig.data.as.pos.config.boardconfig[i].sensors[s]);
+            if(1 == sc->enabled)
+            {
+                posconfig.id = sc->id;
+                posconfig.type = sc->type;
+                posconfig.setting.decideg[0].enabled = 1;
+                posconfig.setting.decideg[0].invertdirection = sc->invertdirection;
+                posconfig.setting.decideg[0].rotation = sc->rotation;
+                posconfig.setting.decideg[0].label = sc->label;
+                posconfig.setting.decideg[0].zero = sc->zero;
+                
+                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);
+            }           
+        }        
     }    
 }
 
@@ -1141,7 +1181,7 @@ static void s_eo_pos_presenceofcanboards_build(EOthePOS *p)
   
     for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
-        eObrd_canlocation_t loc = p->service.servconfig.data.as.pos.boardInfo.canloc[i]; 
+        eObrd_canlocation_t loc = p->service.servconfig.data.as.pos.config.boardconfig[i].canloc; 
         eo_common_hlfword_bitset(&p->not_heardof_target[loc.port], loc.addr);
     }    
 }
@@ -1189,8 +1229,7 @@ static void s_eo_pos_presenceofcanboards_tick(EOthePOS *p)
 }
 
 static eOresult_t s_eo_pos_OnServiceAlreadyActive(EOthePOS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify)
-{    
-    
+{        
     // it means that some other object has activated the pos. it can be either EOtheMotionController or EOtheServices upon request from embObjPOS
     // ... we dont want to interfere, thus we cannot call eo_pos_Deactivate().  
     // we just verify that the eOmn_serv_configuration_t* in argument is the same of (or compatible with) the one already used for activation.
@@ -1200,42 +1239,41 @@ static eOresult_t s_eo_pos_OnServiceAlreadyActive(EOthePOS *p, const eOmn_serv_c
     eObool_t iscompatible = eobool_true;
     
     for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
-    {
-    
-        if(servcfg->data.as.pos.boardInfo.canloc[i].port != p->service.servconfig.data.as.pos.boardInfo.canloc[i].port)
+    {    
+        if(servcfg->data.as.pos.config.boardconfig[i].canloc.port != p->service.servconfig.data.as.pos.config.boardconfig[i].canloc.port)
         {
             iscompatible = eobool_false;
         }
-        if(servcfg->data.as.pos.boardInfo.canloc[i].addr != p->service.servconfig.data.as.pos.boardInfo.canloc[i].addr)
+        if(servcfg->data.as.pos.config.boardconfig[i].canloc.addr != p->service.servconfig.data.as.pos.config.boardconfig[i].canloc.addr)
         {
             iscompatible = eobool_false;
         } 
     }
 
-    if((servcfg->data.as.pos.version.protocol.major != 0) || (servcfg->data.as.pos.version.protocol.minor != 0))
+    if((servcfg->data.as.pos.config.boardconfig[0].boardinfo.protocol.major != 0) || (servcfg->data.as.pos.config.boardconfig[0].boardinfo.protocol.minor != 0))
     {
         // check also the protocol
-        if(servcfg->data.as.pos.version.protocol.major != p->service.servconfig.data.as.pos.version.protocol.major)
+        if(servcfg->data.as.pos.config.boardconfig[0].boardinfo.protocol.major != p->service.servconfig.data.as.pos.config.boardconfig[0].boardinfo.protocol.major)
         {
             iscompatible = eobool_false;
         }
-        if(servcfg->data.as.pos.version.protocol.minor != p->service.servconfig.data.as.pos.version.protocol.minor)
+        if(servcfg->data.as.pos.config.boardconfig[0].boardinfo.protocol.minor != p->service.servconfig.data.as.pos.config.boardconfig[0].boardinfo.protocol.minor)
         {
             iscompatible = eobool_false;
         }
     }
-    if((servcfg->data.as.pos.version.firmware.major != 0) || (servcfg->data.as.pos.version.firmware.minor != 0)  || (servcfg->data.as.pos.version.firmware.build != 0))
+    if((servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.major != 0) || (servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.minor != 0)  || (servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.build != 0))
     {
         // check also the firmaware
-        if(servcfg->data.as.pos.version.firmware.major != p->service.servconfig.data.as.pos.version.firmware.major)
+        if(servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.major != p->service.servconfig.data.as.pos.config.boardconfig[0].boardinfo.firmware.major)
         {
             iscompatible = eobool_false;
         }
-        if(servcfg->data.as.pos.version.firmware.minor != p->service.servconfig.data.as.pos.version.firmware.minor)
+        if(servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.minor != p->service.servconfig.data.as.pos.config.boardconfig[0].boardinfo.firmware.minor)
         {
             iscompatible = eobool_false;
         }
-        if(servcfg->data.as.pos.version.firmware.build != p->service.servconfig.data.as.pos.version.firmware.build)
+        if(servcfg->data.as.pos.config.boardconfig[0].boardinfo.firmware.build != p->service.servconfig.data.as.pos.config.boardconfig[0].boardinfo.firmware.build)
         {
             iscompatible = eobool_false;
         }
