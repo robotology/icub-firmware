@@ -49,7 +49,10 @@
 typedef struct
 {
     uint32_t    mode;
-    uint8_t    poles;
+    uint16_t    hall_offset;
+    //uint16_t    sector_offset;
+    uint8_t     num_polar_couples;
+    uint8_t     swapBC;
 } pwmConfTypeDef;
 
 // we keep int32_t even if the adc gets only int16_t values
@@ -68,12 +71,15 @@ typedef struct
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
 extern HAL_StatusTypeDef hallInit(void);
+HAL_StatusTypeDef hallDeinit(void);
+HAL_StatusTypeDef hallConfig(uint8_t swapBC, uint16_t pwm_hall_offset);
 extern int32_t hallGetCounter(void);
 extern void hallSetCounter(int32_t count);
 extern uint16_t hallGetAngle(void);
 extern uint16_t hallGetStatus(void);
 
 extern HAL_StatusTypeDef pwmInit(void);
+extern HAL_StatusTypeDef pwmDeinit(void);
 extern void pwmSleep(FunctionalState enable);
 extern void pwmReset(FunctionalState enable);
 extern HAL_StatusTypeDef pwmResetFault(void);

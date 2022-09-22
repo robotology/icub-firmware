@@ -138,6 +138,14 @@ namespace embot { namespace hw { namespace motor {
     static PrivateData s_privatedata;
     
     result_t s_hw_init(MOTOR h);
+    result_t s_hw_deinit(MOTOR h);
+    result_t s_hw_configure(
+        MOTOR h,
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset);
     Position s_hw_getencoder(MOTOR h);
     Position s_hw_gethallcounter(MOTOR h);    
     result_t s_hw_setpwm(MOTOR h, Pwm v);
@@ -177,6 +185,23 @@ namespace embot { namespace hw { namespace motor {
         return resNOK;
     }    
     
+    result_t config(
+        MOTOR h,         
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset)
+    {
+        return s_hw_configure(h,
+            enc_resolution, 
+            pwm_num_polar_couples, 
+            pwm_has_hall_sens,
+            pwm_swapBC,
+            pwm_hall_offset);
+        
+        return resOK;
+    }
     
     result_t init(MOTOR h, const Config &config)
     {
@@ -187,7 +212,8 @@ namespace embot { namespace hw { namespace motor {
         
         if(true == initialised(h))
         {
-            return resOK;
+            s_hw_deinit(h);
+            //return resOK;
         }
                 
         std::uint8_t index = embot::core::tointegral(h);
@@ -360,34 +386,45 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_init(MOTOR h)
     {
-        // step 1: what cube mx does
-        MX_ADC1_Init();
-        MX_ADC2_Init();
-        
-        MX_TIM1_Init();
-        MX_TIM3_Init();
-        MX_TIM2_Init();
-        MX_CORDIC_Init();
-        MX_FMAC_Init();
-        MX_CRC_Init();   
-
-        // step 2: what giorgio zini does
+        // motor+sensors configuration
         memset(&MainConf, 0, sizeof(MainConf));
-        
-        analogInit();
-        pwmInit(); // pwmInit() shall be called before encoderInit() as the latter uses specific PWM quantities
-        encoderInit();
-        hallInit();
 
+        analogInit();  
+        encoderInit(); 
+        hallInit();    
+        pwmInit();
 
-        HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
-        HAL_Delay(10); 
-
-
-        // ok, we are now ready to use the driver
-        // or not. we should test it
-        
         return resOK; 
+    }
+    
+    result_t s_hw_deinit(MOTOR h)
+    {
+        pwmDeinit();
+        analogDeinit();
+        encoderDeinit();
+        hallDeinit();
+        
+        return resOK;
+    }
+    
+    result_t s_hw_configure(
+        MOTOR h,
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset)
+    {
+        result_t res = resOK;
+        
+        s_hw_deinit(h);
+        
+        s_hw_init(h);
+        
+        if (HAL_OK != encoderConfig(enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
+        if (HAL_OK != hallConfig(pwm_swapBC, pwm_hall_offset)) res = resNOK;
+      
+        return res; 
     }
     
     Position s_hw_getencoder(MOTOR h)
@@ -418,6 +455,7 @@ namespace embot { namespace hw { namespace motor {
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
     {        
         pwmSet(u, v, w);
+        
         return resOK;
     }
     

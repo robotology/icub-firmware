@@ -730,7 +730,22 @@ namespace embot { namespace hw { namespace motor {
   
     };
     
-    void BSP::init(embot::hw::MOTOR h) const {}
+    void BSP::init(embot::hw::MOTOR h) const {
+    // step 1: what cube mx does
+        MX_ADC1_Init();
+        MX_ADC2_Init();
+        
+        MX_TIM1_Init();
+        MX_TIM3_Init();
+        MX_TIM2_Init();
+        MX_CORDIC_Init();
+        MX_FMAC_Init();
+        MX_CRC_Init();   
+        
+        HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
+        HAL_Delay(10); 
+    
+    }
         
     #else
         #error embot::hw::motor::thebsp must be defined    

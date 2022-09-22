@@ -304,12 +304,7 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     embot::hw::motor::setCallbackOnCurrents(embot::hw::MOTOR::one, Impl::onCurrents_FOC_innerloop, this);
     
     CAN_ID_AMC = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    
-    // init motor configuration parameters from hal
-    // InitConfParams.motorconfig.pole_pairs = MainConf.pwm.poles;
-    //InitConfParams.motorconfig.has_hall_sens...
-    //auto todo... = MainConf.encoder.nsteps = 16000;  TODO: fix (this values depends on pole_pairs and actually it is missing in mbd)
-    
+        
     initted = true;
     return initted;
 }
@@ -398,9 +393,6 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     
     AMC_BLDC_step_Time();
     
-    
-    
-
     // if there an output is available, send it to the CAN Netowork
     for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++)
     {
@@ -417,7 +409,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     
     // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
     // TODO: We should perform the following update inside the architectural model after a SET_MOTOR_CONFIG message has been received
-    MainConf.pwm.poles = AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
+    //MainConf.pwm.num_polar_couples = AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
     
     measureTick->stop();
     

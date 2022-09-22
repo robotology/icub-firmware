@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 4.67
+// Model version                  : 4.74
 // Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep  1 10:27:31 2022
+// C/C++ source code generated on : Thu Sep 15 11:03:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -68,6 +68,7 @@ static void SupervisorFSM_RX_Voltage(void);
 // Forward declaration for local functions
 static ControlModes SupervisorFSM_RX_convert(MCControlModes mccontrolmode);
 static void SupervisorFSM_formatMotorConfig(const BUS_MESSAGES_RX *Selector2);
+static void SupervisorF_hardwareConfigMotor(void);
 
 // Forward declaration for local functions
 static boolean_T SupervisorFSM_isBoardConfigured(void);
@@ -1040,6 +1041,14 @@ static void SupervisorFSM_formatMotorConfig(const BUS_MESSAGES_RX *Selector2)
     Selector2->motor_config.enable_verbosity;
 }
 
+// Function for Chart: '<S1>/CAN Event Dispatcher'
+static void SupervisorF_hardwareConfigMotor(void)
+{
+  rtw_configMotor(SupervisorFSM_RX_B.motorConfig.rotor_encoder_resolution,
+                  SupervisorFSM_RX_B.motorConfig.pole_pairs, static_cast<uint8_T>
+                  (SupervisorFSM_RX_B.motorConfig.has_hall_sens), 1U, 1U);
+}
+
 // System initialize for function-call system: '<Root>/CAN Message Handler'
 void Supervis_CANMessageHandler_Init(void)
 {
@@ -1162,6 +1171,7 @@ void SupervisorFSM_CANMessageHandler(void)
       } else if (SupervisorFSM_RX_rtu_StatusRx->
                  status[SupervisorFSM_RX_B.messageIndex - 1].motor_config) {
         SupervisorFSM_formatMotorConfig(&Selector2);
+        SupervisorF_hardwareConfigMotor();
       } else if (SupervisorFSM_RX_rtu_StatusRx->
                  status[SupervisorFSM_RX_B.messageIndex - 1].desired_targets) {
         SupervisorFSM_RX_B.newSetpoint =
@@ -1233,6 +1243,7 @@ void SupervisorFSM_CANMessageHandler(void)
       } else if (SupervisorFSM_RX_rtu_StatusRx->
                  status[SupervisorFSM_RX_B.messageIndex - 1].motor_config) {
         SupervisorFSM_formatMotorConfig(&Selector2);
+        SupervisorF_hardwareConfigMotor();
       } else if (SupervisorFSM_RX_rtu_StatusRx->
                  status[SupervisorFSM_RX_B.messageIndex - 1].desired_targets) {
         SupervisorFSM_RX_B.newSetpoint =

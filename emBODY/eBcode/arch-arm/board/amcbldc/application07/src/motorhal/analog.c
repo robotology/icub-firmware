@@ -443,6 +443,9 @@ int32_t analogSetOffsetIph3(int32_t offs)
  * @param   
  * @return  
  */
+
+#undef MainConf
+
 HAL_StatusTypeDef analogInit(void)
 {
 	HAL_StatusTypeDef result = HAL_ERROR;
@@ -500,6 +503,18 @@ HAL_StatusTypeDef analogInit(void)
 		}
 	}
 	return result;
+}
+
+HAL_StatusTypeDef analogDeinit(void)
+{
+    /* Stop any ADC operation */
+    HAL_ADC_Stop_DMA(&hadc1);
+    HAL_ADC_Stop_DMA(&hadc2);
+    
+    /* uncalibrate ADCs */
+    MainConf.analog.cinOffs = 0;
+    
+    return HAL_OK;
 }
 
 #if defined(HALCONFIG_DONTUSE_TESTS)
