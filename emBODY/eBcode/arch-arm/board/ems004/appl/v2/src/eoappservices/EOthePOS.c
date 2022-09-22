@@ -600,6 +600,13 @@ extern eOresult_t eo_pos_Activate(EOthePOS *p, const eOmn_serv_configuration_t *
     
     // load the entity 
     eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_pos, p->sharedcan.entitydescriptor);   
+    
+    // i make sure that the status is cleared
+    
+    EOarray *array = (EOarray*)&p->pos->status.arrayofdata;
+    eo_array_Reset(array);
+    eo_array_Resize(array, eo_array_Capacity(array));
+        
 
     #warning TBD: non preparo la mappa, configuro le board
     // build the maps that can translate a received can message into the correct place of the six values.
