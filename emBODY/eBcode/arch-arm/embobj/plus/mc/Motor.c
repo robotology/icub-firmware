@@ -293,9 +293,6 @@ void Motor_init(Motor* o) //
     //o->outOfLimitsSignaled = FALSE;
 }
 
-// TODO: Fix
-//#define DEBUG_workaround_amcbldc
-
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
 {
     // const init
@@ -1009,15 +1006,6 @@ void Motor_actuate(Motor* motor, uint8_t N) //
 {
     if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        // TODO: Fix. Temporary workaround!
-        #ifdef DEBUG_workaround_amcbldc
-        // To be sure that amc_bldc/2foc can process all sent messages, we are sending 1 setpoint every 2ms
-        static uint8_t cnt = 0;
-        if((++cnt % 2) == 1)
-        {
-            return;
-        }
-        #endif
         
         int16_t output[MAX_JOINTS_PER_BOARD] = {0};
     

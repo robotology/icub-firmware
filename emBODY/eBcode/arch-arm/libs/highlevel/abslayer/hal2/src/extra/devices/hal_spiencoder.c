@@ -1508,7 +1508,7 @@ static void s_hal_spiencoder_parse_data_aksim2(uint8_t* frame, hal_spiencoder_ak
     // b8 Warning - If low, the position data is valid, but some operating conditions are close to limits. 
     // b7 : b0 Inverted CRC, 0x97 polynomial
     
-    data->multiturncounter = (frame[0] << 8) | frame[1]; // TODO: check for the first bit (maybe it must be discarded)
+    data->multiturncounter = (frame[0] << 8) | frame[1];
     data->position = (frame[2] << 11) | (frame[3] << 3) | ((frame[4] & 0xe0) >> 5); // the last shift eliminates the non-position values (2) + zero padded bits (3)
     data->status_bits = (frame[4] & 0x03);
     data->crc = frame[5];

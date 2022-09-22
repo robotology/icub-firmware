@@ -2021,120 +2021,7 @@
           <Name>-UV0153FBE -O14 -S0 -C0 -N00("ARM CoreSight JTAG-DP") -D00(3BA00477) -L00(4) -N01("Unknown JTAG device") -D01(06418041) -L01(5) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>990</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>134604068</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_spi.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\src/extra/periphs/hal_spi.c\990</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>723</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>134604452</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_spi.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\src/extra/periphs/hal_spi.c\723</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>605</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>134573108</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\highlevel\abslayer\hal2\src\extra\periphs\hal_spi.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\src/extra/periphs/hal_spi.c\605</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>177</LineNumber>
-          <EnabledFlag>0</EnabledFlag>
-          <Address>134499864</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\cfg\eoemsappl\overridden_configurator.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../cfg/eoemsappl/overridden_configurator.c\177</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>246</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134581130</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../midware/hl-plus/src/utils/hl_spi.c\246</Expression>
-        </Bp>
-        <Bp>
-          <Number>5</Number>
-          <Type>0</Type>
-          <LineNumber>249</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134581136</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../midware/hl-plus/src/utils/hl_spi.c\249</Expression>
-        </Bp>
-        <Bp>
-          <Number>6</Number>
-          <Type>0</Type>
-          <LineNumber>469</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134614186</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\midware\hl-plus\src\utils\hl_spi.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../midware/hl-plus/src/utils/hl_spi.c\469</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -3259,7 +3146,7 @@
 
   <Group>
     <GroupName>appl-services</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3883,7 +3770,7 @@
 
   <Group>
     <GroupName>eo-protocol</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

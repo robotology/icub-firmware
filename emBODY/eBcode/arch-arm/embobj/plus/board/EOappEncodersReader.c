@@ -596,7 +596,6 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     }
                     else
                     {   // we have a valid raw value from hal but ... it is not valid after a check                        
-                        prop.valueinfo->errortype = prop.valueinfo->errortype;
                         errorparam = (spiRawValue >> 6) & 0x0FFF;                                           
                     }                    
                 }
@@ -628,7 +627,6 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     }
                     else
                     {   // we have a valid raw value from hal but ... it is not valid after a check
-                        prop.valueinfo->errortype = prop.valueinfo->errortype;
                         errorparam = (spiRawValue >> 1) & 0x3FFF;
                     }                    
                 }
@@ -649,20 +647,19 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     // check validity for aksim2
                     if(eobool_true == s_eo_appEncReader_IsValidValue_AKSIM2(&diagn, &prop.valueinfo->errortype))
                     {
-                        // rescale the raw value of the position to icubdegrees
+                        // rescale the position value of the position to icubdegrees
                         prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(position, jomo, (eOmc_position_t)prop.descriptor->pos);
                     }
                     else
                     {
-                        // we have a valid raw value from hal but ... it is not valid after a check
-                        prop.valueinfo->errortype = prop.valueinfo->errortype;
+                        // we have a valid reading from hal but ... it is not valid after a check
                         errorparam = diagn.info.aksim2_status_crc;
                     }
                 }
                 else
                 {   // we dont even have a valid reading from hal
                     prop.valueinfo->errortype = encreader_err_AEA_READING;
-                    errorparam = 0xffff; // TODO: in here we may put diagn.info.aksim2_status_crc instead of 0xffff
+                    errorparam = 0xffff;
                 }
             }
             
