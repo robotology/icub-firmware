@@ -557,13 +557,12 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
         // SPI: set the callback function
         hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
         
-        // SPI: set the sizeofframe for this transmission
+        // SPI: set the sizeofframe for this transmission (48 bits --> 6 Bytes for AksIM2)
         hal_spi_set_sizeofframe(intitem->spiid, 6);
         
         // SPI: set the isrtxframe
         hal_spi_set_isrtxframe(intitem->spiid, txframe_dummy_aksim2);
-        //----------------
-
+        
         // SPI start to receive (only one frame)
         hal_spi_start(intitem->spiid, 1);
     }
@@ -1502,9 +1501,9 @@ static void s_hal_spiencoder_parse_data_aksim2(uint8_t* frame, hal_spiencoder_ak
 {
     // Encoder position data structure
     // -------------------------------
-    // b47 : b32 Multiturn counter (if specified in part number) � Left aligned, MSB first. 
-    // b31 : b10 Encoder position + zero padding bits � Left aligned, MSB first. 
-    // b9 Error � If low, the position data is not valid. 
+    // b47 : b32 Multiturn counter (if specified in part number) - Left aligned, MSB first. 
+    // b31 : b10 Encoder position + zero padding bits - Left aligned, MSB first. 
+    // b9 Error - If low, the position data is not valid. 
     // b8 Warning - If low, the position data is valid, but some operating conditions are close to limits. 
     // b7 : b0 Inverted CRC, 0x97 polynomial
     
