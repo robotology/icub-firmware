@@ -214,8 +214,6 @@ uint8_t embot::hw::chip::MB049::Impl::CRC_SPI_97_64bit(uint64_t dw_InputData)
      b_CRC = (uint8_t)(dw_InputData & (uint64_t)0x000000FFu);
      b_Index = b_CRC ^ ab_CRC8_LUT[b_Index];
      b_CRC = ab_CRC8_LUT[b_Index];
-    
-     //embot::core::print("dw_InputData: " + std::to_string(dw_InputData) + " b_Index: " + std::to_string(b_Index));
      
      return b_CRC; 
 }
@@ -230,16 +228,10 @@ void embot::hw::chip::MB049::Impl::parseDataBuffer(Data &data)
     // b8 Warning - If low, the position data is valid, but some operating conditions are close to limits. 
     // b7 : b0 Inverted CRC, 0x97 polynomial
     
-    #if 1
     data.multiturncounter = (_databuffer[0] << 8) | _databuffer[1];
     data.position = (_databuffer[2] << 11) | (_databuffer[3] << 3) | ((_databuffer[4] & 0xe0) >> 5); // the last shift eliminates the non-position values (2) + zero padded bits (3)
     data.status.bits = (_databuffer[4] & 0x03);
     data.crc = _databuffer[5];
-    #else
-    data.multiturncounter = ((_databuffer[0] & 0x7f) << 9) | (_databuffer[1] << 1) | ((_databuffer[2] & 0x80) >> 7);
-    data.position = ((_databuffer[2] & 0x7f) << 12) | (_databuffer[3] << 4) | ((_databuffer[4] & 0xf0) >> 4);
-    data.status.bits = ((_databuffer[4] & 0x01) << 1 ) | ((_databuffer[5] & 0x80) >> 7 );
-    #endif
     
     // check for status bits errors
     data.status.ok = true;
@@ -258,40 +250,16 @@ void embot::hw::chip::MB049::Impl::parseDataBuffer(Data &data)
     uint64_t dw_CRCinputData = 0;
     uint8_t calculated_crc=0;
     
-    dw_CRCinputData = ((uint64_t)_databuffer[0] << 40) + ((uint64_t)_databuffer[1] << 32) +
-                      ((uint64_t)_databuffer[2] << 24) + ((uint64_t)_databuffer[3] << 16) +
-                      ((uint64_t)_databuffer[4] << 8)  + ((uint64_t)_databuffer[5]);
-    
-//    embot::core::print("-----------------------");
-//    embot::core::print("_databuffer[0]: " + std::to_string(_databuffer[0]));
-//    embot::core::print("_databuffer[1]: " + std::to_string(_databuffer[1]));
-//    embot::core::print("_databuffer[2]: " + std::to_string(_databuffer[2]));
-//    embot::core::print("_databuffer[3]: " + std::to_string(_databuffer[3]));
-//    embot::core::print("_databuffer[4]: " + std::to_string(_databuffer[4]));
-//    embot::core::print("_databuffer[5]: " + std::to_string(_databuffer[5]));
-    
-//    dw_CRCinputData = 257;
+    dw_CRCinputData = ((uint64_t)_databuffer[0] << 32) + ((uint64_t)_databuffer[1] << 24) +
+                      ((uint64_t)_databuffer[2] << 16) + ((uint64_t)_databuffer[3] << 8) +
+                      ((uint64_t)_databuffer[4]);
     
     calculated_crc = ~(CRC_SPI_97_64bit(dw_CRCinputData)) & 0xFF; //inverted CRC
     
-//    embot::core::print("calculated_crc = " + std::to_string(calculated_crc));
-
-    
-    // TODO: check CRC
-//    if(calculated_crc != data.crc)
-//    {
-//        embot::core::print("Error - invalid CRC: calculated = " + std::to_string(calculated_crc) + " received = " + std::to_string(data.crc));
-//    }
-//    else
-//    {
-//        embot::core::print("Info - CRC: calculated = " + std::to_string(calculated_crc) + " received = " + std::to_string(data.crc));
-//    }
-    
-//    embot::core::print("Inverted CRC: " + std::to_string(_databuffer[5]));
-    
-    // TODO: clear _databuffer array?
-    //memset(_databuffer, 0, sizeof(_databuffer));
-    
+    if(calculated_crc != data.crc)
+    {
+        embot::core::print("Error - invalid CRC: calculated = " + std::to_string(calculated_crc) + " received = " + std::to_string(data.crc));
+    }
 }
 
 

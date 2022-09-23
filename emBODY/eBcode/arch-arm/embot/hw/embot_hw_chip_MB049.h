@@ -71,11 +71,9 @@ namespace embot { namespace hw { namespace chip {
         
         using POS = uint32_t;
         
-        enum class Parity { even, odd };
-        
         struct Status
         {
-            uint8_t bits {0};   // TODO: try to use bitsfield C++
+            uint8_t bits {0};
             Parity parity {};
             bool ok {false};
             Status() = default;
