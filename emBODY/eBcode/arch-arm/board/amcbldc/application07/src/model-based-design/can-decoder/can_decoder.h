@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.52
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:03:52 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:37:35 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,7 @@
 #define RTW_HEADER_can_decoder_h_
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
+#include "rtw_defines.h"
 
 // Block signals for system '<S2>/Decoding Logic'
 #ifndef can_decoder_MDLREF_HIDE_CHILD_
@@ -55,16 +56,16 @@ struct DW_DecodingLogic_can_decoder_T {
   uint32_T ev_set_velocity_pidEventCounter;// '<S2>/Decoding Logic'
   uint32_T ev_set_motor_configEventCounter;// '<S2>/Decoding Logic'
   uint16_T cmd_processed;              // '<S2>/Decoding Logic'
-  uint8_T is_active_c3_can_decoder;    // '<S2>/Decoding Logic'
   uint8_T is_SET_CONTROL_MODE;         // '<S2>/Decoding Logic'
-  uint8_T is_active_SET_CONTROL_MODE;  // '<S2>/Decoding Logic'
   uint8_T is_DESIRED_TARGETS;          // '<S2>/Decoding Logic'
-  uint8_T is_active_DESIRED_TARGETS;   // '<S2>/Decoding Logic'
   uint8_T is_SET_OPTIONS;              // '<S2>/Decoding Logic'
-  uint8_T is_active_SET_OPTIONS;       // '<S2>/Decoding Logic'
   uint8_T is_SET_MOTOR_CONFIG;         // '<S2>/Decoding Logic'
-  uint8_T is_active_SET_MOTOR_CONFIG;  // '<S2>/Decoding Logic'
   uint8_T is_ERROR_HANDLING;           // '<S2>/Decoding Logic'
+  uint8_T is_active_c3_can_decoder;    // '<S2>/Decoding Logic'
+  uint8_T is_active_SET_CONTROL_MODE;  // '<S2>/Decoding Logic'
+  uint8_T is_active_DESIRED_TARGETS;   // '<S2>/Decoding Logic'
+  uint8_T is_active_SET_OPTIONS;       // '<S2>/Decoding Logic'
+  uint8_T is_active_SET_MOTOR_CONFIG;  // '<S2>/Decoding Logic'
   uint8_T is_active_ERROR_HANDLING;    // '<S2>/Decoding Logic'
   boolean_T ev_async;                  // '<S2>/Decoding Logic'
 };
@@ -101,7 +102,7 @@ struct DW_CoreSubsys_can_decoder_T {
 #ifndef can_decoder_MDLREF_HIDE_CHILD_
 
 struct B_can_decoder_c_T {
-  B_CoreSubsys_can_decoder_T CoreSubsys[4];// '<Root>/Cycling Decoder'
+  B_CoreSubsys_can_decoder_T CoreSubsys[CAN_MAX_NUM_PACKETS];// '<Root>/Cycling Decoder' 
 };
 
 #endif                                 //can_decoder_MDLREF_HIDE_CHILD_
@@ -110,7 +111,7 @@ struct B_can_decoder_c_T {
 #ifndef can_decoder_MDLREF_HIDE_CHILD_
 
 struct DW_can_decoder_f_T {
-  DW_CoreSubsys_can_decoder_T CoreSubsys[4];// '<Root>/Cycling Decoder'
+  DW_CoreSubsys_can_decoder_T CoreSubsys[CAN_MAX_NUM_PACKETS];// '<Root>/Cycling Decoder' 
 };
 
 #endif                                 //can_decoder_MDLREF_HIDE_CHILD_

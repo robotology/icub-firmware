@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.52
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:03:52 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:37:35 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,8 +19,29 @@
 #ifndef RTW_HEADER_can_decoder_types_h_
 #define RTW_HEADER_can_decoder_types_h_
 #include "rtwtypes.h"
+#include "can_decoder_types.h"
 
-// Model Code Variants
+// Includes for objects with custom storage classes
+#include "rtw_defines.h"
+
+//
+//  Constraints for division operations in dimension variants
+
+#if (1 == 0) || ((CAN_MAX_NUM_PACKETS % 1) != 0)
+# error "The preprocessor definition '1' must not be equal to zero and     the division of 'CAN_MAX_NUM_PACKETS' by '1' must not have a remainder."
+#endif
+
+//
+//  Registered constraints for dimension variants
+
+#if CAN_MAX_NUM_PACKETS <= 0
+# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be greater than '0'"
+#endif
+
+#if CAN_MAX_NUM_PACKETS >= 16
+# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be less than '16'"
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
 #define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
 
@@ -54,7 +75,7 @@ struct BUS_CAN
 
 struct BUS_CAN_MULTIPLE
 {
-  BUS_CAN packets[4];
+  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
 };
 
 #endif
@@ -332,7 +353,7 @@ struct BUS_MESSAGES_RX
 
 struct BUS_MESSAGES_RX_MULTIPLE
 {
-  BUS_MESSAGES_RX messages[4];
+  BUS_MESSAGES_RX messages[CAN_MAX_NUM_PACKETS];
 };
 
 #endif
@@ -358,7 +379,7 @@ struct BUS_STATUS_RX
 
 struct BUS_STATUS_RX_MULTIPLE
 {
-  BUS_STATUS_RX status[4];
+  BUS_STATUS_RX status[CAN_MAX_NUM_PACKETS];
 };
 
 #endif
@@ -395,7 +416,7 @@ struct BUS_CAN_RX_ERRORS
 
 struct BUS_CAN_RX_ERRORS_MULTIPLE
 {
-  BUS_CAN_RX_ERRORS errors[4];
+  BUS_CAN_RX_ERRORS errors[CAN_MAX_NUM_PACKETS];
 };
 
 #endif

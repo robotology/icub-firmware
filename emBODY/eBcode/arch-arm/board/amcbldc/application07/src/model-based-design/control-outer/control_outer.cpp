@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 3.33
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:11 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:38:01 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -77,7 +77,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
                    *rtu_Estimates, ControlOuterOutputs *rty_OuterOutputs)
 {
   int32_T rowIdx;
-  int32_T rtu_Estimates_0;
+  int32_T tmp;
   real32_T rtb_Abs;
   real32_T rtb_DProdOut;
   real32_T rtb_DProdOut_f;
@@ -133,7 +133,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   rtb_Product = rtu_ConfigurationParameters->PosLoopPID.N * 0.0005F;
 
   // Math: '<S47>/Reciprocal' incorporates:
-  //   Constant: '<S47>/Constant'
+  //   Constant: '<S47>/Filter Den Constant'
   //   Sum: '<S47>/SumDen'
   //
   //  About '<S47>/Reciprocal':
@@ -152,7 +152,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
     control_outer_DW.DelayInput1_DSTATE);
 
   // DiscreteTransferFcn: '<S47>/Filter Differentiator TF' incorporates:
-  //   Constant: '<S47>/Constant'
+  //   Constant: '<S47>/Filter Den Constant'
   //   Product: '<S46>/DProd Out'
   //   Product: '<S47>/Divide'
   //   Sum: '<S47>/SumNum'
@@ -172,8 +172,8 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
   //   Product: '<S47>/DenCoefOut'
 
-  rtb_Switch2_f = (control_outer_DW.FilterDifferentiatorTF_tmp +
-                   -control_outer_DW.FilterDifferentiatorTF_states) *
+  rtb_Switch2_f = (control_outer_DW.FilterDifferentiatorTF_tmp -
+                   control_outer_DW.FilterDifferentiatorTF_states) *
     rtb_Switch2_f * rtu_ConfigurationParameters->PosLoopPID.N;
 
   // Sum: '<S66>/SumI1' incorporates:
@@ -218,7 +218,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   rtb_Gain1_h = rtu_ConfigurationParameters->DirLoopPID.N * 0.0005F;
 
   // Math: '<S97>/Reciprocal' incorporates:
-  //   Constant: '<S97>/Constant'
+  //   Constant: '<S97>/Filter Den Constant'
   //   Sum: '<S97>/SumDen'
   //
   //  About '<S97>/Reciprocal':
@@ -227,7 +227,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   rtb_DenCoefOut = 1.0F / (rtb_Gain1_h + 1.0F);
 
   // DiscreteTransferFcn: '<S97>/Filter Differentiator TF' incorporates:
-  //   Constant: '<S97>/Constant'
+  //   Constant: '<S97>/Filter Den Constant'
   //   DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
   //   Product: '<S97>/Divide'
   //   Sum: '<S97>/SumNum'
@@ -246,8 +246,8 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   DiscreteTransferFcn: '<S97>/Filter Differentiator TF'
   //   Product: '<S97>/DenCoefOut'
 
-  rtb_DenCoefOut = (control_outer_DW.FilterDifferentiatorTF_tmp_m +
-                    -control_outer_DW.FilterDifferentiatorTF_states_i) *
+  rtb_DenCoefOut = (control_outer_DW.FilterDifferentiatorTF_tmp_m -
+                    control_outer_DW.FilterDifferentiatorTF_states_i) *
     rtb_DenCoefOut * rtu_ConfigurationParameters->DirLoopPID.N;
 
   // Sum: '<S116>/SumI1' incorporates:
@@ -295,9 +295,9 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
     rtb_DenCoefOut = 0.0F;
   }
 
-  // End of Switch: '<Root>/Switch3'
+  // Sum: '<Root>/Sum2' incorporates:
+  //   Switch: '<Root>/Switch3'
 
-  // Sum: '<Root>/Sum2'
   rtb_Switch2_f = rtb_DenCoefOut + rtu_Targets->jointvelocities.velocity;
 
   // Switch: '<S5>/Switch2' incorporates:
@@ -337,7 +337,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   rtb_Product = rtu_ConfigurationParameters->VelLoopPID.N * 0.0005F;
 
   // Math: '<S147>/Reciprocal' incorporates:
-  //   Constant: '<S147>/Constant'
+  //   Constant: '<S147>/Filter Den Constant'
   //   Sum: '<S147>/SumDen'
   //
   //  About '<S147>/Reciprocal':
@@ -346,7 +346,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   rtb_DenCoefOut = 1.0F / (rtb_Product + 1.0F);
 
   // DiscreteTransferFcn: '<S147>/Filter Differentiator TF' incorporates:
-  //   Constant: '<S147>/Constant'
+  //   Constant: '<S147>/Filter Den Constant'
   //   DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
   //   Product: '<S147>/Divide'
   //   Sum: '<S147>/SumNum'
@@ -365,8 +365,8 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   DiscreteTransferFcn: '<S147>/Filter Differentiator TF'
   //   Product: '<S147>/DenCoefOut'
 
-  rtb_DenCoefOut = (control_outer_DW.FilterDifferentiatorTF_tmp_p +
-                    -control_outer_DW.FilterDifferentiatorTF_states_c) *
+  rtb_DenCoefOut = (control_outer_DW.FilterDifferentiatorTF_tmp_p -
+                    control_outer_DW.FilterDifferentiatorTF_states_c) *
     rtb_DenCoefOut * rtu_ConfigurationParameters->VelLoopPID.N;
 
   // Sum: '<S166>/SumI1' incorporates:
@@ -432,11 +432,11 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   RelationalOperator: '<S1>/Relational Operator'
   //   RelationalOperator: '<S8>/Compare'
 
-  rowIdx = static_cast<int32_T>(((((rtb_DenCoefOut > 0.05F *
+  rowIdx = static_cast<int32_T>(((((rtb_DenCoefOut > 0.1F *
     rtu_ConfigurationParameters->thresholds.motorPeakCurrents) ||
     rtb_FixPtRelationalOperator) + (static_cast<uint32_T>(rtb_DenCoefOut <= 0.0F)
     << 1)) << 1) + control_outer_DW.Memory_PreviousInput);
-  rtb_Compare = rtCP_Logic_table[rowIdx + 8U];
+  rtb_Compare = rtCP_Logic_table[static_cast<uint32_T>(rowIdx) + 8U];
 
   // DiscreteIntegrator: '<S1>/Discrete-Time Integrator'
   if (control_outer_DW.DiscreteTimeIntegrator_SYSTEM_E != 0) {
@@ -465,17 +465,16 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   RelationalOperator: '<S9>/Compare'
 
   if (rtu_Estimates->Iq_filtered.current < 0.0F) {
-    rtu_Estimates_0 = -1;
+    tmp = -1;
   } else {
-    rtu_Estimates_0 = 1;
+    tmp = 1;
   }
-
-  // End of Switch: '<S1>/Switch1'
 
   // BusCreator: '<Root>/Bus Creator1' incorporates:
   //   Product: '<S1>/Product'
+  //   Switch: '<S1>/Switch1'
 
-  rty_OuterOutputs->current_limiter = static_cast<real32_T>(rtu_Estimates_0) *
+  rty_OuterOutputs->current_limiter = static_cast<real32_T>(tmp) *
     control_outer_B.DiscreteTimeIntegrator *
     rtu_ConfigurationParameters->CurLoopPID.I;
 

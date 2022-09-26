@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 4.107
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:39 2022
+// Model version                  : 5.1
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:38:31 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,7 @@
 #define RTW_HEADER_AMC_BLDC_private_h_
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
+#include "AMC_BLDC_types.h"
 #endif                                 // RTW_HEADER_AMC_BLDC_private_h_
 
 //

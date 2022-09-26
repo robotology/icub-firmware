@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 3.7
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:27 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:38:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,7 +25,7 @@
 #ifndef filter_current_MDLREF_HIDE_CHILD_
 
 struct DW_filter_current_f_T {
-  dsp_MedianFilter_filter_curre_T obj; // '<Root>/Median Filter'
+  dsp_simulink_MedianFilter_fil_T obj; // '<Root>/Median Filter'
   boolean_T objisempty;                // '<Root>/Median Filter'
 };
 

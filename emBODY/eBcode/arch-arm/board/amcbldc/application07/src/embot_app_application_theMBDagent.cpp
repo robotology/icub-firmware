@@ -224,8 +224,6 @@ struct embot::app::application::theMBDagent::Impl
     volatile embot::core::Time EXTFAULTpressedtime {0};
     volatile embot::core::Time EXTFAULTreleasedtime {0};
     
-    static constexpr uint8_t maxNumberOfPacketsCAN {4};  //define the max number of CAN pkt managed
-
     #ifdef PRINT_HISTO_DEBUG 
     void printHistogram_rxPkt(size_t cur_size); //cur_size is the currente queue size
     static constexpr uint8_t numOfBins {11}; //size of queue of the CAN drive plus 1 (in case any packet is received)
@@ -359,7 +357,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     }
         
     // 1. reset all info 
-    for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++) {
+    for (uint8_t i = 0; i < CAN_MAX_NUM_PACKETS; i++) {
         AMC_BLDC_U.PacketsRx.packets[i].available = false;
     }
     
@@ -368,8 +366,8 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     size_t ninputframes = cur_size;
     
     // 3. limit the number of can pkts per cycle to maxNumberOfPacketsCAN 
-    if(ninputframes>maxNumberOfPacketsCAN)
-        ninputframes = maxNumberOfPacketsCAN;
+    if(ninputframes>CAN_MAX_NUM_PACKETS)
+        ninputframes = CAN_MAX_NUM_PACKETS;
     
     // 4. take ninputframes frames and inset them in the supervisor input queue.
     for (uint8_t i = 0; i < ninputframes; i++) {
@@ -394,7 +392,7 @@ bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::c
     AMC_BLDC_step_Time();
     
     // if there an output is available, send it to the CAN Netowork
-    for (uint8_t i = 0; i < maxNumberOfPacketsCAN; i++)
+    for (uint8_t i = 0; i < CAN_MAX_NUM_PACKETS; i++)
     {
         //if (amc_bldc.AMC_BLDC_Y.PacketsTx.packets[i].available)
         if (AMC_BLDC_Y.PacketsTx.packets[i].available)

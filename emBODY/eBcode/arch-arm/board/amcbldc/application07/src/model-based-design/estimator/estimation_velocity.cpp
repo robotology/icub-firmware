@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 3.3
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:20 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:38:11 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,12 +25,14 @@
 #include "rt_hypotf_snf.h"
 #include "estimation_velocity_private.h"
 
-extern "C" {
+extern "C"
+{
 
 #include "rt_nonfinite.h"
 
 }
-  MdlrefDW_estimation_velocity_T estimation_velocity_MdlrefDW;
+
+MdlrefDW_estimation_velocity_T estimation_velocity_MdlrefDW;
 
 // Block states (default storage)
 DW_estimation_velocity_f_T estimation_velocity_DW;
@@ -182,8 +184,8 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
           b_atmp *= 1.01412048E+31F;
         } while ((std::abs(scale) < 9.86076132E-32F) && (knt + 1 < 20));
 
-        scale = estimation_velocity_xnrm2(15 - b_k, b_A, kend + 2);
-        scale = rt_hypotf_snf(b_atmp, scale);
+        scale = rt_hypotf_snf(b_atmp, estimation_velocity_xnrm2(15 - b_k, b_A,
+          kend + 2));
         if (b_atmp >= 0.0F) {
           scale = -scale;
         }
@@ -259,7 +261,8 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
         int32_T d;
         if (knt + 1 != 0) {
           if (knt >= 0) {
-            std::memset(&work[0], 0, (knt + 1) * sizeof(real32_T));
+            std::memset(&work[0], 0, static_cast<uint32_T>(knt + 1) * sizeof
+                        (real32_T));
           }
 
           nmip1 = (knt << 4) + kend;

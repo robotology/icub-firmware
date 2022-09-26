@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 3.7
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:27 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:38:19 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,7 @@
 #include "filter_current_types.h"
 #include "rtwtypes.h"
 #include <cmath>
+#include <cstring>
 #include "filter_current_private.h"
 
 MdlrefDW_filter_current_T filter_current_MdlrefDW;
@@ -37,13 +38,10 @@ static void filter_MedianFilterCG_resetImpl(c_dsp_internal_MedianFilterCG_T *obj
 {
   real32_T cnt1;
   real32_T cnt2;
-  for (int32_T i = 0; i < 10; i++) {
-    obj->pBuf[i] = 0.0F;
-    obj->pPos[i] = 0.0F;
-    obj->pHeap[i] = 0.0F;
-  }
-
-  obj->pWinLen = 10.0F;
+  std::memset(&obj->pBuf[0], 0, sizeof(real32_T) << 5U);
+  std::memset(&obj->pPos[0], 0, sizeof(real32_T) << 5U);
+  std::memset(&obj->pHeap[0], 0, sizeof(real32_T) << 5U);
+  obj->pWinLen = 32.0F;
   obj->pIdx = obj->pWinLen;
   obj->pMidHeap = std::ceil((obj->pWinLen + 1.0F) / 2.0F);
   cnt1 = (obj->pWinLen - 1.0F) / 2.0F;
@@ -62,18 +60,18 @@ static void filter_MedianFilterCG_resetImpl(c_dsp_internal_MedianFilterCG_T *obj
 
   cnt1 = 1.0F;
   cnt2 = obj->pWinLen;
-  for (int32_T i = 0; i < 10; i++) {
-    if (static_cast<int32_T>(std::fmod(-static_cast<real32_T>(i) + 10.0F, 2.0F))
-        == 0) {
-      obj->pPos[9 - i] = cnt1;
+  for (int32_T i = 0; i < 32; i++) {
+    if (static_cast<int32_T>(std::fmod(32.0F - static_cast<real32_T>(i), 2.0F)) ==
+        0) {
+      obj->pPos[31 - i] = cnt1;
       cnt1++;
     } else {
-      obj->pPos[9 - i] = cnt2;
+      obj->pPos[31 - i] = cnt2;
       cnt2--;
     }
 
-    obj->pHeap[static_cast<int32_T>(obj->pPos[9 - i]) - 1] =
-      -static_cast<real32_T>(i) + 10.0F;
+    obj->pHeap[static_cast<int32_T>(obj->pPos[31 - i]) - 1] = 32.0F -
+      static_cast<real32_T>(i);
   }
 }
 
@@ -84,8 +82,8 @@ static void f_MedianFilterCG_trickleDownMax(c_dsp_internal_MedianFilterCG_T *obj
   exitg1 = false;
   while ((!exitg1) && (i >= -obj->pMaxHeapLength)) {
     real32_T ind2;
+    real32_T temp_tmp;
     real32_T tmp;
-    real32_T u;
     real32_T u_tmp;
     if ((i < -1.0F) && (i > -obj->pMaxHeapLength) && (obj->pBuf
          [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(i + obj->pMidHeap)
@@ -96,28 +94,28 @@ static void f_MedianFilterCG_trickleDownMax(c_dsp_internal_MedianFilterCG_T *obj
 
     u_tmp = i / 2.0F;
     if (u_tmp < 0.0F) {
-      u = std::ceil(u_tmp);
+      temp_tmp = std::ceil(u_tmp);
     } else {
-      u = std::floor(u_tmp);
+      temp_tmp = std::floor(u_tmp);
     }
 
     ind2 = i + obj->pMidHeap;
     tmp = obj->pHeap[static_cast<int32_T>(ind2) - 1];
-    if (!(obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(u +
-           obj->pMidHeap) - 1]) - 1] < obj->pBuf[static_cast<int32_T>(tmp) - 1]))
-    {
+    if (!(obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>
+          (temp_tmp + obj->pMidHeap) - 1]) - 1] < obj->pBuf[static_cast<int32_T>
+          (tmp) - 1])) {
       exitg1 = true;
     } else {
       if (u_tmp < 0.0F) {
-        u = std::ceil(u_tmp);
+        temp_tmp = std::ceil(u_tmp);
       } else {
-        u = std::floor(u_tmp);
+        temp_tmp = std::floor(u_tmp);
       }
 
-      u_tmp = u + obj->pMidHeap;
-      u = obj->pHeap[static_cast<int32_T>(u_tmp) - 1];
+      u_tmp = temp_tmp + obj->pMidHeap;
+      temp_tmp = obj->pHeap[static_cast<int32_T>(u_tmp) - 1];
       obj->pHeap[static_cast<int32_T>(u_tmp) - 1] = tmp;
-      obj->pHeap[static_cast<int32_T>(ind2) - 1] = u;
+      obj->pHeap[static_cast<int32_T>(ind2) - 1] = temp_tmp;
       obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(u_tmp) - 1])
         - 1] = u_tmp;
       obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(ind2) - 1])
@@ -207,7 +205,6 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
   // MATLABSystem: '<Root>/Median Filter'
   obj = &filter_current_DW.obj.pMID;
   if (filter_current_DW.obj.pMID.isInitialized != 1) {
-    filter_current_DW.obj.pMID.isSetupComplete = false;
     filter_current_DW.obj.pMID.isInitialized = 1;
     filter_current_DW.obj.pMID.isSetupComplete = true;
     filter_MedianFilterCG_resetImpl(&filter_current_DW.obj.pMID);

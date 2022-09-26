@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 4.107
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:39 2022
+// Model version                  : 5.1
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:38:31 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,7 +20,20 @@
 #define RTW_HEADER_AMC_BLDC_types_h_
 #include "rtwtypes.h"
 
-// Model Code Variants
+// Includes for objects with custom storage classes
+#include "rtw_defines.h"
+
+//
+//  Registered constraints for dimension variants
+
+#if CAN_MAX_NUM_PACKETS <= 0
+# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be greater than '0'"
+#endif
+
+#if CAN_MAX_NUM_PACKETS >= 16
+# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be less than '16'"
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_JointPositions_
 #define DEFINED_TYPEDEF_FOR_JointPositions_
 
@@ -478,7 +491,7 @@ struct BUS_MESSAGES_RX
 
 struct BUS_MESSAGES_RX_MULTIPLE
 {
-  BUS_MESSAGES_RX messages[4];
+  BUS_MESSAGES_RX messages[CAN_MAX_NUM_PACKETS];
 };
 
 #endif
@@ -504,7 +517,7 @@ struct BUS_STATUS_RX
 
 struct BUS_STATUS_RX_MULTIPLE
 {
-  BUS_STATUS_RX status[4];
+  BUS_STATUS_RX status[CAN_MAX_NUM_PACKETS];
 };
 
 #endif
@@ -541,7 +554,7 @@ struct BUS_CAN_RX_ERRORS
 
 struct BUS_CAN_RX_ERRORS_MULTIPLE
 {
-  BUS_CAN_RX_ERRORS errors[4];
+  BUS_CAN_RX_ERRORS errors[CAN_MAX_NUM_PACKETS];
 };
 
 #endif
@@ -678,7 +691,7 @@ struct BUS_CAN
 
 struct BUS_CAN_MULTIPLE
 {
-  BUS_CAN packets[4];
+  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
 };
 
 #endif
