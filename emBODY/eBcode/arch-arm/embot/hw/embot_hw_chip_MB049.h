@@ -74,7 +74,6 @@ namespace embot { namespace hw { namespace chip {
         struct Status
         {
             uint8_t bits {0};
-            Parity parity {};
             bool ok {false};
             Status() = default;
         };

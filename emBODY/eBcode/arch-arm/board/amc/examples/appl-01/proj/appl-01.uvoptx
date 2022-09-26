@@ -592,72 +592,7 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>996</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>82</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_dma.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\h7eth\../src/driver/stm32h7-v1A0/src/stm32h7xx_hal_dma.c\996</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>249</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134718788</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\h7eth\../../../../../embot/hw/embot_hw_gpio.cpp\249</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>1612</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>78</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\dev\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\driver\stm32h7-v1A0\src\stm32h7xx_hal_dma.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\h7eth\../src/driver/stm32h7-v1A0/src/stm32h7xx_hal_dma.c\1612</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>260</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134719278</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\h7eth\../../../../../embot/hw/embot_hw_gpio.cpp\260</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -689,6 +624,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>g</ItemText>
         </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>_config.numofjomos</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -711,7 +651,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
