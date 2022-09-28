@@ -399,7 +399,7 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_deinit(MOTOR h)
     {
-        pwmDeinit();
+//        pwmDeinit();
         analogDeinit();
         encoderDeinit();
         hallDeinit();
@@ -417,9 +417,9 @@ namespace embot { namespace hw { namespace motor {
     {
         result_t res = resOK;
         
-        s_hw_deinit(h);
+//        s_hw_deinit(h);
         
-        s_hw_init(h);
+//        s_hw_init(h);
         
         if (HAL_OK != encoderConfig(enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
         if (HAL_OK != hallConfig(pwm_swapBC, pwm_hall_offset)) res = resNOK;
