@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 3.10
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:04 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Wed Sep 28 09:23:08 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,11 +22,13 @@
 #include "control_foc_types.h"
 #include "rtGetInf.h"
 
-extern "C" {
+extern "C"
+{
 
 #include "rt_nonfinite.h"
 
 }
+
 #include "zero_crossing_types.h"
 
 // Block states (default storage) for model 'control_foc'
@@ -43,6 +45,16 @@ struct DW_control_foc_f_T {
   real32_T FilterDifferentiatorTF_tmp_c;// '<S39>/Filter Differentiator TF'
   int8_T Integrator_PrevResetState;    // '<S98>/Integrator'
   int8_T Integrator_PrevResetState_k;  // '<S46>/Integrator'
+};
+
+#endif                                 //control_foc_MDLREF_HIDE_CHILD_
+
+// Zero-crossing (trigger) state for model 'control_foc'
+#ifndef control_foc_MDLREF_HIDE_CHILD_
+
+struct ZCV_control_foc_g_T {
+  real_T FilterDifferentiatorTF_Reset_ZC;// '<S91>/Filter Differentiator TF'
+  real_T FilterDifferentiatorTF_Reset__c;// '<S39>/Filter Differentiator TF'
 };
 
 #endif                                 //control_foc_MDLREF_HIDE_CHILD_
@@ -116,7 +128,9 @@ extern ZCE_control_foc_T control_foc_PrevZCX;
 //  Block '<S54>/Data Type Propagation' : Unused code path elimination
 //  Block '<S5>/Data Type Duplicate' : Unused code path elimination
 //  Block '<S6>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S6>/Data Type Duplicate1' : Unused code path elimination
 //  Block '<S8>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S8>/Data Type Duplicate1' : Unused code path elimination
 //  Block '<S9>/Data Type Duplicate' : Unused code path elimination
 //  Block '<S9>/Data Type Propagation' : Unused code path elimination
 //  Block '<S39>/Passthrough for tuning' : Eliminate redundant data type conversion

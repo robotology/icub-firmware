@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 4.74
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:03:29 2022
+// Model version                  : 5.6
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Wed Sep 28 09:22:29 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

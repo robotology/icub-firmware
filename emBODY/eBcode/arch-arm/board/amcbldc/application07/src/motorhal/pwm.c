@@ -434,12 +434,12 @@ HAL_StatusTypeDef pwmInit(void)
     return HAL_OK;
 }
 
-HAL_StatusTypeDef pwmDeinit(void)
-{
-    pwmPhaseDisable(PWM_PHASE_ALL);
-    
-    return HAL_OK;
-}
+//HAL_StatusTypeDef pwmDeinit(void)
+//{
+//    pwmPhaseDisable(PWM_PHASE_ALL);
+//    
+//    return HAL_OK;
+//}
 
 /*******************************************************************************************************************//**
  * @brief   Complete the CubeMx TIM3 configuration for the PWM subsystem

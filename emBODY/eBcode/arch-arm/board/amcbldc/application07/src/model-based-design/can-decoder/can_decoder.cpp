@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 3.52
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:03:52 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Wed Sep 28 09:22:53 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,6 +22,7 @@
 #include <cstring>
 #include <stddef.h>
 #include "can_decoder_private.h"
+#include "rtw_defines.h"
 
 // Named constants for Chart: '<S2>/Decoding Logic'
 const int32_T ca_event_ev_error_pck_malformed = 1;
@@ -29,7 +30,7 @@ const int32_T can_d_event_ev_error_pck_not4us = 2;
 const int32_T can_decoder_CALL_EVENT = -1;
 const uint8_T can_decoder_IN_Event_Error = 1U;
 const uint8_T can_decoder_IN_Home = 1U;
-const uint8_T can_decoder_IN_Home_b = 2U;
+const uint8_T can_decoder_IN_Home_d = 2U;
 const int32_T event_ev_error_mode_unrecognize = 0;
 MdlrefDW_can_decoder_T can_decoder_MdlrefDW;
 
@@ -72,11 +73,11 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
   guard1 = false;
   switch (localDW->is_ERROR_HANDLING) {
    case can_decoder_IN_Event_Error:
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_b;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_d;
     localDW->cmd_processed = 0U;
     break;
 
-   case can_decoder_IN_Home_b:
+   case can_decoder_IN_Home_d:
     if (localDW->sfEvent == can_d_event_ev_error_pck_not4us) {
       localB->error_type = CANErrorTypes_Packet_Not4Us;
       localDW->ev_errorEventCounter++;
@@ -103,7 +104,7 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
       }
 
       localDW->ev_async = false;
-      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_b;
+      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_d;
       localDW->cmd_processed = 0U;
     }
     break;
@@ -121,7 +122,7 @@ static int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh)
   int16_T sw;
   uint16_T x;
   x = static_cast<uint16_T>(static_cast<uint16_T>(bh << 8) | bl);
-  std::memcpy((void *)&sw, (void *)&x, (uint32_T)((size_t)1 * sizeof(int16_T)));
+  std::memcpy((void *)&sw, (void *)&x, (size_t)1 * sizeof(int16_T));
   return sw;
 }
 
@@ -209,7 +210,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
     localDW->is_active_ERROR_HANDLING = 1U;
     localDW->ev_async = false;
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_b;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_d;
     localDW->cmd_processed = 0U;
   } else {
     if ((localDW->is_active_SET_CONTROL_MODE != 0U) &&
@@ -543,57 +544,22 @@ void can_decoder_Init(void)
   };
 
   // SystemInitialize for Iterator SubSystem: '<Root>/Cycling Decoder'
-  // SystemInitialize for Atomic SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
-  // SystemInitialize for MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
-  can_decoder_B.CoreSubsys[0].pck_rx_struct = tmp;
+  for (int32_T ForEach_itr = 0; ForEach_itr < CAN_MAX_NUM_PACKETS; ForEach_itr++)
+  {
+    // SystemInitialize for Atomic SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
+    // SystemInitialize for MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
+    can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct = tmp;
 
-  // End of SystemInitialize for SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
+    // End of SystemInitialize for SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
 
-  // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
-  // SystemInitialize for Chart: '<S2>/Decoding Logic'
-  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[0].sf_DecodingLogic,
-    &can_decoder_DW.CoreSubsys[0].sf_DecodingLogic);
+    // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
+    // SystemInitialize for Chart: '<S2>/Decoding Logic'
+    can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic, &can_decoder_DW.CoreSubsys[ForEach_itr].sf_DecodingLogic);
 
-  // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
+    // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
+  }
 
-  // SystemInitialize for Atomic SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
-  // SystemInitialize for MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
-  can_decoder_B.CoreSubsys[1].pck_rx_struct = tmp;
-
-  // End of SystemInitialize for SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
-
-  // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
-  // SystemInitialize for Chart: '<S2>/Decoding Logic'
-  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[1].sf_DecodingLogic,
-    &can_decoder_DW.CoreSubsys[1].sf_DecodingLogic);
-
-  // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
-
-  // SystemInitialize for Atomic SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
-  // SystemInitialize for MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
-  can_decoder_B.CoreSubsys[2].pck_rx_struct = tmp;
-
-  // End of SystemInitialize for SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
-
-  // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
-  // SystemInitialize for Chart: '<S2>/Decoding Logic'
-  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[2].sf_DecodingLogic,
-    &can_decoder_DW.CoreSubsys[2].sf_DecodingLogic);
-
-  // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
-
-  // SystemInitialize for Atomic SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
-  // SystemInitialize for MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
-  can_decoder_B.CoreSubsys[3].pck_rx_struct = tmp;
-
-  // End of SystemInitialize for SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
-
-  // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
-  // SystemInitialize for Chart: '<S2>/Decoding Logic'
-  can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[3].sf_DecodingLogic,
-    &can_decoder_DW.CoreSubsys[3].sf_DecodingLogic);
-
-  // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
   // End of SystemInitialize for SubSystem: '<Root>/Cycling Decoder'
 }
 
@@ -607,7 +573,8 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
   // Outputs for Iterator SubSystem: '<Root>/Cycling Decoder' incorporates:
   //   ForEach: '<S1>/For Each'
 
-  for (int32_T ForEach_itr = 0; ForEach_itr < 4; ForEach_itr++) {
+  for (int32_T ForEach_itr = 0; ForEach_itr < CAN_MAX_NUM_PACKETS; ForEach_itr++)
+  {
     uint8_T minval;
     uint8_T x_idx_1;
 

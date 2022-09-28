@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 3.7
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:27 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Wed Sep 28 09:23:34 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,6 +19,7 @@
 #ifndef RTW_HEADER_filter_current_private_h_
 #define RTW_HEADER_filter_current_private_h_
 #include "rtwtypes.h"
+#include "filter_current_types.h"
 
 // Macros for accessing real-time model data structure
 #ifndef rtmGetErrorStatus

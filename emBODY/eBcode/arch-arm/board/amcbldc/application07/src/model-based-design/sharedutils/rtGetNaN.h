@@ -7,16 +7,17 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 3.10
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Tue Sep 13 12:54:44 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:37:51 2022
 //
 #ifndef RTW_HEADER_rtGetNaN_h_
 #define RTW_HEADER_rtGetNaN_h_
 #include "rtwtypes.h"
 #ifdef __cplusplus
 
-extern "C" {
+extern "C"
+{
 
 #endif
 
@@ -26,6 +27,7 @@ extern "C" {
 #ifdef __cplusplus
 
 }                                      // extern "C"
+
 #endif
 #endif                                 // RTW_HEADER_rtGetNaN_h_
 

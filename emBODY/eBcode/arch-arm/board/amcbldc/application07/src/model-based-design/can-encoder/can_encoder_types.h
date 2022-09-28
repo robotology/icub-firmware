@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 3.31
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:03:58 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Wed Sep 28 09:22:59 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,8 +19,21 @@
 #ifndef RTW_HEADER_can_encoder_types_h_
 #define RTW_HEADER_can_encoder_types_h_
 #include "rtwtypes.h"
+#include "can_encoder_types.h"
 
-// Model Code Variants
+// Includes for objects with custom storage classes
+#include "rtw_defines.h"
+
+//
+//  Registered constraints for dimension variants
+
+// Constraint 'CAN_MAX_NUM_PACKETS == 4' registered by:
+//  '<S1>/Vector Concatenate'
+
+#if CAN_MAX_NUM_PACKETS != 4
+# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be equal to '4'"
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
 #define DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
 
@@ -301,7 +314,7 @@ struct BUS_CAN
 
 struct BUS_CAN_MULTIPLE
 {
-  BUS_CAN packets[4];
+  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
 };
 
 #endif

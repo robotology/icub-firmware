@@ -7,37 +7,43 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 3.3
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Tue Sep 13 12:54:58 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:38:11 2022
 //
 #include "rtwtypes.h"
 #include "rt_hypotf_snf.h"
 #include <cmath>
 
-extern "C" {
+extern "C"
+{
 
 #include "rt_nonfinite.h"
 
 }
+
 #include "mw_cmsis.h"
+#include "rtGetNaN.h"
 
 real32_T rt_hypotf_snf(real32_T u0, real32_T u1)
 {
   real32_T a;
+  real32_T b;
   real32_T tmp;
   real32_T y;
   a = std::abs(u0);
-  y = std::abs(u1);
-  if (a < y) {
-    a /= y;
+  b = std::abs(u1);
+  if (a < b) {
+    a /= b;
     mw_arm_sqrt_f32(a * a + 1.0F, &tmp);
-    y *= tmp;
-  } else if (a > y) {
-    y /= a;
-    mw_arm_sqrt_f32(y * y + 1.0F, &tmp);
+    y = tmp * b;
+  } else if (a > b) {
+    b /= a;
+    mw_arm_sqrt_f32(b * b + 1.0F, &tmp);
     y = tmp * a;
-  } else if (!rtIsNaNF(y)) {
+  } else if (rtIsNaNF(b)) {
+    y = (rtNaNF);
+  } else {
     y = a * 1.41421354F;
   }
 

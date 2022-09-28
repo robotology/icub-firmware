@@ -7,16 +7,18 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 3.10
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Tue Sep 13 12:54:44 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Mon Sep 26 16:37:51 2022
 //
-extern "C" {
+extern "C"
+{
 
 #include "rtGetNaN.h"
 
 }
-  extern "C"
+
+extern "C"
 {
 
 #include "rtGetInf.h"
@@ -26,14 +28,17 @@ extern "C" {
 #include <stddef.h>
 #include "rtwtypes.h"
 
-extern "C" {
+extern "C"
+{
 
 #include "rt_nonfinite.h"
 
 }
+
 #define NumBitsPerChar                 8U
 
-extern "C" {
+extern "C"
+{
   real_T rtInf;
   real_T rtMinusInf;
   real_T rtNaN;
@@ -41,7 +46,8 @@ extern "C" {
   real32_T rtMinusInfF;
   real32_T rtNaNF;
 }
-  extern "C"
+
+extern "C"
 {
   //
   // Initialize the rtInf, rtMinusInf, and rtNaN needed by the

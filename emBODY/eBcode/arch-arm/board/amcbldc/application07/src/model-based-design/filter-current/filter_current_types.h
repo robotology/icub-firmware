@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 3.7
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:27 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Wed Sep 28 09:23:34 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,8 +19,6 @@
 #ifndef RTW_HEADER_filter_current_types_h_
 #define RTW_HEADER_filter_current_types_h_
 #include "rtwtypes.h"
-
-// Model Code Variants
 #ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
 #define DEFINED_TYPEDEF_FOR_MotorCurrent_
 
@@ -57,11 +55,11 @@ struct c_dsp_internal_MedianFilterCG_T
   int32_T isInitialized;
   boolean_T isSetupComplete;
   real32_T pWinLen;
-  real32_T pBuf[10];
-  real32_T pHeap[10];
+  real32_T pBuf[32];
+  real32_T pHeap[32];
   real32_T pMidHeap;
   real32_T pIdx;
-  real32_T pPos[10];
+  real32_T pPos[32];
   real32_T pMinHeapLength;
   real32_T pMaxHeapLength;
 };
@@ -78,10 +76,10 @@ struct cell_wrap_filter_current_T
 
 #endif                                 // struct_cell_wrap_filter_current_T
 
-#ifndef struct_dsp_MedianFilter_filter_curre_T
-#define struct_dsp_MedianFilter_filter_curre_T
+#ifndef struct_dsp_simulink_MedianFilter_fil_T
+#define struct_dsp_simulink_MedianFilter_fil_T
 
-struct dsp_MedianFilter_filter_curre_T
+struct dsp_simulink_MedianFilter_fil_T
 {
   boolean_T matlabCodegenIsDeleted;
   int32_T isInitialized;
@@ -91,7 +89,7 @@ struct dsp_MedianFilter_filter_curre_T
   c_dsp_internal_MedianFilterCG_T pMID;
 };
 
-#endif                                // struct_dsp_MedianFilter_filter_curre_T
+#endif                                // struct_dsp_simulink_MedianFilter_fil_T
 
 // Forward declaration for rtModel
 typedef struct tag_RTM_filter_current_T RT_MODEL_filter_current_T;

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 4.107
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:39 2022
+// Model version                  : 5.1
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Wed Sep 28 09:23:48 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -127,7 +127,8 @@ struct tag_RTM_AMC_BLDC_T {
 // Block signals (default storage)
 #ifdef __cplusplus
 
-extern "C" {
+extern "C"
+{
 
 #endif
 
@@ -136,6 +137,7 @@ extern "C" {
 #ifdef __cplusplus
 
 }
+
 #endif
 
 // Block states (default storage)
@@ -143,7 +145,8 @@ extern struct DW_AMC_BLDC_T AMC_BLDC_DW;
 
 #ifdef __cplusplus
 
-extern "C" {
+extern "C"
+{
 
 #endif
 
@@ -156,6 +159,7 @@ extern "C" {
 #ifdef __cplusplus
 
 }
+
 #endif
 
 //
@@ -186,7 +190,8 @@ extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
 
 #ifdef __cplusplus
 
-extern "C" {
+extern "C"
+{
 
 #endif
 
@@ -200,12 +205,14 @@ extern "C" {
 #ifdef __cplusplus
 
 }
+
 #endif
 
 // Real-time Model object
 #ifdef __cplusplus
 
-extern "C" {
+extern "C"
+{
 
 #endif
 
@@ -214,6 +221,7 @@ extern "C" {
 #ifdef __cplusplus
 
 }
+
 #endif
 
 //-

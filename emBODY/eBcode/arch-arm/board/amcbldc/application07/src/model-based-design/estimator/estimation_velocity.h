@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 3.3
-// Simulink Coder version         : 9.7 (R2022a) 13-Nov-2021
-// C/C++ source code generated on : Thu Sep 15 11:04:20 2022
+// Model version                  : 4.0
+// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
+// C/C++ source code generated on : Wed Sep 28 09:23:27 2022
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,11 +22,13 @@
 #include "estimation_velocity_types.h"
 #include "rtGetInf.h"
 
-extern "C" {
+extern "C"
+{
 
 #include "rt_nonfinite.h"
 
 }
+
 // Block states (default storage) for model 'estimation_velocity'
 #ifndef estimation_velocity_MDLREF_HIDE_CHILD_
 
