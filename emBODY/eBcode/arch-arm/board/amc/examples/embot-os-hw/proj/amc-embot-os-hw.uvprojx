@@ -609,6 +609,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_MB049.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1310,6 +1315,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_MB049.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1991,6 +2001,11 @@
               <FileName>embot_hw_chip_MA730.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_MB049.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2725,6 +2740,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_MB049.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3458,6 +3478,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_chip_MB049.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4190,6 +4215,11 @@
               <FileName>embot_hw_chip_MA730.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_MB049.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
           </Files>
         </Group>

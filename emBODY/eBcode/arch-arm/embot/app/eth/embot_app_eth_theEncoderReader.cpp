@@ -232,26 +232,49 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::activate(EOconstarray *array
         {
             _config.jomo_cfg[i].encoder1des = jomodes->encoder1;
             _config.jomo_cfg[i].encoder2des = jomodes->encoder2;
+            
+            embot::hw::encoder::Config cfg {};
+            
+            switch(_config.jomo_cfg[i].encoder1des.type)
+            {
+                case eomc_enc_aea:
+                    cfg.type = embot::hw::encoder::Type::chipAS5045;
+                    break;
+                case eomc_enc_aea3:
+                    cfg.type = embot::hw::encoder::Type::chipMA730;
+                    break;
+                case eomc_enc_aksim2:
+                    cfg.type = embot::hw::encoder::Type::chipMB049;
+                    break;
+                default:
+                    // unsupported encoder
+                    return eores_NOK_unsupported;
+            }
+            
+            // 2. configure and initialize SPI encoders
+            switch(_config.jomo_cfg[i].encoder1des.port)
+            {
+                case eobrd_port_amc_J5_X1:
+                    embot::hw::encoder::init(embot::hw::ENCODER::one, cfg);
+                    break;
+                case eobrd_port_amc_J5_X2:
+                    embot::hw::encoder::init(embot::hw::ENCODER::two, cfg);
+                    break;
+                case eobrd_port_amc_J5_X3:
+                    embot::hw::encoder::init(embot::hw::ENCODER::three, cfg);
+                    break;
+                default:
+                    // error invalid SPI
+                    return eores_NOK_generic;
+            }
         }
     }
-
     
-    // 2. configure and initialize SPI encoders
-    //s_eo_configure_SPI_encoders(p);
-
-    embot::hw::encoder::Config cfgONE   { .type = embot::hw::encoder::Type::chipAS5045 };
-    embot::hw::encoder::Config cfgTWO   { .type = embot::hw::encoder::Type::chipAS5045 };
-    embot::hw::encoder::Config cfgTHREE { .type = embot::hw::encoder::Type::chipAS5045 };
-    
-    embot::hw::encoder::init(embot::hw::ENCODER::one, cfgONE);
-    embot::hw::encoder::init(embot::hw::ENCODER::two, cfgTWO);
-    embot::hw::encoder::init(embot::hw::ENCODER::three, cfgTHREE);
-
 //    // 3. configure other encoders
 //    s_eo_appEncReader_configure_NONSPI_encoders(p);
     
     
-    _actived = eobool_true;    
+    _actived = eobool_true;
     
     // to enable the diagnostics ... use on equal to eobool_true
 //    s_eo_appEncReader_amodiag_Config(dc);     
