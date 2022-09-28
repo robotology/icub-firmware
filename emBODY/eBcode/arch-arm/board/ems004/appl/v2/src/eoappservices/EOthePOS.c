@@ -1158,12 +1158,12 @@ static void s_eo_pos_boards_configure(EOthePOS *p)
             eoas_pos_SensorConfig_t *sc = &(p->service.servconfig.data.as.pos.config.boardconfig[i].sensors[s]);
             if(1 == sc->enabled)
             {
-                posconfig.id = sc->id;
+                posconfig.id = sc->connector;
                 posconfig.type = sc->type;
                 posconfig.setting.decideg[0].enabled = 1;
                 posconfig.setting.decideg[0].invertdirection = sc->invertdirection;
                 posconfig.setting.decideg[0].rotation = sc->rotation;
-                posconfig.setting.decideg[0].label = sc->label;
+                posconfig.setting.decideg[0].label = sc->port;
                 posconfig.setting.decideg[0].zero = sc->zero;
                 
                 eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);
