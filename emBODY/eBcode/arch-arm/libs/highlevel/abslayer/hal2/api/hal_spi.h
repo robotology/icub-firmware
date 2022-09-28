@@ -140,7 +140,7 @@ typedef enum
 typedef enum
 {
     hal_spi_gpio_cfg_sckmosi_pullup     = 0,
-    hal_spi_gpio_cfg_sckmosi_nopull     = 1
+    hal_spi_gpio_cfg_sckmosi_pulldown   = 1
 } hal_spi_gpio_cfg_t;
 
 
@@ -165,7 +165,7 @@ typedef struct
     void*                   argonframesreceived;
     hal_spi_cpolarity_t     cpolarity;    
     hal_spi_datacapture_t   datacapture;
-    uint16_t                gpio_cfg_flags;     /* bit 1 assume values defined in hal_spi_gpio_cfg_t (only for AEA and AMO) can be either 0 or 1: if 0 SCK MOSI is pullUP else 1 is NoPull */
+    uint16_t                gpio_cfg_flags;     /* bit 1 assume values defined in hal_spi_gpio_cfg_t (only for AEA, AMO and AKSIM2) can be either 0 or 1: if 0 SCK MOSI is pullUP else 1 is PullDown */
 } hal_spi_cfg_t;
 
  

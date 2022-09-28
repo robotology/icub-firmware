@@ -151,6 +151,7 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
 
         // marco.accame on 16 dec 2020: i assume eomc_enc_pos is similar to ... amo and psc
         case(eomc_enc_pos):
+        case(eomc_enc_aksim2):
         case(eomc_enc_amo):
         case(eomc_enc_psc):
         {
@@ -367,6 +368,7 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
         case eomc_enc_pos:
         case eomc_enc_aea:
         case eomc_enc_aea3:
+        case eomc_enc_aksim2:
         case eomc_enc_amo:
         case eomc_enc_psc:
             AbsEncoder_position_init_aea(o, position);

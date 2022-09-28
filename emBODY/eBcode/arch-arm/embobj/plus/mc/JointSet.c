@@ -39,9 +39,6 @@
 
 #include "Calibrators.h"
 
-// TODO: Remove after tests on real robot
-//#include <hal_trace.h>
-
 static void JointSet_set_inner_control_flags(JointSet* o);
 
 static const CTRL_UNITS DEG2ICUB = 65536.0f/360.0f;
