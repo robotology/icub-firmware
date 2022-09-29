@@ -637,7 +637,25 @@ void I2C1_ER_IRQHandler(void)
     HAL_I2C_ER_IRQHandler(&hi2c1);
 }
 
-//1
+void DMA1_Channel6_IRQHandler(void)
+{   
+    HAL_DMA_IRQHandler(&hdma_i2c1_tx);
+}
+
+void DMA1_Channel7_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+}
+
+void DMA1_Channel4_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&hdma_i2c2_tx);
+}
+
+void DMA1_Channel5_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&hdma_i2c2_rx);
+}
 
 void I2C2_EV_IRQHandler(void)
 {
