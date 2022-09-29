@@ -511,7 +511,7 @@ int alignRotorIndex(volatile int* IqRef)
         
         if (++timer > 30000)
         {
-            rotorA = __builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
+            rotorA = QEgetElettrDegUncal();// __builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
             
             timer = 0;
             
@@ -527,7 +527,7 @@ int alignRotorIndex(volatile int* IqRef)
         {
             IqRef_fake = 0;
             
-            rotorB = __builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
+            rotorB = QEgetElettrDegUncal();//__builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
             
             int delta = rotorB - rotorA;
             
@@ -653,11 +653,11 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         {
             if (hall_sector_old == 6 && hall_sector == 1)
             {
-                QEsignalZeroCrossing(1);
+                QEHESCrossed(1);
             }
             else if (hall_sector_old == 1 && hall_sector == 6)
             {
-                QEsignalZeroCrossing(0);
+                QEHESCrossed(0);
             }
             
             hall_sector_old = hall_sector;
@@ -980,8 +980,8 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     }
     
     // Re-scale Vq, Vd with respect to the PWM resolution and fullscale.
-    Vq = Vq/(1000/PWM_50_DUTY_CYC);
-    Vd = Vd/(1000/PWM_50_DUTY_CYC);
+    Vq = Vq/2;
+    Vd = Vd/2;
     
     //
     ////////////////////////////////////////////////////////////////////////////
