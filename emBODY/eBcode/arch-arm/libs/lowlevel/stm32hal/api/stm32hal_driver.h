@@ -176,7 +176,15 @@ extern "C" {
         #endif        
         #define STM32HAL_DRIVER_VERSION 0x190   
     #endif
-    
+
+#elif   defined(STM32HAL_BOARD_MTB4FAP)
+
+    // one drive only: v1D3.
+    #if !defined(STM32HAL_DRIVER_V1D3)
+        #define STM32HAL_DRIVER_V1D3
+    #endif        
+    #define STM32HAL_DRIVER_VERSION 0x1D3   
+
 #else
     #error STM32HAL: the STM32HAL_BOARD_${B} is undefined
 #endif
@@ -212,6 +220,8 @@ extern "C" {
         #include "../src/driver/stm32l4-v1B0/inc/stm32l4xx_hal.h"
     #elif   defined(STM32HAL_DRIVER_V1D2)        
         #include "../src/driver/stm32l4-v1D2/inc/stm32l4xx_hal.h"        
+     #elif   defined(STM32HAL_DRIVER_V1D3)        
+        #include "../src/driver/stm32l4-v1D3/inc/stm32l4xx_hal.h"        
     #else
         #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
     #endif
