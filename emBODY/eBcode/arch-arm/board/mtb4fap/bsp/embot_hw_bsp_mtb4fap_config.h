@@ -23,12 +23,17 @@
     #define EMBOT_ENABLE_hw_si7051
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_bno055
-    #define EMBOT_ENABLE_hw_multisda
+    #undef EMBOT_ENABLE_hw_multisda
+    #define EMBOT_ENABLE_hw_tlv493d
+    #define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
+    
+    #define EMBOT_ENABLE_hw_i2ce
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_MTB4FAP ...
 #endif
 
+    
 
 #endif  // include-guard
 

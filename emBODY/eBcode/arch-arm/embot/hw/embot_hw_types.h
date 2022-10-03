@@ -63,6 +63,8 @@ namespace embot { namespace hw {
 
     enum class I2C : std::uint8_t { one = 0, two = 1, three = 2, four = 3, none = 31, maxnumberof = 4 };     
 
+    enum class I2CE : std::uint8_t { one = 0, two = 1, three = 2, four = 3, none = 31, maxnumberof = 4 };
+    
     enum class BNO055 : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };    
     
     enum class TLV493D : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 31, maxnumberof = 6 };
