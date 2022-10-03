@@ -719,16 +719,16 @@ namespace embot { namespace hw { namespace tlv493d {
 
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
 
-    constexpr PROP propSDA0  { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0xBC} };
-    constexpr PROP propSDA1  { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0xBC} };
-    constexpr PROP propSDA2  { embot::hw::i2c::Descriptor{embot::hw::I2C::three, 0xBC} }; 
-    constexpr PROP propSDA3  { embot::hw::i2c::Descriptor{embot::hw::I2C::four,  0xBC} };  
+    constexpr PROP propSDA0  { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0xBC} };
+    constexpr PROP propSDA1  { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0xBC} };
+    constexpr PROP propSDA2  { embot::hw::I2Cdescriptor{embot::hw::ANY::three, 0xBC} }; 
+    constexpr PROP propSDA3  { embot::hw::I2Cdescriptor{embot::hw::ANY::four,  0xBC} };  
    
 #else
-    constexpr PROP propSDA0  { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0xBC} };
-    constexpr PROP propSDA1  { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0xBC} };
-    constexpr PROP propSDA2  { embot::hw::i2c::Descriptor{embot::hw::I2C::three, 0xBC} }; 
-    constexpr PROP propSDA3  { embot::hw::i2c::Descriptor{embot::hw::I2C::four,  0xBC} };  
+    constexpr PROP propSDA0  { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0xBC} };
+    constexpr PROP propSDA1  { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0xBC} };
+    constexpr PROP propSDA2  { embot::hw::I2Cdescriptor{embot::hw::ANY::three, 0xBC} }; 
+    constexpr PROP propSDA3  { embot::hw::I2Cdescriptor{embot::hw::ANY::four,  0xBC} };  
 #endif
     
     

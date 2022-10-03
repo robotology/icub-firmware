@@ -221,6 +221,17 @@ namespace embot { namespace hw {
     };
     #endif
       
+    
+    struct I2Cdescriptor
+    {
+        embot::hw::ANY bus {embot::hw::ANY::none};
+        uint8_t adr {0};
+        constexpr I2Cdescriptor() = default;
+        constexpr I2Cdescriptor(embot::hw::ANY b, uint8_t a = 0) : bus(b), adr(a) {}
+        constexpr bool isvalid() const { return (embot::hw::ANY::none != bus) && (0 != adr); } 
+        constexpr embot::hw::I2C getI2Cbus() const { return static_cast<embot::hw::I2C>(bus); }
+        constexpr embot::hw::I2CE getI2CEbus() const { return static_cast<embot::hw::I2CE>(bus); }        
+    };    
 
 }} // namespace embot { namespace hw {
 

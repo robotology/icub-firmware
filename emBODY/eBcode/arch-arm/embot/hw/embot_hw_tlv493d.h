@@ -26,7 +26,6 @@
 #include "embot_hw.h"
 #include "embot_hw_types.h"
 
-#include "embot_hw_i2c.h"
 
 namespace embot { namespace hw { namespace tlv493d {
 

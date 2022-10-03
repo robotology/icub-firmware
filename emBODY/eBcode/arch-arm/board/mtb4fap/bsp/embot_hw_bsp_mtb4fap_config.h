@@ -26,6 +26,7 @@
     #undef EMBOT_ENABLE_hw_multisda
     #define EMBOT_ENABLE_hw_tlv493d
     #define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
+//    #define EMBOT_ENABLE_hw_tlv493d_i2ceMODE
     
     #define EMBOT_ENABLE_hw_i2ce
         
