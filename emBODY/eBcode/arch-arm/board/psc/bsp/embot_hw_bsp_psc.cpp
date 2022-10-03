@@ -737,8 +737,8 @@ namespace embot { namespace hw { namespace tlv493d {
     
     #if defined(STM32HAL_BOARD_PSC)
         
-    constexpr PROP prop01 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} }; 
-    constexpr PROP prop02 { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x3E} }; 
+    constexpr PROP prop01 { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0x3E} }; 
+    constexpr PROP prop02 { embot::hw::I2Cdescriptor{embot::hw::ANY::three,   0x3E} }; 
 
     constexpr BSP thebsp {        
         // maskofsupported

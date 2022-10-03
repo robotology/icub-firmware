@@ -335,32 +335,6 @@ namespace embot { namespace hw { namespace flash {
 
 
 
-// - support map: begin of embot::hw::pga308
-
-#include "embot_hw_pga308_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_pga308)
-
-namespace embot { namespace hw { namespace pga308 {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::PGA308 h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-    #error embot::hw::pga308::thebsp must be defined
-#endif 
-
-
-// - support map: end of embot::hw::pga308
-
-
-
 // - support map: begin of embot::hw::si7051
 
 #include "embot_hw_si7051_bsp.h"
@@ -419,69 +393,6 @@ namespace embot { namespace hw { namespace si7051 {
 
 
 // - support map: end of embot::hw::si7051
-
-
-// - support map: begin of embot::hw::onewire
-
-#include "embot_hw_onewire_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_onewire)
-
-namespace embot { namespace hw { namespace onewire {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::ONEWIRE h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-
-namespace embot { namespace hw { namespace onewire {
-    #if   defined(STM32HAL_BOARD_MTB4FAP)       
-    #else
-        #error embot::hw::onewire::thebsp must be defined    
-    #endif
-}}}
-
-#endif
-
-// - support map: end of embot::hw::onewire
-
-
-
-// - support map: begin of embot::hw::adc
-
-#include "embot_hw_adc_bsp.h"
-
-#if   !defined(HAL_ADC_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_adc)
-
-namespace embot { namespace hw { namespace adc {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::ADC h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-
-namespace embot { namespace hw { namespace adc {
-    #if   defined(STM32HAL_BOARD_MTB4FAP)       
-    #else
-        #error embot::hw::adc::thebsp must be defined    
-    #endif
-}}}
-
-#endif // adc
-
-// - support map: end of embot::hw::adc
 
 
 
@@ -625,7 +536,7 @@ namespace embot { namespace hw { namespace i2c {
 
 // irq handlers of i2c
 
-#if defined(STM32HAL_BOARD_MTB4FAP) | defined(STM32HAL_BOARD_STRAIN2) | defined(STM32HAL_BOARD_RFE)
+#if defined(STM32HAL_BOARD_MTB4FAP)
 
 void I2C1_EV_IRQHandler(void)
 {
@@ -697,7 +608,7 @@ namespace embot { namespace hw { namespace bno055 {
 
 namespace embot { namespace hw { namespace bno055 {
     
-    #if defined(STM32HAL_BOARD_MTB4FAP) || defined(STM32HAL_BOARD_STRAIN2)
+    #if defined(STM32HAL_BOARD_MTB4FAP)
     
     // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
     constexpr PROP prop01 {
@@ -732,39 +643,6 @@ namespace embot { namespace hw { namespace bno055 {
 
 // - support map: end of embot::hw::bno055
 
-
-
-// - support map: begin of embot::hw::tlv493d
-
-#include "embot_hw_tlv493d_bsp.h"
-
-#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_tlv493d)
-
-namespace embot { namespace hw { namespace tlv493d {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::TLV493D h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-
-namespace embot { namespace hw { namespace tlv493d {
-           
-    #if defined(STM32HAL_BOARD_MTB4FAP)        
-    #else
-        #error embot::hw::tlv493d::thebsp must be defined    
-    #endif    
-              
-}}} // namespace embot { namespace hw { namespace tlv493d {
-
-#endif // tlv493d
-
-// - support map: end of embot::hw::tlv493d
 
 
 // - support map: begin of embot::hw::multisda
@@ -815,16 +693,17 @@ namespace embot { namespace hw { namespace multisda {
 // - support map: end of embot::hw::multisda
 
 
-// - support map: begin of embot::hw::ads122c04
 
-#include "embot_hw_ads122c04_bsp.h"
+// - support map: begin of embot::hw::tlv493d
 
-#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_ads122c04)
+#include "embot_hw_tlv493d_bsp.h"
 
-namespace embot { namespace hw { namespace ads122c04 {
+#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_tlv493d)
+
+namespace embot { namespace hw { namespace tlv493d {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::ADS122C04 h) const {}    
+    void BSP::init(embot::hw::TLV493D h) const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -833,46 +712,200 @@ namespace embot { namespace hw { namespace ads122c04 {
 }}}
 
 #else
-namespace embot { namespace hw { namespace ads122c04 {
-    #if   defined(STM32HAL_BOARD_MTB4FAP)       
+
+namespace embot { namespace hw { namespace tlv493d {
+           
+#if defined(STM32HAL_BOARD_MTB4FAP)
+    
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
+
+    constexpr PROP propSDA0  { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0xBC} };
+    constexpr PROP propSDA1  { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0xBC} };
+    constexpr PROP propSDA2  { embot::hw::I2Cdescriptor{embot::hw::ANY::three, 0xBC} }; 
+    constexpr PROP propSDA3  { embot::hw::I2Cdescriptor{embot::hw::ANY::four,  0xBC} };  
+   
+#else
+    constexpr PROP propSDA0  { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0xBC} };
+    constexpr PROP propSDA1  { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0xBC} };
+    constexpr PROP propSDA2  { embot::hw::I2Cdescriptor{embot::hw::ANY::three, 0xBC} }; 
+    constexpr PROP propSDA3  { embot::hw::I2Cdescriptor{embot::hw::ANY::four,  0xBC} };  
+#endif
+    
+    
+    constexpr BSP thebsp {     
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::two) |
+        mask::pos2mask<uint32_t>(TLV493D::three) | mask::pos2mask<uint32_t>(TLV493D::four),        
+        // properties
+        {{
+            &propSDA0, &propSDA1, &propSDA2, &propSDA3, nullptr, nullptr
+        }}      
+    };
+    
+    void BSP::init(embot::hw::TLV493D h) const {}
+        
     #else
-        #error embot::hw::ads122c04::thebsp must be defined    
+        #error embot::hw::tlv493d::thebsp must be defined    
     #endif
-}}}
-#endif // ads122c04
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+              
+}}} // namespace embot { namespace hw { namespace tlv493d {
 
-// - support map: end of embot::hw::ads122c04
+#endif // tlv493d
+
+// - support map: end of embot::hw::tlv493d
 
 
+// - support map: begin of embot::hw::spi
 
-// - support map: begin of embot::hw::ad7147
+#include "embot_hw_i2ce.h"
+#include "embot_hw_i2ce_bsp.h"
+#include "embot_hw_gpio.h"
 
-#include "embot_hw_ad7147_bsp.h"
+#if !defined(EMBOT_ENABLE_hw_i2ce)
 
-#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_ad7147)
-
-namespace embot { namespace hw { namespace ad7147 {
+namespace embot { namespace hw { namespace i2ce { namespace bsp {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::AD7147 h) const {}    
+    bool BSP::init(embot::hw::I2CE h, const Config &config) const { return true;}
+    bool BSP::deinit(embot::hw::I2CE h) const { return true;}
     const BSP& getBSP() 
     {
         return thebsp;
     }
     
-}}}
+}}}}
 
 #else
-namespace embot { namespace hw { namespace ad7147 {
-    #if   defined(STM32HAL_BOARD_MTB4FAP)       
+
+namespace embot { namespace hw { namespace i2ce { namespace bsp {
+    
+    #if defined(STM32HAL_BOARD_MTB4FAP)
+    
+    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinout1 = { {
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four},     // scl
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight}     // sda
+    } };
+    constexpr PROP i2ce1p = { Speed::standard100, pinout1 }; 
+    
+    
+    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinout2 = { {
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four},     // scl
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::seven}     // sda
+    } };
+    constexpr PROP i2ce2p = { Speed::standard100, pinout2 };     
+    
+    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinout3 = { {
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four},     // scl
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::six}       // sda
+    } };
+    constexpr PROP i2ce3p = { Speed::standard100, pinout3 };     
+    
+    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinout4 = { {
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four},     // scl
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five}      // sda
+    } };
+    constexpr PROP i2ce4p = { Speed::standard100, pinout4 }; 
+    
+
+    
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(I2CE::one) | mask::pos2mask<uint32_t>(I2CE::two) | 
+        mask::pos2mask<uint32_t>(I2CE::three) | mask::pos2mask<uint32_t>(I2CE::four),    
+        // properties
+        {{
+            &i2ce1p, &i2ce2p, &i2ce3p, &i2ce4p           
+        }}        
+    };
+     
+    
+    
+    bool BSP::init(embot::hw::I2CE h, const Config &config) const
+    { 
+        static constexpr embot::hw::gpio::Config out 
+        { 
+            embot::hw::gpio::Mode::OUTPUTpushpull, 
+            embot::hw::gpio::Pull::nopull, 
+            embot::hw::gpio::Speed::veryhigh 
+        };    
+        
+        embot::hw::GPIO scl = embot::hw::i2ce::bsp::getBSP().getPROP(h)->pinout[0];
+        embot::hw::GPIO sda = embot::hw::i2ce::bsp::getBSP().getPROP(h)->pinout[1];
+        
+        switch(h)
+        {
+            case I2CE::one:
+            case I2CE::two:
+            case I2CE::three:
+            case I2CE::four:
+            {
+                #warning TODO: init the GPIO specified in the BSP
+                // ... 
+                embot::hw::gpio::init(scl, out);
+                embot::hw::gpio::init(sda, out);
+            } break;
+            
+            default: {} break;                            
+        }
+        
+        return true; 
+    }
+
+    bool BSP::deinit(embot::hw::I2CE h) const
+    { 
+
+        embot::hw::GPIO scl = embot::hw::i2ce::bsp::getBSP().getPROP(h)->pinout[0];
+        embot::hw::GPIO sda = embot::hw::i2ce::bsp::getBSP().getPROP(h)->pinout[1];
+        
+        switch(h)
+        {
+            case I2CE::one:
+            case I2CE::two:
+            case I2CE::three:
+            case I2CE::four:
+            {
+                #warning TODO: deinit the GPIO specified in the BSP
+                // ... 
+                embot::hw::gpio::deinit(scl);
+                embot::hw::gpio::deinit(sda);
+            } break;
+            
+            default: {} break;                            
+        }        
+        
+        return true;        
+    }
+    
     #else
-        #error embot::hw::ad7147::thebsp must be defined    
+        #error embot::hw::bsp::spi::thebsp must be defined    
     #endif
-}}}
-#endif // ad7147
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}}
 
-// - support map: end of embot::hw::ad7147
+extern "C"
+{
+    // TODO: add in here any C function we may need
+    
+}
 
+extern "C"
+{
+    // TODO: add in here any irq handler we may beed
+}
+
+#endif // spi
+
+// - support map: end of embot::hw::spi
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

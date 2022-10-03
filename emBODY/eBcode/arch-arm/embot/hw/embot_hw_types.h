@@ -63,6 +63,8 @@ namespace embot { namespace hw {
 
     enum class I2C : std::uint8_t { one = 0, two = 1, three = 2, four = 3, none = 31, maxnumberof = 4 };     
 
+    enum class I2CE : std::uint8_t { one = 0, two = 1, three = 2, four = 3, none = 31, maxnumberof = 4 };
+    
     enum class BNO055 : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };    
     
     enum class TLV493D : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 31, maxnumberof = 6 };
@@ -219,6 +221,17 @@ namespace embot { namespace hw {
     };
     #endif
       
+    
+    struct I2Cdescriptor
+    {
+        embot::hw::ANY bus {embot::hw::ANY::none};
+        uint8_t adr {0};
+        constexpr I2Cdescriptor() = default;
+        constexpr I2Cdescriptor(embot::hw::ANY b, uint8_t a = 0) : bus(b), adr(a) {}
+        constexpr bool isvalid() const { return (embot::hw::ANY::none != bus) && (0 != adr); } 
+        constexpr embot::hw::I2C getI2Cbus() const { return static_cast<embot::hw::I2C>(bus); }
+        constexpr embot::hw::I2CE getI2CEbus() const { return static_cast<embot::hw::I2CE>(bus); }        
+    };    
 
 }} // namespace embot { namespace hw {
 

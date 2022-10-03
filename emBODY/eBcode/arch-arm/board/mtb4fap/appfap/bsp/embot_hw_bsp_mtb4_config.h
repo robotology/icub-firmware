@@ -28,15 +28,14 @@
     #error this is the bsp config of STM32HAL_BOARD_MTB4 ...
 #endif
 
-#if defined(STM32HAL_BOARD_MTB4FAPfake)
-    #warning STM32HAL_BOARD_MTB4FAPfake is defined ...
+    // adapt for the mtb4fap
     
     #undef EMBOT_ENABLE_hw_multisda
     
     #define EMBOT_ENABLE_hw_tlv493d
     #define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
     
-#endif
+
     
 #endif  // include-guard
 

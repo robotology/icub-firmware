@@ -475,7 +475,7 @@ extern void stm32hal_board_init(void);
         
     #elif(STM32HAL_DRIVER_VERSION == 0x190)
 
-        #include "../src/config/stm32hal_dr5iver_cfg_of_mtb4c_v190.h"
+        #include "../src/config/stm32hal_driver_cfg_of_mtb4c_v190.h"
 
         //#include "../src/board/mtb4c/v190/inc/adc.h"
         #include "../src/board/mtb4c/v190/inc/can.h"

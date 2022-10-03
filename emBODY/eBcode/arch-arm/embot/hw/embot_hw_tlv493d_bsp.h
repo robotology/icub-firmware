@@ -20,7 +20,7 @@ namespace embot { namespace hw { namespace tlv493d {
     
     struct PROP
     { 
-        embot::hw::i2c::Descriptor i2cdes {embot::hw::I2C::none, 0};
+        embot::hw::I2Cdescriptor i2cdes {embot::hw::ANY::none, 0};
     };
     
     struct BSP : public embot::hw::bsp::SUPP

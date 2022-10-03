@@ -909,20 +909,20 @@ namespace embot { namespace hw { namespace tlv493d {
     
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
 
-    constexpr PROP propJ4  { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0xBC} };
-    constexpr PROP propJ5  { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0xBC} };
-    constexpr PROP propJ6  { embot::hw::i2c::Descriptor{embot::hw::I2C::three, 0xBC} }; 
-    constexpr PROP propJ7  { embot::hw::i2c::Descriptor{embot::hw::I2C::four,  0xBC} };  
-    constexpr PROP propJ13 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
-    constexpr PROP propU27 { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0x3E} };
+    constexpr PROP propJ4  { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0xBC} };
+    constexpr PROP propJ5  { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0xBC} };
+    constexpr PROP propJ6  { embot::hw::I2Cdescriptor{embot::hw::ANY::three, 0xBC} }; 
+    constexpr PROP propJ7  { embot::hw::I2Cdescriptor{embot::hw::ANY::four,  0xBC} };  
+    constexpr PROP propJ13 { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0x3E} };
+    constexpr PROP propU27 { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0x3E} };
     
 #else
-    constexpr PROP propJ4  { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0xBC} };
-    constexpr PROP propJ5  { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0xBC} };
-    constexpr PROP propJ6  { embot::hw::i2c::Descriptor{embot::hw::I2C::three, 0xBC} }; 
-    constexpr PROP propJ7  { embot::hw::i2c::Descriptor{embot::hw::I2C::four,  0xBC} };  
-    constexpr PROP propJ13 { embot::hw::i2c::Descriptor{embot::hw::I2C::one,   0x3E} };
-    constexpr PROP propU27 { embot::hw::i2c::Descriptor{embot::hw::I2C::two,   0x3E} };
+    constexpr PROP propJ4  { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0xBC} };
+    constexpr PROP propJ5  { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0xBC} };
+    constexpr PROP propJ6  { embot::hw::I2Cdescriptor{embot::hw::ANY::three, 0xBC} }; 
+    constexpr PROP propJ7  { embot::hw::I2Cdescriptor{embot::hw::ANY::four,  0xBC} };  
+    constexpr PROP propJ13 { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0x3E} };
+    constexpr PROP propU27 { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0x3E} };
 #endif
     
     
