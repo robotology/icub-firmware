@@ -104,9 +104,9 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__DEBUG(eOcanframe_t *frame, eOcanport_t port)
 {
-    // i decode this fram only if it comes from 2foc and i discard it if it comes from a mc4.
+    // i decode this frame only if it comes from 2foc and i discard it if it comes from a mc4.
     // in date 19 sept 2017 we decided that the 2foc boards would send this diagnostics frame when they find an error of type tbd
-    // as a first case we want to sue it for debugging the case of motor encoder dirty which happens on icub-v3.   
+    // as a first case we want to use it for debugging the case of motor encoder dirty which happens on icub-v3.   
     
     eOerrmanDescriptor_t des = {0};
     
@@ -126,6 +126,10 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__DEBUG(eOcanframe_t *fra
     else if(eobrd_cantype_mc4 == boardtype)
     {   
         // we have a mc4, ... we just drop it
+    }
+    else if(eobrd_cantype_amcbldc == boardtype)
+    { 
+        // amcbldc does not emit this message
     }
     
     return(eores_OK); 
@@ -271,7 +275,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
     eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
     
     
-    if(eobrd_cantype_foc == boardtype)
+    if(eobrd_cantype_foc == boardtype || eobrd_cantype_amcbldc == boardtype)
     {   
         // in case we have a 2foc ... i treat the first joint only   
         // first joint: use eobrd_caninsideindex_first and gets the first 2 bytes of the frame         
