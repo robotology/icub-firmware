@@ -936,6 +936,7 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlo
     {
         case eobrd_cantype_mc4:
         case eobrd_cantype_foc:
+        case eobrd_cantype_amcbldc:
         {
             found = eobool_true;
             command.clas = eocanprot_msgclass_pollingMotorControl;

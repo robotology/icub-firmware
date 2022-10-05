@@ -531,7 +531,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 
         // 1. prepare the can discovery for foc boards 
         eOcandiscovery_target_t trgt = {0};
-        trgt.info.type = eobrd_cantype_foc;
+        trgt.info.type = p->service.servconfig.data.mc.foc_based.type;
         trgt.info.protocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major; 
         trgt.info.protocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
         trgt.info.firmware.major = p->service.servconfig.data.mc.foc_based.version.firmware.major; 
@@ -919,7 +919,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 
                 eObrd_canproperties_t prop = {0};
                 
-                prop.type = eobrd_cantype_foc;
+                prop.type = p->service.servconfig.data.mc.foc_based.type;
                 prop.location.port = jomodes->actuator.foc.canloc.port;
                 prop.location.addr = jomodes->actuator.foc.canloc.addr;
                 prop.location.insideindex = jomodes->actuator.foc.canloc.insideindex;

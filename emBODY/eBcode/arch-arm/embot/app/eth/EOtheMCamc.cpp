@@ -554,6 +554,7 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
     
     if(eo_motcon_mode_foc != servcfg->type)  
     {
+        embot::core::print("[ERROR] eo_motioncontrol_Verify2: servcfg->type unrecognized");
         p->service.state = eomn_serv_state_failureofverify;
         s_mc_synchservice(p->service.state);
         if(NULL != onverify)
@@ -592,7 +593,7 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
 
         // 1. prepare the can discovery for foc boards 
         eOcandiscovery_target_t trgt = {0};
-        trgt.info.type = eobrd_cantype_foc;
+        trgt.info.type = p->service.servconfig.data.mc.foc_based.type;
         trgt.info.protocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major; 
         trgt.info.protocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
         trgt.info.firmware.major = p->service.servconfig.data.mc.foc_based.version.firmware.major; 
@@ -637,6 +638,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
     if((eo_motcon_mode_foc != servcfg->type))
     {
+        embot::core::print("[Error] eo_motioncontrol_Activate: unrecognized servcfg->type");
         return(eores_NOK_generic);
     }    
     
@@ -677,7 +679,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 
                 eObrd_canproperties_t prop = {0};
                 
-                prop.type = eobrd_cantype_foc;
+                prop.type = p->service.servconfig.data.mc.foc_based.type;
                 prop.location.port = jomodes->actuator.foc.canloc.port;
                 prop.location.addr = jomodes->actuator.foc.canloc.addr;
                 prop.location.insideindex = jomodes->actuator.foc.canloc.insideindex;
@@ -873,8 +875,12 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
         // just start a reading of encoders        
         //eo_encoderreader_StartReading(eo_encoderreader_GetHandle());
         embot::app::eth::theEncoderReader::getInstance().startReading();
-    } 
-    // eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Start()", s_eobj_ownname);
+    }
+    else
+    {    
+        embot::core::print("[ERROR] eo_motioncontrol_Start: unrecognized servconfig.type");
+        eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Start()", s_eobj_ownname);
+    }
     
     return(eores_OK);    
 }
@@ -1032,6 +1038,10 @@ extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t
         // config motor straigth away
 //        #warning TODO-AMC-MC: add MController  
         MController_config_motor(num, mc);
+    }
+    else
+    {
+        embot::core::print("[ERROR] eo_motioncontrol_ConfigMotor: mcmode unrecognized");
     }
    
     return eores_OK;

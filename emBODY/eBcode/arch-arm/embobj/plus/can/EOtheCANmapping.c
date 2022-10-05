@@ -743,8 +743,8 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
     // brd: 
     static const uint32_t tableB[] = // [epen]
     {
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),         // joint
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),         // motor
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),         // joint      //TODO : check here for amcbldc
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),         // motor
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // strain
         (1 << eobrd_cantype_mais),                                                              // mais
         (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_mtb4c),  // temperature
@@ -988,7 +988,7 @@ static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * 
     eOprotIndex_t index = EOK_uint08dummy;
 
 
-    if(theboard->board.props.type == eobrd_cantype_foc) 
+    if(eobrd_cantype_foc == theboard->board.props.type || eobrd_cantype_amcbldc == theboard->board.props.type) 
     {   // if 1foc it is always in nibble-0 
         index = theboard->board.entities2.compactIndicesOf & 0x000F;
     }
