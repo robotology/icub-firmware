@@ -101,7 +101,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__DEBUG(eOcanframe_t *fra
     
     eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
         
-    if(eobrd_cantype_foc == boardtype)
+    if(eobrd_cantype_foc == boardtype || eobrd_cantype_amcbldc == boardtype)
     {
         // i just forward the full canframe into a debug message. later on i will add a proper message type.        
         des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
@@ -262,7 +262,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
     eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
     
     
-    if(eobrd_cantype_foc == boardtype)
+    if(eobrd_cantype_foc == boardtype || eobrd_cantype_amcbldc == boardtype)
     {   
         // in case we have a 2foc ... i treat the first joint only   
         // first joint: use eobrd_caninsideindex_first and gets the first 2 bytes of the frame         

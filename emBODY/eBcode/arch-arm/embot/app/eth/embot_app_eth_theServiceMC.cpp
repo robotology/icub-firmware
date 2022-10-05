@@ -131,8 +131,10 @@ bool embot::app::eth::theServiceMC::Impl::stop()
 bool embot::app::eth::theServiceMC::Impl::set(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem)
 {
     //#warning TODO: add  embot::app::eth::theMCservice::getInstance().SetRegulars(arrayofid32, &numberofthem);
-    eo_motioncontrol_SetRegulars(_eom, arrayofid32, &numberofthem);
-    #warning possibile baco ... set(regulars) potrebbe non funzionare come dovrebbe quando abbiamo due servizi
+    if( eores_NOK_generic == eo_motioncontrol_SetRegulars(_eom, arrayofid32, &numberofthem)){
+        #warning possibile baco ... set(regulars) potrebbe non funzionare come dovrebbe quando abbiamo due servizi (e.g. Motion Control + FT)
+        embot::core::print("[WARNING] eores_NOK_generic returned  during eo_motioncontrol_SetRegulars");
+    }
     return true;  
 }
 
