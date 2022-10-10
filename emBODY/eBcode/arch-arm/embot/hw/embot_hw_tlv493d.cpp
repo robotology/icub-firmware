@@ -215,7 +215,8 @@ namespace embot { namespace hw { namespace tlv493d {
 
     bool supported(TLV493D h) { return false; }
     bool initialised(TLV493D h) { return false; }
-    result_t init(TLV493D h, const Config &config) { return resNOK; }    
+    result_t init(TLV493D h, const Config &config) { return resNOK; } 
+    result_t deinit(TLV493D h) { return resNOK; } 
     bool isalive(embot::hw::TLV493D h, embot::core::relTime timeout) { return false; }
     bool isacquiring(embot::hw::TLV493D h) { return false; }
     bool canacquire(embot::hw::TLV493D h) { return false; }    
@@ -420,6 +421,58 @@ namespace embot { namespace hw { namespace tlv493d {
         return resOK;
     }
 
+    result_t deinit(TLV493D h)
+    {
+        if(false == supported(h))
+        {
+            return resNOK;
+        }
+        
+        if(false == initialised(h))
+        {
+            return resOK;
+        }
+        
+        
+        std::uint8_t index = embot::core::tointegral(h);
+               
+        
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)        
+        // deinit peripheral (not yet available), so i comment out
+//        embot::hw::tlv493d::getBSP().deinit(h);                             
+        // deinit i2c with the relevant bus specified by the bsp for this chip
+        // not yet available, so i comment out
+        #if defined(EMBOT_ENABLE_hw_tlv493d_i2ceMODE)
+//        embot::hw::i2ce::deinit(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2CEbus());
+        #else
+//        embot::hw::i2c::deinit(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2Cbus());
+        #endif
+#endif 
+        
+        // load config etc
+        s_privatedata.i2cdes[index] = {};
+        s_privatedata.config[index] = {};
+        s_privatedata.acquisition[index].clear();
+
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)          
+        // sensor deinit (so far i dont do it)
+//        if(resOK != s_sensor_deinit(h))
+//        {
+//            return resNOK;
+//        }            
+#else
+        // we emulate the sensor action with a timer which executes the callback. i need to delet it
+        if(nullptr != emulatedMODE_timers4callback[embot::core::tointegral(h)])
+        {
+            delete emulatedMODE_timers4callback[embot::core::tointegral(h)]; 
+            emulatedMODE_timers4callback[embot::core::tointegral(h)] = nullptr;            
+        }
+#endif
+
+        embot::core::binary::bit::clear(initialisedmask, embot::core::tointegral(h));                
+        return resOK;
+    }
+    
     
     bool isacquiring(TLV493D h)
     {
