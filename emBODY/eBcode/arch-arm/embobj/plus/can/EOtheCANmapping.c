@@ -743,23 +743,8 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
     // brd: 
     static const uint32_t tableB[] = // [epen]
     {
-<<<<<<< HEAD
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),         // joint      //TODO : check here for amcbldc
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),         // motor
-        (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // strain
-        (1 << eobrd_cantype_mais),                                                              // mais
-        (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_mtb4c),  // temperature
-        (1 << eobrd_cantype_mtb),                                                               // inertial
-        (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_rfe) |   
-        (1 << eobrd_cantype_mtb4c),                                                             // inertial3
-        (1 << eobrd_cantype_psc),                                                               // psc
-        (1 << eobrd_cantype_mtb4fap) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_psc),     // pos
-        (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                             // ft
-        (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc) |       
-        (1 << eobrd_cantype_mtb4c)                                                              // skin																	// skin
-=======
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),                                     // joint
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc),                                     // motor
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),      // joint
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),      // motor
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                                                         // strain
         (1 << eobrd_cantype_mais),                                                                                          // mais
         (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_mtb4c),                              // temperature
@@ -770,7 +755,6 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2),                                                         // ft
         (1 << eobrd_cantype_bms),                                                                                           // bs
         (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc) | (1 << eobrd_cantype_mtb4c)        // skin																	// skin
->>>>>>> fc5c026da (mc4plus: changes to pos service to support mtb4fap board)
     }; EO_VERIFYsizeof(tableB, sizeof(const uint32_t)*(eocanmap_entities_maxnumberof))
     
     // it is safe to use brd because it is can hence it is < 32
@@ -882,18 +866,18 @@ static void s_eo_canmap_entities_index_set(eOcanmap_board_extended_t * theboard,
     {
         // we can have: 
         // - mc4can: first insideindex in nib-0 or second in nib-1
-        // - 1foc: first insideindex in nib-0
+        // - 1foc or amcbldc: first insideindex in nib-0
         // - pmc: first insideindex in nib-0, or second in nib-1, or third in nib-2  
 
-        if(eobrd_mc4 == theboard->board.props.type)  
+        if(eobrd_cantype_mc4 == theboard->board.props.type)  
         {   
             nib = (eobrd_caninsideindex_none == insideindex2use) ? 0 : insideindex2use;
         }
-        else if(eobrd_foc == theboard->board.props.type)
+        else if((eobrd_cantype_foc == theboard->board.props.type) || (eobrd_cantype_amcbldc == theboard->board.props.type))
         {
             nib = 0;
         }
-        else if(eobrd_pmc == theboard->board.props.type)
+        else if(eobrd_cantype_pmc == theboard->board.props.type)
         {
             nib = (eobrd_caninsideindex_none == insideindex2use) ? 0 : insideindex2use;
         }
@@ -955,11 +939,8 @@ static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard,
     // 1. set presence of this entity    
     eo_common_hlfword_bitset(&theboard->board.entities2.bitmapOfPresence, pos);
 
-#warning marco.accame on 4 marzo 2022: to be clarified
-//#warning non sono sicuro .... ma forse si anche per ft-as perche' una certa board puo' avere ... index = 0 / 1 / 2 / 3
     // 2. store the entity index, but only for mc and sk and as-ft
     uint8_t isASFT = ((eoprot_endpoint_analogsensors == ep) && (eoprot_entity_as_ft == en)) ? 1 : 0;
-//    if((eoprot_endpoint_motioncontrol != ep) && (eoprot_endpoint_skin != ep) && (1 != isASFT))
     if((eoprot_endpoint_motioncontrol != ep) && (eoprot_endpoint_skin != ep) && (1 != isASFT))
     {
         return;
@@ -1003,8 +984,8 @@ static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * 
     eOprotIndex_t index = EOK_uint08dummy;
 
 
-    if(eobrd_cantype_foc == theboard->board.props.type || eobrd_cantype_amcbldc == theboard->board.props.type) 
-    {   // if 1foc it is always in nibble-0 
+    if((eobrd_cantype_foc == theboard->board.props.type) || (eobrd_cantype_amcbldc == theboard->board.props.type)) 
+    {   // if 1foc / amcbldc it is always in nibble-0 
         index = theboard->board.entities2.compactIndicesOf & 0x000F;
     }
     else if(theboard->board.props.type == eobrd_cantype_mc4)
@@ -1020,7 +1001,7 @@ static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * 
         }
     }      
     else if(theboard->board.props.type == eobrd_cantype_pmc)
-    {   // if pmc, index depends on value of loc.insideindex. it can be only first or second or thirs. if loc.insideindex is none or even else: nothing is done
+    {   // if pmc, index depends on value of loc.insideindex. it can be only first or second or third. if loc.insideindex is none or even else: nothing is done
                     
         if(eobrd_caninsideindex_first == loc.insideindex)
         {
@@ -1141,7 +1122,7 @@ static eObrd_caninsideindex_t s_eo_canmap_entities_caninsideindex_get(const eOca
     
     if(index == (tmp & 0x000F))
     {
-        inside = eobrd_caninsideindex_first; // for 1foc we could use eobrd_caninsideindex_none, but it is ok even in this way
+        inside = eobrd_caninsideindex_first; // for 1foc / amcbldc we could use eobrd_caninsideindex_none, but it is ok even in this way
     }
     else if(index == ((tmp >> 4) & 0x000F))
     {
