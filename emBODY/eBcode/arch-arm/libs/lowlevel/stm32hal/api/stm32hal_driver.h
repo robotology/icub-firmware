@@ -183,7 +183,15 @@ extern "C" {
     #if !defined(STM32HAL_DRIVER_V1D3)
         #define STM32HAL_DRIVER_V1D3
     #endif        
-    #define STM32HAL_DRIVER_VERSION 0x1D3   
+    #define STM32HAL_DRIVER_VERSION 0x1D3
+
+#elif   defined(STM32HAL_BOARD_STRAIN2C)
+
+    // one drive only: v1B0
+    #if !defined(STM32HAL_DRIVER_V1B0)
+        #define STM32HAL_DRIVER_V1B0
+    #endif        
+    #define STM32HAL_DRIVER_VERSION 0x1B0   
 
 #else
     #error STM32HAL: the STM32HAL_BOARD_${B} is undefined
