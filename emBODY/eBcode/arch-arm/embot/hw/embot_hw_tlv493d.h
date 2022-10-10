@@ -48,7 +48,7 @@ namespace embot { namespace hw { namespace tlv493d {
     bool supported(embot::hw::TLV493D h);    
     bool initialised(embot::hw::TLV493D h);    
     result_t init(embot::hw::TLV493D h, const Config &config);
-        
+    result_t deinit(embot::hw::TLV493D h);    
     
     // after that init() returns resOK we can check if it is alive. we can specify a timeout
     bool isalive(embot::hw::TLV493D h, embot::core::relTime timeout = 3*embot::core::time1millisec);
