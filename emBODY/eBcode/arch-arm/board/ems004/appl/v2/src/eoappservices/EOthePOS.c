@@ -1164,7 +1164,7 @@ static void s_eo_pos_boards_configure(EOthePOS *p)
                 posconfig.setting.decideg[0].invertdirection = sc->invertdirection;
                 posconfig.setting.decideg[0].rotation = sc->rotation;
                 posconfig.setting.decideg[0].label = sc->port;
-                posconfig.setting.decideg[0].zero = sc->zero;
+                posconfig.setting.decideg[0].offset = sc->offset;
                 
                 eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);
             }           

@@ -1116,8 +1116,8 @@ static void s_eo_psc_boards_configure(EOthePSC *p)
     posconfig.id = 0; // we explicity set id = 0 even if the psc board does not manage this field
     posconfig.setting.decideg[0].enabled =          posconfig.setting.decideg[1].enabled = 1;
     posconfig.setting.decideg[0].invertdirection =  posconfig.setting.decideg[1].invertdirection = 0;
-    posconfig.setting.decideg[0].zero =             posconfig.setting.decideg[1].zero = 0;
-    posconfig.setting.decideg[0].rotation =         posconfig.setting.decideg[1].rotation = icubCanProto_pos_rot_none;
+    posconfig.setting.decideg[0].offset =           posconfig.setting.decideg[1].offset = 0;
+    posconfig.setting.decideg[0].rotation =         posconfig.setting.decideg[1].rotation = icubCanProto_pos_rot_zero;
     
     for(uint8_t i=0; i<eo_psc_maxnumberofCANboards; i++)
     {

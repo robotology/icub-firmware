@@ -362,12 +362,12 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__POS_CONFIG_SET(eOcanprot
         frame->data[1] = (cfg->type & 0xf) | ((cfg->id & 0xf) << 4);
         // we have settings for two sensors ...
         frame->data[2] = (cfg->setting.decideg[0].enabled << 7) | (cfg->setting.decideg[0].invertdirection << 6) | (cfg->setting.decideg[0].rotation << 4) | (cfg->setting.decideg[0].label & 0x0f);
-        frame->data[3] = (cfg->setting.decideg[0].zero & 0x00ff);           // lsb of zero
-        frame->data[4] = (cfg->setting.decideg[0].zero & 0xff00) >> 8;      // msb of zero
+        frame->data[3] = (cfg->setting.decideg[0].offset & 0x00ff);           // lsb of zero
+        frame->data[4] = (cfg->setting.decideg[0].offset & 0xff00) >> 8;      // msb of zero
         
         frame->data[5] = (cfg->setting.decideg[1].enabled << 7) | (cfg->setting.decideg[1].invertdirection << 6) | (cfg->setting.decideg[1].rotation << 4) | (cfg->setting.decideg[1].label & 0x0f);
-        frame->data[6] = (cfg->setting.decideg[1].zero & 0x00ff);           // lsb of zero
-        frame->data[7] = (cfg->setting.decideg[1].zero & 0xff00) >> 8;      // msb of zero             
+        frame->data[6] = (cfg->setting.decideg[1].offset & 0x00ff);           // lsb of zero
+        frame->data[7] = (cfg->setting.decideg[1].offset & 0xff00) >> 8;      // msb of zero             
     }
     else if(icubCanProto_pos_none == cfg->type)
     {
