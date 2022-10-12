@@ -158,7 +158,7 @@ constexpr theFAPreader2::Sensor s1 {
     embot::hw::ANY::one,
     {   
         embot::prot::can::analog::posLABEL::zero, // as eobrd_portpos_hand_thumb = 0 OR eobrd_portpos_hand_thumbmetacarpus = 4
-        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 0}
+        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 0}
     },
     evt_SNSR01_askdata,
     evt_SNSR01_dataready,
@@ -171,7 +171,7 @@ constexpr theFAPreader2::Sensor s2 {
     embot::hw::ANY::two, 
     {         
         embot::prot::can::analog::posLABEL::one,  // as eobrd_portpos_hand_index = 1 OR eobrd_portpos_hand_indexadduction = 6
-        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 0}
+        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 0}
     },
     evt_SNSR02_askdata,
     evt_SNSR02_dataready,
@@ -184,7 +184,7 @@ constexpr theFAPreader2::Sensor s3 {
     embot::hw::ANY::three, 
     {
         embot::prot::can::analog::posLABEL::two, // as eobrd_portpos_hand_medium = 2
-        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 0}
+        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 0}
     },
     evt_SNSR03_askdata,
     evt_SNSR03_dataready,
@@ -197,7 +197,7 @@ constexpr theFAPreader2::Sensor s4 {
     embot::hw::ANY::four,
     {  
         embot::prot::can::analog::posLABEL::three,  // as eobrd_portpos_hand_pinky = 3
-        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 0}
+        {false, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 0}
     },
     evt_SNSR04_askdata,
     evt_SNSR04_dataready,
