@@ -1244,26 +1244,26 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
 
     struct deciDegCalib
     {
-        enum class ROT : uint8_t { none = 0, plus180 = 1, plus090 = 2, minus090 = 3 };
+        enum class ROT : uint8_t { zero = 0, plus180 = 1, plus090 = 2, minus090 = 3 };
         constexpr static deciDeg rotmap[4] = {0, 1800, 900, -900};
         bool invertdirection {false};
-        ROT rotation {ROT::none};   
-        deciDeg zero {0};  
+        ROT rotation {ROT::zero};   
+        deciDeg offset {0};  
         constexpr deciDegCalib() = default;
-        constexpr deciDegCalib(bool inv, ROT rot, deciDeg zer) : invertdirection(inv), rotation(rot), zero(zer) {}
+        constexpr deciDegCalib(bool inv, ROT rot, deciDeg off) : invertdirection(inv), rotation(rot), offset(off) {}
         constexpr deciDeg rotateclip(deciDeg v) const { return ( (v+rotmap[static_cast<uint8_t>(rotation)]) % 3600 ); }
         constexpr deciDeg transform(const deciDeg raw) const
         {
-            deciDeg z = rotateclip(raw) - rotateclip(zero);
+            deciDeg z = rotateclip(raw) + offset;
             return (invertdirection) ? (-z) : (+z);
         }
         void reset()
         {
-            rotation = ROT::none; invertdirection = false; zero = 0;
+            rotation = ROT::zero; invertdirection = false; offset = 0;
         }
-        void load(bool inv, ROT rot, deciDeg zer) 
+        void load(bool inv, ROT rot, deciDeg off) 
         {
-            invertdirection = inv; rotation = rot; zero = zer; 
+            invertdirection = inv; rotation = rot; offset = off; 
         }
     };
 
@@ -1271,22 +1271,22 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     struct deciMilliMeterCalib
     {
         bool invert {false};
-        deciMilliMeter zero {0};  
+        deciMilliMeter offset {0};  
         constexpr deciMilliMeterCalib() = default;
-        constexpr deciMilliMeterCalib(bool inv, deciMilliMeter zer) : invert(inv), zero(zer) {}
+        constexpr deciMilliMeterCalib(bool inv, deciMilliMeter off) : invert(inv), offset(off) {}
 
         constexpr deciMilliMeter transform(const deciMilliMeter raw) const
         {
-            deciMilliMeter z = raw - zero;
+            deciMilliMeter z = raw + offset;
             return (invert) ? (-z) : (+z);
         }
         void reset()
         {
-           invert = false; zero = 0;
+           invert = false; offset = 0;
         }
-        void load(bool inv, deciMilliMeter zer) 
+        void load(bool inv, deciMilliMeter off) 
         {
-            invert = inv; zero = zer; 
+            invert = inv; offset = off; 
         }
     };
     
@@ -1308,8 +1308,8 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             bool invertdirection = embot::core::binary::bit::check(bytes[0], 6);
             deciDegCalib::ROT rotation = static_cast<deciDegCalib::ROT>((bytes[0] >> 4) & 0b0011);           
             label = static_cast<posLABEL>(bytes[0] & 0b1111);
-            deciDeg zero = static_cast<int16_t>(bytes[1]) | (static_cast<int16_t>(bytes[2]) << 8);
-            calib.load(invertdirection, rotation, zero);
+            deciDeg offset = static_cast<int16_t>(bytes[1]) | (static_cast<int16_t>(bytes[2]) << 8);
+            calib.load(invertdirection, rotation, offset);
         }
         void fill(uint8_t *bytes) const 
         {
@@ -1317,8 +1317,8 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             {
                 bytes[0] = 0;
                 bytes[0] = ((enabled & 0b1) << 7) | ((calib.invertdirection & 0b1) << 6) | ((static_cast<uint8_t>(calib.rotation) & 0b11) << 4) | (static_cast<uint8_t>(label) & 0b1111);
-                bytes[1] = calib.zero & 0xff;
-                bytes[2] = (calib.zero >> 8);                
+                bytes[1] = calib.offset & 0xff;
+                bytes[2] = (calib.offset >> 8);                
             }            
         }
         constexpr deciDeg transform(const deciDeg raw) const
