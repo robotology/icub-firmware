@@ -250,7 +250,7 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
     if(true == embot::app::application::theCANparserBasic::getInstance().process(frame, outframes))
     {
     }
-    if(true == embot::app::application::theCANparserPOS::getInstance().process(frame, outframes))
+    else if(true == embot::app::application::theCANparserPOS::getInstance().process(frame, outframes))
     {
     }
 
