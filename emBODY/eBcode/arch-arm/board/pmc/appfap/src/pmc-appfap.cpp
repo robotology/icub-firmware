@@ -251,10 +251,14 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
     {
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     else if(true == embot::app::application::theCANparserPOS::getInstance().process(frame, outframes))
 =======
     if(true == embot::app::application::theCANparserPOS::getInstance().process(frame, outframes))
 >>>>>>> 3103b9f75 (added a fap reader project for the pmc board)
+=======
+    else if(true == embot::app::application::theCANparserPOS::getInstance().process(frame, outframes))
+>>>>>>> 21fb3879e (corrected)
     {
     }
 
