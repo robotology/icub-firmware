@@ -568,130 +568,6 @@ namespace embot { namespace hw { namespace flash {
 // - support map: end of embot::hw::flash
 
 
-
-// - support map: begin of embot::hw::pga308
-
-#include "embot_hw_pga308_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_pga308)
-
-namespace embot { namespace hw { namespace pga308 {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::PGA308 h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-    #error embot::hw::pga308::thebsp must be defined
-#endif 
-
-
-// - support map: end of embot::hw::pga308
-
-
-
-// - support map: begin of embot::hw::si7051
-
-#include "embot_hw_si7051_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_si7051)
-
-namespace embot { namespace hw { namespace si7051 {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::SI7051 h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-#endif // si7051
-
-
-// - support map: end of embot::hw::si7051
-
-
-// - support map: begin of embot::hw::onewire
-
-#include "embot_hw_onewire_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_onewire)
-
-namespace embot { namespace hw { namespace onewire {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::ONEWIRE h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-#endif
-
-// - support map: end of embot::hw::onewire
-
-
-
-// - support map: begin of embot::hw::adc
-
-#include "embot_hw_adc_bsp.h"
-
-#if   !defined(HAL_ADC_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_adc)
-
-namespace embot { namespace hw { namespace adc {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::ADC h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-#endif // adc
-
-// - support map: end of embot::hw::adc
-
-
-
-// - support map: begin of embot::hw::timer
-
-#include "embot_hw_timer_bsp.h"
-
-#if   !defined(HAL_TIM_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_timer)
-
-namespace embot { namespace hw { namespace timer {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::TIMER h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-
-#endif // timer
-
-
-// - support map: end of embot::hw::timer
-
-
 // - support map: begin of embot::hw::i2c
 
 #include "embot_hw_i2c_bsp.h"
@@ -812,37 +688,37 @@ void I2C4_ER_IRQHandler(void)
 
 void DMA1_Channel4_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+    HAL_DMA_IRQHandler(&hdma_i2c1_rx);
 }
 
 void DMA1_Channel5_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(&hdma_i2c1_tx);
+    HAL_DMA_IRQHandler(&hdma_i2c1_tx);
 }
 
 void DMA1_Channel6_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(&hdma_i2c2_rx);
+    HAL_DMA_IRQHandler(&hdma_i2c2_rx);
 }
 
 void DMA1_Channel7_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(&hdma_i2c2_tx);
+    HAL_DMA_IRQHandler(&hdma_i2c2_tx);
 }
 
 void DMA1_Channel8_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(&hdma_i2c3_rx);
+    HAL_DMA_IRQHandler(&hdma_i2c3_rx);
 }
 
 void DMA2_Channel1_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(&hdma_i2c3_tx);
+    HAL_DMA_IRQHandler(&hdma_i2c3_tx);
 }
 
 void DMA2_Channel2_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(&hdma_i2c4_rx);
+    HAL_DMA_IRQHandler(&hdma_i2c4_rx);
 }
 
 void DMA2_Channel3_IRQHandler(void)
@@ -859,30 +735,6 @@ void DMA2_Channel3_IRQHandler(void)
 // - support map: end of embot::hw::i2c    
     
     
-    
-// - support map: begin of embot::hw::bno055
-    
-#include "embot_hw_bno055_bsp.h"
-
-#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_bno055)
-
-namespace embot { namespace hw { namespace bno055 {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::BNO055 h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-#endif // bno055
-
-// - support map: end of embot::hw::bno055
-
-
 
 // - support map: begin of embot::hw::tlv493d
 
@@ -913,8 +765,10 @@ namespace embot { namespace hw { namespace tlv493d {
     constexpr PROP propJ5  { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0xBC} };
     constexpr PROP propJ6  { embot::hw::I2Cdescriptor{embot::hw::ANY::three, 0xBC} }; 
     constexpr PROP propJ7  { embot::hw::I2Cdescriptor{embot::hw::ANY::four,  0xBC} };  
+    #if !defined(EMBOT_HW_BSP_PMC_4faps)    
     constexpr PROP propJ13 { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0x3E} };
     constexpr PROP propU27 { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0x3E} };
+    #endif
     
 #else
     constexpr PROP propJ4  { embot::hw::I2Cdescriptor{embot::hw::ANY::one,   0xBC} };
@@ -929,6 +783,17 @@ namespace embot { namespace hw { namespace tlv493d {
     constexpr BSP thebsp {     
 #if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
         // maskofsupported
+    #if defined(EMBOT_HW_BSP_PMC_4faps)
+        // only four
+        // the full size         
+        mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::two) |
+        mask::pos2mask<uint32_t>(TLV493D::three) | mask::pos2mask<uint32_t>(TLV493D::four),        
+        // properties
+        {{
+            &propJ4, &propJ5, &propJ6, &propJ7, nullptr, nullptr
+        }}
+    #else 
+        // the full size         
         mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::two) |
         mask::pos2mask<uint32_t>(TLV493D::three) | mask::pos2mask<uint32_t>(TLV493D::four) |
         mask::pos2mask<uint32_t>(TLV493D::five) | mask::pos2mask<uint32_t>(TLV493D::six),        
@@ -936,6 +801,7 @@ namespace embot { namespace hw { namespace tlv493d {
         {{
             &propJ4, &propJ5, &propJ6, &propJ7, &propJ13, &propU27
         }}
+    #endif        
 #else
         // maskofsupported
         mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::two) |
