@@ -427,7 +427,7 @@ extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p)
             eo_psc_SendReport(eo_psc_GetHandle());
         } break;
 
-        case eoerror_value_CFG_mc_mc4plusfaps_failed_candiscovery_of_pmc:
+        case eoerror_value_CFG_mc_mc4plusfaps_failed_candiscovery:
         {
             eo_pos_SendReport(eo_pos_GetHandle());
         } break;
@@ -1314,8 +1314,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             prop.location.port = jomodes->actuator.pmc.canloc.port;
             prop.location.addr = jomodes->actuator.pmc.canloc.addr;
             prop.location.insideindex = _index_map[i]; // jomodes->actuator.pmc.canloc.insideindex;
-            prop.requiredprotocol.major = p->service.servconfig.data.mc.mc4pluspmc.pos.version.protocol.major;
-            prop.requiredprotocol.minor = p->service.servconfig.data.mc.mc4pluspmc.pos.version.protocol.minor;
+            prop.requiredprotocol.major = p->service.servconfig.data.mc.mc4pluspmc.pos.config.boardconfig[0].boardinfo.protocol.major;
+            prop.requiredprotocol.minor = p->service.servconfig.data.mc.mc4pluspmc.pos.config.boardconfig[0].boardinfo.protocol.minor;
             
             eo_vector_PushBack(p->sharedcan.boardproperties, &prop);            
         }
@@ -2113,11 +2113,11 @@ static eOresult_t s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t o
         p->service.state = eomn_serv_state_failureofverify;
         eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         
-        eOerror_value_CFG_t errorvalue = eoerror_value_CFG_mc_mc4plusfaps_failed_candiscovery_of_pmc;
+        eOerror_value_CFG_t errorvalue = eoerror_value_CFG_mc_mc4plusfaps_failed_candiscovery;
         
         if(eo_motcon_mode_mc4plusfaps == servcfg->type)
         {
-            errorvalue = eoerror_value_CFG_mc_mc4plusfaps_failed_candiscovery_of_pmc;
+            errorvalue = eoerror_value_CFG_mc_mc4plusfaps_failed_candiscovery;
         }
         else if(eo_motcon_mode_mc4pluspmc == servcfg->type)
         {

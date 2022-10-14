@@ -158,7 +158,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
     constexpr thePOSreader2::Sensor s1 {
         thePOSreader2::sensorType::tlv, embot::hw::ANY::one, // propJ4
         embot::prot::can::analog::posLABEL::zero, // as eobrd_portpos_hand_thumb = 0
-        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 2180}},
+        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 2180}},
         evtSNSR01_askdata,
         evtSNSR01_dataready,
         evtSNSR01_noreply,
@@ -168,7 +168,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
     constexpr thePOSreader2::Sensor s2 {
         thePOSreader2::sensorType::tlv, embot::hw::ANY::two,    // propJ5
         embot::prot::can::analog::posLABEL::one,  // as eobrd_portpos_hand_index = 1
-        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 920}},
+        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 920}},
         evtSNSR02_askdata,
         evtSNSR02_dataready,
         evtSNSR02_noreply,
@@ -188,7 +188,7 @@ embot::app::ctrl::tCTRL *t_ctrl {nullptr};
     constexpr thePOSreader2::Sensor s4 {
         thePOSreader2::sensorType::tlv, embot::hw::ANY::four,  // propJ7
         embot::prot::can::analog::posLABEL::three,  // as eobrd_portpos_hand_pinky = 3
-        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::none, 1650}},
+        {{true, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 1650}},
         evtSNSR04_askdata,
         evtSNSR04_dataready,
         evtSNSR04_noreply,

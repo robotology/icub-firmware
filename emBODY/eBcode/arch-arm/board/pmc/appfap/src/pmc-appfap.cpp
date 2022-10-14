@@ -1,7 +1,7 @@
 
 
 /*
- * Copyright (C) 2019 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -11,6 +11,10 @@
 
 // --------------------------------------------------------------------------------------------------------------------
 // config start
+
+#if defined(EMBOT_HW_BSP_PMC_4faps)
+#warning EMBOT_HW_BSP_PMC_4faps is defined
+#endif
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo
 {
@@ -88,15 +92,6 @@ int main(void)
 #include "embot_hw_si7051.h"
 #include "embot_hw_bno055.h"
 
-namespace embot { namespace hw { namespace bsp { namespace mtb4 {
-
-    constexpr embot::hw::SI7051 thermometer = embot::hw::SI7051::one;
-    constexpr embot::hw::si7051::Config thermometerconfig = {};
-
-    constexpr embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
-    constexpr embot::hw::bno055::Config imuBOSCHconfig = {};
-
-}}}} // namespace embot { namespace hw { namespace bsp { namespace mtb4 {
 
 #include "embot_os_theScheduler.h"
 #include "embot_app_theLEDmanager.h"
@@ -104,10 +99,6 @@ namespace embot { namespace hw { namespace bsp { namespace mtb4 {
 
 #include "embot_app_application_theFAPreader2.h"
 #include "embot_app_application_theCANparserPOS.h"
-#include "embot_app_application_theCANparserIMU.h"
-#include "embot_app_application_theIMU.h"
-#include "embot_app_application_theCANparserTHERMO.h"
-#include "embot_app_application_theTHERMO.h"
 
 
 void mySYS::userdefOnIdle(embot::os::Thread *t, void* idleparam) const
@@ -130,10 +121,6 @@ static_assert(evt_RXcanframe_reserved == embot::app::skeleton::os::evthreadcan::
 
 
 constexpr embot::os::Event evt_POSprocess       = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
-constexpr embot::os::Event evt_IMUtick          = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
-constexpr embot::os::Event evt_IMUdataready     = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
-constexpr embot::os::Event evt_THERMOtick       = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
-constexpr embot::os::Event evt_THERMOdataready  = embot::core::binary::mask::pos2mask<embot::os::Event>(5);
  
 constexpr embot::os::Event evt_ACQUIREfaps      = embot::core::binary::mask::pos2mask<embot::os::Event>(10);
 constexpr embot::os::Event evt_NOREPLYfaps      = embot::core::binary::mask::pos2mask<embot::os::Event>(11);
@@ -242,26 +229,6 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
     embot::app::application::theCANparserPOS::Config configparserpos { &thefapreader2 };
     canparserpos.initialise(configparserpos);
 
-    // init agent of imu
-    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4::imuBOSCH, embot::hw::bsp::mtb4::imuBOSCHconfig, evt_IMUtick, evt_IMUdataready, evtsk);
-    theimu.initialise(configimu);
-
-    // init canparser imu and link it to its agent
-    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
-    embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
-    canparserimu.initialise(configparserimu);
-
-    // init agent of thermo
-    embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4::thermometer, embot::hw::bsp::mtb4::thermometerconfig, evt_THERMOtick, evt_THERMOdataready, evtsk);
-    thethermo.initialise(configthermo);
-
-    // init canparser thermo and link it to its agent
-    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
-    embot::app::application::theCANparserTHERMO::Config configparserthermo { &thethermo };
-    canparserthermo.initialise(configparserthermo);
-
 }
 
 void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
@@ -283,15 +250,10 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
     if(true == embot::app::application::theCANparserBasic::getInstance().process(frame, outframes))
     {
     }
-    if(true == embot::app::application::theCANparserPOS::getInstance().process(frame, outframes))
+    else if(true == embot::app::application::theCANparserPOS::getInstance().process(frame, outframes))
     {
     }
-    else if(true == embot::app::application::theCANparserIMU::getInstance().process(frame, outframes))
-    {
-    }
-    else if(true == embot::app::application::theCANparserTHERMO::getInstance().process(frame, outframes))
-    {
-    }
+
 }
 
 void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const
@@ -300,30 +262,6 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
     if(true == thefapreader2.isvalid(eventmask))
     {
         thefapreader2.process(eventmask, outframes);
-    }
-
-    if(true == embot::core::binary::mask::check(eventmask, evt_IMUtick))
-    {
-        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-        theimu.tick(outframes);
-    }
-
-    if(true == embot::core::binary::mask::check(eventmask, evt_IMUdataready))
-    {
-        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-        theimu.processdata(outframes);
-    }
-
-    if(true == embot::core::binary::mask::check(eventmask, evt_THERMOtick))
-    {
-        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-        thethermo.tick(outframes);
-    }
-
-    if(true == embot::core::binary::mask::check(eventmask, evt_THERMOdataready))
-    {
-        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-        thethermo.processdata(outframes);
     }
 }
 

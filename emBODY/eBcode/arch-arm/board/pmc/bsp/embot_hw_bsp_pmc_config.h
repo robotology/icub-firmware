@@ -31,11 +31,11 @@
     #define EMBOT_ENABLE_hw_pzm_emulatedMODE
 #endif    
 
-    //#define EMBOT_ENABLE_hw_button
-    
-    //#define EMBOT_ENABLE_hw_tlv493d_U27off
-    //#define EMBOT_ENABLE_hw_tlv493d_J13off
-        
+#if defined(EMBOT_HW_BSP_PMC_4faps)    
+    #define EMBOT_ENABLE_hw_tlv493d_U27off
+    #define EMBOT_ENABLE_hw_tlv493d_J13off
+#endif
+
 #else
     #error this is the bsp config of STM32HAL_BOARD_PMC ...
 #endif
