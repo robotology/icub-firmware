@@ -661,7 +661,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     prop.valueinfo->errortype = encreader_err_AEA_READING;
                     errorparam = 0xffff;
                 }
-            }
+            } break;
             
             
             case eomc_enc_amo:
