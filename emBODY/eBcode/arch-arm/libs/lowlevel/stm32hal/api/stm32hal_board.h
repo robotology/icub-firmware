@@ -516,6 +516,34 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for mtb4fap
     #endif
+
+#elif   defined(STM32HAL_BOARD_STRAIN2C)	
+
+    
+    #if(STM32HAL_DRIVER_VERSION == 0x1B0)
+
+                #if !defined(CPU_AT_80MHZ)
+                #define CPU_AT_80MHZ
+                #endif
+                
+        #include "../src/config/stm32hal_driver_cfg_of_strain2c_v1B0.h"
+
+        #include "../src/board/strain2c/v1B0/inc/adc.h"
+        #include "../src/board/strain2c/v1B0/inc/can.h"
+        #include "../src/board/strain2c/v1B0/inc/dma.h"
+        #include "../src/board/strain2c/v1B0/inc/gpio.h"
+        #include "../src/board/strain2c/v1B0/inc/i2c.h"
+        #include "../src/board/strain2c/v1B0/inc/main.h"
+        #include "../src/board/strain2c/v1B0/inc/rng.h"
+        #include "../src/board/strain2c/v1B0/inc/tim.h"
+        #include "../src/board/strain2c/v1B0/inc/usart.h"
+
+        #include "../src/board/strain2c/v1B0/inc/stm32l4xx_it.h"
+
+    #else
+        #error unsupported driver version for strain2c
+    #endif
+    
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${B}
 #endif
