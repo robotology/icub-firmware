@@ -13,6 +13,7 @@
 #include "embot_os_Thread.h"
 
 void testHWinit(embot::os::Thread *owner);
+void testHWinit2();
 
 void testHWtick();
 

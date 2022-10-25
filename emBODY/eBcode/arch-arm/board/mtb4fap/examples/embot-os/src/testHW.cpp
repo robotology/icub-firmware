@@ -22,10 +22,11 @@
 
 
 
-#define TEST_CAN_ENABLED
+//#define TEST_CAN_ENABLED
 
-#define TEST_TLV_EMULATED
+//#define TEST_TLV_EMULATED
 
+#define TEST_I2C_GPIO
 
 #if defined(TEST_CAN_ENABLED)
 #include "embot_hw_can.h"
@@ -34,10 +35,14 @@ void can_print(const std::string &s);
 void can_send(uint32_t v);
 #endif
 
-
 #if defined(TEST_TLV_EMULATED)
 void tlv_init();
 void tlv_tick();
+#endif
+
+#if defined(TEST_I2C_GPIO)
+void i2c_gpio_init();
+void i2c_gpio_tick();
 #endif  
 
 void testHWinit(embot::os::Thread *owner)
@@ -49,15 +54,29 @@ void testHWinit(embot::os::Thread *owner)
 #if defined(TEST_TLV_EMULATED)
     tlv_init();
 #endif    
-    
+
+#if defined(TEST_I2C_GPIO)  
+		i2c_gpio_init();  
+#endif  	
 }
 
+void testHWinit2()
+{
+
+#if defined(TEST_I2C_GPIO)  
+		i2c_gpio_init();  
+#endif  	
+}
 
 void testHWtick()
 {
 #if defined(TEST_TLV_EMULATED)    
     tlv_tick();  
-#endif      
+#endif
+
+	#if defined(TEST_I2C_GPIO)
+		i2c_gpio_tick();  
+#endif  
 }
 
 
@@ -215,6 +234,41 @@ the new emulated driver for i2c needs:
 
 
 
+
+#endif
+
+#if defined(TEST_I2C_GPIO)
+
+constexpr embot::hw::GPIO scl = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four};     // scl
+constexpr embot::hw::GPIO sda = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight};    // sda
+
+static constexpr embot::hw::gpio::Config out 
+{ 
+	  embot::hw::gpio::Mode::OUTPUTpushpull, 
+  	embot::hw::gpio::Pull::pullup, 
+  	embot::hw::gpio::Speed::veryhigh 
+};    
+
+
+
+void i2c_gpio_init() 
+{
+	embot::hw::gpio::init(scl, out);
+	embot::hw::gpio::init(sda, out);
+}
+
+void i2c_gpio_tick() 
+{
+	for(uint8_t i=0; i<8; i++){
+			embot::hw::gpio::set(scl, embot::hw::gpio::State::SET);
+			embot::hw::gpio::set(sda, embot::hw::gpio::State::RESET);
+		  embot::core::wait(embot::core::time1second);
+			
+			embot::hw::gpio::set(scl, embot::hw::gpio::State::RESET);
+			embot::hw::gpio::set(sda, embot::hw::gpio::State::SET);
+		  embot::core::wait(embot::core::time1second);
+	}
+}
 
 #endif
 

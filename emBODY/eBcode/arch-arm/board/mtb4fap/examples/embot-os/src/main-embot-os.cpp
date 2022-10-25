@@ -130,15 +130,13 @@ int main(void)
     embot::os::start();
 
     // just because i am paranoid (thescheduler.start() never returns)
-    for(;;);    
+    for(;;);
+
 }
-
-
-
 // - other code
 
 
-
+	
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
 
