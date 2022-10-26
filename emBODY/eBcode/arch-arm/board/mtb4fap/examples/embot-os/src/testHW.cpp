@@ -43,6 +43,15 @@ void tlv_tick();
 #if defined(TEST_I2C_GPIO)
 void i2c_gpio_init();
 void i2c_gpio_tick();
+
+void i2c_scl_low();
+void i2c_scl_high();
+void i2c_sda_low();
+void i2c_sda_high();
+void i2c_start();
+void i2c_stop();
+void i2c_scl_delay();
+
 #endif  
 
 void testHWinit(embot::os::Thread *owner)
@@ -56,7 +65,7 @@ void testHWinit(embot::os::Thread *owner)
 #endif    
 
 #if defined(TEST_I2C_GPIO)  
-		i2c_gpio_init();  
+		i2c_gpio_init();	
 #endif  	
 }
 
@@ -249,23 +258,68 @@ static constexpr embot::hw::gpio::Config out
   	embot::hw::gpio::Speed::veryhigh 
 };    
 
-
-
 void i2c_gpio_init() 
 {
 	embot::hw::gpio::init(scl, out);
 	embot::hw::gpio::init(sda, out);
 }
 
+void i2c_scl_low()
+{
+	embot::hw::gpio::set(scl, embot::hw::gpio::State::RESET);
+}
+
+void i2c_scl_high()
+{
+	embot::hw::gpio::set(scl, embot::hw::gpio::State::SET);
+}
+
+void i2c_sda_low()
+{
+	embot::hw::gpio::set(sda, embot::hw::gpio::State::RESET);
+}
+
+void i2c_sda_high()
+{
+	embot::hw::gpio::set(sda, embot::hw::gpio::State::SET);
+}
+
+void i2c_scl_delay()
+{
+  /* ref. https://www.nxp.com/docs/en/application-note/AN12841.pdf 3.3.2 */
+  embot::core::wait(5.7*embot::core::time1microsec);
+}
+
+/* START condition */
+void i2c_start(void)
+{
+ i2c_scl_low();
+ i2c_scl_high();
+ i2c_scl_high();
+ i2c_scl_delay();
+ /* SDA change from high to low when SCL is high, i2c start */
+ i2c_sda_low();
+}
+
+/* STOP condition */
+void i2c_Stop(void)
+{
+ i2c_scl_low();
+ i2c_sda_low();
+ i2c_scl_high();
+ i2c_scl_delay();
+ /* SDA change from low to high when SCL is high, i2c stop */
+ i2c_sda_high();
+}
+
 void i2c_gpio_tick() 
 {
 	for(uint8_t i=0; i<8; i++){
-			embot::hw::gpio::set(scl, embot::hw::gpio::State::SET);
-			embot::hw::gpio::set(sda, embot::hw::gpio::State::RESET);
+			i2c_scl_low();
+ 			i2c_sda_high();
 		  embot::core::wait(embot::core::time1second);
-			
-			embot::hw::gpio::set(scl, embot::hw::gpio::State::RESET);
-			embot::hw::gpio::set(sda, embot::hw::gpio::State::SET);
+			i2c_scl_high();
+ 			i2c_sda_low();
 		  embot::core::wait(embot::core::time1second);
 	}
 }

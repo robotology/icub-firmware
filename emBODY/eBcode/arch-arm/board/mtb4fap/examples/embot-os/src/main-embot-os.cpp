@@ -27,6 +27,8 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 #include "testHW.h"
 
+#define enableTRACE_all
+
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {       
     embot::core::print("evthread-startup: ..." ); 
