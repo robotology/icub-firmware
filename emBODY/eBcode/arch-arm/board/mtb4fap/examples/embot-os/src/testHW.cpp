@@ -20,13 +20,11 @@
 #include "embot_hw_sys.h"
 
 
-
-
 //#define TEST_CAN_ENABLED
 
 //#define TEST_TLV_EMULATED
 
-#define TEST_I2C_GPIO
+#define TEST_I2C_EMULATED
 
 #if defined(TEST_CAN_ENABLED)
 #include "embot_hw_can.h"
@@ -40,33 +38,34 @@ void tlv_init();
 void tlv_tick();
 #endif
 
-#if defined(TEST_I2C_GPIO)
+#if defined(TEST_I2C_EMULATED)
 
 constexpr embot::hw::GPIO scl = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four};     // scl
-constexpr embot::hw::GPIO sda = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight};    // sda
+constexpr embot::hw::GPIO sda1 = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight};   // sda1
 
-void i2c_gpio_init();
+void i2c_gpio_init(embot::hw::GPIO sda);
 void i2c_gpio_tick();
 
 void i2c_scl_low();
 void i2c_scl_high();
-void i2c_sda_low();
-void i2c_sda_high();
+void i2c_sda_low(embot::hw::GPIO &sda);
+void i2c_sda_high(embot::hw::GPIO &sda);
 
-void i2c_start();
-void i2c_stop();
+void i2c_start(embot::hw::GPIO &sda);
+void i2c_stop(embot::hw::GPIO &sda);
 
-void i2c_sda_input();
-void i2c_sda_output();
-void i2c_sda_input_off();
-void i2c_sda_output_off();
+void i2c_sda_input(embot::hw::GPIO &sda);
+void i2c_sda_output(embot::hw::GPIO &sda);
+void i2c_sda_input_off(embot::hw::GPIO &sda);
+void i2c_sda_output_off(embot::hw::GPIO &sda);
+
+void i2c_send_ACK(embot::hw::GPIO &sda);
+void i2c_send_NACK(embot::hw::GPIO &sda);
 
 void i2c_scl_delay();
 
-embot::hw::gpio::State i2c_sda_status();
-embot::hw::gpio::State i2c_read_ACK();
-
-#define i2c_RepeatedStart() i2c_start();
+embot::hw::gpio::State i2c_sda_status(embot::hw::GPIO &sda);
+embot::hw::gpio::State i2c_read_ACK(embot::hw::GPIO &sda);
 
 #endif  
 
@@ -80,16 +79,8 @@ void testHWinit(embot::os::Thread *owner)
     tlv_init();
 #endif    
 
-#if defined(TEST_I2C_GPIO)  
-		i2c_gpio_init();	
-#endif  	
-}
-
-void testHWinit2()
-{
-
-#if defined(TEST_I2C_GPIO)  
-		i2c_gpio_init();  
+#if defined(TEST_I2C_EMULATED)  
+		i2c_gpio_init(sda1);	
 #endif  	
 }
 
@@ -99,7 +90,7 @@ void testHWtick()
     tlv_tick();  
 #endif
 
-	#if defined(TEST_I2C_GPIO)
+	#if defined(TEST_I2C_EMULATED)
 		i2c_gpio_tick();  
 #endif  
 }
@@ -262,8 +253,10 @@ the new emulated driver for i2c needs:
 
 #endif
 
-#if defined(TEST_I2C_GPIO)
+#if defined(TEST_I2C_EMULATED)
 
+/* emulated i2c basic functions
+   ref. https://www.nxp.com/docs/en/application-note/AN12841.pdf */
 
 static constexpr embot::hw::gpio::Config out 
 { 
@@ -272,41 +265,40 @@ static constexpr embot::hw::gpio::Config out
   	embot::hw::gpio::Speed::veryhigh 
 };
 
-static constexpr embot::hw::gpio::Config input 
+static constexpr embot::hw::gpio::Config in 
 { 
 		embot::hw::gpio::Mode::INPUT, 
 		embot::hw::gpio::Pull::pullup, 
   	embot::hw::gpio::Speed::veryhigh 
 };    
 
-void i2c_gpio_init(void) 
-{
-	i2c_sda_output();
-}
-
-void i2c_sda_input(void) 
+void i2c_gpio_init(embot::hw::GPIO sda) 
 {
 	embot::hw::gpio::init(scl, out);
-	embot::hw::gpio::init(sda, input);
+	i2c_sda_output(sda);
 }
 
-void i2c_sda_output(void) 
+void i2c_sda_input(embot::hw::GPIO &sda) 
 {
-	embot::hw::gpio::init(scl, out);
+	embot::hw::gpio::init(sda, in);
+}
+
+void i2c_sda_output(embot::hw::GPIO &sda) 
+{
 	embot::hw::gpio::init(sda, out);
 }
 
-void i2c_sda_input_off(void) 
+void i2c_sda_input_off(embot::hw::GPIO &sda) 
 {
-
+	embot::hw::gpio::deinit(sda);
 }
 
-void i2c_sda_output_off(void) 
+void i2c_sda_output_off(embot::hw::GPIO &sda) 
 {
-
+	embot::hw::gpio::deinit(sda);
 }
 
-embot::hw::gpio::State i2c_sda_status(void) 
+embot::hw::gpio::State i2c_sda_status(embot::hw::GPIO &sda) 
 {
 	embot::hw::gpio::State s;
 	
@@ -325,12 +317,12 @@ void i2c_scl_high(void)
 	embot::hw::gpio::set(scl, embot::hw::gpio::State::SET);
 }
 
-void i2c_sda_low(void)
+void i2c_sda_low(embot::hw::GPIO &sda)
 {
 	embot::hw::gpio::set(sda, embot::hw::gpio::State::RESET);
 }
 
-void i2c_sda_high(void)
+void i2c_sda_high(embot::hw::GPIO &sda)
 {
 	embot::hw::gpio::set(sda, embot::hw::gpio::State::SET);
 }
@@ -342,66 +334,59 @@ void i2c_scl_delay(void)
 }
 
 /* START condition */
-void i2c_start(void)
+void i2c_start(embot::hw::GPIO &sda)
 {
  i2c_scl_low();
- i2c_scl_high();
+ i2c_sda_high(sda);
  i2c_scl_high();
  i2c_scl_delay();
  /* SDA change from high to low when SCL is high, i2c start */
- i2c_sda_low();
+ i2c_sda_low(sda);
 }
 
 /* STOP condition */
-void i2c_Stop(void)
+void i2c_Stop(embot::hw::GPIO &sda)
 {
  i2c_scl_low();
- i2c_sda_low();
+ i2c_sda_low(sda);
  i2c_scl_high();
  i2c_scl_delay();
  /* SDA change from low to high when SCL is high, i2c stop */
- i2c_sda_high();
+ i2c_sda_high(sda);
 }
 
 /* master reads ACK signal */
-embot::hw::gpio::State i2c_read_ACK(void)
+embot::hw::gpio::State i2c_read_ACK(embot::hw::GPIO &sda)
 {
 	embot::hw::gpio::State  ack;
  /* the 9th clock start */
  i2c_scl_low();
 
  /* disable PTB6(SDA) output, enable PTB6(SDA) input */
- i2c_sda_output_off();
- i2c_sda_input();
+ i2c_sda_output_off(sda);
+ i2c_sda_input(sda);
 
  i2c_scl_delay();
  i2c_scl_high();
  /* read ACK signal when SCL is high */
- ack = i2c_sda_status();
+ ack = i2c_sda_status(sda);
  i2c_scl_delay();
  /* the 9th clock end */
 
  /* disable SDA input, enable SDA output */
- i2c_sda_input_off();
- i2c_sda_output();
+ i2c_sda_input_off(sda);
+ i2c_sda_output(sda);
 
  /* SCL hold low to wait */
  i2c_scl_low();
- i2c_sda_high();
+ i2c_sda_high(sda);
  return ack;
 }
 
 
 void i2c_gpio_tick() 
 {
-	for(uint8_t i=0; i<8; i++){
-			i2c_scl_low();
- 			i2c_sda_high();
-		  embot::core::wait(embot::core::time1second);
-			i2c_scl_high();
- 			i2c_sda_low();
-		  embot::core::wait(embot::core::time1second);
-	}
+
 }
 
 #endif
