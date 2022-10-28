@@ -17,6 +17,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_bsp_amcbldc.h"
+
 #include "embot_hw_button.h"
 #include "embot_hw_motor.h"
 #include "embot_app_theCANboardInfo.h"
@@ -217,7 +219,7 @@ struct embot::app::application::theMBDagent::Impl
     embot::prot::can::motor::polling::ControlMode cm {embot::prot::can::motor::polling::ControlMode::Idle};
     bool applychanges {false};
     
-    static constexpr embot::hw::BTN buttonEXTfault {embot::hw::BTN::one};
+    embot::hw::BTN buttonEXTfault {embot::hw::BTN::one};
     static void onEXTFAULTpressedreleased(void *owner);  
     volatile bool EXTFAULTisPRESSED {false};   
     volatile bool prevEXTFAULTisPRESSED {false};    
@@ -270,6 +272,9 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     // we also disable the motors if true. 
 
 #if defined(EXTFAULT_enabled)
+               
+    buttonEXTfault = embot::hw::bsp::amcbldc::EXTFAULTbutton();
+    
     embot::core::Callback cbkOnEXTFAULT {onEXTFAULTpressedreleased, this};
     embot::hw::button::init(buttonEXTfault, {embot::hw::button::Mode::TriggeredOnPressAndRelease, cbkOnEXTFAULT, 0});
     prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
@@ -316,7 +321,7 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void 
         return;
     }
     
-    impl->EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
+    impl->EXTFAULTisPRESSED = embot::hw::button::pressed(impl->buttonEXTfault);
     AMC_BLDC_U.ExternalFlags_p.fault_button = impl->EXTFAULTisPRESSED;
     
     if(true == impl->EXTFAULTisPRESSED)

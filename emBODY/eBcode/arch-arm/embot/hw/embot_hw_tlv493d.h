@@ -60,7 +60,7 @@ namespace embot { namespace hw { namespace tlv493d {
     bool canacquire(embot::hw::TLV493D h);    
     
     
-    // we start acquisition of temperature.
+    // we start acquisition of data.
     // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
     result_t acquisition(embot::hw::TLV493D h, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
 

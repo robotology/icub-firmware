@@ -13,8 +13,13 @@
 #include "embot_core.h"
 #include "embot_hw_types.h"
 
-
-
+namespace embot { namespace hw { namespace bsp { namespace amcbldc {
+    
+    Revision revision();
+    
+    embot::hw::BTN EXTFAULTbutton();
+    
+}}}}
 
 #endif  // include-guard
 
