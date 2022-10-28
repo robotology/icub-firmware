@@ -43,43 +43,7 @@ using namespace embot::core::binary;
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - specialize the bsp
-// --------------------------------------------------------------------------------------------------------------------
-
-#include "embot_hw_led_bsp.h"
-
-void leds_off()
-{
-    using namespace embot::hw;
-    const led::BSP &b = led::getBSP();
-    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three};
-    for(const auto &l : leds)
-    {
-        const led::PROP *p = b.getPROP(l);
-        if(nullptr != p)
-        {
-            gpio::init(p->gpio, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::medium});  
-            gpio::set(p->gpio, p->on);
-            gpio::set(p->gpio, p->off);
-        }
-    }    
-}
-
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-bool embot::hw::bsp::specialize() 
-{   
-
-    leds_off();
-    
-    return true; 
-}
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - support maps
+// - support maps for the supported drivers
 // --------------------------------------------------------------------------------------------------------------------
 
 
@@ -169,14 +133,15 @@ namespace embot { namespace hw { namespace led {
        
     constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::two}  };
     constexpr PROP led2p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::five}  };
-    constexpr PROP led3p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen}  };  
+//  board revision b removes PB15 as LED and uses it for the break. so i remove led3p
+//  constexpr PROP led3p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen}  };  
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) | mask::pos2mask<uint32_t>(LED::three),        
+        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two),     
         // properties
         {{
-            &led1p, &led2p, &led3p, nullptr, nullptr, nullptr, nullptr, nullptr            
+            &led1p, &led2p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
         }}        
     };
     
@@ -229,14 +194,17 @@ namespace embot { namespace hw { namespace button {
     // this button is attached directly to PB7 (SDA connector).
     constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::seven}, 
                              .pull = embot::hw::gpio::Pull::pulldown, .irqn = EXTI9_5_IRQn  };  
- 
+
+    // this button is attached directly to PB15 (BREAK connector) but is available only for amcbldc rev b.
+    constexpr PROP btn2p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen}, 
+                             .pull = embot::hw::gpio::Pull::pulldown, .irqn = EXTI15_10_IRQn  };                               
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(BTN::one),        
+        mask::pos2mask<uint32_t>(BTN::one) | mask::pos2mask<uint32_t>(BTN::two),        
         // properties
         {{
-            &btn1p           
+            &btn1p, &btn2p          
         }}        
     };
     
@@ -253,6 +221,11 @@ namespace embot { namespace hw { namespace button {
                 embot::hw::button::onexti(BTN::one);
             } break;    
 
+            case embot::hw::GPIO::PIN::fifteen:
+            {
+                embot::hw::button::onexti(BTN::two);
+            } break;
+            
             default:
             {
             } break;           
@@ -267,7 +240,13 @@ namespace embot { namespace hw { namespace button {
         {
             HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
         }
-        
+
+        void EXTI15_10_IRQHandler()
+        {
+            HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);      // the break
+            //HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);    // VCCOK_Pin
+            //HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);    // VAUXOK_Pin
+        }
         
         void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
@@ -761,6 +740,157 @@ namespace embot { namespace hw { namespace motor {
 #endif // motor
 
 // - support map: end of embot::hw::motor
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - board specific methods
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_hw_bsp_amcbldc.h"
+
+namespace embot { namespace hw { namespace bsp { namespace amcbldc {
+    
+    #include <tuple>
+    #include <array>
+    
+    
+    constexpr std::array< std::tuple<uint32_t, uint32_t, uint32_t>, 5> theUIDsOfRevA =    
+    {
+        std::make_tuple(0x00470045, 0x484E500E, 0x20343356),    // 01
+        std::make_tuple(0x00460046, 0x484E500E, 0x20343356),    // 02
+        std::make_tuple(0x00470047, 0x484E500E, 0x20343356),    // 05
+        std::make_tuple(0x00480022, 0x484E500E, 0x20343356),    // wires attached 
+        std::make_tuple(0x00000000, 0x484E500E, 0x20343356)     // placeholder for the one used by rocco [value yet to be scanned] 
+    };    
+    
+    constexpr std::array< std::tuple<uint32_t, uint32_t, uint32_t>, 10> theUIDsOfRevB =    
+    {
+        std::make_tuple(0x00400041, 0x4650500F, 0x20313432),    // 01
+        std::make_tuple(0x003F0046, 0x4650500F, 0x20313432),    // 02
+        std::make_tuple(0x00400034, 0x4650500F, 0x20313432),    // 03
+        std::make_tuple(0x003E004F, 0x4650500F, 0x20313432),    // 04 
+        std::make_tuple(0x003F0042, 0x4650500F, 0x20313432),    // 05
+        std::make_tuple(0x0040002C, 0x4650500F, 0x20313432),    // 06
+        std::make_tuple(0x003F0029, 0x4650500F, 0x20313432),    // 07
+        std::make_tuple(0x003F0027, 0x4650500F, 0x20313432),    // 08
+        std::make_tuple(0x00400032, 0x4650500F, 0x20313432),    // 09
+        std::make_tuple(0x00400043, 0x4650500F, 0x20313432)     // 10
+    };
+
+    
+    
+    Revision revision()
+    {        
+        static Revision revision {Revision::none};
+        
+        if(Revision::none == revision)
+        {        
+            revision = Revision::A;            
+            volatile uint32_t *myuID = ((volatile uint32_t *)(UID_BASE));
+            auto target = std::make_tuple(myuID[0], myuID[1], myuID[2]);
+            for(const auto &i : theUIDsOfRevB)
+            {
+                if(i == target)
+                {
+                    revision =  Revision::B;
+                }
+            }
+        }                
+        
+        return revision;
+    }
+    
+    embot::hw::BTN EXTFAULTbutton()
+    {
+        return (Revision::A == revision()) ? embot::hw::BTN::one : embot::hw::BTN::two;
+    }
+    
+}}}}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - specialize the bsp
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_hw_led_bsp.h"
+
+
+
+#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
+bool embot::hw::bsp::specialize() { return true; }
+#else   
+
+void leds_init_off()
+{
+    using namespace embot::hw;
+    const led::BSP &b = led::getBSP();
+    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three, LED::four, LED::five, LED::six, LED::seven , LED::eight};
+    for(const auto &l : leds)
+    {
+        const led::PROP *p = b.getPROP(l);
+        if(nullptr != p)
+        {
+            gpio::init(p->gpio, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});  
+            gpio::set(p->gpio, p->off);
+        }
+    }    
+}
+
+void leds_set(bool on)
+{
+    using namespace embot::hw;
+    const led::BSP &b = led::getBSP();
+    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three, LED::four, LED::five, LED::six, LED::seven , LED::eight};
+    for(const auto &l : leds)
+    {
+        const led::PROP *p = b.getPROP(l);
+        if(nullptr != p)
+        {
+            gpio::set(p->gpio, on ? p->on : p->off);
+        }
+    }    
+}
+
+void verify_flash_bank()
+{
+    FLASH_OBProgramInitTypeDef odb = {0};   
+    HAL_FLASHEx_OBGetConfig(&odb);
+    
+    uint8_t detectedbanks = ((odb.USERConfig & FLASH_OPTR_DBANK) == FLASH_OPTR_DBANK) ? 2 : 1;
+
+#if defined(EMBOT_ENABLE_hw_flash_SINGLEBANK)
+    constexpr uint8_t expectedbanks = 1;
+#else
+    constexpr uint8_t expectedbanks = 2;
+#endif
+    
+    if(expectedbanks != detectedbanks)
+    {
+        embot::core::print("number of banks is not as expected: detected " + std::to_string(detectedbanks));
+        embot::core::print("cannot continue");
+        
+        leds_init_off();
+        for(;;)
+        {
+            leds_set(true);
+            HAL_Delay(250);
+            leds_set(false);
+            HAL_Delay(250);
+        }
+    }        
+}
+
+bool embot::hw::bsp::specialize() 
+{   
+
+    leds_init_off();
+    
+    verify_flash_bank();
+    
+    return true; 
+}
+#endif  //EMBOT_ENABLE_hw_bsp_specialize
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

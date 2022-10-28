@@ -231,7 +231,9 @@ namespace embot { namespace hw {
         constexpr bool isvalid() const { return (embot::hw::ANY::none != bus) && (0 != adr); } 
         constexpr embot::hw::I2C getI2Cbus() const { return static_cast<embot::hw::I2C>(bus); }
         constexpr embot::hw::I2CE getI2CEbus() const { return static_cast<embot::hw::I2CE>(bus); }        
-    };    
+    };  
+
+    enum class Revision : uint8_t { A = 0, B = 1, C = 2, D = 3, none = 31, maxnumberof = 4 };     
 
 }} // namespace embot { namespace hw {
 
