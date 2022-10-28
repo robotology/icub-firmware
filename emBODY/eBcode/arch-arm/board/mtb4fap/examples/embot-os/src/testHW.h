@@ -14,7 +14,9 @@
 
 void testHWinit(embot::os::Thread *owner);
 
+
 void testHWtick();
+
 
 
 #endif  // include-guard

@@ -27,6 +27,8 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 #include "testHW.h"
 
+#define enableTRACE_all
+
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {       
     embot::core::print("evthread-startup: ..." ); 
@@ -130,15 +132,13 @@ int main(void)
     embot::os::start();
 
     // just because i am paranoid (thescheduler.start() never returns)
-    for(;;);    
+    for(;;);
+
 }
-
-
-
 // - other code
 
 
-
+	
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
 

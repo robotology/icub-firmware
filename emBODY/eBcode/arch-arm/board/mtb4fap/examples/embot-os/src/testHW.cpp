@@ -20,12 +20,11 @@
 #include "embot_hw_sys.h"
 
 
+//#define TEST_CAN_ENABLED
 
+//#define TEST_TLV_EMULATED
 
-#define TEST_CAN_ENABLED
-
-#define TEST_TLV_EMULATED
-
+#define TEST_I2C_EMULATED
 
 #if defined(TEST_CAN_ENABLED)
 #include "embot_hw_can.h"
@@ -34,10 +33,43 @@ void can_print(const std::string &s);
 void can_send(uint32_t v);
 #endif
 
-
 #if defined(TEST_TLV_EMULATED)
 void tlv_init();
 void tlv_tick();
+#endif
+
+#if defined(TEST_I2C_EMULATED)
+
+constexpr embot::hw::GPIO scl = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four};     // scl
+constexpr embot::hw::GPIO sda1 = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight};   // sda1
+
+void i2c_gpio_init(embot::hw::GPIO sda);
+void i2c_gpio_tick();
+
+void i2c_scl_low();
+void i2c_scl_high();
+void i2c_sda_low(embot::hw::GPIO sda);
+void i2c_sda_high(embot::hw::GPIO sda);
+
+void i2c_start(embot::hw::GPIO sda);
+void i2c_stop(embot::hw::GPIO sda);
+
+void i2c_sda_input(embot::hw::GPIO sda);
+void i2c_sda_output(embot::hw::GPIO sda);
+void i2c_sda_input_off(embot::hw::GPIO sda);
+void i2c_sda_output_off(embot::hw::GPIO sda);
+
+void i2c_send_ACK(embot::hw::GPIO sda);
+void i2c_send_NACK(embot::hw::GPIO sda);
+
+void i2c_scl_delay();
+
+embot::hw::gpio::State i2c_sda_status(embot::hw::GPIO sda);
+embot::hw::gpio::State i2c_read_ACK(embot::hw::GPIO sda);
+
+void i2c_write_byte(unsigned char data);
+unsigned char i2c_read_byte(void);
+	
 #endif  
 
 void testHWinit(embot::os::Thread *owner)
@@ -49,15 +81,21 @@ void testHWinit(embot::os::Thread *owner)
 #if defined(TEST_TLV_EMULATED)
     tlv_init();
 #endif    
-    
-}
 
+#if defined(TEST_I2C_EMULATED)  
+		i2c_gpio_init(sda1);	
+#endif  	
+}
 
 void testHWtick()
 {
 #if defined(TEST_TLV_EMULATED)    
     tlv_tick();  
-#endif      
+#endif
+
+	#if defined(TEST_I2C_EMULATED)
+		i2c_gpio_tick();  
+#endif  
 }
 
 
@@ -215,6 +253,231 @@ the new emulated driver for i2c needs:
 
 
 
+
+#endif
+
+#if defined(TEST_I2C_EMULATED)
+
+/* emulated i2c basic functions
+   ref. https://www.nxp.com/docs/en/application-note/AN12841.pdf */
+
+static constexpr embot::hw::gpio::Config out 
+{ 
+	  embot::hw::gpio::Mode::OUTPUTpushpull, 
+  	embot::hw::gpio::Pull::pullup, 
+  	embot::hw::gpio::Speed::veryhigh 
+};
+
+static constexpr embot::hw::gpio::Config in 
+{ 
+		embot::hw::gpio::Mode::INPUT, 
+		embot::hw::gpio::Pull::pullup, 
+  	embot::hw::gpio::Speed::veryhigh 
+};    
+
+void i2c_gpio_init(embot::hw::GPIO sda) 
+{
+	embot::hw::gpio::init(scl, out);
+	i2c_sda_output(sda);
+}
+
+void i2c_sda_input(embot::hw::GPIO sda) 
+{
+	embot::hw::gpio::init(sda, in);
+}
+
+void i2c_sda_output(embot::hw::GPIO sda) 
+{
+	embot::hw::gpio::init(sda, out);
+}
+
+void i2c_sda_input_off(embot::hw::GPIO sda) 
+{
+	embot::hw::gpio::deinit(sda);
+}
+
+void i2c_sda_output_off(embot::hw::GPIO sda) 
+{
+	embot::hw::gpio::deinit(sda);
+}
+
+embot::hw::gpio::State i2c_sda_status(embot::hw::GPIO sda) 
+{
+	embot::hw::gpio::State s;
+	
+	s = embot::hw::gpio::get(sda);
+	
+	return s;
+}
+
+void i2c_scl_low(void)
+{
+	embot::hw::gpio::set(scl, embot::hw::gpio::State::RESET);
+}
+
+void i2c_scl_high(void)
+{
+	embot::hw::gpio::set(scl, embot::hw::gpio::State::SET);
+}
+
+void i2c_sda_low(embot::hw::GPIO sda)
+{
+	embot::hw::gpio::set(sda, embot::hw::gpio::State::RESET);
+}
+
+void i2c_sda_high(embot::hw::GPIO sda)
+{
+	embot::hw::gpio::set(sda, embot::hw::gpio::State::SET);
+}
+
+void i2c_scl_delay(void)
+{
+  /* ref. https://www.nxp.com/docs/en/application-note/AN12841.pdf 3.3.2 */
+  embot::core::wait(5.7*embot::core::time1microsec);
+}
+
+/* START condition */
+void i2c_start(embot::hw::GPIO sda)
+{
+ i2c_scl_low();
+ i2c_sda_high(sda);
+ i2c_scl_high();
+ i2c_scl_delay();
+ /* SDA change from high to low when SCL is high, i2c start */
+ i2c_sda_low(sda);
+}
+
+/* STOP condition */
+void i2c_stop(embot::hw::GPIO sda)
+{
+ i2c_scl_low();
+ i2c_sda_low(sda);
+ i2c_scl_high();
+ i2c_scl_delay();
+ /* SDA change from low to high when SCL is high, i2c stop */
+ i2c_sda_high(sda);
+}
+
+/* master reads ACK signal */
+embot::hw::gpio::State i2c_read_ACK(embot::hw::GPIO sda)
+{
+	embot::hw::gpio::State  ack;
+ /* the 9th clock start */
+ i2c_scl_low();
+
+ /* disable PTB6(SDA) output, enable PTB6(SDA) input */
+ i2c_sda_output_off(sda);
+ i2c_sda_input(sda);
+
+ i2c_scl_delay();
+ i2c_scl_high();
+ /* read ACK signal when SCL is high */
+ ack = i2c_sda_status(sda);
+ i2c_scl_delay();
+ /* the 9th clock end */
+
+ /* disable SDA input, enable SDA output */
+ i2c_sda_input_off(sda);
+ i2c_sda_output(sda);
+
+ /* SCL hold low to wait */
+ i2c_scl_low();
+ i2c_sda_high(sda);
+ return ack;
+}
+
+/* master sends NACK to slave */
+void i2c_send_NACK(void)
+{
+ /* the 9th clock start*/
+ i2c_scl_low();
+ /*send NACK signal */
+ i2c_sda_high(sda1);
+ i2c_scl_delay();
+ i2c_scl_high();
+ i2c_scl_delay();
+ /* the 9th clock start */
+ /* SCL hold low to wait */
+ i2c_scl_low();
+ i2c_sda_high(sda1);
+}
+
+/* master writes a byte to salve and check ACK signal */
+void i2c_write_byte(unsigned char data)
+{
+ unsigned char i;
+ /* write 8 bits data */
+ for(i=0;i<8;i++)
+{
+ i2c_scl_low();
+ i2c_scl_delay();
+
+ /* Data can be changed only while SCL is low */
+ if(data & 0x80)
+ {
+ i2c_sda_high(sda1);
+ }
+ else
+ {
+ i2c_sda_low(sda1);
+ }
+
+ /* Data must be held stable while SCL is high */
+ i2c_scl_high();
+ i2c_scl_delay();
+ data = data<<1;
+ }
+ /* Must set SCL to low. If SCL is high, SDA change to High/Low will cause Stop/Start signal.*/
+ i2c_scl_low();
+ /* check ACK signal, ACK signal is 0, NACK signal is 1 */
+ if(i2c_read_ACK(sda1) == embot::hw::gpio::State::SET)
+ {
+ /* receive NACK signal,stop data transfer */
+ i2c_stop(sda1);
+ while(1);
+ }
+}
+
+/* master reads a byte from slave */
+unsigned char i2c_read_byte(void)
+{
+ unsigned char i;
+ unsigned char data = 0;
+
+ /* disable PTB6(SDA) output, enable PTB6(SDA) input */
+ i2c_sda_output_off(sda1);
+ i2c_sda_input(sda1);
+	 /* write 8 bits data */
+ for(i=0;i<8;i++)
+ {
+ i2c_scl_low();
+ i2c_scl_delay();
+ /* Data must be held stable while SCL is high */
+ i2c_scl_high();
+ data = data<<1;
+ /* read SDA data */
+	 if(i2c_sda_status(sda1) == embot::hw::gpio::State::SET)
+ {
+ data |= 0x01;
+ }
+ else
+ {
+ data &= ~0x01;
+ }
+ i2c_scl_delay();
+ }
+ /* disable PTB6(SDA) input, enable PTB6(SDA) output */
+ i2c_sda_input_off(sda1);
+ i2c_sda_output(sda1);
+
+ i2c_scl_low(); // set SCL to low
+ return data;
+}
+
+	void i2c_gpio_tick() 
+{
+
+}
 
 #endif
 
