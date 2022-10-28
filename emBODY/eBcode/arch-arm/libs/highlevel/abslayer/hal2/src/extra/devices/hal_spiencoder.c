@@ -808,7 +808,7 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
             diagn->type = hal_spiencoder_diagnostic_type_aksim2_invalid_data;
             diagn->info.aksim2_status_crc |= 0x04;
         }    
-        else if(0x2 == intitem->status_bits)
+        if(0x2 == intitem->status_bits)
         {
             // Warning - the position data is valid, but some operating conditions are close to limits
             diagn->type = hal_spiencoder_diagnostic_type_aksim2_close_to_limits;
