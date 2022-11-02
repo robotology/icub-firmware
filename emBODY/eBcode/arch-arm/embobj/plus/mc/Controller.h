@@ -19,7 +19,7 @@
 #ifndef MC_CONTROLLER___
 #define MC_CONTROLLER___
 
-#ifdef WRIST_MK2
+#if defined(WRIST_MK2) || defined(ERGOJOINT)
 #include "JointSet.h"
 #endif
 
@@ -35,7 +35,7 @@ extern "C" {
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
-#ifndef WRIST_MK2
+#if !defined(WRIST_MK2) && !defined(ERGOJOINT)
 #include "JointSet.h"
 #endif
 typedef struct //MController
@@ -143,6 +143,10 @@ extern int16_t MController_config_motor_pwm_limit(int m, int16_t pwm_limit);
 extern void MController_update_motor_odometry_fbk_can(int m, void* data);
 
 extern void MController_motor_raise_fault_i2t(int m);
+
+#if defined(ERGOJOINT)
+    void MController_update_joint_pos_raw(uint8_t jid, int32_t encoder);
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 

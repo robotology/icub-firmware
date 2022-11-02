@@ -19,8 +19,9 @@
 #ifndef MC_JOINT_SET___
 #define MC_JOINT_SET___
 
-#ifdef WRIST_MK2
+#if defined(WRIST_MK2)
 #include "wrist_decoupler.h"
+#elif defined(ERGOJOINT)
 #else
 #ifdef __cplusplus
 extern "C" {
@@ -96,7 +97,7 @@ typedef struct // JointSet
     
     int32_t calibration_timeout;
     
-#ifdef WRIST_MK2
+#if defined(WRIST_MK2)
     BOOL is_parking;
     BOOL must_park;
     
@@ -151,10 +152,11 @@ extern void JointSet_do_pwm_control(JointSet* o);
     
 extern void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64);
 
-#ifdef WRIST_MK2
+#if defined(WRIST_MK2)
 extern BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_state);
 extern void JointSet_stop(JointSet* o, int j);
+#elif defined(ERGOJOINT)
 #else
 #ifdef __cplusplus
 }       // closing brace for extern "C"

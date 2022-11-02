@@ -46,6 +46,7 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
+#include "Controller.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -670,9 +671,13 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_not_connected);
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
                 }
+
+#ifdef ERGOJOINT
+                MController_update_joint_pos_raw(jomo, position);
+#endif
             } break;
             
-            
+
             case eomc_enc_amo:
             {
                 hal_spiencoder_position_t spiRawValue = 0; 

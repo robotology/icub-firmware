@@ -19,7 +19,7 @@
 #ifndef MC_CALIBRATORS_H___
 #define MC_CALIBRATORS_H___
 
-#ifdef WRIST_MK2
+#if defined(WRIST_MK2) || defined(ERGOJOINT)
 #include "JointSet.h"
 #endif
 
@@ -29,7 +29,7 @@ extern "C" {
 
 #include "EOemsControllerCfg.h"
 
-#ifndef WRIST_MK2
+#if !defined(WRIST_MK2) && !defined(ERGOJOINT)
 #include "JointSet.h"
 #endif
 
