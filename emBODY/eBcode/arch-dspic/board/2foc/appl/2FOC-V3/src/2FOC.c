@@ -324,7 +324,7 @@ volatile int dataB = 0;
 volatile int dataC = 0;
 volatile int dataD = 0;
     
-extern volatile BOOL newencdata;
+volatile BOOL newencdata = FALSE;
 
 int alignRotorHES(volatile int* IqRef)
 {
@@ -413,108 +413,101 @@ int alignRotorIndex(volatile int* IqRef)
     
     static int IqRef_fake = 0;
     
-    static BOOL moved = FALSE;
+    //static BOOL moved = FALSE;
     
-    if (abs((int)POSCNT) > 32) moved = TRUE;
+    //if (abs((int)POSCNT) > 32) moved = TRUE;
     
     const int ENCODER_1_5_REV = (3*QE_ELETTR_DEG_PER_REV())/2;
+
+    static int deltaA =  60;
+    static int deltaB = -60;
     
     if (sAlignInProgress < 3)
     {       
         if (QEready())
         {
-            if (!moved)
-            {
+            //if (!moved)
+            //{
                 // phase is broken
-                *IqRef = IqRef_fake = 0;
-                QE_RISE_ERROR(phase_broken);
-                sAlignInProgress = 0;
-            }
+            //    *IqRef = IqRef_fake = 0;
+            //    QE_RISE_ERROR(phase_broken);
+            //    sAlignInProgress = 0;
+            //}
             
             sAlignInProgress = gEncoderConfig.full_calibration ? 3 : 0;
             gEncoderError.uncalibrated = 0;
             QEcountErrorClear();
         }
-    }
-    
-    static int deltaA =  60;
-    static int deltaB = -60;
-    
-    //static int deltaA = -120;
-    //static int deltaB =    0;
-    
-    if (sAlignInProgress == 1)
-    {
-        static int timer = 0;
         
-        if (IqRef_fake < Inom/2)
+        if (sAlignInProgress == 1)
         {
-            ++IqRef_fake;
-        }
-        else if (encoder_fake < ENCODER_1_5_REV)
-        {
-            if (++timer > 200) { timer = 0; ++encoder_fake; }
-        }
-        else
-        {
-            deltaA = -120;
-            deltaB = 0;
-            sAlignInProgress = 2;
-        }
-    }
-    
-    if (sAlignInProgress == 2)
-    {
-        static int timer = 0;
+            static unsigned int timer = 0;
         
-        if (encoder_fake > -ENCODER_1_5_REV)
-        {
-            if (++timer > 200) { timer = 0; --encoder_fake; }
+            if (IqRef_fake < Inom/2)
+            {
+                ++IqRef_fake;
+            }
+            else if (encoder_fake < ENCODER_1_5_REV)
+            {
+                if (++timer > 200) { timer = 0; ++encoder_fake; }
+            }
+            else
+            {
+                //deltaA = -120;
+                //deltaB = 0;
+                sAlignInProgress = 2;
+            }
         }
-        else
+    
+        if (sAlignInProgress == 2)
         {
-            // Index is broken
-            *IqRef = IqRef_fake = 0;
-            QE_RISE_ERROR(index_broken);
-            sAlignInProgress = 0;
+            static unsigned int timer = 0;
+        
+            if (encoder_fake > -ENCODER_1_5_REV)
+            {
+                if (++timer > 200) { timer = 0; --encoder_fake; }
+            }
+            else
+            {
+                // Index is broken
+                *IqRef = IqRef_fake = 0;
+                QE_RISE_ERROR(index_broken);
+                sAlignInProgress = 0;
+            }
         }
     }
     
     ////////////////////////////////////
     
-    static int encoder_fake_0 = 0x7FFF;
+    static int rotorA;
+    static int rotorB;
+    
+    static int encoder_fake_0 = 0;
+    
+    static unsigned long timer = 0;
     
     if (sAlignInProgress == 3)
-    {
-        static int timer = 0;
-         
-        encoder_fake_0 = encoder_fake;
-        
+    {           
         if (IqRef_fake < Inom)
         {
             ++IqRef_fake;
         }
-        else if (++timer > 10000)
+        else if (++timer > 20000)
         {
+            encoder_fake_0 = encoder_fake;
+            timer = 0;
             sAlignInProgress = 4;
         }
     }
-    
-    static int rotorA;
-    static int rotorB;
-    
-    static unsigned int timer = 0;
-    
+ 
     if (sAlignInProgress == 4)
     {
         encoder_fake = encoder_fake_0 + deltaA;
         
-        if (++timer > 30000)
+        if (++timer > 60000UL)
         {
             rotorA = QEgetElettrDegUncal();// __builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
-            
             timer = 0;
-            
             sAlignInProgress = 5;
         }
     }
@@ -523,9 +516,9 @@ int alignRotorIndex(volatile int* IqRef)
     {
         encoder_fake = encoder_fake_0 + deltaB;
         
-        if (++timer > 60000)
+        if (++timer > 120000UL)
         {
-            IqRef_fake = 0;
+            newencdata = TRUE;
             
             rotorB = QEgetElettrDegUncal();//__builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
             
@@ -541,14 +534,17 @@ int alignRotorIndex(volatile int* IqRef)
                 while (angle >= 360) angle -= 360;
                 while (angle <    0) angle += 360;
             
-                dataC = rotorA;
-                dataD = rotorB;
-            
                 gEncoderConfig.offset = encoder_fake_0 + (deltaA + deltaB)/2 + 90 - angle;
                 
                 while (gEncoderConfig.offset >= 360) gEncoderConfig.offset -= 360;
                 while (gEncoderConfig.offset <    0) gEncoderConfig.offset += 360;
                 
+                dataA = gEncoderConfig.offset;
+                dataB = encoder_fake_0;
+                dataC = rotorA;
+                dataD = rotorB;
+                
+                IqRef_fake = 0;
                 sAlignInProgress = 0;
             }
             else
@@ -563,10 +559,10 @@ int alignRotorIndex(volatile int* IqRef)
                 else
                 {
                     // Index is broken
-                    *IqRef = IqRef_fake = 0;
+                    IqRef_fake = 0;
+                    sAlignInProgress = 0;
                     gEncoderError.uncalibrated = 0;
                     QE_RISE_ERROR(autocalib);
-                    sAlignInProgress = 0;
                 }
             }
         }
@@ -586,14 +582,14 @@ int alignRotorIndex(volatile int* IqRef)
 
 // DMA0 IRQ Service Routine used for FOC loop
 
-extern volatile int dataC;
-extern volatile int dataD;
-
 volatile int angle_feedback = 0;
 volatile int sectr_feedback = 0;
 
 volatile short Ia = 0, Ib = 0, Ic = 0;
 volatile short Va = 0, Vb = 0, Vc = 0;
+
+volatile int VqFbk = 0;
+volatile int IqFbk = 0;
 
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
@@ -694,7 +690,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         static int t = 0;
         static int senc = 0;
 
-        if (++t > 2000)
+        if (++t > 125)
         {
             t = 0;
             ++senc;
@@ -979,6 +975,22 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         }
     }
     
+    static long Vacc = 0;
+    static long Iacc = 0;
+    static char cntr = 0;
+    
+    Vacc += Vq<<5;
+    Iacc += I2Tdata.IQMeasured;
+    
+    if (++cntr == 40)
+    {
+        cntr = 0;
+        IqFbk = __builtin_divsd(Iacc,40);
+        VqFbk = __builtin_divsd(Vacc,40);
+        
+        Iacc = Vacc = 0;
+    }
+    
     // Re-scale Vq, Vd with respect to the PWM resolution and fullscale.
     Vq = Vq/2;
     Vd = Vd/2;
@@ -1013,7 +1025,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     {
         static int i2t_undersampler = 0;
 
-        if (++i2t_undersampler >= 20)
+        if (++i2t_undersampler >= 40)
         {
             i2t_undersampler = 0;
 

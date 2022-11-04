@@ -28,7 +28,7 @@
 //
 // Quadrature (incremental) Encoders parameters
 // 
-// define PPR and swap A/B strategy for known qadrature incremental encoders
+// define PPR and swap A/B strategy for known quadrature incremental encoders
 
 //#define MOTOR_NUMPOLES     4 // 1970
 //#define QE_SWAPAB          0

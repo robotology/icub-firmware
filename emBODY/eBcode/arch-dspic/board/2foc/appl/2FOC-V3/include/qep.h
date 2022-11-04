@@ -11,6 +11,8 @@ typedef struct
     int tolerance;
     unsigned char numPoles;
     BOOL full_calibration;
+    unsigned char IMV;
+    unsigned char QECK;
 } EncoderConfig_t;
 volatile extern EncoderConfig_t gEncoderConfig;
 

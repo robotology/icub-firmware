@@ -69,12 +69,15 @@ extern volatile short Va,Vb,Vc;
 
 extern volatile int storeIa, storeIc, storeVd;
 
+extern volatile int VqFbk;
+extern volatile int IqFbk;
+
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
     static tCanData payload; // = {{0}};
     unsigned long msgid;
 
-    payload.w[0] = I2Tdata.IQMeasured;
+    payload.w[0] = IqFbk;
     payload.w[1] = gQEVelocity;
     payload.w[2] = gQEPosition & 0xFFFF;
     payload.w[3] = gQEPosition >> 16;
@@ -91,15 +94,8 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     //prepare the payload
     payload.b[0] = gControlMode;
     payload.b[1] = gEncoderError.bitmask;
-    
-    //payload.w[1] = POSCNT;
 
-    payload.w[1] = (VqRef>>5);
-
-    //payload.w[1] = HALL;
-    
-    //payload.b[2] = 0;
-    //payload.b[3] = 0;
+    payload.w[1] = VqFbk;
 
     payload.b[4] = SysError.b[0];
     payload.b[5] = SysError.b[1];

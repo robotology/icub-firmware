@@ -215,8 +215,10 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             MotorConfig.has_speed_qe = FALSE;
             
-            gEncoderConfig.offset = rxpayload->w[2];
-        
+            gEncoderConfig.offset = rxpayload->w[2];//116
+            gEncoderConfig.IMV  = 2;//rxpayload->b[4];
+            gEncoderConfig.QECK = 3;//rxpayload->b[5];
+            
             if (MotorConfig.has_index && gEncoderConfig.offset == -1)
             {
                 gEncoderConfig.full_calibration = TRUE;
