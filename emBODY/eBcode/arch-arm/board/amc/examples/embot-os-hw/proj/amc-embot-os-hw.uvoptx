@@ -120,7 +120,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP0948193 -O206 -S8 -C0 -P00000000 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO65555 -TC400000000 -TT10000000 -TP18 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-UP0948199 -O206 -S8 -C0 -P00000000 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO65555 -TC400000000 -TT10000000 -TP18 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -163,52 +163,47 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>osthread</ItemText>
+          <ItemText>part</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>tmr</ItemText>
+          <ItemText>readback</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>_internals.cfg-&gt;isr_queue,0x10</ItemText>
+          <ItemText>d2flash</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>errormsg</ItemText>
+          <ItemText>buffer</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>errormsg</ItemText>
+          <ItemText>nerrors</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>errormsg</ItemText>
+          <ItemText>SystemCoreClock,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pImpl</ItemText>
+          <ItemText>pFlash.ErrorCode</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>largestack</ItemText>
+          <ItemText>&amp;pFlash.ErrorCode</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>frame</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>hfdcan</ItemText>
+          <ItemText>i</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -222,7 +217,7 @@
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>pTxData</ItemText>
+          <ItemText>0x24021560</ItemText>
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
@@ -232,7 +227,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -250,7 +245,7 @@
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
         <aSer4>1</aSer4>
-        <StkLoc>0</StkLoc>
+        <StkLoc>1</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
         <uProt>0</uProt>
@@ -1512,7 +1507,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1864,7 +1859,7 @@
 
   <Group>
     <GroupName>embot-os</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

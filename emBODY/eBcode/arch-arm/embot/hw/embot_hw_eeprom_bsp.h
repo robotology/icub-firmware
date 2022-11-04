@@ -42,8 +42,8 @@ namespace embot { namespace hw { namespace eeprom {
     
     struct flashPROP
     {
-        embot::hw::Partition partition {};   
-        constexpr flashPROP(const embot::hw::Partition &p) : partition(p) {}; 
+        embot::hw::flash::Partition partition {};   
+        constexpr flashPROP(const embot::hw::flash::Partition &p) : partition(p) {}; 
         constexpr flashPROP() = default;             
     };
 
@@ -77,7 +77,7 @@ namespace embot { namespace hw { namespace eeprom {
             : type(Type::chipM95512DF), multi(cc) {}
 //        constexpr PROP(embot::hw::eeprom::Type t, const embot::hw::GPIO &h,  const embot::hw::GPIO &s, const embot::hw::GPIO &w, embot::hw::SPI b) 
 //            : type(Type::spiM95512DF), multi({h, s, w, b}) {};
-        constexpr PROP(embot::hw::eeprom::Type t, const embot::hw::Partition &pa) 
+        constexpr PROP(embot::hw::eeprom::Type t, const embot::hw::flash::Partition &pa) 
             : type(Type::flashEMULATED), multi(pa) {};
         constexpr PROP(embot::hw::eeprom::Type t, size_t s) 
             : type(Type::heapTEST), multi(s) {};

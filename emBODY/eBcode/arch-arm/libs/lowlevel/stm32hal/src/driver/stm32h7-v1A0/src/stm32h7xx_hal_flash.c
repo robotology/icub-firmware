@@ -45,7 +45,7 @@
            (++) Callback functions are called when the flash operations are finished :
                 HAL_FLASH_EndOfOperationCallback() when everything is ok, otherwise
                 HAL_FLASH_OperationErrorCallback()
-           (++) Get error flag status by calling HAL_FLASH_GetError()
+o. diment           (++) Get error flag status by calling HAL_FLASH_GetError()
 
       (#) Option bytes management functions :
            (++) Lock and Unlock the option bytes using HAL_FLASH_OB_Unlock() and
@@ -1173,6 +1173,12 @@ HAL_StatusTypeDef FLASH_CRC_WaitForLastOperation(uint32_t Timeout, uint32_t Bank
 /**
   * @}
   */
+
+
+void iitext_FLASH_ClearFlag(uint32_t flag)
+{ // FLASH_FLAG_PGSERR
+    __HAL_FLASH_CLEAR_FLAG(flag);
+}
 
 #endif /* HAL_FLASH_MODULE_ENABLED */
 

@@ -599,31 +599,71 @@ namespace embot { namespace hw { namespace flash {
 namespace embot { namespace hw { namespace flash {
      
    #if   defined(STM32HAL_BOARD_AMC)
+    
+        constexpr uint32_t banksize {1024*1024};
+        constexpr uint32_t pagesize {128*1024};
+        constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
+        constexpr BankDescriptor bank02 { Bank::two, 0x08100000, banksize, {pagesize, banksize/pagesize} };
+        constexpr theBanks thebanks 
+        {
+            2, 
+            { &bank01, &bank02 }
+        }; 
+        
+        constexpr Partition eLoader         {Bank::one,     bank01.address,                 128*1024}; 
+        constexpr Partition eUpdater        {Bank::one,     eLoader.address+eLoader.size,   256*1024};
+        constexpr Partition eApplication00  {Bank::one,     eUpdater.address+eUpdater.size, 512*1024}; 
 
-// acemor          
-        // application @ tbdk we have 1024 k of flash. so far we use only 512 k
-        constexpr PROP whole                {{0x08000000,               (2*1024)*1024,      128*1024}}; 
-        constexpr PROP eloader              {{0x08000000,               (128)*1024,         128*1024}};   // bootloader
-        constexpr PROP eupdater             {{0x08000000+(128*1024),    (256)*1024,         128*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP eapplication00       {{0x08000000+(384*1024),    (512)*1024,         128*1024}};   // application @ tbdk
-        constexpr PROP eapplication01       {{0x08100000+(128*1024),   (256)*1024,          128*1024}};   // applicationstorage: on top of application            
+        constexpr Partition eApplication01  {Bank::two,     bank02.address,                 256*1024}; 
+        
+        constexpr Partition buffer          {Bank::two,     bank02.address+512*1024,        512*1024};
+        
+        constexpr thePartitions thepartitions
+        {
+            { &eLoader, &eUpdater, &eApplication00, &eApplication01, &buffer  }
+        };
+         
+//        constexpr uint8_t numberofbanks {2};
+//        constexpr uint32_t sizeofeachbank {(1024)*1024};
+//        constexpr uint32_t sizeofeachpage {128*1024};
+        
+//    constexpr Banks thebanks_ok {numberofbanks, sizeofeachbank, sizeofeachpage};
+//    
+//    constexpr BankProp bank1 {Bank::one, 0x08000000, 1024*1024, 128*1024};
+//    constexpr BankProp bank2 {Bank::two, 0x08100000, 1024*1024, 128*1024};
+//    
+//    constexpr Banks3 thebanks3 {2, {{ &bank1, &bank2 }} };    
+
+//    constexpr PROP whole                {{0x08000000,               2*sizeofeachbank,   128*1024}};
+//    constexpr PROP eloader              {{0x08000000,               (128)*1024,         128*1024}};   
+//    constexpr PROP eupdater             {{0x08000000+(128*1024),    (256)*1024,         128*1024}};  
+//    constexpr PROP eapplication00       {{0x08000000+(384*1024),    (512)*1024,         128*1024}};   
+//    constexpr PROP eapplication01       {{0x08100000+(128*1024),    (256)*1024,         128*1024}};              
 
     #else
         #error embot::hw::flash::thebsp must be defined    
     #endif   
 
 
+//    constexpr BSP thebsp {        
+//        // maskofsupported
+//        mask::pos2mask<uint32_t>(FLASH::whole) |
+//        mask::pos2mask<uint32_t>(FLASH::eloader) | mask::pos2mask<uint32_t>(FLASH::eupdater) |
+//        mask::pos2mask<uint32_t>(FLASH::eapplication00) | mask::pos2mask<uint32_t>(FLASH::eapplication01),        
+//        // properties
+//        {{
+//            &whole, &eloader, &eupdater, &eapplication00, &eapplication01            
+//        }},
+//        // banks
+//        thebanks_ok                
+//    };
+        
     constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::eloader) | mask::pos2mask<uint32_t>(FLASH::eupdater) |
-        mask::pos2mask<uint32_t>(FLASH::eapplication00) | mask::pos2mask<uint32_t>(FLASH::eapplication01),        
-        // properties
-        {{
-            &whole, &eloader, &eupdater, &eapplication00, &eapplication01            
-        }}        
-    };
+        thebanks,
+        thepartitions
+    };        
     
-    void BSP::init(embot::hw::FLASH h) const {}
+    void BSP::init() const {}
     
     const BSP& getBSP() 
     {

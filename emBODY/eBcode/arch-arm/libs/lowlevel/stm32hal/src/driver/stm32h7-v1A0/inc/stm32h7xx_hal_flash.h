@@ -843,6 +843,8 @@ extern FLASH_ProcessTypeDef pFlash;
 HAL_StatusTypeDef FLASH_WaitForLastOperation(uint32_t Timeout, uint32_t Bank);
 HAL_StatusTypeDef FLASH_OB_WaitForLastOperation(uint32_t Timeout);
 HAL_StatusTypeDef FLASH_CRC_WaitForLastOperation(uint32_t Timeout, uint32_t Bank);
+
+void iitext_FLASH_ClearFlag(uint32_t flag);
 /**
   * @}
   */

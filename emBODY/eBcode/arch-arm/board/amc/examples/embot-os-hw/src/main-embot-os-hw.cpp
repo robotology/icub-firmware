@@ -30,7 +30,7 @@
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 
-constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
+constexpr embot::core::relTime tickperiod = 5*1000*embot::core::time1millisec;
 
 
 #if defined(TEST_EMBOT_HW)
@@ -43,24 +43,35 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 //#define TEST_EMBOT_HW_ENCODER
 //#define TEST_EMBOT_HW_CHIP_AS5045
-#define TEST_EMBOT_HW_CHIP_MB049
+//#define TEST_EMBOT_HW_CHIP_MB049
 
-//#define TEST_EMBOT_HW_FLASH
+#define TEST_EMBOT_HW_FLASH
+#if defined(TEST_EMBOT_HW_FLASH)
 
-#define TEST_EMBOT_HW_CAN
+//#define TEST_EMBOT_HW_FLASH_READ
+#define TEST_EMBOT_HW_FLASH_ERASE
+#define TEST_EMBOT_HW_FLASH_WRITE
+#define TEST_EMBOT_HW_FLASH_WRITEandREADandCHECK
 
+#define TEST_EMBOT_HW_FLASH_SAME_BANK_AS_CODESPACE
+
+#endif
+
+//#define TEST_EMBOT_HW_CAN
+#if defined(TEST_EMBOT_HW_CAN)
 //#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1
 //#define TEST_EMBOT_HW_CAN_loopback_can1_to_can2_to_can1_BURST
 //#define TEST_EMBOT_HW_CAN_gateway_CAN2toCAN1
 //#define TEST_EMBOT_HW_CAN_gateway_CAN1toCAN2
-#define TEST_EMBOT_HW_CAN_BURST
+//#define TEST_EMBOT_HW_CAN_BURST
+#endif
 
-//# define TEST_EMBOT_HW_TIMER
-
+//#define TEST_EMBOT_HW_TIMER
 //#define TEST_EMBOT_HW_TIMER_ONESHOT
 
 void test_embot_hw_init();
 void test_embot_hw_tick();
+
 #endif
 
 
@@ -76,8 +87,10 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
-    
-    test_embot_hw_init();    
+
+#if defined(TEST_EMBOT_HW)    
+    test_embot_hw_init();   
+#endif    
 }
 
 
@@ -91,9 +104,11 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
     {      
         embot::core::TimeFormatter tf(embot::core::now());        
-//        embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
-    
+        embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
+
+#if defined(TEST_EMBOT_HW)
         test_embot_hw_tick();
+#endif
     }
     
 
@@ -388,15 +403,20 @@ void initSystem(embot::os::Thread *t, void* initparam)
     // start the services with default params
     embot::os::theTimerManager::getInstance().start({});     
     embot::os::theCallbackManager::getInstance().start({});  
-                    
-    embot::core::print("INIT: creating the LED pulser: it will blink a LED at 1 Hz and run a 0.2 Hz waveform on another");
         
-    static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one, embot::hw::LED::two};  
+    constexpr embot::core::Time blinktime {250*embot::core::time1millisec};
+                    
+    embot::core::print("INIT: creating the LED pulser: it will blink a LED @" + embot::core::TimeFormatter(blinktime).to_string());
+        
+    static const std::initializer_list<embot::hw::LED> allleds = 
+    {   
+        embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three, embot::hw::LED::four, embot::hw::LED::five, embot::hw::LED::six   
+    };  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
-    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 50, std::bitset<64>(0b010101));
-    theleds.get(embot::hw::LED::two).wave(&ledwave); 
+    theleds.get(embot::hw::LED::two).pulse(blinktime); 
+//    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 50, std::bitset<64>(0b010101));
+//    theleds.get(embot::hw::LED::two).wave(&ledwave); 
     
     
     embot::core::print("INIT: creating the main thread. it will reveives one periodic tick event and one upon pressure of the blue button");  
@@ -862,9 +882,11 @@ embot::core::Time startwrite {0};
 
 embot::core::Time writetime {0};
 embot::core::Time erasetime {0};
+embot::core::Time readtime {0};
 embot::core::Time start{0};
+embot::core::Time activation{0};
 
-constexpr uint64_t d2flash[1024/8] =
+constexpr uint64_t d2flash0[1024/8] =
 {
     0x1122334455667788,
     0x99aabbccddeeff00,
@@ -876,31 +898,115 @@ constexpr uint64_t d2flash[1024/8] =
     0x99aabbccddeeff00    
 };
 
+constexpr size_t nK {129};
+uint32_t d2flash[nK*1024/4] = {0};   // nk KB
+uint32_t readback[nK*1024/4] = {0};  // nk KB
+
 #endif
 
 void test_embot_hw_tick()
 {
-    static uint8_t cnt = 0;
+    static size_t cnt = 0;
     cnt++;
+      
+#if defined(TEST_EMBOT_HW_FLASH) 
     
-#if defined(TEST_EMBOT_HW_FLASH)
-    const embot::hw::flash::BSP &flashbsp = embot::hw::flash::getBSP();
-    size_t adrflash = flashbsp.getPROP(embot::hw::FLASH::eapplication01)->partition.address;
-    size_t sizeflash = flashbsp.getPROP(embot::hw::FLASH::eapplication01)->partition.maxsize;
-    
-    start = embot::core::now();    
-    embot::hw::flash::erase(adrflash, sizeflash);
-    erasetime = embot::core::now() - start;
+    constexpr size_t period {1};     
+    static uint8_t tmp_data = 0x20;
+    if (0 == (cnt % period))
+    {
+#if defined(TEST_EMBOT_HW_FLASH_SAME_BANK_AS_CODESPACE)
+        constexpr embot::hw::flash::ID partitionID = embot::hw::flash::ID::eapplication00;
+        std::string flashaddress {"0x08060000"}; 
+        // application00 -> 0x08060000
+#else
+        constexpr embot::hw::flash::ID partitionID = embot::hw::flash::ID::eapplication01;
+        std::string flashaddress {"0x08120000"};
+        // application01 -> 0x08120000
+#endif        
+        const embot::hw::flash::BSP &flashbsp = embot::hw::flash::getBSP();
+        size_t partition_address = flashbsp.get(partitionID)->address;
+        size_t partition_size = flashbsp.get(partitionID)->size;
+   
+        activation = embot::core::now();
+        bool OKcheck {true};
+        
+        bool resfl {false};
 
-    start = embot::core::now();    
-    embot::hw::flash::write(adrflash, sizeof(d2flash), d2flash);
-    writetime = embot::core::now() - start;
-//    embot::hw::flash::write(adrflash+2*sizeof(d2flash), sizeof(d2flash), d2flash);
-//    embot::hw::flash::write(adrflash+3*sizeof(d2flash), sizeof(d2flash), d2flash);
-    
-    embot::core::print(std::string("erased sector + written: ") + std::to_string(sizeof(d2flash)) + ". erase time = " + embot::core::TimeFormatter(erasetime).to_string() + ", write time = " + embot::core::TimeFormatter(writetime).to_string());
- 
-#endif    
+#if defined(TEST_EMBOT_HW_FLASH_READ)        
+        std::memset(readback, 0, sizeof(readback));
+        embot::hw::led::on(embot::hw::LED::six);
+        start = embot::core::now();
+        embot::hw::flash::read(partition_address, sizeof(readback), readback);
+        readtime = embot::core::now() - start;
+        embot::hw::led::off(embot::hw::LED::six);
+#endif
+
+#if defined(TEST_EMBOT_HW_FLASH_ERASE)
+        embot::hw::led::on(embot::hw::LED::five);        
+        start = embot::core::now();
+        resfl = embot::hw::flash::erase(partition_address, partition_size); // whole partition, actually
+        erasetime = embot::core::now() - start;
+        embot::hw::led::off(embot::hw::LED::five);
+        
+        if(false == resfl)
+        {
+            embot::core::print("failure of embot::hw::flash::erase()"); 
+        }
+        
+#endif // TEST_EMBOT_HW_FLASH_ERASE
+        
+#if defined(TEST_EMBOT_HW_FLASH_WRITE)        
+//        std::memset(readback, 0, sizeof(readback));
+//        embot::hw::flash::read(partition_address, sizeof(readback), readback);
+        
+        std::memset(d2flash, tmp_data++, sizeof(d2flash));
+        embot::hw::led::on(embot::hw::LED::three);  
+        start = embot::core::now();
+        resfl = embot::hw::flash::write(partition_address, sizeof(d2flash), d2flash);
+        writetime = embot::core::now() - start;
+        embot::hw::led::off(embot::hw::LED::three);  
+        if(false == resfl)
+        {
+            embot::core::print("failure of embot::hw::flash::write()"); 
+        }
+        
+#if defined(TEST_EMBOT_HW_FLASH_WRITEandREADandCHECK) 
+
+        std::memset(readback, 0, sizeof(readback));   
+        start = embot::core::now();        
+        embot::hw::flash::read(partition_address, sizeof(readback), readback);
+        readtime = embot::core::now() - start;
+        
+        OKcheck = (0 == std::memcmp(d2flash, readback, sizeof(readback))); 
+        
+        if(false == OKcheck)
+        {
+            embot::hw::led::on(embot::hw::LED::one);
+        }
+#endif // TEST_EMBOT_HW_FLASH_WRITEandREADandCHECK
+
+#endif // TEST_EMBOT_HW_FLASH_WRITE
+        
+
+        embot::core::print(
+        std::string("FLASH op addr = ") + flashaddress + ": "
+//             + embot::core::TimeFormatter(activation).to_string() + ": " +
+            "partition size = " + std::to_string(partition_size/1024) + " KB, " +
+            "block size = " + std::to_string(sizeof(d2flash)/1024) + " KB, " +
+            "erase time of whole partition = " + embot::core::TimeFormatter(erasetime).to_string() + ", " +
+            "write time of block = " + embot::core::TimeFormatter(writetime).to_string() + ", " +
+            "read time of block = " + embot::core::TimeFormatter(readtime).to_string() + ", " +
+            "readback = " + std::string(OKcheck?"OK":"FCUKO")              
+            );
+
+        
+    }
+    else
+    {
+        embot::core::print("tick number: " + std::to_string(cnt));
+    }
+#endif // TEST_EMBOT_HW_FLASH    
     
     
 #if defined(TEST_EMBOT_HW_EEPROM)
