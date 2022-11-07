@@ -29,33 +29,50 @@ namespace embot { namespace hw { namespace flash {
     
     enum class Bank : uint8_t { one = 0, two = 1, all = 30, none = 31, maxnumberof = 2 }; 
     
-    enum class ID : uint8_t {   bootloader = 0, application = 1, sharedstorage = 2, applicationstorage = 3,     // for use by can boards
-                                eloader = 0, eupdater = 1, eapplication00 = 2, eapplication01 = 3, buffer = 4,  // for use by eth boards
-                                none = 31, maxnumberof = 5 }; 
+    enum class ID : uint8_t {   bootloader = 0, application = 1, sharedstorage = 2, applicationstorage = 3, // for use by can boards
+                                eloader = 0, eupdater = 1, eapplication00 = 2, eapplication01 = 3,          // for use by eth boards
+                                buffer00 = 4, buffer01 = 5, generic = 6,
+                                none = 31, maxnumberof = 7 }; 
     
     struct Partition
     {
+        ID id {ID::generic};
         Bank bank {Bank::none};
         uint32_t address {0};
         uint32_t size {0}; 
         constexpr Partition() = default;
         constexpr Partition(const Bank b, const uint32_t a, const uint32_t s) 
-            : bank(b), address(a), size(s) {}       
-        bool isvalid() const { if((0 == address) || (0 == size) || (Bank::none == bank)) { return false; } else { return true; } }
+            : id(ID::generic), bank(b), address(a), size(s) {} 
+        constexpr Partition(ID i, const Bank b, const uint32_t a, const uint32_t s) 
+            : id(i), bank(b), address(a), size(s) {}       
+        bool isvalid() const { if((0 == size) || (Bank::none == bank)) { return false; } else { return true; } }
         constexpr bool isinside(const uint32_t adr) const { return (adr >= address) && (adr < (address+size)); }
+    };
+    
+    struct BankProperties
+    {
+        Bank bank {Bank::none};
+        uint32_t address {0};
+        uint32_t size {0}; 
+        constexpr BankProperties() = default;
+        constexpr BankProperties(const Bank b, const uint32_t a, const uint32_t s)
+            : bank(b), address(a), size(s) {}            
     };
     
     constexpr uint32_t InvalidPAGE {0xffffffff};
     constexpr uint32_t InvalidADDR {0xffffffff};
 
     const embot::hw::flash::Partition& getpartition(embot::hw::flash::ID id);    
+    const embot::hw::flash::Partition& getpartition(uint32_t address);
         
     bool isaddressvalid(std::uint32_t address);  
     Bank address2bank(std::uint32_t address);  
     std::uint32_t address2page(std::uint32_t address); 
+    std::uint32_t address2pagesize(std::uint32_t address);
     std::uint32_t page2address(std::uint32_t page, Bank bank = Bank::one);
     std::uint32_t address2offset(std::uint32_t address);
- 
+    const BankProperties & bankproperties(const uint32_t address);
+    const BankProperties & bankproperties(const Bank bank);
     
     bool erase(std::uint32_t page, Bank bank = Bank::one);
     bool erase(std::uint32_t address, std::uint32_t size);

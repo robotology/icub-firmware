@@ -354,7 +354,7 @@ struct embot::app::application::theSTRAIN::Impl
 #if defined(STRAIN2_APP_AT_64K)
 #else            
             embot::app::theStorage &storage = embot::app::theStorage::getInstance(); 
-            storage.init(embot::hw::flash::getpartition(embot::hw::FLASH::applicationstorage).address, 1024);
+            storage.init(embot::hw::flash::getpartition(embot::hw::flash::ID::applicationstorage).address, 1024);
 #endif            
             clear();
             

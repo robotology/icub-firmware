@@ -20,57 +20,7 @@
 namespace embot { namespace hw { namespace flash {
         
     enum class Version : uint8_t { one = 0, two = 1, three = 2 };
-    
-//    struct PROP
-//    { 
-//        embot::hw::Partition partition {0, 0, 0};   
-//    };
-    
-//    struct Banks
-//    {
-//        uint8_t number {1}; 
-//        uint32_t size {0};
-//        uint32_t pagesize {0}; 
-//        uint32_t pagesinonebank {0};        
-//        constexpr Banks() = default;
-//        constexpr Banks(uint8_t n, uint32_t s, uint32_t p) 
-//            : number(n), size(s), pagesize(p), pagesinonebank((0==p) ? 0 : (s/p)) {} 
-//    };
-//    
-//    struct BankProp
-//    {
-//        Bank bank {Bank::none};
-//        uint32_t address {0};
-//        uint32_t size {0};
-//        uint32_t pagesize {0};
-//        uint32_t pagesnumber {0};
-//        constexpr BankProp() = default; 
-//        constexpr BankProp(Bank b, uint32_t a, uint32_t s, uint32_t ps)
-//            : bank(b), address(a), size(s), pagesize(ps), pagesnumber((0==ps) ? 0 : (s/ps)) {}            
-//    };
-//    
-//    struct Banks2
-//    {
-//        uint8_t number {1}; 
-//        BankProp prop {};        
-//        constexpr Banks2() = default;
-//        constexpr Banks2(uint8_t n, const BankProp &p) 
-//            : number(n), prop(p) {} 
-//    };  
-
-//    struct Banks3
-//    {
-//        static constexpr auto maxbanks {embot::core::tointegral(Bank::maxnumberof)};
-//        uint8_t number {1}; 
-//        std::array<const BankProp*, maxbanks> props {};        
-//        constexpr Banks3() = default;
-//        constexpr Banks3(uint8_t n, const std::array<const BankProp*, maxbanks> &p) 
-//            : number(n), props(p) {} 
-//    };   
-
-
-    // the new one
-    
+        
     struct Pages
     {   // the type can be different. the case allequalsize is the only one so far. but in case a partition holds pages of different sizes as the stm32f407 ...  
         enum class Type : uint8_t { allequalsize = 0 };
@@ -82,15 +32,12 @@ namespace embot { namespace hw { namespace flash {
             : type(Type::allequalsize), size(s), number(n) {}            
     };       
     
-    struct BankDescriptor
+    struct BankDescriptor : public BankProperties
     {
-        Bank bank {Bank::none};
-        uint32_t address {0};
-        uint32_t size {0};
         Pages pages {};
         constexpr BankDescriptor() = default; 
         constexpr BankDescriptor(const Bank b, const uint32_t a, const uint32_t s, const Pages& p)
-            : bank(b), address(a), size(s), pages(p) {} 
+            : BankProperties(b, a, s), pages(p) {} 
         constexpr bool isinside(const uint32_t adr) const { return (adr >= address) && (adr < (address+size)); }            
         constexpr uint32_t topage(const uint32_t adr) const
         {
@@ -100,6 +47,14 @@ namespace embot { namespace hw { namespace flash {
             }
             return InvalidPAGE;
         }
+        constexpr uint32_t topagesize(const uint32_t adr) const
+        {
+            if(true == isinside(adr))
+            {
+                return pages.size;
+            }
+            return 0;
+        }        
         constexpr uint32_t toaddress(const uint32_t page) const
         {
             if((InvalidPAGE != page) && (page < pages.number))
@@ -168,24 +123,15 @@ namespace embot { namespace hw { namespace flash {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-//        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::FLASH::maxnumberof);
-//        
-//        constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) 
-//            : SUPP(msk), properties(pro), banks({}), version(Version::one) {}
-//        constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro, const Banks &b) 
-//            : SUPP(msk), properties(pro), banks(b), version(Version::two) {}        
-//        constexpr BSP() 
-//            : SUPP(0), properties({0}), banks({}), version(Version::one) {}   
-
+        constexpr BSP() 
+            : SUPP(0), version(Version::three) {}
+        
         constexpr BSP(const theBanks &b, const thePartitions &p) 
             : SUPP(0xffffffff), version(Version::three), thebanks(b), thepartitions(p) {}     
+
                 
-          
         Version version {Version::one};
                 
-//        std::array<const PROP*, maxnumberof> properties {};             
-//        Banks banks {};  
-
         theBanks thebanks {};
         thePartitions thepartitions {};
         
@@ -199,12 +145,16 @@ namespace embot { namespace hw { namespace flash {
             return thebanks.get(b);
         } 
         
+        constexpr const embot::hw::flash::Partition * partition(const uint32_t adr) const
+        {
+            return thepartitions.find(adr);
+        } 
+        
         constexpr const BankDescriptor * find(const uint32_t adr) const
         {
             return thebanks.find(adr);
         } 
-        
-//        constexpr const PROP * getPROP(embot::hw::FLASH h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
+ 
         void init() const;
     };
     

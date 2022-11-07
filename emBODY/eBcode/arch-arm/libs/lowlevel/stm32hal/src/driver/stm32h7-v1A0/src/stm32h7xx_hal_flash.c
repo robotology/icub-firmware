@@ -1175,10 +1175,6 @@ HAL_StatusTypeDef FLASH_CRC_WaitForLastOperation(uint32_t Timeout, uint32_t Bank
   */
 
 
-void iitext_FLASH_ClearFlag(uint32_t flag)
-{ // FLASH_FLAG_PGSERR
-    __HAL_FLASH_CLEAR_FLAG(flag);
-}
 
 #endif /* HAL_FLASH_MODULE_ENABLED */
 

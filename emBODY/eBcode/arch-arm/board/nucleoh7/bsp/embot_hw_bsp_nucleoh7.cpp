@@ -333,7 +333,7 @@ void CAN1_RX0_IRQHandler(void)
 namespace embot { namespace hw { namespace flash {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -351,23 +351,6 @@ namespace embot { namespace hw { namespace flash {
         #error embot::hw::flash::thebsp must be defined    
     #endif   
 
-
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
-        // properties
-        {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
-        }}        
-    };
-    
-    void BSP::init(embot::hw::FLASH h) const {}
-    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
               
 }}} // namespace embot { namespace hw { namespace flash {
 

@@ -48,17 +48,6 @@ using namespace embot::core::binary;
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - specialize the bsp
-// --------------------------------------------------------------------------------------------------------------------
-
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-bool embot::hw::bsp::specialize() { return true; }
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
-
-
-// --------------------------------------------------------------------------------------------------------------------
 // - support maps
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -336,7 +325,7 @@ void CAN1_RX0_IRQHandler(void)
 namespace embot { namespace hw { namespace flash {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -348,30 +337,46 @@ namespace embot { namespace hw { namespace flash {
 
 namespace embot { namespace hw { namespace flash {
      
-    #if   defined(STM32HAL_BOARD_NUCLEO64)
-        #error embot::hw::flash::thebsp is not supported for STM32HAL_BOARD_NUCLEOH7 
-    #else
-        #error embot::hw::flash::thebsp must be defined    
-    #endif   
+#if   defined(STM32HAL_BOARD_NUCLEO64)
 
-
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
-        // properties
-        {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
-        }}        
-    };
+    constexpr uint8_t numbanks {1};
+    constexpr uint32_t banksize {256*1024};
+    constexpr uint32_t pagesize {2*1024};
+    constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, nullptr }
+    }; 
     
-    void BSP::init(embot::hw::FLASH h) const {}
+    // on on top of each other, with sizes:
+    constexpr std::array<uint32_t, 4> ss = {124*1024, 4*1024, 124*1024, 4*1024};
+    constexpr Partition bootloader          {Bank::one,     bank01.address,                             ss[0]}; 
+    constexpr Partition sharedstorage       {Bank::one,     bootloader.address+bootloader.size,         ss[1]};
+    constexpr Partition application         {Bank::one,     sharedstorage.address+sharedstorage.size,   ss[2]}; 
+    constexpr Partition applicationstorage  {Bank::one,     application.address+application.size,       ss[3]}; 
+    
+    constexpr thePartitions thepartitions
+    {
+        { &bootloader, &sharedstorage, &application, &applicationstorage, nullptr }
+    };
+        
+    constexpr BSP thebsp {        
+        thebanks,
+        thepartitions
+    };        
+    
+    void BSP::init() const {}
     
     const BSP& getBSP() 
     {
         return thebsp;
-    }
-              
+    }        
+        
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif
+
 }}} // namespace embot { namespace hw { namespace flash {
 
 #endif // flash
@@ -472,6 +477,27 @@ void TIM7_IRQHandler(void)
 
 
 
+// --------------------------------------------------------------------------------------------------------------------
+// - board specific methods
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_hw_bsp_nucleo64.h"
+
+namespace embot { namespace hw { namespace bsp { namespace nucleao64 {
+    
+}}}}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - specialize the bsp
+// --------------------------------------------------------------------------------------------------------------------
+
+#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
+bool embot::hw::bsp::specialize() { return true; }
+#else   
+bool embot::hw::bsp::specialize() { return true; }
+#endif  //EMBOT_ENABLE_hw_bsp_specialize
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

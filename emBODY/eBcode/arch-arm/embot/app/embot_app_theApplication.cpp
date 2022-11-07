@@ -87,9 +87,11 @@ embot::app::theApplication::~theApplication() { }
     pImpl->config = config;
     
     // now we init the hw, we start the scheduler, we start a countdown with sys restart at the end ... we exec the activity ...
-    if(pImpl->config.addressofapplication > embot::hw::flash::getpartition(embot::hw::FLASH::whole).address)
+
+    uint32_t defaultvectorlocation = embot::hw::flash::bankproperties(pImpl->config.addressofapplication).address;
+    if(pImpl->config.addressofapplication > defaultvectorlocation)
     {
-        std::uint32_t vectorlocation = pImpl->config.addressofapplication - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address;
+        std::uint32_t vectorlocation = pImpl->config.addressofapplication - defaultvectorlocation;
         if(0 != vectorlocation)
         {
             embot::hw::sys::relocatevectortable(vectorlocation);
@@ -102,9 +104,7 @@ embot::app::theApplication::~theApplication() { }
     embot::os::theScheduler &thescheduler = embot::os::theScheduler::getInstance();
     thescheduler.start(cfg);    
     
-    for(;;);
-    
-    //return true;
+    for(;;);    
 }
   
 

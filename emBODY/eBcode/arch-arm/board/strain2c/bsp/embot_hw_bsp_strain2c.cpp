@@ -48,17 +48,6 @@ using namespace embot::core::binary;
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - specialize the bsp
-// --------------------------------------------------------------------------------------------------------------------
-
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-bool embot::hw::bsp::specialize() { return true; }
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
-
-
-// --------------------------------------------------------------------------------------------------------------------
 // - support maps
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -274,7 +263,7 @@ void CAN1_RX0_IRQHandler(void)
 namespace embot { namespace hw { namespace flash {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -286,49 +275,54 @@ namespace embot { namespace hw { namespace flash {
 
 namespace embot { namespace hw { namespace flash {
      
-    #if   defined(STM32HAL_BOARD_STRAIN2C)
+#if   defined(STM32HAL_BOARD_STRAIN2C)
 
-        #if defined(STRAIN2_APP_AT_128K)
-        
-        // strain legacy: application @ 128k and application storage together with sharedstorage
-        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP applicationstorage   {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // applicationstorage: together with sharedstorage
-        constexpr PROP application          {{0x08000000+(128*1024),    (128)*1024,         2*1024}};   // application @ 128k
-        
-        #else 
-        
-        // strain2: application @ 080k
-        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(78*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(80*1024),     (172)*1024,         2*1024}};   // application @ 080k
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application    
-        
-        #endif
-
-    #else
-        #error embot::hw::flash::thebsp must be defined    
-    #endif   
-
-
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
-        // properties
-        {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
-        }}        
-    };
+    constexpr uint8_t numbanks {1};
+    constexpr uint32_t banksize {256*1024};
+    constexpr uint32_t pagesize {2*1024};
+    constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, nullptr }
+    }; 
     
-    void BSP::init(embot::hw::FLASH h) const {}
+    // on on top of each other, with sizes:
+    #if defined(STRAIN2_APP_AT_128K)
+    // application @ 128k and application storage together with sharedstorage
+    constexpr std::array<uint32_t, 3> ss =  {124*1024, 4*1024, 128*1024};
+    constexpr Partition bootloader          {Bank::one,     0x08000000,                             124*1024}; 
+    constexpr Partition sharedstorage       {Bank::one,     0x08000000+124*1024,                      4*1024};
+    constexpr Partition applicationstorage  {Bank::one,     0x08000000+124*1024,                      4*1024};  
+    constexpr Partition application         {Bank::one,     0x08000000+128*1024,                    128*1024}; 
+    #else
+    // application @ 80k
+    constexpr std::array<uint32_t, 4> ss =  {78*1024, 2*1024, 172*1024, 4*1024};
+    constexpr Partition bootloader          {Bank::one,     bank01.address,                             ss[0]}; 
+    constexpr Partition sharedstorage       {Bank::one,     bootloader.address+bootloader.size,         ss[1]};
+    constexpr Partition application         {Bank::one,     sharedstorage.address+sharedstorage.size,   ss[2]}; 
+    constexpr Partition applicationstorage  {Bank::one,     application.address+application.size,       ss[3]}; 
+    #endif    
+    constexpr thePartitions thepartitions
+    {
+        { &bootloader, &sharedstorage, &application, &applicationstorage, nullptr }
+    };
+        
+    constexpr BSP thebsp {        
+        thebanks,
+        thepartitions
+    };        
+    
+    void BSP::init() const {}
     
     const BSP& getBSP() 
     {
         return thebsp;
-    }
+    }        
+        
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif  
               
 }}} // namespace embot { namespace hw { namespace flash {
 
@@ -858,7 +852,33 @@ namespace embot { namespace hw { namespace bno055 {
 
 #endif // bno055
 
+
 // - support map: end of embot::hw::bno055
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - board specific methods
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_hw_bsp_strain2c.h"
+
+namespace embot { namespace hw { namespace bsp { namespace strain2c {
+    
+}}}}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - specialize the bsp
+// --------------------------------------------------------------------------------------------------------------------
+
+#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
+bool embot::hw::bsp::specialize() { return true; }
+#else   
+bool embot::hw::bsp::specialize() { return true; }
+#endif  //EMBOT_ENABLE_hw_bsp_specialize
 
 
 

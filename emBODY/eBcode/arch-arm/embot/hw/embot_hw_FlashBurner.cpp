@@ -129,14 +129,14 @@ struct embot::hw::FlashBurner::Impl
     
     Impl(std::uint32_t _start, std::uint32_t _size, std::uint32_t _buffersize = 2048, std::uint64_t * _buffer = nullptr) 
     {
-        start = _start; // dont do any control ... just > embot::hw::sys::startOfFLASH
-        if(start < embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) // embot::hw::sys::startOfFLASH
+        start = _start; // dont do any control ... just that start is a valid address
+        if(false == embot::hw::flash::isaddressvalid(start)) 
         {
-             start = embot::hw::flash::getpartition(embot::hw::FLASH::application).address; //embot::hw::sys::addressOfApplication;
+            start = embot::hw::flash::getpartition(embot::hw::flash::ID::application).address; 
         }
         
-        // init the page size used by the flash 
-        PAGEsize = embot::hw::flash::getBSP().getPROP(embot::hw::FLASH::whole)->partition.pagesize;
+        // init the page size used by the flash at that address. we assume that it stays the same
+        PAGEsize = embot::hw::flash::address2pagesize(start);
         _buffersize = PAGEsize;
         size = _size;
         

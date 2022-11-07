@@ -44,15 +44,6 @@
 
 using namespace std;
 
-#if defined(STM32HAL_STM32H7)
-extern "C" {
-void iitext_FLASH_ClearFlag(uint32_t flag);
-// to be defined in stm32h7xx_hal_flash.c because ... we had to undef FLASH macro and we cannot call __HAL etc
-//{ // FLASH_FLAG_PGSERR
-//    __HAL_FLASH_CLEAR_FLAG(flag);
-//}
-}
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -69,16 +60,21 @@ void iitext_FLASH_ClearFlag(uint32_t flag);
 
 
 namespace embot { namespace hw { namespace flash {
-
-    const embot::hw::Partition& getpartition(embot::hw::FLASH fl) { static constexpr embot::hw::Partition p {}; return p; }
-    
-    // the following functions use embot::hw::FLASH::whole
-    
+   
+    constexpr Partition dummypartition {};
+    constexpr BankProperties dummybankprop {};
+        
+    const embot::hw::flash::Partition& getpartition(embot::hw::flash::ID id) { return dummypartition; }    
+    const embot::hw::flash::Partition& getpartition(uint32_t address) { return dummypartition; }
+        
     bool isaddressvalid(std::uint32_t address) { return false; }    
-    Bank address2bank(std::uint32_t address) { return Bank::one; }
-    std::uint32_t address2page(std::uint32_t address) { return 0; }
-    std::uint32_t page2address(std::uint32_t page, Bank bank) { return 0; }
-    std::uint32_t address2offset(std::uint32_t address){ return 0; }
+    Bank address2bank(std::uint32_t address) { return Bank::none; }
+    std::uint32_t address2page(std::uint32_t address) { return InvalidPAGE; }
+    std::uint32_t address2pagesize(std::uint32_t address) { return 0; }
+    std::uint32_t page2address(std::uint32_t page, Bank bank) { return InvalidADDR; }
+    std::uint32_t address2offset(std::uint32_t address){ return InvalidADDR; }
+    const BankProperties & bankproperties(const uint32_t address) { return dummybankprop;}
+    const BankProperties & bankproperties(const Bank bank) { return dummybankprop;} 
     
     bool erase(std::uint32_t page, Bank bank) { return false; }
     bool erase(std::uint32_t address, std::uint32_t size) { return false; }
@@ -90,17 +86,22 @@ namespace embot { namespace hw { namespace flash {
 #else
 
 namespace embot { namespace hw { namespace flash {
-    
-//    const embot::hw::Partition& getpartition(embot::hw::FLASH fl)
-//    {
-//        return embot::hw::flash::getBSP().getPROP(fl)->partition;         
-//    }
-    
+        
+    constexpr Partition dummypartition {};
+    constexpr BankProperties dummybankprop {};
+        
     const embot::hw::flash::Partition& getpartition(embot::hw::flash::ID id)
     {
-        return *embot::hw::flash::getBSP().get(id);
+        const Partition *p = embot::hw::flash::getBSP().get(id);
+        return (nullptr == p) ? dummypartition : *p;
     }
-           
+
+    const embot::hw::flash::Partition& getpartition(uint32_t address)
+    {
+        const Partition *p = embot::hw::flash::getBSP().partition(address);
+        return (nullptr == p) ? dummypartition : *p;
+    }
+    
     bool isaddressvalid(std::uint32_t address)
     {
         return nullptr != embot::hw::flash::getBSP().find(address);
@@ -117,6 +118,12 @@ namespace embot { namespace hw { namespace flash {
         const BankDescriptor * bd = embot::hw::flash::getBSP().find(address);               
         return (nullptr == bd) ? InvalidPAGE : bd->topage(address); 
     }
+
+    std::uint32_t address2pagesize(std::uint32_t address)
+    {
+        const BankDescriptor * bd = embot::hw::flash::getBSP().find(address);               
+        return (nullptr == bd) ? 0 : bd->topagesize(address); 
+    }
     
     std::uint32_t page2address(std::uint32_t page, Bank bank)
     {
@@ -130,24 +137,30 @@ namespace embot { namespace hw { namespace flash {
         return (nullptr == bd) ? InvalidADDR : bd->tooffset(address);         
     }
     
-//    Bank page2bank(std::uint32_t page)
-//    {        
-//        if(Version::one == embot::hw::flash::getBSP().version)
-//        {
-//            return Bank::one;
-//        }
-//        
-//        if(Version::two == embot::hw::flash::getBSP().version)
-//        {
-//            if(0 == embot::hw::flash::getBSP().banks.pagesinonebank)
-//            {
-//                return Bank::one;
-//            }    
-//            return static_cast<Bank>(page/embot::hw::flash::getBSP().banks.pagesinonebank);
-//        }
-//        
-//        return Bank::one;
-//    }    
+    
+    const BankProperties & bankproperties(const uint32_t address)
+    {
+        const BankDescriptor * bd = embot::hw::flash::getBSP().find(address);             
+        return (nullptr == bd) ? dummybankprop : *bd;         
+    }
+    
+    const BankProperties & bankproperties(const Bank bank)
+    {
+        const BankDescriptor * bd = embot::hw::flash::getBSP().get(bank);             
+        return (nullptr == bd) ? dummybankprop : *bd; 
+    }        
+    
+    uint32_t tostm32bank(embot::hw::flash::Bank ba)
+    {
+        // Bank values srat from 0, macro FLASH_BANK_1 is i, macro FLASH_BANK_2 sometimes is not defined
+        // in here we dont check much (Bank::all, etc)
+        return embot::core::tointegral(ba) + 1;
+    }
+    
+    void clearflag(uint32_t flag)
+    {
+        __HAL_FLASH_CLEAR_FLAG(flag);
+    }
     
     bool erase(std::uint32_t page, Bank bank)
     {
@@ -158,32 +171,31 @@ namespace embot { namespace hw { namespace flash {
         }
                
         HAL_StatusTypeDef r {HAL_OK};
+        uint32_t error_code {0};
 
-#if defined(STM32HAL_STM32H7)   
-        uint32_t error_code {0};       
+#if defined(STM32HAL_STM32H7)          
         FLASH_EraseInitTypeDef er = {0};
         er.TypeErase = FLASH_TYPEERASE_SECTORS;
-        er.Banks = (Bank::one == bank) ? FLASH_BANK_1 : FLASH_BANK_2;
+        er.Banks = tostm32bank(bank);
         er.Sector = page;
         er.NbSectors = 1;
         er.VoltageRange = FLASH_VOLTAGE_RANGE_3;
         uint32_t eraseErrorIndex = 0;
         
         HAL_FLASH_Unlock();
-        // __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_PGSERR); but i cannot use it, so ... i must add it into a function somewhere
-//        iitext_FLASH_ClearFlag(FLASH_FLAG_PGSERR);
+//        clearflag(FLASH_FLAG_PGSERR);
         r = HAL_FLASHEx_Erase(&er, &eraseErrorIndex);
         HAL_FLASH_Lock();
         
         if(HAL_OK != r)
         {
             error_code = HAL_FLASH_GetError();
-            iitext_FLASH_ClearFlag(error_code);
+            clearflag(error_code);
         }
 #else        
         FLASH_EraseInitTypeDef er = {0};
         er.TypeErase = FLASH_TYPEERASE_PAGES;
-        er.Banks = FLASH_BANK_1;
+        er.Banks = tostm32bank(bank);
         er.Page = page;
         er.NbPages = 1;
         uint32_t pagenum = 0;
@@ -194,11 +206,9 @@ namespace embot { namespace hw { namespace flash {
         if(HAL_OK != r)
         {
             error_code = HAL_FLASH_GetError();
-            //iitext_FLASH_ClearFlag(error_code);
-        }
-        
+            //clearflag(error_code);
+        }       
 #endif 
-
         
         return (HAL_OK == r) ? true : false;                
     }
@@ -233,43 +243,36 @@ namespace embot { namespace hw { namespace flash {
         if(ba == b1)
         {
             HAL_StatusTypeDef r {HAL_ERROR};
+            uint32_t error_code {0};
             
             uint32_t firstpage = address2page(address);
             uint32_t lastpage = address2page(address+size-1);
             uint32_t npages = lastpage - firstpage + 1;   
 
-#if defined(STM32HAL_STM32H7)   
-            uint32_t error_code {0};       
+#if defined(STM32HAL_STM32H7)          
             FLASH_EraseInitTypeDef er = {0};
             er.TypeErase = FLASH_TYPEERASE_SECTORS;
-            er.Banks = (Bank::one == ba) ? FLASH_BANK_1 : FLASH_BANK_2;
+            er.Banks = tostm32bank(ba);
             er.Sector = firstpage;
             er.NbSectors = npages;
             er.VoltageRange = FLASH_VOLTAGE_RANGE_3;
             uint32_t eraseErrorIndex = 0;
             
             HAL_FLASH_Unlock();
-            iitext_FLASH_ClearFlag(FLASH_FLAG_PGSERR);
+//            clearflag(FLASH_FLAG_PGSERR);
             r = HAL_FLASHEx_Erase(&er, &eraseErrorIndex);
             HAL_FLASH_Lock();
-            
-            
-//            error_code = HAL_FLASH_GetError();
-//            if(0 != error_code)
-//            {
-//                nerrors++;                
-//            }
-            
+                                   
             if(HAL_OK != r)
             {
                 nerrors++; 
                 error_code = HAL_FLASH_GetError();
-                iitext_FLASH_ClearFlag(error_code);
+                clearflag(error_code);
             }
 #else        
             FLASH_EraseInitTypeDef er = {0};
             er.TypeErase = FLASH_TYPEERASE_PAGES;
-            er.Banks = FLASH_BANK_1;
+            er.Banks = tostm32bank(ba);
             er.Page = firstpage;
             er.NbPages = npages;
             uint32_t pagenum = 0;
@@ -281,7 +284,7 @@ namespace embot { namespace hw { namespace flash {
             {
                 nerrors++; 
                 error_code = HAL_FLASH_GetError();
-                iitext_FLASH_ClearFlag(error_code);
+                clearflag(error_code);
             }            
 #endif   
 
@@ -289,8 +292,7 @@ namespace embot { namespace hw { namespace flash {
             
         }
         else
-        {
-            
+        {            
             // in here we assume that we have consecutive pages and increasing banks
             // so we iterate by address, until we reach
             uint32_t addressaligned2page = page2address(address2page(address), ba);
@@ -400,8 +402,6 @@ namespace embot { namespace hw { namespace flash {
         {   // address must be 8-aligned. size must be multiple of 8.
             return false;
         }
-
-        //const embot::hw::Partition part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
         
         HAL_FLASH_Unlock();
         
@@ -425,7 +425,7 @@ namespace embot { namespace hw { namespace flash {
         if(HAL_OK != r)
         {
             uint32_t error_code = HAL_FLASH_GetError();
-            iitext_FLASH_ClearFlag(error_code);
+            clearflag(error_code);
         }        
 #else        
         uint32_t tmpadr = address;
@@ -444,7 +444,7 @@ namespace embot { namespace hw { namespace flash {
         if(HAL_OK != r)
         {
             uint32_t error_code = HAL_FLASH_GetError();
-            //iitext_FLASH_ClearFlag(error_code);
+            clearflag(error_code);
         }        
 #endif
 

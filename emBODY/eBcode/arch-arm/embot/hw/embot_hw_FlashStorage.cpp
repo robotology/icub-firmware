@@ -54,9 +54,9 @@ struct embot::hw::FlashStorage::Impl
         pagestart = _pagestart; 
         if(false == embot::hw::flash::isaddressvalid(pagestart))
         {
-             pagestart = embot::hw::flash::getpartition(embot::hw::FLASH::sharedstorage).address;
+            pagestart = embot::hw::flash::getpartition(embot::hw::flash::ID::sharedstorage).address;
         }
-        pagenumber = (pagestart - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) / embot::hw::flash::getpartition(embot::hw::FLASH::whole).pagesize; 
+        pagenumber = embot::hw::flash::address2page(pagestart); 
         
         pagesize = _pagesize;
         if(pagesize > maxSupportedPAGEsize)

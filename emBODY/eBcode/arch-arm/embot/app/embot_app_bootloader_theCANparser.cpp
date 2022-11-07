@@ -628,18 +628,18 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
            
     if(nullptr == pImpl->flashburner)
     {
-        std::uint32_t flashstart = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
-        std::uint32_t flashsize = embot::hw::flash::getpartition(embot::hw::FLASH::application).maxsize;
+        std::uint32_t flashstart = embot::hw::flash::getpartition(embot::hw::flash::ID::application).address;
+        std::uint32_t flashsize = embot::hw::flash::getpartition(embot::hw::flash::ID::application).size;
 
         if(embot::prot::can::Process::application == pImpl->config.owner)
         {
-            flashstart = embot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
-            flashsize = embot::hw::flash::getpartition(embot::hw::FLASH::bootloader).maxsize;            
+            flashstart = embot::hw::flash::getpartition(embot::hw::flash::ID::bootloader).address;
+            flashsize = embot::hw::flash::getpartition(embot::hw::flash::ID::bootloader).size;            
         }
         else
         {
-            flashstart = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
-            flashsize = embot::hw::flash::getpartition(embot::hw::FLASH::application).maxsize;            
+            flashstart = embot::hw::flash::getpartition(embot::hw::flash::ID::application).address;
+            flashsize = embot::hw::flash::getpartition(embot::hw::flash::ID::application).size;            
         }
         
         pImpl->flashburner = new embot::hw::FlashBurner(flashstart, flashsize);

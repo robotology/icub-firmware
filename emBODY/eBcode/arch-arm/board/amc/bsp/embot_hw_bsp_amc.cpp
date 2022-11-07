@@ -42,74 +42,6 @@ using namespace embot::core::binary;
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - specialize the bsp
-// --------------------------------------------------------------------------------------------------------------------
-#if defined(EMBOT_ENABLE_hw_J5_powersupply)
-
-#include "embot_hw_gpio.h"
-void J5power(bool on)
-{
-    constexpr embot::hw::GPIO J5pc {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::five};
-    
-    constexpr embot::hw::gpio::Config J5pcCfg {
-        embot::hw::gpio::Mode::OUTPUTpushpull, 
-        embot::hw::gpio::Pull::nopull, 
-        embot::hw::gpio::Speed::medium
-    };
-    static bool initted {false};
-    
-    if(!initted)
-    {
-        embot::hw::gpio::init(J5pc, J5pcCfg);
-        initted = true;
-    }
-    
-    embot::hw::gpio::set(J5pc, on ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET);        
-    HAL_Delay(10); // wait for 10 ms to stabilize ...
-}
-#endif
-
-#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)    
-#include "embot_hw_gpio.h"
-// it selects spi1 / spi2 / spi3 in connector J5
-void prepare_connector_j5_spi123()
-{
-    // ok, i know it does not compile... because:
-    // todo: if we define EMBOT_ENABLE_hw_spi_123_atstartup then we must not call s_J5_SPIpinout() in runtime
-    s_J5_SPIpinout(embot::hw::SPI::one, true);
-    s_J5_SPIpinout(embot::hw::SPI::two, true);
-    s_J5_SPIpinout(embot::hw::SPI::three, true);
-}
-#endif
-
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-
-    #if   defined(STM32HAL_BOARD_AMC)
-    
-       
-    bool embot::hw::bsp::specialize()
-    {
-
-#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)        
-        prepare_connector_j5_spi123();
-#endif
-
-#if defined(EMBOT_ENABLE_hw_J5_powersupply)
-        J5power(true);
-#endif        
-        return true;
-    }
-
-   
-    #else
-        #error embot::hw::bsp::specialize() must be defined    
-    #endif  
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
-
-
-// --------------------------------------------------------------------------------------------------------------------
 // - support maps
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -584,7 +516,7 @@ namespace embot { namespace hw { namespace can {
 namespace embot { namespace hw { namespace flash {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -594,74 +526,44 @@ namespace embot { namespace hw { namespace flash {
 
 #else
     
-#warning support for hw_flash in embot::hw::bsp is yet to be tested
-
 namespace embot { namespace hw { namespace flash {
      
-   #if   defined(STM32HAL_BOARD_AMC)
+#if   defined(STM32HAL_BOARD_AMC)
     
-        constexpr uint32_t banksize {1024*1024};
-        constexpr uint32_t pagesize {128*1024};
-        constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
-        constexpr BankDescriptor bank02 { Bank::two, 0x08100000, banksize, {pagesize, banksize/pagesize} };
-        constexpr theBanks thebanks 
-        {
-            2, 
-            { &bank01, &bank02 }
-        }; 
-        
-        constexpr Partition eLoader         {Bank::one,     bank01.address,                 128*1024}; 
-        constexpr Partition eUpdater        {Bank::one,     eLoader.address+eLoader.size,   256*1024};
-        constexpr Partition eApplication00  {Bank::one,     eUpdater.address+eUpdater.size, 512*1024}; 
+    constexpr uint8_t numbanks {2};
+    constexpr uint32_t banksize {1024*1024};
+    constexpr uint32_t pagesize {128*1024};
+    constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
+    constexpr BankDescriptor bank02 { Bank::two, 0x08100000, banksize, {pagesize, banksize/pagesize} };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, &bank02 }
+    }; 
+    
+    // on Bank::one
+    constexpr Partition eLoader         {ID::eloader,           Bank::one,     bank01.address,                 128*1024}; 
+    constexpr Partition eUpdater        {ID::eupdater,          Bank::one,     eLoader.address+eLoader.size,   256*1024};
+    constexpr Partition eApplication00  {ID::eapplication00,    Bank::one,     eUpdater.address+eUpdater.size, 512*1024};  
 
-        constexpr Partition eApplication01  {Bank::two,     bank02.address,                 256*1024}; 
-        
-        constexpr Partition buffer          {Bank::two,     bank02.address+512*1024,        512*1024};
-        
-        constexpr thePartitions thepartitions
-        {
-            { &eLoader, &eUpdater, &eApplication00, &eApplication01, &buffer  }
-        };
-         
-//        constexpr uint8_t numberofbanks {2};
-//        constexpr uint32_t sizeofeachbank {(1024)*1024};
-//        constexpr uint32_t sizeofeachpage {128*1024};
-        
-//    constexpr Banks thebanks_ok {numberofbanks, sizeofeachbank, sizeofeachpage};
-//    
-//    constexpr BankProp bank1 {Bank::one, 0x08000000, 1024*1024, 128*1024};
-//    constexpr BankProp bank2 {Bank::two, 0x08100000, 1024*1024, 128*1024};
-//    
-//    constexpr Banks3 thebanks3 {2, {{ &bank1, &bank2 }} };    
+    // on Bank::two
+    constexpr Partition eApplication01  {ID::eapplication01,    Bank::two,     bank02.address,                 256*1024};     
+    constexpr Partition buffer00        {ID::buffer00,          Bank::two,     bank02.address+512*1024,        512*1024};
+    
+    constexpr thePartitions thepartitions
+    {
+        { &eLoader, &eUpdater, &eApplication00, &eApplication01, &buffer00, nullptr, nullptr  }
+    };
 
-//    constexpr PROP whole                {{0x08000000,               2*sizeofeachbank,   128*1024}};
-//    constexpr PROP eloader              {{0x08000000,               (128)*1024,         128*1024}};   
-//    constexpr PROP eupdater             {{0x08000000+(128*1024),    (256)*1024,         128*1024}};  
-//    constexpr PROP eapplication00       {{0x08000000+(384*1024),    (512)*1024,         128*1024}};   
-//    constexpr PROP eapplication01       {{0x08100000+(128*1024),    (256)*1024,         128*1024}};              
-
-    #else
-        #error embot::hw::flash::thebsp must be defined    
-    #endif   
-
-
-//    constexpr BSP thebsp {        
-//        // maskofsupported
-//        mask::pos2mask<uint32_t>(FLASH::whole) |
-//        mask::pos2mask<uint32_t>(FLASH::eloader) | mask::pos2mask<uint32_t>(FLASH::eupdater) |
-//        mask::pos2mask<uint32_t>(FLASH::eapplication00) | mask::pos2mask<uint32_t>(FLASH::eapplication01),        
-//        // properties
-//        {{
-//            &whole, &eloader, &eupdater, &eapplication00, &eapplication01            
-//        }},
-//        // banks
-//        thebanks_ok                
-//    };
-        
     constexpr BSP thebsp {        
         thebanks,
         thepartitions
-    };        
+    };   
+            
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif   
+     
     
     void BSP::init() const {}
     
@@ -1678,6 +1580,92 @@ extern "C"
 }
 
 #endif // timer
+
+
+// - support map: end of embot::hw::timer
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - board specific methods
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_hw_bsp_amc.h"
+
+namespace embot { namespace hw { namespace bsp { namespace amc {
+    
+}}}}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - specialize the bsp
+// --------------------------------------------------------------------------------------------------------------------
+
+#if defined(EMBOT_ENABLE_hw_J5_powersupply)
+
+#include "embot_hw_gpio.h"
+void J5power(bool on)
+{
+    constexpr embot::hw::GPIO J5pc {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::five};
+    
+    constexpr embot::hw::gpio::Config J5pcCfg {
+        embot::hw::gpio::Mode::OUTPUTpushpull, 
+        embot::hw::gpio::Pull::nopull, 
+        embot::hw::gpio::Speed::medium
+    };
+    static bool initted {false};
+    
+    if(!initted)
+    {
+        embot::hw::gpio::init(J5pc, J5pcCfg);
+        initted = true;
+    }
+    
+    embot::hw::gpio::set(J5pc, on ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET);        
+    HAL_Delay(10); // wait for 10 ms to stabilize ...
+}
+#endif
+
+#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)    
+#include "embot_hw_gpio.h"
+// it selects spi1 / spi2 / spi3 in connector J5
+void prepare_connector_j5_spi123()
+{
+    // ok, i know it does not compile... because:
+    // todo: if we define EMBOT_ENABLE_hw_spi_123_atstartup then we must not call s_J5_SPIpinout() in runtime
+    s_J5_SPIpinout(embot::hw::SPI::one, true);
+    s_J5_SPIpinout(embot::hw::SPI::two, true);
+    s_J5_SPIpinout(embot::hw::SPI::three, true);
+}
+#endif
+
+#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
+bool embot::hw::bsp::specialize() { return true; }
+#else   
+
+    #if   defined(STM32HAL_BOARD_AMC)
+    
+       
+    bool embot::hw::bsp::specialize()
+    {
+
+#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)        
+        prepare_connector_j5_spi123();
+#endif
+
+#if defined(EMBOT_ENABLE_hw_J5_powersupply)
+        J5power(true);
+#endif        
+        return true;
+    }
+
+   
+    #else
+        #error embot::hw::bsp::specialize() must be defined    
+    #endif  
+#endif  //EMBOT_ENABLE_hw_bsp_specialize
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

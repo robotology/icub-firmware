@@ -42,17 +42,6 @@ using namespace embot::core::binary;
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - specialize the bsp
-// --------------------------------------------------------------------------------------------------------------------
-
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-bool embot::hw::bsp::specialize() { return true; }
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
-
-
-// --------------------------------------------------------------------------------------------------------------------
 // - support maps
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -293,7 +282,7 @@ extern "C"
 namespace embot { namespace hw { namespace flash {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -305,45 +294,52 @@ namespace embot { namespace hw { namespace flash {
 
 namespace embot { namespace hw { namespace flash {
      
-   #if   defined(STM32HAL_BOARD_STM32G4EVAL)
+#if   defined(STM32HAL_BOARD_STM32G4EVAL)
          
-        // application @ 128k
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ 128k
-        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
- 
-#if 0     
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000+(256+2)*1014,               (128)*1024,          2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(256*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(0*1024),     (252)*1024,         2*1024}};   // application @ 080k
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
-#endif
-
-
-    #else
-        #error embot::hw::flash::thebsp must be defined    
-    #endif   
-
-
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
-        // properties
-        {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
-        }}        
-    };
+    #if defined(EMBOT_ENABLE_hw_flash_DUALBANK)
+        #error EMBOT_ENABLE_hw_flash_DUALBANK should not be enabled
+        // must configure differently the bps, but ... dont define this mcro
+    #endif
+    // note:
+    // the stm32g4 has a page size of:
+    // - 4k when its flash is configured as single bank
+    // - 2k when its flash is configured as two banks
+    // we have used 4k because at the time did not have support for dual bank added only in nov 2022
     
-    void BSP::init(embot::hw::FLASH h) const {}
+    constexpr uint8_t numbanks {1};
+    constexpr uint32_t banksize {512*1024};
+    constexpr uint32_t pagesize {4*1024};
+    constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, nullptr }
+    }; 
+    
+    // on on top of each other, with sizes:
+    constexpr std::array<uint32_t, 4> ss = {124*1024, 4*1024, 380*1024, 4*1024};
+    constexpr Partition bootloader          {Bank::one,     bank01.address,                             ss[0]}; 
+    constexpr Partition sharedstorage       {Bank::one,     bootloader.address+bootloader.size,         ss[1]};
+    constexpr Partition application         {Bank::one,     sharedstorage.address+sharedstorage.size,   ss[2]}; 
+    constexpr Partition applicationstorage  {Bank::one,     application.address+application.size,       ss[3]}; 
+    
+    constexpr thePartitions thepartitions
+    {
+        { &bootloader, &sharedstorage, &application, &applicationstorage, nullptr }
+    };
+        
+    constexpr BSP thebsp {        
+        thebanks,
+        thepartitions
+    };        
+    
+    void BSP::init() const {}
     
     const BSP& getBSP() 
     {
         return thebsp;
     }
+#endif
               
 }}} // namespace embot { namespace hw { namespace flash {
 
@@ -463,12 +459,12 @@ namespace embot { namespace hw { namespace tlv493d {
            
     #if defined(STM32HAL_BOARD_STM32G4EVAL)
          
-    constexpr PROP prop01 { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0xBC} };
-    constexpr PROP prop02fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x02} };
-    constexpr PROP prop03fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x03} };
-    constexpr PROP prop04fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x04} };
-    constexpr PROP prop05fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x05} };
-    constexpr PROP prop06fake { embot::hw::i2c::Descriptor{embot::hw::I2C::three,   0x06} };
+    constexpr PROP prop01 { embot::hw::I2Cdescriptor{embot::hw::ANY::three,   0xBC} };
+    constexpr PROP prop02fake { embot::hw::I2Cdescriptor{embot::hw::ANY::three,   0x02} };
+    constexpr PROP prop03fake { embot::hw::I2Cdescriptor{embot::hw::ANY::three,   0x03} };
+    constexpr PROP prop04fake { embot::hw::I2Cdescriptor{embot::hw::ANY::three,   0x04} };
+    constexpr PROP prop05fake { embot::hw::I2Cdescriptor{embot::hw::ANY::three,   0x05} };
+    constexpr PROP prop06fake { embot::hw::I2Cdescriptor{embot::hw::ANY::three,   0x06} };
 
 
     constexpr BSP thebsp {     
@@ -507,6 +503,86 @@ namespace embot { namespace hw { namespace tlv493d {
 
 // - support map: end of embot::hw::tlv493d
 
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - specialize the bsp
+// --------------------------------------------------------------------------------------------------------------------
+
+
+void leds_init_off()
+{
+    using namespace embot::hw;
+    const led::BSP &b = led::getBSP();
+    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three, LED::four, LED::five, LED::six, LED::seven , LED::eight};
+    for(const auto &l : leds)
+    {
+        const led::PROP *p = b.getPROP(l);
+        if(nullptr != p)
+        {
+            gpio::init(p->gpio, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});  
+            gpio::set(p->gpio, p->off);
+        }
+    }    
+}
+
+void leds_set(bool on)
+{
+    using namespace embot::hw;
+    const led::BSP &b = led::getBSP();
+    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three, LED::four, LED::five, LED::six, LED::seven , LED::eight};
+    for(const auto &l : leds)
+    {
+        const led::PROP *p = b.getPROP(l);
+        if(nullptr != p)
+        {
+            gpio::set(p->gpio, on ? p->on : p->off);
+        }
+    }    
+}
+
+void verify_flash_bank()
+{
+    FLASH_OBProgramInitTypeDef odb = {0};   
+    HAL_FLASHEx_OBGetConfig(&odb);
+    
+    uint8_t detectedbanks = ((odb.USERConfig & FLASH_OPTR_DBANK) == FLASH_OPTR_DBANK) ? 2 : 1;
+
+#if defined(EMBOT_ENABLE_hw_flash_DUALBANK)
+    constexpr uint8_t expectedbanks = 2;
+#else
+    constexpr uint8_t expectedbanks = 1;
+#endif
+    
+    if(expectedbanks != detectedbanks)
+    {
+        embot::core::print("number of banks is not as expected: detected " + std::to_string(detectedbanks));
+        embot::core::print("cannot continue");
+        
+        leds_init_off();
+        for(;;)
+        {
+            leds_set(true);
+            HAL_Delay(250);
+            leds_set(false);
+            HAL_Delay(250);
+        }
+    }        
+}
+
+#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
+bool embot::hw::bsp::specialize() 
+{ 
+    leds_init_off();
+    
+    verify_flash_bank();
+    
+    return true; 
+}
+#else   
+bool embot::hw::bsp::specialize() { return true; }
+#endif  //EMBOT_ENABLE_hw_bsp_specialize
 
 
 

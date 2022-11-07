@@ -53,7 +53,7 @@ struct embot::app::theCANboardInfo::Impl
     std::uint64_t buffer[1024/sizeof(std::uint64_t)];
     Impl() 
     {  
-        addressofsharedstorage = embot::hw::flash::getpartition(embot::hw::FLASH::sharedstorage).address;      
+        addressofsharedstorage = embot::hw::flash::getpartition(embot::hw::flash::ID::sharedstorage).address;      
         userdataaddress = addressofsharedstorage + 1024 - embot::app::theCANboardInfo::sizeOfUserSpace;        
         flashstorage = new embot::hw::FlashStorage(addressofsharedstorage, 1024, buffer); 
 //        embot::os::theStorage &thestrg = embot::os::theStorage::getInstance();

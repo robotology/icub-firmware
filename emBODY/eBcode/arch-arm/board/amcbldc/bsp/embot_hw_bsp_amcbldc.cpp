@@ -390,7 +390,7 @@ extern "C"
 namespace embot { namespace hw { namespace flash {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -402,43 +402,56 @@ namespace embot { namespace hw { namespace flash {
 
 namespace embot { namespace hw { namespace flash {
      
-   #if   defined(STM32HAL_BOARD_AMCBLDC)
-
-   #if defined(EMBOT_ENABLE_hw_flash_SINGLEBANK)
-        // the stm32g4 has a page size of 4k when its flash is configured as single bank
-        constexpr uint32_t pagesize = 4*1024;
-   #else
-        // the stm32g4 has a page size of 2k when its flash is configured as two banks
-        constexpr uint32_t pagesize = 2*1024;
-   #endif
-        // application @ 128k, single bank
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         pagesize}}; 
-        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         pagesize}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           pagesize}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     pagesize}};   // application @ 128k
-        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           pagesize}};   // applicationstorage: on top of application            
-
-    #else
-        #error embot::hw::flash::thebsp must be defined    
-    #endif   
-
-
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
-        // properties
-        {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
-        }}        
-    };
+#if   defined(STM32HAL_BOARD_AMCBLDC)
+        
+    #if defined(EMBOT_ENABLE_hw_flash_DUALBANK)
+        #error EMBOT_ENABLE_hw_flash_DUALBANK should not be enabled
+        // must configure differently the bps, but ... dont define this mcro
+    #endif
+    // note:
+    // the stm32g4 has a page size of:
+    // - 4k when its flash is configured as single bank
+    // - 2k when its flash is configured as two banks
+    // we have used 4k because at the time did not have support for dual bank added only in nov 2022
     
-    void BSP::init(embot::hw::FLASH h) const {}
+    constexpr uint8_t numbanks {1};
+    constexpr uint32_t banksize {512*1024};
+    constexpr uint32_t pagesize {4*1024};
+    constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, nullptr }
+    }; 
+    
+    // on on top of each other, with sizes:
+    constexpr std::array<uint32_t, 4> ss = {124*1024, 4*1024, 380*1024, 4*1024};
+    constexpr Partition bootloader          {Bank::one,     bank01.address,                             ss[0]}; 
+    constexpr Partition sharedstorage       {Bank::one,     bootloader.address+bootloader.size,         ss[1]};
+    constexpr Partition application         {Bank::one,     sharedstorage.address+sharedstorage.size,   ss[2]}; 
+    constexpr Partition applicationstorage  {Bank::one,     application.address+application.size,       ss[3]}; 
+    
+    constexpr thePartitions thepartitions
+    {
+        { &bootloader, &sharedstorage, &application, &applicationstorage, nullptr }
+    };
+        
+    constexpr BSP thebsp {        
+        thebanks,
+        thepartitions
+    };        
+    
+    void BSP::init() const {}
     
     const BSP& getBSP() 
     {
         return thebsp;
-    }
+    }        
+        
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif   
+
               
 }}} // namespace embot { namespace hw { namespace flash {
 
@@ -859,10 +872,10 @@ void verify_flash_bank()
     
     uint8_t detectedbanks = ((odb.USERConfig & FLASH_OPTR_DBANK) == FLASH_OPTR_DBANK) ? 2 : 1;
 
-#if defined(EMBOT_ENABLE_hw_flash_SINGLEBANK)
-    constexpr uint8_t expectedbanks = 1;
-#else
+#if defined(EMBOT_ENABLE_hw_flash_DUALBANK)
     constexpr uint8_t expectedbanks = 2;
+#else
+    constexpr uint8_t expectedbanks = 1;
 #endif
     
     if(expectedbanks != detectedbanks)

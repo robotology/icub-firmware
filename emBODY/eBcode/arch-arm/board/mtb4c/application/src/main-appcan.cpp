@@ -90,18 +90,7 @@ int main(void)
 // - here is the tailoring of the board.
 
 
-#include "embot_hw_si7051.h"
-#include "embot_hw_bno055.h"
-
-namespace embot { namespace hw { namespace bsp { namespace mtb4 {
-        
-    constexpr embot::hw::SI7051 thermometer = embot::hw::SI7051::one;
-    constexpr embot::hw::si7051::Config thermometerconfig = {};
-   
-    constexpr embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
-    constexpr embot::hw::bno055::Config imuBOSCHconfig = {};   
-             
-}}}} // namespace embot { namespace hw { namespace bsp { namespace mtb4 {
+#include "embot_hw_bsp_mtb4c.h"
 
 #include "embot_os_theScheduler.h"
 #include "embot_app_theLEDmanager.h"
@@ -161,7 +150,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
                    
     // init agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4::imuBOSCH, embot::hw::bsp::mtb4::imuBOSCHconfig, evIMUtick, evIMUdataready, evtsk);
+    embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4c::imuBOSCH, embot::hw::bsp::mtb4c::imuBOSCHconfig, evIMUtick, evIMUdataready, evtsk);
     theimu.initialise(configimu);
 
     // init canparser imu and link it to its agent
@@ -171,7 +160,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
     
     // init agent of thermo
     embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4::thermometer, embot::hw::bsp::mtb4::thermometerconfig, evTHERMOtick, evTHERMOdataready, evtsk);
+    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4c::thermometer, embot::hw::bsp::mtb4c::thermometerconfig, evTHERMOtick, evTHERMOdataready, evtsk);
     thethermo.initialise(configthermo);  
 
     // init canparser thermo and link it to its agent
