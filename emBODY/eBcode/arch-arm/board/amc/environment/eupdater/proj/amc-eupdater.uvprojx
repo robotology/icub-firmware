@@ -420,9 +420,9 @@
               <FilePath>..\src\eupdater\updater-core.c</FilePath>
             </File>
             <File>
-              <FileName>hal_embot_hw.cpp</FileName>
+              <FileName>hal_embot.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\eupdater\hal_embot_hw.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1722,9 +1722,9 @@
               <FilePath>..\src\eupdater\updater-core.c</FilePath>
             </File>
             <File>
-              <FileName>hal_embot_hw.cpp</FileName>
+              <FileName>hal_embot.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\eupdater\hal_embot_hw.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2769,9 +2769,9 @@
               <FilePath>..\src\eupdater\updater-core.c</FilePath>
             </File>
             <File>
-              <FileName>hal_embot_hw.cpp</FileName>
+              <FileName>hal_embot.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\eupdater\hal_embot_hw.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3816,9 +3816,9 @@
               <FilePath>..\src\eupdater\updater-core.c</FilePath>
             </File>
             <File>
-              <FileName>hal_embot_hw.cpp</FileName>
+              <FileName>hal_embot.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\eupdater\hal_embot_hw.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
           </Files>
         </Group>
