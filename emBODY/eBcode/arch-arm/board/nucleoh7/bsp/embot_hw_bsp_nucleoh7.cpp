@@ -330,7 +330,7 @@ void CAN1_RX0_IRQHandler(void)
 
 #if !defined(EMBOT_ENABLE_hw_flash)
 
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
     
     constexpr BSP thebsp { };
     void BSP::init() const {}    
@@ -339,11 +339,11 @@ namespace embot { namespace hw { namespace flash {
         return thebsp;
     }
     
-}}}
+}}}}
 
 #else
 
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
      
     #if   defined(STM32HAL_BOARD_NUCLEOH7)
         #error embot::hw::flash::thebsp is not supported for STM32HAL_BOARD_NUCLEOH7 
@@ -352,7 +352,7 @@ namespace embot { namespace hw { namespace flash {
     #endif   
 
               
-}}} // namespace embot { namespace hw { namespace flash {
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
 
 #endif // flash
 

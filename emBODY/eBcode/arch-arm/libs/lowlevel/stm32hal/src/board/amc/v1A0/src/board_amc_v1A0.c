@@ -81,7 +81,7 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void);
 static void MPU_Config(void);
 void PeriphCommonClock_Config(void);
 
-//#define DISABLE_CACHE
+#define DISABLE_CACHE
 
 extern void stm32hal_board_init(void)
 {

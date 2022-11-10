@@ -526,15 +526,15 @@ namespace embot { namespace hw { namespace flash {
 
 #else
     
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
      
 #if   defined(STM32HAL_BOARD_AMC)
     
     constexpr uint8_t numbanks {2};
     constexpr uint32_t banksize {1024*1024};
     constexpr uint32_t pagesize {128*1024};
-    constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
-    constexpr BankDescriptor bank02 { Bank::two, 0x08100000, banksize, {pagesize, banksize/pagesize} };
+    constexpr BankDescriptor bank01 { Bank::ID::one, 0x08000000, banksize, pagesize };
+    constexpr BankDescriptor bank02 { Bank::ID::two, 0x08100000, banksize, pagesize };
     constexpr theBanks thebanks 
     {
         numbanks, 
@@ -542,17 +542,18 @@ namespace embot { namespace hw { namespace flash {
     }; 
     
     // on Bank::one
-    constexpr Partition eLoader         {ID::eloader,           Bank::one,     bank01.address,                 128*1024}; 
-    constexpr Partition eUpdater        {ID::eupdater,          Bank::one,     eLoader.address+eLoader.size,   256*1024};
-    constexpr Partition eApplication00  {ID::eapplication00,    Bank::one,     eUpdater.address+eUpdater.size, 512*1024};  
-
+    constexpr Partition ldr {Partition::ID::eloader,        &bank01,    bank01.address,         128*1024}; 
+    constexpr Partition upd {Partition::ID::eupdater,       &bank01,    ldr.address+ldr.size,   256*1024};
+    constexpr Partition a00 {Partition::ID::eapplication00, &bank01,    upd.address+upd.size,   256*1024};  
+    constexpr Partition b00 {Partition::ID::buffer00,       &bank01,    a00.address+a00.size,   128*1024};
+    
     // on Bank::two
-    constexpr Partition eApplication01  {ID::eapplication01,    Bank::two,     bank02.address,                 256*1024};     
-    constexpr Partition buffer00        {ID::buffer00,          Bank::two,     bank02.address+512*1024,        512*1024};
+    constexpr Partition a01 {Partition::ID::eapplication01, &bank02,    bank02.address,         512*1024};     
+    constexpr Partition b01 {Partition::ID::buffer01,       &bank02,    a01.address+a01.size,   512*1024};
     
     constexpr thePartitions thepartitions
     {
-        { &eLoader, &eUpdater, &eApplication00, &eApplication01, &buffer00, nullptr, nullptr  }
+        { &ldr, &upd, &a00, &b00, &a01, &b01 }
     };
 
     constexpr BSP thebsp {        
@@ -572,7 +573,7 @@ namespace embot { namespace hw { namespace flash {
         return thebsp;
     }
               
-}}} // namespace embot { namespace hw { namespace flash {
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
 
 #endif // flash
 
@@ -1656,6 +1657,12 @@ bool embot::hw::bsp::specialize() { return true; }
 
 #if defined(EMBOT_ENABLE_hw_J5_powersupply)
         J5power(true);
+#endif 
+
+#if defined(EMBOT_ENABLE_hw_IcacheDcache)
+        // enable I and D cache
+        SCB_EnableICache();        
+        SCB_EnableDCache();    
 #endif        
         return true;
     }

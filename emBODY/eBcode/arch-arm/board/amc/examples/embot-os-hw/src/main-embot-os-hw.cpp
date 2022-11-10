@@ -53,7 +53,19 @@ constexpr embot::core::relTime tickperiod = 5*1000*embot::core::time1millisec;
 #define TEST_EMBOT_HW_FLASH_WRITE
 #define TEST_EMBOT_HW_FLASH_WRITEandREADandCHECK
 
+#define TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+//#define TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION_tick1milli
+#define TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION_tick100micro
+//#define TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION_tick10micro
+#endif
+
+//constexpr size_t blocksizeKB {129};
+constexpr size_t blocksizeKB {1};
+
 #define TEST_EMBOT_HW_FLASH_SAME_BANK_AS_CODESPACE
+
+#define TEST_EMBOT_HW_FLASH_api
 
 #endif
 
@@ -513,7 +525,30 @@ int main(void)
 
 #if defined(TEST_EMBOT_HW_FLASH)
 #include "embot_hw_flash.h"
-#include "embot_hw_flash_bsp.h"
+//#include "embot_hw_flash_bsp.h"
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+#include "embot_hw_timer.h"
+constexpr embot::hw::TIMER flashexec_timer {embot::hw::TIMER::one};
+constexpr embot::core::relTime flashexec_period 
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION_tick1milli)    
+{ 1 * embot::core::time1millisec };
+#elif defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION_tick100micro)
+{ 100 * embot::core::time1microsec };
+#elif defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION_tick10micro)
+{ 10 * embot::core::time1microsec };
+#endif
+volatile uint32_t flashexec_ticks {0};
+void flashexec_onexpiry(void *p)
+{ 
+    flashexec_ticks++;
+};
+
+embot::hw::timer::Config flashexec_timerConfig {
+    flashexec_period,
+    embot::hw::timer::Mode::periodic, 
+    {flashexec_onexpiry, nullptr},
+};
+#endif
 #endif
 
 #if defined(TEST_EMBOT_HW_SPI123)
@@ -734,7 +769,12 @@ void test_embot_hw_init()
 #endif
     
 #if defined(TEST_EMBOT_HW_FLASH)
+
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+
+    embot::hw::timer::init(flashexec_timer, flashexec_timerConfig);
     
+#endif
 
 #endif
     
@@ -886,22 +926,19 @@ embot::core::Time readtime {0};
 embot::core::Time start{0};
 embot::core::Time activation{0};
 
-constexpr uint64_t d2flash0[1024/8] =
-{
-    0x1122334455667788,
-    0x99aabbccddeeff00,
-    0x1122334455667788,
-    0x99aabbccddeeff00,
-    0x1122334455667788,
-    0x99aabbccddeeff00,
-    0x1122334455667788,
-    0x99aabbccddeeff00    
-};
+volatile uint32_t flashexec_write_ticks {0};
+volatile uint32_t flashexec_erase_ticks {0};
+volatile uint32_t flashexec_read_ticks {0};
 
-constexpr size_t nK {129};
-uint32_t d2flash[nK*1024/4] = {0};   // nk KB
-uint32_t readback[nK*1024/4] = {0};  // nk KB
 
+
+uint32_t d2flash[blocksizeKB*1024/4] = {0};   // nk KB
+uint32_t readback[blocksizeKB*1024/4] = {0};  // nk KB
+
+#endif
+
+#if defined(TEST_EMBOT_HW_FLASH_api)
+void testAPIflash();
 #endif
 
 void test_embot_hw_tick()
@@ -915,8 +952,12 @@ void test_embot_hw_tick()
     static uint8_t tmp_data = 0x20;
     if (0 == (cnt % period))
     {
+#if defined(TEST_EMBOT_HW_FLASH_api)        
+        testAPIflash();
+#endif
+        
 #if defined(TEST_EMBOT_HW_FLASH_SAME_BANK_AS_CODESPACE)
-        constexpr embot::hw::flash::ID partitionID = embot::hw::flash::ID::eapplication00;
+        constexpr embot::hw::flash::Partition::ID partitionID = embot::hw::flash::Partition::ID::eapplication00;
         std::string flashaddress {"0x08060000"}; 
         // application00 -> 0x08060000
 #else
@@ -924,9 +965,8 @@ void test_embot_hw_tick()
         std::string flashaddress {"0x08120000"};
         // application01 -> 0x08120000
 #endif        
-        const embot::hw::flash::BSP &flashbsp = embot::hw::flash::getBSP();
-        size_t partition_address = flashbsp.get(partitionID)->address;
-        size_t partition_size = flashbsp.get(partitionID)->size;
+        size_t partition_address = embot::hw::flash::bsp::partition(partitionID).address;
+        size_t partition_size = embot::hw::flash::bsp::partition(partitionID).size;
    
         activation = embot::core::now();
         bool OKcheck {true};
@@ -943,10 +983,22 @@ void test_embot_hw_tick()
 #endif
 
 #if defined(TEST_EMBOT_HW_FLASH_ERASE)
-        embot::hw::led::on(embot::hw::LED::five);        
+        embot::hw::led::on(embot::hw::LED::five);           
         start = embot::core::now();
+        
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+        flashexec_ticks = 0;
+        flashexec_erase_ticks = 0;
+        embot::hw::timer::start(flashexec_timer);    
+#endif         
         resfl = embot::hw::flash::erase(partition_address, partition_size); // whole partition, actually
-        erasetime = embot::core::now() - start;
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+        embot::hw::timer::stop(flashexec_timer); 
+        flashexec_erase_ticks = flashexec_ticks;
+        flashexec_ticks = 0;        
+#endif
+
+        erasetime = embot::core::now() - start;        
         embot::hw::led::off(embot::hw::LED::five);
         
         if(false == resfl)
@@ -961,9 +1013,21 @@ void test_embot_hw_tick()
 //        embot::hw::flash::read(partition_address, sizeof(readback), readback);
         
         std::memset(d2flash, tmp_data++, sizeof(d2flash));
-        embot::hw::led::on(embot::hw::LED::three);  
+        embot::hw::led::on(embot::hw::LED::three); 
         start = embot::core::now();
-        resfl = embot::hw::flash::write(partition_address, sizeof(d2flash), d2flash);
+        
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+        flashexec_ticks = 0;
+        flashexec_write_ticks = 0;
+        embot::hw::timer::start(flashexec_timer);    
+#endif        
+        resfl = embot::hw::flash::write(partition_address, sizeof(d2flash), d2flash);        
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+        embot::hw::timer::stop(flashexec_timer); 
+        flashexec_write_ticks = flashexec_ticks;
+        flashexec_ticks = 0;        
+#endif
+
         writetime = embot::core::now() - start;
         embot::hw::led::off(embot::hw::LED::three);  
         if(false == resfl)
@@ -973,9 +1037,21 @@ void test_embot_hw_tick()
         
 #if defined(TEST_EMBOT_HW_FLASH_WRITEandREADandCHECK) 
 
-        std::memset(readback, 0, sizeof(readback));   
-        start = embot::core::now();        
+        std::memset(readback, 0, sizeof(readback));  
+        start = embot::core::now();    
+        
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+        flashexec_ticks = 0;
+        flashexec_read_ticks = 0;
+        embot::hw::timer::start(flashexec_timer);    
+#endif             
         embot::hw::flash::read(partition_address, sizeof(readback), readback);
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+        embot::hw::timer::stop(flashexec_timer); 
+        flashexec_read_ticks = flashexec_ticks;
+        flashexec_ticks = 0;        
+#endif 
+        
         readtime = embot::core::now() - start;
         
         OKcheck = (0 == std::memcmp(d2flash, readback, sizeof(readback))); 
@@ -997,9 +1073,17 @@ void test_embot_hw_tick()
             "erase time of whole partition = " + embot::core::TimeFormatter(erasetime).to_string() + ", " +
             "write time of block = " + embot::core::TimeFormatter(writetime).to_string() + ", " +
             "read time of block = " + embot::core::TimeFormatter(readtime).to_string() + ", " +
-            "readback = " + std::string(OKcheck?"OK":"FCUKO")              
+            "readback = " + std::string(OKcheck?"OK":"FCUKO")            
             );
 
+#if defined(TEST_EMBOT_HW_FLASH_EXECUTIONDURINGOPERATION)
+        embot::core::print(
+            std::string("FLASH concurrency w/ hw timer tick period = ") + embot::core::TimeFormatter(flashexec_period).to_string() + ": "
+            "erase timer ticks = " + std::to_string(flashexec_erase_ticks) + ", " +
+            "write timer ticks = " + std::to_string(flashexec_write_ticks) + ", " +
+            "read timer ticks = " + std::to_string(flashexec_read_ticks)           
+            );
+#endif
         
     }
     else
@@ -1055,5 +1139,40 @@ void test_embot_hw_tick()
 #endif
 
 
+#if defined(TEST_EMBOT_HW_FLASH_api)
+#include "embot_hw_flash.h"
 
+using namespace embot::hw;
+
+void testAPIflash()
+{
+    const embot::hw::flash::Bank &bank1 = flash::bsp::bank(flash::Bank::ID::one);
+    if(bank1.isvalid())
+    {
+        std::vector<embot::hw::flash::Page> thepages {};
+        bank1.pages(thepages);
+        embot::core::print(std::string("FLASH API (pages): on Bank::one their number is = ") + std::to_string(thepages.size())); 
+                    
+        flash::ADDR endofbank01 {bank1.address+bank1.size-1};
+        flash::Page page = bank1.page(endofbank01);
+        
+        if(flash::erase(page.address, page.size))
+        {
+            constexpr uint32_t buffer[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+            uint32_t readback[8] = {0};
+            size_t size = std::min(sizeof(buffer), page.size);
+            if(flash::write(page.address, size, buffer))
+            {
+                flash::read(page.address, size, readback);    
+            } 
+            const char *rr = (0 == std::memcmp(readback, buffer, size)) ? "OK" : "KO";
+            embot::core::print(std::string("FLASH API (erase, write, read): res on last page of Bank::one = ") + rr);
+        }
+    }
+    else
+    {
+        embot::core::print("FLASH API (bank): Bank::one is not configured in the BSP");
+    }
+}
+#endif
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

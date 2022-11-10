@@ -87,11 +87,11 @@ embot::app::theApplication::~theApplication() { }
     pImpl->config = config;
     
     // now we init the hw, we start the scheduler, we start a countdown with sys restart at the end ... we exec the activity ...
-
-    uint32_t defaultvectorlocation = embot::hw::flash::bankproperties(pImpl->config.addressofapplication).address;
-    if(pImpl->config.addressofapplication > defaultvectorlocation)
+    std::uint32_t appladdress = pImpl->config.addressofapplication;
+    uint32_t defaultvectorlocation = embot::hw::flash::bsp::bank(appladdress).address;
+    if(appladdress > defaultvectorlocation)
     {
-        std::uint32_t vectorlocation = pImpl->config.addressofapplication - defaultvectorlocation;
+        std::uint32_t vectorlocation = appladdress - defaultvectorlocation;
         if(0 != vectorlocation)
         {
             embot::hw::sys::relocatevectortable(vectorlocation);

@@ -51,8 +51,8 @@ struct embot::hw::FlashBurner::Impl
         uint32_t    size;
         uint64_t*   data;
         uint8_t*    datamirror08;
-        uint32_t    page;
-        uint32_t    offset;
+        embot::hw::flash::Page::Index pageindex; 
+        uint32_t offset;
     };
     
     uint32_t start;
@@ -64,23 +64,25 @@ struct embot::hw::FlashBurner::Impl
 
     // by this, the PAGEsize is made dependent on the bsp. it is initted in the ctor 
     uint32_t PAGEsize = 2048; 
-    
-    static const uint32_t noPAGE = 0xffffffff;
-        
+            
     bool eraseall()
     {
         if(isallerased)
         {
             return true;
         }
+
+        embot::hw::flash::Page firstpage = embot::hw::flash::bsp::page(start);
+        embot::hw::flash::Page lastpage = embot::hw::flash::bsp::page(start+size-1);
+        embot::hw::flash::Page::Index firstpageIndex = firstpage.index;        
+        embot::hw::flash::Page::Index lastpageIndex = lastpage.index; 
+ 
+        uint32_t numofpages = lastpageIndex - firstpageIndex + 1;
         
-        uint32_t firstpage = embot::hw::flash::address2page(start);
-        uint32_t numofpages = embot::hw::flash::address2page(start+size) - firstpage;
-            
         FLASH_EraseInitTypeDef erase = {0};
         erase.TypeErase = FLASH_TYPEERASE_PAGES;
         erase.Banks = FLASH_BANK_1;
-        erase.Page = firstpage;
+        erase.Page = firstpageIndex;
         erase.NbPages = numofpages;
         uint32_t pagenum = 0;
 #if !defined(TEST_DONT_USE_FLASH)        
@@ -104,7 +106,8 @@ struct embot::hw::FlashBurner::Impl
         
         HAL_FLASH_Unlock();
         
-        uint32_t tmpadr = embot::hw::flash::page2address(buffer.page);
+        constexpr embot::hw::flash::Bank::ID bankid {embot::hw::flash::Bank::ID::one};
+        embot::hw::flash::ADDR tmpadr = embot::hw::flash::bsp::address(bankid, buffer.pageindex);
         uint32_t n64bitwords = PAGEsize / 8;
         for(uint32_t i=0; i<n64bitwords; i++)
         {
@@ -130,17 +133,19 @@ struct embot::hw::FlashBurner::Impl
     Impl(std::uint32_t _start, std::uint32_t _size, std::uint32_t _buffersize = 2048, std::uint64_t * _buffer = nullptr) 
     {
         start = _start; // dont do any control ... just that start is a valid address
-        if(false == embot::hw::flash::isaddressvalid(start)) 
+        if(false == embot::hw::flash::isvalid(start)) 
         {
-            start = embot::hw::flash::getpartition(embot::hw::flash::ID::application).address; 
+            start = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address; 
         }
         
         // init the page size used by the flash at that address. we assume that it stays the same
-        PAGEsize = embot::hw::flash::address2pagesize(start);
+        embot::hw::flash::Page firstpage = embot::hw::flash::bsp::page(start); 
+                
+        PAGEsize = firstpage.size;
         _buffersize = PAGEsize;
         size = _size;
         
-        buffer.page = noPAGE;
+        buffer.pageindex = embot::hw::flash::Page::InvalidIndex;
         buffer.offset = 0;
         
         buffer.size = _buffersize;
@@ -163,7 +168,7 @@ struct embot::hw::FlashBurner::Impl
             buffer.isexternal = true;
             buffer.data = _buffer;
         }
-        //buffer.datamirror08 = static_cast<uint8_t*>(buffer.data);
+
         buffer.datamirror08 = reinterpret_cast<uint8_t*>(buffer.data);
         
         isallerased = false;
@@ -233,17 +238,21 @@ bool embot::hw::FlashBurner::add(std::uint32_t address, std::uint32_t size, cons
     }
     
     // i put data inside the buffer.    
+    embot::hw::flash::Page firstpage = embot::hw::flash::bsp::page(address);   
+    embot::hw::flash::Page lastpage = embot::hw::flash::bsp::page(address+size-1); 
     
-    uint32_t currpagenum = embot::hw::flash::address2page(address);
-    uint32_t curroffset = embot::hw::flash::address2offset(address); 
-    
-    bool dataallinside1page = (embot::hw::flash::address2page(address+size-1) == currpagenum);
-    bool dataisinanewpage = (currpagenum != pImpl->buffer.page);
-    
+    embot::hw::flash::Page::Index currpageIndex = firstpage.index;        
+    embot::hw::flash::Page::Index lastpageIndex = lastpage.index;
+        
+    bool dataallinside1page = (lastpageIndex == currpageIndex);
+    bool dataisinanewpage = (currpageIndex != pImpl->buffer.pageindex);
+     
+    size_t curroffset = address - firstpage.address;    
+            
     
     if(dataisinanewpage)
     {   // must process the old page   
-        if(Impl::noPAGE == pImpl->buffer.page)
+        if(embot::hw::flash::Page::InvalidIndex == pImpl->buffer.pageindex)
         {   // first (valid) data ever. we just erase
             pImpl->eraseall();
         }
@@ -254,7 +263,7 @@ bool embot::hw::FlashBurner::add(std::uint32_t address, std::uint32_t size, cons
         
         // erase the buffer.data, assign the new page to the buffer
         std::memset(pImpl->buffer.data, 0xff, pImpl->buffer.size);
-        pImpl->buffer.page = currpagenum;    
+        pImpl->buffer.pageindex = currpageIndex;    
     }    
         
     if(dataallinside1page)
@@ -275,7 +284,7 @@ bool embot::hw::FlashBurner::add(std::uint32_t address, std::uint32_t size, cons
         pImpl->writebuffer();
         // second block: erase buffer, set the new pagenumber, copy at the beginnig
         std::memset(pImpl->buffer.data, 0xff, pImpl->buffer.size);
-        pImpl->buffer.page = currpagenum+1; 
+        pImpl->buffer.pageindex = currpageIndex+1; 
         std::memmove(&pImpl->buffer.datamirror08[0], data2, size2);         
     }    
         
@@ -285,7 +294,7 @@ bool embot::hw::FlashBurner::add(std::uint32_t address, std::uint32_t size, cons
 
 bool embot::hw::FlashBurner::flush()
 {
-    if(Impl::noPAGE == pImpl->buffer.page)
+    if(embot::hw::flash::Page::InvalidIndex == pImpl->buffer.pageindex)
     {   // never had data inside. cannot write
         return true;
     }

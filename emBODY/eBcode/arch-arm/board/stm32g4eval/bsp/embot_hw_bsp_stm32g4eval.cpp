@@ -279,7 +279,7 @@ extern "C"
 
 #if !defined(EMBOT_ENABLE_hw_flash)
 
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
     
     constexpr BSP thebsp { };
     void BSP::init() const {}    
@@ -291,8 +291,8 @@ namespace embot { namespace hw { namespace flash {
 }}}}
 
 #else
-
-namespace embot { namespace hw { namespace flash {
+ 
+namespace embot { namespace hw { namespace flash { namespace bsp {
      
 #if   defined(STM32HAL_BOARD_STM32G4EVAL)
          
@@ -309,7 +309,7 @@ namespace embot { namespace hw { namespace flash {
     constexpr uint8_t numbanks {1};
     constexpr uint32_t banksize {512*1024};
     constexpr uint32_t pagesize {4*1024};
-    constexpr BankDescriptor bank01 { Bank::one, 0x08000000, banksize, {pagesize, banksize/pagesize} };
+    constexpr BankDescriptor bank01 { Bank::ID::one, 0x08000000, banksize, pagesize };
     constexpr theBanks thebanks 
     {
         numbanks, 
@@ -318,14 +318,14 @@ namespace embot { namespace hw { namespace flash {
     
     // on on top of each other, with sizes:
     constexpr std::array<uint32_t, 4> ss = {124*1024, 4*1024, 380*1024, 4*1024};
-    constexpr Partition bootloader          {Bank::one,     bank01.address,                             ss[0]}; 
-    constexpr Partition sharedstorage       {Bank::one,     bootloader.address+bootloader.size,         ss[1]};
-    constexpr Partition application         {Bank::one,     sharedstorage.address+sharedstorage.size,   ss[2]}; 
-    constexpr Partition applicationstorage  {Bank::one,     application.address+application.size,       ss[3]}; 
+    constexpr Partition btl {Partition::ID::bootloader,         &bank01,    bank01.address,         ss[0]}; 
+    constexpr Partition sha {Partition::ID::sharedstorage,      &bank01,    btl.address+btl.size,   ss[1]};
+    constexpr Partition app {Partition::ID::application,        &bank01,    sha.address+sha.size,   ss[2]}; 
+    constexpr Partition stg {Partition::ID::applicationstorage, &bank01,    app.address+app.size,   ss[3]}; 
     
     constexpr thePartitions thepartitions
     {
-        { &bootloader, &sharedstorage, &application, &applicationstorage, nullptr }
+        { &btl, &sha, &app, &stg }
     };
         
     constexpr BSP thebsp {        
@@ -338,10 +338,13 @@ namespace embot { namespace hw { namespace flash {
     const BSP& getBSP() 
     {
         return thebsp;
-    }
-#endif
+    }        
+        
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif   
               
-}}} // namespace embot { namespace hw { namespace flash {
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
 
 #endif // flash
 
