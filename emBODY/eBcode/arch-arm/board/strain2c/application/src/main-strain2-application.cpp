@@ -90,18 +90,9 @@ int main(void)
 
 #undef ENABLE_IHAVEJUSTSTARTED
 
-#include "embot_hw_led.h"
-#include "embot_hw_si7051.h"
-#include "embot_hw_bno055.h"
-#include "embot_hw_pga308.h"
+#include "embot_hw_bsp_strain2c.h"
 
-namespace embot { namespace hw { namespace bsp { namespace strain2 {
-    const embot::hw::LED ledBLUE = embot::hw::LED::one;
-    const embot::hw::SI7051 thermometerSGAUGES = embot::hw::SI7051::one;
-    const embot::hw::si7051::Config thermometerSGAUGESconfig {};
-    const embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
-    const embot::hw::bno055::Config imuBOSCHconfig {};
-}}}} // namespace embot { namespace hw { namespace bsp { namespace strain2 {
+
 
 #include "embot_os_theScheduler.h"
 #include "embot_app_theLEDmanager.h"
@@ -170,7 +161,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
 
     // init agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig, evIMUtick, evIMUdataready, evthr);
+    embot::app::application::theIMU::Config configimu(embot::hw::bsp::strain2c::imuBOSCH, embot::hw::bsp::strain2c::imuBOSCHconfig, evIMUtick, evIMUdataready, evthr);
     theimu.initialise(configimu);
 
     // init canparser imu and link it to its agent
@@ -180,7 +171,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
 
     // init agent of thermo
     embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::strain2::thermometerSGAUGES, embot::hw::bsp::strain2::thermometerSGAUGESconfig, evTHERMOtick, evTHERMOdataready, evthr);
+    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::strain2c::thermometerSGAUGES, embot::hw::bsp::strain2c::thermometerSGAUGESconfig, evTHERMOtick, evTHERMOdataready, evthr);
     thethermo.initialise(configthermo);
 
     // init canparser thermo and link it to its agent

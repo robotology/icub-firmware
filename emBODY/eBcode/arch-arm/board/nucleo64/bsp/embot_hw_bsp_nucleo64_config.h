@@ -17,6 +17,7 @@
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_button
+    #define EMBOT_ENABLE_hw_flash
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_NUCLEO64 ...

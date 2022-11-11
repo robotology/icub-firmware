@@ -42,74 +42,6 @@ using namespace embot::core::binary;
 
 
 // --------------------------------------------------------------------------------------------------------------------
-// - specialize the bsp
-// --------------------------------------------------------------------------------------------------------------------
-#if defined(EMBOT_ENABLE_hw_J5_powersupply)
-
-#include "embot_hw_gpio.h"
-void J5power(bool on)
-{
-    constexpr embot::hw::GPIO J5pc {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::five};
-    
-    constexpr embot::hw::gpio::Config J5pcCfg {
-        embot::hw::gpio::Mode::OUTPUTpushpull, 
-        embot::hw::gpio::Pull::nopull, 
-        embot::hw::gpio::Speed::medium
-    };
-    static bool initted {false};
-    
-    if(!initted)
-    {
-        embot::hw::gpio::init(J5pc, J5pcCfg);
-        initted = true;
-    }
-    
-    embot::hw::gpio::set(J5pc, on ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET);        
-    HAL_Delay(10); // wait for 10 ms to stabilize ...
-}
-#endif
-
-#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)    
-#include "embot_hw_gpio.h"
-// it selects spi1 / spi2 / spi3 in connector J5
-void prepare_connector_j5_spi123()
-{
-    // ok, i know it does not compile... because:
-    // todo: if we define EMBOT_ENABLE_hw_spi_123_atstartup then we must not call s_J5_SPIpinout() in runtime
-    s_J5_SPIpinout(embot::hw::SPI::one, true);
-    s_J5_SPIpinout(embot::hw::SPI::two, true);
-    s_J5_SPIpinout(embot::hw::SPI::three, true);
-}
-#endif
-
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-
-    #if   defined(STM32HAL_BOARD_AMC)
-    
-       
-    bool embot::hw::bsp::specialize()
-    {
-
-#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)        
-        prepare_connector_j5_spi123();
-#endif
-
-#if defined(EMBOT_ENABLE_hw_J5_powersupply)
-        J5power(true);
-#endif        
-        return true;
-    }
-
-   
-    #else
-        #error embot::hw::bsp::specialize() must be defined    
-    #endif  
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
-
-
-// --------------------------------------------------------------------------------------------------------------------
 // - support maps
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -584,7 +516,7 @@ namespace embot { namespace hw { namespace can {
 namespace embot { namespace hw { namespace flash {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -594,43 +526,54 @@ namespace embot { namespace hw { namespace flash {
 
 #else
     
-#warning support for hw_flash in embot::hw::bsp is yet to be tested
-
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
      
-   #if   defined(STM32HAL_BOARD_AMC)
-
-// acemor          
-        // application @ tbdk we have 1024 k of flash. so far we use only 512 k
-        constexpr PROP whole                {{0x08000000,               (2*1024)*1024,      128*1024}}; 
-        constexpr PROP eloader              {{0x08000000,               (128)*1024,         128*1024}};   // bootloader
-        constexpr PROP eupdater             {{0x08000000+(128*1024),    (256)*1024,         128*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP eapplication00       {{0x08000000+(384*1024),    (512)*1024,         128*1024}};   // application @ tbdk
-        constexpr PROP eapplication01       {{0x08100000+(128*1024),   (256)*1024,          128*1024}};   // applicationstorage: on top of application            
-
-    #else
-        #error embot::hw::flash::thebsp must be defined    
-    #endif   
-
+#if   defined(STM32HAL_BOARD_AMC)
+    
+    constexpr uint8_t numbanks {2};
+    constexpr uint32_t banksize {1024*1024};
+    constexpr uint32_t pagesize {128*1024};
+    constexpr BankDescriptor bank01 { Bank::ID::one, 0x08000000, banksize, pagesize };
+    constexpr BankDescriptor bank02 { Bank::ID::two, 0x08100000, banksize, pagesize };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, &bank02 }
+    }; 
+    
+    // on Bank::one
+    constexpr Partition ldr {Partition::ID::eloader,        &bank01,    bank01.address,         128*1024}; 
+    constexpr Partition upd {Partition::ID::eupdater,       &bank01,    ldr.address+ldr.size,   256*1024};
+    constexpr Partition a00 {Partition::ID::eapplication00, &bank01,    upd.address+upd.size,   256*1024};  
+    constexpr Partition b00 {Partition::ID::buffer00,       &bank01,    a00.address+a00.size,   128*1024};
+    
+    // on Bank::two
+    constexpr Partition a01 {Partition::ID::eapplication01, &bank02,    bank02.address,         512*1024};     
+    constexpr Partition b01 {Partition::ID::buffer01,       &bank02,    a01.address+a01.size,   512*1024};
+    
+    constexpr thePartitions thepartitions
+    {
+        { &ldr, &upd, &a00, &b00, &a01, &b01 }
+    };
 
     constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::eloader) | mask::pos2mask<uint32_t>(FLASH::eupdater) |
-        mask::pos2mask<uint32_t>(FLASH::eapplication00) | mask::pos2mask<uint32_t>(FLASH::eapplication01),        
-        // properties
-        {{
-            &whole, &eloader, &eupdater, &eapplication00, &eapplication01            
-        }}        
-    };
+        thebanks,
+        thepartitions
+    };   
+            
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif   
+     
     
-    void BSP::init(embot::hw::FLASH h) const {}
+    void BSP::init() const {}
     
     const BSP& getBSP() 
     {
         return thebsp;
     }
               
-}}} // namespace embot { namespace hw { namespace flash {
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
 
 #endif // flash
 
@@ -1638,6 +1581,98 @@ extern "C"
 }
 
 #endif // timer
+
+
+// - support map: end of embot::hw::timer
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - board specific methods
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_hw_bsp_amc.h"
+
+namespace embot { namespace hw { namespace bsp { namespace amc {
+    
+}}}}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - specialize the bsp
+// --------------------------------------------------------------------------------------------------------------------
+
+#if defined(EMBOT_ENABLE_hw_J5_powersupply)
+
+#include "embot_hw_gpio.h"
+void J5power(bool on)
+{
+    constexpr embot::hw::GPIO J5pc {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::five};
+    
+    constexpr embot::hw::gpio::Config J5pcCfg {
+        embot::hw::gpio::Mode::OUTPUTpushpull, 
+        embot::hw::gpio::Pull::nopull, 
+        embot::hw::gpio::Speed::medium
+    };
+    static bool initted {false};
+    
+    if(!initted)
+    {
+        embot::hw::gpio::init(J5pc, J5pcCfg);
+        initted = true;
+    }
+    
+    embot::hw::gpio::set(J5pc, on ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET);        
+    HAL_Delay(10); // wait for 10 ms to stabilize ...
+}
+#endif
+
+#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)    
+#include "embot_hw_gpio.h"
+// it selects spi1 / spi2 / spi3 in connector J5
+void prepare_connector_j5_spi123()
+{
+    // ok, i know it does not compile... because:
+    // todo: if we define EMBOT_ENABLE_hw_spi_123_atstartup then we must not call s_J5_SPIpinout() in runtime
+    s_J5_SPIpinout(embot::hw::SPI::one, true);
+    s_J5_SPIpinout(embot::hw::SPI::two, true);
+    s_J5_SPIpinout(embot::hw::SPI::three, true);
+}
+#endif
+
+#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
+bool embot::hw::bsp::specialize() { return true; }
+#else   
+
+    #if   defined(STM32HAL_BOARD_AMC)
+    
+       
+    bool embot::hw::bsp::specialize()
+    {
+
+#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)        
+        prepare_connector_j5_spi123();
+#endif
+
+#if defined(EMBOT_ENABLE_hw_J5_powersupply)
+        J5power(true);
+#endif 
+
+#if defined(EMBOT_ENABLE_hw_IcacheDcache)
+        // enable I and D cache
+        SCB_EnableICache();        
+        SCB_EnableDCache();    
+#endif        
+        return true;
+    }
+
+   
+    #else
+        #error embot::hw::bsp::specialize() must be defined    
+    #endif  
+#endif  //EMBOT_ENABLE_hw_bsp_specialize
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

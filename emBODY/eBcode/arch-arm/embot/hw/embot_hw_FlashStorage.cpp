@@ -42,9 +42,9 @@
 struct embot::hw::FlashStorage::Impl
 {
     uint64_t *buffer;
-    uint32_t pagenumber;
-    uint32_t pagestart;
-    uint32_t pagesize;
+    embot::hw::flash::Page::Index pageindex;
+    embot::hw::flash::ADDR pagestart;
+    size_t pagesize;
     bool bufferisexternal;
     
     static constexpr size_t maxSupportedPAGEsize = 2048; // it can be lower than the actual pagesize on FLASH
@@ -52,11 +52,12 @@ struct embot::hw::FlashStorage::Impl
     Impl(std::uint32_t _pagestart, std::uint32_t _pagesize, std::uint64_t * _buffer = nullptr) 
     {
         pagestart = _pagestart; 
-        if(false == embot::hw::flash::isaddressvalid(pagestart))
+        if(false == embot::hw::flash::isvalid(pagestart))
         {
-             pagestart = embot::hw::flash::getpartition(embot::hw::FLASH::sharedstorage).address;
+            pagestart = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::sharedstorage).address;
         }
-        pagenumber = (pagestart - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) / embot::hw::flash::getpartition(embot::hw::FLASH::whole).pagesize; 
+        embot::hw::flash::Page firstpage = embot::hw::flash::bsp::page(pagestart);        
+        pageindex = firstpage.index; 
         
         pagesize = _pagesize;
         if(pagesize > maxSupportedPAGEsize)
@@ -143,7 +144,7 @@ bool embot::hw::FlashStorage::fullerase()
     FLASH_EraseInitTypeDef erase = {0};
     erase.TypeErase = FLASH_TYPEERASE_PAGES;
     erase.Banks = FLASH_BANK_1;
-    erase.Page = pImpl->pagenumber;
+    erase.Page = pImpl->pageindex;
     erase.NbPages = 1;
     uint32_t pagenum = 0;
     HAL_FLASH_Unlock();

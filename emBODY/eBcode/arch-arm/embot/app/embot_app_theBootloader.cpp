@@ -121,7 +121,7 @@ bool embot::app::theBootloader::jump(std::uint32_t address)
 bool embot::app::theBootloader::restart2application()
 {
     embot::app::theJumper &thejumper = embot::app::theJumper::getInstance();
-    std::uint32_t addressOfApplication = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
+    std::uint32_t addressOfApplication = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address;
     thejumper.set(embot::app::theJumper::Command::jump, addressOfApplication);
     thejumper.restart();   
     
@@ -217,7 +217,7 @@ bool embot::app::theBootloader::startcountdown(embot::core::relTime countdown)
 void embot::app::theBootloader::Impl::restart2application(void *p)
 {
     embot::app::theJumper &thejumper = embot::app::theJumper::getInstance();
-    std::uint32_t addressOfApplication = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
+    std::uint32_t addressOfApplication = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address;
     thejumper.set(embot::app::theJumper::Command::jump, addressOfApplication);
     thejumper.restart();    
 }

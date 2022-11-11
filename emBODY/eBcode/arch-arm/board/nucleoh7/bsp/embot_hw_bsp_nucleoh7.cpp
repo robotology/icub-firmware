@@ -330,20 +330,20 @@ void CAN1_RX0_IRQHandler(void)
 
 #if !defined(EMBOT_ENABLE_hw_flash)
 
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
     }
     
-}}}
+}}}}
 
 #else
 
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
      
     #if   defined(STM32HAL_BOARD_NUCLEOH7)
         #error embot::hw::flash::thebsp is not supported for STM32HAL_BOARD_NUCLEOH7 
@@ -351,25 +351,8 @@ namespace embot { namespace hw { namespace flash {
         #error embot::hw::flash::thebsp must be defined    
     #endif   
 
-
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
-        // properties
-        {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
-        }}        
-    };
-    
-    void BSP::init(embot::hw::FLASH h) const {}
-    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
               
-}}} // namespace embot { namespace hw { namespace flash {
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
 
 #endif // flash
 

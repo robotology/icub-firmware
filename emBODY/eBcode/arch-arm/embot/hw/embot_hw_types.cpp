@@ -56,15 +56,6 @@ static_assert(embot::core::tointegral(embot::hw::CAN::maxnumberof) < embot::core
 
 
 
-
-// - check of values for embot::hw::flash
-static_assert(embot::core::tointegral(embot::hw::FLASH::none) < 8*sizeof(embot::hw::bsp::SUPP::supportedmask), "FLASH::none must be less than 32 to be able to address a std::uint32_t mask");
-static_assert(embot::core::tointegral(embot::hw::FLASH::maxnumberof) < 8*sizeof(embot::hw::bsp::SUPP::supportedmask), "FLASH::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-static_assert(embot::core::tointegral(embot::hw::FLASH::maxnumberof) < embot::core::tointegral(embot::hw::FLASH::none), "FLASH::maxnumberof must be higher that FLASH::none, so that we can optimise code");
-
-
-
-
 // - check of values for embot::hw::pga308
 
 static_assert(embot::core::tointegral(embot::hw::PGA308::none) < 8*sizeof(embot::hw::bsp::SUPP::supportedmask), "PGA308::none must be less than 32 to be able to address a std::uint32_t mask");

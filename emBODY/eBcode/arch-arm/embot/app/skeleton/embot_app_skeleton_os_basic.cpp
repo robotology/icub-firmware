@@ -52,7 +52,7 @@ namespace embot::app::skeleton::os::basic {
         extCFG->sys->userdefonOSerror(errparam);
     }
 
-    static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
+    static const std::uint32_t address = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address;
     constexpr bool initBSP = true;   
     constexpr bool initSYSservices = true; 
 

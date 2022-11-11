@@ -24,7 +24,7 @@
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_button
 //    #define EMBOT_ENABLE_hw_can
-    #undef EMBOT_ENABLE_hw_flash
+    #define EMBOT_ENABLE_hw_flash
     #define EMBOT_ENABLE_hw_eth
         
 #else

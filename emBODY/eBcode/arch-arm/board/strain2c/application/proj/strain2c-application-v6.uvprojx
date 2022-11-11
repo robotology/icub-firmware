@@ -399,26 +399,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_evthreadcan.cpp</FilePath>
             </File>
-            <File>
-              <FileName>adc2ft.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\adc2ft.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>adc2ft.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\adc2ft.h</FilePath>
-            </File>
-            <File>
-              <FileName>adc2ft_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\adc2ft_data.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtwtypes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\src\rtwtypes.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -823,6 +803,21 @@
               <FileName>embot_hw_bsp_strain2c.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_bsp_strain2c.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd</GroupName>
+          <Files>
+            <File>
+              <FileName>adc2ft.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\adc2ft.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>adc2ft_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\adc2ft_data.cpp</FilePath>
             </File>
           </Files>
         </Group>

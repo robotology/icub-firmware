@@ -9,6 +9,8 @@
 #include "embot_core.h"
 #include "embot_core_binary.h"
 
+#include "embot_hw_bsp_nucleo64.h"
+
 #include "embot_hw.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_led.h"
@@ -33,10 +35,8 @@ constexpr bool testBUTTONpressed_released {true};
 
 constexpr embot::core::relTime tickperiod = 3000*embot::core::time1millisec;
 
-constexpr embot::hw::BTN buttonBLUE = embot::hw::BTN::one;
-constexpr embot::hw::BTN buttonPB9 = embot::hw::BTN::two;
 
-constexpr embot::hw::BTN buttonOntest = buttonPB9; // buttonPB9 or buttonBLUE
+constexpr embot::hw::BTN buttonOntest = embot::hw::bsp::nucleo64::buttonPB9; // buttonPB9 or buttonBLUE
 
 void btncallback(void *p)
 {

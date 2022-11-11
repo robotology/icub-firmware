@@ -61,9 +61,6 @@ extern "C" {
     #undef CAN
 #endif
 
-#if defined(FLASH)
-    #undef FLASH
-#endif
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section

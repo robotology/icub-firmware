@@ -272,7 +272,7 @@ void CAN1_RX0_IRQHandler(void)
 
 #if !defined(EMBOT_ENABLE_hw_flash)
 
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::FLASH h) const {}    
@@ -285,49 +285,49 @@ namespace embot { namespace hw { namespace flash {
 
 #else
 
-namespace embot { namespace hw { namespace flash {
+namespace embot { namespace hw { namespace flash { namespace bsp {
      
-    #if   defined(STM32HAL_BOARD_MTB4)
+#if   defined(STM32HAL_BOARD_MTB4)
 
-        // any: application @ 128k but ... applicationstorage on top
-        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: 4k on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (124)*1024,         2*1024}};   // application @ 128k
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: 4k on top of application
-
-#if 0     
-        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000+(256+2)*1014,               (128)*1024,          2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(256*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(0*1024),     (252)*1024,         2*1024}};   // application @ 080k
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
-#endif
-
-
-    #else
-        #error embot::hw::flash::thebsp must be defined    
-    #endif   
-
-
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
-        // properties
-        {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
-        }}        
-    };
+    constexpr uint8_t numbanks {1};
+    constexpr uint32_t banksize {256*1024};
+    constexpr uint32_t pagesize {2*1024};
+    constexpr BankDescriptor bank01 { Bank::ID::one, 0x08000000, banksize, pagesize };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, nullptr }
+    }; 
     
-    void BSP::init(embot::hw::FLASH h) const {}
+    // on on top of each other, with sizes:
+    constexpr std::array<uint32_t, 4> ss = {124*1024, 4*1024, 124*1024, 4*1024};
+    constexpr Partition btl {Partition::ID::bootloader,         &bank01,    bank01.address,         ss[0]}; 
+    constexpr Partition sha {Partition::ID::sharedstorage,      &bank01,    btl.address+btl.size,   ss[1]};
+    constexpr Partition app {Partition::ID::application,        &bank01,    sha.address+sha.size,   ss[2]}; 
+    constexpr Partition stg {Partition::ID::applicationstorage, &bank01,    app.address+app.size,   ss[3]}; 
+    
+    constexpr thePartitions thepartitions
+    {
+        { &btl, &sha, &app, &stg }
+    };
+        
+    constexpr BSP thebsp {        
+        thebanks,
+        thepartitions
+    };        
+    
+    void BSP::init() const {}
     
     const BSP& getBSP() 
     {
         return thebsp;
-    }
+    }       
+        
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif
               
-}}} // namespace embot { namespace hw { namespace flash {
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
 
 #endif // flash
 

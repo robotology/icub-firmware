@@ -476,7 +476,7 @@ namespace embot { namespace hw { namespace can {
 namespace embot { namespace hw { namespace flash {
     
     constexpr BSP thebsp { };
-    void BSP::init(embot::hw::FLASH h) const {}    
+    void BSP::init() const {}    
     const BSP& getBSP() 
     {
         return thebsp;
@@ -485,42 +485,55 @@ namespace embot { namespace hw { namespace flash {
 }}}
 
 #else
-
-namespace embot { namespace hw { namespace flash {
+    
+namespace embot { namespace hw { namespace flash { namespace bsp {
      
-   #if   defined(STM32HAL_BOARD_STM32H745DISCO)
-
-// acemor          
-        // application @ tbdk we have 1024 k of flash. so far we use only 512 k
-        constexpr PROP whole                {{0x08000000,               (1024)*1024,        2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
-        constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ tbdk
-        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
-
-    #else
-        #error embot::hw::flash::thebsp must be defined    
-    #endif   
-
+#if   defined(STM32HAL_BOARD_STM32H745DISCO)
+    
+    constexpr uint8_t numbanks {2};
+    constexpr uint32_t banksize {1024*1024};
+    constexpr uint32_t pagesize {128*1024};
+    constexpr BankDescriptor bank01 { Bank::ID::one, 0x08000000, banksize, pagesize };
+    constexpr BankDescriptor bank02 { Bank::ID::two, 0x08100000, banksize, pagesize };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, &bank02 }
+    }; 
+    
+    // on Bank::one
+    constexpr Partition ldr {Partition::ID::eloader,        &bank01,    bank01.address,         128*1024}; 
+    constexpr Partition upd {Partition::ID::eupdater,       &bank01,    ldr.address+ldr.size,   256*1024};
+    constexpr Partition a00 {Partition::ID::eapplication00, &bank01,    upd.address+upd.size,   256*1024};  
+    constexpr Partition b00 {Partition::ID::buffer00,       &bank01,    a00.address+a00.size,   128*1024};
+    
+    // on Bank::two
+    constexpr Partition a01 {Partition::ID::eapplication01, &bank02,    bank02.address,         512*1024};     
+    constexpr Partition b01 {Partition::ID::buffer01,       &bank02,    a01.address+a01.size,   512*1024};
+    
+    constexpr thePartitions thepartitions
+    {
+        { &ldr, &upd, &a00, &b00, &a01, &b01 }
+    };
 
     constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
-        // properties
-        {{
-            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
-        }}        
-    };
+        thebanks,
+        thepartitions
+    };  
+            
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif   
+     
     
-    void BSP::init(embot::hw::FLASH h) const {}
+    void BSP::init() const {}
     
     const BSP& getBSP() 
     {
         return thebsp;
     }
               
-}}} // namespace embot { namespace hw { namespace flash {
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
 
 #endif // flash
 
