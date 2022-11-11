@@ -18,12 +18,10 @@
 
 #if 0
 
-## Configuration of the BSP
-
-See inside file `embot_hw_flash_bsp.h`.
+## Configuration of the `embot::hw::flash::bsp`
 
 
-In here is a simple configuration to be placed somewhere, possibly inside `embot_hw_bsp_boardname.cpp`
+In here is the configuration of board `amcbldc` to be placed somewhere, possibly inside `embot_hw_bsp_amcbld.cpp`.
 
 ```c++
 namespace embot { namespace hw { namespace flash { namespace bsp {
@@ -64,8 +62,65 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
 
               
 }}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
-```
 
+```
+**Code Listing**. Configuration of the BSP of the `embot::hw::flash` driver for the `amcbldc` board.
+    
+    
+```C++
+
+namespace embot { namespace hw { namespace flash { namespace bsp {
+     
+#if   defined(STM32HAL_BOARD_AMC)
+    
+    constexpr uint8_t numbanks {2};
+    constexpr uint32_t banksize {1024*1024};
+    constexpr uint32_t pagesize {128*1024};
+    constexpr BankDescriptor bank01 { Bank::ID::one, 0x08000000, banksize, pagesize };
+    constexpr BankDescriptor bank02 { Bank::ID::two, 0x08100000, banksize, pagesize };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, &bank02 }
+    }; 
+    
+    // on Bank::one
+    constexpr Partition ldr {Partition::ID::eloader,        &bank01,    bank01.address,         128*1024}; 
+    constexpr Partition upd {Partition::ID::eupdater,       &bank01,    ldr.address+ldr.size,   256*1024};
+    constexpr Partition a00 {Partition::ID::eapplication00, &bank01,    upd.address+upd.size,   256*1024};  
+    constexpr Partition b00 {Partition::ID::buffer00,       &bank01,    a00.address+a00.size,   128*1024};
+    
+    // on Bank::two
+    constexpr Partition a01 {Partition::ID::eapplication01, &bank02,    bank02.address,         512*1024};     
+    constexpr Partition b01 {Partition::ID::buffer01,       &bank02,    a01.address+a01.size,   512*1024};
+    
+    constexpr thePartitions thepartitions
+    {
+        { &ldr, &upd, &a00, &b00, &a01, &b01 }
+    };
+
+    constexpr BSP thebsp {        
+        thebanks,
+        thepartitions
+    };   
+            
+#else
+    #error embot::hw::flash::thebsp must be defined    
+#endif   
+     
+    
+    void BSP::init() const {}
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+              
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
+
+```
+**Code Listing**. Configuration of the BSP of the `embot::hw::flash` driver for the `amc` board.
+    
 #endif
 
 

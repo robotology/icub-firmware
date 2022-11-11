@@ -938,7 +938,9 @@ uint32_t readback[blocksizeKB*1024/4] = {0};  // nk KB
 #endif
 
 #if defined(TEST_EMBOT_HW_FLASH_api)
-void testAPIflash();
+namespace test {
+void APIflashBSP();
+}
 #endif
 
 void test_embot_hw_tick()
@@ -953,7 +955,7 @@ void test_embot_hw_tick()
     if (0 == (cnt % period))
     {
 #if defined(TEST_EMBOT_HW_FLASH_api)        
-        testAPIflash();
+        test::APIflashBSP();
 #endif
         
 #if defined(TEST_EMBOT_HW_FLASH_SAME_BANK_AS_CODESPACE)
@@ -1140,39 +1142,76 @@ void test_embot_hw_tick()
 
 
 #if defined(TEST_EMBOT_HW_FLASH_api)
+
 #include "embot_hw_flash.h"
 
 using namespace embot::hw;
 
-void testAPIflash()
+namespace test {
+    
+constexpr size_t datasize {32};
+constexpr uint32_t datawrite[datasize/sizeof(uint32_t)] = {0, 1, 2, 3, 4, 5, 6, 7};
+uint32_t dataread[datasize/sizeof(uint32_t)] = {0};
+
+void APIflashBasic()
 {
+    flash::erase(0x08100000, 128*1024);             // must erase entire page
+    flash::write(0x08100000, datasize, datawrite);  // write 32 bytes
+    flash::read(0x08100000, datasize, dataread);    // read them back    
+}
+
+void APIflashBSP()
+{
+    // get the handler of the first Bank and operate on it by pages
     const embot::hw::flash::Bank &bank1 = flash::bsp::bank(flash::Bank::ID::one);
-    if(bank1.isvalid())
+    if(!bank1.isvalid())
     {
+        embot::core::print(
+            "FLASH (bank): Bank::one is not configured in the BSP");
+    }
+    else    
+    {
+        // retrieves info of all the pages inside
         std::vector<embot::hw::flash::Page> thepages {};
         bank1.pages(thepages);
-        embot::core::print(std::string("FLASH API (pages): on Bank::one their number is = ") + std::to_string(thepages.size())); 
-                    
+        embot::core::print(
+            std::string("FLASH (pages): on Bank::one their number is = ") + 
+            std::to_string(thepages.size())); 
+           
+        // retrieve info of the last page in the bank          
         flash::ADDR endofbank01 {bank1.address+bank1.size-1};
         flash::Page page = bank1.page(endofbank01);
         
+        // and operate on it: erase, write, read back
         if(flash::erase(page.address, page.size))
         {
-            constexpr uint32_t buffer[8] = {0, 1, 2, 3, 4, 5, 6, 7};
-            uint32_t readback[8] = {0};
-            size_t size = std::min(sizeof(buffer), page.size);
-            if(flash::write(page.address, size, buffer))
+            size_t s = std::min(sizeof(datawrite), page.size);
+            if(flash::write(page.address, s, dataread))
             {
-                flash::read(page.address, size, readback);    
+                flash::read(page.address, s, readback);    
             } 
-            const char *rr = (0 == std::memcmp(readback, buffer, size)) ? "OK" : "KO";
-            embot::core::print(std::string("FLASH API (erase, write, read): res on last page of Bank::one = ") + rr);
+            const char *rr = (0 == std::memcmp(dataread, datawrite, s)) ? "OK" : "KO";
+            embot::core::print(
+                std::string("FLASH (erase, write, read): on last page of Bank::one = ") +
+                rr);
         }
+    }
+    
+    
+    // get the handler of the partion containing the bootloader
+    const flash::Partition& btl { flash::bsp::partition(flash::Partition::ID::bootloader) };  
+    if(!btl.isvalid())
+    {
+        embot::core::print(
+            "FLASH (partition): Partition::ID::bootloader is not configured in the BSP");
     }
     else
     {
-        embot::core::print("FLASH API (bank): Bank::one is not configured in the BSP");
+        embot::core::print("FLASH (partition): Partition::bootloader has size = " +
+        std::to_string(btl.size));
     }
 }
+
+} // namespace test
 #endif
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
