@@ -78,6 +78,7 @@ uint32_t dataread[datasize/sizeof(uint32_t)] = {0};
 void APIflashBSP()
 {
     // get the handler of the first Bank and operate on it by pages
+    std::vector<embot::hw::flash::Page> thepages {};
     const embot::hw::flash::Bank &bank1 = flash::bsp::bank(flash::Bank::ID::one);
     if(!bank1.isvalid())
     {
@@ -87,7 +88,6 @@ void APIflashBSP()
     else    
     {
         // retrieves info of all the pages inside
-        std::vector<embot::hw::flash::Page> thepages {};
         bank1.pages(thepages);
         embot::core::print(
             std::string("FLASH (pages): on Bank::one their number is = ") + 
@@ -113,7 +113,7 @@ void APIflashBSP()
     }
     
     
-    // get the handler of the partion containing the bootloader
+    // get the handler of the partion containing the bootloader (CAN based boards)
     const flash::Partition& btl { flash::bsp::partition(flash::Partition::ID::bootloader) };  
     if(!btl.isvalid())
     {
@@ -122,9 +122,27 @@ void APIflashBSP()
     }
     else
     {
-        embot::core::print("FLASH (partition): Partition::bootloader has size = " +
-        std::to_string(btl.size));
+        btl.pages(thepages);
+        embot::core::print(
+        "FLASH (partition): Partition::ID::bootloader has size = " + std::to_string(btl.size) +
+            " and " + std::to_string(thepages.size()) + " pages");
+        
     }
+    
+    // get the handler of the partion containing the eLoader (ETH based boards)
+    const flash::Partition& ldr { flash::bsp::partition(flash::Partition::ID::eloader) };  
+    if(!ldr.isvalid())
+    {
+        embot::core::print(
+            "FLASH (partition): Partition::ID::eloader is not configured in the BSP");
+    }
+    else
+    {
+        ldr.pages(thepages);
+        embot::core::print(
+        "FLASH (partition): Partition::ID::eloader has size = " + std::to_string(ldr.size) +
+            " and " + std::to_string(thepages.size()) + " pages");
+    }  
 }
 
 } // namespace test {
@@ -323,7 +341,15 @@ namespace embot { namespace hw { namespace flash {
         void pages(std::vector<Page> &pp) const
         {
             pp.clear();
-            if(isvalid()) { owner->pages(pp); }             
+            if(isvalid())
+            {   
+                for(ADDR a=address; a<(address+size); )
+                {
+                    Page p = owner->page(a);
+                    pp.push_back(p);
+                    a += p.size; 
+                }
+            }             
         }
     }; 
             
