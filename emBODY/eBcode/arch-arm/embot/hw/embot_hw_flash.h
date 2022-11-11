@@ -87,7 +87,7 @@ void APIflashBSP()
     else    
     {
         // retrieves info of all the pages inside
-        std::vector<flash::Page> thepages {};
+        std::vector<embot::hw::flash::Page> thepages {};
         bank1.pages(thepages);
         embot::core::print(
             std::string("FLASH (pages): on Bank::one their number is = ") + 
@@ -101,9 +101,9 @@ void APIflashBSP()
         if(flash::erase(page.address, page.size))
         {
             size_t s = std::min(sizeof(datawrite), page.size);
-            if(flash::write(page.address, s, dataread))
+            if(flash::write(page.address, s, datawrite))
             {
-                flash::read(page.address, s, readback);    
+                flash::read(page.address, s, dataread);    
             } 
             const char *rr = (0 == std::memcmp(dataread, datawrite, s)) ? "OK" : "KO";
             embot::core::print(

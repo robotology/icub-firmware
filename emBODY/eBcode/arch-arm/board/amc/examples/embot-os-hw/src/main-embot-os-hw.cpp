@@ -1186,9 +1186,9 @@ void APIflashBSP()
         if(flash::erase(page.address, page.size))
         {
             size_t s = std::min(sizeof(datawrite), page.size);
-            if(flash::write(page.address, s, dataread))
+            if(flash::write(page.address, s, datawrite))
             {
-                flash::read(page.address, s, readback);    
+                flash::read(page.address, s, dataread);    
             } 
             const char *rr = (0 == std::memcmp(dataread, datawrite, s)) ? "OK" : "KO";
             embot::core::print(
