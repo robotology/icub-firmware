@@ -50,7 +50,7 @@ constexpr embot::core::relTime tickperiod = 5*1000*embot::core::time1millisec;
 
 #define TEST_EMBOT_HW_FLASH_api
 
-//#define TEST_EMBOT_HW_FLASH_SAME_BANK_AS_CODESPACE
+#define TEST_EMBOT_HW_FLASH_SAME_BANK_AS_CODESPACE
 #define TEST_EMBOT_HW_FLASH_READ
 #define TEST_EMBOT_HW_FLASH_ERASE
 #define TEST_EMBOT_HW_FLASH_WRITE
@@ -937,6 +937,46 @@ volatile uint32_t flashexec_read_ticks {0};
 uint32_t d2flash[blocksizeKB*1024/4] = {0};   // nk KB
 uint32_t readback[blocksizeKB*1024/4] = {0};  // nk KB
 
+void fill(uint8_t tmp)
+{
+#define FILLMODE_eachdifferent_incremental
+#if defined(FILLMODE_samevalue)
+    std::memset(d2flash, tmp, sizeof(d2flash)); 
+#else
+    size_t s = sizeof(d2flash) / 4;
+    for(size_t i=0; i<s; i++)
+    {
+#if defined(FILLMODE_eachdifferent_rand)        
+        d2flash[i] = rand();
+#elif defined(FILLMODE_eachdifferent_incremental)        
+        d2flash[i] = i;
+#else
+        #error choose one FILLMODE_
+#endif 
+    }
+#endif    
+}
+
+char debug_print[256] = {0};
+void printdifferences()
+{
+    size_t lines = sizeof(d2flash) / 4 / 8;
+    for(uint32_t l=0; l<lines; l++)
+    {
+        snprintf(debug_print, sizeof(debug_print), "wanted: %08x %08x %08x %08x %08x %08x %08x %08x", 
+                    d2flash[8*l  ], d2flash[8*l+1], d2flash[8*l+2], d2flash[8*l+3],
+                    d2flash[8*l+4], d2flash[8*l+5], d2flash[8*l+6], d2flash[8*l+7]
+        );
+        embot::core::print(debug_print);
+        snprintf(debug_print, sizeof(debug_print), "read:   %08x %08x %08x %08x %08x %08x %08x %08x", 
+                    readback[8*l  ], readback[8*l+1], readback[8*l+2], readback[8*l+3],
+                    readback[8*l+4], readback[8*l+5], readback[8*l+6], readback[8*l+7]
+        );
+        embot::core::print(debug_print);
+    }    
+    
+}
+
 #endif
 
 #if defined(TEST_EMBOT_HW_FLASH_api)
@@ -1018,7 +1058,7 @@ void test_embot_hw_tick()
 //        std::memset(readback, 0, sizeof(readback));
 //        embot::hw::flash::read(partition_address, sizeof(readback), readback);
         
-        std::memset(d2flash, tmp_data++, sizeof(d2flash));
+        fill(tmp_data++);
         embot::hw::led::on(embot::hw::LED::three); 
         start = embot::core::now();
         
@@ -1065,6 +1105,7 @@ void test_embot_hw_tick()
         if(false == OKcheck)
         {
             embot::hw::led::on(embot::hw::LED::one);
+            printdifferences();
         }
 #endif // TEST_EMBOT_HW_FLASH_WRITEandREADandCHECK
 

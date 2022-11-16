@@ -40,6 +40,7 @@
 
 #include "eEsharedServices.h"
 
+#include "embot_os_rtos.h"
 
 
 #include "eEmemorymap.h"
@@ -70,8 +71,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+//#define TEST_prog_mode
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -507,6 +508,15 @@ static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, ui
 #endif
 }
 
+#if defined(TEST_prog_mode)
+char debug_print[128] = {0};
+uint32_t datareadback[512/sizeof(uint32_t)] = {0};
+#endif
+
+// i prefer to have data to burn which is 32-bit aligned  
+uint32_t data2burn[512/sizeof(uint32_t)] = {0};
+size_t size2burn = 0;
+
 static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
 {  
     // i use a single funtion for start, data, end, so that i embed in here 
@@ -645,9 +655,27 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             // here is the command. i get what i need to program into flash
             eOuprot_cmd_PROG_DATA_t *cmd = (eOuprot_cmd_PROG_DATA_t*)pktin;
             uint32_t address = (cmd->address[0]) | (cmd->address[1] << 8) | (cmd->address[2] << 16) | (cmd->address[3] << 24);
-            uint16_t size = (cmd->size[0]) | (cmd->size[1] << 8);
+            size_t size = (cmd->size[0]) | (cmd->size[1] << 8);
             uint8_t *data = &cmd->data[0];
             
+            // size is the effective size of data sent by the FirmwareUpdater
+            // size2burn is what we must burn into flash. it can be size bytes or size byte + some pad bytes which must be 0xff 
+            size = std::min(size, sizeof(data2burn)); 
+            // make sure everything is 0xff, so even if we write over erased flash 
+            // because we need to pad we do not do any harm
+            memset(data2burn, 0xff, sizeof(data2burn));
+            memmove(data2burn, data, size);
+
+            // on h7 i must write chunks of 32 bytes, so if for instance the FirmwareUpdater
+            // asks to write only size = 40 bytes, we compute the rem (8) and then we add the
+            // pad (32 - 8 = 24) to the size so that we have an integer number of chunks
+            // but: as we write in flash pad (24) bytes more, we must make sure that data2burn
+            // has 0xff values in data2burn[size] and beyond 
+            uint32_t rem = (size%32);                             
+            size_t pad = (0 == rem) ? 0 : (32 - rem);
+            size2burn = std::min(sizeof(data2burn), size+pad);
+            
+                                        
             // if i am not in programming mode, i quit
             if(0 == s_proc_PROG_downloading_partition)
             {
@@ -665,7 +693,7 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
 #else
             // now we allow to program an application which goes out of upper boundary.
             if(uprot_partitionAPPLICATION == s_proc_PROG_downloading_partition)
-            {   // prevent writing only is address is lower ...
+            {   // prevent writing only if address is lower ...
                 if(address < s_proc_PROG_mem_start)
                 {   
                     // i cannot write below the space of the process
@@ -684,32 +712,34 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             }   
 #endif
             
-    // it could be in this way, but ... check vs deletion of flash beyond the limit ... 
-    //        if(address < s_proc_PROG_mem_start)
-    //        {   
-    //            // i cannot write below the space of the process
-    //            reply->res = uprot_RES_ERR_PROT;
-    //            return ret;            
-    //        } 
-    //
-    //        if((uprot_partitionAPPLICATION != s_proc_PROG_downloading_partition) && ((address+size) >= (s_proc_PROG_mem_start+s_proc_PROG_mem_size)))
-    //        {   
-    //            // i cannot write beyond the space of the process unless i want to write into an application. 
-    //            #warning TODO: i should put a check vs limit of 1024k ... but nevemind for now
-    //            reply->res = uprot_RES_ERR_PROT;
-    //            return ret;            
-    //        } 
+            // also: notice that address may be a ram address. in such a case we must not do anything
+            // but we need to send a ack.
+           
+            bool itisaflashaddress = embot::hw::flash::isvalid(address);
+            if(false == itisaflashaddress)
+            {
+#if defined(TEST_prog_mode)
+                snprintf(debug_print, sizeof(debug_print), "dropping non flash chunk adr = 0x%x, size = %d", address, size);
+                embot::core::print(debug_print);
+#endif                    
+                // i just drop the action because it must be a ram address
+                // but i increment the number of processed packets
+                ++s_proc_PROG_rxpackets;
+                // and force a return w/ no error
+                break;
+            }
 
-            // ok, i can go on
+            
+            // ok, i can go on and manage the pair {data2burn, size or size2burn}
             
 
             if(uprot_partitionLOADER == s_proc_PROG_downloading_partition)
             {   // if loader: i write into ram. no need to erase the flash at this stage
-                
+                // marco.accame: in here you must use size and not size2burn
                 uint32_t position = address - s_proc_PROG_mem_start;
                 if(position < s_proc_PROG_mem_size)
                 {
-                    memcpy(&s_ramforloader_data[position], data, size);
+                    memcpy(&s_ramforloader_data[position], data2burn, size);
                     if((position+size)> s_ramforloader_maxoffset)
                     {
                         s_ramforloader_maxoffset = position+size;
@@ -728,43 +758,100 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                 // if never done: erase the flash
                 if(0 == s_proc_PROG_flash_erased)
                 {
+// on stm32f407 it was:
 //                    hal_sys_irq_disable();  //osal_system_scheduling_suspend();                       
 //                    hal_result_t halres = hal_flash_erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
 //                    hal_sys_irq_enable();   //osal_system_scheduling_restart();
-                    embot::hw::sys::irq_disable();
+
+                    
+#if defined(TEST_prog_mode)
+                    snprintf(debug_print, sizeof(debug_print), "erase1(0x%x, %d)", s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+                    embot::core::print(debug_print);
+#endif       
+                    
+// cannot do embot::hw::sys::irq_disable() or embot::os::rtos::scheduler_lock() because on h7 the erase of flash 
+// requires to measure a delay w/ the HAL tick which is based onto the systick
+// cannot use it      embot::hw::sys::irq_disable();             
                     bool r = embot::hw::flash::erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
-                    embot::hw::sys::irq_enable();
+// cannot use it      embot::hw::sys::irq_enable();
                     hal_result_t halres = r ? hal_res_OK : hal_res_NOK_generic; 
                     
                     if(hal_res_OK != halres)
                     {
+#if defined(TEST_prog_mode)                        
+                        snprintf(debug_print, sizeof(debug_print), "erase1(0x%x, %d): ERROR", s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+                        embot::core::print(debug_print);
+#endif                        
                         s_proc_PROG_downloading_partition = 0;
-                        // updater_core_trace("CORE", "ERASE FAILED");
                         reply->res = uprot_RES_ERR_FLASH;
                         return ret;    
                     }
                     else
                     {
                         s_proc_PROG_flash_erased = s_proc_PROG_downloading_partition;
-                        // updater_core_trace("CORE", "ERASE DONE");
+#if defined(TEST_prog_mode)                        
+                        snprintf(debug_print, sizeof(debug_print), "erase1(0x%x, %d): OK", s_proc_PROG_mem_start, s_proc_PROG_mem_size);
+                        embot::core::print(debug_print);
+#endif 
                     }  
                 }
                 
                 // write the chunk of received data only if it is inside the expected memory space and it is already erased
                 if(0 != s_proc_PROG_flash_erased)
-                {                
+                {
+// on stm32f407 it was:                    
 //                    hal_sys_irq_disable();
 //                    hal_result_t halres = hal_flash_write(address, size, data);
 //                    hal_sys_irq_enable();
-                    embot::hw::sys::irq_disable();
-                    bool r = embot::hw::flash::write(address, size, data);
-                    embot::hw::sys::irq_enable();
+              
+                    bool r = true;
+#if defined(TEST_prog_mode)                    
+                    snprintf(debug_print, sizeof(debug_print), "write(0x%x, %d), size2burn = %d", address, size, size2burn);
+                    embot::core::print(debug_print);
+#endif                                        
+
+                    if((address >= s_proc_PROG_mem_start) && (address < (s_proc_PROG_mem_start+s_proc_PROG_mem_size)))
+                    {
+#if defined(TEST_prog_mode)                            
+                        uint32_t lines = size / 16;
+                        for(uint32_t l=0; l<lines; l++)
+                        {
+                            snprintf(debug_print, sizeof(debug_print), "0x%08x: %08x %08x %08x %08x", address+16*l, data2burn[4*l], data2burn[4*l+1], data2burn[4*l+2], data2burn[4*l+3]);
+                            embot::core::print(debug_print);
+                        }
+#endif
+//                      embot::os::rtos::scheduler_lock();
+                        r = embot::hw::flash::write(address, size2burn, data2burn);
+//                      embot::os::rtos::scheduler_unlock();
+ 
+#if defined(TEST_prog_mode)                              
+                        memset(datareadback, 0, sizeof(datareadback));                            
+                        embot::hw::flash::read(address, size, datareadback);
+                        
+                        if(0 != memcmp(datareadback, data2burn, size))
+                        {
+                            embot::core::print("ERROR: readback is wrong");
+                            for(uint32_t l=0; l<lines; l++)
+                            {
+                                snprintf(debug_print, sizeof(debug_print), "0x%08x: %08x %08x %08x %08x", address+16*l, data2burn[4*l], data2burn[4*l+1], data2burn[4*l+2], data2burn[4*l+3]);
+                                embot::core::print(debug_print);
+                                snprintf(debug_print, sizeof(debug_print), "read:       %08x %08x %08x %08x",               datareadback[4*l], datareadback[4*l+1], datareadback[4*l+2], datareadback[4*l+3]);
+                                embot::core::print(debug_print);
+                            }
+                        }
+#endif                            
+                    }
+                    
                     hal_result_t halres = r ? hal_res_OK : hal_res_NOK_generic;
                     
                     ++s_proc_PROG_rxpackets;
                     
                     if(hal_res_NOK_generic == halres)
                     {
+#if defined(TEST_prog_mode)                         
+                        snprintf(debug_print, sizeof(debug_print), "write(0x%x, %d), size2burn = %d: ERROR", address, size, size2burn);
+                        embot::core::print(debug_print);
+#endif                        
                         reply->res = uprot_RES_ERR_PROT;
                         return ret;
                     }
@@ -821,13 +908,21 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                         erasedproc.info.entity.builddate.day = 13;
 
                         
-                        osal_system_scheduling_suspend();
+
                         
                         if(uprot_partitionAPPLICATION == s_proc_PROG_downloading_partition)
                         {
+#if defined(TEST_prog_mode)                             
+                            snprintf(debug_print, sizeof(debug_print), "erase2(0x%x, %d): to manage errors in programming the application", EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);
+                            embot::core::print(debug_print);
+#endif
+
+// on stm32f407 it was:
+//                            osal_system_scheduling_suspend();                              
+//                            hal_flash_erase(EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);                            
+//                        osal_system_scheduling_restart();
+
                             embot::hw::flash::erase(EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);
-//                            hal_flash_erase(EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);
-                            // updater_core_trace("CORE", "erased app and removed it from partition table"); 
 
                             erasedproc.info.entity.signature = ee_procApplication;
                             erasedproc.info.rom.addr = EENV_MEMMAP_EAPPLICATION_ROMADDR;
@@ -841,10 +936,20 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                         }
                         else if(uprot_partitionUPDATER == s_proc_PROG_downloading_partition)
                         {
-                            embot::hw::flash::erase(EENV_MEMMAP_EUPDATER_ROMADDR, EENV_MEMMAP_EUPDATER_ROMSIZE);
+#if defined(TEST_prog_mode)                             
+                            snprintf(debug_print, sizeof(debug_print), "erase3(0x%x, %d): to manage errors in programming the updater", EENV_MEMMAP_EUPDATER_ROMADDR, EENV_MEMMAP_EUPDATER_ROMSIZE);
+                            embot::core::print(debug_print);
+#endif     
+                            
+// on stm32f407 it was:
+//                            osal_system_scheduling_suspend(); 
 //                            hal_flash_erase(EENV_MEMMAP_EUPDATER_ROMADDR, EENV_MEMMAP_EUPDATER_ROMSIZE);
+//                           osal_system_scheduling_restart();
+
                             // cannot remove updater so far .... ee_sharserv_part_proc_rem(ee_procUpdater);
-                            // updater_core_trace("CORE", "erased upt and removed it from partition table"); 
+                            // updater_core_trace("CORE", "erased upt and removed it from partition table");                             
+                            
+                            embot::hw::flash::erase(EENV_MEMMAP_EUPDATER_ROMADDR, EENV_MEMMAP_EUPDATER_ROMSIZE);
                             
                             erasedproc.info.entity.signature = ee_procUpdater;
                             erasedproc.info.rom.addr = EENV_MEMMAP_EUPDATER_ROMADDR;
@@ -857,7 +962,7 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                             ee_sharserv_part_proc_def2run_set(ee_procApplication);
                         }
                         
-                        osal_system_scheduling_restart();
+
                     }
                     
 
@@ -874,15 +979,17 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                 case uprot_partitionLOADER:
                 {
                     // 1. erase flash and write what in ram. do it as quickly and as safely as possible
+// on stm32f407 it was:                     
 //                    hal_sys_irq_disable();                   
 //                    hal_flash_erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
 //                    hal_flash_write(s_proc_PROG_mem_start, s_proc_PROG_mem_size, s_ramforloader_data);
 //                    hal_sys_irq_enable(); 
 
-                    embot::hw::sys::irq_disable();
+// again: on h7 we cannot disable irqs or teh rtos
+// cannot do it     embot::hw::sys::irq_disable();                   
                     embot::hw::flash::erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
                     embot::hw::flash::write(s_proc_PROG_mem_start, s_proc_PROG_mem_size, s_ramforloader_data);
-                    embot::hw::sys::irq_enable();
+// cannot do it     embot::hw::sys::irq_enable();
                     
                     s_proc_PROG_flash_erased = uprot_partitionLOADER;                                              
                     const volatile eEmoduleInfo_t* lder = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET);

@@ -544,7 +544,7 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
     // on Bank::one
     constexpr Partition ldr {Partition::ID::eloader,        &bank01,    bank01.address,         128*1024}; 
     constexpr Partition upd {Partition::ID::eupdater,       &bank01,    ldr.address+ldr.size,   256*1024};
-    constexpr Partition a00 {Partition::ID::eapplication00, &bank01,    upd.address+upd.size,   256*1024};  
+    constexpr Partition a00 {Partition::ID::eapplication00, &bank01,    upd.address+upd.size,   512*1024};  
     constexpr Partition b00 {Partition::ID::buffer00,       &bank01,    a00.address+a00.size,   128*1024};
     
     // on Bank::two

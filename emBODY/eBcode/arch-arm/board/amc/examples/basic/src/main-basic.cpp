@@ -17,6 +17,22 @@ static const stm32hal_config_t systickcfg = { stm32hal_tick1msecinit, stm32hal_t
 
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(OFFSET384K)
+
+static void relocatevectortable(std::uint32_t offset)
+{
+    SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);        
+}
+
+extern "C" {    
+    void _platform_post_lib_init(void)
+    {
+        relocatevectortable(384*1024);        
+    }      
+}
+
+#endif
+
 int main(void)
 { 
     stm32hal_init(&systickcfg);
@@ -67,6 +83,7 @@ static uint32_t stm32hal_tick1msecget()
 {
     return s_1mstickcount;
 }
+
 
  
 // this macro is seen through stm32hal.h
