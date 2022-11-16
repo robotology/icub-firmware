@@ -280,11 +280,11 @@ namespace embot { namespace hw { namespace flash {
         
 #if defined(STM32HAL_STM32H7)  
         uint32_t flashaddress = address;
-        uint32_t n256bitwords = size / 32; //part.maxsize / 32;     // TODO: check this operation
+        uint32_t n256bitwords = size / 32; // HAL_FLASH_Program() operates on 256 bits (32 bytes)
         const uint32_t *buffer = reinterpret_cast<const std::uint32_t*>(data);        
         for(uint32_t i=0; i<n256bitwords; i++)
-        {
-            uint32_t dataaddress = (uint32_t)&buffer[i];
+        {   // values of both dataaddress and flashaddress must increment by 32
+            uint32_t dataaddress = (uint32_t)&buffer[8*i];
             r = HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, flashaddress, dataaddress);
             flashaddress += 32;
             if(HAL_OK != r)
