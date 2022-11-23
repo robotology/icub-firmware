@@ -38,7 +38,15 @@ namespace embot { namespace app { namespace eth {
         .property =
         {
             Process::eApplication,
-            {3, 0},                  
+#if defined(WRIST_MK2)
+    #if defined(WRIST_MK2_RIGHT)
+            {4, 4},
+    #else
+            {3, 0},
+    #endif            
+#else            
+            {103, 0},  
+#endif            
             {2022, Month::Apr, Day::fourteen, 15, 16}
         },
         .OStick = 1000*embot::core::time1microsec,

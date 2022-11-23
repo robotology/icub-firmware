@@ -112,19 +112,27 @@ int main(void)
 
 #include "embot_os_rtos.h"
 
+//#define SHARED_CIRCULAR
+
 struct shared_t
 {
+    private:
+        
+    static constexpr size_t txCapacity {140};
+    static constexpr size_t rxCapacity {20};
     embot::os::rtos::mutex_t *rxm {nullptr};
     std::vector<embot::prot::can::Frame> rxCANvector {};
     embot::os::rtos::mutex_t *txm {nullptr};    
     std::vector<embot::prot::can::Frame> txCANvector {};  
 
+    public:
+        
     shared_t() 
     {
         rxm = embot::os::rtos::mutex_new();
         txm = embot::os::rtos::mutex_new();
-        rxCANvector.reserve(10);
-        txCANvector.reserve(10);
+        rxCANvector.reserve(rxCapacity);
+        txCANvector.reserve(txCapacity);
     } 
 
     size_t sizeofrx()
@@ -149,6 +157,12 @@ struct shared_t
     bool addrx(const embot::prot::can::Frame &f)
     {
         embot::os::rtos::mutex_take(rxm, embot::core::reltimeWaitForever);
+#if defined(SHARED_CIRCULAR)        
+        if(rxCANvector.size() >= rxCapacity)
+        {
+            rxCANvector.erase(rxCANvector.begin());
+        }
+#endif
         rxCANvector.push_back(f);
         embot::os::rtos::mutex_release(rxm);        
         return true;
@@ -175,6 +189,12 @@ struct shared_t
     bool addtx(const embot::prot::can::Frame &f)
     {
         embot::os::rtos::mutex_take(txm, embot::core::reltimeWaitForever);
+#if defined(SHARED_CIRCULAR)           
+        if(txCANvector.size() >= txCapacity)
+        {
+            txCANvector.erase(txCANvector.begin());
+        }
+#endif        
         txCANvector.push_back(f);
         embot::os::rtos::mutex_release(txm);        
         return true;
@@ -314,7 +334,7 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
         bool valid {false};
         if(0 == embot::prot::can::frame2sender(frame))
         {
-        valid = true;
+            valid = true;
         }
 
         if(valid)
