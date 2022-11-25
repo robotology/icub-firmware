@@ -5,7 +5,8 @@
  * email:   marco.accame@iit.it
 */
 
-#define TEST_EMBOT_HW
+//#define TEST_EMBOT_HW
+#define TEST_EMBOT_OS
 
 
 #include "embot_core.h"
@@ -88,6 +89,13 @@ void test_embot_hw_tick();
 
 #endif
 
+#if defined(TEST_EMBOT_OS)
+
+void test_embot_os_init();
+void test_embot_os_tick();
+
+#endif
+
 
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {   
@@ -100,10 +108,15 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
+    tmr->name("TickTmr");
     tmr->start(cfg);
 
 #if defined(TEST_EMBOT_HW)    
     test_embot_hw_init();   
+#endif    
+    
+#if defined(TEST_EMBOT_OS)
+    test_embot_os_init();
 #endif    
 }
 
@@ -123,10 +136,94 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
 #if defined(TEST_EMBOT_HW)
         test_embot_hw_tick();
 #endif
+        
+#if defined(TEST_EMBOT_OS)
+        test_embot_os_tick();
+#endif        
     }
     
 
 }
+
+
+#if defined(TEST_EMBOT_OS)
+
+embot::os::Timer *tmrperiodic {nullptr};
+embot::os::Timer *tmroneshot {nullptr};
+embot::os::Timer *tmrsomeshots {nullptr};
+
+void onForever(void *p)
+{
+    embot::os::Timer *t = reinterpret_cast<embot::os::Timer*>(p);
+
+    embot::core::TimeFormatter tf(embot::core::now());        
+    embot::core::print("@ " + tf.to_string(embot::core::TimeFormatter::Mode::full) + ": "+ t->name() + " w/ shots: " + std::to_string(t->shots()));    
+    constexpr size_t max {5};
+    if(t->shots() > max)
+    {
+        embot::core::print("stop it");    
+        t->stop();     
+
+        embot::core::print("and restart it");    
+        t->start();                
+    }
+}
+
+void onOneshot(void *p)
+{
+    embot::os::Timer *t = reinterpret_cast<embot::os::Timer*>(p);
+
+    embot::core::TimeFormatter tf(embot::core::now());        
+    embot::core::print("@ " + tf.to_string(embot::core::TimeFormatter::Mode::full) + ": "+ t->name() + " w/ shots: " + std::to_string(t->shots())); 
+
+//    embot::core::print("restarting it");    
+//    t->start();
+    
+}
+
+void onSomeshots(void *p)
+{
+    embot::os::Timer *t = reinterpret_cast<embot::os::Timer*>(p);
+
+    embot::core::TimeFormatter tf(embot::core::now());        
+    embot::core::print("@ " + tf.to_string(embot::core::TimeFormatter::Mode::full) + ": "+ t->name() + " w/ shots: " + std::to_string(t->shots()));    
+}
+
+void test_embot_os_init() 
+{
+    
+    tmrperiodic = new embot::os::Timer;
+    tmrperiodic->name("PerTmr");
+    
+    tmroneshot = new embot::os::Timer;
+    tmroneshot->name("OneTmr");
+    
+    tmrsomeshots = new embot::os::Timer;
+    tmrsomeshots->name("SomTmr");
+    
+    embot::os::Action ap = embot::os::CallbackToThread({onForever, tmrperiodic}, nullptr);
+    tmrperiodic->load({embot::core::time1second, ap, embot::os::Timer::Mode::forever});
+ 
+    embot::os::Action a1 = embot::os::CallbackToThread({onOneshot, tmroneshot}, nullptr);
+    tmroneshot->load({2*embot::core::time1second, a1, embot::os::Timer::Mode::oneshot});
+    
+    embot::os::Action as = embot::os::CallbackToThread({onSomeshots, tmrsomeshots}, nullptr);
+    tmrsomeshots->load({3*embot::core::time1second, as, embot::os::Timer::Mode::someshots, 3});    
+    
+    tmrperiodic->start();
+    tmroneshot->start();
+    tmrsomeshots->start();
+    
+}
+
+void test_embot_os_tick()
+{
+    
+}
+
+#endif
+
+
 
 #if defined(TEST_EMBOT_HW_CAN)
 

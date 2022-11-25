@@ -59,6 +59,7 @@
 
 #include "updater-core.h"
 
+#include "embot_core.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
@@ -177,7 +178,7 @@ extern void eupdater_cangtw_init(void)
     
     // init the gtw task
     #warning MARCOACCAME: non va bene 100, uso 24
-    eupdater_task_cangateway = eom_task_New(eom_mtask_EventDriven, 24, 2*1024, s_cangateway_startup, s_cangateway_run,  32, 
+    eupdater_task_cangateway = eom_task_New(eom_mtask_EventDriven, 24, 6*1024, s_cangateway_startup, s_cangateway_run,  32, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_cangateway, "cangateway");    
     
@@ -185,7 +186,10 @@ extern void eupdater_cangtw_init(void)
 }
 
 extern void eupdater_cangtw_start(eOipv4addr_t remipaddr, const cangtw_parameters_t *params)
-{     
+{
+#if defined(UPDATER_DEBUG_MODE)       
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": eupdater_cangtw_start()");
+#endif 
     if(NULL == params)
     {
        params = &default_params;      
@@ -351,6 +355,43 @@ static void s_cangateway_startup(EOMtask *p, uint32_t t)
     osal_semaphore_increment(startup_done_semaphore, osal_callerTSK);
 }
 
+#if defined(UPDATER_DEBUG_MODE) 
+const char *evtstr[] =
+{
+    "sock_rec", 
+    "can1_rec",
+    "can2_rec",
+    "start",
+    "canstable",
+    "go2run"    
+};
+
+uint8_t evt2index(uint32_t e)
+{
+    uint8_t r = 255;
+    switch(e)
+    {
+        case event_cangtw_sock_rec: r = 0; break;
+        case event_cangtw_can1_rec: r = 1; break;
+        case event_cangtw_can2_rec: r = 2; break;
+        case event_cangtw_start: r = 3; break;
+        case event_cangtw_canstable: r = 4; break;
+        case event_cangtw_go2run: r = 5; break;
+        
+        default: r = 255; break;        
+    }
+
+    return r;    
+}
+
+const char * evtname(uint32_t t)
+{
+    uint8_t i = evt2index(t);
+    
+    return (255 == i) ? "unknown" : evtstr[i];
+}
+#endif
+
 static void s_cangateway_run(EOMtask *p, uint32_t t)
 {
     eOevent_t evt = (eOevent_t) t;
@@ -361,31 +402,61 @@ static void s_cangateway_run(EOMtask *p, uint32_t t)
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_start))
     {
+#if defined(UPDATER_DEBUG_MODE)         
+        embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + 
+            ": s_cangateway_run() evt = " + 
+            std::string(evtname(event_cangtw_start)));
+#endif
         eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evstart);        
     }
 
     if(eobool_true == eo_common_event_check(evt, event_cangtw_canstable))
     {
+#if defined(UPDATER_DEBUG_MODE)         
+        embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + 
+            ": s_cangateway_run() evt = " + 
+            std::string(evtname(event_cangtw_canstable)));
+#endif            
         eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evcanstable);        
     }    
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_go2run))
     {
+#if defined(UPDATER_DEBUG_MODE)         
+        embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + 
+            ": s_cangateway_run() evt = " + 
+            std::string(evtname(event_cangtw_go2run))); 
+#endif        
         eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evgo2run);        
     }
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_sock_rec))
     {
+#if defined(UPDATER_DEBUG_MODE)          
+        embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + 
+            ": s_cangateway_run() evt = " + 
+            std::string(evtname(event_cangtw_sock_rec)));
+#endif             
         eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evrxeth);        
     }
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_can1_rec))
     {
+#if defined(UPDATER_DEBUG_MODE)          
+        embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + 
+            ": s_cangateway_run() evt = " + 
+            std::string(evtname(event_cangtw_can1_rec)));
+#endif             
         eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evrxcan1);        
     }    
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_can2_rec))
     {
+#if defined(UPDATER_DEBUG_MODE)          
+        embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + 
+            ": s_cangateway_run() evt = " + 
+            std::string(evtname(event_cangtw_can2_rec)));
+#endif             
         eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evrxcan2);        
     }  
   

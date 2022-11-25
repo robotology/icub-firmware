@@ -88,16 +88,16 @@ constexpr eEmoduleExtendedInfo_t eupdater_modinfo_extended  __attribute__((secti
                 .signature  = ee_procUpdater,
                 .version    = 
                 { 
-                    .major = 2, 
-                    .minor = 23
+                    .major = 3, 
+                    .minor = 0
                 },  
                 .builddate  = 
                 {
                     .year  = 2022,
-                    .month = 4,
-                    .day   = 8,
-                    .hour  = 18,
-                    .min   = 36
+                    .month = 11,
+                    .day   = 25,
+                    .hour  = 16,
+                    .min   = 42
                 }
             },
             .rom        = 

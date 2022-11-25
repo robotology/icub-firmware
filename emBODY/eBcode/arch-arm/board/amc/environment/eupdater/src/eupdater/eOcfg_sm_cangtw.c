@@ -543,10 +543,15 @@ static void s_smcfg_CanGtw_reset(EOsm *s)
 
 static void s_smcfg_CanGtw_on_entry_IDLE(EOsm *s) 
 {
-//    updater_core_trace(NULL, "inside s_smcfg_CanGtw_on_entry_IDLE()");
-    
+#if defined(UPDATER_DEBUG_MODE)
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_smcfg_CanGtw_on_entry_IDLE");
+#endif    
     // allocate the service timer.
     s_smcfg_CanGtw_service_timer = eo_timer_New();   
+#if defined(UPDATER_DEBUG_MODE)    
+    // and name it
+    eo_timer_SetName(s_smcfg_CanGtw_service_timer, "EOtmrCANGTW");
+#endif    
     
     // allocate the packets
     s_rxpkt_gtwcan = eo_packet_New(eupdater_cangtw_udp_packet_maxsize);  
@@ -556,8 +561,9 @@ static void s_smcfg_CanGtw_on_entry_IDLE(EOsm *s)
 
 static void s_smcfg_CanGtw_on_entry_STARTUP(EOsm *s) 
 {   
-    // updater_core_trace(NULL, "inside s_smcfg_CanGtw_on_entry_STARTUP() w/ CAN power on");
-    
+#if defined(UPDATER_DEBUG_MODE)
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_smcfg_CanGtw_on_entry_STARTUP");
+#endif
     // prepare can bus. then, emit two events which send all the can boards in bootloader mode    
     cangateway_hid_hal_init();
     cangateway_hid_hal_enable();
@@ -578,8 +584,9 @@ static void s_smcfg_CanGtw_on_entry_STARTUP(EOsm *s)
 
 static void s_smcfg_CanGtw_on_entry_RUN(EOsm *s) 
 {   
-    // updater_core_trace("GTW", "inside on_entry_RUN()");
-    
+#if defined(UPDATER_DEBUG_MODE)
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_smcfg_CanGtw_on_entry_RUN");
+#endif    
     eupdater_parser_cangtw_activate();
     
     const cangtw_parameters_t * par = eupdater_cangtw_get_parameters();    
@@ -609,7 +616,10 @@ static void s_smcfg_CanGtw_on_entry_RUN(EOsm *s)
 
 
 static void s_smcfg_CanGtw_on_trans_STARTUP_evcanstable(EOsm *s)
-{  
+{
+#if defined(UPDATER_DEBUG_MODE)    
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_smcfg_CanGtw_on_trans_STARTUP_evcanstable");
+#endif  
     const cangtw_parameters_t * par = eupdater_cangtw_get_parameters();
     
     if(eobool_true == par->send_ff)
@@ -644,8 +654,9 @@ static void s_smcfg_CanGtw_on_trans_STARTUP_evcanstable(EOsm *s)
 
 static void s_smcfg_CanGtw_on_trans_RUN_evgo2run(EOsm *s)
 {    
-    // updater_core_trace("GTW", "called on_trans_RUN_evgo2run()");
-
+#if defined(UPDATER_DEBUG_MODE)
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_smcfg_CanGtw_on_trans_RUN_evgo2run");
+#endif
     const cangtw_parameters_t * par = eupdater_cangtw_get_parameters();    
     
     if(eobool_true == par->clear_can_onentry_gtw)
@@ -663,6 +674,9 @@ static void s_smcfg_CanGtw_on_trans_RUN_evgo2run(EOsm *s)
 
 static void s_smcfg_CanGtw_on_trans_RUN_evrxeth(EOsm *s)
 {
+#if defined(UPDATER_DEBUG_MODE)     
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_smcfg_CanGtw_on_trans_RUN_evrxeth");
+#endif
     // retrieve the packet       
     if(eores_OK == eo_socketdtg_Get(eupdater_sock_cangateway, s_rxpkt_gtwcan, eok_reltimeINFINITE))    
     {   
@@ -678,6 +692,9 @@ static void s_smcfg_CanGtw_on_trans_RUN_evrxeth(EOsm *s)
 
 static void s_smcfg_CanGtw_on_trans_RUN_evrxcan1(EOsm *s)
 {  
+#if defined(UPDATER_DEBUG_MODE)  
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_smcfg_CanGtw_on_trans_RUN_evrxcan1");    
+#endif
     // get can frame from the specified port and forward a single can 
     s_can_get(hal_can_port1);
     
@@ -688,6 +705,9 @@ static void s_smcfg_CanGtw_on_trans_RUN_evrxcan1(EOsm *s)
 
 static void s_smcfg_CanGtw_on_trans_RUN_evrxcan2(EOsm *s)
 {
+#if defined(UPDATER_DEBUG_MODE)  
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_smcfg_CanGtw_on_trans_RUN_evrxcan2");  
+#endif
     // get can frame from the specified port and forward a single can 
     s_can_get(hal_can_port2);
     
@@ -811,6 +831,9 @@ static void s_parse_upd_packet(EOpacket* pkt)
 //    hal_led_toggle((hal_can_port1 == port) ? hal_led4 : hal_led5);
     embot::hw::led::toggle((hal_can_port1 == port) ? embot::hw::LED::five: embot::hw::LED::six);   
     hal_can_put(port, &frame, hal_can_send_normprio_now);
+#if defined(UPDATER_DEBUG_MODE)     
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_parse_upd_packet() tx a can frame");
+#endif
 }
 
 static void s_can_get(hal_can_port_t port)
@@ -823,15 +846,21 @@ static void s_can_get(hal_can_port_t port)
 
     eo_packet_Payload_Get(s_txpkt_gtwcan, (uint8_t**)&simpleudpframe, &size);
     
-  
+#if defined(UPDATER_DEBUG_MODE)     
+   embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_can_get()");
+#endif 
+    
     res = hal_can_get(port, &frame, &remaining);
     
     if(eobool_false == eupdater_parser_cangtw_isactivated())
     {
-    //    updater_core_trace("GTW", "called s_can_get() but the gateway is not active yet");
 #if     defined(_DEBUG_MODE_PRINTCAN_)          
         s_print_canframe(0, 0, port, &frame);   
 #endif        
+
+#if defined(UPDATER_DEBUG_MODE)  
+        embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_can_get() GTW not activated");        
+#endif
         return;
     }
 
@@ -867,7 +896,9 @@ static void s_can_get(hal_can_port_t port)
 #if     defined(_DEBUG_MODE_PRINTCAN_)                
         s_print_canframe(0, 0, port, &frame);        
 #endif
-        
+#if defined(UPDATER_DEBUG_MODE) 
+           embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_can_get() pkt in skt");
+#endif        
     }
 }
 
@@ -909,6 +940,9 @@ static void s_send_blmsg(EOsm *s)
 {
     eOsmDynamicDataCanGtw_t *ram = (eOsmDynamicDataCanGtw_t*) eo_sm_GetDynamicData(s);
     ram->number_of_sent_canblmsg ++;
+#if defined(UPDATER_DEBUG_MODE)     
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_send_blmsg()");
+#endif
     
 
     if(NULL != CANMSG2SEND)

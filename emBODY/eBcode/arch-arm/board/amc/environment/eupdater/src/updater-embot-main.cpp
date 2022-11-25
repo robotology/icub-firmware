@@ -56,15 +56,17 @@ void onIdle(embot::os::Thread *t, void* idleparam)
 void initSystem(embot::os::Thread *t, void* initparam)
 {
     embot::core::print("eUpdater: this is me");    
-        
-    embot::os::theTimerManager::getInstance().start({});     
+    
+    embot::os::theTimerManager::Config tcfg {};
+    tcfg.stacksize = 8*1024;    
+    embot::os::theTimerManager::getInstance().start(tcfg);     
     embot::os::theCallbackManager::getInstance().start({});  
     embot::os::EOM::initialise(eomcfg);
     
     // ok, now you can run whatever you want ...
     s_initialiser();        
                 
-        embot::core::print("eUpdater: quitting the INIT thread. Normal scheduling starts");    
+    embot::core::print("eUpdater: quitting the INIT thread. Normal scheduling starts");    
 }
 
 
@@ -253,11 +255,7 @@ static void s_eom_eupdater_main_init(void)
     // eeprom is used for shared services but is initted also inside there
     //hal_eeprom_init(hal_eeprom_i2c_01, NULL);
     embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
-    // flash MUST be unlocked if one wants to erase code space (program application, updater, loader)
-    //#warning FLASH MUST BE hal_flash_unlock() >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    #warning -> FLASH programming MUST BE TESTED <-
-    //hal_flash_unlock();
-    
+
 
 #if !defined(_MAINTAINER_APPL_)    
     eo_armenv_Initialise((const eEmoduleInfo_t*)&eupdater_modinfo_extended, NULL);
@@ -327,7 +325,7 @@ static void s_eom_eupdater_main_init(void)
     // the eth command task 
 //    updater_core_trace("MAIN", "starting ::taskethcommand");                       
     //#warning MARCOACCAME: non va bene 101, uso 25
-    s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 25, 2*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
+    s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 25, 6*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_ethcommand, "ethcommand");
     s_task_ethcommand = s_task_ethcommand;
