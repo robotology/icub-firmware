@@ -41,7 +41,7 @@ struct embot::os::theTimerManager::Impl
     
     Impl() 
     {              
-    }
+    }    
     
     static void processtimer(Thread *t, os::Message m, void *o)
     {
@@ -49,9 +49,9 @@ struct embot::os::theTimerManager::Impl
         {
             embot::os::Timer *tmr = reinterpret_cast<embot::os::Timer*>(m);
             tmr->execute();            
-        }
-            
+        }            
     }
+
 };
 
 
@@ -107,11 +107,11 @@ bool embot::os::theTimerManager::started() const
     return (nullptr == pImpl->thread) ? false : true;
 }
 
-bool embot::os::theTimerManager::onexpiry(const Timer &timer)
+bool embot::os::theTimerManager::execute(Timer &timer) const
 {
     if(nullptr == pImpl->thread)
     {
-        return false;
+        return timer.execute();
     }
     
     pImpl->thread->setMessage(reinterpret_cast<embot::os::Message>(const_cast<Timer*>(&timer)), embot::core::reltimeWaitNone);

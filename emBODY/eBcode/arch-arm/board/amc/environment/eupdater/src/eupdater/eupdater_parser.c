@@ -460,7 +460,7 @@ static void s_stayforever(eOipv4addr_t remaddress)
 #if !defined(_MAINTAINER_APPL_)
 #ifdef _START_CANGTW_WHEN_STAY_FOREVER_    
     // if updater we also start the can gateway
-    eupdater_cangtw_start(remaddress);
+    eupdater_cangtw_start(remaddress, NULL);
 #endif  
     // i init the 5v0 as soon as i know i stay in here forever.
     // BUT it dont init the can so that things are not changed with respect to prev version

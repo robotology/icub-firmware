@@ -18,8 +18,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_OS_THETIMERMANAGER_H_
-#define _EMBOT_OS_THETIMERMANAGER_H_
+#ifndef __EMBOT_OS_THETIMERMANAGER_H_
+#define __EMBOT_OS_THETIMERMANAGER_H_
 
 #include "embot_core.h"
 #include "embot_os_common.h"
@@ -51,16 +51,16 @@ namespace embot { namespace os {
         
         bool start(const Config &config);   
 
-        // this funtion is called by the timer. if false the expiration of the timer is processed internally and not w/ onexpiry()
         bool started() const;        
-        
-        // this funtion is called only by the timer. if called by someone else it returns false
-        // because the action of the timer is enabled only by internals of the timer itself.
-        bool onexpiry(const Timer &timer);
+ 
+    private:        
+        // this funtion must be called only by the os::Timer on its expiry
+        bool execute(Timer &timer) const;
+        friend class Timer;
 
     private:
         theTimerManager();  
-        ~theTimerManager(); // i dont want a fool can delete it
+        ~theTimerManager(); 
 
     private:    
         struct Impl;

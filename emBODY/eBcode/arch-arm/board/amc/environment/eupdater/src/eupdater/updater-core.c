@@ -495,7 +495,9 @@ static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, ui
         
         pp = &params;
     }
-    
+#if defined(UPDATER_DEBUG_MODE)  
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_uprot_proc_CANGATEWAY() -> eupdater_cangtw_start()");
+#endif    
     eupdater_cangtw_start(remaddr, pp);    
     
     // no reply for now ...

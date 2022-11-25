@@ -34,11 +34,11 @@ namespace embot { namespace os {
     
     bool EventToThread::isvalid() const
     {
-        if((nullptr == task) || (0 == event)) 
+        if((nullptr == thread) || (0 == event)) 
         { 
             return false; 
         }
-        else if(Thread::Type::eventTrigger != task->getType()) 
+        else if(Thread::Type::eventTrigger != thread->getType()) 
         { 
             return false; 
         }
@@ -54,14 +54,14 @@ namespace embot { namespace os {
         {
             return false;
         }
-        task->setEvent(event);
+        thread->setEvent(event);
         return true;
     }
     
     bool MessageToThread::isvalid() const
     {
-        if((nullptr == task) || (nullptr == message)) { return false; }
-        else if(Thread::Type::messageTrigger != task->getType()) { return false; }
+        if((nullptr == thread) || (nullptr == message)) { return false; }
+        else if(Thread::Type::messageTrigger != thread->getType()) { return false; }
         else { return true; }
     } 
     
@@ -71,14 +71,14 @@ namespace embot { namespace os {
         {
             return false;
         }
-        task->setMessage(message, timeout);
+        thread->setMessage(message, timeout);
         return true;
     } 
         
     bool ValueToThread::isvalid() const
     {
-        if((nullptr == task) || (0 == value)) { return false; }
-        else if(Thread::Type::valueTrigger != task->getType()) { return false; }
+        if((nullptr == thread) || (0 == value)) { return false; }
+        else if(Thread::Type::valueTrigger != thread->getType()) { return false; }
         else { return true; }
     } 
     
@@ -88,14 +88,14 @@ namespace embot { namespace os {
         {
             return false;
         }
-        task->setValue(value, timeout);
+        thread->setValue(value, timeout);
         return true;
     } 
     
     bool CallbackToThread::isvalid() const 
     {
         if((false == callback.isvalid())) { return false; }
-        //else if(Thread::Type::callbackTrigger != task->getType()) { return false; }
+        //else if(Thread::Type::callbackTrigger != thread->getType()) { return false; }
         else { return true; }
     } 
     
@@ -106,9 +106,9 @@ namespace embot { namespace os {
         {
             return false;
         }
-        if((nullptr != task) && (embot::os::Thread::Type::callbackTrigger == task->getType()))
+        if((nullptr != thread) && (embot::os::Thread::Type::callbackTrigger == thread->getType()))
         {
-            task->setCallback(callback, timeout);
+            thread->setCallback(callback, timeout);
         }
         else
         {

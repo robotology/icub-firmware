@@ -30,10 +30,10 @@ namespace embot { namespace os {
     struct EventToThread
     {
         os::Event event {0};
-        Thread* task {nullptr};  
+        Thread* thread {nullptr};  
         
         EventToThread() = default;
-        EventToThread(os::Event e, Thread* t) : event(e), task(t) {}
+        EventToThread(os::Event e, Thread* t) : event(e), thread(t) {}
         bool isvalid() const;
         bool execute();
     };
@@ -41,10 +41,10 @@ namespace embot { namespace os {
     struct MessageToThread
     {
         os::Message message {nullptr};
-        Thread* task {nullptr};
+        Thread* thread {nullptr};
         
         MessageToThread() = default;  
-        MessageToThread(os::Message m, Thread* t) : message(m), task(t) {}    
+        MessageToThread(os::Message m, Thread* t) : message(m), thread(t) {}    
         bool isvalid() const;
         bool execute(core::relTime timeout = core::reltimeWaitForever);
     };
@@ -53,10 +53,10 @@ namespace embot { namespace os {
     struct ValueToThread
     {
         os::Value value {0};
-        Thread* task {nullptr};
+        Thread* thread {nullptr};
         
         ValueToThread() = default;  
-        ValueToThread(os::Value v, Thread* t) : value(v), task(t) {}    
+        ValueToThread(os::Value v, Thread* t) : value(v), thread(t) {}    
         bool isvalid() const;
         bool execute(core::relTime timeout = core::reltimeWaitForever);
     };    
@@ -64,11 +64,11 @@ namespace embot { namespace os {
     struct CallbackToThread
     {
         core::Callback callback {nullptr, nullptr};
-        Thread* task {nullptr};  
+        Thread* thread {nullptr};  
 
         CallbackToThread() = default;        
-        CallbackToThread(core::fpCaller c, void *a, Thread *t) : callback(c, a), task(t) {}  
-        CallbackToThread(core::Callback cbk, Thread *t) : callback(cbk), task(t) {}                   
+        CallbackToThread(core::fpCaller c, void *a, Thread *t) : callback(c, a), thread(t) {}  
+        CallbackToThread(core::Callback cbk, Thread *t) : callback(cbk), thread(t) {}                   
         bool isvalid() const;
         bool execute(core::relTime timeout = core::reltimeWaitForever);
     };  
@@ -89,6 +89,7 @@ namespace embot { namespace os {
                
         Action() { clear(); } 
         Action(const CallbackToThread &c) { load(c); }
+        Action(const core::Callback cbk, Thread *t) { load({cbk, t}); }
         Action(const MessageToThread &m) { load(m); }
         Action(const ValueToThread &v) { load(v); }
         Action(const EventToThread &e) { load(e); }        
