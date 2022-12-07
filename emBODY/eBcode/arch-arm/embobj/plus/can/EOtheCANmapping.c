@@ -172,6 +172,7 @@ static EOarray* s_eo_canmap_array_inertials3[eocanmap_inertials3_maxnumberof] = 
 static EOarray* s_eo_canmap_array_pscs[eocanmap_pscs_maxnumberof] = { NULL };
 static EOarray* s_eo_canmap_array_poses[eocanmap_poses_maxnumberof] = { NULL };
 static EOarray* s_eo_canmap_array_fts[eocanmap_fts_maxnumberof] = { NULL };
+static EOarray* s_eo_canmap_array_batteries[eocanmap_batteries_maxnumberof] = { NULL };
 
 static EOarray* s_eo_canmap_array_skins[eocanmap_skins_maxnumberof] = { NULL };
 
@@ -189,7 +190,7 @@ static EOtheCANmapping s_eo_canmap_singleton =
         
         s_eo_canmap_array_strains, s_eo_canmap_array_maises, s_eo_canmap_array_temperatures, 
         s_eo_canmap_array_inertials, s_eo_canmap_array_inertials3, s_eo_canmap_array_pscs, s_eo_canmap_array_poses,
-        s_eo_canmap_array_fts,
+        s_eo_canmap_array_fts, s_eo_canmap_array_batteries,
         
         s_eo_canmap_array_skins
     }
