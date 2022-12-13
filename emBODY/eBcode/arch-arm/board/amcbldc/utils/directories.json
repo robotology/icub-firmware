@@ -1,16 +1,4 @@
 {
-    "source_directory": [
-        "C:",
-        "<\\path-to-icub-firmware-models-parent-folder>",
-        "icub-firmware-models\\boards\\amcbldc",
-        "codegen"
-    ],
-    "target_directory": [
-        "C:",
-        "<\\path-to-icub-firmware-parent-folder>",
-        "icub-firmware\\emBODY\\eBcode\\arch-arm\\board\\amcbldc\\application\\src",
-        "model-based-design"
-    ],
     "subdirectories_to_copy": [
         {
             "source_directory": "_sharedutils",

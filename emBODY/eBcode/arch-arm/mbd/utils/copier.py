@@ -43,27 +43,11 @@ def check_dictionary_type(dictionary, key, type):
     if not isinstance(dictionary[key], type):
         raise Exception(f"Invalid {key}")
 
-def parse_instructions(dictionary):
-    check_dictionary_type(dictionary, "source_directory", list)
-    check_dictionary_type(dictionary, "target_directory", list)
+def parse_instructions(dictionary, source_directory, target_directory):
     check_dictionary_type(dictionary, "subdirectories_to_copy", list)
-
-    # check if placeholders have been replace in json
-    if dictionary["source_directory"][1].startswith("<") or dictionary["target_directory"][1].startswith("<"):
-        print("The file dictionaries.json contains placeholders surrounded with \"<...>\". Replace them before continue.")
-        print("Aborting...")
-        return -1
-
-    source_directory = os.path.join(*dictionary["source_directory"])
-    target_directory = os.path.join(*dictionary["target_directory"])
     subdirectories_to_copy = dictionary["subdirectories_to_copy"]
 
-    if is_empty(source_directory):
-        return -1
-
-    if is_empty(target_directory):
-        return -1
-
+    # loop over the subdirectories
     for subdirectory in subdirectories_to_copy:
         parent = subdirectory["source_directory_parent"] if "source_directory_parent" in subdirectory else None
         source_subdir = find_subdirectory(source_directory, subdirectory["source_directory"], parent)
@@ -100,15 +84,26 @@ def main():
     parser = argparse.ArgumentParser(prog='The Copier',
                                     description="The copier has the purpose to copy the code generated from Simulink to the proper board folder in icub-firmware ",
                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('filepath', help="Absolute path to the directories.json file")
+    parser.add_argument('source', help="Absolute path to the codegen directory within icub-firmware-models")
+    parser.add_argument('destination', help="Absolute path to the model-based-design directory within icub-firmware (for a specific board)")
+    parser.add_argument('path_to_directories_json', help="Absolute path to the directory containing the directories.json file")
 
     args = parser.parse_args()
     config = vars(args)
 
-    with open(config['filepath']) as file:
-        json_instructions = json.load(file)
+    path_to_json = os.path.join(config['path_to_directories_json'], "directories.json")
+    path_to_src = config['source']
+    path_to_dst = config['destination']
 
-    parse_instructions(json_instructions)
+    # check if source and destination directories exist and are not empty
+    if not (is_empty(path_to_src) or is_empty(path_to_dst)):
+
+        # try to open the json configuration file
+        with open(path_to_json) as file:
+            json_instructions = json.load(file)
+
+        # start to parse and (eventually) to copy
+        parse_instructions(json_instructions, path_to_src, path_to_dst)
     
 if __name__ == "__main__":
     main()
