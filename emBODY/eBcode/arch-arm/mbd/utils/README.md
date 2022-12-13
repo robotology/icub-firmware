@@ -86,4 +86,43 @@ For example, if you only want `.cpp` and `.h` files that begin with `helloworld`
 Any file that doesn't follow this naming will be excluded from being copied.
 
 
+### Example of directories.json
+
+```json
+{
+    "source_directory": [
+        "C:",
+        "\\dev",
+        "icub-firmware-models\\boards\\amcbldc",
+        "codegen"
+    ],
+    "target_directory": [
+        "C:",
+        "\\dev",
+        "icub-firmware\\emBODY\\eBcode\\arch-arm\\board\\amcbldc\\application\\src",
+        "model-based-design"
+    ],
+    "subdirectories_to_copy": [
+        {
+            "source_directory": "can_decoder",
+            "source_directory_parent": "ert",
+            "target_directory": "can-decoder",            
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "can_encoder",
+            "source_directory_parent": "ert",
+            "target_directory": "can-encoder",            
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        }
+    ]
+}
+```
+
 [1]: ..\board\amcbldc\utils\directories.json
