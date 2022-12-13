@@ -86,7 +86,7 @@ For example, if you only want `.cpp` and `.h` files that begin with `helloworld`
 Any file that doesn't follow this naming will be excluded from being copied.
 
 
-### Example of directories.json
+### Example of `directories.json`
 
 ```json
 {
