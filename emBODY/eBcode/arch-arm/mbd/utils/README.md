@@ -3,12 +3,16 @@
 To use the Copier script, run the following command:
 
 ```bash
- Python3 copier.py <path-to-the-directories.json-file>.
+ Python3 copier.py <source> <destination> <path_to_directories_json>.
 ```
 
 **Notes:**
+- _source_: It's the directory where the generated code by Simulink resides. This should point to the `codegen` directory of the Model repository.
 
-- The program expects a file called [`directories.json`][1] that should be placed, and properly configured, for each board that includes parts of `mbd` code.
+- _destinantion_: It's the directory where to copy the code. This should point to the `src/model-based-design` directory of `icub-firmware` repo of the respective board.
+
+- _path_to_directories_json_: It's the path to the `directories.json` file. This file should be placed, and properly configured, for each board that includes parts of `mbd` code.
+
 - ⚠️ The program is intended to work on **Windows** machines only. 
 
 ## `directories.json`
@@ -17,25 +21,6 @@ The json file is verified before running the script. If something is wrong, you 
 
 The structure of the json goes as follows:
 
-#### Source 
-
-```json
-"source_directory": [
-    "...",
-]
-```
-
-It's the directory where the generated code resides. This should point to the `codegen` directory of the Model repository.
-
-You can input the location by pieces in an array. The code will join the strings together.
-
-#### Target
-
-```json
-"target_directory": [
-    "...",
-]
-```
 
 It's the directory where to paste the code. This should point to the `src/model-based-design` directory of the respective `icub-firmware` repo.
 
@@ -90,18 +75,6 @@ Any file that doesn't follow this naming will be excluded from being copied.
 
 ```json
 {
-    "source_directory": [
-        "C:",
-        "\\dev",
-        "icub-firmware-models\\boards\\amcbldc",
-        "codegen"
-    ],
-    "target_directory": [
-        "C:",
-        "\\dev",
-        "icub-firmware\\emBODY\\eBcode\\arch-arm\\board\\amcbldc\\application\\src",
-        "model-based-design"
-    ],
     "subdirectories_to_copy": [
         {
             "source_directory": "can_decoder",
