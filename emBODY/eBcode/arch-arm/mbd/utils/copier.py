@@ -9,6 +9,7 @@ import os
 import glob
 import shutil
 import json
+import argparse
 
 SECTION="-------------------"
 BIG_SECTION="*******************"
@@ -96,8 +97,17 @@ def copy_files(source_dir, target_dir, file_selectors, overwrite):
         print("\n")
 
 def main():
-    with open("directories.json") as file:
+    parser = argparse.ArgumentParser(prog='The Copier',
+                                    description="The copier has the purpose to copy the code generated from Simulink to the proper board folder in icub-firmware ",
+                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('filepath', help="Absolute path to the directories.json file")
+
+    args = parser.parse_args()
+    config = vars(args)
+
+    with open(config['filepath']) as file:
         json_instructions = json.load(file)
+
     parse_instructions(json_instructions)
     
 if __name__ == "__main__":

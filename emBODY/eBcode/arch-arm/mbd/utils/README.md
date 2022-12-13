@@ -1,6 +1,15 @@
-## How to use the copy script
+## How to use the Copier script
 
-To use the copy script, run `python copier.py`. The program expects a file called `directories.json` to be in the same directory.
+To use the Copier script, run the following command:
+
+```bash
+ Python3 copier.py <path-to-the-directories.json-file>.
+```
+
+**Notes:**
+
+- The program expects a file called [`directories.json`][1] that should be placed, and properly configured, for each board that includes parts of `mbd` code.
+- ⚠️ The program is intended to work on **Windows** machines only. 
 
 ## `directories.json`
 
@@ -75,3 +84,6 @@ For example, if you only want `.cpp` and `.h` files that begin with `helloworld`
 ```
 
 Any file that doesn't follow this naming will be excluded from being copied.
+
+
+[1]: ..\board\amcbldc\utils\directories.json
