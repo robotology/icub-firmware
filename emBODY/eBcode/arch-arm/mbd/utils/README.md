@@ -125,4 +125,4 @@ Any file that doesn't follow this naming will be excluded from being copied.
 }
 ```
 
-[1]: ..\board\amcbldc\utils\directories.json
+[1]: ../../board/amcbldc/utils/directories.json
