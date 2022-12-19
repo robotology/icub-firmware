@@ -25,6 +25,7 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
     using SPI_Device = SPI_TypeDef;
 #else
     using SPI_Handle = void;
+    using SPI_Device = void;
 #endif
         
     struct PROP
@@ -67,7 +68,7 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
     
     const BSP& getBSP();
     
-    // sadly I cannot put a SPI_TypeDef* inside a constexpr data staructure, so i need this funtion to get SPI1 / SPI2 etc
+    // sadly I cannot put a SPI_TypeDef* inside a constexpr data structure, so i need this funtion to get SPI1 / SPI2 etc
     SPI_Device* getDEVICE(embot::hw::SPI h);
         
 namespace utils {

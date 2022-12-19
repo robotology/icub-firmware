@@ -1,0 +1,15 @@
+
+
+LR_IROM1 0x08100000 0x00100000  {    ; load region size_region
+  ER_IROM1 0x08100000 0x00100000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  RW_IRAM1 0x10000000 0x00047000{  ; RW data
+   .ANY (+RW +ZI)
+  }
+  RAM_FUNC 0x10047000 0x00001000 {
+  	embot_hw_bsp_amc2c.o(.ram_func)
+  }  
+}

@@ -60,7 +60,7 @@ namespace embot { namespace app { namespace eth {
         .allLEDs =
         {
             embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three, 
-            embot::hw::LED::four, embot::hw::LED::five, embot::hw::LED::six
+            embot::hw::LED::four
         },
         .pulseLED = embot::hw::LED::three,
         .pulseFREQ = embot::core::time1second,

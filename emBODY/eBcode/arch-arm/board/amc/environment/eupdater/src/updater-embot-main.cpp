@@ -21,11 +21,13 @@ constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlec
 static_assert(0x08020000 == EENV_MEMMAP_EUPDATER_ROMADDR, "see EENV_MEMMAP_EUPDATER_ROMADDR");
 constexpr uint32_t offset {EENV_MEMMAP_EUPDATER_ROMADDR};  
 
+#include "embot_hw_bsp_amc.h"
 int main(void)
 {
     // relocate the vector table  
     embot::hw::sys::relocatevectortable(offset);
-
+    
+    embot::hw::bsp::amc::set(embot::hw::bsp::amc::OnSpecUpdater);
     // config and start system
     embot::os::init(osconfig); 
     embot::os::start();

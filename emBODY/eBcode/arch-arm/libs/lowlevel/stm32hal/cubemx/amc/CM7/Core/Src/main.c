@@ -117,19 +117,19 @@ int main(void)
   /* Enable D-Cache---------------------------------------------------------*/
   SCB_EnableDCache();
 
-#if defined(THEREMUSTBE_NOCODEIN_CM4CORE)
-#else    
 /* USER CODE BEGIN Boot_Mode_Sequence_1 */
   /* Wait until CPU2 boots and enters in stop mode or timeout*/
-  timeout = 0xFFFF;
-  while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
-  if ( timeout < 0 )
-  {
-  Error_Handler();
-  }
-/* USER CODE END Boot_Mode_Sequence_1 */
-#endif
+//  timeout = 0xFFFF;
+//  while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
+//  if ( timeout < 0 )
+//  {
+//  Error_Handler();
+//  }
 
+  timeout = 0xFFFF;
+  while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout > 0)) {}
+
+/* USER CODE END Boot_Mode_Sequence_1 */
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -154,12 +154,15 @@ HAL_HSEM_FastTake(HSEM_ID_0);
 /*Release HSEM in order to notify the CPU2(CM4)*/
 HAL_HSEM_Release(HSEM_ID_0,0);
 /* wait until CPU2 wakes up from stop mode */
+//timeout = 0xFFFF;
+//while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
+//if ( timeout < 0 )
+//{
+//Error_Handler();
+//}
 timeout = 0xFFFF;
-while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
-if ( timeout < 0 )
-{
-Error_Handler();
-}
+while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout > 0)) {}
+
 /* USER CODE END Boot_Mode_Sequence_2 */
   /* Resource Manager Utility initialisation ---------------------------------*/
   MX_RESMGR_UTILITY_Init();
@@ -170,29 +173,6 @@ Error_Handler();
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-
-#if defined(THEREMUSTBE_NOCODEIN_CM4CORE)
-
-  // marco.accame: let cm7 init the leds ...
-  #define nLED1_Pin GPIO_PIN_13
-  #define nLED2_Pin GPIO_PIN_15
-  #define nLED3_Pin GPIO_PIN_2
-  #define nLED4_Pin GPIO_PIN_3
-  #define nLED5_Pin GPIO_PIN_4
-  #define nLED6_Pin GPIO_PIN_5
-  HAL_GPIO_WritePin(GPIOH, nLED1_Pin|nLED2_Pin|nLED3_Pin|nLED5_Pin
-                          |nLED4_Pin|nLED6_Pin, GPIO_PIN_SET);
-       
-  GPIO_InitTypeDef GPIO_InitStruct = {0};       
-  GPIO_InitStruct.Pin = nLED1_Pin|nLED2_Pin|nLED3_Pin|nLED5_Pin
-                          |nLED4_Pin|nLED6_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
-  HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);  
-
-#endif
-
 //  MX_DMA_Init();
 //  MX_RTC_Init();
 //  MX_CRC_Init();
@@ -208,7 +188,14 @@ Error_Handler();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   
-  itm_puts("cm7 starts toggling leds");
+  itm_puts("cm7 starts toggling orange led @ 2 Hz");
+  
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_PIN_15;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+    HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
   
   HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_15);
   HAL_Delay(500);
@@ -216,11 +203,9 @@ Error_Handler();
   while (1)
   {
     /* USER CODE END WHILE */
-
-    HAL_Delay(500);
-      HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_13);
-      HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_15);
-      itm_puts("cm7 toggles");
+    HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_15);
+    HAL_Delay(250);
+      itm_puts("cm7 toggles orange led @ 2 hz");
       
     /* USER CODE BEGIN 3 */
   }

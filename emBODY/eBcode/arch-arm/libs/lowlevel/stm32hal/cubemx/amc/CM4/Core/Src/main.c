@@ -149,7 +149,15 @@ int main(void)
 //  MX_TIM1_Init();
 //  MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
-  
+
+    itm_puts("cm4 starts toggling leds");
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+    HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
+    
     HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_2);
     HAL_Delay(500);
 
@@ -160,10 +168,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_2);
     HAL_Delay(500);
-      HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_2);
-      HAL_GPIO_TogglePin(GPIOH, GPIO_PIN_3);
-//      itm_puts("cm4 toggles");
+      itm_puts("cm4 toggles led");
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

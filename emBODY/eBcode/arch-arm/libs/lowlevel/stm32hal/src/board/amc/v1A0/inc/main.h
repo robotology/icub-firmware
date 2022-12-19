@@ -62,8 +62,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CAN2_TXD_Pin GPIO_PIN_6
-#define CAN2_TXD_GPIO_Port GPIOB
+//#define CAN2_TXD_Pin GPIO_PIN_6
+//#define CAN2_TXD_GPIO_Port GPIOB
 #define JTDO_SWO_Pin GPIO_PIN_3
 #define JTDO_SWO_GPIO_Port GPIOB
 #define CAN1_TXD_Pin GPIO_PIN_1
@@ -82,14 +82,14 @@ void Error_Handler(void);
 #define EE_MISO_GPIO_Port GPIOB
 #define EE_SCLK_Pin GPIO_PIN_13
 #define EE_SCLK_GPIO_Port GPIOG
-#define CAN2_STBY_Pin GPIO_PIN_5
-#define CAN2_STBY_GPIO_Port GPIOD
+//#define CAN2_STBY_Pin GPIO_PIN_5
+//#define CAN2_STBY_GPIO_Port GPIOD
 #define TRACED2_Pin GPIO_PIN_2
 #define TRACED2_GPIO_Port GPIOD
 #define TRACED3_Pin GPIO_PIN_12
 #define TRACED3_GPIO_Port GPIOC
-#define CAN1_RXD_Pin GPIO_PIN_14
-#define CAN1_RXD_GPIO_Port GPIOH
+//#define CAN1_RXD_Pin GPIO_PIN_14
+//#define CAN1_RXD_GPIO_Port GPIOH
 #define JTMS_SWDIO_Pin GPIO_PIN_13
 #define JTMS_SWDIO_GPIO_Port GPIOA
 #define TP2_Pin GPIO_PIN_8
@@ -100,14 +100,14 @@ void Error_Handler(void);
 #define TRACECLK_GPIO_Port GPIOE
 #define ETH_nIRQ_Pin GPIO_PIN_1
 #define ETH_nIRQ_GPIO_Port GPIOE
-#define CAN2_RXD_Pin GPIO_PIN_5
-#define CAN2_RXD_GPIO_Port GPIOB
+//#define CAN2_RXD_Pin GPIO_PIN_5
+//#define CAN2_RXD_GPIO_Port GPIOB
 #define EE_MOSI_Pin GPIO_PIN_14
 #define EE_MOSI_GPIO_Port GPIOG
-#define CAN1_STBY_Pin GPIO_PIN_4
-#define CAN1_STBY_GPIO_Port GPIOD
-#define CAN_SHDN_Pin GPIO_PIN_0
-#define CAN_SHDN_GPIO_Port GPIOD
+//#define CAN1_STBY_Pin GPIO_PIN_4
+//#define CAN1_STBY_GPIO_Port GPIOD
+//#define CAN_SHDN_Pin GPIO_PIN_0
+//#define CAN_SHDN_GPIO_Port GPIOD
 #define USB_DM_Pin GPIO_PIN_11
 #define USB_DM_GPIO_Port GPIOA
 #define OSS32_OUT_Pin GPIO_PIN_15

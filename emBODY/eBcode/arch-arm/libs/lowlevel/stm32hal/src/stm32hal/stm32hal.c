@@ -74,8 +74,6 @@ static stm32hal_config_t s_stm32hal_bsp_config =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-// - defined in the bsp_xxxxx.c file. i am lazy and i dont want to create a .h file
-extern void stm32hal_bsp_init(void);
 
 extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
 {    
