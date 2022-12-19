@@ -426,6 +426,8 @@ void MPU_Config(void)
 
 // -- others
 
+#if 0
+
 #define DISABLE_CACHE
 
 #ifndef HSEM_ID_0
@@ -605,6 +607,8 @@ static void someothermode(void)
 ////  }
 ////  /* USER CODE END 3 */
 //}
+#endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

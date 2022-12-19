@@ -452,7 +452,7 @@ static void modeminimal(void)
    
 }
 
-
+#if 0
 static void mode1(void)
 {
     
@@ -626,7 +626,7 @@ static void mode1(void)
 #endif      
 }
 
-
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
