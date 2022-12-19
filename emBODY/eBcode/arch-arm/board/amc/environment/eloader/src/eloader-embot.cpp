@@ -76,12 +76,13 @@ constexpr embot::hw::Config hwCFG {nullptr, get1microtime2};
 void thejumper(); 
 
 [[noreturn]] void defaultapplication(embot::core::relTime blinkrate = 1000*embot::core::time1millisec);
+
+#include "embot_hw_bsp_amc.h"
     
 int main(void)
 { 
-    // no need to relocate vectors as we execute at start of ROM
-    //embot::hw::sys::relocatevectortable(EENV_MEMMAP_ELOADER_ROMADDR);
     // hw init
+    embot::hw::bsp::amc::set(embot::hw::bsp::amc::OnSpecLoader);
     embot::hw::init(hwCFG);
     // eval jump
     thejumper();

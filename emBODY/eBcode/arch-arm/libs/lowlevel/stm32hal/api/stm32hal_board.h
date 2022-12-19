@@ -443,7 +443,7 @@ extern void stm32hal_board_init(void);
         #include "../src/board/amc/v1A0/inc/main.h"
         #include "../src/board/amc/v1A0/inc/eth.h"
         #include "../src/board/amc/v1A0/inc/spi.h"
-        #include "../src/board/amc/v1A0/inc/fdcan.h"
+        //#include "../src/board/amc/v1A0/inc/fdcan.h"
 
         #include "../src/board/amc/v1A0/inc/stm32h7xx_it.h"
 		
@@ -451,6 +451,23 @@ extern void stm32hal_board_init(void);
         #error unsupported driver version for amc
     #endif
 
+#elif   defined(STM32HAL_BOARD_AMC2C) 
+
+
+    // one case: v1A0
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+       
+        #include "../src/config/stm32hal_driver_cfg_of_amc2c_v1A0.h"
+
+        #include "../src/board/amc2c/v1A0/inc/gpio.h"
+        #include "../src/board/amc2c/v1A0/inc/main.h"
+
+        #include "../src/board/amc2c/v1A0/inc/stm32h7xx_it.h"
+		
+    #else
+        #error unsupported driver version for amc2c
+    #endif
+    
 #elif   defined(STM32HAL_BOARD_MTB4C)
 
     

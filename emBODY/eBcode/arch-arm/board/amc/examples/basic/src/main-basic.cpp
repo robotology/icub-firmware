@@ -39,16 +39,16 @@ int main(void)
     
     HAL_Delay(500);
     
-    bsp_basic_itm_puts("hello world");
+    bsp_basic_itm_puts("CM7: hello world");
     
     bsp_basic_led_init();
-    bsp_basic_itm_puts("led initted");
+    bsp_basic_itm_puts("CM7: led initted");
         
     for(;;)
     {
-        HAL_Delay(500);
+        HAL_Delay(1000);
         bsp_basic_led_toggle();
-        bsp_basic_itm_puts("led toggled");
+        bsp_basic_itm_puts("CM7: led toggled @ 2 Hz");
     }    
 }
 

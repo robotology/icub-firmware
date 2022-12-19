@@ -278,7 +278,31 @@ extern "C" {
 	// so far we use only the core CM7 for it
     #if !defined(CORE_CM7)
     #define CORE_CM7
-    #endif  	
+    #endif  
+
+#elif   defined(STM32HAL_BOARD_AMC2C)
+
+    // it has a STM32H745xx mpu
+    #if !defined(STM32H745xx)
+    #define STM32H745xx
+    #endif  
+
+    // of family STM32H7
+    #if !defined(STM32H7)
+    #define STM32H7
+    #endif  
+
+    // of family STM32H7 but in STM32HAL_ format  
+    #if !defined(STM32HAL_STM32H7)
+    #define STM32HAL_STM32H7
+    #endif  
+	
+	// so far we use only the core CM4 for it
+    #if !defined(CORE_CM4)
+    #define CORE_CM4
+    #endif  
+    
+    
 #elif   defined(STM32HAL_BOARD_MTB4C)
     
     // it has a STM32L452xx mpu
