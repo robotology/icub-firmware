@@ -14,7 +14,7 @@
 //void PWMEnable(void);
 
 void pwmInit(short pwm_50_duty_cycle, short pwm_deadtime, short pwm_max);
-void pwmSetMax(short Vmax);
+
 char pwmON(void);
 void pwmOFF(void);
 void pwmZero(void);

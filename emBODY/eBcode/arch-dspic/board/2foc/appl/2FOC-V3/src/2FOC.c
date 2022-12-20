@@ -137,7 +137,6 @@ _FICD(ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 
 #define BOARD_CAN_ADDR_DEFAULT 0xE
 #define VOLT_REF_SHIFT 5 // for a PWM resolution of 1000
-#define PWM_50_DUTY_CYC (LOOPINTCY/2)
 
 #define isDriveEnabled() bDriveEnabled
 
@@ -190,7 +189,7 @@ volatile int iQerror_old = 0;
 volatile int iDerror_old = 0;
 volatile char limit = 0;
 
-static const int PWM_MAX = 8*PWM_50_DUTY_CYC/10; // = 80%
+static const int PWM_MAX = (15*LOOPINTCY)/16; // 937
 
 volatile int gMaxCurrent = 0;
 volatile long sI2Tlimit = 0;
@@ -852,6 +851,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     if (gControlMode == icubCanProto_controlmode_current || gControlMode == icubCanProto_controlmode_speed_current || sAlignInProgress)
     {
         int iQerror = IqRef-I2Tdata.IQMeasured;
+        //int iQerror = IqRef-IqFbk;
 
         VqA += __builtin_mulss(iQerror-iQerror_old,IKp) + __builtin_mulss(iQerror+iQerror_old,IKi);
 
@@ -978,35 +978,35 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     static long Vacc = 0;
     static long Iacc = 0;
     static char cntr = 0;
+    static int Imax = 0x8000;
+    static int Imin = 0x7FFF;
     
-    Vacc += Vq<<5;
+    if (I2Tdata.IQMeasured < Imin) Imin = I2Tdata.IQMeasured; 
+    if (I2Tdata.IQMeasured > Imax) Imax = I2Tdata.IQMeasured;
+    
+    Vacc += Vq<<VOLT_REF_SHIFT;
     Iacc += I2Tdata.IQMeasured;
     
     if (++cntr == 40)
     {
         cntr = 0;
-        IqFbk = __builtin_divsd(Iacc,40);
+        
+        Iacc -= Imin+Imax;
+        
+        IqFbk = __builtin_divsd(Iacc,38);
         VqFbk = __builtin_divsd(Vacc,40);
         
         Iacc = Vacc = 0;
+        Imax = 0x8000;
+        Imin = 0x7FFF;
     }
-    
-    // Re-scale Vq, Vd with respect to the PWM resolution and fullscale.
-    Vq = Vq/2;
-    Vd = Vd/2;
-    
     //
     ////////////////////////////////////////////////////////////////////////////
 
-
-    
     ////////////////////////////////////////////////////////////////////////////
-    // inv transform and PWM drive
-    //int V1 = (int)(__builtin_mulss(Vq,cosT)>>15)-3*(int)(__builtin_mulss(Vd,sinT)>>15);
-    //int V2 = (int)(__builtin_mulss(Vq,sinT)>>15)+  (int)(__builtin_mulss(Vd,cosT)>>15);
-    
-    int V1 = (int)((__builtin_mulss(Vq,cosT)-__builtin_mulss(Vd*3,sinT)+16384L)>>15);
-    int V2 = (int)((__builtin_mulss(Vq,sinT)+__builtin_mulss(Vd  ,cosT)+16384L)>>15);
+    // inv transform and PWM drive    
+    int V1 = (int)((__builtin_mulss(Vq,cosT)-__builtin_mulss(Vd*3,sinT)+0x7FFF)>>16);
+    int V2 = (int)((__builtin_mulss(Vq,sinT)+__builtin_mulss(Vd  ,cosT)+0x7FFF)>>16);
     
     if (negative_sec) V2=-V2;
 
@@ -1068,7 +1068,7 @@ void DriveInit()
 // Perform drive SW/HW init
 {
     // Setup PWM 0% offset, PWM max and the trigger to ADC capture (Special Event Compare Count Register)
-    pwmInit(PWM_50_DUTY_CYC, DDEADTIME, PWM_MAX /*pwm max = 80%*/);
+    pwmInit(LOOPINTCY/2, DDEADTIME, PWM_MAX/2);
     
     pwmOFF();
 

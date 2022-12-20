@@ -59,8 +59,9 @@ typedef union
 #define DFCY           (FOSC/2)  // Instruction cycle frequency (Hz) (40Meg)
 #define DTCY           (1.0/DFCY) // Instruction cycle period (sec)
 
-#define DDEADTIME (unsigned int)(DEADTIMESEC*DFCY) // Dead time in dTcys
-#define LOOPINTCY       (DESIREDMIPS/PWMFREQUENCY)
+//#define DDEADTIME (unsigned int)(DEADTIMESEC*DFCY) // Dead time in dTcys
+#define DDEADTIME       (unsigned int)(DESIREDMIPS*DEADTIMESEC)  // Dead time in dTcys
+#define LOOPINTCY                     (DESIREDMIPS/PWMFREQUENCY) // PWM cycle in dTcys
 
 // return state of external fault pin
 #define EXTERNAL_FAULT_PRESSED()  (PORTA & 0x08)

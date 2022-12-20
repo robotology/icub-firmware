@@ -15,12 +15,11 @@
 #ifndef __USERPARMS_H__
 #define __USERPARMS_H__
 
-//#define UDEF_CURRENT_MAX 4000 // 4 A
 #define UDEF_SPEED_MAX  32767
 #ifndef RELENTLESS
-#define UDEF_PWM_MAX    25600 // 800*32 = 80%
+#define UDEF_PWM_MAX    30000
 #else
-#define UDEF_PWM_MAX    25600 // 800*32 = 80%
+#define UDEF_PWM_MAX    30000
 #endif
 
 #define HALL_ERROR_MAX_CNT 1000
@@ -87,7 +86,7 @@
 // Deadtime in seconds (range 1.6 us to 25 ns)
 // DHES accept a greater zero cross distortion in order to keep lower temperature
 //#define DEADTIMESEC	  0.00000100
-  #define DEADTIMESEC     0.00000025 
+  #define DEADTIMESEC     0.00000025 // 250 ns 
 
 // this forces the 2foc interrupt to delay PWM registers update when it is 
 // about to do it very close to the PWM hardware register buffering.

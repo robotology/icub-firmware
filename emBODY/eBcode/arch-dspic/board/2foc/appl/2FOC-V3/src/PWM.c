@@ -12,17 +12,18 @@
 
 extern tSysStatus SysStatus;
 
-static short PWM_50_DUTY_CYCLE = 0;
-static short PWM_DEADTIME = 0;
-static short PWM_MAX = 0;
+static short PWM_50_DUTY_CYCLE = 500;
+static short PWM_DEADTIME = 10;
+static short PWM_MAX = 450;
 
 void pwmInit(short pwm_50_duty_cycle, short pwm_deadtime, short pwm_max)
 {
     PWM_50_DUTY_CYCLE = pwm_50_duty_cycle;
     PWM_DEADTIME = pwm_deadtime;
-
-    pwmSetMax(pwm_max);
-
+    PWM_MAX = (PWM_50_DUTY_CYCLE*15)/16;
+    
+    if (pwm_max < PWM_MAX) PWM_MAX = pwm_max;
+    
     pwmZero();
     pwmOFF();
 
@@ -83,11 +84,6 @@ void __attribute__((__interrupt__,no_auto_psv)) _FLTA1Interrupt(void)
 
     // clear irq flag
     IFS3bits.FLTA1IF = 0;
-}
-
-void pwmSetMax(short pwm_max)
-{
-    if (pwm_max < (PWM_50_DUTY_CYCLE*9)/10) PWM_MAX = pwm_max;
 }
 
 char pwmON(void)
