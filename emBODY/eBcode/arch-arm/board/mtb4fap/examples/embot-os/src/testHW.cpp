@@ -46,7 +46,12 @@ void tlv_tick();
 
 #if defined(TEST_I2C_EMULATED)
 
+#if defined(TEST_I2C_EMULATED_embot)
 
+// just
+#include "embot_hw_i2ce.h"
+
+#else
 
 constexpr embot::hw::GPIO scl = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four};     // scl
 constexpr embot::hw::GPIO sda1 = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight};   // sda1
@@ -113,6 +118,8 @@ bool I2C_init();
 bool I2C_ping(uint8_t adr);
 bool I2C_read(uint8_t adr, size_t n, uint8_t *data);
 bool I2C_write(uint8_t adr, size_t n, uint8_t *data);
+
+#endif
 	
 #endif  
 
@@ -206,14 +213,19 @@ void testI2Cping()
     {
         unluckyyou++;
     }
+}
 
+void testI2Cdiscover()
+{
 #if defined(TEST_I2C_EMULATED_embot)
+    static volatile uint32_t therearesome = 0;
+    static volatile uint32_t unluckyyou = 0;
     std::vector<embot::hw::i2ce::ADR> adrs {};
     volatile bool foundany = embot::hw::i2ce::discover(embot::hw::I2CE::one, adrs);
     volatile size_t ss = adrs.size();
     if(foundany)
     {
-        hereitis = ss;
+        therearesome = ss;
         volatile embot::hw::i2ce::ADR a {0};
         for(size_t i=0; i<ss; i++)
         {
@@ -225,8 +237,7 @@ void testI2Cping()
     {
         unluckyyou++;
     }
-#endif
-    
+#endif   
 }
 
 uint8_t data2read[10] = {0};
@@ -291,6 +302,7 @@ void testHWtick()
 #if defined(TEST_I2C_EMULATED_embot)
 
     testI2Cping();
+    testI2Cdiscover();
     testI2Cread();
     
 #else    
