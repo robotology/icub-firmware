@@ -57,8 +57,8 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOC, BNO055_BOOT_Pin|BNO055_RESET_Pin|LED_RED_Pin|LED_BLUE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, EN_OSC_Pin|SDA0_Pin|SDA3_Pin|SDA2_Pin
-                          |SCK0_Pin|SDA1_Pin, GPIO_PIN_RESET);
+  uint32_t pinsOnGPIOA = EN_OSC_Pin; // pulled-up, so dont init: |SDA0_Pin|SDA3_Pin|SDA2_Pin|SCK0_Pin|SDA1_Pin;
+  HAL_GPIO_WritePin(GPIOA, pinsOnGPIOA, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, CAN1_SHDN_Pin|CAN1_STB_Pin|POWER_TSENSOR1_Pin, GPIO_PIN_RESET);
@@ -114,8 +114,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PAPin PAPin PAPin PAPin
                            PAPin PAPin */
-  GPIO_InitStruct.Pin = EN_OSC_Pin|SDA0_Pin|SDA3_Pin|SDA2_Pin
-                          |SCK0_Pin|SDA1_Pin;
+  GPIO_InitStruct.Pin = pinsOnGPIOA;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

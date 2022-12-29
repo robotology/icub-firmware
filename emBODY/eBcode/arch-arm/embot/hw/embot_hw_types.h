@@ -97,7 +97,12 @@ namespace embot { namespace hw {
         
         constexpr GPIO() = default; 
         constexpr GPIO(PORT po, PIN pi) : port(po), pin(pi) {}          
-        constexpr bool isvalid() const { return (PORT::none == port) ? false : true; }       
+        constexpr bool isvalid() const { return (PORT::none == port) ? false : true; }    
+        
+        constexpr bool operator == (const GPIO& g) const
+        {
+            return (port == g.port) && (pin == g.pin);
+        }
     };
     
     
