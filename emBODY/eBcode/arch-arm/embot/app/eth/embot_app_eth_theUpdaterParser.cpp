@@ -440,13 +440,53 @@ uint8_t embot::app::eth::theUpdaterParser::Impl::s_uprot_proc_CANGATEWAY(Impl* i
     return(1);      
 }
 
-
+// used to fill the reply with the extra processes
+static uint16_t s_discover_fill2(eOuprot_cmd_DISCOVER_REPLY2_t* reply2, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use)
+{
+    reply2->discoveryreply.reply.opc = opcode2use;
+    
+    uint8_t nprocs = 0;
+    const eEprocess_t *s_proctable = NULL;
+    ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
+    constexpr uint8_t maxNumberOfProcessesOnSingleCore {3};
+    
+    // here we iterate only for the extra processes
+    for(uint8_t i=0, j=maxNumberOfProcessesOnSingleCore; j < nprocs; i++, j++)
+    {
+        const eEmoduleInfo_t *s_modinfo = NULL;
+        ee_sharserv_part_proc_get(s_proctable[j], &s_modinfo);
+        reply2->extraprocs[i].type = s_proctable[j];
+        reply2->extraprocs[i].filler[0] = EOUPROT_VALUE_OF_UNUSED_BYTE;
+        reply2->extraprocs[i].version.major = s_modinfo->info.entity.version.major;
+        reply2->extraprocs[i].version.minor = s_modinfo->info.entity.version.minor;
+        memcpy(&reply2->extraprocs[i].date, &s_modinfo->info.entity.builddate, sizeof(eOdate_t));
+        
+        reply2->extraprocs[i].compilationdate.year = 1999;
+        reply2->extraprocs[i].compilationdate.month = 9;
+        reply2->extraprocs[i].compilationdate.day = 9;
+        reply2->extraprocs[i].compilationdate.hour = 9;
+        reply2->extraprocs[i].compilationdate.min = 9;
+        
+        // TODO: can we use embot::hw::flash?
+        //const embot::hw::flash::Partition& pp = embot::hw::flash::bsp::partition(s_modinfo->info.rom.addr);
+        
+        volatile eEmoduleExtendedInfo_t * extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);
+        if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+        {
+            eo_common_compiler_string_to_date((const char*)extinfo->compilationdatetime, &reply2->extraprocs[i].compilationdate);
+        }
+       
+        reply2->extraprocs[i].rom_addr_kb = s_modinfo->info.rom.addr / 1024;
+        reply2->extraprocs[i].rom_size_kb = s_modinfo->info.rom.size / 1024;
+      
+    }
+    return sizeof(eOuprot_cmd_DISCOVER_REPLY2_t);
+}
 
 uint16_t embot::app::eth::theUpdaterParser::Impl::s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use)
 {
     uint16_t size = sizeof(eOuprot_cmd_DISCOVER_REPLY_t);  
     
-
     reply->reply.opc = opcode2use;
     reply->reply.res = uprot_RES_OK;
     reply->reply.protversion = EOUPROT_PROTOCOL_VERSION;
@@ -507,6 +547,9 @@ uint16_t embot::app::eth::theUpdaterParser::Impl::s_discover_fill(eOuprot_cmd_DI
     reply->processes.def2run = def2run;
     reply->processes.runningnow = eApplication;
     
+    constexpr uint8_t maxNumberOfProcessesOnSingleCore {3};
+    uint8_t number = std::min(nprocs, maxNumberOfProcessesOnSingleCore);
+
     for(uint8_t i=0; i<nprocs; i++)
     {
         const eEmoduleInfo_t *s_modinfo = NULL;
@@ -532,6 +575,14 @@ uint16_t embot::app::eth::theUpdaterParser::Impl::s_discover_fill(eOuprot_cmd_DI
         reply->processes.info[i].rom_addr_kb = s_modinfo->info.rom.addr / 1024;
         reply->processes.info[i].rom_size_kb = s_modinfo->info.rom.size / 1024;  
       
+    }
+    
+    // In case of multi core boards we have to add more processes
+    if(nprocs >= maxNumberOfProcessesOnSingleCore)
+    {
+        // prepare for the extended reply
+        eOuprot_cmd_DISCOVER_REPLY2_t* reply2 = reinterpret_cast<eOuprot_cmd_DISCOVER_REPLY2_t*>(reply);
+        size = s_discover_fill2(reply2, uprot_OPC_DISCOVER2, sizeof(eOuprot_cmd_DISCOVER_REPLY2_t));
     }
 
     // now boardinfo32
