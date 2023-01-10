@@ -136,79 +136,7 @@ void Joint_init(Joint* o)
 #endif
 
     Joint_reset_calibration_data(o);
-    
-#ifdef ERGOJOINT
-    o->torque_model.initialize();
-
-    o->joint_motor_offset = 0;
-    o->joint_position_raw = 0;
-    o->joint_encoder_old = 0;
-    o->trq_idle_counter = 0;
-#endif
 }
-
-#ifdef ERGOJOINT
-void Joint_compute_torque(Joint* o)
-{             
-    o->torque_model.step();
-            
-    Joint_update_torque_fbk(o, o->torque_model.rtY.Torque*1000000.0f);
-}
-
-void Joint_update_joint_pos_raw(Joint* o, int32_t encoder)
-{
-    encoder = encoder & 0x7FFFF;
-    
-    static const int32_t FULL_REV = 524288L;
-    static const int32_t HALF_REV = 262144L;
-    
-    int32_t delta = encoder - o->joint_encoder_old;
-    
-    o->joint_encoder_old = encoder;
-    
-    while (delta >  HALF_REV) delta -= FULL_REV;
-    while (delta < -HALF_REV) delta += FULL_REV;
-    
-    o->joint_position_raw += delta;
-    
-    //if (delta < -1 || delta > 1) o->trq_idle_counter = 0;
-}
-
-void Joint_update_motor_pos_raw(Joint* o, int32_t motor_pos_raw)
-{
-    int32_t joint_pos_raw = 20*o->joint_position_raw;
-    
-    if (o->control_mode == eomc_controlmode_idle)
-    {
-        if (o->trq_idle_counter < 3000)
-        {
-            o->trq_idle_counter++;
-        }
-        else
-        {
-            o->joint_motor_offset = joint_pos_raw + motor_pos_raw; // 160/(2^(19-16)) = 160/8;
-        }
-    }
-    else
-    {
-        o->trq_idle_counter = 0;
-    }
-    
-    static const float ENC2RAD = 3.1415926f/(32768.0f*160.0f);
-    
-    int32_t torsion = motor_pos_raw + joint_pos_raw - o->joint_motor_offset; 
-    
-    o->torque_model.rtU.Torsion = ENC2RAD*(float)torsion;
-}
-
-#endif
-
-
-
-
-
-
-
 
 void Joint_reset_calibration_data(Joint* o)
 {
@@ -647,10 +575,6 @@ static CTRL_UNITS wrap180(CTRL_UNITS x)
 
 CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 {        
-#ifdef ERGOJOINT
-    Joint_compute_torque(o);
-#endif
-    
     PID *pid = (o->control_mode == eomc_controlmode_direct || o->control_mode == eomc_controlmode_vel_direct) ?  &o->directPID : &o->minjerkPID; 
     
     o->pushing_limit = FALSE;
@@ -848,10 +772,6 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 
 CTRL_UNITS Joint_do_vel_control(Joint* o)
 {       
-    #ifdef ERGOJOINT
-        Joint_compute_torque(o);
-    #endif
-    
     PID *pid = (o->control_mode == eomc_controlmode_direct || o->control_mode == eomc_controlmode_vel_direct) ?  &o->directPID : &o->minjerkPID; 
     
     o->pushing_limit = FALSE;

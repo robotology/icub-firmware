@@ -19,6 +19,8 @@
 //#include "stdlib.h"
 //#include <string.h>
 
+#include "Motor_hid.h"
+
 #include "EoCommon.h"
 #include "iCubCanProto_types.h"
 #include "EoProtocol.h"
@@ -291,6 +293,15 @@ void Motor_init(Motor* o) //
     Motor_hardStopCalbData_reset(o);
     
     //o->outOfLimitsSignaled = FALSE;
+    
+#ifdef ERGOJOINT
+    o->torque_model.initialize();
+
+    o->joint_motor_offset = 0;
+    o->joint_position_raw = 0;
+    o->joint_encoder_old = 0;
+    o->trq_idle_counter = 0;
+#endif
 }
 
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
@@ -963,8 +974,154 @@ BOOL Motor_is_calibrated(Motor* o) //
     return !(o->not_calibrated);
 }
 
+#define FABS(x) ((x)>ZERO?(x):(-x))
+#define FSGN(x) ((x)>ZERO ? 1.f : ((x)<ZERO? -1.f : ZERO))
+
 CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk) //
 {
+    int32_t joint_pos_raw_gbox = 20*o->joint_position_raw; // 20 = 160/2^3 = 160/(2^19/2^16)
+    
+    if (o->control_mode == icubCanProto_controlmode_idle)
+    {
+        if (o->trq_idle_counter < 3000)
+        {
+            o->trq_idle_counter++;
+        }
+        else
+        {
+            o->joint_motor_offset = joint_pos_raw_gbox + o->pos_raw_fbk; // 160/(2^(19-16)) = 160/8;
+        }
+    }
+    else
+    {
+        o->trq_idle_counter = 0;
+    }
+    
+    static const float ENC2RAD = 3.1415926f/32768.0f;
+    
+    int32_t torsion = o->pos_raw_fbk + joint_pos_raw_gbox - o->joint_motor_offset; 
+    
+    o->torque_model.rtU.Torsion = ENC2RAD*(float)torsion;
+    
+    o->torque_model.step();
+
+    //////////////////////////////////////////////////
+    
+    float result_torque = ZERO;
+    
+    float torsion_torque = o->torque_model.rtY.Torque; // Nm
+    
+    float current = 0.001f*o->Iqq_fbk; // A
+    
+    float speed = ENC2RAD*o->vel_fbk; // rad/s
+    
+    static const float Io = 0.357f; // A
+    static const float Kw = 0.9f;   // A/(rad/s)
+    
+    static const float Kt = 160.0*0.058f; // Nm/A
+    static const float iKt = 1.f/Kt;      // A/Nm;
+    
+    // I = Io + Kw*w;
+    
+    trq_fbk = ZERO;
+    
+    if (FABS(current) <= Io)
+    {
+        trq_fbk = ZERO;
+    }
+    else
+    {
+    }
+    
+    
+    if (speed == ZERO)
+    {
+        if (FABS(current) <= Io)
+        {
+            trq_fbk = ZERO;
+        }
+        else
+        {
+            trq_fbk = iKt*(current - Io);
+        }
+    }
+    else
+    {
+        if (FABS(current) <= Io)
+        {
+            trq_fbk = ZERO;
+        }
+        else
+        {
+        }
+    }
+    
+    
+    
+    
+    
+    CTRL_UNITS Iout = ZERO;
+    
+    if (trq_ref == ZERO)
+    {
+        if (speed == ZERO)
+        {
+            Iout = FSGN(torsion_torque)*Io + iKt*torsion_torque;
+        }
+        else
+        {
+            Iout = FSGN(speed)*Io + Kw*speed + iKt*torsion_torque;
+        }
+    }
+    else
+    {
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    if (-Io<current && current<Io)
+    {
+        if (speed == ZERO)
+        {
+            result_torque = torsion_torque;
+        }
+        else
+        {
+            // load is dragging the motor
+            
+            result_torque = Kt*(current + (speed > ZERO ? Io : -Io) + Kw*speed); 
+        }
+    }
+    else
+    {
+        if (speed != ZERO)
+        {
+            result_torque = Kt * (current-Io-Kw*speed);
+            
+            if ((current > ZERO) ^ (speed > ZERO))
+            {
+            }
+            else
+            {
+            }
+        }
+        else
+        {
+        }
+    }
+
+    
+    
+    
+    
+    
     o->trq_ref = trq_ref;
     o->trq_fbk = trq_fbk;
     
@@ -1264,7 +1421,7 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     while (delta >  TICKS_PER_HALF_REVOLUTION) delta -= TICKS_PER_REVOLUTION;
     
     o->pos_raw_fbk += delta;
-    
+       
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
     //if (o->not_init)
@@ -1413,6 +1570,110 @@ BOOL Motor_is_motor_joint_fault_over(Motor* o)
         
     return ret;
 }
+
+#ifdef ERGOJOINT
+
+void Motor_update_joint_pos_raw(Motor* o, int32_t joint_encoder)
+{
+    joint_encoder = joint_encoder & 0x7FFFF;
+    
+    static const int32_t FULL_REV = 524288L;
+    static const int32_t HALF_REV = 262144L;
+    
+    int32_t delta = joint_encoder - o->joint_encoder_old;
+    
+    o->joint_encoder_old = joint_encoder;
+    
+    while (delta >  HALF_REV) delta -= FULL_REV;
+    while (delta < -HALF_REV) delta += FULL_REV;
+    
+    o->joint_position_raw += delta;
+    
+    if (delta < -1 || delta > 1) o->trq_idle_counter = 0;
+}
+    
+    ///////////////////////////////////////////////////////
+
+void Motor_compute_torque(Motor* o)
+{
+    int32_t joint_pos_raw_gbox = 20*o->joint_position_raw; // 20 = 160/2^3 = 160/(2^19/2^16)
+    
+    if (o->control_mode == icubCanProto_controlmode_idle)
+    {
+        if (o->trq_idle_counter < 3000)
+        {
+            o->trq_idle_counter++;
+        }
+        else
+        {
+            o->joint_motor_offset = joint_pos_raw_gbox + o->pos_raw_fbk; // 160/(2^(19-16)) = 160/8;
+        }
+    }
+    else
+    {
+        o->trq_idle_counter = 0;
+    }
+    
+    static const float ENC2RAD = 3.1415926f/32768.0f;
+    
+    int32_t torsion = o->pos_raw_fbk + joint_pos_raw_gbox - o->joint_motor_offset; 
+    
+    o->torque_model.rtU.Torsion = ENC2RAD*(float)torsion;
+    
+    o->torque_model.step();
+
+    //////////////////////////////////////////////////
+    
+    float result_torque = ZERO;
+    
+    float torsion_torque = o->torque_model.rtY.Torque; // Nm
+    
+    float current = 0.001f*o->Iqq_fbk; // A
+    
+    float speed = ENC2RAD*o->vel_fbk; // rad/s
+    
+    static const float Io = 0.357f; // A
+    static const float Kw = 0.9f; // A/(rad/s)
+    static const float Kt = 0.058f; // Nm/A
+    
+    // I = Io + Kw*w;
+    
+    if (-Io<current && current<Io)
+    {
+        if (speed == ZERO)
+        {
+            // current under trashold, not moving
+            return;
+        }
+        else
+        {
+            // load is dragging the motor
+        }
+    }
+    else
+    {
+        if (speed != ZERO)
+        {
+            result_torque = Kt * (current-Io-Kw*speed);
+            
+            if ((current > ZERO) ^ (speed > ZERO))
+            {
+            }
+            else
+            {
+            }
+        }
+        else
+        {
+        }
+    }
+     
+    //Motor_update_torque_fbk(o, o->torque_model.rtY.Torque*1000000.0f);
+}
+
+
+#endif
+
 
 #if defined(EOTHESERVICES_customize_handV3_7joints)
 

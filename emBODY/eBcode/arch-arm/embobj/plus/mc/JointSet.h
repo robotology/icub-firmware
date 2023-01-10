@@ -21,7 +21,6 @@
 
 #if defined(WRIST_MK2)
 #include "wrist_decoupler.h"
-#elif defined(ERGOJOINT)
 #else
 #ifdef __cplusplus
 extern "C" {
@@ -156,7 +155,6 @@ extern void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par
 extern BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_state);
 extern void JointSet_stop(JointSet* o, int j);
-#elif defined(ERGOJOINT)
 #else
 #ifdef __cplusplus
 }       // closing brace for extern "C"

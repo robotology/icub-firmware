@@ -19,6 +19,7 @@
 #include "Calibrators.h"
 #include "JointSet.h"
 #include "Joint_hid.h"
+#include "Motor_hid.h"
 #include "CalibrationHelperData.h"
 #include "hal_adc.h"
 

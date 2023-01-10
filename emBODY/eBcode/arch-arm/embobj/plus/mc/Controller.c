@@ -30,6 +30,7 @@
 #include "EOtheEntities.h"
 
 #include "Joint_hid.h"
+#include "Motor_hid.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
@@ -2119,10 +2120,6 @@ int16_t MController_config_motor_pwm_limit(int m, int16_t pwm_limit)
 void MController_update_motor_odometry_fbk_can(int m, void* data)
 {
     Motor_update_odometry_fbk_can(smc->motor+m, (CanOdometry2FocMsg*)data);
-    
-#ifdef ERGOJOINT
-    Joint_update_motor_pos_raw(smc->joint+m, smc->motor[m].pos_raw_fbk);
-#endif    
 }
 
 void MController_motor_raise_fault_i2t(int m)

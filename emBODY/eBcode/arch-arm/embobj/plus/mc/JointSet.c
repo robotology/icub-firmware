@@ -31,6 +31,7 @@
 #include "EOtheEntities.h"
 
 #include "Joint_hid.h"
+#include "Motor_hid.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"

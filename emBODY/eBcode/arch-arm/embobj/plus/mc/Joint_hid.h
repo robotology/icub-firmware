@@ -3,13 +3,9 @@
 
 #include "kalman_filter.h"
 
-#if defined(ERGOJOINT)
-#include "TorqueModel.h"
-#else
 #ifdef __cplusplus
 extern "C" {
-#endif
-#endif    
+#endif   
     
 #include "Joint.h"
 
@@ -101,22 +97,12 @@ struct Joint_hid // Joint
 #ifdef FINGER_MK3
     CTRL_UNITS ZTau;
     CTRL_UNITS Ke;
-#endif
-
-#if defined(ERGOJOINT)
-    TorqueModel torque_model;
-    int32_t joint_motor_offset;
-    int32_t joint_position_raw;
-    int32_t joint_encoder_old;
-    int trq_idle_counter;
-#endif        
+#endif       
 };
 
-#if !defined(ERGOJOINT)
 #ifdef __cplusplus
 }       // closing brace for extern "C"
 #endif 
-#endif
 
 #endif  // include-guard
 

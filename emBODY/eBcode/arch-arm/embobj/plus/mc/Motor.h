@@ -140,102 +140,7 @@ typedef struct //HardStopCalibData
     
 } HardStopCalibData;
 
-typedef struct //Motor
-{
-    // consts
-    uint8_t ID;
-    uint8_t actuatorPort;
-#if !defined(EOTHESERVICES_customize_handV3_7joints)
-    // UNKNOWN              0
-    // HARDWARE_2FOC        1
-    // HARDWARE_MC4p        2
-    uint8_t HARDWARE_TYPE;
-#else    
-    eObrd_canlocation_t canloc; // it keeps the can location of the motor 
-    
-    // HARDWARE_UNKNOWN     0
-    // HARDWARE_2FOC        1
-    // HARDWARE_MC4p        2
-    // HARDWARE_PMC         3
-    uint8_t HARDWARE_TYPE; // it can have the above values
-#endif
-
-
-    CTRL_UNITS GEARBOX;
-
-    BOOL HAS_TEMP_SENSOR;
-    int16_t temperature_max;
-    int16_t temperature_fbk;
-
-    int32_t pwm_max;
-    int32_t pwm_fbk;
-    int32_t pwm_ref;
-    
-    int32_t calib_pwm;
-    
-    int32_t pos_raw_cal_fbk;
-    int32_t pos_raw_fbk;
-    int32_t vel_raw_fbk;
-    
-    int32_t pos_calib_offset;
-    
-    int32_t pos_min;
-    int32_t pos_max;
-    int32_t pos_ref;
-    int32_t pos_fbk;
-    int32_t pos_err;
-    
-    int32_t pos_fbk_old;
-    int32_t enc_sign;
-    float32_t enc_tolerance;
-    
-    int32_t vel_max;
-    int32_t vel_ref;
-    int32_t vel_fbk;
-    int32_t vel_err;
-    
-    int32_t Iqq_max;
-    int32_t Iqq_ref;
-    int32_t Iqq_fbk;
-    int32_t Iqq_ovl;
-    int32_t Iqq_err;
-    
-    CTRL_UNITS trq_max;
-    CTRL_UNITS trq_ref;
-    CTRL_UNITS trq_fbk;
-    CTRL_UNITS trq_err;
-    
-    int32_t output;
-    
-    PID trqPID;
-    
-    BOOL not_init;
-    BOOL not_calibrated;
-    BOOL hardware_fault;
-    
-    BOOL can_dead;
-    BOOL wrong_ctrl_mode;
-    
-    uint16_t diagnostics_refresh;
-    uint16_t diagnostics_refresh_warning;
-    MotorFaultState fault_state_prec;
-    MotorFaultState fault_state;
-    QEState qe_state;
-    
-    icubCanProto_controlmode_t  control_mode;
-    icubCanProto_controlmode_t  control_mode_req;
-    WatchDog control_mode_req_wdog;
-
-    HardStopCalibData hardstop_calibdata;
-
-    uint16_t qencoder_err_counter;
-
-    // 2FOC specific data
-    WatchDog can_2FOC_alive_wdog;
-    uint8_t can_motor_config[7];
-    //BOOL outOfLimitsSignaled;
-
-} Motor;
+typedef struct Motor_hid Motor;
 
 extern Motor* Motor_new(uint8_t n);  //
 extern void Motor_init(Motor* o);  //
@@ -298,6 +203,12 @@ extern BOOL Motor_is_running(Motor* o);
 extern BOOL Motor_is_motor_joint_fault_over(Motor* o);
 
 //BOOL Motor_clear_ext_fault(Motor *o);
+
+#ifdef ERGOJOINT
+extern void Motor_compute_torque(Motor* o);
+extern void Motor_update_joint_pos_raw(Motor* o, int32_t encoder);
+extern void Motor_update_motor_pos_raw(Motor* o, int32_t encoder);
+#endif
 
 ////////////////////////////////////////////////////////////////////////////
 extern void Motor_config_gearbox_M2J(Motor* o, float32_t gearbox_M2J);
