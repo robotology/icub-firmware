@@ -223,7 +223,7 @@ static uint8_t updateHallStatus(void)
     uint16_t angle = MainConf.pwm.hall_offset + hallAngleTable[hallStatus];
     
     //int16_t sector = (MainConf.pwm.sector_offset + hallSectorTable[hallStatus]) % 6;
-    int16_t sector = ((1+(int16_t)(angle)) / 60) % 6;
+    int16_t sector = ((5461 + angle) / 10922) % 6;
     static int16_t sector_old = sector;
     
     hallAngle = angle;
@@ -242,6 +242,7 @@ static uint8_t updateHallStatus(void)
         }
         else
         {
+            
             bool forward = ((sector-sector_old+6)%6)==1;
         
             if (forward) // forward
@@ -264,13 +265,19 @@ static uint8_t updateHallStatus(void)
             {
                 encoderForce(angle);
             
+                // settore in cui mi trovo se sto andando avanti o il precedente se sto andando indietro
                 uint8_t s = forward ? sector : (sector+1)%6;
             
                 border[s] = encoderGetUncalibrated();
             
                 border_flag |= 1<<s;
+                
+                
+                char msg_cnt[128];
+                snprintf(msg_cnt, 128, "cal %d flg: %d sector: %d s: %u fw: %u ang: %u", calibration_step, border_flag, sector, s, forward, border[s]);
+                embot::core::print(msg_cnt);
             
-                if (border_flag == 63)
+                if (border_flag == 63) // 111111
                 {
                     calibration_step = 2;
                 
@@ -288,13 +295,13 @@ static uint8_t updateHallStatus(void)
                     encoderCalibrate(-int16_t(offset));
                 }
             }
-            //else if (calibration_step == 2)
-            //{   
+            else if (calibration_step == 2)
+            {
+                encoderForce(angle);
             //    encoderCalibrate(angle);
-            //}
+            }
         }
     }
-
     // update the old sector and hall status
     sector_old = sector;
     hallStatus_old = hallStatus;
