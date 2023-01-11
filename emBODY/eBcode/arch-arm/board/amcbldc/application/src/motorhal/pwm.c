@@ -223,6 +223,7 @@ static uint8_t updateHallStatus(void)
     uint16_t angle = MainConf.pwm.hall_offset + hallAngleTable[hallStatus];
     
     //int16_t sector = (MainConf.pwm.sector_offset + hallSectorTable[hallStatus]) % 6;
+    // Check which sector [0 ... 5] (30 + angle) / 60 
     int16_t sector = ((5461 + angle) / 10922) % 6;
     static int16_t sector_old = sector;
     
@@ -259,46 +260,53 @@ static uint8_t updateHallStatus(void)
             if (calibration_step == 0)
             {
                 encoderForce(angle);
-                calibration_step = 1;
+                
+                if ((sector == 0 && sector_old == 5) || (sector == 5 && sector_old == 0))
+                {
+                    encoderReset();
+                    calibration_step = 1;
+                }
             }
             else if (calibration_step == 1)
             {
                 encoderForce(angle);
             
-                // settore in cui mi trovo se sto andando avanti o il precedente se sto andando indietro
+                // use the current sector if forward rotation or previous if reverse
                 uint8_t s = forward ? sector : (sector+1)%6;
             
+                // keep track of the encoder value between sectors
                 border[s] = encoderGetUncalibrated();
-            
+
+                // found the s-th border, put a 1 in the mask
                 border_flag |= 1<<s;
-                
-                
-                char msg_cnt[128];
-                snprintf(msg_cnt, 128, "cal %d flg: %d sector: %d s: %u fw: %u ang: %u", calibration_step, border_flag, sector, s, forward, border[s]);
-                embot::core::print(msg_cnt);
             
+                // After finding all borders compute offset through minimization of MSE
                 if (border_flag == 63) // 111111
                 {
                     calibration_step = 2;
                 
-                    int32_t offset = int16_t(border[0]);
-                    offset += int16_t(border[1]-10923);
-                    offset += int16_t(border[2]-21845);
-                    offset += int16_t(border[3]-32768);
-                    offset += int16_t(border[4]-43691);
-                    offset += int16_t(border[5]-54613);
+                    int32_t offset = int16_t(MainConf.pwm.hall_offset-5461-border[0]);
+                    offset += int16_t(MainConf.pwm.hall_offset-5461+10923 -border[1]);
+                    offset += int16_t(MainConf.pwm.hall_offset-5461+21845 -border[2]);
+                    offset += int16_t(MainConf.pwm.hall_offset-5461+32768 -border[3]);
+                    offset += int16_t(MainConf.pwm.hall_offset-5461+43691 -border[4]);
+                    offset += int16_t(MainConf.pwm.hall_offset-5461+54613 -border[5]);
                 
                     offset /= 6;
                      
                     embot::core::print("CALIBRATED\n");
-            
+                    
                     encoderCalibrate(-int16_t(offset));
                 }
             }
             else if (calibration_step == 2)
             {
                 encoderForce(angle);
-            //    encoderCalibrate(angle);
+                // reset the angle after full rotation
+                if ((sector == 0 && sector_old == 5) || (sector == 5 && sector_old == 0))
+                {
+                    encoderReset();
+                }
             }
         }
     }
