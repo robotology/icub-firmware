@@ -120,17 +120,22 @@ extern void set_ADC_callback(pwm_ADC_callback_t *cbk)
 
 #if defined(USE_STM32HAL) && defined(__cplusplus)
 
+constexpr int16_t numHallSectors = 6;
+constexpr float_t iCubDeg = 65536.0; // Range of angular values that can be represented with the encoder
+constexpr float_t Deg2iCub = iCubDeg / 360.0;
+constexpr int16_t hallAngleStep = 60.0 * Deg2iCub; // 60 degrees scaled by the range of possible values
+constexpr int16_t minHallAngleDelta = 30.0 * Deg2iCub; // 30 degrees scaled by the range of possible values
 
 constexpr uint16_t hallAngleTable[] =
 {
     /* ABC  (°)  */
     /* LLL ERROR */ 0,
-    /* LLH  240  */ static_cast<uint16_t>(240.0 * 65536.0 / 360.0), /* 43690 */
-    /* LHL  120  */ static_cast<uint16_t>(120.0 * 65536.0 / 360.0), /* 21845 */
-    /* LHH  180  */ static_cast<uint16_t>(180.0 * 65536.0 / 360.0), /* 32768 */
-    /* HLL    0  */ static_cast<uint16_t>(  0.0 * 65536.0 / 360.0), /*     0 */
-    /* HLH  300  */ static_cast<uint16_t>(300.0 * 65536.0 / 360.0), /* 54613 */
-    /* HHL   60  */ static_cast<uint16_t>( 60.0 * 65536.0 / 360.0), /* 10922 */
+    /* LLH  240  */ static_cast<uint16_t>(240.0 * Deg2iCub), /* 43690 */
+    /* LHL  120  */ static_cast<uint16_t>(120.0 * Deg2iCub), /* 21845 */
+    /* LHH  180  */ static_cast<uint16_t>(180.0 * Deg2iCub), /* 32768 */
+    /* HLL    0  */ static_cast<uint16_t>(  0.0 * Deg2iCub), /*     0 */
+    /* HLH  300  */ static_cast<uint16_t>(300.0 * Deg2iCub), /* 54613 */
+    /* HHL   60  */ static_cast<uint16_t>( 60.0 * Deg2iCub), /* 10922 */
     /* HHH ERROR */ static_cast<uint16_t>(0)
 };
 
@@ -222,8 +227,8 @@ static uint8_t updateHallStatus(void)
     hallStatus = DECODE_HALLSTATUS;
     uint16_t angle = MainConf.pwm.hall_offset + hallAngleTable[hallStatus];
     
-    //int16_t sector = (MainConf.pwm.sector_offset + hallSectorTable[hallStatus]) % 6;
-    int16_t sector = ((1+(int16_t)(angle)) / 60) % 6;
+    // Check which sector between [0 ... 5] the rotor is in
+    int16_t sector = ((minHallAngleDelta + angle) / hallAngleStep) % numHallSectors;
     static int16_t sector_old = sector;
     
     hallAngle = angle;
@@ -242,59 +247,87 @@ static uint8_t updateHallStatus(void)
         }
         else
         {
-            bool forward = ((sector-sector_old+6)%6)==1;
+            // Check if the motor is rotating forward (counterclockwise)
+            bool forward = ((sector-sector_old+numHallSectors)%numHallSectors)==1;
         
             if (forward) // forward
             {
                 ++hallCounter;
-                angle -= 5461; // -30 deg
+                angle -= minHallAngleDelta; // -30 deg
             }
             else
             {
                 --hallCounter;
-                angle += 5461; // +30 deg
+                angle += minHallAngleDelta; // +30 deg
             }
-  
+             /*
+            0) Use the Hall sensors to rotate until the wrap-around border is reached,
+             then reset the encoder value
+            */
             if (calibration_step == 0)
             {
                 encoderForce(angle);
-                calibration_step = 1;
+                
+                if ((sector == 0 && sector_old == 5) || (sector == 5 && sector_old == 0))
+                {
+                    encoderReset();
+                    calibration_step = 1;
+                }
             }
+            /*
+            1) Use the hall sensors to rotate. While rotating, store the encoder angle 
+            every time a sector border is crossed. When all 6 borders are crossed,
+            compute the offset to apply to the encoder by least squares fitting. After
+            the offset is applied set encoderCalibrated to true
+            */
             else if (calibration_step == 1)
             {
                 encoderForce(angle);
             
-                uint8_t s = forward ? sector : (sector+1)%6;
+                // use the current sector if forward rotation or previous if reverse
+                uint8_t sector_index = forward ? sector : (sector+1)%numHallSectors;
             
-                border[s] = encoderGetUncalibrated();
-            
-                border_flag |= 1<<s;
-            
-                if (border_flag == 63)
+                // keep track of the encoder value between sectors
+                border[sector_index] = encoderGetUncalibrated();
+
+                // found the s-th border, put a 1 in the mask
+                border_flag |= 1 << sector_index;
+                
+                // If all sectors are found apply least squares fitting by computing average of
+                // difference between measured values on borders and expected hall angle
+                if (border_flag == 63) // 111111
                 {
                     calibration_step = 2;
                 
-                    int32_t offset = int16_t(border[0]);
-                    offset += int16_t(border[1]-10923);
-                    offset += int16_t(border[2]-21845);
-                    offset += int16_t(border[3]-32768);
-                    offset += int16_t(border[4]-43691);
-                    offset += int16_t(border[5]-54613);
+                    int32_t offset = int16_t(border[0] - MainConf.pwm.hall_offset + minHallAngleDelta);
+                    offset += int16_t(border[1] - MainConf.pwm.hall_offset + minHallAngleDelta - hallAngleStep);
+                    offset += int16_t(border[2] - MainConf.pwm.hall_offset + minHallAngleDelta - 2 * hallAngleStep);
+                    offset += int16_t(border[3] - MainConf.pwm.hall_offset + minHallAngleDelta - 3 * hallAngleStep);
+                    offset += int16_t(border[4] - MainConf.pwm.hall_offset + minHallAngleDelta - 4 * hallAngleStep);
+                    offset += int16_t(border[5] - MainConf.pwm.hall_offset + minHallAngleDelta - 5 * hallAngleStep);
                 
-                    offset /= 6;
+                    offset /= numHallSectors;
                      
                     embot::core::print("CALIBRATED\n");
-            
-                    encoderCalibrate(-int16_t(offset));
+                    
+                    encoderCalibrate(int16_t(offset));
                 }
             }
-            //else if (calibration_step == 2)
-            //{   
-            //    encoderCalibrate(angle);
-            //}
+            /*
+            2) Update the forced value even if it is not used when the encoder is calibrated.
+            Reset the encoder angle after a full rotation to avoid desynching
+            */
+            else if (calibration_step == 2)
+            {
+                encoderForce(angle);
+                // reset the angle after full rotation
+                if ((sector == 0 && sector_old == 5) || (sector == 5 && sector_old == 0))
+                {
+                    encoderReset();
+                }
+            }
         }
     }
-
     // update the old sector and hall status
     sector_old = sector;
     hallStatus_old = hallStatus;
