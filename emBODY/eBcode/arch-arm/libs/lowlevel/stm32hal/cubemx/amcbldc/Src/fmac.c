@@ -1,3 +1,4 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    fmac.c
@@ -6,17 +7,16 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2023 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "fmac.h"
 
@@ -30,11 +30,21 @@ FMAC_HandleTypeDef hfmac;
 void MX_FMAC_Init(void)
 {
 
+  /* USER CODE BEGIN FMAC_Init 0 */
+
+  /* USER CODE END FMAC_Init 0 */
+
+  /* USER CODE BEGIN FMAC_Init 1 */
+
+  /* USER CODE END FMAC_Init 1 */
   hfmac.Instance = FMAC;
   if (HAL_FMAC_Init(&hfmac) != HAL_OK)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN FMAC_Init 2 */
+
+  /* USER CODE END FMAC_Init 2 */
 
 }
 
@@ -73,5 +83,3 @@ void HAL_FMAC_MspDeInit(FMAC_HandleTypeDef* fmacHandle)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

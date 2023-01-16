@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -114,9 +114,9 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     __HAL_RCC_I2C4_CLK_ENABLE();
 
     /* I2C4 interrupt Init */
-    HAL_NVIC_SetPriority(I2C4_EV_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(I2C4_EV_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(I2C4_EV_IRQn);
-    HAL_NVIC_SetPriority(I2C4_ER_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(I2C4_ER_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(I2C4_ER_IRQn);
   /* USER CODE BEGIN I2C4_MspInit 1 */
 

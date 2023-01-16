@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -25,6 +25,34 @@
 /* USER CODE END 0 */
 
 FDCAN_HandleTypeDef hfdcan2;
+
+// for 160 mHz
+void MX_FDCAN2_Init_160mhz(void)
+{
+
+  hfdcan2.Instance = FDCAN2;
+  hfdcan2.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
+  hfdcan2.Init.Mode = FDCAN_MODE_NORMAL;
+  hfdcan2.Init.AutoRetransmission = ENABLE;
+  hfdcan2.Init.TransmitPause = ENABLE;
+  hfdcan2.Init.ProtocolException = DISABLE;
+  hfdcan2.Init.NominalPrescaler = 2;
+  hfdcan2.Init.NominalSyncJumpWidth = 16;
+  hfdcan2.Init.NominalTimeSeg1 = 63;
+  hfdcan2.Init.NominalTimeSeg2 = 16;
+  hfdcan2.Init.DataPrescaler = 1;
+  hfdcan2.Init.DataSyncJumpWidth = 4;
+  hfdcan2.Init.DataTimeSeg1 = 5;
+  hfdcan2.Init.DataTimeSeg2 = 4;
+  hfdcan2.Init.StdFiltersNbr = 8;
+  hfdcan2.Init.ExtFiltersNbr = 0;
+  hfdcan2.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+  if (HAL_FDCAN_Init(&hfdcan2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
 
 /* FDCAN2 init function */
 void MX_FDCAN2_Init(void)
@@ -101,17 +129,11 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* FDCAN2 interrupt Init */
-    HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
-    HAL_NVIC_SetPriority(FDCAN2_IT1_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(FDCAN2_IT1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(FDCAN2_IT1_IRQn);
   /* USER CODE BEGIN FDCAN2_MspInit 1 */
-  
-  /********************************************************
-   * CAUTION: This il common to FDCAN1, FDCAN2 and FDCAN3 *
-   ********************************************************/
-    /* Configure Clock divider */
-    FDCAN_CONFIG->CKDIV = 0;
 
   /* USER CODE END FDCAN2_MspInit 1 */
   }
