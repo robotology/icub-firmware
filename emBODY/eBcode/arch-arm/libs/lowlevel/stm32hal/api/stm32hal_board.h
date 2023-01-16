@@ -398,7 +398,24 @@ extern void stm32hal_board_init(void);
         #include "../src/board/amcbldc/v120/inc/usb.h"
         
         #include "../src/board/amcbldc/v120/inc/stm32g4xx_it.h"        
+    #elif (STM32HAL_DRIVER_VERSION == 0x122)
 
+        #include "../src/config/stm32hal_driver_cfg_of_amcbldc_v122.h"
+
+        #include "../src/board/amcbldc/v122/inc/main.h"
+        #include "../src/board/amcbldc/v122/inc/adc.h"
+        #include "../src/board/amcbldc/v122/inc/cordic.h"
+        #include "../src/board/amcbldc/v122/inc/crc.h"
+        #include "../src/board/amcbldc/v122/inc/dma.h"
+        #include "../src/board/amcbldc/v122/inc/fdcan.h"
+        #include "../src/board/amcbldc/v122/inc/fmac.h"
+        #include "../src/board/amcbldc/v122/inc/gpio.h"
+        #include "../src/board/amcbldc/v122/inc/i2c.h"
+        #include "../src/board/amcbldc/v122/inc/rng.h"
+        #include "../src/board/amcbldc/v122/inc/tim.h"
+        #include "../src/board/amcbldc/v122/inc/usb.h"
+        
+        #include "../src/board/amcbldc/v122/inc/stm32g4xx_it.h"
     #else
         #error unsupported driver version for amcbldc
     #endif
