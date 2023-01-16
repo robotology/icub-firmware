@@ -701,6 +701,186 @@ static void s_I2C_OnRXcompletion(embot::hw::I2CE id)
 
 
 namespace embot { namespace hw { namespace i2ce {
+    
+    
+    // logging features
+    
+    
+//    #define ENABLE_i2clogger
+
+#if defined(ENABLE_i2clogger)
+    
+    struct I2Clogger
+    {
+        struct Sample
+        {
+            uint32_t delta {0};         // time in usec after previous sample
+            uint8_t sclvalue {0};       // binary value of scl
+            uint8_t sdavalue {0};       // binary value of sda
+            bool sdainput {false};      // boolean value tellin if the sda in input to the master 
+            bool delaycalled {false};   // delay just called
+            bool sdasampled {false};    // sda just sampled
+            void clear()   
+            {
+                delta = 0;
+                sclvalue = sdavalue = 0;
+                sdainput = delaycalled = sdasampled = false;
+            }
+            
+            void load(uint32_t d, uint8_t sclv, uint8_t sdav, bool inp, bool del, bool sdas)
+            {
+                delta = d;
+                sclvalue = sclv;
+                sdavalue = sdav;
+                sdainput = inp;
+                delaycalled = del;
+                sdasampled = sdas;
+            }
+        };
+    
+        embot::core::Time timeofstart {0};
+        static constexpr size_t capacity {2048};
+        size_t size {0};
+        std::array<Sample, capacity> samples {};
+            
+        volatile uint8_t Vscl {0};      // latest know binary value of SCL
+        volatile uint8_t Vsda {0};      // latest know binary value of SDA
+        volatile bool Isda {false};     // if true the SDA is input to the master
+        volatile bool delaynow {false}; // if true we have just applied a delay
+        volatile bool sampled {false};  // if true we have just sampled the sda value as driven by the slave
+        
+        uint32_t delta {0};
+        
+        embot::hw::GPIO sclgpio {};     // the gpio of teh scl
+        embot::hw::GPIO sdagpio {};     // teh gpio of the sda
+        
+        void start(const embot::hw::GPIO &_scl, const embot::hw::GPIO &_sda)
+        {
+            sclgpio = _scl;
+            sdagpio = _sda;
+            
+            Vscl = Vsda = size = 0;
+            Isda = delaynow = sampled = false;
+            for(auto &i : samples) i.clear();
+            timeofstart = embot::core::now();
+        }
+        
+        void add(uint32_t t)
+        {
+            readsda();
+            samples[size].load(t, Vscl, Vsda, Isda, delaynow, sampled);
+            size++;                
+        }
+
+        bool cantouch()
+        {
+            if(true == size < (capacity-2))
+            {
+                delta = embot::core::now() - timeofstart;
+                return true;
+            }
+            return false;
+        }   
+
+        void readsda()
+        {
+            if(true == Isda)
+            {
+                embot::hw::gpio::State s = embot::hw::gpio::get(sdagpio);
+                Vsda = (embot::hw::gpio::State::RESET == s) ? 0 : 1;
+            }
+        }                
+
+        void delay()
+        {
+            if(!cantouch())
+            {
+                return;
+            }
+            
+            delaynow = false;
+            add(delta-1);
+            delaynow = true;
+            add(delta);
+            delaynow = false;
+            add(delta+1);
+        }
+        
+        void sample()
+        {
+            if(!cantouch())
+            {
+                return;
+            }
+            sampled = false;
+            add(delta-1);
+            sampled = true;
+            add(delta);
+            sampled = false;
+            add(delta+1);                                
+        }
+        
+        void scl(bool on)
+        {
+            if(!cantouch())
+            {
+                return;
+            }
+            add(delta-1);
+            Vscl = on ? 1 : 0;
+            add(delta);               
+        }   
+
+        void sda(bool on)
+        {
+            if(!cantouch())
+            {
+                return;
+            }
+            add(delta-1);
+            Vsda = on ? 1 : 0;
+            add(delta);               
+        }            
+
+        void sdainput(bool input)
+        {
+            if(!cantouch())
+            {
+                return;
+            }
+            add(delta-1);
+            Isda = input;
+            add(delta);               
+        }
+
+        char str[256] {0};
+
+        void report()
+        {
+            constexpr embot::core::relTime de = 100;
+            volatile uint32_t index {0};
+            snprintf(str, sizeof(str), "size: %d", size);
+            embot::core::print(str);
+            for(uint32_t i=0; i<size; i++)
+            {
+                snprintf(str, sizeof(str), "%d, %d, %d, %d, %d, %d, %d", i, samples[i].delta, samples[i].sclvalue, samples[i].sdavalue, samples[i].sdainput, samples[i].delaycalled, samples[i].sdasampled);
+                embot::core::print(str);
+                index ++;
+                if(0 == (index%25))
+                {
+                    index = index;
+                    embot::core::wait(de);
+                }
+            }
+            
+            embot::core::wait(de);
+
+        }                
+        
+    };
+    
+#endif
+    
 
     // the struct 2Cdriver1 implements a GPIO-based driver as explained by
     // AN12841: GPIO Simulated I2C for S08, Rev. 0 — May 2020
@@ -711,6 +891,13 @@ namespace embot { namespace hw { namespace i2ce {
     
     struct I2Cdriver1 : public I2Cdriver
     {
+        static constexpr bool simulateACKfromslave {false};
+
+#if defined(ENABLE_i2clogger)       
+        static constexpr bool enablelogger {true}; // or a macro ...
+        I2Clogger *i2clogger {nullptr};         
+#endif
+        
         enum class Value { L = 0, H = 1 };
         enum class Mode { OUT = 0, INP = 1 };
         
@@ -728,7 +915,14 @@ namespace embot { namespace hw { namespace i2ce {
             embot::hw::gpio::set(scl, embot::hw::gpio::State::SET);
             
             embot::hw::gpio::init(sda, outcfg);
-            embot::hw::gpio::set(sda, embot::hw::gpio::State::SET);              
+            embot::hw::gpio::set(sda, embot::hw::gpio::State::SET);    
+
+#if defined(ENABLE_i2clogger)            
+            if(true == enablelogger)
+            {
+                i2clogger = new I2Clogger;
+            }
+#endif            
         }
         
         void deinit() override
@@ -736,7 +930,14 @@ namespace embot { namespace hw { namespace i2ce {
             embot::hw::gpio::deinit(scl);
             embot::hw::gpio::deinit(sda);
             scl = {};
-            sda = {};           
+            sda = {};  
+
+#if defined(ENABLE_i2clogger) 
+            if(true == enablelogger)
+            {
+                delete i2clogger;
+            }
+#endif             
         }
          
         bool ping(const ADR adr, const embot::core::relTime timeout = embot::core::reltimeWaitForever) override 
@@ -752,9 +953,18 @@ namespace embot { namespace hw { namespace i2ce {
             
             return r;                    
         }
-        
+             
+
+            
         bool read(const ADR adr, embot::core::Data &destination, const embot::core::relTime timeout = embot::core::reltimeWaitForever) override
         {
+#if defined(ENABLE_i2clogger) 
+            if(enablelogger)
+            {
+                i2clogger->start(scl, sda);
+            }
+#endif
+            
             bool r {false};
             
             uint8_t radr = adr | 1;
@@ -766,8 +976,8 @@ namespace embot { namespace hw { namespace i2ce {
             // so, i have tried keep it INP. I do that by calling r = I2Cwrite(radr, true) .... but that is still to be tested 
             // some more because it does not solve.
             
-            //r = I2Cwrite(radr, true);  
-            r = I2Cwrite(radr);
+            //r = I2Cwrite(radr, false);  
+            r = I2Cwrite(radr, true);
             
             if(false == r)
             {
@@ -797,7 +1007,14 @@ namespace embot { namespace hw { namespace i2ce {
                 }
                 
                 delay();        
-            }            
+            }  
+
+#if defined(ENABLE_i2clogger) 
+            if(enablelogger)
+            {
+                i2clogger->report();
+            }
+#endif
             
             return r;             
         }
@@ -849,21 +1066,46 @@ namespace embot { namespace hw { namespace i2ce {
         
         void delay()
         {
+#if defined(ENABLE_i2clogger) 
+            if(enablelogger)
+            {
+                i2clogger->delay();
+            }
+#endif          
             embot::hw::sys::delay(us);
         }
         
         void SCL(Value v) 
-        {
+        {            
+#if defined(ENABLE_i2clogger) 
+            if(enablelogger)
+            {
+                i2clogger->scl(embot::core::tointegral(v));
+            }
+#endif
             embot::hw::gpio::set(scl, static_cast<embot::hw::gpio::State>(v));         
         }
         
         void SDA(Value v) 
         {
+#if defined(ENABLE_i2clogger) 
+            if(enablelogger)
+            {
+                i2clogger->sda(embot::core::tointegral(v));
+            }
+#endif                     
             embot::hw::gpio::set(sda, static_cast<embot::hw::gpio::State>(v));
         }
         
         void SDA(Mode m) 
         {
+#if defined(ENABLE_i2clogger) 
+            if(enablelogger)
+            {
+                i2clogger->sdainput((Mode::INP == m) ? true : false);
+            }
+#endif
+            
             embot::hw::gpio::deinit(sda);
             embot::hw::gpio::init(sda, (Mode::INP == m) ? inpcfg : outcfg);
             
@@ -879,8 +1121,19 @@ namespace embot { namespace hw { namespace i2ce {
         
         Value SDA() 
         {
-            return static_cast<Value>(embot::hw::gpio::get(sda));
+            embot::hw::gpio::State s = embot::hw::gpio::get(sda);
+            
+#if defined(ENABLE_i2clogger) 
+            if(enablelogger)
+            {
+                i2clogger->sample();
+                i2clogger->sda(embot::core::tointegral(s));
+            }       
+#endif
+            
+            return static_cast<Value>(s);
         }
+        
         
         void I2Cstart() 
         {
@@ -1033,9 +1286,12 @@ namespace embot { namespace hw { namespace i2ce {
             /* check ACK signal, ACK signal is 0, NACK signal is 1 */
             if(false == I2Cacked(reading))
             {
-                /* receive NACK signal,stop data transfer */
-                I2Cstop();
-                r = false;
+                if(!simulateACKfromslave)
+                {
+                    /* receive NACK signal,stop data transfer */
+                    I2Cstop();
+                    r = false;
+                }
             }
             return r;
             
@@ -1087,8 +1343,9 @@ namespace embot { namespace hw { namespace i2ce {
             //i2c_sda_output_off(sda1);
             //i2c_sda_input(sda1);
             SDA(Mode::INP);
-            //i2c_scl_delay(); // messo io
-            delay(); // messo io
+//            #warning rimuovere il delay qui di seguito
+            //i2c_scl_delay(); // messo io: 
+//            delay(); // messo io
              /* write 8 bits data */
             for(uint8_t i=0;i<8;i++)
             {
@@ -1123,6 +1380,12 @@ namespace embot { namespace hw { namespace i2ce {
                 // i2c_scl_delay();
                 delay();
             }
+            
+#define CORRECT
+
+#if !defined(CORRECT)            
+            
+            #warning: io qui farei prima scl low, poi (delay??) e poi sda out ed uguale a low
             /* disable PTB6(SDA) input, enable PTB6(SDA) output */
             //i2c_sda_input_off(sda1);
             //i2c_sda_output(sda1);
@@ -1132,7 +1395,12 @@ namespace embot { namespace hw { namespace i2ce {
 
             //i2c_scl_low(); // set SCL to low
             SCL(Value::L);
-
+#else
+            SCL(Value::L); 
+           
+            SDA(Mode::OUT);
+            
+#endif            
             *val = data;
          
             return r;
@@ -1157,7 +1425,8 @@ namespace embot { namespace hw { namespace i2ce {
             //i2c_scl_low();
             SCL(Value::L);
             //i2c_sda_high(sda1);    
-            SDA(Value::H);
+            #warning ... io non metterei qui SDA ad H. lo metterei in input
+//            SDA(Value::H);
         }
 
         
@@ -1180,8 +1449,9 @@ namespace embot { namespace hw { namespace i2ce {
             //i2c_scl_low();
             SCL(Value::L);
             //i2c_sda_high(sda1);  
+            #warning verificare che qui sia corretto sda messo high ??
             SDA(Value::H);            
-        }        
+        }   
         
     };
     
