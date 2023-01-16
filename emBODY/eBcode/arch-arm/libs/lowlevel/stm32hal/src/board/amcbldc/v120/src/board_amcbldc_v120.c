@@ -106,7 +106,7 @@ extern void stm32hal_board_init(void)
   //MX_USB_PCD_Init();
 
 // extra: set led off  
-  HAL_GPIO_WritePin(GPIOB, nLED1_Pin|nLED3_Pin|nLED2_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOB, nLED1_Pin|nLED2_Pin, GPIO_PIN_SET);
 }
 
 
