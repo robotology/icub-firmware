@@ -749,7 +749,7 @@ namespace embot { namespace hw { namespace tlv493d {
 // - support map: end of embot::hw::tlv493d
 
 
-// - support map: begin of embot::hw::spi
+// - support map: begin of embot::hw::i2ce
 
 #include "embot_hw_i2ce.h"
 #include "embot_hw_i2ce_bsp.h"
@@ -892,9 +892,9 @@ extern "C"
     // TODO: add in here any irq handler we may beed
 }
 
-#endif // spi
+#endif // i2ce
 
-// - support map: end of embot::hw::spi
+// - support map: end of embot::hw::i2ce
 
 
 

@@ -26,11 +26,11 @@
 
 //#define TEST_CAN_ENABLED
 
-//#define TEST_TLV_EMULATED
+#define TEST_TLV_EMULATED
 
-#define TEST_I2C_EMULATED
+//#define TEST_I2C_EMULATED
 
-#define TEST_I2C_EMULATED_embot
+//#define TEST_I2C_EMULATED_embot
 
 #if defined(TEST_CAN_ENABLED)
 #include "embot_hw_can.h"
@@ -159,6 +159,8 @@ void testHWinit(embot::os::Thread *owner)
 
 #endif  	
 }
+
+#if defined(TEST_I2C_EMULATED)  
 
 uint8_t data2reset[1] = {0};
 void testI2Creset()
@@ -290,6 +292,9 @@ void testI2Cwrite()
 #endif    
 }
 
+#endif // #if defined(TEST_I2C_EMULATED)  
+
+
 void testHWtick()
 {
 #if defined(TEST_TLV_EMULATED)    
@@ -304,6 +309,7 @@ void testHWtick()
     testI2Cping();
     testI2Cdiscover();
     testI2Cread();
+    
     
 #else    
 
@@ -331,14 +337,26 @@ struct WaitCBK
         done = false; 
     }
     
-    void wait() 
-    { 
+    bool wait(embot::core::relTime timeout = embot::core::reltimeWaitForever) 
+    {
+        if(true == done)
+        {
+            return done;
+        }
+        
+        embot::core::Time timeofexit = embot::core::now() + timeout;
+        
         for(;;) 
         { 
             if(true == done) 
             {
-                return; 
+                return done; 
             } 
+            
+            if(embot::core::now() > timeofexit)
+            {
+                return done;
+            }
         }
     }
     
@@ -420,6 +438,8 @@ void can_send(uint32_t v)
 constexpr embot::hw::TLV493D tlv2test {embot::hw::TLV493D::one};
     
 embot::hw::tlv493d::Position position{0};
+
+volatile bool stophere {true};
    
 volatile bool error {false};
 
@@ -433,17 +453,27 @@ void tlv_init()
 
 WaitCBK wait4it {};
     
+volatile embot::core::Time acqstart {0};
+volatile embot::core::Time acquisitiontime {0};
+volatile float angle {0};
+volatile embot::hw::result_t res {embot::hw::resNOK};
+    
 void tlv_tick()
 {
+    position = 0;
     wait4it.start();
-    embot::hw::tlv493d::acquisition(tlv2test, wait4it.onTermination);
-    
-    wait4it.wait();
+    acqstart = embot::core::now();
+    res = embot::hw::tlv493d::acquisition(tlv2test, wait4it.onTermination);
+    wait4it.wait(5*embot::core::time1millisec);
+    acquisitiontime = embot::core::now() - acqstart;
     
     // and now read it
     embot::hw::tlv493d::read(tlv2test, position);
     
-    position = position;  
+    position = position;
+    angle = position / 100.0f;
+    
+    stophere = stophere;
     
 #if defined(TEST_CAN_ENABLED)    
     can_send(position);
