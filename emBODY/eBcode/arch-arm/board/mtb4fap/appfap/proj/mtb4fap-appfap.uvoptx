@@ -409,9 +409,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>160</LineNumber>
+          <LineNumber>894</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134378810</Address>
+          <Address>134381100</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -420,30 +420,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\..\..\..\embot\app\embot_app_application_theFAPreader2.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\mtb4fap\../../../../embot/app/embot_app_application_theFAPreader2.cpp\160</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>154</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\embot\app\embot_app_application_theFAPreader2.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\mtb4fap\../../../../embot/app/embot_app_application_theFAPreader2.cpp\894</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pImpl-&gt;sensors_mask_of_active</ItemText>
+          <ItemText>this-&gt;pImpl-&gt;sensors_mask_of_active</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
@@ -463,7 +447,12 @@
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>d,0x0A</ItemText>
+          <ItemText>SystemCoreClock,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>du,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -510,7 +499,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
