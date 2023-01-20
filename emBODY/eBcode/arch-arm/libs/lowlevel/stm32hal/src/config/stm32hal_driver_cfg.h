@@ -143,6 +143,11 @@ extern "C" {
         #include "../src/config/stm32hal_driver_cfg_of_amcbldc_v120.h"   
         // we also need some ll includes contained in the driver section
         #include "../src/driver/stm32g4-v120/inc/stm32g4xx_ll_gpio.h"        
+    #elif (STM32HAL_DRIVER_VERSION == 0x122)
+        #define USE_FULL_LL_DRIVER
+        #include "../src/config/stm32hal_driver_cfg_of_amcbldc_v122.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32g4-v122/inc/stm32g4xx_ll_gpio.h"
     #else
         #error unknown driver version
     #endif
