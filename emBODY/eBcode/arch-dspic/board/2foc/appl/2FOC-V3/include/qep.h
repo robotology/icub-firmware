@@ -5,14 +5,12 @@
 
 typedef struct
 {
-    int resolution;
+    int ticks;
     int offset;
     int elettr_deg_per_rev;
     int tolerance;
-    unsigned char numPoles;
+    char numPoles;
     BOOL full_calibration;
-    unsigned char IMV;
-    unsigned char QECK;
 } EncoderConfig_t;
 volatile extern EncoderConfig_t gEncoderConfig;
 
@@ -36,20 +34,16 @@ volatile extern tQEError gEncoderError;
 #define QE_ELETTR_DEG_PER_REV() (gEncoderConfig.elettr_deg_per_rev)
 
 extern volatile BOOL qe_ready;
-//extern volatile int32_t QE_RESOLUTION;
 #define QEready() qe_ready
 
 // MECAPION
 //#define QEgetRaw() (POSCNT<<5)
 //#define QEgetElettrDeg() ((int)(__builtin_muluu(POSCNT,360)>>11))
 
-extern void QEinit(int ticks,int motor_num_poles,char use_index);
-//extern unsigned int QEgetRaw();
-//extern int QEcountError();
+extern void QEinit(int ticks,int motor_num_poles,BOOL use_index);
 extern void QEcountErrorClear();
-extern int QEgetElettrDeg();
-extern int QEgetElettrDegUncal();
-extern int QEgetPos();
+extern  int QEgetElettrDeg();
+extern  int QEgetPosition();
 extern void QEHESCrossed(int up);
-
+//extern int32_t QEgetPosCheck();
 #endif

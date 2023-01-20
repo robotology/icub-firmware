@@ -48,7 +48,7 @@ typedef union
         
         unsigned has_speed_qe:1;
         unsigned verbose:1;
-        unsigned unused:1;
+        unsigned swapBC:1;
         unsigned configured:1;
     };
 

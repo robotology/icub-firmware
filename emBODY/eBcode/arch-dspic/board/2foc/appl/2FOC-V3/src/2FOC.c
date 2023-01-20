@@ -152,13 +152,9 @@ volatile tParkParm ParkParm;
 
 /////////////////////////////////////////////////
 
-//volatile int gulp_sector = 0;
-//volatile int gulp_delta = 0;
-
 volatile tMotorConfig MotorConfig;
 
 volatile static char bDriveEnabled = 0;
-//volatile static char sAlignInProgress = 0;
 volatile int gTemperature = 0;
 volatile unsigned int i2cERRORS = 0;
 
@@ -251,7 +247,6 @@ void ZeroControlReferences()
     iQerror_old = 0;
     iDerror_old = 0;
     limit = 0;
-    // TODO: zero position and sensored torque references
 }
 
 void RequestControlMode(char cm)
@@ -278,7 +273,7 @@ BOOL updateOdometry()
         static int speed_undersampler = 0;
 
         static int position_old = 0;
-        int position = QEgetPos();
+        int position = QEgetPosition();
         int delta = position - position_old;
 
         position_old = position;
@@ -298,7 +293,7 @@ BOOL updateOdometry()
 
             static long QEPosition_old = 0;
 
-            gQEVelocity = (1 + gQEVelocity + gQEPosition - QEPosition_old) / 2;
+            gQEVelocity = (gQEVelocity + gQEPosition - QEPosition_old) / 2;
 
             QEPosition_old = gQEPosition;
 
@@ -322,85 +317,6 @@ volatile int dataA = 0;
 volatile int dataB = 0;
 volatile int dataC = 0;
 volatile int dataD = 0;
-    
-volatile BOOL newencdata = FALSE;
-
-int alignRotorHES(volatile int* IqRef)
-{
-    if (!sAlignInProgress) return 0;
-
-    static int encoder_fake = 0;
-    
-    static int IqRef_fake = 0;
-    
-    static BOOL moved = FALSE;
-    
-    if (abs((int)POSCNT) > 32) moved = TRUE;
-    
-    const int ENCODER_1_5_REV = (3*QE_ELETTR_DEG_PER_REV())/2;
-    
-    if (sAlignInProgress < 3)
-    {       
-        if (QEready())
-        {
-            if (!moved)
-            {
-                // phase is broken
-                *IqRef = IqRef_fake = 0;
-                QE_RISE_ERROR(phase_broken);
-                sAlignInProgress = 0;
-            }
-            
-            sAlignInProgress = 0;
-            gEncoderError.uncalibrated = 0;
-            QEcountErrorClear();
-        }
-    }
-    
-    if (sAlignInProgress == 1)
-    {
-        static int timer = 0;
-        
-        if (IqRef_fake < Inom/2)
-        {
-            ++IqRef_fake;
-        }
-        else if (encoder_fake < ENCODER_1_5_REV)
-        {
-            if (++timer > 200) { timer = 0; ++encoder_fake; }
-        }
-        else
-        {
-            sAlignInProgress = 2;
-        }
-    }
-    
-    if (sAlignInProgress == 2)
-    {
-        static int timer = 0;
-        
-        if (encoder_fake > -ENCODER_1_5_REV)
-        {
-            if (++timer > 200) { timer = 0; --encoder_fake; }
-        }
-        else
-        {
-            // Index is broken
-            *IqRef = IqRef_fake = 0;
-            QE_RISE_ERROR(index_broken);
-            sAlignInProgress = 0;
-        }
-    }
-    
-    *IqRef = IqRef_fake;
-    
-    int encoder = encoder_fake;
-    
-    while (encoder >= 360) encoder -= 360;
-    while (encoder <    0) encoder += 360;
-    
-    return encoder;
-}
 
 int alignRotorIndex(volatile int* IqRef)
 {
@@ -505,7 +421,7 @@ int alignRotorIndex(volatile int* IqRef)
         
         if (++timer > 60000UL)
         {
-            rotorA = QEgetElettrDegUncal();// __builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
+            rotorA = QEgetElettrDeg();
             timer = 0;
             sAlignInProgress = 5;
         }
@@ -517,9 +433,7 @@ int alignRotorIndex(volatile int* IqRef)
         
         if (++timer > 120000UL)
         {
-            newencdata = TRUE;
-            
-            rotorB = QEgetElettrDegUncal();//__builtin_divsd(__builtin_mulss((int)POSCNT, gEncoderConfig.elettr_deg_per_rev),QE_RESOLUTION);
+            rotorB = QEgetElettrDeg();
             
             int delta = rotorB - rotorA;
             
@@ -537,11 +451,6 @@ int alignRotorIndex(volatile int* IqRef)
                 
                 while (gEncoderConfig.offset >= 360) gEncoderConfig.offset -= 360;
                 while (gEncoderConfig.offset <    0) gEncoderConfig.offset += 360;
-                
-                dataA = gEncoderConfig.offset;
-                dataB = encoder_fake_0;
-                dataC = rotorA;
-                dataD = rotorB;
                 
                 IqRef_fake = 0;
                 sAlignInProgress = 0;
@@ -581,8 +490,8 @@ int alignRotorIndex(volatile int* IqRef)
 
 // DMA0 IRQ Service Routine used for FOC loop
 
-volatile int angle_feedback = 0;
-volatile int sectr_feedback = 0;
+//volatile int angle_feedback = 0;
+//volatile int sectr_feedback = 0;
 
 volatile short Ia = 0, Ib = 0, Ic = 0;
 volatile short Va = 0, Vb = 0, Vc = 0;
@@ -642,7 +551,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                 
         int hall_sector = DHESSector();
         
-        sectr_feedback = hall_sector;
+        //sectr_feedback = hall_sector;
         
         if (hall_sector != hall_sector_old)
         {
@@ -663,21 +572,26 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     
     if (MotorConfig.has_qe)
     {
-        // overwrite encoders during alignment
         if (sAlignInProgress)
         {
-            if (MotorConfig.has_hall)
-            {
-                enc = alignRotorHES(&IqRef);
-            }
-            else if (MotorConfig.has_index)
+            if (MotorConfig.has_index)
             {
                 enc = alignRotorIndex(&IqRef);
             }
+            else if (MotorConfig.has_hall)
+            {
+                enc = 60*(DHESSector()-1);
+                
+                if (QEready()) sAlignInProgress = FALSE;
+            }
+            else
+            {
+                // CONFIGURATION ERROR
+            }
         }
         else
-        {            
-            enc = QEgetElettrDeg();
+        {
+            enc = QEgetElettrDeg(); 
         }
     }
     else if (MotorConfig.has_hall)
@@ -703,7 +617,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     // enc is in [0 - 360) range here
 
-    angle_feedback = enc;
+    //angle_feedback = enc;
     
     char sector = 1 + enc/60;
 
@@ -752,19 +666,13 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     {
         // gain = (64/49.03) * (2/3) * (2/sqrt3) = 1.0048 OK!
         
-        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)-__builtin_mulss( *i0*3 ,sinT)+16384L)>>15);
+        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)-__builtin_mulss( *i0 ,3*sinT)+16384L)>>15);
         I2Tdata.IDMeasured = /* 3/2 */     -(int)((__builtin_mulss(  *i0  ,cosT)+__builtin_mulss(*iH-*iL,sinT)+16384L)>>15);
-        
-        //I2Tdata.IQMeasured = /* sqrt3/2 */  (int)(__builtin_mulss((*iH-*iL),cosT)>>15)-3*(int)(__builtin_mulss(   *i0   ,sinT)>>15);
-        //I2Tdata.IDMeasured = /* 3/2 */     -(int)(__builtin_mulss(   *i0   ,cosT)>>15)-  (int)(__builtin_mulss((*iH-*iL),sinT)>>15);
     }
     else
     {
-        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)+__builtin_mulss( *i0*3 ,sinT)+16384L)>>15);
+        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)+__builtin_mulss( *i0 ,3*sinT)+16384L)>>15);
         I2Tdata.IDMeasured = /* 3/2 */      (int)((__builtin_mulss(  *i0  ,cosT)-__builtin_mulss(*iH-*iL,sinT)+16384L)>>15);
-        
-        //I2Tdata.IQMeasured = /* sqrt3/2 */  (int)(__builtin_mulss((*iH-*iL),cosT)>>15)+3*(int)(__builtin_mulss(   *i0   ,sinT)>>15);
-        //I2Tdata.IDMeasured = /* 3/2 */      (int)(__builtin_mulss(   *i0   ,cosT)>>15)-  (int)(__builtin_mulss((*iH-*iL),sinT)>>15);
     }
     
     if (!sAlignInProgress)
@@ -851,7 +759,6 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     if (gControlMode == icubCanProto_controlmode_current || gControlMode == icubCanProto_controlmode_speed_current || sAlignInProgress)
     {
         int iQerror = IqRef-I2Tdata.IQMeasured;
-        //int iQerror = IqRef-IqFbk;
 
         VqA += __builtin_mulss(iQerror-iQerror_old,IKp) + __builtin_mulss(iQerror+iQerror_old,IKi);
 
@@ -1251,37 +1158,6 @@ int main(void)
 
         break; // board is configured
     }
-
-    if (MotorConfig.has_qe || MotorConfig.has_speed_qe)
-    {
-        QEinit(gEncoderConfig.resolution,
-               gEncoderConfig.numPoles,
-               MotorConfig.has_index);
-    }
-    else
-    {
-        IFS3bits.QEI1IF = 0;
-        IEC3bits.QEI1IE = 0;
-    }
-
-    if (MotorConfig.has_qe)
-    {
-        sAlignInProgress = 1;
-        gEncoderError.uncalibrated = 1;
-    }
-    else
-    {
-        sAlignInProgress = 0;
-        gEncoderError.uncalibrated = 0;
-    }
-    
-    if (MotorConfig.has_hall)
-    {
-        MotorConfig.has_tsens = FALSE;
-        DHESInit(65536UL/(6*gEncoderConfig.numPoles));
-    }
-        
-    if (MotorConfig.has_tsens) SetupPorts_I2C();
     
     setSPid(SKp, SKi, SKs);
 
@@ -1411,114 +1287,14 @@ int main(void)
     asm("NOP");
 }
 
-#ifdef CALIBRATION
-    else
-    {
-        static unsigned long cycle = 0;
-
-        ++cycle;
-
-        if (cycle < 20000)
-        {
-            enc = 2400;
-            if (IqCalib<UDEF_CURRENT_MAX/2) ++IqCalib;
-        }
-        else if (cycle < 100000)
-        {
-            enc = 2400;
-            if (IqCalib>0) --IqCalib;
-        }
-        else if (cycle < 120000)
-        {
-            enc = 0;
-            if (IqCalib<UDEF_CURRENT_MAX/2) ++IqCalib;
-        }
-        else if (cycle < 200000)
-        {
-            enc = 0;
-            if (IqCalib>0) --IqCalib;
-        }
-        else if (cycle < 220000)
-        {
-            enc = 1200;
-            if (IqCalib<UDEF_CURRENT_MAX/2) ++IqCalib;
-        }
-        else if (cycle < 300000)
-        {
-            enc = 1200;
-            if (IqCalib>0) --IqCalib;
-        }
-        else if (cycle < 320000)
-        {
-            enc = 0;
-            if (IqCalib<UDEF_CURRENT_MAX/2) ++IqCalib;
-        }
-        else if (cycle < 400000)
-        {
-            enc = 0;
-            if (IqCalib>0) --IqCalib;
-        }
-        else cycle = 0;
-
-    }
-#endif
-
 /*
-void DriveSelfTest()
-// Perform drive HW selftest
-{
-
-    // Check silicon revion
-    //SiliconRevionTest();
-
-    // Selftest EMUROM
-    //EepromTest();
-
-    // Selftest EMUROM
-    //EncoderSelfTest();
-
-    // Test ADC offset
-    //ADCDoOffsetTest();
-
-    // TODO: vedere se possibile verificare l'oscillatore e la verifica di porte di IO
-}
-*/
-
-
-//void updateGulp(void)
-//{
-    //if (!gulp_update_request) return;
-
-    //Gulp.W[0] = POSCNT;//gulp_mec;
-    //Gulp.W[1] = gulp_enc;//gQEVelocity; //gQEVelocity;//gTemperature; //encoder_error;
-    //Gulp.W[2] = gulp_sector;//gTemperature;//overf_cnt; // gQEPosition & 0xFFFF;
-    //Gulp.W[3] = I2Tdata.IQMeasured;//i2cERRORS;    // gQEPosition>>16;
-
-    //Gulp.W[0] = I2Tdata.IQMeasured;
-    //Gulp.W[1] = gQEVelocity;
-    //Gulp.W[2] = gQEPosition & 0xFFFF;
-    //Gulp.W[3] = gQEPosition >> 16;
-
-    //Gulp.W[0] = *gulpadr1;
-    //Gulp.W[1] = *gulpadr2;
-    //Gulp.W[2] = *gulpadr3;
-    //Gulp.W[3] = *gulpadr4;
-
-    // unlock the main loop, so it will read values just updated
-    //gulp_update_request = 0;
-
-    // read VDC link raw value;
-    //VDCLink = ADCGetVDCLink();
-//}
-
-    /*
 void SiliconRevionTest()
 // checks for proper silicon revision
 {
     unsigned int devrev;
 
     // read silicon chip revision
-    _memcpy_p2d16(&devrev, 0xff0002, sizeof (devrev));
+    memcpy_p2d16(&devrev, 0xff0002, sizeof (devrev));
 
     if (devrev != 0x3003)
     {
@@ -1530,23 +1306,3 @@ void SiliconRevionTest()
 }
 */
 
-/*
-void EncoderSelfTest()
-// encoder selftest (when possible)
-{
-    // TODO: giustappunto.
-
-}
-*/
-
-/*
-void ADCDoOffsetTest()
-// ADC Offset test
-{
-    // TODO: giustappunto.
-    // A questo punto la calibrazioni e stata fatta
-    // Se e' fallita e noi qui resettiamo il flag allora
-    // non sapremo mai se e' fallita!!
-    // SysError.ADCCalFailure = 0;
-}
-*/

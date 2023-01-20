@@ -51,8 +51,6 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 extern volatile long VqRef;
 extern volatile int  IqRef;
 
-extern volatile BOOL newencdata;
-
 extern volatile int dataA;
 extern volatile int dataB;
 extern volatile int dataC;
@@ -62,8 +60,8 @@ extern volatile tMotorConfig MotorConfig;
 
 //volatile unsigned char HALL = 0xFF;
 
-extern volatile int angle_feedback;
-extern volatile int sectr_feedback;
+//extern volatile int angle_feedback;
+//extern volatile int sectr_feedback;
 extern volatile short Ia,Ib,Ic;
 extern volatile short Va,Vb,Vc;
 
@@ -76,12 +74,14 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
     static tCanData payload; // = {{0}};
     unsigned long msgid;
-
+    
     payload.w[0] = IqFbk;
     payload.w[1] = gQEVelocity;
-    payload.w[2] = gQEPosition & 0xFFFF;
-    payload.w[3] = gQEPosition >> 16;
-
+    //payload.w[2] = gQEPosition & 0xFFFF;
+    //payload.w[3] = gQEPosition >> 16;
+    payload.dw[1] = gQEPosition;
+    //payload.dw[1] = QEgetPosCheck(); 
+    
     //payload.w[0] = I2Tdata.IQMeasured;
     //payload.w[1] = Ia;
     //payload.w[2] = Ib;
@@ -106,21 +106,37 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 
     ECANSend(msgid, 8, &payload);
 
-    if (MotorConfig.verbose)
+    
+    if (gEncoderConfig.full_calibration)
     {
-        if (newencdata)
+        extern volatile int32_t ovfCNT;
+        
+        static int noflood = 0;
+        
+        if (++noflood > 2000)
         {
-            payload.w[0] = dataA;
-            payload.w[1] = dataB;
-            payload.w[2] = dataC;
-            payload.w[3] = dataD;
-        
-            newencdata = FALSE;
-        
+            noflood = 0;
+            
+            payload.w[0] = gEncoderConfig.offset;
+            payload.w[1] = POSCNT;
+            
+            payload.dw[1] = ovfCNT;
+            
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
             ECANSend(msgid, 8, &payload);
         }
+    }
+    else if (MotorConfig.verbose)
+    {
+        payload.w[0] = dataA;
+        payload.w[1] = dataB;
+        payload.w[2] = dataC;
+        payload.w[3] = dataD;
+        
+        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+
+        ECANSend(msgid, 8, &payload);
     }
 }
 

@@ -30,6 +30,7 @@
 #include "2FOC.h"
 #include "ecan.h"
 #include "qep.h"
+#include "DHES.h"
 
 typedef struct      // size is 4+60+4+4 = 72
 {
@@ -199,33 +200,66 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         if (!gCanProtocolCompatible) return 0;
 
         MotorConfig.bitmask = rxpayload->b[1];
+        MotorConfig.swapBC = FALSE; // until not managed by protocol 
         MotorConfig.configured = TRUE;
-        
-        gEncoderConfig.resolution = rxpayload->w[1];
-        gEncoderConfig.tolerance  = (rxlen == 8) ? rxpayload->b[7] : 36;
+          
+        gEncoderConfig.ticks      = rxpayload->w[1];
+        gEncoderConfig.offset     = rxpayload->w[2];
         gEncoderConfig.numPoles   = rxpayload->b[6]/2;
+        gEncoderConfig.tolerance  = (rxlen == 8) ? rxpayload->b[7] : 36; // tolerance resolution 0.1 deg, 36 = 1%
+        
         gEncoderConfig.full_calibration = FALSE;
-
+        
+        if (gEncoderConfig.numPoles < 0)
+        {
+            gEncoderConfig.numPoles = -gEncoderConfig.numPoles;
+            MotorConfig.swapBC = TRUE;
+        }
+                
+        extern volatile char sAlignInProgress;
+        
+        sAlignInProgress = 0;
+        gEncoderError.uncalibrated = 0;
+        
         if (MotorConfig.has_hall)
         {
-            gEncoderConfig.offset = 330;
+            gEncoderConfig.offset = 330; // until not included in configuration file
             MotorConfig.has_index = FALSE;
+            MotorConfig.has_tsens = FALSE;
+            DHESInit(65536UL/(6*gEncoderConfig.numPoles));
         }
-        else if (MotorConfig.has_qe)
+        
+        if (MotorConfig.has_qe)
         {
             MotorConfig.has_speed_qe = FALSE;
             
-            gEncoderConfig.offset = rxpayload->w[2];//116
-            gEncoderConfig.IMV  = 2;//rxpayload->b[4];
-            gEncoderConfig.QECK = 3;//rxpayload->b[5];
+            sAlignInProgress = 1;
             
-            if (MotorConfig.has_index && gEncoderConfig.offset == -1)
+            if (MotorConfig.has_index)
             {
-                gEncoderConfig.full_calibration = TRUE;
-                gEncoderConfig.offset = 0;
-                MotorConfig.verbose = TRUE;
+                gEncoderError.uncalibrated = 1;
+            
+                if (gEncoderConfig.offset == -1)
+                {
+                    gEncoderConfig.full_calibration = TRUE;
+                    gEncoderConfig.offset = 0;
+                }
             }
         }
+        
+        /////////////////////////////////////////////////////////////
+        if (MotorConfig.has_qe || MotorConfig.has_speed_qe)
+        {
+            QEinit(gEncoderConfig.ticks,gEncoderConfig.numPoles,MotorConfig.has_index);
+        }
+        else
+        {
+            IFS3bits.QEI1IF = 0;
+            IEC3bits.QEI1IE = 0;
+        }
+
+        if (MotorConfig.has_tsens) SetupPorts_I2C();
+        /////////////////////////////////////////////////////////////
         
         return 1;
     }
