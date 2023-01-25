@@ -842,6 +842,22 @@ extern eOresult_t eo_pos_Config(EOthePOS *p, eOas_pos_config_t* config)
     return(eores_OK);     
 }
 
+static eObool_t eo_pos_CANframeIsExpected(EOthePOS *p, eOcanframe_t *frame, eOcanport_t port)
+{
+    eObool_t r = eobool_true;
+    
+    // in here we accept only messages of class = periodicAS and typ = PER_AS_MSG__POS
+    // but we dont chack vs that because eo_pos_AcceptCANframe() is called only inside eocanprotASperiodic_parser_PER_AS_MSG__POS()
+    // so the check would be redundant
+    
+    // we check however that the message comes from a board specified inside the service configuration. 
+    // we use not_heardof_target      
+    
+    r = eo_common_hlfword_bitcheck(p->not_heardof_target[port], EOCANPROT_FRAME_GET_SOURCE(frame));
+    
+    return r;    
+}
+
 extern eOresult_t eo_pos_AcceptCANframe(EOthePOS *p, eOcanframe_t *frame, eOcanport_t port)
 {
     if(NULL == p)
@@ -865,6 +881,13 @@ extern eOresult_t eo_pos_AcceptCANframe(EOthePOS *p, eOcanframe_t *frame, eOcanp
         return(eores_OK);
     }  
     
+    // i verify that the can frame is expected
+    if(eobool_false == eo_pos_CANframeIsExpected(p, frame, port))
+    {
+        return(eores_OK);
+    }
+    
+    // now i know that we have a frame of type PER_AS_MSG__POS coming from a registered can board
     
     // i get the content of the frame and i fill the status of the pos
    
