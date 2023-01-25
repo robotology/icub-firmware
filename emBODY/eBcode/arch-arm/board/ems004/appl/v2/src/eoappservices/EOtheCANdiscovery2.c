@@ -368,6 +368,19 @@ extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eObrd_
         return(eores_NOK_nullpointer);
     }
     
+    // we need to be sure that we are expecting this message
+    if(eobool_false == s_eo_thecandiscovery2.searchstatus.searching)
+    {   // if we are not searching, clearly we are not expecting
+        return eores_OK;
+    }
+    
+    if(eobool_false == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.canmapofoverlappedtargets[loc.port], loc.addr))
+    {   // the board which sent the reply is not amongst those we are searching
+        return eores_OK;
+    }
+    
+    // ok: a board we are searching has replied
+    
     // use the information inside loc to mark that a can board has replied. 
     eo_common_hlfword_bitset(&s_eo_thecandiscovery2.detection.replies[loc.port], loc.addr);
     // put inside detected what the board has told
