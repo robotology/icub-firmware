@@ -157,11 +157,16 @@ extern "C" {
 
 #elif   defined(STM32HAL_BOARD_AMC)
 
-    // one drive only: v1A0.
-    #if !defined(STM32HAL_DRIVER_V1A0)
-        #define STM32HAL_DRIVER_V1A0
-    #endif        
-    #define STM32HAL_DRIVER_VERSION 0x1A0   
+    // two possible drivers: v1A0 and v1B1. default is the 1B1 ...
+    #if defined(STM32HAL_DRIVER_V1A0)    
+        #define STM32HAL_DRIVER_VERSION 0x1A0  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V1B1)
+            #define STM32HAL_DRIVER_V1B1
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x1B1   
+    #endif
+ 
 
 #elif   defined(STM32HAL_BOARD_AMC2C)
 
@@ -258,10 +263,12 @@ extern "C" {
     #if     defined(STM32HAL_DRIVER_V180)    
         #include "../src/driver/stm32h7-v180/inc/stm32h7xx_hal.h"       
     #elif   defined(STM32HAL_DRIVER_V190)    
-        #include "../src/driver/stm32h7-v190/inc/stm32h7xx_hal.h"        
+        #include "../src/driver/stm32h7-v190/inc/stm32h7xx_hal.hx"        
     #elif   defined(STM32HAL_DRIVER_V1A0)    
         #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_hal.h"       
-    #else  		
+    #elif   defined(STM32HAL_DRIVER_V1B1)    
+        #include "../src/driver/stm32h7-v1B1/inc/stm32h7xx_hal.h"       
+    #else  	    
         #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
     #endif
 
