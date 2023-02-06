@@ -251,4 +251,3 @@ static const uint8_t Default_ResTbl[RESMGR_ENTRY_NBR] = {
   */
 #endif /* RES_MGR_CONF_H__ */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

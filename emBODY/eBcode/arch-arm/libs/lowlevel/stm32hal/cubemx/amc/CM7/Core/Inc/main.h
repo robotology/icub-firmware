@@ -137,6 +137,7 @@ void Error_Handler(void);
 #define EE_nWP_GPIO_Port GPIOF
 #define ETH_SCLK_Pin GPIO_PIN_6
 #define ETH_SCLK_GPIO_Port GPIOH
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -146,5 +147,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

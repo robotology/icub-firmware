@@ -219,6 +219,7 @@ void Error_Handler(void);
 #define I2C4_SCL_GPIO_Port GPIOF
 #define MOT_PWM1_Pin GPIO_PIN_9
 #define MOT_PWM1_GPIO_Port GPIOE
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -228,5 +229,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
