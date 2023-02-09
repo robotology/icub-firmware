@@ -87,6 +87,8 @@ static void s_initialiser(void)
 #include "embot_hw.h"
 #include "embot_hw_eeprom.h"
 #include "embot_hw_led.h"
+#include "embot_hw_flash.h"
+
 
 #include "ipal.h"
 
@@ -261,14 +263,30 @@ static void s_eom_eupdater_main_init(void)
 
 #if !defined(_MAINTAINER_APPL_)    
     eo_armenv_Initialise((const eEmoduleInfo_t*)&eupdater_modinfo_extended, NULL);
-    const eEmoduleExtendedInfo_t * eapp_modinfo_extended = (const eEmoduleExtendedInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
 
+    // the info about application00 are saved in ROM
+    const eEmoduleExtendedInfo_t * eapp_modinfo_extended = (const eEmoduleExtendedInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+    
+    // the info about application01 are saved in a flash sector of bank2
+    const embot::hw::flash::Partition& app01 { embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eapplication01) };
+    const eEmoduleExtendedInfo_t * eappcm4_modinfo_extended = (const eEmoduleExtendedInfo_t*)(app01.address + EENV_MODULEINFO_OFFSET);
+
+    // read application00 (core cm7 bank0)
     if((eapp_modinfo_extended->moduleinfo.info.entity.type == ee_procApplication) &&
-        (eapp_modinfo_extended->moduleinfo.info.rom.addr == EENV_MEMMAP_EAPPLICATION_ROMADDR)
+       (eapp_modinfo_extended->moduleinfo.info.rom.addr == EENV_MEMMAP_EAPPLICATION_ROMADDR)
       )
     {
         ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)eapp_modinfo_extended);
     }
+
+    // read application01 (core cm4 bank1)
+    if((eappcm4_modinfo_extended->moduleinfo.info.entity.type == ee_procApplication) &&
+       (eappcm4_modinfo_extended->moduleinfo.info.rom.addr == app01.address)               
+      )
+    {
+        ee_sharserv_part_proc_synchronise(ee_procOther01, (const eEmoduleInfo_t*)eappcm4_modinfo_extended);
+    }
+    
 #else
     eo_armenv_Initialise((const eEmoduleInfo_t*)&emaintainer_modinfo_extended, NULL);
 #endif    
