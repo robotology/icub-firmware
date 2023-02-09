@@ -376,11 +376,11 @@ typedef enum
     ee_procLoader               = 0,    /**< the eLoader: the one executed just after reset which loads any other eProcess */
     ee_procUpdater              = 1,    /**< the eUpdater: the one responsible for performing FW update */
     ee_procApplication          = 2,    /**< the eApplication: the standard application */
-    ee_procOther01              = 3,
-    ee_procOther02              = 4,
-    ee_procOther03              = 5,
-    ee_procOther04              = 6,
-    ee_procOther05              = 7
+    ee_procOther01              = 4,
+    ee_procOther02              = 5,
+    ee_procOther03              = 6,
+    ee_procOther04              = 7,
+    ee_procOther05              = 8
 } eEprocessvalues_t;
 
 enum { ee_procMaxNum = 8 };
