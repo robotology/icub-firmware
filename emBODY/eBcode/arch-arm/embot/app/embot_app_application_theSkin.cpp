@@ -60,13 +60,13 @@
 
 //#define TEST_CANPRINT
 
-static const std::uint8_t dotNumberOf = 12;
-static const std::uint8_t trgNumberOf = 16;
+constexpr std::uint8_t dotNumberOf = 12;
+constexpr std::uint8_t trgNumberOf = 16;
 
 struct TriangleCfg
 {
-    static const std::uint16_t  defaultCDCoffset = 0x2200;
-    static const std::uint8_t   defaultSHIFT = 2;
+    static constexpr std::uint16_t  defaultCDCoffset = 0x2200;
+    static constexpr std::uint8_t   defaultSHIFT = 2;
     std::uint8_t                shift;
     std::uint8_t                dummy;
     std::uint16_t               cdcoffset; 
@@ -114,20 +114,23 @@ const std::uint8_t Triangles::GAIN_V2[dotNumberOf] = {58 , 91, 39, 23, 35, 90, 0
 struct embot::app::application::theSkin::Impl
 { 
       
-    Config config;
+    Config config {};
            
-    bool ticking;
+    bool ticking { false};
     
-    bool forcecalibration;
+    bool forcecalibration {false};
     
-    embot::os::Timer *ticktimer;
-    embot::os::Action action;
+    embot::os::Timer *ticktimer {nullptr};
+    embot::os::Action action {};
     
-    embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info boardconfig;
+    embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info boardconfig {};
     
-    embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info triangleconfigcommand;
+    embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info triangleconfigcommand {};
     
-    Triangles triangles;
+    Triangles triangles {};
+    
+    bool hwisinitted {false};
+    bool deactivated {false};
 
 
     Impl() 
@@ -151,6 +154,10 @@ struct embot::app::application::theSkin::Impl
         triangles.connectedmask = 0xffff;        
     }
     
+    bool initialise(Config &cfg, bool deferredHWinit);
+    bool deactivate();
+    bool hwinit();
+    
     bool start();
     bool stop();
     
@@ -166,9 +173,56 @@ struct embot::app::application::theSkin::Impl
                   
 };
 
+bool embot::app::application::theSkin::Impl::initialise(Config &cfg, bool deferredHWinit)
+{
+    config = cfg;
+    
+    action.load(embot::os::EventToThread(config.tickevent, config.totask));    
+    
+    if(false == deferredHWinit)
+    {
+        hwinit();
+    }
+    
+    return true;
+}
+
+bool embot::app::application::theSkin::Impl::deactivate()
+{
+    if(false == hwisinitted)
+    {
+        deactivated = true;
+    }
+    else
+    {
+        // cannot deactivate because hw was already initted.
+    }
+    return true;
+}
+
+
+bool embot::app::application::theSkin::Impl::hwinit()
+{
+    if((true == deactivated) || (true == hwisinitted))
+    {
+        return true;
+    }
+    
+    triangles.activemask = 0xffff;
+    
+    ad7147_init(triangles.rawvalues, triangles.capoffsets);
+    
+    triangles.connectedmask = ad7147_gettrianglesconnectedmask();
+    
+    hwisinitted = true;
+    
+    return true;
+}
+
 
 bool embot::app::application::theSkin::Impl::configtriangles(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
-{    
+{ 
+   
     triangleconfigcommand = trgcfg;
     
     
@@ -493,90 +547,18 @@ embot::app::application::theSkin::theSkin()
 embot::app::application::theSkin::~theSkin() { }
    
         
-bool embot::app::application::theSkin::initialise(Config &config)
-{
-    pImpl->config = config;
-    
-    pImpl->action.load(embot::os::EventToThread(pImpl->config.tickevent, pImpl->config.totask));
-        
-    pImpl->triangles.activemask = 0xffff;
-    
-    ad7147_init(pImpl->triangles.rawvalues, pImpl->triangles.capoffsets);
-    
-    pImpl->triangles.connectedmask = ad7147_gettrianglesconnectedmask();
-    
-    
-    return true;
+bool embot::app::application::theSkin::initialise(Config &config, bool deferredHWinit)
+{    
+    return pImpl->initialise(config, deferredHWinit);
+}
+
+
+
+bool embot::app::application::theSkin::deactivate()
+{    
+    return pImpl->deactivate();
 }
   
-
-//bool embot::app::application::theSkin::configure(embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg)
-//{
-//    pImpl->boardconfig = brdcfg;
-//    
-//    // as in application of mtb3:
-//    // 1. disable all triangles.
-//    // 2. get the noload.
-//    // 3. get the txperiod
-//    // 4. get type of board ...
-//    // 5. dont stop tx if any ... ? boh. maybe better stop and restart with new value
-//    
-//    // ? should i?
-//    pImpl->triangles.activemask = 0;
-//            
-//    if(true == pImpl->ticking)
-//    {
-//        // stop and start with new period, as mtb3 does.
-//        stop();
-//        start();
-//    }
-//  
-//    return true;    
-//}
-
-
-
-//bool embot::app::application::theSkin::configure(embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
-//{ 
-//    return pImpl->configtriangles(trgcfg);
-//}
-
-//bool embot::app::application::theSkin::configure(embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup)
-//{    
-//    if(true == pImpl->ticking)
-//    {
-//        // stop
-//        stop();
-//    }
-//    
-//    pImpl->setdefault();
-//    
-//    pImpl->boardconfig.txperiod = tactsetup.txperiod;
-//    
-//    
-//    for(std::uint8_t i=0; i<trgNumberOf; i++)
-//    {                       
-//        // we process cdcoffset even if we have enabled == false ... as the old mtb3 application does
-
-//        if(pImpl->triangles.config[i].cdcoffset != tactsetup.cdcOffset)
-//        {
-//            pImpl->triangles.config[i].cdcoffset = tactsetup.cdcOffset;
-//            ad7147_set_cdcoffset(i, pImpl->triangles.config[i].cdcoffset); 
-//        }
-//    }
-//         
-//    pImpl->calibrate();    
-//    
-//    // config board w/ default values.
-//    // config all triangles w/ default values.
-//    // set calib with cdcfoffset
-//    // start tx at 40 ms.
-//    
-//    start();
-//    
-//    return true;    
-//}
-
 
 bool embot::app::application::theSkin::start()
 {    
@@ -596,8 +578,35 @@ bool embot::app::application::theSkin::tick(std::vector<embot::prot::can::Frame>
 
 
 // interface to CANagentSKIN
+
+bool embot::app::application::theSkin::isactive() const
+{
+    return !pImpl->deactivated;
+}
+
+const std::string& embot::app::application::theSkin::status() const
+{
+    static const std::string sta[] = 
+    {
+        "SKIN active", "SKIN deactivated by POS"
+    };
+    
+    return pImpl->deactivated ? sta[1] : sta[0];
+}
+
 bool embot::app::application::theSkin::set(const embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info)
 {
+    if((false == pImpl->deactivated) && (false == pImpl->hwisinitted))
+    {
+        // it is not deactivated and hw not initted yet, so: i enable hw
+        pImpl->hwinit();
+    }
+    else if(true == pImpl->deactivated)
+    {
+        // cannot do anything
+        return true;
+    }
+    
     pImpl->boardconfig = info;
     
     // as in application of mtb3:
@@ -623,12 +632,34 @@ bool embot::app::application::theSkin::set(const embot::prot::can::analog::polli
 
 bool embot::app::application::theSkin::set(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info)
 {
+    if((false == pImpl->deactivated) && (false == pImpl->hwisinitted))
+    {
+        // it is not deactivated and hw not initted yet, so: i enable hw
+        pImpl->hwinit();
+    }
+    else if(true == pImpl->deactivated)
+    {
+        // cannot do anything
+        return true;
+    }
+    
     return pImpl->configtriangles(info);
 }
 
   
 bool embot::app::application::theSkin::set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info)
 {
+    if((false == pImpl->deactivated) && (false == pImpl->hwisinitted))
+    {
+        // it is not deactivated and hw not initted yet, so: i enable hw
+        pImpl->hwinit();
+    }
+    else if(true == pImpl->deactivated)
+    {
+        // cannot do anything
+        return true;
+    }
+    
     if(true == info.transmit)
     {
         start();        
@@ -644,6 +675,17 @@ bool embot::app::application::theSkin::set(const embot::prot::can::analog::polli
  
 bool embot::app::application::theSkin::set(const embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info)
 {
+    if((false == pImpl->deactivated) && (false == pImpl->hwisinitted))
+    {
+        // it is not deactivated and hw not initted yet, so: i enable hw
+        pImpl->hwinit();
+    }
+    else if(true == pImpl->deactivated)
+    {
+        // cannot do anything
+        return true;
+    }
+    
     if(true == pImpl->ticking)
     {
         // stop

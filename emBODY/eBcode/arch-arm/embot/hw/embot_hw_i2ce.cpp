@@ -50,9 +50,10 @@ using namespace embot::hw;
 
 namespace embot { namespace hw { namespace i2ce {
 
-    bool supported(I2CE b)                                                                           { return false; }
-    bool initialised(I2CE b)                                                                         { return false; }
-    result_t init(I2CE b, const Config &config)                                                      { return resNOK; }
+    bool supported(I2CE b) { return false; }
+    bool initialised(I2CE b) { return false; }
+    result_t init(I2CE b, const Config &config) { return resNOK; }
+    result_t deinit(I2CE b) { return resNOK; }
           
     // blocking   
     bool isbusy(embot::hw::I2CE b, embot::core::relTime timeout, embot::core::relTime &remaining) { return false; }      
@@ -111,6 +112,8 @@ namespace embot { namespace hw { namespace i2ce {
     
     // this function gets the implementation of the I2C driver
     I2Cdriver * getI2Cdriver();
+    // and this gives it back
+    void releaseI2Cdriver(I2Cdriver *d);
         
     struct PrivateData
     {    
@@ -187,6 +190,38 @@ namespace embot { namespace hw { namespace i2ce {
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(b));
                 
         return resOK;
+    }
+    
+    result_t deinit(I2CE b)
+    {
+        if(false == supported(b))
+        {
+            return resNOK;
+        }
+        
+        if(false == initialised(b))
+        {
+            return resOK;
+        }        
+        
+        
+        std::uint8_t index = embot::core::tointegral(b);
+        //s_privatedata.config[index] = config;
+        
+        // get the driver and init it w/ scl and sda
+        //s_privatedata.driver[index] = getI2Cdriver();        
+        //s_privatedata.driver[index]->init(embot::hw::i2ce::bsp::getBSP().getPROP(b)->scl(), embot::hw::i2ce::bsp::getBSP().getPROP(b)->sda());
+        
+        s_privatedata.driver[index]->deinit();
+        releaseI2Cdriver(s_privatedata.driver[index]);
+        s_privatedata.driver[index] = nullptr;
+        s_privatedata.config[index] = {};
+        embot::hw::i2ce::bsp::getBSP().deinit(b);
+        
+
+        embot::core::binary::bit::clear(initialisedmask, embot::core::tointegral(b));
+                
+        return resOK;        
     }
  
     
@@ -1458,6 +1493,12 @@ namespace embot { namespace hw { namespace i2ce {
     I2Cdriver * getI2Cdriver()
     {
         return new I2Cdriver1;
+    }
+    
+    void releaseI2Cdriver(I2Cdriver *d)
+    {
+        I2Cdriver1 *p = reinterpret_cast<I2Cdriver1*>(d);       
+        delete p;
     }
     
     

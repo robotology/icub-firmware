@@ -348,7 +348,7 @@ namespace embot { namespace hw { namespace tlv493d {
 
         
     result_t s_sensor_reset(TLV493D h);
-    
+    result_t s_sensor_deinit(TLV493D h);
     result_t s_sensor_init(TLV493D h); 
     
     static void sharedCBK(void *p)
@@ -388,33 +388,36 @@ namespace embot { namespace hw { namespace tlv493d {
         
         
         std::uint8_t index = embot::core::tointegral(h);
-               
-        
-#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)        
-        // init peripheral
-        embot::hw::tlv493d::getBSP().init(h);                             
-        // init i2c with the relevant bus specified by the bsp for this chip
-        #if defined(EMBOT_ENABLE_hw_tlv493d_i2ceMODE)
-        embot::hw::i2ce::init(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2CEbus(), {});
-        #else
-        embot::hw::i2c::init(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2Cbus(), {});
-        #endif
-#endif 
         
         // load config etc
         s_privatedata.i2cdes[index] = embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].init(h);
+               
+        
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)   
 
-#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)          
-        // sensor init
+        // init bsp for the chip. in our case it does nothing
+        embot::hw::tlv493d::getBSP().init(h);          
+        
+        // init i2c / i2ce for the relevant bus specified by the bsp for this chip
+        #if defined(EMBOT_ENABLE_hw_tlv493d_i2ceMODE)
+        embot::hw::i2ce::init(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2CEbus(), {});
+        #else
+        embot::hw::i2c::init(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2Cbus(), {});
+        #endif                        
+      
+        // perform specific init of the sensor over the i2c / i2ce bus
         if(resOK != s_sensor_init(h))
         {
             return resNOK;
-        }            
+        } 
+        
 #else
+        
         // we emulate the sensor action with a timer which executes the callback
         emulatedMODE_timers4callback[embot::core::tointegral(h)] = new embot::os::Timer;  
+        
 #endif
 
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(h));                
@@ -435,31 +438,30 @@ namespace embot { namespace hw { namespace tlv493d {
         
         
         std::uint8_t index = embot::core::tointegral(h);
-               
         
-#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)        
-        // deinit peripheral (not yet available), so i comment out
-//        embot::hw::tlv493d::getBSP().deinit(h);                             
-        // deinit i2c with the relevant bus specified by the bsp for this chip
-        // not yet available, so i comment out
-        #if defined(EMBOT_ENABLE_hw_tlv493d_i2ceMODE)
-//        embot::hw::i2ce::deinit(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2CEbus());
-        #else
-//        embot::hw::i2c::deinit(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2Cbus());
-        #endif
-#endif 
         
-        // load config etc
-        s_privatedata.i2cdes[index] = {};
-        s_privatedata.config[index] = {};
-        s_privatedata.acquisition[index].clear();
+#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)  
+        
+        // perform specific deinit of the sensor over the i2c / i2ce bus (so far i dont do it)
+        if(resOK != s_sensor_deinit(h))
+        {
+            return resNOK;
+        }  
 
-#if !defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)          
-        // sensor deinit (so far i dont do it)
-//        if(resOK != s_sensor_deinit(h))
-//        {
-//            return resNOK;
-//        }            
+        // deinit i2c / i2ce for the relevant bus specified by the bsp for this chip
+        // note by marco.accame: the following works only if the chip does not share the bus with other chips.
+        //                       because if we disable the bus for this chip then the otehr cannot use it anymore
+
+        #if defined(EMBOT_ENABLE_hw_tlv493d_i2ceMODE)
+        embot::hw::i2ce::deinit(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2CEbus());
+        #else
+        embot::hw::i2c::deinit(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2Cbus());
+        #endif
+        
+        // deinit bsp for the chip. in our case it does nothing
+        // and is not in the API of this BSP (yet)
+        // embot::hw::tlv493d::getBSP().deinit(h);
+        
 #else
         // we emulate the sensor action with a timer which executes the callback. i need to delet it
         if(nullptr != emulatedMODE_timers4callback[embot::core::tointegral(h)])
@@ -467,7 +469,12 @@ namespace embot { namespace hw { namespace tlv493d {
             delete emulatedMODE_timers4callback[embot::core::tointegral(h)]; 
             emulatedMODE_timers4callback[embot::core::tointegral(h)] = nullptr;            
         }
-#endif
+#endif        
+                      
+        // unload config etc
+        s_privatedata.i2cdes[index] = {};
+        s_privatedata.config[index] = {};
+        s_privatedata.acquisition[index].clear();
 
         embot::core::binary::bit::clear(initialisedmask, embot::core::tointegral(h));                
         return resOK;
@@ -690,6 +697,16 @@ namespace embot { namespace hw { namespace tlv493d {
 #if defined(embot_hw_tlv493d_DEBUG_readback_at_init)    
     uint8_t readback[10] = {0};
 #endif
+    
+    
+    result_t s_sensor_deinit(TLV493D h)
+    {
+        // i could maybe just reset the chip over i2c / i2ce
+        // but so far i do nothing
+        //s_sensor_reset(h); 
+        return resOK;        
+    }
+    
     
     result_t s_sensor_init(TLV493D h)
     {

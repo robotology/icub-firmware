@@ -38,7 +38,7 @@
 
 #include "embot_app_theCANboardInfo.h"
 
-
+#include "embot_app_application_theCANtracer.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -54,10 +54,14 @@ struct embot::app::application::theCANparserPOS::Impl
         dummyCANagentPOS() {}
         virtual ~dummyCANagentPOS() {}
             
-        virtual bool set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info) { return true; }
-        virtual bool set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info) { return true; }  
+        bool isactive() const override { return false; }
+        const std::string& status() const override { static const std::string s {"dummy"}; return s; }
+        
+        bool set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info) override { return true; }
+        bool set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info) override { return true; }  
 
-        virtual bool get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo) { return true; }            
+        bool get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, 
+                 embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo) override { return true; }            
     };
     
     dummyCANagentPOS dummyagent;
@@ -110,8 +114,7 @@ bool embot::app::application::theCANparserPOS::Impl::process(const embot::prot::
     
     
     switch(cls)
-    {
-        
+    {       
         case embot::prot::can::Clas::pollingAnalogSensor:
         {
             if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::POS_CONFIG_SET) == cmd)
@@ -145,9 +148,15 @@ bool embot::app::application::theCANparserPOS::Impl::process(const embot::prot::
 }
 
 
-
 bool embot::app::application::theCANparserPOS::Impl::process_set_pos_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
-{
+{    
+    if(false == config.agent->isactive())
+    {
+        embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+        tr.print("ERR: " + config.agent->status(), replies);  
+        return true;        
+    }
+    
     embot::prot::can::analog::polling::Message_POS_CONFIG_SET msg;
     msg.load(frame);
       
@@ -159,6 +168,14 @@ bool embot::app::application::theCANparserPOS::Impl::process_set_pos_config(cons
 
 bool embot::app::application::theCANparserPOS::Impl::process_get_pos_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
+    
+    if(false == config.agent->isactive())
+    {
+        embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+        tr.print("ERR: " + config.agent->status(), replies); 
+        return true;        
+    }
+    
     embot::prot::can::analog::polling::Message_POS_CONFIG_GET msg;
     msg.load(frame);
     
@@ -179,6 +196,13 @@ bool embot::app::application::theCANparserPOS::Impl::process_get_pos_config(cons
 
 bool embot::app::application::theCANparserPOS::Impl::process_pos_transmit(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
+    if(false == config.agent->isactive())
+    {
+        embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+        tr.print("ERR: " + config.agent->status(), replies);  
+        return true;        
+    }
+    
     embot::prot::can::analog::polling::Message_POS_TRANSMIT msg;
     msg.load(frame);
     

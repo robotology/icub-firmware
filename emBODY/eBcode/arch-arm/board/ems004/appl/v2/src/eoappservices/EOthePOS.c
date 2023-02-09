@@ -395,7 +395,7 @@ extern eOresult_t eo_pos_Verify(EOthePOS *p, const eOmn_serv_configuration_t * s
 
     // verify that the config is ok. for instance we can have at max one type of boardtype     
     eObrd_cantype_t boardtype = servcfg->data.as.pos.config.boardconfig[0].boardinfo.type;
-    // only pmc and psc and mtb4fap can be used
+    // only pmc and psc and mtb4fap and mtb4c can be used
     eObool_t servcfgisOK = eocanmap_BRDisCompatible(boardtype, eoprot_endpoint_analogsensors, eoprot_entity_as_pos);
     
     for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)

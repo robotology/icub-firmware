@@ -46,21 +46,22 @@ namespace embot { namespace app { namespace application {
         }; 
         
         
-        bool initialise(Config &config);   
+        bool initialise(Config &config, bool deferredHWinit = false);  
 
-//        bool configure(embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg);
-//        bool configure(embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);        
-//        bool configure(embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup);
+        bool deactivate();        
         
         bool start();
         bool stop();        
         bool tick(std::vector<embot::prot::can::Frame> &replies);
         
         // interface to CANagentSKIN
-        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info);
-        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info);  
-        virtual bool set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info); 
-        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info);
+        bool isactive() const override;
+        const std::string& status() const override;
+        
+        bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info) override;
+        bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info) override;  
+        bool set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info) override; 
+        bool set(const embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info) override;
 
     private:
         theSkin(); 
