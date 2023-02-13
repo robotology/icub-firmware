@@ -25,6 +25,7 @@
 #include "embot_app_bootloader_theCANparser.h"
 #include "embot_app_theLEDmanager.h"
 #include "embot_hw_can.h"
+#include "embot_hw_usb.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -111,12 +112,13 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
     constexpr std::uint8_t maxINPcanframes = 16;
     constexpr std::uint8_t maxOUTcanframes = 32;
     constexpr embot::os::Event evRXcanframe = 0x00000001;
+    constexpr embot::os::Event evRXusbmessage = 0x00000010;
 
     static void eventhread_init(embot::os::Thread *t, void *p);
     static void eventhread_onevent(embot::os::Thread *t, embot::os::Event evt, void *p);
     
     static void alerteventhread(void *arg);
-
+static void alerteventbasedthreadusb(void *arg);
     static std::vector<embot::prot::can::Frame> outframes;
 
 
@@ -169,6 +171,15 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
         canconfig.onrxframe = embot::core::Callback(alerteventhread, eventhread); 
         embot::hw::can::init(embot::hw::CAN::one, canconfig);
         //embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());  // removed for test purpose (no filters)
+				
+				// init usb
+				embot::hw::usb::Config configusb;
+				configusb.rxcapacity = 16;
+	      configusb.onrxmessage = embot::core::Callback(alerteventbasedthreadusb, eventhread);
+				embot::hw::usb::init(embot::hw::usb::Port::one, configusb);
+				embot::hw::usb::enable(embot::hw::usb::Port::one);
+			
+				
     }
         
     static void alerteventhread(void *arg)
@@ -178,6 +189,24 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
         {
             evtsk->setEvent(evRXcanframe);
         }
+    }
+		
+		static void alerteventbasedthreadusb(void *arg)
+    {
+				embot::hw::usb::Message msg;
+        std::uint8_t remainingINrx = 0;
+        if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
+        {
+					int i;
+					i++;
+
+				}
+				//					embot::core::wait(300* embot::core::time1millisec);
+//				if(embot::hw::resOK == embot::hw::usb::transmitimmediately(embot::hw::usb::Port::one, msg))
+//        {
+//					int i;
+//					i++;
+//				}		
     }
 
     static void eventhread_init(embot::os::Thread *t, void *p)
@@ -237,6 +266,26 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			 
 		}
 		
+
+
+		void testUsb(void){
+			
+
+			embot::hw::usb::Message msg;
+			msg.data[0] = 'c';
+			msg.data[1] = 'i';
+			msg.data[2] = 'a';
+			msg.data[3] = 'o';
+			
+      std::uint8_t remainingINrx = 0;
+			
+			if(embot::hw::resOK == embot::hw::usb::transmitimmediately(embot::hw::usb::Port::one, msg))
+        {
+					int i;
+					i++;
+				}			 
+		}
+		
     static void eventhread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p)
     {
         if(0 == eventmask)
@@ -264,6 +313,8 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 						//Test led blue on
 						case 0x02 :  embot::core::wait(300* embot::core::time1millisec); testLeds(1); break;
 
+						//Test led blue on
+						case 0x03 :  embot::core::wait(300* embot::core::time1millisec); testUsb(); break;
 						
 						default : break;
 					}
