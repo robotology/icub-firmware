@@ -141,6 +141,7 @@ namespace embot { namespace hw { namespace motor {
     result_t s_hw_deinit(MOTOR h);
     result_t s_hw_configure(
         MOTOR h,
+        uint8_t has_quad_enc,
         int16_t  enc_resolution, 
         uint8_t  pwm_num_polar_couples, 
         uint8_t  pwm_has_hall_sens,
@@ -187,6 +188,7 @@ namespace embot { namespace hw { namespace motor {
     
     result_t config(
         MOTOR h,         
+        uint8_t  has_quad_enc,
         int16_t  enc_resolution, 
         uint8_t  pwm_num_polar_couples, 
         uint8_t  pwm_has_hall_sens,
@@ -194,6 +196,7 @@ namespace embot { namespace hw { namespace motor {
         uint16_t pwm_hall_offset)
     {
         return s_hw_configure(h,
+            has_quad_enc,
             enc_resolution, 
             pwm_num_polar_couples, 
             pwm_has_hall_sens,
@@ -409,6 +412,7 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_configure(
         MOTOR h,
+        uint8_t has_quad_enc,
         int16_t  enc_resolution, 
         uint8_t  pwm_num_polar_couples, 
         uint8_t  pwm_has_hall_sens,
@@ -421,7 +425,7 @@ namespace embot { namespace hw { namespace motor {
         
 //        s_hw_init(h);
         
-        if (HAL_OK != encoderConfig(enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
+        if (HAL_OK != encoderConfig(has_quad_enc, enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
         if (HAL_OK != hallConfig(pwm_swapBC, pwm_hall_offset)) res = resNOK;
       
         return res; 

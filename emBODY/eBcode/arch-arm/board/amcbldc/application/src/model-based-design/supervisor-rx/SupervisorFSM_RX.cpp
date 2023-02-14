@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 5.6
+// Model version                  : 5.7
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Wed Sep 28 09:22:29 2022
+// C/C++ source code generated on : Fri Feb 10 13:57:19 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -1045,7 +1045,9 @@ static void SupervisorFSM_formatMotorConfig(const BUS_MESSAGES_RX *Selector2)
 // Function for Chart: '<S1>/CAN Event Dispatcher'
 static void SupervisorF_hardwareConfigMotor(void)
 {
-  rtw_configMotor(SupervisorFSM_RX_B.motorConfig.rotor_encoder_resolution,
+  rtw_configMotor(static_cast<uint8_T>
+                  (SupervisorFSM_RX_B.motorConfig.has_quadrature_encoder),
+                  SupervisorFSM_RX_B.motorConfig.rotor_encoder_resolution,
                   SupervisorFSM_RX_B.motorConfig.pole_pairs, static_cast<uint8_T>
                   (SupervisorFSM_RX_B.motorConfig.has_hall_sens), 1U, 21845U);
 }

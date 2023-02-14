@@ -108,7 +108,7 @@ HAL_StatusTypeDef encoderDeinit(void)
     return HAL_OK;
 }
 
-HAL_StatusTypeDef encoderConfig(int16_t resolution, uint8_t num_polar_couples, uint8_t has_hall_sens)
+HAL_StatusTypeDef encoderConfig(uint8_t has_quad_enc, int16_t resolution, uint8_t num_polar_couples, uint8_t has_hall_sens)
 {
     TIM_Encoder_InitTypeDef sConfig = {0};
     TIM_MasterConfigTypeDef sMasterConfig = {0};
@@ -117,6 +117,16 @@ HAL_StatusTypeDef encoderConfig(int16_t resolution, uint8_t num_polar_couples, u
     MainConf.encoder.has_hall_sens = has_hall_sens;
     MainConf.pwm.num_polar_couples = num_polar_couples;
     
+    if(!has_quad_enc)
+        resolution=0;
+    
+    MainConf.encoder.resolution = resolution;
+    
+    if (resolution == 0)
+    {
+        return HAL_OK;
+    }
+
     if (resolution < 0)
     {
         resolution = -resolution;
@@ -127,12 +137,6 @@ HAL_StatusTypeDef encoderConfig(int16_t resolution, uint8_t num_polar_couples, u
         htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
     }
     
-    MainConf.encoder.resolution = resolution;
-    
-    if (resolution == 0)
-    {
-        return HAL_OK;
-    }
 
     /* Forced, for now */
     encoderConvFactor = 65536L*num_polar_couples/resolution;   

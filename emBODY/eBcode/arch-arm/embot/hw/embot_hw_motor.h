@@ -53,7 +53,8 @@ namespace embot { namespace hw { namespace motor {
     
     result_t fault(MOTOR h, bool on);
     result_t init(embot::hw::MOTOR h, const Config &config);   
-    result_t config(MOTOR h, 
+    result_t config(MOTOR h,
+        uint8_t  has_quad_enc,
         int16_t  enc_resolution, 
         uint8_t  pwm_num_polar_couples, 
         uint8_t  pwm_has_hall_sens,

@@ -25,11 +25,12 @@
 #include "embot_hw_motor.h"
 #endif /* STM32HAL_BOARD_AMCBLDC */
 
-void rtw_configMotor(int16_t rotor_enc_resolution, uint8_t pole_pairs, uint8_t has_hall_sens, uint8_t swapBC, uint16_t hall_sens_offset)
+void rtw_configMotor(uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t pole_pairs, uint8_t has_hall_sens, uint8_t swapBC, uint16_t hall_sens_offset)
 {
     #ifdef STM32HAL_BOARD_AMCBLDC
     embot::hw::motor::config(
-        embot::hw::MOTOR::one,         
+        embot::hw::MOTOR::one,
+        has_quad_enc,    
         rotor_enc_resolution, 
         pole_pairs, 
         has_hall_sens,
