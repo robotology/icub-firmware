@@ -605,10 +605,10 @@ namespace embot { namespace hw { namespace i2c {
         {            
             MX_I2C1_Init();
         }
-//        else if(h == I2C::two)
-//        {
-//            MX_I2C2_Init();
-//        }         
+        else if(h == I2C::two)
+        {
+            MX_I2C2_Init();
+        }         
     }
     
     #else

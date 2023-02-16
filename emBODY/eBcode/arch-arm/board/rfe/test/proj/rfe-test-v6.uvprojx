@@ -589,6 +589,16 @@
               <FileType>8</FileType>
               <FilePath>..\src\usb_user\embot_hw_usb.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_bno055.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_bno055.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_i2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_i2c.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

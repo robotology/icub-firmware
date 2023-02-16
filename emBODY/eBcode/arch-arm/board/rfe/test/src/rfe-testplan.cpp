@@ -26,6 +26,8 @@
 #include "embot_app_theLEDmanager.h"
 #include "embot_hw_can.h"
 #include "embot_hw_usb.h"
+#include "embot_hw_bno055.h"
+#include "embot_hw_gpio.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -236,7 +238,7 @@ static void alerteventbasedthreadusb(void *arg);
 			
     }
 		
-		static void testCAN(){
+		static void test_CAN(){
 
 			embot::hw::can::Frame canframe;
 			
@@ -249,7 +251,7 @@ static void alerteventbasedthreadusb(void *arg);
 
 		}		
 		
-		void testLeds(uint8_t on){
+		void test_Leds(uint8_t on){
 			 static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
        embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
        theleds.init(allleds);    
@@ -268,7 +270,7 @@ static void alerteventbasedthreadusb(void *arg);
 		
 
 
-		void testUsb(void){
+		void test_Usb(void){
 			
 
 			embot::hw::usb::Message msg;
@@ -286,6 +288,91 @@ static void alerteventbasedthreadusb(void *arg);
 				}			 
 		}
 		
+		constexpr embot::hw::BNO055 imu = embot::hw::BNO055::one;
+		constexpr embot::hw::bno055::Config imuconfig = {};
+		embot::hw::bno055::Info info;
+		
+		static void test_BNO055(){
+			embot::hw::can::Frame canframe;
+			static bool init = false;
+			
+			if(!init) {
+				embot::hw::result_t ret = embot::hw::bno055::init(imu, imuconfig);
+				init = true;
+			}
+
+			embot::hw::bno055::get(imu, info, 1000);
+
+			canframe.id = 0x551;         ;
+			canframe.size = 8;
+			canframe.data[0] = info.chipID;
+			
+			embot::hw::can::put(embot::hw::CAN::one, {canframe.id, canframe.size, canframe.data});   
+			embot::hw::can::transmit(embot::hw::CAN::one);		
+				
+		}
+		
+		constexpr embot::hw::I2C i2c2 = embot::hw::I2C::two;
+		constexpr embot::hw::i2c::Config i2cconfig = {};
+			
+		constexpr embot::hw::gpio::Config out {
+			embot::hw::gpio::Mode::OUTPUTpushpull,
+			embot::hw::gpio::Pull::pullup,
+			embot::hw::gpio::Speed::high
+		};
+
+		constexpr embot::hw::gpio::Config input {
+			embot::hw::gpio::Mode::INPUT,
+			embot::hw::gpio::Pull::nopull,
+			embot::hw::gpio::Speed::high
+		};		
+		constexpr embot::hw::GPIO GPA0 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::zero};
+		constexpr embot::hw::GPIO GPA5 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five};
+		constexpr embot::hw::GPIO GPA15 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::fifteen};
+	
+		static void initGPIO(embot::hw::GPIO gpio, embot::hw::gpio::Config conf, embot::hw::gpio::State state ){
+			embot::hw::gpio::init(gpio, {conf});
+			if(conf.mode == embot::hw::gpio::Mode::OUTPUTpushpull) embot::hw::gpio::set(gpio, state); 
+		}
+		
+		static void test_MPU9250(){
+			embot::hw::can::Frame canframe;
+			static bool init = false;
+			
+			if(!init) {
+				initGPIO(GPA15, out, embot::hw::gpio::State::SET); 
+				embot::hw::i2c::init(i2c2, i2cconfig);
+				init = true;
+			}
+
+			bool res = embot::hw::i2c::ping(i2c2, 0x69, 1000);
+			
+			embot::hw::can::put(embot::hw::CAN::one, {canframe.id, canframe.size, canframe.data});   
+			embot::hw::can::transmit(embot::hw::CAN::one);		
+				
+		}
+		
+		static void test_J2(){
+			embot::hw::can::Frame canframe;
+			static bool init = false;
+			uint16_t res = 0xAA;
+			
+			if(!init) {
+				initGPIO(GPA0, out, embot::hw::gpio::State::SET); 
+				initGPIO(GPA5, input,  embot::hw::gpio::State::SET); 	
+			}
+
+			if(embot::hw::gpio::get(GPA5) !=  embot::hw::gpio::State::SET) res = 0xBB; 
+				
+			canframe.id = 0x551;         ;
+			canframe.size = 8;
+			canframe.data[0] = res;
+			
+			embot::hw::can::put(embot::hw::CAN::one, {canframe.id, canframe.size, canframe.data});   
+			embot::hw::can::transmit(embot::hw::CAN::one);		
+				
+		}
+				
     static void eventhread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p)
     {
         if(0 == eventmask)
@@ -304,18 +391,30 @@ static void alerteventbasedthreadusb(void *arg);
 										
 					switch(canframe.data[0]){
 
+						//test CAN			      
+						case 0x00 :  embot::core::wait(300* embot::core::time1millisec); test_CAN(); break;
+
 						//Check test fw rev.			      
-						case 0x00 :  embot::core::wait(300* embot::core::time1millisec); getFirmwareVersion(); break;
+						case 0x01 :  embot::core::wait(300* embot::core::time1millisec); getFirmwareVersion(); break;
 						
 						//Test led blue off
-						case 0x01 :  embot::core::wait(300* embot::core::time1millisec); testLeds(0); break;
+						case 0x02 :  embot::core::wait(300* embot::core::time1millisec); test_Leds(0); break;
 						
 						//Test led blue on
-						case 0x02 :  embot::core::wait(300* embot::core::time1millisec); testLeds(1); break;
+						case 0x03 :  embot::core::wait(300* embot::core::time1millisec); test_Leds(1); break;
 
 						//Test led blue on
-						case 0x03 :  embot::core::wait(300* embot::core::time1millisec); testUsb(); break;
-						
+						case 0x04 :  embot::core::wait(300* embot::core::time1millisec); test_Usb(); break;
+
+						//Test IMU Bosch BNO055
+						case 0x05 :  embot::core::wait(300* embot::core::time1millisec); test_BNO055(); break;
+
+						//Test IMU MPU-9250
+						case 0x06 :  embot::core::wait(300* embot::core::time1millisec); test_MPU9250(); break;						
+					
+						//Test Connector J2
+						case 0x07 :  embot::core::wait(300* embot::core::time1millisec); test_J2(); break;								
+					
 						default : break;
 					}
         }   
