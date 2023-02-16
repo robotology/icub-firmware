@@ -126,6 +126,7 @@ typedef enum
     hal_spiencoder_diagnostic_type_aksim2_invalid_data = 5,
     hal_spiencoder_diagnostic_type_aksim2_close_to_limits = 6,
     hal_spiencoder_diagnostic_type_aksim2_crc_error = 7,
+    hal_spiencoder_diagnostic_type_aksim2_not_connected = 8,
 } hal_spiencoder_diagnostic_type_t;
 
 typedef struct

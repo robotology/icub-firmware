@@ -832,6 +832,16 @@ extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencode
             diagn->info.aksim2_status_crc |= 0x01;
         }
         
+        
+        // Check for SPI reading errors: if all data are FF then the encoder is not connected or the SPI is not working.
+        if (intitem->multiturncounter == 0xFFFF && intitem->position == 0x7FFFF && intitem->status_bits == 0x03 && intitem->crc == 0xFF)
+        {
+            // TODO: check if it can be manage it, or remove everything berfore the return because these diagnostic is not currently used.
+            diagn->type = hal_spiencoder_diagnostic_type_aksim2_not_connected;
+            diagn->info.value = 0;
+            return hal_res_NOK_generic;
+        }
+        
         *pos = intitem->position;
     }
     else if (intitem->config.type == hal_spiencoder_typeAMO)
