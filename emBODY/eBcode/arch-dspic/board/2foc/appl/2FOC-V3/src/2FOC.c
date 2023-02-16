@@ -272,18 +272,12 @@ BOOL updateOdometry()
         static const int UNDERSAMPLING = PWMFREQUENCY / 1000;
         static int speed_undersampler = 0;
 
+        if (!QEready()) return FALSE;
+        
         static int position_old = 0;
         int position = QEgetPosition();
         int delta = position - position_old;
-
         position_old = position;
-
-        if (sAlignInProgress)
-        {
-            gQEPosition = 0;
-            gQEVelocity = 0;
-            return FALSE;
-        }
 
         gQEPosition += delta;
 
@@ -498,6 +492,10 @@ volatile short Va = 0, Vb = 0, Vc = 0;
 
 volatile int VqFbk = 0;
 volatile int IqFbk = 0;
+
+volatile int V1fbk = 0;
+volatile int V2fbk = 0;
+volatile int V3fbk = 0;
 
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
@@ -909,7 +907,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     }
     //
     ////////////////////////////////////////////////////////////////////////////
-
+    
     ////////////////////////////////////////////////////////////////////////////
     // inv transform and PWM drive    
     int V1 = (int)((__builtin_mulss(Vq,cosT)-__builtin_mulss(Vd*3,sinT)+0x7FFF)>>16);
@@ -920,7 +918,11 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     *ppwmH =  V1-V2;
     *ppwm0 =  V2+V2;
     *ppwmL = -V1-V2;
-
+    
+    V1fbk = Va;
+    V2fbk = Vb;
+    V3fbk = Vc;
+    
     pwmOut(Va,Vb,Vc);
     //
     ////////////////////////////////////////////////////////////////////////////

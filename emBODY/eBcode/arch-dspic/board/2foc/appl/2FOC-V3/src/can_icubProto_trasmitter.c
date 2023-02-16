@@ -70,16 +70,20 @@ extern volatile int storeIa, storeIc, storeVd;
 extern volatile int VqFbk;
 extern volatile int IqFbk;
 
+extern volatile int V1fbk;
+extern volatile int V2fbk;
+extern volatile int V3fbk;
+
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
     static tCanData payload; // = {{0}};
     unsigned long msgid;
     
-    payload.w[0] = IqFbk;
-    payload.w[1] = gQEVelocity;
-    //payload.w[2] = gQEPosition & 0xFFFF;
-    //payload.w[3] = gQEPosition >> 16;
-    payload.dw[1] = gQEPosition;
+    payload.w[0] = POSCNT;//IqFbk;
+    payload.w[1] = V1fbk;//gQEVelocity;
+    payload.w[2] = V2fbk; //gQEPosition & 0xFFFF;
+    payload.w[3] = V3fbk; //gQEPosition >> 16;
+    //payload.dw[1] = gQEPosition;
     //payload.dw[1] = QEgetPosCheck(); 
     
     //payload.w[0] = I2Tdata.IQMeasured;
