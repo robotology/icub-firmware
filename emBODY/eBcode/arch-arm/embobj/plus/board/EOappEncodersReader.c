@@ -648,11 +648,18 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     // check validity for aksim2
                     if(eobool_true == s_eo_appEncReader_IsValidValue_AKSIM2(&diagn, &prop.valueinfo->errortype))
                     {
+                        #ifdef ERGOJOINT
+                        MController_motor_calc_torque(jomo, position);
+                        #endif
+                        
                         // rescale the position value of the position to icubdegrees
                         prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(position, jomo, (eOmc_position_t)prop.descriptor->pos);
                     }
                     else
                     {
+                        #ifdef ERGOJOINT
+                        MController_motor_calc_torque_invalid(jomo, position);
+                        #endif
                         // we have a valid reading from hal but ... it is not valid after a check
                         errorparam = diagn.info.aksim2_status_crc;
                     }
@@ -670,11 +677,11 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     errdes.par64                = (uint64_t) (diagn.info.aksim2_status_crc) << 32;
                     errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_not_connected);
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-                }
 
-#ifdef ERGOJOINT
-                MController_update_joint_pos_raw(jomo, position);
-#endif
+                    #ifdef ERGOJOINT
+                    MController_motor_calc_torque_invalid(jomo, position);
+                    #endif
+                }
             } break;
             
 

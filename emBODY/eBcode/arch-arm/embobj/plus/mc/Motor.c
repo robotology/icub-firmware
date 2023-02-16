@@ -34,6 +34,8 @@
 #include "EoError.h"
 #include "EOtheEntities.h"
 
+#include <math.h>
+
 #if defined(EOTHESERVICES_customize_handV3_7joints)
 
 // -- here is new code for the pmc board
@@ -266,6 +268,8 @@ Motor* Motor_new(uint8_t n) //
     return o;
 }
 
+static void torque_calib_init(Motor* o);
+
 void Motor_init(Motor* o) //
 {
     memset(o, 0, sizeof(Motor));
@@ -297,10 +301,17 @@ void Motor_init(Motor* o) //
 #ifdef ERGOJOINT
     o->torque_model.initialize();
 
-    o->joint_motor_offset = 0;
     o->joint_position_raw = 0;
-    o->joint_encoder_old = 0;
-    o->trq_idle_counter = 0;
+    //o->invalid_torque_measure = 0;
+    //o->invalid_torque_measure_cnt = 0;
+    //o->spikes = 0;
+    
+    o->offmax = -32768;
+    o->offmin =  32767;
+    o->torsion_raw = 0;
+    o->torsion = 0;
+    
+    torque_calib_init(o);
 #endif
 }
 
@@ -979,155 +990,59 @@ BOOL Motor_is_calibrated(Motor* o) //
 
 CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk) //
 {
-    int32_t joint_pos_raw_gbox = 20*o->joint_position_raw; // 20 = 160/2^3 = 160/(2^19/2^16)
+    o->trq_ref = trq_ref;
     
-    if (o->control_mode == icubCanProto_controlmode_idle)
-    {
-        if (o->trq_idle_counter < 3000)
-        {
-            o->trq_idle_counter++;
-        }
-        else
-        {
-            o->joint_motor_offset = joint_pos_raw_gbox + o->pos_raw_fbk; // 160/(2^(19-16)) = 160/8;
-        }
-    }
-    else
-    {
-        o->trq_idle_counter = 0;
-    }
+    o->trq_err = trq_ref - trq_fbk;
+    
+    //float current = 0.001f*o->Iqq_fbk; // A
     
     static const float ENC2RAD = 3.1415926f/32768.0f;
     
-    int32_t torsion = o->pos_raw_fbk + joint_pos_raw_gbox - o->joint_motor_offset; 
+    float omega = ENC2RAD*o->vel_fbk; // rad/s
     
-    o->torque_model.rtU.Torsion = ENC2RAD*(float)torsion;
-    
-    o->torque_model.step();
-
-    //////////////////////////////////////////////////
-    
-    float result_torque = ZERO;
-    
-    float torsion_torque = o->torque_model.rtY.Torque; // Nm
-    
-    float current = 0.001f*o->Iqq_fbk; // A
-    
-    float speed = ENC2RAD*o->vel_fbk; // rad/s
-    
-    static const float Io = 0.357f; // A
+    static const float Io = 0.350f; // A
     static const float Kw = 0.9f;   // A/(rad/s)
     
     static const float Kt = 160.0*0.058f; // Nm/A
     static const float iKt = 1.f/Kt;      // A/Nm;
-    
-    // I = Io + Kw*w;
-    
-    trq_fbk = ZERO;
-    
-    if (FABS(current) <= Io)
-    {
-        trq_fbk = ZERO;
-    }
-    else
-    {
-    }
-    
-    
-    if (speed == ZERO)
-    {
-        if (FABS(current) <= Io)
-        {
-            trq_fbk = ZERO;
-        }
-        else
-        {
-            trq_fbk = iKt*(current - Io);
-        }
-    }
-    else
-    {
-        if (FABS(current) <= Io)
-        {
-            trq_fbk = ZERO;
-        }
-        else
-        {
-        }
-    }
-    
-    
-    
-    
+      
+    trq_ref *= 1.0e-6f; // uNm -> Nm
     
     CTRL_UNITS Iout = ZERO;
     
-    if (trq_ref == ZERO)
-    {
-        if (speed == ZERO)
-        {
-            Iout = FSGN(torsion_torque)*Io + iKt*torsion_torque;
-        }
-        else
-        {
-            Iout = FSGN(speed)*Io + Kw*speed + iKt*torsion_torque;
-        }
-    }
-    else
-    {
-    }
+    CTRL_UNITS omega_sgn = ZERO;
+        
+    if (o->vel_fbk > 0) omega_sgn = +1.0f;
+    if (o->vel_fbk < 0) omega_sgn = -1.0f;
     
+    //Iout = o->trqPID.Ko*omega_sgn + o->trqPID.Kp*omega; // + o->trqPID.Kff*trq_ref; // iKt*trq_ref    
     
+    Iout = Io*omega_sgn + Kw*omega;
     
+    float Ivis = o->trqPID.Kp*omega*omega*omega_sgn;
     
+    trq_fbk = o->torque_model.rtY.Torque;
     
+    float Itrq = 0.0f;
     
+    if (trq_fbk >  0.5f) Itrq += 0.001f*o->trqPID.Ko*Io;
+    if (trq_fbk < -0.5f) Itrq -= 0.001f*o->trqPID.Ko*Io;
     
+    Itrq += 0.001f*o->trqPID.Kff*trq_fbk;
     
+    float Itrqvis = Itrq+Ivis;
     
+    LIMIT(Itrqvis, 0.001f*o->trqPID.Imax);
     
-    if (-Io<current && current<Io)
-    {
-        if (speed == ZERO)
-        {
-            result_torque = torsion_torque;
-        }
-        else
-        {
-            // load is dragging the motor
-            
-            result_torque = Kt*(current + (speed > ZERO ? Io : -Io) + Kw*speed); 
-        }
-    }
-    else
-    {
-        if (speed != ZERO)
-        {
-            result_torque = Kt * (current-Io-Kw*speed);
-            
-            if ((current > ZERO) ^ (speed > ZERO))
-            {
-            }
-            else
-            {
-            }
-        }
-        else
-        {
-        }
-    }
-
+    Iout += Itrqvis;
     
+    Iout *= 1000.0f;
     
+    LIMIT(Iout,o->trqPID.out_max);
     
+    return Iout;
     
-    
-    o->trq_ref = trq_ref;
-    o->trq_fbk = trq_fbk;
-    
-    o->trq_err = trq_ref - trq_fbk;
-    
-    return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_raw_fbk, o->trq_ref);
+    //return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_raw_fbk, o->trq_ref);
 }
 
 void Motor_update_state_fbk(Motor* o, void* state) //
@@ -1169,9 +1084,32 @@ void Motor_actuate(Motor* motor, uint8_t N) //
         for (int m=0; m<N; ++m)
         {
             output[motor[m].actuatorPort] = motor[m].output;
-            //output[m] = motor[m].output;
         }
+                
+//        static int turn = 0;
+//        
+//        if (++turn > 4000) turn = 0;
+//        
+//        if (turn < 2000)
+//        {
+//            ((int16_t*)output)[1] = motor[0].angmin;
+//            ((int16_t*)output)[2] = motor[0].offmin;
+//            ((int16_t*)output)[3] = motor[0].angle;
+//        }
+//        else
+//        {
+//            ((int16_t*)output)[1] = motor[0].angmax;
+//            ((int16_t*)output)[2] = motor[0].offmax;
+//            ((int16_t*)output)[3] = motor[0].angle;
+//        }
+        
+        ((int16_t*)output)[1] = motor[0].pos_raw_fbk;
+        ((int16_t*)output)[2] = motor[0].joint_position_raw>>3;
+        ((int16_t*)output)[3] = motor[0].torsion;
     
+//        ((int16_t*)output)[1] = motor[0].invalid_torque_measure;
+//        ((int16_t*)output)[2] = motor[0].spikes;
+        
         eOcanprot_command_t command = {0};
         command.clas = eocanprot_msgclass_periodicMotorControl;    
         command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
@@ -1573,105 +1511,439 @@ BOOL Motor_is_motor_joint_fault_over(Motor* o)
 
 #ifdef ERGOJOINT
 
-void Motor_update_joint_pos_raw(Motor* o, int32_t joint_encoder)
+void Motor_calc_torque_invalid(Motor* o, int32_t joint_encoder)
 {
+//    o->invalid_torque_measure++;
+//    
+//    if (++o->invalid_torque_measure_cnt > 1000)
+//    {
+//        o->invalid_torque_measure = 0;
+//        o->invalid_torque_measure_cnt = 0;
+//        o->spikes = 0;
+//    }
+}
+
+CTRL_UNITS Motor_calc_torque(Motor* o, int32_t joint_encoder)
+{   
+    const int32_t FULL_REV = o->joint_full_res > 0 ? o->joint_full_res : -o->joint_full_res;
+    const int32_t HALF_REV = FULL_REV>>1;
+    const int16_t DIVISOR = FULL_REV>>16;
+    
     joint_encoder = joint_encoder & 0x7FFFF;
     
-    static const int32_t FULL_REV = 524288L;
-    static const int32_t HALF_REV = 262144L;
+    if (o->joint_full_res < 0)
+    {
+        joint_encoder = FULL_REV-1 - joint_encoder; // old setup
+    }
     
-    int32_t delta = joint_encoder - o->joint_encoder_old;
+    //static int32_t motor_offset = 0;
     
-    o->joint_encoder_old = joint_encoder;
+    static int cnt = 0;
     
-    while (delta >  HALF_REV) delta -= FULL_REV;
-    while (delta < -HALF_REV) delta += FULL_REV;
-    
-    o->joint_position_raw += delta;
-    
-    if (delta < -1 || delta > 1) o->trq_idle_counter = 0;
-}
-    
-    ///////////////////////////////////////////////////////
+    if (cnt < 4)
+    {
+        if (o->joint_encoder_last != joint_encoder) cnt = 0;
 
-void Motor_compute_torque(Motor* o)
-{
-    int32_t joint_pos_raw_gbox = 20*o->joint_position_raw; // 20 = 160/2^3 = 160/(2^19/2^16)
-    
-    if (o->control_mode == icubCanProto_controlmode_idle)
-    {
-        if (o->trq_idle_counter < 3000)
-        {
-            o->trq_idle_counter++;
-        }
-        else
-        {
-            o->joint_motor_offset = joint_pos_raw_gbox + o->pos_raw_fbk; // 160/(2^(19-16)) = 160/8;
-        }
-    }
-    else
-    {
-        o->trq_idle_counter = 0;
+        o->joint_encoder_last = joint_encoder;
+        o->joint_encoder_sure = joint_encoder;
+        o->joint_position_raw = joint_encoder;
+        
+        if (++cnt < 4) return ZERO;
     }
     
-    static const float ENC2RAD = 3.1415926f/32768.0f;
-    
-    int32_t torsion = o->pos_raw_fbk + joint_pos_raw_gbox - o->joint_motor_offset; 
-    
-    o->torque_model.rtU.Torsion = ENC2RAD*(float)torsion;
-    
-    o->torque_model.step();
+    int32_t joint_check = joint_encoder - o->joint_encoder_last;
+    o->joint_encoder_last  = joint_encoder;
 
-    //////////////////////////////////////////////////
+    while (joint_check >  HALF_REV) joint_check -= FULL_REV;
+    while (joint_check < -HALF_REV) joint_check += FULL_REV;
     
-    float result_torque = ZERO;
+    joint_check /=DIVISOR;
     
-    float torsion_torque = o->torque_model.rtY.Torque; // Nm
+    BOOL good = FALSE;
     
-    float current = 0.001f*o->Iqq_fbk; // A
-    
-    float speed = ENC2RAD*o->vel_fbk; // rad/s
-    
-    static const float Io = 0.357f; // A
-    static const float Kw = 0.9f; // A/(rad/s)
-    static const float Kt = 0.058f; // Nm/A
-    
-    // I = Io + Kw*w;
-    
-    if (-Io<current && current<Io)
+    if (-16 < joint_check && joint_check < 16) 
     {
-        if (speed == ZERO)
+        int32_t joint_speed = joint_check*1000;
+        
+        if (o->vel_fbk-250 <= joint_speed && joint_speed <= o->vel_fbk+250)
         {
-            // current under trashold, not moving
-            return;
-        }
-        else
-        {
-            // load is dragging the motor
-        }
-    }
-    else
-    {
-        if (speed != ZERO)
-        {
-            result_torque = Kt * (current-Io-Kw*speed);
+            int32_t joint_delta = joint_encoder - o->joint_encoder_sure;
+
+            o->joint_encoder_sure = joint_encoder;
             
-            if ((current > ZERO) ^ (speed > ZERO))
+            while (joint_delta >  HALF_REV) joint_delta -= FULL_REV;
+            while (joint_delta < -HALF_REV) joint_delta += FULL_REV;
+        
+            o->joint_position_raw += joint_delta;
+            
+            good = TRUE;
+        }
+    }
+    
+    static constexpr float IDEG2RAD = 3.1415926f/32768.0f;
+    
+    //#define CALIBRATION
+    
+    if (good)
+    {
+        uint32_t anglemod = o->joint_position_raw;
+        uint8_t angle256 = (anglemod+DIVISOR*128)/(DIVISOR*256);
+        
+        o->torsion_raw = ((int16_t)o->GEARBOX/DIVISOR)*o->joint_position_raw - o->pos_raw_fbk;
+   
+        #ifdef CALIBRATION
+        o->torsion = o->torsion_raw; // - o->torsion_offset;
+        #else
+        o->torsion = o->torsion_raw - o->torsion_offset;
+        o->torsion -= (int16_t)o->torsion_fine_tuning[angle256];
+        #endif
+        
+        //////////////////////////////////////////////////////////
+        o->torque_model.rtU.Torsion = IDEG2RAD*(float)o->torsion/o->GEARBOX;
+    
+        o->torque_model.step();
+    
+        o->trq_fbk = 1000000.0f*o->torque_model.rtY.Torque; // uNm
+        //////////////////////////////////////////////////////////
+        #ifdef CALIBRATION
+        if (o->joint_position_raw > 2*FULL_REV || o->joint_position_raw < -2*FULL_REV)
+        {
+            o->angle = o->joint_position_raw/DIVISOR;
+                
+            if (o->torsion_raw > o->offmax)
             {
+                o->offmax = o->torsion_raw;
+                o->angmax = o->angle;
+            }
+        
+            if (o->torsion_raw < o->offmin)
+            {
+                o->offmin = o->torsion_raw;
+                o->angmin = o->angle;
+            }
+            
+            o->torsion_offset = (o->offmin+o->offmax)/2;
+            
+            ////////////////////////////////////////////
+
+            static uint8_t angle256_old = angle256;
+            static int32_t torsion_avg = 0;
+            static int16_t cnt = 0;
+         
+            if (angle256 != angle256_old)
+            {
+                int32_t correction = 0;
+            
+                if (cnt!=0) correction = torsion_avg/cnt;
+            
+                // send message angle256_old,correction
+            
+                eOerrmanDescriptor_t errdes = {0};
+
+                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress    = 0;
+                errdes.par16            = angle256_old;
+                errdes.par64            = correction - o->torsion_offset;
+                if (angle256_old == 0)
+                {
+                    errdes.par16 = o->torsion_offset;
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, "<<OFFSET", NULL, &errdes);
+                }
+                else
+                {
+                    errdes.par16 = angle256_old;
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, "<<TORSION", NULL, &errdes);
+                }
+                
+                
+                angle256_old = angle256;
+            
+                torsion_avg = o->torsion;
+            
+                cnt = 1;
             }
             else
             {
+                torsion_avg += o->torsion;
+            
+                ++cnt;
             }
         }
-        else
-        {
-        }
+        #endif
     }
-     
-    //Motor_update_torque_fbk(o, o->torque_model.rtY.Torque*1000000.0f);
+    
+    return o->trq_fbk; 
 }
 
-
+// temporary solution until the data aren't transmitted
+// by protocol from yarprobotinterface at startup
+static void torque_calib_init(Motor* o)
+{
+    if (o->ID==0)
+    { 
+        o->torsion_offset = 0x4179;
+        
+        o->joint_full_res = -524288;
+                
+        o->torsion_fine_tuning[0x00] = 0x0058;
+        o->torsion_fine_tuning[0x01] = 0x0094;
+        o->torsion_fine_tuning[0x02] = 0x0094;
+        o->torsion_fine_tuning[0x03] = 0x00f0;
+        o->torsion_fine_tuning[0x04] = 0x00f6;
+        o->torsion_fine_tuning[0x05] = 0x0146;
+        o->torsion_fine_tuning[0x06] = 0x018d;
+        o->torsion_fine_tuning[0x07] = 0x0158;
+        o->torsion_fine_tuning[0x08] = 0x01db;
+        o->torsion_fine_tuning[0x09] = 0x026c;
+        o->torsion_fine_tuning[0x0a] = 0x0283;
+        o->torsion_fine_tuning[0x0b] = 0x0288;
+        o->torsion_fine_tuning[0x0c] = 0x0290;
+        o->torsion_fine_tuning[0x0d] = 0x02c6;
+        o->torsion_fine_tuning[0x0e] = 0x02da;
+        o->torsion_fine_tuning[0x0f] = 0x02c7;
+        o->torsion_fine_tuning[0x10] = 0x02e7;
+        o->torsion_fine_tuning[0x11] = 0x0344;
+        o->torsion_fine_tuning[0x12] = 0x036e;
+        o->torsion_fine_tuning[0x13] = 0x035d;
+        o->torsion_fine_tuning[0x14] = 0x03a6;
+        o->torsion_fine_tuning[0x15] = 0x03f9;
+        o->torsion_fine_tuning[0x16] = 0x040d;
+        o->torsion_fine_tuning[0x17] = 0x03f2;
+        o->torsion_fine_tuning[0x18] = 0x041b;
+        o->torsion_fine_tuning[0x19] = 0x047d;
+        o->torsion_fine_tuning[0x1a] = 0x048e;
+        o->torsion_fine_tuning[0x1b] = 0x04b0;
+        o->torsion_fine_tuning[0x1c] = 0x04e6;
+        o->torsion_fine_tuning[0x1d] = 0x0532;
+        o->torsion_fine_tuning[0x1e] = 0x0581;
+        o->torsion_fine_tuning[0x1f] = 0x0524;
+        o->torsion_fine_tuning[0x20] = 0x053e;
+        o->torsion_fine_tuning[0x21] = 0x05ac;
+        o->torsion_fine_tuning[0x22] = 0x05a5;
+        o->torsion_fine_tuning[0x23] = 0x0577;
+        o->torsion_fine_tuning[0x24] = 0x0538;
+        o->torsion_fine_tuning[0x25] = 0x054a;
+        o->torsion_fine_tuning[0x26] = 0x0553;
+        o->torsion_fine_tuning[0x27] = 0x0516;
+        o->torsion_fine_tuning[0x28] = 0x054e;
+        o->torsion_fine_tuning[0x29] = 0x054f;
+        o->torsion_fine_tuning[0x2a] = 0x0586;
+        o->torsion_fine_tuning[0x2b] = 0x056f;
+        o->torsion_fine_tuning[0x2c] = 0x055c;
+        o->torsion_fine_tuning[0x2d] = 0x0563;
+        o->torsion_fine_tuning[0x2e] = 0x0552;
+        o->torsion_fine_tuning[0x2f] = 0x04ee;
+        o->torsion_fine_tuning[0x30] = 0x04f4;
+        o->torsion_fine_tuning[0x31] = 0x04fd;
+        o->torsion_fine_tuning[0x32] = 0x04fb;
+        o->torsion_fine_tuning[0x33] = 0x04ea;
+        o->torsion_fine_tuning[0x34] = 0x04a0;
+        o->torsion_fine_tuning[0x35] = 0x04e4;
+        o->torsion_fine_tuning[0x36] = 0x04ee;
+        o->torsion_fine_tuning[0x37] = 0x048c;
+        o->torsion_fine_tuning[0x38] = 0x04a8;
+        o->torsion_fine_tuning[0x39] = 0x049f;
+        o->torsion_fine_tuning[0x3a] = 0x0486;
+        o->torsion_fine_tuning[0x3b] = 0x0401;
+        o->torsion_fine_tuning[0x3c] = 0x03ab;
+        o->torsion_fine_tuning[0x3d] = 0x03c0;
+        o->torsion_fine_tuning[0x3e] = 0x03a9;
+        o->torsion_fine_tuning[0x3f] = 0x037f;
+        o->torsion_fine_tuning[0x40] = 0x0365;
+        o->torsion_fine_tuning[0x41] = 0x037b;
+        o->torsion_fine_tuning[0x42] = 0x03ca;
+        o->torsion_fine_tuning[0x43] = 0x0373;
+        o->torsion_fine_tuning[0x44] = 0x0332;
+        o->torsion_fine_tuning[0x45] = 0x035e;
+        o->torsion_fine_tuning[0x46] = 0x0322;
+        o->torsion_fine_tuning[0x47] = 0x02ef;
+        o->torsion_fine_tuning[0x48] = 0x02fc;
+        o->torsion_fine_tuning[0x49] = 0x031c;
+        o->torsion_fine_tuning[0x4a] = 0x0345;
+        o->torsion_fine_tuning[0x4b] = 0x032a;
+        o->torsion_fine_tuning[0x4c] = 0x0309;
+        o->torsion_fine_tuning[0x4d] = 0x02f4;
+        o->torsion_fine_tuning[0x4e] = 0x0288;
+        o->torsion_fine_tuning[0x4f] = 0x026a;
+        o->torsion_fine_tuning[0x50] = 0x0287;
+        o->torsion_fine_tuning[0x51] = 0x02a7;
+        o->torsion_fine_tuning[0x52] = 0x025e;
+        o->torsion_fine_tuning[0x53] = 0x0285;
+        o->torsion_fine_tuning[0x54] = 0x02e2;
+        o->torsion_fine_tuning[0x55] = 0x0312;
+        o->torsion_fine_tuning[0x56] = 0x0356;
+        o->torsion_fine_tuning[0x57] = 0x0321;
+        o->torsion_fine_tuning[0x58] = 0x0326;
+        o->torsion_fine_tuning[0x59] = 0x0357;
+        o->torsion_fine_tuning[0x5a] = 0x0340;
+        o->torsion_fine_tuning[0x5b] = 0x02e5;
+        o->torsion_fine_tuning[0x5c] = 0x029c;
+        o->torsion_fine_tuning[0x5d] = 0x02af;
+        o->torsion_fine_tuning[0x5e] = 0x027f;
+        o->torsion_fine_tuning[0x5f] = 0x0252;
+        o->torsion_fine_tuning[0x60] = 0x023a;
+        o->torsion_fine_tuning[0x61] = 0x0263;
+        o->torsion_fine_tuning[0x62] = 0x0284;
+        o->torsion_fine_tuning[0x63] = 0x02b0;
+        o->torsion_fine_tuning[0x64] = 0x02bf;
+        o->torsion_fine_tuning[0x65] = 0x02e7;
+        o->torsion_fine_tuning[0x66] = 0x032c;
+        o->torsion_fine_tuning[0x67] = 0x0322;
+        o->torsion_fine_tuning[0x68] = 0x0302;
+        o->torsion_fine_tuning[0x69] = 0x0307;
+        o->torsion_fine_tuning[0x6a] = 0x02f1;
+        o->torsion_fine_tuning[0x6b] = 0x02e3;
+        o->torsion_fine_tuning[0x6c] = 0x027c;
+        o->torsion_fine_tuning[0x6d] = 0x025b;
+        o->torsion_fine_tuning[0x6e] = 0x027a;
+        o->torsion_fine_tuning[0x6f] = 0x0255;
+        o->torsion_fine_tuning[0x70] = 0x01f0;
+        o->torsion_fine_tuning[0x71] = 0x017c;
+        o->torsion_fine_tuning[0x72] = 0x0162;
+        o->torsion_fine_tuning[0x73] = 0x0121;
+        o->torsion_fine_tuning[0x74] = 0x00aa;
+        o->torsion_fine_tuning[0x75] = 0x0083;
+        o->torsion_fine_tuning[0x76] = 0x008e;
+        o->torsion_fine_tuning[0x77] = 0x0085;
+        o->torsion_fine_tuning[0x78] = 0x006e;
+        o->torsion_fine_tuning[0x79] = 0x0066;
+        o->torsion_fine_tuning[0x7a] = 0x0011;
+        o->torsion_fine_tuning[0x7b] = 0xffc5;
+        o->torsion_fine_tuning[0x7c] = 0xffbd;
+        o->torsion_fine_tuning[0x7d] = 0xffc7;
+        o->torsion_fine_tuning[0x7e] = 0xff69;
+        o->torsion_fine_tuning[0x7f] = 0xfef0;
+        o->torsion_fine_tuning[0x80] = 0xff0b;
+        o->torsion_fine_tuning[0x81] = 0xfeda;
+        o->torsion_fine_tuning[0x82] = 0xfebd;
+        o->torsion_fine_tuning[0x83] = 0xfe9e;
+        o->torsion_fine_tuning[0x84] = 0xfe33;
+        o->torsion_fine_tuning[0x85] = 0xfe29;
+        o->torsion_fine_tuning[0x86] = 0xfdd0;
+        o->torsion_fine_tuning[0x87] = 0xfd50;
+        o->torsion_fine_tuning[0x88] = 0xfd18;
+        o->torsion_fine_tuning[0x89] = 0xfce0;
+        o->torsion_fine_tuning[0x8a] = 0xfcae;
+        o->torsion_fine_tuning[0x8b] = 0xfc5f;
+        o->torsion_fine_tuning[0x8c] = 0xfc9b;
+        o->torsion_fine_tuning[0x8d] = 0xfcab;
+        o->torsion_fine_tuning[0x8e] = 0xfc2c;
+        o->torsion_fine_tuning[0x8f] = 0xfc1a;
+        o->torsion_fine_tuning[0x90] = 0xfbea;
+        o->torsion_fine_tuning[0x91] = 0xfbb3;
+        o->torsion_fine_tuning[0x92] = 0xfb7f;
+        o->torsion_fine_tuning[0x93] = 0xfb52;
+        o->torsion_fine_tuning[0x94] = 0xfb7e;
+        o->torsion_fine_tuning[0x95] = 0xfb7a;
+        o->torsion_fine_tuning[0x96] = 0xfbb9;
+        o->torsion_fine_tuning[0x97] = 0xfbf1;
+        o->torsion_fine_tuning[0x98] = 0xfbf9;
+        o->torsion_fine_tuning[0x99] = 0xfc09;
+        o->torsion_fine_tuning[0x9a] = 0xfbda;
+        o->torsion_fine_tuning[0x9b] = 0xfb8d;
+        o->torsion_fine_tuning[0x9c] = 0xfb39;
+        o->torsion_fine_tuning[0x9d] = 0xfb34;
+        o->torsion_fine_tuning[0x9e] = 0xfb3b;
+        o->torsion_fine_tuning[0x9f] = 0xfac7;
+        o->torsion_fine_tuning[0xa0] = 0xfaf2;
+        o->torsion_fine_tuning[0xa1] = 0xfaf1;
+        o->torsion_fine_tuning[0xa2] = 0xfab7;
+        o->torsion_fine_tuning[0xa3] = 0xfa1e;
+        o->torsion_fine_tuning[0xa4] = 0xf9b9;
+        o->torsion_fine_tuning[0xa5] = 0xf97a;
+        o->torsion_fine_tuning[0xa6] = 0xf94f;
+        o->torsion_fine_tuning[0xa7] = 0xf952;
+        o->torsion_fine_tuning[0xa8] = 0xf9c7;
+        o->torsion_fine_tuning[0xa9] = 0xfa7f;
+        o->torsion_fine_tuning[0xaa] = 0xfb84;
+        o->torsion_fine_tuning[0xab] = 0xfc0d;
+        o->torsion_fine_tuning[0xac] = 0xfca4;
+        o->torsion_fine_tuning[0xad] = 0xfd09;
+        o->torsion_fine_tuning[0xae] = 0xfcfc;
+        o->torsion_fine_tuning[0xaf] = 0xfca6;
+        o->torsion_fine_tuning[0xb0] = 0xfc4a;
+        o->torsion_fine_tuning[0xb1] = 0xfbba;
+        o->torsion_fine_tuning[0xb2] = 0xfb22;
+        o->torsion_fine_tuning[0xb3] = 0xfac0;
+        o->torsion_fine_tuning[0xb4] = 0xfa7b;
+        o->torsion_fine_tuning[0xb5] = 0xfa4f;
+        o->torsion_fine_tuning[0xb6] = 0xfa21;
+        o->torsion_fine_tuning[0xb7] = 0xf9e0;
+        o->torsion_fine_tuning[0xb8] = 0xfa2c;
+        o->torsion_fine_tuning[0xb9] = 0xfa01;
+        o->torsion_fine_tuning[0xba] = 0xf9fd;
+        o->torsion_fine_tuning[0xbb] = 0xfa53;
+        o->torsion_fine_tuning[0xbc] = 0xfa59;
+        o->torsion_fine_tuning[0xbd] = 0xfae9;
+        o->torsion_fine_tuning[0xbe] = 0xfb53;
+        o->torsion_fine_tuning[0xbf] = 0xfb1d;
+        o->torsion_fine_tuning[0xc0] = 0xfb77;
+        o->torsion_fine_tuning[0xc1] = 0xfb9d;
+        o->torsion_fine_tuning[0xc2] = 0xfb34;
+        o->torsion_fine_tuning[0xc3] = 0xfb24;
+        o->torsion_fine_tuning[0xc4] = 0xfb15;
+        o->torsion_fine_tuning[0xc5] = 0xfb16;
+        o->torsion_fine_tuning[0xc6] = 0xfb04;
+        o->torsion_fine_tuning[0xc7] = 0xfaee;
+        o->torsion_fine_tuning[0xc8] = 0xfb2e;
+        o->torsion_fine_tuning[0xc9] = 0xfb0a;
+        o->torsion_fine_tuning[0xca] = 0xfb01;
+        o->torsion_fine_tuning[0xcb] = 0xfb60;
+        o->torsion_fine_tuning[0xcc] = 0xfb64;
+        o->torsion_fine_tuning[0xcd] = 0xfbad;
+        o->torsion_fine_tuning[0xce] = 0xfb93;
+        o->torsion_fine_tuning[0xcf] = 0xfb76;
+        o->torsion_fine_tuning[0xd0] = 0xfbfc;
+        o->torsion_fine_tuning[0xd1] = 0xfc2b;
+        o->torsion_fine_tuning[0xd2] = 0xfbfa;
+        o->torsion_fine_tuning[0xd3] = 0xfc1b;
+        o->torsion_fine_tuning[0xd4] = 0xfc38;
+        o->torsion_fine_tuning[0xd5] = 0xfc49;
+        o->torsion_fine_tuning[0xd6] = 0xfc4d;
+        o->torsion_fine_tuning[0xd7] = 0xfc0e;
+        o->torsion_fine_tuning[0xd8] = 0xfc61;
+        o->torsion_fine_tuning[0xd9] = 0xfc80;
+        o->torsion_fine_tuning[0xda] = 0xfc3a;
+        o->torsion_fine_tuning[0xdb] = 0xfca6;
+        o->torsion_fine_tuning[0xdc] = 0xfcb2;
+        o->torsion_fine_tuning[0xdd] = 0xfd27;
+        o->torsion_fine_tuning[0xde] = 0xfd81;
+        o->torsion_fine_tuning[0xdf] = 0xfd45;
+        o->torsion_fine_tuning[0xe0] = 0xfd75;
+        o->torsion_fine_tuning[0xe1] = 0xfd69;
+        o->torsion_fine_tuning[0xe2] = 0xfcff;
+        o->torsion_fine_tuning[0xe3] = 0xfcc0;
+        o->torsion_fine_tuning[0xe4] = 0xfcac;
+        o->torsion_fine_tuning[0xe5] = 0xfc9c;
+        o->torsion_fine_tuning[0xe6] = 0xfc8a;
+        o->torsion_fine_tuning[0xe7] = 0xfc57;
+        o->torsion_fine_tuning[0xe8] = 0xfcb0;
+        o->torsion_fine_tuning[0xe9] = 0xfcfa;
+        o->torsion_fine_tuning[0xea] = 0xfcf6;
+        o->torsion_fine_tuning[0xeb] = 0xfd46;
+        o->torsion_fine_tuning[0xec] = 0xfdc2;
+        o->torsion_fine_tuning[0xed] = 0xfe1c;
+        o->torsion_fine_tuning[0xee] = 0xfe63;
+        o->torsion_fine_tuning[0xef] = 0xfe55;
+        o->torsion_fine_tuning[0xf0] = 0xfe7c;
+        o->torsion_fine_tuning[0xf1] = 0xfe9c;
+        o->torsion_fine_tuning[0xf2] = 0xfe80;
+        o->torsion_fine_tuning[0xf3] = 0xfe96;
+        o->torsion_fine_tuning[0xf4] = 0xfeac;
+        o->torsion_fine_tuning[0xf5] = 0xfeec;
+        o->torsion_fine_tuning[0xf6] = 0xff1d;
+        o->torsion_fine_tuning[0xf7] = 0xff4e;
+        o->torsion_fine_tuning[0xf8] = 0xff67;
+        o->torsion_fine_tuning[0xf9] = 0xff82;
+        o->torsion_fine_tuning[0xfa] = 0xffc1;
+        o->torsion_fine_tuning[0xfb] = 0xffc4;
+        o->torsion_fine_tuning[0xfc] = 0xffa8;
+        o->torsion_fine_tuning[0xfd] = 0x0039;
+        o->torsion_fine_tuning[0xfe] = 0x0060;
+        o->torsion_fine_tuning[0xff] = 0x000e;
+    }
+}
 #endif
 
 

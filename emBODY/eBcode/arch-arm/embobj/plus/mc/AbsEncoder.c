@@ -516,7 +516,7 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
                 
             o->delta = delta;
                 
-            position -= o->offset;
+            //position -= o->offset;
             
             o->distance += (int32_t)delta;
             
@@ -564,104 +564,6 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
     }
 }
 
-/*
-void AbsEncoder_update(AbsEncoder* o, int32_t position)
-{
-    if (!o) return;
-        
-    if (o->fake) return;
-    
-    if (o->state.bits.not_configured) return;
-    
-    if (o->state.bits.not_calibrated) return;
-    
-    position -= o->offset;
-    
-    if (position<0)
-    {
-        position += 65536L;
-    }
-    else if (position>=65536L)
-    {
-        position -= 65536L;
-    }
-    
-    o->invalid_cnt = 0;
-    o->timeout_cnt = 0;
-    
-    if (o->state.bits.not_initialized)
-    {
-        AbsEncoder_position_init(o, position);
-        
-        o->velocity = 0;
-        
-        return;
-    }
-    
-    int32_t check = position - o->position_last;
-    
-    while (check<-32768) check+=65536;    
-    while (check> 32768) check-=65536;
-    
-    o->position_last = position;
-
-    if (-o->spike_mag_limit <= check && check <= o->spike_mag_limit)
-    {
-        int32_t delta = position - o->position_sure;
-
-        while (delta<-32768) delta+=65536;        
-        while (delta> 32768) delta-=65536;
-        
-        if (delta)
-        {
-            o->position_sure = position;
-                
-            o->delta = delta;
-                
-            o->distance += o->delta;
-                
-            o->velocity = (7*o->velocity + ((int32_t)CTRL_LOOP_FREQUENCY)*o->delta) >> 3;
-        }
-        else
-        {
-            o->velocity = (7*o->velocity) >> 3;
-        }
-    }
-    else
-    {
-        o->spike_cnt++;
-       
-        o->velocity = (7*o->velocity) >> 3;
-    }
-        
-    //every second
-    
-    eOemsrunner_diagnosticsinfo_t* runner_info = eom_emsrunner_GetDiagnosticsInfoHandle(eom_emsrunner_GetHandle());
-    
-    if ((runner_info->numberofperiods % 1000) == 0)
-    {
-        if (o->spike_cnt > 0)
-        {                
-            //message "spike encoder error"
-            eOerrmanDescriptor_t descriptor = {0};
-            descriptor.par16 = o->ID;           
-            descriptor.par64 = o->spike_cnt;
-            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-            descriptor.sourceaddress = 0;
-            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
-                
-            if (o->spike_cnt > o->spike_cnt_limit)
-            {
-                o->fault_state.bits.spikes = TRUE;
-                o->hardware_fault = TRUE;
-            }
-            
-            o->spike_cnt = 0;
-        }
-    }
-}
-*/
 
 void AbsEncoder_overwrite(AbsEncoder* o, int32_t position, int32_t velocity)
 {

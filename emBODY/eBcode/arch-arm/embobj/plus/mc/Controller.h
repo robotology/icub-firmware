@@ -145,7 +145,8 @@ extern void MController_update_motor_odometry_fbk_can(int m, void* data);
 extern void MController_motor_raise_fault_i2t(int m);
 
 #if defined(ERGOJOINT)
-    void MController_update_joint_pos_raw(uint8_t jid, int32_t encoder);
+    void MController_motor_calc_torque(uint8_t jid, int32_t encoder);
+    void MController_motor_calc_torque_invalid(uint8_t jid, int32_t encoder);
 #endif
 
 ////////////////////////////////////////////////////////////////////////

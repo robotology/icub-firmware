@@ -2129,9 +2129,16 @@ void MController_motor_raise_fault_i2t(int m)
 
 
 #if defined(ERGOJOINT)
-    void MController_update_joint_pos_raw(uint8_t jid, int32_t encoder)
+    void MController_motor_calc_torque_invalid(uint8_t jid, int32_t encoder)
     {
-        Joint_update_joint_pos_raw(smc->joint+jid, encoder);
+        Motor_calc_torque_invalid(smc->motor+jid, encoder);
+    }
+
+    void MController_motor_calc_torque(uint8_t jid, int32_t encoder)
+    {
+        CTRL_UNITS trq_fbk = Motor_calc_torque(smc->motor+jid, encoder);
+        
+        Joint_update_torque_fbk(smc->joint+jid, trq_fbk);
     }
 #endif
 

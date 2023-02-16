@@ -205,9 +205,8 @@ extern BOOL Motor_is_motor_joint_fault_over(Motor* o);
 //BOOL Motor_clear_ext_fault(Motor *o);
 
 #ifdef ERGOJOINT
-extern void Motor_compute_torque(Motor* o);
-extern void Motor_update_joint_pos_raw(Motor* o, int32_t encoder);
-extern void Motor_update_motor_pos_raw(Motor* o, int32_t encoder);
+extern CTRL_UNITS Motor_calc_torque(Motor* o, int32_t encoder);
+extern void Motor_calc_torque_invalid(Motor* o, int32_t encoder);
 #endif
 
 ////////////////////////////////////////////////////////////////////////////
