@@ -112,7 +112,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 
                 jCalib6Data_ptr->is_active = FALSE;
                 char info[80];
-                sprintf(info,"calib 6:outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
+                sprintf(info,"calib 6:outLim: cp:%d mx:%.1f mn:%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
                 JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
 
                 return(eores_NOK_generic);
@@ -185,20 +185,15 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 m_ptr->pos_fbk_old = 0;
                 m_ptr->not_init = TRUE;
                 
-//                /////Debug code
-//                char message[150];
-//                snprintf(message, sizeof(message), "c6M:pos reached: cp%d co%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
-//                JointSet_send_debug_message(message, m_ptr->ID);
+                /////Debug code
+                char message[150];
+                snprintf(message, sizeof(message), "c6M:pos reached: cp=%d co=%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
+                JointSet_send_debug_message(message, m_ptr->ID, 0, 0);
                 
                 m_ptr->not_calibrated = FALSE;
                 
                 
-                /////Debug code
-//                char info[80];
-//                snprintf(info, 80,"Calib offset is %d", offset);
-//                JointSet_send_debug_message(info, j_ptr->ID);
-                /////ended
-                
+               
                 for (int k=0; k<*(o->pN); ++k)
                 {
                     int m = o->motors_of_set[k];
@@ -210,11 +205,11 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 //restore rotor limits
                 m_ptr->pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
                 m_ptr->pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
-//                /////Debug code 
-//                char info[80];
-//                sprintf(info,"calib 6: restore rlim of m %d", m_ptr->ID);
-//                JointSet_send_debug_message(info, j_ptr->ID);
-//                ////ended
+                /////Debug code 
+                char info[80];
+                sprintf(info,"m_min=%d m_max=%d", m_ptr->pos_min, m_ptr->pos_max );
+                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+                ////ended
             }
                 
         }
@@ -223,6 +218,9 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
         case calibtype6_st_finished:
         {
             *calibrationCompleted = TRUE;
+            char info[80];
+            sprintf(info,"calib Completed" );
+            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
         }break;
         
         default:
@@ -301,6 +299,7 @@ BOOL JointSet_do_wait_calibration_mixed(JointSet* o)
     
     BOOL calibrationCompleted = TRUE;
     eOresult_t res = eores_OK;
+    volatile uint8_t num_of_j = *(o->pN);
     
     for (int k=0; ( (k<*(o->pN)) && (eores_OK == res) ); ++k)
     {
@@ -356,6 +355,10 @@ BOOL JointSet_do_wait_calibration_mixed(JointSet* o)
             Joint* j_ptr = o->joint + o->joints_of_set[k];
             Joint_reset_calibration_data(j_ptr);
         }
+        //Debug code
+        char message[150];
+        snprintf(message, sizeof(message), "JointSet_do_wait_calibration_mixed: calib completed.");
+        JointSet_send_debug_message(message, 0, 0, 0);
     
     }
     return(calibrationCompleted);
