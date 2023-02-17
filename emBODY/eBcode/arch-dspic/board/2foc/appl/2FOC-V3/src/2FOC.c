@@ -908,6 +908,9 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     //
     ////////////////////////////////////////////////////////////////////////////
     
+    Vq/=2;
+    Vd/=2;
+    
     ////////////////////////////////////////////////////////////////////////////
     // inv transform and PWM drive    
     int V1 = (int)((__builtin_mulss(Vq,cosT)-__builtin_mulss(Vd*3,sinT)+0x7FFF)>>16);
