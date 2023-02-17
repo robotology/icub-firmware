@@ -999,12 +999,6 @@ CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk
     static const float ENC2RAD = 3.1415926f/32768.0f;
     
     float omega = ENC2RAD*o->vel_fbk; // rad/s
-    
-    static const float Io = 0.350f; // A
-    static const float Kw = 0.9f;   // A/(rad/s)
-    
-    static const float Kt = 160.0*0.058f; // Nm/A
-    static const float iKt = 1.f/Kt;      // A/Nm;
       
     trq_ref *= 1.0e-6f; // uNm -> Nm
     
@@ -1017,7 +1011,7 @@ CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk
     
     //Iout = o->trqPID.Ko*omega_sgn + o->trqPID.Kp*omega; // + o->trqPID.Kff*trq_ref; // iKt*trq_ref    
     
-    Iout = Io*omega_sgn + Kw*omega;
+    Iout = o->Io*omega_sgn + o->Kw*omega;
     
     float Ivis = o->trqPID.Kp*omega*omega*omega_sgn;
     
@@ -1025,8 +1019,8 @@ CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk
     
     float Itrq = 0.0f;
     
-    if (trq_fbk >  0.5f) Itrq += 0.001f*o->trqPID.Ko*Io;
-    if (trq_fbk < -0.5f) Itrq -= 0.001f*o->trqPID.Ko*Io;
+    if (trq_fbk >  0.5f) Itrq += 0.001f*o->trqPID.Ko*o->Io;
+    if (trq_fbk < -0.5f) Itrq -= 0.001f*o->trqPID.Ko*o->Io;
     
     Itrq += 0.001f*o->trqPID.Kff*trq_fbk;
     
@@ -1103,9 +1097,9 @@ void Motor_actuate(Motor* motor, uint8_t N) //
 //            ((int16_t*)output)[3] = motor[0].angle;
 //        }
         
-        ((int16_t*)output)[1] = motor[0].pos_raw_fbk;
-        ((int16_t*)output)[2] = motor[0].joint_position_raw>>3;
-        ((int16_t*)output)[3] = motor[0].torsion;
+//        ((int16_t*)output)[1] = motor[0].pos_raw_fbk;
+//        ((int16_t*)output)[2] = motor[0].joint_position_raw>>3;
+//        ((int16_t*)output)[3] = motor[0].torsion;
     
 //        ((int16_t*)output)[1] = motor[0].invalid_torque_measure;
 //        ((int16_t*)output)[2] = motor[0].spikes;
@@ -1676,12 +1670,290 @@ CTRL_UNITS Motor_calc_torque(Motor* o, int32_t joint_encoder)
     return o->trq_fbk; 
 }
 
+#define NEW_JOINT
+
 // temporary solution until the data aren't transmitted
 // by protocol from yarprobotinterface at startup
 static void torque_calib_init(Motor* o)
 {
     if (o->ID==0)
     { 
+        #ifdef NEW_JOINT
+        o->Io = 0.8f; // A
+        o->Kw = 1.8f;   // A/(rad/s)
+    
+        o->Kt = 160.0*0.058f; // Nm/A
+        o->iKt = 1.f/o->Kt;      // A/Nm;
+        
+        o->torsion_offset = 0xf7f8;
+        
+        o->joint_full_res = 524288;
+                
+        o->torsion_fine_tuning[0x00] = 0x09d4;
+        o->torsion_fine_tuning[0x01] = 0x0982;
+        o->torsion_fine_tuning[0x02] = 0x0904;
+        o->torsion_fine_tuning[0x03] = 0x089f;
+        o->torsion_fine_tuning[0x04] = 0x0831;
+        o->torsion_fine_tuning[0x05] = 0x07bd;
+        o->torsion_fine_tuning[0x06] = 0x0722;
+        o->torsion_fine_tuning[0x07] = 0x0691;
+        o->torsion_fine_tuning[0x08] = 0x05fa;
+        o->torsion_fine_tuning[0x09] = 0x053b;
+        o->torsion_fine_tuning[0x0a] = 0x04cd;
+        o->torsion_fine_tuning[0x0b] = 0x043b;
+        o->torsion_fine_tuning[0x0c] = 0x03ba;
+        o->torsion_fine_tuning[0x0d] = 0x03aa;
+        o->torsion_fine_tuning[0x0e] = 0x02ff;
+        o->torsion_fine_tuning[0x0f] = 0x026e;
+        o->torsion_fine_tuning[0x10] = 0x0201;
+        o->torsion_fine_tuning[0x11] = 0x0168;
+        o->torsion_fine_tuning[0x12] = 0x00c7;
+        o->torsion_fine_tuning[0x13] = 0x001f;
+        o->torsion_fine_tuning[0x14] = 0xff8a;
+        o->torsion_fine_tuning[0x15] = 0xff5d;
+        o->torsion_fine_tuning[0x16] = 0xfea3;
+        o->torsion_fine_tuning[0x17] = 0xfdf6;
+        o->torsion_fine_tuning[0x18] = 0xfd88;
+        o->torsion_fine_tuning[0x19] = 0xfd45;
+        o->torsion_fine_tuning[0x1a] = 0xfcc4;
+        o->torsion_fine_tuning[0x1b] = 0xfbec;
+        o->torsion_fine_tuning[0x1c] = 0xfb42;
+        o->torsion_fine_tuning[0x1d] = 0xfae6;
+        o->torsion_fine_tuning[0x1e] = 0xf9cc;
+        o->torsion_fine_tuning[0x1f] = 0xf931;
+        o->torsion_fine_tuning[0x20] = 0xf902;
+        o->torsion_fine_tuning[0x21] = 0xf8a3;
+        o->torsion_fine_tuning[0x22] = 0xf898;
+        o->torsion_fine_tuning[0x23] = 0xf844;
+        o->torsion_fine_tuning[0x24] = 0xf856;
+        o->torsion_fine_tuning[0x25] = 0xf82e;
+        o->torsion_fine_tuning[0x26] = 0xf7ce;
+        o->torsion_fine_tuning[0x27] = 0xf762;
+        o->torsion_fine_tuning[0x28] = 0xf707;
+        o->torsion_fine_tuning[0x29] = 0xf706;
+        o->torsion_fine_tuning[0x2a] = 0xf679;
+        o->torsion_fine_tuning[0x2b] = 0xf5f7;
+        o->torsion_fine_tuning[0x2c] = 0xf579;
+        o->torsion_fine_tuning[0x2d] = 0xf59a;
+        o->torsion_fine_tuning[0x2e] = 0xf53d;
+        o->torsion_fine_tuning[0x2f] = 0xf450;
+        o->torsion_fine_tuning[0x30] = 0xf489;
+        o->torsion_fine_tuning[0x31] = 0xf446;
+        o->torsion_fine_tuning[0x32] = 0xf44a;
+        o->torsion_fine_tuning[0x33] = 0xf3b9;
+        o->torsion_fine_tuning[0x34] = 0xf384;
+        o->torsion_fine_tuning[0x35] = 0xf39b;
+        o->torsion_fine_tuning[0x36] = 0xf38a;
+        o->torsion_fine_tuning[0x37] = 0xf30d;
+        o->torsion_fine_tuning[0x38] = 0xf2dc;
+        o->torsion_fine_tuning[0x39] = 0xf2f7;
+        o->torsion_fine_tuning[0x3a] = 0xf2e4;
+        o->torsion_fine_tuning[0x3b] = 0xf2ab;
+        o->torsion_fine_tuning[0x3c] = 0xf2a8;
+        o->torsion_fine_tuning[0x3d] = 0xf263;
+        o->torsion_fine_tuning[0x3e] = 0xf23c;
+        o->torsion_fine_tuning[0x3f] = 0xf227;
+        o->torsion_fine_tuning[0x40] = 0xf233;
+        o->torsion_fine_tuning[0x41] = 0xf1b9;
+        o->torsion_fine_tuning[0x42] = 0xf178;
+        o->torsion_fine_tuning[0x43] = 0xf184;
+        o->torsion_fine_tuning[0x44] = 0xf199;
+        o->torsion_fine_tuning[0x45] = 0xf181;
+        o->torsion_fine_tuning[0x46] = 0xf16e;
+        o->torsion_fine_tuning[0x47] = 0xf13b;
+        o->torsion_fine_tuning[0x48] = 0xf10d;
+        o->torsion_fine_tuning[0x49] = 0xf0da;
+        o->torsion_fine_tuning[0x4a] = 0xf074;
+        o->torsion_fine_tuning[0x4b] = 0xf00a;
+        o->torsion_fine_tuning[0x4c] = 0xefb4;
+        o->torsion_fine_tuning[0x4d] = 0xef3f;
+        o->torsion_fine_tuning[0x4e] = 0xef12;
+        o->torsion_fine_tuning[0x4f] = 0xee7e;
+        o->torsion_fine_tuning[0x50] = 0xee2f;
+        o->torsion_fine_tuning[0x51] = 0xedab;
+        o->torsion_fine_tuning[0x52] = 0xed4a;
+        o->torsion_fine_tuning[0x53] = 0xed53;
+        o->torsion_fine_tuning[0x54] = 0xed8f;
+        o->torsion_fine_tuning[0x55] = 0xedea;
+        o->torsion_fine_tuning[0x56] = 0xeeb1;
+        o->torsion_fine_tuning[0x57] = 0xef94;
+        o->torsion_fine_tuning[0x58] = 0xf03b;
+        o->torsion_fine_tuning[0x59] = 0xf0c0;
+        o->torsion_fine_tuning[0x5a] = 0xf0aa;
+        o->torsion_fine_tuning[0x5b] = 0xf0af;
+        o->torsion_fine_tuning[0x5c] = 0xf0bc;
+        o->torsion_fine_tuning[0x5d] = 0xf092;
+        o->torsion_fine_tuning[0x5e] = 0xf018;
+        o->torsion_fine_tuning[0x5f] = 0xefe9;
+        o->torsion_fine_tuning[0x60] = 0xf083;
+        o->torsion_fine_tuning[0x61] = 0xf090;
+        o->torsion_fine_tuning[0x62] = 0xf00f;
+        o->torsion_fine_tuning[0x63] = 0xf047;
+        o->torsion_fine_tuning[0x64] = 0xf07f;
+        o->torsion_fine_tuning[0x65] = 0xeffc;
+        o->torsion_fine_tuning[0x66] = 0xf044;
+        o->torsion_fine_tuning[0x67] = 0xf019;
+        o->torsion_fine_tuning[0x68] = 0xf045;
+        o->torsion_fine_tuning[0x69] = 0xf08d;
+        o->torsion_fine_tuning[0x6a] = 0xf0b2;
+        o->torsion_fine_tuning[0x6b] = 0xf16c;
+        o->torsion_fine_tuning[0x6c] = 0xf119;
+        o->torsion_fine_tuning[0x6d] = 0xf16f;
+        o->torsion_fine_tuning[0x6e] = 0xf19f;
+        o->torsion_fine_tuning[0x6f] = 0xf139;
+        o->torsion_fine_tuning[0x70] = 0xf1a3;
+        o->torsion_fine_tuning[0x71] = 0xf175;
+        o->torsion_fine_tuning[0x72] = 0xf16a;
+        o->torsion_fine_tuning[0x73] = 0xf181;
+        o->torsion_fine_tuning[0x74] = 0xf171;
+        o->torsion_fine_tuning[0x75] = 0xf1c5;
+        o->torsion_fine_tuning[0x76] = 0xf169;
+        o->torsion_fine_tuning[0x77] = 0xf189;
+        o->torsion_fine_tuning[0x78] = 0xf182;
+        o->torsion_fine_tuning[0x79] = 0xf168;
+        o->torsion_fine_tuning[0x7a] = 0xf1b9;
+        o->torsion_fine_tuning[0x7b] = 0xf1f6;
+        o->torsion_fine_tuning[0x7c] = 0xf1f7;
+        o->torsion_fine_tuning[0x7d] = 0xf249;
+        o->torsion_fine_tuning[0x7e] = 0xf27f;
+        o->torsion_fine_tuning[0x7f] = 0xf2f1;
+        o->torsion_fine_tuning[0x80] = 0xf34e;
+        o->torsion_fine_tuning[0x81] = 0xf36f;
+        o->torsion_fine_tuning[0x82] = 0xf347;
+        o->torsion_fine_tuning[0x83] = 0xf356;
+        o->torsion_fine_tuning[0x84] = 0xf3ae;
+        o->torsion_fine_tuning[0x85] = 0xf402;
+        o->torsion_fine_tuning[0x86] = 0xf42c;
+        o->torsion_fine_tuning[0x87] = 0xf450;
+        o->torsion_fine_tuning[0x88] = 0xf4c3;
+        o->torsion_fine_tuning[0x89] = 0xf4dd;
+        o->torsion_fine_tuning[0x8a] = 0xf508;
+        o->torsion_fine_tuning[0x8b] = 0xf588;
+        o->torsion_fine_tuning[0x8c] = 0xf561;
+        o->torsion_fine_tuning[0x8d] = 0xf53f;
+        o->torsion_fine_tuning[0x8e] = 0xf55c;
+        o->torsion_fine_tuning[0x8f] = 0xf5b6;
+        o->torsion_fine_tuning[0x90] = 0xf5c5;
+        o->torsion_fine_tuning[0x91] = 0xf5a0;
+        o->torsion_fine_tuning[0x92] = 0xf5fe;
+        o->torsion_fine_tuning[0x93] = 0xf6af;
+        o->torsion_fine_tuning[0x94] = 0xf6d3;
+        o->torsion_fine_tuning[0x95] = 0xf714;
+        o->torsion_fine_tuning[0x96] = 0xf7b8;
+        o->torsion_fine_tuning[0x97] = 0xf853;
+        o->torsion_fine_tuning[0x98] = 0xf8f3;
+        o->torsion_fine_tuning[0x99] = 0xf93b;
+        o->torsion_fine_tuning[0x9a] = 0xf9e3;
+        o->torsion_fine_tuning[0x9b] = 0xfa6c;
+        o->torsion_fine_tuning[0x9c] = 0xfabe;
+        o->torsion_fine_tuning[0x9d] = 0xfac6;
+        o->torsion_fine_tuning[0x9e] = 0xfb38;
+        o->torsion_fine_tuning[0x9f] = 0xfb19;
+        o->torsion_fine_tuning[0xa0] = 0xfbc7;
+        o->torsion_fine_tuning[0xa1] = 0xfba5;
+        o->torsion_fine_tuning[0xa2] = 0xfc16;
+        o->torsion_fine_tuning[0xa3] = 0xfcd0;
+        o->torsion_fine_tuning[0xa4] = 0xfd7f;
+        o->torsion_fine_tuning[0xa5] = 0xfdbb;
+        o->torsion_fine_tuning[0xa6] = 0xfe2e;
+        o->torsion_fine_tuning[0xa7] = 0xfee8;
+        o->torsion_fine_tuning[0xa8] = 0xff6c;
+        o->torsion_fine_tuning[0xa9] = 0x002d;
+        o->torsion_fine_tuning[0xaa] = 0x00aa;
+        o->torsion_fine_tuning[0xab] = 0x0134;
+        o->torsion_fine_tuning[0xac] = 0x01d8;
+        o->torsion_fine_tuning[0xad] = 0x0304;
+        o->torsion_fine_tuning[0xae] = 0x03bf;
+        o->torsion_fine_tuning[0xaf] = 0x03cf;
+        o->torsion_fine_tuning[0xb0] = 0x04d9;
+        o->torsion_fine_tuning[0xb1] = 0x05ae;
+        o->torsion_fine_tuning[0xb2] = 0x0621;
+        o->torsion_fine_tuning[0xb3] = 0x068a;
+        o->torsion_fine_tuning[0xb4] = 0x06b1;
+        o->torsion_fine_tuning[0xb5] = 0x077b;
+        o->torsion_fine_tuning[0xb6] = 0x07ae;
+        o->torsion_fine_tuning[0xb7] = 0x07ee;
+        o->torsion_fine_tuning[0xb8] = 0x08bd;
+        o->torsion_fine_tuning[0xb9] = 0x08fa;
+        o->torsion_fine_tuning[0xba] = 0x096b;
+        o->torsion_fine_tuning[0xbb] = 0x09de;
+        o->torsion_fine_tuning[0xbc] = 0x0a43;
+        o->torsion_fine_tuning[0xbd] = 0x0a9b;
+        o->torsion_fine_tuning[0xbe] = 0x0ab5;
+        o->torsion_fine_tuning[0xbf] = 0x0b06;
+        o->torsion_fine_tuning[0xc0] = 0x0ba5;
+        o->torsion_fine_tuning[0xc1] = 0x0bc5;
+        o->torsion_fine_tuning[0xc2] = 0x0c32;
+        o->torsion_fine_tuning[0xc3] = 0x0cd1;
+        o->torsion_fine_tuning[0xc4] = 0x0d1b;
+        o->torsion_fine_tuning[0xc5] = 0x0da7;
+        o->torsion_fine_tuning[0xc6] = 0x0daf;
+        o->torsion_fine_tuning[0xc7] = 0x0e22;
+        o->torsion_fine_tuning[0xc8] = 0x0e9b;
+        o->torsion_fine_tuning[0xc9] = 0x0eed;
+        o->torsion_fine_tuning[0xca] = 0x0f52;
+        o->torsion_fine_tuning[0xcb] = 0x0f97;
+        o->torsion_fine_tuning[0xcc] = 0x0f86;
+        o->torsion_fine_tuning[0xcd] = 0x0fbb;
+        o->torsion_fine_tuning[0xce] = 0x0fb1;
+        o->torsion_fine_tuning[0xcf] = 0x0fa4;
+        o->torsion_fine_tuning[0xd0] = 0x0f9d;
+        o->torsion_fine_tuning[0xd1] = 0x0fc7;
+        o->torsion_fine_tuning[0xd2] = 0x0fab;
+        o->torsion_fine_tuning[0xd3] = 0x0fce;
+        o->torsion_fine_tuning[0xd4] = 0x0f85;
+        o->torsion_fine_tuning[0xd5] = 0x0fe4;
+        o->torsion_fine_tuning[0xd6] = 0x0fcd;
+        o->torsion_fine_tuning[0xd7] = 0x0fd5;
+        o->torsion_fine_tuning[0xd8] = 0x1011;
+        o->torsion_fine_tuning[0xd9] = 0x100a;
+        o->torsion_fine_tuning[0xda] = 0x1057;
+        o->torsion_fine_tuning[0xdb] = 0x102f;
+        o->torsion_fine_tuning[0xdc] = 0x1050;
+        o->torsion_fine_tuning[0xdd] = 0x1041;
+        o->torsion_fine_tuning[0xde] = 0x0ffa;
+        o->torsion_fine_tuning[0xdf] = 0x1014;
+        o->torsion_fine_tuning[0xe0] = 0x101c;
+        o->torsion_fine_tuning[0xe1] = 0x106a;
+        o->torsion_fine_tuning[0xe2] = 0x0fc3;
+        o->torsion_fine_tuning[0xe3] = 0x0fa1;
+        o->torsion_fine_tuning[0xe4] = 0x0faa;
+        o->torsion_fine_tuning[0xe5] = 0x0f89;
+        o->torsion_fine_tuning[0xe6] = 0x0f31;
+        o->torsion_fine_tuning[0xe7] = 0x0f0d;
+        o->torsion_fine_tuning[0xe8] = 0x0ef2;
+        o->torsion_fine_tuning[0xe9] = 0x0f0b;
+        o->torsion_fine_tuning[0xea] = 0x0ebd;
+        o->torsion_fine_tuning[0xeb] = 0x0f22;
+        o->torsion_fine_tuning[0xec] = 0x0eb7;
+        o->torsion_fine_tuning[0xed] = 0x0ef2;
+        o->torsion_fine_tuning[0xee] = 0x0ed7;
+        o->torsion_fine_tuning[0xef] = 0x0e71;
+        o->torsion_fine_tuning[0xf0] = 0x0ebe;
+        o->torsion_fine_tuning[0xf1] = 0x0e76;
+        o->torsion_fine_tuning[0xf2] = 0x0e1d;
+        o->torsion_fine_tuning[0xf3] = 0x0dac;
+        o->torsion_fine_tuning[0xf4] = 0x0d63;
+        o->torsion_fine_tuning[0xf5] = 0x0d4e;
+        o->torsion_fine_tuning[0xf6] = 0x0cb7;
+        o->torsion_fine_tuning[0xf7] = 0x0c91;
+        o->torsion_fine_tuning[0xf8] = 0x0c64;
+        o->torsion_fine_tuning[0xf9] = 0x0c39;
+        o->torsion_fine_tuning[0xfa] = 0x0be5;
+        o->torsion_fine_tuning[0xfb] = 0x0b72;
+        o->torsion_fine_tuning[0xfc] = 0x0b22;
+        o->torsion_fine_tuning[0xfd] = 0x0aec;
+        o->torsion_fine_tuning[0xfe] = 0x0a73;
+        o->torsion_fine_tuning[0xff] = 0x09fd;
+        #endif
+        
+        #ifdef OLD_JOINT
+        o->Io = 0.350f; // A
+        o->Kw = 0.9f;   // A/(rad/s)
+    
+        o->Kt = 160.0*0.058f; // Nm/A
+        o->iKt = 1.f/o->Kt;      // A/Nm;
+        
         o->torsion_offset = 0x4179;
         
         o->joint_full_res = -524288;
@@ -1942,6 +2214,7 @@ static void torque_calib_init(Motor* o)
         o->torsion_fine_tuning[0xfd] = 0x0039;
         o->torsion_fine_tuning[0xfe] = 0x0060;
         o->torsion_fine_tuning[0xff] = 0x000e;
+        #endif
     }
 }
 #endif
