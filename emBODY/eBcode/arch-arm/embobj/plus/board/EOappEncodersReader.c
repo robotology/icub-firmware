@@ -1375,9 +1375,6 @@ static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(hal_spiencoder_diagnostic_
     errdes.par16                = 0;
     errdes.par64                = (uint64_t) (diag->info.aksim2_status_crc) << 32;
 
-    // TODO: remove
-    diag->info.aksim2_status_crc = 0x07;
-
     if(0x04 == (0x04 & diag->info.aksim2_status_crc))
     {
         errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
