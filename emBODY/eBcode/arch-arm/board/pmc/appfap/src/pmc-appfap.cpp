@@ -121,79 +121,79 @@ static_assert(evt_RXcanframe_reserved == embot::app::skeleton::os::evthreadcan::
 
 
 constexpr embot::os::Event evt_POSprocess       = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
- 
+
 constexpr embot::os::Event evt_ACQUIREfaps      = embot::core::binary::mask::pos2mask<embot::os::Event>(10);
 constexpr embot::os::Event evt_NOREPLYfaps      = embot::core::binary::mask::pos2mask<embot::os::Event>(11);
 constexpr embot::os::Event evt_TRANSMITfaps     = embot::core::binary::mask::pos2mask<embot::os::Event>(12);
 
-constexpr embot::os::Event evt_SNSR01_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(13);  
-constexpr embot::os::Event evt_SNSR01_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(14);  
+constexpr embot::os::Event evt_SNSR01_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(13);
+constexpr embot::os::Event evt_SNSR01_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(14);
 constexpr embot::os::Event evt_SNSR01_noreply   = 0; //embot::core::binary::mask::pos2mask<embot::os::Event>(15);
-constexpr embot::os::Event evt_SNSR02_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(16);  
-constexpr embot::os::Event evt_SNSR02_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(17);  
+constexpr embot::os::Event evt_SNSR02_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(16);
+constexpr embot::os::Event evt_SNSR02_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(17);
 constexpr embot::os::Event evt_SNSR02_noreply   = 0; //embot::core::binary::mask::pos2mask<embot::os::Event>(18);
-constexpr embot::os::Event evt_SNSR03_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(19);  
-constexpr embot::os::Event evt_SNSR03_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(20);  
+constexpr embot::os::Event evt_SNSR03_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(19);
+constexpr embot::os::Event evt_SNSR03_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(20);
 constexpr embot::os::Event evt_SNSR03_noreply   = 0; //embot::core::binary::mask::pos2mask<embot::os::Event>(21);
-constexpr embot::os::Event evt_SNSR04_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(22);  
-constexpr embot::os::Event evt_SNSR04_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(23);  
+constexpr embot::os::Event evt_SNSR04_askdata   = embot::core::binary::mask::pos2mask<embot::os::Event>(22);
+constexpr embot::os::Event evt_SNSR04_dataready = embot::core::binary::mask::pos2mask<embot::os::Event>(23);
 constexpr embot::os::Event evt_SNSR04_noreply   = 0; //embot::core::binary::mask::pos2mask<embot::os::Event>(24);
 
 
 constexpr theFAPreader2::Sensor s1 {
-    theFAPreader2::sensorType::tlv, 
+    theFAPreader2::sensorType::tlv,
     embot::hw::ANY::one,
-    {   
-        embot::prot::can::analog::posLABEL::zero, // as eobrd_portpos_hand_thumb = 0 OR eobrd_portpos_hand_thumbmetacarpus = 4
+    {
+        embot::prot::can::analog::posLABEL::zero, // as eobrd_portpos_hand_thumb_oc = 0 OR eobrd_portpos_hand_thumb_add = 4
         {false, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 0}
     },
     evt_SNSR01_askdata,
     evt_SNSR01_dataready,
     evt_SNSR01_noreply,
-    5*embot::core::time1millisec // timeout  
+    5*embot::core::time1millisec // timeout
 };
 
 constexpr theFAPreader2::Sensor s2 {
     theFAPreader2::sensorType::tlv,
-    embot::hw::ANY::two, 
-    {         
-        embot::prot::can::analog::posLABEL::one,  // as eobrd_portpos_hand_index = 1 OR eobrd_portpos_hand_indexadduction = 6
+    embot::hw::ANY::two,
+    {
+        embot::prot::can::analog::posLABEL::one,  // as eobrd_portpos_hand_index_oc = 1 OR eobrd_portpos_hand_index_add = 6
         {false, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 0}
     },
     evt_SNSR02_askdata,
     evt_SNSR02_dataready,
     evt_SNSR02_noreply,
-    0 // 5*embot::core::time1millisec // timeout  
-};  
+    0 // 5*embot::core::time1millisec // timeout
+};
 
 constexpr theFAPreader2::Sensor s3 {
-    theFAPreader2::sensorType::tlv, 
-    embot::hw::ANY::three, 
+    theFAPreader2::sensorType::tlv,
+    embot::hw::ANY::three,
     {
-        embot::prot::can::analog::posLABEL::two, // as eobrd_portpos_hand_medium = 2
+        embot::prot::can::analog::posLABEL::two, // as eobrd_portpos_hand_middle_oc = 2
         {false, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 0}
     },
     evt_SNSR03_askdata,
     evt_SNSR03_dataready,
     evt_SNSR03_noreply,
-    0 //5*embot::core::time1millisec // timeout  
-};  
+    0 //5*embot::core::time1millisec // timeout
+};
 
 constexpr theFAPreader2::Sensor s4 {
-    theFAPreader2::sensorType::tlv, 
+    theFAPreader2::sensorType::tlv,
     embot::hw::ANY::four,
-    {  
-        embot::prot::can::analog::posLABEL::three,  // as eobrd_portpos_hand_pinky = 3
+    {
+        embot::prot::can::analog::posLABEL::three,  // as eobrd_portpos_hand_ring_pinky_oc = 3
         {false, embot::prot::can::analog::polling::deciDegCalib::ROT::zero, 0}
     },
     evt_SNSR04_askdata,
     evt_SNSR04_dataready,
     evt_SNSR04_noreply,
-    0 //5*embot::core::time1millisec // timeout  
-}; 
-    
-constexpr std::array<theFAPreader2::Sensor, theFAPreader2::numberofpositions> snsrs4 
-{ 
+    0 //5*embot::core::time1millisec // timeout
+};
+
+constexpr std::array<theFAPreader2::Sensor, theFAPreader2::numberofpositions> snsrs4
+{
     s1, s2, s3, s4
 };
 
@@ -213,10 +213,10 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
     // init agent of pos
     embot::app::application::theFAPreader2::Config configfapreader2
     {
-        embot::app::application::theFAPreader2::AcquisitionMode::daisychain,    
+        embot::app::application::theFAPreader2::AcquisitionMode::daisychain,
         40*embot::core::time1millisec,  // acquisition time
-        5*embot::core::time1millisec,   // timeout for every acquisition step (1 step for fullyparallel, n for daisychain)        
-        evtsk,          // reader thread 
+        5*embot::core::time1millisec,   // timeout for every acquisition step (1 step for fullyparallel, n for daisychain)
+        evtsk,          // reader thread
         evtsk,          // transmitter thread
         snsrs4,
         { evt_ACQUIREfaps, evt_NOREPLYfaps, evt_TRANSMITfaps,  }    // associated events such as ... read sensor1, read sensor2, tranmsit sensors etc.
