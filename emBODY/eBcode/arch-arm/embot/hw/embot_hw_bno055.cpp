@@ -64,6 +64,7 @@ namespace embot { namespace hw { namespace bno055 {
     bool isalive(BNO055 s, embot::core::relTime timeout)                                          { return false; }
     result_t get(BNO055 s, Info &info, embot::core::relTime timeout)                              { return resNOK; }
     result_t set(BNO055 s, Mode m, embot::core::relTime timeout)                                  { return resNOK; }
+    result_t get(BNO055 s, Mode &m, embot::core::relTime timeout) = { return resNOK; }
     bool isacquiring(BNO055 s)                                                                      { return false; }
     bool canacquire(BNO055 s)                                                                       { return false; }
     result_t acquisition(BNO055 s, Set set, const embot::core::Callback &oncompletion)            { return resNOK; }
@@ -73,6 +74,9 @@ namespace embot { namespace hw { namespace bno055 {
     result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::core::Callback &oncompletion){ return resNOK; }
     result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::core::Data &data, const embot::core::relTime timeout){ return resNOK; }
     result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::core::Data &data, const embot::core::Callback &oncompletion){ return resNOK; }
+    
+    result_t set(BNO055 s, Placement p, const embot::core::relTime timeout) { return resNOK; }
+    result_t get(BNO055 s, Placement &p, const embot::core::relTime timeout) { return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace BNO055 {
 
@@ -123,17 +127,6 @@ namespace embot { namespace hw { namespace bno055 {
     // power-on-reset wait time. 650 ms is enough, datasheet say, before the device can talk over i2c. but much better to be devil-compliant ;-).
     static const embot::core::relTime PORtime = 666*embot::core::time1millisec;
     
-//    static const std::uint8_t i2caddress = 0x52;
-//    #if     defined(STM32HAL_BOARD_STRAIN2)
-//        static const embot::hw::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
-//        static const embot::hw::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);
-//    #elif   defined(STM32HAL_BOARD_MTB4)
-//        static const embot::hw::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
-//        static const embot::hw::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);  
-//    #elif   defined(STM32HAL_BOARD_RFE)
-//        static const embot::hw:::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
-//        static const embot::hw:::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);     
-//    #endif
     
     static PrivateData s_privatedata;
      
@@ -217,6 +210,25 @@ namespace embot { namespace hw { namespace bno055 {
                
         return write(s, Register::OPR_MODE, static_cast<std::uint8_t>(m), timeout);                                       
     } 
+    
+    result_t get(BNO055 s, Mode &m, embot::core::relTime timeout)
+    {
+        if(false == initialised(s))
+        {
+            m = Mode::none;
+            return resNOK;
+        }  
+                       
+        uint8_t dd = {0};
+        embot::core::Data data {&dd, 1};
+        if(resOK == read(s, Register::OPR_MODE, data, timeout))
+        {   
+            m = static_cast<Mode>(dd);;
+            return resOK;            
+        }
+        
+        return resNOK;        
+    }
 
 
     bool isacquiring(BNO055 s)
@@ -446,6 +458,87 @@ namespace embot { namespace hw { namespace bno055 {
         return resOK;        
     }
     
+    
+    struct AxisRemap
+    {
+        static constexpr size_t numberofplacements {embot::core::tointegral(Placement::maxnumberof)};  
+        
+        static constexpr std::array<std::pair<uint8_t, uint8_t>, numberofplacements> regsvalues
+        {
+            std::pair(0x21, 0x04), std::pair(0x24, 0x00), std::pair(0x24, 0x06), std::pair(0x21, 0x02), 
+            std::pair(0x24, 0x03), std::pair(0x21, 0x01), std::pair(0x21, 0x07), std::pair(0x24, 0x05)            
+        }; 
+        
+        static constexpr bool isvalid(const Placement p)
+        {
+            uint8_t i = embot::core::tointegral(p);
+            return (i < numberofplacements) ? true : false;        
+        }
+        
+        static constexpr uint8_t toindex(const Placement p)
+        {
+            if(isvalid(p))
+            {
+               return embot::core::tointegral(p); 
+            }            
+            return embot::core::tointegral(Placement::DEFAULT);
+        }
+        
+        static constexpr uint8_t valueof_AXIS_MAP_CONFIG(const Placement p) 
+        {
+            return regsvalues[toindex(p)].first;
+        } 
+        
+        static constexpr uint8_t valueof_AXIS_MAP_SIGN(const Placement p) 
+        {
+            return regsvalues[toindex(p)].second;
+        }  
+        
+        static constexpr Placement find(const uint8_t cfg, const uint8_t sign)
+        {
+            Placement p {Placement::none};
+            for(uint8_t i=0; i<regsvalues.size(); i++) 
+            {
+                if((regsvalues[i].first == cfg) && (regsvalues[i].second == sign))
+                {
+                    p = static_cast<Placement>(i);
+                    break;
+                }
+            }
+            return p;
+        }
+
+        AxisRemap() = default;        
+    };
+
+    result_t set(BNO055 s, Placement p, const embot::core::relTime timeout)
+    {
+        if(false == AxisRemap::isvalid(p))
+        {
+            return resNOK;
+        }
+        
+        if(resOK == write(s, Register::AXIS_MAP_CONFIG, AxisRemap::valueof_AXIS_MAP_CONFIG(p), timeout))
+        {
+            return write(s, Register::AXIS_MAP_SIGN, AxisRemap::valueof_AXIS_MAP_SIGN(p), timeout);
+        }
+        
+        return resNOK;
+    }
+    
+    result_t get(BNO055 s, Placement &p, const embot::core::relTime timeout)
+    {       
+        uint8_t dd[2] = {0, 0};
+        embot::core::Data data {dd, 2};
+        if(resOK == read(s, embot::hw::bno055::Register::AXIS_MAP_CONFIG, data, timeout))
+        {   
+            p = AxisRemap::find(dd[0], dd[1]);
+            return resOK;            
+        }
+        
+        return resNOK;
+    }        
+    
 
     
 //    static void s_powerOFF(void)
@@ -462,14 +555,6 @@ namespace embot { namespace hw { namespace bno055 {
         embot::hw::sys::delay(waittime);         
     }
     
-//    static result_t s_programregister_safe(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::core::relTime timeout)
-//    {
-//        std::uint8_t index = embot::core::tointegral(s);   
-//        embot::core::Data data(&val, 1);        
-//        result_t r = embot::hw::i2c::write(s_privatedata.i2cdes[index].bus, s_privatedata.i2cdes[index].adr, reg, data, timeout);                
-//        return r;
-//    }
-
     
     static result_t s_programregister(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::core::relTime timeout)
     {

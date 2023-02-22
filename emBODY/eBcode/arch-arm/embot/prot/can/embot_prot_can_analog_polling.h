@@ -142,7 +142,48 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     
     enum class StrainChannel { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, all = 0xf };
     
-    enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
+    
+    struct IMUmode
+    {        
+        static constexpr uint8_t defMODE {0};
+        
+        bool fusion {true};
+        uint8_t mode {defMODE}; // or if not defMODE: any enum class of the chip (such as embot::hw::bno055::Mode)      
+        constexpr IMUmode() = default;
+        
+        void frombyte(uint8_t byte)
+        {
+            fusion = embot::core::binary::bit::check(byte, 0);
+            uint8_t b = byte >> 1;
+            mode = b;
+        }
+        
+        uint8_t tobyte() const
+        {
+            return (true == fusion) ? (0x01 | (mode<<1)) : (0x00 | (mode<<1));
+        }               
+    };
+    
+    struct IMUorientation
+    {       
+        bool custom {false};        // if custom == false the standard orientation is used, else it is applied what in axisremap
+        uint8_t axisremap {0};      // used only if custom == true. use any enum class of the chip (such as embot::hw::bno055::Placement)  
+        constexpr IMUorientation() = default;
+        
+        void frombyte(uint8_t byte)
+        {
+            custom = embot::core::binary::bit::check(byte, 0);
+            uint8_t b = byte >> 1;
+            axisremap = b;
+        }
+        
+        uint8_t tobyte() const
+        {
+            return (true == custom) ? (0x01 | (axisremap<<1)) : (0x00 | (axisremap<<1));
+        }        
+    };
+        
+    
 
 }}}}} //  namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
 
@@ -1095,13 +1136,15 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     {
         public:
             
-                                    
+        
         struct Info
         {
-            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
-            imuFusion fusion;                  // with an enum we can add later on as many options we want. 
-            std::uint32_t ffu_ranges_measureunits;
-            Info() : sensormask(0), fusion(imuFusion::none), ffu_ranges_measureunits(0) {}
+            std::uint16_t sensormask {0};   // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
+            IMUmode mode {};
+            IMUorientation orientation {};         
+            uint8_t ffu08 {0};
+            uint16_t ffu16 {0};
+            Info() = default;
             void enable(embot::prot::can::analog::imuSensor s) 
             { 
                 if(embot::prot::can::analog::imuSensor::none != s)
@@ -1135,10 +1178,12 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         
         struct ReplyInfo
         {
-            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
-            imuFusion fusion;                  // with an enum we can add later on as many options we want. 
-            std::uint32_t ffu_ranges_measureunits;
-            ReplyInfo() : sensormask(0), fusion(imuFusion::none), ffu_ranges_measureunits(0) {}        
+            std::uint16_t sensormask {0};           // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
+            IMUmode mode {};            
+            IMUorientation orientation {};         
+            uint8_t ffu08 {0};
+            uint16_t ffu16 {0};
+            ReplyInfo() = default;        
         };        
         
         Info info;
