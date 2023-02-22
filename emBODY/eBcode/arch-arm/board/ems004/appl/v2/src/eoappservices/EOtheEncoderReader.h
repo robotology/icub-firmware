@@ -80,7 +80,8 @@ typedef enum
     encreader_err_NOTCONNECTED          = 15, /* this error happens when the encoder type is none or encoder is not local, for example it is connected to 2foc board */
     encreader_err_AKSIM2_INVALID_DATA   = 16,
     encreader_err_AKSIM2_CLOSE_TO_LIMITS= 17,
-    encreader_err_AKSIM2_CRC_ERROR      = 18
+    encreader_err_AKSIM2_CRC_ERROR      = 18,
+    encreader_err_AKSIM2_GENERIC        = 19
 
 } eOencoderreader_errortype_t;
 
