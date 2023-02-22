@@ -1353,47 +1353,39 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencode
 
 static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error)
 {
-//    switch(diag->type)
-//    {
-//        case hal_spiencoder_diagnostic_type_aksim2_invalid_data:
-//            *error = encreader_err_AKSIM2_INVALID_DATA;
-//            return eobool_false;
-//        case hal_spiencoder_diagnostic_type_aksim2_crc_error:
-//            *error = encreader_err_AKSIM2_CRC_ERROR;
-//            return eobool_false;
-//        case hal_spiencoder_diagnostic_type_aksim2_close_to_limits:
-//            *error = encreader_err_AKSIM2_CLOSE_TO_LIMITS;
-//            break;
-//        default:
-//            *error = encreader_err_NONE;
-//    }
-//    
-    // TODO: check and re-check
+    // in case of errors we return false. Initially we assume no errors
+    eObool_t ret = eobool_true;
+    
+    // preperare data for diagnostics
     eOerrmanDescriptor_t errdes = {0};
     errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress        = 0;
     errdes.par16                = 0;
     errdes.par64                = (uint64_t) (diag->info.aksim2_status_crc) << 32;
 
+    // In case of errors we send human readable diagnostics messages
     if(0x04 == (0x04 & diag->info.aksim2_status_crc))
     {
         errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ret = eobool_false;
     }
 
     if(0x02 == (0x02 & diag->info.aksim2_status_crc))
     {
         errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_close_to_limits);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ret = eobool_false;
     }
     
     if(0x01 == (0x01 & diag->info.aksim2_status_crc))
     {
         errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ret = eobool_false;
     }
     
-    return eobool_true;
+    return ret;
 }
 
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOencoderreader_errortype_t *error)
