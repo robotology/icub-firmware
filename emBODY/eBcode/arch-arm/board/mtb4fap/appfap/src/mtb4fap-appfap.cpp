@@ -14,7 +14,7 @@
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo
 {
-    embot::prot::can::versionOfAPPLICATION {10, 0, 0},
+    embot::prot::can::versionOfAPPLICATION {1, 1, 0},
     embot::prot::can::versionOfCANPROTOCOL {2, 0}
 };
 
@@ -104,10 +104,10 @@ namespace embot { namespace hw { namespace bsp { namespace mtb4 {
 
 #include "embot_app_application_theFAPreader2.h"
 #include "embot_app_application_theCANparserPOS.h"
-#include "embot_app_application_theCANparserIMU.h"
-#include "embot_app_application_theIMU.h"
-#include "embot_app_application_theCANparserTHERMO.h"
-#include "embot_app_application_theTHERMO.h"
+//#include "embot_app_application_theCANparserIMU.h"
+//#include "embot_app_application_theIMU.h"
+//#include "embot_app_application_theCANparserTHERMO.h"
+//#include "embot_app_application_theTHERMO.h"
 
 
 void mySYS::userdefOnIdle(embot::os::Thread *t, void* idleparam) const
@@ -242,25 +242,25 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
     embot::app::application::theCANparserPOS::Config configparserpos { &thefapreader2 };
     canparserpos.initialise(configparserpos);
 
-    // init agent of imu
-    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4::imuBOSCH, embot::hw::bsp::mtb4::imuBOSCHconfig, evt_IMUtick, evt_IMUdataready, evtsk);
-    theimu.initialise(configimu);
+//    // init agent of imu
+//    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+//    embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4::imuBOSCH, embot::hw::bsp::mtb4::imuBOSCHconfig, evt_IMUtick, evt_IMUdataready, evtsk);
+//    theimu.initialise(configimu);
 
-    // init canparser imu and link it to its agent
-    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
-    embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
-    canparserimu.initialise(configparserimu);
+//    // init canparser imu and link it to its agent
+//    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
+//    embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
+//    canparserimu.initialise(configparserimu);
 
-    // init agent of thermo
-    embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4::thermometer, embot::hw::bsp::mtb4::thermometerconfig, evt_THERMOtick, evt_THERMOdataready, evtsk);
-    thethermo.initialise(configthermo);
+//    // init agent of thermo
+//    embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
+//    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4::thermometer, embot::hw::bsp::mtb4::thermometerconfig, evt_THERMOtick, evt_THERMOdataready, evtsk);
+//    thethermo.initialise(configthermo);
 
-    // init canparser thermo and link it to its agent
-    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
-    embot::app::application::theCANparserTHERMO::Config configparserthermo { &thethermo };
-    canparserthermo.initialise(configparserthermo);
+//    // init canparser thermo and link it to its agent
+//    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
+//    embot::app::application::theCANparserTHERMO::Config configparserthermo { &thethermo };
+//    canparserthermo.initialise(configparserthermo);
 
 }
 
@@ -286,12 +286,12 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
     if(true == embot::app::application::theCANparserPOS::getInstance().process(frame, outframes))
     {
     }
-    else if(true == embot::app::application::theCANparserIMU::getInstance().process(frame, outframes))
-    {
-    }
-    else if(true == embot::app::application::theCANparserTHERMO::getInstance().process(frame, outframes))
-    {
-    }
+//    else if(true == embot::app::application::theCANparserIMU::getInstance().process(frame, outframes))
+//    {
+//    }
+//    else if(true == embot::app::application::theCANparserTHERMO::getInstance().process(frame, outframes))
+//    {
+//    }
 }
 
 void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const
@@ -302,29 +302,29 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
         thefapreader2.process(eventmask, outframes);
     }
 
-    if(true == embot::core::binary::mask::check(eventmask, evt_IMUtick))
-    {
-        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-        theimu.tick(outframes);
-    }
+//    if(true == embot::core::binary::mask::check(eventmask, evt_IMUtick))
+//    {
+//        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+//        theimu.tick(outframes);
+//    }
 
-    if(true == embot::core::binary::mask::check(eventmask, evt_IMUdataready))
-    {
-        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-        theimu.processdata(outframes);
-    }
+//    if(true == embot::core::binary::mask::check(eventmask, evt_IMUdataready))
+//    {
+//        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+//        theimu.processdata(outframes);
+//    }
 
-    if(true == embot::core::binary::mask::check(eventmask, evt_THERMOtick))
-    {
-        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-        thethermo.tick(outframes);
-    }
+//    if(true == embot::core::binary::mask::check(eventmask, evt_THERMOtick))
+//    {
+//        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
+//        thethermo.tick(outframes);
+//    }
 
-    if(true == embot::core::binary::mask::check(eventmask, evt_THERMOdataready))
-    {
-        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-        thethermo.processdata(outframes);
-    }
+//    if(true == embot::core::binary::mask::check(eventmask, evt_THERMOdataready))
+//    {
+//        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
+//        thethermo.processdata(outframes);
+//    }
 }
 
 

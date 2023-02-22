@@ -105,6 +105,7 @@ static uint8_t s_uprot_proc_LEGACY_IP_MASK_SET(eOuprot_opcodes_t opc, uint8_t *p
 
 static void s_sys_reset(void);
 static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use);
+static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY2_t* reply2, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use);
 static uint16_t s_add_description(char *data, uint16_t capacity, const char *prefix);
 //#if     !defined(_MAINTAINER_APPL_)
 static eEresult_t s_sys_eeprom_erase(void);
@@ -185,13 +186,6 @@ extern uint8_t updater_core_uprot_parse(uint8_t *pktin, uint16_t pktinsize, eOip
             opc = (sizeof(eOuprot_cmd_LEGACY_SCAN_t) == pktinsize) ? uprot_OPC_LEGACY_SCAN : uprot_OPC_DISCOVER;
             process = s_uprot_proc_DISCOVER;           
         } break;
-        
-        case uprot_OPC_LEGACY_PROCS: 
-        case uprot_OPC_MOREINFO:
-        {
-            opc = (sizeof(eOuprot_cmd_LEGACY_PROCS_t) == pktinsize) ? uprot_OPC_LEGACY_PROCS : uprot_OPC_MOREINFO;
-            process = s_uprot_proc_MOREINFO;
-        } break;       
         
         case uprot_OPC_LEGACY_CANGATEWAY:
         case uprot_OPC_CANGATEWAY:  
@@ -495,7 +489,9 @@ static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, ui
         
         pp = &params;
     }
-    
+#if defined(UPDATER_DEBUG_MODE)  
+    embot::core::print(embot::core::TimeFormatter(embot::core::now()).to_string() + ": s_uprot_proc_CANGATEWAY() -> eupdater_cangtw_start()");
+#endif    
     eupdater_cangtw_start(remaddr, pp);    
     
     // no reply for now ...
@@ -553,7 +549,7 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                         
             // here is the command. i get what i need to program into flash
             eOuprot_cmd_PROG_START_t *cmd = (eOuprot_cmd_PROG_START_t*)pktin;
-                      
+            
             
             switch(cmd->partition)
             {
@@ -573,9 +569,9 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
 
                 case uprot_partitionAPPLICATION:
                 {
-                    s_proc_PROG_downloading_partition = uprot_partitionAPPLICATION;
-                    s_proc_PROG_mem_start = EENV_MEMMAP_EAPPLICATION_ROMADDR;
-                    s_proc_PROG_mem_size  = EENV_MEMMAP_EAPPLICATION_ROMSIZE;
+                    s_proc_PROG_downloading_partition = uprot_partitionAPPLICATION;                    
+                    s_proc_PROG_mem_start = 0;
+                    s_proc_PROG_mem_size  = 0;
                 } break;
                         
                 default:
@@ -658,6 +654,32 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             size_t size = (cmd->size[0]) | (cmd->size[1] << 8);
             uint8_t *data = &cmd->data[0];
             
+            // notice that address may be a ram address. in such a case we must not do anything
+            // but we need to send a ack.
+           
+            bool itisaflashaddress = embot::hw::flash::isvalid(address);
+            if(false == itisaflashaddress)
+            {
+#if defined(TEST_prog_mode)
+                snprintf(debug_print, sizeof(debug_print), "dropping non flash chunk adr = 0x%x, size = %d", address, size);
+                embot::core::print(debug_print);
+#endif                    
+                // i just drop the action because it must be a ram address
+                // but i increment the number of processed packets
+                ++s_proc_PROG_rxpackets;
+                // and force a return w/ no error
+                break;
+            }
+            
+
+            const embot::hw::flash::Partition& pp = embot::hw::flash::bsp::partition(address);
+            
+            if(uprot_partitionAPPLICATION == s_proc_PROG_downloading_partition)
+            {
+                s_proc_PROG_mem_start = pp.address;
+                s_proc_PROG_mem_size = pp.size;
+            }
+            
             // size is the effective size of data sent by the FirmwareUpdater
             // size2burn is what we must burn into flash. it can be size bytes or size byte + some pad bytes which must be 0xff 
             size = std::min(size, sizeof(data2burn)); 
@@ -711,24 +733,6 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                 }              
             }   
 #endif
-            
-            // also: notice that address may be a ram address. in such a case we must not do anything
-            // but we need to send a ack.
-           
-            bool itisaflashaddress = embot::hw::flash::isvalid(address);
-            if(false == itisaflashaddress)
-            {
-#if defined(TEST_prog_mode)
-                snprintf(debug_print, sizeof(debug_print), "dropping non flash chunk adr = 0x%x, size = %d", address, size);
-                embot::core::print(debug_print);
-#endif                    
-                // i just drop the action because it must be a ram address
-                // but i increment the number of processed packets
-                ++s_proc_PROG_rxpackets;
-                // and force a return w/ no error
-                break;
-            }
-
             
             // ok, i can go on and manage the pair {data2burn, size or size2burn}
             
@@ -867,12 +871,13 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             // download is over, thus resume the normal blinking of led
             eupdater_parser_download_blinkled_stop();
             
+            const embot::hw::flash::Partition& pp = embot::hw::flash::bsp::partition(s_proc_PROG_mem_start);
             
             // here is the command. i get what i need to program into flash
             eOuprot_cmd_PROG_END_t *cmd = (eOuprot_cmd_PROG_END_t*)pktin;
             uint16_t sentpkts = (cmd->numberofpkts[0]) | (cmd->numberofpkts[1] << 8);
             
-            // some error cases. first: i have an unexpectedd s_proc_PROG_downloading_partition equal to 0 ... why? i keep previous code
+            // some error cases. first: i have an unexpected s_proc_PROG_downloading_partition equal to 0 ... why? i keep previous code
             if(0 == s_proc_PROG_downloading_partition)
             {
                 if(0 != s_proc_PROG_flash_erased)
@@ -893,22 +898,20 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             if(sentpkts != s_proc_PROG_rxpackets)
             {
 
-                // must manage the erased flash ... it is only for updater or application because the eloader flash is not erased yeet
+                // must manage the erased flash ... it is only for updater or application because the eloader flash is not erased yet
                 if(0 != s_proc_PROG_flash_erased)
                 {
                     // must manage failure. we surely have erased flash of eapplication / eupdater in here and maybe we have written some sectors.
                     // thus we had better to erase flash fully, set the def2run and start to a safe process, and ... put in partition table message about erased process
                     if(s_proc_PROG_downloading_partition != uprot_partitionLOADER)
-                    {   // application or updater
+                    {   // application (on cm7 or cm4) or updater
                         
                         eEmoduleInfo_t erasedproc = {0};
                         erasedproc.info.entity.type = ee_entity_process;                      
                         erasedproc.info.entity.builddate.year = 1999;
                         erasedproc.info.entity.builddate.month = 9;
                         erasedproc.info.entity.builddate.day = 13;
-
                         
-
                         
                         if(uprot_partitionAPPLICATION == s_proc_PROG_downloading_partition)
                         {
@@ -922,13 +925,19 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
 //                            hal_flash_erase(EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);                            
 //                        osal_system_scheduling_restart();
 
-                            embot::hw::flash::erase(EENV_MEMMAP_EAPPLICATION_ROMADDR, EENV_MEMMAP_EAPPLICATION_ROMSIZE);
+                            embot::hw::flash::erase(s_proc_PROG_mem_start, s_proc_PROG_mem_size);
 
-                            erasedproc.info.entity.signature = ee_procApplication;
-                            erasedproc.info.rom.addr = EENV_MEMMAP_EAPPLICATION_ROMADDR;
-                            memcpy(erasedproc.info.name, "erasedUpd", sizeof("erasedApp"));
+                            uint8_t proc = ee_procApplication;
+                            if(pp.id == embot::hw::flash::Partition::ID::eapplication01)
+                            {
+                                proc = ee_procOther01;
+                            }
+                            erasedproc.info.entity.signature = proc;
+                            erasedproc.info.rom.addr = pp.address;
+                            erasedproc.info.rom.size = pp.size;
+                            memcpy(erasedproc.info.name, "erasedApp", sizeof("erasedApp"));
                             
-                            ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)&erasedproc);
+                            ee_sharserv_part_proc_synchronise(proc,(const eEmoduleInfo_t*)&erasedproc);
                             const volatile eEmoduleInfo_t* updt = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
                             ee_sharserv_part_proc_synchronise(ee_procUpdater,(const eEmoduleInfo_t*)updt);
                             ee_sharserv_part_proc_startup_set(ee_procUpdater);
@@ -973,7 +982,7 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                 return ret;
             }
 
-            // everything seems ok: we finish. actions depens on what i am managing
+            // everything seems ok: we finish. actions depends on what i am managing
             switch(s_proc_PROG_downloading_partition)
             {
                 case uprot_partitionLOADER:
@@ -1006,8 +1015,28 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                 
                 case uprot_partitionAPPLICATION:
                 {
-                    const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
-                    ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)appl);
+                    
+                    uint8_t proc = ee_procApplication;
+                    if(pp.id == embot::hw::flash::Partition::ID::eapplication01)
+                    {
+                        proc = ee_procOther01;
+                    }
+                    
+                    const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(pp.address+EENV_MODULEINFO_OFFSET);
+//                    const volatile eEmoduleInfo_t* appl = (const volatile eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+//                    const volatile eEmoduleInfo_t* appl_c2 = (const volatile eEmoduleInfo_t*)(0x08120400); // TODO: replace the hard coded address with the right macros
+                    
+                    eEresult_t res = ee_res_NOK_generic;
+                    
+
+                    res = ee_sharserv_part_proc_synchronise(proc,(const eEmoduleInfo_t*)appl);
+                    if( ee_res_NOK_generic == res)
+                    {
+                        // something went wrong during the synchronise
+                        reply->res = uprot_RES_ERR_UNK;  // TODO remove or return the right error
+                    }
+                    
+                    
                     //ee_sharserv_part_proc_startup_set(ee_procUpdater);
                 }  break;
                 
@@ -1033,14 +1062,52 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
     return ret;
 }
 
-
-
+// used to fill the reply with the extra processes
+static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY2_t* reply2, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use)
+{
+    reply2->discoveryreply.reply.opc = opcode2use;
+    
+    uint8_t nprocs = 0;
+    const eEprocess_t *s_proctable = NULL;
+    ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
+    constexpr uint8_t maxNumberOfProcessesOnSingleCore = {3};
+    
+    // here we iterate only for the extra processes
+    for(uint8_t i=0, j=maxNumberOfProcessesOnSingleCore; j < nprocs; i++, j++)
+    {
+        const eEmoduleInfo_t *s_modinfo = NULL;
+        ee_sharserv_part_proc_get(s_proctable[j], &s_modinfo);
+        reply2->extraprocs[i].type = s_proctable[j];
+        reply2->extraprocs[i].filler[0] = EOUPROT_VALUE_OF_UNUSED_BYTE;
+        reply2->extraprocs[i].version.major = s_modinfo->info.entity.version.major;
+        reply2->extraprocs[i].version.minor = s_modinfo->info.entity.version.minor;
+        memcpy(&reply2->extraprocs[i].date, &s_modinfo->info.entity.builddate, sizeof(eOdate_t));
+        
+        reply2->extraprocs[i].compilationdate.year = 1999;
+        reply2->extraprocs[i].compilationdate.month = 9;
+        reply2->extraprocs[i].compilationdate.day = 9;
+        reply2->extraprocs[i].compilationdate.hour = 9;
+        reply2->extraprocs[i].compilationdate.min = 9;
+        
+        const embot::hw::flash::Partition& pp = embot::hw::flash::bsp::partition(s_modinfo->info.rom.addr);
+        
+        volatile eEmoduleExtendedInfo_t * extinfo = (volatile eEmoduleExtendedInfo_t*)(pp.address+EENV_MODULEINFO_OFFSET);
+        if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+        {
+            eo_common_compiler_string_to_date((const char*)extinfo->compilationdatetime, &reply2->extraprocs[i].compilationdate);
+        }
+       
+        reply2->extraprocs[i].rom_addr_kb = pp.address / 1024;
+        reply2->extraprocs[i].rom_size_kb = pp.size / 1024;
+      
+    }
+    return sizeof(eOuprot_cmd_DISCOVER_REPLY2_t);
+}
 
 static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use)
 {
     uint16_t size = sizeof(eOuprot_cmd_DISCOVER_REPLY_t);  
     
-
     reply->reply.opc = opcode2use;
     reply->reply.res = uprot_RES_OK;
     reply->reply.protversion = EOUPROT_PROTOCOL_VERSION;
@@ -1097,7 +1164,9 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opc
     
     #warning ..............................................................................................
     #warning: HEI.... in here it crashes ............. USE 2... or rather nprocs
-    const uint8_t number = nprocs;
+    constexpr uint8_t maxNumberOfProcessesOnSingleCore = {3};
+    uint8_t number = std::min(nprocs, maxNumberOfProcessesOnSingleCore);
+    #warning todo verifica che number non scriva fuori del array quindi metter std::max(nproc, capacityofinfo)
     for(uint8_t i=0; i<number; i++)
     {
         const eEmoduleInfo_t *s_modinfo = NULL;
@@ -1121,8 +1190,15 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opc
         }
        
         reply->processes.info[i].rom_addr_kb = s_modinfo->info.rom.addr / 1024;
-        reply->processes.info[i].rom_size_kb = s_modinfo->info.rom.size / 1024;  
-      
+        reply->processes.info[i].rom_size_kb = s_modinfo->info.rom.size / 1024;
+    }
+    
+    // In case of multi core boards we have to add more processes
+    if(nprocs >= maxNumberOfProcessesOnSingleCore)
+    {
+        // prepare for the extended reply
+        eOuprot_cmd_DISCOVER_REPLY2_t* reply2 = (eOuprot_cmd_DISCOVER_REPLY2_t*)reply;
+        size = s_discover_fill(reply2, uprot_OPC_DISCOVER2, sizeof(eOuprot_cmd_DISCOVER_REPLY2_t));
     }
 
     // now boardinfo32
@@ -1187,7 +1263,7 @@ static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint
         }        
 #endif        
         // prepare the reply.
-        eOuprot_cmd_DISCOVER_REPLY_t *reply = (eOuprot_cmd_DISCOVER_REPLY_t*) pktout;        
+        eOuprot_cmd_DISCOVER_REPLY_t *reply = (eOuprot_cmd_DISCOVER_REPLY_t*) pktout;
         *sizeout = s_discover_fill(reply, uprot_OPC_DISCOVER, sizeof(eOuprot_cmd_DISCOVER_REPLY_t));
     }
     
@@ -1294,51 +1370,6 @@ static uint16_t s_add_description(char *data, uint16_t capacity, const char *pre
     }
     
     return size;
-}
-
-
-
-static uint8_t s_uprot_proc_MOREINFO(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
-{    
-    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
-    {
-        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
-    }    
-    
-    if(uprot_OPC_LEGACY_PROCS == opc)
-    {
-        pktout[0] = uprot_OPC_LEGACY_PROCS;
-        pktout[1] = 0;         
-
-        *sizeout = 2 + s_add_description((char*)&pktout[2], capacityout - 2, "legacy PROCS\r\n");        
-    }
-    else
-    {        
-        eOuprot_cmd_MOREINFO_t *cmd = (eOuprot_cmd_MOREINFO_t*) pktin;
-        
-        // prepare the reply.        
-        eOuprot_cmd_MOREINFO_REPLY_t *reply = (eOuprot_cmd_MOREINFO_REPLY_t*) pktout;
-        
-        // surely there is the discover part.
-        *sizeout = s_discover_fill(&reply->discover, uprot_OPC_MOREINFO, sizeof(eOuprot_cmd_MOREINFO_REPLY_t));
-
-        // but there may be also the description
-        reply->hasdescription = cmd->plusdescription;
-        
-
-        if(1 == reply->hasdescription)
-        {
-            // 1. add the description in reply->description
-            uint16_t sizeofdescription = s_add_description((char*)reply->description, capacityout - sizeof(eOuprot_cmd_MOREINFO_REPLY_t), "MOREINFO\r\n"); // we dont care about having 3 bytes less ...
-            
-            // 2. increase some sizes  
-            reply->discover.reply.sizeofextra += sizeofdescription;
-            *sizeout += sizeofdescription;                
-        }
- 
-    }
-    
-    return 1;    
 }
 
 

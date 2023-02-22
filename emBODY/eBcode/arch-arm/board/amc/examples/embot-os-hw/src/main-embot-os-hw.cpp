@@ -5,7 +5,8 @@
  * email:   marco.accame@iit.it
 */
 
-#define TEST_EMBOT_HW
+//#define TEST_EMBOT_HW
+#define TEST_EMBOT_OS
 
 
 #include "embot_core.h"
@@ -17,6 +18,7 @@
 #include "embot_hw_sys.h"
 #include "embot_hw_can.h"
 #include "embot_hw_timer.h"
+#include "embot_hw_eeprom.h"
 
 
 #include "embot_os_theScheduler.h"
@@ -26,6 +28,183 @@
 #include "embot_app_scope.h"
 
 #include <vector>
+
+#if 0
+
+#include <cstdint>
+#include <type_traits>
+#include <vector>
+
+namespace CANdriver {
+    
+    enum class BUS : uint8_t { one = 0, two = 1, numberof = 2};
+    
+    template<typename E>         
+    constexpr auto tointegral(E enumerator) noexcept 
+    {
+        return static_cast<std::underlying_type_t<E>>(enumerator);
+    }
+
+    struct Frame            
+    {
+        static constexpr uint8_t maxsize {8};
+        uint32_t id {0};
+        uint8_t size {0};
+        uint8_t filler[3] {0};
+        uint8_t data[maxsize] {0};  
+        constexpr Frame() = default;
+        constexpr Frame(std::uint32_t i, uint8_t s, uint8_t *d) 
+            : id(i), size(std::min(s, maxsize)) 
+        {
+            if(nullptr != d) { std::memmove(data, d, size); }
+        }
+    };
+    
+    struct Driver
+    {
+        static constexpr uint8_t maxbuses { tointegral(BUS::numberof) };
+        
+        BUS bus { BUS::one };        
+        size_t capacity {8};
+        std::vector<Frame> fifo {};
+        volatile bool thereareframes {false};
+            
+        bool init(BUS b, const size_t cap = 8)
+        {
+            if(tointegral(BUS::numberof) >= maxbuses)
+            {
+                return false;
+            }
+            
+            bus = b;
+            capacity = cap;
+            fifo.reserve(capacity);
+            thereareframes = false;
+            HWinitCAN(this); 
+
+            return true;            
+        }
+        
+        static void HWinitCAN(void *p)
+        {
+            Driver *drv = reinterpret_cast<Driver*>(p);
+            uint8_t x = tointegral(drv->bus);            
+            // put code in here to enable IRQ can bus number x            
+        }
+        
+        static void HWdisableCANirq(void *p)
+        {
+            Driver *drv = reinterpret_cast<Driver*>(p);
+            uint8_t x = tointegral(drv->bus);          
+            // put code in here to disable IRQ can bus number x            
+        }
+
+        static void HWenableCANirq(void *p)
+        {
+            Driver *drv = reinterpret_cast<Driver*>(p);
+            uint8_t x = tointegral(drv->bus);             
+            // put code in here to enable IRQ can bus number x
+        }   
+ 
+        static bool HWgetFrame(void *p, Frame &fr)
+        {
+            Driver *drv = reinterpret_cast<Driver*>(p);
+            uint8_t x = tointegral(drv->bus);             
+            // put code in here to get a frame from can bus number x
+            fr = fr;
+            
+            return true;
+        }  
+        
+        // must be called 
+        static void HWcalledByIRQHandler(void *p)
+        {
+            Driver *drv = reinterpret_cast<Driver*>(p);
+            uint8_t x = tointegral(drv->bus);
+            
+            Frame fr {}; 
+                
+            // get the frame from you HW functions
+            HWgetFrame(p, fr);
+                
+            // this implements a circular buffer
+            if(drv->fifo.size() >= drv->capacity)
+            {
+                drv->fifo.erase(drv->fifo.begin());
+            }
+            
+            drv->fifo.push_back(fr);
+            drv->thereareframes = true;  
+        }
+        
+        bool get(std::vector<Frame> &frames)
+        {
+            frames.clear();
+            
+            if(false == thereareframes)
+            {
+                return false;
+            }
+            
+            HWdisableCANirq(this);
+            frames.assign(fifo.begin(), fifo.end());
+            fifo.clear();
+            thereareframes = false;
+            HWenableCANirq(this);
+            
+            return true;
+        }        
+        
+    };
+    
+    
+    
+} // namespace CANdriver {
+
+namespace CANdriverTest {
+    
+    CANdriver::Driver drvCANone {};
+    CANdriver::Driver drvCANtwo {};    
+        
+    void theIRQHandlerOfCAN1()
+    {
+        CANdriver::Driver::HWcalledByIRQHandler(&drvCANone);        
+    }
+    
+    void theIRQHandlerOfCAN2()
+    {
+        CANdriver::Driver::HWcalledByIRQHandler(&drvCANtwo);        
+    }    
+    
+    
+    void mybaremetalmail()
+    {
+        drvCANone.init(CANdriver::BUS::one, 16);
+        drvCANone.init(CANdriver::BUS::two, 8);
+        
+        std::vector<CANdriver::Frame> frames {};
+        
+        for(;;)
+        {
+            // i do whatever i want
+        
+            // then i check if i have something on CAN
+                        
+            if(true == drvCANone.get(frames))
+            {
+                // use the frames from CAN one
+            }
+
+            if(true == drvCANone.get(frames))
+            {
+                // use the frames from CAN two
+            }
+            
+        }        
+    }        
+    
+}    
+#endif
 
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
@@ -88,6 +267,13 @@ void test_embot_hw_tick();
 
 #endif
 
+#if defined(TEST_EMBOT_OS)
+
+void test_embot_os_init();
+void test_embot_os_tick();
+
+#endif
+
 
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {   
@@ -100,10 +286,15 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
+    tmr->name("TickTmr");
     tmr->start(cfg);
 
 #if defined(TEST_EMBOT_HW)    
     test_embot_hw_init();   
+#endif    
+    
+#if defined(TEST_EMBOT_OS)
+    test_embot_os_init();
 #endif    
 }
 
@@ -123,10 +314,116 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
 #if defined(TEST_EMBOT_HW)
         test_embot_hw_tick();
 #endif
+        
+#if defined(TEST_EMBOT_OS)
+        test_embot_os_tick();
+#endif        
     }
     
 
 }
+
+
+#if defined(TEST_EMBOT_OS)
+
+embot::os::Timer *tmrperiodic {nullptr};
+embot::os::Timer *tmroneshot {nullptr};
+embot::os::Timer *tmrsomeshots {nullptr};
+
+void releasecm4(void *p)
+{
+    static volatile uint32_t xxx {0};    
+    xxx = 1;     
+}
+
+
+uint32_t data2readeeprom[16] = {0};
+    
+void onForever(void *p)
+{
+    embot::os::Timer *t = reinterpret_cast<embot::os::Timer*>(p);
+    
+    std::memset(data2readeeprom, 0, sizeof(data2readeeprom));
+    embot::core::Data data {data2readeeprom, sizeof(data2readeeprom)};
+    
+    embot::hw::eeprom::read(embot::hw::EEPROM::one, 0, data, 3*embot::core::time1millisec);
+
+
+    embot::core::TimeFormatter tf(embot::core::now());        
+    embot::core::print("@ " + tf.to_string(embot::core::TimeFormatter::Mode::full) + ": "+ t->name() + " w/ shots: " + std::to_string(t->shots()));    
+    constexpr size_t max {5};
+    if(t->shots() > max)
+    {
+        embot::core::print("stop it");    
+        t->stop();     
+
+        embot::core::print("and restart it");    
+        t->start();                
+    }
+}
+
+void onOneshot(void *p)
+{
+    embot::os::Timer *t = reinterpret_cast<embot::os::Timer*>(p);
+
+    embot::core::TimeFormatter tf(embot::core::now());        
+    embot::core::print("@ " + tf.to_string(embot::core::TimeFormatter::Mode::full) + ": "+ t->name() + " w/ shots: " + std::to_string(t->shots())); 
+
+    releasecm4(nullptr);
+    embot::core::print("CM4 is released"); 
+//    embot::core::print("restarting it");    
+//    t->start();
+    
+    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();       
+    theleds.get(embot::hw::LED::one).pulse(1000*embot::core::time1millisec);
+    
+}
+
+void onSomeshots(void *p)
+{
+    embot::os::Timer *t = reinterpret_cast<embot::os::Timer*>(p);
+
+    embot::core::TimeFormatter tf(embot::core::now());        
+    embot::core::print("@ " + tf.to_string(embot::core::TimeFormatter::Mode::full) + ": "+ t->name() + " w/ shots: " + std::to_string(t->shots()));    
+}
+
+void test_embot_os_init() 
+{
+    
+    embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+    
+    tmrperiodic = new embot::os::Timer;
+    tmrperiodic->name("PerTmr");
+    
+    tmroneshot = new embot::os::Timer;
+    tmroneshot->name("OneTmr");
+    
+    tmrsomeshots = new embot::os::Timer;
+    tmrsomeshots->name("SomTmr");
+    
+    embot::os::Action ap = embot::os::CallbackToThread({onForever, tmrperiodic}, nullptr);
+    tmrperiodic->load({embot::core::time1second, ap, embot::os::Timer::Mode::forever});
+ 
+    embot::os::Action a1 = embot::os::CallbackToThread({onOneshot, tmroneshot}, nullptr);
+    tmroneshot->load({10*embot::core::time1second, a1, embot::os::Timer::Mode::oneshot});
+    
+    embot::os::Action as = embot::os::CallbackToThread({onSomeshots, tmrsomeshots}, nullptr);
+    tmrsomeshots->load({3*embot::core::time1second, as, embot::os::Timer::Mode::someshots, 3});    
+    
+    tmrperiodic->start();
+    tmroneshot->start();
+    tmrsomeshots->start();
+    
+}
+
+void test_embot_os_tick()
+{
+    
+}
+
+#endif
+
+
 
 #if defined(TEST_EMBOT_HW_CAN)
 
@@ -418,17 +715,17 @@ void initSystem(embot::os::Thread *t, void* initparam)
     embot::os::theTimerManager::getInstance().start({});     
     embot::os::theCallbackManager::getInstance().start({});  
         
-    constexpr embot::core::Time blinktime {250*embot::core::time1millisec};
+    constexpr embot::core::Time blinktime {2000*embot::core::time1millisec};
                     
     embot::core::print("INIT: creating the LED pulser: it will blink a LED @" + embot::core::TimeFormatter(blinktime).to_string());
         
     static const std::initializer_list<embot::hw::LED> allleds = 
     {   
-        embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three, embot::hw::LED::four, embot::hw::LED::five, embot::hw::LED::six   
+        embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three  
     };  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::two).pulse(blinktime); 
+    theleds.get(embot::hw::LED::one).pulse(blinktime); 
 //    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 50, std::bitset<64>(0b010101));
 //    theleds.get(embot::hw::LED::two).wave(&ledwave); 
     
@@ -494,6 +791,13 @@ void initSystem(embot::os::Thread *t, void* initparam)
     embot::core::print("quitting the INIT thread. Normal scheduling starts");    
 }
 
+constexpr stm32hal_board_config_amc_t configAMC 
+{     
+    .valid = true,
+    .usebothcores = true,
+    .usecache= true,
+    .release2ndcore = false
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 

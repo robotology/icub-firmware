@@ -22,6 +22,8 @@
 
 #include "embot_os_rtos.h"
 
+#include "embot_os_theScheduler.h"
+
 #include "embot_os_theTimerManager.h"
 #include "embot_os_theCallbackManager.h"
 
@@ -215,6 +217,9 @@ eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
         res = eores_NOK_generic;
     }
     
+    // set the name
+    reinterpret_cast<embot::os::Timer*>(t->envir.osaltimer)->name(eo_timer_GetName(t));
+    
     
 //    // unlock the manager
 //    eom_mutex_Release((EOMmutex*)tm->mutex);
@@ -295,6 +300,41 @@ void to_embot_action(const EOaction_hid *act, embot::os::Action &action)
     }    
 }
 
+
+
+void s_timer_onexpiry(void *p)
+{
+    EOtimer *t = reinterpret_cast<EOtimer*>(p);       
+    embot::os::Action action {};    
+    to_embot_action(&t->onexpiry, action);
+
+// marcoaccame: code added just for debug purposes    
+//    static const std::string sPref { "> " };
+//    static volatile uint8_t ciao {0};        
+//    if(EOTIMER_MODE_ONESHOT == t->mode)
+//    {    
+//        if((action.type == embot::os::Action::Type::event2thread) && (nullptr != action.evt.thread))
+//        {
+//            embot::core::print(sPref + eo_timer_GetName(t) +
+//                                " sends evt " + std::to_string(action.evt.event) + 
+//                                " to thread " + action.evt.thread->getName());
+//            if(0 == strcmp(eo_timer_GetName(t), "EOtmrCANGTW"))
+//            {
+//                ciao++;
+//            }                
+//        }
+//    } 
+    
+    action.execute();
+
+    // we stop it only if it is a one shot timer
+    if(EOTIMER_MODE_ONESHOT == t->mode) 
+    {
+        // sets dummy values for the timer, which is completed 
+        eo_timer_hid_Reset_but_not_osaltime(t, eo_tmrstat_Completed); 
+    } 
+}
+
 eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t) 
 {
     eOresult_t res = eores_NOK_generic;
@@ -323,21 +363,16 @@ eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
         // cannot lock it ... bye bye
          return(eores_NOK_generic);
     }
-
-    // start the osal timer
-//    timing.startat  = t->startat; 
-//    timing.count    = t->expirytime; 
-//    timing.mode     = ( (EOTIMER_MODE_FOREVER == t->mode) ? (osal_tmrmodeFOREVER) : (osal_tmrmodeONESHOT) );
-//    onexpi.cbk      = s_eom_timerman_OnExpiry;
-//    onexpi.par      = t;
-
-//    res = (eOresult_t)osal_timer_start((osal_timer_t*)t->envir.osaltimer, &timing, &onexpi, osal_callerTSK);
     
-    embot::os::Timer* tmr = reinterpret_cast<embot::os::Timer*>(t->envir.osaltimer);    
-    embot::os::Action act;
-    to_embot_action(&t->onexpiry, act);        
+    embot::os::Timer* tmr = reinterpret_cast<embot::os::Timer*>(t->envir.osaltimer);  
+    // set the name once more
+    tmr->name(eo_timer_GetName(t));    
     embot::os::Timer::Mode mode = (EOTIMER_MODE_FOREVER == t->mode) ? (embot::os::Timer::Mode::forever) : (embot::os::Timer::Mode::oneshot);
-    embot::os::Timer::Config cfg{t->expirytime, act, mode, 0};
+    Action act {{s_timer_onexpiry, t}, nullptr};
+    // by using nullptr as thrird argument, s_timer_onexpiry() is executed directy by the timer manager to save time
+    // then inside s_timer_onexpiry() t->onexpiry is transformed into a embot::os::Action and executed. 
+    // its execution will be done directly inside the timer manager unless Action is of type callback and its thread is the callback manager. 
+    embot::os::Timer::Config cfg {t->expirytime, act, mode, 0}; 
     bool b = tmr->start(cfg);
     
     if(true == b)

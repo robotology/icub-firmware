@@ -28,7 +28,7 @@
     
     #define EMBOT_ENABLE_hw_spi
 //    #define EMBOT_ENABLE_hw_spi_123
-    #define EMBOT_ENABLE_hw_J5_powersupply
+//    #define EMBOT_ENABLE_hw_J5_powersupply
     
     #define EMBOT_ENABLE_hw_encoder
     
@@ -41,7 +41,7 @@
     #define EMBOT_ENABLE_hw_timer
 //    #define EMBOT_ENABLE_hw_timer_emulated
 
-    #define EMBOT_ENABLE_hw_IcacheDcache
+//    #define EMBOT_ENABLE_hw_IcacheDcache
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMC ...

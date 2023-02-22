@@ -200,7 +200,9 @@ uint32_t encoderGetCounter(void)
     return (uint32_t)__HAL_TIM_GET_COUNTER(&htim2);
 }
 
-
+/*******************************************************************************************************************//**
+ * @brief   Reset encoder value
+ */
 void encoderReset()
 {
     __HAL_TIM_SET_COUNTER(&htim2, 0);
@@ -213,6 +215,7 @@ void encoderReset()
  */
 uint16_t encoderGetElectricalAngle(void)
 {
+    
     if (MainConf.encoder.resolution == 0)
     {
         return encoderForcedValue;

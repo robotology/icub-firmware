@@ -24,10 +24,12 @@
     #define EMBOT_ENABLE_hw_led
     //#define EMBOT_ENABLE_hw_button
     #define EMBOT_ENABLE_hw_can
-    #define EMBOT_ENABLE_hw_i2c
+//    #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_tlv493d
-    #define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
+    #define EMBOT_ENABLE_hw_tlv493d_i2ceMODE
+//    #define EMBOT_ENABLE_hw_tlv493d_emulatedMODE
     #define EMBOT_ENABLE_hw_flash
+    #define EMBOT_ENABLE_hw_i2ce
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_STM32G4EVAL ...

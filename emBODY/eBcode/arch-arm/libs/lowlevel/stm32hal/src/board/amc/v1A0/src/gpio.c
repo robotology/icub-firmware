@@ -62,7 +62,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOF_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, CAN2_STBY_Pin|CAN1_STBY_Pin|CAN_SHDN_Pin, GPIO_PIN_SET);
+//  HAL_GPIO_WritePin(GPIOD, CAN2_STBY_Pin|CAN1_STBY_Pin|CAN_SHDN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
 //  HAL_GPIO_WritePin(EE_nSEL_GPIO_Port, EE_nSEL_Pin, GPIO_PIN_SET);
@@ -86,12 +86,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = CAN2_STBY_Pin|CAN1_STBY_Pin|CAN_SHDN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+//  /*Configure GPIO pins : PDPin PDPin PDPin */
+//  GPIO_InitStruct.Pin = CAN2_STBY_Pin|CAN1_STBY_Pin|CAN_SHDN_Pin;
+//  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//  GPIO_InitStruct.Pull = GPIO_NOPULL;
+//  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+//  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   // tecnologix ETH PA8
   /*Configure GPIO pin : PA8 */

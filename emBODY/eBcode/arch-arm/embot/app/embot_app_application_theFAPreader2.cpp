@@ -68,6 +68,9 @@
 
 namespace embot { namespace app { namespace application {
     
+//    volatile uint64_t st{0};
+//    volatile uint64_t du{0};
+    
     struct SensorHelper
     {
         static embot::prot::can::analog::posLABEL getPOSlabel(const theFAPreader2::Sensor &snsr)
@@ -133,12 +136,16 @@ namespace embot { namespace app { namespace application {
 
             return ret;
         }
-                
+          
+
         static void acquisition(const theFAPreader2::Sensor &snsr, const embot::core::Callback &cbk)
         {        
             if(theFAPreader2::sensorType::tlv == snsr.type)
             {
+//                st = embot::core::now();
                 embot::hw::tlv493d::acquisition(static_cast<embot::hw::TLV493D>(snsr.id), cbk);
+//                du = embot::core::now() - st;
+//                du = du;
             }
         }
         

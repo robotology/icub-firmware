@@ -20,13 +20,15 @@ namespace embot { namespace hw { namespace i2ce { namespace bsp {
     
     enum class Signal { SCL = 0, SDA = 1, NumberOf = 2 };
     constexpr size_t SignalsNumberOf {embot::core::tointegral(Signal::NumberOf)};
-        
+    
     struct PROP
     {     
         embot::hw::i2ce::Speed speed {embot::hw::i2ce::Speed::standard100};
         std::array<embot::hw::GPIO, SignalsNumberOf> pinout { {} };
         constexpr PROP() = default;
-        constexpr PROP(embot::hw::i2ce::Speed s, std::array<embot::hw::GPIO, SignalsNumberOf> p) : speed(s), pinout(p) {}   
+        constexpr PROP(embot::hw::i2ce::Speed s, std::array<embot::hw::GPIO, SignalsNumberOf> p) : speed(s), pinout(p) {} 
+        constexpr const embot::hw::GPIO& scl() const { return pinout[0]; }  
+        constexpr const embot::hw::GPIO& sda() const { return pinout[1]; }        
     };
        
     struct BSP : public embot::hw::bsp::SUPP
@@ -43,8 +45,12 @@ namespace embot { namespace hw { namespace i2ce { namespace bsp {
         
         constexpr embot::hw::I2CE toID(const PROP& p) const
         { 
-//            if(nullptr == p.handle) { return embot::hw::I2CE::none; }
-//            for(uint8_t i=0; i<maxnumberof; i++) { if(p.handle == properties[i]->handle) return static_cast<embot::hw::I2CE>(i); }
+            // look for the (scl, sda) gpios, aka p.pinout[0] and p.pinout[1]
+            for(uint8_t i=0; i<maxnumberof; i++) 
+            { 
+                if((p.pinout[0] == properties[i]->pinout[0]) && (p.pinout[1] == properties[i]->pinout[1])) 
+                    return static_cast<embot::hw::I2CE>(i); 
+            }
             return embot::hw::I2CE::none;
         }
     };

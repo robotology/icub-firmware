@@ -131,20 +131,23 @@ namespace embot { namespace hw { namespace led {
     #if   defined(STM32HAL_BOARD_AMC)
        
     
-    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::thirteen}  };  
-    constexpr PROP led2p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::fifteen}  };  
+    constexpr PROP led1pcan1 = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::thirteen}  };  
+//    constexpr PROP led2pcan2 = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::fifteen}  };  
     constexpr PROP led3p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::two}  }; 
     constexpr PROP led4p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::three}  };     
     constexpr PROP led5p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::four}  }; 
-    constexpr PROP led6p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::five}  }; 
+//    constexpr PROP led6pred = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::five}  }; 
     
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) | mask::pos2mask<uint32_t>(LED::three) |
-        mask::pos2mask<uint32_t>(LED::four) | mask::pos2mask<uint32_t>(LED::five) | mask::pos2mask<uint32_t>(LED::six),        
+        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) | 
+        mask::pos2mask<uint32_t>(LED::three) | mask::pos2mask<uint32_t>(LED::four) 
+        // | mask::pos2mask<uint32_t>(LED::five) | mask::pos2mask<uint32_t>(LED::six)
+        ,        
         // properties
         {{
-            &led1p, &led2p, &led3p, &led4p, &led5p, &led6p, nullptr, nullptr            
+//            &led1p, &led2p, &led3p, &led4p, &led5p, &led6p, nullptr, nullptr  
+            &led1pcan1, &led3p, &led4p, &led5p             
         }}        
     };
     
@@ -298,116 +301,105 @@ namespace embot { namespace hw { namespace can {
 
 namespace embot { namespace hw { namespace can {
                
-    #if   defined(STM32HAL_BOARD_AMC)
+#if   defined(STM32HAL_BOARD_AMC)
     
     
-    // it has HAL_FDCAN_MODULE_ENABLED
-    
-//    FDCAN_HandleTypeDef hfdcan;
-//    
-//    /**
-//      * @brief  Configures the FDCAN.
-//      * @param  None
-//      * @retval None
-//      */
-//    static void my_FDCAN1_Config(void)
-//    {
-//      FDCAN_FilterTypeDef sFilterConfig;
-
-//      /* Bit time configuration:
-//        fdcan_ker_ck               = 40 MHz
-//        Time_quantum (tq)          = 25 ns
-//        Synchronization_segment    = 1 tq
-//        Propagation_segment        = 23 tq
-//        Phase_segment_1            = 8 tq
-//        Phase_segment_2            = 8 tq
-//        Synchronization_Jump_width = 8 tq
-//        Bit_length                 = 40 tq = 1 �s
-//        Bit_rate                   = 1 MBit/s
-//      */
-//      hfdcan.Instance = FDCAN1;
-//      hfdcan.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
-//      hfdcan.Init.Mode = FDCAN_MODE_NORMAL;
-//      hfdcan.Init.AutoRetransmission = ENABLE;
-//      hfdcan.Init.TransmitPause = DISABLE;
-//      hfdcan.Init.ProtocolException = ENABLE;
-//      hfdcan.Init.NominalPrescaler = 0x1; /* tq = NominalPrescaler x (1/fdcan_ker_ck) */
-//      hfdcan.Init.NominalSyncJumpWidth = 0x8;
-//      hfdcan.Init.NominalTimeSeg1 = 0x1F; /* NominalTimeSeg1 = Propagation_segment + Phase_segment_1 */
-//      hfdcan.Init.NominalTimeSeg2 = 0x8;
-//      hfdcan.Init.MessageRAMOffset = 0;
-//      hfdcan.Init.StdFiltersNbr = 1;
-//      hfdcan.Init.ExtFiltersNbr = 0;
-//      hfdcan.Init.RxFifo0ElmtsNbr = 1;
-//      hfdcan.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
-//      hfdcan.Init.RxFifo1ElmtsNbr = 0;
-//      hfdcan.Init.RxBuffersNbr = 0;
-//      hfdcan.Init.TxEventsNbr = 0;
-//      hfdcan.Init.TxBuffersNbr = 0;
-//      hfdcan.Init.TxFifoQueueElmtsNbr = 1;
-//      hfdcan.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
-//      hfdcan.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
-//      if (HAL_FDCAN_Init(&hfdcan) != HAL_OK)
-//      {
-//        /* Initialization Error */
-//        Error_Handler();
-//      }
-
-////#define DO_THE_REST_IN_embot_hw_can
-//#if !defined(DO_THE_REST_IN_embot_hw_can)
-//      /* Configure Rx filter */
-//      sFilterConfig.IdType = FDCAN_STANDARD_ID;
-//      sFilterConfig.FilterIndex = 0;
-//      sFilterConfig.FilterType = FDCAN_FILTER_MASK;
-//      sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
-//      sFilterConfig.FilterID1 = 0x321;
-//      sFilterConfig.FilterID2 = 0x7FF;
-//      if (HAL_FDCAN_ConfigFilter(&hfdcan, &sFilterConfig) != HAL_OK)
-//      {
-//        /* Filter configuration Error */
-//        Error_Handler();
-//      }
-
-////      /* Start the FDCAN module */
-////      if (HAL_FDCAN_Start(&hfdcan) != HAL_OK)
-////      {
-////        /* Start Error */
-////        Error_Handler();
-////      }
-
-////      if (HAL_FDCAN_ActivateNotification(&hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
-////      {
-////        /* Notification Error */
-////        Error_Handler();
-////      }
-
-////      /* Prepare Tx Header */
-////      TxHeader.Identifier = 0x321;
-////      TxHeader.IdType = FDCAN_STANDARD_ID;
-////      TxHeader.TxFrameType = FDCAN_DATA_FRAME;
-////      TxHeader.DataLength = FDCAN_DLC_BYTES_2;
-////      TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
-////      TxHeader.BitRateSwitch = FDCAN_BRS_OFF;
-////      TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
-////      TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
-////      TxHeader.MessageMarker = 0;
-//#endif      
-//      
-//    }        
+    // it has HAL_FDCAN_MODULE_ENABLED    
+    FDCAN_HandleTypeDef hfdcan1 {};
+    FDCAN_HandleTypeDef hfdcan2 {};    
     
     constexpr PROP can1p = { .handle = &hfdcan1 }; 
     constexpr PROP can2p = { .handle = &hfdcan2 };    
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(CAN::one) | mask::pos2mask<uint32_t>(CAN::two),        
+        mask::pos2mask<uint32_t>(CAN::one), // | mask::pos2mask<uint32_t>(CAN::two),        
         // properties
         {{
-            &can1p, &can2p           
+            &can1p //, &can2p           
         }}        
     };
     
-        
+    
+    void s_FDCAN1_Init(void)
+    {
+        hfdcan1.Instance = FDCAN1;
+        hfdcan1.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
+        hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
+        hfdcan1.Init.AutoRetransmission = ENABLE;
+        hfdcan1.Init.TransmitPause = ENABLE;
+        hfdcan1.Init.ProtocolException = DISABLE;
+        hfdcan1.Init.NominalPrescaler = 1;
+        hfdcan1.Init.NominalSyncJumpWidth = 20;
+        hfdcan1.Init.NominalTimeSeg1 = 79;
+        hfdcan1.Init.NominalTimeSeg2 = 20;
+        hfdcan1.Init.DataPrescaler = 1;
+        hfdcan1.Init.DataSyncJumpWidth = 8;
+        hfdcan1.Init.DataTimeSeg1 = 11;
+        hfdcan1.Init.DataTimeSeg2 = 8;
+        hfdcan1.Init.MessageRAMOffset = 0;
+        hfdcan1.Init.StdFiltersNbr = 1;
+        hfdcan1.Init.ExtFiltersNbr = 1;
+        hfdcan1.Init.RxFifo0ElmtsNbr = 1;
+        hfdcan1.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
+        hfdcan1.Init.RxFifo1ElmtsNbr = 0;
+        hfdcan1.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
+        hfdcan1.Init.RxBuffersNbr = 1;
+        hfdcan1.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
+        hfdcan1.Init.TxEventsNbr = 0;
+        hfdcan1.Init.TxBuffersNbr = 1;
+        hfdcan1.Init.TxFifoQueueElmtsNbr = 1;
+        hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+        hfdcan1.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
+        if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
+        {
+            Error_Handler();
+        }
+    }
+    
+    void s_FDCAN2_Init(void)
+    {
+        hfdcan2.Instance = FDCAN2;
+        hfdcan2.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
+        hfdcan2.Init.Mode = FDCAN_MODE_NORMAL;
+        hfdcan2.Init.AutoRetransmission = ENABLE;
+        hfdcan2.Init.TransmitPause = ENABLE;
+        hfdcan2.Init.ProtocolException = DISABLE;
+        hfdcan2.Init.NominalPrescaler = 1;
+        hfdcan2.Init.NominalSyncJumpWidth = 20;
+        hfdcan2.Init.NominalTimeSeg1 = 79;
+        hfdcan2.Init.NominalTimeSeg2 = 20;
+        hfdcan2.Init.DataPrescaler = 1;
+        hfdcan2.Init.DataSyncJumpWidth = 8;
+        hfdcan2.Init.DataTimeSeg1 = 11;
+        hfdcan2.Init.DataTimeSeg2 = 8;
+        hfdcan2.Init.MessageRAMOffset = 1280;
+        hfdcan2.Init.StdFiltersNbr = 1;
+        hfdcan2.Init.ExtFiltersNbr = 1;
+        hfdcan2.Init.RxFifo0ElmtsNbr = 1;
+        hfdcan2.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
+        hfdcan2.Init.RxFifo1ElmtsNbr = 0;
+        hfdcan2.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
+        hfdcan2.Init.RxBuffersNbr = 1;
+        hfdcan2.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
+        hfdcan2.Init.TxEventsNbr = 0;
+        hfdcan2.Init.TxBuffersNbr = 1;
+        hfdcan2.Init.TxFifoQueueElmtsNbr = 1;
+        hfdcan2.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+        hfdcan2.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
+        if (HAL_FDCAN_Init(&hfdcan2) != HAL_OK)
+        {
+            Error_Handler();
+        }
+    }    
+    
+    // actions:
+    // 1. Activate the external driver out of STANDBY
+    // can1: HAL_GPIO_WritePin(CAN1_STBY_GPIO_Port, CAN1_STBY_Pin, GPIO_PIN_RESET); 
+    // can2: HAL_GPIO_WritePin(CAN2_STBY_GPIO_Port, CAN2_STBY_Pin, GPIO_PIN_RESET);    
+    // 2. Activate both driver out of SHUTDOWN mode 
+    // can1-can2: HAL_GPIO_WritePin(CAN_SHDN_GPIO_Port, CAN_SHDN_Pin, GPIO_PIN_RESET);
+    // HAL_Delay(10); 
     void hwdriver_init(embot::hw::CAN h)
     {
         constexpr std::array<embot::hw::GPIO, 2> candrivergpiosstandby = { {
@@ -439,19 +431,12 @@ namespace embot { namespace hw { namespace can {
     {
         if(h == CAN::one)
         {            
-            MX_FDCAN1_Init();
-            // Activate the external driver out of STANDBY
-            //HAL_GPIO_WritePin(CAN1_STBY_GPIO_Port, CAN1_STBY_Pin, GPIO_PIN_RESET);
+            s_FDCAN1_Init();
         }
         else if(h == CAN::two)
         {
-            MX_FDCAN2_Init();
-            // Activate the external driver out of STANDBY
-            //HAL_GPIO_WritePin(CAN2_STBY_GPIO_Port, CAN2_STBY_Pin, GPIO_PIN_RESET);
+            s_FDCAN2_Init();
         }
-        // Activate both driver out of SHUTDOWN mode 
-        //HAL_GPIO_WritePin(CAN_SHDN_GPIO_Port, CAN_SHDN_Pin, GPIO_PIN_RESET);
-        //HAL_Delay(10);
         
         hwdriver_init(h);
     }
@@ -470,33 +455,202 @@ namespace embot { namespace hw { namespace can {
 
 #if defined(HAL_FDCAN_MODULE_ENABLED)
 
-    #if defined(STM32HAL_BOARD_AMC)
+#if defined(STM32HAL_BOARD_AMC)
 
-        void FDCAN1_IT0_IRQHandler(void)
-        {
-            HAL_FDCAN_IRQHandler(&hfdcan1);
-        } 
-
-        void FDCAN2_IT0_IRQHandler(void)
-        {
-            HAL_FDCAN_IRQHandler(&hfdcan2);
-        } 
-        
-            
-        void FDCAN1_IT1_IRQHandler(void)
-        {
-            HAL_FDCAN_IRQHandler(&hfdcan1);
-        }          
-
-
-        void FDCAN2_IT1_IRQHandler(void)
-        {
-            HAL_FDCAN_IRQHandler(&hfdcan2);
-        } 
+extern "C"
+{
+    // the irq handlers
     
-    #else
-        #error add the handler
-    #endif        
+    void FDCAN1_IT0_IRQHandler(void)
+    {
+        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan1);
+    } 
+
+    void FDCAN2_IT0_IRQHandler(void)
+    {
+        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan2);
+    } 
+            
+    void FDCAN1_IT1_IRQHandler(void)
+    {
+        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan1);
+    }          
+
+    void FDCAN2_IT1_IRQHandler(void)
+    {
+        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan2);
+    } 
+
+    // the msp init / deinit
+
+    constexpr uint16_t vCAN1_TXD_Pin {GPIO_PIN_1};
+    GPIO_TypeDef *vCAN1_TXD_GPIO_Port {GPIOD};    
+    constexpr uint16_t vCAN2_TXD_Pin {GPIO_PIN_6};
+    GPIO_TypeDef *vCAN2_TXD_GPIO_Port {GPIOB};
+    constexpr uint16_t vCAN1_RXD_Pin {GPIO_PIN_14};
+    GPIO_TypeDef *vCAN1_RXD_GPIO_Port {GPIOH};
+    constexpr uint16_t vCAN2_RXD_Pin {GPIO_PIN_5};
+    GPIO_TypeDef *vCAN2_RXD_GPIO_Port {GPIOB};
+    
+    static uint32_t HAL_RCC_FDCAN_CLK_ENABLED=0;
+
+    void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
+    {
+        GPIO_InitTypeDef GPIO_InitStruct = {0};
+        RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+        if(fdcanHandle->Instance==FDCAN1)
+        {
+            /* USER CODE BEGIN FDCAN1_MspInit 0 */
+
+            /* USER CODE END FDCAN1_MspInit 0 */
+            /** Initializes the peripherals clock
+            */
+            PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
+            PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
+            if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+            {
+                Error_Handler();
+            }
+
+            /* FDCAN1 clock enable */
+            HAL_RCC_FDCAN_CLK_ENABLED++;
+            if(HAL_RCC_FDCAN_CLK_ENABLED==1){
+                __HAL_RCC_FDCAN_CLK_ENABLE();
+            }
+
+            __HAL_RCC_GPIOD_CLK_ENABLE();
+            __HAL_RCC_GPIOH_CLK_ENABLE();
+            /**FDCAN1 GPIO Configuration
+            PD1     ------> FDCAN1_TX
+            PH14     ------> FDCAN1_RX
+            */
+            GPIO_InitStruct.Pin = vCAN1_TXD_Pin;
+            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+            GPIO_InitStruct.Pull = GPIO_NOPULL;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+            GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
+            HAL_GPIO_Init(vCAN1_TXD_GPIO_Port, &GPIO_InitStruct);
+
+            GPIO_InitStruct.Pin = vCAN1_RXD_Pin;
+            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+            GPIO_InitStruct.Pull = GPIO_NOPULL;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+            GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
+            HAL_GPIO_Init(vCAN1_RXD_GPIO_Port, &GPIO_InitStruct);
+
+            /* FDCAN1 interrupt Init */
+            HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
+            HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
+            /* USER CODE BEGIN FDCAN1_MspInit 1 */
+
+            /* USER CODE END FDCAN1_MspInit 1 */
+        }
+        else if(fdcanHandle->Instance==FDCAN2)
+        {
+            /* USER CODE BEGIN FDCAN2_MspInit 0 */
+
+            /* USER CODE END FDCAN2_MspInit 0 */
+
+            /** Initializes the peripherals clock
+            */
+            PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
+            PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
+            if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+            {
+                Error_Handler();
+            }
+
+            /* FDCAN2 clock enable */
+            HAL_RCC_FDCAN_CLK_ENABLED++;
+            if(HAL_RCC_FDCAN_CLK_ENABLED==1){
+                __HAL_RCC_FDCAN_CLK_ENABLE();
+            }
+
+            __HAL_RCC_GPIOB_CLK_ENABLE();
+            /**FDCAN2 GPIO Configuration
+            PB6     ------> FDCAN2_TX
+            PB5     ------> FDCAN2_RX
+            */
+            GPIO_InitStruct.Pin = vCAN2_TXD_Pin | vCAN2_RXD_Pin;
+            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+            GPIO_InitStruct.Pull = GPIO_NOPULL;
+            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+            GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN2;
+            HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+            /* FDCAN2 interrupt Init */
+            HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
+            HAL_NVIC_SetPriority(FDCAN2_IT1_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(FDCAN2_IT1_IRQn);
+            /* USER CODE BEGIN FDCAN2_MspInit 1 */
+
+            /* USER CODE END FDCAN2_MspInit 1 */
+        }
+    }
+
+    void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* fdcanHandle)
+    {
+
+        if(fdcanHandle->Instance==FDCAN1)
+        {
+            /* USER CODE BEGIN FDCAN1_MspDeInit 0 */
+
+            /* USER CODE END FDCAN1_MspDeInit 0 */
+            /* Peripheral clock disable */
+            HAL_RCC_FDCAN_CLK_ENABLED--;
+            if(HAL_RCC_FDCAN_CLK_ENABLED==0){
+              __HAL_RCC_FDCAN_CLK_DISABLE();
+            }
+
+            /**FDCAN1 GPIO Configuration
+            PD1     ------> FDCAN1_TX
+            PH14     ------> FDCAN1_RX
+            */
+            HAL_GPIO_DeInit(vCAN1_TXD_GPIO_Port, vCAN1_TXD_Pin);
+
+            HAL_GPIO_DeInit(vCAN1_RXD_GPIO_Port, vCAN1_RXD_Pin);
+
+            /* FDCAN1 interrupt Deinit */
+            HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
+            HAL_NVIC_DisableIRQ(FDCAN1_IT1_IRQn);
+            /* USER CODE BEGIN FDCAN1_MspDeInit 1 */
+
+            /* USER CODE END FDCAN1_MspDeInit 1 */
+        }
+        else if(fdcanHandle->Instance==FDCAN2)
+        {
+            /* USER CODE BEGIN FDCAN2_MspDeInit 0 */
+
+            /* USER CODE END FDCAN2_MspDeInit 0 */
+            /* Peripheral clock disable */
+            HAL_RCC_FDCAN_CLK_ENABLED--;
+            if(HAL_RCC_FDCAN_CLK_ENABLED==0){
+              __HAL_RCC_FDCAN_CLK_DISABLE();
+            }
+
+            /**FDCAN2 GPIO Configuration
+            PB6     ------> FDCAN2_TX
+            PB5     ------> FDCAN2_RX
+            */
+            HAL_GPIO_DeInit(GPIOB, vCAN2_TXD_Pin | vCAN2_RXD_Pin);
+
+            /* FDCAN2 interrupt Deinit */
+            HAL_NVIC_DisableIRQ(FDCAN2_IT0_IRQn);
+            HAL_NVIC_DisableIRQ(FDCAN2_IT1_IRQn);
+            /* USER CODE BEGIN FDCAN2_MspDeInit 1 */
+
+            /* USER CODE END FDCAN2_MspDeInit 1 */
+        }    
+    }    
+    
+}
+
+#else
+    #error add the handler
+#endif        
 
 #endif //
         
@@ -1465,7 +1619,7 @@ void manageInterrupt(embot::hw::TIMER t, TIM_HandleTypeDef *htim)
 extern "C" {
     void TIM8_UP_TIM13_IRQHandler(void)
     {
-        #warning TODO: cambiare il modo in cui si chiama la callback. usare le callback di stm32
+        //#warning TODO: cambiare il modo in cui si chiama la callback. usare le callback di stm32
         manageInterrupt(embot::hw::TIMER::one, &embot::hw::timer::htim13);
     }
     
@@ -1595,6 +1749,13 @@ extern "C"
 
 namespace embot { namespace hw { namespace bsp { namespace amc {
     
+    OnSpecialize defOnSpec {};
+    
+    void set(const OnSpecialize& onsp)
+    {
+        defOnSpec = onsp;
+    }
+    
 }}}}
 
 
@@ -1603,7 +1764,7 @@ namespace embot { namespace hw { namespace bsp { namespace amc {
 // - specialize the bsp
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(EMBOT_ENABLE_hw_J5_powersupply)
+//#if defined(EMBOT_ENABLE_hw_J5_powersupply)
 
 #include "embot_hw_gpio.h"
 void J5power(bool on)
@@ -1626,44 +1787,70 @@ void J5power(bool on)
     embot::hw::gpio::set(J5pc, on ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET);        
     HAL_Delay(10); // wait for 10 ms to stabilize ...
 }
-#endif
+//#endif
 
-#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)    
+//#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)    
 #include "embot_hw_gpio.h"
 // it selects spi1 / spi2 / spi3 in connector J5
 void prepare_connector_j5_spi123()
 {
     // ok, i know it does not compile... because:
     // todo: if we define EMBOT_ENABLE_hw_spi_123_atstartup then we must not call s_J5_SPIpinout() in runtime
-    s_J5_SPIpinout(embot::hw::SPI::one, true);
-    s_J5_SPIpinout(embot::hw::SPI::two, true);
-    s_J5_SPIpinout(embot::hw::SPI::three, true);
+    embot::hw::spi::bsp::s_J5_SPIpinout(embot::hw::SPI::one, true);
+    embot::hw::spi::bsp::s_J5_SPIpinout(embot::hw::SPI::two, true);
+    embot::hw::spi::bsp::s_J5_SPIpinout(embot::hw::SPI::three, true);
 }
-#endif
+//#endif
 
 #if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
 bool embot::hw::bsp::specialize() { return true; }
 #else   
 
-    #if   defined(STM32HAL_BOARD_AMC)
+#if   defined(STM32HAL_BOARD_AMC)
     
        
     bool embot::hw::bsp::specialize()
     {
+        
+        constexpr uint32_t hsem0 {0};
+        constexpr uint32_t procID0 {0};
+        
+        switch(amc::defOnSpec.cm4mode)
+        {
+            case amc::OnSpecialize::CM4MODE::activateandhold:
+            {
+                // 1. init the hsems and take hsem-0
+                __HAL_RCC_HSEM_CLK_ENABLE();
+                HAL_HSEM_FastTake(hsem0);
 
-#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)        
-        prepare_connector_j5_spi123();
-#endif
-
-#if defined(EMBOT_ENABLE_hw_J5_powersupply)
-        J5power(true);
-#endif 
-
-#if defined(EMBOT_ENABLE_hw_IcacheDcache)
-        // enable I and D cache
-        SCB_EnableICache();        
-        SCB_EnableDCache();    
-#endif        
+                // 2. enable the second core
+                HAL_RCCEx_EnableBootCore(RCC_BOOT_C2);                
+            } break;
+ 
+            case amc::OnSpecialize::CM4MODE::release:
+            {
+                // 1. init the hsems (just in case) and release hsem-0
+                __HAL_RCC_HSEM_CLK_ENABLE();
+                HAL_HSEM_Release(hsem0, procID0);           
+            } break;
+            
+            case amc::OnSpecialize::CM4MODE::donothing:
+            default: 
+            {
+                break;
+            }
+        }
+        
+        if(true == amc::defOnSpec.enableJ5spi_123_at_startup)
+        {
+            prepare_connector_j5_spi123();
+        }
+        
+        if(true == amc::defOnSpec.enableJ5powersupply_at_startup)
+        {
+            J5power(true);
+        }
+       
         return true;
     }
 

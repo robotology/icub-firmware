@@ -151,7 +151,8 @@ namespace embot { namespace hw { namespace flash {
             uint32_t eraseErrorIndex = 0;
             
             HAL_FLASH_Unlock();
-//            clearflag(FLASH_FLAG_PGSERR);
+            // the clear of this flag prevent an error when attempt to erase the first time after a reset
+            clearflag(FLASH_FLAG_PGSERR);
             r = HAL_FLASHEx_Erase(&er, &eraseErrorIndex);
             HAL_FLASH_Lock();
                                    

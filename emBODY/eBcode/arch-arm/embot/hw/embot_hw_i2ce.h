@@ -5,6 +5,16 @@
  * email:   marco.accame@iit.it
 */
 
+
+#if 0
+
+## The `embot::hw::i2ce` driver
+
+It has the same API of `embot::hw::i2c` but a different implemention and hence a different `bsp::BSP`.
+I believe that we could merge the two drivers together but .... let's have this one working first.    
+
+#endif 
+
 // - include guard ----------------------------------------------------------------------------------------------------
 
 #ifndef _EMBOT_HW_I2CE_H_
@@ -13,14 +23,13 @@
 #include "embot_core.h"
 #include "embot_core_utils.h"
 #include "embot_hw_types.h"
+#include <vector>
 
 
 namespace embot { namespace hw { namespace i2ce {
     
     // speeds so far are those 
-    enum class Speed : uint32_t { standard100 = 100000, fast400 = 400000, fastplus1000 = 1000000, high3400 = 3400000, none = 0 };
-    
-//    enum class Signal { SCK = 0, SDA = 1, NumberOf = 2 };
+    enum class Speed : uint32_t { standard100 = 100000, fast400 = 400000, fastplus1000 = 1000000, high3400 = 3400000, none = 0 };   
     
     // address is always expressed by <= 8 bits
     using ADR = std::uint8_t;

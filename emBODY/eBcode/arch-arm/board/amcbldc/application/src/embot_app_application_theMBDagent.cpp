@@ -44,8 +44,14 @@
 // you need to enable the macro USE_KOLLMORGEN_SETUP, otherwise
 // it is implied that motor on wrist mk2 is in use
 
-#define EXTFAULT_enabled
+//#define EXTFAULT_enabled
 #define EXTFAULT_handler_will_disable_motor
+
+#define EXTFAULT_enabled_polling
+
+#if defined(EXTFAULT_enabled)
+#undef EXTFAULT_enabled_polling
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -226,6 +232,10 @@ struct embot::app::application::theMBDagent::Impl
     volatile embot::core::Time EXTFAULTpressedtime {0};
     volatile embot::core::Time EXTFAULTreleasedtime {0};
     
+    void onEXTFAULTpolling();
+    std::vector<bool> faultvalues {};
+    static constexpr size_t faultcapacity {5};
+    
     #ifdef PRINT_HISTO_DEBUG 
     void printHistogram_rxPkt(size_t cur_size); //cur_size is the currente queue size
     static constexpr uint8_t numOfBins {11}; //size of queue of the CAN drive plus 1 (in case any packet is received)
@@ -278,6 +288,20 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     embot::core::Callback cbkOnEXTFAULT {onEXTFAULTpressedreleased, this};
     embot::hw::button::init(buttonEXTfault, {embot::hw::button::Mode::TriggeredOnPressAndRelease, cbkOnEXTFAULT, 0});
     prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
+#elif defined(EXTFAULT_enabled_polling)
+
+    buttonEXTfault = embot::hw::bsp::amcbldc::EXTFAULTbutton();
+    
+    faultvalues.reserve(faultcapacity);
+    faultvalues.clear();
+
+    embot::hw::button::init(buttonEXTfault, {embot::hw::button::Mode::Polling, {}, 0});
+    for(size_t i=0; i<faultcapacity; i++)
+    {
+        faultvalues.push_back(embot::hw::button::pressed(buttonEXTfault));
+    }
+    bool allpressed = std::all_of(faultvalues.cbegin(), faultvalues.cend(), [](auto v){ return v; });
+    prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = allpressed;    
 #else
     prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = false;    
 #endif
@@ -312,6 +336,33 @@ bool embot::app::application::theMBDagent::Impl::initialise()
     return initted;
 }
 
+void embot::app::application::theMBDagent::Impl::onEXTFAULTpolling()
+{
+    if(faultvalues.size() >= faultcapacity)
+    {
+        faultvalues.erase(faultvalues.begin());
+    }
+    bool pressed = embot::hw::button::pressed(buttonEXTfault);
+    faultvalues.push_back(pressed);
+    bool allpressed = std::all_of(faultvalues.cbegin(), faultvalues.cend(), [](auto v){ return v; });
+    
+    EXTFAULTisPRESSED = allpressed;       
+    AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;
+    
+    if(true == EXTFAULTisPRESSED)
+    {
+        EXTFAULTpressedtime = embot::core::now();
+#if defined(EXTFAULT_handler_will_disable_motor) 
+        embot::hw::motor::fault(embot::hw::MOTOR::one, true);
+#endif         
+    }
+    else
+    {
+        embot::hw::motor::fault(embot::hw::MOTOR::one, false);
+        EXTFAULTreleasedtime = embot::core::now();
+    }
+    
+}
 
 void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void *owner)
 {
@@ -342,6 +393,8 @@ void embot::app::application::theMBDagent::Impl::onEXTFAULTpressedreleased(void 
 bool embot::app::application::theMBDagent::Impl::tick(std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 {    
     measureTick->start();
+    
+    onEXTFAULTpolling();
     
     if(prevEXTFAULTisPRESSED != EXTFAULTisPRESSED)
     {

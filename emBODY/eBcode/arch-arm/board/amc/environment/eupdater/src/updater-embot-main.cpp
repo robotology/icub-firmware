@@ -21,11 +21,13 @@ constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlec
 static_assert(0x08020000 == EENV_MEMMAP_EUPDATER_ROMADDR, "see EENV_MEMMAP_EUPDATER_ROMADDR");
 constexpr uint32_t offset {EENV_MEMMAP_EUPDATER_ROMADDR};  
 
+#include "embot_hw_bsp_amc.h"
 int main(void)
 {
     // relocate the vector table  
     embot::hw::sys::relocatevectortable(offset);
-
+    
+    embot::hw::bsp::amc::set(embot::hw::bsp::amc::OnSpecUpdater);
     // config and start system
     embot::os::init(osconfig); 
     embot::os::start();
@@ -56,15 +58,17 @@ void onIdle(embot::os::Thread *t, void* idleparam)
 void initSystem(embot::os::Thread *t, void* initparam)
 {
     embot::core::print("eUpdater: this is me");    
-        
-    embot::os::theTimerManager::getInstance().start({});     
+    
+    embot::os::theTimerManager::Config tcfg {};
+    tcfg.stacksize = 8*1024;    
+    embot::os::theTimerManager::getInstance().start(tcfg);     
     embot::os::theCallbackManager::getInstance().start({});  
     embot::os::EOM::initialise(eomcfg);
     
     // ok, now you can run whatever you want ...
     s_initialiser();        
                 
-        embot::core::print("eUpdater: quitting the INIT thread. Normal scheduling starts");    
+    embot::core::print("eUpdater: quitting the INIT thread. Normal scheduling starts");    
 }
 
 
@@ -83,6 +87,8 @@ static void s_initialiser(void)
 #include "embot_hw.h"
 #include "embot_hw_eeprom.h"
 #include "embot_hw_led.h"
+#include "embot_hw_flash.h"
+
 
 #include "ipal.h"
 
@@ -253,22 +259,34 @@ static void s_eom_eupdater_main_init(void)
     // eeprom is used for shared services but is initted also inside there
     //hal_eeprom_init(hal_eeprom_i2c_01, NULL);
     embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
-    // flash MUST be unlocked if one wants to erase code space (program application, updater, loader)
-    //#warning FLASH MUST BE hal_flash_unlock() >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    #warning -> FLASH programming MUST BE TESTED <-
-    //hal_flash_unlock();
-    
+
 
 #if !defined(_MAINTAINER_APPL_)    
     eo_armenv_Initialise((const eEmoduleInfo_t*)&eupdater_modinfo_extended, NULL);
-    const eEmoduleExtendedInfo_t * eapp_modinfo_extended = (const eEmoduleExtendedInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
 
+    // the info about application00 are saved in ROM
+    const eEmoduleExtendedInfo_t * eapp_modinfo_extended = (const eEmoduleExtendedInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+    
+    // the info about application01 are saved in a flash sector of bank2
+    const embot::hw::flash::Partition& app01 { embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eapplication01) };
+    const eEmoduleExtendedInfo_t * eappcm4_modinfo_extended = (const eEmoduleExtendedInfo_t*)(app01.address + EENV_MODULEINFO_OFFSET);
+
+    // read application00 (core cm7 bank0)
     if((eapp_modinfo_extended->moduleinfo.info.entity.type == ee_procApplication) &&
-        (eapp_modinfo_extended->moduleinfo.info.rom.addr == EENV_MEMMAP_EAPPLICATION_ROMADDR)
+       (eapp_modinfo_extended->moduleinfo.info.rom.addr == EENV_MEMMAP_EAPPLICATION_ROMADDR)
       )
     {
         ee_sharserv_part_proc_synchronise(ee_procApplication,(const eEmoduleInfo_t*)eapp_modinfo_extended);
     }
+
+    // read application01 (core cm4 bank1)
+    if((eappcm4_modinfo_extended->moduleinfo.info.entity.type == ee_procApplication) &&
+       (eappcm4_modinfo_extended->moduleinfo.info.rom.addr == app01.address)               
+      )
+    {
+        ee_sharserv_part_proc_synchronise(ee_procOther01, (const eEmoduleInfo_t*)eappcm4_modinfo_extended);
+    }
+    
 #else
     eo_armenv_Initialise((const eEmoduleInfo_t*)&emaintainer_modinfo_extended, NULL);
 #endif    
@@ -327,7 +345,7 @@ static void s_eom_eupdater_main_init(void)
     // the eth command task 
 //    updater_core_trace("MAIN", "starting ::taskethcommand");                       
     //#warning MARCOACCAME: non va bene 101, uso 25
-    s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 25, 2*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
+    s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 25, 6*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_ethcommand, "ethcommand");
     s_task_ethcommand = s_task_ethcommand;

@@ -657,9 +657,18 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     }
                 }
                 else
-                {   // we dont even have a valid reading from hal
-                    prop.valueinfo->errortype = encreader_err_AEA_READING;
-                    errorparam = 0xffff;
+                {   // we dont even have a valid reading from hal or the encoder is not properly connected to the board
+                    prop.valueinfo->errortype = encreader_err_AKSIM2_GENERIC ;
+                    errorparam = 0;
+                    
+                    // notify the error (check and re-check)
+                    eOerrmanDescriptor_t errdes = {0};
+                    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress        = 0;
+                    errdes.par16                = 0;
+                    errdes.par64                = (uint64_t) (diagn.info.aksim2_status_crc) << 32;
+                    errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_not_connected);
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
                 }
             } break;
             
@@ -869,7 +878,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
         // in par16[1] and par64[1] we put info of the 4 secondary encoders.
         // so far we use prop.valueinfo->errortype but we may use also diagn for the amo
 
-        eObool_t filldiagnostics = eo_common_byte_bitcheck(p->diagnostics.config.jomomask, jomo);        
+        eObool_t filldiagnostics = eo_common_byte_bitcheck(p->diagnostics.config.jomomask, jomo);
         if(eobool_true == filldiagnostics)
         {
             if(eomc_enc_amo == prop.descriptor->type)
@@ -882,11 +891,11 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     // select only 2 bytes: 1 from from diagn.type and one from diagn.info.value
                     uint64_t word = (0x0ff & diagn.type) | ((0xff & diagn.info.value) << 8);
                     // copy the word in correct position so that we have [word-enc3 | word-enc2 | word-enc1 | word-enc0]
-                    p->diagnostics.par64[i] |= (word << (16*jomo));                                         
+                    p->diagnostics.par64[i] |= (word << (16*jomo));
                 }
             }
             else
-            {    
+            {
                 switch(prop.valueinfo->errortype)
                 {
                     case encreader_err_NONE:
@@ -897,10 +906,14 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     default:
                     case encreader_err_GENERIC:
                     {   // we dont know what is happening ... we just set the flag in par16[i].
-                        p->diagnostics.par16[i] |= (encreader_err_GENERIC<<(4*jomo));       // shift by nibbles ..                    
+                        p->diagnostics.par16[i] |= (encreader_err_GENERIC<<(4*jomo));       // shift by nibbles ..
                     } break;
                     
-                    case encreader_err_AEA_READING:               
+                    case encreader_err_AKSIM2_CLOSE_TO_LIMITS:
+                    case encreader_err_AKSIM2_CRC_ERROR:
+                    case encreader_err_AKSIM2_INVALID_DATA:
+                    case encreader_err_AKSIM2_GENERIC:
+                    case encreader_err_AEA_READING:
                     case encreader_err_AEA_PARITY:
                     case encreader_err_AEA_CHIP:
                     case encreader_err_QENC_GENERIC:
@@ -909,17 +922,14 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     case encreader_err_PSC_GENERIC:
                     case encreader_err_POS_GENERIC:
                     case encreader_err_AMO_GENERIC:
-                    case encreader_err_AKSIM2_CLOSE_TO_LIMITS:
-                    case encreader_err_AKSIM2_CRC_ERROR:
-                    case encreader_err_AKSIM2_INVALID_DATA:
                     case encreader_err_SPICHAINOF2_GENERIC:
                     case encreader_err_SPICHAINOF3_GENERIC:
                     {   // in such cases, we report the errortype and the errorparam that someone has prepared 
                         p->diagnostics.par16[i] |= (prop.valueinfo->errortype<<(4*jomo));   // shift by nibbles ..
-                        p->diagnostics.par64[i] &= (errorparam<<(16*jomo));                 // shift by two bytes              
-                    } break;                                
+                        p->diagnostics.par64[i] &= (errorparam<<(16*jomo));                 // shift by two bytes
+                    } break;
                 } 
-            }                
+            }
         }
         
         // ok, we now go to next encoder or ... we terminate the for() loop
@@ -927,7 +937,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
     } // for()
         
     
-    // now the return value. we return always OK          
+    // now the return value. we return always OK
     return eores_OK;
 }
 
@@ -1332,7 +1342,7 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOencoder
 
 static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencoderreader_errortype_t *error)
 {
-    // TODO: there are no way to check the validity when using the AEA3 in SSI mode
+    // TODO: there is no way to check the validity when using the AEA3 in SSI mode
 //    if((*valueraw & 0x01) != 0x00)
 //    {
 //        *error = encreader_err_AEA_CHIP;
@@ -1343,22 +1353,39 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencode
 
 static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error)
 {
-    switch(diag->type)
+    // in case of errors we return false. Initially we assume no errors
+    eObool_t ret = eobool_true;
+    
+    // preperare data for diagnostics
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress        = 0;
+    errdes.par16                = 0;
+    errdes.par64                = (uint64_t) (diag->info.aksim2_status_crc) << 32;
+
+    // In case of errors we send human readable diagnostics messages
+    if(0x04 == (0x04 & diag->info.aksim2_status_crc))
     {
-        case hal_spiencoder_diagnostic_type_aksim2_invalid_data:
-            *error = encreader_err_AKSIM2_INVALID_DATA;
-            return eobool_false;
-        case hal_spiencoder_diagnostic_type_aksim2_crc_error:
-            *error = encreader_err_AKSIM2_CRC_ERROR;
-            return eobool_false;
-        case hal_spiencoder_diagnostic_type_aksim2_close_to_limits:
-            *error = encreader_err_AKSIM2_CLOSE_TO_LIMITS;
-            break;
-        default:
-            *error = encreader_err_NONE;
+        errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ret = eobool_false;
+    }
+
+    if(0x02 == (0x02 & diag->info.aksim2_status_crc))
+    {
+        errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_close_to_limits);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ret = eobool_false;
     }
     
-    return eobool_true;
+    if(0x01 == (0x01 & diag->info.aksim2_status_crc))
+    {
+        errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ret = eobool_false;
+    }
+    
+    return ret;
 }
 
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOencoderreader_errortype_t *error)

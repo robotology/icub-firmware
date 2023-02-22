@@ -202,7 +202,7 @@ extern eEresult_t ee_sharserv_isvalid(void)
     // nothing as i have used inline functions defined in header
 #endif
 
-
+//#define MOVEIT
 extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode)
 {
 
@@ -212,7 +212,9 @@ extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode)
     }
     
     // init sharserv data structure
-    
+#if defined(MOVEIT)   
+    // better do the init before using it
+#else
     shalbase_storage_get(&s_sharserv_strg_info, &s_sharserv_moduleinfo_eeprom, sizeof(eEmoduleInfo_t));
     // now compare with the s_sharserv_moduleinfo ... it must have the major number equal ... otherwise we erase 
     // the full eeprom
@@ -223,7 +225,7 @@ extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode)
         shalbase_storage_set(&s_sharserv_strg_info, &s_sharserv_moduleinfo, sizeof(eEmoduleInfo_t));    
         shalbase_storage_get(&s_sharserv_strg_info, &s_sharserv_moduleinfo_eeprom, sizeof(eEmoduleInfo_t));        
     }
-    
+#endif    
     
     // init shalbase
     if(ee_res_OK != shalbase_init((shalbase_initmode_t)mode->initmode))
@@ -262,8 +264,20 @@ extern eEresult_t ee_sharserv_init(const sharserv_mode_t* mode)
         {
             return(ee_res_NOK_generic);
         }        
-    }   
+    } 
 
+#if defined(MOVEIT) 
+    shalbase_storage_get(&s_sharserv_strg_info, &s_sharserv_moduleinfo_eeprom, sizeof(eEmoduleInfo_t));
+    // now compare with the s_sharserv_moduleinfo ... it must have the major number equal ... otherwise we erase 
+    // the full eeprom
+    if(ee_true != s_sharserv_storage_is_valid(&s_sharserv_moduleinfo_eeprom))
+    {
+        // clear all eeprom
+        //shalbase_storage_clr(&s_sharserv_strg_info, s_sharserv_strg_info.size);
+        shalbase_storage_set(&s_sharserv_strg_info, &s_sharserv_moduleinfo, sizeof(eEmoduleInfo_t));    
+        shalbase_storage_get(&s_sharserv_strg_info, &s_sharserv_moduleinfo_eeprom, sizeof(eEmoduleInfo_t));        
+    }    
+#endif
     
 #if     defined(SHARSERV_MODE_SHALIB)
         // and now put sharserv in partition table
