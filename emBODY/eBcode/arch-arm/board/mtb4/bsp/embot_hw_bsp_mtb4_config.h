@@ -24,7 +24,13 @@
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_bno055
     #define EMBOT_ENABLE_hw_multisda
-        
+
+#if defined(ENABLE_FAPreader)
+    #define EMBOT_ENABLE_hw_i2ce
+    #define EMBOT_ENABLE_hw_tlv493d
+    #define EMBOT_ENABLE_hw_tlv493d_i2ceMODE    
+#endif
+
 #else
     #error this is the bsp config of STM32HAL_BOARD_MTB4 ...
 #endif

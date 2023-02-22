@@ -1177,7 +1177,7 @@ bool embot::app::application::theFAPreader2::get(const embot::prot::can::analog:
     replyinfo.type = info.type;
     if(info.type == embot::prot::can::analog::posTYPE::angleDeciDeg)
     {
-        #warning acemo: add the reply
+        #warning acemor: add the reply
 //        replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
 //        replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
     }
