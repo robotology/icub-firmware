@@ -1258,7 +1258,12 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     //in case of joint controlled by ems+2foc, the motor encoder is connected to 2foc and the 2foc sends motor position to ems by can message. 
     //see Motor_update_odometry_fbk_can function.
 
-    o->pos_raw_fbk = position_raw;
+    int32_t delta = position_raw - o->pos_raw_fbk;
+    
+    while (delta < -TICKS_PER_HALF_REVOLUTION) delta += TICKS_PER_REVOLUTION;
+    while (delta >  TICKS_PER_HALF_REVOLUTION) delta -= TICKS_PER_REVOLUTION;
+    
+    o->pos_raw_fbk += delta;
     
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
@@ -1270,7 +1275,7 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     }
     
     //direction of movement changes depending on the sign
-    int32_t delta = o->enc_sign * (pos_fbk - o->pos_fbk_old);
+    delta = o->enc_sign * (pos_fbk - o->pos_fbk_old);
     
     o->pos_fbk_old = pos_fbk;
     
