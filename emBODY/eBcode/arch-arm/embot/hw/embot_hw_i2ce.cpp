@@ -77,7 +77,7 @@ namespace embot { namespace hw { namespace i2ce {
 
 namespace embot { namespace hw { namespace i2ce {
     
-    #warning marco.accame.says: Transaction::txbuffercapacity is limited to 16 so be careful we may use dynamic allocation
+//    #warning marco.accame.says: Transaction::txbuffercapacity is limited to 16 so be careful we may use dynamic allocation
 
     struct Transaction
     {
@@ -1225,7 +1225,7 @@ namespace embot { namespace hw { namespace i2ce {
             if(!reading)
             {
             /* disable SDA input, enable SDA output */
-            #warning ... maybe in reading i should not move back sda to output in here ......
+//            #warning ... maybe in reading i should not move back sda to output in here ......
             SDA(Mode::OUT);
             }
             
@@ -1233,7 +1233,7 @@ namespace embot { namespace hw { namespace i2ce {
             SCL(Value::L);
             if(!reading)
             {
-            #warning ... BUG???? SURELY in reading i should not drive sda to high in here ......
+//            #warning ... BUG???? SURELY in reading i should not drive sda to high in here ......
             SDA(Value::H);
             }
 // <- B            
@@ -1262,12 +1262,12 @@ namespace embot { namespace hw { namespace i2ce {
 // are u sure it is really required teh code from A to B?
 // A ->           
             /* disable SDA input, enable SDA output */
-            #warning ... maybe in reading i should not move back sda to output in here ......
+//            #warning ... maybe in reading i should not move back sda to output in here ......
             SDA(Mode::OUT);
             
             /* SCL hold low to wait */
             SCL(Value::L);
-            #warning ... BUG???? SURELY in reading i should not drive sda to high in here ......
+//            #warning ... BUG???? SURELY in reading i should not drive sda to high in here ......
             SDA(Value::H);
 // <- B            
             return r;
@@ -1460,7 +1460,7 @@ namespace embot { namespace hw { namespace i2ce {
             //i2c_scl_low();
             SCL(Value::L);
             //i2c_sda_high(sda1);    
-            #warning ... io non metterei qui SDA ad H. lo metterei in input
+//            #warning ... io non metterei qui SDA ad H. lo metterei in input
 //            SDA(Value::H);
         }
 

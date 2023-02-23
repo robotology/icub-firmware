@@ -144,42 +144,116 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     
     
     struct IMUmode
-    {        
-        static constexpr uint8_t defMODE {0};
+    {  
+        enum class TYPE : uint8_t { basic = 0, advanced = 1};
+        struct BASIC
+        {
+            bool fusion {true};
+        };
+        struct ADVANCED
+        {
+            uint8_t chipmode {0};
+        };
         
-        bool fusion {true};
-        uint8_t mode {defMODE}; // or if not defMODE: any enum class of the chip (such as embot::hw::bno055::Mode)      
+        union PARAM
+        {
+            BASIC basic;
+            ADVANCED advanced;            
+        };        
+        
+        #if 0 
+        
+            memory layout:
+            
+             1 bit                                     7 bits
+            -------------------------------------------------
+           | type |                                    param |
+            -------------------------------------------------
+        
+            case TYPE::basic                            1 bit 
+            -------------------------------------------------
+           |  0  |     these bits are not used      | fusion |
+            -------------------------------------------------
+            
+            case TYPE::advanced                        7 bits 
+            -------------------------------------------------
+           |  1  |                                 chipmode  |
+            -------------------------------------------------    
+            
+        #endif
+        
+        TYPE type {TYPE::basic};
+        PARAM param {};
+            
+
         constexpr IMUmode() = default;
         
         void frombyte(uint8_t byte)
         {
-            fusion = embot::core::binary::bit::check(byte, 0);
-            uint8_t b = byte >> 1;
-            mode = b;
+            type = static_cast<TYPE>(embot::core::binary::bit::check(byte, 7));
+            if(TYPE::basic == type)
+            {
+                param.basic.fusion = embot::core::binary::bit::check(byte, 0);
+            }
+            else
+            {
+                param.advanced.chipmode = byte & 0x7f;
+            }
         }
         
         uint8_t tobyte() const
         {
-            return (true == fusion) ? (0x01 | (mode<<1)) : (0x00 | (mode<<1));
+            return (TYPE::basic == type) ? (0x00 | param.basic.fusion) : (0x80 | (0x7f & param.advanced.chipmode));
         }               
     };
     
     struct IMUorientation
-    {       
-        bool custom {false};        // if custom == false the standard orientation is used, else it is applied what in axisremap
-        uint8_t axisremap {0};      // used only if custom == true. use any enum class of the chip (such as embot::hw::bno055::Placement)  
+    { 
+
+        enum class TYPE : uint8_t { factorydefault = 0, advanced = 1};
+
+       #if 0 
+        
+            memory layout:
+            
+             1 bit                                     7 bits
+            -------------------------------------------------
+           | type |                                    param |
+            -------------------------------------------------
+        
+            case TYPE::factorydefault                   1 bit 
+            -------------------------------------------------
+           |  0  |     these bits are not used              |
+            -------------------------------------------------
+            
+            case TYPE::advanced                       7 bits 
+            -------------------------------------------------
+           |  1  |                                    param  |
+            -------------------------------------------------    
+            
+        #endif
+            
+        TYPE type {TYPE::factorydefault};
+        uint8_t param {0};
+        
         constexpr IMUorientation() = default;
         
         void frombyte(uint8_t byte)
         {
-            custom = embot::core::binary::bit::check(byte, 0);
-            uint8_t b = byte >> 1;
-            axisremap = b;
+            type = static_cast<TYPE>(embot::core::binary::bit::check(byte, 7));
+            if(TYPE::factorydefault == type)
+            {
+                param = 0x00;
+            }
+            else
+            {
+                param = byte & 0x7f;
+            }
         }
         
         uint8_t tobyte() const
         {
-            return (true == custom) ? (0x01 | (axisremap<<1)) : (0x00 | (axisremap<<1));
+            return (TYPE::factorydefault == type) ? (0x00) : (0x80 | (0x7f & param));
         }        
     };
         

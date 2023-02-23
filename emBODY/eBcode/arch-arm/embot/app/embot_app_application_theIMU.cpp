@@ -194,31 +194,11 @@ bool embot::app::application::theIMU::Impl::start()
         return true;
     }
     else
-    {
-//        static uint8_t cnt = 0;
-//        embot::hw::bno055::Placement pl { embot::hw::bno055::Placement::P1 };
-//        if((cnt%2) == 0)
-//        {
-//             pl = embot::hw::bno055::Placement::P1;
-//        }
-//        else
-//        {
-//             pl = embot::hw::bno055::Placement::P5;
-//        }
-//        cnt++;
-//        
-//        embot::hw::bno055::set(config.sensor, embot::hw::bno055::Mode::CONFIG, 5*embot::core::time1millisec);
-
-//        embot::hw::bno055::Placement pp { embot::hw::bno055::Placement::none };
-//        embot::hw::bno055::get(config.sensor, pp, 10*embot::core::time1millisec);
-//        embot::hw::bno055::set(config.sensor, pl, 10*embot::core::time1millisec);
-//        embot::hw::bno055::get(config.sensor, pp, 10*embot::core::time1millisec);
-//        
-//        embot::hw::bno055::set(config.sensor, embot::hw::bno055::Mode::NDOF, 5*embot::core::time1millisec);
-        
+    {        
         canrevisitedconfig.counter = 0;
         embot::os::Timer::Config cfg(canrevisitedconfig.txperiod, action, embot::os::Timer::Mode::forever);
-        ticktimer->start(cfg);
+        constexpr bool forcerestart {true};
+        ticktimer->start(cfg, forcerestart);
         ticking = true;
         return true;
     }
@@ -603,8 +583,10 @@ bool embot::app::application::theIMU::set(const embot::prot::can::analog::pollin
 bool embot::app::application::theIMU::set(const embot::prot::can::analog::polling::Message_IMU_CONFIG_SET::Info &info)
 {
     // if ticking: stop it
+    bool wasticking { false };
     if(true == pImpl->ticking)
     {
+        wasticking = true;
         stop();
     }
 
@@ -621,37 +603,37 @@ bool embot::app::application::theIMU::set(const embot::prot::can::analog::pollin
     embot::hw::bno055::Mode mode { embot::hw::bno055::Mode::none };
     embot::hw::bno055::get(pImpl->config.sensor, mode, 5*embot::core::time1millisec);
     
-    // now we transform info.mode into a  ... target mode for the bno055
+    // now we transform info into a  ... target mode for the bno055
     embot::hw::bno055::Mode targetmode {embot::hw::bno055::Mode::NDOF}; 
-    if(embot::prot::can::analog::polling::IMUmode::defMODE == info.mode.mode) // defMODE is 0
-    {   // we use default
-        targetmode = (true == info.mode.fusion) ? embot::hw::bno055::Mode::NDOF : embot::hw::bno055::Mode::IMU;
+    if(embot::prot::can::analog::polling::IMUmode::TYPE::basic == info.mode.type) 
+    {   // we use either fusion or non fusion
+        targetmode = (true == info.mode.param.basic.fusion) ? embot::hw::bno055::Mode::NDOF : embot::hw::bno055::Mode::IMU;
     }
-    else if(true == embot::hw::bno055::isvalidmode(info.mode.mode))
-    {   // we have a mode which someone wants to impose. and it is valid
-        targetmode = embot::hw::bno055::tomode(info.mode.mode);
+    else if(true == embot::hw::bno055::isvalidmode(info.mode.param.advanced.chipmode))
+    {   // we have a mode which someone wants to impose. and it is valid, so we use it
+        targetmode = embot::hw::bno055::tomode(info.mode.param.advanced.chipmode);
     }
     else
-    {   // we revert back to the default
+    {   // the mode someone wants to impose is not valid. i revert to basic fusion
         targetmode = embot::hw::bno055::Mode::NDOF;
     }
     
-    // i get teh current placement
+    // i get the current placement
     embot::hw::bno055::Placement placement {embot::hw::bno055::Placement::none};
     embot::hw::bno055::get(pImpl->config.sensor, placement, 5*embot::core::time1millisec);    
 
     // now we transform info.orientation into a  ... target placement for the bno055
     embot::hw::bno055::Placement targetplacement {embot::hw::bno055::Placement::P1};
-    if(false == info.orientation.custom) 
-    {   // we use the default placement
+    if(embot::prot::can::analog::polling::IMUorientation::TYPE::factorydefault == info.orientation.type) 
+    {   // we use the placement used by the bno055 at boostrap
         targetplacement = embot::hw::bno055::Placement::P1;
     }
-    else if(true == embot::hw::bno055::isvalidplacement(info.orientation.axisremap))
+    else if(true == embot::hw::bno055::isvalidplacement(info.orientation.param))
     {   // we have a placement which someone wants to impose. and it is valid
-        targetplacement = embot::hw::bno055::toplacement(info.orientation.axisremap);
+        targetplacement = embot::hw::bno055::toplacement(info.orientation.param);
     }
     else
-    {   // we revert back to the default
+    {   // the placemnet someone wants to impose is not valid. i revert to default one
         targetplacement = embot::hw::bno055::Placement::P1;
     }
 
@@ -678,6 +660,12 @@ bool embot::app::application::theIMU::set(const embot::prot::can::analog::pollin
         embot::hw::bno055::set(pImpl->config.sensor, targetmode, 5*embot::core::time1millisec);
         // and wait for some time
         embot::core::wait(waitCONFIG2ANY);
+    }
+    
+    if(true == wasticking)
+    {
+        // restart it
+        start();
     }
 
     return true;
