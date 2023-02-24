@@ -24,7 +24,7 @@ constexpr uint32_t numMilli = 50;
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo
 {
-    embot::prot::can::versionOfAPPLICATION {1, 2, 3},
+    embot::prot::can::versionOfAPPLICATION {1, 3, 0},
     embot::prot::can::versionOfCANPROTOCOL {2, 0}
 };
 

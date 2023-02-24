@@ -15,10 +15,10 @@
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo
 {
 #if defined(CUSTOMIZATION_MTB4_FOR_TLR)
-    embot::prot::can::versionOfAPPLICATION {20, 11, 0},
+    embot::prot::can::versionOfAPPLICATION {20, 20, 0},
     embot::prot::can::versionOfCANPROTOCOL {20, 0}
 #else
-    embot::prot::can::versionOfAPPLICATION {1, 11, 0},
+    embot::prot::can::versionOfAPPLICATION {1, 20, 0},
     embot::prot::can::versionOfCANPROTOCOL {2, 0}
 #endif
 };
