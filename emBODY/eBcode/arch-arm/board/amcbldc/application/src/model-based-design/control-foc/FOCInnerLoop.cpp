@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 4.0
+// Model version                  : 4.1
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Fri Feb 10 13:57:51 2023
+// C/C++ source code generated on : Thu Feb 23 16:32:52 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -285,7 +285,8 @@ void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
   // Gain: '<S1>/Gain3' incorporates:
   //   Product: '<S1>/Divide1'
 
-  rtb_algDD_o2_n = rtb_algDD_o1_p / rtb_Product * 100.0F;
+  rtb_algDD_o2_n = rtb_algDD_o1_p / rtu_ConfigurationParameters->motorconfig.Vcc
+    * 100.0F;
 
   // Outputs for Atomic SubSystem: '<S1>/Park Transform'
   // Product: '<S51>/PProd Out' incorporates:
