@@ -1,17 +1,17 @@
 
 /*
- * Copyright (C) 2020 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2023 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_HW_BSP_MTB4_CONFIG_H_
-#define _EMBOT_HW_BSP_MTB4_CONFIG_H_
+#ifndef _EMBOT_HW_BSP_MTB4C_CONFIG_H_
+#define _EMBOT_HW_BSP_MTB4C_CONFIG_H_
 
 
-#if   defined(STM32HAL_BOARD_MTB4C)
+#if defined(STM32HAL_BOARD_MTB4C)
 
     #undef  EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio
@@ -24,6 +24,10 @@
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_bno055
     #define EMBOT_ENABLE_hw_multisda
+    
+    #define EMBOT_ENABLE_hw_i2ce
+    #define EMBOT_ENABLE_hw_tlv493d
+    #define EMBOT_ENABLE_hw_tlv493d_i2ceMODE
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_MTB4C ...

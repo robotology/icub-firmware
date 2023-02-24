@@ -40,14 +40,57 @@ namespace embot { namespace hw { namespace bno055 {
     };
 
 
-    enum class Mode
+    enum class Mode : uint8_t
     {
         CONFIG = 0,
         ACCONLY = 1, MAGONLY = 2, GYRONLY = 3, ACCMAG = 4, ACCGYRO = 5, MAGGYRO = 6, AMG = 7,   // non fusion modes
         IMU = 8, COMPASS = 9, M4G = 10, NDOF_FMC_OFF = 11, NDOF = 12,                           // fusion modes
-        none = 32, maxnumberof = 13
+        none = 127, maxnumberof = 13
+    };
+    
+    constexpr bool isvalidmode(uint8_t v)
+    {
+        constexpr uint32_t mask =
+        {
+            embot::core::binary::mask::pos2mask<uint32_t>(Mode::CONFIG)     |
+            embot::core::binary::mask::pos2mask<uint32_t>(Mode::ACCONLY)    | embot::core::binary::mask::pos2mask<uint32_t>(Mode::MAGONLY)      |
+            embot::core::binary::mask::pos2mask<uint32_t>(Mode::GYRONLY)    | embot::core::binary::mask::pos2mask<uint32_t>(Mode::ACCMAG)       | 
+            embot::core::binary::mask::pos2mask<uint32_t>(Mode::ACCGYRO)    | embot::core::binary::mask::pos2mask<uint32_t>(Mode::MAGGYRO)      |
+            embot::core::binary::mask::pos2mask<uint32_t>(Mode::AMG)        | 
+            embot::core::binary::mask::pos2mask<uint32_t>(Mode::IMU)        | embot::core::binary::mask::pos2mask<uint32_t>(Mode::COMPASS)      | 
+            embot::core::binary::mask::pos2mask<uint32_t>(Mode::M4G)        | embot::core::binary::mask::pos2mask<uint32_t>(Mode::NDOF_FMC_OFF) | 
+            embot::core::binary::mask::pos2mask<uint32_t>(Mode::NDOF)            
+        };
+        return (v >= embot::core::tointegral(Mode::maxnumberof)) ? false : embot::core::binary::bit::check(mask, v);           
+    }
+    
+    constexpr Mode tomode(uint8_t v)
+    {
+        return (true == isvalidmode(v)) ? static_cast<Mode>(v) : Mode::none;
+    }
+
+    enum class Placement : uint8_t
+    {   // orientation as per page 27 of BNO055 datasheet
+        P0 = 0, P1 = 1, P2 = 2, P3 = 3, P4 = 4, P5 = 5, P6 = 6, P7 = 7,       
+        DEFAULT = P1, none = 127, maxnumberof = 8         
     };
 
+    constexpr bool isvalidplacement(uint8_t v)
+    {
+        constexpr uint32_t mask =
+        {
+            embot::core::binary::mask::pos2mask<uint32_t>(Placement::P0)    | embot::core::binary::mask::pos2mask<uint32_t>(Placement::P1)  |
+            embot::core::binary::mask::pos2mask<uint32_t>(Placement::P2)    | embot::core::binary::mask::pos2mask<uint32_t>(Placement::P3)  | 
+            embot::core::binary::mask::pos2mask<uint32_t>(Placement::P4)    | embot::core::binary::mask::pos2mask<uint32_t>(Placement::P5)  |
+            embot::core::binary::mask::pos2mask<uint32_t>(Placement::P6)    | embot::core::binary::mask::pos2mask<uint32_t>(Placement::P7)        
+        };
+        return (v >= embot::core::tointegral(Placement::maxnumberof)) ? false : embot::core::binary::bit::check(mask, v);           
+    }
+    
+    constexpr Placement toplacement(uint8_t v)
+    {
+        return (true == isvalidplacement(v)) ? static_cast<Placement>(v) : Placement::none;
+    }  
 
     enum class Register
     {
@@ -80,7 +123,7 @@ namespace embot { namespace hw { namespace bno055 {
         AMGEQLG         = 44,       // acc+mag+gyr+eul+quat+lia+grv: 44 bytes
         FULL            = 47        // acc+mag+gyr+eul+quat+lia+grv+temp+calib+res: 47 bytes
     };
-
+      
 
     struct Info
     {   // 7 registers from Register::CHIP_ID
@@ -158,8 +201,7 @@ namespace embot { namespace hw { namespace bno055 {
         std::uint8_t calibrationOfMAG() const { return(embot::core::binary::pair::get(calibstatus, 0)); } // 3 is ok, 1 is not calibrated
         //std::uint8_t calibrationOfSYS() const { return(embot::core::binary::pair::get(calibstatus, 4)); } // 3 is ok, 1 is not calibrated BUT ALWAYS ZERO
     };
-
-
+    
 
     bool supported(BNO055 s);
 
@@ -175,8 +217,13 @@ namespace embot { namespace hw { namespace bno055 {
     // we can get info
     result_t get(BNO055 s, Info &info, embot::core::relTime timeout = 3*embot::core::time1millisec);
 
-    // we can now set a working mode. we can specify a timeout
+    // we can now set / get a working mode. we can specify a timeout
     result_t set(BNO055 s, Mode m, embot::core::relTime timeout = 3*embot::core::time1millisec);
+    result_t get(BNO055 s, Mode &m, embot::core::relTime timeout = 3*embot::core::time1millisec);
+    
+    // we can also set / get a placement (axis orientation) 
+    result_t set(BNO055 s, Placement p, const embot::core::relTime timeout = 3*embot::core::time1millisec);
+    result_t get(BNO055 s, Placement &p, const embot::core::relTime timeout = 3*embot::core::time1millisec);
 
     // we must check that nobody is using the sensor, maybe in non-blocking mode some time earlier
     bool isacquiring(BNO055 s);

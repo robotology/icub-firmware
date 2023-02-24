@@ -102,7 +102,8 @@ namespace embot { namespace app { namespace application {
         // even if we cannot manage more than ... 10 because of the fact the we can mange max 32 events per thread and the 
         // reader thread must accept: three events for each sensor (askdata, dataready, noreply) + Events::acquire        
         struct Config
-        {               
+        { 
+            static constexpr embot::core::relTime minimumacquisitionperiod {10*embot::core::time1millisec};            
             AcquisitionMode acquisitionmode { AcquisitionMode::daisychain };
             embot::core::relTime acquisitionperiod {0}; // if 0: use the same period of transmission as ordered by Message_POS_TRANSMIT, else acquisition and transmission are unrelated.             
             embot::core::relTime acquisitiontimeout {0};
@@ -118,8 +119,10 @@ namespace embot { namespace app { namespace application {
         }; 
         
         
-        bool initialise(const Config &config);   
+        bool initialise(const Config &config, bool deferredHWinit = false); 
         
+        bool deactivate(); 
+             
         bool start(embot::core::relTime period = 0);
         bool stop(); 
         
@@ -133,9 +136,12 @@ namespace embot { namespace app { namespace application {
        
         
         // interface to CANagentPOS
-        virtual bool set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info);
-        virtual bool set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info);
-        virtual bool get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo);
+        
+        bool isactive() const override;
+        const std::string& status() const override;
+        bool set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info) override;
+        bool set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info) override;
+        bool get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo) override;
         
 
     private:

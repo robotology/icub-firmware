@@ -34,7 +34,11 @@ namespace embot { namespace app { namespace application {
     {
     public:
         
-        // interface    
+        // interface   
+    
+        virtual bool isactive() const = 0; 
+        virtual const std::string& status() const = 0;    
+    
         virtual bool set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info) = 0;
         virtual bool set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info) = 0;
     

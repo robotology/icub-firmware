@@ -1199,13 +1199,12 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         
         // little endian
         info.sensormask = static_cast<std::uint16_t>(candata.datainframe[0]) | (static_cast<std::uint16_t>(candata.datainframe[1]) << 8);
-        info.fusion = imuFusion::enabled;
-        if(candata.datainframe[2] == static_cast<std::uint8_t>(imuFusion::none))
-        {
-            info.fusion = imuFusion::none;
-        }
+
+        info.mode.frombyte(candata.datainframe[2]);        
+        info.orientation.frombyte(candata.datainframe[3]);
+        info.ffu08 = candata.datainframe[4];
         // little endian
-        std::memmove(&info.ffu_ranges_measureunits, &candata.datainframe[3], 4);
+        std::memmove(&info.ffu16, &candata.datainframe[5], 2);
                 
         return true;         
     }                    
@@ -1234,8 +1233,10 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
 
         dd[0] = (replyinfo.sensormask & 0xff);              // important note: in here we use little endian order ...                                
         dd[1] = (replyinfo.sensormask >> 8) & 0xff; 
-        dd[2] = static_cast<std::uint8_t>(replyinfo.fusion);  
-        std::memmove(&dd[3], &replyinfo.ffu_ranges_measureunits, 4);  
+        dd[2] = replyinfo.mode.tobyte(); 
+        dd[3] = replyinfo.orientation.tobyte();
+        dd[4] = replyinfo.ffu08;       
+        std::memmove(&dd[5], &replyinfo.ffu16, 2);  
         
         std::uint8_t datalen = 7;
         

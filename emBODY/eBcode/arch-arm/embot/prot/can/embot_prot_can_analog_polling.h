@@ -142,7 +142,122 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     
     enum class StrainChannel { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, all = 0xf };
     
-    enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
+    
+    struct IMUmode
+    {  
+        enum class TYPE : uint8_t { basic = 0, advanced = 1};
+        struct BASIC
+        {
+            bool fusion {true};
+        };
+        struct ADVANCED
+        {
+            uint8_t chipmode {0};
+        };
+        
+        union PARAM
+        {
+            BASIC basic;
+            ADVANCED advanced;            
+        };        
+        
+        #if 0 
+        
+            memory layout:
+            
+             1 bit                                     7 bits
+            -------------------------------------------------
+           | type |                                    param |
+            -------------------------------------------------
+        
+            case TYPE::basic                            1 bit 
+            -------------------------------------------------
+           |  0  |     these bits are not used      | fusion |
+            -------------------------------------------------
+            
+            case TYPE::advanced                        7 bits 
+            -------------------------------------------------
+           |  1  |                                 chipmode  |
+            -------------------------------------------------    
+            
+        #endif
+        
+        TYPE type {TYPE::basic};
+        PARAM param {};
+            
+
+        constexpr IMUmode() = default;
+        
+        void frombyte(uint8_t byte)
+        {
+            type = static_cast<TYPE>(embot::core::binary::bit::check(byte, 7));
+            if(TYPE::basic == type)
+            {
+                param.basic.fusion = embot::core::binary::bit::check(byte, 0);
+            }
+            else
+            {
+                param.advanced.chipmode = byte & 0x7f;
+            }
+        }
+        
+        uint8_t tobyte() const
+        {
+            return (TYPE::basic == type) ? (0x00 | param.basic.fusion) : (0x80 | (0x7f & param.advanced.chipmode));
+        }               
+    };
+    
+    struct IMUorientation
+    { 
+
+        enum class TYPE : uint8_t { factorydefault = 0, advanced = 1};
+
+       #if 0 
+        
+            memory layout:
+            
+             1 bit                                     7 bits
+            -------------------------------------------------
+           | type |                                    param |
+            -------------------------------------------------
+        
+            case TYPE::factorydefault                   1 bit 
+            -------------------------------------------------
+           |  0  |     these bits are not used              |
+            -------------------------------------------------
+            
+            case TYPE::advanced                       7 bits 
+            -------------------------------------------------
+           |  1  |                                    param  |
+            -------------------------------------------------    
+            
+        #endif
+            
+        TYPE type {TYPE::factorydefault};
+        uint8_t param {0};
+        
+        constexpr IMUorientation() = default;
+        
+        void frombyte(uint8_t byte)
+        {
+            type = static_cast<TYPE>(embot::core::binary::bit::check(byte, 7));
+            if(TYPE::factorydefault == type)
+            {
+                param = 0x00;
+            }
+            else
+            {
+                param = byte & 0x7f;
+            }
+        }
+        
+        uint8_t tobyte() const
+        {
+            return (TYPE::factorydefault == type) ? (0x00) : (0x80 | (0x7f & param));
+        }        
+    };
+        
+    
 
 }}}}} //  namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
 
@@ -1095,13 +1210,15 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     {
         public:
             
-                                    
+        
         struct Info
         {
-            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
-            imuFusion fusion;                  // with an enum we can add later on as many options we want. 
-            std::uint32_t ffu_ranges_measureunits;
-            Info() : sensormask(0), fusion(imuFusion::none), ffu_ranges_measureunits(0) {}
+            std::uint16_t sensormask {0};   // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
+            IMUmode mode {};
+            IMUorientation orientation {};         
+            uint8_t ffu08 {0};
+            uint16_t ffu16 {0};
+            Info() = default;
             void enable(embot::prot::can::analog::imuSensor s) 
             { 
                 if(embot::prot::can::analog::imuSensor::none != s)
@@ -1135,10 +1252,12 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         
         struct ReplyInfo
         {
-            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
-            imuFusion fusion;                  // with an enum we can add later on as many options we want. 
-            std::uint32_t ffu_ranges_measureunits;
-            ReplyInfo() : sensormask(0), fusion(imuFusion::none), ffu_ranges_measureunits(0) {}        
+            std::uint16_t sensormask {0};           // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
+            IMUmode mode {};            
+            IMUorientation orientation {};         
+            uint8_t ffu08 {0};
+            uint16_t ffu16 {0};
+            ReplyInfo() = default;        
         };        
         
         Info info;

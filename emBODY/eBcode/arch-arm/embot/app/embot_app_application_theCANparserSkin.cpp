@@ -34,6 +34,7 @@
 
 #include "embot_app_theCANboardInfo.h"
 
+#include "embot_app_application_theCANtracer.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -48,10 +49,13 @@ struct embot::app::application::theCANparserSkin::Impl
         dummyCANagentSKIN() {}
         virtual ~dummyCANagentSKIN() {}
             
-        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info)  {  return true; }
-        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info)  {  return true; }  
-        virtual bool set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info)  {  return true; } 
-        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info)  {  return true; }            
+        bool isactive() const override { return false; }
+        const std::string& status() const override { static const std::string s {"dummy"}; return s; }
+            
+        bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info) override {  return true; }
+        bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info) override {  return true; }  
+        bool set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info) override {  return true; } 
+        bool set(const embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info) override {  return true; }            
     };
     
     dummyCANagentSKIN dummyagent;
@@ -152,11 +156,16 @@ bool embot::app::application::theCANparserSkin::Impl::process(const embot::prot:
 
 bool embot::app::application::theCANparserSkin::Impl::process_set_brdcfg(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
+    if(false == config.agent->isactive())
+    {
+        embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+        tr.print("ERR: " + config.agent->status(), replies);  
+        return true;        
+    }
+    
     embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG msg;
     msg.load(frame);
       
-//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-//    theskin.configure(msg.info);
     config.agent->set(msg.info);
             
     return msg.reply();        
@@ -164,11 +173,16 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_brdcfg(const e
 
 bool embot::app::application::theCANparserSkin::Impl::process_set_obsolete_tactsetup(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
+    if(false == config.agent->isactive())
+    {
+        embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+        tr.print("ERR: " + config.agent->status(), replies);  
+        return true;        
+    }
+    
     embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP msg;
     msg.load(frame);
       
-//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-//    theskin.configure(msg.info);
     config.agent->set(msg.info);
             
     return msg.reply();        
@@ -177,12 +191,17 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_obsolete_tacts
 
 
 bool embot::app::application::theCANparserSkin::Impl::process_set_trgcfg(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
-{
+{    
+    if(false == config.agent->isactive())
+    {
+        embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+        tr.print("ERR: " + config.agent->status(), replies);  
+        return true;        
+    }
+    
     embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG msg;
     msg.load(frame);
       
-//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-//    theskin.configure(msg.info);
     config.agent->set(msg.info);
     
     return msg.reply();        
@@ -192,19 +211,16 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_trgcfg(const e
 
 bool embot::app::application::theCANparserSkin::Impl::process_set_txmode(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
+    if(false == config.agent->isactive())
+    {
+        embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
+        tr.print("ERR: " + config.agent->status(), replies);  
+        return true;        
+    }
+    
     embot::prot::can::analog::polling::Message_SET_TXMODE msg(embot::prot::can::Board::mtb4);
     msg.load(frame);
     
-//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-//   
-//    if(true == msg.info.transmit)
-//    {
-//        theskin.start();        
-//    }
-//    else
-//    {
-//        theskin.stop();     
-//    }
     config.agent->set(msg.info);
                   
     return msg.reply();        

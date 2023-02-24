@@ -33,7 +33,12 @@ namespace embot { namespace app { namespace application {
     class CANagentSKIN
     {
     public:
+        
         // interface
+    
+        virtual bool isactive() const = 0; 
+        virtual const std::string& status() const = 0;  
+    
         virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info) = 0;
         virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info) = 0;  
         virtual bool set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info) = 0; 

@@ -67,6 +67,7 @@ namespace embot { namespace hw { namespace i2ce {
     bool supported(embot::hw::I2CE b);    
     bool initialised(embot::hw::I2CE b);    
     result_t init(embot::hw::I2CE b, const Config &config);
+    result_t deinit(embot::hw::I2CE b);
     
     // discovers all chips on the bus. if any, it returns true and fills the vector
     bool discover(embot::hw::I2CE b, std::vector<ADR> &adrs);

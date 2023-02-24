@@ -194,10 +194,11 @@ bool embot::app::application::theIMU::Impl::start()
         return true;
     }
     else
-    {
+    {        
         canrevisitedconfig.counter = 0;
         embot::os::Timer::Config cfg(canrevisitedconfig.txperiod, action, embot::os::Timer::Mode::forever);
-        ticktimer->start(cfg);
+        constexpr bool forcerestart {true};
+        ticktimer->start(cfg, forcerestart);
         ticking = true;
         return true;
     }
@@ -582,8 +583,10 @@ bool embot::app::application::theIMU::set(const embot::prot::can::analog::pollin
 bool embot::app::application::theIMU::set(const embot::prot::can::analog::polling::Message_IMU_CONFIG_SET::Info &info)
 {
     // if ticking: stop it
+    bool wasticking { false };
     if(true == pImpl->ticking)
     {
+        wasticking = true;
         stop();
     }
 
@@ -592,6 +595,78 @@ bool embot::app::application::theIMU::set(const embot::prot::can::analog::pollin
 
     // copy new configuration
     pImpl->canrevisitedconfig.imuinfo = info;
+    
+    // now, if we need to do something on the bno055 we do it.
+    // so far only mode + axis remap
+    
+    // i get the current mode
+    embot::hw::bno055::Mode mode { embot::hw::bno055::Mode::none };
+    embot::hw::bno055::get(pImpl->config.sensor, mode, 5*embot::core::time1millisec);
+    
+    // now we transform info into a  ... target mode for the bno055
+    embot::hw::bno055::Mode targetmode {embot::hw::bno055::Mode::NDOF}; 
+    if(embot::prot::can::analog::polling::IMUmode::TYPE::basic == info.mode.type) 
+    {   // we use either fusion or non fusion
+        targetmode = (true == info.mode.param.basic.fusion) ? embot::hw::bno055::Mode::NDOF : embot::hw::bno055::Mode::IMU;
+    }
+    else if(true == embot::hw::bno055::isvalidmode(info.mode.param.advanced.chipmode))
+    {   // we have a mode which someone wants to impose. and it is valid, so we use it
+        targetmode = embot::hw::bno055::tomode(info.mode.param.advanced.chipmode);
+    }
+    else
+    {   // the mode someone wants to impose is not valid. i revert to basic fusion
+        targetmode = embot::hw::bno055::Mode::NDOF;
+    }
+    
+    // i get the current placement
+    embot::hw::bno055::Placement placement {embot::hw::bno055::Placement::none};
+    embot::hw::bno055::get(pImpl->config.sensor, placement, 5*embot::core::time1millisec);    
+
+    // now we transform info.orientation into a  ... target placement for the bno055
+    embot::hw::bno055::Placement targetplacement {embot::hw::bno055::Placement::P1};
+    if(embot::prot::can::analog::polling::IMUorientation::TYPE::factorydefault == info.orientation.type) 
+    {   // we use the placement used by the bno055 at boostrap
+        targetplacement = embot::hw::bno055::Placement::P1;
+    }
+    else if(true == embot::hw::bno055::isvalidplacement(info.orientation.param))
+    {   // we have a placement which someone wants to impose. and it is valid
+        targetplacement = embot::hw::bno055::toplacement(info.orientation.param);
+    }
+    else
+    {   // the placemnet someone wants to impose is not valid. i revert to default one
+        targetplacement = embot::hw::bno055::Placement::P1;
+    }
+
+    
+    bool changebno055 = (placement != targetplacement) || (mode != targetmode); 
+    
+    if(changebno055)
+    {
+        // from Table 3-6: Operating mode swithcing time
+        constexpr embot::core::relTime waitANY2CONFIG {19 * embot::core::time1millisec};
+        constexpr embot::core::relTime waitCONFIG2ANY {7 * embot::core::time1millisec};
+        
+        // at first we need to go in config mode
+        embot::hw::bno055::set(pImpl->config.sensor, embot::hw::bno055::Mode::CONFIG, 5*embot::core::time1millisec);
+        // and wait for some time
+        embot::core::wait(waitANY2CONFIG);
+        
+        if((embot::hw::bno055::Placement::none != targetplacement) && (placement != targetplacement))
+        {            
+            embot::hw::bno055::set(pImpl->config.sensor, targetplacement, 5*embot::core::time1millisec);       
+        }
+        
+        // now we can go back into the target mode
+        embot::hw::bno055::set(pImpl->config.sensor, targetmode, 5*embot::core::time1millisec);
+        // and wait for some time
+        embot::core::wait(waitCONFIG2ANY);
+    }
+    
+    if(true == wasticking)
+    {
+        // restart it
+        start();
+    }
 
     return true;
 }
@@ -616,8 +691,10 @@ bool embot::app::application::theIMU::get(const embot::prot::can::analog::pollin
 {
     // copy configuration
     replyinfo.sensormask = pImpl->canrevisitedconfig.imuinfo.sensormask;
-    replyinfo.fusion = pImpl->canrevisitedconfig.imuinfo.fusion;
-    replyinfo.ffu_ranges_measureunits = pImpl->canrevisitedconfig.imuinfo.ffu_ranges_measureunits;
+    replyinfo.mode = pImpl->canrevisitedconfig.imuinfo.mode;
+    replyinfo.orientation = pImpl->canrevisitedconfig.imuinfo.orientation;
+    replyinfo.ffu08 = pImpl->canrevisitedconfig.imuinfo.ffu08;
+    replyinfo.ffu16 = pImpl->canrevisitedconfig.imuinfo.ffu16;
 
     return true;
 }

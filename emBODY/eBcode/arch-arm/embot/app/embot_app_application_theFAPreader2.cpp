@@ -130,14 +130,34 @@ namespace embot { namespace app { namespace application {
                     {
                         ret = true;
                     } 
-                    embot::hw::sys::delay(50*embot::core::time1millisec); // why???????
+//                    constexpr embot::core::relTime dly {1*embot::core::time1millisec}; 
+//                    embot::hw::sys::delay(dly); 
                 }
             }
 
             return ret;
         }
           
+        static bool deinit(const theFAPreader2::Sensor &snsr)
+        { 
+            bool ret {false};
+            
+            if(embot::hw::ANY::none != snsr.id)
+            {
+                if(theFAPreader2::sensorType::tlv == snsr.type) 
+                {                
+                    if(embot::hw::resOK == embot::hw::tlv493d::deinit(static_cast<embot::hw::TLV493D>(snsr.id)))
+                    {
+                        ret = true;
+                    } 
+//                    constexpr embot::core::relTime dly {1*embot::core::time1millisec}; 
+//                    embot::hw::sys::delay(dly); 
+                }
+            }
 
+            return ret;
+        }
+        
         static void acquisition(const theFAPreader2::Sensor &snsr, const embot::core::Callback &cbk)
         {        
             if(theFAPreader2::sensorType::tlv == snsr.type)
@@ -185,6 +205,8 @@ struct embot::app::application::theFAPreader2::Impl
     std::vector<uint8_t> activeSensorsIndex {};             
     embot::os::EventMask globaleventmask {0};           
     bool ticking {false};
+    bool hwisinitted {false};
+    bool deactivated {false};
    
     // if the the sensor inside config.sensors[x] can be initted during initialise() at startup of the board then we set sensors_mask_of_connected
     // so, to check if a sensor in pos x is usable we use embot::core::binary::bit::check(pImpl->sensors_mask_of_connected, x);
@@ -305,6 +327,12 @@ struct embot::app::application::theFAPreader2::Impl
         activeSensorsIndex.reserve(numberofpositions);
     }
    
+    bool initialise(const Config &config, bool deferredHWinit);
+    bool deactivate();
+    
+    bool hwinit();
+    bool disable();
+    
     bool start();
     bool stop();    
     bool tick(std::vector<embot::prot::can::Frame> &replies);
@@ -316,7 +344,11 @@ struct embot::app::application::theFAPreader2::Impl
     void acquisitionchain_start(bool yes)
     {
         if(true == yes)
-        {
+        {  
+            if(0 == config.acquisitionperiod)
+            {
+                periodAcquisition = periodTX;
+            }                
             embot::os::Timer::Config cfgac(periodAcquisition, actionAcquisition, embot::os::Timer::Mode::forever);
             timerAcquisition->start(cfgac); 
         }
@@ -562,6 +594,153 @@ struct embot::app::application::theFAPreader2::Impl
     bool acquisition_get(std::vector<embot::prot::can::Frame> &replies);    
                       
 };
+
+bool embot::app::application::theFAPreader2::Impl::initialise(const Config &cfg, bool deferredHWinit)
+{
+    config = cfg;
+    
+    // this event triggers a periodic reading. 
+    actionAcquisition.load(embot::os::EventToThread(config.events.acquire, config.reader));
+    
+    periodAcquisition = std::max(config.acquisitionperiod, Config::minimumacquisitionperiod);
+    
+    // this event signals a no reply in data reading
+    actionTOUT.load(embot::os::EventToThread(config.events.noreply, config.reader));
+    
+    // this event triggers a periodic transmission with period configured by can message
+    actionTX.load(embot::os::EventToThread(config.events.transmit, config.transmitter));
+     
+    tspositions->set(valueOfPositionCHIPnotinitted, 0);
+    tspositions->set(valueOfPositionCHIPnotinitted, 1);
+    
+    
+    if(false == deferredHWinit)
+    {
+        hwinit();
+//#if defined(CONTINUOUS_ACQUISITION)
+//    embot::core::print("theFAPreader2::initialise() -> starting acquisition @ " + std::to_string(pImpl->periodAcquisition/1000) + " ms");
+//    acquisitionchain_start(true);
+//#endif        
+    }
+
+    
+    return true;
+}
+
+
+bool embot::app::application::theFAPreader2::Impl::hwinit()
+{    
+    if((true == deactivated) || (true == hwisinitted))
+    {
+        return true;
+    }
+    
+    std::string str {};
+    globaleventmask = config.events.acquire | config.events.noreply | config.events.transmit;
+    maxTOUT = config.acquisitiontimeout;
+        
+    activeSensorsIndex.clear();
+        
+    sensors_mask_of_connected = 0;
+        
+    // now i init the requested sensors and mark those which are effectively available
+    
+    for(uint8_t s=0; s<numberofpositions; s++)
+    {
+        config.sensors[s].connected = false;
+        
+        if(embot::hw::ANY::none != config.sensors[s].id)
+        {  
+            bool ok = SensorHelper::init(config.sensors[s]);
+            
+            if(ok)
+            {
+                config.sensors[s].connected = true;
+                embot::core::binary::bit::set(sensors_mask_of_connected, s);
+
+                if((config.sensors[s].timeout != 0) && (config.sensors[s].noreply != 0))
+                {
+                    maxTOUT = std::max(maxTOUT, config.sensors[s].timeout);
+                }
+
+                globaleventmask |= (config.sensors[s].askdata | config.sensors[s].dataready | config.sensors[s].noreply);   
+         
+                str += SensorHelper::to_string(config.sensors[s]);
+                str += " ";                
+
+//                embot::hw::LED l = sensor_to_led(config.sensors[n]);
+//                embot::hw::led::on(l);
+            }
+            else
+            {
+//                embot::hw::LED l = sensor_to_led(config.sensors[n]);
+//                embot::hw::led::off(l);
+            }
+            
+        }            
+    }
+    
+    // we also enable for acquisitions all the sensors that are connected and we keep config.sensors[s].params we have, until some can message changes them    
+    sensors_mask_of_active = sensors_mask_of_connected;
+    //and update the activeSensorsIndex
+    updateActiveSensorsIndex();
+    
+                       
+    embot::core::print("theFAPreader2::hwinit() -> found: " + str);
+    
+    hwisinitted = true;
+    
+    return true;
+}
+
+bool embot::app::application::theFAPreader2::Impl::deactivate()
+{
+    if(false == hwisinitted)
+    {
+        deactivated = true;
+    }
+    else
+    {
+        // cannot deactivate because hyw was already initted.
+    }
+    return true;
+}
+
+bool embot::app::application::theFAPreader2::Impl::disable()
+{
+//    if(false == hwisinitted)
+//    {
+//        return true;
+//    }
+//    
+    
+    std::string str {};
+    globaleventmask = config.events.acquire | config.events.noreply | config.events.transmit;
+    maxTOUT = config.acquisitiontimeout;
+        
+    activeSensorsIndex.clear();
+        
+    sensors_mask_of_connected = sensors_mask_of_active = 0;
+            
+    // // now i deinit the sensors and unmark the presence of all of tehm
+        
+    for(uint8_t s=0; s<numberofpositions; s++)
+    {
+        config.sensors[s].connected = false;
+        
+        if(embot::hw::ANY::none != config.sensors[s].id)
+        {  
+            bool ok = SensorHelper::deinit(config.sensors[s]);            
+        }            
+    }
+    
+                       
+    embot::core::print("theFAPreader2::disable() -> called");
+    
+    hwisinitted = false;
+    
+    return true;
+}
 
 
 // this starts the tx actually
@@ -826,83 +1005,15 @@ embot::app::application::theFAPreader2::~theFAPreader2() { }
 
 
          
-bool embot::app::application::theFAPreader2::initialise(const Config &config)
+bool embot::app::application::theFAPreader2::initialise(const Config &config, bool deferredHWinit)
 {
-
-    pImpl->config = config;
-    
-    // this event triggers a periodic reading. 
-    pImpl->actionAcquisition.load(embot::os::EventToThread(pImpl->config.events.acquire, pImpl->config.reader));
-    pImpl->periodAcquisition = std::max(pImpl->config.acquisitionperiod, static_cast<embot::core::relTime>(10*embot::core::time1millisec));
-    
-    // this event signals a no reply in data reading
-    pImpl->actionTOUT.load(embot::os::EventToThread(pImpl->config.events.noreply, pImpl->config.reader));
-    
-    // this event triggers a periodic transmission with period configured by can message
-    pImpl->actionTX.load(embot::os::EventToThread(pImpl->config.events.transmit, pImpl->config.transmitter));
-     
-    pImpl->tspositions->set(pImpl->valueOfPositionCHIPnotinitted, 0);
-    pImpl->tspositions->set(pImpl->valueOfPositionCHIPnotinitted, 1);
-    
-    
-    std::string str {};
-    pImpl->globaleventmask = pImpl->config.events.acquire | pImpl->config.events.noreply | pImpl->config.events.transmit;
-    pImpl->maxTOUT = pImpl->config.acquisitiontimeout;
-        
-    pImpl->activeSensorsIndex.clear();
-        
-    pImpl->sensors_mask_of_connected = 0;
-        
-    for(uint8_t s=0; s<numberofpositions; s++)
-    {
-        pImpl->config.sensors[s].connected = false;
-        
-        if(embot::hw::ANY::none != pImpl->config.sensors[s].id)
-        {  
-            bool ok = SensorHelper::init(config.sensors[s]);
-            
-            if(ok)
-            {
-                pImpl->config.sensors[s].connected = true;
-                embot::core::binary::bit::set(pImpl->sensors_mask_of_connected, s);
-
-                if((pImpl->config.sensors[s].timeout != 0) && (pImpl->config.sensors[s].noreply != 0))
-                {
-                    pImpl->maxTOUT = std::max(pImpl->maxTOUT, pImpl->config.sensors[s].timeout);
-                }
-
-                pImpl->globaleventmask |= (pImpl->config.sensors[s].askdata | pImpl->config.sensors[s].dataready | pImpl->config.sensors[s].noreply);   
-         
-                str += SensorHelper::to_string(config.sensors[s]);
-                str += " ";                
-
-//                embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
-//                embot::hw::led::on(l);
-            }
-            else
-            {
-//                embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
-//                embot::hw::led::off(l);
-            }
-            
-        }            
-    }
-    
-    // we also enables for acquisitions all the sensors that are connected and we keep pImpl->config.sensors[s].params we have, until some can message changes them    
-    pImpl->sensors_mask_of_active = pImpl->sensors_mask_of_connected;
-    //and update the activeSensorsIndex
-    pImpl->updateActiveSensorsIndex();
-    
-                       
-    embot::core::print("theFAPreader2::initialise() -> found: " + str);
-
-//#if defined(CONTINUOUS_ACQUISITION)
-//    embot::core::print("theFAPreader2::initialise() -> starting acquisition @ " + std::to_string(pImpl->periodAcquisition/1000) + " ms");
-//    pImpl->acquisitionchain_start(true);
-//#endif
+    return pImpl->initialise(config, deferredHWinit);
+}
 
 
-    return true;
+bool embot::app::application::theFAPreader2::deactivate()
+{
+    return pImpl->deactivate();
 }
 
 
@@ -944,8 +1055,35 @@ bool embot::app::application::theFAPreader2::process(embot::os::EventMask evtmas
 
 // interface to CANagentPOS
 
-bool embot::app::application::theFAPreader2::set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info)
+bool embot::app::application::theFAPreader2::isactive() const
 {
+    return !pImpl->deactivated;
+}
+
+const std::string& embot::app::application::theFAPreader2::status() const
+{
+    static const std::string sta[] = 
+    {
+        "POS active", "POS deactivated by SKIN"
+    };
+    
+    return pImpl->deactivated ? sta[1] : sta[0];
+}
+
+bool embot::app::application::theFAPreader2::set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info)
+{   
+    if((false == pImpl->deactivated) && (false == pImpl->hwisinitted))
+    {
+        // it is not deactivated and hw not initted yet, so: i enable hw
+        pImpl->hwinit();
+    }
+    else if(true == pImpl->deactivated)
+    {
+        // cannot do anything
+        return true;
+    }
+    
+    
     // if ticking: stop it
     bool wasticking = pImpl->ticking;
     if(true == wasticking)
@@ -1026,10 +1164,20 @@ bool embot::app::application::theFAPreader2::set(const embot::prot::can::analog:
 
 bool embot::app::application::theFAPreader2::get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo)
 {    
-
+    if((false == pImpl->deactivated) && (false == pImpl->hwisinitted))
+    {
+        // it is not deactivated and hw not initted yet, so: i enable hw
+        pImpl->hwinit();
+    }    
+    else if(true == pImpl->deactivated)
+    {
+        // i can reply as long as i dont do anything else
+    }
+        
     replyinfo.type = info.type;
     if(info.type == embot::prot::can::analog::posTYPE::angleDeciDeg)
     {
+        #warning acemor: add the reply
 //        replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
 //        replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
     }
@@ -1040,6 +1188,17 @@ bool embot::app::application::theFAPreader2::get(const embot::prot::can::analog:
 
 bool embot::app::application::theFAPreader2::set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info)
 {
+    if((false == pImpl->deactivated) && (false == pImpl->hwisinitted))
+    {
+        // it is not deactivated and hw not initted yet, so: i enable hw
+        pImpl->hwinit();
+    }    
+    else if(true == pImpl->deactivated)
+    {
+        // cannot do anything
+        return true;
+    }
+    
     if((true == info.transmit) && (info.txperiod > 0))
     {
         start(info.txperiod);
