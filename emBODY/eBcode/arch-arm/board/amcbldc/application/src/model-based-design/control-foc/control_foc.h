@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 4.0
+// Model version                  : 4.1
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Fri Feb 10 13:57:51 2023
+// C/C++ source code generated on : Thu Feb 23 16:32:52 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,13 +20,7 @@
 #define RTW_HEADER_control_foc_h_
 #include "rtwtypes.h"
 #include "control_foc_types.h"
-
-extern "C"
-{
-
 #include "rtGetInf.h"
-
-}
 
 extern "C"
 {
