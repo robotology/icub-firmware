@@ -63,7 +63,7 @@
 #endif
 
 #if defined(EMBOT_ENABLE_hw_lr17_emulatedMODE)
-    #warning EMBOT_ENABLE_hw_lr17_emulatedMODE is defined, the thePOSreader2 will use fake lr17 readings
+    #warning EMBOT_ENABLE_hw_lr17_emulatedMODE is defined, the thePOSreader2 will use fake lr17 readings 
 #endif
 
 
@@ -75,15 +75,15 @@
 #define EMBOT_POSREADER2_compensatereadings
 
 #define CONTINUOUS_ACQUISITION
-
+    
 struct embot::app::application::thePOSreader2::Impl
-{
+{   
 
-    static constexpr size_t _maxQENCs = 2;
-
+    static constexpr size_t _maxQENCs = 2;    
+    
     embot::prot::can::analog::posLABEL sensor_getPOSlabel(const Sensor &snsr)
     {
-        return snsr.label;
+        return snsr.label;     
     }
 
     std::string sensor_to_string(const Sensor &snsr)
@@ -92,7 +92,7 @@ struct embot::app::application::thePOSreader2::Impl
         {
             return "ANY::none";
         }
-
+        
         if(sensorType::tlv == snsr.type)
         {
             return embot::hw::tlv493d::to_string(static_cast<embot::hw::TLV493D>(snsr.id));
@@ -111,28 +111,28 @@ struct embot::app::application::thePOSreader2::Impl
             {
                 return "QE::two";
             }
-        }
+        }        
         return "UNKNOWN";
-    }
+    } 
 
 
     embot::hw::LED sensor_to_led(const Sensor &snsr)
     {
-        static constexpr std::array<embot::hw::LED, 6> tlvleds
-        {
+        static constexpr std::array<embot::hw::LED, 6> tlvleds 
+        { 
             embot::hw::LED::five,   // J4 which has ANY::one = 0
-            embot::hw::LED::one,    // J5 which has ANY::two = 1
+            embot::hw::LED::one,    // J5 which has ANY::two = 1 
             embot::hw::LED::two,    // J6 which has ANY::three = 2
             embot::hw::LED::three,  // J7 which has ANY::four = 3
             embot::hw::LED::four,   // J13 which has ANY::five = 4
             embot::hw::LED::six     // U27 which has ANY::six = 5
         };
-
+        
         if(embot::hw::ANY::none == snsr.id)
         {
             return embot::hw::LED::none;
         }
-
+        
         if(sensorType::tlv == snsr.type)
         {
             uint8_t pos = embot::core::tointegral(snsr.id);
@@ -146,35 +146,35 @@ struct embot::app::application::thePOSreader2::Impl
         {
             return embot::hw::LED::none;
         }
-
-
+        
+            
         return embot::hw::LED::none;
-    }
-
+    }     
+        
     std::array<qe_encoder_t, _maxQENCs> _QEncoders = { &htim2, &htim5 };
-
+     
     bool sensor_init(const Sensor &snsr)
-    {
+    { 
         bool ret {false};
-
+        
         if(embot::hw::ANY::none != snsr.id)
         {
-            if(sensorType::tlv == snsr.type)
-            {
+            if(sensorType::tlv == snsr.type) 
+            {                
                 if(embot::hw::resOK == embot::hw::tlv493d::init(static_cast<embot::hw::TLV493D>(snsr.id), {embot::hw::tlv493d::Config::startupMODE::dontresetCHIP}))
                 {
                     ret = true;
-                }
+                } 
                 embot::hw::sys::delay(50*embot::core::time1millisec); // why???????
             }
             else if(sensorType::lr17 == snsr.type)
             {
                 lr17_encoder_init();
                 ret = true;
-            }
+            }           
             else if(sensorType::qe == snsr.type)
             {
-
+                
                 uint8_t index = embot::core::tointegral(snsr.id);
                 if(index < _QEncoders.size())
                 {
@@ -187,9 +187,9 @@ struct embot::app::application::thePOSreader2::Impl
 
         return ret;
     }
-
+            
     void acquisition(const Sensor &snsr, const embot::core::Callback &cbk)
-    {
+    {        
         if(sensorType::tlv == snsr.type)
         {
             embot::hw::tlv493d::acquisition(static_cast<embot::hw::TLV493D>(snsr.id), cbk);
@@ -203,11 +203,11 @@ struct embot::app::application::thePOSreader2::Impl
             cbk.execute();
         }
     }
-
+    
     embot::hw::result_t read(const Sensor &snsr, Position &pos)
     {
         embot::hw::result_t r = embot::hw::resNOK;
-
+        
         if(sensorType::tlv == snsr.type)
         {
             r = embot::hw::tlv493d::read(static_cast<embot::hw::TLV493D>(snsr.id), pos);
@@ -222,8 +222,8 @@ struct embot::app::application::thePOSreader2::Impl
                 val &= 0x7fff;
                 constexpr float conversionfactor = (36000.0 / 32768.0);
                 float v = conversionfactor * static_cast<float>(val);
-                pos = static_cast<Position>(v);
-            }
+                pos = static_cast<Position>(v);                  
+            }          
         }
         else if(sensorType::qe == snsr.type)
         {
@@ -237,30 +237,30 @@ struct embot::app::application::thePOSreader2::Impl
             }
             // now, the qe is expressed in linear units and the Position in centideg (0.01 degrees)
             // what shall we do? ... convert in micro-m.
-            // Lâ€™encoder dei motori ha una risoluzione di circa 1.25 Âµm/step con un movimento complessivo di
-            // 13.1 mm, quindi i contatori incrementano di 10480 unitÃ  da un estremo allâ€™altro. Lo zero dellâ€™encoder
-            // Ã¨ in posizione centrale, pertanto la lettura dei contatori dovrebbe restituire un valore compreso fra -5240 e +5240;
-            // 1.25 is 5/4
-            pos = 5*val;
+            // L’encoder dei motori ha una risoluzione di circa 1.25 µm/step con un movimento complessivo di
+            // 13.1 mm, quindi i contatori incrementano di 10480 unità da un estremo all’altro. Lo zero dell’encoder
+            // è in posizione centrale, pertanto la lettura dei contatori dovrebbe restituire un valore compreso fra -5240 e +5240;
+            // 1.25 is 5/4 
+            pos = 5*val;  
             pos /= 4;
-
-        }
-
-
+            
+        }        
+        
+        
         if(embot::hw::resOK != r)
         {
             pos = valueOfPositionACQUISITIONnotvalid;
-        }
+        } 
 
-        return r;
+        return r;        
     }
-
-
+    
+    
     void print(const std::string &str)
     {
  //       embot::core::print(str);
     }
-
+    
 
     // it contains the configuration that one can send via can to ... set label, direction, rotation, offset.
     // so far we dont use it ...
@@ -276,43 +276,43 @@ struct embot::app::application::thePOSreader2::Impl
             }
         }
     };
-
+    
 
     Config config {};
-
+        
     uint8_t numofvalidsensors {0};
-
+    
     std::vector<uint8_t> validIDpositions {};
-
+    
     embot::os::EventMask globaleventmask {0};
-
+           
     bool ticking {false};
     std::uint8_t acquisitionmask {0};
     std::uint8_t sensorstoacquiremask {0};
     uint8_t sensorspresencemask {0};
-
+        
     embot::os::Timer *timerAcquisition {nullptr};
-    embot::os::Action actionAcquisition {};
+    embot::os::Action actionAcquisition {};        
     embot::core::relTime periodAcquisition {50*embot::core::time1millisec};
     embot::os::Timer *timerTOUT {nullptr};
     embot::core::relTime maxTOUT {3*embot::core::time1millisec};
-
+    
     embot::os::Timer *timerTX {nullptr};
     embot::os::Action actionTX {};
-    embot::os::Action actionTOUT {};
-
+    embot::os::Action actionTOUT {};        
+        
     embot::core::relTime periodTX {10*embot::core::time1millisec};
 
     canConfig canconfig {};
-
+    
     static constexpr Position valueOfPositionCHIPnotinitted = 2000*100;         // which will results in 2000 degrees or 20000 decidegrees
-
+    
     embot::os::rtos::mutex_t *_mtxOf_positions {nullptr};
     // the following is for canprotocol
     std::array<embot::prot::can::analog::deciDeg, 3> decidegvalues {0};
     std::array<embot::prot::can::analog::deciMilliMeter, 3> decimillimetervalues {0};
-
-
+    
+    
     struct threadsafePositions
     {
         embot::os::rtos::mutex_t *_mtx {nullptr};
@@ -324,17 +324,17 @@ struct embot::app::application::thePOSreader2::Impl
             {
                 return false;
             }
-
+            
             if(true == embot::os::rtos::mutex_take(_mtx, tout))
             {
                 _positions[n] = p;
                 embot::os::rtos::mutex_release(_mtx);
                 return true;
             }
-
-            return false;
+            
+            return false;            
         }
-
+        
         Position get(uint8_t n, embot::core::relTime tout = embot::core::reltimeWaitForever)
         {
             Position p {0};
@@ -342,16 +342,16 @@ struct embot::app::application::thePOSreader2::Impl
             {
                 return p;
             }
-
+            
             if(true == embot::os::rtos::mutex_take(_mtx, tout))
             {
                 p = _positions[n];
                 embot::os::rtos::mutex_release(_mtx);
                 return p;
-            }
-            return p;
+            }            
+            return p;            
         }
-
+        
         bool get(std::array<Position, numberofpositions> &pp, embot::core::relTime tout = embot::core::reltimeWaitForever)
         {
             if(true == embot::os::rtos::mutex_take(_mtx, tout))
@@ -359,103 +359,103 @@ struct embot::app::application::thePOSreader2::Impl
                 pp = _positions;
                 embot::os::rtos::mutex_release(_mtx);
                 return true;
-            }
-            return false;
+            }            
+            return false;            
         }
-
+        
     };
-
+    
     threadsafePositions *tspositions {nullptr};
-
-
-    Impl()
-    {
-        ticking = false;
+    
+   
+    Impl() 
+    {   
+        ticking = false;  
         acquisitionmask = 0;
         sensorstoacquiremask = 0;
         sensorspresencemask = 0;
         periodTX = 10*embot::core::time1millisec;
-
+        
         numofvalidsensors = 0;
 
-        timerAcquisition = new embot::os::Timer;
-        timerTX = new embot::os::Timer;
-        timerTOUT = new embot::os::Timer;
-
+        timerAcquisition = new embot::os::Timer;  
+        timerTX = new embot::os::Timer; 
+        timerTOUT = new embot::os::Timer;         
+        
         //#warning see it
-        // we dont use canconfig so far, but we should do it. it would help us to rotate and set offsets...
+        // we dont use canconfig so far, but we should do it. it would help us to rotate and set offsets... 
         // also, we dont use decidegvalues[] so far ...
         // the formula to use is:
         //Position ps {100}; // 1 deg
         //canconfig.descriptor[0].transform(ps/10);
         // it does what we need.
-
-        canconfig.reset();
+        
+        canconfig.reset(); 
         for(uint8_t i=0; i<numberofpositions; i++)
         {
             canconfig.descriptor[i].label = static_cast<embot::prot::can::analog::posLABEL>(i);
         }
         decidegvalues[0] = decidegvalues[1] = decidegvalues[2] = 0;
         decimillimetervalues[0] = decimillimetervalues[1] = decimillimetervalues[0] = 0;
-
+        
         tspositions = new threadsafePositions;
-
+        
         validIDpositions.reserve(numberofpositions);
     }
-
+    
     bool isvalidposition(const Position &po) const
     {
         if((po == valueOfPositionCHIPnotinitted) || (po == valueOfPositionACQUISITIONnotvalid))
         {
             return false;
         }
-        return true;
+        return true;        
     }
-
+   
     bool start();
-    bool stop();
+    bool stop();    
     bool tick(std::vector<embot::prot::can::Frame> &replies);
     bool isvalid(embot::os::EventMask evtmask) const;
     bool process(embot::os::EventMask evtmask);
     bool get(std::vector<embot::prot::can::Frame> &frames2transmit);
 
-
+    
     void acquisitionchain_start(bool yes)
     {
         if(true == yes)
         {
             embot::os::Timer::Config cfgac(periodAcquisition, actionAcquisition, embot::os::Timer::Mode::forever);
-            timerAcquisition->start(cfgac);
+            timerAcquisition->start(cfgac); 
         }
         else
         {
             timerAcquisition->stop();
         }
-    }
-
+    }        
+        
     static void alertdataisready00(void *p)
     {
         embot::app::application::thePOSreader2::Impl *mypImpl = reinterpret_cast<embot::app::application::thePOSreader2::Impl*>(p);
-
+        
         if(true == mypImpl->ticking)
         {
             mypImpl->config.reader->setEvent(mypImpl->config.sensors[0].dataready);
-        }
+        }   
     }
-
-
+    
+    
     static void alertdataisready01(void *p)
     {
         embot::app::application::thePOSreader2::Impl *mypImpl = reinterpret_cast<embot::app::application::thePOSreader2::Impl*>(p);
-
+        
         if(true == mypImpl->ticking)
         {
             mypImpl->config.reader->setEvent(mypImpl->config.sensors[1].dataready);
-        }
+        }        
     }
-
+        
     static constexpr std::array<embot::core::fpCaller, numberofpositions> alertdataisready = { alertdataisready00, alertdataisready01 };
-
+          
     struct cbkData
     {
         cbkData() = default;
@@ -463,14 +463,14 @@ struct embot::app::application::thePOSreader2::Impl
         embot::app::application::thePOSreader2::Impl *pimpl {nullptr};
         uint8_t n {0};
     };
-
+    
     std::array<cbkData, numberofpositions> cbkdataarray = { };
-
+    
     static void acquisition_parallel_alert_dataready(void *p)
     {
         cbkData *cbkdata = reinterpret_cast<embot::app::application::thePOSreader2::Impl::cbkData*>(p);
         cbkdata->pimpl->config.reader->setEvent(cbkdata->pimpl->config.sensors[cbkdata->n].dataready);
-    }
+    }    
 
 
     static void acquisition_daisychain_alert_dataready(void *p)
@@ -479,8 +479,8 @@ struct embot::app::application::thePOSreader2::Impl
         pimpl->config.reader->setEvent(pimpl->config.sensors[pimpl->validIDpositions[pimpl->daisychain_counter]].dataready);
 //        pimpl->print("acquisition_daisychain_alert_dataready()");
     }
-
-
+    
+    
     void timerTOUT_start()
     {
         if(0 != maxTOUT)
@@ -490,7 +490,7 @@ struct embot::app::application::thePOSreader2::Impl
             timerTOUT->start(cfgtmt);
         }
     }
-
+    
     void timerTOUT_stop()
     {
         if(0 != maxTOUT)
@@ -498,31 +498,31 @@ struct embot::app::application::thePOSreader2::Impl
             timerTOUT->stop();
         }
     }
-
+    
     // daisychain
-
+        
     volatile uint8_t daisychain_counter {0};
-
+    
     void acquisition_daisychain_trigger()
-    {
+    {        
         if(daisychain_counter <= validIDpositions.size())
         {
 //            print("acquisition_daisychain_trigger() @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
             // send event to thread for the current daisychained
             uint8_t n = validIDpositions[daisychain_counter];
-            config.reader->setEvent(config.sensors[n].askdata);
-        }
+            config.reader->setEvent(config.sensors[n].askdata);           
+        }        
     }
-
-
+     
+    
     void acquisition_daisychain_start()
     {
         print("acquisition_daisychain_start() @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-
+                
         daisychain_counter = 0;
         acquisition_daisychain_trigger();
     }
-
+            
     void acquisition_daisychain_on_askdata(uint8_t n)
     {
 //        if(n == daisychain_counter)
@@ -532,31 +532,31 @@ struct embot::app::application::thePOSreader2::Impl
             embot::core::Callback cbk {acquisition_daisychain_alert_dataready, this};
             // start acquisition
             acquisition(config.sensors[n], cbk);
-
+            
             timerTOUT_start();
 //        }
-    }
+    }     
 
     void acquisition_daisychain_on_dataready(uint8_t n)
     {
 //        if(n == daisychain_counter)
 //        {
-            timerTOUT_stop();
-
- //           print("acquisition_daisychain_on_dataready(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+            timerTOUT_stop();    
+            
+ //           print("acquisition_daisychain_on_dataready(" + std::to_string(n) + ") @ " + embot::core::TimeFormatter(embot::core::now()).to_string());            
             // retrieve data from sensor n
-            Position pos {0};
+            Position pos {0};    
             read(config.sensors[n], pos);
-
-            //embot::hw::TLV493D id = config.sensors[n].id;
-            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-
+            
+            //embot::hw::TLV493D id = config.sensors[n].id;            
+            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+    
             //#warning in here we use n or ... daisychain_counter??? we use n. even if some n keep non valid values
             tspositions->set(pos, n);
-
+            
             // increment
             daisychain_counter++;
-
+            
             // if not last, trigger a start()
             if(daisychain_counter < validIDpositions.size())
             {
@@ -567,23 +567,23 @@ struct embot::app::application::thePOSreader2::Impl
                 daisychain_counter = 0;
             }
 //        }
-    }
+    } 
 
     void acquisition_daisychain_noreply()
     {
-        uint8_t n = validIDpositions[daisychain_counter];
+        uint8_t n = validIDpositions[daisychain_counter]; 
         print("acquisition_daisychain_noreply() of " + sensor_to_string(config.sensors[n]) + ", index = " + std::to_string(daisychain_counter) + ", @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
 
         timerTOUT_stop();
-
-        // then... what to do?
+        
+        // then... what to do? 
         // - i could mark a failure mask
-        // - i could get the mask at the end of acquisition chain and fill a can print frame to transmit
+        // - i could get the mask at the end of acquisition chain and fill a can print frame to transmit 
         // for now... i just trigger the next one as if i had received a acquisition_daisychain_on_dataready()
-
+        
         // increment
         daisychain_counter++;
-
+        
         // if not last, trigger a start()
         if(daisychain_counter < validIDpositions.size())
         {
@@ -593,33 +593,33 @@ struct embot::app::application::thePOSreader2::Impl
         {
             daisychain_counter = 0;
         }
-    }
+    }    
 
     // parallel
-
+    
     uint32_t acquisition_fullyparallel_maskofrequests = 0;
     uint32_t acquisition_fullyparallel_maskofreplies = 0;
     void acquisition_fullyparallel_start()
     {
-        std::string str {};
+        std::string str {};        
         acquisition_fullyparallel_maskofrequests = acquisition_fullyparallel_maskofreplies = 0;
         embot::os::EventMask eventmask = 0;
         for(uint8_t i=0; i<validIDpositions.size(); i++)
         {
             uint8_t n = validIDpositions[i];
-            eventmask |= config.sensors[n].askdata;
-            embot::core::binary::bit::set(acquisition_fullyparallel_maskofrequests, n);
+            eventmask |= config.sensors[n].askdata;  
+            embot::core::binary::bit::set(acquisition_fullyparallel_maskofrequests, n);           
             str += sensor_to_string(config.sensors[n]);
             str += " ";
         }
-        config.reader->setEvent(eventmask);
-
+        config.reader->setEvent(eventmask); 
+        
         print("acquisition_fullyparallel_start() for " + str + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-
+               
         timerTOUT_start();
     }
-
-
+    
+   
     void acquisition_fullyparallel_on_askdata(uint8_t n)
     {
         print("acquisition_fp_on_askdata(" + std::to_string(n) + ") for " + sensor_to_string(config.sensors[n]) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
@@ -629,7 +629,7 @@ struct embot::app::application::thePOSreader2::Impl
         embot::core::Callback cbk {acquisition_parallel_alert_dataready, &cbkdataarray[n]};
         // start acquisition
         acquisition(config.sensors[n], cbk);
-    }
+    }     
 
     void acquisition_fullyparallel_on_dataready(uint8_t n)
     {
@@ -637,20 +637,20 @@ struct embot::app::application::thePOSreader2::Impl
         // retrieve data from sensor n
         Position pos {0};
         read(config.sensors[n], pos);
-
-        print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-
+             
+        print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+  
         tspositions->set(pos, n);
-
+        
         embot::core::binary::bit::set(acquisition_fullyparallel_maskofreplies, n);
-
+        
         if(acquisition_fullyparallel_maskofreplies == acquisition_fullyparallel_maskofrequests)
         {
             // ok, we have finished. i stop the timer
             timerTOUT_stop();
         }
-    }
-
+    } 
+    
     void acquisition_fullyparallel_noreply()
     {
         uint32_t maskOFmissing = acquisition_fullyparallel_maskofrequests ^ acquisition_fullyparallel_maskofreplies;
@@ -662,27 +662,27 @@ struct embot::app::application::thePOSreader2::Impl
             {
                 str += sensor_to_string(config.sensors[n]);
                 str += " ";
-            }
+            }            
         }
-
+        
         print("acquisition_fullyparallel_noreply() of " + str + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-
+       
         timerTOUT_stop();
-
-        // then... what to do?
+        
+        // then... what to do? 
         // - i could use the differences between acquisition_fullyparallel_maskofreplies and acquisition_fullyparallel_maskofrequests
-        // - i could fill a can print frame to transmit
+        // - i could fill a can print frame to transmit 
         // for now... i just stop the timer
-
-    }
-
+        
+    }      
+    
     uint32_t acquisition_mod2parallel_maskofrequests = 0;
-    uint32_t acquisition_mod2parallel_maskofreplies = 0;
+    uint32_t acquisition_mod2parallel_maskofreplies = 0;    
     uint8_t mod2_index = 0;
     uint8_t mod2_number = 0;
     uint8_t mod2_replies = 0;
     enum class mod2Mode : uint8_t { even = 0, odd = 1};
-
+    
     mod2Mode currmod2mode = mod2Mode::even;
     void acquisition_mod2parallel_start(mod2Mode mo)
     {
@@ -702,25 +702,25 @@ struct embot::app::application::thePOSreader2::Impl
                 mod2_number++;
                 uint8_t n = validIDpositions[i];
                 eventmask |= config.sensors[n].askdata;
-                embot::core::binary::bit::set(acquisition_mod2parallel_maskofrequests, n);
+                embot::core::binary::bit::set(acquisition_mod2parallel_maskofrequests, n);          
                 str += sensor_to_string(config.sensors[n]);
                 str += " ";
-            }
+            }                
         }
-
+        
         if(0 != eventmask)
+        {        
+            config.reader->setEvent(eventmask); 
+            print("acquisition_mod2parallel_start() for " + str + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string());       
+            timerTOUT_start();  
+        } 
+        else        
         {
-            config.reader->setEvent(eventmask);
-            print("acquisition_mod2parallel_start() for " + str + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-            timerTOUT_start();
-        }
-        else
-        {
-            print(std::string("acquisition_mod2parallel_start() does nothing as there are no sensors ") + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-        }
+            print(std::string("acquisition_mod2parallel_start() does nothing as there are no sensors ") + "@ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
+        }    
 
     }
-
+    
     void acquisition_mod2parallel_on_askdata(uint8_t n)
     {
         print("acquisition_mod2parallel_on_askdata(" + std::to_string(n) + ") for " + sensor_to_string(config.sensors[n]) + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
@@ -730,7 +730,7 @@ struct embot::app::application::thePOSreader2::Impl
         embot::core::Callback cbk {acquisition_parallel_alert_dataready, &cbkdataarray[n]};
         // start acquisition
         acquisition(config.sensors[n], cbk);
-    }
+    }     
 
     void acquisition_mod2parallel_on_dataready(uint8_t n)
     {
@@ -738,33 +738,33 @@ struct embot::app::application::thePOSreader2::Impl
         // retrieve data from sensor n
         Position pos {0};
         read(config.sensors[n], pos);
-
+      
         if(config.sensors[n].type == sensorType::qe)
         {
-            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " uMET @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " uMET @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
         }
         else if((config.sensors[n].type == sensorType::lr17) || (config.sensors[n].type == sensorType::tlv))
         {
-            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
+            print(sensor_to_string(config.sensors[n]) + " (n=" +  std::to_string(n) + ") is " + std::to_string(pos) + " centiDEG @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
         }
-
+        
         tspositions->set(pos, n);
-
+        
         embot::core::binary::bit::set(acquisition_mod2parallel_maskofreplies, n);
-
+        
         if(acquisition_mod2parallel_maskofreplies == acquisition_mod2parallel_maskofrequests)
         {
             // ok, we have finished one stage. i stop the timer
             timerTOUT_stop();
-        }
-
-        mod2_replies++;
-
+        }        
+        
+        mod2_replies++;        
+        
         if((mod2_replies == mod2_number) && (currmod2mode == mod2Mode::even))
         {
             acquisition_mod2parallel_start(mod2Mode::odd);
         }
-    }
+    }   
 
     void acquisition_mod2parallel_noreply()
     {
@@ -778,43 +778,43 @@ struct embot::app::application::thePOSreader2::Impl
                 tspositions->set(0xffff, n);
                 str += sensor_to_string(config.sensors[n]);
                 str += " ";
-            }
+            }            
         }
-
-        print("acquisition_mod2parallel_noreply() of " + str + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());
-
+        
+        print("acquisition_mod2parallel_noreply() of " + str + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string());        
+        
         timerTOUT_stop();
-
-        // then... what to do?
+        
+        // then... what to do? 
         // - i could use the differences between acquisition_md2parallel_maskofreplies and acquisition_mod2parallel_maskofrequests
-        // - i could fill a can print frame to transmit
+        // - i could fill a can print frame to transmit 
         // for now... i just stop the timer and start the odd if i were in even
         if((currmod2mode == mod2Mode::even))
         {
             acquisition_mod2parallel_start(mod2Mode::odd);
         }
-
-    }
-
-
+        
+    } 
 
 
-    bool acquisition_get(std::vector<embot::prot::can::Frame> &replies);
+    
 
+    bool acquisition_get(std::vector<embot::prot::can::Frame> &replies);    
+                      
 };
 
 
 // this starts the tx actually
 bool embot::app::application::thePOSreader2::Impl::start()
-{
+{ 
 #if !defined(CONTINUOUS_ACQUISITION)
     acquisitionchain_start(true);
-#endif
-
+#endif    
+    
     embot::os::Timer::Config cfgtx(periodTX, actionTX, embot::os::Timer::Mode::forever);
     timerTX->start(cfgtx);
-    ticking = true;
-    return true;
+    ticking = true;    
+    return true;            
 }
 
 // this stops the tx
@@ -822,14 +822,14 @@ bool embot::app::application::thePOSreader2::Impl::stop()
 {
 #if !defined(CONTINUOUS_ACQUISITION)
     acquisitionchain_start(false);
-#endif
-
+#endif   
+    
     timerTX->stop();
-    ticking = false;
+    ticking = false;    
     return true;
 }
 
-// this retrieves the
+// this retrieves the 
 bool embot::app::application::thePOSreader2::Impl::get(std::vector<embot::prot::can::Frame> &frames2transmit)
 {
     // that is called by the transmitter thread only ... i may check vs thread correctness but i dont so that i am quicker
@@ -838,23 +838,23 @@ bool embot::app::application::thePOSreader2::Impl::get(std::vector<embot::prot::
 //    {
 //        return false;
 //    }
-
-    acquisition_get(frames2transmit);
+    
+    acquisition_get(frames2transmit);    
     return true;
 }
 
 bool embot::app::application::thePOSreader2::Impl::isvalid(embot::os::EventMask evtmask) const
-{
-    return (0 == (evtmask & globaleventmask)) ? false : true;
+{ 
+    return (0 == (evtmask & globaleventmask)) ? false : true;    
 }
 
 bool embot::app::application::thePOSreader2::Impl::process(embot::os::EventMask evtmask)
-{
+{  
     if(false == isvalid(evtmask))
     {
         return false;
     }
-
+    
     // start acquisition chain
     if(true == embot::core::binary::mask::check(evtmask, config.events.acquire))
     {
@@ -864,7 +864,7 @@ bool embot::app::application::thePOSreader2::Impl::process(embot::os::EventMask 
             {
                 acquisition_daisychain_start();
             } break;
-
+            
             case AcquisitionMode::fullyparallel:
             {
                 acquisition_fullyparallel_start();
@@ -873,12 +873,12 @@ bool embot::app::application::thePOSreader2::Impl::process(embot::os::EventMask 
             case AcquisitionMode::mod2parallel:
             {
                 acquisition_mod2parallel_start(mod2Mode::even);
-            } break;
-
+            } break;            
+                        
             default:
             {
             } break;
-        }
+        }       
     }
 
 
@@ -891,7 +891,7 @@ bool embot::app::application::thePOSreader2::Impl::process(embot::os::EventMask 
             {
                 acquisition_daisychain_noreply();
             } break;
-
+            
             case AcquisitionMode::fullyparallel:
             {
                 acquisition_fullyparallel_noreply();
@@ -900,21 +900,21 @@ bool embot::app::application::thePOSreader2::Impl::process(embot::os::EventMask 
             case AcquisitionMode::mod2parallel:
             {
                 acquisition_mod2parallel_noreply();
-            } break;
-
+            } break;            
+                        
             default:
             {
             } break;
-        }
+        }       
     }
-
-    // check the events related to the sensors
+    
+    // check the events related to the sensors 
     for(uint8_t i=0; i<validIDpositions.size(); i++)
     {
-        // the events for asking to the sensor
+        // the events for asking to the sensor 
         uint8_t n = validIDpositions[i];
-
-        if(true == embot::core::binary::mask::check(evtmask, config.sensors[n].askdata))
+        
+        if(true == embot::core::binary::mask::check(evtmask, config.sensors[n].askdata)) 
         {
             switch(config.acquisitionmode)
             {
@@ -922,30 +922,30 @@ bool embot::app::application::thePOSreader2::Impl::process(embot::os::EventMask 
                 {
                     acquisition_daisychain_on_askdata(n);
                 } break;
-
+                
                 case AcquisitionMode::fullyparallel:
                 {
                    acquisition_fullyparallel_on_askdata(n);
                 } break;
-
+                
                 case AcquisitionMode::mod2parallel:
                 {
                     acquisition_mod2parallel_on_askdata(n);
-                } break;
-
+                } break;                 
+                
                 default:
                 {
                 } break;
-            }
-//            if(config.acquisitionmode == AcquisitionMode::daisychain)
+            }       
+//            if(config.acquisitionmode == AcquisitionMode::daisychain) 
 //            {
 //                acquisition_daisychain_on_askdata(config.sensors[n].askdata);
-//            }
+//            }                
             //acquisition_start(n);
         }
-
+        
         // the events for retrieving the data
-        if(true == embot::core::binary::mask::check(evtmask, config.sensors[n].dataready))
+        if(true == embot::core::binary::mask::check(evtmask, config.sensors[n].dataready)) 
         {
             switch(config.acquisitionmode)
             {
@@ -953,7 +953,7 @@ bool embot::app::application::thePOSreader2::Impl::process(embot::os::EventMask 
                 {
                     acquisition_daisychain_on_dataready(n);
                 } break;
-
+                
                 case AcquisitionMode::fullyparallel:
                 {
                    acquisition_fullyparallel_on_dataready(n);
@@ -962,65 +962,65 @@ bool embot::app::application::thePOSreader2::Impl::process(embot::os::EventMask 
                 case AcquisitionMode::mod2parallel:
                 {
                     acquisition_mod2parallel_on_dataready(n);
-                } break;
-
+                } break;  
+                
                 default:
                 {
                 } break;
-            }
-//            if(config.acquisitionmode == AcquisitionMode::daisychain)
+            } 
+//            if(config.acquisitionmode == AcquisitionMode::daisychain) 
 //            {
 //                acquisition_daisychain_on_dataready(config.sensors[n].dataready);
-//            }
-//            acquisition_retrieve(n);
+//            }   
+//            acquisition_retrieve(n);    
 //            acquisition_processing(n);
         }
     }
 
-    return true;
+    return true;    
 }
 
 
 bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<embot::prot::can::Frame> &replies)
-{
-
+{   
+            
     std::array<Position, numberofpositions> positions {0};
     tspositions->get(positions);
+        
+    // we are ready to transmit    
+    embot::prot::can::Frame frame;     
 
-    // we are ready to transmit
-    embot::prot::can::Frame frame;
-
-    std::string str;
-
+    std::string str;    
+    
 //    for(uint8_t i=0; i<validIDpositions.size(); i++)
 //    {
 //        uint8_t n = validIDpositions[i];
-//
+//        
 //        embot::prot::can::analog::periodic::Message_POS msg;
-//        embot::prot::can::analog::periodic::Message_POS::Info info;
-//
-//        info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-//
-//
+//        embot::prot::can::analog::periodic::Message_POS::Info info;  
+//    
+//        info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
+//        
+//        
 //        sensorType st = config.sensors[n].type;
-//
+//        
 //        if((sensorType::tlv == st) || (sensorType::lr17 == st))
-//        {
+//        {            
 //            // we have rotational sensor
-//
+//                   
 //            // so far i load one value in one packet ...
-//
+//            
 //    #if !defined(EMBOT_POSREADER2_compensatereadings) || defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
-//
+//             
 //            #warning we DONT compensate values of tlv and lr17 encoders for a given hand
 //            // we dont compensate
 //            int16_t v =  (valueOfPositionACQUISITIONnotvalid == positions[n]) ? +10000 : positions[n]/10;
 //            std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
-//
+//            
 //    #else
-//
+//            
 //            #warning we compensate values of tlv and lr17 encoders for a specific hand to be in range [0, 90]
-//            // this code is tunes for teh first prototype of our hand mk3.
+//            // this code is tunes for teh first prototype of our hand mk3. 
 //            // we should somehow get the calibration parameters from an xml file.
 //            // they could be applied in here, so that the pos service uses calibrate values that the yarpscope
 //            // show them correctly, or we can apply them to the motion control part (in our case the mc4plus)
@@ -1028,21 +1028,21 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
 //            constexpr int16_t correction = 10;
 //            constexpr std::array<int16_t, numberofpositions> rotations = { 0, 0, 180, 0, 0, 0, 0, 0, 0 };
 //            //constexpr std::array<Position, numberofpositions> offsets = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-//
+//            
 //            int16_t v = valueOfPositionACQUISITIONnotvalid / 10;
 //            if(valueOfPositionACQUISITIONnotvalid != positions[n])
 //            {
 //                // tlv reads in units of 0.01 deg.
 //                // so i move into deg: positions[n]/100
 //                // then i apply rotation[?] w/: +rotations[embot::core::tointegral(sensor_getPOSlabel(config.sensors[n]))]
-//                // what is ?: is 0, 1, 2, 3, 4, 5, etc whwnre 0 is eobrd_portpos_hand_thumb_oc, 1 is eobrd_portpos_hand_index_oc etc.
-//                // so, the ruke is: i set offsets[] and rotations[] to be zero.
+//                // what is ?: is 0, 1, 2, 3, 4, 5, etc whwnre 0 is eobrd_portpos_hand_thumb, 1 is eobrd_portpos_hand_index etc.
+//                // so, the ruke is: i set offsets[] and rotations[] to be zero. 
 //                // i start the pos service and i look at teh ports.
 //                // se il valore associato al thum che ha label = 0 richidere un offset allora metto il valore in offsets[0],
 //                // se richidere una inversione allora metto rotations[0] = 180, altrikenti 0.
 //                // e cosi'via con gli altri index = 1 etc.
 //                // posso fare cosi' perhche rotations e offset sono orfinati a label.
-//                //
+//                // 
 //                int16_t r = (positions[n]/100+rotations[embot::core::tointegral(sensor_getPOSlabel(config.sensors[n]))]) % 360;
 //                int16_t t = - (r);
 //                v = (720 + t) % 360;
@@ -1050,11 +1050,11 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
 //    //            if(v < 0) v = 0;
 //    //            else if (v > 180) v = 180;
 //                v *= 10;
-//
+//                
 //    //            v = transform(positions[n], embot::core::tointegral(sensor_getPOSlabel(config.sensors[n])));
 //    //            v *= 10;
 //            }
-//
+//            
 //            #warning calibration of thumb metacarpus is to be done here
 //            if(config.sensors[n].id == embot::hw::ANY::five)
 //            {
@@ -1063,24 +1063,24 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
 //                int16_t t = r - 72;
 //                v = 10 * t;
 //            }
-//
+//            
 //            std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
-//
-//    #endif
+//            
+//    #endif        
 
 //            str += sensor_to_string(config.sensors[n]);
 //            str += " = ";
 //            str += std::to_string(v/10);
 //            str += " DEG ";
-//
+//            
 //            info.loadDeciDeg(sensor_getPOSlabel(config.sensors[n]), 1, values);
-//
+//               
 //            msg.load(info);
 //            msg.get(frame);
-//            replies.push_back(frame);
-//
+//            replies.push_back(frame); 
+//        
 //            // in here we manage a wrong measure. in addition to so far we just send a canprint message
-//            // and
+//            // and 
 //            embot::hw::LED led = sensor_to_led(config.sensors[n]);
 //            if(valueOfPositionACQUISITIONnotvalid == positions[n])
 //            {
@@ -1092,49 +1092,49 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
 //            {
 //                embot::hw::led::on(led);
 //            }
-//
+//            
 //        }
 //        else if(sensorType::qe == st)
 //        {
-//
+//            
 //            // we have a linear sensor which measure micro-meters (0.001 mm) and we need to convert in 0.1 mm ->
 //            constexpr int convFactor {100};
 //            // we dont compensate
 //            int16_t v =  (valueOfPositionACQUISITIONnotvalid == positions[n]) ? 0xffff : positions[n]/convFactor;
-//            std::array<embot::prot::can::analog::deciMilliMeter, 3> values = { v, 0, 0};
+//            std::array<embot::prot::can::analog::deciMilliMeter, 3> values = { v, 0, 0}; 
 
 //            str += sensor_to_string(config.sensors[n]);
 //            str += " = ";
 //            str += std::to_string(v/10);
 //            str += " mm ";
-//
+//            
 //            info.loadDeciMilliMeter(sensor_getPOSlabel(config.sensors[n]), 1, values);
-//
+//               
 //            msg.load(info);
 //            msg.get(frame);
-//            replies.push_back(frame);
-//
+//            replies.push_back(frame); 
+//            
 //            embot::hw::LED led = sensor_to_led(config.sensors[n]);
 //            if(valueOfPositionACQUISITIONnotvalid == positions[n])
 //            {
 //                embot::hw::led::off(led);
 //                embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
 //                tr.print("QE" + std::to_string(n) + "err", replies);
-//            }
+//            }            
 //            else
 //            {
 //                embot::hw::led::on(led);
-//            }
-//        }
+//            }            
+//        }        
 //    }
 
-
+    
     for(uint8_t i=0; i<validIDpositions.size(); i++)
     {
         embot::prot::can::analog::periodic::Message_POS msg {};
-        embot::prot::can::analog::periodic::Message_POS::Info info {};
-        info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-
+        embot::prot::can::analog::periodic::Message_POS::Info info {};  
+        info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress(); 
+        
         // we get the index n from the array<> Config::sensors. we have n = i only if every sensor inside Config::sensors was ok.
         uint8_t n = validIDpositions[i];
         // we gets some properties
@@ -1143,25 +1143,25 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
         bool isrotational = (sensorType::tlv == st) || (sensorType::lr17 == st);
         //bool isrotational = (cp.postype == embot::prot::can::analog::posTYPE::angleDeciDeg);
         Position rawvalue = positions[n];
-
-
-        // now we transform the values
+                     
+        
+        // now we transform the values        
         if(true == isrotational)
         {
             embot::prot::can::analog::deciDeg v = valueOfPositionACQUISITIONnotvalid / 10;
-
+            
         #if !defined(EMBOT_POSREADER2_compensatereadings) || defined(EMBOT_ENABLE_hw_tlv493d_emulatedMODE)
-
+                 
             #warning we DONT compensate values of tlv and lr17 encoders for a given hand
             // we dont compensate
-            v = (valueOfPositionACQUISITIONnotvalid == rawvalue) ? +10000 : rawvalue/10;
-
-
+            v = (valueOfPositionACQUISITIONnotvalid == rawvalue) ? +10000 : rawvalue/10;                
+        
+            
         #elif defined(EMBOT_POSREADER2_compensatereadings) && !defined(EMBOT_POSREADER2_compensatereadings_mode1)
             // we compensate in the old legacy way. but we can do better maybe w/ EMBOT_POSREADER2_compensatereadings_mode1
-
-            //#warning we compensate values of tlv and lr17 encoders for a specific hand to be in range [0, 90]
-
+            
+            //#warning we compensate values of tlv and lr17 encoders for a specific hand to be in range [0, 90]            
+            
             if(valueOfPositionACQUISITIONnotvalid != rawvalue)
             {
                 // ok, compensate to embot::prot::can::analog::posTYPE::angleDeciDeg
@@ -1177,11 +1177,11 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
 //                // transform in decidegrees
 //                v *= 10;
 
-                embot::prot::can::analog::deciDeg decideg_not_compensated = rawvalue/10;
+                embot::prot::can::analog::deciDeg decideg_not_compensated = rawvalue/10;                
                 v = cp.decidegcalib.transform(decideg_not_compensated);
             }
-
-        #endif
+            
+        #endif      
 
             // now we transmit v as a deciDeg
             std::array<embot::prot::can::analog::deciDeg, 3> values = { v, 0, 0};
@@ -1190,13 +1190,13 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
             str += " = ";
             str += std::to_string(v/10);
             str += " DEG ";
-
+            
             info.loadDeciDeg(sensor_getPOSlabel(config.sensors[n]), 1, values);
-
+               
             msg.load(info);
             msg.get(frame);
-            replies.push_back(frame);
-
+            replies.push_back(frame); 
+        
             // finally, in here we manage a wrong measure. in addition to led off we also send a canprint message
             embot::hw::LED led = sensor_to_led(config.sensors[n]);
             if(valueOfPositionACQUISITIONnotvalid == rawvalue)
@@ -1208,45 +1208,45 @@ bool embot::app::application::thePOSreader2::Impl::acquisition_get(std::vector<e
             else
             {
                 embot::hw::led::on(led);
-            }
+            }            
         }
         else if(sensorType::qe == st)
-        {
+        {            
             // we have a linear sensor which measure micro-meters (0.001 mm) and we need to convert in 0.1 mm ->
             constexpr int convFactor {100};
             // we dont compensate
             int16_t v =  (valueOfPositionACQUISITIONnotvalid == positions[n]) ? 0xffff : positions[n]/convFactor;
-            std::array<embot::prot::can::analog::deciMilliMeter, 3> values = { v, 0, 0};
+            std::array<embot::prot::can::analog::deciMilliMeter, 3> values = { v, 0, 0}; 
 
             str += sensor_to_string(config.sensors[n]);
             str += " = ";
             str += std::to_string(v/10);
             str += " mm ";
-
+            
             info.loadDeciMilliMeter(sensor_getPOSlabel(config.sensors[n]), 1, values);
-
+               
             msg.load(info);
             msg.get(frame);
-            replies.push_back(frame);
-
+            replies.push_back(frame); 
+            
             embot::hw::LED led = sensor_to_led(config.sensors[n]);
             if(valueOfPositionACQUISITIONnotvalid == positions[n])
             {
                 embot::hw::led::off(led);
                 embot::app::theCANtracer &tr = embot::app::theCANtracer::getInstance();
                 tr.print("QE" + std::to_string(n) + "err", replies);
-            }
+            }            
             else
             {
                 embot::hw::led::on(led);
-            }
-        }
+            }            
+        }        
     }
-
+    
     print("thePOSreader2 transmits: " + str + embot::core::TimeFormatter(embot::core::now()).to_string());
 
-
-    return true;
+             
+    return true;           
 }
 
 
@@ -1267,43 +1267,43 @@ embot::app::application::thePOSreader2& embot::app::application::thePOSreader2::
 embot::app::application::thePOSreader2::thePOSreader2()
 {
     pImpl = std::make_unique<Impl>();
-}
+}  
 
-
+    
 embot::app::application::thePOSreader2::~thePOSreader2() { }
 
-
+         
 bool embot::app::application::thePOSreader2::initialise(const Config &config)
 {
     pImpl->config = config;
-
-    // this event triggers a periodic reading.
+    
+    // this event triggers a periodic reading. 
     pImpl->actionAcquisition.load(embot::os::EventToThread(pImpl->config.events.acquire, pImpl->config.reader));
     if(pImpl->config.acquisitionperiod > 10*embot::core::time1millisec)
     {
         pImpl->periodAcquisition = pImpl->config.acquisitionperiod;
     }
-
+    
     // this event signals a no reply in data reading
     pImpl->actionTOUT.load(embot::os::EventToThread(pImpl->config.events.noreply, pImpl->config.reader));
-
+    
     // this event triggers a periodic transmission with period configured by can message
     pImpl->actionTX.load(embot::os::EventToThread(pImpl->config.events.transmit, pImpl->config.transmitter));
-
+     
     pImpl->tspositions->set(pImpl->valueOfPositionCHIPnotinitted, 0);
     pImpl->tspositions->set(pImpl->valueOfPositionCHIPnotinitted, 1);
-
+    
     pImpl->numofvalidsensors = 0;
-
+    
     std::string str {};
     pImpl->globaleventmask = pImpl->config.events.acquire | pImpl->config.events.noreply;
     pImpl->maxTOUT = pImpl->config.acquisitiontimeout;
     for(uint8_t n=0; n<numberofpositions; n++)
     {
         if(embot::hw::ANY::none != pImpl->config.sensors[n].id)
-        {
+        {  
             bool ok = pImpl->sensor_init(config.sensors[n]);
-
+            
             if(ok)
             {
                 if((pImpl->config.sensors[n].timeout != 0) && (pImpl->config.sensors[n].noreply != 0))
@@ -1313,10 +1313,10 @@ bool embot::app::application::thePOSreader2::initialise(const Config &config)
                 pImpl->validIDpositions.push_back(n);
                 pImpl->numofvalidsensors++;
                 embot::core::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[n].id));
-                pImpl->globaleventmask |= (pImpl->config.sensors[n].askdata | pImpl->config.sensors[n].dataready | pImpl->config.sensors[n].noreply);
-
+                pImpl->globaleventmask |= (pImpl->config.sensors[n].askdata | pImpl->config.sensors[n].dataready | pImpl->config.sensors[n].noreply);   
+         
                 str += pImpl->sensor_to_string(config.sensors[n]);
-                str += " ";
+                str += " ";                
 
                 embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
                 embot::hw::led::on(l);
@@ -1326,11 +1326,11 @@ bool embot::app::application::thePOSreader2::initialise(const Config &config)
                 embot::hw::LED l = pImpl->sensor_to_led(config.sensors[n]);
                 embot::hw::led::off(l);
             }
-
-        }
+            
+        }            
     }
-
-
+    
+                       
     embot::core::print("thePOSreader2::initialise() -> found: " + str);
 
 #if defined(CONTINUOUS_ACQUISITION)
@@ -1338,13 +1338,13 @@ bool embot::app::application::thePOSreader2::initialise(const Config &config)
     pImpl->acquisitionchain_start(true);
 #endif
 
-
+     
     return true;
 }
 
 
 bool embot::app::application::thePOSreader2::start(embot::core::relTime period)
-{
+{   
     if(0 != period)
     {
         pImpl->periodTX = period;
@@ -1355,14 +1355,14 @@ bool embot::app::application::thePOSreader2::start(embot::core::relTime period)
 
 
 bool embot::app::application::thePOSreader2::stop()
-{
-    embot::core::print("thePOSreader2::stop() -> stopping streaming");
+{ 
+    embot::core::print("thePOSreader2::stop() -> stopping streaming");    
     return pImpl->stop();
 }
 
 
 bool embot::app::application::thePOSreader2::get(std::vector<embot::prot::can::Frame> &frames2transmit)
-{
+{   
     return pImpl->get(frames2transmit);
 }
 
@@ -1373,7 +1373,7 @@ bool embot::app::application::thePOSreader2::isvalid(embot::os::EventMask evtmas
 }
 
 bool embot::app::application::thePOSreader2::process(embot::os::EventMask evtmask)
-{
+{   
     return pImpl->process(evtmask);
 }
 
@@ -1388,18 +1388,18 @@ bool embot::app::application::thePOSreader2::set(const embot::prot::can::analog:
     {
         stop();
     }
-
+    
     if(info.type == embot::prot::can::analog::posTYPE::angleDeciDeg)
     {
         pImpl->canconfig.descriptor[0] = info.descriptor[0];
         pImpl->canconfig.descriptor[1] = info.descriptor[1];
     }
-
-    return true;
+    
+    return true;    
 }
 
 bool embot::app::application::thePOSreader2::get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo)
-{
+{    
 
     replyinfo.type = info.type;
     if(info.type == embot::prot::can::analog::posTYPE::angleDeciDeg)
@@ -1407,8 +1407,8 @@ bool embot::app::application::thePOSreader2::get(const embot::prot::can::analog:
         replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
         replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
     }
-
-    return true;
+    
+    return true;    
 }
 
 
@@ -1420,10 +1420,10 @@ bool embot::app::application::thePOSreader2::set(const embot::prot::can::analog:
     }
     else
     {
-        stop();
+        stop();        
     }
-
-    return true;
+    
+    return true;    
 }
 
 
