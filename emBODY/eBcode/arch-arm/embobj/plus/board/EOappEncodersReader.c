@@ -1796,13 +1796,13 @@ static eObool_t s_eo_read_pos_for_port(EOappEncReader *p, eObrd_portpos_t port, 
            
     switch(port)
     {        
-        case eobrd_portpos_hand_thumb:
-        case eobrd_portpos_hand_index:
-        case eobrd_portpos_hand_medium:
-        case eobrd_portpos_hand_pinky:            
-        case eobrd_portpos_hand_thumbmetacarpus:
-        case eobrd_portpos_hand_thumbrotation:
-        case eobrd_portpos_hand_indexadduction:
+        case eobrd_portpos_hand_thumb_oc:
+        case eobrd_portpos_hand_index_oc:
+        case eobrd_portpos_hand_middle_oc:
+        case eobrd_portpos_hand_ring_pinky_oc:            
+        case eobrd_portpos_hand_thumb_add:
+        case eobrd_portpos_hand_tbd:
+        case eobrd_portpos_hand_index_add:
         {
             uint8_t index = port;
             eOas_pos_data_t *data = (eOas_pos_data_t*) eo_array_At(array, index);
