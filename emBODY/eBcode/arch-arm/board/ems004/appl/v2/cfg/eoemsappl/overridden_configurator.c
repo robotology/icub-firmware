@@ -142,11 +142,11 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
         cfg.priority             = hal_int_priority05;
         cfg.arg                  = NULL;
         
-        #ifdef TEST_AEA3
+        #if defined(TEST_AEA3)
         cfg.type	                = hal_spiencoder_typeAEA3;
-        #elifdef TEST_AEA
+        #elif defined(TEST_AEA)
         cfg.type	                = hal_spiencoder_typeAEA;
-        #elifdef TEST_AKSIM2
+        #elif defined(TEST_AKSIM2)
         cfg.type                    = hal_spiencoder_typeAksIM2;
         #endif
         cfg.sdata_precheck       = hal_false;  
@@ -167,13 +167,13 @@ extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator
         char str[64] = {0};
         if(hal_res_OK == r)
         { 
-            #ifdef TEST_AEA3
+            #if defined(TEST_AEA3)
                 hal_spiencoder_position_t raw_value_shifted =  raw_value >> 1; // sensor return 16 bits --> only 14 are valid
                 snprintf(str, sizeof(str), "%d, %d, %f", raw_value, raw_value_shifted, ((360.0 *  raw_value_shifted) / (1024.0*16)));  // (360*value)/(2^14)
-            #elifdef TEST_AEA
+            #elif defined(TEST_AEA)
                 hal_spiencoder_position_t raw_value_shifted =  (raw_value >> 6) & 0x0FFF; // sensor return 16 bits --> only 12 are valid
                 snprintf(str, sizeof(str), "%d, %d, %f", raw_value, raw_value_shifted, ((360.0 *  raw_value_shifted) / (1024.0*4)));  // (360*value)/(2^14)
-            #elifdef TEST_AKSIM2
+            #elif defined(TEST_AKSIM2)
                 snprintf(str, sizeof(str), "%d", raw_value); // it now prints only the position Value
             #endif
         }
