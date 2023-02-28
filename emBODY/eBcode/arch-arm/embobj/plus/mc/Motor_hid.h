@@ -11,6 +11,27 @@ extern "C" {
     
 #include "Motor.h"
 
+#if defined(ERGOJOINT)
+struct TrqCtrlParams_t
+{
+    CTRL_UNITS Ko;  // Static friction coefficient  [A]
+    CTRL_UNITS Kw;  // Viscous friction coefficient [A/(rad/s)]
+    CTRL_UNITS Ifriction_max; // Limits the two contributions above [A] 
+    
+    CTRL_UNITS Kw2; // Quadratic term for non linear characteristic [A/(rad/s)^2]
+                    // It can also be negative to prevent runaway.
+    CTRL_UNITS Iquadratic_max; // Limits the quadratic contribution above [A]
+    
+    CTRL_UNITS Kff; // Feed forward term, equal to 1/(torque constant * gearbox ratio * efficiency) [A/Nm]
+    CTRL_UNITS Iff_max; // Limits the feed forward contribution above [A]
+    
+    CTRL_UNITS Kp; // Proportional term [A/Nm]
+    CTRL_UNITS Iproportional_max; // Limits the proportional contribution above [A]
+    
+    CTRL_UNITS Iout_max; // Limits the final output [A] 
+};
+#endif
+
 struct Motor_hid
 {
     // consts
@@ -126,11 +147,7 @@ struct Motor_hid
     int16_t angmin;
     int16_t angle;
     
-    CTRL_UNITS Io;  // A
-    CTRL_UNITS Kw;  // A/(rad/s)
-    
-    CTRL_UNITS Kt;  // Nm/A
-    CTRL_UNITS iKt; // A/Nm;
+    TrqCtrlParams_t trq_ctrl;
 #endif 
 };
 

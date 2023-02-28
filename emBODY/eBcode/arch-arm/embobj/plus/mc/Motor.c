@@ -985,59 +985,69 @@ BOOL Motor_is_calibrated(Motor* o) //
     return !(o->not_calibrated);
 }
 
+#if !defined(ERGOJOINT)
+
+CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk) //
+{
+    o->trq_ref = trq_ref;
+    o->trq_fbk = trq_fbk;
+    
+    o->trq_err = trq_ref - trq_fbk;
+    
+    return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_raw_fbk, o->trq_ref);
+}
+
+#else
+
 #define FABS(x) ((x)>ZERO?(x):(-x))
 #define FSGN(x) ((x)>ZERO ? 1.f : ((x)<ZERO? -1.f : ZERO))
 
 CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk) //
 {
+    trq_fbk = o->torque_model.rtY.Torque; // overwrites with torsion model output
+    
+    o->trq_fbk = trq_fbk;
+    
     o->trq_ref = trq_ref;
     
     o->trq_err = trq_ref - trq_fbk;
+          
+    trq_ref *= 1.0e-6f; // [uNm] -> [Nm]
+    trq_fbk *= 1.0e-6f; // [uNm] -> [Nm]
     
-    //float current = 0.001f*o->Iqq_fbk; // A
+    constexpr CTRL_UNITS ENC2RAD = 3.1415926f/32768.0f;
     
-    static const float ENC2RAD = 3.1415926f/32768.0f;
+    CTRL_UNITS omega = ENC2RAD*o->vel_fbk; // -> [rad/s]
     
-    float omega = ENC2RAD*o->vel_fbk; // rad/s
-      
-    trq_ref *= 1.0e-6f; // uNm -> Nm
+    CTRL_UNITS omega_sgn = FSGN(omega);
     
-    CTRL_UNITS Iout = ZERO;
+    CTRL_UNITS Ifriction = o->trq_ctrl.Ko*omega_sgn + o->trq_ctrl.Kw*omega;
     
-    CTRL_UNITS omega_sgn = ZERO;
+    LIMIT(Ifriction, o->trq_ctrl.Ifriction_max);
         
-    if (o->vel_fbk > 0) omega_sgn = +1.0f;
-    if (o->vel_fbk < 0) omega_sgn = -1.0f;
+    CTRL_UNITS Iquadratic = o->trq_ctrl.Kw2*omega*omega*omega_sgn;
     
-    //Iout = o->trqPID.Ko*omega_sgn + o->trqPID.Kp*omega; // + o->trqPID.Kff*trq_ref; // iKt*trq_ref    
+    LIMIT(Iquadratic, o->trq_ctrl.Iquadratic_max);
     
-    Iout = o->Io*omega_sgn + o->Kw*omega;
+    CTRL_UNITS Iff = o->trq_ctrl.Kff*trq_ref;
     
-    float Ivis = o->trqPID.Kp*omega*omega*omega_sgn;
+    LIMIT(Iff, o->trq_ctrl.Iff_max);
     
-    trq_fbk = o->torque_model.rtY.Torque;
+    CTRL_UNITS Iproportional = o->trq_ctrl.Kp*(trq_ref-trq_fbk);
     
-    float Itrq = 0.0f;
+    LIMIT(Iproportional, o->trq_ctrl.Iproportional_max);
+    LIMIT(Iproportional, Iff);
     
-    if (trq_fbk >  0.5f) Itrq += 0.001f*o->trqPID.Ko*o->Io;
-    if (trq_fbk < -0.5f) Itrq -= 0.001f*o->trqPID.Ko*o->Io;
+    CTRL_UNITS Iout = Ifriction + Iquadratic + Iff + Iproportional;
     
-    Itrq += 0.001f*o->trqPID.Kff*trq_fbk;
+    LIMIT(Iout, o->trq_ctrl.Iout_max);
     
-    float Itrqvis = Itrq+Ivis;
-    
-    LIMIT(Itrqvis, 0.001f*o->trqPID.Imax);
-    
-    Iout += Itrqvis;
-    
-    Iout *= 1000.0f;
-    
-    LIMIT(Iout,o->trqPID.out_max);
+    Iout *= 1000.0f; // [mA]
     
     return Iout;
-    
-    //return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_raw_fbk, o->trq_ref);
 }
+
+#endif
 
 void Motor_update_state_fbk(Motor* o, void* state) //
 {
@@ -1679,11 +1689,25 @@ static void torque_calib_init(Motor* o)
     if (o->ID==0)
     { 
         #ifdef NEW_JOINT
-        o->Io = 0.8f; // A
-        o->Kw = 1.8f;   // A/(rad/s)
+        
+        CTRL_UNITS omega_max = 2.0f; // [rad/s]
+        
+        o->trq_ctrl.Ko = 0.8f; // Static friction coefficient  [A]
+        o->trq_ctrl.Kw = 1.8f; // Viscous friction coefficient [A/(rad/s)]
+        o->trq_ctrl.Ifriction_max = o->trq_ctrl.Ko + o->trq_ctrl.Kw*omega_max; // Limits the two contributions above [A] 
     
-        o->Kt = 160.0*0.058f; // Nm/A
-        o->iKt = 1.f/o->Kt;      // A/Nm;
+        o->trq_ctrl.Kw2 = 0.0f; // Quadratic term for non linear characteristic [A/(rad/s)^2]
+                            // It can also be negative to prevent runaway.
+        o->trq_ctrl.Iquadratic_max = o->trq_ctrl.Kw2*omega_max*omega_max; // Limits the quadratic contribution above [A]
+    
+        o->trq_ctrl.Kff = 1/FABS((0.058f*o->GEARBOX*0.85f)); // Feed forward term, equal to 1/(torque constant * gearbox ratio * efficiency) [A/Nm]
+        o->trq_ctrl.Iff_max = o->trq_ctrl.Kff * 50.0f; // Limits the feed forward contribution above [A]
+    
+        o->trq_ctrl.Kp = 5.0f * o->trq_ctrl.Kff; // Proportional term [A/Nm]
+        o->trq_ctrl.Iproportional_max = o->trq_ctrl.Iff_max/10.0f; // Limits the proportional contribution above [A]
+    
+        o->trq_ctrl.Iout_max = 10.0f; // Limits the final output [A] 
+        
         
         o->torsion_offset = 0xf7f8;
         
@@ -1948,11 +1972,24 @@ static void torque_calib_init(Motor* o)
         #endif
         
         #ifdef OLD_JOINT
-        o->Io = 0.350f; // A
-        o->Kw = 0.9f;   // A/(rad/s)
+
+        CTRL_UNITS omega_max = 2.0f; // [rad/s]
+        
+        o->trq_ctrl.Ko = 0.350f; // Static friction coefficient  [A]
+        o->trq_ctrl.Kw = 0.9f; // Viscous friction coefficient [A/(rad/s)]
+        o->trq_ctrl.Ifriction_max = o->trq_ctrl.Ko + o->trq_ctrl.Kw*omega_max; // Limits the two contributions above [A] 
     
-        o->Kt = 160.0*0.058f; // Nm/A
-        o->iKt = 1.f/o->Kt;      // A/Nm;
+        o->trq_ctrl.Kw2 = 0.0f; // Quadratic term for non linear characteristic [A/(rad/s)^2]
+                            // It can also be negative to prevent runaway.
+        o->trq_ctrl.Iquadratic_max = o->trq_ctrl.Kw2*omega_max*omega_max; // Limits the quadratic contribution above [A]
+    
+        o->trq_ctrl.Kff = 1/FABS((0.058f*o->GEARBOX*0.85f)); // Feed forward term, equal to 1/(torque constant * gearbox ratio * efficiency) [A/Nm]
+        o->trq_ctrl.Iff_max = o->trq_ctrl.Kff * 50.0f; // Limits the feed forward contribution above [A]
+    
+        o->trq_ctrl.Kp = 5.0f * o->trq_ctrl.Kff; // Proportional term [A/Nm]
+        o->trq_ctrl.Iproportional_max = o->trq_ctrl.Iff_max/10.0f; // Limits the proportional contribution above [A]
+    
+        o->trq_ctrl.Iout_max = 10.0f; // Limits the final output [A] 
         
         o->torsion_offset = 0x4179;
         
