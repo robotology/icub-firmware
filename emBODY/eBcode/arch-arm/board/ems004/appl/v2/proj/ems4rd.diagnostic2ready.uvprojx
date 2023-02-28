@@ -1328,6 +1328,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>torque-model</GroupName>
+          <Files>
+            <File>
+              <FileName>TorqueModel.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\TorqueModel.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>TorqueModel_capi.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\TorqueModel_capi.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -2810,6 +2825,21 @@
               <FileName>kalman_filter_data.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\mbd\kalman_filter\kalman_filter_data.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>torque-model</GroupName>
+          <Files>
+            <File>
+              <FileName>TorqueModel.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\TorqueModel.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>TorqueModel_capi.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\TorqueModel_capi.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -4398,6 +4428,21 @@
               <FileName>kalman_filter_data.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\mbd\kalman_filter\kalman_filter_data.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>torque-model</GroupName>
+          <Files>
+            <File>
+              <FileName>TorqueModel.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\TorqueModel.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>TorqueModel_capi.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\TorqueModel_capi.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -6037,6 +6082,21 @@
               <FileName>kalman_filter_data.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\mbd\kalman_filter\kalman_filter_data.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>torque-model</GroupName>
+          <Files>
+            <File>
+              <FileName>TorqueModel.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\TorqueModel.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>TorqueModel_capi.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\TorqueModel_capi.cpp</FilePath>
             </File>
           </Files>
         </Group>
