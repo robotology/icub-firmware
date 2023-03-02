@@ -617,6 +617,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_velocity_pos:
     case eomc_controlmode_cmd_position:
     case eomc_controlmode_cmd_velocity:
+    case eomc_controlmode_cmd_direct:
     {        
         //if (o->external_fault) return FALSE;
                 
@@ -638,8 +639,8 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_openloop:
     case eomc_controlmode_cmd_current:    
     case eomc_controlmode_cmd_torque:
-    case eomc_controlmode_cmd_direct:
 #ifndef WRIST_MK2
+    case eomc_controlmode_cmd_direct:
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_velocity_pos:
     case eomc_controlmode_cmd_position:
@@ -1881,15 +1882,21 @@ BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel
 {
     if (o->is_parking) return FALSE;
     
-    if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
+    if ((o->control_mode != eomc_controlmode_direct) && (o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
     {
         return FALSE;
+    }
+    
+    if(eomc_controlmode_direct == o->control_mode)
+    {
+        Trajectory_set_pos_raw(&(o->ypr_trajectory[j]), pos_ref);
+        return TRUE;
     }
     
     if (vel_ref == 0.0f) return TRUE;
     
     Trajectory_set_pos_end(&(o->ypr_trajectory[j]), pos_ref, vel_ref);
-    
+
     return TRUE;
 }
 
