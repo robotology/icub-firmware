@@ -40,9 +40,9 @@ namespace embot { namespace app { namespace eth {
             Process::eApplication,
 #if defined(WRIST_MK2)
     #if defined(WRIST_MK2_RIGHT)
-            {4, 4},
+            {4, 5},
     #else
-            {3, 0},
+            {3, 5},
     #endif            
 #else            
             {103, 0},  

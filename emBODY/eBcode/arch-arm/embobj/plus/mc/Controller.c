@@ -2055,10 +2055,10 @@ void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms)
 
 BOOL MController_set_joint_pos_ref(int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
-#ifndef WRIST_MK2
+#if !defined(WRIST_MK2)
     return Joint_set_pos_ref(smc->joint+j, pos_ref, vel_ref);
 #else
-	return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, vel_ref);
+    return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, vel_ref);
 #endif
 }
 
@@ -2069,7 +2069,11 @@ BOOL MController_set_joint_vel_ref(int j, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref
 
 BOOL MController_set_joint_pos_raw(int j, CTRL_UNITS pos_ref)
 {
+#if !defined(WRIST_MK2)
     return Joint_set_pos_raw(smc->joint+j, pos_ref);
+#else
+    return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, 0.0f);
+#endif
 }
 
 BOOL MController_set_joint_vel_raw(int j, CTRL_UNITS vel_ref)
