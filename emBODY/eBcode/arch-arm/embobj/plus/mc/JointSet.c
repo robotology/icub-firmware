@@ -617,6 +617,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_velocity_pos:
     case eomc_controlmode_cmd_position:
     case eomc_controlmode_cmd_velocity:
+    case eomc_controlmode_cmd_direct: //////////////////////////// MOVED HERE
     {        
         //if (o->external_fault) return FALSE;
                 
@@ -638,12 +639,13 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_openloop:
     case eomc_controlmode_cmd_current:    
     case eomc_controlmode_cmd_torque:
-    case eomc_controlmode_cmd_direct:
+    //case eomc_controlmode_cmd_direct: ////////////////////////// REMOVED FROM HERE
 #ifndef WRIST_MK2
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_velocity_pos:
     case eomc_controlmode_cmd_position:
     case eomc_controlmode_cmd_velocity:
+    case eomc_controlmode_cmd_direct: //////////////////////////// MOVED HERE
 #endif
     case eomc_controlmode_cmd_vel_direct:
     {        
