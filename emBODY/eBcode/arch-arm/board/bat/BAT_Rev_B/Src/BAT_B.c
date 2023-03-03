@@ -46,7 +46,7 @@ uint8_t toggle_100ms = 0;
 
 uint16_t I_V12board_MAX      = 10000;    // threshold in mA
 uint16_t I_V12motor_MAX      = 10000;    // threshold in mA
-uint16_t I_HSM_MAX           = 40000;    // threshold in mA
+uint16_t I_HSM_MAX           = 36000;    // threshold in mA
 uint16_t timer_fault_board   = 0;
 uint16_t timer_fault_motors  = 0;
 uint16_t timer_fault_HSM     = 0;
