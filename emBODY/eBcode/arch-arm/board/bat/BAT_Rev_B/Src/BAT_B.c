@@ -10,7 +10,7 @@
 #include "BAT_B.h"
 
 char Firmware_vers = 1;
-char Revision_vers = 0;
+char Revision_vers = 1;
 char Build_number  = 0;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
