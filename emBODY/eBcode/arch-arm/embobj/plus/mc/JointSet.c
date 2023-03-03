@@ -1491,8 +1491,6 @@ static void JointSet_do_wait_calibration(JointSet* o)
     
     JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
 }
-bool isMais(void)
-{return false;}
 
 void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 {
@@ -1567,7 +1565,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             {
                 ////debug code
                 char info[50];
-                snprintf(info, 50, "error type6.current=%d",calibrator->params.type6.current);
+                snprintf(info, sizeof(info), "error type6.current=%d",calibrator->params.type6.current);
                 JointSet_send_debug_message(info, e, 0, 0);
                 ////debug code ended
                 return;
@@ -1575,7 +1573,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             ////debug code
             char info[50];
-            snprintf(info, 50, "vmax=%d,vim=%d",calibrator->params.type6.vmax, calibrator->params.type6.vmin);
+            snprintf(info, sizeof(info), "vmax=%d,vim=%d",calibrator->params.type6.vmax, calibrator->params.type6.vmin);
             JointSet_send_debug_message(info, e, 0, 0);
             ////debug code ended
                 
@@ -1606,7 +1604,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 {    
                     ////debug code
                     char info[70];
-                    snprintf(info, 70, "calib6: error updating Mais conversion factor j%d", e);
+                    snprintf(info, sizeof(info), "calib6: error updating Mais conversion factor j%d", e);
                     JointSet_send_debug_message(info, e, 0, 0);
                     ////debug code ended
                     return;
