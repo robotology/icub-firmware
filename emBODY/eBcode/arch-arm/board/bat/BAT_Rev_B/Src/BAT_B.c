@@ -10,7 +10,7 @@
 #include "BAT_B.h"
 
 char Firmware_vers = 1;
-char Revision_vers = 0;
+char Revision_vers = 1;
 char Build_number  = 0;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
@@ -44,9 +44,9 @@ uint32_t blink_ds=100;
 uint8_t toggle_1s = 0;
 uint8_t toggle_100ms = 0;
 
-uint16_t I_V12board_MAX      = 9000;     // threshold in mA
-uint16_t I_V12motor_MAX      = 6500;     // threshold in mA
-uint16_t I_HSM_MAX           = 20000;
+uint16_t I_V12board_MAX      = 10000;    // threshold in mA
+uint16_t I_V12motor_MAX      = 10000;    // threshold in mA
+uint16_t I_HSM_MAX           = 36000;    // threshold in mA
 uint16_t timer_fault_board   = 0;
 uint16_t timer_fault_motors  = 0;
 uint16_t timer_fault_HSM     = 0;
