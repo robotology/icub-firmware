@@ -18,15 +18,15 @@
 #include "motorhal_config.h"
 #endif
 
-#if defined(HALCONFIG_DONTUSE_FLASH)
+#if defined(MOTORHALCONFIG_DONTUSE_FLASH)
 
 MainConfTypeDef MainConf = {0};
 
 #else
-#endif // HALCONFIG_DONTUSE_FLASH
+#endif // MOTORHALCONFIG_DONTUSE_FLASH
 
 
-#if defined(HALCONFIG_REDEFINE_RTOS)
+#if defined(MOTORHALCONFIG_REDEFINE_RTOS)
 
 void taskENTER_CRITICAL(void)  {}
 void taskEXIT_CRITICAL(void) {}
@@ -37,7 +37,7 @@ void vTaskDelay(uint32_t ms)
 
 #endif
 
-#if defined(HALCONFIG_DONTUSE_LED) 
+#if defined(MOTORHALCONFIG_DONTUSE_LED) 
 
 void ledSet(uint32_t led, uint32_t v) {}
 
@@ -45,7 +45,7 @@ void ledSet(uint32_t led, uint32_t v) {}
 #endif
 
 
-#if defined(HALCONFIG_ADD_IRQHANDLERS)
+#if defined(MOTORHALCONFIG_ADD_IRQHANDLERS)
 
 #include "stm32hal.h"
 

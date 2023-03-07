@@ -5,8 +5,8 @@
  * email:   marco.accame@iit.it
 */
 
-#ifndef __HALCONFIG_H
-#define __HALCONFIG_H
+#ifndef MOTORHAL_CONFIG_H
+#define MOTORHAL_CONFIG_H
 
 #ifdef __cplusplus
     extern "C" {
@@ -17,23 +17,25 @@
 #define USE_STM32HAL
 #endif        
 
-#define HALCONFIG_DONTUSE_CONSOLE
-#define HALCONFIG_DONTUSE_FLASH
-#define HALCONFIG_DONTUSE_UTILITIES
-#define HALCONFIG_DONTUSE_LED
-#define HALCONFIG_DONTUSE_TESTS       
-#define HALCONFIG_ADD_IRQHANDLERS   
-#define HALCONFIG_REDEFINE_RTOS
+#define MOTORHALCONFIG_DONTUSE_CONSOLE
+#define MOTORHALCONFIG_DONTUSE_FLASH
+#define MOTORHALCONFIG_DONTUSE_UTILITIES
+#define MOTORHALCONFIG_DONTUSE_LED
+#define MOTORHALCONFIG_DONTUSE_TESTS       
+#define MOTORHALCONFIG_ADD_IRQHANDLERS   
+#define MOTORHALCONFIG_REDEFINE_RTOS
 
-#if defined(HALCONFIG_DONTUSE_FLASH)
+#define MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING
+
+#if defined(MOTORHALCONFIG_DONTUSE_FLASH)
         
 #include "pwm.h"
 #include "encoder.h"
 #include "analog.h"
 typedef struct
 {
-    pwmConfTypeDef pwm;
-    encoderConfTypeDef encoder;
+    pwm_ConfTypeDef pwm;
+    encoder_ConfTypeDef encoder;
     analogConfTypeDef analog;
 } MainConfTypeDef;
 
@@ -42,7 +44,7 @@ extern MainConfTypeDef MainConf;
 #endif     
 
 
-#if defined(HALCONFIG_DONTUSE_UTILITIES)
+#if defined(MOTORHALCONFIG_DONTUSE_UTILITIES)
 
 // Get the MSB of an integer. The compiler generates an immediate constant value when the argument is a constant
 // value known at compile time. Use macro msb(x) for not constant values
@@ -56,10 +58,10 @@ extern MainConfTypeDef MainConf;
 #define MSB$4(x)    (x&0x000000000000000CLL?(2+MSB$2(x>>2)):MSB$2(x))
 #define MSB$2(x)    (x&0x0000000000000002LL?1:0)
 
-#endif // HALCONFIG_DONTUSE_UTILITIES
+#endif // MOTORHALCONFIG_DONTUSE_UTILITIES
 
 
-#if defined(HALCONFIG_REDEFINE_RTOS)
+#if defined(MOTORHALCONFIG_REDEFINE_RTOS)
 
 void taskENTER_CRITICAL(void);
 void taskEXIT_CRITICAL(void);
@@ -67,7 +69,7 @@ void vTaskDelay(uint32_t ms);
 
 #endif
 
-#if defined(HALCONFIG_DONTUSE_LED) 
+#if defined(MOTORHALCONFIG_DONTUSE_LED) 
 
 enum { LED2 = 0 };
 void ledSet(uint32_t led, uint32_t v);
@@ -78,7 +80,7 @@ void ledSet(uint32_t led, uint32_t v);
     } /* extern "C" */
 #endif /* __cplusplus */
 
-#endif /* __HALCONFIG_H */
+#endif // MOTORHAL_CONFIG_H
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

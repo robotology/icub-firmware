@@ -31,10 +31,14 @@
 #endif
         
 /* Exported macro ----------------------------------------------------------------------------------------------------*/
-
+#if defined(MOTORHAL_changes)
+#define ANALOG_AVG_FILTER_SHIFT     (7)
+#define ANALOG_AVG_FILTER_LENGTH    (1U<<ANALOG_AVG_FILTER_SHIFT)        
+#else
 /* Used by the Moving Average Filter */
 #define ANALOG_AVG_FILTER_SHIFT     (10)
 #define ANALOG_AVG_FILTER_LENGTH    (1U<<ANALOG_AVG_FILTER_SHIFT)
+#endif
 
 
 /* Exported typedefs -------------------------------------------------------------------------------------------------*/
@@ -96,15 +100,18 @@ extern int32_t  analogSetOffsetIph2(int32_t offs);
 extern int32_t  analogGetOffsetIph3(void);
 extern int32_t  analogSetOffsetIph3(int32_t offs);
 
+extern void analogTest(void);
+
+
 #if defined(MOTORHAL_changes)
 
-extern HAL_StatusTypeDef analogDeinit(void);
-extern int16_t raw2mAmps(int16_t raw);
-extern void analog_MovingAverage(int16_t i1, int16_t i2, int16_t i3);
+extern HAL_StatusTypeDef analog_Deinit(void);
+extern int32_t analog_RawCph1(void);
+extern int32_t analog_RawCph2(void);
+extern int32_t analog_RawCph3(void);
+extern void analog_MovingAverage(int32_t i1, int32_t i2, int32_t i3);
 
-#endif
-
-extern void analogTest(void);
+#endif // #if defined(MOTORHAL_changes)
 
 #ifdef __cplusplus
     } /* extern "C" */

@@ -18,15 +18,15 @@
 #include "motorhal_config.h"
 #endif
 
-#if defined(HALCONFIG_DONTUSE_FLASH)
+#if defined(MOTORHALCONFIG_DONTUSE_FLASH)
 
 MainConfTypeDef MainConf = {0};
 
 #else
-#endif // HALCONFIG_DONTUSE_FLASH
+#endif // MOTORHALCONFIG_DONTUSE_FLASH
 
 
-#if defined(HALCONFIG_ADD_IRQHANDLERS)
+#if defined(MOTORHALCONFIG_ADD_IRQHANDLERS)
 
 #include "stm32hal.h"
 

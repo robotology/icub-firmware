@@ -29,7 +29,7 @@
 
 #include "pwm.h"
 
-#if !defined(HALCONFIG_DONTUSE_FLASH)
+#if !defined(MOTORHALCONFIG_DONTUSE_FLASH)
 #include "flash.h"
 #endif
 
@@ -161,11 +161,29 @@ static uint32_t k_vref = 4096 * VREFINT_NOM / mVolt;
 /* Measured VREF in mV. Equal to VCC */
 static uint16_t vref_mV = VREF_NOM / mVolt;
 
+#if defined(MOTORHAL_changes) && defined(MOTORHALCONFIG_DONTUSE_CURR_FILTERING)
+//#warning removed filters as each one uses 8+(4*ANALOG_AVG_FILTER_LENGTH) = 520 bytes of RAM (or 4104 if ANALOG_AVG_FILTER_LENGTH = 1024)
+#endif
 /* Average filters for current measurements */
 static analogAvgFilterTypeDef cinFilter;
 static analogAvgFilterTypeDef cph1Filter;
 static analogAvgFilterTypeDef cph2Filter;
 static analogAvgFilterTypeDef cph3Filter;
+
+
+
+#if defined(MOTORHAL_changes)
+
+// --------------------------------------------------------------------------------------------------------------------
+// add in here all the new types, variables, static function prototypes required by MOTORHAL
+// --------------------------------------------------------------------------------------------------------------------
+
+static volatile int32_t s_analog_rawCph1 = 0;
+static volatile int32_t s_analog_rawCph2 = 0;
+static volatile int32_t s_analog_rawCph3 = 0;
+static volatile int32_t s_analog_raw_cinput = 0;
+
+#endif // #if defined(MOTORHAL_changes)
 
 /* Public variables ***************************************************************************************************/
 
@@ -185,12 +203,6 @@ static int32_t analogMovingAverage(analogAvgFilterTypeDef *filter, int32_t sampl
     return filter->avg;
 }
 
-void analogMovingAverage(int16_t i1, int16_t i2, int16_t i3)
-{
-    analogMovingAverage(&cph1Filter, i1);
-    analogMovingAverage(&cph2Filter, i2);
-    analogMovingAverage(&cph3Filter, i3);
-}
 
 /* Callback functions *************************************************************************************************/
 
@@ -201,9 +213,18 @@ void analogMovingAverage(int16_t i1, int16_t i2, int16_t i3)
  */
 static void adc1_TransferComplete_cb(ADC_HandleTypeDef *hadc)
 {
+#if defined(MOTORHAL_changes)     
+	if (0 != adc1_Buffer.vref) vref_mV = (k_vref + (adc1_Buffer.vref>>1))/adc1_Buffer.vref;
+    else vref_mV = VREF_NOM / mVolt;
+    s_analog_raw_cinput = adc1_Buffer.cin;
+#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
+    analogMovingAverage(&cinFilter, adc1_Buffer.cin);
+#endif
+#else    
 	if (0 != adc1_Buffer.vref) vref_mV = (k_vref + (adc1_Buffer.vref>>1))/adc1_Buffer.vref;
     else vref_mV = VREF_NOM / mVolt;
     analogMovingAverage(&cinFilter, adc1_Buffer.cin);
+#endif
 }
 
 /*******************************************************************************************************************//**
@@ -213,10 +234,22 @@ static void adc1_TransferComplete_cb(ADC_HandleTypeDef *hadc)
  */
 static void adc2_HalfTransferComplete_cb(ADC_HandleTypeDef *hadc)
 {
+#if defined(MOTORHAL_changes) 
+    s_analog_rawCph1 = adc2_Buffer[0].cph1;
+    s_analog_rawCph2 = adc2_Buffer[0].cph2;
+    s_analog_rawCph3 = adc2_Buffer[0].cph3;
     pwmSetCurrents_cb(adc2_Buffer[0].cph1, adc2_Buffer[0].cph2, adc2_Buffer[0].cph3);
-    //analogMovingAverage(&cph1Filter, adc2_Buffer[0].cph1);
-    //analogMovingAverage(&cph2Filter, adc2_Buffer[0].cph2);
-    //analogMovingAverage(&cph3Filter, adc2_Buffer[0].cph3);
+#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
+    analogMovingAverage(&cph1Filter, s_analog_rawCph1);
+    analogMovingAverage(&cph2Filter, s_analog_rawCph2);
+    analogMovingAverage(&cph3Filter, s_analog_rawCph3);   
+#endif    
+#else
+    pwmSetCurrents_cb(adc2_Buffer[0].cph1, adc2_Buffer[0].cph2, adc2_Buffer[0].cph3);
+    analogMovingAverage(&cph1Filter, adc2_Buffer[0].cph1);
+    analogMovingAverage(&cph2Filter, adc2_Buffer[0].cph2);
+    analogMovingAverage(&cph3Filter, adc2_Buffer[0].cph3);
+#endif
 }
 
 /*******************************************************************************************************************//**
@@ -226,10 +259,22 @@ static void adc2_HalfTransferComplete_cb(ADC_HandleTypeDef *hadc)
  */
 static void adc2_TransferComplete_cb(ADC_HandleTypeDef *hadc)
 {
+#if defined(MOTORHAL_changes) 
+    s_analog_rawCph1 = adc2_Buffer[1].cph1;
+    s_analog_rawCph2 = adc2_Buffer[1].cph2;
+    s_analog_rawCph3 = adc2_Buffer[1].cph3;
+    pwmSetCurrents_cb(adc2_Buffer[0].cph1, adc2_Buffer[1].cph2, adc2_Buffer[1].cph3);
+#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
+    analogMovingAverage(&cph1Filter, s_analog_rawCph1);
+    analogMovingAverage(&cph2Filter, s_analog_rawCph2);
+    analogMovingAverage(&cph3Filter, s_analog_rawCph3);   
+#endif    
+#else
     pwmSetCurrents_cb(adc2_Buffer[1].cph1, adc2_Buffer[1].cph2, adc2_Buffer[1].cph3);
-    //analogMovingAverage(&cph1Filter, adc2_Buffer[1].cph1);
-    //analogMovingAverage(&cph2Filter, adc2_Buffer[1].cph2);
-    //analogMovingAverage(&cph3Filter, adc2_Buffer[1].cph3);
+    analogMovingAverage(&cph1Filter, adc2_Buffer[1].cph1);
+    analogMovingAverage(&cph2Filter, adc2_Buffer[1].cph2);
+    analogMovingAverage(&cph3Filter, adc2_Buffer[1].cph3);
+#endif
 }
 
 
@@ -305,8 +350,17 @@ uint32_t analogVph3(void)
  */
 int32_t analogCin(void)
 {
+#if defined(MOTORHAL_changes)
+#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)    
+    int32_t raw = cinFilter.avg >> ANALOG_AVG_FILTER_SHIFT; 
+#else
+    int32_t raw = s_analog_raw_cinput;
+#endif
+    return CIN_GAIN * vref_mV * raw >> 16u;    
+#else
     int32_t raw = cinFilter.avg >> ANALOG_AVG_FILTER_SHIFT;
 	return CIN_GAIN * vref_mV * raw >> 16u;
+#endif    
 }
 
 /*******************************************************************************************************************//**
@@ -316,9 +370,18 @@ int32_t analogCin(void)
  */
 int32_t analogCph1(void)
 {
-    //int32_t raw = cph1Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-	//return CIN_GAIN * vref_mV * raw >> 16u;
-    return cph1Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+#if defined(MOTORHAL_changes) 
+#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
+    int32_t raw = cph1Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+#else
+    int32_t raw = s_analog_rawCph1;  
+#endif    
+	return CIN_GAIN * vref_mV * raw >> 16u;    
+    // note that the above is: return analogConvertCurrent(analog_RawCph1());
+#else
+    int32_t raw = cph1Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+	return CIN_GAIN * vref_mV * raw >> 16u;
+#endif    
 }
 
 /*******************************************************************************************************************//**
@@ -328,14 +391,18 @@ int32_t analogCph1(void)
  */
 int32_t analogCph2(void)
 {
-    //int32_t raw = cph2Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-	//return CIN_GAIN * vref_mV * raw >> 16u;
-    return cph2Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-}
-
-int16_t raw2mAmps(int16_t raw)
-{
-    return CIN_GAIN * vref_mV * raw >> 16u;
+#if defined(MOTORHAL_changes) 
+#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
+    int32_t raw = cph2Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+#else
+    int32_t raw = s_analog_rawCph2;  
+#endif    
+	return CIN_GAIN * vref_mV * raw >> 16u;    
+    // note that the above is: return analogConvertCurrent(analog_RawCph2());
+#else    
+    int32_t raw = cph2Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+	return CIN_GAIN * vref_mV * raw >> 16u;
+#endif    
 }
 
 /*******************************************************************************************************************//**
@@ -345,10 +412,25 @@ int16_t raw2mAmps(int16_t raw)
  */
 int32_t analogCph3(void)
 {
-    //int32_t raw = cph3Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-	//return CIN_GAIN * vref_mV * raw >> 16u;
-    return cph3Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+#if defined(MOTORHAL_changes) 
+#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
+    int32_t raw = cph3Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+#else
+    int32_t raw = s_analog_rawCph3;  
+#endif    
+	return CIN_GAIN * vref_mV * raw >> 16u;    
+    // note that the above is: return analogConvertCurrent(analog_RawCph3());
+#else  
+    int32_t raw = cph3Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+	return CIN_GAIN * vref_mV * raw >> 16u;
+#endif    
 }
+
+#if defined(MOTORHAL_changes)
+#warning BEWARE: read the note
+// note: analogGetOffsetIin() etc will very likely treat raw values of current, not mA ...
+//       because they manage settings proper of the ADC w/out the conversion (CIN_GAIN * vref_mV * raw >> 16u)
+#endif
 
 /*******************************************************************************************************************//**
  * @brief   Read the offset value of the Iin sensor
@@ -443,9 +525,6 @@ int32_t analogSetOffsetIph3(int32_t offs)
  * @param   
  * @return  
  */
-
-#undef MainConf
-
 HAL_StatusTypeDef analogInit(void)
 {
 	HAL_StatusTypeDef result = HAL_ERROR;
@@ -493,8 +572,14 @@ HAL_StatusTypeDef analogInit(void)
 				__HAL_DMA_ENABLE_IT(hadc1.DMA_Handle, DMA_IT_TC);
 				__HAL_DMA_ENABLE_IT(hadc2.DMA_Handle, DMA_IT_TC);
 				/* Enable the ADC in DMA mode */
+#if defined(MOTORHAL_changes)
+                // applied proper cast + () around sizeof() to prevent errors and warnings
 				if ((HAL_OK == HAL_ADC_Start_DMA(&hadc1, (uint32_t *)&adc1_Buffer, sizeof(adc1_Buffer)/(sizeof(uint16_t)))) &&
 					(HAL_OK == HAL_ADC_Start_DMA(&hadc2, (uint32_t *)&adc2_Buffer, sizeof(adc2_Buffer)/(sizeof(uint16_t)))))
+#else				
+				if ((HAL_OK == HAL_ADC_Start_DMA(&hadc1, (void *)&adc1_Buffer, sizeof(adc1_Buffer)/sizeof(uint16_t))) &&
+					(HAL_OK == HAL_ADC_Start_DMA(&hadc2, (void *)&adc2_Buffer, sizeof(adc2_Buffer)/sizeof(uint16_t))))
+#endif
 				{
 					/* DMA is running now */
 					result = HAL_OK;
@@ -505,19 +590,10 @@ HAL_StatusTypeDef analogInit(void)
 	return result;
 }
 
-HAL_StatusTypeDef analogDeinit(void)
-{
-    /* Stop any ADC operation */
-    HAL_ADC_Stop_DMA(&hadc1);
-    HAL_ADC_Stop_DMA(&hadc2);
-    
-    /* uncalibrate ADCs */
-    MainConf.analog.cinOffs = 0;
-    
-    return HAL_OK;
-}
 
-#if defined(HALCONFIG_DONTUSE_TESTS)
+
+#if defined(MOTORHALCONFIG_DONTUSE_TESTS)
+void analogTest(void) {}
 #else
 
 /*******************************************************************************************************************//**
@@ -685,6 +761,68 @@ void analogTest(void)
     }
 }
 
-#endif // HALCONFIG_DONTUSE_TESTS
+#endif // MOTORHALCONFIG_DONTUSE_TESTS
+
+
+
+#if defined(MOTORHAL_changes)
+
+// --------------------------------------------------------------------------------------------------------------------
+// add in here all the new functions required by MOTORHAL
+// --------------------------------------------------------------------------------------------------------------------
+
+
+
+HAL_StatusTypeDef analog_Deinit(void)
+{
+    /* Stop any ADC operation */
+    HAL_ADC_Stop_DMA(&hadc1);
+    HAL_ADC_Stop_DMA(&hadc2);
+    
+    /* uncalibrate ADCs */
+    MainConf.analog.cinOffs = 0;
+    
+    return HAL_OK;
+}
+
+
+//void analog_GetRawCurrentPhases(int32_t *pi1, int32_t *pi2, int32_t *pi3)
+//{
+//    if((NULL != pi1) && (NULL != pi2) && (NULL != pi3))
+//    {
+//        *pi1 = cph1Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+//        *pi2 = cph2Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+//        *pi3 = cph3Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+//    }     
+//} 
+
+int32_t analog_RawCph1(void)
+{
+    return cph1Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+}
+
+int32_t analog_RawCph2(void)
+{
+    return cph2Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+}
+
+int32_t analog_RawCph3(void)
+{
+    return cph3Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
+}
+
+//int32_t analog_raw2mAmps(int32_t raw)
+//{
+//    return analogConvertCurrent(raw);
+//}
+
+void analog_MovingAverage(int32_t i1, int32_t i2, int32_t i3)
+{
+    analogMovingAverage(&cph1Filter, i1);
+    analogMovingAverage(&cph2Filter, i2);
+    analogMovingAverage(&cph3Filter, i3);
+}
+
+#endif // #if defined(MOTORHAL_changes)
 
 /* END OF FILE ********************************************************************************************************/

@@ -23,6 +23,7 @@
 
 #if defined(USE_STM32HAL)
 #include "stm32hal.h"
+#define MOTORHAL_changes
 #else 
 #include <stdarg.h>        
 #include "stm32g4xx.h"
@@ -50,7 +51,6 @@ typedef struct
 
 extern int32_t analogConvertCurrent(int32_t raw);
 extern HAL_StatusTypeDef analogInit(void);
-extern HAL_StatusTypeDef analogDeinit(void);
 extern uint32_t analogVcc(void);
 extern uint32_t analogVph1(void);
 extern uint32_t analogVph2(void);
@@ -69,10 +69,18 @@ extern int32_t  analogSetOffsetIph2(int32_t offs);
 extern int32_t  analogGetOffsetIph3(void);
 extern int32_t  analogSetOffsetIph3(int32_t offs);
 
-extern int16_t raw2mAmps(int16_t raw);
-extern void analogMovingAverage(int16_t i1, int16_t i2, int16_t i3);
-
 extern void analogTest(void);
+
+
+#if defined(MOTORHAL_changes)
+
+extern HAL_StatusTypeDef analog_Deinit(void);
+extern int32_t analog_RawCph1(void);
+extern int32_t analog_RawCph2(void);
+extern int32_t analog_RawCph3(void);
+extern void analog_MovingAverage(int32_t i1, int32_t i2, int32_t i3);
+
+#endif // #if defined(MOTORHAL_changes)
 
 #ifdef __cplusplus
     } /* extern "C" */

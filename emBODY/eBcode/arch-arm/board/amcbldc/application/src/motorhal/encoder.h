@@ -21,7 +21,8 @@
 #include <ctype.h>
         
 #if defined(USE_STM32HAL)
-#include "stm32hal.h"
+#include "stm32hal.h"       
+#define MOTORHAL_changes
 #else
 #include <stdarg.h>
 #include "stm32g4xx.h"
@@ -30,6 +31,8 @@
 
 /* Exported typedefs -------------------------------------------------------------------------------------------------*/
 
+#if defined(MOTORHAL_changes) 
+        
 typedef struct
 {
     uint16_t    mode;
@@ -37,7 +40,21 @@ typedef struct
     uint16_t    idxpos;
     int16_t     resolution;
     uint16_t    has_hall_sens;
+} encoder_ConfTypeDef;
+
+#else
+
+typedef struct
+{
+    uint16_t    mode;
+    uint16_t    filter;
+    uint16_t    idxpos;
+    uint16_t    nsteps;
 } encoderConfTypeDef;
+
+#endif
+
+
 
 
 /* Exported macro ----------------------------------------------------------------------------------------------------*/
@@ -45,17 +62,21 @@ typedef struct
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
 extern HAL_StatusTypeDef encoderInit(void);
-extern HAL_StatusTypeDef encoderDeinit(void);
-extern HAL_StatusTypeDef encoderConfig(uint8_t has_quad_enc, int16_t resolution, uint8_t num_polar_couples, uint8_t has_hall_sens);
-
 extern uint32_t encoderGetCounter(void);
-extern void encoderReset();
-
 extern uint16_t encoderGetElectricalAngle(void);
-extern void encoderForce(uint16_t value);
-extern void encoderCalibrate(uint16_t offset);
-extern uint16_t encoderGetElectricalOffset();
-extern uint16_t encoderGetUncalibrated(void);
+
+
+#if defined(MOTORHAL_changes)
+
+extern HAL_StatusTypeDef encoder_Deinit(void);
+extern HAL_StatusTypeDef encoder_Config(uint8_t has_quad_enc, int16_t resolution, uint8_t num_polar_couples, uint8_t has_hall_sens);
+extern void encoder_Reset();
+extern void encoder_Force(uint16_t value);
+extern void encoder_Calibrate(uint16_t offset);
+extern uint16_t encoder_GetElectricalOffset();
+extern uint16_t encoder_GetUncalibrated(void);
+
+#endif
 
 #ifdef __cplusplus
     } /* extern "C" */

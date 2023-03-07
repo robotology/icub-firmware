@@ -11,9 +11,16 @@
 // --------------------------------------------------------------------------------------------------------------------
 // config start
 
+constexpr uint8_t minor = 
+#if defined(STM32HAL_DRIVER_V120)
+    1;
+#else
+    2;
+#endif
+
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
-{ 
-    embot::prot::can::versionOfAPPLICATION {1, 0, 10},    
+{   
+    embot::prot::can::versionOfAPPLICATION {1, minor, 11},    
     embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 

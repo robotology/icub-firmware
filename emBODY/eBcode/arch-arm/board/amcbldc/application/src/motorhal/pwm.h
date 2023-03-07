@@ -22,7 +22,8 @@
 #include <ctype.h>
 
 #if defined(USE_STM32HAL)
-#include "stm32hal.h"
+#include "stm32hal.h"     
+#define MOTORHAL_changes
 #else 
 #include <stdarg.h>        
 #include "analog.h"
@@ -46,6 +47,8 @@
 
 /* Exported typedefs -------------------------------------------------------------------------------------------------*/
 
+#if defined(MOTORHAL_changes)
+
 typedef struct
 {
     uint32_t    mode;
@@ -53,7 +56,19 @@ typedef struct
     //uint16_t    sector_offset;
     uint8_t     num_polar_couples;
     uint8_t     swapBC;
+} pwm_ConfTypeDef;
+
+#else
+
+typedef struct
+{
+    uint32_t    mode;
+    uint32_t    poles;
 } pwmConfTypeDef;
+
+#endif
+
+#if defined(MOTORHAL_changes)
 
 // we keep int32_t even if the adc gets only int16_t values
 typedef struct
@@ -61,8 +76,9 @@ typedef struct
     int32_t     u;
     int32_t     v;
     int32_t     w;    
-} pwmCurrents_t;
+} pwm_Currents_t;
 
+#endif
 
 /* Exported variables ------------------------------------------------------------------------------------------------*/
 
@@ -71,15 +87,12 @@ typedef struct
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
 extern HAL_StatusTypeDef hallInit(void);
-HAL_StatusTypeDef hallDeinit(void);
-HAL_StatusTypeDef hallConfig(uint8_t swapBC, uint16_t pwm_hall_offset);
 extern int32_t hallGetCounter(void);
 extern void hallSetCounter(int32_t count);
 extern uint16_t hallGetAngle(void);
 extern uint16_t hallGetStatus(void);
 
 extern HAL_StatusTypeDef pwmInit(void);
-//extern HAL_StatusTypeDef pwmDeinit(void);
 extern void pwmSleep(FunctionalState enable);
 extern void pwmReset(FunctionalState enable);
 extern HAL_StatusTypeDef pwmResetFault(void);
@@ -88,10 +101,23 @@ extern void pwmSet(uint16_t u, uint16_t v, uint16_t w);
 extern void pwmPhaseEnable(uint16_t mask);
 extern void pwmPhaseDisable(uint16_t mask);
 
-extern HAL_StatusTypeDef pwmSetValue(int32_t pwm); /* DEPRECATED: it returns HAL_ERROR */
+// pwmSetCurrents_cb(): REWRITTEN by iCubTech 
+extern void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3);
+extern HAL_StatusTypeDef pwmSetValue(int32_t pwm); /* DEPRECATED */
 
 extern void pwmTest(void);
-//extern void setADC_cb(void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty);
+
+
+#if defined(MOTORHAL_changes)
+
+HAL_StatusTypeDef pwm_hallDeinit(void);
+HAL_StatusTypeDef pwm_hallConfig(uint8_t swapBC, uint16_t pwm_hall_offset);
+
+//extern HAL_StatusTypeDef pwm_Deinit(void);
+
+
+
+//extern void pwm_setADC_cb(void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty);
 
 // a function of this type is used by the ADC IRQ Handler to report the measured currents to higher levels
 // we need two param to to the job:
@@ -100,7 +126,7 @@ extern void pwmTest(void);
 // - currents: is a pointer to the three currents. the memory pointed by currents belongs to owner
 //   so that the caller of the callback will just copy the memory of the ADC (typically DMA memory)
 //   straigth away to destination to avoid corruptions. 
-typedef void (*pwm_fp_adc_callback_t) (void *owner, const pwmCurrents_t * const currents);
+typedef void (*pwm_fp_adc_callback_t) (void *owner, const pwm_Currents_t * const currents);
 
 
 typedef struct 
@@ -115,16 +141,20 @@ typedef struct
 // and in here is explained the mechanism of the ADC:
 // the ADC uses DMA to gets its values. the DMA peridically calls function pwmSetCurrents_cb() 
 // at half transfer and at end transfer. this function performs calibration if required, and
-// calls a user-defined function which we can set with set_ADC_callback() so that the values
+// calls a user-defined function which we can set with pwm_set_ADC_callback() so that the values
 // of currents can be used by other software modules.
 
-extern void set_ADC_callback(pwm_ADC_callback_t *cbk);
+extern void pwm_set_ADC_callback(pwm_ADC_callback_t *cbk);
 
 // this function must be used only inside the file analog.c ..... 
 // it is called at the completion of dma transfer (both half and full). then this function may call a user defined
-// callback spefified by set_ADC_callback().
+// callback spefified by pwm_set_ADC_callback().
 // to do: i may remove it from the public API to avoid confusion 
-extern void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3);
+// extern void pwmSetCurrents_cb(int16_t i1, int16_t i2, int16_t i3);
+
+#endif // #if defined(MOTORHAL_changes)
+
+
 
 
 #ifdef __cplusplus
