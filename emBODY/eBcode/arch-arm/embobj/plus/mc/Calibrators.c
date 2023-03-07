@@ -20,10 +20,14 @@
 #include "JointSet.h"
 #include "Joint_hid.h"
 #include "CalibrationHelperData.h"
+#include "EOtheMAIS.h"
+#include "EOthePOS.h"
 #include "hal_adc.h"
 
 #define CALIB_TYPE_6_POS_TRHESHOLD 730 //= 4 deg //1820 //2730 //546=3 degree //91.02f // = 0.5 degree
 #define CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD 14563 //= 80 deg express in icubDeg
+#define ROTOR_LIMIT_DELTA (159.0f/360.0f)*65536.0f  // small amount of iCubdegree on the rotor to be slightly distant from hard-stop
+
 BOOL JointSet_do_wait_calibration_3(JointSet* o)
 {
     BOOL calibrated = TRUE;
@@ -60,7 +64,7 @@ static BOOL JointSet_calibType6_check_reached_pos(Joint *j)
 {
 //    char info[70];
 
-    CTRL_UNITS delta = j->running_calibration.data.type6.targetpos - j->pos_fbk;
+      CTRL_UNITS delta = j->running_calibration.data.type6.targetpos - j->pos_fbk;
     
 //    ///// debug code
 //    int32_t t_ref_pos = Trajectory_get_pos_ref(&j->trajectory);
@@ -89,15 +93,26 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
     
     //get the encoder of joint to calibrate
     AbsEncoder* e_ptr = o->absEncoder+ o->encoders_of_set[indexSet];
+	  
     
     jointCalibType6Data *jCalib6Data_ptr = &(j_ptr->running_calibration.data.type6);
+	
     
     switch(jCalib6Data_ptr->state)
     {
         case calibtype6_st_jntEncResComputed:
         {
+            
             AbsEncoder_calibrate_absolute(e_ptr, 0, jCalib6Data_ptr->computedZero);
+            
+            // debug code
+            char info[80];
+            snprintf(info, sizeof(info), "AbsEnc calib: mcp:%d cz:%d co:%d eps:%d", m_ptr->pos_fbk, m_ptr->hardstop_calibdata.zero, m_ptr->pos_calib_offset, e_ptr->position_sure);
+            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+            // debug code ended
+            
             jCalib6Data_ptr->state = calibtype6_st_absEncoderCalibrated;
+            
         }
         break;
         
@@ -106,24 +121,29 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
             //the limit range is very big. this check should save us from wrong calib params.
             int32_t curr_pos = AbsEncoder_position(e_ptr);
+					
+            // debug code
+            char info[80];
+            snprintf(info, sizeof(info), "Encoder pos:%d and zero:%d", curr_pos, e_ptr->zero);
+            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+            // debug code ended
 
             if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
             {
                 
                 jCalib6Data_ptr->is_active = FALSE;
-                char info[80];
+                memset(&info[0], 0, sizeof(info));
                 snprintf(info, sizeof(info), "calib 6:outLim: cp:%d mx:%.1f mn:%.1f", curr_pos, j_ptr->pos_max, j_ptr->pos_min);
                 JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
 
                 return(eores_NOK_generic);
             }
-            
             for (int k=0; k<*(o->pN); ++k)
             {
                 int m = o->motors_of_set[k];
                 int j = o->joints_of_set[k];
-                Motor_motion_reset(o->motor+ m);
-                Joint_motion_reset(o->joint+ j);
+                Motor_motion_reset(o->motor+ m);  // reset PID
+                Joint_motion_reset(o->joint+ j);  // reset PID and errors
                 //Motor_set_run(o->motor+ m, PWM_INPUT_MOTOR); 
                 Motor_set_run(o->motor+ m, eomc_ctrl_out_type_pwm); //clear ext fault bit if it is not pressed
             }
@@ -138,16 +158,10 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             m_ptr->pos_min = 0;
             m_ptr->pos_max = 0;
             
-//            /////Debug code
-//            char info[80];
-//            sprintf(info,"calib 6: changed rlim of m %d", m_ptr->ID);
-//            JointSet_send_debug_message(info, j_ptr->ID);
-//            //////ended
-            
             BOOL ret = Joint_set_pos_ref_in_calibType6(j_ptr, jCalib6Data_ptr->targetpos, jCalib6Data_ptr->velocity);
             if(!ret)
             {
-                char info[50];
+                memset(&info[0], 0, sizeof(info));
                 snprintf(info, sizeof(info),"error in Joint_set_pos_ref_in_calibType6");
                 JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
                 //restore rotor limits
@@ -157,12 +171,12 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 return(eores_NOK_generic);
             }
             
-//            ///// debug code
-//            char info[70];
-//            snprintf(info, 70, "init traj: cpos=%.2f target=%.2f lim%.2f %.2f", j_ptr->pos_fbk, j_ptr->calib_type6_data.targetpos, j_ptr->pos_max, j_ptr->pos_min);
-//            send_debug_message(info, j_ptr->ID);
-//            //// debug code ended
-            
+            // debug code
+            memset(&info[0], 0, sizeof(info));
+            snprintf(info, sizeof(info), "init traj: cpos=%.2f target=%.2f lim:%.2f %.2f", j_ptr->pos_fbk, j_ptr->running_calibration.data.type6.targetpos, j_ptr->pos_max, j_ptr->pos_min);
+            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+            // debug code ended
+
             jCalib6Data_ptr->state = calibtype6_st_trajectoryStarted;
         }    
         break;
@@ -175,8 +189,6 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             if(JointSet_calibType6_check_reached_pos(j_ptr))
             {
                 jCalib6Data_ptr->state = calibtype6_st_finished;
-                jCalib6Data_ptr->is_active = FALSE;
-                *calibrationCompleted = TRUE;
                 
                 Motor* m_ptr = o->motor + o->motors_of_set[indexSet];
                 m_ptr->pos_calib_offset = m_ptr->pos_fbk;
@@ -185,15 +197,14 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 m_ptr->pos_fbk_old = 0;
                 m_ptr->not_init = TRUE;
                 
-                /////Debug code
-                char message[150];
-                snprintf(message, sizeof(message), "c6M:pos reached: cp=%d co=%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
-                JointSet_send_debug_message(message, m_ptr->ID, 0, 0);
+                //Debug code
+                char info[80];
+                snprintf(info, sizeof(info), "c6M:pos reached: cp=%d co=%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
+                JointSet_send_debug_message(info, m_ptr->ID, 0, 0);
+                //ended
                 
                 m_ptr->not_calibrated = FALSE;
                 
-                
-               
                 for (int k=0; k<*(o->pN); ++k)
                 {
                     int m = o->motors_of_set[k];
@@ -205,31 +216,35 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 //restore rotor limits
                 m_ptr->pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
                 m_ptr->pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
-                /////Debug code 
-                char info[80];
-                snprintf(info, sizeof(info), "m_min=%d m_max=%d", m_ptr->pos_min, m_ptr->pos_max );
+                
+                //Debug code 
+                memset(&info[0], 0, sizeof(info));
+                snprintf(info, sizeof(info), "Mtr limits: m_min=%d m_max=%d", m_ptr->pos_min, m_ptr->pos_max );
                 JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-                ////ended
+                //ended
             }
                 
         }
         break;
-        
         case calibtype6_st_finished:
         {
+            //set status to complete calibration
+            jCalib6Data_ptr->is_active = FALSE;
             *calibrationCompleted = TRUE;
+            
+            //Debug code 
             char info[80];
-            snprintf(info, sizeof(info), "calib Completed" );
+            snprintf(info, sizeof(info), "Calib Completed" );
             JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+            //ended
+            
         }break;
         
         default:
             return(eores_NOK_generic);
 
     }
-
     return(eores_OK);
-
 }
 
 
@@ -356,7 +371,7 @@ BOOL JointSet_do_wait_calibration_mixed(JointSet* o)
             Joint_reset_calibration_data(j_ptr);
         }
         //Debug code
-        char message[150];
+        char message[180];
         snprintf(message, sizeof(message), "JointSet_do_wait_calibration_mixed: calib completed.");
         JointSet_send_debug_message(message, 0, 0, 0);
     
@@ -691,6 +706,198 @@ BOOL JointSet_do_wait_calibration_13(JointSet* o)
         }
     }
     
+    return calibrated;
+}
+
+BOOL JointSet_do_wait_calibration_14(JointSet* o)
+{
+    BOOL calibrated = FALSE;
+    JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff);
+    char info[90] = {};
+    
+    for (int k=0; k<*(o->pN); ++k)
+    {
+        //set pointers to data
+        Joint* j_ptr = o->joint+o->joints_of_set[k];
+        Motor* m_ptr = o->motor+o->motors_of_set[k];
+        AbsEncoder* e_ptr = o->absEncoder+o->encoders_of_set[k];
+        jointCalibType14Data* jcalibdata_ptr = &(j_ptr->running_calibration.data.type14);
+        
+        switch(jcalibdata_ptr->state)
+        {
+            case calibtype14_st_hardLimitSet:
+            {
+                if(!Motor_is_calibrated(m_ptr))
+                {
+                    Motor_do_calibration_hard_stop(m_ptr);
+                }
+                else
+                {
+                    // debug code
+                    memset(&info[0], 0, sizeof(info));
+                    snprintf(info, sizeof(info), "Hw lim reached: mcp:%d cz:%d co:%d eps:%d", m_ptr->pos_fbk, m_ptr->hardstop_calibdata.zero, m_ptr->pos_calib_offset, e_ptr->position_sure);
+                    JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+                    // debug code ended
+                    
+                    AbsEncoder_calibrate_absolute(e_ptr, 0, jcalibdata_ptr->computedZero);
+                    
+                    jcalibdata_ptr->state = calibtype14_st_absEncoderCalibrated;
+                }
+            }
+            break;
+            
+            case calibtype14_st_absEncoderCalibrated:
+            {
+                //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
+                //the limit range is very big. this check should save us from wrong calib params.
+                int32_t curr_pos = AbsEncoder_position(e_ptr);
+                        
+                // debug code
+                memset(&info[0], 0, sizeof(info));
+                snprintf(info, sizeof(info), "Encoder pos:%d and zero:%d", curr_pos, e_ptr->zero);
+                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+                // debug code ended
+                
+                if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
+                {
+                    jcalibdata_ptr->is_active = FALSE;
+                    memset(&info[0], 0, sizeof(info));
+                    snprintf(info, sizeof(info), "calib 6:outLim: cp:%d mx:%.1f mn:%.1f", curr_pos, j_ptr->pos_max, j_ptr->pos_min);
+                    JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+                    return FALSE;
+                }
+                
+                // reset motor and joint -> should this be done or should we trust hard limit reaching
+                Motor_motion_reset(m_ptr);  // reset PID
+                Joint_motion_reset(j_ptr);  // reset PID and errors
+                Motor_set_run(m_ptr, eomc_ctrl_out_type_pwm); //clear ext fault bit if it is not pressed
+                
+                if(j_ptr->control_mode == eomc_controlmode_hwFault)
+                {
+                    return FALSE;
+                }
+                // change rotorLimit --> now only for debugging reasons
+                int32_t rotor_span = abs(m_ptr->pos_max - m_ptr->pos_min);  //max span of the rotor according to mechanical data and passed by the user with configuration
+                if (m_ptr->pos_calib_offset < 0) 
+                {
+                    j_ptr->running_calibration.data.type14.rotorposmin = 0 + ROTOR_LIMIT_DELTA;
+                    j_ptr->running_calibration.data.type14.rotorposmax = rotor_span - ROTOR_LIMIT_DELTA;
+                }
+                else
+                {
+                    j_ptr->running_calibration.data.type14.rotorposmin = -rotor_span + ROTOR_LIMIT_DELTA;
+                    j_ptr->running_calibration.data.type14.rotorposmax = 0 - ROTOR_LIMIT_DELTA;
+                }
+                
+                
+                //Debug code
+                memset(&info[0], 0, sizeof(info));
+                snprintf(info, sizeof(info), "rlim from mn:%d, mx:%d to rn:%d, rx:%d", m_ptr->pos_min, m_ptr->pos_max, j_ptr->running_calibration.data.type14.rotorposmin, j_ptr->running_calibration.data.type6.rotorposmax);
+                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+                //ended
+                
+                // reset rotor limits 
+//                j_ptr->running_calibration.data.type14.rotorposmin = m_ptr->pos_min;
+//                j_ptr->running_calibration.data.type14.rotorposmax = m_ptr->pos_max;
+                // set motor pos max and min to zero thus to move full traj in calibration
+                m_ptr->pos_min = 0;
+                m_ptr->pos_max = 0;
+                
+                // Set reference position
+                BOOL ret = Joint_set_pos_ref_in_calibType14(j_ptr, jcalibdata_ptr->targetPos, jcalibdata_ptr->velocity);
+                if(!ret)
+                {
+                    memset(&info[0], 0, sizeof(info));
+                    snprintf(info, sizeof(info),"error in Joint_set_pos_ref");
+                    JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+        
+                    return FALSE;
+                }
+                
+                // debug code
+                memset(&info[0], 0, sizeof(info));
+                snprintf(info, sizeof(info), "init traj: cpos=%.2f target=%.2f ln:%.2f lx:%.2f", j_ptr->pos_fbk, j_ptr->running_calibration.data.type14.targetPos, j_ptr->pos_max, j_ptr->pos_min);
+                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+                // debug code ended
+
+                jcalibdata_ptr->state = calibtype14_st_trajectoryStarted;
+            }
+            break;
+            
+            case calibtype14_st_trajectoryStarted:
+            {
+                JointSet_do_pwm_control(o);
+                
+                CTRL_UNITS delta = j_ptr->running_calibration.data.type14.targetPos - j_ptr->pos_fbk;
+                
+                if( (delta>CALIB_TYPE_6_POS_TRHESHOLD ) || (delta<-CALIB_TYPE_6_POS_TRHESHOLD ) )
+                    return FALSE;
+                else
+                {
+                    jcalibdata_ptr->state = calibtype14_st_finished;
+                    Motor* m_ptr = o->motor + o->motors_of_set[k];
+                    
+//                    DO NOT RESET LIMIT BUT JUST PRINT FOR DEBUG IF OK
+//                    m_ptr->pos_calib_offset = m_ptr->pos_fbk;
+//                    //reset value of position
+//                    m_ptr->pos_fbk = m_ptr->pos_fbk - m_ptr->pos_calib_offset;
+//                    m_ptr->pos_fbk_old = 0;
+//                    m_ptr->not_init = TRUE;
+                    
+                    //Debug code
+                    memset(&info[0], 0, sizeof(info));
+                    snprintf(info, sizeof(info), "c14M:pos reached: cp=%d co=%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
+                    JointSet_send_debug_message(info, m_ptr->ID, 0, 0);
+                    //ended
+                    
+                    m_ptr->not_calibrated = FALSE;
+                    
+                    for (int k=0; k<*(o->pN); ++k)
+                    {
+                        int m = o->motors_of_set[k];
+                        int j = o->joints_of_set[k];
+                        Motor_motion_reset(o->motor+ m);
+                        Joint_motion_reset(o->joint+ j);
+                        Motor_set_idle(o->motor+ m);
+                    }
+                    
+                    // Reset limits
+                    m_ptr->pos_min = j_ptr->running_calibration.data.type14.rotorposmin;
+                    m_ptr->pos_max = j_ptr->running_calibration.data.type14.rotorposmax;
+                    
+//                    // Set new "correct" limnits
+//                    m_ptr->pos_min = 0;
+//                    m_ptr->pos_max = (m_ptr->pos_fbk) + ROTOR_LIMIT_DELTA;
+                    
+                    //Debug code 
+                    memset(&info[0], 0, sizeof(info));
+                    snprintf(info, sizeof(info), "New Mtr limits: m_min=%d m_max=%d", m_ptr->pos_min, m_ptr->pos_max );
+                    JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+                    //ended
+                }
+            }
+            break;
+            
+            case calibtype14_st_finished:
+            {
+                //set status to complete calibration
+                jcalibdata_ptr->is_active = FALSE;
+                calibrated = TRUE;
+                
+                //Debug code 
+                char info[80];
+                snprintf(info, sizeof(info), "Calib Completed" );
+                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+                //ended
+                
+            }
+            break;
+            
+            default:
+                return FALSE;
+        }// end switch
+        
+    }
     return calibrated;
 }
 

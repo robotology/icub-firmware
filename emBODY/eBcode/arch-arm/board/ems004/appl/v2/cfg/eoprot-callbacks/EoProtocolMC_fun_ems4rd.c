@@ -1016,11 +1016,11 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                   
                    if (calibrator->params.type6.current==1)
                    {
-                       iCubCanProtCalibrator.params.type6.position= calibrator->params.type6.vmax;
+                       iCubCanProtCalibrator.params.type6.position = calibrator->params.type6.vmax;
                    }
                    else if (calibrator->params.type6.current==-1)
                    {
-                       iCubCanProtCalibrator.params.type6.position= calibrator->params.type6.vmin;
+                       iCubCanProtCalibrator.params.type6.position = calibrator->params.type6.vmin;
                    }
                    else
                    {

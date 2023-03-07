@@ -28,6 +28,7 @@
 #include "EOtheEntities.h"
 
 static void Joint_set_inner_control_flags(Joint* o);
+static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 
 Joint* Joint_new(uint8_t n)
 {
@@ -1004,10 +1005,8 @@ static BOOL Joint_set_pos_ref_core(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_
 
 BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
-    if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
-    {
+    if((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
         return FALSE;
-    }
     
     if (o->pos_min != o->pos_max) LIMIT2(o->pos_min, pos_ref, o->pos_max);
     
@@ -1033,12 +1032,27 @@ BOOL Joint_set_pos_raw(Joint* o, CTRL_UNITS pos_ref)
 
 BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
-    CTRL_UNITS pos_ref_limited = pos_ref;
-    
     if( (o->control_mode != eomc_controlmode_calib) || (o->running_calibration.type != eomc_calibration_type6_mais) || (o->running_calibration.data.type6.is_active == FALSE) )
     {
         return FALSE;
     }
+    
+   return(Joint_set_pos_ref_in_calib(o, pos_ref, vel_ref));
+}
+
+BOOL Joint_set_pos_ref_in_calibType14(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
+{
+    if( (o->control_mode != eomc_controlmode_calib) || (o->running_calibration.type != eomc_calibration_type14_qenc_hard_stop_and_fap) || (o->running_calibration.data.type14.is_active == FALSE) )
+    {
+        return FALSE;
+    }
+    
+    return(Joint_set_pos_ref_in_calib(o, pos_ref, vel_ref));
+}
+
+static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
+{
+    CTRL_UNITS pos_ref_limited = pos_ref;
     
     if(pos_ref > o->pos_max)
     {
