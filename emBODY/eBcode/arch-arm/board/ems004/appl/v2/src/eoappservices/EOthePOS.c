@@ -144,6 +144,11 @@
     {
         return eores_NOK_generic;
     }
+		
+    extern eObool_t eo_pos_isAlive(EOthePOS *p)
+    {
+            return eobool_false;
+    }
 
 
 #elif !defined(EOTHESERVICES_disable_thePOS)
