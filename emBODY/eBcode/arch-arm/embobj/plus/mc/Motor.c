@@ -963,14 +963,14 @@ BOOL Motor_is_calibrated(Motor* o) //
     return !(o->not_calibrated);
 }
 
-CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk) //
+CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk, CTRL_UNITS motor_vel_icubdeg_sec) //
 {
     o->trq_ref = trq_ref;
     o->trq_fbk = trq_fbk;
     
     o->trq_err = trq_ref - trq_fbk;
     
-    return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_raw_fbk, o->trq_ref);
+    return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, motor_vel_icubdeg_sec, o->trq_ref);
 }
 
 void Motor_update_state_fbk(Motor* o, void* state) //

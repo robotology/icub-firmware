@@ -15,9 +15,21 @@
  * MERCHANTABILITY or  FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License foFITNESSr more details
 */
+#include "EOtheErrorManager.h"
+#include "EoError.h"
+static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+{
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = jid;
+    errdes.par16            = par16;
+    errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+    //eo_errman_Info(eo_errman_GetHandle(), message, "", &errdes);
+}
 
 #include "Pid.h"
-
 PID* PID_new(uint8_t n)
 {
     PID *o = NEW(PID, n);
@@ -90,10 +102,11 @@ void PID_config_friction(PID *o, float Kbemf, float Ktau, eOmc_FrictionParams_t 
 {
     o->Kbemf = Kbemf;
     o->Ktau  = Ktau;
+    // Printa ktau
     o->viscous_pos_val = friction.viscous_pos_val;
     o->viscous_neg_val = friction.viscous_neg_val;
     o->coulomb_pos_val = friction.coulomb_pos_val;
-    o->coulomb_neg_val = friction.coulomb_neg_val;
+    o->coulomb_neg_val = friction.coulomb_neg_val;    
 }
 
 void PID_config_filter(PID *o, uint8_t filter)
@@ -179,14 +192,40 @@ float PID_do_out(PID* o, float En)
     return o->out_lpf;
 }
 
-#include "EOtheErrorManager.h"
+#define MICRO 1000000.0
 
 float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
 {
 #ifdef USE_VISCOUS_COULOMB 
-    //return o->Ktau*(o->coulomb_pos_val + o->viscous_pos_val*vel_fbk + o->Kff*trq_ref);
-    return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
+    // A threshold is necessary to handle velocities close to zero and higher velocities.
+    // When the velocity is close to zero the model used for friction compensation is cubic
+    // (this avoids discontinuous control for low velocities).
+    // In fact, when the velocity is close to zero, it can continuosly switch from positive to negative values due 
+    // to the effects of noise. As a result, the friction torque also switches from negative values to 
+    // positive values if a threshold is not used.
+    
+    float ret_value = 0;
+    
+    float coulomb_pos_converted = o->coulomb_pos_val * MICRO;
+    float coulomb_neg_converted = o->coulomb_neg_val * MICRO;
+    
+    float threshold = 182.044 * 150; // vel_motor is 150 deg/sec converted in icubdeg/sec
+    
+    if (vel_fbk < -threshold)
+    {
+        ret_value = o->Ktau*(-coulomb_neg_converted + o->viscous_neg_val*vel_fbk + o->Kff*trq_ref);
+    }
+    else if (vel_fbk > threshold)
+    {
+        ret_value = o->Ktau*(coulomb_pos_converted + o->viscous_pos_val*vel_fbk + o->Kff*trq_ref);
+    }
+    else
+    {
+        ret_value = o->Ktau*(o->Kff*trq_ref);
+    }
+    
+    return ret_value;
 #else
     return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
-#endif // USE_VISCOUS_COULOMB
+#endif
 }
