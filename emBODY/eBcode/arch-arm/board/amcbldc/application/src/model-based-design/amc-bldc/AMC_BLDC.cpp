@@ -9,7 +9,7 @@
 //
 // Model version                  : 5.1
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Thu Feb 23 16:33:28 2023
+// C/C++ source code generated on : Mon Mar 13 14:26:47 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -232,7 +232,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
     AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_i[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_bw];
 
   // ModelReference: '<Root>/FOC' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element5'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   control_foc(&AMC_BLDC_U.SensorsData_p, &rtb_BusConversion_InsertedFor_F,
@@ -274,7 +274,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   // End of RateTransition generated from: '<Root>/Adapter1'
 
   // RateTransition generated from: '<Root>/Adapter3' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element5'
 
   rtw_mutex_lock();
   wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g + 1);
@@ -394,27 +394,6 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   filter_current(&rtb_BusConversion_InsertedFor_F,
                  &AMC_BLDC_Y.EstimatedData_p.Iq_filtered);
 
-  // RateTransition generated from: '<Root>/Adapter2' incorporates:
-  //   Outport generated from: '<Root>/Out Bus Element2'
-
-  rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Insert_b2 + 1);
-  if (wrBufIdx == 3) {
-    wrBufIdx = 0;
-  }
-
-  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_ko) {
-    wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
-    if (wrBufIdx == 3) {
-      wrBufIdx = 0;
-    }
-  }
-
-  rtw_mutex_unlock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_k[wrBufIdx] =
-    AMC_BLDC_Y.EstimatedData_p;
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_b2 = wrBufIdx;
-
   // ModelReference: '<S6>/CAN_Decoder' incorporates:
   //   Inport generated from: '<Root>/In Bus Element2'
 
@@ -431,9 +410,9 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   SupervisorFSM_RX(&AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
                    &AMC_BLDC_U.ExternalFlags_p,
                    &AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a,
-                   &AMC_BLDC_B.CAN_Decoder_o1, &AMC_BLDC_B.CAN_Decoder_o2,
-                   &AMC_BLDC_B.CAN_Decoder_o3, &AMC_BLDC_Y.Flags_p,
-                   &rtb_SupervisorFSM_RX_o2,
+                   &AMC_BLDC_B.CAN_Decoder_o1, &AMC_BLDC_Y.EstimatedData_p,
+                   &AMC_BLDC_B.CAN_Decoder_o2, &AMC_BLDC_B.CAN_Decoder_o3,
+                   &AMC_BLDC_Y.Flags_p, &rtb_SupervisorFSM_RX_o2,
                    &AMC_BLDC_Y.ConfigurationParameters_p);
 
   // ModelReference: '<S7>/SupervisorFSM_TX' incorporates:
@@ -540,6 +519,27 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
     rtb_SupervisorFSM_RX_o2;
   AMC_BLDC_DW.RTBInsertedForAdapter_Insert_jj = wrBufIdx;
 
+  // RateTransition generated from: '<Root>/Adapter2' incorporates:
+  //   Outport generated from: '<Root>/Out Bus Element2'
+
+  rtw_mutex_lock();
+  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Insert_b2 + 1);
+  if (wrBufIdx == 3) {
+    wrBufIdx = 0;
+  }
+
+  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_ko) {
+    wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+  }
+
+  rtw_mutex_unlock();
+  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_k[wrBufIdx] =
+    AMC_BLDC_Y.EstimatedData_p;
+  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_b2 = wrBufIdx;
+
   // Update for UnitDelay generated from: '<Root>/Adapter4' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element3'
 
@@ -602,7 +602,7 @@ void AMC_BLDC_initialize(void)
   filter_current_Init();
 
   // SystemInitialize for ModelReference: '<Root>/FOC' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element5'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   control_foc_Init();
