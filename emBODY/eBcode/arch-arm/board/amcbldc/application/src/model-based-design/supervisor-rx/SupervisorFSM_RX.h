@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 5.7
+// Model version                  : 5.9
 // Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Thu Feb 23 16:32:14 2023
+// C/C++ source code generated on : Mon Mar 13 14:25:55 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -121,10 +121,10 @@ extern void SupervisorFSM_RX_Init(Flags *rty_Flags, ConfigurationParameters
   *rty_ConfigurationParameters);
 extern void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const
   ExternalFlags *rtu_ExternalFlags, const ControlOutputs *rtu_ControlOutputs,
-  const BUS_MESSAGES_RX_MULTIPLE *rtu_MessagesRx, const BUS_STATUS_RX_MULTIPLE
-  *rtu_StatusRx, const BUS_CAN_RX_ERRORS_MULTIPLE *rtu_ErrorsRx, Flags
-  *rty_Flags, Targets *rty_Targets, ConfigurationParameters
-  *rty_ConfigurationParameters);
+  const BUS_MESSAGES_RX_MULTIPLE *rtu_MessagesRx, const EstimatedData
+  *rtu_EstimatedData, const BUS_STATUS_RX_MULTIPLE *rtu_StatusRx, const
+  BUS_CAN_RX_ERRORS_MULTIPLE *rtu_ErrorsRx, Flags *rty_Flags, Targets
+  *rty_Targets, ConfigurationParameters *rty_ConfigurationParameters);
 
 // Model reference registration function
 extern void SupervisorFSM_RX_initialize(const char_T **rt_errorStatus);
