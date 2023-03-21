@@ -198,7 +198,7 @@ static void alerteventbasedthreadusb(void *arg);
 		static void alerteventbasedthreadusb(void *arg)
     {
 				embot::hw::usb::Message msg;
-        std::uint8_t remainingINrx = 0;
+        std::uint8_t remainingINrx = 2;
         if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
         {
 					int i;
@@ -206,11 +206,14 @@ static void alerteventbasedthreadusb(void *arg);
 
 				}
 				//					embot::core::wait(300* embot::core::time1millisec);
-//				if(embot::hw::resOK == embot::hw::usb::transmitimmediately(embot::hw::usb::Port::one, msg))
-//        {
-//					int i;
-//					i++;
-//				}		
+				msg.data[0] = 'z';
+				msg.data[1] = 'z';
+				
+				if(embot::hw::resOK == embot::hw::usb::transmitimmediately(embot::hw::usb::Port::one, msg))
+        {
+					int i;
+					i++;
+				}		
     }
 
     static void eventhread_init(embot::os::Thread *t, void *p)
