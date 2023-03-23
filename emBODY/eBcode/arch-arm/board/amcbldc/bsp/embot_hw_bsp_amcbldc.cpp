@@ -881,7 +881,7 @@ void verify_flash_bank()
     if(expectedbanks != detectedbanks)
     {
         embot::core::print("number of banks is not as expected: detected " + std::to_string(detectedbanks));
-        embot::core::print("cannot continue");
+        embot::core::print("cannot continue. program Option bytes / User Configuration / DBANK to be 1 or 2 banks");
         
         leds_init_off();
         for(;;)
