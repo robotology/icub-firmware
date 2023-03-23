@@ -751,11 +751,11 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
         (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_mtb4c) | (1 << eobrd_cantype_strain2c),  // temperature
         (1 << eobrd_cantype_mtb),                                                                                               // inertial
         (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_rfe) | (1 << eobrd_cantype_mtb4c) | (1 << eobrd_cantype_strain2c), // inertial3
-        (1 << eobrd_cantype_psc),                                                                                           // psc
-        (1 << eobrd_cantype_mtb4fap) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_psc) | (1 << eobrd_cantype_mtb4c) | (1 << eobrd_cantype_mtb4),    // pos
-        (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_strain2c),                         // ft
-        (1 << eobrd_cantype_bms),                                                                                           // bs
-        (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc) | (1 << eobrd_cantype_mtb4c)        // skin
+        (1 << eobrd_cantype_psc),                                                                                               // psc
+        (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_psc) | (1 << eobrd_cantype_mtb4c) | (1 << eobrd_cantype_mtb4),           // pos
+        (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_strain2c),                             // ft
+        (1 << eobrd_cantype_bms),                                                                                               // bs
+        (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc) | (1 << eobrd_cantype_mtb4c)            // skin
     }; EO_VERIFYsizeof(tableB, sizeof(const uint32_t)*(eocanmap_entities_maxnumberof))
     
     // it is safe to use brd because it is can hence it is < 32

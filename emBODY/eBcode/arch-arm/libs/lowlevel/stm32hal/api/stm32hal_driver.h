@@ -188,14 +188,6 @@ extern "C" {
         #define STM32HAL_DRIVER_VERSION 0x190   
     #endif
 
-#elif   defined(STM32HAL_BOARD_MTB4FAP)
-
-    // one drive only: v1D3.
-    #if !defined(STM32HAL_DRIVER_V1D3)
-        #define STM32HAL_DRIVER_V1D3
-    #endif        
-    #define STM32HAL_DRIVER_VERSION 0x1D3
-
 #elif   defined(STM32HAL_BOARD_STRAIN2C)
 
     // one drive only: v1B0

@@ -24,9 +24,12 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #if defined(USE_EMBOT_theServices) 
-#warning removed some code
+#warning USE_EMBOT_theServices is defined: removed some code
+// marco.accame: use objects embot::app::eth::theEncoderReader and ... future ones
 #else
 #include "EOappEncodersReader.h"
+#include "EOtheMAIS.h"
+#include "EOthePOS.h"
 #endif
 #include "EOtheEntities.h"
 
@@ -35,8 +38,6 @@
 #include "AbsEncoder.h"
 #include "Pid.h"
 
-#include "EOtheMAIS.h"
-#include "EOthePOS.h"
 
 #include "JointSet.h"
 

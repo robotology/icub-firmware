@@ -486,7 +486,6 @@ extern void stm32hal_board_init(void);
     #endif
     
 #elif   defined(STM32HAL_BOARD_MTB4C)
-
     
     #if (STM32HAL_DRIVER_VERSION == 0x172)
         
@@ -528,31 +527,8 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for mtb4c
     #endif
-#elif   defined(STM32HAL_BOARD_MTB4FAP)
-
-    
-    #if(STM32HAL_DRIVER_VERSION == 0x1D3)
-
-        #include "../src/config/stm32hal_driver_cfg_of_mtb4fap_v1D3.h"
-
-        #include "../src/board/mtb4fap/V1D3/inc/can.h"
-        #include "../src/board/mtb4fap/V1D3/inc/dma.h"
-        #include "../src/board/mtb4fap/V1D3/inc/gpio.h"
-        #include "../src/board/mtb4fap/V1D3/inc/i2c.h"
-        #include "../src/board/mtb4fap/V1D3/inc/rng.h"
-        #include "../src/board/mtb4fap/V1D3/inc/main.h"
-        #include "../src/board/mtb4fap/V1D3/inc/tim.h"
-        #include "../src/board/mtb4fap/V1D3/inc/usart.h"
-
-        #include "../src/board/mtb4fap/V1D3/inc/stm32l4xx_it.h"
-
-
-    #else
-        #error unsupported driver version for mtb4fap
-    #endif
 
 #elif   defined(STM32HAL_BOARD_STRAIN2C)	
-
     
     #if(STM32HAL_DRIVER_VERSION == 0x1B0)
 
