@@ -40,7 +40,13 @@ extern "C" {
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
+#if defined(USE_EMBOT_theServices)  
+//#include "embot_app_eth_Service.h"
+#error USE_EMBOT_theServices is defined: dont use me
+#else
 #include "EOtheServices.h"
+#endif
+
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
