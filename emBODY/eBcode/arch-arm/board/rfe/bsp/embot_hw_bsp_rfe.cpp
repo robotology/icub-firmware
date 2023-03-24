@@ -586,16 +586,18 @@ namespace embot { namespace hw { namespace i2c {
     #if   defined(STM32HAL_BOARD_RFE)
     
     constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::fast400 };
+    constexpr PROP i2c2p { &hi2c2, embot::hw::i2c::Speed::fast400 };
+
     //constexpr PROP i2c2p { .handle = &hi2c2 }; 
         
     constexpr BSP thebsp {        
         // maskofsupported
-        //mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two),   
-        mask::pos2mask<uint32_t>(I2C::one),         
+        mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two),   
+        //mask::pos2mask<uint32_t>(I2C::one),         
         // properties
         {{
-//            &i2c1p, &i2c2p, nullptr             
-            &i2c1p, nullptr, nullptr
+            &i2c1p, &i2c2p, nullptr             
+//            &i2c1p, nullptr, nullptr
         }}        
     }; 
 

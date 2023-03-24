@@ -198,17 +198,20 @@ static void alerteventbasedthreadusb(void *arg);
 		static void alerteventbasedthreadusb(void *arg)
     {
 				embot::hw::usb::Message msg;
-        std::uint8_t remainingINrx = 2;
+			
+        std::uint8_t remainingINrx = 0;
         if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
         {
 					int i;
 					i++;
 
 				}
-				//					embot::core::wait(300* embot::core::time1millisec);
-				msg.data[0] = 'z';
-				msg.data[1] = 'z';
-				
+			
+				msg.data[0] = ' ';
+				msg.data[1] = ' ';
+				msg.data[2] = 'O';
+				msg.data[3] = 'K';
+
 				if(embot::hw::resOK == embot::hw::usb::transmitimmediately(embot::hw::usb::Port::one, msg))
         {
 					int i;
@@ -284,13 +287,8 @@ static void alerteventbasedthreadusb(void *arg);
 			msg.data[2] = 'a';
 			msg.data[3] = 'o';
 			
-      std::uint8_t remainingINrx = 0;
-			
-			if(embot::hw::resOK == embot::hw::usb::transmitimmediately(embot::hw::usb::Port::one, msg))
-        {
-					int i;
-					i++;
-				}			 
+			embot::hw::usb::transmitimmediately(embot::hw::usb::Port::one, msg);
+      			 
 		}
 		
 		constexpr embot::hw::BNO055 imu = embot::hw::BNO055::one;
@@ -306,9 +304,9 @@ static void alerteventbasedthreadusb(void *arg);
 				init = true;
 			}
 
-			embot::hw::bno055::get(imu, info, 1000);
+			embot::hw::bno055::get(imu, info, 100*embot::core::time1millisec);
 
-			canframe.id = 0x551;         ;
+			canframe.id = 0x551;
 			canframe.size = 8;
 			canframe.data[0] = info.chipID;
 			
@@ -339,6 +337,7 @@ static void alerteventbasedthreadusb(void *arg);
 			embot::hw::gpio::Pull::nopull,
 			embot::hw::gpio::Speed::high
 		};		
+		
 		constexpr embot::hw::GPIO GPA0 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::zero};
 		constexpr embot::hw::GPIO GPA5 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five};
 		constexpr embot::hw::GPIO GPA15 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::fifteen};
@@ -353,32 +352,39 @@ static void alerteventbasedthreadusb(void *arg);
 		static void test_MPU9250(){
 			embot::hw::can::Frame canframe;
 			static bool init = false;
-			
+   		uint16_t res = 0xAA;
+
 			if(!init) {
-				initGPIO(GPA15, out, embot::hw::gpio::State::SET); 
+				initGPIO(GPA15, out, embot::hw::gpio::State::RESET); 
 				embot::hw::i2c::init(i2c2, i2cconfig);
 				init = true;
 			}
 
-			bool res = embot::hw::i2c::ping(i2c2, 0x69, 1000);
+			if(!embot::hw::i2c::ping(i2c2, 0x68, 100*embot::core::time1millisec)) res = 0xBB;
+			
+			canframe.id = 0x551;         ;
+			canframe.size = 8;
+			canframe.data[0] = res;
 			
 			embot::hw::can::put(embot::hw::CAN::one, {canframe.id, canframe.size, canframe.data});   
 			embot::hw::can::transmit(embot::hw::CAN::one);		
 				
 		}
 		
-		static void test_J2(){
+		static void test_conn_servo(){
 			embot::hw::can::Frame canframe;
-			static bool init = false;
 			uint16_t res = 0xAA;
 			
-			if(!init) {
-				initGPIO(GPA0, out, embot::hw::gpio::State::SET); 
-				initGPIO(GPA5, input,  embot::hw::gpio::State::SET); 	
-			}
-
+			initGPIO(GPA0, out, embot::hw::gpio::State::SET); 
+			initGPIO(GPA5, input,  embot::hw::gpio::State::SET);
+			
 			if(embot::hw::gpio::get(GPA5) !=  embot::hw::gpio::State::SET) res = 0xBB; 
-				
+			
+			initGPIO(GPA0, out, embot::hw::gpio::State::RESET); 
+			initGPIO(GPA5, input,  embot::hw::gpio::State::RESET);
+			
+			if(embot::hw::gpio::get(GPA5) !=  embot::hw::gpio::State::RESET) res = 0xBB; 
+			
 			canframe.id = 0x551;         ;
 			canframe.size = 8;
 			canframe.data[0] = res;
@@ -392,7 +398,7 @@ static void alerteventbasedthreadusb(void *arg);
 			embot::hw::can::Frame canframe;
 			static bool init = false;
 			uint16_t res = 0xAA;
-			uint16_t FAP = 0x00; // TO BE CHECKED!!!!!!!!!!!!!!!!!
+			uint16_t FAP = 0xbc; // TO BE CHECKED!!!!!!!!!!!!!!!!!
 			
 			if(!init) {
 				initGPIO(GPB1, input,  embot::hw::gpio::State::SET); 	
@@ -401,9 +407,9 @@ static void alerteventbasedthreadusb(void *arg);
 			}
 
 			if(embot::hw::gpio::get(GPB1) !=  embot::hw::gpio::State::SET) res = 0xBB; 
-			if(!embot::hw::i2c::ping(i2c2, FAP, 1000)) res = 0xBB;
+			if(!embot::hw::i2c::ping(i2c, 0xbc, 100*embot::core::time1millisec)) res = 0xBB;
 			
-			canframe.id = 0x551;         ;
+			canframe.id = 0x551;  
 			canframe.size = 8;
 			canframe.data[0] = res;
 			
@@ -465,7 +471,7 @@ static void alerteventbasedthreadusb(void *arg);
 						//Test led blue on
 						case 0x03 :  embot::core::wait(300* embot::core::time1millisec); test_Leds(1); break;
 
-						//Test led blue on
+						//Test serial
 						case 0x04 :  embot::core::wait(300* embot::core::time1millisec); test_Usb(); break;
 
 						//Test IMU Bosch BNO055
@@ -475,19 +481,19 @@ static void alerteventbasedthreadusb(void *arg);
 						case 0x06 :  embot::core::wait(300* embot::core::time1millisec); test_MPU9250(); break;						
 
 						//Test Connector J2 (servo motor)
-						case 0x07 :  embot::core::wait(300* embot::core::time1millisec); test_J2(); break;								
+						case 0x07 :  embot::core::wait(300* embot::core::time1millisec); test_conn_servo(); break;								
 
 						//Test Connector J10 (i2c1 + imu_sync sig.) attaching a FAP and pulling up the IMU_SYNC sig. w/ a 10k resistor
 						case 0x08 :  embot::core::wait(300* embot::core::time1millisec); test_conn_i2c(i2c1); break;
 
 						//Test Connector J11 (i2c2 + imu_sync sig.) attaching a FAP and pulling up the IMU_SYNC sig. w/ a 10k resistor
-						case 0x09 :  embot::core::wait(300* embot::core::time1millisec); test_conn_i2c(i2c1); break;
+						case 0x09 :  embot::core::wait(300* embot::core::time1millisec); test_conn_i2c(i2c2); break;
 
 						//Test Connector J12 (i2c3 + imu_sync sig.) attaching a FAP and pulling up the IMU_SYNC sig. w/ a 10k resistor
-						case 0x0A :  embot::core::wait(300* embot::core::time1millisec); test_conn_i2c(i2c1); break;
+						case 0x0A :  embot::core::wait(300* embot::core::time1millisec); test_conn_i2c(i2c3); break;
 						
 						//Test Connector J13 (i2c4 + imu_sync sig.) attaching a FAP and pulling up the IMU_SYNC sig. w/ a 10k resistor
-						case 0x0B :  embot::core::wait(300* embot::core::time1millisec); test_conn_i2c(i2c1); break;
+						case 0x0B :  embot::core::wait(300* embot::core::time1millisec); test_conn_i2c(i2c4); break;
 						
 						//Test Connector J1 (spi1) using a rfe_mouth board i.e.
 						case 0x0C :  embot::core::wait(300* embot::core::time1millisec); test_conn_spi(spi1); break;
