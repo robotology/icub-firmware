@@ -30,6 +30,8 @@
 #include "embot_hw_gpio.h"
 #include "embot_hw_spi.h"
 
+#include "embot_hw_types.h"
+#include <vector>
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -353,16 +355,22 @@ static void alerteventbasedthreadusb(void *arg);
 			embot::hw::can::Frame canframe;
 			static bool init = false;
    		uint16_t res = 0xAA;
-
-			if(!init) {
-				initGPIO(GPA15, out, embot::hw::gpio::State::RESET); 
+			bool b;
+			
+			if(!embot::hw::i2c::initialised(i2c2)) {
+				initGPIO(GPA15, out, embot::hw::gpio::State::SET); 
 				embot::hw::i2c::init(i2c2, i2cconfig);
 				init = true;
 			}
 
-			if(!embot::hw::i2c::ping(i2c2, 0x68, 100*embot::core::time1millisec)) res = 0xBB;
-			
-			canframe.id = 0x551;         ;
+  		embot::core::wait(300* embot::core::time1millisec);
+      
+			if(!embot::hw::i2c::ping(i2c2, 0xD2, 100*embot::core::time1millisec)) res = 0xBB;
+//			std::vector<embot::hw::i2c::ADR> addresses;    
+//			b = embot::hw::i2c::discover(i2c2, addresses);
+//			int i = addresses.size();
+
+			canframe.id = 0x551;         
 			canframe.size = 8;
 			canframe.data[0] = res;
 			
@@ -396,16 +404,16 @@ static void alerteventbasedthreadusb(void *arg);
 
 		static void test_conn_i2c(embot::hw::I2C i2c){
 			embot::hw::can::Frame canframe;
-			static bool init = false;
 			uint16_t res = 0xAA;
 			uint16_t FAP = 0xbc; // TO BE CHECKED!!!!!!!!!!!!!!!!!
 			
-			if(!init) {
+			if(!embot::hw::i2c::initialised(i2c)) {
 				initGPIO(GPB1, input,  embot::hw::gpio::State::SET); 	
 				embot::hw::i2c::init(i2c, i2cconfig);
-				init = true;
 			}
 
+			embot::core::wait(300* embot::core::time1millisec);
+			
 			if(embot::hw::gpio::get(GPB1) !=  embot::hw::gpio::State::SET) res = 0xBB; 
 			if(!embot::hw::i2c::ping(i2c, 0xbc, 100*embot::core::time1millisec)) res = 0xBB;
 			
@@ -420,17 +428,15 @@ static void alerteventbasedthreadusb(void *arg);
 		
 		static void test_conn_spi(embot::hw::SPI spi){
 			embot::hw::can::Frame canframe;
-			static bool init = false;
 			uint16_t res = 0xAA;
 		
 			
-			if(!init) {
-				embot::hw::spi::init(spi, spiconfig);
-				init = true;
+			if(!embot::hw::spi::initialised(spi)) {
+				embot::hw::spi::init(spi1, spiconfig);
 			}
 
 			//TBD w/ the external board (i.e. mouth rfe)!
-			
+
 			canframe.id = 0x551;         ;
 			canframe.size = 8;
 			canframe.data[0] = res;
