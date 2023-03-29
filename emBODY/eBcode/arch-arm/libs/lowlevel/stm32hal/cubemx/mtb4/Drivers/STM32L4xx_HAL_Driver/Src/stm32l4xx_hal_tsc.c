@@ -10,6 +10,17 @@
   *           + Read acquisition result
   *           + Interrupts and flags management
   *
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
   @verbatim
 ================================================================================
                        ##### TSC specific features #####
@@ -79,45 +90,53 @@
      *** Callback registration ***
      =============================================
 
+  [..]
      The compilation flag USE_HAL_TSC_REGISTER_CALLBACKS when set to 1
      allows the user to configure dynamically the driver callbacks.
-     Use Functions @ref HAL_TSC_RegisterCallback() to register an interrupt callback.
+     Use Functions HAL_TSC_RegisterCallback() to register an interrupt callback.
 
-     Function @ref HAL_TSC_RegisterCallback() allows to register following callbacks:
+  [..]
+     Function HAL_TSC_RegisterCallback() allows to register following callbacks:
        (+) ConvCpltCallback   : callback for conversion complete process.
        (+) ErrorCallback      : callback for error detection.
        (+) MspInitCallback    : callback for Msp Init.
        (+) MspDeInitCallback  : callback for Msp DeInit.
+  [..]
      This function takes as parameters the HAL peripheral handle, the Callback ID
      and a pointer to the user callback function.
 
-     Use function @ref HAL_TSC_UnRegisterCallback to reset a callback to the default
+  [..]
+     Use function HAL_TSC_UnRegisterCallback to reset a callback to the default
      weak function.
-     @ref HAL_TSC_UnRegisterCallback takes as parameters the HAL peripheral handle,
+     HAL_TSC_UnRegisterCallback takes as parameters the HAL peripheral handle,
      and the Callback ID.
+  [..]
      This function allows to reset following callbacks:
        (+) ConvCpltCallback   : callback for conversion complete process.
        (+) ErrorCallback      : callback for error detection.
        (+) MspInitCallback    : callback for Msp Init.
        (+) MspDeInitCallback  : callback for Msp DeInit.
 
-     By default, after the @ref HAL_TSC_Init() and when the state is @ref HAL_TSC_STATE_RESET
+  [..]
+     By default, after the HAL_TSC_Init() and when the state is HAL_TSC_STATE_RESET
      all callbacks are set to the corresponding weak functions:
-     examples @ref HAL_TSC_ConvCpltCallback(), @ref HAL_TSC_ErrorCallback().
+     examples HAL_TSC_ConvCpltCallback(), HAL_TSC_ErrorCallback().
      Exception done for MspInit and MspDeInit functions that are
-     reset to the legacy weak functions in the @ref HAL_TSC_Init()/ @ref HAL_TSC_DeInit() only when
+     reset to the legacy weak functions in the HAL_TSC_Init()/ HAL_TSC_DeInit() only when
      these callbacks are null (not registered beforehand).
-     If MspInit or MspDeInit are not null, the @ref HAL_TSC_Init()/ @ref HAL_TSC_DeInit()
+     If MspInit or MspDeInit are not null, the HAL_TSC_Init()/ HAL_TSC_DeInit()
      keep and use the user MspInit/MspDeInit callbacks (registered beforehand) whatever the state.
 
-     Callbacks can be registered/unregistered in @ref HAL_TSC_STATE_READY state only.
+  [..]
+     Callbacks can be registered/unregistered in HAL_TSC_STATE_READY state only.
      Exception done MspInit/MspDeInit functions that can be registered/unregistered
-     in @ref HAL_TSC_STATE_READY or @ref HAL_TSC_STATE_RESET state,
+     in HAL_TSC_STATE_READY or HAL_TSC_STATE_RESET state,
      thus registered (user) MspInit/DeInit callbacks can be used during the Init/DeInit.
      Then, the user first registers the MspInit/MspDeInit user callbacks
-     using @ref HAL_TSC_RegisterCallback() before calling @ref HAL_TSC_DeInit()
-     or @ref HAL_TSC_Init() function.
+     using HAL_TSC_RegisterCallback() before calling HAL_TSC_DeInit()
+     or HAL_TSC_Init() function.
 
+  [..]
      When the compilation flag USE_HAL_TSC_REGISTER_CALLBACKS is set to 0 or
      not defined, the callback registration feature is not available and all callbacks
      are set to the corresponding weak functions.
@@ -173,34 +192,7 @@
     |   PD2 (AF)   |                 |
     +--------------------------------+
 
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
-  *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
-  ******************************************************************************
+
   */
 
 /* Includes ------------------------------------------------------------------*/
@@ -226,13 +218,13 @@ static uint32_t TSC_extract_groups(uint32_t iomask);
 
 /* Exported functions --------------------------------------------------------*/
 
-/** @defgroup TSC_Exported_Functions Exported Functions
+/** @defgroup TSC_Exported_Functions TSC Exported Functions
   * @{
   */
 
 /** @defgroup TSC_Exported_Functions_Group1 Initialization and de-initialization functions
- *  @brief    Initialization and Configuration functions
- *
+  *  @brief    Initialization and Configuration functions
+  *
 @verbatim
  ===============================================================================
               ##### Initialization and de-initialization functions #####
@@ -266,6 +258,7 @@ HAL_StatusTypeDef HAL_TSC_Init(TSC_HandleTypeDef *htsc)
   assert_param(IS_TSC_SSD(htsc->Init.SpreadSpectrumDeviation));
   assert_param(IS_TSC_SS_PRESC(htsc->Init.SpreadSpectrumPrescaler));
   assert_param(IS_TSC_PG_PRESC(htsc->Init.PulseGeneratorPrescaler));
+  assert_param(IS_TSC_PG_PRESC_VS_CTPL(htsc->Init.PulseGeneratorPrescaler, htsc->Init.CTPulseLowLength));
   assert_param(IS_TSC_MCV(htsc->Init.MaxCountValue));
   assert_param(IS_TSC_IODEF(htsc->Init.IODefaultMode));
   assert_param(IS_TSC_SYNC_POL(htsc->Init.SynchroPinPolarity));
@@ -310,7 +303,7 @@ HAL_StatusTypeDef HAL_TSC_Init(TSC_HandleTypeDef *htsc)
   /* Set all functions */
   htsc->Instance->CR |= (htsc->Init.CTPulseHighLength |
                          htsc->Init.CTPulseLowLength |
-                         (uint32_t)(htsc->Init.SpreadSpectrumDeviation << TSC_CR_SSD_Pos) |
+                         (htsc->Init.SpreadSpectrumDeviation << TSC_CR_SSD_Pos) |
                          htsc->Init.SpreadSpectrumPrescaler |
                          htsc->Init.PulseGeneratorPrescaler |
                          htsc->Init.MaxCountValue |
@@ -318,13 +311,13 @@ HAL_StatusTypeDef HAL_TSC_Init(TSC_HandleTypeDef *htsc)
                          htsc->Init.AcquisitionMode);
 
   /* Spread spectrum */
-  if ((FunctionalState)htsc->Init.SpreadSpectrum == ENABLE)
+  if (htsc->Init.SpreadSpectrum == ENABLE)
   {
     htsc->Instance->CR |= TSC_CR_SSE;
   }
 
   /* Disable Schmitt trigger hysteresis on all used TSC IOs */
-  htsc->Instance->IOHCR = (uint32_t)(~(htsc->Init.ChannelIOs | htsc->Init.ShieldIOs | htsc->Init.SamplingIOs));
+  htsc->Instance->IOHCR = (~(htsc->Init.ChannelIOs | htsc->Init.ShieldIOs | htsc->Init.SamplingIOs));
 
   /* Set channel and shield IOs */
   htsc->Instance->IOCCR = (htsc->Init.ChannelIOs | htsc->Init.ShieldIOs);
@@ -336,7 +329,7 @@ HAL_StatusTypeDef HAL_TSC_Init(TSC_HandleTypeDef *htsc)
   htsc->Instance->IOGCSR = TSC_extract_groups(htsc->Init.ChannelIOs);
 
   /* Disable interrupts */
-  htsc->Instance->IER &= (uint32_t)(~(TSC_IT_EOA | TSC_IT_MCE));
+  htsc->Instance->IER &= (~(TSC_IT_EOA | TSC_IT_MCE));
 
   /* Clear flags */
   htsc->Instance->ICR = (TSC_FLAG_EOA | TSC_FLAG_MCE);
@@ -439,7 +432,8 @@ __weak void HAL_TSC_MspDeInit(TSC_HandleTypeDef *htsc)
   * @param  pCallback pointer to the Callback function
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_TSC_RegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_CallbackIDTypeDef CallbackID, pTSC_CallbackTypeDef pCallback)
+HAL_StatusTypeDef HAL_TSC_RegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_CallbackIDTypeDef CallbackID,
+                                           pTSC_CallbackTypeDef pCallback)
 {
   HAL_StatusTypeDef status = HAL_OK;
 
@@ -609,8 +603,8 @@ HAL_StatusTypeDef HAL_TSC_UnRegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_Ca
   */
 
 /** @defgroup TSC_Exported_Functions_Group2 Input and Output operation functions
- *  @brief    Input and Output operation functions
- *
+  *  @brief    Input and Output operation functions
+  *
 @verbatim
  ===============================================================================
              ##### IO Operation functions #####
@@ -692,7 +686,7 @@ HAL_StatusTypeDef HAL_TSC_Start_IT(TSC_HandleTypeDef *htsc)
   __HAL_TSC_ENABLE_IT(htsc, TSC_IT_EOA);
 
   /* Enable max count error interrupt (optional) */
-  if ((FunctionalState)htsc->Init.MaxCountInterrupt == ENABLE)
+  if (htsc->Init.MaxCountInterrupt == ENABLE)
   {
     __HAL_TSC_ENABLE_IT(htsc, TSC_IT_MCE);
   }
@@ -860,8 +854,8 @@ uint32_t HAL_TSC_GroupGetValue(TSC_HandleTypeDef *htsc, uint32_t gx_index)
   */
 
 /** @defgroup TSC_Exported_Functions_Group3 Peripheral Control functions
- *  @brief    Peripheral Control functions
- *
+  *  @brief    Peripheral Control functions
+  *
 @verbatim
  ===============================================================================
              ##### Peripheral Control functions #####
@@ -895,7 +889,7 @@ HAL_StatusTypeDef HAL_TSC_IOConfig(TSC_HandleTypeDef *htsc, TSC_IOConfigTypeDef 
   __HAL_TSC_STOP_ACQ(htsc);
 
   /* Disable Schmitt trigger hysteresis on all used TSC IOs */
-  htsc->Instance->IOHCR = (uint32_t)(~(config->ChannelIOs | config->ShieldIOs | config->SamplingIOs));
+  htsc->Instance->IOHCR = (~(config->ChannelIOs | config->ShieldIOs | config->SamplingIOs));
 
   /* Set channel and shield IOs */
   htsc->Instance->IOCCR = (config->ChannelIOs | config->ShieldIOs);
@@ -920,7 +914,7 @@ HAL_StatusTypeDef HAL_TSC_IOConfig(TSC_HandleTypeDef *htsc, TSC_IOConfigTypeDef 
   * @param  choice This parameter can be set to ENABLE or DISABLE.
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_TSC_IODischarge(TSC_HandleTypeDef *htsc, uint32_t choice)
+HAL_StatusTypeDef HAL_TSC_IODischarge(TSC_HandleTypeDef *htsc, FunctionalState choice)
 {
   /* Check the parameters */
   assert_param(IS_TSC_ALL_INSTANCE(htsc->Instance));
@@ -928,7 +922,7 @@ HAL_StatusTypeDef HAL_TSC_IODischarge(TSC_HandleTypeDef *htsc, uint32_t choice)
   /* Process locked */
   __HAL_LOCK(htsc);
 
-  if ((FunctionalState)choice == ENABLE)
+  if (choice == ENABLE)
   {
     __HAL_TSC_SET_IODEF_OUTPPLOW(htsc);
   }
@@ -949,8 +943,8 @@ HAL_StatusTypeDef HAL_TSC_IODischarge(TSC_HandleTypeDef *htsc, uint32_t choice)
   */
 
 /** @defgroup TSC_Exported_Functions_Group4 Peripheral State and Errors functions
- *  @brief   Peripheral State and Errors functions
- *
+  *  @brief   Peripheral State and Errors functions
+  *
 @verbatim
  ===============================================================================
             ##### State and Errors functions #####
@@ -1002,8 +996,8 @@ HAL_TSC_StateTypeDef HAL_TSC_GetState(TSC_HandleTypeDef *htsc)
   */
 
 /** @defgroup TSC_IRQ_Handler_and_Callbacks IRQ Handler and Callbacks
- * @{
- */
+  * @{
+  */
 
 /**
   * @brief  Handle TSC interrupt request.
@@ -1091,7 +1085,7 @@ __weak void HAL_TSC_ErrorCallback(TSC_HandleTypeDef *htsc)
   */
 
 /* Private functions ---------------------------------------------------------*/
-/** @defgroup TSC_Private_Functions Private Functions
+/** @defgroup TSC_Private_Functions TSC Private Functions
   * @{
   */
 
@@ -1107,7 +1101,7 @@ static uint32_t TSC_extract_groups(uint32_t iomask)
 
   for (idx = 0UL; idx < (uint32_t)TSC_NB_OF_GROUPS; idx++)
   {
-    if ((iomask & (0x0FUL << (idx * 4UL))) != 0UL )
+    if ((iomask & (0x0FUL << (idx * 4UL))) != 0UL)
     {
       groups |= (1UL << idx);
     }
@@ -1130,4 +1124,3 @@ static uint32_t TSC_extract_groups(uint32_t iomask)
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

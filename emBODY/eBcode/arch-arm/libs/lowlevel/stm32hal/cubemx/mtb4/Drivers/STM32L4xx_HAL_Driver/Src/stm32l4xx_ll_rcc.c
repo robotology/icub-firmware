@@ -6,30 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  *
+  * This software is licensed under terms that can be found in the LICENSE file in
+  * the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   ******************************************************************************
   */
 #if defined(USE_FULL_LL_DRIVER)
@@ -153,27 +135,29 @@
 /** @defgroup RCC_LL_Private_Functions RCC Private functions
   * @{
   */
-uint32_t RCC_GetSystemClockFreq(void);
-uint32_t RCC_GetHCLKClockFreq(uint32_t SYSCLK_Frequency);
-uint32_t RCC_GetPCLK1ClockFreq(uint32_t HCLK_Frequency);
-uint32_t RCC_GetPCLK2ClockFreq(uint32_t HCLK_Frequency);
-uint32_t RCC_PLL_GetFreqDomain_SYS(void);
-uint32_t RCC_PLL_GetFreqDomain_SAI(void);
-uint32_t RCC_PLL_GetFreqDomain_48M(void);
+static uint32_t RCC_GetSystemClockFreq(void);
+static uint32_t RCC_GetHCLKClockFreq(uint32_t SYSCLK_Frequency);
+static uint32_t RCC_GetPCLK1ClockFreq(uint32_t HCLK_Frequency);
+static uint32_t RCC_GetPCLK2ClockFreq(uint32_t HCLK_Frequency);
+static uint32_t RCC_PLL_GetFreqDomain_SYS(void);
+#if defined(RCC_CCIPR_SAI1SEL) || defined(RCC_CCIPR_SAI2SEL) || defined(RCC_CCIPR2_SAI1SEL) || defined(RCC_CCIPR2_SAI2SEL)
+static uint32_t RCC_PLL_GetFreqDomain_SAI(void);
+#endif
+static uint32_t RCC_PLL_GetFreqDomain_48M(void);
 #if defined(RCC_PLLSAI1_SUPPORT)
-uint32_t RCC_PLLSAI1_GetFreqDomain_SAI(void);
-uint32_t RCC_PLLSAI1_GetFreqDomain_48M(void);
-uint32_t RCC_PLLSAI1_GetFreqDomain_ADC(void);
+static uint32_t RCC_PLLSAI1_GetFreqDomain_SAI(void);
+static uint32_t RCC_PLLSAI1_GetFreqDomain_48M(void);
+static uint32_t RCC_PLLSAI1_GetFreqDomain_ADC(void);
 #endif /* RCC_PLLSAI1_SUPPORT */
 #if defined(RCC_PLLSAI2_SUPPORT)
-uint32_t RCC_PLLSAI2_GetFreqDomain_SAI(void);
+static uint32_t RCC_PLLSAI2_GetFreqDomain_SAI(void);
 #if defined(LTDC)
-uint32_t RCC_PLLSAI2_GetFreqDomain_LTDC(void);
+static uint32_t RCC_PLLSAI2_GetFreqDomain_LTDC(void);
 #else
-uint32_t RCC_PLLSAI2_GetFreqDomain_ADC(void);
+static uint32_t RCC_PLLSAI2_GetFreqDomain_ADC(void);
 #endif /* LTDC */
 #if defined(DSI)
-uint32_t RCC_PLLSAI2_GetFreqDomain_DSI(void);
+static uint32_t RCC_PLLSAI2_GetFreqDomain_DSI(void);
 #endif /* DSI */
 #endif /*RCC_PLLSAI2_SUPPORT*/
 /**
@@ -207,7 +191,7 @@ uint32_t RCC_PLLSAI2_GetFreqDomain_DSI(void);
   */
 ErrorStatus LL_RCC_DeInit(void)
 {
-  uint32_t vl_mask;
+  __IO uint32_t vl_mask;
 
   /* Set MSION bit */
   LL_RCC_MSI_Enable();
@@ -224,16 +208,21 @@ ErrorStatus LL_RCC_DeInit(void)
   LL_RCC_MSI_SetCalibTrimming(0);
 
   /* Set HSITRIM bits to the reset value*/
+#if defined(RCC_ICSCR_HSITRIM_6)
+  LL_RCC_HSI_SetCalibTrimming(0x40U);
+#else
   LL_RCC_HSI_SetCalibTrimming(0x10U);
+#endif /* RCC_ICSCR_HSITRIM_6 */
 
   /* Reset CFGR register */
   LL_RCC_WriteReg(CFGR, 0x00000000U);
 
-  vl_mask = 0xFFFFFFFFU;
+  /* Read CR register */
+  vl_mask = LL_RCC_ReadReg(CR);
 
   /* Reset HSION, HSIKERON, HSIASFS, HSEON, PLLON bits */
-  CLEAR_BIT(vl_mask, (RCC_CR_HSION | RCC_CR_HSIASFS | RCC_CR_HSIKERON  | RCC_CR_HSEON |
-  RCC_CR_PLLON));
+  CLEAR_BIT(vl_mask,
+            (RCC_CR_HSION | RCC_CR_HSIASFS | RCC_CR_HSIKERON  | RCC_CR_HSEON | RCC_CR_PLLON));
 
 #if defined(RCC_PLLSAI1_SUPPORT)
   /* Reset PLLSAI1ON bit */
@@ -245,7 +234,7 @@ ErrorStatus LL_RCC_DeInit(void)
   CLEAR_BIT(vl_mask, RCC_CR_PLLSAI2ON);
 #endif /*RCC_PLLSAI2_SUPPORT*/
 
-  /* Write new mask in CR register */
+  /* Write new value in CR register */
   LL_RCC_WriteReg(CR, vl_mask);
 
 #if defined(RCC_PLLSAI2_SUPPORT)
@@ -762,7 +751,16 @@ uint32_t LL_RCC_GetLPTIMClockFreq(uint32_t LPTIMxSource)
       case LL_RCC_LPTIM1_CLKSOURCE_LSI:    /* LPTIM1 Clock is LSI Osc. */
         if (LL_RCC_LSI_IsReady() != 0U)
         {
-          lptim_frequency = LSI_VALUE;
+#if defined(RCC_CSR_LSIPREDIV)
+          if (LL_RCC_LSI_GetPrediv() == LL_RCC_LSI_PREDIV_128)
+          {
+            lptim_frequency = LSI_VALUE / 128U;
+          }
+          else
+#endif /* RCC_CSR_LSIPREDIV */
+          {
+            lptim_frequency = LSI_VALUE;
+          }
         }
         break;
 
@@ -798,7 +796,16 @@ uint32_t LL_RCC_GetLPTIMClockFreq(uint32_t LPTIMxSource)
         case LL_RCC_LPTIM2_CLKSOURCE_LSI:    /* LPTIM2 Clock is LSI Osc. */
           if (LL_RCC_LSI_IsReady() != 0U)
           {
-            lptim_frequency = LSI_VALUE;
+#if defined(RCC_CSR_LSIPREDIV)
+            if (LL_RCC_LSI_GetPrediv() == LL_RCC_LSI_PREDIV_128)
+            {
+              lptim_frequency = LSI_VALUE / 128U;
+            }
+            else
+#endif /* RCC_CSR_LSIPREDIV */
+            {
+              lptim_frequency = LSI_VALUE;
+            }
           }
           break;
 
@@ -856,7 +863,10 @@ uint32_t LL_RCC_GetSAIClockFreq(uint32_t SAIxSource)
       case LL_RCC_SAI1_CLKSOURCE_PLLSAI1:    /* PLLSAI1 clock used as SAI1 clock source */
         if (LL_RCC_PLLSAI1_IsReady() != 0U)
         {
-          sai_frequency = RCC_PLLSAI1_GetFreqDomain_SAI();
+          if (LL_RCC_PLLSAI1_IsEnabledDomain_SAI() != 0U)
+          {
+            sai_frequency = RCC_PLLSAI1_GetFreqDomain_SAI();
+          }
         }
         break;
 
@@ -864,7 +874,10 @@ uint32_t LL_RCC_GetSAIClockFreq(uint32_t SAIxSource)
       case LL_RCC_SAI1_CLKSOURCE_PLLSAI2:    /* PLLSAI2 clock used as SAI1 clock source */
         if (LL_RCC_PLLSAI2_IsReady() != 0U)
         {
-          sai_frequency = RCC_PLLSAI2_GetFreqDomain_SAI();
+          if (LL_RCC_PLLSAI2_IsEnabledDomain_SAI() != 0U)
+          {
+            sai_frequency = RCC_PLLSAI2_GetFreqDomain_SAI();
+          }
         }
         break;
 
@@ -872,7 +885,10 @@ uint32_t LL_RCC_GetSAIClockFreq(uint32_t SAIxSource)
       case LL_RCC_SAI1_CLKSOURCE_PLL:        /* PLL clock used as SAI1 clock source */
         if (LL_RCC_PLL_IsReady() != 0U)
         {
-          sai_frequency = RCC_PLL_GetFreqDomain_SAI();
+          if (LL_RCC_PLL_IsEnabledDomain_SAI() != 0U)
+          {
+            sai_frequency = RCC_PLL_GetFreqDomain_SAI();
+          }
         }
         break;
 
@@ -895,7 +911,10 @@ uint32_t LL_RCC_GetSAIClockFreq(uint32_t SAIxSource)
         case LL_RCC_SAI2_CLKSOURCE_PLLSAI1:  /* PLLSAI1 clock used as SAI2 clock source */
           if (LL_RCC_PLLSAI1_IsReady() != 0U)
           {
-            sai_frequency = RCC_PLLSAI1_GetFreqDomain_SAI();
+            if (LL_RCC_PLLSAI1_IsEnabledDomain_SAI() != 0U)
+            {
+              sai_frequency = RCC_PLLSAI1_GetFreqDomain_SAI();
+            }
           }
           break;
 
@@ -903,7 +922,10 @@ uint32_t LL_RCC_GetSAIClockFreq(uint32_t SAIxSource)
         case LL_RCC_SAI2_CLKSOURCE_PLLSAI2:  /* PLLSAI2 clock used as SAI2 clock source */
           if (LL_RCC_PLLSAI2_IsReady() != 0U)
           {
-            sai_frequency = RCC_PLLSAI2_GetFreqDomain_SAI();
+            if (LL_RCC_PLLSAI2_IsEnabledDomain_SAI() != 0U)
+            {
+              sai_frequency = RCC_PLLSAI2_GetFreqDomain_SAI();
+            }
           }
           break;
 
@@ -911,7 +933,10 @@ uint32_t LL_RCC_GetSAIClockFreq(uint32_t SAIxSource)
         case LL_RCC_SAI2_CLKSOURCE_PLL:      /* PLL clock used as SAI2 clock source */
           if (LL_RCC_PLL_IsReady() != 0U)
           {
-            sai_frequency = RCC_PLL_GetFreqDomain_SAI();
+            if (LL_RCC_PLL_IsEnabledDomain_SAI() != 0U)
+            {
+              sai_frequency = RCC_PLL_GetFreqDomain_SAI();
+            }
           }
           break;
 
@@ -957,7 +982,10 @@ uint32_t LL_RCC_GetSDMMCKernelClockFreq(uint32_t SDMMCxSource)
     case LL_RCC_SDMMC1_KERNELCLKSOURCE_PLLP:        /* PLL "P" output (PLLSAI3CLK) clock used as SDMMC1 clock source */
       if (LL_RCC_PLL_IsReady() != 0U)
       {
-        sdmmc_frequency = RCC_PLL_GetFreqDomain_SAI();
+        if (LL_RCC_PLL_IsEnabledDomain_SAI() != 0U)
+        {
+          sdmmc_frequency = RCC_PLL_GetFreqDomain_SAI();
+        }
       }
       break;
 
@@ -992,7 +1020,10 @@ uint32_t LL_RCC_GetSDMMCClockFreq(uint32_t SDMMCxSource)
     case LL_RCC_SDMMC1_CLKSOURCE_PLLSAI1:    /* PLLSAI1 clock used as SDMMC1 clock source */
       if (LL_RCC_PLLSAI1_IsReady() != 0U)
       {
-        sdmmc_frequency = RCC_PLLSAI1_GetFreqDomain_48M();
+        if (LL_RCC_PLLSAI1_IsEnabledDomain_48M() != 0U)
+        {
+          sdmmc_frequency = RCC_PLLSAI1_GetFreqDomain_48M();
+        }
       }
       break;
 #endif
@@ -1000,7 +1031,10 @@ uint32_t LL_RCC_GetSDMMCClockFreq(uint32_t SDMMCxSource)
     case LL_RCC_SDMMC1_CLKSOURCE_PLL:        /* PLL clock used as SDMMC1 clock source */
       if (LL_RCC_PLL_IsReady() != 0U)
       {
-        sdmmc_frequency = RCC_PLL_GetFreqDomain_48M();
+        if (LL_RCC_PLL_IsEnabledDomain_48M() != 0U)
+        {
+          sdmmc_frequency = RCC_PLL_GetFreqDomain_48M();
+        }
       }
       break;
 
@@ -1057,7 +1091,10 @@ uint32_t LL_RCC_GetRNGClockFreq(uint32_t RNGxSource)
     case LL_RCC_RNG_CLKSOURCE_PLLSAI1:       /* PLLSAI1 clock used as RNG clock source */
       if (LL_RCC_PLLSAI1_IsReady() != 0U)
       {
-        rng_frequency = RCC_PLLSAI1_GetFreqDomain_48M();
+        if (LL_RCC_PLLSAI1_IsEnabledDomain_48M() !=0U)
+        {
+          rng_frequency = RCC_PLLSAI1_GetFreqDomain_48M();
+        }
       }
       break;
 #endif /* RCC_PLLSAI1_SUPPORT */
@@ -1065,7 +1102,10 @@ uint32_t LL_RCC_GetRNGClockFreq(uint32_t RNGxSource)
     case LL_RCC_RNG_CLKSOURCE_PLL:           /* PLL clock used as RNG clock source */
       if (LL_RCC_PLL_IsReady() != 0U)
       {
-        rng_frequency = RCC_PLL_GetFreqDomain_48M();
+        if (LL_RCC_PLL_IsEnabledDomain_48M() != 0U)
+        {
+          rng_frequency = RCC_PLL_GetFreqDomain_48M();
+        }
       }
       break;
 
@@ -1123,7 +1163,10 @@ uint32_t LL_RCC_GetUSBClockFreq(uint32_t USBxSource)
     case LL_RCC_USB_CLKSOURCE_PLLSAI1:       /* PLLSAI1 clock used as USB clock source */
       if (LL_RCC_PLLSAI1_IsReady() != 0U)
       {
-        usb_frequency = RCC_PLLSAI1_GetFreqDomain_48M();
+        if (LL_RCC_PLLSAI1_IsEnabledDomain_48M() != 0U)
+        {
+          usb_frequency = RCC_PLLSAI1_GetFreqDomain_48M();
+        }
       }
       break;
 #endif /* RCC_PLLSAI1_SUPPORT */
@@ -1131,7 +1174,10 @@ uint32_t LL_RCC_GetUSBClockFreq(uint32_t USBxSource)
     case LL_RCC_USB_CLKSOURCE_PLL:           /* PLL clock used as USB clock source */
       if (LL_RCC_PLL_IsReady() != 0U)
       {
-        usb_frequency = RCC_PLL_GetFreqDomain_48M();
+        if (LL_RCC_PLL_IsEnabledDomain_48M() != 0U)
+        {
+          usb_frequency = RCC_PLL_GetFreqDomain_48M();
+        }
       }
       break;
 
@@ -1186,7 +1232,10 @@ uint32_t LL_RCC_GetADCClockFreq(uint32_t ADCxSource)
     case LL_RCC_ADC_CLKSOURCE_PLLSAI1:       /* PLLSAI1 clock used as ADC clock source */
       if (LL_RCC_PLLSAI1_IsReady() != 0U)
       {
-        adc_frequency = RCC_PLLSAI1_GetFreqDomain_ADC();
+        if (LL_RCC_PLLSAI1_IsEnabledDomain_ADC() != 0U)
+        {
+          adc_frequency = RCC_PLLSAI1_GetFreqDomain_ADC();
+        }
       }
       break;
 #endif /* RCC_PLLSAI1_SUPPORT */
@@ -1195,7 +1244,10 @@ uint32_t LL_RCC_GetADCClockFreq(uint32_t ADCxSource)
     case LL_RCC_ADC_CLKSOURCE_PLLSAI2:       /* PLLSAI2 clock used as ADC clock source */
       if (LL_RCC_PLLSAI2_IsReady() != 0U)
       {
-         adc_frequency = RCC_PLLSAI2_GetFreqDomain_ADC();
+        if (LL_RCC_PLLSAI2_IsEnabledDomain_ADC() != 0U)
+        {
+          adc_frequency = RCC_PLLSAI2_GetFreqDomain_ADC();
+        }
       }
       break;
 #endif /* RCC_PLLSAI2_SUPPORT && LL_RCC_ADC_CLKSOURCE_PLLSAI2 */
@@ -1350,7 +1402,10 @@ uint32_t LL_RCC_GetDSIClockFreq(uint32_t DSIxSource)
     case LL_RCC_DSI_CLKSOURCE_PLL:     /* DSI Clock is PLLSAI2 Osc. */
       if (LL_RCC_PLLSAI2_IsReady() != 0U)
       {
-        dsi_frequency = RCC_PLLSAI2_GetFreqDomain_DSI();
+        if (LL_RCC_PLLSAI2_IsEnabledDomain_DSI() != 0U)
+        {
+          dsi_frequency = RCC_PLLSAI2_GetFreqDomain_DSI();
+        }
       }
       break;
 
@@ -1381,7 +1436,10 @@ uint32_t LL_RCC_GetLTDCClockFreq(uint32_t LTDCxSource)
 
   if (LL_RCC_PLLSAI2_IsReady() != 0U)
   {
-     ltdc_frequency = RCC_PLLSAI2_GetFreqDomain_LTDC();
+    if (LL_RCC_PLLSAI2_IsEnabledDomain_LTDC() != 0U)
+    {
+      ltdc_frequency = RCC_PLLSAI2_GetFreqDomain_LTDC();
+    }
   }
 
   return ltdc_frequency;
@@ -1423,7 +1481,10 @@ uint32_t LL_RCC_GetOCTOSPIClockFreq(uint32_t OCTOSPIxSource)
     case LL_RCC_OCTOSPI_CLKSOURCE_PLL:      /* PLL clock used as OCTOSPI source */
       if (LL_RCC_PLL_IsReady() != 0U)
       {
-        octospi_frequency = RCC_PLL_GetFreqDomain_48M();
+        if (LL_RCC_PLL_IsEnabledDomain_48M() != 0U)
+        {
+          octospi_frequency = RCC_PLL_GetFreqDomain_48M();
+        }
       }
       break;
 
@@ -1452,7 +1513,7 @@ uint32_t LL_RCC_GetOCTOSPIClockFreq(uint32_t OCTOSPIxSource)
   * @brief  Return SYSTEM clock frequency
   * @retval SYSTEM clock frequency (in Hz)
   */
-uint32_t RCC_GetSystemClockFreq(void)
+static uint32_t RCC_GetSystemClockFreq(void)
 {
   uint32_t frequency;
 
@@ -1494,7 +1555,7 @@ uint32_t RCC_GetSystemClockFreq(void)
   * @param  SYSCLK_Frequency SYSCLK clock frequency
   * @retval HCLK clock frequency (in Hz)
   */
-uint32_t RCC_GetHCLKClockFreq(uint32_t SYSCLK_Frequency)
+static uint32_t RCC_GetHCLKClockFreq(uint32_t SYSCLK_Frequency)
 {
   /* HCLK clock frequency */
   return __LL_RCC_CALC_HCLK_FREQ(SYSCLK_Frequency, LL_RCC_GetAHBPrescaler());
@@ -1505,7 +1566,7 @@ uint32_t RCC_GetHCLKClockFreq(uint32_t SYSCLK_Frequency)
   * @param  HCLK_Frequency HCLK clock frequency
   * @retval PCLK1 clock frequency (in Hz)
   */
-uint32_t RCC_GetPCLK1ClockFreq(uint32_t HCLK_Frequency)
+static uint32_t RCC_GetPCLK1ClockFreq(uint32_t HCLK_Frequency)
 {
   /* PCLK1 clock frequency */
   return __LL_RCC_CALC_PCLK1_FREQ(HCLK_Frequency, LL_RCC_GetAPB1Prescaler());
@@ -1516,7 +1577,7 @@ uint32_t RCC_GetPCLK1ClockFreq(uint32_t HCLK_Frequency)
   * @param  HCLK_Frequency HCLK clock frequency
   * @retval PCLK2 clock frequency (in Hz)
   */
-uint32_t RCC_GetPCLK2ClockFreq(uint32_t HCLK_Frequency)
+static uint32_t RCC_GetPCLK2ClockFreq(uint32_t HCLK_Frequency)
 {
   /* PCLK2 clock frequency */
   return __LL_RCC_CALC_PCLK2_FREQ(HCLK_Frequency, LL_RCC_GetAPB2Prescaler());
@@ -1526,7 +1587,7 @@ uint32_t RCC_GetPCLK2ClockFreq(uint32_t HCLK_Frequency)
   * @brief  Return PLL clock frequency used for system domain
   * @retval PLL clock frequency (in Hz)
   */
-uint32_t RCC_PLL_GetFreqDomain_SYS(void)
+static uint32_t RCC_PLL_GetFreqDomain_SYS(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1568,7 +1629,7 @@ uint32_t RCC_PLL_GetFreqDomain_SYS(void)
   * @brief  Return PLL clock frequency used for SAI domain
   * @retval PLL clock frequency (in Hz)
   */
-uint32_t RCC_PLL_GetFreqDomain_SAI(void)
+static uint32_t RCC_PLL_GetFreqDomain_SAI(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1610,7 +1671,7 @@ uint32_t RCC_PLL_GetFreqDomain_SAI(void)
   * @brief  Return PLL clock frequency used for 48 MHz domain
   * @retval PLL clock frequency (in Hz)
   */
-uint32_t RCC_PLL_GetFreqDomain_48M(void)
+static uint32_t RCC_PLL_GetFreqDomain_48M(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1651,7 +1712,7 @@ uint32_t RCC_PLL_GetFreqDomain_48M(void)
   * @brief  Return PLL clock frequency used for DSI clock
   * @retval PLL clock frequency (in Hz)
   */
-uint32_t RCC_PLLSAI2_GetFreqDomain_DSI(void)
+static uint32_t RCC_PLLSAI2_GetFreqDomain_DSI(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1694,7 +1755,7 @@ uint32_t RCC_PLLSAI2_GetFreqDomain_DSI(void)
   * @brief  Return PLLSAI1 clock frequency used for SAI domain
   * @retval PLLSAI1 clock frequency (in Hz)
   */
-uint32_t RCC_PLLSAI1_GetFreqDomain_SAI(void)
+static uint32_t RCC_PLLSAI1_GetFreqDomain_SAI(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1738,7 +1799,7 @@ uint32_t RCC_PLLSAI1_GetFreqDomain_SAI(void)
   * @brief  Return PLLSAI1 clock frequency used for 48Mhz domain
   * @retval PLLSAI1 clock frequency (in Hz)
   */
-uint32_t RCC_PLLSAI1_GetFreqDomain_48M(void)
+static uint32_t RCC_PLLSAI1_GetFreqDomain_48M(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1782,7 +1843,7 @@ uint32_t RCC_PLLSAI1_GetFreqDomain_48M(void)
   * @brief  Return PLLSAI1 clock frequency used for ADC domain
   * @retval PLLSAI1 clock frequency (in Hz)
   */
-uint32_t RCC_PLLSAI1_GetFreqDomain_ADC(void)
+static uint32_t RCC_PLLSAI1_GetFreqDomain_ADC(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1828,7 +1889,7 @@ uint32_t RCC_PLLSAI1_GetFreqDomain_ADC(void)
   * @brief  Return PLLSAI2 clock frequency used for SAI domain
   * @retval PLLSAI2 clock frequency (in Hz)
   */
-uint32_t RCC_PLLSAI2_GetFreqDomain_SAI(void)
+static uint32_t RCC_PLLSAI2_GetFreqDomain_SAI(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1878,7 +1939,7 @@ uint32_t RCC_PLLSAI2_GetFreqDomain_SAI(void)
   * @brief  Return PLLSAI2 clock frequency used for LTDC domain
   * @retval PLLSAI2 clock frequency (in Hz)
   */
-uint32_t RCC_PLLSAI2_GetFreqDomain_LTDC(void)
+static uint32_t RCC_PLLSAI2_GetFreqDomain_LTDC(void)
 {
   uint32_t pllinputfreq, pllsource;
 
@@ -1921,7 +1982,7 @@ uint32_t RCC_PLLSAI2_GetFreqDomain_LTDC(void)
   * @brief  Return PLLSAI2 clock frequency used for ADC domain
   * @retval PLLSAI2 clock frequency (in Hz)
   */
-uint32_t RCC_PLLSAI2_GetFreqDomain_ADC(void)
+static uint32_t RCC_PLLSAI2_GetFreqDomain_ADC(void)
 {
   uint32_t pllinputfreq = 0U, pllsource = 0U;
 
@@ -1976,4 +2037,3 @@ uint32_t RCC_PLLSAI2_GetFreqDomain_ADC(void)
 
 #endif /* USE_FULL_LL_DRIVER */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

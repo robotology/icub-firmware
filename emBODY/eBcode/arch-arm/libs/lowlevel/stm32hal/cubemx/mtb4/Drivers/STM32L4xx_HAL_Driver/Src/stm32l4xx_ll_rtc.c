@@ -6,29 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -103,18 +86,7 @@
 
 #define IS_LL_RTC_DAY(__DAY__)    (((__DAY__) >= 1U) && ((__DAY__) <= 31U))
 
-#define IS_LL_RTC_MONTH(__VALUE__) (((__VALUE__) == LL_RTC_MONTH_JANUARY) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_FEBRUARY) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_MARCH) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_APRIL) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_MAY) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_JUNE) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_JULY) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_AUGUST) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_SEPTEMBER) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_OCTOBER) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_NOVEMBER) \
-                                 || ((__VALUE__) == LL_RTC_MONTH_DECEMBER))
+#define IS_LL_RTC_MONTH(__MONTH__) (((__MONTH__) >= 1U) && ((__MONTH__) <= 12U))
 
 #define IS_LL_RTC_YEAR(__YEAR__) ((__YEAR__) <= 99U)
 
@@ -155,7 +127,7 @@
 
 /**
   * @brief  De-Initializes the RTC registers to their default reset values.
-  * @note   This function doesn't reset the RTC Clock source and RTC Backup Data
+  * @note   This function does not reset the RTC Clock source and RTC Backup Data
   *         registers.
   * @param  RTCx RTC Instance
   * @retval An ErrorStatus enumeration value:
@@ -164,7 +136,7 @@
   */
 ErrorStatus LL_RTC_DeInit(RTC_TypeDef *RTCx)
 {
-  ErrorStatus status = ERROR;
+  ErrorStatus status;
 
   /* Check the parameter */
   assert_param(IS_RTC_ALL_INSTANCE(RTCx));
@@ -173,7 +145,8 @@ ErrorStatus LL_RTC_DeInit(RTC_TypeDef *RTCx)
   LL_RTC_DisableWriteProtection(RTCx);
 
   /* Set Initialization mode */
-  if (LL_RTC_EnterInitMode(RTCx) != ERROR)
+  status = LL_RTC_EnterInitMode(RTCx);
+  if (status != ERROR)
   {
     /* Reset TR, DR and CR registers */
     LL_RTC_WriteReg(RTCx, TR, 0x00000000U);
@@ -183,7 +156,7 @@ ErrorStatus LL_RTC_DeInit(RTC_TypeDef *RTCx)
     /* Reset All CR bits except CR[2:0] */
     LL_RTC_WriteReg(RTCx, CR, (LL_RTC_ReadReg(RTCx, CR) & RTC_CR_WUCKSEL));
 
-    LL_RTC_WriteReg(RTCx, PRER,     (RTC_PRER_PREDIV_A | RTC_SYNCH_PRESC_DEFAULT));
+    LL_RTC_WriteReg(RTCx, PRER, (RTC_PRER_PREDIV_A | RTC_SYNCH_PRESC_DEFAULT));
     LL_RTC_WriteReg(RTCx, ALRMAR,   0x00000000U);
     LL_RTC_WriteReg(RTCx, ALRMBR,   0x00000000U);
     LL_RTC_WriteReg(RTCx, SHIFTR,   0x00000000U);
@@ -191,20 +164,17 @@ ErrorStatus LL_RTC_DeInit(RTC_TypeDef *RTCx)
     LL_RTC_WriteReg(RTCx, ALRMASSR, 0x00000000U);
     LL_RTC_WriteReg(RTCx, ALRMBSSR, 0x00000000U);
 
-#if defined(STM32L412xx) || defined(STM32L422xx)
-#else /* #if defined(STM32L412xx) || defined(STM32L422xx) */
-    /* Reset ISR register and exit initialization mode */
-    LL_RTC_WriteReg(RTCx, ISR,      0x00000000U);
-
+#if defined(STM32L412xx) || defined(STM32L422xx) || defined (STM32L4P5xx) || defined (STM32L4Q5xx)
+#else /* #if defined(STM32L412xx) || defined(STM32L422xx) || defined (STM32L4P5xx) || defined (STM32L4Q5xx) */
     /* Reset Tamper and alternate functions configuration register */
     LL_RTC_WriteReg(RTCx, TAMPCR, 0x00000000U);
 
     /* Reset Option register */
     LL_RTC_WriteReg(RTCx, OR, 0x00000000U);
-#endif /* #if defined(STM32L412xx) || defined(STM32L422xx) */
+#endif /* #if defined(STM32L412xx) || defined(STM32L422xx) || defined (STM32L4P5xx) || defined (STM32L4Q5xx) */
 
-    /* Wait till the RTC RSF flag is set */
-    status = LL_RTC_WaitForSynchro(RTCx);
+    /* Exit Initialization mode */
+    LL_RTC_DisableInitMode(RTCx);
   }
 
   /* Enable the write protection for RTC registers */
@@ -343,7 +313,7 @@ ErrorStatus LL_RTC_TIME_Init(RTC_TypeDef *RTCx, uint32_t RTC_Format, LL_RTC_Time
     }
 
     /* Exit Initialization mode */
-    LL_RTC_DisableInitMode(RTC);
+    LL_RTC_DisableInitMode(RTCx);
 
     /* If  RTC_CR_BYPSHAD bit = 0, wait for synchro else this check is not needed */
     if (LL_RTC_IsShadowRegBypassEnabled(RTCx) == 0U)
@@ -381,7 +351,7 @@ void LL_RTC_TIME_StructInit(LL_RTC_TimeTypeDef *RTC_TimeStruct)
   * @param  RTC_Format This parameter can be one of the following values:
   *         @arg @ref LL_RTC_FORMAT_BIN
   *         @arg @ref LL_RTC_FORMAT_BCD
-  * @param  RTC_DateStruct: pointer to a RTC_DateTypeDef structure that contains
+  * @param  RTC_DateStruct pointer to a RTC_DateTypeDef structure that contains
   *                         the date configuration information for the RTC.
   * @retval An ErrorStatus enumeration value:
   *          - SUCCESS: RTC Day register is configured
@@ -397,8 +367,9 @@ ErrorStatus LL_RTC_DATE_Init(RTC_TypeDef *RTCx, uint32_t RTC_Format, LL_RTC_Date
 
   if ((RTC_Format == LL_RTC_FORMAT_BIN) && ((RTC_DateStruct->Month & 0x10U) == 0x10U))
   {
-    RTC_DateStruct->Month = (uint8_t)((RTC_DateStruct->Month & (uint32_t)~(0x10U)) + 0x0AU);
+    RTC_DateStruct->Month = (uint8_t)(((uint32_t) RTC_DateStruct->Month & (uint32_t)~(0x10U)) + 0x0AU);
   }
+
   if (RTC_Format == LL_RTC_FORMAT_BIN)
   {
     assert_param(IS_LL_RTC_YEAR(RTC_DateStruct->Year));
@@ -431,7 +402,7 @@ ErrorStatus LL_RTC_DATE_Init(RTC_TypeDef *RTCx, uint32_t RTC_Format, LL_RTC_Date
     }
 
     /* Exit Initialization mode */
-    LL_RTC_DisableInitMode(RTC);
+    LL_RTC_DisableInitMode(RTCx);
 
     /* If  RTC_CR_BYPSHAD bit = 0, wait for synchro else this check is not needed */
     if (LL_RTC_IsShadowRegBypassEnabled(RTCx) == 0U)
@@ -890,5 +861,3 @@ ErrorStatus LL_RTC_WaitForSynchro(RTC_TypeDef *RTCx)
   */
 
 #endif /* USE_FULL_LL_DRIVER */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

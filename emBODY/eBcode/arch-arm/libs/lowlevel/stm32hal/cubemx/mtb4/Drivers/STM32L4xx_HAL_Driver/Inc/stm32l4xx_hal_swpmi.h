@@ -6,29 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -38,7 +21,7 @@
 #define STM32L4xx_HAL_SWPMI_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -79,7 +62,7 @@ typedef struct
   uint32_t RxBufferingMode;          /*!< Specifies the reception buffering mode.
                                           This parameter can be a value of @ref SWPMI_Rx_Buffering_Mode */
 
-}SWPMI_InitTypeDef;
+} SWPMI_InitTypeDef;
 
 
 /**
@@ -95,12 +78,16 @@ typedef enum
   HAL_SWPMI_STATE_BUSY_TX_RX        = 0x32,    /*!< Data Transmission and Reception process is ongoing */
   HAL_SWPMI_STATE_TIMEOUT           = 0x03,    /*!< Timeout state                                      */
   HAL_SWPMI_STATE_ERROR             = 0x04     /*!< Error                                              */
-}HAL_SWPMI_StateTypeDef;
+} HAL_SWPMI_StateTypeDef;
 
 /**
   * @brief  SWPMI handle Structure definition
   */
+#if (USE_HAL_SWPMI_REGISTER_CALLBACKS == 1)
 typedef struct __SWPMI_HandleTypeDef
+#else
+typedef struct
+#endif /* USE_HAL_SWPMI_REGISTER_CALLBACKS */
 {
   SWPMI_TypeDef                  *Instance;     /*!< SWPMI registers base address         */
 
@@ -129,16 +116,16 @@ typedef struct __SWPMI_HandleTypeDef
   __IO uint32_t                  ErrorCode;     /*!< SWPMI Error code                     */
 
 #if (USE_HAL_SWPMI_REGISTER_CALLBACKS == 1)
-  void (*RxCpltCallback)     (struct __SWPMI_HandleTypeDef *hswpmi); /*!< SWPMI receive complete callback */
-  void (*RxHalfCpltCallback) (struct __SWPMI_HandleTypeDef *hswpmi); /*!< SWPMI receive half complete callback */
-  void (*TxCpltCallback)     (struct __SWPMI_HandleTypeDef *hswpmi); /*!< SWPMI transmit complete callback */
-  void (*TxHalfCpltCallback) (struct __SWPMI_HandleTypeDef *hswpmi); /*!< SWPMI transmit half complete callback */
-  void (*ErrorCallback)      (struct __SWPMI_HandleTypeDef *hswpmi); /*!< SWPMI error callback */
-  void (*MspInitCallback)    (struct __SWPMI_HandleTypeDef *hswpmi); /*!< SWPMI MSP init callback */
-  void (*MspDeInitCallback)  (struct __SWPMI_HandleTypeDef *hswpmi); /*!< SWPMI MSP de-init callback */
+  void (*RxCpltCallback)(struct __SWPMI_HandleTypeDef *hswpmi);      /*!< SWPMI receive complete callback */
+  void (*RxHalfCpltCallback)(struct __SWPMI_HandleTypeDef *hswpmi);  /*!< SWPMI receive half complete callback */
+  void (*TxCpltCallback)(struct __SWPMI_HandleTypeDef *hswpmi);      /*!< SWPMI transmit complete callback */
+  void (*TxHalfCpltCallback)(struct __SWPMI_HandleTypeDef *hswpmi);  /*!< SWPMI transmit half complete callback */
+  void (*ErrorCallback)(struct __SWPMI_HandleTypeDef *hswpmi);       /*!< SWPMI error callback */
+  void (*MspInitCallback)(struct __SWPMI_HandleTypeDef *hswpmi);     /*!< SWPMI MSP init callback */
+  void (*MspDeInitCallback)(struct __SWPMI_HandleTypeDef *hswpmi);   /*!< SWPMI MSP de-init callback */
 #endif
 
-}SWPMI_HandleTypeDef;
+} SWPMI_HandleTypeDef;
 
 #if (USE_HAL_SWPMI_REGISTER_CALLBACKS == 1)
 /**
@@ -153,7 +140,7 @@ typedef enum
   HAL_SWPMI_ERROR_CB_ID           = 0x04U, /*!< SWPMI error callback ID */
   HAL_SWPMI_MSPINIT_CB_ID         = 0x05U, /*!< SWPMI MSP init callback ID */
   HAL_SWPMI_MSPDEINIT_CB_ID       = 0x06U  /*!< SWPMI MSP de-init callback ID */
-}HAL_SWPMI_CallbackIDTypeDef;
+} HAL_SWPMI_CallbackIDTypeDef;
 
 /**
   * @brief  SWPMI callback pointer definition
@@ -294,7 +281,7 @@ typedef void (*pSWPMI_CallbackTypeDef)(SWPMI_HandleTypeDef *hswpmi);
 
 /** @brief  Check whether the specified SWPMI flag is set or not.
   * @param  __HANDLE__ specifies the SWPMI Handle.
-  * @param  __FLAG__: specifies the flag to check.
+  * @param  __FLAG__ specifies the flag to check.
   *        This parameter can be one of the following values:
   *            @arg SWPMI_FLAG_RXBFF  Receive buffer full flag.
   *            @arg SWPMI_FLAG_TXBEF  Transmit buffer empty flag.
@@ -313,7 +300,7 @@ typedef void (*pSWPMI_CallbackTypeDef)(SWPMI_HandleTypeDef *hswpmi);
 
 /** @brief  Clear the specified SWPMI ISR flag.
   * @param  __HANDLE__ specifies the SWPMI Handle.
-  * @param  __FLAG__: specifies the flag to clear.
+  * @param  __FLAG__ specifies the flag to clear.
   *        This parameter can be one of the following values:
   *            @arg SWPMI_FLAG_RXBFF  Receive buffer full flag.
   *            @arg SWPMI_FLAG_TXBEF  Transmit buffer empty flag.
@@ -507,5 +494,3 @@ uint32_t               HAL_SWPMI_GetError(SWPMI_HandleTypeDef *hswpmi);
 #endif
 
 #endif /* STM32L4xx_HAL_SWPMI_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

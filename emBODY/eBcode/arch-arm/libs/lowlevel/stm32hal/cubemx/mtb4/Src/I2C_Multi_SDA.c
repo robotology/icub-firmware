@@ -16,7 +16,7 @@
 //---------------------------------
 //Function prototypes
 //---------------------------------
-//#include "main.h"
+#include "main.h"
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_ll_gpio.h"
 #include "I2C_Multi_SDA.h"

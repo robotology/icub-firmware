@@ -6,29 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -41,7 +24,7 @@
 #include "stm32_assert.h"
 #else
 #define assert_param(expr) ((void)0U)
-#endif
+#endif  /* USE_FULL_ASSERT */
 
 /** @addtogroup STM32L4xx_LL_Driver
   * @{
@@ -198,9 +181,12 @@ ErrorStatus LL_DMA2D_DeInit(DMA2D_TypeDef *DMA2Dx)
 ErrorStatus LL_DMA2D_Init(DMA2D_TypeDef *DMA2Dx, LL_DMA2D_InitTypeDef *DMA2D_InitStruct)
 {
   ErrorStatus status = ERROR;
-  LL_DMA2D_ColorTypeDef DMA2D_ColorStruct;
-  uint32_t tmp, tmp1, tmp2;
-  uint32_t regMask, regValue;
+  LL_DMA2D_ColorTypeDef dma2d_colorstruct;
+  uint32_t tmp;
+  uint32_t tmp1;
+  uint32_t tmp2;
+  uint32_t regMask;
+  uint32_t regValue;
 
   /* Check the parameters */
   assert_param(IS_DMA2D_ALL_INSTANCE(DMA2Dx));
@@ -261,12 +247,12 @@ ErrorStatus LL_DMA2D_Init(DMA2D_TypeDef *DMA2Dx, LL_DMA2D_InitTypeDef *DMA2D_Ini
     LL_DMA2D_SetOutputMemAddr(DMA2Dx, DMA2D_InitStruct->OutputMemoryAddress);
 
     /* DMA2D OCOLR register configuration ------------------------------------------*/
-    DMA2D_ColorStruct.ColorMode   = DMA2D_InitStruct->ColorMode;
-    DMA2D_ColorStruct.OutputBlue  = DMA2D_InitStruct->OutputBlue;
-    DMA2D_ColorStruct.OutputGreen = DMA2D_InitStruct->OutputGreen;
-    DMA2D_ColorStruct.OutputRed   = DMA2D_InitStruct->OutputRed;
-    DMA2D_ColorStruct.OutputAlpha = DMA2D_InitStruct->OutputAlpha;
-    LL_DMA2D_ConfigOutputColor(DMA2Dx, &DMA2D_ColorStruct);
+    dma2d_colorstruct.ColorMode   = DMA2D_InitStruct->ColorMode;
+    dma2d_colorstruct.OutputBlue  = DMA2D_InitStruct->OutputBlue;
+    dma2d_colorstruct.OutputGreen = DMA2D_InitStruct->OutputGreen;
+    dma2d_colorstruct.OutputRed   = DMA2D_InitStruct->OutputRed;
+    dma2d_colorstruct.OutputAlpha = DMA2D_InitStruct->OutputAlpha;
+    LL_DMA2D_ConfigOutputColor(DMA2Dx, &dma2d_colorstruct);
 
     status = SUCCESS;
   }
@@ -665,6 +651,3 @@ void LL_DMA2D_ConfigSize(DMA2D_TypeDef *DMA2Dx, uint32_t NbrOfLines, uint32_t Nb
   */
 
 #endif /* USE_FULL_LL_DRIVER */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

@@ -6,29 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -44,7 +27,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal_def.h"
 
-#if defined(QUADSPI) || defined(QUADSPI1) || defined(QUADSPI2)
+#if defined(QUADSPI)
 
 /** @addtogroup STM32L4xx_HAL_Driver
   * @{
@@ -108,7 +91,11 @@ typedef enum
 /**
   * @brief  QSPI Handle Structure definition
   */
+#if (USE_HAL_QSPI_REGISTER_CALLBACKS == 1)
 typedef struct __QSPI_HandleTypeDef
+#else
+typedef struct
+#endif
 {
   QUADSPI_TypeDef            *Instance;        /* QSPI registers base address        */
   QSPI_InitTypeDef           Init;             /* QSPI communication parameters      */
@@ -462,7 +449,7 @@ typedef void (*pQSPI_CallbackTypeDef)(QSPI_HandleTypeDef *hqspi);
   * @brief QSPI Timeout definition
   * @{
   */
-#define HAL_QPSI_TIMEOUT_DEFAULT_VALUE 5000U /* 5 s */
+#define HAL_QSPI_TIMEOUT_DEFAULT_VALUE 5000U /* 5 s */
 /**
   * @}
   */
@@ -476,7 +463,7 @@ typedef void (*pQSPI_CallbackTypeDef)(QSPI_HandleTypeDef *hqspi);
   * @{
   */
 /** @brief Reset QSPI handle state.
-  * @param  __HANDLE__ : QSPI handle.
+  * @param  __HANDLE__ QSPI handle.
   * @retval None
   */
 #if (USE_HAL_QSPI_REGISTER_CALLBACKS == 1)
@@ -490,20 +477,20 @@ typedef void (*pQSPI_CallbackTypeDef)(QSPI_HandleTypeDef *hqspi);
 #endif
 
 /** @brief  Enable the QSPI peripheral.
-  * @param  __HANDLE__ : specifies the QSPI Handle.
+  * @param  __HANDLE__ specifies the QSPI Handle.
   * @retval None
   */
 #define __HAL_QSPI_ENABLE(__HANDLE__)                       SET_BIT((__HANDLE__)->Instance->CR, QUADSPI_CR_EN)
 
 /** @brief  Disable the QSPI peripheral.
-  * @param  __HANDLE__ : specifies the QSPI Handle.
+  * @param  __HANDLE__ specifies the QSPI Handle.
   * @retval None
   */
 #define __HAL_QSPI_DISABLE(__HANDLE__)                      CLEAR_BIT((__HANDLE__)->Instance->CR, QUADSPI_CR_EN)
 
 /** @brief  Enable the specified QSPI interrupt.
-  * @param  __HANDLE__ : specifies the QSPI Handle.
-  * @param  __INTERRUPT__ : specifies the QSPI interrupt source to enable.
+  * @param  __HANDLE__ specifies the QSPI Handle.
+  * @param  __INTERRUPT__ specifies the QSPI interrupt source to enable.
   *          This parameter can be one of the following values:
   *            @arg QSPI_IT_TO: QSPI Timeout interrupt
   *            @arg QSPI_IT_SM: QSPI Status match interrupt
@@ -516,8 +503,8 @@ typedef void (*pQSPI_CallbackTypeDef)(QSPI_HandleTypeDef *hqspi);
 
 
 /** @brief  Disable the specified QSPI interrupt.
-  * @param  __HANDLE__ : specifies the QSPI Handle.
-  * @param  __INTERRUPT__ : specifies the QSPI interrupt source to disable.
+  * @param  __HANDLE__ specifies the QSPI Handle.
+  * @param  __INTERRUPT__ specifies the QSPI interrupt source to disable.
   *          This parameter can be one of the following values:
   *            @arg QSPI_IT_TO: QSPI Timeout interrupt
   *            @arg QSPI_IT_SM: QSPI Status match interrupt
@@ -529,8 +516,8 @@ typedef void (*pQSPI_CallbackTypeDef)(QSPI_HandleTypeDef *hqspi);
 #define __HAL_QSPI_DISABLE_IT(__HANDLE__, __INTERRUPT__)    CLEAR_BIT((__HANDLE__)->Instance->CR, (__INTERRUPT__))
 
 /** @brief  Check whether the specified QSPI interrupt source is enabled or not.
-  * @param  __HANDLE__ : specifies the QSPI Handle.
-  * @param  __INTERRUPT__ : specifies the QSPI interrupt source to check.
+  * @param  __HANDLE__ specifies the QSPI Handle.
+  * @param  __INTERRUPT__ specifies the QSPI interrupt source to check.
   *          This parameter can be one of the following values:
   *            @arg QSPI_IT_TO: QSPI Timeout interrupt
   *            @arg QSPI_IT_SM: QSPI Status match interrupt
@@ -543,8 +530,8 @@ typedef void (*pQSPI_CallbackTypeDef)(QSPI_HandleTypeDef *hqspi);
 
 /**
   * @brief  Check whether the selected QSPI flag is set or not.
-  * @param  __HANDLE__ : specifies the QSPI Handle.
-  * @param  __FLAG__ : specifies the QSPI flag to check.
+  * @param  __HANDLE__ specifies the QSPI Handle.
+  * @param  __FLAG__ specifies the QSPI flag to check.
   *          This parameter can be one of the following values:
   *            @arg QSPI_FLAG_BUSY: QSPI Busy flag
   *            @arg QSPI_FLAG_TO:   QSPI Timeout flag
@@ -557,8 +544,8 @@ typedef void (*pQSPI_CallbackTypeDef)(QSPI_HandleTypeDef *hqspi);
 #define __HAL_QSPI_GET_FLAG(__HANDLE__, __FLAG__)           ((READ_BIT((__HANDLE__)->Instance->SR, (__FLAG__)) != 0U) ? SET : RESET)
 
 /** @brief  Clears the specified QSPI's flag status.
-  * @param  __HANDLE__ : specifies the QSPI Handle.
-  * @param  __FLAG__ : specifies the QSPI clear register flag that needs to be set
+  * @param  __HANDLE__ specifies the QSPI Handle.
+  * @param  __FLAG__ specifies the QSPI clear register flag that needs to be set
   *          This parameter can be one of the following values:
   *            @arg QSPI_FLAG_TO: QSPI Timeout flag
   *            @arg QSPI_FLAG_SM: QSPI Status match flag
@@ -770,12 +757,10 @@ HAL_StatusTypeDef     HAL_QSPI_SetFlashID      (QSPI_HandleTypeDef *hqspi, uint3
   * @}
   */
 
-#endif /* defined(QUADSPI) || defined(QUADSPI1) || defined(QUADSPI2) */
+#endif /* defined(QUADSPI) */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* STM32L4xx_HAL_QSPI_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

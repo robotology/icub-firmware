@@ -6,29 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -116,8 +99,9 @@ ErrorStatus LL_SWPMI_DeInit(SWPMI_TypeDef *SWPMIx)
 
 /**
   * @brief  Initialize the SWPMI peripheral according to the specified parameters in the SWPMI_InitStruct.
-  * @note   As some bits in SWPMI configuration registers can only be written when the SWPMI is deactivated (SWPMI_CR_SWPACT bit = 0),
-  *         SWPMI IP should be in deactivated state prior calling this function. Otherwise, ERROR result will be returned.
+  * @note   As some bits in SWPMI configuration registers can only be written when the SWPMI is deactivated
+  *         (SWPMI_CR_SWPACT bit = 0), the SWPMI peripheral should be in deactivated state prior calling
+  *         this function. Otherwise, ERROR result will be returned.
   * @param  SWPMIx           SWPMI Instance
   * @param  SWPMI_InitStruct pointer to a @ref LL_SWPMI_InitTypeDef structure that contains
   *                          the configuration information for the SWPMI peripheral.
@@ -147,8 +131,8 @@ ErrorStatus LL_SWPMI_Init(SWPMI_TypeDef *SWPMIx, LL_SWPMI_InitTypeDef *SWPMI_Ini
 
     /* Set the new configuration of the SWPMI peripheral */
     MODIFY_REG(SWPMIx->CR,
-              (SWPMI_CR_RXMODE | SWPMI_CR_TXMODE),
-              (SWPMI_InitStruct->TxBufferingMode | SWPMI_InitStruct->RxBufferingMode));
+               (SWPMI_CR_RXMODE | SWPMI_CR_TXMODE),
+               (SWPMI_InitStruct->TxBufferingMode | SWPMI_InitStruct->RxBufferingMode));
   }
   /* Else (SWPMI not in deactivated state => return ERROR) */
   else
@@ -193,5 +177,3 @@ void LL_SWPMI_StructInit(LL_SWPMI_InitTypeDef *SWPMI_InitStruct)
   */
 
 #endif /* USE_FULL_LL_DRIVER */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

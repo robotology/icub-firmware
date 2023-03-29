@@ -7,34 +7,17 @@
   *          This file contains:
   *           - Data structures and the address mapping for all peripherals
   *           - Peripheral's registers declarations and bits definition
-  *           - Macros to access peripheral’s registers hardware
+  *           - Macros to access peripheral's registers hardware
   *
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -61,11 +44,11 @@
 /**
   * @brief Configuration of the Cortex-M4 Processor and Core Peripherals
    */
-#define __CM4_REV                 0x0001  /*!< Cortex-M4 revision r0p1                       */
-#define __MPU_PRESENT             1       /*!< STM32L4XX provides an MPU                     */
-#define __NVIC_PRIO_BITS          4       /*!< STM32L4XX uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used  */
-#define __FPU_PRESENT             1       /*!< FPU present                                   */
+#define __CM4_REV                 0x0001U  /*!< Cortex-M4 revision r0p1                       */
+#define __MPU_PRESENT             1U       /*!< STM32L4XX provides an MPU                     */
+#define __NVIC_PRIO_BITS          4U       /*!< STM32L4XX uses 4 Bits for the Priority Levels */
+#define __Vendor_SysTickConfig    0U       /*!< Set to 1 if different SysTick Config is used  */
+#define __FPU_PRESENT             1U       /*!< FPU present                                   */
 
 /**
   * @}
@@ -1213,7 +1196,10 @@ typedef struct
 /** @addtogroup Peripheral_memory_map
   * @{
   */
-#define FLASH_BASE            (0x08000000UL) /*!< FLASH(up to 1 MB) base address */
+#define FLASH_BASE            (0x08000000UL) /*!< FLASH(up to 1 MB) base address   */
+#define FLASH_END             (0x080FFFFFUL) /*!< FLASH END address                */
+#define FLASH_BANK1_END       (0x0807FFFFUL) /*!< FLASH END address of bank1       */
+#define FLASH_BANK2_END       (0x080FFFFFUL) /*!< FLASH END address of bank2       */
 #define SRAM1_BASE            (0x20000000UL) /*!< SRAM1(up to 256 KB) base address */
 #define SRAM2_BASE            (0x10000000UL) /*!< SRAM2(64 KB) base address */
 #define PERIPH_BASE           (0x40000000UL) /*!< Peripheral base address */
@@ -1231,6 +1217,11 @@ typedef struct
 
 #define SRAM1_SIZE_MAX        (0x00040000UL) /*!< maximum SRAM1 size (up to 256 KBytes) */
 #define SRAM2_SIZE            (0x00010000UL) /*!< SRAM2 size (64 KBytes) */
+
+#define FLASH_SIZE_DATA_REGISTER ((uint32_t)0x1FFF75E0)
+
+#define FLASH_SIZE               (((((*((uint32_t *)FLASH_SIZE_DATA_REGISTER)) & (0x0000FFFFU))== 0x0000FFFFU)) ? (0x400U << 10U) : \
+                                  (((*((uint32_t *)FLASH_SIZE_DATA_REGISTER)) & (0x0000FFFFU)) << 10U))
 
 /*!< Peripheral memory map */
 #define APB1PERIPH_BASE        PERIPH_BASE
@@ -1548,6 +1539,15 @@ typedef struct
   * @{
   */
 
+/** @addtogroup Hardware_Constant_Definition
+  * @{
+  */
+#define LSI_STARTUP_TIME 130U /*!< LSI Maximum startup time in us */
+
+/**
+  * @}
+  */
+
 /** @addtogroup Peripheral_Registers_Bits_Definition
   * @{
   */
@@ -1702,7 +1702,7 @@ typedef struct
 
 #define ADC_CFGR_ALIGN_Pos             (5U)
 #define ADC_CFGR_ALIGN_Msk             (0x1UL << ADC_CFGR_ALIGN_Pos)           /*!< 0x00000020 */
-#define ADC_CFGR_ALIGN                 ADC_CFGR_ALIGN_Msk                      /*!< ADC data alignement */
+#define ADC_CFGR_ALIGN                 ADC_CFGR_ALIGN_Msk                      /*!< ADC data alignment */
 
 #define ADC_CFGR_EXTSEL_Pos            (6U)
 #define ADC_CFGR_EXTSEL_Msk            (0xFUL << ADC_CFGR_EXTSEL_Pos)          /*!< 0x000003C0 */
@@ -6273,7 +6273,13 @@ typedef struct
 #define CRS_CR_SWSYNC             CRS_CR_SWSYNC_Msk                            /*!< Generate software SYNC event */
 #define CRS_CR_TRIM_Pos           (8U)
 #define CRS_CR_TRIM_Msk           (0x3FUL << CRS_CR_TRIM_Pos)                  /*!< 0x00003F00 */
-#define CRS_CR_TRIM               CRS_CR_TRIM_Msk                              /*!< HSI48 oscillator smooth trimming */
+#define CRS_CR_TRIM               CRS_CR_TRIM_Msk                              /*!< TRIM[5:0] HSI48 oscillator smooth trimming */
+#define CRS_CR_TRIM_0             (0x01UL << CRS_CR_TRIM_Pos)                  /*!< 0x00000100 */
+#define CRS_CR_TRIM_1             (0x02UL << CRS_CR_TRIM_Pos)                  /*!< 0x00000200 */
+#define CRS_CR_TRIM_2             (0x04UL << CRS_CR_TRIM_Pos)                  /*!< 0x00000400 */
+#define CRS_CR_TRIM_3             (0x08UL << CRS_CR_TRIM_Pos)                  /*!< 0x00000800 */
+#define CRS_CR_TRIM_4             (0x10UL << CRS_CR_TRIM_Pos)                  /*!< 0x00001000 */
+#define CRS_CR_TRIM_5             (0x20UL << CRS_CR_TRIM_Pos)                  /*!< 0x00002000 */
 
 /*******************  Bit definition for CRS_CFGR register  *********************/
 #define CRS_CFGR_RELOAD_Pos       (0U)
@@ -8448,9 +8454,6 @@ typedef struct
 #define FLASH_SR_BSY_Pos                  (16U)
 #define FLASH_SR_BSY_Msk                  (0x1UL << FLASH_SR_BSY_Pos)          /*!< 0x00010000 */
 #define FLASH_SR_BSY                      FLASH_SR_BSY_Msk
-#define FLASH_SR_PEMPTY_Pos               (17U)
-#define FLASH_SR_PEMPTY_Msk               (0x1UL << FLASH_SR_PEMPTY_Pos)       /*!< 0x00020000 */
-#define FLASH_SR_PEMPTY                   FLASH_SR_PEMPTY_Msk
 
 /*******************  Bits definition for FLASH_CR register  ******************/
 #define FLASH_CR_PG_Pos                   (0U)
@@ -8638,7 +8641,7 @@ typedef struct
 /******************  Bit definition for FMC_BCR1 register  *******************/
 #define FMC_BCR1_CCLKEN_Pos        (20U)
 #define FMC_BCR1_CCLKEN_Msk        (0x1UL << FMC_BCR1_CCLKEN_Pos)              /*!< 0x00100000 */
-#define FMC_BCR1_CCLKEN            FMC_BCR1_CCLKEN_Msk                         /*!<Continous clock enable     */
+#define FMC_BCR1_CCLKEN            FMC_BCR1_CCLKEN_Msk                         /*!<Continuous clock enable     */
 #define FMC_BCR1_WFDIS_Pos         (21U)
 #define FMC_BCR1_WFDIS_Msk         (0x1UL << FMC_BCR1_WFDIS_Pos)               /*!< 0x00200000 */
 #define FMC_BCR1_WFDIS             FMC_BCR1_WFDIS_Msk                          /*!<Write FIFO Disable         */
@@ -12802,8 +12805,12 @@ typedef struct
 #define RTC_TAMPER1_SUPPORT
 #define RTC_TAMPER2_SUPPORT
 #define RTC_TAMPER3_SUPPORT
+
 #define RTC_WAKEUP_SUPPORT
 #define RTC_BACKUP_SUPPORT
+/******************** Number of backup registers ******************************/
+#define RTC_BKP_NUMBER                32U
+
 
 /********************  Bits definition for RTC_TR register  *******************/
 #define RTC_TR_PM_Pos                  (22U)
@@ -13559,9 +13566,6 @@ typedef struct
 #define RTC_BKP31R_Pos                 (0U)
 #define RTC_BKP31R_Msk                 (0xFFFFFFFFUL << RTC_BKP31R_Pos)        /*!< 0xFFFFFFFF */
 #define RTC_BKP31R                     RTC_BKP31R_Msk
-
-/******************** Number of backup registers ******************************/
-#define RTC_BKP_NUMBER                       32U
 
 /******************************************************************************/
 /*                                                                            */
@@ -16110,7 +16114,7 @@ typedef struct
 
 /******************************************************************************/
 /*                                                                            */
-/*                         Low Power Timer (LPTTIM)                           */
+/*                         Low Power Timer (LPTIM)                            */
 /*                                                                            */
 /******************************************************************************/
 /******************  Bit definition for LPTIM_ISR register  *******************/
@@ -19252,6 +19256,9 @@ typedef struct
 #define IS_LPTIM_INSTANCE(INSTANCE)     (((INSTANCE) == LPTIM1) || \
                                          ((INSTANCE) == LPTIM2))
 
+/****************** LPTIM Instances : supporting the encoder mode *************/
+#define IS_LPTIM_ENCODER_INTERFACE_INSTANCE(INSTANCE) ((INSTANCE) == LPTIM1)
+
 /****************** TIM Instances : All supported instances *******************/
 #define IS_TIM_INSTANCE(INSTANCE)       (((INSTANCE) == TIM1)   || \
                                          ((INSTANCE) == TIM2)   || \
@@ -19585,9 +19592,6 @@ typedef struct
                                                        ((INSTANCE) == TIM16) || \
                                                        ((INSTANCE) == TIM17))
 
-/****************** TIM Instances : supporting synchronization ****************/
-#define IS_TIM_SYNCHRO_INSTANCE(INSTANCE)  IS_TIM_MASTER_INSTANCE(INSTANCE)
-
 /****************** TIM Instances : supporting ADC triggering through TRGO2 ***/
 #define IS_TIM_TRGO2_INSTANCE(INSTANCE)    (((INSTANCE) == TIM1)    || \
                                             ((INSTANCE) == TIM8))
@@ -19705,6 +19709,7 @@ typedef struct
 #define ADC1_IRQn                      ADC1_2_IRQn
 #define TIM1_TRG_COM_IRQn              TIM1_TRG_COM_TIM17_IRQn
 #define TIM8_IRQn                      TIM8_UP_IRQn
+#define DCMI_PSSI_IRQn                 DCMI_IRQn
 #define HASH_RNG_IRQn                  RNG_IRQn
 #define HASH_CRS_IRQn                  CRS_IRQn
 #define DFSDM0_IRQn                    DFSDM1_FLT0_IRQn
@@ -19717,6 +19722,7 @@ typedef struct
 #define ADC1_IRQHandler                ADC1_2_IRQHandler
 #define TIM1_TRG_COM_IRQHandler        TIM1_TRG_COM_TIM17_IRQHandler
 #define TIM8_IRQHandler                TIM8_UP_IRQHandler
+#define DCMI_PSSI_IRQHandler           DCMI_IRQHandler
 #define HASH_RNG_IRQHandler            RNG_IRQHandler
 #define HASH_CRS_IRQHandler            CRS_IRQHandler
 #define DFSDM0_IRQHandler              DFSDM1_FLT0_IRQHandler
@@ -19738,4 +19744,3 @@ typedef struct
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

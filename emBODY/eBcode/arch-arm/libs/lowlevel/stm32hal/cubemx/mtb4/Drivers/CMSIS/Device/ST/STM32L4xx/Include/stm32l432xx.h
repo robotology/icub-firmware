@@ -7,34 +7,17 @@
   *          This file contains:
   *           - Data structures and the address mapping for all peripherals
   *           - Peripheral's registers declarations and bits definition
-  *           - Macros to access peripheral’s registers hardware
+  *           - Macros to access peripheral's registers hardware
   *
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -61,11 +44,11 @@
 /**
   * @brief Configuration of the Cortex-M4 Processor and Core Peripherals
    */
-#define __CM4_REV                 0x0001  /*!< Cortex-M4 revision r0p1                       */
-#define __MPU_PRESENT             1       /*!< STM32L4XX provides an MPU                     */
-#define __NVIC_PRIO_BITS          4       /*!< STM32L4XX uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used  */
-#define __FPU_PRESENT             1       /*!< FPU present                                   */
+#define __CM4_REV                 0x0001U  /*!< Cortex-M4 revision r0p1                       */
+#define __MPU_PRESENT             1U       /*!< STM32L4XX provides an MPU                     */
+#define __NVIC_PRIO_BITS          4U       /*!< STM32L4XX uses 4 Bits for the Priority Levels */
+#define __Vendor_SysTickConfig    0U       /*!< Set to 1 if different SysTick Config is used  */
+#define __FPU_PRESENT             1U       /*!< FPU present                                   */
 
 /**
   * @}
@@ -93,7 +76,7 @@ typedef enum
   SysTick_IRQn                = -1,     /*!< 15 Cortex-M4 System Tick Interrupt                                */
 /******  STM32 specific Interrupt Numbers **********************************************************************/
   WWDG_IRQn                   = 0,      /*!< Window WatchDog Interrupt                                         */
-  PVD_PVM_IRQn                = 1,      /*!< PVD/PVM1/PVM2/PVM3/PVM4 through EXTI Line detection Interrupts    */
+  PVD_PVM_IRQn                = 1,      /*!< PVD/PVM3/PVM4 through EXTI Line detection Interrupts              */
   TAMP_STAMP_IRQn             = 2,      /*!< Tamper and TimeStamp interrupts through the EXTI line             */
   RTC_WKUP_IRQn               = 3,      /*!< RTC Wakeup interrupt through the EXTI line                        */
   FLASH_IRQn                  = 4,      /*!< FLASH global Interrupt                                            */
@@ -929,7 +912,9 @@ typedef struct
   * @{
   */
 #define FLASH_BASE            (0x08000000UL) /*!< FLASH(up to 256 KB) base address */
-#define SRAM1_BASE            (0x20000000UL) /*!< SRAM1(up to 48 KB) base address */
+#define FLASH_END             (0x0803FFFFUL) /*!< FLASH END address                */
+#define FLASH_BANK1_END       (0x0803FFFFUL) /*!< FLASH END address of bank1       */
+#define SRAM1_BASE            (0x20000000UL) /*!< SRAM1(up to 48 KB) base address  */
 #define SRAM2_BASE            (0x10000000UL) /*!< SRAM2(16 KB) base address */
 #define PERIPH_BASE           (0x40000000UL) /*!< Peripheral base address */
 #define QSPI_BASE             (0x90000000UL) /*!< QUADSPI memories accessible over AHB base address */
@@ -944,6 +929,11 @@ typedef struct
 
 #define SRAM1_SIZE_MAX        (0x0000C000UL) /*!< maximum SRAM1 size (up to 48 KBytes) */
 #define SRAM2_SIZE            (0x00004000UL) /*!< SRAM2 size (16 KBytes) */
+
+#define FLASH_SIZE_DATA_REGISTER ((uint32_t)0x1FFF75E0)
+
+#define FLASH_SIZE               (((((*((uint32_t *)FLASH_SIZE_DATA_REGISTER)) & (0x0000FFFFU)) == 0x0000FFFFU)) ? (0x100U << 10U) : \
+                                  (((*((uint32_t *)FLASH_SIZE_DATA_REGISTER)) & (0x0000FFFFU)) << 10U))
 
 /*!< Peripheral memory map */
 #define APB1PERIPH_BASE        PERIPH_BASE
@@ -1139,6 +1129,15 @@ typedef struct
   * @{
   */
 
+/** @addtogroup Hardware_Constant_Definition
+  * @{
+  */
+#define LSI_STARTUP_TIME 130U /*!< LSI Maximum startup time in us */
+
+/**
+  * @}
+  */
+
 /** @addtogroup Peripheral_Registers_Bits_Definition
   * @{
   */
@@ -1289,7 +1288,7 @@ typedef struct
 
 #define ADC_CFGR_ALIGN_Pos             (5U)
 #define ADC_CFGR_ALIGN_Msk             (0x1UL << ADC_CFGR_ALIGN_Pos)           /*!< 0x00000020 */
-#define ADC_CFGR_ALIGN                 ADC_CFGR_ALIGN_Msk                      /*!< ADC data alignement */
+#define ADC_CFGR_ALIGN                 ADC_CFGR_ALIGN_Msk                      /*!< ADC data alignment */
 
 #define ADC_CFGR_EXTSEL_Pos            (6U)
 #define ADC_CFGR_EXTSEL_Msk            (0xFUL << ADC_CFGR_EXTSEL_Pos)          /*!< 0x000003C0 */
@@ -5716,7 +5715,13 @@ typedef struct
 #define CRS_CR_SWSYNC             CRS_CR_SWSYNC_Msk                            /*!< Generate software SYNC event */
 #define CRS_CR_TRIM_Pos           (8U)
 #define CRS_CR_TRIM_Msk           (0x3FUL << CRS_CR_TRIM_Pos)                  /*!< 0x00003F00 */
-#define CRS_CR_TRIM               CRS_CR_TRIM_Msk                              /*!< HSI48 oscillator smooth trimming */
+#define CRS_CR_TRIM               CRS_CR_TRIM_Msk                              /*!< TRIM[5:0] HSI48 oscillator smooth trimming */
+#define CRS_CR_TRIM_0             (0x01UL << CRS_CR_TRIM_Pos)                  /*!< 0x00000100 */
+#define CRS_CR_TRIM_1             (0x02UL << CRS_CR_TRIM_Pos)                  /*!< 0x00000200 */
+#define CRS_CR_TRIM_2             (0x04UL << CRS_CR_TRIM_Pos)                  /*!< 0x00000400 */
+#define CRS_CR_TRIM_3             (0x08UL << CRS_CR_TRIM_Pos)                  /*!< 0x00000800 */
+#define CRS_CR_TRIM_4             (0x10UL << CRS_CR_TRIM_Pos)                  /*!< 0x00001000 */
+#define CRS_CR_TRIM_5             (0x20UL << CRS_CR_TRIM_Pos)                  /*!< 0x00002000 */
 
 /*******************  Bit definition for CRS_CFGR register  *********************/
 #define CRS_CFGR_RELOAD_Pos       (0U)
@@ -6923,7 +6928,7 @@ typedef struct
 #define FLASH_CR_MER1_Msk                 (0x1UL << FLASH_CR_MER1_Pos)         /*!< 0x00000004 */
 #define FLASH_CR_MER1                     FLASH_CR_MER1_Msk
 #define FLASH_CR_PNB_Pos                  (3U)
-#define FLASH_CR_PNB_Msk                  (0xFFUL << FLASH_CR_PNB_Pos)         /*!< 0x000007F8 */
+#define FLASH_CR_PNB_Msk                  (0x7FUL << FLASH_CR_PNB_Pos)         /*!< 0x000003F8 */
 #define FLASH_CR_PNB                      FLASH_CR_PNB_Msk
 #define FLASH_CR_STRT_Pos                 (16U)
 #define FLASH_CR_STRT_Msk                 (0x1UL << FLASH_CR_STRT_Pos)         /*!< 0x00010000 */
@@ -7021,12 +7026,12 @@ typedef struct
 
 /******************  Bits definition for FLASH_PCROP1SR register  **********/
 #define FLASH_PCROP1SR_PCROP1_STRT_Pos    (0U)
-#define FLASH_PCROP1SR_PCROP1_STRT_Msk    (0xFFFFUL << FLASH_PCROP1SR_PCROP1_STRT_Pos) /*!< 0x0000FFFF */
+#define FLASH_PCROP1SR_PCROP1_STRT_Msk    (0x7FFFUL << FLASH_PCROP1SR_PCROP1_STRT_Pos) /*!< 0x00007FFF */
 #define FLASH_PCROP1SR_PCROP1_STRT        FLASH_PCROP1SR_PCROP1_STRT_Msk
 
 /******************  Bits definition for FLASH_PCROP1ER register  ***********/
 #define FLASH_PCROP1ER_PCROP1_END_Pos     (0U)
-#define FLASH_PCROP1ER_PCROP1_END_Msk     (0xFFFFUL << FLASH_PCROP1ER_PCROP1_END_Pos) /*!< 0x0000FFFF */
+#define FLASH_PCROP1ER_PCROP1_END_Msk     (0x7FFFUL << FLASH_PCROP1ER_PCROP1_END_Pos) /*!< 0x00007FFF */
 #define FLASH_PCROP1ER_PCROP1_END         FLASH_PCROP1ER_PCROP1_END_Msk
 #define FLASH_PCROP1ER_PCROP_RDP_Pos      (31U)
 #define FLASH_PCROP1ER_PCROP_RDP_Msk      (0x1UL << FLASH_PCROP1ER_PCROP_RDP_Pos) /*!< 0x80000000 */
@@ -7034,18 +7039,18 @@ typedef struct
 
 /******************  Bits definition for FLASH_WRP1AR register  ***************/
 #define FLASH_WRP1AR_WRP1A_STRT_Pos       (0U)
-#define FLASH_WRP1AR_WRP1A_STRT_Msk       (0xFFUL << FLASH_WRP1AR_WRP1A_STRT_Pos) /*!< 0x000000FF */
+#define FLASH_WRP1AR_WRP1A_STRT_Msk       (0x7FUL << FLASH_WRP1AR_WRP1A_STRT_Pos) /*!< 0x0000007F */
 #define FLASH_WRP1AR_WRP1A_STRT           FLASH_WRP1AR_WRP1A_STRT_Msk
 #define FLASH_WRP1AR_WRP1A_END_Pos        (16U)
-#define FLASH_WRP1AR_WRP1A_END_Msk        (0xFFUL << FLASH_WRP1AR_WRP1A_END_Pos)  /*!< 0x00FF0000 */
+#define FLASH_WRP1AR_WRP1A_END_Msk        (0x7FUL << FLASH_WRP1AR_WRP1A_END_Pos)  /*!< 0x007F0000 */
 #define FLASH_WRP1AR_WRP1A_END            FLASH_WRP1AR_WRP1A_END_Msk
 
 /******************  Bits definition for FLASH_WRPB1R register  ***************/
 #define FLASH_WRP1BR_WRP1B_STRT_Pos       (0U)
-#define FLASH_WRP1BR_WRP1B_STRT_Msk       (0xFFUL << FLASH_WRP1BR_WRP1B_STRT_Pos) /*!< 0x000000FF */
+#define FLASH_WRP1BR_WRP1B_STRT_Msk       (0x7FUL << FLASH_WRP1BR_WRP1B_STRT_Pos) /*!< 0x0000007F */
 #define FLASH_WRP1BR_WRP1B_STRT           FLASH_WRP1BR_WRP1B_STRT_Msk
 #define FLASH_WRP1BR_WRP1B_END_Pos        (16U)
-#define FLASH_WRP1BR_WRP1B_END_Msk        (0xFFUL << FLASH_WRP1BR_WRP1B_END_Pos)  /*!< 0x00FF0000 */
+#define FLASH_WRP1BR_WRP1B_END_Msk        (0x7FUL << FLASH_WRP1BR_WRP1B_END_Pos)  /*!< 0x007F0000 */
 #define FLASH_WRP1BR_WRP1B_END            FLASH_WRP1BR_WRP1B_END_Msk
 
 
@@ -8481,8 +8486,8 @@ typedef struct
 #define PWR_CR2_USV_Msk              (0x1UL << PWR_CR2_USV_Pos)                /*!< 0x00000400 */
 #define PWR_CR2_USV                  PWR_CR2_USV_Msk                           /*!< VDD USB Supply Valid */
 /*!< PVME  Peripheral Voltage Monitor Enable */
-#define PWR_CR2_PVME_Pos             (6U)
-#define PWR_CR2_PVME_Msk             (0x3UL << PWR_CR2_PVME_Pos)               /*!< 0x000000C0 */
+#define PWR_CR2_PVME_Pos             (4U)
+#define PWR_CR2_PVME_Msk             (0xDUL << PWR_CR2_PVME_Pos)               /*!< 0x000000D0 */
 #define PWR_CR2_PVME                 PWR_CR2_PVME_Msk                          /*!< PVM bits field */
 #define PWR_CR2_PVME4_Pos            (7U)
 #define PWR_CR2_PVME4_Msk            (0x1UL << PWR_CR2_PVME4_Pos)              /*!< 0x00000080 */
@@ -8490,6 +8495,9 @@ typedef struct
 #define PWR_CR2_PVME3_Pos            (6U)
 #define PWR_CR2_PVME3_Msk            (0x1UL << PWR_CR2_PVME3_Pos)              /*!< 0x00000040 */
 #define PWR_CR2_PVME3                PWR_CR2_PVME3_Msk                         /*!< PVM 3 Enable */
+#define PWR_CR2_PVME1_Pos            (4U)
+#define PWR_CR2_PVME1_Msk            (0x1UL << PWR_CR2_PVME1_Pos)              /*!< 0x00000010 */
+#define PWR_CR2_PVME1                PWR_CR2_PVME1_Msk                         /*!< PVM 1 Enable */
 /*!< PVD level configuration */
 #define PWR_CR2_PLS_Pos              (1U)
 #define PWR_CR2_PLS_Msk              (0x7UL << PWR_CR2_PLS_Pos)                /*!< 0x0000000E */
@@ -9851,8 +9859,12 @@ typedef struct
 * @brief Specific device feature definitions
 */
 #define RTC_TAMPER2_SUPPORT
+
 #define RTC_WAKEUP_SUPPORT
 #define RTC_BACKUP_SUPPORT
+/******************** Number of backup registers ******************************/
+#define RTC_BKP_NUMBER                32U
+
 
 /********************  Bits definition for RTC_TR register  *******************/
 #define RTC_TR_PM_Pos                  (22U)
@@ -10572,9 +10584,6 @@ typedef struct
 #define RTC_BKP31R_Pos                 (0U)
 #define RTC_BKP31R_Msk                 (0xFFFFFFFFUL << RTC_BKP31R_Pos)        /*!< 0xFFFFFFFF */
 #define RTC_BKP31R                     RTC_BKP31R_Msk
-
-/******************** Number of backup registers ******************************/
-#define RTC_BKP_NUMBER                       32U
 
 /******************************************************************************/
 /*                                                                            */
@@ -12270,7 +12279,7 @@ typedef struct
 
 /******************************************************************************/
 /*                                                                            */
-/*                         Low Power Timer (LPTTIM)                           */
+/*                         Low Power Timer (LPTIM)                            */
 /*                                                                            */
 /******************************************************************************/
 /******************  Bit definition for LPTIM_ISR register  *******************/
@@ -14552,6 +14561,9 @@ typedef struct
 #define IS_LPTIM_INSTANCE(INSTANCE)     (((INSTANCE) == LPTIM1) || \
                                          ((INSTANCE) == LPTIM2))
 
+/****************** LPTIM Instances : supporting the encoder mode *************/
+#define IS_LPTIM_ENCODER_INTERFACE_INSTANCE(INSTANCE) ((INSTANCE) == LPTIM1)
+
 /****************** TIM Instances : All supported instances *******************/
 #define IS_TIM_INSTANCE(INSTANCE)       (((INSTANCE) == TIM1)   || \
                                          ((INSTANCE) == TIM2)   || \
@@ -14742,9 +14754,6 @@ typedef struct
                                                        ((INSTANCE) == TIM15) || \
                                                        ((INSTANCE) == TIM16))
 
-/****************** TIM Instances : supporting synchronization ****************/
-#define IS_TIM_SYNCHRO_INSTANCE(INSTANCE)  IS_TIM_MASTER_INSTANCE(INSTANCE)
-
 /****************** TIM Instances : supporting ADC triggering through TRGO2 ***/
 #define IS_TIM_TRGO2_INSTANCE(INSTANCE)    ((INSTANCE) == TIM1)
 
@@ -14858,4 +14867,3 @@ typedef struct
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
