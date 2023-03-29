@@ -7,17 +7,17 @@
 
   <Targets>
     <Target>
-      <TargetName>strain2-updtbtl-ulpro-v190</TargetName>
+      <TargetName>strain2-updtbtl-v1B0</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32L433RCTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.4.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32L4xx_DFP.2.6.1</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0000C000) IRAM2(0x10000000,0x00004000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>strain2_ub_v190</OutputName>
+          <OutputName>strain2_ub</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -82,7 +82,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\strain2_ub_v190.hex ..\bin\strain2.updaterofbootloader.v190.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\strain2_ub.hex ..\bin\strain2.updaterofbootloader.v1B0.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -186,6 +186,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -336,8 +337,8 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V190 not_STRAIN2_APP_AT_128K</Define>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -Dnot_STRAIN2_APP_AT_128K</MiscControls>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V1B0</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp</IncludePath>
             </VariousControls>
@@ -399,9 +400,33 @@
           <GroupName>stm32hal-nucleo</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.strain2.v190.lib</FileName>
+              <FileName>stm32hal.l4.v1B0.strain2.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.v190.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1B0.strain2.lib</FilePath>
+            </File>
+            <File>
+              <FileName>stm32hal.l4.v1D3.strain2.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.strain2.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -409,9 +434,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.startup.strain2.v190.s</FileName>
+              <FileName>stm32hal.startup.strain2.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.strain2.v190.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.strain2.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -721,23 +746,23 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>strain2-updtbtl-0offset</TargetName>
+      <TargetName>strain2-updtbtl-v1D3</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32L443RCTx</Device>
+          <Device>STM32L433RCTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.4.0</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32L4xx_DFP.2.6.1</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x0000C000) IRAM2(0x10000000,0x00004000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32L4xx_256 -FS08000000 -FL040000 -FP0($$Device:STM32L443RCTx$CMSIS\Flash\STM32L4xx_256.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32L4xx_256 -FS08000000 -FL040000 -FP0($$Device:STM32L433RCTx$CMSIS\Flash\STM32L4xx_256.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:STM32L443RCTx$Drivers\CMSIS\Device\ST\STM32L4xx\Include\stm32l4xx.h</RegisterFile>
+          <RegisterFile>$$Device:STM32L433RCTx$Drivers\CMSIS\Device\ST\STM32L4xx\Include\stm32l4xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -747,7 +772,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32L443RCTx$CMSIS\SVD\STM32L4x3.svd</SFDFile>
+          <SFDFile>$$Device:STM32L433RCTx$CMSIS\SVD\STM32L4x3.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -763,7 +788,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>strain2_0_ubootloader</OutputName>
+          <OutputName>strain2_ub</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -796,7 +821,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\strain2_0_ubootloader.hex ..\bin\strain2.0.updaterofbootloader.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\strain2_ub.hex ..\bin\strain2.updaterofbootloader.v1D3.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -900,6 +925,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1043,17 +1069,17 @@
             <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
-            <v6LangP>6</v6LangP>
+            <v6LangP>8</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V190 EMBOT_APPL_ZEROOFFSET</Define>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -Dnot_STRAIN2_APP_AT_128K</MiscControls>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V1D3</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1084,7 +1110,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\strain2-application0offset.sct</ScatterFile>
+            <ScatterFile>.\strain2-application-v6.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -1113,9 +1139,33 @@
           <GroupName>stm32hal-nucleo</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.strain2.v190.lib</FileName>
+              <FileName>stm32hal.l4.v1B0.strain2.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.v190.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1B0.strain2.lib</FilePath>
+            </File>
+            <File>
+              <FileName>stm32hal.l4.v1D3.strain2.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.strain2.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -1123,9 +1173,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.startup.strain2.v190.s</FileName>
+              <FileName>stm32hal.startup.strain2.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.strain2.v190.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.strain2.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1442,8 +1492,8 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.2.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.5.1"/>
         <targetInfos>
-          <targetInfo excluded="1" name="strain2-updtbtl-0offset" versionMatchMode=""/>
-          <targetInfo excluded="1" name="strain2-updtbtl-ulpro-v190" versionMatchMode=""/>
+          <targetInfo excluded="1" name="strain2-updtbtl-v1B0" versionMatchMode=""/>
+          <targetInfo excluded="1" name="strain2-updtbtl-v1D3" versionMatchMode=""/>
         </targetInfos>
       </component>
     </components>
@@ -1453,12 +1503,7 @@
   <LayerInfo>
     <Layers>
       <Layer>
-        <LayName>&lt;Project Info&gt;</LayName>
-        <LayDesc></LayDesc>
-        <LayUrl></LayUrl>
-        <LayKeys></LayKeys>
-        <LayCat></LayCat>
-        <LayLic></LayLic>
+        <LayName>strain2-updaterofbootloader-v6</LayName>
         <LayTarg>0</LayTarg>
         <LayPrjMark>1</LayPrjMark>
       </Layer>
