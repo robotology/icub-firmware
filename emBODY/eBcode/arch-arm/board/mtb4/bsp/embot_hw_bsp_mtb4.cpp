@@ -584,13 +584,13 @@ namespace embot { namespace hw { namespace bno055 {
 
 namespace embot { namespace hw { namespace bno055 {
     
-    #if defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2)
+    #if defined(STM32HAL_BOARD_MTB4)
     
-    // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
     constexpr PROP prop01 {
         { embot::hw::I2C::two, 0x52 },
         { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen },   // .boot
-        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve }      // .reset
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve },     // .reset
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::ten }         // .INT but for future use
     };
 
     constexpr BSP thebsp {        
@@ -602,7 +602,17 @@ namespace embot { namespace hw { namespace bno055 {
         }}        
     };
 
-    void BSP::init(embot::hw::BNO055 h) const {}
+    void BSP::init(embot::hw::BNO055 h) const 
+    {
+        // 1. be sure that the pins that configure the bno055 are set correctly.
+        // have a look at EN_OSC_Pin, 
+        
+        // the PS1 must be low to ensure i2c and not usart
+        constexpr embot::hw::GPIO PS1 { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::eleven };
+        embot::hw::gpio::init(PS1, embot::hw::gpio::cfgOUTpp);
+        embot::hw::gpio::set(PS1, embot::hw::gpio::State::RESET); 
+        // the nBOOT_LOAD_PIN and the nRESET will be managed inside the driver, if valid        
+    }
         
     #else
         #error embot::hw::bno055::thebsp must be defined    
