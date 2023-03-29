@@ -10,7 +10,7 @@
       <TargetName>basic-mtb4c</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -338,7 +338,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_MTB4C STM32HAL_DRIVER_V190</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_MTB4C STM32HAL_DRIVER_V1D3</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
             </VariousControls>
@@ -395,9 +395,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.mtb4c.v190.lib</FileName>
+              <FileName>stm32hal.l4.v1D3.mtb4c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.mtb4c.v190.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.mtb4c.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -405,9 +405,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.l4.startup.mtb4c.v190.s</FileName>
+              <FileName>stm32hal.l4.startup.mtb4c.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.l4.startup.mtb4c.v190.s</FilePath>
+              <FilePath>..\cfg\stm32hal.l4.startup.mtb4c.s</FilePath>
             </File>
           </Files>
         </Group>

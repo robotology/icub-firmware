@@ -7,10 +7,10 @@
 
   <Targets>
     <Target>
-      <TargetName>mtb4-test-v190</TargetName>
+      <TargetName>mtb4c-test-v190</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -400,9 +400,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.mtb4c.v190.lib</FileName>
+              <FileName>stm32hal.l4.v190.mtb4c.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.mtb4c.v190.lib</FilePath>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v190.mtb4c.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -410,9 +410,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.startup.mtb4.v172.s</FileName>
+              <FileName>stm32hal.startup.mtb4c.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.mtb4.v172.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.mtb4c.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -768,7 +768,7 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
         <targetInfos>
-          <targetInfo excluded="1" name="mtb4-test-v190" versionMatchMode=""/>
+          <targetInfo excluded="1" name="mtb4c-test-v190" versionMatchMode=""/>
         </targetInfos>
       </component>
     </components>
