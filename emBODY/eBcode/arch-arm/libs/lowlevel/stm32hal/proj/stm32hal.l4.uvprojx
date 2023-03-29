@@ -2988,9 +2988,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -7037,9 +7037,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -11086,9 +11086,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -12200,8 +12200,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\v6-lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -15135,9 +15135,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -19184,9 +19184,9 @@
           <GroupName>board-nucleol4-v1D3</GroupName>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -23302,9 +23302,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -27591,9 +27591,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -31931,9 +31931,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -36031,9 +36031,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -40080,9 +40080,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -44129,9 +44129,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -48178,9 +48178,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -49224,7 +49224,7 @@
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
           <DebugInformation>0</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\v6-lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -52227,9 +52227,9 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>board_nucleo64_v1D3.c</FileName>
+              <FileName>board_nucleol4_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>

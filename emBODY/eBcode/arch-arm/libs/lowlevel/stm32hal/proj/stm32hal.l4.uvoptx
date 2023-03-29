@@ -2038,7 +2038,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -7101,8 +7101,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</PathWithFileName>
-      <FilenameWithoutPath>board_nucleo64_v1D3.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\nucleol4\v1D3\src\board_nucleol4_v1D3.c</PathWithFileName>
+      <FilenameWithoutPath>board_nucleol4_v1D3.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
