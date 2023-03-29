@@ -15,14 +15,10 @@ extern "C" {
 
 #if     defined(STM32HAL_BOARD_NUCLEO64)
 
-    #if     (STM32HAL_DRIVER_VERSION == 0x1D2)
-        #include "../src/config/stm32hal_driver_cfg_of_nucleo64_v1D2.h"   
+    #if (STM32HAL_DRIVER_VERSION == 0x1D3)
+        #include "../src/config/stm32hal_driver_cfg_of_nucleo64_v1D3.h"   
         // we also need some ll includes contained in the driver section
-        #include "../src/driver/stm32l4-v1D2/inc/stm32l4xx_ll_gpio.h"
-    #elif   (STM32HAL_DRIVER_VERSION == 0x172)
-        #include "../src/config/stm32hal_driver_cfg_of_nucleo64.h"   
-        // we also need some ll includes contained in the driver section
-        #include "../src/driver/stm32l4-v172/inc/stm32l4xx_ll_gpio.h"
+        #include "../src/driver/stm32l4-v1D3/inc/stm32l4xx_ll_gpio.h"
     #else
         #error unknown driver version
     #endif
@@ -30,14 +26,14 @@ extern "C" {
     
 #elif   defined(STM32HAL_BOARD_MTB4)
 
-    #if     (STM32HAL_DRIVER_VERSION == 0x190)
+    #if     (STM32HAL_DRIVER_VERSION == 0x1D3)
+        #include "../src/config/stm32hal_driver_cfg_of_mtb4_v1D3.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32l4-v1D3/inc/stm32l4xx_ll_gpio.h"
+    #elif   (STM32HAL_DRIVER_VERSION == 0x190)
         #include "../src/config/stm32hal_driver_cfg_of_mtb4_v190.h"   
         // we also need some ll includes contained in the driver section
         #include "../src/driver/stm32l4-v190/inc/stm32l4xx_ll_gpio.h"
-    #elif   (STM32HAL_DRIVER_VERSION == 0x172)
-        #include "../src/config/stm32hal_driver_cfg_of_mtb4.h"   
-        // we also need some ll includes contained in the driver section
-        #include "../src/driver/stm32l4-v172/inc/stm32l4xx_ll_gpio.h"
     #else
         #error unknown driver version
     #endif
@@ -52,19 +48,23 @@ extern "C" {
         #include "../src/config/stm32hal_driver_cfg_of_strain2_v190.h"   
         // we also need some ll includes contained in the driver section
         #include "../src/driver/stm32l4-v190/inc/stm32l4xx_ll_gpio.h"
-    #elif   (STM32HAL_DRIVER_VERSION == 0x172)
-        #include "../src/config/stm32hal_driver_cfg_of_strain2.h"   
+    #elif   (STM32HAL_DRIVER_VERSION == 0x1D3)
+        #include "../src/config/stm32hal_driver_cfg_of_strain2_v1D3.h"   
         // we also need some ll includes contained in the driver section
-        #include "../src/driver/stm32l4-v172/inc/stm32l4xx_ll_gpio.h"
+        #include "../src/driver/stm32l4-v1D3/inc/stm32l4xx_ll_gpio.h"
     #else
         #error unknown driver version
     #endif
 
 #elif   defined(STM32HAL_BOARD_RFE)
-    
-    #include "../src/config/stm32hal_driver_cfg_of_rfe.h"   
-    // we also need some ll includes contained in the driver section
-    #include "../src/driver/stm32l4-v183/inc/stm32l4xx_ll_gpio.h"
+
+    #if     (STM32HAL_DRIVER_VERSION == 0x183)
+        #include "../src/config/stm32hal_driver_cfg_of_rfe.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32l4-v183/inc/stm32l4xx_ll_gpio.h"
+     #else
+        #error unknown driver version
+    #endif       
     
     
 #elif   defined(STM32HAL_BOARD_PSC)
@@ -206,21 +206,25 @@ extern "C" {
     
 #elif   defined(STM32HAL_BOARD_MTB4C)
 
-    #if     (STM32HAL_DRIVER_VERSION == 0x190)
+    #if     (STM32HAL_DRIVER_VERSION == 0x1D3)
+        #include "../src/config/stm32hal_driver_cfg_of_mtb4c_v1D3.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32l4-v1D3/inc/stm32l4xx_ll_gpio.h"
+    #elif   (STM32HAL_DRIVER_VERSION == 0x190)
         #include "../src/config/stm32hal_driver_cfg_of_mtb4c_v190.h"   
         // we also need some ll includes contained in the driver section
         #include "../src/driver/stm32l4-v190/inc/stm32l4xx_ll_gpio.h"
-    #elif   (STM32HAL_DRIVER_VERSION == 0x172)
-        #include "../src/config/stm32hal_driver_cfg_of_mtb4c.h"   
-        // we also need some ll includes contained in the driver section
-        #include "../src/driver/stm32l4-v172/inc/stm32l4xx_ll_gpio.h"
     #else
         #error unknown driver version
     #endif
     
 #elif   defined(STM32HAL_BOARD_STRAIN2C)
 
-    #if     (STM32HAL_DRIVER_VERSION == 0x1B0)
+    #if     (STM32HAL_DRIVER_VERSION == 0x1D3)
+        #include "../src/config/stm32hal_driver_cfg_of_strain2c_v1D3.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32l4-v1D3/inc/stm32l4xx_ll_gpio.h"
+    #elif   (STM32HAL_DRIVER_VERSION == 0x1B0)
         #include "../src/config/stm32hal_driver_cfg_of_strain2c_v1B0.h"   
         // we also need some ll includes contained in the driver section
         #include "../src/driver/stm32l4-v1B0/inc/stm32l4xx_ll_gpio.h"
