@@ -75,6 +75,8 @@ namespace embot { namespace hw { namespace gpio {
         }            
     };
     
+    constexpr Config cfgOUTpp {Mode::OUTPUTpushpull, Pull::nopull, Speed::veryhigh};
+    
     bool supported(const embot::hw::GPIO &g);    
     bool initialised(const embot::hw::GPIO g);    
     result_t init(const embot::hw::GPIO &g, const Config &config);
