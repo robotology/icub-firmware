@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>mtb4w-btl-ulpro-v190</TargetName>
+    <TargetName>mtb4w-btl</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -280,7 +280,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -291,8 +291,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.mtb4.v190.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.mtb4.v190.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.mtb4.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.l4.v1D3.mtb4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -300,7 +300,7 @@
 
   <Group>
     <GroupName>stm32hal-config</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -311,8 +311,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\stm32hal.startup.mtb4w.v172.s</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.startup.mtb4w.v172.s</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\stm32hal.startup.mtb4w.s</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.startup.mtb4w.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

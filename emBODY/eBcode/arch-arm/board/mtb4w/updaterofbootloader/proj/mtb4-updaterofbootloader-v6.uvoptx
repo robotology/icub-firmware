@@ -10,7 +10,7 @@
     <aExt>*.s*; *.src; *.a*</aExt>
     <oExt>*.obj; *.o</oExt>
     <lExt>*.lib</lExt>
-    <tExt>*.txt; *.h; *.inc</tExt>
+    <tExt>*.txt; *.h; *.inc; *.md</tExt>
     <pExt>*.plm</pExt>
     <CppX>*.cpp</CppX>
     <nMigrate>0</nMigrate>
@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>mtb4w-updtbtl-ulpro-v190</TargetName>
+    <TargetName>mtb4w-updtbtl-v1D3</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -259,7 +259,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -278,8 +278,8 @@
   </Group>
 
   <Group>
-    <GroupName>stm32hal-v190</GroupName>
-    <tvExp>0</tvExp>
+    <GroupName>stm32hal</GroupName>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -290,8 +290,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.mtb4.v190.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.mtb4.v190.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.mtb4.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.l4.v1D3.mtb4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -299,7 +299,7 @@
 
   <Group>
     <GroupName>stm32hal-config</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -310,8 +310,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\stm32hal.startup.mtb4w.v172.s</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.startup.mtb4w.v172.s</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\stm32hal.startup.mtb4w.s</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.startup.mtb4w.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
