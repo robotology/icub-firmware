@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2020 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -103,123 +103,6 @@ extern void stm32hal_board_init(void)
 
  }
 
-#if 0    
-int main(void)
-{
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_TIM6_Init();
-  MX_CAN1_Init();
-  MX_USART1_UART_Init();
-  MX_ADC1_Init();
-  MX_I2C1_Init();
-  MX_I2C2_Init();
-  MX_USART2_UART_Init();
-  MX_TIM7_Init();
-  MX_TIM16_Init();
-  MX_TIM15_Init();
-  MX_RNG_Init();
-  /* USER CODE BEGIN 2 */
-	TIMER_Init();  
-  CAN_Config();
-	Si705x_init(1);
-  BNO055_init();
-	
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
- 
-#if 1
-    #warning marco.accame on 27dec18 has uncommented every user-defined can code as it doesnt compile. read commennts in here for more details    
-    // marco.accame on 27dec18: sic.. it doesnt compile because of chanhge of can api.
-    // i uncomment it, as i dont need to make it work    
-#else
-  /*##-2- Start the Reception process and enable reception interrupt #########*/
-  if (HAL_CAN_Receive_IT(&hcan1, CAN_FIFO0) != HAL_OK)
-  {
-    /* Reception Error */
-    Error_Handler();
-  }
-#endif
-
-  PGA308_init();
-  //PGA308_DefaultConfig();
-  
-  HAL_Delay(100);
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_values, 6);
-  
-  HAL_Delay(1000);
-  
-  REGISTER=RAM_CFG0;
-  //REGISTER=RAM_GDAC;
-  
-  while (1)
-  {
-    //CANBUS();
-    TEMPERATURE();
-    BNO055();
-    //BNO055_UART();
-    
-    if(PGA308_StartCalib){
-      TIMER_PROG(1000);
-      PGA308_StartCalib=0;
-      PGA308_DefaultConfig();
-    }
-    else
-    {
-      if(REG_OK==0) {SelfCalibration(CHANNEL, REGISTER);}
-      else{
-        if(CHANNEL<6) {
-          REG_OK=0;
-          CHANNEL++;
-        }
-        else{
-          if(REGISTER==RAM_CFG0){
-            HAL_Delay(100);
-            REGISTER=RAM_ZDAC;
-            REG_OK=0;
-            CHANNEL=1;
-          }
-          else if(REGISTER==RAM_ZDAC){
-            TIMER_PROG(10000);
-            REGISTER=RAM_GDAC;
-          }
-        }
-      }
-    }
-    HAL_Delay(10);
-    
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-
-  }
-  /* USER CODE END 3 */
-}
-#endif
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of funtions genrated by cube-mx which must be global..... sic!
@@ -247,68 +130,52 @@ void Error_Handler(void)
   * @brief System Clock Configuration
   * @retval None
   */
-STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
+void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
-  /**Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /**Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
-                              |RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_I2C2
-                              |RCC_PERIPHCLK_RNG|RCC_PERIPHCLK_ADC;
-  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
-  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
-  PeriphClkInit.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
-  PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_SYSCLK;
-  PeriphClkInit.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /**Configure the main internal regulator output voltage 
+  /** Configure the main internal regulator output voltage
   */
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
     Error_Handler();
   }
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 1;
+  RCC_OscInitStruct.PLL.PLLN = 10;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV7;
+  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
-// previous driver v173 also had:
-#if 0
-
-    /**Configure the Systick 
-    */
-  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
-
-  /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);  
-
-#endif
 
 
 
