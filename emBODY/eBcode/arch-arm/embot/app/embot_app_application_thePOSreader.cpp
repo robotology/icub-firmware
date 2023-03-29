@@ -454,6 +454,21 @@ bool embot::app::application::thePOSreader::process(embot::os::Event evt, std::v
 
 // interface to CANagentPOS
 
+bool embot::app::application::thePOSreader::isactive() const
+{
+    return true;
+}
+
+const std::string& embot::app::application::thePOSreader::status() const
+{
+    static const std::string sta[] = 
+    {
+        "POS active", "POS deactivated by SKIN"
+    };
+    
+    return sta[0];
+}
+
 bool embot::app::application::thePOSreader::set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info)
 {
     // if ticking: stop it
