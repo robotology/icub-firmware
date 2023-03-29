@@ -11,8 +11,8 @@
 #define _EMBOT_HW_BSP_CONFIG_H_
 
   
-#if   defined(STM32HAL_BOARD_NUCLEO64)
-    #include "embot_hw_bsp_nucleo64_config.h"        
+#if   defined(STM32HAL_BOARD_NUCLEOL4)
+    #include "embot_hw_bsp_nucleol4_config.h"        
 #else
     #error wrong board
 #endif

@@ -36,7 +36,7 @@ extern "C" {
 
 // - public interface  ------------------------------------------------------------------------------------------------
   
-#if     defined(STM32HAL_BOARD_NUCLEO64)
+#if     defined(STM32HAL_BOARD_NUCLEOL4)
    
     // one possible driver: the 1D3 ...
     #if !defined(STM32HAL_DRIVER_V1D3)

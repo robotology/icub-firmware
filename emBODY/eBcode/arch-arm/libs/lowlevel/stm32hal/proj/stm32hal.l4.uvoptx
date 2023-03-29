@@ -642,7 +642,7 @@
   </Target>
 
   <Target>
-    <TargetName>nucleo64-v1D3</TargetName>
+    <TargetName>nucleol4-v1D3</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -695,7 +695,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -1935,7 +1935,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -2038,7 +2038,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -7089,7 +7089,7 @@
   </Group>
 
   <Group>
-    <GroupName>board-nucleo64-v1D3</GroupName>
+    <GroupName>board-nucleol4-v1D3</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -7101,7 +7101,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</PathWithFileName>
       <FilenameWithoutPath>board_nucleo64_v1D3.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -7113,7 +7113,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\v1D3\src\gpio.c</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleol4\v1D3\src\gpio.c</PathWithFileName>
       <FilenameWithoutPath>gpio.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -7125,7 +7125,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_msp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -7137,7 +7137,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\v1D3\src\rng.c</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleol4\v1D3\src\rng.c</PathWithFileName>
       <FilenameWithoutPath>rng.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

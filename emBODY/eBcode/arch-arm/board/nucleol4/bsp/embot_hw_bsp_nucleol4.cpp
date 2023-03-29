@@ -31,9 +31,9 @@
 #endif
 
 
-#if defined(STM32HAL_BOARD_NUCLEO64)
+#if defined(STM32HAL_BOARD_NUCLEOL4)
 #else
-    #error this file is only for STM32HAL_BOARD_NUCLEO64
+    #error this file is only for STM32HAL_BOARD_NUCLEOL4
 #endif
 
 
@@ -44,7 +44,7 @@ using namespace embot::core::binary;
 // - configuration of peripherals and chips. it is done board by board. it contains a check vs correct STM32HAL_BOARD_*
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw_bsp_nucleo64_config.h"
+#include "embot_hw_bsp_nucleol4_config.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ using namespace embot::core::binary;
     
 namespace embot { namespace hw { namespace gpio {
  
-    #if defined(STM32HAL_BOARD_NUCLEO64)
+    #if defined(STM32HAL_BOARD_NUCLEOL4)
     const BSP thebsp {        
         // supportmask2d
         {{
@@ -120,7 +120,7 @@ namespace embot { namespace hw { namespace led {
 
 namespace embot { namespace hw { namespace led {         
     
-    #if   defined(STM32HAL_BOARD_NUCLEO64)
+    #if   defined(STM32HAL_BOARD_NUCLEOL4)
        
     constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five}  };  
         
@@ -176,7 +176,7 @@ namespace embot { namespace hw { namespace button {
 
 namespace embot { namespace hw { namespace button {
     
-    #if   defined(STM32HAL_BOARD_NUCLEO64)
+    #if   defined(STM32HAL_BOARD_NUCLEOL4)
     
     // this button is the blue one on the board
     constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}, 
@@ -281,7 +281,7 @@ namespace embot { namespace hw { namespace can {
 
 namespace embot { namespace hw { namespace can {
                
-    #if   defined(STM32HAL_BOARD_NUCLEOH7)        
+    #if   defined(STM32HAL_BOARD_NUCLEOL7)        
     #else
         #error embot::hw::can::thebsp must be defined    
     #endif
@@ -337,7 +337,7 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
  
 namespace embot { namespace hw { namespace flash { namespace bsp {
      
-#if   defined(STM32HAL_BOARD_NUCLEO64)
+#if   defined(STM32HAL_BOARD_NUCLEOL4)
 
     constexpr uint8_t numbanks {1};
     constexpr uint32_t banksize {256*1024};
@@ -406,7 +406,7 @@ namespace embot { namespace hw { namespace timer {
 
 namespace embot { namespace hw { namespace timer {
     
-    #if   defined(STM32HAL_BOARD_NUCLEO64)    
+    #if   defined(STM32HAL_BOARD_NUCLEOL4)    
 
     // sadly we cannot use constexpr because of the reinterpret_cast<> inside TIM6 etc.
     static const PROP tim06p = { .TIMx = TIM6,  .handle = &htim6,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };
@@ -481,9 +481,9 @@ void TIM7_IRQHandler(void)
 // - board specific methods
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw_bsp_nucleo64.h"
+#include "embot_hw_bsp_nucleol4.h"
 
-namespace embot { namespace hw { namespace bsp { namespace nucleao64 {
+namespace embot { namespace hw { namespace bsp { namespace nucleol4 {
     
 }}}}
 

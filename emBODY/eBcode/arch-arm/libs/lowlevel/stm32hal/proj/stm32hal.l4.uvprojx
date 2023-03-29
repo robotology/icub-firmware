@@ -2916,7 +2916,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -2990,22 +2990,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6965,7 +6965,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -7039,22 +7039,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -11014,7 +11014,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -11088,22 +11088,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -15063,7 +15063,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -15137,22 +15137,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -16203,7 +16203,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>nucleo64-v1D3</TargetName>
+      <TargetName>nucleol4-v1D3</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
@@ -16245,7 +16245,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>stm32hal_nucleo64</OutputName>
+          <OutputName>stm32hal_nucleol4</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -16278,7 +16278,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\obj\stm32hal_nucleo64.lib ..\lib\stm32hal.l4.v1D3.nucleo64.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\obj\stm32hal_nucleol4.lib ..\lib\stm32hal.l4.v1D3.nucleol4.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -16534,9 +16534,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEO64 STM32HAL_DRIVER_V1D3</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEOL4 STM32HAL_DRIVER_V1D3</Define>
               <Undefine></Undefine>
-              <IncludePath>..\api;..\src\driver\stm32l4-v1D3\inc;..\src\board\nucleo64\v1D3\inc</IncludePath>
+              <IncludePath>..\api;..\src\driver\stm32l4-v1D3\inc;..\src\board\nucleol4\v1D3\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -19181,27 +19181,27 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <Files>
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -23230,7 +23230,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -23304,22 +23304,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -27519,7 +27519,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -27593,22 +27593,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -31859,7 +31859,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -31933,22 +31933,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -35959,7 +35959,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -36033,22 +36033,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -40008,7 +40008,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -40082,22 +40082,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -44057,7 +44057,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -44131,22 +44131,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -48106,7 +48106,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -48180,22 +48180,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -52155,7 +52155,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>board-nucleo64-v1D3</GroupName>
+          <GroupName>board-nucleol4-v1D3</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -52229,22 +52229,22 @@
             <File>
               <FileName>board_nucleo64_v1D3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\board_nucleo64_v1D3.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\board_nucleo64_v1D3.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\gpio.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>rng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\v1D3\src\rng.c</FilePath>
+              <FilePath>..\src\board\nucleol4\v1D3\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -53237,7 +53237,7 @@
           <targetInfo excluded="1" name="mtb4-v1D3" versionMatchMode=""/>
           <targetInfo excluded="1" name="mtb4c-v190" versionMatchMode=""/>
           <targetInfo excluded="1" name="mtb4c-v1D3" versionMatchMode=""/>
-          <targetInfo excluded="1" name="nucleo64-v1D3" versionMatchMode=""/>
+          <targetInfo excluded="1" name="nucleol4-v1D3" versionMatchMode=""/>
           <targetInfo excluded="1" name="psc-v190" versionMatchMode=""/>
           <targetInfo excluded="1" name="rfe-v183" versionMatchMode=""/>
           <targetInfo excluded="1" name="sg3-v190" versionMatchMode=""/>

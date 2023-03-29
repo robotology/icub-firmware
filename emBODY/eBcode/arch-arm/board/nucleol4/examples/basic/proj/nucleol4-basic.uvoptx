@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>basic-nucleo64</TargetName>
+    <TargetName>basic-nucleol4</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -253,8 +253,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.nucleo64.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.l4.v1D3.nucleo64.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.nucleol4.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.l4.v1D3.nucleol4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -273,8 +273,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\stm32hal.startup.nucleo64.s</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.startup.nucleo64.s</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\stm32hal.startup.nucleol4.s</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.startup.nucleol4.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

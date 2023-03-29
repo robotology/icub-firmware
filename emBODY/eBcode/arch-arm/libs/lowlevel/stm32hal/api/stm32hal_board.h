@@ -49,19 +49,19 @@ extern void stm32hal_board_init(void);
 // it contains whatever cube-mx generates.
 
 
-#if     defined(STM32HAL_BOARD_NUCLEO64)
+#if     defined(STM32HAL_BOARD_NUCLEOL4)
 
     // one version only: v1D3
     #if  (STM32HAL_DRIVER_VERSION == 0x1D3)
         
-        #include "../src/config/stm32hal_driver_cfg_of_nucleo64_v1D3.h"
+        #include "../src/config/stm32hal_driver_cfg_of_nucleol4_v1D3.h"
 
-        #include "../src/board/nucleo64/v1D3/inc/gpio.h"
-        #include "../src/board/nucleo64/v1D3/inc/main.h"
-        #include "../src/board/nucleo64/v1D3/inc/rng.h"
+        #include "../src/board/nucleol4/v1D3/inc/gpio.h"
+        #include "../src/board/nucleol4/v1D3/inc/main.h"
+        #include "../src/board/nucleol4/v1D3/inc/rng.h"
         
     #else
-        #error unsupported driver version for nucleo64
+        #error unsupported driver version for nucleol4
     #endif
     
 #elif   defined(STM32HAL_BOARD_MTB4)

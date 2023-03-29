@@ -451,9 +451,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.l4.v1D3.nucleo64.lib</FileName>
+              <FileName>stm32hal.l4.v1D3.nucleol4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.nucleo64.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.nucleol4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -461,9 +461,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.startup.nucleo64.s</FileName>
+              <FileName>stm32hal.startup.nucleol4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.nucleo64.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.nucleol4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -811,9 +811,9 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_nucleo64.cpp</FileName>
+              <FileName>embot_hw_bsp_nucleol4.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\embot_hw_bsp_nucleo64.cpp</FilePath>
+              <FilePath>..\..\..\bsp\embot_hw_bsp_nucleol4.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -862,7 +862,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>nucleo64</OutputName>
+          <OutputName>nucleol4</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -1151,7 +1151,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEO64 STM32HAL_DRIVER_V1D3</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEOL4 STM32HAL_DRIVER_V1D3</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp</IncludePath>
             </VariousControls>
@@ -1264,9 +1264,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.l4.v1D3.nucleo64.lib</FileName>
+              <FileName>stm32hal.l4.v1D3.nucleol4.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.nucleo64.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.nucleol4.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1274,9 +1274,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.startup.nucleo64.s</FileName>
+              <FileName>stm32hal.startup.nucleol4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.nucleo64.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.nucleol4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1573,9 +1573,9 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_nucleo64.cpp</FileName>
+              <FileName>embot_hw_bsp_nucleol4.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\embot_hw_bsp_nucleo64.cpp</FilePath>
+              <FilePath>..\..\..\bsp\embot_hw_bsp_nucleol4.cpp</FilePath>
             </File>
           </Files>
         </Group>

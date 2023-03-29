@@ -34,7 +34,7 @@ int bsp_basic_itm_puts(const char* str)
 
 // the led section. we use 
 
-#if defined(STM32HAL_BOARD_NUCLEO64)
+#if defined(STM32HAL_BOARD_NUCLEOL4)
     
     // user button is on PC13
     // user led green is on PA5
@@ -42,13 +42,13 @@ int bsp_basic_itm_puts(const char* str)
     static const uint16_t PinLED = GPIO_PIN_5;
     static void clockEnableLED() {  __HAL_RCC_GPIOA_CLK_ENABLE(); }
 #else
-    #error use only for STM32HAL_BOARD_NUCLEO64
+    #error use only for STM32HAL_BOARD_NUCLEOL4
 #endif
 
 void bsp_basic_led_init()
 {
     
-#if defined(STM32HAL_BOARD_NUCLEO64 ) 
+#if defined(STM32HAL_BOARD_NUCLEOL4 ) 
     // start clock
     clockEnableLED();
     
@@ -70,7 +70,7 @@ void bsp_basic_led_init()
 
 void bsp_basic_led_toggle()
 {
-#if defined(STM32HAL_BOARD_NUCLEO64 )
+#if defined(STM32HAL_BOARD_NUCLEOL4 )
     HAL_GPIO_TogglePin(GPIOLED, PinLED);  
 #endif    
 }

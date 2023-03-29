@@ -18,7 +18,7 @@
 #include "embot_core_binary.h"
 
     
-#include "embot_hw_bsp_nucleo64.h"
+#include "embot_hw_bsp_nucleol4.h"
     
 #include "embot_hw.h"
 #include "embot_hw_bsp.h"
@@ -43,7 +43,7 @@ constexpr embot::core::relTime ostick = 500*embot::core::time1microsec;
 constexpr embot::core::relTime tickperiod = 1*embot::core::time1millisec;
 
 
-constexpr embot::hw::BTN buttonOntest = embot::hw::bsp::nucleo64::buttonPB9; // buttonPB9 or buttonBLUE
+constexpr embot::hw::BTN buttonOntest = embot::hw::bsp::nucleol4::buttonPB9; // buttonPB9 or buttonBLUE
 
 
 void btncallback_pressed_released(void *p)
@@ -146,7 +146,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
 {
     volatile uint32_t cpufreq = embot::hw::sys::clock(embot::hw::CLOCK::syscore);
     cpufreq = cpufreq;
-    embot::core::print("this is a demo which shows that this code can run on a nucleo64 board. clock = " + std::to_string(cpufreq/1000000) + " MHz");    
+    embot::core::print("this is a demo which shows that this code can run on a nucleol4 board. clock = " + std::to_string(cpufreq/1000000) + " MHz");    
     
     embot::core::print("starting the INIT thread");
     

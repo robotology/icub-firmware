@@ -13,10 +13,10 @@ extern "C" {
 #include "stm32hal_define.h" 
 #include "stm32hal_driver.h" 
 
-#if     defined(STM32HAL_BOARD_NUCLEO64)
+#if     defined(STM32HAL_BOARD_NUCLEOL4)
 
     #if (STM32HAL_DRIVER_VERSION == 0x1D3)
-        #include "../src/config/stm32hal_driver_cfg_of_nucleo64_v1D3.h"   
+        #include "../src/config/stm32hal_driver_cfg_of_nucleol4_v1D3.h"   
         // we also need some ll includes contained in the driver section
         #include "../src/driver/stm32l4-v1D3/inc/stm32l4xx_ll_gpio.h"
     #else

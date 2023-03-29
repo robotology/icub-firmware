@@ -7,11 +7,11 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef EMBOT_HW_BSP_NUCLEO64_CONFIG_H_
-#define EMBOT_HW_BSP_NUCLEO64_CONFIG_H_
+#ifndef EMBOT_HW_BSP_NUCLEOL4_CONFIG_H_
+#define EMBOT_HW_BSP_NUCLEOL4_CONFIG_H_
 
 
-#if   defined(STM32HAL_BOARD_NUCLEO64)
+#if   defined(STM32HAL_BOARD_NUCLEOL4)
     
     #undef  EMBOT_ENABLE_hw_bsp_specialize    
     #define EMBOT_ENABLE_hw_gpio
@@ -20,7 +20,7 @@
     #define EMBOT_ENABLE_hw_flash
         
 #else
-    #error this is the bsp config of STM32HAL_BOARD_NUCLEO64 ...
+    #error this is the bsp config of STM32HAL_BOARD_NUCLEOL4 ...
 #endif
 
 

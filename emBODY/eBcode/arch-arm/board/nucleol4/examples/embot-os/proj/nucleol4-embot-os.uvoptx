@@ -530,8 +530,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.nucleo64.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.l4.v1D3.nucleo64.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.nucleol4.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.l4.v1D3.nucleol4.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -539,7 +539,7 @@
 
   <Group>
     <GroupName>stm32hal-config</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -550,8 +550,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\stm32hal.startup.nucleo64.s</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.startup.nucleo64.s</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\stm32hal.startup.nucleol4.s</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.startup.nucleol4.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -906,8 +906,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\embot_hw_bsp_nucleo64.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_bsp_nucleo64.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\embot_hw_bsp_nucleol4.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp_nucleol4.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
