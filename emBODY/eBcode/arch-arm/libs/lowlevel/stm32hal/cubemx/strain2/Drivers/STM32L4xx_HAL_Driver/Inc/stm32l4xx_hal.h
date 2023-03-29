@@ -7,13 +7,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -38,26 +37,32 @@
   */
 
 /* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-
-/** @defgroup HAL_Exported_Constants HAL Exported Constants
+/** @defgroup HAL_Exported_Types HAL Exported Types
   * @{
   */
 
 /** @defgroup HAL_TICK_FREQ Tick Frequency
   * @{
   */
-#define  HAL_TICK_FREQ_10HZ         100U
-#define  HAL_TICK_FREQ_100HZ        10U
-#define  HAL_TICK_FREQ_1KHZ         1U
-#define  HAL_TICK_FREQ_DEFAULT      HAL_TICK_FREQ_1KHZ
-
+typedef enum
+{
+  HAL_TICK_FREQ_10HZ         = 100U,
+  HAL_TICK_FREQ_100HZ        = 10U,
+  HAL_TICK_FREQ_1KHZ         = 1U,
+  HAL_TICK_FREQ_DEFAULT      = HAL_TICK_FREQ_1KHZ
+} HAL_TickFreqTypeDef;
 /**
   * @}
   */
 
 /**
   * @}
+  */
+
+/* Exported constants --------------------------------------------------------*/
+
+/** @defgroup HAL_Exported_Constants HAL Exported Constants
+  * @{
   */
 
 /** @defgroup SYSCFG_Exported_Constants SYSCFG Exported Constants
@@ -247,7 +252,14 @@
   * @}
   */
 
+/**
+  * @}
+  */
+
 /* Exported macros -----------------------------------------------------------*/
+/** @defgroup HAL_Exported_Macros HAL Exported Macros
+  * @{
+  */
 
 /** @defgroup DBGMCU_Exported_Macros DBGMCU Exported Macros
   * @{
@@ -536,17 +548,13 @@
   * @}
   */
 
+/**
+  * @}
+  */
+
 /* Private macros ------------------------------------------------------------*/
 /** @defgroup HAL_Private_Macros HAL Private Macros
   * @{
-  */
-
-#define IS_TICKFREQ(__FREQ__) (((__FREQ__) == HAL_TICK_FREQ_10HZ)  || \
-                               ((__FREQ__) == HAL_TICK_FREQ_100HZ) || \
-                               ((__FREQ__) == HAL_TICK_FREQ_1KHZ))
-
-/**
-  * @}
   */
 
 /** @defgroup SYSCFG_Private_Macros SYSCFG Private Macros
@@ -598,6 +606,10 @@
   * @}
   */
 
+/**
+  * @}
+  */
+
 /* Exported variables --------------------------------------------------------*/
 
 /** @addtogroup HAL_Exported_Variables
@@ -605,7 +617,7 @@
   */
 extern __IO uint32_t uwTick;
 extern uint32_t uwTickPrio;
-extern uint32_t uwTickFreq;
+extern HAL_TickFreqTypeDef uwTickFreq;
 /**
   * @}
   */
@@ -640,8 +652,8 @@ void               HAL_IncTick(void);
 void               HAL_Delay(uint32_t Delay);
 uint32_t           HAL_GetTick(void);
 uint32_t           HAL_GetTickPrio(void);
-HAL_StatusTypeDef  HAL_SetTickFreq(uint32_t Freq);
-uint32_t           HAL_GetTickFreq(void);
+HAL_StatusTypeDef  HAL_SetTickFreq(HAL_TickFreqTypeDef Freq);
+HAL_TickFreqTypeDef HAL_GetTickFreq(void);
 void               HAL_SuspendTick(void);
 void               HAL_ResumeTick(void);
 uint32_t           HAL_GetHalVersion(void);
@@ -712,5 +724,3 @@ void              HAL_SYSCFG_DisableIOAnalogSwitchBooster(void);
 #endif
 
 #endif /* STM32L4xx_HAL_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

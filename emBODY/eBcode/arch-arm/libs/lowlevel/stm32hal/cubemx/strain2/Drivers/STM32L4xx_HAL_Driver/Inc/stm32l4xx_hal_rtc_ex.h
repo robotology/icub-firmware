@@ -6,13 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -417,7 +416,7 @@ typedef struct
 #define RTC_IT_TAMP2                        TAMP_IER_TAMP2IE   /*!< Tamper 2 Interrupt */
 #define RTC_IT_TAMP3                        TAMP_IER_TAMP3IE   /*!< Tamper 3 Interrupt */
 #define RTC_IT_TAMP                         (TAMP_IER_TAMP1IE | TAMP_IER_TAMP2IE | TAMP_IER_TAMP3IE)  /*!< Enable all Tamper Interrupt */
-#else 
+#else
 #define RTC_IT_TAMP                         RTC_TAMPCR_TAMPIE  /*!< Enable all Tamper Interrupt  */
 #define RTC_IT_TAMP1                        RTC_TAMPCR_TAMP1IE /*!< Enable Tamper 1 Interrupt     */
 #define RTC_IT_TAMP2                        RTC_TAMPCR_TAMP2IE /*!< Enable Tamper 2 Interrupt     */
@@ -440,7 +439,7 @@ typedef struct
 #define RTC_FLAG_TAMP2F                     TAMP_SR_TAMP2F
 #define RTC_FLAG_TAMP3F                     TAMP_SR_TAMP3F
 #define RTC_FLAG_TAMPALL                   (RTC_FLAG_TAMP1F | RTC_FLAG_TAMP2F | RTC_FLAG_TAMP3F)
-#else 
+#else
 #define RTC_FLAG_TAMP1F                     RTC_ISR_TAMP1F
 #define RTC_FLAG_TAMP2F                     RTC_ISR_TAMP2F
 #define RTC_FLAG_TAMP3F                     RTC_ISR_TAMP3F
@@ -1594,7 +1593,6 @@ uint32_t          HAL_RTCEx_BKUPRead(RTC_HandleTypeDef *hrtc, uint32_t BackupReg
 /** @defgroup RTCEx_Private_Constants RTCEx Private Constants
   * @{
   */
-//#define RTC_EXTI_LINE_ALARM_EVENT           EXTI_IMR1_IM18  /*!< External interrupt line 18 Connected to the RTC Alarm event */
 #if defined (STM32L4P5xx) || defined (STM32L4Q5xx)
 #define RTC_EXTI_LINE_SSRU_EVENT              EXTI_IMR1_IM18  /*!< External interrupt line 18 Connected to the RTC SSR Underflow event  */
 #endif
@@ -1740,5 +1738,3 @@ uint32_t          HAL_RTCEx_BKUPRead(RTC_HandleTypeDef *hrtc, uint32_t BackupReg
 #endif /* __cplusplus */
 
 #endif /* STM32L4xx_HAL_RTC_EX_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
