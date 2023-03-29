@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -89,6 +89,7 @@ void Error_Handler(void);
 #define SDA1_GPIO_Port GPIOA
 #define POWER_TSENSOR1_Pin GPIO_PIN_11
 #define POWER_TSENSOR1_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
