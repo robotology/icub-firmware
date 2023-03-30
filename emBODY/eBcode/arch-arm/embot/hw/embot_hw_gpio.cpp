@@ -170,9 +170,23 @@ namespace embot { namespace hw { namespace gpio {
     constexpr uint32_t _convert_to_stm32mode(Mode m)
     {
         constexpr uint32_t _map2stm32mode[] = {
-            GPIO_MODE_INPUT, GPIO_MODE_OUTPUT_PP, GPIO_MODE_OUTPUT_OD, GPIO_MODE_AF_PP, 
-            GPIO_MODE_AF_OD, GPIO_MODE_ANALOG, GPIO_MODE_IT_RISING, GPIO_MODE_IT_FALLING, 
-            GPIO_MODE_IT_RISING_FALLING, GPIO_MODE_EVT_RISING, GPIO_MODE_EVT_FALLING, GPIO_MODE_EVT_RISING_FALLING
+            GPIO_MODE_INPUT, 
+            GPIO_MODE_OUTPUT_PP, 
+            GPIO_MODE_OUTPUT_OD, 
+            GPIO_MODE_AF_PP, 
+            GPIO_MODE_AF_OD, 
+            GPIO_MODE_ANALOG, 
+#if defined(GPIO_MODE_ANALOG_ADC_CONTROL)            
+            GPIO_MODE_ANALOG_ADC_CONTROL,   // as for instance in l4 architecture
+#else
+            GPIO_MODE_ANALOG,               // as for instance in g4 and h7 architectures
+#endif            
+            GPIO_MODE_IT_RISING, 
+            GPIO_MODE_IT_FALLING, 
+            GPIO_MODE_IT_RISING_FALLING, 
+            GPIO_MODE_EVT_RISING, 
+            GPIO_MODE_EVT_FALLING, 
+            GPIO_MODE_EVT_RISING_FALLING
         };
         
         return _map2stm32mode[embot::core::tointegral(m)];
@@ -199,45 +213,34 @@ namespace embot { namespace hw { namespace gpio {
    
     result_t _configure(const embot::hw::gpio::PROP &g, Mode m, Pull p, Speed s)
     {
-
-        g.clockenable();
+        result_t r {resNOK};
+       
+        switch(m)
+        {
+            case Mode::INPUT:
+            case Mode::OUTPUTpushpull:
+            case Mode::OUTPUTopendrain:
+            case Mode::EXTIrising:
+            case Mode::EXTIfalling:
+            case Mode::EXTIrisingfalling:
+            {
+                g.clockenable();
+                GPIO_InitTypeDef GPIO_InitStruct = {0};       
+                GPIO_InitStruct.Pin = g.stmpin;
+                GPIO_InitStruct.Mode = _convert_to_stm32mode(m); 
+                GPIO_InitStruct.Pull = _convert_to_stm32pull(p);
+                GPIO_InitStruct.Speed = _convert_to_stm32speed(s);
+                HAL_GPIO_Init(g.stmport, &GPIO_InitStruct);
+                r = resOK;                
+            } break;
+            
+            default: 
+            {
+            } break;
+        }
         
-#warning evaluate to use HAL_GPIO_Init() for all modes ...
-    
-        // caveat: for pins HAL_GPIO_* use u16, and all macros are u16, whereas LL_GPIO_* use u32 
-        if(m == Mode::OUTPUTopendrain)
-        {
-            LL_GPIO_SetPinMode(g.stmport, static_cast<std::uint32_t>(g.stmpin), LL_GPIO_MODE_OUTPUT);		
-            LL_GPIO_SetPinOutputType(g.stmport, static_cast<std::uint32_t>(g.stmpin), LL_GPIO_OUTPUT_OPENDRAIN);
-        }
-        else if(m == Mode::OUTPUTpushpull)
-        {
-            LL_GPIO_SetPinMode(g.stmport, static_cast<std::uint32_t>(g.stmpin), LL_GPIO_MODE_OUTPUT);		
-            LL_GPIO_SetPinOutputType(g.stmport, static_cast<std::uint32_t>(g.stmpin), LL_GPIO_OUTPUT_PUSHPULL);            
-        }
-        else if(m == Mode::INPUT)
-        {
-            GPIO_InitTypeDef GPIO_InitStruct = {0};
-            GPIO_InitStruct.Pin = g.stmpin;
-            GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-            GPIO_InitStruct.Pull = _convert_to_stm32pull(p);
-            GPIO_InitStruct.Speed = _convert_to_stm32speed(s);
-            HAL_GPIO_Init(g.stmport, &GPIO_InitStruct);            
-        }
-        else if((m == Mode::EXTIrising) || (m == Mode::EXTIfalling) || (m == Mode::EXTIrisingfalling))
-        {
-            GPIO_InitTypeDef GPIO_InitStruct = {0};
-            GPIO_InitStruct.Pin = g.stmpin;
-            GPIO_InitStruct.Mode = _convert_to_stm32mode(m);
-            GPIO_InitStruct.Pull = _convert_to_stm32pull(p);
-            HAL_GPIO_Init(g.stmport, &GPIO_InitStruct);               
-        }
-        else
-        {
-            return resNOK;
-        }
-
-        return resOK;
+        return r;
+       
     }  
     
     result_t _set(const embot::hw::gpio::PROP &g, State s)
