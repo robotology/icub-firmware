@@ -176,6 +176,12 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  
+  // marco.accame: cube-mx version 6.8.0 does not generate this.
+  // maybe because it is redundant as the same code is called inside the i2c.c file
+  // etc for each clock separately
+  // i could remove it but i keep it because tests were doen w/ this code
+#if 1
   /** Initializes the peripherals clocks
   */
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2C4|RCC_PERIPHCLK_USB
@@ -190,6 +196,7 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
   {
     Error_Handler();
   }
+#endif  
 }
 
 

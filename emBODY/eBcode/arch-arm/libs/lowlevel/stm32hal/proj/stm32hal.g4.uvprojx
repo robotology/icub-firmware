@@ -2209,14 +2209,14 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
-            </File>
-            <File>
               <FileName>board_amcbldc_v122.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v122\src\board_amcbldc_v122.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
             </File>
             <File>
               <FileName>cordic.c</FileName>
@@ -5194,14 +5194,14 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
-            </File>
-            <File>
               <FileName>board_amcbldc_v122.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v122\src\board_amcbldc_v122.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
             </File>
             <File>
               <FileName>cordic.c</FileName>
@@ -8179,14 +8179,14 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
-            </File>
-            <File>
               <FileName>board_amcbldc_v122.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v122\src\board_amcbldc_v122.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
             </File>
             <File>
               <FileName>cordic.c</FileName>
@@ -11095,14 +11095,14 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
-            </File>
-            <File>
               <FileName>board_amcbldc_v122.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v122\src\board_amcbldc_v122.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
             </File>
             <File>
               <FileName>cordic.c</FileName>
@@ -11812,7 +11812,7 @@
       <TargetName>amcbldc-v120</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -11884,7 +11884,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\g4-obj\stm32hal_amcbldc_v120.lib ..\lib\stm32hal.g4.amcbldc.v120.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\g4-obj\stm32hal_amcbldc_v120.lib ..\lib\stm32hal.g4.v120.amcbldc.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -14131,14 +14131,14 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
-            </File>
-            <File>
               <FileName>board_amcbldc_v122.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v122\src\board_amcbldc_v122.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
             </File>
             <File>
               <FileName>cordic.c</FileName>
@@ -14848,7 +14848,7 @@
       <TargetName>amcbldc-v122</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -14891,8 +14891,8 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <DebugInformation>0</DebugInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\g4-lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -14920,7 +14920,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\g4-obj\stm32hal_amcbldc_v122.lib ..\lib\stm32hal.g4.amcbldc.v122.lib</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\g4-obj\stm32hal_amcbldc_v122.lib ..\lib\stm32hal.g4.v122.amcbldc.lib</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -17236,14 +17236,14 @@
           <GroupName>board-amcbldc-v122</GroupName>
           <Files>
             <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
-            </File>
-            <File>
               <FileName>board_amcbldc_v122.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amcbldc\v122\src\board_amcbldc_v122.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amcbldc\v122\src\adc.c</FilePath>
             </File>
             <File>
               <FileName>cordic.c</FileName>
