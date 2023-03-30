@@ -63,7 +63,7 @@ namespace embot { namespace hw { namespace i2c {
     bool supported(I2C b)                                                                           { return false; }
     bool initialised(I2C b)                                                                         { return false; }
     result_t init(I2C b, const Config &config)                                                      { return resNOK; }
-          
+    result_t deinit(I2C b)                                                                          { return resNOK; }     
     // blocking   
     bool isbusy(embot::hw::I2C b, embot::core::relTime timeout, embot::core::relTime &remaining) { return false; }      
     bool ping(embot::hw::I2C b, ADR adr, embot::core::relTime timeout) { return false; }   
@@ -160,6 +160,28 @@ namespace embot { namespace hw { namespace i2c {
         return resOK;
     }
            
+    result_t deinit(I2C b)
+    {
+        if(false == supported(b))
+        {
+            return resNOK;
+        }
+        
+        if(false == initialised(b))
+        {
+            return resOK;
+        }        
+        
+        
+        std::uint8_t index = embot::core::tointegral(b);
+               
+        s_privatedata.config[index] = {};
+        //embot::hw::i2c::bsp::getBSP().deinit(b);
+        
+        embot::core::binary::bit::clear(initialisedmask, embot::core::tointegral(b));
+                
+        return resOK;        
+    }
     
     bool discover(embot::hw::I2C b, std::vector<ADR> &adrs)
     {

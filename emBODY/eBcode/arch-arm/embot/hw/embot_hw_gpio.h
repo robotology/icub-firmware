@@ -27,10 +27,11 @@
 
 namespace embot { namespace hw { namespace gpio {
     
-    
+    // State contains stm32's values such as GPIO_PIN_RESET etc.
     enum class State : std::uint8_t { RESET = 0, SET = 1 };
     
-    // look at stm32's GPIO_mode_define
+    // Mode contains stm32's defines such as GPIO_MODE_INPUT etc.
+    // we dont support them all
     enum class Mode : std::uint8_t { 
         INPUT = 0,
         OUTPUTpushpull = 1, 
@@ -38,16 +39,17 @@ namespace embot { namespace hw { namespace gpio {
         //AFpushpull = 3,
         //AFopendrain = 4,
         //ANALOG = 5,
-        EXTIrising = 6,
-        EXTIfalling = 7,
-        EXTIrisingfalling = 8,
-        //EVTrising = 9,
-        //EVTfalling = 10,
-        //EVTrisingfalling = 11
+        //ANALOGADCcontrol = 6,
+        EXTIrising = 7,
+        EXTIfalling = 8,
+        EXTIrisingfalling = 9,
+        //EVTrising = 10,
+        //EVTfalling = 11,
+        //EVTrisingfalling = 12
         none = 255
     };
      
-    // look at GPIO_pull_define
+    // Pull contains stm32's defines such as GPIO_NOPULL etc.
     enum class Pull : std::uint8_t { 
         nopull = 0, 
         pullup = 1, 
@@ -55,6 +57,7 @@ namespace embot { namespace hw { namespace gpio {
         none = 255
     };
     
+    // Speed contains stm32's defines such as GPIO_SPEED_FREQ_LOW etc.
     enum class Speed : uint8_t {
         low = 0,
         medium = 1,
@@ -74,6 +77,8 @@ namespace embot { namespace hw { namespace gpio {
             return (mode != Mode::none) && (pull != Pull::none) && (speed != Speed::none);
         }            
     };
+    
+    constexpr Config cfgOUTpp {Mode::OUTPUTpushpull, Pull::nopull, Speed::veryhigh};
     
     bool supported(const embot::hw::GPIO &g);    
     bool initialised(const embot::hw::GPIO g);    

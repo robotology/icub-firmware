@@ -260,7 +260,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -271,8 +271,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.mtb4c.v190.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.mtb4c.v190.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.mtb4c.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.l4.v1D3.mtb4c.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -280,7 +280,7 @@
 
   <Group>
     <GroupName>stm32hal-config</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -291,8 +291,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\stm32hal.l4.startup.mtb4c.v190.s</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.l4.startup.mtb4c.v190.s</FilenameWithoutPath>
+      <PathWithFileName>..\cfg\stm32hal.l4.startup.mtb4c.s</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.l4.startup.mtb4c.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -87,9 +87,11 @@ namespace embot { namespace app { namespace application {
 
         
         // interface to CANagentPOS
-        virtual bool set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info);
-        virtual bool set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info);
-        virtual bool get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo);
+        bool isactive() const override;
+        const std::string& status() const override;
+        bool set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info) override;
+        bool set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info) override;
+        bool get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo) override;
         
 
     private:

@@ -170,6 +170,11 @@ namespace embot { namespace hw { namespace bno055 {
         s_privatedata.i2cdes[index] = embot::hw::bno055::getBSP().getPROP(s)->i2cdes;
         
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(s));
+        
+        // after initialised mask i can do other things:
+        
+        // enable the external oscillator by writing 0x80 in reg 0x3F
+        embot::hw::bno055::write(s, embot::hw::bno055::Register::SYS_TRIGGER, 0x80, 5*embot::core::time1millisec);
                 
         return resOK;
     }
@@ -548,11 +553,30 @@ namespace embot { namespace hw { namespace bno055 {
 //    }
     
     static void s_powerON(BNO055 s, embot::core::relTime waittime)
-    {        
-        embot::hw::gpio::set(embot::hw::bno055::getBSP().getPROP(s)->boot, embot::hw::gpio::State::SET);
-        embot::hw::gpio::set(embot::hw::bno055::getBSP().getPROP(s)->reset, embot::hw::gpio::State::SET);
-        
-        embot::hw::sys::delay(waittime);         
+    {
+        const embot::hw::GPIO nBOOT_LOAD_PIN {embot::hw::bno055::getBSP().getPROP(s)->nBOOT_LOAD_PIN};
+        const embot::hw::GPIO nRESET {embot::hw::bno055::getBSP().getPROP(s)->nRESET};
+        // if we have valid boot and reset we just use them
+        if(true == nBOOT_LOAD_PIN.isvalid())
+        {
+            // init and make sure it stays high so that the bootload is NOT loaded at bootstratp 
+            embot::hw::gpio::init(nBOOT_LOAD_PIN, embot::hw::gpio::cfgOUTpp);
+            embot::hw::gpio::set(nBOOT_LOAD_PIN, embot::hw::gpio::State::SET);
+        }
+
+        if(true == nRESET.isvalid())
+        {
+            // the bno restarts if nRESET is low for at least 80 ns. then we wait for the POR time 
+            embot::hw::gpio::init(nRESET, embot::hw::gpio::cfgOUTpp);
+            // we ensure it is high
+            embot::hw::gpio::set(nRESET, embot::hw::gpio::State::SET);
+            // we set low and stay ... 1 ms
+            embot::hw::gpio::set(nRESET, embot::hw::gpio::State::RESET);
+            embot::hw::sys::delay(embot::core::time1millisec);
+            // we can put it high again and wait for the POR time
+            embot::hw::gpio::set(nRESET, embot::hw::gpio::State::SET);
+            embot::hw::sys::delay(waittime);            
+        }             
     }
     
     

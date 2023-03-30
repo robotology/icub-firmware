@@ -36,43 +36,38 @@ extern "C" {
 
 // - public interface  ------------------------------------------------------------------------------------------------
   
-#if     defined(STM32HAL_BOARD_NUCLEO64)
-
+#if     defined(STM32HAL_BOARD_NUCLEOL4)
    
-    // two possible drivers. default is the 1D2 ...
-    #if     defined(STM32HAL_DRIVER_V172)    
-        #define STM32HAL_DRIVER_VERSION 0x172  
-    #else   
-        #if !defined(STM32HAL_DRIVER_V1D2)
-            #define STM32HAL_DRIVER_V1D2
-        #endif        
-        #define STM32HAL_DRIVER_VERSION 0x1D2   
-    #endif    
+    // one possible driver: the 1D3 ...
+    #if !defined(STM32HAL_DRIVER_V1D3)
+        #define STM32HAL_DRIVER_V1D3
+    #endif        
+    #define STM32HAL_DRIVER_VERSION 0x1D3   
     
 #elif   defined(STM32HAL_BOARD_MTB4)
 
-    // two possible drivers. default is the 190 ...
-    #if     defined(STM32HAL_DRIVER_V172)    
-        #define STM32HAL_DRIVER_VERSION 0x172  
+    // two possible drivers. default is the 1D3 ...
+    #if     defined(STM32HAL_DRIVER_V190)    
+        #define STM32HAL_DRIVER_VERSION 0x190  
     #else   
-        #if !defined(STM32HAL_DRIVER_V190)
-            #define STM32HAL_DRIVER_V190
+        #if !defined(STM32HAL_DRIVER_V1D3)
+            #define STM32HAL_DRIVER_V1D3
         #endif        
-        #define STM32HAL_DRIVER_VERSION 0x190   
+        #define STM32HAL_DRIVER_VERSION 0x1D3   
     #endif
     
 #elif   defined(STM32HAL_BOARD_STRAIN2)
 
-    // three possible drivers. default is the 1B0 ...
-    #if     defined(STM32HAL_DRIVER_V172)    
-        #define STM32HAL_DRIVER_VERSION 0x172  
-    #elif   defined(STM32HAL_DRIVER_V190)
-        #define STM32HAL_DRIVER_VERSION 0x190
+    // three possible drivers. default is the 1D3 ...
+    #if     defined(STM32HAL_DRIVER_V190)    
+        #define STM32HAL_DRIVER_VERSION 0x190  
+    #elif   defined(STM32HAL_DRIVER_V1B0)
+        #define STM32HAL_DRIVER_VERSION 0x1B0
     #else   
-        #if !defined(STM32HAL_DRIVER_V1B0)
-            #define STM32HAL_DRIVER_V1B0
+        #if !defined(STM32HAL_DRIVER_V1D3)
+            #define STM32HAL_DRIVER_V1D3
         #endif        
-        #define STM32HAL_DRIVER_VERSION 0x1B0   
+        #define STM32HAL_DRIVER_VERSION 0x1D3   
     #endif
     
 #elif   defined(STM32HAL_BOARD_RFE)
@@ -178,23 +173,28 @@ extern "C" {
     
 #elif   defined(STM32HAL_BOARD_MTB4C)
 
-    // two possible drivers. default is the 190 ...
-    #if     defined(STM32HAL_DRIVER_V172)    
-        #define STM32HAL_DRIVER_VERSION 0x172  
-    #else   
-        #if !defined(STM32HAL_DRIVER_V190)
-            #define STM32HAL_DRIVER_V190
-        #endif        
+    // two possible drivers. default is the 1D3 ...
+    #if   defined(STM32HAL_DRIVER_V190)      
         #define STM32HAL_DRIVER_VERSION 0x190   
+    #else   
+        #if !defined(STM32HAL_DRIVER_V1D3)
+            #define STM32HAL_DRIVER_V1D3
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x1D3   
     #endif
-
+    
 #elif   defined(STM32HAL_BOARD_STRAIN2C)
 
-    // one drive only: v1B0
-    #if !defined(STM32HAL_DRIVER_V1B0)
-        #define STM32HAL_DRIVER_V1B0
+    // two possible drivers: default is the 1D3 ...
+    #if defined(STM32HAL_DRIVER_V1B0)
+        #define STM32HAL_DRIVER_VERSION 0x1B0
+    #else
+        #if !defined(STM32HAL_DRIVER_V1D3)
+            #define STM32HAL_DRIVER_V1D3
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x1D3     
     #endif        
-    #define STM32HAL_DRIVER_VERSION 0x1B0   
+       
 
 #else
     #error STM32HAL: the STM32HAL_BOARD_${B} is undefined

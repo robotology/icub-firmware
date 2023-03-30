@@ -37,11 +37,12 @@ static const embot::core::relTime BlinkSlowPeriod = 500*embot::core::time1millis
 static ActivityParam activity_param = { .blinkingperiod = BlinkSlowPeriod };
 
 // use build 222 for all the updaterofbootloader
-static const embot::prot::can::versionOfAPPLICATION vAP = {1, 6 , 222};
+static const embot::prot::can::versionOfAPPLICATION vAP = {2, 8, 222};
 static const embot::prot::can::versionOfCANPROTOCOL vCP = {2, 0};
 
-static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
-static const std::uint32_t vectorlocation = address - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address;
+static const std::uint32_t address = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address;
+static const std::uint32_t defaultvectorlocation = embot::hw::flash::bsp::bank(address).address;
+static const std::uint32_t vectorlocation = address - defaultvectorlocation; 
 
 int main(void)
 { 

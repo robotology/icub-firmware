@@ -6,13 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                       opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -250,6 +249,11 @@ typedef struct
 #define SDMMC_CMD_SDMMC_RW_EXTENDED                   ((uint8_t)53U)  /*!< For SD I/O card only, reserved for security specification.                               */
 
 /**
+  * @brief Following commands are MMC Specific commands.
+  */
+#define SDMMC_CMD_MMC_SLEEP_AWAKE                     ((uint8_t)5U)   /*!< Toggle the device between Sleep state and Standby state.                                 */
+
+/**
   * @brief Following commands are SD Card Specific security commands.
   *        SDMMC_CMD_APP_CMD should be sent before sending these commands.
   */
@@ -401,10 +405,10 @@ typedef struct
 #define SDMMC_SPEED_MODE_DDR                   ((uint32_t)0x00000004U)
 
 #define IS_SDMMC_SPEED_MODE(MODE) (((MODE) == SDMMC_SPEED_MODE_AUTO) || \
-                                ((MODE) == SDMMC_SPEED_MODE_DEFAULT) || \
-                                ((MODE) == SDMMC_SPEED_MODE_HIGH) || \
-                                ((MODE) == SDMMC_SPEED_MODE_ULTRA) || \
-                                ((MODE) == SDMMC_SPEED_MODE_DDR))
+                                   ((MODE) == SDMMC_SPEED_MODE_DEFAULT) || \
+                                   ((MODE) == SDMMC_SPEED_MODE_HIGH) || \
+                                   ((MODE) == SDMMC_SPEED_MODE_ULTRA) || \
+                                   ((MODE) == SDMMC_SPEED_MODE_DDR))
 
 /**
   * @}
@@ -525,7 +529,7 @@ typedef struct
   */
 #endif /* STM32L4P5xx || STM32L4Q5xx || STM32L4R5xx || STM32L4R7xx || STM32L4R9xx || STM32L4S5xx || STM32L4S7xx || STM32L4S9xx */
 
-/** @defgroup SDMMC_LL_Data_Length Data Lenght
+/** @defgroup SDMMC_LL_Data_Length Data Length
   * @{
   */
 #define IS_SDMMC_DATA_LENGTH(LENGTH) ((LENGTH) <= 0x01FFFFFFU)
@@ -804,13 +808,13 @@ typedef struct
 #define SDMMC_INIT_CLK_DIV ((uint8_t)0x8A)
 
 /* SDMMC Default Speed Frequency (25Mhz max) for Peripheral CLK 110MHz*/
-#define SDMMC_NSpeed_CLK_DIV ((uint8_t)0x3)
+#define SDMMC_NSPEED_CLK_DIV ((uint8_t)0x3)
 
 /* SDMMC High Speed Frequency (50Mhz max) for Peripheral CLK 110MHz*/
-#define SDMMC_HSpeed_CLK_DIV ((uint8_t)0x2)
+#define SDMMC_HSPEED_CLK_DIV ((uint8_t)0x2)
 
 /* SDMMC Data Transfer Frequency (25MHz max) */
-#define SDMMC_TRANSFER_CLK_DIV SDMMC_NSpeed_CLK_DIV
+#define SDMMC_TRANSFER_CLK_DIV SDMMC_NSPEED_CLK_DIV
 #else
 /* SDMMC Initialization Frequency (400KHz max) */
 #define SDMMC_INIT_CLK_DIV     ((uint8_t)0x76)    /* 48MHz / (SDMMC_INIT_CLK_DIV + 2) < 400KHz */
@@ -1236,7 +1240,7 @@ uint32_t SDMMC_CmdEraseStartAdd(SDMMC_TypeDef *SDMMCx, uint32_t StartAdd);
 uint32_t SDMMC_CmdSDEraseStartAdd(SDMMC_TypeDef *SDMMCx, uint32_t StartAdd);
 uint32_t SDMMC_CmdEraseEndAdd(SDMMC_TypeDef *SDMMCx, uint32_t EndAdd);
 uint32_t SDMMC_CmdSDEraseEndAdd(SDMMC_TypeDef *SDMMCx, uint32_t EndAdd);
-uint32_t SDMMC_CmdErase(SDMMC_TypeDef *SDMMCx);
+uint32_t SDMMC_CmdErase(SDMMC_TypeDef *SDMMCx, uint32_t EraseType);
 uint32_t SDMMC_CmdStopTransfer(SDMMC_TypeDef *SDMMCx);
 uint32_t SDMMC_CmdSelDesel(SDMMC_TypeDef *SDMMCx, uint64_t Addr);
 uint32_t SDMMC_CmdGoIdleState(SDMMC_TypeDef *SDMMCx);
@@ -1248,6 +1252,8 @@ uint32_t SDMMC_CmdSendSCR(SDMMC_TypeDef *SDMMCx);
 uint32_t SDMMC_CmdSendCID(SDMMC_TypeDef *SDMMCx);
 uint32_t SDMMC_CmdSendCSD(SDMMC_TypeDef *SDMMCx, uint32_t Argument);
 uint32_t SDMMC_CmdSetRelAdd(SDMMC_TypeDef *SDMMCx, uint16_t *pRCA);
+uint32_t SDMMC_CmdSetRelAddMmc(SDMMC_TypeDef *SDMMCx, uint16_t RCA);
+uint32_t SDMMC_CmdSleepMmc(SDMMC_TypeDef *SDMMCx, uint32_t Argument);
 uint32_t SDMMC_CmdSendStatus(SDMMC_TypeDef *SDMMCx, uint32_t Argument);
 uint32_t SDMMC_CmdStatusRegister(SDMMC_TypeDef *SDMMCx);
 #if defined(STM32L4P5xx) || defined(STM32L4Q5xx) || defined(STM32L4R5xx) || defined(STM32L4R7xx) || defined(STM32L4R9xx) || defined(STM32L4S5xx) || defined(STM32L4S7xx) || defined(STM32L4S9xx)
@@ -1256,6 +1262,13 @@ uint32_t SDMMC_CmdVoltageSwitch(SDMMC_TypeDef *SDMMCx);
 uint32_t SDMMC_CmdOpCondition(SDMMC_TypeDef *SDMMCx, uint32_t Argument);
 uint32_t SDMMC_CmdSwitch(SDMMC_TypeDef *SDMMCx, uint32_t Argument);
 uint32_t SDMMC_CmdSendEXTCSD(SDMMC_TypeDef *SDMMCx, uint32_t Argument);
+
+/* SDMMC Responses management functions */
+uint32_t SDMMC_GetCmdResp1(SDMMC_TypeDef *SDMMCx, uint8_t SD_CMD, uint32_t Timeout);
+uint32_t SDMMC_GetCmdResp2(SDMMC_TypeDef *SDMMCx);
+uint32_t SDMMC_GetCmdResp3(SDMMC_TypeDef *SDMMCx);
+uint32_t SDMMC_GetCmdResp7(SDMMC_TypeDef *SDMMCx);
+uint32_t SDMMC_GetCmdResp6(SDMMC_TypeDef *SDMMCx, uint8_t SD_CMD, uint16_t *pRCA);
 
 /**
   * @}
@@ -1287,5 +1300,3 @@ uint32_t SDMMC_CmdSendEXTCSD(SDMMC_TypeDef *SDMMCx, uint32_t Argument);
 #endif
 
 #endif /* STM32L4xx_LL_SDMMC_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

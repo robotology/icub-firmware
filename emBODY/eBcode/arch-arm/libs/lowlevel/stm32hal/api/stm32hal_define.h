@@ -62,7 +62,7 @@ extern "C" {
     #define register 
 #endif
     
-#if     defined(STM32HAL_BOARD_NUCLEO64)
+#if     defined(STM32HAL_BOARD_NUCLEOL4)
 
     // it has a STM32L476xx mpu
     #if !defined(STM32L476xx)

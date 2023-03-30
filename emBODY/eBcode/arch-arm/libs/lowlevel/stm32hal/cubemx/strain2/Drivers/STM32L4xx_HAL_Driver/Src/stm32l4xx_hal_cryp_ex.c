@@ -9,14 +9,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
+  * This software is licensed under terms that can be found in the LICENSE file in
+  * the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   ******************************************************************************
   */
 
@@ -344,7 +342,7 @@ HAL_StatusTypeDef HAL_CRYPEx_AES_IT(CRYP_HandleTypeDef *hcryp,  uint8_t *pInputD
   * @note   No DMA channel is provided for key derivation only and therefore, access to AES_KEYRx
   *         registers must be done by software.
   * @note   This API is not applicable to key derivation only; for such a mode, access to AES_KEYRx
-  *         registers must be done by software thru HAL_CRYPEx_AES() or HAL_CRYPEx_AES_IT() APIs.
+  *         registers must be done by software through HAL_CRYPEx_AES() or HAL_CRYPEx_AES_IT() APIs.
   * @note   pInputData and pOutputData buffers must be 32-bit aligned to ensure a correct DMA transfer to and from the IP.
   * @retval HAL status
   */
@@ -3245,4 +3243,3 @@ static void CRYP_Padding(CRYP_HandleTypeDef *hcryp, uint32_t difflength, uint32_
 #endif /* AES */
 
 #endif /* HAL_CRYP_MODULE_ENABLED */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

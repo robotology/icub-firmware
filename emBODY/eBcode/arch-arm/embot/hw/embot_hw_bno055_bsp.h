@@ -22,9 +22,11 @@ namespace embot { namespace hw { namespace bno055 {
     struct PROP
     { 
         embot::hw::i2c::Descriptor i2cdes {embot::hw::I2C::none, 0};
-        embot::hw::GPIO boot {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};        
-        embot::hw::GPIO reset {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};   
-        constexpr PROP(const embot::hw::i2c::Descriptor &d, const embot::hw::GPIO &b, const embot::hw::GPIO &r) : i2cdes(d), boot(b), reset(r) {}
+        embot::hw::GPIO nBOOT_LOAD_PIN {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};        
+        embot::hw::GPIO nRESET {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none}; 
+        embot::hw::GPIO INT {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};         
+        constexpr PROP(const embot::hw::i2c::Descriptor &d, const embot::hw::GPIO &b, const embot::hw::GPIO &r, const embot::hw::GPIO &i = {}) 
+            : i2cdes(d), nBOOT_LOAD_PIN(b), nRESET(r), INT(i) {}
     };
     
     struct BSP : public embot::hw::bsp::SUPP

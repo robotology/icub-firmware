@@ -822,13 +822,13 @@ namespace embot { namespace hw { namespace bno055 {
 
 namespace embot { namespace hw { namespace bno055 {
     
-    #if defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2)
+    #if defined(STM32HAL_BOARD_STRAIN2)
     
-    // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
     constexpr PROP prop01 {
         { embot::hw::I2C::two, 0x52 },
-        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen },   // .boot
-        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve }      // .reset
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen },   // .nBOOT_LOAD_PIN
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve },     // .nRESET
+        { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::ten }         // .INT but for future use
     };
 
     constexpr BSP thebsp {        

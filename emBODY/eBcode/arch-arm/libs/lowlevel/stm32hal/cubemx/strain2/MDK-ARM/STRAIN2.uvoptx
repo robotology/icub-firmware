@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <ProjectOpt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="project_optx.xsd">
 
   <SchemaVersion>1.0</SchemaVersion>
@@ -10,7 +10,7 @@
     <aExt>*.s*; *.src; *.a*</aExt>
     <oExt>*.obj; *.o</oExt>
     <lExt>*.lib</lExt>
-    <tExt>*.txt; *.h; *.inc</tExt>
+    <tExt>*.txt; *.h; *.inc; *.md</tExt>
     <pExt>*.plm</pExt>
     <CppX>*.cpp</CppX>
     <nMigrate>0</nMigrate>
@@ -26,7 +26,7 @@
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
-      <CLKADS>80000000</CLKADS>
+      <CLKADS>10000000</CLKADS>
       <OPTTT>
         <gFlags>1</gFlags>
         <BeepAtEnd>1</BeepAtEnd>
@@ -45,7 +45,7 @@
         <PageWidth>79</PageWidth>
         <PageLength>66</PageLength>
         <TabStop>8</TabStop>
-        <ListingPath />
+        <ListingPath></ListingPath>
       </OPTLEX>
       <ListingPage>
         <CreateCListing>1</CreateCListing>
@@ -104,16 +104,16 @@
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
         <nTsel>6</nTsel>
-        <sDll />
-        <sDllPa />
-        <sDlgDll />
-        <sDlgPa />
-        <sIfile />
-        <tDll />
-        <tDllPa />
-        <tDlgDll />
-        <tDlgPa />
-        <tIfile />
+        <sDll></sDll>
+        <sDllPa></sDllPa>
+        <sDlgDll></sDlgDll>
+        <sDlgPa></sDlgPa>
+        <sIfile></sIfile>
+        <tDll></tDll>
+        <tDllPa></tDllPa>
+        <tDlgDll></tDlgDll>
+        <tDlgPa></tDlgPa>
+        <tIfile></tIfile>
         <pMon>STLink\ST-LINKIII-KEIL_SWO.dll</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
@@ -130,7 +130,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ARMDBGFLAGS</Key>
-          <Name />
+          <Name></Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -162,7 +162,7 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
-          <ExecCommand />
+          <ExecCommand></ExecCommand>
           <Expression>\\STRAIN2\../Src/main.c\432</Expression>
         </Bp>
         <Bp>
@@ -178,7 +178,7 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
-          <ExecCommand />
+          <ExecCommand></ExecCommand>
           <Expression>\\STRAIN2\../Src/main.c\364</Expression>
         </Bp>
         <Bp>
@@ -194,7 +194,7 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
-          <ExecCommand />
+          <ExecCommand></ExecCommand>
           <Expression>\\STRAIN2\../Src/main.c\359</Expression>
         </Bp>
         <Bp>
@@ -210,7 +210,7 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\Src\can_utility.c</Filename>
-          <ExecCommand />
+          <ExecCommand></ExecCommand>
           <Expression>\\STRAIN2\../Src/can_utility.c\103</Expression>
         </Bp>
         <Bp>
@@ -226,7 +226,7 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
-          <ExecCommand />
+          <ExecCommand></ExecCommand>
           <Expression>\\STRAIN2\../Src/main.c\366</Expression>
         </Bp>
         <Bp>
@@ -242,8 +242,8 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
-          <ExecCommand />
-          <Expression />
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
         </Bp>
         <Bp>
           <Number>6</Number>
@@ -258,8 +258,8 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>..\Src\can_utility.c</Filename>
-          <ExecCommand />
-          <Expression />
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
         </Bp>
         <Bp>
           <Number>7</Number>
@@ -274,8 +274,8 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
-          <ExecCommand />
-          <Expression />
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
         </Bp>
         <Bp>
           <Number>8</Number>
@@ -290,8 +290,8 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
-          <ExecCommand />
-          <Expression />
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
         </Bp>
         <Bp>
           <Number>9</Number>
@@ -306,8 +306,8 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
-          <ExecCommand />
-          <Expression />
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -391,19 +391,19 @@
         <newCpu>0</newCpu>
         <uProt>0</uProt>
       </DebugFlag>
-      <LintExecutable />
-      <LintConfigFile />
+      <LintExecutable></LintExecutable>
+      <LintConfigFile></LintConfigFile>
       <bLintAuto>0</bLintAuto>
       <bAutoGenD>0</bAutoGenD>
       <LntExFlags>0</LntExFlags>
-      <pMisraName />
-      <pszMrule />
-      <pSingCmds />
-      <pMultCmds />
-      <pMisraNamep />
-      <pszMrulep />
-      <pSingCmdsp />
-      <pMultCmdsp />
+      <pMisraName></pMisraName>
+      <pszMrule></pszMrule>
+      <pSingCmds></pSingCmds>
+      <pMultCmds></pMultCmds>
+      <pMisraNamep></pMisraNamep>
+      <pszMrulep></pszMrulep>
+      <pSingCmdsp></pSingCmdsp>
+      <pMultCmdsp></pMultCmdsp>
       <DebugDescription>
         <Enable>1</Enable>
         <EnableFlashSeq>1</EnableFlashSeq>
@@ -644,7 +644,7 @@
 
   <Group>
     <GroupName>Drivers/STM32L4xx_HAL_Driver</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -691,30 +691,6 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c</PathWithFileName>
-      <FilenameWithoutPath>stm32l4xx_hal_i2c.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>22</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32l4xx_hal_i2c_ex.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>4</GroupNumber>
-      <FileNumber>23</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_rcc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -722,7 +698,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>24</FileNumber>
+      <FileNumber>22</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -734,7 +710,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>25</FileNumber>
+      <FileNumber>23</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -746,7 +722,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>26</FileNumber>
+      <FileNumber>24</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -758,7 +734,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>27</FileNumber>
+      <FileNumber>25</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -770,7 +746,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>28</FileNumber>
+      <FileNumber>26</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -782,7 +758,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>29</FileNumber>
+      <FileNumber>27</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -794,7 +770,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>30</FileNumber>
+      <FileNumber>28</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -806,7 +782,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>31</FileNumber>
+      <FileNumber>29</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -818,7 +794,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>32</FileNumber>
+      <FileNumber>30</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -830,7 +806,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>33</FileNumber>
+      <FileNumber>31</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -842,7 +818,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>34</FileNumber>
+      <FileNumber>32</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -854,13 +830,37 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>35</FileNumber>
+      <FileNumber>33</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_can.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_can.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>34</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c</PathWithFileName>
+      <FilenameWithoutPath>stm32l4xx_hal_i2c.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>35</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32l4xx_hal_i2c_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

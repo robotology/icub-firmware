@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -38,11 +38,11 @@ void MX_CAN1_Init(void)
 
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 2;
+  hcan1.Init.Prescaler = 4;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_2TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_5TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_4TQ;
+  hcan1.Init.TimeSeg2 = CAN_BS2_3TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
   hcan1.Init.AutoBusOff = ENABLE;
   hcan1.Init.AutoWakeUp = ENABLE;

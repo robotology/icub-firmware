@@ -49,50 +49,24 @@ extern void stm32hal_board_init(void);
 // it contains whatever cube-mx generates.
 
 
-#if     defined(STM32HAL_BOARD_NUCLEO64)
+#if     defined(STM32HAL_BOARD_NUCLEOL4)
 
-    // one version only: v172
-    #if (STM32HAL_DRIVER_VERSION == 0x172)
-
-        #include "../src/config/stm32hal_driver_cfg_of_nucleo64.h"
-
-        #include "../src/board/nucleo64/v172/inc/gpio.h"
-        #include "../src/board/nucleo64//v172/inc/main.h"
-        #include "../src/board/nucleo64/v172/inc/usart.h"
+    // one version only: v1D3
+    #if  (STM32HAL_DRIVER_VERSION == 0x1D3)
         
-    #elif(STM32HAL_DRIVER_VERSION == 0x1D2)
-        
-        #include "../src/config/stm32hal_driver_cfg_of_nucleo64.h"
+        #include "../src/config/stm32hal_driver_cfg_of_nucleol4_v1D3.h"
 
-        #include "../src/board/nucleo64/v1D2/inc/gpio.h"
-        #include "../src/board/nucleo64/v1D2/inc/main.h"
-        #include "../src/board/nucleo64/v1D2/inc/rng.h"
+        #include "../src/board/nucleol4/v1D3/inc/gpio.h"
+        #include "../src/board/nucleol4/v1D3/inc/main.h"
+        #include "../src/board/nucleol4/v1D3/inc/rng.h"
         
     #else
-        #error unsupported driver version for nucleo64
+        #error unsupported driver version for nucleol4
     #endif
     
 #elif   defined(STM32HAL_BOARD_MTB4)
-
-    // one version only: v172
-    #if (STM32HAL_DRIVER_VERSION == 0x172)
-
-        #include "../src/config/stm32hal_driver_cfg_of_mtb4.h"
-
-        #include "../src/board/mtb4/v172/inc/adc.h"
-        #include "../src/board/mtb4/v172/inc/can.h"
-        #include "../src/board/mtb4/v172/inc/dma.h"
-        #include "../src/board/mtb4/v172/inc/gpio.h"
-        #include "../src/board/mtb4/v172/inc/i2c.h"
-        #include "../src/board/mtb4/v172/inc/rng.h"
-        #include "../src/board/mtb4/v172/inc/main.h"
-        #include "../src/board/mtb4/v172/inc/tim.h"
-        #include "../src/board/mtb4/v172/inc/usart.h"
-
-
-        #include "../src/board/mtb4/v172/inc/stm32l4xx_it.h"
         
-    #elif(STM32HAL_DRIVER_VERSION == 0x190)
+    #if (STM32HAL_DRIVER_VERSION == 0x190)
 
         #include "../src/config/stm32hal_driver_cfg_of_mtb4_v190.h"
 
@@ -108,6 +82,21 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/mtb4/v190/inc/stm32l4xx_it.h"
 
+    #elif (STM32HAL_DRIVER_VERSION == 0x1D3)
+
+        #include "../src/config/stm32hal_driver_cfg_of_mtb4_v1D3.h"
+
+        #include "../src/board/mtb4/v1D3/inc/adc.h"
+        #include "../src/board/mtb4/v1D3/inc/can.h"
+        #include "../src/board/mtb4/v1D3/inc/dma.h"
+        #include "../src/board/mtb4/v1D3/inc/gpio.h"
+        #include "../src/board/mtb4/v1D3/inc/i2c.h"
+        #include "../src/board/mtb4/v1D3/inc/rng.h"
+        #include "../src/board/mtb4/v1D3/inc/main.h"
+        #include "../src/board/mtb4/v1D3/inc/tim.h"
+        #include "../src/board/mtb4/v1D3/inc/usart.h"
+
+        #include "../src/board/mtb4/v1D3/inc/stm32l4xx_it.h"
 
     #else
         #error unsupported driver version for mtb4
@@ -115,24 +104,8 @@ extern void stm32hal_board_init(void);
 
 #elif   defined(STM32HAL_BOARD_STRAIN2)	
 
-    // three cases: v172, v190, v1B0
-    #if (STM32HAL_DRIVER_VERSION == 0x172)
-
-        #include "../src/config/stm32hal_driver_cfg_of_strain2.h"
-
-        #include "../src/board/strain2/v172/inc/adc.h"
-        #include "../src/board/strain2/v172/inc/can.h"
-        #include "../src/board/strain2/v172/inc/dma.h"
-        #include "../src/board/strain2/v172/inc/gpio.h"
-        #include "../src/board/strain2/v172/inc/i2c.h"
-        #include "../src/board/strain2/v172/inc/main.h"
-        #include "../src/board/strain2/v172/inc/rng.h"
-        #include "../src/board/strain2/v172/inc/tim.h"
-        #include "../src/board/strain2/v172/inc/usart.h"
-
-        #include "../src/board/strain2/v172/inc/stm32l4xx_it.h"
-
-    #elif(STM32HAL_DRIVER_VERSION == 0x190)
+    // three cases: v190, v1B0, V1D3
+    #if (STM32HAL_DRIVER_VERSION == 0x190)
 
         #include "../src/config/stm32hal_driver_cfg_of_strain2_v190.h"
 
@@ -168,6 +141,23 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/strain2/v1B0/inc/stm32l4xx_it.h"
 
+
+    #elif(STM32HAL_DRIVER_VERSION == 0x1D3)
+				
+        #include "../src/config/stm32hal_driver_cfg_of_strain2_v1D3.h"
+
+        #include "../src/board/strain2/v1D3/inc/adc.h"
+        #include "../src/board/strain2/v1D3/inc/can.h"
+        #include "../src/board/strain2/v1D3/inc/dma.h"
+        #include "../src/board/strain2/v1D3/inc/gpio.h"
+        #include "../src/board/strain2/v1D3/inc/i2c.h"
+        #include "../src/board/strain2/v1D3/inc/main.h"
+        #include "../src/board/strain2/v1D3/inc/rng.h"
+        #include "../src/board/strain2/v1D3/inc/tim.h"
+        #include "../src/board/strain2/v1D3/inc/usart.h"
+
+        #include "../src/board/strain2/v1D3/inc/stm32l4xx_it.h"
+
     #else
         #error unsupported driver version for strain2
     #endif
@@ -175,7 +165,7 @@ extern void stm32hal_board_init(void);
 
 #elif   defined(STM32HAL_BOARD_PSC)	
 
-// one case only: v190
+    // one case only: v190
     #if (STM32HAL_DRIVER_VERSION == 0x190)
 
         #include "../src/config/stm32hal_driver_cfg_of_psc_v190.h"
@@ -379,7 +369,7 @@ extern void stm32hal_board_init(void);
 
 #elif   defined(STM32HAL_BOARD_AMCBLDC) 
 
-    // one case: v120
+    // two cases: v120 and v122
     #if (STM32HAL_DRIVER_VERSION == 0x120)
 
         #include "../src/config/stm32hal_driver_cfg_of_amcbldc_v120.h"
@@ -486,27 +476,8 @@ extern void stm32hal_board_init(void);
     #endif
     
 #elif   defined(STM32HAL_BOARD_MTB4C)
-    
-    #if (STM32HAL_DRIVER_VERSION == 0x172)
         
-        #error not supported
-
-        #include "../src/config/stm32hal_driver_cfg_of_mtb4c.h"
-
-        #include "../src/board/mtb4c/v172/inc/adc.h"
-        #include "../src/board/mtb4c/v172/inc/can.h"
-        #include "../src/board/mtb4c/v172/inc/dma.h"
-        #include "../src/board/mtb4c/v172/inc/gpio.h"
-        #include "../src/board/mtb4c/v172/inc/i2c.h"
-        #include "../src/board/mtb4c/v172/inc/rng.h"
-        #include "../src/board/mtb4c/v172/inc/main.h"
-        #include "../src/board/mtb4c/v172/inc/tim.h"
-        #include "../src/board/mtb4c/v172/inc/usart.h"
- 
-
-        #include "../src/board/mtb4c/v172/inc/stm32l4xx_it.h"
-        
-    #elif(STM32HAL_DRIVER_VERSION == 0x190)
+    #if(STM32HAL_DRIVER_VERSION == 0x190)
 
         #include "../src/config/stm32hal_driver_cfg_of_mtb4c_v190.h"
 
@@ -523,18 +494,30 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/mtb4c/v190/inc/stm32l4xx_it.h"
 
+    #elif(STM32HAL_DRIVER_VERSION == 0x1D3)
 
+        #include "../src/config/stm32hal_driver_cfg_of_mtb4c_v1D3.h"
+
+        #include "../src/board/mtb4c/v1D3/inc/adc.h"
+        #include "../src/board/mtb4c/v1D3/inc/can.h"
+        #include "../src/board/mtb4c/v1D3/inc/dma.h"
+        #include "../src/board/mtb4c/v1D3/inc/gpio.h"
+        #include "../src/board/mtb4c/v1D3/inc/i2c.h"
+        #include "../src/board/mtb4c/v1D3/inc/rng.h"
+        #include "../src/board/mtb4c/v1D3/inc/main.h"
+        #include "../src/board/mtb4c/v1D3/inc/tim.h"
+        #include "../src/board/mtb4c/v1D3/inc/usart.h"
+
+        #include "../src/board/mtb4c/v1D3/inc/stm32l4xx_it.h"
+        
     #else
         #error unsupported driver version for mtb4c
     #endif
 
 #elif   defined(STM32HAL_BOARD_STRAIN2C)	
     
+    // two cases: v1B0 and v1D3
     #if(STM32HAL_DRIVER_VERSION == 0x1B0)
-
-                #if !defined(CPU_AT_80MHZ)
-                #define CPU_AT_80MHZ
-                #endif
                 
         #include "../src/config/stm32hal_driver_cfg_of_strain2c_v1B0.h"
 
@@ -550,6 +533,22 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/strain2c/v1B0/inc/stm32l4xx_it.h"
 
+    #elif(STM32HAL_DRIVER_VERSION == 0x1D3)
+
+        #include "../src/config/stm32hal_driver_cfg_of_strain2c_v1D3.h"
+
+        #include "../src/board/strain2c/v1D3/inc/adc.h"
+        #include "../src/board/strain2c/v1D3/inc/can.h"
+        #include "../src/board/strain2c/v1D3/inc/dma.h"
+        #include "../src/board/strain2c/v1D3/inc/gpio.h"
+        #include "../src/board/strain2c/v1D3/inc/i2c.h"
+        #include "../src/board/strain2c/v1D3/inc/main.h"
+        #include "../src/board/strain2c/v1D3/inc/rng.h"
+        #include "../src/board/strain2c/v1D3/inc/tim.h"
+        #include "../src/board/strain2c/v1D3/inc/usart.h"
+
+        #include "../src/board/strain2c/v1D3/inc/stm32l4xx_it.h"
+        
     #else
         #error unsupported driver version for strain2c
     #endif
