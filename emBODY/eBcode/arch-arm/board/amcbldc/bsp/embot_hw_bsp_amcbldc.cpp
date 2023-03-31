@@ -733,6 +733,11 @@ namespace embot { namespace hw { namespace motor {
         MX_CORDIC_Init();
         MX_FMAC_Init();
         MX_CRC_Init();   
+#if defined(STM32HAL_DRIVER_V120)
+#else
+        MX_TIM15_Init(); 
+#endif        
+        
         
         HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
         HAL_Delay(10); 
@@ -767,16 +772,27 @@ namespace embot { namespace hw { namespace bsp { namespace amcbldc {
     #include <tuple>
     #include <array>
     
+#if 0
+//std::make_tuple(0x00460048, 0x484E500E, 0x20343356) // scheda centrale sul wrist setup (etichettata come scheda numero 2)
+//std::make_tuple(0x00470047, 0x484E500E, 0x20343356) // scheda sul wrist setup etichettata come scheda numero 3
+//std::make_tuple(0x00480022, 0x484E500E, 0x20343356) // scheda sul wrist setup etichettata come scheda numero 1
+std::make_tuple(0x00470027, 0x484E500E, 0x20343356 ) // scheda jointlab camozzi
     
-    constexpr std::array< std::tuple<uint32_t, uint32_t, uint32_t>, 5> theUIDsOfRevA =    
+    0x00470045, 0x484E500E, 0x20343356 labeled as A1. caveat: the fault is broken
+#endif
+    
+    constexpr std::array< std::tuple<uint32_t, uint32_t, uint32_t>, 7> theUIDsOfRevA =    
     {
-        std::make_tuple(0x00470045, 0x484E500E, 0x20343356),    // 01
-        std::make_tuple(0x00460046, 0x484E500E, 0x20343356),    // 02
-        std::make_tuple(0x00470047, 0x484E500E, 0x20343356),    // 05
-        std::make_tuple(0x00480022, 0x484E500E, 0x20343356),    // wires attached 
-        std::make_tuple(0x00000000, 0x484E500E, 0x20343356)     // placeholder for the one used by rocco [value yet to be scanned] 
+        std::make_tuple(0x00470045, 0x484E500E, 0x20343356),    // 01  probably broken
+        std::make_tuple(0x00460046, 0x484E500E, 0x20343356),    // 02  probably broken
+        std::make_tuple(0x00470047, 0x484E500E, 0x20343356),    // 03: scheda sul wrist setup etichettata come scheda numero 3
+        std::make_tuple(0x00480022, 0x484E500E, 0x20343356),    // scheda sul wrist setup etichettata come scheda numero 1 
+        std::make_tuple(0x00470027, 0x484E500E, 0x20343356),    // jointlab camozzi 
+        std::make_tuple(0x00460048, 0x484E500E, 0x20343356),    // scheda centrale sul wrist setup (etichettata come scheda numero 2)
+        std::make_tuple(0x00470045, 0x484E500E, 0x20343356)     // labeled as A1 in red ink. caveat: the fault is broken
     };    
-    
+
+#if 0    
     constexpr std::array< std::tuple<uint32_t, uint32_t, uint32_t>, 10> theUIDsOfRevB =    
     {
         std::make_tuple(0x00400041, 0x4650500F, 0x20313432),    // 01
@@ -790,7 +806,7 @@ namespace embot { namespace hw { namespace bsp { namespace amcbldc {
         std::make_tuple(0x00400032, 0x4650500F, 0x20313432),    // 09
         std::make_tuple(0x00400043, 0x4650500F, 0x20313432)     // 10
     };
-
+#endif
     
     
     Revision revision()
@@ -799,14 +815,14 @@ namespace embot { namespace hw { namespace bsp { namespace amcbldc {
         
         if(Revision::none == revision)
         {        
-            revision = Revision::A;            
+            revision = Revision::B;            
             volatile uint32_t *myuID = ((volatile uint32_t *)(UID_BASE));
             auto target = std::make_tuple(myuID[0], myuID[1], myuID[2]);
-            for(const auto &i : theUIDsOfRevB)
+            for(const auto &i : theUIDsOfRevA)
             {
                 if(i == target)
                 {
-                    revision =  Revision::B;
+                    revision =  Revision::A;
                 }
             }
         }                
