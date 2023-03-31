@@ -395,14 +395,14 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.amcbldc.v120.lib</FileName>
+              <FileName>stm32hal.g4.v120.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.amcbldc.v120.lib</FilePath>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v120.amcbldc.lib</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.g4.amcbldc.v122.lib</FileName>
+              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.amcbldc.v122.lib</FilePath>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1626,9 +1626,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.amcbldc.v120.lib</FileName>
+              <FileName>stm32hal.g4.v120.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.amcbldc.v120.lib</FilePath>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v120.amcbldc.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1650,9 +1650,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>stm32hal.g4.amcbldc.v122.lib</FileName>
+              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.amcbldc.v122.lib</FilePath>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
             </File>
             <File>
               <FileName>stm32hal.startup.amcbldc.s</FileName>

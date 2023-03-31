@@ -11,11 +11,18 @@
 // --------------------------------------------------------------------------------------------------------------------
 // bootloader info
 
+constexpr uint8_t minor = 
+#if defined(STM32HAL_DRIVER_V120)
+    1;
+#else
+    2;
+#endif
+
 constexpr std::uint8_t defADDRESS = 1;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
     embot::prot::can::Board::amcbldc, 
-    embot::prot::can::versionOfBOOTLOADER {1, 1}, 
+    embot::prot::can::versionOfBOOTLOADER {1, minor}, 
     defADDRESS,                                                  
     "I am an amcbldc" 
 };
