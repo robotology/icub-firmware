@@ -1142,11 +1142,6 @@
               <FileName>stm32hal.l4.v1B0.strain2.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1B0.strain2.lib</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.l4.v1D3.strain2.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.strain2.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1166,6 +1161,11 @@
                 </CommonProperty>
                 <FileArmAds/>
               </FileOption>
+            </File>
+            <File>
+              <FileName>stm32hal.l4.v1D3.strain2.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.l4.v1D3.strain2.lib</FilePath>
             </File>
           </Files>
         </Group>
