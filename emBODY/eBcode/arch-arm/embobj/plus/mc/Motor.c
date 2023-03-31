@@ -1013,6 +1013,11 @@ void Motor_actuate(Motor* motor, uint8_t N) //
         {
             output[motor[m].actuatorPort] = motor[m].output;
             //output[m] = motor[m].output;
+            // in case of control mode IDLE or HF, force the target current to 0.
+            if (icubCanProto_controlmode_idle == motor->control_mode || icubCanProto_controlmode_hwFault == motor->control_mode)
+            {
+                output[motor[m].actuatorPort] = 0;
+            }
         }
     
         eOcanprot_command_t command = {0};
