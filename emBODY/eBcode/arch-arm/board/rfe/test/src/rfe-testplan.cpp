@@ -12,8 +12,6 @@
 
 #include "embot_app_skeleton_os_bootloader.h"
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -32,6 +30,10 @@
 
 #include "embot_hw_types.h"
 #include <vector>
+
+#include "faceExpressionsTypes.h"
+#include "faceExpressionsLowLevelDriver.h"
+#include "faceExpressionsModule.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -249,7 +251,6 @@ static void alerteventbasedthreadusb(void *arg);
     }
 		
 		static void test_CAN(){
-
 			embot::hw::can::Frame canframe;
 			
 			canframe.id = 0x551;         ;
@@ -278,20 +279,6 @@ static void alerteventbasedthreadusb(void *arg);
 			 
 		}
 		
-
-
-		void test_Usb(void){
-			
-
-			embot::hw::usb::Message msg;
-			msg.data[0] = 'c';
-			msg.data[1] = 'i';
-			msg.data[2] = 'a';
-			msg.data[3] = 'o';
-			
-			embot::hw::usb::transmitimmediately(embot::hw::usb::Port::one, msg);
-      			 
-		}
 		
 		constexpr embot::hw::BNO055 imu = embot::hw::BNO055::one;
 		constexpr embot::hw::bno055::Config imuconfig = {};
@@ -427,23 +414,17 @@ static void alerteventbasedthreadusb(void *arg);
 		}
 		
 		static void test_conn_spi(embot::hw::SPI spi){
-			embot::hw::can::Frame canframe;
-			uint16_t res = 0xAA;
-		
+	
 			
 			if(!embot::hw::spi::initialised(spi)) {
-				embot::hw::spi::init(spi1, spiconfig);
+				embot::hw::spi::init(spi, spiconfig);
 			}
-
-			//TBD w/ the external board (i.e. mouth rfe)!
-
-			canframe.id = 0x551;         ;
-			canframe.size = 8;
-			canframe.data[0] = res;
 			
-			embot::hw::can::put(embot::hw::CAN::one, {canframe.id, canframe.size, canframe.data});   
-			embot::hw::can::transmit(embot::hw::CAN::one);		
-				
+		  RfeApp::FaceExpressions faceExpressions;
+      faceExpressions.init(RfeApp::Expression_t::neutral, RfeApp::Color::white, RfeApp::Brightness::medium);
+      if(spi == spi1){faceExpressions.displayExpression4test(1);}
+			else{faceExpressions.displayExpression4test(2);}
+			
 		}
 
 				
@@ -477,8 +458,8 @@ static void alerteventbasedthreadusb(void *arg);
 						//Test led blue on
 						case 0x03 :  embot::core::wait(300* embot::core::time1millisec); test_Leds(1); break;
 
-						//Test serial
-						case 0x04 :  embot::core::wait(300* embot::core::time1millisec); test_Usb(); break;
+						//Test serial USB is tested in : static void alerteventbasedthreadusb(void *arg)
+						//case 0x04 :  embot::core::wait(300* embot::core::time1millisec); test_Usb(); break;
 
 						//Test IMU Bosch BNO055
 						case 0x05 :  embot::core::wait(300* embot::core::time1millisec); test_BNO055(); break;
