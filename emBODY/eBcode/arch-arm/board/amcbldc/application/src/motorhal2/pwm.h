@@ -33,6 +33,8 @@
 
 /* Exported macro ----------------------------------------------------------------------------------------------------*/
 
+// dithering -> max 2^14, ma un po meno 
+// se si usasse il modo no-dithering -> 2^10 (4 bit in meno)
 #define MAX_PWM		(16383U)
 
 #define PWM_CONF_MODE_HALL      (0x0001UL)

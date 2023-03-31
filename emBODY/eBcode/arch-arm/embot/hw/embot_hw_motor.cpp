@@ -149,7 +149,7 @@ namespace embot { namespace hw { namespace motor {
         uint16_t pwm_hall_offset);
     Position s_hw_getencoder(MOTOR h);
     Position s_hw_gethallcounter(MOTOR h);    
-    result_t s_hw_setpwm(MOTOR h, Pwm v);
+    // result_t s_hw_setpwm(MOTOR h, Pwm v);
     
     
     HallStatus s_hw_gethallstatus(MOTOR h);
@@ -332,6 +332,10 @@ namespace embot { namespace hw { namespace motor {
 
     result_t setpwm(MOTOR h, Pwm v)
     {
+#if 1
+        // deprecated
+        return resNOK;
+#else        
 // if faulted() we are not enabled() ... so we dont need this extra check        
 //        if(true == faulted(h))
 //        {
@@ -345,6 +349,7 @@ namespace embot { namespace hw { namespace motor {
         }
         
         return s_hw_setpwm(h, v);
+#endif        
     } 
     
     result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w)
@@ -402,10 +407,10 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_deinit(MOTOR h)
     {
-//        pwmDeinit();
-        analogDeinit();
-        encoderDeinit();
-        hallDeinit();
+//        pwm_Deinit();
+        analog_Deinit();
+        encoder_Deinit();
+        pwm_hallDeinit();
         
         return resOK;
     }
@@ -425,8 +430,8 @@ namespace embot { namespace hw { namespace motor {
         
 //        s_hw_init(h);
         
-        if (HAL_OK != encoderConfig(has_quad_enc, enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
-        if (HAL_OK != hallConfig(pwm_swapBC, pwm_hall_offset)) res = resNOK;
+        if (HAL_OK != encoder_Config(has_quad_enc, enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
+        if (HAL_OK != pwm_hallConfig(pwm_swapBC, pwm_hall_offset)) res = resNOK;
       
         return res; 
     }
@@ -447,14 +452,14 @@ namespace embot { namespace hw { namespace motor {
     }
 
 
-    result_t s_hw_setpwm(MOTOR h, Pwm v)
-    { 
-        HAL_StatusTypeDef r = HAL_ERROR;
-#if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)         
-        r = pwmSetValue(v);
-#endif  
-        return (HAL_OK == r) ? resOK : resNOK;      
-    }
+//    result_t s_hw_setpwm(MOTOR h, Pwm v)
+//    { 
+//        HAL_StatusTypeDef r = HAL_ERROR;
+//      
+//        //r = pwmSetValue(v);
+
+//        return (HAL_OK == r) ? resOK : resNOK;      
+//    }
     
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
     {        
@@ -466,10 +471,10 @@ namespace embot { namespace hw { namespace motor {
     
 #if defined(EMBOT_AMCBLDC_APP01) || defined(EMBOT_AMCBLDC_APP02) || defined(EMBOT_AMCBLDC_APP03)
 #else    
-    static_assert(sizeof(pwmCurrents_t) == sizeof(embot::hw::motor::Currents), "embot::hw::motor::Currents and pwmCurrents_t differs");
-    static_assert(sizeof(pwmCurrents_t::u) == sizeof(embot::hw::motor::Currents::u), "embot::hw::motor::Currents and pwmCurrents_t differs");
-    static_assert(sizeof(pwmCurrents_t::v) == sizeof(embot::hw::motor::Currents::v), "embot::hw::motor::Currents and pwmCurrents_t differs");
-    static_assert(sizeof(pwmCurrents_t::w) == sizeof(embot::hw::motor::Currents::w), "embot::hw::motor::Currents and pwmCurrents_t differs");
+    static_assert(sizeof(pwm_Currents_t) == sizeof(embot::hw::motor::Currents), "embot::hw::motor::Currents and pwm_Currents_t differs");
+    static_assert(sizeof(pwm_Currents_t::u) == sizeof(embot::hw::motor::Currents::u), "embot::hw::motor::Currents and pwm_Currents_t differs");
+    static_assert(sizeof(pwm_Currents_t::v) == sizeof(embot::hw::motor::Currents::v), "embot::hw::motor::Currents and pwm_Currents_t differs");
+    static_assert(sizeof(pwm_Currents_t::w) == sizeof(embot::hw::motor::Currents::w), "embot::hw::motor::Currents and pwm_Currents_t differs");
 #endif
     
     result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
@@ -486,7 +491,7 @@ namespace embot { namespace hw { namespace motor {
         pwm_ADC_callback_t cbk {};
         cbk.callback = reinterpret_cast<pwm_fp_adc_callback_t>(callback);
         cbk.owner = owner;
-        set_ADC_callback(&cbk);
+        pwm_set_ADC_callback(&cbk);
         return resOK;
 #endif          
     }

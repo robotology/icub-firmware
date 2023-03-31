@@ -43,6 +43,8 @@
 #include "pwm.h"
 #include "utilities.h"
 #include "FreeRTOS.h"
+#include "task.h"
+
 #endif
 
 #if (USE_HAL_ADC_REGISTER_CALLBACKS != 1)
@@ -52,16 +54,12 @@
 
 /* Private macros *****************************************************************************************************/
 
-/* Used by the Moving Average Filter */
-#define ANALOG_AVG_FILTER_SHIFT     (7)
-#define ANALOG_AVG_FILTER_LENGTH    (1U<<ANALOG_AVG_FILTER_SHIFT)
-
 /* Calibration parameter stored by the manufacturer 
  * Given:
- *  VREF                Current reference voltage
- *  VREFINT             Current ADC measurement of VREFIN channel
- *  VREF_CAL            Reference voltage during manufacturer calibration
- *  VREFINT_CAL         ADC measurement of VREFIN channel during manufacturer calibration
+ *  VREF                Current reference voltage (VREF pin. About 3300 mV)
+ *  VREFINT             Current ADC measurement of VREFIN channel (About 1504 raw)
+ *  VREF_CAL            Reference voltage during manufacturer calibration (3000 mV)
+ *  VREFINT_CAL         ADC measurement of VREFIN channel during manufacturer calibration (about 1655 raw)
  *
  * The following equation holds:
  *  VREFINT * VREF = VREFINT_CAL * VREF_CAL
@@ -72,8 +70,8 @@
  * The product k_vref = VREFINT_CAL * VREF_CAL is costant hence it can be evaluated in advance, during initialization.
  * The current VREF voltage can be tracked any time a new VREFINT value is measured
  */
-#define VREF_CAL    ((double)VREFINT_CAL_VREF * mVolt)
-#define VREFINT_CAL (*VREFINT_CAL_ADDR)
+#define VREF_CAL    ((double)VREFINT_CAL_VREF)  /* 3000 mV */
+#define VREFINT_CAL (*VREFINT_CAL_ADDR)         /* about 1655 */
 #define VREF_NOM    (3.300 * Volt)
 #define VREFINT_NOM (1.212 * Volt)
 
@@ -131,6 +129,8 @@ typedef struct
   uint16_t nul7;
 } ADC1_Record_t;
 
+//#warning very important: il workaround e'implemenettao dal nul8
+
 /* Data record of ADC2 */
 typedef struct
 {
@@ -142,24 +142,23 @@ typedef struct
   int16_t nul10;
 } ADC2_Record_t;
 
-typedef struct
-{
-    int32_t     avg;
-    uint32_t    idx;
-    int32_t     buf[ANALOG_AVG_FILTER_LENGTH];
-} analogAvgFilterTypeDef;
 
 /* Private variables **************************************************************************************************/
 
 /* DMA Buffer of ADC1 and ADC2 */
-static ADC1_Record_t adc1_Buffer;
-static ADC2_Record_t adc2_Buffer[2];
+/*static*/ ADC1_Record_t adc1_Buffer;
+/*static*/ ADC2_Record_t adc2_Buffer[2];
 
 /* VREF constant: VREFINT_CAL * VREFINT_CAL_VREF */
-static uint32_t k_vref = 4096 * VREFINT_NOM / mVolt;
+static uint32_t k_vref = 1655UL * 3000UL; 
 
 /* Measured VREF in mV. Equal to VCC */
 static uint16_t vref_mV = VREF_NOM / mVolt;
+
+/* Measured raw phase currents */
+static int16_t rawCph1;
+static int16_t rawCph2;
+static int16_t rawCph3;
 
 #if defined(MOTORHAL_changes) && defined(MOTORHALCONFIG_DONTUSE_CURR_FILTERING)
 //#warning removed filters as each one uses 8+(4*ANALOG_AVG_FILTER_LENGTH) = 520 bytes of RAM (or 4104 if ANALOG_AVG_FILTER_LENGTH = 1024)
@@ -178,9 +177,10 @@ static analogAvgFilterTypeDef cph3Filter;
 // add in here all the new types, variables, static function prototypes required by MOTORHAL
 // --------------------------------------------------------------------------------------------------------------------
 
-static volatile int32_t s_analog_rawCph1 = 0;
-static volatile int32_t s_analog_rawCph2 = 0;
-static volatile int32_t s_analog_rawCph3 = 0;
+// dont need anymore s_analog_rawCphx because we have rawCphx
+//static volatile int32_t s_analog_rawCph1 = 0;
+//static volatile int32_t s_analog_rawCph2 = 0;
+//static volatile int32_t s_analog_rawCph3 = 0;
 static volatile int32_t s_analog_raw_cinput = 0;
 
 #endif // #if defined(MOTORHAL_changes)
@@ -189,20 +189,6 @@ static volatile int32_t s_analog_raw_cinput = 0;
 
 
 /* Private functions **************************************************************************************************/
-
-/*******************************************************************************************************************//**
- * @brief   
- * @param   
- * @return  
- */
-static int32_t analogMovingAverage(analogAvgFilterTypeDef *filter, int32_t sample)
-{
-    filter->avg -= filter->buf[filter->idx];
-    filter->avg += (filter->buf[filter->idx] = sample);
-    if (++(filter->idx) >= ANALOG_AVG_FILTER_LENGTH) filter->idx = 0;
-    return filter->avg;
-}
-
 
 /* Callback functions *************************************************************************************************/
 
@@ -215,15 +201,15 @@ static void adc1_TransferComplete_cb(ADC_HandleTypeDef *hadc)
 {
 #if defined(MOTORHAL_changes)     
 	if (0 != adc1_Buffer.vref) vref_mV = (k_vref + (adc1_Buffer.vref>>1))/adc1_Buffer.vref;
-    else vref_mV = VREF_NOM / mVolt;
+    else vref_mV = VREF_NOM / mVolt; 
     s_analog_raw_cinput = adc1_Buffer.cin;
 #if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
-    analogMovingAverage(&cinFilter, adc1_Buffer.cin);
+    analogMovingAverageFromISR(&cinFilter, adc1_Buffer.cin);
 #endif
 #else    
 	if (0 != adc1_Buffer.vref) vref_mV = (k_vref + (adc1_Buffer.vref>>1))/adc1_Buffer.vref;
     else vref_mV = VREF_NOM / mVolt;
-    analogMovingAverage(&cinFilter, adc1_Buffer.cin);
+    analogMovingAverageFromISR(&cinFilter, adc1_Buffer.cin);
 #endif
 }
 
@@ -232,23 +218,44 @@ static void adc1_TransferComplete_cb(ADC_HandleTypeDef *hadc)
  * @param   
  * @return  
  */
+
+// a che frequenza vengono chiamate?
+#if 0
+
+pwm -> 97 khz ~. 168 m / 2048 -> 82 khz gli impulsi
+ogni tre di questi -> 
+82 / 3 e' la frequanza di ciascuna adc2_HalfTransferComplete_cb() e adc2_TransferComplete_cb()
+
+36.6 us = delta.
+
+h 36.6 f 36.6 h ----
+
+quindi: la pwmSetCurrents_cb() viene chiamata ogni 36.6 us
+
+
+
+il contatore
+#endif
 static void adc2_HalfTransferComplete_cb(ADC_HandleTypeDef *hadc)
 {
 #if defined(MOTORHAL_changes) 
-    s_analog_rawCph1 = adc2_Buffer[0].cph1;
-    s_analog_rawCph2 = adc2_Buffer[0].cph2;
-    s_analog_rawCph3 = adc2_Buffer[0].cph3;
-    pwmSetCurrents_cb(adc2_Buffer[0].cph1, adc2_Buffer[0].cph2, adc2_Buffer[0].cph3);
+    rawCph1 = adc2_Buffer[0].cph1;
+    rawCph2 = adc2_Buffer[0].cph2;
+    rawCph3 = adc2_Buffer[0].cph3;
+    pwmSetCurrents_cb(rawCph1, rawCph2, rawCph3);
 #if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
-    analogMovingAverage(&cph1Filter, s_analog_rawCph1);
-    analogMovingAverage(&cph2Filter, s_analog_rawCph2);
-    analogMovingAverage(&cph3Filter, s_analog_rawCph3);   
+    analogMovingAverageFromISR(&cph1Filter, rawCph1); 
+    analogMovingAverageFromISR(&cph2Filter, rawCph2);
+    analogMovingAverageFromISR(&cph3Filter, rawCph3);   
 #endif    
 #else
-    pwmSetCurrents_cb(adc2_Buffer[0].cph1, adc2_Buffer[0].cph2, adc2_Buffer[0].cph3);
-    analogMovingAverage(&cph1Filter, adc2_Buffer[0].cph1);
-    analogMovingAverage(&cph2Filter, adc2_Buffer[0].cph2);
-    analogMovingAverage(&cph3Filter, adc2_Buffer[0].cph3);
+    rawCph1 = adc2_Buffer[0].cph1;
+    rawCph2 = adc2_Buffer[0].cph2;
+    rawCph3 = adc2_Buffer[0].cph3;
+    pwmSetCurrents_cb(rawCph1, rawCph2, rawCph3);
+    analogMovingAverageFromISR(&cph1Filter, rawCph1);
+    analogMovingAverageFromISR(&cph2Filter, rawCph2);
+    analogMovingAverageFromISR(&cph3Filter, rawCph3);
 #endif
 }
 
@@ -260,26 +267,43 @@ static void adc2_HalfTransferComplete_cb(ADC_HandleTypeDef *hadc)
 static void adc2_TransferComplete_cb(ADC_HandleTypeDef *hadc)
 {
 #if defined(MOTORHAL_changes) 
-    s_analog_rawCph1 = adc2_Buffer[1].cph1;
-    s_analog_rawCph2 = adc2_Buffer[1].cph2;
-    s_analog_rawCph3 = adc2_Buffer[1].cph3;
-    pwmSetCurrents_cb(adc2_Buffer[0].cph1, adc2_Buffer[1].cph2, adc2_Buffer[1].cph3);
+    rawCph1 = adc2_Buffer[1].cph1;
+    rawCph2 = adc2_Buffer[1].cph2;
+    rawCph3 = adc2_Buffer[1].cph3;
+    pwmSetCurrents_cb(rawCph1, rawCph2, rawCph3);
 #if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
-    analogMovingAverage(&cph1Filter, s_analog_rawCph1);
-    analogMovingAverage(&cph2Filter, s_analog_rawCph2);
-    analogMovingAverage(&cph3Filter, s_analog_rawCph3);   
+    analogMovingAverage(&cph1Filter, rawCph1);
+    analogMovingAverage(&cph2Filter, rawCph2);
+    analogMovingAverage(&cph3Filter, rawCph3);   
 #endif    
 #else
-    pwmSetCurrents_cb(adc2_Buffer[1].cph1, adc2_Buffer[1].cph2, adc2_Buffer[1].cph3);
-    analogMovingAverage(&cph1Filter, adc2_Buffer[1].cph1);
-    analogMovingAverage(&cph2Filter, adc2_Buffer[1].cph2);
-    analogMovingAverage(&cph3Filter, adc2_Buffer[1].cph3);
+    rawCph1 = adc2_Buffer[1].cph1;
+    rawCph2 = adc2_Buffer[1].cph2;
+    rawCph3 = adc2_Buffer[1].cph3;
+    pwmSetCurrents_cb(rawCph1, rawCph2, rawCph3);
+    analogMovingAverageFromISR(&cph1Filter, rawCph1);
+    analogMovingAverageFromISR(&cph2Filter, rawCph2);
+    analogMovingAverageFromISR(&cph3Filter, rawCph3);
 #endif
 }
 
 
 /* Public functions ***************************************************************************************************/
 
+
+/*******************************************************************************************************************//**
+ * @brief   
+ * @param   
+ * @return  
+ */
+int32_t analogMovingAverage(analogAvgFilterTypeDef *filter, int32_t sample)
+{
+    int32_t avg;
+    taskENTER_CRITICAL();
+    avg = analogMovingAverageFromISR(filter, sample);
+    taskEXIT_CRITICAL();
+    return avg;
+}
 
 /*******************************************************************************************************************//**
  * @brief   Measure IPHASE1 current
@@ -370,18 +394,10 @@ int32_t analogCin(void)
  */
 int32_t analogCph1(void)
 {
-#if defined(MOTORHAL_changes) 
-#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
-    int32_t raw = cph1Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-#else
-    int32_t raw = s_analog_rawCph1;  
+#if defined(MOTORHAL_changes)
+//    #warning CAVEAT: analogCph1() use unfiltered current
 #endif    
-	return CIN_GAIN * vref_mV * raw >> 16u;    
-    // note that the above is: return analogConvertCurrent(analog_RawCph1());
-#else
-    int32_t raw = cph1Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-	return CIN_GAIN * vref_mV * raw >> 16u;
-#endif    
+	return CIN_GAIN * vref_mV * rawCph1 >> 16u;
 }
 
 /*******************************************************************************************************************//**
@@ -391,18 +407,10 @@ int32_t analogCph1(void)
  */
 int32_t analogCph2(void)
 {
-#if defined(MOTORHAL_changes) 
-#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
-    int32_t raw = cph2Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-#else
-    int32_t raw = s_analog_rawCph2;  
+#if defined(MOTORHAL_changes)
+//    #warning CAVEAT: analogCph2() use unfiltered current
 #endif    
-	return CIN_GAIN * vref_mV * raw >> 16u;    
-    // note that the above is: return analogConvertCurrent(analog_RawCph2());
-#else    
-    int32_t raw = cph2Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-	return CIN_GAIN * vref_mV * raw >> 16u;
-#endif    
+	return CIN_GAIN * vref_mV * rawCph2 >> 16u;
 }
 
 /*******************************************************************************************************************//**
@@ -412,25 +420,11 @@ int32_t analogCph2(void)
  */
 int32_t analogCph3(void)
 {
-#if defined(MOTORHAL_changes) 
-#if !defined(MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING)
-    int32_t raw = cph3Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-#else
-    int32_t raw = s_analog_rawCph3;  
-#endif    
-	return CIN_GAIN * vref_mV * raw >> 16u;    
-    // note that the above is: return analogConvertCurrent(analog_RawCph3());
-#else  
-    int32_t raw = cph3Filter.avg >> ANALOG_AVG_FILTER_SHIFT;
-	return CIN_GAIN * vref_mV * raw >> 16u;
-#endif    
-}
-
 #if defined(MOTORHAL_changes)
-#warning BEWARE: read the note
-// note: analogGetOffsetIin() etc will very likely treat raw values of current, not mA ...
-//       because they manage settings proper of the ADC w/out the conversion (CIN_GAIN * vref_mV * raw >> 16u)
-#endif
+//    #warning CAVEAT: analogCph3() use unfiltered current
+#endif    
+	return CIN_GAIN * vref_mV * rawCph3 >> 16u;
+}
 
 /*******************************************************************************************************************//**
  * @brief   Read the offset value of the Iin sensor
@@ -541,13 +535,13 @@ HAL_StatusTypeDef analogInit(void)
 		    (HAL_OK == HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED)))
 		{
 			/* Calculate the proportionality constant */
-			k_vref = (uint32_t)VREFINT_CAL_VREF * (uint32_t)VREFINT_CAL;
+			k_vref = (uint32_t)VREF_CAL * (uint32_t)VREFINT_CAL;
 
             /* If the board has never been calibrated */
             if (0 == MainConf.analog.cinOffs)
             {
                 /* Configure default values */
-                MainConf.analog.cinOffs   = CIN_OFFS;
+                MainConf.analog.cinOffs    = CIN_OFFS;
                 MainConf.analog.cphOffs[0] = CIN_OFFS;
                 MainConf.analog.cphOffs[1] = CIN_OFFS;
                 MainConf.analog.cphOffs[2] = CIN_OFFS;
@@ -563,14 +557,15 @@ HAL_StatusTypeDef analogInit(void)
 			memset((void *)&adc1_Buffer, 0, sizeof(adc1_Buffer));
 			memset((void *)&adc2_Buffer, 0, sizeof(adc2_Buffer));
 
-			/* Register the interrupt callback function for the DMA Transfer Complete interrupt*/
+			/* Register the interrupt callback function for the DMA Transfer Complete interrupt */
 			if ((HAL_OK == HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, adc1_TransferComplete_cb)) &&
 				(HAL_OK == HAL_ADC_RegisterCallback(&hadc2, HAL_ADC_CONVERSION_HALF_CB_ID, adc2_HalfTransferComplete_cb)) &&
 				(HAL_OK == HAL_ADC_RegisterCallback(&hadc2, HAL_ADC_CONVERSION_COMPLETE_CB_ID, adc2_TransferComplete_cb)))
 			{
 				/* Enable the Transfer Complete interrupts of the DMA */
-				__HAL_DMA_ENABLE_IT(hadc1.DMA_Handle, DMA_IT_TC);
-				__HAL_DMA_ENABLE_IT(hadc2.DMA_Handle, DMA_IT_TC);
+                // forse non serve ...
+//				__HAL_DMA_ENABLE_IT(hadc1.DMA_Handle, DMA_IT_TC);
+//				__HAL_DMA_ENABLE_IT(hadc2.DMA_Handle, DMA_IT_TC);
 				/* Enable the ADC in DMA mode */
 #if defined(MOTORHAL_changes)
                 // applied proper cast + () around sizeof() to prevent errors and warnings
@@ -604,12 +599,10 @@ void analogTest(void) {}
 void analogTest(void)
 {
     char ch;
-    char coBuffer[80];
-    const char *curs;
     int32_t value;
 
-    coprintf("Analog Test\n"); HAL_Delay(250);
-    coprintf("Vin = %5u mV, Iin = %+5d mA, Vcc = %5u mV\n", analogVin(), analogCin(), analogVcc()); HAL_Delay(250);
+    coprintf("Analog Test\n"); vTaskDelay(250);
+    coprintf("Vin = %5u mV, Iin = %+5d mA, Vcc = %5u mV\n", analogVin(), analogCin(), analogVcc()); vTaskDelay(250);
 
     /* Infinite loop */
     for(;;)
@@ -621,7 +614,7 @@ void analogTest(void)
                  "D   : Display currents/voltages\n"
                  "Z   : Autozero phase offsets\n"
                  "ESC : Exit test\n"
-                 "? "); HAL_Delay(250);
+                 "? ");
         ch = coRxChar();
         if (isprint(ch))
         {
@@ -631,7 +624,7 @@ void analogTest(void)
                 case '0':
                     while (1)
                     {
-                        coprintf("\rIin = %+5d mA", analogCin()); HAL_Delay(250);
+                        coprintf("\rIin = %+5d mA", analogCin()); vTaskDelay(250);
                         if (coRxReady())
                         {
                             ch = coRxChar();
@@ -650,7 +643,7 @@ void analogTest(void)
                 case '1':
                     while (1)
                     {
-                        coprintf("\rIph1 = %+5d mA", analogCph1()); HAL_Delay(250);
+                        coprintf("\rIph1 = %+5d mA", analogCph1()); vTaskDelay(250);
                         if (coRxReady())
                         {
                             ch = coRxChar();
@@ -669,7 +662,7 @@ void analogTest(void)
                 case '2':
                     while (1)
                     {
-                        coprintf("\rIph2 = %+5d mA", analogCph2()); HAL_Delay(250);
+                        coprintf("\rIph2 = %+5d mA", analogCph2()); vTaskDelay(250);
                         if (coRxReady())
                         {
                             ch = coRxChar();
@@ -688,7 +681,7 @@ void analogTest(void)
                 case '3':
                     while (1)
                     {
-                        coprintf("\rIph3 = %+5d mA", analogCph3()); HAL_Delay(250);
+                        coprintf("\rIph3 = %+5d mA", analogCph3()); vTaskDelay(250);
                         if (coRxReady())
                         {
                             ch = coRxChar();
@@ -705,38 +698,22 @@ void analogTest(void)
                     break;
 
                 case 'D':
-                    while (1)
+                    coprintf("Press ESC to stop\n");  vTaskDelay(100);
+                    do
                     {
-                        coprintf("Press RETURN to stop\n");  HAL_Delay(100);
-                        /*       "|xxxxx|xxxxx/+xxxx|xxxxx/+xxxx|xxxxx/+xxxx|xxxxx/+xxxx|"  */
-                        coprintf("| Vcc  |    Vin    | Phase #1  | Phase #2  | Phase #3  |\n");  HAL_Delay(100);
-                        coprintf("|  mV  |   mV/mA   |   mV/mA   |   mV/mA   |   mV/mA   |\n");  HAL_Delay(100);
+                        coprintf("| Vcc  |    Vin    | Phase #1  | Phase #2  | Phase #3  |\n");  vTaskDelay(100);
+                        coprintf("|  mV  |   mV/mA   |   mV/mA   |   mV/mA   |   mV/mA   |\n");  vTaskDelay(100);
                         do
                         {
-                            coprintf("\r|%5u |", analogVcc()); HAL_Delay(100);
-                            coprintf("%5u/%+-5d|", analogVin(),  analogCin());  HAL_Delay(100);
-                            coprintf("%5u/%+-5d|", analogVph1(), analogCph1()); HAL_Delay(100);
-                            coprintf("%5u/%+-5d|", analogVph2(), analogCph2()); HAL_Delay(100);
-                            coprintf("%5u/%+-5d|", analogVph3(), analogCph3()); HAL_Delay(100);
-                            coprintf("%+-5d", (analogCph1()+analogCph2()+analogCph3())/3); HAL_Delay(100);
+                            coprintf("\r|%5u |", analogVcc());
+                            coprintf("%5u/%+-5d|", analogVin(),  analogCin());
+                            coprintf("%5u/%+-5d|", analogVph1(), analogCph1());
+                            coprintf("%5u/%+-5d|", analogVph2(), analogCph2());
+                            coprintf("%5u/%+-5d|", analogVph3(), analogCph3());
+                            vTaskDelay(100);
                         } while (!coRxReady());
-                        coprintf("\nPWM? ");
-                        coEditString(coBuffer, sizeof(coBuffer));
-                        coprintf("\n");
-                        curs = &(coBuffer[0]);
-                        ch = skipblank(&curs);
-                        if (isdigit(ch))
-                        {
-//                            if (atosl(&curs, &value) && ('\0' == skipblank(&curs)) && (HAL_OK == pwmSetValue(value)))
-//                            {
-//                                coprintf("Motor PWM = %d\n", value);
-//                                continue;
-//                            }
-                        }
-                        else if ('\0' == ch) break;
-                        coprintf("ERROR: %s\n", curs);
-                    }
-                    pwmSet(0, 0, 0);
+                        coPutChar('\n');
+                    } while ('\x1B' != coGetChar());
                     break;
 
                 case 'Z':

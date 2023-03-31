@@ -23,8 +23,9 @@
 #define MOTORHALCONFIG_DONTUSE_LED
 #define MOTORHALCONFIG_DONTUSE_TESTS       
 #define MOTORHALCONFIG_ADD_IRQHANDLERS   
-        
-#define MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING        
+#define MOTORHALCONFIG_REDEFINE_RTOS
+
+#define MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING
 
 #if defined(MOTORHALCONFIG_DONTUSE_FLASH)
         
@@ -58,6 +59,22 @@ extern MainConfTypeDef MainConf;
 #define MSB$2(x)    (x&0x0000000000000002LL?1:0)
 
 #endif // MOTORHALCONFIG_DONTUSE_UTILITIES
+
+
+#if defined(MOTORHALCONFIG_REDEFINE_RTOS)
+
+void taskENTER_CRITICAL(void);
+void taskEXIT_CRITICAL(void);
+void vTaskDelay(uint32_t ms);
+
+#endif
+
+#if defined(MOTORHALCONFIG_DONTUSE_LED) 
+
+enum { LED2 = 0 };
+void ledSet(uint32_t led, uint32_t v);
+
+#endif
 
 #ifdef __cplusplus
     } /* extern "C" */

@@ -64,7 +64,7 @@ namespace embot { namespace hw { namespace motor {
     result_t enable(MOTOR h, bool on);
     
     // the pwm can be effectively applied only if(true == enabled(h)), so it also must be: (false == faulted(h))
-    result_t setpwm(MOTOR h, Pwm v);
+    result_t setpwm(MOTOR h, Pwm v); // deprecated
     result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w);
     
     // values of encoders and hall sensors can be read if(true == initialised(h))

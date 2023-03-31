@@ -26,6 +26,25 @@ MainConfTypeDef MainConf = {0};
 #endif // MOTORHALCONFIG_DONTUSE_FLASH
 
 
+#if defined(MOTORHALCONFIG_REDEFINE_RTOS)
+
+void taskENTER_CRITICAL(void)  {}
+void taskEXIT_CRITICAL(void) {}
+void vTaskDelay(uint32_t ms)
+{
+    HAL_Delay(ms);
+}
+
+#endif
+
+#if defined(MOTORHALCONFIG_DONTUSE_LED) 
+
+void ledSet(uint32_t led, uint32_t v) {}
+
+
+#endif
+
+
 #if defined(MOTORHALCONFIG_ADD_IRQHANDLERS)
 
 #include "stm32hal.h"

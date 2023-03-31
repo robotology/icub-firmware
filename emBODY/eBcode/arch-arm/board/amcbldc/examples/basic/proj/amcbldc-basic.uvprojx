@@ -395,14 +395,14 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.amcbldc.v120.lib</FileName>
+              <FileName>stm32hal.g4.v120.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.amcbldc.v120.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v120.amcbldc.lib</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.g4.amcbldc.v122.lib</FileName>
+              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.amcbldc.v122.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -432,49 +432,6 @@
               <FileName>stm32hal.startup.amcbldc.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\cfg\stm32hal.startup.amcbldc.s</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.startup.amcbldc.v122.template.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\startup\stm32hal.startup.amcbldc.v122.template.s</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Aads>
-                    <interw>2</interw>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <thumb>2</thumb>
-                    <SplitLS>2</SplitLS>
-                    <SwStkChk>2</SwStkChk>
-                    <NoWarn>2</NoWarn>
-                    <uSurpInc>2</uSurpInc>
-                    <useXO>2</useXO>
-                    <ClangAsOpt>0</ClangAsOpt>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Aads>
-                </FileArmAds>
-              </FileOption>
             </File>
           </Files>
         </Group>
@@ -556,7 +513,7 @@
       <TargetName>basic-amcbldc-v122</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -941,9 +898,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.amcbldc.v120.lib</FileName>
+              <FileName>stm32hal.g4.v120.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.amcbldc.v120.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v120.amcbldc.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -965,9 +922,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>stm32hal.g4.amcbldc.v122.lib</FileName>
+              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.amcbldc.v122.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -978,49 +935,6 @@
               <FileName>stm32hal.startup.amcbldc.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\cfg\stm32hal.startup.amcbldc.s</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Aads>
-                    <interw>2</interw>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <thumb>2</thumb>
-                    <SplitLS>2</SplitLS>
-                    <SwStkChk>2</SwStkChk>
-                    <NoWarn>2</NoWarn>
-                    <uSurpInc>2</uSurpInc>
-                    <useXO>2</useXO>
-                    <ClangAsOpt>0</ClangAsOpt>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Aads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>stm32hal.startup.amcbldc.v122.template.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\startup\stm32hal.startup.amcbldc.v122.template.s</FilePath>
             </File>
           </Files>
         </Group>

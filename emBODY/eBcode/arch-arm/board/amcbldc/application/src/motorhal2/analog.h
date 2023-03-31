@@ -31,6 +31,14 @@
 #endif
         
 /* Exported macro ----------------------------------------------------------------------------------------------------*/
+#if defined(MOTORHAL_changes)
+#define ANALOG_AVG_FILTER_SHIFT     (7)
+#define ANALOG_AVG_FILTER_LENGTH    (1U<<ANALOG_AVG_FILTER_SHIFT)        
+#else
+/* Used by the Moving Average Filter */
+#define ANALOG_AVG_FILTER_SHIFT     (10)
+#define ANALOG_AVG_FILTER_LENGTH    (1U<<ANALOG_AVG_FILTER_SHIFT)
+#endif
 
 
 /* Exported typedefs -------------------------------------------------------------------------------------------------*/
@@ -44,11 +52,34 @@ typedef struct
     uint16_t    cphOffs[3];
 } analogConfTypeDef;
 
+/* Moving average filter structure */
+typedef struct
+{
+    volatile int32_t     avg;
+    volatile uint32_t    idx;
+    volatile int32_t     buf[ANALOG_AVG_FILTER_LENGTH];
+} analogAvgFilterTypeDef;
+
+
 /* Exported variables ------------------------------------------------------------------------------------------------*/
 
 
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
+/*******************************************************************************************************************//**
+ * @brief   
+ * @param   
+ * @return  
+ */
+__STATIC_INLINE int32_t analogMovingAverageFromISR(analogAvgFilterTypeDef *filter, int32_t sample)
+{
+    filter->avg -= filter->buf[filter->idx];
+    filter->avg += (filter->buf[filter->idx] = sample);
+    if (++(filter->idx) >= ANALOG_AVG_FILTER_LENGTH) filter->idx = 0;
+    return filter->avg;
+}
+
+extern int32_t analogMovingAverage(analogAvgFilterTypeDef *filter, int32_t sample);
 extern int32_t analogConvertCurrent(int32_t raw);
 extern HAL_StatusTypeDef analogInit(void);
 extern uint32_t analogVcc(void);

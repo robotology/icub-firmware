@@ -58,13 +58,18 @@ typedef struct
 
 
 /* Exported macro ----------------------------------------------------------------------------------------------------*/
+
+/* Number of step per revolution */
+#define ENCODER_COUNT_PER_REVOLUTION    (4000)
+
+
 /* Exported variables ------------------------------------------------------------------------------------------------*/
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
 extern HAL_StatusTypeDef encoderInit(void);
 extern uint32_t encoderGetCounter(void);
-extern uint16_t encoderGetElectricalAngle(void);
-
+extern uint32_t encoderGetElectricalAngle(void);
+extern int32_t encoderGetSpeed(void);
 
 #if defined(MOTORHAL_changes)
 
