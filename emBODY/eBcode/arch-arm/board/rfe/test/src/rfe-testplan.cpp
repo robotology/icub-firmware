@@ -329,6 +329,7 @@ static void alerteventbasedthreadusb(void *arg);
 		
 		constexpr embot::hw::GPIO GPA0 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::zero};
 		constexpr embot::hw::GPIO GPA5 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five};
+		constexpr embot::hw::GPIO GPA8 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight};
 		constexpr embot::hw::GPIO GPA15 {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::fifteen};
 
 		constexpr embot::hw::GPIO GPB1 {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::one};
@@ -338,6 +339,13 @@ static void alerteventbasedthreadusb(void *arg);
 			if(conf.mode == embot::hw::gpio::Mode::OUTPUTpushpull) embot::hw::gpio::set(gpio, state); 
 		}
 		
+		static void test_12V(void){
+		
+			// EN_5V
+			initGPIO(GPA8, out, embot::hw::gpio::State::SET); 	
+				
+		}
+				
 		static void test_MPU9250(){
 			embot::hw::can::Frame canframe;
 			static bool init = false;
@@ -458,8 +466,8 @@ static void alerteventbasedthreadusb(void *arg);
 						//Test led blue on
 						case 0x03 :  embot::core::wait(300* embot::core::time1millisec); test_Leds(1); break;
 
-						//Test serial USB is tested in : static void alerteventbasedthreadusb(void *arg)
-						//case 0x04 :  embot::core::wait(300* embot::core::time1millisec); test_Usb(); break;
+						//Test 12Vdc
+						case 0x04 :  embot::core::wait(300* embot::core::time1millisec); test_12V(); break;
 
 						//Test IMU Bosch BNO055
 						case 0x05 :  embot::core::wait(300* embot::core::time1millisec); test_BNO055(); break;

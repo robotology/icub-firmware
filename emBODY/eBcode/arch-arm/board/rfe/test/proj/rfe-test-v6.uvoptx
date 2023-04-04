@@ -424,22 +424,6 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>424</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\src\rfe-testplan.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
           <LineNumber>380</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>10</Address>
@@ -451,14 +435,46 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\src\stm32l4xx_hal_pcd_ex.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rfe_test_v183\../src/faceExpressions/faceExpressionsModule.cpp\380</Expression>
+          <Expression>\\rfe_test_v183\../../../../libs/lowlevel/stm32hal/src/driver/stm32l4-v183/src/stm32l4xx_hal_pcd_ex.c\380</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>455</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134289626</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\src\rfe-testplan.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\rfe_test_v183\../src/rfe-testplan.cpp\455</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
+          <LineNumber>424</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134288796</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\src\rfe-testplan.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\rfe_test_v183\../src/rfe-testplan.cpp\424</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
           <LineNumber>217</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134289992</Address>
+          <Address>134289996</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -470,11 +486,11 @@
           <Expression>\\rfe_test_v183\../src/rfe-testplan.cpp\217</Expression>
         </Bp>
         <Bp>
-          <Number>3</Number>
+          <Number>4</Number>
           <Type>0</Type>
           <LineNumber>219</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134290000</Address>
+          <Address>134290004</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -486,11 +502,11 @@
           <Expression>\\rfe_test_v183\../src/rfe-testplan.cpp\219</Expression>
         </Bp>
         <Bp>
-          <Number>4</Number>
+          <Number>5</Number>
           <Type>0</Type>
           <LineNumber>222</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134290008</Address>
+          <Address>134290012</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -502,39 +518,7 @@
           <Expression>\\rfe_test_v183\../src/rfe-testplan.cpp\222</Expression>
         </Bp>
         <Bp>
-          <Number>5</Number>
-          <Type>0</Type>
-          <LineNumber>223</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134290014</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\rfe-testplan.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\rfe_test_v183\../src/rfe-testplan.cpp\223</Expression>
-        </Bp>
-        <Bp>
           <Number>6</Number>
-          <Type>0</Type>
-          <LineNumber>224</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134290016</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\rfe-testplan.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\rfe_test_v183\../src/rfe-testplan.cpp\224</Expression>
-        </Bp>
-        <Bp>
-          <Number>7</Number>
           <Type>0</Type>
           <LineNumber>220</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -550,7 +534,7 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>8</Number>
+          <Number>7</Number>
           <Type>0</Type>
           <LineNumber>221</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -562,6 +546,54 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>..\src\rfe-testplan.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>8</Number>
+          <Type>0</Type>
+          <LineNumber>223</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\src\rfe-testplan.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>9</Number>
+          <Type>0</Type>
+          <LineNumber>224</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\src\rfe-testplan.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>10</Number>
+          <Type>0</Type>
+          <LineNumber>87</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\..\..\embot\hw\embot_hw_spi.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
