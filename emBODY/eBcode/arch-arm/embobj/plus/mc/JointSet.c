@@ -421,6 +421,7 @@ BOOL JointSet_do_check_faults(JointSet* o)
 
 static void JointSet_do_vel_control(JointSet* o);
 static void JointSet_do_current_control(JointSet* o);
+static void JointSet_do_off(JointSet* o);
 
 void JointSet_do_control(JointSet* o)
 {
@@ -436,6 +437,10 @@ void JointSet_do_control(JointSet* o)
     
     case eomc_ctrl_out_type_cur:
         JointSet_do_current_control(o);
+        return;
+    
+    case eomc_ctrl_out_type_off:
+        JointSet_do_off(o);
         return;
     }
 }
@@ -1284,6 +1289,34 @@ static void JointSet_do_current_control(JointSet* o)
 
         default:
             break;
+    }
+}
+
+static void JointSet_do_off(JointSet* o)
+{
+    // get the number of the joints (that is also the number of the motors)
+    int N = *(o->pN);
+
+    // for each joint set the reference to ZERO for each control mode
+    for (int js=0; js<N; ++js)
+    {
+        Joint *pJoint = o->joint+o->joints_of_set[js];
+
+        pJoint->pos_err = pJoint->pos_ref = ZERO;
+        pJoint->vel_err = pJoint->vel_ref = ZERO;
+        pJoint->trq_err = pJoint->trq_ref = ZERO;
+
+        pJoint->output = ZERO;
+    }
+    
+    // for each reference mode set the motor reference to ZERO
+    for (int ms=0; ms<N; ++ms)
+    {
+        int m = o->motors_of_set[ms];
+        
+        Motor_set_Iqq_ref(o->motor+m, 0);
+        Motor_set_pwm_ref(o->motor+m, 0);
+        Motor_set_vel_ref(o->motor+m, 0);
     }
 }
 
