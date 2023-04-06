@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'estimation_velocity'.
 //
 // Model version                  : 4.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:33 2023
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:55 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -80,8 +80,17 @@ static real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32],
 static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
   real32_T tau[2], int32_T jpvt[2])
 {
+  int32_T b_k;
+  int32_T d;
+  int32_T exitg1;
+  int32_T i;
   int32_T ix;
+  int32_T jy;
+  int32_T kend;
+  int32_T kend_tmp;
+  int32_T knt;
   int32_T lastv;
+  int32_T nmip1;
   real32_T vn1[2];
   real32_T vn2[2];
   real32_T work[2];
@@ -89,7 +98,8 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
   real32_T b_atmp;
   real32_T scale;
   real32_T t;
-  for (int32_T b_k = 0; b_k < 2; b_k++) {
+  boolean_T exitg2;
+  for (b_k = 0; b_k < 2; b_k++) {
     jpvt[b_k] = b_k + 1;
   }
 
@@ -98,7 +108,7 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
   std::memcpy(&b_A[0], &A[0], sizeof(real32_T) << 5U);
   work[0] = 0.0F;
   work[1] = 0.0F;
-  for (int32_T b_k = 0; b_k < 2; b_k++) {
+  for (b_k = 0; b_k < 2; b_k++) {
     ix = b_k << 4;
     b_atmp = 0.0F;
     scale = 1.29246971E-26F;
@@ -116,17 +126,11 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
 
     mw_arm_sqrt_f32(b_atmp, &b_atmp);
     b_atmp *= scale;
-    vn2[b_k] = b_atmp;
     vn1[b_k] = b_atmp;
+    vn2[b_k] = b_atmp;
   }
 
-  for (int32_T b_k = 0; b_k < 2; b_k++) {
-    int32_T i;
-    int32_T jy;
-    int32_T kend;
-    int32_T kend_tmp;
-    int32_T knt;
-    int32_T nmip1;
+  for (b_k = 0; b_k < 2; b_k++) {
     i = b_k + 1;
     kend_tmp = b_k << 4;
     kend = kend_tmp + b_k;
@@ -166,8 +170,9 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
     tau[b_k] = 0.0F;
     scale = estimation_velocity_xnrm2(15 - b_k, b_A, kend + 2);
     if (scale != 0.0F) {
-      scale = rt_hypotf_snf(b_A[kend], scale);
-      if (b_A[kend] >= 0.0F) {
+      absxk = b_A[kend];
+      scale = rt_hypotf_snf(absxk, scale);
+      if (absxk >= 0.0F) {
         scale = -scale;
       }
 
@@ -192,7 +197,6 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
 
         tau[b_k] = (scale - b_atmp) / scale;
         b_atmp = 1.0F / (b_atmp - scale);
-        nmip1 = (kend - b_k) - 1;
         for (lastv = ix; lastv <= nmip1 + 17; lastv++) {
           b_A[lastv - 1] *= b_atmp;
         }
@@ -203,8 +207,8 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
 
         b_atmp = scale;
       } else {
-        tau[b_k] = (scale - b_A[kend]) / scale;
-        b_atmp = 1.0F / (b_A[kend] - scale);
+        tau[b_k] = (scale - absxk) / scale;
+        b_atmp = 1.0F / (absxk - scale);
         nmip1 = (kend - b_k) - 1;
         for (lastv = ix; lastv <= nmip1 + 17; lastv++) {
           b_A[lastv - 1] *= b_atmp;
@@ -216,11 +220,9 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
 
     b_A[kend] = b_atmp;
     if (b_k + 1 < 2) {
-      b_atmp = b_A[kend];
       b_A[kend] = 1.0F;
       kend_tmp = kend + 17;
       if (tau[0] != 0.0F) {
-        boolean_T exitg2;
         lastv = 16;
         ix = kend - 1;
         while ((lastv > 0) && (b_A[ix + 16] == 0.0F)) {
@@ -231,7 +233,6 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
         knt = 0;
         exitg2 = false;
         while ((!exitg2) && (knt + 1 > 0)) {
-          int32_T exitg1;
           ix = (knt << 4) + kend;
           jy = ix + 17;
           do {
@@ -258,7 +259,6 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
       }
 
       if (lastv > 0) {
-        int32_T d;
         if (knt + 1 != 0) {
           if (knt >= 0) {
             std::memset(&work[0], 0, static_cast<uint32_T>(knt + 1) * sizeof
@@ -300,8 +300,6 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
     }
 
     for (nmip1 = i + 1; nmip1 < 3; nmip1++) {
-      absxk = vn2[1];
-      b_atmp = vn1[1];
       if (vn1[1] != 0.0F) {
         b_atmp = std::abs(b_A[b_k + 16]) / vn1[1];
         b_atmp = 1.0F - b_atmp * b_atmp;
@@ -329,15 +327,13 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
 
           mw_arm_sqrt_f32(b_atmp, &b_atmp);
           b_atmp *= scale;
-          absxk = b_atmp;
+          vn1[1] = b_atmp;
+          vn2[1] = b_atmp;
         } else {
           mw_arm_sqrt_f32(b_atmp, &b_atmp);
-          b_atmp *= vn1[1];
+          vn1[1] *= b_atmp;
         }
       }
-
-      vn1[1] = b_atmp;
-      vn2[1] = absxk;
     }
   }
 }
@@ -355,8 +351,12 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
   *rty_EstimatedVelocity)
 {
   int32_T jpvt[2];
+  int32_T bIndx;
   int32_T i;
+  int32_T i_0;
+  int32_T jpvt_tmp;
   int32_T rankA;
+  int32_T rtb_QRSolver_tmp;
   real32_T b_A[32];
   real32_T rtb_DelayLine[16];
   real32_T rtb_QRSolver_0[2];
@@ -389,17 +389,15 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
     rankA++;
   }
 
-  for (int32_T i_0 = 0; i_0 < 2; i_0++) {
-    real32_T tau_0;
-    tau_0 = tau[i_0];
+  for (i_0 = 0; i_0 < 2; i_0++) {
     rtb_QRSolver_0[i_0] = 0.0F;
-    if (tau_0 != 0.0F) {
+    if (tau[i_0] != 0.0F) {
       tol = rtb_DelayLine[i_0];
       for (i = i_0 + 2; i < 17; i++) {
         tol += b_A[((i_0 << 4) + i) - 1] * rtb_DelayLine[i - 1];
       }
 
-      tol *= tau_0;
+      tol *= tau[i_0];
       if (tol != 0.0F) {
         rtb_DelayLine[i_0] -= tol;
         for (i = i_0 + 2; i < 17; i++) {
@@ -413,16 +411,14 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
     rtb_QRSolver_0[jpvt[i] - 1] = rtb_DelayLine[i];
   }
 
-  for (int32_T i_0 = rankA; i_0 >= 1; i_0--) {
-    int32_T rtb_QRSolver_tmp;
-    int32_T rtb_QRSolver_tmp_0;
-    rtb_QRSolver_tmp = jpvt[i_0 - 1] - 1;
-    rtb_QRSolver_tmp_0 = (i_0 - 1) << 4;
-    rtb_QRSolver_0[rtb_QRSolver_tmp] /= b_A[(rtb_QRSolver_tmp_0 + i_0) - 1];
+  for (i_0 = rankA; i_0 >= 1; i_0--) {
+    jpvt_tmp = jpvt[i_0 - 1];
+    rtb_QRSolver_tmp = (i_0 - 1) << 4;
+    rtb_QRSolver_0[jpvt_tmp - 1] /= b_A[(rtb_QRSolver_tmp + i_0) - 1];
     i = i_0 - 2;
-    for (int32_T bIndx = 0; bIndx <= i; bIndx++) {
-      rtb_QRSolver_0[jpvt[0] - 1] -= rtb_QRSolver_0[rtb_QRSolver_tmp] *
-        b_A[rtb_QRSolver_tmp_0];
+    for (bIndx = 0; bIndx <= i; bIndx++) {
+      rtb_QRSolver_0[jpvt[0] - 1] -= rtb_QRSolver_0[jpvt_tmp - 1] *
+        b_A[rtb_QRSolver_tmp];
     }
   }
 

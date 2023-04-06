@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'can_decoder'.
 //
 // Model version                  : 4.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:07 2023
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:19 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -56,17 +56,17 @@ struct DW_DecodingLogic_can_decoder_T {
   uint32_T ev_set_velocity_pidEventCounter;// '<S2>/Decoding Logic'
   uint32_T ev_set_motor_configEventCounter;// '<S2>/Decoding Logic'
   uint16_T cmd_processed;              // '<S2>/Decoding Logic'
-  uint8_T is_SET_CONTROL_MODE;         // '<S2>/Decoding Logic'
-  uint8_T is_DESIRED_TARGETS;          // '<S2>/Decoding Logic'
-  uint8_T is_SET_OPTIONS;              // '<S2>/Decoding Logic'
-  uint8_T is_SET_MOTOR_CONFIG;         // '<S2>/Decoding Logic'
-  uint8_T is_ERROR_HANDLING;           // '<S2>/Decoding Logic'
   uint8_T is_active_c3_can_decoder;    // '<S2>/Decoding Logic'
   uint8_T is_active_SET_CONTROL_MODE;  // '<S2>/Decoding Logic'
+  uint8_T is_SET_CONTROL_MODE;         // '<S2>/Decoding Logic'
   uint8_T is_active_DESIRED_TARGETS;   // '<S2>/Decoding Logic'
+  uint8_T is_DESIRED_TARGETS;          // '<S2>/Decoding Logic'
   uint8_T is_active_SET_OPTIONS;       // '<S2>/Decoding Logic'
+  uint8_T is_SET_OPTIONS;              // '<S2>/Decoding Logic'
   uint8_T is_active_SET_MOTOR_CONFIG;  // '<S2>/Decoding Logic'
+  uint8_T is_SET_MOTOR_CONFIG;         // '<S2>/Decoding Logic'
   uint8_T is_active_ERROR_HANDLING;    // '<S2>/Decoding Logic'
+  uint8_T is_ERROR_HANDLING;           // '<S2>/Decoding Logic'
   boolean_T ev_async;                  // '<S2>/Decoding Logic'
 };
 
@@ -180,6 +180,10 @@ extern MdlrefDW_can_decoder_T can_decoder_MdlrefDW;
 
 // Block signals (default storage)
 extern B_can_decoder_c_T can_decoder_B;
+
+#endif                                 //can_decoder_MDLREF_HIDE_CHILD_
+
+#ifndef can_decoder_MDLREF_HIDE_CHILD_
 
 // Block states (default storage)
 extern DW_can_decoder_f_T can_decoder_DW;

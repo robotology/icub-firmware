@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 4.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:26 2023
+// Model version                  : 5.2
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:44 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,9 +37,9 @@ ZCE_control_outer_T control_outer_PrevZCX;
 // System initialize for referenced model: 'control_outer'
 void control_outer_Init(void)
 {
-  // InitializeConditions for UnitDelay: '<S2>/Delay Input1'
+  // InitializeConditions for UnitDelay: '<S18>/Delay Input1'
   //
-  //  Block description for '<S2>/Delay Input1':
+  //  Block description for '<S18>/Delay Input1':
   //
   //   Store in Global RAM
 
@@ -96,29 +96,39 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   // Abs: '<Root>/Abs'
   rtb_Abs = std::abs(rtu_ConfigurationParameters->thresholds.jntVelMax);
 
-  // RelationalOperator: '<S13>/Compare' incorporates:
-  //   Constant: '<S13>/Constant'
+  // RelationalOperator: '<S12>/Compare' incorporates:
+  //   Constant: '<S12>/Constant'
 
   rtb_Compare_m = (rtu_Flags->control_mode != ControlModes_Current);
 
-  // RelationalOperator: '<S11>/Compare' incorporates:
-  //   Constant: '<S11>/Constant'
+  // RelationalOperator: '<S10>/Compare' incorporates:
+  //   Constant: '<S10>/Constant'
 
   rty_OuterOutputs->cur_en = (rtu_Flags->control_mode != ControlModes_Voltage);
 
-  // Logic: '<S3>/NOR' incorporates:
-  //   Constant: '<S14>/Constant'
+  // Logic: '<S2>/NOR' incorporates:
+  //   Constant: '<S13>/Constant'
+  //   Constant: '<S15>/Constant'
   //   Constant: '<S16>/Constant'
-  //   Constant: '<S17>/Constant'
-  //   RelationalOperator: '<S14>/Compare'
+  //   RelationalOperator: '<S13>/Compare'
+  //   RelationalOperator: '<S15>/Compare'
   //   RelationalOperator: '<S16>/Compare'
-  //   RelationalOperator: '<S17>/Compare'
 
   rty_OuterOutputs->out_en = ((rtu_Flags->control_mode !=
     ControlModes_NotConfigured) && (rtu_Flags->control_mode != ControlModes_Idle)
     && (rtu_Flags->control_mode != ControlModes_HwFaultCM));
 
-  // Sum: '<S4>/Sum3'
+  // RelationalOperator: '<S18>/FixPt Relational Operator' incorporates:
+  //   UnitDelay: '<S18>/Delay Input1'
+  //
+  //  Block description for '<S18>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  rtb_FixPtRelationalOperator = (rtu_Flags->control_mode !=
+    control_outer_DW.DelayInput1_DSTATE);
+
+  // Sum: '<S3>/Sum3'
   rtb_DenCoefOut = rtu_Targets->jointpositions.position -
     rtu_Sensors->jointpositions.position;
 
@@ -140,16 +150,6 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   Operator: reciprocal
 
   rtb_Switch2_f = 1.0F / (rtb_Product + 1.0F);
-
-  // RelationalOperator: '<S2>/FixPt Relational Operator' incorporates:
-  //   UnitDelay: '<S2>/Delay Input1'
-  //
-  //  Block description for '<S2>/Delay Input1':
-  //
-  //   Store in Global RAM
-
-  rtb_FixPtRelationalOperator = (rtu_Flags->control_mode !=
-    control_outer_DW.DelayInput1_DSTATE);
 
   // DiscreteTransferFcn: '<S47>/Filter Differentiator TF' incorporates:
   //   Constant: '<S47>/Filter Den Constant'
@@ -196,8 +196,8 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   rtb_FilterDifferentiatorTF = 0.0005F * rtb_DProdOut +
     control_outer_DW.Integrator_DSTATE;
 
-  // RelationalOperator: '<S12>/Compare' incorporates:
-  //   Constant: '<S12>/Constant'
+  // RelationalOperator: '<S11>/Compare' incorporates:
+  //   Constant: '<S11>/Constant'
 
   rtb_Compare = (rtu_Flags->control_mode == ControlModes_Position);
 
@@ -271,15 +271,15 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
 
   // Switch: '<Root>/Switch3' incorporates:
   //   Constant: '<Root>/Constant1'
-  //   Constant: '<S15>/Constant'
-  //   Constant: '<S18>/Constant'
-  //   Logic: '<S3>/OR'
-  //   RelationalOperator: '<S15>/Compare'
-  //   RelationalOperator: '<S18>/Compare'
+  //   Constant: '<S14>/Constant'
+  //   Constant: '<S17>/Constant'
+  //   Logic: '<S2>/OR'
+  //   RelationalOperator: '<S14>/Compare'
+  //   RelationalOperator: '<S17>/Compare'
 
   if (rtb_Compare || (rtu_Flags->control_mode == ControlModes_PositionDirect) ||
       (rtu_Flags->control_mode == ControlModes_Velocity)) {
-    // Switch: '<S4>/Switch5' incorporates:
+    // Switch: '<S3>/Switch5' incorporates:
     //   Sum: '<S113>/Sum'
     //   Sum: '<S63>/Sum'
 
@@ -290,7 +290,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
       rtb_DenCoefOut += rtb_PProdOut_o + rtb_DProdOut_f;
     }
 
-    // End of Switch: '<S4>/Switch5'
+    // End of Switch: '<S3>/Switch5'
   } else {
     rtb_DenCoefOut = 0.0F;
   }
@@ -300,22 +300,22 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
 
   rtb_Switch2_f = rtb_DenCoefOut + rtu_Targets->jointvelocities.velocity;
 
-  // Switch: '<S5>/Switch2' incorporates:
+  // Switch: '<S4>/Switch2' incorporates:
   //   Gain: '<Root>/Gain'
-  //   RelationalOperator: '<S5>/LowerRelop1'
-  //   RelationalOperator: '<S5>/UpperRelop'
-  //   Switch: '<S5>/Switch'
+  //   RelationalOperator: '<S4>/LowerRelop1'
+  //   RelationalOperator: '<S4>/UpperRelop'
+  //   Switch: '<S4>/Switch'
 
   if (rtb_Switch2_f > rtb_Abs) {
     rtb_Switch2_f = rtb_Abs;
   } else if (rtb_Switch2_f < -rtb_Abs) {
-    // Switch: '<S5>/Switch' incorporates:
+    // Switch: '<S4>/Switch' incorporates:
     //   Gain: '<Root>/Gain'
 
     rtb_Switch2_f = -rtb_Abs;
   }
 
-  // End of Switch: '<S5>/Switch2'
+  // End of Switch: '<S4>/Switch2'
 
   // Sum: '<Root>/Sum1'
   rtb_Product = rtb_Switch2_f - rtu_Estimates->jointvelocities.velocity;
@@ -397,23 +397,23 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
 
   // End of Switch: '<Root>/Switch1'
 
-  // Switch: '<S6>/Switch2' incorporates:
+  // Switch: '<S5>/Switch2' incorporates:
   //   Gain: '<Root>/Gain1'
-  //   RelationalOperator: '<S6>/LowerRelop1'
-  //   RelationalOperator: '<S6>/UpperRelop'
-  //   Switch: '<S6>/Switch'
+  //   RelationalOperator: '<S5>/LowerRelop1'
+  //   RelationalOperator: '<S5>/UpperRelop'
+  //   Switch: '<S5>/Switch'
 
   if (rtb_Abs > rtu_ConfigurationParameters->thresholds.motorPeakCurrents) {
     rtb_Abs = rtu_ConfigurationParameters->thresholds.motorPeakCurrents;
   } else if (rtb_Abs <
              -rtu_ConfigurationParameters->thresholds.motorPeakCurrents) {
-    // Switch: '<S6>/Switch' incorporates:
+    // Switch: '<S5>/Switch' incorporates:
     //   Gain: '<Root>/Gain1'
 
     rtb_Abs = -rtu_ConfigurationParameters->thresholds.motorPeakCurrents;
   }
 
-  // End of Switch: '<S6>/Switch2'
+  // End of Switch: '<S5>/Switch2'
 
   // BusCreator: '<Root>/Bus Creator2'
   rty_OuterOutputs->motorcurrent.current = rtb_Abs;
@@ -424,13 +424,13 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   rtb_DenCoefOut = rtu_ConfigurationParameters->thresholds.motorPeakCurrents -
     std::abs(rtu_Estimates->Iq_filtered.current);
 
-  // CombinatorialLogic: '<S10>/Logic' incorporates:
-  //   Constant: '<S8>/Constant'
+  // CombinatorialLogic: '<S9>/Logic' incorporates:
+  //   Constant: '<S7>/Constant'
   //   Gain: '<S1>/Gain1'
   //   Logic: '<S1>/Logical Operator'
-  //   Memory: '<S10>/Memory'
+  //   Memory: '<S9>/Memory'
   //   RelationalOperator: '<S1>/Relational Operator'
-  //   RelationalOperator: '<S8>/Compare'
+  //   RelationalOperator: '<S7>/Compare'
 
   rowIdx = static_cast<int32_T>(((((rtb_DenCoefOut > 0.1F *
     rtu_ConfigurationParameters->thresholds.motorPeakCurrents) ||
@@ -457,12 +457,13 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
 
   // BusCreator: '<Root>/Bus Creator1'
   rty_OuterOutputs->vel_en = rtb_Compare_m;
+  rty_OuterOutputs->pid_reset = rtb_FixPtRelationalOperator;
 
   // Switch: '<S1>/Switch1' incorporates:
   //   Constant: '<S1>/Constant1'
   //   Constant: '<S1>/Constant2'
-  //   Constant: '<S9>/Constant'
-  //   RelationalOperator: '<S9>/Compare'
+  //   Constant: '<S8>/Constant'
+  //   RelationalOperator: '<S8>/Compare'
 
   if (rtu_Estimates->Iq_filtered.current < 0.0F) {
     tmp = -1;
@@ -478,9 +479,9 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
     control_outer_B.DiscreteTimeIntegrator *
     rtu_ConfigurationParameters->CurLoopPID.I;
 
-  // Update for UnitDelay: '<S2>/Delay Input1'
+  // Update for UnitDelay: '<S18>/Delay Input1'
   //
-  //  Block description for '<S2>/Delay Input1':
+  //  Block description for '<S18>/Delay Input1':
   //
   //   Store in Global RAM
 
@@ -528,8 +529,8 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   control_outer_DW.Integrator_PrevResetState_c = static_cast<int8_T>
     (rtb_FixPtRelationalOperator);
 
-  // Update for Memory: '<S10>/Memory' incorporates:
-  //   CombinatorialLogic: '<S10>/Logic'
+  // Update for Memory: '<S9>/Memory' incorporates:
+  //   CombinatorialLogic: '<S9>/Logic'
 
   control_outer_DW.Memory_PreviousInput = rtCP_Logic_table[static_cast<uint32_T>
     (rowIdx)];

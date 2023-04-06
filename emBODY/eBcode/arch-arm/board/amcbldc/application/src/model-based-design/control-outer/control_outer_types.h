@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 4.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:26 2023
+// Model version                  : 5.2
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:44 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -288,6 +288,7 @@ struct ControlOuterOutputs
   boolean_T vel_en;
   boolean_T cur_en;
   boolean_T out_en;
+  boolean_T pid_reset;
   MotorCurrent motorcurrent;
   real32_T current_limiter;
 };

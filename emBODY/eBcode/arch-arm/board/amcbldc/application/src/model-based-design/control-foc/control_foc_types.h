@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 4.1
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:19 2023
+// Model version                  : 5.7
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:35 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,23 +19,6 @@
 #ifndef RTW_HEADER_control_foc_types_h_
 #define RTW_HEADER_control_foc_types_h_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
-
-typedef enum {
-  ControlModes_NotConfigured = 0,      // Default value
-  ControlModes_Idle,
-  ControlModes_Position,
-  ControlModes_PositionDirect,
-  ControlModes_Current,
-  ControlModes_Velocity,
-  ControlModes_Voltage,
-  ControlModes_Torque,
-  ControlModes_HwFaultCM
-} ControlModes;
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_JointPositions_
 #define DEFINED_TYPEDEF_FOR_JointPositions_
 
@@ -73,6 +56,23 @@ struct SensorsData
   JointPositions jointpositions;
   MotorSensors motorsensors;
 };
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
+
+typedef enum {
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_Torque,
+  ControlModes_HwFaultCM
+} ControlModes;
 
 #endif
 
@@ -288,6 +288,7 @@ struct ControlOuterOutputs
   boolean_T vel_en;
   boolean_T cur_en;
   boolean_T out_en;
+  boolean_T pid_reset;
   MotorCurrent motorcurrent;
   real32_T current_limiter;
 };
@@ -321,6 +322,9 @@ struct ControlOutputs
 
   // quadrature current
   MotorCurrent Iq_fbk;
+
+  // direct current
+  MotorCurrent Id_fbk;
 };
 
 #endif

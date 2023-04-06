@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 5.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:02 2023
+// Model version                  : 6.0
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:10 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -121,7 +121,7 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
   if (SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX == 0U) {
     SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX = 1U;
   } else if (rtu_Flags->enable_sending_msg_status) {
-    rty_MessagesTx->foc.current = rtu_ControlOutputs->Iq_fbk.current;
+    rty_MessagesTx->foc.current = rtu_EstimatedData->Iq_filtered.current;
     rty_MessagesTx->foc.velocity = rtu_EstimatedData->jointvelocities.velocity;
     rty_MessagesTx->foc.position = rtu_SensorsData->jointpositions.position;
     SupervisorFSM_TX_DW.ev_focEventCounter++;
