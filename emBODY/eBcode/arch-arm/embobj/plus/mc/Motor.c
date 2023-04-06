@@ -479,7 +479,7 @@ BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
     
     //debug code
     char message[150];
-    snprintf(message, sizeof(message), "Pos fbk:%d, pos lp:%d, zero:%d", o->hardstop_calibdata.last_pos, o->pos_fbk, zero);
+    snprintf(message, sizeof(message), "Pos lp:%d, pos fbk:%d, zero:%d", o->hardstop_calibdata.last_pos, o->pos_fbk, zero);
     send_debug_message(message, o->ID, 0, 0);
     //ends here
     

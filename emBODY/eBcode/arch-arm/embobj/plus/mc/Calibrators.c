@@ -105,11 +105,11 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             
             AbsEncoder_calibrate_absolute(e_ptr, 0, jCalib6Data_ptr->computedZero);
             
-            // debug code
-            char info[80];
-            snprintf(info, sizeof(info), "AbsEnc calib: mcp:%d cz:%d co:%d eps:%d", m_ptr->pos_fbk, m_ptr->hardstop_calibdata.zero, m_ptr->pos_calib_offset, e_ptr->position_sure);
-            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-            // debug code ended
+//            // debug code
+//            char info[80];
+//            snprintf(info, sizeof(info), "AbsEnc calib: mcp:%d cz:%d co:%d eps:%d", m_ptr->pos_fbk, m_ptr->hardstop_calibdata.zero, m_ptr->pos_calib_offset, e_ptr->position_sure);
+//            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+//            // debug code ended
             
             jCalib6Data_ptr->state = calibtype6_st_absEncoderCalibrated;
             
@@ -776,29 +776,11 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
                 {
                     return FALSE;
                 }
-                // change rotorLimit --> now only for debugging reasons
-                int32_t rotor_span = abs(m_ptr->pos_max - m_ptr->pos_min);  //max span of the rotor according to mechanical data and passed by the user with configuration
-                if (m_ptr->pos_calib_offset < 0) 
-                {
-                    j_ptr->running_calibration.data.type14.rotorposmin = 0 + ROTOR_LIMIT_DELTA;
-                    j_ptr->running_calibration.data.type14.rotorposmax = rotor_span - ROTOR_LIMIT_DELTA;
-                }
-                else
-                {
-                    j_ptr->running_calibration.data.type14.rotorposmin = -rotor_span + ROTOR_LIMIT_DELTA;
-                    j_ptr->running_calibration.data.type14.rotorposmax = 0 - ROTOR_LIMIT_DELTA;
-                }
-                
-                
-                //Debug code
-                memset(&info[0], 0, sizeof(info));
-                snprintf(info, sizeof(info), "rlim from mn:%d, mx:%d to rn:%d, rx:%d", m_ptr->pos_min, m_ptr->pos_max, j_ptr->running_calibration.data.type14.rotorposmin, j_ptr->running_calibration.data.type6.rotorposmax);
-                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-                //ended
                 
                 // reset rotor limits 
-//                j_ptr->running_calibration.data.type14.rotorposmin = m_ptr->pos_min;
-//                j_ptr->running_calibration.data.type14.rotorposmax = m_ptr->pos_max;
+                j_ptr->running_calibration.data.type14.rotorposmin = m_ptr->pos_min;
+                j_ptr->running_calibration.data.type14.rotorposmax = m_ptr->pos_max;
+                
                 // set motor pos max and min to zero thus to move full traj in calibration
                 m_ptr->pos_min = 0;
                 m_ptr->pos_max = 0;
