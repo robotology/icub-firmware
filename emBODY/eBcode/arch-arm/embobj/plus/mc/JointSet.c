@@ -2038,9 +2038,15 @@ BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel
 {
     if (o->is_parking) return FALSE;
     
-    if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
+    if (o->control_mode != eomc_controlmode_direct) && (o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
     {
         return FALSE;
+    }
+    
+    if(eomc_controlmode_direct == o->control_mode)
+    {
+        Trajectory_set_pos_raw(&(o->ypr_trajectory[j]), pos_ref);
+        return TRUE;
     }
     
     if (vel_ref == 0.0f) return TRUE;

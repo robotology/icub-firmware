@@ -24,7 +24,6 @@ extern "C" {
 #endif
 
 #include "EoCommon.h"
-//#include "EoMeasures.h"  // TODO: make sense to include for definition of int32_t as eOmeas_position_t
 #include "EOemsControllerCfg.h"
 
 #include "Pid.h"

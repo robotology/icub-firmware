@@ -1006,7 +1006,9 @@ static BOOL Joint_set_pos_ref_core(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_
 BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
     if((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
+    {
         return FALSE;
+    }
     
     if (o->pos_min != o->pos_max) LIMIT2(o->pos_min, pos_ref, o->pos_max);
     
