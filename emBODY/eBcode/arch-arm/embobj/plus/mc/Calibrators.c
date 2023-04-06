@@ -20,8 +20,13 @@
 #include "JointSet.h"
 #include "Joint_hid.h"
 #include "CalibrationHelperData.h"
+#if defined(USE_EMBOT_theServices) 
+#warning USE_EMBOT_theServices is defined: removed some code
+// marco.accame: use objects embot::app::eth::theEncoderReader and ... future ones
+#else
 #include "EOtheMAIS.h"
 #include "EOthePOS.h"
+#endif
 #include "hal_adc.h"
 
 #define CALIB_TYPE_6_POS_TRHESHOLD 730 //= 4 deg //1820 //2730 //546=3 degree //91.02f // = 0.5 degree
