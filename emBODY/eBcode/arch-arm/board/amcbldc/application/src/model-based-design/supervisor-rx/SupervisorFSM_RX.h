@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
 // Model version                  : 5.9
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:25:55 2023
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:45:52 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -43,7 +43,7 @@ struct B_SupervisorFSM_RX_c_T {
   SV_Limits newLimit;                  // '<S1>/CAN Event Dispatcher'
   BUS_MSG_DESIRED_TARGETS newSetpoint; // '<S1>/CAN Event Dispatcher'
   EstimationConfig estimationConfig;   // '<S1>/CAN Event Dispatcher'
-  real32_T newSetpoint_m;              // '<S2>/ControlMode_SM_motor0'
+  real32_T newSetpoint_i;              // '<S2>/ControlMode_SM_motor0'
   int32_T messageIndex;                // '<Root>/SupervisorRX State Handler'
   ControlModes requiredControlMode;    // '<S1>/CAN Event Dispatcher'
   ControlModes newPIDType;             // '<S1>/CAN Event Dispatcher'
@@ -64,21 +64,21 @@ struct B_SupervisorFSM_RX_c_T {
 
 struct DW_SupervisorFSM_RX_f_T {
   ConfigurationParameters UnitDelay_DSTATE;// '<Root>/Unit Delay'
-  uint8_T is_STATE_HANDLER;            // '<Root>/SupervisorRX State Handler'
-  uint8_T is_OverCurrent;              // '<Root>/SupervisorRX State Handler'
-  uint8_T is_FaultButtonPressed;       // '<Root>/SupervisorRX State Handler'
-  uint8_T is_CAN_MESSAGES_FOR_LOOP;    // '<Root>/SupervisorRX State Handler'
   uint8_T is_active_c2_SupervisorFSM_RX;// '<Root>/SupervisorRX State Handler'
   uint8_T is_active_STATE_HANDLER;     // '<Root>/SupervisorRX State Handler'
+  uint8_T is_STATE_HANDLER;            // '<Root>/SupervisorRX State Handler'
   uint8_T is_active_FAULT_HANDLER;     // '<Root>/SupervisorRX State Handler'
   uint8_T is_active_FaultButtonPressed;// '<Root>/SupervisorRX State Handler'
+  uint8_T is_FaultButtonPressed;       // '<Root>/SupervisorRX State Handler'
   uint8_T is_active_OverCurrent;       // '<Root>/SupervisorRX State Handler'
+  uint8_T is_OverCurrent;              // '<Root>/SupervisorRX State Handler'
   uint8_T is_active_CAN_MESSAGES_FOR_LOOP;// '<Root>/SupervisorRX State Handler' 
+  uint8_T is_CAN_MESSAGES_FOR_LOOP;    // '<Root>/SupervisorRX State Handler'
   uint8_T is_active_c11_SupervisorFSM_RX;// '<S1>/CAN Event Dispatcher'
   uint8_T is_active_c3_SupervisorFSM_RX;// '<S4>/Chart'
   uint8_T is_active_c14_SupervisorFSM_RX;// '<S3>/Chart'
-  uint8_T is_c12_SupervisorFSM_RX;     // '<S2>/ControlMode_SM_motor0'
   uint8_T is_active_c12_SupervisorFSM_RX;// '<S2>/ControlMode_SM_motor0'
+  uint8_T is_c12_SupervisorFSM_RX;     // '<S2>/ControlMode_SM_motor0'
   uint8_T is_active_c4_SupervisorFSM_RX;// '<S5>/Chart1'
   boolean_T ExternalFlags_fault_button_prev;// '<Root>/SupervisorRX State Handler' 
   boolean_T ExternalFlags_fault_button_star;// '<Root>/SupervisorRX State Handler' 
@@ -153,6 +153,10 @@ extern MdlrefDW_SupervisorFSM_RX_T SupervisorFSM_RX_MdlrefDW;
 
 // Block signals (default storage)
 extern B_SupervisorFSM_RX_c_T SupervisorFSM_RX_B;
+
+#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
+
+#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 
 // Block states (default storage)
 extern DW_SupervisorFSM_RX_f_T SupervisorFSM_RX_DW;

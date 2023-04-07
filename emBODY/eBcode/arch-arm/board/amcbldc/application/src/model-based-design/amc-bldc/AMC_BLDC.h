@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 5.1
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:47 2023
+// Model version                  : 6.1
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:47:14 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -46,13 +46,14 @@
 
 // Block signals (default storage)
 struct B_AMC_BLDC_T {
+  FOCSlowInputs BusConversion_InsertedFor_FOC_a;
   BUS_MESSAGES_RX_MULTIPLE CAN_Decoder_o1;// '<S6>/CAN_Decoder'
   ConfigurationParameters ZOHBlockInsertedForAdapter_Inse;// '<Root>/Adapter4'
   BUS_MESSAGES_TX MessagesTx;          // '<S7>/SupervisorFSM_TX'
   SensorsData RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter3'
+  ControlOutputs RTBInsertedForAdapter_Inserte_a;// '<Root>/Adapter1'
   BUS_STATUS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
   BUS_CAN_RX_ERRORS_MULTIPLE CAN_Decoder_o3;// '<S6>/CAN_Decoder'
-  ControlOutputs RTBInsertedForAdapter_Inserte_a;// '<Root>/Adapter1'
 };
 
 // Block states (default storage) for system '<Root>'
@@ -63,10 +64,10 @@ struct DW_AMC_BLDC_T {
   SensorsData RTBInsertedForAdapter_Inserte_c;// synthesized block
   SensorsData RTBInsertedForAdapter_Inserte_j;// synthesized block
   Targets RTBInsertedForAdapter_Inserte_m[3];// synthesized block
-  ControlOuterOutputs RTBInsertedForAdapter_Inserte_i[3];// synthesized block
   ControlOutputs RTBInsertedForAdapter_Inserte_d;// synthesized block
   ControlOutputs RTBInsertedForAdapter_Insert_j2;// synthesized block
   ControlOutputs RTBInsertedForAdapter_Inserte_o;// synthesized block
+  ControlOuterOutputs RTBInsertedForAdapter_Inserte_i[3];// synthesized block
   EstimatedData RTBInsertedForAdapter_Inserte_k[3];// synthesized block
   Flags RTBInsertedForAdapter_Inserte_l[3];// synthesized block
   void* RTBInsertedForAdapter_Insert_mf;// synthesized block

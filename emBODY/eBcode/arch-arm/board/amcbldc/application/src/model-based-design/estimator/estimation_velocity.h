@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'estimation_velocity'.
 //
 // Model version                  : 4.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:33 2023
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:55 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,7 +20,7 @@
 #define RTW_HEADER_estimation_velocity_h_
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
-#include "rtGetInf.h"
+#include "rtGetNaN.h"
 
 extern "C"
 {

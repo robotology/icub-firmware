@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'filter_current'.
 //
 // Model version                  : 4.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:39 2023
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:47:03 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -82,7 +82,7 @@ static void f_MedianFilterCG_trickleDownMax(c_dsp_internal_MedianFilterCG_T *obj
   exitg1 = false;
   while ((!exitg1) && (i >= -obj->pMaxHeapLength)) {
     real32_T ind2;
-    real32_T temp_tmp;
+    real32_T temp;
     real32_T tmp;
     real32_T u_tmp;
     if ((i < -1.0F) && (i > -obj->pMaxHeapLength) && (obj->pBuf
@@ -94,28 +94,28 @@ static void f_MedianFilterCG_trickleDownMax(c_dsp_internal_MedianFilterCG_T *obj
 
     u_tmp = i / 2.0F;
     if (u_tmp < 0.0F) {
-      temp_tmp = std::ceil(u_tmp);
+      temp = std::ceil(u_tmp);
     } else {
-      temp_tmp = std::floor(u_tmp);
+      temp = std::floor(u_tmp);
     }
 
     ind2 = i + obj->pMidHeap;
     tmp = obj->pHeap[static_cast<int32_T>(ind2) - 1];
-    if (!(obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>
-          (temp_tmp + obj->pMidHeap) - 1]) - 1] < obj->pBuf[static_cast<int32_T>
-          (tmp) - 1])) {
+    if (!(obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(temp +
+           obj->pMidHeap) - 1]) - 1] < obj->pBuf[static_cast<int32_T>(tmp) - 1]))
+    {
       exitg1 = true;
     } else {
       if (u_tmp < 0.0F) {
-        temp_tmp = std::ceil(u_tmp);
+        temp = std::ceil(u_tmp);
       } else {
-        temp_tmp = std::floor(u_tmp);
+        temp = std::floor(u_tmp);
       }
 
-      u_tmp = temp_tmp + obj->pMidHeap;
-      temp_tmp = obj->pHeap[static_cast<int32_T>(u_tmp) - 1];
+      u_tmp = temp + obj->pMidHeap;
+      temp = obj->pHeap[static_cast<int32_T>(u_tmp) - 1];
       obj->pHeap[static_cast<int32_T>(u_tmp) - 1] = tmp;
-      obj->pHeap[static_cast<int32_T>(ind2) - 1] = temp_tmp;
+      obj->pHeap[static_cast<int32_T>(ind2) - 1] = temp;
       obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(u_tmp) - 1])
         - 1] = u_tmp;
       obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(ind2) - 1])
@@ -132,8 +132,8 @@ static void f_MedianFilterCG_trickleDownMin(c_dsp_internal_MedianFilterCG_T *obj
   exitg1 = false;
   while ((!exitg1) && (i <= obj->pMinHeapLength)) {
     real32_T ind1;
-    real32_T temp;
     real32_T tmp;
+    real32_T tmp_0;
     real32_T u_tmp;
     if ((i > 1.0F) && (i < obj->pMinHeapLength) && (obj->pBuf
          [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>((i + 1.0F) +
@@ -144,28 +144,28 @@ static void f_MedianFilterCG_trickleDownMin(c_dsp_internal_MedianFilterCG_T *obj
 
     u_tmp = i / 2.0F;
     if (u_tmp < 0.0F) {
-      temp = std::ceil(u_tmp);
+      tmp = std::ceil(u_tmp);
     } else {
-      temp = std::floor(u_tmp);
+      tmp = std::floor(u_tmp);
     }
 
     ind1 = i + obj->pMidHeap;
-    tmp = obj->pHeap[static_cast<int32_T>(ind1) - 1];
-    if (!(obj->pBuf[static_cast<int32_T>(tmp) - 1] < obj->pBuf
-          [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(temp +
+    tmp_0 = obj->pHeap[static_cast<int32_T>(ind1) - 1];
+    if (!(obj->pBuf[static_cast<int32_T>(tmp_0) - 1] < obj->pBuf
+          [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(tmp +
            obj->pMidHeap) - 1]) - 1])) {
       exitg1 = true;
     } else {
       if (u_tmp < 0.0F) {
-        temp = std::ceil(u_tmp);
+        tmp = std::ceil(u_tmp);
       } else {
-        temp = std::floor(u_tmp);
+        tmp = std::floor(u_tmp);
       }
 
-      u_tmp = temp + obj->pMidHeap;
+      u_tmp = tmp + obj->pMidHeap;
       obj->pHeap[static_cast<int32_T>(ind1) - 1] = obj->pHeap
         [static_cast<int32_T>(u_tmp) - 1];
-      obj->pHeap[static_cast<int32_T>(u_tmp) - 1] = tmp;
+      obj->pHeap[static_cast<int32_T>(u_tmp) - 1] = tmp_0;
       obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(ind1) - 1])
         - 1] = ind1;
       obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(u_tmp) - 1])
@@ -199,8 +199,14 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
                     *rty_FilteredCurrent)
 {
   c_dsp_internal_MedianFilterCG_T *obj;
+  int32_T vprev_tmp;
+  real32_T ind2;
   real32_T p;
+  real32_T temp;
+  real32_T u_tmp;
   real32_T vprev;
+  boolean_T exitg1;
+  boolean_T flag;
 
   // MATLABSystem: '<Root>/Median Filter'
   obj = &filter_current_DW.obj.pMID;
@@ -210,10 +216,10 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
     filter_MedianFilterCG_resetImpl(&filter_current_DW.obj.pMID);
   }
 
-  vprev = filter_current_DW.obj.pMID.pBuf[static_cast<int32_T>
-    (filter_current_DW.obj.pMID.pIdx) - 1];
-  filter_current_DW.obj.pMID.pBuf[static_cast<int32_T>
-    (filter_current_DW.obj.pMID.pIdx) - 1] = rtu_ControlOutputs->Iq_fbk.current;
+  vprev_tmp = static_cast<int32_T>(filter_current_DW.obj.pMID.pIdx) - 1;
+  vprev = filter_current_DW.obj.pMID.pBuf[vprev_tmp];
+  filter_current_DW.obj.pMID.pBuf[vprev_tmp] =
+    rtu_ControlOutputs->Iq_fbk.current;
   p = filter_current_DW.obj.pMID.pPos[static_cast<int32_T>
     (filter_current_DW.obj.pMID.pIdx) - 1];
   filter_current_DW.obj.pMID.pIdx++;
@@ -227,22 +233,19 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
       vprev = p - filter_current_DW.obj.pMID.pMidHeap;
       f_MedianFilterCG_trickleDownMin(&filter_current_DW.obj.pMID, vprev * 2.0F);
     } else {
-      boolean_T exitg1;
       vprev = p - filter_current_DW.obj.pMID.pMidHeap;
       exitg1 = false;
       while ((!exitg1) && (vprev > 0.0F)) {
-        boolean_T flag;
+        u_tmp = std::floor(vprev / 2.0F);
         flag = (obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>
                  (vprev + obj->pMidHeap) - 1]) - 1] < obj->pBuf
-                [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(std::floor
-                  (vprev / 2.0F) + obj->pMidHeap) - 1]) - 1]);
+                [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(u_tmp +
+                  obj->pMidHeap) - 1]) - 1]);
         if (!flag) {
           exitg1 = true;
         } else {
-          real32_T ind2;
-          real32_T temp;
           p = vprev + obj->pMidHeap;
-          ind2 = std::floor(vprev / 2.0F) + obj->pMidHeap;
+          ind2 = u_tmp + obj->pMidHeap;
           temp = obj->pHeap[static_cast<int32_T>(p) - 1];
           obj->pHeap[static_cast<int32_T>(p) - 1] = obj->pHeap
             [static_cast<int32_T>(ind2) - 1];
@@ -264,12 +267,9 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
       vprev = p - filter_current_DW.obj.pMID.pMidHeap;
       f_MedianFilterCG_trickleDownMax(&filter_current_DW.obj.pMID, vprev * 2.0F);
     } else {
-      boolean_T exitg1;
       vprev = p - filter_current_DW.obj.pMID.pMidHeap;
       exitg1 = false;
       while ((!exitg1) && (vprev < 0.0F)) {
-        real32_T u_tmp;
-        boolean_T flag;
         u_tmp = vprev / 2.0F;
         if (u_tmp < 0.0F) {
           p = std::ceil(u_tmp);
@@ -284,8 +284,6 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
         if (!flag) {
           exitg1 = true;
         } else {
-          real32_T ind2;
-          real32_T temp;
           if (u_tmp < 0.0F) {
             p = std::ceil(u_tmp);
           } else {

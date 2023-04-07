@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'can_decoder'.
 //
 // Model version                  : 4.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:07 2023
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:19 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -30,7 +30,7 @@ const int32_T can_d_event_ev_error_pck_not4us = 2;
 const int32_T can_decoder_CALL_EVENT = -1;
 const uint8_T can_decoder_IN_Event_Error = 1U;
 const uint8_T can_decoder_IN_Home = 1U;
-const uint8_T can_decoder_IN_Home_d = 2U;
+const uint8_T can_decoder_IN_Home_k = 2U;
 const int32_T event_ev_error_mode_unrecognize = 0;
 MdlrefDW_can_decoder_T can_decoder_MdlrefDW;
 
@@ -73,11 +73,11 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
   guard1 = false;
   switch (localDW->is_ERROR_HANDLING) {
    case can_decoder_IN_Event_Error:
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_d;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_k;
     localDW->cmd_processed = 0U;
     break;
 
-   case can_decoder_IN_Home_d:
+   case can_decoder_IN_Home_k:
     if (localDW->sfEvent == can_d_event_ev_error_pck_not4us) {
       localB->error_type = CANErrorTypes_Packet_Not4Us;
       localDW->ev_errorEventCounter++;
@@ -104,7 +104,7 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
       }
 
       localDW->ev_async = false;
-      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_d;
+      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_k;
       localDW->cmd_processed = 0U;
     }
     break;
@@ -194,6 +194,12 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
   rtu_CAN_VOLT_REF_SHIFT, real32_T rtu_CAN_VOLT_REF_GAIN,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW)
 {
+  real32_T c;
+  int16_T tmp_merged;
+  uint8_T idx;
+  boolean_T guard1 = false;
+  boolean_T tmp;
+  boolean_T tmp_0;
   localDW->sfEvent = can_decoder_CALL_EVENT;
 
   // Chart: '<S2>/Decoding Logic'
@@ -210,13 +216,14 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
     localDW->is_active_ERROR_HANDLING = 1U;
     localDW->ev_async = false;
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_d;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_k;
     localDW->cmd_processed = 0U;
   } else {
+    tmp = !rtu_pck_available;
+    tmp_0 = (tmp || (rtu_pck_input->ID.CLS !=
+                     CANClassTypes_Motor_Control_Command));
     if ((localDW->is_active_SET_CONTROL_MODE != 0U) &&
-        (localDW->is_SET_CONTROL_MODE == can_decoder_IN_Home) &&
-        (rtu_pck_available && (rtu_pck_input->ID.CLS ==
-          CANClassTypes_Motor_Control_Command))) {
+        (localDW->is_SET_CONTROL_MODE == can_decoder_IN_Home) && (!tmp_0)) {
       if (rtu_pck_input->ID.DST_TYP == rtu_CAN_ID_DST) {
         if (rtu_pck_input->PAYLOAD.LEN >= 1) {
           if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
@@ -271,14 +278,11 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     }
 
     if ((localDW->is_active_DESIRED_TARGETS != 0U) &&
-        (localDW->is_DESIRED_TARGETS == can_decoder_IN_Home) &&
-        (rtu_pck_available && (rtu_pck_input->ID.CLS ==
-          CANClassTypes_Motor_Control_Streaming) &&
+        (localDW->is_DESIRED_TARGETS == can_decoder_IN_Home) && ((!tmp) &&
+         (rtu_pck_input->ID.CLS == CANClassTypes_Motor_Control_Streaming) &&
          (can_de_safe_cast_to_MCStreaming(rtu_pck_input->ID.DST_TYP) ==
           static_cast<int32_T>(MCStreaming_Desired_Targets)))) {
       if ((rtu_pck_input->PAYLOAD.LEN == 8) && (rtu_CAN_ID_DST <= 4)) {
-        int16_T tmp_merged;
-        uint8_T idx;
         idx = static_cast<uint8_T>((rtu_CAN_ID_DST - 1) << 1);
         tmp_merged = can_decoder_merge_2bytes_signed(static_cast<uint16_T>
           (rtu_pck_input->PAYLOAD.ARG[idx]), static_cast<uint16_T>
@@ -306,11 +310,9 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     }
 
     if ((localDW->is_active_SET_OPTIONS != 0U) && (localDW->is_SET_OPTIONS ==
-         can_decoder_IN_Home) && (rtu_pck_available && (rtu_pck_input->ID.CLS ==
-          CANClassTypes_Motor_Control_Command))) {
+         can_decoder_IN_Home) && (!tmp_0)) {
       if (rtu_pck_input->ID.DST_TYP == rtu_CAN_ID_DST) {
         if (rtu_pck_input->PAYLOAD.LEN >= 1) {
-          boolean_T guard1 = false;
           guard1 = false;
           if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
               (MCOPC_Set_Current_Limit)) {
@@ -339,7 +341,6 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
                      (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
                       (MCOPC_Set_Velocity_PID))) {
             if (rtu_pck_input->PAYLOAD.LEN == 8) {
-              real32_T c;
               localB->msg_set_pid.motor = rtu_pck_input->PAYLOAD.CMD.M;
               localB->msg_set_pid.Ks = rtu_pck_input->PAYLOAD.ARG[7];
               c = static_cast<real32_T>(0x01 << (15 - localB->msg_set_pid.Ks)) /
@@ -402,9 +403,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     }
 
     if ((localDW->is_active_SET_MOTOR_CONFIG != 0U) &&
-        (localDW->is_SET_MOTOR_CONFIG == can_decoder_IN_Home) &&
-        (rtu_pck_available && (rtu_pck_input->ID.CLS ==
-          CANClassTypes_Motor_Control_Command))) {
+        (localDW->is_SET_MOTOR_CONFIG == can_decoder_IN_Home) && (!tmp_0)) {
       if (rtu_pck_input->ID.DST_TYP == rtu_CAN_ID_DST) {
         if (rtu_pck_input->PAYLOAD.LEN >= 1) {
           if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
@@ -527,6 +526,7 @@ static CANClassTypes c_convert_to_enum_CANClassTypes(int32_T input)
 // System initialize for referenced model: 'can_decoder'
 void can_decoder_Init(void)
 {
+  int32_T ForEach_itr;
   static const BUS_CAN_RX tmp = { false,// available
     { { CANClassTypes_Motor_Control_Command,// CLS
         0U,                            // SRC
@@ -544,8 +544,7 @@ void can_decoder_Init(void)
   };
 
   // SystemInitialize for Iterator SubSystem: '<Root>/Cycling Decoder'
-  for (int32_T ForEach_itr = 0; ForEach_itr < CAN_MAX_NUM_PACKETS; ForEach_itr++)
-  {
+  for (ForEach_itr = 0; ForEach_itr < CAN_MAX_NUM_PACKETS; ForEach_itr++) {
     // SystemInitialize for Atomic SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
     // SystemInitialize for MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct = tmp;
@@ -570,29 +569,37 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
                  BUS_STATUS_RX_MULTIPLE *rty_status_rx,
                  BUS_CAN_RX_ERRORS_MULTIPLE *rty_errors_rx)
 {
+  int32_T ForEach_itr;
+  int32_T i;
+  uint16_T rtu_pck_rx_raw_0;
+  uint8_T minval;
+  uint8_T x_idx_1;
+  boolean_T rtb_FixPtRelationalOperator;
+  boolean_T rtb_FixPtRelationalOperator_a;
+  boolean_T rtb_FixPtRelationalOperator_d;
+  boolean_T rtb_FixPtRelationalOperator_e;
+  boolean_T rtb_FixPtRelationalOperator_i;
+  boolean_T rtb_FixPtRelationalOperator_m;
+  boolean_T rtb_FixPtRelationalOperator_p;
+
   // Outputs for Iterator SubSystem: '<Root>/Cycling Decoder' incorporates:
   //   ForEach: '<S1>/For Each'
 
-  for (int32_T ForEach_itr = 0; ForEach_itr < CAN_MAX_NUM_PACKETS; ForEach_itr++)
-  {
-    uint8_T minval;
-    uint8_T x_idx_1;
-
+  for (ForEach_itr = 0; ForEach_itr < CAN_MAX_NUM_PACKETS; ForEach_itr++) {
     // Outputs for Atomic SubSystem: '<S1>/CAN_RX_RAW2STRUCT'
     // MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic' incorporates:
     //   ForEachSliceSelector generated from: '<S1>/pck_rx_raw'
 
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.available =
       rtu_pck_rx_raw->packets[ForEach_itr].available;
+    rtu_pck_rx_raw_0 = rtu_pck_rx_raw->packets[ForEach_itr].packet.ID;
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.CLS =
       c_convert_to_enum_CANClassTypes(static_cast<int32_T>(static_cast<uint16_T>
-      (static_cast<uint32_T>(rtu_pck_rx_raw->packets[ForEach_itr].packet.ID &
-      1792) >> 8)));
+      (static_cast<uint32_T>(rtu_pck_rx_raw_0 & 1792) >> 8)));
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.SRC =
-      static_cast<uint8_T>(static_cast<uint32_T>(rtu_pck_rx_raw->
-      packets[ForEach_itr].packet.ID & 240) >> 4);
+      static_cast<uint8_T>(static_cast<uint32_T>(rtu_pck_rx_raw_0 & 240) >> 4);
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.DST_TYP =
-      static_cast<uint8_T>(rtu_pck_rx_raw->packets[ForEach_itr].packet.ID & 15);
+      static_cast<uint8_T>(rtu_pck_rx_raw_0 & 15);
     x_idx_1 = rtu_pck_rx_raw->packets[ForEach_itr].length;
     minval = 8U;
     if (x_idx_1 < 8) {
@@ -605,23 +612,15 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
         minval;
     }
 
+    x_idx_1 = rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[0];
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.CMD.M =
-      ((rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[0] & 128U) != 0U);
+      ((x_idx_1 & 128U) != 0U);
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.CMD.OPC =
-      static_cast<uint8_T>(rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[0]
-      & 127);
-    for (int32_T i = 0; i < 8; i++) {
+      static_cast<uint8_T>(x_idx_1 & 127);
+    for (i = 0; i < 8; i++) {
       can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.ARG[i] =
         rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[i];
     }
-
-    boolean_T rtb_FixPtRelationalOperator;
-    boolean_T rtb_FixPtRelationalOperator_a;
-    boolean_T rtb_FixPtRelationalOperator_d;
-    boolean_T rtb_FixPtRelationalOperator_e;
-    boolean_T rtb_FixPtRelationalOperator_i;
-    boolean_T rtb_FixPtRelationalOperator_m;
-    boolean_T rtb_FixPtRelationalOperator_p;
 
     // End of MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
     // End of Outputs for SubSystem: '<S1>/CAN_RX_RAW2STRUCT'

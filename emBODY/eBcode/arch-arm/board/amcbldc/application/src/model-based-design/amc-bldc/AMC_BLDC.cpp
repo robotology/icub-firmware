@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 5.1
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:47 2023
+// Model version                  : 6.1
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:47:14 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,8 +18,8 @@
 //
 #include "AMC_BLDC.h"
 #include "rtw_mutex.h"
-#include "AMC_BLDC_types.h"
 #include "rtwtypes.h"
+#include "AMC_BLDC_types.h"
 #define estimation_velocity_MDLREF_HIDE_CHILD_
 #include "estimation_velocity.h"
 #define filter_current_MDLREF_HIDE_CHILD_
@@ -168,7 +168,6 @@ void AMC_BLDC_step0(void)        // Sample time: [1.1428571428571438E-6s, 0.0s]
 // Model step function for TID1
 void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
 {
-  FOCSlowInputs rtb_BusConversion_InsertedFor_F;
   int8_T wrBufIdx;
 
   // RateTransition generated from: '<Root>/Adapter2'
@@ -176,11 +175,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p =
     AMC_BLDC_DW.RTBInsertedForAdapter_Insert_hj;
   rtw_mutex_unlock();
-
-  // BusCreator generated from: '<Root>/FOC' incorporates:
-  //   RateTransition generated from: '<Root>/Adapter2'
-
-  rtb_BusConversion_InsertedFor_F.flags =
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.flags =
     AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l[AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p];
 
   // RateTransition generated from: '<Root>/Adapter2'
@@ -188,11 +183,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   AMC_BLDC_DW.RTBInsertedForAdapter_Insert_m3 =
     AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mp;
   rtw_mutex_unlock();
-
-  // BusCreator generated from: '<Root>/FOC' incorporates:
-  //   RateTransition generated from: '<Root>/Adapter2'
-
-  rtb_BusConversion_InsertedFor_F.configurationparameters =
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.configurationparameters =
     AMC_BLDC_DW.RTBInsertedForAdapter_InsertedF[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_m3];
 
   // RateTransition generated from: '<Root>/Adapter2'
@@ -200,11 +191,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   AMC_BLDC_DW.RTBInsertedForAdapter_Insert_ko =
     AMC_BLDC_DW.RTBInsertedForAdapter_Insert_b2;
   rtw_mutex_unlock();
-
-  // BusCreator generated from: '<Root>/FOC' incorporates:
-  //   RateTransition generated from: '<Root>/Adapter2'
-
-  rtb_BusConversion_InsertedFor_F.estimateddata =
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.estimateddata =
     AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_k[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_ko];
 
   // RateTransition generated from: '<Root>/Adapter2'
@@ -212,11 +199,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mb =
     AMC_BLDC_DW.RTBInsertedForAdapter_Insert_jj;
   rtw_mutex_unlock();
-
-  // BusCreator generated from: '<Root>/FOC' incorporates:
-  //   RateTransition generated from: '<Root>/Adapter2'
-
-  rtb_BusConversion_InsertedFor_F.targets =
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.targets =
     AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mb];
 
   // RateTransition generated from: '<Root>/Adapter2'
@@ -224,18 +207,15 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   AMC_BLDC_DW.RTBInsertedForAdapter_Insert_bw =
     AMC_BLDC_DW.RTBInsertedForAdapter_Insert_p5;
   rtw_mutex_unlock();
-
-  // BusCreator generated from: '<Root>/FOC' incorporates:
-  //   RateTransition generated from: '<Root>/Adapter2'
-
-  rtb_BusConversion_InsertedFor_F.controlouteroutputs =
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.controlouteroutputs =
     AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_i[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_bw];
 
   // ModelReference: '<Root>/FOC' incorporates:
   //   Inport generated from: '<Root>/In Bus Element5'
   //   Outport generated from: '<Root>/Out Bus Element'
 
-  control_foc(&AMC_BLDC_U.SensorsData_p, &rtb_BusConversion_InsertedFor_F,
+  control_foc(&AMC_BLDC_U.SensorsData_p,
+              &AMC_BLDC_B.BusConversion_InsertedFor_FOC_a,
               &AMC_BLDC_Y.ControlOutputs_p);
 
   // RateTransition generated from: '<Root>/Adapter1' incorporates:
@@ -317,6 +297,7 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   ControlOuterOutputs rtb_OuterControl;
   BUS_STATUS_TX rtb_SupervisorFSM_TX_o2;
   ControlOutputs rtb_BusConversion_InsertedFor_F;
+  MotorCurrent rtb_Filter_Current;
   int8_T wrBufIdx;
 
   // RateTransition generated from: '<Root>/Adapter1'
@@ -347,12 +328,16 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   // End of RateTransition generated from: '<Root>/Adapter1'
 
   // BusCreator generated from: '<S5>/Filter_Current'
+  rtb_Filter_Current.current = 0.0F;
+
+  // BusCreator generated from: '<S5>/Filter_Current'
   rtb_BusConversion_InsertedFor_F.Vq = 0.0F;
   rtb_BusConversion_InsertedFor_F.Vabc[0] = 0.0F;
   rtb_BusConversion_InsertedFor_F.Vabc[1] = 0.0F;
   rtb_BusConversion_InsertedFor_F.Vabc[2] = 0.0F;
   rtb_BusConversion_InsertedFor_F.Iq_fbk =
     AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a.Iq_fbk;
+  rtb_BusConversion_InsertedFor_F.Id_fbk = rtb_Filter_Current;
 
   // RateTransition generated from: '<Root>/Adapter3'
   rtw_mutex_lock();
@@ -391,8 +376,12 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
                       &AMC_BLDC_Y.EstimatedData_p.jointvelocities);
 
   // ModelReference: '<S5>/Filter_Current'
-  filter_current(&rtb_BusConversion_InsertedFor_F,
-                 &AMC_BLDC_Y.EstimatedData_p.Iq_filtered);
+  filter_current(&rtb_BusConversion_InsertedFor_F, &rtb_Filter_Current);
+
+  // BusCreator: '<S9>/Bus Creator' incorporates:
+  //   Outport generated from: '<Root>/Out Bus Element2'
+
+  AMC_BLDC_Y.EstimatedData_p.Iq_filtered = rtb_Filter_Current;
 
   // ModelReference: '<S6>/CAN_Decoder' incorporates:
   //   Inport generated from: '<Root>/In Bus Element2'

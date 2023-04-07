@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 4.1
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:19 2023
+// Model version                  : 5.7
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:35 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -23,7 +23,8 @@
 #ifndef control_foc_MDLREF_HIDE_CHILD_
 
 extern void FOCInnerLoop_Init(void);
-extern void FOCInnerLoop(const Flags *rtu_Flags, const ConfigurationParameters
+extern void FOCInnerLoop_Update(const ControlOuterOutputs *rtu_OuterOutputs);
+extern void FOCInnerLoop(const ConfigurationParameters
   *rtu_ConfigurationParameters, const SensorsData *rtu_Sensors, const
   EstimatedData *rtu_Estimates, const Targets *rtu_Targets, const
   ControlOuterOutputs *rtu_OuterOutputs, ControlOutputs *rty_FOCOutputs);

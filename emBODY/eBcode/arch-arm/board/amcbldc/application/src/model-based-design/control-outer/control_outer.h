@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 4.0
-// Simulink Coder version         : 9.8 (R2022b) 13-May-2022
-// C/C++ source code generated on : Mon Mar 13 14:26:26 2023
+// Model version                  : 5.2
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Thu Apr  6 14:46:44 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -44,7 +44,7 @@ struct DW_control_outer_f_T {
   real32_T UnitDelay1_DSTATE;          // '<Root>/Unit Delay1'
   real32_T Integrator_DSTATE_b;        // '<S154>/Integrator'
   real32_T DiscreteTimeIntegrator_DSTATE;// '<S1>/Discrete-Time Integrator'
-  ControlModes DelayInput1_DSTATE;     // '<S2>/Delay Input1'
+  ControlModes DelayInput1_DSTATE;     // '<S18>/Delay Input1'
   real32_T FilterDifferentiatorTF_tmp; // '<S47>/Filter Differentiator TF'
   real32_T FilterDifferentiatorTF_tmp_m;// '<S97>/Filter Differentiator TF'
   real32_T FilterDifferentiatorTF_tmp_p;// '<S147>/Filter Differentiator TF'
@@ -53,7 +53,7 @@ struct DW_control_outer_f_T {
   int8_T Integrator_PrevResetState_c;  // '<S154>/Integrator'
   int8_T DiscreteTimeIntegrator_PrevRese;// '<S1>/Discrete-Time Integrator'
   uint8_T DiscreteTimeIntegrator_SYSTEM_E;// '<S1>/Discrete-Time Integrator'
-  boolean_T Memory_PreviousInput;      // '<S10>/Memory'
+  boolean_T Memory_PreviousInput;      // '<S9>/Memory'
 };
 
 #endif                                 //control_outer_MDLREF_HIDE_CHILD_
@@ -119,8 +119,16 @@ extern MdlrefDW_control_outer_T control_outer_MdlrefDW;
 // Block signals (default storage)
 extern B_control_outer_c_T control_outer_B;
 
+#endif                                 //control_outer_MDLREF_HIDE_CHILD_
+
+#ifndef control_outer_MDLREF_HIDE_CHILD_
+
 // Block states (default storage)
 extern DW_control_outer_f_T control_outer_DW;
+
+#endif                                 //control_outer_MDLREF_HIDE_CHILD_
+
+#ifndef control_outer_MDLREF_HIDE_CHILD_
 
 // Previous zero-crossings (trigger) states
 extern ZCE_control_outer_T control_outer_PrevZCX;
@@ -130,10 +138,10 @@ extern ZCE_control_outer_T control_outer_PrevZCX;
 //-
 //  These blocks were eliminated from the model due to optimizations:
 //
+//  Block '<S4>/Data Type Duplicate' : Unused code path elimination
+//  Block '<S4>/Data Type Propagation' : Unused code path elimination
 //  Block '<S5>/Data Type Duplicate' : Unused code path elimination
 //  Block '<S5>/Data Type Propagation' : Unused code path elimination
-//  Block '<S6>/Data Type Duplicate' : Unused code path elimination
-//  Block '<S6>/Data Type Propagation' : Unused code path elimination
 //  Block '<S47>/Passthrough for tuning' : Eliminate redundant data type conversion
 //  Block '<S65>/Kt' : Eliminated nontunable gain of 1
 //  Block '<S97>/Passthrough for tuning' : Eliminate redundant data type conversion
@@ -158,23 +166,23 @@ extern ZCE_control_outer_T control_outer_PrevZCX;
 //
 //  '<Root>' : 'control_outer'
 //  '<S1>'   : 'control_outer/Current Limiter'
-//  '<S2>'   : 'control_outer/Detect Change'
-//  '<S3>'   : 'control_outer/Enabling Logic'
-//  '<S4>'   : 'control_outer/Position PID control'
-//  '<S5>'   : 'control_outer/Saturation Dynamic'
-//  '<S6>'   : 'control_outer/Saturation Dynamic1'
-//  '<S7>'   : 'control_outer/Velocity PID control'
-//  '<S8>'   : 'control_outer/Current Limiter/Compare To Zero'
-//  '<S9>'   : 'control_outer/Current Limiter/Compare To Zero1'
-//  '<S10>'  : 'control_outer/Current Limiter/S-R Flip-Flop'
-//  '<S11>'  : 'control_outer/Enabling Logic/Compare To Constant'
-//  '<S12>'  : 'control_outer/Enabling Logic/Compare To Constant1'
-//  '<S13>'  : 'control_outer/Enabling Logic/Compare To Constant2'
-//  '<S14>'  : 'control_outer/Enabling Logic/Compare To Constant3'
-//  '<S15>'  : 'control_outer/Enabling Logic/Compare To Constant4'
-//  '<S16>'  : 'control_outer/Enabling Logic/Compare To Constant5'
-//  '<S17>'  : 'control_outer/Enabling Logic/Compare To Constant6'
-//  '<S18>'  : 'control_outer/Enabling Logic/Compare To Constant7'
+//  '<S2>'   : 'control_outer/Enabling Logic'
+//  '<S3>'   : 'control_outer/Position PID control'
+//  '<S4>'   : 'control_outer/Saturation Dynamic'
+//  '<S5>'   : 'control_outer/Saturation Dynamic1'
+//  '<S6>'   : 'control_outer/Velocity PID control'
+//  '<S7>'   : 'control_outer/Current Limiter/Compare To Zero'
+//  '<S8>'   : 'control_outer/Current Limiter/Compare To Zero1'
+//  '<S9>'   : 'control_outer/Current Limiter/S-R Flip-Flop'
+//  '<S10>'  : 'control_outer/Enabling Logic/Compare To Constant'
+//  '<S11>'  : 'control_outer/Enabling Logic/Compare To Constant1'
+//  '<S12>'  : 'control_outer/Enabling Logic/Compare To Constant2'
+//  '<S13>'  : 'control_outer/Enabling Logic/Compare To Constant3'
+//  '<S14>'  : 'control_outer/Enabling Logic/Compare To Constant4'
+//  '<S15>'  : 'control_outer/Enabling Logic/Compare To Constant5'
+//  '<S16>'  : 'control_outer/Enabling Logic/Compare To Constant6'
+//  '<S17>'  : 'control_outer/Enabling Logic/Compare To Constant7'
+//  '<S18>'  : 'control_outer/Enabling Logic/Detect Change'
 //  '<S19>'  : 'control_outer/Position PID control/Position PID'
 //  '<S20>'  : 'control_outer/Position PID control/Position-Direct PID'
 //  '<S21>'  : 'control_outer/Position PID control/Position PID/Anti-windup'
@@ -223,7 +231,7 @@ extern ZCE_control_outer_T control_outer_PrevZCX;
 //  '<S64>'  : 'control_outer/Position PID control/Position PID/Sum Fdbk/Enabled'
 //  '<S65>'  : 'control_outer/Position PID control/Position PID/Tracking Mode/Enabled'
 //  '<S66>'  : 'control_outer/Position PID control/Position PID/Tracking Mode Sum/Tracking Mode'
-//  '<S67>'  : 'control_outer/Position PID control/Position PID/Tsamp - Integral/Passthrough'
+//  '<S67>'  : 'control_outer/Position PID control/Position PID/Tsamp - Integral/TsSignalSpecification'
 //  '<S68>'  : 'control_outer/Position PID control/Position PID/Tsamp - Ngain/Passthrough'
 //  '<S69>'  : 'control_outer/Position PID control/Position PID/postSat Signal/Feedback_Path'
 //  '<S70>'  : 'control_outer/Position PID control/Position PID/preSat Signal/Feedback_Path'
@@ -273,7 +281,7 @@ extern ZCE_control_outer_T control_outer_PrevZCX;
 //  '<S114>' : 'control_outer/Position PID control/Position-Direct PID/Sum Fdbk/Enabled'
 //  '<S115>' : 'control_outer/Position PID control/Position-Direct PID/Tracking Mode/Enabled'
 //  '<S116>' : 'control_outer/Position PID control/Position-Direct PID/Tracking Mode Sum/Tracking Mode'
-//  '<S117>' : 'control_outer/Position PID control/Position-Direct PID/Tsamp - Integral/Passthrough'
+//  '<S117>' : 'control_outer/Position PID control/Position-Direct PID/Tsamp - Integral/TsSignalSpecification'
 //  '<S118>' : 'control_outer/Position PID control/Position-Direct PID/Tsamp - Ngain/Passthrough'
 //  '<S119>' : 'control_outer/Position PID control/Position-Direct PID/postSat Signal/Feedback_Path'
 //  '<S120>' : 'control_outer/Position PID control/Position-Direct PID/preSat Signal/Feedback_Path'
@@ -323,7 +331,7 @@ extern ZCE_control_outer_T control_outer_PrevZCX;
 //  '<S164>' : 'control_outer/Velocity PID control/Sum Fdbk/Enabled'
 //  '<S165>' : 'control_outer/Velocity PID control/Tracking Mode/Enabled'
 //  '<S166>' : 'control_outer/Velocity PID control/Tracking Mode Sum/Tracking Mode'
-//  '<S167>' : 'control_outer/Velocity PID control/Tsamp - Integral/Passthrough'
+//  '<S167>' : 'control_outer/Velocity PID control/Tsamp - Integral/TsSignalSpecification'
 //  '<S168>' : 'control_outer/Velocity PID control/Tsamp - Ngain/Passthrough'
 //  '<S169>' : 'control_outer/Velocity PID control/postSat Signal/Feedback_Path'
 //  '<S170>' : 'control_outer/Velocity PID control/preSat Signal/Feedback_Path'
