@@ -24,7 +24,6 @@ extern "C" {
 #endif
 
 #include "EoCommon.h"
-
 #include "EOemsControllerCfg.h"
 
 #include "Pid.h"
@@ -55,7 +54,7 @@ typedef struct
 
 typedef enum
 {
-    calibtype6_st_inited =0,
+    calibtype6_st_inited = 0,
     calibtype6_st_jntEncResComputed = 1,
     calibtype6_st_absEncoderCalibrated = 2,
     calibtype6_st_trajectoryStarted = 3,
@@ -73,9 +72,6 @@ typedef enum
      int32_t rotorposmax;
  } jointCalibType6Data;
 
-
-
-
 typedef enum
 {
     calibtype7_st_inited =0,
@@ -92,13 +88,34 @@ typedef struct
 } jointCalibType7Data;
 
 
+typedef enum
+{
+    calibtype14_st_inited = 0,
+    calibtype14_st_hardLimitSet = 1,
+    calibtype14_st_absEncoderCalibrated = 2,
+    calibtype14_st_trajectoryStarted = 3,
+    calibtype14_st_finished = 4
+} calibtype14_states;
+
+typedef struct
+{
+    BOOL is_active;
+    calibtype14_states state;
+    CTRL_UNITS velocity;
+    CTRL_UNITS targetPos;
+    CTRL_UNITS hardstopPos;
+    int32_t computedZero;
+    int32_t rotorposmin;
+    int32_t rotorposmax;
+} jointCalibType14Data;
 
 typedef struct
 {
     union
     {
-        jointCalibType6Data type6;
-        jointCalibType7Data type7;
+        jointCalibType6Data  type6;
+        jointCalibType7Data  type7;
+        jointCalibType14Data type14;
     }data;
     eOmc_calibration_type_t type;
 } jointCalibrationData;
@@ -154,6 +171,7 @@ extern BOOL Joint_set_cur_ref(Joint* o, CTRL_UNITS cur_ref);
 extern void Joint_stop(Joint* o);
 
 extern BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
+extern BOOL Joint_set_pos_ref_in_calibType14(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 
 //VALE: debug function. I'll remove it ASAP
 //extern void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep);

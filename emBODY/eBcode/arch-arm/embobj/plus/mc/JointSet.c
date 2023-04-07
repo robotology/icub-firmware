@@ -1498,7 +1498,9 @@ static void JointSet_do_wait_calibration(JointSet* o)
             o->is_calibrated = JointSet_do_wait_calibration_13(o);
             break;
             
-        
+        case eomc_calibration_type14_qenc_hard_stop_and_fap:
+            o->is_calibrated = JointSet_do_wait_calibration_14(o);
+            break;
         case eomc_calibration_typeMixed:
             o->is_calibrated = JointSet_do_wait_calibration_mixed(o);
             break;
@@ -1563,8 +1565,10 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             Motor_calibrate_withOffset(o->motor+e, 0);
             Motor_set_run(o->motor+e, o->postrj_ctrl_out_type);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-            break;
+            
         }
+        break;
+        
         case eomc_calibration_type5_hard_stops:
         {
 //            //Debug code
@@ -1585,13 +1589,13 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             AbsEncoder_calibrate_fake(o->absEncoder+e);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-            break;
+            
         }
+        break;
         
 #if defined(USE_EMBOT_theServices) 
 #warning removed some code
 #else
-        
         
         case eomc_calibration_type6_mais:
         {
@@ -1610,15 +1614,15 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             else
             {
                 ////debug code
-                char info[50];
+                char info[70];
                 snprintf(info, sizeof(info), "error type6.current=%d",calibrator->params.type6.current);
                 JointSet_send_debug_message(info, e, 0, 0);
                 ////debug code ended
                 return;
             }
             
-            ////debug code
-            char info[50];
+            //debug code
+            char info[70];
             snprintf(info, sizeof(info), "vmax=%d,vim=%d",calibrator->params.type6.vmax, calibrator->params.type6.vmin);
             JointSet_send_debug_message(info, e, 0, 0);
             ////debug code ended
@@ -1631,11 +1635,6 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->joint[e].running_calibration.type = (eOmc_calibration_type_t)calibrator->type;
             o->joint[e].running_calibration.data.type6.is_active = TRUE;
             o->joint[e].running_calibration.data.type6.state = calibtype6_st_inited;
-            
-            
-//            o->joint[e].calib_type6_data.is_active = TRUE;
-//            o->joint[e].calib_type6_data.state = calibtype6_st_inited;
-//            o->joint[e].calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             
             
             
@@ -1670,11 +1669,12 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             {
                 o->joint[e].running_calibration.data.type6.targetpos = target_pos;
                 o->joint[e].running_calibration.data.type6.computedZero = 0;
-                ////debug code
-                char info[50];
-                snprintf(info, 50, "targetPos=%.1f",o->joint[e].running_calibration.data.type6.targetpos);
+                
+                //debug code
+                snprintf(info, sizeof(info), "targetPos=%.1f",o->joint[e].running_calibration.data.type6.targetpos);
                 JointSet_send_debug_message(info, e, 0, 0);
-                ////debug code ended
+                //debug code ended
+                
             }
             else
             {
@@ -1786,8 +1786,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->tripod_calib.start_pos[1] = o->motor[o->motors_of_set[1]].pos_fbk;
             o->tripod_calib.start_pos[2] = o->motor[o->motors_of_set[2]].pos_fbk;
             
-            break;
+            
         }
+        break;
         
         case eomc_calibration_type10_abs_hard_stop:
         {
@@ -1803,8 +1804,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             AbsEncoder_still_check_reset(o->absEncoder+e);
             AbsEncoder_start_hard_stop_calibrate(o->absEncoder+e, calibrator->params.type10.calibrationZero);
-            break;
+            
         }
+        break;
         
         case eomc_calibration_type11_cer_hands:
         {   
@@ -1836,8 +1838,10 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             o->calibration_timeout = 0;
             
-            break;
+            
         }
+        break;
+        
         case eomc_calibration_type12_absolute_sensor:
         {
             int32_t offset;
@@ -1872,10 +1876,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             Motor_calibrate_withOffset(o->motor+e, 0);
             Motor_set_run(o->motor+e, o->postrj_ctrl_out_type);
-            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-
-            break;
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;   
         }
+        break;
         
         case eomc_calibration_type13_cer_hands_2:
         {
@@ -1935,6 +1938,81 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             Motor_calibrate_withOffset(o->motor+e, 0);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
         }
+        break;
+       
+
+#if defined(USE_EMBOT_theServices) 
+#warning removed some code
+#else        
+        case eomc_calibration_type14_qenc_hard_stop_and_fap:
+        {
+            // instantiate here info buffer used in debug message. clean it for each message instead of reinstantiate it
+            char info[70] = {};
+            
+            // (1) check current params is ok and set target and hardstop positions
+            o->joint[e].running_calibration.data.type14.targetPos = calibrator->params.type14.final_pos;
+            o->joint[e].running_calibration.data.type14.hardstopPos = 0;
+            o->joint[e].running_calibration.data.type14.computedZero = calibrator->params.type14.calibrationZero;
+            o->joint[e].running_calibration.data.type14.velocity = 9102;
+            
+            // If here calibration type 14 can start it process            
+            // (2) set states for joint and motor
+            o->calibration_timeout = 0;
+            o->calibration_in_progress = eomc_calibration_type14_qenc_hard_stop_and_fap;
+            o->joint[e].running_calibration.type = (eOmc_calibration_type_t)calibrator->type;
+            o->joint[e].running_calibration.data.type14.is_active = TRUE;
+            o->joint[e].running_calibration.data.type14.state = calibtype14_st_inited;
+            
+            //debug code
+            memset(&info[0], 0, sizeof(info));
+            snprintf(info, sizeof(info), "targetPos=%.2f hardstopPos:%.2f", o->joint[e].running_calibration.data.type14.targetPos, o->joint[e].running_calibration.data.type14.hardstopPos);
+            JointSet_send_debug_message(info, e, 0, 0);
+            //debug code ended
+            
+            // (3) set motor params for moving to hard stop
+            // as above, this check of the pos service is not mandatory
+            // considering that at this point the POS service is already up (it's a lower runlevel)
+            // anyway, let's keep it as a preventive check
+            if (eo_pos_isAlive(eo_pos_GetHandle()))
+            {   
+                //Debug code
+                memset(&info[0], 0, sizeof(info));
+                snprintf(info, sizeof(info), "Move hrd_stp motor=%d with pwm=%d and cz=%d", e, calibrator->params.type14.pwmlimit, calibrator->params.type14.calibrationZero);
+                JointSet_send_debug_message(info, e, 0, 0);
+                //debug code ended
+                
+                // this is just a setter
+                BOOL ret = Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type14.pwmlimit, o->joint[e].running_calibration.data.type14.hardstopPos);
+                
+                if(!ret)
+                {
+                    //Debug code
+                    memset(&info[0], 0, sizeof(info));
+                    snprintf(info, sizeof(info), "Error in set hs: ret=%d", ret);
+                    JointSet_send_debug_message(info, e, 0, 0);
+                    //debug code ended
+                    o->joint[e].control_mode = joint_controlMode_old;
+                    o->control_mode = jointSet_controlMode_old;
+                    return;
+                }
+                
+                // (4) set hoint hardware limits
+                Joint_set_hardware_limit(o->joint+e);
+                o->joint[e].running_calibration.data.type14.state = calibtype14_st_hardLimitSet;
+            }
+            else
+            {
+                //debug code
+                char info[70];
+                snprintf(info, 70, "Error! POS service NOT active");
+                JointSet_send_debug_message(info, e, 0, 0);
+                //debug code ended
+                return;
+            }
+        }
+        break;
+        
+#endif
         
         default:
             break;
@@ -1974,7 +2052,7 @@ BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel
     if (vel_ref == 0.0f) return TRUE;
     
     Trajectory_set_pos_end(&(o->ypr_trajectory[j]), pos_ref, vel_ref);
-
+    
     return TRUE;
 }
 

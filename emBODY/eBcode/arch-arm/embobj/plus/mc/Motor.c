@@ -477,6 +477,12 @@ BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 
     o->hardstop_calibdata.last_pos = o->pos_fbk;
     
+    //debug code
+    char message[150];
+    snprintf(message, sizeof(message), "Pos lp:%d, pos fbk:%d, zero:%d", o->hardstop_calibdata.last_pos, o->pos_fbk, zero);
+    send_debug_message(message, o->ID, 0, 0);
+    //ends here
+    
     o->hardstop_calibdata.zero = zero;
     //Motor_set_run(o);
     return TRUE;
@@ -503,11 +509,14 @@ extern void Motor_uncalibrate(Motor* o)
 
 static void Motor_check_hardstopReached(Motor *o)
 {
-//if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
+    //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
+    //TODO: how are we checking position?? Using motor qenc?? are we using some sort of threshold
 
     o->hardstop_calibdata.waitcalib_counter += 1;
     if (o->hardstop_calibdata.waitcalib_counter > MOTOR_HARDSTOP_WAITCALIBCOUNTER_MAX)
     {
+        // TODO: I would put also a delta around last_pos -> so that I do not need to find perfect last pos
+        // but wwe can recover from small errors on the qenc which measures rotor pos
         if (o->pos_fbk == o->hardstop_calibdata.last_pos)
         {
             o->hardstop_calibdata.posStable_counter += 1;
@@ -541,10 +550,11 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
         o->pos_fbk_old = 0;
         o->not_init = TRUE;
         
-//        //debug code
-//        char message[150];
-//        snprintf(message, sizeof(message), "Hw lim reached: cp%d cz%d co%d", o->pos_fbk, o->hardstop_calibdata.zero, o->pos_calib_offset);
-//        send_debug_message(message, o->ID, 0, 0);
+        //debug code
+        char message[150];
+        snprintf(message, sizeof(message), "Hw lim reached: cp%d cz%d co%d", o->pos_fbk, o->hardstop_calibdata.zero, o->pos_calib_offset);
+        send_debug_message(message, o->ID, 0, 0);
+        //ends here
         
         o->not_calibrated = FALSE;
         Motor_hardStopCalbData_reset(o);
