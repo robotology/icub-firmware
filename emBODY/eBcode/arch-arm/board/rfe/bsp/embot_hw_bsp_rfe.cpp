@@ -587,15 +587,19 @@ namespace embot { namespace hw { namespace i2c {
     
     constexpr PROP i2c1p { &hi2c1, embot::hw::i2c::Speed::fast400 };
     //constexpr PROP i2c2p { .handle = &hi2c2 }; 
-        
+    constexpr PROP i2c2p { &hi2c2, embot::hw::i2c::Speed::fast400 };
+    constexpr PROP i2c3p { &hi2c3, embot::hw::i2c::Speed::fast400 };
+    constexpr PROP i2c4p { &hi2c4, embot::hw::i2c::Speed::fast400 };
+
     constexpr BSP thebsp {        
         // maskofsupported
         //mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two),   
-        mask::pos2mask<uint32_t>(I2C::one),         
+        mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two) | mask::pos2mask<uint32_t>(I2C::three) | mask::pos2mask<uint32_t>(I2C::four),         
         // properties
         {{
 //            &i2c1p, &i2c2p, nullptr             
-            &i2c1p, nullptr, nullptr
+            &i2c1p, &i2c2p, &i2c3p, &i2c4p
+						
         }}        
     }; 
 
@@ -605,10 +609,18 @@ namespace embot { namespace hw { namespace i2c {
         {            
             MX_I2C1_Init();
         }
-//        else if(h == I2C::two)
-//        {
-//            MX_I2C2_Init();
-//        }         
+        else if(h == I2C::two)
+        {
+            MX_I2C2_Init();
+        }
+        else if(h == I2C::three)
+        {
+            MX_I2C3_Init();
+        }   
+        else if(h == I2C::four)
+        {
+            MX_I2C4_Init();
+        }   				
     }
     
     #else
@@ -627,6 +639,7 @@ namespace embot { namespace hw { namespace i2c {
 
 #if defined(STM32HAL_BOARD_MTB4) | defined(STM32HAL_BOARD_STRAIN2) | defined(STM32HAL_BOARD_RFE)
 
+
 void I2C1_EV_IRQHandler(void)
 {
     HAL_I2C_EV_IRQHandler(&hi2c1);
@@ -636,6 +649,38 @@ void I2C1_ER_IRQHandler(void)
 {
     HAL_I2C_ER_IRQHandler(&hi2c1);
 }
+
+void I2C2_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c2);
+}
+
+void I2C2_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c2);
+}
+
+void I2C3_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c3);
+}
+
+void I2C3_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c3);
+}
+
+void I2C4_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c4);
+}
+
+void I2C4_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c4);
+}
+
+
 
 void DMA1_Channel6_IRQHandler(void)
 {   
@@ -657,15 +702,6 @@ void DMA1_Channel5_IRQHandler(void)
     HAL_DMA_IRQHandler(&hdma_i2c2_rx);
 }
 
-void I2C2_EV_IRQHandler(void)
-{
-    HAL_I2C_EV_IRQHandler(&hi2c2);
-}
-
-void I2C2_ER_IRQHandler(void)
-{
-    HAL_I2C_ER_IRQHandler(&hi2c2);
-}
 
 
 #endif // irq handlers
@@ -734,4 +770,3 @@ namespace embot { namespace hw { namespace bno055 {
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
