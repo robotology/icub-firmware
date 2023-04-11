@@ -20,6 +20,20 @@ uint8_t               TxData[8];
 uint8_t               RxData[8];
 uint32_t              TxMailbox;
 
+// TODO: For the future - Maybe - If meaninful and useful 
+// I'm thinking to use a strcut for each info packet
+// in the struct we can define the data, which have the same type for all the packets,
+// what changes is only the value
+// then there'll be a getInstance() sort of method for retrieving the struct
+// following the signleton usage in OOP
+// this will help to make code cleaner and avoid duplications
+// Instantiate data for info regarding status of battery pack
+CAN_TxHeaderTypeDef   TxHeader_620;
+CAN_RxHeaderTypeDef   RxHeader_620;
+uint8_t               TxData_620[8];
+uint8_t               RxData_620[8];
+uint32_t              TxMailbox_620;
+
 // -----------------------------------------------------------------------------------------------------------------------------
 // CAN configuration
 // -----------------------------------------------------------------------------------------------------------------------------
@@ -73,6 +87,15 @@ void CAN_Config(void)
   TxHeader.IDE = CAN_ID_STD;
   TxHeader.DLC = 8;
   TxHeader.TransmitGlobalTime = DISABLE;
+  
+  /*##-6- Configure Info Battery Pack Transmission process #####################################*/ 
+  TxHeader_620.StdId = 0x620;
+  TxHeader_620.ExtId = 0x01;
+  TxHeader_620.RTR = CAN_RTR_DATA;
+  TxHeader_620.IDE = CAN_ID_STD;
+  TxHeader_620.DLC = 8;
+  TxHeader_620.TransmitGlobalTime = DISABLE;
+  
 }
 
 

@@ -439,7 +439,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
   }
     
   calcMean();
-  
 }
 
 void calcMean(){
@@ -486,13 +485,14 @@ void calcMean(){
 }
 
 
-
-
-
-
 // -----------------------------------------------------------------------------------------------------------------------------
 // CAN messages management
 // -----------------------------------------------------------------------------------------------------------------------------
+// TODO: this method can be maybe changed by adding a for or a while loop
+// messages should be sent from the BMS in polling with a frequence of 1Hz
+// This method will just send the 5 CAN messages continuously at every board cycle (1ms)
+// As an example, firmware version can be sent just one time or every x minutes
+// The rest can be sent with a higher frequency
 void CANBUS(void){
 	switch(can_message){
     case 0x00:  
@@ -536,11 +536,11 @@ void CANBUS(void){
     {
       TxData[0] = 0x81;               // Voltage message
       TxData[1] = 0x00;
-      TxData[2] = (mean.V_VINPUT >> 8) & 0xFF;
+      TxData[2] = (mean.V_VINPUT >> 8) & 0xFF;   
       TxData[3] = mean.V_VINPUT & 0xFF;
-      TxData[4] = (mean.V_EXTPS >> 8) & 0xFF;
+      TxData[4] = (mean.V_EXTPS >> 8) & 0xFF;        
       TxData[5] = mean.V_EXTPS & 0xFF;
-      TxData[6] = (mean.V_BATTERY >> 8) & 0xFF;
+      TxData[6] = (mean.V_BATTERY >> 8) & 0xFF;       
       TxData[7] = mean.V_BATTERY & 0xFF;
       if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK){
         /* Transmission request Error */
@@ -554,7 +554,7 @@ void CANBUS(void){
     {
       TxData[0] = 0x82;               // Voltage message
       TxData[1] = 0x00;
-      TxData[2] = (mean.V_V12board >> 8) & 0xFF;
+      TxData[2] = (mean.V_V12board >> 8) & 0xFF; 
       TxData[3] = mean.V_V12board & 0xFF;
       TxData[4] = (mean.V_V12motor >> 8) & 0xFF;
       TxData[5] = mean.V_V12motor & 0xFF;
@@ -572,20 +572,37 @@ void CANBUS(void){
     {
       TxData[0] = 0x83;               // Current message
       TxData[1] = 0x00;
-      TxData[2] = (mean.I_V12board >> 8) & 0xFF;
+      TxData[2] = (mean.I_V12board >> 8) & 0xFF;           
       TxData[3] = mean.I_V12board & 0xFF;
-      TxData[4] = (mean.I_V12motor >> 8) & 0xFF;
+      TxData[4] = (mean.I_V12motor >> 8) & 0xFF;            
       TxData[5] = mean.I_V12motor & 0xFF;
-      TxData[6] = (mean.I_HSM >> 8) & 0xFF;
+      TxData[6] = (mean.I_HSM >> 8) & 0xFF;                 
       TxData[7] = mean.I_HSM & 0xFF;
       if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK){
         /* Transmission request Error */
         Error_Handler();
       }
-      can_message = 0;
+      can_message = 5;
     }
     break;
-                
+    
+    case 0x05:
+    {
+        // Battery Pack Info message
+        TxData_620[0] = (mean.V_BATTERY >> 8) & 0xFF;   // b7-b6 Battery pack voltage            
+        TxData_620[1] = mean.V_BATTERY & 0xFF;
+        TxData_620[2] = 0x00;                           // b5-b4 Instant current
+        TxData_620[3] = 0x00;
+        TxData_620[4] = Battery_charge & 0xFF;          // b3-b2 State of charge of battery
+        TxData_620[5] = 0x00;
+        TxData_620[6] = 0x00;                           // b1-b0 Average Temperature of the batteries
+        TxData_620[7] = 0x00;
+        if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader_620, TxData_620, &TxMailbox_620) != HAL_OK){
+            /* Transmission request Error */
+            Error_Handler();
+        }
+        can_message = 0;
+        }           
     default:    
     {
     }
@@ -640,7 +657,6 @@ void displayCharge(void){
         lightupLed(0x9f);     // light up LED4
     }
 }
-
 
 // -----------------------------------------------------------------------------------------------------------------------------
 // Turn on/off and blink V-meter leds
