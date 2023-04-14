@@ -36,7 +36,7 @@ static unsigned char canprototransmitter_bid;
 //static unsigned char received_msg_from_ems = 0;
 //volatile unsigned char received_canloader_msg= 0;
 //extern volatile int gulp_update_request ;
-extern tGulp Gulp;
+//extern tGulp Gulp;
 //extern tGulp GulpHistoryBuffer[GULP_HISTORY_BUFFER_SIZE];
 //extern int GulpHistoryBufferIdx;
 //extern int test_received_data;
@@ -51,38 +51,21 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 extern volatile long VqRef;
 extern volatile int  IqRef;
 
-extern volatile int dataA;
-extern volatile int dataB;
-extern volatile int dataC;
-extern volatile int dataD;
-
 extern volatile tMotorConfig MotorConfig;
 
-//volatile unsigned char HALL = 0xFF;
-
-//extern volatile int angle_feedback;
-//extern volatile int sectr_feedback;
 extern volatile short Ia,Ib,Ic;
 extern volatile short Va,Vb,Vc;
 
-extern volatile int storeIa, storeIc, storeVd;
-
 extern volatile int VqFbk;
 extern volatile int IqFbk;
-
-extern volatile int V1fbk;
-extern volatile int V2fbk;
-extern volatile int V3fbk;
 
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
     static tCanData payload; // = {{0}};
     unsigned long msgid;
     
-    payload.w[0] = IqFbk;
-    payload.w[1] = gQEVelocity;
-    //payload.w[2] = V2fbk; //gQEPosition & 0xFFFF;
-    //payload.w[3] = V3fbk; //gQEPosition >> 16;
+    payload.w[0]  = IqFbk;
+    payload.w[1]  = gQEVelocity;
     payload.dw[1] = gQEPosition;
     //payload.dw[1] = QEgetPosCheck(); 
     
@@ -113,7 +96,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     
     if (gEncoderConfig.full_calibration)
     {
-        extern volatile int32_t ovfCNT;
+        extern volatile int16_t QE_position;
         
         static int noflood = 0;
         
@@ -123,8 +106,8 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
             
             payload.w[0] = gEncoderConfig.offset;
             payload.w[1] = POSCNT;
-            
-            payload.dw[1] = ovfCNT;
+            payload.w[2] = QE_position;
+            payload.w[3] = 0; 
             
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
@@ -133,10 +116,10 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     }
     else if (MotorConfig.verbose)
     {
-        payload.w[0] = dataA;
-        payload.w[1] = dataB;
-        payload.w[2] = dataC;
-        payload.w[3] = dataD;
+        payload.w[0] = 0;
+        payload.w[1] = 0;
+        payload.w[2] = 0;
+        payload.w[3] = 0;
         
         msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 

@@ -133,8 +133,6 @@ _FICD(ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 
 /////////////////////////////////////////
 
-//#define CALIBRATION
-
 #define BOARD_CAN_ADDR_DEFAULT 0xE
 #define VOLT_REF_SHIFT 5 // for a PWM resolution of 1000
 
@@ -307,11 +305,6 @@ BOOL updateOdometry()
     return FALSE;
 }
 
-volatile int dataA = 0;
-volatile int dataB = 0;
-volatile int dataC = 0;
-volatile int dataD = 0;
-
 int alignRotorIndex(volatile int* IqRef)
 {
     if (MotorConfig.has_hall) return 0;
@@ -321,10 +314,6 @@ int alignRotorIndex(volatile int* IqRef)
     static int encoder_fake = 0;
     
     static int IqRef_fake = 0;
-    
-    //static BOOL moved = FALSE;
-    
-    //if (abs((int)POSCNT) > 32) moved = TRUE;
     
     const int ENCODER_1_5_REV = (3*QE_ELETTR_DEG_PER_REV())/2;
 
@@ -474,28 +463,16 @@ int alignRotorIndex(volatile int* IqRef)
     
     *IqRef = IqRef_fake;
     
-    int encoder = encoder_fake;
-    
-    while (encoder >= 360) encoder -= 360;
-    while (encoder <    0) encoder += 360;
-    
-    return encoder;
+    return (7200 + encoder_fake) % 360;
 }
 
 // DMA0 IRQ Service Routine used for FOC loop
-
-//volatile int angle_feedback = 0;
-//volatile int sectr_feedback = 0;
 
 volatile short Ia = 0, Ib = 0, Ic = 0;
 volatile short Va = 0, Vb = 0, Vc = 0;
 
 volatile int VqFbk = 0;
 volatile int IqFbk = 0;
-
-volatile int V1fbk = 0;
-volatile int V2fbk = 0;
-volatile int V3fbk = 0;
 
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
@@ -515,11 +492,8 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetb, Offsetc
     // scale currents by MeasCurrParm.qKa, qKb, qKc
     // Calculate ParkParm.qIa, qIb, qIc
-    //MeasAndCompIaIcCalculateIb();
-    
     ParkParm.qIa = (int)((__builtin_mulss(MeasCurrParm.Offseta-ADCBuffer[0],MeasCurrParm.qKa)+8192L)>>14); 
     ParkParm.qIc = (int)((__builtin_mulss(MeasCurrParm.Offsetc-ADCBuffer[1],MeasCurrParm.qKc)+8192L)>>14);
-    
     ParkParm.qIb = -ParkParm.qIa-ParkParm.qIc;
     
     // qIx = 64 is equal to 50 mA current here
@@ -538,87 +512,65 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     Ia_old = ParkParm.qIa;
     Ib_old = ParkParm.qIb;
     Ic_old = ParkParm.qIc;
-
-    //if (Ia>=0) Ia=(Ia+3)/6; else Ia=(Ia-3)/6;
-    //if (Ib>=0) Ib=(Ib+3)/6; else Ib=(Ib-3)/6;
-    //if (Ic>=0) Ic=(Ic+3)/6; else Ic=(Ic-3)/6;
-    
-    if (MotorConfig.has_hall && MotorConfig.has_qe)
-    {
-        static int hall_sector_old = 0;
-                
-        int hall_sector = DHESSector();
         
-        //sectr_feedback = hall_sector;
-        
-        if (hall_sector != hall_sector_old)
-        {
-            if (hall_sector_old == 6 && hall_sector == 1)
-            {
-                QEHESCrossed(1);
-            }
-            else if (hall_sector_old == 1 && hall_sector == 6)
-            {
-                QEHESCrossed(0);
-            }
-            
-            hall_sector_old = hall_sector;
-        }
-    }
-    
-    int enc = 0;
+    int sector = 0;
+    int delta  = 0;
     
     if (MotorConfig.has_qe)
     {
-        if (sAlignInProgress)
+        if (MotorConfig.has_index)
         {
-            if (MotorConfig.has_index)
+            int angle = 0;
+            
+            if (sAlignInProgress)
             {
-                enc = alignRotorIndex(&IqRef);
-            }
-            else if (MotorConfig.has_hall)
-            {
-                enc = 60*(DHESSector()-1);
-                
-                if (QEready()) sAlignInProgress = FALSE;
+                angle = alignRotorIndex(&IqRef);
             }
             else
             {
-                // CONFIGURATION ERROR
+                angle = QEgetElettrDeg();
+            }
+            
+            sector = 1 + angle/60;
+            
+            delta = angle%60-30;
+        }
+        else if (MotorConfig.has_hall)
+        {
+            // QE and HALL
+            
+            sector = DHESSector();
+            
+            static int sector_old = 0;
+            
+            if (sector != sector_old)
+            {
+                if (sector_old == 6 && sector == 1)
+                {
+                    QEHESCrossed(1);
+                }
+                else if (sector_old == 1 && sector == 6)
+                {
+                    QEHESCrossed(0);
+                }
+                
+                sector_old = sector;
             }
         }
-        else
-        {
-            enc = QEgetElettrDeg(); 
-        }
+        //else CONFIGURATION ERROR
     }
     else if (MotorConfig.has_hall)
     {
-        enc = 60*(DHESSector()-1);
-    }
-    else // no HALL, no encoders, just test
-    {
-        static int t = 0;
-        static int senc = 0;
-
-        if (++t > 125)
-        {
-            t = 0;
-            ++senc;
-            if (senc > 359) senc = 0;
-        }
+        sector = DHESSector();
+        delta = 0;
         
-        enc = senc;
+        //int angle = DHESAngle();
+        //sector = (angle/60)-1;
+        //delta = angle%60-30;
     }
     
     BOOL has_speed_sample = updateOdometry();
-
-    // enc is in [0 - 360) range here
-
-    //angle_feedback = enc;
     
-    char sector = 1 + enc/60;
-
     static char sector_stored = 0;
 
     if (sector_stored != sector)
@@ -640,15 +592,11 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         }
     }
 
-    BOOL negative_sec = sector%2;
-
-    int delta = (enc%60)-30;
-
+    //if (delta> 30) delta =  30;
+    //if (delta<-30) delta = -30;
+    
     int sinT,cosT;
 
-    if (delta> 30) delta =  30;
-    if (delta<-30) delta = -30;
-    
     if (delta<0)
     {
         cosT =  cos_table[-delta];
@@ -660,7 +608,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         sinT =  sin_table[ delta];
     }
     
-    if (negative_sec)
+    if (sector%2) 
     {
         // gain = (64/49.03) * (2/3) * (2/sqrt3) = 1.0048 OK!
         
@@ -775,16 +723,6 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     }
     else // current open loop
     {
-#ifdef RELENTLESS
-        if ((I2Tdata.IQMeasured > Iovr) || (I2Tdata.IQMeasured < -Iovr))
-        {
-            SysError.OverCurrentFailure = 1;
-            // call fault handler
-            FaultConditionsHandler();
-
-            return;
-        }   
-#else
         if (I2Tdata.IQMeasured > Ipeak)
         {
             limit =  1;
@@ -816,7 +754,6 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
             Vq = (int)((VqRef+VqL+IKo)>>IKs);
         }
         else
-#endif // RELENTLESS
         {
             if (gControlMode == icubCanProto_controlmode_openloop)
             {
@@ -908,6 +845,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     //
     ////////////////////////////////////////////////////////////////////////////
     
+    // passing from 20 kHz PWM to 40 kHz the PWM range is divided by 2
     Vq/=2;
     Vd/=2;
     
@@ -916,15 +854,11 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     int V1 = (int)((__builtin_mulss(Vq,cosT)-__builtin_mulss(Vd*3,sinT)+0x7FFF)>>16);
     int V2 = (int)((__builtin_mulss(Vq,sinT)+__builtin_mulss(Vd  ,cosT)+0x7FFF)>>16);
     
-    if (negative_sec) V2=-V2;
+    if (sector%2) V2=-V2;
 
     *ppwmH =  V1-V2;
     *ppwm0 =  V2+V2;
     *ppwmL = -V1-V2;
-    
-    V1fbk = Va;
-    V2fbk = Vb;
-    V3fbk = Vc;
     
     pwmOut(Va,Vb,Vc);
     //

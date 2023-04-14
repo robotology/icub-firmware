@@ -226,7 +226,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             gEncoderConfig.offset = 330; // until not included in configuration file
             MotorConfig.has_index = FALSE;
             MotorConfig.has_tsens = FALSE;
-            DHESInit(65536UL/(6*gEncoderConfig.numPoles));
+            DHESInit(gEncoderConfig.numPoles,gEncoderConfig.offset);
         }
         
         if (MotorConfig.has_qe)
@@ -512,7 +512,7 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
         case icubCanProto_controlmode_velocity:
         case icubCanProto_controlmode_speed_voltage:
         case icubCanProto_controlmode_speed_current:
-            LIMIT(ref, UDEF_SPEED_MAX)
+            LIMIT(ref, UDEF_SPEED_MAX) // 32767
             CtrlReferences.WRef  = ref;
             break;
 
@@ -523,7 +523,7 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
             break;
 
         case icubCanProto_controlmode_openloop:
-            LIMIT(ref, UDEF_PWM_MAX)
+            LIMIT(ref, UDEF_PWM_MAX) // 30000
             CtrlReferences.VqRef = ref;
             //CtrlReferences.IqRef = CtrlReferences.WRef = 0;
             break;

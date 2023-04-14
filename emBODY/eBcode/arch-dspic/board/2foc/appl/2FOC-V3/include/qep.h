@@ -33,17 +33,17 @@ volatile extern tQEError gEncoderError;
 #define QE_RISE_ERROR(e) gEncoderError.e=TRUE; SysError.EncoderFault=TRUE; FaultConditionsHandler()
 #define QE_ELETTR_DEG_PER_REV() (gEncoderConfig.elettr_deg_per_rev)
 
-extern volatile BOOL qe_ready;
-#define QEready() qe_ready
+extern volatile BOOL QE_READY;
+#define QEready() QE_READY
 
 // MECAPION
 //#define QEgetRaw() (POSCNT<<5)
 //#define QEgetElettrDeg() ((int)(__builtin_muluu(POSCNT,360)>>11))
 
-extern void QEinit(int ticks,int motor_num_poles,BOOL use_index);
+extern void QEinit(int16_t ticks,int8_t motor_num_poles,BOOL use_index);
 extern void QEcountErrorClear();
 extern  int QEgetElettrDeg();
 extern  int QEgetPosition();
-extern void QEHESCrossed(int up);
+extern void QEHESCrossed(BOOL up);
 //extern int32_t QEgetPosCheck();
 #endif

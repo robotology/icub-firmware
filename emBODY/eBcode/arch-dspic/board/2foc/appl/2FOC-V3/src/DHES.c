@@ -5,6 +5,7 @@
 //#include "UserParms.h"
 #include "Faults.h"
 #include "DHES.h"
+#include "qep.h"
 
 #define IMPOSSIBLE 2
 
@@ -31,11 +32,13 @@ char DHES_TRANSITION_LUT[7][7] =
 
 static long dhes_position = 0;
 static int  dhes_velocity = 0;
-static int  dhes_step = 0;
+static int  dhes_steps_per_rev = 0;
+static int  dhes_offset = 0;
 
-void DHESInit(int step)
+void DHESInit(int num_poles, int offset)
 {
-    dhes_step = step;
+    dhes_steps_per_rev = 6*num_poles;
+    dhes_offset = offset;
 }
 
 inline long DHESPosition() __attribute__((always_inline));
@@ -67,12 +70,12 @@ inline int DHESVelocity()
     return dhes_velocity;
 }
 
-//extern volatile unsigned char HALL; 
-
 inline unsigned char DHESRead() __attribute__((always_inline));
 unsigned char DHESRead()
 {
     static unsigned char dhes_state = 0;
+    
+    static int dhes_steps = 0;
 
     //#ifdef DHES_CONNECTED_TO_P1_P6
     // HU==RP3==RB3, HV==RP8==RB8, HW==RP9==RB9
@@ -144,6 +147,10 @@ unsigned char DHESRead()
     else
     {
         trans_error_cnt = 0;
+        
+        dhes_steps += transition;
+        
+        dhes_position = __builtin_divsd(((long)dhes_steps)<<16,dhes_steps_per_rev);
     }
     /*
     if (transition == IMPOSSIBLE)
@@ -154,14 +161,6 @@ unsigned char DHESRead()
         return 0;
     }
     */
-    if (transition==1)
-    {
-        dhes_position += dhes_step;
-    }
-    else if (transition==-1)
-    {
-        dhes_position -= dhes_step;
-    }
 
     dhes_state = port_read;
 
@@ -180,4 +179,10 @@ char DHESSector()
 #endif
     
     return dhes2sector[DHESRead()];
+}
+
+inline int DHESAngle() __attribute__((always_inline));
+int DHESAngle()
+{
+    return (60*(DHESSector()-1) + dhes_offset) % 360;
 }

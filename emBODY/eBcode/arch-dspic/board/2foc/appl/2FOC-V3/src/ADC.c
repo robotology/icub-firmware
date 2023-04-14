@@ -223,8 +223,6 @@ int ADCCalibrateOffset(void)
     return 0;
 }
 
-volatile int storeIa,storeIc;
-
 int ADCCalibrateGain(void)
 // Calculate mean value of ADC_CAL_N_SAMPLES samples for iA, iB and Vdc and store in
 // MeasCurrParm.Offseta, Offsetb 
@@ -308,9 +306,6 @@ int ADCCalibrateGain(void)
     
     Ic += Ic>=0 ? ADC_CAL_N_SAMPLES/2 : -ADC_CAL_N_SAMPLES/2;
     Ic = MeasCurrParm.Offsetc - Ic/ADC_CAL_N_SAMPLES;
-    
-    storeIa = Ia;
-    storeIc = Ic;
     
     if (Ia < 0) Ia = -Ia;
     if (Ic < 0) Ic = -Ic;
