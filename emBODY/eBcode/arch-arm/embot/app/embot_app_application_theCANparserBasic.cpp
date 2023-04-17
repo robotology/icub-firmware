@@ -44,7 +44,6 @@
 #include "embot_prot_can_analog_polling.h"
 
 #include "embot_app_theCANboardInfo.h"
-#include "embot_app_theJumper.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -422,7 +421,6 @@ embot::app::application::theCANparserBasic::theCANparserBasic()
 //    : pImpl(new Impl)
 {
     pImpl = std::make_unique<Impl>();
-    embot::app::theJumper& thejumper = embot::app::theJumper::getInstance();
 }  
 
     

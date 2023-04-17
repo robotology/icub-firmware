@@ -48,8 +48,8 @@ namespace embot { namespace app {
         {            
             std::uint32_t                       addressofapplication {0};
             bool                                initbsp {true};
-            embot::core::relTime              ticktime {0};
-            embot::os::theScheduler::Behaviour behaviour {};
+            embot::core::relTime                ticktime {0};
+            embot::os::theScheduler::Behaviour  behaviour {};
 
             Config() = default;
             Config(std::uint32_t _addr, bool _bsp, embot::core::relTime _tic, const embot::os::theScheduler::Behaviour &_beh) : addressofapplication(_addr), initbsp(_bsp), ticktime(_tic), behaviour(_beh) {}                

@@ -53,47 +53,27 @@ namespace embot { namespace app {
             std::uint8_t        tobefilled[3];  // to make the size of struct ... multiple of 8.
         }; 
         
-        struct bootloaderInfo
-        {
-            embot::prot::can::Board board {embot::prot::can::Board::none};
-            embot::prot::can::versionOfBOOTLOADER version {0, 0};
-            std::uint8_t adr {1};
-            const char * definfo32 {nullptr};
-            
-            bootloaderInfo() = default;
-            constexpr bootloaderInfo(embot::prot::can::Board b, const embot::prot::can::versionOfBOOTLOADER &v, std::uint8_t a, const char *i) 
-                        : board(b), version(v), adr(a), definfo32(i) {}             
-        };
-        
-        
-        struct applicationInfo
-        {
-            embot::prot::can::versionOfAPPLICATION version {0, 0, 0};
-            embot::prot::can::versionOfCANPROTOCOL protocol {0, 0};
-
-            applicationInfo() = default;
-            constexpr applicationInfo(const embot::prot::can::versionOfAPPLICATION &v, const embot::prot::can::versionOfCANPROTOCOL &p) 
-                        : version(v), protocol(p) {}             
-        };        
-        
+        // use only to allow backward compatibility w/ all the embot can boards
+        using applicationInfo = embot::prot::can::applicationInfo;
+        using bootloaderInfo = embot::prot::can::bootloaderInfo;       
         
         bool erase();
         
-        bool synch(const bootloaderInfo &info);
-        bool synch(embot::prot::can::Board type, embot::prot::can::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32);
+        bool synch(const embot::prot::can::bootloaderInfo &info);
+        bool synch(embot::prot::can::Board type, embot::prot::can::versionOfBOOTLOADER version, embot::prot::can::Address adr, const char *defInfo32);
         
-        bool synch(const applicationInfo &info);
+        bool synch(const embot::prot::can::applicationInfo &info);
         bool synch(embot::prot::can::versionOfAPPLICATION application, embot::prot::can::versionOfCANPROTOCOL protocol);
         
         bool get(StoredInfo &info);
         bool set(const StoredInfo &info);
         
-        std::uint8_t getCANaddress();
-        bool setCANaddress(std::uint8_t adr);
+        embot::prot::can::Address getCANaddress();
+        bool setCANaddress(embot::prot::can::Address adr);
         
         // the cached can address is refreshed at very call of: synch(), setCANaddress(), getCANaddress(), set().
         // it can be used by the application or by the various parsers to get access to teh can address without making a direct read from storage.        
-        std::uint8_t cachedCANaddress();
+        embot::prot::can::Address cachedCANaddress();
         
         // todo: we could use two different pages for board and userspace. but we should share the buffer ...
         static const std::uint32_t sizeOfUserSpace = 128+256+512; 

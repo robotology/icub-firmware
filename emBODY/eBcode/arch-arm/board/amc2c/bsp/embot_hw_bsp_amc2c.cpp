@@ -207,7 +207,7 @@ namespace embot { namespace hw { namespace button {
 
 namespace embot { namespace hw { namespace button {
     
-    #if   defined(STM32HAL_BOARD_AMC)
+    #if   defined(STM32HAL_BOARD_AMC2C)
         
     // this button is the blue one on the board
     constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}, 
@@ -301,15 +301,15 @@ namespace embot { namespace hw { namespace can {
     
     
     // it has HAL_FDCAN_MODULE_ENABLED    
-    FDCAN_HandleTypeDef hfdcan1 {};
+//    FDCAN_HandleTypeDef hfdcan1 {};
     FDCAN_HandleTypeDef hfdcan2 {};    
     
-    constexpr PROP can1p = { .handle = &hfdcan1 }; 
+//    constexpr PROP can1p = { .handle = &hfdcan1 }; 
     constexpr PROP can2p = { .handle = &hfdcan2 };    
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(CAN::two), // | mask::pos2mask<uint32_t>(CAN::two),        
+        mask::pos2mask<uint32_t>(CAN::two),        
         // properties
         {{
             nullptr, &can2p           
@@ -317,41 +317,41 @@ namespace embot { namespace hw { namespace can {
     };
     
     
-    void s_FDCAN1_Init(void)
-    {
-        hfdcan1.Instance = FDCAN1;
-        hfdcan1.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
-        hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
-        hfdcan1.Init.AutoRetransmission = ENABLE;
-        hfdcan1.Init.TransmitPause = ENABLE;
-        hfdcan1.Init.ProtocolException = DISABLE;
-        hfdcan1.Init.NominalPrescaler = 1;
-        hfdcan1.Init.NominalSyncJumpWidth = 20;
-        hfdcan1.Init.NominalTimeSeg1 = 79;
-        hfdcan1.Init.NominalTimeSeg2 = 20;
-        hfdcan1.Init.DataPrescaler = 1;
-        hfdcan1.Init.DataSyncJumpWidth = 8;
-        hfdcan1.Init.DataTimeSeg1 = 11;
-        hfdcan1.Init.DataTimeSeg2 = 8;
-        hfdcan1.Init.MessageRAMOffset = 0;
-        hfdcan1.Init.StdFiltersNbr = 1;
-        hfdcan1.Init.ExtFiltersNbr = 1;
-        hfdcan1.Init.RxFifo0ElmtsNbr = 1;
-        hfdcan1.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
-        hfdcan1.Init.RxFifo1ElmtsNbr = 0;
-        hfdcan1.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
-        hfdcan1.Init.RxBuffersNbr = 1;
-        hfdcan1.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
-        hfdcan1.Init.TxEventsNbr = 0;
-        hfdcan1.Init.TxBuffersNbr = 1;
-        hfdcan1.Init.TxFifoQueueElmtsNbr = 1;
-        hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
-        hfdcan1.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
-        if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
-        {
-            Error_Handler();
-        }
-    }
+//    void s_FDCAN1_Init(void)
+//    {
+//        hfdcan1.Instance = FDCAN1;
+//        hfdcan1.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
+//        hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
+//        hfdcan1.Init.AutoRetransmission = ENABLE;
+//        hfdcan1.Init.TransmitPause = ENABLE;
+//        hfdcan1.Init.ProtocolException = DISABLE;
+//        hfdcan1.Init.NominalPrescaler = 1;
+//        hfdcan1.Init.NominalSyncJumpWidth = 20;
+//        hfdcan1.Init.NominalTimeSeg1 = 79;
+//        hfdcan1.Init.NominalTimeSeg2 = 20;
+//        hfdcan1.Init.DataPrescaler = 1;
+//        hfdcan1.Init.DataSyncJumpWidth = 8;
+//        hfdcan1.Init.DataTimeSeg1 = 11;
+//        hfdcan1.Init.DataTimeSeg2 = 8;
+//        hfdcan1.Init.MessageRAMOffset = 0;
+//        hfdcan1.Init.StdFiltersNbr = 1;
+//        hfdcan1.Init.ExtFiltersNbr = 1;
+//        hfdcan1.Init.RxFifo0ElmtsNbr = 1;
+//        hfdcan1.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
+//        hfdcan1.Init.RxFifo1ElmtsNbr = 0;
+//        hfdcan1.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
+//        hfdcan1.Init.RxBuffersNbr = 1;
+//        hfdcan1.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
+//        hfdcan1.Init.TxEventsNbr = 0;
+//        hfdcan1.Init.TxBuffersNbr = 1;
+//        hfdcan1.Init.TxFifoQueueElmtsNbr = 1;
+//        hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+//        hfdcan1.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
+//        if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
+//        {
+//            Error_Handler();
+//        }
+//    }
     
     void s_FDCAN2_Init(void)
     {
@@ -427,7 +427,8 @@ namespace embot { namespace hw { namespace can {
     {
         if(h == CAN::one)
         {            
-            s_FDCAN1_Init();
+ //           s_FDCAN1_Init();
+            return;
         }
         else if(h == CAN::two)
         {
@@ -457,20 +458,20 @@ extern "C"
 {
     // the irq handlers
     
-    void FDCAN1_IT0_IRQHandler(void)
-    {
-        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan1);
-    } 
+//    void FDCAN1_IT0_IRQHandler(void)
+//    {
+//        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan1);
+//    } 
 
     void FDCAN2_IT0_IRQHandler(void)
     {
         HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan2);
     } 
             
-    void FDCAN1_IT1_IRQHandler(void)
-    {
-        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan1);
-    }          
+//    void FDCAN1_IT1_IRQHandler(void)
+//    {
+//        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan1);
+//    }          
 
     void FDCAN2_IT1_IRQHandler(void)
     {

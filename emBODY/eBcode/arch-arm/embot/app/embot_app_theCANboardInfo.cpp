@@ -46,7 +46,7 @@
 
 struct embot::app::theCANboardInfo::Impl
 {
-    std::uint8_t cachedcanaddress;    
+    embot::prot::can::Address cachedcanaddress;    
     embot::hw::FlashStorage *flashstorage;
     std::uint32_t userdataaddress;
     std::uint32_t addressofsharedstorage;
@@ -93,12 +93,12 @@ bool embot::app::theCANboardInfo::erase()
 }
    
  
-bool embot::app::theCANboardInfo::synch(const bootloaderInfo &info)
+bool embot::app::theCANboardInfo::synch(const embot::prot::can::bootloaderInfo &info)
 {
     return synch(info.board, info.version, info.adr, info.definfo32);
 }
 
-bool embot::app::theCANboardInfo::synch(embot::prot::can::Board type, embot::prot::can::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32)
+bool embot::app::theCANboardInfo::synch(embot::prot::can::Board type, embot::prot::can::versionOfBOOTLOADER version, embot::prot::can::Address adr, const char *defInfo32)
 {
     bool ret = false;
     // at first we read. if what we read is not nice, then we write again
@@ -140,7 +140,7 @@ bool embot::app::theCANboardInfo::synch(embot::prot::can::Board type, embot::pro
     return ret;
 }
 
-bool embot::app::theCANboardInfo::synch(const applicationInfo &info)
+bool embot::app::theCANboardInfo::synch(const embot::prot::can::applicationInfo &info)
 {
     return synch(info.version, info.protocol);
 }
@@ -204,7 +204,7 @@ bool embot::app::theCANboardInfo::set(const StoredInfo &info)
 }
  
  
-std::uint8_t embot::app::theCANboardInfo::getCANaddress()
+embot::prot::can::Address embot::app::theCANboardInfo::getCANaddress()
 {
     StoredInfo strd = {0};
     get(strd); 
@@ -213,7 +213,7 @@ std::uint8_t embot::app::theCANboardInfo::getCANaddress()
 }
 
 
-std::uint8_t embot::app::theCANboardInfo::cachedCANaddress()
+embot::prot::can::Address embot::app::theCANboardInfo::cachedCANaddress()
 {
     if(255 == pImpl->cachedcanaddress)
     {
@@ -224,7 +224,7 @@ std::uint8_t embot::app::theCANboardInfo::cachedCANaddress()
 }
 
 
-bool embot::app::theCANboardInfo::setCANaddress(std::uint8_t adr)
+bool embot::app::theCANboardInfo::setCANaddress(embot::prot::can::Address adr)
 {
     StoredInfo strd = {0};
     get(strd); 

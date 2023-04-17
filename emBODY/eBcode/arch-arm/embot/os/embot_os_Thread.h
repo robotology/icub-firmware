@@ -35,7 +35,8 @@ namespace embot { namespace os {
         // types used by all derived Thread classes
     
         enum class Type : std::uint8_t { undefined = 0, eventTrigger = 1, messageTrigger = 3, callbackTrigger = 4, periodicTrigger = 5, valueTrigger = 6, multieventTrigger = 7, Init = 100, Idle = 101 };
-                                
+         
+        using fpOnInit = void (*)(Thread *, void *);            
         using fpStartup = void (*)(Thread *, void *);
         using fpOnIdle = void (*)(Thread *, void *);
         using fpOnEvent = void (*)(Thread *, os::EventMask, void *);
@@ -55,7 +56,7 @@ namespace embot { namespace os {
         
         struct BaseConfig
         {
-            std::uint16_t stacksize {256};          // the stack used by the task. it cannot be 0. reasonable value is >= 256
+            std::uint16_t stacksize {1024};         // the stack used by the task. it cannot be 0. reasonable value is >= 256
             Priority priority {Priority::minimum};  // the priority with which the system executes the task. 
             Thread::fpStartup startup {nullptr};    // this function, if not nullptr, is executed only once at start ot the task. its second argument is param
             void *param {nullptr};                  // the optional param passed to startup() and other functions derived from BaseConfig
@@ -96,7 +97,7 @@ namespace embot { namespace os {
         struct Config : public Thread::BaseConfig
         {            
             Config() = default;
-            constexpr Config(std::uint16_t st, Thread::fpStartup fpst, void* pa) : BaseConfig(st, embot::os::Priority::schedInit, fpst, pa) {}            
+            constexpr Config(std::uint16_t st, Thread::fpOnInit fpini, void* pa) : BaseConfig(st, embot::os::Priority::schedInit, fpini, pa) {}            
             bool isvalid() const
             {   
                 return BaseConfig::isvalid();

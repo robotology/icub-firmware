@@ -27,6 +27,13 @@
 namespace embot { namespace prot { namespace can {
     
     // - useful types 
+    
+    using Address = uint8_t; // with the limitation that we use only range [0, 15]
+    
+    constexpr Address addrBroadcast {15};
+    constexpr Address addrHost {0};
+    
+    constexpr bool isaddressvalid(Address a) { return a<=addrBroadcast; }
 
     struct Frame            
     {
@@ -39,7 +46,12 @@ namespace embot { namespace prot { namespace can {
         {
             if(nullptr != d) { std::memmove(data, d, size); }
         }
-        
+        constexpr Frame(std::uint32_t i, std::uint8_t s, const std::initializer_list<uint8_t> &da) : id(i), size(std::min(s, static_cast<std::uint8_t>(8))) 
+        {
+            uint8_t ss = std::min(size, static_cast<std::uint8_t>(da.size())); 
+            uint8_t ndx = 0;
+            for(const uint8_t & v : da) { if(ndx < ss) data[ndx++] = v; }
+        }        
         bool copyto(uint32_t &i, uint8_t &si, uint8_t *da) const
         {
             if(nullptr != da) 
@@ -89,6 +101,32 @@ namespace embot { namespace prot { namespace can {
         std::uint8_t    minor {0};
         versionOfCANPROTOCOL() = default;
         constexpr versionOfCANPROTOCOL(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {}
+    };   
+
+
+    // more structured info for the process
+
+    struct bootloaderInfo
+    {
+        embot::prot::can::Board board {embot::prot::can::Board::none};
+        embot::prot::can::versionOfBOOTLOADER version {0, 0};
+        embot::prot::can::Address adr {1};
+        const char * definfo32 {nullptr};
+        
+        bootloaderInfo() = default;
+        constexpr bootloaderInfo(embot::prot::can::Board b, const embot::prot::can::versionOfBOOTLOADER &v, embot::prot::can::Address a, const char *i) 
+            : board(b), version(v), adr(a), definfo32(i) {}             
+    };
+    
+    
+    struct applicationInfo
+    {
+        embot::prot::can::versionOfAPPLICATION version {0, 0, 0};
+        embot::prot::can::versionOfCANPROTOCOL protocol {0, 0};
+
+        applicationInfo() = default;
+        constexpr applicationInfo(const embot::prot::can::versionOfAPPLICATION &v, const embot::prot::can::versionOfCANPROTOCOL &p) 
+            : version(v), protocol(p) {}             
     };    
     
     
@@ -287,7 +325,7 @@ namespace embot { namespace prot { namespace can { namespace analog {
         posDES() : type(posTYPE::angleDeciDeg), startlabel(posLABEL::zero), labelsnumberof(2) {} 
         void reset() { type = posTYPE::angleDeciDeg; startlabel = posLABEL::zero; labelsnumberof = 2; }
         bool isvalid() const { if(((type == posTYPE::angleDeciDeg) || (type == posTYPE::linearDeciMilliMeter)) && (labelsnumberof>0)) { return true; } else { return false; } }        
-        };  // it must be stored in 16 bits: 8 bits for type, 4 bits for startlabel, 4 bits for labelsnumberof
+    };  // it must be stored in 16 bits: 8 bits for type, 4 bits for startlabel, 4 bits for labelsnumberof
     
     using deciDeg = std::int16_t;
     using deciMilliMeter = std::int16_t; // +/- 32k ~= +/- 3200 mm = +/- 3.2 m

@@ -22,6 +22,7 @@
 #define _EMBOT_OS_H_
 
 #include "embot_core.h"
+#include "embot_hw.h"
 #include "embot_os_common.h"
 #include "embot_os_Thread.h"
 
@@ -36,11 +37,16 @@ namespace embot { namespace os {
         embot::os::InitThread::Config initconfig {};
         embot::os::IdleThread::Config idleconfig {};
         embot::core::Callback onOSerror {};
+        embot::hw::FLASHpartitionID codepartition { embot::hw::FLASHpartitionID::none };
             
         constexpr Config() = default;
             
-        constexpr Config(embot::core::Time _t, const embot::os::InitThread::Config &ini, const embot::os::IdleThread::Config &idl, const embot::core::Callback &err) 
-           : tick(_t), initconfig(ini), idleconfig(idl), onOSerror(err) {}            
+        constexpr Config(embot::core::Time _t, 
+                         const embot::os::InitThread::Config &ini, 
+                         const embot::os::IdleThread::Config &idl, 
+                         const embot::core::Callback &err,
+                         embot::hw::FLASHpartitionID co = embot::hw::FLASHpartitionID::none) 
+                            : tick(_t), initconfig(ini), idleconfig(idl), onOSerror(err), codepartition(co) {}            
         
         bool isvalid() const { if((0 == tick) || (false == initconfig.isvalid()) || (false == idleconfig.isvalid())) { return false; } else { return true; } }        
     }; 

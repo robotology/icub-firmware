@@ -223,7 +223,8 @@ namespace embot { namespace hw { namespace flash {
          
     struct Bank
     {   // this struct implements an abstract interface to the Bank
-        enum class ID : uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 }; 
+        
+        using ID = embot::hw::FLASHbankID;
         
         Bank::ID id {Bank::ID::none};
         ADDR address {InvalidADDR};        
@@ -302,12 +303,7 @@ namespace embot { namespace hw { namespace flash {
     struct Partition
     {   // it can have an ID so that we can easily retrieve its handle from the BSP. we can easily add IDs w/ any value
         
-        enum class ID : uint8_t {
-            generic = 0,                                                                // generic use. it may be inside BSP or not.
-            bootloader = 1, application = 2, sharedstorage = 3, applicationstorage = 4, // used for BSP of CAN-based boards
-            eloader = 5, eupdater = 6, eapplication00 = 7, eapplication01 = 8,          // used for BSP of ETH-based boards
-            buffer00 = 9, buffer01 = 10, buffer02 = 11, buffer03 = 12, buffer04 = 13,   // others
-            none = 31, maxnumberof = 14 };   
+        using ID = embot::hw::FLASHpartitionID;
         
         Partition::ID id {Partition::ID::none};
         const Bank *owner {nullptr};
