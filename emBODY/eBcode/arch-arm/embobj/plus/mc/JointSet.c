@@ -1318,6 +1318,44 @@ static void JointSet_do_off(JointSet* o)
         Motor_set_pwm_ref(o->motor+m, 0);
         Motor_set_vel_ref(o->motor+m, 0);
     }
+    
+#ifdef WRIST_MK2
+    // be sure to continue to report the encoder readings
+    o->wrist_decoupler.rtU.theta_meas[0] = ICUB2DEG*(o->joint[0]).pos_fbk + o->arm_pos_off[0];
+    o->wrist_decoupler.rtU.theta_meas[1] = ICUB2DEG*(o->joint[1]).pos_fbk + o->arm_pos_off[1];
+    o->wrist_decoupler.rtU.theta_meas[2] = ICUB2DEG*(o->joint[2]).pos_fbk + o->arm_pos_off[2];
+    
+    o->wrist_decoupler.step();
+    
+    if (o->wrist_decoupler.rtY.singularity)
+    {
+        if (!o->is_parking)
+        {
+            JointSet_start_park(o);
+        }
+    }
+    
+    // update joint positions (from the yarpmotorgui they still appear as yaw, pitch and roll)
+    o->ypr_pos_fbk[0] = postfactor*DEG2ICUB*(o->wrist_decoupler.rtY.ypr_meas[0]);
+    o->ypr_pos_fbk[1] = DEG2ICUB*(o->wrist_decoupler.rtY.ypr_meas[1]);    
+    o->ypr_pos_fbk[2] = postfactor*DEG2ICUB*(o->wrist_decoupler.rtY.ypr_meas[2]);
+    
+    // be sure that when we go in RUN again the joint does not move from it current position
+    CTRL_UNITS arm_pos_ref[3];
+    
+    arm_pos_ref[0] = DEG2ICUB*wrap180(o->wrist_decoupler.rtY.theta_star[0] - o->arm_pos_off[0]);
+    arm_pos_ref[1] = DEG2ICUB*wrap180(o->wrist_decoupler.rtY.theta_star[1] - o->arm_pos_off[1]);
+    arm_pos_ref[2] = DEG2ICUB*wrap180(o->wrist_decoupler.rtY.theta_star[2] - o->arm_pos_off[2]);
+    
+    for (int js=0; js<N; ++js)
+    {
+        Joint *pJoint = o->joint+o->joints_of_set[js];
+        if (!o->is_parking)
+        {
+            Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
+        }
+    }
+#endif // WRIST_MK2
 }
 
 static void JointSet_do_vel_control(JointSet* o)
