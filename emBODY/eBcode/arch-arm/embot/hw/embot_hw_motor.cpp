@@ -76,8 +76,26 @@ namespace embot { namespace hw { namespace motor {
 
     bool supported(MOTOR h) { return false; }
     bool initialised(MOTOR h) { return false; }
-    result_t init(MOTOR h, const Config &config) { return resNOK; }    
-
+    bool enabled(MOTOR h) { return false; }    
+    bool faulted(MOTOR h) { return false; }    
+    result_t fault(MOTOR h, bool on) { return resNOK; }    
+    result_t config(
+        MOTOR h,         
+        uint8_t  has_quad_enc,
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset) { return resNOK; }    
+    result_t enable(MOTOR h, bool on) { return resNOK; }    
+    result_t getencoder(MOTOR h, Position &position) { return resNOK; }   
+    result_t gethallcounter(MOTOR h, Position &position)  { return resNOK; }    
+    result_t gethallstatus(MOTOR h, HallStatus &hs)  { return resNOK; }     
+    result_t setpwm(MOTOR h, Pwm v) { return resNOK; }      
+    result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w) { return resNOK; }       
+    result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner) { return resNOK; }   
+    result_t init(MOTOR h, const Config &config) { return resNOK; }   
+    
 }}} // namespace embot { namespace hw { namespace MOTOR {
 
 
@@ -377,9 +395,44 @@ namespace embot { namespace hw { namespace motor {
 // in here is the part for low level hw of the amcbldc
     
 #if !defined(STM32HAL_BOARD_AMCBLDC)
+    
+    #if defined(STM32HAL_BOARD_AMC2C)
+    
+    #warning TODO: fill in embot::hw::motor the calls to motorhal2 ... maybe move into the bsp.
+    // and also clean up a lot of this styff in here
+    
+    #endif
+    
     result_t s_hw_init(MOTOR h)
     {
         return resNOK; 
+    }
+    
+    result_t s_hw_motorEnable(MOTOR h)
+    {
+        return resNOK;
+    }
+    
+    result_t s_hw_motorDisable(MOTOR h)
+    {
+        return resNOK;
+    }   
+
+    result_t s_hw_configure(  
+        MOTOR h,
+        uint8_t has_quad_enc,
+        int16_t  enc_resolution, 
+        uint8_t  pwm_num_polar_couples, 
+        uint8_t  pwm_has_hall_sens,
+        uint8_t  pwm_swapBC,
+        uint16_t pwm_hall_offset)
+    { 
+        return resNOK;
+    }        
+    
+    result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
+    {
+        return resNOK;
     }
 
 #else

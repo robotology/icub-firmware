@@ -17,8 +17,14 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(STM32HAL_BOARD_AMC2C)
+#include "embot_hw_bsp_amc2c.h"
+using namespace embot::hw::bsp::amc2c;
+#warning READ CAREFULLY: we may use the same object for both amcbldc and amc2c
+#else
 #include "embot_hw_bsp_amcbldc.h"
-
+using namespace embot::hw::bsp::amcbldc;
+#endif
 
 #include "embot_hw_button.h"
 #include "embot_hw_motor.h"
@@ -31,9 +37,6 @@
 // some protocol includes
 #include "embot_prot_can_motor_polling.h"
 #include "embot_prot_can_motor_periodic.h"
-
-// hal components
-#include "motorhal_config.h"
 
 // mdb components
 #include "AMC_BLDC.h"
@@ -297,7 +300,7 @@ bool embot::app::board::amcbldc::theMBD::Impl::initialise(const Config &config)
     prevEXTFAULTisPRESSED = EXTFAULTisPRESSED = embot::hw::button::pressed(buttonEXTfault);
 #elif defined(EXTFAULT_enabled_polling)
 
-    buttonEXTfault = embot::hw::bsp::amcbldc::EXTFAULTbutton();
+    buttonEXTfault = EXTFAULTbutton();
     
     faultvalues.reserve(faultcapacity);
     faultvalues.clear();
