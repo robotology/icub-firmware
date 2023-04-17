@@ -31,20 +31,29 @@
 // - in the actual drivers embot::gpio, embot::can, embo::i2c etc.
 
 #include "embot_core.h"
+#include "embot_hw_types.h"
+
 
 namespace embot { namespace hw {
     
     struct Config
     {         
         embot::core::fpWorker initmicrotime {nullptr};  
-        embot::core::fpGetU64 get1microtime {nullptr};         
+        embot::core::fpGetU64 get1microtime {nullptr}; 
+        embot::hw::FLASHpartitionID codepartition { embot::hw::FLASHpartitionID::none };       
         
         constexpr Config() = default;
-        constexpr Config(embot::core::fpWorker _init, embot::core::fpGetU64 _tmicro) : initmicrotime(_init), get1microtime(_tmicro) {}
+        constexpr Config(embot::core::fpWorker _init, embot::core::fpGetU64 _tmicro, 
+                         embot::hw::FLASHpartitionID _id = embot::hw::FLASHpartitionID::none) 
+            : initmicrotime(_init), get1microtime(_tmicro), codepartition(_id) {}
         bool isvalid() const { if(nullptr != get1microtime) { return true; } else { return false; } }
     }; 
             
     bool initialised();
+    
+    // to be called before init() in case ... config.codepartition does not contain the proper value
+    // and the vector table is to be relocated
+    void setvectortablelocation(embot::hw::FLASHpartitionID id);
     
     // it calls the proper initialisations for the hw layer and links its to embot::core
     // after this call you can use the hw drivers

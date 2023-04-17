@@ -64,7 +64,7 @@ namespace embot::app::skeleton::os::basic {
     class CFG
     {
     public:
-        const SYSTEM *sys;
+        const SYSTEM *sys {nullptr};
         
         CFG() = delete;
         constexpr CFG(const SYSTEM *s) : sys(s) {}

@@ -13,7 +13,6 @@
 
 #include "embot_core.h"
 #include "embot_core_binary.h"
-#include "embot_hw.h"
 
 
 namespace embot { namespace hw {
@@ -42,10 +41,16 @@ namespace embot { namespace hw {
             
     enum class CAN : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2};
             
-//    enum class FLASH : std::uint8_t {   whole = 0, 
-//                                        bootloader = 1, application = 2, sharedstorage = 3, applicationstorage = 4, // for use by can boards
-//                                        eloader = 1, eupdater = 2, eapplication00 = 3, eapplication01 = 4,          // for use by eth boards
-//                                        none = 31, maxnumberof = 5 };
+    enum class FLASHbankID : uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 }; 
+
+    
+    enum class FLASHpartitionID : uint8_t {
+        generic = 0,                                                                // generic use. it may be inside BSP or not.
+        bootloader = 1, application = 2, sharedstorage = 3, applicationstorage = 4, // used for BSP of CAN-based boards
+        eloader = 5, eupdater = 6, eapplication00 = 7, eapplication01 = 8,          // used for BSP of ETH-based boards
+        buffer00 = 9, buffer01 = 10, buffer02 = 11, buffer03 = 12, buffer04 = 13,   // others
+        none = 31, maxnumberof = 14 };   
+    
     
     enum class BTN : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 31, maxnumberof = 8 };
     

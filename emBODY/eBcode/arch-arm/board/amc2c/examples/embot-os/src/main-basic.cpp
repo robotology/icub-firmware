@@ -163,7 +163,11 @@ int main(void)
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
     constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
-    constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
+    constexpr embot::os::Config osconfig 
+    {
+        embot::core::time1millisec, initcfg, idlecfg, onOSerror, 
+        embot::hw::FLASHpartitionID::eapplication01
+    };
     
     // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
     embot::os::init(osconfig);
