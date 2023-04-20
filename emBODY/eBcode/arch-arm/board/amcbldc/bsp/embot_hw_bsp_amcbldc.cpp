@@ -691,24 +691,20 @@ namespace embot { namespace hw { namespace tlv493d {
 
 #if !defined(EMBOT_ENABLE_hw_motor)
 
-namespace embot { namespace hw { namespace motor {
+namespace embot::hw::motor::bsp {
     
-    constexpr BSP thebsp { };
+    constexpr BSP thebsp {};
     void BSP::init(embot::hw::MOTOR h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
+    const BSP& getBSP() { return thebsp; }
     
-}}}
+}
 
 #else
 
-namespace embot { namespace hw { namespace motor {
+namespace embot::hw::motor::bsp {
            
 #if defined(STM32HAL_BOARD_AMCBLDC)
-    
-    
+        
     constexpr PROP propM1  { 0 };
     
     constexpr BSP thebsp {     
@@ -753,7 +749,7 @@ namespace embot { namespace hw { namespace motor {
         return thebsp;
     }
               
-}}} // namespace embot { namespace hw { namespace motor {
+} //namespace embot::hw::motor::bsp {
 
 #endif // motor
 

@@ -724,6 +724,26 @@
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_bsp_amc2c.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_can_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_flash_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_timer_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_motor_bsp_amc2c.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -827,7 +847,39 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others::motorhal2 TO BE FILLED</GroupName>
+          <GroupName>others::motorhal</GroupName>
+          <Files>
+            <File>
+              <FileName>motorhal.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\motorhal.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motorhal_config.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\motorhal_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>adcm.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\adcm.c</FilePath>
+            </File>
+            <File>
+              <FileName>enc.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\enc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hall.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\hall.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\pwm.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>mbd</GroupName>
@@ -1320,7 +1372,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC2C STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\amcbldc\application\src\model-based-design\sharedutils;..\..\..\amcbldc\application\src\model-based-design\can-decoder;..\..\..\amcbldc\application\src\model-based-design\can-encoder;..\..\..\amcbldc\application\src\model-based-design\supervisor-rx;..\..\..\amcbldc\application\src\model-based-design\supervisor-tx;..\..\..\amcbldc\application\src\model-based-design\control-outer;..\..\..\amcbldc\application\src\model-based-design\control-foc;..\..\..\amcbldc\application\src\model-based-design\estimator;..\..\..\amcbldc\application\src\model-based-design\amc-bldc;..\..\..\amcbldc\application\src\model-based-design\filter-current;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include</IncludePath>
+              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\amcbldc\application\src\model-based-design\sharedutils;..\..\..\amcbldc\application\src\model-based-design\can-decoder;..\..\..\amcbldc\application\src\model-based-design\can-encoder;..\..\..\amcbldc\application\src\model-based-design\supervisor-rx;..\..\..\amcbldc\application\src\model-based-design\supervisor-tx;..\..\..\amcbldc\application\src\model-based-design\control-outer;..\..\..\amcbldc\application\src\model-based-design\control-foc;..\..\..\amcbldc\application\src\model-based-design\estimator;..\..\..\amcbldc\application\src\model-based-design\amc-bldc;..\..\..\amcbldc\application\src\model-based-design\filter-current;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1703,6 +1755,77 @@
               <FileName>embot_hw_bsp_amc2c.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_bsp_amc2c.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>2</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>1</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_can_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_flash_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_timer_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_motor_bsp_amc2c.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1807,7 +1930,39 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others::motorhal2 TO BE FILLED</GroupName>
+          <GroupName>others::motorhal</GroupName>
+          <Files>
+            <File>
+              <FileName>motorhal.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\motorhal.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motorhal_config.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\motorhal_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>adcm.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\adcm.c</FilePath>
+            </File>
+            <File>
+              <FileName>enc.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\enc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hall.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\hall.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\motorhal\pwm.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>mbd</GroupName>

@@ -1617,6 +1617,7 @@ void manageInterrupt(embot::hw::TIMER t, TIM_HandleTypeDef *htim)
 
 
 extern "C" {
+    
     void TIM8_UP_TIM13_IRQHandler(void)
     {
         //#warning TODO: cambiare il modo in cui si chiama la callback. usare le callback di stm32
