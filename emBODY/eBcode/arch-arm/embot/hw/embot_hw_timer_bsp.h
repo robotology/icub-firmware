@@ -7,8 +7,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_HW_TIMER_BSP_H_
-#define _EMBOT_HW_TIMER_BSP_H_
+#ifndef __EMBOT_HW_TIMER_BSP_H_
+#define __EMBOT_HW_TIMER_BSP_H_
 
 
 #include "embot_core.h"

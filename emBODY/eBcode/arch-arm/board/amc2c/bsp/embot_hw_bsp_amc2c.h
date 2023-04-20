@@ -13,19 +13,20 @@
 #include "embot_core.h"
 #include "embot_hw_types.h"
 
-namespace embot { namespace hw { namespace bsp { namespace amc2c {
+namespace embot::hw::bsp::amc2c {
     
     // adds in here constants or functions specific to the board
-    // orange led
+
     constexpr embot::hw::LED blinkLED {embot::hw::LED::one};
-    constexpr embot::hw::LED can2LED {embot::hw::LED::one};
+    constexpr embot::hw::LED can2LED {embot::hw::LED::two};
     
     // led
     constexpr embot::hw::LED redLED {embot::hw::LED::two};
     
     embot::hw::BTN EXTFAULTbutton();
+    embot::hw::LED EXTFAULTled();
     
-}}}}
+}
 
 #endif  // include-guard
 

@@ -52,7 +52,9 @@ namespace embot { namespace hw { namespace motor {
     bool enabled(MOTOR h);  
     
     result_t fault(MOTOR h, bool on);
-    result_t init(embot::hw::MOTOR h, const Config &config);   
+    
+    result_t init(embot::hw::MOTOR h, const Config &config); 
+    
     result_t config(MOTOR h,
         uint8_t  has_quad_enc,
         int16_t  enc_resolution, 
@@ -60,11 +62,11 @@ namespace embot { namespace hw { namespace motor {
         uint8_t  pwm_has_hall_sens,
         uint8_t  pwm_swapBC,
         uint16_t pwm_hall_offset);
+    
     // enable(h, true) is effective only if(false == faulted(h))    
     result_t enable(MOTOR h, bool on);
     
     // the pwm can be effectively applied only if(true == enabled(h)), so it also must be: (false == faulted(h))
-    result_t setpwm(MOTOR h, Pwm v); // deprecated
     result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w);
     
     // values of encoders and hall sensors can be read if(true == initialised(h))

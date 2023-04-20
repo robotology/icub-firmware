@@ -17,7 +17,7 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_motor.h"
 
-namespace embot { namespace hw { namespace motor {
+namespace embot::hw::motor::bsp { 
     
     struct PROP
     { 
@@ -38,7 +38,7 @@ namespace embot { namespace hw { namespace motor {
     const BSP& getBSP();
                                      
         
-}}} // namespace embot { namespace hw { namespace motor { 
+} // namespace embot::hw::motor::bsp { 
 
 
 

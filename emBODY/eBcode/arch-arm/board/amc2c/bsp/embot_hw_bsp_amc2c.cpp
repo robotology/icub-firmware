@@ -46,7 +46,6 @@ using namespace embot::core::binary;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
 // - support map: begin of embot::hw::gpio
 
 #include "embot_hw_gpio_bsp.h"
@@ -55,22 +54,17 @@ using namespace embot::core::binary;
 
 #error CAVEAT: embot::hw requires GPIO. pls enable it!
 
-namespace embot { namespace hw { namespace gpio {
+namespace embot::hw::gpio {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::GPIO h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
+    const BSP& getBSP() { return thebsp; }    
+}
 
 #else
     
-namespace embot { namespace hw { namespace gpio {
+namespace embot::hw::gpio {
  
-    #if defined(STM32HAL_BOARD_AMC2C)
     static const BSP thebsp {        
         // supportmask2d
         {{
@@ -87,10 +81,7 @@ namespace embot { namespace hw { namespace gpio {
             [](){__HAL_RCC_GPIOJ_CLK_ENABLE();}, [](){__HAL_RCC_GPIOK_CLK_ENABLE();}
         }}
     };      
-    #else
-        #error embot::hw::gpio::thebsp must be defined
-    #endif
-    
+
     
     void BSP::init(embot::hw::GPIO h) const {}        
         
@@ -99,12 +90,11 @@ namespace embot { namespace hw { namespace gpio {
         return thebsp;
     }
               
-}}} // namespace embot { namespace hw { namespace gpio {
+} // namespace embot::hw::gpio {
 
 #endif // gpio
 
 // - support map: end of embot::hw::gpio
-
 
 
 // - support map: begin of embot::hw::led
@@ -113,23 +103,17 @@ namespace embot { namespace hw { namespace gpio {
 
 #if !defined(EMBOT_ENABLE_hw_led)
 
-namespace embot { namespace hw { namespace led {
+namespace embot::hw::led {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::LED h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
+    const BSP& getBSP() { return thebsp; }
     
-}}}
+}
 
 #else
 
-namespace embot { namespace hw { namespace led {         
-    
-    #if   defined(STM32HAL_BOARD_AMC2C)
-       
+namespace embot::hw::led {     
     
 //    constexpr PROP led1pcan1 = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::thirteen}  };  
     constexpr PROP led2pcan2 = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::fifteen}  };  
@@ -164,16 +148,12 @@ namespace embot { namespace hw { namespace led {
         embot::hw::gpio::configure(g, embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::low);                        
     } 
 
-    #else
-        #error embot::hw::led::thebsp must be defined    
-    #endif
-    
     const BSP& getBSP() 
     {
         return thebsp;
     }
               
-}}} // namespace embot { namespace hw {  namespace led {
+} // namespace embot::hw::led {
 
 #endif // led
 
@@ -189,34 +169,26 @@ namespace embot { namespace hw { namespace led {
 
 #if !defined(EMBOT_ENABLE_hw_button)
 
-namespace embot { namespace hw { namespace button {
+namespace embot::hw::button {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::BTN h) const {}
     void BSP::onEXTI(const embot::hw::gpio::PROP &p) const {}
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
+    const BSP& getBSP() { return thebsp; }
     
-}}}
+}
 
 #else
-    
-#warning support for hw_button in embot::hw::bsp is yet to be done
 
-namespace embot { namespace hw { namespace button {
+namespace embot::hw::button {
     
-    #if   defined(STM32HAL_BOARD_AMC2C)
-        
-    // this button is the blue one on the board
-    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}, 
+    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::fifteen}, 
                              .pull = embot::hw::gpio::Pull::nopull, .irqn = EXTI15_10_IRQn  };  
  
         
     constexpr BSP thebsp {        
         // maskofsupported
-        0, //mask::pos2mask<uint32_t>(BTN::one),        
+        mask::pos2mask<uint32_t>(BTN::one),        
         // properties
         {{
             &btn1p, nullptr, nullptr            
@@ -228,46 +200,43 @@ namespace embot { namespace hw { namespace button {
     
     void BSP::onEXTI(const embot::hw::gpio::PROP &p) const
     {
-//        const embot::hw::GPIO gpio = embot::hw::gpio::getBSP().getGPIO(p);
-//        switch(gpio.pin)
-//        {
-//            case embot::hw::GPIO::PIN::thirteen:
-//            {
-//                embot::hw::button::onexti(BTN::one);
-//            } break;
-//            
+        const embot::hw::GPIO gpio = embot::hw::gpio::getBSP().getGPIO(p);
+        switch(gpio.pin)
+        {
+            case  embot::hw::GPIO::PIN::fifteen:
+            {
+                embot::hw::button::onexti(BTN::one);
+            } break;
+            
 
-//            default:
-//            {
-//            } break;           
-//        }              
+            default:
+            {
+            } break;           
+        }              
     }
     
     // we put in here the IRQHandlers + the exti callback
 
     extern "C" {
             
-//        void EXTI15_10_IRQHandler(void)
-//        {
-//            HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
-//        }
-//        
-//        void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-//        {
-//             embot::hw::button::getBSP().onEXTI({nullptr, GPIO_Pin, nullptr});            
-//        }        
+        void EXTI15_10_IRQHandler(void)
+        {
+            HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
+        }
+        
+        void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+        {
+             embot::hw::button::getBSP().onEXTI({nullptr, GPIO_Pin, nullptr});            
+        }        
     }
         
-    #else
-        #error embot::hw::bsp::button::thebsp must be defined    
-    #endif
     
     const BSP& getBSP() 
     {
         return thebsp;
     }
     
-}}}
+} // namespace embot::hw::button {
 
 #endif // button
 
@@ -275,917 +244,46 @@ namespace embot { namespace hw { namespace button {
 
 
 
-// - support map: begin of embot::hw::can
-
-#include "embot_hw_can_bsp.h"
-
-#if   !defined(EMBOT_ENABLE_hw_can)
-
-namespace embot { namespace hw { namespace can {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::CAN h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-    
-
-namespace embot { namespace hw { namespace can {
-               
-#if   defined(STM32HAL_BOARD_AMC2C)
-    
-    
-    // it has HAL_FDCAN_MODULE_ENABLED    
-//    FDCAN_HandleTypeDef hfdcan1 {};
-    FDCAN_HandleTypeDef hfdcan2 {};    
-    
-//    constexpr PROP can1p = { .handle = &hfdcan1 }; 
-    constexpr PROP can2p = { .handle = &hfdcan2 };    
-        
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(CAN::two),        
-        // properties
-        {{
-            nullptr, &can2p           
-        }}        
-    };
-    
-    
-//    void s_FDCAN1_Init(void)
-//    {
-//        hfdcan1.Instance = FDCAN1;
-//        hfdcan1.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
-//        hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
-//        hfdcan1.Init.AutoRetransmission = ENABLE;
-//        hfdcan1.Init.TransmitPause = ENABLE;
-//        hfdcan1.Init.ProtocolException = DISABLE;
-//        hfdcan1.Init.NominalPrescaler = 1;
-//        hfdcan1.Init.NominalSyncJumpWidth = 20;
-//        hfdcan1.Init.NominalTimeSeg1 = 79;
-//        hfdcan1.Init.NominalTimeSeg2 = 20;
-//        hfdcan1.Init.DataPrescaler = 1;
-//        hfdcan1.Init.DataSyncJumpWidth = 8;
-//        hfdcan1.Init.DataTimeSeg1 = 11;
-//        hfdcan1.Init.DataTimeSeg2 = 8;
-//        hfdcan1.Init.MessageRAMOffset = 0;
-//        hfdcan1.Init.StdFiltersNbr = 1;
-//        hfdcan1.Init.ExtFiltersNbr = 1;
-//        hfdcan1.Init.RxFifo0ElmtsNbr = 1;
-//        hfdcan1.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
-//        hfdcan1.Init.RxFifo1ElmtsNbr = 0;
-//        hfdcan1.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
-//        hfdcan1.Init.RxBuffersNbr = 1;
-//        hfdcan1.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
-//        hfdcan1.Init.TxEventsNbr = 0;
-//        hfdcan1.Init.TxBuffersNbr = 1;
-//        hfdcan1.Init.TxFifoQueueElmtsNbr = 1;
-//        hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
-//        hfdcan1.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
-//        if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
-//        {
-//            Error_Handler();
-//        }
-//    }
-    
-    void s_FDCAN2_Init(void)
-    {
-        hfdcan2.Instance = FDCAN2;
-        hfdcan2.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
-        hfdcan2.Init.Mode = FDCAN_MODE_NORMAL;
-        hfdcan2.Init.AutoRetransmission = ENABLE;
-        hfdcan2.Init.TransmitPause = ENABLE;
-        hfdcan2.Init.ProtocolException = DISABLE;
-        hfdcan2.Init.NominalPrescaler = 1;
-        hfdcan2.Init.NominalSyncJumpWidth = 20;
-        hfdcan2.Init.NominalTimeSeg1 = 79;
-        hfdcan2.Init.NominalTimeSeg2 = 20;
-        hfdcan2.Init.DataPrescaler = 1;
-        hfdcan2.Init.DataSyncJumpWidth = 8;
-        hfdcan2.Init.DataTimeSeg1 = 11;
-        hfdcan2.Init.DataTimeSeg2 = 8;
-        hfdcan2.Init.MessageRAMOffset = 1280;
-        hfdcan2.Init.StdFiltersNbr = 1;
-        hfdcan2.Init.ExtFiltersNbr = 1;
-        hfdcan2.Init.RxFifo0ElmtsNbr = 1;
-        hfdcan2.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
-        hfdcan2.Init.RxFifo1ElmtsNbr = 0;
-        hfdcan2.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
-        hfdcan2.Init.RxBuffersNbr = 1;
-        hfdcan2.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
-        hfdcan2.Init.TxEventsNbr = 0;
-        hfdcan2.Init.TxBuffersNbr = 1;
-        hfdcan2.Init.TxFifoQueueElmtsNbr = 1;
-        hfdcan2.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
-        hfdcan2.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
-        if (HAL_FDCAN_Init(&hfdcan2) != HAL_OK)
-        {
-            Error_Handler();
-        }
-    }    
-    
-    // actions:
-    // 1. Activate the external driver out of STANDBY
-    // can1: HAL_GPIO_WritePin(CAN1_STBY_GPIO_Port, CAN1_STBY_Pin, GPIO_PIN_RESET); 
-    // can2: HAL_GPIO_WritePin(CAN2_STBY_GPIO_Port, CAN2_STBY_Pin, GPIO_PIN_RESET);    
-    // 2. Activate both driver out of SHUTDOWN mode 
-    // can1-can2: HAL_GPIO_WritePin(CAN_SHDN_GPIO_Port, CAN_SHDN_Pin, GPIO_PIN_RESET);
-    // HAL_Delay(10); 
-    void hwdriver_init(embot::hw::CAN h)
-    {
-        constexpr std::array<embot::hw::GPIO, 2> candrivergpiosstandby = { {
-            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::four},     // CAN1_STBY_GPIO_Port, CAN1_STBY_Pin
-            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::five}      // CAN2_STBY_GPIO_Port, CAN2_STBY_Pin
-        } }; 
-
-        constexpr embot::hw::GPIO candrivergpioshutdown = 
-            {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::zero};     // CAN_SHDN_GPIO_Port, CAN_SHDN_Pin, GPIO_PIN_RESET    
-        
-        constexpr embot::hw::gpio::Config cfg {
-            embot::hw::gpio::Mode::OUTPUTpushpull, 
-            embot::hw::gpio::Pull::nopull, 
-            embot::hw::gpio::Speed::medium };
-        
-        //static bool initted {false};
-        
-        // init the pins
-        embot::hw::gpio::init(candrivergpiosstandby[embot::core::tointegral(h)], cfg);
-        embot::hw::gpio::init(candrivergpioshutdown, cfg);
-        
-        // move them to reset state
-        embot::hw::gpio::set(candrivergpiosstandby[embot::core::tointegral(h)], embot::hw::gpio::State::RESET);
-        embot::hw::gpio::set(candrivergpioshutdown, embot::hw::gpio::State::RESET);
-        HAL_Delay(10);
-    }
-    
-    void BSP::init(embot::hw::CAN h) const 
-    {
-        if(h == CAN::one)
-        {            
- //           s_FDCAN1_Init();
-            return;
-        }
-        else if(h == CAN::two)
-        {
-            s_FDCAN2_Init();
-        }
-        
-        hwdriver_init(h);
-    }
-        
-    #else
-        #error embot::hw::can::thebsp must be defined    
-    #endif
-    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-              
-}}} // namespace embot { namespace hw { namespace can {
-    
-
-#if defined(HAL_FDCAN_MODULE_ENABLED)
-
-#if defined(STM32HAL_BOARD_AMC2C)
-
-extern "C"
-{
-    // the irq handlers
-    
-//    void FDCAN1_IT0_IRQHandler(void)
-//    {
-//        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan1);
-//    } 
-
-    void FDCAN2_IT0_IRQHandler(void)
-    {
-        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan2);
-    } 
-            
-//    void FDCAN1_IT1_IRQHandler(void)
-//    {
-//        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan1);
-//    }          
-
-    void FDCAN2_IT1_IRQHandler(void)
-    {
-        HAL_FDCAN_IRQHandler(&embot::hw::can::hfdcan2);
-    } 
-
-    // the msp init / deinit
-
-    constexpr uint16_t vCAN1_TXD_Pin {GPIO_PIN_1};
-    GPIO_TypeDef *vCAN1_TXD_GPIO_Port {GPIOD};    
-    constexpr uint16_t vCAN2_TXD_Pin {GPIO_PIN_6};
-    GPIO_TypeDef *vCAN2_TXD_GPIO_Port {GPIOB};
-    constexpr uint16_t vCAN1_RXD_Pin {GPIO_PIN_14};
-    GPIO_TypeDef *vCAN1_RXD_GPIO_Port {GPIOH};
-    constexpr uint16_t vCAN2_RXD_Pin {GPIO_PIN_5};
-    GPIO_TypeDef *vCAN2_RXD_GPIO_Port {GPIOB};
-    
-    static uint32_t HAL_RCC_FDCAN_CLK_ENABLED=0;
-
-    void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
-    {
-        GPIO_InitTypeDef GPIO_InitStruct = {0};
-        RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-        if(fdcanHandle->Instance==FDCAN1)
-        {
-            /* USER CODE BEGIN FDCAN1_MspInit 0 */
-
-            /* USER CODE END FDCAN1_MspInit 0 */
-            /** Initializes the peripherals clock
-            */
-            PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
-            PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
-            if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-            {
-                Error_Handler();
-            }
-
-            /* FDCAN1 clock enable */
-            HAL_RCC_FDCAN_CLK_ENABLED++;
-            if(HAL_RCC_FDCAN_CLK_ENABLED==1){
-                __HAL_RCC_FDCAN_CLK_ENABLE();
-            }
-
-            __HAL_RCC_GPIOD_CLK_ENABLE();
-            __HAL_RCC_GPIOH_CLK_ENABLE();
-            /**FDCAN1 GPIO Configuration
-            PD1     ------> FDCAN1_TX
-            PH14     ------> FDCAN1_RX
-            */
-            GPIO_InitStruct.Pin = vCAN1_TXD_Pin;
-            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-            GPIO_InitStruct.Pull = GPIO_NOPULL;
-            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-            GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
-            HAL_GPIO_Init(vCAN1_TXD_GPIO_Port, &GPIO_InitStruct);
-
-            GPIO_InitStruct.Pin = vCAN1_RXD_Pin;
-            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-            GPIO_InitStruct.Pull = GPIO_NOPULL;
-            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-            GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
-            HAL_GPIO_Init(vCAN1_RXD_GPIO_Port, &GPIO_InitStruct);
-
-            /* FDCAN1 interrupt Init */
-            HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 0, 0);
-            HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
-            HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 0, 0);
-            HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
-            /* USER CODE BEGIN FDCAN1_MspInit 1 */
-
-            /* USER CODE END FDCAN1_MspInit 1 */
-        }
-        else if(fdcanHandle->Instance==FDCAN2)
-        {
-            /* USER CODE BEGIN FDCAN2_MspInit 0 */
-
-            /* USER CODE END FDCAN2_MspInit 0 */
-
-            /** Initializes the peripherals clock
-            */
-            PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
-            PeriphClkInitStruct.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
-            if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-            {
-                Error_Handler();
-            }
-
-            /* FDCAN2 clock enable */
-            HAL_RCC_FDCAN_CLK_ENABLED++;
-            if(HAL_RCC_FDCAN_CLK_ENABLED==1){
-                __HAL_RCC_FDCAN_CLK_ENABLE();
-            }
-
-            __HAL_RCC_GPIOB_CLK_ENABLE();
-            /**FDCAN2 GPIO Configuration
-            PB6     ------> FDCAN2_TX
-            PB5     ------> FDCAN2_RX
-            */
-            GPIO_InitStruct.Pin = vCAN2_TXD_Pin | vCAN2_RXD_Pin;
-            GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-            GPIO_InitStruct.Pull = GPIO_NOPULL;
-            GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-            GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN2;
-            HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-            /* FDCAN2 interrupt Init */
-            HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, 0, 0);
-            HAL_NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
-            HAL_NVIC_SetPriority(FDCAN2_IT1_IRQn, 0, 0);
-            HAL_NVIC_EnableIRQ(FDCAN2_IT1_IRQn);
-            /* USER CODE BEGIN FDCAN2_MspInit 1 */
-
-            /* USER CODE END FDCAN2_MspInit 1 */
-        }
-    }
-
-    void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* fdcanHandle)
-    {
-
-        if(fdcanHandle->Instance==FDCAN1)
-        {
-            /* USER CODE BEGIN FDCAN1_MspDeInit 0 */
-
-            /* USER CODE END FDCAN1_MspDeInit 0 */
-            /* Peripheral clock disable */
-            HAL_RCC_FDCAN_CLK_ENABLED--;
-            if(HAL_RCC_FDCAN_CLK_ENABLED==0){
-              __HAL_RCC_FDCAN_CLK_DISABLE();
-            }
-
-            /**FDCAN1 GPIO Configuration
-            PD1     ------> FDCAN1_TX
-            PH14     ------> FDCAN1_RX
-            */
-            HAL_GPIO_DeInit(vCAN1_TXD_GPIO_Port, vCAN1_TXD_Pin);
-
-            HAL_GPIO_DeInit(vCAN1_RXD_GPIO_Port, vCAN1_RXD_Pin);
-
-            /* FDCAN1 interrupt Deinit */
-            HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
-            HAL_NVIC_DisableIRQ(FDCAN1_IT1_IRQn);
-            /* USER CODE BEGIN FDCAN1_MspDeInit 1 */
-
-            /* USER CODE END FDCAN1_MspDeInit 1 */
-        }
-        else if(fdcanHandle->Instance==FDCAN2)
-        {
-            /* USER CODE BEGIN FDCAN2_MspDeInit 0 */
-
-            /* USER CODE END FDCAN2_MspDeInit 0 */
-            /* Peripheral clock disable */
-            HAL_RCC_FDCAN_CLK_ENABLED--;
-            if(HAL_RCC_FDCAN_CLK_ENABLED==0){
-              __HAL_RCC_FDCAN_CLK_DISABLE();
-            }
-
-            /**FDCAN2 GPIO Configuration
-            PB6     ------> FDCAN2_TX
-            PB5     ------> FDCAN2_RX
-            */
-            HAL_GPIO_DeInit(GPIOB, vCAN2_TXD_Pin | vCAN2_RXD_Pin);
-
-            /* FDCAN2 interrupt Deinit */
-            HAL_NVIC_DisableIRQ(FDCAN2_IT0_IRQn);
-            HAL_NVIC_DisableIRQ(FDCAN2_IT1_IRQn);
-            /* USER CODE BEGIN FDCAN2_MspDeInit 1 */
-
-            /* USER CODE END FDCAN2_MspDeInit 1 */
-        }    
-    }    
-  
-}
-
-#else
-    #error add the handler
-#endif        
-
-#endif //
-        
-#endif // EMBOT_ENABLE_hw_can
-
-
-// - support map: end of embot::hw::can
-
-
-
-// - support map: begin of embot::hw::flash
-
-#include "embot_hw_flash_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_flash)
-
-namespace embot { namespace hw { namespace flash {
-    
-    constexpr BSP thebsp { };
-    void BSP::init() const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-    
-namespace embot { namespace hw { namespace flash { namespace bsp {
-     
-#if   defined(STM32HAL_BOARD_AMC2C)
-    
-    constexpr uint8_t numbanks {2};
-    constexpr uint32_t banksize {1024*1024};
-    constexpr uint32_t pagesize {128*1024};
-    constexpr BankDescriptor bank01 { Bank::ID::one, 0x08000000, banksize, pagesize };
-    constexpr BankDescriptor bank02 { Bank::ID::two, 0x08100000, banksize, pagesize };
-    constexpr theBanks thebanks 
-    {
-        numbanks, 
-        { &bank01, &bank02 }
-    }; 
-    
-    // on Bank::one
-    constexpr Partition ldr {Partition::ID::eloader,        &bank01,    bank01.address,         128*1024}; 
-    constexpr Partition upd {Partition::ID::eupdater,       &bank01,    ldr.address+ldr.size,   256*1024};
-    constexpr Partition a00 {Partition::ID::eapplication00, &bank01,    upd.address+upd.size,   512*1024};  
-    constexpr Partition b00 {Partition::ID::buffer00,       &bank01,    a00.address+a00.size,   128*1024};
-    
-    // on Bank::two
-    constexpr Partition a01 {Partition::ID::eapplication01, &bank02,    bank02.address,         512*1024};     
-    constexpr Partition b01 {Partition::ID::buffer01,       &bank02,    a01.address+a01.size,   512*1024};
-    
-    constexpr thePartitions thepartitions
-    {
-        { &ldr, &upd, &a00, &b00, &a01, &b01 }
-    };
-
-    constexpr BSP thebsp {        
-        thebanks,
-        thepartitions
-    };   
-            
-#else
-    #error embot::hw::flash::thebsp must be defined    
-#endif   
-     
-    
-    void BSP::init() const {}
-    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-              
-}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
-
-#endif // flash
-
-// - support map: end of embot::hw::flash
-
-
-// - support map: begin of embot::hw::eeprom
-
-#include "embot_hw_eeprom.h"
-#include "embot_hw_eeprom_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_eeprom)
-
-namespace embot { namespace hw { namespace eeprom {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::EEPROM h) const {}
-    void BSP::deinit(embot::hw::EEPROM h) const {}
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-
-namespace embot { namespace hw { namespace eeprom {
-    
-    #if defined(STM32HAL_BOARD_AMC2C)
-          
-    
-    #else
-        #error embot::hw::bsp::eeprom::thebsp must be defined    
-    #endif
-    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#endif // eeprom
-
-// - support map: end of embot::hw::eeprom
-
-
-// - support map: begin of embot::hw::encoder
-
-#include "embot_hw_encoder.h"
-#include "embot_hw_encoder_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_encoder)
-
-namespace embot { namespace hw { namespace encoder {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::ENCODER h) const {}
-    void BSP::deinit(embot::hw::ENCODER h) const {}
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-
-namespace embot { namespace hw { namespace encoder {
-    
-    #if defined(STM32HAL_BOARD_AMC2C)
-    
-    #else
-        #error embot::hw::bsp::encoder::thebsp must be defined    
-    #endif
-    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#endif // encoder
-
-// - support map: end of embot::hw::encoder
-
-
-// - support map: begin of embot::hw::spi
-
-#include "embot_hw_spi.h"
-#include "embot_hw_spi_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_spi)
-
-namespace embot { namespace hw { namespace spi { namespace bsp {
-    
-    constexpr BSP thebsp { };
-    bool BSP::init(embot::hw::SPI h, const Config &config) const { return true;}
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}}
-
-#else
-
-namespace embot { namespace hw { namespace spi { namespace bsp {
-    
-    #if defined(STM32HAL_BOARD_AMC2C)
-    
-    
-    #else
-        #error embot::hw::bsp::spi::thebsp must be defined    
-    #endif
-    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}}
-
-
-
-#endif // spi
-
-// - support map: end of embot::hw::spi
-
-
-
-// - support map: begin of embot::hw::timer
-
-#include "embot_hw_timer_bsp.h"
-
-#if   !defined(HAL_TIM_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_timer)
-
-namespace embot { namespace hw { namespace timer {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::TIMER h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#elif defined(EMBOT_ENABLE_hw_timer_emulated)
-
-namespace embot { namespace hw { namespace timer {
-    
-    #if defined(STM32HAL_BOARD_AMC2C)    
-
-#error DO it
-    
-    constexpr PROP tim01p = { };
-    constexpr PROP tim02p = { };
-    constexpr PROP tim03p = { };
-    constexpr PROP tim04p = { };  
-    constexpr PROP tim05p = { };
-    constexpr PROP tim06p = { };  
-    
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(TIMER::one) | mask::pos2mask<uint32_t>(TIMER::two) | 
-        mask::pos2mask<uint32_t>(TIMER::three) | mask::pos2mask<uint32_t>(TIMER::four) |
-        mask::pos2mask<uint32_t>(TIMER::four) | mask::pos2mask<uint32_t>(TIMER::five),        
-        // properties
-        {{
-            &tim01p, &tim02p, &tim03p, &tim04p, &tim05p, &tim06p, nullptr, nullptr,     // from 1 to 8
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16             
-        }}        
-    };
-    
-    void BSP::init(embot::hw::TIMER h) const {}
-    
-    #else
-        #error embot::hw::timer::thebsp must be defined    
-    #endif
-        
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }    
-}}}
-
-#else
-
-namespace embot { namespace hw { namespace timer {
-    #if   defined(STM32HAL_BOARD_AMC2C) 
-    // sadly we cannot use constexpr because of the reinterpret_cast<> inside TIM6 etc.
-    TIM_HandleTypeDef htim13;
-    static const PROP tim13p = { .TIMx = TIM13,  .handle = &htim13,  .clock = embot::hw::CLOCK::none, .speed = 200 * 1000000, .isonepulse = false, .mastermode = true };
-        
-    TIM_HandleTypeDef htim15;
-    static const PROP tim15p = { .TIMx = TIM15,  .handle = &htim15,  .clock = embot::hw::CLOCK::none, .speed = 200 * 1000000, .isonepulse = false, .mastermode = true };
-        
-    TIM_HandleTypeDef htim16;
-    static const PROP tim16p = { .TIMx = TIM16,  .handle = &htim16,  .clock = embot::hw::CLOCK::none, .speed = 200 * 1000000, .isonepulse = false, .mastermode = true };
-        
-    constexpr BSP thebsp {        
-        // maskofsupported
-        mask::pos2mask<uint32_t>(TIMER::one) | mask::pos2mask<uint32_t>(TIMER::two) | mask::pos2mask<uint32_t>(TIMER::three),        
-        // properties
-        {{
-            &tim13p, &tim15p, &tim16p, nullptr, nullptr, nullptr, nullptr, nullptr,     // from 1 to 8
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16            
-        }}        
-    };
-    
-    void BSP::init(embot::hw::TIMER h) const {}    
-    #else
-        #error embot::hw::timer::thebsp must be defined    
-    #endif
-        
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }    
-}}}
-
-// in here it is implemented in the way the good old hal2 was doing: the handler directly manages the callback
-// instead the stm hal make a lot of calls before actually calling the callback code, hence it is slower.
-
-#include "embot_hw_timer.h"
-
-void manageInterrupt(embot::hw::TIMER t, TIM_HandleTypeDef *htim)
-{
-    if(__HAL_TIM_GET_FLAG(htim, TIM_FLAG_UPDATE) != RESET)
-    {
-        if(__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_UPDATE) !=RESET)
-        {
-            __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);
-            embot::hw::timer::execute(t);
-        }
-    }   
-} 
-
-
-extern "C" {
-    void TIM8_UP_TIM13_IRQHandler(void)
-    {
-        #warning TODO: cambiare il modo in cui si chiama la callback. usare le callback di stm32
-        manageInterrupt(embot::hw::TIMER::one, &embot::hw::timer::htim13);
-    }
-    
-    void TIM15_IRQHandler(void)
-    {
-        manageInterrupt(embot::hw::TIMER::two, &embot::hw::timer::htim15);
-    }
-    
-    void TIM16_IRQHandler(void)
-    {
-        manageInterrupt(embot::hw::TIMER::three, &embot::hw::timer::htim16);
-    }
-}
-
-
-extern "C"
-{
-    void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
-    {
-      if(tim_baseHandle->Instance==TIM13)
-      {
-      /* USER CODE BEGIN TIM13_MspInit 0 */
-
-      /* USER CODE END TIM13_MspInit 0 */
-        /* TIM13 clock enable */
-        __HAL_RCC_TIM13_CLK_ENABLE();
-
-        /* TIM13 interrupt Init */
-        HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
-      /* USER CODE BEGIN TIM13_MspInit 1 */
-
-      /* USER CODE END TIM13_MspInit 1 */
-      }
-      else if(tim_baseHandle->Instance==TIM15)
-      {
-      /* USER CODE BEGIN TIM15_MspInit 0 */
-
-      /* USER CODE END TIM15_MspInit 0 */
-        /* TIM15 clock enable */
-        __HAL_RCC_TIM15_CLK_ENABLE();
-
-        /* TIM15 interrupt Init */
-        HAL_NVIC_SetPriority(TIM15_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(TIM15_IRQn);
-      /* USER CODE BEGIN TIM15_MspInit 1 */
-
-      /* USER CODE END TIM15_MspInit 1 */
-      }
-      else if(tim_baseHandle->Instance==TIM16)
-      {
-      /* USER CODE BEGIN TIM16_MspInit 0 */
-
-      /* USER CODE END TIM16_MspInit 0 */
-        /* TIM15 clock enable */
-        __HAL_RCC_TIM16_CLK_ENABLE();
-
-        /* TIM16 interrupt Init */
-        HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(TIM16_IRQn);
-      /* USER CODE BEGIN TIM15_MspInit 1 */
-
-      /* USER CODE END TIM15_MspInit 1 */
-      }
-    }
-
-    void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
-    {
-
-      if(tim_baseHandle->Instance==TIM13)
-      {
-      /* USER CODE BEGIN TIM13_MspDeInit 0 */
-
-      /* USER CODE END TIM13_MspDeInit 0 */
-        /* Peripheral clock disable */
-        __HAL_RCC_TIM13_CLK_DISABLE();
-
-        /* TIM13 interrupt Deinit */
-        HAL_NVIC_DisableIRQ(TIM8_UP_TIM13_IRQn);
-      /* USER CODE BEGIN TIM13_MspDeInit 1 */
-
-      /* USER CODE END TIM13_MspDeInit 1 */
-      }
-      else if(tim_baseHandle->Instance==TIM15)
-      {
-      /* USER CODE BEGIN TIM15_MspDeInit 0 */
-
-      /* USER CODE END TIM15_MspDeInit 0 */
-        /* Peripheral clock disable */
-        __HAL_RCC_TIM15_CLK_DISABLE();
-
-        /* TIM15 interrupt Deinit */
-        HAL_NVIC_DisableIRQ(TIM15_IRQn);
-      /* USER CODE BEGIN TIM15_MspDeInit 1 */
-
-      /* USER CODE END TIM15_MspDeInit 1 */
-      }
-      else if(tim_baseHandle->Instance==TIM16)
-      {
-      /* USER CODE BEGIN TIM16_MspDeInit 0 */
-
-      /* USER CODE END TIM16_MspDeInit 0 */
-        /* Peripheral clock disable */
-        __HAL_RCC_TIM16_CLK_DISABLE();
-
-        /* TIM16 interrupt Deinit */
-        HAL_NVIC_DisableIRQ(TIM16_IRQn);
-      /* USER CODE BEGIN TIM16_MspDeInit 1 */
-
-      /* USER CODE END TIM16_MspDeInit 1 */
-      }
-    }
-}
-
-#endif // timer
-
-
-// - support map: end of embot::hw::timer
-
-
-// - support map: begin of embot::hw::motor
-
-#include "embot_hw_motor_bsp.h"
-
-#if !defined(EMBOT_ENABLE_hw_motor)
-
-namespace embot { namespace hw { namespace motor {
-    
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::MOTOR h) const {}    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-    
-}}}
-
-#else
-
-namespace embot { namespace hw { namespace motor {
-           
-#if defined(STM32HAL_BOARD_AMC2C)
-    
-    
-    constexpr PROP propM1  { 0 };
-    
-    constexpr BSP thebsp {     
-
-        // maskofsupported
-        mask::pos2mask<uint32_t>(MOTOR::one),        
-        // properties
-        {{
-            &propM1
-        }}
-  
-    };
-    
-    void BSP::init(embot::hw::MOTOR h) const {
-        
-#if 1
-    #warning fill the BSP of motor
-#else        
-    // step 1: what cube mx does
-        MX_ADC1_Init();
-        MX_ADC2_Init();
-        
-        MX_TIM1_Init();
-        MX_TIM3_Init();
-        MX_TIM2_Init();
-        MX_CORDIC_Init();
-        MX_FMAC_Init();
-        MX_CRC_Init();   
-#if defined(STM32HAL_DRIVER_V120)
-#else
-        MX_TIM15_Init(); 
-#endif        
-        
-        
-        HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
-        HAL_Delay(10); 
-#endif
-
-    }
-        
-    #else
-        #error embot::hw::motor::thebsp must be defined    
-    #endif
-    
-    const BSP& getBSP() 
-    {
-        return thebsp;
-    }
-              
-}}} // namespace embot { namespace hw { namespace motor {
-
-#endif // motor
-
-// - support map: end of embot::hw::motor
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - board specific methods
 // --------------------------------------------------------------------------------------------------------------------
 
+extern "C" {
+      
+    void HAL_MspInit(void)
+    {
+        __HAL_RCC_SYSCFG_CLK_ENABLE();
+
+        /** Enable the VREF clock
+        */
+        __HAL_RCC_VREF_CLK_ENABLE();
+        /** Disable the Internal Voltage Reference buffer
+        */
+        HAL_SYSCFG_DisableVREFBUF();
+        /** Configure the internal voltage reference buffer high impedance mode
+        */
+        HAL_SYSCFG_VREFBUF_HighImpedanceConfig(SYSCFG_VREFBUF_HIGH_IMPEDANCE_ENABLE);            
+    }
+}
+
 #include "embot_hw_bsp_amc2c.h"
 
-namespace embot { namespace hw { namespace bsp { namespace amc2c {
+namespace embot::hw::bsp::amc2c {
     
     embot::hw::BTN EXTFAULTbutton()
     {
-        #warning amc2c is to be refined
-        return embot::hw::BTN::none;
+        return embot::hw::BTN::one;
     }
     
-}}}}
+    embot::hw::LED EXTFAULTled() 
+    {
+        return embot::hw::LED::two;
+    }
+    
+    // we have the input pins (PG5, PG6, PG7) which tells the hw version of the board
+    // VER0_Pin, VER1_Pin, VER2_Pin
+    
+}
 
 
 
@@ -1198,52 +296,59 @@ namespace embot { namespace hw { namespace bsp { namespace amc2c {
 bool embot::hw::bsp::specialize() { return true; }
 #else   
 
-    #if   defined(STM32HAL_BOARD_AMC2C)
-    
 
-    void waitHWmutex(uint32_t mtx)  __attribute__ ((section (".ram_func")));
-    void waitHWmutex(uint32_t mtx)
+void waitHWmutex(uint32_t mtx)  __attribute__ ((section (".ram_func")));
+void waitHWmutex(uint32_t mtx)
+{
+    volatile uint32_t m = mtx;
+    for(;;)
     {
-        volatile uint32_t m = mtx;
-        for(;;)
+        if(HAL_OK == HAL_HSEM_FastTake(m))
         {
-            if(HAL_OK == HAL_HSEM_FastTake(m))
-            {
-                break;
-            }
-        }        
-    }
-    
-    
-    bool embot::hw::bsp::specialize()
+            break;
+        }
+    }        
+}
+
+#if 0
+void leds_init_off()
+{
+    using namespace embot::hw;
+    const led::BSP &b = led::getBSP();
+    constexpr std::array<LED, embot::core::tointegral(LED::maxnumberof)> leds {LED::one, LED::two, LED::three, LED::four, LED::five, LED::six, LED::seven , LED::eight};
+    for(const auto &l : leds)
     {
-        
-        waitHWmutex(0);
+        const led::PROP *p = b.getPROP(l);
+        if(nullptr != p)
+        {
+            gpio::init(p->gpio, {gpio::Mode::OUTPUTpushpull, gpio::Pull::nopull, gpio::Speed::veryhigh});  
+            gpio::set(p->gpio, p->on);
+            gpio::set(p->gpio, p->off);
+        }
+    }    
+}
+#endif
+
+
+
+bool embot::hw::bsp::specialize()
+{
+    // very important: it waits for the unlock called by the application of amc core cm7
+    waitHWmutex(0);
     
-//        static volatile bool ok = false;
+    // all the rest ...
+    
+//    MX_RESMGR_UTILITY_Init();
+    
+#if 0    
+    leds_init_off();
+#endif
+
+    #warning TODO: verificare che le priorita' delle IRQ del motor control possano essere impostate anche dopo la partenza del rtos
+    return true;
+}
 
 
-//        for(;;)
-//        {    
-//            if(HAL_OK == HAL_HSEM_FastTake(0))
-//            {
-//                ok = true;                
-//                break;
-//            }
-//            else
-//            {
-//                ok = false;
-//            }
-//        }   
-//        ok = ok;   
-        
-        return true;
-    }
-
-   
-    #else
-        #error embot::hw::bsp::specialize() must be defined    
-    #endif  
 #endif  //EMBOT_ENABLE_hw_bsp_specialize
 
 

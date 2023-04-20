@@ -18,18 +18,68 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_hw_timer.h"
+
+#include "motorhal.h"
+
+#include "embot_hw_motor.h"
 
 namespace embot::app::board::amc2c::mbd {
+    
+//    void hei(void *p)
+//    {
+//        static volatile uint64_t prev {0};
+//        static volatile uint64_t delta {0};
+//        volatile uint64_t no = embot::core::now();
+//        delta = no - prev;
+//        prev = no;        
+//    }    
+//     embot::core::Callback cc {hei, nullptr};
 
     void Startup(embot::prot::can::Address adr)
     {
-        embot::core::print("MBD is starting up on an amc2c");
-        embot::app::board::amc2c::theMBD::getInstance().initialise({adr});
+        embot::hw::motor::init(embot::hw::MOTOR::one, {});
+//        embot::app::board::amc2c::theMBD::getInstance().initialise({adr});
+        
+//        embot::hw::timer::Config cfg{embot::core::time1millisec, embot::hw::timer::Mode::periodic, cc};
+//        embot::hw::timer::init(embot::hw::TIMER::one, cfg);
+//        embot::hw::timer::start(embot::hw::TIMER::one);  
+        
+        
     }
     
     void OnTick(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output)
     {
-        embot::app::board::amc2c::theMBD::getInstance().tick(input, output);
+        
+        size_t numRXframes = input.size();
+        
+        if(numRXframes > 0)
+        {
+            embot::prot::can::Frame f = input[0];
+            
+            switch(f.id)
+            {
+                case 0x001:
+                {
+                    // test 1
+                    PwmPhaseSet(1, 2, 3);
+                } break;
+                
+                case 0x002:
+                {
+                    // test 2
+                } break;    
+
+                default:
+                {
+                } break;
+            }
+        } 
+
+        
+//        embot::app::board::amc2c::theMBD::getInstance().tick(input, output);
+        
+        
 //        static uint32_t cnt {0};
 //        if(0 == (cnt++ % 1))
 //        {
