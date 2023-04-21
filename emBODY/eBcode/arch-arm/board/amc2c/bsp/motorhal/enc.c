@@ -262,5 +262,46 @@ void EncTest(void)
 
 #endif // #if defined(MOTORHALCONFIG_DONTUSE_TESTS)
 
+
+#if defined(MOTORHAL_changes) 
+
+
+HAL_StatusTypeDef enc_Config(uint8_t has_quad_enc, int16_t resolution, uint8_t num_polar_couples, uint8_t has_hall_sens)
+{
+    #warning TODO....
+    return HAL_OK;
+}
+
+
+int32_t enc_GetElectricalAngle(void)
+{   
+    #warning TODO: review the values etc
+    // in here ther is how it is for the amcbldc
+//    if (MainConf.encoder.resolution == 0)
+//    {
+//        return s_encoder_ForcedValue;
+//    }
+//    
+//    if (MainConf.encoder.has_hall_sens)
+//    {
+//        if (!s_encoder_Calibrated)
+//        {
+//            return s_encoder_ForcedValue;
+//        }
+//    }
+//    
+//    return s_encoder_electricalOffset + (__HAL_TIM_GET_COUNTER(&htim2) * encoderConvFactor) & 0xFFFF;
+    
+    int32_t v = __HAL_TIM_GetCounter(&ENC_TIM);
+    
+    int32_t s_encoder_electricalOffset = 0;
+    int32_t encoderConvFactor = 1;
+    
+    return s_encoder_electricalOffset + (v * encoderConvFactor) & 0xFFFF;  
+}
+
+#endif // #if defined(MOTORHAL_changes) 
+
+
 /* END OF FILE ********************************************************************************************************/
 

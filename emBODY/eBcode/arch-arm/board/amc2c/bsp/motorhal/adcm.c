@@ -58,6 +58,24 @@ extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 #endif
 
+#if defined(MOTORHAL_changes)
+
+// --------------------------------------------------------------------------------------------------------------------
+// add in here all the new types, variables, static function prototypes required by MOTORHAL
+// --------------------------------------------------------------------------------------------------------------------
+
+static void s_adcm_dummy_adc_callback(void *owner, const adcm_Currents_t * const currents) {}
+static adcm_Currents_t s_adcm_dummy_currents = {0};
+    
+static volatile adcm_ADC_callback_t s_adcm_ADC_cbk = 
+{
+    .callback = s_adcm_dummy_adc_callback,
+    .owner = NULL
+};
+
+#endif // #if defined(MOTORHAL_changes)
+
+
 /* Private typedefs ***************************************************************************************************/
 
 /* Structure to hold the ADC1/ADC2 DMA data */
@@ -112,6 +130,13 @@ static void adcMotGetSamples(const DualModeAdcData_t *pBuf)
 #else    
 /*DEBUG*/HAL_GPIO_WritePin(TP4_GPIO_Port, TP4_Pin, GPIO_PIN_RESET);
 #endif
+    
+    static adcm_Currents_t currents = {0};
+    // as soon as possible: copy the currents (must be converted from raw as i1, i2, i3 come from ADC)
+    currents.u = adcm_ConvertCurrent(adcMotCurrents[0]); 
+    currents.v = adcm_ConvertCurrent(adcMotCurrents[1]);
+    currents.w = adcm_ConvertCurrent(adcMotCurrents[2]);
+    s_adcm_ADC_cbk.callback(s_adcm_ADC_cbk.owner, &currents); 
 }
 
 /* Callback functions *************************************************************************************************/
@@ -242,6 +267,33 @@ void AdcMotDeInit(void)
     HAL_ADC_UnRegisterCallback(&hadc1, HAL_ADC_CONVERSION_HALF_CB_ID);
     HAL_ADC_UnRegisterCallback(&hadc1, HAL_ADC_ERROR_CB_ID);
 }
+
+
+
+#if defined(MOTORHAL_changes)
+
+// --------------------------------------------------------------------------------------------------------------------
+// add in here all the new functions required by MOTORHAL
+// --------------------------------------------------------------------------------------------------------------------
+
+
+
+extern void adcm_set_ADC_callback(adcm_ADC_callback_t *cbk)
+{
+    if(NULL != cbk)
+    {
+        s_adcm_ADC_cbk.callback = (NULL != cbk->callback) ? cbk->callback : s_adcm_dummy_adc_callback;
+        s_adcm_ADC_cbk.owner = cbk->owner;     
+    }
+}
+
+extern int32_t adcm_ConvertCurrent(int32_t raw)
+{
+//	return CIN_GAIN * vref_mV * raw >> 16u;
+    return raw;
+}
+
+#endif // #if defined(MOTORHAL_changes)
 
 
 /* END OF FILE ********************************************************************************************************/

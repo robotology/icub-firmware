@@ -35,10 +35,17 @@
 
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
+
 extern HAL_StatusTypeDef HallInit(void);
 extern void HallDeInit(void);
 extern void HallTest(void);
 
+#if defined(MOTORHAL_changes)
+
+extern HAL_StatusTypeDef hall_Config(uint8_t swapBC, uint16_t pwm_hall_offset);
+extern uint8_t hall_GetStatus(void);
+
+#endif
 
 #ifdef __cplusplus
     } /* extern "C" */

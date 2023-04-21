@@ -33,21 +33,6 @@
 #endif
 
 
-#if defined(EMBOT_ENABLE_hw_motor_emulatedMODE)
-
-#warning EMBOT_ENABLE_hw_motor_emulatedMODE is defined, the hw driver of the motor will ... 
-
-//#include "embot_os_theCallbackManager.h"
-//#include "embot_os_Timer.h"
-
-namespace embot { namespace hw { namespace motor {
-
-// we place in here what we need to simulate the motor
-
-}}}
-
-#endif
-
 using namespace embot::hw;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -89,12 +74,13 @@ namespace embot { namespace hw { namespace motor {
         uint16_t pwm_hall_offset) { return resNOK; }    
     result_t enable(MOTOR h, bool on) { return resNOK; }    
     result_t getencoder(MOTOR h, Position &position) { return resNOK; }   
-    result_t gethallcounter(MOTOR h, Position &position)  { return resNOK; }    
+    //result_t gethallcounter(MOTOR h, Position &position)  { return resNOK; }    
     result_t gethallstatus(MOTOR h, HallStatus &hs)  { return resNOK; }     
     result_t setpwm(MOTOR h, Pwm v) { return resNOK; }      
     result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w) { return resNOK; }       
     result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner) { return resNOK; }   
-    result_t init(MOTOR h, const Config &config) { return resNOK; }   
+    result_t init(MOTOR h, const Config &config) { return resNOK; } 
+    result_t configure(embot::hw::MOTOR h, const Config &config) { return resNOK; }     
     
 }}} // namespace embot { namespace hw { namespace MOTOR {
 
@@ -157,16 +143,9 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_init(MOTOR h);
     result_t s_hw_deinit(MOTOR h);
-    result_t s_hw_configure(
-        MOTOR h,
-        uint8_t has_quad_enc,
-        int16_t  enc_resolution, 
-        uint8_t  pwm_num_polar_couples, 
-        uint8_t  pwm_has_hall_sens,
-        uint8_t  pwm_swapBC,
-        uint16_t pwm_hall_offset);
+    result_t s_hw_configure(MOTOR h, const Config &cfg);
     Position s_hw_getencoder(MOTOR h);
-    Position s_hw_gethallcounter(MOTOR h);    
+    // Position s_hw_gethallcounter(MOTOR h);    
     
     
     HallStatus s_hw_gethallstatus(MOTOR h);
@@ -174,6 +153,112 @@ namespace embot { namespace hw { namespace motor {
     result_t s_hw_motorEnable(MOTOR h);
     result_t s_hw_motorDisable(MOTOR h);
     result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner);
+    
+   
+    
+    result_t init(MOTOR h, const Config &cfg)
+    {
+        if(false == supported(h))
+        {
+            return resNOK;
+        }
+        
+        if(true == initialised(h))
+        {
+            s_hw_deinit(h);
+        }
+                
+        uint8_t index = embot::core::tointegral(h);
+                        
+        // prepare the hw environment. something such as prepare GPIOs, TIMs, ADC, link them together, etc.
+        embot::hw::motor::bsp::getBSP().init(h);                           
+        
+        // load config etc
+        s_privatedata.config[index] = cfg;
+      
+        // init the hw. something such as start the TIMs, the ADCs, etc
+        if(resOK != s_hw_init(h)) 
+        {
+            return resNOK;
+        } 
+        
+        // placed in here so that we can call configure()
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(h));
+        
+        // make sure that the ... way we use the HW peripherals is with the correct parameters
+        if(true == cfg.isvalid())
+        {   // ok i know there is a double check vs validity of cfg
+            configure(h, cfg);
+        }            
+                        
+        return resOK;
+    }
+  
+    
+    result_t configure(MOTOR h, const Config&cfg)
+    {
+        if(false == initialised(h))
+        {
+            return resNOK;
+        }
+        
+        if(false == cfg.isvalid())
+        {
+            return resNOK;
+        }
+        
+        s_privatedata.config[embot::core::tointegral(h)] = cfg;            
+        return s_hw_configure(h, cfg);
+    }     
+ 
+    
+    result_t config(MOTOR h, bool  has_quad_enc, int16_t  enc_resolution, 
+                    uint8_t  pwm_num_polar_couples, bool  pwm_has_hall_sens,
+                    bool  pwm_swapBC, uint16_t pwm_hall_offset)
+    {
+        if(false == initialised(h))
+        {
+            return resNOK;
+        }
+        
+        Config cfg { enc_resolution, pwm_num_polar_couples, pwm_hall_offset,
+                     has_quad_enc, pwm_has_hall_sens, pwm_swapBC };  
+        return configure(h, cfg);
+    }    
+   
+    
+    result_t enable(MOTOR h, bool on)
+    {
+        // we must be at least initialised ...
+        if(false == initialised(h))
+        {
+            return resNOK;
+        }
+        
+        // if we are faulted we cannot enable, so i force on to false    
+        if(true == faulted(h))
+        {
+            on = false;
+        }
+        
+        result_t r = resNOK;
+        
+        if(true == on)
+        { 
+            embot::core::binary::bit::set(enabledmask, embot::core::tointegral(h));
+            s_hw_setpwmUVW(h, 0, 0, 0);
+            r = s_hw_motorEnable(h);
+        }
+        else
+        {
+            embot::core::binary::bit::clear(enabledmask, embot::core::tointegral(h));
+            s_hw_setpwmUVW(h, 0, 0, 0);
+            r = s_hw_motorDisable(h);            
+        }   
+        
+        return r;                       
+    }    
+
     
     result_t fault(MOTOR h, bool on)
     {        
@@ -201,95 +286,18 @@ namespace embot { namespace hw { namespace motor {
         }
         
         return resNOK;
-    }    
-    
-    result_t config(
-        MOTOR h,         
-        uint8_t  has_quad_enc,
-        int16_t  enc_resolution, 
-        uint8_t  pwm_num_polar_couples, 
-        uint8_t  pwm_has_hall_sens,
-        uint8_t  pwm_swapBC,
-        uint16_t pwm_hall_offset)
-    {
-        return s_hw_configure(h,
-            has_quad_enc,
-            enc_resolution, 
-            pwm_num_polar_couples, 
-            pwm_has_hall_sens,
-            pwm_swapBC,
-            pwm_hall_offset);
-    }
-    
-    result_t init(MOTOR h, const Config &config)
-    {
-        if(false == supported(h))
-        {
-            return resNOK;
-        }
-        
-        if(true == initialised(h))
-        {
-            s_hw_deinit(h);
-            //return resOK;
-        }
-                
-        std::uint8_t index = embot::core::tointegral(h);
-                       
-#if !defined(EMBOT_ENABLE_hw_motor_emulatedMODE)        
-        // init peripheral
-        embot::hw::motor::bsp::getBSP().init(h);  // marker1                            
-        // else
-#endif 
-        
-        // load config etc
-        s_privatedata.config[index] = config;
+    } 
+  
 
-#if !defined(EMBOT_ENABLE_hw_motor_emulatedMODE)          
-        // proper init
-        if(resOK != s_hw_init(h)) // marker2
+    result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w)
+    {        
+        if(false == enabled(h))
         {
             return resNOK;
-        }            
-#else
-        // we emulate the ...
-//        emulatedMODE_timers4callback[embot::core::tointegral(h)] = new embot::os::Timer;  
-#endif
-
-        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(h));                
-        return resOK;
+        }
+        
+        return s_hw_setpwmUVW(h, u, v, w);
     }
-   
-    result_t enable(MOTOR h, bool on)
-    {
-        // we must be at least initialised ...
-        if(false == initialised(h))
-        {
-            return resNOK;
-        }
-        
-        // if we are faulted we cannot enable, so i force on to false    
-        if(true == faulted(h))
-        {
-            on = false;
-        }
-        
-        result_t r = resNOK;
-        if(true == on)
-        { 
-            embot::core::binary::bit::set(enabledmask, embot::core::tointegral(h));
-            s_hw_setpwmUVW(h, 0, 0, 0);
-            r = s_hw_motorEnable(h);
-        }
-        else
-        {
-            embot::core::binary::bit::clear(enabledmask, embot::core::tointegral(h));
-            s_hw_setpwmUVW(h, 0, 0, 0);
-            r = s_hw_motorDisable(h);            
-        }   
-        
-        return r;                       
-    }    
 
     
     result_t getencoder(MOTOR h, Position &position)
@@ -305,17 +313,18 @@ namespace embot { namespace hw { namespace motor {
     }
     
     
-    result_t gethallcounter(MOTOR h, Position &position)
-    {
-        if(false == initialised(h))
-        {
-            return resNOK;
-        } 
-        
-        position = s_hw_gethallcounter(h);
-        
-        return resOK;               
-    }
+//    result_t gethallcounter(MOTOR h, Position &position)
+//    {
+//        if(false == initialised(h))
+//        {
+//            return resNOK;
+//        } 
+//        
+//        position = s_hw_gethallcounter(h);
+//        
+//        return resOK;               
+//    }
+    
     
     result_t gethallstatus(MOTOR h, HallStatus &hs)
     {
@@ -328,29 +337,18 @@ namespace embot { namespace hw { namespace motor {
         
         return resOK;               
     }
- 
-    
-    result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w)
-    {        
-        if(false == enabled(h))
-        {
-            return resNOK;
-        }
-        
-        return s_hw_setpwmUVW(h, u, v, w);
-    }
+
        
     result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
     {
         return s_hw_setCallbackOnCurrents(h, callback, owner);
     }
     
-// in here is the part for low level hw of the amcbldc
+    
+// in here is the part for low level hw of the boards (amc2c or amcbldc)
     
 #if defined(STM32HAL_BOARD_AMC2C)
-    
-    #warning TODO: fill in embot::hw::motor the calls to motorhal2 ... maybe move into the bsp.
-    // and also clean up a lot of this styff in here
+
 
 //    #include "motorhal_config.h"
     
@@ -375,6 +373,21 @@ namespace embot { namespace hw { namespace motor {
         
         return resOK;
     }    
+ 
+    result_t s_hw_configure(MOTOR h, const Config &cfg)
+    { 
+        result_t res {resNOK};
+        
+        if(HAL_OK == enc_Config(cfg.has_quad_enc, cfg.enc_resolution, cfg.pwm_num_polar_couples, cfg.pwm_has_hall_sens))
+        {
+            if(HAL_OK == hall_Config(cfg.pwm_swapBC, cfg.pwm_hall_offset))
+            {
+                res = resOK;
+            }               
+        }
+      
+        return res; 
+    }  
     
     result_t s_hw_motorEnable(MOTOR h)
     {
@@ -386,46 +399,23 @@ namespace embot { namespace hw { namespace motor {
     {
         PwmPhaseEnable(PWM_PHASE_NONE);
         return resOK;
-    }   
-
-    result_t s_hw_configure(  
-        MOTOR h,
-        uint8_t has_quad_enc,
-        int16_t  enc_resolution, 
-        uint8_t  pwm_num_polar_couples, 
-        uint8_t  pwm_has_hall_sens,
-        uint8_t  pwm_swapBC,
-        uint16_t pwm_hall_offset)
-    { 
-        result_t res = resNOK;
-        
-        
-        #warning TODO-embot::hw::motor: .... runtime configuration of encoder and hall
-//        if (HAL_OK != encoder_Config(has_quad_enc, enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
-//        if (HAL_OK != pwm_hallConfig(pwm_swapBC, pwm_hall_offset)) res = resNOK;
-      
-        return res; 
-    }   
+    }    
 
     Position s_hw_getencoder(MOTOR h)
     {
-        #warning TODO-embot::hw::motor: .... get encoder
-        return 0;
-//        return encoderGetElectricalAngle();
+        return enc_GetElectricalAngle();
     }
 
-    Position s_hw_gethallcounter(MOTOR h)
-    {
-        #warning TODO-embot::hw::motor: .... get hall
-        return 0;        
-//        return hallGetCounter();
-    }
+//    Position s_hw_gethallcounter(MOTOR h)
+//    {
+//        #warning TODO-embot::hw::motor: .... get hall
+//        return 0;        
+////        return hallGetCounter();
+//    }
         
     HallStatus s_hw_gethallstatus(MOTOR h)
-    {
-        #warning TODO-embot::hw::motor: .... get hall status
-        return 0;        
-//        return hallGetStatus();
+    {       
+        return hall_GetStatus();
     }
 
     
@@ -442,11 +432,10 @@ namespace embot { namespace hw { namespace motor {
             return resNOK;
         }      
         
-        #warning TODO-embot::hw::motor: .... callback on currents
-//        pwm_ADC_callback_t cbk {};
-//        cbk.callback = reinterpret_cast<pwm_fp_adc_callback_t>(callback);
-//        cbk.owner = owner;
-//        pwm_set_ADC_callback(&cbk);
+        adcm_ADC_callback_t cbk {};
+        cbk.callback = reinterpret_cast<adcm_fp_adc_callback_t>(callback);
+        cbk.owner = owner;
+        adcm_set_ADC_callback(&cbk);
         return resOK;   
     }
 
@@ -475,7 +464,7 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_deinit(MOTOR h)
     {
-//        pwm_Deinit();
+        // pwm_Deinit(); ?? marco.accame: why is it commented out? 
         analog_Deinit();
         encoder_Deinit();
         pwm_hallDeinit();
@@ -483,23 +472,15 @@ namespace embot { namespace hw { namespace motor {
         return resOK;
     }
     
-    result_t s_hw_configure(
-        MOTOR h,
-        uint8_t has_quad_enc,
-        int16_t  enc_resolution, 
-        uint8_t  pwm_num_polar_couples, 
-        uint8_t  pwm_has_hall_sens,
-        uint8_t  pwm_swapBC,
-        uint16_t pwm_hall_offset)
+    result_t s_hw_configure(MOTOR h, const Config &cfg)
     {
         result_t res = resOK;
         
-//        s_hw_deinit(h);
-        
+//        s_hw_deinit(h);        
 //        s_hw_init(h);
         
-        if (HAL_OK != encoder_Config(has_quad_enc, enc_resolution, pwm_num_polar_couples, pwm_has_hall_sens)) res = resNOK;
-        if (HAL_OK != pwm_hallConfig(pwm_swapBC, pwm_hall_offset)) res = resNOK;
+        if(HAL_OK != encoder_Config(cfg.has_quad_enc, cfg.enc_resolution, cfg.pwm_num_polar_couples, cfg.pwm_has_hall_sens)) res = resNOK;
+        if(HAL_OK != pwm_hallConfig(cfg.pwm_swapBC, cfg.pwm_hall_offset)) res = resNOK;
       
         return res; 
     }
@@ -509,40 +490,27 @@ namespace embot { namespace hw { namespace motor {
         return encoderGetElectricalAngle();
     }
 
-    Position s_hw_gethallcounter(MOTOR h)
-    {
-        return hallGetCounter();
-    }
+//    Position s_hw_gethallcounter(MOTOR h)
+//    {
+//        return hallGetCounter();
+//    }
         
     HallStatus s_hw_gethallstatus(MOTOR h)
     {
         return hallGetStatus();
     }
-
-
-//    result_t s_hw_setpwm(MOTOR h, Pwm v)
-//    { 
-//        HAL_StatusTypeDef r = HAL_ERROR;
-//      
-//        //r = pwmSetValue(v);
-
-//        return (HAL_OK == r) ? resOK : resNOK;      
-//    }
     
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
     {        
-        pwmSet(u, v, w);
-        
+        pwmSet(u, v, w);       
         return resOK;
     }
-       
- 
+        
     static_assert(sizeof(pwm_Currents_t) == sizeof(embot::hw::motor::Currents), "embot::hw::motor::Currents and pwm_Currents_t differs");
     static_assert(sizeof(pwm_Currents_t::u) == sizeof(embot::hw::motor::Currents::u), "embot::hw::motor::Currents and pwm_Currents_t differs");
     static_assert(sizeof(pwm_Currents_t::v) == sizeof(embot::hw::motor::Currents::v), "embot::hw::motor::Currents and pwm_Currents_t differs");
     static_assert(sizeof(pwm_Currents_t::w) == sizeof(embot::hw::motor::Currents::w), "embot::hw::motor::Currents and pwm_Currents_t differs");
-
-    
+   
     result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
     {
         if((nullptr == callback))
@@ -556,12 +524,14 @@ namespace embot { namespace hw { namespace motor {
         pwm_set_ADC_callback(&cbk);
         return resOK;      
     }
-   
+
+    
     result_t s_hw_motorEnable(MOTOR h)
     {
         pwmPhaseEnable(PWM_PHASE_ALL);
         return resOK;
     }
+ 
     
     result_t s_hw_motorDisable(MOTOR h)
     {
@@ -579,13 +549,8 @@ namespace embot { namespace hw { namespace motor {
 
 
 
-
-
-
 #endif //defined(EMBOT_MOTOR_ENABLED)
-
-
-    
+ 
 
 
 

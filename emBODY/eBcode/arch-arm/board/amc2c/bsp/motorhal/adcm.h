@@ -41,6 +41,18 @@ typedef enum
 } AdcMotPhase_t;
 
 
+#if defined(MOTORHAL_changes)
+
+// we keep int32_t even if the adc gets only int16_t values
+typedef struct
+{
+    int32_t     u;
+    int32_t     v;
+    int32_t     w;    
+} adcm_Currents_t;
+
+#endif
+
 /* Exported functions prototypes -------------------------------------------------------------------------------------*/
 
 extern HAL_StatusTypeDef AdcMotInit(void);
@@ -49,6 +61,23 @@ extern void AdcMotGetCurrents(int16_t *pU, int16_t *pV, int16_t *pW);
 extern void AdcMotGetVoltages(uint16_t *pU, uint16_t *pV, uint16_t *pW);
 extern uint32_t AdcMotGetOffset(AdcMotPhase_t Phase);
 extern void AdcMotSetOffset(AdcMotPhase_t Phase, uint16_t Offset);
+
+#if defined(MOTORHAL_changes)
+
+
+typedef void (*adcm_fp_adc_callback_t) (void *owner, const adcm_Currents_t * const currents);
+
+typedef struct 
+{
+    adcm_fp_adc_callback_t   callback;
+    void*                    owner; 
+} adcm_ADC_callback_t;
+
+extern void adcm_set_ADC_callback(adcm_ADC_callback_t *cbk);
+
+extern int32_t adcm_ConvertCurrent(int32_t raw);
+
+#endif // #if defined(MOTORHAL_changes)
 
 #ifdef __cplusplus
     } /* extern "C" */
