@@ -365,4 +365,33 @@ void HallTest(void)
 
 #endif // #if defined(MOTORHALCONFIG_DONTUSE_TESTS)
 
+
+
+#if defined(MOTORHAL_changes)
+
+HAL_StatusTypeDef hall_Config(uint8_t swapBC, uint16_t pwm_hall_offset)
+{
+    #warning TODO-embot::hw::motor: hall_Config()
+//    MainConf.pwm.hall_offset = pwm_hall_offset;
+//    MainConf.pwm.swapBC = swapBC;
+//    
+//    s_pwm_hallOrder[0] = 0;
+//    s_pwm_hallOrder[1] = MainConf.pwm.swapBC ? 2 : 1;
+//    s_pwm_hallOrder[2] = MainConf.pwm.swapBC ? 1 : 2;
+
+//    s_pwm_updateHallStatus();
+//    
+//    /* Start position counter */
+//    hallCounter = 0;
+    
+    return HAL_OK;
+}
+
+uint8_t hall_GetStatus(void)
+{
+    return HallStatus;
+}
+
+#endif // #if defined(MOTORHAL_changes)
+
 /* END OF FILE ********************************************************************************************************/
