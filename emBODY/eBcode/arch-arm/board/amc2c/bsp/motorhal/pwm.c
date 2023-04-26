@@ -64,7 +64,7 @@ extern TIM_HandleTypeDef htim1;
 #define USE_BREAK_INPUT     0
 #else
 /* Set to 1 to use emergency BREAK */
-#define USE_BREAK_INPUT     1
+#define USE_BREAK_INPUT     0
 #endif
 
 /* This macro reduce a PWM unsigned value to the value to be loaded in TIM1_CCRx registers */
@@ -246,6 +246,8 @@ HAL_StatusTypeDef PwmInit(void)
     HAL_TIM_Base_Stop_IT(&htim1);
 
 #if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+    htim1.Instance->BDTR &= ~TIM_BDTR_BKE;
+    htim1.Instance->AF1 &= ~TIM1_AF1_BKINE;
 #else
     
 #if USE_BREAK_INPUT != 1
