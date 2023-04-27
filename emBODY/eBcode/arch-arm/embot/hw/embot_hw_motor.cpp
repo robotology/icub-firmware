@@ -356,10 +356,10 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_init(MOTOR h)
     {
-        AdcMotInit();  
-        EncInit(); 
-        HallInit();    
-        PwmInit();
+        if (HAL_OK != AdcMotInit()) { return resNOK; }
+        if (HAL_OK != EncInit())    { return resNOK; }
+        if (HAL_OK != HallInit())   { return resNOK; }
+        if (HAL_OK != PwmInit())    { return resNOK; }
 
         return resOK; 
     }
