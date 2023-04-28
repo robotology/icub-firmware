@@ -38,8 +38,10 @@ namespace embot::app::board::amc2c::mbd {
 
     void Startup(embot::prot::can::Address adr)
     {
+        // in debug mode we have to click the "RUN" button when stucked on main, before it will be unlocked by CM7
+        // otherwise, it seems that this initialization is not performed.
         embot::hw::motor::init(embot::hw::MOTOR::one, {});
-//        embot::app::board::amc2c::theMBD::getInstance().initialise({adr});
+        embot::app::board::amc2c::theMBD::getInstance().initialise({adr});
         
 //        embot::hw::timer::Config cfg{embot::core::time1millisec, embot::hw::timer::Mode::periodic, cc};
 //        embot::hw::timer::init(embot::hw::TIMER::one, cfg);
@@ -77,7 +79,7 @@ namespace embot::app::board::amc2c::mbd {
         } 
 
         
-//        embot::app::board::amc2c::theMBD::getInstance().tick(input, output);
+        embot::app::board::amc2c::theMBD::getInstance().tick(input, output);
         
         
 //        static uint32_t cnt {0};
