@@ -730,7 +730,7 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
         
         switch(jcalibdata_ptr->state)
         {
-            case calibtype14_st_hardLimitSet:
+            case calibtype14_st_absEncoderCalib:
             {
                 if(!Motor_is_calibrated(m_ptr))
                 {
@@ -746,12 +746,12 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
                     
                     AbsEncoder_calibrate_absolute(e_ptr, 0, jcalibdata_ptr->computedZero);
                     
-                    jcalibdata_ptr->state = calibtype14_st_absEncoderCalibrated;
+                    jcalibdata_ptr->state = calibtype14_st_hardLimitSet;
                 }
             }
             break;
             
-            case calibtype14_st_absEncoderCalibrated:
+            case calibtype14_st_hardLimitSet:
             {
                 //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
                 //the limit range is very big. this check should save us from wrong calib params.
@@ -767,101 +767,18 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
                 {
                     jcalibdata_ptr->is_active = FALSE;
                     memset(&info[0], 0, sizeof(info));
-                    snprintf(info, sizeof(info), "calib 6:outLim: cp:%d mx:%.1f mn:%.1f", curr_pos, j_ptr->pos_max, j_ptr->pos_min);
+                    snprintf(info, sizeof(info), "calib 14:outLim: cp:%d mx:%.1f mn:%.1f", curr_pos, j_ptr->pos_max, j_ptr->pos_min);
                     JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-                    return FALSE;
-                }
-                
-                // reset motor and joint -> should this be done or should we trust hard limit reaching
-                Motor_motion_reset(m_ptr);  // reset PID
-                Joint_motion_reset(j_ptr);  // reset PID and errors
-                Motor_set_run(m_ptr, eomc_ctrl_out_type_pwm); //clear ext fault bit if it is not pressed
-                
-                if(j_ptr->control_mode == eomc_controlmode_hwFault)
-                {
-                    return FALSE;
-                }
-                
-                // reset rotor limits 
-                j_ptr->running_calibration.data.type14.rotorposmin = m_ptr->pos_min;
-                j_ptr->running_calibration.data.type14.rotorposmax = m_ptr->pos_max;
-                
-                // set motor pos max and min to zero thus to move full traj in calibration
-                m_ptr->pos_min = 0;
-                m_ptr->pos_max = 0;
-                
-                // Set reference position
-                BOOL ret = Joint_set_pos_ref_in_calibType14(j_ptr, jcalibdata_ptr->targetPos, jcalibdata_ptr->velocity);
-                if(!ret)
-                {
-                    memset(&info[0], 0, sizeof(info));
-                    snprintf(info, sizeof(info),"error in Joint_set_pos_ref");
-                    JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-        
                     return FALSE;
                 }
                 
                 // debug code
                 memset(&info[0], 0, sizeof(info));
-                snprintf(info, sizeof(info), "init traj: cpos=%.2f target=%.2f ln:%.2f lx:%.2f", j_ptr->pos_fbk, j_ptr->running_calibration.data.type14.targetPos, j_ptr->pos_max, j_ptr->pos_min);
+                snprintf(info, sizeof(info), "New Mtr limits: m_min=%d m_max=%d", m_ptr->pos_min, m_ptr->pos_max);
                 JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
                 // debug code ended
 
-                jcalibdata_ptr->state = calibtype14_st_trajectoryStarted;
-            }
-            break;
-            
-            case calibtype14_st_trajectoryStarted:
-            {
-                JointSet_do_pwm_control(o);
-                
-                CTRL_UNITS delta = j_ptr->running_calibration.data.type14.targetPos - j_ptr->pos_fbk;
-                
-                if( (delta>CALIB_TYPE_6_POS_TRHESHOLD ) || (delta<-CALIB_TYPE_6_POS_TRHESHOLD ) )
-                    return FALSE;
-                else
-                {
-                    jcalibdata_ptr->state = calibtype14_st_finished;
-                    Motor* m_ptr = o->motor + o->motors_of_set[k];
-                    
-//                    DO NOT RESET LIMIT BUT JUST PRINT FOR DEBUG IF OK
-//                    m_ptr->pos_calib_offset = m_ptr->pos_fbk;
-//                    //reset value of position
-//                    m_ptr->pos_fbk = m_ptr->pos_fbk - m_ptr->pos_calib_offset;
-//                    m_ptr->pos_fbk_old = 0;
-//                    m_ptr->not_init = TRUE;
-                    
-                    //Debug code
-                    memset(&info[0], 0, sizeof(info));
-                    snprintf(info, sizeof(info), "c14M:pos reached: cp=%d co=%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
-                    JointSet_send_debug_message(info, m_ptr->ID, 0, 0);
-                    //ended
-                    
-                    m_ptr->not_calibrated = FALSE;
-                    
-                    for (int k=0; k<*(o->pN); ++k)
-                    {
-                        int m = o->motors_of_set[k];
-                        int j = o->joints_of_set[k];
-                        Motor_motion_reset(o->motor+ m);
-                        Joint_motion_reset(o->joint+ j);
-                        Motor_set_idle(o->motor+ m);
-                    }
-                    
-                    // Reset limits
-                    m_ptr->pos_min = j_ptr->running_calibration.data.type14.rotorposmin;
-                    m_ptr->pos_max = j_ptr->running_calibration.data.type14.rotorposmax;
-                    
-//                    // Set new "correct" limnits
-//                    m_ptr->pos_min = 0;
-//                    m_ptr->pos_max = (m_ptr->pos_fbk) + ROTOR_LIMIT_DELTA;
-                    
-                    //Debug code 
-                    memset(&info[0], 0, sizeof(info));
-                    snprintf(info, sizeof(info), "New Mtr limits: m_min=%d m_max=%d", m_ptr->pos_min, m_ptr->pos_max );
-                    JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-                    //ended
-                }
+                jcalibdata_ptr->state = calibtype14_st_finished;
             }
             break;
             
