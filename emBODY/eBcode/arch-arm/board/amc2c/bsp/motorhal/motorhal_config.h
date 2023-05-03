@@ -27,6 +27,8 @@
         
 #define MOTORHALCONFIG_MOT_BREAK_IRQ_remove
         
+//#define MOTORHALCONFIG_enabletests
+        
 #define MOTORHALCONFIG_TESTPOINT_DEBUG_remove
 
 #define MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING
@@ -37,21 +39,6 @@
 #include "enc.h"
 #include "hall.h"
 #include "pwm.h"
-
-#warning TODO-motorhal: see is we need a MainConfTypeDef ...
-// for now i remove it
-#define WIP_removedcode_MainConf
-#if defined(WIP_removedcode_MainConf)
-#else
-typedef struct
-{
-    pwm_ConfTypeDef pwm;
-    encoder_ConfTypeDef encoder;
-    analogConfTypeDef analog;
-} MainConfTypeDef;
-
-extern MainConfTypeDef MainConf;
-#endif // WIP_removedcode_MainConf
 
 #endif     
 

@@ -207,11 +207,11 @@ bool calibrate(const Calibration &calib)
     {
         return r;
     }
-    
-    _adcm_internals.calibrator.init();
     // in here we need to have zero pwm, so we force it
     PwmPhaseSet(0, 0, 0);
-    PwmPhaseEnable(PWM_PHASE_NONE);
+    PwmPhaseEnable(PWM_PHASE_NONE);   
+    
+    _adcm_internals.calibrator.init();
 
     r = _adcm_internals.calibrator.wait(calib.timeout);
    

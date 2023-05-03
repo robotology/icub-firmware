@@ -1047,7 +1047,7 @@
       <TargetName>appl-can-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -2616,7 +2616,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_AMC2C STM32HAL_DRIVER_V1A0</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_AMC2C STM32HAL_DRIVER_V1A0 MOTORHALCONFIG_enabletests</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\amcbldc\application\src\model-based-design\sharedutils;..\..\..\amcbldc\application\src\model-based-design\can-decoder;..\..\..\amcbldc\application\src\model-based-design\can-encoder;..\..\..\amcbldc\application\src\model-based-design\supervisor-rx;..\..\..\amcbldc\application\src\model-based-design\supervisor-tx;..\..\..\amcbldc\application\src\model-based-design\control-outer;..\..\..\amcbldc\application\src\model-based-design\control-foc;..\..\..\amcbldc\application\src\model-based-design\estimator;..\..\..\amcbldc\application\src\model-based-design\amc-bldc;..\..\..\amcbldc\application\src\model-based-design\filter-current;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal</IncludePath>
             </VariousControls>

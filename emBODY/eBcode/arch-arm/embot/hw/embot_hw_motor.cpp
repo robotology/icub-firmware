@@ -32,7 +32,10 @@
     #warning this implementation is only for stm32hal
 #endif
 
-#include "motorhal.h"    
+#if defined(STM32HAL_BOARD_AMC2C)
+    #include "motorhal.h"    
+#endif    
+  
 
 using namespace embot::hw;
 
@@ -351,13 +354,6 @@ namespace embot { namespace hw { namespace motor {
     
 #if defined(STM32HAL_BOARD_AMC2C)
 
-
-//    #include "adcm.h"
-//    #include "enc.h"
-//    #include "hall.h"
-//    #include "pwm.h"
-
-    #include "motorhal.h"    
 
     result_t s_hw_init(MOTOR h)
     {

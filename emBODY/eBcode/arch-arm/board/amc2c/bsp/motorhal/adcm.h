@@ -10,7 +10,6 @@
 #ifndef __ADCM_H
 #define __ADCM_H
 
-
 #ifdef __cplusplus
     extern "C" {
 #endif

@@ -20,16 +20,17 @@
 
 #include "embot_hw_timer.h"
 
-#include "adcm.h"
-#include "enc.h"
-#include "hall.h"
-#include "pwm.h"
 
-#include "embot_hw_motor.h"
+#include "motorhal_config.h"
+#include "embot_hw_motor_bsp_amc2c.h"
 
 extern void HallSetPwm(int32_t pwm);
 
 using namespace embot::hw;
+
+#if !defined(MOTORHALCONFIG_enabletests)
+    #error: MOTORHALCONFIG_enabletests must be defined
+#endif
 
 namespace embot::app::board::amc2c::mbd {
     
@@ -41,9 +42,17 @@ namespace embot::app::board::amc2c::mbd {
 
     void Startup(embot::prot::can::Address adr)
     {
+        embot::hw::motor::bsp::amc2c::Init_MOTORHAL_testmode(embot::hw::MOTOR::one);
+        
+        AdcMotInit();
+        EncInit();
+        HallInit();
+        PwmInit();        
+        
+        
         // in debug mode questa init non viene chiamata a meno che non si clicca "RUN" manualmente prima che venga sbloccato dal CM7
-        embot::hw::motor::init(embot::hw::MOTOR::one, {});
-        embot::app::board::amc2c::theMBD::getInstance().initialise({adr});
+//        embot::hw::motor::init(embot::hw::MOTOR::one, {});
+//        embot::app::board::amc2c::theMBD::getInstance().initialise({adr});
         
 //        embot::hw::timer::Config cfg{embot::core::time1millisec, embot::hw::timer::Mode::periodic, cc};
 //        embot::hw::timer::init(embot::hw::TIMER::one, cfg);
@@ -89,7 +98,7 @@ namespace embot::app::board::amc2c::mbd {
             }
         }
         
-        embot::app::board::amc2c::theMBD::getInstance().tick(input, output);
+//        embot::app::board::amc2c::theMBD::getInstance().tick(input, output);
 
         
 //        if(numRXframes > 0)

@@ -208,7 +208,7 @@ static void HallSetField(int32_t pwm)
  */
 static void HallCapture_cb(TIM_HandleTypeDef *htim)
 {
-#if defined(MOTORHAL_changes)  
+#if defined(MOTORHAL_changes) && !defined(MOTORHALCONFIG_enabletests) 
     HallCapture = HAL_TIM_ReadCapturedValue(&HALL_TIM, TIM_CHANNEL_1);
     HallStatus = HALL_INPUT();
 #else    
