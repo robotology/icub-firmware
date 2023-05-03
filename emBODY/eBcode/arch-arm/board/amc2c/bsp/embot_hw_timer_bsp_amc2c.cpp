@@ -174,7 +174,7 @@ extern "C" {
         }
         else
             {   // the others are used by embot::hw::motor::bsp        
-            embot::hw::motor::bsp::TIM_base_MspInit(htim_base);
+                embot::hw::motor::bsp::amc2c::TIM_base_MspInit(htim_base);
         }
     }
 //      }
@@ -204,7 +204,7 @@ extern "C" {
         }
         else
         {   // the others are used by the motor
-            embot::hw::motor::bsp::TIM_base_MspDeInit(htim_base);
+            embot::hw::motor::bsp::amc2c::TIM_base_MspDeInit(htim_base);
         }
 //      else if(tim_baseHandle->Instance==TIM16)
 //      {

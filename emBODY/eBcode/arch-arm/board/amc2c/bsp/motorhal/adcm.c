@@ -43,14 +43,9 @@
 
 #if defined(MOTORHAL_changes)
 
-// in ... maybe add an include file ...
-namespace embot::hw::motor::bsp {    
-    extern ADC_HandleTypeDef hADC1;
-    extern ADC_HandleTypeDef hADC2;    
-}
-
-#define hadc1 (embot::hw::motor::bsp::hADC1)
-#define hadc2 (embot::hw::motor::bsp::hADC2)
+#include "embot_hw_motor_bsp_amc2c.h"
+#define hadc1 (embot::hw::motor::bsp::amc2c::hADC1)
+#define hadc2 (embot::hw::motor::bsp::amc2c::hADC2)
 
 #else
 /* Declared in main.h */
@@ -61,17 +56,10 @@ extern ADC_HandleTypeDef hadc2;
 #if defined(MOTORHAL_changes)
 
 // --------------------------------------------------------------------------------------------------------------------
-// add in here all the new types, variables, static function prototypes required by MOTORHAL
+// add in here minimal changes
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_adcm_dummy_adc_callback(void *owner, const adcm_Currents_t * const currents) {}
-static adcm_Currents_t s_adcm_dummy_currents = {0};
-    
-static volatile adcm_ADC_callback_t s_adcm_ADC_cbk = 
-{
-    .callback = s_adcm_dummy_adc_callback,
-    .owner = NULL
-};
+void s_adcm_on_acquisition_of_currents(int16_t c1, int16_t c2, int16_t c3); 
 
 #endif // #if defined(MOTORHAL_changes)
 
@@ -131,12 +119,9 @@ static void adcMotGetSamples(const DualModeAdcData_t *pBuf)
 /*DEBUG*/HAL_GPIO_WritePin(TP4_GPIO_Port, TP4_Pin, GPIO_PIN_RESET);
 #endif
     
-    static adcm_Currents_t currents = {0};
-    // as soon as possible: copy the currents (must be converted from raw as i1, i2, i3 come from ADC)
-    currents.u = adcm_ConvertCurrent(adcMotCurrents[0]); 
-    currents.v = adcm_ConvertCurrent(adcMotCurrents[1]);
-    currents.w = adcm_ConvertCurrent(adcMotCurrents[2]);
-    s_adcm_ADC_cbk.callback(s_adcm_ADC_cbk.owner, &currents); 
+#if defined(MOTORHAL_changes)    
+    s_adcm_on_acquisition_of_currents(adcMotCurrents[0], adcMotCurrents[1], adcMotCurrents[2]);
+#endif    
 }
 
 /* Callback functions *************************************************************************************************/
@@ -272,26 +257,223 @@ void AdcMotDeInit(void)
 
 #if defined(MOTORHAL_changes)
 
+
 // --------------------------------------------------------------------------------------------------------------------
-// add in here all the new functions required by MOTORHAL
+// add in here all the new code required by MOTORHAL
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_core.h"
+#include <array>
 
-
-extern void adcm_set_ADC_callback(adcm_ADC_callback_t *cbk)
+struct Converter
 {
-    if(NULL != cbk)
+    static int32_t raw2current(int32_t r)
     {
-        s_adcm_ADC_cbk.callback = (NULL != cbk->callback) ? cbk->callback : s_adcm_dummy_adc_callback;
-        s_adcm_ADC_cbk.owner = cbk->owner;     
+        // return CIN_GAIN * vref_mV * r >> 16u;
+        return r;       
     }
+    
+    static int32_t current2raw(int32_t c)
+    {
+        // int32_t tmp = (curr << 16) / (CIN_GAIN * vref_mV);
+        // return tmp;
+        return c;       
+    }    
+    
+    constexpr Converter() = default;
+};
+
+
+struct Calibrator
+{
+    static constexpr uint8_t _shift {10};
+    static constexpr size_t _maxcount {1 << _shift};
+    
+    volatile bool _done {false};
+    volatile size_t _count {0};
+    adcm_Currents _currents {};
+    std::array<int64_t, 3> cumulativerawvalues {0, 0, 0};
+    
+    constexpr Calibrator() = default;
+    
+    void init()
+    {
+       _count = 0;
+       _done = false; 
+       cumulativerawvalues.fill(0); 
+       adcm_set_ADC_callback({oncurrents, this});
+    }
+    
+    void stop()
+    {
+        adcm_set_ADC_callback({});
+        _count = 0;
+       _done = true;  
+    }
+    
+    
+    bool wait(const embot::core::relTime timeout = 100*embot::core::time1millisec)
+    {
+        bool ret {false};
+        
+        volatile embot::core::Time endtime = embot::core::now() + timeout;
+        
+        for(;;)
+        {
+            volatile embot::core::Time n = embot::core::now();
+            if(true == _done)
+            { 
+                ret = true; 
+                break; 
+            }
+            else if(n > endtime)
+            {
+                ret = false; 
+                stop();
+                break;
+            }
+        }
+
+        return ret;
+    }   
+
+
+    static void oncurrents(void *owner, const adcm_Currents * const currents)
+    {
+        Calibrator *o = reinterpret_cast<Calibrator*>(owner);   
+        
+        // i use Converter::current2raw() because technically adcm_Currents does not contain the raw ADC values but transformed values
+        o->cumulativerawvalues[0] += Converter::current2raw(currents->u);
+        o->cumulativerawvalues[1] += Converter::current2raw(currents->v);
+        o->cumulativerawvalues[2] += Converter::current2raw(currents->w);
+        
+        o->_count++;
+        
+        if(o->_count >= Calibrator::_maxcount)
+        {
+            // time to do business: prepare average currents, impose the offset to ADC, stop the calibrator  
+            
+            // dont use the >> _shift because ... 1. this operation is done only once, so who bother. 
+            //                                    2. cumulativerawvalues is int64_t. it may be (dont think so) negative so it is too complicate to optimize
+            // impose offset to adc.
+            volatile int64_t cc[3] {0, 0, 0};
+            cc[0] = o->cumulativerawvalues[0] / _maxcount;
+            cc[1] = o->cumulativerawvalues[1] / _maxcount;
+            cc[2] = o->cumulativerawvalues[2] / _maxcount;
+            AdcMotSetOffset(ADCMOT_PHASE_U, AdcMotGetOffset(ADCMOT_PHASE_U) + (o->cumulativerawvalues[0] / _maxcount));
+            AdcMotSetOffset(ADCMOT_PHASE_V, AdcMotGetOffset(ADCMOT_PHASE_V) + (o->cumulativerawvalues[1] / _maxcount));
+            AdcMotSetOffset(ADCMOT_PHASE_W, AdcMotGetOffset(ADCMOT_PHASE_W) + (o->cumulativerawvalues[2] / _maxcount));
+            
+            // stop
+            o->stop();
+            
+            return;
+        }                     
+    }    
+    
+};
+
+struct adcm_Internals
+{
+    adcm_Configuration config {};
+    Calibrator calibrator {};
+        
+    static void dummy_adc_callback(void *owner, const adcm_Currents * const currents) {}  
+    static constexpr adcm_ADC_callback dummyADCcbk { dummy_adc_callback, nullptr };         
+        
+    adcm_Internals() = default;    
+};
+
+adcm_Internals _adcm_internals {};
+    
+    
+void s_adcm_on_acquisition_of_currents(int16_t c1, int16_t c2, int16_t c3)
+{
+    // important note: {c1, c2, c3} are the raw ADC acquisitions as in adcMotCurrents[0, 1, 2]
+    // the callback requires converted currents. but to be fair in adcm.c there is no concept of how to convert them as in the amcbldc
+    // so, boh ... for now i do nothing    
+    adcm_Currents currents = {Converter::raw2current(c1), Converter::raw2current(c2), Converter::raw2current(c3)};
+    _adcm_internals.config.onadc.execute(&currents);         
+}    
+
+    
+bool adcm_Init(const adcm_Configuration &config)
+{
+    bool r {true};
+    
+    if(false == config.isvalid())
+    {
+        return false;
+    }
+    
+    _adcm_internals.config = config;
+    
+    // 1. at first we want to be sure that everything is stopped, so:
+    adcm_DeInit();  
+
+    // 2. then we init w/out calibration or w/ calibration
+    if(_adcm_internals.config.calibration == adcm_Configuration::CALIBRATION::none)        
+    {
+        HAL_StatusTypeDef hr = AdcMotInit();      
+        r = (HAL_ERROR == hr) ? false : true;       
+    }
+    else
+    {
+        // 2.b w/ calibration
+        _adcm_internals.calibrator.init();
+        // in here we need to have zero pwm, so we force it
+        PwmPhaseSet(0, 0, 0);
+        PwmPhaseEnable(PWM_PHASE_NONE);
+        
+        AdcMotInit(); // this call starts the ADC acquisition. 
+        // which in turn calls Calibrator::oncurrents() which eventally calls stop() and allows stop() to return
+        r = _adcm_internals.calibrator.wait();
+        r = true;
+    }
+    
+    return r;   
+}  
+
+bool adcm_Calibrate(uint64_t usectimeout)
+{
+    bool r {true};
+    
+        _adcm_internals.calibrator.init();
+        // in here we need to have zero pwm, so we force it
+        PwmPhaseSet(0, 0, 0);
+        PwmPhaseEnable(PWM_PHASE_NONE);
+    
+        r = _adcm_internals.calibrator.wait();
+
+    
+    return r;   
+}    
+
+
+void adcm_set_ADC_callback(const adcm_ADC_callback &cbk)
+{
+    // maybe better to protect execution of s_adcm_ADC_cbk by ...
+    // temporarily suspending the AdcMotTransferComplete_cb() and AdcMotHalfTransfer_cb()  
+    HAL_ADC_UnRegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
+    HAL_ADC_UnRegisterCallback(&hadc1, HAL_ADC_CONVERSION_HALF_CB_ID);
+    
+    _adcm_internals.config.onadc = cbk.isvalid() ? cbk : _adcm_internals.dummyADCcbk;
+    
+    HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AdcMotTransferComplete_cb);
+    HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_HALF_CB_ID, AdcMotHalfTransfer_cb);    
 }
 
-extern int32_t adcm_ConvertCurrent(int32_t raw)
+// as AdcMotDeInit() but ... see the changes in analog_DeInit() of amcbldc
+bool adcm_DeInit()
 {
-//	return CIN_GAIN * vref_mV * raw >> 16u;
-    return raw;
+    bool r = true;    
+    // AdcMotDeInit() unchanged is OK 
+    AdcMotDeInit();
+    // i also clear the callback
+    adcm_set_ADC_callback({});    
+    return r;    
 }
+
 
 #endif // #if defined(MOTORHAL_changes)
 

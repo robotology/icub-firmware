@@ -7,8 +7,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef __EMBOT_HW_MOTORHAL_H_
-#define __EMBOT_HW_MOTORHAL_H_
+#ifndef __MOTORHAL_H_
+#define __MOTORHAL_H_
 
 #include "embot_core.h"
 #include "embot_hw.h"
@@ -18,19 +18,19 @@
 #include "hall.h"
 #include "pwm.h"
 
-namespace embot::hw::motorhal {
-    
-#if 0
-    
-    the ides in here is to provide a common api to the low level files for amcbldc and the cm4 core of the amc
-    which  have different API     
-    
-    so far it can be seen as a duplicate of embot::hw, ... but i hope we shall soon simplify
-    
-#endif
- 
-                   
-} // namespace embot::hw::motorhal {
+//namespace embot::hw::motorhal {
+//    
+//#if 0
+//    
+//    the ides in here is to provide a common api to the low level files for amcbldc and the cm4 core of the amc
+//    which  have different API     
+//    
+//    so far it can be seen as a duplicate of embot::hw, ... but i hope we shall soon simplify
+//    
+//#endif
+// 
+//                   
+//} // namespace embot::hw::motorhal {
 
 
 #endif  // include-guard

@@ -44,12 +44,8 @@
 
 #if defined(MOTORHAL_changes)
 
-// in ... maybe add an include file ...
-namespace embot::hw::motor::bsp {      
-    extern TIM_HandleTypeDef hTIM1;
-}
-
-#define htim1 (embot::hw::motor::bsp::hTIM1)
+#include "embot_hw_motor_bsp_amc2c.h"
+#define htim1 (embot::hw::motor::bsp::amc2c::hTIM1)
 
 #else
 
@@ -279,7 +275,11 @@ HAL_StatusTypeDef PwmInit(void)
         PwmReset(DISABLE);
         PwmSleep(DISABLE);
         /* Enable Interrupts */
-        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE|TIM_IT_BREAK);  
+//#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+//        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE);
+//#else        
+        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE|TIM_IT_BREAK); 
+//#endif         
         return HAL_OK;
     }
 
@@ -414,6 +414,83 @@ void PwmTest(void)
 #endif // #if defined(MOTORHALCONFIG_DONTUSE_TESTS)
 
 
+#if defined(MOTORHAL_changes)
+
+
+struct pwm_Internals
+{
+    volatile bool started {false};
+    volatile bool calibrating {false};
+    pwm_Configuration config {};
+        
+    void pwmcomparevalue_protect(bool on)
+    {
+        // if pwm timer is not started ... we dont protect
+        if(false == started)
+        {
+            return;
+        }
+        
+        if(on == true)
+        {
+            __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_UPDATE);
+        }
+        else
+        {
+            __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE);      
+        }
+    }    
+        
+    pwm_Internals() = default;   
+};
+
+pwm_Internals _pwm_internals {};
+
+extern void pwm_Init(const pwm_Configuration &config)
+{
+    _pwm_internals.config =  config;
+    _pwm_internals.calibrating = false;
+
+    PwmInit();
+    
+    _pwm_internals.started = true;
+    
+    // meglio essere sicuri ... vedi dentro PwmInit()
+    __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_BREAK);
+}
+
+extern void pwm_DeInit()
+{
+    _pwm_internals.started = false;
+    PwmDeInit();   
+}
+
+
+extern void pwm_Set(uint16_t u, uint16_t v, uint16_t w)
+{
+    if(true == _pwm_internals.calibrating)
+    {        
+        u = v = w = 0;
+    }
+    else
+    {   
+        /* Reduce PWM values in counter units */
+        u = PWM_COMPARE_VALUE(u);
+        v = PWM_COMPARE_VALUE(v);
+        w = PWM_COMPARE_VALUE(w);
+    }
+    
+    /* Must be interrupt-safe */
+    _pwm_internals.pwmcomparevalue_protect(true);  
+    PwmComparePhaseU = u;
+    PwmComparePhaseV = v;
+    PwmComparePhaseW = w;
+    _pwm_internals.pwmcomparevalue_protect(false);   
+}
+
+
+
+#endif
 
 
 /* END OF FILE ********************************************************************************************************/

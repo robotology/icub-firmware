@@ -55,6 +55,26 @@ extern void PwmDeInit(void);
 
 extern void PwmTest(void);
 
+#if defined(MOTORHAL_changes)
+
+
+struct pwm_Configuration
+{
+    enum class START { immediate };
+    
+    START start { START::immediate };
+        
+    constexpr pwm_Configuration() = default;
+    constexpr bool isvalid() const { return true; }
+};
+
+extern void pwm_Init(const pwm_Configuration &config);
+extern void pwm_DeInit();
+
+extern void pwm_Set(uint16_t u, uint16_t v, uint16_t w);
+
+
+#endif
 
 #ifdef __cplusplus
     } /* extern "C" */
