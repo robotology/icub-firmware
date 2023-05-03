@@ -27,6 +27,8 @@
         
 #define MOTORHALCONFIG_MOT_BREAK_IRQ_remove
         
+//#define MOTORHALCONFIG_enabletests
+        
 #define MOTORHALCONFIG_TESTPOINT_DEBUG_remove
 
 #define MOTORHALCONFIG_DONTUSE_RUNTIMECURR_FILTERING
@@ -37,21 +39,6 @@
 #include "enc.h"
 #include "hall.h"
 #include "pwm.h"
-
-#warning TODO-motorhal: see is we need a MainConfTypeDef ...
-// for now i remove it
-#define WIP_removedcode_MainConf
-#if defined(WIP_removedcode_MainConf)
-#else
-typedef struct
-{
-    pwm_ConfTypeDef pwm;
-    encoder_ConfTypeDef encoder;
-    analogConfTypeDef analog;
-} MainConfTypeDef;
-
-extern MainConfTypeDef MainConf;
-#endif // WIP_removedcode_MainConf
 
 #endif     
 
@@ -69,6 +56,9 @@ extern MainConfTypeDef MainConf;
 #define MSB$8(x)    (x&0x00000000000000F0LL?(4+MSB$4(x>>4)):MSB$4(x))
 #define MSB$4(x)    (x&0x000000000000000CLL?(2+MSB$2(x>>2)):MSB$2(x))
 #define MSB$2(x)    (x&0x0000000000000002LL?1:0)
+
+// marco.accame: this macro gets the number of zeros below a binary numer. as an example: LSB(0x7000) = LSV(0b0111-0000-0000-0000) = 12
+// it is used to shift down a value.
 
 // Get the LSB of an integer. The compiler generates an immediate constant value when the argument is a constant
 // value known at compile time. Use macro lsb(x) for not constant values

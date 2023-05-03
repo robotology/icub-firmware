@@ -43,14 +43,9 @@
 
 #if defined(MOTORHAL_changes)
 
-// in ... maybe add an include file ...
-namespace embot::hw::motor::bsp {    
-    extern ADC_HandleTypeDef hADC1;
-    extern ADC_HandleTypeDef hADC2;    
-}
-
-#define hadc1 (embot::hw::motor::bsp::hADC1)
-#define hadc2 (embot::hw::motor::bsp::hADC2)
+#include "embot_hw_motor_bsp_amc2c.h"
+#define hadc1 (embot::hw::motor::bsp::amc2c::hADC1)
+#define hadc2 (embot::hw::motor::bsp::amc2c::hADC2)
 
 #else
 /* Declared in main.h */
@@ -61,17 +56,10 @@ extern ADC_HandleTypeDef hadc2;
 #if defined(MOTORHAL_changes)
 
 // --------------------------------------------------------------------------------------------------------------------
-// add in here all the new types, variables, static function prototypes required by MOTORHAL
+// add in here minimal changes
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_adcm_dummy_adc_callback(void *owner, const adcm_Currents_t * const currents) {}
-static adcm_Currents_t s_adcm_dummy_currents = {0};
-    
-static volatile adcm_ADC_callback_t s_adcm_ADC_cbk = 
-{
-    .callback = s_adcm_dummy_adc_callback,
-    .owner = NULL
-};
+extern adcm_fp_int16_int16_uint16_t adcm_FP_on_acquisition_of_currents = NULL;
 
 #endif // #if defined(MOTORHAL_changes)
 
@@ -131,12 +119,12 @@ static void adcMotGetSamples(const DualModeAdcData_t *pBuf)
 /*DEBUG*/HAL_GPIO_WritePin(TP4_GPIO_Port, TP4_Pin, GPIO_PIN_RESET);
 #endif
     
-    static adcm_Currents_t currents = {0};
-    // as soon as possible: copy the currents (must be converted from raw as i1, i2, i3 come from ADC)
-    currents.u = adcm_ConvertCurrent(adcMotCurrents[0]); 
-    currents.v = adcm_ConvertCurrent(adcMotCurrents[1]);
-    currents.w = adcm_ConvertCurrent(adcMotCurrents[2]);
-    s_adcm_ADC_cbk.callback(s_adcm_ADC_cbk.owner, &currents); 
+#if defined(MOTORHAL_changes) 
+    if(NULL != adcm_FP_on_acquisition_of_currents)
+    {        
+        adcm_FP_on_acquisition_of_currents(adcMotCurrents[0], adcMotCurrents[1], adcMotCurrents[2]);
+    }
+#endif    
 }
 
 /* Callback functions *************************************************************************************************/
@@ -147,7 +135,7 @@ static void adcMotGetSamples(const DualModeAdcData_t *pBuf)
  * @param
  * @return
  */
-static void AdcMotHalfTransfer_cb(ADC_HandleTypeDef *hadc)
+void AdcMotHalfTransfer_cb(ADC_HandleTypeDef *hadc)
 {
     /* Record the first half of the buffer */
     adcMotGetSamples(&(AdcMotRawData[0]));
@@ -159,7 +147,7 @@ static void AdcMotHalfTransfer_cb(ADC_HandleTypeDef *hadc)
  * @param
  * @return
  */
-static void AdcMotTransferComplete_cb(ADC_HandleTypeDef *hadc)
+void AdcMotTransferComplete_cb(ADC_HandleTypeDef *hadc)
 {
     /* Record the second half of the buffer */
     adcMotGetSamples(&(AdcMotRawData[NUMBER_OF_ADC_CHANNELS]));
@@ -269,29 +257,9 @@ void AdcMotDeInit(void)
 }
 
 
-
 #if defined(MOTORHAL_changes)
 
-// --------------------------------------------------------------------------------------------------------------------
-// add in here all the new functions required by MOTORHAL
-// --------------------------------------------------------------------------------------------------------------------
-
-
-
-extern void adcm_set_ADC_callback(adcm_ADC_callback_t *cbk)
-{
-    if(NULL != cbk)
-    {
-        s_adcm_ADC_cbk.callback = (NULL != cbk->callback) ? cbk->callback : s_adcm_dummy_adc_callback;
-        s_adcm_ADC_cbk.owner = cbk->owner;     
-    }
-}
-
-extern int32_t adcm_ConvertCurrent(int32_t raw)
-{
-//	return CIN_GAIN * vref_mV * raw >> 16u;
-    return raw;
-}
+// nothing else is required
 
 #endif // #if defined(MOTORHAL_changes)
 

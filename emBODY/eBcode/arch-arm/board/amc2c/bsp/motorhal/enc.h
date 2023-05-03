@@ -46,12 +46,16 @@ extern HAL_StatusTypeDef EncInit(void);
 extern void EncDeInit(void);
 extern void EncTest(void);
 
+
+
 #if defined(MOTORHAL_changes) 
 
-extern HAL_StatusTypeDef enc_Config(uint8_t has_quad_enc, int16_t resolution, uint8_t num_polar_couples, uint8_t has_hall_sens);
-int32_t enc_GetElectricalAngle(void);
+// we need to expose this callback
+extern void EncCapture_cb(TIM_HandleTypeDef *htim);
 
-#endif // #if defined(MOTORHAL_changes)
+#endif // #if defined(MOTORHAL_changes) 
+
+
 
 
 #ifdef __cplusplus

@@ -35,12 +35,8 @@
 
 #if defined(MOTORHAL_changes)
 
-// in ... maybe add an include file ...
-namespace embot::hw::motor::bsp {
-    extern TIM_HandleTypeDef hTIM5;
-}
-
-#define ENC_TIM (embot::hw::motor::bsp::hTIM5)
+#include "embot_hw_motor_bsp_amc2c.h"
+#define ENC_TIM (embot::hw::motor::bsp::amc2c::hTIM5)
 
 #else
 /* Can be htim2 or htim5 */
@@ -89,7 +85,7 @@ static uint32_t EncAbsoluteZero;
  * @param
  * @return
  */
-static void EncCapture_cb(TIM_HandleTypeDef *htim)
+void EncCapture_cb(TIM_HandleTypeDef *htim)
 {
     int32_t le, te, delta;
     /* Read the index trailing edge position */
@@ -262,45 +258,13 @@ void EncTest(void)
 
 #endif // #if defined(MOTORHALCONFIG_DONTUSE_TESTS)
 
+#if defined(MOTORHAL_changes)
 
-#if defined(MOTORHAL_changes) 
+// nothing else is required
 
-
-HAL_StatusTypeDef enc_Config(uint8_t has_quad_enc, int16_t resolution, uint8_t num_polar_couples, uint8_t has_hall_sens)
-{
-    #warning TODO....
-    return HAL_OK;
-}
+#endif // #if defined(MOTORHAL_changes)
 
 
-int32_t enc_GetElectricalAngle(void)
-{   
-    #warning TODO: review the values etc
-    // in here ther is how it is for the amcbldc
-//    if (MainConf.encoder.resolution == 0)
-//    {
-//        return s_encoder_ForcedValue;
-//    }
-//    
-//    if (MainConf.encoder.has_hall_sens)
-//    {
-//        if (!s_encoder_Calibrated)
-//        {
-//            return s_encoder_ForcedValue;
-//        }
-//    }
-//    
-//    return s_encoder_electricalOffset + (__HAL_TIM_GET_COUNTER(&htim2) * encoderConvFactor) & 0xFFFF;
-    
-    int32_t v = __HAL_TIM_GetCounter(&ENC_TIM);
-    
-    int32_t s_encoder_electricalOffset = 0;
-    int32_t encoderConvFactor = 1;
-    
-    return s_encoder_electricalOffset + (v * encoderConvFactor) & 0xFFFF;  
-}
-
-#endif // #if defined(MOTORHAL_changes) 
 
 
 /* END OF FILE ********************************************************************************************************/

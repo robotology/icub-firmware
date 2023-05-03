@@ -56,6 +56,10 @@ extern void PwmDeInit(void);
 extern void PwmTest(void);
 
 
+#if defined(MOTORHAL_changes)
+    // nothing is required
+#endif // #if defined(MOTORHAL_changes) 
+
 #ifdef __cplusplus
     } /* extern "C" */
 #endif /* __cplusplus */

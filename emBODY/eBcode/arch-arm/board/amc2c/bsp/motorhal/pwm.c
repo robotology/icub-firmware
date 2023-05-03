@@ -44,12 +44,8 @@
 
 #if defined(MOTORHAL_changes)
 
-// in ... maybe add an include file ...
-namespace embot::hw::motor::bsp {      
-    extern TIM_HandleTypeDef hTIM1;
-}
-
-#define htim1 (embot::hw::motor::bsp::hTIM1)
+#include "embot_hw_motor_bsp_amc2c.h"
+#define htim1 (embot::hw::motor::bsp::amc2c::hTIM1)
 
 #else
 
@@ -279,7 +275,11 @@ HAL_StatusTypeDef PwmInit(void)
         PwmReset(DISABLE);
         PwmSleep(DISABLE);
         /* Enable Interrupts */
-        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE|TIM_IT_BREAK);  
+//#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
+//        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE);
+//#else        
+        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE|TIM_IT_BREAK); 
+//#endif         
         return HAL_OK;
     }
 
@@ -413,7 +413,11 @@ void PwmTest(void)
 
 #endif // #if defined(MOTORHALCONFIG_DONTUSE_TESTS)
 
+#if defined(MOTORHAL_changes)
 
+// nothing else is required
+
+#endif // #if defined(MOTORHAL_changes)
 
 
 /* END OF FILE ********************************************************************************************************/

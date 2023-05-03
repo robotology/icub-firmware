@@ -32,6 +32,10 @@
     #warning this implementation is only for stm32hal
 #endif
 
+#if defined(STM32HAL_BOARD_AMC2C)
+    #include "motorhal.h"    
+#endif    
+  
 
 using namespace embot::hw;
 
@@ -86,6 +90,7 @@ namespace embot { namespace hw { namespace motor {
 
 
 #else
+
 
 namespace embot { namespace hw { namespace motor {
               
@@ -350,26 +355,37 @@ namespace embot { namespace hw { namespace motor {
 #if defined(STM32HAL_BOARD_AMC2C)
 
 
-//    #include "motorhal_config.h"
-    
-    #include "motorhal.h"
-    
     result_t s_hw_init(MOTOR h)
     {
-        if (HAL_OK != AdcMotInit()) { return resNOK; }
-        if (HAL_OK != EncInit())    { return resNOK; }
-        if (HAL_OK != HallInit())   { return resNOK; }
-        if (HAL_OK != PwmInit())    { return resNOK; }
+        // i want to be sure that the pwm is not active       
+        embot::hw::motor::pwm::deinit(); 
+
+        // adc acquisition of the currents starts straigth away with ::init()
+        embot::hw::motor::adc::init({}); 
+         
+        // then we init the encoder. we actually dont start acquisition because we do that in enc::start()            
+        embot::hw::motor::enc::init({}); 
+        // same applies for hall 
+        embot::hw::motor::hall::init({});   
+            
+        // ok, we start pwm
+        embot::hw::motor::pwm::init({});
+            
+        // now we calibrate adc acquisition
+        embot::hw::motor::adc::calibrate({});
+            
+        // we may calibrate also the encoder so that it is aligned w/ hall values
+        // but maybe better do it later
 
         return resOK; 
     }
     
     result_t s_hw_deinit(MOTOR h)
     {
-        AdcMotDeInit();
-        EncDeInit();
-        HallDeInit();
-        PwmDeInit();
+        embot::hw::motor::adc::deinit(); ;
+        embot::hw::motor::enc::deinit(); 
+        embot::hw::motor::hall::deinit(); 
+        embot::hw::motor::pwm::deinit();
         
         return resOK;
     }    
@@ -378,32 +394,42 @@ namespace embot { namespace hw { namespace motor {
     { 
         result_t res {resNOK};
         
-        if(HAL_OK == enc_Config(cfg.has_quad_enc, cfg.enc_resolution, cfg.pwm_num_polar_couples, cfg.pwm_has_hall_sens))
+        if((true == cfg.has_quad_enc) && (0 != cfg.enc_resolution) && (cfg.pwm_num_polar_couples > 0))
         {
-            if(HAL_OK == hall_Config(cfg.pwm_swapBC, cfg.pwm_hall_offset))
-            {
-                res = resOK;
-            }               
+            // start the encoder
+            embot::hw::motor::enc::Mode mode {cfg.enc_resolution, cfg.pwm_num_polar_couples, false, false};
+            embot::hw::motor::enc::start(mode);
         }
+        
+        if(true == cfg.pwm_has_hall_sens)
+        {
+            // start the hall acquisition
+             embot::hw::motor::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::hall::Mode::SWAP::BC :  embot::hw::motor::hall::Mode::SWAP::none, cfg.pwm_hall_offset };
+             embot::hw::motor::hall::start(mode);
+        }
+        
+        // if we have both encoder and hall sensors, we may calibrate the encoder w/ the hall values
+        // we probably need to move the motor to do that.
+        
       
-        return res; 
+        return resOK; 
     }  
     
     result_t s_hw_motorEnable(MOTOR h)
     {
-        PwmPhaseEnable(PWM_PHASE_ALL);
+        embot::hw::motor::pwm::enable(true);
         return resOK;
     }
     
     result_t s_hw_motorDisable(MOTOR h)
     {
-        PwmPhaseEnable(PWM_PHASE_NONE);
+        embot::hw::motor::pwm::enable(false);
         return resOK;
     }    
 
     Position s_hw_getencoder(MOTOR h)
     {
-        return enc_GetElectricalAngle();
+        return embot::hw::motor::enc::getvalue();
     }
 
 //    Position s_hw_gethallcounter(MOTOR h)
@@ -415,13 +441,13 @@ namespace embot { namespace hw { namespace motor {
         
     HallStatus s_hw_gethallstatus(MOTOR h)
     {       
-        return hall_GetStatus();
+        return  embot::hw::motor::hall::getstatus();
     }
 
     
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
     {   
-        PwmPhaseSet(u, v, w);        
+        embot::hw::motor::pwm::set(u, v, w);        
         return resOK;
     }    
     
@@ -432,10 +458,8 @@ namespace embot { namespace hw { namespace motor {
             return resNOK;
         }      
         
-        adcm_ADC_callback_t cbk {};
-        cbk.callback = reinterpret_cast<adcm_fp_adc_callback_t>(callback);
-        cbk.owner = owner;
-        adcm_set_ADC_callback(&cbk);
+        embot::hw::motor::adc::OnCurrents cbk {reinterpret_cast<embot::hw::motor::adc::OnCurrents::Action>(callback), owner};
+        embot::hw::motor::adc::set(cbk);
         return resOK;   
     }
 

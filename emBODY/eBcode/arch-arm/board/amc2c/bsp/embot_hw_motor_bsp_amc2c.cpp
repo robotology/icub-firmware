@@ -80,12 +80,10 @@ namespace embot::hw::motor::bsp {
   
     };
     
-    // forward declaration
-    void Init_MOTOR(embot::hw::MOTOR h);
-    
+
     void BSP::init(embot::hw::MOTOR h) const { // marker1
         
-        Init_MOTOR(h);
+        amc2c::Init_MOTOR(h);
  
     }
     
@@ -104,7 +102,7 @@ namespace embot::hw::motor::bsp {
 // TIM1, TIM4, TIM5
 
 
-namespace embot::hw::motor::bsp {
+namespace embot::hw::motor::bsp::amc2c {
     
     ADC_HandleTypeDef hADC1;
     ADC_HandleTypeDef hADC2;   
@@ -114,7 +112,7 @@ namespace embot::hw::motor::bsp {
     TIM_HandleTypeDef hTIM5;
 }
 
-namespace embot::hw::motor::bsp {
+namespace embot::hw::motor::bsp::amc2c {
     
     void MX_GPIO_Init();
     void MX_TIM4_Init();
@@ -124,6 +122,7 @@ namespace embot::hw::motor::bsp {
     void MX_ADC1_Init();
     void MX_ADC2_Init();
     
+    
     void Init_MOTOR(embot::hw::MOTOR h)
     {
         // add in here the initialisation of the GPIO that are relevant to the motor.
@@ -132,7 +131,7 @@ namespace embot::hw::motor::bsp {
         MX_GPIO_Init();
         MX_DMA_Init();
         MX_TIM4_Init();
-        MX_TIM5_Init();
+//        MX_TIM5_Init(); // we start the TIM5 elsewhere
         MX_ADC1_Init();
         MX_ADC2_Init();
 //        MX_DAC1_Init();
@@ -141,7 +140,22 @@ namespace embot::hw::motor::bsp {
         // something else
     }
     
-
+    void Init_MOTORHAL_testmode(embot::hw::MOTOR h)
+    {
+        // add in here the initialisation of the GPIO that are relevant to the motor.
+        // keept out the break which is managed inside embot::hw::button::bsp         
+        
+        MX_GPIO_Init();
+        MX_DMA_Init();
+        MX_TIM4_Init();
+        MX_TIM5_Init(); // we start the TIM5 elsewhere
+        MX_ADC1_Init();
+        MX_ADC2_Init();
+//        MX_DAC1_Init();
+        MX_TIM1_Init();
+        
+        // something else
+    }
     
     void MX_GPIO_Init()
     {
@@ -581,6 +595,100 @@ namespace embot::hw::motor::bsp {
     }    
     
     
+    void DeInit_TIM5()
+    {
+        // HAL_TIM_IC_ConfigChannel() inversa for TIM_CHANNEL_3 and TIM_CHANNEL_4
+        // HAL_TIMEx_MasterConfigSynchronization() inversa
+        HAL_TIM_Encoder_DeInit(&hTIM5);
+        
+        HAL_TIM_IC_DeInit(&hTIM5);
+        
+    }
+
+    void Init_TIM5(int16_t _resolution, uint8_t _num_polar_couples)
+    {
+        uint32_t _encodermode = TIM_ENCODERMODE_TI12;
+        uint32_t _countermode = TIM_COUNTERMODE_UP;
+        uint32_t _clockdivision = TIM_CLOCKDIVISION_DIV1; // originally = TIM_CLOCKDIVISION_DIV4, amcbldc = TIM_CLOCKDIVISION_DIV1
+        uint32_t _ic1filter = 4; // amcbldc is = 4, in here amc is originally = 8 
+        uint32_t _ic2filter = 4; // amcbldc is = 4, in here amc is originally = 15 
+        if(_resolution < 0)
+        {
+            _resolution = - _resolution;
+            _countermode = TIM_COUNTERMODE_DOWN;            
+        }
+
+        uint32_t _period = (_resolution/_num_polar_couples + 0.5) - 1;
+       
+
+    //        if (ResMgr_Request(RESMGR_ID_TIM5, RESMGR_FLAGS_ACCESS_NORMAL | \
+    //                      RESMGR_FLAGS_CPU2 , 0, NULL) != RESMGR_OK)
+    //        {
+    //        /* USER CODE BEGIN RESMGR_UTILITY_TIM5 */
+    //        Error_Handler();
+    //        /* USER CODE END RESMGR_UTILITY_TIM5 */
+    //        }
+    //        /* USER CODE BEGIN TIM5_Init 0 */
+
+    //        /* USER CODE END TIM5_Init 0 */
+
+        TIM_Encoder_InitTypeDef sConfig = {0};
+        TIM_MasterConfigTypeDef sMasterConfig = {0};
+        TIM_IC_InitTypeDef sConfigIC = {0};
+
+        /* USER CODE BEGIN TIM5_Init 1 */
+
+        /* USER CODE END TIM5_Init 1 */
+        hTIM5.Instance = TIM5;
+        hTIM5.Init.Prescaler = 0;
+        hTIM5.Init.CounterMode = _countermode;
+        hTIM5.Init.Period = _period;
+        hTIM5.Init.ClockDivision = _clockdivision;
+        hTIM5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+        if (HAL_TIM_IC_Init(&hTIM5) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        sConfig.EncoderMode = _encodermode;
+        sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
+        sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
+        sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
+        sConfig.IC1Filter = _ic1filter;
+        sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
+        sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
+        sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
+        sConfig.IC2Filter = _ic2filter;
+        if (HAL_TIM_Encoder_Init(&hTIM5, &sConfig) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+        sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+        if (HAL_TIMEx_MasterConfigSynchronization(&hTIM5, &sMasterConfig) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+        sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+        sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+        sConfigIC.ICFilter = 8;
+        if (HAL_TIM_IC_ConfigChannel(&hTIM5, &sConfigIC, TIM_CHANNEL_3) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
+        sConfigIC.ICSelection = TIM_ICSELECTION_INDIRECTTI;
+        sConfigIC.ICFilter = 0;
+        if (HAL_TIM_IC_ConfigChannel(&hTIM5, &sConfigIC, TIM_CHANNEL_4) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        /* USER CODE BEGIN TIM5_Init 2 */
+
+        /* USER CODE END TIM5_Init 2 */
+
+    }      
+    
     void MX_ADC1_Init(void)
     {
 
@@ -765,14 +873,14 @@ extern "C" {
     // ADC1 and ADC2 global interrupts
     void ADC_IRQHandler(void)
     {
-        HAL_ADC_IRQHandler(&embot::hw::motor::bsp::hADC1);
-        HAL_ADC_IRQHandler(&embot::hw::motor::bsp::hADC2);
+        HAL_ADC_IRQHandler(&embot::hw::motor::bsp::amc2c::hADC1);
+        HAL_ADC_IRQHandler(&embot::hw::motor::bsp::amc2c::hADC2);
     }   
 
     // DMA2 stream0 global interrupt
     void DMA2_Stream0_IRQHandler(void)
     {
-        HAL_DMA_IRQHandler(&embot::hw::motor::bsp::hdma_adc1);
+        HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amc2c::hdma_adc1);
     }  
 
     // - msp functions    
@@ -826,22 +934,22 @@ extern "C" {
 
             /* ADC1 DMA Init */
             /* ADC1 Init */
-            embot::hw::motor::bsp::hdma_adc1.Instance = DMA2_Stream0;
-            embot::hw::motor::bsp::hdma_adc1.Init.Request = DMA_REQUEST_ADC1;
-            embot::hw::motor::bsp::hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
-            embot::hw::motor::bsp::hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
-            embot::hw::motor::bsp::hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
-            embot::hw::motor::bsp::hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-            embot::hw::motor::bsp::hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-            embot::hw::motor::bsp::hdma_adc1.Init.Mode = DMA_CIRCULAR;
-            embot::hw::motor::bsp::hdma_adc1.Init.Priority = DMA_PRIORITY_HIGH;
-            embot::hw::motor::bsp::hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-            if (HAL_DMA_Init(&embot::hw::motor::bsp::hdma_adc1) != HAL_OK)
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Instance = DMA2_Stream0;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.Request = DMA_REQUEST_ADC1;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.Mode = DMA_CIRCULAR;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.Priority = DMA_PRIORITY_HIGH;
+            embot::hw::motor::bsp::amc2c::hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+            if (HAL_DMA_Init(&embot::hw::motor::bsp::amc2c::hdma_adc1) != HAL_OK)
             {
               Error_Handler();
             }
 
-            __HAL_LINKDMA(hadc,DMA_Handle,embot::hw::motor::bsp::hdma_adc1);
+            __HAL_LINKDMA(hadc,DMA_Handle,embot::hw::motor::bsp::amc2c::hdma_adc1);
 
             /* ADC1 interrupt Init */
             HAL_NVIC_SetPriority(ADC_IRQn, 5, 0);
@@ -1001,38 +1109,38 @@ extern "C" {
         // this mode is not enabled and we get the external fault w/ polling
         for(;;);
 #else        
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::hTIM1);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amc2c::hTIM1);
 #endif
     }
 
     // TIM1 update interrupt
     void TIM1_UP_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::hTIM1);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amc2c::hTIM1);
     }
 
     // TIM1 trigger and commutation interrupts
     void TIM1_TRG_COM_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::hTIM1);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amc2c::hTIM1);
     }
 
     // TIM1 capture compare interrupt
     void TIM1_CC_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::hTIM1);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amc2c::hTIM1);
     }   
     
     // TIM4 global interrupt
     void TIM4_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::hTIM4);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amc2c::hTIM4);
     }
     
     // TIM5 global interrupt
     void TIM5_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::hTIM5);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amc2c::hTIM5);
     }
 
     // msp functions
@@ -1043,8 +1151,8 @@ extern "C" {
     void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle);
     void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle);
     But they are inside the embot::hw::timer section and need only
-    - embot::hw::motor::bsp::TIM_base_MspInit()
-    - embot::hw::motor::bsp::TIM_base_MspDeInit()
+    - embot::hw::motor::bsp::amc2c::TIM_base_MspInit()
+    - embot::hw::motor::bsp::amc2c::TIM_base_MspDeInit()
 #endif
     
     void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* htim_ic)
@@ -1109,7 +1217,7 @@ extern "C" {
 }
 
 
-namespace embot::hw::motor::bsp {
+namespace embot::hw::motor::bsp::amc2c {
     
     void TIM_base_MspInit(TIM_HandleTypeDef* htim_base)
     {
@@ -1252,7 +1360,7 @@ namespace embot::hw::motor::bsp {
             /* USER CODE END TIM4_MspDeInit 1 */
         }  
     }    
-}
+} // namespace embot::hw::motor::bsp::amc2c {
 
 
 

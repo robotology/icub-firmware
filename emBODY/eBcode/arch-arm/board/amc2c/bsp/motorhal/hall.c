@@ -40,17 +40,13 @@
 
 #if defined(MOTORHAL_changes)
 
-// in ... maybe add an include file ...
-namespace embot::hw::motor::bsp {
-    extern TIM_HandleTypeDef hTIM4;
-}
-
-#define HALL_TIM (embot::hw::motor::bsp::hTIM4)
+#include "embot_hw_motor_bsp_amc2c.h"
+#define HALL_TIM (embot::hw::motor::bsp::amc2c::hTIM4)
 
 #else
 /* Can be htim2 or htim5 */
 #define HALL_TIM        htim4
-#endif // 
+#endif // #if defined(MOTORHAL_changes)
 
 /* Hardware related definitions */
 #define HALL_INPUT_PORT     (MOT_HALL1_GPIO_Port->IDR)
@@ -212,10 +208,15 @@ static void HallSetField(int32_t pwm)
  */
 static void HallCapture_cb(TIM_HandleTypeDef *htim)
 {
+#if defined(MOTORHAL_changes) && !defined(MOTORHALCONFIG_enabletests) 
+    HallCapture = HAL_TIM_ReadCapturedValue(&HALL_TIM, TIM_CHANNEL_1);
+    HallStatus = HALL_INPUT();
+#else    
     /* Read the capture register (speed) */
     HallCapture =  HAL_TIM_ReadCapturedValue(&HALL_TIM, TIM_CHANNEL_1);
     /* Update the rotating field */
     HallSetField(HallPwmValue);
+#endif    
 }
 
 
@@ -369,29 +370,9 @@ void HallTest(void)
 
 #if defined(MOTORHAL_changes)
 
-HAL_StatusTypeDef hall_Config(uint8_t swapBC, uint16_t pwm_hall_offset)
-{
-    #warning TODO-embot::hw::motor: hall_Config()
-//    MainConf.pwm.hall_offset = pwm_hall_offset;
-//    MainConf.pwm.swapBC = swapBC;
-//    
-//    s_pwm_hallOrder[0] = 0;
-//    s_pwm_hallOrder[1] = MainConf.pwm.swapBC ? 2 : 1;
-//    s_pwm_hallOrder[2] = MainConf.pwm.swapBC ? 1 : 2;
-
-//    s_pwm_updateHallStatus();
-//    
-//    /* Start position counter */
-//    hallCounter = 0;
-    
-    return HAL_OK;
-}
-
-uint8_t hall_GetStatus(void)
-{
-    return HallStatus;
-}
+uint8_t hall_INPUT() { return HALL_INPUT(); }
 
 #endif // #if defined(MOTORHAL_changes)
+
 
 /* END OF FILE ********************************************************************************************************/
