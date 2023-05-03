@@ -46,48 +46,16 @@ extern HAL_StatusTypeDef EncInit(void);
 extern void EncDeInit(void);
 extern void EncTest(void);
 
+
+
 #if defined(MOTORHAL_changes) 
 
+// we need to expose this callback
+extern void EncCapture_cb(TIM_HandleTypeDef *htim);
 
-// -- public interfaces to be used in embot::hw::motor
+#endif // #if defined(MOTORHAL_changes) 
 
-struct enc_Configuration
-{
-    enum class ACQUISITION { deferred };
-    
-    ACQUISITION acquisition { ACQUISITION::deferred };
-        
-    constexpr enc_Configuration() = default;
-    constexpr bool isvalid() const { return true; }
-};
 
-struct enc_Mode
-{
-    int16_t resolution {0};
-    uint8_t num_polar_couples {0};
-    bool calibrate_with_hall {false};
-    bool use_index {false};
-    
-    constexpr enc_Mode() = default;
-    constexpr enc_Mode(int16_t r, uint8_t n, bool c = false, bool i = false) 
-        : resolution(r), num_polar_couples(n), calibrate_with_hall(c), use_index(i) {}
-    constexpr bool isvalid() const { 
-        bool notok = (0 == resolution) || (0 == num_polar_couples);
-        return !notok;
-    }
-};
-
-extern bool enc_Init(const enc_Configuration &config);
-
-extern bool enc_DeInit();
-
-extern bool enc_Start(const enc_Mode& mode);
-
-extern bool enc_IsStarted();
-
-int32_t enc_GetValue();
-
-#endif // #if defined(MOTORHAL_changes)
 
 
 #ifdef __cplusplus

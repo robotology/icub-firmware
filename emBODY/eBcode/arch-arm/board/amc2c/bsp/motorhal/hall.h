@@ -42,37 +42,10 @@ extern void HallTest(void);
 
 #if defined(MOTORHAL_changes)
 
-struct hall_Configuration
-{
-    enum class ACQUISITION { deferred };
-    
-    ACQUISITION acquisition { ACQUISITION::deferred };
-        
-    constexpr hall_Configuration() = default;
-    constexpr bool isvalid() const { return true; }
-};
+extern uint8_t hall_INPUT();
 
+#endif // #if defined(MOTORHAL_changes) 
 
-struct hall_Mode
-{
-    enum class SWAP { none, BC };
-    SWAP swap {SWAP::none};
-    uint16_t offset {0};
-    
-    constexpr hall_Mode() = default;
-    constexpr hall_Mode(SWAP s, uint16_t o) : swap(s), offset(o) {}
-    constexpr bool isvalid() const { 
-        bool notok = false;
-        return !notok;
-    }
-};
-
-extern bool hall_Init(const hall_Configuration &config);
-extern bool hall_DeInit();
-extern bool hall_Start(const hall_Mode &mode);
-extern uint8_t hall_GetStatus(void);
-
-#endif
 
 #ifdef __cplusplus
     } /* extern "C" */

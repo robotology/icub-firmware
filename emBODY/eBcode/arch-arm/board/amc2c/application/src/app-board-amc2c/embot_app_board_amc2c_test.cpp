@@ -20,7 +20,10 @@
 
 #include "embot_hw_timer.h"
 
-#include "motorhal.h"
+#include "adcm.h"
+#include "enc.h"
+#include "hall.h"
+#include "pwm.h"
 
 #include "embot_hw_motor.h"
 
