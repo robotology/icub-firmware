@@ -429,7 +429,16 @@ namespace embot { namespace hw { namespace motor {
 
     Position s_hw_getencoder(MOTOR h)
     {
-        return embot::hw::motor::enc::getvalue();
+        Position p {0};
+        if(true == embot::hw::motor::enc::isstarted())
+        {
+           p = embot::hw::motor::enc::getvalue();
+        }
+        else if(true == embot::hw::motor::hall::isstarted())
+        {
+           p = embot::hw::motor::hall::getangle();
+        }
+        return p;
     }
 
 //    Position s_hw_gethallcounter(MOTOR h)

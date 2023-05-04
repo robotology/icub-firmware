@@ -17,27 +17,36 @@
 
 #include "rtw_enable_disable_motors.h"
 
-#ifdef STM32HAL_BOARD_AMCBLDC
+
+    
+#if defined(STM32HAL_BOARD_AMCBLDC) || defined(STM32HAL_BOARD_AMC2C)
 
 #ifndef __cplusplus
-    #error this file must be compiled in C++ mode when deployed on the amcbldc target
+    #error this file must be compiled in C++ mode when deployed on the target
 #endif
-// we use embot::hw
+    
 #include "embot_hw_motor.h"
-#endif /* STM32HAL_BOARD_AMCBLDC */
+    
+#else
+    #warning: choose a STM32HAL_BOARD_*    
+#endif
 
 void rtw_enableMotor()
 {
-#ifdef STM32HAL_BOARD_AMCBLDC
+#if defined(STM32HAL_BOARD_AMCBLDC) || defined(STM32HAL_BOARD_AMC2C)
     embot::hw::motor::enable(embot::hw::MOTOR::one, true);
-#endif /* STM32HAL_BOARD_AMCBLDC */
+#else
+    #warning: choose a STM32HAL_BOARD_*    
+#endif
 }
 
 void rtw_disableMotor()
 {
-#ifdef STM32HAL_BOARD_AMCBLDC
+#if defined(STM32HAL_BOARD_AMCBLDC) || defined(STM32HAL_BOARD_AMC2C)
     embot::hw::motor::enable(embot::hw::MOTOR::one, false);
-#endif /* STM32HAL_BOARD_AMCBLDC */
+#else
+    #warning: choose a STM32HAL_BOARD_*    
+#endif
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

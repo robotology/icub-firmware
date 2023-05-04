@@ -32,12 +32,13 @@ inline void rtw_mutex_lock(void)
 {    
     if(false == IsException())
     {
-    #ifdef STM32HAL_BOARD_AMCBLDC
+#if defined(STM32HAL_BOARD_AMCBLDC)
         NVIC_DisableIRQ(DMA1_Channel2_IRQn);
-    #endif    
-    #ifdef STM32HAL_BOARD_AMC2C
-        NVIC_DisableIRQ(BDMA_Channel2_IRQn);
-    #endif
+#elif defined(STM32HAL_BOARD_AMC2C)
+        NVIC_DisableIRQ(DMA2_Stream0_IRQn);
+#else  
+    #warning: choose a STM32HAL_BOARD_*
+#endif
     }  
 }
 
@@ -45,12 +46,13 @@ inline void rtw_mutex_unlock(void)
 {
     if(false == IsException())
     {
-    #ifdef STM32HAL_BOARD_AMCBLDC
+#if defined(STM32HAL_BOARD_AMCBLDC)
         NVIC_EnableIRQ(DMA1_Channel2_IRQn);
-    #endif
-    #ifdef STM32HAL_BOARD_AMC2C
-        NVIC_EnableIRQ(BDMA_Channel2_IRQn);
-    #endif
+#elif defined(STM32HAL_BOARD_AMC2C)
+        NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+#else  
+    #warning: choose a STM32HAL_BOARD_*
+#endif
     }
 }
 

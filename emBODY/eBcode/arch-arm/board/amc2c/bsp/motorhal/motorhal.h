@@ -160,7 +160,8 @@ bool init(const Configuration &config);
 bool deinit();
 bool start(const Mode &mode);
 bool isstarted();
-uint8_t getstatus(void);    
+uint8_t getstatus();    
+int32_t getangle();
     
 } // namespace embot::hw::motor::hall {
 

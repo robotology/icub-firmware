@@ -931,12 +931,12 @@
             </File>
             <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
               <FileName>rtw_motor_config.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
             </File>
           </Files>
@@ -2172,12 +2172,12 @@
             </File>
             <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
               <FileName>rtw_motor_config.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
             </File>
           </Files>
@@ -3464,12 +3464,12 @@
             </File>
             <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
               <FileName>rtw_motor_config.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
             </File>
           </Files>
