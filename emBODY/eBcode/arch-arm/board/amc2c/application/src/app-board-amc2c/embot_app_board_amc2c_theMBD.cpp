@@ -19,9 +19,11 @@
 
 #if defined(STM32HAL_BOARD_AMC2C)
 #include "embot_hw_bsp_amc2c.h"
-#warning READ CAREFULLY: we may use the same object for both amcbldc and amc2c
-#else
+//#warning READ CAREFULLY: we may use the same object for both amcbldc and amc2c
+#elif defined(STM32HAL_BOARD_AMCBLDC)
 #include "embot_hw_bsp_amcbldc.h"
+#else
+#error: choose a STM32HAL_BOARD_*
 #endif
 
 #include "embot_hw_button.h"
@@ -44,6 +46,8 @@
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
 //#define TEST_DURATION_FOC
+
+#define TEST_FOC_logvalues
 
 
 // If the target setup is the KOLLMORGEN motor on RED LEGO platform,
@@ -469,16 +473,29 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
     } 
     
     
-    // If motor configuration parameters changed due to a SET_MOTOR_CONFIG message, then update hal as well (Only pole_pairs at the moment)
-    // TODO: We should perform the following update inside the architectural model after a SET_MOTOR_CONFIG message has been received
-    //MainConf.pwm.num_polar_couples = AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
-    
     measureTick->stop();
     
    
     return true;
 }
 
+#if defined(TEST_FOC_logvalues)
+
+struct dbgFOCvalues
+{
+    embot::hw::motor::Currents currents {0, 0, 0};
+    uint8_t hall {0};    
+    embot::hw::motor::Position electricalangle {0};
+    int32_t position {0};
+    float jointangle {0.0};
+    std::array<int32_t, 3> pwms {0, 0, 0};   
+    
+    dbgFOCvalues() = default;    
+};
+
+dbgFOCvalues dbgFOC {};
+
+#endif
 
 void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owner, const embot::hw::motor::Currents * const currents)
 {
@@ -499,8 +516,10 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     
     // remember to manage impl->EXTFAULTisPRESSED ............
 
-    // retrieve the current value of the Hall sensors 
-    embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, AMC_BLDC_U.SensorsData_p.motorsensors.hallABC);
+    // retrieve the current value of the Hall sensors
+    uint8_t hall {0};    
+    embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, hall);
+    AMC_BLDC_U.SensorsData_p.motorsensors.hallABC = hall;
     
     // retrieve the current value of the encoder
     embot::hw::motor::Position electricalAngle {0};
@@ -514,7 +533,8 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     electricalAngleOld = electricalAngle;
     
     // calculate the current joint position
-    position = position + delta / AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
+    size_t polepairs = (0 != AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs) ? AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs : 1;
+    position = position + delta / polepairs;
     
     AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
     
@@ -538,7 +558,19 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     int32_T Vabc1 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[1] * 163.83F);
     int32_T Vabc2 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[2] * 163.83F);
     
+#if defined(TEST_FOC_logvalues)
+    
+    dbgFOC.currents = currs;
+    dbgFOC.hall = hall;
+    dbgFOC.electricalangle = electricalAngle;
+    dbgFOC.position = position;
+    dbgFOC.jointangle = static_cast<float>(position) * 0.0054931640625f;
+    dbgFOC.pwms = {Vabc0, Vabc1, Vabc2};
+
+#endif
+    
     embot::hw::motor::setpwm(embot::hw::MOTOR::one, Vabc0, Vabc1, Vabc2);
+    
    
 //#define DEBUG_PARAMS
 #ifdef DEBUG_PARAMS

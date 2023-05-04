@@ -48,17 +48,7 @@ namespace embot::app::board::amc2c::mbd {
         EncInit();
         HallInit();
         PwmInit();        
-        
-        
-        // in debug mode questa init non viene chiamata a meno che non si clicca "RUN" manualmente prima che venga sbloccato dal CM7
-//        embot::hw::motor::init(embot::hw::MOTOR::one, {});
-//        embot::app::board::amc2c::theMBD::getInstance().initialise({adr});
-        
-//        embot::hw::timer::Config cfg{embot::core::time1millisec, embot::hw::timer::Mode::periodic, cc};
-//        embot::hw::timer::init(embot::hw::TIMER::one, cfg);
-//        embot::hw::timer::start(embot::hw::TIMER::one);  
-        
-        
+
     }
     
     void OnTick(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output)

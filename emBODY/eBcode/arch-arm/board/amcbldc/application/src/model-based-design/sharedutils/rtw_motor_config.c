@@ -16,25 +16,43 @@
 */
 
 #include "rtw_motor_config.h"
-#ifdef STM32HAL_BOARD_AMCBLDC
+
+#if defined(STM32HAL_BOARD_AMCBLDC) || defined(STM32HAL_BOARD_AMC2C)
 
 #ifndef __cplusplus
-    #error this file must be compiled in C++ mode when deployed on the amcbldc target
+    #error this file must be compiled in C++ mode when deployed on the target
 #endif
-// we use embot::hw
+    
 #include "embot_hw_motor.h"
-#endif /* STM32HAL_BOARD_AMCBLDC */
+    
+#else
+    #warning: choose a STM32HAL_BOARD_*    
+#endif
 
 void rtw_configMotor(uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t pole_pairs, uint8_t has_hall_sens, uint8_t swapBC, uint16_t hall_sens_offset)
 {
-    #ifdef STM32HAL_BOARD_AMCBLDC
-    embot::hw::motor::config(
-        embot::hw::MOTOR::one,
-        has_quad_enc,    
-        rotor_enc_resolution, 
-        pole_pairs, 
-        has_hall_sens,
-        1,
-        120*65536/360);
-    #endif /* STM32HAL_BOARD_AMCBLDC */
+#if defined(STM32HAL_BOARD_AMCBLDC) || defined(STM32HAL_BOARD_AMC2C)
+
+//    embot::hw::motor::config(
+//        embot::hw::MOTOR::one,
+//        has_quad_enc,    
+//        rotor_enc_resolution, 
+//        pole_pairs, 
+//        has_hall_sens,
+//        swapBC,             // it was 1, but better use its param 
+//        hall_sens_offset);  // it was 120*65536/360, but better using its param  
+//                            // because: supervisor calls rtw_configMotor( , swapBC = 1, hall_sens_offset = 21845) and 120*65536/360 = 21845
+    
+    // marco.accame: but now we use embot::hw::motor::Config
+    const embot::hw::motor::Config cfg { 
+        rotor_enc_resolution, pole_pairs, hall_sens_offset, 
+        (0 == has_quad_enc) ? false : true, 
+        (0 == has_hall_sens) ? false : true, 
+        (0 == swapBC) ? false : true 
+    };
+    embot::hw::motor::configure(embot::hw::MOTOR::one, cfg);
+     
+#else
+    #warning: choose a STM32HAL_BOARD_*    
+#endif
 }

@@ -434,7 +434,7 @@ struct hall_Data
 {
     uint8_t order[3] = {0, 1, 2};
     int32_t counter {0};
-    uint16_t angle {0};
+    int32_t angle {0};
     volatile uint8_t status {0};
     
     void reset(Mode::SWAP s = Mode::SWAP::none)
@@ -486,9 +486,9 @@ static uint8_t hall_Get()
     // if we have order = {0, 1, 2} we dont reorder anything, so we have v = x = H3H2H1 = CBA.
     // but in case swapBC is true, then we have  order {0, 2, 1} which swap second w/third, so v = H2H3H1 =  BCA
     
-    uint8_t v = (((v>>0)&0x1) >> _hall_internals.data.order[0])      |   // H1 (pos 0) is moved to the final position
-                (((v>>1)&0x1) >> _hall_internals.data.order[1])      |   // H2 (pos 1) is moved to the final position
-                (((v>>2)&0x1) >> _hall_internals.data.order[2]);         // H3 (pos 2) is moved to the final position
+    uint8_t v = (((x>>0)&0x1) >> _hall_internals.data.order[0])      |   // H1 (pos 0) is moved to the final position
+                (((x>>1)&0x1) >> _hall_internals.data.order[1])      |   // H2 (pos 1) is moved to the final position
+                (((x>>2)&0x1) >> _hall_internals.data.order[2]);         // H3 (pos 2) is moved to the final position
     return v;
 }
 
@@ -497,8 +497,8 @@ static void hall_OnCapture(TIM_HandleTypeDef *htim)
 {
     _hall_internals.data.status = hall_Get();
     
-    // in here we DONT ... perform any calibration of the encoder ....
-    // because in the wrist we dont have encoder. we may implement this calibration later on
+    // in here, we surely fill angle.
+    _hall_internals.data.angle = _hall_internals.mode.offset +  hall_Table::status2angle(_hall_internals.data.status);
 }
 
 
@@ -587,10 +587,15 @@ bool isstarted()
     return _hall_internals.started;
 }
 
-uint8_t getstatus(void)
+uint8_t getstatus()
 {
     return _hall_internals.data.status;
-}    
+}   
+
+int32_t getangle()
+{
+    return _hall_internals.data.angle;
+} 
 
 } // namespace embot::hw::motor::hall {
 
