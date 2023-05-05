@@ -406,6 +406,25 @@ void embot::app::board::amc2c::theMBD::Impl::onEXTFAULTpressedreleased(void *own
     }
 }
 
+
+#if defined(TEST_FOC_logvalues)
+
+struct dbgFOCvalues
+{
+    embot::hw::motor::Currents currents {0, 0, 0};
+    uint8_t hall {0};    
+    embot::hw::motor::Position electricalangle {0};
+    int32_t position {0};
+    float jointangle {0.0};
+    std::array<int32_t, 3> pwms {0, 0, 0};   
+    
+    dbgFOCvalues() = default;    
+};
+
+dbgFOCvalues dbgFOC {};
+
+#endif
+	
 // Called every 1 ms
 bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 { 
@@ -472,30 +491,22 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
         }
     } 
     
-    
+		uint32_t aa = 0x3;
+		uint8_t bb = 8;
+		uint8_t el0 = static_cast<uint8_t>(dbgFOC.electricalangle >> 24);
+		uint8_t el1 = static_cast<uint8_t>(dbgFOC.electricalangle >> 16);
+		uint8_t el2 = static_cast<uint8_t>(dbgFOC.electricalangle >> 8);
+		uint8_t el3 = static_cast<uint8_t>(dbgFOC.electricalangle);
+		
+    embot::prot::can::Frame fr1 {aa, bb , {el0, el1, el2, el3, 0, 0, 0,0xCD}};
+    outframes.push_back(fr1);
+			
     measureTick->stop();
     
    
     return true;
 }
 
-#if defined(TEST_FOC_logvalues)
-
-struct dbgFOCvalues
-{
-    embot::hw::motor::Currents currents {0, 0, 0};
-    uint8_t hall {0};    
-    embot::hw::motor::Position electricalangle {0};
-    int32_t position {0};
-    float jointangle {0.0};
-    std::array<int32_t, 3> pwms {0, 0, 0};   
-    
-    dbgFOCvalues() = default;    
-};
-
-dbgFOCvalues dbgFOC {};
-
-#endif
 
 void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owner, const embot::hw::motor::Currents * const currents)
 {
