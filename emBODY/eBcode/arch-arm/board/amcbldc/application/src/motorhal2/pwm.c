@@ -17,6 +17,7 @@
 #if defined(USE_STM32HAL) 
 // API
 #include "pwm.h"
+#include "motorhal_faults.h"
 #endif
 
 /* Includes ***********************************************************************************************************/
@@ -87,8 +88,8 @@ analogAvgFilterTypeDef hallFilteredCurrent;
 #if defined(MOTORHAL_changes) && defined(__cplusplus)
 
 constexpr int16_t numHallSectors = 6;
-constexpr float_t iCubDeg = 65536.0; // Range of angular values that can be represented with the encoder
-constexpr float_t Deg2iCub = iCubDeg / 360.0;
+constexpr float iCubDeg = 65536.0; // Range of angular values that can be represented with the encoder
+constexpr float Deg2iCub = iCubDeg / 360.0;
 constexpr int16_t hallAngleStep = 60.0 * Deg2iCub; // 60 degrees scaled by the range of possible values
 constexpr int16_t minHallAngleDelta = 30.0 * Deg2iCub; // 30 degrees scaled by the range of possible values
 
@@ -419,6 +420,9 @@ static void pwmMotorFault_cb(TIM_HandleTypeDef *htim)
         __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
         __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
         __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
+        
+        motorhal_set_fault(OverCurrentFailure);
+        
 #if defined(MOTORHAL_changes)
 #else
         /* Null output voltage */
@@ -1047,6 +1051,36 @@ static uint8_t s_pwm_updateHallStatus(void)
     
     /* Read current value of HALL1, HALL2 and HALL3 signals in bits 2..0 */
     hallStatus = DECODE_HALLSTATUS;
+    
+    if (hallStatus == 0 || hallStatus == 7)
+    {
+        // this configuration is impossible
+        // RAISE ERROR STATE
+        motorhal_set_fault(DHESInvalidValue);
+        return 0;
+    }
+    
+    constexpr char hallSectorTable[] = {255, 4, 2, 3, 0, 5, 1};
+    
+    char hallSector = hallSectorTable[hallStatus];
+    
+    static char hallSector_old = hallSector;
+    
+    if (hallSector_old != hallSector)
+    {
+        char updown = (hallSector - hallSector_old + 6) % 6;
+        
+        if (updown != 1 && updown != 5)
+        {
+            // this transition is impossible
+            // RAISE ERROR STATE
+            motorhal_set_fault(DHESInvalidSequence);
+            return 0;
+        }
+        
+        hallSector_old = hallSector;
+    }
+    
     uint16_t angle = MainConf.pwm.hall_offset + hallAngleTable[hallStatus];
     
     // Check which sector between [0 ... 5] the rotor is in
