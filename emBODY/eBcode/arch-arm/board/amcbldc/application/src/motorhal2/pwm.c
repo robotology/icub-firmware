@@ -1043,7 +1043,6 @@ HAL_StatusTypeDef pwm_hallDeinit(void)
 
 static uint8_t s_pwm_updateHallStatus(void)
 {
-    s_pwm_hallStatus_old = hallStatus;
     static int8_t calibration_step = 0;
     
     static uint16_t border[6]={0};
@@ -1057,8 +1056,11 @@ static uint8_t s_pwm_updateHallStatus(void)
         // this configuration is impossible
         // RAISE ERROR STATE
         motorhal_set_fault(DHESInvalidValue);
-        return 0;
+        
+        hallStatus = s_pwm_hallStatus_old;
     }
+    
+    s_pwm_hallStatus_old = hallStatus;
     
     constexpr char hallSectorTable[] = {255, 4, 2, 3, 0, 5, 1};
     
