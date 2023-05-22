@@ -470,8 +470,8 @@ volatile short Va = 0, Vb = 0, Vc = 0;
 volatile int VqFbk = 0;
 volatile int IqFbk = 0;
 
-extern volatile int sector_fbk;
-extern volatile int eldegr_fbk;
+//extern volatile int sector_fbk;
+//extern volatile int eldegr_fbk;
 
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
@@ -550,7 +550,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
             
             sector = DHESSector();
             
-            sector_fbk = sector;
+            //sector_fbk = sector;
                         
             static int sector_old = 0;
             
@@ -572,7 +572,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
             {
                 int angle = QEgetElettrDeg();
                 
-                eldegr_fbk = angle;
+                //eldegr_fbk = angle;
                 
                 sector = 1 + angle/60;
                 delta = angle%60 - 30;

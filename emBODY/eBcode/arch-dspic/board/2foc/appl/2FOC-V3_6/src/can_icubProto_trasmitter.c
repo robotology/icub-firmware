@@ -59,9 +59,7 @@ extern volatile short Va,Vb,Vc;
 extern volatile int VqFbk;
 extern volatile int IqFbk;
 
-volatile int sector_fbk = 0;
-volatile int eldegr_fbk = 0;
-volatile int position_fbk = 0;
+//volatile int position_fbk = 0;
 
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
@@ -70,8 +68,8 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     
     payload.w[0]  = IqFbk;//POSCNT;
     payload.w[1]  = gQEVelocity;
-    //payload.w[2]  = sector_fbk;
-    //payload.w[3]  = 1+eldegr_fbk/60;
+    //payload.w[2]  = indexes;//sector_fbk;
+    //payload.w[3]  = overflows;//1+eldegr_fbk/60;
             
     payload.dw[1] = gQEPosition;
     //payload.dw[1] = QEgetPosCheck(); 
