@@ -48,14 +48,6 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 	canprototransmitter_bid = bid;
 }
 
-extern volatile long VqRef;
-extern volatile int  IqRef;
-
-extern volatile tMotorConfig MotorConfig;
-
-extern volatile short Ia,Ib,Ic;
-extern volatile short Va,Vb,Vc;
-
 extern volatile int VqFbk;
 extern volatile int IqFbk;
 
@@ -66,18 +58,11 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     static tCanData payload; // = {{0}};
     unsigned long msgid;
     
-    payload.w[0]  = IqFbk;//POSCNT;
+    payload.w[0]  = IqFbk;
     payload.w[1]  = gQEVelocity;
-    //payload.w[2]  = indexes;//sector_fbk;
-    //payload.w[3]  = overflows;//1+eldegr_fbk/60;
-            
+    
     payload.dw[1] = gQEPosition;
     //payload.dw[1] = QEgetPosCheck(); 
-    
-    //payload.w[0] = I2Tdata.IQMeasured;
-    //payload.w[1] = Ia;
-    //payload.w[2] = Ib;
-    //payload.w[3] = Ic;
     
     msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 
@@ -86,13 +71,9 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     //prepare the payload
     payload.b[0] = gControlMode;
     payload.b[1] = gEncoderError.bitmask;
-
     payload.w[1] = VqFbk;
-
-    payload.b[4] = SysError.b[0];
-    payload.b[5] = SysError.b[1];
-    payload.b[6] = SysError.b[2];
-    payload.b[7] = SysError.b[3];
+    
+    payload.dw[1] = SysError.L;
 
     msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
 

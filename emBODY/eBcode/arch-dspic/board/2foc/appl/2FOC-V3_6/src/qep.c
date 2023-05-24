@@ -72,8 +72,8 @@ void QEinit(int16_t ticks, int8_t num_poles, BOOL use_index)
     // Filter accept edge if it persist over 3 CK
     // cycles. So max QEP pin freq is about 3.3Mhz
     DFLTCONbits.QECK = 2;
-    //DFLTCONbits.IMV  = 3; // iCub
-    DFLTCONbits.IMV  = 2; // ergoCub
+    DFLTCONbits.IMV  = 3; // iCub
+    //DFLTCONbits.IMV  = 2; // ergoCub ?
 
     // Initialize the QEP module counter to run in modulus.
     //
@@ -87,30 +87,36 @@ void QEinit(int16_t ticks, int8_t num_poles, BOOL use_index)
     
     QE_COUNTER = 0;
     
-    // Reset position counter.
+    // Reset position counter
     POSCNT = 0;
     MAXCNT = QE_RES_POLE-1;
     POSCNT_OLD = 0;
 
+    // Index pulse doesn't reset position counter
+    QEICONbits.POSRES = 0;
+    
     if (use_index)
     {
         // Count error interrupts enabled
         DFLTCONbits.CEID = 0;
         
-        // 
+        // Counter reset by index 
         QEICONbits.QEIM = 6;
+        
+        // Enable interrupts
+        IEC3bits.QEI1IE = 1;
     }
     else
     {
         // Count error interrupts disabled
         DFLTCONbits.CEID = 1;
+             
+        // Disable interrupts
+        IEC3bits.QEI1IE = 0;
         
         // Counter reset by match with MAXCNT
         QEICONbits.QEIM = 7;
     }
-    
-    // Index pulse doesn't reset position counter
-    QEICONbits.POSRES = 0;
     
     // reset interrupt flag
     IFS3bits.QEI1IF = 0;
@@ -130,7 +136,6 @@ inline int QEgetElettrDeg()
     if (QE_RES_POLE) degrees = __builtin_divud(__builtin_muluu(POSCNT,360),(unsigned)QE_RES_POLE);
         
     return (7200 + gEncoderConfig.offset + (int)degrees) % 360;
-    //return ((int)degrees) % 360;
 }
 
 //extern volatile int position_fbk;
@@ -176,7 +181,7 @@ void QEHESCrossed(BOOL up)
         QE_READY = TRUE;
     }
 }
-    
+
 // QE zero crossing interrupt manager
 void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
 {   
@@ -219,7 +224,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
                     }
                 }
             }
-        
+             
             UPDN = QEICONbits.UPDN;
         }
         else
@@ -233,9 +238,9 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
         
         watchdog = 0;
     }
-    
+      
     POSCNT = QEICONbits.UPDN ? 0 : MAXCNT;
-  
+    
     //POSCNT_OLD = POSCNT;
     //QE_COUNTER = QEICONbits.UPDN ? 0 : -1;
 
