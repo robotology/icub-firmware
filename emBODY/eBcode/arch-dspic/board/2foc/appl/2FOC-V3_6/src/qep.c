@@ -155,9 +155,7 @@ inline int QEgetPosition()
     while (QE_COUNTER >= QE_RESOLUTION) QE_COUNTER -= QE_RESOLUTION;
     while (QE_COUNTER < 0)              QE_COUNTER += QE_RESOLUTION;
     
-    //position_fbk = QE_COUNTER;
-        
-    return __builtin_divsd(QE_COUNTER<<14,QE_TICKS);
+    return __builtin_divsd((QE_COUNTER<<14)+QE_TICKS/2,QE_TICKS);
 } 
 
 //inline int32_t QEgetPosCheck() __attribute__((always_inline));
@@ -201,6 +199,8 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
         
             if (abs(watchdog) > QE_NUM_POLES) gEncoderError.index_broken = TRUE;
         }
+        
+        POSCNT = QEICONbits.UPDN ? 0 : MAXCNT;
     }
     else // INDEX
     {        
@@ -237,12 +237,13 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
         }
         
         watchdog = 0;
-    }
-      
-    POSCNT = QEICONbits.UPDN ? 0 : MAXCNT;
+        
+        POSCNT = QEICONbits.UPDN ? 0 : MAXCNT;
     
-    //POSCNT_OLD = POSCNT;
-    //QE_COUNTER = QEICONbits.UPDN ? 0 : -1;
+        POSCNT_OLD = POSCNT;
+        
+        QE_COUNTER = QEICONbits.UPDN ? 0 : QE_RESOLUTION-1;
+    }
 
     QEICONbits.CNTERR = FALSE;
     
