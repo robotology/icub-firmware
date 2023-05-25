@@ -23,6 +23,7 @@
     #define EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
+    #define EMBOT_ENABLE_hw_testpoint
     #define EMBOT_ENABLE_hw_eeprom
 //    #define EMBOT_ENABLE_hw_eeprom_emulatedMODE
     
