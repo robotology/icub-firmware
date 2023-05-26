@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -583,14 +583,19 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led.cpp</FileName>
+              <FileName>embot_hw_testpoint.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_testpoint.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_lowlevel.cpp</FileName>
@@ -2593,8 +2598,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -3141,14 +3146,19 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led.cpp</FileName>
+              <FileName>embot_hw_testpoint.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_testpoint.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_lowlevel.cpp</FileName>
@@ -4896,8 +4906,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -5382,6 +5392,25 @@
               <FileName>osal.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
             <File>
               <FileName>eventviewer.c</FileName>
@@ -5444,14 +5473,19 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led.cpp</FileName>
+              <FileName>embot_hw_testpoint.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_testpoint.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_lowlevel.cpp</FileName>
@@ -7709,8 +7743,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -8308,14 +8342,19 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led.cpp</FileName>
+              <FileName>embot_hw_testpoint.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_testpoint.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_lowlevel.cpp</FileName>
@@ -9298,8 +9337,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -9897,14 +9936,19 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led.cpp</FileName>
+              <FileName>embot_hw_testpoint.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_testpoint.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_lowlevel.cpp</FileName>
@@ -10887,8 +10931,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -11435,14 +11479,19 @@
               <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_led.cpp</FileName>
+              <FileName>embot_hw_testpoint.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_testpoint.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_lowlevel.cpp</FileName>

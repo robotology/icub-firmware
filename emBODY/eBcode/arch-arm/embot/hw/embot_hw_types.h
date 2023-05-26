@@ -38,7 +38,9 @@ namespace embot { namespace hw {
     enum class CLOCK : std::uint8_t { syscore = 0, pclk1 = 1, pclk2 = 2, none = 31, maxnumberof = 3 };
     
     enum class LED : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 31, maxnumberof = 8 };
-            
+
+    enum class TESTPOINT : std::uint8_t { one = 0, two = 1, three = 2, four = 3, none = 31, maxnumberof = 4 };
+        
     enum class CAN : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2};
             
     enum class FLASHbankID : uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 }; 

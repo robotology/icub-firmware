@@ -185,6 +185,78 @@ namespace embot { namespace hw { namespace led {
 
 
 
+// - support map: begin of embot::hw::testpoint
+
+#include "embot_hw_testpoint_bsp.h"
+
+#if !defined(EMBOT_ENABLE_hw_testpoint)
+
+namespace embot { namespace hw { namespace testpoint {
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::TESTPOINT h) const {}    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}
+
+#else
+
+namespace embot { namespace hw { namespace testpoint {
+    
+    #if   defined(STM32HAL_BOARD_AMC)
+
+    
+    constexpr PROP tp1 = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five}  };
+    constexpr PROP tp2 = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::eight}  };
+    constexpr PROP tp3 = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::zero}  };
+    constexpr PROP tp4 = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}}; 
+    
+    constexpr BSP thebsp {
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TESTPOINT::one) | mask::pos2mask<uint32_t>(TESTPOINT::two) | 
+        mask::pos2mask<uint32_t>(TESTPOINT::three) | mask::pos2mask<uint32_t>(TESTPOINT::four) 
+        ,
+        // properties
+        {{
+            &tp1, &tp2, &tp3, &tp4
+        }}
+    };
+    
+    void clock_enable_A() { __HAL_RCC_GPIOA_CLK_ENABLE(); }
+    void clock_enable_C() { __HAL_RCC_GPIOC_CLK_ENABLE(); }
+    void BSP::init(embot::hw::TESTPOINT h) const 
+    {
+        // activate the clock if cube-mx didn't do that
+        uint8_t i = embot::core::tointegral(h);
+
+        clock_enable_A();
+        clock_enable_C();
+        
+        // init the gpio
+        const embot::hw::GPIO &g = thebsp.properties[i]->gpio;
+        embot::hw::gpio::configure(g, embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::high);
+    } 
+
+    #else
+        #error embot::hw::testpoint::thebsp must be defined
+    #endif
+    
+    const BSP& getBSP()
+    {
+        return thebsp;
+    }
+
+}}} // namespace embot { namespace hw {  namespace testpoint {
+
+#endif // testpoint
+
+// - support map: end of embot::hw::testpoint
+
+
+
 // - support map: begin of embot::hw::button
 
 #include "embot_hw_button.h"
