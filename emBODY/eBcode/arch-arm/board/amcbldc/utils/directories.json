@@ -3,7 +3,7 @@
         {
             "source_directory": "_sharedutils",
             "source_directory_parent": "ert",
-            "target_directory": "sharedutils",            
+            "target_directory": "sharedutils",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -11,7 +11,7 @@
         },
         {
             "source_directory": "AMC_BLDC_ert_rtw",
-            "target_directory": "amc-bldc",            
+            "target_directory": "amc-bldc",
             "files": [
                 "AMC*.cpp",
                 "AMC*.h"
@@ -20,7 +20,7 @@
         {
             "source_directory": "can_decoder",
             "source_directory_parent": "ert",
-            "target_directory": "can-decoder",            
+            "target_directory": "can-decoder",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -29,7 +29,7 @@
         {
             "source_directory": "can_encoder",
             "source_directory_parent": "ert",
-            "target_directory": "can-encoder",            
+            "target_directory": "can-encoder",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -38,7 +38,7 @@
         {
             "source_directory": "control_foc",
             "source_directory_parent": "ert",
-            "target_directory": "control-foc",            
+            "target_directory": "control-foc",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -47,7 +47,7 @@
         {
             "source_directory": "control_outer",
             "source_directory_parent": "ert",
-            "target_directory": "control-outer",            
+            "target_directory": "control-outer",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -56,7 +56,7 @@
         {
             "source_directory": "estimation_velocity",
             "source_directory_parent": "ert",
-            "target_directory": "estimator",            
+            "target_directory": "estimator",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -65,7 +65,7 @@
         {
             "source_directory": "filter_current",
             "source_directory_parent": "ert",
-            "target_directory": "filter-current",            
+            "target_directory": "filter-current",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -74,7 +74,7 @@
         {
             "source_directory": "SupervisorFSM_RX",
             "source_directory_parent": "ert",
-            "target_directory": "supervisor-rx",            
+            "target_directory": "supervisor-rx",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -83,9 +83,17 @@
         {
             "source_directory": "SupervisorFSM_TX",
             "source_directory_parent": "ert",
-            "target_directory": "supervisor-tx",            
+            "target_directory": "supervisor-tx",
             "files": [
                 "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "src",
+            "source_directory_parent": "code_replacement",
+            "target_directory": "sharedutils",
+            "files": [
                 "*.h"
             ]
         }
