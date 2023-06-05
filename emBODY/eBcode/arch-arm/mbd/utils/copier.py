@@ -52,7 +52,8 @@ def parse_instructions(dictionary, source_directory, target_directory):
         source_subdir = find_subdirectory(source_directory, subdirectory["source_directory"], parent)
         target_subdir = find_subdirectory(target_directory, subdirectory["target_directory"])
 
-        # copy_files(source_subdir, target_subdir, subdirectory["files"], True)
+        copy_files(source_subdir, target_subdir, subdirectory["files"], True)
+    
     print(BIG_SECTION)
 
 def copy_files(source_dir, target_dir, file_selectors, overwrite):
