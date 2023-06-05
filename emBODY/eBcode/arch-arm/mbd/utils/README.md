@@ -3,11 +3,11 @@
 To use the Copier script, run the following command:
 
 ```bash
- Python3 copier.py <source> <destination> <path_to_directories_json>.
+ Python3 copier.py <source1> <source2> ... <sourceN> <destination> <path_to_directories_json>.
 ```
 
 **Notes:**
-- _source_: It's the directory where the generated code by Simulink resides. This should point to the `codegen` directory of the Model repository.
+- _source_: It's the directory where the generated code by Simulink resides. This should point to the `codegen` and/or `system` directory of the Model repository.
 
 - _destinantion_: It's the directory where to copy the code. This should point to the `src/model-based-design` directory of `icub-firmware` repo of the respective board.
 
