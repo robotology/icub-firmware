@@ -92,8 +92,10 @@ namespace embot { namespace hw { namespace motor {
 #else
 
 
+
+
 namespace embot { namespace hw { namespace motor {
-              
+
     // masks       
     static std::uint32_t initialisedmask = 0;
     static std::uint32_t enabledmask = 0;
@@ -159,7 +161,12 @@ namespace embot { namespace hw { namespace motor {
     result_t s_hw_motorDisable(MOTOR h);
     result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner);
     
-   
+    // fault check functions
+    bool s_hw_isHardwareFault(MOTOR h);
+    bool s_hw_isHallSequenceError(MOTOR h);
+    bool s_hw_isHallValueError(MOTOR h);
+    bool s_hw_isOvercurrent(MOTOR h);
+    uint32_t s_hw_get32bit2FOCstyleFaultMask(MOTOR h);
     
     result_t init(MOTOR h, const Config &cfg)
     {
@@ -174,7 +181,7 @@ namespace embot { namespace hw { namespace motor {
         }
                 
         uint8_t index = embot::core::tointegral(h);
-                        
+        
         // prepare the hw environment. something such as prepare GPIOs, TIMs, ADC, link them together, etc.
         embot::hw::motor::bsp::getBSP().init(h);                           
         
@@ -195,7 +202,7 @@ namespace embot { namespace hw { namespace motor {
         {   // ok i know there is a double check vs validity of cfg
             configure(h, cfg);
         }            
-                        
+        
         return resOK;
     }
   
@@ -349,6 +356,25 @@ namespace embot { namespace hw { namespace motor {
         return s_hw_setCallbackOnCurrents(h, callback, owner);
     }
     
+    bool isHallSequenceError(MOTOR h)
+    {
+        return s_hw_isHallSequenceError(h);
+    }
+    
+    bool isHallValueError(MOTOR h)
+    {
+        return s_hw_isHallValueError(h);
+    }
+    
+    bool isOvercurrent(MOTOR h)
+    {
+        return s_hw_isOvercurrent(h);
+    }
+    
+    bool isHardwareFault(MOTOR h)
+    {
+        return s_hw_isHardwareFault(h);
+    }
     
 // in here is the part for low level hw of the boards (amc2c or amcbldc)
     
@@ -471,6 +497,12 @@ namespace embot { namespace hw { namespace motor {
         embot::hw::motor::adc::set(cbk);
         return resOK;   
     }
+    
+    bool s_hw_isHardwareFault(MOTOR h){ return false; }
+    bool s_hw_isHallSequenceError(MOTOR h){ return false; }
+    bool s_hw_isHallValueError(MOTOR h){ return false; }
+    bool s_hw_isOvercurrent(MOTOR h){ return false; }
+    uint32_t s_hw_get32bit2FOCstyleFaultMask(MOTOR h){ return 0; }
 
 #elif defined(STM32HAL_BOARD_AMCBLDC)
     
@@ -481,16 +513,21 @@ namespace embot { namespace hw { namespace motor {
     #include "pwm.h"
     #include "analog.h"
     #include "motorhal_config.h"
+    #include "motorhal_faults.h"
     
     result_t s_hw_init(MOTOR h)
     {
         // motor+sensors configuration
         memset(&MainConf, 0, sizeof(MainConf));
 
+        motorhal_clear_faultmask();
+        
         analogInit();  
         encoderInit(); 
         hallInit();    
         pwmInit();
+        
+        
 
         return resOK; 
     }
@@ -568,8 +605,35 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_motorDisable(MOTOR h)
     {
+        motorhal_clear_faultmask();
+        
         pwmPhaseDisable(PWM_PHASE_ALL);
         return resOK;
+    }
+    
+    bool s_hw_isHardwareFault(MOTOR h)
+    { 
+        return motorhal_get_faultmask() != 0; 
+    }
+    
+    bool s_hw_isHallSequenceError(MOTOR h)
+    {
+        return motorhal_check_fault(DHESInvalidSequence);
+    }
+    
+    bool s_hw_isHallValueError(MOTOR h)
+    { 
+        return motorhal_check_fault(DHESInvalidValue);
+    }
+    
+    bool s_hw_isOvercurrent(MOTOR h)
+    {
+       return motorhal_check_fault(OverCurrentFailure);
+    }
+    
+    uint32_t s_hw_get32bit2FOCstyleFaultMask(MOTOR h)
+    {
+        return motorhal_get_faultmask();
     }
     
 #else
