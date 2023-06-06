@@ -50,7 +50,7 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 
 extern volatile int VqFbk;
 extern volatile int IqFbk;
-
+extern volatile int32_t QE_COUNTER;
 //volatile int position_fbk = 0;
 
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
@@ -82,8 +82,6 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     
     if (gEncoderConfig.full_calibration)
     {
-        extern volatile int32_t QE_COUNTER;
-        
         static int noflood = 0;
         
         if (++noflood > 2000)
@@ -101,10 +99,11 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     }
     else if (MotorConfig.verbose)
     {
-        payload.w[0] = 0;
-        payload.w[1] = 0;
-        payload.w[2] = 0;
-        payload.w[3] = 0;
+        extern volatile int16_t residual_enc;
+        
+        payload.w[0] = residual_enc;
+        payload.w[1] = POSCNT;
+        payload.dw[1] = QE_COUNTER;
         
         msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 

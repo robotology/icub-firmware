@@ -23,6 +23,8 @@ volatile int32_t QE_COUNTER = 0;
 volatile int16_t QE_ERR_THR = 0;
 //volatile int32_t position_check = 0;
 
+volatile int16_t residual_enc = 0;
+
 void QEinit(int16_t ticks, int8_t num_poles, BOOL use_index)
 {
     // init the quadrature encoder peripheral
@@ -208,20 +210,17 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
         {  
             if (QEICONbits.UPDN == UPDN)
             {
+                residual_enc = QEICONbits.UPDN ? MAXCNT-POSCNT : POSCNT;
+                
+                if (!QEICONbits.UPDN && residual_enc > (MAXCNT-QE_ERR_THR))  residual_enc -= MAXCNT;  
+                
                 if (watchdog == 0)
                 {
                     gEncoderError.phase_broken = TRUE;
                 }
                 else
                 {
-                    if (QEICONbits.UPDN)
-                    {
-                        if (POSCNT < QE_RES_POLE-QE_ERR_THR) gEncoderError.dirty = TRUE;
-                    }
-                    else
-                    {
-                        if (POSCNT >             QE_ERR_THR) gEncoderError.dirty = TRUE;
-                    }
+                    if (residual_enc > QE_ERR_THR) gEncoderError.dirty = TRUE;
                 }
             }
              
