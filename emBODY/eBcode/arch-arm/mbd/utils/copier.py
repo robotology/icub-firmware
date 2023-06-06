@@ -4,7 +4,6 @@
  email:   simone.girardi@iit.it
 """
 
-import os.path
 import os
 import glob
 import shutil
@@ -32,7 +31,7 @@ def find_subdirectory(main_directory, subdirectory, parent = None):
     for root, dirs, files in os.walk(main_directory):
         for dir in dirs:
             if dir == subdirectory:
-                dir_parent = root.split('\\')[-1]
+                dir_parent = root.split(os.sep)[-1]
                 if parent is None or dir_parent == parent:
                     return os.path.join(root, subdirectory)
     return ""
@@ -54,6 +53,7 @@ def parse_instructions(dictionary, source_directory, target_directory):
         target_subdir = find_subdirectory(target_directory, subdirectory["target_directory"])
 
         copy_files(source_subdir, target_subdir, subdirectory["files"], True)
+    
     print(BIG_SECTION)
 
 def copy_files(source_dir, target_dir, file_selectors, overwrite):
@@ -84,7 +84,7 @@ def main():
     parser = argparse.ArgumentParser(prog='The Copier',
                                     description="The copier has the purpose to copy the code generated from Simulink to the proper board folder in icub-firmware ",
                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('source', help="Absolute path to the codegen directory within icub-firmware-models")
+    parser.add_argument('source', nargs='+', help="Absolute paths to the codegen directories within icub-firmware-models")
     parser.add_argument('destination', help="Absolute path to the model-based-design directory within icub-firmware (for a specific board)")
     parser.add_argument('path_to_directories_json', help="Absolute path to the directory containing the directories.json file")
 
@@ -92,18 +92,19 @@ def main():
     config = vars(args)
 
     path_to_json = os.path.join(config['path_to_directories_json'], "directories.json")
-    path_to_src = config['source']
+    path_to_src_list = config['source']
     path_to_dst = config['destination']
 
+    for path_to_src in path_to_src_list:
     # check if source and destination directories exist and are not empty
-    if not (is_empty(path_to_src) or is_empty(path_to_dst)):
+        if not (is_empty(path_to_src) or is_empty(path_to_dst)):
 
-        # try to open the json configuration file
-        with open(path_to_json) as file:
-            json_instructions = json.load(file)
+            # try to open the json configuration file
+            with open(path_to_json) as file:
+                json_instructions = json.load(file)
 
-        # start to parse and (eventually) to copy
-        parse_instructions(json_instructions, path_to_src, path_to_dst)
+            # start to parse and (eventually) to copy
+            parse_instructions(json_instructions, path_to_src, path_to_dst)
     
 if __name__ == "__main__":
     main()
