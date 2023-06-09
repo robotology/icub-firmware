@@ -23,6 +23,7 @@
 #if defined(TEST_embot_hw_icc)
 #include "embot_hw_icc_sig.h"
 #include "embot_hw_icc_mem.h"
+#include "embot_hw_icc_ltr.h"
 #endif
 
 namespace embot::app::board::amc2c::mbd {
@@ -33,7 +34,8 @@ namespace embot::app::board::amc2c::mbd {
         embot::app::board::amc2c::theMBD::getInstance().initialise({adr});  
 #else        
 //        embot::hw::icc::sig::test::init(embot::hw::icc::DIR::rx); 
-        embot::hw::icc::mem::test::init(embot::hw::icc::DIR::rx); 
+//        embot::hw::icc::mem::test::init(embot::hw::icc::DIR::rx); 
+        embot::hw::icc::ltr::test::init(embot::hw::icc::DIR::tx); 
 #endif        
 
     }
@@ -48,7 +50,9 @@ namespace embot::app::board::amc2c::mbd {
         
         if(0 == (tt % 500))
         {
-            embot::hw::icc::mem::test::tick();   
+            // embot::hw::icc::mem::test::tick(); 
+            embot::core::TimeFormatter tf {embot::core::now() };  
+            embot::hw::icc::ltr::test::tick(tf.to_string());
         }   
 #endif                 
     }

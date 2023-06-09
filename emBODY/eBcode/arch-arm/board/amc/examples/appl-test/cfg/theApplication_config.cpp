@@ -156,6 +156,7 @@ namespace embot { namespace app { namespace eth {
 #include "stm32hal.h"
 #include "embot_hw_icc_sig.h"
 #include "embot_hw_icc_mem.h"
+#include "embot_hw_icc_ltr.h"
 
 namespace amc {
     
@@ -171,7 +172,7 @@ namespace amc {
         __HAL_RCC_HSEM_CLK_ENABLE();
         HAL_HSEM_Release(0, 0);  
         
-//        embot::hw::icc::sig::test::init(embot::hw::icc::DIR::tx);
+//        embot::hw::icc::ltr::test::init(embot::hw::icc::DIR::rx);
         
         embot::core::TimeFormatter tf(embot::core::now());        
         std::string str = "@ time = " + tf.to_string();               
@@ -193,20 +194,22 @@ namespace amc {
             if(!initted)
             {
 //                embot::hw::icc::sig::test::init(embot::hw::icc::DIR::txrx);
-                embot::hw::icc::mem::test::init(embot::hw::icc::DIR::tx);
+//                embot::hw::icc::mem::test::init(embot::hw::icc::DIR::tx);
+                embot::hw::icc::ltr::test::init(embot::hw::icc::DIR::rx);
                 initted = true;
             }
 
             uint64_t t0 {embot::core::now()};
             embot::core::TimeFormatter tf(t0);        
             std::string str = "onevent: timeout @ time = " + tf.to_string();               
-            embot::core::print(str);
+//            embot::core::print(str);
             
             uint64_t t00 {embot::core::now()};
             
 //            embot::hw::icc::sig::test::tick();
             
-            embot::hw::icc::mem::test::tick();
+            // actually not required
+            //embot::hw::icc::ltr::test::tick("");
             
 //            uint64_t t1 {embot::core::now()};
 //            embot::core::TimeFormatter tf1(t1-t00);        

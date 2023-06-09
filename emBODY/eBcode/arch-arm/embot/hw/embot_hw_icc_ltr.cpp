@@ -435,6 +435,29 @@ namespace embot::hw::icc::ltr {
 #endif //#elif defined(EMBOT_ENABLE_hw_icc_ltr)
 
 
+#include "embot_hw_icc_printer.h"
+
+namespace embot::hw::icc::ltr::test {
+
+#if !defined(EMBOT_ENABLE_hw_icc_ltr)      
+    
+    void init(DIR dir) {}
+    void tick(const std::string &str) {}
+    
+#else
+        
+    void init(DIR dir)
+    {
+        embot::hw::icc::printer::test::init(dir);
+    }
+    
+    void tick(const std::string &str)
+    {
+        embot::hw::icc::printer::test::tick(str);
+    }
+
+#endif    
+}  
 
 
 

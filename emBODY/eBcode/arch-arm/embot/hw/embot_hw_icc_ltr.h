@@ -75,17 +75,15 @@ namespace embot::hw::icc::ltr {
     bool subscribe(embot::hw::icc::LTR l, const embot::hw::Subscription &onreceived);
     bool available(embot::hw::icc::LTR l);   
     size_t read(embot::hw::icc::LTR l, embot::core::Data &data); 
-
-    
-    // applications:
-    // 1. printer: the client sends a string to the server
-    // 2. a thread on CM7 posts a message to a thread on CM4. this one gets immediately and      
-    #warning .... place embot::hw::icc::thePrinterClient and thePrinterServer in dedicated object files
-    
         
 }   // namespace embot::hw::icc::ltr {
 
 
+namespace embot::hw::icc::ltr::test {
+
+    void init(DIR dir);
+    void tick(const std::string &str);
+}    
 
 #endif  // include-guard
 

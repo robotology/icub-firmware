@@ -684,6 +684,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2204,6 +2209,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3298,6 +3308,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4391,6 +4406,11 @@
               <FileName>embot_hw_icc_ltr.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
             </File>
           </Files>
         </Group>

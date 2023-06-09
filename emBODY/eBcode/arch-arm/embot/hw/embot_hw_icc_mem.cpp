@@ -264,6 +264,15 @@ namespace embot::hw::icc::mem::test {
     
 #else
     
+//    static embot::core::dummyMutex dm {};
+//    struct BetterConfig
+//    {
+////        static constexpr embot::core::dummyMutex dm {};
+//        embot::core::Mutex *mu { &dm };
+//        constexpr BetterConfig() = default;
+//        BetterConfig(embot::core::Mutex *m) : mu((nullptr != m) ? m : &dm) {}
+//    };    
+    
     struct TestDataExchange
     {
         uint32_t n {0};
