@@ -91,6 +91,12 @@ namespace embot { namespace hw {
     enum class EtH : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };
     enum class PHY : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
     
+    enum class MTX : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, 
+                                    nine = 8, ten = 9, eleven = 10, twelve = 11, thirteen = 12, fourteen = 13, fifteen = 14, sixteen = 15,
+                                    seventeen = 16, eighteen = 17, nineteen = 18, twenty = 19, twentyone = 20, twentytwo = 21, twentythree = 22, twentyfour = 23,
+                                    twentyfive = 24, twentysix = 25, twentyseven = 26, twentyeight = 27, twentynine = 28, thirty = 29, thirthyone = 30, 
+                                    none = 31, maxnumberof = 31 };
+
     // definition of more complex data structures
     
     struct GPIO
@@ -112,19 +118,7 @@ namespace embot { namespace hw {
         }
     };
     
-    
-//    struct Partition
-//    {
-//        std::uint32_t   address {0};
-//        std::uint32_t   maxsize {0}; 
-//        std::uint32_t   pagesize {0}; 
-//        constexpr Partition() = default;
-//        constexpr Partition(uint32_t a, uint32_t m, uint32_t p) 
-//            : address(a), maxsize(m), pagesize(p) {}       
-//        bool isvalid() const { if((0 == address) || (0 == maxsize) || (0 == pagesize)) { return false; } else { return true; } }
-//    }; 
-        
-        
+            
     
     // REG<> is a template type for modeling a register of a given size and with a given number of fields
     // rTyp is one of regXXtype below, nFld is the number of fields 
@@ -248,7 +242,33 @@ namespace embot { namespace hw {
 
     enum class Revision : uint8_t { A = 0, B = 1, C = 2, D = 3, none = 31, maxnumberof = 4 };     
 
+    struct Subscription
+    {
+        enum class MODE : uint8_t { none = 0, oneshot = 1, permanent = 2 };
+        
+        embot::core::Callback callback {};
+        MODE mode {MODE::none};  
+
+        constexpr Subscription() = default;  
+        constexpr Subscription(const embot::core::Callback &cbk, MODE mo) : callback(cbk), mode(mo) {} 
+
+        void clear() { callback.clear(); mode = MODE::none; }
+        
+        void execute() 
+        { 
+            if(mode != MODE::none)
+            {   
+                callback.execute();            
+                if(mode == MODE::oneshot) { clear(); } 
+            }            
+        }
+        
+        constexpr bool isvalid() const { return callback.isvalid() && (MODE::none != mode); }
+    };         
+
 }} // namespace embot { namespace hw {
+
+
 
 
 

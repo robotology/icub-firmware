@@ -30,6 +30,11 @@
     #define EMBOT_ENABLE_hw_flash
     #define EMBOT_ENABLE_hw_timer
     #define EMBOT_ENABLE_hw_can
+    
+    #define EMBOT_ENABLE_hw_mtx
+    #define EMBOT_ENABLE_hw_icc_sig
+    #define EMBOT_ENABLE_hw_icc_mem
+    #define EMBOT_ENABLE_hw_icc_ltr
 
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMC2C ...
