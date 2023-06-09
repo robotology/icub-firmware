@@ -64,6 +64,23 @@ namespace embot { namespace os {
                    
 }} // namespace embot { namespace os {
 
+//#define ADDembotcoremutex
+#if defined(ADDembotcoremutex)
+
+namespace embot::core {
+    struct Mutex  
+    {
+        virtual bool take(embot::core::relTime timeout = embot::core::reltimeWaitForever) = 0;
+        virtual void release() = 0;        
+        ~Mutex() {}
+    }; 
+
+    struct dummyMutex final : embot::core::Mutex
+    {
+        bool take(embot::core::relTime timeout = embot::core::reltimeWaitForever) override { return true; }
+        void release() override {}
+    }; 
+}
 namespace embot::os {
             
     struct Mutex final : embot::core::Mutex
@@ -86,6 +103,7 @@ namespace embot::os {
     }; 
     
 }
+#endif
 
 #endif  // include-guard
 

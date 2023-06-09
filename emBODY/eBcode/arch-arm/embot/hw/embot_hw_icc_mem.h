@@ -26,9 +26,10 @@ namespace embot::hw::icc::mem {
     
     struct Config
     {
-        embot::core::Mutex *mu {nullptr}; 
+        uint32_t dummy {0};
+//        embot::core::Mutex *mu {nullptr}; 
         constexpr Config() = default;
-        Config(embot::core::Mutex *m) : mu(m) {}
+//        Config(embot::core::Mutex *m) : mu(m) {}
     };
     
 //    static embot::core::dummyMutex dm {};

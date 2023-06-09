@@ -105,6 +105,8 @@ namespace embot { namespace os {
 
 }} // namespace embot { namespace os {
 
+#if defined(ADDembotcoremutex)
+
 #include "embot_os_rtos.h"
 
 namespace embot::os {
@@ -134,7 +136,7 @@ namespace embot::os {
     
 }
 
-
+#endif // #if defined(ADDembotcoremutex)
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
