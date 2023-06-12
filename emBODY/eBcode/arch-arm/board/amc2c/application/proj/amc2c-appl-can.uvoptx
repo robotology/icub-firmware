@@ -453,9 +453,25 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
+          <LineNumber>324</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>135300074</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_ltr.cpp\324</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
           <LineNumber>116</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>135300878</Address>
+          <Address>135300918</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -467,27 +483,11 @@
           <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_ltr.cpp\116</Expression>
         </Bp>
         <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>320</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>135300160</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_ltr.cpp\320</Expression>
-        </Bp>
-        <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>325</LineNumber>
+          <LineNumber>318</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>135300196</Address>
+          <Address>135300048</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -496,7 +496,23 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_ltr.cpp\325</Expression>
+          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_ltr.cpp\318</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>58</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>135304336</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_printer.cpp\58</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -514,6 +530,11 @@
           <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>tde.str</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>tout,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -1440,7 +1461,7 @@
 
   <Group>
     <GroupName>embot::os</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

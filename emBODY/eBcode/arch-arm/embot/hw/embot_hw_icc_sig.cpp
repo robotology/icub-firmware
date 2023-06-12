@@ -58,7 +58,7 @@ namespace embot::hw::icc::sig {
     { return false; }     
     bool set(embot::hw::icc::SIG s, embot::core::relTime timeout)
     { return false; }
-    bool check(embot::hw::icc::SIG s, bool andclear)
+    bool check(embot::hw::icc::SIG s, bool autoclear)
     { return false; }
     bool clear(embot::hw::icc::SIG s)
     { return false; }  
@@ -249,7 +249,7 @@ namespace embot::hw::icc::sig {
     }
 
 
-    bool check(embot::hw::icc::SIG s, bool andclear)
+    bool check(embot::hw::icc::SIG s, bool autoclear)
     {
         if(false == initialised(s))
         {
@@ -264,7 +264,7 @@ namespace embot::hw::icc::sig {
         }
         
         bool r = _sigdrive.check(s);   
-        if((true == r) && (true == andclear))
+        if((true == r) && (true == autoclear))
         {
             _sigdrive.clear(s);
         }

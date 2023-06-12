@@ -62,7 +62,7 @@ namespace embot::hw::icc::ltr {
     { return 0; }
     size_t post(embot::hw::icc::LTR l, const embot::core::Data &data, const embot::core::Callback &onack)
     { return 0; } 
-    bool acked(embot::hw::icc::LTR l)
+    bool acked(embot::hw::icc::LTR l, , bool autoclear)
     { return false; }
     
 
@@ -156,11 +156,16 @@ namespace embot::hw::icc::ltr {
                 cbkinfo[pos] = {l, this};
                 configs[pos] = cfg;
                 subscriptions[pos].clear();
-                // for the benefit of the RX mode:
+
                 if(cfg.direction == DIR::rx)
                 { 
                     embot::hw::icc::sig::subscribe(signals[pos], {{onsignal, &cbkinfo[pos]}, embot::hw::Subscription::MODE::permanent}); 
                 }
+// we dont need to subscribe if in tx mode because ... we wait for the ack using polling                
+//                else
+//                {
+//                    embot::hw::icc::sig::subscribe(acks[pos], {{onsignal, &cbkinfo[pos]}, embot::hw::Subscription::MODE::permanent}); 
+//                }
             }
         }
              
@@ -240,7 +245,14 @@ namespace embot::hw::icc::ltr {
         SIG _s = embot::hw::icc::ltr::bsp::getBSP().getPROP(l)->sig;
         SIG _a = embot::hw::icc::ltr::bsp::getBSP().getPROP(l)->ack;
         
-        if((resOK == embot::hw::icc::mem::init(_m)) && (resOK == embot::hw::icc::sig::init(_s, {DIR::tx})) && (resOK == embot::hw::icc::sig::init(_a, {DIR::rx})))
+        
+        // we need to init the SIGs  _s and _a in the proper way:
+        // if DIR::tx -> _s {DIR::tx}  + _a {DIR::rx} because it is a sender which signals w/ _s and waits for _a
+        // if DIR::rx -> _s {DIR::rx}  + _a {DIR::tx} because it is a receiver which waits for _s and signals w/ _a
+        embot::hw::icc::sig::Config c_s {(DIR::tx == cfg.direction) ? DIR::tx : DIR::rx};
+        embot::hw::icc::sig::Config c_a {(DIR::tx == cfg.direction) ? DIR::rx : DIR::tx};
+        
+        if((resOK == embot::hw::icc::mem::init(_m)) && (resOK == embot::hw::icc::sig::init(_s, c_s)) && (resOK == embot::hw::icc::sig::init(_a, c_a)))
         {
             r = resOK;
         }
@@ -250,19 +262,25 @@ namespace embot::hw::icc::ltr {
             _ltrdrive.setinitialised(l, true, cfg);        
         }
        
-
         return r;   
     }
     
     
-    bool acked(embot::hw::icc::LTR l)
+    bool acked(embot::hw::icc::LTR l, bool autoclear)
     {
         if(false == initialised(l))
         {
             return false;
         } 
 
-        return embot::core::binary::bit::check(_ltrdrive.ackedmask, embot::core::tointegral(l));          
+        bool r = embot::core::binary::bit::check(_ltrdrive.ackedmask, embot::core::tointegral(l)); 
+        
+        if((true == r) && (true == autoclear))
+        {
+            embot::core::binary::bit::clear(_ltrdrive.ackedmask, embot::core::tointegral(l)); 
+        }
+        
+        return r;
     }
     
     
@@ -289,8 +307,7 @@ namespace embot::hw::icc::ltr {
         
         embot::core::binary::bit::clear(_ltrdrive.ackedmask, pos);
 
-        _ltrdrive.subscriptions[pos].clear();
-        
+        _ltrdrive.subscriptions[pos].clear();       
         embot::hw::icc::sig::subscribe(_a, {{_ltrdrive.onsignal, &_ltrdrive.cbkinfo[pos]}, embot::hw::Subscription::MODE::oneshot});         
         
 
@@ -352,7 +369,7 @@ namespace embot::hw::icc::ltr {
         uint8_t pos = embot::core::tointegral(l);
         
         embot::core::binary::bit::clear(_ltrdrive.ackedmask, pos);
-        
+                    
         _ltrdrive.subscriptions[pos] = {onack, embot::hw::Subscription::MODE::oneshot};
         embot::hw::icc::sig::subscribe(_a, {{_ltrdrive.onsignal, &_ltrdrive.cbkinfo[pos]}, embot::hw::Subscription::MODE::oneshot});
         

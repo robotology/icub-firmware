@@ -24,7 +24,8 @@ namespace embot::hw::icc::printer {
         struct Config
         {            
             embot::hw::icc::LTR l {embot::hw::icc::LTR::one};
-            Config() = default;
+            constexpr Config() = default;
+            constexpr Config(embot::hw::icc::LTR ll) : l(ll) {}
         };                             
 
         static constexpr size_t MAXcapacity = 256;   
@@ -33,8 +34,8 @@ namespace embot::hw::icc::printer {
         bool post(const std::string &str, embot::core::relTime tout = 100*embot::core::time1millisec);        
         
    public:     
-        theClient(const theClient&) = delete;               // non copiable
-        theClient& operator=(const theClient&) = delete;    // non copiable
+        theClient(const theClient&) = delete;               // non copyable
+        theClient& operator=(const theClient&) = delete;    // non copyable
         theClient(theClient&&) = delete;                    // non moveable
         theClient& operator=(theClient&&) = delete;         // non moveable    
         
@@ -56,7 +57,8 @@ namespace embot::hw::icc::printer {
         struct Config
         {            
             embot::hw::icc::LTR l {embot::hw::icc::LTR::one};
-            Config() = default;
+            constexpr Config() = default;
+            constexpr Config(embot::hw::icc::LTR ll) : l(ll) {}
         };                             
 
         static constexpr size_t MAXcapacity = 256;   

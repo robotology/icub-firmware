@@ -50,11 +50,9 @@ namespace embot::hw::icc::ltr {
     
     struct Config
     {        
-        DIR direction {DIR::none};
-        
+        DIR direction {DIR::none};        
         constexpr Config() = default;
-        constexpr Config(DIR d) : direction(d) {}
-            
+        constexpr Config(DIR d) : direction(d) {}            
         constexpr bool isvalid() const 
         {
             return (DIR::rx == direction) || (DIR::tx == direction);
@@ -69,7 +67,7 @@ namespace embot::hw::icc::ltr {
     // tx methods
     size_t post(embot::hw::icc::LTR l, const embot::core::Data &data, embot::core::relTime acktimeout);
     size_t post(embot::hw::icc::LTR l, const embot::core::Data &data, const embot::core::Callback &onack); 
-    bool acked(embot::hw::icc::LTR l);
+    bool acked(embot::hw::icc::LTR l, bool autoclear = true);
     
     // rx methods
     bool subscribe(embot::hw::icc::LTR l, const embot::hw::Subscription &onreceived);

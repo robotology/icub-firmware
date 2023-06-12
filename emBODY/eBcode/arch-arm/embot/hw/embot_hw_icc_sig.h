@@ -40,7 +40,7 @@ namespace embot::hw::icc::sig {
     // the entity which waits must subscribe 
     bool subscribe(embot::hw::icc::SIG s, const embot::hw::Subscription &onsignal);   
     // or it can check() in polling mode.   
-    bool check(embot::hw::icc::SIG s, bool andclear = true);
+    bool check(embot::hw::icc::SIG s, bool autoclear = true);
     // we can also explicitly clear() the signal
     bool clear(embot::hw::icc::SIG s);    
 
