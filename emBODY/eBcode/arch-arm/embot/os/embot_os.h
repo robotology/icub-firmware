@@ -60,9 +60,50 @@ namespace embot { namespace os {
     
     // tells if the scheduler has started
     bool started();
+    
                    
 }} // namespace embot { namespace os {
 
+//#define ADDembotcoremutex
+#if defined(ADDembotcoremutex)
+
+namespace embot::core {
+    struct Mutex  
+    {
+        virtual bool take(embot::core::relTime timeout = embot::core::reltimeWaitForever) = 0;
+        virtual void release() = 0;        
+        ~Mutex() {}
+    }; 
+
+    struct dummyMutex final : embot::core::Mutex
+    {
+        bool take(embot::core::relTime timeout = embot::core::reltimeWaitForever) override { return true; }
+        void release() override {}
+    }; 
+}
+namespace embot::os {
+            
+    struct Mutex final : embot::core::Mutex
+    {
+        bool take(embot::core::relTime timeout = embot::core::reltimeWaitForever) override;
+        void release() override;
+        
+        Mutex();
+        ~Mutex();
+                       
+        // not copiable nor moveable
+        Mutex(const Mutex&) = delete;
+        Mutex& operator=(const Mutex&) = delete;
+        Mutex(Mutex&&) = delete;
+        Mutex& operator=(Mutex&&) = delete;
+        
+    private:
+        struct Impl;
+        std::unique_ptr<Impl> pImpl;    
+    }; 
+    
+}
+#endif
 
 #endif  // include-guard
 

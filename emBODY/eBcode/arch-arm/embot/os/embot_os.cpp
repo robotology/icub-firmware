@@ -105,7 +105,38 @@ namespace embot { namespace os {
 
 }} // namespace embot { namespace os {
 
+#if defined(ADDembotcoremutex)
 
+#include "embot_os_rtos.h"
+
+namespace embot::os {
+
+    struct Mutex::Impl
+    {
+        embot::os::rtos::mutex_t *m {nullptr};
+        
+        Impl() : m(embot::os::rtos::mutex_new()) {}
+        ~Impl() { embot::os::rtos::mutex_delete(m); }
+        
+        bool take(embot::core::relTime timeout = embot::core::reltimeWaitForever)
+        {           
+            return embot::os::rtos::mutex_take(m, timeout);
+        };
+        
+        void release() 
+        {
+            embot::os::rtos::mutex_release(m);
+        }   
+    }; 
+
+    Mutex::Mutex() : pImpl(std::make_unique<Impl>()) {}    
+    Mutex::~Mutex() = default;
+    bool Mutex::take(embot::core::relTime timeout) { return pImpl->take(timeout); }
+    void Mutex::release() { pImpl->release(); }
+    
+}
+
+#endif // #if defined(ADDembotcoremutex)
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

@@ -43,6 +43,11 @@
 //    #define EMBOT_ENABLE_hw_timer_emulated
 
 //    #define EMBOT_ENABLE_hw_IcacheDcache
+
+    #define EMBOT_ENABLE_hw_mtx
+    #define EMBOT_ENABLE_hw_icc_sig
+    #define EMBOT_ENABLE_hw_icc_mem
+    #define EMBOT_ENABLE_hw_icc_ltr
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMC ...

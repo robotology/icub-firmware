@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>amc-template-appl-osal-stlink</TargetName>
+    <TargetName>amc-appl-test</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -103,7 +103,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>6</nTsel>
+        <nTsel>1</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -114,9 +114,14 @@
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
         <tIfile></tIfile>
-        <pMon>STLink\ST-LINKIII-KEIL_SWO.dll</pMon>
+        <pMon>BIN\ULP2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>ULP2CM3</Key>
+          <Name>-UAny -O206 -S8 -C0 -P00000000 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO65555 -TC400000000 -TT10000000 -TP18 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+        </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>JL2CM3</Key>
@@ -150,67 +155,10 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>(105=-1,-1,-1,-1,0)</Name>
+          <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint/>
-      <WatchWindow1>
-        <Ww>
-          <count>0</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>this</ItemText>
-        </Ww>
-        <Ww>
-          <count>1</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>s_the_armenv</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>s_shalbase_IPCdataStored</ItemText>
-        </Ww>
-        <Ww>
-          <count>3</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>eomipnet_addr</ItemText>
-        </Ww>
-        <Ww>
-          <count>4</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>ipal_cfg2</ItemText>
-        </Ww>
-        <Ww>
-          <count>5</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>eomipnet_addr</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>ipconfig</ItemText>
-        </Ww>
-        <Ww>
-          <count>7</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>str</ItemText>
-        </Ww>
-        <Ww>
-          <count>8</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>v</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>ma</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>str</ItemText>
-        </Ww>
-      </WatchWindow1>
       <WatchWindow2>
         <Ww>
           <count>0</count>
@@ -232,7 +180,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -851,7 +799,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1445368 -O206 -S14 -C0 -P00000000 -N00("") -D00(00000000) -L00(0) -TO69635 -TC400000000 -TT10000000 -TP8 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-UP0948199 -O206 -S14 -C0 -P00000000 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO69635 -TC400000000 -TT10000000 -TP8 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -889,7 +837,24 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>1890</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\..\bsp\embot_hw_bsp_amc.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -992,7 +957,7 @@
 
   <Group>
     <GroupName>embot::app::eth</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1096,7 +1061,7 @@
 
   <Group>
     <GroupName>embot::app::eth::config</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1280,7 +1245,7 @@
 
   <Group>
     <GroupName>embot::hw</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1339,18 +1304,6 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_lowlevel.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>27</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_sys.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_sys.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -1358,7 +1311,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>28</FileNumber>
+      <FileNumber>27</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1370,7 +1323,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>29</FileNumber>
+      <FileNumber>28</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1382,7 +1335,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>30</FileNumber>
+      <FileNumber>29</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1394,7 +1347,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>31</FileNumber>
+      <FileNumber>30</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1406,7 +1359,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>32</FileNumber>
+      <FileNumber>31</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1418,7 +1371,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>33</FileNumber>
+      <FileNumber>32</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1430,7 +1383,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>34</FileNumber>
+      <FileNumber>33</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1442,7 +1395,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>35</FileNumber>
+      <FileNumber>34</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1454,7 +1407,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>36</FileNumber>
+      <FileNumber>35</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1466,7 +1419,7 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>37</FileNumber>
+      <FileNumber>36</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1478,19 +1431,19 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>38</FileNumber>
+      <FileNumber>37</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_icc_ltr.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_icc_sig.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
-      <FileNumber>39</FileNumber>
+      <FileNumber>38</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1502,13 +1455,25 @@
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
+      <FileNumber>39</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_icc_ltr.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>8</GroupNumber>
       <FileNumber>40</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_icc_sig.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_icc_printer.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -2201,6 +2166,26 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoUpdaterProtocol.c</PathWithFileName>
       <FilenameWithoutPath>EoUpdaterProtocol.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>embot::hw::lowlevel</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>16</GroupNumber>
+      <FileNumber>94</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_lowlevel.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
