@@ -713,6 +713,31 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_mtx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_mtx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_sig.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_mem.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_ltr.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -742,6 +767,16 @@
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3281,6 +3316,31 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_mtx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_mtx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_sig.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_mem.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_ltr.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3310,6 +3370,16 @@
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -5594,6 +5664,31 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_mtx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_mtx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_sig.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_mem.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_ltr.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5623,6 +5718,16 @@
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -8417,6 +8522,31 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_mtx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_mtx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_sig.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_mem.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_ltr.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8446,6 +8576,16 @@
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -10016,6 +10156,31 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_mtx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_mtx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_sig.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_mem.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_ltr.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -10045,6 +10210,16 @@
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -11615,6 +11790,31 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_mtx.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_mtx.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_sig.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_mem.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_mem.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_ltr.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_printer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -11644,6 +11844,16 @@
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>

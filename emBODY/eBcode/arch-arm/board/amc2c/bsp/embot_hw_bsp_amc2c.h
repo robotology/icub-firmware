@@ -26,6 +26,9 @@ namespace embot::hw::bsp::amc2c {
     embot::hw::BTN EXTFAULTbutton();
     embot::hw::LED EXTFAULTled();
     
+    // it prints to the CM7 core ... if EMBOT_ENABLE_hw_icc_printer is enabled both in here and amc
+    void print(const std::string &str);
+    
 }
 
 #endif  // include-guard

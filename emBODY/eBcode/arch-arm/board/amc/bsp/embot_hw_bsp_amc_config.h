@@ -48,6 +48,7 @@
     #define EMBOT_ENABLE_hw_icc_sig
     #define EMBOT_ENABLE_hw_icc_mem
     #define EMBOT_ENABLE_hw_icc_ltr
+//    #define EMBOT_ENABLE_hw_icc_printer
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMC ...
