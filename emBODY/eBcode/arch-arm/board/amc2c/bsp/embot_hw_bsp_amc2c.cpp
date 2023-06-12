@@ -339,6 +339,7 @@ extern "C" {
 }
 
 #include "embot_hw_bsp_amc2c.h"
+#include "embot_hw_icc_printer.h"
 
 namespace embot::hw::bsp::amc2c {
     
@@ -354,6 +355,14 @@ namespace embot::hw::bsp::amc2c {
     
     // we have the input pins (PG5, PG6, PG7) which tells the hw version of the board
     // VER0_Pin, VER1_Pin, VER2_Pin
+    
+    void print(const std::string &str)
+    {
+#if defined(EMBOT_ENABLE_hw_icc_printer)        
+        embot::hw::icc::printer::theClient::getInstance().post(str);
+#endif        
+    }
+    
     
 }
 
@@ -416,6 +425,10 @@ bool embot::hw::bsp::specialize()
     leds_init_off();
 #endif
 
+#if defined(EMBOT_ENABLE_hw_icc_printer)    
+    embot::hw::icc::printer::theClient::getInstance().initialise({});
+#endif
+    
     #warning TODO: verificare che le priorita' delle IRQ del motor control possano essere impostate anche dopo la partenza del rtos
     return true;
 }

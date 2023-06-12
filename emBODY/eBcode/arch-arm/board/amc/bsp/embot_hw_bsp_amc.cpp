@@ -1819,8 +1819,9 @@ extern "C"
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_bsp_amc.h"
+#include "embot_hw_icc_printer.h"
 
-namespace embot { namespace hw { namespace bsp { namespace amc {
+namespace embot::hw::bsp::amc {
     
     OnSpecialize defOnSpec {};
     
@@ -1829,7 +1830,7 @@ namespace embot { namespace hw { namespace bsp { namespace amc {
         defOnSpec = onsp;
     }
     
-}}}}
+}
 
 
 
@@ -1904,7 +1905,12 @@ bool embot::hw::bsp::specialize() { return true; }
             {
                 // 1. init the hsems (just in case) and release hsem-0
                 __HAL_RCC_HSEM_CLK_ENABLE();
-                HAL_HSEM_Release(hsem0, procID0);           
+                HAL_HSEM_Release(hsem0, procID0);          
+
+#if defined(EMBOT_ENABLE_hw_icc_printer)
+                // and also activate the printer
+                embot::hw::icc::printer::theServer::getInstance().initialise({});
+#endif                
             } break;
             
             case amc::OnSpecialize::CM4MODE::donothing:
