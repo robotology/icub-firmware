@@ -1435,6 +1435,8 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     }
     else if(eo_motcon_mode_mc4plusfaps == p->service.servconfig.type)
     {
+        eo_errman_Trace(eo_errman_GetHandle(), "calling eo_pos_Start() in mc", s_eobj_ownname);
+        eo_errman_Trace(eo_errman_GetHandle(), "calling eo_pos_Transmission() in mc", s_eobj_ownname);
         eo_pos_Start(eo_pos_GetHandle());
         eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);     
         eo_encoderreader_StartReading(eo_encoderreader_GetHandle());
@@ -1445,7 +1447,6 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
         eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);     
         eo_encoderreader_StartReading(eo_encoderreader_GetHandle());
     }    
-    // eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Start()", s_eobj_ownname);
     
     return(eores_OK);    
 }

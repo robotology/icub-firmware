@@ -91,18 +91,15 @@ typedef struct
 typedef enum
 {
     calibtype14_st_inited = 0,
-    calibtype14_st_hardLimitSet = 1,
-    calibtype14_st_absEncoderCalibrated = 2,
-    calibtype14_st_trajectoryStarted = 3,
-    calibtype14_st_finished = 4
+    calibtype14_st_absEncoderCalib = 1,
+    calibtype14_st_hardLimitSet = 2,
+    calibtype14_st_finished = 3
 } calibtype14_states;
 
 typedef struct
 {
     BOOL is_active;
     calibtype14_states state;
-    CTRL_UNITS velocity;
-    CTRL_UNITS targetPos;
     CTRL_UNITS hardstopPos;
     int32_t computedZero;
     int32_t rotorposmin;

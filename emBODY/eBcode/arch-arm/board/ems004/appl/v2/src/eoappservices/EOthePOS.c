@@ -149,6 +149,11 @@
     {
             return eobool_false;
     }
+    
+    extern eOresult_t eo_pos_Calibrate(EOthePOS *p, uint8_t e, uint8_t rotation, uint8_t invertdirection, int32_t offset)
+    {
+        return eores_NOK_generic;
+    }
 
 
 #elif !defined(EOTHESERVICES_disable_thePOS)
@@ -157,7 +162,6 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
@@ -189,6 +193,11 @@ static eObool_t s_eo_pos_isID32relevant(uint32_t id32);
 static void s_eo_pos_transmission(EOthePOS *p, eObool_t on, uint8_t period);
 
 static void s_eo_pos_boards_configure(EOthePOS *p);
+
+static void s_eo_pos_joint_calibrate(EOthePOS *p, uint8_t e, uint8_t rotation, uint8_t invertdirection, int32_t offset);
+
+static void s_eo_pos_sensor_config(icubCanProto_POS_CONFIG_t *posconfig, eoas_pos_SensorConfig_t *sc);
+
 
 static void s_eo_pos_presenceofcanboards_reset(EOthePOS *p);
 static void s_eo_pos_presenceofcanboards_build(EOthePOS *p);
@@ -717,9 +726,36 @@ extern eOresult_t eo_pos_Stop(EOthePOS *p)
     return(eores_OK);
 }
 
+extern eOresult_t eo_pos_Calibrate(EOthePOS *p, uint8_t e, eoas_pos_ROT_t rotation, uint8_t invertdirection, int32_t offset)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    } 
+
+    if(eobool_false == p->service.started)
+    {   // not running, thus we do nothing
+        return(eores_OK);
+    }     
+    
+    if(eobool_false == p->configured)
+    {   // nothing to do because we dont have a configured service 
+        return(eores_OK);
+    }
+    
+    s_eo_pos_joint_calibrate(p, e, rotation, invertdirection, offset);  
+    
+    return(eores_OK);
+}
 
 extern eOresult_t eo_pos_Transmission(EOthePOS *p, eObool_t on)
 {
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_pos_Transmission()", s_eobj_ownname);
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -793,6 +829,7 @@ extern eOresult_t eo_pos_Tick(EOthePOS *p)
 
 extern eOresult_t eo_pos_Config(EOthePOS *p, eOas_pos_config_t* config)
 {
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_pos_Config()", s_eobj_ownname);
     if((NULL == p) || (NULL == config))
     {
         return(eores_NOK_nullpointer);
@@ -1166,7 +1203,6 @@ static void s_eo_pos_boards_configure(EOthePOS *p)
     // we get these values inside service.servconfig.data.as.pos.config.boardconfig[i]     
     // we have the can location either in the EOtheCANmapping object or in p->service.servconfig
     // we use this latter
-    
     for(uint8_t i=0; i<eo_pos_maxnumberofCANboards; i++)
     {
         eObrd_canlocation_t loc = p->service.servconfig.data.as.pos.config.boardconfig[i].canloc;
@@ -1186,21 +1222,48 @@ static void s_eo_pos_boards_configure(EOthePOS *p)
             eoas_pos_SensorConfig_t *sc = &(p->service.servconfig.data.as.pos.config.boardconfig[i].sensors[s]);
             if(1 == sc->enabled)
             {
-                posconfig.id = sc->connector;
-                posconfig.type = sc->type;
-                posconfig.setting.decideg[0].enabled = 1;
-                posconfig.setting.decideg[0].invertdirection = sc->invertdirection;
-                posconfig.setting.decideg[0].rotation = sc->rotation;
-                posconfig.setting.decideg[0].label = sc->port;
-                posconfig.setting.decideg[0].offset = sc->offset;
-                
+                s_eo_pos_sensor_config(&posconfig, sc);    
                 eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);
             }           
         }        
     }    
 }
 
+static void s_eo_pos_joint_calibrate(EOthePOS *p, uint8_t e, uint8_t rotation, uint8_t invertdirection, int32_t offset) // offset = -166
+{
+    // using the CAN protocol we should get the info
+    icubCanProto_POS_CONFIG_t posconfig = {0};
+    
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__POS_CONFIG_SET;
+    p->sharedcan.command.value = &posconfig;
+    eObrd_canlocation_t loc = p->service.servconfig.data.as.pos.config.boardconfig[0].canloc;
+         
+    // then we configure every sensor in the board. 
+    // we use one message for each sensor, so we set decideg[1].enabled = 0
+    posconfig.setting.decideg[1].enabled = 0;
+    eoas_pos_SensorConfig_t *sc = &(p->service.servconfig.data.as.pos.config.boardconfig[0].sensors[e]);
+    sc->rotation = rotation;
+    sc->invertdirection = invertdirection;
+    sc->offset = offset;
+    
+    if(1 == sc->enabled)
+    {
+        s_eo_pos_sensor_config(&posconfig, sc);   
+        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);
+    }               
+}
 
+static void s_eo_pos_sensor_config(icubCanProto_POS_CONFIG_t *posconfig, eoas_pos_SensorConfig_t *sc) // offset = -166
+{
+    posconfig->id = sc->connector;
+    posconfig->type = sc->type;
+    posconfig->setting.decideg[0].enabled = 1;
+    posconfig->setting.decideg[0].invertdirection = sc->invertdirection;
+    posconfig->setting.decideg[0].rotation = sc->rotation;
+    posconfig->setting.decideg[0].label = sc->port;
+    posconfig->setting.decideg[0].offset = sc->offset;  
+}
 
 static void s_eo_pos_presenceofcanboards_reset(EOthePOS *p)
 {

@@ -992,6 +992,7 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_pos_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
             }
+            eo_errman_Trace(eo_errman_GetHandle(), "calling eo_pos_Verify() in service", s_eobj_ownname);
             eo_pos_Verify(eo_pos_GetHandle(), config, s_services_callback_afterverify_pos, eobool_true);            
         } break;       
         
@@ -1387,6 +1388,7 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
 
         case eomn_serv_category_pos:
         {
+            eo_errman_Trace(eo_errman_GetHandle(), "calling eo_pos_Start() in service", s_eobj_ownname);
             res = eo_pos_Start(eo_pos_GetHandle());
         } break; 
         

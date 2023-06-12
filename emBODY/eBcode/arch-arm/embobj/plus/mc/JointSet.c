@@ -422,6 +422,7 @@ BOOL JointSet_do_check_faults(JointSet* o)
 static void JointSet_do_vel_control(JointSet* o);
 static void JointSet_do_current_control(JointSet* o);
 static void JointSet_do_off(JointSet* o);
+static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot);
 
 void JointSet_do_control(JointSet* o)
 {
@@ -812,6 +813,42 @@ static CTRL_UNITS wrap180(CTRL_UNITS x)
     while (x < -180.0f) x += 360.0f;
 
     return x;
+}
+
+static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot)
+{
+    eoas_pos_ROT_t retValue = eoas_pos_ROT_unknown;
+    switch(rot)
+    {
+        case eOmc_calib14_ROT_zero:
+            return eoas_pos_ROT_zero;
+            break;
+        
+        case eOmc_calib14_ROT_plus180:
+            return eoas_pos_ROT_plus180;
+            break;
+        
+        case eOmc_calib14_ROT_plus090:
+            return eoas_pos_ROT_plus090;
+            break;
+        
+        case eOmc_calib14_ROT_minus090:
+            return eoas_pos_ROT_minus090;
+            break;
+        
+        case eOmc_calib14_ROT_none:
+            return eoas_pos_ROT_none;
+            break;
+        
+        case eOmc_calib14_ROT_unknown:
+            return eoas_pos_ROT_unknown;
+            break;
+        
+        default:
+            break;
+    }
+    
+    return retValue;
 }
 
 void JointSet_do_pwm_control(JointSet* o)
@@ -1988,10 +2025,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             char info[70] = {};
             
             // (1) check current params is ok and set target and hardstop positions
-            o->joint[e].running_calibration.data.type14.targetPos = calibrator->params.type14.final_pos;
-            o->joint[e].running_calibration.data.type14.hardstopPos = 0;
+            o->joint[e].running_calibration.data.type14.hardstopPos = calibrator->params.type14.final_pos;
             o->joint[e].running_calibration.data.type14.computedZero = calibrator->params.type14.calibrationZero;
-            o->joint[e].running_calibration.data.type14.velocity = 9102;
             
             // If here calibration type 14 can start it process            
             // (2) set states for joint and motor
@@ -2003,7 +2038,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             //debug code
             memset(&info[0], 0, sizeof(info));
-            snprintf(info, sizeof(info), "targetPos=%.2f hardstopPos:%.2f", o->joint[e].running_calibration.data.type14.targetPos, o->joint[e].running_calibration.data.type14.hardstopPos);
+                snprintf(info, sizeof(info), "Going to hardstopPos:%.2f w/ PWM:%d", o->joint[e].running_calibration.data.type14.hardstopPos, calibrator->params.type14.pwmlimit);
             JointSet_send_debug_message(info, e, 0, 0);
             //debug code ended
             
@@ -2018,6 +2053,57 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 snprintf(info, sizeof(info), "Move hrd_stp motor=%d with pwm=%d and cz=%d", e, calibrator->params.type14.pwmlimit, calibrator->params.type14.calibrationZero);
                 JointSet_send_debug_message(info, e, 0, 0);
                 //debug code ended
+                
+                //1) Fix the offset with the rotation raw
+                int32_t offset_raw = (calibrator->params.type14.offset + calibrator->params.type14.rotation ) % ((int32_t)DEG2ICUB*360);
+                
+                //2) Take offset value of calibation parameter with sign given by invertdirection
+                int32_t offset_fix = (calibrator->params.type14.invertdirection == 1) ? -(offset_raw) : offset_raw;
+                
+                //3) Convert offset to decideg for POS service
+                int32_t offset = ((ICUB2DEG)*(CTRL_UNITS)(offset_fix))*10.0f;
+                
+                ////debug code
+                snprintf(info, sizeof(info), "CALIB 14 j%d: or=%d o=%d", e, offset_raw, offset);
+                JointSet_send_debug_message(info, e, 0, 0);
+                ////debug code ended
+                
+                //4) Add the rotation
+                eOmc_calib14_ROT_t rotation = eomc_int2calib14_ROT(calibrator->params.type14.rotation);
+                
+                ////debug code
+                snprintf(info, sizeof(info), "Rot from:%d to:%u and iv:%u", calibrator->params.type14.rotation, rotation, calibrator->params.type14.invertdirection);
+                JointSet_send_debug_message(info, e, 0, 0);
+                ////debug code ended
+                
+                if(rotation == eOmc_calib14_ROT_unknown || rotation == eOmc_calib14_ROT_none)
+                {
+                    //Debug code
+                    memset(&info[0], 0, sizeof(info));
+                    snprintf(info, sizeof(info), "Error in converting rotation to enum ret: %u", rotation);
+                    JointSet_send_debug_message(info, e, 0, 0);
+                    //debug code ended
+                    return;
+                }
+                eoas_pos_ROT_t posrotation = JointSet_calib14_ROT2pos_ROT(rotation);
+                
+                ////debug code
+                snprintf(info, sizeof(info), "CALIB 14 j %d: rot_raw=%d rot_enum=%u ", e, calibrator->params.type14.rotation, posrotation);
+                JointSet_send_debug_message(info, e, 0, 0);
+                ////debug code ended
+                
+                if (eo_pos_Calibrate(eo_pos_GetHandle(), e, posrotation, calibrator->params.type14.invertdirection, offset) != eores_OK)
+                {
+                    //Debug code
+                    memset(&info[0], 0, sizeof(info));
+                    snprintf(info, sizeof(info), "Error in recalibrate POS encoder");
+                    JointSet_send_debug_message(info, e, 0, 0);
+                    //debug code ended
+                    
+                    o->joint[e].control_mode = joint_controlMode_old;
+                    o->control_mode = jointSet_controlMode_old;
+                    return;
+                }
                 
                 // this is just a setter
                 BOOL ret = Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type14.pwmlimit, o->joint[e].running_calibration.data.type14.hardstopPos);
@@ -2036,7 +2122,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 
                 // (4) set hoint hardware limits
                 Joint_set_hardware_limit(o->joint+e);
-                o->joint[e].running_calibration.data.type14.state = calibtype14_st_hardLimitSet;
+                o->joint[e].running_calibration.data.type14.state = calibtype14_st_absEncoderCalib;
             }
             else
             {

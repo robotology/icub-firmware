@@ -61,7 +61,6 @@ extern EOthePOS* eo_pos_GetHandle(void);
 extern eOmn_serv_state_t eo_pos_GetServiceState(EOthePOS *p);
 extern eOresult_t eo_pos_SendReport(EOthePOS *p);
 
-
 extern eOresult_t eo_pos_Verify(EOthePOS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 extern eOresult_t eo_pos_Activate(EOthePOS *p, const eOmn_serv_configuration_t * servcfg);
@@ -77,6 +76,9 @@ extern eOresult_t eo_pos_Tick(EOthePOS *p);
 extern eOresult_t eo_pos_Stop(EOthePOS *p);
 
 extern uint8_t eo_pos_GetNumberOfOwners(EOthePOS *p); // Start() increments owners, Stop or Deactivate() decrements them.
+
+// pass to POS service, and its boards/sensors, POS parameters defined in the configuration file
+extern eOresult_t eo_pos_Calibrate(EOthePOS *p, uint8_t e, eoas_pos_ROT_t rotation, uint8_t invertdirection, int32_t offset);
 
 // it enables/disables transmission of the pos boards. _Start() just starts the service, not the transmission
 extern eOresult_t eo_pos_Transmission(EOthePOS *p, eObool_t on);
