@@ -122,6 +122,19 @@ struct embot::app::application::theIMU::Impl
 
 
     Config config;
+		
+		static constexpr embot::hw::bno055::Placement defaultboardplacement 
+	  {
+		// remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
+    // https://github.com/icub-tech-iit/fix/issues/780
+    //this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
+    // In strain2 we have the P6 configuration reported in bno055 datasheet
+#if defined(STM32HAL_BOARD_STRAIN2) || (STM32HAL_BOARD_STRAIN2C)
+				embot::hw::bno055::Placement::P6
+#else			
+				embot::hw::bno055::Placement::P1	
+#endif			
+		};
 
     bool ticking;
 
@@ -520,17 +533,10 @@ bool embot::app::application::theIMU::initialise(Config &config)
     pImpl->action.load(embot::os::EventToThread(pImpl->config.tickevent, pImpl->config.totask));
 
     embot::hw::bno055::init(pImpl->config.sensor, pImpl->config.sensorconfig);
-    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
-    // https://github.com/icub-tech-iit/fix/issues/780
-    //this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
-#if defined(STM32HAL_BOARD_STRAIN2)
-    // In strain2 we have the P6 configuration reported in bno055 datasheet
-    embot::hw::bno055::write(pImpl->config.sensor, embot::hw::bno055::Register::AXIS_MAP_CONFIG, 0x21, 5*embot::core::time1millisec);
-    embot::hw::bno055::write(pImpl->config.sensor, embot::hw::bno055::Register::AXIS_MAP_SIGN, 0x07, 5*embot::core::time1millisec);
-#endif
+
+	  embot::hw::result_t res = embot::hw::bno055::set(pImpl->config.sensor, pImpl->defaultboardplacement, 5*embot::core::time1millisec);
+
     embot::hw::bno055::set(pImpl->config.sensor, embot::hw::bno055::Mode::NDOF, 5*embot::core::time1millisec);
-
-
 
     return true;
 }
@@ -623,10 +629,10 @@ bool embot::app::application::theIMU::set(const embot::prot::can::analog::pollin
     embot::hw::bno055::get(pImpl->config.sensor, placement, 5*embot::core::time1millisec);    
 
     // now we transform info.orientation into a  ... target placement for the bno055
-    embot::hw::bno055::Placement targetplacement {embot::hw::bno055::Placement::P1};
+    embot::hw::bno055::Placement targetplacement {pImpl->defaultboardplacement};
     if(embot::prot::can::analog::polling::IMUorientation::TYPE::factorydefault == info.orientation.type) 
     {   // we use the placement used by the bno055 at boostrap
-        targetplacement = embot::hw::bno055::Placement::P1;
+        targetplacement = pImpl->defaultboardplacement;
     }
     else if(true == embot::hw::bno055::isvalidplacement(info.orientation.param))
     {   // we have a placement which someone wants to impose. and it is valid
@@ -634,7 +640,7 @@ bool embot::app::application::theIMU::set(const embot::prot::can::analog::pollin
     }
     else
     {   // the placemnet someone wants to impose is not valid. i revert to default one
-        targetplacement = embot::hw::bno055::Placement::P1;
+        targetplacement = pImpl->defaultboardplacement;
     }
 
     
@@ -642,7 +648,7 @@ bool embot::app::application::theIMU::set(const embot::prot::can::analog::pollin
     
     if(changebno055)
     {
-        // from Table 3-6: Operating mode swithcing time
+        // from Table 3-6: Operating mode switching time
         constexpr embot::core::relTime waitANY2CONFIG {19 * embot::core::time1millisec};
         constexpr embot::core::relTime waitCONFIG2ANY {7 * embot::core::time1millisec};
         
