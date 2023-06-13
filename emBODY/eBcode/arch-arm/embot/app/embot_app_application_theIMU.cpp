@@ -122,19 +122,19 @@ struct embot::app::application::theIMU::Impl
 
 
     Config config;
-		
-		static constexpr embot::hw::bno055::Placement defaultboardplacement 
-	  {
-		// remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
+
+    static constexpr embot::hw::bno055::Placement defaultboardplacement 
+    {
+    // remapping of  the axis to have IMU and FT frames parallel, neglecting non-inertial corrections, see this github issue:
     // https://github.com/icub-tech-iit/fix/issues/780
     //this macro defines different behaviour for the IMU placed in the STRAIN2 board, i.e. the accelerometer/gyroscope/magnetometer axes are remapped to match the FT frame
     // In strain2 we have the P6 configuration reported in bno055 datasheet
 #if defined(STM32HAL_BOARD_STRAIN2) || (STM32HAL_BOARD_STRAIN2C)
-				embot::hw::bno055::Placement::P6
-#else			
-				embot::hw::bno055::Placement::P1	
-#endif			
-		};
+        embot::hw::bno055::Placement::P6
+#else
+        embot::hw::bno055::Placement::P1
+#endif
+    };
 
     bool ticking;
 
@@ -373,7 +373,7 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
         {
             // generate a acc message with canrevisitedconfig.imuinfo.counter
             info.sensor = embot::prot::can::analog::imuSensor::acc;
-	        info.value = imuacquisition.data.acc;
+            info.value = imuacquisition.data.acc;
 
             msg.load(info);
             msg.get(frame);
@@ -534,7 +534,7 @@ bool embot::app::application::theIMU::initialise(Config &config)
 
     embot::hw::bno055::init(pImpl->config.sensor, pImpl->config.sensorconfig);
 
-	  embot::hw::result_t res = embot::hw::bno055::set(pImpl->config.sensor, pImpl->defaultboardplacement, 5*embot::core::time1millisec);
+    embot::hw::result_t res = embot::hw::bno055::set(pImpl->config.sensor, pImpl->defaultboardplacement, 5*embot::core::time1millisec);
 
     embot::hw::bno055::set(pImpl->config.sensor, embot::hw::bno055::Mode::NDOF, 5*embot::core::time1millisec);
 
