@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 4.0
+// Model version                  : 5.1
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:46:55 2023
+// C/C++ source code generated on : Tue Jun 27 10:18:55 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,6 +21,7 @@
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
 #include "rtGetNaN.h"
+#include <cstring>
 
 extern "C"
 {
@@ -30,56 +31,33 @@ extern "C"
 }
 
 // Block states (default storage) for model 'estimation_velocity'
-#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
-
 struct DW_estimation_velocity_f_T {
   real32_T DelayLine_Buff[15];         // '<Root>/Delay Line'
   real32_T Delay_DSTATE[16];           // '<Root>/Delay'
   int32_T DelayLine_BUFF_OFFSET;       // '<Root>/Delay Line'
   uint32_T CircBufIdx;                 // '<Root>/Delay'
-  dsp_simulink_QRSolver_estimat_T obj; // '<S1>/QR Solver'
+  dsp_simulink_QRSolver_estimation_velocity_T obj;// '<S1>/QR Solver'
   boolean_T objisempty;                // '<S1>/QR Solver'
 };
-
-#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
-
-#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
 
 // Real-time Model Data Structure
 struct tag_RTM_estimation_velocity_T {
   const char_T **errorStatus;
 };
 
-#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
-
-#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
-
 struct MdlrefDW_estimation_velocity_T {
+  DW_estimation_velocity_f_T rtdw;
   RT_MODEL_estimation_velocity_T rtm;
 };
 
-#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
-
-extern void estimation_velocity_Init(void);
+// Model reference registration function
+extern void estimation_velocity_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_estimation_velocity_T *const estimation_velocity_M,
+  DW_estimation_velocity_f_T *localDW);
+extern void estimation_velocity_Init(DW_estimation_velocity_f_T *localDW);
 extern void estimation_velocity(const SensorsData *rtu_SensorsData, const
   ConfigurationParameters *rtu_ConfigurationParameters, JointVelocities
-  *rty_EstimatedVelocity);
-
-// Model reference registration function
-extern void estimation_velocity_initialize(const char_T **rt_errorStatus);
-
-#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
-
-extern MdlrefDW_estimation_velocity_T estimation_velocity_MdlrefDW;
-
-#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
-
-#ifndef estimation_velocity_MDLREF_HIDE_CHILD_
-
-// Block states (default storage)
-extern DW_estimation_velocity_f_T estimation_velocity_DW;
-
-#endif                                 //estimation_velocity_MDLREF_HIDE_CHILD_
+  *rty_EstimatedVelocity, DW_estimation_velocity_f_T *localDW);
 
 //-
 //  These blocks were eliminated from the model due to optimizations:

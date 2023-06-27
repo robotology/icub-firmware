@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 4.0
+// Model version                  : 5.1
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:47:03 2023
+// C/C++ source code generated on : Tue Jun 27 10:19:02 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -23,18 +23,15 @@
 #include <cstring>
 #include "filter_current_private.h"
 
-MdlrefDW_filter_current_T filter_current_MdlrefDW;
-
-// Block states (default storage)
-DW_filter_current_f_T filter_current_DW;
-
 // Forward declaration for local functions
-static void filter_MedianFilterCG_resetImpl(c_dsp_internal_MedianFilterCG_T *obj);
-static void f_MedianFilterCG_trickleDownMax(c_dsp_internal_MedianFilterCG_T *obj,
-  real32_T i);
-static void f_MedianFilterCG_trickleDownMin(c_dsp_internal_MedianFilterCG_T *obj,
-  real32_T i);
-static void filter_MedianFilterCG_resetImpl(c_dsp_internal_MedianFilterCG_T *obj)
+static void filter_current_MedianFilterCG_resetImpl
+  (c_dsp_internal_MedianFilterCG_filter_current_T *obj);
+static void filter_current_MedianFilterCG_trickleDownMax
+  (c_dsp_internal_MedianFilterCG_filter_current_T *obj, real32_T i);
+static void filter_current_MedianFilterCG_trickleDownMin
+  (c_dsp_internal_MedianFilterCG_filter_current_T *obj, real32_T i);
+static void filter_current_MedianFilterCG_resetImpl
+  (c_dsp_internal_MedianFilterCG_filter_current_T *obj)
 {
   real32_T cnt1;
   real32_T cnt2;
@@ -75,8 +72,8 @@ static void filter_MedianFilterCG_resetImpl(c_dsp_internal_MedianFilterCG_T *obj
   }
 }
 
-static void f_MedianFilterCG_trickleDownMax(c_dsp_internal_MedianFilterCG_T *obj,
-  real32_T i)
+static void filter_current_MedianFilterCG_trickleDownMax
+  (c_dsp_internal_MedianFilterCG_filter_current_T *obj, real32_T i)
 {
   boolean_T exitg1;
   exitg1 = false;
@@ -125,8 +122,8 @@ static void f_MedianFilterCG_trickleDownMax(c_dsp_internal_MedianFilterCG_T *obj
   }
 }
 
-static void f_MedianFilterCG_trickleDownMin(c_dsp_internal_MedianFilterCG_T *obj,
-  real32_T i)
+static void filter_current_MedianFilterCG_trickleDownMin
+  (c_dsp_internal_MedianFilterCG_filter_current_T *obj, real32_T i)
 {
   boolean_T exitg1;
   exitg1 = false;
@@ -176,19 +173,19 @@ static void f_MedianFilterCG_trickleDownMin(c_dsp_internal_MedianFilterCG_T *obj
 }
 
 // System initialize for referenced model: 'filter_current'
-void filter_current_Init(void)
+void filter_current_Init(DW_filter_current_f_T *localDW)
 {
   // Start for MATLABSystem: '<Root>/Median Filter'
-  filter_current_DW.obj.matlabCodegenIsDeleted = false;
-  filter_current_DW.objisempty = true;
-  filter_current_DW.obj.isInitialized = 1;
-  filter_current_DW.obj.NumChannels = 1;
-  filter_current_DW.obj.pMID.isInitialized = 0;
-  filter_current_DW.obj.isSetupComplete = true;
+  localDW->obj.matlabCodegenIsDeleted = false;
+  localDW->objisempty = true;
+  localDW->obj.isInitialized = 1;
+  localDW->obj.NumChannels = 1;
+  localDW->obj.pMID.isInitialized = 0;
+  localDW->obj.isSetupComplete = true;
 
   // InitializeConditions for MATLABSystem: '<Root>/Median Filter'
-  if (filter_current_DW.obj.pMID.isInitialized == 1) {
-    filter_MedianFilterCG_resetImpl(&filter_current_DW.obj.pMID);
+  if (localDW->obj.pMID.isInitialized == 1) {
+    filter_current_MedianFilterCG_resetImpl(&localDW->obj.pMID);
   }
 
   // End of InitializeConditions for MATLABSystem: '<Root>/Median Filter'
@@ -196,9 +193,9 @@ void filter_current_Init(void)
 
 // Output and update for referenced model: 'filter_current'
 void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
-                    *rty_FilteredCurrent)
+                    *rty_FilteredCurrent, DW_filter_current_f_T *localDW)
 {
-  c_dsp_internal_MedianFilterCG_T *obj;
+  c_dsp_internal_MedianFilterCG_filter_current_T *obj;
   int32_T vprev_tmp;
   real32_T ind2;
   real32_T p;
@@ -209,31 +206,29 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
   boolean_T flag;
 
   // MATLABSystem: '<Root>/Median Filter'
-  obj = &filter_current_DW.obj.pMID;
-  if (filter_current_DW.obj.pMID.isInitialized != 1) {
-    filter_current_DW.obj.pMID.isInitialized = 1;
-    filter_current_DW.obj.pMID.isSetupComplete = true;
-    filter_MedianFilterCG_resetImpl(&filter_current_DW.obj.pMID);
+  obj = &localDW->obj.pMID;
+  if (localDW->obj.pMID.isInitialized != 1) {
+    localDW->obj.pMID.isInitialized = 1;
+    localDW->obj.pMID.isSetupComplete = true;
+    filter_current_MedianFilterCG_resetImpl(&localDW->obj.pMID);
   }
 
-  vprev_tmp = static_cast<int32_T>(filter_current_DW.obj.pMID.pIdx) - 1;
-  vprev = filter_current_DW.obj.pMID.pBuf[vprev_tmp];
-  filter_current_DW.obj.pMID.pBuf[vprev_tmp] =
-    rtu_ControlOutputs->Iq_fbk.current;
-  p = filter_current_DW.obj.pMID.pPos[static_cast<int32_T>
-    (filter_current_DW.obj.pMID.pIdx) - 1];
-  filter_current_DW.obj.pMID.pIdx++;
-  if (filter_current_DW.obj.pMID.pWinLen + 1.0F ==
-      filter_current_DW.obj.pMID.pIdx) {
-    filter_current_DW.obj.pMID.pIdx = 1.0F;
+  vprev_tmp = static_cast<int32_T>(localDW->obj.pMID.pIdx) - 1;
+  vprev = localDW->obj.pMID.pBuf[vprev_tmp];
+  localDW->obj.pMID.pBuf[vprev_tmp] = rtu_ControlOutputs->Iq_fbk.current;
+  p = localDW->obj.pMID.pPos[static_cast<int32_T>(localDW->obj.pMID.pIdx) - 1];
+  localDW->obj.pMID.pIdx++;
+  if (localDW->obj.pMID.pWinLen + 1.0F == localDW->obj.pMID.pIdx) {
+    localDW->obj.pMID.pIdx = 1.0F;
   }
 
-  if (p > filter_current_DW.obj.pMID.pMidHeap) {
+  if (p > localDW->obj.pMID.pMidHeap) {
     if (vprev < rtu_ControlOutputs->Iq_fbk.current) {
-      vprev = p - filter_current_DW.obj.pMID.pMidHeap;
-      f_MedianFilterCG_trickleDownMin(&filter_current_DW.obj.pMID, vprev * 2.0F);
+      vprev = p - localDW->obj.pMID.pMidHeap;
+      filter_current_MedianFilterCG_trickleDownMin(&localDW->obj.pMID, vprev *
+        2.0F);
     } else {
-      vprev = p - filter_current_DW.obj.pMID.pMidHeap;
+      vprev = p - localDW->obj.pMID.pMidHeap;
       exitg1 = false;
       while ((!exitg1) && (vprev > 0.0F)) {
         u_tmp = std::floor(vprev / 2.0F);
@@ -259,15 +254,16 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
       }
 
       if (vprev == 0.0F) {
-        f_MedianFilterCG_trickleDownMax(&filter_current_DW.obj.pMID, -1.0F);
+        filter_current_MedianFilterCG_trickleDownMax(&localDW->obj.pMID, -1.0F);
       }
     }
-  } else if (p < filter_current_DW.obj.pMID.pMidHeap) {
+  } else if (p < localDW->obj.pMID.pMidHeap) {
     if (rtu_ControlOutputs->Iq_fbk.current < vprev) {
-      vprev = p - filter_current_DW.obj.pMID.pMidHeap;
-      f_MedianFilterCG_trickleDownMax(&filter_current_DW.obj.pMID, vprev * 2.0F);
+      vprev = p - localDW->obj.pMID.pMidHeap;
+      filter_current_MedianFilterCG_trickleDownMax(&localDW->obj.pMID, vprev *
+        2.0F);
     } else {
-      vprev = p - filter_current_DW.obj.pMID.pMidHeap;
+      vprev = p - localDW->obj.pMID.pMidHeap;
       exitg1 = false;
       while ((!exitg1) && (vprev < 0.0F)) {
         u_tmp = vprev / 2.0F;
@@ -309,41 +305,38 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
       }
 
       if (vprev == 0.0F) {
-        f_MedianFilterCG_trickleDownMin(&filter_current_DW.obj.pMID, 1.0F);
+        filter_current_MedianFilterCG_trickleDownMin(&localDW->obj.pMID, 1.0F);
       }
     }
   } else {
-    if (filter_current_DW.obj.pMID.pMaxHeapLength != 0.0F) {
-      f_MedianFilterCG_trickleDownMax(&filter_current_DW.obj.pMID, -1.0F);
+    if (localDW->obj.pMID.pMaxHeapLength != 0.0F) {
+      filter_current_MedianFilterCG_trickleDownMax(&localDW->obj.pMID, -1.0F);
     }
 
-    if (filter_current_DW.obj.pMID.pMinHeapLength > 0.0F) {
-      f_MedianFilterCG_trickleDownMin(&filter_current_DW.obj.pMID, 1.0F);
+    if (localDW->obj.pMID.pMinHeapLength > 0.0F) {
+      filter_current_MedianFilterCG_trickleDownMin(&localDW->obj.pMID, 1.0F);
     }
   }
 
-  vprev = filter_current_DW.obj.pMID.pBuf[static_cast<int32_T>
-    (filter_current_DW.obj.pMID.pHeap[static_cast<int32_T>
-     (filter_current_DW.obj.pMID.pMidHeap) - 1]) - 1];
-  vprev += filter_current_DW.obj.pMID.pBuf[static_cast<int32_T>
-    (filter_current_DW.obj.pMID.pHeap[static_cast<int32_T>
-     (filter_current_DW.obj.pMID.pMidHeap - 1.0F) - 1]) - 1];
+  vprev = localDW->obj.pMID.pBuf[static_cast<int32_T>(localDW->obj.pMID.pHeap[
+    static_cast<int32_T>(localDW->obj.pMID.pMidHeap) - 1]) - 1];
+  vprev += localDW->obj.pMID.pBuf[static_cast<int32_T>(localDW->obj.pMID.pHeap[
+    static_cast<int32_T>(localDW->obj.pMID.pMidHeap - 1.0F) - 1]) - 1];
   rty_FilteredCurrent->current = vprev / 2.0F;
 
   // End of MATLABSystem: '<Root>/Median Filter'
 }
 
 // Termination for referenced model: 'filter_current'
-void filter_current_Term(void)
+void filter_current_Term(DW_filter_current_f_T *localDW)
 {
   // Terminate for MATLABSystem: '<Root>/Median Filter'
-  if (!filter_current_DW.obj.matlabCodegenIsDeleted) {
-    filter_current_DW.obj.matlabCodegenIsDeleted = true;
-    if ((filter_current_DW.obj.isInitialized == 1) &&
-        filter_current_DW.obj.isSetupComplete) {
-      filter_current_DW.obj.NumChannels = -1;
-      if (filter_current_DW.obj.pMID.isInitialized == 1) {
-        filter_current_DW.obj.pMID.isInitialized = 2;
+  if (!localDW->obj.matlabCodegenIsDeleted) {
+    localDW->obj.matlabCodegenIsDeleted = true;
+    if ((localDW->obj.isInitialized == 1) && localDW->obj.isSetupComplete) {
+      localDW->obj.NumChannels = -1;
+      if (localDW->obj.pMID.isInitialized == 1) {
+        localDW->obj.pMID.isInitialized = 2;
       }
     }
   }
@@ -352,15 +345,18 @@ void filter_current_Term(void)
 }
 
 // Model initialize function
-void filter_current_initialize(const char_T **rt_errorStatus)
+void filter_current_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_filter_current_T *const filter_current_M, DW_filter_current_f_T
+  *localDW)
 {
-  RT_MODEL_filter_current_T *const filter_current_M =
-    &(filter_current_MdlrefDW.rtm);
-
   // Registration code
 
   // initialize error status
   rtmSetErrorStatusPointer(filter_current_M, rt_errorStatus);
+
+  // states (dwork)
+  (void) std::memset(static_cast<void *>(localDW), 0,
+                     sizeof(DW_filter_current_f_T));
 }
 
 //

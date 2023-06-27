@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.2.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G4xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -186,6 +186,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1066,6 +1067,11 @@
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
+            <File>
+              <FileName>SupervisorFSM_RX_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1135,6 +1141,16 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::thermal-model</GroupName>
+          <Files>
+            <File>
+              <FileName>thermal_model.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1216,14 +1232,14 @@
       <TargetName>amcbldc-app-motorhal2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.2.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G4xx_DFP.1.5.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1392,6 +1408,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1545,7 +1562,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DEMBOT_AMCBLDC_APP05</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V122</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder;..\src\model-based-design\control-outer;..\src\model-based-design\control-foc;..\src\model-based-design\estimator;..\src\model-based-design\amc-bldc;..\src\model-based-design\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc</IncludePath>
+              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder;..\src\model-based-design\control-outer;..\src\model-based-design\control-foc;..\src\model-based-design\estimator;..\src\model-based-design\amc-bldc;..\src\model-based-design\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc;..\src\model-based-design\thermal-model</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2323,6 +2340,11 @@
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
+            <File>
+              <FileName>SupervisorFSM_RX_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2461,6 +2483,16 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::thermal-model</GroupName>
+          <Files>
+            <File>
+              <FileName>thermal_model.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
             </File>
           </Files>
         </Group>

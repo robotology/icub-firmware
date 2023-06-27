@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 4.0
+// Model version                  : 5.0
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:46:19 2023
+// C/C++ source code generated on : Tue Jun 27 10:18:04 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -50,7 +50,7 @@ struct DW_DecodingLogic_can_decoder_T {
   int32_T sfEvent;                     // '<S2>/Decoding Logic'
   uint32_T ev_errorEventCounter;       // '<S2>/Decoding Logic'
   uint32_T ev_set_control_modeEventCounter;// '<S2>/Decoding Logic'
-  uint32_T ev_set_current_limitEventCounte;// '<S2>/Decoding Logic'
+  uint32_T ev_set_current_limitEventCounter;// '<S2>/Decoding Logic'
   uint32_T ev_desired_targetsEventCounter;// '<S2>/Decoding Logic'
   uint32_T ev_set_current_pidEventCounter;// '<S2>/Decoding Logic'
   uint32_T ev_set_velocity_pidEventCounter;// '<S2>/Decoding Logic'

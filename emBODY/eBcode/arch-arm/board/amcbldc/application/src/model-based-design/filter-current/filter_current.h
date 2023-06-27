@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 4.0
+// Model version                  : 5.1
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:47:03 2023
+// C/C++ source code generated on : Tue Jun 27 10:19:02 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,54 +20,32 @@
 #define RTW_HEADER_filter_current_h_
 #include "rtwtypes.h"
 #include "filter_current_types.h"
+#include <cstring>
 
 // Block states (default storage) for model 'filter_current'
-#ifndef filter_current_MDLREF_HIDE_CHILD_
-
 struct DW_filter_current_f_T {
-  dsp_simulink_MedianFilter_fil_T obj; // '<Root>/Median Filter'
+  dsp_simulink_MedianFilter_filter_current_T obj;// '<Root>/Median Filter'
   boolean_T objisempty;                // '<Root>/Median Filter'
 };
-
-#endif                                 //filter_current_MDLREF_HIDE_CHILD_
-
-#ifndef filter_current_MDLREF_HIDE_CHILD_
 
 // Real-time Model Data Structure
 struct tag_RTM_filter_current_T {
   const char_T **errorStatus;
 };
 
-#endif                                 //filter_current_MDLREF_HIDE_CHILD_
-
-#ifndef filter_current_MDLREF_HIDE_CHILD_
-
 struct MdlrefDW_filter_current_T {
+  DW_filter_current_f_T rtdw;
   RT_MODEL_filter_current_T rtm;
 };
 
-#endif                                 //filter_current_MDLREF_HIDE_CHILD_
-
-extern void filter_current_Init(void);
-extern void filter_current(const ControlOutputs *rtu_ControlOutputs,
-  MotorCurrent *rty_FilteredCurrent);
-extern void filter_current_Term(void);
-
 // Model reference registration function
-extern void filter_current_initialize(const char_T **rt_errorStatus);
-
-#ifndef filter_current_MDLREF_HIDE_CHILD_
-
-extern MdlrefDW_filter_current_T filter_current_MdlrefDW;
-
-#endif                                 //filter_current_MDLREF_HIDE_CHILD_
-
-#ifndef filter_current_MDLREF_HIDE_CHILD_
-
-// Block states (default storage)
-extern DW_filter_current_f_T filter_current_DW;
-
-#endif                                 //filter_current_MDLREF_HIDE_CHILD_
+extern void filter_current_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_filter_current_T *const filter_current_M, DW_filter_current_f_T
+  *localDW);
+extern void filter_current_Init(DW_filter_current_f_T *localDW);
+extern void filter_current(const ControlOutputs *rtu_ControlOutputs,
+  MotorCurrent *rty_FilteredCurrent, DW_filter_current_f_T *localDW);
+extern void filter_current_Term(DW_filter_current_f_T *localDW);
 
 //-
 //  The generated code includes comments that allow you to trace directly
