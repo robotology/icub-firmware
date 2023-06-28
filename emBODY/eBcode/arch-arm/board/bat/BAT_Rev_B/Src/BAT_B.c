@@ -11,7 +11,7 @@
 
 char Firmware_vers = 1;
 char Revision_vers = 2;
-char Build_number  = 0;
+char Build_number  = 1;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
 uint32_t vhyst=0;    // voltage hysteresis
@@ -96,8 +96,8 @@ uint16_t Battery_low=3300*7;    // 7s5p battery
 
 #ifdef BAT_B_iCub3
 uint32_t VTH[7]={32000, 34000, 36000, 38000, 40000, 42000, 44000};   // threshold in mV iCub 2.5 Battery
-uint16_t Battery_high=4200*10;   // 10s3p battery
-uint16_t Battery_low=3300*10;    // 10s3p battery
+uint16_t Battery_high=4200*0.1;   // 10s3p battery - Use deciVolt to be compliant with BMS
+uint16_t Battery_low=3300*0.1;    // 10s3p battery - - Use deciVolt to be compliant with BMS
 #endif
 
 adc_measure_t adc_measure = {0};  // initialize all adc values to 0
