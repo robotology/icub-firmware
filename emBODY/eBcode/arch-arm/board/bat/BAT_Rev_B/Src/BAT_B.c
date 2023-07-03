@@ -96,13 +96,14 @@ uint16_t Battery_low=3300*7;    // 7s5p battery
 
 #ifdef BAT_B_iCub3
 uint32_t VTH[7]={32000, 34000, 36000, 38000, 40000, 42000, 44000};   // threshold in mV iCub 2.5 Battery
-uint16_t Battery_high=4200*0.1;   // 10s3p battery - Use deciVolt to be compliant with BMS
-uint16_t Battery_low=3300*0.1;    // 10s3p battery - - Use deciVolt to be compliant with BMS
+uint16_t Battery_high=4200*10;   // 10s3p battery
+uint16_t Battery_low=3300*10;    // 10s3p battery
 #endif
 
 adc_measure_t adc_measure = {0};  // initialize all adc values to 0
 adc_measure_t mean = {0};         // initialize all average values to 0
 uint32_t adc_values[9];           // contains all ADC channels conversion
+uint32_t vBatterydV = 0;          // varibale used for sending mean.V_BATTERY to EMS in deciVolt
 
 uint16_t adc_sample = 0;
 
