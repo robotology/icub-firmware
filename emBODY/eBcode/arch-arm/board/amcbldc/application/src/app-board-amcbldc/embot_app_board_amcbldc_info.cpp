@@ -30,7 +30,7 @@ namespace embot::app::board::amcbldc::info {
     
     constexpr embot::prot::can::applicationInfo applInfo 
     {   
-        embot::prot::can::versionOfAPPLICATION {2, 0, 2},    
+        embot::prot::can::versionOfAPPLICATION {2, 0, 3},    
         embot::prot::can::versionOfCANPROTOCOL {2, 0}   
     };
 
