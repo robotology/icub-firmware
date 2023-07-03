@@ -554,7 +554,7 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(
   if (nullptr == bat) { // something is wrong
     return eores_NOK_generic;
   }
-
+  
   switch (cfd.type) {
   case canFrameDescriptor::Type::unspecified: {
     bat->status.timedvalue.temperature =
@@ -571,8 +571,9 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(
         0.1 * static_cast<float32_t>(
                   (static_cast<uint16_t>(cfd.frame->data[1]) << 8) +
                   static_cast<uint16_t>(cfd.frame->data[0]));
-    break;
+    
   }
+  break;
   default:
     return eores_NOK_unsupported;
   }

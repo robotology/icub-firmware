@@ -476,7 +476,7 @@ void calcMean(){
   
   mean.V_VINPUT   = mean.V_VINPUT   / nr_adc_sample;
   mean.V_EXTPS    = mean.V_EXTPS    / nr_adc_sample;
-  mean.V_BATTERY  = 0.01 * (mean.V_BATTERY  / nr_adc_sample); // in deciVolt to be compliant with BMS
+  mean.V_BATTERY  = mean.V_BATTERY  / nr_adc_sample;  
   mean.V_V12board = mean.V_V12board / nr_adc_sample;
   mean.V_V12motor = mean.V_V12motor / nr_adc_sample;
   mean.I_V12board = mean.I_V12board / nr_adc_sample;
@@ -589,8 +589,9 @@ void CANBUS(void){
     case 0x05:
     {
         // Battery Pack Info message
-        TxData_620[0] = mean.V_BATTERY & 0xFF;          // b7-b6 Battery pack voltage            
-        TxData_620[1] = (mean.V_BATTERY >> 8) & 0xFF; 
+        vBatterydV = 0.01 * (mean.V_BATTERY);
+        TxData_620[0] = vBatterydV & 0xFF;           // b7-b6 Battery pack voltage            
+        TxData_620[1] = (vBatterydV >> 8) & 0xFF;
         TxData_620[2] = 0x00;                           // b5-b4 Instant current
         TxData_620[3] = 0x00;
         TxData_620[4] = Battery_charge & 0xFF;          // b3-b2 State of charge of battery
@@ -1118,6 +1119,19 @@ void dcdc_management(void){
               ((V12motor		& 0x01)	<< 5) +
               ((HSM           & 0x01)	<< 3) +
               (((PB1_restart || PB2_restart) & 0x01)	<< 0);
+    
+    
+  DCDC_status_A = ((V12board      & 0x01) << 7) +
+                  ((V12board_F    & 0x01) << 6) +
+                  ((V12motor      & 0x01) << 5) +
+                  ((V12motor_F    & 0x01) << 4) +
+                  ((HSM           & 0x01) << 3) +
+                  ((HSM_PG        & 0x01) << 2) +
+                  ((HSM_F         & 0x01) << 1) +
+                  ((HSM_broken    & 0x01) << 0);
+    
+  DCDC_status_B = (( PB1_restart & 0x01) << 7) + 
+                  ((PB2_restart    & 0x01) << 6);
     
   if(DCrestart){
     PB1_restart=0;
