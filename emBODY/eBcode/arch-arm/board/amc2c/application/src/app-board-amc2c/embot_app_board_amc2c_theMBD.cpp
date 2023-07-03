@@ -458,7 +458,21 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
     // Model Step Function (1 ms)
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_step_Time();
+    AMC_BLDC_step_Time_1ms();
+    
+
+    // -----------------------------------------------------------------------------
+    // Thermal Model Step Function (10 ms)
+    // -----------------------------------------------------------------------------
+    
+    static uint8_t thermal_model_counter = 0;
+
+    if(thermal_model_counter % 10 == 0)
+    {
+        AMC_BLDC_step_Time_10ms();
+        thermal_model_counter = 0;
+    }
+    thermal_model_counter++;
     
     
     // get any out can frame
