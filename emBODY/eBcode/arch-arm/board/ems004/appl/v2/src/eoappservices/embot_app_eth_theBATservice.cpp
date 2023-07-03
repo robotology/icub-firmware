@@ -54,7 +54,7 @@ constexpr eOservice_diagnostics_t dummy_service_diagnostics{
     .errorType = eo_errortype_info,
     .errorCallbackCount = 0,
     .repetitionOKcase =
-        0 // 10 // with 0 we transmit report only once at succesful activation
+        0 // 10 // with 0 we transmit report only once at successful activation
 };
 
 constexpr eOservice_cantools_t dummy_service_cantools{
@@ -81,7 +81,7 @@ struct embot::app::eth::theBATservice::Impl {
 
   const eOmn_serv_configuration_t *tmpservcfg{nullptr};
   // theBATnetvariables[i] holds pointer to the network variable of the whole
-  // eOas_battery_t w/ i index theFTboards[i] contains the relenat board type
+  // eOas_battery_t w/ i index theFTboards[i] contains the relevant board type
   std::array<eOas_battery_t *, maxSensors> theBATnetvariables{nullptr};
   std::array<eObrd_cantype_t, maxSensors> theBATboards{eobrd_cantype_bms};
 
@@ -348,29 +348,30 @@ eOresult_t embot::app::eth::theBATservice::Impl::Activate(
              sd->boardinfo.type)))) { // even if it is a useless check because
                                       // we did it before inside Verify()
 
-      // preparation for loading can boards into EOtheCANmapping
-      eObrd_canproperties_t prop = {0};
-      prop.type = sd->boardinfo.type;
-      prop.location.port = sd->canloc.port;
-      prop.location.addr = sd->canloc.addr;
-      prop.location.insideindex = eobrd_caninsideindex_none;
-      prop.requiredprotocol = sd->boardinfo.protocol;
-      eo_vector_PushBack(sharedcan.boardproperties, &prop);
+        // preparation for loading can boards into EOtheCANmapping
+        eObrd_canproperties_t prop = {0};
+        prop.type = sd->boardinfo.type;
+        prop.location.port = sd->canloc.port;
+        prop.location.addr = sd->canloc.addr;
+        prop.location.insideindex = eobrd_caninsideindex_none;
+        prop.requiredprotocol = sd->boardinfo.protocol;
+        eo_vector_PushBack(sharedcan.boardproperties, &prop);
 
-      // preparation for loading entities into EOtheCANmapping
-      eOcanmap_entitydescriptor_t des = {0};
-      des.location.port = sd->canloc.port;
-      des.location.addr = sd->canloc.addr;
-      des.location.insideindex = eobrd_caninsideindex_none;
-      des.index = static_cast<eOcanmap_entityindex_t>(s);
-      eo_vector_PushBack(sharedcan.entitydescriptor, &des);
+        // preparation for loading entities into EOtheCANmapping
+        eOcanmap_entitydescriptor_t des = {0};
+        des.location.port = sd->canloc.port;
+        des.location.addr = sd->canloc.addr;
+        des.location.insideindex = eobrd_caninsideindex_none;
+        des.index = static_cast<eOcanmap_entityindex_t>(s);
+        eo_vector_PushBack(sharedcan.entitydescriptor, &des);
 
-      // data used by this class
-      void *vpft = eoprot_entity_ramof_get(
+        // data used by this class
+        void *vpft = eoprot_entity_ramof_get(
           eoprot_board_localboard, eoprot_endpoint_analogsensors,
           eoprot_entity_as_battery, static_cast<eOprotIndex_t>(s));
-      theBATnetvariables[s] = reinterpret_cast<eOas_battery_t *>(vpft);
-      theBATboards[s] = static_cast<eObrd_cantype_t>(sd->boardinfo.type);
+        theBATnetvariables[s] = reinterpret_cast<eOas_battery_t *>(vpft);
+        theBATboards[s] = static_cast<eObrd_cantype_t>(sd->boardinfo.type);
+        
     }
   }
 
@@ -545,7 +546,7 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(
   loc.port = cfd.port;
   loc.addr = EOCANPROT_FRAME_GET_SOURCE(cfd.frame);
   loc.insideindex = eobrd_caninsideindex_none;
-
+      
   eOprotIndex_t index = 0;
 
   canmonitor.touch(loc);
@@ -554,29 +555,102 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(
   if (nullptr == bat) { // something is wrong
     return eores_NOK_generic;
   }
-
+  
+  
   switch (cfd.type) {
-  case canFrameDescriptor::Type::unspecified: {
-    bat->status.timedvalue.temperature =
-        10 * ((static_cast<uint16_t>(cfd.frame->data[7]) << 8) +
-        static_cast<uint16_t>(cfd.frame->data[6]));
-    bat->status.timedvalue.charge = static_cast<float32_t>(
-        (static_cast<uint16_t>(cfd.frame->data[5]) << 8) +
-        static_cast<uint16_t>(cfd.frame->data[4]));
-    int16_t curr = (static_cast<int16_t>(cfd.frame->data[3]) << 8) +
-                  static_cast<int16_t>(cfd.frame->data[2]);
+      
+    case canFrameDescriptor::Type::info:
+    {
+        bat->status.timedvalue.temperature =
+            10 * ((static_cast<uint16_t>(cfd.frame->data[7]) << 8) +
+            static_cast<uint16_t>(cfd.frame->data[6]));
+        
+    bat->status.timedvalue.charge = 
+        static_cast<float32_t>(
+            (static_cast<uint16_t>(cfd.frame->data[5]) << 8) +
+            static_cast<uint16_t>(cfd.frame->data[4])
+        );
+        
+    int16_t curr = 
+        (static_cast<int16_t>(cfd.frame->data[3]) << 8) +
+        static_cast<int16_t>(cfd.frame->data[2]);
+
     bat->status.timedvalue.current =
-            0.1 * static_cast<float32_t>(curr);
+        0.1 * static_cast<float32_t>(curr);
+
     bat->status.timedvalue.voltage =
         0.1 * static_cast<float32_t>(
                   (static_cast<uint16_t>(cfd.frame->data[1]) << 8) +
-                  static_cast<uint16_t>(cfd.frame->data[0]));
-    break;
+                  static_cast<uint16_t>(cfd.frame->data[0])
+        );
+    } break;
+      
+    case canFrameDescriptor::Type::status_bms: 
+    {
+        /*
+        * This byte0 coming from the BMS carries out the information
+        * about the general alarm state with the folloing bits, which are only one up at time
+        * Bit0: Signature Bit - Set to 1 for the BMS device
+        * Bit1: Low Voltage
+        * Bit2: High Voltage
+        * Bit3: Overcurrent in discharge
+        * Bit4: Overcurrent in charge
+        * Bit5: Low SOC
+        * Bit6: Low temperature
+        * Bit7: High temperature
+        * Bit8: Not used (filled by cfd.frame->data[0] because of right shift of 1 but not used having only 7 alarms)
+        If we have an alram, this will persist in the minute after the alarm generation
+        even if the alarm re-enter
+        **/
+        // using embot methods copy the 8bits of bms_status into the two least significant bytes of the general timedvalue.status
+        embot::core::binary::mask::clear(bat->status.timedvalue.status, static_cast<uint32_t>(0x0000ffff), 0);
+        embot::core::binary::bit::set(bat->status.timedvalue.status, 0);
+        embot::core::binary::mask::set(bat->status.timedvalue.status, static_cast<uint32_t>(cfd.frame->data[0]), 1);
+        bat->status.timedvalue.age = embot::core::now();
+        
+    } break;
+    
+    case canFrameDescriptor::Type::status_bat: 
+    {
+        /*
+        * Regarding the status info coming from the BAT carries out the following information
+        * 8 LSB defines DCDC status, i.e. voltage on board and motors regulators and Hot Swap Manager
+        * in 8 MSB the first 4bits, i.e. 0x0000000f, carries out info about push button restart phase
+        * Bit0: V12board       on/off
+        * Bit1: V12board_fault oc/nrm
+        * Bit2: V12motor       on/off
+        * Bit3: V12motor_fault oc/nrm
+        * Bit4: hsm            on/off
+        * Bit5: hsm_pgood      stbale/not_guaranteed
+        * Bit6: hsm_fault      oc-ov/nrm
+        * Bit7: hsm_broken     brnd/nrm
+        * Bit8: pb1_restart    start_up/stable
+        * Bit9: pb2_restart    start_up/stable
+        If we have an alram, this will persist in the minute after the alarm generation
+        even if the alarm re-enter
+        **/
+        // using embot methods copy the 16bits of bms_status into the two most significant bytes of the general timedvalue.status
+        uint16_t bat_status_temp16 = {0x0120};
+        embot::core::binary::mask::clear(bat->status.timedvalue.status, static_cast<uint32_t>(0xffff0000), 0);
+        
+        bat_status_temp16 = static_cast<uint16_t>((cfd.frame->data[1] << 8 ) | cfd.frame->data[0]);
+        embot::core::binary::mask::set(bat->status.timedvalue.status, static_cast<uint32_t>(bat_status_temp16), 16);
+        bat->status.timedvalue.age = embot::core::now();
+    } break;
+    
+    case canFrameDescriptor::Type::unspecified:
+    {
+        //unspecified type do nothing - for now return unsupported error - 
+        //this case should never be set when this method is called
+        return eores_NOK_unsupported;
+    } break;
+    
+    default:
+    {
+        return eores_NOK_unsupported;
+    } break;
+    
   }
-  default:
-    return eores_NOK_unsupported;
-  }
-
   return eores_OK;
 }
 

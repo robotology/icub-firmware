@@ -29,4 +29,10 @@ extern uint8_t               TxData_620[8];
 extern uint8_t               RxData_620[8];
 extern uint32_t              TxMailbox_620;
 
+extern CAN_TxHeaderTypeDef   TxHeader_629;
+extern CAN_RxHeaderTypeDef   RxHeader_629;
+extern uint8_t               TxData_629[8];
+extern uint8_t               RxData_629[8];
+extern uint32_t              TxMailbox_629;
+
 #endif

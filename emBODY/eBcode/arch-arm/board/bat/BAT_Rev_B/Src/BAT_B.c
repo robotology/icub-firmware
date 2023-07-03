@@ -10,8 +10,8 @@
 #include "BAT_B.h"
 
 char Firmware_vers = 1;
-char Revision_vers = 2;
-char Build_number  = 1;
+char Revision_vers = 3;
+char Build_number  = 0;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
 uint32_t vhyst=0;    // voltage hysteresis
@@ -60,6 +60,8 @@ uint8_t V12motor      = 0;		// DCDC motor control
 uint8_t V12motor_F    = 0;		// fault
 uint8_t HSM_broken    = 0;		// HSM transistors broken
 uint8_t HSM           = 0;		// HSM control
+uint8_t HSM_PG        = 0;
+uint8_t HSM_F         = 0;
 uint8_t DCrestart     = 0;
 
 uint8_t V12board_bdc  = 1;    // +++++++++++++++++++++++++++++++++++++++++++++ da cambiare logica ++++++++++++++++++
@@ -78,8 +80,6 @@ uint8_t timerFSM_motors = 0;
 uint8_t DCDC_status_A = 0;
 uint8_t DCDC_status_B = 0;
 uint8_t DCDC_ctrl     = 0;
-uint8_t HSM_PG        = 0;
-uint8_t HSM_F         = 0;
 
 uint16_t timeout    = 0;
 uint16_t time_delay = 500;

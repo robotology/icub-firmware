@@ -1182,7 +1182,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicBattery[] =
 {
     {   // 000      ICUBCANPROTO_PER_BS_MSG__STATUS
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__STATUS
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__INFO
     },
     {   // 001      
         EO_INIT(.former) NULL,
@@ -1190,7 +1190,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicBattery[] =
     }, 
     {   // 002      
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS,
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
     },
     {   // 003      
         EO_INIT(.former) NULL,
@@ -1214,11 +1214,11 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicBattery[] =
     },
     {   // 008      
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__STATUS_BMS
     },
     {   // 009      
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) NULL
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_BS_MSG__STATUS_BAT
     },
     {   // 010      
         EO_INIT(.former) NULL,
@@ -1431,7 +1431,7 @@ static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t por
 
 
 static eObool_t s_eo_canprot_filter_sourceaddress(eOcanframe_t *frame)
-{    
+{        
     if(0 == EOCANPROT_FRAME_GET_SOURCE(frame))
     {
         return(eobool_true);

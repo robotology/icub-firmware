@@ -13,8 +13,6 @@
 #ifndef BAT_B_H
 #define BAT_B_H
 
-void dcdc_management(void);
-
 extern char Firmware_vers;
 extern char Revision_vers;
 extern char Build_number;
@@ -84,6 +82,7 @@ extern uint8_t timerFSM_motors;
 extern uint8_t DCDC_status_A;
 extern uint8_t DCDC_status_B;
 extern uint8_t DCDC_ctrl;
+extern uint8_t DCDC_status;
 extern uint8_t HSM_PG;
 extern uint8_t HSM_F;
 
