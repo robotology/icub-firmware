@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 4.0
+// Model version                  : 5.1
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:46:55 2023
+// C/C++ source code generated on : Tue Jun 27 10:18:55 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -31,11 +31,6 @@ extern "C"
 #include "rt_nonfinite.h"
 
 }
-
-MdlrefDW_estimation_velocity_T estimation_velocity_MdlrefDW;
-
-// Block states (default storage)
-DW_estimation_velocity_f_T estimation_velocity_DW;
 
 // Forward declaration for local functions
 static real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32],
@@ -339,16 +334,32 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
 }
 
 // System initialize for referenced model: 'estimation_velocity'
-void estimation_velocity_Init(void)
+void estimation_velocity_Init(DW_estimation_velocity_f_T *localDW)
 {
+  int32_T idxIn;
+
+  // InitializeConditions for S-Function (sdspsreg2): '<Root>/Delay Line'
+  idxIn = 0;
+  for (int32_T i = 0; i < 15; i++) {
+    localDW->DelayLine_Buff[idxIn] = 0.0F;
+    idxIn++;
+  }
+
+  localDW->DelayLine_BUFF_OFFSET = 0;
+
+  // End of InitializeConditions for S-Function (sdspsreg2): '<Root>/Delay Line' 
+
+  // InitializeConditions for Delay: '<Root>/Delay'
+  localDW->CircBufIdx = 0U;
+
   // Start for MATLABSystem: '<S1>/QR Solver'
-  estimation_velocity_DW.objisempty = true;
+  localDW->objisempty = true;
 }
 
 // Output and update for referenced model: 'estimation_velocity'
 void estimation_velocity(const SensorsData *rtu_SensorsData, const
   ConfigurationParameters *rtu_ConfigurationParameters, JointVelocities
-  *rty_EstimatedVelocity)
+  *rty_EstimatedVelocity, DW_estimation_velocity_f_T *localDW)
 {
   int32_T jpvt[2];
   int32_T bIndx;
@@ -364,17 +375,14 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
   real32_T tol;
 
   // S-Function (sdspsreg2): '<Root>/Delay Line'
-  for (rankA = 0; rankA < 15 - estimation_velocity_DW.DelayLine_BUFF_OFFSET;
-       rankA++) {
-    rtb_DelayLine[rankA] =
-      estimation_velocity_DW.DelayLine_Buff[estimation_velocity_DW.DelayLine_BUFF_OFFSET
-      + rankA];
+  for (rankA = 0; rankA < 15 - localDW->DelayLine_BUFF_OFFSET; rankA++) {
+    rtb_DelayLine[rankA] = localDW->DelayLine_Buff
+      [localDW->DelayLine_BUFF_OFFSET + rankA];
   }
 
-  for (rankA = 0; rankA < estimation_velocity_DW.DelayLine_BUFF_OFFSET; rankA++)
-  {
-    rtb_DelayLine[(rankA - estimation_velocity_DW.DelayLine_BUFF_OFFSET) + 15] =
-      estimation_velocity_DW.DelayLine_Buff[rankA];
+  for (rankA = 0; rankA < localDW->DelayLine_BUFF_OFFSET; rankA++) {
+    rtb_DelayLine[(rankA - localDW->DelayLine_BUFF_OFFSET) + 15] =
+      localDW->DelayLine_Buff[rankA];
   }
 
   rtb_DelayLine[15] = rtu_SensorsData->jointpositions.position;
@@ -437,8 +445,7 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
 
    case EstimationVelocityModes_MovingAverage:
     rty_EstimatedVelocity->velocity = (rtu_SensorsData->jointpositions.position
-      - estimation_velocity_DW.Delay_DSTATE[estimation_velocity_DW.CircBufIdx]) *
-      62.5F;
+      - localDW->Delay_DSTATE[localDW->CircBufIdx]) * 62.5F;
     break;
 
    default:
@@ -449,11 +456,11 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
   // End of MultiPortSwitch: '<Root>/Index Vector'
 
   // Update for S-Function (sdspsreg2): '<Root>/Delay Line'
-  estimation_velocity_DW.DelayLine_Buff[estimation_velocity_DW.DelayLine_BUFF_OFFSET]
-    = rtu_SensorsData->jointpositions.position;
-  estimation_velocity_DW.DelayLine_BUFF_OFFSET++;
-  while (estimation_velocity_DW.DelayLine_BUFF_OFFSET >= 15) {
-    estimation_velocity_DW.DelayLine_BUFF_OFFSET -= 15;
+  localDW->DelayLine_Buff[localDW->DelayLine_BUFF_OFFSET] =
+    rtu_SensorsData->jointpositions.position;
+  localDW->DelayLine_BUFF_OFFSET++;
+  while (localDW->DelayLine_BUFF_OFFSET >= 15) {
+    localDW->DelayLine_BUFF_OFFSET -= 15;
   }
 
   // End of Update for S-Function (sdspsreg2): '<Root>/Delay Line'
@@ -461,23 +468,22 @@ void estimation_velocity(const SensorsData *rtu_SensorsData, const
   // Update for Delay: '<Root>/Delay' incorporates:
   //   S-Function (sdspsreg2): '<Root>/Delay Line'
 
-  estimation_velocity_DW.Delay_DSTATE[estimation_velocity_DW.CircBufIdx] =
+  localDW->Delay_DSTATE[localDW->CircBufIdx] =
     rtu_SensorsData->jointpositions.position;
-  if (estimation_velocity_DW.CircBufIdx < 15U) {
-    estimation_velocity_DW.CircBufIdx++;
+  if (localDW->CircBufIdx < 15U) {
+    localDW->CircBufIdx++;
   } else {
-    estimation_velocity_DW.CircBufIdx = 0U;
+    localDW->CircBufIdx = 0U;
   }
 
   // End of Update for Delay: '<Root>/Delay'
 }
 
 // Model initialize function
-void estimation_velocity_initialize(const char_T **rt_errorStatus)
+void estimation_velocity_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_estimation_velocity_T *const estimation_velocity_M,
+  DW_estimation_velocity_f_T *localDW)
 {
-  RT_MODEL_estimation_velocity_T *const estimation_velocity_M =
-    &(estimation_velocity_MdlrefDW.rtm);
-
   // Registration code
 
   // initialize non-finites
@@ -485,6 +491,10 @@ void estimation_velocity_initialize(const char_T **rt_errorStatus)
 
   // initialize error status
   rtmSetErrorStatusPointer(estimation_velocity_M, rt_errorStatus);
+
+  // states (dwork)
+  (void) std::memset(static_cast<void *>(localDW), 0,
+                     sizeof(DW_estimation_velocity_f_T));
 }
 
 //

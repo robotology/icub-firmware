@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 5.7
+// Model version                  : 5.12
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:46:35 2023
+// C/C++ source code generated on : Tue Jun 27 10:18:32 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,8 @@
 #define RTW_HEADER_control_foc_h_
 #include "rtwtypes.h"
 #include "control_foc_types.h"
+#include "FOCInnerLoop.h"
+#include <cstring>
 
 extern "C"
 {
@@ -31,115 +33,51 @@ extern "C"
 #include "zero_crossing_types.h"
 
 // Block signals for model 'control_foc'
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
 struct B_control_foc_c_T {
-  real32_T SumI1;                      // '<S109>/SumI1'
-  real32_T Integrator;                 // '<S97>/Integrator'
-  real32_T Switch;                     // '<S33>/Switch'
-  real32_T Integrator_j;               // '<S45>/Integrator'
-  real32_T Sum3;                       // '<S1>/Sum3'
+  B_FOCInnerLoop_T FOCinnerloop;       // '<Root>/FOC inner loop'
 };
-
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
 
 // Block states (default storage) for model 'control_foc'
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
 struct DW_control_foc_f_T {
-  real32_T FilterDifferentiatorTF_states;// '<S90>/Filter Differentiator TF'
-  real32_T UnitDelay_DSTATE;           // '<S1>/Unit Delay'
-  real32_T Integrator_DSTATE;          // '<S97>/Integrator'
-  real32_T FilterDifferentiatorTF_states_k;// '<S38>/Filter Differentiator TF'
-  real32_T Integrator_DSTATE_o;        // '<S45>/Integrator'
-  real32_T FilterDifferentiatorTF_tmp; // '<S90>/Filter Differentiator TF'
-  real32_T FilterDifferentiatorTF_tmp_c;// '<S38>/Filter Differentiator TF'
-  int8_T Integrator_PrevResetState;    // '<S97>/Integrator'
-  int8_T Integrator_PrevResetState_k;  // '<S45>/Integrator'
+  DW_FOCInnerLoop_T FOCinnerloop;      // '<Root>/FOC inner loop'
 };
 
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
-
 // Zero-crossing (trigger) state for model 'control_foc'
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
 struct ZCV_control_foc_g_T {
-  real_T FilterDifferentiatorTF_Reset_ZC;// '<S90>/Filter Differentiator TF'
-  real_T FilterDifferentiatorTF_Reset__c;// '<S38>/Filter Differentiator TF'
+  ZCV_FOCInnerLoop_T FOCinnerloop;     // '<Root>/FOC inner loop'
 };
-
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
 
 // Zero-crossing (trigger) state for model 'control_foc'
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
 struct ZCE_control_foc_T {
-  ZCSigState FilterDifferentiatorTF_Reset_ZC;// '<S90>/Filter Differentiator TF' 
-  ZCSigState FilterDifferentiatorTF_Reset__o;// '<S38>/Filter Differentiator TF' 
+  ZCE_FOCInnerLoop_T FOCinnerloop;     // '<Root>/FOC inner loop'
 };
-
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
 
 // Invariant block signals for model 'control_foc'
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
 struct ConstB_control_foc_h_T {
-  real32_T Gain5;                      // '<S1>/Gain5'
-  real32_T Sum5;                       // '<S1>/Sum5'
+  ConstB_FOCInnerLoop_T FOCinnerloop;  // '<Root>/FOC inner loop'
 };
-
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
-
-#ifndef control_foc_MDLREF_HIDE_CHILD_
 
 // Real-time Model Data Structure
 struct tag_RTM_control_foc_T {
   const char_T **errorStatus;
 };
 
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
-
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
 struct MdlrefDW_control_foc_T {
+  B_control_foc_c_T rtb;
+  DW_control_foc_f_T rtdw;
   RT_MODEL_control_foc_T rtm;
+  ZCE_control_foc_T rtzce;
 };
 
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
-
-extern void control_foc_Init(void);
-extern void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
-  *rtu_FOCSlowInputs, ControlOutputs *rty_FOCOutputs);
-
 // Model reference registration function
-extern void control_foc_initialize(const char_T **rt_errorStatus);
-
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
-extern MdlrefDW_control_foc_T control_foc_MdlrefDW;
-
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
-
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
-// Block signals (default storage)
-extern B_control_foc_c_T control_foc_B;
-
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
-
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
-// Block states (default storage)
-extern DW_control_foc_f_T control_foc_DW;
-
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
-
-#ifndef control_foc_MDLREF_HIDE_CHILD_
-
-// Previous zero-crossings (trigger) states
-extern ZCE_control_foc_T control_foc_PrevZCX;
-
-#endif                                 //control_foc_MDLREF_HIDE_CHILD_
+extern void control_foc_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_control_foc_T *const control_foc_M, B_control_foc_c_T *localB,
+  DW_control_foc_f_T *localDW, ZCE_control_foc_T *localZCE);
+extern void control_foc_Init(DW_control_foc_f_T *localDW);
+extern void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
+  *rtu_FOCSlowInputs, ControlOutputs *rty_FOCOutputs, B_control_foc_c_T *localB,
+  DW_control_foc_f_T *localDW, ZCE_control_foc_T *localZCE);
+extern void control_foc_Term(DW_control_foc_f_T *localDW);
 
 //-
 //  These blocks were eliminated from the model due to optimizations:

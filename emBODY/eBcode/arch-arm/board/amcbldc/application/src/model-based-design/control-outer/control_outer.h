@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 5.2
+// Model version                  : 5.5
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:46:44 2023
+// C/C++ source code generated on : Tue Jun 27 10:18:44 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,20 +20,15 @@
 #define RTW_HEADER_control_outer_h_
 #include "rtwtypes.h"
 #include "control_outer_types.h"
+#include <cstring>
 #include "zero_crossing_types.h"
 
 // Block signals for model 'control_outer'
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
 struct B_control_outer_c_T {
   real32_T DiscreteTimeIntegrator;     // '<S1>/Discrete-Time Integrator'
 };
 
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
-
 // Block states (default storage) for model 'control_outer'
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
 struct DW_control_outer_f_T {
   real32_T FilterDifferentiatorTF_states;// '<S47>/Filter Differentiator TF'
   real32_T UnitDelay_DSTATE;           // '<Root>/Unit Delay'
@@ -51,89 +46,50 @@ struct DW_control_outer_f_T {
   int8_T Integrator_PrevResetState;    // '<S54>/Integrator'
   int8_T Integrator_PrevResetState_n;  // '<S104>/Integrator'
   int8_T Integrator_PrevResetState_c;  // '<S154>/Integrator'
-  int8_T DiscreteTimeIntegrator_PrevRese;// '<S1>/Discrete-Time Integrator'
-  uint8_T DiscreteTimeIntegrator_SYSTEM_E;// '<S1>/Discrete-Time Integrator'
+  int8_T DiscreteTimeIntegrator_PrevResetState;// '<S1>/Discrete-Time Integrator' 
+  uint8_T DiscreteTimeIntegrator_SYSTEM_ENABLE;// '<S1>/Discrete-Time Integrator' 
   boolean_T Memory_PreviousInput;      // '<S9>/Memory'
 };
 
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
-
 // Zero-crossing (trigger) state for model 'control_outer'
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
 struct ZCV_control_outer_g_T {
   real_T FilterDifferentiatorTF_Reset_ZC;// '<S47>/Filter Differentiator TF'
-  real_T FilterDifferentiatorTF_Reset__f;// '<S97>/Filter Differentiator TF'
-  real_T FilterDifferentiatorTF_Reset__m;// '<S147>/Filter Differentiator TF'
+  real_T FilterDifferentiatorTF_Reset_ZC_f;// '<S97>/Filter Differentiator TF'
+  real_T FilterDifferentiatorTF_Reset_ZC_m;// '<S147>/Filter Differentiator TF'
 };
-
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
 
 // Zero-crossing (trigger) state for model 'control_outer'
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
 struct ZCE_control_outer_T {
-  ZCSigState FilterDifferentiatorTF_Reset_ZC;// '<S47>/Filter Differentiator TF' 
-  ZCSigState FilterDifferentiatorTF_Reset__m;// '<S97>/Filter Differentiator TF' 
-  ZCSigState FilterDifferentiatorTF_Reset__e;// '<S147>/Filter Differentiator TF' 
+  ZCSigState FilterDifferentiatorTF_Reset_ZCE;// '<S47>/Filter Differentiator TF' 
+  ZCSigState FilterDifferentiatorTF_Reset_ZCE_m;// '<S97>/Filter Differentiator TF' 
+  ZCSigState FilterDifferentiatorTF_Reset_ZCE_e;// '<S147>/Filter Differentiator TF' 
 };
-
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
-
-#ifndef control_outer_MDLREF_HIDE_CHILD_
 
 // Real-time Model Data Structure
 struct tag_RTM_control_outer_T {
   const char_T **errorStatus;
 };
 
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
-
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
 struct MdlrefDW_control_outer_T {
+  B_control_outer_c_T rtb;
+  DW_control_outer_f_T rtdw;
   RT_MODEL_control_outer_T rtm;
+  ZCE_control_outer_T rtzce;
 };
 
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
-
-extern void control_outer_Init(void);
-extern void control_outer_Enable(void);
-extern void control_outer_Disable(void);
+// Model reference registration function
+extern void control_outer_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_control_outer_T *const control_outer_M, B_control_outer_c_T *localB,
+  DW_control_outer_f_T *localDW, ZCE_control_outer_T *localZCE);
+extern void control_outer_Init(DW_control_outer_f_T *localDW);
+extern void control_outer_Enable(DW_control_outer_f_T *localDW);
+extern void control_outer_Disable(B_control_outer_c_T *localB,
+  DW_control_outer_f_T *localDW);
 extern void control_outer(const Flags *rtu_Flags, const ConfigurationParameters *
   rtu_ConfigurationParameters, const Targets *rtu_Targets, const SensorsData
   *rtu_Sensors, const EstimatedData *rtu_Estimates, ControlOuterOutputs
-  *rty_OuterOutputs);
-
-// Model reference registration function
-extern void control_outer_initialize(const char_T **rt_errorStatus);
-
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
-extern MdlrefDW_control_outer_T control_outer_MdlrefDW;
-
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
-
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
-// Block signals (default storage)
-extern B_control_outer_c_T control_outer_B;
-
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
-
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
-// Block states (default storage)
-extern DW_control_outer_f_T control_outer_DW;
-
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
-
-#ifndef control_outer_MDLREF_HIDE_CHILD_
-
-// Previous zero-crossings (trigger) states
-extern ZCE_control_outer_T control_outer_PrevZCX;
-
-#endif                                 //control_outer_MDLREF_HIDE_CHILD_
+  *rty_OuterOutputs, B_control_outer_c_T *localB, DW_control_outer_f_T *localDW,
+  ZCE_control_outer_T *localZCE);
 
 //-
 //  These blocks were eliminated from the model due to optimizations:

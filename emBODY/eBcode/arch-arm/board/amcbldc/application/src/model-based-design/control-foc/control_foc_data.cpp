@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 5.7
+// Model version                  : 5.12
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:46:35 2023
+// C/C++ source code generated on : Tue Jun 27 10:18:32 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,10 +20,14 @@
 
 // Invariant block signals (default storage)
 const ConstB_control_foc_h_T control_foc_ConstB = {
-  0.0249999985F
-  ,                                    // '<S1>/Gain5'
-  0.975F
-  // '<S1>/Sum5'
+  // Start of '<Root>/FOC inner loop'
+  {
+    0.0249999985F
+    ,                                  // '<S1>/Gain5'
+    0.975F
+    // '<S1>/Sum5'
+  }
+  // End of '<Root>/FOC inner loop'
 };
 
 //

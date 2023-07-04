@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 5.7
+// Model version                  : 5.12
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:46:35 2023
+// C/C++ source code generated on : Tue Jun 27 10:18:32 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,7 @@
 #include "control_foc_types.h"
 #include "FOCInnerLoop.h"
 #include "control_foc_private.h"
+#include <cstring>
 
 extern "C"
 {
@@ -28,48 +29,51 @@ extern "C"
 
 }
 
-MdlrefDW_control_foc_T control_foc_MdlrefDW;
-
-// Block signals (default storage)
-B_control_foc_c_T control_foc_B;
-
-// Block states (default storage)
-DW_control_foc_f_T control_foc_DW;
-
-// Previous zero-crossings (trigger) states
-ZCE_control_foc_T control_foc_PrevZCX;
-
 // System initialize for referenced model: 'control_foc'
-void control_foc_Init(void)
+void control_foc_Init(DW_control_foc_f_T *localDW)
 {
   // SystemInitialize for Atomic SubSystem: '<Root>/FOC inner loop'
-  FOCInnerLoop_Init();
+  FOCInnerLoop_Init(&localDW->FOCinnerloop);
 
   // End of SystemInitialize for SubSystem: '<Root>/FOC inner loop'
 }
 
 // Output and update for referenced model: 'control_foc'
 void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
-                 *rtu_FOCSlowInputs, ControlOutputs *rty_FOCOutputs)
+                 *rtu_FOCSlowInputs, ControlOutputs *rty_FOCOutputs,
+                 B_control_foc_c_T *localB, DW_control_foc_f_T *localDW,
+                 ZCE_control_foc_T *localZCE)
 {
   // Outputs for Atomic SubSystem: '<Root>/FOC inner loop'
   FOCInnerLoop(&rtu_FOCSlowInputs->configurationparameters, rtu_Sensors,
                &rtu_FOCSlowInputs->estimateddata, &rtu_FOCSlowInputs->targets,
-               &rtu_FOCSlowInputs->controlouteroutputs, rty_FOCOutputs);
+               &rtu_FOCSlowInputs->controlouteroutputs, rty_FOCOutputs,
+               &localB->FOCinnerloop, &control_foc_ConstB.FOCinnerloop,
+               &localDW->FOCinnerloop, &localZCE->FOCinnerloop);
 
   // End of Outputs for SubSystem: '<Root>/FOC inner loop'
 
   // Update for Atomic SubSystem: '<Root>/FOC inner loop'
-  FOCInnerLoop_Update(&rtu_FOCSlowInputs->controlouteroutputs);
+  FOCInnerLoop_Update(&rtu_FOCSlowInputs->controlouteroutputs,
+                      &localB->FOCinnerloop, &localDW->FOCinnerloop);
 
   // End of Update for SubSystem: '<Root>/FOC inner loop'
 }
 
-// Model initialize function
-void control_foc_initialize(const char_T **rt_errorStatus)
+// Termination for referenced model: 'control_foc'
+void control_foc_Term(DW_control_foc_f_T *localDW)
 {
-  RT_MODEL_control_foc_T *const control_foc_M = &(control_foc_MdlrefDW.rtm);
+  // Terminate for Atomic SubSystem: '<Root>/FOC inner loop'
+  FOCInnerLoop_Term(&localDW->FOCinnerloop);
 
+  // End of Terminate for SubSystem: '<Root>/FOC inner loop'
+}
+
+// Model initialize function
+void control_foc_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_control_foc_T *const control_foc_M, B_control_foc_c_T *localB,
+  DW_control_foc_f_T *localDW, ZCE_control_foc_T *localZCE)
+{
   // Registration code
 
   // initialize non-finites
@@ -77,8 +81,16 @@ void control_foc_initialize(const char_T **rt_errorStatus)
 
   // initialize error status
   rtmSetErrorStatusPointer(control_foc_M, rt_errorStatus);
-  control_foc_PrevZCX.FilterDifferentiatorTF_Reset_ZC = POS_ZCSIG;
-  control_foc_PrevZCX.FilterDifferentiatorTF_Reset__o = POS_ZCSIG;
+
+  // block I/O
+  (void) std::memset((static_cast<void *>(localB)), 0,
+                     sizeof(B_control_foc_c_T));
+
+  // states (dwork)
+  (void) std::memset(static_cast<void *>(localDW), 0,
+                     sizeof(DW_control_foc_f_T));
+  localZCE->FOCinnerloop.FilterDifferentiatorTF_Reset_ZCE = POS_ZCSIG;
+  localZCE->FOCinnerloop.FilterDifferentiatorTF_Reset_ZCE_o = POS_ZCSIG;
 }
 
 //

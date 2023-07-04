@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 4.0
+// Model version                  : 5.1
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:47:03 2023
+// C/C++ source code generated on : Tue Jun 27 10:19:02 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -46,14 +46,20 @@ struct ControlOutputs
 
   // direct current
   MotorCurrent Id_fbk;
+
+  // RMS of Iq
+  MotorCurrent Iq_rms;
+
+  // RMS of Id
+  MotorCurrent Id_rms;
 };
 
 #endif
 
-#ifndef struct_c_dsp_internal_MedianFilterCG_T
-#define struct_c_dsp_internal_MedianFilterCG_T
+#ifndef struct_c_dsp_internal_MedianFilterCG_filter_current_T
+#define struct_c_dsp_internal_MedianFilterCG_filter_current_T
 
-struct c_dsp_internal_MedianFilterCG_T
+struct c_dsp_internal_MedianFilterCG_filter_current_T
 {
   int32_T isInitialized;
   boolean_T isSetupComplete;
@@ -67,7 +73,7 @@ struct c_dsp_internal_MedianFilterCG_T
   real32_T pMaxHeapLength;
 };
 
-#endif                                // struct_c_dsp_internal_MedianFilterCG_T
+#endif                 // struct_c_dsp_internal_MedianFilterCG_filter_current_T
 
 #ifndef struct_cell_wrap_filter_current_T
 #define struct_cell_wrap_filter_current_T
@@ -79,20 +85,20 @@ struct cell_wrap_filter_current_T
 
 #endif                                 // struct_cell_wrap_filter_current_T
 
-#ifndef struct_dsp_simulink_MedianFilter_fil_T
-#define struct_dsp_simulink_MedianFilter_fil_T
+#ifndef struct_dsp_simulink_MedianFilter_filter_current_T
+#define struct_dsp_simulink_MedianFilter_filter_current_T
 
-struct dsp_simulink_MedianFilter_fil_T
+struct dsp_simulink_MedianFilter_filter_current_T
 {
   boolean_T matlabCodegenIsDeleted;
   int32_T isInitialized;
   boolean_T isSetupComplete;
   cell_wrap_filter_current_T inputVarSize;
   int32_T NumChannels;
-  c_dsp_internal_MedianFilterCG_T pMID;
+  c_dsp_internal_MedianFilterCG_filter_current_T pMID;
 };
 
-#endif                                // struct_dsp_simulink_MedianFilter_fil_T
+#endif                     // struct_dsp_simulink_MedianFilter_filter_current_T
 
 // Forward declaration for rtModel
 typedef struct tag_RTM_filter_current_T RT_MODEL_filter_current_T;

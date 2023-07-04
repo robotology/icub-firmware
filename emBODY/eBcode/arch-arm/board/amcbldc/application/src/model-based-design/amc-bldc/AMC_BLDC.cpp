@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 6.1
+// Model version                  : 6.17
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:47:14 2023
+// C/C++ source code generated on : Tue Jun 27 10:19:19 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,18 +20,15 @@
 #include "rtw_mutex.h"
 #include "rtwtypes.h"
 #include "AMC_BLDC_types.h"
-#define estimation_velocity_MDLREF_HIDE_CHILD_
+#include "thermal_model.h"
 #include "estimation_velocity.h"
-#define filter_current_MDLREF_HIDE_CHILD_
 #include "filter_current.h"
-#define control_foc_MDLREF_HIDE_CHILD_
 #include "control_foc.h"
+#include "control_outer.h"
 #define can_decoder_MDLREF_HIDE_CHILD_
 #include "can_decoder.h"
 #define can_encoder_MDLREF_HIDE_CHILD_
 #include "can_encoder.h"
-#define control_outer_MDLREF_HIDE_CHILD_
-#include "control_outer.h"
 #define SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_RX.h"
 #define SupervisorFSM_TX_MDLREF_HIDE_CHILD_
@@ -55,11 +52,16 @@ ConfigurationParameters InitConfParams = {
     0.0F,
     0.0F,
     44.0F,
-    24.0F
+    24.0F,
+    25.9F,
+    271.0F,
+    16.0F,
+    797.5F
   },
 
   {
-    EstimationVelocityModes_MovingAverage
+    EstimationVelocityModes_MovingAverage,
+    0.9995F
   },
 
   {
@@ -122,8 +124,10 @@ ConfigurationParameters InitConfParams = {
     2.0F,
     5.0F,
     10.0F,
-    32000U
-  }
+    32000U,
+    70.0F
+  },
+  25.0F
 } ;                                    // Variable: InitConfParams
                                           //  Referenced by: '<S7>/SupervisorFSM_RX'
 
@@ -172,62 +176,71 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
 
   // RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_lock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_hj;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_RD =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Ls;
   rtw_mutex_unlock();
-  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.flags =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l[AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p];
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_at_inport_1_BusCreator1.flags =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Bu[AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_RD];
 
   // RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_lock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_m3 =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mp;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_RD =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Ls;
   rtw_mutex_unlock();
-  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.configurationparameters =
-    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedF[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_m3];
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_at_inport_1_BusCreator1.configurationparameters
+    =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Bu[AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_RD];
 
   // RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_lock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_ko =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_b2;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_RD =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_Ls;
   rtw_mutex_unlock();
-  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.estimateddata =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_k[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_ko];
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_at_inport_1_BusCreator1.estimateddata
+    =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_Bu[AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_RD];
 
   // RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_lock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mb =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_jj;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_RD =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_Ls;
   rtw_mutex_unlock();
-  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.targets =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mb];
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_at_inport_1_BusCreator1.targets =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_Bu[AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_RD];
 
   // RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_lock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_bw =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_p5;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_RD =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Ls;
   rtw_mutex_unlock();
-  AMC_BLDC_B.BusConversion_InsertedFor_FOC_a.controlouteroutputs =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_i[AMC_BLDC_DW.RTBInsertedForAdapter_Insert_bw];
+  AMC_BLDC_B.BusConversion_InsertedFor_FOC_at_inport_1_BusCreator1.controlouteroutputs
+    =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Bu[AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_RD];
 
   // ModelReference: '<Root>/FOC' incorporates:
   //   Inport generated from: '<Root>/In Bus Element5'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   control_foc(&AMC_BLDC_U.SensorsData_p,
-              &AMC_BLDC_B.BusConversion_InsertedFor_FOC_a,
-              &AMC_BLDC_Y.ControlOutputs_p);
+              &AMC_BLDC_B.BusConversion_InsertedFor_FOC_at_inport_1_BusCreator1,
+              &AMC_BLDC_Y.ControlOutputs_p, &(AMC_BLDC_DW.FOC_InstanceData.rtb),
+              &(AMC_BLDC_DW.FOC_InstanceData.rtdw),
+              &(AMC_BLDC_DW.FOC_InstanceData.rtzce));
 
   // RateTransition generated from: '<Root>/Adapter1' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element'
 
   rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Insert_js + 1);
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_LstB +
+     1);
   if (wrBufIdx == 3) {
     wrBufIdx = 0;
   }
 
-  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_a) {
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RDBu)
+  {
     wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -237,19 +250,23 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   rtw_mutex_unlock();
   switch (wrBufIdx) {
    case 0:
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_d = AMC_BLDC_Y.ControlOutputs_p;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf0 =
+      AMC_BLDC_Y.ControlOutputs_p;
     break;
 
    case 1:
-    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_j2 = AMC_BLDC_Y.ControlOutputs_p;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf1 =
+      AMC_BLDC_Y.ControlOutputs_p;
     break;
 
    case 2:
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_o = AMC_BLDC_Y.ControlOutputs_p;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf2 =
+      AMC_BLDC_Y.ControlOutputs_p;
     break;
   }
 
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_js = wrBufIdx;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_LstB =
+    wrBufIdx;
 
   // End of RateTransition generated from: '<Root>/Adapter1'
 
@@ -257,12 +274,16 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   //   Inport generated from: '<Root>/In Bus Element5'
 
   rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g + 1);
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_LstB +
+     1);
   if (wrBufIdx == 3) {
     wrBufIdx = 0;
   }
 
-  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_pa) {
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RDBu)
+  {
     wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -272,121 +293,122 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   rtw_mutex_unlock();
   switch (wrBufIdx) {
    case 0:
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_e = AMC_BLDC_U.SensorsData_p;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_e =
+      AMC_BLDC_U.SensorsData_p;
     break;
 
    case 1:
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c = AMC_BLDC_U.SensorsData_p;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_c =
+      AMC_BLDC_U.SensorsData_p;
     break;
 
    case 2:
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_j = AMC_BLDC_U.SensorsData_p;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_j =
+      AMC_BLDC_U.SensorsData_p;
     break;
   }
 
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g = wrBufIdx;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_LstB =
+    wrBufIdx;
 
   // End of RateTransition generated from: '<Root>/Adapter3'
 }
 
 // Model step function for TID2
-void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
+void AMC_BLDC_step_Time_1ms(void)      // Sample time: [0.001s, 0.0s]
 {
   // local block i/o variables
   Targets rtb_SupervisorFSM_RX_o2;
   ControlOuterOutputs rtb_OuterControl;
   BUS_STATUS_TX rtb_SupervisorFSM_TX_o2;
-  ControlOutputs rtb_BusConversion_InsertedFor_F;
-  MotorCurrent rtb_Filter_Current;
   int8_T wrBufIdx;
 
-  // RateTransition generated from: '<Root>/Adapter1'
-  rtw_mutex_lock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_a =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Insert_js;
-  rtw_mutex_unlock();
-  switch (AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_a) {
-   case 0:
-    // RateTransition generated from: '<Root>/Adapter1'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_d;
-    break;
-
-   case 1:
-    // RateTransition generated from: '<Root>/Adapter1'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Insert_j2;
-    break;
-
-   case 2:
-    // RateTransition generated from: '<Root>/Adapter1'
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_o;
-    break;
-  }
-
-  // End of RateTransition generated from: '<Root>/Adapter1'
-
-  // BusCreator generated from: '<S5>/Filter_Current'
-  rtb_Filter_Current.current = 0.0F;
-
-  // BusCreator generated from: '<S5>/Filter_Current'
-  rtb_BusConversion_InsertedFor_F.Vq = 0.0F;
-  rtb_BusConversion_InsertedFor_F.Vabc[0] = 0.0F;
-  rtb_BusConversion_InsertedFor_F.Vabc[1] = 0.0F;
-  rtb_BusConversion_InsertedFor_F.Vabc[2] = 0.0F;
-  rtb_BusConversion_InsertedFor_F.Iq_fbk =
-    AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a.Iq_fbk;
-  rtb_BusConversion_InsertedFor_F.Id_fbk = rtb_Filter_Current;
+  // UnitDelay generated from: '<Root>/Adapter4'
+  AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0 =
+    AMC_BLDC_DW.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0;
 
   // RateTransition generated from: '<Root>/Adapter3'
   rtw_mutex_lock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_pa =
-    AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_g;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RDBu =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_LstB;
   rtw_mutex_unlock();
-  switch (AMC_BLDC_DW.RTBInsertedForAdapter_Insert_pa) {
+  switch
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RDBu) {
    case 0:
     // RateTransition generated from: '<Root>/Adapter3'
-    AMC_BLDC_B.RTBInsertedForAdapter_InsertedF =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_e;
+    AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_e;
     break;
 
    case 1:
     // RateTransition generated from: '<Root>/Adapter3'
-    AMC_BLDC_B.RTBInsertedForAdapter_InsertedF =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_c;
+    AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_c;
     break;
 
    case 2:
     // RateTransition generated from: '<Root>/Adapter3'
-    AMC_BLDC_B.RTBInsertedForAdapter_InsertedF =
-      AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_j;
+    AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_j;
     break;
   }
 
   // End of RateTransition generated from: '<Root>/Adapter3'
 
-  // UnitDelay generated from: '<Root>/Adapter4'
-  AMC_BLDC_B.ZOHBlockInsertedForAdapter_Inse =
-    AMC_BLDC_DW.ZOHBlockInsertedForAdapter_Inse;
-
   // ModelReference: '<S5>/Estimation_Velocity'
-  estimation_velocity(&AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
-                      &AMC_BLDC_B.ZOHBlockInsertedForAdapter_Inse,
-                      &AMC_BLDC_Y.EstimatedData_p.jointvelocities);
+  estimation_velocity
+    (&AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0,
+     &AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0,
+     &AMC_BLDC_Y.EstimatedData_p.jointvelocities,
+     &(AMC_BLDC_DW.Estimation_Velocity_InstanceData.rtdw));
+
+  // RateTransition generated from: '<Root>/Adapter1'
+  rtw_mutex_lock();
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RDBu =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_LstB;
+  rtw_mutex_unlock();
+  switch
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RDBu) {
+   case 0:
+    // RateTransition generated from: '<Root>/Adapter1'
+    AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf0;
+    break;
+
+   case 1:
+    // RateTransition generated from: '<Root>/Adapter1'
+    AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf1;
+    break;
+
+   case 2:
+    // RateTransition generated from: '<Root>/Adapter1'
+    AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf2;
+    break;
+  }
+
+  // End of RateTransition generated from: '<Root>/Adapter1'
 
   // ModelReference: '<S5>/Filter_Current'
-  filter_current(&rtb_BusConversion_InsertedFor_F, &rtb_Filter_Current);
+  filter_current
+    (&AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0,
+     &AMC_BLDC_Y.EstimatedData_p.Iq_filtered,
+     &(AMC_BLDC_DW.Filter_Current_InstanceData.rtdw));
 
-  // BusCreator: '<S9>/Bus Creator' incorporates:
-  //   Outport generated from: '<Root>/Out Bus Element2'
-
-  AMC_BLDC_Y.EstimatedData_p.Iq_filtered = rtb_Filter_Current;
+  // RateTransition generated from: '<S5>/Adapter1'
+  rtw_mutex_lock();
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RD_a =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Ls_j;
+  rtw_mutex_unlock();
+  AMC_BLDC_Y.EstimatedData_p.motor_temperature =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf[AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RD_a];
 
   // ModelReference: '<S6>/CAN_Decoder' incorporates:
   //   Inport generated from: '<Root>/In Bus Element2'
 
-  can_decoder(&AMC_BLDC_U.PacketsRx, &AMC_BLDC_B.ZOHBlockInsertedForAdapter_Inse,
+  can_decoder(&AMC_BLDC_U.PacketsRx,
+              &AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0,
               &AMC_BLDC_B.CAN_Decoder_o1, &AMC_BLDC_B.CAN_Decoder_o2,
               &AMC_BLDC_B.CAN_Decoder_o3);
 
@@ -396,29 +418,31 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
-  SupervisorFSM_RX(&AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
-                   &AMC_BLDC_U.ExternalFlags_p,
-                   &AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a,
-                   &AMC_BLDC_B.CAN_Decoder_o1, &AMC_BLDC_Y.EstimatedData_p,
-                   &AMC_BLDC_B.CAN_Decoder_o2, &AMC_BLDC_B.CAN_Decoder_o3,
-                   &AMC_BLDC_Y.Flags_p, &rtb_SupervisorFSM_RX_o2,
-                   &AMC_BLDC_Y.ConfigurationParameters_p);
+  SupervisorFSM_RX
+    (&AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0,
+     &AMC_BLDC_U.ExternalFlags_p,
+     &AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0,
+     &AMC_BLDC_B.CAN_Decoder_o1, &AMC_BLDC_Y.EstimatedData_p,
+     &AMC_BLDC_B.CAN_Decoder_o2, &AMC_BLDC_B.CAN_Decoder_o3, &AMC_BLDC_Y.Flags_p,
+     &rtb_SupervisorFSM_RX_o2, &AMC_BLDC_Y.ConfigurationParameters_p);
 
   // ModelReference: '<S7>/SupervisorFSM_TX' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
-  SupervisorFSM_TX(&AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
-                   &AMC_BLDC_Y.EstimatedData_p, &AMC_BLDC_Y.Flags_p,
-                   &AMC_BLDC_B.RTBInsertedForAdapter_Inserte_a,
-                   &AMC_BLDC_B.MessagesTx, &rtb_SupervisorFSM_TX_o2);
+  SupervisorFSM_TX
+    (&AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0,
+     &AMC_BLDC_Y.EstimatedData_p, &AMC_BLDC_Y.Flags_p,
+     &AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0,
+     &AMC_BLDC_B.MessagesTx, &rtb_SupervisorFSM_TX_o2);
 
   // ModelReference: '<S6>/CAN_Encoder' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element1'
 
   can_encoder(&AMC_BLDC_B.MessagesTx, &rtb_SupervisorFSM_TX_o2,
-              &AMC_BLDC_B.ZOHBlockInsertedForAdapter_Inse, &AMC_BLDC_Y.PacketsTx);
+              &AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0,
+              &AMC_BLDC_Y.PacketsTx);
 
   // ModelReference: '<Root>/OuterControl' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element3'
@@ -427,17 +451,24 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
 
   control_outer(&AMC_BLDC_Y.Flags_p, &AMC_BLDC_Y.ConfigurationParameters_p,
                 &rtb_SupervisorFSM_RX_o2,
-                &AMC_BLDC_B.RTBInsertedForAdapter_InsertedF,
-                &AMC_BLDC_Y.EstimatedData_p, &rtb_OuterControl);
+                &AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0,
+                &AMC_BLDC_Y.EstimatedData_p, &rtb_OuterControl,
+                &(AMC_BLDC_DW.OuterControl_InstanceData.rtb),
+                &(AMC_BLDC_DW.OuterControl_InstanceData.rtdw),
+                &(AMC_BLDC_DW.OuterControl_InstanceData.rtzce));
 
   // RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Insert_p5 + 1);
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Ls +
+     1);
   if (wrBufIdx == 3) {
     wrBufIdx = 0;
   }
 
-  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_bw) {
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_RD)
+  {
     wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -445,19 +476,25 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   }
 
   rtw_mutex_unlock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_i[wrBufIdx] = rtb_OuterControl;
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_p5 = wrBufIdx;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Bu[wrBufIdx]
+    = rtb_OuterControl;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Ls =
+    wrBufIdx;
 
   // RateTransition generated from: '<Root>/Adapter2' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element4'
 
   rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Insert_hj + 1);
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Ls +
+     1);
   if (wrBufIdx == 3) {
     wrBufIdx = 0;
   }
 
-  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_p) {
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_RD)
+  {
     wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -465,19 +502,25 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   }
 
   rtw_mutex_unlock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_l[wrBufIdx] = AMC_BLDC_Y.Flags_p;
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_hj = wrBufIdx;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Bu[wrBufIdx]
+    = AMC_BLDC_Y.Flags_p;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Ls =
+    wrBufIdx;
 
   // RateTransition generated from: '<Root>/Adapter2' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element3'
 
   rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mp + 1);
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Ls +
+     1);
   if (wrBufIdx == 3) {
     wrBufIdx = 0;
   }
 
-  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_m3) {
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_RD)
+  {
     wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -485,18 +528,23 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   }
 
   rtw_mutex_unlock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedF[wrBufIdx] =
-    AMC_BLDC_Y.ConfigurationParameters_p;
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mp = wrBufIdx;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Bu[wrBufIdx]
+    = AMC_BLDC_Y.ConfigurationParameters_p;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Ls =
+    wrBufIdx;
 
   // RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Insert_jj + 1);
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_Ls +
+     1);
   if (wrBufIdx == 3) {
     wrBufIdx = 0;
   }
 
-  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_mb) {
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_RD)
+  {
     wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -504,20 +552,25 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   }
 
   rtw_mutex_unlock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_m[wrBufIdx] =
-    rtb_SupervisorFSM_RX_o2;
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_jj = wrBufIdx;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_Bu[wrBufIdx]
+    = rtb_SupervisorFSM_RX_o2;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_Ls =
+    wrBufIdx;
 
   // RateTransition generated from: '<Root>/Adapter2' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element2'
 
   rtw_mutex_lock();
-  wrBufIdx = static_cast<int8_T>(AMC_BLDC_DW.RTBInsertedForAdapter_Insert_b2 + 1);
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_Ls +
+     1);
   if (wrBufIdx == 3) {
     wrBufIdx = 0;
   }
 
-  if (wrBufIdx == AMC_BLDC_DW.RTBInsertedForAdapter_Insert_ko) {
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_RD)
+  {
     wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -525,28 +578,215 @@ void AMC_BLDC_step_Time(void)          // Sample time: [0.001s, 0.0s]
   }
 
   rtw_mutex_unlock();
-  AMC_BLDC_DW.RTBInsertedForAdapter_Inserte_k[wrBufIdx] =
-    AMC_BLDC_Y.EstimatedData_p;
-  AMC_BLDC_DW.RTBInsertedForAdapter_Insert_b2 = wrBufIdx;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_Bu[wrBufIdx]
+    = AMC_BLDC_Y.EstimatedData_p;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_Ls =
+    wrBufIdx;
+
+  // RateTransition generated from: '<S5>/Adapter3'
+  rtw_mutex_lock();
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Ls_g +
+     1);
+  if (wrBufIdx == 3) {
+    wrBufIdx = 0;
+  }
+
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RD_p)
+  {
+    wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+  }
+
+  rtw_mutex_unlock();
+  switch (wrBufIdx) {
+   case 0:
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf0 =
+      AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0;
+    break;
+
+   case 1:
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf1 =
+      AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0;
+    break;
+
+   case 2:
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf2 =
+      AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0;
+    break;
+  }
+
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Ls_g =
+    wrBufIdx;
+
+  // End of RateTransition generated from: '<S5>/Adapter3'
+
+  // RateTransition generated from: '<S5>/Adapter'
+  rtw_mutex_lock();
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_LstBu +
+     1);
+  if (wrBufIdx == 3) {
+    wrBufIdx = 0;
+  }
+
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_RDBuf)
+  {
+    wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+  }
+
+  rtw_mutex_unlock();
+  switch (wrBufIdx) {
+   case 0:
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf0 =
+      AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0;
+    break;
+
+   case 1:
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf1 =
+      AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0;
+    break;
+
+   case 2:
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf2 =
+      AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0;
+    break;
+  }
+
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_LstBu =
+    wrBufIdx;
+
+  // End of RateTransition generated from: '<S5>/Adapter'
 
   // Update for UnitDelay generated from: '<Root>/Adapter4' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element3'
 
-  AMC_BLDC_DW.ZOHBlockInsertedForAdapter_Inse =
+  AMC_BLDC_DW.ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0 =
     AMC_BLDC_Y.ConfigurationParameters_p;
+}
+
+// Model step function for TID3
+void AMC_BLDC_step_Time_10ms(void)     // Sample time: [0.01s, 0.0s]
+{
+  // local block i/o variables
+  MotorTemperature rtb_Estimation_Temperature;
+  ConfigurationParameters
+    rtb_RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0;
+  ControlOutputs rtb_RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0;
+  int8_T wrBufIdx;
+
+  // RateTransition generated from: '<S5>/Adapter'
+  rtw_mutex_lock();
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_RDBuf =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_LstBu;
+  rtw_mutex_unlock();
+  switch
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_RDBuf) {
+   case 0:
+    rtb_RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf0;
+    break;
+
+   case 1:
+    rtb_RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf1;
+    break;
+
+   case 2:
+    rtb_RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf2;
+    break;
+  }
+
+  // End of RateTransition generated from: '<S5>/Adapter'
+
+  // RateTransition generated from: '<S5>/Adapter3'
+  rtw_mutex_lock();
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RD_p =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Ls_g;
+  rtw_mutex_unlock();
+  switch
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RD_p) {
+   case 0:
+    rtb_RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf0;
+    break;
+
+   case 1:
+    rtb_RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf1;
+    break;
+
+   case 2:
+    rtb_RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0 =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf2;
+    break;
+  }
+
+  // End of RateTransition generated from: '<S5>/Adapter3'
+
+  // ModelReference: '<S5>/Estimation_Temperature'
+  thermal_model(&rtb_RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0,
+                &rtb_RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0,
+                &rtb_Estimation_Temperature,
+                &(AMC_BLDC_DW.Estimation_Temperature_InstanceData.rtdw));
+
+  // RateTransition generated from: '<S5>/Adapter1'
+  rtw_mutex_lock();
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Ls_j +
+     1);
+  if (wrBufIdx == 3) {
+    wrBufIdx = 0;
+  }
+
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RD_a)
+  {
+    wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+  }
+
+  rtw_mutex_unlock();
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf[wrBufIdx]
+    = rtb_Estimation_Temperature;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Ls_j =
+    wrBufIdx;
+
+  // End of RateTransition generated from: '<S5>/Adapter1'
 }
 
 // Model initialize function
 void AMC_BLDC_initialize(void)
 {
+  // Model Initialize function for ModelReference Block: '<S5>/Estimation_Temperature' 
+  thermal_model_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
+    &(AMC_BLDC_DW.Estimation_Temperature_InstanceData.rtm),
+    &(AMC_BLDC_DW.Estimation_Temperature_InstanceData.rtdw));
+
   // Model Initialize function for ModelReference Block: '<S5>/Estimation_Velocity' 
-  estimation_velocity_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
+  estimation_velocity_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
+    &(AMC_BLDC_DW.Estimation_Velocity_InstanceData.rtm),
+    &(AMC_BLDC_DW.Estimation_Velocity_InstanceData.rtdw));
 
   // Model Initialize function for ModelReference Block: '<S5>/Filter_Current'
-  filter_current_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
+  filter_current_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
+    &(AMC_BLDC_DW.Filter_Current_InstanceData.rtm),
+    &(AMC_BLDC_DW.Filter_Current_InstanceData.rtdw));
 
   // Model Initialize function for ModelReference Block: '<Root>/FOC'
-  control_foc_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
+  control_foc_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
+    &(AMC_BLDC_DW.FOC_InstanceData.rtm), &(AMC_BLDC_DW.FOC_InstanceData.rtb),
+    &(AMC_BLDC_DW.FOC_InstanceData.rtdw), &(AMC_BLDC_DW.FOC_InstanceData.rtzce));
 
   // Model Initialize function for ModelReference Block: '<S6>/CAN_Decoder'
   can_decoder_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
@@ -555,7 +795,11 @@ void AMC_BLDC_initialize(void)
   can_encoder_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
 
   // Model Initialize function for ModelReference Block: '<Root>/OuterControl'
-  control_outer_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
+  control_outer_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
+    &(AMC_BLDC_DW.OuterControl_InstanceData.rtm),
+    &(AMC_BLDC_DW.OuterControl_InstanceData.rtb),
+    &(AMC_BLDC_DW.OuterControl_InstanceData.rtdw),
+    &(AMC_BLDC_DW.OuterControl_InstanceData.rtzce));
 
   // Model Initialize function for ModelReference Block: '<S7>/SupervisorFSM_RX' 
   SupervisorFSM_RX_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M));
@@ -584,28 +828,34 @@ void AMC_BLDC_initialize(void)
   // Start for RateTransition generated from: '<Root>/Adapter3'
   rtw_mutex_init();
 
+  // Start for RateTransition generated from: '<S5>/Adapter1'
+  rtw_mutex_init();
+
+  // Start for RateTransition generated from: '<S5>/Adapter3'
+  rtw_mutex_init();
+
+  // Start for RateTransition generated from: '<S5>/Adapter'
+  rtw_mutex_init();
+
+  // SystemInitialize for ModelReference: '<S5>/Estimation_Temperature'
+  thermal_model_Init(&(AMC_BLDC_DW.Estimation_Temperature_InstanceData.rtdw));
+
   // SystemInitialize for ModelReference: '<S5>/Estimation_Velocity'
-  estimation_velocity_Init();
+  estimation_velocity_Init(&(AMC_BLDC_DW.Estimation_Velocity_InstanceData.rtdw));
 
   // SystemInitialize for ModelReference: '<S5>/Filter_Current'
-  filter_current_Init();
+  filter_current_Init(&(AMC_BLDC_DW.Filter_Current_InstanceData.rtdw));
 
-  // SystemInitialize for ModelReference: '<Root>/FOC' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element5'
-  //   Outport generated from: '<Root>/Out Bus Element'
-
-  control_foc_Init();
+  // SystemInitialize for ModelReference: '<Root>/FOC'
+  control_foc_Init(&(AMC_BLDC_DW.FOC_InstanceData.rtdw));
 
   // SystemInitialize for ModelReference: '<S6>/CAN_Decoder' incorporates:
   //   Inport generated from: '<Root>/In Bus Element2'
 
   can_decoder_Init();
 
-  // SystemInitialize for ModelReference: '<Root>/OuterControl' incorporates:
-  //   Outport generated from: '<Root>/Out Bus Element3'
-  //   Outport generated from: '<Root>/Out Bus Element4'
-
-  control_outer_Init();
+  // SystemInitialize for ModelReference: '<Root>/OuterControl'
+  control_outer_Init(&(AMC_BLDC_DW.OuterControl_InstanceData.rtdw));
 
   // SystemInitialize for ModelReference: '<S7>/SupervisorFSM_RX' incorporates:
   //   Inport generated from: '<Root>/In Bus Element'
@@ -621,12 +871,8 @@ void AMC_BLDC_initialize(void)
 
   SupervisorFSM_TX_Init(&AMC_BLDC_B.MessagesTx);
 
-  // Enable for ModelReference: '<Root>/OuterControl' incorporates:
-  //   Outport generated from: '<Root>/Out Bus Element3'
-  //   Outport generated from: '<Root>/Out Bus Element2'
-  //   Outport generated from: '<Root>/Out Bus Element4'
-
-  control_outer_Enable();
+  // Enable for ModelReference: '<Root>/OuterControl'
+  control_outer_Enable(&(AMC_BLDC_DW.OuterControl_InstanceData.rtdw));
 }
 
 // Model terminate function
@@ -647,6 +893,9 @@ void AMC_BLDC_terminate(void)
   // Terminate for RateTransition generated from: '<Root>/Adapter2'
   rtw_mutex_destroy();
 
+  // Terminate for ModelReference: '<Root>/FOC'
+  control_foc_Term(&(AMC_BLDC_DW.FOC_InstanceData.rtdw));
+
   // Terminate for RateTransition generated from: '<Root>/Adapter1'
   rtw_mutex_destroy();
 
@@ -654,7 +903,16 @@ void AMC_BLDC_terminate(void)
   rtw_mutex_destroy();
 
   // Terminate for ModelReference: '<S5>/Filter_Current'
-  filter_current_Term();
+  filter_current_Term(&(AMC_BLDC_DW.Filter_Current_InstanceData.rtdw));
+
+  // Terminate for RateTransition generated from: '<S5>/Adapter1'
+  rtw_mutex_destroy();
+
+  // Terminate for RateTransition generated from: '<S5>/Adapter3'
+  rtw_mutex_destroy();
+
+  // Terminate for RateTransition generated from: '<S5>/Adapter'
+  rtw_mutex_destroy();
 }
 
 //

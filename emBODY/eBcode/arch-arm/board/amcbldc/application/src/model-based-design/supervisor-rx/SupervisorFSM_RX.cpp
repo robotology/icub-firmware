@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 5.9
+// Model version                  : 6.4
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:45:52 2023
+// C/C++ source code generated on : Tue Jun 27 10:17:32 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,27 +21,27 @@
 #include "SupervisorFSM_RX_types.h"
 #include <cmath>
 #include "rt_roundd_snf.h"
-#include "rtw_defines.h"
 #include "SupervisorFSM_RX_private.h"
+#include "rtw_defines.h"
 
 // Named constants for Chart: '<S2>/ControlMode_SM_motor0'
 const uint8_T SupervisorFSM_RX_IN_Current = 1U;
 const uint8_T SupervisorFSM_RX_IN_HWFault = 2U;
 const uint8_T SupervisorFSM_RX_IN_Idle = 3U;
+const uint8_T SupervisorFSM_RX_IN_NotConfigured = 4U;
 const uint8_T SupervisorFSM_RX_IN_Position = 5U;
 const uint8_T SupervisorFSM_RX_IN_Velocity = 6U;
 const uint8_T SupervisorFSM_RX_IN_Voltage = 7U;
-const uint8_T SupervisorFSM__IN_NotConfigured = 4U;
 
 // Named constants for Chart: '<Root>/SupervisorRX State Handler'
-const uint8_T Superviso_IN_LimitNonConfigured = 1U;
+const uint8_T SupervisorFSM_RX_IN_ButtonPressed = 1U;
 const uint8_T SupervisorFSM_RX_IN_Configured = 1U;
 const uint8_T SupervisorFSM_RX_IN_Fault = 2U;
+const uint8_T SupervisorFSM_RX_IN_LimitNonConfigured = 1U;
 const uint8_T SupervisorFSM_RX_IN_NoFault = 2U;
+const uint8_T SupervisorFSM_RX_IN_NotConfigured_g = 3U;
+const uint8_T SupervisorFSM_RX_IN_OverCurrentFault = 3U;
 const uint8_T SupervisorFSM_RX_IN_state1 = 1U;
-const uint8_T SupervisorFSM__IN_ButtonPressed = 1U;
-const uint8_T SupervisorFS_IN_NotConfigured_g = 3U;
-const uint8_T SupervisorF_IN_OverCurrentFault = 3U;
 MdlrefDW_SupervisorFSM_RX_T SupervisorFSM_RX_MdlrefDW;
 
 // Block signals (default storage)
@@ -51,62 +51,62 @@ B_SupervisorFSM_RX_c_T SupervisorFSM_RX_B;
 DW_SupervisorFSM_RX_f_T SupervisorFSM_RX_DW;
 
 // Forward declaration for local functions
-static boolean_T Supervisor_CheckSetPointVoltage(void);
-static boolean_T Supervisor_CheckSetPointCurrent(void);
-static boolean_T Superviso_CheckSetPointVelocity(void);
-static boolean_T Superviso_CheckSetPointPosition(void);
+static boolean_T SupervisorFSM_RX_CheckSetPointVoltage(void);
+static boolean_T SupervisorFSM_RX_CheckSetPointCurrent(void);
+static boolean_T SupervisorFSM_RX_CheckSetPointVelocity(void);
+static boolean_T SupervisorFSM_RX_CheckSetPointPosition(void);
 
 // Forward declaration for local functions
 static boolean_T SupervisorFSM_RX_IsBoardReady(void);
-static boolean_T SupervisorFS_isConfigurationSet(void);
-static boolean_T SupervisorFS_IsNewCtrl_Velocity(void);
-static boolean_T SupervisorFSM_IsNewCtrl_Voltage(void);
-static boolean_T SupervisorFSM_IsNewCtrl_Current(void);
-static boolean_T SupervisorFS_IsNewCtrl_Position(void);
+static boolean_T SupervisorFSM_RX_isConfigurationSet(void);
+static boolean_T SupervisorFSM_RX_IsNewCtrl_Velocity(void);
+static boolean_T SupervisorFSM_RX_IsNewCtrl_Voltage(void);
+static boolean_T SupervisorFSM_RX_IsNewCtrl_Current(void);
+static boolean_T SupervisorFSM_RX_IsNewCtrl_Position(void);
 static boolean_T SupervisorFSM_RX_IsNewCtrl_Idle(void);
 static void SupervisorFSM_RX_Voltage(void);
 
 // Forward declaration for local functions
 static ControlModes SupervisorFSM_RX_convert(MCControlModes mccontrolmode);
-static void SupervisorFSM_formatMotorConfig(const BUS_MESSAGES_RX *Selector2);
-static void SupervisorF_hardwareConfigMotor(void);
+static void SupervisorFSM_RX_formatMotorConfig(const BUS_MESSAGES_RX *Selector2);
+static void SupervisorFSM_RX_hardwareConfigMotor(void);
 
 // Forward declaration for local functions
-static boolean_T SupervisorFSM_isBoardConfigured(void);
+static boolean_T SupervisorFSM_RX_isBoardConfigured(void);
 
 // Declare global variables for system: model 'SupervisorFSM_RX'
-const SensorsData *SupervisorFSM_R_rtu_SensorsData;// '<Root>/SensorsData'
-const ControlOutputs *SupervisorFS_rtu_ControlOutputs;// '<Root>/ControlOutputs' 
+const SensorsData *SupervisorFSM_RX_rtu_SensorsData;// '<Root>/SensorsData'
+const ControlOutputs *SupervisorFSM_RX_rtu_ControlOutputs;// '<Root>/ControlOutputs' 
 const BUS_MESSAGES_RX_MULTIPLE *SupervisorFSM_RX_rtu_MessagesRx;// '<Root>/MessagesRx' 
 const BUS_STATUS_RX_MULTIPLE *SupervisorFSM_RX_rtu_StatusRx;// '<Root>/StatusRx' 
 const BUS_CAN_RX_ERRORS_MULTIPLE *SupervisorFSM_RX_rtu_ErrorsRx;// '<Root>/ErrorsRx' 
 
 // Function for Chart: '<S5>/Chart1'
-static boolean_T Supervisor_CheckSetPointVoltage(void)
+static boolean_T SupervisorFSM_RX_CheckSetPointVoltage(void)
 {
   return SupervisorFSM_RX_B.controlModeDefined == ControlModes_Voltage;
 }
 
 // Function for Chart: '<S5>/Chart1'
-static boolean_T Supervisor_CheckSetPointCurrent(void)
+static boolean_T SupervisorFSM_RX_CheckSetPointCurrent(void)
 {
   return SupervisorFSM_RX_B.controlModeDefined == ControlModes_Current;
 }
 
 // Function for Chart: '<S5>/Chart1'
-static boolean_T Superviso_CheckSetPointVelocity(void)
+static boolean_T SupervisorFSM_RX_CheckSetPointVelocity(void)
 {
   return SupervisorFSM_RX_B.controlModeDefined == ControlModes_Velocity;
 }
 
 // Function for Chart: '<S5>/Chart1'
-static boolean_T Superviso_CheckSetPointPosition(void)
+static boolean_T SupervisorFSM_RX_CheckSetPointPosition(void)
 {
   return SupervisorFSM_RX_B.controlModeDefined == ControlModes_Position;
 }
 
 // System initialize for function-call system: '<Root>/SetpointHandler'
-void Supervisor_SetpointHandler_Init(void)
+void SupervisorFSM_RX_SetpointHandler_Init(void)
 {
   // SystemInitialize for Chart: '<S5>/Chart1'
   SupervisorFSM_RX_B.targets.jointpositions.position = 0.0F;
@@ -116,7 +116,7 @@ void Supervisor_SetpointHandler_Init(void)
 }
 
 // Output and update for function-call system: '<Root>/SetpointHandler'
-void SupervisorFSM_R_SetpointHandler(void)
+void SupervisorFSM_RX_SetpointHandler(void)
 {
   real32_T newSetpoint;
 
@@ -124,11 +124,11 @@ void SupervisorFSM_R_SetpointHandler(void)
   if (SupervisorFSM_RX_DW.is_active_c4_SupervisorFSM_RX == 0U) {
     SupervisorFSM_RX_DW.is_active_c4_SupervisorFSM_RX = 1U;
     if (SupervisorFSM_RX_B.receivedNewSetpoint) {
-      if (Supervisor_CheckSetPointVoltage()) {
+      if (SupervisorFSM_RX_CheckSetPointVoltage()) {
         newSetpoint = SupervisorFSM_RX_B.newSetpoint.voltage;
-      } else if (Supervisor_CheckSetPointCurrent()) {
+      } else if (SupervisorFSM_RX_CheckSetPointCurrent()) {
         newSetpoint = SupervisorFSM_RX_B.newSetpoint.current;
-      } else if (Superviso_CheckSetPointVelocity()) {
+      } else if (SupervisorFSM_RX_CheckSetPointVelocity()) {
         newSetpoint = SupervisorFSM_RX_B.newSetpoint.velocity;
       } else {
         newSetpoint = 0.0F;
@@ -141,26 +141,26 @@ void SupervisorFSM_R_SetpointHandler(void)
     SupervisorFSM_RX_B.targets.motorcurrent.current = 0.0F;
     SupervisorFSM_RX_B.targets.jointvelocities.velocity = 0.0F;
     SupervisorFSM_RX_B.targets.jointpositions.position = 0.0F;
-    if (Supervisor_CheckSetPointCurrent()) {
+    if (SupervisorFSM_RX_CheckSetPointCurrent()) {
       SupervisorFSM_RX_B.targets.motorcurrent.current = newSetpoint;
       SupervisorFSM_RX_B.hasSetpointChanged = true;
-    } else if (Supervisor_CheckSetPointVoltage()) {
+    } else if (SupervisorFSM_RX_CheckSetPointVoltage()) {
       SupervisorFSM_RX_B.targets.motorvoltage.voltage = newSetpoint;
       SupervisorFSM_RX_B.hasSetpointChanged = true;
-    } else if (Superviso_CheckSetPointVelocity()) {
+    } else if (SupervisorFSM_RX_CheckSetPointVelocity()) {
       SupervisorFSM_RX_B.targets.jointvelocities.velocity = newSetpoint;
       SupervisorFSM_RX_B.hasSetpointChanged = true;
-    } else if (Superviso_CheckSetPointPosition()) {
+    } else if (SupervisorFSM_RX_CheckSetPointPosition()) {
       SupervisorFSM_RX_B.targets.jointpositions.position = newSetpoint;
       SupervisorFSM_RX_B.hasSetpointChanged = true;
     }
   } else {
     if (SupervisorFSM_RX_B.receivedNewSetpoint) {
-      if (Supervisor_CheckSetPointVoltage()) {
+      if (SupervisorFSM_RX_CheckSetPointVoltage()) {
         newSetpoint = SupervisorFSM_RX_B.newSetpoint.voltage;
-      } else if (Supervisor_CheckSetPointCurrent()) {
+      } else if (SupervisorFSM_RX_CheckSetPointCurrent()) {
         newSetpoint = SupervisorFSM_RX_B.newSetpoint.current;
-      } else if (Superviso_CheckSetPointVelocity()) {
+      } else if (SupervisorFSM_RX_CheckSetPointVelocity()) {
         newSetpoint = SupervisorFSM_RX_B.newSetpoint.velocity;
       } else {
         newSetpoint = 0.0F;
@@ -173,16 +173,16 @@ void SupervisorFSM_R_SetpointHandler(void)
     SupervisorFSM_RX_B.targets.motorcurrent.current = 0.0F;
     SupervisorFSM_RX_B.targets.jointvelocities.velocity = 0.0F;
     SupervisorFSM_RX_B.targets.jointpositions.position = 0.0F;
-    if (Supervisor_CheckSetPointCurrent()) {
+    if (SupervisorFSM_RX_CheckSetPointCurrent()) {
       SupervisorFSM_RX_B.targets.motorcurrent.current = newSetpoint;
       SupervisorFSM_RX_B.hasSetpointChanged = true;
-    } else if (Supervisor_CheckSetPointVoltage()) {
+    } else if (SupervisorFSM_RX_CheckSetPointVoltage()) {
       SupervisorFSM_RX_B.targets.motorvoltage.voltage = newSetpoint;
       SupervisorFSM_RX_B.hasSetpointChanged = true;
-    } else if (Superviso_CheckSetPointVelocity()) {
+    } else if (SupervisorFSM_RX_CheckSetPointVelocity()) {
       SupervisorFSM_RX_B.targets.jointvelocities.velocity = newSetpoint;
       SupervisorFSM_RX_B.hasSetpointChanged = true;
-    } else if (Superviso_CheckSetPointPosition()) {
+    } else if (SupervisorFSM_RX_CheckSetPointPosition()) {
       SupervisorFSM_RX_B.targets.jointpositions.position = newSetpoint;
       SupervisorFSM_RX_B.hasSetpointChanged = true;
     }
@@ -198,31 +198,31 @@ static boolean_T SupervisorFSM_RX_IsBoardReady(void)
 }
 
 // Function for Chart: '<S2>/ControlMode_SM_motor0'
-static boolean_T SupervisorFS_isConfigurationSet(void)
+static boolean_T SupervisorFSM_RX_isConfigurationSet(void)
 {
   return SupervisorFSM_RX_B.areLimitsSet;
 }
 
 // Function for Chart: '<S2>/ControlMode_SM_motor0'
-static boolean_T SupervisorFS_IsNewCtrl_Velocity(void)
+static boolean_T SupervisorFSM_RX_IsNewCtrl_Velocity(void)
 {
   return SupervisorFSM_RX_B.requiredControlMode == ControlModes_Velocity;
 }
 
 // Function for Chart: '<S2>/ControlMode_SM_motor0'
-static boolean_T SupervisorFSM_IsNewCtrl_Voltage(void)
+static boolean_T SupervisorFSM_RX_IsNewCtrl_Voltage(void)
 {
   return SupervisorFSM_RX_B.requiredControlMode == ControlModes_Voltage;
 }
 
 // Function for Chart: '<S2>/ControlMode_SM_motor0'
-static boolean_T SupervisorFSM_IsNewCtrl_Current(void)
+static boolean_T SupervisorFSM_RX_IsNewCtrl_Current(void)
 {
   return SupervisorFSM_RX_B.requiredControlMode == ControlModes_Current;
 }
 
 // Function for Chart: '<S2>/ControlMode_SM_motor0'
-static boolean_T SupervisorFS_IsNewCtrl_Position(void)
+static boolean_T SupervisorFSM_RX_IsNewCtrl_Position(void)
 {
   return SupervisorFSM_RX_B.requiredControlMode == ControlModes_Position;
 }
@@ -236,9 +236,9 @@ static boolean_T SupervisorFSM_RX_IsNewCtrl_Idle(void)
 // Function for Chart: '<S2>/ControlMode_SM_motor0'
 static void SupervisorFSM_RX_Voltage(void)
 {
-  boolean_T guard1 = false;
-  boolean_T guard2 = false;
-  boolean_T guard3 = false;
+  boolean_T guard1;
+  boolean_T guard2;
+  boolean_T guard3;
   SupervisorFSM_RX_B.controlModeDefined = ControlModes_Voltage;
   guard1 = false;
   guard2 = false;
@@ -252,7 +252,7 @@ static void SupervisorFSM_RX_Voltage(void)
 
       // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
       // this updates the targets value
-      SupervisorFSM_R_SetpointHandler();
+      SupervisorFSM_RX_SetpointHandler();
 
       // End of Outputs for SubSystem: '<Root>/SetpointHandler'
     } else if (SupervisorFSM_RX_B.isFaultButtonPressed) {
@@ -265,45 +265,45 @@ static void SupervisorFSM_RX_Voltage(void)
   }
 
   if (guard3) {
-    if (SupervisorFS_IsNewCtrl_Velocity()) {
-      if ((!SupervisorFSM_IsNewCtrl_Voltage()) &&
-          SupervisorFS_IsNewCtrl_Velocity()) {
+    if (SupervisorFSM_RX_IsNewCtrl_Velocity()) {
+      if ((!SupervisorFSM_RX_IsNewCtrl_Voltage()) &&
+          SupervisorFSM_RX_IsNewCtrl_Velocity()) {
         SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
           SupervisorFSM_RX_IN_Velocity;
         SupervisorFSM_RX_B.controlModeDefined = ControlModes_Velocity;
         SupervisorFSM_RX_B.newSetpoint_i = 0.0F;
 
         // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-        SupervisorFSM_R_SetpointHandler();
+        SupervisorFSM_RX_SetpointHandler();
 
         // End of Outputs for SubSystem: '<Root>/SetpointHandler'
       } else {
         guard2 = true;
       }
-    } else if (!SupervisorFSM_IsNewCtrl_Voltage()) {
-      if (SupervisorFSM_IsNewCtrl_Current()) {
+    } else if (!SupervisorFSM_RX_IsNewCtrl_Voltage()) {
+      if (SupervisorFSM_RX_IsNewCtrl_Current()) {
         // Chart: '<S2>/ControlMode_SM_motor0'
         SupervisorFSM_RX_B.newSetpoint_i =
-          SupervisorFS_rtu_ControlOutputs->Iq_fbk.current;
+          SupervisorFSM_RX_rtu_ControlOutputs->Iq_fbk.current;
         SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
           SupervisorFSM_RX_IN_Current;
         SupervisorFSM_RX_B.controlModeDefined = ControlModes_Current;
 
         // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-        SupervisorFSM_R_SetpointHandler();
+        SupervisorFSM_RX_SetpointHandler();
 
         // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-      } else if (SupervisorFS_IsNewCtrl_Position()) {
+      } else if (SupervisorFSM_RX_IsNewCtrl_Position()) {
         SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
           SupervisorFSM_RX_IN_Position;
         SupervisorFSM_RX_B.controlModeDefined = ControlModes_Position;
 
         // Chart: '<S2>/ControlMode_SM_motor0'
         SupervisorFSM_RX_B.newSetpoint_i =
-          SupervisorFSM_R_rtu_SensorsData->jointpositions.position;
+          SupervisorFSM_RX_rtu_SensorsData->jointpositions.position;
 
         // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-        SupervisorFSM_R_SetpointHandler();
+        SupervisorFSM_RX_SetpointHandler();
 
         // End of Outputs for SubSystem: '<Root>/SetpointHandler'
       } else if (SupervisorFSM_RX_IsNewCtrl_Idle()) {
@@ -321,7 +321,7 @@ static void SupervisorFSM_RX_Voltage(void)
     SupervisorFSM_RX_B.controlModeDefined = ControlModes_Voltage;
 
     // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-    SupervisorFSM_R_SetpointHandler();
+    SupervisorFSM_RX_SetpointHandler();
 
     // End of Outputs for SubSystem: '<Root>/SetpointHandler'
   }
@@ -333,44 +333,45 @@ static void SupervisorFSM_RX_Voltage(void)
 
     // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
     // this updates the targets value
-    SupervisorFSM_R_SetpointHandler();
+    SupervisorFSM_RX_SetpointHandler();
 
     // End of Outputs for SubSystem: '<Root>/SetpointHandler'
   }
 }
 
 // Output and update for function-call system: '<Root>/Control Mode Handler Motor 0'
-void Superv_ControlModeHandlerMotor0(void)
+void SupervisorFSM_RX_ControlModeHandlerMotor0(void)
 {
-  boolean_T guard1 = false;
-  boolean_T guard10 = false;
-  boolean_T guard11 = false;
-  boolean_T guard2 = false;
-  boolean_T guard3 = false;
-  boolean_T guard4 = false;
-  boolean_T guard5 = false;
-  boolean_T guard6 = false;
-  boolean_T guard7 = false;
-  boolean_T guard8 = false;
-  boolean_T guard9 = false;
+  boolean_T guard1;
+  boolean_T guard10;
+  boolean_T guard11;
+  boolean_T guard2;
+  boolean_T guard3;
+  boolean_T guard4;
+  boolean_T guard5;
+  boolean_T guard6;
+  boolean_T guard7;
+  boolean_T guard8;
+  boolean_T guard9;
   boolean_T tmp;
 
   // Chart: '<S2>/ControlMode_SM_motor0'
   if (SupervisorFSM_RX_DW.is_active_c12_SupervisorFSM_RX == 0U) {
     SupervisorFSM_RX_DW.is_active_c12_SupervisorFSM_RX = 1U;
-    if (SupervisorFSM_RX_IsBoardReady() && SupervisorFS_isConfigurationSet()) {
+    if (SupervisorFSM_RX_IsBoardReady() && SupervisorFSM_RX_isConfigurationSet())
+    {
       SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX = SupervisorFSM_RX_IN_Idle;
       SupervisorFSM_RX_B.controlModeDefined = ControlModes_Idle;
       rtw_disableMotor();
 
       // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
       // this updates the targets value
-      SupervisorFSM_R_SetpointHandler();
+      SupervisorFSM_RX_SetpointHandler();
 
       // End of Outputs for SubSystem: '<Root>/SetpointHandler'
     } else {
       SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
-        SupervisorFSM__IN_NotConfigured;
+        SupervisorFSM_RX_IN_NotConfigured;
       SupervisorFSM_RX_B.controlModeDefined = ControlModes_NotConfigured;
       rtw_disableMotor();
     }
@@ -399,7 +400,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
           // this updates the targets value
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
         } else if (SupervisorFSM_RX_B.isFaultButtonPressed) {
@@ -416,9 +417,9 @@ void Superv_ControlModeHandlerMotor0(void)
       SupervisorFSM_RX_B.controlModeDefined = ControlModes_HwFaultCM;
       tmp = !SupervisorFSM_RX_B.isInOverCurrent;
       if (tmp && SupervisorFSM_RX_IsNewCtrl_Idle() &&
-          (!SupervisorFS_isConfigurationSet())) {
+          (!SupervisorFSM_RX_isConfigurationSet())) {
         SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
-          SupervisorFSM__IN_NotConfigured;
+          SupervisorFSM_RX_IN_NotConfigured;
         SupervisorFSM_RX_B.controlModeDefined = ControlModes_NotConfigured;
         rtw_disableMotor();
       } else if (tmp && SupervisorFSM_RX_IsNewCtrl_Idle()) {
@@ -428,7 +429,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
         // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
         // this updates the targets value
-        SupervisorFSM_R_SetpointHandler();
+        SupervisorFSM_RX_SetpointHandler();
 
         // End of Outputs for SubSystem: '<Root>/SetpointHandler'
       }
@@ -446,7 +447,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
           // this updates the targets value
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
         } else if (SupervisorFSM_RX_B.isFaultButtonPressed) {
@@ -459,17 +460,17 @@ void Superv_ControlModeHandlerMotor0(void)
       }
       break;
 
-     case SupervisorFSM__IN_NotConfigured:
+     case SupervisorFSM_RX_IN_NotConfigured:
       SupervisorFSM_RX_B.controlModeDefined = ControlModes_NotConfigured;
-      if (SupervisorFSM_RX_IsBoardReady() && SupervisorFS_isConfigurationSet())
-      {
+      if (SupervisorFSM_RX_IsBoardReady() && SupervisorFSM_RX_isConfigurationSet
+          ()) {
         SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX = SupervisorFSM_RX_IN_Idle;
         SupervisorFSM_RX_B.controlModeDefined = ControlModes_Idle;
         rtw_disableMotor();
 
         // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
         // this updates the targets value
-        SupervisorFSM_R_SetpointHandler();
+        SupervisorFSM_RX_SetpointHandler();
 
         // End of Outputs for SubSystem: '<Root>/SetpointHandler'
       } else if (SupervisorFSM_RX_B.isInOverCurrent) {
@@ -480,7 +481,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
         // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
         // this updates the targets value
-        SupervisorFSM_R_SetpointHandler();
+        SupervisorFSM_RX_SetpointHandler();
 
         // End of Outputs for SubSystem: '<Root>/SetpointHandler'
       }
@@ -498,7 +499,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
           // this updates the targets value
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
         } else if (SupervisorFSM_RX_B.isFaultButtonPressed) {
@@ -523,7 +524,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
           // this updates the targets value
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
         } else if (SupervisorFSM_RX_B.isFaultButtonPressed) {
@@ -544,36 +545,37 @@ void Superv_ControlModeHandlerMotor0(void)
 
     if (guard11) {
       if ((!SupervisorFSM_RX_IsNewCtrl_Idle()) &&
-          (!SupervisorFS_IsNewCtrl_Position())) {
-        if (SupervisorFSM_IsNewCtrl_Current()) {
+          (!SupervisorFSM_RX_IsNewCtrl_Position())) {
+        if (SupervisorFSM_RX_IsNewCtrl_Current()) {
           SupervisorFSM_RX_B.newSetpoint_i =
-            SupervisorFS_rtu_ControlOutputs->Iq_fbk.current;
+            SupervisorFSM_RX_rtu_ControlOutputs->Iq_fbk.current;
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Current;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Current;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-        } else if (SupervisorFSM_IsNewCtrl_Voltage()) {
-          SupervisorFSM_RX_B.newSetpoint_i = SupervisorFS_rtu_ControlOutputs->Vq;
+        } else if (SupervisorFSM_RX_IsNewCtrl_Voltage()) {
+          SupervisorFSM_RX_B.newSetpoint_i =
+            SupervisorFSM_RX_rtu_ControlOutputs->Vq;
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Voltage;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Voltage;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-        } else if (SupervisorFS_IsNewCtrl_Velocity()) {
+        } else if (SupervisorFSM_RX_IsNewCtrl_Velocity()) {
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Velocity;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Velocity;
           SupervisorFSM_RX_B.newSetpoint_i = 0.0F;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
         } else {
@@ -585,37 +587,38 @@ void Superv_ControlModeHandlerMotor0(void)
     }
 
     if (guard10) {
-      if (!SupervisorFS_IsNewCtrl_Velocity()) {
-        if (SupervisorFSM_IsNewCtrl_Voltage()) {
-          SupervisorFSM_RX_B.newSetpoint_i = SupervisorFS_rtu_ControlOutputs->Vq;
+      if (!SupervisorFSM_RX_IsNewCtrl_Velocity()) {
+        if (SupervisorFSM_RX_IsNewCtrl_Voltage()) {
+          SupervisorFSM_RX_B.newSetpoint_i =
+            SupervisorFSM_RX_rtu_ControlOutputs->Vq;
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Voltage;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Voltage;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-        } else if (SupervisorFSM_IsNewCtrl_Current()) {
+        } else if (SupervisorFSM_RX_IsNewCtrl_Current()) {
           SupervisorFSM_RX_B.newSetpoint_i =
-            SupervisorFS_rtu_ControlOutputs->Iq_fbk.current;
+            SupervisorFSM_RX_rtu_ControlOutputs->Iq_fbk.current;
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Current;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Current;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-        } else if (SupervisorFS_IsNewCtrl_Position()) {
+        } else if (SupervisorFSM_RX_IsNewCtrl_Position()) {
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Position;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Position;
           SupervisorFSM_RX_B.newSetpoint_i =
-            SupervisorFSM_R_rtu_SensorsData->jointpositions.position;
+            SupervisorFSM_RX_rtu_SensorsData->jointpositions.position;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
         } else if (SupervisorFSM_RX_IsNewCtrl_Idle()) {
@@ -637,45 +640,45 @@ void Superv_ControlModeHandlerMotor0(void)
     if (guard8) {
       if (!SupervisorFSM_RX_IsNewCtrl_Idle()) {
         rtw_enableMotor();
-        if (SupervisorFS_IsNewCtrl_Position()) {
+        if (SupervisorFSM_RX_IsNewCtrl_Position()) {
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Position;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Position;
           SupervisorFSM_RX_B.newSetpoint_i =
-            SupervisorFSM_R_rtu_SensorsData->jointpositions.position;
+            SupervisorFSM_RX_rtu_SensorsData->jointpositions.position;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-        } else if (SupervisorFSM_IsNewCtrl_Current()) {
+        } else if (SupervisorFSM_RX_IsNewCtrl_Current()) {
           SupervisorFSM_RX_B.newSetpoint_i = 0.0F;
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Current;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Current;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-        } else if (SupervisorFSM_IsNewCtrl_Voltage()) {
+        } else if (SupervisorFSM_RX_IsNewCtrl_Voltage()) {
           SupervisorFSM_RX_B.newSetpoint_i = 0.0F;
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Voltage;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Voltage;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-        } else if (SupervisorFS_IsNewCtrl_Velocity()) {
+        } else if (SupervisorFSM_RX_IsNewCtrl_Velocity()) {
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Velocity;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Velocity;
           SupervisorFSM_RX_B.newSetpoint_i = 0.0F;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
         } else {
@@ -688,27 +691,27 @@ void Superv_ControlModeHandlerMotor0(void)
 
     if (guard7) {
       if ((!SupervisorFSM_RX_IsNewCtrl_Idle()) &&
-          (!SupervisorFS_IsNewCtrl_Position())) {
-        if (!SupervisorFSM_IsNewCtrl_Current()) {
-          if (SupervisorFSM_IsNewCtrl_Voltage()) {
+          (!SupervisorFSM_RX_IsNewCtrl_Position())) {
+        if (!SupervisorFSM_RX_IsNewCtrl_Current()) {
+          if (SupervisorFSM_RX_IsNewCtrl_Voltage()) {
             SupervisorFSM_RX_B.newSetpoint_i =
-              SupervisorFS_rtu_ControlOutputs->Vq;
+              SupervisorFSM_RX_rtu_ControlOutputs->Vq;
             SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
               SupervisorFSM_RX_IN_Voltage;
             SupervisorFSM_RX_B.controlModeDefined = ControlModes_Voltage;
 
             // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-            SupervisorFSM_R_SetpointHandler();
+            SupervisorFSM_RX_SetpointHandler();
 
             // End of Outputs for SubSystem: '<Root>/SetpointHandler'
-          } else if (SupervisorFS_IsNewCtrl_Velocity()) {
+          } else if (SupervisorFSM_RX_IsNewCtrl_Velocity()) {
             SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
               SupervisorFSM_RX_IN_Velocity;
             SupervisorFSM_RX_B.controlModeDefined = ControlModes_Velocity;
             SupervisorFSM_RX_B.newSetpoint_i = 0.0F;
 
             // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-            SupervisorFSM_R_SetpointHandler();
+            SupervisorFSM_RX_SetpointHandler();
 
             // End of Outputs for SubSystem: '<Root>/SetpointHandler'
           } else {
@@ -717,16 +720,16 @@ void Superv_ControlModeHandlerMotor0(void)
         } else {
           guard2 = true;
         }
-      } else if (!SupervisorFSM_IsNewCtrl_Current()) {
-        if (SupervisorFS_IsNewCtrl_Position()) {
+      } else if (!SupervisorFSM_RX_IsNewCtrl_Current()) {
+        if (SupervisorFSM_RX_IsNewCtrl_Position()) {
           SupervisorFSM_RX_DW.is_c12_SupervisorFSM_RX =
             SupervisorFSM_RX_IN_Position;
           SupervisorFSM_RX_B.controlModeDefined = ControlModes_Position;
           SupervisorFSM_RX_B.newSetpoint_i =
-            SupervisorFSM_R_rtu_SensorsData->jointpositions.position;
+            SupervisorFSM_RX_rtu_SensorsData->jointpositions.position;
 
           // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-          SupervisorFSM_R_SetpointHandler();
+          SupervisorFSM_RX_SetpointHandler();
 
           // End of Outputs for SubSystem: '<Root>/SetpointHandler'
         } else if (SupervisorFSM_RX_IsNewCtrl_Idle()) {
@@ -745,7 +748,7 @@ void Superv_ControlModeHandlerMotor0(void)
       SupervisorFSM_RX_B.newSetpoint_i = 0.0F;
 
       // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-      SupervisorFSM_R_SetpointHandler();
+      SupervisorFSM_RX_SetpointHandler();
 
       // End of Outputs for SubSystem: '<Root>/SetpointHandler'
     }
@@ -757,7 +760,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
       // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
       // this updates the targets value
-      SupervisorFSM_R_SetpointHandler();
+      SupervisorFSM_RX_SetpointHandler();
 
       // End of Outputs for SubSystem: '<Root>/SetpointHandler'
     }
@@ -769,7 +772,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
       // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
       // this updates the targets value
-      SupervisorFSM_R_SetpointHandler();
+      SupervisorFSM_RX_SetpointHandler();
 
       // End of Outputs for SubSystem: '<Root>/SetpointHandler'
     }
@@ -781,7 +784,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
       // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
       // this updates the targets value
-      SupervisorFSM_R_SetpointHandler();
+      SupervisorFSM_RX_SetpointHandler();
 
       // End of Outputs for SubSystem: '<Root>/SetpointHandler'
     }
@@ -791,7 +794,7 @@ void Superv_ControlModeHandlerMotor0(void)
       SupervisorFSM_RX_B.controlModeDefined = ControlModes_Current;
 
       // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-      SupervisorFSM_R_SetpointHandler();
+      SupervisorFSM_RX_SetpointHandler();
 
       // End of Outputs for SubSystem: '<Root>/SetpointHandler'
     }
@@ -803,7 +806,7 @@ void Superv_ControlModeHandlerMotor0(void)
 
       // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
       // this updates the targets value
-      SupervisorFSM_R_SetpointHandler();
+      SupervisorFSM_RX_SetpointHandler();
 
       // End of Outputs for SubSystem: '<Root>/SetpointHandler'
     }
@@ -813,7 +816,7 @@ void Superv_ControlModeHandlerMotor0(void)
 }
 
 // System initialize for function-call system: '<Root>/Limits Handler'
-void SupervisorFS_LimitsHandler_Init(void)
+void SupervisorFSM_RX_LimitsHandler_Init(void)
 {
   // SystemInitialize for Chart: '<S3>/Chart'
   SupervisorFSM_RX_B.thresholds.jntPosMin = 0.0F;
@@ -828,6 +831,7 @@ void SupervisorFS_LimitsHandler_Init(void)
   SupervisorFSM_RX_B.thresholds.motorPeakCurrents = 0.0F;
   SupervisorFSM_RX_B.thresholds.motorOverloadCurrents = 0.0F;
   SupervisorFSM_RX_B.thresholds.motorPwmLimit = 0U;
+  SupervisorFSM_RX_B.thresholds.motorCriticalTemperature = 0.0F;
 }
 
 // Output and update for function-call system: '<Root>/Limits Handler'
@@ -848,7 +852,7 @@ void SupervisorFSM_RX_LimitsHandler(void)
         SupervisorFSM_RX_B.areLimitsSet = true;
 
         // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
-        Superv_ControlModeHandlerMotor0();
+        SupervisorFSM_RX_ControlModeHandlerMotor0();
 
         // End of Outputs for SubSystem: '<Root>/Control Mode Handler Motor 0'
       }
@@ -864,7 +868,7 @@ void SupervisorFSM_RX_LimitsHandler(void)
       SupervisorFSM_RX_B.areLimitsSet = true;
 
       // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
-      Superv_ControlModeHandlerMotor0();
+      SupervisorFSM_RX_ControlModeHandlerMotor0();
 
       // End of Outputs for SubSystem: '<Root>/Control Mode Handler Motor 0'
     }
@@ -874,7 +878,7 @@ void SupervisorFSM_RX_LimitsHandler(void)
 }
 
 // System initialize for function-call system: '<Root>/PID Handler'
-void SupervisorFSM_R_PIDHandler_Init(void)
+void SupervisorFSM_RX_PIDHandler_Init(void)
 {
   // SystemInitialize for Chart: '<S4>/Chart'
   SupervisorFSM_RX_B.CurrentPID.OutMax = 0.0F;
@@ -1018,7 +1022,7 @@ static ControlModes SupervisorFSM_RX_convert(MCControlModes mccontrolmode)
 }
 
 // Function for Chart: '<S1>/CAN Event Dispatcher'
-static void SupervisorFSM_formatMotorConfig(const BUS_MESSAGES_RX *Selector2)
+static void SupervisorFSM_RX_formatMotorConfig(const BUS_MESSAGES_RX *Selector2)
 {
   SupervisorFSM_RX_B.motorConfig.use_index = Selector2->motor_config.use_index;
   SupervisorFSM_RX_B.motorConfig.pole_pairs = static_cast<uint8_T>(rt_roundd_snf
@@ -1042,7 +1046,7 @@ static void SupervisorFSM_formatMotorConfig(const BUS_MESSAGES_RX *Selector2)
 }
 
 // Function for Chart: '<S1>/CAN Event Dispatcher'
-static void SupervisorF_hardwareConfigMotor(void)
+static void SupervisorFSM_RX_hardwareConfigMotor(void)
 {
   rtw_configMotor(static_cast<uint8_T>
                   (SupervisorFSM_RX_B.motorConfig.has_quadrature_encoder),
@@ -1052,7 +1056,7 @@ static void SupervisorF_hardwareConfigMotor(void)
 }
 
 // System initialize for function-call system: '<Root>/CAN Message Handler'
-void Supervis_CANMessageHandler_Init(void)
+void SupervisorFSM_RX_CANMessageHandler_Init(void)
 {
   // SystemInitialize for Chart: '<S1>/CAN Event Dispatcher'
   SupervisorFSM_RX_B.newSetpoint.current = 0.0F;
@@ -1083,27 +1087,32 @@ void Supervis_CANMessageHandler_Init(void)
   SupervisorFSM_RX_B.motorConfig.Imax = 0.0F;
   SupervisorFSM_RX_B.motorConfig.Vcc = 0.0F;
   SupervisorFSM_RX_B.motorConfig.Vmax = 0.0F;
+  SupervisorFSM_RX_B.motorConfig.resistance = 0.0F;
+  SupervisorFSM_RX_B.motorConfig.inductance = 0.0F;
+  SupervisorFSM_RX_B.motorConfig.thermal_resistance = 0.0F;
+  SupervisorFSM_RX_B.motorConfig.thermal_time_constant = 0.0F;
   SupervisorFSM_RX_B.estimationConfig.velocity_mode =
     EstimationVelocityModes_Disabled;
+  SupervisorFSM_RX_B.estimationConfig.current_rms_lambda = 0.0F;
 
   // SystemInitialize for Function Call SubSystem: '<Root>/SetpointHandler'
-  Supervisor_SetpointHandler_Init();
+  SupervisorFSM_RX_SetpointHandler_Init();
 
   // End of SystemInitialize for SubSystem: '<Root>/SetpointHandler'
 
   // SystemInitialize for Function Call SubSystem: '<Root>/Limits Handler'
-  SupervisorFS_LimitsHandler_Init();
+  SupervisorFSM_RX_LimitsHandler_Init();
 
   // End of SystemInitialize for SubSystem: '<Root>/Limits Handler'
 
   // SystemInitialize for Function Call SubSystem: '<Root>/PID Handler'
-  SupervisorFSM_R_PIDHandler_Init();
+  SupervisorFSM_RX_PIDHandler_Init();
 
   // End of SystemInitialize for SubSystem: '<Root>/PID Handler'
 }
 
 // Output and update for function-call system: '<Root>/CAN Message Handler'
-void SupervisorFSM_CANMessageHandler(void)
+void SupervisorFSM_RX_CANMessageHandler(void)
 {
   BUS_MESSAGES_RX Selector2;
 
@@ -1130,7 +1139,7 @@ void SupervisorFSM_CANMessageHandler(void)
         SupervisorFSM_RX_B.receivedNewSetpoint = false;
 
         // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
-        Superv_ControlModeHandlerMotor0();
+        SupervisorFSM_RX_ControlModeHandlerMotor0();
 
         // End of Outputs for SubSystem: '<Root>/Control Mode Handler Motor 0'
       } else if (SupervisorFSM_RX_rtu_StatusRx->
@@ -1172,8 +1181,8 @@ void SupervisorFSM_CANMessageHandler(void)
         // End of Outputs for SubSystem: '<Root>/PID Handler'
       } else if (SupervisorFSM_RX_rtu_StatusRx->
                  status[SupervisorFSM_RX_B.messageIndex - 1].motor_config) {
-        SupervisorFSM_formatMotorConfig(&Selector2);
-        SupervisorF_hardwareConfigMotor();
+        SupervisorFSM_RX_formatMotorConfig(&Selector2);
+        SupervisorFSM_RX_hardwareConfigMotor();
       } else if (SupervisorFSM_RX_rtu_StatusRx->
                  status[SupervisorFSM_RX_B.messageIndex - 1].desired_targets) {
         SupervisorFSM_RX_B.newSetpoint =
@@ -1183,7 +1192,7 @@ void SupervisorFSM_CANMessageHandler(void)
         SupervisorFSM_RX_B.receivedNewSetpoint = true;
 
         // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-        SupervisorFSM_R_SetpointHandler();
+        SupervisorFSM_RX_SetpointHandler();
 
         // End of Outputs for SubSystem: '<Root>/SetpointHandler'
       }
@@ -1202,7 +1211,7 @@ void SupervisorFSM_CANMessageHandler(void)
         SupervisorFSM_RX_B.receivedNewSetpoint = false;
 
         // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
-        Superv_ControlModeHandlerMotor0();
+        SupervisorFSM_RX_ControlModeHandlerMotor0();
 
         // End of Outputs for SubSystem: '<Root>/Control Mode Handler Motor 0'
       } else if (SupervisorFSM_RX_rtu_StatusRx->
@@ -1244,8 +1253,8 @@ void SupervisorFSM_CANMessageHandler(void)
         // End of Outputs for SubSystem: '<Root>/PID Handler'
       } else if (SupervisorFSM_RX_rtu_StatusRx->
                  status[SupervisorFSM_RX_B.messageIndex - 1].motor_config) {
-        SupervisorFSM_formatMotorConfig(&Selector2);
-        SupervisorF_hardwareConfigMotor();
+        SupervisorFSM_RX_formatMotorConfig(&Selector2);
+        SupervisorFSM_RX_hardwareConfigMotor();
       } else if (SupervisorFSM_RX_rtu_StatusRx->
                  status[SupervisorFSM_RX_B.messageIndex - 1].desired_targets) {
         SupervisorFSM_RX_B.newSetpoint =
@@ -1255,7 +1264,7 @@ void SupervisorFSM_CANMessageHandler(void)
         SupervisorFSM_RX_B.receivedNewSetpoint = true;
 
         // Outputs for Function Call SubSystem: '<Root>/SetpointHandler'
-        SupervisorFSM_R_SetpointHandler();
+        SupervisorFSM_RX_SetpointHandler();
 
         // End of Outputs for SubSystem: '<Root>/SetpointHandler'
       }
@@ -1266,7 +1275,7 @@ void SupervisorFSM_CANMessageHandler(void)
 }
 
 // Function for Chart: '<Root>/SupervisorRX State Handler'
-static boolean_T SupervisorFSM_isBoardConfigured(void)
+static boolean_T SupervisorFSM_RX_isBoardConfigured(void)
 {
   return true;
 }
@@ -1278,15 +1287,18 @@ void SupervisorFSM_RX_Init(Flags *rty_Flags, ConfigurationParameters
   // SystemInitialize for Chart: '<Root>/SupervisorRX State Handler' incorporates:
   //   SubSystem: '<Root>/CAN Message Handler'
 
-  Supervis_CANMessageHandler_Init();
+  SupervisorFSM_RX_CANMessageHandler_Init();
 
   // SystemInitialize for BusCreator: '<Root>/Bus Creator'
   rty_Flags->control_mode = SupervisorFSM_RX_B.controlModeDefined;
   rty_Flags->enable_sending_msg_status =
     SupervisorFSM_RX_B.enableSendingMsgStatus;
   rty_Flags->fault_button = false;
+  rty_Flags->enable_thermal_protection = SupervisorFSM_RX_ConstB.Constant5;
 
-  // SystemInitialize for BusCreator: '<Root>/Bus Creator1'
+  // SystemInitialize for BusCreator: '<Root>/Bus Creator1' incorporates:
+  //   Constant: '<Root>/Constant4'
+
   rty_ConfigurationParameters->motorconfig = SupervisorFSM_RX_B.motorConfig;
   rty_ConfigurationParameters->estimationconfig =
     SupervisorFSM_RX_B.estimationConfig;
@@ -1295,6 +1307,8 @@ void SupervisorFSM_RX_Init(Flags *rty_Flags, ConfigurationParameters
   rty_ConfigurationParameters->VelLoopPID = SupervisorFSM_RX_B.VelocityPID;
   rty_ConfigurationParameters->DirLoopPID = SupervisorFSM_RX_B.OpenLoopPID;
   rty_ConfigurationParameters->thresholds = SupervisorFSM_RX_B.thresholds;
+  rty_ConfigurationParameters->environment_temperature =
+    InitConfParams.environment_temperature;
 }
 
 // Output and update for referenced model: 'SupervisorFSM_RX'
@@ -1307,39 +1321,39 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
                       Targets *rty_Targets, ConfigurationParameters
                       *rty_ConfigurationParameters)
 {
-  real32_T rtb_UnitDelay_thresholds_motorO;
-  SupervisorFSM_R_rtu_SensorsData = rtu_SensorsData;
-  SupervisorFS_rtu_ControlOutputs = rtu_ControlOutputs;
+  real32_T rtb_UnitDelay_thresholds_motorOverloadCurrents;
+  SupervisorFSM_RX_rtu_SensorsData = rtu_SensorsData;
+  SupervisorFSM_RX_rtu_ControlOutputs = rtu_ControlOutputs;
   SupervisorFSM_RX_rtu_MessagesRx = rtu_MessagesRx;
   SupervisorFSM_RX_rtu_StatusRx = rtu_StatusRx;
   SupervisorFSM_RX_rtu_ErrorsRx = rtu_ErrorsRx;
 
   // UnitDelay: '<Root>/Unit Delay'
-  rtb_UnitDelay_thresholds_motorO =
+  rtb_UnitDelay_thresholds_motorOverloadCurrents =
     SupervisorFSM_RX_DW.UnitDelay_DSTATE.thresholds.motorOverloadCurrents;
 
   // Chart: '<Root>/SupervisorRX State Handler' incorporates:
   //   UnitDelay: '<Root>/Unit Delay'
 
   SupervisorFSM_RX_DW.ExternalFlags_fault_button_prev =
-    SupervisorFSM_RX_DW.ExternalFlags_fault_button_star;
-  SupervisorFSM_RX_DW.ExternalFlags_fault_button_star =
+    SupervisorFSM_RX_DW.ExternalFlags_fault_button_start;
+  SupervisorFSM_RX_DW.ExternalFlags_fault_button_start =
     rtu_ExternalFlags->fault_button;
   if (SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX == 0U) {
     SupervisorFSM_RX_DW.ExternalFlags_fault_button_prev =
       rtu_ExternalFlags->fault_button;
-    SupervisorFSM_RX_DW.ExternalFlags_fault_button_star =
+    SupervisorFSM_RX_DW.ExternalFlags_fault_button_start =
       rtu_ExternalFlags->fault_button;
     SupervisorFSM_RX_DW.is_active_c2_SupervisorFSM_RX = 1U;
     SupervisorFSM_RX_DW.is_active_STATE_HANDLER = 1U;
-    SupervisorFSM_RX_DW.is_STATE_HANDLER = SupervisorFS_IN_NotConfigured_g;
+    SupervisorFSM_RX_DW.is_STATE_HANDLER = SupervisorFSM_RX_IN_NotConfigured_g;
     SupervisorFSM_RX_B.BoardSt = BoardState_NotConfigured;
     SupervisorFSM_RX_DW.is_active_FAULT_HANDLER = 1U;
     SupervisorFSM_RX_DW.is_active_FaultButtonPressed = 1U;
     SupervisorFSM_RX_DW.is_FaultButtonPressed = SupervisorFSM_RX_IN_NoFault;
     SupervisorFSM_RX_B.isFaultButtonPressed = false;
     SupervisorFSM_RX_DW.is_active_OverCurrent = 1U;
-    SupervisorFSM_RX_DW.is_OverCurrent = Superviso_IN_LimitNonConfigured;
+    SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_LimitNonConfigured;
     SupervisorFSM_RX_DW.is_active_CAN_MESSAGES_FOR_LOOP = 1U;
 
     // Outputs for Function Call SubSystem: '<Root>/PID Handler'
@@ -1354,7 +1368,7 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
     SupervisorFSM_RX_B.messageIndex = 1;
     while (SupervisorFSM_RX_B.messageIndex <= CAN_MAX_NUM_PACKETS) {
       // Outputs for Function Call SubSystem: '<Root>/CAN Message Handler'
-      SupervisorFSM_CANMessageHandler();
+      SupervisorFSM_RX_CANMessageHandler();
 
       // End of Outputs for SubSystem: '<Root>/CAN Message Handler'
       SupervisorFSM_RX_B.messageIndex++;
@@ -1372,9 +1386,9 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
         SupervisorFSM_RX_B.BoardSt = BoardState_Fault;
         break;
 
-       case SupervisorFS_IN_NotConfigured_g:
+       case SupervisorFSM_RX_IN_NotConfigured_g:
         SupervisorFSM_RX_B.BoardSt = BoardState_NotConfigured;
-        if (SupervisorFSM_isBoardConfigured()) {
+        if (SupervisorFSM_RX_isBoardConfigured()) {
           SupervisorFSM_RX_DW.is_STATE_HANDLER = SupervisorFSM_RX_IN_Configured;
           SupervisorFSM_RX_B.BoardSt = BoardState_Configured;
         }
@@ -1385,11 +1399,11 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
     if (SupervisorFSM_RX_DW.is_active_FAULT_HANDLER != 0U) {
       if (SupervisorFSM_RX_DW.is_active_FaultButtonPressed != 0U) {
         switch (SupervisorFSM_RX_DW.is_FaultButtonPressed) {
-         case SupervisorFSM__IN_ButtonPressed:
+         case SupervisorFSM_RX_IN_ButtonPressed:
           SupervisorFSM_RX_B.isFaultButtonPressed = true;
           if ((SupervisorFSM_RX_DW.ExternalFlags_fault_button_prev !=
-               SupervisorFSM_RX_DW.ExternalFlags_fault_button_star) &&
-              (!SupervisorFSM_RX_DW.ExternalFlags_fault_button_star)) {
+               SupervisorFSM_RX_DW.ExternalFlags_fault_button_start) &&
+              (!SupervisorFSM_RX_DW.ExternalFlags_fault_button_start)) {
             SupervisorFSM_RX_DW.is_FaultButtonPressed =
               SupervisorFSM_RX_IN_NoFault;
             SupervisorFSM_RX_B.isFaultButtonPressed = false;
@@ -1399,14 +1413,14 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
          case SupervisorFSM_RX_IN_NoFault:
           SupervisorFSM_RX_B.isFaultButtonPressed = false;
           if ((SupervisorFSM_RX_DW.ExternalFlags_fault_button_prev !=
-               SupervisorFSM_RX_DW.ExternalFlags_fault_button_star) &&
-              SupervisorFSM_RX_DW.ExternalFlags_fault_button_star) {
+               SupervisorFSM_RX_DW.ExternalFlags_fault_button_start) &&
+              SupervisorFSM_RX_DW.ExternalFlags_fault_button_start) {
             SupervisorFSM_RX_DW.is_FaultButtonPressed =
-              SupervisorFSM__IN_ButtonPressed;
+              SupervisorFSM_RX_IN_ButtonPressed;
             SupervisorFSM_RX_B.isFaultButtonPressed = true;
 
             // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
-            Superv_ControlModeHandlerMotor0();
+            SupervisorFSM_RX_ControlModeHandlerMotor0();
 
             // End of Outputs for SubSystem: '<Root>/Control Mode Handler Motor 0' 
           }
@@ -1416,7 +1430,7 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
 
       if (SupervisorFSM_RX_DW.is_active_OverCurrent != 0U) {
         switch (SupervisorFSM_RX_DW.is_OverCurrent) {
-         case Superviso_IN_LimitNonConfigured:
+         case SupervisorFSM_RX_IN_LimitNonConfigured:
           if (SupervisorFSM_RX_B.areLimitsSet) {
             SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
             SupervisorFSM_RX_B.isInOverCurrent = false;
@@ -1428,23 +1442,24 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
          case SupervisorFSM_RX_IN_NoFault:
           SupervisorFSM_RX_B.isInOverCurrent = false;
           if (std::abs(rtu_EstimatedData->Iq_filtered.current) >=
-              rtb_UnitDelay_thresholds_motorO) {
-            SupervisorFSM_RX_DW.is_OverCurrent = SupervisorF_IN_OverCurrentFault;
+              rtb_UnitDelay_thresholds_motorOverloadCurrents) {
+            SupervisorFSM_RX_DW.is_OverCurrent =
+              SupervisorFSM_RX_IN_OverCurrentFault;
 
             // MotorFaultFlags.overCurrent=1;
             SupervisorFSM_RX_B.isInOverCurrent = true;
 
             // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
-            Superv_ControlModeHandlerMotor0();
+            SupervisorFSM_RX_ControlModeHandlerMotor0();
 
             // End of Outputs for SubSystem: '<Root>/Control Mode Handler Motor 0' 
           }
           break;
 
-         case SupervisorF_IN_OverCurrentFault:
+         case SupervisorFSM_RX_IN_OverCurrentFault:
           SupervisorFSM_RX_B.isInOverCurrent = true;
           if (std::abs(rtu_EstimatedData->Iq_filtered.current) <
-              rtb_UnitDelay_thresholds_motorO) {
+              rtb_UnitDelay_thresholds_motorOverloadCurrents) {
             SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
             SupervisorFSM_RX_B.isInOverCurrent = false;
 
@@ -1461,7 +1476,7 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
       SupervisorFSM_RX_B.messageIndex = 1;
       while (SupervisorFSM_RX_B.messageIndex <= CAN_MAX_NUM_PACKETS) {
         // Outputs for Function Call SubSystem: '<Root>/CAN Message Handler'
-        SupervisorFSM_CANMessageHandler();
+        SupervisorFSM_RX_CANMessageHandler();
 
         // End of Outputs for SubSystem: '<Root>/CAN Message Handler'
         SupervisorFSM_RX_B.messageIndex++;
@@ -1478,8 +1493,11 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
   rty_Flags->enable_sending_msg_status =
     SupervisorFSM_RX_B.enableSendingMsgStatus;
   rty_Flags->fault_button = SupervisorFSM_RX_B.isFaultButtonPressed;
+  rty_Flags->enable_thermal_protection = SupervisorFSM_RX_ConstB.Constant5;
 
-  // BusCreator: '<Root>/Bus Creator1'
+  // BusCreator: '<Root>/Bus Creator1' incorporates:
+  //   Constant: '<Root>/Constant4'
+
   rty_ConfigurationParameters->motorconfig = SupervisorFSM_RX_B.motorConfig;
   rty_ConfigurationParameters->estimationconfig =
     SupervisorFSM_RX_B.estimationConfig;
@@ -1488,6 +1506,8 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
   rty_ConfigurationParameters->VelLoopPID = SupervisorFSM_RX_B.VelocityPID;
   rty_ConfigurationParameters->DirLoopPID = SupervisorFSM_RX_B.OpenLoopPID;
   rty_ConfigurationParameters->thresholds = SupervisorFSM_RX_B.thresholds;
+  rty_ConfigurationParameters->environment_temperature =
+    InitConfParams.environment_temperature;
 
   // Switch: '<Root>/Switch2' incorporates:
   //   BusCreator: '<Root>/Bus Creator2'

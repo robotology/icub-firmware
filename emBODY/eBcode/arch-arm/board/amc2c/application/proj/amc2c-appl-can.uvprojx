@@ -1009,6 +1009,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
+            <File>
+              <FileName>SupervisorFSM_RX_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\amcbldc\application\src\model-based-design\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1078,6 +1083,16 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::thermal-model</GroupName>
+          <Files>
+            <File>
+              <FileName>thermal_model.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\amcbldc\application\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1417,7 +1432,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC2C STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\amcbldc\application\src\model-based-design\sharedutils;..\..\..\amcbldc\application\src\model-based-design\can-decoder;..\..\..\amcbldc\application\src\model-based-design\can-encoder;..\..\..\amcbldc\application\src\model-based-design\supervisor-rx;..\..\..\amcbldc\application\src\model-based-design\supervisor-tx;..\..\..\amcbldc\application\src\model-based-design\control-outer;..\..\..\amcbldc\application\src\model-based-design\control-foc;..\..\..\amcbldc\application\src\model-based-design\estimator;..\..\..\amcbldc\application\src\model-based-design\amc-bldc;..\..\..\amcbldc\application\src\model-based-design\filter-current;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal</IncludePath>
+              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\amcbldc\application\src\model-based-design\sharedutils;..\..\..\amcbldc\application\src\model-based-design\can-decoder;..\..\..\amcbldc\application\src\model-based-design\can-encoder;..\..\..\amcbldc\application\src\model-based-design\supervisor-rx;..\..\..\amcbldc\application\src\model-based-design\supervisor-tx;..\..\..\amcbldc\application\src\model-based-design\control-outer;..\..\..\amcbldc\application\src\model-based-design\control-foc;..\..\..\amcbldc\application\src\model-based-design\estimator;..\..\..\amcbldc\application\src\model-based-design\amc-bldc;..\..\..\amcbldc\application\src\model-based-design\filter-current;..\..\..\amcbldc\application\src\model-based-design\thermal-model;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2188,6 +2203,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
+            <File>
+              <FileName>SupervisorFSM_RX_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\amcbldc\application\src\model-based-design\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2257,6 +2277,16 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::thermal-model</GroupName>
+          <Files>
+            <File>
+              <FileName>thermal_model.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\amcbldc\application\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3316,6 +3346,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
+            <File>
+              <FileName>SupervisorFSM_RX_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\amcbldc\application\src\model-based-design\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3385,6 +3420,16 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\amcbldc\application\src\model-based-design\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::thermal-model</GroupName>
+          <Files>
+            <File>
+              <FileName>thermal_model.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\amcbldc\application\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
             </File>
           </Files>
         </Group>

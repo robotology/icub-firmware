@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 5.9
+// Model version                  : 6.4
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:45:52 2023
+// C/C++ source code generated on : Tue Jun 27 10:17:32 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -33,11 +33,11 @@
 
 struct B_SupervisorFSM_RX_c_T {
   Thresholds thresholds;               // '<S3>/Chart'
+  MotorConfig motorConfig;             // '<S1>/CAN Event Dispatcher'
   PIDConfig CurrentPID;                // '<S4>/Chart'
   PIDConfig VelocityPID;               // '<S4>/Chart'
   PIDConfig PositionPID;               // '<S4>/Chart'
   PIDConfig OpenLoopPID;               // '<S4>/Chart'
-  MotorConfig motorConfig;             // '<S1>/CAN Event Dispatcher'
   Targets targets;                     // '<S5>/Chart1'
   BUS_MSG_PID newPID;                  // '<S1>/CAN Event Dispatcher'
   SV_Limits newLimit;                  // '<S1>/CAN Event Dispatcher'
@@ -81,7 +81,16 @@ struct DW_SupervisorFSM_RX_f_T {
   uint8_T is_c12_SupervisorFSM_RX;     // '<S2>/ControlMode_SM_motor0'
   uint8_T is_active_c4_SupervisorFSM_RX;// '<S5>/Chart1'
   boolean_T ExternalFlags_fault_button_prev;// '<Root>/SupervisorRX State Handler' 
-  boolean_T ExternalFlags_fault_button_star;// '<Root>/SupervisorRX State Handler' 
+  boolean_T ExternalFlags_fault_button_start;// '<Root>/SupervisorRX State Handler' 
+};
+
+#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
+
+// Invariant block signals for model 'SupervisorFSM_RX'
+#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
+
+struct ConstB_SupervisorFSM_RX_h_T {
+  boolean_T Constant5;                 // '<Root>/Constant5'
 };
 
 #endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
@@ -113,6 +122,7 @@ struct MdlrefDW_SupervisorFSM_RX_T {
 
 extern ConfigurationParameters InitConfParams;// Variable: InitConfParams
                                                  //  Referenced by:
+                                                 //    '<Root>/Constant4'
                                                  //    '<S1>/CAN Event Dispatcher'
                                                  //    '<S3>/Chart'
                                                  //    '<S4>/Chart'
@@ -131,15 +141,15 @@ extern void SupervisorFSM_RX_initialize(const char_T **rt_errorStatus);
 
 #ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 
-extern void Supervisor_SetpointHandler_Init(void);
-extern void SupervisorFSM_R_SetpointHandler(void);
-extern void Superv_ControlModeHandlerMotor0(void);
-extern void SupervisorFS_LimitsHandler_Init(void);
+extern void SupervisorFSM_RX_SetpointHandler_Init(void);
+extern void SupervisorFSM_RX_SetpointHandler(void);
+extern void SupervisorFSM_RX_ControlModeHandlerMotor0(void);
+extern void SupervisorFSM_RX_LimitsHandler_Init(void);
 extern void SupervisorFSM_RX_LimitsHandler(void);
-extern void SupervisorFSM_R_PIDHandler_Init(void);
+extern void SupervisorFSM_RX_PIDHandler_Init(void);
 extern void SupervisorFSM_RX_PIDHandler(void);
-extern void Supervis_CANMessageHandler_Init(void);
-extern void SupervisorFSM_CANMessageHandler(void);
+extern void SupervisorFSM_RX_CANMessageHandler_Init(void);
+extern void SupervisorFSM_RX_CANMessageHandler(void);
 
 #endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 

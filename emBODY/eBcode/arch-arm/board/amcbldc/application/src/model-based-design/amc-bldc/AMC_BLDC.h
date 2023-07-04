@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 6.1
+// Model version                  : 6.17
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Thu Apr  6 14:47:14 2023
+// C/C++ source code generated on : Tue Jun 27 10:19:19 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,11 @@
 #define RTW_HEADER_AMC_BLDC_h_
 #include "rtwtypes.h"
 #include "AMC_BLDC_types.h"
+#include "control_foc.h"
+#include "estimation_velocity.h"
+#include "filter_current.h"
+#include "control_outer.h"
+#include "thermal_model.h"
 #include <stddef.h>
 #include "zero_crossing_types.h"
 
@@ -46,51 +51,79 @@
 
 // Block signals (default storage)
 struct B_AMC_BLDC_T {
-  FOCSlowInputs BusConversion_InsertedFor_FOC_a;
+  FOCSlowInputs BusConversion_InsertedFor_FOC_at_inport_1_BusCreator1;
   BUS_MESSAGES_RX_MULTIPLE CAN_Decoder_o1;// '<S6>/CAN_Decoder'
-  ConfigurationParameters ZOHBlockInsertedForAdapter_Inse;// '<Root>/Adapter4'
+  ConfigurationParameters
+    ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0;// '<Root>/Adapter4' 
   BUS_MESSAGES_TX MessagesTx;          // '<S7>/SupervisorFSM_TX'
-  SensorsData RTBInsertedForAdapter_InsertedF;// '<Root>/Adapter3'
-  ControlOutputs RTBInsertedForAdapter_Inserte_a;// '<Root>/Adapter1'
+  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0;// '<Root>/Adapter1' 
+  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0;// '<Root>/Adapter3' 
   BUS_STATUS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
   BUS_CAN_RX_ERRORS_MULTIPLE CAN_Decoder_o3;// '<S6>/CAN_Decoder'
 };
 
 // Block states (default storage) for system '<Root>'
 struct DW_AMC_BLDC_T {
-  ConfigurationParameters ZOHBlockInsertedForAdapter_Inse;// synthesized block
-  ConfigurationParameters RTBInsertedForAdapter_InsertedF[3];// synthesized block 
-  SensorsData RTBInsertedForAdapter_Inserte_e;// synthesized block
-  SensorsData RTBInsertedForAdapter_Inserte_c;// synthesized block
-  SensorsData RTBInsertedForAdapter_Inserte_j;// synthesized block
-  Targets RTBInsertedForAdapter_Inserte_m[3];// synthesized block
-  ControlOutputs RTBInsertedForAdapter_Inserte_d;// synthesized block
-  ControlOutputs RTBInsertedForAdapter_Insert_j2;// synthesized block
-  ControlOutputs RTBInsertedForAdapter_Inserte_o;// synthesized block
-  ControlOuterOutputs RTBInsertedForAdapter_Inserte_i[3];// synthesized block
-  EstimatedData RTBInsertedForAdapter_Inserte_k[3];// synthesized block
-  Flags RTBInsertedForAdapter_Inserte_l[3];// synthesized block
-  void* RTBInsertedForAdapter_Insert_mf;// synthesized block
-  void* RTBInsertedForAdapter_Inserte_b;// synthesized block
-  void* RTBInsertedForAdapter_Inserte_f;// synthesized block
-  void* RTBInsertedForAdapter_Insert_ey;// synthesized block
-  void* RTBInsertedForAdapter_Insert_ci;// synthesized block
-  void* RTBInsertedForAdapter_Inserte_h;// synthesized block
-  void* RTBInsertedForAdapter_Insert_bz;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_hj;// synthesized block
-  int8_T RTBInsertedForAdapter_Inserte_p;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_mp;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_m3;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_b2;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_ko;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_jj;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_mb;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_p5;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_bw;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_js;// synthesized block
-  int8_T RTBInsertedForAdapter_Inserte_a;// synthesized block
-  int8_T RTBInsertedForAdapter_Inserte_g;// synthesized block
-  int8_T RTBInsertedForAdapter_Insert_pa;// synthesized block
+  ConfigurationParameters
+    ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0;// synthesized block 
+  ConfigurationParameters
+    RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Bu[3];// synthesized block 
+  ConfigurationParameters
+    RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf0;// synthesized block 
+  ConfigurationParameters
+    RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf1;// synthesized block 
+  ConfigurationParameters
+    RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf2;// synthesized block 
+  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf0;// synthesized block 
+  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf1;// synthesized block 
+  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf2;// synthesized block 
+  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf0;// synthesized block 
+  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf1;// synthesized block 
+  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf2;// synthesized block 
+  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_e;// synthesized block 
+  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_c;// synthesized block 
+  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_j;// synthesized block 
+  Targets RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_Bu[3];// synthesized block 
+  EstimatedData RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_Bu[3];// synthesized block 
+  ControlOuterOutputs
+    RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Bu[3];// synthesized block 
+  Flags RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Bu[3];// synthesized block 
+  MotorTemperature RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf[3];// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_SE;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_SE;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_SE;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_SE;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_SE;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_SEMA;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_SEMA;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_SE_l;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_SE_b;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_SEMAP;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Ls;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_RD;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Ls;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_RD;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_Ls;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_RD;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_Ls;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_RD;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Ls;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_RD;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_LstB;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RDBu;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_LstB;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RDBu;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Ls_j;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RD_a;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Ls_g;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RD_p;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_LstBu;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_RDBuf;// synthesized block 
+  MdlrefDW_control_foc_T FOC_InstanceData;// '<Root>/FOC'
+  MdlrefDW_estimation_velocity_T Estimation_Velocity_InstanceData;// '<S5>/Estimation_Velocity' 
+  MdlrefDW_filter_current_T Filter_Current_InstanceData;// '<S5>/Filter_Current' 
+  MdlrefDW_control_outer_T OuterControl_InstanceData;// '<Root>/OuterControl'
+  MdlrefDW_thermal_model_T Estimation_Temperature_InstanceData;// '<S5>/Estimation_Temperature' 
 };
 
 // External inputs (root inport signals with default storage)
@@ -120,7 +153,7 @@ struct tag_RTM_AMC_BLDC_T {
 
   struct {
     struct {
-      uint32_T TID[3];
+      uint32_T TID[4];
     } TaskCounters;
   } Timing;
 };
@@ -200,7 +233,8 @@ extern "C"
   extern void AMC_BLDC_initialize(void);
   extern void AMC_BLDC_step0(void);
   extern void AMC_BLDC_step_FOC(void);
-  extern void AMC_BLDC_step_Time(void);
+  extern void AMC_BLDC_step_Time_1ms(void);
+  extern void AMC_BLDC_step_Time_10ms(void);
   extern void AMC_BLDC_terminate(void);
 
 #ifdef __cplusplus
@@ -248,7 +282,9 @@ extern "C"
 //  '<S6>'   : 'AMC_BLDC/Messaging'
 //  '<S7>'   : 'AMC_BLDC/Supervision'
 //  '<S8>'   : 'AMC_BLDC/Estimation/Adapter'
-//  '<S9>'   : 'AMC_BLDC/Estimation/Mux'
+//  '<S9>'   : 'AMC_BLDC/Estimation/Adapter1'
+//  '<S10>'  : 'AMC_BLDC/Estimation/Adapter3'
+//  '<S11>'  : 'AMC_BLDC/Estimation/Mux'
 
 #endif                                 // RTW_HEADER_AMC_BLDC_h_
 
