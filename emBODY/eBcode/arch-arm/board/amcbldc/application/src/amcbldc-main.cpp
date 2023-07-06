@@ -20,7 +20,7 @@ constexpr uint8_t minor =
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 {   
-    embot::prot::can::versionOfAPPLICATION {1, minor, 12},    
+    embot::prot::can::versionOfAPPLICATION {1, minor, 13},    
     embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
