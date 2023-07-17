@@ -19,9 +19,6 @@
 #ifndef MC_CALIBRATION_HELPER_DATA_H___
 #define MC_CALIBRATION_HELPER_DATA_H___
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "EOemsControllerCfg.h"
 
@@ -43,9 +40,6 @@ typedef struct // CableCalib
 } CableCalib;
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard
 

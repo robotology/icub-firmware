@@ -20,20 +20,13 @@
 #ifndef _EOEMSCONTROLLER_CFG_H_
 #define _EOEMSCONTROLLER_CFG_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
         
- // - external dependencies --------------------------------------------------------------------------------------------
+// - external dependencies --------------------------------------------------------------------------------------------
 
-//#include "EoCommon.h"
-//#include "EOMtheEMSapplCfg_cfg.h"
-    
-//#include "EOappEncodersReader.h"
-    
+#include "EoCommon.h"
 #include "EOtheMemoryPool.h"
- 
- // - public #define  --------------------------------------------------------------------------------------------------
+
+// - public #define  --------------------------------------------------------------------------------------------------
 
 
 #if !defined(EOTHESERVICES_customize_handV3_7joints)
@@ -170,9 +163,7 @@ typedef enum {
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
- #ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
+
 
 #endif  // include guard
 

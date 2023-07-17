@@ -1596,7 +1596,7 @@
 
   <Group>
     <GroupName>rtos</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3623,7 +3623,7 @@
     <File>
       <GroupNumber>34</GroupNumber>
       <FileNumber>164</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -3672,7 +3672,7 @@
       <GroupNumber>34</GroupNumber>
       <FileNumber>168</FileNumber>
       <FileType>8</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\embobj\plus\mc\JointSet.c</PathWithFileName>
@@ -3683,7 +3683,7 @@
     <File>
       <GroupNumber>34</GroupNumber>
       <FileNumber>169</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -3695,7 +3695,7 @@
     <File>
       <GroupNumber>34</GroupNumber>
       <FileNumber>170</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -3707,7 +3707,7 @@
     <File>
       <GroupNumber>34</GroupNumber>
       <FileNumber>171</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -3719,7 +3719,7 @@
     <File>
       <GroupNumber>34</GroupNumber>
       <FileNumber>172</FileNumber>
-      <FileType>1</FileType>
+      <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>

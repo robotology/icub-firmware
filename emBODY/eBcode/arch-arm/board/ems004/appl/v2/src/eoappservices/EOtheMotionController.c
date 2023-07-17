@@ -2651,7 +2651,7 @@ static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eO
     {
         if(encoder->errortype != encreader_err_NONE)
         {
-            MController_invalid_absEncoder_fbk(index, (ae_errortype_t)encoder->errortype);
+            MController_invalid_absEncoder_fbk(index, (uint8_t)encoder->errortype);
             res = eores_NOK_generic;
         }
         else

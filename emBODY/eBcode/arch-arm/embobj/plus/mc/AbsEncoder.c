@@ -16,18 +16,23 @@
  * Public License foFITNESSr more details
 */
 
+#if !defined(__cplusplus)
+    #error this AbsEncoder.c file must be compiled in C++
+#endif
+    
+// - API    
+#include "AbsEncoder.h"
+    
+    
+// - dependencies
 #include "EoCommon.h"
-
 #include "EoError.h"
 #include "EOtheErrorManager.h"
-
 #include "EOtheEntities.h"
-
 #include "EOMtheEMSrunner.h"
-
 #include "EOemsControllerCfg.h"
 
-#include "AbsEncoder.h"
+
 
 #if defined(USE_EMBOT_theServices) 
 #warning removed some code

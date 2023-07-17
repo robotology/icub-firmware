@@ -16,17 +16,25 @@
  * Public License foFITNESSr more details
 */
 
-#include "Joint_hid.h"
+#if !defined(__cplusplus)
+    #error this Joint.c file must be compiled in C++
+#endif
+
+// - API
+#include "Joint.h"
+    
+    
+// - dependencies
 
 #include "hal_adc.h"
-
 #include "EOtheCANprotocol.h"
-
 #include "EOtheErrorManager.h"
 #include "EoError.h"
-
 #include "EOtheEntities.h"
-
+   
+// - OPAQUE STRUCT    
+#include "Joint_hid.h"
+    
 static void Joint_set_inner_control_flags(Joint* o);
 static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 

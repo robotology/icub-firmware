@@ -19,15 +19,9 @@
 #ifndef MC_ABS_ENCODER_H___
 #define MC_ABS_ENCODER_H___
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "EoCommon.h"
-
-//#include "EOtheEncoderReader.h"
 #include "EoMotionControl.h"
-
 #include "EOemsControllerCfg.h"
 
 /////////////////////////////////////////////////////////
@@ -183,9 +177,6 @@ extern void AbsEncoder_start_hard_stop_calibrate(AbsEncoder* o, int32_t hard_sto
 extern BOOL AbsEncoder_is_hard_stop_calibrating(AbsEncoder* o);
 extern void AbsEncoder_calibrate_in_hard_stop(AbsEncoder* o);
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard
 

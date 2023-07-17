@@ -3,9 +3,6 @@
 
 #include "kalman_filter.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
     
 #include "Joint.h"
 
@@ -100,9 +97,6 @@ struct Joint_hid // Joint
 #endif 
 };
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard
 

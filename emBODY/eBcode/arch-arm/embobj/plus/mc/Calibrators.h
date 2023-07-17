@@ -23,9 +23,6 @@
 #include "JointSet.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "EOemsControllerCfg.h"
 
@@ -45,9 +42,6 @@ extern BOOL JointSet_do_wait_calibration_14(JointSet* o);
 extern BOOL JointSet_do_wait_calibration_mixed(JointSet* o); //calib type 6 and 7
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard
 

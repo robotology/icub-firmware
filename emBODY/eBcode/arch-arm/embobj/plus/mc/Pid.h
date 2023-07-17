@@ -19,9 +19,6 @@
 #ifndef MC_PID_H___
 #define MC_PID_H___
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "EoCommon.h"
 #include "EoMotionControl.h"
@@ -80,9 +77,6 @@ extern float PID_do_out(PID* o, float En);
 extern float PID_do_friction_comp(PID *o, float vel, float Tr);
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard
 

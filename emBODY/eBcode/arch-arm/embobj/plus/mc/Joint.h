@@ -19,9 +19,6 @@
 #ifndef MC_JOINT___
 #define MC_JOINT___
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "EoCommon.h"
 #include "EOemsControllerCfg.h"
@@ -172,10 +169,7 @@ extern BOOL Joint_set_pos_ref_in_calibType14(Joint* o, CTRL_UNITS pos_ref, CTRL_
 
 //VALE: debug function. I'll remove it ASAP
 //extern void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep);
-
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
+ 
  
 #endif  // include-guard
 

@@ -16,7 +16,15 @@
  * Public License foFITNESSr more details
 */
 
+#if !defined(__cplusplus)
+    #error this Trajectory.c file must be compiled in C++
+#endif
+
+// - API
 #include "Trajectory.h"
+
+// - dependencies
+// none
 
 Trajectory* Trajectory_new(uint8_t n) 
 {

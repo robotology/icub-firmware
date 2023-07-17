@@ -15,9 +15,19 @@
  * MERCHANTABILITY or  FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License foFITNESSr more details
 */
+
+#if !defined(__cplusplus)
+    #error this Pid.c file must be compiled in C++
+#endif
+
+// - API
+#include "Pid.h"  
+
+// - dependencies    
 #include "EOtheErrorManager.h"
 #include "EoError.h"
-static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+    
+static void send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {
     eOerrmanDescriptor_t errdes = {0};
     errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
@@ -29,7 +39,7 @@ static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint6
     //eo_errman_Info(eo_errman_GetHandle(), message, "", &errdes);
 }
 
-#include "Pid.h"
+
 PID* PID_new(uint8_t n)
 {
     PID *o = NEW(PID, n);

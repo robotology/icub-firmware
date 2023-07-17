@@ -19,9 +19,6 @@
 #ifndef MC_TRAJECTORY_H___
 #define MC_TRAJECTORY_H___
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "EoCommon.h"
 
@@ -91,10 +88,6 @@ extern float Trajectory_get_target_position(Trajectory* o);
 extern float Trajectory_get_target_velocity(Trajectory* o);
 
 
-
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard
 

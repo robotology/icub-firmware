@@ -22,9 +22,6 @@
 #ifndef MC_MOTOR_H___
 #define MC_MOTOR_H___
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "EoCommon.h"
 #include "EoMotionControl.h"
@@ -323,10 +320,7 @@ extern int32_t Motor_get_vel_fbk(Motor* o);
 extern CTRL_UNITS Motor_get_trq_fbk(Motor* o);
 */
 
-
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
+ 
  
 #endif  // include-guard
 

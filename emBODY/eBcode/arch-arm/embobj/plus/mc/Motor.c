@@ -16,16 +16,21 @@
  * Public License foFITNESSr more details
 */
 
-//#include "stdlib.h"
-//#include <string.h>
+#if !defined(__cplusplus)
+    #error this Motor.c file must be compiled in C++
+#endif
 
+// - API
+#include "Motor.h"
+    
+// - dependencies   
 #include "EoCommon.h"
 #include "iCubCanProto_types.h"
 #include "EoProtocol.h"
 #include "EOtheCANprotocol.h"
 #include "EOtheCANservice.h"
 #include "hal_motor.h"
-#include "Motor.h"
+
 #include "hal_led.h"
 
 #include "EOtheErrorManager.h"
@@ -48,7 +53,7 @@ static void pmc_motor_disable(eObrd_canlocation_t canloc);
 /////////////////////////////////////////////////////////
 // Motor
 
-static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+static void send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {
 
     eOerrmanDescriptor_t errdes = {0};

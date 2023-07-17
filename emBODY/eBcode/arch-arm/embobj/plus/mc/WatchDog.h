@@ -19,9 +19,6 @@
 #ifndef MC_WATCHDOG___
 #define MC_WATCHDOG___
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "EoCommon.h"
 
@@ -45,9 +42,6 @@ extern void Watchdog_disarm(WatchDog* o);
 extern BOOL WatchDog_check_expired(WatchDog* o);
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard
 
