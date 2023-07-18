@@ -55,6 +55,9 @@ struct embot::app::application::theCANagentCORE::Impl
 bool embot::app::application::theCANagentCORE::Impl::initialise(const Config &config)
 {
     _config = config;
+    
+    // make sure to synch the application version and can protocol to the eeprom storage
+    embot::app::theCANboardInfo::getInstance().synch(_config.applicationinfo.version, _config.applicationinfo.protocol);
             
     // retrieve board type, version of application, can address
     // we use the object theCANboardInfo which is based onto FlashStorage which manages 
