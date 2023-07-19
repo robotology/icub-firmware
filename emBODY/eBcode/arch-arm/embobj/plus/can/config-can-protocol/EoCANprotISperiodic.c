@@ -97,10 +97,10 @@ EO_weak extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIOD
 
 extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_GYROSCOPE(eOcanframe_t *frame, eOcanport_t port)
 {
-    if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(frame, port))
-    {
-        return(eores_OK);
-    }
+    //if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(frame, port))
+    //{
+    //    return(eores_OK);
+    //}
     
     // both can be safely called. because if one services is not active the function will do nothing
     eo_inertials2_AcceptCANframe(eo_inertials2_GetHandle(), frame, port, eoas_inertial_gyros_mtb_ext);    
@@ -112,10 +112,10 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_GYROSCOPE(eOcan
 extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(eOcanframe_t *frame, eOcanport_t port)
 {
     
-    if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(frame, port))
-    {
-        return(eores_OK);
-    }
+    //if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(frame, port))
+    //{
+    //    return(eores_OK);
+    //}
     
     // both can be safely called. because if one services is not active the function will do nothing
     eo_inertials2_AcceptCANframe(eo_inertials2_GetHandle(), frame, port, eoas_inertial_accel_mtb_int);

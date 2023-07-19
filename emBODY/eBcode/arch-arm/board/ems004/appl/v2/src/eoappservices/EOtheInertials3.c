@@ -508,7 +508,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     // now we have a complete array of targets and also numofboards. we do some checks ...
     
     // we check that we have at least one discovery target    
-    if(0 == eo_array_Size(p->sharedcan.discoverytargets))
+    if(eobool_false) //TODO raise error only if is 0 BUT we don't handle ems4 //0 == eo_array_Size(p->sharedcan.discoverytargets))
     {
         p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
         p->diagnostics.errorDescriptor.sourceaddress      = 0;
@@ -996,7 +996,6 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
                  
     return(eores_OK);        
 }
-
 
 
 extern eOresult_t eo_inertials3_Config(EOtheInertials3 *p, eOas_inertial3_config_t* config)
