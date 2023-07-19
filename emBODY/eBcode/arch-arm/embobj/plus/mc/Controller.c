@@ -16,40 +16,96 @@
  * Public License foFITNESSr more details
 */
 
+#if !defined(__cplusplus)
+    #error this Controller.c file must be compiled in C++
+#endif
+
+// - API
+#include "Controller.h"
+
+    
+// - dependencies
 #include "EoCommon.h"
-
 #include "EOtheMemoryPool.h"
-
-
 #include "EOemsControllerCfg.h"
-
 #include "EOtheErrorManager.h"
-
 #include "EoError.h"
-
 #include "EOtheEntities.h"
-
 #include "Joint_hid.h"
+#include "JointSet.h"
+#include "Joint.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
-
-#include "Controller.h"
-
 #include "hal_led.h"
-
 #include "hal_trace.h"
+#include "stdio.h"
+
+#ifdef WRIST_MK2
+#include "JointSet.h"
+#endif
+
+#include "Joint.h"
+#include "Motor.h"
+#include "AbsEncoder.h"
+#include "Pid.h"
+#ifndef WRIST_MK2
+#include "JointSet.h"
+#endif
+
+// - OPAQUE STRUCT
+
+struct MController_hid
+{
+    uint8_t nEncods;
+    uint8_t nJoints;
+    uint8_t nSets;
+    
+    JointSet *jointSet;
+    
+    uint8_t* set_dim;
+    uint8_t* enc_set_dim;
+    
+    uint8_t multi_encs;
+    
+    uint8_t** jos;
+    uint8_t** mos;
+    uint8_t** eos;
+    
+    uint8_t *j2s;
+    uint8_t *m2s;
+    uint8_t *e2s;
+    
+    Motor *motor;
+    Joint *joint;
+    
+    float **Jjm;
+    float **Jmj;
+    
+    float **Sjm;
+    float **Smj;
+    
+    float **Sje;
+    
+    uint8_t part_type;
+    uint8_t actuation_type;
+    
+    AbsEncoder *absEncoder;
+};
+
+
+
 
 MController* smc = NULL;
 
-#include "stdio.h"
+
 
 static char invert_matrix(float** M, float** I, char n);
 //static void MController_config_motor_set(MController* o);
 //static void MController_config_encoder_set(MController* o);
 
 
-//static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+//static void send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 //{
 
 //    eOerrmanDescriptor_t errdes = {0};
@@ -1745,7 +1801,7 @@ void MController_update_motor_state_fbk(uint8_t m, void* state)
     Motor_update_state_fbk(smc->motor+m, state);
 }
 
-void MController_invalid_absEncoder_fbk(uint8_t e, ae_errortype_t error_type) //
+void MController_invalid_absEncoder_fbk(uint8_t e, uint8_t error_type) //
 {
     //AbsEncoder_invalid(smc->absEncoder+e, error_type);
     
@@ -1753,7 +1809,7 @@ void MController_invalid_absEncoder_fbk(uint8_t e, ae_errortype_t error_type) //
     
     for (int k=0; k<smc->multi_encs; ++k)
     {
-        AbsEncoder_invalid(enc++, error_type);
+        AbsEncoder_invalid(enc++, static_cast<ae_errortype_t>(error_type));
     }
 }
 

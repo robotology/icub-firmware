@@ -134,7 +134,7 @@ static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eO
         if(encoder->errortype != encreader_err_NONE)
         {
 //#warning TODO-AMC-MC: add MController            
-            MController_invalid_absEncoder_fbk(index, (ae_errortype_t)encoder->errortype);
+            MController_invalid_absEncoder_fbk(index, static_cast<uint8_t>(encoder->errortype));
             res = eores_NOK_generic;
         }
         else

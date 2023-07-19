@@ -16,7 +16,15 @@
  * Public License foFITNESSr more details
 */
 
+#if !defined(__cplusplus)
+    #error this Calibrator.c file must be compiled in C++
+#endif
+
+// - API
 #include "Calibrators.h"
+    
+    
+// - dependencies    
 #include "JointSet.h"
 #include "Joint_hid.h"
 #include "CalibrationHelperData.h"

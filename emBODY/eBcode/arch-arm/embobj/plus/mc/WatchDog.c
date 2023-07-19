@@ -16,11 +16,18 @@
  * Public License foFITNESSr more details
 */
 
-#include "EoCommon.h"
+#if !defined(__cplusplus)
+    #error this Watchdog.c file must be compiled in C++
+#endif
 
+// - API
+#include "WatchDog.h"  
+
+// - dependencies    
+#include "EoCommon.h"
 #include "EOemsControllerCfg.h"
 
-#include "WatchDog.h"
+
 
 void WatchDog_init(WatchDog* o)
 {

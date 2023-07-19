@@ -19,62 +19,33 @@
 #ifndef MC_CONTROLLER___
 #define MC_CONTROLLER___
 
-#ifdef WRIST_MK2
-#include "JointSet.h"
-#endif
+// this file Controller.h is the entry point for the usage of this MController module.
+// the module can be used by C modules and also by C++ modules as long as:
+// - we keep the following extern "C" { clause,
+// - we dont add in here any C++ include files
+// We surely can use C++ code inside any other .h and .c files, such as AbsEncoder.[c, h], etc.
+// and we MUST compile the files using C++
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "EoCommon.h"
 
+// to see basic types
+#include "EoCommon.h"
+    
+// to see eOmn_serv_configuration_t etc
+#include "EoManagement.h"    
+
+// to see eOmc_joint_status_t etc
+#include "EoMotionControl.h"    
+    
+// to see CTRL_UNITS
 #include "EOemsControllerCfg.h"
 
-#include "Joint.h"
-#include "Motor.h"
-#include "AbsEncoder.h"
-#include "Pid.h"
-#ifndef WRIST_MK2
-#include "JointSet.h"
-#endif
-typedef struct //MController
-{
-    uint8_t nEncods;
-    uint8_t nJoints;
-    uint8_t nSets;
-    
-    JointSet *jointSet;
-    
-    uint8_t* set_dim;
-    uint8_t* enc_set_dim;
-    
-    uint8_t multi_encs;
-    
-    uint8_t** jos;
-    uint8_t** mos;
-    uint8_t** eos;
-    
-    uint8_t *j2s;
-    uint8_t *m2s;
-    uint8_t *e2s;
-    
-    Motor *motor;
-    Joint *joint;
-    
-    float **Jjm;
-    float **Jmj;
-    
-    float **Sjm;
-    float **Smj;
-    
-    float **Sje;
-    
-    uint8_t part_type;
-    uint8_t actuation_type;
-    
-    AbsEncoder *absEncoder;
-} MController;
+// need to use this opaque struct in order to 
+// remove from the interface any possible .h files, such as Joint.h etc, containing C++ code.
+typedef struct MController_hid MController;
 
 extern MController* MController_new(uint8_t nJoints, uint8_t nEncoders); //
 
@@ -91,7 +62,7 @@ extern void MController_update_motor_state_fbk(uint8_t m, void* state);
 extern void MController_update_joint_torque_fbk(uint8_t j, CTRL_UNITS trq_fbk); //
 extern void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions); //
 
-extern void MController_invalid_absEncoder_fbk(uint8_t e, ae_errortype_t error_type);
+extern void MController_invalid_absEncoder_fbk(uint8_t e, uint8_t error_type); // use ae_errortype_t or similar type
 
 extern void MController_timeout_absEncoder_fbk(uint8_t e);
 
@@ -144,10 +115,6 @@ extern void MController_update_motor_odometry_fbk_can(int m, void* data);
 
 extern void MController_motor_raise_fault_i2t(int m);
 
-////////////////////////////////////////////////////////////////////////
-
-//VALE: debug function. I'll remove it ASAP
-//void MController_updated_debug_current_info(int j, int32_t avgCurrent, int32_t accum_Ep);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

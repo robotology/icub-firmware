@@ -10,7 +10,7 @@
       <TargetName>mc2plus</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -1020,7 +1020,7 @@
             </File>
             <File>
               <FileName>AbsEncoder.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\AbsEncoder.c</FilePath>
             </File>
             <File>
@@ -1040,22 +1040,22 @@
             </File>
             <File>
               <FileName>Motor.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\Motor.c</FilePath>
             </File>
             <File>
               <FileName>Pid.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\Pid.c</FilePath>
             </File>
             <File>
               <FileName>Trajectory.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\Trajectory.c</FilePath>
             </File>
             <File>
               <FileName>WatchDog.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\WatchDog.c</FilePath>
             </File>
           </Files>
@@ -2326,7 +2326,7 @@
             </File>
             <File>
               <FileName>AbsEncoder.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\AbsEncoder.c</FilePath>
             </File>
             <File>
@@ -2346,22 +2346,22 @@
             </File>
             <File>
               <FileName>Motor.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\Motor.c</FilePath>
             </File>
             <File>
               <FileName>Pid.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\Pid.c</FilePath>
             </File>
             <File>
               <FileName>Trajectory.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\Trajectory.c</FilePath>
             </File>
             <File>
               <FileName>WatchDog.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\WatchDog.c</FilePath>
             </File>
           </Files>

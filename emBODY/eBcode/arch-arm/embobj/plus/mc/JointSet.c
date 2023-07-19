@@ -16,10 +16,16 @@
  * Public License foFITNESSr more details
 */
 
+#if !defined(__cplusplus)
+    #error this JointSet.c file must be compiled in C++
+#endif
+
+// - API
+#include "JointSet.h"
+    
+// - dependencies
 #include "EoCommon.h"
-
 #include "EOtheMemoryPool.h"
-
 #include "EOemsControllerCfg.h"
 #include "EOtheErrorManager.h"
 #include "EoError.h"
@@ -32,16 +38,12 @@
 #include "EOthePOS.h"
 #endif
 #include "EOtheEntities.h"
-
 #include "Joint_hid.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
-
-
-#include "JointSet.h"
-
 #include "Calibrators.h"
+
 
 static void JointSet_set_inner_control_flags(JointSet* o);
 
