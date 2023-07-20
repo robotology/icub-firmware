@@ -324,7 +324,6 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
         return(eores_OK);        
     } 
 
-   
     // make sure the timer is not running
     eo_timer_Stop(s_eo_theencoderreader.diagnostics.reportTimer);  
    

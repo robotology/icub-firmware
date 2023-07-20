@@ -1551,7 +1551,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
 
 #endif
 
-void MController_config_joint(int j, eOmc_joint_config_t* config) //
+void MController_config_joint(int j, eOmc_joint_config_t* config, eOmotioncontroller_mode_t mcmode) //
 {
     MController *o = smc;
     
@@ -1569,8 +1569,16 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     for(int e=0; e< o->multi_encs; e++)
     {
-        AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, config->jntEncoderResolution, config->jntEncTolerance);
-        AbsEncoder_config_divisor(smc->absEncoder+j, config->gearbox_E2J);
+        //if encoder alredy initialized and mcmode == eo_motcon_mode_mc4plusmais
+        if(mcmode == eo_motcon_mode_mc4plusmais && AbsEncoder_is_initialized(o->absEncoder+j*o->multi_encs+e))
+        {
+            continue;
+        }
+        else
+        {
+            AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, config->jntEncoderResolution, config->jntEncTolerance);
+            AbsEncoder_config_divisor(smc->absEncoder+j, config->gearbox_E2J);
+        }
     }
 }
 
@@ -1854,6 +1862,24 @@ void MController_set_interaction_mode(uint8_t j, eOmc_interactionmode_t interact
 {
     JointSet_set_interaction_mode(smc->jointSet+smc->j2s[j], interaction_mode);
 } 
+
+
+void MController_Debug_Enc_values(const char * msg)
+{
+    
+    for (int s=0; s<smc->nSets; ++s)
+    {
+        JointSet* o = smc->jointSet+s;
+        AbsEncoder* e_ptr = o->absEncoder+o->encoders_of_set[0];
+        Joint* j_ptr = o->joint+o->joints_of_set[0];
+        
+        int32_t enc_pos = AbsEncoder_position(e_ptr);
+        char info[256];
+        snprintf(info, sizeof(info), "%s p:%d d:%d z:%d m:%d dd:%.4f", msg, enc_pos, e_ptr->distance, e_ptr->zero, e_ptr->mul, e_ptr->div );
+        JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
+    }
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

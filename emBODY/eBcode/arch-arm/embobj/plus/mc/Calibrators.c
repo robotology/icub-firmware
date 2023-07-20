@@ -798,7 +798,7 @@ BOOL JointSet_do_wait_calibration_14(JointSet* o)
                 
                 //Debug code 
                 char info[80];
-                snprintf(info, sizeof(info), "Calib Completed" );
+                snprintf(info, sizeof(info), "Calib Completed.");
                 JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
                 //ended
                 
