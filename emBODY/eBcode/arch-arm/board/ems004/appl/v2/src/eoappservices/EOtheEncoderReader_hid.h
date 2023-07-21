@@ -22,9 +22,6 @@
 #ifndef _EOTHEENCODERREADER_HID_H_
 #define _EOTHEENCODERREADER_HID_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -84,9 +81,6 @@ struct EOtheEncoderReader_hid
 // empty section
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard
 

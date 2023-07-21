@@ -16,6 +16,9 @@
  * Public License for more details
 */
 
+#if !defined(__cplusplus)
+    #error this EOtheEncoderReader.c file must be compiled in C++
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -135,11 +138,7 @@
         return eores_NOK_generic;
     }
 
-    extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint8_t position, eOmc_encoder_descriptor_t *encoder)
-    {
-         return eores_NOK_generic;        
-    }
-    
+
     
 #elif !defined(EOTHESERVICES_disable_theEncoderReader)
 
@@ -427,6 +426,8 @@ extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p)
     return(eo_appEncReader_Diagnostics_Tick(s_eo_theencoderreader.reader));    
 }
 
+#if 0
+// removed
 extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint8_t position, eOmc_encoder_descriptor_t *encoder)
 {
     if((NULL == p) || (NULL == encoder))
@@ -468,9 +469,10 @@ extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint
     
     return(eores_OK);
 }
+#endif
 
 
-extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary)
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t jomo, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary)
 {
     if(NULL == p)
     {
@@ -482,18 +484,92 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
         return(eores_OK);
     }   
 
-    if(position >= eOappEncReader_jomos_maxnumberof)
+    if(jomo >= eOappEncReader_jomos_maxnumberof)
     {
         return(eores_NOK_generic);
     }
 
-    eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, position, primary, secondary); 
+    eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, jomo, primary, secondary); 
     
     return(res);
 }
 
 
+extern eOmc_encoder_t eo_encoderreader_GetType(EOtheEncoderReader* p, uint8_t jomo, eOencoderreader_Position_t position)
+{
+    if(NULL == p)
+    {
+        return eomc_enc_none;
+    } 
+    
+    if(jomo >= eOappEncReader_jomos_maxnumberof)
+    {
+        return eomc_enc_none;
+    } 
 
+    if(position >= 2)
+    {
+        return eomc_enc_none;
+    }        
+
+    eOmc_encoder_t primary = eomc_enc_none;
+    eOmc_encoder_t secondary = eomc_enc_none;
+    
+    eo_appEncReader_GetEncoderType(eo_appEncReader_GetHandle(), jomo, &primary, &secondary);  
+
+    return (0 == position) ? primary : secondary;
+    
+}
+
+
+extern eOresult_t eo_encoderreader_Scale(EOtheEncoderReader* p, uint8_t jomo, eOencoderreader_Position_t position, eOencoderreader_Scaler *scaler)
+{
+    if(NULL == p)
+    {
+        return eores_NOK_generic;
+    } 
+    
+    if(jomo >= eOappEncReader_jomos_maxnumberof)
+    {
+        return eores_NOK_generic;
+    } 
+    
+    // i should check vs position being either 0 or 1 or 14 BUT ... we use this only for the mais or absnalog, so i dont care
+
+    eObool_t ok = (position == eo_encreader_pos_one) || (position == eo_encreader_pos_two) || (position == eo_encreader_pos_any);
+    
+    if(eobool_false == ok)
+    {
+        return eores_NOK_generic;
+    }   
+
+    if(NULL == scaler)
+    {
+        return eores_NOK_generic;
+    }   
+    
+    eOmc_encoder_t primary = eomc_enc_none;
+    eOmc_encoder_t secondary = eomc_enc_none;
+    
+    eo_appEncReader_GetEncoderType(eo_appEncReader_GetHandle(), jomo, &primary, &secondary);
+    
+    eOresult_t r = eores_NOK_generic;
+    
+    if((primary == eomc_enc_mais) || (secondary == eomc_enc_mais))
+    {
+        r = eo_appEncReader_UpdatedMaisConversionFactors(eo_appEncReader_GetHandle(), jomo, scaler->scale);
+    }
+    else if((primary == eomc_enc_absanalog) || (secondary == eomc_enc_absanalog))
+    {
+        r = eo_appEncReader_UpdatedHallAdcConversionFactors(eo_appEncReader_GetHandle(), jomo, scaler->scale);
+        if(eores_OK == r)
+        {
+            r = eo_appEncReader_UpdatedHallAdcOffset(eo_appEncReader_GetHandle(), jomo, scaler->offset);
+        }
+    }
+    
+    return r;    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

@@ -22,9 +22,9 @@
 #ifndef _EOAPPENCODERSREADER_H_
 #define _EOAPPENCODERSREADER_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -43,9 +43,9 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EoManagement.h"
-#include "hal_spiencoder.h"
-
+#include "EOconstarray.h"    
 #include "EOtheEncoderReader.h"
+
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -87,6 +87,7 @@ extern eOresult_t eo_appEncReader_Diagnostics_Enable(EOappEncReader *p, eObool_t
 
 extern eOresult_t eo_appEncReader_Diagnostics_Tick(EOappEncReader *p);
 
+extern eOresult_t eo_appEncReader_GetEncoderType(EOappEncReader *p, uint8_t jomo, eOmc_encoder_t *primary, eOmc_encoder_t *secondary);
 
 extern eOresult_t eo_appEncReader_UpdatedMaisConversionFactors(EOappEncReader *p, uint8_t jomo, float convFactor);
 extern eOresult_t eo_appEncReader_UpdatedHallAdcConversionFactors(EOappEncReader *p, uint8_t jomo, float convFactor);
@@ -97,9 +98,9 @@ extern eOresult_t eo_appEncReader_UpdatedHallAdcOffset(EOappEncReader *p, uint8_
  **/
  
  
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
+//#ifdef __cplusplus
+//}       // closing brace for extern "C"
+//#endif 
 
 #endif  // include-guard
 

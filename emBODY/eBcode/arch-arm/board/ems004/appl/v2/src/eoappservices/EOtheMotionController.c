@@ -17,6 +17,10 @@
 */ 
 
 
+#if !defined(__cplusplus)
+    #error this EOtheMotionController.c file must be compiled in C++
+#endif
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -237,7 +241,9 @@ static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32);
 
 static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionController *p);
 
-static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eOencoderreader_valueInfo_t *encoder);
+
+static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, embot::app::eth::encoder::v1::valueInfo *valueinfo);
+
 
 static void s_delaymotorconfig_init(EOtheMotionController *p);
 static void s_delaymotorconfig_eval(EOtheMotionController *p);
@@ -296,8 +302,6 @@ static EOtheMotionController s_eo_themotcon =
         
         EO_INIT(.jomodescriptors)       NULL,
         EO_INIT(.thecontroller)         NULL,
-        EO_INIT(.theencoderreader)      NULL,
-
 
         EO_INIT(.pwmvalue)              {0},
         EO_INIT(.pwmport)               {hal_motorNONE},
@@ -351,8 +355,10 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardENCOs);
 #endif    
 
-    p->ctrlobjs.theencoderreader = eo_encoderreader_Initialise();
-            
+
+    embot::app::eth::theEncoderReader::getInstance().initialise();
+
+
     p->ctrlobjs.themais = eo_mais_Initialise();
     p->ctrlobjs.thepsc = eo_psc_Initialise();
     p->ctrlobjs.thepos = eo_pos_Initialise();
@@ -438,7 +444,7 @@ extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p)
         case eoerror_value_CFG_mc_mc2pluspsc_failed_encoders_verify:
         case eoerror_value_CFG_mc_mc4plusfaps_failed_encoders_verify:
         {
-            eo_encoderreader_SendReport(eo_encoderreader_GetHandle());
+            embot::app::eth::theEncoderReader::getInstance().SendReport();      
         } break;
         
         default:
@@ -557,7 +563,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         dc.mode = p->service.servconfig.diagnosticsmode;
         dc.par16 = p->service.servconfig.diagnosticsparam;
         // 2. at first i verify the encoders. then, function s_eo_motioncontrol_foc_onendofverify_encoder() shall either issue an encoder error or start discovery of foc boards
-        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_foc_onendofverify_encoder, eobool_true, dc); 
+        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_foc_onendofverify_encoder, p}, true);        
         
     }
     else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
@@ -619,7 +625,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         eOmn_serv_diagn_cfg_t dc = {0, 0};
         dc.mode = p->service.servconfig.diagnosticsmode;
         dc.par16 = p->service.servconfig.diagnosticsparam;
-        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plus_onendofverify_encoder, eobool_true, dc);           
+        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc4plus_onendofverify_encoder, p}, true);       
     }
     else if(eo_motcon_mode_mc4plusmais == p->service.servconfig.type)
     {
@@ -740,9 +746,9 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         
 
         eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
-        
-        eo_encoderreader_Deactivate(eo_encoderreader_GetHandle());
-        
+
+        embot::app::eth::theEncoderReader::getInstance().Deactivate();
+     
         // marco.accame.TODO: call deinit of mcontroller
         
         // now i reset 
@@ -784,8 +790,8 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
             eo_mais_Deactivate(eo_mais_GetHandle());        
             memset(&p->ctrlobjs.servconfigmais, 0, sizeof(p->ctrlobjs.servconfigmais));     
         }            
-        
-        eo_encoderreader_Deactivate(eo_encoderreader_GetHandle());
+           
+        embot::app::eth::theEncoderReader::getInstance().Deactivate();      
         // marco.accame.TODO: in eo_motioncontrol_Deactivate() for mc4plus call: eo_emsController_Deinit()
         // marco.accame.TODO: in eo_motioncontrol_Deactivate() for mc4plus call: disable the motors ...
             
@@ -796,19 +802,19 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     {
         eo_psc_Deactivate(eo_psc_GetHandle());
         memset(&p->ctrlobjs.servconfigpsc, 0, sizeof(p->ctrlobjs.servconfigpsc));
-        eo_encoderreader_Deactivate(eo_encoderreader_GetHandle());        
+        embot::app::eth::theEncoderReader::getInstance().Deactivate();      
     }    
     else if(eo_motcon_mode_mc4plusfaps == p->service.servconfig.type)
     {
         eo_pos_Deactivate(eo_pos_GetHandle());
         memset(&p->ctrlobjs.servconfigpos, 0, sizeof(p->ctrlobjs.servconfigpos));
-        eo_encoderreader_Deactivate(eo_encoderreader_GetHandle());        
+        embot::app::eth::theEncoderReader::getInstance().Deactivate();   
     }    
     else if(eo_motcon_mode_mc4pluspmc == p->service.servconfig.type)
     {
         eo_pos_Deactivate(eo_pos_GetHandle());
         memset(&p->ctrlobjs.servconfigpos, 0, sizeof(p->ctrlobjs.servconfigpos));
-        eo_encoderreader_Deactivate(eo_encoderreader_GetHandle());    
+        embot::app::eth::theEncoderReader::getInstance().Deactivate();
 
         // deconfig mc pmc boards, unload them, set num of entities = 0, clear status, deactivate encoder 
         
@@ -951,7 +957,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             eOmn_serv_diagn_cfg_t dc = {0, 0};
             dc.mode = servcfg->diagnosticsmode;
             dc.par16 = servcfg->diagnosticsparam;
-            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
+            embot::app::eth::theEncoderReader::getInstance().Activate({p->ctrlobjs.jomodescriptors, dc});
 
             
             // init the emscontroller.
@@ -1151,7 +1157,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             eOmn_serv_diagn_cfg_t dc = {0, 0};
             dc.mode = servcfg->diagnosticsmode;
             dc.par16 = servcfg->diagnosticsparam;            
-            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
+            embot::app::eth::theEncoderReader::getInstance().Activate({p->ctrlobjs.jomodescriptors, dc});
 
             
             // e. activate interrupt line for quad_enc indexes check
@@ -1207,7 +1213,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         eOmn_serv_diagn_cfg_t dc = {0, 0};
         dc.mode = servcfg->diagnosticsmode;
         dc.par16 = servcfg->diagnosticsparam;        
-        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
+        embot::app::eth::theEncoderReader::getInstance().Activate({p->ctrlobjs.jomodescriptors, dc});
 
             
         // e. activate interrupt line for quad_enc indexes check (Even if we are on mc2plus, we use the same funcion of mc4plus)   
@@ -1260,7 +1266,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         eOmn_serv_diagn_cfg_t dc = {0, 0};
         dc.mode = servcfg->diagnosticsmode;
         dc.par16 = servcfg->diagnosticsparam;
-        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
+        embot::app::eth::theEncoderReader::getInstance().Activate({p->ctrlobjs.jomodescriptors, dc});
 
             
         // e. activate interrupt line for quad_enc indexes check   
@@ -1363,7 +1369,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         eOmn_serv_diagn_cfg_t dc = {0, 0};
         dc.mode = servcfg->diagnosticsmode;
         dc.par16 = servcfg->diagnosticsparam; 
-        eo_encoderreader_Activate(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, dc);
+        embot::app::eth::theEncoderReader::getInstance().Activate({p->ctrlobjs.jomodescriptors, dc});
 
             
         // e. activate interrupt line for quad_enc indexes check   
@@ -1410,7 +1416,7 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     if(eo_motcon_mode_foc == p->service.servconfig.type)
     {   
         // just start a reading of encoders        
-        eo_encoderreader_StartReading(eo_encoderreader_GetHandle());
+        embot::app::eth::theEncoderReader::getInstance().StartReading();  
     }
     else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
@@ -1425,13 +1431,13 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
             eo_mais_Start(eo_mais_GetHandle());   
             eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
         }
-        eo_encoderreader_StartReading(eo_encoderreader_GetHandle());     
+        embot::app::eth::theEncoderReader::getInstance().StartReading();
     }
     else if(eo_motcon_mode_mc2pluspsc == p->service.servconfig.type)
     {
         eo_psc_Start(eo_psc_GetHandle());
         eo_psc_Transmission(eo_psc_GetHandle(), eobool_true);     
-        eo_encoderreader_StartReading(eo_encoderreader_GetHandle());
+        embot::app::eth::theEncoderReader::getInstance().StartReading();
     }
     else if(eo_motcon_mode_mc4plusfaps == p->service.servconfig.type)
     {
@@ -1439,13 +1445,13 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
         eo_errman_Trace(eo_errman_GetHandle(), "calling eo_pos_Transmission() in mc", s_eobj_ownname);
         eo_pos_Start(eo_pos_GetHandle());
         eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);     
-        eo_encoderreader_StartReading(eo_encoderreader_GetHandle());
+        embot::app::eth::theEncoderReader::getInstance().StartReading();
     }
     else if(eo_motcon_mode_mc4pluspmc == p->service.servconfig.type)
     {
         eo_pos_Start(eo_pos_GetHandle());
         eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);     
-        eo_encoderreader_StartReading(eo_encoderreader_GetHandle());
+        embot::app::eth::theEncoderReader::getInstance().StartReading();
     }    
     
     return(eores_OK);    
@@ -1550,7 +1556,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
     // 1) read positions from both joint and motor encoders and update motor controller engine.
     s_eo_motioncontrol_updatedPositionsFromEncoders(p);
     
-    eo_encoderreader_StartReading(eo_encoderreader_GetHandle()); // Restart the reading of the encoders
+    embot::app::eth::theEncoderReader::getInstance().StartReading();
     
     // 2) perform motor control
     MController_do();
@@ -1711,7 +1717,7 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     // wait for the encoders for some time
     for (uint8_t i=0; i<30; ++i)
     {
-        if (eo_encoderreader_IsReadingAvailable(eo_encoderreader_GetHandle()))
+        if(true == embot::app::eth::theEncoderReader::getInstance().IsReadingAvailable())         
         {
             break;
         }
@@ -1720,7 +1726,7 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     }        
         
     
-    if(eobool_false == eo_encoderreader_IsReadingAvailable(eo_encoderreader_GetHandle()))
+    if(false == embot::app::eth::theEncoderReader::getInstance().IsReadingAvailable())      
     {
         for(uint8_t i=0; i<p->numofjomos; i++)
         {
@@ -1732,24 +1738,24 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     
     // read the encoders        
     for(uint8_t i=0; i<p->numofjomos; i++)
-    {
-        eOencoderreader_valueInfo_t encoder1, encoder2;
-        const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);   
+    {       
+        embot::app::eth::encoder::v1::valueInfo encoder1valueinfo {};
+        embot::app::eth::encoder::v1::valueInfo encoder2valueinfo {};
 
-        eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &encoder1, &encoder2);
+        embot::app::eth::theEncoderReader::getInstance().Read(i, encoder1valueinfo, encoder2valueinfo);
                    
-        if(eores_OK != s_eo_motioncontrol_updatePositionFromEncoder(i, &encoder1))
+        if(eores_OK != s_eo_motioncontrol_updatePositionFromEncoder(i, &encoder1valueinfo))
         {
             res = eores_NOK_generic;
         }
-        if(eores_OK != s_eo_motioncontrol_updatePositionFromEncoder(i, &encoder2))
+        if(eores_OK != s_eo_motioncontrol_updatePositionFromEncoder(i, &encoder2valueinfo))
         {
             res = eores_NOK_generic;
         }
         
     } 
     
-    eo_encoderreader_Diagnostics_Tick(eo_encoderreader_GetHandle());
+    embot::app::eth::theEncoderReader::getInstance().Diagnostics_Tick();
     
     return(res);
 
@@ -1978,7 +1984,7 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
             eOmn_serv_diagn_cfg_t dc = {0, 0};
             dc.mode = servcfg->diagnosticsmode;
             dc.par16 = servcfg->diagnosticsparam;
-            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS, eobool_true, dc);             
+            embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS, p}, true);     
         }
     } 
     else
@@ -2037,7 +2043,7 @@ static eOresult_t s_eo_motioncontrol_onendofverify_psc(EOaService* s, eObool_t o
         eOmn_serv_diagn_cfg_t dc = {0, 0};
         dc.mode = servcfg->diagnosticsmode;
         dc.par16 = servcfg->diagnosticsparam;
-        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder, eobool_true, dc);             
+        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder, p}, true);       
     } 
     else
     {
@@ -2097,14 +2103,14 @@ static eOresult_t s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t o
             eOmn_serv_diagn_cfg_t dc = {0, 0};
             dc.mode = servcfg->diagnosticsmode;
             dc.par16 = servcfg->diagnosticsparam;
-            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder, eobool_true, dc);   
+            embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder, p}, true);     
         } 
         else if(eo_motcon_mode_mc4pluspmc == servcfg->type)
         {
             eOmn_serv_diagn_cfg_t dc = {0, 0};
             dc.mode = servcfg->diagnosticsmode;
             dc.par16 = servcfg->diagnosticsparam;
-            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), p->ctrlobjs.jomodescriptors, s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder, eobool_true, dc);
+            embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder, p}, true);
         }
     } 
     else
@@ -2638,37 +2644,39 @@ static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32)
 }
 
 
-static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eOencoderreader_valueInfo_t *encoder)
+static eOresult_t  s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, embot::app::eth::encoder::v1::valueInfo *valueinfo)
 {
     eOresult_t res = eores_OK;
     
-    if(encoder->errortype == encreader_err_NOTCONNECTED) // skip if the encoder is not connected (i.e is on 2foc.)
+    if(valueinfo->errortype == embot::app::eth::encoder::v1::Error::NOTCONNECTED) // skip if the encoder is not connected (i.e is on 2foc.)
     {
         return res;
     }
         
-    if(encoder->position == eomc_pos_atjoint)
+    if(valueinfo->placement == embot::app::eth::encoder::v1::Placement::atjoint)
     {
-        if(encoder->errortype != encreader_err_NONE)
+        if(valueinfo->errortype != embot::app::eth::encoder::v1::Error::NONE)
         {
-            MController_invalid_absEncoder_fbk(index, (uint8_t)encoder->errortype);
+            MController_invalid_absEncoder_fbk(index, embot::core::tointegral(valueinfo->errortype));
             res = eores_NOK_generic;
         }
         else
         {
-            MController_update_absEncoder_fbk(index, encoder->value);
+            // marco.accame on 03jul2023: MController_update_absEncoder_fbk() needs uint32_t* BUT MController_update_motor_pos_fbk() asks for an int32_t value
+            MController_update_absEncoder_fbk(index, valueinfo->value);
         }
     }
-    else if(encoder->position == eomc_pos_atmotor)
+    else if(valueinfo->placement == embot::app::eth::encoder::v1::Placement::atmotor)
     {
-        MController_update_motor_pos_fbk(index, (int32_t)encoder->value[0]);
+        // marco.accame on 03jul2023: MController_update_absEncoder_fbk() needs uint32_t* BUT MController_update_motor_pos_fbk() asks for an int32_t value
+        MController_update_motor_pos_fbk(index, static_cast<int32_t>(valueinfo->value[0]));
     }
     else
     {
         //do nothing;
     }
-    return res;
-}   
+    return res;    
+}
 
 
 static void s_delaymotorconfig_init(EOtheMotionController *p)

@@ -33,7 +33,8 @@
 #warning USE_EMBOT_theServices is defined: removed some code
 // marco.accame: use objects embot::app::eth::theEncoderReader and ... future ones
 #else
-#include "EOappEncodersReader.h"
+//#include "EOtheEncoderReader.h"
+#include "embot_app_eth_theEncoderReader.h"
 #include "EOtheMAIS.h"
 #include "EOthePOS.h"
 #endif
@@ -1720,7 +1721,10 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             if (eo_mais_isAlive(eo_mais_GetHandle()))
             {
                 float computedJntEncoderResolution = (float)(calibrator->params.type6.vmax - calibrator->params.type6.vmin) / (float) (jconfig->userlimits.max  - jconfig->userlimits.min);
-            
+
+#if 1
+                embot::app::eth::theEncoderReader::getInstance().Scale({e, embot::app::eth::encoder::v1::Position::every}, {computedJntEncoderResolution, 0});
+#else
                 eOresult_t res = eo_appEncReader_UpdatedMaisConversionFactors(eo_appEncReader_GetHandle(), e, computedJntEncoderResolution);
                 if(eores_OK != res)
                 {    
@@ -1731,7 +1735,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                     ////debug code ended
                     return;
                 }
-
+#endif 
                 AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
             
                 //Now I need to re-init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
@@ -1790,6 +1794,10 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             int32_t offset = (((float)calibrator->params.type7.vmin)/computedJntEncoderResolution) - jconfig->userlimits.min;
             
+
+#if 1
+            embot::app::eth::theEncoderReader::getInstance().Scale({e, embot::app::eth::encoder::v1::Position::every}, {computedJntEncoderResolution, offset});
+#else            
             eOresult_t res = eo_appEncReader_UpdatedHallAdcOffset(eo_appEncReader_GetHandle(), e, offset);
             if(eores_OK != res)
             {    
@@ -1812,7 +1820,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code ended
                 return;
             }
-
+#endif       
             AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
             
             //Now I need to re init absEncoder because I chenged hallADCConversionFactor, therefore the values returned by EOappEncoreReder are changed.

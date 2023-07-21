@@ -23,9 +23,9 @@
 #define _EOAPPENCODERSREADER_HID_H_
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
     
 // - doxy -------------------------------------------------------------------------------------------------------------
 /* @file       EOappEncodersReader.h
@@ -133,9 +133,9 @@ struct EOappEncReader_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty-section
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
+//#ifdef __cplusplus
+//}       // closing brace for extern "C"
+//#endif 
 
 #endif  // include guard
 

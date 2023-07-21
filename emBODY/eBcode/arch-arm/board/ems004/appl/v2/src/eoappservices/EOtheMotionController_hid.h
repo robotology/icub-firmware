@@ -22,9 +22,6 @@
 #ifndef _EOTHEMOTIONCONTROLLER_HID_H_
 #define _EOTHEMOTIONCONTROLLER_HID_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -33,7 +30,7 @@ extern "C" {
 #include "EoProtocol.h"
 
 #include "Controller.h"
-#include "EOtheEncoderReader.h"
+#include "embot_app_eth_theEncoderReader.h"  
 
 #include "EOtheMAIS.h"
 #include "EOthePSC.h"
@@ -74,9 +71,7 @@ typedef struct
     
     // for everything apart mc4can
     EOconstarray*                           jomodescriptors; // points to the jomodescriptor inside EOtheMotionController_hid::service::servconfig etc. 
-    MController*                            thecontroller;
-    EOtheEncoderReader*                     theencoderreader;   
-        
+    MController*                            thecontroller;      
     
     // for mc4plus, mc2plus, mc4plus-mais, mc2pluspsc, mc4plus-faps
     int16_t                                 pwmvalue[hal_motors_number];    // at most i can manage 4 motors
@@ -116,9 +111,6 @@ struct EOtheMotionController_hid
 // empty section
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard 
 
