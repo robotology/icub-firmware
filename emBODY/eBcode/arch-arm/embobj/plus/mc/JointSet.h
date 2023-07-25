@@ -96,7 +96,7 @@ typedef struct // JointSet
     BOOL is_parking;
     BOOL must_park;
     
-    wrist_decouplerModelClass wrist_decoupler;
+    wrist_decoupler wristDecoupler;
     
     Trajectory ypr_trajectory[3];
     
@@ -105,7 +105,7 @@ typedef struct // JointSet
     CTRL_UNITS ypr_acc_ref[3];
     CTRL_UNITS ypr_pos_fbk[3];
     
-    CTRL_UNITS arm_pos_off[3];
+    //CTRL_UNITS arm_pos_off[3];
 #endif
 
     TripodCalib tripod_calib;
