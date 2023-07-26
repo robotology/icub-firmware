@@ -1864,23 +1864,6 @@ void MController_set_interaction_mode(uint8_t j, eOmc_interactionmode_t interact
 } 
 
 
-void MController_Debug_Enc_values(const char * msg)
-{
-    
-    for (int s=0; s<smc->nSets; ++s)
-    {
-        JointSet* o = smc->jointSet+s;
-        AbsEncoder* e_ptr = o->absEncoder+o->encoders_of_set[0];
-        Joint* j_ptr = o->joint+o->joints_of_set[0];
-        
-        int32_t enc_pos = AbsEncoder_position(e_ptr);
-        char info[256];
-        snprintf(info, sizeof(info), "%s p:%d d:%d z:%d m:%d dd:%.4f", msg, enc_pos, e_ptr->distance, e_ptr->zero, e_ptr->mul, e_ptr->div );
-        JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-    }
-}
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------

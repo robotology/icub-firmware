@@ -117,8 +117,6 @@ extern void MController_update_motor_odometry_fbk_can(int m, void* data);
 
 extern void MController_motor_raise_fault_i2t(int m);
 
-
-extern void MController_Debug_Enc_values(const char * msg);
 ////////////////////////////////////////////////////////////////////////
 
 //VALE: debug function. I'll remove it ASAP
