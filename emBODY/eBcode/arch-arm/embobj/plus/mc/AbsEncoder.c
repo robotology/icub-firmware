@@ -779,5 +779,9 @@ void AbsEncoder_clear_faults(AbsEncoder* o)
     o->spike_cnt = 0;
 }
 
+BOOL AbsEncoder_is_initialized(AbsEncoder* o)
+{
+    return (!o->state.bits.not_initialized);
+}
 // AbsEncoder
 /////////////////////////////////////////////////////////

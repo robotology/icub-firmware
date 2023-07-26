@@ -2130,7 +2130,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             {
                 //debug code
                 char info[70];
-                snprintf(info, 70, "Error! POS service NOT active");
+                snprintf(info, sizeof(info), "Error! POS service NOT active");
                 JointSet_send_debug_message(info, e, 0, 0);
                 //debug code ended
                 return;

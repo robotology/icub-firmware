@@ -886,7 +886,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
     {
         eo_motioncontrol_Deactivate(p);        
     } 
-
+    
     // we use memmove() because it may be that source and destination are in the same location.
     memmove(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));    
 
@@ -1385,7 +1385,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
 { 
     // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Start()", s_eobj_ownname);  
-    
+
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -1485,7 +1485,7 @@ extern eOresult_t eo_motioncontrol_AddRegulars(EOtheMotionController *p, eOmn_se
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 {   
     // static uint32_t adc_values[4] = {0, 0, 0, 0}; 
-    
+   
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -1558,7 +1558,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
     // 3) update status of motors and joints
     s_eo_motioncontrol_UpdateJointMotorStatus(p);
     
-
+    
     return(eores_OK);    
 }
 

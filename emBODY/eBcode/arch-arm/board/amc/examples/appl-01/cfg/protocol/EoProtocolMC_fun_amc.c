@@ -125,7 +125,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         
     if((eo_motcon_mode_foc == mcmode))
     {
-        MController_config_joint(jxx, cfg);
+        MController_config_joint(jxx, cfg, mcmode);
     }
 
 }

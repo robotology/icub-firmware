@@ -1551,7 +1551,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
 
 #endif
 
-void MController_config_joint(int j, eOmc_joint_config_t* config) //
+void MController_config_joint(int j, eOmc_joint_config_t* config, eOmotioncontroller_mode_t mcmode) //
 {
     MController *o = smc;
     
@@ -1569,8 +1569,16 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     for(int e=0; e< o->multi_encs; e++)
     {
-        AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, config->jntEncoderResolution, config->jntEncTolerance);
-        AbsEncoder_config_divisor(smc->absEncoder+j, config->gearbox_E2J);
+        //if encoder alredy initialized and mcmode == eo_motcon_mode_mc4plusmais
+        if(mcmode == eo_motcon_mode_mc4plusmais && AbsEncoder_is_initialized(o->absEncoder+j*o->multi_encs+e))
+        {
+            continue;
+        }
+        else
+        {
+            AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, config->jntEncoderResolution, config->jntEncTolerance);
+            AbsEncoder_config_divisor(smc->absEncoder+j, config->gearbox_E2J);
+        }
     }
 }
 
@@ -1854,6 +1862,7 @@ void MController_set_interaction_mode(uint8_t j, eOmc_interactionmode_t interact
 {
     JointSet_set_interaction_mode(smc->jointSet+smc->j2s[j], interaction_mode);
 } 
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
