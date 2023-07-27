@@ -80,7 +80,7 @@ bool embot::app::eth::theEncoderReader::Impl::StartReading()
 bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t position, embot::app::eth::encoder::v1::valueInfo &primary, embot::app::eth::encoder::v1::valueInfo &secondary)
 {
     eOencoderreader_valueInfo_t *e1 = reinterpret_cast<eOencoderreader_valueInfo_t*>(&primary);
-    eOencoderreader_valueInfo_t *e2 = reinterpret_cast<eOencoderreader_valueInfo_t*>(&primary);
+    eOencoderreader_valueInfo_t *e2 = reinterpret_cast<eOencoderreader_valueInfo_t*>(&secondary);
     return eores_OK == eo_encoderreader_Read(eo_encoderreader_GetHandle(), position, e1, e2);
 }
 
