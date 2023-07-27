@@ -95,11 +95,13 @@ typedef enum
     hal_motor2          = 1,        /**< motor 2 */  
     hal_motor3          = 2,        /**< motor 3 */
     hal_motor4          = 3,        /**< motor 4 */  
+    hal_motor5          = 4,        /**< motor 5 (1+2) */  
+    hal_motor6          = 5,        /**< motor 6 (3+4) */  
     hal_motorALL        = 254,      /**< all supported motors */
     hal_motorNONE       = 255       /**< no motor */       
 } hal_motor_t;
 
-enum { hal_motors_number = 4 };
+enum { hal_motors_number = 6 };
 
 
 ///** @typedef    typedef enum hal_pwm_status_t 
