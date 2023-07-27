@@ -24,9 +24,16 @@
 #include <memory>
 
 
-namespace embot { namespace app { namespace eth {
+namespace embot::app::eth {
     
-    typedef eOresult_t (*eOservice_onendofoperation_fun_t) (void* p, eObool_t operationisok);
+    using eOservice_onendofoperation_fun_t = eOresult_t (*) (void* p, eObool_t operationisok);
+    
+    struct OnEndOfOperation
+    {
+        eOservice_onendofoperation_fun_t callback {nullptr};
+        void * param {nullptr};
+        constexpr bool isvalid() { return nullptr != callback; }        
+    };
     
     struct DescriptorCANframe
     {
@@ -126,10 +133,9 @@ namespace embot { namespace app { namespace eth {
             }
         }
     };
+   
 
-    
-
-}}} // namespace embot { namespace app { namespace eth
+} // namespace embot::app::eth
 
 
 #endif  // include-guard

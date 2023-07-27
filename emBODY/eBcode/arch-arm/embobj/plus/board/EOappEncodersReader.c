@@ -27,6 +27,10 @@
 **/
 
 
+#if !defined(__cplusplus)
+    #error this EOappEncodersReader.c file must be compiled in C++
+#endif
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -188,6 +192,7 @@ static EOappEncReader s_eo_theappencreader =
     EO_INIT(.amodiag)
     {
         EO_INIT(.enabled)           eobool_true,
+        EO_INIT(.config)            {0, 0},
         EO_INIT(.minimuminterval)   {(100*1000), (100*1000)},
         EO_INIT(.vals)              { 0, 0 },
         EO_INIT(.regs)              { 0, 0 },
@@ -330,15 +335,29 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, EOconstarray *arra
     return(eores_OK);
 }
 
+extern eOresult_t eo_appEncReader_GetEncoderType(EOappEncReader *p, uint8_t jomo, eOmc_encoder_t *primary, eOmc_encoder_t *secondary)
+{
+    if((NULL == p) || (NULL == primary) || (NULL == secondary))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    eOappEncReader_jomoconfig_t this_jomoconfig = p->config.jomoconfig[jomo];
+    
+    *primary = (eOmc_encoder_t)this_jomoconfig.encoder1des.type;
+    *secondary = (eOmc_encoder_t)this_jomoconfig.encoder2des.type;
+    
+    return(eores_OK);    
+}
+
 extern eOresult_t eo_appEncReader_UpdatedMaisConversionFactors(EOappEncReader *p, uint8_t jomo, float convFactor)
 {
-    eOappEncReader_jomoconfig_t this_jomoconfig = p->config.jomoconfig[jomo];
-
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
     
+    eOappEncReader_jomoconfig_t this_jomoconfig = p->config.jomoconfig[jomo];    
 
     // check existence for primary encoder
     if((eomc_enc_mais != this_jomoconfig.encoder1des.type) && (eomc_enc_mais != this_jomoconfig.encoder2des.type))

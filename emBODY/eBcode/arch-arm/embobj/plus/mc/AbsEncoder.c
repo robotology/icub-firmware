@@ -434,18 +434,18 @@ void AbsEncoder_invalid(AbsEncoder* o, ae_errortype_t error_type)
     
     switch (error_type)
     {
-        case ae_err_NOTCONNECTED:
-        case ae_err_NONE:
+        case embot::app::eth::encoder::v1::Error::NOTCONNECTED:
+        case embot::app::eth::encoder::v1::Error::NONE:
             break;
         
         // all other cases are errors: AEA_PARITY, AEA_CHIP, AEA_READING have their tx_error, chip_error, data_error. all others: are data_error. 
-        case ae_err_AEA_PARITY:
+        case embot::app::eth::encoder::v1::Error::AEA_PARITY:
             o->fault_state.bits.tx_error = TRUE;
             break;
-        case ae_err_AEA_CHIP:
+        case embot::app::eth::encoder::v1::Error::AEA_CHIP:
             o->fault_state.bits.chip_error = TRUE;
             break;        
-        case ae_err_AEA_READING:
+        case embot::app::eth::encoder::v1::Error::AEA_READING:
             o->fault_state.bits.data_error = TRUE;
             break;
         

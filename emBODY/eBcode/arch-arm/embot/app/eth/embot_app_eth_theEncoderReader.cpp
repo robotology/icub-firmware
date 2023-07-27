@@ -17,7 +17,6 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_os.h"
 #include "embot_hw_encoder.h"
 #include "EOtheErrorManager.h"
 #include "EoProtocol.h"
@@ -59,9 +58,28 @@ constexpr eOservice_diagnostics_t dummy_service_diagnostics
     .repetitionOKcase =  0 // 10 // with 0 we transmit report only once at succesful activation    
 }; 
 
+
+
 struct embot::app::eth::theEncoderReader::Impl
 {
-    Config _config {};
+    static constexpr size_t max_number_of_jomos { 4 };                          
+    static constexpr size_t max_number_of_encoders { 2 * max_number_of_jomos }; 
+
+    
+    typedef struct
+    {
+        eOmc_encoder_descriptor_t   encoder1des;
+        eOmc_encoder_descriptor_t   encoder2des;
+    } jomoconfig_t;
+
+    struct ImplConfig
+    {
+        uint8_t numofjomos {0};
+        std::array<jomoconfig_t, max_number_of_jomos> jomo_cfg {};
+    };     
+    
+    embot::app::eth::encoder::v1::IFreader::Config config {};
+    ImplConfig _implconfig {};
     bool _initted {false};
     bool _actived {false};
     
@@ -71,40 +89,42 @@ struct embot::app::eth::theEncoderReader::Impl
     typedef struct
     {
         eOmc_encoder_descriptor_t *descriptor;
-        eOencoderreader_valueInfo_t *valueinfo;
+        embot::app::eth::encoder::v1::valueInfo *valueinfo;
     } eOencoderProperties_t;
     
     constexpr static const char s_eobj_ownname[] = "theEncoderReader";
     
     Impl() = default;
     
-    eOresult_t initialise();
-    eOresult_t Verify(      EOconstarray *arrayofjomodes, 
-                            eOservice_onendofoperation_fun_t onverify,
-                            void *arg,        
-                            bool activateafterverify);
-                            
-    eOresult_t activate(EOconstarray *arrayofjomodes, eOmn_serv_diagn_cfg_t dc);
-    eOresult_t deactivate();
-    eOresult_t startReading();
-    eOresult_t read(uint8_t position, eOencoderreader_valueInfo_t *valueInfo1, eOencoderreader_valueInfo_t *valueInfo2);
-    bool report();
-                            
-    bool isreadingavailable();
+    bool initialise();
     
-    static eObool_t s_eo_isconnected(eOmc_encoder_descriptor_t *des);
+    bool Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify);                            
+    bool Activate(const Config &config);    
+    bool Deactivate();   
+    bool StartReading();    
+    bool Read(uint8_t jomo, embot::app::eth::encoder::v1::valueInfo &primary, embot::app::eth::encoder::v1::valueInfo &secondary);
+    bool SendReport();                            
+    bool IsReadingAvailable();
+    bool Diagnostics_Tick() { return true; }
+    embot::app::eth::encoder::v1::Type GetType(const embot::app::eth::encoder::v1::Target &target);
+    bool Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler);
+
+    // advanced
+    bool read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value);
+
+private:    
+    static bool s_eo_isconnected(eOmc_encoder_descriptor_t *des);
     static uint32_t rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmc_position_t pos);
-    static eObool_t isValidValue_AEA(const uint32_t &valueraw, eOencoderreader_errortype_t *error);
-    static void alert(void* p);
-    static void startup(embot::os::Thread *t, void *p);
+    static bool isValidValue_AEA(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
+
 };
 
 
-eOresult_t embot::app::eth::theEncoderReader::Impl::initialise()
+bool embot::app::eth::theEncoderReader::Impl::initialise()
 {
     if(true == _initted)
     {
-        return eores_OK;
+        return true;
     }
     
     
@@ -116,10 +136,10 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::initialise()
 //    
 //    s_eo_theappencreader.stream_map = hal_spiencoder_stream_map_get();
 //    
-//    if(NULL == s_eo_theappencreader.stream_map)
+//    if(nullptr == s_eo_theappencreader.stream_map)
 //    {
 //        // marco.accame: put a diagnostics message about the failure
-//        return(NULL);
+//        return(nullptr);
 //    }   
 
 //    memset(&s_eo_theappencreader.config, 0, sizeof(s_eo_theappencreader.config));
@@ -143,13 +163,10 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::initialise()
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);   
     
     _initted = true;
-    return eores_OK;
+    return true;
 }
 
-eOresult_t embot::app::eth::theEncoderReader::Impl::Verify(EOconstarray *arrayofjomodes, 
-                            eOservice_onendofoperation_fun_t onverify,
-                            void *arg,        
-                            bool activateafterverify)
+bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify)
 { 
    
     
@@ -159,8 +176,8 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::Verify(EOconstarray *arrayof
     // make sure the timer is not running
     eo_timer_Stop(diagnostics.reportTimer);  
     
-    service.onverify = onverify;
-    service.onverifyarg = arg;
+    service.onverify = onverify.callback;
+    service.onverifyarg = onverify.param;
     service.activateafterverify = activateafterverify;
     
     // we dont check and we just assume that everything is all right.
@@ -170,7 +187,7 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::Verify(EOconstarray *arrayof
     
     if(true == activateafterverify)
     {
-        activate(arrayofjomodes, {});        
+        Activate(config);        
     }
     
     diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
@@ -183,7 +200,7 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::Verify(EOconstarray *arrayof
               
     diagnostics.errorType = eo_errortype_debug;
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_ok);
-    eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
+    eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, nullptr, s_eobj_ownname, &diagnostics.errorDescriptor);
     
 //    if((0 != diagnostics.repetitionOKcase) && (0 != diagnostics.reportPeriod))
 //    {
@@ -191,51 +208,51 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::Verify(EOconstarray *arrayof
 //        eo_timer_Start(diagnostics.reportTimer, eok_abstimeNOW, diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
 //    }
          
-    if(NULL != service.onverify)
+    if(nullptr != service.onverify)
     {
         service.onverify(service.onverifyarg, eobool_true); 
     }    
     
-    return eores_OK;  
+    return true;  
 }
 
 
-eOresult_t embot::app::eth::theEncoderReader::Impl::activate(EOconstarray *arrayofjomodes, eOmn_serv_diagn_cfg_t dc)
+bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 {
     eo_errman_Trace(eo_errman_GetHandle(), "::Activate()", s_eobj_ownname);
     
-    if((nullptr == arrayofjomodes))
+    if((nullptr == config.carrayofjomodes))
     {
-        return eores_NOK_nullpointer;
+        return false;
     } 
 
-    if(eo_constarray_Size(arrayofjomodes) > max_number_of_jomos)
+    if(eo_constarray_Size(config.carrayofjomodes) > max_number_of_jomos)
     {
-        return eores_NOK_generic;
+        return false;
     }
 
-    EOconstarray* carray = eo_constarray_Load((const EOarray*)arrayofjomodes);
+    EOconstarray* carray = eo_constarray_Load((const EOarray*)config.carrayofjomodes);
     
-    if(eobool_true == _actived)
+    if(true == _actived)
     {
-        deactivate();
+        Deactivate();
     }
 
     
     // 1. prepare the config
-    _config.numofjomos = eo_constarray_Size(carray);
+    _implconfig.numofjomos = eo_constarray_Size(carray);
     
-    for(uint8_t i=0; i < _config.numofjomos; i++)
+    for(uint8_t i=0; i < _implconfig.numofjomos; i++)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
-        if(NULL != jomodes)
+        if(nullptr != jomodes)
         {
-            _config.jomo_cfg[i].encoder1des = jomodes->encoder1;
-            _config.jomo_cfg[i].encoder2des = jomodes->encoder2;
+            _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
+            _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
             
             embot::hw::encoder::Config cfg {};
             
-            switch(_config.jomo_cfg[i].encoder1des.type)
+            switch(_implconfig.jomo_cfg[i].encoder1des.type)
             {
                 case eomc_enc_aea:
                     cfg.type = embot::hw::encoder::Type::chipAS5045;
@@ -252,7 +269,7 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::activate(EOconstarray *array
             }
             
             // 2. configure and initialize SPI encoders
-            switch(_config.jomo_cfg[i].encoder1des.port)
+            switch(_implconfig.jomo_cfg[i].encoder1des.port)
             {
                 case eobrd_port_amc_J5_X1:
                     embot::hw::encoder::init(embot::hw::ENCODER::one, cfg);
@@ -274,40 +291,38 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::activate(EOconstarray *array
 //    s_eo_appEncReader_configure_NONSPI_encoders(p);
     
     
-    _actived = eobool_true;
+    _actived = true;
     
     // to enable the diagnostics ... use on equal to eobool_true
 //    s_eo_appEncReader_amodiag_Config(dc);     
 //    eo_appEncReader_Diagnostics_Enable(p, (eomn_serv_diagn_mode_MC_ENC == dc.mode) ? eobool_true: eobool_false);
     
-    return eores_OK;
+    return true;
 }
 
-eOresult_t embot::app::eth::theEncoderReader::Impl::deactivate()
+bool embot::app::eth::theEncoderReader::Impl::Deactivate()
 {
     eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
     
-    if(eobool_false == _actived)
+    if(false == _actived)
     {
-        return(eores_OK);
+        return true;
     }
     
     if((resOK == embot::hw::encoder::deinit(embot::hw::ENCODER::one)) &&
        (resOK == embot::hw::encoder::deinit(embot::hw::ENCODER::two)) &&
        (resOK == embot::hw::encoder::deinit(embot::hw::ENCODER::three)))
     {
-        _config.numofjomos = 0;
+        _implconfig.numofjomos = 0;
         _actived = false;
         
-        return eores_OK;
+        return true;
     }
-    else
-    {
-        return eores_NOK_generic;
-    }
+    
+    return false;
 }
 
-eOresult_t embot::app::eth::theEncoderReader::Impl::startReading()
+bool embot::app::eth::theEncoderReader::Impl::StartReading()
 {
     //eo_errman_Trace(eo_errman_GetHandle(), "::Start()", s_eobj_ownname);
     
@@ -316,34 +331,30 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::startReading()
     embot::hw::encoder::startRead(embot::hw::ENCODER::two);
     embot::hw::encoder::startRead(embot::hw::ENCODER::three);
     
-    return eores_OK;
+    return true;;
 }
 
-eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoderreader_valueInfo_t *valueInfo1, eOencoderreader_valueInfo_t *valueInfo2)
+bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth::encoder::v1::valueInfo &primary, embot::app::eth::encoder::v1::valueInfo &secondary)
 {
-    if((nullptr == valueInfo1) || (nullptr == valueInfo2))
-    {
-        return(eores_NOK_nullpointer);
-    }
     
-    if(eobool_false == _actived)
+    if(false == _actived)
     {   // nothing to do because we dont have it
-        return eores_OK;
+        return true;
     }
     
     embot::hw::ENCODER e = static_cast<embot::hw::ENCODER>(jomo);
     if(e >= embot::hw::ENCODER::maxnumberof)
     {
-        return eores_NOK_generic;
+        return false;
     }
     
-    eOencoderProperties_t encProp[2] = {NULL};
+    eOencoderProperties_t encProp[2] = {nullptr};
     
-    encProp[0].descriptor = &_config.jomo_cfg[jomo].encoder1des;
-    encProp[0].valueinfo = valueInfo1;
+    encProp[0].descriptor = &_implconfig.jomo_cfg[jomo].encoder1des;
+    encProp[0].valueinfo = &primary;
     
-    encProp[1].descriptor = &_config.jomo_cfg[jomo].encoder2des;
-    encProp[1].valueinfo = valueInfo2;
+    encProp[1].descriptor = &_implconfig.jomo_cfg[jomo].encoder2des;
+    encProp[1].valueinfo = &secondary;
     
     for(uint8_t i=0; i<2; i++)
     {   // for each of the two encoders ....
@@ -352,17 +363,17 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoder
         
         // assign composedof and position
         prop.valueinfo->composedof = eomc_encoder_get_numberofcomponents((eOmc_encoder_t)prop.descriptor->type); 
-        prop.valueinfo->position = (eOmc_position_t)prop.descriptor->pos;
+        prop.valueinfo->placement = static_cast<embot::app::eth::encoder::v1::Placement>(prop.descriptor->pos);
         
         // so far we assume no errors and we assign 0 to all values
-        prop.valueinfo->errortype = encreader_err_NONE;
+        prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::NONE;
         memset(prop.valueinfo->value, 0, sizeof(prop.valueinfo->value)); // was not 0 but: hal_NA32;
         
         // now we compute the value(s) and adjust if we detect any errors
         
-        if(eobool_false == s_eo_isconnected(prop.descriptor))
+        if(false == s_eo_isconnected(prop.descriptor))
         {   // the encoder is not connected: adjust its error type and continue with other encoders in the loop
-            prop.valueinfo->errortype = encreader_err_NOTCONNECTED;
+            prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::NOTCONNECTED;
             continue;   // KEEP this continue! IT'S IMPORTANT!
         } 
         
@@ -385,7 +396,7 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoder
                 // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
                 if(resOK == embot::hw::encoder::getValue(e, spiRawValue/*, &diagn*/))                
                 {   // ok, the hal reads correctly
-                    if(eobool_true == isValidValue_AEA(spiRawValue, &prop.valueinfo->errortype))
+                    if(true == isValidValue_AEA(spiRawValue, prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
 
                         // marco.accame: hal_spiencoder_get_value2() gives back a value in uint32_t with only 18 bits of information (internally masked with 0x03FFFF).
@@ -405,7 +416,7 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoder
                 }
                 else
                 {   // we dont even have a valid reading from hal
-                    prop.valueinfo->errortype = encreader_err_AEA_READING;
+                    prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::AEA_READING;
                     errorparam = 0xffff;                                         
                 }   
                
@@ -413,7 +424,7 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoder
             
             default:
             {   // we have not recognised any valid encoder type
-                prop.valueinfo->errortype = encreader_err_GENERIC;   
+                prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::GENERIC;   
                 errorparam = 0;                
             } break;
         }
@@ -423,24 +434,43 @@ eOresult_t embot::app::eth::theEncoderReader::Impl::read(uint8_t jomo, eOencoder
 
     //eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, position, primary, secondary); 
     
-    return eores_OK;
+    return true;
 }
 
-bool embot::app::eth::theEncoderReader::Impl::report()
+bool embot::app::eth::theEncoderReader::Impl::SendReport()
 {
     return true;
 }
 
-bool embot::app::eth::theEncoderReader::Impl::isreadingavailable()
+bool embot::app::eth::theEncoderReader::Impl::IsReadingAvailable()
 {
     return true;
 }
 
-// private memmbers
+embot::app::eth::encoder::v1::Type  embot::app::eth::theEncoderReader::Impl::GetType(const embot::app::eth::encoder::v1::Target &target)
+{  
+    return embot::app::eth::encoder::v1::Type::none;
+}
 
-eObool_t embot::app::eth::theEncoderReader::Impl::s_eo_isconnected(eOmc_encoder_descriptor_t *des)
+bool embot::app::eth::theEncoderReader::Impl::Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler)
 {
-    return ((eomc_enc_none != (des->type)) && (eobrd_port_nolocal != (des->port))) ? eobool_true : eobool_false;
+    return false;
+}
+
+bool embot::app::eth::theEncoderReader::Impl::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
+{
+    value.raw = 0x123456789A;
+    value.error = embot::app::eth::encoder::experimental::Error::NONE;
+    
+    return true;
+}
+
+
+// private members
+
+bool embot::app::eth::theEncoderReader::Impl::s_eo_isconnected(eOmc_encoder_descriptor_t *des)
+{
+    return ((eomc_enc_none != (des->type)) && (eobrd_port_nolocal != (des->port))) ? true : false;
 }
 
 uint32_t embot::app::eth::theEncoderReader::Impl::rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmc_position_t pos)
@@ -506,8 +536,10 @@ uint32_t embot::app::eth::theEncoderReader::Impl::rescale2icubdegrees(uint32_t v
 }
 
 
-eObool_t embot::app::eth::theEncoderReader::Impl::isValidValue_AEA(const uint32_t &valueraw, eOencoderreader_errortype_t *error)
+bool embot::app::eth::theEncoderReader::Impl::isValidValue_AEA(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error)
 {
+    error = embot::app::eth::encoder::v1::Error::NONE;
+    
 // TODO: probably redundant function
 //    uint8_t parity_error = 0;
 //    uint8_t b = 0;
@@ -532,7 +564,7 @@ eObool_t embot::app::eth::theEncoderReader::Impl::isValidValue_AEA(const uint32_
 
 //    }
     
-    return(eobool_true);
+    return true;
 }
 
 
@@ -554,51 +586,66 @@ embot::app::eth::theEncoderReader::theEncoderReader()
 
 embot::app::eth::theEncoderReader::~theEncoderReader() { }
 
-eOresult_t embot::app::eth::theEncoderReader::initialise()
+bool embot::app::eth::theEncoderReader::initialise()
 {
     return pImpl->initialise();
 }
 
-eOresult_t embot::app::eth::theEncoderReader::Verify(
-                            EOconstarray *arrayofjomodes, 
-                            eOservice_onendofoperation_fun_t onverify,
-                            void *arg,        
-                            bool activateafterverify)
+bool embot::app::eth::theEncoderReader::Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify)
 {
-    return pImpl->Verify(arrayofjomodes, onverify, arg, activateafterverify); 
-}
-//        eOresult_t Activate(const eOmn_serv_configuration_t * servcfg);  
-
-eOresult_t embot::app::eth::theEncoderReader::activate(EOconstarray *arrayofjomodes, eOmn_serv_diagn_cfg_t dc)
-{
-    return pImpl->activate(arrayofjomodes, dc);
+    return pImpl->Verify(config, onverify, activateafterverify); 
 }
 
-eOresult_t embot::app::eth::theEncoderReader::deactivate()
+
+bool embot::app::eth::theEncoderReader::Activate(const Config &config)
 {
-    return pImpl->deactivate();
+    return pImpl->Activate(config);
 }
 
-eOresult_t embot::app::eth::theEncoderReader::startReading()
+bool embot::app::eth::theEncoderReader::Deactivate()
 {
-    return pImpl->startReading();
+    return pImpl->Deactivate();
 }
 
-eOresult_t embot::app::eth::theEncoderReader::read(uint8_t position, eOencoderreader_valueInfo_t *valueInfo1, eOencoderreader_valueInfo_t *valueInfo2)
+bool embot::app::eth::theEncoderReader::StartReading()
 {
-    return pImpl->read(position, valueInfo1, valueInfo2);
+    return pImpl->StartReading();
 }
 
-bool embot::app::eth::theEncoderReader::report()
+bool embot::app::eth::theEncoderReader::Read(uint8_t jomo, embot::app::eth::encoder::v1::valueInfo &primary, embot::app::eth::encoder::v1::valueInfo &secondary)
 {
-    return pImpl->report();
+    return pImpl->Read(jomo, primary, secondary);
 }
 
-bool embot::app::eth::theEncoderReader::isreadingavailable()
+bool embot::app::eth::theEncoderReader::SendReport()
 {
-    return pImpl->isreadingavailable();
+    return pImpl->SendReport();
 }
 
+bool embot::app::eth::theEncoderReader::IsReadingAvailable()
+{
+    return pImpl->IsReadingAvailable();
+}
+
+bool embot::app::eth::theEncoderReader::Diagnostics_Tick()
+{
+    return pImpl->Diagnostics_Tick();
+}
+
+embot::app::eth::encoder::v1::Type  embot::app::eth::theEncoderReader::GetType(const embot::app::eth::encoder::v1::Target &target)
+{
+    return pImpl->GetType(target);
+}
+
+bool embot::app::eth::theEncoderReader::Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler)
+{
+    return pImpl->Scale(target, scaler);
+}
+
+bool embot::app::eth::theEncoderReader::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
+{
+    return pImpl->read(target, value);
+}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -21,9 +21,8 @@
 #ifndef _EOTHEENCODERREADER_H_
 #define _EOTHEENCODERREADER_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "embot_app_eth_Encoder.h"
+
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -61,28 +60,29 @@ extern "C" {
 
 typedef struct EOtheEncoderReader_hid EOtheEncoderReader;
 
+// we keep eOencoderreader_errortype_t in here but dependent from embot::app::eth::encoder::v1::Error
 
 typedef enum
 {
-    encreader_err_NONE                  = 0,
-    encreader_err_AEA_READING           = 1,
-    encreader_err_AEA_PARITY            = 2,
-    encreader_err_AEA_CHIP              = 3,
-    encreader_err_QENC_GENERIC          = 4,
-    encreader_err_ABSANALOG_GENERIC     = 5,
-    encreader_err_MAIS_GENERIC          = 6,
-    encreader_err_SPICHAINOF2_GENERIC   = 7,
-    encreader_err_SPICHAINOF3_GENERIC   = 8,
-    encreader_err_AMO_GENERIC           = 9,
-    encreader_err_PSC_GENERIC           = 10,
-    encreader_err_POS_GENERIC           = 11,
-    encreader_err_GENERIC               = 14,
-    encreader_err_NOTCONNECTED          = 15, /* this error happens when the encoder type is none or encoder is not local, for example it is connected to 2foc board */
-    encreader_err_AKSIM2_INVALID_DATA   = 16,
-    encreader_err_AKSIM2_CLOSE_TO_LIMITS= 17,
-    encreader_err_AKSIM2_CRC_ERROR      = 18,
-    encreader_err_AKSIM2_GENERIC        = 19
-
+    encreader_err_NONE                  = embot::core::tointegral(embot::app::eth::encoder::v1::Error::NONE),                   // 0
+    encreader_err_AEA_READING           = embot::core::tointegral(embot::app::eth::encoder::v1::Error::AEA_READING),            // 1,
+    encreader_err_AEA_PARITY            = embot::core::tointegral(embot::app::eth::encoder::v1::Error::AEA_PARITY),             // 2,
+    encreader_err_AEA_CHIP              = embot::core::tointegral(embot::app::eth::encoder::v1::Error::AEA_CHIP),               // 3,
+    encreader_err_QENC_GENERIC          = embot::core::tointegral(embot::app::eth::encoder::v1::Error::QENC_GENERIC),           // 4,
+    encreader_err_ABSANALOG_GENERIC     = embot::core::tointegral(embot::app::eth::encoder::v1::Error::ABSANALOG_GENERIC),      // 5,
+    encreader_err_MAIS_GENERIC          = embot::core::tointegral(embot::app::eth::encoder::v1::Error::MAIS_GENERIC),           // 6,
+    encreader_err_SPICHAINOF2_GENERIC   = embot::core::tointegral(embot::app::eth::encoder::v1::Error::SPICHAINOF2_GENERIC),    // 7,
+    encreader_err_SPICHAINOF3_GENERIC   = embot::core::tointegral(embot::app::eth::encoder::v1::Error::SPICHAINOF3_GENERIC),    // 8,
+    encreader_err_AMO_GENERIC           = embot::core::tointegral(embot::app::eth::encoder::v1::Error::AMO_GENERIC),            // 9,
+    encreader_err_PSC_GENERIC           = embot::core::tointegral(embot::app::eth::encoder::v1::Error::PSC_GENERIC),            // 10,
+    encreader_err_POS_GENERIC           = embot::core::tointegral(embot::app::eth::encoder::v1::Error::POS_GENERIC),            // 11,
+    encreader_err_GENERIC               = embot::core::tointegral(embot::app::eth::encoder::v1::Error::GENERIC),                // 14,
+    encreader_err_NOTCONNECTED          = embot::core::tointegral(embot::app::eth::encoder::v1::Error::NOTCONNECTED),           // 15, 
+    // marco.accame: any error beyond 15 cannot be managed by diagnostics messages because it will not fit inside a nibble
+    encreader_err_AKSIM2_INVALID_DATA   = embot::core::tointegral(embot::app::eth::encoder::v1::Error::AKSIM2_INVALID_DATA),    // 16,
+    encreader_err_AKSIM2_CLOSE_TO_LIMITS= embot::core::tointegral(embot::app::eth::encoder::v1::Error::AKSIM2_CLOSE_TO_LIMITS), // 17,
+    encreader_err_AKSIM2_CRC_ERROR      = embot::core::tointegral(embot::app::eth::encoder::v1::Error::AKSIM2_CRC_ERROR),       // 18,
+    encreader_err_AKSIM2_GENERIC        = embot::core::tointegral(embot::app::eth::encoder::v1::Error::AKSIM2_GENERIC)          // 19
 } eOencoderreader_errortype_t;
 
 typedef struct
@@ -93,9 +93,19 @@ typedef struct
     eOmc_position_t                         position;
 } eOencoderreader_valueInfo_t;
 
-//typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);
+typedef struct
+{   // out = input * 1/fabs(scale) - offset
+    float scale;
+    int32_t offset;    
+} eOencoderreader_Scaler;
 
-
+typedef enum
+{
+    eo_encreader_pos_one = 0,
+    eo_encreader_pos_two = 1,
+    eo_encreader_pos_any = 14,
+    eo_encreader_pos_none = 15   
+} eOencoderreader_Position_t;    
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -124,20 +134,20 @@ extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p);
 
 extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p);
 
-extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary);
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t jomo, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary);
 
 extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p);
 
-extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint8_t position, eOmc_encoder_descriptor_t *encoder);
+// position is only: 0 (primary) or 1 (secondary)
+extern eOmc_encoder_t eo_encoderreader_GetType(EOtheEncoderReader* p, uint8_t jomo, eOencoderreader_Position_t position);
+
+extern eOresult_t eo_encoderreader_Scale(EOtheEncoderReader* p, uint8_t jomo, eOencoderreader_Position_t position, eOencoderreader_Scaler *scaler);
 
 
 /** @}            
     end of group eo_EOtheEncoderReader
  **/
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
  
 #endif  // include-guard 
 
