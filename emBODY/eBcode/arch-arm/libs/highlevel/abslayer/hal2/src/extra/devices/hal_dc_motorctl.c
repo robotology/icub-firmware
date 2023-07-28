@@ -629,7 +629,8 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
 			pwm= TIM8->CCR3; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM8->CCR4; //take the pwmvalue
 			break;
-        } 
+        }
+		// Motor 0+1		
 	  case 4:	    
 		{
 			pwm= TIM1->CCR3; //take the pwmvalue 
