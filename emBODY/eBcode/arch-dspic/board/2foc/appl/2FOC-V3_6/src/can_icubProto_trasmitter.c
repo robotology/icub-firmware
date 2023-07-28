@@ -53,59 +53,81 @@ extern volatile int IqFbk;
 extern volatile int32_t QE_COUNTER;
 //volatile int position_fbk = 0;
 
+extern volatile int16_t residual_enc;
+
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
     static tCanData payload; // = {{0}};
     unsigned long msgid;
-    
-    payload.w[0]  = IqFbk;
-    payload.w[1]  = gQEVelocity;
-    
+
+    payload.w[0] = IqFbk;
+    payload.w[1] = gQEVelocity;
     payload.dw[1] = gQEPosition;
-    //payload.dw[1] = QEgetPosCheck(); 
-    
+
     msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 
     ECANSend(msgid, 8, &payload);
-
-    //prepare the payload
-    payload.b[0] = gControlMode;
-    payload.b[1] = gEncoderError.bitmask;
-    payload.w[1] = VqFbk;
     
-    payload.dw[1] = SysError.L;
+    BOOL bequiet = FALSE;
 
-    msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
-
-    ECANSend(msgid, 8, &payload);
-
-    
     if (gEncoderConfig.full_calibration)
     {
         static int noflood = 0;
+    
+        int Tsend = 500 + canprototransmitter_bid*100;
         
-        if (++noflood > 2000)
+        if (noflood <= 10 || noflood >= Tsend-10) bequiet = TRUE;
+        
+        if (++noflood >= Tsend)
         {
             noflood = 0;
             
             payload.w[0] = gEncoderConfig.offset;
             payload.w[1] = POSCNT;
             payload.dw[1] = QE_COUNTER; 
-            
+
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
             ECANSend(msgid, 8, &payload);
         }
     }
     else if (MotorConfig.verbose)
+    {        
+        static int noflood = 0;
+        
+        extern volatile char I2Cdead;
+        extern volatile uint16_t I2Cerrors;
+        extern volatile int I2Cerrcode;
+        
+        int Tsend = 500 + canprototransmitter_bid*100;
+        
+        if (noflood <= 10 || noflood >= Tsend-10) bequiet = TRUE;
+        
+        if (++noflood >= Tsend)
+        {
+            noflood = 0;
+            
+            payload.w[0] = gTemperature;
+            payload.w[1] = I2Cerrcode;
+            payload.w[2] = I2Cerrors;
+            payload.w[3] = residual_enc;
+        
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+
+            ECANSend(msgid, 8, &payload);
+        }
+    }
+    
+    if (!bequiet)
     {
-        extern volatile int16_t residual_enc;
-        
-        payload.w[0] = residual_enc;
-        payload.w[1] = POSCNT;
-        payload.dw[1] = QE_COUNTER;
-        
-        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+        payload.b[0] = gControlMode;
+        payload.b[1] = gEncoderError.bitmask;
+
+        payload.w[1] = VqFbk;
+
+        payload.dw[1] = SysError.L;
+
+        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
 
         ECANSend(msgid, 8, &payload);
     }

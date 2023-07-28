@@ -14,8 +14,10 @@ extern "C" {
 
 #include "UserTypes.h"
 
-BOOL setupI2CTsens(void);
-int  readI2CTsens(void);
+#define isActiveI2CTsens() (I2C1CONbits.I2CEN)
+    
+int setupI2CTsens(void);
+int readI2CTsens(volatile int* temperature);
 
 #ifdef	__cplusplus
 }

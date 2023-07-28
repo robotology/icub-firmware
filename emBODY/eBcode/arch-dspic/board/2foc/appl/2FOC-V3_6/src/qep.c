@@ -74,7 +74,7 @@ void QEinit(int16_t ticks, int8_t num_poles, BOOL use_index)
     // Filter accept edge if it persist over 3 CK
     // cycles. So max QEP pin freq is about 3.3Mhz
     DFLTCONbits.QECK = 2;
-    DFLTCONbits.IMV  = 3; // iCub
+    DFLTCONbits.IMV  = 2; // iCub
     //DFLTCONbits.IMV  = 2; // ergoCub ?
 
     // Initialize the QEP module counter to run in modulus.

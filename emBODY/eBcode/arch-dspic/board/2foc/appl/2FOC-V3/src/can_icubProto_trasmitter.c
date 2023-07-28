@@ -78,27 +78,18 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 
     ECANSend(msgid, 8, &payload);
-
-    //prepare the payload
-    payload.b[0] = gControlMode;
-    payload.b[1] = gEncoderError.bitmask;
     
-    payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
-
-    payload.b[4] = SysError.b[0];
-    payload.b[5] = SysError.b[1];
-    payload.b[6] = SysError.b[2];
-    payload.b[7] = SysError.b[3];
-
-    msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
-
-    ECANSend(msgid, 8, &payload);
+    BOOL bequiet = FALSE;
 
     if (MotorConfig.fullcalib)
     {
         static int noflood = 0;
+    
+        int Tsend = 500 + canprototransmitter_bid*100;
         
-        if (++noflood > 2000)
+        if (noflood <= 10 || noflood >= Tsend-10) bequiet = TRUE;
+        
+        if (++noflood >= Tsend)
         {
             noflood = 0;
             
@@ -113,27 +104,46 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         }
     }
     else if (MotorConfig.verbose)
-    {
-        // diagnostics for iCub3
-        payload.b[0] = Iafbk>>8;
-        payload.b[1] = Icfbk>>8;
-        payload.b[2] = Vqfbk/10;
-        payload.b[3] = (int)(VqRef>>IKs)/10;
-                
-        payload.w[2] = maxCountfbk;
+    {        
+        static int noflood = 0;
         
-        switch (iQprot)
+        extern volatile char I2Cdead;
+        extern volatile uint16_t I2Cerrors;
+        extern volatile int I2Cerrcode;
+        
+        int Tsend = 500 + canprototransmitter_bid*100;
+        
+        if (noflood <= 10 || noflood >= Tsend-10) bequiet = TRUE;
+        
+        if (++noflood >= Tsend)
         {
-            case -1: payload.w[3] = 0x8000 | ElDegfbk; 
-                     break;
-            case  1: payload.w[3] = 0x4000 | ElDegfbk; 
-                     break;
-            default: payload.w[3] = ElDegfbk; 
-                     break;
-        }
+            noflood = 0;
             
-        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
-   
+            payload.w[0] = gTemperature;
+            payload.w[1] = I2Cerrcode;
+            payload.w[2] = I2Cdead;
+            payload.w[3] = I2Cerrors;
+        
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+
+            ECANSend(msgid, 8, &payload);
+        }
+    }
+    
+    if (!bequiet)
+    {
+        payload.b[0] = gControlMode;
+        payload.b[1] = gEncoderError.bitmask;
+    
+        payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
+
+        payload.b[4] = SysError.b[0];
+        payload.b[5] = SysError.b[1];
+        payload.b[6] = SysError.b[2];
+        payload.b[7] = SysError.b[3];
+
+        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
+
         ECANSend(msgid, 8, &payload);
     }
 }
