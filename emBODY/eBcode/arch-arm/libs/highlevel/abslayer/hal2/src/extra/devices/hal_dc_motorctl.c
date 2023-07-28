@@ -629,7 +629,8 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
 			pwm= TIM8->CCR3; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM8->CCR4; //take the pwmvalue
 			break;
-        } 
+        }
+		// Motor 0+1		
 	  case 4:	    
 		{
 			pwm= TIM1->CCR3; //take the pwmvalue 
@@ -734,7 +735,6 @@ extern hal_result_t hal_motor_enable(hal_motor_t id)
       s_hal_motor_out_enabled[4] = hal_true;
 		}
 		break;
-
   	// Motor 2+3
     case 5:
         {
@@ -963,7 +963,7 @@ static hal_boolval_t s_hal_motor_supported_is(hal_motor_t id)
 
 static void s_hal_motor_initted_set(hal_motor_t id)
 {	
-	 hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id));
+	hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id));
 }
 
 static void s_hal_motor_initted_reset(hal_motor_t id)
