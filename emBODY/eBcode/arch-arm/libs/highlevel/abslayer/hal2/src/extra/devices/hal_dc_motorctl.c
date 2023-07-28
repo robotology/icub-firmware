@@ -442,9 +442,6 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
     return(hal_res_OK);    
 }
 
-
-
-
 extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 {
     
@@ -546,6 +543,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 			}
 		}
 		break;
+	  // Motor 0+1
 		case 4:		
 		{
 			if (pwmvalue>0) 
@@ -565,6 +563,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 			}
 		}
 		break;
+		// Motor 2+3
 		case 5:		
 		{
 			if (pwmvalue>0) 
@@ -630,13 +629,15 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
 			pwm= TIM8->CCR3; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM8->CCR4; //take the pwmvalue
 			break;
-        } 
+        }
+		// Motor 0+1		
 	  case 4:	    
 		{
 			pwm= TIM1->CCR3; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM1->CCR4; //take the pwmvalue
 			break;
         }
+		// Motor 2+3
 	  case 5:	    
 		{
 			pwm= TIM8->CCR3; //take the pwmvalue 
@@ -710,6 +711,7 @@ extern hal_result_t hal_motor_enable(hal_motor_t id)
       s_hal_motor_out_enabled[3] = hal_true;
 		}
 		break;
+ 	  // Motor 0+1
     case 4:
         {
 		  TIM_CtrlPWMOutputs(TIM1,ENABLE);
@@ -718,6 +720,7 @@ extern hal_result_t hal_motor_enable(hal_motor_t id)
       s_hal_motor_out_enabled[4] = hal_true;
 		}
 		break;
+  	// Motor 2+3
     case 5:
         {
 		  TIM_CtrlPWMOutputs(TIM8,ENABLE);
@@ -780,6 +783,28 @@ extern hal_result_t hal_motor_disable(hal_motor_t id)
 		break;
 		case 3:
 		{
+		    if (s_hal_motor_out_enabled[2] == hal_false) TIM_CtrlPWMOutputs(TIM8,DISABLE);
+			GPIO_ResetBits(GPIOE, EN4);
+            s_hal_motor_out_enabled[3] = hal_false;
+		}
+		break;
+		// Motor 0+1
+		case 4: 
+		{
+		    if (s_hal_motor_out_enabled[1] == hal_false) TIM_CtrlPWMOutputs(TIM1,DISABLE);
+			GPIO_ResetBits(GPIOE, EN2);
+            s_hal_motor_out_enabled[0] = hal_false;
+		    if (s_hal_motor_out_enabled[0] == hal_false) TIM_CtrlPWMOutputs(TIM1,DISABLE);
+			GPIO_ResetBits(GPIOE, EN1);
+            s_hal_motor_out_enabled[1] = hal_false;
+		}
+		break;
+		// Motor 2+3
+		case 5:
+		{
+		    if (s_hal_motor_out_enabled[3] == hal_false) TIM_CtrlPWMOutputs(TIM8,DISABLE);
+			GPIO_ResetBits(GPIOE, EN3);
+            s_hal_motor_out_enabled[2] = hal_false;
 		    if (s_hal_motor_out_enabled[2] == hal_false) TIM_CtrlPWMOutputs(TIM8,DISABLE);
 			GPIO_ResetBits(GPIOE, EN4);
             s_hal_motor_out_enabled[3] = hal_false;
@@ -927,9 +952,11 @@ static hal_boolval_t s_hal_motor_supported_is(hal_motor_t id)
 static void s_hal_motor_initted_set(hal_motor_t id)
 {	
 		switch(HAL_motor_id2index(id)){
+			// Motor 0+1
 			case 4 : hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id - 4)); 
 							 hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id - 3));
 							 break;
+    	// Motor 2+3
 			case 5 : hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id - 2)); 
 							 hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id - 1));
 							 break;		
