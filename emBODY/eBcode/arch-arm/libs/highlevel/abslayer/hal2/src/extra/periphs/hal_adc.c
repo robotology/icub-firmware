@@ -1089,7 +1089,6 @@ extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor)
 			result5 += (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
 			return result5;
 		}
-
 }
 
 #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
