@@ -75,7 +75,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -313,7 +313,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
       <DebugOpt>
@@ -358,7 +358,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP0948199 -O206 -S8 -C0 -P00000003 -N00("") -D00(00000000) -L00(0) -TO32787 -TC200000000 -TT400000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD10000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-UP0948193 -O462 -S12 -C0 -P00000003 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO32787 -TC200000000 -TT400000000 -TP18 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD10000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -373,7 +373,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ARMRTXEVENTFLAGS</Key>
-          <Name>-L200 -Z20 -C0 -M1 -T1</Name>
+          <Name>-L200 -Z23 -C0 -M1 -T1</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -391,72 +391,7 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>324</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>135300074</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_ltr.cpp\324</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>116</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>135300918</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_ltr.cpp\116</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>318</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>135300048</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_icc_ltr.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_ltr.cpp\318</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>58</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>135304336</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_icc_printer.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\amc2c\../../../../embot/hw/embot_hw_icc_printer.cpp\58</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -500,7 +435,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -517,7 +452,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>1</aSer4>
+        <aSer4>0</aSer4>
         <StkLoc>1</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -536,6 +471,12 @@
       <pszMrulep></pszMrulep>
       <pSingCmdsp></pSingCmdsp>
       <pMultCmdsp></pMultCmdsp>
+      <SystemViewers>
+        <Entry>
+          <Name>OS Support\Event Viewer</Name>
+          <WinId>35905</WinId>
+        </Entry>
+      </SystemViewers>
       <DebugDescription>
         <Enable>0</Enable>
         <EnableFlashSeq>0</EnableFlashSeq>
@@ -831,7 +772,7 @@
 
   <Group>
     <GroupName>theMBD</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
