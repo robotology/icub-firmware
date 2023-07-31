@@ -385,7 +385,7 @@ namespace embot::hw::motor::bsp::amc2c {
         hTIM1.Instance = TIM1;
         hTIM1.Init.Prescaler = 0;
         hTIM1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-        hTIM1.Init.Period = 1024;
+        hTIM1.Init.Period = 1219;
         hTIM1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
         hTIM1.Init.RepetitionCounter = 0;
         hTIM1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -440,7 +440,7 @@ namespace embot::hw::motor::bsp::amc2c {
         Error_Handler();
         }
         sConfigOC.OCMode = TIM_OCMODE_PWM2;
-        sConfigOC.Pulse = 752;
+        sConfigOC.Pulse = 895; // was 752, changed due to different clock source from amc-bldc
         if (HAL_TIM_PWM_ConfigChannel(&hTIM1, &sConfigOC, TIM_CHANNEL_6) != HAL_OK)
         {
         Error_Handler();
@@ -1260,8 +1260,8 @@ namespace embot::hw::motor::bsp::amc2c {
             HAL_NVIC_SetPriority(TIM1_BRK_IRQn, 5, 0);
             HAL_NVIC_EnableIRQ(TIM1_BRK_IRQn);
 #endif            
-            HAL_NVIC_SetPriority(TIM1_UP_IRQn, 5, 0);
-            HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
+//            HAL_NVIC_SetPriority(TIM1_UP_IRQn, 5, 0);
+//            HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
             HAL_NVIC_SetPriority(TIM1_TRG_COM_IRQn, 5, 0);
             HAL_NVIC_EnableIRQ(TIM1_TRG_COM_IRQn);
             HAL_NVIC_SetPriority(TIM1_CC_IRQn, 5, 0);
@@ -1331,7 +1331,7 @@ namespace embot::hw::motor::bsp::amc2c {
 #else            
             HAL_NVIC_DisableIRQ(TIM1_BRK_IRQn);
 #endif            
-            HAL_NVIC_DisableIRQ(TIM1_UP_IRQn);
+//            HAL_NVIC_DisableIRQ(TIM1_UP_IRQn);
             HAL_NVIC_DisableIRQ(TIM1_TRG_COM_IRQn);
             HAL_NVIC_DisableIRQ(TIM1_CC_IRQn);
             /* USER CODE BEGIN TIM1_MspDeInit 1 */

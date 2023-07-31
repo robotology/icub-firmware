@@ -32,6 +32,7 @@
 #include "embot_hw_sys.h"
 #include "embot_core.h"
 #include "embot_app_theLEDmanager.h"
+#include "embot_hw_testpoint.h"
 #include <array>
 
 // some protocol includes
@@ -47,7 +48,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 //#define TEST_DURATION_FOC
 
-#define TEST_FOC_logvalues
+//#define TEST_FOC_logvalues
 
 
 // If the target setup is the KOLLMORGEN motor on RED LEGO platform,
@@ -254,6 +255,8 @@ struct embot::app::board::amc2c::theMBD::Impl
     uint32_t bin[numOfBins]{0};
     #endif
 
+    static constexpr embot::hw::TESTPOINT tp1 {embot::hw::TESTPOINT::one};
+    static constexpr embot::hw::TESTPOINT tp2 {embot::hw::TESTPOINT::two};
 };
 
 
@@ -336,6 +339,9 @@ bool embot::app::board::amc2c::theMBD::Impl::initialise(const Config &config)
         embot::app::theLEDmanager::getInstance().get(ledEXTfault).off();
     }
     
+    // Init testpoint for debug
+    embot::hw::testpoint::init(tp1);
+    embot::hw::testpoint::init(tp2);
     // init MBD
     AMC_BLDC_initialize();
     
@@ -413,7 +419,8 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
     // in here... 
     // inpframes.size() is always <= 4.
     // outputframes.size() is always = 0
-    
+    embot::hw::testpoint::on(tp1);
+
     measureTick->start();
     
     onEXTFAULTpolling();
@@ -489,7 +496,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
     
     measureTick->stop();
     
-   
+    embot::hw::testpoint::off(tp1);
     return true;
 }
 
@@ -513,6 +520,9 @@ dbgFOCvalues dbgFOC {};
 
 void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owner, const embot::hw::motor::Currents * const currents)
 {
+    embot::hw::testpoint::on(tp2);
+
+    //embot::hw::testpoint::on(tp2);
     Impl * impl = reinterpret_cast<Impl*>(owner);
     if((nullptr == impl) || (nullptr == currents))
     {
@@ -566,11 +576,13 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     // -----------------------------------------------------------------------------
     
     AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
+    //constexpr float coneversion2pwmvalue (163.83F);
+    constexpr float coneversion2pwmvalue (12.19F);
 
     // Set the voltages
-    int32_T Vabc0 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[0] * 163.83F);
-    int32_T Vabc1 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[1] * 163.83F);
-    int32_T Vabc2 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[2] * 163.83F);
+    int32_T Vabc0 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[0] * coneversion2pwmvalue);
+    int32_T Vabc1 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[1] * coneversion2pwmvalue);
+    int32_T Vabc2 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[2] * coneversion2pwmvalue);
     
 #if defined(TEST_FOC_logvalues)
     
@@ -622,6 +634,7 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
 #endif // #if defined(TEST_DURATION_FOC) 
 
     impl->measureFOC->stop();
+    embot::hw::testpoint::off(tp2);
 }
 
 #ifdef PRINT_HISTO_DEBUG 
