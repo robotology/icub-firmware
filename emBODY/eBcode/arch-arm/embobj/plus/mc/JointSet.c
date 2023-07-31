@@ -2067,11 +2067,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 //1) Fix the offset with the rotation raw
                 int32_t offset_raw = (calibrator->params.type14.offset + calibrator->params.type14.rotation ) % ((int32_t)DEG2ICUB*360);
                 
-                //2) Take offset value of calibation parameter with sign given by invertdirection
-                int32_t offset_fix = (calibrator->params.type14.invertdirection == 1) ? -(offset_raw) : offset_raw;
-                
-                //3) Convert offset to decideg for POS service
-                int32_t offset = ((ICUB2DEG)*(CTRL_UNITS)(offset_fix))*10.0f;
+                //3) Convert offset to decideg for POS service and add "-" sign to offset_raw to correct raw position (always minus sign independently from invertDirection value)
+                int32_t offset = ((ICUB2DEG)*(CTRL_UNITS)((-1)*offset_raw))*10.0f;
                 
                 ////debug code
                 snprintf(info, sizeof(info), "CALIB 14 j%d: or=%d o=%d", e, offset_raw, offset);
