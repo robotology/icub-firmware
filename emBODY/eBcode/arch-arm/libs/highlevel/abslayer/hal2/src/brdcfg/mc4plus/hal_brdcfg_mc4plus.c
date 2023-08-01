@@ -1013,7 +1013,7 @@
 
     const hal_motor_boardconfig_t hal_motor__theboardconfig =
     {
-        .supportedmask              =  (1 << hal_motor1) | (1 << hal_motor2) | (1 << hal_motor3) | (1 << hal_motor4)
+        .supportedmask              =  (1 << hal_motor1) | (1 << hal_motor2) | (1 << hal_motor3) | (1 << hal_motor4) | (1 << hal_motor5) | (1 << hal_motor6)
     };
     
 #endif//HAL_USE_DEVICE_MOTORCTL
