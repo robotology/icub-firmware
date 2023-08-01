@@ -33,6 +33,8 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+volatile int32_t RAW = 0;
+volatile int32_t CURRENT = 0;
 
 namespace embot::hw::motor::adc {
     
@@ -45,7 +47,12 @@ struct Converter
     static int32_t raw2current(int32_t r)
     {
         int32_t c = (r/1000) * 7872;
-        return c;
+        
+        RAW = r;
+        RAW = RAW;
+        CURRENT = c;
+        CURRENT = CURRENT;
+        return CURRENT;
     }
     
     static int32_t current2raw(int32_t c)

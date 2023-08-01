@@ -137,9 +137,9 @@ void PwmPhaseSet(uint16_t u, uint16_t v, uint16_t w)
 
     /* Must be interrupt-safe */
 //    taskDISABLE_INTERRUPTS();
-    PwmComparePhaseU = (u<1024) ? (u) : (1023);
-    PwmComparePhaseV = (v<1024) ? (v) : (1023);
-    PwmComparePhaseW = (w<1024) ? (w) : (1023);
+    PwmComparePhaseU = (u<1219) ? (u) : (1219);
+    PwmComparePhaseV = (v<1219) ? (v) : (1219);
+    PwmComparePhaseW = (w<1219) ? (w) : (1219);
 //    taskENABLE_INTERRUPTS();
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PwmComparePhaseU);
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, PwmComparePhaseV);
