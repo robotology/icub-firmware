@@ -55,7 +55,7 @@ struct embot::app::board::amc2c::theCANagentCORE::Impl
         std::uint8_t        tobefilled[3];  // to make the size of struct ... multiple of 8.
     };         
         
-    StoredInfo _storedinfo = {0};  
+    StoredInfo _storedinfo = {};  
     
     embot::prot::can::applicationInfo _applicationinfo {};
 
@@ -82,7 +82,7 @@ bool embot::app::board::amc2c::theCANagentCORE::Impl::initialise(const Config &c
     _storedinfo.applicationVbuild = _config.applicationinfo.version.build;
     _storedinfo.protocolVmajor = _config.applicationinfo.protocol.major;
     _storedinfo.protocolVminor = _config.applicationinfo.protocol.minor;
-    _storedinfo.protocolVmajor = _config.applicationinfo.protocol.major;
+  
     std::memmove(_storedinfo.info32, _config.boardinfo, sizeof(_storedinfo.info32)); 
     
     _board = static_cast<embot::prot::can::Board>(_storedinfo.boardtype);

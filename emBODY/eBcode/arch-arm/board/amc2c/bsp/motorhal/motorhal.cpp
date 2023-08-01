@@ -33,28 +33,32 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+volatile int32_t RAW = 0;
+volatile int32_t CURRENT = 0;
 
 namespace embot::hw::motor::adc {
     
 
 #define hadc1 (embot::hw::motor::bsp::amc2c::hADC1)
 #define hadc2 (embot::hw::motor::bsp::amc2c::hADC2)
-    
-    
 
 struct Converter
 {
     static int32_t raw2current(int32_t r)
     {
-        // return CIN_GAIN * vref_mV * r >> 16u;
-        return r;       
+        int32_t c = (r/1000) * 7872;
+        
+        RAW = r;
+        RAW = RAW;
+        CURRENT = c;
+        CURRENT = CURRENT;
+        return CURRENT;
     }
     
     static int32_t current2raw(int32_t c)
     {
-        // int32_t tmp = (curr << 16) / (CIN_GAIN * vref_mV);
-        // return tmp;
-        return c;       
+        int32_t r = (c*7872) / 1000;
+        return r;
     }    
     
     constexpr Converter() = default;
@@ -237,7 +241,7 @@ bool deinit()
 {
     bool r = true;    
     // AdcMotDeInit() unchanged is OK 
-    AdcMotDeInit();
+    // AdcMotDeInit();
     // i also clear the callback
     set({});    
     return r;    
@@ -406,7 +410,7 @@ struct hall_Table
 
     static constexpr uint16_t hallAngleTable[] =
     {
-        /* ABC  (°)  */
+        /* ABC  (?)  */
         /* LLL ERROR */ static_cast<uint16_t>(0),
         /* LLH  240  */ static_cast<uint16_t>(240.0 * Deg2iCub), /* 43690 */
         /* LHL  120  */ static_cast<uint16_t>(120.0 * Deg2iCub), /* 21845 */
@@ -661,9 +665,9 @@ extern void set(uint16_t u, uint16_t v, uint16_t w)
         u = v = w = 0;
     }
 
-    _pwm_internals.pwmcomparevalue_protect(true);    
+//    _pwm_internals.pwmcomparevalue_protect(true);    
     PwmPhaseSet(u, v, w);
-    _pwm_internals.pwmcomparevalue_protect(false);
+//    _pwm_internals.pwmcomparevalue_protect(false);
     
 //    if(true == _pwm_internals.calibrating)
 //    {        

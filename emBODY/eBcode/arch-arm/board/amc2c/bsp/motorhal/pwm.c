@@ -63,6 +63,8 @@ extern TIM_HandleTypeDef htim1;
 #define USE_BREAK_INPUT     0
 #endif
 
+// marco.accame: between [0, 1023], where original value is in [0, 64k) and use nearest integer
+// using (p+32)/64
 /* This macro reduce a PWM unsigned value to the value to be loaded in TIM1_CCRx registers */
 #define PWM_COMPARE_VALUE(Pwm)  ((((unsigned)(Pwm))>=0xFFC0U)?0x03FFU:((Pwm+0x0020U)>>6u))
 
@@ -88,13 +90,13 @@ static volatile uint16_t PwmComparePhaseW = 0;
  * @param   phtim   Not used
  * @return  void
  */
-static void PwmUpdateEvent_cb(TIM_HandleTypeDef *phtim)
-{
-    /* Update the compare registers of the PWM counter */
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PwmComparePhaseU);
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, PwmComparePhaseV);
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, PwmComparePhaseW);
-}
+//static void PwmUpdateEvent_cb(TIM_HandleTypeDef *phtim)
+//{
+//    /* Update the compare registers of the PWM counter */
+//    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PwmComparePhaseU);
+//    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, PwmComparePhaseV);
+//    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, PwmComparePhaseW);
+//}
 
 #if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
 #else
@@ -128,15 +130,20 @@ static void PwmBreakEvent_cb(TIM_HandleTypeDef *phtim)
 void PwmPhaseSet(uint16_t u, uint16_t v, uint16_t w)
 {
     /* Reduce PWM values in counter units */
-    u = PWM_COMPARE_VALUE(u);
-    v = PWM_COMPARE_VALUE(v);
-    w = PWM_COMPARE_VALUE(w);
+//    u = PWM_COMPARE_VALUE(u);
+//    v = PWM_COMPARE_VALUE(v);
+//    w = PWM_COMPARE_VALUE(w);
+
+
     /* Must be interrupt-safe */
-    taskDISABLE_INTERRUPTS();
-    PwmComparePhaseU = u;
-    PwmComparePhaseV = v;
-    PwmComparePhaseW = w;
-    taskENABLE_INTERRUPTS();
+//    taskDISABLE_INTERRUPTS();
+    PwmComparePhaseU = (u<1219) ? (u) : (1219);
+    PwmComparePhaseV = (v<1219) ? (v) : (1219);
+    PwmComparePhaseW = (w<1219) ? (w) : (1219);
+//    taskENABLE_INTERRUPTS();
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PwmComparePhaseU);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, PwmComparePhaseV);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, PwmComparePhaseW);    
 }
 
 
@@ -232,9 +239,9 @@ HAL_StatusTypeDef PwmInit(void)
 {
     /* Stop any operation in progress */
 #if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
-    __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_UPDATE);
+//    __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_UPDATE);
 #else    
-    __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_UPDATE|TIM_IT_BREAK);
+    __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_BREAK);
 #endif    
     HAL_TIM_PWM_Stop_IT(&htim1, TIM_CHANNEL_1);
     HAL_TIM_PWM_Stop_IT(&htim1, TIM_CHANNEL_2);
@@ -259,7 +266,8 @@ HAL_StatusTypeDef PwmInit(void)
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, PwmComparePhaseW = 0);
    
     /* Register the TIM1 callback functions and start the PWM generator */
-    if ((HAL_OK == HAL_TIM_RegisterCallback(&htim1, HAL_TIM_PERIOD_ELAPSED_CB_ID, PwmUpdateEvent_cb)) &&
+    if (
+//        (HAL_OK == HAL_TIM_RegisterCallback(&htim1, HAL_TIM_PERIOD_ELAPSED_CB_ID, PwmUpdateEvent_cb)) &&
 #if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
 #else    
         (HAL_OK == HAL_TIM_RegisterCallback(&htim1, HAL_TIM_BREAK2_CB_ID, PwmBreakEvent_cb)) &&
@@ -278,7 +286,7 @@ HAL_StatusTypeDef PwmInit(void)
 //#if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
 //        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE);
 //#else        
-        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE|TIM_IT_BREAK); 
+        __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_BREAK); 
 //#endif         
         return HAL_OK;
     }
@@ -300,9 +308,9 @@ void PwmDeInit(void)
     PwmReset(ENABLE);
     PwmSleep(ENABLE);
 #if defined(MOTORHALCONFIG_MOT_BREAK_IRQ_remove)
-     __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_UPDATE);
+//     __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_UPDATE);
 #else    
-    __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_UPDATE|TIM_IT_BREAK);
+    __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_BREAK);
 #endif    
     HAL_TIM_Base_Stop(&htim1);
     HAL_TIM_PWM_Stop_IT(&htim1, TIM_CHANNEL_1);
