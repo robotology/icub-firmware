@@ -29,21 +29,14 @@
 // - public #define  --------------------------------------------------------------------------------------------------
 
 
-#if !defined(EOTHESERVICES_customize_handV3_7joints)
-
-#define UNKNOWN              0
-
-#define HARDWARE_2FOC        1
-#define HARDWARE_MC4p        2
-
-#else
-
 // used by  MController::actuation_type  
 typedef enum {
     ACT_TYPE_UNKNOWN    = 0,
     ACT_TYPE_2FOC       = 1,
-    ACT_TYPE_MC4p       = 2,
-    ACT_TYPE_MC4pPMC    = 3    
+    ACT_TYPE_MC4p       = 2
+#if defined(EOTHESERVICES_customize_handV3_7joints)    
+   ,ACT_TYPE_MC4pPMC    = 3 
+#endif    
 } MC_ACTUATION_t;
     
 // used by Motor::HARDWARE_TYPE
@@ -52,11 +45,12 @@ typedef enum {
 typedef enum {
     HARDWARE_UNKNOWN    = 0,
     HARDWARE_2FOC       = 1,
-    HARDWARE_MC4p       = 2,
-    HARDWARE_PMC        = 3
+    HARDWARE_MC4p       = 2
+#if defined(EOTHESERVICES_customize_handV3_7joints)    
+   ,HARDWARE_PMC        = 3
+#endif    
 } MC_MOTOR_HARDWARE_t;
 
-#endif
 
 //#define NOT_AVAIL_MOTOR 0
 //#define PWM_INPUT_MOTOR 1

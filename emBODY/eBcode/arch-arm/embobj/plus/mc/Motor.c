@@ -1016,12 +1016,47 @@ void Motor_update_state_fbk(Motor* o, void* state) //
     */
 }
 
-#if !defined(EOTHESERVICES_customize_handV3_7joints)
-void Motor_actuate(Motor* motor, uint8_t N) //
+void Motor_actuate(MC_ACTUATION_t act, Motor* motor, uint8_t N) //
 {
-    if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
+    // we dont use act for now unless in special cases
+    
+#if defined(EOTHESERVICES_customize_handV3_7joints)    
+    
+    if(act == ACT_TYPE_MC4pPMC)
     {
-        
+        // first 4 motors are local and are managed by mc4plus board
+        for (int m=0; m<4; ++m)
+        {
+            motor[m].pwm_fbk = motor[m].output;
+            hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
+        }
+        // last 3 motors are on pmc and are managed by can messages
+        // so far i use the ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
+        int16_t output[3];
+    
+        for (int m=0; m<3; ++m)
+        {
+            output[m] = motor[m+4].output;
+        }
+    
+        eOcanprot_command_t command = {0};
+        command.clas = eocanprot_msgclass_periodicMotorControl;    
+        command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
+        command.value = output;
+    
+        eObrd_canlocation_t location = {0};
+        location.port = eOcanport1;
+        location.addr = 0xf;
+        location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
+
+        // and i send the command
+        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location);         
+    } else 
+    
+#endif // #if defined(EOTHESERVICES_customize_handV3_7joints)  
+    
+    if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
+    {        
         int16_t output[MAX_JOINTS_PER_BOARD] = {0};
     
         for (int m=0; m<N; ++m)
@@ -1052,75 +1087,6 @@ void Motor_actuate(Motor* motor, uint8_t N) //
         }
     }
 }  
-#else
-void Motor_actuate(MC_ACTUATION_t act, Motor* motor, uint8_t N) //
-{
-    if(act == ACT_TYPE_MC4pPMC)
-    {
-        // first 4 motors are local and are managed by mc4plus board
-        for (int m=0; m<4; ++m)
-        {
-            motor[m].pwm_fbk = motor[m].output;
-            hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
-        }
-        // last 3 motors are on pmc and are managed by can messages
-        // so far i use the ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
-        int16_t output[3];
-    
-        for (int m=0; m<3; ++m)
-        {
-            output[m] = motor[m+4].output;
-        }
-    
-        eOcanprot_command_t command = {0};
-        command.clas = eocanprot_msgclass_periodicMotorControl;    
-        command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
-        command.value = output;
-    
-        eObrd_canlocation_t location = {0};
-        location.port = eOcanport1;
-        location.addr = 0xf;
-        location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
-
-        // and i send the command
-        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location);         
-    }
-    else
-    {
-        if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
-        {
-            int16_t output[MAX_JOINTS_PER_BOARD];
-        
-            for (int m=0; m<N; ++m)
-            {
-                output[motor[m].actuatorPort] = motor[m].output;
-                //output[m] = motor[m].output;
-            }
-        
-            eOcanprot_command_t command = {0};
-            command.clas = eocanprot_msgclass_periodicMotorControl;    
-            command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
-            command.value = output;
-        
-            eObrd_canlocation_t location = {0};
-            location.port = eOcanport1;
-            location.addr = 0;
-            location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
-
-            // and i send the command
-            eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location); 
-        }
-        else if (motor->HARDWARE_TYPE == HARDWARE_MC4p)
-        {
-            for (int m=0; m<N; ++m)
-            {
-                motor[m].pwm_fbk = motor[m].output;
-                hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
-            }
-        }
-    }
-}  
-#endif
 
 // Motor
 /////////////////////////////////////////////////////////

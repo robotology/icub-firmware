@@ -88,7 +88,7 @@ struct MController_hid
     float **Sje;
     
     uint8_t part_type;
-    uint8_t actuation_type;
+    MC_ACTUATION_t actuation_type;
     
     AbsEncoder *absEncoder;
 };
@@ -612,53 +612,33 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         case eomn_serv_MC_foc:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.foc_based.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.foc_based.arrayofjomodescriptors.head.size;
-#if !defined(EOTHESERVICES_customize_handV3_7joints)            
-            o->actuation_type = HARDWARE_2FOC;
-#else
             o->actuation_type = ACT_TYPE_2FOC;
-#endif            
             jomoCouplingInfo = &(brd_cfg->data.mc.foc_based.jomocoupling);
             break;
         
         case eomn_serv_MC_mc4plusmais:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
-#if !defined(EOTHESERVICES_customize_handV3_7joints)            
-            o->actuation_type = HARDWARE_MC4p;
-#else
             o->actuation_type = ACT_TYPE_MC4p;
-#endif 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusmais_based.jomocoupling);
             break;
         
         case eomn_serv_MC_mc4plus:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
-#if !defined(EOTHESERVICES_customize_handV3_7joints)            
-            o->actuation_type = HARDWARE_MC4p;
-#else
             o->actuation_type = ACT_TYPE_MC4p;
-#endif
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
             break;
         case eomn_serv_MC_mc2pluspsc:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors.head.size; 
-#if !defined(EOTHESERVICES_customize_handV3_7joints)            
-            o->actuation_type = HARDWARE_MC4p; 
-#else
-            o->actuation_type = ACT_TYPE_MC4p;
-#endif 
+            o->actuation_type = ACT_TYPE_MC4p; 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc2pluspsc.jomocoupling);            
             break;
         case eomn_serv_MC_mc4plusfaps:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors.head.size; 
-#if !defined(EOTHESERVICES_customize_handV3_7joints)            
-            o->actuation_type = HARDWARE_MC4p; 
-#else
-            o->actuation_type = ACT_TYPE_MC4p;
-#endif 
+            o->actuation_type = ACT_TYPE_MC4p; 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusfaps.jomocoupling);            
             break;
 #if !defined(EOTHESERVICES_customize_handV3_7joints) 
@@ -760,12 +740,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 break;
             }
         };
-
-#if !defined(EOTHESERVICES_customize_handV3_7joints) 
-
-        o->motor[k].HARDWARE_TYPE = o->actuation_type;
-        
-#else
        
         // marco.accame: each motor has an hardware type which depends on actuation_type
         switch(o->actuation_type)
@@ -780,6 +754,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 o->motor[k].HARDWARE_TYPE = HARDWARE_MC4p;
             } break;    
 
+#if !defined(EOTHESERVICES_customize_handV3_7joints) 
+#else
             case ACT_TYPE_MC4pPMC: 
             {
                 // marco.accame on 07 jan 2021. 
@@ -789,13 +765,12 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 // so we use magic numbers ...
                 o->motor[k].HARDWARE_TYPE = (k <= 3) ? (HARDWARE_MC4p) : (HARDWARE_PMC);
             } break;   
-
+#endif
             default:
             {
                 o->motor[k].HARDWARE_TYPE = HARDWARE_UNKNOWN;
             } break;
         }
-#endif
                 
         switch(o->motor[k].HARDWARE_TYPE)
         {
@@ -805,6 +780,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             
             case HARDWARE_2FOC:
                 o->motor[k].actuatorPort = jomodes->actuator.foc.canloc.addr-1;
+                //o->motor[k].canloc = jomodes->actuator.foc.canloc;
                 break;
 
 #if !defined(EOTHESERVICES_customize_handV3_7joints) 
@@ -1845,12 +1821,7 @@ void MController_do()
         JointSet_do(smc->jointSet+s);
     }
     
-
-#if !defined(EOTHESERVICES_customize_handV3_7joints)
-    Motor_actuate(smc->motor, smc->nJoints);
-#else    
-    Motor_actuate(smc->actuation_type, smc->motor, smc->nJoints);
-#endif    
+    Motor_actuate(static_cast<MC_ACTUATION_t>(smc->actuation_type), smc->motor, smc->nJoints);
 }
 
 BOOL MController_set_control_mode(uint8_t j, eOmc_controlmode_command_t control_mode) //
