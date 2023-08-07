@@ -29,21 +29,15 @@
 // - public #define  --------------------------------------------------------------------------------------------------
 
 
-#if !defined(EOTHESERVICES_customize_handV3_7joints)
-
-#define UNKNOWN              0
-
-#define HARDWARE_2FOC        1
-#define HARDWARE_MC4p        2
-
-#else
-
 // used by  MController::actuation_type  
 typedef enum {
     ACT_TYPE_UNKNOWN    = 0,
     ACT_TYPE_2FOC       = 1,
-    ACT_TYPE_MC4p       = 2,
-    ACT_TYPE_MC4pPMC    = 3    
+    ACT_TYPE_MC4p       = 2 
+#if 0
+    // marco.accame: i keep it as an example of a mix actuation done by two boards: an mc4plus and a pmc   
+   ,ACT_TYPE_MC4pPMC    = 3 
+#endif    
 } MC_ACTUATION_t;
     
 // used by Motor::HARDWARE_TYPE
@@ -52,11 +46,13 @@ typedef enum {
 typedef enum {
     HARDWARE_UNKNOWN    = 0,
     HARDWARE_2FOC       = 1,
-    HARDWARE_MC4p       = 2,
-    HARDWARE_PMC        = 3
+    HARDWARE_MC4p       = 2
+#if 0
+    //marco.accame: i keep it as an example. the ACT_TYPE_MC4pPMC uses a motor hardware of type HARDWARE_MC4p but also of type HARDWARE_PMC
+   ,HARDWARE_PMC        = 3
+#endif    
 } MC_MOTOR_HARDWARE_t;
 
-#endif
 
 //#define NOT_AVAIL_MOTOR 0
 //#define PWM_INPUT_MOTOR 1
@@ -82,15 +78,11 @@ typedef enum {
 //#define EMS_FREQUENCY_INT32 1000
 //#define EMS_FREQUENCY_FLOAT CTRL_LOOP_FREQUENCY
 
-#if !defined(EOTHESERVICES_customize_handV3_7joints)
-    #define MAX_ENCODS_PER_BOARD 8
-    #define MAX_JOINTS_PER_BOARD 4
-    #define MAX_MOTORS_PER_BOARD 4
-#else
-    #define MAX_ENCODS_PER_BOARD 8
-    #define MAX_JOINTS_PER_BOARD 7
-    #define MAX_MOTORS_PER_BOARD 7
-#endif
+
+#define MAX_ENCODS_PER_BOARD 8
+#define MAX_JOINTS_PER_BOARD 4
+#define MAX_MOTORS_PER_BOARD 4
+
 
 #define TICKS_PER_REVOLUTION      65536
 #define TICKS_PER_HALF_REVOLUTION 32768

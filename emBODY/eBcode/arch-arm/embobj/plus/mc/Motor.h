@@ -142,20 +142,10 @@ typedef struct //Motor
     // consts
     uint8_t ID;
     uint8_t actuatorPort;
-#if !defined(EOTHESERVICES_customize_handV3_7joints)
-    // UNKNOWN              0
-    // HARDWARE_2FOC        1
-    // HARDWARE_MC4p        2
-    uint8_t HARDWARE_TYPE;
-#else    
-    eObrd_canlocation_t canloc; // it keeps the can location of the motor 
-    
-    // HARDWARE_UNKNOWN     0
-    // HARDWARE_2FOC        1
-    // HARDWARE_MC4p        2
-    // HARDWARE_PMC         3
-    uint8_t HARDWARE_TYPE; // it can have the above values
-#endif
+
+    eObrd_canlocation_t canloc; // it keeps the can location of the motor
+    MC_MOTOR_HARDWARE_t HARDWARE_TYPE;
+
 
 
     CTRL_UNITS GEARBOX;
@@ -266,11 +256,8 @@ extern void Motor_update_state_fbk(Motor* o, void* state_msg); //
 extern void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* data); //
 extern void Motor_do_calibration_hard_stop(Motor* o); //
 
-#if !defined(EOTHESERVICES_customize_handV3_7joints)
-extern void Motor_actuate(Motor* o, uint8_t N); //
-#else
-extern void Motor_actuate(MC_ACTUATION_t act, Motor* o, uint8_t N); // it needs on meore parameter
-#endif
+
+extern void Motor_actuate(Motor* o, uint8_t N, MC_ACTUATION_t act); //
 
 extern void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref);
 extern void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref);

@@ -349,11 +349,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     p->id32ofregulars = eo_array_New(motioncontrol_maxRegulars, sizeof(uint32_t), NULL);
     
-#if defined(EOTHESERVICES_customize_handV3_7joints)
-    p->ctrlobjs.thecontroller = MController_new(eo_motcon_extendedJOMOs, eo_motcon_extendedENCOs);
-#else
-    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardENCOs);
-#endif    
+    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardENCOs);  
 
 
     embot::app::eth::theEncoderReader::getInstance().initialise();
@@ -493,8 +489,8 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     if((eo_motcon_mode_foc != servcfg->type) && (eo_motcon_mode_mc4 != servcfg->type) &&
        (eo_motcon_mode_mc4plus != servcfg->type) && (eo_motcon_mode_mc4plusmais != servcfg->type) &&
        (eo_motcon_mode_mc2pluspsc != servcfg->type) && (eo_motcon_mode_mc4plusfaps != servcfg->type) 
-#if defined(EOTHESERVICES_customize_handV3_7joints) 
-       // we accept this mode only if we have compiled w/ macro EOTHESERVICES_customize_handV3_7joints w/ extends memory to 7 joints         
+#if 0 
+       // we dont accept this mode anymore         
        && (eo_motcon_mode_mc4pluspmc != servcfg->type)
 #endif    
       )
@@ -879,8 +875,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
     if((eo_motcon_mode_foc != servcfg->type) && (eo_motcon_mode_mc4 != servcfg->type) &&
        (eo_motcon_mode_mc4plus != servcfg->type) && (eo_motcon_mode_mc4plusmais != servcfg->type) &&
        (eo_motcon_mode_mc2pluspsc != servcfg->type) && (eo_motcon_mode_mc4plusfaps != servcfg->type) 
-#if defined(EOTHESERVICES_customize_handV3_7joints) 
-       // we accept this mode only if we have compiled w/ macro EOTHESERVICES_customize_handV3_7joints w/ extends memory to 7 joints         
+#if 0 
+       // we dont accept this mode anymore         
        && (eo_motcon_mode_mc4pluspmc != servcfg->type)
 #endif       
       )
