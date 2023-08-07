@@ -101,6 +101,10 @@ static const uint32_t AdcMotOffsetNumber[] =
 
 
 /* Local functions ****************************************************************************************************/
+// TODO: Remove, used only for debug
+int32_t AVG0 = 0;
+int32_t AVG1 = 0;
+int32_t AVG2 = 0;
 
 static void adcMotGetSamples(const DualModeAdcData_t *pBuf)
 {
@@ -119,10 +123,35 @@ static void adcMotGetSamples(const DualModeAdcData_t *pBuf)
 /*DEBUG*/HAL_GPIO_WritePin(TP4_GPIO_Port, TP4_Pin, GPIO_PIN_RESET);
 #endif
     
+//    static int32_t counter = 0;
+//    static int32_t avg_r_0, avg_r_1, avg_r_2  = 0;
+    
 #if defined(MOTORHAL_changes) 
     if(NULL != adcm_FP_on_acquisition_of_currents)
     {        
         adcm_FP_on_acquisition_of_currents(adcMotCurrents[0], adcMotCurrents[1], adcMotCurrents[2]);
+// TODO: Remove, used only for debug
+//        counter++;
+//        avg_r_0 = adcMotCurrents[0];
+//        avg_r_1 = adcMotCurrents[1];
+//        avg_r_2 = adcMotCurrents[2];
+          AVG0 = adcMotCurrents[0];
+          AVG1 = adcMotCurrents[1];
+          AVG2 = adcMotCurrents[2] ;
+        
+//        if(counter % 50 == 0)
+//        {
+//            AVG0 = avg_r_0 / counter;
+//            AVG1 = avg_r_1 / counter;
+//            AVG2 = avg_r_2 / counter;
+//            //embot::core::print(std::to_string(AVG0) + ";" + std::to_string(AVG1) + ";" + std::to_string(AVG2));
+
+//            counter = 0;
+//            avg_r_0 = 0;
+//            avg_r_1 = 0;
+//            avg_r_2 = 0;
+//        }
+        
     }
 #endif    
 }
