@@ -63,9 +63,7 @@ extern "C" {
 #endif
 
 
-#if defined(EOTHESERVICES_customize_handV3_7joints)
-    #define VERSION_MAJOR_OFFSET  70
-#elif defined(EOTHESERVICES_customize_handV3)
+#if defined(EOTHESERVICES_customize_handV3)
     #define VERSION_MAJOR_OFFSET  30
 #elif defined(FATALERR_trace_RTOS) || defined(FATALERR_trace_TMRMAN)
     #define VERSION_MAJOR_OFFSET  100

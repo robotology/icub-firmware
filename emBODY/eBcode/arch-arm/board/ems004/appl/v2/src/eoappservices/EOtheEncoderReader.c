@@ -621,10 +621,7 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
     s_eo_theencoderreader.diagnostics.errorDescriptor.par64 = 0;    
     for(uint8_t i=0; i<s_eo_theencoderreader.numofjomos; i++)
     {
-#if defined(EOTHESERVICES_customize_handV3_7joints)
-        #warning the case of EOTHESERVICES_customize_handV3_7joints allows EOtheEncoderReader to send diagnostics of encoders of only 4 joints
-        // i can put in here info of up to 4 joints at maximum. so, we cannot manage info of the encoders of the last 3 joints 
-#endif        
+        // i can put in here info of up to 4 joints at maximum. so, we cannot manage info of any further joint     
         if(i < 4) 
         {
             uint64_t value = 0;

@@ -257,7 +257,7 @@ extern void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* data); /
 extern void Motor_do_calibration_hard_stop(Motor* o); //
 
 
-extern void Motor_actuate(MC_ACTUATION_t act, Motor* o, uint8_t N); //
+extern void Motor_actuate(Motor* o, uint8_t N, MC_ACTUATION_t act); //
 
 extern void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref);
 extern void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref);
