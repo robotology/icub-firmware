@@ -548,18 +548,18 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 		{
 			if (pwmvalue>0) 
 			{
-				TIM_SetCompare3(TIM1, pwmvalue);
-				TIM_SetCompare4(TIM1, 0);			
 				TIM_SetCompare1(TIM1, pwmvalue);
-				TIM_SetCompare2(TIM1, 0);		
+				TIM_SetCompare2(TIM1, 0);	
+				TIM_SetCompare3(TIM1, pwmvalue);
+				TIM_SetCompare4(TIM1, 0);				
 			}
 			else
 			{
 				pwmvalue=-pwmvalue;
-				TIM_SetCompare3(TIM1, 0);
-				TIM_SetCompare4(TIM1, pwmvalue);
 				TIM_SetCompare1(TIM1, 0);
 				TIM_SetCompare2(TIM1, pwmvalue);
+				TIM_SetCompare3(TIM1, 0);
+				TIM_SetCompare4(TIM1, pwmvalue);
 			}
 		}
 		break;
@@ -640,9 +640,9 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
 		// Motor 2+3
 	  case 5:	    
 		{
-			pwm= TIM8->CCR3; //take the pwmvalue 
-			if (pwm==0) 	pwm=-TIM8->CCR4; //take the pwmvalue
-			break;
+			pwm= TIM8->CCR1; //take the pwmvalue 
+			if (pwm==0) 	pwm=-TIM8->CCR2; //take the pwmvalue
+      break;
         }
 				
 		default:
@@ -951,18 +951,7 @@ static hal_boolval_t s_hal_motor_supported_is(hal_motor_t id)
 
 static void s_hal_motor_initted_set(hal_motor_t id)
 {	
-		switch(HAL_motor_id2index(id)){
-			// Motor 0+1
-			case 4 : hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id - 4)); 
-							 hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id - 3));
-							 break;
-    	// Motor 2+3
-			case 5 : hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id - 2)); 
-							 hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id - 1));
-							 break;		
-			default : hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id));
-								break;
-		}
+	 hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id));
 }
 
 static void s_hal_motor_initted_reset(hal_motor_t id)
@@ -972,7 +961,7 @@ static void s_hal_motor_initted_reset(hal_motor_t id)
 
 static hal_boolval_t s_hal_motor_initted_is(hal_motor_t id)
 {  
-    if(id >= hal_motors_number)
+	if(id >= hal_motors_number)
     {
         return(hal_false);
     }    
