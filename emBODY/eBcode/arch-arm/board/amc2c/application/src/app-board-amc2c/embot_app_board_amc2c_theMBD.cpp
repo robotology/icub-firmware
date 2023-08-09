@@ -594,8 +594,13 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     dbgFOC.pwms = {Vabc0, Vabc1, Vabc2};
 
 #endif
-    
-    embot::hw::motor::setpwm(embot::hw::MOTOR::one, Vabc0, Vabc1, Vabc2);
+    // TODO: Remove, used only for debug
+    //  0% PWM value on phase Vabc2 = 0,0,0
+    // 10% PWM value on phase Vabc2 = 0,0,122
+    // 20% PWM value on phase Vabc2 = 0,0,244
+    // 30% PWM value on phase Vabc2 = 0,0,366
+
+    embot::hw::motor::setpwm(embot::hw::MOTOR::one, 0, 0, 122);
     
    
 //#define DEBUG_PARAMS
