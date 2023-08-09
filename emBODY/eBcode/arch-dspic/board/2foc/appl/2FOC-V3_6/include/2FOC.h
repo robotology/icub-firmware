@@ -61,7 +61,7 @@ volatile extern tCtrlReferences CtrlReferences;
 volatile extern tI2T I2Tdata;
 volatile extern unsigned char gControlMode;
 volatile extern int gTemperature;
-volatile extern unsigned int i2cERRORS;
+volatile extern int gTemperatureLimit;
 volatile extern long gQEPosition;
 volatile extern int  gQEVelocity;
 

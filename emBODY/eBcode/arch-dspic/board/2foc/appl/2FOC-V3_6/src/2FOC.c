@@ -154,7 +154,7 @@ volatile tMotorConfig MotorConfig;
 
 volatile static char bDriveEnabled = 0;
 volatile int gTemperature = 0;
-volatile unsigned int i2cERRORS = 0;
+volatile int gTemperatureLimit = 0;
 
 volatile char sAlignInProgress = 0;
 
@@ -1036,6 +1036,8 @@ void DisableDrive()
 // - disable PWM generators
 // - disable FOC loop
 {
+    //if (MotorConfig.has_tsens) I2C1CONbits.I2CEN = 0;
+
     // disable PWM
     pwmOFF();
     pwmZero();
@@ -1052,6 +1054,8 @@ void DisableDrive()
     //ZeroRegulators();
 
     bDriveEnabled = 0;
+    
+    //if (MotorConfig.has_tsens) I2C1CONbits.I2CEN = 1;
 }
 
 // drive functions are controlled according to DS402 standard (when possible)

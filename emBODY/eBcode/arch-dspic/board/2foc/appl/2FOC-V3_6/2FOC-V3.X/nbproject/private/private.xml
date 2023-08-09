@@ -3,14 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/CONFIGHAL/icub-firmware_V35/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/can_icubProto_parser.c</file>
-            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/CONFIGHAL/icub-firmware_V35/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/can_icubProto_trasmitter.c</file>
-            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/CONFIGHAL/icub-firmware_V35/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/DHES.c</file>
-            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/CONFIGHAL/icub-firmware_V35/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/can_icubProto.h</file>
-            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/CONFIGHAL/icub-firmware_V35/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/qep.h</file>
-            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/CONFIGHAL/icub-firmware_V35/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/qep.c</file>
-            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/CONFIGHAL/icub-firmware_V35/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/can_icubProto.c</file>
-            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/CONFIGHAL/icub-firmware_V35/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/2FOC.c</file>
+            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/2FOCV36/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3_6/include/i2cTsens.h</file>
+            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/2FOCV36/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3_6/src/i2cTsens.c</file>
+            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/2FOCV36/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3_6/src/System.c</file>
+            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/2FOCV36/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3_6/include/can_icubProto.h</file>
+            <file>file:/C:/Users/ascalzo/Documents/IIT/Projects-GIT/2FOCV36/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3_6/src/can_icubProto_trasmitter.c</file>
         </group>
     </open-files>
 </project-private>

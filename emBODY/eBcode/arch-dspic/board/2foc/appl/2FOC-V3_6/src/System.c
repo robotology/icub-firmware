@@ -149,12 +149,10 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
     IFS0bits.T3IF = 0; // clear flag
 }
 
-void __attribute__((interrupt, no_auto_psv)) _MI2C1Interrupt(void)
-{
-        //IFS1bits.MI2C1IF = 0;	//Clear the DMA0 Interrupt Flag;
-}
-
-//#define WAITFOR(flag,errcode,jump) for (wdog=12800; wdog && (flag); --wdog); if (!wdog) { gTemperature=errcode; goto jump; }
+//void __attribute__((interrupt, no_auto_psv)) _MI2C1Interrupt(void)
+//{
+//        //IFS1bits.MI2C1IF = 0;	//Clear the DMA0 Interrupt Flag;
+//}
 
 void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
 //
@@ -169,23 +167,34 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
     // light the leds
     ActuateMuxLed();
 
-    if (MotorConfig.has_tsens)
+    if (MotorConfig.has_tsens && isActiveI2CTsens())
     {
+        extern volatile BOOL overheating;
+        
         static int cycle = 0;
-        if (++cycle>=20)
+        
+        if (++cycle>=208)
         {
             cycle = 0;
-            gTemperature = readI2CTsens();
+
+            int err = readI2CTsens(&gTemperature);
         
-            if (gTemperature < 0)
-            {
-                ++i2cERRORS;
-            }
-            else if (gTemperature > 3468) // = 100 C   T = 0.0297*i2c - 3;
-            {
-                //The temperature grew too much. Protect!
-                SysError.I2TFailure = 1;
-                FaultConditionsHandler();
+            if (!err)
+            {        
+                if (gTemperature > gTemperatureLimit)
+                {
+                    overheating = TRUE;
+                }
+                else if (gTemperature < (gTemperatureLimit-gTemperatureLimit/8))
+                {
+                    overheating = FALSE;
+                }
+                
+                if (overheating && !SysError.I2TFailure)
+                {
+                    SysError.I2TFailure = TRUE;
+                    FaultConditionsHandler();
+                }
             }
         }
     }
