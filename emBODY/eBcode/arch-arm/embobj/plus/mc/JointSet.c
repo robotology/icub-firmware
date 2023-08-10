@@ -616,6 +616,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     {
     case eomc_controlmode_cmd_force_idle:
     case eomc_controlmode_cmd_idle:
+    {
         for (int k=0; k<N; ++k)
         { 
             Motor_motion_reset(o->motor+o->motors_of_set[k]);
@@ -624,7 +625,8 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
             Motor_set_idle(o->motor+o->motors_of_set[k]);
             Joint_set_control_mode(o->joint+o->joints_of_set[k], control_mode_cmd);
         }
-        break;
+    }
+    break;
 #ifdef WRIST_MK2    
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_velocity_pos:

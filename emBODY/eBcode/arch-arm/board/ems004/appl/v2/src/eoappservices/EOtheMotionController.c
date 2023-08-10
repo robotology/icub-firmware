@@ -1581,9 +1581,9 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     
     if(eobool_false == p->service.started)
     {   // it is already stopped
+    
         return(eores_OK);
     }
-    
     
     if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
@@ -1594,7 +1594,8 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     }
     else //foc, mc4plus, mc4plusmais, and others which use the MControler
     {
-         MController_go_idle();
+        MController_go_idle();
+        MController_deinit();
     }
       
     p->service.started = eobool_false;
@@ -1605,7 +1606,6 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     //eo_motioncontrol_SetRegulars(p, NULL, NULL);
     
     // eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Stop()", s_eobj_ownname);
-    
     return(eores_OK);    
 }
 
