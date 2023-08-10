@@ -36,6 +36,11 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOtheEntities.h"
+    
+
+#include "Motor_hid.h"
+
+#include "embot_app_eth_mc_messaging.h"
 
 
 
@@ -111,20 +116,9 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
         }    
     }
     
-    ((int16_t*)KpKiKdKs)[0] = Kp;
-    ((int16_t*)KpKiKdKs)[1] = Ki;
-    ((int16_t*)KpKiKdKs)[2] = Kd; //(unused in 2FOC)
-               KpKiKdKs [6] = Ks; // shift
-    
-    send_debug_message("CURRENT PID", o->ID, Ks, (((uint64_t)Kp)<<32) | Ki);
-    
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
-    
-    eOcanprot_command_t cmdPid;
-    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
-    cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    cmdPid.value = KpKiKdKs;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
+    // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID
+    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{o->mlocation}, {Kp, Ki, Kd, Ks}};
+    msg.transmit(); 
 }
 
 static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
@@ -161,34 +155,21 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
             break;
         }    
     }
-    
-    ((int16_t*)KpKiKdKs)[0] = Kp;
-    ((int16_t*)KpKiKdKs)[1] = Ki;
-    ((int16_t*)KpKiKdKs)[2] = Kd; //(unused in 2FOC)
-               KpKiKdKs [6] = Ks; // shift
-        
-    send_debug_message("VELOCITY PID", o->ID, Ks, (((uint64_t)Kp)<<32) | Ki);
-    
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
-    
-    eOcanprot_command_t cmdPid;
-    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
-    cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID;
-    cmdPid.value = KpKiKdKs;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
+
+    // ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID    
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{o->mlocation}, {Kp, Ki, Kd, Ks}};
+    msg.transmit();    
 }
 
 static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_t* current_params)
-{    
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
-    
-    uint32_t max_current = current_params->peakCurrent;
-    
-    eOcanprot_command_t cmdMaxCurrent;
-    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
-    cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    cmdMaxCurrent.value = &max_current;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
+{ 
+    // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT    
+    embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
+    {
+        {o->mlocation},
+        {current_params->nominalCurrent, current_params->peakCurrent, current_params->overloadCurrent}
+    };
+    msg.transmit();   
 }
 
 static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
@@ -216,32 +197,27 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     
     o->can_motor_config[6] = (int)(o->enc_tolerance*10.0f);
 
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
-    
     Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
     Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
-        
-    eOcanprot_command_t cmdMaxCurrent;
-    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
-    cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    cmdMaxCurrent.value = &(config->currentLimits);
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
 
-    eOcanprot_command_t cmdMotorConfig;
-    cmdMotorConfig.clas = eocanprot_msgclass_pollingMotorControl;
-    cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
-    cmdMotorConfig.value = o->can_motor_config;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);
+    // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT 
+    embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
+    {
+        {o->mlocation},
+        {config->currentLimits.nominalCurrent, config->currentLimits.peakCurrent, config->currentLimits.overloadCurrent}
+    };
+    msg.transmit(); 
+        
+    // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG    
+    embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{o->mlocation}, {&o->can_motor_config[0]}};
+    msgmc.transmit();          
 }
 
-static void Motor_set_control_mode_2FOC(uint8_t motor, icubCanProto_controlmode_t control_mode)
-{
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
-    eOcanprot_command_t command = {0};
-    command.clas = eocanprot_msgclass_pollingMotorControl;
-    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
-    command.value = &control_mode;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+static void Motor_set_control_mode_2FOC(Motor* o, icubCanProto_controlmode_t control_mode)
+{   
+    // ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE
+    embot::app::eth::mc::messaging::sender::Set_Control_Mode msg {{o->mlocation}, {control_mode}};
+    msg.transmit(); 
 }
 
 
@@ -331,7 +307,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
         //Motor_config_MC4p(o->ID, config);
 
         o->control_mode = icubCanProto_controlmode_idle;
-        hal_motor_disable((hal_motor_t)o->actuatorPort);
+        hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
     }    
        
 }
@@ -343,16 +319,11 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
         *(int16_t*)(o->can_motor_config+1) = resolution;
-        
-        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
-        
-        eOcanprot_command_t cmdMotorConfig;
-        cmdMotorConfig.clas = eocanprot_msgclass_pollingMotorControl;
-        cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
-        cmdMotorConfig.value = o->can_motor_config;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);  
-    }
-     
+
+        // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG   
+        embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{o->mlocation}, {&o->can_motor_config[0]}};
+        msgmc.transmit();           
+    }     
 }
 
 void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params)
@@ -364,10 +335,6 @@ void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_p
         Motor_config_max_currents_2FOC(o, current_params);
     }   
 }
-
-//extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
-//extern void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid);
-//extern void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pid);
 
 void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
 {
@@ -447,14 +414,13 @@ extern void Motor_uncalibrate(Motor* o)
 {
     //o->not_init = TRUE;
     o->not_calibrated = TRUE;
-
+        
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
-    {
-        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
-        eOcanprot_command_t command = {0};
-        command.clas = eocanprot_msgclass_pollingMotorControl;
-        command.type  = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+    {        
+        // ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER
+        // i use icubCanProto_calibration_type_undefined because the 2foc does not process the payload. 
+        embot::app::eth::mc::messaging::sender::Calibrate_Encoder msg {{o->mlocation}, {{icubCanProto_calibration_type_undefined, 0}}};
+        msg.transmit();         
     }
 }
 
@@ -554,14 +520,14 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        Motor_set_control_mode_2FOC(o->ID, control_mode);
+        Motor_set_control_mode_2FOC(o, control_mode);
         Motor_new_state_req(o, control_mode);
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
         hal_motor_reenable_break_interrupts();
         
-        hal_motor_enable((hal_motor_t)o->actuatorPort);
+        hal_motor_enable(static_cast<hal_motor_t>(o->mlocation.eth.id));
 
         o->control_mode = control_mode;
     }    
@@ -589,12 +555,12 @@ void Motor_set_idle(Motor* o) //
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        Motor_set_control_mode_2FOC(o->ID, icubCanProto_controlmode_idle);
+        Motor_set_control_mode_2FOC(o, icubCanProto_controlmode_idle);
         Motor_new_state_req(o, icubCanProto_controlmode_idle);
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        hal_motor_disable((hal_motor_t)o->actuatorPort);
+        hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
         
         if (o->control_mode != icubCanProto_controlmode_hwFault)
         {
@@ -607,13 +573,13 @@ void Motor_force_idle(Motor* o) //
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        Motor_set_control_mode_2FOC(o->ID, icubCanProto_controlmode_forceIdle);
+        Motor_set_control_mode_2FOC(o, icubCanProto_controlmode_forceIdle);
         Motor_new_state_req(o, icubCanProto_controlmode_idle);
         WatchDog_rearm(&o->can_2FOC_alive_wdog);
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        hal_motor_disable((hal_motor_t)o->actuatorPort);
+        hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
         
         o->control_mode = icubCanProto_controlmode_idle;
     }
@@ -753,7 +719,7 @@ BOOL Motor_check_faults(Motor* o) //
     
     if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        hal_motor_disable((hal_motor_t)o->actuatorPort);
+        hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
     }
     
     // DIAGNOSTICS MESSAGES
@@ -849,7 +815,7 @@ BOOL Motor_check_faults(Motor* o) //
 
 static void Motor_raise_fault_overcurrent(Motor* o)
 {
-    hal_motor_disable((hal_motor_t)o->actuatorPort);
+    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
     
     o->fault_state.bits.OverCurrentFailure = TRUE;
     
@@ -858,7 +824,7 @@ static void Motor_raise_fault_overcurrent(Motor* o)
 
 void Motor_raise_fault_i2t(Motor* o)
 {
-    hal_motor_disable((hal_motor_t)o->actuatorPort);
+    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
     
     o->fault_state.bits.I2TFailure = TRUE;
     
@@ -867,7 +833,7 @@ void Motor_raise_fault_i2t(Motor* o)
 /*
 void Motor_raise_fault_external(Motor* o)
 {
-    hal_motor_disable((hal_motor_t)o->actuatorPort);
+    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
     
     o->fault_state.bits.ExternalFaultAsserted = TRUE;
     
@@ -930,36 +896,23 @@ void Motor_actuate(Motor* motor, uint8_t N, MC_ACTUATION_t act) //
     // marco.accame on 07aug2023:
     // in here we decide the type of actuation by comparing motor->HARDWARE_TYPE vs HARDWARE_2FOC etc.
     // we also act so that in some cases we can use ACT_TYPE_2FOC / ACT_TYPE_MC4p / etc.
-
-    if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
-    {        
-        int16_t output[MAX_JOINTS_PER_BOARD] = {0};
     
-        for (int m=0; m<N; ++m)
-        {
-            output[motor[m].actuatorPort] = motor[m].output;
-            //output[m] = motor[m].output;
-        }
-    
-        eOcanprot_command_t command = {0};
-        command.clas = eocanprot_msgclass_periodicMotorControl;    
-        command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
-        command.value = output;
-    
-        eObrd_canlocation_t location = {0};
-        location.port = eOcanport1;
-        location.addr = 0;
-        location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
-
-        // and i send the command
-        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location); 
-    }
-    else if (motor->HARDWARE_TYPE == HARDWARE_MC4p)
+    if(ACT_TYPE_2FOC == act)
     {
-        for (int m=0; m<N; ++m)
+        // ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT
+        embot::app::eth::mc::messaging::sender::Actuate_Motors msg {};
+        for(uint8_t m=0; m<std::min(N, embot::app::eth::mc::messaging::sender::Actuate_Motors::maxnumberofmotors); m++)
+        {
+            msg.push_back({{motor[m].mlocation}, {motor[m].output}});
+        }
+        msg.transmit();                
+    }
+    else if (ACT_TYPE_MC4p == act)
+    {
+        for (uint8_t m=0; m<N; m++)
         {
             motor[m].pwm_fbk = motor[m].output;
-            hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
+            hal_motor_pwmset(static_cast<hal_motor_t>(motor[m].mlocation.eth.id), motor[m].output);
         }
     }
 }  

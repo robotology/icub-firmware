@@ -157,7 +157,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || 
        (eo_motcon_mode_mc4plusfaps == mcmode) || (eo_motcon_mode_mc4pluspmc == mcmode))
     {
-        MController_config_joint(jxx, cfg, mcmode);
+        MController_config_joint(jxx, cfg);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -1192,7 +1192,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || 
        (eo_motcon_mode_mc4plusfaps == mcmode) || (eo_motcon_mode_mc4pluspmc == mcmode))
     {
-        MController_set_control_mode(jxx, (eOmc_controlmode_command_t)(*controlmode));        
+        MController_set_control_mode(jxx, *controlmode);        
     }    
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -1452,7 +1452,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
     eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
 
     eOmc_current_limits_params_t *currentLimits = (eOmc_current_limits_params_t*)rd->data;
-    eOmeas_current_t curr = currentLimits->overloadCurrent;
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
@@ -1472,36 +1471,28 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
    
     // foc-base and mc4based should send overloadCurrent to can-boards
 
-
     if(eo_motcon_mode_foc == mcmode)
     {
-        //  send the can message to relevant board
-        eOcanprot_command_t command = {0};
-        command.clas = eocanprot_msgclass_pollingMotorControl;
-        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-        command.value = &curr;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-
         MController_motor_config_max_currents(mxx, currentLimits);
     }
     else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || (eo_motcon_mode_mc4plusfaps == mcmode))
     {
-        eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+        eo_currents_watchdog_UpdateCurrentLimits(eo_currents_watchdog_GetHandle(), mxx);
         // now for the case of mc4plus, the watchdog updates the current limits inside ems controller. 
         // we should re-evaluate the situation after refactoring of mc-controller
     }
     else if(eo_motcon_mode_mc4pluspmc == mcmode)  
     {
         eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
-        // marco.accame on 22 apr 2021: ERROR
-        // MController_motor_config_max_currents() does not form correctly the CAN frame because it uses 
-        // eOmc_current_limits_params_t::peakCurrent instead
         MController_motor_config_max_currents(mxx, currentLimits);
     }     
     else if(eo_motcon_mode_mc4 == mcmode)
     {
-        // just send the can message to relevant board
-       //  send the can message to relevant board
+        // marco.accame on 08aug2023: the ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT message accepts a .value which points to 
+        // a eOmc_current_limits_params_t struct. this struct holds three int16_t: nominalCurrent, peakCurrent, overloadCurrent
+        // however the case of a mc4can board has always used a pointer to overloadCurrent ...
+        // so, i keep it as it has always been.
+        eOmeas_current_t curr = currentLimits->overloadCurrent;
         eOcanprot_command_t command = {0};
         command.clas = eocanprot_msgclass_pollingMotorControl;
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;

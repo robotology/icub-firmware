@@ -35,8 +35,6 @@
 
 #include <cstring>
 
-#include "embot_hw.h"
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -126,6 +124,7 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
            
     std::string tostring(MotIndex mo)
     {
+
         switch(mo)
         {
             case MotIndex::one:
@@ -136,6 +135,16 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
             case MotIndex::two:
             {
                 return "two";
+            } break;
+            
+            case MotIndex::three:
+            {
+                return "three";
+            } break;  
+
+            case MotIndex::four:
+            {
+                return "four";
             } break;
             
             default:
@@ -164,16 +173,31 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
                 cm = ControlMode::Current;
             } break;
             
+            case 0x09:
+            {
+                cm = ControlMode::ForceIdle;
+            } break;            
+
             case 0x0A:
             {
                 cm = ControlMode::SpeedVoltage;
-            } break;            
-            
+            } break;
+              
             case 0x50:
             {
                 cm = ControlMode::OpenLoop;
-            } break;   
+            } break; 
 
+            case 0xA0:
+            {
+                cm = ControlMode::HWfault;
+            } break; 
+
+            case 0xB0:
+            {
+                cm = ControlMode::NotConfigured;
+            } break; 
+            
             default:
             {
                 cm = ControlMode::none;
@@ -203,6 +227,11 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
             {
                 return "Current";
             } break;
+
+            case ControlMode::ForceIdle:
+            {
+                return "ForceIdle";
+            } break;
             
             case ControlMode::SpeedVoltage:
             {
@@ -214,6 +243,16 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
                 return "OpenLoop";
             } break;
 
+            case ControlMode::HWfault:
+            {
+                return "HWfault";
+            } break;
+
+            case ControlMode::NotConfigured:
+            {
+                return "NotConfigured";
+            } break;
+            
             default:
             {
                 return "none";

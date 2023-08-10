@@ -27,6 +27,8 @@
 // - dependencies    
 #include "JointSet.h"
 #include "Joint_hid.h"
+#include "Motor_hid.h"
+    
 #include "CalibrationHelperData.h"
 #if defined(USE_EMBOT_theServices) 
 //#warning USE_EMBOT_theServices is defined
@@ -383,7 +385,7 @@ BOOL JointSet_do_wait_calibration_8(JointSet* o)
     {
         int m = o->motors_of_set[ms];
 
-        if (hal_adc_get_hall_sensor_analog_input_mV(o->motor[m].actuatorPort) < 1500)
+        if (hal_adc_get_hall_sensor_analog_input_mV(o->motor[m].mlocation.eth.id) < 1500)
         {
             o->motor[m].not_calibrated = FALSE;
         }

@@ -35,6 +35,7 @@
 #include "JointSet.h"
 #include "Joint.h"
 #include "Motor.h"
+#include "Motor_hid.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
 #include "hal_led.h"
@@ -91,6 +92,11 @@ struct MController_hid
     MC_ACTUATION_t actuation_type;
     
     AbsEncoder *absEncoder;
+    
+    // it gets those values of eOmn_serv_type_t that belong to category eomn_serv_category_mc.
+    // they are: eomn_serv_MC* 
+    // i could use also values of eOmotioncontroller_mode_t but i prefere remove dependancy from EOtheMotionController.h in here
+    eOmn_serv_type_t mcmode; 
 };
 
 
@@ -246,6 +252,8 @@ void MController_init() //
     {        
         AbsEncoder_init(o->absEncoder+i);
     }
+    
+    o->mcmode = eomn_serv_NONE;
 }
 
 void MController_deinit()
@@ -256,14 +264,11 @@ void MController_deinit()
 static uint8_t getNumberOfSets(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
 {
     uint8_t n=0;
-#if !defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)
-    for(uint8_t i=0; i<MAX_JOINTS_PER_BOARD; i++)
-#else    
+    
     // marco.accame on 12 apr 2021: 
     // this function works with a eOmc_4jomo_coupling_t argument which manages 4 joints. hence we must use 4 and not MAX_JOINTS_PER_BOARD (which could be redefined)
-    static const int NJ = 4; 
-    for(uint8_t i=0; i<NJ; i++)
-#endif    
+    static const size_t NJ = 4; 
+    for(uint8_t i=0; i<NJ; i++)   
     {
         if((jomoCouplingInfo->joint2set[i] != eomc_jointSetNum_none) && (jomoCouplingInfo->joint2set[i] > n))
         {
@@ -277,14 +282,11 @@ static uint8_t getNumberOfSets(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
 static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo,  EOconstarray* carray)
 {
     MController *o = smc;
-#if !defined(EMBOT_ENABLE_hw_pzm_emulatedMODE)
-    for(uint8_t i=0; i<MAX_JOINTS_PER_BOARD; i++)
-#else    
+  
     // marco.accame on 12 apr 2021: 
     // this function works with a eOmc_4jomo_coupling_t argument which manages 4 joints. hence we must use 4 and not MAX_JOINTS_PER_BOARD (which could be redefined)
-    static const int NJ = 4; 
-    for(uint8_t i=0; i<NJ; i++)
-#endif    
+    static const size_t NJ = 4; 
+    for(uint8_t i=0; i<NJ; i++)  
     {
         if(eomc_jointSetNum_none == jomoCouplingInfo->joint2set[i])
             continue; //leave init values
@@ -649,6 +651,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     EOconstarray* carray = NULL;
     const eOmc_4jomo_coupling_t *jomoCouplingInfo = NULL;
     
+    // init the motion control mode
+    o->mcmode = static_cast<eOmn_serv_type_t>(brd_cfg->type); 
+    
     switch (brd_cfg->type)
     {
         case eomn_serv_MC_foc:
@@ -694,9 +699,20 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             break;
 #endif        
         default:
-            return;
+        {
+            // unsupported mode
+            o->mcmode = eomn_serv_NONE;
+        } break;
+
     }
     
+    if(eomn_serv_NONE == o->mcmode)
+    {
+        // we have an unsupported mode, so i cannot go on
+        return;    
+    }        
+    
+
     for (int k=0; k<o->nJoints; ++k)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, k);
@@ -820,26 +836,45 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         switch(o->motor[k].HARDWARE_TYPE)
         {
             case HARDWARE_MC4p:
-                o->motor[k].actuatorPort = jomodes->actuator.pwm.port;
-                break;
+            {
+                o->motor[k].mlocation.eth.place = eobrd_place_eth;
+                o->motor[k].mlocation.eth.id = jomodes->actuator.pwm.port;
+
+            } break;
             
             case HARDWARE_2FOC:
-                o->motor[k].actuatorPort = jomodes->actuator.foc.canloc.addr-1;
-                //o->motor[k].canloc = jomodes->actuator.foc.canloc;
-                break;
+            {            
+                // marco.accame on 01aug2023: so far we use only can location to manage the case of
+                // - up to 4 foc can boards 
+                // - the 3 amcbldc.
+                // for now we can manage the case of 1 amc2c on the same core by assigning to it a CAN1:5 address
+                // but we should change jomodes->actuator.foc.canloc into a proper jomodes->actuator.foc.location
+                // this solution would also manage much better the future case of amc2foc            
+                o->motor[k].mlocation.can.place = eobrd_place_can;
+                o->motor[k].mlocation.can.port = jomodes->actuator.foc.canloc.port;
+                o->motor[k].mlocation.can.addr = jomodes->actuator.foc.canloc.addr;
+                o->motor[k].mlocation.can.ffu = 0;  
             
+            } break;
+
             // marco.accame: i keep it just an example in case we need to manage a new mode w/ mixed actuation type. 
             //               if a motor uses a particular hw it may use a specific ... location for the actuator
             //               this code was for the case: EOTHESERVICES_customize_handV3_7joints
 #if 0
             case HARDWARE_PMC:
-                o->motor[k].actuatorPort = jomodes->actuator.pmc.canloc.addr-1;
-                o->motor[k].canloc = jomodes->actuator.pmc.canloc;
-                break;
+            {
+                o->motor[k].mlocation.can.place = eobrd_place_can;
+                o->motor[k].mlocation.can.port = jomodes->actuator.pmc.canloc.port;
+                o->motor[k].mlocation.can.addr = jomodes->actuator.pmc.canloc.addr;
+                o->motor[k].mlocation.can.ffu = 0;
+                
+            } break;
 #endif 
            
             default:
+            {
                 return;
+            } break;
         }
         
         o->joint[k].eo_joint_ptr = eo_entities_GetJoint(eo_entities_GetHandle(), k);
@@ -905,646 +940,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
 
 
 
-
-
-#if 0
-
-//void MController_config_board(uint8_t part_type, uint8_t actuation_type)
-void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
-{
-    MController *o = smc;
-    
-    EOconstarray* carray = NULL;
-    const eOmc_4jomo_coupling_t *jomoCouplingInfo = NULL;
-    
-    switch (brd_cfg->type)
-    {
-        case eomn_serv_MC_foc:
-            carray = eo_constarray_Load((const EOarray*)&brd_cfg->data.mc.foc_based.arrayofjomodescriptors);
-            o->part_type = brd_cfg->data.mc.foc_based.boardtype4mccontroller;
-            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.foc_based.arrayofjomodescriptors.head.size;
-            o->actuation_type = HARDWARE_2FOC;
-            jomoCouplingInfo = &(brd_cfg->data.mc.foc_based.jomocoupling);
-            break;
-        
-        case eomn_serv_MC_mc4plusmais:
-            carray = eo_constarray_Load((const EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
-            o->part_type = brd_cfg->data.mc.mc4plusmais_based.boardtype4mccontroller;
-            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
-            o->actuation_type = HARDWARE_MC4p;
-            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusmais_based.jomocoupling);
-            break;
-        
-        case eomn_serv_MC_mc4plus:
-            carray = eo_constarray_Load((const EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
-            o->part_type = brd_cfg->data.mc.mc4plus_based.boardtype4mccontroller;
-            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
-            o->actuation_type = HARDWARE_MC4p;
-            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
-            break;
-        
-        default:
-            return;
-    }
-    
-    for (int k=0; k<o->nJoints; ++k)
-    {
-        const eOmc_jomo_descriptor_t *jomodes = (const eOmc_jomo_descriptor_t*) eo_constarray_At(carray, k);
-        
-        switch(jomodes->encoder1.type)
-        {
-            case eomc_enc_spichainof2:
-            {
-                for (int e=0; e<2; ++e)
-                {
-                    o->absEncoder[k*2+e].type = eomc_enc_aea;
-                    o->absEncoder[k*2+e].fake = FALSE;
-                }
-                break;
-            }
-            case eomc_enc_spichainof3:
-            {
-                for (int e=0; e<3; ++e)
-                {
-                    o->absEncoder[k*3+e].type = eomc_enc_aea;
-                    o->absEncoder[k*3+e].fake = FALSE;
-                }
-                break;
-            }                
-            case eomc_enc_aea:
-            {
-                o->absEncoder[k].type = eomc_enc_aea;
-                o->absEncoder[k].fake = FALSE;
-                break;
-            }
-            
-            case eomc_enc_mais:
-            {
-                o->absEncoder[k].type = eomc_enc_mais;
-                o->absEncoder[k].fake = FALSE;
-                break;
-            }
-            
-            case eomc_enc_absanalog:
-            {
-                o->absEncoder[k].type = eomc_enc_absanalog;
-                o->absEncoder[k].fake = FALSE;
-                break;
-            }
-            default:
-            {
-                o->absEncoder[k].fake = TRUE;
-                o->absEncoder[k].type = eomc_enc_aea;
-                break;
-            }
-        };
-        
-        o->motor[k].HARDWARE_TYPE = o->actuation_type;
-        
-        switch(o->motor[k].HARDWARE_TYPE)
-        {
-            case HARDWARE_MC4p:
-            {
-                o->motor[k].actuatorPort = jomodes->actuator.pwm.port;
-                Motor_clear_ext_fault(&(o->motor[k]));
-            }
-                break;
-            
-            case HARDWARE_2FOC:
-                o->motor[k].actuatorPort = jomodes->actuator.foc.canloc.addr-1;
-                break;
-
-            default:
-                return;
-        }
-        
-        o->joint[k].eo_joint_ptr = eo_entities_GetJoint(eo_entities_GetHandle(), k);
-    }
-    
-    float **Jjm = NULL; //o->Jjm;
-    float **Jmj = NULL; //o->Jmj;
-  
-    float **Sjm = NULL; //o->Sjm;
-    float **Sje = NULL; //o->Sje;
-    
-    
-    
-    get_jomo_coupling_info(jomoCouplingInfo);
-    
-    //Currently not all info are stored in boardconfig, so in following switch the controller configures jointsets, joints, etc. with remaining info
-    
-    switch (o->part_type)
-    {
-    case eomc_ctrlboard_ANKLE:                   //= 1,    //2FOC
-    {
-        for (int k = 0; k<o->nJoints; ++k)
-        {            
-            o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            
-            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->jointSet[k].CAN_DO_TRQ_CTRL = TRUE;
-        }
-        
-        break;
-    }
-    
-    case eomc_ctrlboard_CER_UPPER_ARM:               //= 17,    //2FOC
-    {
-        for (int k = 0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
-            o->joint[k].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-        
-            o->jointSet[k].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-            o->jointSet[k].CAN_DO_TRQ_CTRL = TRUE;
-        }
-        break;
-    }   
-
-    case eomc_ctrlboard_UPPERLEG:                //= 2,    //2FOC
-    {
-        Jjm = o->Jjm;
-        Sjm = o->Sjm;
-    
-        Sjm[0][0] = 50.0f/75.0f;
-        Jjm[0][0] = Sjm[0][0];
-    
-        //invert_matrix(Jjm, Jmj, 4);
-        
-        for (int k = 0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            
-            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->jointSet[k].CAN_DO_TRQ_CTRL = TRUE;
-        }
-        break;
-    }
-        
-        
-    case eomc_ctrlboard_WAIST:                   //= 3,    //2FOC
-    {
-
-        // |j0|   |   0.5   0.5    0   |   |m0|
-        // |j1| = |  -0.5   0.5    0   | * |m1|
-        // |j2|   | 22/80 22/80  44/80 |   |m2|
-        
-        Sjm = o->Sjm;
-        Jjm = o->Jjm;
-        Jmj = o->Jmj;
-        
-        float alfa = 22.0f/80.0f;
-    
-        Sjm[0][0] =  0.5f; Sjm[0][1] =  0.5f; Sjm[0][2] =  0.0f; 
-        Sjm[1][0] = -0.5f; Sjm[1][1] =  0.5f; Sjm[1][2] =  0.0f; 
-        Sjm[2][0] =  alfa; Sjm[2][1] =  alfa; Sjm[2][2] =  2.0f*alfa;
-    
-        for (int j=0; j<3; ++j)
-            for (int m=0; m<3; ++m)
-                Jjm[j][m] = Sjm[j][m];
-        
-        
-        for (int k = 0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        }
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
-        
-        break;
-    }
-    case eomc_ctrlboard_SHOULDER:                //= 4,    //2FOC
-    {
-        Sjm = o->Sjm;
-        Jjm = o->Jjm;
-        Jmj = o->Jmj;
-        #if defined(ICUB_MEC_V1) || defined(ICUB_GENOVA04)
-        // |j0|   |  1     0    0   |   |e0|     
-        // |j1| = |  0     1    0   | * |e1|
-        // |j2|   |  1    -1  40/65 |   |e2|
-        Sje = o->Sje;
-        #endif
-        
-        // |j0|    | 1     0       0   |   |m0|
-        // |j1|  = | 1   40/65     0   | * |m1|
-        // |j2|    | 0  -40/65   40/65 |   |m2|
-
-        float alfa = 40.0f/65.0f; //IMPORTANT: alfa must have the same value of variable alfa in EOtheBoardConfig.c
-    
-        Sjm[0][0] =  1.0f; Sjm[0][1] =  0.0f; Sjm[0][2] =  0.0f; Sjm[0][3] =  0.0f;
-        Sjm[1][0] =  1.0f; Sjm[1][1] =  alfa; Sjm[1][2] =  0.0f; Sjm[1][3] =  0.0f;
-        Sjm[2][0] =  0.0f; Sjm[2][1] = -alfa; Sjm[2][2] =  alfa; Sjm[2][3] =  0.0f;
-        Sjm[3][0] =  0.0f; Sjm[3][1] =  0.0f; Sjm[3][2] =  0.0f; Sjm[3][3] =  1.0f;
-
-        for (int j=0; j<4; ++j)
-            for (int m=0; m<4; ++m)
-                Jjm[j][m] = Sjm[j][m];
-        
-        for (int k=0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        }
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
-        
-        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
-        
-        break;
-    }
-    case eomc_ctrlboard_CER_WAIST:               //= 15,   //2FOC
-    {
-        for (int k=0; k<3; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        }
-        
-        o->joint[3].CAN_DO_TRQ_CTRL = TRUE;
-        o->joint[3].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-        o->motor[3].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
-        
-        o->jointSet[1].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
-        
-        o->jointSet[0].special_constraint = TRIFID_CONSTRAINT;
-        o->jointSet[0].special_limit = WAIST_TRIFID_LIMIT;
-    
-        break;
-    }
-        
-    case eomc_ctrlboard_CER_LOWER_ARM:               //= 12,   //MC4plus
-    {
-        //Sje = o->Sje;
-        //Sje[3][3] = 1.0f/64.0f;
-    
-        for (int k=0; k<3; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        }
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
-        
-        o->jointSet[0].special_constraint = TRIFID_CONSTRAINT;
-        o->jointSet[0].special_limit = WRIST_TRIFID_LIMIT;
-        
-        //////////////////////////////////////////////////////
-        
-        o->joint[3].CAN_DO_TRQ_CTRL = TRUE;
-        o->joint[3].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->motor[3].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        
-        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
-        
-        AbsEncoder_config_divisor(o->absEncoder+3, 64);
-        
-        break;
-    }
-        
-    case eomc_ctrlboard_CER_BASE:                //= 21    //2FOC
-    {
-        
-        for (int k = 0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-            
-            o->jointSet[k].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
-        }
-    }
-        break;
-    
-    case eomc_ctrlboard_CER_NECK:                   //= 22,    //mc4plus
-    {
-        for (int k = 0; k<o->nJoints; ++k)
-        {            
-            o->joint[k].dead_zone = 0;
-            
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            
-            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
-        }
-        
-        AbsEncoder_config_divisor(o->absEncoder+1, 125);
-        
-        break;
-    }
-    
-    case eomc_ctrlboard_CER_HAND:                   //= 14, 16,    //mc2plus
-    {
-        o->nEncods = 6;
-    
-        o->multi_encs = 3;
-    
-        Sje = o->Sje;
-
-        Sje[0][0] = -1; Sje[0][1] = 1; Sje[0][2] = 0; Sje[0][3] =  0; Sje[0][4] = 0; Sje[0][5] = 0;
-        Sje[1][0] =  0; Sje[1][1] = 0; Sje[1][2] = 0; Sje[1][3] = -1; Sje[1][4] = 1; Sje[1][5] = 0;
-    
-        //Sje[0][0] =  0; Sje[0][1] = 0; Sje[0][2] = 1; Sje[0][3] =  0; Sje[0][4] = 0; Sje[0][5] = 0;
-        //Sje[1][0] =  0; Sje[1][1] = 0; Sje[1][2] = 0; Sje[1][3] =  0; Sje[1][4] = 0; Sje[1][5] = 1;
-    
-        o->e2s[0] = o->e2s[1] = o->e2s[2] = 0;
-        o->e2s[3] = o->e2s[4] = o->e2s[5] = 1;
-    
-        for (int k = 0; k<o->nJoints; ++k)
-        {            
-            o->joint[k].dead_zone = 400;
-            
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            
-            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->jointSet[k].USE_SPEED_FBK_FROM_MOTORS = FALSE;
-            
-            o->j2s[k] = o->m2s[k] = k;
-            
-            //o->multi_encs[k] = 2;
-            
-            o->jointSet[k].special_constraint = CER_HAND_CONSTRAINT;
-        }
-        
-        break;    
-    }
-    
-    case eomc_ctrlboard_HEAD_neckpitch_neckroll:      //= 5,    //MC4plus
-    {
-        // motor to joint
-        // |j0|   |   0.5   -0.5  |   |m0|
-        // |j1| = |   0.5    0.5  | * |m1|
-
-        Sjm = o->Sjm;
-        Jjm = o->Jjm;
-        Jmj = o->Jmj;
-        
-        Sjm[0][0] =  0.5f; Sjm[0][1] = -0.5f;
-        Sjm[1][0] =  0.5f; Sjm[1][1] =  0.5f;
-    
-        for (int j=0; j<o->nJoints; ++j)
-            for (int m=0; m<o->nJoints; ++m)
-                Jjm[j][m] = Sjm[j][m];
-
-        for (int k = 0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        }
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
-        
-        break;
-    }
-    case eomc_ctrlboard_HEAD_neckyaw_eyes:       //=6,      //MC4plus
-    {
-
-        Sjm = o->Sjm;
-        Jjm = o->Jjm;
-        Jmj = o->Jmj;
-        
-        //motor to joint
-        
-        // |j0|    | 1     0       0      0 |    |m0|
-        // |j1|  = | 0     1       0      0 |  * |m1|
-        // |j2|    | 0     0      0.5    0.5|    |m2|
-        // |j3|    | 0     0     -0.5    0.5|    |m2|
-
-        Sjm[0][0] =  1.0f; Sjm[0][1] =  0.0f; Sjm[0][2] =  0.0f; Sjm[0][3] =  0.0f;
-        Sjm[1][0] =  0.0f; Sjm[1][1] =  1.0f; Sjm[1][2] =  0.0f; Sjm[1][3] =  0.0f;
-        Sjm[2][0] =  0.0f; Sjm[2][1] =  0.0f; Sjm[2][2] =  0.5f; Sjm[2][3] =  0.5f;
-        Sjm[3][0] =  0.0f; Sjm[3][1] =  0.0f; Sjm[3][2] = -0.5f; Sjm[3][3] =  0.5f;
-
-        for (int j=0; j<4; ++j)
-            for (int m=0; m<4; ++m)
-                Jjm[j][m] = Sjm[j][m];
-        
-        for (int k=0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        }
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
-        
-        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[1].CAN_DO_TRQ_CTRL = FALSE;
-        
-        o->jointSet[2].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[2].CAN_DO_TRQ_CTRL = FALSE;
-        
-        break;
-    }
-
-    case eomc_ctrlboard_HAND_thumb:                  //= 9,    //MC4plus
-    {
-        /*
-        NOTE: (VALE)
-            In this board, thumb oppose and thumb proximal joints are coupled.
-            I get decoupled matrix from mc4(CAN) firmware version 0x228 function "decouple_dutycycle".
-            In this function, the fw uses a different decoupled matrix if it runs on left arm or right arm.
-            Currently I tested only left arm, so we need to check if the same matrix can be use also on twin board on right arm.
-        */
-        
-        Jjm = o->Jjm;
-        Jmj = o->Jmj;
-        
-        //motor to joint
-        
-        // |j0|    | 1     0       0      0 |    |m0|
-        // |j1|  = | 1     1       0      0 |  * |m1|
-        // |j2|    | 0     0       1      0 |    |m2|
-        // |j3|    | 0     0       0      1 |    |m3|
-
-        Jjm[0][0] =  1.0f; Jjm[0][1] =  0.0f; Jjm[0][2] =  0.0f; Jjm[0][3] =  0.0f;
-        Jjm[1][0] =  1.0f; Jjm[1][1] =  1.0f; Jjm[1][2] =  0.0f; Jjm[1][3] =  0.0f;
-        Jjm[2][0] =  0.0f; Jjm[2][1] =  0.0f; Jjm[2][2] =  1.0f; Jjm[2][3] =  0.0f;
-        Jjm[3][0] =  0.0f; Jjm[3][1] =  0.0f; Jjm[3][2] =  0.0f; Jjm[3][3] =  1.0f;
-
-        
-        for (int k=0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        }
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
-        
-        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[1].CAN_DO_TRQ_CTRL = FALSE;
-        
-        o->jointSet[2].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[2].CAN_DO_TRQ_CTRL = FALSE;
-    }    
-    break;
-    
-    case eomc_ctrlboard_FACE_eyelids_jaw:        //= 7,    //MC4plus
-    case eomc_ctrlboard_4jointsNotCoupled:               //= 8,    //MC4plus
-    {
-        for (int k = 0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            
-            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
-
-        }
-
-        break;
-    }
-    case eomc_ctrlboard_HAND_2:                  //= 10,   //MC4plus
-        break;
-    
-    case eomc_ctrlboard_FOREARM:                 //= 11,   //MC4plus
-    {
-        Sjm = o->Sjm;
-        Jjm = o->Jjm;
-        Jmj = o->Jmj;
-        
-        //motor to joint
-        
-        // |j0|    | 1     0       0      0 |    |m0|
-        // |j1|  = | 0     1       1      0 |  * |m1|
-        // |j2|    | 0     0       1      0 |    |m2|
-        // |j3|    | 0     0       0      1 |    |m3|
-
-        Sjm[0][0] =  1.0f; Sjm[0][1] =  0.0f; Sjm[0][2] =  0.0f; Sjm[0][3] =  0.0f;
-        Sjm[1][0] =  0.0f; Sjm[1][1] =  1.0f; Sjm[1][2] =  1.0f; Sjm[1][3] =  0.0f;
-        Sjm[2][0] =  0.0f; Sjm[2][1] =  0.0f; Sjm[2][2] =  1.0f; Sjm[2][3] =  0.0f;
-        Sjm[3][0] =  0.0f; Sjm[3][1] =  0.0f; Sjm[3][2] =  0.0f; Sjm[3][3] =  1.0f;
-
-        for (int j=0; j<4; ++j)
-            for (int m=0; m<4; ++m)
-                Jjm[j][m] = Sjm[j][m];
-
-        for (int k=0; k<o->nJoints; ++k)
-        {
-            o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
-            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        }
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
-        
-        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
-        
-        o->jointSet[2].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[2].CAN_DO_TRQ_CTRL = TRUE;
-    
-    break;
-    }    
-    
-
-    default:
-        return;
-    }
-    
-    //check multi encoder compatibility
-    //currently all joint of same board have the the same number of multiple encoder. so i use j0
-    const eOmc_jomo_descriptor_t *jomodes = (const eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
-    uint8_t cfg_multienc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
-    if(o->multi_encs != cfg_multienc)
-    {
-        eOerrmanDescriptor_t errdes;
-        char str[50];
-        snprintf(str, sizeof(str), "multiEnc check: par16=mc par64=cfg");
-        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag04);
-        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress    = 0;
-        errdes.par16            = o->multi_encs;
-        errdes.par64            = cfg_multienc;
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
-    
-    }
-    
-    
-    for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
-    
-    for (int e=0; e<o->nEncods; ++e)
-    {
-        int s = o->e2s[e];
-
-        o->eos[s][(o->enc_set_dim[s])++] = e;
-    }
-    
-    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
- 
-    for (int m=0; m<o->nJoints; ++m)
-    {
-        int s = o->m2s[m];
-
-        o->mos[s][(o->set_dim[s])++] = m;
-    }
-    
-    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
- 
-    for (int j=0; j<o->nJoints; ++j)
-    {
-        int s = o->j2s[j];
-
-        o->jos[s][(o->set_dim[s])++] = j;
-    }
-    
-    for (int s=0; s<o->nSets; ++s)
-    {
-        JointSet_config
-        (
-            o->jointSet+s,
-            o->set_dim+s,
-            o->enc_set_dim+s,
-            o->jos[s],
-            o->mos[s],
-            o->eos[s],
-            o->joint, 
-            o->motor, 
-            o->absEncoder,
-            Jjm,
-            Jmj,
-            Sje,
-            Sjm
-        );
-        
-        o->jointSet[s].led = (hal_led_t)(hal_led1 + s);
-    }
-}
-
-#endif
-
-void MController_config_joint(int j, eOmc_joint_config_t* config, eOmotioncontroller_mode_t mcmode) //
+void MController_config_joint(int j, eOmc_joint_config_t* config) //
 {
     MController *o = smc;
     
@@ -1563,7 +959,7 @@ void MController_config_joint(int j, eOmc_joint_config_t* config, eOmotioncontro
     for(int e=0; e< o->multi_encs; e++)
     {
         //if encoder alredy initialized and mcmode == eo_motcon_mode_mc4plusmais
-        if(mcmode == eo_motcon_mode_mc4plusmais && AbsEncoder_is_initialized(o->absEncoder+j*o->multi_encs+e))
+        if(o->mcmode == eomn_serv_MC_mc4plusmais && AbsEncoder_is_initialized(o->absEncoder+j*o->multi_encs+e))
         {
             continue;
         }
