@@ -1801,7 +1801,6 @@ void MController_set_interaction_mode(uint8_t j, eOmc_interactionmode_t interact
     JointSet_set_interaction_mode(smc->jointSet+smc->j2s[j], interaction_mode);
 } 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
