@@ -18,8 +18,8 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _STM32HAL_BOARD_H_
-#define _STM32HAL_BOARD_H_
+#ifndef __STM32HAL_BOARD_H_
+#define __STM32HAL_BOARD_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -474,6 +474,33 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for amc2c
     #endif
+
+#elif   defined(STM32HAL_BOARD_AMCFOCM7) 
+
+    // one case: v1A0
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+    
+        #include "../src/config/stm32hal_driver_cfg_of_amcfocm7_v1A0.h"
+        #include "../src/board/amcfocm7/v1A0/inc/gpio.h"
+        #include "../src/board/amcfocm7/v1A0/inc/stm32h7xx_it.h"
+		
+    #else
+        #error unsupported driver version for amcfocm7
+    #endif
+
+#elif   defined(STM32HAL_BOARD_AMCFOCM4) 
+
+
+    // one case: v1A0
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+       
+        #include "../src/config/stm32hal_driver_cfg_of_amcfocm4_v1A0.h"
+//        #include "../src/board/amcfocm4/v1A0/inc/gpio.h"
+        #include "../src/board/amcfocm4/v1A0/inc/stm32h7xx_it.h"
+		
+    #else
+        #error unsupported driver version for amcfocm4
+    #endif
     
 #elif   defined(STM32HAL_BOARD_MTB4C)
         
@@ -552,7 +579,7 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for strain2c
     #endif
-    
+        
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${B}
 #endif
