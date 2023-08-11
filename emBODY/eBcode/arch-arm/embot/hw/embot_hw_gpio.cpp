@@ -65,8 +65,8 @@ namespace embot { namespace hw { namespace gpio {
     bool supported(GPIO &g) { return false; }
     bool initialised(GPIO &g) { return false; }
     result_t init(const embot::hw::GPIO &g, const Config &config) { return resNOK; }
-    result_t configure(const embot::hw::stm32GPIO &g, Mode m, Pull p, Speed s) { return resNOK; }      
-    result_t set(const embot::hw::stm32GPIO &g, State s) { return resNOK; }
+    result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s) { return resNOK; }      
+    result_t set(const embot::hw::GPIO &g, State s) { return resNOK; }
     result_t toggle(const embot::hw::GPIO &g) { return resNOK; }
     State get(const embot::hw::GPIO &g) { return State::RESET; }
     

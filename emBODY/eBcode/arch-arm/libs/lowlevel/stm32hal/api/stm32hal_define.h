@@ -17,8 +17,8 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _STM32HAL_DEFINE_H_
-#define _STM32HAL_DEFINE_H_
+#ifndef __STM32HAL_DEFINE_H_
+#define __STM32HAL_DEFINE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -302,6 +302,49 @@ extern "C" {
     #define CORE_CM4
     #endif  
     
+#elif   defined(STM32HAL_BOARD_AMCFOCM7)
+
+    // it has a STM32H745xx mpu
+    #if !defined(STM32H745xx)
+    #define STM32H745xx
+    #endif  
+
+    // of family STM32H7
+    #if !defined(STM32H7)
+    #define STM32H7
+    #endif  
+
+    // of family STM32H7 but in STM32HAL_ format  
+    #if !defined(STM32HAL_STM32H7)
+    #define STM32HAL_STM32H7
+    #endif  
+	
+	// so far we use only the core CM7 for it
+    #if !defined(CORE_CM7)
+    #define CORE_CM7
+    #endif  
+
+#elif   defined(STM32HAL_BOARD_AMCFOCM4)
+
+    // it has a STM32H745xx mpu
+    #if !defined(STM32H745xx)
+    #define STM32H745xx
+    #endif  
+
+    // of family STM32H7
+    #if !defined(STM32H7)
+    #define STM32H7
+    #endif  
+
+    // of family STM32H7 but in STM32HAL_ format  
+    #if !defined(STM32HAL_STM32H7)
+    #define STM32HAL_STM32H7
+    #endif  
+	
+	// so far we use only the core CM4 for it
+    #if !defined(CORE_CM4)
+    #define CORE_CM4
+    #endif 
     
 #elif   defined(STM32HAL_BOARD_MTB4C)
     
@@ -335,7 +378,7 @@ extern "C" {
     // of family STM32L4 but in STM32HAL_ format    
     #if !defined(STM32HAL_STM32L4)
     #define STM32HAL_STM32L4
-    #endif    
+    #endif     
     
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
