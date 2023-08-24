@@ -107,62 +107,63 @@ void JointSet_init(JointSet* o) //
     
     o->calibration_in_progress = eomc_calibration_typeUndefined;
 
-#ifdef WRIST_MK2
-    o->is_parking = FALSE;
-    o->must_park = TRUE;
-    
-    o->wristDecoupler.initialize();
-    
-#ifdef WRIST_MK2_RIGHT
-    o->wristDecoupler.rtU.RL = true;
-#else
-    o->wristDecoupler.rtU.RL = false;
-#endif
 
-    o->wristDecoupler.rtU.arm_bend = 30.0f;
+//#ifdef WRIST_MK2
+//    o->wristMK2.is_parking = FALSE;
+//    o->wristMK2.must_park = TRUE;
+//    
+//    o->wristMK2.wristDecoupler.initialize();
+////Moved to update_jointAndMotor_withJointset_constraints    
+////#ifdef WRIST_MK2_RIGHT
+////    o->wristDecoupler.rtU.RL = true;
+////#else
+////    o->wristDecoupler.rtU.RL = false;
+////#endif
 
-#ifdef WRIST_MK2_1
-    o->wristDecoupler.rtU.plat_off[0] =   60.0f; 
-    o->wristDecoupler.rtU.plat_off[1] =  180.0f; 
-    o->wristDecoupler.rtU.plat_off[2] =  300.0f;
+//    o->wristMK2.wristDecoupler.rtU.arm_bend = 30.0f;
 
-    o->wristDecoupler.rtU.theta_off[0] =  60.0f +  60.0f;
-    o->wristDecoupler.rtU.theta_off[1] = 180.0f +  60.0f;
-    o->wristDecoupler.rtU.theta_off[2] = 300.0f +  60.0f;
-#else
-    o->wristDecoupler.rtU.plat_off[0] =  85.0f; 
-    o->wristDecoupler.rtU.plat_off[1] = 185.0f;
-    o->wristDecoupler.rtU.plat_off[2] = 280.0f;
+////#ifdef WRIST_MK2_1 Moved to update_jointAndMotor_withJointset_constraints
+////    o->wristDecoupler.rtU.plat_off[0] =   60.0f; 
+////    o->wristDecoupler.rtU.plat_off[1] =  180.0f; 
+////    o->wristDecoupler.rtU.plat_off[2] =  300.0f;
 
-    o->wristDecoupler.rtU.theta_off[0] =  85.0f +  60.0f;
-    o->wristDecoupler.rtU.theta_off[1] = 185.0f +  85.0f;
-    o->wristDecoupler.rtU.theta_off[2] = 280.0f + 120.0f;
-#endif
-    
-    Trajectory_init(&(o->ypr_trajectory[0]), 0, 0, 0);
-    Trajectory_init(&(o->ypr_trajectory[1]), 0, 0, 0);
-    Trajectory_init(&(o->ypr_trajectory[2]), 0, 0, 0);
-    
-    Trajectory_config_limits(&(o->ypr_trajectory[0]), -90.0f*DEG2ICUB, 90.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
-    Trajectory_config_limits(&(o->ypr_trajectory[1]), -60.0f*DEG2ICUB, 50.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
-    Trajectory_config_limits(&(o->ypr_trajectory[2]), -30.0f*DEG2ICUB, 30.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
-    
-    o->ypr_pos_ref[0] = ZERO;
-    o->ypr_pos_ref[1] = ZERO;
-    o->ypr_pos_ref[2] = ZERO;
-    
-    o->ypr_vel_ref[0] = ZERO;
-    o->ypr_vel_ref[1] = ZERO;
-    o->ypr_vel_ref[2] = ZERO;
+////    o->wristDecoupler.rtU.theta_off[0] =  60.0f +  60.0f;
+////    o->wristDecoupler.rtU.theta_off[1] = 180.0f +  60.0f;
+////    o->wristDecoupler.rtU.theta_off[2] = 300.0f +  60.0f;
+////#else
+////    o->wristDecoupler.rtU.plat_off[0] =  85.0f; 
+////    o->wristDecoupler.rtU.plat_off[1] = 185.0f;
+////    o->wristDecoupler.rtU.plat_off[2] = 280.0f;
 
-    o->ypr_pos_fbk[0] = ZERO;
-    o->ypr_pos_fbk[1] = ZERO;
-    o->ypr_pos_fbk[2] = ZERO;
-    
-    //o->arm_pos_off[0] = 145.0f;
-    //o->arm_pos_off[1] = 270.0f;
-    //o->arm_pos_off[2] =  40.0f;
-#endif
+////    o->wristDecoupler.rtU.theta_off[0] =  85.0f +  60.0f;
+////    o->wristDecoupler.rtU.theta_off[1] = 185.0f +  85.0f;
+////    o->wristDecoupler.rtU.theta_off[2] = 280.0f + 120.0f;
+////#endif
+//    
+//    Trajectory_init(&(o->ypr_trajectory[0]), 0, 0, 0);
+//    Trajectory_init(&(o->ypr_trajectory[1]), 0, 0, 0);
+//    Trajectory_init(&(o->ypr_trajectory[2]), 0, 0, 0);
+//    
+//    Trajectory_config_limits(&(o->ypr_trajectory[0]), -90.0f*DEG2ICUB, 90.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
+//    Trajectory_config_limits(&(o->ypr_trajectory[1]), -60.0f*DEG2ICUB, 50.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
+//    Trajectory_config_limits(&(o->ypr_trajectory[2]), -30.0f*DEG2ICUB, 30.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
+//    
+//    o->ypr_pos_ref[0] = ZERO;
+//    o->ypr_pos_ref[1] = ZERO;
+//    o->ypr_pos_ref[2] = ZERO;
+//    
+//    o->ypr_vel_ref[0] = ZERO;
+//    o->ypr_vel_ref[1] = ZERO;
+//    o->ypr_vel_ref[2] = ZERO;
+
+//    o->ypr_pos_fbk[0] = ZERO;
+//    o->ypr_pos_fbk[1] = ZERO;
+//    o->ypr_pos_fbk[2] = ZERO;
+//    
+//    //o->arm_pos_off[0] = 145.0f;
+//    //o->arm_pos_off[1] = 270.0f;
+//    //o->arm_pos_off[2] =  40.0f;
+//#endif
 }
 
 void JointSet_config //
@@ -483,10 +484,28 @@ void JointSet_do(JointSet* o)
     }
 }
 
-#ifdef WRIST_MK2
-static void JointSet_start_park(JointSet* o)
+void JointSet_set_constraints(JointSet* o, const eOmc_jointSet_constraints_t *constraints)
 {
-    o->is_parking = TRUE;
+    
+    o->special_constraint = (eOmc_jsetconstraint_t)constraints->type;
+    if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
+    {
+        o->wristMK2.mk_version = (wrist_mk_version_t)constraints->param1; //can be WRIST_MK_VER_2_0 or WRIST_MK_VER_2_1
+        o->wristMK2.is_right_wrist = constraints->param2; //0 is left, 1 is right
+    }
+    else
+    {
+        o->special_limit = constraints->param1;
+        //NOTE: jsetcfg[s].constraints.param2 is not used currently. It is reserved for future use
+    }
+
+}
+
+//#ifdef WRIST_MK2
+
+static void JointSet_wristMK2_start_park(JointSet* o)
+{
+    o->wristMK2.is_parking = TRUE;
     
     Joint_set_control_mode(&(o->joint[0]), eomc_controlmode_cmd_position);
     Joint_set_control_mode(&(o->joint[1]), eomc_controlmode_cmd_position);
@@ -501,32 +520,32 @@ static void JointSet_start_park(JointSet* o)
     JointSet_send_debug_message(msg, 0, 0, 0);
 }
 
-static void JointSet_stop_park(JointSet* o)
+static void JointSet_wristMK2_stop_park(JointSet* o)
 {
     Joint_stop(&(o->joint[0]));
     Joint_stop(&(o->joint[1]));
     Joint_stop(&(o->joint[2]));
     
-    Trajectory_stop(&(o->ypr_trajectory[0]),ZERO);
-    Trajectory_stop(&(o->ypr_trajectory[1]),ZERO);
-    Trajectory_stop(&(o->ypr_trajectory[2]),ZERO);
+    Trajectory_stop(&(o->wristMK2.ypr_trajectory[0]),ZERO);
+    Trajectory_stop(&(o->wristMK2.ypr_trajectory[1]),ZERO);
+    Trajectory_stop(&(o->wristMK2.ypr_trajectory[2]),ZERO);
     
     JointSet_set_control_mode(o, (eOmc_controlmode_command_t)(o->control_mode));
     
-    o->is_parking = FALSE;
+    o->wristMK2.is_parking = FALSE;
     
     static char msg[] = "PARK DONE";
     
     JointSet_send_debug_message(msg, 0, 0, 0);
 }
 
-static BOOL JointSet_is_parked(JointSet* o)
+static BOOL JointSet_wristMK2_is_parked(JointSet* o)
 {
-    if (!o->is_parking) return TRUE;
+    if (!o->wristMK2.is_parking) return TRUE;
     
     return (fabs(o->joint[0].pos_fbk) < 400.0f && fabs(o->joint[1].pos_fbk) < 400.0f && fabs(o->joint[2].pos_fbk) < 400.0f);
 }
-#endif
+//#endif
 
 static int control_output_type(JointSet* o, int16_t control_mode)
 {
@@ -575,16 +594,22 @@ static int control_output_type(JointSet* o, int16_t control_mode)
 
 BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_mode_cmd)
 {
-#ifdef WRIST_MK2
-    Trajectory_stop(&(o->ypr_trajectory[0]), o->ypr_pos_fbk[0]);
-    Trajectory_stop(&(o->ypr_trajectory[1]), o->ypr_pos_fbk[1]);
-    Trajectory_stop(&(o->ypr_trajectory[2]), o->ypr_pos_fbk[2]);
-#endif
+//#ifdef WRIST_MK2
+    if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
+    {
+        Trajectory_stop(&(o->wristMK2.ypr_trajectory[0]), o->wristMK2.ypr_pos_fbk[0]);
+        Trajectory_stop(&(o->wristMK2.ypr_trajectory[1]), o->wristMK2.ypr_pos_fbk[1]);
+        Trajectory_stop(&(o->wristMK2.ypr_trajectory[2]), o->wristMK2.ypr_pos_fbk[2]);
+    }
+//#endif
     if (control_mode_cmd != eomc_controlmode_cmd_force_idle)
     {
-#ifndef WRIST_MK2
-        if ((eOmc_controlmode_t)control_mode_cmd == o->control_mode) return TRUE;
-#endif
+//#ifndef WRIST_MK2
+        if(eomc_jsetconstraint_ergocubwrist != o->special_constraint)
+        {
+            if ((eOmc_controlmode_t)control_mode_cmd == o->control_mode) return TRUE;
+        }
+//#endif
         if (o->control_mode == eomc_controlmode_calib) return FALSE;
     
         if (o->control_mode == eomc_controlmode_notConfigured) return FALSE;
@@ -599,9 +624,12 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     {
         if (control_mode_cmd == eomc_controlmode_cmd_force_idle)
         {
-#ifdef WRIST_MK2
-		o->must_park = TRUE;
-#endif
+//#ifdef WRIST_MK2
+        if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
+        {
+            o->wristMK2.must_park = TRUE;
+        }
+//#endif
             for (int k=0; k<E; ++k)
             {   
                 AbsEncoder_clear_faults(o->absEncoder+o->encoders_of_set[k]);
@@ -642,9 +670,10 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
             Motor_set_idle(o->motor+o->motors_of_set[k]);
             Joint_set_control_mode(o->joint+o->joints_of_set[k], control_mode_cmd);
         }
-    }
-    break;
-#ifdef WRIST_MK2    
+    }break;
+    
+//#ifdef WRIST_MK2    
+
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_velocity_pos:
     case eomc_controlmode_cmd_position:
@@ -661,23 +690,34 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
             if (!Motor_set_run(o->motor+o->motors_of_set[k], o->motor_input_type)) return FALSE;
         }
         
+        eOmc_controlmode_command_t cmd;
+        
+        if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
+        {
+            cmd=eomc_controlmode_cmd_direct;
+        }
+        else
+        {
+            cmd=control_mode_cmd;
+        }
+        
         for (int k=0; k<N; ++k)
         { 
             Joint_set_control_mode(o->joint+o->joints_of_set[k], eomc_controlmode_cmd_direct);
         }
         break;
     } 
-#endif
+//#endif
     case eomc_controlmode_cmd_openloop:
     case eomc_controlmode_cmd_current:    
     case eomc_controlmode_cmd_torque:
-#ifndef WRIST_MK2
-    case eomc_controlmode_cmd_direct:
-    case eomc_controlmode_cmd_mixed:
-    case eomc_controlmode_cmd_velocity_pos:
-    case eomc_controlmode_cmd_position:
-    case eomc_controlmode_cmd_velocity:
-#endif
+//#ifndef WRIST_MK2
+//    case eomc_controlmode_cmd_direct:
+//    case eomc_controlmode_cmd_mixed:
+//    case eomc_controlmode_cmd_velocity_pos:
+//    case eomc_controlmode_cmd_position:
+//    case eomc_controlmode_cmd_velocity:
+//#endif
     case eomc_controlmode_cmd_vel_direct:
     {        
         //if (o->external_fault) return FALSE;
@@ -876,103 +916,110 @@ static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot)
 void JointSet_do_pwm_control(JointSet* o)
 {
     int N = *(o->pN);
+    
+    CTRL_UNITS arm_pos_ref[3];
         
     BOOL limits_torque_protection = FALSE;
-#ifdef WRIST_MK2
-         
-    if (o->must_park)
-    {
-        JointSet_start_park(o);
-  
-        o->must_park = FALSE;
-        
-        static char msg[] = "PARKING...";
-        
-        JointSet_send_debug_message(msg, 0, 0, 0);
-    }
-    
-    if (o->is_parking)
-    {
-        if (JointSet_is_parked(o))
+//#ifdef WRIST_MK2
+    if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
+    {     
+        if (o->wristMK2.must_park)
         {
-            static char msg[] = "PARKING DONE.";
-        
-            JointSet_send_debug_message(msg, 0, 0, 0);
+            JointSet_wristMK2_start_park(o);
+      
+            o->wristMK2.must_park = FALSE;
             
-            JointSet_stop_park(o);
+            static char msg[] = "PARKING...";
+            
+            JointSet_send_debug_message(msg, 0, 0, 0);
         }
-    }
     
-    if (!o->is_parking)
-    {
-        Trajectory_do_step(o->ypr_trajectory,   o->ypr_pos_ref,   o->ypr_vel_ref,   o->ypr_acc_ref  );
-        Trajectory_do_step(o->ypr_trajectory+1, o->ypr_pos_ref+1, o->ypr_vel_ref+1, o->ypr_acc_ref+1);
-        Trajectory_do_step(o->ypr_trajectory+2, o->ypr_pos_ref+2, o->ypr_vel_ref+2, o->ypr_acc_ref+2);
-    }
-    else
-    {
-        o->ypr_pos_ref[0] = o->ypr_vel_ref[0] = o->ypr_acc_ref[0] = ZERO;
-        o->ypr_pos_ref[1] = o->ypr_vel_ref[1] = o->ypr_acc_ref[1] = ZERO;
-        o->ypr_pos_ref[2] = o->ypr_vel_ref[2] = o->ypr_acc_ref[2] = ZERO;
-    }
-    
-//    static int noflood = 0;
-//    
-//    if (++noflood > 1000)
-//    {
-//        noflood = 0;
-//        int16_t par16 = (int16_t)(o->ypr_pos_ref[0]*ICUB2DEG);
-//        int32_t par32 = (int32_t)(Trajectory_get_target_position(o->ypr_trajectory)*ICUB2DEG);
-//        JointSet_send_debug_message(NULL, 0, par16, par32);
-//    }
-    
-    o->wristDecoupler.rtU.ypr_star[0] = ICUB2DEG*o->ypr_pos_ref[0];
-    o->wristDecoupler.rtU.ypr_star[1] = ICUB2DEG*o->ypr_pos_ref[1];
-    o->wristDecoupler.rtU.ypr_star[2] = ICUB2DEG*o->ypr_pos_ref[2];
-    
-    o->wristDecoupler.rtU.theta_diff[0] = ICUB2DEG*(o->joint[0]).pos_fbk;
-    o->wristDecoupler.rtU.theta_diff[1] = ICUB2DEG*(o->joint[1]).pos_fbk;
-    o->wristDecoupler.rtU.theta_diff[2] = ICUB2DEG*(o->joint[2]).pos_fbk;
-    
-    //////////////////////////
-    o->wristDecoupler.step();
-    //////////////////////////
-    
-    if (o->wristDecoupler.rtY.singularity)
-    {
-        if (!o->is_parking)
+        if (o->wristMK2.is_parking)
         {
-            JointSet_start_park(o);
+            if (JointSet_wristMK2_is_parked(o))
+            {
+                static char msg[] = "PARKING DONE.";
+            
+                JointSet_send_debug_message(msg, 0, 0, 0);
+                
+                JointSet_wristMK2_stop_park(o);
+            }
         }
-    }
-    
-    o->ypr_pos_fbk[0] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[0]);
-    o->ypr_pos_fbk[1] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[1]);    
-    o->ypr_pos_fbk[2] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[2]);
         
-//    o->ypr_pos_fbk[0] = ZERO;
-//    o->ypr_pos_fbk[1] = ZERO;    
-//    o->ypr_pos_fbk[2] = ZERO;
+        if (!o->wristMK2.is_parking)
+        {
+            Trajectory_do_step(o->wristMK2.ypr_trajectory,   o->wristMK2.ypr_pos_ref,   o->wristMK2.ypr_vel_ref,   o->wristMK2.ypr_acc_ref  );
+            Trajectory_do_step(o->wristMK2.ypr_trajectory+1, o->wristMK2.ypr_pos_ref+1, o->wristMK2.ypr_vel_ref+1, o->wristMK2.ypr_acc_ref+1);
+            Trajectory_do_step(o->wristMK2.ypr_trajectory+2, o->wristMK2.ypr_pos_ref+2, o->wristMK2.ypr_vel_ref+2, o->wristMK2.ypr_acc_ref+2);
+        }
+        else
+        {
+            o->wristMK2.ypr_pos_ref[0] = o->wristMK2.ypr_vel_ref[0] = o->wristMK2.ypr_acc_ref[0] = ZERO;
+            o->wristMK2.ypr_pos_ref[1] = o->wristMK2.ypr_vel_ref[1] = o->wristMK2.ypr_acc_ref[1] = ZERO;
+            o->wristMK2.ypr_pos_ref[2] = o->wristMK2.ypr_vel_ref[2] = o->wristMK2.ypr_acc_ref[2] = ZERO;
+        }
+        
+    //    static int noflood = 0;
+    //    
+    //    if (++noflood > 1000)
+    //    {
+    //        noflood = 0;
+    //        int16_t par16 = (int16_t)(o->ypr_pos_ref[0]*ICUB2DEG);
+    //        int32_t par32 = (int32_t)(Trajectory_get_target_position(o->ypr_trajectory)*ICUB2DEG);
+    //        JointSet_send_debug_message(NULL, 0, par16, par32);
+    //    }
+        
+        o->wristMK2.wristDecoupler.rtU.ypr_star[0] = ICUB2DEG*o->wristMK2.ypr_pos_ref[0];
+        o->wristMK2.wristDecoupler.rtU.ypr_star[1] = ICUB2DEG*o->wristMK2.ypr_pos_ref[1];
+        o->wristMK2.wristDecoupler.rtU.ypr_star[2] = ICUB2DEG*o->wristMK2.ypr_pos_ref[2];
+        
+        o->wristMK2.wristDecoupler.rtU.theta_diff[0] = ICUB2DEG*(o->joint[0]).pos_fbk;
+        o->wristMK2.wristDecoupler.rtU.theta_diff[1] = ICUB2DEG*(o->joint[1]).pos_fbk;
+        o->wristMK2.wristDecoupler.rtU.theta_diff[2] = ICUB2DEG*(o->joint[2]).pos_fbk;
+        
+        //////////////////////////
+        o->wristMK2.wristDecoupler.step();
+        //////////////////////////
+        
+        if (o->wristMK2.wristDecoupler.rtY.singularity)
+        {
+            if (!o->wristMK2.is_parking)
+            {
+                JointSet_wristMK2_start_park(o);
+            }
+        }
+        
+        o->wristMK2.ypr_pos_fbk[0] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[0]);
+        o->wristMK2.ypr_pos_fbk[1] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[1]);    
+        o->wristMK2.ypr_pos_fbk[2] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[2]);
+            
+    //    o->ypr_pos_fbk[0] = ZERO;
+    //    o->ypr_pos_fbk[1] = ZERO;    
+    //    o->ypr_pos_fbk[2] = ZERO;
 
-    CTRL_UNITS arm_pos_ref[3];
-    
-    arm_pos_ref[0] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[0];
-    arm_pos_ref[1] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[1];
-    arm_pos_ref[2] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[2];
-    
-//    arm_pos_ref[0] = ZERO;
-//    arm_pos_ref[1] = ZERO;
-//    arm_pos_ref[2] = ZERO;
-#endif
+        //CTRL_UNITS arm_pos_ref[3];// move out of this section
+        
+        arm_pos_ref[0] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[0];
+        arm_pos_ref[1] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[1];
+        arm_pos_ref[2] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[2];
+        
+    //    arm_pos_ref[0] = ZERO;
+    //    arm_pos_ref[1] = ZERO;
+    //    arm_pos_ref[2] = ZERO;
+    }//end if eroigocubwrist
+//#endif
     for (int js=0; js<N; ++js)
     {
         Joint *pJoint = o->joint+o->joints_of_set[js];
-#ifdef WRIST_MK2 
-        if (!o->is_parking)
+//#ifdef WRIST_MK2 
+        if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
         {
-            Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
+            if (!o->wristMK2.is_parking)
+            {
+                Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
+            }
         }
-#endif
+//#endif
         Joint_do_pwm_or_current_control(pJoint);
        
         if (o->trq_control_active && Joint_pushing_limit(pJoint))
@@ -1119,95 +1166,103 @@ void JointSet_do_pwm_control(JointSet* o)
 static void JointSet_do_current_control(JointSet* o)
 {
     int N = *(o->pN);
+    
+    CTRL_UNITS arm_pos_ref[3];
         
     BOOL limits_torque_protection = FALSE;
-#ifdef WRIST_MK2
-    if (o->must_park)
+//#ifdef WRIST_MK2
+    if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {
-        JointSet_start_park(o);
-
-        o->must_park = FALSE;
-
-        static char msg[] = "BUONGIORNISSIMO 2";
-
-        JointSet_send_debug_message(msg, 0, 0, 0);
-    }
-
-    if (o->is_parking)
-    {
-        if (JointSet_is_parked(o))
+        if (o->wristMK2.must_park)
         {
-            JointSet_stop_park(o);
+            JointSet_wristMK2_start_park(o);
+
+            o->wristMK2.must_park = FALSE;
+
+            static char msg[] = "BUONGIORNISSIMO 2";
+
+            JointSet_send_debug_message(msg, 0, 0, 0);
         }
-    }
 
-    if (!o->is_parking)
-    {
-        Trajectory_do_step(o->ypr_trajectory,   o->ypr_pos_ref,   o->ypr_vel_ref,   o->ypr_acc_ref  );
-        Trajectory_do_step(o->ypr_trajectory+1, o->ypr_pos_ref+1, o->ypr_vel_ref+1, o->ypr_acc_ref+1);
-        Trajectory_do_step(o->ypr_trajectory+2, o->ypr_pos_ref+2, o->ypr_vel_ref+2, o->ypr_acc_ref+2);
-    }
-    else
-    {
-        o->ypr_pos_ref[0] = o->ypr_vel_ref[0] = o->ypr_acc_ref[0] = ZERO;
-        o->ypr_pos_ref[1] = o->ypr_vel_ref[1] = o->ypr_acc_ref[1] = ZERO;
-        o->ypr_pos_ref[2] = o->ypr_vel_ref[2] = o->ypr_acc_ref[2] = ZERO;
-    }
-
-//    static int noflood = 0;
-//
-//    if (++noflood > 1000)
-//    {
-//        noflood = 0;
-//        int16_t par16 = (int16_t)(o->ypr_pos_ref[0]*ICUB2DEG);
-//        int32_t par32 = (int32_t)(Trajectory_get_target_position(o->ypr_trajectory)*ICUB2DEG);
-//        JointSet_send_debug_message(NULL, 0, par16, par32);
-//    }
-
-    o->wristDecoupler.rtU.ypr_star[0] = ICUB2DEG*o->ypr_pos_ref[0];
-    o->wristDecoupler.rtU.ypr_star[1] = ICUB2DEG*o->ypr_pos_ref[1];
-    o->wristDecoupler.rtU.ypr_star[2] = ICUB2DEG*o->ypr_pos_ref[2];
-
-    o->wristDecoupler.rtU.theta_diff[0] = ICUB2DEG*(o->joint[0]).pos_fbk;
-    o->wristDecoupler.rtU.theta_diff[1] = ICUB2DEG*(o->joint[1]).pos_fbk;
-    o->wristDecoupler.rtU.theta_diff[2] = ICUB2DEG*(o->joint[2]).pos_fbk;
-
-    //////////////////////////
-    o->wristDecoupler.step();
-    //////////////////////////
-
-    if (o->wristDecoupler.rtY.singularity)
-    {
-        if (!o->is_parking)
+        if (o->wristMK2.is_parking)
         {
-            JointSet_start_park(o);
+            if (JointSet_wristMK2_is_parked(o))
+            {
+                JointSet_wristMK2_stop_park(o);
+            }
         }
-    }
 
-    o->ypr_pos_fbk[0] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[0]);
-    o->ypr_pos_fbk[1] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[1]);
-    o->ypr_pos_fbk[2] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[2]);
+        if (!o->wristMK2.is_parking)
+        {
+            Trajectory_do_step(o->wristMK2.ypr_trajectory,   o->wristMK2.ypr_pos_ref,   o->wristMK2.ypr_vel_ref,   o->wristMK2.ypr_acc_ref  );
+            Trajectory_do_step(o->wristMK2.ypr_trajectory+1, o->wristMK2.ypr_pos_ref+1, o->wristMK2.ypr_vel_ref+1, o->wristMK2.ypr_acc_ref+1);
+            Trajectory_do_step(o->wristMK2.ypr_trajectory+2, o->wristMK2.ypr_pos_ref+2, o->wristMK2.ypr_vel_ref+2, o->wristMK2.ypr_acc_ref+2);
+        }
+        else
+        {
+            o->wristMK2.ypr_pos_ref[0] = o->wristMK2.ypr_vel_ref[0] = o->wristMK2.ypr_acc_ref[0] = ZERO;
+            o->wristMK2.ypr_pos_ref[1] = o->wristMK2.ypr_vel_ref[1] = o->wristMK2.ypr_acc_ref[1] = ZERO;
+            o->wristMK2.ypr_pos_ref[2] = o->wristMK2.ypr_vel_ref[2] = o->wristMK2.ypr_acc_ref[2] = ZERO;
+        }
 
-    CTRL_UNITS arm_pos_ref[3];
+    //    static int noflood = 0;
+    //
+    //    if (++noflood > 1000)
+    //    {
+    //        noflood = 0;
+    //        int16_t par16 = (int16_t)(o->ypr_pos_ref[0]*ICUB2DEG);
+    //        int32_t par32 = (int32_t)(Trajectory_get_target_position(o->ypr_trajectory)*ICUB2DEG);
+    //        JointSet_send_debug_message(NULL, 0, par16, par32);
+    //    }
 
-    arm_pos_ref[0] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[0];
-    arm_pos_ref[1] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[1];
-    arm_pos_ref[2] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[2];
+        o->wristMK2.wristDecoupler.rtU.ypr_star[0] = ICUB2DEG*o->wristMK2.ypr_pos_ref[0];
+        o->wristMK2.wristDecoupler.rtU.ypr_star[1] = ICUB2DEG*o->wristMK2.ypr_pos_ref[1];
+        o->wristMK2.wristDecoupler.rtU.ypr_star[2] = ICUB2DEG*o->wristMK2.ypr_pos_ref[2];
 
-//    arm_pos_ref[0] = ZERO;
-//    arm_pos_ref[1] = ZERO;
-//    arm_pos_ref[2] = ZERO;
-#endif
+        o->wristMK2.wristDecoupler.rtU.theta_diff[0] = ICUB2DEG*(o->joint[0]).pos_fbk;
+        o->wristMK2.wristDecoupler.rtU.theta_diff[1] = ICUB2DEG*(o->joint[1]).pos_fbk;
+        o->wristMK2.wristDecoupler.rtU.theta_diff[2] = ICUB2DEG*(o->joint[2]).pos_fbk;
+
+        //////////////////////////
+        o->wristMK2.wristDecoupler.step();
+        //////////////////////////
+
+        if (o->wristMK2.wristDecoupler.rtY.singularity)
+        {
+            if (!o->wristMK2.is_parking)
+            {
+                JointSet_wristMK2_start_park(o);
+            }
+        }
+
+        o->wristMK2.ypr_pos_fbk[0] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[0]);
+        o->wristMK2.ypr_pos_fbk[1] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[1]);
+        o->wristMK2.ypr_pos_fbk[2] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[2]);
+
+        //CTRL_UNITS arm_pos_ref[3]; move out of this section to make it available to next scope
+
+        arm_pos_ref[0] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[0];
+        arm_pos_ref[1] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[1];
+        arm_pos_ref[2] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[2];
+
+    //    arm_pos_ref[0] = ZERO;
+    //    arm_pos_ref[1] = ZERO;
+    //    arm_pos_ref[2] = ZERO;
+    }//end ergocubwrist
+//#endif
         
     for (int js=0; js<N; ++js)
     {
         Joint *pJoint = o->joint+o->joints_of_set[js];
-#ifdef WRIST_MK2
-        if (!o->is_parking)
+//#ifdef WRIST_MK2
+        if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
         {
-            Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
+            if (!o->wristMK2.is_parking)
+            {
+                Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
+            }
         }
-#endif
+//#endif
         
         Joint_do_pwm_or_current_control(pJoint);
        
@@ -1382,43 +1437,46 @@ static void JointSet_do_off(JointSet* o)
         Motor_set_vel_ref(o->motor+m, 0);
     }
     
-#ifdef WRIST_MK2
-    // be sure to continue to report the encoder readings
-    o->wristDecoupler.rtU.theta_diff[0] = ICUB2DEG*(o->joint[0]).pos_fbk;
-    o->wristDecoupler.rtU.theta_diff[1] = ICUB2DEG*(o->joint[1]).pos_fbk;
-    o->wristDecoupler.rtU.theta_diff[2] = ICUB2DEG*(o->joint[2]).pos_fbk;
-    
-    o->wristDecoupler.step();
-    
-    if (o->wristDecoupler.rtY.singularity)
+//#ifdef WRIST_MK2
+    if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {
-        if (!o->is_parking)
+        // be sure to continue to report the encoder readings
+        o->wristMK2.wristDecoupler.rtU.theta_diff[0] = ICUB2DEG*(o->joint[0]).pos_fbk;
+        o->wristMK2.wristDecoupler.rtU.theta_diff[1] = ICUB2DEG*(o->joint[1]).pos_fbk;
+        o->wristMK2.wristDecoupler.rtU.theta_diff[2] = ICUB2DEG*(o->joint[2]).pos_fbk;
+        
+        o->wristMK2.wristDecoupler.step();
+        
+        if (o->wristMK2.wristDecoupler.rtY.singularity)
         {
-            JointSet_start_park(o);
+            if (!o->wristMK2.is_parking)
+            {
+                JointSet_wristMK2_start_park(o);
+            }
         }
-    }
-    
-    // update joint positions (from the yarpmotorgui they still appear as yaw, pitch and roll)
-    o->ypr_pos_fbk[0] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[0]);
-    o->ypr_pos_fbk[1] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[1]);    
-    o->ypr_pos_fbk[2] = DEG2ICUB*(o->wristDecoupler.rtY.ypr_meas[2]);
-    
-    // be sure that when we go in RUN again the joint does not move from it current position
-    CTRL_UNITS arm_pos_ref[3];
-    
-    arm_pos_ref[0] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[0];
-    arm_pos_ref[1] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[1];
-    arm_pos_ref[2] = DEG2ICUB*o->wristDecoupler.rtY.theta_star[2];
-    
-    for (int js=0; js<N; ++js)
-    {
-        Joint *pJoint = o->joint+o->joints_of_set[js];
-        if (!o->is_parking)
+        
+        // update joint positions (from the yarpmotorgui they still appear as yaw, pitch and roll)
+        o->wristMK2.ypr_pos_fbk[0] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[0]);
+        o->wristMK2.ypr_pos_fbk[1] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[1]);    
+        o->wristMK2.ypr_pos_fbk[2] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[2]);
+        
+        // be sure that when we go in RUN again the joint does not move from it current position
+        CTRL_UNITS arm_pos_ref[3];
+        
+        arm_pos_ref[0] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[0];
+        arm_pos_ref[1] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[1];
+        arm_pos_ref[2] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[2];
+        
+        for (int js=0; js<N; ++js)
         {
-            Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
+            Joint *pJoint = o->joint+o->joints_of_set[js];
+            if (!o->wristMK2.is_parking)
+            {
+                Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
+            }
         }
-    }
-#endif // WRIST_MK2
+    } //end ergocubwrist
+//#endif // WRIST_MK2
 }
 
 static void JointSet_do_vel_control(JointSet* o)
@@ -2150,10 +2208,75 @@ void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par16, uin
 
 }
 
-#ifdef WRIST_MK2
-BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
+
+extern void JointSet_init_wrist_decoupler(JointSet* o)
 {
-    if (o->is_parking) return FALSE;
+    o->wristMK2.is_parking = FALSE;
+    o->wristMK2.must_park = TRUE;
+    
+    o->wristMK2.wristDecoupler.initialize();
+
+    o->wristMK2.wristDecoupler.rtU.arm_bend = 30.0f;
+
+
+    if(o->wristMK2.is_right_wrist)
+        o->wristMK2.wristDecoupler.rtU.RL = true;
+    else
+        o->wristMK2.wristDecoupler.rtU.RL = false;
+            
+    if(o->wristMK2.mk_version == WRIST_MK_VER_2_1)
+    {
+        o->wristMK2.wristDecoupler.rtU.plat_off[0] =   60.0f; 
+        o->wristMK2.wristDecoupler.rtU.plat_off[1] =  180.0f; 
+        o->wristMK2.wristDecoupler.rtU.plat_off[2] =  300.0f;
+
+        o->wristMK2.wristDecoupler.rtU.theta_off[0] =  60.0f +  60.0f;
+        o->wristMK2.wristDecoupler.rtU.theta_off[1] = 180.0f +  60.0f;
+        o->wristMK2.wristDecoupler.rtU.theta_off[2] = 300.0f +  60.0f;
+    }
+    else
+    {
+        o->wristMK2.wristDecoupler.rtU.plat_off[0] =  85.0f; 
+        o->wristMK2.wristDecoupler.rtU.plat_off[1] = 185.0f;
+        o->wristMK2.wristDecoupler.rtU.plat_off[2] = 280.0f;
+
+        o->wristMK2.wristDecoupler.rtU.theta_off[0] =  85.0f +  60.0f;
+        o->wristMK2.wristDecoupler.rtU.theta_off[1] = 185.0f +  85.0f;
+        o->wristMK2.wristDecoupler.rtU.theta_off[2] = 280.0f + 120.0f;
+    }
+
+    
+    
+    Trajectory_init(&(o->wristMK2.ypr_trajectory[0]), 0, 0, 0);
+    Trajectory_init(&(o->wristMK2.ypr_trajectory[1]), 0, 0, 0);
+    Trajectory_init(&(o->wristMK2.ypr_trajectory[2]), 0, 0, 0);
+    
+    Trajectory_config_limits(&(o->wristMK2.ypr_trajectory[0]), -90.0f*DEG2ICUB, 90.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
+    Trajectory_config_limits(&(o->wristMK2.ypr_trajectory[1]), -60.0f*DEG2ICUB, 50.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
+    Trajectory_config_limits(&(o->wristMK2.ypr_trajectory[2]), -30.0f*DEG2ICUB, 30.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
+    
+    o->wristMK2.ypr_pos_ref[0] = ZERO;
+    o->wristMK2.ypr_pos_ref[1] = ZERO;
+    o->wristMK2.ypr_pos_ref[2] = ZERO;
+    
+    o->wristMK2.ypr_vel_ref[0] = ZERO;
+    o->wristMK2.ypr_vel_ref[1] = ZERO;
+    o->wristMK2.ypr_vel_ref[2] = ZERO;
+
+    o->wristMK2.ypr_pos_fbk[0] = ZERO;
+    o->wristMK2.ypr_pos_fbk[1] = ZERO;
+    o->wristMK2.ypr_pos_fbk[2] = ZERO;
+    
+    //o->arm_pos_off[0] = 145.0f;
+    //o->arm_pos_off[1] = 270.0f;
+    //o->arm_pos_off[2] =  40.0f;
+
+}
+
+//#ifdef WRIST_MK2
+BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref) //use only in WRIST_MK2 case
+{
+    if (o->wristMK2.is_parking) return FALSE;
     
     if ((o->control_mode != eomc_controlmode_direct) && (o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
     {
@@ -2162,30 +2285,30 @@ BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel
     
     if(eomc_controlmode_direct == o->control_mode)
     {
-        Trajectory_set_pos_raw(&(o->ypr_trajectory[j]), pos_ref);
+        Trajectory_set_pos_raw(&(o->wristMK2.ypr_trajectory[j]), pos_ref);
         return TRUE;
     }
     
     if (vel_ref == 0.0f) return TRUE;
     
-    Trajectory_set_pos_end(&(o->ypr_trajectory[j]), pos_ref, vel_ref);
+    Trajectory_set_pos_end(&(o->wristMK2.ypr_trajectory[j]), pos_ref, vel_ref);
     
     return TRUE;
 }
 
-void JointSet_stop(JointSet* o, int j)
+void JointSet_stop(JointSet* o, int j) //use only in WRIST_MK2 case
 {
-    Trajectory_stop(&(o->ypr_trajectory[j]), o->ypr_pos_fbk[j]);
+    Trajectory_stop(&(o->wristMK2.ypr_trajectory[j]), o->wristMK2.ypr_pos_fbk[j]);
 }
 
-extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_state)
+extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_state) //use only in WRIST_MK2 case
 {
     joint_state->core.modes.interactionmodestatus    = o->interaction_mode;
     joint_state->core.modes.controlmodestatus        = o->control_mode;
-    joint_state->core.modes.ismotiondone             = Trajectory_is_done(&(o->ypr_trajectory[j]));
-    joint_state->core.measures.meas_position         = o->ypr_pos_fbk[j];           
+    joint_state->core.modes.ismotiondone             = Trajectory_is_done(&(o->wristMK2.ypr_trajectory[j]));
+    joint_state->core.measures.meas_position         = o->wristMK2.ypr_pos_fbk[j];           
     joint_state->core.measures.meas_velocity         = ZERO;        
     joint_state->core.measures.meas_acceleration     = ZERO;      
     joint_state->core.measures.meas_torque           = ZERO;
 }
-#endif
+//#endif

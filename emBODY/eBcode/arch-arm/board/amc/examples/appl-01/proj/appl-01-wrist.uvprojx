@@ -2507,11 +2507,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler.cpp</FilePath>
             </File>
-            <File>
-              <FileName>wrist_decoupler_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler_data.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -4859,11 +4854,6 @@
               <FileName>wrist_decoupler.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>wrist_decoupler_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler_data.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -7723,11 +7713,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler.cpp</FilePath>
             </File>
-            <File>
-              <FileName>wrist_decoupler_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler_data.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -9362,11 +9347,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler.cpp</FilePath>
             </File>
-            <File>
-              <FileName>wrist_decoupler_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler_data.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -11000,11 +10980,6 @@
               <FileName>wrist_decoupler.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>wrist_decoupler_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler_data.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -12996,11 +12971,6 @@
               <FileName>wrist_decoupler.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>wrist_decoupler_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\wrist_decoupler_data.cpp</FilePath>
             </File>
           </Files>
         </Group>

@@ -29,6 +29,8 @@ struct Joint_hid // Joint
 
     BOOL use_hard_limit;
     
+    BOOL belong2WristMK2;
+    
     CTRL_UNITS pos_min_soft;
     CTRL_UNITS pos_max_soft;    
     CTRL_UNITS pos_min_hard;
