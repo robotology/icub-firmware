@@ -1278,7 +1278,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
     else if(eo_motcon_mode_mc4pluspmc == p->service.servconfig.type)
     {      
         //#warning for eo_motcon_mode_mc4pluspmc we use 4 pwm in first 4 positions  
-        const uint8_t numOfPWMs = 6;
+        const uint8_t numOfPWMs = 4;
         const uint8_t startOfPWMs = 0;
         const uint8_t numOfPZMs = 3;
         const uint8_t startOfPZM = 4;
