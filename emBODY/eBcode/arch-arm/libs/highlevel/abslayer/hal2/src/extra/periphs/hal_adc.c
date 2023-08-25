@@ -1071,12 +1071,12 @@ extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor)
 		}
 		// Motor 0 + Motor 1
 		else if(motor == 4){
-			motor = 0;
-			//rescaling from -5000mA to 5000mA and applying the reduction factor
-			int16_t result4 = (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
 			motor = 1;
 			//rescaling from -5000mA to 5000mA and applying the reduction factor
-			result4 += (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
+			int16_t result4 = (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
+			motor = 0;
+			//rescaling from -5000mA to 5000mA and applying the reduction factor
+		  result4 += (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
 			return result4;
 		}
   	// Motor 2 + Motor 3

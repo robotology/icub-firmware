@@ -522,7 +522,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 			}
 			else
 			{
-			    pwmvalue=-pwmvalue;
+			  pwmvalue=-pwmvalue;
 				TIM_SetCompare1(TIM8, 0);
 				TIM_SetCompare2(TIM8, pwmvalue);
 			}
@@ -537,7 +537,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 			}
 			else
 			{
-			    pwmvalue=-pwmvalue;
+			  pwmvalue=-pwmvalue;
 				TIM_SetCompare3(TIM8, 0);
 				TIM_SetCompare4(TIM8, pwmvalue);
 			}
