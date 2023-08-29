@@ -50,6 +50,7 @@ typedef struct //PID
     float viscous_neg_val;
     float coulomb_pos_val;
     float coulomb_neg_val;
+    float velocityThres_val;
 
 #ifdef FINGER_MK3
     float out_max_open;
