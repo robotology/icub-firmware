@@ -29,7 +29,6 @@
       <itemPath>../include/iCubCanProto_skinMessages.h</itemPath>
       <itemPath>../include/iCubCanProto_types.h</itemPath>
       <itemPath>../include/iCubCanProtocol.h</itemPath>
-      <itemPath>../include/park.h</itemPath>
       <itemPath>../include/qep.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"

@@ -32,6 +32,8 @@
 #include "qep.h"
 #include "DHES.h"
 
+#define PWM_MAX_REF 30400 // = 95% of 32000
+
 typedef struct      // size is 4+60+4+4 = 72
 {
     uint32_t        canadr;
@@ -305,7 +307,6 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             char ks=rxpayload->b[7];
 
             setIPid(kp,ki,ks);
-
             
             return 1;
         }
@@ -423,7 +424,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         if (gControlMode != icubCanProto_controlmode_openloop) return 0;
 
         CtrlReferences.VqRef = (rxpayload->b[2] << 8 | rxpayload->b[1]);
-        LIMIT(CtrlReferences.VqRef, UDEF_PWM_MAX)
+        LIMIT(CtrlReferences.VqRef, PWM_MAX_REF) // 95% max PWM
 
         return 1;
     }
@@ -524,7 +525,7 @@ static int s_canIcubProtoParser_parse_periodicMsg(unsigned char permsg_type, tCa
             break;
 
         case icubCanProto_controlmode_openloop:
-            LIMIT(ref, UDEF_PWM_MAX) // 30000
+            LIMIT(ref, PWM_MAX_REF) // 95% of max PWM
             CtrlReferences.VqRef = ref;
             //CtrlReferences.IqRef = CtrlReferences.WRef = 0;
             break;

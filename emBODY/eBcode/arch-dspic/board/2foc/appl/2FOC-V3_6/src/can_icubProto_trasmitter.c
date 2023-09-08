@@ -25,7 +25,6 @@
 #include "faults.h"
 #include "2FOC.h"
 #include "qep.h"
-#include "park.h"
 
 //CAN_PERIOD_PHASE is used to be sure that all foc don't send status msg in the same time
 //#define CAN_PERIOD_PHASE (canprototransmitter_bid)*2
@@ -95,7 +94,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     {        
         static int noflood = 0;
         
-        extern volatile char I2Cdead;
+        //extern volatile char I2Cdead;
         extern volatile uint16_t I2Cerrors;
         extern volatile int I2Cerrcode;
         

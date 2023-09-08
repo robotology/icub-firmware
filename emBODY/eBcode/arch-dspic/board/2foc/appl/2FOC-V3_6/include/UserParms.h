@@ -16,7 +16,6 @@
 #define __USERPARMS_H__
 
 #define UDEF_SPEED_MAX  32767
-#define UDEF_PWM_MAX    30000
 #define HALL_ERROR_MAX_CNT 1000
 
 //

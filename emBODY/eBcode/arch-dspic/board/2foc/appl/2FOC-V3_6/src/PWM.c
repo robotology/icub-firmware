@@ -12,15 +12,15 @@
 
 extern tSysStatus SysStatus;
 
-static short PWM_50_DUTY_CYCLE = 500;
-static short PWM_DEADTIME = 10;
-static short PWM_MAX = 450;
+static int PWM_50_DUTY_CYCLE = 500;
+static int PWM_MAX = 475;
+static int PWM_DEADTIME = 10;
 
 void pwmInit(short pwm_50_duty_cycle, short pwm_deadtime, short pwm_max)
 {
     PWM_50_DUTY_CYCLE = pwm_50_duty_cycle;
+    PWM_MAX = (PWM_50_DUTY_CYCLE*19)/20; //95%
     PWM_DEADTIME = pwm_deadtime;
-    PWM_MAX = (PWM_50_DUTY_CYCLE*15)/16;
     
     if (pwm_max < PWM_MAX) PWM_MAX = pwm_max;
     
