@@ -121,7 +121,6 @@ _FICD(ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 #include "Status.h"
 #include "Faults.h"
 #include "DCLink.h"
-#include "Park.h"
 
 #include "qep.h"
 #include "DHES.h"
@@ -146,7 +145,6 @@ volatile long gQEPosition = 0;
 volatile int  gQEVelocity = 0;
 volatile tMeasCurrParm MeasCurrParm;
 volatile tCtrlReferences CtrlReferences;
-volatile tParkParm ParkParm;
 
 /////////////////////////////////////////////////
 
@@ -183,22 +181,20 @@ volatile int iQerror_old = 0;
 volatile int iDerror_old = 0;
 volatile char limit = 0;
 
-static const int PWM_MAX = (15*LOOPINTCY)/16; // 937
+static const int PWM_MAX = (19*LOOPINTCY)/20; // 950
 
 volatile int gMaxCurrent = 0;
 volatile long sI2Tlimit = 0;
 
 volatile int  IKp = 0; //8;
 volatile int  IKi = 0; //2;
-volatile int  IKo = 0; //0;
 volatile char IKs = 0; //10;
-volatile long IIntLimit = 0;//800L*1024L;
+volatile long IIntLimit = 0;
 
 volatile int  SKp = 0x0C;
 volatile int  SKi = 0x10;
 volatile char SKs = 0x0A;
-volatile int  SKo = 512;
-volatile long SIntLimit = 0;//800L*1024L;
+volatile long SIntLimit = 0;
 
 /////////////////////////////////////////
 
@@ -216,8 +212,8 @@ void setIPid(int kp, int ki, char shift)
     IKp = kp;
     IKi = ki/2;
     IKs = shift;
-    if (IKs>0) IKo = 1<<(IKs-1); else IKo = 0;
     IIntLimit = ((long)PWM_MAX)<<shift;
+    //IIntLimit = ((long)PWM_MAX/2)<<shift; // TEST
 }
 
 void setSPid(int kp, int ki, char shift)
@@ -225,8 +221,8 @@ void setSPid(int kp, int ki, char shift)
     SKp = kp;
     SKi = ki/2;
     SKs = shift;
-    if (SKs>0) SKo = 1<<(SKs-1); else SKo = 0;
     SIntLimit = ((long)PWM_MAX)<<shift;
+    //SIntLimit = ((long)PWM_MAX/2)<<shift; // TEST
 }
 
 void ZeroControlReferences()
@@ -489,34 +485,33 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     volatile static short *iH, *iL, *i0;
     volatile static short *ppwmH, *ppwmL, *ppwm0;
     
+    
     // setting CORCON in this way rather than using CORCONbits is
     // slightly more efficient (because CORCONbits is volatile and
     // optimizer cannot collapse multiple bit operations)
     CORCON = 0b11110100;
-
-    // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetb, Offsetc
-    // scale currents by MeasCurrParm.qKa, qKb, qKc
-    // Calculate ParkParm.qIa, qIb, qIc
-    ParkParm.qIa = (int)((__builtin_mulss(MeasCurrParm.Offseta-ADCBuffer[0],MeasCurrParm.qKa)+8192L)>>14); 
-    ParkParm.qIc = (int)((__builtin_mulss(MeasCurrParm.Offsetc-ADCBuffer[1],MeasCurrParm.qKc)+8192L)>>14);
-    ParkParm.qIb = -ParkParm.qIa-ParkParm.qIc;
     
-    // qIx = 64 is equal to 50 mA current here
-    // since we have 10 bits resolution, left aligned, with LSB = 50 mA
+    // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetc
+    // scale currents by MeasCurrParm.qKa, qKc
+    
+    short Ia_raw = (int)(__builtin_mulss(MeasCurrParm.Offseta-ADCBuffer[0],MeasCurrParm.qKa)>>14); // TEST 
+    short Ic_raw = (int)(__builtin_mulss(MeasCurrParm.Offsetc-ADCBuffer[1],MeasCurrParm.qKc)>>14); // TEST
+    
+    // Ix_raw = 64 is equal to 49.03 mA current here
+    // since we have 10 bits resolution, left aligned, with LSB = 49.03 mA
     
     // gain = 64/49.03
     
-    static short Ia_old = 0, Ib_old = 0, Ic_old = 0;
+    static short Ia_raw_old = 0, Ic_raw_old = 0;
     
-    Ia = (ParkParm.qIa + Ia_old)/3;
-    Ib = (ParkParm.qIb + Ib_old)/3;
-    Ic = (ParkParm.qIc + Ic_old)/3;
+    Ia = (Ia_raw+Ia_raw_old)/3;
+    Ic = (Ic_raw+Ic_raw_old)/3;
+    Ib = -Ia-Ic;
+    
+    Ia_raw_old = Ia_raw;
+    Ic_raw_old = Ic_raw;
     
     // gain = (64/49.03) * (2/3)
-    
-    Ia_old = ParkParm.qIa;
-    Ib_old = ParkParm.qIb;
-    Ic_old = ParkParm.qIc;
         
     int sector = 0;
     int delta  = 0;
@@ -643,13 +638,13 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     {
         // gain = (64/49.03) * (2/3) * (2/sqrt3) = 1.0048 OK!
         
-        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)-__builtin_mulss( *i0 ,3*sinT)+16384L)>>15);
-        I2Tdata.IDMeasured = /* 3/2 */     -(int)((__builtin_mulss(  *i0  ,cosT)+__builtin_mulss(*iH-*iL,sinT)+16384L)>>15);
+        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)-__builtin_mulss( *i0 ,3*sinT))>>15); //+16384L
+        I2Tdata.IDMeasured = /* 3/2 */     -(int)((__builtin_mulss(  *i0  ,cosT)+__builtin_mulss(*iH-*iL,sinT))>>15);
     }
     else
-    {
-        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)+__builtin_mulss( *i0 ,3*sinT)+16384L)>>15);
-        I2Tdata.IDMeasured = /* 3/2 */      (int)((__builtin_mulss(  *i0  ,cosT)-__builtin_mulss(*iH-*iL,sinT)+16384L)>>15);
+    {   
+        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)+__builtin_mulss( *i0 ,3*sinT))>>15);
+        I2Tdata.IDMeasured = /* 3/2 */      (int)((__builtin_mulss(  *i0  ,cosT)-__builtin_mulss(*iH-*iL,sinT))>>15);
     }
     
     if (!sAlignInProgress)
@@ -743,7 +738,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
         if (VqA > IIntLimit) VqA = IIntLimit; else if (VqA < -IIntLimit) VqA = -IIntLimit;
 
-        Vq = (int)((VqA+IKo)>>IKs);
+        Vq = (int)(VqA>>IKs);
 
         // alternative formulation with ff term
         //VqA += __builtin_mulss(iQerror+iQerror_old,Ki);
@@ -782,17 +777,17 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                 if (VqL <= 0) { VqL = 0; limit = 0; iQerror_old = 0; }
             }
 
-            Vq = (int)((VqRef+VqL+IKo)>>IKs);
+            Vq = (int)((VqRef+VqL)>>IKs);
         }
         else
         {
             if (gControlMode == icubCanProto_controlmode_openloop)
             {
-                Vq = (int)((VqRef+IKo)>>IKs);
+                Vq = (int)(VqRef>>IKs);
             }
             else // if (gControlMode == icubCanProto_controlmode_speed_voltage)
             {
-                Vq = (int)((VqRef+SKo)>>SKs);
+                Vq = (int)(VqRef>>SKs);
             }
         }
     }
@@ -809,7 +804,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     if (VdA > IIntLimit) VdA = IIntLimit; else if (VdA < -IIntLimit) VdA = -IIntLimit;
   
-    int Vd = (int)((VdA+IKo)>>IKs);
+    int Vd = (int)(VdA>>IKs);
     //
     ////////////////////////////////////////////////////////////////////////////
 
@@ -876,14 +871,16 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     //
     ////////////////////////////////////////////////////////////////////////////
     
-    // passing from 20 kHz PWM to 40 kHz the PWM range is divided by 2
-    Vq/=2;
-    Vd/=2;
-    
     ////////////////////////////////////////////////////////////////////////////
     // inv transform and PWM drive    
-    int V1 = (int)((__builtin_mulss(Vq,cosT)-__builtin_mulss(Vd*3,sinT)+0x7FFF)>>16);
-    int V2 = (int)((__builtin_mulss(Vq,sinT)+__builtin_mulss(Vd  ,cosT)+0x7FFF)>>16);
+    int V1 = (int)((__builtin_mulss(Vq,cosT)-__builtin_mulss(Vd,3*sinT))>>16);
+    int V2 = (int)((__builtin_mulss(Vq,sinT)+__builtin_mulss(Vd,  cosT))>>16);
+    
+    //Vq /= 2; // TEST
+    //Vd /= 2; // TEST
+    
+    //int V1 = (int)(__builtin_mulss(Vq,cosT)>>15)-3*(int)(__builtin_mulss(Vd,sinT)>>15); // TEST
+    //int V2 = (int)(__builtin_mulss(Vq,sinT)>>15)+  (int)(__builtin_mulss(Vd,cosT)>>15); // TEST
     
     if (sector%2) V2=-V2;
 
