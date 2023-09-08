@@ -40,14 +40,14 @@ namespace embot { namespace app { namespace eth {
             Process::eApplication,
 #if defined(WRIST_MK2)
     #if defined(WRIST_MK2_RIGHT)
-            {101, 8},
+            {101, 9},
     #else
-            {102, 8},
+            {102, 9},
     #endif            
 #else            
-            {103, 8},  
+            {103, 9},  
 #endif            
-            {2023, Month::Jul, Day::thirthyone, 11, 30}
+            {2023, Month::Sep, Day::seven, 14, 00}
         },
         .OStick = 1000*embot::core::time1microsec,
         .OSstacksizeinit = 10*1024,

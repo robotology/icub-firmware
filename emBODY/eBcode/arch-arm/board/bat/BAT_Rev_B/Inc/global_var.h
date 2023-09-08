@@ -91,6 +91,7 @@ extern uint8_t timerFSM_motors;
 extern uint8_t DCDC_status_A;
 extern uint8_t DCDC_status_B;
 extern uint8_t DCDC_ctrl;
+extern uint8_t DCDC_status;
 extern uint8_t HSM_PG;
 extern uint8_t HSM_F;
 

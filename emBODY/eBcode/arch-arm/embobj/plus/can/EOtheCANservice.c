@@ -298,7 +298,7 @@ extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t por
             errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txbusfailure);
             errdes.par16                = 0x0001;
             errdes.par16                |= ((uint16_t)sizeoftxfifo << 8);
-            errdes.par64                = 0; // dont knw what to send up           
+            errdes.par64                = 0; // dont know what to send up           
             errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
             errdes.sourceaddress        = 0;                                   
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);    

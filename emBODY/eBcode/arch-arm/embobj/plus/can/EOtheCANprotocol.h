@@ -48,11 +48,11 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
-// we mange teh following: 
+// we manage the following: 
 // - class: it is eOcanprot_msgclass_t
 // - source: it is the can address which sent the frame [0, 14]
 // - destination: it is the can address where to send the frame [0, 14]
-// - type: it is either the MSG or the CMD whcih describes the message (ICUBCANPROTO_PER_MC_MSG__POSITION, ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE, etc.).
+// - type: it is either the MSG or the CMD which describes the message (ICUBCANPROTO_PER_MC_MSG__POSITION, ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE, etc.).
 // - idcan: it is the ID of the CAN frame
 // - internal index: it is either 0 or 1 and is used in mc to specify a joint/motor
 

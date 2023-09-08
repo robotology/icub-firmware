@@ -44,6 +44,9 @@ public:
 
   struct canFrameDescriptor {
     enum class Type : uint8_t {
+      info,
+      status_bms,
+      status_bat,
       unspecified,
     };
     eOcanport_t port{eOcanport1};
@@ -86,8 +89,7 @@ public:
   static constexpr eOas_battery_status_t defaultBATstatus{
       .timedvalue = {.age = 0,
                      .temperature = 0,
-                     .status = 0,
-                     .filler = 0,
+                     //.status = 0,
                      .voltage = 0,
                      .current = 0,
                      .charge = 0}};
@@ -97,7 +99,7 @@ public:
   };
 
   const theServiceTester::Config &servicetesterconfig() const;
-
+  
 private:
   // this one is called inside process() when the tag is
   // eoprot_tag_as_bat_config (or by theServiceTester)

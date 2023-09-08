@@ -96,6 +96,7 @@ void lightupLed(uint16_t lightup);
 void checkHSM(void);
 void dcdc_management(void);
 void FAULT_CHECK(void);
+void dcdcStatusUpdate(void);
 
 /* USER CODE END PFP */
 
@@ -150,10 +151,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //  HAL_TIM_Base_Start_IT(&htim6);    // 100us
-  HAL_TIM_Base_Start_IT(&htim7);    // 1ms
-  HAL_TIM_Base_Start_IT(&htim15);   // 10ms
-  HAL_TIM_Base_Start_IT(&htim16);   // 100ms
-  HAL_TIM_Base_Start_IT(&htim17);   // 1s
+      HAL_TIM_Base_Start_IT(&htim7);    // 1ms
+      HAL_TIM_Base_Start_IT(&htim15);   // 10ms
+      HAL_TIM_Base_Start_IT(&htim16);   // 100ms
+      HAL_TIM_Base_Start_IT(&htim17);   // 1s
   HAL_TIM_IRQHandler(&htim1);
   HAL_TIM_IRQHandler(&htim2);
 //  HAL_TIM_IRQHandler(&htim6);
@@ -177,33 +178,6 @@ int main(void)
   RST_DSPL_ON;
   FAULT_REM_ON;
   LED_BT_OFF;
-  
-  
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  
-  //uint8_t RN4871_TEST[5] = {0x01, 0x02, 0x03};
-  //uint8_t RN4871_TEST[] = "$$$";
-  //uint8_t RN4871_Reset[] = "SF,1,2\r\n";
-//  uint8_t RN4871_Reboot[] = "R,1\r\n";  
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-//    HAL_UART_Transmit_DMA(&huart2, (uint8_t*)RN4871_TEST, sizeof(RN4871_TEST)-1);
-//    HAL_Delay(100);
-//    HAL_Delay(10);
-//    HAL_UART_Transmit_DMA(&huart2, (uint8_t*)RN4871_Reset, sizeof(RN4871_Reset)-1);
-//    HAL_Delay(10);
-//    HAL_UART_Transmit_DMA(&huart2, (uint8_t*)RN4871_Reboot, sizeof(RN4871_Reboot)-1);
-//    HAL_Delay(10);
-//    HAL_Delay(1000);
-  
-  }
-  /* USER CODE END 3 */
 }
 
 /**
@@ -312,10 +286,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
     }
   }
   if(htim->Instance==TIM6){         // timer 100us
+    // do nothing -> interrupt not used
   }
   if(htim->Instance==TIM7){         // timer 1ms
-    CANBUS();
     dcdc_management();
+    dcdcStatusUpdate();
+    CANBUS();
     //HAL_TIM_Base_Stop_IT(&htim10);
     //timeout=1;
   }
@@ -404,8 +380,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
   if( (*(adc_values+6)) > 2048) {adc_measure.I_V12motor  = ((*(adc_values+6))-2048)*9;}  // mA
   else                          {adc_measure.I_V12motor  = 0;}  
   adc_measure.I_HSM       = ((*(adc_values+7))*8.5);       // mA
-  adc_measure.Temp_sensor = (((*(adc_values+8))*80.5)-76000)/2.5+2500;       	// Temperature (in °C*100) = {(VSENSE – V25) / Avg_Slope} + 25 (page 441)
-  //adc_measure.Temp_sensor = ((((*(adc_values+8))*3300)/4096)-760)/2.5+25;       	// Temperature (in °C) = {(VSENSE – V25) / Avg_Slope} + 25 (page 441)
+  adc_measure.Temp_sensor = (((*(adc_values+8))*80.5)-76000)/2.5+2500;       	// Temperature (in ï¿½C*100) = {(VSENSE ï¿½ V25) / Avg_Slope} + 25 (page 441)
+  //adc_measure.Temp_sensor = ((((*(adc_values+8))*3300)/4096)-760)/2.5+25;       	// Temperature (in ï¿½C) = {(VSENSE ï¿½ V25) / Avg_Slope} + 25 (page 441)
   
 //  adc_measure.V_VINPUT    = (*(adc_values+0));
 //  adc_measure.V_EXTPS     = (*(adc_values+1));
@@ -418,24 +394,48 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 //  adc_measure.Temp_sensor = (*(adc_values+8));
     
   if(adc_measure.I_V12board > I_V12board_MAX){                    // Check for board overcurrent
-    if(timer_fault_board < 10)  {timer_fault_board++;}
-    else                        {V12board_F = 1;}
+    if(timer_fault_board < 10)  
+    {
+        timer_fault_board++;
+    }
+    else                        
+    {
+        V12board_F = 1;
+        //Current_board_in_fault = adc_measure.I_V12board;
+    }
   }else{
     if(timer_fault_board > 0)   {timer_fault_board--;}
+    //if(Current_board_in_fault != 0) {Current_board_in_fault = 0;}
   }
         
   if(adc_measure.I_V12motor > I_V12motor_MAX){                    // Check for motors overcurrent
-    if(timer_fault_motors < 10) {timer_fault_motors++;}
-    else                        {V12motor_F = 1;}
+    if(timer_fault_motors < 10) 
+    {
+        timer_fault_motors++;
+    }
+    else                        
+    {
+        V12motor_F = 1;
+        //Current_motor_in_fault = adc_measure.I_V12motor;
+    }
   }else{
     if(timer_fault_motors > 0)  {timer_fault_motors--;}
+    //if(Current_motor_in_fault != 0) {Current_motor_in_fault = 0;}
   }
   
   if(adc_measure.I_HSM > I_HSM_MAX){                              // Check for HSM overcurrent
-    if(timer_fault_HSM < 10)    {timer_fault_HSM++;}
-    else                        {HSM_F = 1;}
+    if(timer_fault_HSM < 10)    
+    {
+        timer_fault_HSM++;
+    }
+    else                        
+    {
+        HSM_F = 1;
+        //Current_HSM_in_fault = adc_measure.I_HSM;
+    }
   }else{
     if(timer_fault_HSM > 0)     {timer_fault_HSM--;}
+    //if(Current_HSM_in_fault != 0) {Current_HSM_in_fault = 0;}
   }
     
   calcMean();
@@ -494,7 +494,10 @@ void calcMean(){
 // As an example, firmware version can be sent just one time or every x minutes
 // The rest can be sent with a higher frequency
 void CANBUS(void){
+    
 	switch(can_message){
+
+#ifdef ENABLE_GUI_CUSTOM_MSG  // Define to be added as -DENABLE_GUI_CUSTOM_MSG in `Option for target... >> C/C++ >> Misc controls` for enabling all messages (Also the custom ones not related to protocol)
     case 0x00:  
     {
       TxData[0] = 0xFF;               // Firmware version message
@@ -587,10 +590,13 @@ void CANBUS(void){
     break;
     
     case 0x05:
+#else
+    case 0x00:   
+#endif
     {
         // Battery Pack Info message
         vBatterydV = 0.01 * (mean.V_BATTERY);
-        TxData_620[0] = vBatterydV & 0xFF;           // b7-b6 Battery pack voltage            
+        TxData_620[0] = vBatterydV & 0xFF;              // b7-b6 Battery pack voltage            
         TxData_620[1] = (vBatterydV >> 8) & 0xFF;
         TxData_620[2] = 0x00;                           // b5-b4 Instant current
         TxData_620[3] = 0x00;
@@ -602,15 +608,35 @@ void CANBUS(void){
             /* Transmission request Error */
             Error_Handler();
         }
-        can_message = 0;
-        }           
+        
+        can_message = 6;
+    }
+    break;
+    
+    case 0x06:
+    {
+        TxData_629[0] = DCDC_status_A & 0xFF;
+        TxData_629[1] = DCDC_status_B & 0xFF;
+        TxData_629[2] = 0x00;           
+        TxData_629[3] = 0x00;
+        TxData_629[4] = 0x00;            
+        TxData_629[5] = 0x00;
+        TxData_629[6] = 0x00;                 
+        TxData_629[7] = 0x00;
+        if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader_629, TxData_629, &TxMailbox_629) != HAL_OK){
+            /* Transmission request Error */
+            Error_Handler();
+      }
+      can_message = 0;
+    }
+    break;
+    
     default:    
     {
     }
     break;
   }
 }
-
 
 // -----------------------------------------------------------------------------------------------------------------------------
 // Light up leds to display battery voltage
@@ -768,144 +794,135 @@ void dcdc_management(void){
   
 	switch(state_fsm_boards){
 	
-		case START:
-		{
-      timerFSM_boards++;
-			state_fsm_boards_prev = START;
-		
-			if(timerFSM_boards >= 10){
-				state_fsm_boards = READY;
-			}
-    }
-		break;
-		
-		case READY:
-		{
-      timerFSM_boards = 0;
-			PB1_LED_RED;
-		}
-    break;
-		
-		case OFF_BOARD:
-		{
-      EN_V12board_OFF;
-      V12board=0;
-			PB1_LED_RED;
-    }
-    break;
-    
-		case ON_BOARD:
-    {
-      if(timer_delay_board < timer_delay_board_max){
-        timer_delay_board++;
-      }
-      else{
-        EN_V12board_ON;
-        V12board=1;
-        timer_delay_board=0;
-      }
-			if(V12board==0){
-        if(toggle_100ms)  {PB1_LED_GREEN;}
-        else              {PB1_LED_OFF;}
-			}
-      else                {PB1_LED_GREEN;}
-		}
-    break;
-		
-   	case FAULT_BOARD:
-		{
-      EN_V12board_OFF;
-      V12board=0;
-			if(toggle_100ms)  {PB1_LED_RED;}
-			else              {PB1_LED_OFF;}
-		}
-    break;
-    
-    default:
-		{
-      
-    }
-		break;
-	}
-  
-  
-  switch(state_fsm_motors){
-	
-		case START:
-		{
-      timerFSM_motors++;
-			state_fsm_motors_prev = START;
-		
-			if(timerFSM_motors >= 10){
-				state_fsm_motors = READY;
-			}
-    }
-		break;
-		
-		case READY:
-		{
-      timerFSM_motors = 0;
-			PB2_LED_RED;			
-		}
-    break;
-		
-		case OFF_MOTORS:
-		{
-      EN_V12motor_OFF;
-      HSM_EN_OFF;
-      V12motor=0;
-      HSM=0;
-			PB2_LED_RED;
-    }
-    break;
-		
-		case ON_MOTORS:
-    {
-      if(timer_delay_motor < timer_delay_motor_max){
-        timer_delay_motor++;
-      }
-      else{
-        EN_V12motor_ON;
-        HSM_EN_ON;
-        V12motor=1;
-        HSM=1;
-        timer_delay_motor=0;
-      }
-			if(HSM_PG==0){
-        if(toggle_100ms)  {PB2_LED_GREEN;}
-        else              {PB2_LED_OFF;}
-			}
-      else                {PB2_LED_GREEN;}
-		}
-    break;
-		
-		case FAULT_MOTORS:
-		{
-      EN_V12motor_OFF;
-      HSM_EN_OFF;
-      V12motor=0;
-			HSM=0;
-      if(toggle_100ms)  {PB2_LED_RED;}
-			else              {PB2_LED_OFF;}
-		}
-    break;
-    
-    default:
-		{
-      
-    }
-		break;
-	}
+        case START:
+        {
+            timerFSM_boards++;
+            state_fsm_boards_prev = START;
 
-  DCDC_ctrl = ((V12board		& 0x01) << 7) +
-              ((V12motor		& 0x01)	<< 5) +
-              ((HSM           & 0x01)	<< 3) +
-              (((PB1_restart || PB2_restart) & 0x01)	<< 0);
+            if(timerFSM_boards >= 10){
+                state_fsm_boards = READY;   // after 10ms boards are ready -> are we sure of thise timing?
+            }
+        }
+        break;
+
+        case READY:
+        {
+            timerFSM_boards = 0;
+            PB1_LED_RED;
+        }
+        break;
+
+        case OFF_BOARD:
+        {
+            EN_V12board_OFF;
+            V12board=0;
+            PB1_LED_RED;
+        }
+        break;
+
+        case ON_BOARD:
+        {
+            if(timer_delay_board < timer_delay_board_max)
+            {
+                timer_delay_board++;
+            }
+            else
+            {
+                EN_V12board_ON;
+                V12board=1;
+                timer_delay_board=0;
+            }
+            if(V12board==0){
+                if(toggle_100ms)  {PB1_LED_GREEN;}
+                else              {PB1_LED_OFF;}
+            }
+            else                {PB1_LED_GREEN;}
+        }
+        break;
+
+        case FAULT_BOARD:
+        {
+            EN_V12board_OFF;
+            V12board=0;
+            if(toggle_100ms)  {PB1_LED_RED;}
+            else              {PB1_LED_OFF;}
+        }
+        break;
+
+        default:
+        {
+        }
+        break;
+    }
+  
+  
+    switch(state_fsm_motors){
 	
-  if(DCrestart){
-    PB1_restart=0;
-    PB2_restart=0;
-  }
+        case START:
+        {
+            timerFSM_motors++;
+            state_fsm_motors_prev = START;
+            
+            if(timerFSM_motors >= 10){
+                state_fsm_motors = READY;
+            }
+        }
+        break;
+            
+        case READY:
+        {
+            timerFSM_motors = 0;
+            PB2_LED_RED;			
+        }
+        break;
+
+        case OFF_MOTORS:
+        {
+            EN_V12motor_OFF;
+            HSM_EN_OFF;
+            V12motor=0;
+            HSM=0;
+            PB2_LED_RED;
+        }
+        break;
+
+        case ON_MOTORS:
+        {
+            if(timer_delay_motor < timer_delay_motor_max){
+                timer_delay_motor++;
+            }
+            else
+            {
+                EN_V12motor_ON;
+                HSM_EN_ON;
+                V12motor=1;
+                HSM=1;
+                timer_delay_motor=0;
+            }
+            if(HSM_PG==0){
+                if(toggle_100ms)  {PB2_LED_GREEN;}
+                else              {PB2_LED_OFF;}
+            }
+            else                  {PB2_LED_GREEN;}
+        }
+        break;
+
+        case FAULT_MOTORS:
+        {
+            EN_V12motor_OFF;
+            HSM_EN_OFF;
+            V12motor=0;
+            HSM=0;
+            if(toggle_100ms)      {PB2_LED_RED;}
+                else              {PB2_LED_OFF;}
+        }
+        break;
+
+        default:
+        {
+        }
+        break;
+    }
 }
 #endif 
 
@@ -1114,32 +1131,34 @@ void dcdc_management(void){
 		break;
     
 	}
+}
+#endif 
 
-  DCDC_ctrl = ((V12board		& 0x01) << 7) +
+void dcdcStatusUpdate(void)
+{
+    DCDC_ctrl = ((V12board		& 0x01) << 7) +
               ((V12motor		& 0x01)	<< 5) +
               ((HSM           & 0x01)	<< 3) +
               (((PB1_restart || PB2_restart) & 0x01)	<< 0);
     
     
-  DCDC_status_A = ((V12board      & 0x01) << 7) +
-                  ((V12board_F    & 0x01) << 6) +
-                  ((V12motor      & 0x01) << 5) +
-                  ((V12motor_F    & 0x01) << 4) +
-                  ((HSM           & 0x01) << 3) +
-                  ((HSM_PG        & 0x01) << 2) +
-                  ((HSM_F         & 0x01) << 1) +
-                  ((HSM_broken    & 0x01) << 0);
-    
-  DCDC_status_B = (( PB1_restart & 0x01) << 7) + 
-                  ((PB2_restart    & 0x01) << 6);
-    
-  if(DCrestart){
-    PB1_restart=0;
-    PB2_restart=0;
-  }
-}
-#endif 
+    DCDC_status_A = ((V12board      & 0x01) << 7) +
+                    ((V12board_F    & 0x01) << 6) +
+                    ((V12motor      & 0x01) << 5) +
+                    ((V12motor_F    & 0x01) << 4) +
+                    ((HSM           & 0x01) << 3) +
+                    ((HSM_PG        & 0x01) << 2) +
+                    ((HSM_F         & 0x01) << 1) +
+                    ((HSM_broken    & 0x01) << 0);
 
+    DCDC_status_B = (( PB1_restart & 0x01) << 1) + 
+                    ((PB2_restart    & 0x01) << 0);
+
+    if(DCrestart){
+        PB1_restart=0;
+        PB2_restart=0;
+    }
+}
 
 
 void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef* hcan1)

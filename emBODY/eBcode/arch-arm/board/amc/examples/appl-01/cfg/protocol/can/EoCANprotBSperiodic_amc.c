@@ -72,18 +72,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 //#include "embot_core.h"
-extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__STATUS(eOcanframe_t *frame, eOcanport_t port)
+extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__INFO(eOcanframe_t *frame, eOcanport_t port)
 {
-//    embot::app::eth::theBATservice::canFrameDescriptor cfd 
-//    { 
-//        port, 
-//        frame, 
-//        embot::app::eth::theBATservice::canFrameDescriptor::Type::unspecified
-//    };
-//    embot::app::eth::theBATservice::getInstance().AcceptCANframe(cfd);
     return(eores_OK);
 }
 
+extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__STATUS_BMS(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(eores_OK);
+}
+
+extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__STATUS_BAT(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(eores_OK);
+}
 
 extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS(eOcanframe_t *frame, eOcanport_t port)
 {
