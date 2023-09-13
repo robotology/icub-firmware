@@ -116,6 +116,8 @@ private:
     static bool s_eo_isconnected(eOmc_encoder_descriptor_t *des);
     static uint32_t rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmc_position_t pos);
     static bool isValidValue_AEA(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
+    static bool isValidValue_AEA3(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
+
 
 };
 
@@ -422,6 +424,36 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                
             } break;
             
+            
+            case eomc_enc_aea3:
+            {
+                embot::hw::encoder::POS spiRawValue = 0; 
+                // hal_spiencoder_errors_flags flags = {0};
+                
+                
+                // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+                if(resOK == embot::hw::encoder::getValue(e, spiRawValue/*, &diagn*/))                
+                {   // ok, the hal reads correctly
+                    if(true == isValidValue_AEA3(spiRawValue, prop.valueinfo->errortype))
+                    {   // the spi raw reading from hal is valid. i just need to rescale it.
+                        // the resolution is 16384 ticks per revolution.
+                        
+                        prop.valueinfo->value[0] = rescale2icubdegrees(spiRawValue, jomo, (eOmc_position_t)prop.descriptor->pos);                           
+                    }
+                    else
+                    {   // we have a valid raw value from hal but ... it is not valid after a check                        
+                        prop.valueinfo->errortype = prop.valueinfo->errortype;
+                        errorparam = spiRawValue; //(spiRawValue >> 6) & 0x0FFF;                                           
+                    }                    
+                }
+                else
+                {   // we dont even have a valid reading from hal
+                    prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::AEA_READING;
+                    errorparam = 0xffff;                                         
+                }   
+               
+            } break;
+            
             default:
             {   // we have not recognised any valid encoder type
                 prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::GENERIC;   
@@ -566,6 +598,14 @@ bool embot::app::eth::theEncoderReader::Impl::isValidValue_AEA(const uint32_t &v
     
     return true;
 }
+
+bool embot::app::eth::theEncoderReader::Impl::isValidValue_AEA3(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error)
+{
+    error = embot::app::eth::encoder::v1::Error::NONE;
+    // TODO: there is no way to check the validity when using the AEA3 in SSI mode
+    return true;
+}
+
 
 
 

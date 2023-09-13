@@ -117,11 +117,11 @@ namespace embot { namespace hw { namespace encoder {
         const embot::hw::encoder::BSP &encoderbsp = embot::hw::encoder::getBSP();
         embot::hw::SPI spiBus = encoderbsp.getPROP(e)->spiBus;
         
-        // TODO: safe guard (remove it when AEA3 is completely implemented)
-        if(cfg.type != embot::hw::encoder::Type::chipAS5045)
-        {
-            return resNOK;
-        }
+//        // TODO: safe guard (remove it when AEA3 is completely implemented)
+//        if(cfg.type != embot::hw::encoder::Type::chipAS5045)
+//        {
+//            return resNOK;
+//        }
         
         uint8_t index = embot::core::tointegral(e);
         
@@ -139,9 +139,8 @@ namespace embot { namespace hw { namespace encoder {
         }
         else if(embot::hw::encoder::Type::chipMA730 == cfg.type)
         {
-            // TODO: placeholder for AEA3
-            //_data_array[index].chip_MA730 = new embot::hw::chip::MA730;
-            return resNOK;
+             _data_array[index].chip_MA730 = new embot::hw::chip::MA730;
+            _data_array[index].chip_MA730->init({spiBus, _data_array[index].chip_MA730->standardspiconfig} );
         }
         
         embot::core::binary::bit::set(initialisedmask, index);
@@ -161,10 +160,10 @@ namespace embot { namespace hw { namespace encoder {
         const embot::hw::encoder::BSP &encoderbsp = embot::hw::encoder::getBSP();
         embot::hw::encoder::Type type = _data_array[index].config.type;
         
-        if(type != embot::hw::encoder::Type::chipAS5045)
-        {
-            return resNOK;
-        }
+//        if(type != embot::hw::encoder::Type::chipAS5045)
+//        {
+//            return resNOK;
+//        }
         
         if(embot::hw::encoder::Type::chipAS5045 == type)
         {
@@ -216,7 +215,18 @@ namespace embot { namespace hw { namespace encoder {
         }
         else if(embot::hw::encoder::Type::chipMA730 == _data_array[index].config.type)
         {
-            // TODO: AEA3
+            _data_array[index].start(on_completion_userdef);
+            
+            embot::core::Callback cbk { onChipCompletionReading, &_data_array[index] };
+            
+            if (true == _data_array[index].chip_MA730->read(_data_array[index].ma730_data, cbk))
+            {
+                return resOK;
+            }
+            else
+            {
+                return resNOK;
+            }
             return resNOK;
         }
         else
@@ -242,6 +252,15 @@ namespace embot { namespace hw { namespace encoder {
             if(_data_array[index].data_is_ready)
             {
                 pos = _data_array[index].as5045_data.position;
+                res = resOK;
+            }
+        }
+        else if(embot::hw::encoder::Type::chipMA730 == _data_array[index].config.type)
+        {
+            // retrieve the current encoder position from data saved internally.
+            if(_data_array[index].data_is_ready)
+            {
+                pos = _data_array[index].ma730_data.position;
                 res = resOK;
             }
         }
@@ -272,7 +291,14 @@ namespace embot { namespace hw { namespace encoder {
         }
         else if(embot::hw::encoder::Type::chipMA730 == _data_array[index].config.type)
         {
-            // placeholder for AEA3
+            embot::hw::chip::MA730::Data dd {};
+            _data_array[index].chip_MA730->read(dd, timeout);
+                
+            if(dd.status.ok)
+            {
+                pos = dd.position;
+                //destination.status = dd.status.ok;
+            }
         }
         else
         {

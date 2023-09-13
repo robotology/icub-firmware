@@ -193,6 +193,7 @@ void embot::hw::chip::MA730::Impl::onCompletion(void *p)
     {
        pimpl->_tmpdata->position = ((pimpl->_databuffer[0] & 0x7F) << 7) | (pimpl->_databuffer[1] >> 1);
        pimpl->_tmpdata->status.ok = true;
+       //embot::core::print("_databuffer[0]="+ std::to_string(pimpl->_databuffer[0]) + " _databuffer[1]="+std::to_string(pimpl->_databuffer[1]));
     }
     pimpl->_tmponcompletion.execute();
     pimpl->_tmponcompletion.clear();
