@@ -57,6 +57,7 @@ extern void PwmTest(void);
 
 
 #if defined(MOTORHAL_changes)
+extern void PwmSet(float u, float v, float w);
     // nothing is required
 #endif // #if defined(MOTORHAL_changes) 
 

@@ -84,7 +84,8 @@ namespace embot { namespace hw { namespace motor {
     result_t setpwm(MOTOR h, Pwm u, Pwm v, Pwm w) { return resNOK; }       
     result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner) { return resNOK; }   
     result_t init(MOTOR h, const Config &config) { return resNOK; } 
-    result_t configure(embot::hw::MOTOR h, const Config &config) { return resNOK; }     
+    result_t configure(embot::hw::MOTOR h, const Config &config) { return resNOK; }   
+    result_t setPWM(MOTOR h, const PWMperc &p) { return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace MOTOR {
 
@@ -157,6 +158,7 @@ namespace embot { namespace hw { namespace motor {
     
     HallStatus s_hw_gethallstatus(MOTOR h);
     result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w);
+    result_t s_hw_setpwmUVWperc(MOTOR h, const PWMperc &p);
     result_t s_hw_motorEnable(MOTOR h);
     result_t s_hw_motorDisable(MOTOR h);
     result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner);
@@ -311,6 +313,16 @@ namespace embot { namespace hw { namespace motor {
         return s_hw_setpwmUVW(h, u, v, w);
     }
 
+    result_t setPWM(MOTOR h, const PWMperc &p)
+    {
+        if(false == enabled(h))
+        {
+            return resNOK;
+        }
+        
+        return s_hw_setpwmUVWperc(h, p);
+    } 
+
     
     result_t getencoder(MOTOR h, Position &position)
     {
@@ -396,9 +408,9 @@ namespace embot { namespace hw { namespace motor {
             
         // ok, we start pwm
         embot::hw::motor::pwm::init({});
-            
+    #warning marco.accame: remove calibration of adc             
         // now we calibrate adc acquisition
-        embot::hw::motor::adc::calibrate({});
+//        embot::hw::motor::adc::calibrate({});
             
         // we may calibrate also the encoder so that it is aligned w/ hall values
         // but maybe better do it later
@@ -484,7 +496,15 @@ namespace embot { namespace hw { namespace motor {
     {   
         embot::hw::motor::pwm::set(u, v, w);        
         return resOK;
-    }    
+    }   
+
+    result_t s_hw_setpwmUVWperc(MOTOR h, const PWMperc &p)
+    {   
+        embot::hw::motor::pwm::setperc(p.a, p.b, p.c);        
+        return resOK;
+    }  
+    
+   
     
     result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
     {        

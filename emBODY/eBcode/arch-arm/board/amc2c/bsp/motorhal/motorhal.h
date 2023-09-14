@@ -182,7 +182,8 @@ struct Configuration
 void init(const Configuration &config);
 void deinit();
 void enable(bool on);
-void set(uint16_t u, uint16_t v, uint16_t w);    
+void set(uint16_t u, uint16_t v, uint16_t w);   
+void setperc(float u, float v, float w);
     
 } // namespace embot::hw::motor::pwm {
 

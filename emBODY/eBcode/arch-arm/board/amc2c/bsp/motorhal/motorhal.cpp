@@ -45,14 +45,14 @@ struct Converter
     {
         //int32_t c = (r/1000) * 7872;
         //return c;
-        return 1;
+        return r;
     }
     
     static int32_t current2raw(int32_t c)
     {
         //int32_t r = (c*7872) / 1000;
         //return r;
-        return 1;
+        return c;
     }    
     
     constexpr Converter() = default;
@@ -76,7 +76,7 @@ struct Calibrator
        _count = 0;
        _done = false; 
        cumulativerawvalues.fill(0); 
-       set({oncurrents, this});
+       set({oncurrentscalib, this});
     }
     
     void stop()
@@ -113,10 +113,11 @@ struct Calibrator
     }   
 
 
-    static void oncurrents(void *owner, const Currents * const currents)
+    static void oncurrentscalib(void *owner, const Currents * const currents)
     {
         Calibrator *o = reinterpret_cast<Calibrator*>(owner);   
-        
+ #warning maybe remove this calibration
+     
         // i use Converter::current2raw() because technically Currents does not contain the raw ADC values but transformed values
         o->cumulativerawvalues[0] += Converter::current2raw(currents->u);
         o->cumulativerawvalues[1] += Converter::current2raw(currents->v);
@@ -197,24 +198,24 @@ bool init(const Configuration &config)
     return r;   
 }  
 
-bool calibrate(const Calibration &calib)
-{
-    bool r {true};
-    
-    if(calib.calibration != Calibration::CALIBRATION::current)
-    {
-        return r;
-    }
-    // in here we need to have zero pwm, so we force it
-    PwmPhaseSet(0, 0, 0);
-    PwmPhaseEnable(PWM_PHASE_NONE);   
-    
-    _adcm_internals.calibrator.init();
+//bool calibrate(const Calibration &calib)
+//{
+//    bool r {true};
+//    
+//    if(calib.calibration != Calibration::CALIBRATION::current)
+//    {
+//        return r;
+//    }
+//    // in here we need to have zero pwm, so we force it
+//    PwmPhaseSet(0, 0, 0);
+//    PwmPhaseEnable(PWM_PHASE_NONE);   
+//    
+//    _adcm_internals.calibrator.init();
 
-    r = _adcm_internals.calibrator.wait(calib.timeout);
-   
-    return r;   
-}    
+//    r = _adcm_internals.calibrator.wait(calib.timeout);
+//   
+//    return r;   
+//}    
 
 
 void set(const OnCurrents &cbk)
@@ -681,6 +682,16 @@ extern void set(uint16_t u, uint16_t v, uint16_t w)
 //    PwmComparePhaseV = v;
 //    PwmComparePhaseW = w;
 //    _pwm_internals.pwmcomparevalue_protect(false);   
+}
+
+extern void setperc(float u, float v, float w)
+{
+    if(true == _pwm_internals.calibrating)
+    {        
+        u = v = w = 0;
+    }
+   
+    PwmSet(u, v, w); 
 }
     
 extern void enable(bool on)

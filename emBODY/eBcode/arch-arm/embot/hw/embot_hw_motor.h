@@ -95,6 +95,16 @@ namespace embot { namespace hw { namespace motor {
           
     // imposes a callback on end of measurement of the currents
     result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner);
+     
+    struct PWMperc 
+    {
+        float a {0.0};
+        float b {0.0};
+        float c {0.0};
+        constexpr PWMperc() = default;
+        constexpr PWMperc(float u, float v, float w) : a(u), b(v), c(w) {}
+    };        
+    result_t setPWM(MOTOR h, const PWMperc &p);
     
 }}} // namespace embot { namespace hw { namespace motor {
     

@@ -421,9 +421,37 @@ void PwmTest(void)
 
 #endif // #if defined(MOTORHALCONFIG_DONTUSE_TESTS)
 
+
 #if defined(MOTORHAL_changes)
 
-// nothing else is required
+float limitit(float x)
+{
+    return (x<0.0) ? (0.0) : ( (x>100.0) ? (100.0) : (x)  );    
+}
+
+uint16_t rescale(float x)
+{
+    static const uint16_t maxpwm = 1219;
+    float n = maxpwm * x/100.0;
+    return static_cast<uint16_t>(n); 
+}
+
+extern void PwmSet(float u, float v, float w)
+{
+    uint16_t a = 0;
+    uint16_t b = 0;
+    uint16_t c = 0;
+    
+    u = limitit(u);
+    v = limitit(v);
+    w = limitit(w);
+    
+    a = rescale(u);
+    b = rescale(v);
+    c = rescale(w);
+      
+    PwmPhaseSet(a, b, c);
+}
 
 #endif // #if defined(MOTORHAL_changes)
 
