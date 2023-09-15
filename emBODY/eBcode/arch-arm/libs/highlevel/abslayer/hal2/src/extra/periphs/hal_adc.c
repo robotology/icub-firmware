@@ -1064,10 +1064,31 @@ extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor)
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
-    //rescaling from -5000mA to 5000mA and applying the reduction factor
-    int16_t result = (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
-    
-	return	result;
+		if (motor < 4) {
+			//rescaling from -5000mA to 5000mA and applying the reduction factor
+			int16_t result = (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));  
+			return	result;
+		}
+		// Motor 0 + Motor 1
+		else if(motor == 4){
+			motor = 1;
+			//rescaling from -5000mA to 5000mA and applying the reduction factor
+			int16_t result4 = (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
+			motor = 0;
+			//rescaling from -5000mA to 5000mA and applying the reduction factor
+		  result4 += (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
+			return result4;
+		}
+  	// Motor 2 + Motor 3
+		else if (motor == 5) {
+			motor = 2;
+			//rescaling from -5000mA to 5000mA and applying the reduction factor
+			int16_t result5 = (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
+			motor = 3;
+			//rescaling from -5000mA to 5000mA and applying the reduction factor
+			result5 += (int16_t)(CURRENT_SCALE * (float)(S_HAL_ADC_DATA(AnalogMotorsInput)[motor*2 + 1] - S_HAL_ADC_DATA(hCurOffset)[motor]));
+			return result5;
+		}
 }
 
 #if !defined(HAL_ADC_REMOVE_UNUSED_CODE)
