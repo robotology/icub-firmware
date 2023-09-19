@@ -749,12 +749,21 @@ namespace embot::hw::motor::bsp::amc2c {
         }
         /** Configure Regular Channel
         */
+        
+#if 0
+        
         sConfig.Channel = ADC_CHANNEL_0;
         sConfig.Rank = ADC_REGULAR_RANK_1;
         sConfig.SamplingTime = ADC_SAMPLETIME_8CYCLES_5;
         sConfig.SingleDiff = ADC_SINGLE_ENDED;
         sConfig.OffsetNumber = ADC_OFFSET_1;
-        sConfig.Offset = 29789;
+//        sConfig.Offset = 29789;
+//        sConfig.OffsetRightShift = DISABLE;
+//        sConfig.OffsetSignedSaturation = ENABLE;
+//        sConfig.Offset = 0;
+//        sConfig.OffsetRightShift = DISABLE;
+//        sConfig.OffsetSignedSaturation = DISABLE;
+        sConfig.Offset = 29496;
         sConfig.OffsetRightShift = DISABLE;
         sConfig.OffsetSignedSaturation = ENABLE;
         if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
@@ -766,6 +775,7 @@ namespace embot::hw::motor::bsp::amc2c {
         sConfig.Channel = ADC_CHANNEL_1;
         sConfig.Rank = ADC_REGULAR_RANK_2;
         sConfig.OffsetNumber = ADC_OFFSET_2;
+        sConfig.Offset = 29634;
         if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
         {
         Error_Handler();
@@ -775,10 +785,46 @@ namespace embot::hw::motor::bsp::amc2c {
         sConfig.Channel = ADC_CHANNEL_3;
         sConfig.Rank = ADC_REGULAR_RANK_3;
         sConfig.OffsetNumber = ADC_OFFSET_3;
+        sConfig.Offset = 29020;
         if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
         {
         Error_Handler();
         }
+        
+#else
+// zero offset in ADC        
+        sConfig.Channel = ADC_CHANNEL_0;
+        sConfig.Rank = ADC_REGULAR_RANK_1;
+        sConfig.SamplingTime = ADC_SAMPLETIME_8CYCLES_5;
+        sConfig.SingleDiff = ADC_SINGLE_ENDED;
+        sConfig.OffsetNumber = ADC_OFFSET_NONE;
+        sConfig.Offset = 0;
+        sConfig.OffsetRightShift = DISABLE;
+        sConfig.OffsetSignedSaturation = DISABLE;
+        if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        /** Configure Regular Channel
+        */
+        sConfig.Channel = ADC_CHANNEL_1;
+        sConfig.Rank = ADC_REGULAR_RANK_2;
+
+
+        if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        /** Configure Regular Channel
+        */
+        sConfig.Channel = ADC_CHANNEL_3;
+        sConfig.Rank = ADC_REGULAR_RANK_3;
+
+        if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
+        {
+        Error_Handler();
+        }
+#endif        
         /* USER CODE BEGIN ADC1_Init 2 */
 
         /* USER CODE END ADC1_Init 2 */

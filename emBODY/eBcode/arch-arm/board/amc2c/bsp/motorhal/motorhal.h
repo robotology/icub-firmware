@@ -23,6 +23,7 @@ this API exposes what is required to move the motor using embot::hw::motor
 namespace embot::hw::motor::adc {
 
 // we keep int32_t even if the adc gets only int16_t values
+// the unit is [mA]
 struct Currents
 {
     int32_t u {0};

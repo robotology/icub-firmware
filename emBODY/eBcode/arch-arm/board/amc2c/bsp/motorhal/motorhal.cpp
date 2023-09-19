@@ -41,21 +41,34 @@ namespace embot::hw::motor::adc {
 
 struct Converter
 {
-    static int32_t raw2current(int32_t r)
-    {
-        //int32_t c = (r/1000) * 7872;
-        //return c;
-        return r;
-    }
-    
-    static int32_t current2raw(int32_t c)
-    {
-        //int32_t r = (c*7872) / 1000;
-        //return r;
-        return c;
-    }    
+    static constexpr uint32_t defOffset {29789};
+    uint32_t offset {defOffset};
     
     constexpr Converter() = default;
+    constexpr Converter(uint32_t o) : offset(o) {};  
+
+    void clear() 
+    {
+        set(defOffset);
+    }        
+
+    void set(uint32_t o) 
+    {
+        offset = o;
+    }
+
+    int32_t raw2current(uint32_t r)
+    {
+        int32_t t = static_cast<int32_t>(r - offset)*33000;
+        return t/(256*1024);
+    }
+    
+    uint32_t current2raw(int32_t c)
+    {
+        int32_t t = c*256*1024;
+        return t/33000 + offset;
+    }    
+    
 };
 
 
@@ -67,21 +80,25 @@ struct Calibrator
     volatile bool _done {false};
     volatile size_t _count {0};
     Currents _currents {};
-    std::array<int64_t, 3> cumulativerawvalues {0, 0, 0};
+    std::array<uint64_t, 3> cumulativerawvalues {0, 0, 0};
+    
+
+    std::array<Converter, 3> _conv {};
     
     constexpr Calibrator() = default;
     
     void init()
     {
+       for(auto &i : _conv) { i.clear(); } // but the clear is not necessary
        _count = 0;
        _done = false; 
        cumulativerawvalues.fill(0); 
-       set({oncurrentscalib, this});
+       embot::hw::motor::adc::set({oncurrentscalib, this});
     }
     
     void stop()
     {
-        set({});
+        embot::hw::motor::adc::set({});
         _count = 0;
        _done = true;  
     }
@@ -116,12 +133,13 @@ struct Calibrator
     static void oncurrentscalib(void *owner, const Currents * const currents)
     {
         Calibrator *o = reinterpret_cast<Calibrator*>(owner);   
- #warning maybe remove this calibration
+     
+        // currents is in mA 
      
         // i use Converter::current2raw() because technically Currents does not contain the raw ADC values but transformed values
-        o->cumulativerawvalues[0] += Converter::current2raw(currents->u);
-        o->cumulativerawvalues[1] += Converter::current2raw(currents->v);
-        o->cumulativerawvalues[2] += Converter::current2raw(currents->w);
+        o->cumulativerawvalues[0] += o->_conv[0].current2raw(currents->u);
+        o->cumulativerawvalues[1] += o->_conv[1].current2raw(currents->v);
+        o->cumulativerawvalues[2] += o->_conv[2].current2raw(currents->w);
         
         o->_count++;
         
@@ -130,20 +148,19 @@ struct Calibrator
             // time to do business: prepare average currents, impose the offset to ADC, stop the calibrator  
             
             // dont use the >> _shift because ... 1. this operation is done only once, so who bother. 
-            //                                    2. cumulativerawvalues is int64_t. it may be (dont think so) negative so it is too complicate to optimize
+            //                                    2. cumulativerawvalues is int64_t, so shift does niot work for negative values
             // impose offset to adc.
-//            volatile int64_t cc[3] {0, 0, 0};
-//            cc[0] = o->cumulativerawvalues[0] / _maxcount;
-//            cc[1] = o->cumulativerawvalues[1] / _maxcount;
-//            cc[2] = o->cumulativerawvalues[2] / _maxcount;
-            AdcMotSetOffset(ADCMOT_PHASE_U, AdcMotGetOffset(ADCMOT_PHASE_U) + (o->cumulativerawvalues[0] / _maxcount));
-            AdcMotSetOffset(ADCMOT_PHASE_V, AdcMotGetOffset(ADCMOT_PHASE_V) + (o->cumulativerawvalues[1] / _maxcount));
-            AdcMotSetOffset(ADCMOT_PHASE_W, AdcMotGetOffset(ADCMOT_PHASE_W) + (o->cumulativerawvalues[2] / _maxcount));
+            volatile int64_t cc[3] {0, 0, 0};
+            cc[0] = o->cumulativerawvalues[0] / _maxcount;
+            cc[1] = o->cumulativerawvalues[1] / _maxcount;
+            cc[2] = o->cumulativerawvalues[2] / _maxcount;
             
-            // stop
+            o->_conv[0].set(cc[0]);
+            o->_conv[1].set(cc[1]);
+            o->_conv[2].set(cc[2]);
+            
+            // stop: deregister this callback
             o->stop();
-            
-            return;
         }                     
     }    
     
@@ -155,23 +172,28 @@ struct adcm_Internals
     Calibrator calibrator {};
         
     static void dummy_adc_callback(void *owner, const Currents * const currents) {}  
-    static constexpr OnCurrents dummyADCcbk { dummy_adc_callback, nullptr };         
+    static constexpr OnCurrents dummyADCcbk { dummy_adc_callback, nullptr };          
         
     adcm_Internals() = default;    
 };
 
 adcm_Internals _adcm_internals {};
     
- 
-void adcm_on_acquisition_of_currents(int16_t c1, int16_t c2, int16_t c3)
+// this is the callback executed inside the ADC handler  
+// {c1, c2, c3} are in adc units [0, 64k)
+// so, we need to transform them into currents expressed in milli-ampere
+    // and call the callback imposed by the embot::hw::motor::setCallbackOnCurrents()
+void adcm_on_acquisition_of_currents(uint16_t c1, uint16_t c2, uint16_t c3)
 {
-    // important note: {c1, c2, c3} are the raw ADC acquisitions as in adcMotCurrents[0, 1, 2]
-    // the callback requires converted currents. but to be fair in adcm.c there is no concept of how to convert them as in the amcbldc
-    // so, boh ... for now i do nothing    
-    Currents currents = {Converter::raw2current(c1), Converter::raw2current(c2), Converter::raw2current(c3)};
+    // important note: {{c1, c2, c3} are in adc units [0, 64k). no conversion yet. 
+    Currents currents = 
+    {
+        _adcm_internals.calibrator._conv[0].raw2current(c1), 
+        _adcm_internals.calibrator._conv[1].raw2current(c2),
+        _adcm_internals.calibrator._conv[2].raw2current(c3),
+    };
     _adcm_internals.config.oncurrents.execute(&currents);         
-}    
-
+}   
     
 bool init(const Configuration &config)
 {
@@ -198,24 +220,24 @@ bool init(const Configuration &config)
     return r;   
 }  
 
-//bool calibrate(const Calibration &calib)
-//{
-//    bool r {true};
-//    
-//    if(calib.calibration != Calibration::CALIBRATION::current)
-//    {
-//        return r;
-//    }
-//    // in here we need to have zero pwm, so we force it
-//    PwmPhaseSet(0, 0, 0);
-//    PwmPhaseEnable(PWM_PHASE_NONE);   
-//    
-//    _adcm_internals.calibrator.init();
+bool calibrate(const Calibration &calib)
+{
+    bool r {true};
+    
+    if(calib.calibration != Calibration::CALIBRATION::current)
+    {
+        return r;
+    }
+    // in here we need to have zero pwm, so we force it
+    PwmPhaseSet(0, 0, 0);
+    PwmPhaseEnable(PWM_PHASE_NONE);   
+    
+    _adcm_internals.calibrator.init();
 
-//    r = _adcm_internals.calibrator.wait(calib.timeout);
-//   
-//    return r;   
-//}    
+    r = _adcm_internals.calibrator.wait(calib.timeout);
+   
+    return r;   
+}    
 
 
 void set(const OnCurrents &cbk)

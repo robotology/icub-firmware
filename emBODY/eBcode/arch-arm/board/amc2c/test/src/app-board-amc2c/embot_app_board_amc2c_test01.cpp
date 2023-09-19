@@ -195,12 +195,12 @@ namespace embot::app::board::amc2c::test01 {
             int16_t i0 = static_cast<int16_t>(_shared.adcvalues[0]);
             int16_t i1 = static_cast<int16_t>(_shared.adcvalues[1]);
             int16_t i2 = static_cast<int16_t>(_shared.adcvalues[2]);
-            constexpr float conv {1000.0};
-            float I0 = conv*33.0*i0 / (256*1024);
-            float I1 = conv*33.0*i1 / (256*1024);
-            float I2 = conv*33.0*i2 / (256*1024);
-            //embot::core::print("curs = (" + std::to_string(i0) + ", " + std::to_string(i1) + ", " + std::to_string(i2) + ")");
-            embot::core::print("curs [mA] = (" + std::to_string(I0) + ", " + std::to_string(I1) + ", " + std::to_string(I2) + ")");                    
+//            constexpr float conv {1000.0};
+//            float I0 = conv*33.0*i0 / (256*1024);
+//            float I1 = conv*33.0*i1 / (256*1024);
+//            float I2 = conv*33.0*i2 / (256*1024);
+            embot::core::print("curs = (" + std::to_string(i0) + ", " + std::to_string(i1) + ", " + std::to_string(i2) + ")");
+          //  embot::core::print("curs [mA] = (" + std::to_string(I0) + ", " + std::to_string(I1) + ", " + std::to_string(I2) + ")");                    
         }
           
               

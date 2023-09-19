@@ -408,9 +408,9 @@ namespace embot { namespace hw { namespace motor {
             
         // ok, we start pwm
         embot::hw::motor::pwm::init({});
-    #warning marco.accame: remove calibration of adc             
+          
         // now we calibrate adc acquisition
-//        embot::hw::motor::adc::calibrate({});
+        embot::hw::motor::adc::calibrate({});
             
         // we may calibrate also the encoder so that it is aligned w/ hall values
         // but maybe better do it later

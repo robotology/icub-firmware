@@ -27,6 +27,7 @@ namespace embot { namespace hw { namespace motor {
     using HallStatus = std::uint8_t;
     
     // so far, we keep int32_t as it is more general. even if lower levels may propagate them as int16_t
+    // u, v, w are expressed as mA
     struct Currents
     {
         int32_t u {0};

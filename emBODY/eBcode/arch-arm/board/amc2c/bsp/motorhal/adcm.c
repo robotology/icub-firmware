@@ -59,7 +59,7 @@ extern ADC_HandleTypeDef hadc2;
 // add in here minimal changes
 // --------------------------------------------------------------------------------------------------------------------
 
-extern adcm_fp_int16_int16_uint16_t adcm_FP_on_acquisition_of_currents = NULL;
+extern adcm_fp_uint16_uint16_uint16_t adcm_FP_on_acquisition_of_currents = NULL;
 
 #endif // #if defined(MOTORHAL_changes)
 
@@ -69,7 +69,7 @@ extern adcm_fp_int16_int16_uint16_t adcm_FP_on_acquisition_of_currents = NULL;
 /* Structure to hold the ADC1/ADC2 DMA data */
 typedef struct
 {
-    int16_t adc1;
+    uint16_t adc1;
     uint16_t adc2;
 } __attribute__((aligned(4),packed)) DualModeAdcData_t;
 
@@ -80,7 +80,7 @@ typedef struct
 static DualModeAdcData_t AdcMotRawData[2*NUMBER_OF_ADC_CHANNELS];
 
 /* Unpacked data */
-static int16_t adcMotCurrents[NUMBER_OF_ADC_CHANNELS];
+static uint16_t adcMotCurrents[NUMBER_OF_ADC_CHANNELS]; // in adc units [0, 64k)
 static uint16_t adcMotVoltages[NUMBER_OF_ADC_CHANNELS];
 
 /* Channels assigned to phase current measurement */
@@ -123,35 +123,11 @@ static void adcMotGetSamples(const DualModeAdcData_t *pBuf)
 /*DEBUG*/HAL_GPIO_WritePin(TP4_GPIO_Port, TP4_Pin, GPIO_PIN_RESET);
 #endif
     
-//    static int32_t counter = 0;
-//    static int32_t avg_r_0, avg_r_1, avg_r_2  = 0;
     
 #if defined(MOTORHAL_changes) 
     if(NULL != adcm_FP_on_acquisition_of_currents)
     {        
-        adcm_FP_on_acquisition_of_currents(adcMotCurrents[0], adcMotCurrents[1], adcMotCurrents[2]);
-// TODO: Remove, used only for debug
-//        counter++;
-//        avg_r_0 = adcMotCurrents[0];
-//        avg_r_1 = adcMotCurrents[1];
-//        avg_r_2 = adcMotCurrents[2];
-          AVG0 = adcMotCurrents[0];
-          AVG1 = adcMotCurrents[1];
-          AVG2 = adcMotCurrents[2] ;
-        
-//        if(counter % 50 == 0)
-//        {
-//            AVG0 = avg_r_0 / counter;
-//            AVG1 = avg_r_1 / counter;
-//            AVG2 = avg_r_2 / counter;
-//            //embot::core::print(std::to_string(AVG0) + ";" + std::to_string(AVG1) + ";" + std::to_string(AVG2));
-
-//            counter = 0;
-//            avg_r_0 = 0;
-//            avg_r_1 = 0;
-//            avg_r_2 = 0;
-//        }
-        
+        adcm_FP_on_acquisition_of_currents(adcMotCurrents[0], adcMotCurrents[1], adcMotCurrents[2]);        
     }
 #endif    
 }
