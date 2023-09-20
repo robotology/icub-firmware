@@ -576,6 +576,14 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     // -----------------------------------------------------------------------------
     
     AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
+    
+#if 1
+    embot::hw::motor::PWMperc pwmperc 
+    {
+        AMC_BLDC_Y.ControlOutputs_p.Vabc[0], AMC_BLDC_Y.ControlOutputs_p.Vabc[1], AMC_BLDC_Y.ControlOutputs_p.Vabc[2]
+    };
+    embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmperc);
+#else
     //constexpr float coneversion2pwmvalue (163.83F);
     constexpr float coneversion2pwmvalue (12.19F);
 
@@ -601,7 +609,7 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     // 30% PWM value on phase Vabc2 = 0,0,366
 
     embot::hw::motor::setpwm(embot::hw::MOTOR::one, 0, 0, 122);
-    
+#endif    
    
 //#define DEBUG_PARAMS
 #ifdef DEBUG_PARAMS
