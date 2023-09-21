@@ -595,6 +595,12 @@ namespace embot { namespace hw { namespace motor {
         pwmSet(u, v, w);       
         return resOK;
     }
+    
+    result_t s_hw_setpwmUVWperc(MOTOR h, const PWMperc &p)
+    {   
+        pwm_SetPerc(p.a, p.b, p.c);        
+        return resOK;
+    }      
         
     static_assert(sizeof(pwm_Currents_t) == sizeof(embot::hw::motor::Currents), "embot::hw::motor::Currents and pwm_Currents_t differs");
     static_assert(sizeof(pwm_Currents_t::u) == sizeof(embot::hw::motor::Currents::u), "embot::hw::motor::Currents and pwm_Currents_t differs");
