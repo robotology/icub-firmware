@@ -151,9 +151,9 @@ struct Calibrator
             //                                    2. cumulativerawvalues is int64_t, so shift does niot work for negative values
             // impose offset to adc.
             volatile int64_t cc[3] {0, 0, 0};
-            cc[0] = o->cumulativerawvalues[0] / _maxcount;
-            cc[1] = o->cumulativerawvalues[1] / _maxcount;
-            cc[2] = o->cumulativerawvalues[2] / _maxcount;
+            cc[0] = o->cumulativerawvalues[0] / o->_count;
+            cc[1] = o->cumulativerawvalues[1] / o->_count;
+            cc[2] = o->cumulativerawvalues[2] / o->_count;
             
             o->_conv[0].set(cc[0]);
             o->_conv[1].set(cc[1]);
