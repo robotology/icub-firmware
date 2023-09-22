@@ -411,10 +411,15 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::prot:
 
             // The Bosch euler representation can be either the windows(default) or android, but in YARP
             // we have a different representation(see https://github.com/robotology/yarp/blob/0481f994c6e03897d038c5f1d1078145646a1772/src/libYARP_dev/src/yarp/dev/MultipleAnalogSensorsInterfaces.h#L302-L348)
-            info.value.x = imuacquisition.data.eul.z;
+#ifdef STM32HAL_BOARD_RFE 
+   					info.value.x = -imuacquisition.data.eul.z;
             info.value.y = -imuacquisition.data.eul.y;
-            info.value.z = imuacquisition.data.eul.x;
-
+            info.value.z = -imuacquisition.data.eul.x;
+#else
+   					info.value.x = imuacquisition.data.eul.z;
+            info.value.y = -imuacquisition.data.eul.y;
+            info.value.z = imuacquisition.data.eul.x;					
+#endif
             msg.load(info);
             msg.get(frame);
             replies.push_back(frame);
