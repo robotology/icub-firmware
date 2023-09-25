@@ -9,9 +9,17 @@
 #include "stm32l4xx_hal.h"
 #include "BAT_B.h"
 
+//TEST VARS
+uint32_t test_faults_final_time = 60000;
+uint32_t test_faults_counter_motor = 20000;
+uint32_t test_faults_waiting_motor = 2000;
+uint32_t test_faults_counter_board = 20000;
+uint32_t test_faults_waiting_board = 2000;
+
+
 char Firmware_vers = 1;
 char Revision_vers = 3;
-char Build_number  = 0;
+char Build_number  = 1;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
 uint32_t vhyst=0;    // voltage hysteresis
@@ -46,7 +54,7 @@ uint8_t toggle_100ms = 0;
 
 uint16_t I_V12board_MAX      = 10000;    // threshold in mA
 uint16_t I_V12motor_MAX      = 10000;    // threshold in mA
-uint16_t I_HSM_MAX           = 36000;    // threshold in mA
+uint16_t I_HSM_MAX           = 38000;    // threshold in mA
 uint16_t timer_fault_board   = 0;
 uint16_t timer_fault_motors  = 0;
 uint16_t timer_fault_HSM     = 0;
@@ -63,6 +71,15 @@ uint8_t HSM           = 0;		// HSM control
 uint8_t HSM_PG        = 0;
 uint8_t HSM_F         = 0;
 uint8_t DCrestart     = 0;
+
+//HSM Hw-Sw Fault flags
+uint8_t HSM_HW_F         = 0;
+uint8_t HSM_SW_F         = 0;
+
+// Instantaneous Currents at fault to be sent to UART
+int32_t Current_board_in_fault = 0;
+int32_t Current_HSM_in_fault = 0;
+int32_t Current_motor_in_fault = 0;
 
 uint8_t V12board_bdc  = 1;    // +++++++++++++++++++++++++++++++++++++++++++++ da cambiare logica ++++++++++++++++++
 uint8_t V12motor_bdc  = 1;    // +++++++++++++++++++++++++++++++++++++++++++++ da cambiare logica ++++++++++++++++++

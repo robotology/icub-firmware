@@ -13,7 +13,7 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 // Display_uOLED_128_G2
 // -----------------------------------------------------------------------------------------------------------------------------
-uint16_t uOLED_Parameters[14] = {0};
+uint16_t uOLED_Parameters[18] = {0};
 uint16_t Display_qualifier = 0x01;
 
 
@@ -43,6 +43,11 @@ void Display_uOLED_128_G2(){
   
   uOLED_Parameters[12] = (100*HSM_PG) + (10*V12motor) + (V12board);
   uOLED_Parameters[13] = (100*HSM_F) + (10*V12motor_F) + (V12board_F);
+  uOLED_Parameters[14] = (DCDC_status_B << 8) | DCDC_status_A;
+  
+  uOLED_Parameters[15] = Current_board_in_fault;
+  uOLED_Parameters[16] = Current_motor_in_fault;
+  uOLED_Parameters[17] = Current_HSM_in_fault;
   
   HAL_UART_Transmit_DMA(&huart1, (uint8_t*)uOLED_Parameters, sizeof(uOLED_Parameters));
 }

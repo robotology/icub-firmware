@@ -13,6 +13,13 @@
 #ifndef BAT_B_H
 #define BAT_B_H
 
+// TEST VARIABLES
+extern uint32_t test_faults_final_time;
+extern uint32_t test_faults_counter_motor;
+extern uint32_t test_faults_waiting_motor;
+extern uint32_t test_faults_counter_board;
+extern uint32_t test_faults_waiting_board;
+
 extern char Firmware_vers;
 extern char Revision_vers;
 extern char Build_number;
@@ -43,6 +50,7 @@ extern uint16_t timer_delay_motor;
 extern uint16_t timer_delay_board_max;
 extern uint16_t timer_delay_motor_max;
 extern uint16_t timer_delay_dcdc_max;
+
 
 extern uint32_t blink_ds;
 extern uint8_t toggle_1s;
@@ -85,6 +93,13 @@ extern uint8_t DCDC_ctrl;
 extern uint8_t DCDC_status;
 extern uint8_t HSM_PG;
 extern uint8_t HSM_F;
+
+extern uint8_t HSM_HW_F;
+extern uint8_t HSM_SW_F;
+
+extern int32_t Current_board_in_fault;
+extern int32_t Current_HSM_in_fault;
+extern int32_t Current_motor_in_fault;
 
 extern uint16_t timeout;
 extern uint16_t time_delay;

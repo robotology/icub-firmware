@@ -291,7 +291,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   if(htim->Instance==TIM7){         // timer 1ms
     dcdc_management();
     dcdcStatusUpdate();
-    CANBUS();
     //HAL_TIM_Base_Stop_IT(&htim10);
     //timeout=1;
   }
@@ -303,7 +302,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
     #endif
   }
   if(htim->Instance==TIM16){        // timer 100ms
-    toggle_100ms = toggle_100ms^1;
+    CANBUS();
   }
   if(htim->Instance==TIM17){        // timer 1s
     toggle_1s = toggle_1s^1;
@@ -330,9 +329,18 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
       HAL_TIM_Base_Start_IT(&htim2);   // 10ms
     }
   }
-  if(GPIO_Pin==GPIO_PIN_13){        // HSM_nFLT
-    if(HAL_GPIO_ReadPin(HSM_nFLT) == 0)   {V48motor_FLT_ON;     HSM_F=1;}
-    else                                  {V48motor_FLT_OFF;    HSM_F=0;}
+  if(GPIO_Pin==GPIO_PIN_13){        // HSM_nFLT 
+    if(HAL_GPIO_ReadPin(HSM_nFLT) == 0)   
+    {
+        V48motor_FLT_ON;     
+        HSM_F=1;
+        HSM_HW_F = 1;
+    }
+    else
+    {
+        V48motor_FLT_OFF;    
+        HSM_F=0;
+    }
   }
   if(GPIO_Pin==GPIO_PIN_14){        // HSM_nPG
     if(HAL_GPIO_ReadPin(HSM_nPG) == 0)    {V48motor_PG_ON;      HSM_PG=1;}
@@ -401,11 +409,11 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
     else                        
     {
         V12board_F = 1;
-        //Current_board_in_fault = adc_measure.I_V12board;
+        Current_board_in_fault = adc_measure.I_V12board;
     }
   }else{
     if(timer_fault_board > 0)   {timer_fault_board--;}
-    //if(Current_board_in_fault != 0) {Current_board_in_fault = 0;}
+    if(Current_board_in_fault != 0) {Current_board_in_fault = 0;}
   }
         
   if(adc_measure.I_V12motor > I_V12motor_MAX){                    // Check for motors overcurrent
@@ -416,26 +424,26 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
     else                        
     {
         V12motor_F = 1;
-        //Current_motor_in_fault = adc_measure.I_V12motor;
+        Current_motor_in_fault = adc_measure.I_V12motor;
     }
   }else{
     if(timer_fault_motors > 0)  {timer_fault_motors--;}
-    //if(Current_motor_in_fault != 0) {Current_motor_in_fault = 0;}
+    if(Current_motor_in_fault != 0) {Current_motor_in_fault = 0;}
   }
   
   if(adc_measure.I_HSM > I_HSM_MAX){                              // Check for HSM overcurrent
-    if(timer_fault_HSM < 10)    
+    if(timer_fault_HSM < 20)    
     {
         timer_fault_HSM++;
     }
     else                        
     {
         HSM_F = 1;
-        //Current_HSM_in_fault = adc_measure.I_HSM;
+        HSM_SW_F = 1;
+        Current_HSM_in_fault = adc_measure.I_HSM;
     }
   }else{
     if(timer_fault_HSM > 0)     {timer_fault_HSM--;}
-    //if(Current_HSM_in_fault != 0) {Current_HSM_in_fault = 0;}
   }
     
   calcMean();
@@ -730,7 +738,7 @@ void FAULT_CHECK(void){
             int_fault=0;
           }
        }
-       else{                // FAULT!!!!
+       else{// FAULT!!!!
           if(filter_fault_gpio<timer_debounce){             
               filter_fault_gpio++;                    
           }
@@ -846,6 +854,8 @@ void dcdc_management(void){
             V12board=0;
             if(toggle_100ms)  {PB1_LED_RED;}
             else              {PB1_LED_OFF;}
+            // send CAN message before the set timer of 100ms if a FAULT happens 
+            CANBUS();
         }
         break;
 
@@ -888,11 +898,14 @@ void dcdc_management(void){
 
         case ON_MOTORS:
         {
+            HSM_HW_F = 0;
+            HSM_SW_F = 0;
+            
             if(timer_delay_motor < timer_delay_motor_max){
                 timer_delay_motor++;
             }
             else
-            {
+            {   
                 EN_V12motor_ON;
                 HSM_EN_ON;
                 V12motor=1;
@@ -915,6 +928,8 @@ void dcdc_management(void){
             HSM=0;
             if(toggle_100ms)      {PB2_LED_RED;}
                 else              {PB2_LED_OFF;}
+            // send CAN message before the set timer of 100ms if a FAULT happens
+            CANBUS();
         }
         break;
 
@@ -1134,6 +1149,7 @@ void dcdc_management(void){
 }
 #endif 
 
+
 void dcdcStatusUpdate(void)
 {
     DCDC_ctrl = ((V12board		& 0x01) << 7) +
@@ -1150,9 +1166,12 @@ void dcdcStatusUpdate(void)
                     ((HSM_PG        & 0x01) << 2) +
                     ((HSM_F         & 0x01) << 1) +
                     ((HSM_broken    & 0x01) << 0);
+    
 
-    DCDC_status_B = (( PB1_restart & 0x01) << 1) + 
-                    ((PB2_restart    & 0x01) << 0);
+    DCDC_status_B = (( HSM_SW_F    & 0x01) << 3) +
+                    (( HSM_HW_F    & 0x01) << 2) +
+                    (( PB1_restart & 0x01) << 1) + 
+                    (( PB2_restart    & 0x01) << 0);
 
     if(DCrestart){
         PB1_restart=0;

@@ -1590,11 +1590,6 @@ static void JointSet_do_wait_calibration(JointSet* o)
             break;
     }
     
-    //Debug code
-    // char message[150];
-    // snprintf(message, sizeof(message), "JointSet_do_wait_calibration: is_calib=%d.",o->is_calibrated );
-    // JointSet_send_debug_message(message, 0, 0, 0);
-    
     if (!o->is_calibrated) return;
     
     for (int es=0; es<E; ++es)
@@ -1651,10 +1646,6 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         
         case eomc_calibration_type5_hard_stops:
         {
-//            //Debug code
-//            char message[150];
-//            snprintf(message, sizeof(message), "calib cmd rec: pwm%d cz%d", calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
-//            JointSet_send_debug_message(message, e);
             o->calibration_timeout = 0;
             BOOL ret = Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, (calibrator->params.type5.final_pos - calibrator->params.type5.calibrationZero));
             
@@ -1699,14 +1690,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 JointSet_send_debug_message(info, e, 0, 0);
                 ////debug code ended
                 return;
-            }
-            
-            //debug code
-            char info[70];
-            snprintf(info, sizeof(info), "vmax=%d,vim=%d",calibrator->params.type6.vmax, calibrator->params.type6.vmin);
-            JointSet_send_debug_message(info, e, 0, 0);
-            ////debug code ended
-                
+            } 
             //if I'm here I can perform calib type 6.
             
             // 2) set state
@@ -1752,12 +1736,6 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             {
                 o->joint[e].running_calibration.data.type6.targetpos = target_pos;
                 o->joint[e].running_calibration.data.type6.computedZero = 0;
-                
-                //debug code
-                snprintf(info, sizeof(info), "targetPos=%.1f",o->joint[e].running_calibration.data.type6.targetpos);
-                JointSet_send_debug_message(info, e, 0, 0);
-                //debug code ended
-                
             }
             else
             {
@@ -2072,18 +2050,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 //3) Convert offset to decideg for POS service and add "-" sign to offset_raw to correct raw position (always minus sign independently from invertDirection value)
                 int32_t offset = ((ICUB2DEG)*(CTRL_UNITS)((-1)*offset_raw))*10.0f;
                 
-                ////debug code
-                snprintf(info, sizeof(info), "CALIB 14 j%d: or=%d o=%d", e, offset_raw, offset);
-                JointSet_send_debug_message(info, e, 0, 0);
-                ////debug code ended
-                
                 //4) Add the rotation
                 eOmc_calib14_ROT_t rotation = eomc_int2calib14_ROT(calibrator->params.type14.rotation);
-                
-                ////debug code
-                snprintf(info, sizeof(info), "Rot from:%d to:%u and iv:%u", calibrator->params.type14.rotation, rotation, calibrator->params.type14.invertdirection);
-                JointSet_send_debug_message(info, e, 0, 0);
-                ////debug code ended
                 
                 if(rotation == eOmc_calib14_ROT_unknown || rotation == eOmc_calib14_ROT_none)
                 {
@@ -2095,11 +2063,6 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                     return;
                 }
                 eoas_pos_ROT_t posrotation = JointSet_calib14_ROT2pos_ROT(rotation);
-                
-                ////debug code
-                snprintf(info, sizeof(info), "CALIB 14 j %d: rot_raw=%d rot_enum=%u ", e, calibrator->params.type14.rotation, posrotation);
-                JointSet_send_debug_message(info, e, 0, 0);
-                ////debug code ended
                 
                 if (eo_pos_Calibrate(eo_pos_GetHandle(), e, posrotation, calibrator->params.type14.invertdirection, offset) != eores_OK)
                 {
