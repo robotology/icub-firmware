@@ -17,7 +17,7 @@
 void Display_uOLED_128_G2(void);
 void Display_uOLED_init(void);
 
-extern uint16_t uOLED_Parameters[14];
+extern uint16_t uOLED_Parameters[18];
 extern uint16_t Display_qualifier;
 
 

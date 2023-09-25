@@ -118,12 +118,6 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             
             AbsEncoder_calibrate_absolute(e_ptr, 0, jCalib6Data_ptr->computedZero);
             
-//            // debug code
-//            char info[80];
-//            snprintf(info, sizeof(info), "AbsEnc calib: mcp:%d cz:%d co:%d eps:%d", m_ptr->pos_fbk, m_ptr->hardstop_calibdata.zero, m_ptr->pos_calib_offset, e_ptr->position_sure);
-//            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-//            // debug code ended
-            
             jCalib6Data_ptr->state = calibtype6_st_absEncoderCalibrated;
             
         }
@@ -134,12 +128,6 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
             //the limit range is very big. this check should save us from wrong calib params.
             int32_t curr_pos = AbsEncoder_position(e_ptr);
-					
-            // debug code
-            char info[80];
-            snprintf(info, sizeof(info), "Encoder pos:%d and zero:%d", curr_pos, e_ptr->zero);
-            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-            // debug code ended
 
             if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
             {
@@ -183,12 +171,6 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
     
                 return(eores_NOK_generic);
             }
-            
-            // debug code
-            memset(&info[0], 0, sizeof(info));
-            snprintf(info, sizeof(info), "init traj: cpos=%.2f target=%.2f lim:%.2f %.2f", j_ptr->pos_fbk, j_ptr->running_calibration.data.type6.targetpos, j_ptr->pos_max, j_ptr->pos_min);
-            JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
-            // debug code ended
 
             jCalib6Data_ptr->state = calibtype6_st_trajectoryStarted;
         }    
@@ -301,9 +283,6 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
             {
                 *calibrationCompleted = TRUE;
                 jCalib7data_ptr->state = calibtype7_st_finished;
-//                char info[80];
-//                sprintf(info,"calib7:completed!");
-//                JointSet_send_debug_message(info, j->ID);
             }
          }    
         break;

@@ -12,6 +12,13 @@
 #ifndef __GLOBAL_VAR_H
 #define __GLOBAL_VAR_H
 
+// TEST VARS
+extern uint32_t test_faults_final_time;
+extern uint32_t test_faults_counter_motor;
+extern uint32_t test_faults_waiting_motor;
+extern uint32_t test_faults_counter_board;
+extern uint32_t test_faults_waiting_board;
+
 // ----------------------------------------------------------------------------
 // Firmware Version
 // ----------------------------------------------------------------------------
@@ -73,6 +80,13 @@ extern uint8_t V12motor;
 extern uint8_t V12motor_F;
 extern uint8_t HSM_broken;
 extern uint8_t HSM;
+extern uint8_t HSM_HW_F;
+extern uint8_t HSM_SW_F;
+
+extern int32_t Current_board_in_fault;
+extern int32_t Current_HSM_in_fault;
+extern int32_t Current_motor_in_fault;
+
 extern uint8_t DCrestart;
 
 extern uint8_t V12board_bdc;

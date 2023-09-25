@@ -688,17 +688,6 @@ BOOL AbsEncoder_is_ok(AbsEncoder* o)
 
 BOOL AbsEncoder_is_calibrated(AbsEncoder* o)
 {
-
-    eOerrmanDescriptor_t errdes = {0};
-    char message[150];
-    snprintf(message, sizeof(message), "enc_off=o->offset=%d enc_zero=%d",o->offset, o->zero );
-    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
-    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress    = 0;
-    errdes.par16            = 0;
-    errdes.par64            = 0;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
-    
     return !o->state.bits.not_calibrated;
 }
 
