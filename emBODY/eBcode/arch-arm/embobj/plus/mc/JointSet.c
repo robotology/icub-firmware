@@ -703,7 +703,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         
         for (int k=0; k<N; ++k)
         { 
-            Joint_set_control_mode(o->joint+o->joints_of_set[k], eomc_controlmode_cmd_direct);
+            Joint_set_control_mode(o->joint+o->joints_of_set[k], cmd);
         }
         break;
     } 
