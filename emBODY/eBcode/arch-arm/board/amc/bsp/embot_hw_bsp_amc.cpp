@@ -1036,23 +1036,23 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
     void s_J5_SPIpinout(embot::hw::SPI h, bool enable)
     {
         static constexpr embot::hw::gpio::Config out { embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::medium };    
-        static constexpr embot::hw::gpio::State stateSPI[2] = {embot::hw::gpio::State::SET, embot::hw::gpio::State::RESET};
+        static constexpr embot::hw::gpio::State stateSPI[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::SET};
         static constexpr embot::hw::gpio::State stateNONE[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::RESET};
     
         static constexpr size_t spinum {embot::core::tointegral(embot::hw::SPI::three)+1};
         static constexpr embot::hw::GPIO X1ENspi[spinum][2] = 
         {
             {   // spi1
-                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::zero},
-                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::eight}
+                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::zero},   // i2c1 ENABLE
+                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::eight}   // spi1 ENABLE
             },
             {   // spi2
-                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::one},
-                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::nine}
+                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::one},   // i2c2 ENABLE
+                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::nine}   // spi2 ENABLE
             },
             {   // spi3
-                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::two},
-                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::ten} 
+                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::two},   // i2c3 ENABLE
+                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::ten}    // spi3 ENABLE 
             }
         };
         
