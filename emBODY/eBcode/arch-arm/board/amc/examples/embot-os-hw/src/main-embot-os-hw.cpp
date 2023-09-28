@@ -223,6 +223,7 @@ constexpr embot::core::relTime tickperiod = 5*1000*embot::core::time1millisec;
 //#define TEST_EMBOT_HW_ENCODER
 //#define TEST_EMBOT_HW_CHIP_AS5045
 //#define TEST_EMBOT_HW_CHIP_MB049
+//#define TEST_EMBOT_HW_CHIP_MA730
 
 #define TEST_EMBOT_HW_FLASH
 #if defined(TEST_EMBOT_HW_FLASH)
@@ -880,6 +881,9 @@ constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
 #if defined(TEST_EMBOT_HW_CHIP_MB049)
     #include "embot_hw_chip_MB049.h"
 #endif
+#if defined(TEST_EMBOT_HW_CHIP_MA730)
+    #include "embot_hw_chip_MA730.h"
+#endif
 
 void done1(void* p)
 {
@@ -1175,6 +1179,9 @@ void test_embot_hw_init()
 #elif defined(TEST_EMBOT_HW_CHIP_MB049)
 
     embot::hw::chip::testof_MB049();
+#elif defined(TEST_EMBOT_HW_CHIP_MA730)
+
+    embot::hw::chip::testof_MA730();
 
 #endif
 
