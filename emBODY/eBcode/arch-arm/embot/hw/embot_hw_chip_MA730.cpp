@@ -173,11 +173,9 @@ bool embot::hw::chip::MA730::Impl::read(Data &data, embot::core::relTime timeout
     
     if(resOK == embot::hw::spi::read(_config.spi, da, timeout))
     {
-        // TODO: verify
-        // AEA3 offers 14 bit of resolution
+        // AEA3 offers 14 bit of resolution (0-16383)
         // in this way we are reading 16 bits (1 bit dummy + 14 bit valid + 1 bit zero padded). The dummy bit has been masked.
-        data.position = (((_databuffer[0] & 0x7F) << 8 )| _databuffer[1]);
-       
+        data.position = ((_databuffer[0] & 0x7F) << 7) | (_databuffer[1] >> 1);
         data.status.ok = true;
         r = true;
     }
@@ -193,7 +191,7 @@ void embot::hw::chip::MA730::Impl::onCompletion(void *p)
     embot::hw::chip::MA730::Impl *pimpl = reinterpret_cast<embot::hw::chip::MA730::Impl*>(p);
     if(nullptr != pimpl->_tmpdata)
     {
-       pimpl->_tmpdata->position = (((pimpl->_databuffer[0] & 0x7F) << 8 )| pimpl->_databuffer[1]); // to be verified ....
+       pimpl->_tmpdata->position = ((pimpl->_databuffer[0] & 0x7F) << 7) | (pimpl->_databuffer[1] >> 1);
        pimpl->_tmpdata->status.ok = true;
     }
     pimpl->_tmponcompletion.execute();
