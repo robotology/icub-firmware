@@ -9,14 +9,6 @@
 #include "stm32l4xx_hal.h"
 #include "BAT_B.h"
 
-//TEST VARS
-uint32_t test_faults_final_time = 60000;
-uint32_t test_faults_counter_motor = 20000;
-uint32_t test_faults_waiting_motor = 2000;
-uint32_t test_faults_counter_board = 20000;
-uint32_t test_faults_waiting_board = 2000;
-
-
 char Firmware_vers = 1;
 char Revision_vers = 3;
 char Build_number  = 1;

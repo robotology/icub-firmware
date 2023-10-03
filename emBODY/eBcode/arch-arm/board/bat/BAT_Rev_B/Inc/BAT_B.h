@@ -13,13 +13,6 @@
 #ifndef BAT_B_H
 #define BAT_B_H
 
-// TEST VARIABLES
-extern uint32_t test_faults_final_time;
-extern uint32_t test_faults_counter_motor;
-extern uint32_t test_faults_waiting_motor;
-extern uint32_t test_faults_counter_board;
-extern uint32_t test_faults_waiting_board;
-
 extern char Firmware_vers;
 extern char Revision_vers;
 extern char Build_number;
