@@ -196,6 +196,18 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
     msg.transmit();   
 }
 
+static void Motor_config_motor_max_temperature_2FOC(Motor* o, eOmeas_temperature_t* motor_temperature_limit)
+{
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
+    
+    eOcanprot_command_t cmdMaxTemperature;
+    cmdMaxTemperature.clas = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxTemperature.type = ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT;
+    cmdMaxTemperature.value = (int16_t*)motor_temperature_limit;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxTemperature, id32);
+    
+}
+
 static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 {   
     #define HAS_QE         0x0001
@@ -223,6 +235,18 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 
     Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
     Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
+        
+    eOcanprot_command_t cmdMaxCurrent;
+    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+    cmdMaxCurrent.value = &(config->currentLimits);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
+    
+    eOcanprot_command_t cmdMaxTemperature;
+    cmdMaxTemperature.clas = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxTemperature.type = ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT;
+    cmdMaxTemperature.value = &(config->temperatureLimit);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxTemperature, id32);
 
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT 
     embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 

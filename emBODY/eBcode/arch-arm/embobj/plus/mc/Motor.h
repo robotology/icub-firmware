@@ -50,6 +50,7 @@ extern void Motor_still_check_reset(Motor* o);
 
 extern void Motor_config_encoder(Motor* o, int32_t resolution);
 extern void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params);
+extern void Motor_config_max_temperature(Motor* o, eOmeas_temperature_t* motor_temperature_limit);
 
 extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
 extern void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid);
