@@ -3,6 +3,7 @@
 
 #include <i2c.h>
 #include <xc.h>
+#include <stdint.h>
 
 #include "i2cTsens.h"
 

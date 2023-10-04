@@ -1,6 +1,7 @@
 #include <p33FJ128MC802.h>
 #include <libpic30.h>
 
+#include <stdint.h>
 #include <i2c.h>
 #include <xc.h>
 

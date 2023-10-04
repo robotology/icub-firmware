@@ -190,9 +190,9 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
                     overheating = FALSE;
                 }
                 
-                if (overheating && !SysError.I2TFailure)
+                if (overheating && !SysError.OverHeatingFailure)
                 {
-                    SysError.I2TFailure = TRUE;
+                    SysError.OverHeatingFailure = TRUE;
                     FaultConditionsHandler();
                 }
             }

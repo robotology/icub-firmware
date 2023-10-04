@@ -1468,7 +1468,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
     // current limits using the correct argument eOmc_current_limits_params_t.    
     // so far I prefer just to log this error. 
     
-   
     // foc-base and mc4based should send overloadCurrent to can-boards
 
     if(eo_motcon_mode_foc == mcmode)
@@ -1563,6 +1562,33 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
 
 }
 
+// f-marker-begin
+extern void eoprot_fun_UPDT_mc_motor_config_temperaturelimit(const EOnv* nv, const eOropdescriptor_t* rd)
+{        
+    eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
+
+    eOmeas_temperature_t *temperatureLimit = (eOmeas_temperature_t*)rd->data;
+
+    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+
+    if(eo_motcon_mode_foc == mcmode)
+    {
+        //  send the can message to relevant board
+        eOcanprot_command_t command = {0};
+        command.clas = eocanprot_msgclass_pollingMotorControl;
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT;
+        command.value = temperatureLimit;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
+
+        MController_motor_config_max_temperature(mxx, temperatureLimit);
+    }
+    else 
+    {
+       // just send the can message to relevant board
+       //  send the can message to relevant board
+       // NOT MANAGED
+    }
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

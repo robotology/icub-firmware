@@ -384,6 +384,20 @@ void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_p
     }   
 }
 
+void Motor_config_max_temperature(Motor* o, eOmeas_temperature_t* motor_temperature_limit)
+{
+    o->temperature_max = *motor_temperature_limit;
+    
+    if(o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        Motor_config_motor_max_temperature_2FOC(o, motor_temperature_limit);
+    }
+}
+
+//extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
+//extern void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid);
+//extern void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pid);
+
 void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -819,6 +833,12 @@ BOOL Motor_check_faults(Motor* o) //
             fault_state.bits.CANInvalidProtocol = FALSE;
         }
         
+        if (o->fault_state.bits.OverHeatingFailure && !o->fault_state_prec.bits.OverHeatingFailure)
+        {
+            Motor_send_error(o->ID, eoerror_value_MC_motor_overheating, (uint64_t)o->temperature_fbk);
+            fault_state.bits.OverHeatingFailure = FALSE;
+        }
+        
         #define CAN_GENERIC_ERROR 0x00003D00
         
         if ((o->fault_state.bitmask & CAN_GENERIC_ERROR) && ((o->fault_state.bitmask & CAN_GENERIC_ERROR) != (o->fault_state_prec.bitmask & CAN_GENERIC_ERROR)))
@@ -871,6 +891,15 @@ static void Motor_raise_fault_overcurrent(Motor* o)
     o->control_mode = icubCanProto_controlmode_hwFault;
 }
 
+static void Motor_raise_fault_overheating(Motor* o)
+{
+    hal_motor_disable((hal_motor_t)o->actuatorPort);
+    
+    o->fault_state.bits.OverHeatingFailure = TRUE;
+    
+    o->control_mode = icubCanProto_controlmode_hwFault;
+}
+
 void Motor_raise_fault_i2t(Motor* o)
 {
     hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
@@ -879,6 +908,7 @@ void Motor_raise_fault_i2t(Motor* o)
     
     o->control_mode = icubCanProto_controlmode_hwFault;
 }
+
 /*
 void Motor_raise_fault_external(Motor* o)
 {
@@ -1158,6 +1188,16 @@ void Motor_update_current_fbk(Motor* o, int16_t current)
     }
     
     o->Iqq_fbk = current;
+}
+
+void Motor_update_temperature_fbk(Motor* o, int16_t temperature)
+{
+    if((abs(o->temperature_fbk + temperature) / 2 ) > o->temperature_max)
+    {
+        Motor_raise_fault_overheating(o);
+    }
+    
+    o->temperature_fbk = temperature;
 }
 
 void Motor_config_gearbox_M2J(Motor* o, float32_t gearbox_M2J)

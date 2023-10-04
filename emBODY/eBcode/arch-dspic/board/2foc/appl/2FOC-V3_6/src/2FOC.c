@@ -207,6 +207,11 @@ void setMaxCurrent(int nom, int peak, int ovr)
     Iovr = ovr;
 }
 
+void setMaxTemperature(int peak)
+{
+    gTemperatureLimit = peak;
+}
+
 void setIPid(int kp, int ki, char shift)
 {
     IKp = kp;

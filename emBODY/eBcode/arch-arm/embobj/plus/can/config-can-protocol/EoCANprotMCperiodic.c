@@ -89,6 +89,8 @@ static eOresult_t s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmc
                                                                                                 eOmc_interactionmode_t *eomc_intermode);
 static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type);
 
+static uint16_t print_counter = 1000;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -457,32 +459,81 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcanframe_t *frame, eOcanport_t port)
 {
-    // this frame is from mc4 only, thus ...
-    // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
-    eOprotIndex_t jointindex = 0;
-    eOmc_joint_t *joint = NULL;
-    icubCanProto_interactionmode_t caninteractionmodes[2] = {icubCanProto_interactionmode_stiff, icubCanProto_interactionmode_stiff};
-       
-    uint8_t j=0;
-    // the two joints have ...
-    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
-    caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
-    caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
-    eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
-    for(j=0; j<2; j++)
+    
+    eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
+    // motor related infos --> temperature
+    if(eobrd_cantype_foc == boardtype)
     {
-        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
-        {
-            return(eores_OK);        
-        }
+        eOmeas_temperature_t motor_temperature = 0;
+        eOmc_motor_t *motor = NULL;
+        eOprotIndex_t motorindex = 0;
+           
         
-        if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(caninteractionmodes[j], &tmp))
+        if(NULL == (motor = (eOmc_motor_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eobrd_caninsideindex_first, &motorindex)))
         {
-            return(eores_OK);        
+            return(eores_OK);
         }
-        joint->status.core.modes.interactionmodestatus = tmp;        
+
+        motor_temperature = *((eOmeas_temperature_t*)&(frame->data[2]));
+        motor->status.basic.mot_temperature = motor_temperature;
+            
+            
+//        char message[80];
+//        snprintf(message, sizeof(message), "Parser temp message");
+//        eOerrmanDescriptor_t errdes = {0};
+
+//        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//        errdes.sourceaddress    = 0;
+//        errdes.par16            = (int16_t)(motor_temperature);
+//        errdes.par64            = eo_common_canframe_data2u64(frame);
+//    
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+        
     }
-   
+    else
+    {
+        // this frame is from mc4 only, thus ...
+        //i retrieve the two joints related to the can frame. such a frame manages two joints per can address
+        const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second}; 
+        uint8_t j=0;
+        eOprotIndex_t jointindex = 0;
+        eOmc_joint_t *joint = NULL;
+        icubCanProto_interactionmode_t caninteractionmodes[2] = {icubCanProto_interactionmode_stiff, icubCanProto_interactionmode_stiff};
+        // the two joints have ...
+        caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
+        caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
+    
+        eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
+        
+        for(j=0; j<2; j++)
+        {
+            if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+            {
+                return(eores_OK);        
+            }
+        
+        
+            if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(caninteractionmodes[j], &tmp))
+            {
+                return(eores_OK);        
+            }
+            joint->status.core.modes.interactionmodestatus = tmp;     
+
+            
+//            char message[80];
+//            snprintf(message, sizeof(message), "Parser interaction message");
+//            eOerrmanDescriptor_t errdes = {0};
+
+//            errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//            errdes.sourceaddress    = 0;
+//            errdes.par16            = (int16_t)(tmp);
+//            errdes.par64            = eo_common_canframe_data2u64(frame);
+//        
+//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+        }
+    }
     return(eores_OK);
 }
 
