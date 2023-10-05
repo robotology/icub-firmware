@@ -98,7 +98,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
     /* When i'm here i sure that:
        - state = calibtype6_st_jntEncResComputed
      */
-    
+    char info[80];
     *calibrationCompleted = FALSE;   
     //get poiter to the joint to calibrate
     Joint* j_ptr = o->joint + o->joints_of_set[indexSet];
