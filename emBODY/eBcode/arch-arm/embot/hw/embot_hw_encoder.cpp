@@ -260,8 +260,13 @@ namespace embot { namespace hw { namespace encoder {
             // retrieve the current encoder position from data saved internally.
             if(_data_array[index].data_is_ready)
             {
-                pos = _data_array[index].ma730_data.position;
-                res = resOK;
+                if(_data_array[index].ma730_data.status.ok)
+                {
+                    pos = _data_array[index].ma730_data.position;
+                    res = resOK;
+                }
+                else
+                    res = resNOK;
             }
         }
         
