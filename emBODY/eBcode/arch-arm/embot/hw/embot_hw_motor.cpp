@@ -445,10 +445,7 @@ namespace embot { namespace hw { namespace motor {
              embot::hw::motor::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::hall::Mode::SWAP::BC :  embot::hw::motor::hall::Mode::SWAP::none, cfg.pwm_hall_offset };
              embot::hw::motor::hall::start(mode);
         }
-        
-        // if we have both encoder and hall sensors, we may calibrate the encoder w/ the hall values
-        // we probably need to move the motor to do that.
-        
+                
       
         return resOK; 
     }  

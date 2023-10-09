@@ -498,7 +498,7 @@ void embot::app::board::amcbldc::theMBD::Impl::onCurrents_FOC_innerloop(void *ow
         return;
     }    
         
-    impl->measureFOC->start();
+//    impl->measureFOC->start();
     
     // 1. copy currents straight away, so that we can use them
     embot::hw::motor::Currents currs = *currents;
@@ -543,12 +543,13 @@ void embot::app::board::amcbldc::theMBD::Impl::onCurrents_FOC_innerloop(void *ow
     
     AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
 
-    // Set the voltages
-    int32_T Vabc0 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[0] * 163.83F);
-    int32_T Vabc1 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[1] * 163.83F);
-    int32_T Vabc2 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[2] * 163.83F);
+    // Set the voltages 
     
-    embot::hw::motor::setpwm(embot::hw::MOTOR::one, Vabc0, Vabc1, Vabc2);
+    embot::hw::motor::PWMperc pwmperc 
+    {
+        AMC_BLDC_Y.ControlOutputs_p.Vabc[0], AMC_BLDC_Y.ControlOutputs_p.Vabc[1], AMC_BLDC_Y.ControlOutputs_p.Vabc[2]
+    };
+    embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmperc);    
    
 //#define DEBUG_PARAMS
 #ifdef DEBUG_PARAMS
@@ -585,7 +586,7 @@ void embot::app::board::amcbldc::theMBD::Impl::onCurrents_FOC_innerloop(void *ow
 
 #endif // #if defined(TEST_DURATION_FOC) 
 
-    impl->measureFOC->stop();
+//    impl->measureFOC->stop();
 }
 
 #ifdef PRINT_HISTO_DEBUG 
