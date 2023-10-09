@@ -385,7 +385,7 @@ namespace embot::hw::motor::bsp::amc2c {
         hTIM1.Instance = TIM1;
         hTIM1.Init.Prescaler = 0;
         hTIM1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-        hTIM1.Init.Period = 1219;
+        hTIM1.Init.Period = embot::hw::motor::bsp::amc2c::PWMvals.TIM1_period; // 2000; // 1219;
         hTIM1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
         hTIM1.Init.RepetitionCounter = 0;
         hTIM1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -440,7 +440,7 @@ namespace embot::hw::motor::bsp::amc2c {
         Error_Handler();
         }
         sConfigOC.OCMode = TIM_OCMODE_PWM2;
-        sConfigOC.Pulse = 895; // was 752, changed due to different clock source from amc-bldc
+        sConfigOC.Pulse = embot::hw::motor::bsp::amc2c::PWMvals.TIM1_ocPulse ; // 1469; //895; // was 752, changed due to different clock source from amc-bldc
         if (HAL_TIM_PWM_ConfigChannel(&hTIM1, &sConfigOC, TIM_CHANNEL_6) != HAL_OK)
         {
         Error_Handler();

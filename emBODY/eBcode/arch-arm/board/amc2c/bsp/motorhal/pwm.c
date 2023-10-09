@@ -137,10 +137,15 @@ void PwmPhaseSet(uint16_t u, uint16_t v, uint16_t w)
 
     /* Must be interrupt-safe */
 //    taskDISABLE_INTERRUPTS();
-    PwmComparePhaseU = (u<1219) ? (u) : (1219);
-    PwmComparePhaseV = (v<1219) ? (v) : (1219);
-    PwmComparePhaseW = (w<1219) ? (w) : (1219);
+//    PwmComparePhaseU = (u<1219) ? (u) : (1219);
+//    PwmComparePhaseV = (v<1219) ? (v) : (1219);
+//    PwmComparePhaseW = (w<1219) ? (w) : (1219);
 //    taskENABLE_INTERRUPTS();
+
+    // we remove from here the check vs max value because we assume that the caller has already done it 
+    PwmComparePhaseU = u;
+    PwmComparePhaseV = v;
+    PwmComparePhaseW = w;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PwmComparePhaseU);
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, PwmComparePhaseV);
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, PwmComparePhaseW);    
@@ -424,34 +429,6 @@ void PwmTest(void)
 
 #if defined(MOTORHAL_changes)
 
-float limitit(float x)
-{
-    return (x<0.0) ? (0.0) : ( (x>100.0) ? (100.0) : (x)  );    
-}
-
-uint16_t rescale(float x)
-{
-    static const uint16_t maxpwm = 1219;
-    float n = maxpwm * x/100.0;
-    return static_cast<uint16_t>(n); 
-}
-
-extern void PwmSet(float u, float v, float w)
-{
-    uint16_t a = 0;
-    uint16_t b = 0;
-    uint16_t c = 0;
-    
-    u = limitit(u);
-    v = limitit(v);
-    w = limitit(w);
-    
-    a = rescale(u);
-    b = rescale(v);
-    c = rescale(w);
-      
-    PwmPhaseSet(a, b, c);
-}
 
 #endif // #if defined(MOTORHAL_changes)
 

@@ -125,7 +125,8 @@ bool init(const Configuration &config);
 bool deinit();
 bool start(const Mode& mode);
 bool isstarted();
-int32_t getvalue();    
+int32_t getvalue(); 
+void force(int32_t value);
     
 } // namespace embot::hw::motor::enc {
 
@@ -135,8 +136,10 @@ namespace embot::hw::motor::hall {
 struct Configuration
 {
     enum class ACQUISITION { deferred };
+    enum class ENCODERtuning { none, forcevalue, adjust };
     
     ACQUISITION acquisition { ACQUISITION::deferred };
+    ENCODERtuning encodertuning { ENCODERtuning::none };
         
     constexpr Configuration() = default;
     constexpr bool isvalid() const { return true; }

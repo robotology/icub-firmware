@@ -43,7 +43,20 @@ namespace embot::hw::motor::bsp::amc2c {
     // pwm
     extern TIM_HandleTypeDef hTIM1;
     
+    struct PWMvalues
+    {   // the default is for pwm @ 20 us (
 
+        uint32_t TIM1_period { 2000 };                                                            // 2000 {1219};
+        static constexpr float prop { 0.7345 };
+        uint32_t TIM1_ocPulse { static_cast<uint32_t>(prop*static_cast<float>(TIM1_period)) };    // 1469 {895} // actually a proprotion of TIM1_period       
+        uint32_t value100perc {TIM1_period-1};
+        constexpr PWMvalues() = default;
+    };   
+    
+    
+    constexpr PWMvalues PWMvals {};
+
+    
     
 }
 
