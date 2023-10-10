@@ -51,9 +51,6 @@ static void JointSet_set_inner_control_flags(JointSet* o);
 static const CTRL_UNITS DEG2ICUB = 65536.0f/360.0f;
 static const CTRL_UNITS ICUB2DEG = 360.0f/65536.0f;
 
-//#define WRIST_MK2_RIGHT
-//#define WRIST_MK2_1
-
 JointSet* JointSet_new(uint8_t n) //
 {
     JointSet* o = NEW(JointSet, n);
@@ -107,63 +104,6 @@ void JointSet_init(JointSet* o) //
     
     o->calibration_in_progress = eomc_calibration_typeUndefined;
 
-
-//#ifdef WRIST_MK2
-//    o->wristMK2.is_parking = FALSE;
-//    o->wristMK2.must_park = TRUE;
-//    
-//    o->wristMK2.wristDecoupler.initialize();
-////Moved to update_jointAndMotor_withJointset_constraints    
-////#ifdef WRIST_MK2_RIGHT
-////    o->wristDecoupler.rtU.RL = true;
-////#else
-////    o->wristDecoupler.rtU.RL = false;
-////#endif
-
-//    o->wristMK2.wristDecoupler.rtU.arm_bend = 30.0f;
-
-////#ifdef WRIST_MK2_1 Moved to update_jointAndMotor_withJointset_constraints
-////    o->wristDecoupler.rtU.plat_off[0] =   60.0f; 
-////    o->wristDecoupler.rtU.plat_off[1] =  180.0f; 
-////    o->wristDecoupler.rtU.plat_off[2] =  300.0f;
-
-////    o->wristDecoupler.rtU.theta_off[0] =  60.0f +  60.0f;
-////    o->wristDecoupler.rtU.theta_off[1] = 180.0f +  60.0f;
-////    o->wristDecoupler.rtU.theta_off[2] = 300.0f +  60.0f;
-////#else
-////    o->wristDecoupler.rtU.plat_off[0] =  85.0f; 
-////    o->wristDecoupler.rtU.plat_off[1] = 185.0f;
-////    o->wristDecoupler.rtU.plat_off[2] = 280.0f;
-
-////    o->wristDecoupler.rtU.theta_off[0] =  85.0f +  60.0f;
-////    o->wristDecoupler.rtU.theta_off[1] = 185.0f +  85.0f;
-////    o->wristDecoupler.rtU.theta_off[2] = 280.0f + 120.0f;
-////#endif
-//    
-//    Trajectory_init(&(o->ypr_trajectory[0]), 0, 0, 0);
-//    Trajectory_init(&(o->ypr_trajectory[1]), 0, 0, 0);
-//    Trajectory_init(&(o->ypr_trajectory[2]), 0, 0, 0);
-//    
-//    Trajectory_config_limits(&(o->ypr_trajectory[0]), -90.0f*DEG2ICUB, 90.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
-//    Trajectory_config_limits(&(o->ypr_trajectory[1]), -60.0f*DEG2ICUB, 50.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
-//    Trajectory_config_limits(&(o->ypr_trajectory[2]), -30.0f*DEG2ICUB, 30.0f*DEG2ICUB, 90.0f*DEG2ICUB, ZERO);
-//    
-//    o->ypr_pos_ref[0] = ZERO;
-//    o->ypr_pos_ref[1] = ZERO;
-//    o->ypr_pos_ref[2] = ZERO;
-//    
-//    o->ypr_vel_ref[0] = ZERO;
-//    o->ypr_vel_ref[1] = ZERO;
-//    o->ypr_vel_ref[2] = ZERO;
-
-//    o->ypr_pos_fbk[0] = ZERO;
-//    o->ypr_pos_fbk[1] = ZERO;
-//    o->ypr_pos_fbk[2] = ZERO;
-//    
-//    //o->arm_pos_off[0] = 145.0f;
-//    //o->arm_pos_off[1] = 270.0f;
-//    //o->arm_pos_off[2] =  40.0f;
-//#endif
 }
 
 void JointSet_config //
@@ -488,20 +428,22 @@ void JointSet_set_constraints(JointSet* o, const eOmc_jointSet_constraints_t *co
 {
     
     o->special_constraint = (eOmc_jsetconstraint_t)constraints->type;
+    #ifdef WRIST_MK2
     if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {
         o->wristMK2.mk_version = (wrist_mk_version_t)constraints->param1; //can be WRIST_MK_VER_2_0 or WRIST_MK_VER_2_1
         o->wristMK2.is_right_wrist = constraints->param2; //0 is left, 1 is right
     }
-    else
+    #else
     {
         o->special_limit = constraints->param1;
         //NOTE: jsetcfg[s].constraints.param2 is not used currently. It is reserved for future use
     }
+    #endif
 
 }
 
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
 
 static void JointSet_wristMK2_start_park(JointSet* o)
 {
@@ -534,9 +476,6 @@ static void JointSet_wristMK2_stop_park(JointSet* o)
     
     o->wristMK2.is_parking = FALSE;
     
-    static char msg[] = "PARK DONE";
-    
-    JointSet_send_debug_message(msg, 0, 0, 0);
 }
 
 static BOOL JointSet_wristMK2_is_parked(JointSet* o)
@@ -545,7 +484,7 @@ static BOOL JointSet_wristMK2_is_parked(JointSet* o)
     
     return (fabs(o->joint[0].pos_fbk) < 400.0f && fabs(o->joint[1].pos_fbk) < 400.0f && fabs(o->joint[2].pos_fbk) < 400.0f);
 }
-//#endif
+#endif
 
 static int control_output_type(JointSet* o, int16_t control_mode)
 {
@@ -594,22 +533,22 @@ static int control_output_type(JointSet* o, int16_t control_mode)
 
 BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_mode_cmd)
 {
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
     if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {
         Trajectory_stop(&(o->wristMK2.ypr_trajectory[0]), o->wristMK2.ypr_pos_fbk[0]);
         Trajectory_stop(&(o->wristMK2.ypr_trajectory[1]), o->wristMK2.ypr_pos_fbk[1]);
         Trajectory_stop(&(o->wristMK2.ypr_trajectory[2]), o->wristMK2.ypr_pos_fbk[2]);
     }
-//#endif
+#endif
     if (control_mode_cmd != eomc_controlmode_cmd_force_idle)
     {
-//#ifndef WRIST_MK2
+#ifdef WRIST_MK2
         if(eomc_jsetconstraint_ergocubwrist != o->special_constraint)
         {
             if ((eOmc_controlmode_t)control_mode_cmd == o->control_mode) return TRUE;
         }
-//#endif
+#endif
         if (o->control_mode == eomc_controlmode_calib) return FALSE;
     
         if (o->control_mode == eomc_controlmode_notConfigured) return FALSE;
@@ -624,12 +563,12 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     {
         if (control_mode_cmd == eomc_controlmode_cmd_force_idle)
         {
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
         if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
         {
             o->wristMK2.must_park = TRUE;
         }
-//#endif
+#endif
             for (int k=0; k<E; ++k)
             {   
                 AbsEncoder_clear_faults(o->absEncoder+o->encoders_of_set[k]);
@@ -672,8 +611,6 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         }
     }break;
     
-//#ifdef WRIST_MK2    
-
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_velocity_pos:
     case eomc_controlmode_cmd_position:
@@ -690,16 +627,13 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
             if (!Motor_set_run(o->motor+o->motors_of_set[k], o->motor_input_type)) return FALSE;
         }
         
-        eOmc_controlmode_command_t cmd;
+        eOmc_controlmode_command_t cmd = control_mode_cmd;
         
         if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
         {
             cmd=eomc_controlmode_cmd_direct;
         }
-        else
-        {
-            cmd=control_mode_cmd;
-        }
+
         
         for (int k=0; k<N; ++k)
         { 
@@ -707,17 +641,10 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         }
         break;
     } 
-//#endif
+
     case eomc_controlmode_cmd_openloop:
     case eomc_controlmode_cmd_current:    
     case eomc_controlmode_cmd_torque:
-//#ifndef WRIST_MK2
-//    case eomc_controlmode_cmd_direct:
-//    case eomc_controlmode_cmd_mixed:
-//    case eomc_controlmode_cmd_velocity_pos:
-//    case eomc_controlmode_cmd_position:
-//    case eomc_controlmode_cmd_velocity:
-//#endif
     case eomc_controlmode_cmd_vel_direct:
     {        
         //if (o->external_fault) return FALSE;
@@ -745,9 +672,6 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         case eomc_controlmode_cmd_velocity_pos:
             o->control_mode = (eOmc_controlmode_t)eomc_controlmode_cmd_mixed;
             break;
-        //case eomc_controlmode_cmd_velocity:
-        //    o->control_mode = (eOmc_controlmode_t)eomc_controlmode_cmd_vel_direct;
-        //    break;
         case eomc_controlmode_cmd_force_idle:
             o->control_mode = eomc_controlmode_idle;
             break;
@@ -756,7 +680,6 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
             break;
     }
     
-    //JointSet_send_debug_message("SET CONTROLMODE", 0, control_mode_cmd, o->control_mode);
     
     JointSet_set_inner_control_flags(o);
     
@@ -920,7 +843,7 @@ void JointSet_do_pwm_control(JointSet* o)
     CTRL_UNITS arm_pos_ref[3];
         
     BOOL limits_torque_protection = FALSE;
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
     if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {     
         if (o->wristMK2.must_park)
@@ -929,7 +852,7 @@ void JointSet_do_pwm_control(JointSet* o)
       
             o->wristMK2.must_park = FALSE;
             
-            static char msg[] = "PARKING...";
+            static char msg[] = "pwm_ctrl: PARKING...";
             
             JointSet_send_debug_message(msg, 0, 0, 0);
         }
@@ -938,7 +861,7 @@ void JointSet_do_pwm_control(JointSet* o)
         {
             if (JointSet_wristMK2_is_parked(o))
             {
-                static char msg[] = "PARKING DONE.";
+                static char msg[] = "pwm_ctrl:PARKING DONE.";
             
                 JointSet_send_debug_message(msg, 0, 0, 0);
                 
@@ -993,25 +916,17 @@ void JointSet_do_pwm_control(JointSet* o)
         o->wristMK2.ypr_pos_fbk[1] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[1]);    
         o->wristMK2.ypr_pos_fbk[2] = DEG2ICUB*(o->wristMK2.wristDecoupler.rtY.ypr_meas[2]);
             
-    //    o->ypr_pos_fbk[0] = ZERO;
-    //    o->ypr_pos_fbk[1] = ZERO;    
-    //    o->ypr_pos_fbk[2] = ZERO;
-
-        //CTRL_UNITS arm_pos_ref[3];// move out of this section
         
         arm_pos_ref[0] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[0];
         arm_pos_ref[1] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[1];
         arm_pos_ref[2] = DEG2ICUB*o->wristMK2.wristDecoupler.rtY.theta_star[2];
         
-    //    arm_pos_ref[0] = ZERO;
-    //    arm_pos_ref[1] = ZERO;
-    //    arm_pos_ref[2] = ZERO;
     }//end if eroigocubwrist
-//#endif
+#endif
     for (int js=0; js<N; ++js)
     {
         Joint *pJoint = o->joint+o->joints_of_set[js];
-//#ifdef WRIST_MK2 
+#ifdef WRIST_MK2 
         if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
         {
             if (!o->wristMK2.is_parking)
@@ -1019,7 +934,7 @@ void JointSet_do_pwm_control(JointSet* o)
                 Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
             }
         }
-//#endif
+#endif
         Joint_do_pwm_or_current_control(pJoint);
        
         if (o->trq_control_active && Joint_pushing_limit(pJoint))
@@ -1170,7 +1085,7 @@ static void JointSet_do_current_control(JointSet* o)
     CTRL_UNITS arm_pos_ref[3];
         
     BOOL limits_torque_protection = FALSE;
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
     if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {
         if (o->wristMK2.must_park)
@@ -1179,7 +1094,7 @@ static void JointSet_do_current_control(JointSet* o)
 
             o->wristMK2.must_park = FALSE;
 
-            static char msg[] = "BUONGIORNISSIMO 2";
+            static char msg[] = "cur_ctrl:PARKING...";
 
             JointSet_send_debug_message(msg, 0, 0, 0);
         }
@@ -1188,6 +1103,10 @@ static void JointSet_do_current_control(JointSet* o)
         {
             if (JointSet_wristMK2_is_parked(o))
             {
+                 static char msg[] = "cur_ctrl:PARKING DONE.";
+            
+                JointSet_send_debug_message(msg, 0, 0, 0);
+                
                 JointSet_wristMK2_stop_park(o);
             }
         }
@@ -1249,12 +1168,12 @@ static void JointSet_do_current_control(JointSet* o)
     //    arm_pos_ref[1] = ZERO;
     //    arm_pos_ref[2] = ZERO;
     }//end ergocubwrist
-//#endif
+#endif
         
     for (int js=0; js<N; ++js)
     {
         Joint *pJoint = o->joint+o->joints_of_set[js];
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
         if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
         {
             if (!o->wristMK2.is_parking)
@@ -1262,7 +1181,7 @@ static void JointSet_do_current_control(JointSet* o)
                 Joint_set_pos_raw(pJoint, arm_pos_ref[js]);
             }
         }
-//#endif
+#endif
         
         Joint_do_pwm_or_current_control(pJoint);
        
@@ -1437,7 +1356,7 @@ static void JointSet_do_off(JointSet* o)
         Motor_set_vel_ref(o->motor+m, 0);
     }
     
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
     if(eomc_jsetconstraint_ergocubwrist == o->special_constraint)
     {
         // be sure to continue to report the encoder readings
@@ -1476,7 +1395,7 @@ static void JointSet_do_off(JointSet* o)
             }
         }
     } //end ergocubwrist
-//#endif // WRIST_MK2
+#endif // WRIST_MK2
 }
 
 static void JointSet_do_vel_control(JointSet* o)
@@ -2208,7 +2127,7 @@ void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par16, uin
 
 }
 
-
+#ifdef WRIST_MK2
 extern void JointSet_init_wrist_decoupler(JointSet* o)
 {
     o->wristMK2.is_parking = FALSE;
@@ -2273,7 +2192,7 @@ extern void JointSet_init_wrist_decoupler(JointSet* o)
 
 }
 
-//#ifdef WRIST_MK2
+
 BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref) //use only in WRIST_MK2 case
 {
     if (o->wristMK2.is_parking) return FALSE;
@@ -2311,4 +2230,4 @@ extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_st
     joint_state->core.measures.meas_acceleration     = ZERO;      
     joint_state->core.measures.meas_torque           = ZERO;
 }
-//#endif
+#endif

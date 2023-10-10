@@ -19,9 +19,9 @@
 #ifndef MC_JOINT_SET___
 #define MC_JOINT_SET___
 
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
 #include "wrist_decoupler.h"
-//#endif
+#endif
 
 #include "EoCommon.h"
 
@@ -36,12 +36,8 @@
 
 #include "hal_led.h"
 
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
 enum wrist_mk_version_t {WRIST_MK_VER_2_0 = 20,  WRIST_MK_VER_2_1 = 21};
-
-//const int WRIST_MK_VER_2_0 = 20;
-//const int WRIST_MK_VER_2_1 = 21;
-//#endif
 
 /* The struct wristMk2_t contains all the data related to the wrist MK2*/
 typedef struct //wristMk2_t
@@ -64,6 +60,9 @@ typedef struct //wristMk2_t
     //CTRL_UNITS arm_pos_off[3];
 
 } wristMK2_t;
+
+#endif
+
 
 typedef struct // JointSet
 {
@@ -119,27 +118,9 @@ typedef struct // JointSet
     eOmc_calibration_type_t calibration_in_progress;
     
     int32_t calibration_timeout;
-    
+    #ifdef WRIST_MK2
     wristMK2_t wristMK2;
-    
-//#ifdef WRIST_MK2 ==> move to the wristMk2_t
-//    BOOL is_parking;
-//    BOOL must_park;
-//    
-//    float mk_version;
-//    BOOL is_right_wrist;
-//    
-//    wrist_decoupler wristDecoupler;
-//    
-//    Trajectory ypr_trajectory[3];
-//    
-//    CTRL_UNITS ypr_pos_ref[3];
-//    CTRL_UNITS ypr_vel_ref[3];
-//    CTRL_UNITS ypr_acc_ref[3];
-//    CTRL_UNITS ypr_pos_fbk[3];
-//    
-//    //CTRL_UNITS arm_pos_off[3];
-//#endif
+    #endif
 
     TripodCalib tripod_calib;
 } JointSet;
@@ -180,11 +161,11 @@ extern void JointSet_do_pwm_control(JointSet* o);
     
 extern void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64);
 
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
 extern BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref); //used only for WRIST_MK2
 extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_state);  //used only for WRIST_MK2
 extern void JointSet_stop(JointSet* o, int j);  //used only for WRIST_MK2
-//#endif
+#endif
 extern void JointSet_set_constraints(JointSet* o, const eOmc_jointSet_constraints_t *constraints);
 extern void JointSet_init_wrist_decoupler(JointSet* o);
  

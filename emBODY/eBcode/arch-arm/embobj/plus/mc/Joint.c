@@ -155,21 +155,8 @@ void Joint_reset_calibration_data(Joint* o)
 
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 {
-    o->ID = ID;
-//#ifndef WRIST_MK2        
-    if(!o->belong2WristMK2)
-    {
-        o->pos_min_soft = config->userlimits.min;
-        o->pos_max_soft = config->userlimits.max;    
-        o->pos_min_hard = config->hardwarelimits.min;
-        o->pos_max_hard = config->hardwarelimits.max;
-        
-        o->pos_min = config->userlimits.min;
-        o->pos_max = config->userlimits.max;
-
-        o->vel_max = config->maxvelocityofjoint;
-    }
-    else
+	 o->ID = ID;
+    if(o->belong2WristMK2)
     {
         const CTRL_UNITS lim = (150.0f/360.0f)*65536.0f;
         
@@ -180,8 +167,22 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
         o->pos_max_hard =  lim+400.0f;
         
         o->vel_max = (90.0f/360.0f)*65536.0f;
+     }
+    else
+    {
+       
+
+        o->pos_min_soft = config->userlimits.min;
+        o->pos_max_soft = config->userlimits.max;    
+        o->pos_min_hard = config->hardwarelimits.min;
+        o->pos_max_hard = config->hardwarelimits.max;
+
+        o->pos_min = config->userlimits.min;
+        o->pos_max = config->userlimits.max;
+
+        o->vel_max = config->maxvelocityofjoint;
     }
-//#endif
+    
 
     o->acc_max = 10000000.0f;
     
@@ -489,19 +490,16 @@ int8_t Joint_pushing_limit(Joint* o)
 
 void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
 {
-//#ifndef WRIST_MK2
-    if(!o->belong2WristMK2)
-    {
-        o->pos_min = pos_min;
-        o->pos_max = pos_max;
-    }
-//#else
-    else
+    if(o->belong2WristMK2)
     {
         o->pos_min = -(150.0f/360.0f)*65536.0f;
         o->pos_max = -o->pos_min;
     }
-//#endif
+    else
+    {    
+        o->pos_min = pos_min;
+        o->pos_max = pos_max;
+    }
     
     Trajectory_config_limits(&o->trajectory, pos_min, pos_max, 0.0f, 0.0f);
 }
@@ -662,13 +660,12 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
         
             //CTRL_UNITS pos_err_old = o->pos_err;
         
-//#ifdef WRIST_MK2
+
             if(o->belong2WristMK2)
                 o->pos_err = wrap180(o->pos_ref - o->pos_fbk);
-//#else
             else
                 o->pos_err = o->pos_ref - o->pos_fbk;
-//#endif
+
             o->vel_err = o->vel_ref - o->vel_fbk;
         
             if (o->interaction_mode == eOmc_interactionmode_stiff)

@@ -513,6 +513,7 @@ static void update_jointAndMotor_withJointset_constraints(void)
                 o->joint[j].not_reversible = TRUE;
             }
         }
+        #ifdef WRIST_MK2
         if(o->jointSet[s].special_constraint == eomc_jsetconstraint_ergocubwrist)
         {
             JointSet_init_wrist_decoupler(&(o->jointSet[s]));
@@ -525,6 +526,7 @@ static void update_jointAndMotor_withJointset_constraints(void)
                 o->joint[j].belong2WristMK2 = TRUE;
             }
         }
+        #endif
         
 //#ifdef WRIST_MK2 moved to JointSet_init_wrist_decoupler function
 //        if(o->jointSet[s].special_constraint == eomc_jsetconstraint_ergocubwrist)
@@ -2021,21 +2023,21 @@ void MController_go_idle(void)
 
 void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
 {
-//    static uint32_t count =0;
-//    
-//    count++;
+
     Joint *j_ptr= smc->joint+j;
-    //#ifndef WRIST_MK2
+#ifdef WRIST_MK2
     if((!j_ptr->belong2WristMK2) || ((j_ptr->belong2WristMK2) && (j_ptr->control_mode == eomc_controlmode_notConfigured)))
     {
         Joint_get_state(j_ptr, joint_state);
     }
-    //#else
     else
     {
         JointSet_get_state(&(smc->jointSet[0]), j, joint_state);
     }
-    //#endif
+
+#else
+     Joint_get_state(j_ptr, joint_state);
+#endif
     
     AbsEncoder* enc_ptr = smc->absEncoder + j*smc->multi_encs;
     
@@ -2045,8 +2047,7 @@ void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
         //joint_state->addinfo.multienc[k] = count;
     }
     
-//    if(count>10000)
-//        count = 0;
+
 }
 
 
@@ -2110,14 +2111,15 @@ void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms)
 BOOL MController_set_joint_pos_ref(int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
     Joint *j_ptr= smc->joint+j;
-//#if !defined(WRIST_MK2)
+
+#ifdef WRIST_MK2
     if(!j_ptr->belong2WristMK2)
         return Joint_set_pos_ref(j_ptr, pos_ref, vel_ref);
-//#else
     else
-        
         return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, vel_ref);
-//#endif
+#else
+        return Joint_set_pos_ref(j_ptr, pos_ref, vel_ref);
+#endif
 }
 
 BOOL MController_set_joint_vel_ref(int j, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
@@ -2128,13 +2130,16 @@ BOOL MController_set_joint_vel_ref(int j, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref
 BOOL MController_set_joint_pos_raw(int j, CTRL_UNITS pos_ref)
 {
     Joint *j_ptr= smc->joint+j;
-//#if !defined(WRIST_MK2)
+#ifdef WRIST_MK2
     if(!j_ptr->belong2WristMK2)
         return Joint_set_pos_raw(j_ptr, pos_ref);
-//#else
+
     else
         return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, 0.0f);
-//#endif
+#else
+    
+     return Joint_set_pos_raw(j_ptr, pos_ref);
+#endif
 }
 
 BOOL MController_set_joint_vel_raw(int j, CTRL_UNITS vel_ref)
@@ -2160,13 +2165,14 @@ BOOL MController_set_joint_cur_ref(int j, CTRL_UNITS cur_ref)
 void MController_stop_joint(int j)
 {
     Joint *j_ptr= smc->joint+j;
-//#ifdef WRIST_MK2
+#ifdef WRIST_MK2
     if(j_ptr->belong2WristMK2)
         JointSet_stop(&(smc->jointSet[0]), j);
-//#else
     else
         Joint_stop(j_ptr);
-//#endif
+#else
+    Joint_stop(j_ptr);
+#endif
 }
 
 void MController_config_motor_gearbox_M2J(int m, float32_t gearbox_M2J)
