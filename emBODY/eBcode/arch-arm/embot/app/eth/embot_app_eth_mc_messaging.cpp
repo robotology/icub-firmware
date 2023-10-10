@@ -23,7 +23,6 @@
 // for embOBJ
 #include "EoProtocol.h"
 #include "EOtheCANprotocol.h"
-#include "EOtheCANservice.h"
 #include "EOtheCANprotocol_functions.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -33,7 +32,7 @@
 
 namespace embot::app::eth::mc::messaging {
     
-    void Destination::load(const eObrd_location_t &l)
+    void Location::load(const eObrd_location_t &l)
     {
         uint8_t place {l.any.place};
         if((eobrd_place_can == place) || (eobrd_place_extcan == place))
@@ -59,15 +58,15 @@ namespace embot::app::eth::mc::messaging::sender {
     {
         using Former = eOresult_t (*)(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
         
-        Destination destination {};
+        Location destination {};
         eOcanprot_msgclass_t cls {eocanprot_msgclass_pollingMotorControl};
         uint8_t cmd {ICUBCANPROTO_POL_MC_CMD__NO_MESSAGE};
         void *value {nullptr};        
         Former former {nullptr};
                 
         Command() = default; 
-        Command(const Destination &d, eOcanprot_msgclass_t c, uint8_t co, void *v, Former f = dummyformer) 
-            : destination(d), cls(c), cmd(co), former((nullptr == f) ? dummyformer : f) {}  
+        Command(const Location &d, eOcanprot_msgclass_t c, uint8_t co, void *v, Former f = dummyformer) 
+            : destination(d), cls(c), cmd(co), value(v), former((nullptr == f) ? dummyformer : f) {}  
                 
         void clear()
         {
@@ -78,7 +77,7 @@ namespace embot::app::eth::mc::messaging::sender {
             former = nullptr;                
         }    
 
-        void load(const Destination &d, eOcanprot_msgclass_t c, uint8_t co, void *v, Former f = dummyformer)
+        void load(const Location &d, eOcanprot_msgclass_t c, uint8_t co, void *v, Former f = dummyformer)
         {
             destination = d; 
             cls = c; 
@@ -87,7 +86,13 @@ namespace embot::app::eth::mc::messaging::sender {
             former = (nullptr == f) ? dummyformer : f; 
         }            
 
-        bool isvalid() const { return destination.isvalid() && (nullptr != value) && (nullptr != former);  }         
+        bool isvalid() const { 
+            volatile bool dd = destination.isvalid();
+            volatile bool vv = nullptr != value;
+            volatile bool ff = nullptr != former;
+            return dd && vv && ff;
+//            return destination.isvalid() && (nullptr != value) && (nullptr != former);  
+        }         
               
 
         bool transmit() 
@@ -103,19 +108,19 @@ namespace embot::app::eth::mc::messaging::sender {
         eOcanprot_command_t cancommand() const { return tocancommand(cls, cmd, value); }
         
         static eOresult_t dummyformer(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame) { return eores_OK; }
-
-        static eObrd_canlocation_t tocanlocation(const Destination &des)
+#warning siamo sicuri he abbia un senso il tocanlocation(0 per un ICC ???
+        static eObrd_canlocation_t tocanlocation(const Location &des)
         {
             eObrd_canlocation_t canloc {};
             if(true == des.isCAN())
             {            
-                canloc.port = (Destination::BUS::can1 == des.bus) ? eOcanport1 : eOcanport2;   
+                canloc.port = (Location::BUS::can1 == des.bus) ? eOcanport1 : eOcanport2;   
                 canloc.addr = des.address;
                 canloc.insideindex = eobrd_caninsideindex_first;
             }
             else if(true == des.isICC())
             {            
-                canloc.port = (Destination::BUS::icc1 == des.bus) ? eOcanport1 : eOcanport2;   
+                canloc.port = (Location::BUS::icc1 == des.bus) ? eOcanport1 : eOcanport2;   
                 canloc.addr = des.address;
                 canloc.insideindex = eobrd_caninsideindex_first;
             }
@@ -127,7 +132,7 @@ namespace embot::app::eth::mc::messaging::sender {
            return {static_cast<uint8_t>(c), co, {0, 0}, v}; 
         }
         
-        static embot::prot::can::Frame toprotcanframe(const Destination &des, const eOcanprot_command_t &c, Former f)
+        static embot::prot::can::Frame toprotcanframe(const Location &des, const eOcanprot_command_t &c, Former f)
         {
             eOcanprot_descriptor_t cd {c, tocanlocation(des)};           
             eOcanframe_t cf {0};               
@@ -135,7 +140,7 @@ namespace embot::app::eth::mc::messaging::sender {
             return {cf.id, cf.size, cf.data};
         }
                
-        static bool transmit(const Destination &des, const eOcanprot_command_t &cmd, Former f)
+        static bool transmit(const Location &des, const eOcanprot_command_t &cmd, Former f)
         {
             bool r {false};
             if(true == des.isCAN())
@@ -151,17 +156,8 @@ namespace embot::app::eth::mc::messaging::sender {
             return r;            
         }
         
-        static bool tx2can(const eObrd_canlocation_t &canloc, const eOcanprot_command_t &command)
-        {
-            return eores_OK == eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), const_cast<eOcanprot_command_t*>(&command), canloc);               
-        }
-    
-        static bool tx2icc(const Destination &des, const embot::prot::can::Frame &frame)
-        {
-            #warning TODO: fill embot::app::eth::mc::messaging::sender::Command::tx2icc() which adds a frame in the ICC queue
-            
-            return true;
-        }        
+        static bool tx2can(const eObrd_canlocation_t &canloc, const eOcanprot_command_t &command);    
+        static bool tx2icc(const Location &des, const embot::prot::can::Frame &frame);
                 
     };
 
@@ -260,12 +256,50 @@ namespace embot::app::eth::mc::messaging::sender {
     {
         bool ret {false};
         
+#if 1
+        // this is the version that enables to map the Actuate_Motors::maxnumberofmotors (4) values into ...
+        Location destinations[Location::numberofBUSes] {};
+        int16_t payloads[Location::numberofBUSes][Actuate_Motors::maxnumberofmotors] = {0}; 
+
+        // in here i go through the actuations and i fill the destinations and the payloads for every bus
+        for(uint8_t i=0; i<actuations.size(); i++)
+        {
+            if((true == actuations[i].destination.isvalid()) && (actuations[i].destination.address > 0) && (actuations[i].destination.address <= Actuate_Motors::maxnumberofmotors) )
+            {
+                uint8_t pos = embot::core::tointegral(actuations[i].destination.bus);
+                destinations[pos] = {actuations[i].destination.bus, sourceaddress}; // for the streaming we must pass the source, not the destination
+                payloads[pos][actuations[i].destination.address-1] = actuations[i].value;               
+            }
+        }
+
+        // in here for every valid destination i ...
+        bool r {true};
+        for(uint8_t d=0; d<Location::numberofBUSes; d++)
+        {
+            if(true == destinations[d].isvalid())
+            {
+                Command command 
+                {
+                    destinations[d], // the source is zero
+                    eocanprot_msgclass_periodicMotorControl, 
+                    ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT, 
+                    reinterpret_cast<void*>(payloads[d]), 
+                    eocanprotMCperiodic_former_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT 
+                    // for CAN we dont need the former: eocanprotMCperiodic_former_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT  
+                    // but we need it for the icc                     
+                };
+                ret = command.transmit();
+            }                       
+        }
+        
+        return ret;
+#else        
         // bus must be equal for all of them. but we can choose if can1 or can2
-        Destination CANdestination {}; // address is not used because it is a broadcast message
+        Location CANdestination{}; // address is not used because it is a broadcast message
         int16_t CANdata[4] = {0};        
         
         // iccbus must be equal for all of them.
-        Destination ICCdestination {}; // address is not used because it is a broadcast message        
+        Location ICCdestination {}; // address is not used because it is a broadcast message        
         int16_t ICCdata[4] = {0};
 
         
@@ -309,7 +343,7 @@ namespace embot::app::eth::mc::messaging::sender {
             ret = command.transmit();             
         }
  
-        if(true == CANdestination.isvalid())
+        if(true == ICCdestination.isvalid())
         {
             // ok, we have some data to send to ICC
             command.load
@@ -325,14 +359,86 @@ namespace embot::app::eth::mc::messaging::sender {
         } 
 
         return ret;
+#endif        
     }        
    
 
 } // namespace embot::app::eth::mc::messaging::sender {
 
  
+#include "EOtheCANservice.h"
+
+namespace embot::app::eth::mc::messaging::sender {
+    
+    bool Command::tx2can(const eObrd_canlocation_t &canloc, const eOcanprot_command_t &command)
+    {
+        return eores_OK == eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), const_cast<eOcanprot_command_t*>(&command), canloc);               
+    }
+
+    bool Command::tx2icc(const Location &des, const embot::prot::can::Frame &frame)
+    {
+        #warning TODO: fill embot::app::eth::mc::messaging::sender::Command::tx2icc() which adds a frame in the ICC queue
+        embot::core::print(frame.to_string());
+        return true;
+    } 
+        
+} // namespace embot::app::eth::mc::messaging::sender {
 
 
+#include "Controller.h"
+
+namespace embot::app::eth::mc::messaging::receiver {
+    
+    // in here we have objects which receive an info and send it to a destination
+    
+    void sigFOCstatus1::load(const Location::BUS bus, const embot::prot::can::Frame &frame,  bool andprocess)
+    {
+        source.bus = bus;
+        source.address = (frame.id & 0x0f0) >> 4;
+        info.current = ((int16_t*)frame.data)[0];
+        info.velocity = ((int16_t*)frame.data)[1];
+        info.position = ((int32_t*)frame.data)[1];
+        
+        if(false == andprocess)
+        {
+            return;
+        }
+        
+        // cannot use eocanprotMCperiodic_parser_PER_MC_MSG__2FOC() because ... inside we have s_eocanprotMCperiodic_get_entity() that uses the can mapping
+        // so, we need an object that tells us the motorindex given the source. We should fill the map {Location, index} somewhere in EOtheMotionController.c
+        // for now we dont need it, so ... we dont do any new code
+  
+        eOprotIndex_t motorindex = 0; // for example ...
+        eOmc_motor_t *motor = reinterpret_cast<eOmc_motor_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motorindex));
+        motor->status.basic.mot_current = info.current;
+        motor->status.basic.mot_velocity = info.velocity;
+        motor->status.basic.mot_position = info.position;
+        MController_update_motor_odometry_fbk_can(motorindex, (void*)frame.data);
+    }
+    
+    void sigFOCstatus2::load(const Location::BUS bus, const embot::prot::can::Frame &frame,  bool andprocess)
+    {
+        source.bus = bus;
+        source.address = (frame.id & 0x0f0) >> 4;
+        info.controlmode = frame.data[0];
+        info.qencflags = frame.data[1];
+        info.pwmfeedback = ((int16_t*)frame.data)[2];
+        info.motorfaultflags = ((uint32_t*)frame.data)[4];
+        
+        if(false == andprocess)
+        {
+            return;
+        }
+        
+        // cannot use eocanprotMCperiodic_parser_PER_MC_MSG__STATUS() because ... inside we have s_eocanprotMCperiodic_get_entity() that uses the can mapping
+        // so, we need an object that tells us the motorindex given the source. We should fill the map {Location, index} somewhere in EOtheMotionController.c
+        // for now we dont need it, so ... we dont do any new code
+        
+        eOprotIndex_t motorindex = 0; // for example ...
+        MController_update_motor_state_fbk(motorindex, (void*)frame.data);
+    }    
+
+} // namespace embot::app::eth::mc::messaging::receiver {
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

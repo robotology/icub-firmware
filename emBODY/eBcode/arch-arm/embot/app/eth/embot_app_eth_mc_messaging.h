@@ -29,26 +29,27 @@
 
 namespace embot::app::eth::mc::messaging {
     
-    // this object models the destination of a message.
+    // this object models the destination / origin of a message.
     // it can be constructed also using the embOBJ eObrd_location_t which allows can, extcan and eth locations    
-    struct Destination 
+    struct Location 
     {
         // if we keep can1 = 0 and can2 = 1 we have a simple conversion vs eOcanport1 and eOcanport2
         // i dont use the eOcanport1/eOcanport2 values to remove as much as possible dependencies from embOBJ 
-        enum class BUS : uint8_t {can1 = 0, can2 = 1, icc1, icc2, icc3, none = 31};        
+        enum class BUS : uint8_t {can1 = 0, can2 = 1, icc1 = 2, icc2 = 3, any = 30, none = 31}; 
+        static constexpr uint8_t numberofBUSes {4};         
         // enum class TYPE : uint8_t {can, icc, none}; -> maybe later on
         
         BUS bus {BUS::none};
         uint8_t address {0};
         // uint8_t subaddress {0}; -> maybe later on
         
-        constexpr Destination() = default;        
-        constexpr Destination(const BUS b, uint8_t a) : bus(b), address(a) {}           
-        constexpr Destination(const eObrd_location_t &l) { load(l); }    
+        constexpr Location() = default;        
+        constexpr Location(const BUS b, uint8_t a) : bus(b), address(a) {}           
+        constexpr Location(const eObrd_location_t &l) { load(l); }    
 
         constexpr bool isvalid() const { return BUS::none != bus; }  
         constexpr bool isCAN() const { return (BUS::can1 == bus) || (BUS::can2 == bus); }       
-        constexpr bool isICC() const { return (BUS::icc1 == bus) || (BUS::icc2 == bus) || (BUS::icc3 == bus); }
+        constexpr bool isICC() const { return (BUS::icc1 == bus) || (BUS::icc2 == bus); }
 
     private:        
         void load(const eObrd_location_t &l);      
@@ -120,6 +121,7 @@ namespace embot::app::eth::mc::messaging::info {
         
 
     using MOTOR_ACTUATION = int32_t;
+    
                              
 } // namespace embot::app::eth::mc::messaging::info {
 
@@ -130,11 +132,11 @@ namespace embot::app::eth::mc::messaging::sender {
     
     struct Set_Control_Mode
     { 
-        Destination destination {};           
+        Location destination {};           
         info::CONTROL_MODE info{};
             
         Set_Control_Mode() = default;
-        Set_Control_Mode(const Destination &d, const info::CONTROL_MODE &i) : destination(d), info(i) {}
+        Set_Control_Mode(const Location &d, const info::CONTROL_MODE &i) : destination(d), info(i) {}
             
         bool transmit();    
     }; 
@@ -142,55 +144,55 @@ namespace embot::app::eth::mc::messaging::sender {
 
     struct Set_Current_Limit
     { 
-        Destination destination {};           
+        Location destination {};           
         info::CURRENT_LIMIT info{};
             
         Set_Current_Limit() = default;
-        Set_Current_Limit(const Destination &d, const info::CURRENT_LIMIT &i) : destination(d), info(i) {}
+        Set_Current_Limit(const Location &d, const info::CURRENT_LIMIT &i) : destination(d), info(i) {}
             
         bool transmit();    
     };  
 
     struct Set_Current_PID
     { 
-        Destination destination {};           
+        Location destination {};           
         info::CURRENT_PID info{};
             
         Set_Current_PID() = default;
-        Set_Current_PID(const Destination &d, const info::CURRENT_PID &i) : destination(d), info(i) {}
+        Set_Current_PID(const Location &d, const info::CURRENT_PID &i) : destination(d), info(i) {}
             
         bool transmit();    
     };  
 
     struct Set_Velocity_PID
     { 
-        Destination destination {};           
+        Location destination {};           
         info::VELOCITY_PID info{};
             
         Set_Velocity_PID() = default;
-        Set_Velocity_PID(const Destination &d, const info::VELOCITY_PID &i) : destination(d), info(i) {}
+        Set_Velocity_PID(const Location &d, const info::VELOCITY_PID &i) : destination(d), info(i) {}
             
         bool transmit();    
     }; 
 
     struct Set_Motor_Config
     { 
-        Destination destination {};           
+        Location destination {};           
         info::MOTOR_CONFIG info{};
             
         Set_Motor_Config() = default;
-        Set_Motor_Config(const Destination &d, const info::MOTOR_CONFIG &i) : destination(d), info(i) {}
+        Set_Motor_Config(const Location &d, const info::MOTOR_CONFIG &i) : destination(d), info(i) {}
             
         bool transmit();    
     };  
 
     struct Calibrate_Encoder
     {
-        Destination destination {};           
+        Location destination {};           
         info::CALIBRATE_ENCODER info{};
             
         Calibrate_Encoder() = default;
-        Calibrate_Encoder(const Destination &d, const info::CALIBRATE_ENCODER &i) : destination(d), info(i) {}
+        Calibrate_Encoder(const Location &d, const info::CALIBRATE_ENCODER &i) : destination(d), info(i) {}
             
         bool transmit();   
     }; 
@@ -199,20 +201,21 @@ namespace embot::app::eth::mc::messaging::sender {
     { 
         struct Actuation
         {
-            Destination destination {};           
+            Location destination {};           
             info::MOTOR_ACTUATION value{};
                 
             Actuation() = default;
-            Actuation(const Destination &d, const info::MOTOR_ACTUATION &v) : destination(d), value(v) {}            
+            Actuation(const Location &d, const info::MOTOR_ACTUATION &v) : destination(d), value(v) {}            
         };
         
         static constexpr uint8_t maxnumberofmotors {4};
         
         std::array<Actuation, maxnumberofmotors> actuations {};
         uint8_t number {0};
+        uint8_t sourceaddress {0};
                     
         Actuate_Motors() = default;
-        Actuate_Motors(const std::array<Actuation, maxnumberofmotors> &a) : actuations(a), number(maxnumberofmotors) {}
+        Actuate_Motors(const std::array<Actuation, maxnumberofmotors> &a, uint8_t saddr) : actuations(a), number(maxnumberofmotors), sourceaddress(saddr) {}
             
         void clear() { number = 0; }
         void push_back(const Actuation &a) { if(number < maxnumberofmotors) { actuations[number++] = a; } }
@@ -221,6 +224,58 @@ namespace embot::app::eth::mc::messaging::sender {
     };   
     
 } // namespace embot::app::eth::mc::messaging::sender {
+
+
+namespace embot::app::eth::mc::messaging::info {
+    
+    struct FOCstatus1
+    {   
+        int16_t current {0};
+        int16_t velocity {0};
+        int32_t position {0};
+        
+        FOCstatus1() = default;         
+        FOCstatus1(int16_t c, int16_t v, int32_t p) : current(c), velocity(v), position(p) {}
+    };
+    
+    
+    struct FOCstatus2
+    {   // the State2FocMsg in Motor_hid.h   
+        uint8_t controlmode {0};
+        uint8_t qencflags {0};          // the QEState in Motor_hid.h
+        int16_t pwmfeedback {0};
+        uint32_t motorfaultflags {0};   // the MotorFaultState 
+        
+        FOCstatus2() = default;         
+    };    
+                             
+} // namespace embot::app::eth::mc::messaging::info {
+
+namespace embot::app::eth::mc::messaging::receiver {
+    
+    // in here we have objects which receive info and send it to a destination
+    
+    struct sigFOCstatus1
+    {   // ICUBCANPROTO_PER_MC_MSG__2FOC 
+        Location source {};           
+        info::FOCstatus1 info {};
+            
+        sigFOCstatus1() = default;
+            
+            void load(const Location::BUS bus, const embot::prot::can::Frame &frame, bool andprocess = true);
+    }; 
+
+    struct sigFOCstatus2
+    {   // ICUBCANPROTO_PER_MC_MSG__STATUS 
+        Location source {};           
+        info::FOCstatus2 info {};
+            
+        sigFOCstatus2() = default;
+            
+        void load(const Location::BUS bus, const embot::prot::can::Frame &frame, bool andprocess = true);
+    };
+    
+} // namespace embot::app::eth::mc::messaging::receiver {
 
  
 #endif  // include-guard

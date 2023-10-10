@@ -32,8 +32,8 @@
 namespace embot { namespace app { namespace eth {
       
       
-    // fills a given eOropdescriptor_t w/ whatever is required to be given to theFTservice::process()   
-    const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
+//    // fills a given eOropdescriptor_t w/ whatever is required to be given to theFTservice::process()   
+//    const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
     
     class theFTservice
     {
@@ -126,31 +126,6 @@ namespace embot { namespace app { namespace eth {
         std::unique_ptr<Impl> pImpl;     
     }; 
 
-
-//    class theFTserviceTester : public ServiceTester
-//    {
-//    public:
-//        static theFTserviceTester& getInstance();
-//                
-//    public:
-//                  
-//        // bool initialise(const Config &config);  
-//        virtual eOmn_serv_category_t category() const { return eomn_serv_category_ft; }
-//        virtual eOmn_serv_state_t state() const;
-//        virtual const eOmn_serv_configuration_t & configuration() const;        
-//        virtual bool initialise();
-//        virtual bool tick(Caller caller);
-
-//        
-//    private:
-//        theFTserviceTester(); 
-//        ~theFTserviceTester(); 
-
-//    private:    
-//        struct Impl;
-//        std::unique_ptr<Impl> pImpl;     
-//    };       
-//    
 
 
 }}} // namespace embot { namespace app { namespace eth

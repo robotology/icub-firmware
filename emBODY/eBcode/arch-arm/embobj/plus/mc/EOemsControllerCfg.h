@@ -42,13 +42,14 @@ typedef enum {
     
 // used by Motor::HARDWARE_TYPE
 // typically, given a MController::actuation_type all the motors share the same Motor::HARDWARE_TYPE
-// however, for the case of ACT_TYPE_MC4pPMC we have motors in mixed values of Motor::HARDWARE_TYPE
+// however, we may have mixed motor types. see note (xxx)
 typedef enum {
     HARDWARE_UNKNOWN    = 0,
     HARDWARE_2FOC       = 1,
     HARDWARE_MC4p       = 2
 #if 0
-    //marco.accame: i keep it as an example. the ACT_TYPE_MC4pPMC uses a motor hardware of type HARDWARE_MC4p but also of type HARDWARE_PMC
+    // marco.accame: 
+    // note (xxx) i keep it as an example. the ACT_TYPE_MC4pPMC uses motor hardware of mixed type: HARDWARE_MC4p but also of HARDWARE_PMC
    ,HARDWARE_PMC        = 3
 #endif    
 } MC_MOTOR_HARDWARE_t;

@@ -472,7 +472,7 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 
 extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
-    //eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Verify()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Verify()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -546,7 +546,16 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         for(i=0; i<numofjomos; i++)
         {
             const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
-            eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr);         
+#if defined(useMCfoc_actuator_descriptor_generic)
+            if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
+            {
+                // we consider only actuators located on can
+                continue;
+            }            
+            eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.gen.location.can.port], jomodes->actuator.gen.location.can.addr);    
+#else            
+            eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr);   
+#endif            
         }
         
         // force a cleaned discoverytargets before we add the target
@@ -700,7 +709,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Deactivate()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Deactivate()", s_eobj_ownname);
     
     if(NULL == p)
     {
@@ -739,6 +748,10 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         
         eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, p->sharedcan.entitydescriptor); 
         eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor); 
+
+#if defined(useMCfoc_actuator_descriptor_generic)            
+        // we should make sure that embot::app::eth::theICCservices unloads its entities
+#endif                
         
 
         eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
@@ -865,7 +878,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
 extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Activate()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Activate()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -918,8 +931,25 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             for(i=0; i<numofjomos; i++)
             {
                 const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
-                
                 eObrd_canproperties_t prop = {0};
+                
+#if defined(useMCfoc_actuator_descriptor_generic)
+                
+                if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
+                {
+                    // object EOtheCANmapping treats only actuators located on can
+                    continue;
+                }
+                
+                prop.type = p->service.servconfig.data.mc.foc_based.type;
+                prop.location.port = jomodes->actuator.gen.location.can.port;
+                prop.location.addr = jomodes->actuator.gen.location.can.addr;
+                prop.location.insideindex = eobrd_caninsideindex_first;
+                prop.requiredprotocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major;
+                prop.requiredprotocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
+                
+                eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
+#else            
                 
                 prop.type = p->service.servconfig.data.mc.foc_based.type;
                 prop.location.port = jomodes->actuator.foc.canloc.port;
@@ -928,23 +958,42 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 prop.requiredprotocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major;
                 prop.requiredprotocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
                 
-                eo_vector_PushBack(p->sharedcan.boardproperties, &prop);            
+                eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
+#endif                
             }
             eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
             
             // load the entity mapping.
             for(i=0; i<numofjomos; i++)
             {
-                const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
+                const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);                
+                eOcanmap_entitydescriptor_t des = {0};  
                 
-                eOcanmap_entitydescriptor_t des = {0};
+#if defined(useMCfoc_actuator_descriptor_generic)
                 
+                if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
+                {
+                    // if this location is eobrd_place_eth then ... we should tell some new object embot::app::eth::theICCservices
+                    // that this location is associated to the i-th eoprot_entity_mc_motor / joint entity
+                    continue;
+                }
+
+                des.location.port = jomodes->actuator.gen.location.can.port;
+                des.location.addr = jomodes->actuator.gen.location.can.addr;
+                des.location.insideindex = eobrd_caninsideindex_first;
+                des.index = (eOcanmap_entityindex_t)i;
+
+                eo_vector_PushBack(p->sharedcan.entitydescriptor, &des); 
+                
+#else                
+                                
                 des.location.port = jomodes->actuator.foc.canloc.port;
                 des.location.addr = jomodes->actuator.foc.canloc.addr;
                 des.location.insideindex = jomodes->actuator.foc.canloc.insideindex;
                 des.index = (eOcanmap_entityindex_t)i;
 
-                eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);            
+                eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);  
+#endif                
             }        
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, p->sharedcan.entitydescriptor); 
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor);        
@@ -1386,7 +1435,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
 { 
-    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Start()", s_eobj_ownname);  
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Start()", s_eobj_ownname);  
 
     if(NULL == p)
     {
@@ -1413,6 +1462,8 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     {   
         // just start a reading of encoders        
         embot::app::eth::theEncoderReader::getInstance().StartReading();  
+        #warning marco.accame on 25sept2023: i added this, just for debug
+        MController_go_idle();
     }
     else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
@@ -1567,7 +1618,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 
 extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
 { 
-    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Stop()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Stop()", s_eobj_ownname);
     
     if(NULL == p)
     {

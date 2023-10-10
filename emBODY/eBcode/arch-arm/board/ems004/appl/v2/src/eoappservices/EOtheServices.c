@@ -227,8 +227,8 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
     // we initialise the services
     s_eo_services_initialise(p);
 
-#if defined(TESTRTC_IS_ACTIVE)    
-    testRTC_init();
+#if defined(TESTRTC_IS_ACTIVE)
+    testRTC_init(); 
 #elif defined(enableTHESERVICETESTER)
     servicetester_init();
 #endif

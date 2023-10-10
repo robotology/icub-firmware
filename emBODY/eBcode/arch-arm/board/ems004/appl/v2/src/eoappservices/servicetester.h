@@ -19,10 +19,14 @@ extern "C" {
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+// this must be called inside eo_services_Initialise()
 extern void servicetester_init(void);
 
+// this must be called inside eom_emsconfigurator_hid_userdef_ProcessUserdef03Event()
+extern void servicetester_cfgtick(void);
+    
+// this must be called inside eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception() 
 extern void servicetester_runtick(void);
-
 
 
 #ifdef __cplusplus

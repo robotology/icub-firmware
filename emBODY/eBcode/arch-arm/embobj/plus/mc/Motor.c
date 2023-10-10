@@ -903,7 +903,9 @@ void Motor_actuate(Motor* motor, uint8_t N, MC_ACTUATION_t act) //
         embot::app::eth::mc::messaging::sender::Actuate_Motors msg {};
         for(uint8_t m=0; m<std::min(N, embot::app::eth::mc::messaging::sender::Actuate_Motors::maxnumberofmotors); m++)
         {
-            msg.push_back({{motor[m].mlocation}, {motor[m].output}});
+            //msg.push_back({{motor[m].mlocation}, {motor[m].output}});
+            #warning JUST for debug
+            msg.push_back({{motor[m].mlocation}, {m+10}});
         }
         msg.transmit();                
     }

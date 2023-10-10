@@ -843,18 +843,19 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             } break;
             
             case HARDWARE_2FOC:
-            {            
-                // marco.accame on 01aug2023: so far we use only can location to manage the case of
+            {  
+#if defined(useMCfoc_actuator_descriptor_generic)
+                // marco.accame on 27sept2023: i have in here either a eobrd_place_can or an eobrd_place_eth location
+                o->motor[k].mlocation = jomodes->actuator.gen.location;                
+#else                
+                // marco.accame on 27sept2023: in here we use only can location to manage the case of
                 // - up to 4 foc can boards 
-                // - the 3 amcbldc.
-                // for now we can manage the case of 1 amc2c on the same core by assigning to it a CAN1:5 address
-                // but we should change jomodes->actuator.foc.canloc into a proper jomodes->actuator.foc.location
-                // this solution would also manage much better the future case of amc2foc            
+                // - the 3 amcbldc.         
                 o->motor[k].mlocation.can.place = eobrd_place_can;
                 o->motor[k].mlocation.can.port = jomodes->actuator.foc.canloc.port;
                 o->motor[k].mlocation.can.addr = jomodes->actuator.foc.canloc.addr;
                 o->motor[k].mlocation.can.ffu = 0;  
-            
+#endif            
             } break;
 
             // marco.accame: i keep it just an example in case we need to manage a new mode w/ mixed actuation type. 
@@ -891,9 +892,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     float **Sje_aux = NULL;
     
     eOboolvalues_t isIdentityMatrix = eobool_true;
-    // marco.accame on 08 jan 2021: 
-    // even for the case of EOTHESERVICES_customize_handV3_7joints it is ok to use 
-    // MAX_JOINTS_PER_BOARD and MAX_ENCODS_PER_BOARD because the matrices are allocated upon their values
+
     for (int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
     {
         for (int k=0; k<MAX_ENCODS_PER_BOARD; ++k)
