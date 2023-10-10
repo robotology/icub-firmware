@@ -399,6 +399,7 @@ void embot::app::board::amcbldc::theMBD::Impl::onEXTFAULTpressedreleased(void *o
     }
 }
 
+float vin {0.0};
 // Called every 1 ms
 bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes)
 { 
@@ -408,6 +409,8 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::pro
     // outputframes.size() is always = 0
     
     measureTick->start();
+    
+    vin = embot::hw::bsp::amcbldc::getVIN();
     
     onEXTFAULTpolling();
     
