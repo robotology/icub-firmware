@@ -28,10 +28,11 @@ namespace embot::app::board::amc2c {
         {
             embot::prot::can::applicationInfo applicationinfo {{0,0,1}, {2,0}};
             embot::hw::CAN canbus {embot::hw::CAN::one};
+            uint8_t canaddress {3};
             const char *boardinfo {"hello, i am an amc2c"};            
             constexpr Config() = default;
-            constexpr Config(const embot::prot::can::applicationInfo& ai, embot::hw::CAN b, const char *bi) 
-                : applicationinfo(ai), canbus(b), boardinfo(bi) {}
+            constexpr Config(const embot::prot::can::applicationInfo& ai, embot::hw::CAN b, uint8_t ca, const char *bi) 
+                : applicationinfo(ai), canbus(b), canaddress(ca), boardinfo(bi) {}
         };
                 
         bool initialise(const Config &config);   

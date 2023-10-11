@@ -85,8 +85,10 @@ bool embot::app::board::amc2c::theCANagentCORE::Impl::initialise(const Config &c
   
     std::memmove(_storedinfo.info32, _config.boardinfo, sizeof(_storedinfo.info32)); 
     
+    _storedinfo.canaddress = _config.canaddress;
+    
     _board = static_cast<embot::prot::can::Board>(_storedinfo.boardtype);
-//        _address = _storedinfo.canaddress;
+
     _applicationinfo.version.major = _storedinfo.applicationVmajor;
     _applicationinfo.version.minor = _storedinfo.applicationVminor;
     _applicationinfo.version.build = _storedinfo.applicationVbuild;

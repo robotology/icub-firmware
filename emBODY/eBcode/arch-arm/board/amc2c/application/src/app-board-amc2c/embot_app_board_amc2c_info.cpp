@@ -46,6 +46,8 @@ namespace embot::app::board::amc2c::info {
     {
         embot::hw::CAN::two
     };
+    
+    constexpr uint8_t canaddress {3};
 
     static const char *info32  
     { // 0123456789abcde0123456789abcde
@@ -74,7 +76,7 @@ namespace embot::app::board::amc2c::info {
         if(!initted)
         {
             force_placement_of_moduleinfo();
-            embot::app::board::amc2c::theCANagentCORE::getInstance().initialise({applInfo, canBus, info32});
+            embot::app::board::amc2c::theCANagentCORE::getInstance().initialise({applInfo, canBus, canaddress, info32});
             initted = true;
         }
         return &embot::app::board::amc2c::theCANagentCORE::getInstance();
