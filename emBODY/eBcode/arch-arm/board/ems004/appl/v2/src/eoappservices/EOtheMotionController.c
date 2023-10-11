@@ -1462,8 +1462,8 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     {   
         // just start a reading of encoders        
         embot::app::eth::theEncoderReader::getInstance().StartReading();  
-        #warning marco.accame on 25sept2023: i added this, just for debug
-        MController_go_idle();
+//        #warning marco.accame on 25sept2023: i added this, just for debug, but i think it is better to force idle at start of service
+//        MController_go_idle();
     }
     else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {

@@ -91,7 +91,6 @@ namespace embot::app::eth::mc::messaging::sender {
             volatile bool vv = nullptr != value;
             volatile bool ff = nullptr != former;
             return dd && vv && ff;
-//            return destination.isvalid() && (nullptr != value) && (nullptr != former);  
         }         
               
 
@@ -108,7 +107,7 @@ namespace embot::app::eth::mc::messaging::sender {
         eOcanprot_command_t cancommand() const { return tocancommand(cls, cmd, value); }
         
         static eOresult_t dummyformer(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame) { return eores_OK; }
-#warning siamo sicuri he abbia un senso il tocanlocation(0 per un ICC ???
+//#warning siamo sicuri he abbia un senso il tocanlocation(0 per un ICC ???
         static eObrd_canlocation_t tocanlocation(const Location &des)
         {
             eObrd_canlocation_t canloc {};
@@ -377,7 +376,7 @@ namespace embot::app::eth::mc::messaging::sender {
 
     bool Command::tx2icc(const Location &des, const embot::prot::can::Frame &frame)
     {
-        #warning TODO: fill embot::app::eth::mc::messaging::sender::Command::tx2icc() which adds a frame in the ICC queue
+        //#warning TODO: fill embot::app::eth::mc::messaging::sender::Command::tx2icc() which adds a frame in the ICC queue
         embot::core::print(frame.to_string());
         return true;
     } 

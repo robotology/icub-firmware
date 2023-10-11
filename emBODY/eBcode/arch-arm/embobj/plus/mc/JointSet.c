@@ -473,7 +473,7 @@ static void JointSet_wristMK2_stop_park(JointSet* o)
     Trajectory_stop(&(o->wristMK2.ypr_trajectory[1]),ZERO);
     Trajectory_stop(&(o->wristMK2.ypr_trajectory[2]),ZERO);
     
-    JointSet_set_control_mode(o, /*(eOmc_controlmode_command_t)*/(o->control_mode));
+    JointSet_set_control_mode(o, static_cast<eOmc_controlmode_command_t>(o->control_mode));
     
     o->wristMK2.is_parking = FALSE;
     
