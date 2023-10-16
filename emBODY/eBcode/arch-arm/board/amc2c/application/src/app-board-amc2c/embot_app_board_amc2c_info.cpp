@@ -28,7 +28,7 @@ namespace embot::app::board::amc2c::info {
     
     constexpr embot::prot::can::applicationInfo applInfo 
     {   
-        embot::prot::can::versionOfAPPLICATION {100, 100, 0},    
+        embot::prot::can::versionOfAPPLICATION {2, 0, 4},    
         embot::prot::can::versionOfCANPROTOCOL {2, 0}    
     };
 
@@ -47,7 +47,7 @@ namespace embot::app::board::amc2c::info {
         embot::hw::CAN::two
     };
     
-    constexpr uint8_t canaddress {3};
+    constexpr uint8_t canaddress {1};
 
     static const char *info32  
     { // 0123456789abcde0123456789abcde

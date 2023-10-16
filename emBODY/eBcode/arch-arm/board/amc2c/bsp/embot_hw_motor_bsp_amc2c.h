@@ -51,10 +51,24 @@ namespace embot::hw::motor::bsp::amc2c {
         uint32_t TIM1_ocPulse { static_cast<uint32_t>(prop*static_cast<float>(TIM1_period)) };    // 1469 {895} // actually a proprotion of TIM1_period       
         uint32_t value100perc {TIM1_period-1};
         constexpr PWMvalues() = default;
-    };   
+        constexpr PWMvalues(uint32_t pwmnanosec) : TIM1_period(pwmnanosec/10) 
+        { 
+            TIM1_ocPulse = static_cast<uint32_t>(prop*static_cast<float>(TIM1_period));
+            value100perc = TIM1_period-1;
+        };
+    };
     
+    // 20000 is 20.0 us
+    // 15000 is 15.0 us
+    // 12500 is 12.5 us
+    // 12190 is ... as amcbldc
+    constexpr PWMvalues PWMvals20us {20000};
+    constexpr PWMvalues PWMvals15us {15000};
+    constexpr PWMvalues PWMvals12dot5us {12500};
+    constexpr PWMvalues PWMvals12dot190us {12190}; // 36.57
     
-    constexpr PWMvalues PWMvals {};
+    constexpr PWMvalues PWMvals {PWMvals20us};
+    //constexpr PWMvalues PWMvals {PWMvals15us};
 
     
     
