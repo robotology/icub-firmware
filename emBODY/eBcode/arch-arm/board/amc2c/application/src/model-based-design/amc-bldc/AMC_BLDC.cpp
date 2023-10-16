@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 6.17
+// Model version                  : 6.18
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:19:19 2023
+// C/C++ source code generated on : Mon Oct 16 10:09:05 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -164,13 +164,13 @@ RT_MODEL_AMC_BLDC_T AMC_BLDC_M_ = RT_MODEL_AMC_BLDC_T();
 RT_MODEL_AMC_BLDC_T *const AMC_BLDC_M = &AMC_BLDC_M_;
 
 // Model step function for TID0
-void AMC_BLDC_step0(void)        // Sample time: [1.1428571428571438E-6s, 0.0s]
+void AMC_BLDC_step0(void)              // Sample time: [2.0E-5s, 0.0s]
 {
   // (no output/update code required)
 }
 
 // Model step function for TID1
-void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
+void AMC_BLDC_step1(void)              // Sample time: [6.0E-5s, 0.0s]
 {
   int8_T wrBufIdx;
 
@@ -218,7 +218,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
     AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Bu[AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_RD];
 
   // ModelReference: '<Root>/FOC' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element5'
+  //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   control_foc(&AMC_BLDC_U.SensorsData_p,
@@ -271,7 +271,7 @@ void AMC_BLDC_step_FOC(void)       // Sample time: [3.65714285714286E-5s, 0.0s]
   // End of RateTransition generated from: '<Root>/Adapter1'
 
   // RateTransition generated from: '<Root>/Adapter3' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element5'
+  //   Inport generated from: '<Root>/In Bus Element6'
 
   rtw_mutex_lock();
   wrBufIdx = static_cast<int8_T>

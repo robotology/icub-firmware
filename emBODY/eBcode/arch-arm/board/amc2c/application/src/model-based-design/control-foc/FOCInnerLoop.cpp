@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 5.12
+// Model version                  : 5.13
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:18:32 2023
+// C/C++ source code generated on : Mon Oct 16 10:08:10 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -314,7 +314,7 @@ void FOCInnerLoop(const ConfigurationParameters *rtu_ConfigurationParameters,
   //  About '<S40>/Tsamp':
   //   y = u * K where K = ( w * Ts )
 
-  DProdOut = rtu_ConfigurationParameters->CurLoopPID.N * 1.82857148E-5F;
+  DProdOut = rtu_ConfigurationParameters->CurLoopPID.N * 3.0E-5F;
 
   // Math: '<S90>/Reciprocal' incorporates:
   //   Constant: '<S90>/Filter Den Constant'
@@ -391,8 +391,7 @@ void FOCInnerLoop(const ConfigurationParameters *rtu_ConfigurationParameters,
   }
 
   // DiscreteIntegrator: '<S97>/Integrator'
-  localB->Integrator = 1.82857148E-5F * localB->SumI1 +
-    localDW->Integrator_DSTATE;
+  localB->Integrator = 3.0E-5F * localB->SumI1 + localDW->Integrator_DSTATE;
 
   // Switch: '<S1>/Switch1' incorporates:
   //   Gain: '<S1>/Gain6'
@@ -535,8 +534,7 @@ void FOCInnerLoop(const ConfigurationParameters *rtu_ConfigurationParameters,
   }
 
   // DiscreteIntegrator: '<S45>/Integrator'
-  localB->Integrator_j = 1.82857148E-5F * localB->Switch +
-    localDW->Integrator_DSTATE_o;
+  localB->Integrator_j = 3.0E-5F * localB->Switch + localDW->Integrator_DSTATE_o;
 
   // Sum: '<S55>/Sum'
   rtb_algDD_o2_n = (rtb_Unary_Minus + localB->Integrator_j) + DProdOut;
@@ -743,8 +741,7 @@ void FOCInnerLoop_Update(const ControlOuterOutputs *rtu_OuterOutputs,
   localDW->UnitDelay_DSTATE = localB->Sum3;
 
   // Update for DiscreteIntegrator: '<S97>/Integrator'
-  localDW->Integrator_DSTATE = 1.82857148E-5F * localB->SumI1 +
-    localB->Integrator;
+  localDW->Integrator_DSTATE = 3.0E-5F * localB->SumI1 + localB->Integrator;
   localDW->Integrator_PrevResetState = static_cast<int8_T>
     (rtu_OuterOutputs->pid_reset);
 
@@ -755,8 +752,7 @@ void FOCInnerLoop_Update(const ControlOuterOutputs *rtu_OuterOutputs,
   // Update for DiscreteIntegrator: '<S45>/Integrator' incorporates:
   //   DiscreteIntegrator: '<S97>/Integrator'
 
-  localDW->Integrator_DSTATE_o = 1.82857148E-5F * localB->Switch +
-    localB->Integrator_j;
+  localDW->Integrator_DSTATE_o = 3.0E-5F * localB->Switch + localB->Integrator_j;
   localDW->Integrator_PrevResetState_k = static_cast<int8_T>
     (rtu_OuterOutputs->pid_reset);
 }

@@ -9,7 +9,7 @@
 //
 // Model version                  : 5.1
 // Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:18:55 2023
+// C/C++ source code generated on : Mon Oct 16 10:08:35 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -260,8 +260,8 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
                         (real32_T));
           }
 
-          nmip1 = (knt << 4) + kend;
-          for (ix = kend_tmp; ix <= nmip1 + 17; ix += 16) {
+          nmip1 = ((knt << 4) + kend) + 17;
+          for (ix = kend_tmp; ix <= nmip1; ix += 16) {
             scale = 0.0F;
             d = ix + lastv;
             for (jy = ix; jy < d; jy++) {

@@ -562,10 +562,10 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2] = 0.001f*currs.w;
     
     // -----------------------------------------------------------------------------
-    // FOC Step Function (~26.6 KHz)
+    // FOC Step Function (~16.6 KHz)
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_step_FOC();
+    AMC_BLDC_step1();
     
     // -----------------------------------------------------------------------------
     
