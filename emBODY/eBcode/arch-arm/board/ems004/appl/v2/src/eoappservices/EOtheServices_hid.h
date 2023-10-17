@@ -61,16 +61,18 @@ extern "C" {
 // so far, i write them in here. later on we think of a board file or else...
 #if 1
 
-#ifdef WRIST_MK2
-#define EOTHESERVICES_disable_theInertials2
-#define EOTHESERVICES_disable_theInertials3
-#define EOTHESERVICES_disable_theTemperatures
-#endif
+//#ifdef WRIST_MK2
+//#define EOTHESERVICES_disable_theInertials2
+//#define EOTHESERVICES_disable_theInertials3
+//#define EOTHESERVICES_disable_theTemperatures
+//#endif
+
+
 //#define EOTHESERVICES_disable_theMAIS
 //#define EOTHESERVICES_disable_theSTRAIN
-#ifdef WRIST_MK2
-#define EOTHESERVICES_disable_theSKIN
-#endif
+//#ifdef WRIST_MK2
+//#define EOTHESERVICES_disable_theSKIN
+//#endif
 //#define EOTHESERVICES_disable_thePSC
 ////#define EOTHESERVICES_disable_thePOS
 //#define EOTHESERVICES_disable_theMC4boards

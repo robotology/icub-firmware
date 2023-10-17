@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: wrist_decoupler.cpp
 //
 // Code generated for Simulink model 'wrist_decoupler'.
 //
-// Model version                  : 2.3
-// Simulink Coder version         : 9.4 (R2020b) 29-Jul-2020
-// C/C++ source code generated on : Tue Nov 17 12:30:21 2020
+// Model version                  : 7.13
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Tue Jul 25 11:18:40 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,10 +19,15 @@
 // Validation result: Not run
 //
 #include "wrist_decoupler.h"
+#include "rtwtypes.h"
+#include <cmath>
+#include <cstring>
+#include <cfloat>
+#include <stddef.h>
 #define NumBitsPerChar                 8U
 
-extern real_T rt_atan2d_snf(real_T u0, real_T u1);
 extern real_T rt_remd_snf(real_T u0, real_T u1);
+extern real_T rt_atan2d_snf(real_T u0, real_T u1);
 
 //===========*
 //  Constants *
@@ -54,7 +59,8 @@ extern real_T rt_remd_snf(real_T u0, real_T u1);
 #endif
 #endif
 
-extern "C" {
+extern "C"
+{
   real_T rtInf;
   real_T rtMinusInf;
   real_T rtNaN;
@@ -62,7 +68,8 @@ extern "C" {
   real32_T rtMinusInfF;
   real32_T rtNaNF;
 }
-  extern "C"
+
+extern "C"
 {
   //
   // Initialize rtNaN needed by the generated code.
@@ -94,14 +101,15 @@ extern "C" {
   //
   static real32_T rtGetNaNF(void)
   {
-    IEEESingle nanF = { { 0 } };
+    IEEESingle nanF = { { 0.0F } };
 
     nanF.wordL.wordLuint = 0xFFC00000U;
     return nanF.wordL.wordLreal;
   }
 }
 
-extern "C" {
+extern "C"
+{
   //
   // Initialize the rtInf, rtMinusInf, and rtNaN needed by the
   // generated code. NaN is initialized as non-signaling. Assumes IEEE.
@@ -161,7 +169,8 @@ extern "C" {
                        (tmp.wordL.wordLuint & 0x007FFFFF) != 0 );
   }
 }
-  extern "C"
+
+extern "C"
 {
   //
   // Initialize rtInf needed by the generated code.
@@ -234,27 +243,467 @@ extern "C" {
   }
 }
 
+real_T rt_remd_snf(real_T u0, real_T u1)
+{
+  real_T y;
+  if (rtIsNaN(u0) || rtIsNaN(u1) || rtIsInf(u0)) {
+    y = (rtNaN);
+  } else if (rtIsInf(u1)) {
+    y = u0;
+  } else {
+    real_T q;
+    if (u1 < 0.0) {
+      q = std::ceil(u1);
+    } else {
+      q = std::floor(u1);
+    }
+
+    if ((u1 != 0.0) && (u1 != q)) {
+      q = std::abs(u0 / u1);
+      if (!(std::abs(q - std::floor(q + 0.5)) > DBL_EPSILON * q)) {
+        y = 0.0 * u0;
+      } else {
+        y = std::fmod(u0, u1);
+      }
+    } else {
+      y = std::fmod(u0, u1);
+    }
+  }
+
+  return y;
+}
+
+// Function for MATLAB Function: '<S1>/motors2ypr'
+void wrist_decoupler::cosd(real_T x[3])
+{
+  real_T absx;
+  real_T b_x;
+  int8_T n;
+  if (rtIsInf(x[0]) || rtIsNaN(x[0])) {
+    x[0] = (rtNaN);
+  } else {
+    b_x = rt_remd_snf(x[0], 360.0);
+    absx = std::abs(b_x);
+    if (absx > 180.0) {
+      if (b_x > 0.0) {
+        b_x -= 360.0;
+      } else {
+        b_x += 360.0;
+      }
+
+      absx = std::abs(b_x);
+    }
+
+    if (absx <= 45.0) {
+      b_x *= 0.017453292519943295;
+      n = 0;
+    } else if (absx <= 135.0) {
+      if (b_x > 0.0) {
+        b_x = (b_x - 90.0) * 0.017453292519943295;
+        n = 1;
+      } else {
+        b_x = (b_x + 90.0) * 0.017453292519943295;
+        n = -1;
+      }
+    } else if (b_x > 0.0) {
+      b_x = (b_x - 180.0) * 0.017453292519943295;
+      n = 2;
+    } else {
+      b_x = (b_x + 180.0) * 0.017453292519943295;
+      n = -2;
+    }
+
+    switch (n) {
+     case 0:
+      x[0] = std::cos(b_x);
+      break;
+
+     case 1:
+      x[0] = -std::sin(b_x);
+      break;
+
+     case -1:
+      x[0] = std::sin(b_x);
+      break;
+
+     default:
+      x[0] = -std::cos(b_x);
+      break;
+    }
+  }
+
+  if (rtIsInf(x[1]) || rtIsNaN(x[1])) {
+    x[1] = (rtNaN);
+  } else {
+    b_x = rt_remd_snf(x[1], 360.0);
+    absx = std::abs(b_x);
+    if (absx > 180.0) {
+      if (b_x > 0.0) {
+        b_x -= 360.0;
+      } else {
+        b_x += 360.0;
+      }
+
+      absx = std::abs(b_x);
+    }
+
+    if (absx <= 45.0) {
+      b_x *= 0.017453292519943295;
+      n = 0;
+    } else if (absx <= 135.0) {
+      if (b_x > 0.0) {
+        b_x = (b_x - 90.0) * 0.017453292519943295;
+        n = 1;
+      } else {
+        b_x = (b_x + 90.0) * 0.017453292519943295;
+        n = -1;
+      }
+    } else if (b_x > 0.0) {
+      b_x = (b_x - 180.0) * 0.017453292519943295;
+      n = 2;
+    } else {
+      b_x = (b_x + 180.0) * 0.017453292519943295;
+      n = -2;
+    }
+
+    switch (n) {
+     case 0:
+      x[1] = std::cos(b_x);
+      break;
+
+     case 1:
+      x[1] = -std::sin(b_x);
+      break;
+
+     case -1:
+      x[1] = std::sin(b_x);
+      break;
+
+     default:
+      x[1] = -std::cos(b_x);
+      break;
+    }
+  }
+
+  if (rtIsInf(x[2]) || rtIsNaN(x[2])) {
+    x[2] = (rtNaN);
+  } else {
+    b_x = rt_remd_snf(x[2], 360.0);
+    absx = std::abs(b_x);
+    if (absx > 180.0) {
+      if (b_x > 0.0) {
+        b_x -= 360.0;
+      } else {
+        b_x += 360.0;
+      }
+
+      absx = std::abs(b_x);
+    }
+
+    if (absx <= 45.0) {
+      b_x *= 0.017453292519943295;
+      n = 0;
+    } else if (absx <= 135.0) {
+      if (b_x > 0.0) {
+        b_x = (b_x - 90.0) * 0.017453292519943295;
+        n = 1;
+      } else {
+        b_x = (b_x + 90.0) * 0.017453292519943295;
+        n = -1;
+      }
+    } else if (b_x > 0.0) {
+      b_x = (b_x - 180.0) * 0.017453292519943295;
+      n = 2;
+    } else {
+      b_x = (b_x + 180.0) * 0.017453292519943295;
+      n = -2;
+    }
+
+    switch (n) {
+     case 0:
+      x[2] = std::cos(b_x);
+      break;
+
+     case 1:
+      x[2] = -std::sin(b_x);
+      break;
+
+     case -1:
+      x[2] = std::sin(b_x);
+      break;
+
+     default:
+      x[2] = -std::cos(b_x);
+      break;
+    }
+  }
+}
+
+// Function for MATLAB Function: '<S1>/motors2ypr'
+void wrist_decoupler::sind(real_T x[3])
+{
+  real_T absx;
+  real_T b_x;
+  int8_T n;
+  if (rtIsInf(x[0]) || rtIsNaN(x[0])) {
+    x[0] = (rtNaN);
+  } else {
+    b_x = rt_remd_snf(x[0], 360.0);
+    absx = std::abs(b_x);
+    if (absx > 180.0) {
+      if (b_x > 0.0) {
+        b_x -= 360.0;
+      } else {
+        b_x += 360.0;
+      }
+
+      absx = std::abs(b_x);
+    }
+
+    if (absx <= 45.0) {
+      b_x *= 0.017453292519943295;
+      n = 0;
+    } else if (absx <= 135.0) {
+      if (b_x > 0.0) {
+        b_x = (b_x - 90.0) * 0.017453292519943295;
+        n = 1;
+      } else {
+        b_x = (b_x + 90.0) * 0.017453292519943295;
+        n = -1;
+      }
+    } else if (b_x > 0.0) {
+      b_x = (b_x - 180.0) * 0.017453292519943295;
+      n = 2;
+    } else {
+      b_x = (b_x + 180.0) * 0.017453292519943295;
+      n = -2;
+    }
+
+    switch (n) {
+     case 0:
+      x[0] = std::sin(b_x);
+      break;
+
+     case 1:
+      x[0] = std::cos(b_x);
+      break;
+
+     case -1:
+      x[0] = -std::cos(b_x);
+      break;
+
+     default:
+      x[0] = -std::sin(b_x);
+      break;
+    }
+  }
+
+  if (rtIsInf(x[1]) || rtIsNaN(x[1])) {
+    x[1] = (rtNaN);
+  } else {
+    b_x = rt_remd_snf(x[1], 360.0);
+    absx = std::abs(b_x);
+    if (absx > 180.0) {
+      if (b_x > 0.0) {
+        b_x -= 360.0;
+      } else {
+        b_x += 360.0;
+      }
+
+      absx = std::abs(b_x);
+    }
+
+    if (absx <= 45.0) {
+      b_x *= 0.017453292519943295;
+      n = 0;
+    } else if (absx <= 135.0) {
+      if (b_x > 0.0) {
+        b_x = (b_x - 90.0) * 0.017453292519943295;
+        n = 1;
+      } else {
+        b_x = (b_x + 90.0) * 0.017453292519943295;
+        n = -1;
+      }
+    } else if (b_x > 0.0) {
+      b_x = (b_x - 180.0) * 0.017453292519943295;
+      n = 2;
+    } else {
+      b_x = (b_x + 180.0) * 0.017453292519943295;
+      n = -2;
+    }
+
+    switch (n) {
+     case 0:
+      x[1] = std::sin(b_x);
+      break;
+
+     case 1:
+      x[1] = std::cos(b_x);
+      break;
+
+     case -1:
+      x[1] = -std::cos(b_x);
+      break;
+
+     default:
+      x[1] = -std::sin(b_x);
+      break;
+    }
+  }
+
+  if (rtIsInf(x[2]) || rtIsNaN(x[2])) {
+    x[2] = (rtNaN);
+  } else {
+    b_x = rt_remd_snf(x[2], 360.0);
+    absx = std::abs(b_x);
+    if (absx > 180.0) {
+      if (b_x > 0.0) {
+        b_x -= 360.0;
+      } else {
+        b_x += 360.0;
+      }
+
+      absx = std::abs(b_x);
+    }
+
+    if (absx <= 45.0) {
+      b_x *= 0.017453292519943295;
+      n = 0;
+    } else if (absx <= 135.0) {
+      if (b_x > 0.0) {
+        b_x = (b_x - 90.0) * 0.017453292519943295;
+        n = 1;
+      } else {
+        b_x = (b_x + 90.0) * 0.017453292519943295;
+        n = -1;
+      }
+    } else if (b_x > 0.0) {
+      b_x = (b_x - 180.0) * 0.017453292519943295;
+      n = 2;
+    } else {
+      b_x = (b_x + 180.0) * 0.017453292519943295;
+      n = -2;
+    }
+
+    switch (n) {
+     case 0:
+      x[2] = std::sin(b_x);
+      break;
+
+     case 1:
+      x[2] = std::cos(b_x);
+      break;
+
+     case -1:
+      x[2] = -std::cos(b_x);
+      break;
+
+     default:
+      x[2] = -std::sin(b_x);
+      break;
+    }
+  }
+}
+
+// Function for MATLAB Function: '<S1>/motors2ypr'
+real_T wrist_decoupler::maximum(const real_T x[3])
+{
+  real_T ex;
+  int32_T idx;
+  int32_T k;
+  if (!rtIsNaN(x[0])) {
+    idx = 1;
+  } else {
+    boolean_T exitg1;
+    idx = 0;
+    k = 2;
+    exitg1 = false;
+    while ((!exitg1) && (k < 4)) {
+      if (!rtIsNaN(x[k - 1])) {
+        idx = k;
+        exitg1 = true;
+      } else {
+        k++;
+      }
+    }
+  }
+
+  if (idx == 0) {
+    ex = x[0];
+  } else {
+    ex = x[idx - 1];
+    for (k = idx + 1; k < 4; k++) {
+      real_T x_0;
+      x_0 = x[k - 1];
+      if (ex < x_0) {
+        ex = x_0;
+      }
+    }
+  }
+
+  return ex;
+}
+
+// Function for MATLAB Function: '<S1>/motors2ypr'
+real_T wrist_decoupler::minimum(const real_T x[3])
+{
+  real_T ex;
+  int32_T idx;
+  int32_T k;
+  if (!rtIsNaN(x[0])) {
+    idx = 1;
+  } else {
+    boolean_T exitg1;
+    idx = 0;
+    k = 2;
+    exitg1 = false;
+    while ((!exitg1) && (k < 4)) {
+      if (!rtIsNaN(x[k - 1])) {
+        idx = k;
+        exitg1 = true;
+      } else {
+        k++;
+      }
+    }
+  }
+
+  if (idx == 0) {
+    ex = x[0];
+  } else {
+    ex = x[idx - 1];
+    for (k = idx + 1; k < 4; k++) {
+      real_T x_0;
+      x_0 = x[k - 1];
+      if (ex > x_0) {
+        ex = x_0;
+      }
+    }
+  }
+
+  return ex;
+}
+
 real_T rt_atan2d_snf(real_T u0, real_T u1)
 {
   real_T y;
-  int32_T u0_0;
-  int32_T u1_0;
   if (rtIsNaN(u0) || rtIsNaN(u1)) {
     y = (rtNaN);
   } else if (rtIsInf(u0) && rtIsInf(u1)) {
+    int32_T tmp;
+    int32_T tmp_0;
     if (u0 > 0.0) {
-      u0_0 = 1;
+      tmp = 1;
     } else {
-      u0_0 = -1;
+      tmp = -1;
     }
 
     if (u1 > 0.0) {
-      u1_0 = 1;
+      tmp_0 = 1;
     } else {
-      u1_0 = -1;
+      tmp_0 = -1;
     }
 
-    y = std::atan2(static_cast<real_T>(u0_0), static_cast<real_T>(u1_0));
+    y = std::atan2(static_cast<real_T>(tmp), static_cast<real_T>(tmp_0));
   } else if (u1 == 0.0) {
     if (u0 > 0.0) {
       y = RT_PI / 2.0;
@@ -270,321 +719,37 @@ real_T rt_atan2d_snf(real_T u0, real_T u1)
   return y;
 }
 
-// Function for MATLAB Function: '<S2>/motors2quat'
-real_T wrist_decouplerModelClass::maximum(const real_T x[3])
-{
-  real_T ex;
-  int32_T idx;
-  int32_T k;
-  boolean_T exitg1;
-  if (!rtIsNaN(x[0])) {
-    idx = 1;
-  } else {
-    idx = 0;
-    k = 2;
-    exitg1 = false;
-    while ((!exitg1) && (k < 4)) {
-      if (!rtIsNaN(x[k - 1])) {
-        idx = k;
-        exitg1 = true;
-      } else {
-        k++;
-      }
-    }
-  }
-
-  if (idx == 0) {
-    ex = x[0];
-  } else {
-    ex = x[idx - 1];
-    while (idx + 1 <= 3) {
-      if (ex < x[idx]) {
-        ex = x[idx];
-      }
-
-      idx++;
-    }
-  }
-
-  return ex;
-}
-
-// Function for MATLAB Function: '<S2>/motors2quat'
-real_T wrist_decouplerModelClass::minimum(const real_T x[3])
-{
-  real_T ex;
-  int32_T idx;
-  int32_T k;
-  boolean_T exitg1;
-  if (!rtIsNaN(x[0])) {
-    idx = 1;
-  } else {
-    idx = 0;
-    k = 2;
-    exitg1 = false;
-    while ((!exitg1) && (k < 4)) {
-      if (!rtIsNaN(x[k - 1])) {
-        idx = k;
-        exitg1 = true;
-      } else {
-        k++;
-      }
-    }
-  }
-
-  if (idx == 0) {
-    ex = x[0];
-  } else {
-    ex = x[idx - 1];
-    while (idx + 1 <= 3) {
-      if (ex > x[idx]) {
-        ex = x[idx];
-      }
-
-      idx++;
-    }
-  }
-
-  return ex;
-}
-
-real_T rt_remd_snf(real_T u0, real_T u1)
-{
-  real_T u1_0;
-  real_T y;
-  if (rtIsNaN(u0) || rtIsNaN(u1) || rtIsInf(u0)) {
-    y = (rtNaN);
-  } else if (rtIsInf(u1)) {
-    y = u0;
-  } else {
-    if (u1 < 0.0) {
-      u1_0 = std::ceil(u1);
-    } else {
-      u1_0 = std::floor(u1);
-    }
-
-    if ((u1 != 0.0) && (u1 != u1_0)) {
-      u1_0 = std::abs(u0 / u1);
-      if (!(std::abs(u1_0 - std::floor(u1_0 + 0.5)) > DBL_EPSILON * u1_0)) {
-        y = 0.0 * u0;
-      } else {
-        y = std::fmod(u0, u1);
-      }
-    } else {
-      y = std::fmod(u0, u1);
-    }
-  }
-
-  return y;
-}
-
-// Function for MATLAB Function: '<S2>/motors2quat'
-void wrist_decouplerModelClass::sind(real_T x[3])
-{
-  real_T absx;
-  real_T c_x;
-  int8_T n;
-  if (rtIsInf(x[0]) || rtIsNaN(x[0])) {
-    c_x = (rtNaN);
-  } else {
-    c_x = rt_remd_snf(x[0], 360.0);
-    absx = std::abs(c_x);
-    if (absx > 180.0) {
-      if (c_x > 0.0) {
-        c_x -= 360.0;
-      } else {
-        c_x += 360.0;
-      }
-
-      absx = std::abs(c_x);
-    }
-
-    if (absx <= 45.0) {
-      c_x *= 0.017453292519943295;
-      n = 0;
-    } else if (absx <= 135.0) {
-      if (c_x > 0.0) {
-        c_x = (c_x - 90.0) * 0.017453292519943295;
-        n = 1;
-      } else {
-        c_x = (c_x + 90.0) * 0.017453292519943295;
-        n = -1;
-      }
-    } else if (c_x > 0.0) {
-      c_x = (c_x - 180.0) * 0.017453292519943295;
-      n = 2;
-    } else {
-      c_x = (c_x + 180.0) * 0.017453292519943295;
-      n = -2;
-    }
-
-    switch (n) {
-     case 0:
-      c_x = std::sin(c_x);
-      break;
-
-     case 1:
-      c_x = std::cos(c_x);
-      break;
-
-     case -1:
-      c_x = -std::cos(c_x);
-      break;
-
-     default:
-      c_x = -std::sin(c_x);
-      break;
-    }
-  }
-
-  x[0] = c_x;
-  if (rtIsInf(x[1]) || rtIsNaN(x[1])) {
-    c_x = (rtNaN);
-  } else {
-    c_x = rt_remd_snf(x[1], 360.0);
-    absx = std::abs(c_x);
-    if (absx > 180.0) {
-      if (c_x > 0.0) {
-        c_x -= 360.0;
-      } else {
-        c_x += 360.0;
-      }
-
-      absx = std::abs(c_x);
-    }
-
-    if (absx <= 45.0) {
-      c_x *= 0.017453292519943295;
-      n = 0;
-    } else if (absx <= 135.0) {
-      if (c_x > 0.0) {
-        c_x = (c_x - 90.0) * 0.017453292519943295;
-        n = 1;
-      } else {
-        c_x = (c_x + 90.0) * 0.017453292519943295;
-        n = -1;
-      }
-    } else if (c_x > 0.0) {
-      c_x = (c_x - 180.0) * 0.017453292519943295;
-      n = 2;
-    } else {
-      c_x = (c_x + 180.0) * 0.017453292519943295;
-      n = -2;
-    }
-
-    switch (n) {
-     case 0:
-      c_x = std::sin(c_x);
-      break;
-
-     case 1:
-      c_x = std::cos(c_x);
-      break;
-
-     case -1:
-      c_x = -std::cos(c_x);
-      break;
-
-     default:
-      c_x = -std::sin(c_x);
-      break;
-    }
-  }
-
-  x[1] = c_x;
-  if (rtIsInf(x[2]) || rtIsNaN(x[2])) {
-    c_x = (rtNaN);
-  } else {
-    c_x = rt_remd_snf(x[2], 360.0);
-    absx = std::abs(c_x);
-    if (absx > 180.0) {
-      if (c_x > 0.0) {
-        c_x -= 360.0;
-      } else {
-        c_x += 360.0;
-      }
-
-      absx = std::abs(c_x);
-    }
-
-    if (absx <= 45.0) {
-      c_x *= 0.017453292519943295;
-      n = 0;
-    } else if (absx <= 135.0) {
-      if (c_x > 0.0) {
-        c_x = (c_x - 90.0) * 0.017453292519943295;
-        n = 1;
-      } else {
-        c_x = (c_x + 90.0) * 0.017453292519943295;
-        n = -1;
-      }
-    } else if (c_x > 0.0) {
-      c_x = (c_x - 180.0) * 0.017453292519943295;
-      n = 2;
-    } else {
-      c_x = (c_x + 180.0) * 0.017453292519943295;
-      n = -2;
-    }
-
-    switch (n) {
-     case 0:
-      c_x = std::sin(c_x);
-      break;
-
-     case 1:
-      c_x = std::cos(c_x);
-      break;
-
-     case -1:
-      c_x = -std::cos(c_x);
-      break;
-
-     default:
-      c_x = -std::sin(c_x);
-      break;
-    }
-  }
-
-  x[2] = c_x;
-}
-
-// Function for MATLAB Function: '<S2>/motors2quat'
-real_T wrist_decouplerModelClass::det(const real_T x[9])
+// Function for MATLAB Function: '<S1>/motors2ypr'
+real_T wrist_decoupler::det(const real_T x[9])
 {
   real_T A[9];
-  real_T b_y;
-  real_T smax;
   real_T y;
-  int32_T c;
-  int32_T c_ix;
-  int32_T c_k;
-  int32_T d;
-  int32_T ijA;
-  int32_T ix;
-  int32_T iy;
-  int32_T j;
   int8_T ipiv[3];
   boolean_T isodd;
   std::memcpy(&A[0], &x[0], 9U * sizeof(real_T));
   ipiv[0] = 1;
   ipiv[1] = 2;
-  for (j = 0; j < 2; j++) {
-    c = j << 2;
-    iy = 0;
-    ix = c;
-    smax = std::abs(A[c]);
-    for (c_k = 2; c_k <= 3 - j; c_k++) {
-      ix++;
-      b_y = std::abs(A[ix]);
-      if (b_y > smax) {
-        iy = c_k - 1;
-        smax = b_y;
+  for (int32_T j = 0; j < 2; j++) {
+    real_T smax;
+    int32_T b_ix;
+    int32_T iy;
+    int32_T jj;
+    jj = j << 2;
+    iy = 3 - j;
+    b_ix = 0;
+    smax = std::abs(A[jj]);
+    for (int32_T c_k = 2; c_k <= iy; c_k++) {
+      real_T s;
+      s = std::abs(A[(jj + c_k) - 1]);
+      if (s > smax) {
+        b_ix = c_k - 1;
+        smax = s;
       }
     }
 
-    if (A[c + iy] != 0.0) {
-      if (iy != 0) {
-        iy += j;
+    if (A[jj + b_ix] != 0.0) {
+      if (b_ix != 0) {
+        iy = j + b_ix;
         ipiv[j] = static_cast<int8_T>(iy + 1);
         smax = A[j];
         A[j] = A[iy];
@@ -597,27 +762,25 @@ real_T wrist_decouplerModelClass::det(const real_T x[9])
         A[iy + 6] = smax;
       }
 
-      iy = (c - j) + 3;
-      for (ix = c + 1; ix < iy; ix++) {
-        A[ix] /= A[c];
+      iy = (jj - j) + 3;
+      for (b_ix = jj + 2; b_ix <= iy; b_ix++) {
+        A[b_ix - 1] /= A[jj];
       }
     }
 
-    iy = c;
-    ix = c + 3;
-    for (c_k = 0; c_k <= 1 - j; c_k++) {
-      if (A[ix] != 0.0) {
-        smax = -A[ix];
-        c_ix = c + 1;
-        d = (iy - j) + 6;
-        for (ijA = iy + 4; ijA < d; ijA++) {
-          A[ijA] += A[c_ix] * smax;
-          c_ix++;
+    iy = 1 - j;
+    b_ix = jj + 5;
+    for (int32_T c_k = 0; c_k <= iy; c_k++) {
+      smax = A[(c_k * 3 + jj) + 3];
+      if (smax != 0.0) {
+        int32_T c;
+        c = (b_ix - j) + 1;
+        for (int32_T ijA = b_ix; ijA <= c; ijA++) {
+          A[ijA - 1] += A[((jj + ijA) - b_ix) + 1] * -smax;
         }
       }
 
-      ix += 3;
-      iy += 3;
+      b_ix += 3;
     }
   }
 
@@ -634,306 +797,207 @@ real_T wrist_decouplerModelClass::det(const real_T x[9])
   return y;
 }
 
-// Function for MATLAB Function: '<S2>/motors2quat'
-void wrist_decouplerModelClass::mldivide(const real_T A[9], const real_T B_0[3],
-  real_T Y[3])
+// Model step function
+void wrist_decoupler::step()
 {
-  real_T b_A[9];
+  real_T up[12];
+  real_T P_0[9];
+  real_T b[9];
+  real_T ya_0[9];
+  real_T xa[3];
+  real_T xb[3];
+  real_T ya[3];
+  real_T yb[3];
+  real_T absx;
+  real_T b_n;
   real_T maxval;
-  real_T y;
+  real_T rtb_Gain_o_idx_0;
+  real_T rtb_Gain_o_idx_1;
+  real_T rtb_Gain_o_idx_2;
+  real_T rtb_Product1;
+  real_T rtb_attitude_idx_0;
+  real_T st;
+  real_T theta;
+  real_T tmp;
+  real_T tmp_0;
+  real_T up_tmp;
+  real_T up_tmp_0;
+  real_T up_tmp_1;
+  real_T up_tmp_2;
+  real_T up_tmp_3;
+  real_T up_tmp_4;
+  real_T yc_idx_2;
+  int32_T cycles;
+  int32_T exitg1;
+  int32_T idx;
   int32_T r1;
   int32_T r2;
   int32_T r3;
   int32_T rtemp;
-  std::memcpy(&b_A[0], &A[0], 9U * sizeof(real_T));
-  r1 = 0;
-  r2 = 1;
-  r3 = 2;
-  maxval = std::abs(A[0]);
-  y = std::abs(A[1]);
-  if (y > maxval) {
-    maxval = y;
-    r1 = 1;
-    r2 = 0;
-  }
-
-  if (std::abs(A[2]) > maxval) {
-    r1 = 2;
-    r2 = 1;
-    r3 = 0;
-  }
-
-  b_A[r2] = A[r2] / A[r1];
-  b_A[r3] /= b_A[r1];
-  b_A[r2 + 3] -= b_A[r1 + 3] * b_A[r2];
-  b_A[r3 + 3] -= b_A[r1 + 3] * b_A[r3];
-  b_A[r2 + 6] -= b_A[r1 + 6] * b_A[r2];
-  b_A[r3 + 6] -= b_A[r1 + 6] * b_A[r3];
-  if (std::abs(b_A[r3 + 3]) > std::abs(b_A[r2 + 3])) {
-    rtemp = r2;
-    r2 = r3;
-    r3 = rtemp;
-  }
-
-  b_A[r3 + 3] /= b_A[r2 + 3];
-  b_A[r3 + 6] -= b_A[r3 + 3] * b_A[r2 + 6];
-  Y[1] = B_0[r2] - B_0[r1] * b_A[r2];
-  Y[2] = (B_0[r3] - B_0[r1] * b_A[r3]) - b_A[r3 + 3] * Y[1];
-  Y[2] /= b_A[r3 + 6];
-  Y[0] = B_0[r1] - b_A[r1 + 6] * Y[2];
-  Y[1] -= b_A[r2 + 6] * Y[2];
-  Y[1] /= b_A[r2 + 3];
-  Y[0] -= b_A[r1 + 3] * Y[1];
-  Y[0] /= b_A[r1];
-}
-
-// Model step function
-void wrist_decouplerModelClass::step()
-{
-  real_T oa[12];
-  real_T up[12];
-  real_T arg_0[9];
-  real_T p[9];
-  real_T q[9];
-  real_T arg[3];
-  real_T ct[3];
-  real_T st[3];
-  real_T absx;
-  real_T b_oc_idx_0;
-  real_T b_oc_idx_1;
-  real_T b_oc_idx_2;
-  real_T c_oc;
-  real_T oa_idx_0;
-  real_T od;
-  real_T rtb_Product1;
-  real_T rtb_Product2;
-  real_T rtb_Product3;
-  real_T st_0;
-  real_T theta;
-  int32_T b_cycles;
-  int32_T b_k;
-  int32_T exitg2;
-  int32_T idx;
-  int32_T q_tmp;
-  int8_T b_n;
-  boolean_T exitg1;
+  int8_T n;
+  boolean_T exitg2;
   boolean_T guard1 = false;
 
   // Outputs for Atomic SubSystem: '<Root>/wrist_decoupler'
-  // Outport: '<Root>/theta_star' incorporates:
-  //   MATLAB Function: '<S1>/ypr2motors'
+  // MATLAB Function: '<S1>/motors2ypr' incorporates:
+  //   Inport: '<Root>/arm_bend'
+  //   Inport: '<Root>/plat_off'
+  //   Inport: '<Root>/theta_diff'
+  //   Inport: '<Root>/theta_off'
 
-  // :  theta = [0;0;0];
-  // :  q = Q*eul2rotm(deg2rad(ypr'))';
-  rtY.theta_star[0] = 0.0;
+  rtb_Gain_o_idx_0 = rtU.theta_diff[0];
+  rtb_Gain_o_idx_1 = rtU.theta_diff[1];
+  rtb_Gain_o_idx_2 = rtU.theta_diff[2];
 
-  // MATLAB Function: '<S1>/ypr2motors' incorporates:
-  //   Inport: '<Root>/ypr_star'
-
-  st_0 = 0.017453292519943295 * rtU.ypr[0];
-  ct[0] = std::cos(st_0);
-  st[0] = std::sin(st_0);
-
-  // Outport: '<Root>/theta_star' incorporates:
-  //   MATLAB Function: '<S1>/ypr2motors'
-
-  rtY.theta_star[1] = 0.0;
-
-  // MATLAB Function: '<S1>/ypr2motors' incorporates:
-  //   Inport: '<Root>/ypr_star'
-
-  st_0 = 0.017453292519943295 * rtU.ypr[1];
-  ct[1] = std::cos(st_0);
-  st[1] = std::sin(st_0);
-
-  // Outport: '<Root>/theta_star' incorporates:
-  //   MATLAB Function: '<S1>/ypr2motors'
-
-  rtY.theta_star[2] = 0.0;
-
-  // MATLAB Function: '<S1>/ypr2motors' incorporates:
-  //   Inport: '<Root>/ypr_star'
-
-  st_0 = 0.017453292519943295 * rtU.ypr[2];
-  c_oc = std::cos(st_0);
-  st_0 = std::sin(st_0);
-  p[0] = ct[1] * ct[0];
-  rtb_Product3 = st_0 * st[1];
-  p[3] = rtb_Product3 * ct[0] - c_oc * st[0];
-  absx = c_oc * st[1];
-  p[6] = absx * ct[0] + st_0 * st[0];
-  p[1] = ct[1] * st[0];
-  p[4] = rtb_Product3 * st[0] + c_oc * ct[0];
-  p[7] = absx * st[0] - st_0 * ct[0];
-  p[2] = -st[1];
-  p[5] = st_0 * ct[1];
-  p[8] = c_oc * ct[1];
-  for (idx = 0; idx < 3; idx++) {
-    for (b_k = 0; b_k < 3; b_k++) {
-      q_tmp = idx + 3 * b_k;
-      q[q_tmp] = 0.0;
-      q[q_tmp] += rtConstP.pooled4[idx] * p[b_k];
-      q[q_tmp] += rtConstP.pooled4[idx + 3] * p[b_k + 3];
-      q[q_tmp] += rtConstP.pooled4[idx + 6] * p[b_k + 6];
-    }
-  }
-
-  // :  m = [sqrt(q(1,1)^2+q(1,2)^2) sqrt(q(2,1)^2+q(2,2)^2) sqrt(q(3,1)^2+q(3,2)^2)]; 
-  absx = std::sqrt(q[0] * q[0] + q[3] * q[3]);
-  c_oc = std::sqrt(q[1] * q[1] + q[4] * q[4]);
-  b_oc_idx_1 = std::sqrt(q[2] * q[2] + q[5] * q[5]);
-
-  // :  if min(abs(m)) == 0
-  st[0] = std::abs(absx);
-  st[1] = std::abs(c_oc);
-  st[2] = std::abs(b_oc_idx_1);
-  if (!rtIsNaN(st[0])) {
-    idx = 1;
-  } else {
-    idx = 0;
-    b_k = 2;
-    exitg1 = false;
-    while ((!exitg1) && (b_k < 4)) {
-      if (!rtIsNaN(st[b_k - 1])) {
-        idx = b_k;
-        exitg1 = true;
-      } else {
-        b_k++;
-      }
-    }
-  }
-
-  if (idx == 0) {
-    rtb_Product3 = st[0];
-  } else {
-    rtb_Product3 = st[idx - 1];
-    while (idx + 1 <= 3) {
-      if (rtb_Product3 > st[idx]) {
-        rtb_Product3 = st[idx];
-      }
-
-      idx++;
-    }
-  }
-
-  if (rtb_Product3 == 0.0) {
-    // Outport: '<Root>/out_of_range'
-    // :  out_of_range = 1;
-    rtY.out_of_range = 1.0;
-  } else {
-    // :  arg = [(PQ(1)-Pz(1)*q(1,3))/m(1); (PQ(2)-Pz(2)*q(2,3))/m(2); (PQ(3)-Pz(3)*q(3,3))/m(3)]; 
-    arg[0] = (0.5 - -0.57735026918962573 * q[6]) / absx;
-    arg[1] = (0.087155742747658166 - -0.57735026918962573 * q[7]) / c_oc;
-    arg[2] = (-0.49999999999999994 - -0.57735026918962573 * q[8]) / b_oc_idx_1;
-
-    // :  if max(abs(arg)) > 1
-    st[0] = std::abs(arg[0]);
-    st[1] = std::abs(arg[1]);
-    st[2] = std::abs(arg[2]);
-    if (!rtIsNaN(st[0])) {
-      idx = 1;
-    } else {
-      idx = 0;
-      b_k = 2;
-      exitg1 = false;
-      while ((!exitg1) && (b_k < 4)) {
-        if (!rtIsNaN(st[b_k - 1])) {
-          idx = b_k;
-          exitg1 = true;
-        } else {
-          b_k++;
-        }
-      }
-    }
-
-    if (idx == 0) {
-      rtb_Product3 = st[0];
-    } else {
-      rtb_Product3 = st[idx - 1];
-      while (idx + 1 <= 3) {
-        if (rtb_Product3 < st[idx]) {
-          rtb_Product3 = st[idx];
-        }
-
-        idx++;
-      }
-    }
-
-    if (rtb_Product3 > 1.0) {
-      // Outport: '<Root>/out_of_range'
-      // :  out_of_range = 1;
-      rtY.out_of_range = 1.0;
-    } else {
-      // Outport: '<Root>/theta_star'
-      // :  theta = atan2d(q(:,2),q(:,1))+[90; 90; 90;]-asind(arg);
-      rtY.theta_star[0] = (57.295779513082323 * rt_atan2d_snf(q[3], q[0]) + 90.0)
-        - 57.295779513082323 * std::asin(arg[0]);
-      rtY.theta_star[1] = (57.295779513082323 * rt_atan2d_snf(q[4], q[1]) + 90.0)
-        - 57.295779513082323 * std::asin(arg[1]);
-      rtY.theta_star[2] = (57.295779513082323 * rt_atan2d_snf(q[5], q[2]) + 90.0)
-        - 57.295779513082323 * std::asin(arg[2]);
-
-      // Outport: '<Root>/out_of_range'
-      // :  out_of_range = 0;
-      rtY.out_of_range = 0.0;
-    }
-  }
-
-  // Outputs for Atomic SubSystem: '<S1>/motors2ypr'
-  // MATLAB Function: '<S2>/motors2quat' incorporates:
-  //   Inport: '<Root>/theta_meas'
-
-  // :  if isempty(T)
   // :  if isempty(singularity_reg)
-  // :  theta_diff = theta_meas - [145; -90; 40];
-  // :  for k=1:3
+  if (!rtDW.singularity_reg_not_empty) {
+    // :  Pz = -tand(arm_bend)*[1; 1; 1];
+    if (rtIsInf(rtU.arm_bend) || rtIsNaN(rtU.arm_bend)) {
+      maxval = (rtNaN);
+    } else {
+      maxval = rt_remd_snf(rtU.arm_bend, 360.0);
+      absx = std::abs(maxval);
+      if (absx > 180.0) {
+        if (maxval > 0.0) {
+          maxval -= 360.0;
+        } else {
+          maxval += 360.0;
+        }
+
+        absx = std::abs(maxval);
+      }
+
+      if (absx <= 45.0) {
+        maxval *= 0.017453292519943295;
+        n = 0;
+      } else if (absx <= 135.0) {
+        if (maxval > 0.0) {
+          maxval = (maxval - 90.0) * 0.017453292519943295;
+          n = 1;
+        } else {
+          maxval = (maxval + 90.0) * 0.017453292519943295;
+          n = -1;
+        }
+      } else if (maxval > 0.0) {
+        maxval = (maxval - 180.0) * 0.017453292519943295;
+        n = 2;
+      } else {
+        maxval = (maxval + 180.0) * 0.017453292519943295;
+        n = -2;
+      }
+
+      maxval = std::tan(maxval);
+      if ((n == 1) || (n == -1)) {
+        absx = 1.0 / maxval;
+        maxval = -(1.0 / maxval);
+        if (rtIsInf(maxval) && (n == 1)) {
+          maxval = absx;
+        }
+      }
+    }
+
+    // :  P = [cosd(theta_off) sind(theta_off) Pz];
+    rtDW.Pz_b[0] = -maxval;
+    yb[0] = rtU.theta_off[0];
+    rtDW.Pz_b[1] = -maxval;
+    yb[1] = rtU.theta_off[1];
+    rtDW.Pz_b[2] = -maxval;
+    yb[2] = rtU.theta_off[2];
+    cosd(yb);
+    ya[0] = rtU.theta_off[0];
+    ya[1] = rtU.theta_off[1];
+    ya[2] = rtU.theta_off[2];
+    sind(ya);
+
+    // :  Q = [cosd(plat_off) sind(plat_off) [0; 0; 0]];
+    P_0[0] = yb[0];
+    P_0[3] = ya[0];
+    yb[0] = rtU.plat_off[0];
+    P_0[1] = yb[1];
+    P_0[4] = ya[1];
+    yb[1] = rtU.plat_off[1];
+    P_0[2] = yb[2];
+    P_0[5] = ya[2];
+    yb[2] = rtU.plat_off[2];
+    cosd(yb);
+    ya[0] = rtU.plat_off[0];
+    ya[1] = rtU.plat_off[1];
+    ya[2] = rtU.plat_off[2];
+    sind(ya);
+    rtDW.Q_p[0] = yb[0];
+    rtDW.Q_p[3] = ya[0];
+    rtDW.Q_p[6] = 0.0;
+    rtDW.Q_p[1] = yb[1];
+    rtDW.Q_p[4] = ya[1];
+    rtDW.Q_p[7] = 0.0;
+    rtDW.Q_p[2] = yb[2];
+    rtDW.Q_p[5] = ya[2];
+    rtDW.Q_p[8] = 0.0;
+
+    // :  PQ = [P(1,:)*Q(1,:)' P(2,:)*Q(2,:)' P(3,:)*Q(3,:)'];
+    rtDW.PQ_f[0] = (P_0[0] * rtDW.Q_p[0] + P_0[3] * rtDW.Q_p[3]) + rtDW.Pz_b[0] *
+      0.0;
+    rtDW.PQ_f[1] = (P_0[1] * rtDW.Q_p[1] + P_0[4] * rtDW.Q_p[4]) + rtDW.Pz_b[1] *
+      0.0;
+    rtDW.PQ_f[2] = (P_0[2] * rtDW.Q_p[2] + P_0[5] * rtDW.Q_p[5]) + rtDW.Pz_b[2] *
+      0.0;
+
+    // :  T = quaternion(1,0,0,0);
+    rtDW.T.a = 1.0;
+    rtDW.T.b = 0.0;
+    rtDW.T.c = 0.0;
+    rtDW.T.d = 0.0;
+
+    // :  singularity_reg = 0;
+    rtDW.singularity_reg_not_empty = true;
+  }
+
+  // :  theta_diff = Wrap180(theta_diff);
+  // :  y = x;
+  // :  for i=1:3
   // :  if max(abs(theta_diff)) < 5.0
-  arg[0] = rtU.theta_meas[0] - 145.0;
-
-  // :  while theta_diff(k) > 180.0
-  while (arg[0] > 180.0) {
-    // :  theta_diff(k) = theta_diff(k) - 360.0;
-    arg[0] -= 360.0;
+  // :  while y(i) > 180.0
+  while (rtb_Gain_o_idx_0 > 180.0) {
+    // :  y(i) = y(i) - 360.0;
+    rtb_Gain_o_idx_0 -= 360.0;
   }
 
-  // :  while theta_diff(k) < -180.0
-  while (arg[0] < -180.0) {
-    // :  theta_diff(k) = theta_diff(k) + 360.0;
-    arg[0] += 360.0;
+  // :  while y(i) < -180.0
+  while (rtb_Gain_o_idx_0 < -180.0) {
+    // :  y(i) = y(i) + 360.0;
+    rtb_Gain_o_idx_0 += 360.0;
   }
 
-  st[0] = std::abs(arg[0]);
-  arg[1] = rtU.theta_meas[1] - -90.0;
+  xa[0] = std::abs(rtb_Gain_o_idx_0);
 
-  // :  while theta_diff(k) > 180.0
-  while (arg[1] > 180.0) {
-    // :  theta_diff(k) = theta_diff(k) - 360.0;
-    arg[1] -= 360.0;
+  // :  while y(i) > 180.0
+  while (rtb_Gain_o_idx_1 > 180.0) {
+    // :  y(i) = y(i) - 360.0;
+    rtb_Gain_o_idx_1 -= 360.0;
   }
 
-  // :  while theta_diff(k) < -180.0
-  while (arg[1] < -180.0) {
-    // :  theta_diff(k) = theta_diff(k) + 360.0;
-    arg[1] += 360.0;
+  // :  while y(i) < -180.0
+  while (rtb_Gain_o_idx_1 < -180.0) {
+    // :  y(i) = y(i) + 360.0;
+    rtb_Gain_o_idx_1 += 360.0;
   }
 
-  st[1] = std::abs(arg[1]);
-  arg[2] = rtU.theta_meas[2] - 40.0;
+  xa[1] = std::abs(rtb_Gain_o_idx_1);
 
-  // :  while theta_diff(k) > 180.0
-  while (arg[2] > 180.0) {
-    // :  theta_diff(k) = theta_diff(k) - 360.0;
-    arg[2] -= 360.0;
+  // :  while y(i) > 180.0
+  while (rtb_Gain_o_idx_2 > 180.0) {
+    // :  y(i) = y(i) - 360.0;
+    rtb_Gain_o_idx_2 -= 360.0;
   }
 
-  // :  while theta_diff(k) < -180.0
-  while (arg[2] < -180.0) {
-    // :  theta_diff(k) = theta_diff(k) + 360.0;
-    arg[2] += 360.0;
+  // :  while y(i) < -180.0
+  while (rtb_Gain_o_idx_2 < -180.0) {
+    // :  y(i) = y(i) + 360.0;
+    rtb_Gain_o_idx_2 += 360.0;
   }
 
-  st[2] = std::abs(arg[2]);
-  if (maximum(st) < 5.0) {
+  xa[2] = std::abs(rtb_Gain_o_idx_2);
+  if (maximum(xa) < 5.0) {
     // :  singularity_reg = 0;
     rtDW.singularity_reg = 0.0;
   }
@@ -941,466 +1005,346 @@ void wrist_decouplerModelClass::step()
   // :  if singularity_reg
   if (rtDW.singularity_reg != 0.0) {
     // :  attitude = compact(T);
-    absx = rtDW.T.a;
-    theta = rtDW.T.b;
-    b_oc_idx_1 = rtDW.T.c;
-    c_oc = rtDW.T.d;
+    rtb_attitude_idx_0 = rtDW.T.a;
+    yc_idx_2 = rtDW.T.b;
+    b_n = rtDW.T.c;
+    st = rtDW.T.d;
 
     // Outport: '<Root>/singularity'
     // :  singularity = singularity_reg;
     rtY.singularity = rtDW.singularity_reg;
 
     // :  cycles = 0;
-    idx = 0;
+    cycles = 0;
   } else {
     // :  for cycles=1:200
-    idx = 1;
-    b_cycles = 0;
+    cycles = 1;
+    idx = 0;
     guard1 = false;
     do {
-      exitg2 = 0;
-      if (b_cycles < 200) {
-        idx = b_cycles + 1;
+      exitg1 = 0;
+      if (idx < 200) {
+        cycles = idx + 1;
 
         // :  q = rotatepoint(T,Q);
         theta = std::sqrt(((rtDW.T.a * rtDW.T.a + rtDW.T.b * rtDW.T.b) +
                            rtDW.T.c * rtDW.T.c) + rtDW.T.d * rtDW.T.d);
-        rtb_Product3 = rtDW.T.a / theta;
-        absx = rtDW.T.b / theta;
-        rtb_Product1 = rtDW.T.c / theta;
-        rtb_Product2 = rtDW.T.d / theta;
+        rtb_attitude_idx_0 = rtDW.T.a / theta;
+        yc_idx_2 = rtDW.T.b / theta;
+        b_n = rtDW.T.c / theta;
+        st = rtDW.T.d / theta;
         up[0] = 0.0;
         up[1] = 0.0;
         up[2] = 0.0;
-        std::memcpy(&up[3], &rtConstP.pooled4[0], 9U * sizeof(real_T));
-        oa_idx_0 = ((rtb_Product3 * up[0] - absx * up[3]) - rtb_Product1 * up[6])
-          - rtb_Product2 * up[9];
-        c_oc = ((rtb_Product3 * up[3] + absx * up[0]) + rtb_Product1 * up[9]) -
-          rtb_Product2 * up[6];
-        st_0 = ((rtb_Product3 * up[6] - absx * up[9]) + rtb_Product1 * up[0]) +
-          rtb_Product2 * up[3];
-        od = ((rtb_Product3 * up[9] + absx * up[6]) - rtb_Product1 * up[3]) +
-          rtb_Product2 * up[0];
-        oa[0] = ((oa_idx_0 * rtb_Product3 - c_oc * -absx) - st_0 * -rtb_Product1)
-          - od * -rtb_Product2;
-        st[0] = ((oa_idx_0 * -absx + c_oc * rtb_Product3) + st_0 * -rtb_Product2)
-          - od * -rtb_Product1;
-        b_oc_idx_0 = ((oa_idx_0 * -rtb_Product1 - c_oc * -rtb_Product2) + st_0 *
-                      rtb_Product3) + od * -absx;
-        arg[0] = ((oa_idx_0 * -rtb_Product2 + c_oc * -rtb_Product1) - st_0 *
-                  -absx) + od * rtb_Product3;
-        oa_idx_0 = ((rtb_Product3 * up[1] - absx * up[4]) - rtb_Product1 * up[7])
-          - rtb_Product2 * up[10];
-        c_oc = ((rtb_Product3 * up[4] + absx * up[1]) + rtb_Product1 * up[10]) -
-          rtb_Product2 * up[7];
-        st_0 = ((rtb_Product3 * up[7] - absx * up[10]) + rtb_Product1 * up[1]) +
-          rtb_Product2 * up[4];
-        od = ((rtb_Product3 * up[10] + absx * up[7]) - rtb_Product1 * up[4]) +
-          rtb_Product2 * up[1];
-        oa[1] = ((oa_idx_0 * rtb_Product3 - c_oc * -absx) - st_0 * -rtb_Product1)
-          - od * -rtb_Product2;
-        st[1] = ((oa_idx_0 * -absx + c_oc * rtb_Product3) + st_0 * -rtb_Product2)
-          - od * -rtb_Product1;
-        b_oc_idx_1 = ((oa_idx_0 * -rtb_Product1 - c_oc * -rtb_Product2) + st_0 *
-                      rtb_Product3) + od * -absx;
-        arg[1] = ((oa_idx_0 * -rtb_Product2 + c_oc * -rtb_Product1) - st_0 *
-                  -absx) + od * rtb_Product3;
-        oa_idx_0 = ((rtb_Product3 * up[2] - absx * up[5]) - rtb_Product1 * up[8])
-          - rtb_Product2 * up[11];
-        c_oc = ((rtb_Product3 * up[5] + absx * up[2]) + rtb_Product1 * up[11]) -
-          rtb_Product2 * up[8];
-        st_0 = ((rtb_Product3 * up[8] - absx * up[11]) + rtb_Product1 * up[2]) +
-          rtb_Product2 * up[5];
-        od = ((rtb_Product3 * up[11] + absx * up[8]) - rtb_Product1 * up[5]) +
-          rtb_Product2 * up[2];
-        oa[2] = ((oa_idx_0 * rtb_Product3 - c_oc * -absx) - st_0 * -rtb_Product1)
-          - od * -rtb_Product2;
-        st[2] = ((oa_idx_0 * -absx + c_oc * rtb_Product3) + st_0 * -rtb_Product2)
-          - od * -rtb_Product1;
-        b_oc_idx_2 = ((oa_idx_0 * -rtb_Product1 - c_oc * -rtb_Product2) + st_0 *
-                      rtb_Product3) + od * -absx;
-        oa_idx_0 = ((oa_idx_0 * -rtb_Product2 + c_oc * -rtb_Product1) - st_0 *
-                    -absx) + od * rtb_Product3;
-        up[3] = st[0];
-        up[9] = arg[0];
-        oa[3] = st[0];
-        oa[6] = b_oc_idx_0;
-        oa[9] = arg[0];
-        up[4] = st[1];
-        up[10] = arg[1];
-        oa[4] = st[1];
-        oa[7] = b_oc_idx_1;
-        oa[10] = arg[1];
-        st_0 = st[2];
-        oa[5] = st[2];
-        oa[8] = b_oc_idx_2;
-        oa[11] = oa_idx_0;
-
-        // :  m = [sqrt(q(1,1)^2+q(1,2)^2) sqrt(q(2,1)^2+q(2,2)^2) sqrt(q(3,1)^2+q(3,2)^2)]; 
-        c_oc = b_oc_idx_0 * b_oc_idx_0;
-        arg[0] = std::sqrt(st[0] * st[0] + c_oc);
-        b_oc_idx_1 *= b_oc_idx_1;
-        arg[1] = std::sqrt(st[1] * st[1] + b_oc_idx_1);
-        arg[2] = std::sqrt(st[2] * st[2] + b_oc_idx_2 * b_oc_idx_2);
-
-        // :  if min(abs(m)) == 0
-        for (b_k = 0; b_k < 3; b_k++) {
-          q_tmp = (b_k + 1) * 3;
-          q[3 * b_k] = oa[q_tmp];
-          q[3 * b_k + 1] = oa[q_tmp + 1];
-          q[3 * b_k + 2] = oa[q_tmp + 2];
-          st[b_k] = std::abs(arg[b_k]);
+        std::memcpy(&up[3], &rtDW.Q_p[0], 9U * sizeof(real_T));
+        yb[0] = ((rtb_attitude_idx_0 * up[0] - yc_idx_2 * up[3]) - b_n * up[6])
+          - st * up[9];
+        ya[0] = ((rtb_attitude_idx_0 * up[3] + yc_idx_2 * up[0]) + b_n * up[9])
+          - st * up[6];
+        xa[0] = ((rtb_attitude_idx_0 * up[6] - yc_idx_2 * up[9]) + b_n * up[0])
+          + st * up[3];
+        xb[0] = ((rtb_attitude_idx_0 * up[9] + yc_idx_2 * up[6]) - b_n * up[3])
+          + st * up[0];
+        yb[1] = ((rtb_attitude_idx_0 * up[1] - yc_idx_2 * up[4]) - b_n * up[7])
+          - st * up[10];
+        ya[1] = ((rtb_attitude_idx_0 * up[4] + yc_idx_2 * up[1]) + b_n * up[10])
+          - st * up[7];
+        xa[1] = ((rtb_attitude_idx_0 * up[7] - yc_idx_2 * up[10]) + b_n * up[1])
+          + st * up[4];
+        xb[1] = ((rtb_attitude_idx_0 * up[10] + yc_idx_2 * up[7]) - b_n * up[4])
+          + st * up[1];
+        yb[2] = ((rtb_attitude_idx_0 * up[2] - yc_idx_2 * up[5]) - b_n * up[8])
+          - st * up[11];
+        ya[2] = ((rtb_attitude_idx_0 * up[5] + yc_idx_2 * up[2]) + b_n * up[11])
+          - st * up[8];
+        xa[2] = ((rtb_attitude_idx_0 * up[8] - yc_idx_2 * up[11]) + b_n * up[2])
+          + st * up[5];
+        xb[2] = ((rtb_attitude_idx_0 * up[11] + yc_idx_2 * up[8]) - b_n * up[5])
+          + st * up[2];
+        up_tmp = ((yb[0] * -yc_idx_2 + ya[0] * rtb_attitude_idx_0) + xa[0] * -st)
+          - xb[0] * -b_n;
+        up_tmp_0 = ((yb[0] * -b_n - ya[0] * -st) + xa[0] * rtb_attitude_idx_0) +
+          xb[0] * -yc_idx_2;
+        up_tmp_1 = ((yb[0] * -st + ya[0] * -b_n) - xa[0] * -yc_idx_2) + xb[0] *
+          rtb_attitude_idx_0;
+        up[0] = ((yb[0] * rtb_attitude_idx_0 - ya[0] * -yc_idx_2) - xa[0] * -b_n)
+          - xb[0] * -st;
+        up[3] = up_tmp;
+        up[6] = up_tmp_0;
+        up[9] = up_tmp_1;
+        up_tmp_2 = ((yb[1] * -yc_idx_2 + ya[1] * rtb_attitude_idx_0) + xa[1] *
+                    -st) - xb[1] * -b_n;
+        up_tmp_3 = ((yb[1] * -b_n - ya[1] * -st) + xa[1] * rtb_attitude_idx_0) +
+          xb[1] * -yc_idx_2;
+        up_tmp_4 = ((yb[1] * -st + ya[1] * -b_n) - xa[1] * -yc_idx_2) + xb[1] *
+          rtb_attitude_idx_0;
+        up[1] = ((yb[1] * rtb_attitude_idx_0 - ya[1] * -yc_idx_2) - xa[1] * -b_n)
+          - xb[1] * -st;
+        up[4] = up_tmp_2;
+        up[7] = up_tmp_3;
+        up[10] = up_tmp_4;
+        theta = ((yb[2] * -yc_idx_2 + ya[2] * rtb_attitude_idx_0) + xa[2] * -st)
+          - xb[2] * -b_n;
+        rtb_Product1 = ((yb[2] * -b_n - ya[2] * -st) + xa[2] *
+                        rtb_attitude_idx_0) + xb[2] * -yc_idx_2;
+        maxval = ((yb[2] * -st + ya[2] * -b_n) - xa[2] * -yc_idx_2) + xb[2] *
+          rtb_attitude_idx_0;
+        up[2] = ((yb[2] * rtb_attitude_idx_0 - ya[2] * -yc_idx_2) - xa[2] * -b_n)
+          - xb[2] * -st;
+        up[5] = theta;
+        up[8] = rtb_Product1;
+        up[11] = maxval;
+        for (r1 = 0; r1 < 3; r1++) {
+          r2 = (r1 + 1) * 3;
+          P_0[3 * r1] = up[r2];
+          P_0[3 * r1 + 1] = up[r2 + 1];
+          P_0[3 * r1 + 2] = up[r2 + 2];
         }
 
-        if (minimum(st) == 0.0) {
+        // :  m = [sqrt(q(1,1)^2+q(1,2)^2) sqrt(q(2,1)^2+q(2,2)^2) sqrt(q(3,1)^2+q(3,2)^2)]; 
+        absx = std::sqrt(P_0[0] * P_0[0] + P_0[3] * P_0[3]);
+        tmp = std::sqrt(P_0[1] * P_0[1] + P_0[4] * P_0[4]);
+        tmp_0 = std::sqrt(P_0[2] * P_0[2] + P_0[5] * P_0[5]);
+
+        // :  if min(abs(m)) == 0
+        xa[0] = absx;
+        xa[1] = tmp;
+        xa[2] = tmp_0;
+        if (minimum(xa) == 0.0) {
           // :  cycles = -1;
-          idx = -1;
+          cycles = -1;
           guard1 = true;
-          exitg2 = 1;
+          exitg1 = 1;
         } else {
           // :  arg = [(PQ(1)-Pz(1)*q(1,3))/m(1); (PQ(2)-Pz(2)*q(2,3))/m(2); (PQ(3)-Pz(3)*q(3,3))/m(3)]; 
-          ct[0] = (0.5 - -0.57735026918962573 * up[9]) / std::sqrt(up[3] * up[3]
-            + c_oc);
-          ct[1] = (0.087155742747658166 - -0.57735026918962573 * up[10]) / std::
-            sqrt(up[4] * up[4] + b_oc_idx_1);
-          ct[2] = (-0.49999999999999994 - -0.57735026918962573 * oa_idx_0) / std::
-            sqrt(st_0 * st_0 + b_oc_idx_2 * b_oc_idx_2);
+          yb[0] = (rtDW.PQ_f[0] - rtDW.Pz_b[0] * up_tmp_1) / absx;
+          yb[1] = (rtDW.PQ_f[1] - rtDW.Pz_b[1] * up_tmp_4) / tmp;
+          yb[2] = (rtDW.PQ_f[2] - rtDW.Pz_b[2] * maxval) / tmp_0;
 
           // :  if max(abs(arg)) > 1.0
-          st[0] = std::abs(ct[0]);
-          st[1] = std::abs(ct[1]);
-          st[2] = std::abs(ct[2]);
-          if (maximum(st) > 1.0) {
+          xa[0] = std::abs(yb[0]);
+          xa[1] = std::abs(yb[1]);
+          xa[2] = std::abs(yb[2]);
+          if (maximum(xa) > 1.0) {
             // :  cycles = -2;
-            idx = -2;
+            cycles = -2;
             guard1 = true;
-            exitg2 = 1;
+            exitg1 = 1;
           } else {
             // :  theta = atan2d(q(:,2),q(:,1))+[90; 90; 90;]-asind(arg);
-            // :  theta_err = theta_meas-theta;
-            // :  for k=1:3
+            // :  theta_err = Wrap180(theta_diff+theta_off-theta);
+            // :  y = x;
+            // :  for i=1:3
             // :  if max(abs(theta_err)) < 0.01
-            ct[0] = 57.295779513082323 * std::asin(ct[0]);
-            arg[0] = (57.295779513082323 * rt_atan2d_snf(q[3], q[0]) + 90.0) -
-              ct[0];
+            absx = (57.295779513082323 * rt_atan2d_snf(P_0[3], P_0[0]) + 90.0) -
+              57.295779513082323 * std::asin(yb[0]);
+            ya[0] = absx;
+            xb[0] = (rtb_Gain_o_idx_0 + rtU.theta_off[0]) - absx;
 
-            // :  while theta_err(k) > 180.0
-            for (rtb_Product1 = rtU.theta_meas[0] - arg[0]; rtb_Product1 > 180.0;
-                 rtb_Product1 -= 360.0) {
-              // :  theta_err(k) = theta_err(k) - 360.0;
+            // :  while y(i) > 180.0
+            while (xb[0] > 180.0) {
+              // :  y(i) = y(i) - 360.0;
+              xb[0] -= 360.0;
             }
 
-            // :  while theta_err(k) < -180.0
-            while (rtb_Product1 < -180.0) {
-              // :  theta_err(k) = theta_err(k) + 360.0;
-              rtb_Product1 += 360.0;
+            // :  while y(i) < -180.0
+            while (xb[0] < -180.0) {
+              // :  y(i) = y(i) + 360.0;
+              xb[0] += 360.0;
             }
 
-            st[0] = std::abs(rtb_Product1);
-            arg[1] = 57.295779513082323 * rt_atan2d_snf(q[4], q[1]);
-            ct[1] = 57.295779513082323 * std::asin(ct[1]);
-            arg[1] = (arg[1] + 90.0) - ct[1];
+            xa[0] = std::abs(xb[0]);
+            absx = (57.295779513082323 * rt_atan2d_snf(P_0[4], P_0[1]) + 90.0) -
+              57.295779513082323 * std::asin(yb[1]);
+            ya[1] = absx;
+            xb[1] = (rtb_Gain_o_idx_1 + rtU.theta_off[1]) - absx;
 
-            // :  while theta_err(k) > 180.0
-            for (rtb_Product2 = rtU.theta_meas[1] - arg[1]; rtb_Product2 > 180.0;
-                 rtb_Product2 -= 360.0) {
-              // :  theta_err(k) = theta_err(k) - 360.0;
+            // :  while y(i) > 180.0
+            while (xb[1] > 180.0) {
+              // :  y(i) = y(i) - 360.0;
+              xb[1] -= 360.0;
             }
 
-            // :  while theta_err(k) < -180.0
-            while (rtb_Product2 < -180.0) {
-              // :  theta_err(k) = theta_err(k) + 360.0;
-              rtb_Product2 += 360.0;
+            // :  while y(i) < -180.0
+            while (xb[1] < -180.0) {
+              // :  y(i) = y(i) + 360.0;
+              xb[1] += 360.0;
             }
 
-            st[1] = std::abs(rtb_Product2);
-            arg[2] = 57.295779513082323 * rt_atan2d_snf(q[5], q[2]);
-            ct[2] = 57.295779513082323 * std::asin(ct[2]);
-            arg[2] = (arg[2] + 90.0) - ct[2];
+            xa[1] = std::abs(xb[1]);
+            absx = (57.295779513082323 * rt_atan2d_snf(P_0[5], P_0[2]) + 90.0) -
+              57.295779513082323 * std::asin(yb[2]);
+            ya[2] = absx;
+            xb[2] = (rtb_Gain_o_idx_2 + rtU.theta_off[2]) - absx;
 
-            // :  while theta_err(k) > 180.0
-            for (b_oc_idx_2 = rtU.theta_meas[2] - arg[2]; b_oc_idx_2 > 180.0;
-                 b_oc_idx_2 -= 360.0) {
-              // :  theta_err(k) = theta_err(k) - 360.0;
+            // :  while y(i) > 180.0
+            while (xb[2] > 180.0) {
+              // :  y(i) = y(i) - 360.0;
+              xb[2] -= 360.0;
             }
 
-            // :  while theta_err(k) < -180.0
-            while (b_oc_idx_2 < -180.0) {
-              // :  theta_err(k) = theta_err(k) + 360.0;
-              b_oc_idx_2 += 360.0;
+            // :  while y(i) < -180.0
+            while (xb[2] < -180.0) {
+              // :  y(i) = y(i) + 360.0;
+              xb[2] += 360.0;
             }
 
-            st[2] = std::abs(b_oc_idx_2);
-            if (maximum(st) < 0.01) {
+            xa[2] = std::abs(xb[2]);
+            if (maximum(xa) < 0.01) {
               // :  T = normalize(T);
-              rtDW.T.a /= theta;
-              rtDW.T.b /= theta;
-              rtDW.T.c /= theta;
-              rtDW.T.d /= theta;
+              rtDW.T.a = rtb_attitude_idx_0;
+              rtDW.T.b = yc_idx_2;
+              rtDW.T.c = b_n;
+              rtDW.T.d = st;
 
               // :  attitude = compact(T);
-              absx = rtDW.T.a;
-              theta = rtDW.T.b;
-              b_oc_idx_1 = rtDW.T.c;
-              c_oc = rtDW.T.d;
-
               // :  singularity = singularity_reg;
               rtY.singularity = rtDW.singularity_reg;
-              exitg2 = 1;
+              exitg1 = 1;
             } else {
               // :  p = [cosd(theta) sind(theta) Pz];
-              if (rtIsInf(arg[0]) || rtIsNaN(arg[0])) {
-                oa_idx_0 = (rtNaN);
-              } else {
-                rtb_Product3 = rt_remd_snf(arg[0], 360.0);
-                absx = std::abs(rtb_Product3);
-                if (absx > 180.0) {
-                  if (rtb_Product3 > 0.0) {
-                    rtb_Product3 -= 360.0;
-                  } else {
-                    rtb_Product3 += 360.0;
-                  }
-
-                  absx = std::abs(rtb_Product3);
-                }
-
-                if (absx <= 45.0) {
-                  rtb_Product3 *= 0.017453292519943295;
-                  b_n = 0;
-                } else if (absx <= 135.0) {
-                  if (rtb_Product3 > 0.0) {
-                    rtb_Product3 = (rtb_Product3 - 90.0) * 0.017453292519943295;
-                    b_n = 1;
-                  } else {
-                    rtb_Product3 = (rtb_Product3 + 90.0) * 0.017453292519943295;
-                    b_n = -1;
-                  }
-                } else if (rtb_Product3 > 0.0) {
-                  rtb_Product3 = (rtb_Product3 - 180.0) * 0.017453292519943295;
-                  b_n = 2;
-                } else {
-                  rtb_Product3 = (rtb_Product3 + 180.0) * 0.017453292519943295;
-                  b_n = -2;
-                }
-
-                switch (b_n) {
-                 case 0:
-                  oa_idx_0 = std::cos(rtb_Product3);
-                  break;
-
-                 case 1:
-                  oa_idx_0 = -std::sin(rtb_Product3);
-                  break;
-
-                 case -1:
-                  oa_idx_0 = std::sin(rtb_Product3);
-                  break;
-
-                 default:
-                  oa_idx_0 = -std::cos(rtb_Product3);
-                  break;
-                }
-              }
-
-              if (rtIsInf(arg[1]) || rtIsNaN(arg[1])) {
-                theta = (rtNaN);
-              } else {
-                rtb_Product3 = rt_remd_snf(arg[1], 360.0);
-                absx = std::abs(rtb_Product3);
-                if (absx > 180.0) {
-                  if (rtb_Product3 > 0.0) {
-                    rtb_Product3 -= 360.0;
-                  } else {
-                    rtb_Product3 += 360.0;
-                  }
-
-                  absx = std::abs(rtb_Product3);
-                }
-
-                if (absx <= 45.0) {
-                  rtb_Product3 *= 0.017453292519943295;
-                  b_n = 0;
-                } else if (absx <= 135.0) {
-                  if (rtb_Product3 > 0.0) {
-                    rtb_Product3 = (rtb_Product3 - 90.0) * 0.017453292519943295;
-                    b_n = 1;
-                  } else {
-                    rtb_Product3 = (rtb_Product3 + 90.0) * 0.017453292519943295;
-                    b_n = -1;
-                  }
-                } else if (rtb_Product3 > 0.0) {
-                  rtb_Product3 = (rtb_Product3 - 180.0) * 0.017453292519943295;
-                  b_n = 2;
-                } else {
-                  rtb_Product3 = (rtb_Product3 + 180.0) * 0.017453292519943295;
-                  b_n = -2;
-                }
-
-                switch (b_n) {
-                 case 0:
-                  theta = std::cos(rtb_Product3);
-                  break;
-
-                 case 1:
-                  theta = -std::sin(rtb_Product3);
-                  break;
-
-                 case -1:
-                  theta = std::sin(rtb_Product3);
-                  break;
-
-                 default:
-                  theta = -std::cos(rtb_Product3);
-                  break;
-                }
-              }
-
-              if (rtIsInf(arg[2]) || rtIsNaN(arg[2])) {
-                rtb_Product3 = (rtNaN);
-              } else {
-                rtb_Product3 = rt_remd_snf(arg[2], 360.0);
-                absx = std::abs(rtb_Product3);
-                if (absx > 180.0) {
-                  if (rtb_Product3 > 0.0) {
-                    rtb_Product3 -= 360.0;
-                  } else {
-                    rtb_Product3 += 360.0;
-                  }
-
-                  absx = std::abs(rtb_Product3);
-                }
-
-                if (absx <= 45.0) {
-                  rtb_Product3 *= 0.017453292519943295;
-                  b_n = 0;
-                } else if (absx <= 135.0) {
-                  if (rtb_Product3 > 0.0) {
-                    rtb_Product3 = (rtb_Product3 - 90.0) * 0.017453292519943295;
-                    b_n = 1;
-                  } else {
-                    rtb_Product3 = (rtb_Product3 + 90.0) * 0.017453292519943295;
-                    b_n = -1;
-                  }
-                } else if (rtb_Product3 > 0.0) {
-                  rtb_Product3 = (rtb_Product3 - 180.0) * 0.017453292519943295;
-                  b_n = 2;
-                } else {
-                  rtb_Product3 = (rtb_Product3 + 180.0) * 0.017453292519943295;
-                  b_n = -2;
-                }
-
-                switch (b_n) {
-                 case 0:
-                  rtb_Product3 = std::cos(rtb_Product3);
-                  break;
-
-                 case 1:
-                  rtb_Product3 = -std::sin(rtb_Product3);
-                  break;
-
-                 case -1:
-                  rtb_Product3 = std::sin(rtb_Product3);
-                  break;
-
-                 default:
-                  rtb_Product3 = -std::cos(rtb_Product3);
-                  break;
-                }
-              }
-
-              sind(arg);
-              p[3] = arg[0];
-              p[4] = arg[1];
-              p[5] = arg[2];
+              yb[0] = ya[0];
+              yb[1] = ya[1];
+              yb[2] = absx;
+              cosd(yb);
+              sind(ya);
+              P_0[3] = ya[0];
+              P_0[1] = yb[1];
+              P_0[4] = ya[1];
+              P_0[2] = yb[2];
+              P_0[5] = ya[2];
 
               // :  q1xp1 = cross(q(1,:),p(1,:));
-              arg[2] = q[0] * p[3] - q[3] * oa_idx_0;
+              ya[0] = rtDW.Pz_b[0] * up_tmp_0 - P_0[3] * up_tmp_1;
+              ya[1] = yb[0] * up_tmp_1 - rtDW.Pz_b[0] * up_tmp;
+              ya[2] = up_tmp * P_0[3] - yb[0] * up_tmp_0;
 
               // :  q2xp2 = cross(q(2,:),p(2,:));
-              ct[2] = q[1] * p[4] - q[4] * theta;
+              yb[0] = rtDW.Pz_b[1] * up_tmp_3 - P_0[4] * up_tmp_4;
+              yb[1] = P_0[1] * up_tmp_4 - rtDW.Pz_b[1] * up_tmp_2;
+              yb[2] = up_tmp_2 * P_0[4] - P_0[1] * up_tmp_3;
 
               // :  q3xp3 = cross(q(3,:),p(3,:));
-              absx = q[2] * p[5] - q[5] * rtb_Product3;
+              yc_idx_2 = theta * P_0[5] - P_0[2] * rtb_Product1;
 
               // :  if min(abs([q1xp1(3) q2xp2(3) q3xp3(3)])) == 0.0
-              st[0] = std::abs(arg[2]);
-              st[1] = std::abs(ct[2]);
-              st[2] = std::abs(absx);
-              if (minimum(st) == 0.0) {
+              xa[0] = std::abs(ya[2]);
+              xa[1] = std::abs(yb[2]);
+              xa[2] = std::abs(yc_idx_2);
+              if (minimum(xa) == 0.0) {
                 // :  cycles = -3;
-                idx = -3;
+                cycles = -3;
                 guard1 = true;
-                exitg2 = 1;
+                exitg1 = 1;
               } else {
                 // :  if det([q1xp1/q1xp1(3); q2xp2/q2xp2(3); q3xp3/q3xp3(3)]) == 0.0 
-                c_oc = (q[3] * -0.57735026918962573 - q[6] * p[3]) / arg[2];
-                arg_0[0] = c_oc;
-                b_oc_idx_1 = (q[4] * -0.57735026918962573 - q[7] * p[4]) / ct[2];
-                arg_0[1] = b_oc_idx_1;
-                st_0 = (q[5] * -0.57735026918962573 - q[8] * p[5]) / absx;
-                arg_0[2] = st_0;
-                oa_idx_0 = (q[6] * oa_idx_0 - q[0] * -0.57735026918962573) /
-                  arg[2];
-                arg_0[3] = oa_idx_0;
-                theta = (q[7] * theta - q[1] * -0.57735026918962573) / ct[2];
-                arg_0[4] = theta;
-                rtb_Product3 = (q[8] * rtb_Product3 - q[2] *
-                                -0.57735026918962573) / absx;
-                arg_0[5] = rtb_Product3;
-                b_oc_idx_0 = arg[2] / arg[2];
-                arg_0[6] = b_oc_idx_0;
-                od = ct[2] / ct[2];
-                arg_0[7] = od;
-                absx /= absx;
-                arg_0[8] = absx;
-                if (det(arg_0) == 0.0) {
+                st = ya[0] / ya[2];
+                ya_0[0] = st;
+                absx = yb[0] / yb[2];
+                ya_0[1] = absx;
+                b_n = (rtDW.Pz_b[2] * rtb_Product1 - P_0[5] * maxval) / yc_idx_2;
+                ya_0[2] = b_n;
+                rtb_Product1 = ya[1] / ya[2];
+                ya_0[3] = rtb_Product1;
+                rtb_attitude_idx_0 = yb[1] / yb[2];
+                ya_0[4] = rtb_attitude_idx_0;
+                theta = (P_0[2] * maxval - rtDW.Pz_b[2] * theta) / yc_idx_2;
+                ya_0[5] = theta;
+                maxval = ya[2] / ya[2];
+                ya_0[6] = maxval;
+                up_tmp = yb[2] / yb[2];
+                ya_0[7] = up_tmp;
+                yc_idx_2 /= yc_idx_2;
+                ya_0[8] = yc_idx_2;
+                if (det(ya_0) == 0.0) {
                   // :  cycles = -4;
-                  idx = -4;
+                  cycles = -4;
                   guard1 = true;
-                  exitg2 = 1;
+                  exitg1 = 1;
                 } else {
                   // :  T = quaternion(([q1xp1/q1xp1(3); q2xp2/q2xp2(3); q3xp3/q3xp3(3)]\(0.02*theta_err))','rotvec')*T; 
-                  arg_0[0] = c_oc;
-                  arg_0[1] = b_oc_idx_1;
-                  arg_0[2] = st_0;
-                  st[0] = 0.02 * rtb_Product1;
-                  arg_0[3] = oa_idx_0;
-                  arg_0[4] = theta;
-                  arg_0[5] = rtb_Product3;
-                  st[1] = 0.02 * rtb_Product2;
-                  arg_0[6] = b_oc_idx_0;
-                  arg_0[7] = od;
-                  arg_0[8] = absx;
-                  st[2] = 0.02 * b_oc_idx_2;
-                  mldivide(arg_0, st, ct);
-                  rtb_Product3 = 1.0;
-                  absx = 0.0;
-                  rtb_Product1 = 0.0;
-                  rtb_Product2 = 0.0;
-                  theta = std::sqrt((ct[0] * ct[0] + ct[1] * ct[1]) + ct[2] *
-                                    ct[2]);
-                  st_0 = std::sin(theta / 2.0);
-                  if (theta != 0.0) {
-                    ct[0] = ct[0] / theta * st_0;
-                    ct[1] = ct[1] / theta * st_0;
-                    rtb_Product3 = std::cos(theta / 2.0);
-                    absx = ct[0];
-                    rtb_Product1 = ct[1];
-                    rtb_Product2 = ct[2] / theta * st_0;
+                  xb[0] *= 0.02;
+                  P_0[0] = st;
+                  P_0[1] = absx;
+                  P_0[2] = b_n;
+                  xb[1] *= 0.02;
+                  P_0[3] = rtb_Product1;
+                  P_0[4] = rtb_attitude_idx_0;
+                  P_0[5] = theta;
+                  xb[2] *= 0.02;
+                  P_0[6] = maxval;
+                  P_0[7] = up_tmp;
+                  P_0[8] = yc_idx_2;
+                  r1 = 0;
+                  r2 = 1;
+                  r3 = 2;
+                  maxval = std::abs(st);
+                  absx = std::abs(absx);
+                  if (absx > maxval) {
+                    maxval = absx;
+                    r1 = 1;
+                    r2 = 0;
                   }
 
-                  theta = ((rtb_Product3 * rtDW.T.a - absx * rtDW.T.b) -
-                           rtb_Product1 * rtDW.T.c) - rtb_Product2 * rtDW.T.d;
-                  st_0 = ((rtb_Product3 * rtDW.T.b + absx * rtDW.T.a) +
-                          rtb_Product1 * rtDW.T.d) - rtb_Product2 * rtDW.T.c;
-                  c_oc = ((rtb_Product3 * rtDW.T.c - absx * rtDW.T.d) +
-                          rtb_Product1 * rtDW.T.a) + rtb_Product2 * rtDW.T.b;
-                  rtDW.T.d = ((rtb_Product3 * rtDW.T.d + absx * rtDW.T.c) -
-                              rtb_Product1 * rtDW.T.b) + rtb_Product2 * rtDW.T.a;
-                  rtDW.T.a = theta;
-                  rtDW.T.b = st_0;
-                  rtDW.T.c = c_oc;
-                  b_cycles++;
+                  if (std::abs(b_n) > maxval) {
+                    r1 = 2;
+                    r2 = 1;
+                    r3 = 0;
+                  }
+
+                  P_0[r2] /= P_0[r1];
+                  P_0[r3] /= P_0[r1];
+                  P_0[r2 + 3] -= P_0[r1 + 3] * P_0[r2];
+                  P_0[r3 + 3] -= P_0[r1 + 3] * P_0[r3];
+                  P_0[r2 + 6] -= P_0[r1 + 6] * P_0[r2];
+                  P_0[r3 + 6] -= P_0[r1 + 6] * P_0[r3];
+                  if (std::abs(P_0[r3 + 3]) > std::abs(P_0[r2 + 3])) {
+                    rtemp = r2;
+                    r2 = r3;
+                    r3 = rtemp;
+                  }
+
+                  P_0[r3 + 3] /= P_0[r2 + 3];
+                  P_0[r3 + 6] -= P_0[r3 + 3] * P_0[r2 + 6];
+                  yb[1] = xb[r2] - xb[r1] * P_0[r2];
+                  yb[2] = (xb[r3] - xb[r1] * P_0[r3]) - P_0[r3 + 3] * yb[1];
+                  yb[2] /= P_0[r3 + 6];
+                  yb[0] = xb[r1] - P_0[r1 + 6] * yb[2];
+                  yb[1] -= P_0[r2 + 6] * yb[2];
+                  yb[1] /= P_0[r2 + 3];
+                  yb[0] -= P_0[r1 + 3] * yb[1];
+                  yb[0] /= P_0[r1];
+                  maxval = 1.0;
+                  absx = 0.0;
+                  rtb_Product1 = 0.0;
+                  b_n = 0.0;
+                  ya[0] = yb[0] * yb[0];
+                  ya[1] = yb[1] * yb[1];
+                  ya[2] = yb[2] * yb[2];
+                  theta = std::sqrt((ya[0] + ya[1]) + ya[2]);
+                  st = std::sin(theta / 2.0);
+                  if (theta != 0.0) {
+                    yb[0] = yb[0] / theta * st;
+                    yb[1] = yb[1] / theta * st;
+                    yb[2] = yb[2] / theta * st;
+                    maxval = std::cos(theta / 2.0);
+                    absx = yb[0];
+                    rtb_Product1 = yb[1];
+                    b_n = yb[2];
+                  }
+
+                  theta = rtDW.T.a;
+                  st = rtDW.T.b;
+                  yc_idx_2 = rtDW.T.c;
+                  rtDW.T.a = ((maxval * rtDW.T.a - absx * rtDW.T.b) -
+                              rtb_Product1 * rtDW.T.c) - b_n * rtDW.T.d;
+                  rtDW.T.b = ((maxval * rtDW.T.b + absx * theta) + rtb_Product1 *
+                              rtDW.T.d) - b_n * rtDW.T.c;
+                  rtDW.T.c = ((maxval * rtDW.T.c - absx * rtDW.T.d) +
+                              rtb_Product1 * theta) + b_n * st;
+                  rtDW.T.d = ((maxval * rtDW.T.d + absx * yc_idx_2) -
+                              rtb_Product1 * st) + b_n * theta;
+                  idx++;
                   guard1 = false;
                 }
               }
@@ -1409,9 +1353,9 @@ void wrist_decouplerModelClass::step()
         }
       } else {
         guard1 = true;
-        exitg2 = 1;
+        exitg1 = 1;
       }
-    } while (exitg2 == 0);
+    } while (exitg1 == 0);
 
     if (guard1) {
       // :  T = quaternion(1,0,0,0);
@@ -1421,16 +1365,16 @@ void wrist_decouplerModelClass::step()
       rtDW.T.d = 0.0;
 
       // :  attitude = compact(T);
-      absx = rtDW.T.a;
-      theta = rtDW.T.b;
-      b_oc_idx_1 = rtDW.T.c;
-      c_oc = rtDW.T.d;
+      rtb_attitude_idx_0 = rtDW.T.a;
+      yc_idx_2 = rtDW.T.b;
+      b_n = rtDW.T.b;
+      st = rtDW.T.b;
 
       // :  singularity_reg = 1;
       rtDW.singularity_reg = 1.0;
 
       // :  singularity = singularity_reg;
-      rtY.singularity = rtDW.singularity_reg;
+      rtY.singularity = 1.0;
     }
   }
 
@@ -1441,31 +1385,40 @@ void wrist_decouplerModelClass::step()
   //   Product: '<S13>/Product3'
   //   Sum: '<S13>/Sum'
 
-  rtb_Product3 = std::sqrt(((absx * absx + theta * theta) + b_oc_idx_1 *
-    b_oc_idx_1) + c_oc * c_oc);
+  maxval = std::sqrt(((rtb_attitude_idx_0 * rtb_attitude_idx_0 + yc_idx_2 *
+                       yc_idx_2) + b_n * b_n) + st * st);
 
   // Product: '<S7>/Product'
-  absx /= rtb_Product3;
+  absx = rtb_attitude_idx_0 / maxval;
 
   // Product: '<S7>/Product1'
-  rtb_Product1 = theta / rtb_Product3;
+  rtb_Product1 = yc_idx_2 / maxval;
 
   // Product: '<S7>/Product2'
-  rtb_Product2 = b_oc_idx_1 / rtb_Product3;
+  b_n /= maxval;
 
   // Product: '<S7>/Product3'
-  rtb_Product3 = c_oc / rtb_Product3;
+  maxval = st / maxval;
 
-  // Fcn: '<S4>/fcn2' incorporates:
-  //   Fcn: '<S4>/fcn5'
+  // Fcn: '<S2>/fcn3'
+  theta = (rtb_Product1 * maxval - absx * b_n) * -2.0;
 
-  c_oc = absx * absx;
-  b_oc_idx_1 = rtb_Product1 * rtb_Product1;
-  st_0 = rtb_Product2 * rtb_Product2;
-  oa_idx_0 = rtb_Product3 * rtb_Product3;
+  // Fcn: '<S2>/fcn2' incorporates:
+  //   Fcn: '<S2>/fcn5'
 
-  // Fcn: '<S4>/fcn3'
-  theta = (rtb_Product1 * rtb_Product3 - absx * rtb_Product2) * -2.0;
+  rtb_Gain_o_idx_2 = absx * absx;
+  rtb_Gain_o_idx_1 = rtb_Product1 * rtb_Product1;
+  st = b_n * b_n;
+  yc_idx_2 = maxval * maxval;
+
+  // Gain: '<S3>/Gain' incorporates:
+  //   Fcn: '<S2>/fcn1'
+  //   Fcn: '<S2>/fcn2'
+  //   Trigonometry: '<S6>/Trigonometric Function1'
+
+  rtb_Gain_o_idx_0 = rt_atan2d_snf((rtb_Product1 * b_n + absx * maxval) * 2.0,
+    ((rtb_Gain_o_idx_2 + rtb_Gain_o_idx_1) - st) - yc_idx_2) *
+    57.295779513082323;
 
   // If: '<S8>/If' incorporates:
   //   Constant: '<S10>/Constant'
@@ -1478,70 +1431,451 @@ void wrist_decouplerModelClass::step()
     theta = 1.0;
 
     // End of Outputs for SubSystem: '<S8>/If Action Subsystem'
+  } else if (theta < -1.0) {
+    // Outputs for IfAction SubSystem: '<S8>/If Action Subsystem1' incorporates:
+    //   ActionPort: '<S10>/Action Port'
+
+    theta = 1.0;
+
+    // End of Outputs for SubSystem: '<S8>/If Action Subsystem1'
+  }
+
+  // Gain: '<S3>/Gain' incorporates:
+  //   Fcn: '<S2>/fcn4'
+  //   Fcn: '<S2>/fcn5'
+  //   Trigonometry: '<S6>/Trigonometric Function3'
+
+  rtb_Gain_o_idx_2 = rt_atan2d_snf((b_n * maxval + absx * rtb_Product1) * 2.0,
+    ((rtb_Gain_o_idx_2 - rtb_Gain_o_idx_1) - st) + yc_idx_2) *
+    57.295779513082323;
+
+  // MATLAB Function: '<S1>/ypr2motors' incorporates:
+  //   Inport: '<Root>/arm_bend'
+  //   Inport: '<Root>/plat_off'
+  //   Inport: '<Root>/theta_off'
+
+  // :  if isempty(Pz)
+  if (!rtDW.Pz_not_empty) {
+    // :  Pz = -tand(arm_bend)*[1; 1; 1];
+    if (rtIsInf(rtU.arm_bend) || rtIsNaN(rtU.arm_bend)) {
+      maxval = (rtNaN);
+    } else {
+      maxval = rt_remd_snf(rtU.arm_bend, 360.0);
+      absx = std::abs(maxval);
+      if (absx > 180.0) {
+        if (maxval > 0.0) {
+          maxval -= 360.0;
+        } else {
+          maxval += 360.0;
+        }
+
+        absx = std::abs(maxval);
+      }
+
+      if (absx <= 45.0) {
+        maxval *= 0.017453292519943295;
+        n = 0;
+      } else if (absx <= 135.0) {
+        if (maxval > 0.0) {
+          maxval = (maxval - 90.0) * 0.017453292519943295;
+          n = 1;
+        } else {
+          maxval = (maxval + 90.0) * 0.017453292519943295;
+          n = -1;
+        }
+      } else if (maxval > 0.0) {
+        maxval = (maxval - 180.0) * 0.017453292519943295;
+        n = 2;
+      } else {
+        maxval = (maxval + 180.0) * 0.017453292519943295;
+        n = -2;
+      }
+
+      maxval = std::tan(maxval);
+      if ((n == 1) || (n == -1)) {
+        absx = 1.0 / maxval;
+        maxval = -(1.0 / maxval);
+        if (rtIsInf(maxval) && (n == 1)) {
+          maxval = absx;
+        }
+      }
+    }
+
+    rtDW.Pz_not_empty = true;
+
+    // :  P = [cosd(theta_off) sind(theta_off) Pz];
+    rtDW.Pz[0] = -maxval;
+    yb[0] = rtU.theta_off[0];
+    rtDW.Pz[1] = -maxval;
+    yb[1] = rtU.theta_off[1];
+    rtDW.Pz[2] = -maxval;
+    yb[2] = rtU.theta_off[2];
+    cosd(yb);
+    ya[0] = rtU.theta_off[0];
+    ya[1] = rtU.theta_off[1];
+    ya[2] = rtU.theta_off[2];
+    sind(ya);
+    P_0[0] = yb[0];
+    P_0[3] = ya[0];
+    P_0[1] = yb[1];
+    P_0[4] = ya[1];
+    P_0[2] = yb[2];
+    P_0[5] = ya[2];
+
+    // :  Q = [cosd(plat_off) sind(plat_off) [0; 0; 0]];
+    yb[0] = rtU.plat_off[0];
+    yb[1] = rtU.plat_off[1];
+    yb[2] = rtU.plat_off[2];
+    cosd(yb);
+    ya[0] = rtU.plat_off[0];
+    ya[1] = rtU.plat_off[1];
+    ya[2] = rtU.plat_off[2];
+    sind(ya);
+    rtDW.Q[0] = yb[0];
+    rtDW.Q[3] = ya[0];
+    rtDW.Q[6] = 0.0;
+    rtDW.Q[1] = yb[1];
+    rtDW.Q[4] = ya[1];
+    rtDW.Q[7] = 0.0;
+    rtDW.Q[2] = yb[2];
+    rtDW.Q[5] = ya[2];
+    rtDW.Q[8] = 0.0;
+
+    // :  PQ = [P(1,:)*Q(1,:)' P(2,:)*Q(2,:)' P(3,:)*Q(3,:)'];
+    rtDW.PQ[0] = (P_0[0] * rtDW.Q[0] + P_0[3] * rtDW.Q[3]) + rtDW.Pz[0] * 0.0;
+    rtDW.PQ[1] = (P_0[1] * rtDW.Q[1] + P_0[4] * rtDW.Q[4]) + rtDW.Pz[1] * 0.0;
+    rtDW.PQ[2] = (P_0[2] * rtDW.Q[2] + P_0[5] * rtDW.Q[5]) + rtDW.Pz[2] * 0.0;
+
+    // :  last_theta_ok = [0;0;0];
+  }
+
+  // Switch: '<S1>/Switch' incorporates:
+  //   Gain: '<S1>/Gain'
+  //   Inport: '<Root>/RL'
+  //   Inport: '<Root>/ypr_star'
+
+  // :  q = Q*eul2rotm(deg2rad(ypr'))';
+  if (rtU.RL) {
+    absx = -rtU.ypr_star[0];
   } else {
-    if (theta < -1.0) {
-      // Outputs for IfAction SubSystem: '<S8>/If Action Subsystem1' incorporates:
-      //   ActionPort: '<S10>/Action Port'
+    absx = rtU.ypr_star[0];
+  }
 
-      theta = 1.0;
+  // MATLAB Function: '<S1>/ypr2motors' incorporates:
+  //   Gain: '<S1>/Gain'
+  //   Inport: '<Root>/ypr_star'
+  //   Switch: '<S1>/Switch'
 
-      // End of Outputs for SubSystem: '<S8>/If Action Subsystem1'
+  absx *= 0.017453292519943295;
+  rtb_Gain_o_idx_1 = std::cos(absx);
+  maxval = std::sin(absx);
+  absx = 0.017453292519943295 * rtU.ypr_star[1];
+  b_n = std::cos(absx);
+  st = std::sin(absx);
+
+  // Switch: '<S1>/Switch' incorporates:
+  //   Gain: '<S1>/Gain'
+  //   Inport: '<Root>/RL'
+  //   Inport: '<Root>/ypr_star'
+
+  if (rtU.RL) {
+    absx = -rtU.ypr_star[2];
+  } else {
+    absx = rtU.ypr_star[2];
+  }
+
+  // MATLAB Function: '<S1>/ypr2motors' incorporates:
+  //   Inport: '<Root>/theta_off'
+  //   Switch: '<S1>/Switch'
+
+  absx *= 0.017453292519943295;
+  rtb_Product1 = std::cos(absx);
+  absx = std::sin(absx);
+  b[0] = rtb_Gain_o_idx_1 * b_n;
+  yc_idx_2 = st * absx;
+  b[3] = yc_idx_2 * rtb_Gain_o_idx_1 - maxval * rtb_Product1;
+  rtb_attitude_idx_0 = st * rtb_Product1;
+  b[6] = rtb_attitude_idx_0 * rtb_Gain_o_idx_1 + maxval * absx;
+  b[1] = maxval * b_n;
+  b[4] = yc_idx_2 * maxval + rtb_Gain_o_idx_1 * rtb_Product1;
+  b[7] = rtb_attitude_idx_0 * maxval - rtb_Gain_o_idx_1 * absx;
+  b[2] = -st;
+  b[5] = b_n * absx;
+  b[8] = b_n * rtb_Product1;
+  for (r1 = 0; r1 < 3; r1++) {
+    rtb_Gain_o_idx_1 = rtDW.Q[r1 + 3];
+    maxval = rtDW.Q[r1];
+    absx = rtDW.Q[r1 + 6];
+    for (idx = 0; idx < 3; idx++) {
+      P_0[r1 + 3 * idx] = (b[idx + 3] * rtb_Gain_o_idx_1 + maxval * b[idx]) +
+        b[idx + 6] * absx;
     }
   }
 
-  // End of If: '<S8>/If'
+  // :  m = [sqrt(q(1,1)^2+q(1,2)^2) sqrt(q(2,1)^2+q(2,2)^2) sqrt(q(3,1)^2+q(3,2)^2)]; 
+  absx = std::sqrt(P_0[0] * P_0[0] + P_0[3] * P_0[3]);
+  tmp = std::sqrt(P_0[1] * P_0[1] + P_0[4] * P_0[4]);
+  tmp_0 = std::sqrt(P_0[2] * P_0[2] + P_0[5] * P_0[5]);
 
-  // Outport: '<Root>/ypr_meas' incorporates:
-  //   Fcn: '<S4>/fcn1'
-  //   Fcn: '<S4>/fcn2'
-  //   Fcn: '<S4>/fcn4'
-  //   Fcn: '<S4>/fcn5'
-  //   Gain: '<S2>/Gain3'
-  //   Trigonometry: '<S6>/Trigonometric Function1'
-  //   Trigonometry: '<S6>/Trigonometric Function3'
+  // :  if min(abs(m)) == 0
+  ya[0] = absx;
+  ya[1] = tmp;
+  ya[2] = tmp_0;
+  if (minimum(ya) == 0.0) {
+    // :  theta = last_theta_ok;
+    xb[0] = rtDW.last_theta_ok[0];
+    xb[1] = rtDW.last_theta_ok[1];
+    xb[2] = rtDW.last_theta_ok[2];
+
+    // Outport: '<Root>/out_of_range'
+    // :  out_of_range = 1;
+    rtY.out_of_range = 1.0;
+  } else {
+    // :  arg = [(PQ(1)-Pz(1)*q(1,3))/m(1); (PQ(2)-Pz(2)*q(2,3))/m(2); (PQ(3)-Pz(3)*q(3,3))/m(3)]; 
+    xa[0] = (rtDW.PQ[0] - rtDW.Pz[0] * P_0[6]) / absx;
+    xa[1] = (rtDW.PQ[1] - rtDW.Pz[1] * P_0[7]) / tmp;
+    xa[2] = (rtDW.PQ[2] - rtDW.Pz[2] * P_0[8]) / tmp_0;
+
+    // :  if max(abs(arg)) > 1
+    ya[0] = std::abs(xa[0]);
+    ya[1] = std::abs(xa[1]);
+    ya[2] = std::abs(xa[2]);
+    if (!rtIsNaN(ya[0])) {
+      idx = 1;
+    } else {
+      idx = 0;
+      r1 = 2;
+      exitg2 = false;
+      while ((!exitg2) && (r1 < 4)) {
+        if (!rtIsNaN(ya[r1 - 1])) {
+          idx = r1;
+          exitg2 = true;
+        } else {
+          r1++;
+        }
+      }
+    }
+
+    if (idx == 0) {
+      maxval = ya[0];
+    } else {
+      maxval = ya[idx - 1];
+      for (r1 = idx + 1; r1 < 4; r1++) {
+        absx = ya[r1 - 1];
+        if (maxval < absx) {
+          maxval = absx;
+        }
+      }
+    }
+
+    if (maxval > 1.0) {
+      // :  theta = last_theta_ok;
+      xb[0] = rtDW.last_theta_ok[0];
+      xb[1] = rtDW.last_theta_ok[1];
+      xb[2] = rtDW.last_theta_ok[2];
+
+      // Outport: '<Root>/out_of_range'
+      // :  out_of_range = 1;
+      rtY.out_of_range = 1.0;
+    } else {
+      // :  theta = atan2d(q(:,2),q(:,1))+[90; 90; 90;]-asind(arg);
+      rtb_Gain_o_idx_1 = (57.295779513082323 * rt_atan2d_snf(P_0[3], P_0[0]) +
+                          90.0) - 57.295779513082323 * std::asin(xa[0]);
+      maxval = (57.295779513082323 * rt_atan2d_snf(P_0[4], P_0[1]) + 90.0) -
+        57.295779513082323 * std::asin(xa[1]);
+      absx = (57.295779513082323 * rt_atan2d_snf(P_0[5], P_0[2]) + 90.0) -
+        57.295779513082323 * std::asin(xa[2]);
+
+      // :  gap = abs(Wrap180([(theta(2)-theta(1)) (theta(3)-theta(2)) (theta(1)-theta(3))])); 
+      yb[0] = maxval - rtb_Gain_o_idx_1;
+      yb[1] = absx - maxval;
+      yb[2] = rtb_Gain_o_idx_1 - absx;
+
+      // :  y = x;
+      // :  for i=1:3
+      // :  while y(i) > 180.0
+      while (yb[0] > 180.0) {
+        // :  y(i) = y(i) - 360.0;
+        yb[0] -= 360.0;
+      }
+
+      // :  while y(i) < -180.0
+      while (yb[0] < -180.0) {
+        // :  y(i) = y(i) + 360.0;
+        yb[0] += 360.0;
+      }
+
+      ya[0] = std::abs(yb[0]);
+
+      // :  while y(i) > 180.0
+      while (yb[1] > 180.0) {
+        // :  y(i) = y(i) - 360.0;
+        yb[1] -= 360.0;
+      }
+
+      // :  while y(i) < -180.0
+      while (yb[1] < -180.0) {
+        // :  y(i) = y(i) + 360.0;
+        yb[1] += 360.0;
+      }
+
+      ya[1] = std::abs(yb[1]);
+
+      // :  while y(i) > 180.0
+      while (yb[2] > 180.0) {
+        // :  y(i) = y(i) - 360.0;
+        yb[2] -= 360.0;
+      }
+
+      // :  while y(i) < -180.0
+      while (yb[2] < -180.0) {
+        // :  y(i) = y(i) + 360.0;
+        yb[2] += 360.0;
+      }
+
+      ya[2] = std::abs(yb[2]);
+
+      // :  if min(gap) < 33.0
+      if (minimum(ya) < 33.0) {
+        // :  theta = last_theta_ok;
+        xb[0] = rtDW.last_theta_ok[0];
+        xb[1] = rtDW.last_theta_ok[1];
+        xb[2] = rtDW.last_theta_ok[2];
+
+        // Outport: '<Root>/out_of_range'
+        // :  out_of_range = 1;
+        rtY.out_of_range = 1.0;
+      } else {
+        // :  theta = Wrap180(theta-theta_off);
+        // :  y = x;
+        // :  for i=1:3
+        // :  last_theta_ok = theta;
+        xb[0] = rtb_Gain_o_idx_1 - rtU.theta_off[0];
+
+        // :  while y(i) > 180.0
+        while (xb[0] > 180.0) {
+          // :  y(i) = y(i) - 360.0;
+          xb[0] -= 360.0;
+        }
+
+        // :  while y(i) < -180.0
+        while (xb[0] < -180.0) {
+          // :  y(i) = y(i) + 360.0;
+          xb[0] += 360.0;
+        }
+
+        rtDW.last_theta_ok[0] = xb[0];
+        xb[1] = maxval - rtU.theta_off[1];
+
+        // :  while y(i) > 180.0
+        while (xb[1] > 180.0) {
+          // :  y(i) = y(i) - 360.0;
+          xb[1] -= 360.0;
+        }
+
+        // :  while y(i) < -180.0
+        while (xb[1] < -180.0) {
+          // :  y(i) = y(i) + 360.0;
+          xb[1] += 360.0;
+        }
+
+        rtDW.last_theta_ok[1] = xb[1];
+        xb[2] = absx - rtU.theta_off[2];
+
+        // :  while y(i) > 180.0
+        while (xb[2] > 180.0) {
+          // :  y(i) = y(i) - 360.0;
+          xb[2] -= 360.0;
+        }
+
+        // :  while y(i) < -180.0
+        while (xb[2] < -180.0) {
+          // :  y(i) = y(i) + 360.0;
+          xb[2] += 360.0;
+        }
+
+        rtDW.last_theta_ok[2] = xb[2];
+
+        // Outport: '<Root>/out_of_range' incorporates:
+        //   Inport: '<Root>/theta_off'
+
+        // :  out_of_range = 0;
+        rtY.out_of_range = 0.0;
+      }
+    }
+  }
+
+  // End of Outputs for SubSystem: '<Root>/wrist_decoupler'
+
+  // Outport: '<Root>/theta_star'
+  rtY.theta_star[0] = xb[0];
+
+  // Outputs for Atomic SubSystem: '<Root>/wrist_decoupler'
+  // Switch: '<S1>/Switch1' incorporates:
+  //   Inport: '<Root>/RL'
+
+  if (rtU.RL) {
+    // Outport: '<Root>/ypr_meas' incorporates:
+    //   Gain: '<S1>/Gain1'
+
+    rtY.ypr_meas[0] = -rtb_Gain_o_idx_0;
+  } else {
+    // Outport: '<Root>/ypr_meas'
+    rtY.ypr_meas[0] = rtb_Gain_o_idx_0;
+  }
+
+  // End of Outputs for SubSystem: '<Root>/wrist_decoupler'
+
+  // Outport: '<Root>/theta_star'
+  rtY.theta_star[1] = xb[1];
+
+  // Outputs for Atomic SubSystem: '<Root>/wrist_decoupler'
+  // If: '<S8>/If' incorporates:
+  //   Gain: '<S3>/Gain'
+  //   Outport: '<Root>/ypr_meas'
+  //   Switch: '<S1>/Switch1'
   //   Trigonometry: '<S6>/trigFcn'
 
-  rtY.ypr_meas[0] = 57.295779513082323 * rt_atan2d_snf((rtb_Product1 *
-    rtb_Product2 + absx * rtb_Product3) * 2.0, ((c_oc + b_oc_idx_1) - st_0) -
-    oa_idx_0);
   rtY.ypr_meas[1] = 57.295779513082323 * std::asin(theta);
-  rtY.ypr_meas[2] = 57.295779513082323 * rt_atan2d_snf((rtb_Product2 *
-    rtb_Product3 + absx * rtb_Product1) * 2.0, ((c_oc - b_oc_idx_1) - st_0) +
-    oa_idx_0);
+
+  // End of Outputs for SubSystem: '<Root>/wrist_decoupler'
+
+  // Outport: '<Root>/theta_star'
+  rtY.theta_star[2] = xb[2];
+
+  // Outputs for Atomic SubSystem: '<Root>/wrist_decoupler'
+  // Switch: '<S1>/Switch1' incorporates:
+  //   Inport: '<Root>/RL'
+
+  if (rtU.RL) {
+    // Outport: '<Root>/ypr_meas' incorporates:
+    //   Gain: '<S1>/Gain1'
+
+    rtY.ypr_meas[2] = -rtb_Gain_o_idx_2;
+  } else {
+    // Outport: '<Root>/ypr_meas'
+    rtY.ypr_meas[2] = rtb_Gain_o_idx_2;
+  }
 
   // Outport: '<Root>/cycles' incorporates:
-  //   MATLAB Function: '<S2>/motors2quat'
+  //   MATLAB Function: '<S1>/motors2ypr'
 
-  rtY.cycles = idx;
+  rtY.cycles = cycles;
 
-  // End of Outputs for SubSystem: '<S1>/motors2ypr'
   // End of Outputs for SubSystem: '<Root>/wrist_decoupler'
 }
 
 // Model initialize function
-void wrist_decouplerModelClass::initialize()
+void wrist_decoupler::initialize()
 {
   // Registration code
 
   // initialize non-finites
   rt_InitInfAndNaN(sizeof(real_T));
-
-  // SystemInitialize for Atomic SubSystem: '<Root>/wrist_decoupler'
-  // SystemInitialize for Atomic SubSystem: '<S1>/motors2ypr'
-  // SystemInitialize for MATLAB Function: '<S2>/motors2quat'
-  // :  T = quaternion(1,0,0,0);
-  rtDW.T.a = 1.0;
-  rtDW.T.b = 0.0;
-  rtDW.T.c = 0.0;
-  rtDW.T.d = 0.0;
-
-  // End of SystemInitialize for SubSystem: '<S1>/motors2ypr'
-  // End of SystemInitialize for SubSystem: '<Root>/wrist_decoupler'
-  // :  singularity_reg = 0;
 }
 
 // Constructor
-wrist_decouplerModelClass::wrist_decouplerModelClass() :
+wrist_decoupler::wrist_decoupler() :
   rtU(),
   rtY(),
   rtDW(),
@@ -1551,13 +1885,13 @@ wrist_decouplerModelClass::wrist_decouplerModelClass() :
 }
 
 // Destructor
-wrist_decouplerModelClass::~wrist_decouplerModelClass()
+wrist_decoupler::~wrist_decoupler()
 {
   // Currently there is no destructor body generated.
 }
 
 // Real-Time Model get method
-wrist_decouplerModelClass::RT_MODEL * wrist_decouplerModelClass::getRTM()
+wrist_decoupler::RT_MODEL * wrist_decoupler::getRTM()
 {
   return (&rtM);
 }

@@ -1,15 +1,15 @@
 //
 // Non-Degree Granting Education License -- for use at non-degree
-// granting, nonprofit, educational organizations only. Not for
-// government, commercial, or other organizational use.
+// granting, nonprofit, education, and research organizations only. Not
+// for commercial or industrial use.
 //
 // File: wrist_decoupler.h
 //
 // Code generated for Simulink model 'wrist_decoupler'.
 //
-// Model version                  : 2.3
-// Simulink Coder version         : 9.4 (R2020b) 29-Jul-2020
-// C/C++ source code generated on : Tue Nov 17 12:30:21 2020
+// Model version                  : 7.13
+// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
+// C/C++ source code generated on : Tue Jul 25 11:18:40 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,14 +20,8 @@
 //
 #ifndef RTW_HEADER_wrist_decoupler_h_
 #define RTW_HEADER_wrist_decoupler_h_
+#include "rtwtypes.h"
 #include <stddef.h>
-#include "rtwtypes.h"
-#include <cfloat>
-#include <cmath>
-#include <cstring>
-#include "rtwtypes.h"
-
-// Model Code Variants
 
 // Macros for accessing real-time model data structure
 #ifndef rtmGetErrorStatus
@@ -38,11 +32,11 @@
 #define rtmSetErrorStatus(rtm, val)    ((rtm)->errorStatus = (val))
 #endif
 
-// Custom Type definition for MATLAB Function: '<S2>/motors2quat'
-#ifndef struct_tag_v7m7NEstuUdktFlQqRQnjB
-#define struct_tag_v7m7NEstuUdktFlQqRQnjB
+// Custom Type definition for MATLAB Function: '<S1>/motors2ypr'
+#ifndef struct_quaternion
+#define struct_quaternion
 
-struct tag_v7m7NEstuUdktFlQqRQnjB
+struct quaternion
 {
   real_T a;
   real_T b;
@@ -50,20 +44,17 @@ struct tag_v7m7NEstuUdktFlQqRQnjB
   real_T d;
 };
 
-#endif                                 //struct_tag_v7m7NEstuUdktFlQqRQnjB
+#endif                                 // struct_quaternion
 
-#ifndef typedef_quaternion
-#define typedef_quaternion
-
-typedef tag_v7m7NEstuUdktFlQqRQnjB quaternion;
-
-#endif                                 //typedef_quaternion
-
-extern "C" {
+extern "C"
+{
   static real_T rtGetNaN(void);
   static real32_T rtGetNaNF(void);
 }                                      // extern "C"
-  extern "C"
+
+#define NOT_USING_NONFINITE_LITERALS   1
+
+extern "C"
 {
   extern real_T rtInf;
   extern real_T rtMinusInf;
@@ -76,74 +67,82 @@ extern "C" {
   static boolean_T rtIsInfF(real32_T value);
   static boolean_T rtIsNaN(real_T value);
   static boolean_T rtIsNaNF(real32_T value);
-  typedef struct {
+  struct BigEndianIEEEDouble {
     struct {
       uint32_T wordH;
       uint32_T wordL;
     } words;
-  } BigEndianIEEEDouble;
+  };
 
-  typedef struct {
+  struct LittleEndianIEEEDouble {
     struct {
       uint32_T wordL;
       uint32_T wordH;
     } words;
-  } LittleEndianIEEEDouble;
+  };
 
-  typedef struct {
+  struct IEEESingle {
     union {
       real32_T wordLreal;
       uint32_T wordLuint;
     } wordL;
-  } IEEESingle;
+  };
 }                                      // extern "C"
 
-extern "C" {
+extern "C"
+{
   static real_T rtGetInf(void);
   static real32_T rtGetInfF(void);
   static real_T rtGetMinusInf(void);
   static real32_T rtGetMinusInfF(void);
 }                                      // extern "C"
-  // Class declaration for model wrist_decoupler
-  class wrist_decouplerModelClass
+
+// Class declaration for model wrist_decoupler
+class wrist_decoupler
 {
   // public data and function members
  public:
   // Block signals and states (default storage) for system '<Root>'
-  typedef struct {
-    quaternion T;                      // '<S2>/motors2quat'
-    real_T singularity_reg;            // '<S2>/motors2quat'
-  } DW;
-
-  // Constant parameters (default storage)
-  typedef struct {
-    // Pooled Parameter (Expression: Q)
-    //  Referenced by:
-    //    '<S1>/ypr2motors'
-    //    '<S2>/motors2quat'
-
-    real_T pooled4[9];
-  } ConstP;
+  struct DW {
+    quaternion T;                      // '<S1>/motors2ypr'
+    real_T Pz[3];                      // '<S1>/ypr2motors'
+    real_T PQ[3];                      // '<S1>/ypr2motors'
+    real_T Q[9];                       // '<S1>/ypr2motors'
+    real_T last_theta_ok[3];           // '<S1>/ypr2motors'
+    real_T Q_p[9];                     // '<S1>/motors2ypr'
+    real_T PQ_f[3];                    // '<S1>/motors2ypr'
+    real_T Pz_b[3];                    // '<S1>/motors2ypr'
+    real_T singularity_reg;            // '<S1>/motors2ypr'
+    boolean_T Pz_not_empty;            // '<S1>/ypr2motors'
+    boolean_T singularity_reg_not_empty;// '<S1>/motors2ypr'
+  };
 
   // External inputs (root inport signals with default storage)
-  typedef struct {
-    real_T theta_meas[3];              // '<Root>/theta_meas'
-    real_T ypr[3];                     // '<Root>/ypr_star'
-  } ExtU;
+  struct ExtU {
+    real_T theta_diff[3];              // '<Root>/theta_diff'
+    real_T theta_off[3];               // '<Root>/theta_off'
+    real_T plat_off[3];                // '<Root>/plat_off'
+    real_T arm_bend;                   // '<Root>/arm_bend'
+    real_T ypr_star[3];                // '<Root>/ypr_star'
+    boolean_T RL;                      // '<Root>/RL'
+  };
 
   // External outputs (root outports fed by signals with default storage)
-  typedef struct {
+  struct ExtY {
     real_T theta_star[3];              // '<Root>/theta_star'
     real_T out_of_range;               // '<Root>/out_of_range'
     real_T ypr_meas[3];                // '<Root>/ypr_meas'
     real_T singularity;                // '<Root>/singularity'
     real_T cycles;                     // '<Root>/cycles'
-  } ExtY;
+  };
 
   // Real-time Model Data Structure
   struct RT_MODEL {
     const char_T * volatile errorStatus;
   };
+
+  // Real-Time Model get method
+  wrist_decoupler::RT_MODEL * getRTM();
 
   // External inputs
   ExtU rtU;
@@ -158,34 +157,26 @@ extern "C" {
   void step();
 
   // Constructor
-  wrist_decouplerModelClass();
+  wrist_decoupler();
 
   // Destructor
-  ~wrist_decouplerModelClass();
-
-  // Real-Time Model get method
-  wrist_decouplerModelClass::RT_MODEL * getRTM();
+  ~wrist_decoupler();
 
   // private data and function members
  private:
-  // Block signals and states
+  // Block states
   DW rtDW;
+
+  // private member function(s) for subsystem '<Root>'
+  void cosd(real_T x[3]);
+  void sind(real_T x[3]);
+  real_T maximum(const real_T x[3]);
+  real_T minimum(const real_T x[3]);
+  real_T det(const real_T x[9]);
 
   // Real-Time Model
   RT_MODEL rtM;
-
-  // private member function(s) for subsystem '<Root>'
-  real_T maximum(const real_T x[3]);
-  real_T minimum(const real_T x[3]);
-  void sind(real_T x[3]);
-  real_T det(const real_T x[9]);
-  void mldivide(const real_T A[9], const real_T B_0[3], real_T Y[3]);
-}
-
-;
-
-// Constant parameters (default storage)
-extern const wrist_decouplerModelClass::ConstP rtConstP;
+};
 
 //-
 //  The generated code includes comments that allow you to trace directly
@@ -199,25 +190,25 @@ extern const wrist_decouplerModelClass::ConstP rtConstP;
 //  MATLAB hilite_system command to trace the generated code back
 //  to the parent model.  For example,
 //
-//  hilite_system('ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler')    - opens subsystem ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler
-//  hilite_system('ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/Kp') - opens and selects block Kp
+//  hilite_system('spherical_wrist/Position_Controller/wrist_decoupler')    - opens subsystem spherical_wrist/Position_Controller/wrist_decoupler
+//  hilite_system('spherical_wrist/Position_Controller/wrist_decoupler/Kp') - opens and selects block Kp
 //
 //  Here is the system hierarchy for this model
 //
-//  '<Root>' : 'ok_wrist_simple_motors_3/Position_Controller'
-//  '<S1>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler'
-//  '<S2>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr'
-//  '<S3>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/ypr2motors'
-//  '<S4>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1'
-//  '<S5>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/motors2quat'
-//  '<S6>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1/Angle Calculation'
-//  '<S7>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1/Quaternion Normalize'
-//  '<S8>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1/Angle Calculation/Protect asincos input'
-//  '<S9>'   : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1/Angle Calculation/Protect asincos input/If Action Subsystem'
-//  '<S10>'  : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1/Angle Calculation/Protect asincos input/If Action Subsystem1'
-//  '<S11>'  : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1/Angle Calculation/Protect asincos input/If Action Subsystem2'
-//  '<S12>'  : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1/Quaternion Normalize/Quaternion Modulus'
-//  '<S13>'  : 'ok_wrist_simple_motors_3/Position_Controller/wrist_decoupler/motors2ypr/Quaternions to Rotation Angles1/Quaternion Normalize/Quaternion Modulus/Quaternion Norm'
+//  '<Root>' : 'spherical_wrist/Position_Controller'
+//  '<S1>'   : 'spherical_wrist/Position_Controller/wrist_decoupler'
+//  '<S2>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles'
+//  '<S3>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Radians to Degrees'
+//  '<S4>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/motors2ypr'
+//  '<S5>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/ypr2motors'
+//  '<S6>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation'
+//  '<S7>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize'
+//  '<S8>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input'
+//  '<S9>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem'
+//  '<S10>'  : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem1'
+//  '<S11>'  : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem2'
+//  '<S12>'  : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize/Quaternion Modulus'
+//  '<S13>'  : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize/Quaternion Modulus/Quaternion Norm'
 
 #endif                                 // RTW_HEADER_wrist_decoupler_h_
 

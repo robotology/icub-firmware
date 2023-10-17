@@ -41,17 +41,17 @@
 #include "hal_trace.h"
 #include "stdio.h"
 
-#ifdef WRIST_MK2
+//#ifdef WRIST_MK2
 #include "JointSet.h"
-#endif
+//#endif
 
 #include "Joint.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
 #include "Pid.h"
-#ifndef WRIST_MK2
-#include "JointSet.h"
-#endif
+//#ifndef WRIST_MK2
+//#include "JointSet.h"
+//#endif
 
 // - OPAQUE STRUCT
 
@@ -513,6 +513,52 @@ static void update_jointAndMotor_withJointset_constraints(void)
                 o->joint[j].not_reversible = TRUE;
             }
         }
+        #ifdef WRIST_MK2
+        if(o->jointSet[s].special_constraint == eomc_jsetconstraint_ergocubwrist)
+        {
+            JointSet_init_wrist_decoupler(&(o->jointSet[s]));
+            //init the joint of the set
+            /*Implementation note: I connot move the belong2WristMK2 init in the JointSet_init_wrist_decoupler function, 
+            because the jointset_config functionis still not invoked and the joint_set structure has all pointer to null. */
+            for(int i=0; i<o->set_dim[s]; i++)
+            {
+                int j = o->jos[s][i];
+                o->joint[j].belong2WristMK2 = TRUE;
+            }
+        }
+        #endif
+        
+//#ifdef WRIST_MK2 moved to JointSet_init_wrist_decoupler function
+//        if(o->jointSet[s].special_constraint == eomc_jsetconstraint_ergocubwrist)
+//        {
+//            JointSet *jset_ptr = &(o->jointSet[s]);
+//            if(jset_ptr->is_right_wrist)
+//                jset_ptr->wristDecoupler.rtU.RL = true;
+//            else
+//                jset_ptr->wristDecoupler.rtU.RL = false;
+//            
+//            if(jset_ptr->mk_version == WRIST_MK_VER_2_1)
+//            {
+//                jset_ptr->wristDecoupler.rtU.plat_off[0] =   60.0f; 
+//                jset_ptr->wristDecoupler.rtU.plat_off[1] =  180.0f; 
+//                jset_ptr->wristDecoupler.rtU.plat_off[2] =  300.0f;
+
+//                jset_ptr->wristDecoupler.rtU.theta_off[0] =  60.0f +  60.0f;
+//                jset_ptr->wristDecoupler.rtU.theta_off[1] = 180.0f +  60.0f;
+//                jset_ptr->wristDecoupler.rtU.theta_off[2] = 300.0f +  60.0f;
+//            }
+//            else
+//            {
+//                jset_ptr->wristDecoupler.rtU.plat_off[0] =  85.0f; 
+//                jset_ptr->wristDecoupler.rtU.plat_off[1] = 185.0f;
+//                jset_ptr->wristDecoupler.rtU.plat_off[2] = 280.0f;
+
+//                jset_ptr->wristDecoupler.rtU.theta_off[0] =  85.0f +  60.0f;
+//                jset_ptr->wristDecoupler.rtU.theta_off[1] = 185.0f +  85.0f;
+//                jset_ptr->wristDecoupler.rtU.theta_off[2] = 280.0f + 120.0f;
+//            }
+//        }
+//#endif
     }
 }
 
@@ -560,9 +606,13 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
         o->jointSet[s].veldir_ctrl_out_type = jsetcfg[s].pid_output_types.veldir_ctrl_out_type;
         
         o->jointSet[s].USE_SPEED_FBK_FROM_MOTORS = jsetcfg[s].usespeedfeedbackfrommotors;
-        o->jointSet[s].special_constraint = (eOmc_jsetconstraint_t)jsetcfg[s].constraints.type;
-        o->jointSet[s].special_limit = jsetcfg[s].constraints.param1;
-        //NOTE: jsetcfg[s].constraints.param2 is not used currently. It is reserved for future use
+        
+        JointSet_set_constraints(&(o->jointSet[s]), &(jsetcfg[s].constraints));
+        
+        //moved in JointSet_set_constraints(JointSet* o, eOmc_jointSet_constraints_t *constraints)
+//        o->jointSet[s].special_constraint = (eOmc_jsetconstraint_t)jsetcfg[s].constraints.type;
+//        o->jointSet[s].special_limit = jsetcfg[s].constraints.param1;
+//        //NOTE: jsetcfg[s].constraints.param2 is not used currently. It is reserved for future use
         
         
 #ifdef R1_HAND_MKII
@@ -1973,17 +2023,21 @@ void MController_go_idle(void)
 
 void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
 {
-//    static uint32_t count =0;
-//    
-//    count++;
-    
-    #ifndef WRIST_MK2
+
     Joint *j_ptr= smc->joint+j;
-    
-    Joint_get_state(j_ptr, joint_state);
-    #else
-    JointSet_get_state(&(smc->jointSet[0]), j, joint_state);
-    #endif
+#ifdef WRIST_MK2
+    if((!j_ptr->belong2WristMK2) || ((j_ptr->belong2WristMK2) && (j_ptr->control_mode == eomc_controlmode_notConfigured)))
+    {
+        Joint_get_state(j_ptr, joint_state);
+    }
+    else
+    {
+        JointSet_get_state(&(smc->jointSet[0]), j, joint_state);
+    }
+
+#else
+     Joint_get_state(j_ptr, joint_state);
+#endif
     
     AbsEncoder* enc_ptr = smc->absEncoder + j*smc->multi_encs;
     
@@ -1993,8 +2047,7 @@ void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
         //joint_state->addinfo.multienc[k] = count;
     }
     
-//    if(count>10000)
-//        count = 0;
+
 }
 
 
@@ -2057,10 +2110,15 @@ void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms)
 
 BOOL MController_set_joint_pos_ref(int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
-#if !defined(WRIST_MK2)
-    return Joint_set_pos_ref(smc->joint+j, pos_ref, vel_ref);
+    Joint *j_ptr= smc->joint+j;
+
+#ifdef WRIST_MK2
+    if(!j_ptr->belong2WristMK2)
+        return Joint_set_pos_ref(j_ptr, pos_ref, vel_ref);
+    else
+        return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, vel_ref);
 #else
-    return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, vel_ref);
+        return Joint_set_pos_ref(j_ptr, pos_ref, vel_ref);
 #endif
 }
 
@@ -2071,10 +2129,16 @@ BOOL MController_set_joint_vel_ref(int j, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref
 
 BOOL MController_set_joint_pos_raw(int j, CTRL_UNITS pos_ref)
 {
-#if !defined(WRIST_MK2)
-    return Joint_set_pos_raw(smc->joint+j, pos_ref);
+    Joint *j_ptr= smc->joint+j;
+#ifdef WRIST_MK2
+    if(!j_ptr->belong2WristMK2)
+        return Joint_set_pos_raw(j_ptr, pos_ref);
+
+    else
+        return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, 0.0f);
 #else
-    return JointSet_set_pos_ref(&(smc->jointSet[0]), j, pos_ref, 0.0f);
+    
+     return Joint_set_pos_raw(j_ptr, pos_ref);
 #endif
 }
 
@@ -2100,10 +2164,14 @@ BOOL MController_set_joint_cur_ref(int j, CTRL_UNITS cur_ref)
 
 void MController_stop_joint(int j)
 {
+    Joint *j_ptr= smc->joint+j;
 #ifdef WRIST_MK2
-	JointSet_stop(&(smc->jointSet[0]), j);
+    if(j_ptr->belong2WristMK2)
+        JointSet_stop(&(smc->jointSet[0]), j);
+    else
+        Joint_stop(j_ptr);
 #else
-    Joint_stop(smc->joint+j);
+    Joint_stop(j_ptr);
 #endif
 }
 
