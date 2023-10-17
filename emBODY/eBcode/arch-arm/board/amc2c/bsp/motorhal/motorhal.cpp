@@ -23,6 +23,7 @@
 #include "enc.h"
 #include "hall.h"
 #include "pwm.h"
+#include "motorhal_faults.h"
 
 #include "embot_core.h"
 #include <array>
@@ -41,21 +42,34 @@ namespace embot::hw::motor::adc {
 
 struct Converter
 {
-    static int32_t raw2current(int32_t r)
-    {
-        //int32_t c = (r/1000) * 7872;
-        //return c;
-        return 1;
-    }
-    
-    static int32_t current2raw(int32_t c)
-    {
-        //int32_t r = (c*7872) / 1000;
-        //return r;
-        return 1;
-    }    
+    static constexpr uint32_t defOffset {29789};
+    uint32_t offset {defOffset};
     
     constexpr Converter() = default;
+    constexpr Converter(uint32_t o) : offset(o) {};  
+
+    void clear() 
+    {
+        set(defOffset);
+    }        
+
+    void set(uint32_t o) 
+    {
+        offset = o;
+    }
+
+    int32_t raw2current(uint32_t r)
+    {
+        int32_t t = static_cast<int32_t>(r - offset)*33000;
+        return t/(256*1024);
+    }
+    
+    uint32_t current2raw(int32_t c)
+    {
+        int32_t t = c*256*1024;
+        return t/33000 + offset;
+    }    
+    
 };
 
 
@@ -67,21 +81,25 @@ struct Calibrator
     volatile bool _done {false};
     volatile size_t _count {0};
     Currents _currents {};
-    std::array<int64_t, 3> cumulativerawvalues {0, 0, 0};
+    std::array<uint64_t, 3> cumulativerawvalues {0, 0, 0};
+    
+
+    std::array<Converter, 3> _conv {};
     
     constexpr Calibrator() = default;
     
     void init()
     {
+       for(auto &i : _conv) { i.clear(); } // but the clear is not necessary
        _count = 0;
        _done = false; 
        cumulativerawvalues.fill(0); 
-       set({oncurrents, this});
+       embot::hw::motor::adc::set({oncurrentscalib, this});
     }
     
     void stop()
     {
-        set({});
+        embot::hw::motor::adc::set({});
         _count = 0;
        _done = true;  
     }
@@ -113,14 +131,16 @@ struct Calibrator
     }   
 
 
-    static void oncurrents(void *owner, const Currents * const currents)
+    static void oncurrentscalib(void *owner, const Currents * const currents)
     {
         Calibrator *o = reinterpret_cast<Calibrator*>(owner);   
-        
+     
+        // currents is in mA 
+     
         // i use Converter::current2raw() because technically Currents does not contain the raw ADC values but transformed values
-        o->cumulativerawvalues[0] += Converter::current2raw(currents->u);
-        o->cumulativerawvalues[1] += Converter::current2raw(currents->v);
-        o->cumulativerawvalues[2] += Converter::current2raw(currents->w);
+        o->cumulativerawvalues[0] += o->_conv[0].current2raw(currents->u);
+        o->cumulativerawvalues[1] += o->_conv[1].current2raw(currents->v);
+        o->cumulativerawvalues[2] += o->_conv[2].current2raw(currents->w);
         
         o->_count++;
         
@@ -129,20 +149,19 @@ struct Calibrator
             // time to do business: prepare average currents, impose the offset to ADC, stop the calibrator  
             
             // dont use the >> _shift because ... 1. this operation is done only once, so who bother. 
-            //                                    2. cumulativerawvalues is int64_t. it may be (dont think so) negative so it is too complicate to optimize
+            //                                    2. cumulativerawvalues is int64_t, so shift does niot work for negative values
             // impose offset to adc.
-//            volatile int64_t cc[3] {0, 0, 0};
-//            cc[0] = o->cumulativerawvalues[0] / _maxcount;
-//            cc[1] = o->cumulativerawvalues[1] / _maxcount;
-//            cc[2] = o->cumulativerawvalues[2] / _maxcount;
-            AdcMotSetOffset(ADCMOT_PHASE_U, AdcMotGetOffset(ADCMOT_PHASE_U) + (o->cumulativerawvalues[0] / _maxcount));
-            AdcMotSetOffset(ADCMOT_PHASE_V, AdcMotGetOffset(ADCMOT_PHASE_V) + (o->cumulativerawvalues[1] / _maxcount));
-            AdcMotSetOffset(ADCMOT_PHASE_W, AdcMotGetOffset(ADCMOT_PHASE_W) + (o->cumulativerawvalues[2] / _maxcount));
+            volatile int64_t cc[3] {0, 0, 0};
+            cc[0] = o->cumulativerawvalues[0] / o->_count;
+            cc[1] = o->cumulativerawvalues[1] / o->_count;
+            cc[2] = o->cumulativerawvalues[2] / o->_count;
             
-            // stop
+            o->_conv[0].set(cc[0]);
+            o->_conv[1].set(cc[1]);
+            o->_conv[2].set(cc[2]);
+            
+            // stop: deregister this callback
             o->stop();
-            
-            return;
         }                     
     }    
     
@@ -154,23 +173,28 @@ struct adcm_Internals
     Calibrator calibrator {};
         
     static void dummy_adc_callback(void *owner, const Currents * const currents) {}  
-    static constexpr OnCurrents dummyADCcbk { dummy_adc_callback, nullptr };         
+    static constexpr OnCurrents dummyADCcbk { dummy_adc_callback, nullptr };          
         
     adcm_Internals() = default;    
 };
 
 adcm_Internals _adcm_internals {};
     
- 
-void adcm_on_acquisition_of_currents(int16_t c1, int16_t c2, int16_t c3)
+// this is the callback executed inside the ADC handler  
+// {c1, c2, c3} are in adc units [0, 64k)
+// so, we need to transform them into currents expressed in milli-ampere
+    // and call the callback imposed by the embot::hw::motor::setCallbackOnCurrents()
+void adcm_on_acquisition_of_currents(uint16_t c1, uint16_t c2, uint16_t c3)
 {
-    // important note: {c1, c2, c3} are the raw ADC acquisitions as in adcMotCurrents[0, 1, 2]
-    // the callback requires converted currents. but to be fair in adcm.c there is no concept of how to convert them as in the amcbldc
-    // so, boh ... for now i do nothing    
-    Currents currents = {Converter::raw2current(c1), Converter::raw2current(c2), Converter::raw2current(c3)};
+    // important note: {{c1, c2, c3} are in adc units [0, 64k). no conversion yet. 
+    Currents currents = 
+    {
+        _adcm_internals.calibrator._conv[0].raw2current(c1), 
+        _adcm_internals.calibrator._conv[1].raw2current(c2),
+        _adcm_internals.calibrator._conv[2].raw2current(c3),
+    };
     _adcm_internals.config.oncurrents.execute(&currents);         
-}    
-
+}   
     
 bool init(const Configuration &config)
 {
@@ -278,6 +302,7 @@ struct enc_Internals
     Configuration config {};
     Mode mode {};
     enc_Conversion conversion {};
+    int32_t forcedvalue {0};    
         
     enc_Internals() = default;   
 };
@@ -366,7 +391,6 @@ extern bool start(const Mode& mode)
     return ret;
 }
 
-
 extern bool isstarted()
 {
     return _enc_internals.started;
@@ -376,12 +400,17 @@ extern int32_t getvalue()
 {
     if(false == _enc_internals.started)
     {
-        return 0;
+        return _enc_internals.forcedvalue;
     }
     
     int32_t v = __HAL_TIM_GetCounter(&ENC_TIM);
     
     return _enc_internals.conversion.convert(v);
+}
+
+void force(int32_t value)
+{
+    _enc_internals.forcedvalue = value;
 }
 
 
@@ -402,6 +431,7 @@ struct hall_Table
     static constexpr int16_t hallAngleStep = 60.0 * Deg2iCub; // 60 degrees scaled by the range of possible values
     static constexpr int16_t minHallAngleDelta = 30.0 * Deg2iCub; // 30 degrees scaled by the range of possible values    
 
+    // it keeps the table from hall values H3h2H1 = [1, 2, 3, 4, 5, 6] to the center of the sector expressed in icub degrees 
     static constexpr uint16_t hallAngleTable[] =
     {
         /* ABC  (?)  */
@@ -415,9 +445,18 @@ struct hall_Table
         /* HHH ERROR */ static_cast<uint16_t>(0)
     };
     
+    // it is the lookup table from hall value H3H2H1 = [1, 2, 3, 4, 5, 6] to sector.
+    // the sector number x is centered in angle x*60 [deg] and is 60 deg wide
+    static constexpr uint8_t hallSectorTable[] = {255, 4, 2, 3, 0, 5, 1, 255};
+    
     static constexpr uint16_t status2angle(uint8_t hallstatus)
     {
         return hallAngleTable[hallstatus & 0x07];
+    }
+
+    static constexpr uint8_t status2sector(uint8_t hallstatus)
+    {
+        return hallSectorTable[hallstatus & 0x07];
     }
     
     static constexpr uint8_t angle2sector(uint16_t angle)
@@ -430,25 +469,49 @@ struct hall_Table
 
 struct hall_Data
 {
-    uint8_t order[3] = {0, 1, 2};
-    int32_t counter {0};
+    static constexpr uint8_t PREV = 0;
+    static constexpr uint8_t CURR = 1;
+    
+    // in icub degrees
     int32_t angle {0};
-    volatile uint8_t status {0};
-    
-    void reset(Mode::SWAP s = Mode::SWAP::none)
+
+    std::array<uint8_t, 2> h3h2h1 = {0, 0}; 
+
+    static constexpr bool isH3H2H1valid(uint8_t v)
     {
-        counter = 0;
+        return (0 != v) && (v < 7);
+    }
+    
+    static constexpr bool isTransitionOfH3H2H1valid(uint8_t prev, uint8_t curr)
+    {   // the prev and curr values must be valid
+        // the following lut tells which h3h2h1 is expected for clockwise and counter clockwise rotation
+        // given the value of the previous h3h2h1 which must be in range [1, 6]
+        constexpr uint8_t nextclockwise[7] =        {255, 5, 3, 1, 6, 4, 2};
+        constexpr uint8_t nextcounterclockwise[7] = {255, 3, 6, 2, 5, 1, 4};
+        
+        if(false == isH3H2H1valid(prev))
+        {
+            return false;
+        }
+        
+        if((curr == prev) || (curr == nextclockwise[prev]) || (curr == nextcounterclockwise[prev]))
+        {   // it is ok if the transition happens by a single step clockwise or counterclockise
+            return true;
+        }
+        
+        return false;
+    }
+    
+    bool firstacquisition {true};       
+    
+    void reset()
+    {
         angle = 0;
-        status = 0;
-        set(s);
+        h3h2h1[hall_Data::CURR] = h3h2h1[hall_Data::PREV] = 0;
+        firstacquisition = true;
     }
     
-    void set(Mode::SWAP s)
-    {
-        order[0] = 0; 
-        order[1] = (Mode::SWAP::BC == s) ? 2 : 1;
-        order[2] = (Mode::SWAP::BC == s) ? 1 : 2;        
-    }
+
     
     hall_Data() = default;
 };
@@ -459,7 +522,8 @@ struct hall_Internals
     bool started {false};
     Configuration config {};
     Mode mode {};    
-    hall_Data data {};       
+    hall_Data data {};  
+      
 
     void reset()
     {
@@ -471,32 +535,222 @@ struct hall_Internals
     }        
         
     hall_Internals() = default;   
+    
+    
+    uint8_t input()
+    {
+        // we get the values of the three bits: H3|H2|H1. they correspond to C|B|A
+        uint8_t x = hall_INPUT(); 
+        
+        uint8_t v = x & 0b111; // already masked by hall_INPUT() but better be sure
+        
+        if(embot::hw::motor::hall::Mode::SWAP::BC == mode.swap)
+        {
+            // in case swapBC is true, then we swap second (H2) w/ third (H3), so we have v = H2H3H1 = BCA
+        
+            v = ((x & 0b001)     )  |   // gets 0|0|H1 and keeps it where it is
+                ((x & 0b010) << 1)  |   // gets 0|H2|0 and moves it up by one position
+                ((x & 0b100) >> 1)  ;   // gets H3|0|0 and moves it down by one position
+        } 
+
+        return v;        
+    }
+    
+    void acquire()
+    {
+        // actually ... we
+        // get the input and validate it vs possible states and possible transitions       
+        
+        if(true == validate(input()))
+        {
+            // i assign angle
+            data.angle = mode.offset + hall_Table::status2angle(data.h3h2h1[hall_Data::CURR]);  
+            
+            // i may do....
+            
+            switch(config.encodertuning)
+            {
+                case Configuration::ENCODERtuning::forcevalue:
+                {   
+                    embot::hw::motor::enc::force(data.angle);
+                } break;
+
+                case Configuration::ENCODERtuning::adjust:
+                {   
+                    encoderadjust();
+                } break;
+                 
+                case Configuration::ENCODERtuning::none:
+                default:
+                {   
+                    // do nothing
+                } break;               
+            }
+
+        }      
+    }
+    
+        
+    bool validate(uint8_t v)
+    {
+        bool r {true};
+               
+        // 1. validate h3h2h1
+                
+        if(false == hall_Data::isH3H2H1valid(v))
+        {
+            // error
+//            data.h3h2h1[hall_Data::CURR] = data.h3h2h1[hall_Data::PREV];
+
+            // RAISE ERROR STATE
+            motorhal_set_fault(DHESInvalidValue);
+            return false;
+        }
+        
+        // 2. update h3h2h1 status
+        
+        // first time of call after a reset()
+        if(true == data.firstacquisition)
+        {
+            data.firstacquisition = false;
+            // i use current value v for both
+            data.h3h2h1[hall_Data::PREV] = data.h3h2h1[hall_Data::CURR] = v;
+        }  
+        else   
+        {                    
+            // i store previous h3h2h1 and i assign the new h3h2h1
+            data.h3h2h1[hall_Data::PREV] = data.h3h2h1[hall_Data::CURR];
+            data.h3h2h1[hall_Data::CURR] = v;
+        }
+        
+        // 3. validate transition from previous h3h2h1 to the current one.
+        //    we can directly use a transition table or to verify that the sectors that corresponds to the two h3h2h1 values
+        //    are the same or spaced by one
+        
+        if(data.h3h2h1[hall_Data::PREV] != data.h3h2h1[hall_Data::CURR])
+        {
+            if(false == hall_Data::isTransitionOfH3H2H1valid(data.h3h2h1[hall_Data::PREV], data.h3h2h1[hall_Data::CURR]))
+            {
+                motorhal_set_fault(DHESInvalidSequence);
+                return false; 
+            }                
+        }
+        
+        return true;                
+    }
+    
+    void encoderadjust()
+    {
+        // in here we do what is done for amcbldc in function s_pwm_updateHallStatus() for the case when MainConf.encoder.resolution is not zero.
+        // that means we have an encoder and we want the hall to help its acquisition.
+        
+#if 0
+        if (!s_pwm_hallStatus_old)
+        {            
+            hallCounter = 0;
+            encoder_Reset();
+            encoder_Force(angle);
+        }
+        else
+        {
+            // Check if the motor is rotating forward (counterclockwise)
+            bool forward = ((sector-sector_old+numHallSectors)%numHallSectors)==1;
+        
+            if (forward) // forward
+            {
+                ++hallCounter;
+                angle -= minHallAngleDelta; // -30 deg
+            }
+            else
+            {
+                --hallCounter;
+                angle += minHallAngleDelta; // +30 deg
+            }
+             /*
+            0) Use the Hall sensors to rotate until the wrap-around border is reached,
+             then reset the encoder value
+            */
+            if (calibration_step == 0)
+            {
+                encoder_Force(angle);
+                
+                if ((sector == 0 && sector_old == 5) || (sector == 5 && sector_old == 0))
+                {
+                    encoder_Reset();
+                    calibration_step = 1;
+                }
+            }
+            /*
+            1) Use the hall sensors to rotate. While rotating, store the encoder angle 
+            every time a sector border is crossed. When all 6 borders are crossed,
+            compute the offset to apply to the encoder by least squares fitting. After
+            the offset is applied set encoderCalibrated to true
+            */
+            else if (calibration_step == 1)
+            {
+                encoder_Force(angle);
+            
+                // use the current sector if forward rotation or previous if reverse
+                uint8_t sector_index = forward ? sector : (sector+1)%numHallSectors;
+            
+                // keep track of the encoder value between sectors
+                border[sector_index] = encoder_GetUncalibrated();
+
+                // found the s-th border, put a 1 in the mask
+                border_flag |= 1 << sector_index;
+                
+                // If all sectors are found apply least squares fitting by computing average of
+                // difference between measured values on borders and expected hall angle
+                if (border_flag == 63) // 111111
+                {
+                    calibration_step = 2;
+                
+                    int32_t offset = int16_t(border[0] - MainConf.pwm.hall_offset + minHallAngleDelta);
+                    offset += int16_t(border[1] - MainConf.pwm.hall_offset + minHallAngleDelta - hallAngleStep);
+                    offset += int16_t(border[2] - MainConf.pwm.hall_offset + minHallAngleDelta - 2 * hallAngleStep);
+                    offset += int16_t(border[3] - MainConf.pwm.hall_offset + minHallAngleDelta - 3 * hallAngleStep);
+                    offset += int16_t(border[4] - MainConf.pwm.hall_offset + minHallAngleDelta - 4 * hallAngleStep);
+                    offset += int16_t(border[5] - MainConf.pwm.hall_offset + minHallAngleDelta - 5 * hallAngleStep);
+                
+                    offset /= numHallSectors;
+                     
+                    embot::core::print("CALIBRATED\n");
+                    
+                    encoder_Calibrate(int16_t(offset));
+                }
+            }
+            /*
+            2) Update the forced value even if it is not used when the encoder is calibrated.
+            Reset the encoder angle after a full rotation to avoid desynching
+            */
+            else if (calibration_step == 2)
+            {
+                encoder_Force(angle);
+                // reset the angle after full rotation
+                if ((sector == 0 && sector_old == 5) || (sector == 5 && sector_old == 0))
+                {
+                    encoder_Reset();
+                }
+            }
+
+#endif        
+        
+    }
+        
+    
+    static void capture(hall_Internals &hint)
+    {
+        hint.acquire();        
+    }    
 };
 
 
 hall_Internals _hall_internals {};
 
 
-static uint8_t hall_Get()
-{
-    uint8_t x = hall_INPUT(); // we get the values of the three bits: H3|H2|H1. they are also called C|B|A
-    // and now we move them according to order[]. 
-    // if we have order = {0, 1, 2} we dont reorder anything, so we have v = x = H3H2H1 = CBA.
-    // but in case swapBC is true, then we have  order {0, 2, 1} which swap second w/third, so v = H2H3H1 =  BCA
-    
-    uint8_t v = (((x>>0)&0x1) >> _hall_internals.data.order[0])      |   // H1 (pos 0) is moved to the final position
-                (((x>>1)&0x1) >> _hall_internals.data.order[1])      |   // H2 (pos 1) is moved to the final position
-                (((x>>2)&0x1) >> _hall_internals.data.order[2]);         // H3 (pos 2) is moved to the final position
-    return v;
-}
-
-
 static void hall_OnCapture(TIM_HandleTypeDef *htim)
 {
-    _hall_internals.data.status = hall_Get();
-    
-    // in here, we surely fill angle.
-    _hall_internals.data.angle = _hall_internals.mode.offset +  hall_Table::status2angle(_hall_internals.data.status);
+    hall_Internals::capture(_hall_internals);
 }
 
 
@@ -527,10 +781,8 @@ bool start(const Mode &mode)
     bool ret {true};  
 
     _hall_internals.mode = mode;        
-    
-    _hall_internals.data.set(_hall_internals.mode.swap);
-    
-    _hall_internals.data.status = hall_Get();
+        
+    hall_Internals::capture(_hall_internals);
 
     // marco.accame: i stop things
     
@@ -574,7 +826,7 @@ bool start(const Mode &mode)
     _hall_internals.started = ret;
     
     // i read it again
-    _hall_internals.data.status = hall_Get();
+    hall_Internals::capture(_hall_internals);
     
     
     return ret;
@@ -587,7 +839,7 @@ bool isstarted()
 
 uint8_t getstatus()
 {
-    return _hall_internals.data.status;
+    return _hall_internals.data.h3h2h1[hall_Data::CURR];
 }   
 
 int32_t getangle()
@@ -681,6 +933,38 @@ extern void set(uint16_t u, uint16_t v, uint16_t w)
 //    PwmComparePhaseV = v;
 //    PwmComparePhaseW = w;
 //    _pwm_internals.pwmcomparevalue_protect(false);   
+}
+
+uint16_t map2integer(float x)
+{
+    static constexpr float maxpwmdiv100 = static_cast<float>(embot::hw::motor::bsp::amc2c::PWMvals.value100perc) / 100.0;
+    uint16_t r = 0;
+    if((x > 0) && (x < 100.0))
+    {
+        float t = x*maxpwmdiv100;
+        r = static_cast<uint16_t>(t);
+    }
+    else if(x >= 100.0)
+    {
+        r = embot::hw::motor::bsp::amc2c::PWMvals.value100perc;
+    }
+    
+    return r;    
+}
+
+extern void pwmset(float u, float v, float w)
+{ 
+    PwmPhaseSet(map2integer(u), map2integer(v), map2integer(w));
+}
+
+extern void setperc(float u, float v, float w)
+{
+    if(true == _pwm_internals.calibrating)
+    {        
+        u = v = w = 0;
+    }
+   
+    pwmset(u, v, w); 
 }
     
 extern void enable(bool on)

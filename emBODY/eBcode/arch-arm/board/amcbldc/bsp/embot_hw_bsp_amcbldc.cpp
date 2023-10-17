@@ -763,6 +763,8 @@ namespace embot::hw::motor::bsp {
 
 #include "embot_hw_bsp_amcbldc.h"
 
+#include "analog.h"
+
 namespace embot { namespace hw { namespace bsp { namespace amcbldc {
     
     #include <tuple>
@@ -829,6 +831,15 @@ std::make_tuple(0x00470027, 0x484E500E, 0x20343356 ) // scheda jointlab camozzi
     embot::hw::BTN EXTFAULTbutton()
     {
         return (Revision::A == revision()) ? embot::hw::BTN::one : embot::hw::BTN::two;
+    }
+    
+    float getVIN()
+    {
+        float v {0.0};
+        
+        v = analogVin() * 0.001;
+        return v;
+        
     }
     
 }}}}

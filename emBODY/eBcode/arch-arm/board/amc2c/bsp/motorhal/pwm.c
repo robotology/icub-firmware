@@ -137,10 +137,15 @@ void PwmPhaseSet(uint16_t u, uint16_t v, uint16_t w)
 
     /* Must be interrupt-safe */
 //    taskDISABLE_INTERRUPTS();
-    PwmComparePhaseU = (u<1219) ? (u) : (1219);
-    PwmComparePhaseV = (v<1219) ? (v) : (1219);
-    PwmComparePhaseW = (w<1219) ? (w) : (1219);
+//    PwmComparePhaseU = (u<1219) ? (u) : (1219);
+//    PwmComparePhaseV = (v<1219) ? (v) : (1219);
+//    PwmComparePhaseW = (w<1219) ? (w) : (1219);
 //    taskENABLE_INTERRUPTS();
+
+    // we remove from here the check vs max value because we assume that the caller has already done it 
+    PwmComparePhaseU = u;
+    PwmComparePhaseV = v;
+    PwmComparePhaseW = w;
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, PwmComparePhaseU);
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, PwmComparePhaseV);
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, PwmComparePhaseW);    
@@ -421,9 +426,9 @@ void PwmTest(void)
 
 #endif // #if defined(MOTORHALCONFIG_DONTUSE_TESTS)
 
+
 #if defined(MOTORHAL_changes)
 
-// nothing else is required
 
 #endif // #if defined(MOTORHAL_changes)
 

@@ -54,6 +54,14 @@
 #define HALL_INPUT_POS      (LSB(HALL_INPUT_MASK))
 #define HALL_INPUT()        ((HALL_INPUT_PORT&HALL_INPUT_MASK)>>HALL_INPUT_POS)
 
+// marco.accame, note-667: 
+// HALL_INPUT() gets three bits in this order: H3|H2|H1, where:
+// - H3 is the status of {MOT_HALL3_GPIO_Port, MOT_HALL3_Pin} = PD14
+// - H2 is the status of {MOT_HALL2_GPIO_Port, MOT_HALL2_Pin} = PD13
+// - H1 is the status of {MOT_HALL1_GPIO_Port, MOT_HALL1_Pin} = PD12
+// because it reads the whole status of the port D, mask the bits 14, 13, 12 and then shifts down by 12 positions
+// so: it is correct but we read a byte where bit0 is H1, bit 1 is H2 and bit 2 is H3
+
 /* Shorthand */
 #define _U_     PWM_PHASE_U
 #define _V_     PWM_PHASE_V

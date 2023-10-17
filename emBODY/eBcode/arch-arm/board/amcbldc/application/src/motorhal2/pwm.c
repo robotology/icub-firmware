@@ -1211,13 +1211,29 @@ HAL_StatusTypeDef pwm_hallConfig(uint8_t swapBC, uint16_t pwm_hall_offset)
     return HAL_OK;
 }
 
-//void pwm_setADC_cb(void (*fn_cb)(void *, int16_t[3], void*, void*), void *owner, void* rtu, void* rty)
-//{
-//    s_pwm_adc_callback_set.callback_fn = fn_cb;
-//    s_pwm_adc_callback_set.owner = owner;
-//    s_pwm_adc_callback_set.rtu = rtu;
-//    s_pwm_adc_callback_set.rty = rty;
-//}
+uint16_t s_pwm_map2integer(float x)
+{
+    static constexpr float maxpwmdiv100 = static_cast<float>(MAX_PWM)/100.0;
+    uint16_t r = 0;
+    if((x > 0) && (x < 100.0))
+    {
+        float t = x*maxpwmdiv100;
+        r = static_cast<uint16_t>(t);
+    }
+    else if(x >= 100.0)
+    {
+        r = MAX_PWM;
+    }
+    
+    return r;
+}
+
+void pwm_SetPerc(float a, float b, float c)
+{
+    // map a, b, c from range [0.0, 100.0] into [0, MAX_PWM].
+    // if negative -> 0, if > MAX_PWM -> MAX_PWM   
+    pwmSet(s_pwm_map2integer(a), s_pwm_map2integer(b), s_pwm_map2integer(c));    
+}
 
 
 

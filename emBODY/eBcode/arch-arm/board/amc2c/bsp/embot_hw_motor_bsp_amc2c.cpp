@@ -385,7 +385,7 @@ namespace embot::hw::motor::bsp::amc2c {
         hTIM1.Instance = TIM1;
         hTIM1.Init.Prescaler = 0;
         hTIM1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-        hTIM1.Init.Period = 1219;
+        hTIM1.Init.Period = embot::hw::motor::bsp::amc2c::PWMvals.TIM1_period; // 2000; // 1219;
         hTIM1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
         hTIM1.Init.RepetitionCounter = 0;
         hTIM1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -440,7 +440,7 @@ namespace embot::hw::motor::bsp::amc2c {
         Error_Handler();
         }
         sConfigOC.OCMode = TIM_OCMODE_PWM2;
-        sConfigOC.Pulse = 895; // was 752, changed due to different clock source from amc-bldc
+        sConfigOC.Pulse = embot::hw::motor::bsp::amc2c::PWMvals.TIM1_ocPulse ; // 1469; //895; // was 752, changed due to different clock source from amc-bldc
         if (HAL_TIM_PWM_ConfigChannel(&hTIM1, &sConfigOC, TIM_CHANNEL_6) != HAL_OK)
         {
         Error_Handler();
@@ -749,12 +749,21 @@ namespace embot::hw::motor::bsp::amc2c {
         }
         /** Configure Regular Channel
         */
+        
+#if 0
+        
         sConfig.Channel = ADC_CHANNEL_0;
         sConfig.Rank = ADC_REGULAR_RANK_1;
         sConfig.SamplingTime = ADC_SAMPLETIME_8CYCLES_5;
         sConfig.SingleDiff = ADC_SINGLE_ENDED;
         sConfig.OffsetNumber = ADC_OFFSET_1;
-        sConfig.Offset = 29789;
+//        sConfig.Offset = 29789;
+//        sConfig.OffsetRightShift = DISABLE;
+//        sConfig.OffsetSignedSaturation = ENABLE;
+//        sConfig.Offset = 0;
+//        sConfig.OffsetRightShift = DISABLE;
+//        sConfig.OffsetSignedSaturation = DISABLE;
+        sConfig.Offset = 29496;
         sConfig.OffsetRightShift = DISABLE;
         sConfig.OffsetSignedSaturation = ENABLE;
         if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
@@ -766,6 +775,7 @@ namespace embot::hw::motor::bsp::amc2c {
         sConfig.Channel = ADC_CHANNEL_1;
         sConfig.Rank = ADC_REGULAR_RANK_2;
         sConfig.OffsetNumber = ADC_OFFSET_2;
+        sConfig.Offset = 29634;
         if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
         {
         Error_Handler();
@@ -775,10 +785,46 @@ namespace embot::hw::motor::bsp::amc2c {
         sConfig.Channel = ADC_CHANNEL_3;
         sConfig.Rank = ADC_REGULAR_RANK_3;
         sConfig.OffsetNumber = ADC_OFFSET_3;
+        sConfig.Offset = 29020;
         if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
         {
         Error_Handler();
         }
+        
+#else
+// zero offset in ADC        
+        sConfig.Channel = ADC_CHANNEL_0;
+        sConfig.Rank = ADC_REGULAR_RANK_1;
+        sConfig.SamplingTime = ADC_SAMPLETIME_8CYCLES_5;
+        sConfig.SingleDiff = ADC_SINGLE_ENDED;
+        sConfig.OffsetNumber = ADC_OFFSET_NONE;
+        sConfig.Offset = 0;
+        sConfig.OffsetRightShift = DISABLE;
+        sConfig.OffsetSignedSaturation = DISABLE;
+        if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        /** Configure Regular Channel
+        */
+        sConfig.Channel = ADC_CHANNEL_1;
+        sConfig.Rank = ADC_REGULAR_RANK_2;
+
+
+        if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
+        {
+        Error_Handler();
+        }
+        /** Configure Regular Channel
+        */
+        sConfig.Channel = ADC_CHANNEL_3;
+        sConfig.Rank = ADC_REGULAR_RANK_3;
+
+        if (HAL_ADC_ConfigChannel(&hADC1, &sConfig) != HAL_OK)
+        {
+        Error_Handler();
+        }
+#endif        
         /* USER CODE BEGIN ADC1_Init 2 */
 
         /* USER CODE END ADC1_Init 2 */
@@ -1264,8 +1310,8 @@ namespace embot::hw::motor::bsp::amc2c {
 //            HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
             HAL_NVIC_SetPriority(TIM1_TRG_COM_IRQn, 5, 0);
             HAL_NVIC_EnableIRQ(TIM1_TRG_COM_IRQn);
-            HAL_NVIC_SetPriority(TIM1_CC_IRQn, 5, 0);
-            HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
+//            HAL_NVIC_SetPriority(TIM1_CC_IRQn, 5, 0);
+//            HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
             /* USER CODE BEGIN TIM1_MspInit 1 */
 
             /* USER CODE END TIM1_MspInit 1 */
@@ -1333,7 +1379,7 @@ namespace embot::hw::motor::bsp::amc2c {
 #endif            
 //            HAL_NVIC_DisableIRQ(TIM1_UP_IRQn);
             HAL_NVIC_DisableIRQ(TIM1_TRG_COM_IRQn);
-            HAL_NVIC_DisableIRQ(TIM1_CC_IRQn);
+//            HAL_NVIC_DisableIRQ(TIM1_CC_IRQn);
             /* USER CODE BEGIN TIM1_MspDeInit 1 */
 
             /* USER CODE END TIM1_MspDeInit 1 */

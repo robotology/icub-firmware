@@ -520,23 +520,17 @@ dbgFOCvalues dbgFOC {};
 
 void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owner, const embot::hw::motor::Currents * const currents)
 {
-    embot::hw::testpoint::on(tp2);
-
-    //embot::hw::testpoint::on(tp2);
     Impl * impl = reinterpret_cast<Impl*>(owner);
     if((nullptr == impl) || (nullptr == currents))
     {
         return;
     }    
         
-    impl->measureFOC->start();
+//    impl->measureFOC->start();
     
     // 1. copy currents straight away, so that we can use them
     embot::hw::motor::Currents currs = *currents;
    
-#if defined(TEST_DURATION_FOC)        
-    embot::hw::sys::delay(25);
-#else
     
     // remember to manage impl->EXTFAULTisPRESSED ............
 
@@ -568,78 +562,24 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2] = 0.001f*currs.w;
     
     // -----------------------------------------------------------------------------
-    // FOC Step Function (~26.6 KHz)
+    // FOC Step Function (~16.6 KHz)
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_step_FOC();
+    AMC_BLDC_step1();
     
     // -----------------------------------------------------------------------------
     
     AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
-    //constexpr float coneversion2pwmvalue (163.83F);
-    constexpr float coneversion2pwmvalue (12.19F);
-
-    // Set the voltages
-    int32_T Vabc0 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[0] * coneversion2pwmvalue);
-    int32_T Vabc1 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[1] * coneversion2pwmvalue);
-    int32_T Vabc2 = static_cast<int32_T>(AMC_BLDC_Y.ControlOutputs_p.Vabc[2] * coneversion2pwmvalue);
     
-#if defined(TEST_FOC_logvalues)
-    
-    dbgFOC.currents = currs;
-    dbgFOC.hall = hall;
-    dbgFOC.electricalangle = electricalAngle;
-    dbgFOC.position = position;
-    dbgFOC.jointangle = static_cast<float>(position) * 0.0054931640625f;
-    dbgFOC.pwms = {Vabc0, Vabc1, Vabc2};
-
-#endif
-    // TODO: Remove, used only for debug
-    //  0% PWM value on phase Vabc2 = 0,0,0
-    // 10% PWM value on phase Vabc2 = 0,0,122
-    // 20% PWM value on phase Vabc2 = 0,0,244
-    // 30% PWM value on phase Vabc2 = 0,0,366
-
-    embot::hw::motor::setpwm(embot::hw::MOTOR::one, 0, 0, 122);
-    
-   
-//#define DEBUG_PARAMS
-#ifdef DEBUG_PARAMS
-    
-    static char msg2[64];
-    static uint32_t counter;
-    if(counter % 10 == 0)
+    embot::hw::motor::PWMperc pwmperc 
     {
-        sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", \
-                                 Vabc0,  \
-                                 Vabc1,  \
-                                 Vabc2,  \
-                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
-                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
-                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2],       \
-                                 AMC_BLDC_U.SensorsData_p.motorsensors.angle,         \
-                                 AMC_BLDC_Y.EstimatedData_p.jointvelocities.velocity, \
-                                 AMC_BLDC_B.Targets_n.motorcurrent.current,           \
-                                 AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current,          \
-                                 AMC_BLDC_Y.ControlOutputs_p.Vq);
+        AMC_BLDC_Y.ControlOutputs_p.Vabc[0], AMC_BLDC_Y.ControlOutputs_p.Vabc[1], AMC_BLDC_Y.ControlOutputs_p.Vabc[2]
+    };
+    embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmperc);
 
-//        sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f", \
-//                                 Vabc0,  \
-//                                 Vabc1,  \
-//                                 Vabc2,  \
-//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
-//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
-//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2]);
-        embot::core::print(msg2);
-        counter = 0;
-    }
-    counter++;
-#endif
 
-#endif // #if defined(TEST_DURATION_FOC) 
 
-    impl->measureFOC->stop();
-    embot::hw::testpoint::off(tp2);
+//    impl->measureFOC->stop();
 }
 
 #ifdef PRINT_HISTO_DEBUG 

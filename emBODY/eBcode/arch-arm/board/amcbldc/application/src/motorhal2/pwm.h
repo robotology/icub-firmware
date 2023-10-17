@@ -115,6 +115,8 @@ extern void pwmTest(void);
 HAL_StatusTypeDef pwm_hallDeinit(void);
 HAL_StatusTypeDef pwm_hallConfig(uint8_t swapBC, uint16_t pwm_hall_offset);
 
+void pwm_SetPerc(float a, float b, float c);
+
 //extern HAL_StatusTypeDef pwm_Deinit(void);
 
 

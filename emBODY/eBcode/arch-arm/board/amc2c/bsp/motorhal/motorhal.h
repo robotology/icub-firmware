@@ -23,6 +23,7 @@ this API exposes what is required to move the motor using embot::hw::motor
 namespace embot::hw::motor::adc {
 
 // we keep int32_t even if the adc gets only int16_t values
+// the unit is [mA]
 struct Currents
 {
     int32_t u {0};
@@ -124,7 +125,8 @@ bool init(const Configuration &config);
 bool deinit();
 bool start(const Mode& mode);
 bool isstarted();
-int32_t getvalue();    
+int32_t getvalue(); 
+void force(int32_t value);
     
 } // namespace embot::hw::motor::enc {
 
@@ -134,8 +136,10 @@ namespace embot::hw::motor::hall {
 struct Configuration
 {
     enum class ACQUISITION { deferred };
+    enum class ENCODERtuning { none, forcevalue, adjust };
     
     ACQUISITION acquisition { ACQUISITION::deferred };
+    ENCODERtuning encodertuning { ENCODERtuning::none };
         
     constexpr Configuration() = default;
     constexpr bool isvalid() const { return true; }
@@ -182,7 +186,8 @@ struct Configuration
 void init(const Configuration &config);
 void deinit();
 void enable(bool on);
-void set(uint16_t u, uint16_t v, uint16_t w);    
+void set(uint16_t u, uint16_t v, uint16_t w);   
+void setperc(float u, float v, float w);
     
 } // namespace embot::hw::motor::pwm {
 

@@ -57,9 +57,9 @@ extern void AdcMotSetOffset(AdcMotPhase_t Phase, uint16_t Offset);
 extern void AdcMotHalfTransfer_cb(ADC_HandleTypeDef *hadc);
 extern void AdcMotTransferComplete_cb(ADC_HandleTypeDef *hadc);
 
-// we need to be bale to specify a user-defined function when the currents are available
-typedef void (*adcm_fp_int16_int16_uint16_t) (int16_t, int16_t, int16_t);
-extern adcm_fp_int16_int16_uint16_t adcm_FP_on_acquisition_of_currents;
+// we need to be able to specify a user-defined function when the raw adc acquistion of currents are available
+typedef void (*adcm_fp_uint16_uint16_uint16_t) (uint16_t, uint16_t, uint16_t);
+extern adcm_fp_uint16_uint16_uint16_t adcm_FP_on_acquisition_of_currents;
 
 #endif
 

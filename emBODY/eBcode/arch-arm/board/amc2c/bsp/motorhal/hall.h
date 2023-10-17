@@ -42,6 +42,8 @@ extern void HallTest(void);
 
 #if defined(MOTORHAL_changes)
 
+// it contains a byte w/ only three significant bits: 0b00000xyz
+// where x = H3, y = H2, z = H1, so it reads H3|H2|H1
 extern uint8_t hall_INPUT();
 
 #endif // #if defined(MOTORHAL_changes) 
