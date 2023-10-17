@@ -34,7 +34,7 @@ namespace embot::app::board::amc2c::info {
 
     constexpr embot::app::eth::Date date
     {
-        2023, embot::app::eth::Month::Apr, embot::app::eth::Day::fourteen, 16, 54
+        2023, embot::app::eth::Month::Oct, embot::app::eth::Day::sixteen, 15, 51
     };
 
     constexpr embot::hw::FLASHpartitionID codePartition 
@@ -47,11 +47,18 @@ namespace embot::app::board::amc2c::info {
         embot::hw::CAN::two
     };
     
-    constexpr uint8_t canaddress {1};
+    constexpr uint8_t canaddress {3};
+    
+    // marco.accame: i use the macro INFO32 just because ... i want to init eEmoduleExtendedInfo_t::userdefined with the same string 
+    // and i dont know how to fit it inside otherwise
+    
+                 // 0123456789abcde0123456789abcde
+    #define INFO32 "hi, i am an amc2c on CAN2:3"
 
-    static const char *info32  
+    constexpr const char *info32  
     { // 0123456789abcde0123456789abcde
-        "hi, i am an amc2c can"
+      //"hi, i am an amc2c CAN2:3"
+        INFO32
     };
 
 } // embot::app::board::amc2c::info {
@@ -141,21 +148,22 @@ constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended __attribute__((section(E
                 .size   = 0,
                 .addr   = 0
             },
-            .communication  = ee_commtype_none,
+            .communication  = ee_commtype_can2,
             .name           = "eOther01"
         },
         .protocols  =
         {
             .udpprotversion  = { .major = 0, .minor = 0},
             .can1protversion = { .major = 0, .minor = 0},
-            .can2protversion = { .major = 0, .minor = 0},
+            .can2protversion = { .major = 2, .minor = 0},
             .gtwprotversion  = { .major = 0, .minor = 0}
         },
         .extra      = {"EXT"}
     },
     .compilationdatetime    = __DATE__ " " __TIME__,
-    .userdefined            = {0}
+    .userdefined            = {INFO32}
 };
+
 
 #include <cstring>
 
