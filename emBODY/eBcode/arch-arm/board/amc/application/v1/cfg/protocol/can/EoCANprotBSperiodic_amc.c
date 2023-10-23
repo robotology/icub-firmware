@@ -22,7 +22,8 @@
 
 
 #include "EoCommon.h"
-//#include "embot_app_eth_theBATservice.h"
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -71,24 +72,28 @@
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//#include "embot_core.h"
+
 extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__INFO(eOcanframe_t *frame, eOcanport_t port)
-{
+{   
+    // must add code in here. the ems uses embot_app_eth_theBATservice
     return(eores_OK);
 }
 
 extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__STATUS_BMS(eOcanframe_t *frame, eOcanport_t port)
 {
+    // must add code in here. the ems uses embot_app_eth_theBATservice
     return(eores_OK);
 }
 
 extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__STATUS_BAT(eOcanframe_t *frame, eOcanport_t port)
 {
+    // must add code in here. the ems uses embot_app_eth_theBATservice
     return(eores_OK);
 }
 
 extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS(eOcanframe_t *frame, eOcanport_t port)
 {
+    // must add code in here. the ems uses embot_app_eth_theBATservice
     return(eores_OK);   
 }
 

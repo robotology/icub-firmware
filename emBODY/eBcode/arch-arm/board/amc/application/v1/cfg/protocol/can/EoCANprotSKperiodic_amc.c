@@ -10,9 +10,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
 #include "EoCommon.h"
-//#include "EOtheSKIN.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -64,6 +62,7 @@
 
 extern eOresult_t eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG(eOcanframe_t *frame, eOcanport_t port)
 {
+    // must add code in here. the ems uses EOtheSKIN
     return(eores_NOK_generic); 
 }
 

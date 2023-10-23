@@ -21,19 +21,10 @@
 
 #include "EOtheCANmapping.h"
 
-
-
-#include "EOtheCANservice.h"
 #include "EOtheCANdiscovery2.h"
-
-
-#include "EOtheErrorManager.h"
-
-#include "EoError.h"
 
 #include "embot_app_eth_theFTservice.h"
 
-// but also to retrieve information of other things ...
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -145,14 +136,13 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES(eOcanpro
 // this function receives the full scale of a channel and asks object EOtheSTRAIN to take care of it
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanframe_t *frame, eOcanport_t port)
 {
-//    eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processFullScale);
-    
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
         frame, 
         embot::app::eth::theFTservice::canFrameDescriptor::Type::fullscale
     };
+    
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
     
     return(eores_OK);

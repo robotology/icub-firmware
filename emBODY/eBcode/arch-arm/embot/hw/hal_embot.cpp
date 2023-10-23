@@ -173,8 +173,6 @@ extern hal_result_t hal_can_out_get(hal_can_t id, uint8_t *numberof)
 
 
 #include "embot_hw_timer.h"
-
-#warning TODO implement and use embot::hw::timer
     
 embot::hw::TIMER convert(hal_timer_t id)
 {
@@ -221,6 +219,8 @@ extern hal_timer_status_t hal_timer_status_get(hal_timer_t id)
 
 #if defined(USE_EMBOT_theServicesMC)
 
+// compiled by MC but not used by amc
+
 // --- hal_adc
 
 #include "hal_adc.h"
@@ -241,12 +241,10 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
     return hal_res_NOK_generic;
 }
 
-
 extern hal_result_t hal_motor_enable(hal_motor_t id)
 {
     return hal_res_NOK_generic;
 }
-
 
 extern hal_result_t hal_motor_disable(hal_motor_t id)
 {

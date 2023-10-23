@@ -12,34 +12,11 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdlib.h" 
-#include "string.h"
-#include "stdio.h"
-
-#include "EoCommon.h"
-#include "EOnv.h"
-
-#include "EoMotionControl.h"
-
-
-
 #include "EOtheEntities.h"
-
 #include "EOtheErrorManager.h"
 #include "EoError.h"
-
 #include "EOtheCANservice.h"
-
-
-#include "EOtheBOARDtransceiver.h"
-
-
 #include "EOtheMotionController.h"
-
-
-
-
-// foc-case
 #include "Controller.h"
 
 

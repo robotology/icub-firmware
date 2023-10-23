@@ -72,7 +72,9 @@ namespace embot { namespace os { namespace rtos {
     // it retrieves the time of the scheduler.
     embot::core::Time scheduler_timeget();   
     
-
+    // it sets the time of tje scheduler
+    bool scheduler_timeset(embot::core::Time t);
+    
     // it tells which thread is actually running   
     thread_t * scheduler_thread_running();    
     

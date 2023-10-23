@@ -149,7 +149,6 @@ static eOresult_t s_eom_mutex_take(void *p, eOreltime_t tout)
 {
     EOMmutex *m = reinterpret_cast<EOMmutex*>(p);    
     return (true == embot::os::rtos::mutex_take(m->mutex, tout)) ? eores_OK : eores_NOK_generic;        
-//    return eom_mutex_Take(reinterpret_cast<EOMmutex*>(p), tout);
 }
 
 
@@ -158,7 +157,6 @@ static eOresult_t s_eom_mutex_release(void *p)
     EOMmutex *m = reinterpret_cast<EOMmutex*>(p);
     embot::os::rtos::mutex_release(m->mutex);
     return eores_OK;
-//    return eom_mutex_Release(reinterpret_cast<EOMmutex*>(p));
 }
 
 static eOresult_t s_eom_mutex_delete(void *p) 
@@ -180,7 +178,7 @@ static eOresult_t s_eom_mutex_delete(void *p)
     eov_mutex_hid_Delete(m->base);
     
     delete m;  
-//    eom_mutex_Delete(reinterpret_cast<EOMmutex*>(p));
+    
     return(eores_OK);
 }
 

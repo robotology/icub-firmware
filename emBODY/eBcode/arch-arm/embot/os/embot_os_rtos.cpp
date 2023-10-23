@@ -817,8 +817,22 @@ namespace embot { namespace os { namespace rtos {
         return osal_system_abstime_get();
 #endif        
     } 
-    
-    
+
+    bool scheduler_timeset(embot::core::Time t)
+    {
+        if(!scheduler_isrunning())
+        {
+            return false;
+        }
+        
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        return false;
+#elif defined(EMBOT_USE_rtos_osal)
+        osal_system_ticks_abstime_set(t);
+        return true;
+#endif        
+    } 
+       
     thread_t * scheduler_thread_running()
     {
 #if defined(EMBOT_USE_rtos_cmsisos2)

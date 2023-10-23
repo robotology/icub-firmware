@@ -28,6 +28,7 @@
 #include "EOtheErrorManager.h"
 
 #if defined(USE_EMBOT_theHandler)
+//#warning we use embot::app:::eth::theHandler in here
 #include "embot_app_eth_theHandler.h"
 #include "embot_app_eth_theErrorManager.h"
 #include "embot_os_theScheduler.h"
@@ -308,7 +309,6 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2error))
     {
 #if defined(USE_EMBOT_theHandler)
-        #warning USE_EMBOT_theHandler is defined
         embot::app::eth::theHandler::getInstance().moveto(embot::app::eth::theHandler::State::FATALERROR);        
 #else        
         eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);
@@ -433,7 +433,6 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2runner))
     {
 #if defined(USE_EMBOT_theHandler)
-        #warning USE_EMBOT_theHandler is defined
         embot::app::eth::theHandler::getInstance().moveto(embot::app::eth::theHandler::State::RUN);
 #else          
         eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);

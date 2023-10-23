@@ -63,10 +63,10 @@ namespace embot::app::eth {
         
         enum class Category : uint8_t { // the same values as eOmn_serv_category_t
             mc = 0, strain = 1, mais = 2, inertials = 3, skin = 4, inertials3 = 5,
-            temperatures = 6, psc = 7, pos = 8, ft = 9, 
+            temperatures = 6, psc = 7, pos = 8, ft = 9, bat = 10,
             all = 128, test = 200, unknown = 254, none = 255 
         };
-        static constexpr uint8_t numberOfCategories {10}; 
+        static constexpr uint8_t numberOfCategories {11}; 
         
         enum class Type : uint8_t { // the same values as eOmn_serv_type_t
             MC_foc = 1, MC_mc4plus = 3, 
@@ -86,15 +86,13 @@ namespace embot::app::eth {
         
         virtual State state() const = 0;
         virtual void set(State s) = 0;
-        //virtual bool Verify(const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, bool activateafterverify) = 0;
         virtual bool verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation) = 0;
         virtual bool activate(const eOmn_serv_configuration_t * servcfg) = 0;
-        virtual bool deactivate() = 0; //const eOmn_serv_configuration_t * servcfg) = 0;
+        virtual bool deactivate() = 0;
         virtual bool start() = 0;
         virtual bool stop() = 0;
         virtual bool setregulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem) = 0;
         virtual bool tick(bool resetstatus = false) = 0;
-//        virtual bool AcceptCANframe(const canFrameDescriptor &canframedescriptor) = 0;
         virtual bool report() = 0;   
         
         virtual bool process(const DescriptorCANframe &canframedescriptor) = 0;

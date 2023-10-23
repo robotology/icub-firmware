@@ -37,7 +37,7 @@
 #include "EOVtheSystem.h"
 
 #if defined(USE_EMBOT_theHandler)
-    #warning USE_EMBOT_theHandler is defined. we now use _Ticker()
+ //   #warning USE_EMBOT_theHandler is defined. we now use _Ticker()
 #else 
 #include "EOMtheEMSappl.h"
 #include "EOMtheEMSconfigurator.h"
@@ -872,7 +872,7 @@ static void s_eo_candiscovery2_on_timer_expiry(void *arg)
     // however, if in config mode i must alert the processing task to execute a _Tick().
     
 #if defined(USE_EMBOT_theHandler)
-    #warning USE_EMBOT_theHandler is defined and we execution of _Tick() w/ _Ticker(). Remember to use _SetTicker() properly
+//    #warning USE_EMBOT_theHandler is defined and we execution of _Tick() w/ _Ticker(). Remember to use _SetTicker() properly
     eo_candiscovery2_Ticker(p);
 #else     
     eOsmStatesEMSappl_t state = eo_sm_emsappl_STerr;

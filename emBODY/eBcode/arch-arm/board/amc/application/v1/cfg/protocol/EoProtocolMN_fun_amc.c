@@ -10,37 +10,28 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdlib.h" 
-#include "string.h"
-#include "stdio.h"
-
-#include "EoManagement.h"
-#include "EOnv_hid.h"
-
-#include "EOtheBOARDtransceiver.h"
-#include "EOtheErrorManager.h"
-#include "EoError.h"
-#include "eEsharedServices.h"
-#include "EOVtheSystem.h"
-
-#include "EOMtheEMStransceiver.h"
-#include "EOMtheEMSrunner.h"
 
 #if defined(USE_EMBOT_theServices)
 #include "embot_app_eth_theServices.h"
-#else
-#include "EOtheServices.h"
+#else  
+    #error this file is to used w/ USE_EMBOT_theServices
 #endif
 
 #if defined(USE_EMBOT_theHandler)
-#include "theApplication_config.h"
-#include "theHandler_Config.h"
 #include "embot_app_eth_theHandler.h"
-#else
-#include "EOMtheEMSappl.h"
-#include "EOMtheEMSapplCfg.h"
+#else  
+    #error this file is to be used w/ USE_EMBOT_theHandler
 #endif
 
+
+#include "EOtheBOARDtransceiver.h"
+#include "EOMtheEMSrunner.h"
+
+#include "EOtheErrorManager.h"
+#include "EoError.h"
+#include "eEsharedServices.h"
+#include "embot_os_rtos.h"
+#include "EOnv_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -99,54 +90,40 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
-{
-    eOmn_comm_status_t* status = (eOmn_comm_status_t*)nv->ram;
-    
-    // 1. init the management protocol version
-    
-    eOversion_t* version = &status->managementprotocolversion;
-    
-    version->major = eoprot_version_mn_major;
-    version->minor = eoprot_version_mn_minor;
-    
-    
-    // 2. init the transceiver
-    
-    eOmn_transceiver_properties_t* transp = &status->transceiver;
-    
-#if defined(USE_EMBOT_theHandler)    
-    transp->listeningPort = embot::app::eth::theHandler_EOMtheEMSsocket_Config.localport;
-    transp->destinationPort = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.hostipv4port;
-    transp->maxsizeRXpacket = embot::app::eth::theHandler_EOMtheEMSsocket_Config.inpdatagramsizeof;
-    transp->maxsizeTXpacket = embot::app::eth::theHandler_EOMtheEMSsocket_Config.outdatagramsizeof;
-    transp->maxsizeROPframeRegulars = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframeregulars;
-    transp->maxsizeROPframeReplies = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframereplies;
-    transp->maxsizeROPframeOccasionals = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframeoccasionals;
-    transp->maxsizeROP = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofrop;
-    transp->maxnumberRegularROPs = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.maxnumberofregularrops;
-    memset(transp->filler06, 0, sizeof(transp->filler06));     
-#else    
-    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
-    
-    transp->listeningPort                   = emscfg->socketcfg.localport;
-    transp->destinationPort                 = emscfg->transcfg.hostipv4port;
-    transp->maxsizeRXpacket                 = emscfg->socketcfg.inpdatagramsizeof;
-    transp->maxsizeTXpacket                 = emscfg->socketcfg.outdatagramsizeof;
-    transp->maxsizeROPframeRegulars         = emscfg->transcfg.sizes.capacityofropframeregulars;
-    transp->maxsizeROPframeReplies          = emscfg->transcfg.sizes.capacityofropframereplies;
-    transp->maxsizeROPframeOccasionals      = emscfg->transcfg.sizes.capacityofropframeoccasionals;
-    transp->maxsizeROP                      = emscfg->transcfg.sizes.capacityofrop;
-    transp->maxnumberRegularROPs            = emscfg->transcfg.sizes.maxnumberofregularrops;
-    memset(transp->filler06, 0, sizeof(transp->filler06)); 
-#endif    
-}
+//extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
+//{
+//    eOmn_comm_status_t* status = (eOmn_comm_status_t*)rd->data;
+//    
+//    // 1. init the management protocol version
+//    
+//    eOversion_t* version = &status->managementprotocolversion;
+//    
+//    version->major = eoprot_version_mn_major;
+//    version->minor = eoprot_version_mn_minor;
+//    
+//    
+//    // 2. init the transceiver
+//    
+//    eOmn_transceiver_properties_t* transp = &status->transceiver;
+//    
+//    transp->listeningPort = embot::app::eth::theHandler_EOMtheEMSsocket_Config.localport;
+//    transp->destinationPort = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.hostipv4port;
+//    transp->maxsizeRXpacket = embot::app::eth::theHandler_EOMtheEMSsocket_Config.inpdatagramsizeof;
+//    transp->maxsizeTXpacket = embot::app::eth::theHandler_EOMtheEMSsocket_Config.outdatagramsizeof;
+//    transp->maxsizeROPframeRegulars = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframeregulars;
+//    transp->maxsizeROPframeReplies = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframereplies;
+//    transp->maxsizeROPframeOccasionals = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframeoccasionals;
+//    transp->maxsizeROP = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofrop;
+//    transp->maxnumberRegularROPs = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.maxnumberofregularrops;
+//    memset(transp->filler06, 0, sizeof(transp->filler06));     
+
+//}
 
 
 
 extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;    
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;    
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
         
     if(eobool_true == eo_nv_hid_isLocal(nv))
@@ -175,7 +152,7 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_querynumof(const EOnv* nv, co
 
 extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_queryarray(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;    
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;    
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
         
     if(eobool_true == eo_nv_hid_isLocal(nv))
@@ -203,7 +180,7 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_queryarray(const EOnv* nv, co
 
 extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmn_command_t* command = (eOmn_command_t*)nv->ram;    
+    eOmn_command_t* command = (eOmn_command_t*)rd->data;    
     eOmn_opc_t opc = (eOmn_opc_t)command->cmd.opc;
         
     if(eobool_true == eo_nv_hid_isLocal(nv))
@@ -231,98 +208,53 @@ extern void eoprot_fun_UPDT_mn_comm_cmmnds_command_config(const EOnv* nv, const 
 
 }
 
-extern void eoprot_fun_INIT_mn_appl_config(const EOnv* nv)
-{
-    eOmn_appl_config_t config = {0};
-
-#if defined(USE_EMBOT_theHandler)    
-    config.cycletime =  embot::app::eth::theHandler_EOMtheEMSrunner_Config.period;
-    config.txratedivider = embot::app::eth::theHandler_EOMtheEMSrunner_Config.defaultTXdecimationfactor;
-#else     
-    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();    
-    config.cycletime        = emscfg->runobjcfg.period;
-    config.txratedivider    = emscfg->runobjcfg.defaultTXdecimationfactor;
-#endif          
-    // set it
-    eo_nv_Set(nv, &config, eobool_true, eo_nv_upd_dontdo);        
-}
+//extern void eoprot_fun_INIT_mn_appl_config(const EOnv* nv)
+//{
+//    eOmn_appl_config_t config = {0};
+// 
+//    config.cycletime =  embot::app::eth::theHandler_EOMtheEMSrunner_Config.period;
+//    config.txratedivider = embot::app::eth::theHandler_EOMtheEMSrunner_Config.defaultTXdecimationfactor;
+//       
+//    // set it
+//    eo_nv_Set(nv, &config, eobool_true, eo_nv_upd_dontdo);        
+//}
 
 
 
-extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
-{
-    eOmn_appl_status_t status = {0};
+//extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
+//{
+//    eOmn_appl_status_t status = {0};
 
-#if defined(USE_EMBOT_theHandler)    
-    
-    // build date
-    status.buildate.year    = embot::app::eth::theApplication_Config.property.date.year;
-    status.buildate.month   = embot::app::eth::theApplication_Config.property.date.month;
-    status.buildate.day     = embot::app::eth::theApplication_Config.property.date.day;
-    status.buildate.hour    = embot::app::eth::theApplication_Config.property.date.hour;
-    status.buildate.min     = embot::app::eth::theApplication_Config.property.date.minute;
-    
-    // version    
-    status.version.major    = embot::app::eth::theApplication_Config.property.version.major;
-    status.version.minor    = embot::app::eth::theApplication_Config.property.version.minor;
-    
-    // control loop timings 
-    status.cloop_timings[0] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.execDOafter;
-	status.cloop_timings[1] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.execTXafter - embot::app::eth::theHandler_EOMtheEMSrunner_Config.execDOafter;
-	status.cloop_timings[2] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.period - embot::app::eth::theHandler_EOMtheEMSrunner_Config.execTXafter;
-    status.txdecimationfactor = embot::app::eth::theHandler_EOMtheEMSrunner_Config.defaultTXdecimationfactor;
-    
-    // name
-    static const char * nn[] = {"amc"};
-    memcpy(status.name, nn, std::min(sizeof(status.name), sizeof(nn)));
-       
-    // curr state
-    status.currstate = applstate_config;
-    status.boardtype = eobrd_ethtype_amc;
-    
-#else     
-//    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
-//    
+
 //    // build date
-//    status.buildate.year        = emscfg->applcfg.emsappinfo->info.entity.builddate.year;
-//    status.buildate.month       = emscfg->applcfg.emsappinfo->info.entity.builddate.month;
-//    status.buildate.day         = emscfg->applcfg.emsappinfo->info.entity.builddate.day;
-//    status.buildate.hour        = emscfg->applcfg.emsappinfo->info.entity.builddate.hour;
-//    status.buildate.min         = emscfg->applcfg.emsappinfo->info.entity.builddate.min;
+//    status.buildate.year    = embot::app::eth::theApplication_Config.property.date.year;
+//    status.buildate.month   = embot::app::eth::theApplication_Config.property.date.month;
+//    status.buildate.day     = embot::app::eth::theApplication_Config.property.date.day;
+//    status.buildate.hour    = embot::app::eth::theApplication_Config.property.date.hour;
+//    status.buildate.min     = embot::app::eth::theApplication_Config.property.date.minute;
 //    
-//    // version
-//    status.version.major        = emscfg->applcfg.emsappinfo->info.entity.version.major;
-//    status.version.minor        = emscfg->applcfg.emsappinfo->info.entity.version.minor;
-//		
-//	// control loop timings 
-//    status.cloop_timings[0]     = emscfg->runobjcfg.execDOafter;
-//	status.cloop_timings[1]     = emscfg->runobjcfg.execTXafter - emscfg->runobjcfg.execDOafter;
-//	status.cloop_timings[2]     = emscfg->runobjcfg.period - emscfg->runobjcfg.execTXafter;
-//    status.txdecimationfactor   = emscfg->runobjcfg.defaultTXdecimationfactor;
+//    // version    
+//    status.version.major    = embot::app::eth::theApplication_Config.property.version.major;
+//    status.version.minor    = embot::app::eth::theApplication_Config.property.version.minor;
 //    
-//    uint16_t min = EO_MIN(sizeof(status.name), sizeof(emscfg->applcfg.emsappinfo->info.name));
-//    memcpy(status.name, emscfg->applcfg.emsappinfo->info.name, min);
-
-
+//    // control loop timings 
+//    status.cloop_timings[0] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.execDOafter;
+//	status.cloop_timings[1] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.execTXafter - embot::app::eth::theHandler_EOMtheEMSrunner_Config.execDOafter;
+//	status.cloop_timings[2] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.period - embot::app::eth::theHandler_EOMtheEMSrunner_Config.execTXafter;
+//    status.txdecimationfactor = embot::app::eth::theHandler_EOMtheEMSrunner_Config.defaultTXdecimationfactor;
+//    
+//    // name
+//    static const char * nn[] = {"amc"};
+//    memcpy(status.name, nn, std::min(sizeof(status.name), sizeof(nn)));
+//       
 //    // curr state
 //    status.currstate = applstate_config;
-//    status.boardtype = eobrd_ethtype_unknown;
-//    
-//#if defined(USE_EMS4RD)
-//    status.boardtype = eobrd_ethtype_ems4;
-//#elif defined(USE_MC4PLUS)
-//    status.boardtype = eobrd_ethtype_mc4plus;
-//#elif defined(USE_MC2PLUS)
-//    status.boardtype = eobrd_ethtype_mc2plus;
-//#elif defined(STM32HAL_BOARD_AMC)
 //    status.boardtype = eobrd_ethtype_amc;
-//#endif
+//    
 
-#endif 
-
-    // set it
-    eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
-}
+//    // set it
+//    eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
+//}
 
 extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -364,7 +296,7 @@ extern void eoprot_fun_UPDT_mn_appl_config_txratedivider(const EOnv* nv, const e
 
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)nv->ram;
+    eOmn_appl_state_t *go2state = (eOmn_appl_state_t *)rd->data;
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
@@ -374,34 +306,19 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
     switch(*go2state)
     {
         case applstate_config:
-        {
-#if defined(USE_EMBOT_theHandler)    
+        { 
             embot::app::eth::theHandler::getInstance().process(embot::app::eth::theHandler::Command::go2IDLE);
-#else             
-//            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
-//            res = res;
-#endif
         } break;
 
         case applstate_running:
         {
             // we always allow entering the control loop. to be in control loop does nothing unless the service is activated.
-            
-#if defined(USE_EMBOT_theHandler)    
             embot::app::eth::theHandler::getInstance().process(embot::app::eth::theHandler::Command::go2RUN);
-#else 
-            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
-#endif
         } break;
         
         case applstate_error:
-        {
-#if defined(USE_EMBOT_theHandler)    
+        {  
             embot::app::eth::theHandler::getInstance().process(embot::app::eth::theHandler::Command::go2FATALERROR);
-#else             
-            // i don't expect to receive a go2error command
-            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
-#endif            
         } break;
 
         case applstate_resetmicro:
@@ -428,12 +345,11 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
 extern void eoprot_fun_UPDT_mn_appl_cmmnds_timeset(const EOnv* nv, const eOropdescriptor_t* rd) 
 {
-    eOabstime_t *timeset = (eOabstime_t *)nv->ram;
-    #warning TODO: review eoprot_fun_UPDT_mn_appl_cmmnds_timesetfill()
+    eOabstime_t *timeset = (eOabstime_t *)rd->data;
     
     // first implementation: if the received time is not much different, then i apply it
     
-    eOabstime_t currtime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    embot::core::Time currtime = embot::os::rtos::scheduler_timeget();
     int64_t delta = *timeset - currtime;
     
     char str[96];
@@ -483,11 +399,10 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_timeset(const EOnv* nv, const eOropde
     
     if(eobool_true == apply)
     {
-        eov_sys_LifeTimeSet(eov_sys_GetHandle(), *timeset);
+         embot::os::rtos::scheduler_timeset(*timeset);
     }
     
-    
-    currtime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    currtime = embot::os::rtos::scheduler_timeget();
     
     descriptor.par16 = apply;
     descriptor.par64 = currtime;
@@ -502,13 +417,9 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_timeset(const EOnv* nv, const eOropde
 
 extern void eoprot_fun_UPDT_mn_service_cmmnds_command(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmn_service_cmmnds_command_t *command = (eOmn_service_cmmnds_command_t *)nv->ram;    
+    eOmn_service_cmmnds_command_t *command = (eOmn_service_cmmnds_command_t *)rd->data;    
     // ok, we have received a command for a given service. we ask the object theservices to manage the thing
-#if defined(USE_EMBOT_theServices)
     embot::app::eth::theServices::getInstance().process(command);
-#else    
-    eo_services_ProcessCommand(eo_services_GetHandle(), command);
-#endif    
 }
 
 
@@ -560,13 +471,9 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
-            ropdesc.data    = NULL; // so that dat from teh EOnv is retrieved.
-#if defined(USE_EMBOT_theHandler)    
-//            #warning USE_EMBOT_theHandler is defined. SOLVED how to transmit an occasional ROP
-            eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
-#else             
-            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);    // it also alert someone to send the rop   
-#endif            
+            ropdesc.data    = NULL; // so that data from the EOnv is retrieved.
+            embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+//            eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
         } break;
               
 
@@ -588,11 +495,8 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
             ropdesc.data    = NULL; // so that dat from teh EOnv is retrieved.
-#if defined(USE_EMBOT_theHandler)    
-            eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
-#else             
-            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);           
-#endif            
+            embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+            //eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
         } break;
        
         
@@ -615,12 +519,8 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
             ropdesc.data    = NULL; // so that data from the EOnv is retrieved.
-#if defined(USE_EMBOT_theHandler)    
-            eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
-#else             
-            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
-#endif            
-           
+            embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+            //eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
         } break;
  
         
@@ -684,12 +584,9 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
             cmdreplyarray->opcpar.endpoint  = eoprot_endpoint_all;
             cmdreplyarray->opcpar.setnumber = setnumber;
             cmdreplyarray->opcpar.setsize   = setsize;
-            eoprot_endpoints_array_get(eoprot_board_localboard, ep08array, setnumber*setsize);    
-#if defined(USE_EMBOT_theHandler)    
-            eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
-#else             
-            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
-#endif           
+            eoprot_endpoints_array_get(eoprot_board_localboard, ep08array, setnumber*setsize); 
+            embot::app::eth::theHandler::getInstance().transmit(ropdesc);            
+            //eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
         } break;      
 
         
@@ -716,11 +613,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
             cmdreplyarray->opcpar.setnumber = setnumber;
             cmdreplyarray->opcpar.setsize   = setsize;
             eoprot_endpoints_arrayofdescriptors_get(eoprot_board_localboard, epdesarray, setnumber*setsize);   
-#if defined(USE_EMBOT_theHandler)    
-            eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
-#else             
-            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
-#endif           
+            embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+            //eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
         } break;           
 
         
@@ -755,12 +649,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
             {
                 eoprot_entities_in_endpoint_arrayofdescriptors_get(eoprot_board_localboard, endpoint, endesarray, setnumber*setsize);
             }
-#if defined(USE_EMBOT_theHandler)    
-            eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
-#else             
-            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
-#endif
-           
+            embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+            //eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
         } break;  
         
         
@@ -798,11 +688,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
             {    
                 eo_transceiver_RegularROP_ArrayID32GetWithEP(theems00transceiver, endpoint, setnumber*setsize, id32array);
             }
-#if defined(USE_EMBOT_theHandler)    
-            eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
-#else            
-            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
-#endif           
+            //eom_emstransceiver_Transmit_OccasionalROP(eom_emstransceiver_GetHandle(), &ropdesc);
+            embot::app::eth::theHandler::getInstance().transmit(ropdesc);
         } break;         
         
         default:
@@ -945,8 +832,9 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
             {
                 if(eobool_false == eoprot_endpoint_configured_is(eoprot_board_localboard, epcfg->endpoint))
                 {
-                    EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle());
-                    eo_nvset_LoadEP(nvset, epcfg, eobool_true);                        
+//                    EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle());
+//                    eo_nvset_LoadEP(nvset, epcfg, eobool_true); 
+                    embot::app::eth::theServices::getInstance().load(*epcfg);                    
                 }                  
             }        
         } break;

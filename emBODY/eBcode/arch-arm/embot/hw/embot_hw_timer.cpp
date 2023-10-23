@@ -429,7 +429,7 @@ namespace embot { namespace hw { namespace timer {
         #if defined(STM32HAL_STM32L4) && (STM32HAL_DRIVER_VERSION >= 0x183)
         phandletimx->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
         #elif defined(STM32HAL_STM32H7)
-        #warning TODO: verify it
+        //#warning TODO: verify it
         phandletimx->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
         #endif
         

@@ -858,7 +858,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
     
     canFrameDescriptor::Type type = cfd.type;
     
-    #warning process also Type::autodetect 
+    // #warning process also Type::autodetect 
     if(canFrameDescriptor::Type::autodetect == type)
     {
         // eval the frame->id and frame->data[0]

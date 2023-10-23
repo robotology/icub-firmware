@@ -29,7 +29,7 @@
 #include "Joint_hid.h"
 #include "CalibrationHelperData.h"
 #if defined(USE_EMBOT_theServices) 
-#warning USE_EMBOT_theServices is defined: removed some code
+//#warning USE_EMBOT_theServices is defined
 // marco.accame: use objects embot::app::eth::theEncoderReader and ... future ones
 #else
 #include "EOtheMAIS.h"

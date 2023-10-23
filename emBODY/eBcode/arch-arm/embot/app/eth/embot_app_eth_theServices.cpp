@@ -65,6 +65,8 @@ struct embot::app::eth::theServices::Impl
     bool stop();
     bool tick();
     
+    bool load(const eOprot_EPcfg_t &epcfg);
+    
     bool sendresult(Service *s, const eOmn_service_cmmnds_command_t *command, eOmn_serv_state_t state, bool ok); 
     
     // statics
@@ -188,10 +190,7 @@ void embot::app::eth::theServices::Impl::init_step2()
                 eo_nvset_LoadEP(_nvset, epcfg, eobool_true);
             }                        
         }
-        
-//        eo_entities_Initialise();
-        
-        
+       
         
         // 3. the callbacks
         // marco.accame on 30 sept 2015: so far i define all the callbacks. however:
@@ -292,7 +291,6 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
     eOmn_serv_operation_t operation = (eOmn_serv_operation_t)command->operation;
     eOmn_serv_category_t category = static_cast<eOmn_serv_category_t>(command->category);
     const eOmn_serv_configuration_t *config = &command->parameter.configuration;
-    //eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;
     
     embot::app::eth::Service::Category cat = static_cast<embot::app::eth::Service::Category>(command->category);
     
@@ -300,39 +298,30 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
     // else if it is category_all and we have stop or deactivate we go on   
     // else .... no good
     
+
     if((embot::app::eth::Service::Category::all == cat) && (eomn_serv_operation_stop == operation))
     {
         embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "stop all");
-        stop();        
+        stop(); 
+        
+        // surely we must to idle
+        bool noserviceisrunning {true};
+        for(auto r : _running) { if(r) noserviceisrunning = false; }
+        if(true == noserviceisrunning)
+        {
+            embot::app::eth::theHandler::getInstance().process(embot::app::eth::theHandler::Command::go2IDLE);
+        }  
+          
         sendresult(nullptr, command, eomn_serv_state_idle, true);
         return true;
     }
-    
-    
-    #if 0
-    
-    theftserv = new FTService;
-    theftserv->init();
-    theservices.load(theftserv);
-    
-    Service srv* theServices.get(FTcategory);
-    
-    srv->verify(arg) etc
-    but also
-    tehservices.verify(arg) ???
-    
-    sicuramente 
-    theservices.stop() ferma tutto
-    
-    
-    #endif
+            
     
     embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "some request");
 
     embot::app::eth::Service *service = get(cat);
     if(nullptr == service)
     {   // category not supported or not available yet
-        #warning TODO: send up ROP w/ failure 
         embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "cannot get service of type ...");
         sendresult(nullptr, command, eomn_serv_state_notsupported, false);
         return false;
@@ -375,8 +364,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
                 servstate = static_cast<eOmn_serv_state_t>(_mnservice->status.stateofservice[category]);                
                 sendresult(service, command, servstate, ok);                
             }            
-            
-//            service->Start();
+
             // for reference it was: s_eo_services_process_start(category);
         } break;
         
@@ -457,13 +445,11 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
 
 bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
 {
-    if((nullptr == id32ofregulars) || (nullptr == arrayofid32))
+    if(nullptr == id32ofregulars)
     {
         return false;
     }
-    
-    EOarray* id32array = (EOarray*)arrayofid32;    
-        
+            
     uint8_t size = 0;
     uint8_t i = 0;
     
@@ -478,7 +464,8 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
     ropdesc.signature               = eo_rop_SIGNATUREdummy;  
     uint32_t* id32 = NULL;
     
-    // at first we remove all regulars inside id32ofregulars and we reset it
+    
+    // at first we remove all regulars inside id32ofregulars and we clear id32ofregulars
     size = eo_array_Size(id32ofregulars);
     for(i=0; i<size; i++)
     {
@@ -492,7 +479,10 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
     eo_array_Reset(id32ofregulars);
     
     
-    // then i load the new id32s ... if there are any
+    EOarray* id32array = (EOarray*)arrayofid32;    
+    
+    // then ... if we have new ID32 inside the array:
+    // i load the valid ones inside the transceiver but also inside id32ofregulars
     if((NULL != id32array) && (0 != eo_array_Size(id32array)))
     {
         // get all the id32 from id32array (but not more than ...) and: 1. push back into id32ofregulars, 2. load the regular
@@ -538,6 +528,7 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
         }
     }
     
+    // finally i return back how many new ID32s I have added
     if(nullptr != numberofthem)
     {
         *numberofthem = eo_array_Size(id32ofregulars);
@@ -546,103 +537,6 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
     return true;   
 }
 
-#warning SEE this new implem
-#if 0
-bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, bool clearfirst, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
-{
-    if(nullptr == id32ofregulars)
-    {
-        return false;
-    }
-             
-    uint8_t size = 0;
-    uint8_t i = 0;
-    
-    EOtransceiver* boardtransceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
-
-    if(true == clearfirst)
-    {    
-        eOropdescriptor_t ropdesc;
-        memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
-        ropdesc.control.plustime        = eobool_false;
-        ropdesc.control.plussign        = eobool_false;
-        ropdesc.ropcode                 = eo_ropcode_sig;
-        ropdesc.id32                    = eo_prot_ID32dummy;    
-        ropdesc.signature               = eo_rop_SIGNATUREdummy;  
-        uint32_t* id32 = NULL;
-        
-        // at first we remove all regulars inside id32ofregulars and we reset it
-        size = eo_array_Size(id32ofregulars);
-        for(i=0; i<size; i++)
-        {
-            id32 = (uint32_t*)eo_array_At(id32ofregulars, i);
-            if(NULL != id32)
-            {
-                ropdesc.id32 = *id32;
-                eo_transceiver_RegularROP_Unload(boardtransceiver, &ropdesc);
-            }       
-        }    
-        eo_array_Reset(id32ofregulars);
-    }    
-    
-    EOarray* id32array = (EOarray*)arrayofid32;   
-        
-    // then i load the new id32s ... if there are any
-    if((NULL != id32array) && (0 != eo_array_Size(id32array)))
-    {
-        // get all the id32 from id32array (but not more than ...) and: 1. push back into id32ofregulars, 2. load the regular
-        size = eo_array_Size(id32array);
-        
-        eOropdescriptor_t ropdesc;
-        memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
-        ropdesc.control.plustime    = 0;
-        ropdesc.control.plussign    = 0;
-        ropdesc.ropcode             = eo_ropcode_sig;
-        ropdesc.signature           = eo_rop_SIGNATUREdummy;  
-        uint32_t* id32 = NULL;        
-        
-        for(i=0; i<size; i++)
-        {
-            id32 = (uint32_t*)eo_array_At(id32array, i);
-            if(NULL != id32)
-            { 
-                // filter them 
-                bool itisrelevant = true;
-                if(nullptr != fpISOK)
-                {
-                    itisrelevant = fpISOK(*id32);                   
-                }
-                
-                if(true == itisrelevant)
-                {
-                    ropdesc.id32 = *id32;     
-                    if(eores_OK == eo_transceiver_RegularROP_Load(boardtransceiver, &ropdesc))
-                    {
-                        eo_array_PushBack(id32ofregulars, id32);
-                        if(eobool_true == eo_array_Full(id32ofregulars))
-                        {   // cannot add any more regulars
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        
-                    }
-                   
-                }                
-            }           
-        }
-    }
-    
-    if(nullptr != numberofthem)
-    {
-        *numberofthem = eo_array_Size(id32ofregulars);
-    }
-    
-    return true;   
-}
-
-#endif
 
 bool embot::app::eth::theServices::Impl::synch(Service::Category category, Service::State state)
 {
@@ -661,23 +555,6 @@ bool embot::app::eth::theServices::Impl::synch(Service::Category category, Servi
     
     return true;
 }
-
-//extern eOresult_t eo_service_hid_SynchServiceState(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_state_t servstate)
-//{
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }   
-//    
-//    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category) || (eomn_serv_category_unknown == category))
-//    {
-//        return(eores_NOK_generic);
-//    }
-//    
-//    p->mnservice->status.stateofservice[category] = servstate;
-//    
-//    return(eores_OK);
-//}
 
 
 bool embot::app::eth::theServices::Impl::stop()
@@ -707,6 +584,13 @@ bool embot::app::eth::theServices::Impl::tick()
             s->tick();
         }            
     }   
+    return true;
+}
+
+bool embot::app::eth::theServices::Impl::load(const eOprot_EPcfg_t &epcfg)
+{
+    eOprot_EPcfg_t *p = const_cast<eOprot_EPcfg_t*>(&epcfg);
+    eo_nvset_LoadEP(_nvset, p, eobool_true);
     return true;
 }
 
@@ -756,7 +640,6 @@ bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const e
     eOmn_serv_category_t category = static_cast<eOmn_serv_category_t>(s->category());
     eOmn_serv_type_t type = static_cast<eOmn_serv_type_t>(sc->type);    
         
-//    Impl *impl = reinterpret_cast<Impl*>(caller);
     // mnservice can be retrieved w/ ...
     eOmn_service_t * mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
     mnservice->status.commandresult.category = category;
@@ -766,8 +649,6 @@ bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const e
     mnservice->status.commandresult.latestcommandisok = ok ? eobool_true : eobool_false;    
     mnservice->status.commandresult.data[0] = ok ? eomn_serv_state_activated: eomn_serv_state_failureofverify;        
     
-//    transmit_rop();  
-
     eOropdescriptor_t ropdesc {};
 
     memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
@@ -782,30 +663,6 @@ bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const e
     return true;
 }
 
-//static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_serv_operation_t operation, eOmn_serv_category_t category)
-//{
-//    p->mnservice->status.commandresult.latestcommandisok = eobool_false;
-//    p->mnservice->status.commandresult.category = category;
-//    p->mnservice->status.commandresult.operation = operation;
-//    p->mnservice->status.commandresult.type = eomn_serv_NONE;
-
-//    send_rop_command_result(); 
-
-//    return(eores_OK);    
-//}
-
-
-//static void send_rop_command_result(void)
-//{
-//    eOropdescriptor_t ropdesc;
-
-//    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
-//    ropdesc.ropcode = eo_ropcode_sig;
-//    ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_service, 0, eoprot_tag_mn_service_status_commandresult);
-//    ropdesc.data    = NULL; // so that data from the EOnv is retrieved (which is: p->mnservice->status.commandresult)          
-//    
-//    eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
-//}
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -866,6 +723,11 @@ bool embot::app::eth::theServices::stop()
 bool embot::app::eth::theServices::tick()
 {
     return pImpl->tick();
+}
+
+bool embot::app::eth::theServices::load(const eOprot_EPcfg_t &epcfg)
+{
+    return pImpl->load(epcfg);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
