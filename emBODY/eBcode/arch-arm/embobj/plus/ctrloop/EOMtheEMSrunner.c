@@ -390,15 +390,15 @@ extern eObool_t eom_emsrunner_IsRunning(EOMtheEMSrunner *p)
     return p->isrunning;    
 }
 
-extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id)
-{
-    if(NULL == p)
-    {
-        return(NULL);
-    }
-    
-    return(s_theemsrunner.task[id]);
-}
+//extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id)
+//{
+//    if(NULL == p)
+//    {
+//        return(NULL);
+//    }
+//    
+//    return(s_theemsrunner.task[id]);
+//}
 
 
 extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8_t txdecimationfactor)

@@ -59,6 +59,7 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
+#define CANflushMODE_DO_phase
 
 // the theCTRLsocket objects wraps the use of EOMtheEMSsocket + EOMtheEMStransceiver inside theHandler
 struct theCTRLsocket
@@ -428,7 +429,6 @@ struct theSM
         eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);        
     }
     
-    #define CANflushMODE_DO_phase
     
     static void objectRUN_DO_activity()
     {
@@ -696,8 +696,8 @@ static void s_manage_haltrace(const eOerrmanErrorType_t errtype, const char *inf
     const char empty[] = "EO?";
     const char *err = eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype);
     const char *eobjstr = (NULL == caller) ? (empty) : ((NULL == caller->eobjstr) ? (empty) : (caller->eobjstr));
-    const uint32_t taskid = (NULL == caller) ? (0) : (caller->taskid);
-    
+    const uint32_t taskid = 666; // because in embot application the caller->taskid is meaningless. much better to use the thread name
+
     embot::core::TimeFormatter tf {embot::core::now()};
     
     if(eo_errortype_trace == errtype)

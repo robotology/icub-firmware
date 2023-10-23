@@ -85,6 +85,9 @@ namespace embot { namespace os {
         virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) = 0;
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) = 0;
         
+        virtual bool setData(void *data) = 0;
+        virtual void * getData() = 0;
+        
     public:
         virtual ~Thread() {};                        
     };  
@@ -106,16 +109,19 @@ namespace embot { namespace os {
                              
         static InitThread& getInstance();        
     
-        virtual Type getType() const;
-        virtual Priority getPriority() const;
-        virtual bool setPriority(Priority priority);
-        virtual const char * getName() const;
-        virtual void run();
+        Type getType() const override;
+        Priority getPriority() const override;
+        bool setPriority(Priority priority) override;
+        const char * getName() const override;
+        void run() override;
         
-        virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
+        bool setEvent(os::Event event) override;  
+        bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) override;
+        
+        bool setData(void *data) override;
+        void * getData() override;
         
         void synch(); // only the scheduler can call this method
         
@@ -154,16 +160,19 @@ namespace embot { namespace os {
                              
         static IdleThread& getInstance();        
     
-        virtual Type getType() const;
-        virtual Priority getPriority() const;
-        virtual bool setPriority(Priority priority);
-        virtual const char * getName() const;
-        virtual void run();
+        Type getType() const override;
+        Priority getPriority() const override;
+        bool setPriority(Priority priority) override;
+        const char * getName() const override;
+        void run() override;
         
-        virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
+        bool setEvent(os::Event event) override;  
+        bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) override;
+        
+        bool setData(void *data) override;
+        void * getData() override;
         
         void synch(); // only the scheduler can call this method
         
@@ -199,18 +208,21 @@ namespace embot { namespace os {
         EventThread();
         virtual ~EventThread();
     
-        virtual Type getType() const;
-        virtual Priority getPriority() const;
-        virtual bool setPriority(Priority priority);
-        virtual const char * getName() const;
+        Type getType() const override;
+        Priority getPriority() const override;
+        bool setPriority(Priority priority) override;
+        const char * getName() const override;
+        void run() override;
         
-        virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
-                 
-        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
-        virtual void run();    
+        bool setEvent(os::Event event) override;  
+        bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) override;
+        
+        bool setData(void *data) override;
+        void * getData() override;
+        
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);   
 
     private:        
         struct Impl;
@@ -244,18 +256,21 @@ namespace embot { namespace os {
         MultiEventThread();
         virtual ~MultiEventThread();
     
-        virtual Type getType() const;
-        virtual Priority getPriority() const;
-        virtual bool setPriority(Priority priority);
-        virtual const char * getName() const;
+        Type getType() const override;
+        Priority getPriority() const override;
+        bool setPriority(Priority priority) override;
+        const char * getName() const override;
+        void run() override;
         
-        virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
-                 
-        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
-        virtual void run();    
+        bool setEvent(os::Event event) override;  
+        bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) override;
+        
+        bool setData(void *data) override;
+        void * getData() override;
+        
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);  
 
     private:        
         struct Impl;
@@ -285,18 +300,21 @@ namespace embot { namespace os {
         MessageThread();
         virtual ~MessageThread();
           
-        virtual Type getType() const;
-        virtual Priority getPriority() const;
-        virtual bool setPriority(Priority priority);
-        virtual const char * getName() const;
+        Type getType() const override;
+        Priority getPriority() const override;
+        bool setPriority(Priority priority) override;
+        const char * getName() const override;
+        void run() override;
         
-        virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
-         
+        bool setEvent(os::Event event) override;  
+        bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) override;
+        
+        bool setData(void *data) override;
+        void * getData() override;
+        
         bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
-        virtual void run();
         
     
     private:        
@@ -327,18 +345,21 @@ namespace embot { namespace os {
         ValueThread();
         virtual ~ValueThread();
           
-        virtual Type getType() const;
-        virtual Priority getPriority() const;
-        virtual bool setPriority(Priority priority);
-        virtual const char * getName() const;
+        Type getType() const override;
+        Priority getPriority() const override;
+        bool setPriority(Priority priority) override;
+        const char * getName() const override;
+        void run() override;
         
-        virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
-         
+        bool setEvent(os::Event event) override;  
+        bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) override;
+        
+        bool setData(void *data) override;
+        void * getData() override;
+        
         bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
-        virtual void run();
             
     private:        
         struct Impl;
@@ -369,19 +390,21 @@ namespace embot { namespace os {
         CallbackThread();
         virtual ~CallbackThread();
         
-        virtual Type getType() const;
-        virtual Priority getPriority() const;
-        virtual bool setPriority(Priority priority);
-        virtual const char * getName() const;
+        Type getType() const override;
+        Priority getPriority() const override;
+        bool setPriority(Priority priority) override;
+        const char * getName() const override;
+        void run() override;
         
-        virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever); 
-        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);    
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
+        bool setEvent(os::Event event) override;  
+        bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) override;
         
-
+        bool setData(void *data) override;
+        void * getData() override;
+        
         bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
-        virtual void run();
     
     private:        
         struct Impl;
@@ -410,19 +433,23 @@ namespace embot { namespace os {
         PeriodicThread();
         virtual ~PeriodicThread();
          
-        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
-        virtual void run();
-    
-        virtual Type getType() const;
-        virtual Priority getPriority() const;
-        virtual bool setPriority(Priority priority);
-        virtual const char * getName() const;
-        
-        virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
 
+        Type getType() const override;
+        Priority getPriority() const override;
+        bool setPriority(Priority priority) override;
+        const char * getName() const override;
+        void run() override;
+        
+        bool setEvent(os::Event event) override;  
+        bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) override;
+        bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) override;
+        
+        bool setData(void *data) override;
+        void * getData() override;
+        
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);   
+        
     private:        
         struct Impl;
         Impl *pImpl;           

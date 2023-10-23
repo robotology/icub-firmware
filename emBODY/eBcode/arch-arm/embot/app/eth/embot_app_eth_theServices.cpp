@@ -59,7 +59,11 @@ struct embot::app::eth::theServices::Impl
     
     bool process(eOmn_service_cmmnds_command_t *command);
     
-    bool setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);
+    bool setREGULARS(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);
+    
+    bool add(const std::vector<eOprotID32_t> &id32s, fpIsID32relevant fpISOK, uint8_t &added);
+    bool rem(const std::vector<eOprotID32_t> &id32s,uint8_t &removed);
+    
     bool synch(Service::Category category, Service::State state);
     
     bool stop();
@@ -443,7 +447,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
 }
 
 
-bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
+bool embot::app::eth::theServices::Impl::setREGULARS(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
 {
     if(nullptr == id32ofregulars)
     {
@@ -537,6 +541,85 @@ bool embot::app::eth::theServices::Impl::setregulars(EOarray* id32ofregulars, eO
     return true;   
 }
 
+bool embot::app::eth::theServices::Impl::add(const std::vector<eOprotID32_t> &id32s, fpIsID32relevant fpISOK, uint8_t &added)
+{
+    if(true == id32s.empty())
+    {
+        return false;
+    }
+
+    EOtransceiver* boardtransceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+            
+    eOropdescriptor_t ropdesc;
+    memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+    ropdesc.control.plustime    = 0;
+    ropdesc.control.plussign    = 0;
+    ropdesc.ropcode             = eo_ropcode_sig;
+    ropdesc.signature           = eo_rop_SIGNATUREdummy;   
+    
+    uint8_t count {0};
+    
+    for(size_t i=0; i<id32s.size(); i++)
+    {
+        eOprotID32_t id32 = id32s[i];
+
+        // filter them 
+        bool itisrelevant = true;
+        if(nullptr != fpISOK)
+        {
+            itisrelevant = fpISOK(id32);                   
+        }
+        
+        if(true == itisrelevant)
+        {
+            ropdesc.id32 = id32;     
+            if(eores_OK == eo_transceiver_RegularROP_Load(boardtransceiver, &ropdesc))
+            {
+                count++;
+            } 
+        }                               
+                   
+    }
+   
+    added = count;
+  
+    return true;
+}
+
+bool embot::app::eth::theServices::Impl::rem(const std::vector<eOprotID32_t> &id32s, uint8_t &removed)
+{
+    if(true == id32s.empty())
+    {
+        return false;
+    }
+
+    EOtransceiver* boardtransceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+
+
+    eOropdescriptor_t ropdesc;
+    memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+    ropdesc.control.plustime        = eobool_false;
+    ropdesc.control.plussign        = eobool_false;
+    ropdesc.ropcode                 = eo_ropcode_sig;
+    ropdesc.id32                    = eo_prot_ID32dummy;    
+    ropdesc.signature               = eo_rop_SIGNATUREdummy;  
+    
+    uint8_t count {0};
+    for(size_t i=0; i<id32s.size(); i++)
+    {
+        ropdesc.id32 = id32s[i];
+
+        if(eores_OK == eo_transceiver_RegularROP_Unload(boardtransceiver, &ropdesc))
+        {
+            count ++;
+        }
+    
+    }    
+    
+    removed = count;
+    
+    return true;
+}
 
 bool embot::app::eth::theServices::Impl::synch(Service::Category category, Service::State state)
 {
@@ -705,9 +788,19 @@ bool embot::app::eth::theServices::process(eOmn_service_cmmnds_command_t *comman
     return pImpl->process(command);
 }
 
-bool embot::app::eth::theServices::setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
+bool embot::app::eth::theServices::setREGULARS(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
 {
-    return pImpl->setregulars(id32ofregulars, arrayofid32, fpISOK, numberofthem);
+    return pImpl->setREGULARS(id32ofregulars, arrayofid32, fpISOK, numberofthem);
+}
+
+bool embot::app::eth::theServices::add(const std::vector<eOprotID32_t> &id32s, fpIsID32relevant fpISOK, uint8_t &added)
+{   
+    return pImpl->add(id32s, fpISOK, added);
+}
+
+bool embot::app::eth::theServices::rem(const std::vector<eOprotID32_t> &id32s, uint8_t &removed)
+{   
+    return pImpl->rem(id32s, removed);
 }
 
 bool embot::app::eth::theServices::synch(Service::Category category, Service::State state)

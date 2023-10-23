@@ -519,8 +519,11 @@ static eOresult_t s_eom_virtual_tsk_exec_callback(EOVtaskDerived *t, eOcallback_
 }
 
 extern eOid08_t s_eom_virtual_get_id(EOVtaskDerived *t) 
-{     
-    return(0);
+{ 
+    // this method is used by eov_task_GetID() that in an embot application is called only by eo_errman_Error() and eo_errman_Trace()
+    // however, in the overridden error functions inside theHandler we dont use taskid.
+    // so ... who cares what we return   
+    return(66);
 }
 
 static void s_prepare_base_object(EOMtask *p)

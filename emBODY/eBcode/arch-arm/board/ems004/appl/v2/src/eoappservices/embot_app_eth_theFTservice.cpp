@@ -822,7 +822,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::SetRegulars(eOmn_serv_arrayof_id
     }  
 #if defined(USE_EMBOT_theServices)
     auto isok = [](uint32_t id){ return eobool_true == s_ft_isID32relevant(id); };
-    bool r = embot::app::eth::theServices::getInstance().setregulars(id32ofregulars, arrayofid32, isok, numberofthem);
+    bool r = embot::app::eth::theServices::getInstance().setREGULARS(id32ofregulars, arrayofid32, isok, numberofthem);
     return r ? eores_OK : eores_NOK_generic;
 #else    
     return(eo_service_hid_SetRegulars(id32ofregulars, arrayofid32, s_ft_isID32relevant, numberofthem));

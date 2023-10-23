@@ -124,8 +124,11 @@ eOresult_t s_systemstart(eOvoid_fp_void_t userinit_fn)
 
 EOVtaskDerived* s_getrunningtask(void)
 {
-    #warning TOBESOLVED
     return nullptr;
+    // this method is called only by eov_sys_GetRunningTask() that in an embot applications is used only by eo_errman_Error() / eo_errman_Trace()
+    // which uses the returned value to call eov_task_GetID(value) when the value is not NULL.
+    // in here i return nullptr because ... i dont care knowing the calling task in such a situation
+    
 }
 
 uint64_t s_now_get()

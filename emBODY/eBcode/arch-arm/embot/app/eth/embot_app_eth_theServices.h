@@ -39,7 +39,7 @@ namespace embot { namespace app { namespace eth {
         };
         
         // tells if a ID32 is relevant to the calling service
-        using fpIsID32relevant = bool (*)(uint32_t id32);
+        using fpIsID32relevant = bool (*)(eOprotID32_t id32);
                
         bool initialise(const Config &config); 
         
@@ -52,16 +52,16 @@ namespace embot { namespace app { namespace eth {
         bool stop(); // stop and deactivate every service
         bool tick(); // tick all activated services        
 
-        // setregulars() is called by a given Service object which gives its own id32ofregulars than MUST be non nullptr.
+        // setREGULARS() is called by a given Service object which gives its own id32ofregulars than MUST be non nullptr.
         // id32ofregulars can be either nullptr or not
         // - id32ofregulars is nullptr: setregulars() makes sure that the ID32 values inside id32ofregulars are removed from the transceiver 
         //   and then it clears id32ofregulars
         // - id32ofregulars is not nullptr: setregulars() makes sure that id32ofregulars contains ONLY what inside arrayofid32 and updates the transceiver.        
-        bool setregulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);   
+        bool setREGULARS(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);   
         
-//        // but these are better methods: they must have non nullptr pointers. 
-//        bool add(const eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t &added);
-//        bool rem(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t &removed);
+        // as a better alternative ... these are better methods
+        bool add(const std::vector<eOprotID32_t> &id32s, fpIsID32relevant fpISOK, uint8_t &added);
+        bool rem(const std::vector<eOprotID32_t> &id32s, uint8_t &removed);
         
         bool load(const eOprot_EPcfg_t &epcfg);         
         bool synch(Service::Category category, Service::State state);  

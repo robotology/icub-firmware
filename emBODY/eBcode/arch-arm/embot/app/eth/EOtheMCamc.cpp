@@ -885,7 +885,7 @@ extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_se
 
 #if defined(USE_EMBOT_theServices)
     auto isok = [](uint32_t id){ return eobool_true == s_eo_motioncontrol_isID32relevant(id); };
-    bool r = embot::app::eth::theServices::getInstance().setregulars(p->id32ofregulars, arrayofid32, isok, numberofthem);
+    bool r = embot::app::eth::theServices::getInstance().setREGULARS(p->id32ofregulars, arrayofid32, isok, numberofthem);
     return r ? eores_OK : eores_NOK_generic;
 #else    
     //return(eo_service_hid_SetRegulars(id32ofregulars, arrayofid32, s_ft_isID32relevant, numberofthem));
@@ -909,7 +909,7 @@ extern eOresult_t eo_motioncontrol_AddRegulars(EOtheMotionController *p, eOmn_se
 
 #if defined(USE_EMBOT_theServices)
     auto isok = [](uint32_t id){ return eobool_true == s_eo_motioncontrol_isID32relevant(id); };
-    bool r = embot::app::eth::theServices::getInstance().setregulars(p->id32ofregulars, arrayofid32, isok, numberofthem);
+    bool r = embot::app::eth::theServices::getInstance().setREGULARS(p->id32ofregulars, arrayofid32, isok, numberofthem);
     return r ? eores_OK : eores_NOK_generic;
 #else    
     //return(eo_service_hid_AddRegulars(p->id32ofregulars, arrayofid32, s_eo_motioncontrol_isID32relevant, numberofthem));

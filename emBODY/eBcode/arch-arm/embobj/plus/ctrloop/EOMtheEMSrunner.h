@@ -43,7 +43,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtransceiver.h"
-#include "EOMtask.h"
+//#include "EOMtask.h"
 #include "hal_timer.h"
 
 #include "eOcfg_sm_EMSappl.h"
@@ -170,7 +170,7 @@ extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p);
 
 extern eOresult_t eom_emsrunner_GracefulStopAndGoTo(EOMtheEMSrunner *p, eOsmEventsEMSappl_t ev);
 
-extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
+//extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
 
 extern eObool_t eom_emsrunner_SafeDurationExpired(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
 
