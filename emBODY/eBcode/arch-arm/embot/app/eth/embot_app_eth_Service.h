@@ -93,10 +93,8 @@ namespace embot::app::eth {
         virtual bool stop() = 0;
         // if arrayofid32 is nullptr than we remove them all. if not we substitute
         virtual bool setregulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem) = 0;
-        // these are much better 
-        // virtual bool set(const vector<eOprotID32_t> &id32s, uint8_t& added) = 0;
-        // virtual bool clr(const vector<eOprotID32_t> &id32s, uint8_t& removed) = 0;
-        // virtual bool add(const vector<eOprotID32_t> &id32s, uint8_t& added) = 0;
+        // but this may be better. if vector is empty we remove signalling of all internal id32, else we add them
+        //virtual bool signal(const std::vector<eOprotID32_t> &id32s) = 0;
         virtual bool tick(bool resetstatus = false) = 0;
         virtual bool report() = 0;   
         
