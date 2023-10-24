@@ -1458,6 +1458,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\eth\EOtheMCamc.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_eth_mc_messaging.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\00-icub-firmware\emBODY\eBcode\arch-arm\embot\app\eth\embot_app_eth_mc_messaging.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

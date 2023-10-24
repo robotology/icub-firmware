@@ -418,8 +418,9 @@ extern void Motor_uncalibrate(Motor* o)
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {        
         // ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER
-        // i use icubCanProto_calibration_type_undefined because the 2foc does not process the payload. 
-        embot::app::eth::mc::messaging::sender::Calibrate_Encoder msg {{o->mlocation}, {{icubCanProto_calibration_type_undefined, 0}}};
+        // i can use use icubCanProto_calibration_type0_hard_stops because the 2foc does not process the payload. 
+        // BUT much better to use a new icubCanProto_calibration_type_undefined 
+        embot::app::eth::mc::messaging::sender::Calibrate_Encoder msg {{o->mlocation}, {{icubCanProto_calibration_type0_hard_stops, 0}}};
         msg.transmit();         
     }
 }

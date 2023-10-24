@@ -546,7 +546,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         for(i=0; i<numofjomos; i++)
         {
             const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
-#if defined(useMCfoc_actuator_descriptor_generic)
+#if defined(YRI_uses_MC_foc_actuator_descriptor_generic)
             if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
             {
                 // we consider only actuators located on can
@@ -749,7 +749,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, p->sharedcan.entitydescriptor); 
         eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor); 
 
-#if defined(useMCfoc_actuator_descriptor_generic)            
+#if defined(YRI_uses_MC_foc_actuator_descriptor_generic)            
         // we should make sure that embot::app::eth::theICCservices unloads its entities
 #endif                
         
@@ -933,7 +933,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
                 eObrd_canproperties_t prop = {0};
                 
-#if defined(useMCfoc_actuator_descriptor_generic)
+#if defined(YRI_uses_MC_foc_actuator_descriptor_generic)
                 
                 if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
                 {
@@ -969,7 +969,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);                
                 eOcanmap_entitydescriptor_t des = {0};  
                 
-#if defined(useMCfoc_actuator_descriptor_generic)
+#if defined(YRI_uses_MC_foc_actuator_descriptor_generic)
                 
                 if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
                 {

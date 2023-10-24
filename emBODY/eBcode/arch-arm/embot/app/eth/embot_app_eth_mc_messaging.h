@@ -113,7 +113,7 @@ namespace embot::app::eth::mc::messaging::info {
 
     struct CALIBRATE_ENCODER
     {   
-        icubCanProto_calibrator_t calibrator {icubCanProto_calibration_type_undefined, 0};
+        icubCanProto_calibrator_t calibrator {icubCanProto_calibration_type0_hard_stops, 0};
         
         CALIBRATE_ENCODER() = default;
         CALIBRATE_ENCODER(const icubCanProto_calibrator_t &c) : calibrator(c) {}

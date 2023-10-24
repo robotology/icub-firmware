@@ -844,7 +844,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             
             case HARDWARE_2FOC:
             {  
-#if defined(useMCfoc_actuator_descriptor_generic)
+#if defined(YRI_uses_MC_foc_actuator_descriptor_generic)
                 // marco.accame on 27sept2023: i have in here either a eobrd_place_can or an eobrd_place_eth location
                 o->motor[k].mlocation = jomodes->actuator.gen.location;                
 #else                
