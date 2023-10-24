@@ -236,7 +236,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2328,7 +2328,7 @@
 
   <Group>
     <GroupName>embot::app::eth::theServiceMC</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2363,7 +2363,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\..\..\..\00-icub-firmware\emBODY\eBcode\arch-arm\embot\app\eth\embot_app_eth_mc_messaging.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\embot\app\eth\embot_app_eth_mc_messaging.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_eth_mc_messaging.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
