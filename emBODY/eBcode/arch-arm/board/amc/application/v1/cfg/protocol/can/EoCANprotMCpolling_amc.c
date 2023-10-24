@@ -17,26 +17,10 @@
 // in here is whatever is required to offer parsing of can frames and copying into protocol data structures.
 
 #include "EOtheCANprotocol.h" 
-
 #include "EoProtocol.h"
 #include "EoProtocolMC.h"
-
-// but also to retrieve information of other things ...
-
 #include "iCubCanProtocol.h"
-
-#include "EOproxy.h"
-#include "EOtheBOARDtransceiver.h"
-#include "EOtheErrorManager.h"
-#include "EoError.h"
-
-#include "EOtheCANmapping.h"
-
 #include "EOtheCANdiscovery2.h"
-
-//#include "EOtheMC4boards.h"
-
-//#include "EOMtheEMSappl.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -55,7 +39,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -77,19 +61,14 @@ static void* s_eocanprotMCpolling_get_entity(eOprot_entity_t entity, eOcanframe_
 
 
 // parser helper funtions
-
-//static eOresult_t s_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port);
+// none so far
 
 // former helper funtions
 
 static void s_former_POL_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type);
-
 static void s_former_POL_MC_CMD_setpid(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
-
-//static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
-
 static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
 static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
 static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
@@ -97,13 +76,12 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
 
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_RUN(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -222,70 +200,14 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE(eOcanprot_de
 }
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port)
-//{
-//    eOmc_joint_t *joint = NULL;
-//    eOprotIndex_t index = EOK_uint08dummy; 
-//    
-//    // retrieve the joint related to the frame    
-//    if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, &index)))
-//    {
-//        return(eores_OK);        
-//    }   
-//    
-//    // in byte data[1] there is: 0/1 
-//    joint->status.core.modes.ismotiondone = (eObool_t)frame->data[1];    
-//   
-//    // and now let's manage the proxy
-//    
-//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_status_core_modes_ismotiondone);
-//    
-//    eOerrmanDescriptor_t errdes = {0};
-//    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-//    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
-//    if(NULL == param)
-//    {
-//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//        errdes.sourceaddress    = 0;
-//        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
-//        errdes.par16            = 0; 
-//        errdes.par64            = id32; 
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//                
-//        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
-//        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
-//        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
-//        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
-//        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
-//        
-//        return(eores_OK);
-//    }  
-//    
-//    param->p08_2 ++;
-//        
-//    if(param->p08_1 == param->p08_2)
-//    {
-//        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
-//        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());       
-//    }        
-
-//#if defined(DEBUG_LOG_PROXY_ACTIVITY)
-//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//    errdes.sourceaddress    = 0;
-//    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
-//    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
-//    errdes.par64            = id32; 
-//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes); 
-//#endif
-//    
-//    return(eores_OK);
-//}
 {
     static volatile uint32_t xxx = 0;
     for(;;)
-    {   // i dont think trhat the foc control mode uses it, but we never know
+    {   // the foc control mode does not use it, but we never know
+        // in case have a look at the way the ems implements that
         xxx = 0;
     }
+    
     return(eores_NOK_generic); 
 }
 
@@ -420,72 +342,11 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_PWM_LIMIT(eOcanprot_
 }
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT(eOcanframe_t *frame, eOcanport_t port)
-//{  
-//    eOprotIndex_t index = EOK_uint08dummy;  
-
-//    eObrd_canlocation_t loc = {0};
-//    loc.port            = port;
-//    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
-//    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
-//    
-//    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
-//    if(EOK_uint08dummy == index)
-//    {
-//        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
-//        return(eores_OK);
-//    }
-//        
-//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, index, eoprot_tag_mc_motor_config_pwmlimit);
-//   
-//    eOerrmanDescriptor_t errdes = {0};
-//    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-//    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
-//    if(NULL == param)
-//    {
-//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//        errdes.sourceaddress    = 0;
-//        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
-//        errdes.par16            = 0; 
-//        errdes.par64            = id32; 
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//        
-//        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
-//        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
-//        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
-//        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
-//        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
-//        
-//        return(eores_OK);
-//    } 
-
-//    eOmeas_pwm_t *pwmLimit = (eOmeas_pwm_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
-//    
-//    *pwmLimit = *((eOmeas_pwm_t*)(&frame->data[1]));
-
-//    param->p08_2 ++;
-//    
-//    if(param->p08_1 == param->p08_2)
-//    {
-//        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
-//        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
-//    }
-
-//#if defined(DEBUG_LOG_PROXY_ACTIVITY)
-//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//    errdes.sourceaddress    = 0;
-//    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
-//    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
-//    errdes.par64            = id32; 
-//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);
-//#endif
-//    
-//    return(eores_OK);
-//}
 {
     static volatile uint32_t xxx = 0;
     for(;;)
-    {   // i dont think trhat the foc control mode uses it, but we never know
+    {   // the foc control mode does not use it, but we never know
+        // in case have a look at the way the ems implements that
         xxx = 0;
     }
     return(eores_NOK_generic); 
@@ -828,7 +689,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_POS_STICTION_PARAMS(
     return(eores_OK); 
 
 }
-//extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_POS_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port);//unused
+
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_POS_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -851,7 +712,6 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_STICTION_PARA
     *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
     return(eores_OK);
 }
-//extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port);//unused
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -950,17 +810,6 @@ static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor
     *((int16_t*)(&frame->data[5])) = (int16_t) pid->limitonintegral;
 }
 
-/*
-static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
-{
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;    
-    s_former_POL_MC_prepare_frame(descriptor, frame, 7, type);    
-    // now i prepare data[1] -> data[6]  
-    *((int16_t*)(&frame->data[1])) = (int16_t) pid->kp;
-    *((int16_t*)(&frame->data[3])) = (int16_t) pid->ki;
-    *((int16_t*)(&frame->data[5])) = (int16_t) pid->kd;
-}
-*/
 
 static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
 {
@@ -975,96 +824,11 @@ static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descript
 
 // cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION, ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION
 static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
-//{   
-//    eOprotIndex_t index = EOK_uint08dummy;  
-
-//    eObrd_canlocation_t loc = {0};
-//    loc.port            = port;
-//    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
-//    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
-//    
-//    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-//    if(EOK_uint08dummy == index)
-//    {
-//        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
-//        return(eores_OK);
-//    }
-//    
-//    
-//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_config_userlimits);
-//   
-//    eOerrmanDescriptor_t errdes = {0};
-//    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-//    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
-//    if(NULL == param)
-//    {
-//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//        errdes.sourceaddress    = 0;
-//        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
-//        errdes.par16            = 0; 
-//        errdes.par64            = id32; 
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//        
-//        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
-//        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
-//        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
-//        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
-//        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
-//        
-//        return(eores_OK);
-//    } 
-
-//    eOmeas_position_limits_t *limits = (eOmeas_position_limits_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
-//    
-//    icubCanProto_position_t icub_pos =  *((icubCanProto_position_t*)(&frame->data[1]));
-//    // ok, now i must convert from one to another ...
-//    eOmeas_position_t pos = eo_mc4boards_Convert_Position_fromCAN(eo_mc4boards_GetHandle(), index, icub_pos);
-//    
-//    if(ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION == type)
-//    {
-//        limits->min = pos;
-//    }
-//    else if(ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION == type)
-//    {
-//        limits->max = pos;
-//    }
-//    else
-//    {   // i must have called it badly
-//        return(eores_NOK_generic);
-//    }
-
-//    param->p08_2 ++;
-//    
-//    if(param->p08_1 == param->p08_2)
-//    {
-//        // send back response               
-//        if(limits->max < limits->min)
-//        {   // exchange them
-//            eOmeas_position_t tmp = limits->min;
-//            limits->min = limits->max;
-//            limits->max = tmp;
-//        }
-//       
-//        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
-//        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
-//    }
-
-//#if defined(DEBUG_LOG_PROXY_ACTIVITY)
-//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//    errdes.sourceaddress    = 0;
-//    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
-//    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
-//    errdes.par64            = id32; 
-//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes); 
-//#endif
-//    
-//    return(eores_OK);
-//}
 {
     static volatile uint32_t xxx = 0;
     for(;;)
-    {   // i dont think trhat the foc control mode uses it, but we never know
+    {   // the foc control mode does not use it, but we never know
+        // in case have a look at the way the ems implements that
         xxx = 0;
     }    
     return(eores_NOK_generic); 
@@ -1074,113 +838,11 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
 // cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS
 //             ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS
 static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
-//{    
-//    eOprotIndex_t index = EOK_uint08dummy;  
-
-//    eObrd_canlocation_t loc = {0};
-//    loc.port            = port;
-//    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
-//    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
-//    
-//    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-//    if(EOK_uint08dummy == index)
-//    {
-//        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
-//        return(eores_OK);
-//    }
-//    
-//    eOprotTag_t tag = eoprot_tag_none;
-//    
-//    switch(type)
-//    {
-//        case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID:
-//        case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS:
-//        case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS:    tag = eoprot_tag_mc_joint_config_pidtorque;  
-//        break;
-
-//        case ICUBCANPROTO_POL_MC_CMD__GET_POS_PID:
-//        case ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS:
-//        case ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS:       tag = eoprot_tag_mc_joint_config_pidposition;  
-//        break; 
-
-//        default:                                                tag = eoprot_tag_none;
-//        break;
-//    }
-//    
-//    if(eoprot_tag_none == tag)
-//    {   // returns NOK because it is something i cannot parse. i must have called this function badly ...
-//        return(eores_NOK_generic);
-//    }
-//    
-//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, tag);
-//   
-//    eOerrmanDescriptor_t errdes = {0};
-//    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-//    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
-//    if(NULL == param)
-//    {
-//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//        errdes.sourceaddress    = 0;
-//        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
-//        errdes.par16            = 0; 
-//        errdes.par64            = id32; 
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//        
-//        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
-//        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
-//        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
-//        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
-//        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);         
-//        
-//        return(eores_OK);
-//    } 
-//    
-//    eOmc_PID_t* pid = (eOmc_PID_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
-//    
-//    if((ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID == type) || (ICUBCANPROTO_POL_MC_CMD__GET_POS_PID == type))
-//    {
-//        pid->kp = *((int16_t*)&frame->data[1]);
-//        pid->ki = *((int16_t*)&frame->data[3]);
-//        pid->kd = *((int16_t*)&frame->data[5]); 
-//    }
-//    else if((ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS == type) || (ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS == type))
-//    {
-//        pid->offset = *((int16_t*)(&frame->data[1]));
-//        pid->limitonoutput = *((int16_t*)(&frame->data[3]));
-//        pid->limitonintegral = *((int16_t*)(&frame->data[5]));  
-//    }
-//    else // no need to verify that type value is a LIMITS i already did it in the switch-case part.
-//    {
-//        pid->stiction_up_val   = *((int16_t*)&frame->data[1]);
-//        pid->stiction_down_val = *((int16_t*)&frame->data[3]);
-//    }
-//       
-//    param->p08_2 ++;
-//    
-//    if(param->p08_1 == param->p08_2)
-//    {
-//        // send back response
-//        //marco.accame -> can eo_proxy_ReplyROP_Load() use the same memory as the nv? much be better using NULL. think of using memmove.
-//        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  // if NULL it does not copy dat into the nv and uses ram inside the netvar
-//        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
-//    }
-
-//#if defined(DEBUG_LOG_PROXY_ACTIVITY)
-//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//    errdes.sourceaddress    = 0;
-//    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
-//    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
-//    errdes.par64            = id32; 
-//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes); 
-//#endif
-//    
-//    return(eores_OK);
-//}
 {
     static volatile uint32_t xxx = 0;
     for(;;)
-    {   // i dont think trhat the foc control mode uses it, but we never know
+    {   // the foc control mode does not use it, but we never know
+        // in case have a look at the way the ems implements that
         xxx = 0;
     }    
     return(eores_NOK_generic); 
@@ -1189,91 +851,11 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
 
 // cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET
 static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
-//{
-//    
-//    eOprotIndex_t index = EOK_uint08dummy;  
-
-//    eObrd_canlocation_t loc = {0};
-//    loc.port            = port;
-//    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
-//    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
-//    
-//    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
-//    if(EOK_uint08dummy == index)
-//    {
-//        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
-//        return(eores_OK);
-//    }
-//    
-//    
-//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_config_impedance);
-//   
-//    eOerrmanDescriptor_t errdes = {0};
-//    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
-//    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
-//    if(NULL == param)
-//    {
-//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//        errdes.sourceaddress    = 0;
-//        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
-//        errdes.par16            = 0; 
-//        errdes.par64            = id32; 
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-//        
-//        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
-//        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
-//        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
-//        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
-//        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
-//        
-//        return(eores_OK);
-//    } 
-
-//    eOmc_impedance_t *impedance = (eOmc_impedance_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
-//    
-//    if(ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS == type)
-//    {
-//        icubCanProto_stiffness_t icub_stiff = *((icubCanProto_stiffness_t*)(&frame->data[1]));
-//        icubCanProto_damping_t icub_dump = *((icubCanProto_damping_t*)(&frame->data[3]));
-//        impedance->stiffness = eo_mc4boards_Convert_impedanceStiffness_S2I(eo_mc4boards_GetHandle(), index, icub_stiff);
-//        impedance->damping = eo_mc4boards_Convert_impedanceDamping_S2I(eo_mc4boards_GetHandle(), index, icub_dump);        
-//        
-//    }
-//    else if(ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET == type)
-//    {
-//        icubCanProto_torque_t icub_trq = *((icubCanProto_torque_t*)(&frame->data[1]));
-//        impedance->offset = eo_mc4boards_Convert_torque_S2I(eo_mc4boards_GetHandle(), index, icub_trq);        
-//    }
-//    else
-//    {   // i must have called it badly
-//        return(eores_NOK_generic);
-//    }
-
-//    param->p08_2 ++;
-//    
-//    if(param->p08_1 == param->p08_2)
-//    {
-//        // send back response               
-//        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
-//        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
-//    }
-
-//#if defined(DEBUG_LOG_PROXY_ACTIVITY)       
-//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//    errdes.sourceaddress    = 0;
-//    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
-//    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
-//    errdes.par64            = id32; 
-//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes); 
-//#endif
-//    
-//    return(eores_OK);
-//}
 {
     static volatile uint32_t xxx = 0;
     for(;;)
-    {   // i dont think trhat the foc control mode uses it, but we never know
+    {   // the foc control mode does not use it, but we never know
+        // in case have a look at the way the ems implements that
         xxx = 0;
     }    
     return(eores_NOK_generic); 

@@ -1162,11 +1162,8 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opc
     reply->processes.def2run = def2run;
     reply->processes.runningnow = s_running_process;
     
-    #warning ..............................................................................................
-    #warning: HEI.... in here it crashes ............. USE 2... or rather nprocs
     constexpr uint8_t maxNumberOfProcessesOnSingleCore = {3};
     uint8_t number = std::min(nprocs, maxNumberOfProcessesOnSingleCore);
-    #warning todo verifica che number non scriva fuori del array quindi metter std::max(nproc, capacityofinfo)
     for(uint8_t i=0; i<number; i++)
     {
         const eEmoduleInfo_t *s_modinfo = NULL;

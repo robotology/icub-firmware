@@ -402,7 +402,7 @@ extern const eOsm_cfg_t * eo_cfg_sm_EMSappl_Get(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 #if defined(USE_EMBOT_theHandler)
-    #warning USE_EMBOT_theHandler is defined. the specification of the EOsm is inside theHandler
+//    #warning USE_EMBOT_theHandler is defined. the specification of the EOsm is inside theHandler
 #else
 
 // -- init

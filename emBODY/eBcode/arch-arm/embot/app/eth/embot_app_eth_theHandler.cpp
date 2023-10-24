@@ -37,13 +37,14 @@
 
 #include "embot_app_eth_theETHmonitor.h"
 
+#include "embot_os_theScheduler.h"
+
 #include "EOtheCANservice.h"
 #include "EOtheCANdiscovery2.h"
 #include "EOtheCANprotocol.h"
 #include "embot_app_theLEDmanager.h"
 
 #include "embot_app_eth_theServices.h"
-//#include "embot_app_eth_theFTservice.h"
 #include "embot_app_eth_theServiceFT.h"
 
 #if defined(USE_EMBOT_theServicesMC)
@@ -52,15 +53,15 @@
 
 #include "EOtheEntities.h"
 
-
 #include "EOMtheEMSrunner_hid.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
+#define CANflushMODE_DO_phase
 
-// this struct wraps the use of EOMtheEMSsocket + EOMtheEMStransceiver inside theHandler
+// the theCTRLsocket objects wraps the use of EOMtheEMSsocket + EOMtheEMStransceiver inside theHandler
 struct theCTRLsocket
 { 
     theCTRLsocket() = default;
@@ -88,8 +89,8 @@ struct theCTRLsocket
 
         return true;        
     }
-#if 1
-//the good one    
+
+    
     static bool set(embot::app::eth::theHandler::State s)
     {
         EOaction_strg astg = {0};
@@ -102,8 +103,6 @@ struct theCTRLsocket
             EOaction *onrx = reinterpret_cast<EOaction*>(&astg);
             tsk2alert = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
             eo_action_SetEvent(onrx, emssocket_evt_packet_received, tsk2alert);            
-            
-            #warning GROSSO COME UNA CASA: verificare se il ontxrequest (terza action) non debba essere un ... send-evt-tx   
             EOaction *ontxrequest = reinterpret_cast<EOaction*>(&astg2);
             eo_action_SetEvent(ontxrequest, emsconfigurator_evt_ropframeTx, tsk2alert);
                         
@@ -115,7 +114,8 @@ struct theCTRLsocket
                 eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);        
             }
             
-            // also send a tx request just in case. because cfg state transmit only if requested an we dont want to have missed a previous request.
+            // also send a tx request just in case. 
+            // because cfg state transmits only when requested and we dont want to have missed a previous request.
             eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx);             
             
         }
@@ -142,77 +142,20 @@ struct theCTRLsocket
             
             eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, ontxrequest);
             
-            // if any rx packets already in socket then alert the err task
+            // if any rx packets are already in socket then alert the err task
             if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
             {
                 eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);        
             }
             
             // also send a tx request just in case
+            // because err state transmits only when requested and we dont want to have missed a previous request.
             eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);                 
         }
         
         return true;
     }
-#else
-// the bad one
-
-    static bool set(embot::app::eth::theHandler::State s)
-    {
-        EOaction_strg astg = {0};
-        EOMtask *tsk2alert {nullptr};
-        
-        if(embot::app::eth::theHandler::State::IDLE == s)
-        {
-            // open/reopen the ems socket so that it must alert the EOMtheEMSconfigurator upon RX of packets
-            EOaction *onrx = reinterpret_cast<EOaction*>(&astg);
-            tsk2alert = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());
-            eo_action_SetEvent(onrx, emssocket_evt_packet_received, tsk2alert);
-            eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, NULL);
-            
-            // if any rx packets is already in the socket then alert the cfg task
-            if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
-            {
-                eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);        
-            }
-            
-            // also send a tx request just in case. because cfg state transmit only if requested an we dont want to have missed a previous request.
-            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx);             
-            
-        }
-        else if(embot::app::eth::theHandler::State::RUN == s)
-        {
-            // open/reopen the ems socket so that it must alert the EOMtheEMSrunner upon end of TX of packets
-            EOaction *ontxdone = reinterpret_cast<EOaction*>(&astg);
-            eo_action_SetCallback(ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
-            // the socket does not alert anybody when it receives a pkt, but will alert the sending task, so that it knows that it can stop wait.
-            // the alert is done by a callback, eom_emsrunner_OnUDPpacketTransmitted(), which executed by the sender of the packet directly.
-            // this funtion is executed with eo_action_Execute(s->socket->ontransmission) inside the EOMtheIPnet object
-            // for this reason we call eo_action_SetCallback(....., exectask = NULL_); IT MUST NOT BE the callback-manager!!!!
-            eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, ontxdone, NULL);            
-        }
-        else if(embot::app::eth::theHandler::State::FATALERROR == s)
-        {
-            // open/reopen the ems socket so that it must alert the EOMtheEMSerror upon RX of packets
-            EOaction *onrx = reinterpret_cast<EOaction*>(&astg);
-            tsk2alert = eom_emserror_GetTask(eom_emserror_GetHandle());
-            eo_action_SetEvent(onrx, emssocket_evt_packet_received, tsk2alert);
-            eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, NULL);
-            
-            // if any rx packets already in socket then alert the err task
-            if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
-            {
-                eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);        
-            }
-            
-            // also send a tx request just in case
-            eom_task_SetEvent(tsk2alert, emssocket_evt_packet_received);                 
-        }
-        
-        return true;
-    }
-
-#endif    
+  
     static bool transmissionrequest()
     {
         eom_emssocket_TransmissionRequest(eom_emssocket_GetHandle());
@@ -228,15 +171,15 @@ struct theCTRLsocket
 };
 
 
-// this struct wraps:
+// the theSM object wraps:
 // - the state machine of the application w/ IDLE, RUN and FATALERROR states,
-// - the customisation of the associated on entry, exit and transition functions
+// - the customisation of the associated on entry, on exit and on transition functions
 // - the management of objects which model the states + their user-defined functions:
 //   - EOMtheEMSconfigurator (IDLE),
 //   - EOMtheEMSrunner (RUN),
 //   - EOMtheEMSerror (FATALERROR)
 // - the user-defined functions of the above objects 
-// 
+
 struct theSM
 { 
     static constexpr embot::hw::LED statusLED {embot::hw::LED::four};
@@ -256,45 +199,6 @@ struct theSM
         eom_emsrunner_Initialise(&embot::app::eth::theHandler_EOMtheEMSrunner_Config);
         // state::FATALERROR
         eom_emserror_Initialise(&embot::app::eth::theHandler_EOMtheEMSerror_Config);
- 
-        #warning marco.accame: removed on 5 august 2022        
-//////        // some services in here such as
-//////        #warning TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO: remove from here put just after protocol initialization
-//////        {    
-//////        eo_entities_Initialise();
-//////        eo_canmap_Initialise(NULL);
-//////        eo_canprot_Initialise(NULL);
-//////        }
-        
-//////        {   // C.  can services and discovery.
-//////        // so far i do in here what i need without any container
-//////             
-//////        // can-services
-//////        eOcanserv_cfg_t config;   
-//////        
-//////        config.mode                 = eocanserv_mode_straight;
-//////        config.canstabilizationtime = 7*eok_reltime1sec;
-//////        config.rxqueuesize[0]       = 64;
-//////        config.rxqueuesize[1]       = 64;
-//////        config.txqueuesize[0]       = 64;
-//////        config.txqueuesize[1]       = 64;  
-//////        config.onrxcallback[0]      = s_can_cbkonrx; 
-//////        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
-//////        config.onrxcallback[1]      = s_can_cbkonrx; 
-//////        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
-
-//////            
-//////        // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
-//////        eo_canserv_Initialise(&config);   
-//////        
-//////        // can-discovery
-//////        eo_candiscovery2_Initialise(NULL);  
-//////        EOaction_strg astrg = {0};
-//////        EOaction *act = (EOaction*)&astrg;
-//////        eo_action_SetEvent(act, emsconfigurator_evt_userdef01, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-//////        eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), act);
-//////      
-//////        } 
             
         return true;
     }
@@ -346,8 +250,11 @@ struct theSM
     
     static void stateIDLE_onentry()
     {
+        embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"stateIDLE_onentry()", thr}, {}, "called");        
+        
         // set the correct protocol state 
-        set(applstate_config);
+        theSM::set(applstate_config);        
 
         theCTRLsocket::set(embot::app::eth::theHandler::State::IDLE);    
            
@@ -366,16 +273,15 @@ struct theSM
         
         // pulse LED::four forever at 0.50 hz.       
         embot::app::theLEDmanager::getInstance().get(statusLED).pulse(2*embot::core::time1second, 0);
-        
-        #warning -> sm on entry cfg user defined ??? 
-        // exec any user-defined activity
-        //sm_userdef_on_entry_CFG();
     }
 
     static void stateRUN_onentry()
     {
+        embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"stateRUN_onentry()", thr}, {}, "called");
+        
         // set the correct protocol state 
-        set(applstate_running);
+        theSM::set(applstate_running);
 
         theCTRLsocket::set(embot::app::eth::theHandler::State::RUN);  
 
@@ -400,9 +306,12 @@ struct theSM
     }
     
     static void stateFATALERROR_onentry()        
-    {
+    {        
+        embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"stateFATALERROR_onentry()", thr}, {}, "called");
+            
         // set the correct protocol state 
-        set(applstate_error);  
+        theSM::set(applstate_error);  
 
         theCTRLsocket::set(embot::app::eth::theHandler::State::FATALERROR);    
 
@@ -421,8 +330,7 @@ struct theSM
         eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), act);
         
         // tell embot::app::eth::theETHmonitor to alert thread of error w/ event emsconfigurator_evt_userdef02    
-        embot::app::eth::theETHmonitor::getInstance().set({ticker_ethmonitor_fatalerror, nullptr});
-       
+        embot::app::eth::theETHmonitor::getInstance().set({ticker_ethmonitor_fatalerror, nullptr});       
         
         // stop and deactivate all the services which may have been started 
         embot::app::eth::theServices::getInstance().stop();                 
@@ -430,24 +338,24 @@ struct theSM
 
     static void stateIDLE_onexit()
     {
-        // tell the ethmonitor to alert no task. the relevant on_entry_xxx function will set a new action
-        //eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);        
+        // do nothing: the relevant on_entry_xxx function will do what is needed    
     }
     
- 
     static void stateRUN_onexit()
     {
-        //#warning --> it is good thing to attempt to stop the hal timers in here as well. see comment below.
-        // marco.accame: if we exit from the runner in an un-expected way with a fatal error, then we dont 
-        // stop teh timers smoothly. thus we do it in here as well.
-        
-        // in normal case instead, the stop of the emsrunner is not executed in one function, but in steps 
-        // inside its rx-do-tx tasks.
-        
-        
+//        embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+//        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"stateRUN_onexit()", thr}, {}, "called");
+            
+        // marco.accame: 
+        // the stop of the EOMtheEMSrunner can be safely called also when it is already stopped
+        // so we call it again, because:        
+        // in the normal case, the stop of the EOMtheEMSrunner is executed by stopping the HW timers
+        // in steps inside its rx-do-tx tasks. 
+        // but if we exit from the RUN state in an un-expected way with a fatal error, then we dont 
+        // stop the timers smoothly. thus we call eom_emsrunner_Stop() in here.        
         eom_emsrunner_Stop(eom_emsrunner_GetHandle());
 
-        // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
+        // EOtheCANservice: set straigth mode and force parsing of all the frames in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
               
@@ -503,6 +411,24 @@ struct theSM
         servicetester_runtick();
 #endif          
     }
+
+    static void flushCANtransmission()
+    {
+        // test the TX of additional frames of 8 bytes
+//        eObrd_canlocation_t loc {eOcanport1, 8, eobrd_caninsideindex_first};
+//        uint8_t da[8] = {0};
+//        icubCanProto_imu_config_t cc {};
+//        eOcanprot_command_t cmd {eocanprot_msgclass_pollingAnalogSensor, ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET, {0, 0}, &cc};
+//        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &cmd, loc);
+//        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &cmd, loc);
+//        eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &cmd, loc);        
+        
+        uint8_t txcan1frames = 0;
+        uint8_t txcan2frames = 0;        
+        eo_canserv_TXstartAll(eo_canserv_GetHandle(), &txcan1frames, &txcan2frames);    
+        eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);        
+    }
+    
     
     static void objectRUN_DO_activity()
     {
@@ -511,60 +437,43 @@ struct theSM
         eObool_t prevTXhadRegulars = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle());
         
         // we tick the services ...
-        // see if we can use a single call embot::app::eth::theServices.tick() which ticks all the relevant ones.
-        // otherwise, better moving it into a configurable function
+        // we do that with a single call embot::app::eth::theServices.tick() which ticks all the started ones.
+
     
         embot::app::eth::theServices::getInstance().tick(); 
         
-    //    embot::app::eth::theFTservice::getInstance().Tick(); 
-        
-    //    eo_motioncontrol_Tick(eo_motioncontrol_GetHandle());
-    //    eo_mais_Tick(eo_mais_GetHandle());
-    //    eo_strain_Tick(eo_strain_GetHandle());   
-    //    eo_psc_Tick(eo_psc_GetHandle());
-    //    eo_pos_Tick(eo_pos_GetHandle());        
+        // marco.accame on 20oct2023:
+        // we could start the transmission of the CAN frames at the end of the DO phase
+        // in an attempt to reduce the wait time at the end of the TX phase         
+#if defined(CANflushMODE_DO_phase)
+        flushCANtransmission();
+#endif        
     }   
+    
 
     static void objectRUN_TX_beforeUDPtx()
     {   
-        uint8_t txcan1frames = 0;
-        uint8_t txcan2frames = 0;
-
-        eo_canserv_TXstartAll(eo_canserv_GetHandle(), &txcan1frames, &txcan2frames);    
-        eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);        
+#if !defined(CANflushMODE_DO_phase)        
+        flushCANtransmission();
+#endif        
     }    
 
     static void objectRUN_TX_afterUDPtx()
     {
-    //    eObool_t prevTXhadRegulars = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle());
-    
-    // ticks some services ... 
-    // marco.accame: i put them in here just after tx phase. however, we can move it even in eom_emsrunner_hid_userdef_taskDO_activity() 
-    // because eom_emsrunner_CycleHasJustTransmittedRegulars() keeps memory of previous tx cycle.
-//    eo_skin_Tick(eo_skin_GetHandle(), prevTXhadRegulars); 
-    
-//#if defined(TESTRTC_IS_ACTIVE)
-//#warning ---------------> just for test
-//    prevTXhadRegulars = eobool_true;
-//#endif
-    
-//    eo_inertials2_Tick(eo_inertials2_GetHandle(), prevTXhadRegulars); 
-//    
-//    eo_inertials3_Tick(eo_inertials3_GetHandle(), prevTXhadRegulars); 
-//    
-//    eo_temperatures_Tick(eo_temperatures_GetHandle(), prevTXhadRegulars);
-// 
-    
-        // ABSOLUTELY KEEP IT LAST: wait until can tx started by eo_canserv_TXstartAll() in objectRUN_TX_beforeUDPtx() is all done
+        // it is not necessary to call any Tick() in here.
+        
+        
+        // ABSOLUTELY KEEP IT LAST: 
+        // it lock the thread TX until all CAN frame has exited the board
         const eOreltime_t timeout = 3*EOK_reltime1ms;
         eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), timeout);   
     }
 
-    static void moveto(EOsm *sm, embot::app::eth::theHandler::State state)
+    static void moveto(EOsm *sm, embot::app::eth::theHandler::State st)
     {
-        static constexpr eOsmEventsEMSappl_t map2evt[3] = {eo_sm_emsappl_EVgo2cfg, eo_sm_emsappl_EVgo2run, eo_sm_emsappl_EVgo2err};    
-        eOsmEventsEMSappl_t smevt = map2evt[embot::core::tointegral(state)];
-        eo_sm_ProcessEvent(sm, smevt);
+        embot::app::eth::legacy::thehandler::eoApplEVENT applevent = embot::app::eth::legacy::thehandler::toevent(st);
+        eOsmEventsEMSappl_t smevt = static_cast<eOsmEventsEMSappl_t>(applevent);  
+        eo_sm_ProcessEvent(sm, smevt);        
     }        
 //        
 //    private:
@@ -577,20 +486,20 @@ struct embot::app::eth::theHandler::Impl
 {       
     Config _config {};  
         
-    State _state {State::IDLE};
-    
+    State _state {State::IDLE};    
     
     EOsm *_sm {nullptr};
 
-    Impl(); 
+    Impl() = default; 
     
     bool initialise(const Config &cfg);    
     
-    bool transmit();
+    bool forcetransmission();
     bool transmit(const eOropdescriptor_t &ropdes);
     
     bool moveto(State state);
-    State state() { _state = static_cast<State>(eo_sm_GetActiveState(_sm)); return _state; } ;
+    
+    State state() const { State s = static_cast<State>(eo_sm_GetActiveState(_sm)); return s; } ;
     
     bool process(Command cmd);
     
@@ -601,14 +510,12 @@ private:
 
 };
 
-embot::app::eth::theHandler::Impl::Impl()
-{
-}
 
 bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
 {
     _config = cfg;   
-
+    _state = State::IDLE;
+    
     embot::app::eth::theETHmonitor::getInstance().initialise(theHandler_theETHmonitor_Config);    
     
     theCTRLsocket::init();
@@ -616,39 +523,26 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
     theSM::initialise(_sm);
 
     redefine_errorhandler();
-    theCTRLsocket::set(embot::app::eth::theHandler::State::IDLE);
+    theCTRLsocket::set(State::IDLE);
     
-    
-    // now call all the other things inside eom_emsappl_hid_userdef_initialise() defined inside overridden_appl.c 
-#if 0
-    // pulse led3 forever at 20 hz.
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);     
-    // do whatever is needed to start services.
-    s_overridden_appl_initialise_services();   ->
-    {
-    eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
-    eo_services_Initialise(ipaddress);        
-    }
-#endif     
-    
-    
+    // initialise theServices      
     embot::app::eth::theServices::getInstance().initialise({});   
         
+    // and then initialise each Service and load it inside theServices
+    // TODO: put in some config (e.g. theHandler_theServices_Config) all the services that we want to init ....
+        
+    // FT
     embot::app::eth::theServiceFT::getInstance().initialise({});          
     embot::app::eth::theServices::getInstance().load(embot::app::eth::theServiceFT::getInstance().service());
+    
+    // MC        
 #if defined(USE_EMBOT_theServicesMC)
     embot::app::eth::theServiceMC::getInstance().initialise({});          
     embot::app::eth::theServices::getInstance().load(embot::app::eth::theServiceMC::getInstance().service());  
 #endif
         
-//    // create the state machine and start it
-//    // its configuration comes from eo_cfg_sm_EMSappl_Get()
-//    // which requires some external function such as eo_cfg_sm_EMSappl_hid_on_entry_CFG() etc.
-//    // which are defined in this cpp file
-//    thesm = eo_sm_New(eo_cfg_sm_EMSappl_Get());
-//    eo_sm_Start(thesm);
-        
-        
+
+    // load and start the state machine        
     theSM::start(_sm);
         
     // tell the world that we have started
@@ -657,16 +551,11 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
     return true;
 } 
 
-#warning TODO: must develop embot::app::eth::theServices ... 
 
-//bool embot::app::eth::theHandler::Impl::process(Event ev)
-//{   
-//    return true;
-//}
 
 bool embot::app::eth::theHandler::Impl::process(Command cmd)
 {   
-    // this asks to the runner, configurator etc to go gracefully a new state
+    // this asks to the runner, configurator etc to gracefully move to a new state
     // it is the old eom_emsappl_ProcessGo2stateRequest() 
 
     if(Command::dummy == cmd)
@@ -674,27 +563,26 @@ bool embot::app::eth::theHandler::Impl::process(Command cmd)
         return false;
     }
     
-    State s = state();
-    State rq = static_cast<State>(cmd); 
+    _state = state();
+    State rq = embot::app::eth::theHandler::tostate(cmd); 
     
-    if(s == rq)
+    if(_state == rq)
     {
         // already in requested state
         return true;
     }
     
-    if(s == State::FATALERROR)
+    if(_state == State::FATALERROR)
     {   // currently it is not possible to exit from error
         return false;
     }
     
     eOresult_t res {eores_NOK_generic};
+     
+    embot::app::eth::legacy::thehandler::eoApplEVENT applevent = embot::app::eth::legacy::thehandler::toevent(rq);
+    eOsmEventsEMSappl_t smevt = static_cast<eOsmEventsEMSappl_t>(applevent);
     
-    static constexpr eOsmEventsEMSappl_t map2evt[3] = {eo_sm_emsappl_EVgo2cfg, eo_sm_emsappl_EVgo2run, eo_sm_emsappl_EVgo2err};
-    
-    eOsmEventsEMSappl_t smevt = map2evt[embot::core::tointegral(rq)];
-        
-    switch(s)
+    switch(_state)
     {
         case State::IDLE:
         {   // from here i can go only into RUN or FATALERROR
@@ -702,14 +590,11 @@ bool embot::app::eth::theHandler::Impl::process(Command cmd)
         } break;
         
         case State::RUN:
-        {   // if i am here newstate can be only eo_sm_emsappl_STcfg (or err). i dont send an event, but i call a function which will smmotly go back to cfg
+        {   // if i am here i can go only int CFG or FATALERROR. i will go smoothly to CFG because i need to end first the RX-DO-TX cycle
             res = eom_emsrunner_GracefulStopAndGoTo(eom_emsrunner_GetHandle(), smevt);     
         } break;
         
-        // case eo_sm_emsappl_STerr:
-        // {
-            // res = eores_NOK_unsupported;//currently is inpossible go to any other state!!
-        // }break;
+        case State::FATALERROR:
         default:
         {
             res = eores_NOK_generic;
@@ -721,7 +606,7 @@ bool embot::app::eth::theHandler::Impl::process(Command cmd)
 }
 
 
-bool embot::app::eth::theHandler::Impl::transmit()
+bool embot::app::eth::theHandler::Impl::forcetransmission()
 {
     return theCTRLsocket::transmissionrequest();
 }
@@ -733,47 +618,19 @@ bool embot::app::eth::theHandler::Impl::transmit(const eOropdescriptor_t &ropdes
 }
 
 
-bool embot::app::eth::theHandler::Impl::moveto(State state)
+bool embot::app::eth::theHandler::Impl::moveto(State st)
 {
-    // this makes the sm evolve to a new state. it is called by runner etc
+    // this makes the sm directly evolve to a new state. 
+    // it is called by EOMtheEMSrunner or EOMtheEMSconfigurator after a call to their _GracefulStopAndGoTo() methods
     // it is the old eom_emsappl_SM_ProcessEvent
-    theSM::moveto(_sm, state);
+    theSM::moveto(_sm, st);
+    _state = state();
     return true;
 }
 
 
 // - in here we start all the required services.
 
-//void embot::app::eth::theHandler::Impl::init_ctrl_socket()
-//{        
-//    eom_emssocket_Initialise(&theHandler_EOMtheEMSsocket_Config);   
-//    eom_emstransceiver_Initialise(&theHandler_EOMtheEMStransceiver_Config);
-
-//    // i try connection now, so that if the host address does not change, then during transmission we dont do a connect anymore
-//    eOresult_t res = eom_emssocket_Connect(eom_emssocket_GetHandle(), theHandler_EOMtheEMStransceiver_Config.hostipv4addr, 5*EOK_reltime100ms); 
-
-//    if(eores_OK == res)
-//    {
-//        embot::app::theLEDmanager::getInstance().get(embot::hw::LED::one).on();
-//    }
-//    else
-//    {
-//        embot::app::theLEDmanager::getInstance().get(embot::hw::LED::one).off();
-//    }
-
-//// we can create a connection_tick() which sets the red LED on if ... connected and then we call it regularly
-//// and what if we detach the cable? can we do that inside theETHmonitor?    
-//// a method  setmonitor(ip, led) follows the things ... i think that is much better
-//            
-//}
-
-
-//void embot::app::eth::theHandler::Impl::init_states()
-//{
-//    eom_emsconfigurator_Initialise(&theHandler_EOMtheEMSconfigurator_Config);
-//    eom_emsrunner_Initialise(&theHandler_EOMtheEMSrunner_Config);
-//    eom_emserror_Initialise(&theHandler_EOMtheEMSerror_Config);
-//}
 
 extern void xxx_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *errdes);
 
@@ -839,8 +696,8 @@ static void s_manage_haltrace(const eOerrmanErrorType_t errtype, const char *inf
     const char empty[] = "EO?";
     const char *err = eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype);
     const char *eobjstr = (NULL == caller) ? (empty) : ((NULL == caller->eobjstr) ? (empty) : (caller->eobjstr));
-    const uint32_t taskid = (NULL == caller) ? (0) : (caller->taskid);
-    
+    const uint32_t taskid = 666; // because in embot application the caller->taskid is meaningless. much better to use the thread name
+
     embot::core::TimeFormatter tf {embot::core::now()};
     
     if(eo_errortype_trace == errtype)
@@ -913,12 +770,7 @@ static void s_manage_dispatch(const eOerrmanErrorType_t errtype, const char *inf
     // the call eo_infodispatcher_Put() is only in here, thus we can either protect with a mutex in here or put put a mutex inside. WE USE MUTEX IN HERE
     eo_infodispatcher_Put(eo_infodispatcher_GetHandle(), &props, info); 
     eom_emssocket_TransmissionRequest(eom_emssocket_GetHandle());
-    
-    // the call eom_emsappl_SendTXRequest() either does nothing and is reentrant (when in run mode) or sends an event to a task with osal_eventflag_set() which is reentrant.
-    // it is called also by the can protocol parser in case of proxy, which however is used in run mode (thus reentrant).
-    // i protect both functions in here
-//    eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
-#warning add a eom_emsappl_SendTXRequest()
+
     
     embot::os::rtos::mutex_release(onerrormutex);   
 
@@ -928,26 +780,15 @@ static void s_manage_dispatch(const eOerrmanErrorType_t errtype, const char *inf
 
 static void s_manage_fatal(const char *info, const eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {
-    // manage fatal error (go in error state, start periodic tx of error status)  
-    //#warning --> marco.accame: in case of fatal error, shall we: (1) go smoothly to error state, (2) force immediate transition to error state?
-    
-    // if in here tehre is a serious error. but we dont care about concurrency
-    //osal_mutex_take(s_emsappl_singleton.onerrormutex, osal_reltimeINFINITE);    
-    
     // i am going to error state, thus i set the correct state in eOmn_appl_status_t variable, which is used by robotInterface
     // to understand the status of the ems: cfg, run, err.
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
     status->currstate = applstate_error;
-    
-//#if 1        
-    // this call forces immediate transition to error state. then we stop the calling task, so that 
-    // it does not do anything damaging anymore.
-    // it seems a good approach because we should immediately stop upon fatal error. 
+ 
 
     eom_emserror_SetFatalError(eom_emserror_GetHandle(), des);
-    #warning MANAGE eom_emsappl_SM_ProcessEvent
-//    eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2err);  
+    embot::app::eth::theHandler::getInstance().process(embot::app::eth::theHandler::Command::go2FATALERROR);
     eom_task_SetEvent(eom_emserror_GetTask(eom_emserror_GetHandle()), emserror_evt_fatalerror);    
     
 
@@ -956,39 +797,8 @@ static void s_manage_fatal(const char *info, const eOerrmanCaller_t *caller, con
     // of error task and amongst others we lose communication with the remote host.
     // when we are in error state the remote host must be able to know it.
     
-    for(;;);
- 
-//    eOsmStatesEMSappl_t state = eo_sm_emsappl_STcfg;
-    #warning MANAGE eom_emsappl_GetCurrentState
-//    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &state);
-    
-//    if(eo_sm_emsappl_STerr != state)
-//    {
-//        // this call makes the calling task wait in here forever.
-//        osal_semaphore_decrement(blockingsemaphore, OSAL_reltimeINFINITE);
-//        // the forever loop should not be necessary.
-//        for(;;);
-//    }
-    
-//#else
-//    // in this situation, the transition to error state is done by the active task, thus we require that the execution
-//    // continues. the good thing is that we exit in a clean way from the state, but the high risk is to execute dangerous instructions.
-//    // example: some object inside the runner detects that some pointer that is going to be used is NULL. if we keep on running this
-//    // code, then teh NULL pointer is deferenced and teh application crashes....    
-//    eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
-//    return;
-//#endif    
+    for(;;); 
 }
-
-//void embot::app::eth::theHandler::Impl::theemssocket_defaultopen()
-//{   
-//    // we also open the socket, so that we can tx or rx straight away. for now we direct towards the configurator task
-//    EOaction_strg astg = {0};
-//    EOaction *onrx = (EOaction*)&astg;
-//    eo_action_SetEvent(onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-//    // the socket alerts the cfg task for any newly received packet
-//    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, NULL);
-//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1004,33 +814,32 @@ embot::app::eth::theHandler::theHandler()
 {
     pImpl = std::make_unique<Impl>();
 }  
-    
+  
 embot::app::eth::theHandler::~theHandler() { }
-        
+  
 bool embot::app::eth::theHandler::initialise(const Config &cfg)
 {
     return pImpl->initialise(cfg);
 }
 
-embot::app::eth::theHandler::State embot::app::eth::theHandler::state()
+embot::app::eth::theHandler::State embot::app::eth::theHandler::state() const
 {
     return pImpl->state();
 }
  
-
-bool embot::app::eth::theHandler::transmit()
-{
-   return pImpl->transmit(); 
-}
+//bool embot::app::eth::theHandler::forcetransmission()
+//{
+//   return pImpl->forcetransmission(); 
+//}
 
 bool embot::app::eth::theHandler::transmit(const eOropdescriptor_t &ropdes)
 {
    return pImpl->transmit(ropdes); 
 }
 
-bool embot::app::eth::theHandler::moveto(State state)
+bool embot::app::eth::theHandler::moveto(State st)
 {
-    return pImpl->moveto(state);
+    return pImpl->moveto(st);
 }
 
 bool embot::app::eth::theHandler::process(Command cmd)
@@ -1062,98 +871,20 @@ extern void eo_cfg_sm_EMSappl_hid_reset(EOsm *s)
 
 // -- on entry
 
-// CFG
+// CFG.onentry
 extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
 {
     theSM::stateIDLE_onentry();
 }
-//{
-//    // set the correct state 
-//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
-//    eOmn_appl_status_t *status = reinterpret_cast<eOmn_appl_status_t*>(eoprot_variable_ramof_get(eoprot_board_localboard, id32));
-//    status->currstate = applstate_config;  
 
-//    theCTRLsocket::set(embot::app::eth::theHandler::State::IDLE);    
-//    
-////    // tell the ems socket that it must alert the EOMtheEMSconfigurator upon RX of packets
-////    EOaction_strg astg = {0};
-////    EOaction *onrx = reinterpret_cast<EOaction*>(&astg);
-////    eo_action_SetEvent(onrx, emssocket_evt_packet_received, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));
-////    eom_emssocket_Open(eom_emssocket_GetHandle(), onrx, NULL, NULL);
-////    
-////    // if any rx packets is already in the socket then alert the cfg task
-////    if(0 != eom_emssocket_NumberOfReceivedPackets(eom_emssocket_GetHandle()))
-////    {
-////        eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emssocket_evt_packet_received);        
-////    }
-////    
-////    // also send a tx request just in case. because cfg state transmit only if requested an we dont want to have missed a previous request.
-////    eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx);    
-//       
-//    // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
-//    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
-//    eo_canserv_ParseAll(eo_canserv_GetHandle());
 
-//    #warning -> carefully check if also embot::app::eth::theETHmonitor must alert w/ emsconfigurator_evt_userdef02 ...   
-//    // well, it must if we use a tick .... maybe yes....
-//    
-//    // tell the ethmonitor to alert the task of the configurator
-////    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef02);
-//    
-
-//    // pulse LED::four forever at 0.50 hz.       
-//    embot::app::theLEDmanager::getInstance().get(statusLED).pulse(2*embot::core::time1second, 0);
-//    
-//    #warning -> sm on entry cfg user defined ??? 
-//    // exec any user-defined activity
-//    //sm_userdef_on_entry_CFG();
-//}  
-
-// RUN
+// RUN.onentry
 extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 {
     theSM::stateRUN_onentry();
 }
-//{
-//    // set the correct state 
-//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
-//    eOmn_appl_status_t *status = reinterpret_cast<eOmn_appl_status_t*>(eoprot_variable_ramof_get(eoprot_board_localboard, id32));
-//    status->currstate = applstate_running;       
 
-
-//    theCTRLsocket::set(embot::app::eth::theHandler::State::RUN);  
-//    
-////    EOaction_strg astg = {0};
-////    EOaction *ontxdone = reinterpret_cast<EOaction*>(&astg);
-////    // tell the ems socket that it must alert the EOMtheEMSconfigurator upon RX of packets
-////    eo_action_SetCallback(ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
-////    // the socket does not alert anybody when it receives a pkt, but will alert the sending task, so that it knows that it can stop wait.
-////    // the alert is done by a callback, eom_emsrunner_OnUDPpacketTransmitted(), which executed by the sender of the packet directly.
-////    // this funtion is executed with eo_action_Execute(s->socket->ontransmission) inside the EOMtheIPnet object
-////    // for this reason we call eo_action_SetCallback(....., exectask = NULL_); IT MUST NOT BE the callback-manager!!!!
-////    eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, ontxdone, NULL);
-//    
-//    // we activate the runner
-//    eom_emsrunner_Start(eom_emsrunner_GetHandle());
-
-//    
-//    // EOtheCANservice: set on demand mode. then tx all canframes remained in the tx queues
-//    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);    
-//    eo_canserv_TXstartAll(eo_canserv_GetHandle(), NULL, NULL);
-//    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
-
-//#warning -> adjust theETHmonitor     
-//    // tell the ethmonitor to alert no task, because the runner will tick it now at every cycle
-////    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);
-
-
-//    // pulse LED::four forever at 1 hz.
-//    embot::app::theLEDmanager::getInstance().get(statusLED).pulse(1*embot::core::time1second, 0);
-
-//    // we dont start services    
-//}  
-
-
+// ERR.onentry
 extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 {
     theSM::stateFATALERROR_onentry();
@@ -1162,31 +893,19 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 
 // -- on exit 
 
+// CFG.onexit
 extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
 {
     theSM::stateIDLE_onexit();
-    #warning add something in here  
-    // eom_emsappl_hid_userdef_on_exit_CFG(&s_emsappl_singleton);
 }  
 
+// RUN.onexit
 extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
 {
     theSM::stateRUN_onexit();
 }
-//{
-//    //#warning --> it is good thing to attempt to stop the hal timers in here as well. see comment below.
-//    // marco.accame: if we exit from the runner in an un-expected way with a fatal error, then we dont 
-//    // stop teh timers smoothly. thus we do it in here as well.
-//    
-//    // in normal case instead, the stop of the emsrunner is not executed in one function, but in steps 
-//    // inside its rx-do-tx tasks.
-//    
-//    
-//    eom_emsrunner_Stop(eom_emsrunner_GetHandle());
-//    #warning add something in here 
-//    // eom_emsappl_hid_userdef_on_exit_RUN(&s_emsappl_singleton);
-//}
 
+// ERR.onexit
 extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 {
     // we dont actually exit, but ...
@@ -1194,24 +913,27 @@ extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 }  
 
 
-
 // -- on trans
 
+// CFG->RUN
 extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2run(EOsm *s)
 {
     // nothing to do
 }  
 
+// CFG->ERR
 extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2err(EOsm *s)
 {
     // nothing to do
 }  
 
+// RUN->CFG
 extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2cfg(EOsm *s)
 {
     // nothing to do
 }  
 
+// RUN->ERR
 extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2err(EOsm *s)
 {
     // nothing to do
@@ -1230,10 +952,10 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
 }
 
 
-// marco.accame on 15 sept 15:  the event emsconfigurator_evt_userdef01 is send by a timer inside the EOtheCANdiscovery2 
+// marco.accame on 15 sept 15:  the event emsconfigurator_evt_userdef01 is sent by a timer inside the EOtheCANdiscovery2 
 // if we are in CFG state so that we can _Tick() it.
 
-#warning must configure someone inside transitions of the SM to alert teh candiscovery2
+
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfigurator* p)
 {
     theSM::objectIDLE_on_evt(emsconfigurator_evt_userdef01);
@@ -1245,7 +967,8 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
 }
 
 #include "EoError.h"
-#warning VERIFY: this callback is called by the EMSconfigurator both for parsing and forming of a packet 
+
+// VERIFY: this callback is called by the EMSconfigurator both for parsing and forming of a packet 
 // maybe it is better to rename eoerror_value_SYS_configurator_udptxfailure into eoerror_value_SYS_configurator_udprxtxfailure
 extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
@@ -1263,102 +986,13 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfi
 extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p) {}
 extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p) {}
 
-#if 0
-extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
-{
-
-#warning I HAVE REDEFINED THE eom_emsconfigurator_hid_userdef_ProcessTimeout()
-    
-    static volatile uint32_t ccc {0};
-    constexpr size_t burstlength {4}; // must be >= 4
-    static eObrd_canlocation_t loc {.port = eOcanport1, .addr = 1, .insideindex = eobrd_caninsideindex_first};
-    static eOcanprot_command_t commands[burstlength] = {};        
-    static uint8_t data[8] = {1, 2, 3, 4, 5, 6, 7, 8};
-        
-    if(0 == ccc)
-    {
-        // init only once
-        loc.port = eOcanport1;
-        loc.addr = 1;
-        loc.insideindex = eobrd_caninsideindex_first;
-        
-        // i set a default command which is 8-bytes long
-        for(uint8_t i=0; i<burstlength; i++)
-        {
-            commands[1].clas = eocanprot_msgclass_pollingAnalogSensor;
-            commands[1].type = ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET;
-            commands[1].value = data;            
-        }
-        
-        // but ... i specialise only 4 commands
-        commands[0].clas = eocanprot_msgclass_pollingMotorControl;
-        commands[0].type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-        commands[0].value = data;
-        
-        commands[1].clas = eocanprot_msgclass_pollingMotorControl;
-        commands[1].type = ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID;
-        commands[1].value = data;   
-
-        commands[2].clas = eocanprot_msgclass_pollingMotorControl;
-        commands[2].type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-        commands[2].value = data;  
-
-        commands[3].clas = eocanprot_msgclass_pollingMotorControl;
-        commands[3].type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
-        commands[3].value = data;          
-    }
-    
-    ccc++;
-    
-    if(0 != (ccc%100))
-    {
-        return;
-    }
-    
-    constexpr embot::core::relTime maxdly {1000};
-    constexpr uint32_t step {10};
-    volatile eOresult_t r {eores_NOK_generic};
-
-    static int32_t dly {maxdly};
-    for(int i =0; i<4; i++)
-    {        
-        r = eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &commands[i], loc);
-        if((eores_OK == r) && (dly > 0))
-        {
-            embot::core::wait(dly);    
-        }
-        
-    }
-    
-    if((eores_OK == r) && (dly > 0))
-    {
-        dly -= step;        
-    }
-}
-#endif
-
 
 // - EOMtheEMSrunner: redefinition of userdef functions
 //   formerly inside overridden_runner.c
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
-    theSM::objectRUN_RX_afterUDPparsing();
-    
-//    // i tick the can-discovery. 
-//    // this function does something only if a discovery is active and if the search timer period has expired.
-//    eo_candiscovery2_Tick(eo_candiscovery2_GetHandle());
-//    
-//    // i manage the can-bus reception. i parse everything. 
-//    // it will be the can parser functions which will call the relevant objects which will do what they must.
-//    // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
-//    eo_canserv_ParseAll(eo_canserv_GetHandle());    
-//    
-//#if defined(TESTRTC_IS_ACTIVE)     
-//    testRTC_RUN_tick();
-//#elif defined(enableTHESERVICETESTER)
-//    servicetester_runtick();
-//#endif  
+    theSM::objectRUN_RX_afterUDPparsing(); 
 }
 
 #include "embot_app_eth_theServices.h"
@@ -1367,63 +1001,16 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
     theSM::objectRUN_DO_activity();
-    
-//    eObool_t prevTXhadRegulars = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle());
-//    
-//    embot::app::eth::theETHmonitor::getInstance().tick();
-//    
-//    // we tick the services ...
-//    // see if we can use a single call embot::app::eth::theServices.tick() which ticks all the relevant ones.
-//    // otherwise, better moving it into a configurable function
-//    
-//    embot::app::eth::theFTservice::getInstance().Tick(); 
-//    
-////    eo_motioncontrol_Tick(eo_motioncontrol_GetHandle());
-////    eo_mais_Tick(eo_mais_GetHandle());
-////    eo_strain_Tick(eo_strain_GetHandle());   
-////    eo_psc_Tick(eo_psc_GetHandle());
-////    eo_pos_Tick(eo_pos_GetHandle());
 }
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
     theSM::objectRUN_TX_beforeUDPtx();
-//    
-//    uint8_t txcan1frames = 0;
-//    uint8_t txcan2frames = 0;
-
-//    eo_canserv_TXstartAll(eo_canserv_GetHandle(), &txcan1frames, &txcan2frames);    
-//    eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);
 }
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
     theSM::objectRUN_TX_afterUDPtx();
-    
-//    eObool_t prevTXhadRegulars = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle());
-//    
-//    // ticks some services ... 
-//    // marco.accame: i put them in here just after tx phase. however, we can move it even in eom_emsrunner_hid_userdef_taskDO_activity() 
-//    // because eom_emsrunner_CycleHasJustTransmittedRegulars() keeps memory of previous tx cycle.
-////    eo_skin_Tick(eo_skin_GetHandle(), prevTXhadRegulars); 
-//    
-////#if defined(TESTRTC_IS_ACTIVE)
-////#warning ---------------> just for test
-////    prevTXhadRegulars = eobool_true;
-////#endif
-//    
-////    eo_inertials2_Tick(eo_inertials2_GetHandle(), prevTXhadRegulars); 
-////    
-////    eo_inertials3_Tick(eo_inertials3_GetHandle(), prevTXhadRegulars); 
-////    
-////    eo_temperatures_Tick(eo_temperatures_GetHandle(), prevTXhadRegulars);
-//// 
-//    
-//    // ABSOLUTELY KEEP IT LAST: wait until can tx started by eo_canserv_TXstartAll() in eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission() is all done
-//    const eOreltime_t timeout = 3*EOK_reltime1ms;
-//    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), timeout);   
-
-//    return; 
 }
 
 extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
@@ -1436,7 +1023,6 @@ extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
     errdes.sourceaddress    = 0;    
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
 }
-
 
 extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
 {
@@ -1456,6 +1042,89 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
 extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt) {} 
 extern void eom_emserror_hid_userdef_OnRXuserdefevent(eOemserror_event_t evt) {}
 
+
+// other initialisation functions: MN protocol
+
+#include "EoProtocolMN.h"    
+#include "EOnv_hid.h"
+    
+extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
+{
+    eOmn_comm_status_t* status = (eOmn_comm_status_t*)nv->ram;
+    
+    // 1. init the management protocol version
+    
+    eOversion_t* version = &status->managementprotocolversion;
+    
+    version->major = eoprot_version_mn_major;
+    version->minor = eoprot_version_mn_minor;
+    
+    
+    // 2. init the transceiver
+    
+    eOmn_transceiver_properties_t* transp = &status->transceiver;
+    
+    transp->listeningPort = embot::app::eth::theHandler_EOMtheEMSsocket_Config.localport;
+    transp->destinationPort = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.hostipv4port;
+    transp->maxsizeRXpacket = embot::app::eth::theHandler_EOMtheEMSsocket_Config.inpdatagramsizeof;
+    transp->maxsizeTXpacket = embot::app::eth::theHandler_EOMtheEMSsocket_Config.outdatagramsizeof;
+    transp->maxsizeROPframeRegulars = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframeregulars;
+    transp->maxsizeROPframeReplies = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframereplies;
+    transp->maxsizeROPframeOccasionals = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofropframeoccasionals;
+    transp->maxsizeROP = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.capacityofrop;
+    transp->maxnumberRegularROPs = embot::app::eth::theHandler_EOMtheEMStransceiver_Config.sizes.maxnumberofregularrops;
+    memset(transp->filler06, 0, sizeof(transp->filler06));     
+
+} 
+
+
+extern void eoprot_fun_INIT_mn_appl_config(const EOnv* nv)
+{
+    eOmn_appl_config_t config = {0};
+ 
+    config.cycletime =  embot::app::eth::theHandler_EOMtheEMSrunner_Config.period;
+    config.txratedivider = embot::app::eth::theHandler_EOMtheEMSrunner_Config.defaultTXdecimationfactor;
+       
+    // set it
+    eo_nv_Set(nv, &config, eobool_true, eo_nv_upd_dontdo);        
+}
+
+
+
+extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
+{
+    eOmn_appl_status_t status = {0};
+
+
+    // build date
+    status.buildate.year    = embot::app::eth::theApplication_Config.property.date.year;
+    status.buildate.month   = embot::app::eth::theApplication_Config.property.date.month;
+    status.buildate.day     = embot::app::eth::theApplication_Config.property.date.day;
+    status.buildate.hour    = embot::app::eth::theApplication_Config.property.date.hour;
+    status.buildate.min     = embot::app::eth::theApplication_Config.property.date.minute;
+    
+    // version    
+    status.version.major    = embot::app::eth::theApplication_Config.property.version.major;
+    status.version.minor    = embot::app::eth::theApplication_Config.property.version.minor;
+    
+    // control loop timings 
+    status.cloop_timings[0] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.execDOafter;
+	status.cloop_timings[1] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.execTXafter - embot::app::eth::theHandler_EOMtheEMSrunner_Config.execDOafter;
+	status.cloop_timings[2] = embot::app::eth::theHandler_EOMtheEMSrunner_Config.period - embot::app::eth::theHandler_EOMtheEMSrunner_Config.execTXafter;
+    status.txdecimationfactor = embot::app::eth::theHandler_EOMtheEMSrunner_Config.defaultTXdecimationfactor;
+    
+    // name
+    static const char * nn[] = {"amc"};
+    memcpy(status.name, nn, std::min(sizeof(status.name), sizeof(nn)));
+       
+    // curr state
+    status.currstate = applstate_config;
+    status.boardtype = eobrd_ethtype_amc;
+    
+
+    // set it
+    eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
+}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

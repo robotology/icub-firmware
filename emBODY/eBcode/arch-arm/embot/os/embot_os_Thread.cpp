@@ -39,8 +39,9 @@
 
 struct embot::os::InitThread::Impl
 { 
+    void * _data {nullptr};    
     bool _started {false}; 
-    bool _terminated {false};     
+    bool _terminated {false}; 
     embot::os::rtos::thread_t *rtosthread {nullptr};     
     Impl() = default;    
     ~Impl() { }       
@@ -111,6 +112,17 @@ bool embot::os::InitThread::setCallback(const core::Callback &callback, core::re
     return false;
 }
 
+bool embot::os::InitThread::setData(void *data)
+{
+    pImpl->_data =  data;
+    return true;
+}
+
+void * embot::os::InitThread::getData()
+{
+    return pImpl->_data;
+}
+
 void embot::os::InitThread::synch()
 {    
     pImpl->rtosthread = embot::os::rtos::scheduler_thread_running();
@@ -149,7 +161,8 @@ bool embot::os::InitThread::isterminated() const
 // --------------------------------------------------------------------------------------------------------------------
 
 struct embot::os::IdleThread::Impl
-{    
+{
+    void * _data {nullptr};    
     bool started {false};
     embot::os::rtos::thread_t *rtosthread {nullptr};
     //Config config {};
@@ -223,6 +236,17 @@ bool embot::os::IdleThread::setCallback(const core::Callback &callback, core::re
     return false;
 }
 
+bool embot::os::IdleThread::setData(void *data)
+{
+    pImpl->_data =  data;
+    return true;
+}
+
+void * embot::os::IdleThread::getData()
+{
+    return pImpl->_data;
+}
+
 void embot::os::IdleThread::synch()
 {     
     pImpl->rtosthread = embot::os::rtos::scheduler_thread_running();
@@ -240,7 +264,8 @@ void embot::os::IdleThread::run() {}
 // --------------------------------------------------------------------------------------------------------------------
 
 struct embot::os::EventThread::Impl
-{    
+{
+    void * _data {nullptr};    
     EventThread * parentThread {nullptr};
     embot::os::rtos::thread_t *rtosthread {nullptr};
     Config config {64, Priority::minimum, nullptr, nullptr, embot::core::reltimeWaitForever, dummyOnEvent, "evtThread"};
@@ -353,6 +378,17 @@ bool embot::os::EventThread::setCallback(const core::Callback &callback, core::r
     return false;
 }
 
+bool embot::os::EventThread::setData(void *data)
+{
+    pImpl->_data =  data;
+    return true;
+}
+
+void * embot::os::EventThread::getData()
+{
+    return pImpl->_data;
+}
+
 bool embot::os::EventThread::start(const Config &cfg, embot::core::fpCaller eviewername)
 {    
     if(false == cfg.isvalid())
@@ -389,7 +425,8 @@ void embot::os::EventThread::run()
 // --------------------------------------------------------------------------------------------------------------------
 
 struct embot::os::MultiEventThread::Impl
-{    
+{
+    void * _data {nullptr};    
     MultiEventThread * parentThread {nullptr};
     embot::os::rtos::thread_t *rtosthread {nullptr};
     Config config {64, Priority::minimum, nullptr, nullptr, 
@@ -506,6 +543,17 @@ bool embot::os::MultiEventThread::setCallback(const core::Callback &callback, co
     return false;
 }
 
+bool embot::os::MultiEventThread::setData(void *data)
+{
+    pImpl->_data =  data;
+    return true;
+}
+
+void * embot::os::MultiEventThread::getData()
+{
+    return pImpl->_data;
+}
+
 bool embot::os::MultiEventThread::start(const Config &cfg, embot::core::fpCaller eviewername)
 {    
     if(false == cfg.isvalid())
@@ -541,7 +589,8 @@ void embot::os::MultiEventThread::run()
 // --------------------------------------------------------------------------------------------------------------------
 
 struct embot::os::MessageThread::Impl
-{    
+{ 
+    void * _data {nullptr};    
     MessageThread * parentThread {nullptr};
     embot::os::rtos::thread_t *rtosthread {nullptr};    
     embot::os::rtos::messagequeue_t *osmessagequeue {nullptr};    
@@ -665,6 +714,16 @@ bool embot::os::MessageThread::setCallback(const core::Callback &callback, core:
     return false;
 }
 
+bool embot::os::MessageThread::setData(void *data)
+{
+    pImpl->_data =  data;
+    return true;
+}
+
+void * embot::os::MessageThread::getData()
+{
+    return pImpl->_data;
+}
 
 bool embot::os::MessageThread::start(const Config &cfg, embot::core::fpCaller eviewername)
 {    
@@ -707,7 +766,8 @@ void embot::os::MessageThread::run()
 // --------------------------------------------------------------------------------------------------------------------
 
 struct embot::os::ValueThread::Impl
-{    
+{
+    void * _data {nullptr};    
     ValueThread * parentThread {nullptr};
     embot::os::rtos::thread_t *rtosthread {nullptr};    
     embot::os::rtos::messagequeue_t *osmessagequeue {nullptr};    
@@ -830,6 +890,16 @@ bool embot::os::ValueThread::setCallback(const core::Callback &callback, core::r
     return false;
 }
 
+bool embot::os::ValueThread::setData(void *data)
+{
+    pImpl->_data =  data;
+    return true;
+}
+
+void * embot::os::ValueThread::getData()
+{
+    return pImpl->_data;
+}
 
 bool embot::os::ValueThread::start(const Config &cfg, embot::core::fpCaller eviewername)
 {    
@@ -881,7 +951,8 @@ void embot::os::ValueThread::run()
 #define CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE
 
 struct embot::os::CallbackThread::Impl
-{    
+{
+    void * _data {nullptr};    
     CallbackThread * parentThread {nullptr};
     embot::os::rtos::thread_t *rtosthread {nullptr};
 #if defined(CALLBACKTHREAD_IMPL_USE_RTOSCALLBACKQUEUE)
@@ -1138,6 +1209,17 @@ bool embot::os::CallbackThread::setCallback(const embot::core::Callback &callbac
     return pImpl->_setcallback(callback, timeout);
 }
 
+bool embot::os::CallbackThread::setData(void *data)
+{
+    pImpl->_data =  data;
+    return true;
+}
+
+void * embot::os::CallbackThread::getData()
+{
+    return pImpl->_data;
+}
+
 bool embot::os::CallbackThread::start(const Config &cfg, embot::core::fpCaller eviewername)
 {  
     return pImpl->_start(cfg, eviewername);
@@ -1183,7 +1265,8 @@ void embot::os::CallbackThread::run()
 // --------------------------------------------------------------------------------------------------------------------
 
 struct embot::os::PeriodicThread::Impl
-{    
+{
+    void * _data {nullptr};    
     PeriodicThread * parentThread {nullptr};
     embot::os::rtos::thread_t *rtosthread {nullptr};    
     Config config {64, Priority::minimum, nullptr, nullptr, embot::core::time1second, dummyOnPeriod, "perThread"};    
@@ -1294,6 +1377,17 @@ bool embot::os::PeriodicThread::setMessage(embot::os::Message message, core::rel
 bool embot::os::PeriodicThread::setCallback(const core::Callback &callback, core::relTime timeout)
 {
     return false;
+}
+
+bool embot::os::PeriodicThread::setData(void *data)
+{
+    pImpl->_data =  data;
+    return true;
+}
+
+void * embot::os::PeriodicThread::getData()
+{
+    return pImpl->_data;
 }
 
 bool embot::os::PeriodicThread::setValue(embot::os::Value value, core::relTime timeout)

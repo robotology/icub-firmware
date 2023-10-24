@@ -356,7 +356,6 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     if(remaining > 0)
     {
 #if defined(USE_EMBOT_theHandler)
-        #warning USE_EMBOT_theHandler is defined. SOLVED: we use theEMSsocket to ask for transmission
         eom_emssocket_TransmissionRequest(eom_emssocket_GetHandle());    
 #else        
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());

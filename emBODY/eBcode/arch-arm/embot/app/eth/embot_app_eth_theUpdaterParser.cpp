@@ -24,6 +24,9 @@
 #include "EoBoards.h"
 #include "embot_hw_sys.h"
 
+#include "embot_app_eth_theHandler.h"
+       
+
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
@@ -527,13 +530,8 @@ uint16_t embot::app::eth::theUpdaterParser::Impl::s_discover_fill(eOuprot_cmd_DI
     const eEprocess_t *s_proctable = NULL;
     ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
     
-    reply->boardtype = boardtype;
-#if defined(USE_EMBOT_runner)  
-    #warning USE_EMBOT_runner is defined............. we must understand if the runner is running or not.
-    reply->unused[0] = 0x00;
-#else    
-    reply->unused[0] = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? 0x01 : (0x00);
-#endif
+    reply->boardtype = boardtype;    
+    reply->unused[0] = (embot::app::eth::theHandler::State::RUN == embot::app::eth::theHandler::getInstance().state()) ? 0x01 : 0x00;
     
     reply->capabilities = eouprot_get_capabilities(eApplication, EOUPROT_PROTOCOL_VERSION);;
     reply->mac48[0] = (ipnetworkstrg->macaddress>>40) & 0xFF;

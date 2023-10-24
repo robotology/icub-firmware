@@ -43,6 +43,7 @@
 
 
 #if defined(USE_EMBOT_theHandler)
+//#warning EOMtheEMSrunner uses embot::app::eth::theHandler
 #include "embot_app_eth_theHandler.h"
 #include "embot_app_scope.h"
 #else
@@ -122,9 +123,9 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
 
 #if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
 
-//    #define EOM_EMSRUNNER_EVIEW_MEASURES_START
-//    #define EOM_EMSRUNNER_EVIEW_MEASURES_STOP
-    #define EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS
+    #define EOM_EMSRUNNER_EVIEW_MEASURES_START
+    #define EOM_EMSRUNNER_EVIEW_MEASURES_STOP
+//    #define EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS
 
 
     #if defined(EOM_EMSRUNNER_EVIEW_MEASURES_START)
@@ -389,15 +390,15 @@ extern eObool_t eom_emsrunner_IsRunning(EOMtheEMSrunner *p)
     return p->isrunning;    
 }
 
-extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id)
-{
-    if(NULL == p)
-    {
-        return(NULL);
-    }
-    
-    return(s_theemsrunner.task[id]);
-}
+//extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id)
+//{
+//    if(NULL == p)
+//    {
+//        return(NULL);
+//    }
+//    
+//    return(s_theemsrunner.task[id]);
+//}
 
 
 extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8_t txdecimationfactor)
@@ -651,7 +652,7 @@ extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p)
 #if !defined(EMBOBJ_USE_EMBOT)    
     osal_semaphore_increment(s_theemsrunner.waitudptxisdone, osal_callerTSK);
 #else    
-    embot::os::rtos::semaphore_release(reinterpret_cast<embot::os::rtos::semaphore_t*>(s_theemsrunner.waitudptxisdone));
+    embot::os::rtos::semaphore_release(s_theemsrunner.waitudptxisdone);
 #endif    
 }
 
@@ -1015,7 +1016,7 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 #if !defined(EMBOBJ_USE_EMBOT)     
         osal_semaphore_decrement(s_theemsrunner.waitudptxisdone, osal_reltimeINFINITE);
 #else
-        embot::os::rtos::semaphore_acquire(reinterpret_cast<embot::os::rtos::semaphore_t*>(s_theemsrunner.waitudptxisdone), embot::core::reltimeWaitForever);
+        embot::os::rtos::semaphore_acquire(s_theemsrunner.waitudptxisdone, embot::core::reltimeWaitForever);
 #endif        
         s_theemsrunner.numofpacketsinsidesocket--;
         //#warning --> marco.accame: we wait for osal_reltimeINFINITE that the udp packet is sent ... can we think of a timeout???
@@ -1057,8 +1058,8 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
         s_theemsrunner.event = eo_sm_emsappl_EVdummy;
         // we process the event. it can be either eo_sm_emsappl_EVgo2err or eo_sm_emsappl_EVgo2cfg
 #if defined(USE_EMBOT_theHandler)
-        #warning USE_EMBOT_theHandler is defined
-        embot::app::eth::theHandler::State st = static_cast<embot::app::eth::theHandler::State>(ev);
+        embot::app::eth::theHandler::Command cmd = embot::app::eth::legacy::thehandler::tocommand(static_cast<embot::app::eth::legacy::thehandler::eoApplEVENT>(ev));
+        embot::app::eth::theHandler::State st = embot::app::eth::theHandler::tostate(cmd);
         embot::app::eth::theHandler::getInstance().moveto(st);
 #else        
         eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), ev); 
@@ -1343,6 +1344,7 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
   	errdes.sourceaddress    = 0;
 	eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == s_theemsrunner.mode) ? (eo_errortype_error) : (eo_errortype_warning);
     
+//    const uint32_t periodreport = 10000;
 	switch (taskid)
 	{
 		case eo_emsrunner_taskid_runRX:
@@ -1358,7 +1360,15 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                 errdes.par64            = last4durations; 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
-
+            else
+            {
+//                static uint32_t rr = 0;
+//                if(700 == (++rr % periodreport))
+//                {
+////                    embot::core::TimeFormatter tf {currduration};
+////                    embot::core::print("RX is " + tf.to_string());
+//                }                               
+            }    
         } break;
             
 		case eo_emsrunner_taskid_runDO:
@@ -1366,11 +1376,16 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
             
 //            snprintf(strtime, sizeof(strtime), "DO %d us", (int)currduration); 
 //            eo_errman_Trace(eo_errman_GetHandle(), strtime, s_eobj_ownname);
+            
 			if(eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown)
 			{
                 static int dont_stress = 0;
-                
-                if (++dont_stress > 5000)
+#if defined(STM32HAL_BOARD_AMC)
+                static const int stresstolerance  = 0;
+#else
+                static const int stresstolerance  = 5000;
+#endif                
+                if (++dont_stress > stresstolerance)
                 {
                     dont_stress = 0;
                     
@@ -1380,6 +1395,15 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                     eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
                 }
 			}
+            else
+            {
+//                static uint32_t dd = 0;
+//                if(700 == (++dd % periodreport))
+//                {
+////                    embot::core::TimeFormatter tf {currduration};
+////                    embot::core::print("DO is " + tf.to_string());
+//                }                               
+            }            
 
         } break;
             
@@ -1397,6 +1421,15 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                 errdes.par64            = (last4durations & 0x0000ffffffffffff) | (canframes << 48); 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
+            else
+            {
+//                static uint32_t dd = 0;
+//                if(0 == (++dd % periodreport))
+//                {
+////                    embot::core::TimeFormatter tf {currduration};
+////                    embot::core::print("TX is " + tf.to_string());
+//                }                               
+            }
           
         } break;
 	}

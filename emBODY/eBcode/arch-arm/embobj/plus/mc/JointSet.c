@@ -30,7 +30,7 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #if defined(USE_EMBOT_theServices) 
-#warning USE_EMBOT_theServices is defined: removed some code
+//#warning USE_EMBOT_theServices is defined
 // marco.accame: use objects embot::app::eth::theEncoderReader and ... future ones
 #else
 //#include "EOtheEncoderReader.h"
@@ -1663,7 +1663,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         break;
         
 #if defined(USE_EMBOT_theServices) 
-#warning removed some code
+//#warning removed some code
 #else
         
         case eomc_calibration_type6_mais:
@@ -2005,7 +2005,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
        
 
 #if defined(USE_EMBOT_theServices) 
-#warning removed some code
+//#warning removed some code
 #else        
         case eomc_calibration_type14_qenc_hard_stop_and_fap:
         {

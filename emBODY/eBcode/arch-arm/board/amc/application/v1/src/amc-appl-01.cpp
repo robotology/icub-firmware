@@ -12,9 +12,11 @@ Just ...
 
 ```c++
 #include "embot_app_eth_theApplication.h"
+#include "embot_hw_bsp_amc.h"
    
 int main(void)
 {
+    embot::hw::bsp::amc::set(embot::hw::bsp::amc::OnSpecApplication);
     embot::app::eth::theApplication::getInstance().start({});
 }
 ```

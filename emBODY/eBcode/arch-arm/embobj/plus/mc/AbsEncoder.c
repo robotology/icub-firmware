@@ -35,7 +35,7 @@
 
 
 #if defined(USE_EMBOT_theServices) 
-#warning removed some code
+//#warning removed some code
 #else
 #include "EOtheMAIS.h"
 #endif
@@ -712,7 +712,7 @@ static void AbsEncoder_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_
 BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
 {
 #if defined(USE_EMBOT_theServices) 
-#warning removed some code
+//#warning removed some code
 #else    
     if(eomc_enc_mais == o->type)
     {

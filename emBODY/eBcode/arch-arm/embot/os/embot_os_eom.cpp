@@ -124,18 +124,11 @@ eOresult_t s_systemstart(eOvoid_fp_void_t userinit_fn)
 
 EOVtaskDerived* s_getrunningtask(void)
 {
-//    osal_task_t *p;
-//    
-//    p = osal_task_get(osal_callerTSK);
-
-//    if(NULL == p)
-//    {
-//        return(NULL);
-//    }
-
-//    return(osal_task_extdata_get(p));
-    #warning TOBESOLVED
     return nullptr;
+    // this method is called only by eov_sys_GetRunningTask() that in an embot applications is used only by eo_errman_Error() / eo_errman_Trace()
+    // which uses the returned value to call eov_task_GetID(value) when the value is not NULL.
+    // in here i return nullptr because ... i dont care knowing the calling task in such a situation
+    
 }
 
 uint64_t s_now_get()
@@ -145,7 +138,7 @@ uint64_t s_now_get()
 
 void s_now_set(uint64_t t)
 {
-  #warning TOBESOLVED  
+    embot::os::rtos::scheduler_timeset(t);  
 }
 
 
@@ -357,7 +350,6 @@ eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     }
 
     
-//    if(eores_OK != eov_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE)) 
     if(eores_OK != eov_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE))
     {
         // cannot lock it ... bye bye
@@ -369,7 +361,7 @@ eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     tmr->name(eo_timer_GetName(t));    
     embot::os::Timer::Mode mode = (EOTIMER_MODE_FOREVER == t->mode) ? (embot::os::Timer::Mode::forever) : (embot::os::Timer::Mode::oneshot);
     Action act {{s_timer_onexpiry, t}, nullptr};
-    // by using nullptr as thrird argument, s_timer_onexpiry() is executed directy by the timer manager to save time
+    // by using nullptr as third argument, s_timer_onexpiry() is executed directy by the timer manager to save time
     // then inside s_timer_onexpiry() t->onexpiry is transformed into a embot::os::Action and executed. 
     // its execution will be done directly inside the timer manager unless Action is of type callback and its thread is the callback manager. 
     embot::os::Timer::Config cfg {t->expirytime, act, mode, 0}; 
@@ -412,7 +404,6 @@ eOresult_t s_eom_timerman_RemTimer(EOVtheTimerManager* tm, EOtimer *t)
     //osaltimer = t->envir.osaltimer;
     
     // stop the osal timer. operation is null safe.
-//    osal_timer_stop((osal_timer_t*)t->envir.osaltimer, osal_callerTSK);
     
     embot::os::Timer* tmr = reinterpret_cast<embot::os::Timer*>(t->envir.osaltimer); 
     if(nullptr != tmr)
@@ -427,7 +418,6 @@ eOresult_t s_eom_timerman_RemTimer(EOVtheTimerManager* tm, EOtimer *t)
     //t->osaltimer = osaltimer;
 
     // unlock the manager
-    // eov_mutex_Release((EOMmutex*)tm->mutex);
     eov_mutex_Release((EOMmutex*)tm->mutex);
 
     return(eores_OK);
@@ -444,8 +434,7 @@ void init_EOVtheCallbackManager()
     cbkmanagertsk = eom_task_Wrap(embot::os::theCallbackManager::getInstance().thread());
 
     // i initialise the base callback manager
-    eov_callbackman_hid_Initialise(s_eom_callbackman_execute, cbkmanagertsk);
-    
+    eov_callbackman_hid_Initialise(s_eom_callbackman_execute, cbkmanagertsk);    
 }
 
 eOresult_t s_eom_callbackman_execute(EOVtheCallbackManager *v, eOcallback_t cbk, void *arg, eOreltime_t tout)

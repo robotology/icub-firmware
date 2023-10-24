@@ -22,6 +22,8 @@
 #include "EOsocketDatagram.h"
 #include "EOMmutex.h"
 #include "eEcommon.h"
+#include "embot_os_theScheduler.h"
+#include "embot_app_eth_theErrorManager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -141,9 +143,8 @@ void embot::app::eth::theListener::Impl::startup(embot::os::Thread *t, void *p)
     
     if(eores_OK != res)
     {
-//        eo_errman_Trace(eo_errman_GetHandle(), "cannot open the listener socket", s_eobj_ownname);
-        #warning add it back w/ a macro
-        embot::core::print("listener cannot open the socket");
+        embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theListener", thr}, {}, "cannot open its socket");        
     }    
 }
 

@@ -19,12 +19,6 @@
 #include "EoProtocol.h"
 #include "EoProtocolAS.h"
 
-// but also to retrieve information of other things ...
-#include "EOtheErrorManager.h"
-#include "EoError.h"
-
-#include "EOtheCANmapping.h"
-
 #include "embot_app_eth_theFTservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -90,15 +84,13 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__POS(eOcanframe_t *frame
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE(eOcanframe_t *frame, eOcanport_t port)
 {
-    //// this can frame is from strain only ... i dont do the check that the board must be a strain
-    //eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processDebugForce);
-
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
         frame, 
         embot::app::eth::theFTservice::canFrameDescriptor::Type::unspecified
     };
+    
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
     
     return(eores_OK);    
@@ -107,15 +99,13 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEB
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE(eOcanframe_t *frame, eOcanport_t port)
 {
-    // this can frame is from strain only ... i dont do the check that the board must be a strain
-    //eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processDebugTorque);
-
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
         frame, 
         embot::app::eth::theFTservice::canFrameDescriptor::Type::unspecified
     };
+    
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
     
     return(eores_OK);    
@@ -131,16 +121,13 @@ extern eOresult_t eocanprotASperiodic_former_PER_AS_MSG__FORCE_VECTOR(eOcanprot_
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__FORCE_VECTOR(eOcanframe_t *frame, eOcanport_t port)
 {
-    // this can frame is from strain only ... i dont do the check that the board must be a strain
-    // process force
-    //eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processForce);
-
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
         frame, 
         embot::app::eth::theFTservice::canFrameDescriptor::Type::force
     };
+    
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
     
     return(eores_OK);
@@ -157,16 +144,13 @@ extern eOresult_t eocanprotASperiodic_former_PER_AS_MSG__TORQUE_VECTOR(eOcanprot
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__TORQUE_VECTOR(eOcanframe_t *frame, eOcanport_t port)
 {
-    // this can frame is from strain only ... i dont do the check that the board must be a strain
-    // process torque
-    //eo_strain_AcceptCANframe(eo_strain_GetHandle(), frame, port, processTorque);
-
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
         frame, 
         embot::app::eth::theFTservice::canFrameDescriptor::Type::torque
     };
+    
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
     
     return(eores_OK);
@@ -192,6 +176,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__THERMOMETER_MEASURE(eOc
         frame, 
         embot::app::eth::theFTservice::canFrameDescriptor::Type::temperature
     };
+    
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
     
     

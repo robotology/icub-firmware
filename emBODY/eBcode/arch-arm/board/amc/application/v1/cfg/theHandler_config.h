@@ -16,7 +16,7 @@
 
 #include "EOMtheEMSsocket.h"
 
-
+#include "EOMtheEMStransceiver.h"
 #include "EOMtheEMSconfigurator.h"
 #include "EOMtheEMSrunner.h"
 #include "EOMtheEMSerror.h"

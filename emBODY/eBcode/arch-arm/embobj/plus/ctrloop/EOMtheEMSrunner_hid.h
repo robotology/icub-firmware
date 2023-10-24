@@ -20,8 +20,16 @@
 #ifndef _EOMTHEEMSRUNNER_HID_H_
 #define _EOMTHEEMSRUNNER_HID_H_
 
+// marco.accame: this file is used only by EOMtheEMSrunner.c
+// when we compile EOMtheEMSrunner.c in C++ mode we want to be able to use C++ constructs, 
+// so when we have EMBOBJ_USE_EMBOT defined we have to remove the C linkage 
+
+#if defined(EMBOBJ_USE_EMBOT)
+// use c++ linkage
+#else
 #ifdef __cplusplus
 extern "C" {
+#endif
 #endif
 
 /* @file       EOMtheEMSrunner_hid.h
@@ -41,11 +49,7 @@ extern "C" {
 #if !defined(EMBOBJ_USE_EMBOT)    
 #include "osal.h"
 #else
-//#include "embot_os_rtos.h" 
-// cannot include a c++ file because ... 
-// this file EOMtheEMSrunner_hid.h is used by a .cpp file, so ... __cplusplus is defined, so ... linkage is C style
-// and as embot_os_rtos.h contains C++ only .h files it give errors.
-// so, the easiest solution is to avoid using embot::os::rtos::semaphore_t* and using void* instead
+#include "embot_os_rtos.h" 
 #endif
 
 #include "hal_timer.h"
@@ -103,7 +107,7 @@ struct EOMtheEMSrunner_hid
 #if !defined(EMBOBJ_USE_EMBOT)      
     osal_semaphore_t*           waitudptxisdone;     
 #else
-    void*                       waitudptxisdone;
+    embot::os::rtos::semaphore_t* waitudptxisdone;
 #endif    
     uint8_t                     usedTXdecimationfactor;
     eOtransmitter_ropsnumber_t  txropsnumberincycle;
@@ -137,10 +141,14 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p);
 
 
+#if defined(EMBOBJ_USE_EMBOT)
+// use c++ linkage
+#else
 #ifdef __cplusplus
 }       // closing brace for extern "C"
 #endif 
- 
+#endif
+
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

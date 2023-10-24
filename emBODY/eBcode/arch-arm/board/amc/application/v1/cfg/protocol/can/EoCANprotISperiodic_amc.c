@@ -10,7 +10,6 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-//#include "EOVtheSystem.h"
 
 #include "stdlib.h"
 #include "EoCommon.h"
@@ -20,12 +19,6 @@
 #include "EoProtocol.h"
 #include "EoProtocolAS.h"
 
-// but also to retrieve information of other things ...
-
-#include "EOtheCANmapping.h"
-
-//#include "EOtheInertials2.h"
-//#include "EOtheInertials3.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

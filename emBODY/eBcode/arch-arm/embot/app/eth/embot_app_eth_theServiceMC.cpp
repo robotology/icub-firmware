@@ -130,9 +130,7 @@ bool embot::app::eth::theServiceMC::Impl::stop()
 
 bool embot::app::eth::theServiceMC::Impl::set(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem)
 {
-    //#warning TODO: add  embot::app::eth::theMCservice::getInstance().SetRegulars(arrayofid32, &numberofthem);
-    if( eores_NOK_generic == eo_motioncontrol_SetRegulars(_eom, arrayofid32, &numberofthem)){
-        #warning possibile baco ... set(regulars) potrebbe non funzionare come dovrebbe quando abbiamo due servizi (e.g. Motion Control + FT)
+    if(eores_NOK_generic == eo_motioncontrol_SetRegulars(_eom, arrayofid32, &numberofthem)) {
         embot::core::print("[WARNING] eores_NOK_generic returned  during eo_motioncontrol_SetRegulars");
     }
     return true;  
@@ -164,7 +162,7 @@ bool embot::app::eth::theServiceMC::Impl::process(const DescriptorCANframe &canf
 
 bool embot::app::eth::theServiceMC::Impl::process(const DescriptorROP &ropdescriptor)
 {
-    #warning TODO: add  embot::app::eth::theMCservice::getInstance().process(ropdescriptor.rd, ropdescriptor.nv);
+    // #warning TODO: add  embot::app::eth::theMCservice::getInstance().process(ropdescriptor.rd, ropdescriptor.nv);
     return true;
 }
 
