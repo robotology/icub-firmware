@@ -30,8 +30,6 @@
 extern "C" {
 #endif
 
-#include "EOtheMotionController.h"  //TODO:to be removed
-
 
 // to see basic types
 #include "EoCommon.h"
@@ -55,7 +53,7 @@ extern void MController_init(void); //
 extern void MController_deinit(void); //
 extern void MController_config_board(const eOmn_serv_configuration_t* brd_cfg);
 
-extern void MController_config_joint(int j, eOmc_joint_config_t* config, eOmotioncontroller_mode_t mcmode); //
+extern void MController_config_joint(int j, eOmc_joint_config_t* config); //
 extern void MController_config_motor(int m, eOmc_motor_config_t* config); //
 extern void MController_config_Jjm(float **Jjm); //
 extern void MController_config_Jje(float **Jje); //
@@ -79,8 +77,6 @@ extern void MController_calibrate(uint8_t e, eOmc_calibrator_t *calibrator);
 
 extern void MController_go_idle(void);
 
-////////////////////////////////////////////////////////////////////////
-//extern void MController_get_motor_control_state(uint8_t m, uint8_t* control_state, uint8_t* control_state_req);
 extern void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state);
 extern void MController_get_pid_state(int j, eOmc_joint_status_ofpid_t* pid_state, BOOL decoupled_pwm);
 extern void MController_get_motor_state(int m, eOmc_motor_status_t* motor_status);
@@ -117,10 +113,7 @@ extern void MController_update_motor_odometry_fbk_can(int m, void* data);
 
 extern void MController_motor_raise_fault_i2t(int m);
 
-////////////////////////////////////////////////////////////////////////
 
-//VALE: debug function. I'll remove it ASAP
-//void MController_updated_debug_current_info(int j, int32_t avgCurrent, int32_t accum_Ep);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

@@ -61,6 +61,16 @@ namespace embot { namespace prot { namespace can {
             }
             return false;
         }
+        std::string to_string() const
+        {
+            char i[8] = {0};
+            char d[20] = {0};
+            snprintf(i, sizeof(i), "%03X", id);
+            snprintf(d, sizeof(d), "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X", 
+                     data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+            return std::string("[ID, size, data] = [") + i + ", " + std::to_string(size) + ", " + d + "]";
+           
+        }
     };
 
     

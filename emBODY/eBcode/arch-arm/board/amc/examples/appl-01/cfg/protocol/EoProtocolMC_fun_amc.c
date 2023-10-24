@@ -125,7 +125,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         
     if((eo_motcon_mode_foc == mcmode))
     {
-        MController_config_joint(jxx, cfg, mcmode);
+        MController_config_joint(jxx, cfg);
     }
 
 }
@@ -371,7 +371,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     
     if((eo_motcon_mode_foc == mcmode))
     {
-        MController_set_control_mode(jxx, (eOmc_controlmode_command_t)(*controlmode));        
+        MController_set_control_mode(jxx, *controlmode);        
     }    
     
 }
@@ -494,7 +494,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
     eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
 
     eOmc_current_limits_params_t *currentLimits = (eOmc_current_limits_params_t*)rd->data;
-    eOmeas_current_t curr = currentLimits->overloadCurrent;
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
@@ -517,13 +516,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
 
     if(eo_motcon_mode_foc == mcmode)
     {
-        //  send the can message to relevant board
-        eOcanprot_command_t command = {0};
-        command.clas = eocanprot_msgclass_pollingMotorControl;
-        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-        command.value = &curr;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-
         MController_motor_config_max_currents(mxx, currentLimits);
     }
 }

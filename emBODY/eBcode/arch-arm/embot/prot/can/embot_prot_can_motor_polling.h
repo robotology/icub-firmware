@@ -18,8 +18,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_PROT_CAN_MOTOR_H_
-#define _EMBOT_PROT_CAN_MOTOR_H_
+#ifndef __EMBOT_PROT_CAN_MOTOR_POLLING_H_
+#define __EMBOT_PROT_CAN_MOTOR_POLLING_H_
 
 #include "embot_core.h"
 
@@ -63,12 +63,12 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
    
     // some required types
 
-    enum class MotIndex : uint8_t { one = 0, two = 1, none = 254 };
+    enum class MotIndex : uint8_t { one = 0, two = 1, three = 2, four = 3, none = 254 };
     MotIndex toMotIndex(uint8_t v);
     uint8_t convert(MotIndex mo);  
     std::string tostring(MotIndex mo);    
     
-    enum class ControlMode : uint8_t { Idle = 0x00, Current = 0x06, SpeedVoltage = 0x0A, OpenLoop = 0x50, none = 254 };         
+    enum class ControlMode : uint8_t { Idle = 0x00, Current = 0x06, ForceIdle = 0x09, SpeedVoltage = 0x0A, OpenLoop = 0x50, HWfault = 0xA0, NotConfigured = 0xB0, none = 254 };         
     ControlMode toControlMode(uint8_t v);
     uint8_t convert(ControlMode cm); 
     std::string tostring(ControlMode cm);      
