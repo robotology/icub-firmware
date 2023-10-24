@@ -1379,11 +1379,15 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
             
 			if(eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown)
 			{
-//                static int dont_stress = 0;
-                
-//                if (++dont_stress > 5000)
+                static int dont_stress = 0;
+#if defined(STM32HAL_BOARD_AMC)
+                static const int stresstolerance  = 0;
+#else
+                static const int stresstolerance  = 5000;
+#endif                
+                if (++dont_stress > stresstolerance)
                 {
-//                    dont_stress = 0;
+                    dont_stress = 0;
                     
                     errdes.code             = eoerror_code_get(eoerror_category_System, errorvalue[taskid]);
                     errdes.par16            = currduration & 0xffff;
