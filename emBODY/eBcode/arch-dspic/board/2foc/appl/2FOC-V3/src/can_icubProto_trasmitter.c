@@ -133,20 +133,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     
     if (!bequiet)
     {
-        payload.b[0] = gControlMode;
-        payload.b[1] = gEncoderError.bitmask;
-    
-        payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
-
-        payload.b[4] = SysError.b[0];
-        payload.b[5] = SysError.b[1];
-        payload.b[6] = SysError.b[2];
-        payload.b[7] = SysError.b[3];
-
-        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
-
-        ECANSend(msgid, 8, &payload);
-
+        BOOL transmit_addStatus = FALSE;
         if (MotorConfig.has_tsens && isActiveI2CTsens())
         {
             int Tsend = 100 + canprototransmitter_bid*100;
@@ -155,13 +142,33 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
             if (++noflood >= Tsend)
             {
                 noflood = 0;
-
-                payload.w[1] = gTemperature;
-
-                msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS );
-                ECANSend(msgid, 4, &payload);
+                transmit_addStatus = TRUE;
             }
         }
+        if(transmit_addStatus)
+        {
+            payload.w[1] = gTemperature;
+
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS );
+            ECANSend(msgid, 4, &payload);
+        }
+        else
+        {
+            payload.b[0] = gControlMode;
+            payload.b[1] = gEncoderError.bitmask;
+
+            payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
+
+            payload.b[4] = SysError.b[0];
+            payload.b[5] = SysError.b[1];
+            payload.b[6] = SysError.b[2];
+            payload.b[7] = SysError.b[3];
+
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
+
+            ECANSend(msgid, 8, &payload);
+        }
+
     }
 }
 
@@ -169,4 +176,3 @@ extern void CanIcubProtoTransmitterUpdateBoardId(unsigned char bid)
 {
     canprototransmitter_bid = bid;
 }
-

@@ -106,10 +106,9 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         if (++noflood >= Tsend)
         {
             noflood = 0;
-            payload.w[0] = gTemperature;
-            payload.w[1] = I2Cerrcode;
-            payload.w[2] = I2Cerrors;
-            payload.w[3] = residual_enc;
+            payload.w[0] = I2Cerrcode;
+            payload.w[1] = I2Cerrors;
+            payload.w[2] = residual_enc;
         
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
@@ -117,19 +116,10 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         }
     }
     
+
     if (!bequiet)
     {
-        payload.b[0] = gControlMode;
-        payload.b[1] = gEncoderError.bitmask;
-
-        payload.w[1] = VqFbk;
-
-        payload.dw[1] = SysError.L;
-
-        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
-
-        ECANSend(msgid, 8, &payload);
-        
+        BOOL transmit_addStatus = FALSE;
         if (MotorConfig.has_tsens && isActiveI2CTsens())
         {
             int Tsend = 100 + canprototransmitter_bid*100;
@@ -138,14 +128,33 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
             if (++noflood >= Tsend)
             {
                 noflood = 0;
-
-                payload.w[1] = gTemperature;
-
-                msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS );
-                ECANSend(msgid, 4, &payload);
+                transmit_addStatus = TRUE;
             }
         }
+        if(transmit_addStatus)
+        {
+            payload.w[1] = gTemperature;
+
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS );
+            ECANSend(msgid, 4, &payload);
+        }
+        else
+        {
+            payload.b[0] = gControlMode;
+            payload.b[1] = gEncoderError.bitmask;
+
+            payload.w[1] = VqFbk;
+
+            payload.dw[1] = SysError.L;
+
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
+
+            ECANSend(msgid, 8, &payload);
+        }
+
     }
+
+
 }
 
 extern void CanIcubProtoTransmitterUpdateBoardId(unsigned char bid)
