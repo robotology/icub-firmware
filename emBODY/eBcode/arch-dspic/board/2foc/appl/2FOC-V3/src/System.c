@@ -483,9 +483,9 @@ void SetupPorts_DHES(void)
     // No particular init needed, pins already inputs
 }
 
-void SetupPorts_I2C(void)
+int SetupPorts_I2C(void)
 {
-    setupI2CTsens();
+    return setupI2CTsens();
 }
 
 void SetupPorts( void )

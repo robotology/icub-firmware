@@ -260,7 +260,7 @@ int setupI2CTsens(void)
 int readI2CTsens(volatile int* temperature)
 {   
     I2Cerrcode = 0;
-    //*temperature = 0xABBA;
+    *temperature = -5000;
     
     // start
     I2C1CONbits.ACKDT = 0; // Reset any ACK
@@ -293,6 +293,11 @@ int readI2CTsens(volatile int* temperature)
         }
 
         *temperature = buffer[0]<<8 | buffer[1];
+        if(*temperature == 0x7fff)
+        {
+            *temperature = -5000;
+            I2Cerrcode = -18;
+        }
     }
     else
     {

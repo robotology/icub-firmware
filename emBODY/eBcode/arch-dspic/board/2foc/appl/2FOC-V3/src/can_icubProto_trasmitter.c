@@ -120,7 +120,6 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         {
             noflood = 0;
             
-            payload.w[0] = gTemperature;
             payload.w[1] = I2Cerrcode;
             payload.w[2] = I2Cdead;
             payload.w[3] = I2Cerrors;

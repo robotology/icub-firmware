@@ -96,7 +96,7 @@ static BOOL JointSet_calibType6_check_reached_pos(Joint *j)
 
 static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int indexSet, BOOL* calibrationCompleted)
 {
-    char info[80];
+    
     /* When i'm here i sure that:
        - state = calibtype6_st_jntEncResComputed
      */

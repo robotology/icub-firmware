@@ -536,18 +536,6 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT(eO
     // now i prepare data[1] -> data[2]   
     *((int16_t*)(&frame->data[1])) = *((eOmeas_temperature_t*)descriptor->cmd.value);
     
-    char message[80];
-    snprintf(message, sizeof(message), "Former temp message");
-    eOerrmanDescriptor_t errdes = {0};
-
-    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress    = 0;
-    errdes.par16            = *((int16_t*)(&frame->data[1]));
-    errdes.par64            = 0;
-    
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
-    
     return(eores_OK);
 }
 

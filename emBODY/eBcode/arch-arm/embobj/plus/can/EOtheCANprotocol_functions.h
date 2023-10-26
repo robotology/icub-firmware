@@ -376,6 +376,7 @@ extern eOresult_t eocanprotINperiodic_parser_PER_BS_MSG__ALLTHEOTHERS(eOcanframe
 extern eOresult_t eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG(eOcanframe_t *frame, eOcanport_t port);
 
 
+
 /** @}            
     end of group doxygroup_EOtheCANprotocolCfg  
  **/

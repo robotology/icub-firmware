@@ -193,7 +193,21 @@ namespace embot::app::eth::mc::messaging::sender {
         
         return command.transmit();  
     }    
-
+    
+    bool Set_Temperature_Limit::transmit()
+    {
+        Command command 
+        {
+            destination, 
+            eocanprot_msgclass_pollingMotorControl, 
+            ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT, 
+            const_cast<void*>(reinterpret_cast<const void*>(&info)), 
+            eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT
+        };
+        
+        return command.transmit();  
+    }
+    
     bool Set_Current_PID::transmit()
     {
         Command command 

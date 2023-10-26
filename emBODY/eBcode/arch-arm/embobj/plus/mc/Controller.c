@@ -1489,6 +1489,9 @@ void MController_update_joint_targets(int j)
     Joint_update_status_reference(smc->joint+j);
 }
 
+
+
+
 void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf)
 {
     PID_config(&(smc->joint[j].minjerkPID), pid_conf);

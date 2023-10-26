@@ -1192,7 +1192,15 @@ int main(void)
     }
     else
     {
-        if (MotorConfig.has_tsens) SetupPorts_I2C();
+        if (MotorConfig.has_tsens) 
+        {
+            gTemperature = SetupPorts_I2C();
+        }
+        else
+        {
+            gTemperature = -5000;
+        }
+            
 
         if (MotorConfig.has_qe)
         {

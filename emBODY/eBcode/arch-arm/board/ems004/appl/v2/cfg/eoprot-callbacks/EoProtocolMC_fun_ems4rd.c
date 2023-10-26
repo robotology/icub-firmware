@@ -1573,13 +1573,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_temperaturelimit(const EOnv* nv, con
 
     if(eo_motcon_mode_foc == mcmode)
     {
-        //  send the can message to relevant board
-        eOcanprot_command_t command = {0};
-        command.clas = eocanprot_msgclass_pollingMotorControl;
-        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT;
-        command.value = temperatureLimit;
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-
         MController_motor_config_max_temperature(mxx, temperatureLimit);
     }
     else 
