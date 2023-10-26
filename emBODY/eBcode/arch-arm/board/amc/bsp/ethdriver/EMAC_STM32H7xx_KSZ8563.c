@@ -177,13 +177,7 @@ Configuration tab
 extern ETH_HandleTypeDef    heth;
 extern ETH_DMADescTypeDef   DMARxDscrTab[ETH_RX_DESC_CNT];
 extern ETH_DMADescTypeDef   DMATxDscrTab[ETH_TX_DESC_CNT];
-
-#if defined(STM32HAL_DRIVER_V1B1)
-#warning acemor removes Rx_Buff[] for version 1B1  
-//extern uint8_t              Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE];
-#else
 extern uint8_t              Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE];
-#endif
 
 /* Driver Version */
 static const ARM_DRIVER_VERSION DriverVersion = {
@@ -370,18 +364,11 @@ static int32_t PowerControl (ARM_POWER_STATE state) {
       if (HAL_ETH_Init (&heth) != HAL_OK) {
         return ARM_DRIVER_ERROR;
       }
-#if defined(STM32HAL_DRIVER_V1B1)
-#warning acemor removes Rx_Buff[] for version 1B1   
-//      /* Assign memory for Rx packets */
-//      for (idx = 0; idx < ETH_RX_DESC_CNT; idx++) {
-//        HAL_ETH_DescAssignMemory (&heth, idx, Rx_Buff[idx], NULL);
-//      }
-#else
       /* Assign memory for Rx packets */
       for (idx = 0; idx < ETH_RX_DESC_CNT; idx++) {
         HAL_ETH_DescAssignMemory (&heth, idx, Rx_Buff[idx], NULL);
       }
-#endif
+
       Emac.tx_buf.len = 0;
       Emac.flags     |= EMAC_FLAG_POWER;
       break;
@@ -596,57 +583,11 @@ static int32_t ReadFrame (uint8_t *frame, uint32_t len) {
     memcpy (frame, Emac.rx_buf.buffer, len);
     Emac.rx_buf.buffer = NULL;
   }
-#if defined(STM32HAL_DRIVER_V1B1)
-#warning acemor does not know how to chamge it
-    // ETH_UpdateDescriptor Emac.h); is called inside HAL_ETH_ReadData()
-#else
-//  /* Return block back to EMAC-DMA */
+  /* Return block back to EMAC-DMA */
   HAL_ETH_BuildRxDescriptors (Emac.h);
-#endif
 
   return (len);
 }
-
-#if defined(STM32HAL_DRIVER_V1B1)
-struct pbuf {
-  /** next pbuf in singly linked pbuf chain */
-  struct pbuf *next;
-
-  /** pointer to the actual data in the buffer */
-  void *payload;
-
-  /**
-   * total length of this buffer and all next buffers in chain
-   * belonging to the same packet.
-   *
-   * For non-queue packet chains this is the invariant:
-   * p->tot_len == p->len + (p->next? p->next->tot_len: 0)
-   */
-  uint16_t tot_len;
-
-  /** length of this buffer */
-  uint16_t len;
-
-  /** a bit field indicating pbuf type and allocation sources
-      (see PBUF_TYPE_FLAG_*, PBUF_ALLOC_FLAG_* and PBUF_TYPE_ALLOC_SRC_MASK)
-    */
-  uint8_t type_internal;
-
-  /** misc flags */
-  uint8_t flags;
-
-  /**
-   * the reference count always equals the number of pointers
-   * that refer to this pbuf. This can be pointers from an application,
-   * the stack itself, or pbuf->next pointers from a chain.
-   */
-  uint8_t ref;
-
-  /** For incoming packets, this contains the input netif's index */
-  uint8_t if_idx;
-};
-
-#endif
 
 /**
   \fn          uint32_t GetRxFrameSize (void)
@@ -654,23 +595,8 @@ struct pbuf {
   \return      number of bytes in received frame
 */
 static uint32_t GetRxFrameSize (void) {
-  
-    uint32_t len = 0;
-    
-#if defined(STM32HAL_DRIVER_V1B1)    
-    struct pbuf *p = NULL;
-    #warning changed api
+  uint32_t len = 0;
 
-    if(HAL_OK == HAL_ETH_ReadData(Emac.h, (void **)&p))
-    {
-        Emac.rx_buf.buffer = p->payload;
-        Emac.rx_buf.len = p->len;
-        len = p->len;
-    }
-    
-    return len;
-#else    
-    
   /* Clean and invalidate data cache */
   if(HAL_ETH_GetRxDataBuffer(Emac.h, &Emac.rx_buf) == HAL_OK) {
     if (HAL_ETH_GetRxDataLength (Emac.h, &len) == HAL_OK) {
@@ -679,7 +605,6 @@ static uint32_t GetRxFrameSize (void) {
   }
   /* No data available */
   return (0);
-#endif  
 }
 
 /**
