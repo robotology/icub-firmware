@@ -87,7 +87,7 @@ static void s_initialiser(void)
 #include "embot_hw.h"
 #include "embot_hw_eeprom.h"
 #include "embot_hw_led.h"
-#include "embot_hw_flash.h"
+#include "embot_hw_flash_bsp.h"
 
 
 #include "ipal.h"
@@ -268,7 +268,7 @@ static void s_eom_eupdater_main_init(void)
     const eEmoduleExtendedInfo_t * eapp_modinfo_extended = (const eEmoduleExtendedInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
     
     // the info about application01 are saved in a flash sector of bank2
-    const embot::hw::flash::Partition& app01 { embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::eapplication01) };
+    const embot::hw::flash::Partition& app01 { embot::hw::sys::partition(embot::hw::flash::Partition::ID::eapplication01) };
     const eEmoduleExtendedInfo_t * eappcm4_modinfo_extended = (const eEmoduleExtendedInfo_t*)(app01.address + EENV_MODULEINFO_OFFSET);
 
     // read application00 (core cm7 bank0)

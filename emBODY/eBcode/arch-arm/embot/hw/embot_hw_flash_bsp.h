@@ -20,8 +20,18 @@
 
 ## Configuration of the `embot::hw::flash::bsp`
 
+The `embot::hw::flash::bps::BSP` has core information of the code space layout and ...
+must ALWAYS be defined, even when the macro `EMBOT_ENABLE_hw_flash` is undefined.
 
-In here is the configuration of board `amcbldc` to be placed somewhere, possibly inside `embot_hw_bsp_amcbld.cpp`.
+We need the `embot::hw::flash::bps::BSP` because `embot::hw::init()` must relocate 
+the vector table to the FLASH address of the running application and for that we use 
+functions such as `embot::hw::flash::bsp::partition()` and `embot::hw::flash::bsp::bank()` 
+that retrieve flash information placed inside the BSP. 
+
+So, as examples, are two typical definitions of the `embot::hw::flash::bps::BSP`.
+
+In here is the configuration of board `amcbldc` to be placed somewhere, possibly inside 
+`embot_hw_bsp_amcbldc.cpp`.
 
 ```c++
 namespace embot { namespace hw { namespace flash { namespace bsp {
@@ -65,8 +75,12 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
 
 ```
 **Code Listing**. Configuration of the BSP of the `embot::hw::flash` driver for the `amcbldc` board.
-    
-    
+   
+
+And in here is the configuration of board `amc` to be placed somewhere, possibly inside 
+`embot_hw_bsp_amc.cpp`.
+
+
 ```C++
 
 namespace embot { namespace hw { namespace flash { namespace bsp {
@@ -105,7 +119,7 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
     };   
             
 #else
-    #error embot::hw::flash::thebsp must be defined    
+    #error embot::hw::flash::thebsp is MANDATORY and must be always defined even if     
 #endif   
      
     
@@ -124,7 +138,11 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
 #endif
 
 
-namespace embot { namespace hw { namespace flash { namespace bsp {
+// --------------------------------------------------------------------------------------------------------------------
+
+
+// and in here are the data structure used to define the BSP
+namespace embot::hw::flash::bsp {
 
     
     struct BankDescriptor : public RegularBank
@@ -192,6 +210,7 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
             return nullptr;
         }        
     };      
+
     
     struct BSP
     {        
@@ -227,7 +246,7 @@ namespace embot { namespace hw { namespace flash { namespace bsp {
     
     const BSP& getBSP();                                     
         
-}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
+} // namespace embot::hw::flash::bsp {
 
 
 

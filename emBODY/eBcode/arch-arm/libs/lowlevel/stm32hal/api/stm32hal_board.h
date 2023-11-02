@@ -590,6 +590,14 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for strain2c
     #endif
+    
+#elif   defined(STM32HAL_BOARD_EMS)	
+    
+    // nothing to include 
+    
+#elif   defined(STM32HAL_BOARD_MC4PLUS)	
+        
+    // nothing to include 
         
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${B}

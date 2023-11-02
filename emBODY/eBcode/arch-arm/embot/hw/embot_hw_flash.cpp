@@ -20,6 +20,7 @@
 
 #include "embot_hw_bsp_config.h"
 #include "embot_hw_flash_bsp.h"
+#include "embot_hw_sys.h"
 
 #include <cstring>
 #include <vector>
@@ -36,38 +37,13 @@ using namespace std;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
-// --------------------------------------------------------------------------------------------------------------------
-
-namespace embot { namespace hw { namespace flash {  
-    
-    constexpr Page InvalidPage { nullptr, InvalidADDR, InvalidSize, Page::InvalidIndex };    
-    
-    constexpr Partition InvalidPartition { Partition::ID::none, nullptr, InvalidADDR, 0 };
-    
-namespace bsp {
-    constexpr BankDescriptor InvalidBank { Bank::ID::none, InvalidADDR, InvalidSize, {} };
-}
-    
-}}} // namespace embot { namespace hw { namespace flash {    
+// --------------------------------------------------------------------------------------------------------------------  
 
 #if !defined(EMBOT_ENABLE_hw_flash)
 
 
 namespace embot { namespace hw { namespace flash {
    
-namespace bsp {      
-    
-    const embot::hw::flash::Partition& bsp::partition(const embot::hw::flash::Partition::ID id) { return InvalidPartition; }    
-    const embot::hw::flash::Partition& bsp::partition(const ADDR address) { return InvalidPartition; }
-    
-    const embot::hw::flash::Bank & bank(const ADDR address) { return InvalidBank;}
-    const embot::hw::flash::Bank & bank(const Bank::ID id) { return InvalidBank;}
-
-    Page page(const ADDR address) { return {}; }
-    ADDR address(const Bank::ID bank, const Page::Index pageindex) { return InvalidADDR; } 
-    
-} // namespace bsp {
-
     bool isvalid(const ADDR address) { return false; } 
     bool erase(const ADDR address, const size_t size) { return false; }
     bool read(const ADDR address, const size_t size, void *data) { return false; }
@@ -78,13 +54,13 @@ namespace bsp {
     
 }}} // namespace embot { namespace hw { namespace flash {
 
-#else
 
+#else // defined(EMBOT_ENABLE_hw_flash)
 
+#if defined(USE_HAL_DRIVER) // always defined if we use the traditional stm32hal.h 
 
-namespace embot { namespace hw { namespace flash {
-    
-    
+namespace embot::hw::flash {
+      
     // declation of static functions
 
     static uint32_t tostm32bank(embot::hw::flash::Bank::ID id);    
@@ -118,8 +94,8 @@ namespace embot { namespace hw { namespace flash {
         // if the limits of [address, address+size) are both inside the same bank, we erase in one shot.
         // otherwise we erase by page ...
 
-        Bank::ID ba = bsp::bank(address).id;
-        Bank::ID b1 = bsp::bank(address+size-1).id;
+        Bank::ID ba = embot::hw::sys::bank(address).id;
+        Bank::ID b1 = embot::hw::sys::bank(address+size-1).id;
         if((Bank::ID::none == ba) || (Bank::ID::none == b1))
         {
             return false;
@@ -127,8 +103,8 @@ namespace embot { namespace hw { namespace flash {
         
         static volatile uint32_t nerrors {0};
                 
-        Page firstpage = bsp::page(address);            
-        Page lastpage = bsp::page(address+size-1);
+        Page firstpage = embot::hw::sys::page(address);            
+        Page lastpage = embot::hw::sys::page(address+size-1);
           
               
         if(ba == b1)
@@ -205,7 +181,7 @@ namespace embot { namespace hw { namespace flash {
                     break;
                 }
                 
-                Page currpage = bsp::page(addressaligned2page);
+                Page currpage = embot::hw::sys::page(addressaligned2page);
                 
                 rr = erase(b, currpage.index);
                 if(false == rr)
@@ -213,7 +189,7 @@ namespace embot { namespace hw { namespace flash {
                     break;
                 }
                 addressaligned2page += currpage.size;
-                b = bsp::bank(addressaligned2page).id;
+                b = embot::hw::sys::bank(addressaligned2page).id;
                 if(addressaligned2page > lastaddressaligned2page)
                 {
                     break;
@@ -401,59 +377,31 @@ namespace embot { namespace hw { namespace flash {
         __HAL_FLASH_CLEAR_FLAG(flag);
     }
         
+} // namespace embot::hw::flash { 
+
+#elif defined(USE_hal2_DRIVER) 
+
+namespace embot::hw::flash { 
     
-}}} // }}}} // namespace embot { namespace hw { namespace flash {
-
-
-// the BSP part
-
-namespace embot { namespace hw { namespace flash { namespace bsp {
+    #warning implementation of embot::hw::flash for USE_hal2_DRIVER is TBD
         
-    const embot::hw::flash::Partition& partition(const embot::hw::flash::Partition::ID id)
-    {
-        const Partition *p = embot::hw::flash::bsp::getBSP().partition(id);
-        return (nullptr == p) ? InvalidPartition : *p;
-    }
-
-    const embot::hw::flash::Partition& partition(const ADDR address)
-    {
-        const Partition *p = embot::hw::flash::bsp::getBSP().partition(address);
-        return (nullptr == p) ? InvalidPartition : *p;
-    }
+    bool isvalid(const ADDR address) { return false; } 
+    bool erase(const ADDR address, const size_t size) { return false; }
+    bool read(const ADDR address, const size_t size, void *data) { return false; }
+    bool write(const ADDR address, const size_t size, const void *data) { return false; }
     
-    const embot::hw::flash::Bank & bank(const ADDR address)
-    {
-        const BankDescriptor * bd = embot::hw::flash::bsp::getBSP().bank(address);             
-        return (nullptr == bd) ? InvalidBank : *bd;         
-    }
+    bool isvalid(const Bank::ID id, const Page::Index pageindex) { return false; }        
+    bool erase(const Bank::ID id, const Page::Index pageindex) { return false; }  
+
+} // namespace embot::hw::flash {     
     
-    const embot::hw::flash::Bank & bank(const Bank::ID id)
-    {
-        const BankDescriptor * bd = embot::hw::flash::bsp::getBSP().bank(id);             
-        return (nullptr == bd) ? InvalidBank : *bd; 
-    }   
-       
-    Page page(const ADDR address) 
-    {          
-        const bsp::BankDescriptor * bd = embot::hw::flash::bsp::getBSP().bank(address);   
-        if(nullptr != bd)
-        {
-            return bd->page(address);
-        }               
-        return {}; 
-    }
- 
-    ADDR address(const Bank::ID id, const Page::Index index) 
-    {
-        const bsp::BankDescriptor * bd = embot::hw::flash::bsp::getBSP().bank(id);
-        return (nullptr == bd) ? InvalidADDR : bd->index2page(index).address;             
-    }      
-    
-}}}} // }}}} // namespace embot { namespace hw { namespace flash { namespace bsp {     
+#else
+    #error either HAL or hal2
+#endif  
 
 
+#endif //defined(EMBOT_ENABLE_hw_flash)  
 
-#endif //defined(EMBOT_ENABLE_hw_flash)
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

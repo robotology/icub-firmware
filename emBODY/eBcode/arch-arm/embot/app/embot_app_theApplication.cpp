@@ -37,7 +37,7 @@
 #include "embot_hw_sys.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_flash.h"
-
+#include "embot_hw_flash_bsp.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -88,7 +88,7 @@ embot::app::theApplication::~theApplication() { }
     
     // now we init the hw, we start the scheduler, we start a countdown with sys restart at the end ... we exec the activity ...
     std::uint32_t appladdress = pImpl->config.addressofapplication;
-    uint32_t defaultvectorlocation = embot::hw::flash::bsp::bank(appladdress).address;
+    uint32_t defaultvectorlocation = embot::hw::sys::bank(appladdress).address;
     if(appladdress > defaultvectorlocation)
     {
         std::uint32_t vectorlocation = appladdress - defaultvectorlocation;

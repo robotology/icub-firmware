@@ -36,6 +36,7 @@
 #include <vector>
 #include "embot_core_binary.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_gpio.h"
 
 #if defined(USE_STM32HAL)
     #include "stm32hal.h"

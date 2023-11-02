@@ -72,8 +72,8 @@ struct embot::hw::FlashBurner::Impl
             return true;
         }
 
-        embot::hw::flash::Page firstpage = embot::hw::flash::bsp::page(start);
-        embot::hw::flash::Page lastpage = embot::hw::flash::bsp::page(start+size-1);
+        embot::hw::flash::Page firstpage = embot::hw::sys::page(start);
+        embot::hw::flash::Page lastpage = embot::hw::sys::page(start+size-1);
         embot::hw::flash::Page::Index firstpageIndex = firstpage.index;        
         embot::hw::flash::Page::Index lastpageIndex = lastpage.index; 
  
@@ -107,7 +107,7 @@ struct embot::hw::FlashBurner::Impl
         HAL_FLASH_Unlock();
         
         constexpr embot::hw::flash::Bank::ID bankid {embot::hw::flash::Bank::ID::one};
-        embot::hw::flash::ADDR tmpadr = embot::hw::flash::bsp::address(bankid, buffer.pageindex);
+        embot::hw::flash::ADDR tmpadr = embot::hw::sys::address(bankid, buffer.pageindex);
         uint32_t n64bitwords = PAGEsize / 8;
         for(uint32_t i=0; i<n64bitwords; i++)
         {
@@ -135,11 +135,11 @@ struct embot::hw::FlashBurner::Impl
         start = _start; // dont do any control ... just that start is a valid address
         if(false == embot::hw::flash::isvalid(start)) 
         {
-            start = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address; 
+            start = embot::hw::sys::partition(embot::hw::flash::Partition::ID::application).address; 
         }
         
         // init the page size used by the flash at that address. we assume that it stays the same
-        embot::hw::flash::Page firstpage = embot::hw::flash::bsp::page(start); 
+        embot::hw::flash::Page firstpage = embot::hw::sys::page(start); 
                 
         PAGEsize = firstpage.size;
         _buffersize = PAGEsize;
@@ -238,8 +238,8 @@ bool embot::hw::FlashBurner::add(std::uint32_t address, std::uint32_t size, cons
     }
     
     // i put data inside the buffer.    
-    embot::hw::flash::Page firstpage = embot::hw::flash::bsp::page(address);   
-    embot::hw::flash::Page lastpage = embot::hw::flash::bsp::page(address+size-1); 
+    embot::hw::flash::Page firstpage = embot::hw::sys::page(address);   
+    embot::hw::flash::Page lastpage = embot::hw::sys::page(address+size-1); 
     
     embot::hw::flash::Page::Index currpageIndex = firstpage.index;        
     embot::hw::flash::Page::Index lastpageIndex = lastpage.index;

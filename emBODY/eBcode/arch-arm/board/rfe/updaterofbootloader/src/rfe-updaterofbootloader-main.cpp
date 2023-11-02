@@ -40,8 +40,8 @@ static ActivityParam activity_param = { .blinkingperiod = BlinkSlowPeriod };
 static const embot::prot::can::versionOfAPPLICATION vAP = {1, 5 , 222};
 static const embot::prot::can::versionOfCANPROTOCOL vCP = {2, 0};
 
-static const std::uint32_t address = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address;
-static const std::uint32_t defaultvectorlocation = embot::hw::flash::bsp::bank(address).address;
+static const std::uint32_t address = embot::hw::sys::partition(embot::hw::flash::Partition::ID::application).address;
+static const std::uint32_t defaultvectorlocation = embot::hw::sys::bank(address).address;
 static const std::uint32_t vectorlocation = address - defaultvectorlocation;
 
 int main(void)

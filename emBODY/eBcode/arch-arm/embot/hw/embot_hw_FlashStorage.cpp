@@ -33,6 +33,7 @@
 
 
 #include "embot_hw_flash.h" 
+#include "embot_hw_sys.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -54,9 +55,9 @@ struct embot::hw::FlashStorage::Impl
         pagestart = _pagestart; 
         if(false == embot::hw::flash::isvalid(pagestart))
         {
-            pagestart = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::sharedstorage).address;
+            pagestart = embot::hw::sys::partition(embot::hw::flash::Partition::ID::sharedstorage).address;
         }
-        embot::hw::flash::Page firstpage = embot::hw::flash::bsp::page(pagestart);        
+        embot::hw::flash::Page firstpage = embot::hw::sys::page(pagestart);        
         pageindex = firstpage.index; 
         
         pagesize = _pagesize;

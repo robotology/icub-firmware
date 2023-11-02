@@ -34,6 +34,7 @@
 #include <new>
 #include "embot_hw.h"
 #include "embot_hw_flash.h"
+#include "embot_hw_sys.h"
 #include "embot_hw_can.h"
 #include "embot_prot_can.h"
 #include "embot_prot_can_bootloader.h"
@@ -628,18 +629,18 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
            
     if(nullptr == pImpl->flashburner)
     {
-        std::uint32_t flashstart = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address;
-        std::uint32_t flashsize = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).size;
+        std::uint32_t flashstart = embot::hw::sys::partition(embot::hw::flash::Partition::ID::application).address;
+        std::uint32_t flashsize = embot::hw::sys::partition(embot::hw::flash::Partition::ID::application).size;
 
         if(embot::prot::can::Process::application == pImpl->config.owner)
         {
-            flashstart = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::bootloader).address;
-            flashsize = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::bootloader).size;            
+            flashstart = embot::hw::sys::partition(embot::hw::flash::Partition::ID::bootloader).address;
+            flashsize = embot::hw::sys::partition(embot::hw::flash::Partition::ID::bootloader).size;            
         }
         else
         {
-            flashstart = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address;
-            flashsize = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).size;            
+            flashstart = embot::hw::sys::partition(embot::hw::flash::Partition::ID::application).address;
+            flashsize = embot::hw::sys::partition(embot::hw::flash::Partition::ID::application).size;            
         }
         
         pImpl->flashburner = new embot::hw::FlashBurner(flashstart, flashsize);
