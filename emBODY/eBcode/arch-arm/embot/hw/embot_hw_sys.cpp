@@ -53,185 +53,69 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(USE_HAL_DRIVER) // standard stm32hal usage
+namespace embot::hw::sys::DRIVER {    
+    // these depend on the hal layer beneath. it may be either USE_HAL_DRIVER ore USE_hal2_DRIVER 
+    std::uint32_t _clock(embot::hw::CLOCK clk);
+    void _reset();   
+    bool _canjump2address(embot::hw::flash::ADDR address);    
+    void _jump2address(embot::hw::flash::ADDR address);   
+    void _jump2address2(embot::hw::flash::ADDR address);    
+    void _relocatevectortable(std::uint32_t offset); 
+    uint64_t _uniqueid(); 
+    void _delay(embot::core::relTime t);
+    std::uint32_t _random();
+    void _irq_disable();
+    void _irq_enable();
+}
 
-#include "embot_hw_lowlevel.h"  
-    
+constexpr std::uint32_t maxRANDmask = 0x3ff; // 1023 
+
 namespace embot::hw::sys { 
-          
-    static void ss_delay(uint64_t t)
-    {   
-        static uint64_t s_hl_sys_numofops1sec = 0;
-        static uint32_t s_hl_sys_used_systemcoreclock = 0;
-        if(s_hl_sys_used_systemcoreclock != SystemCoreClock)
-        {
-
-            // to occupy a millisec i execute an operation for a number of times which depends on: 
-            // SystemCoreClock, cortex gain(1.25 dmips/mhz), flash access, etc.
-            // to overcome all this i just consider SystemCoreClock w/out 1.25 gain and i measures
-            // extra gain with on a simple assembly function which should take 4 cycles per iteration (?).      
-            //s_hl_sys_numofops1sec = (5*(SystemCoreClock)) / 4; 
-            s_hl_sys_used_systemcoreclock = SystemCoreClock;
-            s_hl_sys_numofops1sec = SystemCoreClock;
-
-            #if defined(STM32H7)
-            // empirically removed ...
-            #elif defined(STM32L4) 
-            s_hl_sys_numofops1sec /= 3;
-            #elif defined(STM32G4) 
-            s_hl_sys_numofops1sec /= 3;
-            #warning specify tuning must be verified
-            #else
-            #error specify tuning             
-            #endif
-
-            // at this point i normalise the variable to keep not the nymber of operations for 1 sec,
-            // but for 1024*1024 microsec. by doing so, later on i shift by 20 instead of using a division. 
-            s_hl_sys_numofops1sec <<= 20;
-            s_hl_sys_numofops1sec /= 1000000;
-        }
-        
-        
-        volatile uint64_t num = s_hl_sys_numofops1sec * t;
-        num >>= 20; 
-        //num -= offset; //we may remove some cycles to compensates for previous instructions, but ... we dont do it. it depends on c compiler optimisation 
-        if(0 == num)
-        {
-            return;
-        }
-        embot::hw::lowlevel::asmEXECcycles(static_cast<uint32_t>(num));
-    }
-    
-    
+                 
     std::uint32_t clock(embot::hw::CLOCK clk)
     {
-        std::uint32_t value = 0;
-        switch(clk)
-        {
-            case embot::hw::CLOCK::pclk1:
-            {
-                value = HAL_RCC_GetPCLK1Freq();
-            } break;
-            
-            case embot::hw::CLOCK::pclk2:
-            {
-                value = HAL_RCC_GetPCLK2Freq();
-            } break;
-            
-            default:
-            case embot::hw::CLOCK::syscore:
-            {
-                //value = HAL_RCC_GetHCLKFreq(); it has a bug for H7 ??
-                value = SystemCoreClock;
-            } break;            
-        }   
-        return value;
+        return DRIVER::_clock(clk);
     }
     
     void reset()
     {        
-        NVIC_SystemReset();
+        DRIVER::_reset();
     }
     
-    bool canjump2address(std::uint32_t address)
+    bool canjump2address(embot::hw::flash::ADDR address)
     {
-        volatile std::uint32_t * firstword32 = reinterpret_cast<volatile std::uint32_t *>(address);
-        if(0xffffffff == *firstword32)
-        {   // so far i disable only the jumpt to erase flash
-            return false;
-        }
-        return true;
+        return DRIVER::_canjump2address(address);
     }
     
-    void jump2address(std::uint32_t address)
+    void jump2address(embot::hw::flash::ADDR address)
     {
-        volatile std::uint32_t jumpaddr;
-        void (*app_fn)(void) = NULL;
-        
-        if(false == canjump2address(address))
-        {
-            return;
-        }
-
-
-        // prepare jump address 
-        jumpaddr = *(volatile std::uint32_t*) (address + 4);
-        // prepare jumping function
-        app_fn = (void (*)(void)) jumpaddr;
-        // initialize user application's stack pointer 
-        __set_MSP(*(volatile uint32_t*) address);
-        // jump.
-        app_fn(); 
-        
-        // never in here.
-        return;                 
+        DRIVER::_jump2address(address);          
     }
     
-    void jump2address2(std::uint32_t address)
+    void jump2address2(embot::hw::flash::ADDR address)
     {        
-        if(false == canjump2address(address))
-        {
-            return;
-        }
-        
-        // as found in https://developer.arm.com/documentation/ka001423/1-0
-        // it seems that allows the application to use IRQ handlers and RTOS
-        
-        // make sure that the address argument is safely copied into memory before we change the stack
-        volatile uint32_t flashstart = address;
-        static volatile std::uint32_t resetlocation = 0;
-        resetlocation = *(volatile std::uint32_t*) (flashstart + 4);
-        // now change everything
-        __disable_irq();
-        memset((uint32_t *)NVIC->ICER, 0xFF, sizeof(NVIC->ICER));
-        SysTick->CTRL = 0;
-        SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;
-        SCB->VTOR = FLASH_BASE | (flashstart & (uint32_t)0x1FFFFF80);
-        __set_MSP( ((unsigned int *)(SCB->VTOR))[0] );
-        __set_CONTROL( 0 );
-        __enable_irq();
-        
-        // and jump
-        void (*reset_fn)(void) = NULL;
-        reset_fn = (void (*)(void)) resetlocation;        
-        reset_fn();  
-        
-        // never in here.
-        return;          
+        DRIVER::_jump2address2(address);
     }
     
     void relocatevectortable(std::uint32_t offset)
     {
-        SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);        
+        DRIVER::_relocatevectortable(offset);        
     }
     
     uint64_t uniqueid()
     {
-        uint64_t r = 0;
-    #if defined(STM32H7)    
-        r = HAL_GetUIDw0() | static_cast<uint64_t>(HAL_GetUIDw1()) << 32;
-        r += HAL_GetUIDw2();
-    #endif    
-        return r;        
+        return DRIVER::_uniqueid();
     }    
 
     
     void delay(embot::core::relTime t)
     {   
-        ss_delay(t);
+        DRIVER::_delay(t);
     }
-      
-    constexpr std::uint32_t maxRANDmask = 0x3ff; // 1023    
+         
     std::uint32_t random()
     {
-#if defined(HAL_RNG_MODULE_ENABLED) && !defined(EMBOT_ENABLE_hw_sys_emulateRAND)
-        std::uint32_t v = 0;        
-        HAL_RNG_GenerateRandomNumber(&hrng, &v);
-#else
-        std::uint32_t v; // not initialised on purpose. it gets the value on the stack
-        // marco.accame: i dont remember why i dont use srand() and rand() ...
-#endif        
-        return v & maxRANDmask;
+        return DRIVER::_random();
     }
     
     std::uint32_t minrandom()
@@ -247,169 +131,29 @@ namespace embot::hw::sys {
     //[[deprecated( "use embot::core::print()" )]]
     int puts(const std::string &str) 
     {
-        return puts(str.c_str());
+        return embot::core::print(str);
     }
     
     //[[deprecated( "use embot::core::print()" )]]
     int puts(const char* str) 
-    {    
- 
-        if(nullptr == str)
-        {
-            return(0);
-        }
-    
-        std::uint32_t ch;
-        int num = 0;
-        while('\0' != (ch = *str))
-        {
-            ITM_SendChar(ch);
-            str++;
-            num++;
-        }
-         
-        ITM_SendChar('\n');
-        return(++num);    
+    {  
+        return embot::core::print(str);
+
     }
 
     void irq_disable()
     {
-        __disable_irq();
+        DRIVER::_irq_disable();
     }
 
     void irq_enable()
     {
-        __enable_irq();
+        DRIVER::_irq_enable();
     }
        
     
 } // namespace embot::hw::sys { 
 
-#elif defined(USE_hal2_DRIVER)
- 
-
-//#define HL_USE_MPU_NAME_STM32F407IG
-//#include "hl_core.h"
-// sadly i cannot use hl w/ compiler v6 and c++, so i cannot use basic cmsis functions
-
-extern uint32_t SystemCoreClock;
-    
-namespace embot::hw::sys {    
-       
-    std::uint32_t clock(embot::hw::CLOCK clk)
-    {
-        std::uint32_t value = 0;
-        switch(clk)
-        {
-            
-            case embot::hw::CLOCK::syscore:
-            {
-                value = SystemCoreClock;
-            } break;   
-
-            default:              
-            case embot::hw::CLOCK::pclk1:
-            case embot::hw::CLOCK::pclk2:
-            {
-            } break;            
-        }   
-        return value;
-    }
-    
-    void reset()
-    {        
-        hal_sys_systemreset();
-    }
-    
-    bool canjump2address(std::uint32_t address)
-    {
-        volatile std::uint32_t * firstword32 = reinterpret_cast<volatile std::uint32_t *>(address);
-        if(0xffffffff == *firstword32)
-        {   // so far i disable only the jumpt to erase flash
-            return false;
-        }
-        return true;
-    }
-    
-    void jump2address(std::uint32_t address)
-    {
-        if(false == canjump2address(address))
-        {
-            return;
-        }
-
-        hal_sys_executenowataddress(address);
-        
-        // never in here.
-        return;                 
-    }
-    
-    void jump2address2(std::uint32_t address)
-    {        
-        jump2address2(address);         
-    }
-    
-    
-    void relocatevectortable(std::uint32_t offset)
-    {
-        hal_sys_vectortable_relocate(offset);
-    }
-        
-    uint64_t uniqueid()
-    {  
-        return hal_uniqueid_id64bit_get();        
-    }    
-
-    
-    void delay(embot::core::relTime t)
-    {   
-        hal_sys_delay(t);
-    }    
-      
-    constexpr std::uint32_t maxRANDmask = 0x3ff; // 1023    
-    std::uint32_t random()
-    {
-        std::uint32_t v; // not initialised on purpose. it gets the value on the stack  
-        return v & maxRANDmask;
-    }
-    
-    std::uint32_t minrandom()
-    {
-        return 0;
-    }
-    
-    std::uint32_t maxrandom()
-    {
-        return maxRANDmask;
-    }
-    
-    //[[deprecated( "use embot::core::print()" )]]
-    int puts(const std::string &str) 
-    {
-        return puts(str.c_str());
-    }
-    
-    //[[deprecated( "use embot::core::print()" )]]
-    int puts(const char* str) 
-    {    
-        return hal_trace_puts(str);
-    }
-    
-    void irq_disable()
-    {
-        hal_sys_irq_disable();
-    }
-
-    void irq_enable()
-    {
-        hal_sys_irq_enable();
-    }    
-
-} // namespace embot::hw::sys {
-
-#else
-    #error either HAL or hal2 driver
-#endif    
 
 namespace embot::hw::sys {
             
@@ -477,6 +221,294 @@ namespace embot::hw::sys {
     }      
     
 }   // namespace embot::hw::sys { 
+
+
+
+// and now comes what depends on the hal
+
+#if defined(USE_HAL_DRIVER)    
+
+#include "embot_hw_lowlevel.h"
+
+namespace embot::hw::sys::DRIVER {   
+
+    // these depend on the hal layer beneath
+    std::uint32_t _clock(embot::hw::CLOCK clk)
+    {
+        std::uint32_t value = 0;
+        switch(clk)
+        {
+            case embot::hw::CLOCK::pclk1:
+            {
+                value = HAL_RCC_GetPCLK1Freq();
+            } break;
+            
+            case embot::hw::CLOCK::pclk2:
+            {
+                value = HAL_RCC_GetPCLK2Freq();
+            } break;
+            
+            default:
+            case embot::hw::CLOCK::syscore:
+            {
+                //value = HAL_RCC_GetHCLKFreq(); it has a bug for H7 ??
+                value = SystemCoreClock;
+            } break;            
+        }   
+        return value;
+    }
+    
+    void _reset()
+    {
+        NVIC_SystemReset();
+    }
+    
+    bool _canjump2address(embot::hw::flash::ADDR address)
+    {
+        volatile std::uint32_t * firstword32 = reinterpret_cast<volatile std::uint32_t *>(address);
+        if(0xffffffff == *firstword32)
+        {   // so far i disable only the jumpt to erase flash
+            return false;
+        }
+        return true;
+    }
+    
+    void _jump2address(embot::hw::flash::ADDR address)
+    {
+        volatile std::uint32_t jumpaddr;
+        void (*app_fn)(void) = NULL;
+        
+        if(false == canjump2address(address))
+        {
+            return;
+        }
+
+
+        // prepare jump address 
+        jumpaddr = *(volatile std::uint32_t*) (address + 4);
+        // prepare jumping function
+        app_fn = (void (*)(void)) jumpaddr;
+        // initialize user application's stack pointer 
+        __set_MSP(*(volatile uint32_t*) address);
+        // jump.
+        app_fn(); 
+        
+        // never in here.
+        return;       
+    }
+    
+    void _jump2address2(embot::hw::flash::ADDR address)
+    {
+        if(false == canjump2address(address))
+        {
+            return;
+        }
+        
+        // as found in https://developer.arm.com/documentation/ka001423/1-0
+        // it seems that allows the application to use IRQ handlers and RTOS
+        
+        // make sure that the address argument is safely copied into memory before we change the stack
+        volatile uint32_t flashstart = address;
+        static volatile std::uint32_t resetlocation = 0;
+        resetlocation = *(volatile std::uint32_t*) (flashstart + 4);
+        // now change everything
+        __disable_irq();
+        memset((uint32_t *)NVIC->ICER, 0xFF, sizeof(NVIC->ICER));
+        SysTick->CTRL = 0;
+        SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;
+        SCB->VTOR = FLASH_BASE | (flashstart & (uint32_t)0x1FFFFF80);
+        __set_MSP( ((unsigned int *)(SCB->VTOR))[0] );
+        __set_CONTROL( 0 );
+        __enable_irq();
+        
+        // and jump
+        void (*reset_fn)(void) = NULL;
+        reset_fn = (void (*)(void)) resetlocation;        
+        reset_fn();  
+        
+        // never in here.
+        return;          
+    }
+
+    void _relocatevectortable(std::uint32_t offset)
+    {
+        SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);
+    }
+    
+    uint64_t _uniqueid()
+    {
+        uint64_t r = 0;
+#if defined(STM32H7)    
+        r = HAL_GetUIDw0() | static_cast<uint64_t>(HAL_GetUIDw1()) << 32;
+        r += HAL_GetUIDw2();
+#endif    
+        return r;  
+    }
+    
+    void _delay(embot::core::relTime t)
+    {
+        static uint64_t s_hl_sys_numofops1sec = 0;
+        static uint32_t s_hl_sys_used_systemcoreclock = 0;
+        if(s_hl_sys_used_systemcoreclock != SystemCoreClock)
+        {
+
+            // to occupy a millisec i execute an operation for a number of times which depends on: 
+            // SystemCoreClock, cortex gain(1.25 dmips/mhz), flash access, etc.
+            // to overcome all this i just consider SystemCoreClock w/out 1.25 gain and i measures
+            // extra gain with on a simple assembly function which should take 4 cycles per iteration (?).      
+            //s_hl_sys_numofops1sec = (5*(SystemCoreClock)) / 4; 
+            s_hl_sys_used_systemcoreclock = SystemCoreClock;
+            s_hl_sys_numofops1sec = SystemCoreClock;
+
+            #if defined(STM32H7)
+            // empirically removed ...
+            #elif defined(STM32L4) 
+            s_hl_sys_numofops1sec /= 3;
+            #elif defined(STM32G4) 
+            s_hl_sys_numofops1sec /= 3;
+            #warning specify tuning must be verified
+            #else
+            #error specify tuning             
+            #endif
+
+            // at this point i normalise the variable to keep not the nymber of operations for 1 sec,
+            // but for 1024*1024 microsec. by doing so, later on i shift by 20 instead of using a division. 
+            s_hl_sys_numofops1sec <<= 20;
+            s_hl_sys_numofops1sec /= 1000000;
+        }
+                
+        volatile uint64_t num = s_hl_sys_numofops1sec * t;
+        num >>= 20; 
+        //num -= offset; //we may remove some cycles to compensates for previous instructions, but ... we dont do it. it depends on c compiler optimisation 
+        if(0 == num)
+        {
+            return;
+        }
+        embot::hw::lowlevel::asmEXECcycles(static_cast<uint32_t>(num));    
+    }
+
+    std::uint32_t _random()
+    {
+#if defined(HAL_RNG_MODULE_ENABLED) && !defined(EMBOT_ENABLE_hw_sys_emulateRAND)
+        std::uint32_t v = 0;        
+        HAL_RNG_GenerateRandomNumber(&hrng, &v);
+#else
+        std::uint32_t v; // not initialised on purpose. it gets the value on the stack
+        // marco.accame: i dont remember why i dont use srand() and rand() ...
+#endif        
+        return v & maxRANDmask;
+    }
+    
+    void _irq_disable()
+    {
+        __disable_irq();
+    }
+
+    void _irq_enable()
+    {
+        __enable_irq();
+    }
+}
+
+#elif defined(USE_hal2_DRIVER)
+ 
+
+//#define HL_USE_MPU_NAME_STM32F407IG
+//#include "hl_core.h"
+// sadly i cannot use hl w/ compiler v6 and c++, so i wiil not use basic cmsis functions
+
+extern uint32_t SystemCoreClock;
+    
+namespace embot::hw::sys::DRIVER {    
+       
+    std::uint32_t _clock(embot::hw::CLOCK clk)
+    {
+        std::uint32_t value = 0;
+        switch(clk)
+        {            
+            case embot::hw::CLOCK::syscore:
+            {
+                value = SystemCoreClock;
+            } break;   
+
+            default:              
+            case embot::hw::CLOCK::pclk1:
+            case embot::hw::CLOCK::pclk2:
+            {
+            } break;            
+        }   
+        return value;
+    }
+    
+    void _reset()
+    {        
+        hal_sys_systemreset();
+    }
+    
+    bool _canjump2address(embot::hw::flash::ADDR address)
+    {
+        volatile std::uint32_t * firstword32 = reinterpret_cast<volatile std::uint32_t *>(address);
+        if(0xffffffff == *firstword32)
+        {   // so far i disable only the jumpt to erase flash
+            return false;
+        }
+        return true;
+    }
+    
+    void _jump2address(embot::hw::flash::ADDR address)
+    {
+        if(false == canjump2address(address))
+        {
+            return;
+        }
+
+        hal_sys_executenowataddress(address);
+        
+        // never in here.
+        return;                 
+    }
+    
+    void _jump2address2(embot::hw::flash::ADDR address)
+    {        
+        _jump2address(address);         
+    }    
+    
+    void _relocatevectortable(std::uint32_t offset)
+    {
+        hal_sys_vectortable_relocate(offset);
+    }
+        
+    uint64_t _uniqueid()
+    {  
+        return hal_uniqueid_id64bit_get();        
+    }    
+    
+    void _delay(embot::core::relTime t)
+    {   
+        hal_sys_delay(t);
+    }    
+       
+    std::uint32_t _random()
+    {
+        std::uint32_t v; // not initialised on purpose. it gets the value on the stack  
+        return v & maxRANDmask;
+    }    
+        
+    void _irq_disable()
+    {
+        hal_sys_irq_disable();
+    }
+
+    void _irq_enable()
+    {
+        hal_sys_irq_enable();
+    }    
+
+} // namespace embot::hw::sys {
+
+#else
+    #error either HAL or hal2 driver
+#endif    
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

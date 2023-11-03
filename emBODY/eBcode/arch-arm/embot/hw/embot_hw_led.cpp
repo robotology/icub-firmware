@@ -112,7 +112,6 @@ namespace embot { namespace hw { namespace led {
         return resOK;        
 
     }
-
           
     result_t on(LED led)
     {

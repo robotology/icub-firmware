@@ -176,7 +176,7 @@ namespace embot::hw::gpio {
 
 // and now comes what depends on the hal
 
-#if defined(USE_HAL_DRIVER) // always defined if we use the traditional stm32hal.h     
+#if defined(USE_HAL_DRIVER)   
 
 #include "stm32hal.h"
 
