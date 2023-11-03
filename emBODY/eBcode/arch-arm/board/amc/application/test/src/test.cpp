@@ -81,14 +81,14 @@ namespace test::can {
         
         
 
-//        // and now tx the can frames we need
-//        constexpr size_t num {8};
-//        for(size_t i=0; i<num; i++)
-//        {   
-//            embot::prot::can::Frame frame {0x123, 8, {static_cast<uint8_t>(tt), static_cast<uint8_t>(i), 2, 3, 4, 5, 6, 7}};
-//            embot::hw::can::put(can::bus, {frame.id, frame.size, frame.data});                                       
-//        }
-//        embot::hw::can::transmit(can::bus);          
+        // and now tx the can frames we need
+        constexpr size_t num {8};
+        for(size_t i=0; i<num; i++)
+        {   
+            embot::prot::can::Frame frame {0x123, 8, {static_cast<uint8_t>(tt), static_cast<uint8_t>(i), 2, 3, 4, 5, 6, 7}};
+            embot::hw::can::put(can::bus, {frame.id, frame.size, frame.data});                                       
+        }
+        embot::hw::can::transmit(can::bus);          
     }
     
     
