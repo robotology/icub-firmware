@@ -45,7 +45,7 @@ extern "C" {
 #define USE_STM32HAL
 #endif   
 
-#if !defined(USE_HAL_DRIVER)
+#if !defined(USE_HAL_DRIVER) && !defined(USE_hal2_DRIVER)
 #define USE_HAL_DRIVER
 #endif   
 
@@ -378,10 +378,18 @@ extern "C" {
     // of family STM32L4 but in STM32HAL_ format    
     #if !defined(STM32HAL_STM32L4)
     #define STM32HAL_STM32L4
-    #endif     
+    #endif   
+
+#elif   defined(USE_hal2_DRIVER) & defined(STM32HAL_BOARD_EMS)
+
+    //  nothing to define
+    
+#elif   defined(USE_hal2_DRIVER) & defined(STM32HAL_BOARD_MC4PLUS)
+
+    //  nothing to define
     
 #else
-        #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
+    #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif
 
                 

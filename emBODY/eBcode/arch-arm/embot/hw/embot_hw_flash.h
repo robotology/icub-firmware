@@ -170,18 +170,8 @@ namespace embot { namespace hw { namespace flash {
     
 }}} // namespace embot { namespace hw { namespace flash {    
 
-// BASIC USAGE: functions which operate on FLASH by address. 
-namespace embot { namespace hw { namespace flash {
-           
-    bool isvalid(const ADDR address);    
-    bool erase(const ADDR address, const size_t size);
-    bool read(const ADDR address, const size_t size, void *data);
-    bool write(const ADDR address, const size_t size, const void *data);
 
-}}} // namespace embot { namespace hw { namespace flash {
-
-
-// ADVANCED USAGE: the following data structures allows to hold information about the structure of the FLASH
+// the following data structures hold information about the structure of the FLASH 
 // so that we can get addresses and sizes
 namespace embot { namespace hw { namespace flash {
     
@@ -348,36 +338,16 @@ namespace embot { namespace hw { namespace flash {
             }             
         }
     }; 
-            
+    
+    constexpr Page InvalidPage { nullptr, InvalidADDR, InvalidSize, Page::InvalidIndex };        
+    constexpr Partition InvalidPartition { Partition::ID::none, nullptr, InvalidADDR, 0 };
+    constexpr RegularBank InvalidBank { Bank::ID::none, InvalidADDR, InvalidSize, 0 };                 
 
 }}} // namespace embot { namespace hw { namespace flash {
 
 
-// in here are functions used to retrieve info from the BSP
-namespace embot { namespace hw { namespace flash { namespace bsp {
-    
-    // it gets the address of a given bank + pageindex. 
-    // returns InvalidADDR if {id, index} are invalid, else a valid address
-    ADDR address(const Bank::ID id, const Page::Index index);    
-    
-    // it gets a Page which contains a given address. if address is invalid, page.isvalid() is false
-    Page page(const ADDR address);    
-    
-    // they retrieve a Partition specified inside the BSP by its ID or by ADDR
-    // if not found inside the BSP they return the handle to a Partition where .isvalid() is false
-    const embot::hw::flash::Partition& partition(const embot::hw::flash::Partition::ID id);    
-    const embot::hw::flash::Partition& partition(const ADDR address);
-    
-    // they retrieve a Bank specified inside the BSP by its ID or by ADDR
-    // if not found inside the BSP they return the handle to a Bank here .isvalid() is false
-    const embot::hw::flash::Bank & bank(const ADDR address);
-    const embot::hw::flash::Bank & bank(const Bank::ID id);
-        
-           
-}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {{
-
-
 // functions which operate on FLASH by Bank::ID and Page::Index. 
+// macro EMBOT_ENABLE_hw_flash must be defined
 
 namespace embot { namespace hw { namespace flash {
     
@@ -386,6 +356,16 @@ namespace embot { namespace hw { namespace flash {
 
 }}} // namespace embot { namespace hw { namespace flash {
 
+// functions which operate on FLASH by address. 
+// macro EMBOT_ENABLE_hw_flash must be defined
+namespace embot { namespace hw { namespace flash {
+           
+    bool isvalid(const ADDR address);    
+    bool erase(const ADDR address, const size_t size);
+    bool read(const ADDR address, const size_t size, void *data);
+    bool write(const ADDR address, const size_t size, const void *data);
+
+}}} // namespace embot { namespace hw { namespace flash {
 
 
 #endif  // include-guard

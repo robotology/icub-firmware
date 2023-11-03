@@ -63,8 +63,8 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
     [[noreturn]] void run(const embot::app::theCANboardInfo::applicationInfo &info)
     {
 
-        static const std::uint32_t appladdress = embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::application).address;
-        uint32_t defaultvectorlocation = embot::hw::flash::bsp::bank(appladdress).address;
+        static const std::uint32_t appladdress = embot::hw::sys::partition(embot::hw::flash::Partition::ID::application).address;
+        uint32_t defaultvectorlocation = embot::hw::sys::bank(appladdress).address;
         static const std::uint32_t vectorlocation = appladdress - defaultvectorlocation;
         
         

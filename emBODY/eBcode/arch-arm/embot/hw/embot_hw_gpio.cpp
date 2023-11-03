@@ -36,13 +36,6 @@
 #include "embot_core_binary.h"
 
 
-#if defined(USE_STM32HAL)
-    #include "stm32hal.h"
-#else
-    #warning this implementation is only for stm32hal
-#endif
-
-
 using namespace std;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -58,7 +51,7 @@ using namespace std;
 
 using namespace embot::hw;
 
-#if !defined(HAL_GPIO_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_gpio)
+#if !defined(EMBOT_ENABLE_hw_gpio)
 
 namespace embot { namespace hw { namespace gpio {
 
@@ -74,18 +67,20 @@ namespace embot { namespace hw { namespace gpio {
     
 #else  
 
-namespace embot { namespace hw { namespace gpio {
-    
-    result_t _configure(const embot::hw::gpio::PROP &g, Mode m, Pull p, Speed s);    
-    result_t _set(const embot::hw::gpio::PROP &g, State s);
-    result_t _toggle(const embot::hw::gpio::PROP &g);    
-    State _get(const embot::hw::gpio::PROP &g);
-    
-    
+namespace embot::hw::gpio::DRIVER {    
+    // these depend on the hal layer beneath
+    bool _configure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, Mode m, Pull p, Speed s);   
+    bool _deconfigure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg);      
+    bool _set(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, State s);
+    bool _toggle(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg);    
+    State _get(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg);    
+}
+
+namespace embot::hw::gpio {
+     
     // initialised mask. there must be one for each of PORT::maxnumberof     
     static std::array<std::uint32_t, embot::core::tointegral(embot::hw::GPIO::PORT::maxnumberof)> initialised2dmask = {0};
     
-
     bool supported(const GPIO &g)
     {
         return embot::hw::gpio::getBSP().supported(g);
@@ -108,6 +103,7 @@ namespace embot { namespace hw { namespace gpio {
     {
         return configure(g, config.mode, config.pull, config.speed);
     }  
+ 
     
     result_t deinit(const embot::hw::GPIO &g)
     {
@@ -116,23 +112,29 @@ namespace embot { namespace hw { namespace gpio {
         {
             return resNOK;
         }  
-        HAL_GPIO_DeInit(gg.stmport, gg.stmpin);   
+        embot::hw::gpio::DRIVER::_deconfigure(g, gg); 
         
         embot::core::binary::bit::clear(initialised2dmask[embot::core::tointegral(g.port)], embot::core::tointegral(g.pin));
         return resOK;
     }
 
+    
     result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s)
-    {        
+    { 
+        result_t r {resNOK};
         embot::hw::gpio::PROP gg = embot::hw::gpio::getBSP().getPROP(g);    
         if(!gg.isvalid())
         {
             return resNOK;
         }            
-        _configure(gg, m, p, s);
-        embot::core::binary::bit::set(initialised2dmask[embot::core::tointegral(g.port)], embot::core::tointegral(g.pin));
-        return resOK;
+        if(true == embot::hw::gpio::DRIVER::_configure(g, gg, m, p, s))
+        {
+            embot::core::binary::bit::set(initialised2dmask[embot::core::tointegral(g.port)], embot::core::tointegral(g.pin));
+            r = resOK;
+        }
+        return r;
     }  
+ 
     
     result_t set(const embot::hw::GPIO &g, State s)
     {
@@ -141,9 +143,10 @@ namespace embot { namespace hw { namespace gpio {
         {
             return resNOK;
         }  
-        _set(gg, s);
+        embot::hw::gpio::DRIVER::_set(g, gg, s);
         return resOK;        
     }
+ 
     
     result_t toggle(const embot::hw::GPIO &g)
     {
@@ -152,9 +155,10 @@ namespace embot { namespace hw { namespace gpio {
         {
             return resNOK;
         }  
-        _toggle(gg);
+        embot::hw::gpio::DRIVER::_toggle(g, gg);
         return resOK;        
     }
+ 
     
     State get(const embot::hw::GPIO &g)
     {
@@ -163,10 +167,21 @@ namespace embot { namespace hw { namespace gpio {
         {
             return State::RESET;
         }          
-        return _get(gg);        
+        return embot::hw::gpio::DRIVER::_get(g, gg);        
     }  
 
+} // namespace embot::hw::gpio     
 
+   
+
+// and now comes what depends on the hal
+
+#if defined(USE_HAL_DRIVER)   
+
+#include "stm32hal.h"
+
+namespace embot::hw::gpio::DRIVER {  
+    
     constexpr uint32_t _convert_to_stm32mode(Mode m)
     {
         constexpr uint32_t _map2stm32mode[] = {
@@ -211,9 +226,9 @@ namespace embot { namespace hw { namespace gpio {
     }
         
    
-    result_t _configure(const embot::hw::gpio::PROP &g, Mode m, Pull p, Speed s)
+    bool _configure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, Mode m, Pull p, Speed s)
     {
-        result_t r {resNOK};
+        bool r {false};
        
         switch(m)
         {
@@ -224,14 +239,14 @@ namespace embot { namespace hw { namespace gpio {
             case Mode::EXTIfalling:
             case Mode::EXTIrisingfalling:
             {
-                g.clockenable();
+                gg.clockenable();
                 GPIO_InitTypeDef GPIO_InitStruct = {0};       
-                GPIO_InitStruct.Pin = g.stmpin;
+                GPIO_InitStruct.Pin = gg.stmpin;
                 GPIO_InitStruct.Mode = _convert_to_stm32mode(m); 
                 GPIO_InitStruct.Pull = _convert_to_stm32pull(p);
                 GPIO_InitStruct.Speed = _convert_to_stm32speed(s);
-                HAL_GPIO_Init(g.stmport, &GPIO_InitStruct);
-                r = resOK;                
+                HAL_GPIO_Init(gg.stmport, &GPIO_InitStruct);
+                r = true;                
             } break;
             
             default: 
@@ -242,29 +257,112 @@ namespace embot { namespace hw { namespace gpio {
         return r;
        
     }  
-    
-    result_t _set(const embot::hw::gpio::PROP &g, State s)
+
+    bool _deconfigure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg)
     {
-        HAL_GPIO_WritePin(g.stmport, g.stmpin, static_cast<GPIO_PinState>(s));    
-        return resOK;        
+        HAL_GPIO_DeInit(gg.stmport, gg.stmpin);  
+        return true;
+    }    
+    
+    bool _set(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, State s)
+    {
+        HAL_GPIO_WritePin(gg.stmport, gg.stmpin, static_cast<GPIO_PinState>(s));    
+        return true;        
     }
     
-    result_t _toggle(const embot::hw::gpio::PROP &g)
+    bool _toggle(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg)
     {
-        HAL_GPIO_TogglePin(g.stmport, g.stmpin);    
-        return resOK;        
+        HAL_GPIO_TogglePin(gg.stmport, gg.stmpin);    
+        return true;        
     }
     
-    State _get(const embot::hw::gpio::PROP &g)
+    State _get(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg)
     {
-        GPIO_PinState s = HAL_GPIO_ReadPin(g.stmport, g.stmpin);            
+        GPIO_PinState s = HAL_GPIO_ReadPin(gg.stmport, gg.stmpin);            
         return static_cast<State>(s);        
     }
-    
-       
-}}} // namespace embot { namespace hw { namespace gpio     
 
-#endif // !defined(HAL_GPIO_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_gpio)
+} // namespace embot::hw::gpio::DRIVER {  
+
+#elif defined(USE_hal2_DRIVER) // in case we use legacy hal2
+
+namespace embot::hw::gpio::DRIVER {  
+    
+    namespace hal2tools {
+        
+        hal_gpio_pin_t topin(GPIO::PIN p)       { return static_cast<hal_gpio_pin_t>(0x0001 << embot::core::tointegral(p)); }
+        hal_gpio_port_t toport(GPIO::PORT p)    { return static_cast<hal_gpio_port_t>(p); }
+        hal_gpio_t togpio(GPIO g)               { return {toport(g.port), topin(g.pin)}; }
+        hal_gpio_val_t toval(State s)           { return static_cast<hal_gpio_val_t>(s); }
+        hal_gpio_cfg_t toconfig(Mode m, Pull p, Speed s) 
+        { 
+            hal_gpio_dir_t dd { Mode::INPUT == m ? hal_gpio_dirINP : hal_gpio_dirOUT};
+            hal_gpio_speed_t ss { Speed::none == s ? hal_gpio_speed_NONE : (static_cast<hal_gpio_speed_t>(static_cast<uint8_t>(s)+1))};   
+            return {dd, ss, nullptr}; 
+        }
+        
+    }    
+    
+    bool _configure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, Mode m, Pull p, Speed s)
+    {
+        bool r {false};
+       
+        switch(m)
+        {
+            case Mode::INPUT:
+            case Mode::OUTPUTpushpull:
+            case Mode::OUTPUTopendrain:
+            {
+                const hal_gpio_cfg_t cfg = hal2tools::toconfig(m, p, s);
+                hal_gpio_init(hal2tools::togpio(g), &cfg);
+                r = true;                
+            } break;
+            
+            case Mode::EXTIrising:
+            case Mode::EXTIfalling:
+            case Mode::EXTIrisingfalling:            
+            default: 
+            {
+            } break;
+        }
+        
+        return r;       
+    }  
+
+    bool _deconfigure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg)
+    {
+        return true;
+    }  
+    
+    bool _set(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, State s)
+    {
+        hal_gpio_setval(hal2tools::togpio(g), hal2tools::toval(s));
+        return true;        
+    }
+    
+    bool _toggle(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg)
+    {
+        hal_gpio_val_t v = hal_gpio_getval(hal2tools::togpio(g));
+        State s = (hal_gpio_valLOW == v) ? (State::SET) : (State::RESET);
+        _set(g, gg, s);
+        return true;        
+    }
+    
+    State _get(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg)
+    {
+        hal_gpio_val_t v = hal_gpio_getval(hal2tools::togpio(g));         
+        return static_cast<State>(v);        
+    } 
+
+} // namespace embot::hw::gpio::DRIVER {  
+
+#else
+    #error either HAL or hal2
+#endif    
+       
+
+
+#endif // !defined(EMBOT_ENABLE_hw_gpio)
 
     
 

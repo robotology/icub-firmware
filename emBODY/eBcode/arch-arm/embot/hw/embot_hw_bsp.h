@@ -26,7 +26,7 @@
 #include "embot_core_binary.h"
 #include "embot_hw.h"
 #include "embot_hw_types.h"
-#include "embot_hw_gpio.h"
+
 #include <array>
 
 #if defined(USE_STM32HAL)
@@ -36,7 +36,7 @@
 #endif
 
 
-namespace embot { namespace hw { namespace bsp {
+namespace embot::hw::bsp {
 
                 
     bool initialised();
@@ -51,12 +51,12 @@ namespace embot { namespace hw { namespace bsp {
     // it is called inside embot::bsp::init() after the HAL init to ... specialize what it has done. it must be implemented board by board
     bool specialize();    
     
-}}}
+} // namespace embot::hw::bsp {
 
 
 // - support maps
 
-namespace embot { namespace hw { namespace bsp {
+namespace embot::hw::bsp {
                     
     // it is the base class used by all other support maps
     struct SUPP
@@ -74,7 +74,7 @@ namespace embot { namespace hw { namespace bsp {
 
     // the other support maps, one per each driver, must be defined board by board    
               
-}}} // namespace embot { namespace hw { namespace bsp {
+} // namespace embot::hw::bsp {
 
   
 

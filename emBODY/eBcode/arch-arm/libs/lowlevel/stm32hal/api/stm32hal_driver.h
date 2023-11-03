@@ -19,8 +19,8 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _STM32HAL_DRIVER_H_
-#define _STM32HAL_DRIVER_H_
+#ifndef __STM32HAL_DRIVER_H_
+#define __STM32HAL_DRIVER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +35,12 @@ extern "C" {
 
 
 // - public interface  ------------------------------------------------------------------------------------------------
+  
+#if defined(USE_hal2_DRIVER)
+
+    #include "../../../highlevel/abslayer/hal2/api/hal2.h"
+    
+#elif defined(USE_HAL_DRIVER)
   
 #if     defined(STM32HAL_BOARD_NUCLEOL4)
    
@@ -300,6 +306,9 @@ extern "C" {
 #else
     #error STM32HAL: the STM32HAL_${SF} is not managed
 #endif   
+
+
+#endif // #elif defined(USE_HAL_DRIVER)
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

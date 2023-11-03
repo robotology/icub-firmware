@@ -34,33 +34,15 @@
 #include "embot_core.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_sys.h"
-#include "embot_hw_flash.h"
+
 
 using namespace std;
 
 
 namespace embot { namespace hw {
-
-    void setvectortablelocation(embot::hw::FLASHpartitionID id)
-    {
-        uint32_t addressofapplication = embot::hw::flash::bsp::partition(id).address;
-        uint32_t defaultvectorlocation = embot::hw::flash::bsp::bank(addressofapplication).address;
-        if((embot::hw::flash::InvalidADDR == addressofapplication) || (embot::hw::flash::InvalidADDR == defaultvectorlocation))
-        {
-            return;
-        }        
-        if(addressofapplication > defaultvectorlocation)
-        {
-            std::uint32_t vectorlocation = addressofapplication - defaultvectorlocation;
-            if(0 != vectorlocation)
-            {
-                embot::hw::sys::relocatevectortable(vectorlocation);
-            }
-        }                  
-    }
-    
-    
+        
     static bool initted = false; 
+
     
     bool initialised()
     {
@@ -68,6 +50,12 @@ namespace embot { namespace hw {
     }   
         
 
+    void setvectortablelocation(embot::hw::FLASHpartitionID id)
+    {
+        embot::hw::sys::relocatevectortable(id);              
+    }
+
+    
     bool init(const Config &config)
     {
         if(true == embot::hw::initialised())
@@ -77,7 +65,7 @@ namespace embot { namespace hw {
         
         if(embot::hw::FLASHpartitionID::none != config.codepartition)
         {
-            setvectortablelocation(config.codepartition);
+            embot::hw::sys::relocatevectortable(config.codepartition);
         }
         
         embot::core::init({{nullptr, config.get1microtime}, {embot::hw::bsp::print}});        
@@ -86,6 +74,7 @@ namespace embot { namespace hw {
         initted = true;
         return true;
     }
+    
        
 }} // namespace embot { namespace hw {
 

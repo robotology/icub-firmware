@@ -48,6 +48,7 @@ using namespace embot::core::binary;
 // - support map: begin of embot::hw::can
 
 #include "embot_hw_can_bsp.h"
+#include "embot_hw_gpio.h"
 
 #if   !defined(EMBOT_ENABLE_hw_can)
 

@@ -35,6 +35,7 @@
 #include "embot_hw_sys.h"
 #include "embot_hw_led.h"
 #include "embot_hw_flash.h"
+#include "embot_hw_sys.h"
 #include "osal.h"
 #include "ipal.h"
 
@@ -672,7 +673,7 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             }
             
 
-            const embot::hw::flash::Partition& pp = embot::hw::flash::bsp::partition(address);
+            const embot::hw::flash::Partition& pp = embot::hw::sys::partition(address);
             
             if(uprot_partitionAPPLICATION == s_proc_PROG_downloading_partition)
             {
@@ -871,7 +872,7 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             // download is over, thus resume the normal blinking of led
             eupdater_parser_download_blinkled_stop();
             
-            const embot::hw::flash::Partition& pp = embot::hw::flash::bsp::partition(s_proc_PROG_mem_start);
+            const embot::hw::flash::Partition& pp = embot::hw::sys::partition(s_proc_PROG_mem_start);
             
             // here is the command. i get what i need to program into flash
             eOuprot_cmd_PROG_END_t *cmd = (eOuprot_cmd_PROG_END_t*)pktin;
@@ -1089,7 +1090,7 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY2_t* reply2, eOuprot_o
         reply2->extraprocs[i].compilationdate.hour = 9;
         reply2->extraprocs[i].compilationdate.min = 9;
         
-        const embot::hw::flash::Partition& pp = embot::hw::flash::bsp::partition(s_modinfo->info.rom.addr);
+        const embot::hw::flash::Partition& pp = embot::hw::sys::partition(s_modinfo->info.rom.addr);
         
         volatile eEmoduleExtendedInfo_t * extinfo = (volatile eEmoduleExtendedInfo_t*)(pp.address+EENV_MODULEINFO_OFFSET);
         if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))

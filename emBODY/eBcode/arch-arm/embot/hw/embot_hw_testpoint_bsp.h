@@ -14,7 +14,7 @@
 #include "embot_core.h"
 #include "embot_hw_types.h"
 #include "embot_hw_bsp.h"
-
+#include "embot_hw_gpio.h"
 
 namespace embot { namespace hw { namespace testpoint {
     

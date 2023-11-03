@@ -60,6 +60,7 @@ namespace embot { namespace app { namespace eth {
             uint16_t par16 {0};         /* it must be 0 unless the code needs one particular param */
             uint64_t par64 {0};         /* it must be 0 unless the code needs one particular param */
             constexpr Descriptor() = default;
+            constexpr Descriptor(uint32_t c, uint16_t p16, uint64_t p64) : code(c), sourcedevice(0), sourceaddress(0), par16(p16), par64(p64) {}
             constexpr bool isvalid() const { return 0 != code; }
         };  
 
