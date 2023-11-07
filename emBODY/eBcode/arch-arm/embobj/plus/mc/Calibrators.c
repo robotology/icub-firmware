@@ -596,24 +596,53 @@ BOOL JointSet_do_wait_calibration_10(JointSet* o)
     {
         int m = o->motors_of_set[k];
         
-        int e = o->encoders_of_set[k];
+        AbsEncoder *encoder = o->absEncoder+o->encoders_of_set[k];
         
-        if (AbsEncoder_is_hard_stop_calibrating(o->absEncoder+e))
+        if (AbsEncoder_is_fake(encoder))
         {
             Motor_set_pwm_ref(o->motor+m, o->motor[m].calib_pwm);
-        
-            if (AbsEncoder_is_still(o->absEncoder+e, 12000, 1000))
+            
+            if (Motor_is_still(o->motor+m, 12000, 1000))
             {
-                AbsEncoder_calibrate_in_hard_stop(o->absEncoder+e);
+                o->motor[m].pos_calib_offset += o->motor[m].pos_fbk - o->hard_stop_calib.zero;        
+                o->motor[m].pos_fbk = o->hard_stop_calib.zero;
+                o->motor[m].not_init = FALSE;
+                o->motor[m].pos_fbk_old = o->motor[m].pos_fbk;
+
+                char message[128];
+                snprintf(message, sizeof(message), "CALIBRATED!!!");
+                JointSet_send_debug_message(message, 0, 0, 0);
+                
+                Motor_set_pwm_ref(o->motor+m, 0);
             }
             else
             {
+                //char message[128];
+                //snprintf(message, sizeof(message), "fake ENCODER=%d", o->motor[m].partial_space);
+                //JointSet_send_debug_message(message, 0, 0, 0);
+                
                 calibrated = FALSE;
             }
         }
         else
         {
-            Motor_set_pwm_ref(o->motor+m, 0);
+            if (AbsEncoder_is_hard_stop_calibrating(encoder))
+            {
+                Motor_set_pwm_ref(o->motor+m, o->motor[m].calib_pwm);
+        
+                if (AbsEncoder_is_still(encoder, 12000, 1000))
+                {
+                    AbsEncoder_calibrate_in_hard_stop(encoder);
+                }
+                else
+                {                
+                    calibrated = FALSE;
+                }
+            }
+            else
+            {
+                Motor_set_pwm_ref(o->motor+m, 0);
+            }
         }
     }
     

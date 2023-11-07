@@ -45,6 +45,9 @@ extern void Motor_init(Motor* o);  //
 extern void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config); //
 extern void Motor_destroy(Motor* o); //
 
+extern BOOL Motor_is_still(Motor* o, int32_t space_window, int32_t time_window);
+extern void Motor_still_check_reset(Motor* o);
+
 extern void Motor_config_encoder(Motor* o, int32_t resolution);
 extern void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params);
 

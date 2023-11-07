@@ -39,6 +39,14 @@ typedef struct // CableCalib
     int32_t cable_range;
 } CableCalib;
 
+typedef struct // HardStopCalib
+{
+    int32_t pwm;
+    int32_t zero;
+    int32_t space_thr;
+    int32_t time_thr;
+} HardStopCalib;
+
 
  
 #endif  // include-guard

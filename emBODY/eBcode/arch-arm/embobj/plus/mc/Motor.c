@@ -74,6 +74,30 @@ static void Motor_config_MC4p(uint8_t motor, eOmc_motor_config_t* config)
 }
 */
 
+BOOL Motor_is_still(Motor* o, int32_t space_window, int32_t time_window)
+{
+    o->partial_space += o->pos_raw_fbk - o->pos_raw_fbk_old;
+    o->pos_raw_fbk_old = o->pos_raw_fbk;
+    
+    BOOL still = FALSE;
+    
+    if (++o->partial_timer > time_window)
+    {        
+        still = abs(o->partial_space) < space_window;
+        
+        o->partial_timer = 0;
+        o->partial_space = 0;
+    }
+    
+    return still;
+}
+
+void Motor_still_check_reset(Motor* o)
+{
+    o->partial_timer = 0;
+    o->partial_space = 0;
+}
+
 static void Motor_hardStopCalbData_reset(Motor* o)
 {
     memset(&o->hardstop_calibdata, 0, sizeof(HardStopCalibData));

@@ -123,6 +123,8 @@ typedef struct // JointSet
     #endif
 
     TripodCalib tripod_calib;
+    HardStopCalib hard_stop_calib;
+
 } JointSet;
 
 extern JointSet* JointSet_new(uint8_t n); //

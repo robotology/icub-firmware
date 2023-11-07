@@ -142,6 +142,9 @@ struct Motor_hid
 
     CTRL_UNITS GEARBOX;
 
+    uint32_t partial_timer;
+    int32_t  partial_space;
+
     BOOL HAS_TEMP_SENSOR;
     int16_t temperature_max;
     int16_t temperature_fbk;
@@ -154,6 +157,7 @@ struct Motor_hid
     
     int32_t pos_raw_cal_fbk;
     int32_t pos_raw_fbk;
+    int32_t pos_raw_fbk_old;
     int32_t vel_raw_fbk;
     
     int32_t pos_calib_offset;
