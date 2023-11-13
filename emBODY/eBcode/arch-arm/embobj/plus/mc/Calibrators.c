@@ -602,7 +602,7 @@ BOOL JointSet_do_wait_calibration_10(JointSet* o)
         {
             Motor_set_pwm_ref(o->motor+m, o->motor[m].calib_pwm);
             
-            if (Motor_is_still(o->motor+m, 12000, 1000))
+            if (Motor_is_still(o->motor+m, o->hard_stop_calib.space_thr, o->hard_stop_calib.time_thr))
             {
                 o->motor[m].pos_calib_offset += o->motor[m].pos_fbk - o->hard_stop_calib.zero;        
                 o->motor[m].pos_fbk = o->hard_stop_calib.zero;
@@ -630,7 +630,7 @@ BOOL JointSet_do_wait_calibration_10(JointSet* o)
             {
                 Motor_set_pwm_ref(o->motor+m, o->motor[m].calib_pwm);
         
-                if (AbsEncoder_is_still(encoder, 12000, 1000))
+                if (AbsEncoder_is_still(encoder, o->hard_stop_calib.space_thr, o->hard_stop_calib.time_thr))
                 {
                     AbsEncoder_calibrate_in_hard_stop(encoder);
                 }
