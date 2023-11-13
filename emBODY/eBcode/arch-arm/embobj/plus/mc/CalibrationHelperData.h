@@ -24,20 +24,28 @@
 
 typedef struct // TripodCalib
 {
-    int32_t pwm;
-    int32_t zero;
-    int32_t max_delta;
-    int32_t start_pos[3];
+    int32_t pwm;          // [2FOC PWM units] (-32000 : +32000) = (-100% : +100%)
+    int32_t zero;         // [millimiters]
+    int32_t max_delta;    // [millimeters]
+    int32_t start_pos[3]; // [millimeters]
     
 } TripodCalib;
 
 typedef struct // CableCalib
 {
-    int32_t pwm;
-    int32_t delta;
-    int32_t target;
-    int32_t cable_range;
+    int32_t pwm;          // [MC2+ PWM units] (-3360 : +3360) = (-100% : +100%)
+    int32_t delta;        // [icubdegrees]
+    int32_t target;       // [icubdegrees]
+    int32_t cable_range;  // [icubdegrees]
 } CableCalib;
+
+typedef struct // HardStopCalib
+{
+	  int32_t pwm;       // [2FOC PWM units] (-32000 : +32000) = (-100% : +100%)
+    int32_t zero;      // [icubdegrees]
+    int32_t space_thr; // [icubdegrees]  
+    int32_t time_thr;  // [milliseconds]
+} HardStopCalib;
 
 
  

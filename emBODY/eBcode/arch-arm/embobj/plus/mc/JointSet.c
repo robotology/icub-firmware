@@ -1861,14 +1861,28 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->calibration_timeout = 0;
             
             Joint_set_hardware_limit(o->joint+e);
-            
+
             Motor_calibrate_withOffset(o->motor+e, 0);
             Motor_set_run(o->motor+e, eomc_ctrl_out_type_pwm);
             o->motor[e].calib_pwm = calibrator->params.type10.pwmlimit;
             
-            AbsEncoder_still_check_reset(o->absEncoder+e);
-            AbsEncoder_start_hard_stop_calibrate(o->absEncoder+e, calibrator->params.type10.calibrationZero);
-            
+            if (AbsEncoder_is_fake(o->absEncoder+e))
+            {
+                AbsEncoder_calibrate_fake(o->absEncoder+e);
+                o->hard_stop_calib.zero = calibrator->params.type10.calibrationZero;
+                o->hard_stop_calib.pwm = calibrator->params.type10.pwmlimit;
+                o->hard_stop_calib.space_thr = 12000; // we can make them configurable (probably not needed)
+                o->hard_stop_calib.time_thr = 1000;   // we can make them configurable (probably not needed)
+            }
+            else
+            {
+                o->hard_stop_calib.zero = calibrator->params.type10.calibrationZero;
+                o->hard_stop_calib.pwm = calibrator->params.type10.pwmlimit;
+                o->hard_stop_calib.space_thr = 12000; // we can make them configurable (probably not needed)
+                o->hard_stop_calib.time_thr = 1000;   // we can make them configurable (probably not needed)
+                AbsEncoder_still_check_reset(o->absEncoder+e);
+                AbsEncoder_start_hard_stop_calibrate(o->absEncoder+e, calibrator->params.type10.calibrationZero);
+            }
         }
         break;
         
