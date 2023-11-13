@@ -1447,12 +1447,12 @@ static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
     memset(p->frommems2id, NOID08, sizeof(p->frommems2id));
     memset(p->memsparam, 255, sizeof(p->memsparam));    
     
-//    memset(p->fromcan2id, NOID08, sizeof(p->fromcan2id));
+    memset(p->fromcan2id, NOID08, sizeof(p->fromcan2id));
 
 
-//    memset(p->canmap_mtb_accel_int, 0, sizeof(p->canmap_mtb_accel_int));
-//    memset(p->canmap_mtb_accel_ext, 0, sizeof(p->canmap_mtb_accel_ext));
-//    memset(p->canmap_mtb_gyros_ext, 0, sizeof(p->canmap_mtb_gyros_ext));
+    memset(p->canmap_mtb_accel_int, 0, sizeof(p->canmap_mtb_accel_int));
+    memset(p->canmap_mtb_accel_ext, 0, sizeof(p->canmap_mtb_accel_ext));
+    memset(p->canmap_mtb_gyros_ext, 0, sizeof(p->canmap_mtb_gyros_ext));
     p->ethmap_mems_active = 0;
 
     for(uint8_t i=0; i<numofsensors; i++)
@@ -1473,23 +1473,23 @@ static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
 
                 switch(des->typeofsensor)
                 {
-//                    case eoas_inertial_accel_mtb_int:
-//                    {
-//                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_accel_mtb_int-eoas_inertial_accel_mtb_int] = i;
-//                        eo_common_hlfword_bitset(&p->canmap_mtb_accel_int[des->on.can.port], des->on.can.addr);                        
-//                    } break;
+                    case eoas_inertial_accel_mtb_int:
+                    {
+                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_accel_mtb_int-eoas_inertial_accel_mtb_int] = i;
+                        eo_common_hlfword_bitset(&p->canmap_mtb_accel_int[des->on.can.port], des->on.can.addr);                        
+                    } break;
 
-//                    case eoas_inertial_accel_mtb_ext:
-//                    {       
-//                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_accel_mtb_ext-eoas_inertial_accel_mtb_int] = i;
-//                        eo_common_hlfword_bitset(&p->canmap_mtb_accel_ext[des->on.can.port], des->on.can.addr);
-//                    } break;  
+                    case eoas_inertial_accel_mtb_ext:
+                    {       
+                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_accel_mtb_ext-eoas_inertial_accel_mtb_int] = i;
+                        eo_common_hlfword_bitset(&p->canmap_mtb_accel_ext[des->on.can.port], des->on.can.addr);
+                    } break;  
                     
-//                    case eoas_inertial_gyros_mtb_ext:
-//                    {                        
-//                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_gyros_mtb_ext-eoas_inertial_accel_mtb_int] = i;
-//                        eo_common_hlfword_bitset(&p->canmap_mtb_gyros_ext[des->on.can.port], des->on.can.addr);                        
-//                    } break; 
+                    case eoas_inertial_gyros_mtb_ext:
+                    {                        
+                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_gyros_mtb_ext-eoas_inertial_accel_mtb_int] = i;
+                        eo_common_hlfword_bitset(&p->canmap_mtb_gyros_ext[des->on.can.port], des->on.can.addr);                        
+                    } break; 
                     
                     default:
                     {
@@ -1905,18 +1905,18 @@ static eOresult_t s_eo_inertials2_TXstart(EOtheInertials3 *p)
             {               
                 canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
                 // prepare canprotoconfig.enabledsensors ...
-                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
+                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_accel_int[port], addr))
                 {
                     canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
                 }
-                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
+                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_accel_ext[port], addr))
                 {
                     canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
                 }     
-                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
+                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_gyros_ext[port], addr))
                 {
                     canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
-                }                  
+                }                
                 location.addr = addr;
                 eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);
             }
