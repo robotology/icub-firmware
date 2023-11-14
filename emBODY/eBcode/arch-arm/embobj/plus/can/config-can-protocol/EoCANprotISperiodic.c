@@ -102,8 +102,7 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_GYROSCOPE(eOcan
     //    return(eores_OK);
     //}
     
-    // both can be safely called. because if one services is not active the function will do nothing
-    eo_inertials2_AcceptCANframe(eo_inertials2_GetHandle(), frame, port, eoas_inertial_gyros_mtb_ext);    
+    // both can be safely called. because if one services is not active the function will do nothing   
     eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), frame, port, eoas_inertial3_gyros_mtb_ext);
     
     return(eores_OK);
@@ -118,7 +117,6 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(e
     //}
     
     // both can be safely called. because if one services is not active the function will do nothing
-    eo_inertials2_AcceptCANframe(eo_inertials2_GetHandle(), frame, port, eoas_inertial_accel_mtb_int);
     eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), frame, port, eoas_inertial3_accel_mtb_int);
     
     return(eores_OK);    

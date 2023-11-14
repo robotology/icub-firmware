@@ -69,7 +69,8 @@ struct EOtheInertials3_hid
     eOas_inertial3_config_t                 sensorsconfig;
     uint16_t                                canmap_mtb_accel_int[2];
     uint16_t                                canmap_mtb_accel_ext[2];
-    uint16_t                                canmap_mtb_gyros_ext[2];    
+    uint16_t                                canmap_mtb_gyros_ext[2]; 
+    uint16_t                                canmap_imu[2];    
     uint16_t                                canmap_brd_active[2];
     uint8_t                                 ethmap_mems_active;
     uint16_t                                fromcan2id[2][16][3];   // 2 ports, 15 addresses (0->14), 3 kinds on mtb ... use mtb-eoas_inertial_accel_mtb_int

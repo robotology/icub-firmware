@@ -213,6 +213,9 @@ static void s_eo_inertials3_presenceofcanboards_tick(EOtheInertials3 *p);
 static void s_eo_inertials3_imu_configure(EOtheInertials3 *p);
 static void s_eo_inertials3_imu_transmission(EOtheInertials3 *p, eObool_t on, uint8_t period);
 
+static void s_eo_inertials3_mtb3_configure(EOtheInertials3 *p);
+static void s_eo_inertials3_mtb3_transmission(EOtheInertials3 *p, eObool_t on, uint8_t period);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -275,10 +278,11 @@ static EOtheInertials3 s_eo_theinertials3 =
 //    .fromcan2id)                {NOID08},
         
     
-#if 0     
-    .canmap_mtb_accel_int)      {0},
-    .canmap_mtb_accel_ext)      {0},
-    .canmap_mtb_gyros_ext)      {0},
+#if 1     
+    .canmap_mtb_accel_int      = {0},
+    .canmap_mtb_accel_ext      = {0},
+    .canmap_mtb_gyros_ext      = {0},
+    .canmap_imu                = {0},
 #endif
     
     .inertial3                  = NULL,
@@ -320,6 +324,8 @@ extern EOtheInertials3* eo_inertials3_Initialise(void)
     memset(p->canmap_brd_active, 0, sizeof(p->canmap_brd_active));
     p->configured = eobool_false;
     memset(p->numofcanboards, 0, sizeof(p->numofcanboards));
+    
+    memset(p->canmap_mtb_accel_int, 0, sizeof(p->canmap_mtb_accel_int));
     
     p->ethmap_mems_active = 0;
        
@@ -460,6 +466,8 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         return res;        
     }
     
+    #warning we nmay manage the case of no can cards and only gyro on ems in here by returnring onverify(ok)
+    
     // now we deal with sensors on can:
     // step-1: check vs max number of can boards in config
     // step-2: do discovery of all boards (let us begin w/ strain2 only at first)
@@ -503,7 +511,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         }
     }
     
-    
+    #warning TODO: manage teh case of non can boards and only a gyro on the ems
     
     // now we have a complete array of targets and also numofboards. we do some checks ...
     
@@ -839,6 +847,7 @@ extern eOresult_t eo_inertials3_SetRegulars(EOtheInertials3 *p, eOmn_serv_arrayo
 
 extern eOresult_t eo_inertials3_Stop(EOtheInertials3 *p)
 {
+
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -901,11 +910,11 @@ extern eOresult_t eo_inertials3_Transmission(EOtheInertials3 *p, eObool_t on)
 
     if(eobool_true == on)
     {
-        s_eo_inertials2_TXstart(p);
+        s_eo_inertials3_TXstart(p);
     }
     else
     {
-        s_eo_inertials2_TXstop(p);
+        s_eo_inertials3_TXstop(p);
     }
 
     return(eores_OK);
@@ -1355,6 +1364,7 @@ static eOresult_t s_eo_inertials3_verify_local_sensors(EOtheInertials3 *p, const
 
 static eOresult_t s_eo_inertials3_TXstart(EOtheInertials3 *p)
 { 
+
     if(eobool_false == p->configured)
     {   // dont have a configured service
         return(eores_OK);
@@ -1377,12 +1387,12 @@ static eOresult_t s_eo_inertials3_TXstart(EOtheInertials3 *p)
     }                        
  
     
-    //#warning create the can message for inertials3 config and place it in another place ...         
+        
     s_eo_inertials3_imu_configure(p);
-
-    //#warning create the can message for inertials3 tx start and place it in here ...     
     s_eo_inertials3_imu_transmission(p, eobool_true, p->sensorsconfig.datarate);
-    
+
+    s_eo_inertials3_mtb3_configure(p);
+    s_eo_inertials3_mtb3_transmission(p, eobool_true, p->sensorsconfig.datarate);    
     
     p->transmissionisactive = eobool_true;
     s_eo_inertials3_presenceofcanboards_start(p);
@@ -1404,7 +1414,7 @@ static eOresult_t s_eo_inertials3_TXstop(EOtheInertials3 *p)
     s_eo_inertials3_imu_transmission(p, eobool_false, p->sensorsconfig.datarate);
     
     // stop mtbs
-    //#warning TODO: s_eo_inertials3_mtb_transmission();
+    s_eo_inertials3_mtb3_transmission(p, eobool_false, p->sensorsconfig.datarate);
     
     // stop the mems
     eo_mems_Stop(eo_mems_GetHandle());
@@ -1453,6 +1463,7 @@ static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
     memset(p->canmap_mtb_accel_int, 0, sizeof(p->canmap_mtb_accel_int));
     memset(p->canmap_mtb_accel_ext, 0, sizeof(p->canmap_mtb_accel_ext));
     memset(p->canmap_mtb_gyros_ext, 0, sizeof(p->canmap_mtb_gyros_ext));
+    memset(p->canmap_imu, 0, sizeof(p->canmap_imu));
     p->ethmap_mems_active = 0;
 
     for(uint8_t i=0; i<numofsensors; i++)
@@ -1470,30 +1481,40 @@ static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
             if(eobrd_place_can == des->on.any.place)
             {                
                 eo_common_hlfword_bitset(&p->canmap_brd_active[des->on.can.port], des->on.can.addr); 
-
-                switch(des->typeofsensor)
+                
+                eOas_inertial3_type_t ty = des->typeofsensor; 
+                switch(ty)
                 {
-                    case eoas_inertial_accel_mtb_int:
+                    case eoas_inertial3_accel_mtb_int:
                     {
-                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_accel_mtb_int-eoas_inertial_accel_mtb_int] = i;
+                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial3_accel_mtb_int-eoas_inertial3_accel_mtb_int] = i;
                         eo_common_hlfword_bitset(&p->canmap_mtb_accel_int[des->on.can.port], des->on.can.addr);                        
                     } break;
 
-                    case eoas_inertial_accel_mtb_ext:
+                    case eoas_inertial3_accel_mtb_ext:
                     {       
-                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_accel_mtb_ext-eoas_inertial_accel_mtb_int] = i;
+                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial3_accel_mtb_ext-eoas_inertial3_accel_mtb_int] = i;
                         eo_common_hlfword_bitset(&p->canmap_mtb_accel_ext[des->on.can.port], des->on.can.addr);
                     } break;  
                     
-                    case eoas_inertial_gyros_mtb_ext:
+                    case eoas_inertial3_gyros_mtb_ext:
                     {                        
-                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_gyros_mtb_ext-eoas_inertial_accel_mtb_int] = i;
+                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial3_gyros_mtb_ext-eoas_inertial3_accel_mtb_int] = i;
                         eo_common_hlfword_bitset(&p->canmap_mtb_gyros_ext[des->on.can.port], des->on.can.addr);                        
                     } break; 
+               
+                    case eoas_inertial3_none:
+                    case eoas_inertial3_unknown:
+                    {
+                    } break;
                     
                     default:
                     {
+                        // it must be a eoas_inertial3_imu*
+                        p->fromcan2id[des->on.can.port][des->on.can.addr][ty-eoas_inertial3_accel_mtb_int] = i;
+                        eo_common_hlfword_bitset(&p->canmap_imu[des->on.can.port], des->on.can.addr);
                     } break;
+                    
                 }
                 
             }
@@ -1850,8 +1871,11 @@ static void s_eo_inertials3_imu_transmission(EOtheInertials3 *p, eObool_t on, ui
     {
         location.port = port;
         for(uint8_t addr=1; addr<15; addr++)
-        {            
-            if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
+        {
+            eObool_t thereisaboard = eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr); 
+            eObool_t itisaimuboard = eo_common_hlfword_bitcheck(p->canmap_imu[port], addr);
+            if((eobool_true == thereisaboard) && (eobool_true == itisaimuboard))            
+//            if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
             {                                             
                 location.addr = addr;
                 eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);
@@ -1989,14 +2013,16 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
     {
         location.port = port;
         for(uint8_t addr=1; addr<15; addr++)
-        {            
-            if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
+        {
+            eObool_t thereisaboard = eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr); 
+            eObool_t itisaimuboard = eo_common_hlfword_bitcheck(p->canmap_imu[port], addr);
+            if((eobool_true == thereisaboard) && (eobool_true == itisaimuboard))
             {                                             
                 location.addr = addr;
                 // and now i fill enabledsensors and i send the message
                 imuconfig.enabledsensors = 0; 
                 //we want alway read the status
-                eo_common_hlfword_bitset(&imuconfig.enabledsensors, icubCanProto_imu_status);
+                eo_common_hlfword_bitset(&imuconfig.enabledsensors, icubCanProto_imu_status);    
                 
                 for(uint8_t i=0; i<numofsensors; i++)
                 {
@@ -2010,7 +2036,7 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
                             if(icubCanProto_imu_none != ps)
                             {
                                 eo_common_hlfword_bitset(&imuconfig.enabledsensors, ps);
-                            }
+                            } 
                         }
                     }
                 }
@@ -2020,6 +2046,78 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
     }   
 }
 
+
+static void s_eo_inertials3_mtb3_configure(EOtheInertials3 *p)
+{
+ 
+}
+
+static void s_eo_inertials3_mtb3_transmission(EOtheInertials3 *p, eObool_t on, uint8_t period)
+{
+
+    
+    if((0 == p->canmap_brd_active[0]) && (0 == p->canmap_brd_active[1]))
+    {   // no can boards at all
+        return;
+    } 
+    
+//    if(0 == p->sensorsconfig.enabled)
+//    {   // no mtb boards or local mems enabled
+//        return(eores_OK);
+//    } 
+                       
+ 
+    icubCanProto_inertial_config_t canprotoconfig = {0};
+    
+    canprotoconfig.period = period;
+    canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
+    
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
+    p->sharedcan.command.value = &canprotoconfig;
+
+    eObrd_canlocation_t location = {0};
+    location.insideindex = eobrd_caninsideindex_none;
+    for(uint8_t port=0; port<2; port++)
+    {
+        location.port = port;
+        for(uint8_t addr=1; addr<15; addr++)
+        { 
+            eObool_t thereisaboard = eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr);
+            eObool_t itisimu = eo_common_hlfword_bitcheck(p->canmap_imu[port], addr);
+            if((eobool_true == thereisaboard) && (eobool_false == itisimu))
+            {  
+                // FOR SURE IT MUST BE AN MTB3                
+                canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
+                
+                if(eobool_true == on)
+                {
+                    // prepare canprotoconfig.enabledsensors ...
+                    if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_accel_int[port], addr))
+                    {
+                        canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
+                    }
+                    if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_accel_ext[port], addr))
+                    {
+                        canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
+                    }     
+                    if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_gyros_ext[port], addr))
+                    {
+                        canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
+                    }   
+                }  
+                else
+                {
+                    // i keep icubCanProto_inertial_sensorflag_none
+                }    
+                location.addr = addr;
+                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);
+            }
+        }
+    }
+    
+    s_eo_inertials3_presenceofcanboards_start(p);
+}
 
 #endif // #elif !defined(EOTHESERVICES_disable_theInertials3)
 
