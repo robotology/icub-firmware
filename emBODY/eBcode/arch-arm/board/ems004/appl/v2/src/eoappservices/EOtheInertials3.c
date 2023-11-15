@@ -188,10 +188,6 @@ static eOresult_t s_eo_inertials3_TXstart(EOtheInertials3 *p);
 
 static eOresult_t s_eo_inertials3_TXstop(EOtheInertials3 *p);
 
-static eOresult_t s_eo_inertials2_TXstart(EOtheInertials3 *p);
-
-static eOresult_t s_eo_inertials2_TXstop(EOtheInertials3 *p);
-
 static eObool_t s_eo_inertials3_activestate_can_accept_canframe(void);
 
 static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask);
@@ -276,15 +272,11 @@ static EOtheInertials3 s_eo_theinertials3 =
     .fifoofinertial3data        = NULL,
     
 //    .fromcan2id)                {NOID08},
-        
-    
-#if 1     
+  
     .canmap_mtb_accel_int      = {0},
     .canmap_mtb_accel_ext      = {0},
     .canmap_mtb_gyros_ext      = {0},
     .canmap_imu                = {0},
-#endif
-    
     .inertial3                  = NULL,
     .id32ofregulars             = NULL,
     .setofboardinfos            = {0},
@@ -1875,126 +1867,12 @@ static void s_eo_inertials3_imu_transmission(EOtheInertials3 *p, eObool_t on, ui
             eObool_t thereisaboard = eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr); 
             eObool_t itisaimuboard = eo_common_hlfword_bitcheck(p->canmap_imu[port], addr);
             if((eobool_true == thereisaboard) && (eobool_true == itisaimuboard))            
-//            if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
             {                                             
                 location.addr = addr;
                 eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);
             }
         }
     }    
-}
-
-enum { mems_gyro = 0, mems_accel = 1 , mems_numberofthem = 2 };
-
-static eOresult_t s_eo_inertials2_TXstart(EOtheInertials3 *p)
-{ 
-    if(eobool_false == p->configured)
-    {   // dont have a configured service
-        return(eores_OK);
-    }    
-    
-    if((0 == p->canmap_brd_active[0]) && (0 == p->canmap_brd_active[1]) && (0 == p->ethmap_mems_active))
-    {   // no mtb boards or onboard sensors configured
-        return(eores_OK);
-    } 
-    
-    if(0 == p->sensorsconfig.enabled)
-    {   // no mtb boards or local mems enabled
-        return(eores_OK);
-    } 
-    
-    if(eobool_true == eo_common_byte_bitcheck(p->ethmap_mems_active, mems_gyro))
-    {
-        eo_mems_Config(eo_mems_GetHandle(), &p->memsconfig[mems_gyro]);
-        eo_mems_Start(eo_mems_GetHandle());
-    }                        
- 
-    icubCanProto_inertial_config_t canprotoconfig = {0};
-    
-    canprotoconfig.period = p->sensorsconfig.datarate;
-    canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
-    
-    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
-    p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
-    p->sharedcan.command.value = &canprotoconfig;
-
-    eObrd_canlocation_t location = {0};
-    location.insideindex = eobrd_caninsideindex_none;
-    for(uint8_t port=0; port<2; port++)
-    {
-        location.port = port;
-        for(uint8_t addr=1; addr<15; addr++)
-        {                        
-            if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
-            {               
-                canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
-                // prepare canprotoconfig.enabledsensors ...
-                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_accel_int[port], addr))
-                {
-                    canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-                }
-                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_accel_ext[port], addr))
-                {
-                    canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
-                }     
-                if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_mtb_gyros_ext[port], addr))
-                {
-                    canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
-                }                
-                location.addr = addr;
-                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);
-            }
-        }
-    }
-    
-    p->transmissionisactive = eobool_true;
-    s_eo_inertials3_presenceofcanboards_start(p);
-    
-    return(eores_OK);   
-}
-
-
-static eOresult_t s_eo_inertials2_TXstop(EOtheInertials3 *p)
-{
-    if(eobool_false == p->configured)
-    {   // nothing to do because we dont have a configured service 
-        return(eores_OK);
-    }     
-
-    icubCanProto_inertial_config_t canprotoconfig = {0};
-    
-    canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
-    canprotoconfig.period           = p->sensorsconfig.datarate;
-
-    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
-    p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
-    p->sharedcan.command.value = &canprotoconfig;
-    
-    
-    eObrd_canlocation_t location = {0};
-    location.insideindex = eobrd_caninsideindex_none;
-    for(uint8_t port=0; port<2; port++)
-    {            
-        location.port = port;
-        for(uint8_t addr=1; addr<15; addr++)
-        {
-            if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
-            {
-                location.addr = addr;
-                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);
-            }
-        }
-    }
-    
-    
-    // stop the mems
-    eo_mems_Stop(eo_mems_GetHandle());
-
-
-    p->transmissionisactive = eobool_false;
-    s_eo_inertials3_presenceofcanboards_reset(p);
-               
-    return(eores_OK);
 }
 
 static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
