@@ -471,6 +471,19 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     // the number of sensor descriptors
     uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);
     uint16_t overlappedmap[2] = {0};
+    eObool_t thereIsEMSGyro = eobool_false;
+    
+    for(uint8_t s=0; s<numofsensors; s++)
+    {
+        eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, s);
+        if(NULL != des)
+        {
+            if(eobrd_ethtype_ems4 == des->typeofboard) {
+                thereIsEMSGyro = eobool_true;
+            }
+        }            
+    }
+    
     for(uint8_t b=0; b<eoas_inertial3_supportedboards_numberof(); b++)
     {
         eOcandiscovery_target_t trgt = {0};
@@ -503,12 +516,10 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         }
     }
     
-    #warning TODO: manage teh case of non can boards and only a gyro on the ems
-    
     // now we have a complete array of targets and also numofboards. we do some checks ...
     
-    // we check that we have at least one discovery target    
-    if(eobool_false) //TODO raise error only if is 0 BUT we don't handle ems4 //0 == eo_array_Size(p->sharedcan.discoverytargets))
+    // we check that we have at least one discovery target if we don't have ems gyro active  
+    if((eobool_false == thereIsEMSGyro) && (0 == eo_array_Size(p->sharedcan.discoverytargets)))
     {
         p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
         p->diagnostics.errorDescriptor.sourceaddress      = 0;
@@ -1941,7 +1952,7 @@ static void s_eo_inertials3_mtb3_transmission(EOtheInertials3 *p, eObool_t on, u
     
 //    if(0 == p->sensorsconfig.enabled)
 //    {   // no mtb boards or local mems enabled
-//        return(eores_OK);
+//        return;
 //    } 
                        
  
