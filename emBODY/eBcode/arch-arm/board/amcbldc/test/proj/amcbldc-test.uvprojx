@@ -686,27 +686,27 @@
           <Files>
             <File>
               <FileName>analog.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\analog.c</FilePath>
             </File>
             <File>
               <FileName>encoder.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\encoder.c</FilePath>
             </File>
             <File>
               <FileName>motorhal_config.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\motorhal_config.c</FilePath>
             </File>
             <File>
               <FileName>motorhal_faults.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\motorhal_faults.c</FilePath>
             </File>
             <File>
               <FileName>pwm.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\pwm.c</FilePath>
             </File>
           </Files>
@@ -1465,27 +1465,27 @@
           <Files>
             <File>
               <FileName>analog.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\analog.c</FilePath>
             </File>
             <File>
               <FileName>encoder.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\encoder.c</FilePath>
             </File>
             <File>
               <FileName>motorhal_config.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\motorhal_config.c</FilePath>
             </File>
             <File>
               <FileName>motorhal_faults.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\motorhal_faults.c</FilePath>
             </File>
             <File>
               <FileName>pwm.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\motorhal2\pwm.c</FilePath>
             </File>
           </Files>
