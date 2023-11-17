@@ -59,8 +59,6 @@ struct EOtheInertials3_hid
     eOservice_diagnostics_t                 diagnostics;
     eOservice_cantools_t                    sharedcan;
     
-    uint8_t                                 numofmtbs;
-    
     eObool_t                                configured;
     
     uint8_t                                 numofcanboards[eo_inertials3_maxTypesOfBoard];
@@ -88,7 +86,10 @@ struct EOtheInertials3_hid
     uint16_t                                not_heardof_target[2];
     uint16_t                                not_heardof_status[2];
     uint32_t                                not_heardof_counter;
-    eObool_t                                transmissionisactive;
+    eObool_t                                cantransmissionisactive;
+    uint8_t                                 numofsensors;
+    uint8_t                                 numoflocalsensors;
+    uint8_t                                 numofoncansensors;
 }; 
 
 

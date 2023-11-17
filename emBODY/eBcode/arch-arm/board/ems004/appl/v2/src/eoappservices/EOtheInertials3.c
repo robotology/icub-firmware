@@ -212,6 +212,7 @@ static void s_eo_inertials3_imu_transmission(EOtheInertials3 *p, eObool_t on, ui
 static void s_eo_inertials3_mtb3_configure(EOtheInertials3 *p);
 static void s_eo_inertials3_mtb3_transmission(EOtheInertials3 *p, eObool_t on, uint8_t period);
 
+static void s_eo_inertials3_number_of_sensors_count(EOtheInertials3 *p);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -248,7 +249,8 @@ static EOtheInertials3 s_eo_theinertials3 =
         .errorType              = eo_errortype_info,
         .errorCallbackCount     = 0, 
         .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
-    },     
+    },   
+    
     .sharedcan =
     {
         .boardproperties        = NULL,
@@ -271,7 +273,7 @@ static EOtheInertials3 s_eo_theinertials3 =
       
     .fifoofinertial3data        = NULL,
     
-//    .fromcan2id)                {NOID08},
+    .fromcan2id                 = {NOID08},
   
     .canmap_mtb_accel_int      = {0},
     .canmap_mtb_accel_ext      = {0},
@@ -284,7 +286,10 @@ static EOtheInertials3 s_eo_theinertials3 =
     .not_heardof_target         = {0},
     .not_heardof_status         = {0},
     .not_heardof_counter        = 0,
-    .transmissionisactive       = eobool_false
+    .cantransmissionisactive       = eobool_false,
+    .numofsensors               = 0,
+    .numoflocalsensors               = 0,
+    .numofoncansensors               = 0
 };
 
 
@@ -346,7 +351,8 @@ extern EOtheInertials3* eo_inertials3_Initialise(void)
     p->service.initted = eobool_true;    
     p->service.active = eobool_false;
     p->service.started = eobool_false;
-    p->transmissionisactive = eobool_false;
+    p->cantransmissionisactive = eobool_false;
+    p->numofsensors = p->numoflocalsensors = p->numofoncansensors = 0;
     p->service.state = eomn_serv_state_idle;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
     
@@ -429,8 +435,8 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         }        
         return(eores_NOK_generic);
     }   
+       
     
- 
     if(eobool_true == p->service.active)
     {
         eo_inertials3_Deactivate(p);        
@@ -450,17 +456,71 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     memcpy(&p->setofboardinfos, &servcfg->data.as.inertial3.setofboardinfos, sizeof(eOas_inertial3_setof_boardinfos_t));
     memcpy(p->arrayofsensordescriptors, &servcfg->data.as.inertial3.arrayofdescriptor, sizeof(eOas_inertial3_arrayof_descriptors_t));
     
+    // ok, now we manage the configuration.
+    // it contains an EOarray of items eOas_inertial3_descriptor_t whose max number is eOas_inertials3_descriptors_maxnumber = 32
+    // each item describe a sensor. 
+    // for now we check:
+    // 1. we have the correct number of sensors in the EOarray.
+    // 2. we check in sequence:
+    //    2.a the validity of the sensor description of local sensors (if any), 
+    //    2.b the validity of the sensor description sensors placed on can (if any)  
+
+
+    // 1. i verify that the service configuration contains at least one sensor and not more than the max number
+   
+    s_eo_inertials3_number_of_sensors_count(p);
     
-    // at first we verify sensors which are local (if any)
+    if((p->numofsensors == 0) || (p->numofsensors > eOas_inertials3_descriptors_maxnumber))
+    {
+        p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        }        
+        return(eores_NOK_generic);
+    }  
     
-    if(eores_OK != (res = s_eo_inertials3_verify_local_sensors(p, servcfg)))
-    {        
-        return res;        
-    }
+    // then i verify how many sensors are local and how many are on can
+
     
-    #warning we nmay manage the case of no can cards and only gyro on ems in here by returnring onverify(ok)
+    // 2.a at first we verify sensors which are local (if any)    
+    if(p->numoflocalsensors > 0)
+    {
+        if(eores_OK != (res = s_eo_inertials3_verify_local_sensors(p, servcfg)))
+        { 
+            // note: in case of failure s_eo_inertials3_verify_local_sensors() internally calls: onverify(p, eobool_false)            
+            return res;        
+        }
+        
+        // ok, the local are verified
+        // if we dont have any oncan sensors then we can stop in here ....
+        
+        if(0 == p->numofoncansensors)
+        {          
+            // we activate
+            if((eobool_true == p->service.activateafterverify))
+            {
+                eo_inertials3_Activate(p, servcfg);        
+            }
+            
+            // we send positive ack
+            if(NULL != p->service.onverify)
+            {
+                p->service.onverify(p, eobool_true); 
+            }                   
+            
+            // and we return OK
+            return eores_OK;
+        }
+    } 
     
-    // now we deal with sensors on can:
+    // 2.b sensors on can    
+    
+    // marco.accame on 17 nov 2023: now i proceed w/ the verification of can resources.
+    // i could refactore the code a bit but i prefer to keep the following as much untouched as possible
+    
+
     // step-1: check vs max number of can boards in config
     // step-2: do discovery of all boards (let us begin w/ strain2 only at first)
     
@@ -469,11 +529,10 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     
     
     // the number of sensor descriptors
-    uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);
     uint16_t overlappedmap[2] = {0};
     eObool_t thereIsEMSGyro = eobool_false;
     
-    for(uint8_t s=0; s<numofsensors; s++)
+    for(uint8_t s=0; s<p->numofsensors; s++)
     {
         eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, s);
         if(NULL != des)
@@ -497,7 +556,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         memmove(&trgt.info, brdinfo, sizeof(eObrd_info_t)); 
         trgt.canmap[eOcanport1] =  trgt.canmap[eOcanport2] = 0;
         // now i search for this brdtype inside the arrayofsensordescriptors
-        for(uint8_t s=0; s<numofsensors; s++)
+        for(uint8_t s=0; s<p->numofsensors; s++)
         {
             eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, s);
             if(NULL != des)
@@ -524,7 +583,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
         p->diagnostics.errorDescriptor.sourceaddress      = 0;
         p->diagnostics.errorDescriptor.par16              = 1;
-        p->diagnostics.errorDescriptor.par64              = numofsensors;
+        p->diagnostics.errorDescriptor.par64              = p->numofsensors;
        
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
@@ -619,10 +678,12 @@ extern eOresult_t eo_inertials3_Deactivate(EOtheInertials3 *p)
     }
     
     eo_inertials3_SetRegulars(p, NULL, NULL);
-      
-    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, p->sharedcan.entitydescriptor); 
     
-    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties);
+//    if(p->numofoncansensors > 0)
+//    {
+        eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, p->sharedcan.entitydescriptor);     
+        eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties);
+//    }
      
     
     eo_entities_SetNumOfInertials3(eo_entities_GetHandle(), 0);
@@ -647,6 +708,8 @@ extern eOresult_t eo_inertials3_Deactivate(EOtheInertials3 *p)
     p->sensorsconfig.enabled = 0;
     p->configured = eobool_false;
     memset(p->numofcanboards, 0, sizeof(p->numofcanboards));
+    p->numofsensors = p->numofoncansensors = p->numoflocalsensors = 0;
+    
     p->service.active = eobool_false;    
     p->service.state = eomn_serv_state_idle;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
@@ -695,97 +758,103 @@ extern eOresult_t eo_inertials3_Activate(EOtheInertials3 *p, const eOmn_serv_con
     memcpy(p->arrayofsensordescriptors, &servcfg->data.as.inertial3.arrayofdescriptor, sizeof(eOas_inertial3_arrayof_descriptors_t));
     
     
-    // now i build maps for check of presence
+    // this part is for can sensors only
+    // because ... we fill dat structures used to manage boards on can
     
-    s_eo_inertials3_presenceofcanboards_build(p);
-    
-    
-    // now i must build the canbusmapping[] for EOtheCANmapping object
-    
-    uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);    
+    if(p->numofoncansensors > 0)
+    {        
+        // now i build maps for check of can presence
+        
+        s_eo_inertials3_presenceofcanboards_build(p);
+                
+        // now i must build the canbusmapping[] for EOtheCANmapping object
 
-    uint16_t canbusmapping[2] = {0};
-    eObrd_cantype_t boardtypes[2][16] = {eobrd_cantype_none};
-    
-    for(uint8_t i=0; i<numofsensors; i++)
-    {
-        eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
-        if(NULL != des)
+        uint16_t canbusmapping[2] = {0};
+        eObrd_cantype_t boardtypes[2][16] = {eobrd_cantype_none};
+        
+        for(uint8_t i=0; i<p->numofsensors; i++)
         {
-            if(eobrd_place_can == des->on.any.place)
+            eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
+            if(NULL != des)
             {
-                eo_common_hlfword_bitset(&canbusmapping[des->on.can.port], des->on.can.addr);  
-                boardtypes[des->on.can.port][des->on.can.addr] = (eObrd_cantype_t)des->typeofboard;
+                if(eobrd_place_can == des->on.any.place)
+                {
+                    eo_common_hlfword_bitset(&canbusmapping[des->on.can.port], des->on.can.addr);  
+                    boardtypes[des->on.can.port][des->on.can.addr] = (eObrd_cantype_t)des->typeofboard;
+                }
             }
-        }
-    }    
-    
-    
-    eObrd_canproperties_t prop = {0};
-    // only this stays constant:
-    prop.location.insideindex = eobrd_caninsideindex_none;  
-    // the others must be set
-    prop.location.port = 0; prop.location.addr = 0; 
-    prop.type = eobrd_cantype_none;
-    prop.requiredprotocol.major = 0;
-    prop.requiredprotocol.minor = 0;
+        }    
+        
+        
+        eObrd_canproperties_t prop = {0};
+        // only this stays constant:
+        prop.location.insideindex = eobrd_caninsideindex_none;  
+        // the others must be set
+        prop.location.port = 0; prop.location.addr = 0; 
+        prop.type = eobrd_cantype_none;
+        prop.requiredprotocol.major = 0;
+        prop.requiredprotocol.minor = 0;
 
-    
-    eOcanmap_entitydescriptor_t des = {0};
-    // only this stays constant: 
-    des.location.insideindex = eobrd_caninsideindex_none;
-     // the others must be set
-    des.location.port = 0; des.location.addr = 0; 
-    des.index = entindex00;
-       
+        
+        eOcanmap_entitydescriptor_t des = {0};
+        // only this stays constant: 
+        des.location.insideindex = eobrd_caninsideindex_none;
+         // the others must be set
+        des.location.port = 0; des.location.addr = 0; 
+        des.index = entindex00;
+           
 
-    // ok, we have one of these boards 
-    for(uint8_t j=0; j<eOcanports_number; j++)
-    {
-        for(uint8_t k=1; k<15; k++)
+        // ok, we have one of these boards 
+        for(uint8_t j=0; j<eOcanports_number; j++)
         {
-            if(eobool_true == eo_common_hlfword_bitcheck(canbusmapping[j], k))
-            {   // i pushback. i dont verify vs the capacity of the vector because eo_inertials3_Verify() has already done it
-                
-                prop.type = boardtypes[j][k];
-                const eObrd_info_t * brdinfo = eoas_inertial3_setof_boardinfos_find(&p->setofboardinfos, (eObrd_cantype_t)prop.type);
-                
-                if(NULL == brdinfo)
-                {
-                    prop.requiredprotocol.major = 0;
-                    prop.requiredprotocol.minor = 0;                    
+            for(uint8_t k=1; k<15; k++)
+            {
+                if(eobool_true == eo_common_hlfword_bitcheck(canbusmapping[j], k))
+                {   // i pushback. i dont verify vs the capacity of the vector because eo_inertials3_Verify() has already done it
+                    
+                    prop.type = boardtypes[j][k];
+                    const eObrd_info_t * brdinfo = eoas_inertial3_setof_boardinfos_find(&p->setofboardinfos, (eObrd_cantype_t)prop.type);
+                    
+                    if(NULL == brdinfo)
+                    {
+                        prop.requiredprotocol.major = 0;
+                        prop.requiredprotocol.minor = 0;                    
+                    }
+                    else
+                    {
+                        prop.requiredprotocol.major = brdinfo->protocol.major;
+                        prop.requiredprotocol.minor = brdinfo->protocol.minor;                    
+                    }
+                    
+                    prop.location.port = j;
+                    prop.location.addr = k;
+                    eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
+                    
+                    des.location.port = j;
+                    des.location.addr = k;
+                    des.index = entindex00;                        
+                    eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);                
                 }
-                else
-                {
-                    prop.requiredprotocol.major = brdinfo->protocol.major;
-                    prop.requiredprotocol.minor = brdinfo->protocol.minor;                    
-                }
-                
-                prop.location.port = j;
-                prop.location.addr = k;
-                eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
-                
-                des.location.port = j;
-                des.location.addr = k;
-                des.index = entindex00;                        
-                eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);                
             }
         }
-    }
 
-
-
+        
+        // load the can mapping 
+        eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
+        
+        // load the entity mapping.
+        eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, p->sharedcan.entitydescriptor);   
+        
+    } // if there are can boards  
     
-    // load the can mapping 
-    eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
+    // build the maps.
+    // for can sensors: they translate a received can message into the id 
+    // for local sensors: ... just do it.
     
-    // load the entity mapping.
-    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, p->sharedcan.entitydescriptor);   
-    
-    
-    // build the maps that can translate a received can message into the id to be put into ...
-    // we assume that 
     s_eo_inertials3_build_maps(p, 0xffffffff);
+    
+
+    
     p->configured = eobool_false; // still false
     p->service.active = eobool_true;    
     p->service.state = eomn_serv_state_activated;
@@ -946,7 +1015,7 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
         return(eores_OK);
     }    
     
-    if(eobool_true == p->transmissionisactive)
+    if(eobool_true == p->cantransmissionisactive)
     {
         s_eo_inertials3_presenceofcanboards_tick(p);
     }
@@ -1294,14 +1363,44 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_eo_inertials3_number_of_sensors_count(EOtheInertials3 *p)
+{
+    p->numofsensors = p->numoflocalsensors = p->numofoncansensors = 0;
+
+    
+    p->numofsensors = eo_array_Size(p->arrayofsensordescriptors);    
+    for(uint8_t i=0; i<p->numofsensors; i++)
+    {
+        eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
+        if(NULL != des)
+        {
+            switch(des->on.any.place)
+            {
+                case eobrd_place_eth:
+                {
+                    p->numoflocalsensors++; 
+                } break;
+                
+                case eobrd_place_can:
+                case eobrd_place_extcan:
+                {
+                    p->numofoncansensors++; 
+                } break;   
+
+                default: {} break;
+            }
+
+        }
+    }
+}
+
 static eOresult_t s_eo_inertials3_verify_local_sensors(EOtheInertials3 *p, const eOmn_serv_configuration_t * servcfg)
 {
     eOresult_t res = eores_OK;
     
     uint64_t errormask = 0; // at most i have eOas_inertials3_maxnumber = 48 items
     uint8_t numoferrors = 0;
-    uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);    
-    for(uint8_t i=0; i<numofsensors; i++)
+    for(uint8_t i=0; i<p->numofsensors; i++)
     {
         eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
         if(NULL != des)
@@ -1387,19 +1486,20 @@ static eOresult_t s_eo_inertials3_TXstart(EOtheInertials3 *p)
     {
         eo_mems_Config(eo_mems_GetHandle(), &p->memsconfig[inertials3_mems_gyro]);
         eo_mems_Start(eo_mems_GetHandle());
-    }                        
- 
-    
-        
-    s_eo_inertials3_imu_configure(p);
-    s_eo_inertials3_imu_transmission(p, eobool_true, p->sensorsconfig.datarate);
+    }                            
 
-    s_eo_inertials3_mtb3_configure(p);
-    s_eo_inertials3_mtb3_transmission(p, eobool_true, p->sensorsconfig.datarate);    
-    
-    p->transmissionisactive = eobool_true;
-    s_eo_inertials3_presenceofcanboards_start(p);
-    
+    if(p->numofoncansensors > 0)
+    {    
+        s_eo_inertials3_imu_configure(p);
+        s_eo_inertials3_imu_transmission(p, eobool_true, p->sensorsconfig.datarate);
+
+        s_eo_inertials3_mtb3_configure(p);
+        s_eo_inertials3_mtb3_transmission(p, eobool_true, p->sensorsconfig.datarate);    
+        
+        p->cantransmissionisactive = eobool_true;
+        s_eo_inertials3_presenceofcanboards_start(p);
+    }
+        
     return(eores_OK);   
 }
 
@@ -1409,22 +1509,27 @@ static eOresult_t s_eo_inertials3_TXstop(EOtheInertials3 *p)
     if(eobool_false == p->configured)
     {   // nothing to do because we dont have a configured service 
         return(eores_OK);
-    }     
+    }        
+    
+    if(p->numofoncansensors > 0)
+    {    
+        // stop the imus
+        s_eo_inertials3_imu_transmission(p, eobool_false, p->sensorsconfig.datarate);
+        
+        // stop the mtbs
+        s_eo_inertials3_mtb3_transmission(p, eobool_false, p->sensorsconfig.datarate);
+        
+        // stop can monitoring 
+        p->cantransmissionisactive = eobool_false;        
+        s_eo_inertials3_presenceofcanboards_reset(p);        
+    }
 
-    //#warning create the inetrials3 can message
-    
-    // stop the imus
-    s_eo_inertials3_imu_transmission(p, eobool_false, p->sensorsconfig.datarate);
-    
-    // stop mtbs
-    s_eo_inertials3_mtb3_transmission(p, eobool_false, p->sensorsconfig.datarate);
-    
-    // stop the mems
-    eo_mems_Stop(eo_mems_GetHandle());
-
-    p->transmissionisactive = eobool_false;
-    s_eo_inertials3_presenceofcanboards_reset(p);
-               
+    if(p->numoflocalsensors > 0)
+    {
+        // stop the mems
+        eo_mems_Stop(eo_mems_GetHandle());
+    }
+         
     return(eores_OK);
 }
 
@@ -1450,9 +1555,7 @@ static eObool_t s_eo_inertials3_activestate_can_accept_canframe(void)
 
 
 static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
-{
-    uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);    
-  
+{ 
     // at first we disable all. 
     
     memset(p->canmap_brd_active, 0, sizeof(p->canmap_brd_active));
@@ -1469,7 +1572,7 @@ static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
     memset(p->canmap_imu, 0, sizeof(p->canmap_imu));
     p->ethmap_mems_active = 0;
 
-    for(uint8_t i=0; i<numofsensors; i++)
+    for(uint8_t i=0; i<p->numofsensors; i++)
     {
         eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
         if(NULL != des)
@@ -1791,12 +1894,11 @@ static void s_eo_inertials3_presenceofcanboards_build(EOtheInertials3 *p)
 {
     s_eo_inertials3_presenceofcanboards_reset(p);
 
-    // now i must build the canmaps used to monitor presence 
-    uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);   
+    // now i must build the canmaps used to monitor presence  
     
     p->not_heardof_target[eOcanport1] = p->not_heardof_target[eOcanport2] = 0;
 
-    for(uint8_t i=0; i<numofsensors; i++)
+    for(uint8_t i=0; i<p->numofsensors; i++)
     {
         eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
         if(NULL != des)
@@ -1897,7 +1999,6 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
     
     eObrd_canlocation_t location = {0};
     location.insideindex = eobrd_caninsideindex_none;
-    uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);
     for(uint8_t port=0; port<2; port++)
     {
         location.port = port;
@@ -1913,7 +2014,7 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
                 //we want alway read the status
                 eo_common_hlfword_bitset(&imuconfig.enabledsensors, icubCanProto_imu_status);    
                 
-                for(uint8_t i=0; i<numofsensors; i++)
+                for(uint8_t i=0; i<p->numofsensors; i++)
                 {
                     eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
                     if(NULL != des)
