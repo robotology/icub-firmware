@@ -116,7 +116,8 @@ void PID_config_friction(PID *o, float Kbemf, float Ktau, eOmc_FrictionParams_t 
     o->viscous_pos_val = friction.viscous_pos_val;
     o->viscous_neg_val = friction.viscous_neg_val;
     o->coulomb_pos_val = friction.coulomb_pos_val;
-    o->coulomb_neg_val = friction.coulomb_neg_val;    
+    o->coulomb_neg_val = friction.coulomb_neg_val;
+    o->velocityThres_val = friction.velocityThres_val;
 }
 
 void PID_config_filter(PID *o, uint8_t filter)
@@ -202,11 +203,8 @@ float PID_do_out(PID* o, float En)
     return o->out_lpf;
 }
 
-#define MICRO 1000000.0
-
-float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
+float PID_do_friction_comp(PID *o, float32_t vel_fbk, float32_t trq_ref)
 {
-#ifdef USE_VISCOUS_COULOMB 
     // A threshold is necessary to handle velocities close to zero and higher velocities.
     // When the velocity is close to zero the model used for friction compensation is cubic
     // (this avoids discontinuous control for low velocities).
@@ -214,28 +212,23 @@ float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
     // to the effects of noise. As a result, the friction torque also switches from negative values to 
     // positive values if a threshold is not used.
     
-    float ret_value = 0;
+    const float32_t MICRO { 1000000.0 }; // conversion from Nm into microNm
+    const float32_t coulomb_pos_converted = o->coulomb_pos_val * MICRO;
+    const float32_t coulomb_neg_converted = o->coulomb_neg_val * MICRO;
     
-    float coulomb_pos_converted = o->coulomb_pos_val * MICRO;
-    float coulomb_neg_converted = o->coulomb_neg_val * MICRO;
+    const float32_t viscous_neg = o->viscous_neg_val * vel_fbk;
+    const float32_t viscous_pos = o->viscous_pos_val * vel_fbk;
     
-    float threshold = 182.044 * 150; // vel_motor is 150 deg/sec converted in icubdeg/sec
-    
-    if (vel_fbk < -threshold)
+    if (vel_fbk <= -o->velocityThres_val)
     {
-        ret_value = o->Ktau*(-coulomb_neg_converted + o->viscous_neg_val*vel_fbk + o->Kff*trq_ref);
+        return o->Ktau*(-coulomb_neg_converted + viscous_neg + o->Kff*trq_ref);
     }
-    else if (vel_fbk > threshold)
+    else if (vel_fbk > o->velocityThres_val)
     {
-        ret_value = o->Ktau*(coulomb_pos_converted + o->viscous_pos_val*vel_fbk + o->Kff*trq_ref);
+        return o->Ktau*(coulomb_pos_converted + viscous_pos + o->Kff*trq_ref);
     }
     else
     {
-        ret_value = o->Ktau*(o->Kff*trq_ref);
+        return o->Ktau*(o->Kff*trq_ref);
     }
-    
-    return ret_value;
-#else
-    return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
-#endif
 }
