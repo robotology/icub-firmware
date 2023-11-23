@@ -64,9 +64,14 @@ struct EOtheInertials3_hid
     uint8_t                                 numofcanboards[eo_inertials3_maxTypesOfBoard];
     
     // now the old ones
-    eOas_inertial3_config_t                 sensorsconfig;    
+    eOas_inertial3_config_t                 sensorsconfig;
+    uint16_t                                canmap_mtb_accel_int[2];
+    uint16_t                                canmap_mtb_accel_ext[2];
+    uint16_t                                canmap_mtb_gyros_ext[2]; 
+    uint16_t                                canmap_imu[2];    
     uint16_t                                canmap_brd_active[2];
     uint8_t                                 ethmap_mems_active;
+    uint16_t                                fromcan2id[2][16][3];   // 2 ports, 15 addresses (0->14), 3 kinds on mtb ... use mtb-eoas_inertial_accel_mtb_int
     uint16_t                                frommems2id[inertials3_mems_numberofthem];
     uint8_t                                 memsparam[inertials3_mems_numberofthem];    
     eOmems_sensor_cfg_t                     memsconfig[inertials3_mems_numberofthem];
@@ -81,7 +86,10 @@ struct EOtheInertials3_hid
     uint16_t                                not_heardof_target[2];
     uint16_t                                not_heardof_status[2];
     uint32_t                                not_heardof_counter;
-    eObool_t                                transmissionisactive;
+    eObool_t                                cantransmissionisactive;
+    uint8_t                                 numofsensors;
+    uint8_t                                 numoflocalsensors;
+    uint8_t                                 numofoncansensors;
 }; 
 
 
