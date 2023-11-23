@@ -73,7 +73,6 @@ extern void I2Twatcher(void);
 extern void setIPid(int kp,int ki, char shift);
 extern void setSPid(int kp,int ki, char shift);
 extern void setMaxCurrent(int nom, int peak, int ovr);
-extern void setMaxTemperature(int peak);
 extern void RequestControlMode(char cm);
 extern BOOL updateOdometry();
 

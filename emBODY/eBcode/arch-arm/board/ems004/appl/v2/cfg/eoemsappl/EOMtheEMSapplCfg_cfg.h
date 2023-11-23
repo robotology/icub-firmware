@@ -93,13 +93,9 @@ extern "C" {
 //  <o> day             <1-31>
 #define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          23
 //  <o> hour            <0-23>
-<<<<<<< Updated upstream
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         10
-=======
 #define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         18
->>>>>>> Stashed changes
 //  <o> minute          <0-59>
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          13
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          00
 //  </h>build date
 // </h>Info 
 
