@@ -28,7 +28,6 @@
 #include "iCubCanProto_types.h"
 #include "EoProtocol.h"
 #include "EOtheCANprotocol.h"
-#include "EOtheCANservice.h"
 #include "hal_motor.h"
 
 #include "hal_led.h"
