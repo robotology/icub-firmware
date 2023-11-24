@@ -28,6 +28,9 @@
 #include "embot_app_eth_theErrorManager.h"
 #include "embot_os_theScheduler.h"
 
+#include "embot_app_eth_theICCservice.h"
+#include "embot_app_eth_theICCmapping.h"
+#include "EOtheCANprotocol.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -75,6 +78,8 @@ struct embot::app::eth::theServices::Impl
     
     // statics
     static bool onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok);
+    
+    static bool icubcanparser(const embot::app::eth::theICCservice::Item &item);
 
 };
 
@@ -125,6 +130,12 @@ static void s_can_cbkonrx(void *arg)
 {
     EOMtask *task = (EOMtask *)arg;
     eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
+}
+
+static void s_icc_cbkonrx(void *arg)
+{
+    EOMtask *task = (EOMtask *)arg;
+    eom_task_isrSetEvent(task, emsconfigurator_evt_userdef03);
 }
 
 
@@ -233,7 +244,36 @@ void embot::app::eth::theServices::Impl::init_step2()
         
     // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
     eo_canserv_Initialise(&config);   
-    
+        
+    embot::app::eth::theICCmapping::getInstance().initialise({});
+    embot::app::eth::mc::messaging::receiver::load(embot::app::eth::mc::messaging::receiver::agent());        
+
+       
+    embot::core::Callback oniccRX {s_icc_cbkonrx, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle())};
+#if 0 
+    marco.accame on 24 nov 2023: i cannot init so late in the execution.
+    because if the otehr core start to tx then this core never receive anything ever.
+    so: 
+    1. very early we init the theICCservice w/ dummy callback on rx and parser
+    2. in here we just configure those two correctly
+           
+    embot::app::eth::theICCservice::Config cfgicc
+    {
+        embot::hw::icc::LTR::one, embot::hw::icc::LTR::two,
+        32, 32,
+        embot::app::eth::theICCservice::modeTX::onflush,
+        embot::os::Priority::system54, embot::os::Priority::system53,
+        oniccRX,
+        icubcanparser
+    };
+            
+    embot::app::eth::theICCservice::getInstance().initialise(cfgicc);
+#endif
+
+    embot::app::eth::theICCservice::getInstance().set(oniccRX); 
+    embot::app::eth::theICCservice::getInstance().set(icubcanparser);     
+        
+            
     // can-discovery
     eo_candiscovery2_Initialise(NULL);  
     EOaction_strg astrg = {0};
@@ -744,6 +784,11 @@ bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const e
     embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate()", thr}, {}, ok ? "ok": "false");
                 
     return true;
+}
+
+bool embot::app::eth::theServices::Impl::icubcanparser(const embot::app::eth::theICCservice::Item &item)
+{   
+    return embot::app::eth::mc::messaging::receiver::parse(item.des.bus, item.frame);
 }
 
 
