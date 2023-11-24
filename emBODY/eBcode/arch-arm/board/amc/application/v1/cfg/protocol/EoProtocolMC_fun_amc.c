@@ -15,7 +15,6 @@
 #include "EOtheEntities.h"
 #include "EOtheErrorManager.h"
 #include "EoError.h"
-#include "EOtheCANservice.h"
 #include "EOtheMotionController.h"
 #include "Controller.h"
 
