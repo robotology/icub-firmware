@@ -116,26 +116,26 @@ namespace embot::hw::icc::mem::bsp {
     // -- MEM
     
     constexpr uint32_t startmemory {0x38001000};
-    constexpr uint32_t memsize {256};
+    constexpr uint32_t memsizes[] = {1024, 1024, 512, 512};
     
     static const PROP mm1 = {
         reinterpret_cast<void*>(startmemory),
-        memsize,
+        memsizes[0],
         MTX::nine
     };
     static const PROP mm2 = {
-        reinterpret_cast<void*>(startmemory+1*memsize),
-        memsize,
+        reinterpret_cast<void*>(startmemory+mm1.data.capacity),
+        memsizes[1],
         MTX::ten
     };
     static const PROP mm3 = {
-        reinterpret_cast<void*>(startmemory+2*memsize),
-        memsize,
+        reinterpret_cast<void*>(startmemory+mm1.data.capacity+mm2.data.capacity),
+        memsizes[2],
         MTX::eleven
     };
     static const PROP mm4 = {
-        reinterpret_cast<void*>(startmemory+3*memsize),
-        memsize,
+        reinterpret_cast<void*>(startmemory+mm1.data.capacity+mm2.data.capacity+mm3.data.capacity),
+        memsizes[3],
         MTX::twelve
     };  
     
@@ -180,14 +180,15 @@ namespace embot::hw::icc::ltr::bsp {
 
     // LTR
 
-    constexpr PROP ltr01 = { embot::hw::icc::MEM::four, embot::hw::icc::SIG::four, embot::hw::icc::SIG::three };
-       
+    constexpr PROP ltr01 = { embot::hw::icc::MEM::one, embot::hw::icc::SIG::one, embot::hw::icc::SIG::two };
+    constexpr PROP ltr02 = { embot::hw::icc::MEM::two, embot::hw::icc::SIG::three, embot::hw::icc::SIG::four };
+    
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LTR::one),        
+        mask::pos2mask<uint32_t>(LTR::one) | mask::pos2mask<uint32_t>(LTR::two),        
         // properties
         {{
-            &ltr01
+            &ltr01, &ltr02
         }}        
     };
     
@@ -202,62 +203,6 @@ namespace embot::hw::icc::ltr::bsp {
 } // namespace embot::hw::icc::ltr::bsp {
 
 #endif // #elif defined(EMBOT_ENABLE_hw_icc_ltr)    
-
-
-//namespace embot::hw::icc::sig::bsp {
-//        
-////    // -- SIG
-////    constexpr BSPsig thebsp_sig {};
-////    void BSPsig::init(embot::hw::icc::SIG h) const {}    
-////    const BSPsig & getBSPsig() { return thebsp_sig; }  
-//       
-////    // -- MEM
-////    constexpr BSPmem thebsp_mem {};    
-////    void BSPmem::init(embot::hw::icc::MEM h) const {}
-////    const BSPmem & getBSPmem() { return thebsp_mem; }  
-
-////    // LTR      
-////    constexpr BSPltr thebsp_ltr {};
-////    void BSPltr::init(embot::hw::icc::LTR h) const {}
-////    const BSPltr & getBSPltr() { return thebsp_ltr; }    
-
-//}
-
-//#elif defined(EMBOT_ENABLE_hw_icc)
-
-
-//    
-
-//    
-
-
-//    // LTR
-
-//    constexpr PROPltr ltr01 = { embot::hw::icc::MEM::four, embot::hw::icc::SIG::four, embot::hw::icc::SIG::three };
-//       
-//    constexpr BSPltr thebsp_ltr {        
-//        // maskofsupported
-//        mask::pos2mask<uint32_t>(LTR::one),        
-//        // properties
-//        {{
-//            &ltr01
-//        }}        
-//    };
-//    
-
-//    void BSPltr::init(embot::hw::icc::LTR h) const
-//    {
-//    }            
-
-//    const BSPltr & getBSPltr() 
-//    {
-//        return thebsp_ltr;
-//    }      
-
-//} // namespace embot::hw::icc::bsp {
-
-
-//#endif // #elif defined(EMBOT_ENABLE_hw_icc)
 
 
 //// - support map: end of embot::hw::icc
