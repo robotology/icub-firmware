@@ -161,7 +161,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>../src/main-bootloader.cpp</Filename>
+          <Filename>C:\icub-tech-iit\icub-firmware\emBODY\eBcode\arch-arm\board\amcbldc\test\src\main-bootloader.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -323,7 +323,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>6</nTsel>
+        <nTsel>1</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -334,7 +334,7 @@
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
         <tIfile></tIfile>
-        <pMon>STLink\ST-LINKIII-KEIL_SWO.dll</pMon>
+        <pMon>BIN\ULP2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
         <SetRegEntry>
@@ -368,7 +368,24 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>200</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134246942</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\src\embot_app_skeleton_os_test.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\amcbldc_bootloader\../src/embot_app_skeleton_os_test.cpp\200</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -457,8 +474,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>../src/main-bootloader.cpp</PathWithFileName>
-      <FilenameWithoutPath>main-bootloader.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\embot_app_skeleton_os_test.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_skeleton_os_test.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -469,8 +486,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_bootloader.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_code_bootloader.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\main-test.cpp</PathWithFileName>
+      <FilenameWithoutPath>main-test.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -562,7 +579,7 @@
 
   <Group>
     <GroupName>embot</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -774,7 +791,7 @@
 
   <Group>
     <GroupName>embot::hw</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -926,7 +943,7 @@
 
   <Group>
     <GroupName>embot-hw-lowlevel</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -946,7 +963,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -965,7 +982,7 @@
   </Group>
 
   <Group>
-    <GroupName>othermotorhal2</GroupName>
+    <GroupName>motorhal2</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1010,7 +1027,7 @@
       <GroupNumber>9</GroupNumber>
       <FileNumber>42</FileNumber>
       <FileType>8</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\motorhal2\motorhal_faults.c</PathWithFileName>

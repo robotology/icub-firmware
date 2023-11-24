@@ -385,14 +385,14 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>main-bootloader.cpp</FileName>
+              <FileName>embot_app_skeleton_os_test.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>../src/main-bootloader.cpp</FilePath>
+              <FilePath>..\src\embot_app_skeleton_os_test.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_code_bootloader.cpp</FileName>
+              <FileName>main-test.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_bootloader.cpp</FilePath>
+              <FilePath>..\src\main-test.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -682,7 +682,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>othermotorhal2</GroupName>
+          <GroupName>motorhal2</GroupName>
           <Files>
             <File>
               <FileName>analog.c</FileName>
@@ -828,7 +828,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>amcbldc_test</OutputName>
+          <OutputName>amcbldc_bootloader</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -861,7 +861,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\amcbldc_test.hex ..\bin\amcbldc.test.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\amcbldc_bootloader.hex ..\bin\amcbldc.bootloader.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -917,7 +917,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -1093,7 +1093,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>2</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1119,7 +1119,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V122</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\motorhal2</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\motorhal2</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1164,14 +1164,14 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>main-bootloader.cpp</FileName>
+              <FileName>embot_app_skeleton_os_test.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>../src/main-bootloader.cpp</FilePath>
+              <FilePath>..\src\embot_app_skeleton_os_test.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_code_bootloader.cpp</FileName>
+              <FileName>main-test.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_bootloader.cpp</FilePath>
+              <FilePath>..\src\main-test.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1461,7 +1461,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>othermotorhal2</GroupName>
+          <GroupName>motorhal2</GroupName>
           <Files>
             <File>
               <FileName>analog.c</FileName>
