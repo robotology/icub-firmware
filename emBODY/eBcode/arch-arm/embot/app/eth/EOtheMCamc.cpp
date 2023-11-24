@@ -34,6 +34,8 @@
 
 #include "embot_app_eth_theEncoderReader.h"
 
+#include "embot_app_eth_theICCmapping.h"
+
 #include "Controller.h"
 
 #include "EOtheEntities.h"
@@ -724,6 +726,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 {
                     // if this location is eobrd_place_eth then ... we should tell some new object embot::app::eth::theICCservices
                     // that this location is associated to the i-th eoprot_entity_mc_motor / joint entity
+                    embot::app::eth::theICCmapping::getInstance().load({{jomodes->actuator.gen.location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, i});
+                    embot::app::eth::theICCmapping::getInstance().load({{jomodes->actuator.gen.location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, i});
                     continue;
                 }
 
@@ -819,6 +823,8 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         
 #if defined(useMCfoc_actuator_descriptor_generic)            
         // we should make sure that embot::app::eth::theICCservices unloads its entities
+        #warning TODO: much better doing embot::app::eth::theICCmapping::getInstance().clear(motors && joints);
+        embot::app::eth::theICCmapping::getInstance().clear();
 #endif 
         
         eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
