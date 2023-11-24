@@ -187,27 +187,27 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnTimeout(embot::os::Thread *t, void
 
     #warning TEST_theICCservice  is defined ....
 
-    // print over debugger ... ?
-    // add a canprint to output queue _tCOMMoutframes
-    // send a ...
-    
-    static constexpr embot::core::Time period {5000*embot::core::time1millisec};    
-    static embot::core::Time lastcall {0};    
-    embot::core::Time now = embot::core::now();
-    embot::core::Time delta = now - lastcall;    
-    if(delta < period)
-    {
-        return;
-    }    
-    lastcall = now;
-    
-    // and now what i have to do
-    
-    Impl *impl = reinterpret_cast<Impl*>(param);    
+//    // print over debugger ... ?
+//    // add a canprint to output queue _tCOMMoutframes
+//    // send a ...
+//    
+//    static constexpr embot::core::Time period {5000*embot::core::time1millisec};    
+//    static embot::core::Time lastcall {0};    
+//    embot::core::Time now = embot::core::now();
+//    embot::core::Time delta = now - lastcall;    
+//    if(delta < period)
+//    {
+//        return;
+//    }    
+//    lastcall = now;
+//    
+//    // and now what i have to do
+//    
+//    Impl *impl = reinterpret_cast<Impl*>(param);    
 
-    embot::core::print("emitting a CAN PRINT w/ string = 5sEc");    
-    embot::app::theCANtracer::getInstance().print("5sEc", impl->_tCOMMoutframes);   
-    t->setEvent(evt_COMM_TXiccframes);    
+//    embot::core::print("emitting a CAN PRINT w/ string = 5sEc");    
+//    embot::app::theCANtracer::getInstance().print("5sEc", impl->_tCOMMoutframes);   
+//    t->setEvent(evt_COMM_TXiccframes);    
     
 #endif    
 }

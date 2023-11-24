@@ -29,6 +29,29 @@
 
 #include "embot_app_eth_theICCservice.h"
 
+void regularTX(std::vector<embot::prot::can::Frame> &output)
+{
+    // print over debugger ... ?
+    // add a canprint to output queue _tCOMMoutframes
+    // send a ...
+    
+    static constexpr embot::core::Time period {5000*embot::core::time1millisec};    
+    static embot::core::Time lastcall {0};    
+    embot::core::Time now = embot::core::now();
+    embot::core::Time delta = now - lastcall;    
+    if(delta < period)
+    {
+        return;
+    }    
+    lastcall = now;
+    
+    // and now what i have to do
+     
+
+    embot::core::print("emitting a CAN PRINT w/ string = 5sEc");    
+    embot::app::theCANtracer::getInstance().print("5sEc", output);         
+}
+
 #endif
 
 namespace embot::app::board::amc2c::mbd {
@@ -51,12 +74,10 @@ namespace embot::app::board::amc2c::mbd {
     }
     
     void OnTick(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output)
-    {
-        
+    {        
 #if defined(TEST_theICCservice)
         
-        #warning TEST_theICCservice  is defined ....
-        
+        #warning TEST_theICCservice  is defined ....        
         // i just print the messages
         
         if(false == input.empty())
@@ -74,6 +95,8 @@ namespace embot::app::board::amc2c::mbd {
             // ok, i will send back one frame then
             embot::app::theCANtracer::getInstance().print("acKed", output);            
         }
+        
+        regularTX(output);
         
 #elif defined(TEST_embot_hw_icc)
       
