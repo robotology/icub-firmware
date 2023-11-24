@@ -1101,20 +1101,41 @@ extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStrans
 
 extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator* p) {}
 
-#define TESTICC
-#if !defined(TESTICC)
+
+#if !defined(TEST_theICCservice)
 extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p) {}
 extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p) {}
 
 #else
+    
+    #warning TEST_theICCservice is defined .....................................................
+    
 void sendicc()
 {
+    static constexpr embot::core::Time period {4000*embot::core::time1millisec};    
+    static embot::core::Time lastcall {0};    
+    embot::core::Time now = embot::core::now();
+    embot::core::Time delta = now - lastcall;    
+    if(delta < period)
+    {
+        return;
+    }    
+    lastcall = now;
+    
+    // ok, and now the rest
+    
     static uint8_t n {0};
     n++;
     #warning DEBUG... remove it later on
-    embot::prot::can::Frame frame1 {0x111, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
+    uint32_t ID = 0x101; // i want the sender to have 0 address .........
+    embot::prot::can::Frame frame1 {ID, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
     embot::app::eth::mc::messaging::Location loc1 {embot::app::eth::mc::messaging::Location::BUS::icc1, 3};
+    embot::prot::can::Frame frame2 {ID, 8, {n, 2, 2, 2, 2, 2, 2, 2}};    
     embot::app::eth::theICCservice::getInstance().put({loc1, frame1});
+    embot::app::eth::theICCservice::getInstance().put({loc1, frame2});
+    
+    embot::core::print(embot::core::TimeFormatter(now).to_string() + ": thread tCFG will transmit some messages via ICC to the amc2c application");
+
     embot::app::eth::theICCservice::getInstance().flush();    
 }
 extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p) 

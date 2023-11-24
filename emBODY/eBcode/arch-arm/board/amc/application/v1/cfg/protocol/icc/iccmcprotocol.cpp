@@ -27,6 +27,8 @@
 #include "EoProtocol.h"
 #include "embot_app_eth_theICCmapping.h"
 //#include "EOtheCANprotocol.h"
+#include "embot_app_eth_theErrorManager.h"
+#include "embot_os_theScheduler.h"
 
 namespace embot::app::eth::mc::messaging::receiver {
     
@@ -70,7 +72,10 @@ namespace embot::app::eth::mc::messaging::receiver {
         { 
             // the message may have history ...
             // we however just print the substring
-            embot::core::print("CAN print: " + std::string(msg.info.substring));
+            embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"ICC agent received CAN print:", thr}, {}, std::string(msg.info.substring));        
+ 
+            //embot::core::print("received CAN print: " + std::string(msg.info.substring));
             return false; 
         }
     };

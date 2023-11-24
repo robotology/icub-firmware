@@ -164,68 +164,52 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_Startup(embot::os::Thread *t, void *
 {
     Impl *impl = reinterpret_cast<Impl*>(param);
     
-//    // init the can ...
-//    embot::hw::can::Config canconfig {};
-//    canconfig.rxcapacity = impl->_config.tCOMMmaxINPcanframes;
-//    canconfig.txcapacity = impl->_config.tCOMMmaxOUTcanframes;
-//    canconfig.onrxframe = embot::core::Callback(impl->alertonrxframe, t); 
-//    embot::hw::can::init(impl->_tCOMMcanbus, canconfig);
-//#if defined(STM32HAL_BOARD_AMC2C)
-//    #warning marco.accame: attenzione la amc2c non apprezza il can::setfilters
-//#else        
-//    embot::hw::can::setfilters(impl->_tCOMMcanbus, impl->_tCOMMcanaddress); 
-//#endif        
-//    // pre-allocate output vector of frames
-//    impl->_tCOMMoutframes.reserve(impl->_config.tCOMMmaxOUTcanframes);
-// 
-//    // and ok, enable it
-//    embot::hw::can::enable(impl->_tCOMMcanbus);
-    
+    // init ICC. at first w/ the default slave configuration. then w/ focused tuning       
+    embot::app::eth::theICCservice::getInstance().initialise(embot::app::eth::iccslavecfg);  
+    // alert this thread on RX of messages    
     embot::core::Callback oniccRX {impl->alertonrxframe, t};
-    embot::app::eth::theICCservice::Config cfgicc
-    {
-        embot::hw::icc::LTR::two, embot::hw::icc::LTR::one,
-        32, 32,
-        embot::app::eth::theICCservice::modeTX::onflush,
-        embot::os::Priority::system54, embot::os::Priority::system53,
-        oniccRX,
-        nullptr, // icubcanparser
-    };
-            
-    embot::app::eth::theICCservice::getInstance().initialise(cfgicc);   
+    embot::app::eth::theICCservice::getInstance().set(oniccRX);
+    // tx only on explicit command
+    embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::onflush);
+    // use the dummy parser because we get messages one by one
+    embot::app::eth::theICCservice::getInstance().set(nullptr);
     
     // pre-allocate output vector of frames
     impl->_tCOMMoutframes.reserve(impl->_config.tCOMMmaxOUTcanframes);    
               
 }
 
+
 void embot::app::bldc::theCOMM::Impl::tCOMM_OnTimeout(embot::os::Thread *t, void *param)
 {
+
+#if defined(TEST_theICCservice )
+
+    #warning TEST_theICCservice  is defined ....
 
     // print over debugger ... ?
     // add a canprint to output queue _tCOMMoutframes
     // send a ...
     
-    static constexpr embot::core::Time period {500*embot::core::time1millisec};
-    
-    static embot::core::Time lastcall {0};
-    
+    static constexpr embot::core::Time period {5000*embot::core::time1millisec};    
+    static embot::core::Time lastcall {0};    
     embot::core::Time now = embot::core::now();
-    embot::core::Time delta = now - lastcall;
-    
+    embot::core::Time delta = now - lastcall;    
     if(delta < period)
     {
         return;
-    }
-    
+    }    
     lastcall = now;
     
+    // and now what i have to do
     
-    Impl *impl = reinterpret_cast<Impl*>(param);
-        
-    embot::app::theCANtracer::getInstance().print("hi", impl->_tCOMMoutframes);
-    
+    Impl *impl = reinterpret_cast<Impl*>(param);    
+
+    embot::core::print("emitting a CAN PRINT w/ string = 5sEc");    
+    embot::app::theCANtracer::getInstance().print("5sEc", impl->_tCOMMoutframes);   
     t->setEvent(evt_COMM_TXiccframes);    
+    
+#endif    
 }
 
 #define PARSE_RX_ALLINONESHOT
@@ -318,7 +302,7 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnRXframe(embot::os::Thread *t, embo
 {
     constexpr uint8_t CANaddressMASTER {0};
     
-    embot::core::print("received: " + frame.to_string());   
+//    embot::core::print("received: " + frame.to_string());   
     
             
     if(true == embot::app::application::theCANparserCORE::getInstance().process(frame, outframes))

@@ -12,13 +12,12 @@
 
 #include "embot_app_board_amc2c_mbd.h"
 #include "embot_app_board_amc2c_theMBD.h"
-
+#include "embot_app_application_theCANtracer.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#define TEST_theICCservice
 
 #if defined(TEST_embot_hw_icc)
 #include "embot_hw_icc_sig.h"
@@ -26,11 +25,18 @@
 #include "embot_hw_icc_ltr.h"
 #endif
 
+#if defined(TEST_theICCservice)
+
+#include "embot_app_eth_theICCservice.h"
+
+#endif
+
 namespace embot::app::board::amc2c::mbd {
     
     void Startup(embot::prot::can::Address adr)
     {
 #if defined(TEST_theICCservice)
+        
         
 #elif defined(TEST_embot_hw_icc)
       
@@ -48,6 +54,26 @@ namespace embot::app::board::amc2c::mbd {
     {
         
 #if defined(TEST_theICCservice)
+        
+        #warning TEST_theICCservice  is defined ....
+        
+        // i just print the messages
+        
+        if(false == input.empty())
+        {
+            embot::core::Time n {embot::core::now()};
+            
+            embot::core::print(embot::core::TimeFormatter(n).to_string() + ": received " +
+            std::to_string(input.size()) + " ICC frames -> ");
+            for(auto const &frame : input)
+            {
+                embot::core::print(frame.to_string());
+            }
+            embot::core::print("sending back a CAN PRINT w/ string = acKed");
+
+            // ok, i will send back one frame then
+            embot::app::theCANtracer::getInstance().print("acKed", output);            
+        }
         
 #elif defined(TEST_embot_hw_icc)
       
