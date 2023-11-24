@@ -62,7 +62,7 @@ namespace embot::hw::icc::ltr {
     { return 0; }
     size_t post(embot::hw::icc::LTR l, const embot::core::Data &data, const embot::core::Callback &onack)
     { return 0; } 
-    bool acked(embot::hw::icc::LTR l, , bool autoclear)
+    bool acked(embot::hw::icc::LTR l, bool autoclear)
     { return false; }
     
 
