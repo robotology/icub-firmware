@@ -50,6 +50,11 @@ namespace embot::app::eth::mc::messaging {
         constexpr bool isvalid() const { return BUS::none != bus; }  
         constexpr bool isCAN() const { return (BUS::can1 == bus) || (BUS::can2 == bus); }       
         constexpr bool isICC() const { return (BUS::icc1 == bus) || (BUS::icc2 == bus); }
+        
+        bool operator==(const Location& rhs) const
+        {
+            return (rhs.bus == bus) && (rhs.address == address);
+        }
 
     private:        
         void load(const eObrd_location_t &l);      
@@ -248,31 +253,48 @@ namespace embot::app::eth::mc::messaging::sender {
 namespace embot::app::eth::mc::messaging::info {
     
     struct FOCstatus1
-    {   
+    {   // ICUBCANPROTO_PER_MC_MSG__2FOC   
         int16_t current {0};
         int16_t velocity {0};
         int32_t position {0};
         
+        uint8_t payload[8] = {0};
+        
         FOCstatus1() = default;         
-        FOCstatus1(int16_t c, int16_t v, int32_t p) : current(c), velocity(v), position(p) {}
+        //FOCstatus1(int16_t c, int16_t v, int32_t p) : current(c), velocity(v), position(p) {}
     };
     
     
     struct FOCstatus2
-    {   // the State2FocMsg in Motor_hid.h   
+    {   // ICUBCANPROTO_PER_MC_MSG__STATUS 
+        // we use the struct State2FocMsg that is in Motor_hid.h   
         uint8_t controlmode {0};
         uint8_t qencflags {0};          // the QEState in Motor_hid.h
         int16_t pwmfeedback {0};
         uint32_t motorfaultflags {0};   // the MotorFaultState 
         
+        uint8_t payload[8] = {0};
+        
         FOCstatus2() = default;         
     };    
+    
+    struct Print
+    {   // ICUBCANPROTO_PER_MC_MSG__PRINT (=6)
+        uint8_t s {0};          // signature of the string
+        uint8_t n {0};          // sequence number [0, 5] 
+        char substring[7] {0};  // can be of lenght [1, 6]
+        uint8_t nchars {0};    
+        bool endofburst {true};
+        uint8_t payload[8] = {0};
+        
+        Print() = default;         
+    };        
                              
 } // namespace embot::app::eth::mc::messaging::info {
 
 namespace embot::app::eth::mc::messaging::receiver {
     
-    // in here we have objects which receive info and send it to a destination
+    // in here we have objects which receive a frame and build up the source and info
     
     struct sigFOCstatus1
     {   // ICUBCANPROTO_PER_MC_MSG__2FOC 
@@ -280,8 +302,9 @@ namespace embot::app::eth::mc::messaging::receiver {
         info::FOCstatus1 info {};
             
         sigFOCstatus1() = default;
-            
-            void load(const Location::BUS bus, const embot::prot::can::Frame &frame, bool andprocess = true);
+        sigFOCstatus1(const Location::BUS bus, const embot::prot::can::Frame &frame);   
+                    
+        void load(const Location::BUS bus, const embot::prot::can::Frame &frame);
     }; 
 
     struct sigFOCstatus2
@@ -290,9 +313,59 @@ namespace embot::app::eth::mc::messaging::receiver {
         info::FOCstatus2 info {};
             
         sigFOCstatus2() = default;
+        sigFOCstatus2(const Location::BUS bus, const embot::prot::can::Frame &frame); 
             
-        void load(const Location::BUS bus, const embot::prot::can::Frame &frame, bool andprocess = true);
+        void load(const Location::BUS bus, const embot::prot::can::Frame &frame);
     };
+
+    struct sigPrint
+    {   // ICUBCANPROTO_PER_MC_MSG__STATUS 
+        Location source {};           
+        info::Print info {};
+            
+        sigPrint() = default;
+        sigPrint(const Location::BUS bus, const embot::prot::can::Frame &frame); 
+            
+        void load(const Location::BUS bus, const embot::prot::can::Frame &frame);
+    };
+    
+    // and we also have an agent that operates on the received info
+    
+    class Agent
+    {
+    public:
+               
+        // interface: returns true is we need to tx a reply else false
+        virtual bool get(const sigFOCstatus1 &msg) = 0;
+        virtual bool get(const sigFOCstatus2 &msg) = 0;
+        virtual bool get(const sigPrint &msg) = 0;
+        
+    public:
+        virtual ~Agent() {}         
+    };
+    
+    class dummyAgent : public Agent 
+    {
+    public:
+        
+        dummyAgent() {}
+        virtual ~dummyAgent() {}
+            
+        bool get(const sigFOCstatus1 &msg) override { return false; } 
+        bool get(const sigFOCstatus2 &msg) override { return false; } 
+        bool get(const sigPrint &msg) override { return false; }         
+    };   
+
+
+    // and now we ... get an agent ... this funtion must be defined by the application
+    
+    Agent * agent();
+    // and we load it    
+    void load(Agent *a);
+   
+    
+    // which is used by this one
+    bool parse(const Location::BUS bus, const embot::prot::can::Frame &frame);
     
 } // namespace embot::app::eth::mc::messaging::receiver {
 

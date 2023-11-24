@@ -380,6 +380,7 @@ namespace embot::app::eth::mc::messaging::sender {
 
  
 #include "EOtheCANservice.h"
+#include "embot_app_eth_theICCservice.h"
 
 namespace embot::app::eth::mc::messaging::sender {
     
@@ -391,65 +392,149 @@ namespace embot::app::eth::mc::messaging::sender {
     bool Command::tx2icc(const Location &des, const embot::prot::can::Frame &frame)
     {
         //#warning TODO: fill embot::app::eth::mc::messaging::sender::Command::tx2icc() which adds a frame in the ICC queue
-        embot::core::print(frame.to_string());
+        // embot::core::print(frame.to_string());
+        embot::app::eth::theICCservice::getInstance().put({des, frame});
         return true;
     } 
         
 } // namespace embot::app::eth::mc::messaging::sender {
 
 
-#include "Controller.h"
 
 namespace embot::app::eth::mc::messaging::receiver {
     
-    // in here we have objects which receive an info and send it to a destination
+    // in here we have objects which receive a frame and build up the source and info
     
-    void sigFOCstatus1::load(const Location::BUS bus, const embot::prot::can::Frame &frame,  bool andprocess)
+    sigFOCstatus1::sigFOCstatus1(const Location::BUS bus, const embot::prot::can::Frame &frame)
+    {
+        load(bus, frame);
+    }
+    
+    void sigFOCstatus1::load(const Location::BUS bus, const embot::prot::can::Frame &frame)
     {
         source.bus = bus;
         source.address = (frame.id & 0x0f0) >> 4;
+        
+        std::memmove(info.payload, frame.data, sizeof(info.payload));
+        
         info.current = ((int16_t*)frame.data)[0];
         info.velocity = ((int16_t*)frame.data)[1];
         info.position = ((int32_t*)frame.data)[1];
         
-        if(false == andprocess)
-        {
-            return;
-        }
-        
-        // cannot use eocanprotMCperiodic_parser_PER_MC_MSG__2FOC() because ... inside we have s_eocanprotMCperiodic_get_entity() that uses the can mapping
-        // so, we need an object that tells us the motorindex given the source. We should fill the map {Location, index} somewhere in EOtheMotionController.c
-        // for now we dont need it, so ... we dont do any new code
-  
-        eOprotIndex_t motorindex = 0; // for example ...
-        eOmc_motor_t *motor = reinterpret_cast<eOmc_motor_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motorindex));
-        motor->status.basic.mot_current = info.current;
-        motor->status.basic.mot_velocity = info.velocity;
-        motor->status.basic.mot_position = info.position;
-        MController_update_motor_odometry_fbk_can(motorindex, (void*)frame.data);
     }
     
-    void sigFOCstatus2::load(const Location::BUS bus, const embot::prot::can::Frame &frame,  bool andprocess)
+    sigFOCstatus2::sigFOCstatus2(const Location::BUS bus, const embot::prot::can::Frame &frame)
+    {
+        load(bus, frame);
+    }
+    
+    void sigFOCstatus2::load(const Location::BUS bus, const embot::prot::can::Frame &frame)
     {
         source.bus = bus;
         source.address = (frame.id & 0x0f0) >> 4;
+        
+        std::memmove(info.payload, frame.data, sizeof(info.payload));
+        
         info.controlmode = frame.data[0];
         info.qencflags = frame.data[1];
         info.pwmfeedback = ((int16_t*)frame.data)[2];
         info.motorfaultflags = ((uint32_t*)frame.data)[4];
+    } 
+
+    
+    sigPrint::sigPrint(const Location::BUS bus, const embot::prot::can::Frame &frame)
+    {
+        load(bus, frame);
+    }
+    
+    void sigPrint::load(const Location::BUS bus, const embot::prot::can::Frame &frame)
+    {
+        source.bus = bus;
+        source.address = (frame.id & 0x0f0) >> 4;
         
-        if(false == andprocess)
+        std::memmove(info.payload, frame.data, sizeof(info.payload));
+        
+        info.endofburst = (frame.data[0] == 0x86);
+        
+        info.s = frame.data[1] >> 4;
+        info.n = frame.data[1] & 0x0f;
+        info.nchars = frame.size - 2;
+        for(uint8_t i=0; i<info.nchars; i++)
         {
-            return;
+            info.substring[i] = frame.data[2+i];
         }
+        info.substring[info.nchars] = 0;
+    } 
+    
+    dummyAgent dummyagent {};
+    Agent *theagent {&dummyagent};
+    
+    void load(Agent *a)
+    {
+        theagent = (nullptr == a) ? (&dummyagent) : (a);
+    }
+    
+    bool parse(const Location::BUS bus, const embot::prot::can::Frame &frame)
+    {
+        bool r {false};
+
+        embot::prot::can::Clas cls {embot::prot::can::frame2clas(frame)};
+        std::uint8_t cmd {embot::prot::can::frame2cmd(frame)};
         
-        // cannot use eocanprotMCperiodic_parser_PER_MC_MSG__STATUS() because ... inside we have s_eocanprotMCperiodic_get_entity() that uses the can mapping
-        // so, we need an object that tells us the motorindex given the source. We should fill the map {Location, index} somewhere in EOtheMotionController.c
-        // for now we dont need it, so ... we dont do any new code
+        switch(cls)
+        {
+            case embot::prot::can::Clas::pollingMotorControl:
+            {
+                // maybe inside embot::prot::can::motor::polling ->
+                // 0x07 GET_CONTROL_MODE, 91 GET_FIRMWARE_VERSION
+                
+                r = false;
+            } break;
+
+            case embot::prot::can::Clas::periodicMotorControl:
+            {
+                // inside embot::prot::can::motor::polling ->
+                // FOC = 0, STATUS = 3, PRINT = 6, 
+                //  not this one  EMSTO2FOC_DESIRED_CURRENT = 15  
+                if(embot::core::tointegral(embot::prot::can::motor::periodic::CMD::FOC) == cmd)
+                {
+                    embot::app::eth::mc::messaging::receiver::sigFOCstatus1 s {bus, frame};
+                    // and now i call the agent that processes what i need                         
+                    theagent->get(s); 
+                    r = true;                    
+                }                
+                else if(embot::core::tointegral(embot::prot::can::motor::periodic::CMD::STATUS) == cmd)
+                {
+                    embot::app::eth::mc::messaging::receiver::sigFOCstatus2 s {bus, frame};
+                    // and now i call the agent that processes what i need 
+                    theagent->get(s); 
+                    r = true;  
+                } 
+                else if(embot::core::tointegral(embot::prot::can::motor::periodic::CMD::PRINT) == cmd)
+                {
+                    embot::app::eth::mc::messaging::receiver::sigPrint s {bus, frame};
+                    // and now i call the agent that processes what i need 
+                    theagent->get(s); 
+                    r = true;  
+                }             
+            } break;
+            
+            case embot::prot::can::Clas::bootloader:
+            case embot::prot::can::Clas::pollingAnalogSensor:
+            case embot::prot::can::Clas::periodicAnalogSensor:
+            case embot::prot::can::Clas::periodicInertialSensor:
+            case embot::prot::can::Clas::periodicBattery:            
+            default:
+            {
+                // add diagnostic message / trace ...
+                r = false;
+            } break;
+        }        
         
-        eOprotIndex_t motorindex = 0; // for example ...
-        MController_update_motor_state_fbk(motorindex, (void*)frame.data);
-    }    
+        
+        return r;        
+        
+    }
 
 } // namespace embot::app::eth::mc::messaging::receiver {
 
