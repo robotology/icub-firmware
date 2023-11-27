@@ -238,13 +238,43 @@ static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32)
     return(eobool_false); 
 }
 
+bool checklocalactuators()
+{
+    EOtheMotionController* p = &s_eo_themotcon;
+    
+    return true;
+}
 static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eObool_t operationisok)
 {    
     EOtheMotionController* p = &s_eo_themotcon;
     
     if(eobool_true == operationisok)
     {
-        eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop);        
+        // do we have can boards to discover?
+        #warning SEE IF WE HAVE
+        constexpr bool checklocally {false};
+        EOarray * a = reinterpret_cast<EOarray*>(p->sharedcan.discoverytargets);
+        if(0 != eo_array_Size(a))
+        {
+            eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop);  
+        } 
+        else 
+        {   // we must have only local actuators
+            bool searchisok = checklocalactuators();
+            p->service.state = (searchisok) ? (eomn_serv_state_verified) : (eomn_serv_state_failureofverify);
+            s_mc_synchservice(p->service.state);    
+
+            if((true == searchisok) && (eobool_true == p->service.activateafterverify))
+            {
+                const eOmn_serv_configuration_t * mcserv = &p->service.servconfig; // or also: (const eOmn_serv_configuration_t *)par;
+                eo_motioncontrol_Activate(p, mcserv);
+            }                
+
+            if(NULL != p->service.onverify)
+            {
+                p->service.onverify(p->service.onverifyarg, searchisok ? eobool_true : eobool_false); 
+            }              
+        }
     }    
     else
     {
@@ -551,6 +581,7 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
         }        
         return(eores_NOK_nullpointer);
     }
+      
     
     if(eo_motcon_mode_foc != servcfg->type)  
     {
@@ -563,6 +594,21 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
         }         
         return(eores_NOK_generic);
     }
+    
+    
+    #warning: just for debug of icc i modify the p->service.servconfig ...
+    {
+//        uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
+        EOarray * a = reinterpret_cast<EOarray*>(&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
+        uint8_t n = eo_array_Size(a);
+        for(uint8_t i=0; i<n; i++)
+        {
+            eOmc_jomo_descriptor_t *d = (eOmc_jomo_descriptor_t*) eo_array_At(a, i);
+            uint8_t adr = d->actuator.foc.canloc.addr;
+            d->actuator.gen.location.eth.place = eobrd_place_eth;
+            d->actuator.gen.location.eth.id = adr;
+        }
+    }      
 
     if(eobool_true == p->service.active)
     {
@@ -653,7 +699,21 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
     } 
 
     // we use memmove() because it may be that source and destination are in the same location.
-    memmove(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));    
+    memmove(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));  
+    #warning: just for debug of icc i modify the p->service.servconfig ...
+    {
+//        uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
+        EOarray * a = reinterpret_cast<EOarray*>(&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
+        uint8_t n = eo_array_Size(a);
+        for(uint8_t i=0; i<n; i++)
+        {
+            eOmc_jomo_descriptor_t *d = (eOmc_jomo_descriptor_t*) eo_array_At(a, i);
+            uint8_t adr = d->actuator.foc.canloc.addr;
+            d->actuator.gen.location.eth.place = eobrd_place_eth;
+            d->actuator.gen.location.eth.id = adr;
+        }
+    }
+            
 
     if(eo_motcon_mode_foc == p->service.servconfig.type)
     {

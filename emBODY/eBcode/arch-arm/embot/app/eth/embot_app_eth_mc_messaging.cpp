@@ -380,7 +380,9 @@ namespace embot::app::eth::mc::messaging::sender {
 
  
 #include "EOtheCANservice.h"
+#if defined(STM32HAL_BOARD_AMC) 
 #include "embot_app_eth_theICCservice.h"
+#endif
 
 namespace embot::app::eth::mc::messaging::sender {
     
@@ -393,7 +395,10 @@ namespace embot::app::eth::mc::messaging::sender {
     {
         //#warning TODO: fill embot::app::eth::mc::messaging::sender::Command::tx2icc() which adds a frame in the ICC queue
         // embot::core::print(frame.to_string());
+        #warning TODO: solve the use of theICCservice by ems etc
+#if defined(STM32HAL_BOARD_AMC)        
         embot::app::eth::theICCservice::getInstance().put({des, frame});
+#endif        
         return true;
     } 
         

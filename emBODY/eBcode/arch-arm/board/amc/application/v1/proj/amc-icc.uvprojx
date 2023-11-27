@@ -338,7 +338,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-DuseMCfoc_actuator_descriptor_generic -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2 -DUSE_EMBOT_theHandler -DUSE_EMBOT_theServices -DEOTHESERVICES_disable_theMotionController -DUSE_EOtheMCamc -DUSE_EMBOT_theServicesMC</MiscControls>
-              <Define>TEST_theICCservice USE_EMBOT_HW EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0 WRIST_MK2</Define>
+              <Define>xTEST_theICCservice USE_EMBOT_HW EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0 WRIST_MK2</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;--..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\cfg;..\..\..\bsp\ethdriver;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\app\eth;.;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\cfg\protocol;..\..\..\..\..\embobj\plus\can;..\..\..\..\ems004\appl\v2\src\eoappservices;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\mbd\kalman_filter;..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embot\prot\can</IncludePath>
             </VariousControls>
@@ -1949,6 +1949,95 @@
               <FileName>iccmcprotocol.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\cfg\protocol\icc\iccmcprotocol.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::app::tester</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>0</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>0</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>0</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <uGnu>2</uGnu>
+                <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>2</vShortEn>
+                <vShortWch>2</vShortWch>
+                <v6Lto>2</v6Lto>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <ClangAsOpt>0</ClangAsOpt>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
+          <Files>
+            <File>
+              <FileName>servicetester.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\servicetester.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theServiceTester.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_theServiceTester.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theMCserviceEOtesterconfig.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_theMCserviceEOtesterconfig.cpp</FilePath>
             </File>
           </Files>
         </Group>
