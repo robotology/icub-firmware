@@ -251,12 +251,6 @@ extern EOtheCANmapping * eo_canmap_Initialise(const eOcanmap_cfg_t *canmapcfg)
     {
         s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_temperature_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
     }
-        
-    m = eocanmap_posOfEPEN(eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
-    for(uint8_t n=0; n<eocanmap_inertials_maxnumberof; n++)
-    {
-        s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_inertial_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
-    }
 
     m = eocanmap_posOfEPEN(eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3);
     for(uint8_t n=0; n<eocanmap_inertials3_maxnumberof; n++)
@@ -767,7 +761,7 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-EO_VERIFYproposition(eocanmap_posOfEPEN__pos, (eoprot_entities_numberof == 17))
+EO_VERIFYproposition(eocanmap_posOfEPEN__pos, (eoprot_entities_numberof == 16))
 // if error: change the magic number and put the new entity in the pos[][] map
 
 extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en)

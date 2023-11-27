@@ -27,7 +27,6 @@
 
 
 #include "EOtheCANservice.h"
-//#include "EOtheInertials2.h"
 //#include "EOtheInertials3.h"
 //#include "EOtheTemperatures.h"
 #include "EOtheCANdiscovery2.h"

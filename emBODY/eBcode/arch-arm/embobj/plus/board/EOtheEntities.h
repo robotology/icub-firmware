@@ -92,12 +92,6 @@ extern eOas_temperature_t * eo_entities_GetTemperature(EOtheEntities *p, eOprotI
 extern eOas_temperature_config_t * eo_entities_GetTemperatureConfig(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_temperature_status_t * eo_entities_GetTemperatureStatus(EOtheEntities *p, eOprotIndex_t id);
 
-extern eOresult_t eo_entities_SetNumOfInertials(EOtheEntities *p, uint8_t num);
-extern uint8_t eo_entities_NumOfInertials(EOtheEntities *p);
-extern eOas_inertial_t * eo_entities_GetInertial(EOtheEntities *p, eOprotIndex_t id);
-extern eOas_inertial_config_t * eo_entities_GetInertialConfig(EOtheEntities *p, eOprotIndex_t id);
-extern eOas_inertial_status_t * eo_entities_GetInertialStatus(EOtheEntities *p, eOprotIndex_t id);
-
 extern eOresult_t eo_entities_SetNumOfInertials3(EOtheEntities *p, uint8_t num);
 extern uint8_t eo_entities_NumOfInertials3(EOtheEntities *p);
 extern eOas_inertial3_t * eo_entities_GetInertial3(EOtheEntities *p, eOprotIndex_t id);

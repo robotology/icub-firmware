@@ -44,7 +44,6 @@ enum
     eoprotwrap_max_strains      = 1,
     eoprotwrap_max_maises       = 1,
     eoprotwrap_max_temperatures = 1,
-    eoprotwrap_max_inertials    = 1,
     eoprotwrap_max_inertials3   = 1,
     eoprotwrap_max_pscs         = 1,
     eoprotwrap_max_poss         = 1
@@ -59,7 +58,6 @@ struct EOtheEntities_hid
     eOas_strain_t*  strains[eoprotwrap_max_strains];
     eOas_mais_t*    maises[eoprotwrap_max_maises];
     eOas_temperature_t* temperatures[eoprotwrap_max_temperatures];
-    eOas_inertial_t* inertials[eoprotwrap_max_inertials];
     eOas_inertial3_t* inertials3[eoprotwrap_max_inertials3];
     eOas_psc_t*     pscs[eoprotwrap_max_pscs];
     eOas_pos_t*     poss[eoprotwrap_max_poss];

@@ -79,7 +79,6 @@ static EOtheEntities s_eo_theentities =
     EO_INIT(.strains        ) {NULL},
     EO_INIT(.maises         ) {NULL},
     EO_INIT(.temperatures   ) {NULL},
-    EO_INIT(.inertials      ) {NULL},
     EO_INIT(.inertials3     ) {NULL},
     EO_INIT(.pscs           ) {NULL},
     EO_INIT(.poss           ) {NULL},
@@ -135,7 +134,6 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     memset(s_eo_theentities.strains, 0, sizeof(s_eo_theentities.strains));
     memset(s_eo_theentities.maises, 0, sizeof(s_eo_theentities.maises));
     memset(s_eo_theentities.temperatures, 0, sizeof(s_eo_theentities.temperatures));
-    memset(s_eo_theentities.inertials, 0, sizeof(s_eo_theentities.inertials));
     memset(s_eo_theentities.inertials3, 0, sizeof(s_eo_theentities.inertials3));
     memset(s_eo_theentities.pscs, 0, sizeof(s_eo_theentities.pscs));
     
@@ -191,16 +189,6 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     for(i=0; i<max; i++)
     {
         s_eo_theentities.temperatures[i] = (eOas_temperature_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_temperature, (eOprotIndex_t)i);
-    } 
-    
-    
-    // inertials
-    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
-    s_eo_theentities.numofinertials = 0;
-    if(max>eoprotwrap_max_inertials) max = eoprotwrap_max_inertials;
-    for(i=0; i<max; i++)
-    {
-        s_eo_theentities.inertials[i] = (eOas_inertial_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, (eOprotIndex_t)i);
     } 
 
     // inertials3
@@ -441,62 +429,6 @@ extern eOas_temperature_status_t * eo_entities_GetTemperatureStatus(EOtheEntitie
 
     return(ret);
 }
-
-
-extern eOresult_t eo_entities_SetNumOfInertials(EOtheEntities *p, uint8_t num)
-{
-    if(num > eoprotwrap_max_inertials)
-    {
-        return(eores_NOK_generic);
-    }
-    
-    s_eo_theentities.numofinertials = num;
-    
-    return(eores_OK);   
-}
-
-extern uint8_t eo_entities_NumOfInertials(EOtheEntities *p)
-{
-    return(s_eo_theentities.numofinertials);    
-}
-
-extern eOas_inertial_t * eo_entities_GetInertial(EOtheEntities *p, eOprotIndex_t id)
-{
-    if(id >= s_eo_theentities.numofinertials)
-    {
-        return(NULL);
-    }
-
-    return(s_eo_theentities.inertials[id]);
-}
-
-extern eOas_inertial_config_t * eo_entities_GetInertialConfig(EOtheEntities *p, eOprotIndex_t id)
-{
-    eOas_inertial_config_t *ret = NULL;    
-    eOas_inertial_t *in = eo_entities_GetInertial(p, id);
-    
-    if(NULL != in)
-    {
-        ret = &(in->config);
-    }
-
-    return(ret);
-}
-
-
-extern eOas_inertial_status_t * eo_entities_GetInertialStatus(EOtheEntities *p, eOprotIndex_t id)
-{
-    eOas_inertial_status_t *ret = NULL;    
-    eOas_inertial_t *in = eo_entities_GetInertial(p, id);
-    
-    if(NULL != in)
-    {
-        ret = &(in->status);
-    }
-
-    return(ret);
-}
-
 
 extern eOresult_t eo_entities_SetNumOfInertials3(EOtheEntities *p, uint8_t num)
 {

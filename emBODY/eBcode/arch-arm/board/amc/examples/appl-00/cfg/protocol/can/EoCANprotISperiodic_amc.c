@@ -24,7 +24,6 @@
 
 #include "EOtheCANmapping.h"
 
-//#include "EOtheInertials2.h"
 //#include "EOtheInertials3.h"
 
 // --------------------------------------------------------------------------------------------------------------------

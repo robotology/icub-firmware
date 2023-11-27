@@ -27,7 +27,6 @@
 
 
 #include "EOtheCANservice.h"
-#include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
 #include "EOtheCANdiscovery2.h"
@@ -183,8 +182,6 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 #warning ---------------> just for test
     prevTXhadRegulars = eobool_true;
 #endif
-    
-    eo_inertials2_Tick(eo_inertials2_GetHandle(), prevTXhadRegulars); 
     
     eo_inertials3_Tick(eo_inertials3_GetHandle(), prevTXhadRegulars); 
     

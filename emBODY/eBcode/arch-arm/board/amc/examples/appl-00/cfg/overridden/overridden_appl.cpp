@@ -44,7 +44,6 @@
 //#include "EOtheSTRAIN.h"
 //#include "EOtheMAIS.h"
 //#include "EOtheSKIN.h"
-//#include "EOtheInertials2.h"
 //#include "EOtheInertials3.h"
 //#include "EOtheTemperatures.h"
 //#include "EOthePSC.h"
