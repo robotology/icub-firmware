@@ -460,6 +460,8 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
     
     eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
     // motor related infos --> temperature
+    // if board is of type foc we are interested on the temperature only
+    // and we have no reason to check the interaction mode
     if(eobrd_cantype_foc == boardtype)
     {
         eOmeas_temperature_t motor_temperature = 0;
@@ -481,7 +483,8 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
     else
     {
         // this frame is from mc4 only, thus ...
-        //i retrieve the two joints related to the can frame. such a frame manages two joints per can address
+        // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
+        // and i have no reason to be interested on the temperature
         const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second}; 
         uint8_t j=0;
         eOprotIndex_t jointindex = 0;
