@@ -137,7 +137,7 @@ static void s_eo_mems_taskworker_startup(EOMtask *rt, uint32_t n);
 static void s_eo_mems_taskworker_run(EOMtask *rt, uint32_t n);
 
 static eObool_t s_eo_mems_init_gyro(void); 
-static eObool_t s_eo_mems_read_gyro(eOas_inertial_data_t *data);
+static eObool_t s_eo_mems_read_gyro(eOas_inertial3_data_t *data);
 static eObool_t s_eo_mems_deinit_gyro(void);
 
 
@@ -213,7 +213,7 @@ extern EOtheMEMS* eo_mems_Initialise(const eOmems_cfg_t *cfg)
         
     p->semaphorefifo = osal_semaphore_new(1, 1);
 
-    p->fifoofinertialdata = eo_vector_New(sizeof(eOas_inertial_data_t), 8, NULL, 0, NULL, NULL);
+    p->fifoofinertialdata = eo_vector_New(sizeof(eOas_inertial3_data_t), 8, NULL, 0, NULL, NULL);
     
     p->initted = eobool_true;
     
@@ -267,7 +267,7 @@ extern eOresult_t eo_mems_Config(EOtheMEMS *p, eOmems_sensor_cfg_t *cfg)
 }
 
 
-extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltime_t timeout, eOmems_sensor_t *sensor, uint16_t* remaining)
+extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial3_data_t* data, eOreltime_t timeout, eOmems_sensor_t *sensor, uint16_t* remaining)
 {
     if((NULL == p) || (NULL == data))
     {
@@ -280,7 +280,7 @@ extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltim
     }
         
 
-    data->id = eoas_inertial_none;
+    data->id = eoas_inertial3_none;
     eOresult_t res = eores_NOK_generic;
 
     // i try to lock: i get the semaphore.    
@@ -288,10 +288,10 @@ extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltim
     {  
         if(eobool_true != eo_vector_Empty(p->fifoofinertialdata))
         {
-            eOas_inertial_data_t *front = (eOas_inertial_data_t*) eo_vector_Front(p->fifoofinertialdata);
+            eOas_inertial3_data_t *front = (eOas_inertial3_data_t*) eo_vector_Front(p->fifoofinertialdata);
             if(NULL != front)
             {
-                memcpy(data, front, sizeof(eOas_inertial_data_t));
+                memcpy(data, front, sizeof(eOas_inertial3_data_t));
                 eo_vector_PopFront(p->fifoofinertialdata);
                 res = eores_OK;
                 if(NULL != sensor)
@@ -440,7 +440,7 @@ static void s_eo_mems_taskworker_run(EOMtask *rt, uint32_t t)
         //const osal_reltime_t wait = osal_reltimeZERO;
         const osal_reltime_t wait = osal_reltimeINFINITE;
         
-        eOas_inertial_data_t data = {0};
+        eOas_inertial3_data_t data = {0};
         eObool_t ok = eobool_false;
         
         // begin of activity.
@@ -516,7 +516,7 @@ static eObool_t s_eo_mems_init_gyro(void)
 
 
 // the worker thread calls it regularly
-static eObool_t s_eo_mems_read_gyro(eOas_inertial_data_t *data)
+static eObool_t s_eo_mems_read_gyro(eOas_inertial3_data_t *data)
 {
     EOtheMEMS* p = &s_eo_themems;
     eObool_t ok = eobool_false;

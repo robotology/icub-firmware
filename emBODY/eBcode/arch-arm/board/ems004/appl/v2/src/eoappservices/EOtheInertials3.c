@@ -1036,7 +1036,7 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
     eOas_inertial3_data_t i3data = {0};
     
     eOmems_sensor_t sensor = mems_gyroscope_l3g4200;
-    eOas_inertial_data_t memsdata = {0};
+    eOas_inertial3_data_t memsdata = {0};
     // i put new data in status with this rule:
     // first: if we have a mems i add it; second: if we have something inside fifoofinertial3data.
     // if nothing: i set data invalid
