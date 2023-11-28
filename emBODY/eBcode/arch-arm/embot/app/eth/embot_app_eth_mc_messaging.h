@@ -28,8 +28,8 @@ namespace embot::msg {
     using ADR = uint8_t;
     
     struct Location        
-    {
-        struct PACKED { 
+    {  
+        struct PACKED { // it has the same fromat as eOlocation_t
             uint8_t bus:3; uint8_t ffu:1; uint8_t adr:4; 
             constexpr PACKED(uint8_t b, uint8_t a, uint8_t f = 0) : bus (b&0x0f), adr(a&0x0f), ffu(f) {}
             PACKED(uint8_t byte) { PACKED *p = reinterpret_cast<PACKED*>(&byte); bus = p->bus; ffu = p->ffu; adr = p->adr; }
@@ -57,8 +57,8 @@ namespace embot::app::eth::mc::messaging {
     {
         // if we keep can1 = 0 and can2 = 1 we have a simple conversion vs eOcanport1 and eOcanport2
         // i dont use the eOcanport1/eOcanport2 values to remove as much as possible dependencies from embOBJ 
-        enum class BUS : uint8_t {can1 = 0, can2 = 1, icc1 = 2, icc2 = 3, any = 30, none = 31}; 
-        static constexpr uint8_t numberofBUSes {4};         
+        enum class BUS : uint8_t {can1 = 0, can2 = 1, local = 2, icc1 = 3, icc2 = 4, ffu1 = 5, ffu2 = 6, none = 7}; 
+        static constexpr uint8_t numberofBUSes {7};         
         // enum class TYPE : uint8_t {can, icc, none}; -> maybe later on
         
         BUS bus {BUS::none};
@@ -67,7 +67,8 @@ namespace embot::app::eth::mc::messaging {
         
         constexpr Location() = default;        
         constexpr Location(const BUS b, uint8_t a) : bus(b), address(a) {}           
-        constexpr Location(const eObrd_location_t &l) { load(l); }    
+        constexpr Location(const eObrd_location_t &l) { load(l); }  
+        constexpr Location(const eOlocation_t &l) { load(l); }
 
         constexpr bool isvalid() const { return BUS::none != bus; }  
         constexpr bool isCAN() const { return (BUS::can1 == bus) || (BUS::can2 == bus); }       
@@ -79,7 +80,8 @@ namespace embot::app::eth::mc::messaging {
         }
 
     private:        
-        void load(const eObrd_location_t &l);      
+        void load(const eObrd_location_t &l);
+        void load(const eOlocation_t &l);    
     };
     
 } // namespace embot::app::eth::mc::messaging {       

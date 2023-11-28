@@ -48,6 +48,12 @@ namespace embot::app::eth::mc::messaging {
         }
     }        
 
+    void Location::load(const eOlocation_t &l)
+    {
+        bus = static_cast<BUS>(l.bus);
+        address = l.adr;
+    }  
+    
 } // namespace embot::app::eth::mc::messaging {
 
 

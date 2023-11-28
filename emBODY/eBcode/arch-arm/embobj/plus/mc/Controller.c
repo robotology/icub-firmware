@@ -837,24 +837,18 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         {
             case HARDWARE_MC4p:
             {
-                o->motor[k].mlocation.eth.place = eobrd_place_eth;
-                o->motor[k].mlocation.eth.id = jomodes->actuator.pwm.port;
+                o->motor[k].motorlocation.bus = eobus_local;
+                o->motor[k].motorlocation.adr = jomodes->actuator.pwm.port;
 
             } break;
             
             case HARDWARE_2FOC:
             {  
 #if defined(YRI_uses_MC_foc_actuator_descriptor_generic)
-                // marco.accame on 27sept2023: i have in here either a eobrd_place_can or an eobrd_place_eth location
-                o->motor[k].mlocation = jomodes->actuator.gen.location;                
+                o->motor[k].motorlocation = jomodes->actuator.gen.location;            
 #else                
-                // marco.accame on 27sept2023: in here we use only can location to manage the case of
-                // - up to 4 foc can boards 
-                // - the 3 amcbldc.         
-                o->motor[k].mlocation.can.place = eobrd_place_can;
-                o->motor[k].mlocation.can.port = jomodes->actuator.foc.canloc.port;
-                o->motor[k].mlocation.can.addr = jomodes->actuator.foc.canloc.addr;
-                o->motor[k].mlocation.can.ffu = 0;  
+                o->motor[k].motorlocation.bus = (jomodes->actuator.foc.canloc.port == 0) ? eobus_can1 : eobus_can2;
+                o->motor[k].motorlocation.adr = jomodes->actuator.foc.canloc.addr;              
 #endif            
             } break;
 

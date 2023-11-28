@@ -605,8 +605,8 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
         {
             eOmc_jomo_descriptor_t *d = (eOmc_jomo_descriptor_t*) eo_array_At(a, i);
             uint8_t adr = d->actuator.foc.canloc.addr;
-            d->actuator.gen.location.eth.place = eobrd_place_eth;
-            d->actuator.gen.location.eth.id = adr;
+            d->actuator.gen.location.bus = eobus_icc1;
+            d->actuator.gen.location.adr = adr;
         }
     }      
 
@@ -654,13 +654,14 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
         {
             const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
 #if defined(useMCfoc_actuator_descriptor_generic)
-            if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
+            eObus_t bus = static_cast<eObus_t>(jomodes->actuator.gen.location.bus);
+            if((eobus_can1 != bus) && (eobus_can2 != bus))
             {
                 // we consider only actuators located on can
                 continue;
             } 
             numofcanjomos++;            
-            eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.gen.location.can.port], jomodes->actuator.gen.location.can.addr);    
+            eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.gen.location.bus], jomodes->actuator.gen.location.adr);    
 #else
             numofcanjomos++;            
             eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr); 
@@ -738,16 +739,17 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 eObrd_canproperties_t prop = {0};
 
 #if defined(useMCfoc_actuator_descriptor_generic)
-                
-                if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
+
+                eObus_t bus = static_cast<eObus_t>(jomodes->actuator.gen.location.bus);
+                if((eobus_can1 != bus) && (eobus_can2 != bus))
                 {
                     // object EOtheCANmapping treats only actuators located on can
                     continue;
                 }
                 
                 prop.type = p->service.servconfig.data.mc.foc_based.type;
-                prop.location.port = jomodes->actuator.gen.location.can.port;
-                prop.location.addr = jomodes->actuator.gen.location.can.addr;
+                prop.location.port = jomodes->actuator.gen.location.bus;
+                prop.location.addr = jomodes->actuator.gen.location.adr;
                 prop.location.insideindex = eobrd_caninsideindex_first;
                 prop.requiredprotocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major;
                 prop.requiredprotocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
@@ -774,18 +776,19 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 eOcanmap_entitydescriptor_t des = {0};  
                 
 #if defined(useMCfoc_actuator_descriptor_generic)
-                
-                if(eobrd_place_can != jomodes->actuator.gen.location.any.place)
+                eOlocation_t location = jomodes->actuator.gen.location;
+                eObus_t bus = static_cast<eObus_t>(jomodes->actuator.gen.location.bus);
+                if((eobus_icc1 == bus) || (eobus_icc2 == bus))
                 {
-                    // if this location is eobrd_place_eth then ... we should tell some new object embot::app::eth::theICCservices
+                    // if this location is icc then ... we should tell some new object embot::app::eth::theICCservices
                     // that this location is associated to the i-th eoprot_entity_mc_motor / joint entity
-                    embot::app::eth::theICCmapping::getInstance().load({{jomodes->actuator.gen.location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, i});
-                    embot::app::eth::theICCmapping::getInstance().load({{jomodes->actuator.gen.location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, i});
+                    embot::app::eth::theICCmapping::getInstance().load({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, i});
+                    embot::app::eth::theICCmapping::getInstance().load({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, i});
                     continue;
                 }
 
-                des.location.port = jomodes->actuator.gen.location.can.port;
-                des.location.addr = jomodes->actuator.gen.location.can.addr;
+                des.location.port = location.bus;
+                des.location.addr = location.adr;
                 des.location.insideindex = eobrd_caninsideindex_first;
                 des.index = (eOcanmap_entityindex_t)i;
 

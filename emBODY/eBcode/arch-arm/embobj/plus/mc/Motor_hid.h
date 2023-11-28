@@ -128,7 +128,8 @@ struct Motor_hid
     // the location of the hw actuator. it can hold: 
     // - a can location in case of actuators on the CAN bus (foc / amcbldc boards)
     // - an eth location in case of actuator(s) on the same board (mc4plus, second core, ...)
-    eObrd_location_t mlocation;
+    //eObrd_location_t mlocation;
+    eOlocation_t motorlocation;
     
     // it tells what type of hw actuation controls the motor: 
     // HARDWARE_MC4p (pwm ports of a mc4plus), 
