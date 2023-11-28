@@ -17,7 +17,6 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-//#include "embot_app_eth_theFTservice.h"
 #include "EOtheMotionController.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,8 +82,6 @@ eOresult_t embot::app::eth::theServiceMC::Impl::initialise()
     
     embot::core::print("embot::app::eth::theServiceMC::Impl::initialise()");
 
-//#warning TODO: add embot::app::eth::theMCservice::getInstance().initialise({});    
-//    embot::app::eth::theFTservice::getInstance().initialise({}); 
     _eom = eo_motioncontrol_Initialise();
     
     _initted = true;
@@ -95,7 +92,6 @@ eOresult_t embot::app::eth::theServiceMC::Impl::initialise()
 bool embot::app::eth::theServiceMC::Impl::verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation)
 {
     _operation.load(_owner, servcfg, onendoperation, activateafterverify);
-    //embot::app::eth::theFTservice::getInstance().Verify(servcfg, cbk_afterverify, this, activateafterverify ? eobool_true : eobool_false);
     eo_motioncontrol_Verify2(_eom, servcfg, cbk_afterverify, this, eobool_true);    
     return true;
 }
@@ -152,10 +148,6 @@ bool embot::app::eth::theServiceMC::Impl::report()
 
 bool embot::app::eth::theServiceMC::Impl::process(const DescriptorCANframe &canframedescriptor)
 {
-    //#warning BUT later on u will use the third parameter as well ...
-    //embot::app::eth::theFTservice::canFrameDescriptor cfd {canframedescriptor.port, canframedescriptor.frame}; 
-    //embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
-    //#warning TODO: add  embot::app::eth::theMCservice::getInstance().AcceptCANframe()
     eo_motioncontrol_AcceptCANframe(_eom, canframedescriptor.frame, canframedescriptor.port, eo_motcon_canframe_unknown);
     return true;
 }

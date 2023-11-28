@@ -645,9 +645,11 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
     // TODO: put in some config (e.g. theHandler_theServices_Config) all the services that we want to init ....
         
     // FT
+#if defined(USE_EMBOT_theServicesFT)        
     embot::app::eth::theServiceFT::getInstance().initialise({});          
     embot::app::eth::theServices::getInstance().load(embot::app::eth::theServiceFT::getInstance().service());
-    
+#endif
+        
     // MC        
 #if defined(USE_EMBOT_theServicesMC)
     embot::app::eth::theServiceMC::getInstance().initialise({});          

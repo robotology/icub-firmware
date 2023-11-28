@@ -158,12 +158,12 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ev</ItemText>
+          <ItemText>item</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>_state</ItemText>
+          <ItemText>d</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
@@ -173,12 +173,22 @@
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>s_theemsrunner</ItemText>
+          <ItemText>frame</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>time</ItemText>
+          <ItemText>descriptor</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>cmd</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>o</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -2327,7 +2337,7 @@
 
   <Group>
     <GroupName>embot::app::eth::theServiceMC</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2571,7 +2581,7 @@
 
   <Group>
     <GroupName>embot::app::eth::theServiceFT</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2603,7 +2613,7 @@
 
   <Group>
     <GroupName>embot::app::eth::theICCservice</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2635,7 +2645,7 @@
 
   <Group>
     <GroupName>icc-amc-callbacks</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

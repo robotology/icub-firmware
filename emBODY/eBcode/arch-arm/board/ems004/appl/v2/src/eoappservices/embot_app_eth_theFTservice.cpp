@@ -30,7 +30,9 @@
 
 #include "embot_core_binary.h"
 #include "embot_app_eth_CANmonitor.h"
-
+#include "embot_prot_can.h"
+#include "embot_prot_can_analog_polling.h"
+#include "embot_prot_can_analog_periodic.h"
 
 #if defined(USE_EMBOT_theServices)
 #include "embot_app_eth_theServices.h"
@@ -861,22 +863,48 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
     
     canFrameDescriptor::Type type = cfd.type;
     
-    // #warning process also Type::autodetect 
     if(canFrameDescriptor::Type::autodetect == type)
     {
         // eval the frame->id and frame->data[0]
-        if(3 == cfd.frame->data[0])
+        
+        type = canFrameDescriptor::Type::unspecified;
+        
+        embot::prot::can::Frame fr {cfd.frame->id, cfd.frame->size, cfd.frame->data};
+        embot::prot::can::Clas cls = embot::prot::can::frame2clas(fr);
+        
+        if(cls == embot::prot::can::Clas::pollingAnalogSensor)
         {
-           type = canFrameDescriptor::Type::fullscale; 
+            if(embot::core::tointegral(embot::prot::can::analog::polling::CMD::GET_FULL_SCALES) == cfd.frame->data[0])
+            {
+                type = canFrameDescriptor::Type::fullscale;
+            }                
         }
-        else if(4 == (cfd.frame->id & 0xf))
+        else if(cls == embot::prot::can::Clas::periodicAnalogSensor)
         {
-            type = canFrameDescriptor::Type::force; 
+            switch(cfd.frame->id & 0xf)
+            {
+                case embot::core::tointegral(embot::prot::can::analog::periodic::CMD::FORCE_VECTOR):
+                {
+                    type = canFrameDescriptor::Type::force;
+                } break;
+                
+                case embot::core::tointegral(embot::prot::can::analog::periodic::CMD::TORQUE_VECTOR):
+                {
+                    type = canFrameDescriptor::Type::torque;
+                } break;  
+                
+                case embot::core::tointegral(embot::prot::can::analog::periodic::CMD::THERMOMETER_MEASURE):
+                {
+                    type = canFrameDescriptor::Type::temperature;
+                } break; 
+
+                default: 
+                {
+                } break;
+            }
+
         }
-        else if(5 == (cfd.frame->id & 0xf))
-        {
-            type = canFrameDescriptor::Type::torque; 
-        }        
+        
     }
     
     if(canFrameDescriptor::Type::fullscale == type)

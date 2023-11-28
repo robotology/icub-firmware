@@ -599,7 +599,7 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
     #warning: just for debug of icc i modify the p->service.servconfig ...
     {
 //        uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
-        EOarray * a = reinterpret_cast<EOarray*>(&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
+        EOarray * a = (EOarray*)(&servcfg->data.mc.foc_based.arrayofjomodescriptors);
         uint8_t n = eo_array_Size(a);
         for(uint8_t i=0; i<n; i++)
         {
@@ -649,6 +649,7 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
         
         uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
         uint8_t i = 0;
+        uint8_t numofcanjomos {0};
         for(i=0; i<numofjomos; i++)
         {
             const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
@@ -657,18 +658,23 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
             {
                 // we consider only actuators located on can
                 continue;
-            }            
+            } 
+            numofcanjomos++;            
             eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.gen.location.can.port], jomodes->actuator.gen.location.can.addr);    
-#else 
+#else
+            numofcanjomos++;            
             eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr); 
 #endif            
         }
         
         // force a cleaned discoverytargets before we add the target
-        eo_array_Reset(p->sharedcan.discoverytargets);                
-        eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);
-        p->sharedcan.ondiscoverystop.function = s_eo_motioncontrol_onstop_search4focs;
-        p->sharedcan.ondiscoverystop.parameter = (void*)&p->service.servconfig;
+        eo_array_Reset(p->sharedcan.discoverytargets); 
+        if(numofcanjomos > 0)
+        {            
+            eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);
+            p->sharedcan.ondiscoverystop.function = s_eo_motioncontrol_onstop_search4focs;
+            p->sharedcan.ondiscoverystop.parameter = (void*)&p->service.servconfig;
+        }
         
         eOmn_serv_diagn_cfg_t dc = {0, 0};
         embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_foc_onendofverify_encoder, p}, true);
@@ -700,19 +706,6 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
     // we use memmove() because it may be that source and destination are in the same location.
     memmove(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));  
-    #warning: just for debug of icc i modify the p->service.servconfig ...
-    {
-//        uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
-        EOarray * a = reinterpret_cast<EOarray*>(&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
-        uint8_t n = eo_array_Size(a);
-        for(uint8_t i=0; i<n; i++)
-        {
-            eOmc_jomo_descriptor_t *d = (eOmc_jomo_descriptor_t*) eo_array_At(a, i);
-            uint8_t adr = d->actuator.foc.canloc.addr;
-            d->actuator.gen.location.eth.place = eobrd_place_eth;
-            d->actuator.gen.location.eth.id = adr;
-        }
-    }
             
 
     if(eo_motcon_mode_foc == p->service.servconfig.type)

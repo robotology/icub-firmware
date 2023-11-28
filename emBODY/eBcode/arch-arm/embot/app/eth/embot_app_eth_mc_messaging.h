@@ -20,11 +20,33 @@
 
  
 #include <array>
- 
-// redefinition of some CAN message handling, due to mixed location of the actuators
-// for example: the amc board uses three actuators: two amcbldc boards over CAN bus and a third one with the amc2c
-// on its cm4 core. the two amcbldc use actual CAN messaging, whereas the amc2c excnage CAN frames over inter core communication
-// for this case we need to override some TX / RX CAN frame handling.
+
+
+namespace embot::msg {
+  
+    enum class BUS : uint8_t {can1 = 0, can2 = 1, local = 2, icc1 = 3, icc2 = 4, ffu1 = 5, ffu2 = 6, none = 7}; 
+    using ADR = uint8_t;
+    
+    struct Location        
+    {
+        struct PACKED { 
+            uint8_t bus:3; uint8_t ffu:1; uint8_t adr:4; 
+            constexpr PACKED(uint8_t b, uint8_t a, uint8_t f = 0) : bus (b&0x0f), adr(a&0x0f), ffu(f) {}
+            PACKED(uint8_t byte) { PACKED *p = reinterpret_cast<PACKED*>(&byte); bus = p->bus; ffu = p->ffu; adr = p->adr; }
+            PACKED(void *m = nullptr) { if(nullptr == m) { bus = 7; ffu = adr = 0; } else { PACKED *p = reinterpret_cast<PACKED*>(m); bus = p->bus; ffu = p->ffu; adr = p->adr; } }
+        };
+        
+        PACKED packed {7, 0};
+        
+        BUS bus {BUS::none};
+        ADR adr {0};
+                 
+        constexpr Location() = default;
+        constexpr Location(BUS b, ADR a) : bus(b), adr(a) { packed.bus = embot::core::tointegral(bus); packed.adr = adr; packed.ffu = 0;  } 
+        constexpr Location(const PACKED &p) : packed(p) { bus = static_cast<BUS>(packed.bus); adr = packed.adr; }           
+    };
+    
+}
 
 
 namespace embot::app::eth::mc::messaging {
