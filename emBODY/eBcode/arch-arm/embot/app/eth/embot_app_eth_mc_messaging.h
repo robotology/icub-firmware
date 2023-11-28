@@ -82,6 +82,14 @@ namespace embot::app::eth::mc::messaging::info {
         CURRENT_LIMIT() = default;
         CURRENT_LIMIT(int16_t n, int16_t p, int16_t o) : nominal(n), peak(p), overload(o) {}
     };
+    
+    struct TEMPERATURE_LIMIT
+    {   // raw-valu Vdiff
+        int16_t temperature {0};
+        
+        TEMPERATURE_LIMIT() = default;
+        TEMPERATURE_LIMIT(int16_t t) : temperature(t) {}
+    };
  
     struct PID16bit
     {
@@ -151,7 +159,18 @@ namespace embot::app::eth::mc::messaging::sender {
         Set_Current_Limit(const Location &d, const info::CURRENT_LIMIT &i) : destination(d), info(i) {}
             
         bool transmit();    
-    };  
+    };
+
+    struct Set_Temperature_Limit
+    {
+        Location destination {};
+        info::TEMPERATURE_LIMIT info{};
+        
+        Set_Temperature_Limit() = default;
+        Set_Temperature_Limit(const Location &d, const info::TEMPERATURE_LIMIT &i) : destination(d), info(i) {}
+        
+        bool transmit();
+    };
 
     struct Set_Current_PID
     { 

@@ -83,6 +83,7 @@ extern void MController_get_motor_state(int m, eOmc_motor_status_t* motor_status
 extern void MController_update_joint_targets(int j);
 extern void MController_update_motor_pos_fbk(int m, int32_t position_raw);
 extern void MController_update_motor_current_fbk(int m, int16_t current);
+extern void MController_update_motor_temperature_fbk(int m, int16_t temperature);
 extern void MController_config_motor_friction(int m, eOmc_motor_params_t* params); //
 extern void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance); //
 
@@ -96,6 +97,7 @@ extern void MController_motor_config_speed_PID(int m, eOmc_PID_t *pid);
 extern void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max);
 extern void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms);
 extern void MController_motor_config_max_currents(int m, eOmc_current_limits_params_t* current_params);
+extern void MController_motor_config_max_temperature(int m, eOmeas_temperature_t* temperature);
 
 extern BOOL MController_set_joint_pos_ref(int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 extern BOOL MController_set_joint_vel_ref(int j, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref);

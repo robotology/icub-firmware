@@ -25,6 +25,7 @@
 #include "faults.h"
 #include "2FOC.h"
 #include "qep.h"
+#include "i2cTsens.h"
 
 //CAN_PERIOD_PHASE is used to be sure that all foc don't send status msg in the same time
 //#define CAN_PERIOD_PHASE (canprototransmitter_bid)*2
@@ -105,11 +106,10 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         if (++noflood >= Tsend)
         {
             noflood = 0;
-            
             payload.w[0] = gTemperature;
-            payload.w[1] = I2Cerrcode;
-            payload.w[2] = I2Cerrors;
-            payload.w[3] = residual_enc;
+            payload.w[0] = I2Cerrcode;
+            payload.w[1] = I2Cerrors;
+            payload.w[2] = residual_enc;
         
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
@@ -117,8 +117,10 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         }
     }
     
+
     if (!bequiet)
     {
+        
         payload.b[0] = gControlMode;
         payload.b[1] = gEncoderError.bitmask;
 
@@ -129,7 +131,11 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
 
         ECANSend(msgid, 8, &payload);
+        
+
     }
+
+
 }
 
 extern void CanIcubProtoTransmitterUpdateBoardId(unsigned char bid)

@@ -46,8 +46,8 @@ typedef union
         //B1 H
         unsigned CAN_IsWarnTX           :1;
         unsigned CAN_IsWarnRX           :1;
+        unsigned OverHeatingFailure     :1;
         unsigned unused                 :1;
-        unsigned OverHeating            :1;
         //B2 L
         unsigned ADCCalFailure          :1; 
         unsigned I2TFailure             :1;                     

@@ -188,9 +188,25 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             setMaxCurrent(nom, peak, ovr);
 
-        return 1;
-    }
+            return 1;
+        }
     
+        return 0;
+    }
+
+    if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT)
+    {
+       if (!gCanProtocolCompatible) return 0;
+        
+        if (rxlen==3)
+        {
+            int peak  = ((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
+
+            setMaxTemperature(peak);
+            
+            return 1;
+        }
+        
         return 0;
     }
     

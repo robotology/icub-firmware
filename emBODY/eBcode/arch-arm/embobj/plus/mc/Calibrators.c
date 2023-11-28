@@ -195,7 +195,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 m_ptr->not_init = TRUE;
                 
                 //Debug code
-                char info[80];
+                memset(&info[0], 0, sizeof(info));
                 snprintf(info, sizeof(info), "c6M:pos reached: cp=%d co=%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
                 JointSet_send_debug_message(info, m_ptr->ID, 0, 0);
                 //ended

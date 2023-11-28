@@ -1,6 +1,8 @@
 #ifndef __QEP_H__
 #define __QEP_H__
 
+#include <stdint.h>
+
 #include "UserTypes.h"
 
 typedef struct

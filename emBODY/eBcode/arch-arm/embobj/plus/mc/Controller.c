@@ -1010,6 +1010,11 @@ void MController_motor_config_max_currents(int m, eOmc_current_limits_params_t* 
     Motor_config_max_currents(smc->motor+m, current_params);
 }
 
+void MController_motor_config_max_temperature(int m, eOmeas_temperature_t* temperature)
+{
+    Motor_config_max_temperature(smc->motor+m, temperature);
+}
+
 /*
 void MController_config_Jjm(float **Jjm) //
 {
@@ -1472,6 +1477,11 @@ void MController_update_motor_pos_fbk(int m, int32_t position_raw)
 void MController_update_motor_current_fbk(int m, int16_t current)
 {
     Motor_update_current_fbk(smc->motor+m, current);
+}
+
+void MController_update_motor_temperature_fbk(int m, int16_t temperature)
+{
+    Motor_update_temperature_fbk(smc->motor+m, temperature);
 }
 
 void MController_update_joint_targets(int j)

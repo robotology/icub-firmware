@@ -530,6 +530,14 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_LIMIT(eOcanp
     return(eores_OK);
 }
 
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT);
+    // now i prepare data[1] -> data[2]   
+    *((int16_t*)(&frame->data[1])) = *((eOmeas_temperature_t*)descriptor->cmd.value);
+    
+    return(eores_OK);
+}
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_BCAST_POLICY(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {

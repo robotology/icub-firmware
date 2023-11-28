@@ -232,6 +232,9 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_VELOCITY(eOcanpr
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 // no parser
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+// no parser
     
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_BCAST_POLICY(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 // no parser

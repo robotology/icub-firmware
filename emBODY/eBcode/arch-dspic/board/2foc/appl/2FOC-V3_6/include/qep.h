@@ -1,6 +1,7 @@
 #ifndef __QEP_H__
 #define __QEP_H__
 
+#include <stdint.h>
 #include "UserTypes.h"
 
 typedef struct
@@ -40,7 +41,7 @@ extern volatile BOOL QE_READY;
 //#define QEgetRaw() (POSCNT<<5)
 //#define QEgetElettrDeg() ((int)(__builtin_muluu(POSCNT,360)>>11))
 
-extern void QEinit(int16_t ticks,int8_t motor_num_poles,BOOL use_index);
+extern void QEinit(int16_t ticks, int8_t motor_num_poles, BOOL use_index);
 extern void QEcountErrorClear();
 extern  int QEgetElettrDeg();
 extern  int QEgetPosition();

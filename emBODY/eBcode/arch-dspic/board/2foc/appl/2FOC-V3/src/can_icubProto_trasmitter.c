@@ -25,6 +25,7 @@
 #include "Faults.h"
 #include "2FOC.h"
 #include "qep.h"
+#include "i2cTsens.h"
 
 //CAN_PERIOD_PHASE is used to be sure that all foc don't send status msg in the same time
 //#define CAN_PERIOD_PHASE (canprototransmitter_bid)*2
@@ -119,7 +120,6 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         {
             noflood = 0;
             
-            payload.w[0] = gTemperature;
             payload.w[1] = I2Cerrcode;
             payload.w[2] = I2Cdead;
             payload.w[3] = I2Cerrors;
@@ -132,19 +132,42 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     
     if (!bequiet)
     {
-        payload.b[0] = gControlMode;
-        payload.b[1] = gEncoderError.bitmask;
-    
-        payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
+        BOOL transmit_addStatus = FALSE;
+        if (MotorConfig.has_tsens && isActiveI2CTsens())
+        {
+            int Tsend = 100 + canprototransmitter_bid*100;
+            static int noflood = 0;
 
-        payload.b[4] = SysError.b[0];
-        payload.b[5] = SysError.b[1];
-        payload.b[6] = SysError.b[2];
-        payload.b[7] = SysError.b[3];
+            if (++noflood >= Tsend)
+            {
+                noflood = 0;
+                transmit_addStatus = TRUE;
+            }
+        }
+        if(transmit_addStatus)
+        {
+            payload.w[1] = gTemperature;
 
-        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS );
+            ECANSend(msgid, 4, &payload);
+        }
+        else
+        {
+            payload.b[0] = gControlMode;
+            payload.b[1] = gEncoderError.bitmask;
 
-        ECANSend(msgid, 8, &payload);
+            payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
+
+            payload.b[4] = SysError.b[0];
+            payload.b[5] = SysError.b[1];
+            payload.b[6] = SysError.b[2];
+            payload.b[7] = SysError.b[3];
+
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__STATUS);
+
+            ECANSend(msgid, 8, &payload);
+        }
+
     }
 }
 
@@ -152,4 +175,3 @@ extern void CanIcubProtoTransmitterUpdateBoardId(unsigned char bid)
 {
     canprototransmitter_bid = bid;
 }
-

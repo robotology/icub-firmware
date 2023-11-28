@@ -20,7 +20,7 @@ typedef struct
 } /*__attribute__ ((__packed__))*/ tLED_status;
 
 extern void oscConfig(void);
-extern void SetupPorts_I2C(void);
+extern int SetupPorts_I2C(void);
 extern void SetupPorts( void );
 extern volatile tLED_status LED_status; 
 extern volatile tMeasCurrParm MeasCurrParm;

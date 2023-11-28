@@ -50,6 +50,7 @@ extern void Motor_still_check_reset(Motor* o);
 
 extern void Motor_config_encoder(Motor* o, int32_t resolution);
 extern void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params);
+extern void Motor_config_max_temperature(Motor* o, eOmeas_temperature_t* motor_temperature_limit);
 
 extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
 extern void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid);
@@ -89,6 +90,7 @@ extern void Motor_get_pid_state(Motor* o, eOmc_joint_status_ofpid_t* pid_state);
 extern void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status);
 extern void Motor_update_pos_fbk(Motor* o, int32_t position_raw);
 extern void Motor_update_current_fbk(Motor* o, int16_t current);
+extern void Motor_update_temperature_fbk(Motor* o, int16_t temperature);
 
 extern void Motor_set_i2t_fault(Motor* o);
 
@@ -107,7 +109,6 @@ extern void Motor_config_gearbox_M2J(Motor* o, float32_t gearbox_M2J);
 extern int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit);
 ////////////////////////////////////////////////////////////////////////////
 /*
-extern void Motor_update_temperature_fbk(Motor* o, int16_t temperature_fbk);
 extern void Motor_update_pos_raw_fbk(Motor* o, int32_t pos_raw_fbk);
 extern void Motor_update_vel_raw_fbk(Motor* o, int32_t vel_raw_fbk);
 extern void Motor_update_pwm_fbk(Motor* o, int16_t pwm_fbk);

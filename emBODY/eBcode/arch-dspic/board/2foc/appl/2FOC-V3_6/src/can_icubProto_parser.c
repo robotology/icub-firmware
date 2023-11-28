@@ -186,13 +186,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             int nom  = ((int)rxpayload->b[2])|(((int)rxpayload->b[3])<<8);
             int peak = ((int)rxpayload->b[4])|(((int)rxpayload->b[5])<<8);
             int ovr  = ((int)rxpayload->b[6])|(((int)rxpayload->b[7])<<8);
-            
-            gTemperatureLimit = ovr;
 
             setMaxCurrent(nom, peak, ovr);
 
         return 1;
-    }
+        }
     
         return 0;
     }
@@ -253,7 +251,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         /////////////////////////////////////////////////////////////
         if (MotorConfig.has_qe || MotorConfig.has_speed_qe)
         {
-            QEinit(gEncoderConfig.ticks,gEncoderConfig.numPoles,MotorConfig.has_index);
+            QEinit(gEncoderConfig.ticks, gEncoderConfig.numPoles, MotorConfig.has_index);
         }
         else
         {

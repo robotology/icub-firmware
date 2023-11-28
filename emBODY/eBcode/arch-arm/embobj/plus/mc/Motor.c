@@ -196,6 +196,18 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
     msg.transmit();   
 }
 
+static void Motor_config_motor_max_temperature_2FOC(Motor* o, eOmeas_temperature_t* motor_temperature_limit)
+{
+    // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
+    embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msg
+    {
+        {o->mlocation},
+        {*(int16_t*)motor_temperature_limit}
+    };
+    msg.transmit();
+      
+}
+
 static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 {   
     #define HAS_QE         0x0001
@@ -223,6 +235,14 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 
     Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
     Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
+    
+    // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
+    embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msgtmp
+    {
+        {o->mlocation},
+        {(int16_t)config->temperatureLimit}
+    };
+    msgtmp.transmit();
 
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT 
     embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
@@ -358,6 +378,16 @@ void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_p
     {
         Motor_config_max_currents_2FOC(o, current_params);
     }   
+}
+
+void Motor_config_max_temperature(Motor* o, eOmeas_temperature_t* motor_temperature_limit)
+{
+    o->temperature_max = *motor_temperature_limit;
+    
+    if(o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        Motor_config_motor_max_temperature_2FOC(o, motor_temperature_limit);
+    }
 }
 
 void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
@@ -795,6 +825,12 @@ BOOL Motor_check_faults(Motor* o) //
             fault_state.bits.CANInvalidProtocol = FALSE;
         }
         
+        if (o->fault_state.bits.OverHeatingFailure && !o->fault_state_prec.bits.OverHeatingFailure)
+        {
+            Motor_send_error(o->ID, eoerror_value_MC_motor_overheating, (uint64_t)o->temperature_fbk);
+            fault_state.bits.OverHeatingFailure = FALSE;
+        }
+        
         #define CAN_GENERIC_ERROR 0x00003D00
         
         if ((o->fault_state.bitmask & CAN_GENERIC_ERROR) && ((o->fault_state.bitmask & CAN_GENERIC_ERROR) != (o->fault_state_prec.bitmask & CAN_GENERIC_ERROR)))
@@ -843,6 +879,15 @@ static void Motor_raise_fault_overcurrent(Motor* o)
     hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
     
     o->fault_state.bits.OverCurrentFailure = TRUE;
+    
+    o->control_mode = icubCanProto_controlmode_hwFault;
+}
+
+static void Motor_raise_fault_overheating(Motor* o)
+{
+    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+    
+    o->fault_state.bits.OverHeatingFailure = TRUE;
     
     o->control_mode = icubCanProto_controlmode_hwFault;
 }
@@ -1134,6 +1179,11 @@ void Motor_update_current_fbk(Motor* o, int16_t current)
     }
     
     o->Iqq_fbk = current;
+}
+
+void Motor_update_temperature_fbk(Motor* o, int16_t temperature)
+{   
+    o->temperature_fbk = temperature;
 }
 
 void Motor_config_gearbox_M2J(Motor* o, float32_t gearbox_M2J)

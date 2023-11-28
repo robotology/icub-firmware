@@ -216,6 +216,11 @@ void setMaxCurrent(int nom, int peak, int ovr)
     Iovr = ovr;
 }
 
+void setMaxTemperature(int peak)
+{
+    gTemperatureLimit = peak;
+}
+
 void setIPid(int kp, int ki, char shift)
 {
     IKp = kp;
@@ -1187,7 +1192,15 @@ int main(void)
     }
     else
     {
-        if (MotorConfig.has_tsens) SetupPorts_I2C();
+        if (MotorConfig.has_tsens) 
+        {
+            gTemperature = SetupPorts_I2C();
+        }
+        else
+        {
+            gTemperature = -5000;
+        }
+            
 
         if (MotorConfig.has_qe)
         {

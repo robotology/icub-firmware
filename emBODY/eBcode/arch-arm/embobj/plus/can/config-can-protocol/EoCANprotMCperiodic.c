@@ -456,33 +456,58 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
 
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcanframe_t *frame, eOcanport_t port)
-{
-    // this frame is from mc4 only, thus ...
-    // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
-    eOprotIndex_t jointindex = 0;
-    eOmc_joint_t *joint = NULL;
-    icubCanProto_interactionmode_t caninteractionmodes[2] = {icubCanProto_interactionmode_stiff, icubCanProto_interactionmode_stiff};
-       
-    uint8_t j=0;
-    // the two joints have ...
-    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
-    caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
-    caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
-    eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
-    for(j=0; j<2; j++)
+{   
+    
+    eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
+    // motor related infos --> temperature
+    // if board is of type foc we are interested on the temperature only
+    // and we have no reason to check the interaction mode
+    if(eobrd_cantype_foc == boardtype)
     {
-        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
-        {
-            return(eores_OK);        
-        }
+        eOmeas_temperature_t motor_temperature = 0;
+        eOmc_motor_t *motor = NULL;
+        eOprotIndex_t motorindex = EOK_uint08dummy;
+           
         
-        if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(caninteractionmodes[j], &tmp))
+        if(NULL == (motor = (eOmc_motor_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eobrd_caninsideindex_first, &motorindex)))
         {
-            return(eores_OK);        
+            return(eores_OK);
         }
-        joint->status.core.modes.interactionmodestatus = tmp;        
+
+        motor_temperature = *((eOmeas_temperature_t*)&(frame->data[2]));
+        motor->status.basic.mot_temperature = motor_temperature;
+        
+        // Update motor temperature fdbk to be used for error printing
+        MController_update_motor_temperature_fbk(motorindex, motor_temperature);
     }
-   
+    else
+    {
+        // this frame is from mc4 only, thus ...
+        // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
+        // and i have no reason to be interested on the temperature
+        const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second}; 
+        uint8_t j=0;
+        eOprotIndex_t jointindex = 0;
+        eOmc_joint_t *joint = NULL;
+        icubCanProto_interactionmode_t caninteractionmodes[2] = {icubCanProto_interactionmode_stiff, icubCanProto_interactionmode_stiff};
+        // the two joints have ...
+        caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
+        caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
+        eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
+        for(j=0; j<2; j++)
+        {
+            if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+            {
+                return(eores_OK);        
+            }
+                
+            if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(caninteractionmodes[j], &tmp))
+            {
+                return(eores_OK);        
+            }
+            joint->status.core.modes.interactionmodestatus = tmp;     
+        }
+    }
     return(eores_OK);
 }
 
