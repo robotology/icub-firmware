@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>BAT_B_iCub3</TargetName>
+    <TargetName>BAT_B_Generic</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
