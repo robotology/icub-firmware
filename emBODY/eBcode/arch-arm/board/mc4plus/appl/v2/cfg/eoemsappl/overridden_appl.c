@@ -44,7 +44,6 @@
 #include "EOtheMotionController.h"
 #include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
-#include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
 #include "EOthePSC.h"
@@ -205,11 +204,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     // mais
     eo_mais_Stop(eo_mais_GetHandle());
     eo_mais_Deactivate(eo_mais_GetHandle());
-
-    // inertials
-    eo_inertials2_Stop(eo_inertials2_GetHandle());    
-    eo_inertials2_Deactivate(eo_inertials2_GetHandle());
-    
+   
     // inertials3
     eo_inertials3_Stop(eo_inertials3_GetHandle());    
     eo_inertials3_Deactivate(eo_inertials3_GetHandle());
@@ -263,10 +258,6 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     // mais
     eo_mais_Stop(eo_mais_GetHandle());
     eo_mais_Deactivate(eo_mais_GetHandle());
-
-    // inertials
-    eo_inertials2_Stop(eo_inertials2_GetHandle());    
-    eo_inertials2_Deactivate(eo_inertials2_GetHandle());
     
     // inertials3
     eo_inertials3_Stop(eo_inertials3_GetHandle());    

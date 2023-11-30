@@ -27,7 +27,6 @@
 
 
 #include "EOtheCANservice.h"
-#include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
 #include "EOtheCANdiscovery2.h"
@@ -174,9 +173,7 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     // marco.accame: i put them in here just after tx phase. however, we can move it even in eom_emsrunner_hid_userdef_taskDO_activity() 
     // because eom_emsrunner_CycleHasJustTransmittedRegulars() keeps memory of previous tx cycle.
     eo_skin_Tick(eo_skin_GetHandle(), prevTXhadRegulars); 
-    
-    eo_inertials2_Tick(eo_inertials2_GetHandle(), prevTXhadRegulars); 
-    
+     
     eo_inertials3_Tick(eo_inertials3_GetHandle(), prevTXhadRegulars); 
     
     eo_temperatures_Tick(eo_temperatures_GetHandle(), prevTXhadRegulars);

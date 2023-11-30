@@ -35,7 +35,6 @@
 #include "EOtheSTRAIN.h"
 #include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
-#include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
 #include "EOthePSC.h"
@@ -286,12 +285,7 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
         case eomn_serv_category_battery:
         {
             state = embot::app::eth::theBATservice::getInstance().GetServiceState();           
-        } break; 
-        
-        case eomn_serv_category_inertials:
-        {
-            state = eo_inertials2_GetServiceState(eo_inertials2_GetHandle());   
-        } break;
+        } break;        
         
         case eomn_serv_category_inertials3:
         {
@@ -658,7 +652,6 @@ static void s_eo_services_initialise(EOtheServices *p)
         eo_mais_Initialise();        
         eo_motioncontrol_Initialise();    
         eo_skin_Initialise(); 
-        eo_inertials2_Initialise(); 
         eo_inertials3_Initialise(); 
         eo_temperatures_Initialise(); 
         eo_psc_Initialise();
@@ -752,20 +745,6 @@ static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok
     send_rop_command_result();       
     
     return(eores_OK);       
-}
-
-
-static eOresult_t s_services_callback_afterverify_inertial(EOaService* p, eObool_t operationisok)
-{
-    if(eobool_false == operationisok)
-    {
-        eo_inertials2_SendReport(eo_inertials2_GetHandle());
-        eo_inertials2_Deactivate(eo_inertials2_GetHandle());
-    }
-    
-    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_inertials, eomn_serv_AS_inertials, eo_service_inertials);
-       
-    return(eores_OK);
 }
 
 static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok)
@@ -930,20 +909,7 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
             // if it is NULL, every function of kind _Verify() issues a failure
             eo_motioncontrol_Verify(eo_motioncontrol_GetHandle(), config, s_services_callback_afterverify_motioncontrol, eobool_true);            
         } break;
-        
-        case eomn_serv_category_inertials:
-        {
-            if(eobool_true == uselocalconfig)
-            {
-                config = NULL;
-                
-                errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_using_onboard_config);
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
-            }
-            //#warning mettere un risultato ko in modo da avvisare
-            eo_inertials2_Verify(eo_inertials2_GetHandle(), config, s_services_callback_afterverify_inertial, eobool_true);            
-        } break; 
-        
+            
         
         case eomn_serv_category_inertials3:
         {
@@ -1259,11 +1225,6 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
         {
             res = eo_skin_SetRegulars(eo_skin_GetHandle(), arrayofid32, &number);
         } break;        
-
-        case eomn_serv_category_inertials:
-        {
-            res = eo_inertials2_SetRegulars(eo_inertials2_GetHandle(), arrayofid32, &number);
-        } break;
         
         case eomn_serv_category_inertials3:
         {
@@ -1365,11 +1326,6 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
         {
             res = eo_skin_Start(eo_skin_GetHandle());
         } break;        
-
-        case eomn_serv_category_inertials:
-        {
-            res = eo_inertials2_Start(eo_inertials2_GetHandle());
-        } break;
         
         case eomn_serv_category_inertials3:
         {
@@ -1484,17 +1440,6 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
                 eo_skin_Deactivate(eo_skin_GetHandle());
             }
         } break;        
-
-        case eomn_serv_category_inertials:
-        {
-            res = eo_inertials2_Stop(eo_inertials2_GetHandle());
-            eo_inertials2_SetRegulars(eo_inertials2_GetHandle(), NULL, numofregulars);
-            p->running[eomn_serv_category_inertials] = eobool_false;
-            if(eobool_true == and_deactivate)
-            {
-                eo_inertials2_Deactivate(eo_inertials2_GetHandle());
-            }
-        } break;
         
         case eomn_serv_category_inertials3:
         {
@@ -1588,15 +1533,7 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             if(eobool_true == and_deactivate)
             {
                 eo_skin_Deactivate(eo_skin_GetHandle());
-            }
-            
-            eo_inertials2_Stop(eo_inertials2_GetHandle());
-            eo_inertials2_SetRegulars(eo_inertials2_GetHandle(), NULL, NULL);  
-            p->running[eomn_serv_category_inertials] = eobool_false;
-            if(eobool_true == and_deactivate)
-            {            
-                eo_inertials2_Deactivate(eo_inertials2_GetHandle());  
-            }                
+            }               
 
             eo_inertials3_Stop(eo_inertials3_GetHandle());
             eo_inertials3_SetRegulars(eo_inertials3_GetHandle(), NULL, NULL);  

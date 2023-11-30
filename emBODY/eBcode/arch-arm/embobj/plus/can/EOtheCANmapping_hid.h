@@ -55,7 +55,6 @@ enum
     eocanmap_strains_maxnumberof        = 1,    // we may have up to 1 strain on an eth board 
     eocanmap_maises_maxnumberof         = 1,
     eocanmap_temperatures_maxnumberof   = 1,
-    eocanmap_inertials_maxnumberof      = 1,
     eocanmap_inertials3_maxnumberof     = 1,
     eocanmap_pscs_maxnumberof           = 1,
     eocanmap_poses_maxnumberof          = 1,
@@ -74,7 +73,6 @@ enum
     eocanmap_strain_boards_maxnumberof        = 1,    // we can use up to 1 can board (strain or strain2) to represent a single strain index
     eocanmap_mais_boards_maxnumberof          = 1,
     eocanmap_temperature_boards_maxnumberof   = 1,
-    eocanmap_inertial_boards_maxnumberof      = 1,
     eocanmap_inertial3_boards_maxnumberof     = 1,
     eocanmap_psc_boards_maxnumberof           = 3,    // we use exactly three psc boards to have the 6 values of the psc entity
     eocanmap_pos_boards_maxnumberof           = 3,    // we use only 1 pmc / mtb4c / mtb4 boards but we may use 3 psc boards
@@ -84,7 +82,7 @@ enum
 };
 
 
-enum { eocanmap_entities_maxnumberof = 12 };
+enum { eocanmap_entities_maxnumberof = 11 };
 
 extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en);
 

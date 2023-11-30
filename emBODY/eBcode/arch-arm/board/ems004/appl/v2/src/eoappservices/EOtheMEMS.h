@@ -105,7 +105,7 @@ extern eOresult_t eo_mems_Start(EOtheMEMS *p);
 
 extern eOresult_t eo_mems_SetAlert(EOtheMEMS *p, EOMtask *task, eOevent_t event);
 
-extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltime_t timeout, eOmems_sensor_t *sensor, uint16_t* remaining);
+extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial3_data_t* data, eOreltime_t timeout, eOmems_sensor_t *sensor, uint16_t* remaining);
 
 extern eOresult_t eo_mems_Stop(EOtheMEMS *p);
 

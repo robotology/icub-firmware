@@ -124,29 +124,6 @@ extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv,
     }
 }
 
-extern void eoprot_fun_UPDT_as_inertial_config(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    eOas_inertial_config_t *cfg = (eOas_inertial_config_t*)rd->data;    
-    eo_inertials2_Config(eo_inertials2_GetHandle(), cfg);    
-}
-
-
-extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    eOas_inertial_commands_t *cmd = (eOas_inertial_commands_t*)rd->data;  
-
-    if(0 == cmd->enable)
-    {
-        eo_inertials2_Stop(eo_inertials2_GetHandle());    
-    }
-    else
-    {
-        eo_inertials2_Start(eo_inertials2_GetHandle());    
-        eo_inertials2_Transmission(eo_inertials2_GetHandle(), eobool_true);
-    }
-}
-
-
 
 extern void eoprot_fun_UPDT_as_inertial3_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
