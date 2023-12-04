@@ -297,7 +297,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   if(htim->Instance==TIM15){        // timer 10ms
     displayCharge();
     checkHSM();
-    #ifdef BAT_B_iCub3
+    #ifdef BAT_B_Generic
       FAULT_CHECK();
     #endif
   }
@@ -757,9 +757,9 @@ void FAULT_CHECK(void){
 
 
 // -----------------------------------------------------------------------------------------------------------------------------
-// Finite state machine - DCDC power management - Target BAT_B_iCub3
+// Finite state machine - DCDC power management - Target BAT_B_Generic
 // -----------------------------------------------------------------------------------------------------------------------------
-#ifdef BAT_B_iCub3
+#ifdef BAT_B_Generic
 void dcdc_management(void){
 	
   // ----- EVENTS -------------------------------------------------- //

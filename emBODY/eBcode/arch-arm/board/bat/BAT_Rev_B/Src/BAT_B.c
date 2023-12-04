@@ -103,7 +103,7 @@ uint16_t Battery_high=4200*7;   // 7s5p battery
 uint16_t Battery_low=3300*7;    // 7s5p battery
 #endif 
 
-#ifdef BAT_B_iCub3
+#ifdef BAT_B_Generic
 uint32_t VTH[7]={32000, 34000, 36000, 38000, 40000, 42000, 44000};   // threshold in mV iCub 2.5 Battery
 uint16_t Battery_high=4200*10;   // 10s3p battery
 uint16_t Battery_low=3300*10;    // 10s3p battery
