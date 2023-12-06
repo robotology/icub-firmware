@@ -20,7 +20,10 @@
 
 #include "EOMtheIPnet.h"
 #include "embot_os.h"
+
+#if !defined(THEIPNET_CONFIG_dontuse_theEnvironment)
 #include "embot_app_eth_theEnvironment.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -86,8 +89,12 @@ bool embot::app::eth::theIPnet::Impl::initialise(const Config &config)
     };
 
     if(true == _config.ipal.useenvironment)
-    {        
+    {
+#if !defined(THEIPNET_CONFIG_dontuse_theEnvironment)        
         embot::app::eth::theEnvironment::getInstance().get(ipconfig);
+#else
+        ipconfig = {_config.ipal.cfg2->eth->eth_mac, _config.ipal.cfg2->eth->eth_ip, _config.ipal.cfg2->eth->eth_mask};
+#endif        
     }
     else
     {

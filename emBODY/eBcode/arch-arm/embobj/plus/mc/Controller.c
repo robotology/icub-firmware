@@ -1428,7 +1428,7 @@ void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
 #ifdef WRIST_MK2
     if((!j_ptr->belong2WristMK2) || ((j_ptr->belong2WristMK2) && (j_ptr->control_mode == eomc_controlmode_notConfigured)))
     {
-        Joint_get_state(j_ptr, joint_state);
+        Joint_get_state(j_ptr, j, joint_state);
     }
     else
     {
@@ -1436,7 +1436,7 @@ void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
     }
 
 #else
-     Joint_get_state(j_ptr, joint_state);
+     Joint_get_state(j_ptr, j, joint_state);
 #endif
     
     AbsEncoder* enc_ptr = smc->absEncoder + j*smc->multi_encs;

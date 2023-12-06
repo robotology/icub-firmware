@@ -166,8 +166,8 @@ namespace embot { namespace app { namespace eth {
     
     struct IPconfig
     {
-        MACaddress macaddr {"10.0.1.99"};
-        IPaddress ipaddr {};
+        MACaddress macaddr {1, 2, 3, 4, 5, 6};
+        IPaddress ipaddr {"10.0.1.99"};
         IPmask ipmask {"255.255.255.0"}; 
         constexpr IPconfig() = default;
         constexpr IPconfig(const MACaddress& ma, const IPaddress &ia, const IPmask& im) 

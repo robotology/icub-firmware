@@ -37,6 +37,8 @@
 
 #include "embot_app_eth_theETHmonitor.h"
 
+#include "embot_app_eth_theBackdoor.h"
+
 #include "embot_os_theScheduler.h"
 
 #include "EOtheCANservice.h"
@@ -46,6 +48,7 @@
 
 #include "embot_app_eth_theServices.h"
 #include "embot_app_eth_theServiceFT.h"
+#include "embot_app_eth_theEncoderReader.h"
 
 #if defined(USE_EMBOT_theServicesMC)
 #include "embot_app_eth_theServiceMC.h"
@@ -393,6 +396,12 @@ struct theSM
         }
         
     }
+
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)    
+    EOpacket *packet {nullptr};    
+    eOipv4addr_t hostip {EO_COMMON_IPV4ADDR(10, 0, 1, 104)};
+    eOipv4port_t hostport {6666};
+#endif
     
     static void objectRUN_RX_afterUDPparsing()
     {
@@ -441,6 +450,10 @@ struct theSM
 
     
         embot::app::eth::theServices::getInstance().tick(); 
+        
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)
+        embot::app::eth::theEncoderReader::getInstance().log();        
+#endif        
         
         // marco.accame on 20oct2023:
         // we could start the transmission of the CAN frames at the end of the DO phase

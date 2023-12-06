@@ -27,6 +27,11 @@
 #include "embot_app_eth_theServices.h"
 #include "embot_app_eth_Service_legacy.h"
 
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)   
+#include "embot_app_eth_theBackdoor.h"
+#include "EOpacket.h"
+#endif
+    
 using namespace std;
 using namespace embot::hw;
 
@@ -86,6 +91,8 @@ struct embot::app::eth::theEncoderReader::Impl
     eOservice_core_t service {dummy_service_core};
     eOservice_diagnostics_t diagnostics {dummy_service_diagnostics};
     
+    std::array<std::array<embot::app::eth::encoder::experimental::Value, 2>, max_number_of_jomos> rawvalues {};
+    
     typedef struct
     {
         eOmc_encoder_descriptor_t *descriptor;
@@ -108,7 +115,11 @@ struct embot::app::eth::theEncoderReader::Impl
     bool Diagnostics_Tick() { return true; }
     embot::app::eth::encoder::v1::Type GetType(const embot::app::eth::encoder::v1::Target &target);
     bool Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler);
+    
+    bool raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value);
 
+    void log();
+    
     // advanced
     bool read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value);
 
@@ -118,7 +129,13 @@ private:
     static bool isValidValue_AEA(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
     static bool isValidValue_AEA3(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
 
-
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)    
+    EOpacket *packet {nullptr};    
+    eOipv4addr_t hostip {EO_COMMON_IPV4ADDR(10, 0, 1, 104)};
+    eOipv4port_t hostport {6666};
+    char sss[512] = {0};
+#endif
+    
 };
 
 
@@ -132,26 +149,6 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     
     embot::core::print("embot::app::eth::theEncoderReader::Impl::initialise()");
      
-//    s_eo_theappencreader.totalnumberofencoders = 0;
-//    
-//    // step 1: retrieve the spi mapping from hal
-//    
-//    s_eo_theappencreader.stream_map = hal_spiencoder_stream_map_get();
-//    
-//    if(nullptr == s_eo_theappencreader.stream_map)
-//    {
-//        // marco.accame: put a diagnostics message about the failure
-//        return(nullptr);
-//    }   
-
-//    memset(&s_eo_theappencreader.config, 0, sizeof(s_eo_theappencreader.config));
-//    
-//    s_eo_clear_SPI_streams(&s_eo_theappencreader);   
-//    
-//    
-//    // amodiag is an extra respect to the legacy diagnostics.
-//    // in here i just init it. later i will set its enable state
-//    s_eo_appEncReader_amodiag_Init();
 
     service.servconfig.type = eomn_serv_NONE;
     service.initted = eobool_true;
@@ -163,6 +160,11 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     diagnostics.errorType = eo_errortype_error;
     diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);   
+
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)    
+    packet = eo_packet_New(512);    
+    eo_packet_Addressing_Set(packet, hostip, hostport);  
+#endif
     
     _initted = true;
     return true;
@@ -383,20 +385,19 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
         // we also retrieve its diagnostic
         //hal_spiencoder_diagnostic_t diagn = {0};
         //diagn.type = hal_spiencoder_diagnostic_type_none;
+        embot::hw::result_t rr {resNOK}; 
+        embot::hw::encoder::POS spiRawValue = 0; 
         
         switch(prop.descriptor->type)
         {
             // they are: eomc_enc_aea3, eomc_enc_aea, eomc_enc_amo, eomc_enc_spichainof2,
             //           eomc_enc_spichainof3, eomc_enc_qenc, eomc_enc_absanalog, eomc_enc_mais
-            
+                       
             case eomc_enc_aea:
-            {
-                embot::hw::encoder::POS spiRawValue = 0; 
-                // hal_spiencoder_errors_flags flags = {0};
-                
+            {               
                 
                 // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
-                if(resOK == embot::hw::encoder::getValue(e, spiRawValue/*, &diagn*/))                
+                if(resOK == (rr = embot::hw::encoder::getValue(e, spiRawValue/*, &diagn*/)))                
                 {   // ok, the hal reads correctly
                     if(true == isValidValue_AEA(spiRawValue, prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
@@ -421,18 +422,18 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                     prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::AEA_READING;
                     errorparam = 0xffff;                                         
                 }   
+                
+                rawvalues[i][jomo].raw = spiRawValue;
+                rawvalues[i][jomo].error = (resOK == rr) ? embot::app::eth::encoder::experimental::Error::NONE : embot::app::eth::encoder::experimental::Error::SOME;
                
             } break;
             
             
             case eomc_enc_aea3:
             {
-                embot::hw::encoder::POS spiRawValue = 0; 
-                // hal_spiencoder_errors_flags flags = {0};
-                
-                
+                               
                 // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
-                if(resOK == embot::hw::encoder::getValue(e, spiRawValue/*, &diagn*/))                
+                if(resOK == (rr = embot::hw::encoder::getValue(e, spiRawValue/*, &diagn*/)))                
                 {   // ok, the hal reads correctly
                     if(true == isValidValue_AEA3(spiRawValue, prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
@@ -450,14 +451,20 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                 {   // we dont even have a valid reading from hal
                     prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::AEA_READING;
                     errorparam = 0xffff;                                         
-                }   
+                } 
+
+                rawvalues[i][jomo].raw = spiRawValue;                
                
             } break;
             
             default:
             {   // we have not recognised any valid encoder type
                 prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::GENERIC;   
-                errorparam = 0;                
+                errorparam = 0; 
+                
+                rawvalues[i][jomo].raw = 0;
+                rawvalues[i][jomo].error = embot::app::eth::encoder::experimental::Error::SOME;
+                
             } break;
         }
     }
@@ -487,6 +494,40 @@ embot::app::eth::encoder::v1::Type  embot::app::eth::theEncoderReader::Impl::Get
 bool embot::app::eth::theEncoderReader::Impl::Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler)
 {
     return false;
+}
+
+bool embot::app::eth::theEncoderReader::Impl::raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value)
+{
+    uint8_t p = embot::core::tointegral(pos);
+    
+    if((p > 2) || (jomo > max_number_of_jomos))
+    {
+        return false;
+    }   
+    
+    value = rawvalues[p][jomo];
+    return embot::app::eth::encoder::experimental::Error::NONE == value.error;
+}
+
+
+void embot::app::eth::theEncoderReader::Impl::log()
+{
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor) 
+    
+    embot::core::Time n {embot::core::now()};
+    std::string s {embot::core::TimeFormatter(n).to_string() + ":"};
+    for(size_t jomo=0; jomo<3; jomo++)
+    {
+        s += " ";
+        s += std::to_string(rawvalues[0][jomo].raw);           
+    } 
+    
+    std::snprintf(sss, sizeof(sss), "%s\n", s.c_str());             
+        
+    eo_packet_Payload_Set(packet, reinterpret_cast<uint8_t*>(sss), std::strlen(sss));    
+    embot::app::eth::theBackdoor::getInstance().transmit(packet);   
+    
+#endif    
 }
 
 bool embot::app::eth::theEncoderReader::Impl::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
@@ -681,6 +722,17 @@ bool embot::app::eth::theEncoderReader::Scale(const embot::app::eth::encoder::v1
 {
     return pImpl->Scale(target, scaler);
 }
+
+bool embot::app::eth::theEncoderReader::raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value)
+{
+    return pImpl->raw(jomo, pos, value);
+}
+
+void embot::app::eth::theEncoderReader::log()
+{
+    pImpl->log();
+}
+
 
 bool embot::app::eth::theEncoderReader::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
 {

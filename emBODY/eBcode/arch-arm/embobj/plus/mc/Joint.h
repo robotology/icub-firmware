@@ -151,7 +151,7 @@ extern BOOL Joint_set_interaction_mode(Joint* o, eOmc_interactionmode_t interact
 extern void Joint_set_impedance(Joint* o, eOmc_impedance_t* impedance);
 extern void Joint_get_impedance(Joint* o, eOmc_impedance_t* impedance);
 
-extern void Joint_get_state(Joint* o, eOmc_joint_status_t* joint_state);
+extern void Joint_get_state(Joint* o, int j, eOmc_joint_status_t* joint_state);
 
 extern BOOL Joint_get_pid_state(Joint* o, eOmc_joint_status_ofpid_t* pid_state);
 
