@@ -303,6 +303,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   }
   if(htim->Instance==TIM16){        // timer 100ms
     toggle_100ms = toggle_100ms^1;
+    if(TX_ENABLED == 0)
+        return;        
     CANBUS();
   }
   if(htim->Instance==TIM17){        // timer 1s

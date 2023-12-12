@@ -24,7 +24,6 @@
 #include "stdlib.h"
 #include "EoCommon.h"
 
-
 #include "EOtheMemoryPool.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -275,12 +274,18 @@ extern EOtheCANmapping * eo_canmap_Initialise(const eOcanmap_cfg_t *canmapcfg)
         s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_ft_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
     }
     
+    m = eocanmap_posOfEPEN(eoprot_endpoint_analogsensors, eoprot_entity_as_battery);
+    for(uint8_t n=0; n<eocanmap_batteries_maxnumberof; n++)
+    {
+        s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_batteries_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
+    }
+    
     m = eocanmap_posOfEPEN(eoprot_endpoint_skin, eoprot_entity_sk_skin);
     for(uint8_t n=0; n<eocanmap_skins_maxnumberof; n++)
     {
         s_eo_canmap_singleton.arrayOfBRDEXTptr[m][n] = eo_array_New(eocanmap_skin_boards_maxnumberof, sizeof(eOcanmap_board_extended_t*), NULL); 
     }
-
+    
     
     uint8_t i=0;
     uint8_t j=0;
@@ -746,7 +751,7 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
         (1 << eobrd_cantype_psc),                                                                                               // psc
         (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_psc) | (1 << eobrd_cantype_mtb4c) | (1 << eobrd_cantype_mtb4),           // pos
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_strain2c),                             // ft
-        (1 << eobrd_cantype_bms),                                                                                               // bs
+        (1 << eobrd_cantype_bms) | (1 << eobrd_cantype_bat),                                                                    // bs
         (1 << eobrd_cantype_mtb) | (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_psc) | (1 << eobrd_cantype_mtb4c)            // skin
     }; EO_VERIFYsizeof(tableB, sizeof(const uint32_t)*(eocanmap_entities_maxnumberof))
     

@@ -81,19 +81,21 @@ struct embot::app::eth::theBATservice::Impl {
 
   const eOmn_serv_configuration_t *tmpservcfg{nullptr};
   // theBATnetvariables[i] holds pointer to the network variable of the whole
-  // eOas_battery_t w/ i index theFTboards[i] contains the relevant board type
+  // eOas_battery_t w/ i index 
+  // theBATboards[i] contains the relevant board type
   std::array<eOas_battery_t *, maxSensors> theBATnetvariables{nullptr};
-  std::array<eObrd_cantype_t, maxSensors> theBATboards{eobrd_cantype_bms};
+  std::array<eObrd_cantype_t, maxSensors> theBATboards{eobrd_cantype_none};
 
   // this object performs the monitoring of presence of CAN boards
   CANmonitor canmonitor{};
   static constexpr CANmonitor::Config defaultcanmonitorconfig{
       {}, // the map is left empty
-      100 * embot::core::time1millisec,
+      250 * embot::core::time1millisec,
       CANmonitor::Report::ALL,
       10 * embot::core::time1second,
       s_eobj_ownname,
-      eomn_serv_category_battery};
+      eomn_serv_category_battery
+  };
 
   embot::core::Time debugtimeft{0};
 
@@ -152,8 +154,10 @@ private:
   void debug_CANMAPPING(EOconstarray *carray);
 };
 
-eOresult_t embot::app::eth::theBATservice::Impl::initialise() {
-  if (true == initted) {
+eOresult_t embot::app::eth::theBATservice::Impl::initialise() 
+{
+  if (true == initted) 
+  {
     return eores_OK;
   }
 
@@ -181,26 +185,24 @@ eOresult_t embot::app::eth::theBATservice::Impl::initialise() {
   service.active = eobool_false;
   service.started = eobool_false;
   service.state = eomn_serv_state_idle;
-  eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                   eomn_serv_category_battery, service.state);
+  eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
 
   // clear data used by this class
-  for (auto &item : theBATnetvariables)
-    item = nullptr;
-  for (auto &item : theBATboards)
-    item = eobrd_cantype_bms;
+  for (auto &item : theBATnetvariables) item = nullptr;
+  for (auto &item : theBATboards) item = eobrd_cantype_none;
 
   initted = true;
   return eores_OK;
 }
 
 eOresult_t embot::app::eth::theBATservice::Impl::Tick() {
-  if (eobool_false ==
-      service.active) { // nothing to do because object must be first activated
+  if (eobool_false == service.active) 
+  { // nothing to do because object must be first activated
     return (eores_OK);
   }
 
-  if (eobool_false == service.started) { // not running, thus we do nothing
+  if (eobool_false == service.started) 
+  { // not running, thus we do nothing
     return (eores_OK);
   }
 
@@ -210,12 +212,11 @@ eOresult_t embot::app::eth::theBATservice::Impl::Tick() {
   return eores_OK;
 }
 
-eOresult_t embot::app::eth::theBATservice::Impl::SendReport() {
-  eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, NULL,
-                  s_eobj_ownname, &diagnostics.errorDescriptor);
+eOresult_t embot::app::eth::theBATservice::Impl::SendReport() 
+{
+  eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
 
-  eOerror_value_t errorvalue =
-      eoerror_code2value(diagnostics.errorDescriptor.code);
+  eOerror_value_t errorvalue = eoerror_code2value(diagnostics.errorDescriptor.code);
 
   switch (errorvalue) {
   case eoerror_value_CFG_bat_failed_candiscovery: {
@@ -230,26 +231,27 @@ eOresult_t embot::app::eth::theBATservice::Impl::SendReport() {
   return eores_OK;
 }
 
-eOresult_t embot::app::eth::theBATservice::Impl::Verify(
-    const eOmn_serv_configuration_t *servcfg,
-    eOservice_onendofoperation_fun_t onverify, bool activateafterverify) {
+eOresult_t embot::app::eth::theBATservice::Impl::Verify(const eOmn_serv_configuration_t *servcfg, eOservice_onendofoperation_fun_t onverify, bool activateafterverify) 
+{
   eo_errman_Trace(eo_errman_GetHandle(), "::Verify()", s_eobj_ownname);
 
-  if (NULL == servcfg) {
+  if (NULL == servcfg) 
+  {
     service.state = eomn_serv_state_failureofverify;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                     eomn_serv_category_battery, service.state);
-    if (NULL != onverify) {
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
+    if (NULL != onverify) 
+    {
       onverify(nullptr, eobool_false);
     }
     return (eores_NOK_nullpointer);
   }
 
-  if (eomn_serv_AS_battery != servcfg->type) {
+  if (eomn_serv_AS_battery != servcfg->type) 
+  {
     service.state = eomn_serv_state_failureofverify;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                     eomn_serv_category_battery, service.state);
-    if (NULL != onverify) {
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
+    if (NULL != onverify) 
+    {
       onverify(nullptr, eobool_false);
     }
     return (eores_NOK_generic);
@@ -260,8 +262,7 @@ eOresult_t embot::app::eth::theBATservice::Impl::Verify(
   }
 
   service.state = eomn_serv_state_verifying;
-  eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                   eomn_serv_category_battery, service.state);
+  eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
 
   // make sure the timer is not running
   eo_timer_Stop(diagnostics.reportTimer);
@@ -270,10 +271,10 @@ eOresult_t embot::app::eth::theBATservice::Impl::Verify(
   service.activateafterverify = activateafterverify;
 
   service.state = eomn_serv_state_verified;
-  eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                   eomn_serv_category_battery, service.state);
+  eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
 
-  if (eobool_true == service.activateafterverify) {
+  if (eobool_true == service.activateafterverify) 
+  {
     Activate(servcfg);
   }
 
@@ -283,19 +284,16 @@ eOresult_t embot::app::eth::theBATservice::Impl::Verify(
   diagnostics.errorDescriptor.par64 = 0;
   EOaction_strg astrg = {0};
   EOaction *act = (EOaction *)&astrg;
-  eo_action_SetCallback(act, s_send_periodic_error_report, this,
-                        eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+  eo_action_SetCallback(act, s_send_periodic_error_report, this, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
 
   diagnostics.errorType = eo_errortype_debug;
-  diagnostics.errorDescriptor.code =
-      eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_bat_ok);
-  eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, NULL,
-                  s_eobj_ownname, &diagnostics.errorDescriptor);
+  diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_bat_ok);
+  eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
 
-  if ((0 != diagnostics.repetitionOKcase) && (0 != diagnostics.reportPeriod)) {
+  if ((0 != diagnostics.repetitionOKcase) && (0 != diagnostics.reportPeriod)) 
+  {
     diagnostics.errorCallbackCount = diagnostics.repetitionOKcase;
-    eo_timer_Start(diagnostics.reportTimer, eok_abstimeNOW,
-                   diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+    eo_timer_Start(diagnostics.reportTimer, eok_abstimeNOW, diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
   }
 
   if (NULL != service.onverify) {
@@ -305,8 +303,8 @@ eOresult_t embot::app::eth::theBATservice::Impl::Verify(
   return eores_OK;
 }
 
-eOresult_t embot::app::eth::theBATservice::Impl::Activate(
-    const eOmn_serv_configuration_t *servcfg) {
+eOresult_t embot::app::eth::theBATservice::Impl::Activate(const eOmn_serv_configuration_t *servcfg) 
+{
   eo_errman_Trace(eo_errman_GetHandle(), "::Activate()", s_eobj_ownname);
 
   if (NULL == servcfg) {
@@ -337,7 +335,8 @@ eOresult_t embot::app::eth::theBATservice::Impl::Activate(
   // - init the theBATnetvariables
 
   // we must load all the boards into can mapping, entities etc
-  for (uint8_t s = 0; s < numofsensors; s++) {
+  for (uint8_t s = 0; s < numofsensors; s++) 
+  {
     const eOas_battery_sensordescriptor_t *sd =
         reinterpret_cast<const eOas_battery_sensordescriptor_t *>(
             eo_constarray_At(carray, s));
@@ -383,21 +382,21 @@ eOresult_t embot::app::eth::theBATservice::Impl::Activate(
 
   service.active = eobool_true;
   service.state = eomn_serv_state_activated;
-  eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                   eomn_serv_category_battery, service.state);
+  eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
 
   return (eores_OK);
 }
 
-eOresult_t embot::app::eth::theBATservice::Impl::Deactivate() {
+eOresult_t embot::app::eth::theBATservice::Impl::Deactivate() 
+{
   eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
 
-  if (eobool_false == service.active) {
+  if (eobool_false == service.active) 
+  {
     // i force to eomn_serv_state_idle because it may be that state was
     // eomn_serv_state_verified or eomn_serv_state_failureofverify
     service.state = eomn_serv_state_idle;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                     eomn_serv_category_battery, service.state);
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
     return (eores_OK);
   }
 
@@ -405,27 +404,24 @@ eOresult_t embot::app::eth::theBATservice::Impl::Deactivate() {
   // entity-can-mapping and the board-can-mapping, reset all things inside this
   // object
 
-  if (eobool_true == service.started) {
+  if (eobool_true == service.started) 
+  {
     Stop();
   }
 
   SetRegulars(nullptr, nullptr);
 
   // deconfig EOtheCANmapping
-  eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors,
-                           eoprot_entity_as_battery,
-                           sharedcan.entitydescriptor);
+  eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_battery, sharedcan.entitydescriptor);
   eo_canmap_UnloadBoards(eo_canmap_GetHandle(), sharedcan.boardproperties);
 
   // clear data used by this class
   for (auto &item : theBATnetvariables) {
     if (nullptr != item) {
       // i reset the status to its default value
-      std::memmove(&item->status, &defaultBATstatus,
-                   sizeof(eOas_battery_status_t));
+      std::memmove(&item->status, &defaultBATstatus, sizeof(eOas_battery_status_t));
       // i reset the config to its default value
-      std::memmove(&item->config, &defaultFTconfig,
-                   sizeof(eOas_battery_config_t));
+      std::memmove(&item->config, &defaultBATconfig, sizeof(eOas_battery_config_t));
     }
 
     item = nullptr;
@@ -446,8 +442,7 @@ eOresult_t embot::app::eth::theBATservice::Impl::Deactivate() {
 
   service.active = eobool_false;
   service.state = eomn_serv_state_idle;
-  eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                   eomn_serv_category_battery, service.state);
+  eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
 
   return (eores_OK);
 }
@@ -479,14 +474,15 @@ eOresult_t embot::app::eth::theBATservice::Impl::Start() {
   CANmonitor::Config cfg = defaultcanmonitorconfig;
   // use ...
   cfg.target.clear();
-  cfg.periodofcheck =
-      embot::core::time1millisec *
-      service.servconfig.data.as.battery.canmonitorconfig.periodofcheck;
-  cfg.periodofreport =
-      embot::core::time1millisec *
-      service.servconfig.data.as.battery.canmonitorconfig.periodofreport;
-  cfg.reportmode = static_cast<CANmonitor::Report>(
-      service.servconfig.data.as.battery.canmonitorconfig.reportmode);
+  // check if we are not using custom value > 100 for service.servconfig.data.as.battery.canmonitorconfig.periodofcheck 
+  // if not we are setting it to 250 in order to not having error when canmonitor checks for BAT frames
+//  if(service.servconfig.data.as.battery.canmonitorconfig.periodofcheck != 0)
+//  {
+//    cfg.periodofcheck = embot::core::time1millisec * service.servconfig.data.as.battery.canmonitorconfig.periodofcheck;
+//    cfg.periodofreport = embot::core::time1millisec * service.servconfig.data.as.battery.canmonitorconfig.periodofreport;
+//    cfg.reportmode = static_cast<CANmonitor::Report>(service.servconfig.data.as.battery.canmonitorconfig.reportmode);
+//  }
+
   canmonitor.configure(cfg);
   canmonitor.start();
 
@@ -512,8 +508,7 @@ eOresult_t embot::app::eth::theBATservice::Impl::Stop() {
 
   service.started = eobool_false;
   service.state = eomn_serv_state_activated;
-  eo_service_hid_SynchServiceState(eo_services_GetHandle(),
-                                   eomn_serv_category_battery, service.state);
+  eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_battery, service.state);
 
   // we dont remove all regulars related to ft entity because Deactivate() does
   // that.
@@ -521,24 +516,23 @@ eOresult_t embot::app::eth::theBATservice::Impl::Stop() {
   return eores_OK;
 }
 
-eOresult_t embot::app::eth::theBATservice::Impl::SetRegulars(
-    eOmn_serv_arrayof_id32_t *arrayofid32, uint8_t *numberofthem) {
+eOresult_t embot::app::eth::theBATservice::Impl::SetRegulars(eOmn_serv_arrayof_id32_t *arrayofid32, uint8_t *numberofthem) 
+{
   eo_errman_Trace(eo_errman_GetHandle(), "::SetRegulars()", s_eobj_ownname);
 
-  if (eobool_false ==
-      service.active) { // nothing to do because object must be first activated
+  if (eobool_false == service.active) 
+  { // nothing to do because object must be first activated
     return (eores_OK);
   }
 
-  return (eo_service_hid_SetRegulars(id32ofregulars, arrayofid32,
-                                     s_battery_isID32relevant, numberofthem));
+  return (eo_service_hid_SetRegulars(id32ofregulars, arrayofid32, s_battery_isID32relevant, numberofthem));
 }
 
-eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(
-    const canFrameDescriptor &cfd) {
+eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(const canFrameDescriptor &cfd) {
   // object must be first activated otherwise we cannot use EOtheCANmapping,
   // theBATnetvariables, theFTboards
-  if (eobool_false == service.active) {
+  if (eobool_false == service.active) 
+  {
     return (eores_OK);
   }
 
@@ -659,47 +653,50 @@ embot::app::eth::theBATservice::Impl::GetServiceState() const {
   return service.state;
 }
 
-eOresult_t
-embot::app::eth::theBATservice::Impl::process(const eOropdescriptor_t *rd,
-                                              const EOnv *nv) {
-  if ((nullptr == rd) || (nullptr == rd->data)) {
-    return eores_NOK_nullpointer;
+eOresult_t embot::app::eth::theBATservice::Impl::process(const eOropdescriptor_t *rd, const EOnv *nv) 
+{
+  
+  if ((nullptr == rd) || (nullptr == rd->data)) 
+  {
+      return eores_NOK_nullpointer;
   }
 
   eOprotIndex_t index = eoprot_ID2index(rd->id32);
-  eOprot_tag_as_battery_t tag =
-      static_cast<eOprot_tag_as_battery_t>(eoprot_ID2tag(rd->id32));
+  eOprot_tag_as_battery_t tag = static_cast<eOprot_tag_as_battery_t>(eoprot_ID2tag(rd->id32));
 
-  switch (tag) {
-  case eoprot_tag_as_battery_config: {
-    // in here we need to get the configuration and assign it
-    eOas_battery_config_t *cfg =
-        reinterpret_cast<eOas_battery_config_t *>(rd->data);
-    set(index, cfg);
-  } break;
+  switch (tag) 
+  {
+    case eoprot_tag_as_battery_config: 
+    {
+      // in here we need to get the configuration and assign it
+      eOas_battery_config_t *cfg = reinterpret_cast<eOas_battery_config_t *>(rd->data);
+      set(index, cfg);
+    } break;
 
-  case eoprot_tag_as_battery_cmmnds_enable: {
-    // in here we either start or stop depending on value 1 or 0 of ...
-    // eOas_battery_commands_t::enable
-    uint8_t *cmdenable = reinterpret_cast<uint8_t *>(rd->data);
-    enable(index, cmdenable);
-  } break;
+    case eoprot_tag_as_battery_cmmnds_enable: 
+    {
+      // in here we either start or stop depending on value 1 or 0 of ...
+      // eOas_battery_commands_t::enable
+      uint8_t *cmdenable = reinterpret_cast<uint8_t *>(rd->data);
+      enable(index, cmdenable);
+    } break;
 
-  default: {
+    default: 
+    {
 
-  } break;
+    } break;
   }
 
   return eores_OK;
 }
 
-bool embot::app::eth::theBATservice::Impl::set(
-    eOprotIndex_t index, const eOas_battery_config_t *ftc) {
+bool embot::app::eth::theBATservice::Impl::set(eOprotIndex_t index, const eOas_battery_config_t *ftc) 
+{
   // NOTE-x:
   // ... the ETH protocol mechanism already writes inside the relevant memory
   // the new values inside ftc we just have have them, which are also inside
   // theBATnetvariables[index]->config however, ... if the method process()
-  // whuich calls set() is called by theServiceValidator and not by the ETH
+  // which calls set() is called by theServiceValidator and not by the ETH
   // callbacks, we also must copy what inside ftc but ... beware of nullptr
 
   if (nullptr == ftc) {
@@ -710,16 +707,17 @@ bool embot::app::eth::theBATservice::Impl::set(
     return false;
   }
 
-  eOas_battery_config_t *theNVptr = (nullptr != theBATnetvariables[index])
-                                        ? &theBATnetvariables[index]->config
-                                        : nullptr;
+  eOas_battery_config_t *theNVptr = (nullptr != theBATnetvariables[index]) ? &theBATnetvariables[index]->config : nullptr;
 
-  if (nullptr == theNVptr) {
+  if (nullptr == theNVptr) 
+  {
     return false;
   }
 
-  if (ftc != theNVptr) { // in this case the caller was not the ETH handler, so
-                         // we must update the internal memory
+  if (ftc != theNVptr) 
+  { 
+    // in this case the caller was not the ETH handler, so
+    // we must update the internal memory
     std::memmove(theNVptr, ftc, sizeof(eOas_battery_config_t));
   }
 
@@ -764,11 +762,9 @@ bool embot::app::eth::theBATservice::Impl::enable(eOprotIndex_t index,
   // NOTE: i do that only for FT, not for temperature because it is FT che
   // comanda
   eObrd_canlocation_t loc{};
-  eOprotID32_t id32 =
-      eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_battery,
-                    index, eoprot_tag_none);
-  if (eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &loc,
-                                              NULL, NULL)) {
+  eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_battery, index, eoprot_tag_none);
+  if (eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &loc, NULL, NULL)) 
+  {
     if (true == on) {
       canmonitor.add(loc);
       //            // i adjust rate according to actual rate w/ a safety factor
@@ -822,18 +818,56 @@ embot::app::eth::theBATservice::Impl::s_battery_isID32relevant(uint32_t id32) {
   return (eobool_false);
 }
 
-void embot::app::eth::theBATservice::Impl::can_battery_Config(
-    eOprotIndex_t index, uint8_t ratemillisec) {
-  // For now do nothing for BMS
+void embot::app::eth::theBATservice::Impl::can_battery_Config(eOprotIndex_t index, uint8_t ratemillisec) 
+{
+//    uint8_t datarate = ratemillisec;    
+//    sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
+//    sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+//    sharedcan.command.value = &datarate;
+//    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_battery, index, eoprot_tag_none);
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32);
+    
+    // Notihing to do for now
 }
 
-void embot::app::eth::theBATservice::Impl::can_battery_TX(eOprotIndex_t index,
-                                                          bool on) {
-  // For now do nothing for BMS
+void embot::app::eth::theBATservice::Impl::can_battery_TX(eOprotIndex_t index, bool on) 
+{
+    if(nullptr == theBATnetvariables[index])
+    {
+        return;
+    }
+    
+    // now, depending on the pair {transmit, mode} we choose the eOas_batterymode_t value to send to the bat / bms board
+    // amongst these two: 
+    // eoas_batterymode_txdatacontinuously                    
+    // eoas_batterymode_acquirebutdonttx                      
+    
+    eOas_batterymode_t batterymode = (true == on ) ? eoas_batterymode_txdatacontinuously : eoas_batterymode_acquirebutdonttx;
+
+    sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
+    sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    sharedcan.command.value = &batterymode; 
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_battery, index, eoprot_tag_none);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32);    
 }
 
 void embot::app::eth::theBATservice::Impl::can_battery_TXstop() {
-  // For now do nothing for BMS
+   // set txmode
+   eOenum08_t mode = eoas_batterymode_acquirebutdonttx; 
+   sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
+   sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+   sharedcan.command.value = &mode;
+
+   for(uint8_t protindex = 0; protindex<theBATnetvariables.size(); protindex++)
+   {
+       if(nullptr != theBATnetvariables[protindex])
+       {
+           // it means that we have the entity index activated
+           // we get the mode from the entity ram and we send the command
+           eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_battery, protindex, eoprot_tag_none);
+           eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &sharedcan.command, id32);
+       }
+   }
 }
 
 void embot::app::eth::theBATservice::Impl::debug_CANMAPPING(
@@ -843,8 +877,8 @@ void embot::app::eth::theBATservice::Impl::debug_CANMAPPING(
 
 const theServiceTester::Config &
 embot::app::eth::theBATservice::Impl::servicetesterconfig() const {
-  static constexpr embot::app::eth::theServiceTester::Config FTservtestconfig{};
-  return FTservtestconfig;
+  static constexpr embot::app::eth::theServiceTester::Config BATservtestconfig{};
+  return BATservtestconfig;
 }
 
 } // namespace embot::app::eth
@@ -923,8 +957,8 @@ bool embot::app::eth::theBATservice::enable(eOprotIndex_t index,
   return pImpl->enable(index, cmdenable);
 }
 
-const embot::app::eth::theServiceTester::Config &
-embot::app::eth::theBATservice::servicetesterconfig() const {
+const embot::app::eth::theServiceTester::Config &embot::app::eth::theBATservice::servicetesterconfig() const 
+{
   return pImpl->servicetesterconfig();
 }
 
@@ -934,29 +968,27 @@ embot::app::eth::theBATservice::servicetesterconfig() const {
 
 extern "C" {
 
-extern void eoprot_fun_UPDT_as_battery_config(const EOnv *nv,
-                                              const eOropdescriptor_t *rd) {
+extern void eoprot_fun_UPDT_as_battery_config(const EOnv *nv, const eOropdescriptor_t *rd) 
+{
   embot::app::eth::theBATservice::getInstance().process(rd, nv);
 }
 
 extern void
-eoprot_fun_UPDT_as_battery_cmmnds_enable(const EOnv *nv,
-                                         const eOropdescriptor_t *rd) {
+eoprot_fun_UPDT_as_battery_cmmnds_enable(const EOnv *nv, const eOropdescriptor_t *rd) 
+{
   embot::app::eth::theBATservice::getInstance().process(rd, nv);
 }
 
-extern void eoprot_fun_INIT_as_battery_config(const EOnv *nv) {
-  eOas_battery_config_t *config =
-      reinterpret_cast<eOas_battery_config_t *>(eo_nv_RAM(nv));
-  std::memmove(config, &embot::app::eth::theBATservice::defaultFTconfig,
-               sizeof(eOas_battery_config_t));
+extern void eoprot_fun_INIT_as_battery_config(const EOnv *nv) 
+{
+  eOas_battery_config_t *config = reinterpret_cast<eOas_battery_config_t *>(eo_nv_RAM(nv));
+  std::memmove(config, &embot::app::eth::theBATservice::defaultBATconfig, sizeof(eOas_battery_config_t));
 }
 
-extern void eoprot_fun_INIT_as_battery_status(const EOnv *nv) {
-  eOas_battery_status_t *status =
-      reinterpret_cast<eOas_battery_status_t *>(eo_nv_RAM(nv));
-  std::memmove(status, &embot::app::eth::theBATservice::defaultBATstatus,
-               sizeof(eOas_battery_status_t));
+extern void eoprot_fun_INIT_as_battery_status(const EOnv *nv) 
+{
+  eOas_battery_status_t *status = reinterpret_cast<eOas_battery_status_t *>(eo_nv_RAM(nv));
+  std::memmove(status, &embot::app::eth::theBATservice::defaultBATstatus, sizeof(eOas_battery_status_t));
 }
 
 } // extern "C"

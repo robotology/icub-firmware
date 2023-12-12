@@ -115,4 +115,6 @@ extern uint16_t time_delay;
 
 extern uint8_t can_message;
 
+extern uint8_t TX_ENABLED;
+
 #endif
