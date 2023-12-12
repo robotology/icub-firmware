@@ -25,6 +25,7 @@
 #include "embot_app_eth_theEnvironment.h"
 #include "embot_app_eth_theIPnet.h"
 #include "embot_app_eth_theListener.h"
+#include "embot_app_eth_theBackdoor.h"
 
 #include "embot_os_theScheduler.h"
 #include "embot_os_theTimerManager.h"
@@ -88,6 +89,10 @@ void embot::app::eth::theApplication::Impl::initSystem(embot::os::Thread *t, voi
     embot::app::eth::theIPnet::getInstance().initialise(embot::app::eth::theApplication_Config.IPNETconfig);
     embot::app::eth::theListener::getInstance().initialise(embot::app::eth::theApplication_Config.LISTENERconfig);       
 
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)    
+    // start theBackdoor
+    embot::app::eth::theBackdoor::getInstance().initialise({}); 
+#endif        
     // and now we can launch whatever else we want
         
     embot::app::eth::theApplication_Config.OSuserdefinit.execute();

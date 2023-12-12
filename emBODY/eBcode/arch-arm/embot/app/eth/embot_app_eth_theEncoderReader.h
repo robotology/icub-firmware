@@ -58,6 +58,10 @@ namespace embot { namespace app { namespace eth {
         // experimental::IFreader
         bool read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value) override;
     
+        bool raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value);
+    
+        void log();
+        
     private:
         theEncoderReader(); 
         ~theEncoderReader(); 

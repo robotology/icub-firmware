@@ -77,7 +77,6 @@ namespace embot { namespace hw { namespace encoder {
     
     /**
      * @brief This function allow to get the last value read from the encoder `e`.
-     *        If the value is not yet ready when this function is called, then `pos` will contain the value 1.
      * 
      * @param e the encoder to use.
      * @param pos reference to the variable where to store the value.
@@ -86,11 +85,7 @@ namespace embot { namespace hw { namespace encoder {
      result_t getValue(ENCODER e, POS &pos);
     
     /**
-     * @brief BLOCKING READ.
-     *        It reads starting from address adr a total of destination.capacity bytes and waits until a timeout.
-     *        The timeout must always be specified. for example 3*embot::core::time1millisec, 500*embot::core::time1microsec, etc. 
-     *        operation is OK only if read() returns resOK. In this case destination.pointer contains the data; 
-     *        operation fails if read() returns resNOKtimeout (the timeout has expired) or resNOK (the operation was not even started)
+     * @brief It reads with a timeout
      * 
      * @param e the encoder to use.
      * @param pos the reference where to store the data.

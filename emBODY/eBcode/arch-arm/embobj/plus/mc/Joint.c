@@ -31,6 +31,10 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOtheEntities.h"
+    
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_TORQUE)
+#include "embot_app_eth_theEncoderReader.h"
+#endif
    
 // - OPAQUE STRUCT    
 #include "Joint_hid.h"
@@ -951,15 +955,22 @@ void Joint_get_impedance(Joint* o, eOmc_impedance_t* impedance)
     impedance->offset    = (eOmeas_torque_t)(o->tcKoffset);
 }
 
-void Joint_get_state(Joint* o, eOmc_joint_status_t* joint_state)
+void Joint_get_state(Joint* o, int j, eOmc_joint_status_t* joint_state)
 {
     joint_state->core.modes.interactionmodestatus    = o->interaction_mode;
     joint_state->core.modes.controlmodestatus        = o->control_mode;
     joint_state->core.modes.ismotiondone             = Trajectory_is_done(&o->trajectory);
     joint_state->core.measures.meas_position         = o->pos_fbk;           
     joint_state->core.measures.meas_velocity         = o->vel_fbk;        
-    joint_state->core.measures.meas_acceleration     = o->acc_fbk;      
-    joint_state->core.measures.meas_torque           = o->trq_fbk;    
+    joint_state->core.measures.meas_acceleration     = o->acc_fbk;   
+    
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_TORQUE)
+    embot::app::eth::encoder::experimental::Value value {};
+    bool r = embot::app::eth::theEncoderReader::getInstance().raw(j, embot::app::eth::encoder::v1::Position::primary, value);
+    joint_state->core.measures.meas_torque           = r ? value.raw : 100000;
+#else      
+    joint_state->core.measures.meas_torque           = o->trq_fbk;
+#endif            
 }
 
 BOOL Joint_get_pid_state(Joint* o, eOmc_joint_status_ofpid_t* pid_state)

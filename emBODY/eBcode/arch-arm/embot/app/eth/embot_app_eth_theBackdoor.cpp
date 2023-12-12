@@ -22,7 +22,7 @@
 #include "EOMtheIPnet.h"
 #include "EOsocketDatagram.h"
 #include "EOMmutex.h"
-#include "eEcommon.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++

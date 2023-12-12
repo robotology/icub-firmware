@@ -33,8 +33,11 @@
 #if defined(USE_EMBOT_theServices) 
 //#warning USE_EMBOT_theServices is defined
 // marco.accame: use objects embot::app::eth::theEncoderReader and ... future ones
+    #if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_TORQUE)
+    #include "embot_app_eth_theEncoderReader.h"
+    #endif
 #else
-//#include "EOtheEncoderReader.h"
+
 #include "embot_app_eth_theEncoderReader.h"
 #include "EOtheMAIS.h"
 #include "EOthePOS.h"
@@ -2243,6 +2246,15 @@ extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_st
     joint_state->core.measures.meas_position         = o->wristMK2.ypr_pos_fbk[j];           
     joint_state->core.measures.meas_velocity         = ZERO;        
     joint_state->core.measures.meas_acceleration     = ZERO;      
+#if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_TORQUE)
+    embot::app::eth::encoder::experimental::Value value {};
+    bool r = embot::app::eth::theEncoderReader::getInstance().raw(j, embot::app::eth::encoder::v1::Position::primary, value);
+    joint_state->core.measures.meas_torque           = r ? value.raw : 100000;
+#else      
     joint_state->core.measures.meas_torque           = ZERO;
+#endif         
 }
+
 #endif
+
+// eof
