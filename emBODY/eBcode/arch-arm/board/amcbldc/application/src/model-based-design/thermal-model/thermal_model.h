@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'thermal_model'.
 //
-// Model version                  : 5.21
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:19:07 2023
+// Model version                  : 6.3
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Thu Dec 14 10:44:18 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,6 +25,11 @@
 // Block states (default storage) for model 'thermal_model'
 struct DW_thermal_model_f_T {
   real32_T DigitalFilter_states;       // '<Root>/DigitalFilter'
+};
+
+// Invariant block signals for model 'thermal_model'
+struct ConstB_thermal_model_h_T {
+  real32_T Product[2];                 // '<S1>/Product'
 };
 
 // Real-time Model Data Structure
@@ -49,7 +54,6 @@ extern void thermal_model(const ControlOutputs *rtu_ControlOutputs, const
 //  These blocks were eliminated from the model due to optimizations:
 //
 //  Block '<S1>/Cast To Single1' : Eliminate redundant data type conversion
-//  Block '<S1>/Cast To Single2' : Eliminate redundant data type conversion
 
 
 //-

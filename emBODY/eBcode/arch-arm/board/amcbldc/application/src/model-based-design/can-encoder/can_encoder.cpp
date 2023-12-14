@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 5.0
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:18:14 2023
+// Model version                  : 6.2
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Thu Dec 14 10:43:28 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,9 +19,9 @@
 #include "can_encoder.h"
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
+#include "can_encoder_private.h"
 #include <cstring>
 #include <stddef.h>
-#include "can_encoder_private.h"
 #include "rtw_defines.h"
 
 MdlrefDW_can_encoder_T can_encoder_MdlrefDW;

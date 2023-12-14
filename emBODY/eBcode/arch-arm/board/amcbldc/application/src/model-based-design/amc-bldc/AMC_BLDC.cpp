@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 6.17
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:19:19 2023
+// Model version                  : 7.2
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Thu Dec 14 10:44:31 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,23 +20,20 @@
 #include "rtw_mutex.h"
 #include "rtwtypes.h"
 #include "AMC_BLDC_types.h"
-#include "thermal_model.h"
+#include "control_foc.h"
 #include "estimation_velocity.h"
 #include "filter_current.h"
-#include "control_foc.h"
-#include "control_outer.h"
-#define can_decoder_MDLREF_HIDE_CHILD_
 #include "can_decoder.h"
-#define can_encoder_MDLREF_HIDE_CHILD_
-#include "can_encoder.h"
-#define SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_RX.h"
-#define SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 #include "SupervisorFSM_TX.h"
+#include "can_encoder.h"
+#include "control_outer.h"
+#include "thermal_model.h"
 
 // Exported block parameters
 ConfigurationParameters InitConfParams = {
   {
+    30.0F,
     true,
     true,
     false,

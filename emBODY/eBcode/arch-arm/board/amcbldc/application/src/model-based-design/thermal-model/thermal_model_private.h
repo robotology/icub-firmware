@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'thermal_model'.
 //
-// Model version                  : 5.21
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:19:07 2023
+// Model version                  : 6.3
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Thu Dec 14 10:44:18 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,6 +19,7 @@
 #ifndef RTW_HEADER_thermal_model_private_h_
 #define RTW_HEADER_thermal_model_private_h_
 #include "rtwtypes.h"
+#include "thermal_model.h"
 #include "thermal_model_types.h"
 
 // Macros for accessing real-time model data structure
@@ -37,6 +38,10 @@
 #ifndef rtmSetErrorStatusPointer
 #define rtmSetErrorStatusPointer(rtm, val) ((rtm)->errorStatus = (val))
 #endif
+
+// Invariant block signals (default storage)
+extern const ConstB_thermal_model_h_T thermal_model_ConstB;
+
 #endif                                 // RTW_HEADER_thermal_model_private_h_
 
 //

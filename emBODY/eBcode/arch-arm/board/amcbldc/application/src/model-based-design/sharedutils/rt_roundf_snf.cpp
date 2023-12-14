@@ -3,7 +3,7 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: SupervisorFSM_RX_data.cpp
+// File: rt_roundf_snf.cpp
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
@@ -11,18 +11,27 @@
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
 // C/C++ source code generated on : Thu Dec 14 10:43:02 2023
 //
-// Target selection: ert.tlc
-// Embedded hardware selection: ARM Compatible->ARM Cortex-M
-// Code generation objectives: Unspecified
-// Validation result: Not run
-//
-#include "SupervisorFSM_RX_private.h"
+#include "rtwtypes.h"
+#include "rt_roundf_snf.h"
+#include <cmath>
 
-// Invariant block signals (default storage)
-const ConstB_SupervisorFSM_RX_h_T SupervisorFSM_RX_ConstB = {
-  0
-  // '<Root>/Constant5'
-};
+real32_T rt_roundf_snf(real32_T u)
+{
+  real32_T y;
+  if (std::abs(u) < 8.388608E+6F) {
+    if (u >= 0.5F) {
+      y = std::floor(u + 0.5F);
+    } else if (u > -0.5F) {
+      y = u * 0.0F;
+    } else {
+      y = std::ceil(u - 0.5F);
+    }
+  } else {
+    y = u;
+  }
+
+  return y;
+}
 
 //
 // File trailer for generated code.
