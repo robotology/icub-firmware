@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 6.1
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:17:51 2023
+// Model version                  : 7.2
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Thu Dec 14 10:43:13 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,46 +21,6 @@
 #include "rtwtypes.h"
 #include "SupervisorFSM_TX_types.h"
 
-// Block signals for model 'SupervisorFSM_TX'
-#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-struct B_SupervisorFSM_TX_c_T {
-  boolean_T ev_foc;                    // '<Root>/SupervisorFSM_TX'
-  boolean_T ev_status;                 // '<Root>/SupervisorFSM_TX'
-};
-
-#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-// Block states (default storage) for model 'SupervisorFSM_TX'
-#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-struct DW_SupervisorFSM_TX_f_T {
-  uint32_T ev_focEventCounter;         // '<Root>/SupervisorFSM_TX'
-  uint32_T ev_statusEventCounter;      // '<Root>/SupervisorFSM_TX'
-  boolean_T DelayInput1_DSTATE;        // '<S1>/Delay Input1'
-  boolean_T DelayInput1_DSTATE_d;      // '<S2>/Delay Input1'
-  uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
-};
-
-#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-// Real-time Model Data Structure
-struct tag_RTM_SupervisorFSM_TX_T {
-  const char_T **errorStatus;
-};
-
-#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-struct MdlrefDW_SupervisorFSM_TX_T {
-  RT_MODEL_SupervisorFSM_TX_T rtm;
-};
-
-#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
 extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx);
 extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
   EstimatedData *rtu_EstimatedData, const Flags *rtu_Flags, const ControlOutputs
@@ -69,26 +29,6 @@ extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
 
 // Model reference registration function
 extern void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus);
-
-#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-extern MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_MdlrefDW;
-
-#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-// Block signals (default storage)
-extern B_SupervisorFSM_TX_c_T SupervisorFSM_TX_B;
-
-#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_TX_MDLREF_HIDE_CHILD_
-
-// Block states (default storage)
-extern DW_SupervisorFSM_TX_f_T SupervisorFSM_TX_DW;
-
-#endif                                 //SupervisorFSM_TX_MDLREF_HIDE_CHILD_
 
 //-
 //  The generated code includes comments that allow you to trace directly

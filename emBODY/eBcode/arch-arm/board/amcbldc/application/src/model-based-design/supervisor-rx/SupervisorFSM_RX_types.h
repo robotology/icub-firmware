@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 6.4
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:17:32 2023
+// Model version                  : 7.4
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Thu Dec 14 10:43:02 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -390,6 +390,8 @@ struct Flags
 
 struct MotorConfig
 {
+  // Angular offset in degrees between the stator windings and the hall sensors. 
+  real32_T hall_sens_offset;
   boolean_T has_hall_sens;
   boolean_T has_quadrature_encoder;
   boolean_T has_speed_quadrature_encoder;

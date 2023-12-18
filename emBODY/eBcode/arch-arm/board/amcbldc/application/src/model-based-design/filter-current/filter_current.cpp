@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 5.1
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:19:02 2023
+// Model version                  : 6.2
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Thu Dec 14 10:44:14 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -35,11 +35,15 @@ static void filter_current_MedianFilterCG_resetImpl
 {
   real32_T cnt1;
   real32_T cnt2;
+
+  // Start for MATLABSystem: '<Root>/Median Filter'
   std::memset(&obj->pBuf[0], 0, sizeof(real32_T) << 5U);
   std::memset(&obj->pPos[0], 0, sizeof(real32_T) << 5U);
   std::memset(&obj->pHeap[0], 0, sizeof(real32_T) << 5U);
   obj->pWinLen = 32.0F;
   obj->pIdx = obj->pWinLen;
+
+  // Start for MATLABSystem: '<Root>/Median Filter'
   obj->pMidHeap = std::ceil((obj->pWinLen + 1.0F) / 2.0F);
   cnt1 = (obj->pWinLen - 1.0F) / 2.0F;
   if (cnt1 < 0.0F) {
@@ -58,8 +62,8 @@ static void filter_current_MedianFilterCG_resetImpl
   cnt1 = 1.0F;
   cnt2 = obj->pWinLen;
   for (int32_T i = 0; i < 32; i++) {
-    if (static_cast<int32_T>(std::fmod(32.0F - static_cast<real32_T>(i), 2.0F)) ==
-        0) {
+    // Start for MATLABSystem: '<Root>/Median Filter'
+    if (std::fmod(32.0F - static_cast<real32_T>(i), 2.0F) == 0.0F) {
       obj->pPos[31 - i] = cnt1;
       cnt1++;
     } else {
@@ -82,10 +86,10 @@ static void filter_current_MedianFilterCG_trickleDownMax
     real32_T temp;
     real32_T tmp;
     real32_T u_tmp;
-    if ((i < -1.0F) && (i > -obj->pMaxHeapLength) && (obj->pBuf
-         [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(i + obj->pMidHeap)
-          - 1]) - 1] < obj->pBuf[static_cast<int32_T>(obj->pHeap
-          [static_cast<int32_T>((i - 1.0F) + obj->pMidHeap) - 1]) - 1])) {
+    if ((i < -1.0F) && (i > -obj->pMaxHeapLength) && (obj->pBuf[static_cast<
+         int32_T>(obj->pHeap[static_cast<int32_T>(i + obj->pMidHeap) - 1]) - 1] <
+         obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>((i -
+            1.0F) + obj->pMidHeap) - 1]) - 1])) {
       i--;
     }
 
@@ -182,13 +186,6 @@ void filter_current_Init(DW_filter_current_f_T *localDW)
   localDW->obj.NumChannels = 1;
   localDW->obj.pMID.isInitialized = 0;
   localDW->obj.isSetupComplete = true;
-
-  // InitializeConditions for MATLABSystem: '<Root>/Median Filter'
-  if (localDW->obj.pMID.isInitialized == 1) {
-    filter_current_MedianFilterCG_resetImpl(&localDW->obj.pMID);
-  }
-
-  // End of InitializeConditions for MATLABSystem: '<Root>/Median Filter'
 }
 
 // Output and update for referenced model: 'filter_current'

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 6.4
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jun 27 10:17:32 2023
+// Model version                  : 7.4
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Thu Dec 14 10:43:02 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,90 +27,6 @@
 // user code (top of header file)
 #include "rtw_enable_disable_motors.h"
 #include "rtw_motor_config.h"
-
-// Block signals for model 'SupervisorFSM_RX'
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-struct B_SupervisorFSM_RX_c_T {
-  Thresholds thresholds;               // '<S3>/Chart'
-  MotorConfig motorConfig;             // '<S1>/CAN Event Dispatcher'
-  PIDConfig CurrentPID;                // '<S4>/Chart'
-  PIDConfig VelocityPID;               // '<S4>/Chart'
-  PIDConfig PositionPID;               // '<S4>/Chart'
-  PIDConfig OpenLoopPID;               // '<S4>/Chart'
-  Targets targets;                     // '<S5>/Chart1'
-  BUS_MSG_PID newPID;                  // '<S1>/CAN Event Dispatcher'
-  SV_Limits newLimit;                  // '<S1>/CAN Event Dispatcher'
-  BUS_MSG_DESIRED_TARGETS newSetpoint; // '<S1>/CAN Event Dispatcher'
-  EstimationConfig estimationConfig;   // '<S1>/CAN Event Dispatcher'
-  real32_T newSetpoint_i;              // '<S2>/ControlMode_SM_motor0'
-  int32_T messageIndex;                // '<Root>/SupervisorRX State Handler'
-  ControlModes requiredControlMode;    // '<S1>/CAN Event Dispatcher'
-  ControlModes newPIDType;             // '<S1>/CAN Event Dispatcher'
-  ControlModes controlModeDefined;     // '<S2>/ControlMode_SM_motor0'
-  BoardState BoardSt;                  // '<Root>/SupervisorRX State Handler'
-  boolean_T isInOverCurrent;           // '<Root>/SupervisorRX State Handler'
-  boolean_T isFaultButtonPressed;      // '<Root>/SupervisorRX State Handler'
-  boolean_T enableSendingMsgStatus;    // '<S1>/CAN Event Dispatcher'
-  boolean_T receivedNewSetpoint;       // '<S1>/CAN Event Dispatcher'
-  boolean_T areLimitsSet;              // '<S3>/Chart'
-  boolean_T hasSetpointChanged;        // '<S5>/Chart1'
-};
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-// Block states (default storage) for model 'SupervisorFSM_RX'
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-struct DW_SupervisorFSM_RX_f_T {
-  ConfigurationParameters UnitDelay_DSTATE;// '<Root>/Unit Delay'
-  uint8_T is_active_c2_SupervisorFSM_RX;// '<Root>/SupervisorRX State Handler'
-  uint8_T is_active_STATE_HANDLER;     // '<Root>/SupervisorRX State Handler'
-  uint8_T is_STATE_HANDLER;            // '<Root>/SupervisorRX State Handler'
-  uint8_T is_active_FAULT_HANDLER;     // '<Root>/SupervisorRX State Handler'
-  uint8_T is_active_FaultButtonPressed;// '<Root>/SupervisorRX State Handler'
-  uint8_T is_FaultButtonPressed;       // '<Root>/SupervisorRX State Handler'
-  uint8_T is_active_OverCurrent;       // '<Root>/SupervisorRX State Handler'
-  uint8_T is_OverCurrent;              // '<Root>/SupervisorRX State Handler'
-  uint8_T is_active_CAN_MESSAGES_FOR_LOOP;// '<Root>/SupervisorRX State Handler' 
-  uint8_T is_CAN_MESSAGES_FOR_LOOP;    // '<Root>/SupervisorRX State Handler'
-  uint8_T is_active_c11_SupervisorFSM_RX;// '<S1>/CAN Event Dispatcher'
-  uint8_T is_active_c3_SupervisorFSM_RX;// '<S4>/Chart'
-  uint8_T is_active_c14_SupervisorFSM_RX;// '<S3>/Chart'
-  uint8_T is_active_c12_SupervisorFSM_RX;// '<S2>/ControlMode_SM_motor0'
-  uint8_T is_c12_SupervisorFSM_RX;     // '<S2>/ControlMode_SM_motor0'
-  uint8_T is_active_c4_SupervisorFSM_RX;// '<S5>/Chart1'
-  boolean_T ExternalFlags_fault_button_prev;// '<Root>/SupervisorRX State Handler' 
-  boolean_T ExternalFlags_fault_button_start;// '<Root>/SupervisorRX State Handler' 
-};
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-// Invariant block signals for model 'SupervisorFSM_RX'
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-struct ConstB_SupervisorFSM_RX_h_T {
-  boolean_T Constant5;                 // '<Root>/Constant5'
-};
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-// Real-time Model Data Structure
-struct tag_RTM_SupervisorFSM_RX_T {
-  const char_T **errorStatus;
-};
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-struct MdlrefDW_SupervisorFSM_RX_T {
-  RT_MODEL_SupervisorFSM_RX_T rtm;
-};
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 
 //
 //  Exported Global Parameters
@@ -138,40 +54,6 @@ extern void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const
 
 // Model reference registration function
 extern void SupervisorFSM_RX_initialize(const char_T **rt_errorStatus);
-
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-extern void SupervisorFSM_RX_SetpointHandler_Init(void);
-extern void SupervisorFSM_RX_SetpointHandler(void);
-extern void SupervisorFSM_RX_ControlModeHandlerMotor0(void);
-extern void SupervisorFSM_RX_LimitsHandler_Init(void);
-extern void SupervisorFSM_RX_LimitsHandler(void);
-extern void SupervisorFSM_RX_PIDHandler_Init(void);
-extern void SupervisorFSM_RX_PIDHandler(void);
-extern void SupervisorFSM_RX_CANMessageHandler_Init(void);
-extern void SupervisorFSM_RX_CANMessageHandler(void);
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-extern MdlrefDW_SupervisorFSM_RX_T SupervisorFSM_RX_MdlrefDW;
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-// Block signals (default storage)
-extern B_SupervisorFSM_RX_c_T SupervisorFSM_RX_B;
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-#ifndef SupervisorFSM_RX_MDLREF_HIDE_CHILD_
-
-// Block states (default storage)
-extern DW_SupervisorFSM_RX_f_T SupervisorFSM_RX_DW;
-
-#endif                                 //SupervisorFSM_RX_MDLREF_HIDE_CHILD_
 
 //-
 //  The generated code includes comments that allow you to trace directly

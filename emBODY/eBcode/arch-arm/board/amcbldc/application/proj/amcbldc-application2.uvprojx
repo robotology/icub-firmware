@@ -1044,6 +1044,11 @@
           <GroupName>mbd</GroupName>
           <Files>
             <File>
+              <FileName>const_params.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\const_params.cpp</FilePath>
+            </File>
+            <File>
               <FileName>rt_hypotf_snf.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
@@ -1059,19 +1064,29 @@
               <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
+              <FileName>rt_roundf_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_roundf_snf.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rt_roundd_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
+            </File>
+            <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
+              <FileName>rtw_motor_config.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
+            </File>
+            <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
-            </File>
-            <File>
-              <FileName>const_params.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\const_params.cpp</FilePath>
             </File>
             <File>
               <FileName>uMultiWord2Double.cpp</FileName>
@@ -1082,16 +1097,6 @@
               <FileName>uMultiWordShl.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_roundd_snf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_motor_config.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1276,6 +1281,11 @@
               <FileName>thermal_model.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>thermal_model_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\thermal-model\thermal_model_data.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2391,6 +2401,11 @@
           <GroupName>mbd</GroupName>
           <Files>
             <File>
+              <FileName>const_params.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\const_params.cpp</FilePath>
+            </File>
+            <File>
               <FileName>rt_hypotf_snf.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
@@ -2406,19 +2421,29 @@
               <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
+              <FileName>rt_roundf_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_roundf_snf.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rt_roundd_snf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
+            </File>
+            <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
+              <FileName>rtw_motor_config.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
+            </File>
+            <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
-            </File>
-            <File>
-              <FileName>const_params.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\const_params.cpp</FilePath>
             </File>
             <File>
               <FileName>uMultiWord2Double.cpp</FileName>
@@ -2429,16 +2454,6 @@
               <FileName>uMultiWordShl.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_roundd_snf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtw_motor_config.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2554,6 +2569,11 @@
               <FileName>thermal_model.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>thermal_model_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\model-based-design\thermal-model\thermal_model_data.cpp</FilePath>
             </File>
           </Files>
         </Group>

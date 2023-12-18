@@ -28,7 +28,7 @@ namespace embot::app::board::amc2c::info {
     
     constexpr embot::prot::can::applicationInfo applInfo 
     {   
-        embot::prot::can::versionOfAPPLICATION {2, 0, 4},    
+        embot::prot::can::versionOfAPPLICATION {2, 0, 5},    
         embot::prot::can::versionOfCANPROTOCOL {2, 0}    
     };
 
