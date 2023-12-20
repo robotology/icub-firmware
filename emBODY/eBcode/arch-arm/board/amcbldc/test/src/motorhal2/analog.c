@@ -368,6 +368,15 @@ uint32_t analogVph3(void)
 }
 
 /*******************************************************************************************************************//**
+ * @brief   Measure temp
+ * @param   void
+ * @return  temp voltage in mV [0 .. 57000mV]
+ */
+uint32_t temperature(void)
+{
+	return adc1_Buffer.temp >> 16u;
+}
+/*******************************************************************************************************************//**
  * @brief   Measure IIN current
  * @param   void
  * @return  IIN current in mA [-2500mA .. 2500mA]
