@@ -474,8 +474,9 @@ eOresult_t embot::app::eth::theBATservice::Impl::Start() {
   CANmonitor::Config cfg = defaultcanmonitorconfig;
   // use ...
   cfg.target.clear();
-  // check if we are not using custom value > 100 for service.servconfig.data.as.battery.canmonitorconfig.periodofcheck 
-  // if not we are setting it to 250 in order to not having error when canmonitor checks for BAT frames
+// this if condition should be used to check if canmonitor config is passed by the configuration files
+// currently it is not woring properly since we are discussing the udpates related to this for the icub-main part
+// therefore we are keeping it commented for now and using the default configuration for the canmonitor  
 //  if(service.servconfig.data.as.battery.canmonitorconfig.periodofcheck != 0)
 //  {
 //    cfg.periodofcheck = embot::core::time1millisec * service.servconfig.data.as.battery.canmonitorconfig.periodofcheck;
