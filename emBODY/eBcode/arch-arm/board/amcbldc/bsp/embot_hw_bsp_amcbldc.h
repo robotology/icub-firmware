@@ -21,6 +21,7 @@ namespace embot { namespace hw { namespace bsp { namespace amcbldc {
     
     float getVIN();
     float getCIN();
+	  float getTEMP();
     
 }}}}
 

@@ -370,7 +370,7 @@ uint32_t analogVph3(void)
 /*******************************************************************************************************************//**
  * @brief   Measure temp
  * @param   void
- * @return  temp voltage in mV [0 .. 57000mV]
+ * @return  temp in Celsius degrees
  */
 uint32_t temperature(void)
 {
