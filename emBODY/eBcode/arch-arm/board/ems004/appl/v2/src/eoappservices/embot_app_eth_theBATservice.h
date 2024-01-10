@@ -84,6 +84,12 @@ public:
   // function
   eOresult_t process(const eOropdescriptor_t *rd, const EOnv *nv = nullptr);
   eOresult_t SendReport();
+  
+//  // we can call them if _Activate() was called. they are used by the callbacks of eth protocol
+//  eOresult_t eo_battery_GetFullScale(eOservice_onendofoperation_fun_t overrideonfullscaleready);
+//  eOresult_t eo_battery_Set(eOas_battery_config_t *cfg);
+//  eOresult_t eo_battery_SetDataRate(uint8_t datarate);
+//  uint8_t eo_battery_GetDataRate();
 
   // default status of the BAT sensors
   static constexpr eOas_battery_status_t defaultBATstatus{
@@ -94,7 +100,7 @@ public:
                      .current = 0,
                      .charge = 0}};
   // default configuration of the BAT sensors
-  static constexpr eOas_battery_config_t defaultFTconfig{
+  static constexpr eOas_battery_config_t defaultBATconfig{
       .period = 100,
   };
 

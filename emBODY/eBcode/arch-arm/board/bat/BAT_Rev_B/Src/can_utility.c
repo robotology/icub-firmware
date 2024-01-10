@@ -25,7 +25,7 @@ uint32_t              TxMailbox;
 // in the struct we can define the data, which have the same type for all the packets,
 // what changes is only the value
 // then there'll be a getInstance() sort of method for retrieving the struct
-// following the signleton usage in OOP
+// following the singleton usage in OOP
 // this will help to make code cleaner and avoid duplications
 // Instantiate data regarding info of battery pack
 CAN_TxHeaderTypeDef   TxHeader_620;
@@ -145,6 +145,15 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     /* Reception Error */
     Error_Handler();
   }
+  
+  /* Enable - Disable CAN Transmission from EMS */
+  if( (RxHeader.IDE == CAN_ID_STD) && ((RxHeader.StdId & 0x700) >> 8) == 2 ) // GOT MESSAGE FROM CLASS ICUBCANPROTO_CLASS_POLLING_ANALOGSENSOR
+  {
+      if((RxData[0] & 0x7F) == 7) // GOT MESSAGE OF TYPE ICUBCANPROTO_POL_AS_CMD__SET_TXMODE
+      {
+        TX_ENABLED = (RxData[1] == 0) ? 1 : 0;
+      }
+  }
 
   /* Display LEDx */
   if ((RxHeader.StdId == 0x621) && (RxHeader.IDE == CAN_ID_STD) && (RxHeader.DLC == 8))
@@ -152,4 +161,5 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     //LED_Display(RxData[0]);
     //ubKeyNumber = RxData[0];
   }
+  
 }

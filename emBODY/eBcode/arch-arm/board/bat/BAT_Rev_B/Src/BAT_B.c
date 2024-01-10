@@ -11,7 +11,7 @@
 
 char Firmware_vers = 1;
 char Revision_vers = 3;
-char Build_number  = 2;
+char Build_number  = 3;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
 uint32_t vhyst=0;    // voltage hysteresis
@@ -72,6 +72,8 @@ uint8_t HSM_SW_F         = 0;
 int32_t Current_board_in_fault = 0;
 int32_t Current_HSM_in_fault = 0;
 int32_t Current_motor_in_fault = 0;
+
+uint8_t TX_ENABLED = 0;
 
 uint8_t V12board_bdc  = 1;    // +++++++++++++++++++++++++++++++++++++++++++++ da cambiare logica ++++++++++++++++++
 uint8_t V12motor_bdc  = 1;    // +++++++++++++++++++++++++++++++++++++++++++++ da cambiare logica ++++++++++++++++++

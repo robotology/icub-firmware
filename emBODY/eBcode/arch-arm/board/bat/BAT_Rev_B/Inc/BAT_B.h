@@ -99,6 +99,8 @@ extern uint16_t time_delay;
 
 extern uint8_t can_message;
 
+extern uint8_t TX_ENABLED;
+
 extern __IO ITStatus UartReady;
 
 extern uint32_t VTH[7];
