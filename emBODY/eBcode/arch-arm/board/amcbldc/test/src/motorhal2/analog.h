@@ -88,6 +88,7 @@ extern uint32_t analogVph2(void);
 extern uint32_t analogVph3(void);
 extern uint32_t analogVin(void);
 extern int32_t  analogCin(void);
+extern uint32_t  temperature(void);
 extern int32_t  analogCph1(void);
 extern int32_t  analogCph2(void);
 extern int32_t  analogCph3(void);

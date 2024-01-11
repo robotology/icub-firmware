@@ -841,7 +841,23 @@ std::make_tuple(0x00470027, 0x484E500E, 0x20343356 ) // scheda jointlab camozzi
         return v;
         
     }
-    
+
+    float getCIN()
+    {
+        float c {0.0};
+        
+        c = analogCin() * 0.001;
+        return c;
+        
+    }
+
+    float getTEMP()
+    {
+			 float t {0.0};
+        t = temperature();
+        return t;
+        
+    }    
 }}}}
 
 

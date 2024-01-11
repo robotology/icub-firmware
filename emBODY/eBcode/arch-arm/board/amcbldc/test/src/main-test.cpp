@@ -18,13 +18,14 @@ constexpr uint8_t minor =
     2;
 #endif
 
+
 constexpr std::uint8_t defADDRESS = 1;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
     embot::prot::can::Board::amcbldc, 
     embot::prot::can::versionOfBOOTLOADER {1, minor}, 
     defADDRESS,                                                  
-    "I am an amcbldc" 
+    "I am an amcbldc - test FW" 
 };
 
 // --------------------------------------------------------------------------------------------------------------------

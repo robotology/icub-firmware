@@ -20,6 +20,8 @@ namespace embot { namespace hw { namespace bsp { namespace amcbldc {
     embot::hw::BTN EXTFAULTbutton();
     
     float getVIN();
+    float getCIN();
+	  float getTEMP();
     
 }}}}
 
