@@ -130,10 +130,10 @@ inline int QEgetPos()
     
     if (QE_USE_INDEX)
     {
-        static int poscnt_old = 0;
-
         if (qe_index_found)
         {
+            static int poscnt_old = 0;
+            
             if (QEICONbits.INDX)
             {
                 if (poscnt_old>QE_ERR_THR && poscnt_old<QE_RESOLUTION-QE_ERR_THR)
@@ -145,9 +145,9 @@ inline int QEgetPos()
             {
                 QE_RISE_ERROR(index_broken);
             }
+            
+            poscnt_old = poscnt;
         }
-        
-        poscnt_old = poscnt;
     }
 
     return __builtin_divsd(((long)poscnt)<<16,QE_RESOLUTION);
