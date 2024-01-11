@@ -551,7 +551,7 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     electricalAngleOld = electricalAngle;
     
     // calculate the current joint position
-    size_t polepairs = (0 != AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs) ? AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs : 1;
+    uint8_t polepairs = (0 != AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs) ? AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs : 1;
     position = position + delta / polepairs;
     
     AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
