@@ -123,9 +123,22 @@ inline int QEgetElettrDeg()
     return degrees;
 }
 
+
+
 inline int QEgetPos() __attribute__((always_inline));
 inline int QEgetPos()
 {
+//    if (qe_index_found)
+//    {
+//        if (POSCNT>2 && POSCNT<QE_RESOLUTION-2 && POSCNT%95==0)
+//        {
+//            if (QEICONbits.UPDN) 
+//                --POSCNT;
+//            else
+//                ++POSCNT;
+//        }
+//    }
+    
     int poscnt = (int)POSCNT;
     
     if (QE_USE_INDEX)
@@ -138,12 +151,17 @@ inline int QEgetPos()
             {
                 if (poscnt_old>QE_ERR_THR && poscnt_old<QE_RESOLUTION-QE_ERR_THR)
                 {
-                    QE_RISE_ERROR(dirty);
+                    QE_RISE_WARNING(dirty);
                 }
             }
             else if (poscnt<-16 || poscnt > QE_RESOLUTION+16)
             {
-                QE_RISE_ERROR(index_broken);
+                QE_RISE_WARNING(index_broken);
+                
+                while (poscnt < 0)              poscnt += QE_RESOLUTION;
+                while (poscnt >= QE_RESOLUTION) poscnt -= QE_RESOLUTION;
+                
+                POSCNT = (unsigned int)poscnt;
             }
             
             poscnt_old = poscnt;
@@ -160,12 +178,13 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
     IEC3bits.QEI1IE = 0;
 
     qe_index_found = TRUE;
-    
-//    static int rompiti = 0;
-//    
-//    if (++rompiti == 3200)
+ 
+//    static int simulate_fault = 0;
+//    if (++simulate_fault == 11)
 //    {
-//        QEICONbits.POSRES = 1;
+//        QEICONbits.QEIM = 0;
+//        QEICONbits.POSRES = 0;
+//        QEICONbits.QEIM = 6;        
 //    }
     
     // clear interrupt flag

@@ -33,6 +33,7 @@ typedef union
 volatile extern tQEError gEncoderError;
 
 #define QE_RISE_ERROR(e) gEncoderError.e=TRUE; SysError.EncoderFault=TRUE; FaultConditionsHandler()
+#define QE_RISE_WARNING(e) gEncoderError.e=TRUE
 #define QE_ELETTR_DEG_PER_REV() (gEncoderConfig.elettr_deg_per_rev)
 
 extern volatile BOOL qe_index_found;
