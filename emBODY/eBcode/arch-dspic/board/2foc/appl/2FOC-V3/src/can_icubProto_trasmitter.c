@@ -51,8 +51,6 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 extern volatile long VqRef;
 extern volatile int  IqRef;
 
-extern volatile int calibOffsetfbk;
-extern volatile int poscntfbk;
 extern volatile int rotorAfbk;
 extern volatile int rotorBfbk;
 extern volatile char IKs;
@@ -71,11 +69,10 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     static tCanData payload; // = {{0}};
     unsigned long msgid;
 
-    payload.w[0] = I2Tdata.IQMeasured;
-    payload.w[1] = gQEVelocity;
-    payload.w[2] = gQEPosition & 0xFFFF;
-    payload.w[3] = gQEPosition >> 16;
-
+    payload.w[0]  = I2Tdata.IQMeasured;
+    payload.w[1]  = gQEVelocity;
+    payload.dw[1] = gQEPosition;
+    
     msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 
     ECANSend(msgid, 8, &payload);
@@ -94,8 +91,8 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         {
             noflood = 0;
             
-            payload.w[0] = calibOffsetfbk;
-            payload.w[1] = poscntfbk;
+            payload.w[0] = gEncoderConfig.offset;
+            payload.w[1] = POSCNT;
             payload.w[2] = rotorAfbk;
             payload.w[3] = rotorBfbk;
         
