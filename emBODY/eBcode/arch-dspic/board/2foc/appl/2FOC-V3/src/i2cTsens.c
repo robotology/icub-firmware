@@ -339,11 +339,15 @@ I2Ctimeout:
 
     __delay32(400);
     
+    config_sensor();
+    
     return I2Cerrcode;
 
 fatal_error:
 
     I2Cdead = TRUE;
+
+    config_sensor();
 
     return I2Cerrcode;
 }

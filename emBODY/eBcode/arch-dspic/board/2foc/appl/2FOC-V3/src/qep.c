@@ -167,7 +167,7 @@ inline int QEgetPos()
             poscnt_old = poscnt;
         }
     }
-
+    
     return __builtin_divsd(((long)poscnt)<<16,QE_RESOLUTION);
 }
 
