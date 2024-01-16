@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 6.18
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Mon Oct 16 10:09:05 2023
+// Model version                  : 7.12
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Mon Jan 15 18:22:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -62,6 +62,16 @@ struct MotorSensors
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_SupplyVoltage_
+#define DEFINED_TYPEDEF_FOR_SupplyVoltage_
+
+struct SupplyVoltage
+{
+  real32_T voltage;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_SensorsData_
 #define DEFINED_TYPEDEF_FOR_SensorsData_
 
@@ -69,7 +79,12 @@ struct SensorsData
 {
   // position encoders
   JointPositions jointpositions;
+
+  // motor probes
   MotorSensors motorsensors;
+
+  // supply probes
+  SupplyVoltage supplyvoltagesensors;
 };
 
 #endif
@@ -110,6 +125,8 @@ struct Flags
 
 struct MotorConfig
 {
+  // Angular offset in degrees between the stator windings and the hall sensors. 
+  real32_T hall_sens_offset;
   boolean_T has_hall_sens;
   boolean_T has_quadrature_encoder;
   boolean_T has_speed_quadrature_encoder;
@@ -124,7 +141,6 @@ struct MotorConfig
   real32_T Rphase;
   real32_T Imin;
   real32_T Imax;
-  real32_T Vcc;
   real32_T Vmax;
   real32_T resistance;
   real32_T inductance;
@@ -748,67 +764,6 @@ typedef enum {
   CANClassTypes_Future_Use = 6,
   CANClassTypes_Management_Bootloader = 7
 } CANClassTypes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_ID_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_ID_RX_
-
-struct BUS_CAN_ID_RX
-{
-  // 3 bits defining the message class type.
-  CANClassTypes CLS;
-
-  // 4 bits defining the source ID.
-  uint8_T SRC;
-
-  // 4 bits definint the destination ID or the message sub-type.
-  uint8_T DST_TYP;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_CMD_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_CMD_
-
-struct BUS_CAN_CMD
-{
-  // 1 bits for motor selector.
-  boolean_T M;
-
-  // 7 bits defining the operational code of the command.
-  uint8_T OPC;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PAYLOAD_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_PAYLOAD_RX_
-
-struct BUS_CAN_PAYLOAD_RX
-{
-  // Actual length of the total PAYLOAD field.
-  uint8_T LEN;
-  BUS_CAN_CMD CMD;
-
-  // 8 bytes for the command argument in order to account also message of type streaming. 
-  uint8_T ARG[8];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_RX_
-
-// Fields of a received CAN packet.
-struct BUS_CAN_PACKET_RX
-{
-  // ID of the CAN packet.
-  BUS_CAN_ID_RX ID;
-
-  // PAYLOAD of the CAN packet.
-  BUS_CAN_PAYLOAD_RX PAYLOAD;
-};
 
 #endif
 

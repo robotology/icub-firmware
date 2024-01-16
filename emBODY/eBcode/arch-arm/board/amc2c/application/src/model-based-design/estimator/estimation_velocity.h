@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 5.1
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Mon Oct 16 10:08:35 2023
+// Model version                  : 6.4
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Mon Jan 15 18:21:58 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,8 +20,6 @@
 #define RTW_HEADER_estimation_velocity_h_
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
-#include "rtGetNaN.h"
-#include <cstring>
 
 extern "C"
 {
@@ -29,6 +27,9 @@ extern "C"
 #include "rt_nonfinite.h"
 
 }
+
+#include "rtGetNaN.h"
+#include <cstring>
 
 // Block states (default storage) for model 'estimation_velocity'
 struct DW_estimation_velocity_f_T {

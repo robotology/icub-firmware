@@ -854,7 +854,7 @@ std::make_tuple(0x00470027, 0x484E500E, 0x20343356 ) // scheda jointlab camozzi
     float getTEMP()
     {
 			 float t {0.0};
-        t = temperature();
+        //t = temperature();
         return t;
         
     }    

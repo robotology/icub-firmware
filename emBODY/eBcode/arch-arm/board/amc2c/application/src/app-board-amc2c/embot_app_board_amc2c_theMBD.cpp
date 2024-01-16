@@ -458,7 +458,10 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
         inpframes[i].copyto(rx_id, AMC_BLDC_U.PacketsRx.packets[i].length, AMC_BLDC_U.PacketsRx.packets[i].packet.PAYLOAD); 
         AMC_BLDC_U.PacketsRx.packets[i].packet.ID = (uint16_T)rx_id;
         AMC_BLDC_U.PacketsRx.packets[i].available = true;
-    } 
+    }
+    
+    // read Vcc
+    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = 44; // TODO: read the voltage from ADC (temporary hardcoded)
 
     
     // -----------------------------------------------------------------------------
@@ -472,6 +475,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
     // Thermal Model Step Function (10 ms)
     // -----------------------------------------------------------------------------
     
+#ifdef ENABLE_THERMAL_MODEL // (Temporary disabled)
     static uint8_t thermal_model_counter = 0;
 
     if(thermal_model_counter % 10 == 0)
@@ -480,6 +484,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
         thermal_model_counter = 0;
     }
     thermal_model_counter++;
+#endif
     
     
     // get any out can frame
@@ -565,7 +570,7 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     // FOC Step Function (~16.6 KHz)
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_step1();
+    AMC_BLDC_step_FOC();
     
     // -----------------------------------------------------------------------------
     

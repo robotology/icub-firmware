@@ -7,9 +7,9 @@
 //
 //  Code generation for model "estimation_velocity".
 //
-//  Model version              : 5.1
-//  Simulink Coder version : 9.9 (R2023a) 19-Nov-2022
-//  C++ source code generated on : Thu Oct 12 19:04:35 2023
+//  Model version              : 6.4
+//  Simulink Coder version : 23.2 (R2023b) 01-Aug-2023
+//  C++ source code generated on : Mon Jan 15 18:18:33 2024
 
 #include "rtwtypes.h"
 

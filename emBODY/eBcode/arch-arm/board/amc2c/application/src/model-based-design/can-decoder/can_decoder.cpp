@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 5.0
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Mon Oct 16 10:07:44 2023
+// Model version                  : 6.3
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Mon Jan 15 18:21:18 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -17,18 +17,18 @@
 // Validation result: Not run
 //
 #include "can_decoder.h"
+#include "can_decoder_private.h"
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
 #include <cstring>
 #include <stddef.h>
-#include "can_decoder_private.h"
 #include "rtw_defines.h"
 
 // Named constants for Chart: '<S2>/Decoding Logic'
 const int32_T can_decoder_CALL_EVENT = -1;
 const uint8_T can_decoder_IN_Event_Error = 1U;
 const uint8_T can_decoder_IN_Home = 1U;
-const uint8_T can_decoder_IN_Home_k = 2U;
+const uint8_T can_decoder_IN_Home_p = 2U;
 const int32_T can_decoder_event_ev_error_mode_unrecognized = 0;
 const int32_T can_decoder_event_ev_error_pck_malformed = 1;
 const int32_T can_decoder_event_ev_error_pck_not4us = 2;
@@ -73,11 +73,11 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
   guard1 = false;
   switch (localDW->is_ERROR_HANDLING) {
    case can_decoder_IN_Event_Error:
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_k;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_p;
     localDW->cmd_processed = 0U;
     break;
 
-   case can_decoder_IN_Home_k:
+   case can_decoder_IN_Home_p:
     if (localDW->sfEvent == can_decoder_event_ev_error_pck_not4us) {
       localB->error_type = CANErrorTypes_Packet_Not4Us;
       localDW->ev_errorEventCounter++;
@@ -105,7 +105,7 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
       }
 
       localDW->ev_async = false;
-      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_k;
+      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_p;
       localDW->cmd_processed = 0U;
     }
     break;
@@ -158,34 +158,9 @@ static uint16_T can_decoder_merge_2bytes_unsigned(uint16_T bl, uint16_T bh)
 }
 
 // System initialize for atomic system: '<S2>/Decoding Logic'
-void can_decoder_DecodingLogic_Init(B_DecodingLogic_can_decoder_T *localB,
-  DW_DecodingLogic_can_decoder_T *localDW)
+void can_decoder_DecodingLogic_Init(DW_DecodingLogic_can_decoder_T *localDW)
 {
   localDW->sfEvent = can_decoder_CALL_EVENT;
-  localB->msg_set_control_mode.motor = false;
-  localB->msg_set_control_mode.mode = MCControlModes_Idle;
-  localB->msg_set_current_limit.motor = false;
-  localB->msg_set_current_limit.nominal = 0.0F;
-  localB->msg_set_current_limit.peak = 0.0F;
-  localB->msg_set_current_limit.overload = 0.0F;
-  localB->msg_desired_targets.current = 0.0F;
-  localB->msg_desired_targets.voltage = 0.0F;
-  localB->msg_desired_targets.velocity = 0.0F;
-  localB->msg_set_pid.motor = false;
-  localB->msg_set_pid.Kp = 0.0F;
-  localB->msg_set_pid.Ki = 0.0F;
-  localB->msg_set_pid.Kd = 0.0F;
-  localB->msg_set_pid.Ks = 0U;
-  localB->msg_set_motor_config.has_hall_sens = false;
-  localB->msg_set_motor_config.has_quadrature_encoder = false;
-  localB->msg_set_motor_config.has_speed_quadrature_encoder = false;
-  localB->msg_set_motor_config.has_torque_sens = false;
-  localB->msg_set_motor_config.use_index = false;
-  localB->msg_set_motor_config.enable_verbosity = false;
-  localB->msg_set_motor_config.number_poles = 0U;
-  localB->msg_set_motor_config.encoder_tolerance = 0U;
-  localB->msg_set_motor_config.rotor_encoder_resolution = 0;
-  localB->msg_set_motor_config.rotor_index_offset = 0;
 }
 
 // Output and update for atomic system: '<S2>/Decoding Logic'
@@ -217,7 +192,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
     localDW->is_active_ERROR_HANDLING = 1U;
     localDW->ev_async = false;
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_k;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_p;
     localDW->cmd_processed = 0U;
   } else {
     tmp = !rtu_pck_available;
@@ -555,8 +530,8 @@ void can_decoder_Init(void)
 
     // SystemInitialize for Atomic SubSystem: '<S1>/CAN_Decoder'
     // SystemInitialize for Chart: '<S2>/Decoding Logic'
-    can_decoder_DecodingLogic_Init(&can_decoder_B.CoreSubsys[ForEach_itr].
-      sf_DecodingLogic, &can_decoder_DW.CoreSubsys[ForEach_itr].sf_DecodingLogic);
+    can_decoder_DecodingLogic_Init(&can_decoder_DW.CoreSubsys[ForEach_itr].
+      sf_DecodingLogic);
 
     // End of SystemInitialize for SubSystem: '<S1>/CAN_Decoder'
   }
@@ -597,7 +572,7 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
     rtu_pck_rx_raw_0 = rtu_pck_rx_raw->packets[ForEach_itr].packet.ID;
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.CLS =
       can_decoder_convert_to_enum_CANClassTypes(static_cast<int32_T>(
-      static_cast<uint16_T>(static_cast<uint32_T>(rtu_pck_rx_raw_0 & 1792) >> 8)));
+      static_cast<uint32_T>(rtu_pck_rx_raw_0 & 1792) >> 8));
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.SRC =
       static_cast<uint8_T>(static_cast<uint32_T>(rtu_pck_rx_raw_0 & 240) >> 4);
     can_decoder_B.CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.DST_TYP =

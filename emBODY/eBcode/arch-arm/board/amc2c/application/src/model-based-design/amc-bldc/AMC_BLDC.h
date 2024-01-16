@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 6.18
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Mon Oct 16 10:09:05 2023
+// Model version                  : 7.12
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Mon Jan 15 18:22:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -24,7 +24,6 @@
 #include "estimation_velocity.h"
 #include "filter_current.h"
 #include "control_outer.h"
-#include "thermal_model.h"
 #include <stddef.h>
 #include "zero_crossing_types.h"
 
@@ -56,8 +55,8 @@ struct B_AMC_BLDC_T {
   ConfigurationParameters
     ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0;// '<Root>/Adapter4' 
   BUS_MESSAGES_TX MessagesTx;          // '<S7>/SupervisorFSM_TX'
-  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0;// '<Root>/Adapter1' 
   SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0;// '<Root>/Adapter3' 
+  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0;// '<Root>/Adapter1' 
   BUS_STATUS_RX_MULTIPLE CAN_Decoder_o2;// '<S6>/CAN_Decoder'
   BUS_CAN_RX_ERRORS_MULTIPLE CAN_Decoder_o3;// '<S6>/CAN_Decoder'
 };
@@ -68,37 +67,30 @@ struct DW_AMC_BLDC_T {
     ZOHBlockInsertedForAdapter_InsertedFor_Adapter4_at_outport_0;// synthesized block 
   ConfigurationParameters
     RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Bu[3];// synthesized block 
-  ConfigurationParameters
-    RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf0;// synthesized block 
-  ConfigurationParameters
-    RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf1;// synthesized block 
-  ConfigurationParameters
-    RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf2;// synthesized block 
+  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf0;// synthesized block 
+  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf1;// synthesized block 
+  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Buf2;// synthesized block 
   ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf0;// synthesized block 
   ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf1;// synthesized block 
   ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf2;// synthesized block 
-  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf0;// synthesized block 
-  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf1;// synthesized block 
-  ControlOutputs RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_Buf2;// synthesized block 
-  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_e;// synthesized block 
-  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_c;// synthesized block 
-  SensorsData RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Bu_j;// synthesized block 
   Targets RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_Bu[3];// synthesized block 
   EstimatedData RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_Bu[3];// synthesized block 
   ControlOuterOutputs
     RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Bu[3];// synthesized block 
   Flags RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Bu[3];// synthesized block 
-  MotorTemperature RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Buf[3];// synthesized block 
+  MotorTemperature RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Bu_d;// synthesized block 
+  MotorTemperature RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Bu_j;// synthesized block 
+  MotorTemperature RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Bu_o;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_SEMA;// synthesized block 
   void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_SE;// synthesized block 
   void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_SE;// synthesized block 
   void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_3_SE;// synthesized block 
   void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_SE;// synthesized block 
   void* RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_SE;// synthesized block 
-  void* RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_SEMA;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_SE_h;// synthesized block 
   void* RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_SEMA;// synthesized block 
-  void* RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_SE_l;// synthesized block 
-  void* RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_SE_b;// synthesized block 
-  void* RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_SEMAP;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_LstB;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RDBu;// synthesized block 
   int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_Ls;// synthesized block 
   int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_1_RD;// synthesized block 
   int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_2_Ls;// synthesized block 
@@ -109,21 +101,14 @@ struct DW_AMC_BLDC_T {
   int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_4_RD;// synthesized block 
   int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_Ls;// synthesized block 
   int8_T RTBInsertedForAdapter_InsertedFor_Adapter2_at_outport_0_5_RD;// synthesized block 
-  int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_LstB;// synthesized block 
-  int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RDBu;// synthesized block 
-  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_LstB;// synthesized block 
-  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RDBu;// synthesized block 
   int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_Ls_j;// synthesized block 
   int8_T RTBInsertedForAdapter_InsertedFor_Adapter1_at_outport_0_RD_a;// synthesized block 
-  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_Ls_g;// synthesized block 
-  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RD_p;// synthesized block 
-  int8_T RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_LstBu;// synthesized block 
-  int8_T RTBInsertedForAdapter_InsertedFor_Adapter_at_outport_0_RDBuf;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_LstB;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Adapter3_at_outport_0_RDBu;// synthesized block 
   MdlrefDW_control_foc_T FOC_InstanceData;// '<Root>/FOC'
   MdlrefDW_estimation_velocity_T Estimation_Velocity_InstanceData;// '<S5>/Estimation_Velocity' 
   MdlrefDW_filter_current_T Filter_Current_InstanceData;// '<S5>/Filter_Current' 
   MdlrefDW_control_outer_T OuterControl_InstanceData;// '<Root>/OuterControl'
-  MdlrefDW_thermal_model_T Estimation_Temperature_InstanceData;// '<S5>/Estimation_Temperature' 
 };
 
 // External inputs (root inport signals with default storage)
@@ -153,7 +138,7 @@ struct tag_RTM_AMC_BLDC_T {
 
   struct {
     struct {
-      uint32_T TID[4];
+      uint32_T TID[3];
     } TaskCounters;
   } Timing;
 };
@@ -232,9 +217,8 @@ extern "C"
   // Model entry point functions
   extern void AMC_BLDC_initialize(void);
   extern void AMC_BLDC_step0(void);
-  extern void AMC_BLDC_step1(void);
+  extern void AMC_BLDC_step_FOC(void);
   extern void AMC_BLDC_step_Time_1ms(void);
-  extern void AMC_BLDC_step_Time_10ms(void);
   extern void AMC_BLDC_terminate(void);
 
 #ifdef __cplusplus
@@ -284,7 +268,9 @@ extern "C"
 //  '<S8>'   : 'AMC_BLDC/Estimation/Adapter'
 //  '<S9>'   : 'AMC_BLDC/Estimation/Adapter1'
 //  '<S10>'  : 'AMC_BLDC/Estimation/Adapter3'
-//  '<S11>'  : 'AMC_BLDC/Estimation/Mux'
+//  '<S11>'  : 'AMC_BLDC/Estimation/Estimation_Temperature'
+//  '<S12>'  : 'AMC_BLDC/Estimation/Mux'
+//  '<S13>'  : 'AMC_BLDC/Estimation/Estimation_Temperature/Disabled'
 
 #endif                                 // RTW_HEADER_AMC_BLDC_h_
 

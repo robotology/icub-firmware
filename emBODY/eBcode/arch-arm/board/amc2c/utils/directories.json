@@ -1,0 +1,93 @@
+{
+    "subdirectories_to_copy": [
+        {
+            "source_directory": "_sharedutils",
+            "source_directory_parent": "ert",
+            "target_directory": "sharedutils",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "AMC_BLDC_ert_rtw",
+            "target_directory": "amc-bldc",
+            "files": [
+                "AMC*.cpp",
+                "AMC*.h"
+            ]
+        },
+        {
+            "source_directory": "can_decoder",
+            "source_directory_parent": "ert",
+            "target_directory": "can-decoder",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "can_encoder",
+            "source_directory_parent": "ert",
+            "target_directory": "can-encoder",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "control_foc",
+            "source_directory_parent": "ert",
+            "target_directory": "control-foc",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "control_outer",
+            "source_directory_parent": "ert",
+            "target_directory": "control-outer",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "estimation_velocity",
+            "source_directory_parent": "ert",
+            "target_directory": "estimator",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "filter_current",
+            "source_directory_parent": "ert",
+            "target_directory": "filter-current",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "SupervisorFSM_RX",
+            "source_directory_parent": "ert",
+            "target_directory": "supervisor-rx",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "SupervisorFSM_TX",
+            "source_directory_parent": "ert",
+            "target_directory": "supervisor-tx",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        }
+    ]
+}

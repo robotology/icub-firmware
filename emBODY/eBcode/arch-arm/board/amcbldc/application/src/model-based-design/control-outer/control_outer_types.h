@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 6.2
+// Model version                  : 6.3
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Dec 14 10:43:51 2023
+// C/C++ source code generated on : Mon Jan 15 14:41:42 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -71,7 +71,6 @@ struct MotorConfig
   real32_T Rphase;
   real32_T Imin;
   real32_T Imax;
-  real32_T Vcc;
   real32_T Vmax;
   real32_T resistance;
   real32_T inductance;
@@ -270,6 +269,16 @@ struct MotorSensors
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_SupplyVoltage_
+#define DEFINED_TYPEDEF_FOR_SupplyVoltage_
+
+struct SupplyVoltage
+{
+  real32_T voltage;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_SensorsData_
 #define DEFINED_TYPEDEF_FOR_SensorsData_
 
@@ -277,7 +286,12 @@ struct SensorsData
 {
   // position encoders
   JointPositions jointpositions;
+
+  // motor probes
   MotorSensors motorsensors;
+
+  // supply probes
+  SupplyVoltage supplyvoltagesensors;
 };
 
 #endif

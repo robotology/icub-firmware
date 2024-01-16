@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 5.5
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Mon Oct 16 10:08:24 2023
+// Model version                  : 6.3
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Mon Jan 15 18:21:42 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -49,13 +49,6 @@ struct DW_control_outer_f_T {
   int8_T DiscreteTimeIntegrator_PrevResetState;// '<S1>/Discrete-Time Integrator' 
   uint8_T DiscreteTimeIntegrator_SYSTEM_ENABLE;// '<S1>/Discrete-Time Integrator' 
   boolean_T Memory_PreviousInput;      // '<S9>/Memory'
-};
-
-// Zero-crossing (trigger) state for model 'control_outer'
-struct ZCV_control_outer_g_T {
-  real_T FilterDifferentiatorTF_Reset_ZC;// '<S47>/Filter Differentiator TF'
-  real_T FilterDifferentiatorTF_Reset_ZC_f;// '<S97>/Filter Differentiator TF'
-  real_T FilterDifferentiatorTF_Reset_ZC_m;// '<S147>/Filter Differentiator TF'
 };
 
 // Zero-crossing (trigger) state for model 'control_outer'

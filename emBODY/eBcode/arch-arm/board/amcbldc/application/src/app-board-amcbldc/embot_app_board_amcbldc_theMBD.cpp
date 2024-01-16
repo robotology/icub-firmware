@@ -447,7 +447,10 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::pro
         inpframes[i].copyto(rx_id, AMC_BLDC_U.PacketsRx.packets[i].length, AMC_BLDC_U.PacketsRx.packets[i].packet.PAYLOAD); 
         AMC_BLDC_U.PacketsRx.packets[i].packet.ID = (uint16_T)rx_id;
         AMC_BLDC_U.PacketsRx.packets[i].available = true;
-    } 
+    }
+    
+    // read Vcc
+    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = 44; // TODO: read the voltage from ADC (temporary hardcoded)
 
     
     // -----------------------------------------------------------------------------
@@ -460,7 +463,8 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::pro
     // -----------------------------------------------------------------------------
     // Thermal Model Step Function (10 ms)
     // -----------------------------------------------------------------------------
-    
+
+#ifdef ENABLE_THERMAL_MODEL // (Temporary disabled)
     static uint8_t thermal_model_counter = 0;
 
     if(thermal_model_counter % 10 == 0)
@@ -469,6 +473,7 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::pro
         thermal_model_counter = 0;
     }
     thermal_model_counter++;
+#endif
     
     // get any out can frame
     
