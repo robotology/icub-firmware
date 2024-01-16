@@ -544,7 +544,7 @@ namespace embot { namespace hw { namespace motor {
         hallInit();    
         pwmInit();
         
-        
+        HAL_GPIO_WritePin(VAUXEN_GPIO_Port, VAUXEN_Pin, GPIO_PIN_SET);
 
         return resOK; 
     }

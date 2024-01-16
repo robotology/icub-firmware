@@ -584,16 +584,16 @@ void I2C4_ER_IRQHandler(void)
     HAL_I2C_ER_IRQHandler(&hi2c4);
 }
 
-#error TODO: add DMA for I2C in cubemx
-void DMA2_Channel2_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_i2c4_rx);
-}
+//#error TODO: add DMA for I2C in cubemx
+//void DMA2_Channel2_IRQHandler(void)
+//{
+//  HAL_DMA_IRQHandler(&hdma_i2c4_rx);
+//}
 
-void DMA2_Channel3_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_i2c4_tx);
-}
+//void DMA2_Channel3_IRQHandler(void)
+//{
+//  HAL_DMA_IRQHandler(&hdma_i2c4_tx);
+//}
 
 }
 
