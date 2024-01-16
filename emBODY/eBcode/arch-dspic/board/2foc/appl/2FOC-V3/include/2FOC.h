@@ -60,6 +60,8 @@ volatile extern tI2T I2Tdata;
 volatile extern unsigned char gControlMode;
 volatile extern int gTemperature;
 volatile extern int gTemperatureLimit;
+volatile extern int gTemperatureOverheatingCounter;
+volatile extern BOOL isTemperatureRead;
 volatile extern unsigned int i2cERRORS;
 volatile extern long gQEPosition;
 volatile extern int  gQEVelocity;
