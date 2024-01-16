@@ -613,6 +613,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_motor.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_i2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_i2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1407,6 +1417,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_motor.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_i2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_i2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2200,6 +2220,16 @@
               <FileName>embot_hw_motor.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_motor.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_i2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_i2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
           </Files>
         </Group>

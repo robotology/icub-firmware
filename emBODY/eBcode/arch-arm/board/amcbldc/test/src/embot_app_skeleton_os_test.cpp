@@ -30,12 +30,16 @@ constexpr extern uint8_t  Build_number  = 0;
 #include "embot_app_theLEDmanager.h"
 #include "embot_hw_can.h"
 #include "embot_hw_gpio.h"
-
+#include "embot_hw_i2c.h"
 #include "embot_hw_motor.h"
+#include "embot_hw_encoder.h"
+#include "embot_hw_types.h"
 
 #include "stm32hal.h"
 
 #include "analog.h"
+#include "pwm.h"
+#include "encoder.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -276,51 +280,103 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 		}
 		
 		void testVin(){
+			uint8_t data[8] {0};
 	    float vin {0.0};
 			vin = embot::hw::bsp::amcbldc::getVIN();
 
 			embot::core::print("Vin : " + std::to_string(vin));
+			
+			if(vin > 11.5 && vin < 12.5) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+  		sendCAN(data);
 		}
 		
 		void testCin(){
-	    float cin {0.0};
+			uint8_t data[8] {0};
+	    float cin {0.00};
 			cin = embot::hw::bsp::amcbldc::getCIN();
 
 			embot::core::print("Cin : " + std::to_string(cin));
+			
+			if(cin > 0.030 && cin < 0.060) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+  		sendCAN(data);
 		}
 		
 
 		constexpr embot::hw::GPIO VAUXOK {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::fourteen};
 
 		void testVAUXOK(){
-			
+			uint8_t data[8] {0};
 			auto s = embot::hw::gpio::get(VAUXOK);
-			
-			if(s == embot::hw::gpio::State::SET) embot::core::print("OK");
-			else embot::core::print("NOK");
 
+			if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+			else{embot::core::print("NOK"); data[0] = 0xBB;}
+			
+  		sendCAN(data);
 		}
 		
 		constexpr embot::hw::GPIO VCCOK {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen};
 
 		void testVCCOK(){
-			
+			uint8_t data[8] {0};
 			auto s = embot::hw::gpio::get(VCCOK);
 			
-			if(s == embot::hw::gpio::State::SET) embot::core::print("OK");
-			else embot::core::print("NOK");
-
+		  if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+			else{embot::core::print("NOK"); data[0] = 0xBB;}
+			
+  		sendCAN(data);
 		}
 		
 		constexpr embot::hw::GPIO EXTFAULT {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen};
 
 		void testFAULT(){
-			
+			uint8_t data[8] {0};			
 			auto s = embot::hw::gpio::get(EXTFAULT);
 			
-			if(s == embot::hw::gpio::State::SET) embot::core::print("OK");
-			else embot::core::print("NOK");
+			if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+			else{embot::core::print("NOK"); data[0] = 0xBB;}
+			
+  		sendCAN(data);
+		}
+		
+ 		constexpr embot::hw::I2C i2c = embot::hw::I2C::four;
+		constexpr embot::hw::i2c::Config i2cconfig = {};
+			
+		void testI2C(embot::hw::I2C i2c){
+			uint8_t data[8] {0};			
+			uint16_t FAP = 0xbc; // FAP i2c address
+			
+			if(!embot::hw::i2c::initialised(i2c)) {
+				embot::hw::i2c::init(i2c, i2cconfig);
+			}
 
+			embot::core::wait(300* embot::core::time1millisec);
+			
+			if(embot::hw::i2c::ping(i2c, FAP, 100*embot::core::time1millisec)) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+  		sendCAN(data);
+		}
+		
+		void testHALL(){
+			uint8_t data[8] {0};		
+			std::string h1,h2,h3;
+			
+			for(int i=0; i<15000; i++){	
+				if(HAL_GPIO_ReadPin(HALL1_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET) h1 = "H";
+				else h1 ="L";
+				if(HAL_GPIO_ReadPin(HALL2_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET) h2 = "H";
+				else h2 ="L";
+				if(HAL_GPIO_ReadPin(HALL3_GPIO_Port, HALL3_Pin)     != GPIO_PIN_RESET) h3 = "H";
+				else h3 ="L";
+				embot::core::print(h1 + h2 + h3);
+				embot::core::wait(1* embot::core::time1millisec);
+			}
+			embot::core::print("end");
+  		sendCAN(data);
 		}
 		
 //******************** END TESTS ******************************************************************//
@@ -348,39 +404,42 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
   					case 0x00 : embot::core::wait(300* embot::core::time1millisec);	testCAN(); break;
 						
 						//Check test fw revision		      
-						case 0x01 :  embot::core::wait(300* embot::core::time1millisec); getFirmwareVersion(); break;
+						case 0x01 : embot::core::wait(300* embot::core::time1millisec); getFirmwareVersion(); break;
 
 						//Test LEDs off
-						case 0x02 :  embot::core::wait(300* embot::core::time1millisec); testLeds(0); break;
+						case 0x02 : embot::core::wait(300* embot::core::time1millisec); testLeds(0); break;
 
 						//Test LEDs on
-						case 0x03 :  embot::core::wait(300* embot::core::time1millisec); testLeds(1); break;
+						case 0x03 : embot::core::wait(300* embot::core::time1millisec); testLeds(1); break;
 						
 						//Test micro DEV_ID
-						case 0x04 :  embot::core::wait(300* embot::core::time1millisec); testIDCODE(canframe); break;
+						case 0x04 : embot::core::wait(300* embot::core::time1millisec); testIDCODE(canframe); break;
 						
 						//Test Vin
-						case 0x05 :  embot::core::wait(300* embot::core::time1millisec); testVin(); break;
+						case 0x05 : embot::core::wait(300* embot::core::time1millisec); testVin(); break;
 						
 						//Test Cin
-						case 0x06 :  embot::core::wait(300* embot::core::time1millisec); testCin(); break;
+						case 0x06 : embot::core::wait(300* embot::core::time1millisec); testCin(); break;
 						
 						//Test VAUXOK
-						case 0x07 :  embot::core::wait(300* embot::core::time1millisec); testVAUXOK(); break;
+						case 0x07 : embot::core::wait(300* embot::core::time1millisec); testVAUXOK(); break;
 
 						//Test VCCOK
-						case 0x08 :  embot::core::wait(300* embot::core::time1millisec); testVCCOK(); break;
+						case 0x08 : embot::core::wait(300* embot::core::time1millisec); testVCCOK(); break;
 						
 						//Test FAULT
-						case 0x09 :  embot::core::wait(300* embot::core::time1millisec); testFAULT(); break;
+						case 0x09 : embot::core::wait(300* embot::core::time1millisec); testFAULT(); break;
+
+						//Test I2C
+						case 0x0A : embot::core::wait(300* embot::core::time1millisec); testI2C(i2c); break;
+
+						//Test HALL
+						case 0x0B : embot::core::wait(300* embot::core::time1millisec); testHALL(); break;
 						
 						default : break;
 					}			
-     
-        }
-     
+        }   
     }
-
 
 }}}}}
 
