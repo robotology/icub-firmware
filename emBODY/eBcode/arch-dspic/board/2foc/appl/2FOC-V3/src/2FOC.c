@@ -161,6 +161,8 @@ volatile static char bDriveEnabled = 0;
 //volatile static char sAlignInProgress = 0;
 volatile int gTemperature = 0;
 volatile int gTemperatureLimit = 0;
+volatile int gTemperatureOverheatingCounter = 0;
+volatile BOOL isTemperatureRead = FALSE;
 volatile unsigned int i2cERRORS = 0;
 
 volatile char sAlignInProgress = 0;
@@ -1198,7 +1200,7 @@ int main(void)
         }
         else
         {
-            gTemperature = -5000;
+            gTemperature = 0;
         }
             
 

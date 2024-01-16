@@ -129,24 +129,29 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     
     if (!bequiet)
     {
+        /**
         BOOL transmit_addStatus = FALSE;
         if (MotorConfig.has_tsens && isActiveI2CTsens())
         {
-            int Tsend = 100 + canprototransmitter_bid*100;
+            
+            int Tsend = 100 + canprototransmitter_bid*3;
             static int noflood = 0;
 
-            if (++noflood >= Tsend)
+            if (isTemperatureRead)
             {
                 noflood = 0;
                 transmit_addStatus = TRUE;
             }
         }
-        if(transmit_addStatus)
+         * */
+        if(isTemperatureRead)
         {
+            payload.w[0] = 0;
             payload.w[1] = gTemperature;
 
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__ADDITIONAL_STATUS );
             ECANSend(msgid, 4, &payload);
+            isTemperatureRead = FALSE;
         }
         else
         {

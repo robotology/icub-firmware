@@ -18,6 +18,8 @@ extern "C" {
     
 int setupI2CTsens(void);
 int readI2CTsens(volatile int* temperature);
+// function used for generating synthetic temperature data useful for testing 
+void generateI2CTsensSynthetic(volatile int* temperature);
 
 #ifdef	__cplusplus
 }

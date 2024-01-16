@@ -186,14 +186,16 @@ void I2CSequentialReadReg(char addr, char byteHigh, char byteLow, char* buff, in
 
 
 
-
+volatile int synthTempCounter = 0;//timer for generation of synthetic data
 int I2Cwdog = 0;
+volatile int I2Ccomerrwdog = 0; //counts number of continuos communication error
 volatile int I2Cerrcode = 0;
 volatile char I2Cdead = 0;
 volatile uint16_t I2Cerrors = 0;
 volatile BOOL overheating = FALSE;
 
-#define WHILE(flag, errcode, jump) for (I2Cwdog=25600; I2Cwdog && (flag); --I2Cwdog); if (!I2Cwdog) { I2Cerrcode=errcode; goto jump; }
+//25600
+#define WHILE(flag, errcode, jump) for (I2Cwdog=6400; I2Cwdog && (flag); --I2Cwdog); if (!I2Cwdog) { I2Cerrcode=errcode; goto jump; }
 
 //////////////////////////////////
 
@@ -243,7 +245,7 @@ int setupI2CTsens(void)
     ODCBbits.ODCB8=1;
     ODCBbits.ODCB9=1;
 
-    I2C1BRG = 393;          // @100kHz; (FCY/FSCL - FCY/1e7) - 1
+    I2C1BRG = 196;//393;          // @100kHz; (FCY/FSCL - FCY/1e7) - 1
     I2C1CONbits.I2CEN = 0;  // Disable I2C
     I2C1CONbits.DISSLW = 1; // Disable slew rate control
     I2C1CONbits.A10M = 0;   // 7-bit slave addr
@@ -257,10 +259,39 @@ int setupI2CTsens(void)
     return config_sensor();
 }
 
+
+#define TEST_ON_ROBOT
+
+#ifdef TEST_ON_ROBOT
+//-30 deg
+#define ERR_VAL_0X19 -378
+//-50 deg
+#define ERR_VAL_0X10 -631
+//-70 deg
+#define ERR_NUM_10 -886
+// -90 deg
+#define DEF_VAL_TEMP -1141
+// 10 deg for increments of synth data
+#define INCR_DEG_10 127
+
+#else
+//-30 deg
+#define ERR_VAL_0X19 -2729
+// -50 deg
+#define ERR_VAL_0X10 -4613
+// -70 deg
+#define ERR_NUM_10 -6549
+// -90 deg
+#define DEF_VAL_TEMP -8541
+// 10 deg for increments of synth data
+#define INCR_DEG_10 897
+#endif
+    
+
 int readI2CTsens(volatile int* temperature)
 {   
     I2Cerrcode = 0;
-    *temperature = -5000;
+    *temperature = DEF_VAL_TEMP;
     
     // start
     I2C1CONbits.ACKDT = 0; // Reset any ACK
@@ -291,17 +322,54 @@ int readI2CTsens(volatile int* temperature)
             I2C1CONbits.ACKEN = 1;      // Initiate Acknowledge and transmit ACKDT
             WHILE(I2C1CONbits.ACKEN, -14, I2Ctimeout)
         }
-
-        *temperature = buffer[0]<<8 | buffer[1];
-        if(*temperature == 0x7fff)
+        
+        if(buffer[2] == 0x19) //data valid
         {
-            *temperature = -5000;
-            I2Cerrcode = -18;
+            int cur_tmp = buffer[0]<<8 | buffer[1];
+            
+            if(cur_tmp == 0x7fff)
+            {
+                I2Cerrcode = -18;
+                I2Ccomerrwdog++;
+            }
+            else
+            {
+                //if i'm here I have a correct value
+                *temperature = cur_tmp;
+                I2Ccomerrwdog = 0; // clean the communication error watchdog
+            }
+        }         
+        else
+        {
+            I2Ccomerrwdog++;
+            //data not valid
+            if(buffer[2] == 0x10) // sensor re-initialized itself --> configure again
+            {
+                I2Cerrcode = -20;
+                *temperature = ERR_VAL_0X10;
+            }
+            else
+            {
+                *temperature = ERR_VAL_0X19;
+                I2Cerrcode = -19;
+            }
+            goto I2Ctimeout; //--> go to reinit the I2C
         }
     }
     else
     {
+        ++I2Ccomerrwdog;
         I2Cerrcode = -17;
+    }
+    
+    if(I2Ccomerrwdog > 100) // cannot communicate
+    {
+        I2Cerrcode = -21;
+        
+        if(( *temperature != ERR_VAL_0X10) && (*temperature != ERR_VAL_0X19))
+        {
+            *temperature = ERR_NUM_10; 
+        }
     }
     
     // stop
@@ -350,4 +418,21 @@ fatal_error:
     config_sensor();
 
     return I2Cerrcode;
+}
+
+// function used for generating synthetic temperature data useful for testing
+// the increase is done in raw value for a PT1000 and the value is 10 deg each 2 call 
+void generateI2CTsensSynthetic(volatile int* temperature)
+{
+    
+    // increase temp of 10 raw unit 
+    if(synthTempCounter >= 2)
+    {
+        *temperature += 897;
+        synthTempCounter = 0;
+    }
+    else
+    {
+        ++synthTempCounter;
+    }
 }
