@@ -162,7 +162,7 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_Startup(embot::os::Thread *t, void *
     canconfig.txcapacity = impl->_config.tCOMMmaxOUTcanframes;
     canconfig.onrxframe = embot::core::Callback(impl->alertonrxframe, t); 
     embot::hw::can::init(impl->_tCOMMcanbus, canconfig);
-#if defined(STM32HAL_BOARD_AMC2C)
+#if defined(STM32HAL_BOARD_AMC2C) && !defined(STM32HAL_DRIVER_V1B1)
     #warning marco.accame: attenzione la amc2c non apprezza il can::setfilters
 #else        
     embot::hw::can::setfilters(impl->_tCOMMcanbus, impl->_tCOMMcanaddress); 
