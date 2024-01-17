@@ -20,6 +20,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "eth.h"
 
+#include "string.h"
+
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
 #pragma location=0x30046000

@@ -472,7 +472,7 @@ extern void stm32hal_board_init(void);
 #elif   defined(STM32HAL_BOARD_AMC2C) 
 
 
-    // one case: v1A0
+    // two cases: v1A0 and v1B1
     #if (STM32HAL_DRIVER_VERSION == 0x1A0)
        
         #include "../src/config/stm32hal_driver_cfg_of_amc2c_v1A0.h"
@@ -481,6 +481,15 @@ extern void stm32hal_board_init(void);
         #include "../src/board/amc2c/v1A0/inc/main.h"
 
         #include "../src/board/amc2c/v1A0/inc/stm32h7xx_it.h"
+
+    #elif (STM32HAL_DRIVER_VERSION == 0x1B1)
+
+        #include "../src/config/stm32hal_driver_cfg_of_amc2c_v1B1.h"
+
+        #include "../src/board/amc2c/v1B1/inc/gpio.h"
+        #include "../src/board/amc2c/v1B1/inc/main.h"
+
+        #include "../src/board/amc2c/v1B1/inc/stm32h7xx_it.h"
 		
     #else
         #error unsupported driver version for amc2c

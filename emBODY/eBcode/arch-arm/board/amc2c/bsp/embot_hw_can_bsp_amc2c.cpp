@@ -135,8 +135,8 @@ namespace embot::hw::can {
         hfdcan2.Init.DataTimeSeg1 = 11;
         hfdcan2.Init.DataTimeSeg2 = 8;
         hfdcan2.Init.MessageRAMOffset = 1280;
-        hfdcan2.Init.StdFiltersNbr = 1;
-        hfdcan2.Init.ExtFiltersNbr = 1;
+        hfdcan2.Init.StdFiltersNbr = 8;
+        hfdcan2.Init.ExtFiltersNbr = 0;
         hfdcan2.Init.RxFifo0ElmtsNbr = 1;
         hfdcan2.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
         hfdcan2.Init.RxFifo1ElmtsNbr = 0;
