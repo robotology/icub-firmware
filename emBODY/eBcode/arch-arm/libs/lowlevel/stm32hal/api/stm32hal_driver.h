@@ -272,7 +272,7 @@ extern "C" {
     #if     defined(STM32HAL_DRIVER_V180)    
         #include "../src/driver/stm32h7-v180/inc/stm32h7xx_hal.h"       
     #elif   defined(STM32HAL_DRIVER_V190)    
-        #include "../src/driver/stm32h7-v190/inc/stm32h7xx_hal.hx"        
+        #include "../src/driver/stm32h7-v190/inc/stm32h7xx_hal.h"        
     #elif   defined(STM32HAL_DRIVER_V1A0)    
         #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_hal.h"       
     #elif   defined(STM32HAL_DRIVER_V1B1)    
