@@ -365,7 +365,6 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 		
 		void testHALL(){
 			uint8_t data[8] {0};		
-			uint8_t h1[2],h2[2],h3[2] {0};
 			uint8_t res {0};
 
 			for(int i=0; i<500; i++){	
@@ -380,12 +379,36 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			
 				embot::core::print(std::to_string(res));
 				
-		}
+			}
 
-		if(res == 63) data[0] = 0xAA;
-		else data[0] = 0xBB;
+			if(res == 63) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+			sendCAN(data);
+		}
 		
-  		sendCAN(data);
+		void testENCODER(){
+			uint8_t data[8] {0};		
+			uint8_t res {0};
+
+			for(int i=0; i<500; i++){	
+				if((HAL_GPIO_ReadPin(ENCA_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET)) res |= 1;
+				else res |= 2;
+				if((HAL_GPIO_ReadPin(ENCB_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET)) res |= 4;
+				else res |= 8;
+				if((HAL_GPIO_ReadPin(ENCZ_GPIO_Port, HALL3_Pin)     != GPIO_PIN_RESET)) res |= 16;
+				else res |= 32;
+
+				embot::core::wait(10* embot::core::time1millisec);
+			
+				embot::core::print(std::to_string(res));
+				
+			}
+
+			if(res == 47) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+			sendCAN(data);
 		}
 		
 //******************** END TESTS ******************************************************************//
@@ -444,6 +467,9 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 
 						//Test HALL
 						case 0x0B : embot::core::wait(300* embot::core::time1millisec); testHALL(); break;
+
+						//Test ECODER
+						case 0x0C : embot::core::wait(300* embot::core::time1millisec); testENCODER(); break;
 						
 						default : break;
 					}			
