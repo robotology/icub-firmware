@@ -107,6 +107,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 //            } break;
 //        }
         config.countdown = 0;
+				activity_param.blinkingperiod = ActivityParam::BlinkSlowPeriod;      
         // and now we execute. this function is [[noreturn]]
         // it inits the hw::bsp and then starts the scheduler. 
         // the OS init thread will: start timer manager and callback manager, and finally call activity_function(&activity_param).
@@ -144,14 +145,14 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
         embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();   
         canbrdinfo.synch(*activity_param.info);    
         
-        // manage the led blinking period
-        embot::core::relTime period = 0;    
-        if(nullptr != pp)
-        {
-            period = pp->blinkingperiod;
-        }    
+//        // manage the led blinking period
+//        embot::core::relTime period = 0;    
+//        if(nullptr != pp)
+//        {
+//            period = pp->blinkingperiod;
+//        }    
 
-        // start the led pulser
+//        // start the led pulser
 //        static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
 //        embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
 //        theleds.init(allleds);    
@@ -240,7 +241,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			 static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three};  
         embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
         theleds.init(allleds);    
-				
+
 			  switch(on){
 					case 0: 
 						theleds.get(embot::hw::LED::one).off();
@@ -361,21 +362,29 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
   		sendCAN(data);
 		}
 		
+		
 		void testHALL(){
 			uint8_t data[8] {0};		
-			std::string h1,h2,h3;
+			uint8_t h1[2],h2[2],h3[2] {0};
+			uint8_t res {0};
+
+			for(int i=0; i<500; i++){	
+				if((HAL_GPIO_ReadPin(HALL1_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET)) res |= 1;
+				else res |= 2;
+				if((HAL_GPIO_ReadPin(HALL2_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET)) res |= 4;
+				else res |= 8;
+				if((HAL_GPIO_ReadPin(HALL3_GPIO_Port, HALL3_Pin)     != GPIO_PIN_RESET)) res |= 16;
+				else res |= 32;
+
+				embot::core::wait(10* embot::core::time1millisec);
 			
-			for(int i=0; i<15000; i++){	
-				if(HAL_GPIO_ReadPin(HALL1_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET) h1 = "H";
-				else h1 ="L";
-				if(HAL_GPIO_ReadPin(HALL2_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET) h2 = "H";
-				else h2 ="L";
-				if(HAL_GPIO_ReadPin(HALL3_GPIO_Port, HALL3_Pin)     != GPIO_PIN_RESET) h3 = "H";
-				else h3 ="L";
-				embot::core::print(h1 + h2 + h3);
-				embot::core::wait(1* embot::core::time1millisec);
-			}
-			embot::core::print("end");
+				embot::core::print(std::to_string(res));
+				
+		}
+
+		if(res == 63) data[0] = 0xAA;
+		else data[0] = 0xBB;
+		
   		sendCAN(data);
 		}
 		
