@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 6.18
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Mon Oct 16 10:09:05 2023
+// Model version                  : 7.12
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Mon Jan 15 18:22:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

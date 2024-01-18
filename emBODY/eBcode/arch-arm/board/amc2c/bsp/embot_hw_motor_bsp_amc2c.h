@@ -58,18 +58,15 @@ namespace embot::hw::motor::bsp::amc2c {
         };
     };
     
-    // 20000 is 20.0 us
-    // 15000 is 15.0 us
-    // 12500 is 12.5 us
-    // 12190 is ... as amcbldc
-    constexpr PWMvalues PWMvals20us {20000};
-    constexpr PWMvalues PWMvals15us {15000};
-    constexpr PWMvalues PWMvals12dot5us {12500};
-    constexpr PWMvalues PWMvals12dot190us {12190}; // 36.57
+    // the amcbldc uses 82 kHz
+    constexpr PWMvalues pwm50000Hz {20000};     // pwm @ 50.000 kHz [pwm 20.000us, foc 60.000us]
+    constexpr PWMvalues pwm66666Hz {15000};     // pwm @ 66.666 kHz [pwm 15.000us, foc 45.000us] 
+    constexpr PWMvalues pwm70000Hz {14285};     // pwm @ 70.000 kHz [pwm 14.285us, foc 42.857us]
+    constexpr PWMvalues pwm75000Hz {13333};     // pwm @ 75.000 kHz [pwm 13.333us, foc 40.000us]
+    constexpr PWMvalues pwm80000Hz {12500};     // pwm @ 80.000 kHz [pwm 12.500us, foc 37.500us]
+    constexpr PWMvalues PWM82000Hz {12195};     // pwm @ 82.000 kHz [pwm 12.195us, foc 36.585us]
     
-    constexpr PWMvalues PWMvals {PWMvals20us};
-    //constexpr PWMvalues PWMvals {PWMvals15us};
-
+    constexpr PWMvalues PWMvals {pwm66666Hz};
     
     
 }

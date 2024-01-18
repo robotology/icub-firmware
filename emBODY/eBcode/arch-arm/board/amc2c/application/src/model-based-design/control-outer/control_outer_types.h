@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 5.5
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Mon Oct 16 10:08:24 2023
+// Model version                  : 6.3
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Mon Jan 15 18:21:42 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -55,6 +55,8 @@ struct Flags
 
 struct MotorConfig
 {
+  // Angular offset in degrees between the stator windings and the hall sensors. 
+  real32_T hall_sens_offset;
   boolean_T has_hall_sens;
   boolean_T has_quadrature_encoder;
   boolean_T has_speed_quadrature_encoder;
@@ -69,7 +71,6 @@ struct MotorConfig
   real32_T Rphase;
   real32_T Imin;
   real32_T Imax;
-  real32_T Vcc;
   real32_T Vmax;
   real32_T resistance;
   real32_T inductance;
@@ -268,6 +269,16 @@ struct MotorSensors
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_SupplyVoltage_
+#define DEFINED_TYPEDEF_FOR_SupplyVoltage_
+
+struct SupplyVoltage
+{
+  real32_T voltage;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_SensorsData_
 #define DEFINED_TYPEDEF_FOR_SensorsData_
 
@@ -275,7 +286,12 @@ struct SensorsData
 {
   // position encoders
   JointPositions jointpositions;
+
+  // motor probes
   MotorSensors motorsensors;
+
+  // supply probes
+  SupplyVoltage supplyvoltagesensors;
 };
 
 #endif

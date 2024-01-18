@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 6.2
+// Model version                  : 6.3
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Dec 14 10:43:51 2023
+// C/C++ source code generated on : Mon Jan 15 14:41:42 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.4
+// Model version                  : 6.16
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Dec 14 10:43:43 2023
+// C/C++ source code generated on : Mon Jan 15 14:41:30 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -47,6 +47,16 @@ struct MotorSensors
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_SupplyVoltage_
+#define DEFINED_TYPEDEF_FOR_SupplyVoltage_
+
+struct SupplyVoltage
+{
+  real32_T voltage;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_SensorsData_
 #define DEFINED_TYPEDEF_FOR_SensorsData_
 
@@ -54,7 +64,12 @@ struct SensorsData
 {
   // position encoders
   JointPositions jointpositions;
+
+  // motor probes
   MotorSensors motorsensors;
+
+  // supply probes
+  SupplyVoltage supplyvoltagesensors;
 };
 
 #endif
@@ -111,7 +126,6 @@ struct MotorConfig
   real32_T Rphase;
   real32_T Imin;
   real32_T Imax;
-  real32_T Vcc;
   real32_T Vmax;
   real32_T resistance;
   real32_T inductance;
@@ -364,51 +378,6 @@ struct ControlOutputs
 };
 
 #endif
-
-#ifndef struct_c_dsp_internal_ExponentialMovingAverage_control_foc_T
-#define struct_c_dsp_internal_ExponentialMovingAverage_control_foc_T
-
-struct c_dsp_internal_ExponentialMovingAverage_control_foc_T
-{
-  int32_T isInitialized;
-  boolean_T isSetupComplete;
-  boolean_T TunablePropsChanged;
-  real32_T ForgettingFactor;
-  real32_T pwN;
-  real32_T pmN;
-  real32_T plambda;
-};
-
-#endif          // struct_c_dsp_internal_ExponentialMovingAverage_control_foc_T
-
-#ifndef struct_cell_wrap_control_foc_T
-#define struct_cell_wrap_control_foc_T
-
-struct cell_wrap_control_foc_T
-{
-  uint32_T f1[8];
-};
-
-#endif                                 // struct_cell_wrap_control_foc_T
-
-#ifndef struct_dsp_simulink_MovingRMS_control_foc_T
-#define struct_dsp_simulink_MovingRMS_control_foc_T
-
-struct dsp_simulink_MovingRMS_control_foc_T
-{
-  boolean_T matlabCodegenIsDeleted;
-  int32_T isInitialized;
-  boolean_T isSetupComplete;
-  boolean_T TunablePropsChanged;
-  cell_wrap_control_foc_T inputVarSize[2];
-  real32_T ForgettingFactor;
-  c_dsp_internal_ExponentialMovingAverage_control_foc_T *pStatistic;
-  int32_T NumChannels;
-  int32_T FrameLength;
-  c_dsp_internal_ExponentialMovingAverage_control_foc_T _pobj0;
-};
-
-#endif                           // struct_dsp_simulink_MovingRMS_control_foc_T
 
 // Forward declaration for rtModel
 typedef struct tag_RTM_control_foc_T RT_MODEL_control_foc_T;

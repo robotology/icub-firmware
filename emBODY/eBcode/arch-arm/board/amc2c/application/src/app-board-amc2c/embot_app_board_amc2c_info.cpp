@@ -28,13 +28,13 @@ namespace embot::app::board::amc2c::info {
     
     constexpr embot::prot::can::applicationInfo applInfo 
     {   
-        embot::prot::can::versionOfAPPLICATION {2, 0, 7},    
+        embot::prot::can::versionOfAPPLICATION {2, 0, 8},    
         embot::prot::can::versionOfCANPROTOCOL {2, 0}    
     };
 
     constexpr embot::app::eth::Date date
     {
-        2024, embot::app::eth::Month::Jan, embot::app::eth::Day::seventeen, 10, 10
+        2024, embot::app::eth::Month::Jan, embot::app::eth::Day::eigthteen, 10, 00
     };
 
     constexpr embot::hw::FLASHpartitionID codePartition 

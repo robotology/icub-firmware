@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 6.2
+// Model version                  : 6.3
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Dec 14 10:44:14 2023
+// C/C++ source code generated on : Mon Jan 15 14:42:05 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

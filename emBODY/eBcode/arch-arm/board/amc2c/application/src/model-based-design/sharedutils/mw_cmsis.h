@@ -1,4 +1,4 @@
-/* Copyright 2015-2021 The MathWorks, Inc. */
+/* Copyright 2015-2023 The MathWorks, Inc. */
 
 /****************************************************
 *                                                   *   
@@ -11,6 +11,9 @@
 
 #include "arm_math.h"
 #include "rtwtypes.h"
+
+#define mw_arm_vlog_f32(pSrc, pDst, blockSize) arm_vlog_f32((float32_t *)pSrc, (float32_t *)pDst, blockSize)
+#define mw_arm_vexp_f32(pSrc, pDst, blockSize) arm_vexp_f32((float32_t *)pSrc, (float32_t *)pDst, blockSize)
 
 #define mw_arm_abs_f32(pSrc, pDst, blockSize) arm_abs_f32((float32_t *)pSrc, (float32_t *)pDst, blockSize)
 #define mw_arm_abs_q7(pSrc, pDst, blockSize) arm_abs_q7((q7_t *)pSrc, (q7_t *)pDst, blockSize) 
