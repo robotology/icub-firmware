@@ -1,8 +1,8 @@
 
 /*
- * Copyright (C) 2019 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Davide Tomé
+ * email:   davide.tome@iit.it
 */
 
 
@@ -41,6 +41,7 @@ constexpr extern uint8_t  Build_number  = 0;
 #include "pwm.h"
 #include "encoder.h"
 
+#include "tests.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -211,7 +212,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 		static void sendCan(std::uint8_t data[8]){
 			embot::hw::can::Frame canframe;
 			
-			canframe.id = 0x551;         ;
+			canframe.id = 0x551;  
 			canframe.size = 8;
 			for(uint8_t i = 0; i < 8; i++) {canframe.data[i] = data[i];}
 			
@@ -233,7 +234,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			data[0] = Firmware_vers;
 			data[1] = Revision_vers;
 			data[2] = Build_number;
-				
+
 			sendCan(data);
     }
 		

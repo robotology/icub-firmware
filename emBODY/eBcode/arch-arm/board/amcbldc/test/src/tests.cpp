@@ -1,3 +1,13 @@
+
+/*
+ * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Davide Tomé
+ * email:   davide.tome@iit.it
+*/
+
+
+#include "tests.h"
+
 // dependencies
 #include "embot_core.h"
 #include "embot_os_theScheduler.h"
@@ -8,33 +18,16 @@
 
 
 
-namespace test::any {
+namespace testplan { namespace tests {
     
-		void init(){}
+		struct FirmwareInfo{
+			static const uint8_t  Firmware_vers = 1;
+			static const uint8_t  Revision_vers = 0;
+			static const uint8_t  Build_number  = 0;
+		};
 			
-		static void sendCAN(uint8_t data[8]){
-			embot::hw::can::Frame canframe;
-			
-			canframe.id = 0x551;         ;
-			canframe.size = 8;
-			
-			embot::hw::can::put(embot::hw::CAN::one, {canframe.id, canframe.size, canframe.data});   
-			embot::hw::can::transmit(embot::hw::CAN::one);	
-			
-		}
-		static void testCAN(){
-			uint8_t data[8] {0};
-			data[0] = 0xAA;
-			
-			sendCAN(data);
-		}
-
-
+	}
 }
 
-void test_hw_init()
-{
-    test::any::init();   
-}
 
 
