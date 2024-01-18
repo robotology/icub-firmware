@@ -208,7 +208,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 
 //******************** TESTS ******************************************************************//
 		
-		static void sendCAN(std::uint8_t data[8]){
+		static void sendCan(std::uint8_t data[8]){
 			embot::hw::can::Frame canframe;
 			
 			canframe.id = 0x551;         ;
@@ -220,11 +220,11 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			
 		}
 		
-		static void testCAN(){
+		static void testCan(){
 			uint8_t data[8] {0};
 			data[0] = 0xAA;
 			
-			sendCAN(data);
+			sendCan(data);
 		}
 
     void getFirmwareVersion()
@@ -234,7 +234,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			data[1] = Revision_vers;
 			data[2] = Build_number;
 				
-			sendCAN(data);
+			sendCan(data);
     }
 		
 	void testLeds(uint8_t on){
@@ -256,7 +256,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			 
 		}
 
-		void testIDCODE(embot::hw::can::Frame frame){
+		void testIdCode(embot::hw::can::Frame frame){
 			uint32_t id = DBGMCU->IDCODE & 0xFFF;
 			uint32_t rev = (DBGMCU->IDCODE >> 16) & 0xFFFF;
 		
@@ -272,12 +272,12 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			  id2 == frame.data[4]) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
-			data[1] = rev >> 8;
-			data[2] = rev;
-			data[3] = id >> 8;
-			data[4] = id;
+			data[1] = rev1;
+			data[2] = rev2;
+			data[3] = id1;
+			data[4] = id2;
 			
-			sendCAN(data);
+			sendCan(data);
 		}
 		
 		void testVin(){
@@ -290,7 +290,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			if(vin > 11.5 && vin < 12.5) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
-  		sendCAN(data);
+  		sendCan(data);
 		}
 		
 		void testCin(){
@@ -303,50 +303,50 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			if(cin > 0.030 && cin < 0.060) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
-  		sendCAN(data);
+  		sendCan(data);
 		}
 		
 
 		constexpr embot::hw::GPIO VAUXOK {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::fourteen};
 
-		void testVAUXOK(){
+		void testVauxOk(){
 			uint8_t data[8] {0};
 			auto s = embot::hw::gpio::get(VAUXOK);
 
 			if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
 			else{embot::core::print("NOK"); data[0] = 0xBB;}
 			
-  		sendCAN(data);
+  		sendCan(data);
 		}
 		
 		constexpr embot::hw::GPIO VCCOK {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen};
 
-		void testVCCOK(){
+		void testVccOk(){
 			uint8_t data[8] {0};
 			auto s = embot::hw::gpio::get(VCCOK);
 			
 		  if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
 			else{embot::core::print("NOK"); data[0] = 0xBB;}
 			
-  		sendCAN(data);
+  		sendCan(data);
 		}
 		
 		constexpr embot::hw::GPIO EXTFAULT {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen};
 
-		void testFAULT(){
+		void testFault(){
 			uint8_t data[8] {0};			
 			auto s = embot::hw::gpio::get(EXTFAULT);
 			
 			if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
 			else{embot::core::print("NOK"); data[0] = 0xBB;}
 			
-  		sendCAN(data);
+  		sendCan(data);
 		}
 		
  		constexpr embot::hw::I2C i2c = embot::hw::I2C::four;
 		constexpr embot::hw::i2c::Config i2cconfig = {};
 			
-		void testI2C(embot::hw::I2C i2c){
+		void testI2c(embot::hw::I2C i2c){
 			uint8_t data[8] {0};			
 			uint16_t FAP = 0xbc; // FAP i2c address
 			
@@ -359,11 +359,11 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			if(embot::hw::i2c::ping(i2c, FAP, 100*embot::core::time1millisec)) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
-  		sendCAN(data);
+  		sendCan(data);
 		}
 		
 		
-		void testHALL(){
+		void testHall(){
 			uint8_t data[8] {0};		
 			uint8_t res {0};
 
@@ -384,10 +384,10 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			if(res == 63) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
-			sendCAN(data);
+			sendCan(data);
 		}
 		
-		void testENCODER(){
+		void testEncoder(){
 			uint8_t data[8] {0};		
 			uint8_t res {0};
 
@@ -408,7 +408,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			if(res == 47) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
-			sendCAN(data);
+			sendCan(data);
 		}
 		
 //******************** END TESTS ******************************************************************//
@@ -433,7 +433,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 					switch(canframe.data[0]){
 						
 						//Test CAN
-  					case 0x00 : embot::core::wait(300* embot::core::time1millisec);	testCAN(); break;
+  					case 0x00 : embot::core::wait(300* embot::core::time1millisec);	testCan(); break;
 						
 						//Check test fw revision		      
 						case 0x01 : embot::core::wait(300* embot::core::time1millisec); getFirmwareVersion(); break;
@@ -445,7 +445,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 						case 0x03 : embot::core::wait(300* embot::core::time1millisec); testLeds(1); break;
 						
 						//Test micro DEV_ID
-						case 0x04 : embot::core::wait(300* embot::core::time1millisec); testIDCODE(canframe); break;
+						case 0x04 : embot::core::wait(300* embot::core::time1millisec); testIdCode(canframe); break;
 						
 						//Test Vin
 						case 0x05 : embot::core::wait(300* embot::core::time1millisec); testVin(); break;
@@ -454,22 +454,22 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 						case 0x06 : embot::core::wait(300* embot::core::time1millisec); testCin(); break;
 						
 						//Test VAUXOK
-						case 0x07 : embot::core::wait(300* embot::core::time1millisec); testVAUXOK(); break;
+						case 0x07 : embot::core::wait(300* embot::core::time1millisec); testVauxOk(); break;
 
 						//Test VCCOK
-						case 0x08 : embot::core::wait(300* embot::core::time1millisec); testVCCOK(); break;
+						case 0x08 : embot::core::wait(300* embot::core::time1millisec); testVccOk(); break;
 						
 						//Test FAULT
-						case 0x09 : embot::core::wait(300* embot::core::time1millisec); testFAULT(); break;
+						case 0x09 : embot::core::wait(300* embot::core::time1millisec); testFault(); break;
 
 						//Test I2C
-						case 0x0A : embot::core::wait(300* embot::core::time1millisec); testI2C(i2c); break;
+						case 0x0A : embot::core::wait(300* embot::core::time1millisec); testI2c(i2c); break;
 
 						//Test HALL
-						case 0x0B : embot::core::wait(300* embot::core::time1millisec); testHALL(); break;
+						case 0x0B : embot::core::wait(300* embot::core::time1millisec); testHall(); break;
 
 						//Test ECODER
-						case 0x0C : embot::core::wait(300* embot::core::time1millisec); testENCODER(); break;
+						case 0x0C : embot::core::wait(300* embot::core::time1millisec); testEncoder(); break;
 						
 						default : break;
 					}			
