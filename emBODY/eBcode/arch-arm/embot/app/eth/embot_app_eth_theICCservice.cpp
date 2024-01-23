@@ -22,6 +22,7 @@
 #include "embot_hw_icc_ltr_bsp.h"
 
 #include <array>
+#include <vector>
 
 using namespace std;
 

@@ -17,6 +17,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_app_eth_Service_impl.h"
+
 #include "embot_app_eth_theFTservice.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -30,14 +32,14 @@ namespace embot::app::eth {
 //struct Operation
 //{
 //    const eOmn_serv_configuration_t * servcfg {nullptr};
-//    embot::app::eth::Service::fpOnEndOfOperation onendoperation {nullptr};   
+//    embot::app::eth::Service::OnEndOfConfigOperation onendoperation {nullptr};   
 //    embot::app::eth::Service *service {nullptr};
 //    bool activateafterverify {false};
 //    
 //    Operation() = default;
 //    
 //    bool isvalid() { return (nullptr != servcfg) && (nullptr != onendoperation) && (nullptr != service); }
-//    void load(embot::app::eth::Service *s, const eOmn_serv_configuration_t *c, embot::app::eth::Service::fpOnEndOfOperation eop, bool act)
+//    void load(embot::app::eth::Service *s, const eOmn_serv_configuration_t *c, embot::app::eth::Service::OnEndOfConfigOperation eop, bool act)
 //    {
 //        service = s;
 //        servcfg = c;
@@ -62,7 +64,7 @@ struct embot::app::eth::theServiceFT::Impl
     theServiceFT *_owner {nullptr};
     State _state {State::idle};
     
-    ServiceOperation _operation {};
+    embot::app::eth::service::impl::ServiceOperation2 _operation2 {};    
     
     // methods used by theServiceFT 
     
@@ -71,21 +73,37 @@ struct embot::app::eth::theServiceFT::Impl
     eOresult_t initialise();
         
     Category category() const { return embot::app::eth::Service::Category::ft; }
+    Type type() const { return embot::app::eth::Service::Type::AS_ft; }
     State state() const { return _state; }
     void set(State s) { _state = s; }
     
-    bool verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation);
-    bool activate(const eOmn_serv_configuration_t * servcfg);
+    bool verifyactivate(const embot::app::eth::Service::Config * servcfg, OnEndOfOperation onendofverifyactivate);
     bool deactivate();
     bool start();
     bool stop();
-    bool set(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem);
+    bool set(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem);
     bool tick(bool resetstatus);
     bool report();
     bool process(const DescriptorCANframe &canframedescriptor);
     bool process(const DescriptorROP &ropdescriptor);
     
-    static eOresult_t cbk_afterverify(void* p, eObool_t operationisok);    
+//    static void cbk_afterverify(void* p, eObool_t operationisok)
+//    {
+//        // the embobj service executes a callback where we passed p as Impl * and operationisok contains success of operation
+//        // remember that the callback is called after verification is OK or when verification is OK and activation is already done
+//        // in any case, the callback should signal to YRI the result of the verify() operation     
+//        Impl *impl = reinterpret_cast<Impl*>(p);
+//        impl->_operation.onend(static_cast<bool>(operationisok));  
+//    }  
+    
+    static void cbk_afterverifyactivate(void* p, eObool_t operationisok)
+    {
+        // the embobj service executes a callback where we passed p as Impl * and operationisok contains success of operation
+        // remember that the callback is called after verification is OK or when verification is OK and activation is already done
+        // in any case, the callback should signal to YRI the result of the verify() operation     
+        Impl *impl = reinterpret_cast<Impl*>(p);
+        impl->_operation2.onend(static_cast<bool>(operationisok));  
+    }  
 
 private:  
     
@@ -113,16 +131,11 @@ eOresult_t embot::app::eth::theServiceFT::Impl::initialise()
 }
 
 
-bool embot::app::eth::theServiceFT::Impl::verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation)
+bool embot::app::eth::theServiceFT::Impl::verifyactivate(const embot::app::eth::Service::Config * servcfg, OnEndOfOperation onendofverifyactivate)
 {
-    _operation.load(_owner, servcfg, onendoperation, activateafterverify);
-    embot::app::eth::theFTservice::getInstance().Verify(servcfg, cbk_afterverify, this, activateafterverify ? eobool_true : eobool_false);
-    return true;
-}
-
-bool embot::app::eth::theServiceFT::Impl::activate(const eOmn_serv_configuration_t * servcfg)
-{
-    embot::app::eth::theFTservice::getInstance().Activate(servcfg);
+    _operation2.load(_owner, servcfg, onendofverifyactivate);
+    const eOmn_serv_configuration_t * eomnservcfg = reinterpret_cast<const eOmn_serv_configuration_t *>(servcfg->memory());
+    embot::app::eth::theFTservice::getInstance().Verify(eomnservcfg, cbk_afterverifyactivate, this, eobool_true);   
     return true;
 }
 
@@ -144,7 +157,7 @@ bool embot::app::eth::theServiceFT::Impl::stop()
     return true;
 }
 
-bool embot::app::eth::theServiceFT::Impl::set(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem)
+bool embot::app::eth::theServiceFT::Impl::set(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem)
 {
     embot::app::eth::theFTservice::getInstance().SetRegulars(arrayofid32, &numberofthem);
     return true;  
@@ -180,15 +193,6 @@ bool embot::app::eth::theServiceFT::Impl::process(const DescriptorROP &ropdescri
     return true;
 }
 
-// - static
-
-eOresult_t embot::app::eth::theServiceFT::Impl::cbk_afterverify(void* p, eObool_t operationisok)
-{
-    Impl *impl = reinterpret_cast<Impl*>(p);
-    impl->_operation.onend();
-    
-    return eores_OK;
-}
 
 
 } // namespace embot::app::eth {
@@ -228,6 +232,12 @@ embot::app::eth::Service::Category embot::app::eth::theServiceFT::category() con
     return pImpl->category();
 }
 
+
+embot::app::eth::Service::Type embot::app::eth::theServiceFT::type() const
+{
+    return pImpl->type();
+}
+
 embot::app::eth::Service::State embot::app::eth::theServiceFT::state() const
 {
     return pImpl->state();
@@ -238,14 +248,10 @@ void embot::app::eth::theServiceFT::set(embot::app::eth::Service::State s)
     pImpl->set(s);
 }
 
-bool embot::app::eth::theServiceFT::verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation)
-{
-    return pImpl->verify(servcfg, activateafterverify, onendoperation);
-}
 
-bool embot::app::eth::theServiceFT::activate(const eOmn_serv_configuration_t * servcfg)
+bool embot::app::eth::theServiceFT::verifyactivate(const embot::app::eth::Service::Config * servcfg, OnEndOfOperation onendofverifyactivate)
 {
-    return pImpl->activate(servcfg);
+    return pImpl->verifyactivate(servcfg, onendofverifyactivate);
 }
 
 bool embot::app::eth::theServiceFT::deactivate()
@@ -263,7 +269,7 @@ bool embot::app::eth::theServiceFT::stop()
     return pImpl->stop();
 }
 
-bool embot::app::eth::theServiceFT::setregulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem)
+bool embot::app::eth::theServiceFT::setregulars(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem)
 {
     return pImpl->set(arrayofid32, numberofthem);
 }

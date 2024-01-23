@@ -22,7 +22,7 @@ The management of the encoders in the embOBJ environment ....
 #endif
 
 #include "embot_core.h"
-#include "embot_app_eth_Service.h"
+#include "embot_app_eth.h"
 
 #include "EoCommon.h"
 #include "EoManagement.h"
@@ -182,7 +182,7 @@ namespace embot::app::eth::encoder::v1 {
             constexpr bool isvalid() { return carrayofjomodes != nullptr; }
         };
         
-        virtual bool Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify) = 0; 
+        virtual bool Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion) = 0; 
         virtual bool Activate(const Config &config) = 0;
         virtual bool Deactivate() = 0;
         virtual bool SendReport() = 0;

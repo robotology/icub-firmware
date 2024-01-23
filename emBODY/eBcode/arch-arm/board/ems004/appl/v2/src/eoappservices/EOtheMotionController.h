@@ -71,6 +71,8 @@ typedef enum
     eo_motcon_mode_mc4plusfaps  = eomn_serv_MC_mc4plusfaps,
     eo_motcon_mode_advfoc       = eomn_serv_MC_advfoc    
 } eOmotioncontroller_mode_t;
+
+#warning add everywhere the mode eo_motcon_mode_advfoc / eomn_serv_MC_advfoc alongside the eo_motcon_mode_foc / eomn_serv_MC_foc
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section

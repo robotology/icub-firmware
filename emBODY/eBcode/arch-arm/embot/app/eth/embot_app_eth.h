@@ -11,11 +11,23 @@
 #ifndef _EMBOT_APP_ETH_H_
 #define _EMBOT_APP_ETH_H_
 
+#if 0
+    
+    we use this .h file to describe all data structure that is useful for an embot eth application.
+    in here we have ONLY modern embot C++ code:
+    - some code is a new more powerful version of its embobj counterpart. for instance embot::app::eth::Date is
+      an enhancement of eOdate_t that has a constructor and that has the same memory layout of eOdate_t
+    - some code is new
+        
+    some code parts may also be inside embot_app_eth.cpp, for intance size checks w/ static_assert 
+
+#endif
+
 #include "embot_core.h"
 #include "embot_core_utils.h"
 
 
-namespace embot { namespace app { namespace eth {
+namespace embot::app::eth {
     
     
     enum class Process : uint8_t { none = 255, eLoader = 0, eUpdater = 1, eApplication = 2 };
@@ -151,7 +163,7 @@ namespace embot { namespace app { namespace eth {
             { 
                 uint8_t a = (v)&0xff; uint8_t b = (v>>8)&0xff; uint8_t c = (v>>16)&0xff; 
                 uint8_t d = (v>>24)&0xff; uint8_t e = (v>>32)&0xff; uint8_t f = (v>>40)&0xff;
-                std::snprintf(s, sizeof(s), "%.2X:%.2X:%.2X:%.2X:%.2X:%.2X", a, b, c, d, e, f);           
+                std::snprintf(s, size, "%.2X:%.2X:%.2X:%.2X:%.2X:%.2X", a, b, c, d, e, f);           
             }
             return s;
         }
@@ -174,7 +186,8 @@ namespace embot { namespace app { namespace eth {
             : macaddr(ma), ipaddr(ia), ipmask(im) {}        
     };    
     
-}}} // namespace embot { namespace app { namespace eth {
+    
+} // namespace embot::app::eth {
 
 
 #endif  // include-guard

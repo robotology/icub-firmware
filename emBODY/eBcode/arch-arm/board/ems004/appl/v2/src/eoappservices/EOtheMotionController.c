@@ -208,24 +208,24 @@
 
 static void s_eo_motioncontrol_send_periodic_error_report(void *par);
 
-static eOresult_t s_eo_motioncontrol_mc4plus_onendofverify_encoder(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_mc4plus_onendofverify_encoder(EOaService* s, eObool_t operationisok);
 
-static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eObool_t operationisok);
 
 static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
-static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t operationisok);
 
-static eOresult_t s_eo_motioncontrol_onendofverify_psc(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_onendofverify_psc(EOaService* s, eObool_t operationisok);
 
-static eOresult_t s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t operationisok);
 
 static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
-static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaService* s, eObool_t operationisok);
-static eOresult_t s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder(EOaService* s, eObool_t operationisok);
-static eOresult_t s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder(EOaService* s, eObool_t operationisok);
-static eOresult_t s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder(EOaService* s, eObool_t operationisok);
     
 static void s_eo_motioncontrol_UpdateJointMotorStatus(EOtheMotionController *p);
 
@@ -490,8 +490,8 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
        (eo_motcon_mode_mc4plus != servcfg->type) && (eo_motcon_mode_mc4plusmais != servcfg->type) &&
        (eo_motcon_mode_mc2pluspsc != servcfg->type) && (eo_motcon_mode_mc4plusfaps != servcfg->type) 
 #if 0 
-       // we dont accept this mode anymore         
-       && (eo_motcon_mode_mc4pluspmc != servcfg->type)
+       // we dont accept this mode ....         
+       && (eo_motcon_mode_advfoc != servcfg->type)
 #endif    
       )
     {
@@ -568,7 +568,8 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         dc.mode = p->service.servconfig.diagnosticsmode;
         dc.par16 = p->service.servconfig.diagnosticsparam;
         // 2. at first i verify the encoders. then, function s_eo_motioncontrol_foc_onendofverify_encoder() shall either issue an encoder error or start discovery of foc boards
-        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_foc_onendofverify_encoder, p}, true);        
+        const embot::core::Confirmer oncompletion {reinterpret_cast<embot::core::fpResult>(s_eo_motioncontrol_foc_onendofverify_encoder), p};
+        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, true, oncompletion);        
         
     }
     else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
@@ -630,7 +631,9 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         eOmn_serv_diagn_cfg_t dc = {0, 0};
         dc.mode = p->service.servconfig.diagnosticsmode;
         dc.par16 = p->service.servconfig.diagnosticsparam;
-        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc4plus_onendofverify_encoder, p}, true);       
+        const embot::core::Confirmer oncompletion {reinterpret_cast<embot::core::fpResult>(s_eo_motioncontrol_mc4plus_onendofverify_encoder), p};
+        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, true, oncompletion); 
+        
     }
     else if(eo_motcon_mode_mc4plusmais == p->service.servconfig.type)
     {
@@ -685,23 +688,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         // at first i verify the pos. then, function s_eo_motioncontrol_onendofverify_pos() shall either issue a pos error or start verification of encoders (if mode is eo_motcon_mode_mc4pluspos)     
         eo_pos_Verify(eo_pos_GetHandle(), &p->ctrlobjs.servconfigpos, s_eo_motioncontrol_onendofverify_pos, eobool_true);          
     }
-    else if(eo_motcon_mode_mc4pluspmc == servcfg->type)
-    {
-        // we shall always use this jomodescriptors in the form of a EOconstarray. it is a pointer to the actual data inside p->service.servconfig
-        p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4pluspmc.arrayof7jomodescriptors);
 
-        p->service.onverify = onverify;
-        p->service.onverifyarg = p;
-        p->service.activateafterverify = activateafterverify;
-        
-        // prepare the verify of pos service
-        p->ctrlobjs.servconfigpos.type = eomn_serv_AS_pos;
-        memmove(&p->ctrlobjs.servconfigpos.data.as.pos, &p->service.servconfig.data.mc.mc4pluspmc.pos, sizeof(eOmn_serv_config_data_as_pos_t));    
-   
-        // at first i verify the pos. then, function s_eo_motioncontrol_onendofverify_pos() shall either issue a pos error or start verification of encoders 
-        // if mode is eo_motcon_mode_mc4plusfaps or eo_motcon_mode_mc4pluspmc     
-        eo_pos_Verify(eo_pos_GetHandle(), &p->ctrlobjs.servconfigpos, s_eo_motioncontrol_onendofverify_pos, eobool_true);                  
-    }
 
     return(eores_OK);   
 }
@@ -819,24 +806,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         memset(&p->ctrlobjs.servconfigpos, 0, sizeof(p->ctrlobjs.servconfigpos));
         embot::app::eth::theEncoderReader::getInstance().Deactivate();   
     }    
-    else if(eo_motcon_mode_mc4pluspmc == p->service.servconfig.type)
-    {
-        eo_pos_Deactivate(eo_pos_GetHandle());
-        memset(&p->ctrlobjs.servconfigpos, 0, sizeof(p->ctrlobjs.servconfigpos));
-        embot::app::eth::theEncoderReader::getInstance().Deactivate();
 
-        // deconfig mc pmc boards, unload them, set num of entities = 0, clear status, deactivate encoder 
-        
-        eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, p->sharedcan.entitydescriptor); 
-        eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor); 
-        
-        eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
-                
-        // now i reset 
-        eo_vector_Clear(p->sharedcan.entitydescriptor);
-        eo_vector_Clear(p->sharedcan.boardproperties);   
-        eo_array_Reset(p->sharedcan.discoverytargets);                
-    }
     
     // Reset the communicated fault state to dummy for each motor
     uint8_t n_motors = eo_entities_NumOfMotors(eo_entities_GetHandle());
@@ -889,8 +859,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
        (eo_motcon_mode_mc4plus != servcfg->type) && (eo_motcon_mode_mc4plusmais != servcfg->type) &&
        (eo_motcon_mode_mc2pluspsc != servcfg->type) && (eo_motcon_mode_mc4plusfaps != servcfg->type) 
 #if 0 
-       // we dont accept this mode anymore         
-       && (eo_motcon_mode_mc4pluspmc != servcfg->type)
+       // we dont accept this mode yet         
+       && (eo_motcon_mode_advfoc != servcfg->type)
 #endif       
       )
     {
@@ -1324,109 +1294,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         p->service.state = eomn_serv_state_activated;
         eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);            
     }
-    else if(eo_motcon_mode_mc4pluspmc == p->service.servconfig.type)
-    {      
-        //#warning for eo_motcon_mode_mc4pluspmc we use 4 pwm in first 4 positions  
-        const uint8_t numOfPWMs = 4;
-        const uint8_t startOfPWMs = 0;
-        const uint8_t numOfPZMs = 3;
-        const uint8_t startOfPZM = 4;
-                
-        p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4pluspmc.arrayof7jomodescriptors);
-        
-        uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
-        
-        eo_entities_SetNumOfJoints(eo_entities_GetHandle(), numofjomos);
-        eo_entities_SetNumOfMotors(eo_entities_GetHandle(), numofjomos);
-        
-        if(0 == eo_entities_NumOfJoints(eo_entities_GetHandle()))
-        {
-            p->service.active = eobool_false;
-            return(eores_NOK_generic);
-        }
-                  
-        p->numofjomos = numofjomos;
-        uint8_t i=0;
-        
-        // we need to config the last 3 joints on can ...
-        
-        // piezo-init
-        
-        static const eObrd_caninsideindex_t _index_map[] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second, eobrd_caninsideindex_third};
-                        
-        // load the can mapping of PZM they are 3
-        for(i=0; i<numOfPZMs; i++)
-        {
-            const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i+startOfPZM);
-            
-            eObrd_canproperties_t prop = {0};
-                        
-            prop.type = eobrd_cantype_pmc;
-            prop.location.port = jomodes->actuator.pmc.canloc.port;
-            prop.location.addr = jomodes->actuator.pmc.canloc.addr;
-            prop.location.insideindex = _index_map[i]; // jomodes->actuator.pmc.canloc.insideindex;
-            prop.requiredprotocol.major = p->service.servconfig.data.mc.mc4pluspmc.pos.config.boardconfig[0].boardinfo.protocol.major;
-            prop.requiredprotocol.minor = p->service.servconfig.data.mc.mc4pluspmc.pos.config.boardconfig[0].boardinfo.protocol.minor;
-            
-            eo_vector_PushBack(p->sharedcan.boardproperties, &prop);            
-        }
-        eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
-        
-        // load the entity mapping.
-        for(i=0; i<numOfPZMs; i++)
-        {
-            const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i+startOfPZM);
-            
-            eOcanmap_entitydescriptor_t des = {0};
-            
-            des.location.port = jomodes->actuator.pmc.canloc.port;
-            des.location.addr = jomodes->actuator.pmc.canloc.addr;
-            des.location.insideindex = _index_map[i]; // jomodes->actuator.pmc.canloc.insideindex;
-            des.index = (eOcanmap_entityindex_t)(i+startOfPZM);
-
-            eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);            
-        }        
-        eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, p->sharedcan.entitydescriptor); 
-        eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor);  
-                       
-        // piezo-end
-                
-           
-        MController_config_board(&p->service.servconfig);
-
-        // b. clear the pwm values and the port mapping, currents and voltage
-        memset(p->ctrlobjs.pwmvalue, 0, sizeof(p->ctrlobjs.pwmvalue));
-        memset(p->ctrlobjs.pwmport, hal_motorNONE, sizeof(p->ctrlobjs.pwmport));
-        memset(p->ctrlobjs.currents, 0, sizeof(p->ctrlobjs.currents));
-        p->ctrlobjs.voltage = 0;
-            
-        // b1. init the port mapping
-        for(i=0; i<numOfPWMs; i++)
-        {
-            const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);         
-            p->ctrlobjs.pwmport[i] = (jomodes->actuator.pwm.port == eobrd_port_none) ? (hal_motorNONE) : ((hal_motor_t)jomodes->actuator.pwm.port);                
-        }
-            
-        // c. low level init for motors and adc             
-        s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
-
-        // d. init the encoders  
-        eOmn_serv_diagn_cfg_t dc = {0, 0};
-        dc.mode = servcfg->diagnosticsmode;
-        dc.par16 = servcfg->diagnosticsparam; 
-        embot::app::eth::theEncoderReader::getInstance().Activate({p->ctrlobjs.jomodescriptors, dc});
-
-            
-        // e. activate interrupt line for quad_enc indexes check   
-        // marco.accame: maybe it is better to move it inside eo_appEncReader_Activate()
-        s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt();
-        
-        eo_currents_watchdog_Initialise();
-        
-        p->service.active = eobool_true;
-        p->service.state = eomn_serv_state_activated;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);            
-    }        
+       
     
     return(eores_OK);   
 }
@@ -1494,12 +1362,7 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
         eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);     
         embot::app::eth::theEncoderReader::getInstance().StartReading();
     }
-    else if(eo_motcon_mode_mc4pluspmc == p->service.servconfig.type)
-    {
-        eo_pos_Start(eo_pos_GetHandle());
-        eo_pos_Transmission(eo_pos_GetHandle(), eobool_true);     
-        embot::app::eth::theEncoderReader::getInstance().StartReading();
-    }    
+    
     
     return(eores_OK);    
 }
@@ -1571,8 +1434,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
     
     // first of all check current limits
     if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type) ||
-       (eo_motcon_mode_mc2pluspsc == p->service.servconfig.type) || (eo_motcon_mode_mc4plusfaps == p->service.servconfig.type) ||
-       (eo_motcon_mode_mc4pluspmc == p->service.servconfig.type)
+       (eo_motcon_mode_mc2pluspsc == p->service.servconfig.type) || (eo_motcon_mode_mc4plusfaps == p->service.servconfig.type)
       )
     {
         // p->numofjomos is not always ok because mc4pluspmc has 7 jomos. hence we use the min between hal_motors_number and p->numofjomos
@@ -1688,7 +1550,7 @@ extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t
         }
     }
     else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || 
-           (eo_motcon_mode_mc4plusfaps == mcmode) || (eo_motcon_mode_mc4pluspmc == mcmode))   
+           (eo_motcon_mode_mc4plusfaps == mcmode))   
     {
         MController_config_motor(num, mc);
         eo_currents_watchdog_UpdateCurrentLimits(eo_currents_watchdog_GetHandle(), num);
@@ -1896,7 +1758,7 @@ static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdisco
     return(eores_OK);   
 }
 
-static eOresult_t s_eo_motioncontrol_mc4plus_onendofverify_encoder(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_mc4plus_onendofverify_encoder(EOaService* s, eObool_t operationisok)
 {
     EOtheMotionController* p = &s_eo_themotcon;
     
@@ -1954,13 +1816,11 @@ static eOresult_t s_eo_motioncontrol_mc4plus_onendofverify_encoder(EOaService* s
     if(NULL != p->service.onverify)
     {
         p->service.onverify(p, operationisok); 
-    }    
-    
-    return(eores_OK);       
+    }        
     
 }
 
-static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eObool_t operationisok)
 {    
     EOtheMotionController* p = &s_eo_themotcon;
     
@@ -2003,11 +1863,10 @@ static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eO
         }            
                 
     }  
-    
-    return(eores_OK);    
+       
 }
 
-static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t operationisok)
 {
     EOtheMotionController* p = &s_eo_themotcon;
     
@@ -2031,7 +1890,8 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
             eOmn_serv_diagn_cfg_t dc = {0, 0};
             dc.mode = servcfg->diagnosticsmode;
             dc.par16 = servcfg->diagnosticsparam;
-            embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS, p}, true);     
+            const embot::core::Confirmer oncompletion {reinterpret_cast<embot::core::fpResult>(s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS), p};
+            embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, true, oncompletion);             
         }
     } 
     else
@@ -2071,10 +1931,9 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
         
     }
  
-    return(eores_OK);    
 }
 
-static eOresult_t s_eo_motioncontrol_onendofverify_psc(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_onendofverify_psc(EOaService* s, eObool_t operationisok)
 {
     EOtheMotionController* p = &s_eo_themotcon;
     
@@ -2090,7 +1949,9 @@ static eOresult_t s_eo_motioncontrol_onendofverify_psc(EOaService* s, eObool_t o
         eOmn_serv_diagn_cfg_t dc = {0, 0};
         dc.mode = servcfg->diagnosticsmode;
         dc.par16 = servcfg->diagnosticsparam;
-        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder, p}, true);       
+        const embot::core::Confirmer oncompletion {reinterpret_cast<embot::core::fpResult>(s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder), p};
+        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, true, oncompletion);             
+        
     } 
     else
     {
@@ -2128,17 +1989,16 @@ static eOresult_t s_eo_motioncontrol_onendofverify_psc(EOaService* s, eObool_t o
         }            
         
     }
- 
-    return(eores_OK);    
+  
 }
 
-static eOresult_t s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t operationisok)
 {
     EOtheMotionController* p = &s_eo_themotcon;
     
     const eOmn_serv_configuration_t * servcfg = &p->service.servconfig; //  not anymore: p->service.tmpcfg; 
     
-    // it is eo_motcon_mode_mc4plusfaps or eo_motcon_mode_mc4pluspmc
+    // it is eo_motcon_mode_mc4plusfaps
     
     if(eobool_true == operationisok)
     {
@@ -2149,16 +2009,10 @@ static eOresult_t s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t o
         {
             eOmn_serv_diagn_cfg_t dc = {0, 0};
             dc.mode = servcfg->diagnosticsmode;
-            dc.par16 = servcfg->diagnosticsparam;
-            embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder, p}, true);     
+            dc.par16 = servcfg->diagnosticsparam; 
+            const embot::core::Confirmer oncompletion {reinterpret_cast<embot::core::fpResult>(s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder), p};
+            embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, true, oncompletion);                         
         } 
-        else if(eo_motcon_mode_mc4pluspmc == servcfg->type)
-        {
-            eOmn_serv_diagn_cfg_t dc = {0, 0};
-            dc.mode = servcfg->diagnosticsmode;
-            dc.par16 = servcfg->diagnosticsparam;
-            embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder, p}, true);
-        }
     } 
     else
     {
@@ -2172,10 +2026,6 @@ static eOresult_t s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t o
         if(eo_motcon_mode_mc4plusfaps == servcfg->type)
         {
             errorvalue = eoerror_value_CFG_mc_mc4plusfaps_failed_candiscovery;
-        }
-        else if(eo_motcon_mode_mc4pluspmc == servcfg->type)
-        {
-            errorvalue = eoerror_value_CFG_mc_mc4pluspmc_failed_candiscovery_of_pmc;
         }
         
         // prepare things        
@@ -2204,9 +2054,7 @@ static eOresult_t s_eo_motioncontrol_onendofverify_pos(EOaService* s, eObool_t o
             p->service.onverify(p, operationisok); 
         }            
         
-    }
- 
-    return(eores_OK);    
+    } 
 }
 
 static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
@@ -2274,7 +2122,7 @@ static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdisco
 }
 
 
-static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaService* s, eObool_t operationisok)
 {  
     EOtheMotionController* p = &s_eo_themotcon;
     
@@ -2334,12 +2182,11 @@ static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaSe
     {
         p->service.onverify(p, operationisok); 
     }    
-    
-    return(eores_OK);        
+         
 }
 
 
-static eOresult_t s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder(EOaService* s, eObool_t operationisok)
 {  
     EOtheMotionController* p = &s_eo_themotcon;
     
@@ -2400,12 +2247,10 @@ static eOresult_t s_eo_motioncontrol_mc2pluspsc_onendofverify_encoder(EOaService
         p->service.onverify(p, operationisok); 
     }    
     
-    return(eores_OK);   
-    
 }
 
 
-static eOresult_t s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder(EOaService* s, eObool_t operationisok)
 {  
     EOtheMotionController* p = &s_eo_themotcon;
     
@@ -2466,11 +2311,10 @@ static eOresult_t s_eo_motioncontrol_mc4plusfaps_onendofverify_encoder(EOaServic
         p->service.onverify(p, operationisok); 
     }    
     
-    return(eores_OK);   
     
 }
 
-static eOresult_t s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder(EOaService* s, eObool_t operationisok)
+static void s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder(EOaService* s, eObool_t operationisok)
 {  
     EOtheMotionController* p = &s_eo_themotcon;
     
@@ -2530,8 +2374,6 @@ static eOresult_t s_eo_motioncontrol_mc4pluspmc_onendofverify_encoder(EOaService
     {
         p->service.onverify(p, operationisok); 
     }    
-    
-    return(eores_OK);   
     
 }
 

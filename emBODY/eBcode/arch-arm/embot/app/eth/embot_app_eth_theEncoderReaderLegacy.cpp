@@ -32,7 +32,7 @@ struct embot::app::eth::theEncoderReader::Impl
     
     bool initialise();
     
-    bool Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify);                            
+    bool Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion);                            
     bool Activate(const Config &config);    
     bool Deactivate();   
     bool StartReading();    
@@ -56,9 +56,10 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     return true;
 }
 
-bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify)
+bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion)
 { 
-    return eores_OK == eo_encoderreader_Verify(eo_encoderreader_GetHandle(), config.carrayofjomodes, onverify.callback, static_cast<eObool_t>(activateafterverify), config.dc);
+    // safe reinterpret_cast<eOservice_onendofoperation_fun_t> because ... 
+    return eores_OK == eo_encoderreader_Verify(eo_encoderreader_GetHandle(), config.carrayofjomodes, reinterpret_cast<eOservice_onendofoperation_fun_t>(oncompletion.call), static_cast<eObool_t>(activateafterverify), config.dc);
 }
 
 
@@ -143,9 +144,9 @@ bool embot::app::eth::theEncoderReader::initialise()
     return pImpl->initialise();
 }
 
-bool embot::app::eth::theEncoderReader::Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify)
+bool embot::app::eth::theEncoderReader::Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion)
 {
-    return pImpl->Verify(config, onverify, activateafterverify); 
+    return pImpl->Verify(config, activateafterverify, oncompletion); 
 }
 
 

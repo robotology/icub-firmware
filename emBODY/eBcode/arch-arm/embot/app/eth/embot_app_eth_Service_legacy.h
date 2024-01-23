@@ -23,18 +23,20 @@
 #include "EOtheErrorManager.h"
 #include "EOtheCANprotocol.h"
 
-// legacy types defined in EOtheService{.h, _hid.h]
+// legacy types defined in EOtheService{.h, _hid.h] and EOaService.h
 
-typedef void EOaService;
-typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t operationisok);
 
 struct eOservice_core_t
 {
+    // the following two are needed to use eOservice_onendofoperation_fun_t as it is in EOaService.h
+    using EOaService = void;
+    using onendofoperation_fun_t = void (*)(EOaService* p, eObool_t operationisok);
+    
     eObool_t initted {eobool_false};
     eObool_t active {eobool_false};  
     eObool_t activateafterverify {eobool_false};
     eObool_t started {eobool_false};
-    eOservice_onendofoperation_fun_t onverify {nullptr};
+    onendofoperation_fun_t onverify {nullptr};
     void *onverifyarg {nullptr};
     eOmn_serv_state_t state {eomn_serv_state_idle};
     const eOmn_serv_configuration_t* tmpcfg {nullptr};

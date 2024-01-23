@@ -44,7 +44,7 @@ namespace embot { namespace app { namespace eth {
         bool initialise();
        
         // v1::IFreader
-        bool Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify) override;         
+        bool Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion) override;         
         bool Activate(const Config &config) override;
         bool Deactivate() override;
         bool SendReport() override;         

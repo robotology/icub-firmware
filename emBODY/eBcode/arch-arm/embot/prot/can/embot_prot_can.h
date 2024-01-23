@@ -24,7 +24,7 @@
 #include "embot_core.h"
 
 
-namespace embot { namespace prot { namespace can {
+namespace embot::prot::can {
     
     // - useful types 
     
@@ -244,7 +244,7 @@ namespace embot { namespace prot { namespace can {
     
     
     
-}}} // namespace embot { namespace prot { namespace can {
+    } // namespace embot::prot::can {
 
 
 

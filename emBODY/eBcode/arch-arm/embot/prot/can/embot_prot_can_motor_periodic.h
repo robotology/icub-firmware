@@ -29,7 +29,7 @@
 
 
     
-namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {
+namespace embot::prot::can::motor::periodic {
   
     // the supported commands    
     enum class CMD { 
@@ -50,12 +50,12 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);    
        
-}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic { 
+} // namespace embot::prot::can::motor::periodic {
        
 
   
   
-namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {
+namespace embot::prot::can::motor::periodic {
          
     // the management of commands
     
@@ -149,7 +149,7 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         bool get(embot::prot::can::Frame &outframe);    
     };        
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {    
+} // namespace embot::prot::can::motor::periodic {    
 
 
 #endif  // include-guard

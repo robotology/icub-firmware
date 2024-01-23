@@ -105,7 +105,7 @@ struct embot::app::eth::theEncoderReader::Impl
     
     bool initialise();
     
-    bool Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify);                            
+    bool Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion);                            
     bool Activate(const Config &config);    
     bool Deactivate();   
     bool StartReading();    
@@ -170,7 +170,7 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     return true;
 }
 
-bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify)
+bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion)
 { 
    
     
@@ -180,9 +180,20 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, const
     // make sure the timer is not running
     eo_timer_Stop(diagnostics.reportTimer);  
     
-    service.onverify = onverify.callback;
-    service.onverifyarg = onverify.param;
+    service.onverify = nullptr; // onverify.callback;
+    service.onverifyarg = nullptr; // onverify.param;
     service.activateafterverify = activateafterverify;
+    
+    #warning ahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh. we dont verify ??? are we insane?
+
+#if 0 
+    we should enhance this object w/   
+    - a proper verify and activate
+    - internal data structure as in namespace embot::app::eth::service::impl
+    - surely diagnostics
+    - ...    
+
+#endif    
     
     // we dont check and we just assume that everything is all right.
     // 1. we activate
@@ -235,20 +246,20 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
         return false;
     }
 
-    EOconstarray* carray = eo_constarray_Load((const EOarray*)config.carrayofjomodes);
+    EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
     
     if(true == _actived)
     {
         Deactivate();
     }
-
-    
+   
     // 1. prepare the config
     _implconfig.numofjomos = eo_constarray_Size(carray);
     
-    for(uint8_t i=0; i < _implconfig.numofjomos; i++)
+    for(uint8_t i=0; i<_implconfig.numofjomos; i++)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
+        
         if(nullptr != jomodes)
         {
             _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
@@ -259,48 +270,56 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
             switch(_implconfig.jomo_cfg[i].encoder1des.type)
             {
                 case eomc_enc_aea:
+                {
                     cfg.type = embot::hw::encoder::Type::chipAS5045;
-                    break;
+                } break;
+                
                 case eomc_enc_aea3:
+                {
                     cfg.type = embot::hw::encoder::Type::chipMA730;
-                    break;
+                } break;
+                
                 case eomc_enc_aksim2:
+                {
                     cfg.type = embot::hw::encoder::Type::chipMB049;
-                    break;
+                } break;
+                
                 default:
+                {
                     // unsupported encoder
                     return eores_NOK_unsupported;
+                } break;
             }
             
             // 2. configure and initialize SPI encoders
             switch(_implconfig.jomo_cfg[i].encoder1des.port)
             {
                 case eobrd_port_amc_J5_X1:
+                {
                     embot::hw::encoder::init(embot::hw::ENCODER::one, cfg);
-                    break;
+                } break;
+                
                 case eobrd_port_amc_J5_X2:
+                {
                     embot::hw::encoder::init(embot::hw::ENCODER::two, cfg);
-                    break;
+                }  break;
+                
                 case eobrd_port_amc_J5_X3:
+                {
                     embot::hw::encoder::init(embot::hw::ENCODER::three, cfg);
-                    break;
+                } break;
+                
                 default:
+                {
                     // error invalid SPI
                     return eores_NOK_generic;
+                } break;
             }
         }
     }
-    
-//    // 3. configure other encoders
-//    s_eo_appEncReader_configure_NONSPI_encoders(p);
-    
-    
+        
     _actived = true;
-    
-    // to enable the diagnostics ... use on equal to eobool_true
-//    s_eo_appEncReader_amodiag_Config(dc);     
-//    eo_appEncReader_Diagnostics_Enable(p, (eomn_serv_diagn_mode_MC_ENC == dc.mode) ? eobool_true: eobool_false);
-    
+      
     return true;
 }
 
@@ -672,9 +691,9 @@ bool embot::app::eth::theEncoderReader::initialise()
     return pImpl->initialise();
 }
 
-bool embot::app::eth::theEncoderReader::Verify(const Config &config, const OnEndOfOperation &onverify, bool activateafterverify)
+bool embot::app::eth::theEncoderReader::Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion)
 {
-    return pImpl->Verify(config, onverify, activateafterverify); 
+    return pImpl->Verify(config, activateafterverify, oncompletion); 
 }
 
 

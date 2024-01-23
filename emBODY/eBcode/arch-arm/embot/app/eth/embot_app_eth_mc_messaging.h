@@ -21,6 +21,10 @@
  
 #include <array>
 
+#warning we have two Location objects, on embot::msg::Location and one embot::app::eth::mc::messaging::Location ....
+    
+
+// apparently, embot::msg::Location is not used ....
 
 namespace embot::msg {
   
@@ -29,14 +33,14 @@ namespace embot::msg {
     
     struct Location        
     {  
-        struct PACKED { // it has the same fromat as eOlocation_t
+        struct PACKED { // it has the same format as eOlocation_t
             uint8_t bus:3; uint8_t ffu:1; uint8_t adr:4; 
             constexpr PACKED(uint8_t b, uint8_t a, uint8_t f = 0) : bus (b&0x0f), adr(a&0x0f), ffu(f) {}
             PACKED(uint8_t byte) { PACKED *p = reinterpret_cast<PACKED*>(&byte); bus = p->bus; ffu = p->ffu; adr = p->adr; }
             PACKED(void *m = nullptr) { if(nullptr == m) { bus = 7; ffu = adr = 0; } else { PACKED *p = reinterpret_cast<PACKED*>(m); bus = p->bus; ffu = p->ffu; adr = p->adr; } }
         };
         
-        PACKED packed {7, 0};
+        PACKED packed {embot::core::tointegral(BUS::none), 0};
         
         BUS bus {BUS::none};
         ADR adr {0};
@@ -113,7 +117,7 @@ namespace embot::app::eth::mc::messaging::info {
     };
     
     struct TEMPERATURE_LIMIT
-    {   // raw-valu Vdiff
+    {   // the measurement unit is 0.1 C
         int16_t temperature {0};
         
         TEMPERATURE_LIMIT() = default;
@@ -320,6 +324,13 @@ namespace embot::app::eth::mc::messaging::receiver {
     
     // in here we have objects which receive a frame and build up the source and info
     
+    enum class MessageType 
+    {
+        FOCstatus1 = 0,
+        FOCstatus2 = 1,
+        Print = 3
+    };
+    
     struct sigFOCstatus1
     {   // ICUBCANPROTO_PER_MC_MSG__2FOC 
         Location source {};           
@@ -343,7 +354,7 @@ namespace embot::app::eth::mc::messaging::receiver {
     };
 
     struct sigPrint
-    {   // ICUBCANPROTO_PER_MC_MSG__STATUS 
+    {   // ICUBCANPROTO_PER_MC_MSG__PRINT 
         Location source {};           
         info::Print info {};
             

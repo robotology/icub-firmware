@@ -80,7 +80,7 @@ static void s_mc_synchservice(eOmn_serv_state_t s)
 #endif      
 }    
 
-static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eObool_t operationisok);
+static void s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, bool operationisok);
 static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok);
 static void s_eo_motioncontrol_send_periodic_error_report(void *par);
 static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32);
@@ -104,7 +104,6 @@ static void s_eo_motioncontrol_UpdateJointMotorStatus(EOtheMotionController *p)
     {
         if(NULL != (jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jId)))
         {
-//            #warning TODO-AMC-MC: add MController
             MController_get_joint_state(jId, jstatus);            
             MController_get_pid_state(jId, &jstatus->core.ofpid, transmit_decoupled_pwms);
         }
@@ -114,7 +113,6 @@ static void s_eo_motioncontrol_UpdateJointMotorStatus(EOtheMotionController *p)
     {
         if(NULL != (mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), jId)))
         {
- //           #warning TODO-AMC-MC: add MController
             MController_get_motor_state(jId, mstatus);
         }
     }
@@ -125,7 +123,7 @@ static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, em
 {
     eOresult_t res = eores_OK;
     
-    if(valueinfo->errortype == embot::app::eth::encoder::v1::Error::NOTCONNECTED) // skip if the encoder is not connected (i.e is on 2foc.)
+    if(valueinfo->errortype == embot::app::eth::encoder::v1::Error::NOTCONNECTED) 
     {
         return res;
     }
@@ -165,26 +163,18 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     // wait for the encoders for some time
     for (uint8_t i=0; i<30; ++i)
     {
-//        if (eo_encoderreader_IsReadingAvailable(eo_encoderreader_GetHandle()))
-//        {
-//            break;
-//        }
         if(true == embot::app::eth::theEncoderReader::getInstance().IsReadingAvailable())
         {
             break;
         }
-        
-//        hal_sys_delay(5*hal_RELTIME_1microsec);
         embot::core::wait(5*embot::core::time1microsec);
     }        
         
     
- //   if(eobool_false == eo_encoderreader_IsReadingAvailable(eo_encoderreader_GetHandle()))
     if(false == embot::app::eth::theEncoderReader::getInstance().IsReadingAvailable())
     {
         for(uint8_t i=0; i<p->numofjomos; i++)
         {
- //           #warning TODO-AMC-MC: add MController  
             MController_timeout_absEncoder_fbk(i);
         }
         
@@ -242,24 +232,32 @@ bool checklocalactuators()
 {
     EOtheMotionController* p = &s_eo_themotcon;
     
+    #warning ADD in here teh check of local actuators. 
+//    // for instance: check that the local actuator are coherent w/ the running board
+//    embot::hw::bsp::board() // retrieves the current board type
+//    if amc then the local actuator must be an amc2c board
+//    also: check that the required version is equal to the one on the other core ...
+    
     return true;
 }
-static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eObool_t operationisok)
+
+
+static void s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, bool operationisok)
 {    
     EOtheMotionController* p = &s_eo_themotcon;
     
-    if(eobool_true == operationisok)
+    if(true == operationisok)
     {
         // do we have can boards to discover?
         #warning SEE IF WE HAVE
-        constexpr bool checklocally {false};
-        EOarray * a = reinterpret_cast<EOarray*>(p->sharedcan.discoverytargets);
-        if(0 != eo_array_Size(a))
+ 
+        EOconstarray * a = reinterpret_cast<EOconstarray*>(p->sharedcan.discoverytargets);
+        if(0 != eo_constarray_Size(a))
         {
             eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop);  
         } 
         else 
-        {   // we must have only local actuators
+        {   // we must have at least one local actuators
             bool searchisok = checklocalactuators();
             p->service.state = (searchisok) ? (eomn_serv_state_verified) : (eomn_serv_state_failureofverify);
             s_mc_synchservice(p->service.state);    
@@ -310,13 +308,13 @@ static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eO
             p->service.onverify(p->service.onverifyarg, eobool_false); 
         }            
                 
-    }  
-    
-    return(eores_OK);    
+    }   
 }
 
 static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
 {
+    #warning ... actually in here we should also call the check of local actuators...
+    
     EOtheMotionController* p = &s_eo_themotcon;
     
     if(eobool_true == searchisok)
@@ -384,10 +382,8 @@ static void s_eo_motioncontrol_send_periodic_error_report(void *par)
     p->diagnostics.errorDescriptor.par64 ++;
     eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
     
-    if(eoerror_value_CFG_mc_foc_failed_candiscovery_of_foc == eoerror_code2value(p->diagnostics.errorDescriptor.code) ||
-       eoerror_value_CFG_mc_mc4_failed_candiscovery_of_mc4 == eoerror_code2value(p->diagnostics.errorDescriptor.code)
-      )
-    {   // if i dont find the focs / mc4s, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
+    if(eoerror_value_CFG_mc_foc_failed_candiscovery_of_foc == eoerror_code2value(p->diagnostics.errorDescriptor.code))
+    {   // if i dont find the focs, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
         eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
     }
     
@@ -440,24 +436,26 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     p->service.tmpcfg = NULL;
     p->service.servconfig.type = eomn_serv_NONE;
     
-    // up to to 12 mc4 OR upto 4 foc (the MAIS is managed directly by the EOtheMAIS object, and the PSCs boards are managed by the EOthePSC)
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
+    // up to 4 foc 
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_motcon_standardJOMOs, NULL, 0, NULL, NULL);
     
-    // up to 12 jomos
-    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
+    // up to 4 jomos
+    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_motcon_standardJOMOs, NULL, 0, NULL, NULL);
     
-    p->sharedcan.discoverytargets = eo_array_New(1, sizeof(eOcandiscovery_target_t),  NULL);
-    
+    // up to 4 different discover targets
+    p->sharedcan.discoverytargets = eo_array_New(eo_motcon_standardJOMOs, sizeof(eOcandiscovery_target_t),  NULL);
+        
     p->id32ofregulars = eo_array_New(motioncontrol_maxRegulars, sizeof(uint32_t), NULL);
     
-//    #warning TODO add the controller
+    // up to 4 jomos and 6 encoders (?)
     p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardENCOs);
+    
+    // up to 4 different can and icc boards
+    p->ctrlobjs.canboards.reserve(eo_motcon_standardJOMOs);
+    p->ctrlobjs.iccboards.reserve(eo_motcon_standardJOMOs);
   
-//    #warning TODO add the encoder reader
-//    p->ctrlobjs.theencoderreader = eo_encoderreader_Initialise();
     embot::app::eth::theEncoderReader::getInstance().initialise();
             
-
     p->diagnostics.reportTimer = eo_timer_New();   
     p->diagnostics.errorType = eo_errortype_error;
     p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
@@ -467,10 +465,9 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     p->service.active = eobool_false;
     p->service.started = eobool_false;
     p->service.state = eomn_serv_state_idle;    
-//    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);    
+ 
     s_mc_synchservice(p->service.state);
-    
-        
+            
     return(p);
 }
 
@@ -510,32 +507,11 @@ extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p)
     switch(errorvalue)
     {
         case eoerror_value_CFG_mc_foc_failed_candiscovery_of_foc:
-//        case eoerror_value_CFG_mc_mc4_failed_candiscovery_of_mc4:
         {
             eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());            
         } break;
-        
-//        case eoerror_value_CFG_mc_mc4_failed_mais_verify:
-//        case eoerror_value_CFG_mc_mc4plusmais_failed_candiscovery_of_mais:
-//        {
-//            eo_mais_SendReport(eo_mais_GetHandle());
-//        } break;
-        
-//        case eoerror_value_CFG_mc_mc2pluspsc_failed_candiscovery_of_pscs:
-//        {
-//            eo_psc_SendReport(eo_psc_GetHandle());
-//        } break;
-
-//        case eoerror_value_CFG_mc_mc4plusfaps_failed_candiscovery_of_pmc:
-//        {
-//            eo_pos_SendReport(eo_pos_GetHandle());
-//        } break;
-        
+                
         case eoerror_value_CFG_mc_foc_failed_encoders_verify:
-//        case eoerror_value_CFG_mc_mc4plus_failed_encoders_verify:
-//        case eoerror_value_CFG_mc_mc4plusmais_failed_encoders_verify:
-//        case eoerror_value_CFG_mc_mc2pluspsc_failed_encoders_verify:
-//        case eoerror_value_CFG_mc_mc4plusfaps_failed_encoders_verify:
         {
             embot::app::eth::theEncoderReader::getInstance().SendReport();
         } break;
@@ -569,7 +545,9 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 
 extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, void *arg, eObool_t activateafterverify)
 {   
-    //eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Verify2()", s_eobj_ownname);
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("eo_motioncontrol_Verify2()"), {s_eobj_ownname, thr}); 
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -583,7 +561,7 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
     }
       
     
-    if(eo_motcon_mode_foc != servcfg->type)  
+    if((eo_motcon_mode_foc != servcfg->type) && (eo_motcon_mode_advfoc != servcfg->type))  
     {
         embot::core::print("[ERROR] eo_motioncontrol_Verify2: servcfg->type unrecognized");
         p->service.state = eomn_serv_state_failureofverify;
@@ -596,19 +574,19 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
     }
     
     
-    #warning: just for debug of icc i modify the p->service.servconfig ...
-    {
-//        uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
-        EOarray * a = (EOarray*)(&servcfg->data.mc.foc_based.arrayofjomodescriptors);
-        uint8_t n = eo_array_Size(a);
-        for(uint8_t i=0; i<n; i++)
-        {
-            eOmc_jomo_descriptor_t *d = (eOmc_jomo_descriptor_t*) eo_array_At(a, i);
-            uint8_t adr = d->actuator.foc.canloc.addr;
-            d->actuator.gen.location.bus = eobus_icc1;
-            d->actuator.gen.location.adr = adr;
-        }
-    }      
+    #warning: VERY IMPORTANT JUST FOR DEBUG: for debug of icc i modify the p->service.servconfig ...
+//    {
+////        uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
+//        EOarray * a = (EOarray*)(&servcfg->data.mc.foc_based.arrayofjomodescriptors);
+//        uint8_t n = eo_array_Size(a);
+//        for(uint8_t i=0; i<n; i++)
+//        {
+//            eOmc_jomo_descriptor_t *d = (eOmc_jomo_descriptor_t*) eo_array_At(a, i);
+//            uint8_t adr = d->actuator.foc.canloc.addr;
+//            d->actuator.gen.location.bus = eobus_icc1;
+//            d->actuator.gen.location.adr = adr;
+//        }
+//    }      
 
     if(eobool_true == p->service.active)
     {
@@ -630,8 +608,10 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
     
     if(eo_motcon_mode_foc == p->service.servconfig.type)
     {
+        const eOmn_serv_config_data_mc_foc_t *foc = reinterpret_cast<const eOmn_serv_config_data_mc_foc_t*>(&p->service.servconfig.data.mc.foc_based);
+        
         // we shall always use this jomodescriptors in the form of a EOconstarray. it is a pointer to the actual data inside p->service.servconfig
-        p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
+        p->ctrlobjs.jomodescriptors = eo_constarray_Load(reinterpret_cast<const EOarray*>(&foc->arrayofjomodescriptors));
         
         p->service.onverify = onverify;
         p->service.onverifyarg = arg;
@@ -639,12 +619,12 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
 
         // 1. prepare the can discovery for foc boards 
         eOcandiscovery_target_t trgt = {0};
-        trgt.info.type = p->service.servconfig.data.mc.foc_based.type;
-        trgt.info.protocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major; 
-        trgt.info.protocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
-        trgt.info.firmware.major = p->service.servconfig.data.mc.foc_based.version.firmware.major; 
-        trgt.info.firmware.minor = p->service.servconfig.data.mc.foc_based.version.firmware.minor;   
-        trgt.info.firmware.build = p->service.servconfig.data.mc.foc_based.version.firmware.build;   
+        trgt.info.type = foc->type;
+        trgt.info.protocol.major = foc->version.protocol.major; 
+        trgt.info.protocol.minor = foc->version.protocol.minor;
+        trgt.info.firmware.major = foc->version.firmware.major; 
+        trgt.info.firmware.minor = foc->version.firmware.minor;   
+        trgt.info.firmware.build = foc->version.firmware.build;   
                 
         
         uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
@@ -678,7 +658,105 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
         }
         
         eOmn_serv_diagn_cfg_t dc = {0, 0};
-        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, {s_eo_motioncontrol_foc_onendofverify_encoder, p}, true);
+        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, true, {s_eo_motioncontrol_foc_onendofverify_encoder, p});
+        
+    }
+    else if(eo_motcon_mode_advfoc == p->service.servconfig.type)
+    {
+        #warning complete the advfoc code
+        
+        //asfidanken
+        
+        const eOmn_serv_config_data_mc_advfoc_t *advfoc = reinterpret_cast<const eOmn_serv_config_data_mc_advfoc_t*>(&p->service.servconfig.data.mc.advfoc);
+        
+        // we shall always use this advjomodescriptors in the form of a EOconstarray. it is a pointer to the actual data inside p->service.servconfig
+        p->ctrlobjs.advjomodescriptors = eo_constarray_Load(reinterpret_cast<const EOarray*>(&advfoc->arrayof4advjomodescriptors));
+        
+        EOconstarray *carray = p->ctrlobjs.advjomodescriptors;
+        
+        p->service.onverify = onverify;
+        p->service.onverifyarg = arg;
+        p->service.activateafterverify = activateafterverify;
+
+        // search for all the can and the icc boards
+        uint8_t numofjomos = eo_constarray_Size(carray);
+        p->ctrlobjs.canboards.clear();
+        p->ctrlobjs.iccboards.clear();
+        for(uint8_t i=0; i<numofjomos; i++)
+        {
+            const eOmc_adv_jomo_descriptor_t *advjomodes = (eOmc_adv_jomo_descriptor_t*) eo_constarray_At(carray, i);
+            eObus_t bus = static_cast<eObus_t>(advjomodes->actuator.location.bus);
+            if((eobus_can1 == bus) || (eobus_can2 == bus))
+            {
+                p->ctrlobjs.canboards.push_back(advjomodes->actuator.board);
+            }
+            else if((eobus_icc1 == bus) || (eobus_icc2 == bus))
+            {
+                p->ctrlobjs.iccboards.push_back(advjomodes->actuator.board);
+            }             
+        }
+        
+        // now i verify that we have enough boards
+        
+        if((0 == numofjomos) || (0 == (p->ctrlobjs.iccboards.size()+p->ctrlobjs.iccboards.size())))
+        {
+            // damn ... we cannot go on...
+            embot::core::print("[ERROR] eo_motioncontrol_Verify2: no actuators");
+            p->service.state = eomn_serv_state_failureofverify;
+            s_mc_synchservice(p->service.state);
+            if(NULL != onverify)
+            {
+                onverify(arg, eobool_false); 
+            }         
+            return(eores_NOK_generic);
+        }
+        
+        embot::core::print("[TRACE] eo_motioncontrol_Verify2: num of actuators -> can = " + std::to_string(p->ctrlobjs.canboards.size()) + ", icc = " + std::to_string(p->ctrlobjs.iccboards.size()));
+                    
+        
+        
+        // 1. prepare the can discovery for foc/amcbldc/whatever boards.
+        // for now i assume that all the actuators have the same type of board w/ the same version even if i could use one foc and one amcbldc and ... 
+        eOcandiscovery_target_t trgt = {0};
+        trgt.info.type = p->service.servconfig.data.mc.foc_based.type;
+        trgt.info.protocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major; 
+        trgt.info.protocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
+        trgt.info.firmware.major = p->service.servconfig.data.mc.foc_based.version.firmware.major; 
+        trgt.info.firmware.minor = p->service.servconfig.data.mc.foc_based.version.firmware.minor;   
+        trgt.info.firmware.build = p->service.servconfig.data.mc.foc_based.version.firmware.build;   
+                
+
+        uint8_t i = 0;
+        uint8_t numofcanjomos {0};
+        for(i=0; i<numofjomos; i++)
+        {
+            const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
+#if defined(useMCfoc_actuator_descriptor_generic)
+            eObus_t bus = static_cast<eObus_t>(jomodes->actuator.gen.location.bus);
+            if((eobus_can1 != bus) && (eobus_can2 != bus))
+            {
+                // we consider only actuators located on can
+                continue;
+            } 
+            numofcanjomos++;            
+            eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.gen.location.bus], jomodes->actuator.gen.location.adr);    
+#else
+            numofcanjomos++;            
+            eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr); 
+#endif            
+        }
+        
+        // force a cleaned discoverytargets before we add the target
+        eo_array_Reset(p->sharedcan.discoverytargets); 
+        if(numofcanjomos > 0)
+        {            
+            eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);
+            p->sharedcan.ondiscoverystop.function = s_eo_motioncontrol_onstop_search4focs;
+            p->sharedcan.ondiscoverystop.parameter = (void*)&p->service.servconfig;
+        }
+        
+        eOmn_serv_diagn_cfg_t dc = {0, 0};
+        embot::app::eth::theEncoderReader::getInstance().Verify({p->ctrlobjs.jomodescriptors, dc}, true, {s_eo_motioncontrol_foc_onendofverify_encoder, p});
         
     }
 
@@ -687,14 +765,16 @@ extern eOresult_t eo_motioncontrol_Verify2(EOtheMotionController *p, const eOmn_
 
 extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Activate()", s_eobj_ownname);
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("eo_motioncontrol_Activate()"), {s_eobj_ownname, thr}); 
     
     if((NULL == p) || (NULL == servcfg))
     {
         return(eores_NOK_nullpointer);
     }  
 
-    if((eo_motcon_mode_foc != servcfg->type))
+    if((eo_motcon_mode_foc != servcfg->type) && (eo_motcon_mode_advfoc != servcfg->type))
     {
         embot::core::print("[Error] eo_motioncontrol_Activate: unrecognized servcfg->type");
         return(eores_NOK_generic);
@@ -711,7 +791,6 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
     if(eo_motcon_mode_foc == p->service.servconfig.type)
     {
-
         p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
         
         uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
@@ -809,42 +888,30 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
             // init the encoders
             eOmn_serv_diagn_cfg_t dc = {0, 0};
-            //dc.mode = servcfg->diagnosticsmode;
-            //dc.par16 = servcfg->diagnosticsparam;
             embot::app::eth::theEncoderReader::getInstance().Activate({p->ctrlobjs.jomodescriptors, dc});
             
-            // init the emscontroller.
-            // marco.accame.TODO: change the emsController. see comments below
-            //                the emscontroller is not a singleton which can be initted and deinitted. 
-            // it should have a _Initialise(), a _GetHandle(), a _Config(cfg) and a _Deconfig().
-//            if(NULL == p->ctrlobjs.thecontroller)
-//            {
-//                //p->ctrlobjs.thecontroller = eo_emsController_Init((eOeomc_ctrlboard_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, emscontroller_actuation_2FOC, numofjomos);
-//                p->ctrlobjs.thecontroller = MController_new(numofjomos, numofjomos);
-//                //MController_config_board((eOeomc_ctrlboard_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, HARDWARE_2FOC);                
-//                MController_config_board(&p->service.servconfig);
-//            }
-
-//#warning TODO-AMC-MC: add MController_config_board                
+            
             MController_config_board(&p->service.servconfig);
-            
-            // proxy config
-//            s_eo_motioncontrol_proxy_config(p, eobool_true);
-            
+                        
             p->service.active = eobool_true;
-            p->service.state = eomn_serv_state_activated;
-//            eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);    
+            p->service.state = eomn_serv_state_activated;   
             s_mc_synchservice(p->service.state);
         }
     
-    }      
+    }  
+    else if(eo_motcon_mode_advfoc == p->service.servconfig.type)
+    {
+        #warning TODO add the advfoc code
+    }    
     
     return(eores_OK);  
 }
 
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Deactivate()", s_eobj_ownname);
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("eo_motioncontrol_Deactivate()"), {s_eobj_ownname, thr}); 
     
     if(NULL == p)
     {
@@ -855,7 +922,6 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     {
         // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
         p->service.state = eomn_serv_state_idle; 
-        //eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         s_mc_synchservice(p->service.state);
         return(eores_OK);        
     } 
@@ -885,7 +951,6 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         
         eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
         
-        //eo_encoderreader_Deactivate(eo_encoderreader_GetHandle());
         embot::app::eth::theEncoderReader::getInstance().Deactivate();
         
         // marco.accame.TODO: call deinit of mcontroller
@@ -893,13 +958,12 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         // now i reset 
         eo_vector_Clear(p->sharedcan.entitydescriptor);
         eo_vector_Clear(p->sharedcan.boardproperties);   
-        eo_array_Reset(p->sharedcan.discoverytargets);        
-
-        // proxy deconfig
-//        s_eo_motioncontrol_proxy_config(p, eobool_false);        
-    
+        eo_array_Reset(p->sharedcan.discoverytargets);              
     }
-
+    else if(eo_motcon_mode_advfoc == p->service.servconfig.type)
+    {
+        #warning TODO add the advfoc code
+    }
     
     // Reset the communicated fault state to dummy for each motor
     uint8_t n_motors = eo_entities_NumOfMotors(eo_entities_GetHandle());
@@ -917,6 +981,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     eo_entities_SetNumOfJoints(eo_entities_GetHandle(), 0);
     eo_entities_SetNumOfMotors(eo_entities_GetHandle(), 0);
     
+    #warning HEIIIIIIIIIIIIIIIIIIIIIII are u sure?
     p->ctrlobjs.jomodescriptors = NULL;
     
     memset(&p->service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
@@ -933,7 +998,6 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     
     p->service.active = eobool_false;    
     p->service.state = eomn_serv_state_idle; 
-//    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);  
     s_mc_synchservice(p->service.state);    
     
     
@@ -942,7 +1006,9 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
 { 
-    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Start()", s_eobj_ownname);  
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("eo_motioncontrol_Start()"), {s_eobj_ownname, thr}); 
     
     if(NULL == p)
     {
@@ -958,24 +1024,23 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     {   // it is already running
         return(eores_OK);
     }
+    
+    if((eo_motcon_mode_foc != p->service.servconfig.type) && (eo_motcon_mode_advfoc != p->service.servconfig.type))
+    {
+        embot::core::print("[ERROR] eo_motioncontrol_Start: unrecognized servconfig.type");
+        eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Start()", s_eobj_ownname);  
+        return(eores_OK);        
+    }
        
     p->service.started = eobool_true;    
-    p->service.state = eomn_serv_state_started;
-//    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);    
+    p->service.state = eomn_serv_state_started;  
     s_mc_synchservice(p->service.state); 
     
 
     // focbased: just init a read of the encoder
-    if(eo_motcon_mode_foc == p->service.servconfig.type)
+    if((eo_motcon_mode_advfoc == p->service.servconfig.type) || (eo_motcon_mode_foc == p->service.servconfig.type))
     {   
-        // just start a reading of encoders        
-        //eo_encoderreader_StartReading(eo_encoderreader_GetHandle());
         embot::app::eth::theEncoderReader::getInstance().StartReading();
-    }
-    else
-    {    
-        embot::core::print("[ERROR] eo_motioncontrol_Start: unrecognized servconfig.type");
-        eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Start()", s_eobj_ownname);
     }
     
     return(eores_OK);    
@@ -984,6 +1049,10 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
 
 extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
 {
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("eo_motioncontrol_SetRegulars()"), {s_eobj_ownname, thr}); 
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -999,7 +1068,6 @@ extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_se
     bool r = embot::app::eth::theServices::getInstance().setREGULARS(p->id32ofregulars, arrayofid32, isok, numberofthem);
     return r ? eores_OK : eores_NOK_generic;
 #else    
-    //return(eo_service_hid_SetRegulars(id32ofregulars, arrayofid32, s_ft_isID32relevant, numberofthem));
     return(eo_service_hid_SetRegulars(p->id32ofregulars, arrayofid32, s_eo_motioncontrol_isID32relevant, numberofthem));
 #endif  
     
@@ -1008,6 +1076,10 @@ extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_se
 
 extern eOresult_t eo_motioncontrol_AddRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
 {
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("eo_motioncontrol_AddRegulars()"), {s_eobj_ownname, thr}); 
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -1023,16 +1095,16 @@ extern eOresult_t eo_motioncontrol_AddRegulars(EOtheMotionController *p, eOmn_se
     bool r = embot::app::eth::theServices::getInstance().setREGULARS(p->id32ofregulars, arrayofid32, isok, numberofthem);
     return r ? eores_OK : eores_NOK_generic;
 #else    
-    //return(eo_service_hid_AddRegulars(p->id32ofregulars, arrayofid32, s_eo_motioncontrol_isID32relevant, numberofthem));
     return(eo_service_hid_AddRegulars(p->id32ofregulars, arrayofid32, s_eo_motioncontrol_isID32relevant, numberofthem));
 #endif      
-//    return(eo_service_hid_AddRegulars(p->id32ofregulars, arrayofid32, s_eo_motioncontrol_isID32relevant, numberofthem));
 }
 
 
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 {   
-    // static uint32_t adc_values[4] = {0, 0, 0, 0}; 
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("eo_motioncontrol_Tick()"), {s_eobj_ownname, thr}); 
     
     if(NULL == p)
     {
@@ -1048,33 +1120,28 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
     {   // not running, thus we do nothing
         return(eores_OK);
     }
-       
-    
-    // in here we ... see descriotion in s_delaymotorconfig_eval()
-//    s_delaymotorconfig_eval(p);
-    
+           
     
     // 1) read positions from both joint and motor encoders and update motor controller engine.
     s_eo_motioncontrol_updatedPositionsFromEncoders(p);
-    
-//    eo_encoderreader_StartReading(eo_encoderreader_GetHandle()); // Restart the reading of the encoders
+
     embot::app::eth::theEncoderReader::getInstance().StartReading();
     
-    // 2) perform motor control
-//#warning TODO-AMC-MC: add MController      
+    // 2) perform motor control  
     MController_do();
     
     // 3) update status of motors and joints
     s_eo_motioncontrol_UpdateJointMotorStatus(p);
     
-
     return(eores_OK);    
 }
 
 
 extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
 { 
-    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Stop()", s_eobj_ownname);
+//    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
+//    embot::app::eth::theErrorManager::getInstance().trace(
+//    std::string("eo_motioncontrol_Stop()"), {s_eobj_ownname, thr}); 
     
     if(NULL == p)
     {
@@ -1090,29 +1157,21 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     {   // it is already stopped
         return(eores_OK);
     }
-    
-//#warning TODO-AMC-MC: add MController      
+   
     MController_go_idle();
       
     p->service.started = eobool_false;
     p->service.state = eomn_serv_state_activated;
-//    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     s_mc_synchservice(p->service.state);
-    
-    // remove all regulars related to motion control entities: joint, motor, controller ... no, dont do that
-    //eo_motioncontrol_SetRegulars(p, NULL, NULL);
-    
-    // eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Stop()", s_eobj_ownname);
-    
+        
     return(eores_OK);    
 }
 
-    extern eOresult_t eo_motioncontrol_Transmission(EOtheMotionController *p, eObool_t on)
-    {
-        return eores_NOK_generic;
-    }
+extern eOresult_t eo_motioncontrol_Transmission(EOtheMotionController *p, eObool_t on)
+{
+    return eores_NOK_generic;
+}
 
-    
     
 extern eOresult_t eo_motioncontrol_AcceptCANframe(EOtheMotionController *p, eOcanframe_t *frame, eOcanport_t port, eOmotioncontroller_canframe_t cftype)
 {
@@ -1125,18 +1184,20 @@ extern eOresult_t eo_motioncontrol_ConfigMotor(EOtheMotionController *p, uint8_t
 {
 //    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};    
 //    embot::app::eth::theErrorManager::getInstance().trace(
-//    std::string("motconfig-eth"), {s_eobj_ownname, thr}); 
+//    std::string("eo_motioncontrol_ConfigMotor()"), {s_eobj_ownname, thr}); 
 
     eOmotioncontroller_mode_t mcmode = eo_motioncontrol_GetMode(p);
-    if(eo_motcon_mode_foc == mcmode)
+    
+    if((eo_motcon_mode_foc != mcmode) && (eo_motcon_mode_advfoc != mcmode))
     {
-        // config motor straigth away
-//        #warning TODO-AMC-MC: add MController  
-        MController_config_motor(num, mc);
+        embot::core::print("[ERROR] eo_motioncontrol_ConfigMotor: unrecognized mcmode");
+        eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_ConfigMotor()", "unrecognised mode");  
+        return(eores_OK);        
     }
-    else
+    
+    if((eo_motcon_mode_advfoc == mcmode) || (eo_motcon_mode_foc == mcmode))
     {
-        embot::core::print("[ERROR] eo_motioncontrol_ConfigMotor: mcmode unrecognized");
+        MController_config_motor(num, mc);
     }
    
     return eores_OK;

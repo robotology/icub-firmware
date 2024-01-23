@@ -129,16 +129,16 @@ static void send_rop_command_result(void);
 static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok, eOmn_serv_category_t category, eOmn_serv_type_t type, eOservice_type_t servtype);
 
 // functions used for runtime activation
-static eOresult_t s_services_callback_afterverify_skin(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_mais(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_strain(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_ft(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_inertial(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_temperatures(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_psc(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_pos(EOaService* p, eObool_t operationisok);
-static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_skin(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_mais(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_strain(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_ft(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_inertial(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_temperatures(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_psc(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_pos(EOaService* p, eObool_t operationisok);
+static void s_services_callback_afterverify_motioncontrol(EOaService* p, eObool_t operationisok);
 static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok, eOmn_serv_category_t category, eOmn_serv_type_t type, eOservice_type_t servtype);
 
 
@@ -747,7 +747,7 @@ static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok
     return(eores_OK);       
 }
 
-static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
@@ -756,11 +756,10 @@ static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObo
     }
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_inertials3, eomn_serv_AS_inertials3, eo_service_inertials3);
-       
-    return(eores_OK);
+
 }
 
-static eOresult_t s_services_callback_afterverify_temperatures(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_temperatures(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
@@ -770,10 +769,9 @@ static eOresult_t s_services_callback_afterverify_temperatures(EOaService* p, eO
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_temperatures, eomn_serv_AS_temperatures, eo_service_temperatures);
        
-    return(eores_OK);
 }
 
-static eOresult_t s_services_callback_afterverify_psc(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_psc(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
@@ -783,10 +781,9 @@ static eOresult_t s_services_callback_afterverify_psc(EOaService* p, eObool_t op
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_psc, eomn_serv_AS_psc, eo_service_psc);
        
-    return(eores_OK);
 }
 
-static eOresult_t s_services_callback_afterverify_pos(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_pos(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
@@ -796,10 +793,9 @@ static eOresult_t s_services_callback_afterverify_pos(EOaService* p, eObool_t op
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_pos, eomn_serv_AS_pos, eo_service_pos);
        
-    return(eores_OK);
 }
 
-static eOresult_t s_services_callback_afterverify_mais(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_mais(EOaService* p, eObool_t operationisok)
 {   
     if(eobool_false == operationisok)
     {
@@ -808,12 +804,11 @@ static eOresult_t s_services_callback_afterverify_mais(EOaService* p, eObool_t o
     }
 
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_mais, eomn_serv_AS_mais, eo_service_mais);
-    
-    return(eores_OK);    
+  
 }
 
 
-static eOresult_t s_services_callback_afterverify_strain(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_strain(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
@@ -823,10 +818,9 @@ static eOresult_t s_services_callback_afterverify_strain(EOaService* p, eObool_t
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_strain, eomn_serv_AS_strain, eo_service_strain);
       
-    return(eores_OK);
 }
 
-static eOresult_t s_services_callback_afterverify_ft(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_ft(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
@@ -836,10 +830,9 @@ static eOresult_t s_services_callback_afterverify_ft(EOaService* p, eObool_t ope
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_ft, eomn_serv_AS_ft, eo_service_ft);
       
-    return(eores_OK);
 }
 
-static eOresult_t s_services_callback_afterverify_bat(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_bat(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
@@ -849,10 +842,9 @@ static eOresult_t s_services_callback_afterverify_bat(EOaService* p, eObool_t op
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_battery, eomn_serv_AS_battery, eo_service_battery);
       
-    return(eores_OK);
 }
 
-static eOresult_t s_services_callback_afterverify_skin(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_skin(EOaService* p, eObool_t operationisok)
 {   
     if(eobool_false == operationisok)
     {
@@ -862,11 +854,10 @@ static eOresult_t s_services_callback_afterverify_skin(EOaService* p, eObool_t o
 
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_skin, eomn_serv_SK_skin, eo_service_skin);
     
-    return(eores_OK);
 }
 
 
-static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, eObool_t operationisok)
+static void s_services_callback_afterverify_motioncontrol(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
@@ -876,7 +867,6 @@ static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, e
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_mc, (eOmn_serv_type_t) s_eo_theservices.mcservicetype, eo_service_mc);
     
-    return(eores_OK);
 }
 
 

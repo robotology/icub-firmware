@@ -200,7 +200,7 @@ static void Motor_config_motor_max_temperature_2FOC(Motor* o, eOmeas_temperature
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
     embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msg
     {
-        {o->mlocation},
+        {o->motorlocation},
         {*(int16_t*)motor_temperature_limit}
     };
     msg.transmit();
@@ -238,7 +238,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
     embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msgtmp
     {
-        {o->mlocation},
+        {o->motorlocation},
         {(int16_t)config->temperatureLimit}
     };
     msgtmp.transmit();
@@ -884,7 +884,7 @@ static void Motor_raise_fault_overcurrent(Motor* o)
 
 static void Motor_raise_fault_overheating(Motor* o)
 {
-    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+    hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     
     o->fault_state.bits.OverHeatingFailure = TRUE;
     
