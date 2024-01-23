@@ -1,8 +1,8 @@
 
 /*
- * Copyright (C) 2019 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Davide Tomé
+ * email:   davide.tome@iit.it
 */
 
 
@@ -30,13 +30,18 @@ constexpr extern uint8_t  Build_number  = 0;
 #include "embot_app_theLEDmanager.h"
 #include "embot_hw_can.h"
 #include "embot_hw_gpio.h"
-
+#include "embot_hw_i2c.h"
 #include "embot_hw_motor.h"
+#include "embot_hw_encoder.h"
+#include "embot_hw_types.h"
 
 #include "stm32hal.h"
 
 #include "analog.h"
+#include "pwm.h"
+#include "encoder.h"
 
+#include "tests.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -103,6 +108,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 //            } break;
 //        }
         config.countdown = 0;
+				activity_param.blinkingperiod = ActivityParam::BlinkSlowPeriod;      
         // and now we execute. this function is [[noreturn]]
         // it inits the hw::bsp and then starts the scheduler. 
         // the OS init thread will: start timer manager and callback manager, and finally call activity_function(&activity_param).
@@ -140,14 +146,14 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
         embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();   
         canbrdinfo.synch(*activity_param.info);    
         
-        // manage the led blinking period
-        embot::core::relTime period = 0;    
-        if(nullptr != pp)
-        {
-            period = pp->blinkingperiod;
-        }    
+//        // manage the led blinking period
+//        embot::core::relTime period = 0;    
+//        if(nullptr != pp)
+//        {
+//            period = pp->blinkingperiod;
+//        }    
 
-        // start the led pulser
+//        // start the led pulser
 //        static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
 //        embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
 //        theleds.init(allleds);    
@@ -203,10 +209,10 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 
 //******************** TESTS ******************************************************************//
 		
-		static void sendCAN(std::uint8_t data[8]){
+		static void sendCan(std::uint8_t data[8]){
 			embot::hw::can::Frame canframe;
 			
-			canframe.id = 0x551;         ;
+			canframe.id = 0x551;  
 			canframe.size = 8;
 			for(uint8_t i = 0; i < 8; i++) {canframe.data[i] = data[i];}
 			
@@ -215,11 +221,11 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			
 		}
 		
-		static void testCAN(){
+		static void testCan(){
 			uint8_t data[8] {0};
 			data[0] = 0xAA;
 			
-			sendCAN(data);
+			sendCan(data);
 		}
 
     void getFirmwareVersion()
@@ -228,15 +234,15 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			data[0] = Firmware_vers;
 			data[1] = Revision_vers;
 			data[2] = Build_number;
-				
-			sendCAN(data);
+
+			sendCan(data);
     }
 		
 	void testLeds(uint8_t on){
 			 static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three};  
         embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
         theleds.init(allleds);    
-				
+
 			  switch(on){
 					case 0: 
 						theleds.get(embot::hw::LED::one).off();
@@ -251,7 +257,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			 
 		}
 
-		void testIDCODE(embot::hw::can::Frame frame){
+		void testIdCode(embot::hw::can::Frame frame){
 			uint32_t id = DBGMCU->IDCODE & 0xFFF;
 			uint32_t rev = (DBGMCU->IDCODE >> 16) & 0xFFFF;
 		
@@ -267,66 +273,152 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			  id2 == frame.data[4]) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
-			data[1] = rev >> 8;
-			data[2] = rev;
-			data[3] = id >> 8;
-			data[4] = id;
+			data[1] = rev1;
+			data[2] = rev2;
+			data[3] = id1;
+			data[4] = id2;
 			
-			sendCAN(data);
+			sendCan(data);
 		}
 		
 		void testVin(){
+			uint8_t data[8] {0};
 	    float vin {0.0};
 			vin = embot::hw::bsp::amcbldc::getVIN();
 
 			embot::core::print("Vin : " + std::to_string(vin));
+			
+			if(vin > 11.5 && vin < 12.5) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+  		sendCan(data);
 		}
 		
 		void testCin(){
-	    float cin {0.0};
+			uint8_t data[8] {0};
+	    float cin {0.00};
 			cin = embot::hw::bsp::amcbldc::getCIN();
 
 			embot::core::print("Cin : " + std::to_string(cin));
-		}
-		
-		void testTemp(){
-			float t {0.0};
-	    t = temperature();
 			
-			embot::core::print("Temp : " + std::to_string(t));
+			if(cin > 0.030 && cin < 0.060) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+  		sendCan(data);
 		}
 		
+
 		constexpr embot::hw::GPIO VAUXOK {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::fourteen};
 
-		void testVAUXOK(){
-			
+		void testVauxOk(){
+			uint8_t data[8] {0};
 			auto s = embot::hw::gpio::get(VAUXOK);
-			
-			if(s == embot::hw::gpio::State::SET) embot::core::print("OK");
-			else embot::core::print("NOK");
 
+			if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+			else{embot::core::print("NOK"); data[0] = 0xBB;}
+			
+  		sendCan(data);
 		}
 		
 		constexpr embot::hw::GPIO VCCOK {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen};
 
-		void testVCCOK(){
-			
+		void testVccOk(){
+			uint8_t data[8] {0};
 			auto s = embot::hw::gpio::get(VCCOK);
 			
-			if(s == embot::hw::gpio::State::SET) embot::core::print("OK");
-			else embot::core::print("NOK");
-
+		  if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+			else{embot::core::print("NOK"); data[0] = 0xBB;}
+			
+  		sendCan(data);
 		}
 		
 		constexpr embot::hw::GPIO EXTFAULT {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen};
 
-		void testFAULT(){
-			
+		void testFault(uint8_t status){
+			uint8_t data[8] {0};			
 			auto s = embot::hw::gpio::get(EXTFAULT);
-			
-			if(s == embot::hw::gpio::State::SET) embot::core::print("OK");
-			else embot::core::print("NOK");
 
+		if(status == 1)
+		{	
+			if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+			else{embot::core::print("NOK"); data[0] = 0xBB;}
+			
+		}
+		else
+		{
+			if(s != embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+			else{embot::core::print("NOK"); data[0] = 0xBB;}
+		}
+
+  		sendCan(data);
+		}
+		
+ 		constexpr embot::hw::I2C i2c = embot::hw::I2C::four;
+		constexpr embot::hw::i2c::Config i2cconfig = {};
+			
+		void testI2c(embot::hw::I2C i2c){
+			uint8_t data[8] {0};			
+			uint16_t FAP = 0xbc; // FAP i2c address
+			
+			if(!embot::hw::i2c::initialised(i2c)) {
+				embot::hw::i2c::init(i2c, i2cconfig);
+			}
+
+			embot::core::wait(300* embot::core::time1millisec);
+			
+			if(embot::hw::i2c::ping(i2c, FAP, 100*embot::core::time1millisec)) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+  		sendCan(data);
+		}
+		
+		
+		void testHall(){
+			uint8_t data[8] {0};		
+			uint8_t res {0};
+
+			for(int i=0; i<500; i++){	
+				if((HAL_GPIO_ReadPin(HALL1_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET)) res |= 1;
+				else res |= 2;
+				if((HAL_GPIO_ReadPin(HALL2_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET)) res |= 4;
+				else res |= 8;
+				if((HAL_GPIO_ReadPin(HALL3_GPIO_Port, HALL3_Pin)     != GPIO_PIN_RESET)) res |= 16;
+				else res |= 32;
+
+				embot::core::wait(10* embot::core::time1millisec);
+			
+				embot::core::print(std::to_string(res));
+				
+			}
+
+			if(res == 63) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+			sendCan(data);
+		}
+		
+		void testEncoder(){
+			uint8_t data[8] {0};		
+			uint8_t res {0};
+
+			for(int i=0; i<500; i++){	
+				if((HAL_GPIO_ReadPin(ENCA_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET)) res |= 1;
+				else res |= 2;
+				if((HAL_GPIO_ReadPin(ENCB_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET)) res |= 4;
+				else res |= 8;
+				if((HAL_GPIO_ReadPin(ENCZ_GPIO_Port, HALL3_Pin)     != GPIO_PIN_RESET)) res |= 16;
+				else res |= 32;
+
+				embot::core::wait(10* embot::core::time1millisec);
+			
+				embot::core::print(std::to_string(res));
+				
+			}
+
+			if(res == 47) data[0] = 0xAA;
+			else data[0] = 0xBB;
+			
+			sendCan(data);
 		}
 		
 //******************** END TESTS ******************************************************************//
@@ -351,77 +443,51 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 					switch(canframe.data[0]){
 						
 						//Test CAN
-  					case 0x00 : embot::core::wait(300* embot::core::time1millisec);	testCAN(); break;
+  					case 0x00 : embot::core::wait(300* embot::core::time1millisec);	testCan(); break;
 						
 						//Check test fw revision		      
-						case 0x01 :  embot::core::wait(300* embot::core::time1millisec); getFirmwareVersion(); break;
+						case 0x01 : embot::core::wait(300* embot::core::time1millisec); getFirmwareVersion(); break;
 
 						//Test LEDs off
-						case 0x02 :  embot::core::wait(300* embot::core::time1millisec); testLeds(0); break;
+						case 0x02 : embot::core::wait(300* embot::core::time1millisec); testLeds(0); break;
 
 						//Test LEDs on
-						case 0x03 :  embot::core::wait(300* embot::core::time1millisec); testLeds(1); break;
+						case 0x03 : embot::core::wait(300* embot::core::time1millisec); testLeds(1); break;
 						
 						//Test micro DEV_ID
-						case 0x04 :  embot::core::wait(300* embot::core::time1millisec); testIDCODE(canframe); break;
+						case 0x04 : embot::core::wait(300* embot::core::time1millisec); testIdCode(canframe); break;
 						
 						//Test Vin
-						case 0x05 :  embot::core::wait(300* embot::core::time1millisec); testVin(); break;
+						case 0x05 : embot::core::wait(300* embot::core::time1millisec); testVin(); break;
 						
 						//Test Cin
-						case 0x06 :  embot::core::wait(300* embot::core::time1millisec); testCin(); break;
-						
-						//Test temp
-						case 0x07 :  embot::core::wait(300* embot::core::time1millisec); testTemp(); break;
+						case 0x06 : embot::core::wait(300* embot::core::time1millisec); testCin(); break;
 						
 						//Test VAUXOK
-						case 0x08 :  embot::core::wait(300* embot::core::time1millisec); testVAUXOK(); break;
+						case 0x07 : embot::core::wait(300* embot::core::time1millisec); testVauxOk(); break;
 
 						//Test VCCOK
-						case 0x09 :  embot::core::wait(300* embot::core::time1millisec); testVCCOK(); break;
+						case 0x08 : embot::core::wait(300* embot::core::time1millisec); testVccOk(); break;
 						
-						//Test FAULT
-						case 0x0A :  embot::core::wait(300* embot::core::time1millisec); testFAULT(); break;
+						//Test FAULT ON
+						case 0x09 : embot::core::wait(300* embot::core::time1millisec); testFault(1); break;
+						
+  					//Test FAULT OFF
+						case 0x0A : embot::core::wait(300* embot::core::time1millisec); testFault(0); break;
+
+						//Test I2C
+						case 0x0B : embot::core::wait(300* embot::core::time1millisec); testI2c(i2c); break;
+
+						//Test HALL
+						case 0x0C : embot::core::wait(300* embot::core::time1millisec); testHall(); break;
+
+						//Test ECODER
+						case 0x0D : embot::core::wait(300* embot::core::time1millisec); testEncoder(); break;
 						
 						default : break;
-					}
-
-					
-     
-        }
-    
-//        if(true == embot::core::binary::mask::check(eventmask, evRXcanframe))
-//        {        
-//            embot::hw::can::Frame canframe;
-//            std::uint8_t remaining = 0;
-//            if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, canframe, remaining))
-//            {        
-//                embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
-//                if(true == canparser.process({canframe.id, canframe.size, canframe.data}, outframes))
-//                {
-//                }
-//                
-//                if(remaining > 0)
-//                {
-//                    t->setEvent(evRXcanframe);                 
-//                }
-//            }        
-//        }
-        
-        
-//        // if we have any packet we transmit them
-//        std::uint8_t num = outframes.size();
-//        if(num > 0)
-//        {
-//            for(std::uint8_t i=0; i<num; i++)
-//            {
-//                embot::hw::can::put(embot::hw::CAN::one, {outframes[i].id, outframes[i].size, outframes[i].data});                                       
-//            }
-//            embot::hw::can::transmit(embot::hw::CAN::one);                    
-//        }
-     
+					}			
+        }   
     }
-
 
 }}}}}
 

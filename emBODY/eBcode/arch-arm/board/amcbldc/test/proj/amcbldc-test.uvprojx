@@ -613,6 +613,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_motor.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_i2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_i2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -682,7 +692,7 @@
             <File>
               <FileName>embot_hw_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
+              <FilePath>..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1407,6 +1417,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_motor.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_i2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_i2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1476,7 +1496,7 @@
             <File>
               <FileName>embot_hw_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
+              <FilePath>..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1928,7 +1948,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V122</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\src\motorhal2</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\src\motorhal2;..\bsp</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2201,6 +2221,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_motor.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_i2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_i2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2270,7 +2300,7 @@
             <File>
               <FileName>embot_hw_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
+              <FilePath>..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>

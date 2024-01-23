@@ -7,27 +7,22 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_HW_BSP_AMCBLDC_H_
-#define _EMBOT_HW_BSP_AMCBLDC_H_
+#ifndef _EMBOT_HW_BSP_CONFIG_H_
+#define _EMBOT_HW_BSP_CONFIG_H_
 
-#include "embot_core.h"
-#include "embot_hw_types.h"
+  
+#if   defined(STM32HAL_BOARD_AMCBLDC)
 
-namespace embot { namespace hw { namespace bsp { namespace amcbldc {
+    #include "embot_hw_bsp_amcbldc_config.h"    
     
-    Revision revision();
-    
-    embot::hw::BTN EXTFAULTbutton();
-    
-    float getVIN();
-    float getCIN();
-    
-}}}}
+#else
+    #error wrong board
+#endif
+
 
 #endif  // include-guard
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
 
 

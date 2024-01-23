@@ -544,8 +544,6 @@ namespace embot { namespace hw { namespace motor {
         hallInit();    
         pwmInit();
         
-        
-
         return resOK; 
     }
     
