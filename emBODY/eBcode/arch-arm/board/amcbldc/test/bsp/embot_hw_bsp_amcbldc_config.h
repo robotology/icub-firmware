@@ -28,9 +28,9 @@
     #define EMBOT_ENABLE_hw_motor
     #define EMBOT_ENABLE_hw_button
 
-    // #define EMBOT_ENABLE_hw_i2c    
-    // #define EMBOT_ENABLE_hw_pwm 
-    // #define EMBOT_ENABLE_hw_hall 
+    #define EMBOT_ENABLE_hw_i2c    
+    #define EMBOT_ENABLE_hw_pwm 
+    #define EMBOT_ENABLE_hw_hall 
         
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMCBLDC ...
