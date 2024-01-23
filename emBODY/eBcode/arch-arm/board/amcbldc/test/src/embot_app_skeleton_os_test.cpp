@@ -334,13 +334,22 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 		
 		constexpr embot::hw::GPIO EXTFAULT {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen};
 
-		void testFault(){
+		void testFault(uint8_t status){
 			uint8_t data[8] {0};			
 			auto s = embot::hw::gpio::get(EXTFAULT);
-			
+
+		if(status == 1)
+		{	
 			if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
 			else{embot::core::print("NOK"); data[0] = 0xBB;}
 			
+		}
+		else
+		{
+			if(s != embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+			else{embot::core::print("NOK"); data[0] = 0xBB;}
+		}
+
   		sendCan(data);
 		}
 		
@@ -460,17 +469,20 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 						//Test VCCOK
 						case 0x08 : embot::core::wait(300* embot::core::time1millisec); testVccOk(); break;
 						
-						//Test FAULT
-						case 0x09 : embot::core::wait(300* embot::core::time1millisec); testFault(); break;
+						//Test FAULT ON
+						case 0x09 : embot::core::wait(300* embot::core::time1millisec); testFault(1); break;
+						
+  					//Test FAULT OFF
+						case 0x0A : embot::core::wait(300* embot::core::time1millisec); testFault(0); break;
 
 						//Test I2C
-						case 0x0A : embot::core::wait(300* embot::core::time1millisec); testI2c(i2c); break;
+						case 0x0B : embot::core::wait(300* embot::core::time1millisec); testI2c(i2c); break;
 
 						//Test HALL
-						case 0x0B : embot::core::wait(300* embot::core::time1millisec); testHall(); break;
+						case 0x0C : embot::core::wait(300* embot::core::time1millisec); testHall(); break;
 
 						//Test ECODER
-						case 0x0C : embot::core::wait(300* embot::core::time1millisec); testEncoder(); break;
+						case 0x0D : embot::core::wait(300* embot::core::time1millisec); testEncoder(); break;
 						
 						default : break;
 					}			
