@@ -46,7 +46,6 @@
 #include "embot_hw_pga308.h"
 #include "embot_hw_adc.h"
 #include "embot_hw_flash.h"
-
 #include "embot_hw_sys.h"
 
 
@@ -354,7 +353,7 @@ struct embot::app::application::theSTRAIN::Impl
 #if defined(STRAIN2_APP_AT_64K)
 #else            
             embot::app::theStorage &storage = embot::app::theStorage::getInstance(); 
-            storage.init(embot::hw::flash::bsp::partition(embot::hw::flash::Partition::ID::applicationstorage).address, 1024);
+            storage.init(embot::hw::sys::partition(embot::hw::flash::Partition::ID::applicationstorage).address, 1024);
 #endif            
             clear();
             
