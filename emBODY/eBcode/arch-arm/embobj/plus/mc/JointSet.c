@@ -2241,18 +2241,7 @@ void JointSet_stop(JointSet* o, int j) //use only in WRIST_MK2 case
 extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_state) //use only in WRIST_MK2 case
 {
     joint_state->core.modes.interactionmodestatus    = o->interaction_mode;
-    
-    /*NOTE: 
-    in WRIST_MK2 case the jointset.controlmode values the control mode imposed by the user, 
-    while the control_mode of each joint belonging tothe set values "position_direct" always. 
-    In the case the jointset.controlmode is harwarefault, we need to return the exact state of each joint 
-    in order to inform the user which is the joint with the fault*/
-    if(o->control_mode == eomc_controlmode_hwFault)
-        joint_state->core.modes.controlmodestatus = o->joint[o->joints_of_set[j]].control_mode;
-    else
-        joint_state->core.modes.controlmodestatus = o->control_mode; 
-    
-    
+    joint_state->core.modes.controlmodestatus        = o->control_mode; 
     joint_state->core.modes.ismotiondone             = Trajectory_is_done(&(o->wristMK2.ypr_trajectory[j]));
     joint_state->core.measures.meas_position         = o->wristMK2.ypr_pos_fbk[j];           
     joint_state->core.measures.meas_velocity         = ZERO;        
