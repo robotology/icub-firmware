@@ -97,36 +97,6 @@ namespace embot::app::eth::service::impl {
         }
     };    
     
-    struct Paraphernalia
-    {   
-        bool initted {false};
-        bool active {false};  
-        bool activateafterverify {false};
-        bool started {false};
-        ServiceOperation::OnEnd onverifyactivate {nullptr};
-        void *onverifyarg {nullptr};
-        embot::app::eth::Service::State state {embot::app::eth::Service::State::idle};
-        const eOmn_serv_configuration_t* tmpcfg {nullptr};
-        eOmn_serv_configuration_t servconfig {};
-            
-        constexpr Paraphernalia() = default;
-            
-        void initialise()
-        {
-            clear();
-            initted = true;
-        }
-        
-        void clear()
-        {
-            active = activateafterverify = started = false;
-            onverifyactivate = nullptr;
-            onverifyarg = nullptr;
-            state = embot::app::eth::Service::State::idle;
-            tmpcfg = nullptr;
-            std::memset(&servconfig, 0, sizeof(servconfig));
-        }
-    };
     
     struct CANtools
     {
@@ -178,31 +148,76 @@ namespace embot::app::eth::service::impl {
 
     struct Core
     {
-        Paraphernalia paraphernalia {};
-        CANtools cantools {};    
-        EOarray* id32ofRegulars {nullptr};
-        std::vector<eOprotID32_t> regulars {};
-        Diagnostics diagnostics {};
-                    
-        constexpr Core() = default;  
+        bool _initted {false};
         
-        void initialise(size_t nboards, size_t nentities, size_t ntargets, size_t nregulars)
-        {
-            paraphernalia.initialise();
-            cantools.initialise(nboards, nentities, ntargets);
-            id32ofRegulars = eo_array_New(nregulars, sizeof(uint32_t), nullptr);
-            regulars.reserve(nregulars);
-            diagnostics.initialise();
+        bool _active {false};  
+        bool _started {false};
+        
+        embot::app::eth::Service::State _state {embot::app::eth::Service::State::idle};
+        eOmn_serv_configuration_t serviceconfig {};  
+            
+        uint8_t capacityOfRegulars {0};    
+        EOarray* id32ofRegulars {nullptr};
+        
+                    
+        constexpr Core() = default; 
+
+        bool initted() const { return _initted; }        
+        
+        void initialise(uint8_t maxregulars)
+        {          
+            if(true == _initted)
+            {
+                return;
+            }
+            
+            capacityOfRegulars = maxregulars;
+            id32ofRegulars = eo_array_New(maxregulars, sizeof(uint32_t), nullptr);
+            
+            clear();
+            
+            _initted = true;
         } 
         
         void clear()
         {
-            paraphernalia.clear();
-            cantools.clear();     
+            _active = _started = false;
+            _state = embot::app::eth::Service::State::idle;
+            std::memset(&serviceconfig, 0, sizeof(serviceconfig));            
             eo_array_Reset(id32ofRegulars);
-            regulars.clear();
-            diagnostics.clear();
         }
+        
+        void state(embot::app::eth::Service::State s)
+        {
+            _state = s;
+            _active = state2active(s);
+            _started = state2started(s);
+        }
+
+        bool active() const
+        {
+            return _active;
+        }
+
+        bool started() const
+        {
+            return _started;
+        }
+        
+        embot::app::eth::Service::State state() const
+        {
+            return _state;
+        }
+        
+        static bool state2active(embot::app::eth::Service::State s)
+        {
+            return (s == embot::app::eth::Service::State::activated) || (s == embot::app::eth::Service::State::started);
+        }
+        
+        static bool state2started(embot::app::eth::Service::State s)
+        {
+            return (s == embot::app::eth::Service::State::started);
+        }        
     };
 
 } // namespace embot::app::eth::service::impl {
