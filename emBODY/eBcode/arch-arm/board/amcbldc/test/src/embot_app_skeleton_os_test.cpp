@@ -267,16 +267,16 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			uint8_t id1 = id >> 8;
 			uint8_t id2 = id;
 			
-			if(rev1 == frame.data[1] &&
-				rev2 == frame.data[2] &&
-			  id1 == frame.data[3] &&
-			  id2 == frame.data[4]) data[0] = 0xAA;
-			else data[0] = 0xBB;
+//			if(rev1 == frame.data[1] &&
+//				rev2 == frame.data[2] &&
+//			  id1 == frame.data[3] &&
+//			  id2 == frame.data[4]) data[0] = 0xAA;
+//			else data[0] = 0xBB;
 			
-			data[1] = rev1;
-			data[2] = rev2;
-			data[3] = id1;
-			data[4] = id2;
+			data[0] = rev1;
+			data[1] = rev2;
+			data[2] = id1;
+			data[3] = id2;
 			
 			sendCan(data);
 		}
@@ -377,7 +377,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			uint8_t data[8] {0};		
 			uint8_t res {0};
 
-			for(int i=0; i<500; i++){	
+			for(int i=0; i<150; i++){	
 				if((HAL_GPIO_ReadPin(HALL1_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET)) res |= 1;
 				else res |= 2;
 				if((HAL_GPIO_ReadPin(HALL2_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET)) res |= 4;
@@ -401,7 +401,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			uint8_t data[8] {0};		
 			uint8_t res {0};
 
-			for(int i=0; i<500; i++){	
+			for(int i=0; i<150; i++){	
 				if((HAL_GPIO_ReadPin(ENCA_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET)) res |= 1;
 				else res |= 2;
 				if((HAL_GPIO_ReadPin(ENCB_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET)) res |= 4;
