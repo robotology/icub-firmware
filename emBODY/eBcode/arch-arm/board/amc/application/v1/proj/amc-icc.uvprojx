@@ -1927,6 +1927,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_eth_Service_impl_mc_FOC.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_Service_impl_mc_FOC.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theServiceMC_impl.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theServiceMC_impl.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_Service_impl_mc_ADVFOC.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_Service_impl_mc_ADVFOC.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

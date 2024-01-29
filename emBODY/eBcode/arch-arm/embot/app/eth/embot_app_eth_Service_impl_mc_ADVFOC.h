@@ -10,86 +10,89 @@
 #define __EMBOT_APP_ETH_SERVICE_IMPL_MC_ADVFOC_H_
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - external dependencies
-// --------------------------------------------------------------------------------------------------------------------
-
 #include "embot_app_eth_Service_impl_mc_if.h"
-
-
+#include "embot_app_eth_theErrorManager.h"
+#include "EOerror.h"
     
 namespace embot::app::eth::service::impl::mc {    
 
-
 struct mcOBJadvfoc : public IFmcobj
-{    
-    
+{ 
+    static const size_t maxjomos {4};
+           
     mcOBJadvfoc() = default;
+        
+    void initialise(embot::app::eth::service::impl::Core *c);
+
+    embot::app::eth::Service::Type type() const override;    
+    bool clear() override;    
+    bool load(embot::app::eth::Service *serv, const eOmn_serv_configuration_t *sc) override;    
+    size_t numberofjomos() const override;    
+    bool verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate = true) override;    
+    bool activate() override;
+    bool deactivate() override;
     
-    size_t numofjomos {0};
+protected:  
+
+    // p2core points to an external object loaded w/ initialise()
+    // it is reponsibility of the mcOBJfoc object to update its state etc
+    embot::app::eth::service::impl::Core *p2core {nullptr};
     
+    // servconfig, advfoc and advjomodescriptors points to memory
+    // stored in p2core->serviceconfig
+    const eOmn_serv_configuration_t *servconfig {nullptr}; 
+    const eOmn_serv_config_data_mc_advfoc_t *advfoc {nullptr};        
+    EOconstarray* advjomodescriptors {nullptr};  // holds eOmc_adv_jomo_descriptor_t     
+
+    // focservconfig is local memory used to transform servconfig in what 
+    // the encoder reader and mcontroller need. foc and focjomodescriptors points to it.
+    eOmn_serv_configuration_t focservconfig {};      
+    eOmn_serv_config_data_mc_foc_t *foc {nullptr};
+    EOarray* focjomodescriptors {nullptr};             
+    
+    struct extACT
+    {
+        uint8_t index {0};
+        eOmc_adv_actuator_descriptor_t actua {};
+        extACT() = default;
+        extACT(uint8_t i, const eOmc_adv_actuator_descriptor_t& a) : index(i), actua(a) {}
+    };
+
+    std::vector<extACT> iccactuators {};
+    std::vector<extACT> canactuators {};
+    
+    // internally stored w/ load() 
+    embot::app::eth::Service *service {nullptr};
+    // internally stored w/ verify(). it is executed after activate() if triggeractivate is true
+    // else after verify()
+    embot::app::eth::Service::OnEndOfOperation afterverifyactivate {nullptr};
+    bool triggeractivate {true};
+    // computed from the loaded servconfig
+    size_t numofjomos {0};   
+    // service objects    
+    embot::app::eth::service::impl::CANtools cantools {};        
+    embot::app::eth::theErrorManager::Descriptor desc {};
+        
+        
+    // it emits diagnostics messages        
+    void emit(embot::app::eth::theErrorManager::Severity s, eOerror_code_t errorcode);
+        
+    // it synch the state of the embot::app::eth::service::impl::Core and of the MC service to the new state   
+    void synch(embot::app::eth::Service::State s);
+
 #if 0
-
-    verification is done in two steps:
-    - 01: encoders
-    - 02: presence of icc resources
-    - 03: presence of can boards 
-    
-    
+    verification is done in three steps:
+    - 01: encoders -> it triggers verify_step01_onENDof_verifyencoders()
+    - 02: presence of icc located boards -> it triggers verify_step02_onENDof_iccdiscovery()
+    - 03: presence of can boards -> it triggers verify_step03_onENDof_candiscovery() 
+        if both steps are ok then p2core->state gets ::verified, and if triggeractivate is true then it is executed activate()        
 #endif
+        
     
-
-    embot::app::eth::Service::Type type() const override
-    { 
-        return embot::app::eth::Service::Type::MC_advfoc; 
-    }
-    
-    bool clear() override
-    {
-        bool r {true};
-        
-        return r;
-    }
-    
-    
-    bool load(embot::app::eth::Service *serv, const eOmn_serv_configuration_t *sc) override
-    {
-        bool r {true};
-                       
-        return r;        
-    }
-
-    size_t numberofjomos() const override
-    {
-       return numofjomos; 
-    }
-    
-    bool verifyactivate(embot::app::eth::Service::OnEndOfOperation onend) override
-    {
-        bool r {true};
-        
-//        void *owner {nullptr};
-//        // i assign ... and bla bla bla.
-//        // i call 
-//        EOconstarray *carrayofjomodes {nullptr};
-//        eOmn_serv_diagn_cfg_t dc = {0, 0};
-//        const embot::core::Confirmer conf {step01_onENDof_verifyencoders, owner};
-//        embot::app::eth::theEncoderReader::getInstance().Verify({carrayofjomodes, dc}, true, conf);
-        
-        return r;
-        
-    }
-    
-    bool deactivate() override
-    {
-        bool r {true};
-        
-        
-        
-                       
-        return r;           
-    }
-
+    // static methods used for callbacks: void *tHIS must be a pointer to this mcOBJfoc struct
+    static void verify_step01_onENDof_verifyencoders(void *tHIS, bool operationisok);
+    static void verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok);
+    static eOresult_t verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANdiscovery2* cd2, eObool_t searchisok);
 }; 
 
 } // namespace embot::app::eth::service::impl::mc { 

@@ -24,10 +24,16 @@ namespace embot::app::eth::service::impl::mc {
 struct IFmcobj 
 {
     virtual embot::app::eth::Service::Type type() const = 0;
-    virtual bool clear() = 0;    
+    virtual bool clear() = 0;  
     virtual bool load(embot::app::eth::Service *serv, const eOmn_serv_configuration_t *sc) = 0;
     virtual size_t numberofjomos() const = 0;
-    virtual bool verifyactivate(embot::app::eth::Service::OnEndOfOperation onend) = 0;
+    // if andactivate is true at end of an OK verification it is internally called activate()
+    // and finally is called onend(serv, true)
+    // if activate is false at end of an OK verification it is called only onend(service, true)
+    // and activate() must be called externally.
+    // we use the mode andactivate = true    
+    virtual bool verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate = true) = 0;    
+    virtual bool activate() = 0;
     virtual bool deactivate() = 0;
     
 protected:
@@ -50,7 +56,10 @@ struct mcOBJnone : public IFmcobj
     size_t numberofjomos() const override
     { return 0; }
     
-    bool verifyactivate(embot::app::eth::Service::OnEndOfOperation onend) override
+    bool verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate = true) override
+    { return false; }
+
+    bool activate() override
     { return false; }
     
     bool deactivate() override

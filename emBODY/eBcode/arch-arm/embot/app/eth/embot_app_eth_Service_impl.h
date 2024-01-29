@@ -97,6 +97,88 @@ namespace embot::app::eth::service::impl {
         }
     };    
     
+    // this object contains the core information related to a service: 
+    // - the state: use only by its setter and getter funtions
+    // - the configuration: can be accessed directly
+    // - the array with the IDs of the configured regular ROPs: can be accessed directly
+    // the other oprotected data members are service data. 
+    // TODO: 
+    // - change eOmn_serv_configuration_t into a Service::Config
+    // - change the EOarray* id32ofRegulars into a container, maybe a vector<>
+    struct Core
+    { 
+        
+    protected:
+        
+        bool _initted {false};        
+        bool _active {false};  
+        bool _started {false};
+        
+    public:  
+        
+        embot::app::eth::Service::State _state {embot::app::eth::Service::State::idle};
+        eOmn_serv_configuration_t serviceconfig {};  
+        EOarray* id32ofRegulars {nullptr};             
+                      
+        constexpr Core() = default; 
+
+        bool initted() const { return _initted; }        
+        
+        void initialise(uint8_t maxregulars)
+        {          
+            if(true == _initted)
+            {
+                return;
+            }
+            
+            id32ofRegulars = eo_array_New(maxregulars, sizeof(uint32_t), nullptr);
+            
+            clear();
+            
+            _initted = true;
+        } 
+        
+        void clear()
+        {
+            _active = _started = false;
+            _state = embot::app::eth::Service::State::idle;
+            std::memset(&serviceconfig, 0, sizeof(serviceconfig));  
+            serviceconfig.type = eomn_serv_NONE;            
+            eo_array_Reset(id32ofRegulars);
+        }
+        
+        void state(embot::app::eth::Service::State s)
+        {
+            _state = s;
+            _active = state2active(s);
+            _started = state2started(s);
+        }
+
+        bool active() const
+        {
+            return _active;
+        }
+
+        bool started() const
+        {
+            return _started;
+        }
+        
+        embot::app::eth::Service::State state() const
+        {
+            return _state;
+        }
+        
+        static bool state2active(embot::app::eth::Service::State s)
+        {
+            return (s == embot::app::eth::Service::State::activated) || (s == embot::app::eth::Service::State::started);
+        }
+        
+        static bool state2started(embot::app::eth::Service::State s)
+        {
+            return (s == embot::app::eth::Service::State::started);
+        }        
+    };
     
     struct CANtools
     {
@@ -144,80 +226,6 @@ namespace embot::app::eth::service::impl {
         
         void initialise() {}
         void clear() {};            
-    };
-
-    struct Core
-    {
-        bool _initted {false};
-        
-        bool _active {false};  
-        bool _started {false};
-        
-        embot::app::eth::Service::State _state {embot::app::eth::Service::State::idle};
-        eOmn_serv_configuration_t serviceconfig {};  
-            
-        uint8_t capacityOfRegulars {0};    
-        EOarray* id32ofRegulars {nullptr};
-        
-                    
-        constexpr Core() = default; 
-
-        bool initted() const { return _initted; }        
-        
-        void initialise(uint8_t maxregulars)
-        {          
-            if(true == _initted)
-            {
-                return;
-            }
-            
-            capacityOfRegulars = maxregulars;
-            id32ofRegulars = eo_array_New(maxregulars, sizeof(uint32_t), nullptr);
-            
-            clear();
-            
-            _initted = true;
-        } 
-        
-        void clear()
-        {
-            _active = _started = false;
-            _state = embot::app::eth::Service::State::idle;
-            std::memset(&serviceconfig, 0, sizeof(serviceconfig));            
-            eo_array_Reset(id32ofRegulars);
-        }
-        
-        void state(embot::app::eth::Service::State s)
-        {
-            _state = s;
-            _active = state2active(s);
-            _started = state2started(s);
-        }
-
-        bool active() const
-        {
-            return _active;
-        }
-
-        bool started() const
-        {
-            return _started;
-        }
-        
-        embot::app::eth::Service::State state() const
-        {
-            return _state;
-        }
-        
-        static bool state2active(embot::app::eth::Service::State s)
-        {
-            return (s == embot::app::eth::Service::State::activated) || (s == embot::app::eth::Service::State::started);
-        }
-        
-        static bool state2started(embot::app::eth::Service::State s)
-        {
-            return (s == embot::app::eth::Service::State::started);
-        }        
     };
 
 } // namespace embot::app::eth::service::impl {
