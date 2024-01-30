@@ -931,11 +931,11 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     Vqfbk = Vq;
 
     // Re-scale Vq, Vd with respect to the PWM resolution and fullscale.
-    if (PWM_50_DUTY_CYC!=1000)
-    {
-        Vq /= 2;
-        Vd /= 2;
-    }
+//    if (PWM_50_DUTY_CYC!=1000)
+//    {
+//        Vq /= 2;
+//        Vd /= 2;
+//    }
 
     //
     ////////////////////////////////////////////////////////////////////////////
