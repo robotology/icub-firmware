@@ -1,7 +1,7 @@
 
 /*
  * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Davide Tomé
+ * Author:  Davide Tomï¿½
  * email:   davide.tome@iit.it
 */
 

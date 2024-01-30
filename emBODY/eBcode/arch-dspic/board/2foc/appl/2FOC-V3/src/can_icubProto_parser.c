@@ -224,7 +224,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             MotorConfig.fullcalib = TRUE;
             gEncoderConfig.full_calibration = TRUE;
-            gEncoderConfig.offset = 0;
+            //gEncoderConfig.offset = 0;
         }
         else
         {
