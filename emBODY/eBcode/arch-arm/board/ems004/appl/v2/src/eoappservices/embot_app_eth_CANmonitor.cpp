@@ -39,6 +39,7 @@ struct embot::app::eth::CANmonitor::Impl
     embot::core::Time timeofdisappearance {0};
     
     MAP boards2touch {0, 0};
+    MAP boards2report {0, 0};
 
     bool transmissionisactive {false};
     bool allboardsarealive {false};    
@@ -109,7 +110,8 @@ bool embot::app::eth::CANmonitor::Impl::start()
         return false;
     }
 
-    boards2touch = _config.target;
+    boards2touch = boards2report = _config.target;
+
     state = State::OK;
     allboardsarealive = true;
     active = true;
@@ -121,6 +123,7 @@ bool embot::app::eth::CANmonitor::Impl::stop()
 {  
 //    log("stop()");  
     boards2touch.clear();
+    boards2report.clear();
     state = State::OK;
     allboardsarealive = false;
     active = false;
@@ -149,11 +152,10 @@ bool embot::app::eth::CANmonitor::Impl::tick()
     {
         regularreportnow = true;
     }  
-        
-    MAP boards2report {};
     
     if(true == checknow)
     {
+        boards2report.clear();
         timeoflastcheck = timenow;
         
         bool allboardstouched = boards2touch.empty();
@@ -215,16 +217,16 @@ bool embot::app::eth::CANmonitor::Impl::tick()
             case State::OK:
             {
 //                alwayslog("OK");
-                errdes.par16 = 0;
+                errdes.par16 = _config.servicecategory;
                 errdes.par64 = boards2report.getcompact();        
                 errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_monitor_regularcontact);              
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, _config.ownername, &errdes); 
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, _config.ownername, &errdes);
             } break;
             
             case State::justLOST:
             {
 //                alwayslog("jLOST");
-                errdes.par16 = 0;
+                errdes.par16 = _config.servicecategory;
                 errdes.par64 = boards2report.getcompact();        
                 errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_monitor_lostcontact);              
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, _config.ownername, &errdes);                
@@ -234,7 +236,7 @@ bool embot::app::eth::CANmonitor::Impl::tick()
             {
 //                alwayslog("JFOUND");
                 uint64_t mspassed = (timenow-timeofdisappearance)/1000;
-                errdes.par16 = 0;
+                errdes.par16 = _config.servicecategory;
                 errdes.par64 = (mspassed << 32) | boards2report.getcompact();        
                 errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_monitor_retrievedcontact);              
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, _config.ownername, &errdes);                
@@ -244,7 +246,7 @@ bool embot::app::eth::CANmonitor::Impl::tick()
             {
 //                alwayslog("sLOST");
                 uint64_t mspassed = (timenow-timeofdisappearance)/1000;
-                errdes.par16 = 0;
+                errdes.par16 = _config.servicecategory;
                 errdes.par64 = (mspassed << 32) | boards2report.getcompact();        
                 errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_monitor_stillnocontact);              
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, _config.ownername, &errdes);

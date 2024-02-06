@@ -169,7 +169,7 @@ and `justLOST` states may happen if some boards keep on disappearing and reappea
             
             constexpr Config(const MAP &map, embot::core::relTime rc, Report rm, embot::core::relTime rr, const char *o, eOmn_serv_category_t s)
             {
-                target = map; periodofcheck = rc; reportmode = rm; ownername = o; servicecategory = s; 
+                target = map; periodofcheck = rc; reportmode = rm; periodofreport = rr; ownername = o; servicecategory = s; 
             }  
             
             Config() = default;
