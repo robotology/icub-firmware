@@ -90,7 +90,7 @@ struct embot::app::eth::theBATservice::Impl {
   CANmonitor canmonitor{};
   static constexpr CANmonitor::Config defaultcanmonitorconfig{
       {}, // the map is left empty
-      250 * embot::core::time1millisec,
+      1000 * embot::core::time1millisec, // this is the time interval used by the ems to touch the CAN boards that initialize this service. We MUST use 1000 ms since we are using the servicefor both BAT (that streams data at 100ms) and BMS (which instead streams at 1s)
       CANmonitor::Report::ALL,
       10 * embot::core::time1second,
       s_eobj_ownname,
@@ -556,28 +556,30 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(const canFrameDe
       
     case canFrameDescriptor::Type::info:
     {
-        bat->status.timedvalue.temperature =
-            10 * ((static_cast<uint16_t>(cfd.frame->data[7]) << 8) +
-            static_cast<uint16_t>(cfd.frame->data[6]));
         
+    bat->status.timedvalue.temperature =
+            10 * static_cast<int16_t>((static_cast<uint16_t>(cfd.frame->data[7]) << 8) +
+            static_cast<uint16_t>(cfd.frame->data[6]));
+    
     bat->status.timedvalue.charge = 
         static_cast<float32_t>(
             (static_cast<uint16_t>(cfd.frame->data[5]) << 8) +
             static_cast<uint16_t>(cfd.frame->data[4])
         );
-        
+    
     int16_t curr = 
         (static_cast<int16_t>(cfd.frame->data[3]) << 8) +
         static_cast<int16_t>(cfd.frame->data[2]);
-
+    
     bat->status.timedvalue.current =
         0.1 * static_cast<float32_t>(curr);
-
+        
     bat->status.timedvalue.voltage =
         0.1 * static_cast<float32_t>(
                   (static_cast<uint16_t>(cfd.frame->data[1]) << 8) +
                   static_cast<uint16_t>(cfd.frame->data[0])
         );
+    
     } break;
       
     case canFrameDescriptor::Type::status_bms: 
@@ -597,10 +599,8 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(const canFrameDe
         If we have an alram, this will persist in the minute after the alarm generation
         even if the alarm re-enter
         **/
-        // using embot methods copy the 8bits of bms_status into the two least significant bytes of the general timedvalue.status
-        embot::core::binary::mask::clear(bat->status.timedvalue.status, static_cast<uint32_t>(0x0000ffff), 0);
-        embot::core::binary::bit::set(bat->status.timedvalue.status, 0);
-        embot::core::binary::mask::set(bat->status.timedvalue.status, static_cast<uint32_t>(cfd.frame->data[0]), 1);
+        
+        bat->status.timedvalue.status = static_cast<uint16_t>(cfd.frame->data[0]);
         bat->status.timedvalue.age = embot::core::now();
         
     } break;
@@ -624,12 +624,8 @@ eOresult_t embot::app::eth::theBATservice::Impl::AcceptCANframe(const canFrameDe
         If we have an alram, this will persist in the minute after the alarm generation
         even if the alarm re-enter
         **/
-        // using embot methods copy the 16bits of bms_status into the two most significant bytes of the general timedvalue.status
-        uint16_t bat_status_temp16 = {0x0120};
-        embot::core::binary::mask::clear(bat->status.timedvalue.status, static_cast<uint32_t>(0xffff0000), 0);
         
-        bat_status_temp16 = static_cast<uint16_t>((cfd.frame->data[1] << 8 ) | cfd.frame->data[0]);
-        embot::core::binary::mask::set(bat->status.timedvalue.status, static_cast<uint32_t>(bat_status_temp16), 16);
+        bat->status.timedvalue.status = static_cast<uint16_t>((cfd.frame->data[1] << 8 ) | cfd.frame->data[0]);
         bat->status.timedvalue.age = embot::core::now();
     } break;
     

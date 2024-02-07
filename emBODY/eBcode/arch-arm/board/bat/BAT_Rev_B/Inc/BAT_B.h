@@ -140,5 +140,6 @@ extern adc_measure_t mean;
 extern uint32_t adc_values[9];
 extern fifo adc_samples;
 extern uint32_t vBatterydV;
+extern uint32_t iBatterydA;
 
 #endif

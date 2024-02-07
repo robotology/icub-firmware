@@ -11,7 +11,7 @@
 
 char Firmware_vers = 1;
 char Revision_vers = 3;
-char Build_number  = 3;
+char Build_number  = 4;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
 uint32_t vhyst=0;    // voltage hysteresis
@@ -108,13 +108,14 @@ uint16_t Battery_low=3300*7;    // 7s5p battery
 #ifdef BAT_B_Generic
 uint32_t VTH[7]={32000, 34000, 36000, 38000, 40000, 42000, 44000};   // threshold in mV iCub 2.5 Battery
 uint16_t Battery_high=4200*10;   // 10s3p battery
-uint16_t Battery_low=3300*10;    // 10s3p battery
+uint16_t Battery_low=3000*10;    // 10s3p battery
 #endif
 
 adc_measure_t adc_measure = {0};  // initialize all adc values to 0
 adc_measure_t mean = {0};         // initialize all average values to 0
 uint32_t adc_values[9];           // contains all ADC channels conversion
-uint32_t vBatterydV = 0;          // varibale used for sending mean.V_BATTERY to EMS in deciVolt
+uint32_t vBatterydV = 0;          // variable used for sending mean.V_BATTERY to EMS in deciVolt
+uint32_t iBatterydA = 0;          // variable used for sending the mean.I_BATTERY_M_B in deciAmpere
 
 uint16_t adc_sample = 0;
 

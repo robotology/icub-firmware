@@ -97,6 +97,7 @@ void checkHSM(void);
 void dcdc_management(void);
 void FAULT_CHECK(void);
 void dcdcStatusUpdate(void);
+void evaluateSoCPercentage(void);
 
 /* USER CODE END PFP */
 
@@ -300,9 +301,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
     #ifdef BAT_B_Generic
       FAULT_CHECK();
     #endif
+    evaluateSoCPercentage();
   }
   if(htim->Instance==TIM16){        // timer 100ms
     toggle_100ms = toggle_100ms^1;
+    
     if(TX_ENABLED == 0)
         return;        
     CANBUS();
@@ -606,14 +609,16 @@ void CANBUS(void){
 #endif
     {
         // Battery Pack Info message
-        vBatterydV = 0.01 * (mean.V_BATTERY);
-        TxData_620[0] = vBatterydV & 0xFF;              // b7-b6 Battery pack voltage            
+        iBatterydA = 0.01 * (mean.I_HSM + ((mean.V_V12board * mean.I_V12board) / mean.V_VINPUT) + ((mean.V_V12motor * mean.I_V12motor) / mean.V_VINPUT));
+        vBatterydV = 0.01 * (mean.V_VINPUT);
+        
+        TxData_620[0] = vBatterydV & 0xFF;              // b7-b6 Input voltage (either battery pack voltage or power supply voltage - highest between the 2)            
         TxData_620[1] = (vBatterydV >> 8) & 0xFF;
-        TxData_620[2] = 0x00;                           // b5-b4 Instant current
-        TxData_620[3] = 0x00;
+        TxData_620[2] = iBatterydA & 0xFF;              // b5-b4 Total current absorbed by the system
+        TxData_620[3] = (iBatterydA >> 8) & 0xFF;
         TxData_620[4] = Battery_charge & 0xFF;          // b3-b2 State of charge of battery
         TxData_620[5] = 0x00;
-        TxData_620[6] = 0x00;                           // b1-b0 Average Temperature of the batteries
+        TxData_620[6] = 0x00;                           // b1-b0 Ready for Average Temperature of the batteries (Not available for now)
         TxData_620[7] = 0x00;
         if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader_620, TxData_620, &TxMailbox_620) != HAL_OK){
             /* Transmission request Error */
@@ -1182,6 +1187,18 @@ void dcdcStatusUpdate(void)
     }
 }
 
+// -----------------------------------------------------------------------------------------------------------------------------
+// Evaluation of most possible accurate battery charge percentage without overdesigning (going to use parallel 1deg polynomials, i.e. line)
+// -----------------------------------------------------------------------------------------------------------------------------
+void evaluateSoCPercentage()
+{
+  if(mean.V_BATTERY > Battery_high)       {Battery_charge=100;}
+  else if(mean.V_BATTERY < Battery_low)   {Battery_charge=0;}
+  else                                    
+  {
+    Battery_charge = 100*(mean.V_BATTERY-Battery_low)/(Battery_high-Battery_low);
+  }
+}
 
 void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef* hcan1)
 {
