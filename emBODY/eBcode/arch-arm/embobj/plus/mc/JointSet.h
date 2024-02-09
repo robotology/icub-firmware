@@ -43,7 +43,7 @@ enum wrist_mk_version_t {WRIST_MK_VER_2_0 = 20,  WRIST_MK_VER_2_1 = 21};
 typedef struct //wristMk2_t
 {
     BOOL is_parking;
-    BOOL must_park;
+    BOOL warmup;
     
     wrist_mk_version_t mk_version;
     BOOL is_right_wrist;
@@ -57,7 +57,8 @@ typedef struct //wristMk2_t
     CTRL_UNITS ypr_acc_ref[3];
     CTRL_UNITS ypr_pos_fbk[3];
     
-    //CTRL_UNITS arm_pos_off[3];
+    CTRL_UNITS last_valid_pos[3];
+    CTRL_UNITS park_target[3];
 
 } wristMK2_t;
 
