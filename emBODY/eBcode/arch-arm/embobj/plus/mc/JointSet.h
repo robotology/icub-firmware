@@ -43,7 +43,9 @@ enum wrist_mk_version_t {WRIST_MK_VER_2_0 = 20,  WRIST_MK_VER_2_1 = 21};
 typedef struct //wristMk2_t
 {
     BOOL is_parking;
-    BOOL warmup;
+    int warmup;
+    
+    int watchdog;
     
     wrist_mk_version_t mk_version;
     BOOL is_right_wrist;
@@ -51,14 +53,18 @@ typedef struct //wristMk2_t
     wrist_decoupler wristDecoupler;
     
     Trajectory ypr_trajectory[3];
+    Trajectory prk_trajectory[3];
     
     CTRL_UNITS ypr_pos_ref[3];
     CTRL_UNITS ypr_vel_ref[3];
     CTRL_UNITS ypr_acc_ref[3];
     CTRL_UNITS ypr_pos_fbk[3];
     
+    CTRL_UNITS prk_pos_ref[3];
+    CTRL_UNITS prk_vel_ref[3];
+    CTRL_UNITS prk_acc_ref[3];
+    
     CTRL_UNITS last_valid_pos[3];
-    CTRL_UNITS park_target[3];
 
 } wristMK2_t;
 

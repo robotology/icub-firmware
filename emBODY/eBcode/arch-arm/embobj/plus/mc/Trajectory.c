@@ -200,6 +200,12 @@ void Trajectory_stop(Trajectory *o, int32_t pos)
     Trajectory_set_pos_raw(o, pos);
 }
 
+void Trajectory_start2end(Trajectory *o, int32_t start, float end, float velAvg)
+{
+    Trajectory_set_pos_raw(o, start);
+    Trajectory_set_pos_end(o, end, velAvg);
+}
+
 void Trajectory_velocity_stop(Trajectory *o)
 {
     o->bVelocityMove = FALSE;
