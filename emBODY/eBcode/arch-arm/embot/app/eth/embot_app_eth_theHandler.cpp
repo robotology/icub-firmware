@@ -41,7 +41,10 @@
 
 #include "embot_os_theScheduler.h"
 
+#if defined(USE_ICC_COMM) 
 #include "embot_app_eth_theICCservice.h"
+#endif
+
 #include "EOtheCANservice.h"
 #include "EOtheCANdiscovery2.h"
 #include "EOtheCANprotocol.h"
@@ -251,22 +254,22 @@ struct theSM
         EOMtask *task = (EOMtask *)arg;
         eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
     }
-    
+#if defined(USE_ICC_COMM)     
     static void s_icc_cbkonrx_idle(void *arg)
     {
         eom_task_isrSetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef03);
     }    
-    
+#endif    
     static void s_can_cbkonrx_fatalerror(void *arg)
     {
         eom_task_isrSetEvent(eom_emserror_GetTask(eom_emserror_GetHandle()), emserror_evt_userdef01);
     } 
-    
+#if defined(USE_ICC_COMM)     
     static void s_icc_cbkonrx_fatalerror(void *arg)
     {
         eom_task_isrSetEvent(eom_emserror_GetTask(eom_emserror_GetHandle()), emserror_evt_userdef01);
     }    
-    
+#endif    
     static void stateIDLE_onentry()
     {
         embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
@@ -280,7 +283,7 @@ struct theSM
         // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());
-
+#if defined(USE_ICC_COMM) 
 #if defined(debugNOicc)
 #else            
         // theICCservice
@@ -288,6 +291,7 @@ struct theSM
         embot::app::eth::theICCservice::getInstance().parse();
         embot::app::eth::theICCservice::getInstance().flush(5*embot::core::time1millisec); 
         embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_idle, nullptr});             
+#endif
 #endif        
         // can discovery
         EOaction_strg astrg = {0};
@@ -319,7 +323,7 @@ struct theSM
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);    
         eo_canserv_TXstartAll(eo_canserv_GetHandle(), NULL, NULL);
         eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
- 
+#if defined(USE_ICC_COMM)  
 #if defined(debugNOicc)
 #else            
         // theICCservice
@@ -327,7 +331,7 @@ struct theSM
         embot::app::eth::theICCservice::getInstance().flush(5*embot::core::time1millisec);  
         embot::app::eth::theICCservice::getInstance().set(embot::core::Callback());             
 #endif         
-            
+#endif            
         
         // can discovery
         eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), nullptr);
@@ -358,13 +362,14 @@ struct theSM
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
         //#warning shall we set s_can_cbkonrx_fatalerror ??  we cannot do it for EOtheCANservice  
-
+#if defined(USE_ICC_COMM) 
 #if defined(debugNOicc)
 #else            
         // theICCservice
         embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
         embot::app::eth::theICCservice::getInstance().parse();   
         embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())});             
+#endif
 #endif                      
         // can discovery
         EOaction_strg astrg = {0};
@@ -401,7 +406,7 @@ struct theSM
         // EOtheCANservice: set straigth mode and force parsing of all the frames in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
-
+#if defined(USE_ICC_COMM) 
 #if defined(debugNOicc)
 #else        
         // theICCservice
@@ -409,7 +414,7 @@ struct theSM
         embot::app::eth::theICCservice::getInstance().parse();  
         embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_idle, nullptr});                     
 #endif      
-        
+#endif        
         // stop and deactivate all the services which may have been started 
         embot::app::eth::theServices::getInstance().stop();        
     }
@@ -439,7 +444,7 @@ struct theSM
             {
                 embot::app::eth::theETHmonitor::getInstance().tick();
             } break;
-
+#if defined(USE_ICC_COMM) 
             case emsconfigurator_evt_userdef03:
             {
 #if defined(debugNOicc)
@@ -447,7 +452,7 @@ struct theSM
                 embot::app::eth::theICCservice::getInstance().parse();  
 #endif                
             } break;
-            
+#endif            
             default: {} break;                                  
         }
         
@@ -469,11 +474,12 @@ struct theSM
         // it will be the can parser functions which will call the relevant objects which will do what they must.
         // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
         eo_canserv_ParseAll(eo_canserv_GetHandle());    
-
+#if defined(USE_ICC_COMM) 
 #if defined(debugNOicc)
 #else        
         // theICCservice
         embot::app::eth::theICCservice::getInstance().parse();                        
+#endif
 #endif
         
 #if defined(TESTRTC_IS_ACTIVE)     
@@ -499,9 +505,10 @@ struct theSM
         eo_canserv_TXstartAll(eo_canserv_GetHandle(), &txcan1frames, &txcan2frames);    
         eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);        
     }
-    
+
+#if defined(USE_ICC_COMM)     
     // marco.accame on 24 nov 2023
-    // for now we just flush in no blocking mode uisng a dummy callback
+    // for now we just flush in no blocking mode using a dummy callback
     // then we wait using bool flushed() method.
     // BUT: much better to use a callback that releases a semaphore and wait for the
     //      release of it
@@ -540,7 +547,7 @@ struct theSM
         }
 #endif        
     }
-    
+#endif    
     
     static void objectRUN_DO_activity()
     {
@@ -563,7 +570,9 @@ struct theSM
         // in an attempt to reduce the wait time at the end of the TX phase         
 #if defined(CANICCflushMODE_DO_phase)
         flushCANtransmission();
+#if defined(USE_ICC_COMM)         
         flushICCtransmission();
+#endif        
 #endif        
     }   
     
@@ -572,7 +581,9 @@ struct theSM
     {   
 #if !defined(CANICCflushMODE_DO_phase)        
         flushCANtransmission();
+#if defined(USE_ICC_COMM)         
         flushICCtransmission();
+#endif        
 #endif        
     }    
 
@@ -580,9 +591,11 @@ struct theSM
     {
         // it is not necessary to call any Tick() in here.
                 
-        
+
+#if defined(USE_ICC_COMM)         
         // keep it last but one       
         waitICCisflushed();
+#endif
         
         // ABSOLUTELY KEEP IT LAST: 
         // it lock the thread TX until all CAN frame has exited the board
@@ -636,7 +649,8 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
 {
     _config = cfg;   
     _state = State::IDLE;
-    
+
+#if defined(USE_ICC_COMM)     
 #if 0
     marco.accame on 24 nov 2023
     i anticipate in here the init of theICCservice because:
@@ -650,6 +664,7 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
 #if defined(debugNOicc)
 #else    
     embot::app::eth::theICCservice::getInstance().initialise(embot::app::eth::iccmastercfg);    
+#endif
 #endif
     
     embot::app::eth::theETHmonitor::getInstance().initialise(theHandler_theETHmonitor_Config);    
@@ -1104,10 +1119,14 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
     theSM::objectIDLE_on_evt(emsconfigurator_evt_userdef02);
 }
 
+#if defined(USE_ICC_COMM) 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
 {
     theSM::objectIDLE_on_evt(emsconfigurator_evt_userdef03);
 }
+#else
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p) {}
+#endif
 
 #include "EoError.h"
 

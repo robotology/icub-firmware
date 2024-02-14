@@ -73,7 +73,7 @@
         <LExpSel>0</LExpSel>
       </OPTXL>
       <OPTFL>
-        <tvExp>0</tvExp>
+        <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
@@ -1718,7 +1718,7 @@
   </Group>
 
   <Group>
-    <GroupName>eo-eth-protocol</GroupName>
+    <GroupName>eo-rop-protocol</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1846,7 +1846,7 @@
   </Group>
 
   <Group>
-    <GroupName>eo-eth-protocol-amc-callbacks</GroupName>
+    <GroupName>eo-rop-protocol-callbacks</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1858,7 +1858,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\protocol\EoProtocolMN_fun_amc.c</PathWithFileName>
+      <PathWithFileName>..\cfg\protocol\rop\EoProtocolMN_fun_amc.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolMN_fun_amc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1870,7 +1870,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\protocol\EoProtocolMC_fun_amc.c</PathWithFileName>
+      <PathWithFileName>..\cfg\protocol\rop\EoProtocolMC_fun_amc.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolMC_fun_amc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1882,7 +1882,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\protocol\EoProtocolAS_fun_amc.c</PathWithFileName>
+      <PathWithFileName>..\cfg\protocol\rop\EoProtocolAS_fun_amc.c</PathWithFileName>
       <FilenameWithoutPath>EoProtocolAS_fun_amc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1951,7 +1951,7 @@
 
   <Group>
     <GroupName>eo-can-mapping+protocol+service</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1994,8 +1994,8 @@
   </Group>
 
   <Group>
-    <GroupName>eo-can-protocol-amc-callbacks</GroupName>
-    <tvExp>1</tvExp>
+    <GroupName>eo-can-protocol-callbacks</GroupName>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2327,7 +2327,7 @@
 
   <Group>
     <GroupName>embot::app::eth::theServiceMC</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2547,7 +2547,7 @@
 
   <Group>
     <GroupName>mbd::kalman-filter</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2579,7 +2579,7 @@
 
   <Group>
     <GroupName>mbd::wrist-decoupler</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2682,8 +2682,8 @@
   </Group>
 
   <Group>
-    <GroupName>icc-amc-callbacks</GroupName>
-    <tvExp>1</tvExp>
+    <GroupName>icc-callbacks</GroupName>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

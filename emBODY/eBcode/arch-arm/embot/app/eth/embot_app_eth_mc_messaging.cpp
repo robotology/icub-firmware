@@ -25,12 +25,9 @@
 #include "EOtheCANprotocol.h"
 #include "EOtheCANprotocol_functions.h" 
 
-#if defined(STM32HAL_BOARD_AMC) || defined(STM32HAL_BOARD_AMCFOCM7)
-#define USE_ICC
-#endif
 
 #include "EOtheCANservice.h"
-#if defined(USE_ICC) 
+#if defined(USE_ICC_COMM) 
 #include "embot_app_eth_theICCservice.h"
 #endif
 
@@ -114,7 +111,7 @@ namespace embot::app::eth::mc::messaging::sender {
             }
             else if(true == des.isICC())
             {   
-                // marco.accame on 13feb2023: we need to use a eObrd_canlocation_t also for ICC because
+                // marco.accame on 13feb2024: we need to use a eObrd_canlocation_t also for ICC because
                 // we use the same former as for CAN. 
                 // clearly the .port field has no meaning but it is not used, so i can safely use any value for it                 
                 canloc.port = eOcanport1; // or also: (embot::msg::BUS::icc1 == des.getbus()) ? eOcanport1 : eOcanport2;   
@@ -419,7 +416,7 @@ namespace embot::app::eth::mc::messaging::sender {
         //#warning TODO: fill embot::app::eth::mc::messaging::sender::Command::tx2icc() which adds a frame in the ICC queue
         // embot::core::print(frame.to_string());
 //        #warning TODO: solve the use of theICCservice by ems etc
-#if defined(USE_ICC)
+#if defined(USE_ICC_COMM)
 #if defined(debugNOicc)
 #else        
         embot::app::eth::theICCservice::getInstance().put({des, frame});
@@ -431,6 +428,7 @@ namespace embot::app::eth::mc::messaging::sender {
 } // namespace embot::app::eth::mc::messaging::sender {
 
 
+#warning IMPORTANT this file behaves differently because now the agent for embot::prot::can::Frame is not called and in devel it is. does the amc-v1 use it???
 
 namespace embot::app::eth::mc::messaging::receiver {
     

@@ -244,7 +244,7 @@ namespace embot::prot::can {
     
     
     
-    } // namespace embot::prot::can {
+} // namespace embot::prot::can {
 
 
 

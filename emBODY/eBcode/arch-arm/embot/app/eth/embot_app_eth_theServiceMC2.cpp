@@ -581,7 +581,6 @@ bool embot::app::eth::theServiceMC::process(const DescriptorFrame &framedescript
     return pImpl->process(framedescriptor);
 }
 
-
 bool embot::app::eth::theServiceMC::process(const DescriptorROP &ropdescriptor)
 {
     return pImpl->process(ropdescriptor);

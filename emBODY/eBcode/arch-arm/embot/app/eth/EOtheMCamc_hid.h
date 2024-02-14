@@ -43,10 +43,7 @@
 typedef struct
 {
     EOconstarray*                           jomodescriptors; // points to the jomodescriptor inside EOtheMotionController_hid::service::servconfig etc. 
-    EOconstarray*                           advjomodescriptors; // point to the eOmc_arrayof_4advjomodescriptors_t inside ....
     MController*                            thecontroller;
-    std::vector<eObrd_info_t>               canboards;
-    std::vector<eObrd_info_t>               iccboards;
 } eOmotioncontroller_objs_t;
 
 
@@ -62,7 +59,7 @@ struct EOtheMotionController_hid
     
     uint8_t                                 numofjomos;    
     eOmotioncontroller_objs_t               ctrlobjs;             
-    EOarray*                                id32ofregulars;   
+    EOarray*                                id32ofregulars;
 }; 
 
 

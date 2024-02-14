@@ -868,11 +868,13 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             {  
                 if(true == ACT_TYPE_2FOC_uses_foc_actuator_descriptor_generic)
                 {
+                    // marco.accame: which for now is the case only of (eomn_serv_MC_advfoc == brd_cfg->type)
                     o->motor[k].motorlocation = jomodes->actuator.gen.location;    
                 }    
                 else  
-                {    
-                    o->motor[k].motorlocation.bus = (jomodes->actuator.foc.canloc.port == 0) ? eobus_can1 : eobus_can2;
+                {
+                    // marco.accame: which for now is the case of (eomn_serv_MC_foc == brd_cfg->type)     
+                    o->motor[k].motorlocation.bus = (jomodes->actuator.foc.canloc.port == eOcanport1) ? eobus_can1 : eobus_can2;
                     o->motor[k].motorlocation.adr = jomodes->actuator.foc.canloc.addr;
                 }    
             

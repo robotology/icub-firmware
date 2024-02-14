@@ -125,10 +125,10 @@ typedef struct //HardStopCalibData
 
 struct Motor_hid
 {
-    // the location of the hw actuator. it can hold: 
+    // the location of the hw actuator that host the motor. it can hold: 
     // - a can location in case of actuators on the CAN bus (foc / amcbldc boards)
-    // - an eth location in case of actuator(s) on the same board (mc4plus, second core, ...)
-    //eObrd_location_t mlocation;
+    // - a local location in case of actuator(s) on the same board (mc4plus)
+    // - an icc location in case of actuators on the second core
     eOlocation_t motorlocation;
     
     // it tells what type of hw actuation controls the motor: 

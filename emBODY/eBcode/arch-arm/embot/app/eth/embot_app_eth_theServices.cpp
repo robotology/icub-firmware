@@ -28,8 +28,11 @@
 #include "embot_app_eth_theErrorManager.h"
 #include "embot_os_theScheduler.h"
 
+#if defined(USE_ICC_COMM) 
 #include "embot_app_eth_theICCservice.h"
 #include "embot_app_eth_theICCmapping.h"
+#endif
+
 #include "EOtheCANprotocol.h"
 #include "embot_app_eth_Service_impl.h"
 
@@ -84,8 +87,10 @@ struct embot::app::eth::theServices::Impl
     // static
     static void onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok);
     static void onendverifyactivate2(Service *s, bool ok);
-    
+
+#if defined(USE_ICC_COMM)     
     static bool iccitemparser(const embot::app::eth::theICCservice::Item &item);
+#endif    
 
 };
 
@@ -138,12 +143,13 @@ static void s_can_cbkonrx(void *arg)
     eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
 }
 
+#if defined(USE_ICC_COMM) 
 static void s_icc_cbkonrx(void *arg)
 {
     EOMtask *task = (EOMtask *)arg;
     eom_task_isrSetEvent(task, emsconfigurator_evt_userdef03);
 }
-
+#endif
 
 #include "EOtheCANdiscovery2.h"
 
@@ -250,7 +256,8 @@ void embot::app::eth::theServices::Impl::init_step2()
         
     // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
     eo_canserv_Initialise(&config);   
-        
+
+#if defined(USE_ICC_COMM)         
     // initialisation just loads the basic ICC receiver agents 
     // it is for instance the serviceMC that loads its own agent for the MC messages
     embot::app::eth::theICCmapping::getInstance().initialise({});
@@ -260,7 +267,7 @@ void embot::app::eth::theServices::Impl::init_step2()
     embot::core::Callback oniccRX {s_icc_cbkonrx, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle())};
 #if 0 
     marco.accame on 24 nov 2023: i cannot init so late in the execution.
-    because if the otehr core start to tx then this core never receive anything ever.
+    because if the other core start to tx then this core never receive anything ever.
     so: 
     1. very early we init the theICCservice w/ dummy callback on rx and parser
     2. in here we just configure those two correctly
@@ -283,6 +290,8 @@ void embot::app::eth::theServices::Impl::init_step2()
     embot::app::eth::theICCservice::getInstance().set(oniccRX); 
     embot::app::eth::theICCservice::getInstance().set(iccitemparser);     
 #endif        
+
+#endif // #if defined(USE_ICC_COMM)
             
     // can-discovery
     eo_candiscovery2_Initialise(NULL);  
@@ -797,10 +806,10 @@ void embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const e
 
     embot::app::eth::theHandler::getInstance().transmit(ropdesc);
         
-    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate()", thr}, {}, ok ? "ok": "false");
+//    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate()", thr}, {}, ok ? "ok": "false");
 }
 
-// the signature of this funtion is teh same as embot::app::eth::Service::OnEndOfOperation
+// the signature of this funtion is the same as embot::app::eth::Service::OnEndOfOperation
 
 void embot::app::eth::theServices::Impl::onendverifyactivate2(Service *s, bool ok)
 {
@@ -845,9 +854,10 @@ void embot::app::eth::theServices::Impl::onendverifyactivate2(Service *s, bool o
 
     embot::app::eth::theHandler::getInstance().transmit(ropdesc);
         
-    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate2()", thr}, {}, ok ? "ok": "false");
+//    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate2()", thr}, {}, ok ? "ok": "false");
 }
 
+#if defined(USE_ICC_COMM) 
 bool embot::app::eth::theServices::Impl::iccitemparser(const embot::app::eth::theICCservice::Item &item)
 {   
     // now we just ask to the MC service
@@ -855,7 +865,7 @@ bool embot::app::eth::theServices::Impl::iccitemparser(const embot::app::eth::th
     // and we do not call that anymore....
 //    return embot::app::eth::mc::messaging::receiver::parse(item.des.bus, item.frame);
 }
-
+#endif // #if defined(USE_ICC_COMM) 
 
 // --------------------------------------------------------------------------------------------------------------------
 
