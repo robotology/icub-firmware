@@ -23,9 +23,8 @@
 
 #include "EOtheCANdiscovery2.h"
 
-#if defined(USE_EMBOT_theServicesFT)  
 #include "embot_app_eth_theFTservice.h"
-#endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -137,7 +136,6 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES(eOcanpro
 // this function receives the full scale of a channel and asks object EOtheSTRAIN to take care of it
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanframe_t *frame, eOcanport_t port)
 {
-#if defined(USE_EMBOT_theServicesFT)      
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
@@ -146,7 +144,7 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanfra
     };
     
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
-#endif    
+    
     return(eores_OK);
 }
 

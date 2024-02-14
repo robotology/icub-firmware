@@ -1565,16 +1565,6 @@
             </File>
           </Files>
         </Group>
-        <Group>
-          <GroupName>embot::app::eth::theICCservice</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_app_eth_theICCservice.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
       </Groups>
     </Target>
   </Targets>

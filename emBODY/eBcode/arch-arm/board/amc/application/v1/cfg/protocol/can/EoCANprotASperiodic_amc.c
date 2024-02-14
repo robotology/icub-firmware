@@ -19,9 +19,7 @@
 #include "EoProtocol.h"
 #include "EoProtocolAS.h"
 
-#if defined(USE_EMBOT_theServicesFT)  
 #include "embot_app_eth_theFTservice.h"
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -86,7 +84,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__POS(eOcanframe_t *frame
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE(eOcanframe_t *frame, eOcanport_t port)
 {
-#if defined(USE_EMBOT_theServicesFT)    
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
@@ -95,7 +92,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEB
     };
     
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
-#endif
     
     return(eores_OK);    
 }
@@ -103,7 +99,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEB
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE(eOcanframe_t *frame, eOcanport_t port)
 {
-#if defined(USE_EMBOT_theServicesFT)
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
@@ -112,7 +107,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DE
     };
     
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
-#endif    
+    
     return(eores_OK);    
 }
 
@@ -126,7 +121,6 @@ extern eOresult_t eocanprotASperiodic_former_PER_AS_MSG__FORCE_VECTOR(eOcanprot_
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__FORCE_VECTOR(eOcanframe_t *frame, eOcanport_t port)
 {
-#if defined(USE_EMBOT_theServicesFT)    
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
@@ -135,7 +129,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__FORCE_VECTOR(eOcanframe
     };
     
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
-#endif    
+    
     return(eores_OK);
 }
 
@@ -150,7 +144,6 @@ extern eOresult_t eocanprotASperiodic_former_PER_AS_MSG__TORQUE_VECTOR(eOcanprot
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__TORQUE_VECTOR(eOcanframe_t *frame, eOcanport_t port)
 {
-#if defined(USE_EMBOT_theServicesFT)    
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
@@ -159,7 +152,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__TORQUE_VECTOR(eOcanfram
     };
     
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
-#endif    
+    
     return(eores_OK);
 }
 
@@ -177,7 +170,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14(eOcanframe_t *
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__THERMOMETER_MEASURE(eOcanframe_t *frame, eOcanport_t port)
 {
-#if defined(USE_EMBOT_theServicesFT)  
     embot::app::eth::theFTservice::canFrameDescriptor cfd 
     { 
         port, 
@@ -186,7 +178,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__THERMOMETER_MEASURE(eOc
     };
     
     embot::app::eth::theFTservice::getInstance().AcceptCANframe(cfd);
-#endif    
+    
     
 //    if(eobool_true == eocanprotASperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_THERMOMETER_MSG(frame, port))
 //    {

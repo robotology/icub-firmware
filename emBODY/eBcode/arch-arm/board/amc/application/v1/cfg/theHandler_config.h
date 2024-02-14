@@ -49,10 +49,10 @@ namespace embot { namespace app { namespace eth {
         .sizes = 
         {
             .capacityoftxpacket = theHandler_EOMtheEMSsocket_Config.outdatagramsizeof, //EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, 
-            .capacityofrop = 400,//                EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, was 384
+            .capacityofrop = 384,//                EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, 
             .capacityofropframeregulars = 1024,//   EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY, 
             .capacityofropframeoccasionals = 128, //EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, 
-            .capacityofropframereplies = 400+28, //     EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, was 400
+            .capacityofropframereplies = 400, //     EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY, 
             .maxnumberofregularrops = 32 //      EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS         
         },
         .transprotection = eo_trans_protection_none,

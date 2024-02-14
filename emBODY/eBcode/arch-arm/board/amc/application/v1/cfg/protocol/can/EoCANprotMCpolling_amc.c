@@ -308,17 +308,8 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_MIN_POSITION(eOcanpr
 
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MIN_POSITION(eOcanframe_t *frame, eOcanport_t port)
-{ 
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }
-    
-    return(eores_NOK_generic); 
-    
-//    return(s_parser_POL_MC_CMD_getposition(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION));
+{       
+    return(s_parser_POL_MC_CMD_getposition(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_MIN_POSITION));
 }
 
 
@@ -380,14 +371,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_MOTOR_POS(eOcanp
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MAX_POSITION(eOcanframe_t *frame, eOcanport_t port)
 {  
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);     
-//    return(s_parser_POL_MC_CMD_getposition(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION));    
+    return(s_parser_POL_MC_CMD_getposition(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION));    
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_VELOCITY(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -440,14 +424,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_PID(eOcanprot
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_PID(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);     
-//    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID));
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID));
 }
 
 
@@ -466,14 +443,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_PIDLIMITS(eOc
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_PIDLIMITS(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);  
-//    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS));
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS));
 }
 
 
@@ -491,14 +461,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_POS_PID(eOcanprot_de
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_PID(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);  
-//   return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_PID));
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_PID));
 }
 
 
@@ -516,14 +479,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_POS_PIDLIMITS(eOcanp
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_PIDLIMITS(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);
-//    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS));
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS));
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VEL_TIMEOUT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -555,14 +511,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_IMPEDANCE_PARAMS(eOc
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_PARAMS(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);     
-//    return(s_parser_POL_MC_CMD_getimpedance(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS));
+    return(s_parser_POL_MC_CMD_getimpedance(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_PARAMS));
 }
 
 
@@ -584,14 +533,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_IMPEDANCE_OFFSET(eOc
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_OFFSET(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);  
-//   return(s_parser_POL_MC_CMD_getimpedance(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET));
+    return(s_parser_POL_MC_CMD_getimpedance(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET));
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_FIRMWARE_VERSION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -701,25 +643,18 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOca
 
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOcanframe_t *frame, eOcanport_t port)
-{
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);   
-//    eOmc_joint_t *joint = NULL;
-//    
-//    if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, NULL)))
-//    {
-//        return(eores_OK);        
-//    }
-//  
-//    //it is: joint->status.ofpid.openloop.refolo = *((int16_t*)&frame->data[1]);  
-//    joint->status.target.trgt_pwm = *((int16_t*)&frame->data[1]);
-//  
-//    return(eores_OK);    
+{    
+    eOmc_joint_t *joint = NULL;
+    
+    if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, NULL)))
+    {
+        return(eores_OK);        
+    }
+  
+    //it is: joint->status.ofpid.openloop.refolo = *((int16_t*)&frame->data[1]);  
+    joint->status.target.trgt_pwm = *((int16_t*)&frame->data[1]);
+  
+    return(eores_OK);    
 }
 
 
@@ -765,14 +700,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_POS_STICTION_PARAMS(
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);  
-//    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS));
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS));
 }
 
 
@@ -793,14 +721,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_STICTION_PARA
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port)
 {
-    static volatile uint32_t xxx = 0;
-    for(;;)
-    {   // the foc control mode does not use it, but we never know
-        // in case have a look at the way the ems implements that
-        xxx = 0;
-    }    
-    return(eores_NOK_generic);  
-//    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS));
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS));
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
