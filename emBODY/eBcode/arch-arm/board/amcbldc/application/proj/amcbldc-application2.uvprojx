@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>5</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -340,7 +340,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DEMBOT_AMCBLDC_APP05</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V122</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\src\model-based-design\sharedutils;..\src\model-based-design\can-decoder;..\src\model-based-design\can-raw2struct;..\src\model-based-design\supervisor-rx;..\src\model-based-design\supervisor-tx;..\src\model-based-design\can-encoder;..\src\model-based-design\control-outer;..\src\model-based-design\control-foc;..\src\model-based-design\estimator;..\src\model-based-design\amc-bldc;..\src\model-based-design\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc;..\src\model-based-design\thermal-model</IncludePath>
+              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-raw2struct;..\..\..\..\mbd\amcbldc\supervisor-rx;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -903,6 +903,75 @@
         </Group>
         <Group>
           <GroupName>others-cmsis-math</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>0</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>0</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>0</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <uGnu>2</uGnu>
+                <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>2</vShortEn>
+                <vShortWch>2</vShortWch>
+                <v6Lto>2</v6Lto>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <ClangAsOpt>0</ClangAsOpt>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
           <Files>
             <File>
               <FileName>arm_cortexM4lf_math.lib</FileName>
@@ -1046,57 +1115,57 @@
             <File>
               <FileName>const_params.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\const_params.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\const_params.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_hypotf_snf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf_snf.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_nonfinite.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_nonfinite.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_roundf_snf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_roundf_snf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf_snf.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_roundd_snf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundd_snf.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
               <FileName>rtw_motor_config.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
             </File>
             <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
               <FileName>uMultiWord2Double.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWord2Double.cpp</FilePath>
             </File>
             <File>
               <FileName>uMultiWordShl.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWordShl.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1106,7 +1175,7 @@
             <File>
               <FileName>can_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\can-encoder\can_encoder.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1116,7 +1185,7 @@
             <File>
               <FileName>can_decoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-decoder\can_decoder.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\can-decoder\can_decoder.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1126,12 +1195,12 @@
             <File>
               <FileName>SupervisorFSM_RX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX_data.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1141,7 +1210,7 @@
             <File>
               <FileName>SupervisorFSM_TX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1151,7 +1220,7 @@
             <File>
               <FileName>control_outer.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1230,17 +1299,17 @@
             <File>
               <FileName>control_foc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\control-foc\control_foc.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\control_foc.cpp</FilePath>
             </File>
             <File>
               <FileName>FOCInnerLoop.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\control-foc\FOCInnerLoop.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\FOCInnerLoop.cpp</FilePath>
             </File>
             <File>
               <FileName>control_foc_data.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\control-foc\control_foc_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\control_foc_data.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1250,7 +1319,7 @@
             <File>
               <FileName>estimation_velocity.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\estimator\estimation_velocity.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\estimator\estimation_velocity.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1260,7 +1329,7 @@
             <File>
               <FileName>filter_current.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\filter-current\filter_current.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\filter-current\filter_current.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1270,22 +1339,7 @@
             <File>
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\amc-bldc\AMC_BLDC.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>mbd::thermal-model</GroupName>
-          <Files>
-            <File>
-              <FileName>thermal_model.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>thermal_model_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\thermal-model\thermal_model_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\amc-bldc\AMC_BLDC.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2403,57 +2457,57 @@
             <File>
               <FileName>const_params.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\const_params.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\const_params.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_hypotf_snf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf_snf.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_nonfinite.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_nonfinite.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetInf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetInf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtGetInf.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_roundf_snf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_roundf_snf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf_snf.cpp</FilePath>
             </File>
             <File>
               <FileName>rt_roundd_snf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundd_snf.cpp</FilePath>
             </File>
             <File>
               <FileName>rtGetNaN.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtGetNaN.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtGetNaN.cpp</FilePath>
             </File>
             <File>
               <FileName>rtw_motor_config.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_motor_config.c</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
             </File>
             <File>
               <FileName>rtw_enable_disable_motors.c</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
               <FileName>uMultiWord2Double.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWord2Double.cpp</FilePath>
             </File>
             <File>
               <FileName>uMultiWordShl.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWordShl.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2463,7 +2517,7 @@
             <File>
               <FileName>can_encoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-encoder\can_encoder.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\can-encoder\can_encoder.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2473,7 +2527,7 @@
             <File>
               <FileName>can_decoder.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\can-decoder\can_decoder.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\can-decoder\can_decoder.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2483,12 +2537,12 @@
             <File>
               <FileName>SupervisorFSM_RX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
             </File>
             <File>
               <FileName>SupervisorFSM_RX_data.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2498,7 +2552,7 @@
             <File>
               <FileName>SupervisorFSM_TX.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-tx\SupervisorFSM_TX.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2508,7 +2562,7 @@
             <File>
               <FileName>control_outer.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2518,17 +2572,17 @@
             <File>
               <FileName>control_foc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\control-foc\control_foc.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\control_foc.cpp</FilePath>
             </File>
             <File>
               <FileName>FOCInnerLoop.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\control-foc\FOCInnerLoop.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\FOCInnerLoop.cpp</FilePath>
             </File>
             <File>
               <FileName>control_foc_data.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\control-foc\control_foc_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\control_foc_data.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2538,7 +2592,7 @@
             <File>
               <FileName>estimation_velocity.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\estimator\estimation_velocity.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\estimator\estimation_velocity.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2548,7 +2602,7 @@
             <File>
               <FileName>filter_current.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\filter-current\filter_current.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\filter-current\filter_current.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2558,22 +2612,7 @@
             <File>
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\amc-bldc\AMC_BLDC.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>mbd::thermal-model</GroupName>
-          <Files>
-            <File>
-              <FileName>thermal_model.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\thermal-model\thermal_model.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>thermal_model_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\model-based-design\thermal-model\thermal_model_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\amc-bldc\AMC_BLDC.cpp</FilePath>
             </File>
           </Files>
         </Group>

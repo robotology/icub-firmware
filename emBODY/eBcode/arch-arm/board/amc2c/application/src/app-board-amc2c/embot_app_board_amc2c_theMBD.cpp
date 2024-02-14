@@ -419,7 +419,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
     // in here... 
     // inpframes.size() is always <= 4.
     // outputframes.size() is always = 0
-    embot::hw::testpoint::on(tp1);
+    //embot::hw::testpoint::on(tp1);
 
     measureTick->start();
     
@@ -501,7 +501,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::prot:
     
     measureTick->stop();
     
-    embot::hw::testpoint::off(tp1);
+    //embot::hw::testpoint::off(tp1);
     return true;
 }
 
