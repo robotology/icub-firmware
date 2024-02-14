@@ -918,7 +918,17 @@ void JointSet_do_pwm_control(JointSet* o)
             }
             else
             {
-                o->control_mode = eomc_controlmode_notConfigured;
+                if ( o->wristMK2.warmup)
+                {
+                    o->control_mode = eomc_controlmode_notConfigured;
+                }
+                
+                o->wristMK2.watchdog = 10000;
+                
+                Trajectory_start2end(o->wristMK2.prk_trajectory,   (o->joint[0]).pos_fbk, ZERO, DEG2ICUB*30.0f);
+                Trajectory_start2end(o->wristMK2.prk_trajectory+1, (o->joint[1]).pos_fbk, ZERO, DEG2ICUB*30.0f);
+                Trajectory_start2end(o->wristMK2.prk_trajectory+2, (o->joint[2]).pos_fbk, ZERO, DEG2ICUB*30.0f);
+                
                 static char msg[] = "*** CAN'T EXIT SINGULARITY ***";
                 JointSet_send_debug_message(msg, 0, 0, 0);
             }
