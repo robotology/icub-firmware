@@ -49,7 +49,11 @@ void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 0;
   htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-  htim1.Init.Period = 1023;
+  // htim1.Init.Period = 1023; // 1023 because: ... (168M/2/1024) makes the PWM frequency = 82031.25 Hz 
+  // that makes a period Tpwm = 1.219047619047619e-5 that makes a Tfoc = 3*Tpwm =  3.657 us   
+  htim1.Init.Period = 1259; // if we want Fpwm = 66666.66 Hz (66.6 kHz) w/ a Tpwm = 15 us,...
+  // we need (period+1) = 15 * 84 = 1260 -> Period = 1259
+  // so, apart a -1 we have a factor = 1260/1024 = 1.23046875 VERY IMPORTANT NUMBER .......
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -60,7 +64,9 @@ void MX_TIM1_Init(void)
   HAL_TIMEx_DitheringEnable(&htim1);
 
   /* rewrite ARR register when dither mode active */
-  __HAL_TIM_SET_AUTORELOAD(&htim1, 16383);
+  //__HAL_TIM_SET_AUTORELOAD(&htim1, 16383);    // 16383 is ((htim1.Init.Period+1)*16 - 1)
+  __HAL_TIM_SET_AUTORELOAD(&htim1, ((1259+1)*16-1));  // so ... in here we write ... 
+  // that is also = 16K * factor - 1 = 20159
   HAL_TIM_GenerateEvent(&htim1, TIM_EVENTSOURCE_UPDATE);
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
@@ -104,7 +110,7 @@ void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 13311;
+  sConfigOC.Pulse = 16378; // = 13311*factor;
   if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_6) != HAL_OK)
   {
     Error_Handler();

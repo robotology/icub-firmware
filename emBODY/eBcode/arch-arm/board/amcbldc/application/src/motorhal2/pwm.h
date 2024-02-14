@@ -35,7 +35,9 @@
 
 // dithering -> max 2^14, ma un po meno 
 // se si usasse il modo no-dithering -> 2^10 (4 bit in meno)
-#define MAX_PWM		(16383U)
+//#define MAX_PWM		(16383U)
+// instead of 16K-1 we use: 16K * factor - 1 = 20159
+#define MAX_PWM		(20159U)
 
 #define PWM_CONF_MODE_HALL      (0x0001UL)
 #define PWM_CONF_MODE_ENCODER   (0x0002UL)
