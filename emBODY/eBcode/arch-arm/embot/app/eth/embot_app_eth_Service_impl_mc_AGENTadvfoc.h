@@ -87,7 +87,7 @@ protected:
     - 01: encoders -> it triggers verify_step01_onENDof_verifyencoders()
     - 02: presence of icc located boards -> it triggers verify_step02_onENDof_iccdiscovery()
     - 03: presence of can boards -> it triggers verify_step03_onENDof_candiscovery() 
-        if both steps are ok then p2core->state gets ::verified, and if triggeractivate is true then it is executed activate()        
+        if all steps are ok then p2core->state gets ::verified, and if triggeractivate is true then it is executed activate()        
 #endif
         
     
@@ -95,6 +95,9 @@ protected:
     static void verify_step01_onENDof_verifyencoders(void *tHIS, bool operationisok);
     static void verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok);
     static eOresult_t verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANdiscovery2* cd2, eObool_t searchisok);
+        
+        
+    bool iccdiscovery();
 }; 
 
 } // namespace embot::app::eth::service::impl::mc { 

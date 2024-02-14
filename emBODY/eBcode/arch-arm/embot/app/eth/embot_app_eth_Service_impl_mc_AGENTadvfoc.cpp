@@ -400,7 +400,10 @@ void AGENTadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operatio
     if(true == ICCdiscovery)
     {
         // nothing for now: i just call the verify_step02_onENDof_iccdiscovery w/ good params        
-        verify_step02_onENDof_iccdiscovery(tHIS, true);
+//        verify_step02_onENDof_iccdiscovery(tHIS, true);
+        
+        bool iicdiscoveryOK = mcadvfoc->iccdiscovery();
+        verify_step02_onENDof_iccdiscovery(tHIS, iicdiscoveryOK);
     }
     else
     {
@@ -424,7 +427,7 @@ void AGENTadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok
 
         // 2. diagnostics
         embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::error};
-        eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_foc_failed_encoders_verify)};      
+        eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_foc_failed_candiscovery_of_foc)};      
         mcadvfoc->emit(s, errorcode);
         
         // 3. on verify
@@ -500,6 +503,55 @@ eOresult_t AGENTadvfoc::verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANd
     }
                 
     return r;
+}
+
+#include "eEsharedServices.h" 
+
+// but much better to define a new struct w/ board name etc plus adr and map it in another fixed position ...
+// also: verify what happens when the icc1 address is wrong ...
+// also: add working diagnostics
+
+bool AGENTadvfoc::iccdiscovery()
+{
+    bool r {false};
+    
+    if(false == iccactuators.empty())
+    {
+        size_t s = iccactuators.size();
+        for(size_t i=0; i<s; i++)
+        {
+            const auto &item = iccactuators[i];
+            const eOlocation_t location = item.actua.location;
+            eObrd_info_t target = item.actua.board;
+            
+            if(0 == (target.firmware.major + target.firmware.minor + target.firmware.build + target.protocol.major + target.protocol.minor))
+            {
+                r =  true;
+            }
+            else
+            {    
+                // i must retrieve the board info on the other core
+                eObrd_info_t detected {};
+                // i will not use ICC and getfirmwareversion. rather i will read the eEmoduleExtendedInfo_t struct mapped at 0x08100400
+                // which however has only firmware.major and firmware.minor, so i trick a bit                     
+                std::memmove(&detected, &target, sizeof(detected));
+                volatile const eEmoduleExtendedInfo_t * const modinfo = (volatile const eEmoduleExtendedInfo_t * const)(0x08100400);
+                detected.firmware.major = modinfo->moduleinfo.info.entity.version.major;
+                detected.firmware.minor = modinfo->moduleinfo.info.entity.version.minor;
+
+                r = ( (detected.firmware.major == target.firmware.major) && (detected.firmware.minor == target.firmware.minor) );
+            }
+            
+            if(false == r)
+            {
+                break;
+            }
+            
+        }
+        
+    }
+    
+    return r;    
 }
     
 
