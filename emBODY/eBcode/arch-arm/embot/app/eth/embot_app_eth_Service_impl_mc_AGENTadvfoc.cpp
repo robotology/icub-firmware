@@ -5,7 +5,7 @@
  * email:   marco.accame@iit.it
 */
 
-#include "embot_app_eth_Service_impl_mc_ADVFOC.h"
+#include "embot_app_eth_Service_impl_mc_AGENTadvfoc.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ namespace embot::app::eth::service::impl::mc {
 
 
 
-void mcOBJadvfoc::initialise(embot::app::eth::service::impl::Core *c)
+void AGENTadvfoc::initialise(embot::app::eth::service::impl::Core *c)
 {
     p2core = c;
     
@@ -45,25 +45,25 @@ void mcOBJadvfoc::initialise(embot::app::eth::service::impl::Core *c)
     // and now i init several things related to legacy foc mode
     std::memset(&focservconfig, 0, sizeof(eOmn_serv_configuration_t));
     focservconfig.type = eomn_serv_MC_advfoc;
-    eOmn_serv_config_data_mc_foc_t *foc = &focservconfig.data.mc.foc_based;
+    foc = &focservconfig.data.mc.foc_based;
     focjomodescriptors = eo_array_New(4, sizeof(eOmc_jomo_descriptor_t), &foc->arrayofjomodescriptors);    
     
     clear();        
 }
 
-void mcOBJadvfoc::emit(embot::app::eth::theErrorManager::Severity s, eOerror_code_t errorcode)
+void AGENTadvfoc::emit(embot::app::eth::theErrorManager::Severity s, eOerror_code_t errorcode)
 {
     desc.code = errorcode;
-    embot::app::eth::theErrorManager::Caller cllr {"mcOBJadvfoc", embot::os::theScheduler::getInstance().scheduled()};
+    embot::app::eth::theErrorManager::Caller cllr {"AGENTadvfoc", embot::os::theScheduler::getInstance().scheduled()};
     embot::app::eth::theErrorManager::getInstance().emit(s, cllr, desc, "");
 }  
 
-embot::app::eth::Service::Type mcOBJadvfoc::type() const
+embot::app::eth::Service::Type AGENTadvfoc::type() const
 { 
-    return embot::app::eth::Service::Type::MC_foc; 
+    return embot::app::eth::Service::Type::MC_advfoc; 
 }
 
-bool mcOBJadvfoc::clear()
+bool AGENTadvfoc::clear()
 {
     bool r {true};
     
@@ -85,13 +85,13 @@ bool mcOBJadvfoc::clear()
     return r;
 }
    
-void mcOBJadvfoc::synch(embot::app::eth::Service::State s)
+void AGENTadvfoc::synch(embot::app::eth::Service::State s)
 {
     p2core->state(s);
     embot::app::eth::theServices::getInstance().synch(embot::app::eth::Service::Category::mc, s);     
 }
 
-bool mcOBJadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configuration_t *sc)
+bool AGENTadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configuration_t *sc)
 {
     bool r {true};
     
@@ -125,20 +125,26 @@ bool mcOBJadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configura
     {
         const eOmc_adv_jomo_descriptor_t *advjomodes = reinterpret_cast<const eOmc_adv_jomo_descriptor_t*>(eo_constarray_At(advjomodescriptors, i));
 
-//        // every advjomodes->actuator.type must be eomc_act_foc
-//        if(eomc_act_foc != advjomodes->actuator.type)
+//        // every advjomodes->actuator.type must be eomc_act_advfoc
+//        if(eomc_act_advfoc != advjomodes->actuator.type)
 //        {
 //            break;
 //        }
              
+        // eObus_t 
+        uint8_t b = advjomodes->actuator.location.bus;
         // actuators: i need the icc and the can based on a separate container 
-        if((eobus_icc1 == advjomodes->actuator.location.bus) || (eobus_icc2 == advjomodes->actuator.location.bus))
+        if((eobus_icc1 == b) || (eobus_icc2 == b))
         {
             iccactuators.push_back({i, advjomodes->actuator});
         }
-        else if((eobus_can1 == advjomodes->actuator.location.bus) || (eobus_can2 == advjomodes->actuator.location.bus))
+        else if((eobus_can1 == b) || (eobus_can2 == b))
         {
             canactuators.push_back({i, advjomodes->actuator});
+        }
+        else
+        {
+            break;
         }
         
         // i fill focjomodescriptors for the encoderreader and mcontroller
@@ -183,7 +189,7 @@ bool mcOBJadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configura
         eo_array_PushBack(cantools.discoverytargets, &trgt);
 
         // then i assign the params of end of discovery: tha callback and it argument 
-        cantools.ondiscoverystop.function = mcOBJadvfoc::verify_step03_onENDof_candiscovery;
+        cantools.ondiscoverystop.function = AGENTadvfoc::verify_step03_onENDof_candiscovery;
         cantools.ondiscoverystop.parameter = this;
     }
     
@@ -193,13 +199,13 @@ bool mcOBJadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configura
 }
 
 
-size_t mcOBJadvfoc::numberofjomos() const
+size_t AGENTadvfoc::numberofjomos() const
 {
    return numofjomos; 
 }
 
 
-bool mcOBJadvfoc::verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate)
+bool AGENTadvfoc::verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate)
 {
     bool r {true};
     
@@ -216,19 +222,31 @@ bool mcOBJadvfoc::verify(embot::app::eth::Service::OnEndOfOperation onend, bool 
     
 }
 
-bool mcOBJadvfoc::deactivate()
+bool AGENTadvfoc::deactivate()
 {
     bool r {true};
     
     eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, cantools.entitydescriptor); 
     eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, cantools.entitydescriptor); 
+    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), cantools.boardproperties);  
     
           
     // we should make sure that embot::app::eth::theICCservices unloads its entities
-    #warning TODO: much better doing embot::app::eth::theICCmapping::getInstance().clear(motors && joints);
-    embot::app::eth::theICCmapping::getInstance().clear();
+//    #warning TODO: much better doing embot::app::eth::theICCmapping::getInstance().clear(motors && joints);
+//    embot::app::eth::theICCmapping::getInstance().clear();
     
-    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), cantools.boardproperties); 
+    if(false == iccactuators.empty())
+    {
+        for(uint8_t i=0; i<iccactuators.size(); i++)
+        {        
+            // this location is icc then ... we should tell object embot::app::eth::theICCmapping
+            // that this location is associated to the i-th eoprot_entity_mc_motor / joint entity
+            eOlocation_t location = iccactuators[i].actua.location;
+            uint8_t index = iccactuators[i].index;
+            embot::app::eth::theICCmapping::getInstance().clear({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, index});
+            embot::app::eth::theICCmapping::getInstance().clear({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, index});
+        }        
+    }
     
     embot::app::eth::theEncoderReader::getInstance().Deactivate();
     
@@ -262,7 +280,7 @@ bool mcOBJadvfoc::deactivate()
     return r;           
 }
 
-bool mcOBJadvfoc::activate()
+bool AGENTadvfoc::activate()
 {
     bool r {true};
     
@@ -310,12 +328,12 @@ bool mcOBJadvfoc::activate()
     // load the icc mapping of boards and of entities, if any icc board
     if(false == iccactuators.empty())
     {
-        for(uint8_t i=0; i<canactuators.size(); i++)
+        for(uint8_t i=0; i<iccactuators.size(); i++)
         {        
             // this location is icc then ... we should tell object embot::app::eth::theICCmapping
             // that this location is associated to the i-th eoprot_entity_mc_motor / joint entity
-            eOlocation_t location = canactuators[i].actua.location;
-            uint8_t index = canactuators[i].index;
+            eOlocation_t location = iccactuators[i].actua.location;
+            uint8_t index = iccactuators[i].index;
             embot::app::eth::theICCmapping::getInstance().load({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, index});
             embot::app::eth::theICCmapping::getInstance().load({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, index});
         }        
@@ -335,11 +353,23 @@ bool mcOBJadvfoc::activate()
 
     return r;                
 }
-    
+  
+bool AGENTadvfoc::stop()
+{
+    // nothing is required 
+    return true;        
+}
 
-void mcOBJadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operationisok)
+
+bool AGENTadvfoc::start()
+{
+    // nothing is required 
+    return true;        
+}
+
+void AGENTadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operationisok)
 {  
-    mcOBJadvfoc *mcadvfoc = reinterpret_cast<mcOBJadvfoc*>(tHIS);  
+    AGENTadvfoc *mcadvfoc = reinterpret_cast<AGENTadvfoc*>(tHIS);  
 
     if(false == operationisok)
     {
@@ -381,9 +411,9 @@ void mcOBJadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operatio
     return;
 }  
 
-void mcOBJadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok)
+void AGENTadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok)
 {
-    mcOBJadvfoc *mcadvfoc = reinterpret_cast<mcOBJadvfoc*>(tHIS);  
+    AGENTadvfoc *mcadvfoc = reinterpret_cast<AGENTadvfoc*>(tHIS);  
 
     if(false == searchisok)
     {
@@ -425,11 +455,11 @@ void mcOBJadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok
     
 }
 
-eOresult_t mcOBJadvfoc::verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANdiscovery2* cd2, eObool_t searchisok)
+eOresult_t AGENTadvfoc::verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANdiscovery2* cd2, eObool_t searchisok)
 {
     eOresult_t r {eores_OK}; // always OK is fine as well, as nobody checks it    
     
-    mcOBJadvfoc *mcadvfoc = reinterpret_cast<mcOBJadvfoc*>(tHIS);
+    AGENTadvfoc *mcadvfoc = reinterpret_cast<AGENTadvfoc*>(tHIS);
 
     // it is the final step, so: i get the params ...
     

@@ -1,9 +1,9 @@
 
 
 /*
- * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Simone Girardi
- * email:   simone.girardi@iit.it
+ * Copyright (C) 2023 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ namespace embot::app::eth {
     
         struct Item
         {
-            embot::app::eth::mc::messaging::Location des {};
+            embot::msg::Location des {};
             embot::prot::can::Frame frame {};
             constexpr Item() = default;
         };

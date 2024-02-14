@@ -88,6 +88,8 @@ struct embot::app::eth::theEncoderReader::Impl
     bool _initted {false};
     bool _actived {false};
     
+    bool activateafterverify {true};
+    embot::core::Confirmer onverifycompleted {};
     eOservice_core_t service {dummy_service_core};
     eOservice_diagnostics_t diagnostics {dummy_service_diagnostics};
     
@@ -170,23 +172,20 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     return true;
 }
 
-bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool activateafterverify, const embot::core::Confirmer &oncompletion)
-{ 
-   
-    
+bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool ActivateafterverifY, const embot::core::Confirmer &oncompletion)
+{    
     service.state = eomn_serv_state_verifying;
-    //synchservice(service.state);
 
     // make sure the timer is not running
     eo_timer_Stop(diagnostics.reportTimer);  
+        
+    activateafterverify = ActivateafterverifY;
+    onverifycompleted = oncompletion;
     
-    service.onverify = nullptr; // onverify.callback;
-    service.onverifyarg = nullptr; // onverify.param;
-    service.activateafterverify = activateafterverify;
-    
-    #warning ahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh. we dont verify ??? are we insane?
+//    #warning acemor-says: embot::app::eth::theEncoderReader should be revised. for now it does NOT verify encoders ...
 
 #if 0 
+    READ this:
     we should enhance this object w/   
     - a proper verify and activate
     - internal data structure as in namespace embot::app::eth::service::impl
@@ -197,8 +196,10 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     
     // we dont check and we just assume that everything is all right.
     // 1. we activate
-    // 2. we send a nice disgnostic message 
+    // 2. we send a nice diagnostic message 
     // 3. ...
+    
+    constexpr bool verificationisOK {true};
     
     if(true == activateafterverify)
     {
@@ -223,10 +224,8 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 //        eo_timer_Start(diagnostics.reportTimer, eok_abstimeNOW, diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
 //    }
          
-    if(nullptr != service.onverify)
-    {
-        service.onverify(service.onverifyarg, eobool_true); 
-    }    
+    
+    onverifycompleted.execute(verificationisOK);  
     
     return true;  
 }

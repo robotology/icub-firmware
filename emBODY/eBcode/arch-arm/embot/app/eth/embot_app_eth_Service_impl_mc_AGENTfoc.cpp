@@ -5,7 +5,7 @@
  * email:   marco.accame@iit.it
 */
 
-#include "embot_app_eth_Service_impl_mc_FOC.h"
+#include "embot_app_eth_Service_impl_mc_AGENTfoc.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -21,14 +21,14 @@
 #include "EOtheEntities.h"
 #include "Controller.h"
 #include "embot_app_eth_theEncoderReader.h"
-#include "embot_app_eth_theICCmapping.h"
+//#include "embot_app_eth_theICCmapping.h"
 #include "embot_app_eth_theServices.h"
 
 namespace embot::app::eth::service::impl::mc {    
 
 
 
-void mcOBJfoc::initialise(embot::app::eth::service::impl::Core *c)
+void AGENTfoc::initialise(embot::app::eth::service::impl::Core *c)
 {
     p2core = c;
     
@@ -40,19 +40,19 @@ void mcOBJfoc::initialise(embot::app::eth::service::impl::Core *c)
     clear();        
 }
 
-void mcOBJfoc::emit(embot::app::eth::theErrorManager::Severity s, eOerror_code_t errorcode)
+void AGENTfoc::emit(embot::app::eth::theErrorManager::Severity s, eOerror_code_t errorcode)
 {
     desc.code = errorcode;
-    embot::app::eth::theErrorManager::Caller cllr {"mcOBJfoc", embot::os::theScheduler::getInstance().scheduled()};
+    embot::app::eth::theErrorManager::Caller cllr {"AGENTfoc", embot::os::theScheduler::getInstance().scheduled()};
     embot::app::eth::theErrorManager::getInstance().emit(s, cllr, desc, "");
 }  
 
-embot::app::eth::Service::Type mcOBJfoc::type() const
+embot::app::eth::Service::Type AGENTfoc::type() const
 { 
     return embot::app::eth::Service::Type::MC_foc; 
 }
 
-bool mcOBJfoc::clear()
+bool AGENTfoc::clear()
 {
     bool r {true};
     
@@ -68,13 +68,13 @@ bool mcOBJfoc::clear()
     return r;
 }
    
-void mcOBJfoc::synch(embot::app::eth::Service::State s)
+void AGENTfoc::synch(embot::app::eth::Service::State s)
 {
     p2core->state(s);
     embot::app::eth::theServices::getInstance().synch(embot::app::eth::Service::Category::mc, s);     
 }
 
-bool mcOBJfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configuration_t *sc)
+bool AGENTfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configuration_t *sc)
 {
     bool r {true};
     
@@ -148,7 +148,7 @@ error            if((eobus_can1 != bus) && (eobus_can2 != bus))
         // i push back only once because i have only one type of board to search for           
         eo_array_PushBack(cantools.discoverytargets, &trgt);
         // then i assign the params of end of discovery: tha callback and it argument 
-        cantools.ondiscoverystop.function = mcOBJfoc::verify_step02_onENDof_candiscovery;
+        cantools.ondiscoverystop.function = AGENTfoc::verify_step02_onENDof_candiscovery;
         cantools.ondiscoverystop.parameter = this;
     }
     
@@ -156,13 +156,13 @@ error            if((eobus_can1 != bus) && (eobus_can2 != bus))
 }
 
 
-size_t mcOBJfoc::numberofjomos() const
+size_t AGENTfoc::numberofjomos() const
 {
    return numofjomos; 
 }
 
 
-bool mcOBJfoc::verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate)
+bool AGENTfoc::verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate)
 {
     bool r {true};
     
@@ -179,7 +179,7 @@ bool mcOBJfoc::verify(embot::app::eth::Service::OnEndOfOperation onend, bool and
     
 }
 
-bool mcOBJfoc::deactivate()
+bool AGENTfoc::deactivate()
 {
     bool r {true};
     
@@ -217,17 +217,14 @@ bool mcOBJfoc::deactivate()
     eo_entities_SetNumOfJoints(eo_entities_GetHandle(), 0);
     eo_entities_SetNumOfMotors(eo_entities_GetHandle(), 0);
 
-
     synch(embot::app::eth::Service::State::idle);
     
-    // maybe put in clear() also entities etc. 
-    #warning even better manage entities elsewhere ...
     clear();  
     
     return r;           
 }
 
-bool mcOBJfoc::activate()
+bool AGENTfoc::activate()
 {
     bool r {true};
     
@@ -326,11 +323,25 @@ bool mcOBJfoc::activate()
 
     return r;                
 }
+
+
+bool AGENTfoc::stop()
+{
+    // nothing is required 
+    return true;        
+}
+
+
+bool AGENTfoc::start()
+{
+    // nothing is required 
+    return true;        
+}
     
 
-void mcOBJfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operationisok)
+void AGENTfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operationisok)
 {  
-    mcOBJfoc *mcfoc = reinterpret_cast<mcOBJfoc*>(tHIS);  
+    AGENTfoc *mcfoc = reinterpret_cast<AGENTfoc*>(tHIS);  
 
     if(false == operationisok)
     {
@@ -356,7 +367,7 @@ void mcOBJfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operationis
     }
 
     
-    // surely we have can boards to discover because we checked inside mcOBJfoc::load( ... )
+    // surely we have can boards to discover because we checked inside AGENTfoc::load( ... )
     // so, we start can discovery and exit.
     // it will be mcfoc->cantools.ondiscoverystop and in particular 
     // verify_step02_onENDof_candiscovery() that will be called next
@@ -367,11 +378,11 @@ void mcOBJfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operationis
 
 }  
 
-eOresult_t mcOBJfoc::verify_step02_onENDof_candiscovery(void *tHIS, EOtheCANdiscovery2* cd2, eObool_t searchisok)
+eOresult_t AGENTfoc::verify_step02_onENDof_candiscovery(void *tHIS, EOtheCANdiscovery2* cd2, eObool_t searchisok)
 {
     eOresult_t r {eores_OK}; // always OK is fine as well, as nobody checks it    
     
-    mcOBJfoc *mcfoc = reinterpret_cast<mcOBJfoc*>(tHIS);
+    AGENTfoc *mcfoc = reinterpret_cast<AGENTfoc*>(tHIS);
 
     // it is the final step, so: i get the params ...
     

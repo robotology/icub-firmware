@@ -64,8 +64,8 @@ struct embot::app::bldc::theCOMM::Impl
     embot::app::application::dummyCANagentCORE _dummycanagentcore {};
         
     embot::os::EventThread *_t_COMM {nullptr};
-    
-    embot::app::eth::mc::messaging::Location _location {embot::app::eth::mc::messaging::Location::BUS::icc1, 3};
+    #warning move _location elsewhere in file _info.cpp ....
+    embot::msg::Location _location {embot::msg::BUS::icc1, 3};
       
     Config _config {};
     bool _initted {false};
@@ -285,7 +285,7 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
     {        
         for(size_t i=0; i<num; i++)
         {
-            embot::app::eth::mc::messaging::Location destination { embot::app::eth::mc::messaging::Location::BUS::icc1, 0 }; 
+            embot::msg::Location destination { embot::msg::BUS::icc1, 0 }; 
             embot::app::eth::theICCservice::Item item { destination, impl->_tCOMMoutframes[i] };            
             bool r = embot::app::eth::theICCservice::getInstance().put(item, embot::core::reltimeWaitForever);
             // if r is false then  we have a failure. but timeout is infinite            

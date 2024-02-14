@@ -280,13 +280,15 @@ struct theSM
         // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());
-            
+
+#if defined(debugNOicc)
+#else            
         // theICCservice
         embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
         embot::app::eth::theICCservice::getInstance().parse();
         embot::app::eth::theICCservice::getInstance().flush(5*embot::core::time1millisec); 
         embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_idle, nullptr});             
-        
+#endif        
         // can discovery
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
@@ -317,12 +319,14 @@ struct theSM
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);    
         eo_canserv_TXstartAll(eo_canserv_GetHandle(), NULL, NULL);
         eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
-            
+ 
+#if defined(debugNOicc)
+#else            
         // theICCservice
         embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::onflush);  
         embot::app::eth::theICCservice::getInstance().flush(5*embot::core::time1millisec);  
         embot::app::eth::theICCservice::getInstance().set(embot::core::Callback());             
-         
+#endif         
             
         
         // can discovery
@@ -354,12 +358,14 @@ struct theSM
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
         //#warning shall we set s_can_cbkonrx_fatalerror ??  we cannot do it for EOtheCANservice  
-            
+
+#if defined(debugNOicc)
+#else            
         // theICCservice
         embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
         embot::app::eth::theICCservice::getInstance().parse();   
         embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())});             
-                      
+#endif                      
         // can discovery
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
@@ -395,12 +401,14 @@ struct theSM
         // EOtheCANservice: set straigth mode and force parsing of all the frames in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
-              
+
+#if defined(debugNOicc)
+#else        
         // theICCservice
         embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
         embot::app::eth::theICCservice::getInstance().parse();  
         embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_idle, nullptr});                     
-      
+#endif      
         
         // stop and deactivate all the services which may have been started 
         embot::app::eth::theServices::getInstance().stop();        
@@ -434,7 +442,10 @@ struct theSM
 
             case emsconfigurator_evt_userdef03:
             {
-                embot::app::eth::theICCservice::getInstance().parse();                              
+#if defined(debugNOicc)
+#else                
+                embot::app::eth::theICCservice::getInstance().parse();  
+#endif                
             } break;
             
             default: {} break;                                  
@@ -458,10 +469,13 @@ struct theSM
         // it will be the can parser functions which will call the relevant objects which will do what they must.
         // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
         eo_canserv_ParseAll(eo_canserv_GetHandle());    
-        
+
+#if defined(debugNOicc)
+#else        
         // theICCservice
         embot::app::eth::theICCservice::getInstance().parse();                        
-    
+#endif
+        
 #if defined(TESTRTC_IS_ACTIVE)     
         testRTC_RUN_tick();
 #elif defined(enableTHESERVICETESTER)
@@ -494,13 +508,18 @@ struct theSM
     
     static void flushICCtransmission()
     {
+#if defined(debugNOicc)
+#else        
         // theICCservice: i call the flush() with a callback so it returns immediately
         constexpr embot::core::Callback donothingonflushdone {};
-        embot::app::eth::theICCservice::getInstance().flush(donothingonflushdone);                    
+        embot::app::eth::theICCservice::getInstance().flush(donothingonflushdone);  
+#endif        
     }
     
     static void waitICCisflushed()
     {
+#if defined(debugNOicc)
+#else        
         if(true == embot::app::eth::theICCservice::getInstance().flushed())
         {
             return;   
@@ -518,7 +537,8 @@ struct theSM
             {
                 break;
             }
-        }              
+        }
+#endif        
     }
     
     
@@ -626,8 +646,11 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
     so: we init in here and we configure the parsing inside theHandler together with the init
     of theICCmapping and the CAN protocol things
 #endif
-            
+
+#if defined(debugNOicc)
+#else    
     embot::app::eth::theICCservice::getInstance().initialise(embot::app::eth::iccmastercfg);    
+#endif
     
     embot::app::eth::theETHmonitor::getInstance().initialise(theHandler_theETHmonitor_Config);    
     
@@ -1131,7 +1154,7 @@ void sendicc()
     #warning DEBUG... remove it later on
     uint32_t ID = 0x101; // i want the sender to have 0 address .........
     embot::prot::can::Frame frame1 {ID, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
-    embot::app::eth::mc::messaging::Location loc1 {embot::app::eth::mc::messaging::Location::BUS::icc1, 3};
+    embot::msg::Location loc1 {embot::msg::Location::BUS::icc1, 3};
     embot::prot::can::Frame frame2 {ID, 8, {n, 2, 2, 2, 2, 2, 2, 2}};    
     embot::app::eth::theICCservice::getInstance().put({loc1, frame1});
     embot::app::eth::theICCservice::getInstance().put({loc1, frame2});

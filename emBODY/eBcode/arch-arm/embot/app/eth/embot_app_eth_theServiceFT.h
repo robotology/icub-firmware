@@ -59,6 +59,7 @@ namespace embot { namespace app { namespace eth {
         bool tick(bool resetstatus = false) override;
         bool report() override;
         bool process(const DescriptorCANframe &canframedescriptor) override;
+        bool process(const DescriptorFrame &framedescriptor) override;
         bool process(const DescriptorROP &ropdescriptor) override;
 
     private:        

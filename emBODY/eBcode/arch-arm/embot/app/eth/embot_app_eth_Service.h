@@ -116,8 +116,8 @@ namespace embot::app::eth {
         virtual bool report() = 0;   
         
         virtual bool process(const DescriptorCANframe &canframedescriptor) = 0;
-        // we may add it for ICC processing ... 
-//        virtual bool process(const DescriptorFrame &framedescriptor) = 0;
+        // DescriptorFrame can be either CAN or ICC  
+        virtual bool process(const DescriptorFrame &framedescriptor) = 0;
         virtual bool process(const DescriptorROP &ropdescriptor) = 0;
                 
     protected:

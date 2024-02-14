@@ -6,8 +6,8 @@
 */
 
 
-#ifndef __EMBOT_APP_ETH_SERVICE_IMPL_MC_IF_H_
-#define __EMBOT_APP_ETH_SERVICE_IMPL_MC_IF_H_
+#ifndef __EMBOT_APP_ETH_SERVICE_IMPL_MC_IF_AGENT_H_
+#define __EMBOT_APP_ETH_SERVICE_IMPL_MC_IF_AGENT_H_
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@
 namespace embot::app::eth::service::impl::mc {    
 
 
-struct IFmcobj 
+struct IFagent 
 {
     virtual embot::app::eth::Service::Type type() const = 0;
     virtual bool clear() = 0;  
@@ -35,14 +35,16 @@ struct IFmcobj
     virtual bool verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate = true) = 0;    
     virtual bool activate() = 0;
     virtual bool deactivate() = 0;
+    virtual bool stop() = 0;
+    virtual bool start() = 0;
     
 protected:
-    virtual ~IFmcobj() {};    // cannot delete from interface but only from derived object 
+    virtual ~IFagent() {};    // cannot delete from interface but only from derived object 
 };
 
-struct mcOBJnone : public IFmcobj
+struct AGENTnone : public IFagent
 {       
-    mcOBJnone() = default;
+    AGENTnone() = default;
         
     embot::app::eth::Service::Type type() const override
     { return embot::app::eth::Service::Type::none; }
@@ -64,6 +66,12 @@ struct mcOBJnone : public IFmcobj
     
     bool deactivate() override
     { return false; }
+    
+    bool stop() override
+    { return false; }  
+
+    bool start() override
+    { return false; }    
     
 };
 

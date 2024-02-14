@@ -289,6 +289,11 @@ bool embot::app::eth::theServiceFT::process(const DescriptorCANframe &canframede
     return pImpl->process(canframedescriptor);
 }
 
+bool embot::app::eth::theServiceFT::process(const DescriptorFrame &framedescriptor)
+{
+    return false; //pImpl->process(canframedescriptor);
+}
+
 bool embot::app::eth::theServiceFT::process(const DescriptorROP &ropdescriptor)
 {
     return pImpl->process(ropdescriptor);

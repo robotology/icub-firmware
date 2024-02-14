@@ -666,32 +666,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             jomoCouplingInfo = &(brd_cfg->data.mc.foc_based.jomocoupling);
             break;
         
-        case eomn_serv_MC_mc4plusmais:
-            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
-            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
-            o->actuation_type = ACT_TYPE_MC4p;
-            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusmais_based.jomocoupling);
-            break;
-        
-        case eomn_serv_MC_mc4plus:
-            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
-            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
-            o->actuation_type = ACT_TYPE_MC4p;
-            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
-            break;
-        case eomn_serv_MC_mc2pluspsc:
-            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors);
-            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors.head.size; 
-            o->actuation_type = ACT_TYPE_MC4p; 
-            jomoCouplingInfo = &(brd_cfg->data.mc.mc2pluspsc.jomocoupling);            
-            break;
-        case eomn_serv_MC_mc4plusfaps:
-            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors);
-            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors.head.size; 
-            o->actuation_type = ACT_TYPE_MC4p; 
-            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusfaps.jomocoupling);            
-            break;
-        
         case eomn_serv_MC_advfoc:
         {
             if(true == MC_advfoc_uses_foc_based_servconfig_with_actuator_descriptor_generic)
@@ -706,8 +680,36 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             {
                 o->mcmode = eomn_serv_NONE;
             }
-        } break;
+        } break;        
         
+        case eomn_serv_MC_mc4plusmais:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
+            o->actuation_type = ACT_TYPE_MC4p;
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusmais_based.jomocoupling);
+            break;
+        
+        case eomn_serv_MC_mc4plus:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
+            o->actuation_type = ACT_TYPE_MC4p;
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
+            break;
+        
+        case eomn_serv_MC_mc2pluspsc:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors.head.size; 
+            o->actuation_type = ACT_TYPE_MC4p; 
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc2pluspsc.jomocoupling);            
+            break;
+        
+        case eomn_serv_MC_mc4plusfaps:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors.head.size; 
+            o->actuation_type = ACT_TYPE_MC4p; 
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusfaps.jomocoupling);            
+            break;
+                
 #if 0
         // marco.accame: i keep it just an example in case we need to manage a new mode w/ mixed actuation type  
         //               this code was for the case: EOTHESERVICES_customize_handV3_7joints        

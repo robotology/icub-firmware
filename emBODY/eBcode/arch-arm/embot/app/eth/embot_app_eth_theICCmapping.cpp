@@ -42,7 +42,7 @@ struct embot::app::eth::theICCmapping::Impl
     bool load(const embot::app::eth::theICCmapping::Item &item);
     bool clear(const embot::app::eth::theICCmapping::Item &item);        
     bool clear();        
-    Index toindex(const embot::app::eth::mc::messaging::Location &loc, const Entity &entity) const;
+    Index toindex(const embot::msg::Location &loc, const Entity &entity) const;
 };
 
 
@@ -59,7 +59,7 @@ bool embot::app::eth::theICCmapping::Impl::initialise(const Config &config)
     // ok, do something
     _config = config;
             
-    items.resize(_config.maxitems);
+    items.reserve(_config.maxitems);
     
     
     _initted = true;
@@ -70,10 +70,18 @@ bool embot::app::eth::theICCmapping::Impl::load(const embot::app::eth::theICCmap
 {
     bool r {false};
     
-    // at first find it if not found i push ot back
-//    auto is_equal = [item](const Item &i) { 
-//        return i == item;         
-//    };    
+//    embot::core::print("load(): " + item.location.to_string());
+//    volatile size_t ss = items.size();
+//    ss = ss;     
+//    for(size_t n=0; n<ss; n++)
+//    {
+//        Item ii = items[n];
+//        volatile int x = ii.index;
+//        embot::core::print("inside we have: @" + std::to_string(n) + " " + ii.location.to_string()) ;
+//    }     
+
+    
+    // if not found i push it back   
     auto it = std::find(items.begin(), items.end(), item);
     if(it == std::end(items))
     {
@@ -88,17 +96,26 @@ bool embot::app::eth::theICCmapping::Impl::clear(const embot::app::eth::theICCma
 {
     bool r {false};
     
-    // at first find it if not found i push ot back
-//    auto is_equal = [item](const Item &i) { 
-//        return i == item;         
-//    };    
+//    embot::core::print("clear(): " + item.location.to_string());
+//    volatile size_t ss = items.size();
+//    ss = ss;     
+//    for(size_t n=0; n<ss; n++)
+//    {
+//        Item ii = items[n];
+//        volatile int x = ii.index;
+//        embot::core::print("inside we have: @" + std::to_string(n) + " " + ii.location.to_string()) ;
+//    }    
+    
+    // if not found i push it back
     auto it = std::find(items.begin(), items.end(), item);
     if(it != std::end(items))
     {
         items.erase(it);
         r = true;
     }
-    
+
+//    ss = items.size();
+//    ss = ss;    
     return r; 
 }
 
@@ -108,10 +125,22 @@ bool embot::app::eth::theICCmapping::Impl::clear()
     return true;  
 }
 
-embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::Impl::toindex(const embot::app::eth::mc::messaging::Location &loc, const Entity &entity) const
+embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::Impl::toindex(const embot::msg::Location &loc, const Entity &entity) const
 {
-    Index i {invalidindex};
-    
+    Index index {invalidindex};
+
+//    embot::core::print("toindex(): " + loc.to_string());
+//    volatile size_t ss = items.size();
+//    ss = ss;     
+//    for(size_t n=0; n<ss; n++)
+//    {
+//        Item ii = items[n];
+//        volatile int x = ii.index;
+//        embot::core::print("inside we have: @" + std::to_string(n) + " " + ii.location.to_string());
+//        volatile bool equal = ii.location == loc;
+//        equal = equal;        
+//    } 
+       
     auto is_entity_on_location = [loc, entity](const Item &i) { 
         return((i.location == loc) && (i.entity == entity));    
     }; //return((i.location == loc) && (i.entity == entity)); };    
@@ -119,10 +148,10 @@ embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::Impl::toin
     
     if(it != std::end(items))
     {
-        i = it->index;
+        index = it->index;
     }    
     
-    return i;
+    return index;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -163,7 +192,7 @@ bool embot::app::eth::theICCmapping::clear()
     return pImpl->clear();
 }
 
-embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::toindex(const embot::app::eth::mc::messaging::Location &loc, const Entity &entity) const
+embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::toindex(const embot::msg::Location &loc, const Entity &entity) const
 {
     return pImpl->toindex(loc, entity);
 }

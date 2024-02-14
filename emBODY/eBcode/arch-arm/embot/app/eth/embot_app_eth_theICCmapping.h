@@ -1,9 +1,9 @@
 
 
 /*
- * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Simone Girardi
- * email:   simone.girardi@iit.it
+ * Copyright (C) 2023 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
@@ -51,16 +51,16 @@ namespace embot::app::eth {
         
         struct Item
         {
-            embot::app::eth::mc::messaging::Location location {};
+            embot::msg::Location location {};
             Entity entity {};
             Index index {0};
             constexpr Item() = default;
-            constexpr Item(const embot::app::eth::mc::messaging::Location &l, const Entity &e, const Index &i)
+            constexpr Item(const embot::msg::Location &l, const Entity &e, const Index &i)
                 : location(l), entity(e), index(i) {}
             
             bool operator==(const Item& rhs) const
             {
-                return (rhs.location == location) && (rhs.entity == entity) && (rhs.index == index);    
+                return (rhs.location == location) && (rhs.entity == entity) && (rhs.index == index);  
             }
             
         };
@@ -80,7 +80,7 @@ namespace embot::app::eth {
         
         bool clear();
         
-        Index toindex(const embot::app::eth::mc::messaging::Location &loc, const Entity &entity) const;
+        Index toindex(const embot::msg::Location &loc, const Entity &entity) const;
                 
     
     private:

@@ -20,7 +20,7 @@
 
 #include "EoProtocol.h"
 #include "EoProtocolMC.h"
-#include "Controller.h"
+//#include "Controller.h"
 
 #include "EOtheErrorManager.h"
 #include "EoError.h"
@@ -60,16 +60,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//static eObool_t s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t port);
+//static eObrd_cantype_t s_eocanprotMCperiodic_get_boardtype(eOcanframe_t *frame, eOcanport_t port);
 
-//static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, eObrd_caninsideindex_t insideindex, uint8_t *index);
-
-static eObrd_cantype_t s_eocanprotMCperiodic_get_boardtype(eOcanframe_t *frame, eOcanport_t port);
-
-//static eOresult_t s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcControlMode(icubCanProto_controlmode_t icubcanProto_controlmode,
-//                                                                                        eOmc_controlmode_t *eomc_controlmode);
-//static eOresult_t s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(icubCanProto_interactionmode_t icubcanProto_intermode,
-//                                                                                                eOmc_interactionmode_t *eomc_intermode);
 static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type);
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -84,58 +76,29 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 
 
 
-
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__DEBUG(eOcanframe_t *frame, eOcanport_t port)
 {
-    // i decode this frame only if it comes from 2foc and i discard it if it comes from a mc4.
-    // in date 19 sept 2017 we decided that the 2foc boards would send this diagnostics frame when they find an error of type tbd
-    // as a first case we want to use it for debugging the case of motor encoder dirty which happens on icub-v3.   
-    // i extend that also for amcbldc
+    // marco.accame: we could add the management of this message maybe to theServiceMC ...  
+    //  embot::app::eth::theServiceMC::getInstance().process({port, frame, 0});
     
     eOerrmanDescriptor_t des = {0};
     
-//    eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
-//        
-//    if((eobrd_cantype_foc == boardtype) || (eobrd_cantype_amcbldc == boardtype))
-//    {
-        // i just forward the full canframe into a debug message. later on i will add a proper message type.        
-        des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
-        des.par16 = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
-        des.par64 = eo_common_canframe_data2u64(frame);
-        des.sourcedevice = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-        des.sourceaddress = EOCANPROT_FRAME_GET_SOURCE(frame);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);               
-    
-//    }
-    
+    // i just forward the full canframe into a debug message. later on i will add a proper message type.        
+    des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+    des.par16 = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+    des.par64 = eo_common_canframe_data2u64(frame);
+    des.sourcedevice = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+    des.sourceaddress = EOCANPROT_FRAME_GET_SOURCE(frame);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);               
+
+   
     return(eores_OK); 
 }
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *frame, eOcanport_t port)
 {
     embot::app::eth::theServiceMC::getInstance().process({port, frame, 0});
-        
-//    // this can frame is from 2foc only ... as the name of the message says. i dont do the check that the board must be a 2foc
-//    // i retrieve the motor related to the frame    
-//    eOmc_motor_t *motor = NULL;
-//    eOprotIndex_t motorindex = EOK_uint08dummy;
-//    
-//    if(NULL == (motor = (eOmc_motor_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eobrd_caninsideindex_first, &motorindex)))
-//    { 
-//        return(eores_OK);  
-//    }    
-//    
-//    // note of marco.accame: the following code is ok as long as the 2foc has been configured to send up in its periodic message 
-//    // current, velocity, and position. if so, frame->data contains: [current:2bytes, velocity:2bytes, position:4bytes]. 
-//    // the following code extract these values. 
-//    motor->status.basic.mot_current  = ((int16_t*)frame->data)[0];
-//    motor->status.basic.mot_velocity = ((int16_t*)frame->data)[1];
-//    motor->status.basic.mot_position = ((int32_t*)frame->data)[1];
-//     
-//    //eo_emsController_AcquireMotorEncoder(motorindex, motor->status.basic.mot_current, motor->status.basic.mot_velocity, motor->status.basic.mot_position);
-
-//    MController_update_motor_odometry_fbk_can(motorindex, frame->data);
-    
+            
     return(eores_OK);
 }
 
@@ -164,84 +127,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *frame, eOcanport_t port)
 {
     embot::app::eth::theServiceMC::getInstance().process({port, frame, 0});
-    
-//    // both 2foc and mc4 can send this frame. the parsing is however different because:
-//    // - the 2foc contains info related to one joint only and it is used the EMScontroller to parse the frame,
-//    // - the mc4 contains info related to two joints and we need to parse the frame directly
-//    
-//    eOprotIndex_t jointindex = 0;
-//    eOmc_joint_t *joint = NULL;
-////    eOmc_controlmode_t eomc_controlmode = eomc_controlmode_idle;
-////    eOerrmanDescriptor_t des = {0};
-//    
-//    eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
-//    
-//    
-//    if(eobrd_cantype_foc == boardtype || eobrd_cantype_amcbldc == boardtype)
-//    {   
-//        // in case we have a 2foc ... i treat the first joint only   
-//        // first joint: use eobrd_caninsideindex_first and gets the first 2 bytes of the frame         
-//        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, eobrd_caninsideindex_first, &jointindex)))
-//        {
-////            if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
-////            {
-////                return(eores_OK);
-////            }
-//            return(eores_OK);        
-//        }        
-//        
-//       
-//        // marco.accame: the variable eomc_controlmode is not used because eo_emsController_ReadMotorstatus() gets directly what it needs,
-//        //               thus no need to perform the conversion 
-//        //res = s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[1], &eomc_controlmode);
-//        //if(eores_OK != res)
-//        //{
-//        //    #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
-//        //    return(eores_OK);    
-//        //}
-//        //eo_emsController_ReadMotorstatus(jointindex, frame->data);
-//        MController_update_motor_state_fbk(jointindex, frame->data);
-//        // l'aggiornamento delle nv del giunto sara' fatto nel DO.
-//        // se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
-//        // marco.accame: the previous code contained the following function which does nothing but putting into motor.status.filler04[]
-//        // some flags ... probably for debug. well, we dont do it in here, but if needed we can add it.        
-//        // s_eo_appTheDB_UpdateMototStatusPtr(mId, frame, runmode);
-//              
-//    }
-////    else if(eobrd_cantype_mc4 == boardtype)
-////    {   // we have a mc4, thus we must manage two joints
-////        uint8_t j=0;
-////        // the two joints have ...
-////        const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
-////        const uint8_t offset[2] = {1, 3};
-////        
-////        for(j=0; j<2; j++) // 2 joints ....
-////        {                       
-////            // joint i-th
-////            if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
-////            {
-////                return(eores_OK);        
-////            }  
-////            // manage controlmode
-////            if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[offset[j]], &eomc_controlmode))
-////            {
-////                //#warning -> TODO: add diagnostics about not found control mode as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
-////                return(eores_OK);    
-////            }
-////            
-////            joint->status.core.modes.controlmodestatus = eomc_controlmode;
-////            
-////            if(eomc_controlmode_hwFault == eomc_controlmode)
-////            {        
-////                des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_hwfault2);
-////                des.par16 = (frame->data[1] << 8) | eomc_controlmode;
-////                des.sourceaddress = jointindex;
-////                des.sourcedevice = eo_errman_sourcedevice_localboard;
-////                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);               
-////            }                        
-////        }  
-////    }
-    
+        
     return(eores_OK);    
 }
 
@@ -313,183 +199,16 @@ extern eOresult_t eocanprotMCperiodic_former_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRE
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-//static eObool_t s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t port)
-//{
-//    const eOprotBRD_t eb5board = 4;
-//    eOprotBRD_t localboard = eoprot_board_local_get();
-//    
-//    if(localboard != eb5board)
-//    {
-//        return(eobool_false);
-//    }
-//    
-//    if( (eOcanport1 == port) &&  (2 == EOCANPROT_FRAME_GET_SOURCE(frame)) )
-//    {
-//        return(eobool_true);
-//    }
-//    else
-//    {
-//        return(eobool_false);
-//    }        
-//}
 
-
-//static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, eObrd_caninsideindex_t insideindex, uint8_t *index)
+//static eObrd_cantype_t s_eocanprotMCperiodic_get_boardtype(eOcanframe_t *frame, eOcanport_t port)
 //{
-//    void * ret = NULL;
-//    uint8_t ii = 0;
 //    eObrd_canlocation_t loc = {0};
-//    
 //    loc.port = port;
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-//    loc.insideindex = insideindex;
-//    
-//    ii = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, entity);
-//    
-//    if(EOK_uint08dummy == ii)
-//    {     
-//        //#warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
-//        return(NULL);
-//    }
-//    
-//    ret = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, entity, ii);
-//    
-//    if(NULL != index)
-//    {
-//        *index = ii;        
-//    }  
+//    loc.insideindex = eobrd_caninsideindex_none; // dont care of it if we look for a board
+//    return(eo_canmap_GetBoardType(eo_canmap_GetHandle(), loc));
+//}  
 
-//    return(ret);   
-//}
-
-
-static eObrd_cantype_t s_eocanprotMCperiodic_get_boardtype(eOcanframe_t *frame, eOcanport_t port)
-{
-    eObrd_canlocation_t loc = {0};
-    loc.port = port;
-    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-    loc.insideindex = eobrd_caninsideindex_none; // dont care of it if we look for a board
-    return(eo_canmap_GetBoardType(eo_canmap_GetHandle(), loc));
-}  
-
-// not used for modern can-based mc boards managed by the amc (amcbldc, 2foc)
-
-//static eOresult_t s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcControlMode(icubCanProto_controlmode_t icubcanProto_controlmode,
-//                                                                                        eOmc_controlmode_t *eomc_controlmode)
-//{
-//    eOresult_t res = eores_OK;
-
-//    switch(icubcanProto_controlmode)
-//    {
-//        case icubCanProto_controlmode_idle:
-//        {
-//            *eomc_controlmode = eomc_controlmode_idle;
-//        } break;
-//        
-//        case icubCanProto_controlmode_position:
-//        {
-//            *eomc_controlmode = eomc_controlmode_position;
-//        } break;
-//        
-//        case icubCanProto_controlmode_velocity:
-//        {
-//            *eomc_controlmode = eomc_controlmode_velocity; //
-//        } break;
-//        
-//        case icubCanProto_controlmode_torque:
-//        {
-//            *eomc_controlmode = eomc_controlmode_torque;
-//        } break;
-//        
-//        case icubCanProto_controlmode_impedance_pos:
-//        {
-//            *eomc_controlmode = eomc_controlmode_impedance_pos;
-//        } break;
-
-//        case icubCanProto_controlmode_impedance_vel:
-//        {
-//            *eomc_controlmode = eomc_controlmode_impedance_vel;
-//        } break;
-
-//        case icubCanProto_controlmode_current:
-//        {
-//            *eomc_controlmode = eomc_controlmode_current;
-//        } break;
-//        case icubCanProto_controlmode_mixed:
-//        {
-//            *eomc_controlmode = eomc_controlmode_mixed;
-//        } break;
-//        
-//        case icubCanProto_controlmode_direct:
-//        {
-//            *eomc_controlmode = eomc_controlmode_direct;
-//        } break;
-
-//        case icubCanProto_controlmode_openloop:
-//        {
-//            *eomc_controlmode = eomc_controlmode_openloop;
-//        } break;
-//        
-//        case  icubCanProto_controlmode_calibration:
-//        {
-//            *eomc_controlmode = eomc_controlmode_calib;
-//        } break;
-//        
-//        case icubCanProto_controlmode_hwFault:
-//        {
-//            *eomc_controlmode = eomc_controlmode_hwFault;
-//        } break;
-//        
-//        case icubCanProto_controlmode_notConfigured:
-//        {
-//            *eomc_controlmode = eomc_controlmode_notConfigured;
-//        } break;
-//        
-//        case icubCanProto_controlmode_configured:
-//        {
-//            *eomc_controlmode = eomc_controlmode_configured;
-//        } break;
-//        
-//        case icubCanProto_controlmode_unknownError:
-//        {
-//            *eomc_controlmode = eomc_controlmode_unknownError;
-//        } break;
-//        
-//        default:
-//        {
-//            res = eores_NOK_generic;
-//        } break;
-//    }
-//    
-//    return(res);
-//}
-
-// not used by modern can-based mc boards managed by the amc (amcbldc, 2foc)
-//static eOresult_t s_eocanprotMCperiodic_convert_icubCanProtoInteractionMode2eOmcInteractionMode(icubCanProto_interactionmode_t icubcanProto_intermode,
-//                                                                                                eOmc_interactionmode_t *eomc_intermode)
-//{
-//    eOresult_t res = eores_OK;
-//    
-//    switch(icubcanProto_intermode)
-//    {
-//        case icubCanProto_interactionmode_stiff:
-//        {
-//            *eomc_intermode = eOmc_interactionmode_stiff;
-//        } break;
-//        
-//        case icubCanProto_interactionmode_compliant:
-//        {
-//            *eomc_intermode = eOmc_interactionmode_compliant;
-//        } break;
-//    
-//        default:
-//        {
-//            res = eores_NOK_generic;
-//        } break;
-//    }
-//    
-//    return(res);
-//}
 
 // former helper funtions
 
