@@ -5,20 +5,20 @@
  * email:   marco.accame@iit.it
 */
 
-#ifndef __EMBOT_MSG__
-#define __EMBOT_MSG__
+#ifndef __EMBOT_APP_MSG_H_
+#define __EMBOT_APP_MSG_H_
 
 
 #include "embot_core.h"
 #include "embot_core_binary.h"
 
 // needed for: eOlocation_t
-#include "EoCommon.h"
+//#include "EoCommon.h"
 
 
-namespace embot::msg {
+namespace embot::app::msg {
   
-    // embot::msg::BUS has same values as eObus_t 
+    // embot::app::msg::BUS has same values as eObus_t 
     enum class BUS : uint8_t {can1 = 0, can2 = 1, local = 2, icc1 = 3, icc2 = 4, ffu1 = 5, ffu2 = 6, none = 7}; 
     static constexpr uint8_t numberofBUSes {7};
     using ADR = uint8_t;
@@ -52,8 +52,8 @@ namespace embot::msg {
     }
     
     
-    // embot::msg::Location is its a C++ version of eOlocation_t that does not have the same binary footprint
-    // embot::msg::Location::PACKED is a C++ version of eOlocation_t that has its same binary footprint
+    // embot::app::msg::Location is its a C++ version of eOlocation_t that does not have the same binary footprint
+    // embot::app::msg::Location::PACKED is a C++ version of eOlocation_t that has its same binary footprint
     // we use it just for ... easy migration between types
     
     // NOTE: 
@@ -79,7 +79,7 @@ namespace embot::msg {
         constexpr Location(BUS b, ADR a) : bus(b), adr(a), ffu(0) { packed.bus = embot::core::tointegral(bus); packed.adr = adr; packed.ffu = 0;  } 
         constexpr Location(const PACKED &p) : packed(p) { bus = static_cast<BUS>(packed.bus); adr = packed.adr; ffu = 0; } 
         constexpr Location(const void *p2eolocation) : packed(p2eolocation) { bus = static_cast<BUS>(packed.bus); adr = packed.adr; ffu = 0; }    
-        constexpr Location(const eOlocation_t &l)  : packed(&l) { bus = static_cast<BUS>(packed.bus); adr = packed.adr; ffu = 0; }
+//        constexpr Location(const eOlocation_t &l)  : packed(&l) { bus = static_cast<BUS>(packed.bus); adr = packed.adr; ffu = 0; }
         
         void set(BUS b, ADR a)
         {
@@ -95,9 +95,9 @@ namespace embot::msg {
             return bus_to_string(bus) + ":" + std::to_string(adr);
         }
         
-        constexpr bool isvalid() const { return embot::msg::BUS::none != bus; }  
-        constexpr bool isCAN() const { return (embot::msg::BUS::can1 == bus) || (embot::msg::BUS::can2 == bus); }       
-        constexpr bool isICC() const { return (embot::msg::BUS::icc1 == bus) || (embot::msg::BUS::icc2 == bus); }
+        constexpr bool isvalid() const { return embot::app::msg::BUS::none != bus; }  
+        constexpr bool isCAN() const { return (embot::app::msg::BUS::can1 == bus) || (embot::app::msg::BUS::can2 == bus); }       
+        constexpr bool isICC() const { return (embot::app::msg::BUS::icc1 == bus) || (embot::app::msg::BUS::icc2 == bus); }
         constexpr typeofBUS typeofbus() const { return bus_to_type(bus); }
     
         bool operator==(const Location& rhs) const
@@ -105,7 +105,7 @@ namespace embot::msg {
             return (rhs.bus == bus) && (rhs.adr == adr) && (rhs.ffu == ffu); // && (rhs.packed == packed);
         } 
         
-    protected:
+    public:
         
         // i have chosen protected because i prefer to use ctor() and set() to fill values so that we avoid incomplete initialization
         // so, i need get() to retrieve the values  
@@ -120,14 +120,14 @@ namespace embot::msg {
     static_assert(sizeof(Location::PACKED) == 1, "err");
     static_assert(sizeof(Location) == 4, "err");
     
-    // Location can be constructed from a eOlocation_t using the dedicated constructor
-    // or with the following fill()    
-    void fill(Location &loc, const eOlocation_t &l);  
-    // if needed, we can also uncomment this
-    // void fill(Location &loc, const eObrd_location_t &l); 
-    // but we need: #include "EoBoards.h"  
+    // Location can be constructed from a eOlocation_t using the void* constructor
+    // constexpr Location(const void *p2eolocation) 
+    // as in following code
+    // eOlocation ll {};
+    // Location loc {&ll};
+  
     
-    Location transform(const eOlocation_t &l);
+    //Location transform(const eOlocation_t &l);
     //eOlocation_t transform(const Location &l);
     
 }

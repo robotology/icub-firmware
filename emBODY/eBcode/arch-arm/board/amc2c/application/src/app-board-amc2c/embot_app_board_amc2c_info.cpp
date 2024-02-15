@@ -17,6 +17,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#include "embot_app_msg.h"
+#include "embot_app_icc.h"
 #include "embot_app_eth.h"
 #include "embot_app_board_amc2c_theCANagentCORE.h"
 
@@ -24,36 +27,49 @@
 // - the configurable constants
 // --------------------------------------------------------------------------------------------------------------------
     
+// for now we keep the dual situation only ICC or only CAN, but maybe later on we can have both
+// we used macro USE_ICC_COMM to config the former or the latter
 namespace embot::app::board::amc2c::info { 
     
-    constexpr embot::prot::can::applicationInfo applInfo 
-    {   
-        embot::prot::can::versionOfAPPLICATION {2, 0, 9},    
-        embot::prot::can::versionOfCANPROTOCOL {2, 0}    
-    };
-
-    constexpr embot::app::eth::Date date
+    
+#if defined(USE_ICC_COMM)
+    constexpr uint8_t address {3}; 
+    static constexpr embot::app::icc::Signature signature __attribute__((section(".ARM.__at_0x08100800"))) =
     {
-        2024, embot::app::eth::Month::Feb, embot::app::eth::Day::fourteen, 14, 00
+        embot::app::boards::Board::amcbldc,
+        {embot::app::msg::BUS::icc1, address},
+        {3, 0, 0, 0},   // application version
+        {2, 0},         // protocol version
+        {2024, embot::app::eth::Month::Feb, embot::app::eth::Day::fourteen, 14, 00}
     };
-
+#else
+    constexpr uint8_t address {3}; 
+    static constexpr embot::app::icc::Signature signature __attribute__((section(".ARM.__at_0x08100800"))) =
+    {
+        embot::app::boards::Board::amcbldc,
+        {embot::app::msg::BUS::can2, address},
+        {2, 0, 9, 0},   // application version
+        {2, 0},         // protocol version
+        {2024, embot::app::eth::Month::Feb, embot::app::eth::Day::fourteen, 14, 00}
+    };
+#endif   
+        
     constexpr embot::hw::FLASHpartitionID codePartition 
     {
         embot::hw::FLASHpartitionID::eapplication01
     };
-
-    constexpr embot::hw::CAN canBus 
-    {
-        embot::hw::CAN::two
-    };
-    
-    constexpr uint8_t canaddress {3};
+      
     
     // marco.accame: i use the macro INFO32 just because ... i want to init eEmoduleExtendedInfo_t::userdefined with the same string 
     // and i dont know how to fit it inside otherwise
-    
+ 
+#if defined(USE_ICC_COMM)     
+                 // 0123456789abcde0123456789abcde
+    #define INFO32 "hi, i am an amc2c on ICC1:3"
+#else
                  // 0123456789abcde0123456789abcde
     #define INFO32 "hi, i am an amc2c on CAN2:3"
+#endif    
 
     constexpr const char *info32  
     { // 0123456789abcde0123456789abcde
@@ -68,7 +84,7 @@ namespace embot::app::board::amc2c::info {
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-void force_placement_of_moduleinfo();
+void force_placement_of_flashmappedinfo();
 
 namespace embot::app::board::amc2c::info {
     
@@ -82,8 +98,20 @@ namespace embot::app::board::amc2c::info {
         static bool initted {false};
         if(!initted)
         {
-            force_placement_of_moduleinfo();
-            embot::app::board::amc2c::theCANagentCORE::getInstance().initialise({applInfo, canBus, canaddress, info32});
+            force_placement_of_flashmappedinfo();
+            // maybe we add in here also type of board and location
+            
+            static constexpr embot::prot::can::Board theboard {static_cast<embot::prot::can::Board>(signature.board)};
+
+            static constexpr embot::prot::can::applicationInfo applInfo 
+            {             
+                embot::prot::can::versionOfAPPLICATION {signature.application.major, signature.application.minor, signature.application.build},    
+                embot::prot::can::versionOfCANPROTOCOL {signature.protocol.major, signature.protocol.minor}        
+            }; 
+            
+            static constexpr embot::app::msg::Location location {signature.location};
+            
+            embot::app::board::amc2c::theCANagentCORE::getInstance().initialise({theboard, applInfo, location, info32});
             initted = true;
         }
         return &embot::app::board::amc2c::theCANagentCORE::getInstance();
@@ -120,16 +148,16 @@ constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended __attribute__((section(E
                 .signature  = ee_procOther01,
                 .version    = 
                 { 
-                    .major = embot::app::board::amc2c::info::applInfo.version.major, 
-                    .minor = embot::app::board::amc2c::info::applInfo.version.minor
+                    .major = embot::app::board::amc2c::info::signature.application.major, 
+                    .minor = embot::app::board::amc2c::info::signature.application.minor
                 },  
                 .builddate  = 
                 {
-                    .year  = embot::app::board::amc2c::info::date.year,
-                    .month = embot::app::board::amc2c::info::date.month,
-                    .day   = embot::app::board::amc2c::info::date.day,
-                    .hour  = embot::app::board::amc2c::info::date.hour,
-                    .min   = embot::app::board::amc2c::info::date.minute
+                    .year  = embot::app::board::amc2c::info::signature.date.year,
+                    .month = embot::app::board::amc2c::info::signature.date.month,
+                    .day   = embot::app::board::amc2c::info::signature.date.day,
+                    .hour  = embot::app::board::amc2c::info::signature.date.hour,
+                    .min   = embot::app::board::amc2c::info::signature.date.minute
                 }
             },
             .rom        = 
@@ -168,7 +196,8 @@ constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended __attribute__((section(E
 #include <cstring>
 
 eEmoduleExtendedInfo_t ss {};
-void force_placement_of_moduleinfo()
+embot::app::icc::Signature sig {};    
+void force_placement_of_flashmappedinfo()
 {
     static volatile uint8_t used {0};
         
@@ -181,7 +210,8 @@ void force_placement_of_moduleinfo()
         used = 2;
     }
     
-    std::memmove(&ss, &s_cm4app_info_extended, sizeof(ss));    
+    std::memmove(&ss, &s_cm4app_info_extended, sizeof(ss)); 
+    std::memmove(&sig, &embot::app::board::amc2c::info::signature, sizeof(sig));     
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

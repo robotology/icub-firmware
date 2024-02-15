@@ -25,6 +25,7 @@
 #include "embot_app_eth_theServices.h"
 
 #include "EOarray.h"
+#include "embot_app_icc.h"
 
 namespace embot::app::eth::service::impl::mc {    
 
@@ -243,8 +244,8 @@ bool AGENTadvfoc::deactivate()
             // that this location is associated to the i-th eoprot_entity_mc_motor / joint entity
             eOlocation_t location = iccactuators[i].actua.location;
             uint8_t index = iccactuators[i].index;
-            embot::app::eth::theICCmapping::getInstance().clear({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, index});
-            embot::app::eth::theICCmapping::getInstance().clear({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, index});
+            embot::app::eth::theICCmapping::getInstance().clear({{&location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, index});
+            embot::app::eth::theICCmapping::getInstance().clear({{&location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, index});
         }        
     }
     
@@ -334,8 +335,8 @@ bool AGENTadvfoc::activate()
             // that this location is associated to the i-th eoprot_entity_mc_motor / joint entity
             eOlocation_t location = iccactuators[i].actua.location;
             uint8_t index = iccactuators[i].index;
-            embot::app::eth::theICCmapping::getInstance().load({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, index});
-            embot::app::eth::theICCmapping::getInstance().load({{location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, index});
+            embot::app::eth::theICCmapping::getInstance().load({{&location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint}, index});
+            embot::app::eth::theICCmapping::getInstance().load({{&location}, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor}, index});
         }        
     }
 
@@ -505,11 +506,11 @@ eOresult_t AGENTadvfoc::verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANd
     return r;
 }
 
-#include "eEsharedServices.h" 
-
-// but much better to define a new struct w/ board name etc plus adr and map it in another fixed position ...
-// also: verify what happens when the icc1 address is wrong ...
-// also: add working diagnostics
+volatile const embot::app::icc::Signature * const getsignature(size_t i)
+{
+    // when we have more than one actuator (e.g., for the amcfoc), we shall have something different
+    return (volatile const embot::app::icc::Signature * const)(0x08100800);
+}
 
 bool AGENTadvfoc::iccdiscovery()
 {
@@ -521,7 +522,7 @@ bool AGENTadvfoc::iccdiscovery()
         for(size_t i=0; i<s; i++)
         {
             const auto &item = iccactuators[i];
-            const eOlocation_t location = item.actua.location;
+            const embot::app::msg::Location targetlocation {&item.actua.location};
             eObrd_info_t target = item.actua.board;
             
             if(0 == (target.firmware.major + target.firmware.minor + target.firmware.build + target.protocol.major + target.protocol.minor))
@@ -532,14 +533,33 @@ bool AGENTadvfoc::iccdiscovery()
             {    
                 // i must retrieve the board info on the other core
                 eObrd_info_t detected {};
-                // i will not use ICC and getfirmwareversion. rather i will read the eEmoduleExtendedInfo_t struct mapped at 0x08100400
-                // which however has only firmware.major and firmware.minor, so i trick a bit                     
-                std::memmove(&detected, &target, sizeof(detected));
-                volatile const eEmoduleExtendedInfo_t * const modinfo = (volatile const eEmoduleExtendedInfo_t * const)(0x08100400);
-                detected.firmware.major = modinfo->moduleinfo.info.entity.version.major;
-                detected.firmware.minor = modinfo->moduleinfo.info.entity.version.minor;
+                // i will not use getfirmwareversion through ICC. 
+                // rather i will read the embot::app::icc::Signature of the second core mapped at 0x08100800               
 
-                r = ( (detected.firmware.major == target.firmware.major) && (detected.firmware.minor == target.firmware.minor) );
+                volatile const embot::app::icc::Signature * signature = getsignature(i);
+                 
+                embot::app::msg::Location location {signature->location.bus, signature->location.adr};
+              
+                if(targetlocation == location)
+                { 
+                    detected.type = embot::core::tointegral(signature->board);    
+                    detected.firmware.major = signature->application.major;
+                    detected.firmware.minor = signature->application.minor;
+                    detected.firmware.build = signature->application.build;
+                    detected.protocol.major = signature->protocol.major;
+                    detected.protocol.minor = signature->protocol.minor; 
+                    
+                    if(detected.type == target.type)
+                    {
+                        if((detected.protocol.major == signature->protocol.major) && (detected.protocol.minor == signature->protocol.minor))
+                        {
+                            if((detected.firmware.major == target.firmware.major) && (detected.firmware.minor == target.firmware.minor))
+                            {
+                                r = (detected.firmware.build >= target.firmware.build);
+                            }
+                        }                          
+                    }
+                }
             }
             
             if(false == r)

@@ -10,7 +10,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#include "embot_msg.h"
+#include "embot_app_msg.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -22,7 +22,7 @@
 // --------------------------------------------------------------------------------------------------------------------
  
  
-namespace embot::msg {
+ namespace embot::app::msg {
 
 //    void fill(Location &loc, const eObrd_location_t &l)
 //    {
@@ -39,16 +39,16 @@ namespace embot::msg {
 //        }         
 //    }
     
-    void fill(Location &loc, const eOlocation_t &l)
-    {
-        loc = {&l};
-    }  
+//    void fill(Location &loc, const eOlocation_t &l)
+//    {
+//        loc = {&l};
+//    }  
 
-    Location transform(const eOlocation_t &l)
-    {
-        Location r {&l};
-        return r;
-    }   
+//    Location transform(const eOlocation_t &l)
+//    {
+//        Location r {&l};
+//        return r;
+//    }   
 
 //    eOlocation_t transform(const Location &l)
 //    {

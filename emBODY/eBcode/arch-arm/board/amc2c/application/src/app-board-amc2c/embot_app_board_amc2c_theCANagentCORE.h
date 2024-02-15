@@ -13,7 +13,7 @@
 #include <vector>
 #include <memory>
 
-
+#include "embot_app_msg.h"
 #include "embot_app_application_CANagentCORE.h"
 
 
@@ -26,13 +26,17 @@ namespace embot::app::board::amc2c {
     
         struct Config
         {
+            embot::prot::can::Board board {embot::prot::can::Board::amc2c}; // but we can also use amcbldc
             embot::prot::can::applicationInfo applicationinfo {{0,0,1}, {2,0}};
-            embot::hw::CAN canbus {embot::hw::CAN::one};
-            uint8_t canaddress {3};
+            embot::app::msg::Location location {embot::app::msg::BUS::icc1, 3}; // but also {embot::app::msg::BUS::can2, 3}
             const char *boardinfo {"hello, i am an amc2c"};            
             constexpr Config() = default;
-            constexpr Config(const embot::prot::can::applicationInfo& ai, embot::hw::CAN b, uint8_t ca, const char *bi) 
-                : applicationinfo(ai), canbus(b), canaddress(ca), boardinfo(bi) {}
+            constexpr Config(const embot::prot::can::Board brd, 
+                             const embot::prot::can::applicationInfo& ai, 
+                             const embot::app::msg::Location &loc,    
+                             const char *bi) 
+                : board(brd), applicationinfo(ai), location(loc), 
+                  boardinfo(bi) {}
         };
                 
         bool initialise(const Config &config);   

@@ -42,7 +42,7 @@ struct embot::app::eth::theICCmapping::Impl
     bool load(const embot::app::eth::theICCmapping::Item &item);
     bool clear(const embot::app::eth::theICCmapping::Item &item);        
     bool clear();        
-    Index toindex(const embot::msg::Location &loc, const Entity &entity) const;
+    Index toindex(const embot::app::msg::Location &loc, const Entity &entity) const;
 };
 
 
@@ -125,7 +125,7 @@ bool embot::app::eth::theICCmapping::Impl::clear()
     return true;  
 }
 
-embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::Impl::toindex(const embot::msg::Location &loc, const Entity &entity) const
+embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::Impl::toindex(const embot::app::msg::Location &loc, const Entity &entity) const
 {
     Index index {invalidindex};
 
@@ -192,7 +192,7 @@ bool embot::app::eth::theICCmapping::clear()
     return pImpl->clear();
 }
 
-embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::toindex(const embot::msg::Location &loc, const Entity &entity) const
+embot::app::eth::theICCmapping::Index embot::app::eth::theICCmapping::toindex(const embot::app::msg::Location &loc, const Entity &entity) const
 {
     return pImpl->toindex(loc, entity);
 }

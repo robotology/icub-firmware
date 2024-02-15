@@ -21,7 +21,7 @@
  
 #include <array>
 
-#include "embot_msg.h"
+#include "embot_app_msg.h"
 
       
 
@@ -108,11 +108,11 @@ namespace embot::app::eth::mc::messaging::sender {
     
     struct Set_Control_Mode
     { 
-        embot::msg::Location destination {};           
+        embot::app::msg::Location destination {};           
         info::CONTROL_MODE info{};
             
         Set_Control_Mode() = default;
-        Set_Control_Mode(const embot::msg::Location &d, const info::CONTROL_MODE &i) : destination(d), info(i) {}
+        Set_Control_Mode(const embot::app::msg::Location &d, const info::CONTROL_MODE &i) : destination(d), info(i) {}
             
         bool transmit();    
     }; 
@@ -120,66 +120,66 @@ namespace embot::app::eth::mc::messaging::sender {
 
     struct Set_Current_Limit
     { 
-        embot::msg::Location destination {};           
+        embot::app::msg::Location destination {};           
         info::CURRENT_LIMIT info{};
             
         Set_Current_Limit() = default;
-        Set_Current_Limit(const embot::msg::Location &d, const info::CURRENT_LIMIT &i) : destination(d), info(i) {}
+        Set_Current_Limit(const embot::app::msg::Location &d, const info::CURRENT_LIMIT &i) : destination(d), info(i) {}
             
         bool transmit();    
     };
 
     struct Set_Temperature_Limit
     {
-        embot::msg::Location destination {};
+        embot::app::msg::Location destination {};
         info::TEMPERATURE_LIMIT info{};
         
         Set_Temperature_Limit() = default;
-        Set_Temperature_Limit(const embot::msg::Location &d, const info::TEMPERATURE_LIMIT &i) : destination(d), info(i) {}
+        Set_Temperature_Limit(const embot::app::msg::Location &d, const info::TEMPERATURE_LIMIT &i) : destination(d), info(i) {}
         
         bool transmit();
     };
 
     struct Set_Current_PID
     { 
-        embot::msg::Location destination {};           
+        embot::app::msg::Location destination {};           
         info::CURRENT_PID info{};
             
         Set_Current_PID() = default;
-        Set_Current_PID(const embot::msg::Location &d, const info::CURRENT_PID &i) : destination(d), info(i) {}
+        Set_Current_PID(const embot::app::msg::Location &d, const info::CURRENT_PID &i) : destination(d), info(i) {}
             
         bool transmit();    
     };  
 
     struct Set_Velocity_PID
     { 
-        embot::msg::Location destination {};           
+        embot::app::msg::Location destination {};           
         info::VELOCITY_PID info{};
             
         Set_Velocity_PID() = default;
-        Set_Velocity_PID(const embot::msg::Location &d, const info::VELOCITY_PID &i) : destination(d), info(i) {}
+        Set_Velocity_PID(const embot::app::msg::Location &d, const info::VELOCITY_PID &i) : destination(d), info(i) {}
             
         bool transmit();    
     }; 
 
     struct Set_Motor_Config
     { 
-        embot::msg::Location destination {};           
+        embot::app::msg::Location destination {};           
         info::MOTOR_CONFIG info{};
             
         Set_Motor_Config() = default;
-        Set_Motor_Config(const embot::msg::Location &d, const info::MOTOR_CONFIG &i) : destination(d), info(i) {}
+        Set_Motor_Config(const embot::app::msg::Location &d, const info::MOTOR_CONFIG &i) : destination(d), info(i) {}
             
         bool transmit();    
     };  
 
     struct Calibrate_Encoder
     {
-        embot::msg::Location destination {};           
+        embot::app::msg::Location destination {};           
         info::CALIBRATE_ENCODER info{};
             
         Calibrate_Encoder() = default;
-        Calibrate_Encoder(const embot::msg::Location &d, const info::CALIBRATE_ENCODER &i) : destination(d), info(i) {}
+        Calibrate_Encoder(const embot::app::msg::Location &d, const info::CALIBRATE_ENCODER &i) : destination(d), info(i) {}
             
         bool transmit();   
     }; 
@@ -188,11 +188,11 @@ namespace embot::app::eth::mc::messaging::sender {
     { 
         struct Actuation
         {
-            embot::msg::Location destination {};           
+            embot::app::msg::Location destination {};           
             info::MOTOR_ACTUATION value{};
                 
             Actuation() = default;
-            Actuation(const embot::msg::Location &d, const info::MOTOR_ACTUATION &v) : destination(d), value(v) {}            
+            Actuation(const embot::app::msg::Location &d, const info::MOTOR_ACTUATION &v) : destination(d), value(v) {}            
         };
         
         static constexpr uint8_t maxnumberofmotors {4};
@@ -268,35 +268,35 @@ namespace embot::app::eth::mc::messaging::receiver {
     
     struct sigFOCstatus1
     {   // ICUBCANPROTO_PER_MC_MSG__2FOC 
-        embot::msg::Location source {};           
+        embot::app::msg::Location source {};           
         info::FOCstatus1 info {};
             
         sigFOCstatus1() = default;
-        sigFOCstatus1(const embot::msg::BUS bus, const embot::prot::can::Frame &frame);   
+        sigFOCstatus1(const embot::app::msg::BUS bus, const embot::prot::can::Frame &frame);   
                     
-        void load(const embot::msg::BUS bus, const embot::prot::can::Frame &frame);
+        void load(const embot::app::msg::BUS bus, const embot::prot::can::Frame &frame);
     }; 
 
     struct sigFOCstatus2
     {   // ICUBCANPROTO_PER_MC_MSG__STATUS 
-        embot::msg::Location source {};           
+        embot::app::msg::Location source {};           
         info::FOCstatus2 info {};
             
         sigFOCstatus2() = default;
-        sigFOCstatus2(const embot::msg::BUS bus, const embot::prot::can::Frame &frame); 
+        sigFOCstatus2(const embot::app::msg::BUS bus, const embot::prot::can::Frame &frame); 
             
-        void load(const embot::msg::BUS bus, const embot::prot::can::Frame &frame);
+        void load(const embot::app::msg::BUS bus, const embot::prot::can::Frame &frame);
     };
 
     struct sigPrint
     {   // ICUBCANPROTO_PER_MC_MSG__PRINT 
-        embot::msg::Location source {};           
+        embot::app::msg::Location source {};           
         info::Print info {};
             
         sigPrint() = default;
-        sigPrint(const embot::msg::BUS bus, const embot::prot::can::Frame &frame); 
+        sigPrint(const embot::app::msg::BUS bus, const embot::prot::can::Frame &frame); 
             
-        void load(const embot::msg::BUS bus, const embot::prot::can::Frame &frame);
+        void load(const embot::app::msg::BUS bus, const embot::prot::can::Frame &frame);
     };
     
     // and we also have an agent that operates on the received info
@@ -335,7 +335,7 @@ namespace embot::app::eth::mc::messaging::receiver {
    
     
     // which is used by this one
-    bool parse(const embot::msg::BUS bus, const embot::prot::can::Frame &frame);
+    bool parse(const embot::app::msg::BUS bus, const embot::prot::can::Frame &frame);
     
 } // namespace embot::app::eth::mc::messaging::receiver {
 

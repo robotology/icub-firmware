@@ -47,7 +47,7 @@ namespace embot::app::eth {
         // for a CAN or ICC frame
         struct DescriptorFrame
         {
-            embot::msg::BUS bus {embot::msg::BUS::none};
+            embot::app::msg::BUS bus {embot::app::msg::BUS::none};
             embot::prot::can::Frame frame {};
             constexpr DescriptorFrame() = default;
         };

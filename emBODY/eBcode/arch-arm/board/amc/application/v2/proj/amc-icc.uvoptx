@@ -158,17 +158,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>modinfo</ItemText>
+          <ItemText>detected</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>detected</ItemText>
+          <ItemText>target</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>target</ItemText>
+          <ItemText>signature</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -361,7 +361,7 @@
 
   <Group>
     <GroupName>embot::app::eth::config</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2388,8 +2388,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embot\app\eth\embot_msg.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_msg.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\embot\app\eth\embot_app_msg.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_msg.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

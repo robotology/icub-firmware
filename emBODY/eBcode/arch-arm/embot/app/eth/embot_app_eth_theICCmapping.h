@@ -51,11 +51,11 @@ namespace embot::app::eth {
         
         struct Item
         {
-            embot::msg::Location location {};
+            embot::app::msg::Location location {};
             Entity entity {};
             Index index {0};
             constexpr Item() = default;
-            constexpr Item(const embot::msg::Location &l, const Entity &e, const Index &i)
+            constexpr Item(const embot::app::msg::Location &l, const Entity &e, const Index &i)
                 : location(l), entity(e), index(i) {}
             
             bool operator==(const Item& rhs) const
@@ -80,7 +80,7 @@ namespace embot::app::eth {
         
         bool clear();
         
-        Index toindex(const embot::msg::Location &loc, const Entity &entity) const;
+        Index toindex(const embot::app::msg::Location &loc, const Entity &entity) const;
                 
     
     private:

@@ -26,7 +26,7 @@
 #include "embot_core.h"
 #include "embot_core_utils.h"
 
-
+    
 namespace embot::app::eth {
     
     
@@ -64,7 +64,17 @@ namespace embot::app::eth {
         uint8_t minor {0};
         constexpr Version(uint8_t ma, uint8_t mi) : major(ma), minor(mi) {}
     };
-                
+
+    struct Version2
+    {
+        uint8_t major {3};
+        uint8_t minor {0};
+        uint8_t build {0};
+        uint8_t extra {0};
+        constexpr Version2(uint8_t ma, uint8_t mi, uint8_t bu, uint8_t ex) 
+            : major(ma), minor(mi), build(bu), extra(ex) {}
+    };
+    
     struct Property 
     {
         Process process {Process::none};

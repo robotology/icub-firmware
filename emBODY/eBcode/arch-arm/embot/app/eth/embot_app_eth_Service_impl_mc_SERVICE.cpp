@@ -45,7 +45,7 @@ in this implementation the mcAgent is used ONLY for ICC messages, so it gets the
 the messages from CAN are parsed with similar duplicated code and ask the motorindex to the CAN mapping via p_getentityindex()
 
 to avoid code duplication in parsing messages we could use just this mcAgent and inside 
-we could check the msg.source (that is a embot::msg::Location) and ask the relevant object: 
+we could check the msg.source (that is a embot::app::msg::Location) and ask the relevant object: 
 the ICC or the CAN mapping depending on the bus type 
 
 #endif
@@ -54,20 +54,20 @@ the ICC or the CAN mapping depending on the bus type
 namespace embot::app::eth::mc::messaging::receiver {
     
   
-    bool getentityindex(const embot::msg::Location &source, uint8_t index)
+    bool getentityindex(const embot::app::msg::Location &source, uint8_t index)
     {
         bool ret {true};
-        embot::msg::typeofBUS bustype = source.typeofbus();
+        embot::app::msg::typeofBUS bustype = source.typeofbus();
 
         switch(bustype)
         {
-            case embot::msg::typeofBUS::ICC:
+            case embot::app::msg::typeofBUS::ICC:
             {
                 index = embot::app::eth::theICCmapping::getInstance().toindex(source, {eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor});
                 ret = (embot::app::eth::theICCmapping::invalidindex == index) ? false : true;           
             } break;
 
-            case embot::msg::typeofBUS::CAN:
+            case embot::app::msg::typeofBUS::CAN:
             {
                 eObrd_canlocation_t loc = {0};
                 loc.port = embot::core::tointegral(source.getbus()); // direct conversion to eOcanport_t is OK

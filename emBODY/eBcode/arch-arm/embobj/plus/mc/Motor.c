@@ -140,7 +140,7 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     }
     
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID
-    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{o->motorlocation}, {Kp, Ki, Kd, Ks}};
+    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{&o->motorlocation}, {Kp, Ki, Kd, Ks}};
     msg.transmit(); 
 }
 
@@ -180,7 +180,7 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
     }
 
     // ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID    
-    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{o->motorlocation}, {Kp, Ki, Kd, Ks}};
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{&o->motorlocation}, {Kp, Ki, Kd, Ks}};
     msg.transmit();    
 }
 
@@ -189,7 +189,7 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT    
     embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
     {
-        {o->motorlocation},
+        {&o->motorlocation},
         {current_params->nominalCurrent, current_params->peakCurrent, current_params->overloadCurrent}
     };
     msg.transmit();   
@@ -200,7 +200,7 @@ static void Motor_config_motor_max_temperature_2FOC(Motor* o, eOmeas_temperature
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
     embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msg
     {
-        {o->motorlocation},
+        {&o->motorlocation},
         {*(int16_t*)motor_temperature_limit}
     };
     msg.transmit();
@@ -238,7 +238,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
     embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msgtmp
     {
-        {o->motorlocation},
+        {&o->motorlocation},
         {(int16_t)config->temperatureLimit}
     };
     msgtmp.transmit();
@@ -246,20 +246,20 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT 
     embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
     {
-        {o->motorlocation},
+        {&o->motorlocation},
         {config->currentLimits.nominalCurrent, config->currentLimits.peakCurrent, config->currentLimits.overloadCurrent}
     };
     msg.transmit(); 
         
     // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG    
-    embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{o->motorlocation}, {&o->can_motor_config[0]}};
+    embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{&o->motorlocation}, {&o->can_motor_config[0]}};
     msgmc.transmit();          
 }
 
 static void Motor_set_control_mode_2FOC(Motor* o, icubCanProto_controlmode_t control_mode)
 {   
     // ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE
-    embot::app::eth::mc::messaging::sender::Set_Control_Mode msg {{o->motorlocation}, {control_mode}};
+    embot::app::eth::mc::messaging::sender::Set_Control_Mode msg {{&o->motorlocation}, {control_mode}};
     msg.transmit(); 
 }
 
@@ -364,7 +364,7 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
         *(int16_t*)(o->can_motor_config+1) = resolution;
 
         // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG   
-        embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{o->motorlocation}, {&o->can_motor_config[0]}};
+        embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{&o->motorlocation}, {&o->can_motor_config[0]}};
         msgmc.transmit();           
     }     
 }
@@ -473,7 +473,7 @@ extern void Motor_uncalibrate(Motor* o)
         // ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER
         // i can use use icubCanProto_calibration_type0_hard_stops because the 2foc does not process the payload. 
         // BUT much better to use a new icubCanProto_calibration_type_undefined 
-        embot::app::eth::mc::messaging::sender::Calibrate_Encoder msg {{o->motorlocation}, {{icubCanProto_calibration_type0_hard_stops, 0}}};
+        embot::app::eth::mc::messaging::sender::Calibrate_Encoder msg {{&o->motorlocation}, {{icubCanProto_calibration_type0_hard_stops, 0}}};
         msg.transmit();         
     }
 }
@@ -972,7 +972,7 @@ void Motor_actuate(Motor* motor, uint8_t N, MC_ACTUATION_t act) //
         embot::app::eth::mc::messaging::sender::Actuate_Motors msg {};
         for(uint8_t m=0; m<std::min(N, embot::app::eth::mc::messaging::sender::Actuate_Motors::maxnumberofmotors); m++)
         {
-            msg.push_back({{motor[m].motorlocation}, {motor[m].output}});
+            msg.push_back({{&motor[m].motorlocation}, {motor[m].output}});
         }
         msg.transmit();                
     }

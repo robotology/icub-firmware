@@ -1173,7 +1173,7 @@ void sendicc()
     #warning DEBUG... remove it later on
     uint32_t ID = 0x101; // i want the sender to have 0 address .........
     embot::prot::can::Frame frame1 {ID, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
-    embot::msg::Location loc1 {embot::msg::Location::BUS::icc1, 3};
+    embot::app::msg::Location loc1 {embot::app::msg::Location::BUS::icc1, 3};
     embot::prot::can::Frame frame2 {ID, 8, {n, 2, 2, 2, 2, 2, 2, 2}};    
     embot::app::eth::theICCservice::getInstance().put({loc1, frame1});
     embot::app::eth::theICCservice::getInstance().put({loc1, frame2});

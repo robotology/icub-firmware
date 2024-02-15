@@ -34,7 +34,7 @@ namespace embot::app::eth {
     
         struct Item
         {
-            embot::msg::Location des {};
+            embot::app::msg::Location des {};
             embot::prot::can::Frame frame {};
             constexpr Item() = default;
         };
