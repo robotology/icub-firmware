@@ -522,7 +522,7 @@ bool AGENTadvfoc::iccdiscovery()
         for(size_t i=0; i<s; i++)
         {
             const auto &item = iccactuators[i];
-            const embot::app::msg::Location targetlocation {&item.actua.location};
+            volatile embot::app::msg::Location targetlocation {&item.actua.location};
             eObrd_info_t target = item.actua.board;
             
             if(0 == (target.firmware.major + target.firmware.minor + target.firmware.build + target.protocol.major + target.protocol.minor))
@@ -538,9 +538,9 @@ bool AGENTadvfoc::iccdiscovery()
 
                 volatile const embot::app::icc::Signature * signature = getsignature(i);
                  
-                embot::app::msg::Location location {signature->location.bus, signature->location.adr};
+                volatile embot::app::msg::Location location {signature->location.bus, signature->location.adr};
               
-                if(targetlocation == location)
+                if((targetlocation.bus == location.bus) && (targetlocation.adr == location.adr))
                 { 
                     detected.type = embot::core::tointegral(signature->board);    
                     detected.firmware.major = signature->application.major;

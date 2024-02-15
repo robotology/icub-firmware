@@ -33,10 +33,10 @@ namespace embot::app::board::amc2c::info {
     
     
 #if defined(USE_ICC_COMM)
-    constexpr uint8_t address {3}; 
+    constexpr uint8_t address {1}; 
     static constexpr embot::app::icc::Signature signature __attribute__((section(".ARM.__at_0x08100800"))) =
     {
-        embot::app::boards::Board::amcbldc,
+        embot::app::boards::Board::amc2c,
         {embot::app::msg::BUS::icc1, address},
         {3, 0, 0, 0},   // application version
         {2, 0},         // protocol version
