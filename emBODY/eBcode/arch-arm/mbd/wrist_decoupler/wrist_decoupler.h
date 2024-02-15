@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'wrist_decoupler'.
 //
-// Model version                  : 7.13
-// Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
-// C/C++ source code generated on : Tue Jul 25 11:18:40 2023
+// Model version                  : 8.5
+// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
+// C/C++ source code generated on : Wed Feb 14 13:47:53 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -109,12 +109,12 @@ class wrist_decoupler
     real_T PQ[3];                      // '<S1>/ypr2motors'
     real_T Q[9];                       // '<S1>/ypr2motors'
     real_T last_theta_ok[3];           // '<S1>/ypr2motors'
-    real_T Q_p[9];                     // '<S1>/motors2ypr'
-    real_T PQ_f[3];                    // '<S1>/motors2ypr'
-    real_T Pz_b[3];                    // '<S1>/motors2ypr'
-    real_T singularity_reg;            // '<S1>/motors2ypr'
+    real_T Q_a[9];                     // '<S1>/motors2ypr'
+    real_T PQ_c[3];                    // '<S1>/motors2ypr'
+    real_T Pz_i[3];                    // '<S1>/motors2ypr'
+    real_T attitude_ok[4];             // '<S1>/motors2ypr'
     boolean_T Pz_not_empty;            // '<S1>/ypr2motors'
-    boolean_T singularity_reg_not_empty;// '<S1>/motors2ypr'
+    boolean_T Q_not_empty;             // '<S1>/motors2ypr'
   };
 
   // External inputs (root inport signals with default storage)
@@ -170,9 +170,12 @@ class wrist_decoupler
   // private member function(s) for subsystem '<Root>'
   void cosd(real_T x[3]);
   void sind(real_T x[3]);
-  real_T maximum(const real_T x[3]);
+  void cosd_f(real_T *x);
+  void sind_c(real_T *x);
   real_T minimum(const real_T x[3]);
+  real_T maximum(const real_T x[3]);
   real_T det(const real_T x[9]);
+  void mldivide(const real_T A[9], const real_T B_0[3], real_T Y[3]);
 
   // Real-Time Model
   RT_MODEL rtM;
@@ -190,25 +193,25 @@ class wrist_decoupler
 //  MATLAB hilite_system command to trace the generated code back
 //  to the parent model.  For example,
 //
-//  hilite_system('spherical_wrist/Position_Controller/wrist_decoupler')    - opens subsystem spherical_wrist/Position_Controller/wrist_decoupler
-//  hilite_system('spherical_wrist/Position_Controller/wrist_decoupler/Kp') - opens and selects block Kp
+//  hilite_system('spherical_wrist2/Position_Controller/wrist_decoupler')    - opens subsystem spherical_wrist2/Position_Controller/wrist_decoupler
+//  hilite_system('spherical_wrist2/Position_Controller/wrist_decoupler/Kp') - opens and selects block Kp
 //
 //  Here is the system hierarchy for this model
 //
-//  '<Root>' : 'spherical_wrist/Position_Controller'
-//  '<S1>'   : 'spherical_wrist/Position_Controller/wrist_decoupler'
-//  '<S2>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles'
-//  '<S3>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Radians to Degrees'
-//  '<S4>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/motors2ypr'
-//  '<S5>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/ypr2motors'
-//  '<S6>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation'
-//  '<S7>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize'
-//  '<S8>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input'
-//  '<S9>'   : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem'
-//  '<S10>'  : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem1'
-//  '<S11>'  : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem2'
-//  '<S12>'  : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize/Quaternion Modulus'
-//  '<S13>'  : 'spherical_wrist/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize/Quaternion Modulus/Quaternion Norm'
+//  '<Root>' : 'spherical_wrist2/Position_Controller'
+//  '<S1>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler'
+//  '<S2>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles'
+//  '<S3>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler/Radians to Degrees'
+//  '<S4>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler/motors2ypr'
+//  '<S5>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler/ypr2motors'
+//  '<S6>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation'
+//  '<S7>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize'
+//  '<S8>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input'
+//  '<S9>'   : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem'
+//  '<S10>'  : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem1'
+//  '<S11>'  : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Angle Calculation/Protect asincos input/If Action Subsystem2'
+//  '<S12>'  : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize/Quaternion Modulus'
+//  '<S13>'  : 'spherical_wrist2/Position_Controller/wrist_decoupler/Quaternions to Rotation Angles/Quaternion Normalize/Quaternion Modulus/Quaternion Norm'
 
 #endif                                 // RTW_HEADER_wrist_decoupler_h_
 
