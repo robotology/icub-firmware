@@ -2548,7 +2548,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\mc\wrist_decoupler.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\wrist_decoupler\wrist_decoupler.cpp</PathWithFileName>
       <FilenameWithoutPath>wrist_decoupler.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
