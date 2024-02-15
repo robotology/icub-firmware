@@ -1469,9 +1469,9 @@
               <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_msg.cpp</FileName>
+              <FileName>embot_app_msg.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\app\eth\embot_msg.cpp</FilePath>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_msg.cpp</FilePath>
             </File>
           </Files>
         </Group>
