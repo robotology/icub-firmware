@@ -72,6 +72,8 @@ extern void Trajectory_set_vel_end(Trajectory *o, float v1, float avg_acc);
 extern void Trajectory_set_pos_raw(Trajectory *o, float p0);
 extern void Trajectory_set_vel_raw(Trajectory *o, float v0);
 
+extern void Trajectory_start2end(Trajectory *o, int32_t start, float end, float velAvg);
+
 extern int8_t Trajectory_do_step(Trajectory *o, float *p, float *v, float *a);
 
 extern void Trajectory_init(Trajectory *o, int32_t p0, int32_t v0, int32_t a0);
