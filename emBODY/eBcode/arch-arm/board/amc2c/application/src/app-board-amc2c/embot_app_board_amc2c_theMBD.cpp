@@ -476,7 +476,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
     }
     
     // read Vcc
-    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = 44; // TODO: read the voltage from ADC (temporary hardcoded)
+    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = getVIN();
 
     
     // -----------------------------------------------------------------------------

@@ -362,6 +362,24 @@ namespace embot::hw::bsp::amc2c {
         embot::hw::icc::printer::theClient::getInstance().post(str);
 #endif        
     }
+
+    float getVIN()
+    {
+        float v {0.0};
+        
+        v = 44.0; //analogVin() * 0.001;
+        return v;
+        
+    }
+
+    float getCIN()
+    {
+        float c {0.0};
+        
+        //c = analogCin() * 0.001;
+        return c;
+        
+    }
     
     
 }
