@@ -92,6 +92,72 @@ void AGENTadvfoc::synch(embot::app::eth::Service::State s)
     embot::app::eth::theServices::getInstance().synch(embot::app::eth::Service::Category::mc, s);     
 }
 
+bool AGENTadvfoc::adapt2FOCconfig()
+{
+    bool r {false};
+    // in here we transform the advfoc configuration into the foc configuration.
+    // the reason of this transformation is that the mcontroller uses the foc configuration and it is
+    // much easier to pass to it the foc pointer, clearly populated from advfoc
+    
+ 
+    // at first we need to verify compatibility
+    
+    // so far we have just need to check that the coupling data inside advfoc is compatible
+    if(eommccoupling_traditional4x4 != advfoc->adv4jomocoupling.type)
+    {
+        return false;
+    }
+    
+    // we have two parts that we need to adapt:
+    // 1. the jomo description
+    // 2. the jomo coupling
+       
+    
+    // 1. jomo description
+ 
+    // at first we clear the focjomodescriptors container
+    eo_array_Reset(focjomodescriptors);
+    
+    // then we iterate advjomodescriptors to get the actuators and encoder, create a eOmc_jomo_descriptor_t and push it back inside the container
+    for(uint8_t i=0; i<numofjomos; i++)
+    {
+        const eOmc_adv_jomo_descriptor_t *advjomodes = reinterpret_cast<const eOmc_adv_jomo_descriptor_t*>(eo_constarray_At(advjomodescriptors, i));
+
+        // i fill focjomodescriptors for the encoderreader and mcontroller
+        eOmc_jomo_descriptor_t jd {};              
+        jd.actuator.gen.location = advjomodes->actuator.location;   
+        jd.encoder1 = {advjomodes->encoder1.type, advjomodes->encoder1.port, advjomodes->encoder1.pos};   
+        jd.encoder2 = {advjomodes->encoder2.type, advjomodes->encoder2.port, advjomodes->encoder2.pos};               
+        eo_array_PushBack(focjomodescriptors, &jd);                  
+    } 
+
+
+    // 2. jomo coupling
+    
+    // at first we get some pointers
+    const eOmc_adv4jomo_coupling_t *JCsrc = &advfoc->adv4jomocoupling; 
+    eOmc_4jomo_coupling_t *JCdst = &foc->jomocoupling;
+        
+    // we have joint2set, jsetcfg, joint2motor and motor2joint w/ the same format, so we copy them directly
+    std::memmove(&JCdst->joint2set[0], &JCsrc->data.coupling4x4.joint2set[0], 4*sizeof(uint8_t));
+    std::memmove(&JCdst->jsetcfg[0], &JCsrc->data.coupling4x4.jsetcfg[0], 4*sizeof(eOmc_jointset_configuration_t));
+    std::memmove(&JCdst->joint2motor, &JCsrc->data.coupling4x4.joint2motor, sizeof(eOmc_4x4_matrix_t));
+    std::memmove(&JCdst->motor2joint, &JCsrc->data.coupling4x4.motor2joint, sizeof(eOmc_4x4_matrix_t));
+    // but we need to copy a eOmc_4x4_matrix_t inside a eOmc_4x6_matrix_t
+    for(uint8_t r=0; r<4; r++)
+    {
+        for(uint8_t c=0; c<6; c++)
+        {
+            eOq17_14_t v = (c<4) ? JCsrc->data.coupling4x4.encoder2joint4x4[r][c] : EOK_Q17_14_ZERO;
+            JCdst->encoder2joint[r][c] = v;
+        }        
+    }
+    
+    // jolly good
+    r = true;    
+    return r;
+}
+
 bool AGENTadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configuration_t *sc)
 {
     bool r {true};
@@ -118,8 +184,8 @@ bool AGENTadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configura
     } 
 
     
-    // copy into the foc jomocoupling
-    std::memmove(&foc->jomocoupling, &advfoc->adv4jomocoupling.data.traditional, sizeof(eOmc_4jomo_coupling_t));
+//    // copy into the foc jomocoupling
+//    std::memmove(&foc->jomocoupling, &advfoc->adv4jomocoupling.data.traditional, sizeof(eOmc_4jomo_coupling_t));
     
     // now i iterate advjomodescriptors to build up suitable data structure for actuators an encoders:
     for(uint8_t i=0; i<numofjomos; i++)
@@ -148,12 +214,12 @@ bool AGENTadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configura
             break;
         }
         
-        // i fill focjomodescriptors for the encoderreader and mcontroller
-        eOmc_jomo_descriptor_t jd {};              
-        jd.actuator.gen.location = advjomodes->actuator.location;   
-        jd.encoder1 = {advjomodes->encoder1.type, advjomodes->encoder1.port, advjomodes->encoder1.pos};   
-        jd.encoder2 = {advjomodes->encoder2.type, advjomodes->encoder2.port, advjomodes->encoder2.pos};               
-        eo_array_PushBack(focjomodescriptors, &jd);                  
+//        // i fill focjomodescriptors for the encoderreader and mcontroller
+//        eOmc_jomo_descriptor_t jd {};              
+//        jd.actuator.gen.location = advjomodes->actuator.location;   
+//        jd.encoder1 = {advjomodes->encoder1.type, advjomodes->encoder1.port, advjomodes->encoder1.pos};   
+//        jd.encoder2 = {advjomodes->encoder2.type, advjomodes->encoder2.port, advjomodes->encoder2.pos};               
+//        eo_array_PushBack(focjomodescriptors, &jd);                  
     } 
 
     // we need all valid actuators
@@ -164,6 +230,12 @@ bool AGENTadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configura
     }
     
     
+    // in here we build up the foc config to be passed to the mcontroller
+    if(false == adapt2FOCconfig())
+    {
+        clear();
+        return false;         
+    }
 
     // prepare the can discovery for can boards
     // in this service type we could have 4 different types of CAN boards 

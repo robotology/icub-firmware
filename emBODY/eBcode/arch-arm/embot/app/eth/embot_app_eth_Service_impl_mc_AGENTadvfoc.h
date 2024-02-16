@@ -98,6 +98,7 @@ protected:
         
         
     bool iccdiscovery();
+    bool adapt2FOCconfig();
 }; 
 
 } // namespace embot::app::eth::service::impl::mc { 
