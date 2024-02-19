@@ -50,6 +50,8 @@ struct AGENTs
     size_t numberofjomos() const;
     
     bool verifyactivate(embot::app::eth::Service::OnEndOfOperation onend);
+    
+    bool forceidle();
 
     bool deactivate();
     

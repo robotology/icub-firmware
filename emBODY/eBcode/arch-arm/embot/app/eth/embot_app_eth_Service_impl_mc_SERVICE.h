@@ -65,7 +65,7 @@ struct SERVICE
     
     bool stop();
     
-    bool forcestopofverify();
+    bool forceidle();
     
     bool start();
 

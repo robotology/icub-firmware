@@ -322,11 +322,12 @@ namespace embot::app::eth::service::impl::mc {
         return r;          
     }   
     
-    bool SERVICE::forcestopofverify()
+    bool SERVICE::forceidle()
     {
         bool r {true};
-        // so far we just ... deactivate
-        deactivate();
+        r = mcagents.forceidle();
+//        // so far we just ... deactivate
+//        deactivate();
         return r;          
     }   
     

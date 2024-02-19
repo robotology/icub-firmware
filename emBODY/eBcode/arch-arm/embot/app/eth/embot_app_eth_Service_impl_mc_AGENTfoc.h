@@ -36,6 +36,7 @@ struct AGENTfoc : public IFagent
     size_t numberofjomos() const override;    
     bool verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate = true) override;    
     bool activate() override;
+    bool forceidle() override;
     bool deactivate() override;
     bool stop() override;
     bool start() override;  
@@ -78,6 +79,9 @@ protected:
         if both steps are ok then p2core->state gets ::verified, and if triggeractivate is true then it is executed activate()        
 #endif
         
+    constexpr static uint8_t numberofverifysteps {2};
+    uint8_t stepofverify {0};
+    bool forceidleinverify {false};
     
     // static methods used for callbacks: void *tHIS must be a pointer to this AGENTfoc struct
     static void verify_step01_onENDof_verifyencoders(void *tHIS, bool operationisok);

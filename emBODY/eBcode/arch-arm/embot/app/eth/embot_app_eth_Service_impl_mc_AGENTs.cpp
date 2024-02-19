@@ -121,6 +121,10 @@ namespace embot::app::eth::service::impl::mc {
         return _theactiveagent->verify(onend, andactivate);        
     }   
 
+    bool AGENTs::forceidle()
+    {
+        return _theactiveagent->forceidle();
+    }
     
     bool AGENTs::deactivate()
     {

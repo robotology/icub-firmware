@@ -34,6 +34,7 @@ struct IFagent
     // we use the mode andactivate = true    
     virtual bool verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate = true) = 0;    
     virtual bool activate() = 0;
+    virtual bool forceidle() = 0;
     virtual bool deactivate() = 0;
     virtual bool stop() = 0;
     virtual bool start() = 0;
@@ -61,6 +62,9 @@ struct AGENTnone : public IFagent
     bool verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate = true) override
     { return false; }
 
+    bool forceidle() override
+    { return false; }
+    
     bool activate() override
     { return false; }
     

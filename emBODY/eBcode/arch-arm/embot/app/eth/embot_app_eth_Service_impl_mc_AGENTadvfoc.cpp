@@ -81,6 +81,8 @@ bool AGENTadvfoc::clear()
     eo_array_Reset(focjomodescriptors);      
     
     triggeractivate = false;
+    stepofverify = 0;
+    forceidleinverify = false;
     
     desc.clear();
     return r;
@@ -281,9 +283,17 @@ size_t AGENTadvfoc::numberofjomos() const
 bool AGENTadvfoc::verify(embot::app::eth::Service::OnEndOfOperation onend, bool andactivate)
 {
     bool r {true};
+
+    if(forceidleinverify == true)
+    {
+        synch(embot::app::eth::Service::State::idle);
+        clear();        
+        return false;        
+    }
     
     afterverifyactivate = onend;
     triggeractivate = andactivate;
+    stepofverify = 1;
     
     // i assign ... and bla bla bla.
     // i call 
@@ -293,6 +303,37 @@ bool AGENTadvfoc::verify(embot::app::eth::Service::OnEndOfOperation onend, bool 
     
     return r;
     
+}
+
+bool AGENTadvfoc::forceidle() 
+{
+    bool r {true};
+
+    embot::app::eth::Service::State s = p2core->state();
+    
+    if((embot::app::eth::Service::State::idle == s))
+    {
+    }
+    else if((embot::app::eth::Service::State::failureofverify == s))
+    {
+        synch(embot::app::eth::Service::State::idle);
+    }
+    else if((embot::app::eth::Service::State::started == s) || (embot::app::eth::Service::State::activated == s))
+    {
+        stop();
+        deactivate();
+        synch(embot::app::eth::Service::State::idle);
+    }
+    else if(embot::app::eth::Service::State::verifying == s)
+    {
+        forceidleinverify = true;        
+    }
+    else if(embot::app::eth::Service::State::verified == s)
+    {
+        forceidleinverify = true; 
+    }
+    
+    return r;
 }
 
 bool AGENTadvfoc::deactivate()
@@ -357,8 +398,21 @@ bool AGENTadvfoc::activate()
 {
     bool r {true};
     
-    // we should activate only if the state of p2core is ::verified ... but for now we just drop this check
-
+    // we should activate only if we are in State::verified     
+    embot::app::eth::Service::State s = p2core->state();
+    if(embot::app::eth::Service::State::verified != s)
+    {
+        return false;
+    }
+    
+    // and if we are not forced to idle
+    if(forceidleinverify == true)
+    {
+        synch(embot::app::eth::Service::State::idle);
+        clear();    
+        return false;
+    } 
+    
     eo_entities_SetNumOfJoints(eo_entities_GetHandle(), numofjomos);
     eo_entities_SetNumOfMotors(eo_entities_GetHandle(), numofjomos);
     
@@ -444,9 +498,17 @@ void AGENTadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operatio
 {  
     AGENTadvfoc *mcadvfoc = reinterpret_cast<AGENTadvfoc*>(tHIS);  
 
+    if(mcadvfoc->forceidleinverify == true)
+    {
+        mcadvfoc->synch(embot::app::eth::Service::State::idle);
+        mcadvfoc->clear(); 
+        return;
+    }
+    
     if(false == operationisok)
     {
-        // the encoder reader fails. we dont even start the discovery of the foc boards.
+        // the encoder reader fails. we dont even start the discovery of the foc boards.        
+        mcadvfoc->stepofverify = 0;
         
         // 1. assign new state  
         mcadvfoc->synch(embot::app::eth::Service::State::failureofverify);        
@@ -470,11 +532,10 @@ void AGENTadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operatio
     // now we may do icc discovery
     bool ICCdiscovery = (false == mcadvfoc->iccactuators.empty());  
     
+    mcadvfoc->stepofverify = 2;
+    
     if(true == ICCdiscovery)
     {
-        // nothing for now: i just call the verify_step02_onENDof_iccdiscovery w/ good params        
-//        verify_step02_onENDof_iccdiscovery(tHIS, true);
-        
         bool iicdiscoveryOK = mcadvfoc->iccdiscovery();
         verify_step02_onENDof_iccdiscovery(tHIS, iicdiscoveryOK);
     }
@@ -490,10 +551,18 @@ void AGENTadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operatio
 void AGENTadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok)
 {
     AGENTadvfoc *mcadvfoc = reinterpret_cast<AGENTadvfoc*>(tHIS);  
-
+    
+    if(mcadvfoc->forceidleinverify == true)
+    {
+        mcadvfoc->synch(embot::app::eth::Service::State::idle);
+        mcadvfoc->clear();    
+        return;
+    }    
+    
     if(false == searchisok)
     {
         // the icc discovery fails. we dont even start the discovery of the can boards.
+        mcadvfoc->stepofverify = 0;
         
         // 1. assign new state  
         mcadvfoc->synch(embot::app::eth::Service::State::failureofverify);        
@@ -519,6 +588,8 @@ void AGENTadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok
     
     bool CANdiscovery = (false == mcadvfoc->canactuators.empty());
 
+    mcadvfoc->stepofverify = 3;
+    
     if(true == CANdiscovery)
     {
         eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), mcadvfoc->cantools.discoverytargets, &mcadvfoc->cantools.ondiscoverystop);      
@@ -537,6 +608,14 @@ eOresult_t AGENTadvfoc::verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANd
     
     AGENTadvfoc *mcadvfoc = reinterpret_cast<AGENTadvfoc*>(tHIS);
 
+    if(mcadvfoc->forceidleinverify == true)
+    {
+        mcadvfoc->synch(embot::app::eth::Service::State::idle);
+        mcadvfoc->clear();    
+        return r;
+    }    
+
+    
     // it is the final step, so: i get the params ...
     
     //eOmn_serv_state_t state {eomn_serv_state_verified};
@@ -559,6 +638,7 @@ eOresult_t AGENTadvfoc::verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANd
     // 1. assign new state
     mcadvfoc->synch(state);
     
+    mcadvfoc->stepofverify = 0;
     
     // 2. send diagnostics
     mcadvfoc->emit(s, errorcode);

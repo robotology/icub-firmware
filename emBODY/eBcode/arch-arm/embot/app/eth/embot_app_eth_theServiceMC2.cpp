@@ -89,7 +89,8 @@ bool embot::app::eth::theServiceMC::Impl::initialise()
     _mcservice.synch(embot::app::eth::Service::State::idle);
     
 #if 0
-    state()     idle
+    we are in:
+    state()     State::idle
     active()    false
     started()   false
 #endif    
@@ -103,33 +104,33 @@ bool embot::app::eth::theServiceMC::Impl::stop()
     p_traceprint("stop()");
 
 #if 0
-    it generates trasnsition started --> activate, so to preceed we must be in started state
-    state   started
-    active  true
-    started true
+    it generates the transition State::started --> State::activated, 
+    so to preceed we must be in:
+    state()     State::started
+    active()    true
+    started()   true
 #endif      
-
-    if(false == _mcservice.active())
-    {   // nothing to do because object must be activated
-        return true;
-    } 
-        
-    if(false == _mcservice.started())
-    {   // it is already stopped
-        return true;
+    
+    if(embot::app::eth::Service::State::started != _mcservice.state())
+    {
+        // it is not is State::started, so we dont proceed
+        // the return value is not very important, but we use:
+        // - true if we already are in the target State::activated, or
+        // - false to tell that stop() was wrongly called 
+        return embot::app::eth::Service::State::activated == _mcservice.state();
     }
     
     // do action
     _mcservice.stop();
 
-    // and then uptdate the state to activated 
+    // and then update the state to activated 
     _mcservice.synch(embot::app::eth::Service::State::activated);
 
 #if 0
-    we have
-    state   activated
-    active  true
-    started false
+    we are in:
+    state()     State::activated
+    active()    true
+    started()   false
 #endif
     
     return true;
@@ -139,47 +140,79 @@ bool embot::app::eth::theServiceMC::Impl::deactivate()
 {
     p_traceprint("deactivate()");
     
-        
-    // if the  service is not activated (so states: idle, failureofverify, verified or verifying) i just clear and synch to idle
-    // actually the state verifying may give some problems but that should never happen
-    if(false == _mcservice.active())
+    // we should call deactivate() only if we are in State::activated or State::failureofverifying, BUT
+    // we want to be sure that this action ALWAYS sends the service in State::idle, SO:
+    // there are other state to be considered:
+    
+    embot::app::eth::Service::State s = _mcservice.state();
+    
+    
+    // 1. if the service is in State::verifying, then YRI is doing some great mess because it has just sent two consecutive
+    // requests, the former of verifyactivate and the latter of deactivate.
+    // it is difficult to recover because the State::verifying requires some background activity that cannot be easily stopped,
+    // rather it must terminate by itself. also, the verification activities depend on the kind of service type, so at the end on
+    // the underlying embot::app::eth::service::impl::mc::IFagent.
+    // SO, we just call a forceidle() method that will do the right thing and we just return
+    //
+    // 2. if the state is in State::verified, then we are in the same situation of a previous verifyactivate request from YRI but we 
+    // have just terminated the verification phase. even in here, we call a forceidle() method and we just return
+    // 
+
+    if((embot::app::eth::Service::State::verifying == s) || (embot::app::eth::Service::State::verified == s))
     {
-        _mcservice.clear(); 
+        _mcservice.forceidle(); 
         _mcservice.synch(embot::app::eth::Service::State::idle);
         return true;        
     } 
     
-#if 0
-    now we surely are in
-    state   started / activated
-    active  true
-    started true / false
-#endif    
-        
+    // 3. for States::idle or ::failureofverify i just clear, synch to ::idle and return true.     
     
-    // if the service is in state started at first we stop it so that it goes into state activated
-    if(true == _mcservice.started())
+    if((embot::app::eth::Service::State::idle == s) || (embot::app::eth::Service::State::failureofverify == s))
+    {
+        _mcservice.clear(); 
+        _mcservice.synch(embot::app::eth::Service::State::idle);
+        return true;        
+    }      
+
+    // 4. if the service is activated (so States::started or ::activated), we proceed as follows 
+#if 0
+    we are in:
+    state()     State::started or State::activated
+    active()    true
+    started()   false or false
+#endif    
+    
+    // if the service is in State::started at first we stop it so that it goes into state ::activated
+    if(embot::app::eth::Service::State::started == s)
     {
         Impl::stop();   
     }    
 
 #if 0
-    now we surely are in
-    state   activated
-    active  true
-    started false
+    we are in:
+    state()     State::activated
+    active()    true
+    started()   false
 #endif 
     
     // we just need to make sure the regulars are cleared
     uint8_t n {0};
     Impl::set(nullptr, n);  
     
-    // then we call the proper deactivate of the mcservice that sends into idle state
+    // then we call the proper deactivate of the mcservice that sends into ::idle
     _mcservice.deactivate();
     
-    // i may also force gain the active flag to false and the state idle 
+    // i may also force again to State::idle 
     _mcservice.synch(embot::app::eth::Service::State::idle);
-    
+
+
+#if 0
+    we are in:
+    state()     State::idle
+    active()    false
+    started()   false
+#endif 
+        
     return true;
 }
 
@@ -188,52 +221,79 @@ bool embot::app::eth::theServiceMC::Impl::verifyactivate(const embot::app::eth::
 {
     p_traceprint("verifyactivate()");
     
+    // we should call verifyactivate() only if we are in State::idle, BUT
+    // we want to be sure that any wrong request of verifyactivate() does not harm the service, SO:
+    // there are other state to be considered:
+    
+    embot::app::eth::Service::State s = _mcservice.state();
+
 #if 0
-    state()     any, but normally: idle, activated, started, failureofverify. hopefully never verifying or verified
+    we are in:
+    state()     any
     active()    any
     started()   any
 #endif 
-    
-    // if we already are in states activated or started we need to go back to idle. we call deactivate() that also calls stop() if needed.
-    // but it would be much better to call deactivate() in any case because we want to go to idle in any case.
-    // only thing: if we are in verifying state we should just drop the request.
 
-#if 0
-    // as it was     
-    if(true == _mcservice.active())
+    // 1. if the service is in State::verifying, then YRI is doing some great mess because it has just sent two consecutive
+    // requests of verifyactivate.
+    // it is difficult to recover because the State::verifying requires some background activity that cannot be easily stopped,
+    // rather it must terminate by itself. also, the verification activities depend on the kind of service type, so at the end on
+    // the underlying embot::app::eth::service::impl::mc::IFagent.
+    // SO, we just call a forceidle() method that will do the right thing and we just return false with a failure
+    //
+    // 2. if the state is in State::verified, then we are in the same situation of a previous verifyactivate request from YRI but we 
+    // have just terminated the verification phase. even in here, we call a forceidle() method and we just return
+    // 
+    
+    if((embot::app::eth::Service::State::verifying == s) || (embot::app::eth::Service::State::verified == s))
     {
-        deactivate();        
-    }         
-#else
-    // as it is better to have
-    if(embot::app::eth::Service::State::verifying == _mcservice.state())
-    {
-        // damn: the board is busy in verifying what YRI has asked, YRI is waiting for a reply and so we should never receive this request. 
-        // nevertheless we dont continue and ...        
-        _mcservice.forcestopofverify();        
-        _mcservice.synch(embot::app::eth::Service::State::failureofverify);
+        // damn: the board is busy in verifying what YRI has asked, YRI is waiting for a reply
+        // so we should never have received this request, SO: we trye to recover.
+        // we ask the underlying verification to interrupt itself and go in a safe State::idle
+        // and in here we transmit back a failure 
+        //         
+        _mcservice.forceidle();        
+        _mcservice.synch(embot::app::eth::Service::State::idle);
         
         if(nullptr != onendofverifyactivate)
         {
             onendofverifyactivate(_owner, false); 
-        }        
+        } 
+        #if 0
+            we are in:
+            state()     State::failureofverify
+            active()    false
+            started()   false
+        #endif           
         return false;                
     }
     
-    // in all other cases it is better to deactivate() first
+    // 3. for States::idle or ::failureofverify i just clear, synch to ::idle and continue.
     
-    deactivate();
+    if((embot::app::eth::Service::State::idle == s) || (embot::app::eth::Service::State::failureofverify == s))
+    {
+        _mcservice.clear(); 
+        _mcservice.synch(embot::app::eth::Service::State::idle);      
+    }     
+    
+    // 4. if we are in State::activated or ::started I need first to go back to ::idle. 
+    // a call to deactivate() does it perfectly and also such to State::idle)
 
-#endif
+    if((embot::app::eth::Service::State::activated == s) || (embot::app::eth::Service::State::started == s))
+    {    
+        deactivate();
+    }
     
  
-#if 0
-    now we surely are in
-    state     idle
-    active    false
-    started   false
-#endif     
+    // 5. now we are sure we are in State::idle, so we proceed safely
     
+#if 0
+
+    state()     State::idle
+    active()    false
+    started()   false
+#endif 
+            
     if((nullptr == servcfg) || (embot::app::eth::Service::Config::Type::eOmn_serv != servcfg->type()))
     { 
         _mcservice.synch(embot::app::eth::Service::State::failureofverify);        
@@ -243,8 +303,7 @@ bool embot::app::eth::theServiceMC::Impl::verifyactivate(const embot::app::eth::
         }        
         return false;
     }
-    
-    
+        
     // now we check if service configuration is OK
 
     const eOmn_serv_configuration_t * svc =  reinterpret_cast<const eOmn_serv_configuration_t*>(servcfg->memory());      
@@ -263,8 +322,7 @@ bool embot::app::eth::theServiceMC::Impl::verifyactivate(const embot::app::eth::
     
 
     // ok, i can verify
-    
- 
+     
     // load and copy inside the service configuration
     if(false == _mcservice.load(_owner, svc))
     {
@@ -272,21 +330,27 @@ bool embot::app::eth::theServiceMC::Impl::verifyactivate(const embot::app::eth::
         if(nullptr != onendofverifyactivate)
         {
             onendofverifyactivate(_owner, false); 
-        }        
+        } 
+        #if 0
+            we have failed the verification because for wrong configuration
+            we are in:
+            state()     State::failureofverify
+            active()    false
+            started()   false
+        #endif           
         return false;        
     }
     
     // assign the proper state before calling _mcservice.verifyactivate()
-    // because the final state is assigned 
+    // even if _mcservice.verifyactivate() may change it internally
     _mcservice.synch(embot::app::eth::Service::State::verifying);    
 
-
 #if 0
-    we are now
-    state   verifying
-    active  true
-    started false
-#endif      
+    we are in:
+    state()     State::verifying
+    active()    false
+    started()   false
+#endif 
     
     // start the process. at end of verification we may go to states:
     // - failureofverify, or
@@ -297,12 +361,29 @@ bool embot::app::eth::theServiceMC::Impl::verifyactivate(const embot::app::eth::
         if(nullptr != onendofverifyactivate)
         {
             onendofverifyactivate(_owner, false); 
-        }        
+        } 
+        #if 0
+            the verification can be done immediatley and has failed because required resources are not present
+            we are in:
+            state()     State::failureofverify
+            active()    false
+            started()   false
+        #endif         
         return false;         
     }
-    
-    // i dont assign the state verifying now because ... it will be _mcservice
-    // that internally does that or change the state.    
+    else
+    {
+#if 0
+    if the verification can be done immediately the service is also activated, so:  
+    state()     State::activated 
+    active()    true
+    started()   false 
+    else (as in the case of a CAN discovery) the service stays in State::verifying until 
+    the check is done. it will be another thread that will send the service in State::failureofverifying or
+    ::verified and then ::activated
+    for the case of CAN discovery only it will be the CAN receiving thread etc.        
+#endif         
+    }
     
     return true;
 }
@@ -311,40 +392,36 @@ bool embot::app::eth::theServiceMC::Impl::verifyactivate(const embot::app::eth::
 bool embot::app::eth::theServiceMC::Impl::start()
 {
     p_traceprint("start()");
-    
+
 #if 0
-    to proceed we must have
-    state   activated
-    active  true
-    started false
+    it generates the transition State::activated --> State::started, 
+    so to preceed we must be in:
+    state()     State::activated
+    active()    true
+    started()   false
 #endif      
-       
-    if(false == _mcservice.active())
-    {   // nothing to do because object must be first activated
-        return true;
-    } 
-        
-    if(true == _mcservice.started())
-    {   // it is already started
-        return true;
-    }
-                       
-//    // we just need to start a read of the encoder, nothing else 
-//    embot::app::eth::theEncoderReader::getInstance().StartReading();
     
+    if(embot::app::eth::Service::State::activated != _mcservice.state())
+    {
+        // it is not is State::activated, so we dont proceed
+        // the return value is not very important, but we use:
+        // - true if we already are in the target State::started, or
+        // - false to tell that start() was wrongly called 
+        return embot::app::eth::Service::State::started == _mcservice.state();
+    }    
+          
     _mcservice.start();
 
     
-    // now i synch to state started 
+    // now i also synch to State::started 
     _mcservice.synch(embot::app::eth::Service::State::started);
-
-    
+   
 #if 0
-    and now we have
-    state   started
-    active  true
-    started true
-#endif   
+    we are in:
+    state()     State::started
+    active()    true
+    started()   true
+#endif  
     
     return true;
 }
@@ -356,15 +433,15 @@ bool embot::app::eth::theServiceMC::Impl::set(const eOmn_serv_arrayof_id32_t* ar
     p_traceprint("set(ID32)");
     
 #if 0
-    must be
-    state   activated / started
-    active  true
-    started false / true
+    it must be activated, so:
+    state()     State::activated or ::started
+    active()    true
+    started()   false or true
 #endif      
     
     if(false == _mcservice.active())
-    {   // nothing to do because object must be activated
-        return true;
+    {   // nothing to do because object must be activated first
+        return false;
     } 
 
     bool r = embot::app::eth::theServices::getInstance().setREGULARS(_mcservice.core.id32ofRegulars, arrayofid32, p_isID32relevant, &numberofthem);
@@ -377,15 +454,15 @@ bool embot::app::eth::theServiceMC::Impl::tick(bool resetstatus)
 //    p_traceprint("tick()");
     
 #if 0
-    must be
-    state   started
-    active  true
-    started true
-#endif  
+    it is called by theHandler during the DO phase every 1 ms but we executed it only if:
+    state()     State::started
+    active()    true
+    started()   true
+#endif     
     
         
     if(false == _mcservice.started())
-    {   // not yet started
+    {   // not yet started, so we dont execute the tick(). we may return true
         return true;
     }
      
@@ -407,7 +484,7 @@ bool embot::app::eth::theServiceMC::Impl::process(const DescriptorCANframe &canf
 //    p_traceprint("process(DescriptorCANframe)");    
     bool r {false};
 
-    // i can proceed only if service is active .... 
+    // i proceed a CAN frame only if service is active .... 
     if(false == _mcservice.active())
     {
         return r;
@@ -426,7 +503,7 @@ bool embot::app::eth::theServiceMC::Impl::process(const DescriptorFrame &framede
 //    p_traceprint("process(DescriptorCANframe)");    
     bool r {false};
 
-    // i can proceed only if service is active .... 
+    // i proceed a CAN/ICC frame only if service is active .... 
     if(false == _mcservice.active())
     {
         return r;
@@ -441,7 +518,7 @@ bool embot::app::eth::theServiceMC::Impl::process(const DescriptorROP &ropdescri
     
     bool r {false};
     
-    // i can proceed only if service is active .... 
+    // i proceed a ROP only if the service is active .... 
     if(false == _mcservice.active())
     {
         return r;
