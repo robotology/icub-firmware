@@ -128,7 +128,7 @@ void embot::app::bldc::theApplication::Impl::onInit(embot::os::Thread *t, void* 
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one, embot::hw::LED::two};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);       
-    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
+    theleds.get(embot::hw::LED::one).pulse(4*embot::core::time1second); 
 
     
     impl->justbeforeSchedulerStart(t, initparam);

@@ -742,8 +742,8 @@ extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t e
     // brd: 
     static const uint32_t tableB[] = // [epen]
     {
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),          // joint
-        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc),          // motor
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc) | (1 << eobrd_cantype_amc2c), // joint
+        (1 << eobrd_cantype_mc4) | (1 << eobrd_cantype_foc) | (1 << eobrd_cantype_pmc) | (1 << eobrd_cantype_amcbldc) | (1 << eobrd_cantype_amc2c), // motor
         (1 << eobrd_cantype_strain) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_strain2c),                             // strain
         (1 << eobrd_cantype_mais),                                                                                              // mais
         (1 << eobrd_cantype_mtb4) | (1 << eobrd_cantype_strain2) | (1 << eobrd_cantype_mtb4c) | (1 << eobrd_cantype_strain2c),  // temperature                                                                                           // inertial
@@ -864,14 +864,14 @@ static void s_eo_canmap_entities_index_set(eOcanmap_board_extended_t * theboard,
     {
         // we can have: 
         // - mc4can: first insideindex in nib-0 or second in nib-1
-        // - 1foc or amcbldc: first insideindex in nib-0
+        // - 1foc or amcbldc or amc2c: first insideindex in nib-0
         // - pmc: first insideindex in nib-0, or second in nib-1, or third in nib-2  
 
         if(eobrd_cantype_mc4 == theboard->board.props.type)  
         {   
             nib = (eobrd_caninsideindex_none == insideindex2use) ? 0 : insideindex2use;
         }
-        else if((eobrd_cantype_foc == theboard->board.props.type) || (eobrd_cantype_amcbldc == theboard->board.props.type))
+        else if((eobrd_cantype_foc == theboard->board.props.type) || (eobrd_cantype_amcbldc == theboard->board.props.type) || (eobrd_cantype_amc2c == theboard->board.props.type))
         {
             nib = 0;
         }
@@ -982,8 +982,8 @@ static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * 
     eOprotIndex_t index = EOK_uint08dummy;
 
 
-    if((eobrd_cantype_foc == theboard->board.props.type) || (eobrd_cantype_amcbldc == theboard->board.props.type)) 
-    {   // if 1foc / amcbldc it is always in nibble-0 
+    if((eobrd_cantype_foc == theboard->board.props.type) || (eobrd_cantype_amcbldc == theboard->board.props.type) || (eobrd_cantype_amc2c == theboard->board.props.type)) 
+    {   // if 1foc / amcbldc / amc2c it is always in nibble-0 
         index = theboard->board.entities2.compactIndicesOf & 0x000F;
     }
     else if(theboard->board.props.type == eobrd_cantype_mc4)
@@ -1120,7 +1120,7 @@ static eObrd_caninsideindex_t s_eo_canmap_entities_caninsideindex_get(const eOca
     
     if(index == (tmp & 0x000F))
     {
-        inside = eobrd_caninsideindex_first; // for 1foc / amcbldc we could use eobrd_caninsideindex_none, but it is ok even in this way
+        inside = eobrd_caninsideindex_first; // for 1foc / amcbldc / amc2c we could use eobrd_caninsideindex_none, but it is ok even in this way
     }
     else if(index == ((tmp >> 4) & 0x000F))
     {

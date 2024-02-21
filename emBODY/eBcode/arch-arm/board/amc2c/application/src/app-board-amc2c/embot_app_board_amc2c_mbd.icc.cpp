@@ -29,7 +29,7 @@
 
 #include "embot_app_eth_theICCservice.h"
 
-void regularTX(std::vector<embot::prot::can::Frame> &output)
+void regularTX(std::vector<embot::app::bldc::MSG> &output)
 {
     // print over debugger ... ?
     // add a canprint to output queue _tCOMMoutframes
@@ -56,7 +56,7 @@ void regularTX(std::vector<embot::prot::can::Frame> &output)
 
 namespace embot::app::board::amc2c::mbd {
     
-    void Startup(embot::prot::can::Address adr)
+    void Startup(embot::app::msg::ADR adr)
     {
 #if defined(TEST_theICCservice)
         
@@ -73,7 +73,7 @@ namespace embot::app::board::amc2c::mbd {
 
     }
     
-    void OnTick(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output)
+    void OnTick(const std::vector<embot::app::bldc::MSG> &input, std::vector<embot::app::bldc::MSG> &output)
     {        
 #if defined(TEST_theICCservice)
         

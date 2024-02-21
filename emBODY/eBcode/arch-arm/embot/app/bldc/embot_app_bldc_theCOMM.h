@@ -14,7 +14,7 @@
 
 #include <memory>
 #include <vector>
-#include "embot_prot_can.h"
+
 #include "embot_app_bldc_COMM.h"
 #include "embot_app_application_CANagentCORE.h"
 #include "embot_os_common.h"
@@ -58,12 +58,12 @@ namespace embot { namespace app { namespace bldc {
 
 //        bool subscribe(Direction dir, const embot::os::Action &action);  
 
-        bool add(const embot::prot::can::Frame &frame) override;
-        bool add(const std::vector<embot::prot::can::Frame> &frames) override;      
+        bool add(const embot::app::bldc::MSG &frame) override;
+        bool add(const std::vector<embot::app::bldc::MSG> &frames) override;      
 
         // retrieval methods
-        bool get(size_t &remaining, embot::prot::can::Frame &frame) override;
-        bool get(size_t &remaining, std::vector<embot::prot::can::Frame> &frames, size_t &retrieved, const size_t max2retrieve = COMM::MAXcapacity) override;          
+        bool get(size_t &remaining, embot::app::bldc::MSG &frame) override;
+        bool get(size_t &remaining, std::vector<embot::app::bldc::MSG> &frames, size_t &retrieved, const size_t max2retrieve = COMM::MAXcapacity) override;          
         
         
     private:

@@ -106,20 +106,20 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *fram
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *frame, eOcanport_t port)
 {   
-    // not from modern can-based mc boards managed by the amc (amcbldc, 2foc)
+    // not from modern can-based mc boards managed by the amc (amcbldc, amc2c, 2foc)
     return(eores_NOK_generic); 
 }
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__MOTOR_POSITION(eOcanframe_t *frame, eOcanport_t port)
 {
-    // not from modern can-based mc boards managed by the amc (amcbldc, 2foc)
+    // not from modern can-based mc boards managed by the amc (amcbldc, amc2c, 2foc)
     return(eores_OK);       
 }
 
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *frame, eOcanport_t port)
 {
-    // not from modern can-based mc boards managed by the amc (amcbldc, 2foc)
+    // not from modern can-based mc boards managed by the amc (amcbldc, amc2c, 2foc)
     return(eores_OK);
 }
 
@@ -134,7 +134,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__CURRENT(eOcanframe_t *frame, eOcanport_t port)
 {
-    // not from modern can-based mc boards managed by the amc (amcbldc, 2foc)    
+    // not from modern can-based mc boards managed by the amc (amcbldc, amc2c, 2foc)    
     return(eores_OK);
 }
 
@@ -155,20 +155,20 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PRINT(eOcanframe_t *fra
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *frame, eOcanport_t port)
 {
-    // not from modern can-based mc boards managed by the amc (amcbldc, 2foc)
+    // not from modern can-based mc boards managed by the amc (amcbldc, amc2c, 2foc)
     return(eores_NOK_generic); 
 }
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t *frame, eOcanport_t port)
 {
-    // not from modern can-based mc boards managed by the amc (amcbldc, 2foc)
+    // not from modern can-based mc boards managed by the amc (amcbldc, amc2c, 2foc)
     return(eores_NOK_generic); 
 }
 
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcanframe_t *frame, eOcanport_t port)
 {
-    // not from modern can-based mc boards managed by the amc (amcbldc, 2foc)
+    // not from modern can-based mc boards managed by the amc (amcbldc, amc2c, 2foc)
     return(eores_NOK_generic); 
 }
 

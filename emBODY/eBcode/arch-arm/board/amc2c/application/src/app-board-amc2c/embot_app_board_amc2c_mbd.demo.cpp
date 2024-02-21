@@ -40,7 +40,7 @@ namespace embot::app::board::amc2c::mbd {
 
     }
     
-    void OnTick(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output)
+    void OnTick(const std::vector<embot::app::bldc::MSG> &input, std::vector<embot::app::bldc::MSG> &output)
     {
 #if! defined(TEST_embot_hw_icc)
         embot::app::board::amc2c::theMBD::getInstance().tick(input, output);    

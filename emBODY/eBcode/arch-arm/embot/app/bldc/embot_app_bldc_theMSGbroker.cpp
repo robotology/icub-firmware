@@ -55,20 +55,20 @@ struct embot::app::bldc::theMSGbroker::Impl
     bool _initted {false};
     
     embot::os::rtos::mutex_t *_rxm {nullptr};
-    std::vector<embot::prot::can::Frame> _rxCANvector {};
+    std::vector<embot::app::bldc::MSG> _rxMSGvector {};
     embot::os::rtos::mutex_t *_txm {nullptr};    
-    std::vector<embot::prot::can::Frame> _txCANvector {};     
+    std::vector<embot::app::bldc::MSG> _txMSGvector {};     
         
     // the initialization code
     bool initialise(Config config);       
 
     size_t size(Direction dir) const;
 
-    bool add(Direction dir, const embot::prot::can::Frame &frame);
-    bool add(Direction dir, const std::vector<embot::prot::can::Frame> &frames);        
+    bool add(Direction dir, const embot::app::bldc::MSG &msg);
+    bool add(Direction dir, const std::vector<embot::app::bldc::MSG> &msgs);        
 
-    bool rem(Direction dir, size_t &remaining, embot::prot::can::Frame &frame);
-    bool rem(Direction dir, size_t &remaining, std::vector<embot::prot::can::Frame> &frames, size_t &retrieved, const size_t max2retrieve);  
+    bool rem(Direction dir, size_t &remaining, embot::app::bldc::MSG &msg);
+    bool rem(Direction dir, size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve);  
         
     bool subscribe(Direction dir, const embot::os::Action &action);
 };
@@ -92,8 +92,8 @@ bool embot::app::bldc::theMSGbroker::Impl::initialise(const Config config)
     
     _rxm = embot::os::rtos::mutex_new();
     _txm = embot::os::rtos::mutex_new();
-    _rxCANvector.reserve(_config.rxCapacity);
-    _txCANvector.reserve(_config.txCapacity);
+    _rxMSGvector.reserve(_config.rxCapacity);
+    _txMSGvector.reserve(_config.txCapacity);
     
     _initted = true;
     return _initted;
@@ -107,20 +107,20 @@ size_t embot::app::bldc::theMSGbroker::Impl::size(Direction dir) const
     if(Direction::INP == dir)
     {
         embot::os::rtos::mutex_take(_rxm, embot::core::reltimeWaitForever);
-        r = _rxCANvector.size();
+        r = _rxMSGvector.size();
         embot::os::rtos::mutex_release(_rxm); 
     }
     else
     {
         embot::os::rtos::mutex_take(_txm, embot::core::reltimeWaitForever);
-        r = _txCANvector.size();
+        r = _txMSGvector.size();
         embot::os::rtos::mutex_release(_txm);
     }  
     
     return r;
 }
 
-bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const embot::prot::can::Frame &frame)
+bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const embot::app::bldc::MSG &msg)
 {
     bool r {false};
     
@@ -130,12 +130,12 @@ bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const embot::prot:
     {
         embot::os::rtos::mutex_take(_rxm, embot::core::reltimeWaitForever);
 #if defined(SHARED_CIRCULAR)        
-        if((_rxCANvector.size() + s) > _config.rxCapacity)
+        if((_rxMSGvector.size() + s) > _config.rxCapacity)
         {
-            _rxCANvector.erase(_rxCANvector.begin());
+            _rxMSGvector.erase(_rxMSGvector.begin());
         }
 #endif
-        _rxCANvector.push_back(frame);
+        _rxMSGvector.push_back(msg);
         _onRX.execute();
         r = true;
         embot::os::rtos::mutex_release(_rxm); 
@@ -144,12 +144,12 @@ bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const embot::prot:
     {
         embot::os::rtos::mutex_take(_txm, embot::core::reltimeWaitForever);
 #if defined(SHARED_CIRCULAR)        
-        if((_txCANvector.size() + s) > _config.txCapacity)
+        if((_txMSGvector.size() + s) > _config.txCapacity)
         {
-            _txCANvector.erase(_txCANvector.begin());
+            _txMSGvector.erase(_txMSGvector.begin());
         }
 #endif
-        _txCANvector.push_back(frame);
+        _txMSGvector.push_back(msg);
         _onTX.execute();
         r = true;
         embot::os::rtos::mutex_release(_txm);
@@ -158,33 +158,33 @@ bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const embot::prot:
     return r;
 }
 
-bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const std::vector<embot::prot::can::Frame> &frames)
+bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const std::vector<embot::app::bldc::MSG> &msgs)
 {
     bool r {false};
     
-    if(true == frames.empty())
+    if(true == msgs.empty())
     {
         return r;
     }
 
 #if defined(SHARED_CIRCULAR)
-    // we limit the number of insertable frames to capacity
-    const size_t s = std::min(frames.size(), (Direction::INP == dir) ? _config.rxCapacity : _config.txCapacity);
+    // we limit the number of insertable msgs to capacity
+    const size_t s = std::min(msgs.size(), (Direction::INP == dir) ? _config.rxCapacity : _config.txCapacity);
 #else    
-    const size_t s = frames.size();
+    const size_t s = msgs.size();
 #endif 
     
     if(Direction::INP == dir)
     {
         embot::os::rtos::mutex_take(_rxm, embot::core::reltimeWaitForever);        
 #if defined(SHARED_CIRCULAR)
-        int toremove = s - (_config.rxCapacity - _rxCANvector.size());        
+        int toremove = s - (_config.rxCapacity - _rxMSGvector.size());        
         if(toremove > 0)
         {
-            _rxCANvector.erase(_rxCANvector.begin(), _rxCANvector.begin() + toremove);
+            _rxMSGvector.erase(_rxMSGvector.begin(), _rxMSGvector.begin() + toremove);
         }
 #endif
-        _rxCANvector.insert(_rxCANvector.end(), frames.begin(), frames.begin() + s);
+        _rxMSGvector.insert(_rxMSGvector.end(), msgs.begin(), msgs.begin() + s);
         _onRX.execute();
         r = true;
         embot::os::rtos::mutex_release(_rxm);
@@ -193,13 +193,13 @@ bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const std::vector<
     {
         embot::os::rtos::mutex_take(_txm, embot::core::reltimeWaitForever);
 #if defined(SHARED_CIRCULAR)
-        int toremove = s - (_config.txCapacity - _txCANvector.size());        
+        int toremove = s - (_config.txCapacity - _txMSGvector.size());        
         if(toremove > 0)
         {
-            _txCANvector.erase(_txCANvector.begin(), _txCANvector.begin() + toremove);
+            _txMSGvector.erase(_txMSGvector.begin(), _txMSGvector.begin() + toremove);
         }
 #endif
-        _txCANvector.insert(_txCANvector.end(), frames.begin(), frames.begin() + s);
+        _txMSGvector.insert(_txMSGvector.end(), msgs.begin(), msgs.begin() + s);
         _onTX.execute();
         r = true;
         embot::os::rtos::mutex_release(_txm);        
@@ -209,22 +209,22 @@ bool embot::app::bldc::theMSGbroker::Impl::add(Direction dir, const std::vector<
 }
 
 
-bool embot::app::bldc::theMSGbroker::Impl::rem(Direction dir, size_t &remaining, embot::prot::can::Frame &frame)
+bool embot::app::bldc::theMSGbroker::Impl::rem(Direction dir, size_t &remaining, embot::app::bldc::MSG &msg)
 {
     bool r {false};
 
     remaining = 0;
-    embot::prot::can::Frame ff {};
+    embot::app::bldc::MSG ff {};
             
     if(Direction::INP == dir)
     {
         embot::os::rtos::mutex_take(_rxm, embot::core::reltimeWaitForever);
-        if(!_rxCANvector.empty())
+        if(!_rxMSGvector.empty())
         {
-            ff = _rxCANvector.front();
-            frame = ff;
-            _rxCANvector.erase(_rxCANvector.begin());
-            remaining = _rxCANvector.size();
+            ff = _rxMSGvector.front();
+            msg = ff;
+            _rxMSGvector.erase(_rxMSGvector.begin());
+            remaining = _rxMSGvector.size();
             r = true;            
         }
         embot::os::rtos::mutex_release(_rxm); 
@@ -232,12 +232,12 @@ bool embot::app::bldc::theMSGbroker::Impl::rem(Direction dir, size_t &remaining,
     else
     {
         embot::os::rtos::mutex_take(_txm, embot::core::reltimeWaitForever);
-        if(!_txCANvector.empty())
+        if(!_txMSGvector.empty())
         {
-            ff = _txCANvector.front();
-            frame = ff;
-            _txCANvector.erase(_txCANvector.begin());
-            remaining = _txCANvector.size();
+            ff = _txMSGvector.front();
+            msg = ff;
+            _txMSGvector.erase(_txMSGvector.begin());
+            remaining = _txMSGvector.size();
             r = true;            
         }
         embot::os::rtos::mutex_release(_txm);
@@ -246,7 +246,7 @@ bool embot::app::bldc::theMSGbroker::Impl::rem(Direction dir, size_t &remaining,
     return r;
 }
 
-bool embot::app::bldc::theMSGbroker::Impl::rem(Direction dir, size_t &remaining, std::vector<embot::prot::can::Frame> &frames, size_t &retrieved, const size_t max2retrieve)
+bool embot::app::bldc::theMSGbroker::Impl::rem(Direction dir, size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve)
 {
     bool r {false};
 
@@ -256,12 +256,12 @@ bool embot::app::bldc::theMSGbroker::Impl::rem(Direction dir, size_t &remaining,
     if(Direction::INP == dir)
     {
         embot::os::rtos::mutex_take(_rxm, embot::core::reltimeWaitForever);
-        retrieved = std::min(max2retrieve, _rxCANvector.size()); 
+        retrieved = std::min(max2retrieve, _rxMSGvector.size()); 
         if(retrieved > 0)
         {
-            frames.assign(_rxCANvector.begin(), _rxCANvector.begin() + retrieved);
-            _rxCANvector.erase(_rxCANvector.begin(), _rxCANvector.begin() + retrieved);
-            remaining = _rxCANvector.size();
+            msgs.assign(_rxMSGvector.begin(), _rxMSGvector.begin() + retrieved);
+            _rxMSGvector.erase(_rxMSGvector.begin(), _rxMSGvector.begin() + retrieved);
+            remaining = _rxMSGvector.size();
             r = true;            
         }
         embot::os::rtos::mutex_release(_rxm); 
@@ -269,12 +269,12 @@ bool embot::app::bldc::theMSGbroker::Impl::rem(Direction dir, size_t &remaining,
     else
     {
         embot::os::rtos::mutex_take(_txm, embot::core::reltimeWaitForever);
-        retrieved = std::min(max2retrieve, _txCANvector.size()); 
+        retrieved = std::min(max2retrieve, _txMSGvector.size()); 
         if(retrieved > 0)
         {
-            frames.assign(_txCANvector.begin(), _txCANvector.begin() + retrieved);
-            _txCANvector.erase(_txCANvector.begin(), _txCANvector.begin() + retrieved);
-            remaining = _txCANvector.size();
+            msgs.assign(_txMSGvector.begin(), _txMSGvector.begin() + retrieved);
+            _txMSGvector.erase(_txMSGvector.begin(), _txMSGvector.begin() + retrieved);
+            remaining = _txMSGvector.size();
             r = true;            
         }
         embot::os::rtos::mutex_release(_txm);
@@ -330,24 +330,24 @@ size_t embot::app::bldc::theMSGbroker::size(Direction dir) const
     return pImpl->size(dir);
 }
 
-bool embot::app::bldc::theMSGbroker::add(Direction dir, const embot::prot::can::Frame &frame)
+bool embot::app::bldc::theMSGbroker::add(Direction dir, const embot::app::bldc::MSG &msg)
 {
-    return pImpl->add(dir, frame);
+    return pImpl->add(dir, msg);
 }
 
-bool embot::app::bldc::theMSGbroker::add(Direction dir, const std::vector<embot::prot::can::Frame> &frames)
+bool embot::app::bldc::theMSGbroker::add(Direction dir, const std::vector<embot::app::bldc::MSG> &msgs)
 {
-    return pImpl->add(dir, frames);
+    return pImpl->add(dir, msgs);
 }
 
-bool embot::app::bldc::theMSGbroker::rem(Direction dir, size_t &remaining, embot::prot::can::Frame &frame)
+bool embot::app::bldc::theMSGbroker::rem(Direction dir, size_t &remaining, embot::app::bldc::MSG &msg)
 {
-    return pImpl->rem(dir, remaining, frame);
+    return pImpl->rem(dir, remaining, msg);
 }
 
-bool embot::app::bldc::theMSGbroker::rem(Direction dir, size_t &remaining, std::vector<embot::prot::can::Frame> &frames, size_t &retrieved, const size_t max2retrieve)
+bool embot::app::bldc::theMSGbroker::rem(Direction dir, size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve)
 {
-    return pImpl->rem(dir, remaining, frames, retrieved, max2retrieve);
+    return pImpl->rem(dir, remaining, msgs, retrieved, max2retrieve);
 }
 
 bool embot::app::bldc::theMSGbroker::subscribe(Direction dir, const embot::os::Action &action)

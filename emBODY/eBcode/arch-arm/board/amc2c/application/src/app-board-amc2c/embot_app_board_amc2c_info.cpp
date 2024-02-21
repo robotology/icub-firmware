@@ -31,9 +31,9 @@
 // we used macro USE_ICC_COMM to config the former or the latter
 namespace embot::app::board::amc2c::info { 
     
+    constexpr uint8_t address {3}; 
     
 #if defined(USE_ICC_COMM)
-    constexpr uint8_t address {1}; 
     static constexpr embot::app::icc::Signature signature __attribute__((section(".ARM.__at_0x08100800"))) =
     {
         embot::app::boards::Board::amc2c,
@@ -42,8 +42,16 @@ namespace embot::app::board::amc2c::info {
         {2, 0},         // protocol version
         {2024, embot::app::eth::Month::Feb, embot::app::eth::Day::fourteen, 14, 00}
     };
+    
+    constexpr embot::app::msg::Location icclocation {signature.location};
+    
+#if defined(USE_ICC_CAN_COMM)
+    constexpr embot::app::msg::Location canlocation {embot::app::msg::BUS::can2, address};
 #else
-    constexpr uint8_t address {3}; 
+    constexpr embot::app::msg::Location canlocation {embot::app::msg::BUS::none, 0};
+#endif
+    
+#else
     static constexpr embot::app::icc::Signature signature __attribute__((section(".ARM.__at_0x08100800"))) =
     {
         embot::app::boards::Board::amcbldc,
@@ -52,6 +60,9 @@ namespace embot::app::board::amc2c::info {
         {2, 0},         // protocol version
         {2024, embot::app::eth::Month::Feb, embot::app::eth::Day::fourteen, 14, 00}
     };
+    
+    constexpr embot::app::msg::Location canlocation {signature.location};
+    constexpr embot::app::msg::Location icclocation {embot::app::msg::BUS::none, 0};
 #endif   
         
     constexpr embot::hw::FLASHpartitionID codePartition 
@@ -76,7 +87,18 @@ namespace embot::app::board::amc2c::info {
       //"hi, i am an amc2c CAN2:3"
         INFO32
     };
-
+    
+    
+    embot::app::msg::Location getCANlocation()
+    {
+        return canlocation;        
+    }
+    
+    embot::app::msg::Location getICClocation()
+    {
+        return icclocation;        
+    }
+    
 } // embot::app::board::amc2c::info {
 
 
@@ -109,7 +131,7 @@ namespace embot::app::board::amc2c::info {
                 embot::prot::can::versionOfCANPROTOCOL {signature.protocol.major, signature.protocol.minor}        
             }; 
             
-            static constexpr embot::app::msg::Location location {signature.location};
+            static constexpr embot::app::msg::Location location {canlocation};
             
             embot::app::board::amc2c::theCANagentCORE::getInstance().initialise({theboard, applInfo, location, info32});
             initted = true;
