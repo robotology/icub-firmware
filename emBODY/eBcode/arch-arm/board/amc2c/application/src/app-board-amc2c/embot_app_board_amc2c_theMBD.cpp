@@ -219,7 +219,7 @@ struct embot::app::board::amc2c::theMBD::Impl
     bool initialise(const Config &config);
         
     // the code called @ 1 kHz (aka every 1000 usec) inside a high priority thread
-    bool tick(const std::vector<embot::app::bldc::MSG> &inpframes, std::vector<embot::app::bldc::MSG> &outframes);
+    bool tick(const std::vector<embot::app::bldc::MSG> &inputmessages, std::vector<embot::app::bldc::MSG> &outputmessages);
 
     // the code called @ 80/3 kHz (aka every 37.5 usec) inside the DMA1_Channel2_IRQHandler()
     // it must be static because we use it as a callback
@@ -420,18 +420,18 @@ void embot::app::board::amc2c::theMBD::Impl::onEXTFAULTpressedreleased(void *own
 }
 
 // Called every 1 ms
-bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::bldc::MSG> &inpframes, std::vector<embot::app::bldc::MSG> &outframes)
+bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::bldc::MSG> &inputmessages, std::vector<embot::app::bldc::MSG> &outputmessages)
 {     
     static bool lockedtobus {false};
 
-    if((false == lockedtobus) && (false == inpframes.empty()))
+    if((false == lockedtobus) && (false == inputmessages.empty()))
     {
         lockedtobus = true;
-        bus2use = inpframes[0].location.getbus();
+        bus2use = inputmessages[0].location.getbus();
     }
 
     // in here... 
-    // inpframes.size() is always <= 4.
+    // inputmessages.size() is always <= 4.
     // outputframes.size() is always = 0
     //embot::hw::testpoint::on(tp1);
 
@@ -459,7 +459,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
         
     // add any input can frame into the supervisor input queue
     
-    size_t ninputframes = std::min(inpframes.size(), static_cast<size_t>(CAN_MAX_NUM_PACKETS));
+    size_t ninputframes = std::min(inputmessages.size(), static_cast<size_t>(CAN_MAX_NUM_PACKETS));
     
     
     for(uint8_t i=0; i<CAN_MAX_NUM_PACKETS; i++) 
@@ -470,7 +470,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
     for(uint8_t i=0; i<ninputframes; i++) 
     {        
         uint32_t rx_id {0};
-        inpframes[i].frame.copyto(rx_id, AMC_BLDC_U.PacketsRx.packets[i].length, AMC_BLDC_U.PacketsRx.packets[i].packet.PAYLOAD); 
+        inputmessages[i].frame.copyto(rx_id, AMC_BLDC_U.PacketsRx.packets[i].length, AMC_BLDC_U.PacketsRx.packets[i].packet.PAYLOAD); 
         AMC_BLDC_U.PacketsRx.packets[i].packet.ID = (uint16_T)rx_id;
         AMC_BLDC_U.PacketsRx.packets[i].available = true;
     }
@@ -511,7 +511,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
             embot::prot::can::Frame fr {AMC_BLDC_Y.PacketsTx.packets[i].packet.ID, AMC_BLDC_Y.PacketsTx.packets[i].length, AMC_BLDC_Y.PacketsTx.packets[i].packet.PAYLOAD};
             embot::app::msg::Location l {bus2use, _config.adr};
             embot::app::bldc::MSG msg {l, fr};
-            outframes.push_back(msg);
+            outputmessages.push_back(msg);
         }
     } 
     
@@ -659,9 +659,9 @@ bool embot::app::board::amc2c::theMBD::initialise(const Config &config)
     return pImpl->initialise(config);
 }
 
-bool embot::app::board::amc2c::theMBD::tick(const std::vector<embot::app::bldc::MSG> &inpframes, std::vector<embot::app::bldc::MSG> &outframes)
+bool embot::app::board::amc2c::theMBD::tick(const std::vector<embot::app::bldc::MSG> &inputmessages, std::vector<embot::app::bldc::MSG> &outputmessages)
 {
-    return pImpl->tick(inpframes, outframes);
+    return pImpl->tick(inputmessages, outputmessages);
 }
 
 

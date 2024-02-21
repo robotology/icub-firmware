@@ -27,12 +27,12 @@ namespace embot { namespace app { namespace bldc {
         static constexpr size_t MAXcapacity {1111};
         
         // transmission methods
-        virtual bool add(const embot::app::bldc::MSG &frame) = 0;
-        virtual bool add(const std::vector<embot::app::bldc::MSG> &frames) = 0;      
+        virtual bool add(const embot::app::bldc::MSG &msg) = 0;
+        virtual bool add(const std::vector<embot::app::bldc::MSG> &msgs) = 0;      
 
         // retrieval methods
-        virtual bool get(size_t &remaining, embot::app::bldc::MSG &frame) = 0;
-        virtual bool get(size_t &remaining, std::vector<embot::app::bldc::MSG> &frames, size_t &retrieved, const size_t max2retrieve = COMM::MAXcapacity) = 0;          
+        virtual bool get(size_t &remaining, embot::app::bldc::MSG &msg) = 0;
+        virtual bool get(size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve = COMM::MAXcapacity) = 0;          
       
     public:
         virtual ~COMM() {}          
@@ -47,12 +47,12 @@ namespace embot { namespace app { namespace bldc {
             
         
         // transmission methods
-        bool add(const embot::app::bldc::MSG &frame) override { return false; }
-        bool add(const std::vector<embot::app::bldc::MSG> &frames) override { return false; }      
+        bool add(const embot::app::bldc::MSG &msg) override { return false; }
+        bool add(const std::vector<embot::app::bldc::MSG> &msgs) override { return false; }      
 
         // retrieval methods
-        bool get(size_t &remaining, embot::app::bldc::MSG &frame) override { return false; }
-        bool get(size_t &remaining, std::vector<embot::app::bldc::MSG> &frames, size_t &retrieved, const size_t max2retrieve = COMM::MAXcapacity) override { return false; }               
+        bool get(size_t &remaining, embot::app::bldc::MSG &msg) override { return false; }
+        bool get(size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve = COMM::MAXcapacity) override { return false; }               
     };
     
 }}} // namespace embot { namespace app { namespace bldc

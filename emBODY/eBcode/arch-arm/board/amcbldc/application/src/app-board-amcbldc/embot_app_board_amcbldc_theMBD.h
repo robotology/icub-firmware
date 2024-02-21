@@ -32,7 +32,7 @@ namespace embot::app::board::amcbldc {
         };
                 
         bool initialise(const Config &config);   
-        bool tick(const std::vector<embot::app::bldc::MSG> &inpframes, std::vector<embot::app::bldc::MSG> &outframes);
+        bool tick(const std::vector<embot::app::bldc::MSG> &inputmessages, std::vector<embot::app::bldc::MSG> &outputmessages);
          
         void on();
         void off();

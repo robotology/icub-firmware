@@ -56,16 +56,15 @@ void thrCOMM(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
 
 struct embot::app::bldc::theCOMM::Impl
 {
-    static constexpr embot::os::Event evt_COMM_RXiccframe { embot::core::binary::mask::pos2mask<embot::os::Event>(0) };
-    static constexpr embot::os::Event evt_COMM_RXcanframe { embot::core::binary::mask::pos2mask<embot::os::Event>(1) };   
-    static constexpr embot::os::Event evt_COMM_TXframes { embot::core::binary::mask::pos2mask<embot::os::Event>(2) };
+    static constexpr embot::os::Event evt_COMM_RXicc { embot::core::binary::mask::pos2mask<embot::os::Event>(0) };
+    static constexpr embot::os::Event evt_COMM_RXcan { embot::core::binary::mask::pos2mask<embot::os::Event>(1) };   
+    static constexpr embot::os::Event evt_COMM_TX { embot::core::binary::mask::pos2mask<embot::os::Event>(2) };
     
     std::vector<embot::prot::can::Frame> _tCOMMtmpCANframes;
     
     std::vector<embot::app::bldc::MSG> _tCOMMoutmessages;
     embot::hw::CAN _tCOMMcanbus {embot::hw::CAN::two};
     embot::prot::can::Address _tCOMMcanaddress {1};
-    embot::app::msg::Location _tCOMMicclocation {embot::app::msg::BUS::icc1, 1};
     
     embot::app::application::dummyCANagentCORE _dummycanagentcore {};
         
@@ -90,14 +89,14 @@ struct embot::app::bldc::theCOMM::Impl
     // on timeout                
     void tCOMM_OnTimeout(embot::os::Thread *t, void *param);
     
-    // when we have a frame to process from icc
-    void tCOMM_OnRXmessage(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::app::bldc::MSG &frame, std::vector<embot::app::bldc::MSG> &outframes);
+    // when we have a msg to process from icc or can
+    void tCOMM_OnRXmessage(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::app::bldc::MSG &msg, std::vector<embot::app::bldc::MSG> &outframes);
         
     // interface to COMM. it is used in this case by theCTRL
-    bool add(const embot::app::bldc::MSG &frame);
-    bool add(const std::vector<embot::app::bldc::MSG> &frames);
-    bool get(size_t &remaining, embot::app::bldc::MSG &frame);
-    bool get(size_t &remaining, std::vector<embot::app::bldc::MSG> &frames, size_t &retrieved, const size_t max2retrieve);
+    bool add(const embot::app::bldc::MSG &msg);
+    bool add(const std::vector<embot::app::bldc::MSG> &msgs);
+    bool get(size_t &remaining, embot::app::bldc::MSG &msg);
+    bool get(size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve);
     
     
     // others
@@ -164,7 +163,7 @@ bool embot::app::bldc::theCOMM::Impl::initialise(const Config &config)
     embot::app::bldc::theMSGbroker::getInstance().initialise({});        
       
     // and subscribe the tCOMM to be triggered by the OUT direction of the MSGbroker
-    embot::os::Action act {embot::os::EventToThread(evt_COMM_TXframes, _t_COMM)};
+    embot::os::Action act {embot::os::EventToThread(evt_COMM_TX, _t_COMM)};
     embot::app::bldc::theMSGbroker::getInstance().subscribe(embot::app::bldc::theMSGbroker::Direction::OUT, act);            
     
     // and now ... start the tCOMM   
@@ -182,7 +181,7 @@ void embot::app::bldc::theCOMM::Impl::alertonrxiccframe(void *arg)
     embot::os::EventThread* evthr = reinterpret_cast<embot::os::EventThread*>(arg);
     if(nullptr != evthr)
     {
-        evthr->setEvent(evt_COMM_RXiccframe);
+        evthr->setEvent(evt_COMM_RXicc);
     }
 }
 
@@ -192,7 +191,7 @@ void embot::app::bldc::theCOMM::Impl::alertonrxcanframe(void *arg)
     embot::os::EventThread* evthr = reinterpret_cast<embot::os::EventThread*>(arg);
     if(nullptr != evthr)
     {
-        evthr->setEvent(evt_COMM_RXcanframe);
+        evthr->setEvent(evt_COMM_RXcan);
     }
 }
 
@@ -212,16 +211,16 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_Startup(embot::os::Thread *t, void *
 
     // init the can ...
     embot::hw::can::Config canconfig {};
-    canconfig.rxcapacity = impl->_config.tCOMMmaxINPcanframes;
-    canconfig.txcapacity = impl->_config.tCOMMmaxOUTcanframes;
+    canconfig.rxcapacity = impl->_config.tCOMMmaxINPmessages;
+    canconfig.txcapacity = impl->_config.tCOMMmaxOUTmessages;
     canconfig.onrxframe = embot::core::Callback(impl->alertonrxcanframe, t); 
     embot::hw::can::init(impl->_tCOMMcanbus, canconfig);
     embot::hw::can::setfilters(impl->_tCOMMcanbus, impl->_tCOMMcanaddress); 
         
-    // pre-allocate output vector of frames
-    impl->_tCOMMoutmessages.reserve(impl->_config.tCOMMmaxOUTcanframes);    
+    // pre-allocate output vector of msgs
+    impl->_tCOMMoutmessages.reserve(impl->_config.tCOMMmaxOUTmessages);    
     
-    impl->_tCOMMtmpCANframes.reserve(impl->_config.tCOMMmaxOUTcanframes);
+    impl->_tCOMMtmpCANframes.reserve(impl->_config.tCOMMmaxOUTmessages);
         
     // and ok, enable can
     embot::hw::can::enable(impl->_tCOMMcanbus);
@@ -273,7 +272,7 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
         return;
     }
     
-    if(true == embot::core::binary::mask::check(eventmask, evt_COMM_RXiccframe))
+    if(true == embot::core::binary::mask::check(eventmask, evt_COMM_RXicc))
     {
         // DEBUG
         //impl->tCOMM_OnTimeout(t, param);
@@ -294,7 +293,7 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
         // if any arrives since we called embot::hw::can::inputqueuesize(tCOMMcanbus) ...
         if(remainingINrx > 0)
         {
-            t->setEvent(evt_COMM_RXiccframe);                 
+            t->setEvent(evt_COMM_RXicc);                 
         }        
 #else        
     #error unsupported
@@ -302,7 +301,7 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
     }
     
     
-    if(true == embot::core::binary::mask::check(eventmask, evt_COMM_RXcanframe))
+    if(true == embot::core::binary::mask::check(eventmask, evt_COMM_RXcan))
     {
 #if defined(PARSE_RX_ALLINONESHOT)
         // attempt to get all messages in one shot
@@ -321,14 +320,14 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
         // if any arrives since we called embot::hw::can::inputqueuesize(tCOMMcanbus) ...
         if(remainingINrx > 0)
         {
-            t->setEvent(evt_COMM_RXcanframe);                 
+            t->setEvent(evt_COMM_RXcan);                 
         }
 #else        
     #error unsupported
 #endif        
     }    
     
-    if(true == embot::core::binary::mask::check(eventmask, evt_COMM_TXframes))
+    if(true == embot::core::binary::mask::check(eventmask, evt_COMM_TX))
     {        
         // get all the messages from the theMSGbroker and put them inside the tCOMMoutframes
         size_t remaining {0};
@@ -371,7 +370,7 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
         }            
     } 
     
-    // and now we can clear the frames to be trasmitted
+    // and now we can clear the msgs to be trasmitted
     impl->_tCOMMoutmessages.clear();          
 }
 
@@ -426,24 +425,24 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnRXmessage(embot::os::Thread *t, em
 }
 
 
-bool embot::app::bldc::theCOMM::Impl::add(const embot::app::bldc::MSG &frame)
+bool embot::app::bldc::theCOMM::Impl::add(const embot::app::bldc::MSG &msg)
 {
-    return embot::app::bldc::theMSGbroker::getInstance().add(embot::app::bldc::theMSGbroker::Direction::OUT, frame);
+    return embot::app::bldc::theMSGbroker::getInstance().add(embot::app::bldc::theMSGbroker::Direction::OUT, msg);
 }
 
-bool embot::app::bldc::theCOMM::Impl::add(const std::vector<embot::app::bldc::MSG> &frames)
+bool embot::app::bldc::theCOMM::Impl::add(const std::vector<embot::app::bldc::MSG> &msgs)
 {
-   return embot::app::bldc::theMSGbroker::getInstance().add(embot::app::bldc::theMSGbroker::Direction::OUT, frames);
+   return embot::app::bldc::theMSGbroker::getInstance().add(embot::app::bldc::theMSGbroker::Direction::OUT, msgs);
 }
 
-bool embot::app::bldc::theCOMM::Impl::get(size_t &remaining, embot::app::bldc::MSG &frame)
+bool embot::app::bldc::theCOMM::Impl::get(size_t &remaining, embot::app::bldc::MSG &msg)
 {
-   return embot::app::bldc::theMSGbroker::getInstance().rem(embot::app::bldc::theMSGbroker::Direction::INP, remaining, frame);
+   return embot::app::bldc::theMSGbroker::getInstance().rem(embot::app::bldc::theMSGbroker::Direction::INP, remaining, msg);
 }
 
-bool embot::app::bldc::theCOMM::Impl::get(size_t &remaining, std::vector<embot::app::bldc::MSG> &frames, size_t &retrieved, const size_t max2retrieve)
+bool embot::app::bldc::theCOMM::Impl::get(size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve)
 {
-   return embot::app::bldc::theMSGbroker::getInstance().rem(embot::app::bldc::theMSGbroker::Direction::INP, remaining, frames, retrieved, max2retrieve);
+   return embot::app::bldc::theMSGbroker::getInstance().rem(embot::app::bldc::theMSGbroker::Direction::INP, remaining, msgs, retrieved, max2retrieve);
 }
 
 
@@ -476,24 +475,24 @@ bool embot::app::bldc::theCOMM::initialise(const Config &config)
 
 
 
-bool embot::app::bldc::theCOMM::add(const embot::app::bldc::MSG &frame)
+bool embot::app::bldc::theCOMM::add(const embot::app::bldc::MSG &msg)
 {
-    return pImpl->add(frame);
+    return pImpl->add(msg);
 }
 
-bool embot::app::bldc::theCOMM::add(const std::vector<embot::app::bldc::MSG> &frames)
+bool embot::app::bldc::theCOMM::add(const std::vector<embot::app::bldc::MSG> &msgs)
 {
-    return pImpl->add(frames);
+    return pImpl->add(msgs);
 }
 
-bool embot::app::bldc::theCOMM::get(size_t &remaining, embot::app::bldc::MSG &frame)
+bool embot::app::bldc::theCOMM::get(size_t &remaining, embot::app::bldc::MSG &msg)
 {
-    return pImpl->get(remaining, frame);
+    return pImpl->get(remaining, msg);
 }
 
-bool embot::app::bldc::theCOMM::get(size_t &remaining, std::vector<embot::app::bldc::MSG> &frames, size_t &retrieved, const size_t max2retrieve)
+bool embot::app::bldc::theCOMM::get(size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve)
 {
-    return pImpl->get(remaining, frames, retrieved, max2retrieve);
+    return pImpl->get(remaining, msgs, retrieved, max2retrieve);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
