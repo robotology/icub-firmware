@@ -30,18 +30,21 @@
 namespace embot::app::eth::service::impl::mc {    
 
 
-
 void AGENTadvfoc::initialise(embot::app::eth::service::impl::Core *c)
 {
+    static constexpr CANtools::Config cantoolsconfig
+    {
+        4, // nboards
+        4, // nentities
+        4  // ntargets - on can one actuator type is the usual number. but we allow up to 4 different targets (act1 on amcbldc, act2 on foc, act3 on amc2c etc)
+    };
+
     p2core = c;
     
-    size_t nboards {4};
-    size_t nentities {4};
-    size_t ntargets {1};
-    cantools.initialise(nboards, nentities, ntargets);
+    cantools.initialise(cantoolsconfig.nboards, cantoolsconfig.nentities, cantoolsconfig.ntargets);
     
-    iccactuators.reserve(nboards);
-    canactuators.reserve(nboards);
+    iccactuators.reserve(cantoolsconfig.nboards);
+    canactuators.reserve(cantoolsconfig.nboards);
     
     // and now i init several things related to legacy foc mode
     std::memset(&focservconfig, 0, sizeof(eOmn_serv_configuration_t));
@@ -245,7 +248,11 @@ bool AGENTadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configura
     
     if(false == canactuators.empty())
     {        
-        eOcandiscovery_target_t trgt = {0};
+        
+#if 0
+        //  version for one target only    
+
+        eOcandiscovery_target_t trgt = {0};        
         trgt.info = canactuators[0].actua.board;  
                 
         for(uint8_t i=0; i<canactuators.size(); i++)
@@ -262,8 +269,55 @@ bool AGENTadvfoc::load(embot::app::eth::Service *serv, const eOmn_serv_configura
         // i push back only once because i have only one type of board to search for    
         // in case of more types of board ... we need something else but for now it is OK        
         eo_array_PushBack(cantools.discoverytargets, &trgt);
+        
+#else
+        // version for up to 4 discovery targets 
+        
+        // force a cleaned discoverytargets before we add the target
+        eo_array_Reset(cantools.discoverytargets); 
+        
+        uint8_t theboards[4] = {eobrd_none, eobrd_none, eobrd_none, eobrd_none};
+        uint8_t theboards_size {0};
+        
+        for(uint8_t i=0; i<canactuators.size(); i++)
+        {
+            eOcandiscovery_target_t trgt = {0};
+            
+            trgt.info = canactuators[i].actua.board;
+            bool inside {false};
+            for(uint8_t b=0; b<theboards_size; b++)
+            {
+                if(trgt.info.type == theboards[b])
+                {   // i dont check vs protocol and application values as i assume they are consistent w/ type
+                    inside = true;
+                    break;
+                }
+            }
+            
+            if(false == inside)
+            {
+                // use this board as a target
+                // now i must search for every occurrence of it and we fill the canmap
+                theboards[theboards_size] = trgt.info.type;
+                theboards_size++;
+                for(uint8_t j=0; j<canactuators.size(); j++)
+                {
+                    if(trgt.info.type == canactuators[j].actua.board.type)
+                    {
+                        uint8_t port = (eobus_can1 == canactuators[j].actua.location.bus) ? eOcanport1 : eOcanport2; // we already know it is can
+                        uint8_t addr = canactuators[j].actua.location.adr;
+                        eo_common_hlfword_bitset(&trgt.canmap[port], addr);                                              
+                    }                    
+                }
+                
+                // and finally we add it to the discoverytarget
+                eo_array_PushBack(cantools.discoverytargets, &trgt);
+            }           
+        }
 
-        // then i assign the params of end of discovery: tha callback and it argument 
+#endif
+
+        // then i assign the params of end of discovery: the callback and its argument 
         cantools.ondiscoverystop.function = AGENTadvfoc::verify_step03_onENDof_candiscovery;
         cantools.ondiscoverystop.parameter = this;
     }

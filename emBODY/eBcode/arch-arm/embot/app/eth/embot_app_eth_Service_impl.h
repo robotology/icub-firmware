@@ -182,6 +182,15 @@ namespace embot::app::eth::service::impl {
     
     struct CANtools
     {
+        struct Config
+        {
+            size_t nboards {4};
+            size_t nentities {4};
+            size_t ntargets {4};
+            constexpr Config() = default;
+            constexpr Config(size_t b, size_t e, size_t t) : nboards(b), nentities(e), ntargets(t) {}
+        }; 
+        
         EOvector* boardproperties {nullptr};    // of eObrd_canproperties_t
         EOvector* entitydescriptor {nullptr};   // of eOcanmap_entitydescriptor_t
         EOarray* discoverytargets {nullptr};    // of eOcandiscovery_target_t
@@ -196,9 +205,9 @@ namespace embot::app::eth::service::impl {
             {
                 return;
             }
-            boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), nboards, nullptr, 0, nullptr, nullptr);
-            entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), nentities, nullptr, 0, nullptr, nullptr);
-            discoverytargets = eo_array_New(sizeof(eOcandiscovery_target_t), ntargets, nullptr);
+            boardproperties = eo_vector_New(nboards, sizeof(eObrd_canproperties_t), nullptr, 0, nullptr, nullptr);
+            entitydescriptor = eo_vector_New(nentities, sizeof(eOcanmap_entitydescriptor_t), nullptr, 0, nullptr, nullptr);
+            discoverytargets = eo_array_New(ntargets, sizeof(eOcandiscovery_target_t), nullptr);
         } 
         
         void clear()
