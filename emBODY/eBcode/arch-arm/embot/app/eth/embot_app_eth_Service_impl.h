@@ -205,8 +205,8 @@ namespace embot::app::eth::service::impl {
             {
                 return;
             }
-            boardproperties = eo_vector_New(nboards, sizeof(eObrd_canproperties_t), nullptr, 0, nullptr, nullptr);
-            entitydescriptor = eo_vector_New(nentities, sizeof(eOcanmap_entitydescriptor_t), nullptr, 0, nullptr, nullptr);
+            boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), nboards, nullptr, 0, nullptr, nullptr);
+            entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), nentities, nullptr, 0, nullptr, nullptr);
             discoverytargets = eo_array_New(ntargets, sizeof(eOcandiscovery_target_t), nullptr);
         } 
         
