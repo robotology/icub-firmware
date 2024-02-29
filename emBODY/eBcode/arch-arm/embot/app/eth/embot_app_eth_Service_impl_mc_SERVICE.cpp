@@ -54,7 +54,7 @@ the ICC or the CAN mapping depending on the bus type
 namespace embot::app::eth::mc::messaging::receiver {
     
   
-    bool getentityindex(const embot::app::msg::Location &source, uint8_t index)
+    bool getentityindex(const embot::app::msg::Location &source, uint8_t &index)
     {
         bool ret {true};
         embot::app::msg::typeofBUS bustype = source.typeofbus();
