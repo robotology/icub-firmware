@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.17.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.17.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1416,6 +1416,26 @@
               <FileName>kalman_filter_data.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\mbd\kalman_filter\kalman_filter_data.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::prot::can</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_prot_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_motor_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_periodic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_motor_polling.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_polling.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1431,7 +1451,7 @@
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.17.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.17.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2831,6 +2851,26 @@
               <FileName>kalman_filter_data.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\mbd\kalman_filter\kalman_filter_data.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::prot::can</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_prot_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_motor_periodic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_periodic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_prot_can_motor_polling.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\prot\can\embot_prot_can_motor_polling.cpp</FilePath>
             </File>
           </Files>
         </Group>
