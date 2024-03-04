@@ -40,7 +40,7 @@ namespace embot::app::board::amc2c::info {
         {embot::app::msg::BUS::icc1, address},
         {3, 0, 0, 0},   // application version
         {2, 0},         // protocol version
-        {2024, embot::app::eth::Month::Feb, embot::app::eth::Day::fourteen, 14, 00}
+        {2024, embot::app::eth::Month::Mar, embot::app::eth::Day::one, 17, 17}
     };
     
     constexpr embot::app::msg::Location icclocation {signature.location};
@@ -56,9 +56,9 @@ namespace embot::app::board::amc2c::info {
     {
         embot::app::boards::Board::amcbldc,
         {embot::app::msg::BUS::can2, address},
-        {2, 0, 9, 0},   // application version
+        {2, 0, 10, 0},  // application version
         {2, 0},         // protocol version
-        {2024, embot::app::eth::Month::Feb, embot::app::eth::Day::fourteen, 14, 00}
+        {2024, embot::app::eth::Month::Mar, embot::app::eth::Day::one, 17, 17}
     };
     
     constexpr embot::app::msg::Location canlocation {signature.location};
@@ -76,10 +76,10 @@ namespace embot::app::board::amc2c::info {
  
 #if defined(USE_ICC_COMM)     
                  // 0123456789abcde0123456789abcde
-    #define INFO32 "hi, i am an amc2c on ICC1:3"
+    #define INFO32 "i am an amc2c @ ICC1:3/CAN2:3"
 #else
                  // 0123456789abcde0123456789abcde
-    #define INFO32 "hi, i am an amc2c on CAN2:3"
+    #define INFO32 "i am an amc2c @ CAN2:3"
 #endif    
 
     constexpr const char *info32  

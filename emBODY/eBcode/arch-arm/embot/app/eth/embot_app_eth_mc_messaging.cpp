@@ -428,7 +428,6 @@ namespace embot::app::eth::mc::messaging::sender {
 } // namespace embot::app::eth::mc::messaging::sender {
 
 
-#warning IMPORTANT this file behaves differently because now the agent for embot::prot::can::Frame is not called and in devel it is. does the amc-v1 use it???
 
 namespace embot::app::eth::mc::messaging::receiver {
     

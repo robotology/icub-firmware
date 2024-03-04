@@ -559,7 +559,11 @@ namespace embot::app::eth::service::impl::mc {
                 
                 case eoprot_tag_mc_joint_wholeitem: // = 0 and never used
                     
-                #warning: some tags in eoprot_tag_mc_joint_config are duplicated ... why is it?
+                #warning: some tags in eoprot_tag_mc_joint_config are duplicated ... see following note
+                // marco.accame: i think that we should do some clean up in file:
+                // icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api/EoProtocolMC.h
+                // to remove what we dont need
+                
                 // case eoprot_tag_mc_joint_config_pidtrajectory: // = 2 as position ????
                 // case eoprot_tag_mc_joint_config_piddirect: // = 3 as velocity ???
                 case eoprot_tag_mc_joint_config_tcfiltertype: //= 8
