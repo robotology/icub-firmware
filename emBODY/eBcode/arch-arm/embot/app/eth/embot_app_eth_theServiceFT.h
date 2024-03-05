@@ -47,18 +47,19 @@ namespace embot { namespace app { namespace eth {
         
         // interface of Service
         Category category() const override;
+        Type type() const override;
         State state() const override;
         void set(State s) override;
         
-        bool verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation) override;
-        bool activate(const eOmn_serv_configuration_t * servcfg) override;
+        bool verifyactivate(const embot::app::eth::Service::Config * servcfg, OnEndOfOperation onendofverifyactivate) override;
         bool deactivate() override;
         bool start() override;
         bool stop() override;
-        bool setregulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem) override;
+        bool setregulars(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem) override;
         bool tick(bool resetstatus = false) override;
         bool report() override;
         bool process(const DescriptorCANframe &canframedescriptor) override;
+        bool process(const DescriptorFrame &framedescriptor) override;
         bool process(const DescriptorROP &ropdescriptor) override;
 
     private:        

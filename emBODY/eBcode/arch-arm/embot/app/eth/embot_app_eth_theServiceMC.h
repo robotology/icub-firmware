@@ -23,7 +23,7 @@
 #include <memory>
 
 
-namespace embot { namespace app { namespace eth {
+namespace embot::app::eth {
       
     
     class theServiceMC : Service
@@ -32,7 +32,9 @@ namespace embot { namespace app { namespace eth {
         static theServiceMC& getInstance();
                 
     public:
-                        
+                  
+        static constexpr size_t maxJOMOs {4};  
+        static constexpr size_t maxREGULARs {4*maxJOMOs};        
         struct Config
         {
             uint32_t tbd {0};
@@ -41,24 +43,25 @@ namespace embot { namespace app { namespace eth {
             constexpr bool isvalid() const { return (666 == tbd) ? false : true; }
         }; 
         
-        eOresult_t initialise(const Config &config);  
+        bool initialise(const Config &config);  
         
         Service* service();
         
         // interface of Service
         Category category() const override;
+        Type type() const override;
         State state() const override;
         void set(State s) override;
         
-        bool verify(const eOmn_serv_configuration_t * servcfg, bool activateafterverify, fpOnEndOfOperation onendoperation) override;
-        bool activate(const eOmn_serv_configuration_t * servcfg) override;
+        bool verifyactivate(const embot::app::eth::Service::Config * servcfg, OnEndOfOperation onendofverifyactivate) override;
         bool deactivate() override;
         bool start() override;
         bool stop() override;
-        bool setregulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem) override;
+        bool setregulars(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t& numberofthem) override;
         bool tick(bool resetstatus = false) override;
         bool report() override;
         bool process(const DescriptorCANframe &canframedescriptor) override;
+        bool process(const DescriptorFrame &framedescriptor) override;
         bool process(const DescriptorROP &ropdescriptor) override;
 
     private:        
@@ -73,7 +76,7 @@ namespace embot { namespace app { namespace eth {
     }; 
 
 
-}}} // namespace embot { namespace app { namespace eth
+} // namespace embot::app::eth {
 
 
 #endif  // include-guard

@@ -17,7 +17,8 @@
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
-#if defined(USE_EMBOT_theServices)  
+#if defined(USE_EMBOT_theServices)
+#include "EOaService.h" // just to see eOservice_onendofoperation_fun_t
 #include "embot_app_eth_Service.h"
 #else
 #include "EOtheServices.h"
@@ -29,12 +30,9 @@
 #include <memory>
 
 
-namespace embot { namespace app { namespace eth {
+namespace embot::app::eth {
       
-      
-//    // fills a given eOropdescriptor_t w/ whatever is required to be given to theFTservice::process()   
-//    const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
-    
+
     class theFTservice
     {
     public:
@@ -74,7 +72,7 @@ namespace embot { namespace app { namespace eth {
         eOresult_t Deactivate();        
         eOresult_t Start();        
         eOresult_t Stop();        
-        eOresult_t SetRegulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);        
+        eOresult_t SetRegulars(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);        
         eOresult_t Tick();          
         // processes a CAN frame coming from the sensor        
         eOresult_t AcceptCANframe(const canFrameDescriptor &canframedescriptor);        
@@ -128,7 +126,7 @@ namespace embot { namespace app { namespace eth {
 
 
 
-}}} // namespace embot { namespace app { namespace eth
+} // namespace embot::app::eth
 
 
 #endif  // include-guard

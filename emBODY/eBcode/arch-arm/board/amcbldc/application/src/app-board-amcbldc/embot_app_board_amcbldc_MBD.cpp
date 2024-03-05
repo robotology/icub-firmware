@@ -22,13 +22,13 @@
 
 namespace embot::app::board::amcbldc::mbd {
 
-    void Startup(embot::prot::can::Address adr)
+    void Startup(embot::app::msg::ADR adr)
     {
         embot::core::print("MBD is starting up");
         embot::app::board::amcbldc::theMBD::getInstance().initialise({adr});
     }
     
-    void OnTick(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output)
+    void OnTick(const std::vector<embot::app::bldc::MSG> &input, std::vector<embot::app::bldc::MSG> &output)
     {
         embot::app::board::amcbldc::theMBD::getInstance().tick(input, output);
 //        static uint32_t cnt {0};

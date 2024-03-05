@@ -33,13 +33,14 @@ namespace embot { namespace app { namespace eth {
     // NOTE: theApplication_Config.property MUST be used in theEnvironment_config.h to as follow
     //       constexpr theEnvironment::Config theEnvironment_Config {theApplication_Config.property};
     
+    #warning: use v2/proj/amc-icc instead as it contains icc. this version will be soon removed
     constexpr theApplication::Config theApplication_Config
     {
         .property =
         {
             Process::eApplication,
-            {1, 14},
-            {2024, Month::Feb, Day::twentythree, 13, 00}
+            {1, 15},
+            {2024, Month::Mar, Day::one, 17, 00}
         },
         .OStick = 1000*embot::core::time1microsec,
         .OSstacksizeinit = 10*1024,

@@ -30,7 +30,9 @@
 
 #include "embot_core_binary.h"
 #include "embot_app_eth_CANmonitor.h"
-
+#include "embot_prot_can.h"
+#include "embot_prot_can_analog_polling.h"
+#include "embot_prot_can_analog_periodic.h"
 
 #if defined(USE_EMBOT_theServices)
 #include "embot_app_eth_theServices.h"
@@ -262,18 +264,18 @@ struct FSquery2
 
 namespace embot::app::eth {
     
-    // fills a given eOropdescriptor_t w/ whatever is required to be given to theFTservice::process()   
-    const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
-    
-const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc)
-{
-    std::memset(&rd, 0, sizeof(rd));
-    rd.id32 = id32;
-    rd.data = reinterpret_cast<uint8_t*>(data);
-    rd.size = size;
-    rd.ropcode = rpc;
-    return &rd;
-}
+//// fills a given eOropdescriptor_t w/ whatever is required to be given to theFTservice::process()   
+//const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc = eo_ropcode_set);
+//    
+//const eOropdescriptor_t * fill(eOropdescriptor_t &rd, eOnvID32_t id32, void *data, uint16_t size, eOropcode_t rpc)
+//{
+//    std::memset(&rd, 0, sizeof(rd));
+//    rd.id32 = id32;
+//    rd.data = reinterpret_cast<uint8_t*>(data);
+//    rd.size = size;
+//    rd.ropcode = rpc;
+//    return &rd;
+//}
  
 constexpr eOservice_core_t dummy_service_core 
 {
@@ -359,7 +361,7 @@ struct embot::app::eth::theFTservice::Impl
     eOresult_t Activate(const eOmn_serv_configuration_t * servcfg);
     eOresult_t Deactivate();  
     eOmn_serv_state_t GetServiceState() const;   
-    eOresult_t SetRegulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem); 
+    eOresult_t SetRegulars(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem); 
     eOresult_t Start(); 
     eOresult_t Stop();
     eOresult_t Tick(); 
@@ -815,7 +817,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::Stop()
     return eores_OK;
 }
 
-eOresult_t embot::app::eth::theFTservice::Impl::SetRegulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+eOresult_t embot::app::eth::theFTservice::Impl::SetRegulars(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
 {
     eo_errman_Trace(eo_errman_GetHandle(), "::SetRegulars()", s_eobj_ownname);
     
@@ -828,7 +830,7 @@ eOresult_t embot::app::eth::theFTservice::Impl::SetRegulars(eOmn_serv_arrayof_id
     bool r = embot::app::eth::theServices::getInstance().setREGULARS(id32ofregulars, arrayofid32, isok, numberofthem);
     return r ? eores_OK : eores_NOK_generic;
 #else    
-    return(eo_service_hid_SetRegulars(id32ofregulars, arrayofid32, s_ft_isID32relevant, numberofthem));
+    return(eo_service_hid_SetRegulars(id32ofregulars, const_cast<eOmn_serv_arrayof_id32_t*>(arrayofid32), s_ft_isID32relevant, numberofthem));
 #endif    
 }
 
@@ -861,22 +863,48 @@ eOresult_t embot::app::eth::theFTservice::Impl::AcceptCANframe(const canFrameDes
     
     canFrameDescriptor::Type type = cfd.type;
     
-    // #warning process also Type::autodetect 
     if(canFrameDescriptor::Type::autodetect == type)
     {
         // eval the frame->id and frame->data[0]
-        if(3 == cfd.frame->data[0])
+        
+        type = canFrameDescriptor::Type::unspecified;
+        
+        embot::prot::can::Frame fr {cfd.frame->id, cfd.frame->size, cfd.frame->data};
+        embot::prot::can::Clas cls = embot::prot::can::frame2clas(fr);
+        
+        if(cls == embot::prot::can::Clas::pollingAnalogSensor)
         {
-           type = canFrameDescriptor::Type::fullscale; 
+            if(embot::core::tointegral(embot::prot::can::analog::polling::CMD::GET_FULL_SCALES) == cfd.frame->data[0])
+            {
+                type = canFrameDescriptor::Type::fullscale;
+            }                
         }
-        else if(4 == (cfd.frame->id & 0xf))
+        else if(cls == embot::prot::can::Clas::periodicAnalogSensor)
         {
-            type = canFrameDescriptor::Type::force; 
+            switch(cfd.frame->id & 0xf)
+            {
+                case embot::core::tointegral(embot::prot::can::analog::periodic::CMD::FORCE_VECTOR):
+                {
+                    type = canFrameDescriptor::Type::force;
+                } break;
+                
+                case embot::core::tointegral(embot::prot::can::analog::periodic::CMD::TORQUE_VECTOR):
+                {
+                    type = canFrameDescriptor::Type::torque;
+                } break;  
+                
+                case embot::core::tointegral(embot::prot::can::analog::periodic::CMD::THERMOMETER_MEASURE):
+                {
+                    type = canFrameDescriptor::Type::temperature;
+                } break; 
+
+                default: 
+                {
+                } break;
+            }
+
         }
-        else if(5 == (cfd.frame->id & 0xf))
-        {
-            type = canFrameDescriptor::Type::torque; 
-        }        
+        
     }
     
     if(canFrameDescriptor::Type::fullscale == type)
@@ -1905,7 +1933,7 @@ eOresult_t embot::app::eth::theFTservice::Stop()
     return pImpl->Stop();
 }
 
-eOresult_t embot::app::eth::theFTservice::SetRegulars(eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+eOresult_t embot::app::eth::theFTservice::SetRegulars(const eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
 {
     return pImpl->SetRegulars(arrayofid32, numberofthem);
 }

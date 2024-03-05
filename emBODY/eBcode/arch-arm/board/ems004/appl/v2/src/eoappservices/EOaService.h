@@ -20,7 +20,8 @@ extern "C" {
 typedef void EOaService;
 
 
-typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t operationisok);
+// typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t operationisok);
+typedef void (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t operationisok);
 
 
 

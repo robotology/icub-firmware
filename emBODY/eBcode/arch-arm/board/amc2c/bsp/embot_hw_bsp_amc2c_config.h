@@ -19,6 +19,8 @@
 
 #if   defined(STM32HAL_BOARD_AMC2C)
 
+//    #define EMBOT_ENABLE_hw_bsp_redefine_puts
+    
     #define EMBOT_ENABLE_hw_sys_emulateRAND
     #define EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio

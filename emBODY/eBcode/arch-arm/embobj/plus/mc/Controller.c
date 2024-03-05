@@ -651,6 +651,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     EOconstarray* carray = NULL;
     const eOmc_4jomo_coupling_t *jomoCouplingInfo = NULL;
     
+    constexpr bool MC_advfoc_uses_foc_based_servconfig_with_actuator_descriptor_generic {true};
+    bool ACT_TYPE_2FOC_uses_foc_actuator_descriptor_generic {false};
+    
     // init the motion control mode
     o->mcmode = static_cast<eOmn_serv_type_t>(brd_cfg->type); 
     
@@ -662,6 +665,22 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->actuation_type = ACT_TYPE_2FOC;
             jomoCouplingInfo = &(brd_cfg->data.mc.foc_based.jomocoupling);
             break;
+        
+        case eomn_serv_MC_advfoc:
+        {
+            if(true == MC_advfoc_uses_foc_based_servconfig_with_actuator_descriptor_generic)
+            {
+                carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.foc_based.arrayofjomodescriptors);
+                o->nSets = o->nEncods = o->nJoints = eo_constarray_Size(carray);
+                o->actuation_type = ACT_TYPE_2FOC;
+                jomoCouplingInfo = &(brd_cfg->data.mc.foc_based.jomocoupling);            
+                ACT_TYPE_2FOC_uses_foc_actuator_descriptor_generic = true;
+            }
+            else
+            {
+                o->mcmode = eomn_serv_NONE;
+            }
+        } break;        
         
         case eomn_serv_MC_mc4plusmais:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
@@ -676,18 +695,21 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->actuation_type = ACT_TYPE_MC4p;
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
             break;
+        
         case eomn_serv_MC_mc2pluspsc:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors.head.size; 
             o->actuation_type = ACT_TYPE_MC4p; 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc2pluspsc.jomocoupling);            
             break;
+        
         case eomn_serv_MC_mc4plusfaps:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors);
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusfaps.arrayofjomodescriptors.head.size; 
             o->actuation_type = ACT_TYPE_MC4p; 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusfaps.jomocoupling);            
             break;
+                
 #if 0
         // marco.accame: i keep it just an example in case we need to manage a new mode w/ mixed actuation type  
         //               this code was for the case: EOTHESERVICES_customize_handV3_7joints        
@@ -837,25 +859,25 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         {
             case HARDWARE_MC4p:
             {
-                o->motor[k].mlocation.eth.place = eobrd_place_eth;
-                o->motor[k].mlocation.eth.id = jomodes->actuator.pwm.port;
+                o->motor[k].motorlocation.bus = eobus_local;
+                o->motor[k].motorlocation.adr = jomodes->actuator.pwm.port;
 
             } break;
             
             case HARDWARE_2FOC:
             {  
-#if defined(YRI_uses_MC_foc_actuator_descriptor_generic)
-                // marco.accame on 27sept2023: i have in here either a eobrd_place_can or an eobrd_place_eth location
-                o->motor[k].mlocation = jomodes->actuator.gen.location;                
-#else                
-                // marco.accame on 27sept2023: in here we use only can location to manage the case of
-                // - up to 4 foc can boards 
-                // - the 3 amcbldc.         
-                o->motor[k].mlocation.can.place = eobrd_place_can;
-                o->motor[k].mlocation.can.port = jomodes->actuator.foc.canloc.port;
-                o->motor[k].mlocation.can.addr = jomodes->actuator.foc.canloc.addr;
-                o->motor[k].mlocation.can.ffu = 0;  
-#endif            
+                if(true == ACT_TYPE_2FOC_uses_foc_actuator_descriptor_generic)
+                {
+                    // marco.accame: which for now is the case only of (eomn_serv_MC_advfoc == brd_cfg->type)
+                    o->motor[k].motorlocation = jomodes->actuator.gen.location;    
+                }    
+                else  
+                {
+                    // marco.accame: which for now is the case of (eomn_serv_MC_foc == brd_cfg->type)     
+                    o->motor[k].motorlocation.bus = (jomodes->actuator.foc.canloc.port == eOcanport1) ? eobus_can1 : eobus_can2;
+                    o->motor[k].motorlocation.adr = jomodes->actuator.foc.canloc.addr;
+                }    
+            
             } break;
 
             // marco.accame: i keep it just an example in case we need to manage a new mode w/ mixed actuation type. 

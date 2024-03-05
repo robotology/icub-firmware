@@ -27,7 +27,7 @@ namespace embot { namespace app { namespace bldc {
         static theCTRL& getInstance();
  
         using OnStartup = void (*)(embot::prot::can::Address adr);    
-        using OnTick = void (*)(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output);
+        using OnTick = void (*)(const std::vector<embot::app::bldc::MSG> &input, std::vector<embot::app::bldc::MSG> &output);
     
         struct Config
         {            

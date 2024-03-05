@@ -18,10 +18,10 @@
 
 namespace embot::app::board::amcbldc::mbd {
     
-    void Startup(embot::prot::can::Address adr);    
-    void OnTick(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output);
+    void Startup(embot::app::msg::ADR adr);    
+    void OnTick(const std::vector<embot::app::bldc::MSG> &input, std::vector<embot::app::bldc::MSG> &output);
     
-    } // embot::app::board::amcbldc::mbd {
+} // embot::app::board::amcbldc::mbd {
 
 
 #endif  // include-guard

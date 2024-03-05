@@ -34,6 +34,12 @@
 
 struct embot::app::board::amc2c::theCANagentCORE::Impl
 {  
+    
+#if defined(USE_ICC_COMM)
+    static constexpr embot::prot::can::Board theboard {embot::prot::can::Board::amc2c};
+#else
+    static constexpr embot::prot::can::Board theboard {embot::prot::can::Board::amcbldc};
+#endif    
         
     Config _config {};
         
@@ -41,8 +47,8 @@ struct embot::app::board::amc2c::theCANagentCORE::Impl
     struct StoredInfo
     {   // contains the basics stored inside some embot::i2h::Storage
         std::uint32_t       key {validityKey};
-        std::uint8_t        canaddress {3};
-        std::uint8_t        boardtype { embot::core::tointegral(embot::prot::can::Board::amcbldc) };
+        std::uint8_t        address {3};
+        std::uint8_t        boardtype { embot::core::tointegral(theboard) };
         std::uint8_t        bootloaderVmajor {0};
         std::uint8_t        bootloaderVminor {0};
         std::uint8_t        info32[32] {"i am a amc2c"};
@@ -59,7 +65,8 @@ struct embot::app::board::amc2c::theCANagentCORE::Impl
     
     embot::prot::can::applicationInfo _applicationinfo {};
 
-    embot::prot::can::Board _board {embot::prot::can::Board::amcbldc};
+    embot::prot::can::Board _board {theboard};
+    embot::hw::CAN _canbus {embot::hw::CAN::two};
 
     
     Impl() { }
@@ -77,6 +84,8 @@ bool embot::app::board::amc2c::theCANagentCORE::Impl::initialise(const Config &c
     // we use the object theCANboardInfo which is based onto FlashStorage which manages 
     // the flash partition called Partition::ID::sharedstorage
 
+    _storedinfo.address = _config.location.getadr();
+    _storedinfo.boardtype = embot::core::tointegral(_config.board);
     _storedinfo.applicationVmajor = _config.applicationinfo.version.major;
     _storedinfo.applicationVminor = _config.applicationinfo.version.minor;
     _storedinfo.applicationVbuild = _config.applicationinfo.version.build;
@@ -84,11 +93,17 @@ bool embot::app::board::amc2c::theCANagentCORE::Impl::initialise(const Config &c
     _storedinfo.protocolVminor = _config.applicationinfo.protocol.minor;
   
     std::memmove(_storedinfo.info32, _config.boardinfo, sizeof(_storedinfo.info32)); 
-    
-    _storedinfo.canaddress = _config.canaddress;
-    
-    _board = static_cast<embot::prot::can::Board>(_storedinfo.boardtype);
-
+           
+    _board = _config.board;
+    embot::app::msg::BUS bus = _config.location.getbus();
+    if(true == _config.location.isCAN())
+    {
+        _canbus = (embot::app::msg::BUS::can1 == bus) ? (embot::hw::CAN::one) : (embot::hw::CAN::two);
+    }
+    else
+    {
+        _canbus = embot::hw::CAN::none;
+    }
     _applicationinfo.version.major = _storedinfo.applicationVmajor;
     _applicationinfo.version.minor = _storedinfo.applicationVminor;
     _applicationinfo.version.build = _storedinfo.applicationVbuild;
@@ -106,13 +121,13 @@ bool embot::app::board::amc2c::theCANagentCORE::Impl::setcanaddress(const std::u
 {
     
     // i reinforce a reading from storage. just for safety. in here we are dealing w/ can address change and i want to be sure.
-    std::uint8_t canaddress = _storedinfo.canaddress;
+    std::uint8_t address = _storedinfo.address;
     
     std::uint8_t target = adr;
     
     if(0xff == adr)
     {
-        // compute a new random address. use the randoinvalid mask to filter out the undesired values. for sure 0x8001.
+        // compute a new random address. use the randominvalidmask to filter out the undesired values. for sure 0x8001.
         std::uint16_t mask = randominvalidmask;
         mask |= 0x8001;
         if(0xffff == mask)
@@ -145,17 +160,20 @@ bool embot::app::board::amc2c::theCANagentCORE::Impl::setcanaddress(const std::u
     }
         
     
-    if(canaddress != target)
+    if(address != target)
     {
-        if(embot::hw::resOK != embot::hw::can::setfilters(_config.canbus, target))
+        if(embot::hw::CAN::none != _canbus)
         {
-            return false;
+            if(embot::hw::resOK != embot::hw::can::setfilters(_canbus, target))
+            {
+                return false;
+            }
         }
-        _storedinfo.canaddress = target;
-        canaddress = _storedinfo.canaddress;
+        _storedinfo.address = target;
+        address = _storedinfo.address;
     }
                     
-    return (target == canaddress);
+    return (target == address);
 }
 
 
@@ -195,12 +213,12 @@ const embot::prot::can::applicationInfo & embot::app::board::amc2c::theCANagentC
 
 embot::hw::CAN embot::app::board::amc2c::theCANagentCORE::bus() const
 { 
-    return pImpl->_config.canbus;
+    return pImpl->_canbus;
 }
 
 embot::prot::can::Address embot::app::board::amc2c::theCANagentCORE::address() const
 {    
-    return pImpl->_storedinfo.canaddress;
+    return pImpl->_storedinfo.address;
 }
 
 

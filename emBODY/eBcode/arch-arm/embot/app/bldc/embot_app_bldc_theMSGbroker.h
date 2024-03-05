@@ -14,12 +14,12 @@
 
 #include <memory>
 #include <vector>
-#include "embot_prot_can.h"
+
+#include "embot_app_bldc.h"
 #include "embot_os_Action.h"
 
-
 namespace embot { namespace app { namespace bldc {
-           
+                 
     class theMSGbroker 
     {
     public:
@@ -34,7 +34,7 @@ namespace embot { namespace app { namespace bldc {
             constexpr Config(size_t r, size_t t) : rxCapacity(r), txCapacity(t) {}
             constexpr bool isvalid() const { return (rxCapacity > 0) && (txCapacity > 0); }
         };
-        
+                
         enum class Direction : uint8_t { INP, OUT };
         
         static constexpr size_t MAXcapacity = 999;   
@@ -44,15 +44,15 @@ namespace embot { namespace app { namespace bldc {
         size_t size(Direction dir) const;
         
 
-        bool add(Direction dir, const embot::prot::can::Frame &frame);
-        bool add(Direction dir, const std::vector<embot::prot::can::Frame> &frames);  
+        bool add(Direction dir, const embot::app::bldc::MSG &msg);
+        bool add(Direction dir, const std::vector<embot::app::bldc::MSG> &msgs);  
 
         // if ::OUT, whenever someone call any add(::OUT, ) then the action is called
         // the same for ::IN
         bool subscribe(Direction dir, const embot::os::Action &action);        
 
-        bool rem(Direction dir, size_t &remaining, embot::prot::can::Frame &frame);
-        bool rem(Direction dir, size_t &remaining, std::vector<embot::prot::can::Frame> &frames, size_t &retrieved, const size_t max2retrieve = theMSGbroker::MAXcapacity);          
+        bool rem(Direction dir, size_t &remaining, embot::app::bldc::MSG &msg);
+        bool rem(Direction dir, size_t &remaining, std::vector<embot::app::bldc::MSG> &msgs, size_t &retrieved, const size_t max2retrieve = theMSGbroker::MAXcapacity);          
         
     private:
         theMSGbroker(); 

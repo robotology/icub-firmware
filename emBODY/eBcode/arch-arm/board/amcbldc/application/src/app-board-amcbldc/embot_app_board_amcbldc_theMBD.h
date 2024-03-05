@@ -15,7 +15,7 @@
 #include <memory>
 
 #include "embot_core.h"
-#include "embot_prot_can.h"
+#include "embot_app_bldc.h"
 
 namespace embot::app::board::amcbldc {
            
@@ -26,13 +26,13 @@ namespace embot::app::board::amcbldc {
     
         struct Config
         {
-            embot::prot::can::Address adr {1};            
+            embot::app::msg::ADR adr {1};            
             constexpr Config() = default;
-            constexpr Config(embot::prot::can::Address a) : adr(a) {}
+            constexpr Config(embot::app::msg::ADR a) : adr(a) {}
         };
                 
         bool initialise(const Config &config);   
-        bool tick(const std::vector<embot::prot::can::Frame> &inpframes, std::vector<embot::prot::can::Frame> &outframes);
+        bool tick(const std::vector<embot::app::bldc::MSG> &inputmessages, std::vector<embot::app::bldc::MSG> &outputmessages);
          
         void on();
         void off();

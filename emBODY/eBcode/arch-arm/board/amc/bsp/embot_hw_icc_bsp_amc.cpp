@@ -116,33 +116,34 @@ namespace embot::hw::icc::mem::bsp {
     // -- MEM
     
     constexpr uint32_t startmemory {0x38001000};
-    constexpr uint32_t memsize {256};
+    constexpr uint32_t memsizes[] = {1024, 1024, 512, 512};
     
     static const PROP mm1 = {
         reinterpret_cast<void*>(startmemory),
-        memsize,
+        memsizes[0],
         MTX::nine
     };
     static const PROP mm2 = {
-        reinterpret_cast<void*>(startmemory+1*memsize),
-        memsize,
+        reinterpret_cast<void*>(startmemory+mm1.data.capacity),
+        memsizes[1],
         MTX::ten
     };
     static const PROP mm3 = {
-        reinterpret_cast<void*>(startmemory+2*memsize),
-        memsize,
+        reinterpret_cast<void*>(startmemory+mm1.data.capacity+mm2.data.capacity),
+        memsizes[2],
         MTX::eleven
     };
     static const PROP mm4 = {
-        reinterpret_cast<void*>(startmemory+3*memsize),
-        memsize,
+        reinterpret_cast<void*>(startmemory+mm1.data.capacity+mm2.data.capacity+mm3.data.capacity),
+        memsizes[3],
         MTX::twelve
     };  
+
     
     constexpr BSP thebsp {        
         // maskofsupported
         mask::pos2mask<uint32_t>(MEM::one) | mask::pos2mask<uint32_t>(MEM::two) | 
-        mask::pos2mask<uint32_t>(MEM::three) | mask::pos2mask<uint32_t>(MEM::four),        
+        mask::pos2mask<uint32_t>(MEM::three) | mask::pos2mask<uint32_t>(MEM::four),
         // properties
         {{
             &mm1, &mm2, &mm3, &mm4      
@@ -180,14 +181,15 @@ namespace embot::hw::icc::ltr::bsp {
 
     // LTR
 
-    constexpr PROP ltr01 = { embot::hw::icc::MEM::four, embot::hw::icc::SIG::four, embot::hw::icc::SIG::three };
-       
+    constexpr PROP ltr01 = { embot::hw::icc::MEM::one, embot::hw::icc::SIG::one, embot::hw::icc::SIG::two };
+    constexpr PROP ltr02 = { embot::hw::icc::MEM::two, embot::hw::icc::SIG::three, embot::hw::icc::SIG::four };
+    
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LTR::one),        
+        mask::pos2mask<uint32_t>(LTR::one) | mask::pos2mask<uint32_t>(LTR::two),        
         // properties
         {{
-            &ltr01
+            &ltr01, &ltr02
         }}        
     };
     

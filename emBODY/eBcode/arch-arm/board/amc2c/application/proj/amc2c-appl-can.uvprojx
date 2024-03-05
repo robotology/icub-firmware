@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1210,7 +1210,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1534,7 +1534,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC2C STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\supervisor-rx;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal</IncludePath>
+              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\..\..\embot\app\eth;..\..\..\..\embot\app\bldc;..\src\app-board-amc2c;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\supervisor-rx;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\bsp\motorhal;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2473,7 +2473,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.1.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>

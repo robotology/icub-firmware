@@ -41,6 +41,10 @@
 
 #include "embot_os_theScheduler.h"
 
+#if defined(USE_ICC_COMM) 
+#include "embot_app_eth_theICCservice.h"
+#endif
+
 #include "EOtheCANservice.h"
 #include "EOtheCANdiscovery2.h"
 #include "EOtheCANprotocol.h"
@@ -62,7 +66,7 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-#define CANflushMODE_DO_phase
+#define CANICCflushMODE_DO_phase
 
 // the theCTRLsocket objects wraps the use of EOMtheEMSsocket + EOMtheEMStransceiver inside theHandler
 struct theCTRLsocket
@@ -245,12 +249,27 @@ struct theSM
         eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef01);
     }    
 
-    static void s_can_cbkonrx(void *arg)
+    static void s_can_cbkonrx_idle(void *arg)
     {
         EOMtask *task = (EOMtask *)arg;
         eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
     }
-    
+#if defined(USE_ICC_COMM)     
+    static void s_icc_cbkonrx_idle(void *arg)
+    {
+        eom_task_isrSetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef03);
+    }    
+#endif    
+    static void s_can_cbkonrx_fatalerror(void *arg)
+    {
+        eom_task_isrSetEvent(eom_emserror_GetTask(eom_emserror_GetHandle()), emserror_evt_userdef01);
+    } 
+#if defined(USE_ICC_COMM)     
+    static void s_icc_cbkonrx_fatalerror(void *arg)
+    {
+        eom_task_isrSetEvent(eom_emserror_GetTask(eom_emserror_GetHandle()), emserror_evt_userdef01);
+    }    
+#endif    
     static void stateIDLE_onentry()
     {
         embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
@@ -264,7 +283,16 @@ struct theSM
         // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());
-        
+#if defined(USE_ICC_COMM) 
+#if defined(debugNOicc)
+#else            
+        // theICCservice
+        embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
+        embot::app::eth::theICCservice::getInstance().parse();
+        embot::app::eth::theICCservice::getInstance().flush(5*embot::core::time1millisec); 
+        embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_idle, nullptr});             
+#endif
+#endif        
         // can discovery
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
@@ -295,6 +323,15 @@ struct theSM
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);    
         eo_canserv_TXstartAll(eo_canserv_GetHandle(), NULL, NULL);
         eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
+#if defined(USE_ICC_COMM)  
+#if defined(debugNOicc)
+#else            
+        // theICCservice
+        embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::onflush);  
+        embot::app::eth::theICCservice::getInstance().flush(5*embot::core::time1millisec);  
+        embot::app::eth::theICCservice::getInstance().set(embot::core::Callback());             
+#endif         
+#endif            
         
         // can discovery
         eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), nullptr);
@@ -321,11 +358,19 @@ struct theSM
         // pulse LED::four forever at 4 hz.
         embot::app::theLEDmanager::getInstance().get(statusLED).pulse(embot::core::time1second/4, 0);
       
-
         // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
-        
+        //#warning shall we set s_can_cbkonrx_fatalerror ??  we cannot do it for EOtheCANservice  
+#if defined(USE_ICC_COMM) 
+#if defined(debugNOicc)
+#else            
+        // theICCservice
+        embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
+        embot::app::eth::theICCservice::getInstance().parse();   
+        embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())});             
+#endif
+#endif                      
         // can discovery
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
@@ -361,7 +406,15 @@ struct theSM
         // EOtheCANservice: set straigth mode and force parsing of all the frames in the RX queues.
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
-              
+#if defined(USE_ICC_COMM) 
+#if defined(debugNOicc)
+#else        
+        // theICCservice
+        embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
+        embot::app::eth::theICCservice::getInstance().parse();  
+        embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_idle, nullptr});                     
+#endif      
+#endif        
         // stop and deactivate all the services which may have been started 
         embot::app::eth::theServices::getInstance().stop();        
     }
@@ -391,7 +444,15 @@ struct theSM
             {
                 embot::app::eth::theETHmonitor::getInstance().tick();
             } break;
-            
+#if defined(USE_ICC_COMM) 
+            case emsconfigurator_evt_userdef03:
+            {
+#if defined(debugNOicc)
+#else                
+                embot::app::eth::theICCservice::getInstance().parse();  
+#endif                
+            } break;
+#endif            
             default: {} break;                                  
         }
         
@@ -413,7 +474,14 @@ struct theSM
         // it will be the can parser functions which will call the relevant objects which will do what they must.
         // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
         eo_canserv_ParseAll(eo_canserv_GetHandle());    
-    
+#if defined(USE_ICC_COMM) 
+#if defined(debugNOicc)
+#else        
+        // theICCservice
+        embot::app::eth::theICCservice::getInstance().parse();                        
+#endif
+#endif
+        
 #if defined(TESTRTC_IS_ACTIVE)     
         testRTC_RUN_tick();
 #elif defined(enableTHESERVICETESTER)
@@ -437,7 +505,49 @@ struct theSM
         eo_canserv_TXstartAll(eo_canserv_GetHandle(), &txcan1frames, &txcan2frames);    
         eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);        
     }
+
+#if defined(USE_ICC_COMM)     
+    // marco.accame on 24 nov 2023
+    // for now we just flush in no blocking mode using a dummy callback
+    // then we wait using bool flushed() method.
+    // BUT: much better to use a callback that releases a semaphore and wait for the
+    //      release of it
     
+    static void flushICCtransmission()
+    {
+#if defined(debugNOicc)
+#else        
+        // theICCservice: i call the flush() with a callback so it returns immediately
+        constexpr embot::core::Callback donothingonflushdone {};
+        embot::app::eth::theICCservice::getInstance().flush(donothingonflushdone);  
+#endif        
+    }
+    
+    static void waitICCisflushed()
+    {
+#if defined(debugNOicc)
+#else        
+        if(true == embot::app::eth::theICCservice::getInstance().flushed())
+        {
+            return;   
+        }
+        
+        // theICCservice
+        embot::core::Time expirytime {embot::core::now() + 3*embot::core::time1millisec};
+        for(;;)
+        {
+            if(true == embot::app::eth::theICCservice::getInstance().flushed())
+            {
+                break;
+            }
+            if(embot::core::now() >= expirytime)
+            {
+                break;
+            }
+        }
+#endif        
+    }
+#endif    
     
     static void objectRUN_DO_activity()
     {
@@ -458,23 +568,34 @@ struct theSM
         // marco.accame on 20oct2023:
         // we could start the transmission of the CAN frames at the end of the DO phase
         // in an attempt to reduce the wait time at the end of the TX phase         
-#if defined(CANflushMODE_DO_phase)
+#if defined(CANICCflushMODE_DO_phase)
         flushCANtransmission();
+#if defined(USE_ICC_COMM)         
+        flushICCtransmission();
+#endif        
 #endif        
     }   
     
 
     static void objectRUN_TX_beforeUDPtx()
     {   
-#if !defined(CANflushMODE_DO_phase)        
+#if !defined(CANICCflushMODE_DO_phase)        
         flushCANtransmission();
+#if defined(USE_ICC_COMM)         
+        flushICCtransmission();
+#endif        
 #endif        
     }    
 
     static void objectRUN_TX_afterUDPtx()
     {
         // it is not necessary to call any Tick() in here.
-        
+                
+
+#if defined(USE_ICC_COMM)         
+        // keep it last but one       
+        waitICCisflushed();
+#endif
         
         // ABSOLUTELY KEEP IT LAST: 
         // it lock the thread TX until all CAN frame has exited the board
@@ -528,6 +649,23 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
 {
     _config = cfg;   
     _state = State::IDLE;
+
+#if defined(USE_ICC_COMM)     
+#if 0
+    marco.accame on 24 nov 2023
+    i anticipate in here the init of theICCservice because:
+    - theCTRLsocket initialization takes long time
+    - the ICC receiver must be ready to accept data from the slave running on the amc2c that
+      is faster in booting up.
+    so: we init in here and we configure the parsing inside theHandler together with the init
+    of theICCmapping and the CAN protocol things
+#endif
+
+#if defined(debugNOicc)
+#else    
+    embot::app::eth::theICCservice::getInstance().initialise(embot::app::eth::iccmastercfg);    
+#endif
+#endif
     
     embot::app::eth::theETHmonitor::getInstance().initialise(theHandler_theETHmonitor_Config);    
     
@@ -545,9 +683,11 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
     // TODO: put in some config (e.g. theHandler_theServices_Config) all the services that we want to init ....
         
     // FT
+#if defined(USE_EMBOT_theServicesFT)        
     embot::app::eth::theServiceFT::getInstance().initialise({});          
     embot::app::eth::theServices::getInstance().load(embot::app::eth::theServiceFT::getInstance().service());
-    
+#endif
+        
     // MC        
 #if defined(USE_EMBOT_theServicesMC)
     embot::app::eth::theServiceMC::getInstance().initialise({});          
@@ -979,6 +1119,15 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
     theSM::objectIDLE_on_evt(emsconfigurator_evt_userdef02);
 }
 
+#if defined(USE_ICC_COMM) 
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
+{
+    theSM::objectIDLE_on_evt(emsconfigurator_evt_userdef03);
+}
+#else
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p) {}
+#endif
+
 #include "EoError.h"
 
 // VERIFY: this callback is called by the EMSconfigurator both for parsing and forming of a packet 
@@ -995,10 +1144,53 @@ extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStrans
 }
 
 extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator* p) {}
-extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p) {}
+
+
+#if !defined(TEST_theICCservice)
 extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p) {}
 extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p) {}
 
+#else
+    
+    #warning TEST_theICCservice is defined .....................................................
+    
+void sendicc()
+{
+    static constexpr embot::core::Time period {4000*embot::core::time1millisec};    
+    static embot::core::Time lastcall {0};    
+    embot::core::Time now = embot::core::now();
+    embot::core::Time delta = now - lastcall;    
+    if(delta < period)
+    {
+        return;
+    }    
+    lastcall = now;
+    
+    // ok, and now the rest
+    
+    static uint8_t n {0};
+    n++;
+    #warning DEBUG... remove it later on
+    uint32_t ID = 0x101; // i want the sender to have 0 address .........
+    embot::prot::can::Frame frame1 {ID, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
+    embot::app::msg::Location loc1 {embot::app::msg::Location::BUS::icc1, 3};
+    embot::prot::can::Frame frame2 {ID, 8, {n, 2, 2, 2, 2, 2, 2, 2}};    
+    embot::app::eth::theICCservice::getInstance().put({loc1, frame1});
+    embot::app::eth::theICCservice::getInstance().put({loc1, frame2});
+    
+    embot::core::print(embot::core::TimeFormatter(now).to_string() + ": thread tCFG will transmit some messages via ICC to the amc2c application");
+
+    embot::app::eth::theICCservice::getInstance().flush();    
+}
+extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p) 
+{
+    sendicc();
+}
+extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p) 
+{
+    sendicc();
+}
+#endif
 
 // - EOMtheEMSrunner: redefinition of userdef functions
 //   formerly inside overridden_runner.c
@@ -1053,7 +1245,13 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
 #include "EOMtheEMSerror_hid.h"     
     
 extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt) {} 
-extern void eom_emserror_hid_userdef_OnRXuserdefevent(eOemserror_event_t evt) {}
+extern void eom_emserror_hid_userdef_OnRXuserdefevent(eOemserror_event_t evt)
+{
+    #warning TODO: add management of several things in FATALERROR state
+    // they are: ethmonitor, icc rx and can rx in FATALERROR state
+    // if emserror_evt_userdef01 -> can and icc rx in fatal error state
+    // if emserror_evt_userdef02 -> ticker of ethmonitor
+}
 
 
 // other initialisation functions: MN protocol

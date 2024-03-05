@@ -17,6 +17,7 @@
 #include "embot_os_common.h"
 #include "embot_os_thread.h"
 #include "embot_hw.h"
+#include "embot_app_bldc.h"
 
 #include "embot_app_application_CANagentCORE.h"
 
@@ -30,8 +31,8 @@ namespace embot { namespace app { namespace bldc {
  
         using getCodePartition = embot::hw::FLASHpartitionID (*)();
         using getAgentCore = embot::app::application::CANagentCORE* (*)();
-        using OnStartupCTRL = void (*)(embot::prot::can::Address adr);    
-        using OnTickCTRL = void (*)(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output);
+        using OnStartupCTRL = void (*)(embot::app::msg::ADR adr);    
+        using OnTickCTRL = void (*)(const std::vector<embot::app::bldc::MSG> &input, std::vector<embot::app::bldc::MSG> &output);
 
         struct CoreCfg
         {

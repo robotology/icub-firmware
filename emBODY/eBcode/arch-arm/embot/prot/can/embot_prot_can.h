@@ -24,7 +24,7 @@
 #include "embot_core.h"
 
 
-namespace embot { namespace prot { namespace can {
+namespace embot::prot::can {
     
     // - useful types 
     
@@ -75,7 +75,8 @@ namespace embot { namespace prot { namespace can {
 
     
     enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, 
-                       pmc = 17, amcbldc = 18, bms = 19, mtb4c = 20, mtb4fap = 21, strain2c = 22, none = 254, unknown = 0xff };
+                       pmc = 17, amcbldc = 18, bms = 19, mtb4c = 20, amc2c = 21, strain2c = 22, bat = 23,
+                       none = 254, unknown = 0xff };
     
     enum class Process { bootloader = 0, application = 1, unknown = 0xff };
            
@@ -244,7 +245,7 @@ namespace embot { namespace prot { namespace can {
     
     
     
-}}} // namespace embot { namespace prot { namespace can {
+} // namespace embot::prot::can {
 
 
 

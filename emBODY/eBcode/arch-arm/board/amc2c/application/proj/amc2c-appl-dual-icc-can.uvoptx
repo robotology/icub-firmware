@@ -260,7 +260,7 @@
   </Target>
 
   <Target>
-    <TargetName>appl-can-ulpro</TargetName>
+    <TargetName>appl-icc-ulpro</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -358,7 +358,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1123199 -O462 -S12 -C0 -P00000003 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO32819 -TC200000000 -TT400000000 -TP18 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD10000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>-UP1123199 -O16846 -S12 -C0 -P00000003 -N00("ARM CoreSight SW-DP") -D00(6BA02477) -L00(0) -TO32819 -TC200000000 -TT400000000 -TP18 -TDX0 -TDD0 -TDS8001 -TDT0 -TDC1F -TIE1 -TIP9 -FO7 -FD10000000 -FC8000 -FN1 -FF0STM32H7x_2048.FLM -FS08000000 -FL0200000 -FP0($$Device:STM32H745IIKx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -373,7 +373,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ARMRTXEVENTFLAGS</Key>
-          <Name>-L200 -Z11 -C0 -M1 -T1</Name>
+          <Name>-L200 -Z21 -C0 -M1 -T1</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -396,12 +396,32 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>PPP</ItemText>
+          <ItemText>msg</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>activated</ItemText>
+          <ItemText>fr</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>hwframe</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>period,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>bus2use</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>msg</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -425,7 +445,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -442,7 +462,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>1</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -614,7 +634,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -657,26 +677,14 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\app-board-amc2c\embot_app_board_amc2c_mbd.demo.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_board_amc2c_mbd.demo.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\src\app-board-amc2c\embot_app_board_amc2c_mbd.icc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_board_amc2c_mbd.icc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>4</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\app-board-amc2c\embot_app_board_amc2c_test.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_board_amc2c_test.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>2</GroupNumber>
-      <FileNumber>5</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -690,13 +698,13 @@
 
   <Group>
     <GroupName>theMBD</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>6</FileNumber>
+      <FileNumber>5</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -710,10 +718,22 @@
 
   <Group>
     <GroupName>embot::app::bldc</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>6</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_eth_theICCservice.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
     <File>
       <GroupNumber>4</GroupNumber>
       <FileNumber>7</FileNumber>
@@ -721,8 +741,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\app\bldc\embot_app_bldc_theApplication.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_bldc_theApplication.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMMcanicc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_bldc_theCOMMcanicc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -733,8 +753,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMM.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_app_bldc_theCOMM.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\app\bldc\embot_app_bldc_theApplication.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_bldc_theApplication.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -833,8 +853,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amc2c.v1B1.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.h7.amc2c.v1B1.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.amc2c.v1A0.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.h7.amc2c.v1A0.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -938,7 +958,7 @@
 
   <Group>
     <GroupName>embot::hw</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1581,7 +1601,7 @@
   </Group>
 
   <Group>
-    <GroupName>mbd</GroupName>
+    <GroupName>mbd::sharedutils</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1593,7 +1613,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\const_params.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\const_params.cpp</PathWithFileName>
       <FilenameWithoutPath>const_params.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1605,7 +1625,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\rt_hypotf_snf.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf_snf.cpp</PathWithFileName>
       <FilenameWithoutPath>rt_hypotf_snf.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1617,7 +1637,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\rt_nonfinite.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rt_nonfinite.cpp</PathWithFileName>
       <FilenameWithoutPath>rt_nonfinite.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1629,7 +1649,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\rt_roundd_snf.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundd_snf.cpp</PathWithFileName>
       <FilenameWithoutPath>rt_roundd_snf.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1641,8 +1661,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\rtGetInf.cpp</PathWithFileName>
-      <FilenameWithoutPath>rtGetInf.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf_snf.cpp</PathWithFileName>
+      <FilenameWithoutPath>rt_roundf_snf.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1653,8 +1673,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\rtGetNaN.cpp</PathWithFileName>
-      <FilenameWithoutPath>rtGetNaN.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rtGetInf.cpp</PathWithFileName>
+      <FilenameWithoutPath>rtGetInf.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1665,8 +1685,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\uMultiWord2Double.cpp</PathWithFileName>
-      <FilenameWithoutPath>uMultiWord2Double.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rtGetNaN.cpp</PathWithFileName>
+      <FilenameWithoutPath>rtGetNaN.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1677,8 +1697,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\uMultiWordShl.cpp</PathWithFileName>
-      <FilenameWithoutPath>uMultiWordShl.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWord2Double.cpp</PathWithFileName>
+      <FilenameWithoutPath>uMultiWord2Double.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1689,8 +1709,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\rtw_enable_disable_motors.c</PathWithFileName>
-      <FilenameWithoutPath>rtw_enable_disable_motors.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWordShl.cpp</PathWithFileName>
+      <FilenameWithoutPath>uMultiWordShl.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1701,7 +1721,19 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\sharedutils\rtw_motor_config.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</PathWithFileName>
+      <FilenameWithoutPath>rtw_enable_disable_motors.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>17</GroupNumber>
+      <FileNumber>81</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</PathWithFileName>
       <FilenameWithoutPath>rtw_motor_config.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1716,12 +1748,12 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>18</GroupNumber>
-      <FileNumber>81</FileNumber>
+      <FileNumber>82</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\can-encoder\can_encoder.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\can-encoder\can_encoder.cpp</PathWithFileName>
       <FilenameWithoutPath>can_encoder.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1736,12 +1768,12 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>19</GroupNumber>
-      <FileNumber>82</FileNumber>
+      <FileNumber>83</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\can-decoder\can_decoder.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\can-decoder\can_decoder.cpp</PathWithFileName>
       <FilenameWithoutPath>can_decoder.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1756,24 +1788,24 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>83</FileNumber>
+      <FileNumber>84</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX.cpp</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_RX.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>20</GroupNumber>
-      <FileNumber>84</FileNumber>
+      <FileNumber>85</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\supervisor-rx\SupervisorFSM_RX_data.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX_data.cpp</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_RX_data.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1788,12 +1820,12 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>21</GroupNumber>
-      <FileNumber>85</FileNumber>
+      <FileNumber>86</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\supervisor-tx\SupervisorFSM_TX.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\supervisor-tx\SupervisorFSM_TX.cpp</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_TX.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1808,12 +1840,12 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>22</GroupNumber>
-      <FileNumber>86</FileNumber>
+      <FileNumber>87</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\control-outer\control_outer.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</PathWithFileName>
       <FilenameWithoutPath>control_outer.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1828,25 +1860,13 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>23</GroupNumber>
-      <FileNumber>87</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\control-foc\control_foc.cpp</PathWithFileName>
-      <FilenameWithoutPath>control_foc.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>23</GroupNumber>
       <FileNumber>88</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\control-foc\control_foc_data.cpp</PathWithFileName>
-      <FilenameWithoutPath>control_foc_data.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\control-foc\control_foc.cpp</PathWithFileName>
+      <FilenameWithoutPath>control_foc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1857,7 +1877,19 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\control-foc\FOCInnerLoop.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\control-foc\control_foc_data.cpp</PathWithFileName>
+      <FilenameWithoutPath>control_foc_data.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>23</GroupNumber>
+      <FileNumber>90</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\control-foc\FOCInnerLoop.cpp</PathWithFileName>
       <FilenameWithoutPath>FOCInnerLoop.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1872,12 +1904,12 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>24</GroupNumber>
-      <FileNumber>90</FileNumber>
+      <FileNumber>91</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\estimator\estimation_velocity.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\estimator\estimation_velocity.cpp</PathWithFileName>
       <FilenameWithoutPath>estimation_velocity.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1892,12 +1924,12 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>25</GroupNumber>
-      <FileNumber>91</FileNumber>
+      <FileNumber>92</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\filter-current\filter_current.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\filter-current\filter_current.cpp</PathWithFileName>
       <FilenameWithoutPath>filter_current.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1912,33 +1944,13 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>26</GroupNumber>
-      <FileNumber>92</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\amc-bldc\AMC_BLDC.cpp</PathWithFileName>
-      <FilenameWithoutPath>AMC_BLDC.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-  </Group>
-
-  <Group>
-    <GroupName>mbd::thermal-model</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
-    <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>27</GroupNumber>
       <FileNumber>93</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\model-based-design\thermal-model\thermal_model.cpp</PathWithFileName>
-      <FilenameWithoutPath>thermal_model.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\mbd\amcbldc\amc-bldc\AMC_BLDC.cpp</PathWithFileName>
+      <FilenameWithoutPath>AMC_BLDC.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

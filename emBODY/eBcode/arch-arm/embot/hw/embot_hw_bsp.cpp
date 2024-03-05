@@ -83,6 +83,8 @@ namespace embot::hw::bsp {
 
 #if defined(USE_HAL_DRIVER) 
 
+#if defined(EMBOT_ENABLE_hw_bsp_redefine_puts)
+#else
 int embot::hw::bsp::DRIVER::puts(const char* str)
 {
     if(nullptr == str)
@@ -102,14 +104,17 @@ int embot::hw::bsp::DRIVER::puts(const char* str)
     ITM_SendChar('\n');
     return(++num);
 }
+#endif
 
 #elif defined(USE_hal2_DRIVER)
 
-
+#if defined(EMBOT_ENABLE_hw_bsp_redefine_puts)
+#else
 int embot::hw::bsp::DRIVER::puts(const char* str)
 {
     return hal_trace_puts(str);
 }
+#endif
 
 #else
     #error either HAL or hal2 DRIVER    

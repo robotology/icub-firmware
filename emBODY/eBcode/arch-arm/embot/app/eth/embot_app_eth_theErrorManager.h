@@ -62,6 +62,10 @@ namespace embot { namespace app { namespace eth {
             constexpr Descriptor() = default;
             constexpr Descriptor(uint32_t c, uint16_t p16, uint64_t p64) : code(c), sourcedevice(0), sourceaddress(0), par16(p16), par64(p64) {}
             constexpr bool isvalid() const { return 0 != code; }
+            void clear() 
+            {
+                code = sourcedevice = par16 = par64 = 0;
+            }
         };  
 
         struct Caller

@@ -60,11 +60,11 @@ struct embot::app::bldc::theCTRL::Impl
     embot::app::application::dummyCANagentCORE _dummycanagentcore {};
     embot::app::bldc::dummyCOMM _dummycomm {};
         
-    std::vector<embot::prot::can::Frame> _tCTRLoutframes {};
-    std::vector<embot::prot::can::Frame> _tCTRLinpframes {};
+    std::vector<embot::app::bldc::MSG> _tCTRLoutframes {};
+    std::vector<embot::app::bldc::MSG> _tCTRLinpframes {};
         
-    embot::hw::CAN _tCTRLcanbus {embot::hw::CAN::none};
-    embot::prot::can::Address _tCTRLcanaddress {1};
+//    embot::hw::CAN _tCTRLcanbus {embot::hw::CAN::none};
+//    embot::prot::can::Address _tCTRLcanaddress {1};
         
     embot::os::EventThread *_t_CTRL {nullptr};
     embot::os::Timer * _tCTRL_tickTimer {nullptr};
@@ -86,7 +86,7 @@ struct embot::app::bldc::theCTRL::Impl
     void tCTRL_OnTimeout(embot::os::Thread *t, void *param);
     
     // when we have a frame in embot::hw::can to retrieve
-    void tCTRL_OnRXframe(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &outframes);
+    void tCTRL_OnRXframe(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::app::bldc::MSG &frame, std::vector<embot::app::bldc::MSG> &outframes);
     
 
     bool subscribe(embot::app::bldc::COMM *comm);
@@ -119,9 +119,9 @@ bool embot::app::bldc::theCTRL::Impl::initialise(const Config config)
         _config.canagentcore = &_dummycanagentcore;
     }
     
-    // retrieve some CAN constants
-    _tCTRLcanbus = _config.canagentcore->bus();
-    _tCTRLcanaddress = _config.canagentcore->address();      
+//    // retrieve some CAN constants
+//    _tCTRLcanbus = _config.canagentcore->bus();
+//    _tCTRLcanaddress = _config.canagentcore->address();      
     
 
     // the tCOMM    

@@ -28,6 +28,15 @@
 #include "embot_app_eth_theErrorManager.h"
 #include "embot_os_theScheduler.h"
 
+#if defined(USE_ICC_COMM) 
+#include "embot_app_eth_theICCservice.h"
+#include "embot_app_eth_theICCmapping.h"
+#endif
+
+#include "EOtheCANprotocol.h"
+#include "embot_app_eth_Service_impl.h"
+
+#include "embot_app_eth_theServiceMC.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -40,7 +49,9 @@ struct embot::app::eth::theServices::Impl
     Config _config {};  
     EOnvSet* _nvset {nullptr};   
     eOmn_service_t *_mnservice {nullptr};
-    std::array<bool, Service::numberOfCategories> _running {false};     
+    std::array<bool, Service::numberOfCategories> _running {false};   
+
+    embot::app::eth::service::impl::eOmnConfig _eomnServConfig {};
     
     // i need a map of objects Service w/ a key given by the Service::Category
     
@@ -59,7 +70,7 @@ struct embot::app::eth::theServices::Impl
     
     bool process(eOmn_service_cmmnds_command_t *command);
     
-    bool setREGULARS(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);
+    bool setREGULARS(EOarray* id32ofregulars, const eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);
     
     bool add(const std::vector<eOprotID32_t> &id32s, fpIsID32relevant fpISOK, uint8_t &added);
     bool rem(const std::vector<eOprotID32_t> &id32s,uint8_t &removed);
@@ -73,8 +84,13 @@ struct embot::app::eth::theServices::Impl
     
     bool sendresult(Service *s, const eOmn_service_cmmnds_command_t *command, eOmn_serv_state_t state, bool ok); 
     
-    // statics
-    static bool onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok);
+    // static
+    static void onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok);
+    static void onendverifyactivate2(Service *s, bool ok);
+
+#if defined(USE_ICC_COMM)     
+    static bool iccitemparser(const embot::app::eth::theICCservice::Item &item);
+#endif    
 
 };
 
@@ -127,6 +143,13 @@ static void s_can_cbkonrx(void *arg)
     eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
 }
 
+#if defined(USE_ICC_COMM) 
+static void s_icc_cbkonrx(void *arg)
+{
+    EOMtask *task = (EOMtask *)arg;
+    eom_task_isrSetEvent(task, emsconfigurator_evt_userdef03);
+}
+#endif
 
 #include "EOtheCANdiscovery2.h"
 
@@ -233,7 +256,43 @@ void embot::app::eth::theServices::Impl::init_step2()
         
     // inside eo_canserv_Initialise() it is called hal_can_supported_is(canx) to see if we can init the can bus as requested.
     eo_canserv_Initialise(&config);   
-    
+
+#if defined(USE_ICC_COMM)         
+    // initialisation just loads the basic ICC receiver agents 
+    // it is for instance the serviceMC that loads its own agent for the MC messages
+    embot::app::eth::theICCmapping::getInstance().initialise({});
+//    embot::app::eth::mc::messaging::receiver::load(embot::app::eth::mc::messaging::receiver::agent());        
+
+       
+    embot::core::Callback oniccRX {s_icc_cbkonrx, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle())};
+#if 0 
+    marco.accame on 24 nov 2023: i cannot init so late in the execution.
+    because if the other core start to tx then this core never receive anything ever.
+    so: 
+    1. very early we init the theICCservice w/ dummy callback on rx and parser
+    2. in here we just configure those two correctly
+           
+    embot::app::eth::theICCservice::Config cfgicc
+    {
+        embot::hw::icc::LTR::one, embot::hw::icc::LTR::two,
+        32, 32,
+        embot::app::eth::theICCservice::modeTX::onflush,
+        embot::os::Priority::system54, embot::os::Priority::system53,
+        oniccRX,
+        iccitemparser
+    };
+            
+    embot::app::eth::theICCservice::getInstance().initialise(cfgicc);
+#endif
+
+#if defined(debugNOicc)
+#else
+    embot::app::eth::theICCservice::getInstance().set(oniccRX); 
+    embot::app::eth::theICCservice::getInstance().set(iccitemparser);     
+#endif        
+
+#endif // #if defined(USE_ICC_COMM)
+            
     // can-discovery
     eo_candiscovery2_Initialise(NULL);  
     EOaction_strg astrg = {0};
@@ -338,9 +397,11 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
         case eomn_serv_operation_verifyactivate:
         {
             embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::process()", thr}, {}, "verifyactivate");
-            service->verify(config, true, onendverifyactivate);
-            // we dont send any result. the callback onendverifyactivate() will do it.
-            // for reference it was: s_eo_services_process_verifyactivate(category, config);            
+//            service->verify(config, true, onendverifyactivate);
+//            // we dont send any result. the callback onendverifyactivate() will do it.
+//            // for reference it was: s_eo_services_process_verifyactivate(category, config);    
+            _eomnServConfig.eomnservcfg = config;
+            service->verifyactivate(&_eomnServConfig, onendverifyactivate2);
         } break;
         
         case eomn_serv_operation_start:
@@ -447,7 +508,7 @@ bool embot::app::eth::theServices::Impl::process(eOmn_service_cmmnds_command_t *
 }
 
 
-bool embot::app::eth::theServices::Impl::setREGULARS(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
+bool embot::app::eth::theServices::Impl::setREGULARS(EOarray* id32ofregulars, const eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
 {
     if(nullptr == id32ofregulars)
     {
@@ -706,7 +767,7 @@ bool embot::app::eth::theServices::Impl::sendresult(Service *s, const eOmn_servi
 
 // - static
 
-bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok)
+void embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const eOmn_serv_configuration_t *sc, bool ok)
 {
     embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
     
@@ -721,8 +782,12 @@ bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const e
     // now i must send back a rop w/ the result of the request
     // i need
     eOmn_serv_category_t category = static_cast<eOmn_serv_category_t>(s->category());
-    eOmn_serv_type_t type = static_cast<eOmn_serv_type_t>(sc->type);    
-        
+    eOmn_serv_type_t type = ok ? static_cast<eOmn_serv_type_t>(s->type()) : eomn_serv_NONE; // see note below
+    // note: s->type() returns the applied service type.
+    // so if ok is true -> the one asked to configure. but if ok is false it returns eomn_serv_NONE. 
+    // but that is OK as long as ... YRI does not check type in case of failure
+    //eOmn_serv_type_t type = static_cast<eOmn_serv_type_t>(sc->type);    
+   
     // mnservice can be retrieved w/ ...
     eOmn_service_t * mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
     mnservice->status.commandresult.category = category;
@@ -741,11 +806,66 @@ bool embot::app::eth::theServices::Impl::onendverifyactivate(Service *s, const e
 
     embot::app::eth::theHandler::getInstance().transmit(ropdesc);
         
-    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate()", thr}, {}, ok ? "ok": "false");
-                
-    return true;
+//    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate()", thr}, {}, ok ? "ok": "false");
 }
 
+// the signature of this funtion is the same as embot::app::eth::Service::OnEndOfOperation
+
+void embot::app::eth::theServices::Impl::onendverifyactivate2(Service *s, bool ok)
+{
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+    
+    if(nullptr == s)
+    {
+        // it must never happen. we may add some sort of diagnostics trace 
+        return;
+    }
+    
+    if(false == ok)
+    {
+        // we could remove it because: the service should have already reported and surely is not activated
+        s->report();
+        s->deactivate();
+    }
+    
+    // now i must send back a rop w/ the result of the request
+    // i need
+    eOmn_serv_category_t category = static_cast<eOmn_serv_category_t>(s->category());
+    eOmn_serv_type_t type = ok ? static_cast<eOmn_serv_type_t>(s->type()) : eomn_serv_NONE; // see note below
+    // note: s->type() returns the applied service type.
+    // so if ok is true -> the one asked to configure. but if ok is false it returns eomn_serv_NONE. 
+    // but that is OK as long as ... YRI does not check type in case of failure   
+   
+    // mnservice can be retrieved w/ ...
+    eOmn_service_t * mnservice = reinterpret_cast<eOmn_service_t*>(eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0));
+    mnservice->status.commandresult.category = category;
+    mnservice->status.commandresult.operation = eomn_serv_operation_verifyactivate;
+    mnservice->status.commandresult.type = type;   
+
+    mnservice->status.commandresult.latestcommandisok = ok ? eobool_true : eobool_false;    
+    mnservice->status.commandresult.data[0] = ok ? eomn_serv_state_activated: eomn_serv_state_failureofverify;        
+    
+    eOropdescriptor_t ropdesc {};
+
+    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+    ropdesc.ropcode = eo_ropcode_sig;
+    ropdesc.id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_service, 0, eoprot_tag_mn_service_status_commandresult);
+    ropdesc.data = nullptr; // so that data from the EOnv is retrieved (which is: p->mnservice->status.commandresult)          
+
+    embot::app::eth::theHandler::getInstance().transmit(ropdesc);
+        
+//    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"theServices::onendverifyactivate2()", thr}, {}, ok ? "ok": "false");
+}
+
+#if defined(USE_ICC_COMM) 
+bool embot::app::eth::theServices::Impl::iccitemparser(const embot::app::eth::theICCservice::Item &item)
+{   
+    // now we just ask to the MC service
+    return embot::app::eth::theServiceMC::getInstance().process({item.des.getbus(), item.frame});
+    // and we do not call that anymore....
+//    return embot::app::eth::mc::messaging::receiver::parse(item.des.bus, item.frame);
+}
+#endif // #if defined(USE_ICC_COMM) 
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -788,7 +908,7 @@ bool embot::app::eth::theServices::process(eOmn_service_cmmnds_command_t *comman
     return pImpl->process(command);
 }
 
-bool embot::app::eth::theServices::setREGULARS(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
+bool embot::app::eth::theServices::setREGULARS(EOarray* id32ofregulars, const eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem)
 {
     return pImpl->setREGULARS(id32ofregulars, arrayofid32, fpISOK, numberofthem);
 }

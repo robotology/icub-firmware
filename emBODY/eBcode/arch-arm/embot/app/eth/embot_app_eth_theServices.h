@@ -57,7 +57,7 @@ namespace embot { namespace app { namespace eth {
         // - id32ofregulars is nullptr: setregulars() makes sure that the ID32 values inside id32ofregulars are removed from the transceiver 
         //   and then it clears id32ofregulars
         // - id32ofregulars is not nullptr: setregulars() makes sure that id32ofregulars contains ONLY what inside arrayofid32 and updates the transceiver.        
-        bool setREGULARS(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);   
+        bool setREGULARS(EOarray* id32ofregulars, const eOmn_serv_arrayof_id32_t* arrayofid32, fpIsID32relevant fpISOK, uint8_t* numberofthem);   
         
         // as a better alternative ... these are better methods
         bool add(const std::vector<eOprotID32_t> &id32s, fpIsID32relevant fpISOK, uint8_t &added);

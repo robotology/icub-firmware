@@ -28,7 +28,6 @@
 #include "iCubCanProto_types.h"
 #include "EoProtocol.h"
 #include "EOtheCANprotocol.h"
-#include "EOtheCANservice.h"
 #include "hal_motor.h"
 
 #include "hal_led.h"
@@ -141,7 +140,7 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     }
     
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID
-    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{o->mlocation}, {Kp, Ki, Kd, Ks}};
+    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{&o->motorlocation}, {Kp, Ki, Kd, Ks}};
     msg.transmit(); 
 }
 
@@ -181,7 +180,7 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
     }
 
     // ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID    
-    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{o->mlocation}, {Kp, Ki, Kd, Ks}};
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{&o->motorlocation}, {Kp, Ki, Kd, Ks}};
     msg.transmit();    
 }
 
@@ -190,7 +189,7 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT    
     embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
     {
-        {o->mlocation},
+        {&o->motorlocation},
         {current_params->nominalCurrent, current_params->peakCurrent, current_params->overloadCurrent}
     };
     msg.transmit();   
@@ -201,7 +200,7 @@ static void Motor_config_motor_max_temperature_2FOC(Motor* o, eOmeas_temperature
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
     embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msg
     {
-        {o->mlocation},
+        {&o->motorlocation},
         {*(int16_t*)motor_temperature_limit}
     };
     msg.transmit();
@@ -239,7 +238,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     // ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT
     embot::app::eth::mc::messaging::sender::Set_Temperature_Limit msgtmp
     {
-        {o->mlocation},
+        {&o->motorlocation},
         {(int16_t)config->temperatureLimit}
     };
     msgtmp.transmit();
@@ -247,20 +246,20 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT 
     embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
     {
-        {o->mlocation},
+        {&o->motorlocation},
         {config->currentLimits.nominalCurrent, config->currentLimits.peakCurrent, config->currentLimits.overloadCurrent}
     };
     msg.transmit(); 
         
     // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG    
-    embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{o->mlocation}, {&o->can_motor_config[0]}};
+    embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{&o->motorlocation}, {&o->can_motor_config[0]}};
     msgmc.transmit();          
 }
 
 static void Motor_set_control_mode_2FOC(Motor* o, icubCanProto_controlmode_t control_mode)
 {   
     // ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE
-    embot::app::eth::mc::messaging::sender::Set_Control_Mode msg {{o->mlocation}, {control_mode}};
+    embot::app::eth::mc::messaging::sender::Set_Control_Mode msg {{&o->motorlocation}, {control_mode}};
     msg.transmit(); 
 }
 
@@ -351,7 +350,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
         //Motor_config_MC4p(o->ID, config);
 
         o->control_mode = icubCanProto_controlmode_idle;
-        hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+        hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     }    
        
 }
@@ -365,7 +364,7 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
         *(int16_t*)(o->can_motor_config+1) = resolution;
 
         // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG   
-        embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{o->mlocation}, {&o->can_motor_config[0]}};
+        embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{&o->motorlocation}, {&o->can_motor_config[0]}};
         msgmc.transmit();           
     }     
 }
@@ -474,7 +473,7 @@ extern void Motor_uncalibrate(Motor* o)
         // ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER
         // i can use use icubCanProto_calibration_type0_hard_stops because the 2foc does not process the payload. 
         // BUT much better to use a new icubCanProto_calibration_type_undefined 
-        embot::app::eth::mc::messaging::sender::Calibrate_Encoder msg {{o->mlocation}, {{icubCanProto_calibration_type0_hard_stops, 0}}};
+        embot::app::eth::mc::messaging::sender::Calibrate_Encoder msg {{&o->motorlocation}, {{icubCanProto_calibration_type0_hard_stops, 0}}};
         msg.transmit();         
     }
 }
@@ -582,7 +581,7 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
     {
         hal_motor_reenable_break_interrupts();
         
-        hal_motor_enable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+        hal_motor_enable(static_cast<hal_motor_t>(o->motorlocation.adr));
 
         o->control_mode = control_mode;
     }    
@@ -615,7 +614,7 @@ void Motor_set_idle(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+        hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
         
         if (o->control_mode != icubCanProto_controlmode_hwFault)
         {
@@ -634,7 +633,7 @@ void Motor_force_idle(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+        hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
         
         o->control_mode = icubCanProto_controlmode_idle;
     }
@@ -774,7 +773,7 @@ BOOL Motor_check_faults(Motor* o) //
     
     if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+        hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     }
     
     // DIAGNOSTICS MESSAGES
@@ -876,7 +875,7 @@ BOOL Motor_check_faults(Motor* o) //
 
 static void Motor_raise_fault_overcurrent(Motor* o)
 {
-    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+    hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     
     o->fault_state.bits.OverCurrentFailure = TRUE;
     
@@ -885,7 +884,7 @@ static void Motor_raise_fault_overcurrent(Motor* o)
 
 static void Motor_raise_fault_overheating(Motor* o)
 {
-    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+    hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     
     o->fault_state.bits.OverHeatingFailure = TRUE;
     
@@ -894,7 +893,7 @@ static void Motor_raise_fault_overheating(Motor* o)
 
 void Motor_raise_fault_i2t(Motor* o)
 {
-    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+    hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     
     o->fault_state.bits.I2TFailure = TRUE;
     
@@ -903,7 +902,7 @@ void Motor_raise_fault_i2t(Motor* o)
 /*
 void Motor_raise_fault_external(Motor* o)
 {
-    hal_motor_disable(static_cast<hal_motor_t>(o->mlocation.eth.id));
+    hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     
     o->fault_state.bits.ExternalFaultAsserted = TRUE;
     
@@ -973,7 +972,7 @@ void Motor_actuate(Motor* motor, uint8_t N, MC_ACTUATION_t act) //
         embot::app::eth::mc::messaging::sender::Actuate_Motors msg {};
         for(uint8_t m=0; m<std::min(N, embot::app::eth::mc::messaging::sender::Actuate_Motors::maxnumberofmotors); m++)
         {
-            msg.push_back({{motor[m].mlocation}, {motor[m].output}});
+            msg.push_back({{&motor[m].motorlocation}, {motor[m].output}});
         }
         msg.transmit();                
     }
@@ -982,7 +981,7 @@ void Motor_actuate(Motor* motor, uint8_t N, MC_ACTUATION_t act) //
         for (uint8_t m=0; m<N; m++)
         {
             motor[m].pwm_fbk = motor[m].output;
-            hal_motor_pwmset(static_cast<hal_motor_t>(motor[m].mlocation.eth.id), motor[m].output);
+            hal_motor_pwmset(static_cast<hal_motor_t>(motor[m].motorlocation.adr), motor[m].output);
         }
     }
 }  
