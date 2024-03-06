@@ -1,0 +1,1 @@
+copy .\obj-lwipcm7\SYS_MINIMAL\ipal_lwip_sys_minimal_cm4.lib .\lib\ipal.lwip.h7.cm4.lib

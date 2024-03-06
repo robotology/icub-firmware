@@ -479,7 +479,9 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/amc2c/v1A0/inc/gpio.h"
         #include "../src/board/amc2c/v1A0/inc/main.h"
-
+#if defined(STM32HAL_BOARD_AMC2C_V1A0_enableETH)        
+        #include "../src/board/amc/v1A0/inc/eth.h"
+#endif
         #include "../src/board/amc2c/v1A0/inc/stm32h7xx_it.h"
 
     #elif (STM32HAL_DRIVER_VERSION == 0x1B1)
