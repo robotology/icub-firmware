@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 6.3
+// Model version                  : 6.9
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Feb 13 11:54:30 2024
+// C/C++ source code generated on : Wed Mar  6 15:00:31 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -93,8 +93,15 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
               sizeof(uint8_T));
   rtb_BusCreator_m.packet.PAYLOAD[2] = tmp2[0];
   rtb_BusCreator_m.packet.PAYLOAD[3] = tmp2[1];
-  rtb_BusCreator_m.packet.PAYLOAD[4] =
-    rtu_messages_tx->status.flags.ExternalFaultAsserted;
+  if (rtu_messages_tx->status.flags.OverCurrentFailure) {
+    rtb_BusCreator_m.packet.PAYLOAD[4] = static_cast<uint8_T>
+      (static_cast<int32_T>(rtu_messages_tx->status.flags.ExternalFaultAsserted)
+       | 8);
+  } else {
+    rtb_BusCreator_m.packet.PAYLOAD[4] =
+      rtu_messages_tx->status.flags.ExternalFaultAsserted;
+  }
+
   rtb_BusCreator_m.packet.PAYLOAD[5] = 0U;
   rtb_BusCreator_m.packet.PAYLOAD[6] = 0U;
   rtb_BusCreator_m.packet.PAYLOAD[7] = 0U;

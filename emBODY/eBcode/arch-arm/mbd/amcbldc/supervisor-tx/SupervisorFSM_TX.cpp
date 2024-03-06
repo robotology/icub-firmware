@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 7.3
+// Model version                  : 7.4
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Feb 13 11:54:17 2024
+// C/C++ source code generated on : Wed Mar  6 15:00:19 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -129,6 +129,7 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
       (rtu_Flags->control_mode);
     rty_MessagesTx->status.pwm_fbk = rtu_ControlOutputs->Vq;
     rty_MessagesTx->status.flags.ExternalFaultAsserted = rtu_Flags->fault_button;
+    rty_MessagesTx->status.flags.OverCurrentFailure = rtu_Flags->overcurrent;
     SupervisorFSM_TX_DW.ev_statusEventCounter++;
   }
 
