@@ -792,13 +792,6 @@ void initSystem(embot::os::Thread *t, void* initparam)
     embot::core::print("quitting the INIT thread. Normal scheduling starts");    
 }
 
-constexpr stm32hal_board_config_amc_t configAMC 
-{     
-    .valid = true,
-    .usebothcores = true,
-    .usecache= true,
-    .release2ndcore = false
-};
 
 // --------------------------------------------------------------------------------------------------------------------
 

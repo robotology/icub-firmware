@@ -51,7 +51,7 @@ namespace test::iccservice {
         embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::onflush); 
             
 //        embot::prot::can::Frame frame {0x111, 8, {1, 2, 3, 4, 5, 6, 7, 8}};
-//        embot::app::eth::mc::messaging::Location loc {embot::app::eth::mc::messaging::Location::BUS::icc1, 3};
+//        embot::app::msg::Location loc {embot::app::msg::BUS::icc1, 3};
 //        embot::app::eth::theICCservice::getInstance().put({loc, frame});
     }
     
@@ -91,11 +91,11 @@ namespace test::iccservice {
 #if defined(iccAMCisCLIENT)
         uint8_t n = tt;
         embot::prot::can::Frame frame {0x111, 8, {n, 0, 1, 1, 1, 1, 1, 1}};
-        embot::app::eth::mc::messaging::Location loc {embot::app::eth::mc::messaging::Location::BUS::icc1, 3};
+        embot::app::msg::Location loc {embot::app::msg::BUS::icc1, 3};
         embot::app::eth::theICCservice::getInstance().put({loc, frame});
 
         embot::prot::can::Frame frame1 {0x111, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
-        embot::app::eth::mc::messaging::Location loc1 {embot::app::eth::mc::messaging::Location::BUS::icc1, 3};
+        embot::app::msg::Location loc1 {embot::app::msg::BUS::icc1, 3};
         embot::app::eth::theICCservice::getInstance().put({loc1, frame1});
         
         size_t n2tx = embot::app::eth::theICCservice::getInstance().output();
@@ -153,11 +153,11 @@ namespace test::iccservice {
         // i transmit two frames 
         uint8_t n = tt;
         embot::prot::can::Frame frame {0x111, 8, {n, 0, 1, 1, 1, 1, 1, 1}};
-        embot::app::eth::mc::messaging::Location loc {embot::app::eth::mc::messaging::Location::BUS::icc1, 3};
+        embot::app::msg::Location loc {embot::app::msg::BUS::icc1, 3};
         embot::app::eth::theICCservice::getInstance().put({loc, frame});
 
         embot::prot::can::Frame frame1 {0x112, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
-        embot::app::eth::mc::messaging::Location loc1 {embot::app::eth::mc::messaging::Location::BUS::icc1, 3};
+        embot::app::msg::Location loc1 {embot::app::msg::BUS::icc1, 3};
         embot::app::eth::theICCservice::getInstance().put({loc1, frame1});
         
         size_t n2tx = embot::app::eth::theICCservice::getInstance().output();
