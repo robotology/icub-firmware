@@ -3114,6 +3114,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6789,6 +6794,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -10673,6 +10683,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -14555,6 +14570,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -18897,6 +18917,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -23393,6 +23418,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -24052,7 +24082,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DcherrypickFDCANv1B1</MiscControls>
+              <MiscControls>-DcherrypickFDCANv1B1 -DSTM32HAL_BOARD_AMC2C_V1A0_enableETH</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMC2C STM32HAL_DRIVER_V1A0 STM32H745xx CORE_CM4 USE_HAL_DRIVER</Define>
               <Undefine></Undefine>
               <IncludePath>..\api;..\src\driver\stm32h7-v1A0\inc;..\src\board\amc2c\v1A0\inc;..\src\board\amc2c\v1A0\drv</IncludePath>
@@ -27581,6 +27611,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -31839,6 +31874,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -36182,6 +36222,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -40370,6 +40415,11 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\amc2c\v1A0\src\stm32h7xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>eth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\amc2c\v1A0\src\eth.c</FilePath>
             </File>
           </Files>
         </Group>

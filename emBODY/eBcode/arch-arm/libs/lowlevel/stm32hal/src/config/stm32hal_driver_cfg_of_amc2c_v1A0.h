@@ -82,7 +82,9 @@
 #define HAL_DAC_MODULE_ENABLED
 /* #define HAL_DCMI_MODULE_ENABLED   */
 /* #define HAL_DMA2D_MODULE_ENABLED   */
-/* #define HAL_ETH_MODULE_ENABLED   */
+#if defined(STM32HAL_BOARD_AMC2C_V1A0_enableETH)
+    #define HAL_ETH_MODULE_ENABLED
+#endif // STM32HAL_BOARD_AMC2C_V1A0_enableETH
 /* #define HAL_NAND_MODULE_ENABLED   */
 /* #define HAL_NOR_MODULE_ENABLED   */
 /* #define HAL_OTFDEC_MODULE_ENABLED   */
