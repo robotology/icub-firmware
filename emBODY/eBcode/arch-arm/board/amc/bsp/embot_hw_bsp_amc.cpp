@@ -1913,6 +1913,21 @@ bool embot::hw::bsp::specialize() { return true; }
 #endif                
             } break;
             
+            
+            case amc::OnSpecialize::CM4MODE::activate:
+            {
+                // 1. init the hsems and take hsem-0
+                __HAL_RCC_HSEM_CLK_ENABLE();
+                HAL_HSEM_FastTake(hsem0);
+
+                // 2. enable the second core
+                HAL_RCCEx_EnableBootCore(RCC_BOOT_C2);   
+
+                // 3. and release hsem-0
+                HAL_HSEM_Release(hsem0, procID0);
+                
+            } break;            
+            
             case amc::OnSpecialize::CM4MODE::donothing:
             default: 
             {

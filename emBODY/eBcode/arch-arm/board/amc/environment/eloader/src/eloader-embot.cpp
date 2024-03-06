@@ -68,8 +68,14 @@ constexpr embot::hw::Config hwCFG {nullptr, get1microtime2};
 #endif // USE_SYSTICK_AS_TIME_BASE
 
 
-// principal macros
-#undef DEBUG_DEF2RUN_FORCE_APPLICATION
+// principal debug macros
+
+// if defined it forces tge eeprom to have def2run = application, so that the eupdater will jump to application 
+#undef DEBUG_forceEEPROM_DEF2RUNequalAPPLICATION
+// if defined it does not jump and forces execution of defaultapplication() 
+#undef DEBUG_stayinhere
+// if defined it enables the CM4 core after clock initialization inside embot::hw::init()
+#undef DEBUG_startCM4now
 
 // used functions
 
@@ -78,14 +84,22 @@ void thejumper();
 [[noreturn]] void defaultapplication(embot::core::relTime blinkrate = 1000*embot::core::time1millisec);
 
 #include "embot_hw_bsp_amc.h"
+
+#if defined(DEBUG_startCM4now)
+constexpr embot::hw::bsp::amc::OnSpecialize onspec { embot::hw::bsp::amc::OnSpecialize::CM4MODE::activate, false, false };
+#else
+constexpr embot::hw::bsp::amc::OnSpecialize onspec { embot::hw::bsp::amc::OnSpecLoader };
+#endif
     
 int main(void)
 { 
     // hw init
-    embot::hw::bsp::amc::set(embot::hw::bsp::amc::OnSpecLoader);
+    embot::hw::bsp::amc::set(onspec);
     embot::hw::init(hwCFG);
+#if !defined(DEBUG_stayinhere) 
     // eval jump
     thejumper();
+#endif    
     // run default application
     defaultapplication();         
 }
@@ -319,7 +333,7 @@ static void s_loader_shared_services_init(void)
         ee_sharserv_part_proc_def2run_set(ee_procUpdater);      
     } 
 
-#if defined(DEBUG_DEF2RUN_FORCE_APPLICATION)
+#if defined(DEBUG_forceEEPROM_DEF2RUNequalAPPLICATION)
     // we impose that the application is the def2run
     ee_sharserv_part_proc_def2run_set(ee_procApplication);
 #endif    

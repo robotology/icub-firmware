@@ -10,14 +10,14 @@
       <TargetName>demo-embot-osal-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6180000::V6.18::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -405,9 +405,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.amc.CM7.s</FileName>
+              <FileName>stm32hal.h7.startup.amc.CM4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM7.s</FilePath>
+              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -527,36 +527,6 @@
               <FileName>embot_hw_encoder.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_spi.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_AS5045.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MA730.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MB049.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -786,6 +756,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc2c.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_flash_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_can_bsp_amc2c.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -930,8 +910,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1319,9 +1299,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.amc.CM7.s</FileName>
+              <FileName>stm32hal.h7.startup.amc.CM4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM7.s</FilePath>
+              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1461,36 +1441,6 @@
               <FileType>8</FileType>
               <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_hw_timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_spi.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_AS5045.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MA730.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MB049.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1565,6 +1515,16 @@
               <FileName>embot_hw_bsp_amc2c.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_flash_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_can_bsp_amc2c.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1641,8 +1601,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2030,9 +1990,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.amc.CM7.s</FileName>
+              <FileName>stm32hal.h7.startup.amc.CM4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM7.s</FilePath>
+              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -2153,36 +2113,6 @@
               <FileType>8</FileType>
               <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_hw_timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_spi.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_AS5045.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MA730.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MB049.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2257,6 +2187,16 @@
               <FileName>embot_hw_bsp_amc2c.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_flash_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_can_bsp_amc2c.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2333,8 +2273,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -2722,9 +2662,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.amc.CM7.s</FileName>
+              <FileName>stm32hal.h7.startup.amc.CM4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM7.s</FilePath>
+              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -2896,36 +2836,6 @@
               <FileType>8</FileType>
               <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_hw_timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_spi.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_AS5045.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MA730.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MB049.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -3000,6 +2910,16 @@
               <FileName>embot_hw_bsp_amc2c.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_flash_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_can_bsp_amc2c.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3076,8 +2996,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -3465,9 +3385,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.amc.CM7.s</FileName>
+              <FileName>stm32hal.h7.startup.amc.CM4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM7.s</FilePath>
+              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -3639,36 +3559,6 @@
               <FileType>8</FileType>
               <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_hw_timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_spi.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_AS5045.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MA730.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MB049.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -3743,6 +3633,16 @@
               <FileName>embot_hw_bsp_amc2c.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_flash_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_can_bsp_amc2c.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3819,8 +3719,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -4208,9 +4108,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.amc.CM7.s</FileName>
+              <FileName>stm32hal.h7.startup.amc.CM4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM7.s</FilePath>
+              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -4382,36 +4282,6 @@
               <FileType>8</FileType>
               <FilePath>.\..\..\..\..\..\embot\hw\embot_hw_encoder.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_hw_timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_spi.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_AS5045.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_AS5045.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MA730.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MA730.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_chip_MB049.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_MB049.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -4486,6 +4356,16 @@
               <FileName>embot_hw_bsp_amc2c.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_flash_bsp_amc2c.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc2c.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_can_bsp_amc2c.cpp</FilePath>
             </File>
           </Files>
         </Group>
