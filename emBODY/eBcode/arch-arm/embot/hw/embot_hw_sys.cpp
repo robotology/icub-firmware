@@ -360,8 +360,11 @@ namespace embot::hw::sys::DRIVER {
             s_hl_sys_used_systemcoreclock = SystemCoreClock;
             s_hl_sys_numofops1sec = SystemCoreClock;
 
-            #if defined(STM32H7)
+            #if defined(STM32H7) & defined(CORE_CM7)
             // empirically removed ...
+            #elif defined(STM32H7) & defined(CORE_CM4)
+            // same as other CM4 cores: L4 and G4
+            s_hl_sys_numofops1sec /= 3;
             #elif defined(STM32L4) 
             s_hl_sys_numofops1sec /= 3;
             #elif defined(STM32G4) 
