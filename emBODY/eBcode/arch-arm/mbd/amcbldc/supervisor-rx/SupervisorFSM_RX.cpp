@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 7.5
+// Model version                  : 7.7
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Feb 13 11:54:08 2024
+// C/C++ source code generated on : Wed Mar  6 15:00:13 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -1177,6 +1177,7 @@ void SupervisorFSM_RX_Init(Flags *rty_Flags, ConfigurationParameters
   rty_Flags->enable_sending_msg_status =
     SupervisorFSM_RX_B.enableSendingMsgStatus;
   rty_Flags->fault_button = false;
+  rty_Flags->overcurrent = false;
   rty_Flags->enable_thermal_protection = SupervisorFSM_RX_ConstB.Constant5;
 
   // SystemInitialize for BusCreator: '<Root>/Bus Creator1' incorporates:
@@ -1317,8 +1318,6 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
           if (SupervisorFSM_RX_B.areLimitsSet) {
             SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
             SupervisorFSM_RX_B.isInOverCurrent = false;
-
-            // MotorFaultFlags.overCurrent=0;
           }
           break;
 
@@ -1328,8 +1327,6 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
               rtb_UnitDelay_thresholds_motorOverloadCurrents) {
             SupervisorFSM_RX_DW.is_OverCurrent =
               SupervisorFSM_RX_IN_OverCurrentFault;
-
-            // MotorFaultFlags.overCurrent=1;
             SupervisorFSM_RX_B.isInOverCurrent = true;
 
             // Outputs for Function Call SubSystem: '<Root>/Control Mode Handler Motor 0' 
@@ -1345,8 +1342,6 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
               rtb_UnitDelay_thresholds_motorOverloadCurrents) {
             SupervisorFSM_RX_DW.is_OverCurrent = SupervisorFSM_RX_IN_NoFault;
             SupervisorFSM_RX_B.isInOverCurrent = false;
-
-            // MotorFaultFlags.overCurrent=0;
           }
           break;
         }
@@ -1376,6 +1371,7 @@ void SupervisorFSM_RX(const SensorsData *rtu_SensorsData, const ExternalFlags
   rty_Flags->enable_sending_msg_status =
     SupervisorFSM_RX_B.enableSendingMsgStatus;
   rty_Flags->fault_button = SupervisorFSM_RX_B.isFaultButtonPressed;
+  rty_Flags->overcurrent = SupervisorFSM_RX_B.isInOverCurrent;
   rty_Flags->enable_thermal_protection = SupervisorFSM_RX_ConstB.Constant5;
 
   // BusCreator: '<Root>/Bus Creator1' incorporates:

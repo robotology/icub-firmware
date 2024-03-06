@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 7.5
+// Model version                  : 7.7
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Feb 13 11:54:08 2024
+// C/C++ source code generated on : Wed Mar  6 15:00:13 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -395,6 +395,7 @@ struct Flags
   ControlModes control_mode;
   boolean_T enable_sending_msg_status;
   boolean_T fault_button;
+  boolean_T overcurrent;
   boolean_T enable_thermal_protection;
 };
 
