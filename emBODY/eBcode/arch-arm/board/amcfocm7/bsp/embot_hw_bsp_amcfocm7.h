@@ -20,7 +20,7 @@ namespace embot { namespace hw { namespace bsp { namespace amcfocm7 {
     
     struct OnSpecialize 
     {
-        enum class CM4MODE { donothing = 0, activateandhold = 1, release = 2};
+        enum class CM4MODE { donothing = 0, activateandhold = 1, release = 2, activate = 3 };
         
         CM4MODE cm4mode {CM4MODE::donothing};
         bool enableJ5powersupply_at_startup {false};
