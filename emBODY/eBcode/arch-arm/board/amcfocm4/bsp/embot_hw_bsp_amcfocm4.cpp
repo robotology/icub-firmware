@@ -319,6 +319,73 @@ namespace embot::hw::button {
 // - support map: end of embot::hw::button
 
 
+// - support map: begin of embot::hw::flash
+
+#include "embot_hw_flash_bsp.h"
+
+#if !defined(EMBOT_ENABLE_hw_flash)
+
+namespace embot { namespace hw { namespace flash { namespace bsp {
+    
+    constexpr BSP thebsp { };
+    void BSP::init() const {}    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}}
+
+#else
+    
+namespace embot { namespace hw { namespace flash { namespace bsp {
+     
+    
+    constexpr uint8_t numbanks {2};
+    constexpr uint32_t banksize {1024*1024};
+    constexpr uint32_t pagesize {128*1024};
+    constexpr BankDescriptor bank01 { Bank::ID::one, 0x08000000, banksize, pagesize };
+    constexpr BankDescriptor bank02 { Bank::ID::two, 0x08100000, banksize, pagesize };
+    constexpr theBanks thebanks 
+    {
+        numbanks, 
+        { &bank01, &bank02 }
+    }; 
+    
+    // on Bank::one
+    constexpr Partition ldr {Partition::ID::eloader,        &bank01,    bank01.address,         128*1024}; 
+    constexpr Partition upd {Partition::ID::eupdater,       &bank01,    ldr.address+ldr.size,   256*1024};
+    constexpr Partition a00 {Partition::ID::eapplication00, &bank01,    upd.address+upd.size,   512*1024};  
+    constexpr Partition b00 {Partition::ID::buffer00,       &bank01,    a00.address+a00.size,   128*1024};
+    
+    // on Bank::two
+    constexpr Partition a01 {Partition::ID::eapplication01, &bank02,    bank02.address,         512*1024};     
+    constexpr Partition b01 {Partition::ID::buffer01,       &bank02,    a01.address+a01.size,   512*1024};
+    
+    constexpr thePartitions thepartitions
+    {
+        { &ldr, &upd, &a00, &b00, &a01, &b01 }
+    };
+
+    constexpr BSP thebsp {        
+        thebanks,
+        thepartitions
+    };   
+                  
+    
+    void BSP::init() const {}
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+              
+}}}} // namespace embot { namespace hw { namespace flash { namespace bsp {
+
+#endif // flash
+
+// - support map: end of embot::hw::flash
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - board specific methods
@@ -374,7 +441,7 @@ void waitHWmutex(uint32_t mtx)
 bool embot::hw::bsp::specialize()
 {
     // very important: it waits for the unlock called by the application of amc core cm7
-//    waitHWmutex(0);
+    waitHWmutex(0);
     
 
     return true;
