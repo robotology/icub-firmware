@@ -35,7 +35,7 @@
 /* Private macros *****************************************************************************************************/
 
 /* Couples of ADC channels */
-#define NUMBER_OF_ADC_CHANNELS  (3)
+#define NUMBER_OF_ADC_CHANNELS   (3) // both ADC1 and ADC2 have 3 channels each one
 
 
 
@@ -101,10 +101,6 @@ static const uint32_t AdcMotOffsetNumber[] =
 
 
 /* Local functions ****************************************************************************************************/
-// TODO: Remove, used only for debug
-int32_t AVG0 = 0;
-int32_t AVG1 = 0;
-int32_t AVG2 = 0;
 
 static void adcMotGetSamples(const DualModeAdcData_t *pBuf)
 {

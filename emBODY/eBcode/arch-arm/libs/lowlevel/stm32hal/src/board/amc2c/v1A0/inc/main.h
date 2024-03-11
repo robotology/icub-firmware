@@ -156,6 +156,10 @@ void Error_Handler(void);
 #define MOT_HALL2_GPIO_Port GPIOD
 #define OSC_IN_Pin GPIO_PIN_0
 #define OSC_IN_GPIO_Port GPIOH
+#define PWR_aVCORE_Pin GPIO_PIN_7
+#define PWR_aVCORE_GPIO_Port GPIOF
+#define PWR_aVAUX_Pin GPIO_PIN_9
+#define PWR_aVAUX_GPIO_Port GPIOF
 #define MOT_HALL1_Pin GPIO_PIN_12
 #define MOT_HALL1_GPIO_Port GPIOD
 #define SPI2_nXEN_Pin GPIO_PIN_9

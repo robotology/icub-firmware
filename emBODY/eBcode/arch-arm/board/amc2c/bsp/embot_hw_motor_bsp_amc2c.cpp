@@ -98,18 +98,21 @@ namespace embot::hw::motor::bsp {
  
 
 // the motorhal requires:
-// ADC1, ADC2
-// TIM1, TIM4, TIM5
+// ADC1, ADC2, ADC3
+// TIM1, TIM4, TIM5, TIM6
 
 
 namespace embot::hw::motor::bsp::amc2c {
     
     ADC_HandleTypeDef hADC1;
-    ADC_HandleTypeDef hADC2;   
-    DMA_HandleTypeDef hdma_adc1;    
+    ADC_HandleTypeDef hADC2;
+    ADC_HandleTypeDef hADC3;
+    DMA_HandleTypeDef hdma_adc1;
+    DMA_HandleTypeDef hdma_adc3;
     TIM_HandleTypeDef hTIM1;
     TIM_HandleTypeDef hTIM4;
     TIM_HandleTypeDef hTIM5;
+    TIM_HandleTypeDef hTIM6;
 }
 
 namespace embot::hw::motor::bsp::amc2c {
@@ -121,6 +124,8 @@ namespace embot::hw::motor::bsp::amc2c {
     void MX_DMA_Init();
     void MX_ADC1_Init();
     void MX_ADC2_Init();
+    void MX_ADC3_Init();
+    void MX_TIM6_Init();
     
     
     void Init_MOTOR(embot::hw::MOTOR h)
@@ -136,6 +141,9 @@ namespace embot::hw::motor::bsp::amc2c {
         MX_ADC2_Init();
 //        MX_DAC1_Init();
         MX_TIM1_Init();
+        
+        MX_ADC3_Init();
+        MX_TIM6_Init();
         
         // something else
     }
@@ -320,6 +328,10 @@ namespace embot::hw::motor::bsp::amc2c {
         /* DMA2_Stream0_IRQn interrupt configuration */
         HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
         HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+        
+        /* DMA1_Stream4_IRQn interrupt configuration */
+        HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 5, 0);
+        HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
     }   
     
     void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
@@ -594,7 +606,46 @@ namespace embot::hw::motor::bsp::amc2c {
 
     }    
     
-    
+    void MX_TIM6_Init(void)
+    {
+
+//      if (ResMgr_Request(RESMGR_ID_TIM6, RESMGR_FLAGS_ACCESS_NORMAL | \
+//                      RESMGR_FLAGS_CPU1 , 0, NULL) != RESMGR_OK)
+//      {
+//        /* USER CODE BEGIN RESMGR_UTILITY_TIM6 */
+//        Error_Handler();
+//        /* USER CODE END RESMGR_UTILITY_TIM6 */
+//      }
+//      /* USER CODE BEGIN TIM6_Init 0 */
+
+//      /* USER CODE END TIM6_Init 0 */
+
+      TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+      /* USER CODE BEGIN TIM6_Init 1 */
+
+      /* USER CODE END TIM6_Init 1 */
+      hTIM6.Instance = TIM6;
+      hTIM6.Init.Prescaler = 2000-1;
+      hTIM6.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+      hTIM6.Init.CounterMode = TIM_COUNTERMODE_UP;
+      hTIM6.Init.Period = 2000-1;
+      hTIM6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+      if (HAL_TIM_Base_Init(&hTIM6) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+      sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+      if (HAL_TIMEx_MasterConfigSynchronization(&hTIM6, &sMasterConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      /* USER CODE BEGIN TIM6_Init 2 */
+
+      /* USER CODE END TIM6_Init 2 */
+    }
+
     void DeInit_TIM5()
     {
         // HAL_TIM_IC_ConfigChannel() inversa for TIM_CHANNEL_3 and TIM_CHANNEL_4
@@ -904,30 +955,142 @@ namespace embot::hw::motor::bsp::amc2c {
 
         /* USER CODE END ADC2_Init 2 */
 
-    }    
+    }
+
+    void MX_ADC3_Init(void)
+    {
+
+//      if (ResMgr_Request(RESMGR_ID_ADC3, RESMGR_FLAGS_ACCESS_NORMAL | \
+//                      RESMGR_FLAGS_CPU2 , 0, NULL) != RESMGR_OK)
+//      {
+//        /* USER CODE BEGIN RESMGR_UTILITY_ADC3 */
+//        Error_Handler();
+//        /* USER CODE END RESMGR_UTILITY_ADC3 */
+//      }
+//      /* USER CODE BEGIN ADC3_Init 0 */
+
+//      /* USER CODE END ADC3_Init 0 */
+
+      ADC_ChannelConfTypeDef sConfig = {0};
+
+      /* USER CODE BEGIN ADC3_Init 1 */
+
+      /* USER CODE END ADC3_Init 1 */
+      /** Common config
+      */
+      hADC3.Instance = ADC3;
+      hADC3.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
+      hADC3.Init.Resolution = ADC_RESOLUTION_16B;
+      hADC3.Init.ScanConvMode = ADC_SCAN_ENABLE;
+      hADC3.Init.EOCSelection = ADC_EOC_SEQ_CONV;
+      hADC3.Init.LowPowerAutoWait = DISABLE;
+      hADC3.Init.ContinuousConvMode = DISABLE;
+      hADC3.Init.NbrOfConversion = 6;
+      hADC3.Init.DiscontinuousConvMode = ENABLE;
+      hADC3.Init.NbrOfDiscConversion = 1;
+      hADC3.Init.ExternalTrigConv = ADC_EXTERNALTRIG_T6_TRGO;
+      hADC3.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
+      hADC3.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR;
+      hADC3.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+      hADC3.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
+      hADC3.Init.OversamplingMode = DISABLE;
+      if (HAL_ADC_Init(&hADC3) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      /** Configure Regular Channel
+      */
+      sConfig.Channel = ADC_CHANNEL_0;
+      sConfig.Rank = ADC_REGULAR_RANK_1;
+      sConfig.SamplingTime = ADC_SAMPLETIME_64CYCLES_5;
+      sConfig.SingleDiff = ADC_SINGLE_ENDED;
+      sConfig.OffsetNumber = ADC_OFFSET_1;
+      sConfig.Offset = 29789;
+      sConfig.OffsetRightShift = DISABLE;
+      sConfig.OffsetSignedSaturation = DISABLE;
+      if (HAL_ADC_ConfigChannel(&hADC3, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      /** Configure Regular Channel
+      */
+      sConfig.Channel = ADC_CHANNEL_1;
+      sConfig.Rank = ADC_REGULAR_RANK_2;
+      sConfig.OffsetNumber = ADC_OFFSET_NONE;
+      sConfig.Offset = 0;
+      if (HAL_ADC_ConfigChannel(&hADC3, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      /** Configure Regular Channel
+      */
+      sConfig.Channel = ADC_CHANNEL_2;
+      sConfig.Rank = ADC_REGULAR_RANK_3;
+      if (HAL_ADC_ConfigChannel(&hADC3, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      /** Configure Regular Channel
+      */
+      sConfig.Channel = ADC_CHANNEL_3;
+      sConfig.Rank = ADC_REGULAR_RANK_4;
+      if (HAL_ADC_ConfigChannel(&hADC3, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      /** Configure Regular Channel
+      */
+      sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+      sConfig.Rank = ADC_REGULAR_RANK_5;
+      sConfig.SamplingTime = ADC_SAMPLETIME_387CYCLES_5;
+      if (HAL_ADC_ConfigChannel(&hADC3, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      /** Configure Regular Channel
+      */
+      sConfig.Channel = ADC_CHANNEL_VREFINT;
+      sConfig.Rank = ADC_REGULAR_RANK_6;
+      if (HAL_ADC_ConfigChannel(&hADC3, &sConfig) != HAL_OK)
+      {
+        Error_Handler();
+      }
+      /* USER CODE BEGIN ADC3_Init 2 */
+
+      /* USER CODE END ADC3_Init 2 */
+
+    }
+    
 
 } // namespace embot::hw::motor::bsp {
 
 
 // in here the required IRQ handlers, MspInit and MspDeInit 
 
-// ADC1, ADC2 and assciated DMA
+// ADC1, ADC2, ADC3 and assciated DMA
 extern "C" {
     
     // - irq handlers
     
-    // ADC1 and ADC2 global interrupts
+    // ADC1, ADC2 and ADC3 global interrupts
     void ADC_IRQHandler(void)
     {
         HAL_ADC_IRQHandler(&embot::hw::motor::bsp::amc2c::hADC1);
         HAL_ADC_IRQHandler(&embot::hw::motor::bsp::amc2c::hADC2);
+        HAL_ADC_IRQHandler(&embot::hw::motor::bsp::amc2c::hADC3);
     }   
 
     // DMA2 stream0 global interrupt
     void DMA2_Stream0_IRQHandler(void)
     {
         HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amc2c::hdma_adc1);
-    }  
+    }
+    
+    // DMA1 stream4 global interrupt
+    void DMA1_Stream4_IRQHandler(void)
+    {
+        HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amc2c::hdma_adc3);
+    }
 
     // - msp functions    
     
@@ -1052,6 +1215,57 @@ extern "C" {
 
             /* USER CODE END ADC2_MspInit 1 */
         }
+        else if(hadc->Instance==ADC3)
+        {
+        /* USER CODE BEGIN ADC3_MspInit 0 */
+
+        /* USER CODE END ADC3_MspInit 0 */
+          /* ADC3 clock enable */
+            __HAL_RCC_ADC3_CLK_ENABLE();
+
+            __HAL_RCC_GPIOF_CLK_ENABLE();
+            __HAL_RCC_GPIOC_CLK_ENABLE();
+            /**ADC3 GPIO Configuration
+            PF7     ------> ADC3_INP3
+            PF9     ------> ADC3_INP2
+            PC2_C     ------> ADC3_INP0
+            PC3_C     ------> ADC3_INP1
+            */
+            GPIO_InitStruct.Pin = PWR_aVCORE_Pin|PWR_aVAUX_Pin;
+            GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+            GPIO_InitStruct.Pull = GPIO_NOPULL;
+            HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+          
+            HAL_SYSCFG_AnalogSwitchConfig(SYSCFG_SWITCH_PC2, SYSCFG_SWITCH_PC2_OPEN);
+          
+            HAL_SYSCFG_AnalogSwitchConfig(SYSCFG_SWITCH_PC3, SYSCFG_SWITCH_PC3_OPEN);
+          
+            /* ADC3 DMA Init */
+            /* ADC3 Init */
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Instance = DMA1_Stream4;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.Request = DMA_REQUEST_ADC3;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.Direction = DMA_PERIPH_TO_MEMORY;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.PeriphInc = DMA_PINC_DISABLE;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.MemInc = DMA_MINC_ENABLE;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.Mode = DMA_CIRCULAR;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.Priority = DMA_PRIORITY_MEDIUM;
+            embot::hw::motor::bsp::amc2c::hdma_adc3.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+            if (HAL_DMA_Init(&embot::hw::motor::bsp::amc2c::hdma_adc3) != HAL_OK)
+            {
+              Error_Handler();
+            }
+          
+            __HAL_LINKDMA(hadc,DMA_Handle,embot::hw::motor::bsp::amc2c::hdma_adc3);
+          
+            /* ADC3 interrupt Init */
+            HAL_NVIC_SetPriority(ADC3_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(ADC3_IRQn);
+          /* USER CODE BEGIN ADC3_MspInit 1 */
+          
+          /* USER CODE END ADC3_MspInit 1 */
+        }
 
     }
 
@@ -1136,7 +1350,28 @@ extern "C" {
 
             /* USER CODE END ADC2_MspDeInit 1 */
         }
-
+        else if(hadc->Instance==ADC3)
+        {
+            /* USER CODE BEGIN ADC3_MspDeInit 0 */
+            
+            /* USER CODE END ADC3_MspDeInit 0 */
+              /* Peripheral clock disable */
+              __HAL_RCC_ADC3_CLK_DISABLE();
+            
+              /**ADC3 GPIO Configuration
+              PF7       ------> ADC3_INP3
+              PF9       ------> ADC3_INP2
+              PC2_C     ------> ADC3_INP0
+              PC3_C     ------> ADC3_INP1
+              */
+              HAL_GPIO_DeInit(GPIOF, PWR_aVCORE_Pin|PWR_aVAUX_Pin);
+            
+              /* ADC3 DMA DeInit */
+              HAL_DMA_DeInit(hadc->DMA_Handle);
+            /* USER CODE BEGIN ADC3_MspDeInit 1 */
+            
+            /* USER CODE END ADC3_MspDeInit 1 */
+        }
     }    
 
 
@@ -1343,7 +1578,18 @@ namespace embot::hw::motor::bsp::amc2c {
             /* USER CODE BEGIN TIM4_MspInit 1 */
 
             /* USER CODE END TIM4_MspInit 1 */
-        }     
+        }
+        else if(htim_base->Instance==TIM6)
+        {
+        /* USER CODE BEGIN TIM6_MspInit 0 */
+
+        /* USER CODE END TIM6_MspInit 0 */
+          /* Peripheral clock enable */
+          __HAL_RCC_TIM6_CLK_ENABLE();
+        /* USER CODE BEGIN TIM6_MspInit 1 */
+
+        /* USER CODE END TIM6_MspInit 1 */
+        }
     }
 
     void TIM_base_MspDeInit(TIM_HandleTypeDef* htim_base)
@@ -1404,7 +1650,18 @@ namespace embot::hw::motor::bsp::amc2c {
             /* USER CODE BEGIN TIM4_MspDeInit 1 */
 
             /* USER CODE END TIM4_MspDeInit 1 */
-        }  
+        }
+        else if(htim_base->Instance==TIM6)
+        {
+        /* USER CODE BEGIN TIM6_MspDeInit 0 */
+        
+        /* USER CODE END TIM6_MspDeInit 0 */
+            /* Peripheral clock disable */
+            __HAL_RCC_TIM6_CLK_DISABLE();
+        /* USER CODE BEGIN TIM6_MspDeInit 1 */
+        
+        /* USER CODE END TIM6_MspDeInit 1 */
+        }
     }    
 } // namespace embot::hw::motor::bsp::amc2c {
 

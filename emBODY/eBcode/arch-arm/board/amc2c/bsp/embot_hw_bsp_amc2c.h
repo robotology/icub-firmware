@@ -28,9 +28,6 @@ namespace embot::hw::bsp::amc2c {
     
     // it prints to the CM7 core ... if EMBOT_ENABLE_hw_icc_printer is enabled both in here and amc
     void print(const std::string &str);
-
-    float getVIN();
-    float getCIN();
 }
 
 #endif  // include-guard

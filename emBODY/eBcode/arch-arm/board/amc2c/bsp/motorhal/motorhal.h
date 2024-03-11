@@ -191,6 +191,25 @@ void setperc(float u, float v, float w);
     
 } // namespace embot::hw::motor::pwm {
 
+
+namespace embot::hw::analog {
+    
+struct Configuration
+{
+    uint32_t ciao {0};
+    
+        
+    constexpr Configuration() = default;
+    constexpr bool isvalid() const { return true; }
+};
+
+void init(const Configuration &config);
+void deinit();
+float getVin();
+float getCin();
+
+} // namespace embot::hw::analog {
+
 #endif  // include-guard
 
 

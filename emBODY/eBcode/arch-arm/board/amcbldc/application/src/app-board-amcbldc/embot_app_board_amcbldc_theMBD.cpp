@@ -251,6 +251,8 @@ struct embot::app::board::amcbldc::theMBD::Impl
     #endif
     
     embot::app::msg::BUS bus2use {embot::app::msg::BUS::can1};
+    
+    embot::app::bldc::Rounder _rounder {};
 };
 
 
@@ -342,6 +344,9 @@ bool embot::app::board::amcbldc::theMBD::Impl::initialise(const Config &config)
     embot::hw::motor::setCallbackOnCurrents(embot::hw::MOTOR::one, Impl::onCurrents_FOC_innerloop, this);
     
     CAN_ID_AMC = _config.adr;
+        
+    // init the rouder used to get the Vcc
+    _rounder.init(0.0f, 1); // default initial value=0, decimals=1
         
     initted = true;
     return initted;
@@ -457,8 +462,8 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::app
         AMC_BLDC_U.PacketsRx.packets[i].available = true;
     }
     
-    // read Vcc
-    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = 44; // TODO: read the voltage from ADC (temporary hardcoded)
+    // read the power supply voltage from ADC3
+    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = _rounder.getRoundedValueOf(embot::hw::motor::getVIN());
 
     
     // -----------------------------------------------------------------------------

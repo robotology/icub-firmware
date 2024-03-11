@@ -26,7 +26,45 @@ namespace embot::app::bldc {
         constexpr MSG() = default; 
         constexpr MSG(const embot::app::msg::Location& l, const embot::prot::can::Frame& f) : location(l), frame(f) {}  
         constexpr MSG(const embot::prot::can::Frame& f) : location({}), frame(f) {}            
-    };    
+    };
+    
+    
+    struct Rounder
+    {
+    private:
+
+        float value {0.0f};
+        float rounded_value {0.0f};
+        float multiplier {0.0f};
+        uint8_t decimals {0};
+
+        float clipValue(float value) {
+            return std::roundf(value * multiplier) / multiplier;
+        }
+
+    public:
+
+        Rounder() = default;
+
+        void init(float value, uint8_t decimals)
+        {
+            this->value = value;
+            this->decimals = decimals;
+            multiplier = std::pow(10.0f, decimals);
+        }
+
+        float getRoundedValueOf(const float &value)
+        {
+            if(this->value == value)
+            {
+                return rounded_value;
+            }
+
+            this->value = value;
+            this->rounded_value = clipValue(value);
+            return rounded_value;
+        }
+    };
     
 } // namespace embot::app::bldc {
 
