@@ -196,8 +196,7 @@ namespace embot::hw::analog {
     
 struct Configuration
 {
-    uint32_t ciao {0};
-    
+    //uint32_t ciao {0};
         
     constexpr Configuration() = default;
     constexpr bool isvalid() const { return true; }
