@@ -20,6 +20,8 @@
 #include "embot_os_theCallbackManager.h"
 #include "embot_app_theLEDmanager.h"
 
+#include "embot_hw_bsp_amcfocm7.h"
+
 #include <vector>
 
 
@@ -92,12 +94,24 @@ void initSystem(embot::os::Thread *t, void* initparam)
                     
     embot::core::print("INIT: creating the LED pulser: it will blink a LED at 1 Hz and run a 0.2 Hz waveform on another");
         
-    static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one, embot::hw::LED::two};  
+    static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
-    theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
-//    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 50, std::bitset<64>(0b010101));
-//    theleds.get(embot::hw::LED::two).wave(&ledwave); 
+    theleds.init(allleds);   
+    
+    theleds.get(embot::hw::LED::one).on(); 
+    theleds.get(embot::hw::LED::two).on(); 
+    theleds.get(embot::hw::LED::three).on(); 
+    theleds.get(embot::hw::LED::one).off(); 
+    theleds.get(embot::hw::LED::two).off(); 
+    theleds.get(embot::hw::LED::three).off(); 
+    
+#if defined(dualcore_BOOT_cm7master)
+    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second);
+#else
+//    embot::app::LEDwaveT<64> ledwave(150*embot::core::time1millisec, 30, std::bitset<64>(0b01010101010101));
+//    theleds.get(embot::hw::LED::one).wave(&ledwave); 
+    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second);
+#endif    
     
     
     embot::core::print("INIT: creating the main thread. it will reveives one periodic tick event and one upon pressure of the blue button");  
@@ -123,10 +137,14 @@ void initSystem(embot::os::Thread *t, void* initparam)
 }
 
 
+#include "embot_hw_dualcore.h"
+#include "embot_core_binary.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 
 int main(void)
 { 
+
     // steps:
     // 1. i init the embot::os
     // 2 i start the scheduler
@@ -135,8 +153,16 @@ int main(void)
     constexpr embot::os::IdleThread::Config idlecfg = { 2*1024, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
     constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
+
+#if defined(dualcore_BOOT_cm7master)     
+    embot::hw::dualcore::config({embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate});
+#endif
+    
+    
+
     
     // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
+
     embot::os::init(osconfig);
     
     // now i start the os    

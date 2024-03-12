@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2024 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -15,6 +15,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details
 */
+
+#define EMPTY_stm32hal_board_init
+
+#if defined(EMPTY_stm32hal_board_init)
+
+extern void stm32hal_board_init(void) {}
+    
+#else    
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -606,6 +614,7 @@ static void someothermode(void)
 //}
 #endif
 
+#endif  // of EMPTY_stm32hal_board_init
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

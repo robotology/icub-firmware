@@ -16,6 +16,14 @@
  * Public License for more details
 */
 
+#define EMPTY_stm32hal_board_init
+
+#if defined(EMPTY_stm32hal_board_init)
+
+extern void stm32hal_board_init(void) {}
+    
+#else    
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -616,6 +624,9 @@ static void mode1(void)
 }
 
 #endif
+
+#endif  // of EMPTY_stm32hal_board_init
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

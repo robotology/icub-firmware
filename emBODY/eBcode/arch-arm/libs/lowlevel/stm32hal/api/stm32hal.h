@@ -93,6 +93,18 @@ typedef enum
 extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg);
 
 
+// as an alternative, the following API split in two the initialization:
+// at first it loads a configuration, so that the timing funtions are specified.
+// then it starts the HAL
+// this split mode is partcicularly useful when the user wants to that full configurability of the STM32HAL.
+// that is typically done in embot::hw with macro EMBOT_REDEFINE_hw_bsp_DRIVER_init defined.
+// in such a case the user shall provide a init() whihc will surely calls stm32hal_config() and then what else is needed.
+// see the dual core examples
+
+extern stm32hal_res_t stm32hal_config(const stm32hal_config_t *cfg);
+extern stm32hal_res_t stm32hal_start(void);
+
+
 
 /** @}            
     end of group stm32hal_lib_api  

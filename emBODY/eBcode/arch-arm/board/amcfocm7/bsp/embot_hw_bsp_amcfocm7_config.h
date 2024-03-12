@@ -19,6 +19,10 @@
 
 #if   defined(STM32HAL_BOARD_AMCFOCM7)
 
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init
+    
+    #define EMBOT_ENABLE_hw_dualcore
+    
     #define EMBOT_ENABLE_hw_sys_emulateRAND
     #define EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio

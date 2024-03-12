@@ -76,8 +76,18 @@ namespace embot::hw::bsp {
               
 } // namespace embot::hw::bsp {
 
-  
 
+// in here declaration of code that depends on the DRIVER  
+// it can be redefined using macros
+// - EMBOT_REDEFINE_hw_bsp_DRIVER_init
+// - EMBOT_REDEFINE_hw_bsp_DRIVER_puts
+namespace embot::hw::bsp::DRIVER {
+    
+    // it prepares the HW DRIVER. In short: it calls HAL_Init(), configures clocks etc
+    bool init(const embot::hw::Config &config);    
+    // it sends a character to the HW. It may be ITM but it can ba also ... usart or else
+    int puts(const char* str);   
+}
 
 
 
