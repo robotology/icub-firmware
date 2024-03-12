@@ -45,36 +45,67 @@ using namespace embot::core::binary;
 // - support maps
 // --------------------------------------------------------------------------------------------------------------------
 
-// none in here
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - board specific methods
-// --------------------------------------------------------------------------------------------------------------------
+// - support map: begin of embot::hw::gpio
 
-#include "embot_hw_bsp_amcfocm7.h"
+#include "embot_hw_gpio_bsp.h"
 
+#if   !defined(HAL_GPIO_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_gpio)
 
-namespace embot::hw::bsp::amcfocm7 {
+#error CAVEAT: embot::hw requires GPIO. pls enable it!
+
+namespace embot { namespace hw { namespace gpio {
     
-
-}
-
-
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-
-    bool embot::hw::bsp::specialize()
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::GPIO h) const {}    
+    const BSP& getBSP() 
     {
-        // all the rest
-        // nothing for now
-        
-        
-        return true;
+        return thebsp;
     }
+    
+}}}
 
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
+#else
+    
+namespace embot { namespace hw { namespace gpio {
+ 
+    #if defined(STM32HAL_BOARD_AMCFOCM7)
+    static const BSP thebsp {        
+        // supportmask2d
+        {{
+            0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff 
+        }},            
+        // ports
+        {{
+            GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, [](){__HAL_RCC_GPIOF_CLK_ENABLE();},
+            [](){__HAL_RCC_GPIOG_CLK_ENABLE();}, [](){__HAL_RCC_GPIOH_CLK_ENABLE();}, [](){__HAL_RCC_GPIOI_CLK_ENABLE();},
+            [](){__HAL_RCC_GPIOJ_CLK_ENABLE();}, [](){__HAL_RCC_GPIOK_CLK_ENABLE();}
+        }}
+    };      
+    #else
+        #error embot::hw::gpio::thebsp must be defined
+    #endif
+    
+    
+    void BSP::init(embot::hw::GPIO h) const {}        
+        
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+              
+}}} // namespace embot { namespace hw { namespace gpio {
+
+#endif // gpio
+
+// - support map: end of embot::hw::gpio
+
+
 
 
 

@@ -13,21 +13,11 @@
 #include "embot_core.h"
 #include "embot_hw_types.h"
 
-namespace embot::hw::bsp::amc2c {
+namespace embot::hw::bsp::amcfocm4 {
     
     // adds in here constants or functions specific to the board
 
-    constexpr embot::hw::LED blinkLED {embot::hw::LED::one};
-    constexpr embot::hw::LED can2LED {embot::hw::LED::two};
-    
-    // led
-    constexpr embot::hw::LED redLED {embot::hw::LED::two};
-    
-    embot::hw::BTN EXTFAULTbutton();
-    embot::hw::LED EXTFAULTled();
-    
-    // it prints to the CM7 core ... if EMBOT_ENABLE_hw_icc_printer is enabled both in here and amc
-    void print(const std::string &str);
+      
     
 }
 

@@ -38,44 +38,63 @@ using namespace embot::core::binary;
 // - configuration of peripherals and chips. it is done board by board. it contains a check vs correct STM32HAL_BOARD_*
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw_bsp_amcfocm7_config.h"
+#include "embot_hw_bsp_amcfocm4_config.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - support maps
 // --------------------------------------------------------------------------------------------------------------------
 
-// none in here
 
+// - support map: begin of embot::hw::gpio
 
-// --------------------------------------------------------------------------------------------------------------------
-// - board specific methods
-// --------------------------------------------------------------------------------------------------------------------
+#include "embot_hw_gpio_bsp.h"
 
-#include "embot_hw_bsp_amcfocm7.h"
+#if   !defined(HAL_GPIO_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_gpio)
 
+#error CAVEAT: embot::hw requires GPIO. pls enable it!
 
-namespace embot::hw::bsp::amcfocm7 {
+namespace embot::hw::gpio {
     
-
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::GPIO h) const {}    
+    const BSP& getBSP() { return thebsp; }    
 }
 
+#else
+    
+namespace embot::hw::gpio {
+ 
+    static const BSP thebsp {        
+        // supportmask2d
+        {{
+            0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff 
+        }},            
+        // ports
+        {{
+            GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI, GPIOJ, GPIOK
+        }},
+        {{
+            [](){__HAL_RCC_GPIOA_CLK_ENABLE();}, [](){__HAL_RCC_GPIOB_CLK_ENABLE();}, [](){__HAL_RCC_GPIOC_CLK_ENABLE();}, 
+            [](){__HAL_RCC_GPIOD_CLK_ENABLE();}, [](){__HAL_RCC_GPIOE_CLK_ENABLE();}, [](){__HAL_RCC_GPIOF_CLK_ENABLE();},
+            [](){__HAL_RCC_GPIOG_CLK_ENABLE();}, [](){__HAL_RCC_GPIOH_CLK_ENABLE();}, [](){__HAL_RCC_GPIOI_CLK_ENABLE();},
+            [](){__HAL_RCC_GPIOJ_CLK_ENABLE();}, [](){__HAL_RCC_GPIOK_CLK_ENABLE();}
+        }}
+    };      
 
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-
-    bool embot::hw::bsp::specialize()
+    
+    void BSP::init(embot::hw::GPIO h) const {}        
+        
+    const BSP& getBSP() 
     {
-        // all the rest
-        // nothing for now
-        
-        
-        return true;
+        return thebsp;
     }
+              
+} // namespace embot::hw::gpio {
 
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
+#endif // gpio
 
+// - support map: end of embot::hw::gpio
 
 
 

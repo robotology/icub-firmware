@@ -279,6 +279,10 @@ extern "C" {
     #if !defined(CORE_CM7)
     #define CORE_CM7
     #endif  
+    
+    #if !defined(STM32HAL_DUALCORE)
+    #define STM32HAL_DUALCORE
+    #endif    
 
 #elif   defined(STM32HAL_BOARD_AMC2C)
 
@@ -301,6 +305,10 @@ extern "C" {
     #if !defined(CORE_CM4)
     #define CORE_CM4
     #endif  
+
+    #if !defined(STM32HAL_DUALCORE)
+    #define STM32HAL_DUALCORE
+    #endif
     
 #elif   defined(STM32HAL_BOARD_AMCFOCM7)
 
@@ -323,7 +331,11 @@ extern "C" {
     #if !defined(CORE_CM7)
     #define CORE_CM7
     #endif  
-
+    
+    #if !defined(STM32HAL_DUALCORE)
+    #define STM32HAL_DUALCORE
+    #endif
+        
 #elif   defined(STM32HAL_BOARD_AMCFOCM4)
 
     // it has a STM32H745xx mpu
@@ -345,6 +357,10 @@ extern "C" {
     #if !defined(CORE_CM4)
     #define CORE_CM4
     #endif 
+
+    #if !defined(STM32HAL_DUALCORE)
+    #define STM32HAL_DUALCORE
+    #endif  
     
 #elif   defined(STM32HAL_BOARD_MTB4C)
     

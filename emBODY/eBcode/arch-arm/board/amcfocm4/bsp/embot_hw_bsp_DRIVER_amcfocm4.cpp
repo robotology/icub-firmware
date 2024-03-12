@@ -38,46 +38,35 @@ using namespace embot::core::binary;
 // - configuration of peripherals and chips. it is done board by board. it contains a check vs correct STM32HAL_BOARD_*
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw_bsp_amcfocm7_config.h"
+#include "embot_hw_bsp_amcfocm4_config.h"
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - support maps
-// --------------------------------------------------------------------------------------------------------------------
-
-// none in here
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - board specific methods
-// --------------------------------------------------------------------------------------------------------------------
-
-#include "embot_hw_bsp_amcfocm7.h"
-
-
-namespace embot::hw::bsp::amcfocm7 {
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_init)
     
+#include "embot_hw_dualcore.h"     
 
+uint32_t _get1millitick()
+{
+    return embot::core::now() / 1000;        
+}
+    
+bool embot::hw::bsp::DRIVER::init(const embot::hw::Config &config)
+{
+    // configure the chosen hal
+    stm32hal_config_t cfg = {0};
+    cfg.tick1ms_init = config.initmicrotime;
+    cfg.tick1ms_get = _get1millitick;       
+    stm32hal_config(&cfg);
+    
+    
+    // and then, in here we do what we must
+    embot::hw::dualcore::start2();
+    
+    return true;    
 }
 
 
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
-bool embot::hw::bsp::specialize() { return true; }
-#else   
-
-    bool embot::hw::bsp::specialize()
-    {
-        // all the rest
-        // nothing for now
-        
-        
-        return true;
-    }
-
-#endif  //EMBOT_ENABLE_hw_bsp_specialize
-
-
-
+#endif
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

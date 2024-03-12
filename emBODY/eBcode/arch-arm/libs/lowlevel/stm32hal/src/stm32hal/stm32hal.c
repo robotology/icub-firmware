@@ -74,6 +74,45 @@ static stm32hal_config_t s_stm32hal_bsp_config =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+extern stm32hal_res_t stm32hal_config(const stm32hal_config_t *cfg)
+{
+    stm32hal_res_t r = stm32hal_res_OK;
+    
+    static const stm32hal_config_t s_config = 
+    {
+        s_stm32hal_bps_dummy_tick1msinit,
+        s_stm32hal_bps_dummy_tick1msget
+    };    
+    
+    if(NULL == cfg)
+    {
+        cfg = &s_config;
+    }
+    
+    memmove(&s_stm32hal_bsp_config, cfg, sizeof(s_stm32hal_bsp_config));
+    
+    if(NULL == s_stm32hal_bsp_config.tick1ms_init)
+    {
+        s_stm32hal_bsp_config.tick1ms_init = s_stm32hal_bps_dummy_tick1msinit;
+    }
+    
+    if(NULL == s_stm32hal_bsp_config.tick1ms_get)
+    {
+        s_stm32hal_bsp_config.tick1ms_get = s_stm32hal_bps_dummy_tick1msget;
+    }    
+    
+    return r;
+    
+}
+
+extern stm32hal_res_t stm32hal_start(void)
+{
+    stm32hal_res_t r = stm32hal_res_OK;
+    
+    stm32hal_board_init();
+    
+    return r;    
+}
 
 extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
 {    
@@ -113,9 +152,23 @@ extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
 // --------------------------------------------------------------------------------------------------------------------
 
 
+
 static void s_stm32hal_bps_dummy_tick1msinit(void)
 {
 }
+
+
+#if defined(STM32HAL_USE_LOWLEVEL_DELAY)
+
+#include "lowlevel.h"
+static uint32_t s_stm32hal_bps_dummy_tick1msget(void)
+{
+    static volatile uint64_t cnt = 0;
+    lowlevel_delay(1000);
+    return ++cnt;
+}
+
+#else
 
 static uint32_t s_stm32hal_bps_dummy_tick1msget(void)
 {
@@ -129,6 +182,7 @@ static uint32_t s_stm32hal_bps_dummy_tick1msget(void)
 }
 
 
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - redefinition of functions required by stm32 and weakly defined

@@ -37,13 +37,6 @@ using namespace embot::core::binary;
 // - definition of public functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-// in here declaration of code that depends on the DRIVER
-
-namespace embot::hw::bsp::DRIVER {
-    
-    int puts(const char* str);
-    
-}
     
 namespace embot::hw::bsp {
     
@@ -53,16 +46,12 @@ namespace embot::hw::bsp {
     }
     
     bool init(const embot::hw::Config &config)
-    {          
-        // init the chosen hal
-        stm32hal_config_t cfg = {0};
-        cfg.tick1ms_init = config.initmicrotime;
-        cfg.tick1ms_get = _get1millitick;       
-        stm32hal_init(&cfg);
+    {                  
+        embot::hw::bsp::DRIVER::init(config);
         
         // perform further initialization defined board by board        
         specialize();
-
+        
         return true;
     }
     
@@ -81,11 +70,29 @@ namespace embot::hw::bsp {
 
 // in here definition of code that depends on the DRIVER
 
+namespace embot::hw::bsp::DRIVER {
+
+
 #if defined(USE_HAL_DRIVER) 
 
-#if defined(EMBOT_ENABLE_hw_bsp_redefine_puts)
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_init)
+    // pls provide a different implementation
 #else
-int embot::hw::bsp::DRIVER::puts(const char* str)
+    bool init(const embot::hw::Config &config)
+    {          
+        // init the chosen hal
+        stm32hal_config_t cfg = {0};
+        cfg.tick1ms_init = config.initmicrotime;
+        cfg.tick1ms_get = embot::hw::bsp::_get1millitick;       
+        stm32hal_init(&cfg);
+        
+        return true;
+    }
+#endif
+
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_puts)
+#else
+int puts(const char* str)
 {
     if(nullptr == str)
     {
@@ -108,19 +115,33 @@ int embot::hw::bsp::DRIVER::puts(const char* str)
 
 #elif defined(USE_hal2_DRIVER)
 
-#if defined(EMBOT_ENABLE_hw_bsp_redefine_puts)
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_init)
 #else
-int embot::hw::bsp::DRIVER::puts(const char* str)
+    bool init(const embot::hw::Config &config)
+    {          
+        // init the chosen hal
+        stm32hal_config_t cfg = {0};
+        cfg.tick1ms_init = config.initmicrotime;
+        cfg.tick1ms_get = embot::hw::bsp::_get1millitick;       
+        stm32hal_init(&cfg);
+
+        return true;
+    }
+#endif
+
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_puts)
+#else
+int puts(const char* str)
 {
     return hal_trace_puts(str);
 }
 #endif
 
 #else
-    #error either HAL or hal2 DRIVER    
+    #error embot::hw::bsp::DRIVER supports either HAL or hal2 DRIVER    
 #endif   
 
-
+} // namespace embot::hw::bsp::DRIVER {
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
