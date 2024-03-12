@@ -362,8 +362,6 @@ namespace embot::hw::bsp::amc2c {
         embot::hw::icc::printer::theClient::getInstance().post(str);
 #endif        
     }
-    
-    
 }
 
 

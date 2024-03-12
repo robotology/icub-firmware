@@ -107,6 +107,12 @@ namespace embot { namespace hw { namespace motor {
     };        
     result_t setPWM(MOTOR h, const PWMperc &p);
     
+    // Return Vin in Volts
+    float getVIN();
+
+    // Return Cin in Ampere (not yet implemented)
+    float getCIN();
+    
 }}} // namespace embot { namespace hw { namespace motor {
     
 

@@ -28,20 +28,23 @@ namespace embot::hw::motor::bsp::amc2c {
     
     
     
-    // declaration of MspInit() / MspDeInit() used by motor. it is called by emebot::hw::timer   
+    // declaration of MspInit() / MspDeInit() used by motor. it is called by embot::hw::timer   
     void TIM_base_MspInit(TIM_HandleTypeDef* htim_base);
     void TIM_base_MspDeInit(TIM_HandleTypeDef* htim_base);
 
     // they are required by motorhal 
     // adm
     extern ADC_HandleTypeDef hADC1;
-    extern ADC_HandleTypeDef hADC2;  
+    extern ADC_HandleTypeDef hADC2;
+    extern ADC_HandleTypeDef hADC3;
     // encoder
     extern TIM_HandleTypeDef hTIM5;   
     // hall   
     extern TIM_HandleTypeDef hTIM4;    
     // pwm
     extern TIM_HandleTypeDef hTIM1;
+    // vcc
+    extern TIM_HandleTypeDef hTIM6;
     
     struct PWMvalues
     {   // the default is for pwm @ 20 us (

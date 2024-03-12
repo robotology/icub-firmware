@@ -169,6 +169,7 @@ namespace embot { namespace hw { namespace motor {
     bool s_hw_isHallValueError(MOTOR h);
     bool s_hw_isOvercurrent(MOTOR h);
     uint32_t s_hw_get32bit2FOCstyleFaultMask(MOTOR h);
+    float s_hw_getVin();
     
     result_t init(MOTOR h, const Config &cfg)
     {
@@ -388,6 +389,21 @@ namespace embot { namespace hw { namespace motor {
         return s_hw_isHardwareFault(h);
     }
     
+    float getVIN()
+    {
+        return s_hw_getVin();
+    }
+
+    float getCIN()
+    {
+        // TODO: not yet implemented
+        float c {0.0};
+        
+        //c = analogCin() * 0.001;
+        return c;
+        
+    }
+    
 // in here is the part for low level hw of the boards (amc2c or amcbldc)
     
 #if defined(STM32HAL_BOARD_AMC2C)
@@ -411,6 +427,9 @@ namespace embot { namespace hw { namespace motor {
           
         // now we calibrate adc acquisition
         embot::hw::motor::adc::calibrate({});
+
+        // now we start analog acquisition
+        embot::hw::analog::init({});
             
         // we may calibrate also the encoder so that it is aligned w/ hall values
         // but maybe better do it later
@@ -520,6 +539,11 @@ namespace embot { namespace hw { namespace motor {
     bool s_hw_isHallValueError(MOTOR h){ return false; }
     bool s_hw_isOvercurrent(MOTOR h){ return false; }
     uint32_t s_hw_get32bit2FOCstyleFaultMask(MOTOR h){ return 0; }
+    
+    float s_hw_getVin()
+    {
+        return embot::hw::analog::getVin();
+    }
 
 #elif defined(STM32HAL_BOARD_AMCBLDC)
     
@@ -655,6 +679,11 @@ namespace embot { namespace hw { namespace motor {
     uint32_t s_hw_get32bit2FOCstyleFaultMask(MOTOR h)
     {
         return motorhal_get_faultmask();
+    }
+    
+    float s_hw_getVin(){
+        // Return Vin in Volts
+        return analogVin() * 0.001;
     }
     
 #else

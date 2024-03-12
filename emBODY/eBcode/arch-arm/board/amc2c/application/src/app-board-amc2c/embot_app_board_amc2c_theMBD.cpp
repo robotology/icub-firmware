@@ -174,7 +174,7 @@ struct MeasureHisto : public Measure
         }        
     }
     
-#define PRINT_REPORT 
+//#define PRINT_REPORT 
     
     void report()
     {            
@@ -259,6 +259,8 @@ struct embot::app::board::amc2c::theMBD::Impl
     static constexpr embot::hw::TESTPOINT tp2 {embot::hw::TESTPOINT::two};
     
     embot::app::msg::BUS bus2use {embot::app::msg::BUS::none};
+    
+    embot::app::bldc::Rounder _rounder {};
 
 };
 
@@ -345,6 +347,7 @@ bool embot::app::board::amc2c::theMBD::Impl::initialise(const Config &config)
     // Init testpoint for debug
     embot::hw::testpoint::init(tp1);
     embot::hw::testpoint::init(tp2);
+    
     // init MBD
     AMC_BLDC_initialize();
     
@@ -360,7 +363,10 @@ bool embot::app::board::amc2c::theMBD::Impl::initialise(const Config &config)
         
         
 //    // init the ledpulser w/ a waveform
-//    embot::app::theLEDmanager::getInstance().get(embot::hw::LED::one).wave(&ledwavenone);    
+//    embot::app::theLEDmanager::getInstance().get(embot::hw::LED::one).wave(&ledwavenone);
+    
+    // init the rouder used to get the Vcc
+    _rounder.init(0.0f, 1); // default initial value=0, decimals=1
         
     initted = true;
     return initted;
@@ -475,9 +481,9 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
         AMC_BLDC_U.PacketsRx.packets[i].available = true;
     }
     
-    // read Vcc
-    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = 44; // TODO: read the voltage from ADC (temporary hardcoded)
-
+    // read Vcc (in Volts)
+    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = _rounder.getRoundedValueOf(embot::hw::motor::getVIN());
+    
     
     // -----------------------------------------------------------------------------
     // Model Step Function (1 ms)
