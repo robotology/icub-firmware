@@ -66,7 +66,7 @@ bool embot::hw::bsp::specialize()
 {
     // all the rest
     // nothing for now
-    __HAL_RCC_GPIOE_CLK_ENABLE();
+
     
     
     return true;  

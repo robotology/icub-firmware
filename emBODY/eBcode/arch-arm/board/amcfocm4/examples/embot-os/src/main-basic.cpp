@@ -20,9 +20,13 @@
 #include "embot_os_theCallbackManager.h"
 #include "embot_app_theLEDmanager.h"
 
+#include "embot_app_scope.h"
+
 #include <vector>
 
 #include "embot_hw_bsp_amcfocm4.h"
+
+embot::app::scope::Signal *signal {nullptr};
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 
@@ -32,6 +36,8 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 #include "embot_hw_led.h"
 #include "embot_hw_sys.h"
+
+void ON(){};
 
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {   
@@ -48,7 +54,10 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     
     embot::core::print("mainthread-startup: started timer which sends evtTick to evthread every = " + embot::core::TimeFormatter(tickperiod).to_string());
     
-    //embot::core::TimeFormatter tf(embot::core::now());        
+    //embot::core::TimeFormatter tf(embot::core::now());      
+
+    constexpr embot::app::scope::SignalEViewer::Config cc{ON, embot::app::scope::SignalEViewer::Config::LABEL::one};
+    signal = new embot::app::scope::SignalEViewer(cc);    
     
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
@@ -57,6 +66,55 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     
 }
 
+#include <cmath>
+
+void compute()
+{
+    static constexpr size_t N {10}; 
+    static constexpr size_t M {10};
+    static float data[N][M] = {0};
+    
+    std::memset(data, 0, sizeof(data));
+    
+    for(size_t n=0; n<N; n++)
+    {
+        for(size_t m=0; m<M; m++)
+        {
+            data[n][m] = 0.1*static_cast<float>(n+m)*(data[n][m] + 1.0f);
+            data[std::max(N, m)][std::max(M, n)] = data[n][m] * data[n][m];
+        }        
+    }
+    
+}
+
+void compute2()
+{
+    static constexpr size_t N {10}; 
+    static constexpr size_t M {10};
+    static float data[N][M] = {0};
+    
+    std::memset(data, 0, sizeof(data));
+    
+    for(size_t n=0; n<N; n++)
+    for(size_t m=0; m<M; m++)
+        data[n][m] = 0.1 * static_cast<float>(n) * static_cast<float>(m);
+    
+    for(size_t n=0; n<N; n++)
+    {
+        for(size_t m=0; m<M; m++)
+        {
+            data[n][m] = std::sin(0.1*static_cast<float>(n+m)*(data[n][m] + 1.0f));
+            data[std::max(N, m)][std::max(M, n)] = data[n][m] * data[n][m];
+        }        
+    }
+    
+}
+
+void testduration()
+{
+    //embot::hw::sys::delay(50);
+    compute2();
+}
 
 void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {   
@@ -66,7 +124,12 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     }
 
     if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
-    {      
+    { 
+
+        signal->on();   
+        testduration();   
+        signal->off();   
+        
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
     }

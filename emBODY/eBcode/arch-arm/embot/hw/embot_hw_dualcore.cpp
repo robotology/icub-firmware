@@ -56,11 +56,8 @@ namespace embot::hw::dualcore {
     bool config(const Config &c)
     { return false; }
     
-    bool start()
-    { return false; }    
-    
-    bool start2()
-    { return false; }       
+    bool init()
+    { return false; }             
     
 } // namespace embot::hw::dualcore {
 
@@ -102,15 +99,6 @@ namespace embot::hw::dualcore {
         return embot::hw::dualcore::bsp::getBSP().config(c);
     }    
      
-    bool start()
-    {
-        if(false == supported())
-        {
-            return false;
-        }
-        return embot::hw::dualcore::bsp::getBSP().start();
-    } 
-
     void waitHWmutex(uint32_t mtx)
     {
         volatile uint32_t m = mtx;
@@ -123,7 +111,7 @@ namespace embot::hw::dualcore {
         }        
     }    
 
-    bool start2()
+    bool init()
     {
         if(false == supported())
         {
@@ -133,6 +121,8 @@ namespace embot::hw::dualcore {
         
         embot::hw::dualcore::CORE co = embot::hw::dualcore::bsp::getBSP().getPROP()->core;
         embot::hw::dualcore::BOOT bo = embot::hw::dualcore::bsp::getBSP().getPROP()->boot;
+        embot::hw::MTX mtx = embot::hw::dualcore::bsp::getBSP().getPROP()->mtx;
+        uint32_t hsem = embot::core::tointegral(mtx);
         
         uint32_t other_RCC_BOOT_Cx = (embot::hw::dualcore::CORE::cm7 == co) ? RCC_BOOT_C2 : RCC_BOOT_C1;
         bool IamMaster = ((embot::hw::dualcore::CORE::cm7 == co) && (embot::hw::dualcore::BOOT::cm7master == bo)) ||
@@ -146,14 +136,13 @@ namespace embot::hw::dualcore {
 
             if(embot::hw::dualcore::Config::HW::forceinit == cfg.hw)
             {
-                embot::hw::dualcore::bsp::getBSP().hwinit();
+                embot::hw::dualcore::bsp::getBSP().init();
             }
             
             SystemCoreClockUpdate();
             
             // and now i process the command for the other core
 
-            constexpr uint32_t hsem0 {0};
             constexpr uint32_t procID0 {0};
             
             switch(cfg.othercore)
@@ -162,7 +151,7 @@ namespace embot::hw::dualcore {
                 {
                     // 1. init the hsems and take hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_FastTake(hsem0);
+                    HAL_HSEM_FastTake(hsem);
 
                     // 2. enable the other core C2
                     HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);                
@@ -172,20 +161,20 @@ namespace embot::hw::dualcore {
                 {
                     // 1. init the hsems (just in case) and release hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_Release(hsem0, procID0);                       
+                    HAL_HSEM_Release(hsem, procID0);                       
                 } break;
 
                 case embot::hw::dualcore::Config::CMD::activate:
                 {
                     // 1. init the hsems and take hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_FastTake(hsem0);
+                    HAL_HSEM_FastTake(hsem);
 
                     // 2. enable the other core C2
                     HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);   
 
                     // 3. and release hsem-0
-                    HAL_HSEM_Release(hsem0, procID0);
+                    HAL_HSEM_Release(hsem, procID0);
                     
                 } break;  
                 
@@ -202,12 +191,12 @@ namespace embot::hw::dualcore {
         {
             // just wait until the master core activates the slave core and unlocks the HSEM 0
             __HAL_RCC_HSEM_CLK_ENABLE();
-            waitHWmutex(0);
+            waitHWmutex(hsem);
             
             // then i do some hw init specific to me
             if(embot::hw::dualcore::Config::HW::forceinit == cfg.hw)
             {
-                embot::hw::dualcore::bsp::getBSP().hwinit();
+                embot::hw::dualcore::bsp::getBSP().init();
             }
             
             SystemCoreClockUpdate();            
@@ -218,14 +207,13 @@ namespace embot::hw::dualcore {
         {
             if(embot::hw::dualcore::Config::HW::forceinit == cfg.hw)
             {
-                embot::hw::dualcore::bsp::getBSP().hwinit();
+                embot::hw::dualcore::bsp::getBSP().start();
             }
             
             SystemCoreClockUpdate();
             
             // and now i process the command for the other core
 
-            constexpr uint32_t hsem0 {0};
             constexpr uint32_t procID0 {0};
             
             switch(cfg.othercore)
@@ -234,7 +222,7 @@ namespace embot::hw::dualcore {
                 {
                     // 1. init the hsems and take hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_FastTake(hsem0);
+                    HAL_HSEM_FastTake(hsem);
 
                     // 2. enable the other core C2
                     HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);                
@@ -244,20 +232,20 @@ namespace embot::hw::dualcore {
                 {
                     // 1. init the hsems (just in case) and release hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_Release(hsem0, procID0);                       
+                    HAL_HSEM_Release(hsem, procID0);                       
                 } break;
 
                 case embot::hw::dualcore::Config::CMD::activate:
                 {
                     // 1. init the hsems and take hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_FastTake(hsem0);
+                    HAL_HSEM_FastTake(hsem);
 
                     // 2. enable the other core C2
                     HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);   
 
                     // 3. and release hsem-0
-                    HAL_HSEM_Release(hsem0, procID0);
+                    HAL_HSEM_Release(hsem, procID0);
                     
                 } break;  
                 
@@ -273,12 +261,12 @@ namespace embot::hw::dualcore {
 
             // just wait until the master core activates the slave core and unlocks the HSEM 0
             __HAL_RCC_HSEM_CLK_ENABLE();
-            waitHWmutex(0);
+            waitHWmutex(hsem);
             
             // then i do some hw init
             if(embot::hw::dualcore::Config::HW::forceinit == cfg.hw)
             {
-                embot::hw::dualcore::bsp::getBSP().hwinit();
+                embot::hw::dualcore::bsp::getBSP().start();
             }
             
             SystemCoreClockUpdate();
@@ -288,7 +276,7 @@ namespace embot::hw::dualcore {
         {
             if(embot::hw::dualcore::Config::HW::forceinit == cfg.hw)
             {
-                embot::hw::dualcore::bsp::getBSP().hwinit();
+                embot::hw::dualcore::bsp::getBSP().start();
             }
             
             SystemCoreClockUpdate();
@@ -296,7 +284,6 @@ namespace embot::hw::dualcore {
             
             // and now i process the command for the other core
 
-            constexpr uint32_t hsem0 {0};
             constexpr uint32_t procID0 {0};
             
             switch(cfg.othercore)
@@ -305,7 +292,7 @@ namespace embot::hw::dualcore {
                 {
                     // 1. init the hsems and take hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_FastTake(hsem0);
+                    HAL_HSEM_FastTake(hsem);
 
                     // 2. enable the other core c1
                     HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);                
@@ -315,20 +302,20 @@ namespace embot::hw::dualcore {
                 {
                     // 1. init the hsems (just in case) and release hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_Release(hsem0, procID0);                       
+                    HAL_HSEM_Release(hsem, procID0);                       
                 } break;
 
                 case embot::hw::dualcore::Config::CMD::activate:
                 {
                     // 1. init the hsems and take hsem-0
                     __HAL_RCC_HSEM_CLK_ENABLE();
-                    HAL_HSEM_FastTake(hsem0);
+                    HAL_HSEM_FastTake(hsem);
 
                     // 2. enable the other core c1
                     HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);   
 
                     // 3. and release hsem-0
-                    HAL_HSEM_Release(hsem0, procID0);
+                    HAL_HSEM_Release(hsem, procID0);
                     
                 } break;  
                 
@@ -344,12 +331,12 @@ namespace embot::hw::dualcore {
         {
             // just wait until the master core activates the slave core and unlocks the HSEM 0
             __HAL_RCC_HSEM_CLK_ENABLE();
-            waitHWmutex(0);
+            waitHWmutex(hsem);
             
             // then i do some hw init
             if(embot::hw::dualcore::Config::HW::forceinit == cfg.hw)
             {
-                embot::hw::dualcore::bsp::getBSP().hwinit();
+                embot::hw::dualcore::bsp::getBSP().start();
             }
             
             SystemCoreClockUpdate();            

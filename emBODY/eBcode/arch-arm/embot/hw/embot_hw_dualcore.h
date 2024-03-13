@@ -19,9 +19,9 @@
 namespace embot::hw::dualcore {
         
     enum class CORE : uint8_t { cm4 = 0, cm7 = 1, none = 31, maxnumberof = 2 };
-    enum class BOOT : uint8_t { cm4master = 0, cm7master = 1, none = 31 };
+    enum class BOOT : uint8_t { cm4master = 0, cm7master = 1, none = 31, maxnumberof = 2 };
     
-    // what is actually executed .. just before embot:hw::bsp::specialize()
+    
     struct Config
     {   
         enum class HW : uint8_t { dontinit = 0, forceinit = 1 };
@@ -42,13 +42,9 @@ namespace embot::hw::dualcore {
     CORE core();
     BOOT boot();
     
-    // it must be called in main() before start()
-    bool config(const Config &on);
-    
-    // it must be called just after embot::hw::bsp::DRIVER::init() or even better instead that
-    bool start();
-    
-    bool start2();
+
+    bool config(const Config &on);   
+    bool init();
     
    
 } // namespace embot::hw::dualcore {

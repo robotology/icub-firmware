@@ -24,9 +24,10 @@ namespace embot::hw::dualcore::bsp {
     struct PROP
     {
         embot::hw::dualcore::CORE core {embot::hw::dualcore::CORE::cm7}; 
-        embot::hw::dualcore::BOOT boot {embot::hw::dualcore::BOOT::cm7master}; 
+        embot::hw::dualcore::BOOT boot {embot::hw::dualcore::BOOT::cm7master};
+        embot::hw::MTX mtx {embot::hw::MTX::one};         
         constexpr PROP() = default;
-        constexpr PROP(embot::hw::dualcore::CORE c, embot::hw::dualcore::BOOT b) : core(c), boot(b) {} 
+        constexpr PROP(embot::hw::dualcore::CORE c, embot::hw::dualcore::BOOT b, embot::hw::MTX m) : core(c), boot(b), mtx(m) {} 
     };
        
     struct BSP : public embot::hw::bsp::SUPP
@@ -43,8 +44,7 @@ namespace embot::hw::dualcore::bsp {
         bool supported() const { return embot::hw::bsp::SUPP::supported(thempu); }
         bool config(const Config &c) const;
         const Config& config() const;
-        bool start() const;
-        bool hwinit() const;
+        bool init() const;
     };
     
     const BSP& getBSP();

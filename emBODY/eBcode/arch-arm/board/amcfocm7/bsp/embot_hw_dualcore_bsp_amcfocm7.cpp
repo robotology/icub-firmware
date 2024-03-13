@@ -70,10 +70,10 @@ namespace embot::hw::dualcore::bsp {
 namespace embot::hw::dualcore::bsp {         
 
 #if defined(dualcore_BOOT_cm7master)      
-    constexpr PROP _cm7 = { embot::hw::dualcore::CORE::cm7, embot::hw::dualcore::BOOT::cm7master };  
+    constexpr PROP _cm7 = { embot::hw::dualcore::CORE::cm7, embot::hw::dualcore::BOOT::cm7master, embot::hw::MTX::one};  
     Config _config {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate};
 #elif defined(dualcore_BOOT_cm4master)
-    constexpr PROP _cm7 = { embot::hw::dualcore::CORE::cm7, embot::hw::dualcore::BOOT::cm4master };
+    constexpr PROP _cm7 = { embot::hw::dualcore::CORE::cm7, embot::hw::dualcore::BOOT::cm4master, embot::hw::MTX::one};
     Config _config {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing};
 #endif
     
@@ -103,155 +103,49 @@ namespace embot::hw::dualcore::bsp {
         return _config;
     }        
 
-    void init_board();    
-    bool BSP::start() const 
-    { 
-        // ok, now we see what we need to do
-        init_board();
-        
-        return true; 
-    }  
     
     void mySystemClock_Config(void);
     void icub_SystemClock_Config(void);
     
-    bool BSP::hwinit() const
+    bool BSP::init() const
     {
-//#if defined(dualcore_BOOT_cm7master)  
+
         if(embot::hw::dualcore::BOOT::cm7master == _cm7.boot)
         {        
             // the cm7 is master, so it must call HAL_Init() and start the clocks
             
             //MPU_Config();
             HAL_MPU_Disable();
-            SCB_EnableICache();
-            SCB_EnableDCache();    
+//            SCB_EnableICache();
+//            SCB_EnableDCache();    
             HAL_Init();                    
            // mySystemClock_Config();  
-            icub_SystemClock_Config();
-//            HAL_SYSTICK_CLKSourceConfig();            
+            icub_SystemClock_Config();          
         }
         else
         {
-//#elif defined(dualcore_BOOT_cm4master)
         
             // the cm7 is slave, so the cm4 has already done everything.
             // only thing is to enable the cache as only the cm7 can do it
+            // ... maybe add some MPU initialization
             
-            SCB_EnableICache();
-            SCB_EnableDCache();
-            HAL_Init(); 
-            icub_SystemClock_Config();            
-            //mySystemClock_Config();
-            //SystemCoreClockUpdate();            
+//            SCB_EnableICache();
+//            SCB_EnableDCache();            
         }
-        
-//#endif        
+            
         return true; 
     }
 
 
-//#if defined(dualcore_BOOT_cm4master)
-
-    void waitHWmutex(uint32_t mtx)
-    {
-        volatile uint32_t m = mtx;
-        for(;;)
-        {
-            if(HAL_OK == HAL_HSEM_FastTake(m))
-            {
-                break;
-            }
-        }        
-    }
-
-//#endif
 
 
-    void mySystemClock_Config(void);
+    
+} // namespace embot::hw::dualcore::bsp {
 
-    void init_board()
-    {
 
-#if defined(dualcore_BOOT_cm7master)  
+// in here are the SystemClock_Config() that we use
 
-        if(embot::hw::dualcore::Config::HW::forceinit == _config.hw)
-        {
-            //MPU_Config();
-            HAL_MPU_Disable();
-            SCB_EnableICache();
-            SCB_EnableDCache();    
-            HAL_Init();                    
-            mySystemClock_Config();
-        }
-        
-        SystemCoreClockUpdate();
-        
-        // and now i process the command for the other core
-
-        constexpr uint32_t hsem0 {0};
-        constexpr uint32_t procID0 {0};
-        
-        switch(_config.othercore)
-        {
-            case embot::hw::dualcore::Config::CMD::activateandhold:
-            {
-                // 1. init the hsems and take hsem-0
-                __HAL_RCC_HSEM_CLK_ENABLE();
-                HAL_HSEM_FastTake(hsem0);
-
-                // 2. enable the other core
-                HAL_RCCEx_EnableBootCore(RCC_BOOT_C2);                
-            } break;
-
-            case embot::hw::dualcore::Config::CMD::release:
-            {
-                // 1. init the hsems (just in case) and release hsem-0
-                __HAL_RCC_HSEM_CLK_ENABLE();
-                HAL_HSEM_Release(hsem0, procID0);                       
-            } break;
-
-            case embot::hw::dualcore::Config::CMD::activate:
-            {
-                // 1. init the hsems and take hsem-0
-                __HAL_RCC_HSEM_CLK_ENABLE();
-                HAL_HSEM_FastTake(hsem0);
-
-                // 2. enable the other core
-                HAL_RCCEx_EnableBootCore(RCC_BOOT_C2);   
-
-                // 3. and release hsem-0
-                HAL_HSEM_Release(hsem0, procID0);
-                
-            } break;  
-            
-            case embot::hw::dualcore::Config::CMD::donothing:
-            default: 
-            {
-                break;
-            }
-        }
-            
-#elif defined(dualcore_BOOT_cm4master) 
-        
-        // just wait until the master core activates the slave core and unlocks the HSEM 0
-        __HAL_RCC_HSEM_CLK_ENABLE();
-        waitHWmutex(0);
-
-        if(embot::hw::dualcore::Config::HW::forceinit == _config.hw)
-        {
-//            //MPU_Config();
-//            HAL_MPU_Disable();
-            SCB_EnableICache();
-            SCB_EnableDCache();    
-//            HAL_Init();
-        }
-        
-        SystemCoreClockUpdate();
-        
-#endif                    
-        
-    } 
+namespace embot::hw::dualcore::bsp {
 
         // from icubtech
     
