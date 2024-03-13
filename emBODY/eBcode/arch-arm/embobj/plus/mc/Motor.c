@@ -789,7 +789,7 @@ BOOL Motor_check_faults(Motor* o) //
     
     if (o->fault_state_prec.bitmask != o->fault_state.bitmask)
     {
-        MotorFaultState fault_state;
+        eOmc_motorFaultState_t fault_state;
         fault_state.bitmask = o->fault_state.bitmask;
         
         if (o->fault_state.bits.ExternalFaultAsserted && !o->fault_state_prec.bits.ExternalFaultAsserted)
@@ -830,13 +830,13 @@ BOOL Motor_check_faults(Motor* o) //
             fault_state.bits.OverHeatingFailure = FALSE;
         }
         
-        #define CAN_GENERIC_ERROR 0x00003D00
-        
-        if ((o->fault_state.bitmask & CAN_GENERIC_ERROR) && ((o->fault_state.bitmask & CAN_GENERIC_ERROR) != (o->fault_state_prec.bitmask & CAN_GENERIC_ERROR)))
-        {
-            Motor_send_error(o->ID, eoerror_value_MC_motor_can_generic, (o->fault_state.bitmask & CAN_GENERIC_ERROR));
-            fault_state.bitmask &= ~CAN_GENERIC_ERROR;
-        }
+//        #define CAN_GENERIC_ERROR 0x00003D00
+//        
+//        if ((o->fault_state.bitmask & CAN_GENERIC_ERROR) && ((o->fault_state.bitmask & CAN_GENERIC_ERROR) != (o->fault_state_prec.bitmask & CAN_GENERIC_ERROR)))
+//        {
+//            Motor_send_error(o->ID, eoerror_value_MC_motor_can_generic, (o->fault_state.bitmask & CAN_GENERIC_ERROR));
+//            fault_state.bitmask &= ~CAN_GENERIC_ERROR;
+//        }
                 
         if (o->fault_state.bits.EncoderFault && !o->fault_state_prec.bits.EncoderFault)
         {

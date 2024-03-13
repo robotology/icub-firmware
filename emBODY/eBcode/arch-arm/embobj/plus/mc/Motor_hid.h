@@ -28,56 +28,6 @@ typedef union
 {
     struct
     {
-        //B0 L
-        unsigned ExternalFaultAsserted  :1;
-        unsigned UnderVoltageFailure    :1;      
-        unsigned OverVoltageFailure     :1;
-        unsigned OverCurrentFailure     :1;
-        //B0 H
-        unsigned DHESInvalidValue       :1;
-        unsigned AS5045CSumError        :1;
-        unsigned DHESInvalidSequence    :1;
-        unsigned CANInvalidProtocol     :1;
-        //B1 L
-        unsigned CAN_BufferOverRun      :1;
-        unsigned SetpointExpired        :1;
-        unsigned CAN_TXIsPasv           :1;
-        unsigned CAN_RXIsPasv           :1;
-        //B1 H
-        unsigned CAN_IsWarnTX           :1;
-        unsigned CAN_IsWarnRX           :1;
-        unsigned OverHeatingFailure     :1;
-        unsigned unused                 :1;
-        //B2 L
-        unsigned ADCCalFailure          :1; 
-        unsigned I2TFailure             :1;                     
-        unsigned EMUROMFault            :1;
-        unsigned EMUROMCRCFault         :1;
-        //B2 H
-        unsigned EncoderFault           :1;
-        unsigned FirmwareSPITimingError :1;		
-        unsigned AS5045CalcError        :1;
-        unsigned FirmwarePWMFatalError  :1;
-        //B3 L
-        unsigned CAN_TXWasPasv          :1;
-        unsigned CAN_RXWasPasv          :1;
-        unsigned CAN_RTRFlagActive      :1;
-        unsigned CAN_WasWarn            :1;
-        //B3 H
-        unsigned CAN_DLCError           :1;
-        unsigned SiliconRevisionFault   :1;
-        unsigned PositionLimitUpper     :1; 
-        unsigned PositionLimitLower     :1; 
-    } bits;
-        
-    uint32_t bitmask;
-        
-} MotorFaultState;
-
-typedef union
-{
-    struct
-    {
         unsigned dirty           :1;
         unsigned stuck           :1;
         unsigned index_broken    :1;
@@ -202,8 +152,8 @@ struct Motor_hid
     
     uint16_t diagnostics_refresh;
     uint16_t diagnostics_refresh_warning;
-    MotorFaultState fault_state_prec;
-    MotorFaultState fault_state;
+    eOmc_motorFaultState_t fault_state_prec;
+    eOmc_motorFaultState_t fault_state;
     QEState qe_state;
     
     icubCanProto_controlmode_t  control_mode;
