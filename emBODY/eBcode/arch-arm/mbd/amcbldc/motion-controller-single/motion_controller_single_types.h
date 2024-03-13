@@ -3,21 +3,21 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: AMC_BLDC_types.h
+// File: motion_controller_single_types.h
 //
-// Code generated for Simulink model 'AMC_BLDC'.
+// Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 7.81
+// Model version                  : 1.175
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 14:50:32 2024
+// C/C++ source code generated on : Thu Mar  7 10:07:38 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_AMC_BLDC_types_h_
-#define RTW_HEADER_AMC_BLDC_types_h_
+#ifndef RTW_HEADER_motion_controller_single_types_h_
+#define RTW_HEADER_motion_controller_single_types_h_
 #include "rtwtypes.h"
 
 // Includes for objects with custom storage classes
@@ -26,16 +26,8 @@
 //
 //  Registered constraints for dimension variants
 
-#if CAN_MAX_NUM_PACKETS <= 0
-# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be greater than '0'"
-#endif
-
 #if MAX_EVENTS_PER_TICK <= 0
 # error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be greater than '0'"
-#endif
-
-#if CAN_MAX_NUM_PACKETS >= 16
-# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be less than '16'"
 #endif
 
 #if MAX_EVENTS_PER_TICK >= 16
@@ -203,6 +195,39 @@ struct ReceivedEvents
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+
+struct EstimationConfiguration
+{
+  real32_T environment_temperature;
+  real32_T current_rms_lambda;
+  EstimationVelocityModes velocity_est_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+
+struct GlobalConfiguration
+{
+  EstimationConfiguration estimation;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
 #define DEFINED_TYPEDEF_FOR_FOCOutputs_
 
@@ -242,31 +267,6 @@ struct EstimatedData
 
   // motor temperature
   real32_T motor_temperature;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
-#define DEFINED_TYPEDEF_FOR_HardwareFaults_
-
-struct HardwareFaults
-{
-  boolean_T overcurrent;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
-
-struct Flags
-{
-  boolean_T enable_sending_msg_status;
-  HardwareFaults hw_faults;
-  boolean_T enable_thermal_protection;
-
-  // control mode
-  ControlModes control_mode;
 };
 
 #endif
@@ -349,190 +349,36 @@ struct ActuatorConfiguration
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
+#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
+#define DEFINED_TYPEDEF_FOR_HardwareFaults_
 
-// Fields of a FOC message.
-struct BUS_MSG_FOC
+struct HardwareFaults
 {
-  // Current feedback in A.
-  real32_T current;
-
-  // Position feedback in deg.
-  real32_T position;
-
-  // Velocity feedback in deg/s.
-  real32_T velocity;
+  boolean_T overcurrent;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
-#define DEFINED_TYPEDEF_FOR_MCControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
 
-typedef enum {
-  MCControlModes_Idle = 0,             // Default value
-  MCControlModes_OpenLoop = 80,
-  MCControlModes_SpeedVoltage = 10,
-  MCControlModes_SpeedCurrent = 11,
-  MCControlModes_Current = 6,
-  MCControlModes_NotConfigured = 176,
-  MCControlModes_HWFault = 160
-} MCControlModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_FLAGS_TX_
-#define DEFINED_TYPEDEF_FOR_BUS_FLAGS_TX_
-
-struct BUS_FLAGS_TX
+struct Flags
 {
-  boolean_T dirty;
-  boolean_T stuck;
-  boolean_T index_broken;
-  boolean_T phase_broken;
-  real32_T not_calibrated;
-  boolean_T ExternalFaultAsserted;
-  boolean_T UnderVoltageFailure;
-  boolean_T OverVoltageFailure;
-  boolean_T OverCurrentFailure;
-  boolean_T DHESInvalidValue;
-  boolean_T AS5045CSumError;
-  boolean_T DHESInvalidSequence;
-  boolean_T CANInvalidProtocol;
-  boolean_T CAN_BufferOverRun;
-  boolean_T SetpointExpired;
-  boolean_T CAN_TXIsPasv;
-  boolean_T CAN_RXIsPasv;
-  boolean_T CAN_IsWarnTX;
-  boolean_T CAN_IsWarnRX;
-  boolean_T OverHeating;
-  boolean_T ADCCalFailure;
-  boolean_T I2TFailure;
-  boolean_T EMUROMFault;
-  boolean_T EMUROMCRCFault;
-  boolean_T EncoderFault;
-  boolean_T FirmwareSPITimingError;
-  boolean_T AS5045CalcError;
-  boolean_T FirmwarePWMFatalError;
-  boolean_T CAN_TXWasPasv;
-  boolean_T CAN_RXWasPasv;
-  boolean_T CAN_RTRFlagActive;
-  boolean_T CAN_WasWarn;
-  boolean_T CAN_DLCError;
-  boolean_T SiliconRevisionFault;
-  boolean_T PositionLimitUpper;
-  boolean_T PositionLimitLower;
+  boolean_T enable_sending_msg_status;
+  HardwareFaults hw_faults;
+  boolean_T enable_thermal_protection;
+
+  // control mode
+  ControlModes control_mode;
 };
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_STATUS_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_STATUS_
-
-struct BUS_MSG_STATUS
-{
-  MCControlModes control_mode;
-
-  // control effort (quadrature)
-  real32_T pwm_fbk;
-  BUS_FLAGS_TX flags;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_TX_
-#define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_TX_
-
-// Aggregate of all CAN transmitted messages.
-struct BUS_MESSAGES_TX
-{
-  BUS_MSG_FOC foc;
-  BUS_MSG_STATUS status;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
-#define DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
-
-// Aggregate of all events specifying types of transmitted messages.
-struct BUS_STATUS_TX
-{
-  boolean_T foc;
-  boolean_T status;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
-
-// Fields of a transmitted CAN packet.
-struct BUS_CAN_PACKET
-{
-  // ID of the CAN packet.
-  uint16_T ID;
-
-  // PAYLOAD of the CAN packet.
-  uint8_T PAYLOAD[8];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_
-
-struct BUS_CAN
-{
-  // If true, the packet is available to be processed.
-  boolean_T available;
-  uint8_T length;
-  BUS_CAN_PACKET packet;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-
-struct BUS_CAN_MULTIPLE
-{
-  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_CANClassTypes_
-#define DEFINED_TYPEDEF_FOR_CANClassTypes_
-
-typedef enum {
-  CANClassTypes_Motor_Control_Command = 0,// Default value
-  CANClassTypes_Motor_Control_Streaming = 1,
-  CANClassTypes_Analog_Sensors_Command = 2,
-  CANClassTypes_Skin_Sensor_Streaming = 4,
-  CANClassTypes_Inertial_Sensor_Streaming = 5,
-  CANClassTypes_Future_Use = 6,
-  CANClassTypes_Management_Bootloader = 7
-} CANClassTypes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
 
 #endif
 
 // Forward declaration for rtModel
-typedef struct tag_RTM_AMC_BLDC_T RT_MODEL_AMC_BLDC_T;
+typedef struct tag_RTM_motion_controller_single_T
+  RT_MODEL_motion_controller_single_T;
 
-#endif                                 // RTW_HEADER_AMC_BLDC_types_h_
+#endif                          // RTW_HEADER_motion_controller_single_types_h_
 
 //
 // File trailer for generated code.

@@ -9,7 +9,7 @@
 //
 // Model version                  : 6.9
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:43 2024
+// C/C++ source code generated on : Thu Mar  7 10:06:50 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,27 @@
 #define RTW_HEADER_can_encoder_h_
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
+
+// Block signals for system '<S5>/format_can_id'
+struct B_format_can_id_can_encoder_T {
+  uint16_T pkt_id;                     // '<S5>/format_can_id'
+};
+
+// Block signals for model 'can_encoder'
+struct B_can_encoder_c_T {
+  B_format_can_id_can_encoder_T sf_format_can_id_n;// '<S8>/format_can_id'
+  B_format_can_id_can_encoder_T sf_format_can_id;// '<S5>/format_can_id'
+};
+
+// Real-time Model Data Structure
+struct tag_RTM_can_encoder_T {
+  const char_T **errorStatus;
+};
+
+struct MdlrefDW_can_encoder_T {
+  B_can_encoder_c_T rtb;
+  RT_MODEL_can_encoder_T rtm;
+};
 
 //
 //  Exported Global Parameters
@@ -41,12 +62,16 @@ extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //    '<S4>/Constant'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
-extern void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const
-  BUS_STATUS_TX *rtu_status_tx, const ConfigurationParameters
-  *rtu_ConfigurationParameters, BUS_CAN_MULTIPLE *rty_pck_tx);
 
 // Model reference registration function
-extern void can_encoder_initialize(const char_T **rt_errorStatus);
+extern void can_encoder_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_can_encoder_T *const can_encoder_M);
+extern void can_encoder_format_can_id(uint8_T rtu_class, uint8_T rtu_can_id_amc,
+  uint8_T rtu_dst_typ, B_format_can_id_can_encoder_T *localB);
+extern void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const
+  BUS_STATUS_TX *rtu_status_tx, const ActuatorConfiguration
+  *rtu_ConfigurationParameters, BUS_CAN_MULTIPLE *rty_pck_tx, B_can_encoder_c_T *
+  localB);
 
 //-
 //  The generated code includes comments that allow you to trace directly

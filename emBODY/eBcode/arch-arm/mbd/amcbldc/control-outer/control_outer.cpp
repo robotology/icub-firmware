@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 6.3
+// Model version                  : 6.35
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:07 2024
+// C/C++ source code generated on : Thu Mar  7 10:07:02 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,7 +22,6 @@
 #include "rtwtypes.h"
 #include "control_outer_private.h"
 #include "zero_crossing_types.h"
-#include <cstring>
 
 // System initialize for referenced model: 'control_outer'
 void control_outer_Init(DW_control_outer_f_T *localDW)
@@ -35,29 +34,14 @@ void control_outer_Init(DW_control_outer_f_T *localDW)
 
   localDW->DelayInput1_DSTATE = ControlModes_Idle;
 
-  // InitializeConditions for DiscreteTransferFcn: '<S47>/Filter Differentiator TF' 
-  localDW->FilterDifferentiatorTF_states = 0.0F;
-
   // InitializeConditions for DiscreteIntegrator: '<S54>/Integrator'
-  localDW->Integrator_DSTATE = 0.0F;
   localDW->Integrator_PrevResetState = 2;
 
-  // InitializeConditions for DiscreteTransferFcn: '<S97>/Filter Differentiator TF' 
-  localDW->FilterDifferentiatorTF_states_i = 0.0F;
-
   // InitializeConditions for DiscreteIntegrator: '<S104>/Integrator'
-  localDW->Integrator_DSTATE_i = 0.0F;
   localDW->Integrator_PrevResetState_n = 2;
 
-  // InitializeConditions for DiscreteTransferFcn: '<S147>/Filter Differentiator TF' 
-  localDW->FilterDifferentiatorTF_states_c = 0.0F;
-
   // InitializeConditions for DiscreteIntegrator: '<S154>/Integrator'
-  localDW->Integrator_DSTATE_b = 0.0F;
   localDW->Integrator_PrevResetState_c = 2;
-
-  // InitializeConditions for DiscreteIntegrator: '<S1>/Discrete-Time Integrator' 
-  localDW->DiscreteTimeIntegrator_PrevResetState = 0;
 }
 
 // Enable for referenced model: 'control_outer'
@@ -76,27 +60,26 @@ void control_outer_Disable(B_control_outer_c_T *localB, DW_control_outer_f_T
 }
 
 // Output and update for referenced model: 'control_outer'
-void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
-                   *rtu_ConfigurationParameters, const Targets *rtu_Targets,
-                   const SensorsData *rtu_Sensors, const EstimatedData
-                   *rtu_Estimates, ControlOuterOutputs *rty_OuterOutputs,
+void control_outer(const Flags *rtu_Flags, const ActuatorConfiguration
+                   *rtu_ConfigurationParameters, const EstimatedData
+                   *rtu_Estimates, const SensorsData *rtu_Sensors, const Targets
+                   *rtu_Targets, ControlOuterOutputs *rty_OuterOutputs,
                    B_control_outer_c_T *localB, DW_control_outer_f_T *localDW,
                    ZCE_control_outer_T *localZCE)
 {
   int32_T rowIdx;
   int32_T tmp;
+  real32_T Integrator;
+  real32_T Integrator_p;
   real32_T rtb_Abs;
-  real32_T rtb_DProdOut;
-  real32_T rtb_DProdOut_f;
+  real32_T rtb_DProdOut_b;
   real32_T rtb_DenCoefOut;
-  real32_T rtb_FilterDifferentiatorTF;
-  real32_T rtb_FilterDifferentiatorTF_n;
-  real32_T rtb_Gain1_h;
-  real32_T rtb_PProdOut;
-  real32_T rtb_PProdOut_o;
-  real32_T rtb_Product;
+  real32_T rtb_NProdOut;
+  real32_T rtb_NProdOut_f;
+  real32_T rtb_Sum2;
+  real32_T rtb_SumI1;
+  real32_T rtb_SumI1_e;
   real32_T rtb_Switch2;
-  real32_T rtb_Switch2_f;
   boolean_T rtb_Compare;
   boolean_T rtb_Compare_m;
   boolean_T rtb_FixPtRelationalOperator;
@@ -146,61 +129,103 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   // End of Switch: '<Root>/Switch2'
 
   // Sum: '<S3>/Sum3'
-  rtb_DenCoefOut = rtu_Targets->jointpositions.position -
-    rtu_Sensors->jointpositions.position;
+  rtb_DenCoefOut = rtu_Targets->position - rtu_Sensors->position;
 
-  // Product: '<S59>/PProd Out'
-  rtb_PProdOut = rtb_DenCoefOut * rtu_ConfigurationParameters->PosLoopPID.P;
+  // Product: '<S59>/PProd Out' incorporates:
+  //   Product: '<S109>/PProd Out'
 
-  // SampleTimeMath: '<S49>/Tsamp'
+  rtb_Sum2 = rtb_DenCoefOut * rtu_ConfigurationParameters->pids.positionPID.P;
+
+  // SampleTimeMath: '<S49>/Tsamp' incorporates:
+  //   SampleTimeMath: '<S99>/Tsamp'
   //
   //  About '<S49>/Tsamp':
   //   y = u * K where K = ( w * Ts )
+  //
+  //  About '<S99>/Tsamp':
+  //   y = u * K where K = ( w * Ts )
 
-  rtb_Product = rtu_ConfigurationParameters->PosLoopPID.N * 0.0005F;
+  rtb_SumI1 = rtu_ConfigurationParameters->pids.positionPID.N * 0.0005F;
 
   // Math: '<S47>/Reciprocal' incorporates:
   //   Constant: '<S47>/Filter Den Constant'
+  //   Math: '<S97>/Reciprocal'
+  //   SampleTimeMath: '<S49>/Tsamp'
   //   Sum: '<S47>/SumDen'
   //
   //  About '<S47>/Reciprocal':
   //   Operator: reciprocal
+  //
+  //  About '<S97>/Reciprocal':
+  //   Operator: reciprocal
+  //
+  //  About '<S49>/Tsamp':
+  //   y = u * K where K = ( w * Ts )
 
-  rtb_Switch2_f = 1.0F / (rtb_Product + 1.0F);
+  rtb_SumI1_e = 1.0F / (rtb_SumI1 + 1.0F);
 
-  // DiscreteTransferFcn: '<S47>/Filter Differentiator TF' incorporates:
-  //   Constant: '<S47>/Filter Den Constant'
-  //   Product: '<S46>/DProd Out'
-  //   Product: '<S47>/Divide'
-  //   Sum: '<S47>/SumNum'
-
+  // DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
   if (rtb_FixPtRelationalOperator && (localZCE->FilterDifferentiatorTF_Reset_ZCE
        != POS_ZCSIG)) {
     localDW->FilterDifferentiatorTF_states = 0.0F;
   }
 
   localZCE->FilterDifferentiatorTF_Reset_ZCE = rtb_FixPtRelationalOperator;
-  localDW->FilterDifferentiatorTF_tmp = rtb_DenCoefOut *
-    rtu_ConfigurationParameters->PosLoopPID.D - (rtb_Product - 1.0F) *
-    rtb_Switch2_f * localDW->FilterDifferentiatorTF_states;
+
+  // Product: '<S46>/DProd Out' incorporates:
+  //   Product: '<S96>/DProd Out'
+
+  Integrator_p = rtb_DenCoefOut *
+    rtu_ConfigurationParameters->pids.positionPID.D;
+
+  // Product: '<S47>/Divide' incorporates:
+  //   Constant: '<S47>/Filter Den Constant'
+  //   Math: '<S47>/Reciprocal'
+  //   Product: '<S97>/Divide'
+  //   SampleTimeMath: '<S49>/Tsamp'
+  //   Sum: '<S47>/SumNum'
+  //
+  //  About '<S47>/Reciprocal':
+  //   Operator: reciprocal
+  //
+  //  About '<S49>/Tsamp':
+  //   y = u * K where K = ( w * Ts )
+
+  rtb_NProdOut_f = (rtb_SumI1 - 1.0F) * rtb_SumI1_e;
+
+  // DiscreteTransferFcn: '<S47>/Filter Differentiator TF' incorporates:
+  //   Product: '<S46>/DProd Out'
+  //   Product: '<S47>/Divide'
+
+  localDW->FilterDifferentiatorTF_tmp = Integrator_p - rtb_NProdOut_f *
+    localDW->FilterDifferentiatorTF_states;
 
   // Product: '<S57>/NProd Out' incorporates:
   //   DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
+  //   Math: '<S47>/Reciprocal'
   //   Product: '<S47>/DenCoefOut'
+  //
+  //  About '<S47>/Reciprocal':
+  //   Operator: reciprocal
 
-  rtb_Switch2_f = (localDW->FilterDifferentiatorTF_tmp -
-                   localDW->FilterDifferentiatorTF_states) * rtb_Switch2_f *
-    rtu_ConfigurationParameters->PosLoopPID.N;
+  rtb_NProdOut = (localDW->FilterDifferentiatorTF_tmp -
+                  localDW->FilterDifferentiatorTF_states) * rtb_SumI1_e *
+    rtu_ConfigurationParameters->pids.positionPID.N;
+
+  // Product: '<S51>/IProd Out' incorporates:
+  //   Product: '<S101>/IProd Out'
+
+  rtb_DenCoefOut *= rtu_ConfigurationParameters->pids.positionPID.I;
 
   // Sum: '<S66>/SumI1' incorporates:
   //   Product: '<S51>/IProd Out'
+  //   Product: '<S59>/PProd Out'
   //   Sum: '<S64>/Sum Fdbk'
   //   Sum: '<S65>/SumI3'
   //   UnitDelay: '<Root>/Unit Delay'
 
-  rtb_DProdOut = (localDW->UnitDelay_DSTATE - ((rtb_PProdOut +
-    localDW->Integrator_DSTATE) + rtb_Switch2_f)) + rtb_DenCoefOut *
-    rtu_ConfigurationParameters->PosLoopPID.I;
+  rtb_SumI1 = (localDW->UnitDelay_DSTATE - ((rtb_Sum2 +
+    localDW->Integrator_DSTATE) + rtb_NProdOut)) + rtb_DenCoefOut;
 
   // DiscreteIntegrator: '<S54>/Integrator'
   if (rtb_FixPtRelationalOperator && (localDW->Integrator_PrevResetState <= 0))
@@ -209,44 +234,15 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   }
 
   // DiscreteIntegrator: '<S54>/Integrator'
-  rtb_FilterDifferentiatorTF = 0.0005F * rtb_DProdOut +
-    localDW->Integrator_DSTATE;
+  Integrator = 0.0005F * rtb_SumI1 + localDW->Integrator_DSTATE;
 
   // RelationalOperator: '<S11>/Compare' incorporates:
   //   Constant: '<S11>/Constant'
 
   rtb_Compare = (rtu_Flags->control_mode == ControlModes_Position);
 
-  // Product: '<S109>/PProd Out'
-  rtb_PProdOut_o = rtb_DenCoefOut * rtu_ConfigurationParameters->DirLoopPID.P;
-
-  // Product: '<S101>/IProd Out'
-  rtb_Product = rtb_DenCoefOut * rtu_ConfigurationParameters->DirLoopPID.I;
-
-  // Product: '<S96>/DProd Out'
-  rtb_DProdOut_f = rtb_DenCoefOut * rtu_ConfigurationParameters->DirLoopPID.D;
-
-  // SampleTimeMath: '<S99>/Tsamp'
-  //
-  //  About '<S99>/Tsamp':
-  //   y = u * K where K = ( w * Ts )
-
-  rtb_Gain1_h = rtu_ConfigurationParameters->DirLoopPID.N * 0.0005F;
-
-  // Math: '<S97>/Reciprocal' incorporates:
-  //   Constant: '<S97>/Filter Den Constant'
-  //   Sum: '<S97>/SumDen'
-  //
-  //  About '<S97>/Reciprocal':
-  //   Operator: reciprocal
-
-  rtb_DenCoefOut = 1.0F / (rtb_Gain1_h + 1.0F);
-
   // DiscreteTransferFcn: '<S97>/Filter Differentiator TF' incorporates:
-  //   Constant: '<S97>/Filter Den Constant'
   //   DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
-  //   Product: '<S97>/Divide'
-  //   Sum: '<S97>/SumNum'
 
   if (rtb_FixPtRelationalOperator &&
       (localZCE->FilterDifferentiatorTF_Reset_ZCE_m != POS_ZCSIG)) {
@@ -254,24 +250,24 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   }
 
   localZCE->FilterDifferentiatorTF_Reset_ZCE_m = rtb_FixPtRelationalOperator;
-  localDW->FilterDifferentiatorTF_tmp_m = rtb_DProdOut_f - (rtb_Gain1_h - 1.0F) *
-    rtb_DenCoefOut * localDW->FilterDifferentiatorTF_states_i;
+  localDW->FilterDifferentiatorTF_tmp_m = Integrator_p - rtb_NProdOut_f *
+    localDW->FilterDifferentiatorTF_states_i;
 
   // Product: '<S107>/NProd Out' incorporates:
   //   DiscreteTransferFcn: '<S97>/Filter Differentiator TF'
   //   Product: '<S97>/DenCoefOut'
 
-  rtb_DenCoefOut = (localDW->FilterDifferentiatorTF_tmp_m -
-                    localDW->FilterDifferentiatorTF_states_i) * rtb_DenCoefOut *
-    rtu_ConfigurationParameters->DirLoopPID.N;
+  rtb_NProdOut_f = (localDW->FilterDifferentiatorTF_tmp_m -
+                    localDW->FilterDifferentiatorTF_states_i) * rtb_SumI1_e *
+    rtu_ConfigurationParameters->pids.positionPID.N;
 
   // Sum: '<S116>/SumI1' incorporates:
   //   Sum: '<S114>/Sum Fdbk'
   //   Sum: '<S115>/SumI3'
   //   UnitDelay: '<Root>/Unit Delay'
 
-  rtb_FilterDifferentiatorTF_n = (localDW->UnitDelay_DSTATE - ((rtb_PProdOut_o +
-    localDW->Integrator_DSTATE_i) + rtb_DenCoefOut)) + rtb_Product;
+  rtb_SumI1_e = (localDW->UnitDelay_DSTATE - ((rtb_Sum2 +
+    localDW->Integrator_DSTATE_i) + rtb_NProdOut_f)) + rtb_DenCoefOut;
 
   // DiscreteIntegrator: '<S104>/Integrator'
   if (rtb_FixPtRelationalOperator && (localDW->Integrator_PrevResetState_n <= 0))
@@ -280,8 +276,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   }
 
   // DiscreteIntegrator: '<S104>/Integrator'
-  rtb_DProdOut_f = 0.0005F * rtb_FilterDifferentiatorTF_n +
-    localDW->Integrator_DSTATE_i;
+  Integrator_p = 0.0005F * rtb_SumI1_e + localDW->Integrator_DSTATE_i;
 
   // Switch: '<Root>/Switch3' incorporates:
   //   Constant: '<Root>/Constant1'
@@ -294,14 +289,14 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   if (rtb_Compare || (rtu_Flags->control_mode == ControlModes_PositionDirect) ||
       (rtu_Flags->control_mode == ControlModes_Velocity)) {
     // Switch: '<S3>/Switch5' incorporates:
+    //   Product: '<S59>/PProd Out'
     //   Sum: '<S113>/Sum'
     //   Sum: '<S63>/Sum'
 
     if (rtb_Compare) {
-      rtb_DenCoefOut = (rtb_PProdOut + rtb_FilterDifferentiatorTF) +
-        rtb_Switch2_f;
+      rtb_DenCoefOut = (rtb_Sum2 + Integrator) + rtb_NProdOut;
     } else {
-      rtb_DenCoefOut += rtb_PProdOut_o + rtb_DProdOut_f;
+      rtb_DenCoefOut = (rtb_Sum2 + Integrator_p) + rtb_NProdOut_f;
     }
 
     // End of Switch: '<S3>/Switch5'
@@ -312,7 +307,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   // Sum: '<Root>/Sum2' incorporates:
   //   Switch: '<Root>/Switch3'
 
-  rtb_Switch2_f = rtb_DenCoefOut + rtu_Targets->jointvelocities.velocity;
+  rtb_Sum2 = rtb_DenCoefOut + rtu_Targets->velocity;
 
   // Switch: '<S4>/Switch2' incorporates:
   //   Gain: '<Root>/Gain'
@@ -320,35 +315,37 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   RelationalOperator: '<S4>/UpperRelop'
   //   Switch: '<S4>/Switch'
 
-  if (rtb_Switch2_f > rtb_Abs) {
-    rtb_Switch2_f = rtb_Abs;
-  } else if (rtb_Switch2_f < -rtb_Abs) {
+  if (rtb_Sum2 > rtb_Abs) {
+    rtb_Sum2 = rtb_Abs;
+  } else if (rtb_Sum2 < -rtb_Abs) {
     // Switch: '<S4>/Switch' incorporates:
     //   Gain: '<Root>/Gain'
 
-    rtb_Switch2_f = -rtb_Abs;
+    rtb_Sum2 = -rtb_Abs;
   }
 
   // End of Switch: '<S4>/Switch2'
 
   // Sum: '<Root>/Sum1'
-  rtb_Product = rtb_Switch2_f - rtu_Estimates->jointvelocities.velocity;
+  rtb_NProdOut_f = rtb_Sum2 - rtu_Estimates->velocity;
 
   // Product: '<S159>/PProd Out'
-  rtb_Abs = rtb_Product * rtu_ConfigurationParameters->VelLoopPID.P;
+  rtb_NProdOut = rtb_NProdOut_f *
+    rtu_ConfigurationParameters->pids.velocityPID.P;
 
   // Product: '<S151>/IProd Out'
-  rtb_Gain1_h = rtb_Product * rtu_ConfigurationParameters->VelLoopPID.I;
+  rtb_Abs = rtb_NProdOut_f * rtu_ConfigurationParameters->pids.velocityPID.I;
 
   // Product: '<S146>/DProd Out'
-  rtb_PProdOut = rtb_Product * rtu_ConfigurationParameters->VelLoopPID.D;
+  rtb_DProdOut_b = rtb_NProdOut_f *
+    rtu_ConfigurationParameters->pids.velocityPID.D;
 
   // SampleTimeMath: '<S149>/Tsamp'
   //
   //  About '<S149>/Tsamp':
   //   y = u * K where K = ( w * Ts )
 
-  rtb_Product = rtu_ConfigurationParameters->VelLoopPID.N * 0.0005F;
+  rtb_NProdOut_f = rtu_ConfigurationParameters->pids.velocityPID.N * 0.0005F;
 
   // Math: '<S147>/Reciprocal' incorporates:
   //   Constant: '<S147>/Filter Den Constant'
@@ -357,7 +354,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //  About '<S147>/Reciprocal':
   //   Operator: reciprocal
 
-  rtb_DenCoefOut = 1.0F / (rtb_Product + 1.0F);
+  rtb_DenCoefOut = 1.0F / (rtb_NProdOut_f + 1.0F);
 
   // DiscreteTransferFcn: '<S147>/Filter Differentiator TF' incorporates:
   //   Constant: '<S147>/Filter Den Constant'
@@ -371,24 +368,24 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   }
 
   localZCE->FilterDifferentiatorTF_Reset_ZCE_e = rtb_FixPtRelationalOperator;
-  localDW->FilterDifferentiatorTF_tmp_p = rtb_PProdOut - (rtb_Product - 1.0F) *
-    rtb_DenCoefOut * localDW->FilterDifferentiatorTF_states_c;
+  localDW->FilterDifferentiatorTF_tmp_p = rtb_DProdOut_b - (rtb_NProdOut_f -
+    1.0F) * rtb_DenCoefOut * localDW->FilterDifferentiatorTF_states_c;
 
   // Product: '<S157>/NProd Out' incorporates:
   //   DiscreteTransferFcn: '<S147>/Filter Differentiator TF'
   //   Product: '<S147>/DenCoefOut'
 
-  rtb_DenCoefOut = (localDW->FilterDifferentiatorTF_tmp_p -
+  rtb_NProdOut_f = (localDW->FilterDifferentiatorTF_tmp_p -
                     localDW->FilterDifferentiatorTF_states_c) * rtb_DenCoefOut *
-    rtu_ConfigurationParameters->VelLoopPID.N;
+    rtu_ConfigurationParameters->pids.velocityPID.N;
 
   // Sum: '<S166>/SumI1' incorporates:
   //   Sum: '<S164>/Sum Fdbk'
   //   Sum: '<S165>/SumI3'
   //   UnitDelay: '<Root>/Unit Delay1'
 
-  rtb_PProdOut = (localDW->UnitDelay1_DSTATE - ((rtb_Abs +
-    localDW->Integrator_DSTATE_b) + rtb_DenCoefOut)) + rtb_Gain1_h;
+  rtb_DenCoefOut = (localDW->UnitDelay1_DSTATE - ((rtb_NProdOut +
+    localDW->Integrator_DSTATE_b) + rtb_NProdOut_f)) + rtb_Abs;
 
   // DiscreteIntegrator: '<S154>/Integrator'
   if (rtb_FixPtRelationalOperator && (localDW->Integrator_PrevResetState_c <= 0))
@@ -397,46 +394,45 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   }
 
   // DiscreteIntegrator: '<S154>/Integrator'
-  rtb_Product = 0.0005F * rtb_PProdOut + localDW->Integrator_DSTATE_b;
+  rtb_Abs = 0.0005F * rtb_DenCoefOut + localDW->Integrator_DSTATE_b;
 
-  // Switch: '<Root>/Switch1' incorporates:
-  //   Sum: '<S163>/Sum'
-
+  // Switch: '<Root>/Switch1'
   if (rtb_Compare_m) {
-    rtb_Abs = (rtb_Abs + rtb_Product) + rtb_DenCoefOut;
+    // Switch: '<Root>/Switch1' incorporates:
+    //   Sum: '<S163>/Sum'
+
+    localDW->UnitDelay1_DSTATE = (rtb_NProdOut + rtb_Abs) + rtb_NProdOut_f;
   } else {
-    rtb_Abs = rtu_Targets->motorcurrent.current;
+    // Switch: '<Root>/Switch1'
+    localDW->UnitDelay1_DSTATE = rtu_Targets->current;
   }
 
   // End of Switch: '<Root>/Switch1'
 
   // Switch: '<S5>/Switch2' incorporates:
+  //   Gain: '<Root>/Gain1'
   //   RelationalOperator: '<S5>/LowerRelop1'
+  //   RelationalOperator: '<S5>/UpperRelop'
+  //   Switch: '<S5>/Switch'
 
-  if (!(rtb_Abs > rtb_Switch2)) {
-    // Gain: '<Root>/Gain1'
-    rtb_Switch2 = -rtb_Switch2;
+  if (localDW->UnitDelay1_DSTATE > rtb_Switch2) {
+    // Switch: '<Root>/Switch1'
+    localDW->UnitDelay1_DSTATE = rtb_Switch2;
+  } else if (localDW->UnitDelay1_DSTATE < -rtb_Switch2) {
+    // Switch: '<Root>/Switch1' incorporates:
+    //   Gain: '<Root>/Gain1'
+    //   Switch: '<S5>/Switch'
 
-    // Switch: '<S5>/Switch' incorporates:
-    //   RelationalOperator: '<S5>/UpperRelop'
-
-    if (!(rtb_Abs < rtb_Switch2)) {
-      rtb_Switch2 = rtb_Abs;
-    }
-
-    // End of Switch: '<S5>/Switch'
+    localDW->UnitDelay1_DSTATE = -rtb_Switch2;
   }
 
   // End of Switch: '<S5>/Switch2'
 
-  // BusCreator: '<Root>/Bus Creator2'
-  rty_OuterOutputs->motorcurrent.current = rtb_Switch2;
-
   // Sum: '<S1>/Sum' incorporates:
   //   Abs: '<S1>/Abs1'
 
-  rtb_Abs = rtu_ConfigurationParameters->thresholds.motorPeakCurrents - std::abs
-    (rtu_Estimates->Iq_filtered.current);
+  rtb_Switch2 = rtu_ConfigurationParameters->thresholds.motorPeakCurrents - std::
+    abs(rtu_Estimates->Iq_filtered);
 
   // CombinatorialLogic: '<S9>/Logic' incorporates:
   //   Constant: '<S7>/Constant'
@@ -446,10 +442,10 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   RelationalOperator: '<S1>/Relational Operator'
   //   RelationalOperator: '<S7>/Compare'
 
-  rowIdx = static_cast<int32_T>(((((rtb_Abs > 0.1F *
+  rowIdx = static_cast<int32_T>(((((rtb_Switch2 > 0.1F *
     rtu_ConfigurationParameters->thresholds.motorPeakCurrents) ||
-    rtb_FixPtRelationalOperator) + (static_cast<uint32_T>(rtb_Abs <= 0.0F) << 1))
-    << 1) + localDW->Memory_PreviousInput);
+    rtb_FixPtRelationalOperator) + (static_cast<uint32_T>(rtb_Switch2 <= 0.0F) <<
+    1)) << 1) + localDW->Memory_PreviousInput);
   rtb_Compare = rtCP_Logic_table[static_cast<uint32_T>(rowIdx) + 8U];
 
   // DiscreteIntegrator: '<S1>/Discrete-Time Integrator'
@@ -462,15 +458,18 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
     localB->DiscreteTimeIntegrator = 0.0F;
   } else {
     // DiscreteIntegrator: '<S1>/Discrete-Time Integrator'
-    localB->DiscreteTimeIntegrator = 0.0005F * rtb_Abs +
+    localB->DiscreteTimeIntegrator = 0.0005F * rtb_Switch2 +
       localDW->DiscreteTimeIntegrator_DSTATE;
   }
 
   // End of DiscreteIntegrator: '<S1>/Discrete-Time Integrator'
 
-  // BusCreator: '<Root>/Bus Creator1'
+  // BusCreator: '<Root>/Bus Creator1' incorporates:
+  //   UnitDelay: '<Root>/Unit Delay1'
+
   rty_OuterOutputs->vel_en = rtb_Compare_m;
   rty_OuterOutputs->pid_reset = rtb_FixPtRelationalOperator;
+  rty_OuterOutputs->motorcurrent = localDW->UnitDelay1_DSTATE;
 
   // Switch: '<S1>/Switch1' incorporates:
   //   Constant: '<S1>/Constant1'
@@ -478,7 +477,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   Constant: '<S8>/Constant'
   //   RelationalOperator: '<S8>/Compare'
 
-  if (rtu_Estimates->Iq_filtered.current < 0.0F) {
+  if (rtu_Estimates->Iq_filtered < 0.0F) {
     tmp = -1;
   } else {
     tmp = 1;
@@ -489,7 +488,13 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   //   Switch: '<S1>/Switch1'
 
   rty_OuterOutputs->current_limiter = static_cast<real32_T>(tmp) *
-    localB->DiscreteTimeIntegrator * rtu_ConfigurationParameters->CurLoopPID.I;
+    localB->DiscreteTimeIntegrator *
+    rtu_ConfigurationParameters->pids.currentPID.I;
+
+  // Sum: '<Root>/Sum3' incorporates:
+  //   UnitDelay: '<Root>/Unit Delay'
+
+  localDW->UnitDelay_DSTATE = rtb_Sum2 - rtu_Targets->velocity;
 
   // Update for UnitDelay: '<S18>/Delay Input1'
   //
@@ -502,15 +507,8 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   // Update for DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
   localDW->FilterDifferentiatorTF_states = localDW->FilterDifferentiatorTF_tmp;
 
-  // Update for UnitDelay: '<Root>/Unit Delay' incorporates:
-  //   Sum: '<Root>/Sum3'
-
-  localDW->UnitDelay_DSTATE = rtb_Switch2_f -
-    rtu_Targets->jointvelocities.velocity;
-
   // Update for DiscreteIntegrator: '<S54>/Integrator'
-  localDW->Integrator_DSTATE = 0.0005F * rtb_DProdOut +
-    rtb_FilterDifferentiatorTF;
+  localDW->Integrator_DSTATE = 0.0005F * rtb_SumI1 + Integrator;
   localDW->Integrator_PrevResetState = static_cast<int8_T>
     (rtb_FixPtRelationalOperator);
 
@@ -521,8 +519,7 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   // Update for DiscreteIntegrator: '<S104>/Integrator' incorporates:
   //   DiscreteIntegrator: '<S54>/Integrator'
 
-  localDW->Integrator_DSTATE_i = 0.0005F * rtb_FilterDifferentiatorTF_n +
-    rtb_DProdOut_f;
+  localDW->Integrator_DSTATE_i = 0.0005F * rtb_SumI1_e + Integrator_p;
   localDW->Integrator_PrevResetState_n = static_cast<int8_T>
     (rtb_FixPtRelationalOperator);
 
@@ -530,13 +527,10 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
   localDW->FilterDifferentiatorTF_states_c =
     localDW->FilterDifferentiatorTF_tmp_p;
 
-  // Update for UnitDelay: '<Root>/Unit Delay1'
-  localDW->UnitDelay1_DSTATE = rtb_Switch2;
-
   // Update for DiscreteIntegrator: '<S154>/Integrator' incorporates:
   //   DiscreteIntegrator: '<S54>/Integrator'
 
-  localDW->Integrator_DSTATE_b = 0.0005F * rtb_PProdOut + rtb_Product;
+  localDW->Integrator_DSTATE_b = 0.0005F * rtb_DenCoefOut + rtb_Abs;
   localDW->Integrator_PrevResetState_c = static_cast<int8_T>
     (rtb_FixPtRelationalOperator);
 
@@ -547,29 +541,15 @@ void control_outer(const Flags *rtu_Flags, const ConfigurationParameters
 
   // Update for DiscreteIntegrator: '<S1>/Discrete-Time Integrator'
   localDW->DiscreteTimeIntegrator_SYSTEM_ENABLE = 0U;
-  localDW->DiscreteTimeIntegrator_DSTATE = 0.0005F * rtb_Abs +
+  localDW->DiscreteTimeIntegrator_DSTATE = 0.0005F * rtb_Switch2 +
     localB->DiscreteTimeIntegrator;
   localDW->DiscreteTimeIntegrator_PrevResetState = static_cast<int8_T>
     (rtb_Compare);
 }
 
 // Model initialize function
-void control_outer_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_control_outer_T *const control_outer_M, B_control_outer_c_T *localB,
-  DW_control_outer_f_T *localDW, ZCE_control_outer_T *localZCE)
+void control_outer_initialize(ZCE_control_outer_T *localZCE)
 {
-  // Registration code
-
-  // initialize error status
-  rtmSetErrorStatusPointer(control_outer_M, rt_errorStatus);
-
-  // block I/O
-  (void) std::memset((static_cast<void *>(localB)), 0,
-                     sizeof(B_control_outer_c_T));
-
-  // states (dwork)
-  (void) std::memset(static_cast<void *>(localDW), 0,
-                     sizeof(DW_control_outer_f_T));
   localZCE->FilterDifferentiatorTF_Reset_ZCE = POS_ZCSIG;
   localZCE->FilterDifferentiatorTF_Reset_ZCE_m = POS_ZCSIG;
   localZCE->FilterDifferentiatorTF_Reset_ZCE_e = POS_ZCSIG;

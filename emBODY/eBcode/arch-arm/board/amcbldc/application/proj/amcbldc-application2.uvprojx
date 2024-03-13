@@ -340,7 +340,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DEMBOT_AMCBLDC_APP05</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V122</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-raw2struct;..\..\..\..\mbd\amcbldc\supervisor-rx;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc;..\..\..\..\embot\app;..\..\..\..\embot\app\eth</IncludePath>
+              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-raw2struct;..\..\..\..\mbd\amcbldc\motion-controller-single;..\..\..\..\mbd\amcbldc\motion-controller;..\..\..\..\mbd\amcbldc\supervisor;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc;..\..\..\..\embot\app;..\..\..\..\embot\app\eth</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1167,6 +1167,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWordShl.cpp</FilePath>
             </File>
+            <File>
+              <FileName>rt_hypotf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rt_roundd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundd.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rt_roundf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1190,17 +1205,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>mbd::supervisor-rx</GroupName>
+          <GroupName>mbd::supervisor</GroupName>
           <Files>
             <File>
-              <FileName>SupervisorFSM_RX.cpp</FileName>
+              <FileName>supervisor.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>SupervisorFSM_RX_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor\supervisor.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1306,11 +1316,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\control-foc\FOCInnerLoop.cpp</FilePath>
             </File>
-            <File>
-              <FileName>control_foc_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\control_foc_data.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1340,6 +1345,21 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::motion-controller</GroupName>
+          <Files>
+            <File>
+              <FileName>motion_controller_single.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller-single\motion_controller_single.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motion_controller.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2509,6 +2529,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWordShl.cpp</FilePath>
             </File>
+            <File>
+              <FileName>rt_hypotf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rt_roundd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundd.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rt_roundf.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2532,17 +2567,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>mbd::supervisor-rx</GroupName>
+          <GroupName>mbd::supervisor</GroupName>
           <Files>
             <File>
-              <FileName>SupervisorFSM_RX.cpp</FileName>
+              <FileName>supervisor.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>SupervisorFSM_RX_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor\supervisor.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2579,11 +2609,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\control-foc\FOCInnerLoop.cpp</FilePath>
             </File>
-            <File>
-              <FileName>control_foc_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\control_foc_data.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2613,6 +2638,21 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::motion-controller</GroupName>
+          <Files>
+            <File>
+              <FileName>motion_controller_single.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller-single\motion_controller_single.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motion_controller.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller.cpp</FilePath>
             </File>
           </Files>
         </Group>

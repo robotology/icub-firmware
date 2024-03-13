@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 6.3
+// Model version                  : 6.14
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:38 2024
+// C/C++ source code generated on : Mon Mar  4 13:07:41 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,7 +20,6 @@
 #define RTW_HEADER_filter_current_h_
 #include "rtwtypes.h"
 #include "filter_current_types.h"
-#include <cstring>
 
 // Block states (default storage) for model 'filter_current'
 struct DW_filter_current_f_T {
@@ -28,23 +27,13 @@ struct DW_filter_current_f_T {
   boolean_T objisempty;                // '<Root>/Median Filter'
 };
 
-// Real-time Model Data Structure
-struct tag_RTM_filter_current_T {
-  const char_T **errorStatus;
-};
-
 struct MdlrefDW_filter_current_T {
   DW_filter_current_f_T rtdw;
-  RT_MODEL_filter_current_T rtm;
 };
 
-// Model reference registration function
-extern void filter_current_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_filter_current_T *const filter_current_M, DW_filter_current_f_T
-  *localDW);
 extern void filter_current_Init(DW_filter_current_f_T *localDW);
-extern void filter_current(const ControlOutputs *rtu_ControlOutputs,
-  MotorCurrent *rty_FilteredCurrent, DW_filter_current_f_T *localDW);
+extern void filter_current(const FOCOutputs *rtu_ControlOutputs, real32_T
+  *rty_FilteredCurrent, DW_filter_current_f_T *localDW);
 extern void filter_current_Term(DW_filter_current_f_T *localDW);
 
 //-

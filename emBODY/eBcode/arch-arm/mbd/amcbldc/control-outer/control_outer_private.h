@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 6.3
+// Model version                  : 6.35
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:07 2024
+// C/C++ source code generated on : Thu Mar  7 10:07:02 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,23 +21,6 @@
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
 #include "control_outer_types.h"
-
-// Macros for accessing real-time model data structure
-#ifndef rtmGetErrorStatus
-#define rtmGetErrorStatus(rtm)         (*((rtm)->errorStatus))
-#endif
-
-#ifndef rtmSetErrorStatus
-#define rtmSetErrorStatus(rtm, val)    (*((rtm)->errorStatus) = (val))
-#endif
-
-#ifndef rtmGetErrorStatusPointer
-#define rtmGetErrorStatusPointer(rtm)  (rtm)->errorStatus
-#endif
-
-#ifndef rtmSetErrorStatusPointer
-#define rtmSetErrorStatusPointer(rtm, val) ((rtm)->errorStatus = (val))
-#endif
 
 extern const boolean_T rtCP_pooled_kUC6nmgO8rex[16];
 

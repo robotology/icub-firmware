@@ -3,24 +3,24 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: filter_current_private.h
+// File: supervisor_private.h
 //
-// Code generated for Simulink model 'filter_current'.
+// Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 6.14
+// Model version                  : 1.319
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Mar  4 13:07:41 2024
+// C/C++ source code generated on : Wed Mar 13 15:01:32 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_filter_current_private_h_
-#define RTW_HEADER_filter_current_private_h_
+#ifndef RTW_HEADER_supervisor_private_h_
+#define RTW_HEADER_supervisor_private_h_
 #include "rtwtypes.h"
-#include "filter_current_types.h"
-#endif                                 // RTW_HEADER_filter_current_private_h_
+#include "supervisor_types.h"
+#endif                                 // RTW_HEADER_supervisor_private_h_
 
 //
 // File trailer for generated code.

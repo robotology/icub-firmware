@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 6.4
+// Model version                  : 6.21
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:26 2024
+// C/C++ source code generated on : Wed Mar  6 16:39:21 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,16 +21,6 @@
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
 
-extern "C"
-{
-
-#include "rt_nonfinite.h"
-
-}
-
-#include "rtGetNaN.h"
-#include <cstring>
-
 // Block states (default storage) for model 'estimation_velocity'
 struct DW_estimation_velocity_f_T {
   real32_T DelayLine_Buff[15];         // '<Root>/Delay Line'
@@ -41,23 +31,13 @@ struct DW_estimation_velocity_f_T {
   boolean_T objisempty;                // '<S1>/QR Solver'
 };
 
-// Real-time Model Data Structure
-struct tag_RTM_estimation_velocity_T {
-  const char_T **errorStatus;
-};
-
 struct MdlrefDW_estimation_velocity_T {
   DW_estimation_velocity_f_T rtdw;
-  RT_MODEL_estimation_velocity_T rtm;
 };
 
-// Model reference registration function
-extern void estimation_velocity_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_estimation_velocity_T *const estimation_velocity_M,
-  DW_estimation_velocity_f_T *localDW);
 extern void estimation_velocity_Init(DW_estimation_velocity_f_T *localDW);
-extern void estimation_velocity(const SensorsData *rtu_SensorsData, const
-  ConfigurationParameters *rtu_ConfigurationParameters, JointVelocities
+extern void estimation_velocity(const EstimationVelocityModes
+  *rtu_EstimationConfig, const real32_T *rtu_position, real32_T
   *rty_EstimatedVelocity, DW_estimation_velocity_f_T *localDW);
 
 //-

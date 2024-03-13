@@ -9,7 +9,7 @@
 //
 // Model version                  : 6.9
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:43 2024
+// C/C++ source code generated on : Thu Mar  7 10:06:50 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,12 +19,10 @@
 #include "can_encoder.h"
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
-#include "can_encoder_private.h"
 #include <cstring>
 #include <stddef.h>
+#include "can_encoder_private.h"
 #include "rtw_defines.h"
-
-MdlrefDW_can_encoder_T can_encoder_MdlrefDW;
 
 //
 // Output and update for atomic system:
@@ -32,17 +30,18 @@ MdlrefDW_can_encoder_T can_encoder_MdlrefDW;
 //    '<S8>/format_can_id'
 //
 void can_encoder_format_can_id(uint8_T rtu_class, uint8_T rtu_can_id_amc,
-  uint8_T rtu_dst_typ, uint16_T *rty_pkt_id)
+  uint8_T rtu_dst_typ, B_format_can_id_can_encoder_T *localB)
 {
-  *rty_pkt_id = static_cast<uint16_T>(rtu_class << 8);
-  *rty_pkt_id = static_cast<uint16_T>(rtu_can_id_amc << 4 | *rty_pkt_id);
-  *rty_pkt_id = static_cast<uint16_T>(rtu_dst_typ | *rty_pkt_id);
+  localB->pkt_id = static_cast<uint16_T>(rtu_class << 8);
+  localB->pkt_id = static_cast<uint16_T>(rtu_can_id_amc << 4 | localB->pkt_id);
+  localB->pkt_id = static_cast<uint16_T>(rtu_dst_typ | localB->pkt_id);
 }
 
 // Output and update for referenced model: 'can_encoder'
 void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
-                 *rtu_status_tx, const ConfigurationParameters
-                 *rtu_ConfigurationParameters, BUS_CAN_MULTIPLE *rty_pck_tx)
+                 *rtu_status_tx, const ActuatorConfiguration
+                 *rtu_ConfigurationParameters, BUS_CAN_MULTIPLE *rty_pck_tx,
+                 B_can_encoder_c_T *localB)
 {
   BUS_CAN rtb_BusCreator_n_0[4];
   BUS_CAN rtb_BusCreator_hs;
@@ -57,14 +56,21 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
   uint8_T tmp2[2];
 
   // Outputs for Atomic SubSystem: '<Root>/CAN_Encoder'
+  for (i = 0; i < 8; i++) {
+    // BusCreator: '<S4>/Bus Creator' incorporates:
+    //   MATLAB Function: '<S4>/format_status_pck'
+
+    rtb_BusCreator_m.packet.PAYLOAD[i] = 0U;
+  }
+
   // MATLAB Function: '<S4>/format_status_pck' incorporates:
   //   BusCreator: '<S4>/Bus Creator'
 
   rtb_BusCreator_m.packet.PAYLOAD[0] = static_cast<uint8_T>
     (rtu_messages_tx->status.control_mode);
   rtb_BusCreator_m.packet.PAYLOAD[1] = 0U;
-  qY = 5U - rtu_ConfigurationParameters->CurLoopPID.shift_factor;
-  if (5U - rtu_ConfigurationParameters->CurLoopPID.shift_factor > 5U) {
+  qY = 5U - rtu_ConfigurationParameters->pids.currentPID.shift_factor;
+  if (5U - rtu_ConfigurationParameters->pids.currentPID.shift_factor > 5U) {
     qY = 0U;
   }
 
@@ -102,7 +108,6 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
       rtu_messages_tx->status.flags.ExternalFaultAsserted;
   }
 
-  rtb_BusCreator_m.packet.PAYLOAD[5] = 0U;
   rtb_BusCreator_m.packet.PAYLOAD[6] = 0U;
   rtb_BusCreator_m.packet.PAYLOAD[7] = 0U;
 
@@ -168,27 +173,35 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
   rtb_BusCreator_n.packet.PAYLOAD[6] = b_tmp[2];
   rtb_BusCreator_n.packet.PAYLOAD[7] = b_tmp[3];
 
-  // BusCreator: '<S4>/Bus Creator' incorporates:
+  // MATLAB Function: '<S8>/format_can_id' incorporates:
   //   Constant: '<S4>/Constant'
   //   Constant: '<S4>/Motor Control Streaming'
   //   Constant: '<S4>/TYPESTATUS'
-  //   Constant: '<S4>/length'
-  //   MATLAB Function: '<S8>/format_can_id'
 
-  can_encoder_format_can_id(1, CAN_ID_AMC, 3, &rtb_BusCreator_m.packet.ID);
+  can_encoder_format_can_id(1, CAN_ID_AMC, 3, &localB->sf_format_can_id_n);
+
+  // BusCreator: '<S4>/Bus Creator' incorporates:
+  //   BusCreator: '<S4>/Bus Creator1'
+  //   Constant: '<S4>/length'
+
   rtb_BusCreator_m.available = rtu_status_tx->status;
   rtb_BusCreator_m.length = 8U;
+  rtb_BusCreator_m.packet.ID = localB->sf_format_can_id_n.pkt_id;
 
-  // BusCreator: '<S2>/Bus Creator' incorporates:
+  // MATLAB Function: '<S5>/format_can_id' incorporates:
   //   Constant: '<S2>/Constant'
   //   Constant: '<S2>/Motor Control Streaming'
   //   Constant: '<S2>/TYPE2FOC'
-  //   Constant: '<S2>/length'
-  //   MATLAB Function: '<S5>/format_can_id'
 
-  can_encoder_format_can_id(1, CAN_ID_AMC, 0, &rtb_BusCreator_n.packet.ID);
+  can_encoder_format_can_id(1, CAN_ID_AMC, 0, &localB->sf_format_can_id);
+
+  // BusCreator: '<S2>/Bus Creator' incorporates:
+  //   BusCreator: '<S2>/Bus Creator1'
+  //   Constant: '<S2>/length'
+
   rtb_BusCreator_n.available = rtu_status_tx->foc;
   rtb_BusCreator_n.length = 8U;
+  rtb_BusCreator_n.packet.ID = localB->sf_format_can_id.pkt_id;
 
   // BusCreator: '<S3>/Bus Creator' incorporates:
   //   BusCreator: '<S3>/Bus Creator6'
@@ -219,10 +232,9 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
 }
 
 // Model initialize function
-void can_encoder_initialize(const char_T **rt_errorStatus)
+void can_encoder_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_can_encoder_T *const can_encoder_M)
 {
-  RT_MODEL_can_encoder_T *const can_encoder_M = &(can_encoder_MdlrefDW.rtm);
-
   // Registration code
 
   // initialize error status

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.19
+// Model version                  : 6.80
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:55 2024
+// C/C++ source code generated on : Mon Mar 11 16:50:34 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -28,7 +28,6 @@ struct B_FOCInnerLoop_T {
   real32_T Integrator;                 // '<S106>/Integrator'
   real32_T Switch;                     // '<S40>/Switch'
   real32_T Integrator_j;               // '<S52>/Integrator'
-  real32_T Sum3;                       // '<S1>/Sum3'
 };
 
 // Block states (default storage) for system '<Root>/FOC inner loop'
@@ -50,21 +49,15 @@ struct ZCE_FOCInnerLoop_T {
   ZCSigState FilterDifferentiatorTF_Reset_ZCE_o;// '<S45>/Filter Differentiator TF' 
 };
 
-// Invariant block signals for system '<Root>/FOC inner loop'
-struct ConstB_FOCInnerLoop_T {
-  real32_T Gain5;                      // '<S1>/Gain5'
-  real32_T Sum5;                       // '<S1>/Sum5'
-};
-
 extern void FOCInnerLoop_Init(DW_FOCInnerLoop_T *localDW);
 extern void FOCInnerLoop_Update(const ControlOuterOutputs *rtu_OuterOutputs,
   B_FOCInnerLoop_T *localB, DW_FOCInnerLoop_T *localDW);
-extern void FOCInnerLoop(const ConfigurationParameters
-  *rtu_ConfigurationParameters, const SensorsData *rtu_Sensors, const
-  EstimatedData *rtu_Estimates, const Targets *rtu_Targets, const
-  ControlOuterOutputs *rtu_OuterOutputs, ControlOutputs *rty_FOCOutputs,
-  B_FOCInnerLoop_T *localB, const ConstB_FOCInnerLoop_T *localC,
-  DW_FOCInnerLoop_T *localDW, ZCE_FOCInnerLoop_T *localZCE);
+extern void FOCInnerLoop(const SensorsData *rtu_Sensors, const
+  ActuatorConfiguration *rtu_ConfigurationParameters, const EstimatedData
+  *rtu_Estimates_Inport_3, const Targets *rtu_Targets_Inport_4, const
+  ControlOuterOutputs *rtu_OuterOutputs, FOCOutputs *rty_FOCOutputs,
+  B_FOCInnerLoop_T *localB, DW_FOCInnerLoop_T *localDW, ZCE_FOCInnerLoop_T
+  *localZCE);
 
 #endif                                 // RTW_HEADER_FOCInnerLoop_h_
 

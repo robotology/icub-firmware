@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 6.4
+// Model version                  : 6.21
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:26 2024
+// C/C++ source code generated on : Wed Mar  6 16:39:21 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,23 +20,6 @@
 #define RTW_HEADER_estimation_velocity_private_h_
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
-
-// Macros for accessing real-time model data structure
-#ifndef rtmGetErrorStatus
-#define rtmGetErrorStatus(rtm)         (*((rtm)->errorStatus))
-#endif
-
-#ifndef rtmSetErrorStatus
-#define rtmSetErrorStatus(rtm, val)    (*((rtm)->errorStatus) = (val))
-#endif
-
-#ifndef rtmGetErrorStatusPointer
-#define rtmGetErrorStatusPointer(rtm)  (rtm)->errorStatus
-#endif
-
-#ifndef rtmSetErrorStatusPointer
-#define rtmSetErrorStatusPointer(rtm, val) ((rtm)->errorStatus = (val))
-#endif
 
 extern const real32_T rtCP_pooled_Az3IVI54Pn7X[32];
 

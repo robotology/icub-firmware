@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.19
+// Model version                  : 6.80
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:55 2024
+// C/C++ source code generated on : Mon Mar 11 16:50:34 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,14 +21,6 @@
 #include "rtwtypes.h"
 #include "control_foc_types.h"
 #include "FOCInnerLoop.h"
-#include <cstring>
-
-extern "C"
-{
-
-#include "rt_nonfinite.h"
-
-}
 
 // Block signals for model 'control_foc'
 struct B_control_foc_c_T {
@@ -45,30 +37,17 @@ struct ZCE_control_foc_T {
   ZCE_FOCInnerLoop_T FOCinnerloop;     // '<Root>/FOC inner loop'
 };
 
-// Invariant block signals for model 'control_foc'
-struct ConstB_control_foc_h_T {
-  ConstB_FOCInnerLoop_T FOCinnerloop;  // '<Root>/FOC inner loop'
-};
-
-// Real-time Model Data Structure
-struct tag_RTM_control_foc_T {
-  const char_T **errorStatus;
-};
-
 struct MdlrefDW_control_foc_T {
   B_control_foc_c_T rtb;
   DW_control_foc_f_T rtdw;
-  RT_MODEL_control_foc_T rtm;
   ZCE_control_foc_T rtzce;
 };
 
 // Model reference registration function
-extern void control_foc_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_control_foc_T *const control_foc_M, B_control_foc_c_T *localB,
-  DW_control_foc_f_T *localDW, ZCE_control_foc_T *localZCE);
+extern void control_foc_initialize(ZCE_control_foc_T *localZCE);
 extern void control_foc_Init(DW_control_foc_f_T *localDW);
 extern void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
-  *rtu_FOCSlowInputs, ControlOutputs *rty_FOCOutputs, B_control_foc_c_T *localB,
+  *rtu_FocSlowInputs, FOCOutputs *rty_FOCOutputs, B_control_foc_c_T *localB,
   DW_control_foc_f_T *localDW, ZCE_control_foc_T *localZCE);
 
 //-

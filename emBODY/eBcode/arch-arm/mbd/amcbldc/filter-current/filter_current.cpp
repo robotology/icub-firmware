@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 6.3
+// Model version                  : 6.14
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:38 2024
+// C/C++ source code generated on : Mon Mar  4 13:07:41 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,7 +21,6 @@
 #include "rtwtypes.h"
 #include <cmath>
 #include <cstring>
-#include "filter_current_private.h"
 
 // Forward declaration for local functions
 static void filter_current_MedianFilterCG_resetImpl
@@ -33,7 +32,7 @@ static void filter_current_MedianFilterCG_trickleDownMin
 static void filter_current_MedianFilterCG_resetImpl
   (c_dsp_internal_MedianFilterCG_filter_current_T *obj)
 {
-  real32_T cnt1;
+  int32_T cnt1;
   real32_T cnt2;
 
   // Start for MATLABSystem: '<Root>/Median Filter'
@@ -45,26 +44,26 @@ static void filter_current_MedianFilterCG_resetImpl
 
   // Start for MATLABSystem: '<Root>/Median Filter'
   obj->pMidHeap = std::ceil((obj->pWinLen + 1.0F) / 2.0F);
-  cnt1 = (obj->pWinLen - 1.0F) / 2.0F;
-  if (cnt1 < 0.0F) {
-    obj->pMinHeapLength = std::ceil(cnt1);
+  cnt2 = (obj->pWinLen - 1.0F) / 2.0F;
+  if (cnt2 < 0.0F) {
+    obj->pMinHeapLength = std::ceil(cnt2);
   } else {
-    obj->pMinHeapLength = std::floor(cnt1);
+    obj->pMinHeapLength = std::floor(cnt2);
   }
 
-  cnt1 = obj->pWinLen / 2.0F;
-  if (cnt1 < 0.0F) {
-    obj->pMaxHeapLength = std::ceil(cnt1);
+  cnt2 = obj->pWinLen / 2.0F;
+  if (cnt2 < 0.0F) {
+    obj->pMaxHeapLength = std::ceil(cnt2);
   } else {
-    obj->pMaxHeapLength = std::floor(cnt1);
+    obj->pMaxHeapLength = std::floor(cnt2);
   }
 
-  cnt1 = 1.0F;
+  cnt1 = 1;
   cnt2 = obj->pWinLen;
   for (int32_T i = 0; i < 32; i++) {
     // Start for MATLABSystem: '<Root>/Median Filter'
     if (std::fmod(32.0F - static_cast<real32_T>(i), 2.0F) == 0.0F) {
-      obj->pPos[31 - i] = cnt1;
+      obj->pPos[31 - i] = static_cast<real32_T>(cnt1);
       cnt1++;
     } else {
       obj->pPos[31 - i] = cnt2;
@@ -102,8 +101,8 @@ static void filter_current_MedianFilterCG_trickleDownMax
 
     ind2 = i + obj->pMidHeap;
     tmp = obj->pHeap[static_cast<int32_T>(ind2) - 1];
-    if (!(obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(temp +
-           obj->pMidHeap) - 1]) - 1] < obj->pBuf[static_cast<int32_T>(tmp) - 1]))
+    if (obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(temp +
+          obj->pMidHeap) - 1]) - 1] >= obj->pBuf[static_cast<int32_T>(tmp) - 1])
     {
       exitg1 = true;
     } else {
@@ -152,9 +151,9 @@ static void filter_current_MedianFilterCG_trickleDownMin
 
     ind1 = i + obj->pMidHeap;
     tmp_0 = obj->pHeap[static_cast<int32_T>(ind1) - 1];
-    if (!(obj->pBuf[static_cast<int32_T>(tmp_0) - 1] < obj->pBuf
-          [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(tmp +
-           obj->pMidHeap) - 1]) - 1])) {
+    if (obj->pBuf[static_cast<int32_T>(tmp_0) - 1] >= obj->pBuf
+        [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(tmp +
+          obj->pMidHeap) - 1]) - 1]) {
       exitg1 = true;
     } else {
       if (u_tmp < 0.0F) {
@@ -189,15 +188,15 @@ void filter_current_Init(DW_filter_current_f_T *localDW)
 }
 
 // Output and update for referenced model: 'filter_current'
-void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
+void filter_current(const FOCOutputs *rtu_ControlOutputs, real32_T
                     *rty_FilteredCurrent, DW_filter_current_f_T *localDW)
 {
   c_dsp_internal_MedianFilterCG_filter_current_T *obj;
   int32_T vprev_tmp;
+  real32_T ind1;
   real32_T ind2;
   real32_T p;
   real32_T temp;
-  real32_T u_tmp;
   real32_T vprev;
   boolean_T exitg1;
   boolean_T flag;
@@ -212,7 +211,7 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
 
   vprev_tmp = static_cast<int32_T>(localDW->obj.pMID.pIdx) - 1;
   vprev = localDW->obj.pMID.pBuf[vprev_tmp];
-  localDW->obj.pMID.pBuf[vprev_tmp] = rtu_ControlOutputs->Iq_fbk.current;
+  localDW->obj.pMID.pBuf[vprev_tmp] = rtu_ControlOutputs->Iq_fbk;
   p = localDW->obj.pMID.pPos[static_cast<int32_T>(localDW->obj.pMID.pIdx) - 1];
   localDW->obj.pMID.pIdx++;
   if (localDW->obj.pMID.pWinLen + 1.0F == localDW->obj.pMID.pIdx) {
@@ -220,7 +219,7 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
   }
 
   if (p > localDW->obj.pMID.pMidHeap) {
-    if (vprev < rtu_ControlOutputs->Iq_fbk.current) {
+    if (vprev < rtu_ControlOutputs->Iq_fbk) {
       vprev = p - localDW->obj.pMID.pMidHeap;
       filter_current_MedianFilterCG_trickleDownMin(&localDW->obj.pMID, vprev *
         2.0F);
@@ -228,22 +227,22 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
       vprev = p - localDW->obj.pMID.pMidHeap;
       exitg1 = false;
       while ((!exitg1) && (vprev > 0.0F)) {
-        u_tmp = std::floor(vprev / 2.0F);
+        p = std::floor(vprev / 2.0F);
         flag = (obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>
                  (vprev + obj->pMidHeap) - 1]) - 1] < obj->pBuf
-                [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(u_tmp +
+                [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(p +
                   obj->pMidHeap) - 1]) - 1]);
         if (!flag) {
           exitg1 = true;
         } else {
-          p = vprev + obj->pMidHeap;
-          ind2 = u_tmp + obj->pMidHeap;
-          temp = obj->pHeap[static_cast<int32_T>(p) - 1];
-          obj->pHeap[static_cast<int32_T>(p) - 1] = obj->pHeap
+          ind1 = vprev + obj->pMidHeap;
+          ind2 = p + obj->pMidHeap;
+          temp = obj->pHeap[static_cast<int32_T>(ind1) - 1];
+          obj->pHeap[static_cast<int32_T>(ind1) - 1] = obj->pHeap
             [static_cast<int32_T>(ind2) - 1];
           obj->pHeap[static_cast<int32_T>(ind2) - 1] = temp;
-          obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(p) - 1])
-            - 1] = p;
+          obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(ind1) -
+            1]) - 1] = ind1;
           obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(ind2) -
             1]) - 1] = ind2;
           vprev = std::floor(vprev / 2.0F);
@@ -255,7 +254,7 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
       }
     }
   } else if (p < localDW->obj.pMID.pMidHeap) {
-    if (rtu_ControlOutputs->Iq_fbk.current < vprev) {
+    if (rtu_ControlOutputs->Iq_fbk < vprev) {
       vprev = p - localDW->obj.pMID.pMidHeap;
       filter_current_MedianFilterCG_trickleDownMax(&localDW->obj.pMID, vprev *
         2.0F);
@@ -263,38 +262,38 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
       vprev = p - localDW->obj.pMID.pMidHeap;
       exitg1 = false;
       while ((!exitg1) && (vprev < 0.0F)) {
-        u_tmp = vprev / 2.0F;
-        if (u_tmp < 0.0F) {
-          p = std::ceil(u_tmp);
+        p = vprev / 2.0F;
+        if (p < 0.0F) {
+          ind1 = std::ceil(p);
         } else {
-          p = -0.0F;
+          ind1 = -0.0F;
         }
 
-        flag = (obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(p
-                  + obj->pMidHeap) - 1]) - 1] < obj->pBuf[static_cast<int32_T>
-                (obj->pHeap[static_cast<int32_T>(vprev + obj->pMidHeap) - 1]) -
-                1]);
+        flag = (obj->pBuf[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>
+                 (ind1 + obj->pMidHeap) - 1]) - 1] < obj->pBuf
+                [static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(vprev +
+                  obj->pMidHeap) - 1]) - 1]);
         if (!flag) {
           exitg1 = true;
         } else {
-          if (u_tmp < 0.0F) {
-            p = std::ceil(u_tmp);
+          if (p < 0.0F) {
+            ind1 = std::ceil(p);
           } else {
-            p = -0.0F;
+            ind1 = -0.0F;
           }
 
-          p += obj->pMidHeap;
+          ind1 += obj->pMidHeap;
           ind2 = vprev + obj->pMidHeap;
-          temp = obj->pHeap[static_cast<int32_T>(p) - 1];
-          obj->pHeap[static_cast<int32_T>(p) - 1] = obj->pHeap
-            [static_cast<int32_T>(ind2) - 1];
+          temp = obj->pHeap[static_cast<int32_T>(ind1) - 1];
+          obj->pHeap[static_cast<int32_T>(ind1) - 1] = obj->pHeap[static_cast<
+            int32_T>(ind2) - 1];
           obj->pHeap[static_cast<int32_T>(ind2) - 1] = temp;
-          obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(p) - 1])
-            - 1] = p;
+          obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(ind1) -
+            1]) - 1] = ind1;
           obj->pPos[static_cast<int32_T>(obj->pHeap[static_cast<int32_T>(ind2) -
             1]) - 1] = ind2;
-          if (u_tmp < 0.0F) {
-            vprev = std::ceil(u_tmp);
+          if (p < 0.0F) {
+            vprev = std::ceil(p);
           } else {
             vprev = -0.0F;
           }
@@ -315,13 +314,15 @@ void filter_current(const ControlOutputs *rtu_ControlOutputs, MotorCurrent
     }
   }
 
-  vprev = localDW->obj.pMID.pBuf[static_cast<int32_T>(localDW->obj.pMID.pHeap[
+  ind1 = localDW->obj.pMID.pBuf[static_cast<int32_T>(localDW->obj.pMID.pHeap[
     static_cast<int32_T>(localDW->obj.pMID.pMidHeap) - 1]) - 1];
-  vprev += localDW->obj.pMID.pBuf[static_cast<int32_T>(localDW->obj.pMID.pHeap[
-    static_cast<int32_T>(localDW->obj.pMID.pMidHeap - 1.0F) - 1]) - 1];
-  rty_FilteredCurrent->current = vprev / 2.0F;
+  vprev = localDW->obj.pMID.pBuf[static_cast<int32_T>(localDW->obj.pMID.pHeap[
+    static_cast<int32_T>(localDW->obj.pMID.pMidHeap - 1.0F) - 1]) - 1] + ind1;
 
-  // End of MATLABSystem: '<Root>/Median Filter'
+  // SignalConversion generated from: '<Root>/Median Filter' incorporates:
+  //   MATLABSystem: '<Root>/Median Filter'
+  //
+  *rty_FilteredCurrent = vprev / 2.0F;
 }
 
 // Termination for referenced model: 'filter_current'
@@ -339,21 +340,6 @@ void filter_current_Term(DW_filter_current_f_T *localDW)
   }
 
   // End of Terminate for MATLABSystem: '<Root>/Median Filter'
-}
-
-// Model initialize function
-void filter_current_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_filter_current_T *const filter_current_M, DW_filter_current_f_T
-  *localDW)
-{
-  // Registration code
-
-  // initialize error status
-  rtmSetErrorStatusPointer(filter_current_M, rt_errorStatus);
-
-  // states (dwork)
-  (void) std::memset(static_cast<void *>(localDW), 0,
-                     sizeof(DW_filter_current_f_T));
 }
 
 //

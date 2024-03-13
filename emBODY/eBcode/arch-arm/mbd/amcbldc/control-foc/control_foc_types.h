@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.19
+// Model version                  : 6.80
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:55 2024
+// C/C++ source code generated on : Mon Mar 11 16:50:34 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,13 +19,66 @@
 #ifndef RTW_HEADER_control_foc_types_h_
 #define RTW_HEADER_control_foc_types_h_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_JointPositions_
-#define DEFINED_TYPEDEF_FOR_JointPositions_
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
 
-struct JointPositions
+struct EstimatedData
 {
-  // joint positions
+  // velocity
+  real32_T velocity;
+
+  // filtered motor current
+  real32_T Iq_filtered;
+
+  // motor temperature
+  real32_T motor_temperature;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Targets_
+#define DEFINED_TYPEDEF_FOR_Targets_
+
+struct Targets
+{
   real32_T position;
+  real32_T velocity;
+  real32_T current;
+  real32_T voltage;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+
+struct EstimationConfiguration
+{
+  real32_T environment_temperature;
+  real32_T current_rms_lambda;
+  EstimationVelocityModes velocity_est_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
+#define DEFINED_TYPEDEF_FOR_DriverSensors_
+
+struct DriverSensors
+{
+  // power supply voltage
+  real32_T Vcc;
 };
 
 #endif
@@ -47,133 +100,25 @@ struct MotorSensors
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_SupplyVoltage_
-#define DEFINED_TYPEDEF_FOR_SupplyVoltage_
-
-struct SupplyVoltage
-{
-  real32_T voltage;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_SensorsData_
 #define DEFINED_TYPEDEF_FOR_SensorsData_
 
 struct SensorsData
 {
   // position encoders
-  JointPositions jointpositions;
-
-  // motor probes
+  real32_T position;
+  DriverSensors driversensors;
   MotorSensors motorsensors;
-
-  // supply probes
-  SupplyVoltage supplyvoltagesensors;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
 
-typedef enum {
-  ControlModes_NotConfigured = 0,      // Default value
-  ControlModes_Idle,
-  ControlModes_Position,
-  ControlModes_PositionDirect,
-  ControlModes_Current,
-  ControlModes_Velocity,
-  ControlModes_Voltage,
-  ControlModes_Torque,
-  ControlModes_HwFaultCM
-} ControlModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
-
-struct Flags
+struct GlobalConfiguration
 {
-  // control mode
-  ControlModes control_mode;
-  boolean_T enable_sending_msg_status;
-  boolean_T fault_button;
-  boolean_T overcurrent;
-  boolean_T enable_thermal_protection;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfig_
-#define DEFINED_TYPEDEF_FOR_MotorConfig_
-
-struct MotorConfig
-{
-  // Angular offset in degrees between the stator windings and the hall sensors. 
-  real32_T hall_sens_offset;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_torque_sens;
-  boolean_T use_index;
-  boolean_T enable_verbosity;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  real32_T Kbemf;
-  real32_T Rphase;
-  real32_T Imin;
-  real32_T Imax;
-  real32_T Vmax;
-  real32_T resistance;
-  real32_T inductance;
-  real32_T thermal_resistance;
-  real32_T thermal_time_constant;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationConfig_
-#define DEFINED_TYPEDEF_FOR_EstimationConfig_
-
-struct EstimationConfig
-{
-  EstimationVelocityModes velocity_mode;
-
-  // Forgetting factor in [0, 1] for exponential weighting-based estimation of RMS current value 
-  real32_T current_rms_lambda;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_PIDConfig_
-#define DEFINED_TYPEDEF_FOR_PIDConfig_
-
-struct PIDConfig
-{
-  real32_T OutMax;
-  real32_T OutMin;
-  real32_T P;
-  real32_T I;
-  real32_T D;
-  real32_T N;
-  real32_T I0;
-  real32_T D0;
-  uint8_T shift_factor;
+  EstimationConfiguration estimation;
 };
 
 #endif
@@ -183,30 +128,8 @@ struct PIDConfig
 
 struct Thresholds
 {
-  // It shall be greater than hardwareJntPosMin
-  real32_T jntPosMin;
-
-  // It shall be smaller than hardwareJntPosMax
-  real32_T jntPosMax;
-
-  // Imposed by hardware constraint
-  real32_T hardwareJntPosMin;
-
-  // Imposed by hardware constraint
-  real32_T hardwareJntPosMax;
-
-  // If robotMin == rotorMax == 0, there's no check
-  real32_T rotorPosMin;
-
-  // If robotMin == rotorMax == 0, there's no check
-  real32_T rotorPosMax;
-
   // Can be only non-negative
   real32_T jntVelMax;
-
-  // Timeout on reception of velocity setpoint
-  // Can be only non-negative
-  uint32_T velocityTimeout;
 
   // Current that can be kept for an indefinite period of time w/o damaging the motor
   // Expressed in [A] as all the internal computations are done this way
@@ -234,93 +157,100 @@ struct Thresholds
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ConfigurationParameters_
-#define DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
 
-struct ConfigurationParameters
+typedef enum {
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_HwFaultCM
+} ControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PID_
+#define DEFINED_TYPEDEF_FOR_PID_
+
+struct PID
 {
-  MotorConfig motorconfig;
-  EstimationConfig estimationconfig;
-  PIDConfig CurLoopPID;
-  PIDConfig PosLoopPID;
-  PIDConfig VelLoopPID;
-  PIDConfig DirLoopPID;
+  ControlModes type;
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+  uint8_T shift_factor;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+
+struct PIDsConfiguration
+{
+  PID currentPID;
+  PID velocityPID;
+  PID positionPID;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+
+struct MotorConfigurationExternal
+{
+  boolean_T enable_verbosity;
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_torque_sens;
+  uint8_T encoder_tolerance;
+  uint8_T pole_pairs;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  boolean_T use_index;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
+#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
+
+struct MotorConfiguration
+{
+  MotorConfigurationExternal externals;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Imin;
+  real32_T Imax;
+  real32_T Vmax;
+  real32_T resistance;
+  real32_T inductance;
+  real32_T thermal_resistance;
+  real32_T thermal_time_constant;
+  real32_T hall_sensors_offset;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+
+struct ActuatorConfiguration
+{
   Thresholds thresholds;
-  real32_T environment_temperature;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_JointVelocities_
-#define DEFINED_TYPEDEF_FOR_JointVelocities_
-
-struct JointVelocities
-{
-  // joint velocities
-  real32_T velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
-#define DEFINED_TYPEDEF_FOR_MotorCurrent_
-
-struct MotorCurrent
-{
-  // motor current
-  real32_T current;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorTemperature_
-#define DEFINED_TYPEDEF_FOR_MotorTemperature_
-
-struct MotorTemperature
-{
-  // motor temperature
-  real32_T temperature;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // velocity
-  JointVelocities jointvelocities;
-
-  // filtered motor current
-  MotorCurrent Iq_filtered;
-
-  // motor temperature
-  MotorTemperature motor_temperature;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorVoltage_
-#define DEFINED_TYPEDEF_FOR_MotorVoltage_
-
-struct MotorVoltage
-{
-  // motor voltage
-  real32_T voltage;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
-
-struct Targets
-{
-  JointPositions jointpositions;
-  JointVelocities jointvelocities;
-  MotorCurrent motorcurrent;
-  MotorVoltage motorvoltage;
+  PIDsConfiguration pids;
+  MotorConfiguration motor;
 };
 
 #endif
@@ -334,7 +264,7 @@ struct ControlOuterOutputs
   boolean_T cur_en;
   boolean_T out_en;
   boolean_T pid_reset;
-  MotorCurrent motorcurrent;
+  real32_T motorcurrent;
   real32_T current_limiter;
 };
 
@@ -345,19 +275,19 @@ struct ControlOuterOutputs
 
 struct FOCSlowInputs
 {
-  Flags flags;
-  ConfigurationParameters configurationparameters;
-  EstimatedData estimateddata;
+  GlobalConfiguration global_configuration;
+  ActuatorConfiguration actuator_configuration;
+  EstimatedData estimated_data;
   Targets targets;
-  ControlOuterOutputs controlouteroutputs;
+  ControlOuterOutputs control_outer_outputs;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOutputs_
+#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
+#define DEFINED_TYPEDEF_FOR_FOCOutputs_
 
-struct ControlOutputs
+struct FOCOutputs
 {
   // control effort (quadrature)
   real32_T Vq;
@@ -366,23 +296,19 @@ struct ControlOutputs
   real32_T Vabc[3];
 
   // quadrature current
-  MotorCurrent Iq_fbk;
+  real32_T Iq_fbk;
 
   // direct current
-  MotorCurrent Id_fbk;
+  real32_T Id_fbk;
 
   // RMS of Iq
-  MotorCurrent Iq_rms;
+  real32_T Iq_rms;
 
   // RMS of Id
-  MotorCurrent Id_rms;
+  real32_T Id_rms;
 };
 
 #endif
-
-// Forward declaration for rtModel
-typedef struct tag_RTM_control_foc_T RT_MODEL_control_foc_T;
-
 #endif                                 // RTW_HEADER_control_foc_types_h_
 
 //

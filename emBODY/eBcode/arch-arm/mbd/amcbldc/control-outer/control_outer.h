@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_outer'.
 //
-// Model version                  : 6.3
+// Model version                  : 6.35
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:07 2024
+// C/C++ source code generated on : Thu Mar  7 10:07:02 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,7 +20,6 @@
 #define RTW_HEADER_control_outer_h_
 #include "rtwtypes.h"
 #include "control_outer_types.h"
-#include <cstring>
 #include "zero_crossing_types.h"
 
 // Block signals for model 'control_outer'
@@ -58,29 +57,21 @@ struct ZCE_control_outer_T {
   ZCSigState FilterDifferentiatorTF_Reset_ZCE_e;// '<S147>/Filter Differentiator TF' 
 };
 
-// Real-time Model Data Structure
-struct tag_RTM_control_outer_T {
-  const char_T **errorStatus;
-};
-
 struct MdlrefDW_control_outer_T {
   B_control_outer_c_T rtb;
   DW_control_outer_f_T rtdw;
-  RT_MODEL_control_outer_T rtm;
   ZCE_control_outer_T rtzce;
 };
 
 // Model reference registration function
-extern void control_outer_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_control_outer_T *const control_outer_M, B_control_outer_c_T *localB,
-  DW_control_outer_f_T *localDW, ZCE_control_outer_T *localZCE);
+extern void control_outer_initialize(ZCE_control_outer_T *localZCE);
 extern void control_outer_Init(DW_control_outer_f_T *localDW);
 extern void control_outer_Enable(DW_control_outer_f_T *localDW);
 extern void control_outer_Disable(B_control_outer_c_T *localB,
   DW_control_outer_f_T *localDW);
-extern void control_outer(const Flags *rtu_Flags, const ConfigurationParameters *
-  rtu_ConfigurationParameters, const Targets *rtu_Targets, const SensorsData
-  *rtu_Sensors, const EstimatedData *rtu_Estimates, ControlOuterOutputs
+extern void control_outer(const Flags *rtu_Flags, const ActuatorConfiguration
+  *rtu_ConfigurationParameters, const EstimatedData *rtu_Estimates, const
+  SensorsData *rtu_Sensors, const Targets *rtu_Targets, ControlOuterOutputs
   *rty_OuterOutputs, B_control_outer_c_T *localB, DW_control_outer_f_T *localDW,
   ZCE_control_outer_T *localZCE);
 

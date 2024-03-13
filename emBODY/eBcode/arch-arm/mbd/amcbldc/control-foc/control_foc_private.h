@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.19
+// Model version                  : 6.80
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:55 2024
+// C/C++ source code generated on : Mon Mar 11 16:50:34 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,34 +20,12 @@
 #define RTW_HEADER_control_foc_private_h_
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
-#include "control_foc.h"
 #include "control_foc_types.h"
-
-// Macros for accessing real-time model data structure
-#ifndef rtmGetErrorStatus
-#define rtmGetErrorStatus(rtm)         (*((rtm)->errorStatus))
-#endif
-
-#ifndef rtmSetErrorStatus
-#define rtmSetErrorStatus(rtm, val)    (*((rtm)->errorStatus) = (val))
-#endif
-
-#ifndef rtmGetErrorStatusPointer
-#define rtmGetErrorStatusPointer(rtm)  (rtm)->errorStatus
-#endif
-
-#ifndef rtmSetErrorStatusPointer
-#define rtmSetErrorStatusPointer(rtm, val) ((rtm)->errorStatus = (val))
-#endif
 
 extern const real32_T rtCP_pooled_IgamRjjg0YgF[6];
 
 #define rtCP_IaIbIc0_Gain              rtCP_pooled_IgamRjjg0YgF  // Computed Parameter: rtCP_IaIbIc0_Gain
                                                                  //  Referenced by: '<S1>/Ia+Ib+Ic=0'
-
-
-// Invariant block signals (default storage)
-extern const ConstB_control_foc_h_T control_foc_ConstB;
 
 #endif                                 // RTW_HEADER_control_foc_private_h_
 

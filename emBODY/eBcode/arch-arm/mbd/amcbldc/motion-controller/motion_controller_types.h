@@ -3,33 +3,25 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: can_decoder_types.h
+// File: motion_controller_types.h
 //
-// Code generated for Simulink model 'can_decoder'.
+// Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 6.115
+// Model version                  : 2.239
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Mar  7 16:12:35 2024
+// C/C++ source code generated on : Wed Mar 13 14:50:20 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_can_decoder_types_h_
-#define RTW_HEADER_can_decoder_types_h_
+#ifndef RTW_HEADER_motion_controller_types_h_
+#define RTW_HEADER_motion_controller_types_h_
 #include "rtwtypes.h"
-#include "can_decoder_types.h"
 
 // Includes for objects with custom storage classes
 #include "rtw_defines.h"
-
-//
-//  Constraints for division operations in dimension variants
-
-#if (1 == 0) || ((CAN_MAX_NUM_PACKETS % 1) != 0)
-# error "The preprocessor definition '1' must not be equal to zero and     the division of 'CAN_MAX_NUM_PACKETS' by '1' must not have a remainder."
-#endif
 
 //
 //  Registered constraints for dimension variants
@@ -38,58 +30,8 @@
 # error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be greater than '0'"
 #endif
 
-#if CAN_MAX_NUM_PACKETS <= 0
-# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be greater than '0'"
-#endif
-
-#if (CAN_MAX_NUM_PACKETS+1) <= MAX_EVENTS_PER_TICK
-# error "The preprocessor definition '(CAN_MAX_NUM_PACKETS+1)' must be greater than 'MAX_EVENTS_PER_TICK'"
-#endif
-
 #if MAX_EVENTS_PER_TICK >= 16
 # error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be less than '16'"
-#endif
-
-#if CAN_MAX_NUM_PACKETS >= 16
-# error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be less than '16'"
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
-
-// Fields of a transmitted CAN packet.
-struct BUS_CAN_PACKET
-{
-  // ID of the CAN packet.
-  uint16_T ID;
-
-  // PAYLOAD of the CAN packet.
-  uint8_T PAYLOAD[8];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_
-
-struct BUS_CAN
-{
-  // If true, the packet is available to be processed.
-  boolean_T available;
-  uint8_T length;
-  BUS_CAN_PACKET packet;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-
-struct BUS_CAN_MULTIPLE
-{
-  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
-};
-
 #endif
 
 #ifndef DEFINED_TYPEDEF_FOR_Thresholds_
@@ -224,91 +166,104 @@ struct ActuatorConfiguration
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_CANClassTypes_
-#define DEFINED_TYPEDEF_FOR_CANClassTypes_
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
 
 typedef enum {
-  CANClassTypes_Motor_Control_Command = 0,// Default value
-  CANClassTypes_Motor_Control_Streaming = 1,
-  CANClassTypes_Analog_Sensors_Command = 2,
-  CANClassTypes_Skin_Sensor_Streaming = 4,
-  CANClassTypes_Inertial_Sensor_Streaming = 5,
-  CANClassTypes_Future_Use = 6,
-  CANClassTypes_Management_Bootloader = 7
-} CANClassTypes;
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_ID_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_ID_RX_
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
 
-struct BUS_CAN_ID_RX
+struct EstimationConfiguration
 {
-  // 3 bits defining the message class type.
-  CANClassTypes CLS;
-
-  // 4 bits defining the source ID.
-  uint8_T SRC;
-
-  // 4 bits definint the destination ID or the message sub-type.
-  uint8_T DST_TYP;
+  real32_T environment_temperature;
+  real32_T current_rms_lambda;
+  EstimationVelocityModes velocity_est_mode;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_CMD_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_CMD_
+#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
 
-struct BUS_CAN_CMD
+struct GlobalConfiguration
 {
-  // 1 bits for motor selector.
-  boolean_T M;
-
-  // 7 bits defining the operational code of the command.
-  uint8_T OPC;
+  EstimationConfiguration estimation;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PAYLOAD_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_PAYLOAD_RX_
+#ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
+#define DEFINED_TYPEDEF_FOR_DriverSensors_
 
-struct BUS_CAN_PAYLOAD_RX
+struct DriverSensors
 {
-  // Actual length of the total PAYLOAD field.
-  uint8_T LEN;
-  BUS_CAN_CMD CMD;
-
-  // 8 bytes for the command argument in order to account also message of type streaming. 
-  uint8_T ARG[8];
+  // power supply voltage
+  real32_T Vcc;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_RX_
+#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
+#define DEFINED_TYPEDEF_FOR_MotorSensors_
 
-// Fields of a received CAN packet.
-struct BUS_CAN_PACKET_RX
+struct MotorSensors
 {
-  // ID of the CAN packet.
-  BUS_CAN_ID_RX ID;
+  real32_T Iabc[3];
 
-  // PAYLOAD of the CAN packet.
-  BUS_CAN_PAYLOAD_RX PAYLOAD;
+  // electrical angle = angle * pole_pairs
+  real32_T angle;
+  real32_T temperature;
+  real32_T voltage;
+  real32_T current;
+  uint8_T hallABC;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_RX_
+#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
+#define DEFINED_TYPEDEF_FOR_SensorsData_
 
-// Specifies the CAN input.
-struct BUS_CAN_RX
+struct SensorsData
 {
-  // If true, the packet is available to be processed.
-  boolean_T available;
-  BUS_CAN_PACKET_RX packet;
+  // position encoders
+  real32_T position;
+  DriverSensors driversensors;
+  MotorSensors motorsensors;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocity
+  real32_T velocity;
+
+  // filtered motor current
+  real32_T Iq_filtered;
+
+  // motor temperature
+  real32_T motor_temperature;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ExternalFlags_
+#define DEFINED_TYPEDEF_FOR_ExternalFlags_
+
+struct ExternalFlags
+{
+  // External Fault Button (1 == pressed)
+  boolean_T fault_button;
 };
 
 #endif
@@ -368,62 +323,86 @@ struct ReceivedEvents
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_CANErrorTypes_
-#define DEFINED_TYPEDEF_FOR_CANErrorTypes_
+#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
 
-typedef enum {
-  CANErrorTypes_No_Error = 0,          // Default value
-  CANErrorTypes_Packet_Not4Us,
-  CANErrorTypes_Packet_Unrecognized,
-  CANErrorTypes_Packet_Malformed,
-  CANErrorTypes_Packet_MultiFunctionsDetected,
-  CANErrorTypes_Mode_Unrecognized
-} CANErrorTypes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
-#define DEFINED_TYPEDEF_FOR_MCControlModes_
-
-typedef enum {
-  MCControlModes_Idle = 0,             // Default value
-  MCControlModes_OpenLoop = 80,
-  MCControlModes_SpeedVoltage = 10,
-  MCControlModes_SpeedCurrent = 11,
-  MCControlModes_Current = 6,
-  MCControlModes_NotConfigured = 176,
-  MCControlModes_HWFault = 160
-} MCControlModes;
+struct ControlOuterOutputs
+{
+  boolean_T vel_en;
+  boolean_T cur_en;
+  boolean_T out_en;
+  boolean_T pid_reset;
+  real32_T motorcurrent;
+  real32_T current_limiter;
+};
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MCOPC_
-#define DEFINED_TYPEDEF_FOR_MCOPC_
+#ifndef DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+#define DEFINED_TYPEDEF_FOR_FOCSlowInputs_
 
-typedef enum {
-  MCOPC_Set_Control_Mode = 9,          // Default value
-  MCOPC_Set_Current_Limit = 72,
-  MCOPC_Set_Current_PID = 101,
-  MCOPC_Set_Velocity_PID = 105,
-  MCOPC_Set_Motor_Config = 119
-} MCOPC;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MCStreaming_
-#define DEFINED_TYPEDEF_FOR_MCStreaming_
-
-typedef enum {
-  MCStreaming_Desired_Targets = 15,    // Default value
-  MCStreaming_FOC = 0
-} MCStreaming;
+struct FOCSlowInputs
+{
+  GlobalConfiguration global_configuration;
+  ActuatorConfiguration actuator_configuration;
+  EstimatedData estimated_data;
+  Targets targets;
+  ControlOuterOutputs control_outer_outputs;
+};
 
 #endif
 
-// Forward declaration for rtModel
-typedef struct tag_RTM_can_decoder_T RT_MODEL_can_decoder_T;
+#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
+#define DEFINED_TYPEDEF_FOR_HardwareFaults_
 
-#endif                                 // RTW_HEADER_can_decoder_types_h_
+struct HardwareFaults
+{
+  boolean_T overcurrent;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
+
+struct Flags
+{
+  boolean_T enable_sending_msg_status;
+  HardwareFaults hw_faults;
+  boolean_T enable_thermal_protection;
+
+  // control mode
+  ControlModes control_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
+#define DEFINED_TYPEDEF_FOR_FOCOutputs_
+
+struct FOCOutputs
+{
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
+  real32_T Vabc[3];
+
+  // quadrature current
+  real32_T Iq_fbk;
+
+  // direct current
+  real32_T Id_fbk;
+
+  // RMS of Iq
+  real32_T Iq_rms;
+
+  // RMS of Id
+  real32_T Id_rms;
+};
+
+#endif
+#endif                                 // RTW_HEADER_motion_controller_types_h_
 
 //
 // File trailer for generated code.
