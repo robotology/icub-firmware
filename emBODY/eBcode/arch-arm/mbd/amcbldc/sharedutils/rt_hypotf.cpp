@@ -3,28 +3,20 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: rt_hypotf_snf.cpp
+// File: rt_hypotf.cpp
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 5.1
+// Model version                  : 6.19
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Sep 20 16:39:02 2023
+// C/C++ source code generated on : Mon Mar  4 13:07:25 2024
 //
 #include "rtwtypes.h"
-#include "rt_hypotf_snf.h"
+#include "rt_hypotf.h"
 #include <cmath>
-
-extern "C"
-{
-
-#include "rt_nonfinite.h"
-
-}
-
 #include "mw_cmsis.h"
 
-real32_T rt_hypotf_snf(real32_T u0, real32_T u1)
+real32_T rt_hypotf(real32_T u0, real32_T u1)
 {
   real32_T a;
   real32_T b;
@@ -40,8 +32,6 @@ real32_T rt_hypotf_snf(real32_T u0, real32_T u1)
     b /= a;
     mw_arm_sqrt_f32(b * b + 1.0F, &tmp);
     y = tmp * a;
-  } else if (rtIsNaNF(b)) {
-    y = (rtNaNF);
   } else {
     y = a * 1.41421354F;
   }

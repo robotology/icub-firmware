@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_RX'.
 //
-// Model version                  : 7.5
+// Model version                  : 6.22
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Jan 15 18:17:08 2024
+// C/C++ source code generated on : Wed Sep 20 16:37:54 2023
 //
 #ifndef RTWTYPES_H
 #define RTWTYPES_H
