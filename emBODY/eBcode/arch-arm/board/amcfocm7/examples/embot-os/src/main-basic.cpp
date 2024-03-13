@@ -22,15 +22,19 @@
 
 #include "embot_hw_bsp_amcfocm7.h"
 
+#include "embot_app_scope.h"
+
 #include <vector>
 
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 
+embot::app::scope::Signal *signal {nullptr};
 
 
 constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
+void ON(){};
 
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {   
@@ -42,6 +46,10 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     
     //embot::core::TimeFormatter tf(embot::core::now());        
     
+    constexpr embot::app::scope::SignalEViewer::Config cc{ON, embot::app::scope::SignalEViewer::Config::LABEL::one};
+    signal = new embot::app::scope::SignalEViewer(cc);
+    
+    
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
@@ -49,6 +57,54 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
 
 }
 
+void compute()
+{
+    static constexpr size_t N {10}; 
+    static constexpr size_t M {10};
+    static float data[N][M] = {0};
+    
+    std::memset(data, 0, sizeof(data));
+    
+    for(size_t n=0; n<N; n++)
+    {
+        for(size_t m=0; m<M; m++)
+        {
+            data[n][m] = 0.1*static_cast<float>(n+m)*(data[n][m] + 1.0f);
+            data[std::max(N, m)][std::max(M, n)] = data[n][m] * data[n][m];
+        }        
+    }
+    
+}
+
+void compute2()
+{
+    static constexpr size_t N {10}; 
+    static constexpr size_t M {10};
+    static float data[N][M] = {0};
+    
+    std::memset(data, 0, sizeof(data));
+    
+    for(size_t n=0; n<N; n++)
+    for(size_t m=0; m<M; m++)
+        data[n][m] = 0.1 * static_cast<float>(n) * static_cast<float>(m);
+    
+    for(size_t n=0; n<N; n++)
+    {
+        for(size_t m=0; m<M; m++)
+        {
+            data[n][m] = std::sin(0.1*static_cast<float>(n+m)*(data[n][m] + 1.0f));
+            data[std::max(N, m)][std::max(M, n)] = data[n][m] * data[n][m];
+        }        
+    }
+    
+}
+
+
+void testduration()
+{
+//    embot::hw::sys::delay(50);
+    compute2();
+}
 
 void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {   
@@ -58,9 +114,14 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     }
 
     if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
-    {      
+    { 
+        signal->on();   
+        testduration();   
+        signal->off();    
+        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
+        embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));  
+                  
     }
     
 

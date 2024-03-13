@@ -55,9 +55,8 @@ bool embot::hw::bsp::DRIVER::init(const embot::hw::Config &config)
     cfg.tick1ms_get = _get1millitick;       
     stm32hal_config(&cfg);
     
-    // but start it in a special way
-    
-    embot::hw::dualcore::start2();
+    // but init it in a special way    
+    embot::hw::dualcore::init();
     
     return true;    
 }

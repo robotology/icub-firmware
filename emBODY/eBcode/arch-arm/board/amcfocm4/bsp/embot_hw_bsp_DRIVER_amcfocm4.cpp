@@ -60,7 +60,7 @@ bool embot::hw::bsp::DRIVER::init(const embot::hw::Config &config)
     
     
     // and then, in here we do what we must
-    embot::hw::dualcore::start2();
+    embot::hw::dualcore::init();
     
     return true;    
 }

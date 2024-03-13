@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -340,7 +340,7 @@
               <MiscControls>-Ddualcore_BOOT_cm7master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCFOCM7 STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -558,6 +558,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -592,6 +602,11 @@
               <FileName>embot_hw_bsp_gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32h7xx-cm4-cm7-gated.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1035,7 +1050,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1061,7 +1076,7 @@
               <MiscControls>-Ddualcore_BOOT_cm4master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCFOCM7 STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\bsp;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1279,6 +1294,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_scope.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1313,6 +1338,11 @@
               <FileName>embot_hw_bsp_gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_bsp_gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32h7xx-cm4-cm7-gated.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\bsp\system_stm32h7xx-cm4-cm7-gated.c</FilePath>
             </File>
           </Files>
         </Group>
