@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.16
+// Model version                  : 5.12
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Jan 15 18:18:06 2024
+// C/C++ source code generated on : Wed Sep 20 16:38:40 2023
 //
 extern "C"
 {
