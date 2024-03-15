@@ -661,17 +661,27 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             bool itisaflashaddress = embot::hw::flash::isvalid(address);
             if(false == itisaflashaddress)
             {
-#if defined(TEST_prog_mode)
+                #if defined(TEST_prog_mode)
                 snprintf(debug_print, sizeof(debug_print), "dropping non flash chunk adr = 0x%x, size = %d", address, size);
                 embot::core::print(debug_print);
-#endif                    
+                #endif
+                
                 // i just drop the action because it must be a ram address
                 // but i increment the number of processed packets
-                ++s_proc_PROG_rxpackets;
-                // and force a return w/ no error
+
+                // Commenting out line 678 and adding 683 fixes the programming result of AMC cm7 and cm4 cores;
+                // leaving it causes an error message even if the programming went well
+                // see :
+                //  - https://github.com/robotology/icub-main/issues/950
+                //  
+                
+                //++s_proc_PROG_rxpackets;                // and force a return w/ no error
                 break;
             }
-            
+            else
+            {
+                ++s_proc_PROG_rxpackets;
+            }
 
             const embot::hw::flash::Partition& pp = embot::hw::sys::partition(address);
             
