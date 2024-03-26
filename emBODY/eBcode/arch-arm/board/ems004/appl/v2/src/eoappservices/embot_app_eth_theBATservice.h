@@ -95,7 +95,7 @@ public:
   static constexpr eOas_battery_status_t defaultBATstatus{
       .timedvalue = {.age = 0,
                      .temperature = 0,
-                     //.status = 0,
+                     .status = 0,
                      .voltage = 0,
                      .current = 0,
                      .charge = 0}};

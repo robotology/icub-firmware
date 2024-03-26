@@ -24,9 +24,6 @@ void Display_uOLED_init(){
 
 
 void Display_uOLED_128_G2(){
-  if(mean.V_BATTERY > Battery_high)       {Battery_charge=100;}
-  else if(mean.V_BATTERY < Battery_low)   {Battery_charge=0;}
-  else                                    {Battery_charge = 100*(mean.V_BATTERY-Battery_low)/(Battery_high-Battery_low);}
   
   //uOLED_Parameters[0] 
   //uOLED_Parameters[1] 
