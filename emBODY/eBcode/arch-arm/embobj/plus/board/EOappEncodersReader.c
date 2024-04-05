@@ -115,7 +115,7 @@ static eObool_t s_eo_configure_SPI_encoders(EOappEncReader *p);
 
 static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOencoderreader_errortype_t *error);
 static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencoderreader_errortype_t *error);
-static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error);
+static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(uint8_t jomo, hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error);
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOencoderreader_errortype_t *error);
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN3(uint32_t *valueraw, eOencoderreader_errortype_t *error);
 
@@ -664,7 +664,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &position, &diagn))
                 {
                     // check validity for aksim2
-                    if(eobool_true == s_eo_appEncReader_IsValidValue_AKSIM2(&diagn, &prop.valueinfo->errortype))
+                    if(eobool_true == s_eo_appEncReader_IsValidValue_AKSIM2(jomo, &diagn, &prop.valueinfo->errortype))
                     {
                         // rescale the position value of the position to icubdegrees
                         prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(position, jomo, (eOmc_position_t)prop.descriptor->pos);
@@ -1370,7 +1370,7 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencode
     return eobool_true;
 }
 
-static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error)
+static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(uint8_t jomo, hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error)
 {
     // in case of errors we return false. Initially we assume no errors
     eObool_t ret = eobool_true;
@@ -1379,7 +1379,7 @@ static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(hal_spiencoder_diagnostic_
     eOerrmanDescriptor_t errdes = {0};
     errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress        = 0;
-    errdes.par16                = 0;
+    errdes.par16                = jomo;
     errdes.par64                = (uint64_t) (diag->info.aksim2_status_crc) << 32;
 
     // In case of errors we send human readable diagnostics messages
