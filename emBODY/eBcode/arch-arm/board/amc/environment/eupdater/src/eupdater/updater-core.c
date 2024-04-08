@@ -73,7 +73,10 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-//#define TEST_prog_mode
+#undef TEST_prog_mode
+#if defined(TEST_prog_mode)
+#define TEST_prog_mode_extracheck
+#endif // TEST_prog_mode
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -655,32 +658,28 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             size_t size = (cmd->size[0]) | (cmd->size[1] << 8);
             uint8_t *data = &cmd->data[0];
             
-            // notice that address may be a ram address. in such a case we must not do anything
-            // but we need to send a ack.
-           
+            // if we dont have a valid flash address, i discard ...
+            // explanation
+            // the .hex files sometimes contain non FLASH data (e.g., RAM segments).
+            // The sender of uprot_OPC_PROG_DATA commands (in our case FirmwareUpdater) should filter them out, 
+            // so this code should never treat non FLASH data. BUT we must be fail-safe so in here we shall
+            // - discard the invalid uprot_OPC_PROG_DATA command,
+            // - increase the s_proc_PROG_rxpackets counter   
+            // - return a OK result
+                   
             bool itisaflashaddress = embot::hw::flash::isvalid(address);
             if(false == itisaflashaddress)
             {
-                #if defined(TEST_prog_mode)
+#if defined(TEST_prog_mode)
                 snprintf(debug_print, sizeof(debug_print), "dropping non flash chunk adr = 0x%x, size = %d", address, size);
                 embot::core::print(debug_print);
-                #endif
-                
+#endif                    
                 // i just drop the action because it must be a ram address
                 // but i increment the number of processed packets
-
-                // Commenting out line 678 and adding 683 fixes the programming result of AMC cm7 and cm4 cores;
-                // leaving it causes an error message even if the programming went well
-                // see :
-                //  - https://github.com/robotology/icub-main/issues/950
-                //  
-                
-                //++s_proc_PROG_rxpackets;                // and force a return w/ no error
-                break;
-            }
-            else
-            {
                 ++s_proc_PROG_rxpackets;
+                // and force a return w/ no error
+                reply->res = uprot_RES_OK;
+                break;
             }
 
             const embot::hw::flash::Partition& pp = embot::hw::sys::partition(address);
@@ -821,13 +820,13 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
               
                     bool r = true;
 #if defined(TEST_prog_mode)                    
-                    snprintf(debug_print, sizeof(debug_print), "write(0x%x, %d), size2burn = %d", address, size, size2burn);
+                    snprintf(debug_print, sizeof(debug_print), "s_proc_PROG_rxpackets = %d, write(0x%x, %d), size2burn = %d", s_proc_PROG_rxpackets, address, size, size2burn);
                     embot::core::print(debug_print);
 #endif                                        
 
                     if((address >= s_proc_PROG_mem_start) && (address < (s_proc_PROG_mem_start+s_proc_PROG_mem_size)))
                     {
-#if defined(TEST_prog_mode)                            
+#if defined(TEST_prog_mode) && defined(TEST_prog_mode_extracheck)
                         uint32_t lines = size / 16;
                         for(uint32_t l=0; l<lines; l++)
                         {
@@ -839,7 +838,7 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                         r = embot::hw::flash::write(address, size2burn, data2burn);
 //                      embot::os::rtos::scheduler_unlock();
  
-#if defined(TEST_prog_mode)                              
+#if defined(TEST_prog_mode) && defined(TEST_prog_mode_extracheck)                              
                         memset(datareadback, 0, sizeof(datareadback));                            
                         embot::hw::flash::read(address, size, datareadback);
                         
@@ -904,6 +903,11 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
                 reply->res = uprot_RES_ERR_UNK;
                 return ret;            
             }
+
+#if defined(TEST_prog_mode)                             
+            snprintf(debug_print, sizeof(debug_print), "uprot_OPC_PROG_END: FirmwareUpdater says it sent %d pkts, I received %d", sentpkts, s_proc_PROG_rxpackets);
+            embot::core::print(debug_print);
+#endif
             
             // some error cases. second: number of sent and of received packets are mismathing
             if(sentpkts != s_proc_PROG_rxpackets)
