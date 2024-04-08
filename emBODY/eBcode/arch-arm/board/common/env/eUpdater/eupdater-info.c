@@ -95,15 +95,15 @@ const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ME
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 23
+                    .minor = 24
                 },  
                 .builddate  = 
                 {
-                    .year  = 2016,
-                    .month = 11,
-                    .day   = 14,
-                    .hour  = 15,
-                    .min   = 14
+                    .year  = 2024,
+                    .month = 4,
+                    .day   = 8,
+                    .hour  = 10,
+                    .min   = 10
                 }
             },
             .rom        = 

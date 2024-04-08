@@ -645,7 +645,27 @@ static uint8_t s_uprot_proc_PROGRAM(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
             {
                 reply->res = uprot_RES_ERR_UNK; 
                 return ret;   
-            }  
+            }
+
+            // if we dont have a valida flash address, i discard ...
+            // explanation
+            // the .hex files sometimes contain non FLASH data (e.g., RAM segments).
+            // The sender of uprot_OPC_PROG_DATA commands (in our case FirmwareUpdater) should filter them out, 
+            // so this code should never treat non FLASH data. BUT we must be fail-safe so in here we shall
+            // - discard the invalid uprot_OPC_PROG_DATA command,
+            // - increase the s_proc_PROG_rxpackets counter   
+            // - return a OK result
+       
+            hal_boolval_t itisaflashaddress = hal_flash_address_isvalid(address);
+            if(hal_false == itisaflashaddress)
+            {
+                // i just drop the action because it must be a ram address
+                // but i increment the number of processed packets
+                ++s_proc_PROG_rxpackets;
+                // and force a return w/ no error
+                reply->res = uprot_RES_OK;
+                break;
+            }               
 #if 0
             // before it was like that .... but it does not allow to write applications with bigger code space ....
             if((address < s_proc_PROG_mem_start) || ((address+size) >= (s_proc_PROG_mem_start+s_proc_PROG_mem_size)))

@@ -89,15 +89,15 @@ constexpr eEmoduleExtendedInfo_t eupdater_modinfo_extended  __attribute__((secti
                 .version    = 
                 { 
                     .major = 3, 
-                    .minor = 0
+                    .minor = 1
                 },  
                 .builddate  = 
                 {
-                    .year  = 2022,
-                    .month = 11,
-                    .day   = 25,
-                    .hour  = 16,
-                    .min   = 42
+                    .year  = 2024,
+                    .month = 4,
+                    .day   = 8,
+                    .hour  = 12,
+                    .min   = 10
                 }
             },
             .rom        = 
