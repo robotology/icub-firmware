@@ -428,6 +428,8 @@ void embot::app::board::amc2c::theMBD::Impl::onEXTFAULTpressedreleased(void *own
 // Called every 1 ms
 bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::bldc::MSG> &inputmessages, std::vector<embot::app::bldc::MSG> &outputmessages)
 {     
+#if defined(COMM_BUS_LOCKED_AT_FIRST_MC_RECEPTION)
+    // the first time we receive a message we use its bus forever    
     static bool lockedtobus {false};
 
     if((false == lockedtobus) && (false == inputmessages.empty()))
@@ -435,6 +437,14 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
         lockedtobus = true;
         bus2use = inputmessages[0].location.getbus();
     }
+#else
+    // we allow the bus to change in the lifetime of the board. 
+    // we reply to the bus of the first input message    
+    if(false == inputmessages.empty())
+    {
+        bus2use = inputmessages[0].location.getbus();
+    }
+#endif    
 
     // in here... 
     // inputmessages.size() is always <= 4.
@@ -483,6 +493,16 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
     
     // read Vcc (in Volts)
     AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = _rounder.getRoundedValueOf(embot::hw::motor::getVIN());
+
+// just a print debug    
+//    constexpr embot::core::Time freq { embot::core::time1second };
+//    static embot::core::Time tt = embot::core::now();
+//    embot::core::Time n = embot::core::now();
+//    if((n-tt) > freq)
+//    {
+//        tt = n;
+//        embot::core::print("Vcc = " + std::to_string(embot::hw::motor::getVIN()));
+//    }
     
     
     // -----------------------------------------------------------------------------
