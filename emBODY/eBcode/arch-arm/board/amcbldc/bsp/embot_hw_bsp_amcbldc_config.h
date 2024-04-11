@@ -26,6 +26,7 @@
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_can
     #define EMBOT_ENABLE_hw_motor
+    #define EMBOT_ENABLE_hw_analog_ish
     #define EMBOT_ENABLE_hw_button
 
     // #define EMBOT_ENABLE_hw_i2c    

@@ -98,21 +98,28 @@ namespace embot::hw::motor::bsp {
  
 
 // the motorhal requires:
-// ADC1, ADC2, ADC3
-// TIM1, TIM4, TIM5, TIM6
+// ADC1, ADC2
+// TIM1, TIM4, TIM5
+// ADC3 and TIM6 for measuring power supply and currents
 
 
 namespace embot::hw::motor::bsp::amc2c {
     
     ADC_HandleTypeDef hADC1;
     ADC_HandleTypeDef hADC2;
-    ADC_HandleTypeDef hADC3;
+
     DMA_HandleTypeDef hdma_adc1;
-    DMA_HandleTypeDef hdma_adc3;
+
     TIM_HandleTypeDef hTIM1;
     TIM_HandleTypeDef hTIM4;
-    TIM_HandleTypeDef hTIM5;
-    TIM_HandleTypeDef hTIM6;
+    TIM_HandleTypeDef hTIM5;   
+    
+#if defined(EMBOT_ENABLE_hw_analog_ish)     
+    TIM_HandleTypeDef hTIM6;    
+    ADC_HandleTypeDef hADC3;    
+    DMA_HandleTypeDef hdma_adc3;
+#endif    
+
 }
 
 namespace embot::hw::motor::bsp::amc2c {
@@ -124,9 +131,11 @@ namespace embot::hw::motor::bsp::amc2c {
     void MX_DMA_Init();
     void MX_ADC1_Init();
     void MX_ADC2_Init();
+    
+#if defined(EMBOT_ENABLE_hw_analog_ish)    
     void MX_ADC3_Init();
     void MX_TIM6_Init();
-    
+#endif    
     
     void Init_MOTOR(embot::hw::MOTOR h)
     {
@@ -141,11 +150,15 @@ namespace embot::hw::motor::bsp::amc2c {
         MX_ADC2_Init();
 //        MX_DAC1_Init();
         MX_TIM1_Init();
-        
+
+#if defined(EMBOT_ENABLE_hw_analog_ish)
+        // TIM6 ticks ADC3 to retrieves the values        
         MX_ADC3_Init();
-        MX_TIM6_Init();
-        
-        // something else
+        MX_TIM6_Init();       
+#endif    
+    
+        // something else ?
+        // ...
     }
     
     void Init_MOTORHAL_testmode(embot::hw::MOTOR h)
@@ -605,6 +618,8 @@ namespace embot::hw::motor::bsp::amc2c {
         /* USER CODE END TIM5_Init 2 */
 
     }    
+
+#if defined(EMBOT_ENABLE_hw_analog_ish)
     
     void MX_TIM6_Init(void)
     {
@@ -646,6 +661,8 @@ namespace embot::hw::motor::bsp::amc2c {
       /* USER CODE END TIM6_Init 2 */
     }
 
+#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)
+    
     void DeInit_TIM5()
     {
         // HAL_TIM_IC_ConfigChannel() inversa for TIM_CHANNEL_3 and TIM_CHANNEL_4
@@ -957,6 +974,8 @@ namespace embot::hw::motor::bsp::amc2c {
 
     }
 
+#if defined(EMBOT_ENABLE_hw_analog_ish)
+    
     void MX_ADC3_Init(void)
     {
 
@@ -1061,6 +1080,7 @@ namespace embot::hw::motor::bsp::amc2c {
 
     }
     
+#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)    
 
 } // namespace embot::hw::motor::bsp {
 
@@ -1077,7 +1097,9 @@ extern "C" {
     {
         HAL_ADC_IRQHandler(&embot::hw::motor::bsp::amc2c::hADC1);
         HAL_ADC_IRQHandler(&embot::hw::motor::bsp::amc2c::hADC2);
+#if defined(EMBOT_ENABLE_hw_analog_ish)        
         HAL_ADC_IRQHandler(&embot::hw::motor::bsp::amc2c::hADC3);
+#endif
     }   
 
     // DMA2 stream0 global interrupt
@@ -1085,13 +1107,15 @@ extern "C" {
     {
         HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amc2c::hdma_adc1);
     }
-    
+
+#if defined(EMBOT_ENABLE_hw_analog_ish)      
     // DMA1 stream4 global interrupt
     void DMA1_Stream4_IRQHandler(void)
     {
         HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amc2c::hdma_adc3);
     }
-
+#endif
+    
     // - msp functions    
     
     static uint32_t HAL_RCC_ADC12_CLK_ENABLED=0;
@@ -1215,6 +1239,7 @@ extern "C" {
 
             /* USER CODE END ADC2_MspInit 1 */
         }
+#if defined(EMBOT_ENABLE_hw_analog_ish)          
         else if(hadc->Instance==ADC3)
         {
         /* USER CODE BEGIN ADC3_MspInit 0 */
@@ -1266,6 +1291,7 @@ extern "C" {
           
           /* USER CODE END ADC3_MspInit 1 */
         }
+#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)          
 
     }
 
@@ -1350,6 +1376,7 @@ extern "C" {
 
             /* USER CODE END ADC2_MspDeInit 1 */
         }
+#if defined(EMBOT_ENABLE_hw_analog_ish)        
         else if(hadc->Instance==ADC3)
         {
             /* USER CODE BEGIN ADC3_MspDeInit 0 */
@@ -1372,6 +1399,7 @@ extern "C" {
             
             /* USER CODE END ADC3_MspDeInit 1 */
         }
+#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)        
     }    
 
 
@@ -1579,6 +1607,7 @@ namespace embot::hw::motor::bsp::amc2c {
 
             /* USER CODE END TIM4_MspInit 1 */
         }
+#if defined(EMBOT_ENABLE_hw_analog_ish)        
         else if(htim_base->Instance==TIM6)
         {
         /* USER CODE BEGIN TIM6_MspInit 0 */
@@ -1590,6 +1619,7 @@ namespace embot::hw::motor::bsp::amc2c {
 
         /* USER CODE END TIM6_MspInit 1 */
         }
+#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)        
     }
 
     void TIM_base_MspDeInit(TIM_HandleTypeDef* htim_base)
@@ -1651,6 +1681,7 @@ namespace embot::hw::motor::bsp::amc2c {
 
             /* USER CODE END TIM4_MspDeInit 1 */
         }
+#if defined(EMBOT_ENABLE_hw_analog_ish)        
         else if(htim_base->Instance==TIM6)
         {
         /* USER CODE BEGIN TIM6_MspDeInit 0 */
@@ -1662,6 +1693,7 @@ namespace embot::hw::motor::bsp::amc2c {
         
         /* USER CODE END TIM6_MspDeInit 1 */
         }
+#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)        
     }    
 } // namespace embot::hw::motor::bsp::amc2c {
 

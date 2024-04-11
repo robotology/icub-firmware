@@ -31,6 +31,12 @@
 #include "embot_hw_motor_bsp_amc2c.h"
 
 // --------------------------------------------------------------------------------------------------------------------
+// - configuration of peripherals and chips. it is done board by board. it contains a check vs correct STM32HAL_BOARD_*
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_hw_bsp_amc2c_config.h"
+
+// --------------------------------------------------------------------------------------------------------------------
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -975,7 +981,21 @@ extern void enable(bool on)
 } // namespace embot::hw::motor::pwm {
 
 
+#if !defined(EMBOT_ENABLE_hw_analog_ish)
+
 namespace embot::hw::analog {
+
+    void deinit() {}
+    void init(const Configuration &config) {}
+    float getVin() { return 18.0f; }
+    float getCin() { return 1.0f; } 
+       
+}
+
+#elif defined(EMBOT_ENABLE_hw_analog_ish)  
+
+namespace embot::hw::analog {
+     
     
 #define hadc3 (embot::hw::motor::bsp::amc2c::hADC3)
 #define htim6 (embot::hw::motor::bsp::amc2c::hTIM6)
@@ -1012,9 +1032,11 @@ static uint32_t Kvrefcal = static_cast<uint32_t>(VREFINT_NOM * VREF_NOM + 0.5);
 
 /* Measured VREF in mV. Equal to VCC */
 static volatile uint16_t Vcc_mV = VREF_NOM;
-static volatile uint16_t Vin_mV;
-static AdcMovingAverageFilter_t VrefFilter;
-//static AdcMovingAverageFilter_t CinFilter;
+static volatile uint16_t Vin_mV = 18000;
+static AdcMovingAverageFilter_t VrefFilter {0};
+//static AdcMovingAverageFilter_t CinFilter {0};
+
+static volatile int16_t Cin_mA = +1000;
 
 
 /* DMA buffer for ADC3 raw data */
@@ -1079,7 +1101,7 @@ void AdcPwrTransferComplete_callback(ADC_HandleTypeDef *hadc)
 }
 
     
-extern void init(const Configuration &config)
+void init(const Configuration &config)
 {
     if (HAL_OK == HAL_TIM_Base_Start(&htim6))
     {
@@ -1114,7 +1136,7 @@ extern void init(const Configuration &config)
     }
 }
 
-extern void deinit()
+void deinit()
 {
     HAL_ADCEx_MultiModeStop_DMA(&hadc3);
     HAL_ADC_UnRegisterCallback(&hadc3, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
@@ -1126,12 +1148,18 @@ float getVin()
     // return Vin in Volts
     return Vin_mV * 0.001f;
 }
+
+float getCin()
+{
+    return Cin_mA * 0.001f;
+}
     
 } // namespace embot::hw::analog
  
+#endif // #if defined(EMBOT_ENABLE_hw_analog_ish)
 
 
-// old code whihc may become useful later on
+// old code which may become useful later on
 
 
 #if 0
