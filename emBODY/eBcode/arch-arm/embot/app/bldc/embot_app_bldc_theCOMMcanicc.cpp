@@ -102,7 +102,7 @@ struct embot::app::bldc::theCOMM::Impl
     // others
     embot::app::msg::BUS mcBUS2use {embot::app::msg::BUS::none};
     
-    embot::app::LEDwaveT<64> ledwavemcBUSnone {100*embot::core::time1millisec, 30, std::bitset<64>(0b0101010101)};   
+    embot::app::LEDwaveT<64> ledwavemcBUSnone {100*embot::core::time1millisec, 30, std::bitset<64>(0b0101010101010101)};   
     embot::app::LEDwaveT<64> ledwavemcBUScan {250*embot::core::time1millisec, 10, std::bitset<64>(0b0101)};
     embot::app::LEDwaveT<64> ledwavemcBUSicc {250*embot::core::time1millisec, 10, std::bitset<64>(0b01)};
     
