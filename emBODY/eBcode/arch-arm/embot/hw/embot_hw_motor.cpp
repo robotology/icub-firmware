@@ -170,6 +170,7 @@ namespace embot { namespace hw { namespace motor {
     bool s_hw_isOvercurrent(MOTOR h);
     uint32_t s_hw_get32bit2FOCstyleFaultMask(MOTOR h);
     float s_hw_getVin();
+    float s_hw_getCin();
     
     result_t init(MOTOR h, const Config &cfg)
     {
@@ -396,12 +397,7 @@ namespace embot { namespace hw { namespace motor {
 
     float getCIN()
     {
-        // TODO: not yet implemented
-        float c {0.0};
-        
-        //c = analogCin() * 0.001;
-        return c;
-        
+        return s_hw_getCin();        
     }
     
 // in here is the part for low level hw of the boards (amc2c or amcbldc)
@@ -544,6 +540,11 @@ namespace embot { namespace hw { namespace motor {
     {
         return embot::hw::analog::getVin();
     }
+    
+    float s_hw_getCin()
+    {
+        return embot::hw::analog::getCin();
+    }    
 
 #elif defined(STM32HAL_BOARD_AMCBLDC)
     
@@ -681,10 +682,25 @@ namespace embot { namespace hw { namespace motor {
         return motorhal_get_faultmask();
     }
     
-    float s_hw_getVin(){
+    float s_hw_getVin()
+    {
+#if defined(EMBOT_ENABLE_hw_analog_ish)        
         // Return Vin in Volts
         return analogVin() * 0.001;
+#else
+        return 18.0f;
+#endif        
     }
+    
+    float s_hw_getCin()
+    {
+#if defined(EMBOT_ENABLE_hw_analog_ish)         
+        return analogCin() * 0.001;
+#else
+        return 1.0f;
+#endif        
+    } 
+      
     
 #else
     #error define a board

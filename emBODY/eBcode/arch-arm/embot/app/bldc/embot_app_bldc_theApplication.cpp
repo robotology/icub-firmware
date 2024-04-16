@@ -149,17 +149,27 @@ void embot::app::bldc::theApplication::Impl::onDefaultError(void* errparam)
     //for(;;);    
 }
 
+#define MOREpriority2COMMthread
 
 void embot::app::bldc::theApplication::Impl::justbeforeSchedulerStart(embot::os::Thread *t, void* initparam)
 {
     Impl *impl = reinterpret_cast<Impl*>(initparam);    
+    
+#if defined(MOREpriority2COMMthread)    
+    constexpr embot::os::Priority pcomm { embot::os::Priority::high45 };
+    constexpr embot::os::Priority pctrl { embot::os::Priority::high44 };
+#else    
+    constexpr embot::os::Priority pcomm { embot::os::Priority::high44 };
+    constexpr embot::os::Priority pctrl { embot::os::Priority::high45 };
+#endif    
+
 
     // we perform in here all operations formerly done by theCANboardInfo such as synch the application info etc.
     impl->_canagentcore = impl->_config.core.getagentcore();
     // we start communication
     embot::app::bldc::theCOMM::Config commConfig 
     {
-        embot::os::Priority::high44,
+        pcomm,
         impl->_config.comm.stacksize,
         50*embot::core::time1millisec,
         impl->_canagentcore,
@@ -170,7 +180,7 @@ void embot::app::bldc::theApplication::Impl::justbeforeSchedulerStart(embot::os:
     // we start control
     embot::app::bldc::theCTRL::Config ctrlConfig 
     {
-        embot::os::Priority::high45,
+        pctrl,
         impl->_config.ctrl.stacksize,
         1*embot::core::time1millisec,
         impl->_canagentcore,

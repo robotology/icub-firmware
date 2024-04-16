@@ -53,6 +53,11 @@ the ICC or the CAN mapping depending on the bus type
 
 namespace embot::app::eth::mc::messaging::receiver {
     
+//#define PRINT_MSG_FROM_ACTUATOR    
+
+#if defined(PRINT_MSG_FROM_ACTUATOR)    
+    char dbgstr[128] = {0};
+#endif    
   
     bool getentityindex(const embot::app::msg::Location &source, uint8_t &index)
     {
@@ -109,7 +114,10 @@ namespace embot::app::eth::mc::messaging::receiver {
             motor->status.basic.mot_velocity = msg.info.velocity;
             motor->status.basic.mot_position = msg.info.position;
             MController_update_motor_odometry_fbk_can(motorindex, (void*)msg.info.payload);      
-            
+#if defined(PRINT_MSG_FROM_ACTUATOR)
+            std::snprintf(dbgstr, sizeof(dbgstr), "from %s, st1: cu %d, ve %d, po %d", msg.source.to_string().c_str(), msg.info.current, msg.info.velocity, msg.info.position);  
+            embot::core::print(dbgstr);            
+#endif            
             return ok; 
         } 
         
@@ -125,7 +133,10 @@ namespace embot::app::eth::mc::messaging::receiver {
             }
             
             MController_update_motor_state_fbk(motorindex, (void*)msg.info.payload);
-
+#if defined(PRINT_MSG_FROM_ACTUATOR)
+            std::snprintf(dbgstr, sizeof(dbgstr), "from %s, st2: cmo %d, qef %x, pwm %d, flt %x",  msg.source.to_string().c_str(), msg.info.controlmode, msg.info.qencflags, msg.info.pwmfeedback, msg.info.motorfaultflags);  
+            embot::core::print(dbgstr);  
+#endif
             return ok; 
         } 
         

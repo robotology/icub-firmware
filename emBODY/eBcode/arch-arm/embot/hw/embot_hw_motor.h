@@ -107,6 +107,9 @@ namespace embot { namespace hw { namespace motor {
     };        
     result_t setPWM(MOTOR h, const PWMperc &p);
     
+    // the following getVIN() and getCIN()  are about the power supply of the board. 
+    // so far we keep them in embot::hw::motor and we enable proper code w/ them w/ EMBOT_ENABLE_hw_analog_ish
+    // if EMBOT_ENABLE_hw_analog_ish is undefined getVIN() returns 18.0 and getCIN() returns 1.0
     // Return Vin in Volts
     float getVIN();
 

@@ -102,9 +102,9 @@ struct embot::app::bldc::theCOMM::Impl
     // others
     embot::app::msg::BUS mcBUS2use {embot::app::msg::BUS::none};
     
-    embot::app::LEDwaveT<64> ledwavemcBUSnone {100*embot::core::time1millisec, 30, std::bitset<64>(0b0101010101)};   
-    embot::app::LEDwaveT<64> ledwavemcBUScan {100*embot::core::time1millisec, 20, std::bitset<64>(0b0101)};
-    embot::app::LEDwaveT<64> ledwavemcBUSicc {100*embot::core::time1millisec, 10, std::bitset<64>(0b01)};
+    embot::app::LEDwaveT<64> ledwavemcBUSnone {100*embot::core::time1millisec, 30, std::bitset<64>(0b0101010101010101)};   
+    embot::app::LEDwaveT<64> ledwavemcBUScan {250*embot::core::time1millisec, 10, std::bitset<64>(0b0101)};
+    embot::app::LEDwaveT<64> ledwavemcBUSicc {250*embot::core::time1millisec, 10, std::bitset<64>(0b01)};
     
     bool acceptMCmessage(const embot::app::bldc::MSG &msg);
     void locktoBUS(const embot::app::bldc::MSG &msg);
@@ -383,16 +383,18 @@ bool embot::app::bldc::theCOMM::Impl::acceptMCmessage(const embot::app::bldc::MS
     {
         r = false;
     }
-    
+#if defined(COMM_BUS_LOCKED_AT_FIRST_MC_RECEPTION)
     if((embot::app::msg::BUS::none != mcBUS2use) && (msg.location.getbus() != mcBUS2use))
     {
         r = false;
     }
-       
+#else
+#endif
+
     return r;
 }
 
-
+#if defined(COMM_BUS_LOCKED_AT_FIRST_MC_RECEPTION)
 void embot::app::bldc::theCOMM::Impl::locktoBUS(const embot::app::bldc::MSG &msg)
 {    
     if(embot::app::msg::BUS::none == mcBUS2use)
@@ -401,6 +403,24 @@ void embot::app::bldc::theCOMM::Impl::locktoBUS(const embot::app::bldc::MSG &msg
        embot::app::theLEDmanager::getInstance().get(embot::hw::LED::one).wave((embot::app::msg::typeofBUS::CAN == embot::app::msg::bus_to_type(mcBUS2use)) ? (&ledwavemcBUScan) : (&ledwavemcBUSicc));
     }
 }
+#else
+void embot::app::bldc::theCOMM::Impl::locktoBUS(const embot::app::bldc::MSG &msg)
+{
+    // we lock to bus in case of unicast messages of MC only
+    bool isUnicast = (embot::prot::can::frame2destination(msg.frame) == _tCOMMcanaddress); // _tCOMMcanaddress is both icc or can address 
+    bool isMCpolling = (embot::prot::can::Clas::pollingMotorControl == embot::prot::can::frame2clas(msg.frame));
+    
+    // and if the bus is different from the one we are locked now.
+    // surely nobody must send a unicast mc polling over CAN to this board when we it uses icc
+    auto b = msg.location.getbus();
+    
+    if((true == isUnicast) && (true == isMCpolling) && (b != mcBUS2use))
+    {
+       mcBUS2use = b;
+       embot::app::theLEDmanager::getInstance().get(embot::hw::LED::one).wave((embot::app::msg::typeofBUS::CAN == embot::app::msg::bus_to_type(mcBUS2use)) ? (&ledwavemcBUScan) : (&ledwavemcBUSicc));
+    }
+}
+#endif
 
 void embot::app::bldc::theCOMM::Impl::tCOMM_OnRXmessage(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::app::bldc::MSG &msg, std::vector<embot::app::bldc::MSG> &outframes)
 {   
@@ -412,7 +432,15 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnRXmessage(embot::os::Thread *t, em
     else if(true == acceptMCmessage(msg))
     {
         locktoBUS(msg);
+#if defined(COMM_BUS_LOCKED_AT_FIRST_MC_RECEPTION)
         embot::app::bldc::theMSGbroker::getInstance().add(embot::app::bldc::theMSGbroker::Direction::INP, msg);
+#else        
+        if(msg.location.getbus() == mcBUS2use)
+        {
+            // is such a way i filter out the MC CAN periodic that the host sends to the other boards (in case i am attached to CAN)
+            embot::app::bldc::theMSGbroker::getInstance().add(embot::app::bldc::theMSGbroker::Direction::INP, msg);
+        }
+#endif        
     }
 
     if(false == _tCOMMtmpCANframes.empty())

@@ -29,6 +29,7 @@
     #define EMBOT_ENABLE_hw_button
     
     #define EMBOT_ENABLE_hw_motor
+    #define EMBOT_ENABLE_hw_analog_ish
     #define EMBOT_ENABLE_hw_flash
     #define EMBOT_ENABLE_hw_timer
     #define EMBOT_ENABLE_hw_can

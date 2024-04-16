@@ -128,9 +128,9 @@ namespace embot::hw::mtx::bsp {
         
         if(false == irqinitted)
         {
-            HAL_NVIC_SetPriority(HSEM1_IRQn, 10, 0);
+            HAL_NVIC_SetPriority(HSEM1_IRQn, 0, 0);
             HAL_NVIC_EnableIRQ(HSEM1_IRQn);
-            HAL_NVIC_SetPriority(HSEM2_IRQn, 10, 0);
+            HAL_NVIC_SetPriority(HSEM2_IRQn, 0, 0);
             HAL_NVIC_EnableIRQ(HSEM2_IRQn);            
             irqinitted = true;
         }           
