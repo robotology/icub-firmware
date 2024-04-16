@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 7.81
+// Model version                  : 7.83
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 14:50:32 2024
+// C/C++ source code generated on : Tue Apr 16 11:32:02 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,7 +27,7 @@
 #include "rtw_defines.h"
 
 // Exported block parameters
-ActuatorConfiguration InitConfParams = {
+ActuatorConfiguration AmcbldcInitConf = {
   {
     40000.0F,
     0.35F,
@@ -102,7 +102,7 @@ ActuatorConfiguration InitConfParams = {
     797.5F,
     30.0F
   }
-} ;                                    // Variable: InitConfParams
+} ;                                    // Variable: AmcbldcInitConf
                                           //  Referenced by: '<Root>/Motion Controller Single'
 
 
@@ -150,7 +150,7 @@ void AMC_BLDC_step_FOC(void)           // Sample time: [4.5E-5s, 0.0s]
   int8_T wrBufIdx;
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element3'
+  //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   motion_controller_singleTID1(&AMC_BLDC_U.SensorsData_p,
@@ -252,7 +252,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
 
   // ModelReference generated from: '<Root>/SupervisorFSM_TX' incorporates:
   //   Inport generated from: '<Root>/In Bus Element4'
-  //   Inport generated from: '<Root>/In Bus Element3'
+  //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 

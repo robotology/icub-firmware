@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 7.81
+// Model version                  : 7.83
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 14:50:32 2024
+// C/C++ source code generated on : Tue Apr 16 11:32:02 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -151,8 +151,8 @@ extern "C"
 //  these parameters and exports their symbols.
 //
 
-extern ActuatorConfiguration InitConfParams;// Variable: InitConfParams
-                                               //  Referenced by: '<Root>/Motion Controller Single'
+extern ActuatorConfiguration AmcbldcInitConf;// Variable: AmcbldcInitConf
+                                                //  Referenced by: '<Root>/Motion Controller Single'
 
 extern real32_T CAN_ANGLE_DEG2ICUB;    // Variable: CAN_ANGLE_DEG2ICUB
                                           //  Referenced by: '<S2>/CAN_Encoder'

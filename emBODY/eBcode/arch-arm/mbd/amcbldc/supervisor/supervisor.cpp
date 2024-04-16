@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 1.319
+// Model version                  : 1.320
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 15:01:32 2024
+// C/C++ source code generated on : Tue Apr 16 12:06:56 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -48,18 +48,18 @@ static void supervisor_TargetsManager(Targets *rty_targets, DW_supervisor_f_T
   *localDW);
 static void supervisor_Idle(const SensorsData *rtu_SensorsData, Targets
   *rty_targets, Flags *rty_Flags, DW_supervisor_f_T *localDW);
-static void supervisor_Velocity(const FOCOutputs *rtu_ControlOutputs, const
-  SensorsData *rtu_SensorsData, Targets *rty_targets, Flags *rty_Flags,
-  DW_supervisor_f_T *localDW);
+static void supervisor_Velocity(const EstimatedData *rtu_EstimatedData, const
+  FOCOutputs *rtu_ControlOutputs, const SensorsData *rtu_SensorsData, Targets
+  *rty_targets, Flags *rty_Flags, DW_supervisor_f_T *localDW);
 static boolean_T supervisor_isConfigurationSet(DW_supervisor_f_T *localDW);
-static void supervisor_ControlModeHandler(const FOCOutputs *rtu_ControlOutputs,
-  const SensorsData *rtu_SensorsData, Targets *rty_targets, Flags *rty_Flags,
-  DW_supervisor_f_T *localDW);
+static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData,
+  const FOCOutputs *rtu_ControlOutputs, const SensorsData *rtu_SensorsData,
+  Targets *rty_targets, Flags *rty_Flags, DW_supervisor_f_T *localDW);
 static void supervisor_SetLimits(real32_T ev_limits_content_overload, real32_T
-  ev_limits_content_peak, real32_T ev_limits_content_nominal, const FOCOutputs
-  *rtu_ControlOutputs, const SensorsData *rtu_SensorsData, Targets *rty_targets,
-  ActuatorConfiguration *rty_ConfigurationParameters, Flags *rty_Flags,
-  DW_supervisor_f_T *localDW);
+  ev_limits_content_peak, real32_T ev_limits_content_nominal, const
+  EstimatedData *rtu_EstimatedData, const FOCOutputs *rtu_ControlOutputs, const
+  SensorsData *rtu_SensorsData, Targets *rty_targets, ActuatorConfiguration
+  *rty_ConfigurationParameters, Flags *rty_Flags, DW_supervisor_f_T *localDW);
 static void supervisor_SetPid(ControlModes ev_pid_content_type, real32_T
   ev_pid_content_P, real32_T ev_pid_content_I, real32_T ev_pid_content_D,
   uint8_T ev_pid_content_shift_factor, ActuatorConfiguration
@@ -201,9 +201,9 @@ static void supervisor_Idle(const SensorsData *rtu_SensorsData, Targets
 }
 
 // Function for Chart: '<Root>/Supervisor'
-static void supervisor_Velocity(const FOCOutputs *rtu_ControlOutputs, const
-  SensorsData *rtu_SensorsData, Targets *rty_targets, Flags *rty_Flags,
-  DW_supervisor_f_T *localDW)
+static void supervisor_Velocity(const EstimatedData *rtu_EstimatedData, const
+  FOCOutputs *rtu_ControlOutputs, const SensorsData *rtu_SensorsData, Targets
+  *rty_targets, Flags *rty_Flags, DW_supervisor_f_T *localDW)
 {
   int32_T e_previousEvent;
   boolean_T guard1;
@@ -250,7 +250,7 @@ static void supervisor_Velocity(const FOCOutputs *rtu_ControlOutputs, const
         localDW->sfEvent = e_previousEvent;
       } else if ((localDW->sfEvent == supervisor_event_SetCtrlMode) && (
                   static_cast<int32_T>(localDW->requestedControlMode) == 4)) {
-        localDW->newSetpoint = rtu_ControlOutputs->Iq_fbk;
+        localDW->newSetpoint = rtu_EstimatedData->Iq_filtered;
         localDW->is_ControlModeHandler = supervisor_IN_Current;
         rty_Flags->control_mode = ControlModes_Current;
         e_previousEvent = localDW->sfEvent;
@@ -302,9 +302,9 @@ static boolean_T supervisor_isConfigurationSet(DW_supervisor_f_T *localDW)
 }
 
 // Function for Chart: '<Root>/Supervisor'
-static void supervisor_ControlModeHandler(const FOCOutputs *rtu_ControlOutputs,
-  const SensorsData *rtu_SensorsData, Targets *rty_targets, Flags *rty_Flags,
-  DW_supervisor_f_T *localDW)
+static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData,
+  const FOCOutputs *rtu_ControlOutputs, const SensorsData *rtu_SensorsData,
+  Targets *rty_targets, Flags *rty_Flags, DW_supervisor_f_T *localDW)
 {
   int32_T m_previousEvent;
   boolean_T guard1;
@@ -454,8 +454,8 @@ static void supervisor_ControlModeHandler(const FOCOutputs *rtu_ControlOutputs,
 
    case supervisor_IN_Velocity:
     // Chart: '<Root>/Supervisor'
-    supervisor_Velocity(rtu_ControlOutputs, rtu_SensorsData, rty_targets,
-                        rty_Flags, localDW);
+    supervisor_Velocity(rtu_EstimatedData, rtu_ControlOutputs, rtu_SensorsData,
+                        rty_targets, rty_Flags, localDW);
     break;
 
    case supervisor_IN_Voltage:
@@ -493,7 +493,7 @@ static void supervisor_ControlModeHandler(const FOCOutputs *rtu_ControlOutputs,
       if ((localDW->sfEvent == supervisor_event_SetCtrlMode) &&
           (static_cast<int32_T>(localDW->requestedControlMode) == 4)) {
         // Chart: '<Root>/Supervisor'
-        localDW->newSetpoint = rtu_ControlOutputs->Iq_fbk;
+        localDW->newSetpoint = rtu_EstimatedData->Iq_filtered;
         localDW->is_ControlModeHandler = supervisor_IN_Current;
 
         // Chart: '<Root>/Supervisor'
@@ -592,7 +592,7 @@ static void supervisor_ControlModeHandler(const FOCOutputs *rtu_ControlOutputs,
     if ((localDW->sfEvent == supervisor_event_SetCtrlMode) &&
         (static_cast<int32_T>(localDW->requestedControlMode) == 4)) {
       // Chart: '<Root>/Supervisor'
-      localDW->newSetpoint = rtu_ControlOutputs->Iq_fbk;
+      localDW->newSetpoint = rtu_EstimatedData->Iq_filtered;
       localDW->is_ControlModeHandler = supervisor_IN_Current;
 
       // Chart: '<Root>/Supervisor'
@@ -727,10 +727,10 @@ static void supervisor_ControlModeHandler(const FOCOutputs *rtu_ControlOutputs,
 
 // Function for Chart: '<Root>/Supervisor'
 static void supervisor_SetLimits(real32_T ev_limits_content_overload, real32_T
-  ev_limits_content_peak, real32_T ev_limits_content_nominal, const FOCOutputs
-  *rtu_ControlOutputs, const SensorsData *rtu_SensorsData, Targets *rty_targets,
-  ActuatorConfiguration *rty_ConfigurationParameters, Flags *rty_Flags,
-  DW_supervisor_f_T *localDW)
+  ev_limits_content_peak, real32_T ev_limits_content_nominal, const
+  EstimatedData *rtu_EstimatedData, const FOCOutputs *rtu_ControlOutputs, const
+  SensorsData *rtu_SensorsData, Targets *rty_targets, ActuatorConfiguration
+  *rty_ConfigurationParameters, Flags *rty_Flags, DW_supervisor_f_T *localDW)
 {
   int32_T b_previousEvent;
 
@@ -747,8 +747,8 @@ static void supervisor_SetLimits(real32_T ev_limits_content_overload, real32_T
     localDW->sfEvent = supervisor_event_initialControlModeTrigger;
     if (localDW->is_active_ControlModeHandler != 0U) {
       // Chart: '<Root>/Supervisor'
-      supervisor_ControlModeHandler(rtu_ControlOutputs, rtu_SensorsData,
-        rty_targets, rty_Flags, localDW);
+      supervisor_ControlModeHandler(rtu_EstimatedData, rtu_ControlOutputs,
+        rtu_SensorsData, rty_targets, rty_Flags, localDW);
     }
 
     localDW->sfEvent = b_previousEvent;
@@ -969,7 +969,8 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
         supervisor_SetLimits(rtu_ReceivedEvents[ei].limits_content.overload,
                              rtu_ReceivedEvents[ei].limits_content.peak,
                              rtu_ReceivedEvents[ei].limits_content.nominal,
-                             rtu_ControlOutputs, rtu_SensorsData, rty_targets,
+                             rtu_EstimatedData, rtu_ControlOutputs,
+                             rtu_SensorsData, rty_targets,
                              rty_ConfigurationParameters, rty_Flags, localDW);
         break;
 
@@ -1003,8 +1004,8 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
         b_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_SetCtrlMode;
         if (localDW->is_active_ControlModeHandler != 0U) {
-          supervisor_ControlModeHandler(rtu_ControlOutputs, rtu_SensorsData,
-            rty_targets, rty_Flags, localDW);
+          supervisor_ControlModeHandler(rtu_EstimatedData, rtu_ControlOutputs,
+            rtu_SensorsData, rty_targets, rty_Flags, localDW);
         }
 
         localDW->sfEvent = b_previousEvent;
@@ -1072,8 +1073,8 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
     }
 
     if (localDW->is_active_ControlModeHandler != 0U) {
-      supervisor_ControlModeHandler(rtu_ControlOutputs, rtu_SensorsData,
-        rty_targets, rty_Flags, localDW);
+      supervisor_ControlModeHandler(rtu_EstimatedData, rtu_ControlOutputs,
+        rtu_SensorsData, rty_targets, rty_Flags, localDW);
     }
 
     if ((localDW->is_active_InputsDispatcher != 0U) &&
@@ -1085,7 +1086,8 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
           supervisor_SetLimits(rtu_ReceivedEvents[ei].limits_content.overload,
                                rtu_ReceivedEvents[ei].limits_content.peak,
                                rtu_ReceivedEvents[ei].limits_content.nominal,
-                               rtu_ControlOutputs, rtu_SensorsData, rty_targets,
+                               rtu_EstimatedData, rtu_ControlOutputs,
+                               rtu_SensorsData, rty_targets,
                                rty_ConfigurationParameters, rty_Flags, localDW);
           break;
 
@@ -1119,8 +1121,8 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
           b_previousEvent = localDW->sfEvent;
           localDW->sfEvent = supervisor_event_SetCtrlMode;
           if (localDW->is_active_ControlModeHandler != 0U) {
-            supervisor_ControlModeHandler(rtu_ControlOutputs, rtu_SensorsData,
-              rty_targets, rty_Flags, localDW);
+            supervisor_ControlModeHandler(rtu_EstimatedData, rtu_ControlOutputs,
+              rtu_SensorsData, rty_targets, rty_Flags, localDW);
           }
 
           localDW->sfEvent = b_previousEvent;

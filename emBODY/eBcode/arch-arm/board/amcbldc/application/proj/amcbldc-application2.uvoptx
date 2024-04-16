@@ -103,7 +103,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>1</nTsel>
+        <nTsel>6</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -114,9 +114,14 @@
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
         <tIfile></tIfile>
-        <pMon>BIN\ULP2CM3.DLL</pMon>
+        <pMon>STLink\ST-LINKIII-KEIL_SWO.dll</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
+        <SetRegEntry>
+          <Number>0</Number>
+          <Key>ST-LINKIII-KEIL_SWO</Key>
+          <Name>-U005700373137510539383538 -O206 -SF50000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(2BA01477) -L00(0) -TO65555 -TC168000000 -TT10000000 -TP21 -TDS808F -TDT0 -TDC1F -TIE80000001 -TIP9 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32G47x-8x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32G474QETx$CMSIS\Flash\STM32G47x-8x_512.FLM) -WA0 -WE0 -WVCE4 -WS2710 -WM0 -WP2</Name>
+        </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
@@ -219,7 +224,7 @@
       </SystemViewers>
       <DebugDescription>
         <Enable>1</Enable>
-        <EnableFlashSeq>1</EnableFlashSeq>
+        <EnableFlashSeq>0</EnableFlashSeq>
         <EnableLog>0</EnableLog>
         <Protocol>2</Protocol>
         <DbgClock>50000000</DbgClock>
@@ -1576,7 +1581,7 @@
       <GroupNumber>21</GroupNumber>
       <FileNumber>80</FileNumber>
       <FileType>8</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\mbd\amcbldc\supervisor\supervisor.cpp</PathWithFileName>
@@ -1588,7 +1593,7 @@
 
   <Group>
     <GroupName>mbd::supervisor-tx</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

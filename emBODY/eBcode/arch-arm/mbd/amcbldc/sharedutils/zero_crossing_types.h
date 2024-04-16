@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.73
+// Model version                  : 6.82
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Mar  4 13:06:51 2024
+// C/C++ source code generated on : Tue Apr 16 11:29:19 2024
 //
 #ifndef ZERO_CROSSING_TYPES_H
 #define ZERO_CROSSING_TYPES_H

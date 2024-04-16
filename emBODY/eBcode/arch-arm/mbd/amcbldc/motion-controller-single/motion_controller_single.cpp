@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 1.175
+// Model version                  : 1.176
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Thu Mar  7 10:07:38 2024
+// C/C++ source code generated on : Tue Apr 16 11:31:52 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -81,7 +81,7 @@ void mc_1ms_tick(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
     EstimationVelocityModes_MovingAverage;
 
   // Constant: '<Root>/Constant'
-  localB->Constant = InitConfParams;
+  localB->Constant = AmcbldcInitConf;
 
   // ModelReference: '<Root>/Motion Controller'
   mc_step_1ms(rtu_ExternalFlags, &localB->BusCreator, &rtu_messages_rx[0],

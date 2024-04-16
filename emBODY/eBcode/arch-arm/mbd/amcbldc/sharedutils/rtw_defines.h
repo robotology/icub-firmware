@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 6.62
+// Model version                  : 6.115
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Mar  4 13:06:26 2024
+// C/C++ source code generated on : Tue Apr 16 11:28:54 2024
 //
 
 #ifndef RTW_HEADER_rtw_defines_h_

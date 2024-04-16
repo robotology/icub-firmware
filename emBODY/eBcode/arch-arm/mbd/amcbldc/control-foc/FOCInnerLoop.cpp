@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.80
+// Model version                  : 6.82
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Mar 11 16:50:34 2024
+// C/C++ source code generated on : Tue Apr 16 11:29:19 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -23,6 +23,8 @@
 #include "rtwtypes.h"
 #include "control_foc_private.h"
 #include "zero_crossing_types.h"
+
+#include "embot_core.h"
 
 // System initialize for atomic system: '<Root>/FOC inner loop'
 void FOCInnerLoop_Init(DW_FOCInnerLoop_T *localDW)
@@ -117,6 +119,16 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
   // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
 
   // Sum: '<S1>/Sum'
+	
+	  static char msg2[64];
+    static uint32_t counter;
+    if(++counter % 1000 == 0)
+    {
+        sprintf(msg2, "%.3f", rtu_OuterOutputs->motorcurrent);
+        embot::core::print(msg2);
+        counter = 0;
+    }
+	
   rtb_Diff = rtu_OuterOutputs->motorcurrent - rtb_algDD_o2;
 
   // Product: '<S111>/PProd Out'
