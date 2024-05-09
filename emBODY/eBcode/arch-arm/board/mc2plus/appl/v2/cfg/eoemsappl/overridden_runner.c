@@ -63,7 +63,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+// if defined, the CAN flush is done at end of the DO phase, else at the beginning of the TX phase
+#define CANflushMODE_DO_phase
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -82,7 +84,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static void flushCANtransmission();
+static void waitforCANisflushed(const eOreltime_t timeout);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -92,7 +96,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -141,18 +145,24 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     // TODO: see if i can move all the _Tick() in the do phase.
     
     // eo_ethmonitor_Tick(eo_ethmonitor_GetHandle()); // if we do it in here, then in eb2/eb4 it warns about execution time overflow
+    
+#if defined(CANflushMODE_DO_phase)
+    flushCANtransmission();
+#else    
+    // we flush elsewhere
+#endif       
 }
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
-    uint8_t txcan1frames = 0;
-    uint8_t txcan2frames = 0;
-
-    eo_canserv_TXstartAll(eo_canserv_GetHandle(), &txcan1frames, &txcan2frames);
-    
-    eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);
+#if defined(CANflushMODE_DO_phase)
+    // we flush elsewhere
+#else    
+    flushCANtransmission();
+#endif    
 }
+
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
@@ -172,9 +182,9 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 
 
     
-    // ABSOLUTELY KEEP IT LAST: wait until can tx started by eo_canserv_TXstartAll() in eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission() is all done
-    const eOreltime_t timeout = 3*EOK_reltime1ms;
-    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), timeout);   
+    // ABSOLUTELY KEEP IT LAST: wait until can tx started by flushCANtransmission() is all done
+    static const eOreltime_t timeout = 3*EOK_reltime1ms;
+    waitforCANisflushed(timeout);   
 
     return; 
 }
@@ -209,7 +219,21 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+static void flushCANtransmission()
+{
+    uint8_t txcan1frames = 0;
+    uint8_t txcan2frames = 0;        
+    eo_canserv_TXstartAll(eo_canserv_GetHandle(), &txcan1frames, &txcan2frames);    
+    eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);        
+}
+
+static void waitforCANisflushed(const eOreltime_t timeout)
+{
+    // it lock the thread TX until all CAN frame has exited the board
+//    const eOreltime_t timeout = 3*EOK_reltime1ms;
+    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), timeout);    
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
