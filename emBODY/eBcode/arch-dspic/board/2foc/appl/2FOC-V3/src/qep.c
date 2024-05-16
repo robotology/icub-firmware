@@ -13,6 +13,8 @@ int QE_ERR_THR = 0;//144;
 BOOL QE_USE_INDEX = FALSE;
 
 volatile BOOL qe_index_found = FALSE;
+volatile BOOL my_index_found = FALSE;
+volatile BOOL qe_reg_INDX = FALSE;
 
 void QEinit(int resolution, int motor_num_poles,char use_index)
 {
@@ -138,8 +140,9 @@ inline int QEgetPos()
 //                ++POSCNT;
 //        }
 //    }
-    
+    volatile extern int gQERawPosition;
     int poscnt = (int)POSCNT;
+    gQERawPosition= (int)POSCNT;
     
     if (QE_USE_INDEX)
     {  
@@ -153,18 +156,26 @@ inline int QEgetPos()
                 {
                     QE_RISE_WARNING(dirty);
                 }
+                qe_reg_INDX = TRUE;
             }
-            else if (poscnt<-16 || poscnt > QE_RESOLUTION+16)
+            else
             {
-                QE_RISE_WARNING(index_broken);
-                
-                if (poscnt < 0)              poscnt += QE_RESOLUTION;
-                if (poscnt >= QE_RESOLUTION) poscnt -= QE_RESOLUTION;
-                
-                POSCNT = (unsigned int)poscnt;
+                qe_reg_INDX = FALSE;
+                if (poscnt<-16 || poscnt > QE_RESOLUTION+16)
+                {
+                    QE_RISE_WARNING(index_broken);
+
+                    if (poscnt < 0)              poscnt += QE_RESOLUTION;
+                    if (poscnt >= QE_RESOLUTION) poscnt -= QE_RESOLUTION;
+
+                    POSCNT = (unsigned int)poscnt;
+                }
             }
             
+            
+            
             poscnt_old = poscnt;
+            
         }   
     }
     
@@ -178,6 +189,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
     IEC3bits.QEI1IE = 0;
 
     qe_index_found = TRUE;
+    my_index_found = TRUE;
  
 //    static int simulate_fault = 0;
 //    if (++simulate_fault == 11)

@@ -103,7 +103,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     }
     else if (MotorConfig.verbose)
     {        
-        static int noflood = 0;
+/*        static int noflood = 0;
         
         extern volatile char I2Cdead;
         extern volatile uint16_t I2Cerrors;
@@ -117,6 +117,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         {
             noflood = 0;
             
+           
             payload.w[1] = I2Cerrcode;
             payload.w[2] = I2Cdead;
             payload.w[3] = I2Cerrors;
@@ -124,6 +125,26 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
             ECANSend(msgid, 8, &payload);
+        }
+ */
+        if(gControlMode != icubCanProto_controlmode_notConfigured)
+        {
+            uint8_t bitmask = 0;
+            bitmask |= ((uint8_t)qe_reg_INDX);
+            bitmask |= ((uint8_t)my_index_found) << 1;
+            bitmask |= ((uint8_t)gEncoderError.dirty) << 2;
+            bitmask |= ((uint8_t)gEncoderError.index_broken) << 3;
+            payload.w[0]  = gQERawPosition;
+            //payload.w[1] = gQEElectrDeg;
+            payload.b[2] = bitmask;
+
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+
+            ECANSend(msgid, 3, &payload);
+            
+            gEncoderError.dirty = FALSE;
+            gEncoderError.index_broken = FALSE;
+            my_index_found = FALSE;
         }
     }
     
