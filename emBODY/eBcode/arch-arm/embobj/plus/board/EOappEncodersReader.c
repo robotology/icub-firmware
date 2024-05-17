@@ -49,7 +49,10 @@
 #include "EoError.h"
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
-
+    
+#if defined(DEBUG_encoder_AKSIM)
+#include "embot_app_scope.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -63,7 +66,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "EOappEncodersReader_hid.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -98,6 +100,17 @@ typedef struct
 } eOencoderProperties_t;   
 
 
+// SignalViewerImpl
+#if defined(DEBUG_encoder_AKSIM)
+void AKSIM2D() {}
+embot::app::scope::SignalEViewer *sev {nullptr};
+embot::app::scope::SignalEViewer::Config evc {AKSIM2D, embot::app::scope::SignalEViewer::Config::LABEL::one};  
+
+void initscope()
+{
+    sev = new embot::app::scope::SignalEViewer(evc);
+}
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -213,6 +226,10 @@ extern EOappEncReader* eo_appEncReader_Initialise(void)
     {
         return(&s_eo_theappencreader);
     }
+    
+    #if defined(DEBUG_encoder_AKSIM)
+    initscope();
+    #endif
     
     // do what ever is needed apart from what depends on the configuration
     
@@ -659,6 +676,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
 
             case eomc_enc_aksim2:
             {
+                #if defined(DEBUG_encoder_AKSIM)
+                sev->on();
+                #endif
+                
                 hal_spiencoder_position_t position = 0;
                 
                 if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &position, &diagn))
@@ -689,6 +710,9 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_not_connected);
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
                 }
+                #if defined(DEBUG_encoder_AKSIM)
+                sev->off();
+                #endif
             } break;
             
             

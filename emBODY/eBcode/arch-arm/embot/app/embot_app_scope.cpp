@@ -61,6 +61,8 @@ struct embot::app::scope::SignalPrint::Impl
                           
 };
 
+#if !defined(EMBOT_APP_SCOPE_core)
+
 struct embot::app::scope::SignalGPIO::Impl
 {   
 
@@ -91,6 +93,8 @@ struct embot::app::scope::SignalGPIO::Impl
     }    
                       
 };
+
+#endif
 
 // ------
 
@@ -203,6 +207,7 @@ void embot::app::scope::SignalPrint::off()
 
 // ---
 
+#if !defined(EMBOT_APP_SCOPE_core)
 
 embot::app::scope::SignalGPIO::SignalGPIO(const Config &cfg) 
 : pImpl(new Impl)
@@ -227,7 +232,7 @@ void embot::app::scope::SignalGPIO::off()
     pImpl->off();
 }
 
-
+#endif
 // -----
 
 embot::app::scope::SignalEViewer::SignalEViewer(const Config &cfg) 
