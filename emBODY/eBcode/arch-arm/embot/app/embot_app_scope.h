@@ -12,9 +12,12 @@
 #ifndef __EMBOT_APP_SCOPE_H_
 #define __EMBOT_APP_SCOPE_H_
 
+//#define EMBOT_APP_SCOPE_core
 
 #include "embot_core.h"
+#if !defined(EMBOT_APP_SCOPE_core)
 #include "embot_hw_gpio.h"
+#endif
 #include "embot_tools.h"
 
 namespace embot { namespace app { namespace scope {
@@ -123,6 +126,8 @@ namespace embot { namespace app { namespace scope {
         Impl *pImpl;           
     }; 
 
+
+#if !defined(EMBOT_APP_SCOPE_core)
     
     // this implementation uses a gpio which puts high or low.
     class SignalGPIO: public Signal
@@ -153,7 +158,8 @@ namespace embot { namespace app { namespace scope {
         struct Impl;
         Impl *pImpl;           
     };
-    
+
+#endif    
     
     // this implementation collects [on, off] duration in a histogram
     class SignalHisto: public Signal
