@@ -97,7 +97,7 @@ extern "C" {
 //  <o> minute          <0-59>
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          00
 //  </h>build date
-// </h>Info
+// </h>Info 
 
 
 // <h> Configuration of EMS application
