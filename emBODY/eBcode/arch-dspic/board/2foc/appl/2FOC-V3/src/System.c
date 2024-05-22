@@ -164,7 +164,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
                 overheating = TRUE;
             }
             else if (!err)
-            {        
+            {     
                 if (gTemperature > gTemperatureLimit)
                 {
                     ++gTemperatureOverheatingCounter;
@@ -180,26 +180,27 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
                 SysError.OverHeatingFailure = TRUE;
                 FaultConditionsHandler();
             }
-            isTemperatureRead = TRUE;
             
+            // simulating spikes       
             // Synthetic data generation
-            /*
-            generateI2CTsensSynthetic(&gTemperature);    
+            /**
+            generateI2CTsensSynthetic(&gTemperature, gTemperatureSpikeSimulated);  
             if (gTemperature > gTemperatureLimit)
             {
                 overheating = TRUE;
             }
-            else if (gTemperature < (gTemperatureLimit-gTemperatureLimit/8))
+            else if (gTemperature < gTemperatureLimit)
             {
                 overheating = FALSE;
             }
-
-            if (overheating && !SysError.OverHeatingFailure)
+            if ( (overheating) && (!SysError.OverHeatingFailure))
             {
                 SysError.OverHeatingFailure = TRUE;
                 FaultConditionsHandler();
             }
             */
+            
+            isTemperatureRead = TRUE;
         }
     }
     
