@@ -745,7 +745,7 @@
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
@@ -2180,7 +2180,7 @@
             </File>
             <File>
               <FileName>EOMtheEMSrunner.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSrunner.c</FilePath>
             </File>
             <File>
