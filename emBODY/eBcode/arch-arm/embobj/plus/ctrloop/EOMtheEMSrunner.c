@@ -87,14 +87,14 @@
 // - #define with internal scope
 
 
-#define theRunner_USE_revised_algorithm
+// #define theRunner_USE_revised_algorithm
 // NOTE: by undefininng theRunner_USE_revised_algorithm we revert back as originally designed
 
 // #define DEBUG_show_when_evt_execute_is_sent
 // NOTE: if defined eventviewr will show when the evt_execute is emitted
 
 
- #define DEBUG_force_time_overflow
+// #define DEBUG_force_time_overflow
 // NOTE: if defined the cycle sometimes will produce a phase with much longer time
 
 
