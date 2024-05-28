@@ -65,7 +65,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 // if defined, the CAN flush is done at end of the DO phase, else at the beginning of the TX phase
-// #define CANflushMODE_DO_phase
+#define CANflushMODE_DO_phase
 
 
 // --------------------------------------------------------------------------------------------------------------------

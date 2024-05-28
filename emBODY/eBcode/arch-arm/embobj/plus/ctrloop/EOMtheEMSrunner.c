@@ -87,7 +87,7 @@
 // - #define with internal scope
 
 
-// #define theRunner_USE_revised_algorithm
+#define theRunner_USE_revised_algorithm
 // NOTE: by undefininng theRunner_USE_revised_algorithm we revert back as originally designed
 
 // #define DEBUG_show_when_evt_execute_is_sent
