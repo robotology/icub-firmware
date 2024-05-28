@@ -68,7 +68,7 @@ extern "C" {
 
 
 typedef struct
-{
+{   eOabstime_t         timebudget;
     eOabstime_t         timestarted;
     eOabstime_t         timestopped;
     eOabstime_t         duration[2];    // 0 is current iteration, 1 is previous iteration
@@ -81,6 +81,8 @@ typedef struct
 typedef struct
 {
     eObool_t                    cycleisrunning;
+    eOemsrunner_taskid_t        taskinexecution;
+    eOemsrunner_taskid_t        taskterminatedaslatest;
     uint64_t                    iterationnumber;
     eOemsrunner_tasktiming_t    tasktiming[eo_emsrunner_task_numberof];    
 } eOemsrunner_cycletiming_t;

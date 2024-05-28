@@ -66,7 +66,8 @@ typedef enum
 {
     eo_emsrunner_taskid_runRX       = 0,
     eo_emsrunner_taskid_runDO       = 1,
-    eo_emsrunner_taskid_runTX       = 2   
+    eo_emsrunner_taskid_runTX       = 2,
+    eo_emsrunner_taskid_NONE        = 255
 } eOemsrunner_taskid_t;
 
 enum { eo_emsrunner_task_numberof   = 3 };

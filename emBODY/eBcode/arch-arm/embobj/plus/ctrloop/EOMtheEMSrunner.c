@@ -63,6 +63,7 @@
 #include "hal_timer.h"
 #endif
 
+#include "embot_core.h"
 
 
 
@@ -85,12 +86,132 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 
-//#define EOM_EMSRUNNER_EVIEW_MEASURES
 
-#if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
-#include "eventviewer.h"
+#define theRunner_USE_revised_algorithm
+// NOTE: by undefininng theRunner_USE_revised_algorithm we revert back as originally designed
+
+// #define DEBUG_show_when_evt_execute_is_sent
+// NOTE: if defined eventviewr will show when the evt_execute is emitted
+
+
+// #define DEBUG_force_time_overflow
+// NOTE: if defined the cycle sometimes will produce a phase with much longer time
+
+
+// #define EOM_EMSRUNNER_EVIEW_MEASURES
+// NOTE: if defined the eventviewer will show the timing of the phases. marco.accame: maybe it is not useful anymore.
+
+
+#if defined(theRunner_USE_revised_algorithm)
+
+// with USE_ACTIVATION_Mode02 defined the timer sends eo_emsrunner_evt_execute to its task in the following way. 
+// - if the target task is NOT executing AND
+// - if the enabling task (the enabling of RX is TX, of DO is RX and of TX is DO) is the latest executed task OR it is in execution
+// if undefined it always sends eo_emsrunner_evt_execute 
+#define USE_ACTIVATION_Mode02
+
+// with USE_TIMINGMEASURE_effective we start measuring time on entry of thread. 
+// if undefined we measure since emission of the event by the timer 
+#define USE_TIMINGMEASURE_effective
+
+// with USE_OVERFLOWCHECK_effectivetime we mark overflow by checking execution time > budget. 
+// if undefined we mark overflow if the next timer triggers and thread is still in exec. 
+#define USE_OVERFLOWCHECK_effectivetime
+
 #endif
 
+
+
+#if defined(DEBUG_show_when_evt_execute_is_sent)
+
+#include "embot_app_scope.h"
+#include <array>
+
+void execRXemitted() {}
+//embot::app::scope::SignalEViewer *sevrx {nullptr};
+embot::app::scope::SignalEViewer::Config evcrx {execRXemitted, embot::app::scope::SignalEViewer::Config::LABEL::one};  
+
+void execDOemitted() {}
+//embot::app::scope::SignalEViewer *sevdo {nullptr};
+embot::app::scope::SignalEViewer::Config evcdo {execDOemitted, embot::app::scope::SignalEViewer::Config::LABEL::two};  
+
+void execTXemitted() {}
+//embot::app::scope::SignalEViewer *sevtx {nullptr};
+embot::app::scope::SignalEViewer::Config evctx {execTXemitted, embot::app::scope::SignalEViewer::Config::LABEL::three};  
+
+std::array<embot::app::scope::SignalEViewer *, eo_emsrunner_task_numberof> ev {nullptr};
+
+void eom_emsrunner_scope_init()
+{
+    ev[0] = new embot::app::scope::SignalEViewer(evcrx);
+    ev[1] = new embot::app::scope::SignalEViewer(evcdo);
+    ev[2] = new embot::app::scope::SignalEViewer(evctx);    
+}
+
+void eom_emsrunner_scope_tick(eOemsrunner_taskid_t t)
+{
+    if(t < eo_emsrunner_task_numberof)
+    {        
+        ev[t]->on();
+        ev[t]->off();
+    }
+}
+
+#endif
+
+
+
+#if defined(DEBUG_force_time_overflow)
+
+#if defined(USE_EMBOT_theHandler)
+#include "embot_hw_sys.h"
+#else
+#include "embot_core.h"
+#endif
+
+
+void mydelay(uint64_t t)
+{
+#if defined(USE_EMBOT_theHandler)
+    embot::hw::sys::delay(t);
+#else
+    embot::core::wait(t);
+#endif    
+    
+}
+
+void debug_delay_task(eOemsrunner_taskid_t t, uint64_t iterationnumber)
+{
+    static constexpr uint64_t period {1000};
+    static constexpr std::array<uint64_t, 3> delays {700, 1900, 900};
+    
+    if(eo_emsrunner_taskid_runRX == t)
+    {        
+        if((iterationnumber % period) == 4)
+        {            
+            mydelay(delays[t]);
+        }
+    }
+    else if(eo_emsrunner_taskid_runDO == t)
+    {
+        if((iterationnumber % period) == 5)
+        {
+            mydelay(delays[t]);
+        }         
+    }
+    else if(eo_emsrunner_taskid_runTX == t)
+    {
+        if((iterationnumber % period) == 4)
+        {
+            mydelay(delays[t]);
+        }        
+    }
+    
+}
+    
+
+    
+#endif    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -120,6 +241,10 @@ const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
+#include "eventviewer.h"
+#endif
 
 #if defined(EOM_EMSRUNNER_EVIEW_MEASURES)
 
@@ -227,6 +352,11 @@ static void s_eom_runner_overflow_clr(EOMtheEMSrunner *p, eOemsrunner_taskid_t t
 static void s_eom_emsrunner_6HALTIMERS_safestop_check_task(void *arg);
 static void s_eom_emsrunner_6HALTIMERS_start_periodic_timer_safestop_check(void *arg);
 
+
+static eOemsrunner_taskid_t s_eom_emsrunner_prev(eOemsrunner_taskid_t n);
+
+static void e_eom_emsrunner_update_timebudget(void);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -253,7 +383,14 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.txropsnumberincycle)   {0, 0, 0},
     EO_INIT(.txcan1frames)          0,
     EO_INIT(.txcan2frames)          0,
-    EO_INIT(.cycletiming)           { EO_INIT(.cycleisrunning) eobool_false, EO_INIT(.iterationnumber) 0, { {EO_INIT(.timestarted) 0, EO_INIT(.timestopped) 0, EO_INIT(.duration) {0, 0}, EO_INIT(.isexecuting) eobool_false, EO_INIT(.isabout2overflow) eobool_false, EO_INIT(.isoverflown) eobool_false} } },
+    EO_INIT(.cycletiming)           
+    { 
+        EO_INIT(.cycleisrunning) eobool_false, 
+        EO_INIT(.taskinexecution) eo_emsrunner_taskid_NONE, 
+        EO_INIT(.taskterminatedaslatest) eo_emsrunner_taskid_NONE, 
+        EO_INIT(.iterationnumber) 0, 
+        { { EO_INIT(.timebudget) 0, EO_INIT(.timestarted) 0, EO_INIT(.timestopped) 0, EO_INIT(.duration) {0, 0}, EO_INIT(.isexecuting) eobool_false, EO_INIT(.isabout2overflow) eobool_false, EO_INIT(.isoverflown) eobool_false} } 
+    },
     EO_INIT(.isrunning)             eobool_false
 };
 
@@ -307,7 +444,11 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
 #endif   
     
     
-    s_theemsrunner.cycletiming.iterationnumber = 0;    
+    s_theemsrunner.cycletiming.taskinexecution = s_theemsrunner.cycletiming.taskterminatedaslatest = eo_emsrunner_taskid_NONE;
+    s_theemsrunner.cycletiming.iterationnumber = 0;  
+
+    e_eom_emsrunner_update_timebudget();
+
     s_theemsrunner.usedTXdecimationfactor = cfg->defaultTXdecimationfactor;
     if(0 == s_theemsrunner.usedTXdecimationfactor)
     {
@@ -361,6 +502,9 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
 #endif
     
 
+#if defined(DEBUG_show_when_evt_execute_is_sent)
+    eom_emsrunner_scope_init();   
+#endif
 
     s_theemsrunner.isrunning = eobool_false;
 
@@ -446,7 +590,7 @@ extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p
 
 #if defined(USE_EMBOT_theHandler)
 
-#include "embot_hw_bsp_amc_config.h"
+#include "embot_hw_bsp_config.h"
 #include "theApplication_Config.h"
 
 #if defined(EMBOT_ENABLE_hw_timer_emulated)
@@ -479,6 +623,8 @@ extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_
     p->cfg.safeTXexecutiontime = cs*timing->period - cs*timing->txstartafter + cs*timing->rxstartafter - cs*timing->safetygap;
     p->cfg.period = cs*timing->period;
     
+    e_eom_emsrunner_update_timebudget();
+    
     return(eores_OK);
 }
 
@@ -503,6 +649,8 @@ extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_
     p->cfg.execTXafter = timing->txstartafter;
     p->cfg.safeTXexecutiontime = timing->period - timing->txstartafter + timing->rxstartafter - timing->safetygap;
     p->cfg.period = timing->period;
+    
+    e_eom_emsrunner_update_timebudget();
     
     return(eores_OK);
 }
@@ -836,6 +984,8 @@ static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 
 static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
 {
+    s_theemsrunner.cycletiming.taskinexecution = eo_emsrunner_taskid_runRX;
+    
     s_theemsrunner.cycletiming.iterationnumber ++;
     
     s_eom_emsrunner_tasktiming_on_entry(eo_emsrunner_taskid_runRX);
@@ -847,6 +997,9 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     // perform the rx activity    
     if(eobool_true == eom_runner_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runRX))
     {
+#if defined(DEBUG_force_time_overflow)
+        debug_delay_task(eo_emsrunner_taskid_runRX, s_theemsrunner.cycletiming.iterationnumber);
+#endif        
         s_eom_emsrunner_userdef_taskRX_activity(&s_theemsrunner);
     }
           
@@ -860,6 +1013,9 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     
    
     s_eom_emsrunner_tasktiming_on_exit(eo_emsrunner_taskid_runRX);
+    
+    s_theemsrunner.cycletiming.taskterminatedaslatest = eo_emsrunner_taskid_runRX;
+    s_theemsrunner.cycletiming.taskinexecution = eo_emsrunner_taskid_NONE;
     
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     eom_task_SetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runDO], eo_emsrunner_evt_enable);
@@ -947,11 +1103,16 @@ static void s_eom_emsrunner_taskDO_startup(EOMtask *p, uint32_t t)
 
 static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
 {
+    s_theemsrunner.cycletiming.taskinexecution = eo_emsrunner_taskid_runDO;
+    
     s_eom_emsrunner_tasktiming_on_entry(eo_emsrunner_taskid_runDO);
     
     
     if(eobool_true == eom_runner_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runDO))
     {
+#if defined(DEBUG_force_time_overflow)
+        debug_delay_task(eo_emsrunner_taskid_runDO, s_theemsrunner.cycletiming.iterationnumber);
+#endif            
         // perform the do activity
         eom_emsrunner_hid_userdef_taskDO_activity(&s_theemsrunner);
     }
@@ -979,7 +1140,9 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
 
     s_eom_emsrunner_tasktiming_on_exit(eo_emsrunner_taskid_runDO);
        
-		
+	s_theemsrunner.cycletiming.taskterminatedaslatest = eo_emsrunner_taskid_runDO;	
+    s_theemsrunner.cycletiming.taskinexecution = eo_emsrunner_taskid_NONE;
+    
     // Z. at the end enable next in the chain by sending to it a eo_emsrunner_evt_enable
     eom_task_SetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runTX], eo_emsrunner_evt_enable);
 }
@@ -994,10 +1157,16 @@ static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t)
 
 static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 {
+    s_theemsrunner.cycletiming.taskinexecution = eo_emsrunner_taskid_runTX;
+    
     s_eom_emsrunner_tasktiming_on_entry(eo_emsrunner_taskid_runTX);
     
         
     s_theemsrunner.numoftxpackets = 0;
+
+#if defined(DEBUG_force_time_overflow)
+        debug_delay_task(eo_emsrunner_taskid_runTX, s_theemsrunner.cycletiming.iterationnumber);
+#endif 
     
     s_eom_emsrunner_userdef_taskTX_activity(&s_theemsrunner);
     
@@ -1051,6 +1220,9 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
         hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX]);        
         hal_timer_stop(s_theemsrunner.haltimer_safestop[eo_emsrunner_taskid_runTX]);
         
+        s_theemsrunner.cycletiming.taskterminatedaslatest = eo_emsrunner_taskid_NONE;
+        s_theemsrunner.cycletiming.taskinexecution = eo_emsrunner_taskid_NONE;
+        
         
         // and now ... finally we sent the state machine into the new state
         // reset the event to the dummy value.
@@ -1066,7 +1238,9 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
 #endif        
     }
     else
-    {                  
+    {
+        s_theemsrunner.cycletiming.taskterminatedaslatest = eo_emsrunner_taskid_runTX;
+        s_theemsrunner.cycletiming.taskinexecution = eo_emsrunner_taskid_NONE;        
         eom_task_SetEvent(s_theemsrunner.task[eo_emsrunner_taskid_runRX], eo_emsrunner_evt_enable);
     }
 }
@@ -1201,6 +1375,69 @@ static void s_eom_emsrunner_6HALTIMERS_stop(void)
 }
 
 
+#if defined(USE_ACTIVATION_Mode02)
+
+static void s_eom_emsrunner_6HALTIMERS_execute_task(void *arg)
+{
+    eOabstime_t now = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    
+    eOemsrunner_taskid_t taskID2execute = (eOemsrunner_taskid_t) (int32_t)arg;
+    eOemsrunner_taskid_t taskIDprevious = s_eom_emsrunner_prev(taskID2execute);    
+    eOemsrunner_taskid_t taskIDprevprev = s_eom_emsrunner_prev(taskIDprevious);
+    
+#if defined(EOM_EMSRUNNER_EVIEW_MEASURES_TIMERS)
+    evEntityId_t prev = eventviewer_switch_to(ev_tmr_exp[taskID2execute]);      
+    eventviewer_switch_to(prev); 
+#endif  
+
+    
+    bool sendEVENTexecute = false;
+    
+    // we send the or of these conditions:
+    // 1. it is the first cycle
+    // 2. it the previous executing 
+    // 3. the previous was the latest to execute and we are not executing now
+    
+    bool IStheFIRSTcycle = (0 == s_theemsrunner.cycletiming.tasktiming[taskID2execute].timestarted) ? true : false;
+    bool ISthepreviousEXECUTING = s_theemsrunner.cycletiming.tasktiming[taskIDprevious].isexecuting;
+    bool HASthepreviousJUSTexecuted = s_theemsrunner.cycletiming.taskterminatedaslatest == taskIDprevious; 
+    bool ISthecurrentEXECUTING = s_theemsrunner.cycletiming.tasktiming[taskID2execute].isexecuting;
+    
+    sendEVENTexecute = IStheFIRSTcycle || ISthepreviousEXECUTING || (HASthepreviousJUSTexecuted && !ISthecurrentEXECUTING);
+
+  
+
+#if defined(USE_OVERFLOWCHECK_effectivetime)
+#else    
+    if(eobool_true == ISthepreviousEXECUTING)
+    {
+        // damn ... the previous task has not finished yet .... i must mark an overflow for that task.
+        s_eom_runner_overflow_set(&s_theemsrunner, taskIDprevious);
+    }
+#endif
+    
+    if(true == sendEVENTexecute)
+    {
+
+#if defined(DEBUG_show_when_evt_execute_is_sent)        
+        eom_emsrunner_scope_tick(taskID2execute);
+#endif
+        
+        // send event to execute the task in argument
+        EOMtask *task2execute = s_theemsrunner.task[taskID2execute];
+        eom_task_isrSetEvent(task2execute, eo_emsrunner_evt_execute);
+        
+#if defined(USE_TIMINGMEASURE_effective)
+#else        
+        s_theemsrunner.cycletiming.tasktiming[taskID2execute].timestarted = now;
+#endif
+    }
+
+}
+
+
+#elif !defined(USE_ACTIVATION_Mode02)
+
 static void s_eom_emsrunner_6HALTIMERS_execute_task(void *arg)
 {
     eOemsrunner_taskid_t taskID2execute = (eOemsrunner_taskid_t) (int32_t)arg;
@@ -1213,20 +1450,31 @@ static void s_eom_emsrunner_6HALTIMERS_execute_task(void *arg)
            
     eOemsrunner_taskid_t taskIDprevious = (eo_emsrunner_taskid_runRX == taskID2execute) ? (eo_emsrunner_taskid_runTX) : ((eOemsrunner_taskid_t)((uint8_t)taskID2execute-1));
 //    EOMtask* taskprevious = s_theemsrunner.task[taskIDprevious];
-    
+
+
+#if defined(USE_OVERFLOWCHECK_effectivetime)
+#else    
     if(eobool_true == s_theemsrunner.cycletiming.tasktiming[taskIDprevious].isexecuting)
     {
         // damn ... the previous task has not finished yet .... i must mark an overflow for that task.
         s_eom_runner_overflow_set(&s_theemsrunner, taskIDprevious);
     }
+#endif    
+
 
 		 
     // send event to activate the task in argument
     eom_task_isrSetEvent(task2execute, eo_emsrunner_evt_execute);
 
-   
+
+#if defined(USE_TIMINGMEASURE_effective)
+#else        
     s_theemsrunner.cycletiming.tasktiming[taskID2execute].timestarted = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+#endif    
+    
 }
+
+#endif // #elif !defined(USE_ACTIVATION_Mode02)
 
 
 static void s_eom_emsrunner_6HALTIMERS_safestop_check_task(void *arg)
@@ -1301,6 +1549,12 @@ static void s_eom_emsrunner_tasktiming_on_entry(eOemsrunner_taskid_t taskid)
     evEntityId_t prev = eventviewer_switch_to(ev_meas_start[taskid]);      
     eventviewer_switch_to(prev); 
 #endif
+    
+#if defined(USE_TIMINGMEASURE_effective)
+     s_theemsrunner.cycletiming.tasktiming[taskid].timestarted = eov_sys_LifeTimeGet(eov_sys_GetHandle());;
+#else        
+#endif 
+    
     s_theemsrunner.cycletiming.tasktiming[taskid].isexecuting = eobool_true;   
 }
 
@@ -1314,8 +1568,23 @@ static void s_eom_emsrunner_tasktiming_on_exit(eOemsrunner_taskid_t taskid)
     
     s_theemsrunner.cycletiming.tasktiming[taskid].timestopped = eov_sys_LifeTimeGet(eov_sys_GetHandle());
     s_theemsrunner.cycletiming.tasktiming[taskid].duration[1] = s_theemsrunner.cycletiming.tasktiming[taskid].duration[0]; 
+#if defined(USE_TIMINGMEASURE_effective)    
     s_theemsrunner.cycletiming.tasktiming[taskid].duration[0] = s_theemsrunner.cycletiming.tasktiming[taskid].timestopped - s_theemsrunner.cycletiming.tasktiming[taskid].timestarted;
-    s_theemsrunner.cycletiming.tasktiming[taskid].isexecuting = eobool_false;      
+#else
+    s_theemsrunner.cycletiming.tasktiming[taskid].duration[0] = s_theemsrunner.cycletiming.tasktiming[taskid].timestopped - s_theemsrunner.cycletiming.tasktiming[taskid].timestarted;
+#endif    
+    s_theemsrunner.cycletiming.tasktiming[taskid].isexecuting = eobool_false;   
+
+#if defined(USE_OVERFLOWCHECK_effectivetime)
+        
+    if(s_theemsrunner.cycletiming.tasktiming[taskid].duration[0] >= s_theemsrunner.cycletiming.tasktiming[taskid].timebudget)
+    {
+        // damn ... this thread has finished beyond budget i must mark an overflow.
+        s_eom_runner_overflow_set(&s_theemsrunner, taskid);
+    } 
+    
+#else    
+#endif    
 }
 
 
@@ -1335,6 +1604,8 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
     static uint64_t last4durations = 0;
     
     uint64_t currduration = s_theemsrunner.cycletiming.tasktiming[taskid].duration[0];
+    
+    constexpr bool logDURATIONs {false};
 
     
 //    char strtime[64] = {0};
@@ -1344,7 +1615,8 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
   	errdes.sourceaddress    = 0;
 	eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == s_theemsrunner.mode) ? (eo_errortype_error) : (eo_errortype_warning);
     
-//    const uint32_t periodreport = 10000;
+    constexpr uint32_t periodreport = 5000;
+    
 	switch (taskid)
 	{
 		case eo_emsrunner_taskid_runRX:
@@ -1360,14 +1632,14 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                 errdes.par64            = last4durations; 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
-            else
+            else if(true == logDURATIONs)
             {
-//                static uint32_t rr = 0;
-//                if(700 == (++rr % periodreport))
-//                {
-////                    embot::core::TimeFormatter tf {currduration};
-////                    embot::core::print("RX is " + tf.to_string());
-//                }                               
+                static uint32_t rr = 0;
+                if(0 == (++rr % periodreport))
+                {
+                    embot::core::TimeFormatter tf {currduration};
+                    embot::core::print("RX is " + tf.to_string());
+                }                               
             }    
         } break;
             
@@ -1380,7 +1652,7 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
 			if(eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown)
 			{
                 static int dont_stress = 0;
-#if defined(STM32HAL_BOARD_AMC)
+#if defined(USE_EMBOT_theHandler)
                 static const int stresstolerance  = 0;
 #else
                 static const int stresstolerance  = 5000;
@@ -1395,14 +1667,14 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                     eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
                 }
 			}
-            else
+            else if(true == logDURATIONs)
             {
-//                static uint32_t dd = 0;
-//                if(700 == (++dd % periodreport))
-//                {
-////                    embot::core::TimeFormatter tf {currduration};
-////                    embot::core::print("DO is " + tf.to_string());
-//                }                               
+                static uint32_t dd = 0;
+                if(700 == (++dd % periodreport))
+                {
+                    embot::core::TimeFormatter tf {currduration};
+                    embot::core::print("DO is " + tf.to_string());
+                }                               
             }            
 
         } break;
@@ -1421,17 +1693,19 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                 errdes.par64            = (last4durations & 0x0000ffffffffffff) | (canframes << 48); 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
-            else
+            else if(true == logDURATIONs)
             {
-//                static uint32_t dd = 0;
-//                if(0 == (++dd % periodreport))
-//                {
-////                    embot::core::TimeFormatter tf {currduration};
-////                    embot::core::print("TX is " + tf.to_string());
-//                }                               
+                static uint32_t dd = 0;
+                if(0 == (++dd % periodreport))
+                {
+                    embot::core::TimeFormatter tf {currduration};
+                    embot::core::print("TX is " + tf.to_string());
+                }                               
             }
           
         } break;
+        
+        default: {} break;
 	}
     
     // must clear
@@ -1530,9 +1804,12 @@ static void s_eom_emsrunner_6HALTIMERS_start(EOMtheEMSrunner *p)
     
     // we impose that the cycle is running    
     p->cycletiming.cycleisrunning = eobool_true;
+    p->cycletiming.taskinexecution = p->cycletiming.taskterminatedaslatest = eo_emsrunner_taskid_NONE;
     p->cycletiming.iterationnumber = 0;
     
     memset(&s_theemsrunner.cycletiming.tasktiming, 0, sizeof(s_theemsrunner.cycletiming.tasktiming));
+    // but also reassign the time budgets inside tasktiming[]
+    e_eom_emsrunner_update_timebudget();
 
     // finally: we activate the hal timers. it is best to avoid any interruption in here, thus we disable scheduling
     //osal_system_scheduling_suspend();
@@ -1595,6 +1872,18 @@ extern eObool_t eom_runner_cansafelyexecute(EOMtheEMSrunner *p, eOemsrunner_task
     
     return(ret);
     
+}
+
+static eOemsrunner_taskid_t s_eom_emsrunner_prev(eOemsrunner_taskid_t n)
+{
+    return (eo_emsrunner_taskid_runRX == n) ? (eo_emsrunner_taskid_runTX) : ((eOemsrunner_taskid_t)((uint8_t)n-1));
+}
+
+static void e_eom_emsrunner_update_timebudget(void)
+{
+    s_theemsrunner.cycletiming.tasktiming[eo_emsrunner_taskid_runRX].timebudget = s_theemsrunner.cfg.execDOafter;
+    s_theemsrunner.cycletiming.tasktiming[eo_emsrunner_taskid_runDO].timebudget = s_theemsrunner.cfg.execTXafter - s_theemsrunner.cfg.execDOafter;
+    s_theemsrunner.cycletiming.tasktiming[eo_emsrunner_taskid_runTX].timebudget = s_theemsrunner.cfg.period - s_theemsrunner.cfg.execTXafter;    
 }
 
 

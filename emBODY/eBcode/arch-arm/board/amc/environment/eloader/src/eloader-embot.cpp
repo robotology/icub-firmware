@@ -76,6 +76,7 @@ constexpr embot::hw::Config hwCFG {nullptr, get1microtime2};
 #undef DEBUG_stayinhere
 // if defined it enables the CM4 core after clock initialization inside embot::hw::init()
 #undef DEBUG_startCM4now
+#undef DEBUG_eraseeeprom
 
 // used functions
 
@@ -247,6 +248,10 @@ constexpr uint32_t LOADER_ADR_INVALID {0xffffffff};
 
 void thejumper()
 {
+#if defined(DEBUG_eraseeeprom)
+    embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+    embot::hw::eeprom::erase(embot::hw::EEPROM::one, 3*embot::core::time1millisec); // 0, 8*1024);   
+#endif    
     s_loader_shared_services_init();
     
     s_loader_eval_jump_request_from_an_eproc();
