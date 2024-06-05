@@ -115,6 +115,17 @@ typedef struct
 } eo_appEncReader_amodiag_t;
 
 
+// structure defined for counting the errors related to aksim2 encoder
+typedef struct
+{
+    uint16_t encoder_error_crc_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t encoder_error_invalid_data_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t encoder_error_close_to_limit_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t encoder_error_hal_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t encoder_error_total_timer_counter[eOappEncReader_jomos_maxnumberof];
+    
+} eOappEncReader_Aksim2_DiagnosticError_Counters_t;
+
 struct EOappEncReader_hid
 {
     eObool_t                                initted;
@@ -127,6 +138,7 @@ struct EOappEncReader_hid
     float                                   maisConversionFactors[eOappEncReader_jomos_maxnumberof];
     eOappEncReader_hallAdc_conversionData_t hallAdcConversionData;
     eo_appEncReader_amodiag_t               amodiag;
+    eOappEncReader_Aksim2_DiagnosticError_Counters_t aksim2DiagnerrorCounters;
 }; 
 
 

@@ -212,6 +212,14 @@ static EOappEncReader s_eo_theappencreader =
         EO_INIT(.cnts)              { 0, 0},
         EO_INIT(.one)               { 0, 0, 0, 0, 0 },
         EO_INIT(.two)               { 0, 0, 0, 0, 0 }       
+    },
+    EO_INIT(.aksim2DiagnerrorCounters )
+    {
+        EO_INIT(.encoder_error_crc_counter            ) {0, 0, 0, 0},
+        EO_INIT(.encoder_error_invalid_data_counter   ) {0, 0, 0, 0},
+        EO_INIT(.encoder_error_close_to_limit_counter ) {0, 0, 0, 0},
+        EO_INIT(.encoder_error_hal_counter            ) {0, 0, 0, 0},
+        EO_INIT(.encoder_error_total_timer_counter    ) {0, 0, 0, 0}
     }
 };
 
@@ -698,18 +706,57 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 }
                 else
                 {   // we dont even have a valid reading from hal or the encoder is not properly connected to the board
+                    ++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_hal_counter[jomo];
+                
                     prop.valueinfo->errortype = encreader_err_AKSIM2_GENERIC ;
                     errorparam = 0;
-                    
-                    // notify the error (check and re-check)
+                }
+                
+                if(++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_total_timer_counter[jomo] > 10000)
+                {
+                    // preperare data for diagnostics
                     eOerrmanDescriptor_t errdes = {0};
                     errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
                     errdes.sourceaddress        = 0;
-                    errdes.par16                = 0;
+                    errdes.par16                = jomo;
                     errdes.par64                = (uint64_t) (diagn.info.aksim2_status_crc) << 32;
-                    errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_not_connected);
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                    
+                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_hal_counter[jomo] > 0)
+                    {
+                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_not_connected);
+                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_hal_counter[jomo];
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                        
+                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_hal_counter[jomo] = 0;
+                    }
+                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] > 0)
+                    {
+                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
+                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo];
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                        
+                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] = 0;
+                    }
+                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] > 0)
+                    {
+                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_close_to_limits);
+                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo];
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                        
+                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] = 0;
+                    }
+                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] > 0)
+                    {
+                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
+                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo];
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                        
+                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] = 0;
+                    }
+                    
+                    s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_total_timer_counter[jomo] = 0;
                 }
+            
                 #if defined(DEBUG_encoder_AKSIM)
                 sev->off();
                 #endif
@@ -1398,35 +1445,25 @@ static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(uint8_t jomo, hal_spiencod
 {
     // in case of errors we return false. Initially we assume no errors
     eObool_t ret = eobool_true;
-    
-    // preperare data for diagnostics
-    eOerrmanDescriptor_t errdes = {0};
-    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress        = 0;
-    errdes.par16                = jomo;
-    errdes.par64                = (uint64_t) (diag->info.aksim2_status_crc) << 32;
 
-    // In case of errors we send human readable diagnostics messages
     if(0x04 == (0x04 & diag->info.aksim2_status_crc))
     {
-        errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo];
         ret = eobool_false;
     }
 
     if(0x02 == (0x02 & diag->info.aksim2_status_crc))
     {
-        errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_close_to_limits);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo];
         ret = eobool_false;
     }
     
     if(0x01 == (0x01 & diag->info.aksim2_status_crc))
     {
-        errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        ++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo];
         ret = eobool_false;
     }
+    
     
     return ret;
 }
