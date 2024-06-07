@@ -98,7 +98,8 @@ void JointSet_init(JointSet* o) //
     o->posdir_ctrl_out_type = eomc_ctrl_out_type_n_a;
     o->veldir_ctrl_out_type = eomc_ctrl_out_type_n_a;
     
-    o->pos_control_active = TRUE;
+    //o->pos_control_active = TRUE;
+    o->pos_control_active = FALSE;
     o->trq_control_active = FALSE; 
     o->USE_SPEED_FBK_FROM_MOTORS = TRUE;
     
@@ -451,13 +452,13 @@ void JointSet_set_constraints(JointSet* o, const eOmc_jointSet_constraints_t *co
 
 #endif
 
-static int control_output_type(JointSet* o, int16_t control_mode)
+static int control_output_type(JointSet* o, int16_t control_mode, int16_t interaction_mode)
 {
     if (control_mode == eomc_controlmode_cmd_force_idle) return eomc_ctrl_out_type_off;
     
     if (control_mode == eomc_controlmode_cmd_idle) return eomc_ctrl_out_type_off;
     
-    if (o->interaction_mode == eOmc_interactionmode_stiff)
+    if (interaction_mode == eOmc_interactionmode_stiff)
     {
         switch (control_mode)
         {
@@ -550,7 +551,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         }
     }
     
-    int motor_input_type = control_output_type(o, control_mode_cmd);
+    int motor_input_type = control_output_type(o, control_mode_cmd, o->interaction_mode);
         
     if (motor_input_type == eomc_ctrl_out_type_n_a)
     {
@@ -653,11 +654,14 @@ void JointSet_set_interaction_mode(JointSet* o, eOmc_interactionmode_t interacti
 {
     if (interaction_mode == o->interaction_mode) return;
     
-    if ((interaction_mode == eOmc_interactionmode_compliant) && (o->torque_ctrl_out_type == eomc_ctrl_out_type_n_a)) return;
+    //if ((interaction_mode == eOmc_interactionmode_compliant) && (o->torque_ctrl_out_type == eomc_ctrl_out_type_n_a)) return;
     
+    int motor_input_type = control_output_type(o, o->control_mode, interaction_mode);
+    
+    if (motor_input_type == eomc_ctrl_out_type_n_a) return;
+   
     o->interaction_mode = interaction_mode;
-    
-    int motor_input_type = control_output_type(o, o->control_mode);
+    o->motor_input_type = motor_input_type;
     
     JointSet_set_inner_control_flags(o);
     
@@ -674,6 +678,11 @@ void JointSet_set_interaction_mode(JointSet* o, eOmc_interactionmode_t interacti
     
     for (int k=0; k<N; ++k)
     {
+        if (Motor_is_running(o->motor+o->motors_of_set[k]))
+        {
+            Motor_set_run(o->motor+o->motors_of_set[k], o->motor_input_type);
+        }
+        
         Joint_set_interaction_mode(o->joint+o->joints_of_set[k], interaction_mode);
     }
 }
