@@ -105,6 +105,54 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
 }
 
 
+
+//#include "osal.h"
+
+//int32_t tdelta {0};
+//volatile uint64_t tnow {0};
+//volatile uint64_t tpre {0};
+//volatile uint32_t negs {0}; 
+//volatile uint32_t poss {0}; 
+//volatile uint64_t oks {0}; 
+
+//    
+//#include "hal_sys.h"
+//void test()
+//{
+//    
+//    tnow = tpre = osal_system_abstime_get();
+////    dbg_time_add();
+//    for(;;)
+//    {
+////        hal_sys_delay(20);        
+//        tnow = osal_system_abstime_get();
+////        dbg_time_add();
+//        tdelta = tnow - tpre;
+
+//        if(tdelta < 0)
+//        {
+//            negs ++;
+//        }
+//        else if(tdelta > 1000)
+//        {
+//            poss ++;
+//        }
+//        else
+//        {
+//            oks ++;
+//        }
+//        
+//        tpre = tnow;
+//    }
+//    
+//    
+//}
+// 
+//extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
+//{
+//    test();
+//}
+
 // simone.girardi on 8 Nov 2021: with the following macro enabled we can test the reading on aea3 encoder.
 // with a minimum effort we can use it to test other similar encoders (e.g. aea1, aea2 ...)  as well.
 //#define TEST_SPI_ENCODER
