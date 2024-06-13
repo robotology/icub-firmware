@@ -853,6 +853,10 @@ void rt_pop_req (void) {
 #endif
 }
 
+// by defining this we protect the increment of oosiit_time
+// so that its use inside s_oosiit_microtime_get() is more reliable
+#define OSIIT_TIME_INCREMENTED_WITH_IRQ_DISABLE
+
 #ifdef __CMSIS_RTOS
 extern void sysTimerTick(void);
 #endif
@@ -871,7 +875,13 @@ void rt_systick (void) {
 
   /* Update delays. */
   os_time++;
+#if defined(OSIIT_TIME_INCREMENTED_WITH_IRQ_DISABLE)    
+  volatile int wasmasked = __disable_irq();    
   oosiit_time++;				            // IIT-EXT
+  if(!wasmasked) __enable_irq();  
+#else
+  oosiit_time++;				            // IIT-EXT
+#endif    
   iitchanged_rt_dec_dly ();			        // IIT-EXT
 
 
