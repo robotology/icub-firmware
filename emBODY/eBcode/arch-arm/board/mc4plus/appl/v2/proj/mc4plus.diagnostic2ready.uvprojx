@@ -400,9 +400,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
-              <FileName>osal.cm4.lib</FileName>
+              <FileName>osal.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
               <FileName>hal2.mc4plus.ethdbg.lib</FileName>
@@ -1835,9 +1835,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
-              <FileName>osal.cm4.lib</FileName>
+              <FileName>osal.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
             <File>
               <FileName>hal2.mc4plus.ethdbg.lib</FileName>

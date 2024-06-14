@@ -86,6 +86,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 
+// define it in case you experience negative delta times
+//#define theRunner_USE_compensationofdurations
+
 
 #define theRunner_USE_revised_algorithm
 // NOTE: by undefininng theRunner_USE_revised_algorithm we revert back as originally designed
@@ -1558,6 +1561,20 @@ static void s_eom_emsrunner_tasktiming_on_entry(eOemsrunner_taskid_t taskid)
     s_theemsrunner.cycletiming.tasktiming[taskid].isexecuting = eobool_true;   
 }
 
+#if defined(theRunner_USE_compensationofdurations)
+static void send_debug_message(uint16_t par16, uint64_t par64)
+{
+    eOerrmanDescriptor_t errdes = {0};
+
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.par16            = par16;
+    errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);
+
+}
+#endif
 
 static void s_eom_emsrunner_tasktiming_on_exit(eOemsrunner_taskid_t taskid)
 {
@@ -1568,10 +1585,36 @@ static void s_eom_emsrunner_tasktiming_on_exit(eOemsrunner_taskid_t taskid)
     
     s_theemsrunner.cycletiming.tasktiming[taskid].timestopped = eov_sys_LifeTimeGet(eov_sys_GetHandle());
     s_theemsrunner.cycletiming.tasktiming[taskid].duration[1] = s_theemsrunner.cycletiming.tasktiming[taskid].duration[0]; 
-#if defined(USE_TIMINGMEASURE_effective)    
-    s_theemsrunner.cycletiming.tasktiming[taskid].duration[0] = s_theemsrunner.cycletiming.tasktiming[taskid].timestopped - s_theemsrunner.cycletiming.tasktiming[taskid].timestarted;
+#if defined(USE_TIMINGMEASURE_effective)  
+    int64_t delta = s_theemsrunner.cycletiming.tasktiming[taskid].timestopped - s_theemsrunner.cycletiming.tasktiming[taskid].timestarted;
+#if defined(theRunner_USE_compensationofdurations)
+    if(delta < 0)
+    {
+        // emit msg
+        send_debug_message(taskid, delta);
+        delta = 1;
+    }
+    else if(delta > 1000)
+    {
+        delta -= 1000;    
+    } 
+#endif // #if defined(theRunner_USE_compensationofdurations)           
+    s_theemsrunner.cycletiming.tasktiming[taskid].duration[0] = delta;
 #else
-    s_theemsrunner.cycletiming.tasktiming[taskid].duration[0] = s_theemsrunner.cycletiming.tasktiming[taskid].timestopped - s_theemsrunner.cycletiming.tasktiming[taskid].timestarted;
+    int64_t delta = s_theemsrunner.cycletiming.tasktiming[taskid].timestopped - s_theemsrunner.cycletiming.tasktiming[taskid].timestarted;
+#if defined(theRunner_USE_compensationofdurations)
+    if(delta < 0)
+    {
+        // emit msg
+        send_debug_message(taskid, delta);
+        delta = 1;
+    }
+    else if(delta > 1000)
+    {
+        delta -= 1000;    
+    }     
+#endif // #if defined(theRunner_USE_compensationofdurations)           
+    s_theemsrunner.cycletiming.tasktiming[taskid].duration[0] = delta;
 #endif    
     s_theemsrunner.cycletiming.tasktiming[taskid].isexecuting = eobool_false;   
 
@@ -1606,16 +1649,41 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
     uint64_t currduration = s_theemsrunner.cycletiming.tasktiming[taskid].duration[0];
     
     constexpr bool logDURATIONs {false};
+    constexpr uint32_t periodreport = 10000; // in ms
+    constexpr uint32_t offsetreport[3] = {0, 0, 0};
 
+    enum { stat_cnt = 0, stat_min = 1, stat_max = 2, stat_cum = 3, stats_numberof = 4}; 
+    static uint64_t stats[eo_emsrunner_task_numberof][stats_numberof] = {0};
+
+    if(true == logDURATIONs)
+    {    
+        if(stats[taskid][stat_cnt] == 0)
+        {
+            stats[taskid][stat_max] = stats[taskid][stat_cum] = 0;
+            stats[taskid][stat_min] = 1000000;  
+            stats[taskid][stat_cnt] = offsetreport[taskid];            
+        }
+        
+        stats[taskid][stat_cum] += currduration;
+        stats[taskid][stat_cnt]++;
+
+        if(currduration < stats[taskid][stat_min])
+        {
+            stats[taskid][stat_min] = currduration;
+        }
+        
+        if(currduration > stats[taskid][stat_max])
+        {
+            stats[taskid][stat_max] = currduration;
+        } 
+    }        
     
-//    char strtime[64] = {0};
     
 	eOerrmanDescriptor_t errdes = {0};
 	errdes.sourcedevice = eo_errman_sourcedevice_localboard;
   	errdes.sourceaddress    = 0;
 	eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == s_theemsrunner.mode) ? (eo_errortype_error) : (eo_errortype_warning);
     
-    constexpr uint32_t periodreport = 5000;
     
 	switch (taskid)
 	{
@@ -1632,13 +1700,32 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                 errdes.par64            = last4durations; 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
-            else if(true == logDURATIONs)
+            
+            if(true == logDURATIONs)
             {
-                static uint32_t rr = 0;
-                if(0 == (++rr % periodreport))
+                if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
                 {
-                    embot::core::TimeFormatter tf {currduration};
-                    embot::core::print("RX is " + tf.to_string());
+                    
+//                    embot::core::TimeFormatter tf {currduration};
+//                    embot::core::print("RX is " + tf.to_string());
+                    uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphaseaverage);
+                    errdes.par16            = currduration & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);    
+
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphasemin);
+                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphasemax);
+                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+                                         
+                    // as last
+                    stats[taskid][stat_cnt] = 0;
                 }                               
             }    
         } break;
@@ -1667,13 +1754,32 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                     eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
                 }
 			}
-            else if(true == logDURATIONs)
+            
+            if(true == logDURATIONs)
             {
-                static uint32_t dd = 0;
-                if(700 == (++dd % periodreport))
+                if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
                 {
-                    embot::core::TimeFormatter tf {currduration};
-                    embot::core::print("DO is " + tf.to_string());
+                    uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
+                    
+//                    embot::core::TimeFormatter tf {currduration};
+//                    embot::core::print("DO is " + tf.to_string());
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophaseaverage);
+                    errdes.par16            = average & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);     
+
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophasemin);
+                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophasemax);
+                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
+
+                    // as last
+                    stats[taskid][stat_cnt] = 0;                    
                 }                               
             }            
 
@@ -1693,13 +1799,32 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                 errdes.par64            = (last4durations & 0x0000ffffffffffff) | (canframes << 48); 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
-            else if(true == logDURATIONs)
+            
+            if(true == logDURATIONs)
             {
-                static uint32_t dd = 0;
-                if(0 == (++dd % periodreport))
+                if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
                 {
-                    embot::core::TimeFormatter tf {currduration};
-                    embot::core::print("TX is " + tf.to_string());
+                    uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
+                    
+//                    embot::core::TimeFormatter tf {currduration};
+//                    embot::core::print("TX is " + tf.to_string());
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphaseaverage);
+                    errdes.par16            = average & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);      
+
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphasemin);
+                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphasemax);
+                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
+                    errdes.par64            = last4durations; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                       
+
+                    // as last
+                    stats[taskid][stat_cnt] = 0;
                 }                               
             }
           

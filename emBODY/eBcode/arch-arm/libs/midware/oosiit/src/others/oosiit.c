@@ -65,6 +65,10 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+#define OSIIT_TIME_USE_IRQ_DISABLE
+
+#define OSIIT_TIME_COMPENSATE_PENDING_SYSTICK
+
 //#define OOSIIT_USE_TIMEGET_UNDER_SVC
 
 // used to avoid problems with the SVC declarations
@@ -151,10 +155,10 @@ static __INLINE oosiit_result_t s_oosiit_sem_valid(oosiit_objptr_t op);
 static __INLINE oosiit_result_t s_oosiit_mbx_valid(oosiit_objptr_t op);
 static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op);
 
-#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+//#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* high);
 static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* high);
-#endif
+//#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of svc functions
@@ -781,10 +785,12 @@ extern oosiit_result_t oosiit_time_set(uint64_t target)
 }
 
 
-#if     defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+
 
 extern uint64_t oosiit_time_get(void)
 {
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)  
+    
     if(0 != __get_IPSR()) 
     {   // inside isr
         return(oosiit_time);
@@ -803,15 +809,23 @@ extern uint64_t oosiit_time_get(void)
     else
     {   // not within an isr. os not started
         return(oosiit_time);
-    }    
+    }
+    
+#else
+        
+    return(oosiit_time);
+    
+#endif    
 }
 
 
 extern uint64_t oosiit_microtime_get(void)
-{       
+{     
     uint32_t low = 0;
     uint32_t high = 0;
     uint64_t res = 0;
+    
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)   
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -821,11 +835,17 @@ extern uint64_t oosiit_microtime_get(void)
     {   // call svc
         __svc_oosiit_microtime_get(&low, &high);
     }  
+
+#else
+    
+    s_oosiit_microtime_get(&low, &high);
+    
+#endif
     
     res = high;
     res <<= 32;
     res += low;
-    return(res);    
+    return(res);  
 }
 
 extern uint64_t oosiit_nanotime_get(void)
@@ -833,6 +853,8 @@ extern uint64_t oosiit_nanotime_get(void)
     uint32_t low = 0;
     uint32_t high = 0;
     uint64_t res = 0;
+
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)  
     
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -842,53 +864,18 @@ extern uint64_t oosiit_nanotime_get(void)
     {   // call svc
         __svc_oosiit_nanotime_get(&low, &high);
     }  
+
+#else
+    
+    s_oosiit_nanotime_get(&low, &high);
+    
+#endif
     
     res = high;
     res <<= 32;
     res += low;
     return(res); 
 }
-
-#else//!defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
-
-extern uint64_t oosiit_time_get(void)
-{
-    return(oosiit_time);
-}
-
-extern uint64_t oosiit_microtime_get(void)
-{
-    uint64_t microsecs;
-    uint64_t tmp;
-    volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
-    
-    // add to microsecs the content of register systick_current_value_reg properly scaled.
-
-    // tmp is in pico
-    tmp = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    tmp /= 1000000LL; // now micro
-    microsecs = (oosiit_time * oosiit_cfg_in_use->ticktime) + tmp;
-
-    return(microsecs);    
-}
-
-extern uint64_t oosiit_nanotime_get(void)
-{
-    uint64_t nanosecs;
-    volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
-
-    // add to nanosecs the content of register systick_current_value_reg properly scaled.
-
-    nanosecs = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    nanosecs /= 1000; // before it was pico, now it is nano
-    nanosecs += (oosiit_time * oosiit_cfg_in_use->ticktime * 1000LL);
-
-    return(nanosecs);
-}
-
-
-
-#endif//!defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 
 // - delay functions --------------------------------------------------------------------------------------------------
@@ -1796,7 +1783,7 @@ extern oosiit_result_t svc_oosiit_time_set(uint32_t low, uint32_t high)
     return(oosiit_res_OK);
 }
 
-#if     defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 extern oosiit_result_t svc_oosiit_time_get(uint32_t* low, uint32_t* high)
 {
@@ -1826,7 +1813,7 @@ extern oosiit_result_t svc_oosiit_nanotime_get(uint32_t* low, uint32_t* high)
     return(oosiit_res_OK);    
 }
 
-#endif//defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+#endif // #if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 
 // delay
@@ -2302,21 +2289,64 @@ static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op)
     return(oosiit_res_OK);    
 }
 
-#if     defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+//#if defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+
+// note: now s_oosiit_microtime_get() and s_oosiit_nanotime_get() are used irrespectively of definition of OOSIIT_USE_TIMEGET_UNDER_SVC
 
 static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* high)
-{
-    uint64_t microsecs;
-    uint64_t tmp;
-    volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
+{   
+    volatile uint64_t nticks = 0;    
+    volatile uint32_t regSTCUR0xE000E018 = 0; 
+    
+#if defined(OSIIT_TIME_USE_IRQ_DISABLE)     
+    volatile int wasmasked = __disable_irq();
+#endif // #if defined(OSIIT_TIME_USE_IRQ_DISABLE) 
+    
+    // nticks contains the value of ticks (typically millisec resolution)
+    // as generated by the systick handler that get pending wevery time the STCUR register goes to zero.
+    nticks = oosiit_time;
+    // regSTCUR0xE000E018 contains the value of the register which will help us to achieve microsecond resolution
+    regSTCUR0xE000E018 = *((volatile uint32_t *)0xE000E018);
+    
+#if defined(OSIIT_TIME_COMPENSATE_PENDING_SYSTICK)
+    // however, the systick may be pending and not yet executed. remember that it have a low IRQ priority and can be
+    // preempted by the SVC handler that runs this code.
+    // so, i read the interrupt and control status register (ICSR) and check bit 26 to see if the systick is pending. 
+    // it is important to detect if the systick is pending because we need to increment nticks 
+    // ideally we should read STCUR and ICSR at the very same time instant, but that cannot happen and the STCUR keeps on running,
+    // so it may happen that we read a small value of STCUR (on the ems: 0, 1, 2, 3, 4 or 5) and then we read ICSR. By the time
+    // we read ICSR the STCUR have goene to zero and we find the ICSR:bit26 on.
+    // in this case we must NOT increment nticks.
+    // we detect this situation by doing a second reading of STCUR and cheching that we have not passed through zero.    
+    volatile uint32_t regICSR0xE000ED04 = *((volatile uint32_t *)0xE000ED04);
+    uint8_t isSYSTICKpending = 0x04000000 == (regICSR0xE000ED04 & 0x04000000);// (1 << 26);
+    if(1 == isSYSTICKpending)
+    {
+        volatile uint32_t reg0xE000E018_2ndread = *((volatile uint32_t *)0xE000E018);
+        if(reg0xE000E018_2ndread < regSTCUR0xE000E018)
+        {   // it means that the pending systick happened before the reading of STCUR into regSTCUR0xE000E018 
+            // and not after. so we must considere an extra tick.
+            nticks++;
+        }        
+    }
+
+#endif // #if defined(OSIIT_TIME_COMPENSATE_PENDING_SYSTICK) 
+
+#if defined(OSIIT_TIME_USE_IRQ_DISABLE)      
+    if(!wasmasked) __enable_irq();
+#endif // #if defined(OSIIT_TIME_USE_IRQ_DISABLE) 
+
     
     // add to microsecs the content of register systick_current_value_reg properly scaled.
 
-    // tmp is in pico
-    tmp = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    tmp /= 1000000LL;   // now in micro
-    microsecs = (oosiit_time * oosiit_cfg_in_use->ticktime) + tmp;
+    uint64_t microsecs = 0;;
+    volatile uint64_t tmp_pico = 0;;
+    volatile uint64_t tmp_micro = 0;
     
+    tmp_pico = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - regSTCUR0xE000E018);
+    tmp_micro = tmp_pico / 1000000LL;   // now in micro
+    microsecs = (nticks * oosiit_cfg_in_use->ticktime) + tmp_micro;
+           
     *low = microsecs & 0xffffffff;
     *high = (microsecs >> 32) & 0xffffffff;
 
@@ -2326,16 +2356,58 @@ static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* 
 
 static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* high)
 {
-    uint64_t nanosecs;
-    volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
+    volatile uint64_t nticks = 0;    
+    volatile uint32_t regSTCUR0xE000E018 = 0; 
+    
+#if defined(OSIIT_TIME_USE_IRQ_DISABLE)     
+    volatile int wasmasked = __disable_irq();
+#endif // #if defined(OSIIT_TIME_USE_IRQ_DISABLE) 
+    
+    // nticks contains the value of ticks (typically millisec resolution)
+    // as generated by the systick handler that get pending wevery time the STCUR register goes to zero.
+    nticks = oosiit_time;
+    // regSTCUR0xE000E018 contains the value of the register which will help us to achieve microsecond resolution
+    regSTCUR0xE000E018 = *((volatile uint32_t *)0xE000E018);
+    
+#if defined(OSIIT_TIME_COMPENSATE_PENDING_SYSTICK)
+    // however, the systick may be pending and not yet executed. remember that it have a low IRQ priority and can be
+    // preempted by the SVC handler that runs this code.
+    // so, i read the interrupt and control status register (ICSR) and check bit 26 to see if the systick is pending. 
+    // it is important to detect if the systick is pending because we need to increment nticks 
+    // ideally we should read STCUR and ICSR at the very same time instant, but that cannot happen and the STCUR keeps on running,
+    // so it may happen that we read a small value of STCUR (on the ems: 0, 1, 2, 3, 4 or 5) and then we read ICSR. By the time
+    // we read ICSR the STCUR have goene to zero and we find the ICSR:bit26 on.
+    // in this case we must NOT increment nticks.
+    // we detect this situation by doing a second reading of STCUR and cheching that we have not passed through zero.    
+    volatile uint32_t regICSR0xE000ED04 = *((volatile uint32_t *)0xE000ED04);
+    uint8_t isSYSTICKpending = 0x04000000 == (regICSR0xE000ED04 & 0x04000000);// (1 << 26);
+    if(1 == isSYSTICKpending)
+    {
+        volatile uint32_t reg0xE000E018_2ndread = *((volatile uint32_t *)0xE000E018);
+        if(reg0xE000E018_2ndread < regSTCUR0xE000E018)
+        {   // it means that the pending systick happened before the reading of STCUR into regSTCUR0xE000E018 
+            // and not after. so we must considere an extra tick.
+            nticks++;
+        }        
+    }
 
+#endif // #if defined(OSIIT_TIME_COMPENSATE_PENDING_SYSTICK) 
+
+#if defined(OSIIT_TIME_USE_IRQ_DISABLE)      
+    if(!wasmasked) __enable_irq();
+#endif // #if defined(OSIIT_TIME_USE_IRQ_DISABLE) 
+    
+    uint64_t nanosecs = 0;;
+    volatile uint64_t tmp_pico = 0;;
+    volatile uint64_t tmp_micro = 0;    
+    
     // add to nanosecs the content of register systick_current_value_reg properly scaled.
     // if it is equal to systick_reload_value_reg, then extranano = 0;
     // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
 
-    nanosecs = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    nanosecs = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - regSTCUR0xE000E018);
     nanosecs /= 1000LL; // before it was pico, now it is nano
-    nanosecs += (oosiit_time * oosiit_cfg_in_use->ticktime * 1000LL);
+    nanosecs += (nticks * oosiit_cfg_in_use->ticktime * 1000LL);
 
     *low = nanosecs & 0xffffffff;
     *high = (nanosecs >> 32) & 0xffffffff;
@@ -2343,7 +2415,7 @@ static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* h
     return(oosiit_res_OK);    
 }
 
-#endif//defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
+//#endif // defined(OOSIIT_USE_TIMEGET_UNDER_SVC)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
