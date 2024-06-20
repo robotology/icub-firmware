@@ -22,6 +22,7 @@ extern "C" {
 // - public #define  --------------------------------------------------------------------------------------------------
     
 #define triangles_max_num   16
+#define triangles_add_num   4
 #define MAXVAL 255
 #define MINVAL   0
 #define NOLOAD 245
@@ -31,7 +32,7 @@ extern "C" {
     
 enum 
 {
-    ad7147_triangles_numberof = 16,
+    ad7147_triangles_numberof = 20,
     ad7147_dots_numberof = 12,  // in each triangle
     ad7147_dot_value_max = 255,
     ad7147_dot_value_min = 0,
@@ -62,7 +63,7 @@ typedef struct
     unsigned int                    indexInSet; //triangle index in set
     unsigned int                    setNum; //equal to sda num
     unsigned int                    isToUpdate; //if =1 triangle needs to be recalibrated
-    unsigned int                   CDCoffset;
+    unsigned int                    CDCoffset;
 }triangle_cfg_t;
 
 #endif // defined(if2hw_common_AD7147_USE_EXTERNALCONTROLTYPES)
@@ -78,8 +79,8 @@ typedef struct
 
 #else
 
-extern if2hw_data_ad7147_t AD7147Registers[16][12];	// il primo campo rappresenta il numero dei canali (non c'e' +)
-extern if2hw_data_ad7147_t CapOffset[16][12];
+extern if2hw_data_ad7147_t AD7147Registers[20][12];	// il primo campo rappresenta il numero dei canali (non c'e' +)
+extern if2hw_data_ad7147_t CapOffset[20][12];
 
 #endif
 
@@ -104,14 +105,16 @@ void SetCDCoffsetOnAllTriangles(unsigned char Channel, if2hw_data_ad7147_t cdcOf
      
  
 // new api
-extern void ad7147_init(if2hw_data_ad7147_t ext_rawvalues[][12], if2hw_data_ad7147_t ext_capoffsets[][12]);
+extern void ad7147_init(
+      if2hw_data_ad7147_t ext_rawvalues[][12], if2hw_data_ad7147_t ext_capoffsets[][12],
+      if2hw_data_ad7147_t ext_rawvalues5th[][12], if2hw_data_ad7147_t ext_capoffsets5th[][12]);
 extern void ad7147_calibrate(void);
 extern void ad7147_set_cdcoffset(uint8_t trg, uint16_t cdcoffset);
 extern uint16_t ad7147_gettrianglesconnectedmask(void);
 extern void ad7147_acquire(void);
 extern uint8_t ad7147_istriangleconnected(uint8_t trg);
-extern if2hw_data_ad7147_t * ad7147_get12rawvaluesoftriangle(uint8_t trg); 
-extern if2hw_data_ad7147_t * ad7147_get12capoffsetsoftriangle(uint8_t trg);
+extern if2hw_data_ad7147_t * ad7147_get12rawvaluesoftriangle(uint16_t trg); 
+extern if2hw_data_ad7147_t * ad7147_get12capoffsetsoftriangle(uint16_t trg);
 
 
 #ifdef __cplusplus

@@ -59,9 +59,15 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 //#define TEST_CANPRINT
-
+std::uint16_t dbg = 0;
 constexpr std::uint8_t dotNumberOf = 12;
-constexpr std::uint8_t trgNumberOf = 16;
+constexpr std::uint8_t trgNumberOf = 16; //4 for each sda. This is used in the CAN message forming so it's locked to 16
+#ifdef USE_FIFTH_I2C 
+    uint16_t trianglesOrder[16]  = {0,4,8,12,16,1,2,3,5,6,7,9,10,11,13,14};
+    //uint8_t taxsel120 = 0;
+#else
+    constexpr std::uint16_t trianglesOrder[16]  = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+#endif
 
 struct TriangleCfg
 {
@@ -89,11 +95,14 @@ struct Triangles
     std::uint16_t       activemask;
     std::uint16_t       connectedmask;
     TriangleCfg         config[trgNumberOf];
+    TriangleCfg         config5th[4];
     static const std::uint8_t GAIN[dotNumberOf];
     static const std::uint8_t GAIN_PALM[dotNumberOf];
     static const std::uint8_t GAIN_V2[dotNumberOf];
     if2hw_data_ad7147_t capoffsets[trgNumberOf][dotNumberOf];
     if2hw_data_ad7147_t rawvalues[trgNumberOf][dotNumberOf];
+    if2hw_data_ad7147_t capoffsets5th[4][dotNumberOf];
+    if2hw_data_ad7147_t rawvalues5th[4][dotNumberOf];
     TriangleErr         errors[trgNumberOf];
     Triangles() : activemask(0xffff), connectedmask(0xffff) { std::memset(capoffsets, 0, sizeof(capoffsets)); std::memset(rawvalues, 0, sizeof(rawvalues)); 
         uint16_t v = 0;
@@ -102,6 +111,9 @@ struct Triangles
             rawvalues[t][d] = v++;    
     }
 };
+
+//uint16_t testraw[20][12] = {0};
+//uint16_t testoff[20][12] = {0};
 
 const std::uint8_t Triangles::GAIN[dotNumberOf] = {70 ,96, 83, 38, 38, 70, 0, 45, 77, 164, 0, 77}; // these gains are moltiplied by 128 with respect to matlab
 const std::uint8_t Triangles::GAIN_PALM[dotNumberOf] = {0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // these gains are moltiplied by 128 with respect to matlab
@@ -210,7 +222,7 @@ bool embot::app::application::theSkin::Impl::hwinit()
     
     triangles.activemask = 0xffff;
     
-    ad7147_init(triangles.rawvalues, triangles.capoffsets);
+    ad7147_init(triangles.rawvalues, triangles.capoffsets, triangles.rawvalues5th, triangles.capoffsets5th);
     
     triangles.connectedmask = ad7147_gettrianglesconnectedmask();
     
@@ -251,12 +263,21 @@ bool embot::app::application::theSkin::Impl::configtriangles(const embot::prot::
         }
         
         // we process shift and cdcoffset even if we have enabled == false ... as the old mtb3 application does
-        
-        triangles.config[i].shift = triangleconfigcommand.shift;
-        if(triangles.config[i].cdcoffset != triangleconfigcommand.cdcOffset)
+        if(trianglesOrder[i] >= triangles_max_num){        
+            triangles.config5th[trianglesOrder[i]-triangles_max_num].shift = triangleconfigcommand.shift;
+            if(triangles.config5th[trianglesOrder[i]-triangles_max_num].cdcoffset != triangleconfigcommand.cdcOffset)
+                {
+                    triangles.config5th[trianglesOrder[i]-triangles_max_num].cdcoffset = triangleconfigcommand.cdcOffset;
+                    ad7147_set_cdcoffset(trianglesOrder[i], triangles.config5th[trianglesOrder[i]-triangles_max_num].cdcoffset);         
+                }    
+        }
+        else
         {
-            triangles.config[i].cdcoffset = triangleconfigcommand.cdcOffset;
-            ad7147_set_cdcoffset(i, triangles.config[i].cdcoffset); 
+            triangles.config[i].shift = triangleconfigcommand.shift;        
+            if(triangles.config[i].cdcoffset != triangleconfigcommand.cdcOffset){                              
+                triangles.config[i].cdcoffset = triangleconfigcommand.cdcOffset;
+                ad7147_set_cdcoffset(i, triangles.config[i].cdcoffset);         
+            }
         }
     }
     
@@ -366,8 +387,11 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
 bool embot::app::application::theSkin::Impl::fill(embot::prot::can::skin::periodic::Message_TRG::Info &info, const std::uint8_t trg)
 {
     bool ret = true;
-    if2hw_data_ad7147_t *the12rawvalues = ad7147_get12rawvaluesoftriangle(trg);
-    if2hw_data_ad7147_t *the12capoffsets = ad7147_get12capoffsetsoftriangle(trg);
+ 
+    if2hw_data_ad7147_t *the12rawvalues = ad7147_get12rawvaluesoftriangle(trianglesOrder[trg]);
+    if2hw_data_ad7147_t *the12capoffsets = ad7147_get12capoffsetsoftriangle(trianglesOrder[trg]);
+    
+    
     if((nullptr == the12rawvalues) || (nullptr == the12capoffsets))
     {
         return false;

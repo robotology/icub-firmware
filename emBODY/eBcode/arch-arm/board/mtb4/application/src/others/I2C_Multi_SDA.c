@@ -20,13 +20,7 @@
 
 // marco.accame: added functions which move pins
 
-static void MCO_0_on(void);
-static void MCO_0_off(void);
-static void DO_0on(void);
-static void DO_0off(void);
-static void MCE_0output(void);
-static void DE_0output(void);
-static void DE_0input(void);
+
 
 //struct GPIOdes_t
 //{
@@ -56,6 +50,21 @@ static void DE_0input(void);
 #include "embot_hw_multisda_bsp.h"
 static const embot::hw::multisda::PROP& props = embot::hw::multisda::getBSP().prop;
 
+const uint8_t sdachannels = props.numberof;
+
+
+//int nsda = 5;
+
+
+//static const void = nlines;
+static void MCO_0_on(void);
+static void MCO_0_off(void);
+static void DO_0on(void);/* remind to check name of this input variable, it was int sdachannels that could enable runtime swithc of number of lines*/
+static void DO_0off(void);
+static void MCE_0output(void);
+static void DE_0output(void);
+static void DE_0input(void);
+
 
 
 static void MCO_0_on(void)
@@ -72,47 +81,60 @@ static void MCO_0_off(void)
 
 static void DO_0on(void)
 {
-    HAL_GPIO_WritePin(props.sda[0].stmport, props.sda[0].stmpin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(props.sda[1].stmport, props.sda[1].stmpin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(props.sda[2].stmport, props.sda[2].stmpin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(props.sda[3].stmport, props.sda[3].stmpin, GPIO_PIN_SET); 
+//    HAL_GPIO_WritePin(props.sda[0].stmport, props.sda[0].stmpin, GPIO_PIN_SET);
+//    HAL_GPIO_WritePin(props.sda[1].stmport, props.sda[1].stmpin, GPIO_PIN_SET);
+//    HAL_GPIO_WritePin(props.sda[2].stmport, props.sda[2].stmpin, GPIO_PIN_SET);
+//    HAL_GPIO_WritePin(props.sda[3].stmport, props.sda[3].stmpin, GPIO_PIN_SET); 
+    for (int i=0; i<sdachannels; i++){
+            HAL_GPIO_WritePin(props.sda[i].stmport, props.sda[i].stmpin, GPIO_PIN_SET); 
+    }
 }
 
 static void DO_0off(void)
 {
-    HAL_GPIO_WritePin(props.sda[0].stmport, props.sda[0].stmpin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(props.sda[1].stmport, props.sda[1].stmpin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(props.sda[2].stmport, props.sda[2].stmpin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(props.sda[3].stmport, props.sda[3].stmpin, GPIO_PIN_RESET);   
+//    HAL_GPIO_WritePin(props.sda[0].stmport, props.sda[0].stmpin, GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(props.sda[1].stmport, props.sda[1].stmpin, GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(props.sda[2].stmport, props.sda[2].stmpin, GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(props.sda[3].stmport, props.sda[3].stmpin, GPIO_PIN_RESET); 
+    for (int i=0; i<sdachannels; i++){
+            HAL_GPIO_WritePin(props.sda[i].stmport, props.sda[i].stmpin, GPIO_PIN_RESET); 
+    }
+    
 }
 
 
 static void DE_0input(void)
 {
     DO_0on();
-    
-    LL_GPIO_SetPinMode(props.sda[0].stmport, props.sda[0].stmpin, LL_GPIO_MODE_INPUT);
-    LL_GPIO_SetPinMode(props.sda[1].stmport, props.sda[1].stmpin, LL_GPIO_MODE_INPUT);
-    LL_GPIO_SetPinMode(props.sda[2].stmport, props.sda[2].stmpin, LL_GPIO_MODE_INPUT);
-    LL_GPIO_SetPinMode(props.sda[3].stmport, props.sda[3].stmpin, LL_GPIO_MODE_INPUT);
-    LL_GPIO_SetPinPull(props.sda[0].stmport, props.sda[0].stmpin, LL_GPIO_PULL_UP);
-    LL_GPIO_SetPinPull(props.sda[1].stmport, props.sda[1].stmpin, LL_GPIO_PULL_UP);
-    LL_GPIO_SetPinPull(props.sda[2].stmport, props.sda[2].stmpin, LL_GPIO_PULL_UP);
-    LL_GPIO_SetPinPull(props.sda[3].stmport, props.sda[3].stmpin, LL_GPIO_PULL_UP);   
+    for (int i=0; i<sdachannels; i++){
+        LL_GPIO_SetPinMode(props.sda[i].stmport, props.sda[i].stmpin, LL_GPIO_MODE_INPUT);
+        LL_GPIO_SetPinPull(props.sda[i].stmport, props.sda[i].stmpin, LL_GPIO_PULL_UP);
+    }
+//    LL_GPIO_SetPinMode(props.sda[0].stmport, props.sda[0].stmpin, LL_GPIO_MODE_INPUT);
+//    LL_GPIO_SetPinMode(props.sda[1].stmport, props.sda[1].stmpin, LL_GPIO_MODE_INPUT);
+//    LL_GPIO_SetPinMode(props.sda[2].stmport, props.sda[2].stmpin, LL_GPIO_MODE_INPUT);
+//    LL_GPIO_SetPinMode(props.sda[3].stmport, props.sda[3].stmpin, LL_GPIO_MODE_INPUT);
+//    LL_GPIO_SetPinPull(props.sda[0].stmport, props.sda[0].stmpin, LL_GPIO_PULL_UP);
+//    LL_GPIO_SetPinPull(props.sda[1].stmport, props.sda[1].stmpin, LL_GPIO_PULL_UP);
+//    LL_GPIO_SetPinPull(props.sda[2].stmport, props.sda[2].stmpin, LL_GPIO_PULL_UP);
+//    LL_GPIO_SetPinPull(props.sda[3].stmport, props.sda[3].stmpin, LL_GPIO_PULL_UP);   
 }
-
 
 
 static void DE_0output(void)
 {
-    LL_GPIO_SetPinMode(props.sda[0].stmport, props.sda[0].stmpin, LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinMode(props.sda[1].stmport, props.sda[1].stmpin, LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinMode(props.sda[2].stmport, props.sda[2].stmpin, LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinMode(props.sda[3].stmport, props.sda[3].stmpin, LL_GPIO_MODE_OUTPUT);
-    LL_GPIO_SetPinOutputType(props.sda[0].stmport, props.sda[0].stmpin, LL_GPIO_OUTPUT_PUSHPULL);
-    LL_GPIO_SetPinOutputType(props.sda[1].stmport, props.sda[1].stmpin, LL_GPIO_OUTPUT_PUSHPULL);
-    LL_GPIO_SetPinOutputType(props.sda[2].stmport, props.sda[2].stmpin, LL_GPIO_OUTPUT_PUSHPULL);
-    LL_GPIO_SetPinOutputType(props.sda[3].stmport, props.sda[3].stmpin, LL_GPIO_OUTPUT_PUSHPULL);    
+//    LL_GPIO_SetPinMode(props.sda[0].stmport, props.sda[0].stmpin, LL_GPIO_MODE_OUTPUT);
+//    LL_GPIO_SetPinMode(props.sda[1].stmport, props.sda[1].stmpin, LL_GPIO_MODE_OUTPUT);
+//    LL_GPIO_SetPinMode(props.sda[2].stmport, props.sda[2].stmpin, LL_GPIO_MODE_OUTPUT);
+//    LL_GPIO_SetPinMode(props.sda[3].stmport, props.sda[3].stmpin, LL_GPIO_MODE_OUTPUT);
+//    LL_GPIO_SetPinOutputType(props.sda[0].stmport, props.sda[0].stmpin, LL_GPIO_OUTPUT_PUSHPULL);
+//    LL_GPIO_SetPinOutputType(props.sda[1].stmport, props.sda[1].stmpin, LL_GPIO_OUTPUT_PUSHPULL);
+//    LL_GPIO_SetPinOutputType(props.sda[2].stmport, props.sda[2].stmpin, LL_GPIO_OUTPUT_PUSHPULL);
+//    LL_GPIO_SetPinOutputType(props.sda[3].stmport, props.sda[3].stmpin, LL_GPIO_OUTPUT_PUSHPULL);    
+    for (int i=0; i<sdachannels; i++){
+        LL_GPIO_SetPinMode(props.sda[i].stmport, props.sda[i].stmpin, LL_GPIO_MODE_OUTPUT);
+        LL_GPIO_SetPinPull(props.sda[i].stmport, props.sda[i].stmpin, LL_GPIO_OUTPUT_PUSHPULL);
+    }
 }
 
 
@@ -146,11 +168,14 @@ static void ace_MCO_0_off(void)
 
 static void ace_DE_0input(SDAch_t s)
 {
+    volatile uint8_t sss = sdachannels;
+    sss ++;
+    
     if(s == SDAall)
     {
         ace_DO_0on(SDAall);
         
-        for(uint8_t i=0; i<4; i++)
+        for(uint8_t i=0; i<sdachannels; i++)
         {
             LL_GPIO_SetPinMode(props.sda[i].stmport, props.sda[i].stmpin, LL_GPIO_MODE_INPUT);
             LL_GPIO_SetPinPull(props.sda[i].stmport, props.sda[i].stmpin, LL_GPIO_PULL_UP);            
@@ -175,7 +200,7 @@ static void ace_DE_0output(SDAch_t s)
 {
     if(s == SDAall)
     {
-        for(uint8_t i=0; i<4; i++)
+        for(uint8_t i=0; i<sdachannels; i++)
         {
             LL_GPIO_SetPinMode(props.sda[i].stmport, props.sda[i].stmpin, LL_GPIO_MODE_OUTPUT);
             LL_GPIO_SetPinOutputType(props.sda[i].stmport, props.sda[i].stmpin, LL_GPIO_OUTPUT_PUSHPULL);
@@ -192,7 +217,7 @@ static void ace_DO_0(SDAch_t s, GPIO_PinState v)
 {
     if(s == SDAall)
     {
-        for(uint8_t i=0; i<4; i++)
+        for(uint8_t i=0; i<sdachannels; i++)
         {
             HAL_GPIO_WritePin(props.sda[i].stmport, props.sda[i].stmpin, v);
         }
@@ -242,8 +267,7 @@ unsigned char ace_SendByteI2CMaster(SDAch_t sda, unsigned char ByteToSend);
 #define I2C_RD		0x01
 #define	ACK			0
 #define	NACK		1
-unsigned int I2Cbit=1; //the duration of a bit 10 is about 28Khz, 1 is about 500KHz
-
+unsigned int I2Cbit=0; //the duration of a bit 10 is about 28Khz, 1 is about 500KHz
 
 //======================================= I2C interface initialization ========================
 
@@ -257,7 +281,8 @@ unsigned int I2Cbit=1; //the duration of a bit 10 is about 28Khz, 1 is about 500
 
 
 
-static unsigned char ReceivedByte[4] = { 0, 0, 0, 0 };
+//static unsigned char ReceivedByte[4] = { 0, 0, 0, 0 };
+static unsigned char ReceivedByte[5] = { 0, 0, 0, 0, 0 };
 
 void Wait(unsigned int cycles) {
     
@@ -666,10 +691,13 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 		const unsigned char NumberOfRegistersToRead, 
         if2hw_data_i2cmultisda_t *DataBuffer1, if2hw_data_i2cmultisda_t *DataBuffer2, 
         if2hw_data_i2cmultisda_t *DataBuffer3, if2hw_data_i2cmultisda_t *DataBuffer4, 
+        if2hw_data_i2cmultisda_t *DataBuffer5,
         const unsigned int OffsetInBuffer) {
             
 	unsigned char LowByteAddress, HighByteAddress;
-	unsigned char LowByteData[4], HighByteData[4];
+//	unsigned char LowByteData[4], HighByteData[4];
+	unsigned char LowByteData[5] = {0};
+    unsigned char HighByteData[5] = {0};
 	unsigned char r, AcknError;
 	unsigned char DeviceAddressHeader;
 
@@ -702,12 +730,14 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 						HighByteData[1] = ReceivedByte[1];
 						HighByteData[2] = ReceivedByte[2];
 						HighByteData[3] = ReceivedByte[3];
+						HighByteData[4] = ReceivedByte[4];
 
 						ReceiveByteI2CMaster(Channel, NACK);
 						LowByteData[0] = ReceivedByte[0];
 						LowByteData[1] = ReceivedByte[1];
 						LowByteData[2] = ReceivedByte[2];
 						LowByteData[3] = ReceivedByte[3];
+						LowByteData[4] = ReceivedByte[4];
 
 						DataBuffer1[OffsetInBuffer] = ((HighByteData[0] & 0xFF)
 								<< 8) | LowByteData[0];
@@ -720,6 +750,9 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 
 						DataBuffer4[OffsetInBuffer] = ((HighByteData[3] & 0xFF)
 								<< 8) | LowByteData[3];
+                                
+						DataBuffer5[OffsetInBuffer] = ((HighByteData[4] & 0xFF)
+								<< 8) | LowByteData[4];
 
 					} else {
 						for (r = 0; r < (NumberOfRegistersToRead - 1); r++) {
@@ -728,12 +761,14 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 							HighByteData[1] = ReceivedByte[1];
 							HighByteData[2] = ReceivedByte[2];
 							HighByteData[3] = ReceivedByte[3];
+							HighByteData[4] = ReceivedByte[4];
 
 							ReceiveByteI2CMaster(Channel, ACK);
 							LowByteData[0] = ReceivedByte[0];
 							LowByteData[1] = ReceivedByte[1];
 							LowByteData[2] = ReceivedByte[2];
 							LowByteData[3] = ReceivedByte[3];
+							LowByteData[4] = ReceivedByte[4];
 
 							DataBuffer1[OffsetInBuffer + r] = ((HighByteData[0]
 									& 0xFF) << 8) | LowByteData[0];
@@ -747,6 +782,8 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 							DataBuffer4[OffsetInBuffer + r] = ((HighByteData[3]
 									& 0xFF) << 8) | LowByteData[3];
 
+							DataBuffer5[OffsetInBuffer + r] = ((HighByteData[4]
+									& 0xFF) << 8) | LowByteData[4];
 						}
 						//Do the last read sending the NACK
 						ReceiveByteI2CMaster(Channel, ACK);
@@ -754,12 +791,14 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 						HighByteData[1] = ReceivedByte[1];
 						HighByteData[2] = ReceivedByte[2];
 						HighByteData[3] = ReceivedByte[3];
+						HighByteData[4] = ReceivedByte[4];
 
 						ReceiveByteI2CMaster(Channel, NACK);
 						LowByteData[0] = ReceivedByte[0];
 						LowByteData[1] = ReceivedByte[1];
 						LowByteData[2] = ReceivedByte[2];
 						LowByteData[3] = ReceivedByte[3];
+						LowByteData[4] = ReceivedByte[4];
 
 						DataBuffer1[OffsetInBuffer + NumberOfRegistersToRead - 1] =
 								((HighByteData[0] & 0xFF) << 8)
@@ -776,6 +815,10 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 						DataBuffer4[OffsetInBuffer + NumberOfRegistersToRead - 1] =
 								((HighByteData[3] & 0xFF) << 8)
 										| LowByteData[3];
+
+						DataBuffer5[OffsetInBuffer + NumberOfRegistersToRead - 1] =
+								((HighByteData[4] & 0xFF) << 8)
+										| LowByteData[4];
 
 					}
 					//Stop transfer
@@ -1041,7 +1084,7 @@ void StartI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum) {
 	/*
 	switch (Channel) {
 	case CH0: {
-		//DE_0input();;
+		//DE_0input(sdachannels)();;
 		SetSdaReg(sdaNum, 1);
 
 		Wait(I2Cbit);
@@ -1050,7 +1093,7 @@ void StartI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum) {
 		Wait(I2Cbit);
 
 		Wait(I2Cbit);
-		//DE_0output();    //SDA as output
+		//DE_0output(sdachannels)();    //SDA as output
 		SetSdaReg(sdaNum, 0);
 
 		//DO_0off();
@@ -1062,7 +1105,7 @@ void StartI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum) {
 	}
 		break;
 	case CH1: {
-		//DE_0input();;
+		//DE_0input(sdachannels)();;
 		SetSdaReg(sdaNum, 1);
 
 		Wait(I2Cbit);
@@ -1071,7 +1114,7 @@ void StartI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum) {
 		Wait(I2Cbit);
 
 		Wait(I2Cbit);
-		//DE_0output();    //SDA as output
+		//DE_0output(sdachannels)();    //SDA as output
 		SetSdaReg(sdaNum, 0);
 
 		//DO_0off();
@@ -1110,7 +1153,7 @@ void StopI2CMaster(unsigned char Channel) {
 void StopI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum) {
     StopI2CMaster(Channel);
   
-		//DE_0output();  //SDA as output
+		//DE_0output(sdachannels)();  //SDA as output
 		SetSdaReg(sdaNum, 0);
 		//DO_0off();  //SDA low
 		SetValReg(sdaNum, 0);
@@ -1118,7 +1161,7 @@ void StopI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum) {
 		MCO_0_on();
 		//SCL high
 		Wait(I2Cbit);   //Wait(I2Cbit);
-		//DE_0input();  //SDA as output
+		//DE_0input(sdachannels)();  //SDA as output
 		SetSdaReg(sdaNum, 1);
 }
 
@@ -1179,7 +1222,7 @@ unsigned char SendByteI2CMaster_onSdaX(unsigned char Channel,
 	unsigned char i;
 	unsigned char noack = 0;
 
-		//DE_0output();  //SDAs as output
+		//DE_0output(sdachannels)();  //SDAs as output
 		SetSdaReg(sdaNum, 0);
 
 		for (i = 8; i > 0; i--) {
@@ -1205,17 +1248,17 @@ unsigned char SendByteI2CMaster_onSdaX(unsigned char Channel,
 			Wait(I2Cbit);
 			MCO_0_off();
 			if (i == 1) {
-				//DE_0input();;
+				//DE_0input(sdachannels)();;
 				SetSdaReg(sdaNum, 1);
 			} else {                //Reset SCL
 				Wait(I2Cbit);                //Wait(I2Cbit);
 				ByteToSend <<= 1;         //Rotate data
 			}
 		}
-		//DO_0off();
+		//DO_0off(sdachannels)();
 		SetValReg(sdaNum, 0);
 
-		//DE_0input();                //SDA becomes an input
+		//DE_0input(sdachannels)();                //SDA becomes an input
 		SetSdaReg(sdaNum, 1);
 
 		MCO_0_off();
@@ -1228,7 +1271,7 @@ unsigned char SendByteI2CMaster_onSdaX(unsigned char Channel,
 
 		Wait(I2Cbit);              //Wait(I2Cbit);
 		MCO_0_off();
-		//DE_0output();   //SDA becomes an output
+		//DE_0output(sdachannels)();   //SDA becomes an output
 		SetSdaReg(sdaNum, 0);
 
 	return (noack);
@@ -1254,6 +1297,7 @@ void ReceiveByteI2CMaster(unsigned char Channel, unsigned char ackn) // changed 
 			ReceivedByte[1] <<= 1;      //Rotate data
 			ReceivedByte[2] <<= 1;      //Rotate data
 			ReceivedByte[3] <<= 1;      //Rotate data
+			ReceivedByte[4] <<= 1;      //Rotate data
 			MCO_0_on();                //Set SCL
             Wait(I2Cbit); // added..... why?
 //            // debugged by marco.accame / andrea.mura
@@ -1266,6 +1310,7 @@ void ReceiveByteI2CMaster(unsigned char Channel, unsigned char ackn) // changed 
 			ReceivedByte[1] |= HAL_GPIO_ReadPin(props.sda[1].stmport, props.sda[1].stmpin);  //Read I2C_SDA1 -> data
 			ReceivedByte[2] |= HAL_GPIO_ReadPin(props.sda[2].stmport, props.sda[2].stmpin);  //Read I2C_SDA2 -> data
 			ReceivedByte[3] |= HAL_GPIO_ReadPin(props.sda[3].stmport, props.sda[3].stmpin);  //Read I2C_SDA3 -> data            
+			ReceivedByte[4] |= HAL_GPIO_ReadPin(props.sda[4].stmport, props.sda[4].stmpin);  //Read I2C_SDA3 -> data            
 			Wait(I2Cbit);    //Wait(I2Cbit);
 			MCO_0_off();
 			//Reset SCL
@@ -1314,14 +1359,14 @@ void ace_StopI2CMaster(SDAch_t sda) {
     Wait(I2Cbit);    //Wait(I2Cbit);
     ace_DE_0input(sda);
     //SDA as output
-    //DO_0on();   //SDA goes from low to high when SCL is already high,
+    //DO_0on(sdachannels)();   //SDA goes from low to high when SCL is already high,
     Wait(I2Cbit);//Wait(I2Cbit);
 }
 
 //void StopI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum) {
 //    StopI2CMaster(Channel);
 //  
-//		//DE_0output();  //SDA as output
+//		//DE_0output(sdachannels)();  //SDA as output
 //		SetSdaReg(sdaNum, 0);
 //		//DO_0off();  //SDA low
 //		SetValReg(sdaNum, 0);
@@ -1329,7 +1374,7 @@ void ace_StopI2CMaster(SDAch_t sda) {
 //		MCO_0_on();
 //		//SCL high
 //		Wait(I2Cbit);   //Wait(I2Cbit);
-//		//DE_0input();  //SDA as output
+//		//DE_0input(sdachannels)();  //SDA as output
 //		SetSdaReg(sdaNum, 1);
 //}
 
