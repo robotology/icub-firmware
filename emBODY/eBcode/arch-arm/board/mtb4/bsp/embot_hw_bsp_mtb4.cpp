@@ -657,7 +657,7 @@ namespace embot { namespace hw { namespace multisda {
         { SCK0_GPIO_Port, SCK0_Pin, nullptr },
         // sda
         {{  
-            { SDA0_GPIO_Port, SDA0_Pin, nullptr }, { SDA1_GPIO_Port, SDA1_Pin, nullptr }, { SDA2_GPIO_Port, SDA2_Pin, nullptr }, { SDA3_GPIO_Port, SDA3_Pin, nullptr }            
+            { SDA0_GPIO_Port, SDA0_Pin, nullptr }, { SDA1_GPIO_Port, SDA1_Pin, nullptr }, { SDA2_GPIO_Port, SDA2_Pin, nullptr }, { SDA3_GPIO_Port, SDA3_Pin, nullptr }, {GPIOC, GPIO_PIN_0, nullptr } /*as an alternative use the definitiin from cubeMX in main.h   */
         }}
     };
     
@@ -705,6 +705,7 @@ namespace embot { namespace hw { namespace tlv493d {
     constexpr PROP propSDA1  { embot::hw::I2Cdescriptor{embot::hw::ANY::two,   0xBC} };
     constexpr PROP propSDA2  { embot::hw::I2Cdescriptor{embot::hw::ANY::three, 0xBC} }; 
     constexpr PROP propSDA3  { embot::hw::I2Cdescriptor{embot::hw::ANY::four,  0xBC} };  
+//   constexpr PROP propSDA4  { embot::hw::I2Cdescriptor{embot::hw::ANY::five,  0xBC} };  //SD added
        
     
     constexpr BSP thebsp {     

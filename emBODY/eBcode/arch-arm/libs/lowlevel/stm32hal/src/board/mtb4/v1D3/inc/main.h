@@ -105,6 +105,8 @@ void Error_Handler(void);
 #define CAN1_SHDN_Pin GPIO_PIN_0
 #define CAN1_SHDN_GPIO_Port GPIOB
 #define SDA2_Pin GPIO_PIN_6
+#define SDA4_GPIO_Port GPIOC
+#define SDA4_Pin GPIO_PIN_0
 #define SDA2_GPIO_Port GPIOA
 #define CAN1_STB_Pin GPIO_PIN_1
 #define CAN1_STB_GPIO_Port GPIOB
