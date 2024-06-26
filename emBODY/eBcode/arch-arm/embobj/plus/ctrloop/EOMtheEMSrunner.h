@@ -160,6 +160,8 @@ extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p
 
 extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_timing_t *timing);
 
+extern eOresult_t eom_emsrunner_SetReport(EOMtheEMSrunner *p, eOmn_appl_config_logging_t *logging);
+
 extern uint64_t eom_emsrunner_Get_IterationNumber(EOMtheEMSrunner *p);
 
 extern eOreltime_t eom_emsrunner_Get_Period(EOMtheEMSrunner *p);

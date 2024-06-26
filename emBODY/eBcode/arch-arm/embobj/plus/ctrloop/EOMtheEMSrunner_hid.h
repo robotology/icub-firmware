@@ -117,6 +117,7 @@ struct EOMtheEMSrunner_hid
     uint8_t                     txcan2frames;
     eOemsrunner_cycletiming_t   cycletiming;
     eObool_t                    isrunning;
+    eOmn_appl_config_logging_t  logging;
 };
 
 

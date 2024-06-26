@@ -394,7 +394,9 @@ static EOMtheEMSrunner s_theemsrunner =
         EO_INIT(.iterationnumber) 0, 
         { { EO_INIT(.timebudget) 0, EO_INIT(.timestarted) 0, EO_INIT(.timestopped) 0, EO_INIT(.duration) {0, 0}, EO_INIT(.isexecuting) eobool_false, EO_INIT(.isabout2overflow) eobool_false, EO_INIT(.isoverflown) eobool_false} } 
     },
-    EO_INIT(.isrunning)             eobool_false
+    EO_INIT(.isrunning) eobool_false,
+    EO_INIT(.logging) {1, 0}
+ 
 };
 
 
@@ -510,6 +512,8 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
 #endif
 
     s_theemsrunner.isrunning = eobool_false;
+    
+    s_theemsrunner.logging.flags = (0x0001 << eomn_appl_log_asynchro_exectime_overflow);
 
     return(&s_theemsrunner);
 }
@@ -659,6 +663,18 @@ extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_
 }
 
 #endif
+
+extern eOresult_t eom_emsrunner_SetReport(EOMtheEMSrunner *p, eOmn_appl_config_logging_t *logging)
+{
+    if((NULL == p) || (NULL == logging))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+    
+
+    s_theemsrunner.logging = *logging;
+    return(eores_OK);    
+}
  
 extern uint64_t eom_emsrunner_Get_IterationNumber(EOMtheEMSrunner *p)
 {  
@@ -1648,15 +1664,25 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
     
     uint64_t currduration = s_theemsrunner.cycletiming.tasktiming[taskid].duration[0];
     
-    constexpr bool logDURATIONs {false};
-    constexpr uint32_t periodreport = 10000; // in ms
+    bool logSTATs {false};
+    bool logOVERFLOWs {true};
+    uint32_t periodreport = 0;
     constexpr uint32_t offsetreport[3] = {0, 0, 0};
+    
 
     enum { stat_cnt = 0, stat_min = 1, stat_max = 2, stat_cum = 3, stats_numberof = 4}; 
     static uint64_t stats[eo_emsrunner_task_numberof][stats_numberof] = {0};
+    
+    constexpr uint16_t mask_logoverflows = 0x0001 << eomn_appl_log_asynchro_exectime_overflow;
+    logOVERFLOWs = ((s_theemsrunner.logging.flags & mask_logoverflows) == mask_logoverflows);
+    
+    constexpr uint16_t mask_logstatistics = 0x0001 << eomn_appl_log_periodic_exectime_statistics;
+    logSTATs = (0 != s_theemsrunner.logging.period) && ((s_theemsrunner.logging.flags & mask_logstatistics) == mask_logstatistics);
 
-    if(true == logDURATIONs)
-    {    
+    if(true == logSTATs)
+    {
+        periodreport = s_theemsrunner.logging.period; // in ms or rather in ticks   
+        
         if(stats[taskid][stat_cnt] == 0)
         {
             stats[taskid][stat_max] = stats[taskid][stat_cum] = 0;
@@ -1685,15 +1711,12 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
 	eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == s_theemsrunner.mode) ? (eo_errortype_error) : (eo_errortype_warning);
     
     
-	switch (taskid)
+	switch(taskid)
 	{
 		case eo_emsrunner_taskid_runRX:
         {
-            
-//            snprintf(strtime, sizeof(strtime), "RX %d us", (int)currduration); 
-//            eo_errman_Trace(eo_errman_GetHandle(), strtime, s_eobj_ownname);
-            
-			if(eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown)
+                        
+			if((true == logOVERFLOWs) && (eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown))
 			{
 				errdes.code             = eoerror_code_get(eoerror_category_System, errorvalue[taskid]);
 				errdes.par16            = currduration & 0xffff;
@@ -1701,13 +1724,11 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
             
-            if(true == logDURATIONs)
+            if(true == logSTATs)
             {
                 if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
                 {
                     
-//                    embot::core::TimeFormatter tf {currduration};
-//                    embot::core::print("RX is " + tf.to_string());
                     uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
                     errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphaseaverage);
                     errdes.par16            = currduration & 0xffff;
@@ -1732,11 +1753,8 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
             
 		case eo_emsrunner_taskid_runDO:
         {
-            
-//            snprintf(strtime, sizeof(strtime), "DO %d us", (int)currduration); 
-//            eo_errman_Trace(eo_errman_GetHandle(), strtime, s_eobj_ownname);
-            
-			if(eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown)
+                        
+			if((true == logOVERFLOWs) && (eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown))
 			{
                 static int dont_stress = 0;
 #if defined(USE_EMBOT_theHandler)
@@ -1755,14 +1773,12 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
                 }
 			}
             
-            if(true == logDURATIONs)
+            if(true == logSTATs)
             {
                 if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
                 {
                     uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
                     
-//                    embot::core::TimeFormatter tf {currduration};
-//                    embot::core::print("DO is " + tf.to_string());
                     errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophaseaverage);
                     errdes.par16            = average & 0xffff;
                     errdes.par64            = last4durations; 
@@ -1787,11 +1803,8 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
             
 		case eo_emsrunner_taskid_runTX:
         {
-            
-//            snprintf(strtime, sizeof(strtime), "TX %d us", (int)currduration); 
-//            eo_errman_Trace(eo_errman_GetHandle(), strtime, s_eobj_ownname);
-            
-			if(eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown)
+                        
+			if((true == logOVERFLOWs) && (eobool_true == s_theemsrunner.cycletiming.tasktiming[taskid].isoverflown))
 			{
 				errdes.code             = eoerror_code_get(eoerror_category_System, errorvalue[taskid]);
 				errdes.par16            = currduration & 0xffff;
@@ -1800,14 +1813,12 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
             
-            if(true == logDURATIONs)
+            if(true == logSTATs)
             {
                 if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
                 {
                     uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
                     
-//                    embot::core::TimeFormatter tf {currduration};
-//                    embot::core::print("TX is " + tf.to_string());
                     errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphaseaverage);
                     errdes.par16            = average & 0xffff;
                     errdes.par64            = last4durations; 
