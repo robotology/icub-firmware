@@ -1010,8 +1010,8 @@ static void s_eom_emsrunner_taskRX_run(EOMtask *p, uint32_t t)
     s_eom_emsrunner_tasktiming_on_entry(eo_emsrunner_taskid_runRX);
     
 
-    // we eval the timings of the previous cycle
-    s_eom_emsrunner_tasktiming_eval();
+//    // we eval the timings of the previous cycle
+//    s_eom_emsrunner_tasktiming_eval();
          
     // perform the rx activity    
     if(eobool_true == eom_runner_cansafelyexecute(&s_theemsrunner, eo_emsrunner_taskid_runRX))
@@ -1643,16 +1643,20 @@ static void s_eom_emsrunner_tasktiming_on_exit(eOemsrunner_taskid_t taskid)
     } 
     
 #else    
-#endif    
+#endif  
+
+
+    // we eval the timings of the previous rx phase
+    s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(taskid);  
 }
 
 
 static void s_eom_emsrunner_tasktiming_eval(void)
 {
     // we call it at teh beginning of the ctrl loop. we dont check isabout2overflow, only isoverflown
-    s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eo_emsrunner_taskid_runRX);
-    s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eo_emsrunner_taskid_runDO);
-    s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eo_emsrunner_taskid_runTX);    
+//    s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eo_emsrunner_taskid_runRX);
+//    s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eo_emsrunner_taskid_runDO);
+//    s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eo_emsrunner_taskid_runTX);    
 }
 
 
@@ -1662,12 +1666,15 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
     static const eOerror_value_SYS_t errorvalue[3] = { eoerror_value_SYS_ctrloop_execoverflowRX, eoerror_value_SYS_ctrloop_execoverflowDO, eoerror_value_SYS_ctrloop_execoverflowTX };
     static uint64_t last4durations = 0;
     
+    static bool first[3] =  {true, true, true};
+    
     uint64_t currduration = s_theemsrunner.cycletiming.tasktiming[taskid].duration[0];
     
     bool logSTATs {false};
     bool logOVERFLOWs {true};
     uint32_t periodreport = 0;
-    constexpr uint32_t offsetreport[3] = {0, 0, 0};
+    constexpr uint32_t offsetreport[3] = {0, 0, 0}; //{0, 1000, 2000};
+    uint32_t offset2use[] = {0, 0, 0};
     
 
     enum { stat_cnt = 0, stat_min = 1, stat_max = 2, stat_cum = 3, stats_numberof = 4}; 
@@ -1677,17 +1684,20 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
     logOVERFLOWs = ((s_theemsrunner.logging.flags & mask_logoverflows) == mask_logoverflows);
     
     constexpr uint16_t mask_logstatistics = 0x0001 << eomn_appl_log_periodic_exectime_statistics;
-    logSTATs = (0 != s_theemsrunner.logging.period) && ((s_theemsrunner.logging.flags & mask_logstatistics) == mask_logstatistics);
+    logSTATs = (0 != s_theemsrunner.logging.period10ms) && ((s_theemsrunner.logging.flags & mask_logstatistics) == mask_logstatistics);
 
     if(true == logSTATs)
     {
-        periodreport = s_theemsrunner.logging.period; // in ms or rather in ticks   
+        periodreport = 10*s_theemsrunner.logging.period10ms; // logging.period is in 10*ms. we want ms    
         
         if(stats[taskid][stat_cnt] == 0)
         {
+            offset2use[taskid] = (true == first[taskid]) ? offsetreport[taskid] : 0;
+            first[taskid] = false;
+            
             stats[taskid][stat_max] = stats[taskid][stat_cum] = 0;
             stats[taskid][stat_min] = 1000000;  
-            stats[taskid][stat_cnt] = offsetreport[taskid];            
+            stats[taskid][stat_cnt] = offset2use[taskid];            
         }
         
         stats[taskid][stat_cum] += currduration;
@@ -1720,30 +1730,36 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
 			{
 				errdes.code             = eoerror_code_get(eoerror_category_System, errorvalue[taskid]);
 				errdes.par16            = currduration & 0xffff;
-                errdes.par64            = last4durations; 
+                errdes.par64            = ((periodreport/10) & 0xffff); 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
             
             if(true == logSTATs)
             {
-                if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
+                if(stats[taskid][stat_cnt] >= (periodreport+offset2use[taskid]))
                 {
-                    
                     uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphaseaverage);
-                    errdes.par16            = currduration & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);    
+                    
+                    uint64_t par64 = ((stats[taskid][stat_min] & 0xffff) << 48) | ((average & 0xffff) << 32) | ((stats[taskid][stat_max] & 0xffff) << 16) | ((periodreport/10) & 0xffff); 
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_exec_time_stats);
+                    errdes.par16            = taskid;
+                    errdes.par64            = par64; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                     
+                    
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphasemin);
+//                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
+//                    errdes.par64            = ((periodreport/10) & 0xffff); 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+//                    
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphaseaverage);
+//                    errdes.par16            = average & 0xffff;
+//                    errdes.par64            = last4durations; 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
 
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphasemin);
-                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
-
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphasemax);
-                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_rxphasemax);
+//                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
+//                    errdes.par64            = ((periodreport/10) & 0xffff); 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
                                          
                     // as last
                     stats[taskid][stat_cnt] = 0;
@@ -1775,24 +1791,30 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
             
             if(true == logSTATs)
             {
-                if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
+                if(stats[taskid][stat_cnt] >= (periodreport+offset2use[taskid]))
                 {
                     uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
                     
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophaseaverage);
-                    errdes.par16            = average & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);     
+                    uint64_t par64 = ((stats[taskid][stat_min] & 0xffff) << 48) | ((average & 0xffff) << 32) | ((stats[taskid][stat_max] & 0xffff) << 16) | ((periodreport/10) & 0xffff); 
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_exec_time_stats);
+                    errdes.par16            = taskid;
+                    errdes.par64            = par64; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);  
+                       
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophasemin);
+//                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
+//                    errdes.par64            = ((periodreport/10) & 0xffff); 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
 
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophasemin);
-                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
-
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophasemax);
-                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophaseaverage);
+//                    errdes.par16            = average & 0xffff;
+//                    errdes.par64            = ((periodreport/10) & 0xffff); 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);  
+//                    
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_dophasemax);
+//                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
+//                    errdes.par64            = ((periodreport/10) & 0xffff); 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
 
                     // as last
                     stats[taskid][stat_cnt] = 0;                    
@@ -1815,24 +1837,30 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows2(eOemsrunner_
             
             if(true == logSTATs)
             {
-                if(stats[taskid][stat_cnt] >= (periodreport+offsetreport[taskid]))
+                if(stats[taskid][stat_cnt] >= (periodreport+offset2use[taskid]))
                 {
-                    uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];
+                    uint64_t average = stats[taskid][stat_cum] / stats[taskid][stat_cnt];   
+
+                    uint64_t par64 = ((stats[taskid][stat_min] & 0xffff) << 48) | ((average & 0xffff) << 32) | ((stats[taskid][stat_max] & 0xffff) << 16) | ((periodreport/10) & 0xffff); 
+                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_exec_time_stats);
+                    errdes.par16            = taskid;
+                    errdes.par64            = par64; 
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);  
                     
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphaseaverage);
-                    errdes.par16            = average & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);      
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphasemin);
+//                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
+//                    errdes.par64            = ((periodreport/10) & 0xffff); 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
 
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphasemin);
-                    errdes.par16            = stats[taskid][stat_min] & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
-
-                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphasemax);
-                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
-                    errdes.par64            = last4durations; 
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                       
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphaseaverage);
+//                    errdes.par16            = average & 0xffff;
+//                    errdes.par64            = ((periodreport/10) & 0xffff); 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                       
+//                    
+//                    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_ctrloop_txphasemax);
+//                    errdes.par16            = stats[taskid][stat_max] & 0xffff;
+//                    errdes.par64            = ((periodreport/10) & 0xffff); 
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                       
 
                     // as last
                     stats[taskid][stat_cnt] = 0;
