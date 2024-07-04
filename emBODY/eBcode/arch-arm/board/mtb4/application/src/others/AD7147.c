@@ -153,9 +153,9 @@ void ServiceAD7147Isr(unsigned char Channel)
 {
   unsigned int i=0;
     // code added SD + Marco Accame
-    constexpr size_t nI2Clines {5};
+    constexpr size_t nI2Clines {1};
     constexpr size_t NumberOfRegistertoRead  {12};
-	for (i=0;i<nI2Clines;i++)
+	for (i=0;i<4;i++)// this 4 is number of addresses on each I2C line
 	{
 	   ReadViaI2C(Channel,AD7147_ADD[i],(ADCRESULT_S0), NumberOfRegistertoRead,
         s_AD7147Registers[i],
@@ -225,7 +225,7 @@ void TrianglesInit(unsigned char Channel, uint8_t applycdcoffset)
     	{
             for (k=0;k<12;k++)
             {
-                s_CapOffset_5th[i][k]=s_AD7147Registers_5th[i][k];
+                s_CapOffset_5th[i][k]=s_AD7147Registers_5th[i][k];              
                 if (s_AD7147Registers_5th[i][k]==0xFFFF)
                 {
                     unconnect +=1;
