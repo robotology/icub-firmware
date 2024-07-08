@@ -177,7 +177,7 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
         return(&s_emsappl_singleton);
     }
     
-    char str[64];
+    char str[96];
     snprintf(str, sizeof(str), "inside _Initialise()");
     eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);  
       
