@@ -200,42 +200,44 @@ namespace embot::app::eth::encoder::v1 {
     
 
 
+// NOTE: Currently means 9th Oct 2024
+// This is an experimental interface we are currently using for collecting the raw data from the joint encoder sensors
+// Currently is used only for the joint encoder. It allows to stream to the higher sw level raw value (as ticks per revolution depending on the encoder resolution)
+// and diagnostic raw value depending on what provided by the HAL of the sensor
 namespace embot::app::eth::encoder::experimental {
         
-    // this is just an example of an experimental interface which can match the needs of the new sensors
-    
-    enum class Error : uint8_t
-    {
-        NONE        = 0,
-        SOME        = 1,
-        OTHER       = 2        
+    enum class Position : uint8_t { joint = 0, motor = 1, aux = 2}; // currently we are just looking at joint encoder
+    constexpr size_t maxPOSITIONs {3};
+
+    // This struct defines a raw value and its raw diagnostic value for an encoder of any type
+    // It is totally generic, the only restriction is to cast eveything to int32_t values
+    struct RawValueEncoder
+    {   // the value w/ the diagnostic     
+        int32_t val {0};                            
+        int32_t diagnInfo{0};
     };
     
-    // maybe in the future we want more than two encoders per joint-motor entity
-    enum class Position : uint8_t { one = 0, two = 1, three = 2, four = 3, every = 14, none = 15};
-    constexpr size_t maxPOSITIONs {4};
-    
-    struct Value
-    {   // the value w/ a possible error     
-        int64_t raw {0};                                                    // to accomodate high resolution values
-        embot::app::eth::encoder::experimental::Error error {Error::NONE};      // 
-    };
-    
-    struct Target
+    // This struct defines the raw encoder data (raw value and diagnostic)
+    // and provides the possibility to add a validity flag to the readings 
+    // for a jomo (which is thought as the combination of up to three encoders)
+    // idially joint and motor encoder and an auxiliary one if needed for a particulat setup
+    struct RawValuesOfJomo
     {   // it tells which joint-motor pair + plus the posotion of the encoder
-        static constexpr size_t maxJOMOs {4};
-        uint8_t jomo {0};
-        Position pos {Position::one};
         
-        constexpr Target() = default;
-        constexpr Target(uint8_t j, Position p) : jomo(j), pos(p) {}
-            
-        constexpr bool isvalid() {  return (jomo < maxJOMOs) && (embot::core::tointegral(pos) < maxPOSITIONs); }        
+        RawValueEncoder rawvalues[maxPOSITIONs];
+        bool areValidReadings[maxPOSITIONs];
+        
+        constexpr RawValuesOfJomo() : 
+            rawvalues{{0, 0}, {0, 0}, {0, 0}}, 
+            areValidReadings{false, false, false} {}
     };
 
+    // Currently this struct provide the interface for reading the raw encoder data for a jomo
+    // or for a single component of the jomo. Only the first API is actually implemented in the code
     struct IFreader
     {
-        virtual bool read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value) = 0;   
+        virtual bool GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray) = 0;            
+        virtual bool GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue) = 0;
         
     protected:
         virtual ~IFreader() {};    // cannot delete from interface but only from derived object        
