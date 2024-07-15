@@ -13,8 +13,8 @@ int QE_ERR_THR = 0;//144;
 BOOL QE_USE_INDEX = FALSE;
 
 volatile BOOL qe_index_found = FALSE;
-volatile BOOL my_index_found = FALSE;
-volatile BOOL qe_reg_INDX = FALSE;
+volatile BOOL is_qe_index_just_found = FALSE;
+volatile BOOL qe_index_found_debug = FALSE;
 
 void QEinit(int resolution, int motor_num_poles,char use_index)
 {
@@ -146,21 +146,32 @@ inline int QEgetPos()
     
     if (QE_USE_INDEX)
     {  
-        if (qe_index_found)
+        if (qe_index_found) // I found at least one time during calib
         {
             static int poscnt_old = 0;
+            //static int count_QEICONbits_INDX = 0;
             
-            if (QEICONbits.INDX)
+            if( (QEICONbits.INDX) || (is_qe_index_just_found))
             {
                 if (poscnt_old>QE_ERR_THR && poscnt_old<QE_RESOLUTION-QE_ERR_THR)
                 {
                     QE_RISE_WARNING(dirty);
                 }
-                qe_reg_INDX = TRUE;
+                
+                if(is_qe_index_just_found)
+                    is_qe_index_just_found = FALSE;
+                
+                //Here I don't need to adjust the POSCNT value because  
+                // the QE drive resets it automatically when found the index
+                //For the same reason we use poscnt_old and not POSCNT
             }
             else
             {
-                qe_reg_INDX = FALSE;
+                //The threshold 16 can been calculated starting from the max velocity at joint, the gearbox and the resolution and the frequency of 2foc loop
+                
+                /* threashold= (max_velocity_at_joint * gearbox * resolution * period_of2_foc_loop/360)
+                 * since this info are not available in 2foc, we continue to use the value 16 that it has been found experimentally */
+                
                 if (poscnt<-16 || poscnt > QE_RESOLUTION+16)
                 {
                     QE_RISE_WARNING(index_broken);
@@ -171,9 +182,7 @@ inline int QEgetPos()
                     POSCNT = (unsigned int)poscnt;
                 }
             }
-            
-            
-            
+             
             poscnt_old = poscnt;
             
         }   
@@ -188,8 +197,9 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
     // disable interrupt
     IEC3bits.QEI1IE = 0;
 
-    qe_index_found = TRUE;
-    my_index_found = TRUE;
+    qe_index_found = TRUE; 
+    is_qe_index_just_found = TRUE;
+    qe_index_found_debug = TRUE;
  
 //    static int simulate_fault = 0;
 //    if (++simulate_fault == 11)

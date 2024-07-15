@@ -37,9 +37,10 @@ volatile extern tQEError gEncoderError;
 #define QE_ELETTR_DEG_PER_REV() (gEncoderConfig.elettr_deg_per_rev)
 
 extern volatile BOOL qe_index_found;
-extern volatile BOOL my_index_found;
-extern volatile BOOL qe_reg_INDX;
+extern volatile BOOL is_qe_index_just_found;
+extern volatile BOOL qe_index_found_debug;
 extern volatile int QE_RESOLUTION;
+
 #define QEIndexFound() qe_index_found
 
 extern void QEinit(int qe_resolution,int motor_num_poles,char use_index);
