@@ -140,6 +140,11 @@ _FICD(ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 
 #define isDriveEnabled() bDriveEnabled
 
+
+volatile int alignRotorTimerConst = 50;                                         // this variable is used for timing the moving of the encoder position during the calibration
+                                                                                // the value of 50 is an experimental number found after testing on different types of setups
+                                                                                // the value is then updated with this formula: value = (LOOPINTCY/(gEncoderConfig.numPoles * 50)) just before starting the alignRotor() method
+
 volatile tI2T I2Tdata;
 volatile tLED_status LED_status = {0x00};
 tSysStatus SysStatus;
@@ -388,7 +393,7 @@ int alignRotor(volatile int* IqRef)
         }
         else if (encoder_fake < ENCODER_1_5_REV)
         {
-            if (++timer > 200) { timer = 0; ++encoder_fake; }
+            if (++timer > alignRotorTimerConst) { timer = 0; ++encoder_fake;}
         }
         else
         {
@@ -404,7 +409,7 @@ int alignRotor(volatile int* IqRef)
 
         if (encoder_fake > -ENCODER_1_5_REV)
         {
-            if (++timer > 200) { timer = 0; --encoder_fake; }
+            if (++timer > alignRotorTimerConst) { timer = 0; --encoder_fake; }
         }
         else
         {
@@ -414,7 +419,6 @@ int alignRotor(volatile int* IqRef)
             sAlignInProgress = 0;
         }
     }
-
     ////////////////////////////////////
 
     static int encoder_fake_0 = 0x7FFF;
@@ -1206,6 +1210,7 @@ int main(void)
 
         if (MotorConfig.has_qe)
         {
+            alignRotorTimerConst = (LOOPINTCY/(gEncoderConfig.numPoles * 50));  // here we update the value of the timing used when moving the encoder during the calibration with the
             sAlignInProgress = 1;
             gEncoderError.uncalibrated = 1;
         }

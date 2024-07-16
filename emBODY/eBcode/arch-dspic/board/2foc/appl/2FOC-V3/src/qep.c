@@ -16,6 +16,8 @@ volatile BOOL qe_index_found = FALSE;
 volatile BOOL is_qe_index_just_found = FALSE;
 volatile BOOL qe_index_found_debug = FALSE;
 
+volatile int gQERawPosition = 0;
+
 void QEinit(int resolution, int motor_num_poles,char use_index)
 {
     // init the quadrature encoder peripheral
@@ -140,9 +142,9 @@ inline int QEgetPos()
 //                ++POSCNT;
 //        }
 //    }
-    volatile extern int gQERawPosition;
+    
     int poscnt = (int)POSCNT;
-    gQERawPosition= (int)POSCNT;
+    gQERawPosition = (int)POSCNT;
     
     if (QE_USE_INDEX)
     {  

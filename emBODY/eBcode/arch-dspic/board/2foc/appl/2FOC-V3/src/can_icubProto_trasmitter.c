@@ -139,9 +139,9 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
             bitmask |= ((uint8_t)gEncoderError.dirty) << 2;
             bitmask |= ((uint8_t)gEncoderError.index_broken) << 3;
             payload.w[0]  = gQERawPosition;
-            payload.b[1] = bitmask;
+            payload.b[2] = bitmask;
 
-            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
             ECANSend(msgid, 3, &payload);
             

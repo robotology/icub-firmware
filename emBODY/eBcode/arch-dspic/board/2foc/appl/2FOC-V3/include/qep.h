@@ -16,6 +16,8 @@ typedef struct
 } EncoderConfig_t;
 volatile extern EncoderConfig_t gEncoderConfig;
 
+volatile extern int gQERawPosition;
+
 typedef union
 {
     struct
