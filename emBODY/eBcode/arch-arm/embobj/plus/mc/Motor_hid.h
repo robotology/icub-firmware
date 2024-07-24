@@ -23,13 +23,21 @@
 
 #include "WatchDog.h"
 
+typedef struct
+{
+    uint16_t total_counter;
+    uint16_t qe_dirty_err_counter;
+    uint16_t qe_index_broken_err_counter;
+    uint16_t qe_phase_broken_err_counter;
+} QEDiagnosticData;
 
+const uint16_t QEDiagnosticMaxCounter = 10* CTRL_LOOP_FREQUENCY_INT;
 typedef union
 {
     struct
     {
         unsigned dirty           :1;
-        unsigned stuck           :1;
+        unsigned stuck           :1; //currently not used
         unsigned index_broken    :1;
         unsigned phase_broken    :1;
         
@@ -150,8 +158,9 @@ struct Motor_hid
     BOOL can_dead;
     BOOL wrong_ctrl_mode;
     
-    uint16_t diagnostics_refresh;
-    uint16_t diagnostics_refresh_warning;
+    uint16_t diagnostics_refresh; //keep for old diagnosic
+    //uint16_t diagnostics_refresh_warning;
+    QEDiagnosticData diagnostic;
     eOmc_motorFaultState_t fault_state_prec;
     eOmc_motorFaultState_t fault_state;
     QEState qe_state;

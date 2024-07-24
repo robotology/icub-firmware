@@ -247,7 +247,7 @@ int setupI2CTsens(void)
     ODCBbits.ODCB8=1;
     ODCBbits.ODCB9=1;
 
-    I2C1BRG = 196;//393;          // @100kHz; (FCY/FSCL - FCY/1e7) - 1
+    I2C1BRG = 393;//393;          // (511 - limit)77.5kHz (196)200kHz (393)@100kHz; raw value to be set in I2C1BRG = (FCY/FSCL - FCY/1e7) - 1 --> where FCY = micro freq (40MHz) and FSCL = desired i2C clock freq
     I2C1CONbits.I2CEN = 0;        // Disable I2C
     I2C1CONbits.DISSLW = 1;       // Disable slew rate control
     I2C1CONbits.A10M = 0;         // 7-bit slave addr
@@ -398,15 +398,17 @@ I2Ctimeout:
     // I2CEN: I2Cx Enable bit
     I2C1CONbits.I2CEN = 0; // 0 = Disables the I2Cx module. All I2C? pins are controlled by port functions
 
+    // configure the port of the register so that I can write on the pin RB8 of the port --> tristate condition of the pin (high impedance) 
     TRISBbits.TRISB8 = 0;
     RPOR4bits.RP8R = 0;
     ODCBbits.ODCB8 = 1;
 
+    // send 9 clock pulse so that I simulate a clean transmission and I do not restart in the middle of it 
     int c;
     for (c=0; c<=18; ++c)
     {
         PORTBbits.RB8 = c%2;
-        __delay32(400);
+        __delay32(200);  // set to 200 since you are setting the bit value of the port high and low at each cycle 400 when u are using the i2c freq at 100kHz --> because the micro is running at 40MHz so you have 400  cycles each 100kHz --> thus delay need to be changed accordingly to i2c freq 
     }
     
     I2C1CONbits.I2CEN = 1; // 1 = Enables the I2Cx module and configures the SDAx and SCLx pins as serial port pins
