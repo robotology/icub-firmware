@@ -294,9 +294,13 @@ void Motor_init(Motor* o) //
     
     o->fault_state_prec.bitmask = 0;
     o->fault_state.bitmask = 0;
-    o->diagnostics_refresh = 0;
-    o->diagnostics_refresh_warning = 0;
-    o->qencoder_err_counter = 0;
+    //o->diagnostics_refresh = 0;
+    //o->diagnostics_refresh_warning = 0;
+//    o->qencoder_err_counter = 0;
+    o->diagnostic.total_counter=0;
+    o->diagnostic.qe_dirty_err_counter=0;
+    o->diagnostic.qe_index_broken_err_counter=0;
+    o->diagnostic.qe_phase_broken_err_counter=0;
     
     WatchDog_init(&o->control_mode_req_wdog);
     WatchDog_init(&o->can_2FOC_alive_wdog);
@@ -644,7 +648,7 @@ void Motor_force_idle(Motor* o) //
     o->fault_state_prec.bitmask = 0;
     o->fault_state.bitmask = 0;
     o->diagnostics_refresh = 0;
-    o->diagnostics_refresh_warning = 0;
+    //o->diagnostics_refresh_warning = 0;
     o->qencoder_err_counter = 0;
     
     o->hardware_fault = FALSE;
@@ -735,7 +739,7 @@ BOOL Motor_check_faults(Motor* o) //
         }
 
         // No HW fault triggered by this warnings
-        if (++o->diagnostics_refresh_warning > 5*CTRL_LOOP_FREQUENCY_INT ) {
+       /* if (++o->diagnostics_refresh_warning > 5*CTRL_LOOP_FREQUENCY_INT ) {
             if (o->qencoder_err_counter < ERROR_COUNTER_MAX) // we are still below the maximum number of error messages
             {
                 if (o->qe_state.bits.dirty) {
@@ -757,6 +761,38 @@ BOOL Motor_check_faults(Motor* o) //
             }
             o->diagnostics_refresh_warning = 0; //restart the counter for the warnings
         }
+        */
+        if (o->qe_state.bits.dirty)
+        {
+            o->diagnostic.qe_dirty_err_counter ++;
+        }
+        
+        if (o->qe_state.bits.index_broken)
+        {
+            o->diagnostic.qe_index_broken_err_counter ++;
+        }
+        
+         if (o->qe_state.bits.phase_broken)
+        {
+            o->diagnostic.qe_phase_broken_err_counter ++;
+        }
+        
+        
+        if (++o->diagnostic.total_counter > QEDiagnosticMaxCounter)
+        {
+            uint64_t mask = o->diagnostic.qe_dirty_err_counter | ((uint64_t)(o->diagnostic.qe_index_broken_err_counter) << 16) | ((uint64_t)(o->diagnostic.qe_phase_broken_err_counter) << 32);
+            if(mask != 0)
+            {
+                Motor_send_error(o->ID, eoerror_value_MC_motor_qencoder_dirty, mask);
+            }
+            
+            //reset diagnostic counter
+            o->diagnostic.total_counter = 0;
+            o->diagnostic.qe_dirty_err_counter=0;
+            o->diagnostic.qe_index_broken_err_counter=0;
+            o->diagnostic.qe_phase_broken_err_counter=0;
+        }
+        
     }
 
     if (!o->fault_state.bits.ExternalFaultAsserted && !o->hardware_fault)
@@ -838,6 +874,9 @@ BOOL Motor_check_faults(Motor* o) //
 //            fault_state.bitmask &= ~CAN_GENERIC_ERROR;
 //        }
                 
+        /* 12th July 2024: Valegagge: I commented this check because the bit "EncoderFault" is no longer used by 2foc to signal an encoder error.
+        The 2FOC board sets the bit in qe_state when it detects an error in the the qe encoder.
+        
         if (o->fault_state.bits.EncoderFault && !o->fault_state_prec.bits.EncoderFault)
         {
             if (o->qe_state.bits.index_broken)
@@ -847,6 +886,7 @@ BOOL Motor_check_faults(Motor* o) //
 
             fault_state.bits.EncoderFault = FALSE;
         }
+*/
 				
 
         if (can_dead && !o->can_dead)

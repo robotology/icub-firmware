@@ -79,7 +79,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_eoprot_ep_mn_fun_apply_config(uint32_t period, uint16_t rxtime, uint16_t dotime, uint16_t txtime, uint8_t txratedivider);
+static void s_eoprot_ep_mn_fun_apply_config(uint32_t period, uint16_t rxtime, uint16_t dotime, uint16_t txtime, uint8_t txratedivider, eOmn_appl_config_logging_t *logging);
 
 static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider);
 
@@ -599,7 +599,7 @@ extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor
         cfg->txratedivider = 1;
     }
     
-    s_eoprot_ep_mn_fun_apply_config(cfg->cycletime, cfg->maxtimeRX, cfg->maxtimeDO, cfg->maxtimeTX, cfg->txratedivider);   
+    s_eoprot_ep_mn_fun_apply_config(cfg->cycletime, cfg->maxtimeRX, cfg->maxtimeDO, cfg->maxtimeTX, cfg->txratedivider, &cfg->logging);   
 }
 
 
@@ -1267,7 +1267,7 @@ static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider)
     eom_emsrunner_Set_TXdecimationFactor(eom_emsrunner_GetHandle(), txratedivider);    
 }
 
-static void s_eoprot_ep_mn_fun_apply_config(uint32_t period, uint16_t rxtime, uint16_t dotime, uint16_t txtime, uint8_t txratedivider)
+static void s_eoprot_ep_mn_fun_apply_config(uint32_t period, uint16_t rxtime, uint16_t dotime, uint16_t txtime, uint8_t txratedivider, eOmn_appl_config_logging_t *logging)
 {
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
@@ -1287,6 +1287,9 @@ static void s_eoprot_ep_mn_fun_apply_config(uint32_t period, uint16_t rxtime, ui
     eom_emsrunner_SetTiming(eom_emsrunner_GetHandle(), &timing); 
     
     eom_emsrunner_Set_TXdecimationFactor(eom_emsrunner_GetHandle(), txratedivider);    
+    
+
+    eom_emsrunner_SetReport(eom_emsrunner_GetHandle(), logging);
 }
 
 
