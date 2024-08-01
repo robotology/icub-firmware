@@ -272,10 +272,10 @@ bool embot::app::application::theSkin::Impl::configtriangles(const embot::prot::
         }
         else
         {
-            triangles.config[i].shift = triangleconfigcommand.shift;        
-            if(triangles.config[i].cdcoffset != triangleconfigcommand.cdcOffset){                              
-                triangles.config[i].cdcoffset = triangleconfigcommand.cdcOffset;
-                ad7147_set_cdcoffset(i, triangles.config[i].cdcoffset);         
+            triangles.config[trianglesOrder[i]].shift = triangleconfigcommand.shift;        
+            if(triangles.config[trianglesOrder[i]].cdcoffset != triangleconfigcommand.cdcOffset){                              
+                triangles.config[trianglesOrder[i]].cdcoffset = triangleconfigcommand.cdcOffset;
+                ad7147_set_cdcoffset(trianglesOrder[i], triangles.config[trianglesOrder[i]].cdcoffset);         
             }
         }
     }
@@ -724,10 +724,16 @@ bool embot::app::application::theSkin::set(const embot::prot::can::analog::polli
     {                       
         // we process cdcoffset even if we have enabled == false ... as the old mtb3 application does
 
-        if(pImpl->triangles.config[i].cdcoffset != info.cdcOffset)
+        if (trianglesOrder[i] >= triangles_max_num){ 
+            if(pImpl->triangles.config5th[trianglesOrder[i] - triangles_max_num].cdcoffset != info.cdcOffset){
+                pImpl->triangles.config5th[trianglesOrder[i] - triangles_max_num].cdcoffset = info.cdcOffset;
+                ad7147_set_cdcoffset(trianglesOrder[i] - triangles_max_num, pImpl->triangles.config5th[trianglesOrder[i]- triangles_max_num].cdcoffset); 
+            }
+        }
+        if(pImpl->triangles.config[trianglesOrder[i]].cdcoffset != info.cdcOffset)
         {
-            pImpl->triangles.config[i].cdcoffset = info.cdcOffset;
-            ad7147_set_cdcoffset(i, pImpl->triangles.config[i].cdcoffset); 
+            pImpl->triangles.config[trianglesOrder[i]].cdcoffset = info.cdcOffset;
+            ad7147_set_cdcoffset(trianglesOrder[i], pImpl->triangles.config[trianglesOrder[i]].cdcoffset); 
         }
     }
          

@@ -90,8 +90,8 @@ extern if2hw_data_ad7147_t CapOffset[20][12];
 
 #else
 
-extern triangle_cfg_t triangle_cfg_list[16];
-extern error_cap err[16];
+extern triangle_cfg_t triangle_cfg_list[20];
+extern error_cap err[20];
 
 #endif
 

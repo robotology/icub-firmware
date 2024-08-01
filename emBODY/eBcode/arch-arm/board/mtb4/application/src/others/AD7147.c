@@ -55,10 +55,10 @@ if2hw_data_ad7147_t CapOffset[16][12];
 #if defined(if2hw_common_AD7147_USE_EXTERNALCONTROLTYPES)
 #else
 
-triangle_cfg_t triangle_cfg_list[16];
-error_cap err[16];
-5th_triangle_cfg_t triangle_cfg_list[4];
-5th_error_cap err[4];
+triangle_cfg_t triangle_cfg_list[20];
+error_cap err[20];
+//triangle_cfg_t 5th_triangle_cfg_list[4];
+//5th_error_cap err[4];
 
 #endif
 
@@ -116,7 +116,7 @@ void SetCDCoffsetOnSingleTriangle(uint16_t cdcOffset, unsigned char triangleN)
 	 //init triangle_cfg_list
 	unsigned int j=0;
 
-	for(j=0;j<triangles_max_num; j++)
+	for(j=0;j<triangles_max_num + triangles_add_num; j++)
 	{
 		triangle_cfg_list[j].shift = SHIFT;
 		triangle_cfg_list[j].CDCoffset = s_ConValue[0];
