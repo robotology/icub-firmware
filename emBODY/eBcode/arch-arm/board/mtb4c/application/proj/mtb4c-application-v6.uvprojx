@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32L452RCIx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.6.1</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
+          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x10000000,0x00008000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -721,82 +721,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>other-hw</GroupName>
-          <Files>
-            <File>
-              <FileName>AD7147.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\others\AD7147.c</FilePath>
-            </File>
-            <File>
-              <FileName>I2C_Multi_SDA.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\others\I2C_Multi_SDA.c</FilePath>
-            </File>
-            <File>
-              <FileName>AD7147_Configuration.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\others\AD7147_Configuration.c</FilePath>
-            </File>
-            <File>
-              <FileName>if2hw_common.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\others\if2hw_common.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>2</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>1</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>embot-hw-lowlevel</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -936,6 +860,36 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>shared-hw</GroupName>
+          <Files>
+            <File>
+              <FileName>AD7147.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\AD7147.c</FilePath>
+            </File>
+            <File>
+              <FileName>AD7147_Configuration.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\AD7147_Configuration.c</FilePath>
+            </File>
+            <File>
+              <FileName>I2C_Multi_SDA.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\I2C_Multi_SDA.c</FilePath>
+            </File>
+            <File>
+              <FileName>if2hw_common.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\if2hw_common.c</FilePath>
+            </File>
+            <File>
+              <FileName>AD7147.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\AD7147.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -948,8 +902,8 @@
         <TargetCommonOption>
           <Device>STM32L452RCIx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.6.1</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
+          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x10000000,0x00008000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 DSP CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1270,9 +1224,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_MTB4C STM32HAL_DRIVER_V1D3</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_MTB4C STM32HAL_DRIVER_V1D3 USE_FIFTH_I2C</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\mtb4\application\src\others;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp;..\..\..\..\src\others</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1653,82 +1607,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>other-hw</GroupName>
-          <Files>
-            <File>
-              <FileName>AD7147.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\others\AD7147.c</FilePath>
-            </File>
-            <File>
-              <FileName>I2C_Multi_SDA.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\others\I2C_Multi_SDA.c</FilePath>
-            </File>
-            <File>
-              <FileName>AD7147_Configuration.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\others\AD7147_Configuration.c</FilePath>
-            </File>
-            <File>
-              <FileName>if2hw_common.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\others\if2hw_common.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>2</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>1</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>embot-hw-lowlevel</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1865,6 +1743,36 @@
               <FileName>embot_hw_bsp_mtb4c.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_bsp_mtb4c.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>shared-hw</GroupName>
+          <Files>
+            <File>
+              <FileName>AD7147.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\AD7147.c</FilePath>
+            </File>
+            <File>
+              <FileName>AD7147_Configuration.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\AD7147_Configuration.c</FilePath>
+            </File>
+            <File>
+              <FileName>I2C_Multi_SDA.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\I2C_Multi_SDA.c</FilePath>
+            </File>
+            <File>
+              <FileName>if2hw_common.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\if2hw_common.c</FilePath>
+            </File>
+            <File>
+              <FileName>AD7147.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\mtb4\application\src\others\AD7147.h</FilePath>
             </File>
           </Files>
         </Group>

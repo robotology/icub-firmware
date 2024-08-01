@@ -657,7 +657,8 @@ namespace embot { namespace hw { namespace multisda {
         { SCK0_GPIO_Port, SCK0_Pin, nullptr },
         // sda
         {{  
-            { SDA0_GPIO_Port, SDA0_Pin, nullptr }, { SDA1_GPIO_Port, SDA1_Pin, nullptr }, { SDA2_GPIO_Port, SDA2_Pin, nullptr }, { SDA3_GPIO_Port, SDA3_Pin, nullptr }            
+            { SDA0_GPIO_Port, SDA0_Pin, nullptr }, { SDA1_GPIO_Port, SDA1_Pin, nullptr }, { SDA2_GPIO_Port, SDA2_Pin, nullptr }, { SDA3_GPIO_Port, SDA3_Pin, nullptr } , {GPIOC, GPIO_PIN_0, nullptr } /*as an alternative use the definitiin from cubeMX in main.h   */
+           
         }}
     };
     
