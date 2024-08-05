@@ -17,16 +17,11 @@ constexpr embot::app::theCANboardInfo::applicationInfo applInfo
 #if defined(CUSTOMIZATION_MTB4_FOR_TLR)
     embot::prot::can::versionOfAPPLICATION {20, 21, 0},
     embot::prot::can::versionOfCANPROTOCOL {20, 0}
-#elif defined(USE_FIFTH_I2C)
-    embot::prot::can::versionOfAPPLICATION {51, 22, 0},
-    embot::prot::can::versionOfCANPROTOCOL {2, 0}
 #else
     embot::prot::can::versionOfAPPLICATION {1, 22, 0},
     embot::prot::can::versionOfCANPROTOCOL {2, 0}
 #endif
 };
-
-//#define USE_FIFTH_I2C 
 
 constexpr std::uint16_t threadIDLEstacksize = 512;
 constexpr std::uint16_t threadINITstacksize = 2048;

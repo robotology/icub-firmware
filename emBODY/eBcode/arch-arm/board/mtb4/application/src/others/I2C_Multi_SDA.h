@@ -38,14 +38,13 @@ typedef enum
 	sda7 = 7,
 } i2c_sda_num_t;
 
-enum SDAch_t { SDAch0 = 0, SDAch1 = 1, SDAch2 = 2, SDAch3 = 3, SDAch4 = 4, SDAall = 255 };
+enum SDAch_t { SDAch0 = 0, SDAch1 = 1, SDAch2 = 2, SDAch3 = 3, SDAall = 255 };
 
 
 #define i2c_sda_num_max 8
 #define CH0     0
 #define CH1     1
 
-//int numberofi2c; 
 
 void I2C_Multi_SDA_Init(unsigned char Channel);
 void I2C_Multi_SDA_test(unsigned char Channel);
@@ -70,7 +69,7 @@ unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, un
 unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, 
                               if2hw_data_i2cmultisda_t *DataBuffer);
 extern unsigned char ReadViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, 
-                                if2hw_data_i2cmultisda_t *DataBuffer1, if2hw_data_i2cmultisda_t *DataBuffer2, if2hw_data_i2cmultisda_t *DataBuffer3, if2hw_data_i2cmultisda_t *DataBuffer4, if2hw_data_i2cmultisda_t *DataBuffer5, 
+                                if2hw_data_i2cmultisda_t *DataBuffer1, if2hw_data_i2cmultisda_t *DataBuffer2, if2hw_data_i2cmultisda_t *DataBuffer3, if2hw_data_i2cmultisda_t *DataBuffer4, 
                                 const unsigned int OffsetInBuffer);
 unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
 unsigned char ReadByteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
