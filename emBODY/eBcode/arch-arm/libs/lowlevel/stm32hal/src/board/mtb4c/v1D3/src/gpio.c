@@ -87,7 +87,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PB4 PB3 PB5 PB15
                            PB2 PB12 */
-  GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_3|GPIO_PIN_5|GPIO_PIN_15
+  GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_15
                           |GPIO_PIN_2|GPIO_PIN_12;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
