@@ -57,6 +57,8 @@ if2hw_data_ad7147_t CapOffset[16][12];
 
 triangle_cfg_t triangle_cfg_list[16];
 error_cap err[16];
+5th_triangle_cfg_t triangle_cfg_list[4];
+5th_error_cap err[4];
 
 #endif
 
@@ -80,6 +82,9 @@ static const unsigned int SHIFT = 2;
 static if2hw_data_ad7147_t (*s_AD7147Registers)[12] = NULL;
 static if2hw_data_ad7147_t (*s_CapOffset)[12] = NULL;
 
+static if2hw_data_ad7147_t (*s_AD7147Registers_5th)[12] = NULL;
+static if2hw_data_ad7147_t (*s_CapOffset_5th)[12] = NULL;
+
 #else
 
 
@@ -88,9 +93,12 @@ static if2hw_data_ad7147_t (*s_CapOffset)[12] = CapOffset;
 
 #endif
 
- 
+uint16_t SKV = 0;
+uint16_t taxsel0 = 0;
+uint16_t taxsel4 = 0;
+uint16_t taxsel5 = 0;
 
-static uint16_t triangleconnectionmask = 0xffff;
+static uint32_t triangleconnectionmask = 0xffff;
 
 
 
@@ -144,10 +152,32 @@ void SetCDCoffsetOnAllTriangles(unsigned char Channel, if2hw_data_ad7147_t cdcOf
 void ServiceAD7147Isr(unsigned char Channel)
 {
   unsigned int i=0;
-	for (i=0;i<4;i++)
+    // code added SD + Marco Accame
+    constexpr size_t nI2Clines {1};
+    constexpr size_t NumberOfRegistertoRead  {12};
+	for (i=0;i<4;i++)// this 4 is number of addresses on each I2C line
 	{
-	   ReadViaI2C(Channel,AD7147_ADD[i],(ADCRESULT_S0), 12, s_AD7147Registers[i],s_AD7147Registers[i+4],s_AD7147Registers[i+8],s_AD7147Registers[i+12], 0);
+	   ReadViaI2C(Channel,AD7147_ADD[i],(ADCRESULT_S0), NumberOfRegistertoRead,
+        s_AD7147Registers[i],
+        s_AD7147Registers[i+4],
+        s_AD7147Registers[i+8],
+        s_AD7147Registers[i+12],
+//        s_AD7147Registers[i+16],
+        s_AD7147Registers_5th[i],
+        0);
 	}
+    static int x = 0;
+    x++;
+    if(x > 11) x =0;
+#ifdef USE_FIFTH_I2C
+    SKV = s_AD7147Registers_5th[0][x];
+#endif
+//    SKV = s_AD7147Registers[16][x];
+
+    taxsel0 = s_AD7147Registers_5th[0][0];
+    taxsel4 = s_AD7147Registers_5th[0][4];
+    taxsel5 = s_AD7147Registers_5th[0][5];
+    
 }
 
 void TrianglesInit(unsigned char Channel, uint8_t applycdcoffset)
@@ -191,6 +221,30 @@ void TrianglesInit(unsigned char Channel, uint8_t applycdcoffset)
             triangle_cfg_list[i].shift = SHIFT;
 #endif
     	}
+   	for (i=0;i<4;i++)
+    	{
+            for (k=0;k<12;k++)
+            {
+                s_CapOffset_5th[i][k]=s_AD7147Registers_5th[i][k];              
+                if (s_AD7147Registers_5th[i][k]==0xFFFF)
+                {
+                    unconnect +=1;
+                }
+            }
+            if (unconnect==12) // no answer from the chip at startup
+            {
+#if !defined(if2hw_common_AD7147_USE_EXTERNALCONTROLTYPES)                
+                err[i].error |=error_notconnected;
+#endif                
+                // clear bit i-th
+                triangleconnectionmask &= (~(0x0001<<i));
+
+            }
+            unconnect=0;
+#if !defined(if2hw_common_AD7147_USE_EXTERNALCONTROLTYPES)            
+            5th_triangle_cfg_list[i].shift = SHIFT;
+#endif
+    	}
 }
 
 
@@ -198,12 +252,16 @@ void TrianglesInit(unsigned char Channel, uint8_t applycdcoffset)
 // - new api
 
 
-extern void ad7147_init(if2hw_data_ad7147_t ext_rawvalues[][12], if2hw_data_ad7147_t ext_capoffsets[][12])
+extern void ad7147_init(if2hw_data_ad7147_t ext_rawvalues[][12], if2hw_data_ad7147_t ext_capoffsets[][12],
+    if2hw_data_ad7147_t ext_rawvalues5th[][12], if2hw_data_ad7147_t ext_capoffsets5th[][12])
 {
     
 #if defined(if2hw_common_AD7147_USE_EXTERNALDATA)    
     s_AD7147Registers = ext_rawvalues;
     s_CapOffset = ext_capoffsets;
+    s_AD7147Registers_5th = ext_rawvalues5th;
+    s_CapOffset_5th = ext_capoffsets5th;
+    
 #endif
     
     triangleconnectionmask = 0;
@@ -238,23 +296,33 @@ extern void ad7147_acquire(void)
 }
 
 
-extern if2hw_data_ad7147_t * ad7147_get12rawvaluesoftriangle(uint8_t trg)
+extern if2hw_data_ad7147_t * ad7147_get12rawvaluesoftriangle(uint16_t trg)
 {
-    if(trg >= triangles_max_num)
+    if(trg >= triangles_max_num + triangles_add_num )
     {
         return(NULL);
     }
-    return(s_AD7147Registers[trg]);
+    else if ( trg >= triangles_max_num)
+    {
+        return(s_AD7147Registers_5th[0]);//trg - triangles_max_num]); 
+    }
+    else
+        return(s_AD7147Registers[trg]);
 }  
 
 
-extern if2hw_data_ad7147_t * ad7147_get12capoffsetsoftriangle(uint8_t trg)
+extern if2hw_data_ad7147_t * ad7147_get12capoffsetsoftriangle(uint16_t trg)
 {
-    if(trg >= triangles_max_num)
+    if(trg >= triangles_max_num + triangles_add_num )
     {
         return(NULL);
     }
-    return(s_CapOffset[trg]);
+    else if ( trg >= triangles_max_num)
+    {
+        return(s_CapOffset_5th[trg - triangles_max_num]); 
+    }
+    else
+        return(s_CapOffset[trg]);
 }  
 
 
