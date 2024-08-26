@@ -9,7 +9,7 @@
 //
 // Model version                  : 8.8
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Aug 26 12:01:12 2024
+// C/C++ source code generated on : Mon Aug 26 15:37:13 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -150,7 +150,7 @@ void AMC_BLDC_step_FOC(void)           // Sample time: [4.5E-5s, 0.0s]
   int8_T wrBufIdx;
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element3'
+  //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   motion_controller_singleTID1(&AMC_BLDC_U.SensorsData_p,
@@ -215,7 +215,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
               &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtdw));
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element4'
+  //   Inport generated from: '<Root>/In Bus Element1'
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
@@ -251,8 +251,8 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
   // End of RateTransition generated from: '<Root>/SupervisorFSM_TX'
 
   // ModelReference generated from: '<Root>/SupervisorFSM_TX' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element4'
-  //   Inport generated from: '<Root>/In Bus Element3'
+  //   Inport generated from: '<Root>/In Bus Element1'
+  //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 

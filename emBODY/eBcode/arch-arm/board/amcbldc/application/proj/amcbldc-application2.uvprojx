@@ -1138,11 +1138,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
-            <File>
-              <FileName>mw_cmsis.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\mw_cmsis.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2459,11 +2454,6 @@
               <FileName>rt_roundf.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>mw_cmsis.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\mw_cmsis.h</FilePath>
             </File>
           </Files>
         </Group>

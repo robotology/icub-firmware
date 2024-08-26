@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.0
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Fri Aug 23 11:52:16 2024
+// C/C++ source code generated on : Mon Aug 26 15:37:06 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,6 +37,13 @@ void motion_controller_single_Enable(DW_motion_controller_single_f_T *localDW)
 {
   // Enable for ModelReference: '<Root>/Motion Controller'
   motion_controller_Enable(&(localDW->MotionController_InstanceData.rtdw));
+}
+
+// Disable for referenced model: 'motion_controller_single'
+void motion_controller_single_Disable(DW_motion_controller_single_f_T *localDW)
+{
+  // Disable for ModelReference: '<Root>/Motion Controller'
+  motion_controller_Disable(&(localDW->MotionController_InstanceData.rtdw));
 }
 
 // Output and update for referenced model: 'motion_controller_single'
