@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 6.21
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:31:02 2024
+// Model version                  : 7.2
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Fri Aug 23 11:51:51 2024
 //
-#ifndef RTW_HEADER_rt_hypotf_h_
-#define RTW_HEADER_rt_hypotf_h_
+#ifndef rt_hypotf_h_
+#define rt_hypotf_h_
 #include "rtwtypes.h"
 
 extern real32_T rt_hypotf(real32_T u0, real32_T u1);
 
-#endif                                 // RTW_HEADER_rt_hypotf_h_
+#endif                                 // rt_hypotf_h_
 
 //
 // File trailer for generated code.

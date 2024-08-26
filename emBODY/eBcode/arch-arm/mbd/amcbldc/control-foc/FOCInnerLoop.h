@@ -7,46 +7,50 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.82
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:29:19 2024
+// Model version                  : 7.4
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 12:35:20 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_FOCInnerLoop_h_
-#define RTW_HEADER_FOCInnerLoop_h_
+#ifndef FOCInnerLoop_h_
+#define FOCInnerLoop_h_
 #include "rtwtypes.h"
 #include "control_foc_types.h"
 #include "zero_crossing_types.h"
 
 // Block signals for system '<Root>/FOC inner loop'
 struct B_FOCInnerLoop_T {
-  real32_T SumI1;                      // '<S118>/SumI1'
-  real32_T Integrator;                 // '<S106>/Integrator'
-  real32_T Switch;                     // '<S40>/Switch'
-  real32_T Integrator_j;               // '<S52>/Integrator'
+  real32_T SumI1;                      // '<S122>/SumI1'
+  real32_T Integrator;                 // '<S110>/Integrator'
+  real32_T Switch;                     // '<S41>/Switch'
+  real32_T Integrator_j;               // '<S54>/Integrator'
 };
 
 // Block states (default storage) for system '<Root>/FOC inner loop'
 struct DW_FOCInnerLoop_T {
-  real32_T FilterDifferentiatorTF_states;// '<S99>/Filter Differentiator TF'
+  real32_T FilterDifferentiatorTF_states;// '<S103>/Filter Differentiator TF'
   real32_T UnitDelay_DSTATE;           // '<S1>/Unit Delay'
-  real32_T Integrator_DSTATE;          // '<S106>/Integrator'
-  real32_T FilterDifferentiatorTF_states_k;// '<S45>/Filter Differentiator TF'
-  real32_T Integrator_DSTATE_o;        // '<S52>/Integrator'
-  real32_T FilterDifferentiatorTF_tmp; // '<S99>/Filter Differentiator TF'
-  real32_T FilterDifferentiatorTF_tmp_c;// '<S45>/Filter Differentiator TF'
-  int8_T Integrator_PrevResetState;    // '<S106>/Integrator'
-  int8_T Integrator_PrevResetState_k;  // '<S52>/Integrator'
+  real32_T Integrator_DSTATE;          // '<S110>/Integrator'
+  real32_T FilterDifferentiatorTF_states_k;// '<S47>/Filter Differentiator TF'
+  real32_T Integrator_DSTATE_o;        // '<S54>/Integrator'
+  real32_T FilterDifferentiatorTF_tmp; // '<S103>/Filter Differentiator TF'
+  real32_T FilterDifferentiatorTF_tmp_c;// '<S47>/Filter Differentiator TF'
+  int8_T Integrator_PrevResetState;    // '<S110>/Integrator'
+  int8_T Integrator_PrevResetState_k;  // '<S54>/Integrator'
+  uint8_T FilterDifferentiatorTF_icLoad;// '<S103>/Filter Differentiator TF'
+  uint8_T Integrator_IC_LOADING;       // '<S110>/Integrator'
+  uint8_T FilterDifferentiatorTF_icLoad_c;// '<S47>/Filter Differentiator TF'
+  uint8_T Integrator_IC_LOADING_b;     // '<S54>/Integrator'
 };
 
 // Zero-crossing (trigger) state for system '<Root>/FOC inner loop'
 struct ZCE_FOCInnerLoop_T {
-  ZCSigState FilterDifferentiatorTF_Reset_ZCE;// '<S99>/Filter Differentiator TF' 
-  ZCSigState FilterDifferentiatorTF_Reset_ZCE_o;// '<S45>/Filter Differentiator TF' 
+  ZCSigState FilterDifferentiatorTF_Reset_ZCE;// '<S103>/Filter Differentiator TF' 
+  ZCSigState FilterDifferentiatorTF_Reset_ZCE_o;// '<S47>/Filter Differentiator TF' 
 };
 
 extern void FOCInnerLoop_Init(DW_FOCInnerLoop_T *localDW);
@@ -59,7 +63,7 @@ extern void FOCInnerLoop(const SensorsData *rtu_Sensors, const
   B_FOCInnerLoop_T *localB, DW_FOCInnerLoop_T *localDW, ZCE_FOCInnerLoop_T
   *localZCE);
 
-#endif                                 // RTW_HEADER_FOCInnerLoop_h_
+#endif                                 // FOCInnerLoop_h_
 
 //
 // File trailer for generated code.

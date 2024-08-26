@@ -8,16 +8,16 @@
 // Code generated for Simulink model 'can_decoder'.
 //
 // Model version                  : 6.115
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:28:54 2024
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 12:00:41 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_can_decoder_types_h_
-#define RTW_HEADER_can_decoder_types_h_
+#ifndef can_decoder_types_h_
+#define can_decoder_types_h_
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
 
@@ -423,7 +423,7 @@ typedef enum {
 // Forward declaration for rtModel
 typedef struct tag_RTM_can_decoder_T RT_MODEL_can_decoder_T;
 
-#endif                                 // RTW_HEADER_can_decoder_types_h_
+#endif                                 // can_decoder_types_h_
 
 //
 // File trailer for generated code.

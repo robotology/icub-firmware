@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 7.83
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:32:02 2024
+// Model version                  : 8.8
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 12:01:12 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -150,7 +150,7 @@ void AMC_BLDC_step_FOC(void)           // Sample time: [4.5E-5s, 0.0s]
   int8_T wrBufIdx;
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   motion_controller_singleTID1(&AMC_BLDC_U.SensorsData_p,
@@ -252,7 +252,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
 
   // ModelReference generated from: '<Root>/SupervisorFSM_TX' incorporates:
   //   Inport generated from: '<Root>/In Bus Element4'
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
@@ -280,6 +280,13 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
 // Model initialize function
 void AMC_BLDC_initialize(void)
 {
+  // Registration code
+
+  // Set task counter limit used by the static main program
+  (AMC_BLDC_M)->Timing.TaskCounters.cLimit[0] = 1;
+  (AMC_BLDC_M)->Timing.TaskCounters.cLimit[1] = 9;
+  (AMC_BLDC_M)->Timing.TaskCounters.cLimit[2] = 200;
+
   // Model Initialize function for ModelReference Block: '<S2>/CAN_Decoder'
   can_decoder_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
     &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtm));

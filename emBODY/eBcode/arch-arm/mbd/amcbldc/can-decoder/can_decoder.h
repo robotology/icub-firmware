@@ -8,16 +8,16 @@
 // Code generated for Simulink model 'can_decoder'.
 //
 // Model version                  : 6.115
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:28:54 2024
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 12:00:41 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_can_decoder_h_
-#define RTW_HEADER_can_decoder_h_
+#ifndef can_decoder_h_
+#define can_decoder_h_
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
 #include "rtw_defines.h"
@@ -140,7 +140,7 @@ extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
 //  '<S4>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Decoding Logic'
 //  '<S5>'   : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT/RAW2STRUCT Decoding Logic'
 
-#endif                                 // RTW_HEADER_can_decoder_h_
+#endif                                 // can_decoder_h_
 
 //
 // File trailer for generated code.

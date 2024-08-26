@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 2.239
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 12:07:07 2024
+// Model version                  : 3.9
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 10:36:44 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_motion_controller_h_
-#define RTW_HEADER_motion_controller_h_
+#ifndef motion_controller_h_
+#define motion_controller_h_
 #include "rtwtypes.h"
 #include "motion_controller_types.h"
 #include "control_foc.h"
@@ -31,7 +31,7 @@
 // Block signals for model 'motion_controller'
 struct B_motion_controller_c_T {
   FOCSlowInputs RateTransition;        // '<Root>/Rate Transition'
-  SensorsData RateTransition3;         // '<Root>/Rate Transition3'
+  SensorsData Transitionto1ms;         // '<Root>/Transition to 1ms'
   FOCOutputs RateTransition2;          // '<Root>/Rate Transition2'
   Targets targets;                     // '<Root>/Motor Supervisor'
 };
@@ -39,21 +39,21 @@ struct B_motion_controller_c_T {
 // Block states (default storage) for model 'motion_controller'
 struct DW_motion_controller_f_T {
   FOCSlowInputs RateTransition_Buf[3]; // '<Root>/Rate Transition'
-  SensorsData RateTransition3_Buf0;    // '<Root>/Rate Transition3'
-  SensorsData RateTransition3_Buf1;    // '<Root>/Rate Transition3'
-  SensorsData RateTransition3_Buf2;    // '<Root>/Rate Transition3'
+  SensorsData Transitionto1ms_Buf0;    // '<Root>/Transition to 1ms'
+  SensorsData Transitionto1ms_Buf1;    // '<Root>/Transition to 1ms'
+  SensorsData Transitionto1ms_Buf2;    // '<Root>/Transition to 1ms'
   FOCOutputs RateTransition2_Buf0;     // '<Root>/Rate Transition2'
   FOCOutputs RateTransition2_Buf1;     // '<Root>/Rate Transition2'
   FOCOutputs RateTransition2_Buf2;     // '<Root>/Rate Transition2'
   void* RateTransition_SEMAPHORE;      // '<Root>/Rate Transition'
   void* RateTransition2_SEMAPHORE;     // '<Root>/Rate Transition2'
-  void* RateTransition3_SEMAPHORE;     // '<Root>/Rate Transition3'
+  void* Transitionto1ms_SEMAPHORE;     // '<Root>/Transition to 1ms'
   int8_T RateTransition_LstBufWR;      // '<Root>/Rate Transition'
   int8_T RateTransition_RDBuf;         // '<Root>/Rate Transition'
   int8_T RateTransition2_LstBufWR;     // '<Root>/Rate Transition2'
   int8_T RateTransition2_RDBuf;        // '<Root>/Rate Transition2'
-  int8_T RateTransition3_LstBufWR;     // '<Root>/Rate Transition3'
-  int8_T RateTransition3_RDBuf;        // '<Root>/Rate Transition3'
+  int8_T Transitionto1ms_LstBufWR;     // '<Root>/Transition to 1ms'
+  int8_T Transitionto1ms_RDBuf;        // '<Root>/Transition to 1ms'
   MdlrefDW_control_foc_T FOC_InstanceData;// '<Root>/FOC'
   MdlrefDW_estimation_velocity_T VelocityEstimator_InstanceData;// '<S1>/Velocity Estimator' 
   MdlrefDW_filter_current_T CurrentFilter_InstanceData;// '<S1>/Current Filter'
@@ -104,7 +104,7 @@ extern void motion_controller_Term(DW_motion_controller_f_T *localDW);
 //  '<S2>'   : 'motion_controller/Estimation/Thermal model'
 //  '<S3>'   : 'motion_controller/Estimation/Thermal model/Thermal model OFF'
 
-#endif                                 // RTW_HEADER_motion_controller_h_
+#endif                                 // motion_controller_h_
 
 //
 // File trailer for generated code.

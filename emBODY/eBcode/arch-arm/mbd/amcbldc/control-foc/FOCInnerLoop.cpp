@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.82
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:29:19 2024
+// Model version                  : 7.4
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 12:35:20 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,22 +18,27 @@
 //
 #include "FOCInnerLoop.h"
 #include "control_foc_types.h"
-#include "arm_math.h"
 #include <cmath>
 #include "rtwtypes.h"
 #include "control_foc_private.h"
 #include "zero_crossing_types.h"
 
-#include "embot_core.h"
-
 // System initialize for atomic system: '<Root>/FOC inner loop'
 void FOCInnerLoop_Init(DW_FOCInnerLoop_T *localDW)
 {
-  // InitializeConditions for DiscreteIntegrator: '<S106>/Integrator'
-  localDW->Integrator_PrevResetState = 2;
+  // InitializeConditions for DiscreteTransferFcn: '<S103>/Filter Differentiator TF' 
+  localDW->FilterDifferentiatorTF_icLoad = 1U;
 
-  // InitializeConditions for DiscreteIntegrator: '<S52>/Integrator'
+  // InitializeConditions for DiscreteIntegrator: '<S110>/Integrator'
+  localDW->Integrator_PrevResetState = 2;
+  localDW->Integrator_IC_LOADING = 1U;
+
+  // InitializeConditions for DiscreteTransferFcn: '<S47>/Filter Differentiator TF' 
+  localDW->FilterDifferentiatorTF_icLoad_c = 1U;
+
+  // InitializeConditions for DiscreteIntegrator: '<S54>/Integrator'
   localDW->Integrator_PrevResetState_k = 2;
+  localDW->Integrator_IC_LOADING_b = 1U;
 }
 
 // Outputs for atomic system: '<Root>/FOC inner loop'
@@ -45,6 +50,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
                   *localDW, ZCE_FOCInnerLoop_T *localZCE)
 {
   real32_T rtb_IaIbIc0[2];
+  real32_T algDD_o1;
   real32_T rtb_Add;
   real32_T rtb_Diff;
   real32_T rtb_NProdOut;
@@ -52,10 +58,10 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
   real32_T rtb_Product;
   real32_T rtb_SinCos_o1;
   real32_T rtb_SinCos_o2;
-  real32_T rtb_algDD_o1;
-  real32_T rtb_algDD_o1_g;
-  real32_T rtb_algDD_o2;
-  real32_T rtb_algDD_o2_l;
+  real32_T rtb_SumFdbk_m;
+  real32_T rtb_Switch_ez_idx_0;
+  real32_T rtb_Switch_ez_idx_1;
+  real32_T rtb_sum_beta;
   int8_T tmp;
   int8_T tmp_0;
 
@@ -86,21 +92,23 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
   rtb_Product = 0.5F * rtb_Diff * 0.975F;
 
   // Gain: '<S1>/Ia+Ib+Ic=0'
-  rtb_SinCos_o1 = rtu_Sensors->motorsensors.Iabc[1];
-  rtb_SinCos_o2 = rtu_Sensors->motorsensors.Iabc[0];
-  rtb_Diff = rtu_Sensors->motorsensors.Iabc[2];
+  rtb_Switch_ez_idx_1 = rtu_Sensors->motorsensors.Iabc[1];
+  algDD_o1 = rtu_Sensors->motorsensors.Iabc[0];
+  rtb_Switch_ez_idx_0 = rtu_Sensors->motorsensors.Iabc[2];
   for (int32_T i = 0; i < 2; i++) {
-    rtb_IaIbIc0[i] = (rtCP_IaIbIc0_Gain[i + 2] * rtb_SinCos_o1 +
-                      rtCP_IaIbIc0_Gain[i] * rtb_SinCos_o2) +
-      rtCP_IaIbIc0_Gain[i + 4] * rtb_Diff;
+    rtb_IaIbIc0[i] = (rtCP_IaIbIc0_Gain[i + 2] * rtb_Switch_ez_idx_1 +
+                      rtCP_IaIbIc0_Gain[i] * algDD_o1) + rtCP_IaIbIc0_Gain[i + 4]
+      * rtb_Switch_ez_idx_0;
   }
 
   // End of Gain: '<S1>/Ia+Ib+Ic=0'
 
   // Outputs for Atomic SubSystem: '<S12>/Two phase CRL wrap'
-  // AlgorithmDescriptorDelegate generated from: '<S13>/a16'
-  arm_clarke_f32(rtb_IaIbIc0[0], rtb_IaIbIc0[1], &rtb_algDD_o1_g,
-                 &rtb_algDD_o2_l);
+  // Gain: '<S13>/one_by_sqrt3' incorporates:
+  //   Sum: '<S13>/a_plus_2b'
+
+  rtb_sum_beta = ((rtb_IaIbIc0[0] + rtb_IaIbIc0[1]) + rtb_IaIbIc0[1]) *
+    0.577350259F;
 
   // End of Outputs for SubSystem: '<S12>/Two phase CRL wrap'
 
@@ -112,122 +120,146 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
   rtb_SinCos_o2 = std::cos(rtb_Diff);
 
   // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
-  // AlgorithmDescriptorDelegate generated from: '<S123>/a16'
-  arm_park_f32(rtb_algDD_o1_g, rtb_algDD_o2_l, &rtb_algDD_o1, &rtb_algDD_o2,
-               rtb_SinCos_o1, rtb_SinCos_o2);
+  // Outputs for Atomic SubSystem: '<S12>/Two phase CRL wrap'
+  // Switch: '<S128>/Switch' incorporates:
+  //   AlgorithmDescriptorDelegate generated from: '<S13>/a16'
+  //   Product: '<S127>/acos'
+  //   Product: '<S127>/asin'
+  //   Product: '<S127>/bcos'
+  //   Product: '<S127>/bsin'
+  //   Sum: '<S127>/sum_Ds'
+  //   Sum: '<S127>/sum_Qs'
+
+  rtb_Switch_ez_idx_0 = rtb_IaIbIc0[0] * rtb_SinCos_o2 + rtb_sum_beta *
+    rtb_SinCos_o1;
+  rtb_Switch_ez_idx_1 = rtb_sum_beta * rtb_SinCos_o2 - rtb_IaIbIc0[0] *
+    rtb_SinCos_o1;
+
+  // End of Outputs for SubSystem: '<S12>/Two phase CRL wrap'
+
+  // AlgorithmDescriptorDelegate generated from: '<S127>/a16'
+  algDD_o1 = rtb_Switch_ez_idx_0;
+
+  // Sum: '<S1>/Sum' incorporates:
+  //   AlgorithmDescriptorDelegate generated from: '<S127>/a16'
+
+  rtb_Diff = rtu_OuterOutputs->motorcurrent - rtb_Switch_ez_idx_1;
 
   // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
 
-  // Sum: '<S1>/Sum'
-	
-	  static char msg2[64];
-    static uint32_t counter;
-    if(++counter % 1000 == 0)
-    {
-        sprintf(msg2, "%.3f", rtu_OuterOutputs->motorcurrent);
-        embot::core::print(msg2);
-        counter = 0;
-    }
-	
-  rtb_Diff = rtu_OuterOutputs->motorcurrent - rtb_algDD_o2;
-
-  // Product: '<S111>/PProd Out'
+  // Product: '<S115>/PProd Out'
   rtb_PProdOut = rtb_Diff * rtu_ConfigurationParameters->pids.currentPID.P;
 
-  // SampleTimeMath: '<S101>/Tsamp' incorporates:
-  //   SampleTimeMath: '<S47>/Tsamp'
+  // SampleTimeMath: '<S105>/Tsamp' incorporates:
+  //   SampleTimeMath: '<S49>/Tsamp'
   //
-  //  About '<S101>/Tsamp':
+  //  About '<S105>/Tsamp':
+  //   y = u * K where K = ( w * Ts )
+  //    *
+  //  About '<S49>/Tsamp':
   //   y = u * K where K = ( w * Ts )
   //
-  //  About '<S47>/Tsamp':
-  //   y = u * K where K = ( w * Ts )
-
   rtb_NProdOut = rtu_ConfigurationParameters->pids.currentPID.N * 2.25E-5F;
 
-  // Math: '<S99>/Reciprocal' incorporates:
-  //   Constant: '<S99>/Filter Den Constant'
-  //   Math: '<S45>/Reciprocal'
-  //   SampleTimeMath: '<S101>/Tsamp'
-  //   Sum: '<S99>/SumDen'
+  // Math: '<S103>/Reciprocal' incorporates:
+  //   Constant: '<S103>/Filter Den Constant'
+  //   Math: '<S47>/Reciprocal'
+  //   SampleTimeMath: '<S105>/Tsamp'
+  //   Sum: '<S103>/SumDen'
   //
-  //  About '<S99>/Reciprocal':
+  //  About '<S103>/Reciprocal':
   //   Operator: reciprocal
   //
-  //  About '<S45>/Reciprocal':
+  //  About '<S47>/Reciprocal':
   //   Operator: reciprocal
   //
-  //  About '<S101>/Tsamp':
+  //  About '<S105>/Tsamp':
   //   y = u * K where K = ( w * Ts )
+  //
+  rtb_sum_beta = 1.0F / (rtb_NProdOut + 1.0F);
 
-  rtb_algDD_o1_g = 1.0F / (rtb_NProdOut + 1.0F);
-
-  // DiscreteTransferFcn: '<S99>/Filter Differentiator TF'
+  // DiscreteTransferFcn: '<S103>/Filter Differentiator TF'
   if (rtu_OuterOutputs->pid_reset && (localZCE->FilterDifferentiatorTF_Reset_ZCE
        != POS_ZCSIG)) {
-    localDW->FilterDifferentiatorTF_states = 0.0F;
+    localDW->FilterDifferentiatorTF_icLoad = 1U;
   }
 
   localZCE->FilterDifferentiatorTF_Reset_ZCE = rtu_OuterOutputs->pid_reset;
+  if (localDW->FilterDifferentiatorTF_icLoad != 0) {
+    localDW->FilterDifferentiatorTF_states = 0.0F;
+    localDW->FilterDifferentiatorTF_icLoad = 0U;
+  }
 
-  // Product: '<S99>/Divide' incorporates:
-  //   Constant: '<S99>/Filter Den Constant'
-  //   Math: '<S99>/Reciprocal'
-  //   Product: '<S45>/Divide'
-  //   SampleTimeMath: '<S101>/Tsamp'
-  //   Sum: '<S99>/SumNum'
+  // Product: '<S103>/Divide' incorporates:
+  //   Constant: '<S103>/Filter Den Constant'
+  //   Math: '<S103>/Reciprocal'
+  //   Product: '<S47>/Divide'
+  //   SampleTimeMath: '<S105>/Tsamp'
+  //   Sum: '<S103>/SumNum'
   //
-  //  About '<S99>/Reciprocal':
+  //  About '<S103>/Reciprocal':
   //   Operator: reciprocal
   //
-  //  About '<S101>/Tsamp':
+  //  About '<S105>/Tsamp':
   //   y = u * K where K = ( w * Ts )
+  //
+  rtb_SumFdbk_m = (rtb_NProdOut - 1.0F) * rtb_sum_beta;
 
-  rtb_algDD_o2_l = (rtb_NProdOut - 1.0F) * rtb_algDD_o1_g;
-
-  // DiscreteTransferFcn: '<S99>/Filter Differentiator TF' incorporates:
-  //   Product: '<S98>/DProd Out'
-  //   Product: '<S99>/Divide'
+  // DiscreteTransferFcn: '<S103>/Filter Differentiator TF' incorporates:
+  //   Product: '<S101>/DProd Out'
+  //   Product: '<S103>/Divide'
 
   localDW->FilterDifferentiatorTF_tmp = rtb_Diff *
-    rtu_ConfigurationParameters->pids.currentPID.D - rtb_algDD_o2_l *
+    rtu_ConfigurationParameters->pids.currentPID.D - rtb_SumFdbk_m *
     localDW->FilterDifferentiatorTF_states;
 
-  // Product: '<S109>/NProd Out' incorporates:
-  //   DiscreteTransferFcn: '<S99>/Filter Differentiator TF'
-  //   Math: '<S99>/Reciprocal'
-  //   Product: '<S99>/DenCoefOut'
+  // Product: '<S113>/NProd Out' incorporates:
+  //   DiscreteTransferFcn: '<S103>/Filter Differentiator TF'
+  //   Math: '<S103>/Reciprocal'
+  //   Product: '<S103>/DenCoefOut'
   //
-  //  About '<S99>/Reciprocal':
+  //  About '<S103>/Reciprocal':
   //   Operator: reciprocal
 
   rtb_NProdOut = (localDW->FilterDifferentiatorTF_tmp -
-                  localDW->FilterDifferentiatorTF_states) * rtb_algDD_o1_g *
+                  localDW->FilterDifferentiatorTF_states) * rtb_sum_beta *
     rtu_ConfigurationParameters->pids.currentPID.N;
 
-  // Sum: '<S118>/SumI1' incorporates:
-  //   Product: '<S103>/IProd Out'
-  //   Sum: '<S116>/Sum Fdbk'
-  //   Sum: '<S117>/SumI3'
+  // Sum: '<S122>/SumI1' incorporates:
+  //   Product: '<S107>/IProd Out'
+  //   Sum: '<S120>/Sum Fdbk'
+  //   Sum: '<S121>/SumI3'
   //   UnitDelay: '<S1>/Unit Delay'
 
   localB->SumI1 = (localDW->UnitDelay_DSTATE - ((rtb_PProdOut +
     localDW->Integrator_DSTATE) + rtb_NProdOut)) + rtb_Diff *
     rtu_ConfigurationParameters->pids.currentPID.I;
 
-  // DiscreteIntegrator: '<S106>/Integrator'
-  if (rtu_OuterOutputs->pid_reset && (localDW->Integrator_PrevResetState <= 0))
-  {
-    localDW->Integrator_DSTATE = 0.0F;
+  // DiscreteIntegrator: '<S110>/Integrator' incorporates:
+  //   AlgorithmDescriptorDelegate generated from: '<S127>/a16'
+
+  if (localDW->Integrator_IC_LOADING != 0) {
+    // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
+    localDW->Integrator_DSTATE = rtb_Switch_ez_idx_1;
+
+    // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
   }
 
-  // DiscreteIntegrator: '<S106>/Integrator'
+  if (rtu_OuterOutputs->pid_reset && (localDW->Integrator_PrevResetState <= 0))
+  {
+    // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
+    localDW->Integrator_DSTATE = rtb_Switch_ez_idx_1;
+
+    // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
+  }
+
+  // DiscreteIntegrator: '<S110>/Integrator'
   localB->Integrator = 2.25E-5F * localB->SumI1 + localDW->Integrator_DSTATE;
 
   // Switch: '<S1>/Switch1' incorporates:
   //   Gain: '<S1>/Gain6'
   //   Product: '<S1>/Divide2'
-  //   Sum: '<S115>/Sum'
+  //   Sum: '<S119>/Sum'
   //   Sum: '<S1>/Sum2'
   //   Sum: '<S1>/Sum6'
 
@@ -258,70 +290,87 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
 
   // End of Switch: '<S11>/Switch2'
 
-  // Product: '<S57>/PProd Out' incorporates:
+  // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
+  // Product: '<S59>/PProd Out' incorporates:
+  //   AlgorithmDescriptorDelegate generated from: '<S127>/a16'
   //   Gain: '<S1>/Gain'
 
-  rtb_NProdOut = -rtb_algDD_o1 * rtu_ConfigurationParameters->pids.currentPID.P;
+  rtb_NProdOut = -rtb_Switch_ez_idx_0 *
+    rtu_ConfigurationParameters->pids.currentPID.P;
 
-  // DiscreteTransferFcn: '<S45>/Filter Differentiator TF' incorporates:
-  //   DiscreteTransferFcn: '<S99>/Filter Differentiator TF'
+  // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
+
+  // DiscreteTransferFcn: '<S47>/Filter Differentiator TF' incorporates:
+  //   AlgorithmDescriptorDelegate generated from: '<S127>/a16'
+  //   DiscreteTransferFcn: '<S103>/Filter Differentiator TF'
   //   Gain: '<S1>/Gain'
-  //   Product: '<S44>/DProd Out'
+  //   Product: '<S45>/DProd Out'
 
   if (rtu_OuterOutputs->pid_reset &&
       (localZCE->FilterDifferentiatorTF_Reset_ZCE_o != POS_ZCSIG)) {
-    localDW->FilterDifferentiatorTF_states_k = 0.0F;
+    localDW->FilterDifferentiatorTF_icLoad_c = 1U;
   }
 
   localZCE->FilterDifferentiatorTF_Reset_ZCE_o = rtu_OuterOutputs->pid_reset;
-  localDW->FilterDifferentiatorTF_tmp_c = -rtb_algDD_o1 *
-    rtu_ConfigurationParameters->pids.currentPID.D - rtb_algDD_o2_l *
+  if (localDW->FilterDifferentiatorTF_icLoad_c != 0) {
+    localDW->FilterDifferentiatorTF_states_k = 0.0F;
+    localDW->FilterDifferentiatorTF_icLoad_c = 0U;
+  }
+
+  // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
+  localDW->FilterDifferentiatorTF_tmp_c = -rtb_Switch_ez_idx_0 *
+    rtu_ConfigurationParameters->pids.currentPID.D - rtb_SumFdbk_m *
     localDW->FilterDifferentiatorTF_states_k;
 
-  // Product: '<S55>/NProd Out' incorporates:
-  //   DiscreteTransferFcn: '<S45>/Filter Differentiator TF'
-  //   Product: '<S45>/DenCoefOut'
+  // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
 
-  rtb_algDD_o1_g = (localDW->FilterDifferentiatorTF_tmp_c -
-                    localDW->FilterDifferentiatorTF_states_k) * rtb_algDD_o1_g *
+  // Product: '<S57>/NProd Out' incorporates:
+  //   DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
+  //   Product: '<S47>/DenCoefOut'
+
+  rtb_sum_beta = (localDW->FilterDifferentiatorTF_tmp_c -
+                  localDW->FilterDifferentiatorTF_states_k) * rtb_sum_beta *
     rtu_ConfigurationParameters->pids.currentPID.N;
 
-  // Sum: '<S63>/Sum Fdbk'
-  rtb_algDD_o2_l = (rtb_NProdOut + localDW->Integrator_DSTATE_o) +
-    rtb_algDD_o1_g;
+  // Sum: '<S65>/Sum Fdbk'
+  rtb_SumFdbk_m = (rtb_NProdOut + localDW->Integrator_DSTATE_o) + rtb_sum_beta;
 
-  // Switch: '<S43>/Switch' incorporates:
+  // Switch: '<S44>/Switch' incorporates:
   //   Gain: '<S1>/Gain2'
-  //   RelationalOperator: '<S43>/u_GTE_up'
-  //   RelationalOperator: '<S43>/u_GT_lo'
-  //   Switch: '<S43>/Switch1'
+  //   RelationalOperator: '<S44>/u_GTE_up'
+  //   RelationalOperator: '<S44>/u_GT_lo'
+  //   Switch: '<S44>/Switch1'
 
-  if (rtb_algDD_o2_l >= rtb_Product) {
+  if (rtb_SumFdbk_m >= rtb_Product) {
     rtb_Diff = rtb_Product;
-  } else if (rtb_algDD_o2_l > -rtb_Product) {
-    // Switch: '<S43>/Switch1'
-    rtb_Diff = rtb_algDD_o2_l;
+  } else if (rtb_SumFdbk_m > -rtb_Product) {
+    // Switch: '<S44>/Switch1'
+    rtb_Diff = rtb_SumFdbk_m;
   } else {
     rtb_Diff = -rtb_Product;
   }
 
-  // Sum: '<S43>/Diff' incorporates:
-  //   Switch: '<S43>/Switch'
+  // Sum: '<S44>/Diff' incorporates:
+  //   Switch: '<S44>/Switch'
 
-  rtb_Diff = rtb_algDD_o2_l - rtb_Diff;
+  rtb_Diff = rtb_SumFdbk_m - rtb_Diff;
 
-  // Sum: '<S71>/sum_alpha' incorporates:
+  // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
+  // Sum: '<S73>/sum_alpha' incorporates:
+  //   AlgorithmDescriptorDelegate generated from: '<S127>/a16'
   //   Gain: '<S1>/Gain'
-  //   Product: '<S49>/IProd Out'
+  //   Product: '<S51>/IProd Out'
 
-  localB->Switch = -rtb_algDD_o1 *
+  localB->Switch = -rtb_Switch_ez_idx_0 *
     rtu_ConfigurationParameters->pids.currentPID.I;
 
-  // Switch: '<S40>/Switch1' incorporates:
-  //   Constant: '<S40>/Clamping_zero'
-  //   Constant: '<S40>/Constant'
-  //   Constant: '<S40>/Constant2'
-  //   RelationalOperator: '<S40>/fix for DT propagation issue'
+  // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
+
+  // Switch: '<S41>/Switch1' incorporates:
+  //   Constant: '<S41>/Clamping_zero'
+  //   Constant: '<S41>/Constant'
+  //   Constant: '<S41>/Constant2'
+  //   RelationalOperator: '<S41>/fix for DT propagation issue'
 
   if (rtb_Diff > 0.0F) {
     tmp = 1;
@@ -329,11 +378,11 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
     tmp = -1;
   }
 
-  // Switch: '<S40>/Switch2' incorporates:
-  //   Constant: '<S40>/Clamping_zero'
-  //   Constant: '<S40>/Constant3'
-  //   Constant: '<S40>/Constant4'
-  //   RelationalOperator: '<S40>/fix for DT propagation issue1'
+  // Switch: '<S41>/Switch2' incorporates:
+  //   Constant: '<S41>/Clamping_zero'
+  //   Constant: '<S41>/Constant3'
+  //   Constant: '<S41>/Constant4'
+  //   RelationalOperator: '<S41>/fix for DT propagation issue1'
 
   if (localB->Switch > 0.0F) {
     tmp_0 = 1;
@@ -341,58 +390,73 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
     tmp_0 = -1;
   }
 
-  // Switch: '<S40>/Switch' incorporates:
-  //   Constant: '<S40>/Clamping_zero'
-  //   Logic: '<S40>/AND3'
-  //   RelationalOperator: '<S40>/Equal1'
-  //   RelationalOperator: '<S40>/Relational Operator'
-  //   Switch: '<S40>/Switch1'
-  //   Switch: '<S40>/Switch2'
+  // Switch: '<S41>/Switch' incorporates:
+  //   Constant: '<S41>/Clamping_zero'
+  //   Logic: '<S41>/AND3'
+  //   RelationalOperator: '<S41>/Equal1'
+  //   RelationalOperator: '<S41>/Relational Operator'
+  //   Switch: '<S41>/Switch1'
+  //   Switch: '<S41>/Switch2'
 
   if ((rtb_Diff != 0.0F) && (tmp == tmp_0)) {
-    // Sum: '<S71>/sum_alpha' incorporates:
-    //   Constant: '<S40>/Constant1'
-    //   Switch: '<S40>/Switch'
+    // Sum: '<S73>/sum_alpha' incorporates:
+    //   Constant: '<S41>/Constant1'
+    //   Switch: '<S41>/Switch'
 
     localB->Switch = 0.0F;
   }
 
-  // End of Switch: '<S40>/Switch'
+  // End of Switch: '<S41>/Switch'
 
-  // DiscreteIntegrator: '<S52>/Integrator'
-  if (rtu_OuterOutputs->pid_reset && (localDW->Integrator_PrevResetState_k <= 0))
-  {
-    localDW->Integrator_DSTATE_o = 0.0F;
+  // DiscreteIntegrator: '<S54>/Integrator' incorporates:
+  //   AlgorithmDescriptorDelegate generated from: '<S127>/a16'
+
+  if (localDW->Integrator_IC_LOADING_b != 0) {
+    // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
+    localDW->Integrator_DSTATE_o = rtb_Switch_ez_idx_0;
+
+    // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
   }
 
-  // DiscreteIntegrator: '<S52>/Integrator'
+  if (rtu_OuterOutputs->pid_reset && (localDW->Integrator_PrevResetState_k <= 0))
+  {
+    // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
+    localDW->Integrator_DSTATE_o = rtb_Switch_ez_idx_0;
+
+    // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
+  }
+
+  // DiscreteIntegrator: '<S54>/Integrator'
   localB->Integrator_j = 2.25E-5F * localB->Switch +
     localDW->Integrator_DSTATE_o;
 
-  // Sum: '<S62>/Sum'
-  rtb_Diff = (rtb_NProdOut + localB->Integrator_j) + rtb_algDD_o1_g;
+  // Sum: '<S64>/Sum'
+  rtb_Diff = (rtb_NProdOut + localB->Integrator_j) + rtb_sum_beta;
 
-  // Switch: '<S60>/Switch2' incorporates:
+  // Switch: '<S62>/Switch2' incorporates:
   //   Gain: '<S1>/Gain2'
-  //   RelationalOperator: '<S60>/LowerRelop1'
-  //   RelationalOperator: '<S60>/UpperRelop'
-  //   Switch: '<S60>/Switch'
+  //   RelationalOperator: '<S62>/LowerRelop1'
+  //   RelationalOperator: '<S62>/UpperRelop'
+  //   Switch: '<S62>/Switch'
 
   if (rtb_Diff > rtb_Product) {
     rtb_Diff = rtb_Product;
   } else if (rtb_Diff < -rtb_Product) {
-    // Switch: '<S60>/Switch' incorporates:
+    // Switch: '<S62>/Switch' incorporates:
     //   Gain: '<S1>/Gain2'
 
     rtb_Diff = -rtb_Product;
   }
 
-  // Outputs for Atomic SubSystem: '<S8>/Two inputs CRL'
-  // AlgorithmDescriptorDelegate generated from: '<S71>/a16' incorporates:
-  //   Switch: '<S60>/Switch2'
+  // End of Switch: '<S62>/Switch2'
 
-  arm_inv_park_f32(rtb_Diff, rtb_PProdOut, &rtb_Product, &rtb_NProdOut,
-                   rtb_SinCos_o1, rtb_SinCos_o2);
+  // Outputs for Atomic SubSystem: '<S8>/Two inputs CRL'
+  // Switch: '<S74>/Switch' incorporates:
+  //   Product: '<S73>/dcos'
+  //   Product: '<S73>/qsin'
+  //   Sum: '<S73>/sum_alpha'
+
+  rtb_Switch_ez_idx_0 = rtb_Diff * rtb_SinCos_o2 - rtb_PProdOut * rtb_SinCos_o1;
 
   // End of Outputs for SubSystem: '<S8>/Two inputs CRL'
 
@@ -400,47 +464,82 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
   //   Constant: '<S1>/Constant1'
 
   if (rtu_OuterOutputs->out_en) {
-    // Gain: '<S70>/sqrt3_by_two'
-    rtb_SinCos_o1 = 0.866025388F * rtb_NProdOut;
+    // Outputs for Atomic SubSystem: '<S8>/Two inputs CRL'
+    // Gain: '<S72>/sqrt3_by_two' incorporates:
+    //   Product: '<S73>/dsin'
+    //   Product: '<S73>/qcos'
+    //   Sum: '<S73>/sum_beta'
 
-    // Gain: '<S70>/one_by_two'
-    rtb_Diff = 0.5F * rtb_Product;
+    rtb_SinCos_o2 = (rtb_PProdOut * rtb_SinCos_o2 + rtb_Diff * rtb_SinCos_o1) *
+      0.866025388F;
 
-    // Sum: '<S70>/add_c'
-    rtb_algDD_o1_g = (0.0F - rtb_Diff) - rtb_SinCos_o1;
+    // Gain: '<S72>/one_by_two' incorporates:
+    //   AlgorithmDescriptorDelegate generated from: '<S73>/a16'
 
-    // Sum: '<S70>/add_b'
-    rtb_Diff = rtb_SinCos_o1 - rtb_Diff;
+    rtb_SinCos_o1 = 0.5F * rtb_Switch_ez_idx_0;
 
-    // MinMax: '<S1>/Min1'
-    if (rtb_Product <= rtb_Diff) {
-      rtb_SinCos_o1 = rtb_Product;
+    // End of Outputs for SubSystem: '<S8>/Two inputs CRL'
+
+    // Sum: '<S72>/add_c'
+    rtb_Product = (0.0F - rtb_SinCos_o1) - rtb_SinCos_o2;
+
+    // Sum: '<S72>/add_b'
+    rtb_SinCos_o1 = rtb_SinCos_o2 - rtb_SinCos_o1;
+
+    // Outputs for Atomic SubSystem: '<S8>/Two inputs CRL'
+    // MinMax: '<S1>/Min1' incorporates:
+    //   AlgorithmDescriptorDelegate generated from: '<S73>/a16'
+
+    if (rtb_Switch_ez_idx_0 <= rtb_SinCos_o1) {
+      rtb_SinCos_o2 = rtb_Switch_ez_idx_0;
     } else {
-      rtb_SinCos_o1 = rtb_Diff;
+      rtb_SinCos_o2 = rtb_SinCos_o1;
     }
 
-    if (rtb_SinCos_o1 > rtb_algDD_o1_g) {
-      rtb_SinCos_o1 = rtb_algDD_o1_g;
+    // End of Outputs for SubSystem: '<S8>/Two inputs CRL'
+    if (rtb_SinCos_o2 > rtb_Product) {
+      rtb_SinCos_o2 = rtb_Product;
     }
 
     // Gain: '<S1>/Gain3' incorporates:
     //   Product: '<S1>/Divide1'
 
-    rtb_SinCos_o2 = rtb_PProdOut / rtu_Sensors->driversensors.Vcc * 100.0F;
+    rtb_Diff = rtb_PProdOut / rtu_Sensors->driversensors.Vcc * 100.0F;
 
     // Saturate: '<S1>/Saturation1'
-    if (rtb_SinCos_o2 > 100.0F) {
+    if (rtb_Diff > 100.0F) {
       // BusCreator: '<S1>/Bus Creator'
       rty_FOCOutputs->Vq = 100.0F;
-    } else if (rtb_SinCos_o2 < -100.0F) {
+    } else if (rtb_Diff < -100.0F) {
       // BusCreator: '<S1>/Bus Creator'
       rty_FOCOutputs->Vq = -100.0F;
     } else {
       // BusCreator: '<S1>/Bus Creator'
-      rty_FOCOutputs->Vq = rtb_SinCos_o2;
+      rty_FOCOutputs->Vq = rtb_Diff;
     }
 
     // End of Saturate: '<S1>/Saturation1'
+
+    // Outputs for Atomic SubSystem: '<S8>/Two inputs CRL'
+    // Sum: '<S1>/Sum1' incorporates:
+    //   AlgorithmDescriptorDelegate generated from: '<S73>/a16'
+    //   Constant: '<S1>/Constant2'
+    //   Gain: '<S1>/Gain1'
+    //   MinMax: '<S1>/Min1'
+    //   Product: '<S1>/Divide'
+    //   Sum: '<S1>/Sum4'
+
+    rtb_Switch_ez_idx_0 = (rtb_Switch_ez_idx_0 - rtb_SinCos_o2) /
+      rtu_Sensors->driversensors.Vcc * 100.0F + 5.0F;
+
+    // End of Outputs for SubSystem: '<S8>/Two inputs CRL'
+
+    // Saturate: '<S1>/Saturation'
+    if (rtb_Switch_ez_idx_0 > 100.0F) {
+      rtb_Switch_ez_idx_0 = 100.0F;
+    } else if (rtb_Switch_ez_idx_0 < 0.0F) {
+      rtb_Switch_ez_idx_0 = 0.0F;
+    }
 
     // Sum: '<S1>/Sum1' incorporates:
     //   Constant: '<S1>/Constant2'
@@ -449,7 +548,24 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
     //   Product: '<S1>/Divide'
     //   Sum: '<S1>/Sum4'
 
-    rtb_Product = (rtb_Product - rtb_SinCos_o1) / rtu_Sensors->driversensors.Vcc
+    rtb_SinCos_o1 = (rtb_SinCos_o1 - rtb_SinCos_o2) /
+      rtu_Sensors->driversensors.Vcc * 100.0F + 5.0F;
+
+    // Saturate: '<S1>/Saturation'
+    if (rtb_SinCos_o1 > 100.0F) {
+      rtb_SinCos_o1 = 100.0F;
+    } else if (rtb_SinCos_o1 < 0.0F) {
+      rtb_SinCos_o1 = 0.0F;
+    }
+
+    // Sum: '<S1>/Sum1' incorporates:
+    //   Constant: '<S1>/Constant2'
+    //   Gain: '<S1>/Gain1'
+    //   MinMax: '<S1>/Min1'
+    //   Product: '<S1>/Divide'
+    //   Sum: '<S1>/Sum4'
+
+    rtb_Product = (rtb_Product - rtb_SinCos_o2) / rtu_Sensors->driversensors.Vcc
       * 100.0F + 5.0F;
 
     // Saturate: '<S1>/Saturation'
@@ -458,61 +574,32 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
     } else if (rtb_Product < 0.0F) {
       rtb_Product = 0.0F;
     }
-
-    // Sum: '<S1>/Sum1' incorporates:
-    //   Constant: '<S1>/Constant2'
-    //   Gain: '<S1>/Gain1'
-    //   MinMax: '<S1>/Min1'
-    //   Product: '<S1>/Divide'
-    //   Sum: '<S1>/Sum4'
-
-    rtb_Diff = (rtb_Diff - rtb_SinCos_o1) / rtu_Sensors->driversensors.Vcc *
-      100.0F + 5.0F;
-
-    // Saturate: '<S1>/Saturation'
-    if (rtb_Diff > 100.0F) {
-      rtb_Diff = 100.0F;
-    } else if (rtb_Diff < 0.0F) {
-      rtb_Diff = 0.0F;
-    }
-
-    // Sum: '<S1>/Sum1' incorporates:
-    //   Constant: '<S1>/Constant2'
-    //   Gain: '<S1>/Gain1'
-    //   MinMax: '<S1>/Min1'
-    //   Product: '<S1>/Divide'
-    //   Sum: '<S1>/Sum4'
-
-    rtb_algDD_o1_g = (rtb_algDD_o1_g - rtb_SinCos_o1) /
-      rtu_Sensors->driversensors.Vcc * 100.0F + 5.0F;
-
-    // Saturate: '<S1>/Saturation'
-    if (rtb_algDD_o1_g > 100.0F) {
-      rtb_algDD_o1_g = 100.0F;
-    } else if (rtb_algDD_o1_g < 0.0F) {
-      rtb_algDD_o1_g = 0.0F;
-    }
   } else {
     // BusCreator: '<S1>/Bus Creator' incorporates:
     //   Constant: '<S1>/Constant1'
 
     rty_FOCOutputs->Vq = 0.0F;
+    rtb_Switch_ez_idx_0 = 0.0F;
+    rtb_SinCos_o1 = 0.0F;
     rtb_Product = 0.0F;
-    rtb_Diff = 0.0F;
-    rtb_algDD_o1_g = 0.0F;
   }
 
   // End of Switch: '<S1>/Switch2'
 
   // BusCreator: '<S1>/Bus Creator' incorporates:
+  //   AlgorithmDescriptorDelegate generated from: '<S127>/a16'
   //   Constant: '<S14>/Constant'
   //   Constant: '<S14>/Constant1'
 
-  rty_FOCOutputs->Vabc[0] = rtb_Product;
-  rty_FOCOutputs->Vabc[1] = rtb_Diff;
-  rty_FOCOutputs->Vabc[2] = rtb_algDD_o1_g;
-  rty_FOCOutputs->Iq_fbk = rtb_algDD_o2;
-  rty_FOCOutputs->Id_fbk = rtb_algDD_o1;
+  rty_FOCOutputs->Vabc[0] = rtb_Switch_ez_idx_0;
+  rty_FOCOutputs->Vabc[1] = rtb_SinCos_o1;
+  rty_FOCOutputs->Vabc[2] = rtb_Product;
+
+  // Outputs for Atomic SubSystem: '<S10>/Two inputs CRL'
+  rty_FOCOutputs->Iq_fbk = rtb_Switch_ez_idx_1;
+
+  // End of Outputs for SubSystem: '<S10>/Two inputs CRL'
+  rty_FOCOutputs->Id_fbk = algDD_o1;
   rty_FOCOutputs->Iq_rms = 0.0F;
   rty_FOCOutputs->Id_rms = 0.0F;
 
@@ -526,21 +613,25 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
 void FOCInnerLoop_Update(const ControlOuterOutputs *rtu_OuterOutputs,
   B_FOCInnerLoop_T *localB, DW_FOCInnerLoop_T *localDW)
 {
-  // Update for DiscreteTransferFcn: '<S99>/Filter Differentiator TF'
+  // Update for DiscreteTransferFcn: '<S103>/Filter Differentiator TF'
+  localDW->FilterDifferentiatorTF_icLoad = 0U;
   localDW->FilterDifferentiatorTF_states = localDW->FilterDifferentiatorTF_tmp;
 
-  // Update for DiscreteIntegrator: '<S106>/Integrator'
+  // Update for DiscreteIntegrator: '<S110>/Integrator'
+  localDW->Integrator_IC_LOADING = 0U;
   localDW->Integrator_DSTATE = 2.25E-5F * localB->SumI1 + localB->Integrator;
   localDW->Integrator_PrevResetState = static_cast<int8_T>
     (rtu_OuterOutputs->pid_reset);
 
-  // Update for DiscreteTransferFcn: '<S45>/Filter Differentiator TF'
+  // Update for DiscreteTransferFcn: '<S47>/Filter Differentiator TF'
+  localDW->FilterDifferentiatorTF_icLoad_c = 0U;
   localDW->FilterDifferentiatorTF_states_k =
     localDW->FilterDifferentiatorTF_tmp_c;
 
-  // Update for DiscreteIntegrator: '<S52>/Integrator' incorporates:
-  //   DiscreteIntegrator: '<S106>/Integrator'
+  // Update for DiscreteIntegrator: '<S54>/Integrator' incorporates:
+  //   DiscreteIntegrator: '<S110>/Integrator'
 
+  localDW->Integrator_IC_LOADING_b = 0U;
   localDW->Integrator_DSTATE_o = 2.25E-5F * localB->Switch +
     localB->Integrator_j;
   localDW->Integrator_PrevResetState_k = static_cast<int8_T>

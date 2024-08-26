@@ -1,4 +1,7 @@
 {
+    "source_base_paths": 
+    [],
+    
     "subdirectories_to_copy": [
         {
             "source_directory": "_sharedutils",
@@ -112,6 +115,7 @@
             "source_directory_parent": "code_replacement",
             "target_directory": "sharedutils",
             "files": [
+                "*.c",
                 "*.h"
             ]
         }

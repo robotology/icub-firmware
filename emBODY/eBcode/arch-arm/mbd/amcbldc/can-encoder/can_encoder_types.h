@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 6.10
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:29:08 2024
+// Model version                  : 7.0
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Fri Aug 23 11:49:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_can_encoder_types_h_
-#define RTW_HEADER_can_encoder_types_h_
+#ifndef can_encoder_types_h_
+#define can_encoder_types_h_
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
 
@@ -323,7 +323,7 @@ struct BUS_CAN_MULTIPLE
 // Forward declaration for rtModel
 typedef struct tag_RTM_can_encoder_T RT_MODEL_can_encoder_T;
 
-#endif                                 // RTW_HEADER_can_encoder_types_h_
+#endif                                 // can_encoder_types_h_
 
 //
 // File trailer for generated code.

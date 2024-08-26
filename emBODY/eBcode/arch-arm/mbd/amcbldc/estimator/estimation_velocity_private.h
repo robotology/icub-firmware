@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 6.21
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:31:02 2024
+// Model version                  : 7.2
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Fri Aug 23 11:51:51 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_estimation_velocity_private_h_
-#define RTW_HEADER_estimation_velocity_private_h_
+#ifndef estimation_velocity_private_h_
+#define estimation_velocity_private_h_
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
 
@@ -26,7 +26,7 @@ extern const real32_T rtCP_pooled_Az3IVI54Pn7X[32];
 #define rtCP_Constant_Value_c          rtCP_pooled_Az3IVI54Pn7X  // Computed Parameter: rtCP_Constant_Value_c
                                                                  //  Referenced by: '<S1>/Constant'
 
-#endif                             // RTW_HEADER_estimation_velocity_private_h_
+#endif                                 // estimation_velocity_private_h_
 
 //
 // File trailer for generated code.

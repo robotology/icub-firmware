@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 6.14
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:31:14 2024
+// Model version                  : 7.1
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Fri Aug 23 11:51:58 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_filter_current_types_h_
-#define RTW_HEADER_filter_current_types_h_
+#ifndef filter_current_types_h_
+#define filter_current_types_h_
 #include "rtwtypes.h"
 #ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
 #define DEFINED_TYPEDEF_FOR_FOCOutputs_
@@ -88,7 +88,7 @@ struct dsp_simulink_MedianFilter_filter_current_T
 };
 
 #endif                     // struct_dsp_simulink_MedianFilter_filter_current_T
-#endif                                 // RTW_HEADER_filter_current_types_h_
+#endif                                 // filter_current_types_h_
 
 //
 // File trailer for generated code.

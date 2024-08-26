@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 1.176
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:31:52 2024
+// Model version                  : 2.0
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Fri Aug 23 11:52:16 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_motion_controller_single_types_h_
-#define RTW_HEADER_motion_controller_single_types_h_
+#ifndef motion_controller_single_types_h_
+#define motion_controller_single_types_h_
 #include "rtwtypes.h"
 
 // Includes for objects with custom storage classes
@@ -378,7 +378,7 @@ struct Flags
 typedef struct tag_RTM_motion_controller_single_T
   RT_MODEL_motion_controller_single_T;
 
-#endif                          // RTW_HEADER_motion_controller_single_types_h_
+#endif                                 // motion_controller_single_types_h_
 
 //
 // File trailer for generated code.

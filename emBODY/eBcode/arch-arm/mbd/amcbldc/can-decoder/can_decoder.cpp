@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'can_decoder'.
 //
 // Model version                  : 6.115
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:28:54 2024
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 12:00:41 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -28,13 +28,12 @@
 const int32_T can_decoder_CALL_EVENT = -1;
 const uint8_T can_decoder_IN_Event_Error = 1U;
 const uint8_T can_decoder_IN_Home = 1U;
-const uint8_T can_decoder_IN_Home_p = 2U;
+const uint8_T can_decoder_IN_Home_o = 2U;
 const int32_T can_decoder_event_ev_error_mode_unrecognized = 0;
 const int32_T can_decoder_event_ev_error_pck_malformed = 1;
 const int32_T can_decoder_event_ev_error_pck_not4us = 2;
 
 // Forward declaration for local functions
-static int32_T can_decoder_safe_cast_to_MCStreaming(int32_T input);
 static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
 static int16_T can_decoder_merge_2bytes_signed(uint16_T bl, uint16_T bh);
@@ -43,24 +42,7 @@ static void can_decoder_SET_OPTIONS(boolean_T rtu_pck_available, const
   BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
 static boolean_T can_decoder_is_controlmode_recognized(int32_T mode);
-static int32_T can_decoder_safe_cast_to_MCControlModes(int32_T input);
 static ControlModes can_decoder_convertMode(MCControlModes MCMode);
-
-// Forward declaration for local functions
-static CANClassTypes can_decoder_convert_to_enum_CANClassTypes(int32_T input);
-static int32_T can_decoder_safe_cast_to_MCStreaming(int32_T input)
-{
-  int32_T output;
-
-  // Initialize output value to default value for MCStreaming (Desired_Targets)
-  output = 15;
-  if ((input == 0) || (input == 15)) {
-    // Set output value to input value if it is a member of MCStreaming
-    output = input;
-  }
-
-  return output;
-}
 
 // Function for Chart: '<S2>/Decoding Logic'
 static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
@@ -70,11 +52,11 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
   guard1 = false;
   switch (localDW->is_ERROR_HANDLING) {
    case can_decoder_IN_Event_Error:
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_p;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_o;
     localDW->cmd_processed = 0U;
     break;
 
-   case can_decoder_IN_Home_p:
+   case can_decoder_IN_Home_o:
     if (localDW->sfEvent == can_decoder_event_ev_error_pck_not4us) {
       localB->error_type = CANErrorTypes_Packet_Not4Us;
       localDW->ev_errorEventCounter++;
@@ -102,7 +84,7 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
       }
 
       localDW->ev_async = false;
-      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_p;
+      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_o;
       localDW->cmd_processed = 0U;
     }
     break;
@@ -245,21 +227,6 @@ static boolean_T can_decoder_is_controlmode_recognized(int32_T mode)
     static_cast<int32_T>(MCControlModes_Current));
 }
 
-static int32_T can_decoder_safe_cast_to_MCControlModes(int32_T input)
-{
-  int32_T output;
-
-  // Initialize output value to default value for MCControlModes (Idle)
-  output = 0;
-  if ((input == 0) || (input == 6) || ((input >= 10) && (input <= 11)) || (input
-       == 80) || (input == 160) || (input == 176)) {
-    // Set output value to input value if it is a member of MCControlModes
-    output = input;
-  }
-
-  return output;
-}
-
 // Function for Chart: '<S2>/Decoding Logic'
 static ControlModes can_decoder_convertMode(MCControlModes MCMode)
 {
@@ -354,7 +321,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
     localDW->is_active_ERROR_HANDLING = 1U;
     localDW->ev_async = false;
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_p;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_o;
     localDW->cmd_processed = 0U;
   } else {
     tmp = !rtu_pck_available;
@@ -371,9 +338,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
                    (rtu_pck_input->PAYLOAD.ARG[1]))) {
                 //  msg_set_control_mode.motor = pck_input.PAYLOAD.CMD.M;
                 localB->msg_set_control_mode = can_decoder_convertMode(
-                  static_cast<MCControlModes>
-                  (can_decoder_safe_cast_to_MCControlModes
-                   (rtu_pck_input->PAYLOAD.ARG[1])));
+                  static_cast<MCControlModes>(rtu_pck_input->PAYLOAD.ARG[1]));
                 localDW->cmd_processed = static_cast<uint16_T>
                   (localDW->cmd_processed + 1);
                 localB->event_type = EventTypes_SetControlMode;
@@ -419,8 +384,8 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     if ((localDW->is_active_DESIRED_TARGETS != 0U) &&
         (localDW->is_DESIRED_TARGETS == can_decoder_IN_Home) && ((!tmp) &&
          (rtu_pck_input->ID.CLS == CANClassTypes_Motor_Control_Streaming) &&
-         (can_decoder_safe_cast_to_MCStreaming(rtu_pck_input->ID.DST_TYP) ==
-          static_cast<int32_T>(MCStreaming_Desired_Targets)))) {
+         (rtu_pck_input->ID.DST_TYP == static_cast<int32_T>
+          (MCStreaming_Desired_Targets)))) {
       if ((rtu_pck_input->PAYLOAD.LEN == 8) && (rtu_CAN_ID_DST <= 4)) {
         idx = static_cast<uint8_T>((rtu_CAN_ID_DST - 1) << 1);
         tmp_merged = can_decoder_merge_2bytes_signed(static_cast<uint16_T>
@@ -480,8 +445,8 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
                 can_decoder_merge_2bytes_signed(static_cast<uint16_T>
                 (rtu_pck_input->PAYLOAD.ARG[4]), static_cast<uint16_T>
                 (rtu_pck_input->PAYLOAD.ARG[5]));
-              localB->msg_set_motor_config.pole_pairs = static_cast<uint8_T>(
-                static_cast<uint32_T>(rtu_pck_input->PAYLOAD.ARG[6]) >> 1);
+              localB->msg_set_motor_config.pole_pairs = static_cast<uint8_T>
+                (rtu_pck_input->PAYLOAD.ARG[6] >> 1);
               localB->msg_set_motor_config.encoder_tolerance =
                 rtu_pck_input->PAYLOAD.ARG[7];
               localDW->cmd_processed = static_cast<uint16_T>
@@ -532,21 +497,6 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
   }
 }
 
-// Function for MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
-static CANClassTypes can_decoder_convert_to_enum_CANClassTypes(int32_T input)
-{
-  CANClassTypes output;
-
-  // Initialize output value to default value for CANClassTypes (Motor_Control_Command) 
-  output = CANClassTypes_Motor_Control_Command;
-  if (((input >= 0) && (input <= 2)) || ((input >= 4) && (input <= 7))) {
-    // Set output value to input value if it is a member of CANClassTypes
-    output = static_cast<CANClassTypes>(input);
-  }
-
-  return output;
-}
-
 // System initialize for referenced model: 'can_decoder'
 void can_decoder_Init(B_can_decoder_c_T *localB, DW_can_decoder_f_T *localDW)
 {
@@ -593,8 +543,8 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
                  B_can_decoder_c_T *localB, DW_can_decoder_f_T *localDW)
 {
   int32_T ForEach_itr;
-  int32_T i;
-  uint16_T rtu_pck_rx_raw_0;
+  int32_T input;
+  uint16_T rtu_pck_rx_raw_packets;
   uint8_T minval;
   uint8_T x_idx_1;
 
@@ -608,14 +558,22 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
 
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.available =
       rtu_pck_rx_raw->packets[ForEach_itr].available;
-    rtu_pck_rx_raw_0 = rtu_pck_rx_raw->packets[ForEach_itr].packet.ID;
+    rtu_pck_rx_raw_packets = rtu_pck_rx_raw->packets[ForEach_itr].packet.ID;
+    input = (rtu_pck_rx_raw_packets & 1792) >> 8;
+
+    // Initialize output value to default value for CANClassTypes (Motor_Control_Command) 
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.CLS =
-      can_decoder_convert_to_enum_CANClassTypes(static_cast<int32_T>(
-      static_cast<uint32_T>(rtu_pck_rx_raw_0 & 1792) >> 8));
-    localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.SRC = static_cast<
-      uint8_T>(static_cast<uint32_T>(rtu_pck_rx_raw_0 & 240) >> 4);
+      CANClassTypes_Motor_Control_Command;
+    if ((input <= 2) || (input >= 4)) {
+      // Set output value to input value if it is a member of CANClassTypes
+      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.CLS = static_cast<
+        CANClassTypes>(input);
+    }
+
+    localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.SRC =
+      static_cast<uint8_T>((rtu_pck_rx_raw_packets & 240) >> 4);
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.DST_TYP =
-      static_cast<uint8_T>(rtu_pck_rx_raw_0 & 15);
+      static_cast<uint8_T>(rtu_pck_rx_raw_packets & 15);
     x_idx_1 = rtu_pck_rx_raw->packets[ForEach_itr].length;
     minval = 8U;
     if (x_idx_1 < 8) {
@@ -632,9 +590,9 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
       ((x_idx_1 & 128U) != 0U);
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.CMD.OPC =
       static_cast<uint8_T>(x_idx_1 & 127);
-    for (i = 0; i < 8; i++) {
-      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.ARG[i] =
-        rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[i];
+    for (input = 0; input < 8; input++) {
+      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.ARG[input] =
+        rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[input];
     }
 
     // End of MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'

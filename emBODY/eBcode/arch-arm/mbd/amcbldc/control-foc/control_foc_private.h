@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 6.82
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:29:19 2024
+// Model version                  : 7.4
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 12:35:20 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_control_foc_private_h_
-#define RTW_HEADER_control_foc_private_h_
+#ifndef control_foc_private_h_
+#define control_foc_private_h_
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
 #include "control_foc_types.h"
@@ -27,7 +27,7 @@ extern const real32_T rtCP_pooled_IgamRjjg0YgF[6];
 #define rtCP_IaIbIc0_Gain              rtCP_pooled_IgamRjjg0YgF  // Computed Parameter: rtCP_IaIbIc0_Gain
                                                                  //  Referenced by: '<S1>/Ia+Ib+Ic=0'
 
-#endif                                 // RTW_HEADER_control_foc_private_h_
+#endif                                 // control_foc_private_h_
 
 //
 // File trailer for generated code.

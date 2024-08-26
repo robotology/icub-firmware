@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 2.239
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 12:07:07 2024
+// Model version                  : 3.9
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Aug 26 10:36:44 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_motion_controller_types_h_
-#define RTW_HEADER_motion_controller_types_h_
+#ifndef motion_controller_types_h_
+#define motion_controller_types_h_
 #include "rtwtypes.h"
 
 // Includes for objects with custom storage classes
@@ -32,6 +32,47 @@
 
 #if MAX_EVENTS_PER_TICK >= 16
 # error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be less than '16'"
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
+#define DEFINED_TYPEDEF_FOR_DriverSensors_
+
+struct DriverSensors
+{
+  // power supply voltage
+  real32_T Vcc;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
+#define DEFINED_TYPEDEF_FOR_MotorSensors_
+
+struct MotorSensors
+{
+  real32_T Iabc[3];
+
+  // electrical angle = angle * pole_pairs
+  real32_T angle;
+  real32_T temperature;
+  real32_T voltage;
+  real32_T current;
+  uint8_T hallABC;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
+#define DEFINED_TYPEDEF_FOR_SensorsData_
+
+struct SensorsData
+{
+  // position encoders
+  real32_T position;
+  DriverSensors driversensors;
+  MotorSensors motorsensors;
+};
+
 #endif
 
 #ifndef DEFINED_TYPEDEF_FOR_Thresholds_
@@ -199,47 +240,6 @@ struct GlobalConfiguration
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
-#define DEFINED_TYPEDEF_FOR_DriverSensors_
-
-struct DriverSensors
-{
-  // power supply voltage
-  real32_T Vcc;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
-#define DEFINED_TYPEDEF_FOR_MotorSensors_
-
-struct MotorSensors
-{
-  real32_T Iabc[3];
-
-  // electrical angle = angle * pole_pairs
-  real32_T angle;
-  real32_T temperature;
-  real32_T voltage;
-  real32_T current;
-  uint8_T hallABC;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_SensorsData_
-#define DEFINED_TYPEDEF_FOR_SensorsData_
-
-struct SensorsData
-{
-  // position encoders
-  real32_T position;
-  DriverSensors driversensors;
-  MotorSensors motorsensors;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
 #define DEFINED_TYPEDEF_FOR_EstimatedData_
 
@@ -352,31 +352,6 @@ struct FOCSlowInputs
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
-#define DEFINED_TYPEDEF_FOR_HardwareFaults_
-
-struct HardwareFaults
-{
-  boolean_T overcurrent;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
-
-struct Flags
-{
-  boolean_T enable_sending_msg_status;
-  HardwareFaults hw_faults;
-  boolean_T enable_thermal_protection;
-
-  // control mode
-  ControlModes control_mode;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
 #define DEFINED_TYPEDEF_FOR_FOCOutputs_
 
@@ -402,7 +377,32 @@ struct FOCOutputs
 };
 
 #endif
-#endif                                 // RTW_HEADER_motion_controller_types_h_
+
+#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
+#define DEFINED_TYPEDEF_FOR_HardwareFaults_
+
+struct HardwareFaults
+{
+  boolean_T overcurrent;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
+
+struct Flags
+{
+  boolean_T enable_sending_msg_status;
+  HardwareFaults hw_faults;
+  boolean_T enable_thermal_protection;
+
+  // control mode
+  ControlModes control_mode;
+};
+
+#endif
+#endif                                 // motion_controller_types_h_
 
 //
 // File trailer for generated code.

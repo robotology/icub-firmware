@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 6.10
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:29:08 2024
+// Model version                  : 7.0
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Fri Aug 23 11:49:24 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -69,7 +69,11 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
   rtb_BusCreator_m.packet.PAYLOAD[0] = static_cast<uint8_T>
     (rtu_messages_tx->status.control_mode);
   rtb_BusCreator_m.packet.PAYLOAD[1] = 0U;
+
+  // MW:begin MISRA2012:D4.1 CERT-C:INT30-C 'Justifying MISRA CPP rule violation' 
   qY = 5U - rtu_ConfigurationParameters->pids.currentPID.shift_factor;
+
+  // MW:end MISRA2012:D4.1 CERT-C:INT30-C
   if (5U - rtu_ConfigurationParameters->pids.currentPID.shift_factor > 5U) {
     qY = 0U;
   }

@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 7.17
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Tue Apr 16 11:28:26 2024
+// Model version                  : 8.0
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Fri Aug 23 11:50:33 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_SupervisorFSM_TX_types_h_
-#define RTW_HEADER_SupervisorFSM_TX_types_h_
+#ifndef SupervisorFSM_TX_types_h_
+#define SupervisorFSM_TX_types_h_
 #include "rtwtypes.h"
 #ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
 #define DEFINED_TYPEDEF_FOR_DriverSensors_
@@ -379,7 +379,7 @@ struct BUS_MESSAGES_TX
 // Forward declaration for rtModel
 typedef struct tag_RTM_SupervisorFSM_TX_T RT_MODEL_SupervisorFSM_TX_T;
 
-#endif                                 // RTW_HEADER_SupervisorFSM_TX_types_h_
+#endif                                 // SupervisorFSM_TX_types_h_
 
 //
 // File trailer for generated code.
