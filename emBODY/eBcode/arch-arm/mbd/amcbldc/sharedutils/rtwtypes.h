@@ -5,11 +5,11 @@
 //
 // File: rtwtypes.h
 //
-// Code generated for Simulink model 'control_foc'.
+// Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 7.1
+// Model version                  : 8.0
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Fri Aug 23 11:51:28 2024
+// C/C++ source code generated on : Wed Aug 28 12:31:19 2024
 //
 #ifndef RTWTYPES_H
 #define RTWTYPES_H

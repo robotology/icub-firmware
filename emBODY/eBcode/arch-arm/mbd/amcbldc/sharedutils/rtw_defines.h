@@ -5,11 +5,11 @@
 //
 // File: rtw_defines.h
 //
-// Code generated for Simulink model 'AMC_BLDC'.
+// Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 8.7
+// Model version                  : 6.115
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Fri Aug 23 11:52:23 2024
+// C/C++ source code generated on : Wed Aug 28 12:31:35 2024
 //
 
 #ifndef rtw_defines_h_

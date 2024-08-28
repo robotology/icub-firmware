@@ -81,9 +81,9 @@ def main():
     parser = argparse.ArgumentParser(prog='The Copier',
                                     description="The copier has the purpose to copy the code generated from Simulink to the proper board folder in icub-firmware ",
                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--source', help="Absolute paths to the codegen directory within icub-firmware-models")
-    parser.add_argument('--destination', help="Absolute path to the model-based-design directory within icub-firmware (for a specific board)")
-    parser.add_argument('--json_path', help="Absolute path to the directory containing the directories.json file")
+    parser.add_argument('-s', '--source', help="Absolute paths to the codegen directory within icub-firmware-models")
+    parser.add_argument('-d', '--destination', help="Absolute path to the model-based-design directory within icub-firmware (for a specific board)")
+    parser.add_argument('-j', '--json_path', help="Absolute path to the directory containing the directories.json file")
 
     args = parser.parse_args()
     config = vars(args)

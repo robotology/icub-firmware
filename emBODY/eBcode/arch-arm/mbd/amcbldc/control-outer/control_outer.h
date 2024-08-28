@@ -9,7 +9,7 @@
 //
 // Model version                  : 7.5
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Aug 26 15:36:30 2024
+// C/C++ source code generated on : Wed Aug 28 13:50:17 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -87,6 +87,7 @@ extern void control_outer(const Flags *rtu_Flags, const ActuatorConfiguration
 //  Block '<S101>/Passthrough for tuning' : Eliminate redundant data type conversion
 //  Block '<S119>/Kt' : Eliminated nontunable gain of 1
 //  Block '<S153>/Passthrough for tuning' : Eliminate redundant data type conversion
+//  Block '<S171>/Kt' : Eliminated nontunable gain of 1
 
 
 //-

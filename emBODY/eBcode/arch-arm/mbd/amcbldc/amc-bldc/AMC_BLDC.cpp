@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 8.8
+// Model version                  : 8.9
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Aug 26 15:37:13 2024
+// C/C++ source code generated on : Wed Aug 28 12:32:42 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,6 +25,8 @@
 #include "can_encoder.h"
 #include "motion_controller_single.h"
 #include "rtw_defines.h"
+
+const boolean_T AMC_BLDC_BGND = false; // boolean_T ground
 
 // Exported block parameters
 ActuatorConfiguration AmcbldcInitConf = {
@@ -150,7 +152,7 @@ void AMC_BLDC_step_FOC(void)           // Sample time: [4.5E-5s, 0.0s]
   int8_T wrBufIdx;
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   motion_controller_singleTID1(&AMC_BLDC_U.SensorsData_p,
@@ -215,7 +217,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
               &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtdw));
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element1'
+  //   Inport generated from: '<Root>/In Bus Element4'
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
@@ -251,15 +253,14 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
   // End of RateTransition generated from: '<Root>/SupervisorFSM_TX'
 
   // ModelReference generated from: '<Root>/SupervisorFSM_TX' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element1'
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
   SupervisorFSM_TX(&AMC_BLDC_U.SensorsData_p, &AMC_BLDC_Y.EstimatedData_p,
-                   &AMC_BLDC_Y.Flags_p, &rtb_TmpRTBAtSupervisorFSM_TXInport4,
-                   &AMC_BLDC_U.ExternalFlags_p.fault_button,
-                   &AMC_BLDC_B.MessagesTx, &rtb_SupervisorFSM_TX_o2,
+                   &AMC_BLDC_Y.Flags_p, &rtb_TmpRTBAtSupervisorFSM_TXInport4, (
+    const_cast<boolean_T*>(&AMC_BLDC_BGND)), &AMC_BLDC_B.MessagesTx,
+                   &rtb_SupervisorFSM_TX_o2,
                    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtb),
                    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtdw));
 

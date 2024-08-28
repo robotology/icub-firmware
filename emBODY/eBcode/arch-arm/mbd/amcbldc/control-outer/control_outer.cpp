@@ -9,7 +9,7 @@
 //
 // Model version                  : 7.5
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Aug 26 15:36:30 2024
+// C/C++ source code generated on : Wed Aug 28 13:50:17 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -380,13 +380,12 @@ void control_outer(const Flags *rtu_Flags, const ActuatorConfiguration
     rtu_ConfigurationParameters->pids.velocityPID.N;
 
   // Sum: '<S172>/SumI1' incorporates:
-  //   Gain: '<S171>/Kt'
   //   Sum: '<S170>/Sum Fdbk'
   //   Sum: '<S171>/SumI3'
   //   UnitDelay: '<Root>/Unit Delay1'
 
   rtb_DenCoefOut = (localDW->UnitDelay1_DSTATE - ((rtb_NProdOut +
-    localDW->Integrator_DSTATE_b) + rtb_NProdOut_f)) * 10.0F + rtb_Abs;
+    localDW->Integrator_DSTATE_b) + rtb_NProdOut_f)) + rtb_Abs;
 
   // DiscreteIntegrator: '<S160>/Integrator'
   if (rtb_FixPtRelationalOperator && (localDW->Integrator_PrevResetState_c <= 0))
