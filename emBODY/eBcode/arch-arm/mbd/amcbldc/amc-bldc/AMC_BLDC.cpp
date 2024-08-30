@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 8.9
+// Model version                  : 8.11
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Aug 28 12:32:42 2024
+// C/C++ source code generated on : Fri Aug 30 13:08:59 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -217,7 +217,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
               &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtdw));
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element4'
+  //   Inport generated from: '<Root>/In Bus Element1'
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
