@@ -17,7 +17,10 @@ constexpr embot::app::theCANboardInfo::applicationInfo applInfo
 #if defined(CUSTOMIZATION_MTB4_FOR_TLR) 
     embot::prot::can::versionOfAPPLICATION {22, 0, 0},    
     embot::prot::can::versionOfCANPROTOCOL {20, 0} 
-#else    
+#elif defined(USE_FIFTH_I2C)
+    embot::prot::can::versionOfAPPLICATION {52, 2, 0},
+    embot::prot::can::versionOfCANPROTOCOL {2, 0}
+#else   
     embot::prot::can::versionOfAPPLICATION {2, 2, 0},    
     embot::prot::can::versionOfCANPROTOCOL {2, 0} 
 #endif    
