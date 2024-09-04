@@ -262,20 +262,22 @@ bool embot::app::application::theSkin::Impl::configtriangles(const embot::prot::
         }
         
         // we process shift and cdcoffset even if we have enabled == false ... as the old mtb3 application does
-        if(trianglesOrder[i] >= triangles_max_num){        
+        if(trianglesOrder[i] >= triangles_max_num)
+        {        
             triangles.config5th[trianglesOrder[i]-triangles_max_num].shift = triangleconfigcommand.shift;
             if(triangles.config5th[trianglesOrder[i]-triangles_max_num].cdcoffset != triangleconfigcommand.cdcOffset)
-                {
-                    triangles.config5th[trianglesOrder[i]-triangles_max_num].cdcoffset = triangleconfigcommand.cdcOffset;
-                    ad7147_set_cdcoffset(trianglesOrder[i], triangles.config5th[trianglesOrder[i]-triangles_max_num].cdcoffset);         
-                }    
+            {
+                triangles.config5th[trianglesOrder[i]-triangles_max_num].cdcoffset = triangleconfigcommand.cdcOffset;
+                ad7147_set_cdcoffset(trianglesOrder[i], triangles.config5th[trianglesOrder[i]-triangles_max_num].cdcoffset);         
+            }    
         }
         else
         {
-            triangles.config[i].shift = triangleconfigcommand.shift;        
-            if(triangles.config[i].cdcoffset != triangleconfigcommand.cdcOffset){                              
-                triangles.config[i].cdcoffset = triangleconfigcommand.cdcOffset;
-                ad7147_set_cdcoffset(i, triangles.config[i].cdcoffset);         
+            triangles.config[trianglesOrder[i]].shift = triangleconfigcommand.shift;        
+            if(triangles.config[trianglesOrder[i]].cdcoffset != triangleconfigcommand.cdcOffset)
+            {                              
+                triangles.config[trianglesOrder[i]].cdcoffset = triangleconfigcommand.cdcOffset;
+                ad7147_set_cdcoffset(trianglesOrder[i], triangles.config[trianglesOrder[i]].cdcoffset);         
             }
         }
     }
