@@ -10,7 +10,6 @@
       <TargetName>amc-icc-osal-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>6190000::V6.19::.\armclang-r6p19-00rel0</pArmCC>
       <pCCUsed>6190000::V6.19::.\armclang-r6p19-00rel0</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
