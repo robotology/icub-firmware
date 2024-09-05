@@ -8,5 +8,6 @@ The projects are:
 - embot-os:
   it is a demo project w/ embot::os. it has one event based thread activated by a tick event sent by a embot::os:Timer (and one peridiodic thread).
   it also has several HW tests. the active one is about the TLV reading over I2C. That needs a FAP board connected to some pins of the connecteor 
-  
+- embot-os2:
+  test project for usage of cmsisos2. it may not compile   
   

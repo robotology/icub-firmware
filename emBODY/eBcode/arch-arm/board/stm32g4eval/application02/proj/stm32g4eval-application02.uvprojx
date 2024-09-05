@@ -10,14 +10,14 @@
       <TargetName>stm32g4eval-app02</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6150000::V6.15::ARMCLANG</pCCUsed>
+      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.2.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G4xx_DFP.1.6.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -186,6 +186,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -336,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal </MiscControls>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask-;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core-;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp</IncludePath>
@@ -972,17 +973,17 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>stm32g4eval-app01-cmsisos2</TargetName>
+      <TargetName>stm32g4eval-app02-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
+      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.2.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32G4xx_DFP.1.6.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1013,14 +1014,14 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>.\objcmsisos2\</OutputDirectory>
+          <OutputDirectory>.\obj\</OutputDirectory>
           <OutputName>stm32g4eval</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\lstcmsisos2\</ListingPath>
+          <ListingPath>.\lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -1047,7 +1048,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\objcmsisos2\stm32g4eval.hex ..\bin\stm32g4eval.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\stm32g4eval.hex ..\bin\stm32g4eval.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -1151,6 +1152,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1281,7 +1283,7 @@
             <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
-            <OneElfS>1</OneElfS>
+            <OneElfS>0</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
             <PlainCh>0</PlainCh>
@@ -1297,14 +1299,14 @@
             <v6LangP>8</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
-            <v6Lto>1</v6Lto>
+            <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_cmsisos2</MiscControls>
-              <Define>USE_STM32HAL USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V120</Define>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask-;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core-;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\libs\highlevel\abslayer\cmsisos2\api</IncludePath>
+              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask-;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core-;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\app\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\bsp</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1417,6 +1419,16 @@
               <FileName>osal.cm4.dbg.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
+            </File>
+            <File>
+              <FileName>eventviewer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmsisos2.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\libs\highlevel\abslayer\cmsisos2\lib\cmsisos2.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -1436,67 +1448,6 @@
                 </CommonProperty>
                 <FileArmAds/>
               </FileOption>
-            </File>
-            <File>
-              <FileName>eventviewer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>cmsisos2.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\cmsisos2\lib\cmsisos2.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1995,8 +1946,8 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.4.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
         <targetInfos>
-          <targetInfo excluded="1" name="stm32g4eval-app01-cmsisos2" versionMatchMode=""/>
           <targetInfo excluded="1" name="stm32g4eval-app02" versionMatchMode=""/>
+          <targetInfo excluded="1" name="stm32g4eval-app02-ulpro"/>
         </targetInfos>
       </component>
     </components>

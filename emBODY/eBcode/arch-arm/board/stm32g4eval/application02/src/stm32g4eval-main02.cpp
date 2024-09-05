@@ -6,6 +6,9 @@
 */
 
 
+#warning marco.accame: this project does not compile because ... read note below
+// object theFAPreader is an incomplete derivation from CANagentPOS
+
 #include "embot_app_skeleton_os_evthreadcan.h"
 
 #include "tCOMM.h"
