@@ -433,6 +433,10 @@ void onIdle(embot::os::Thread *t, void* idleparam)
     i++;
 }
 
+void thrEVT(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
+
+void thrPER(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
+
 embot::os::EventThread* thr {nullptr};
 
 void initSystem(embot::os::Thread *t, void* initparam)
@@ -467,7 +471,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     // create the main thread 
     thr = new embot::os::EventThread;          
     // and start it
-    thr->start(configEV); 
+    thr->start(configEV, thrEVT); 
     
 #if defined(TEST_EMBOT_OS_OSAL)    
     
@@ -494,7 +498,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     };
 
     embot::os::PeriodicThread *pth = new embot::os::PeriodicThread;
-    pth->start(pc);    
+    pth->start(pc, thrPER);    
 
 #endif
 
