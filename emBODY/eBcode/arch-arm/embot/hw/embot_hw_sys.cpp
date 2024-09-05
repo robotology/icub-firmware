@@ -511,7 +511,70 @@ namespace embot::hw::sys::DRIVER {
 
 #else
     #error either HAL or hal2 driver
-#endif    
+#endif
+
+
+#if 0
+in here we retarget the sys io functions. 
+they prevent the hanging of the execution when we use for instance printf(), which we must not do,
+or if we use armclang v6.20 or later. since v6.20 the linker uses ... but lets read the reply from arm:
+
+ > ... since the change [SDCOMP-64440] described in the release note of v6.22 https://developer.arm.com/documentation/109472/6-22/?lang=en
+ > Such a change seems to make armlink to link many additional Arm C/C++ standard lib components like printf, vfprintf or abort etc. 
+ > When your debug session stuck at breakpoint 0xAB, usually it indicates a semihosting issue: https://developer.arm.com/documentation/ka002219/latest/
+
+a quick workaround is to retargeting the system I/O functions as in https://developer.arm.com/documentation/dui0475/m/the-arm-c-and-c---libraries/redefining-target-dependent-system-i-o-functions-in-the-c-library
+
+#endif
+
+// - retargeting of the system I/O functions
+// at first we do that in a dummy way. 
+
+void your_device_write(const unsigned char *buf, unsigned len) {}
+
+#include "rt_sys.h"
+
+extern "C"
+{
+    
+    FILEHANDLE _sys_open(const char *name, int openmode)
+    {
+      return 1; /* everything goes to the same output */
+    }
+    int _sys_close(FILEHANDLE fh)
+    {
+      return 0;
+    }
+    int _sys_write(FILEHANDLE fh, const unsigned char *buf,
+                   unsigned len, int mode)
+    {
+      your_device_write(buf, len);
+      return 0;
+    }
+    int _sys_read(FILEHANDLE fh, unsigned char *buf,
+                  unsigned len, int mode)
+    {
+      return -1; /* not supported */
+    }
+    void _ttywrch(int ch)
+    {
+      const unsigned char c = ch;
+      your_device_write(&c, 1);
+    }
+    int _sys_istty(FILEHANDLE fh)
+    {
+      return 0; /* buffered output */
+    }
+    int _sys_seek(FILEHANDLE fh, long pos)
+    {
+      return -1; /* not supported */
+    }
+    long _sys_flen(FILEHANDLE fh)
+    {
+      return -1; /* not supported */
+    }    
+    
+}
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

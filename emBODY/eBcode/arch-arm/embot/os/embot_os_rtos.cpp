@@ -1662,7 +1662,9 @@ void operator delete (void* ptr) noexcept
 #endif    
 }
 
-#endif //#if defined(EMBOT_HEAP_PROTECTION_use_OSsupport)
+#endif // #if defined(EMBOT_HEAP_redefine_heapoperators)
+
+
 
 
 // -- C/C++ Standard Library Multithreading Interface
