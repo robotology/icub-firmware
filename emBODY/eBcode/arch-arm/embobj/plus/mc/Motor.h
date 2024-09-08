@@ -72,6 +72,7 @@ extern BOOL Motor_check_faults(Motor* o); //
 extern void Motor_reset(Motor *o);//
 
 extern CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk, CTRL_UNITS motor_vel_kf_icubdeg_sec); //
+extern CTRL_UNITS Motor_do_trq_control_EXPERIMENTAL(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk, CTRL_UNITS motor_vel_icubdeg_sec);
 extern void Motor_update_state_fbk(Motor* o, void* state_msg); //
 extern void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* data); //
 extern void Motor_do_calibration_hard_stop(Motor* o); //

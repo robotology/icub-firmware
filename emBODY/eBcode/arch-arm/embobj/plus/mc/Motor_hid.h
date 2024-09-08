@@ -20,7 +20,7 @@
 #ifndef MC_MOTOR_HID_H___
 #define MC_MOTOR_HID_H___
 
-
+#include "TorqueEstimator.h"
 #include "WatchDog.h"
 
 typedef struct
@@ -177,7 +177,11 @@ struct Motor_hid
     WatchDog can_2FOC_alive_wdog;
     uint8_t can_motor_config[7];
     //BOOL outOfLimitsSignaled;
-
+    
+    float torque;
+    BOOL sensorless_torque;
+    
+    TorqueEstimator torque_estimator {};
 };
 
 

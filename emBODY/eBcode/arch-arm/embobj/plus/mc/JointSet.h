@@ -135,6 +135,8 @@ typedef struct // JointSet
 
     TripodCalib tripod_calib;
     HardStopCalib hard_stop_calib;
+    
+    BOOL sensorless_torque;
 
 } JointSet;
 
