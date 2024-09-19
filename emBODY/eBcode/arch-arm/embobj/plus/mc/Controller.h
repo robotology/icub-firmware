@@ -85,6 +85,7 @@ extern void MController_update_motor_pos_fbk(int m, int32_t position_raw);
 extern void MController_update_motor_current_fbk(int m, int16_t current);
 extern void MController_update_motor_temperature_fbk(int m, int16_t temperature);
 extern void MController_config_motor_friction(int m, eOmc_motor_params_t* params); //
+extern void MController_config_LuGre_params(int m, eOmc_LuGre_params_t* params);
 extern void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance); //
 
 extern void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf); //
