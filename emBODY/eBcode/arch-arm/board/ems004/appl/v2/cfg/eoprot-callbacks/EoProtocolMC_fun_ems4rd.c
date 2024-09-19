@@ -321,6 +321,20 @@ extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const e
     }
 }
 
+extern void eoprot_fun_UPDT_mc_joint_config_LuGre_params(const EOnv* nv, const eOropdescriptor_t* rd) 
+{   // not for mc4can
+    eOmc_LuGre_params_t *mparams = (eOmc_LuGre_params_t*)rd->data;
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);        
+
+    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+    
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode) || 
+       (eo_motcon_mode_mc4plusfaps == mcmode))
+    {
+        MController_config_LuGre_params(jxx, mparams);
+    }
+}
+
 
 // f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)

@@ -446,6 +446,17 @@ void Motor_config_friction(Motor* o, float Bemf, float Ktau, eOmc_FrictionParams
     PID_config_friction(&o->trqPID, Bemf, Ktau, friction);
 }
 
+void Motor_config_LuGre(Motor* o, float Km, float Kw, float S0, float S1, float Vth, float Fc, float Fs)
+{
+    o->torque_estimator.rtU.Km  = Km;
+    o->torque_estimator.rtU.Kw  = Kw;
+    o->torque_estimator.rtU.S0  = S0;
+    o->torque_estimator.rtU.S1  = S1;
+    o->torque_estimator.rtU.Vth = Vth;
+    o->torque_estimator.rtU.Fc  = Fc;
+    o->torque_estimator.rtU.Fs  = Fs;
+}
+
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 {
     o->pos_calib_offset = offset;

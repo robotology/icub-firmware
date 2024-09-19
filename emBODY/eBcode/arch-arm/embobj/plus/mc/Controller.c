@@ -1002,6 +1002,20 @@ void MController_config_motor_friction(int m, eOmc_motor_params_t* params) //
     Motor_config_friction(smc->motor+m, params->bemf_value, params->ktau_value, params->friction);
 }
 
+void MController_config_LuGre_params(int m, eOmc_LuGre_params_t* params) //
+{
+    Motor_config_LuGre(smc->motor+m,
+        params->Km,
+        params->Kw,
+        params->S0,
+        params->S1,
+        params->Vth,
+        params->Fc,
+        params->Fs
+    );
+}
+
+
 void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance) //
 {
     Joint_set_impedance(smc->joint+j, impedance);
