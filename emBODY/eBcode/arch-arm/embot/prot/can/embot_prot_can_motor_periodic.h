@@ -127,7 +127,7 @@ namespace embot::prot::can::motor::periodic {
                     } break; 
                     case Type::POSITION:
                     {   // i want to have [deg]. i have [icubdeg] ->
-                        v = embot::prot::can::motor::Converter::to_degree(val);;                      
+                        v = embot::prot::can::motor::Converter::position_to_degree(val);;                      
                     } break;                     
                 }
                 return v;                
@@ -150,9 +150,9 @@ namespace embot::prot::can::motor::periodic {
         {
             uint8_t canaddress {0};
             
-            embot::prot::can::motor::Current current {0};       // in [mA]
-            embot::prot::can::motor::Velocity velocity {0};     // in [icubdeg/ms]
-            embot::prot::can::motor::Position position {0};     // in [icubdeg]
+            embot::prot::can::motor::Current current {0};           // in [mA]
+            embot::prot::can::motor::Velocity velocity {0};         // in [icubdeg/ms]
+            embot::prot::can::motor::PositionFull position {0};     // in [icubdeg]
             
             Info() = default;
             
@@ -166,7 +166,7 @@ namespace embot::prot::can::motor::periodic {
             }
             void setPosition(float pos)
             {
-                position = embot::prot::can::motor::Converter::to_can_position(pos); 
+                position = embot::prot::can::motor::Converter::to_can_fullposition(pos); 
             }            
         };
         

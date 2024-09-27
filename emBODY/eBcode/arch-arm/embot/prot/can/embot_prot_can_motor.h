@@ -31,6 +31,9 @@ namespace embot::prot::can::motor {
     // position is expressed in icubdegree in range [-180, + 180]
     using Position = int16_t;
     
+    // position is expressed in icubdegree in full range.
+    using PositionFull = int32_t;
+    
     // velocity is expressed in icubdegree / ms 
     using Velocity = int16_t;
     
@@ -191,7 +194,17 @@ namespace embot::prot::can::motor {
             return static_cast<Position>(deg*deg2icubdeg);
         } 
         
-        static constexpr float to_degree(const Position idg)
+        static constexpr float position_to_degree(const Position idg)
+        {
+            return static_cast<float>(idg) * icubdeg2deg;
+        }        
+ 
+        static constexpr PositionFull to_can_fullposition(const float deg)
+        {
+            return static_cast<PositionFull>(deg*deg2icubdeg);
+        } 
+        
+        static constexpr float fullposition_to_degree(const PositionFull idg)
         {
             return static_cast<float>(idg) * icubdeg2deg;
         }
