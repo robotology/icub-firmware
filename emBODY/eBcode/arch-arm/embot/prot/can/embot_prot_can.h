@@ -28,6 +28,10 @@ namespace embot::prot::can {
     
     // - useful types 
     
+    // these OPCs are somehow very much theoretical and not well defined in the CAN protocol.
+    // i may need them to define the flow of the messages. 
+    enum class OPC : uint8_t { set = 0, get = 1, reply = 2, sig = 3, none = 7 };
+    
     using Address = uint8_t; // with the limitation that we use only range [0, 15]
     
     constexpr Address addrBroadcast {15};
