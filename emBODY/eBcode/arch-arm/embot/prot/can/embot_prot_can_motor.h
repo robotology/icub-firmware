@@ -15,6 +15,7 @@
 #include "embot_prot_can.h"
 
 #include <algorithm>
+#include <array>
 #include <cstring>
 
 
