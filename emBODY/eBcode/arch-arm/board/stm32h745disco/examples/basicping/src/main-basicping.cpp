@@ -119,6 +119,52 @@ static uint32_t stm32hal_tick1msecget()
 }
 
 
+void your_device_write(const unsigned char *buf, unsigned len) {}
+
+#include "rt_sys.h"
+
+extern "C"
+{
+    
+    FILEHANDLE _sys_open(const char *name, int openmode)
+    {
+      return 1; /* everything goes to the same output */
+    }
+    int _sys_close(FILEHANDLE fh)
+    {
+      return 0;
+    }
+    int _sys_write(FILEHANDLE fh, const unsigned char *buf,
+                   unsigned len, int mode)
+    {
+      your_device_write(buf, len);
+      return 0;
+    }
+    int _sys_read(FILEHANDLE fh, unsigned char *buf,
+                  unsigned len, int mode)
+    {
+      return -1; /* not supported */
+    }
+    void _ttywrch(int ch)
+    {
+      const unsigned char c = ch;
+      your_device_write(&c, 1);
+    }
+    int _sys_istty(FILEHANDLE fh)
+    {
+      return 0; /* buffered output */
+    }
+    int _sys_seek(FILEHANDLE fh, long pos)
+    {
+      return -1; /* not supported */
+    }
+    long _sys_flen(FILEHANDLE fh)
+    {
+      return -1; /* not supported */
+    }    
+    
+}
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
 
