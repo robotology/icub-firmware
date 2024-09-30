@@ -108,7 +108,7 @@ static void s_initialiser(void)
     // we init the emBOBJ object EOMtheIPnet. 
     // it starts two threads which manage IPAL
     // as a result of that we can at least ping the board
-    s_init_ipnet();
+    s_init_ipnet();   //
     
     // we init the emBOT object embot::app::theLEDmanager
 //    s_init_ledmanager();
@@ -337,6 +337,10 @@ static void serverthread_onvalue(embot::os::Thread *t, embot::os::Value v, void 
     
 }
     
+#define MIRROR_COMMAND
+
+#include <string.h>
+    
 bool parser(EOpacket *rxpkt, EOpacket *txpkt)
 {    
     eOipv4addr_t remaddr {0};
@@ -347,15 +351,29 @@ bool parser(EOpacket *rxpkt, EOpacket *txpkt)
     uint16_t size {0};
         
     eo_packet_Payload_Get(s_rxpkt_ethcmd, &pData, &size);
+    
+    std::string nn = embot::core::TimeFormatter(embot::core::now()).to_string();
         
-    embot::core::print(std::string("UDP server: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
+    embot::core::print(std::string("UDP server: @ ") + nn + 
                         " received a packet from " + embot::prot::eth::IPv4(remaddr).to_string() + ":" + std::to_string(remport)
                        );
         
     embot::core::print(std::string("size = ") + std::to_string(size) + ", string = " + std::string(reinterpret_cast<char*>(pData))
                        );
     
+#if !defined(MIRROR_COMMAND)    
     return false;
+#else
+    
+    char replybuffer[128] = {0};
+    snprintf(replybuffer, sizeof(replybuffer), "@ %s -> RX = %s", nn.c_str(), pData);
+    // copy payload of rx packet inside tx packet
+    //eo_packet_Payload_Set(txpkt, pData, size);
+    eo_packet_Payload_Set(txpkt, reinterpret_cast<uint8_t*>(replybuffer), strlen(replybuffer));
+    // assign destination: same ip address of sender, port 3333
+    eo_packet_Destination_Set(txpkt, remaddr, remport);
+    return true;
+#endif    
 }
 
 // blocking call
