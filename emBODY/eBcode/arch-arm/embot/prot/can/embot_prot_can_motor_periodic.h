@@ -185,10 +185,10 @@ namespace embot::prot::can::motor::periodic {
         struct Info
         {
             uint8_t canaddress {0};         
-            uint8_t controlmode {0};        // use values in embot::prot::can::motor::polling::ControlMode
-            uint8_t quadencoderstate {0};   // treat the bit flags w/ suitable values. for board 2foc use QEstate2FOC
+            uint8_t controlmode {0};        // use values in embot::prot::can::motor::ControlMode
+            uint8_t quadencoderstate {0};   // treat the bit flags w/ suitable values. for board 2foc use embot::prot::can::motor::board::foc::QEstate
             int16_t pwmfeedback {0};        // [-100, +100] is mapped in [-32000, +32000]
-            uint32_t motorfaultstate {0};   // treat the bit flags w/ suitable values. for board 2fos use MotorFaultState2FOC
+            uint32_t motorfaultstate {0};   // treat the bit flags w/ suitable values. for board 2fos use embot::prot::can::motor::board::foc::MotorFaultState
             Info() = default;
         };
         

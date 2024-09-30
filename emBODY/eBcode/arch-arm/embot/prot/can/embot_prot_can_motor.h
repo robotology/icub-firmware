@@ -14,6 +14,7 @@
 #include "embot_core_binary.h"
 #include "embot_prot_can.h"
 
+#include <algorithm>
 #include <cstring>
 
 
@@ -57,7 +58,8 @@ namespace embot::prot::can::motor {
         // omissis 
         // in here something else
         none = 254 
-    };     
+    };  
+    constexpr uint8_t ControlModeNumberOf {8};    
     
         
     struct Converter
@@ -70,112 +72,49 @@ namespace embot::prot::can::motor {
         static constexpr float vel2dps = 1000.0f * Converter::icubdeg2deg; 
         static constexpr float dps2vel = 0.001f * Converter::deg2icubdeg; 
         
-        
-        static constexpr ControlMode toControlMode(uint8_t v)
-        {
-            ControlMode cm {ControlMode::none};
-            
-            switch(v)
-            {
-                case 0x00:
-                {
-                    cm = ControlMode::Idle;
-                } break;
-
-                case 0x06:
-                {
-                    cm = ControlMode::Current;
-                } break;
-                
-                case 0x09:
-                {
-                    cm = ControlMode::ForceIdle;
-                } break;            
-
-                case 0x0A:
-                {
-                    cm = ControlMode::SpeedVoltage;
-                } break;
-                  
-                case 0x50:
-                {
-                    cm = ControlMode::OpenLoop;
-                } break; 
-
-                case 0xA0:
-                {
-                    cm = ControlMode::HWfault;
-                } break; 
-
-                case 0xB0:
-                {
-                    cm = ControlMode::NotConfigured;
-                } break; 
-                
-                default:
-                {
-                    cm = ControlMode::none;
-                } break;
-
-            }  
-
-            return cm;        
-        }
+               
         
         static constexpr uint8_t convert(ControlMode cm)
         {
             return embot::core::tointegral(cm);
         }
         
+        static constexpr ControlMode convert(uint8_t v)
+        {
+            constexpr std::array<ControlMode, ControlModeNumberOf> values { 
+                ControlMode::Idle, ControlMode::ForceIdle, ControlMode::Current, ControlMode::SpeedVoltage, 
+                ControlMode::OpenLoop, ControlMode::NotConfigured, ControlMode::HWfault, ControlMode::none 
+            };  
+            
+            ControlMode r {ControlMode::none};            
+            if(std::end(values) != std::find_if(values.begin(), values.end(), [&](const auto& val){ return convert(val) == v; }))
+            {
+                r = static_cast<ControlMode>(v);
+            }
+            
+            return r;                        
+        }
+        
+        static constexpr ControlMode toControlMode(uint8_t v) { return convert(v); }     
+
+
         static std::string tostring(ControlMode cm)
         {
+            constexpr std::array<std::pair<ControlMode, const char *>, ControlModeNumberOf> pairs { 
+                std::pair(ControlMode::Idle, "Idle"), 
+                std::pair(ControlMode::ForceIdle, "ForceIdle"), 
+                std::pair(ControlMode::Current, "Current"), 
+                std::pair(ControlMode::SpeedVoltage, "SpeedVoltage"),  
+                std::pair(ControlMode::OpenLoop, "OpenLoop"), 
+                std::pair(ControlMode::NotConfigured, "NotConfigured"), 
+                std::pair(ControlMode::HWfault, "HWfault"), 
+                std::pair(ControlMode::none, "none")                
+            };
 
-            switch(cm)
-            {
-                case ControlMode::Idle:
-                {
-                    return "Idle";
-                } break;
-
-                case ControlMode::Current:
-                {
-                    return "Current";
-                } break;
-
-                case ControlMode::ForceIdle:
-                {
-                    return "ForceIdle";
-                } break;
-                
-                case ControlMode::SpeedVoltage:
-                {
-                    return "SpeedVoltage";
-                } break;
-
-                case ControlMode::OpenLoop:
-                {
-                    return "OpenLoop";
-                } break;
-
-                case ControlMode::HWfault:
-                {
-                    return "HWfault";
-                } break;
-
-                case ControlMode::NotConfigured:
-                {
-                    return "NotConfigured";
-                } break;
-                
-                default:
-                {
-                    return "none";
-                } break;
-
-            } 
-
-            return "none";
-        }          
+            auto pp = std::find_if(pairs.begin(), pairs.end(), [&](const auto& p){ return p.first == cm; });            
+            return (std::end(pairs) != pp) ? pp->second : "none";
+        }           
+        
         
         // current in CAN is in [mA]
         static constexpr Current to_can_current(const float amp)
@@ -317,7 +256,23 @@ flowchart LR
         }
     };  
   
-  
+
+    struct PIDlimits
+    {
+        enum class Type : uint8_t { CURR = 0, VEL = 1, NONE = 7 };
+        
+        Type type {Type::NONE};         
+        int16_t offset {0}; 
+        int16_t limitonoutput{0}; // derivative gain
+        int16_t limitonintegral {0}; // integral gain
+        
+        constexpr PIDlimits() = default;
+        constexpr PIDlimits(Type t, int16_t o, int16_t li, int16_t lo) : type(t), offset(o), limitonintegral(li), limitonoutput(lo) {}
+        
+        // note:
+        // so far, we dont use PIDlimits so we dont provide any getter /setter function 
+        // the way its members are used may follow the same rules of PID, so we may need PID::ks to scale          
+    };      
     
 } // namespace embot::prot::can::motor {
 

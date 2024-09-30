@@ -18,6 +18,29 @@
 #include <cstring>
 
 
+#if 0
+
+## The namespace `embot::prot::can::motor::board`
+
+It holds definition of dat structures used in `embot::prot::can::motor::periodic` or `embot::prot::can::motor::polling`
+that depends on a specific board. 
+
+It may be the case of the field `embot::prot::can::motor::periodic::Message_STATUS::motorfaultstate` that is a 32 bit mask
+that contains information that may be heavily related to a specific board. 
+
+At date of 30 Sept 2024, this mask is used mainly but the `foc` board, so we have defined a specific 
+`embot::prot::can::motor::board::foc::MotorFaultState` implementation for it.
+
+
+The other boards `amcbldc`, `amc.motor`, `amcfoc.mot` use only its `.ExternalFaultAsserted` field because they dont 
+have the same chips, so for now they may share the same implementation.
+
+
+
+
+
+#endif
+
 namespace embot::prot::can::motor::board  {
     
     
@@ -27,7 +50,7 @@ namespace embot::prot::can::motor::board  {
     namespace foc {   
    
         // for the foc board, use the following to manage Message_STATUS::Info::quadencoderstate 
-        struct QEstate2FOC : embot::core::binary::mask::Mask<uint8_t>
+        struct QEstate : embot::core::binary::mask::Mask<uint8_t>
         {
             #if 0
                  pos:   76543210
@@ -42,10 +65,10 @@ namespace embot::prot::can::motor::board  {
                 not_calibrated          = 4
             };
             
-            constexpr QEstate2FOC() = default;
-            constexpr QEstate2FOC(uint8_t m) : embot::core::binary::mask::Mask<uint8_t>(m) {}
+            constexpr QEstate() = default;
+            constexpr QEstate(uint8_t m) : embot::core::binary::mask::Mask<uint8_t>(m) {}
                 
-            QEstate2FOC(const std::initializer_list<Flag> &flags) : embot::core::binary::mask::Mask<uint8_t>(0) 
+            QEstate(const std::initializer_list<Flag> &flags) : embot::core::binary::mask::Mask<uint8_t>(0) 
             {
                 for(const auto &f : flags) set(f);        
             }
@@ -66,11 +89,11 @@ namespace embot::prot::can::motor::board  {
         // from eOmc_motorFaultState_t
       
         // flags used by the board 2foc to express its fault state
-        // they are in this strange ordee because for their implementation it was used rhe  
+        // they are in this strange order because for their first implementation it was used rhe  
         // struct eOmc_motorFaultState_t w/ bitfields that align like that    
-        struct MotorFaultState2FOC : embot::core::binary::mask::Mask<uint32_t>
+        struct MotorFaultState : embot::core::binary::mask::Mask<uint32_t>
         {
-            // contains the position of the flags inside a uint32_t mask
+            // contains the position of the flags inside a uint32_t mask in little endian ordering
             // as the boatd 2foc uses
             enum class Flag : uint8_t
             {
@@ -112,9 +135,9 @@ namespace embot::prot::can::motor::board  {
                 PositionLimitLower      = 24
             };
                                 
-            constexpr MotorFaultState2FOC() = default;
-            constexpr MotorFaultState2FOC(uint32_t m) : embot::core::binary::mask::Mask<uint32_t>(m) {}
-            MotorFaultState2FOC(const std::initializer_list<Flag> &flags) : embot::core::binary::mask::Mask<uint32_t>(0) 
+            constexpr MotorFaultState() = default;
+            constexpr MotorFaultState(uint32_t m) : embot::core::binary::mask::Mask<uint32_t>(m) {}
+            MotorFaultState(const std::initializer_list<Flag> &flags) : embot::core::binary::mask::Mask<uint32_t>(0) 
             {
                 for(const auto &f : flags) set(f);        
             }   

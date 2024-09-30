@@ -43,8 +43,8 @@ namespace embot::prot::can::motor::polling {
         GET_FIRMWARE_VERSION = 91,
         SET_CURRENT_PID = 101,  
         GET_CURRENT_PID = 102,
-        SET_CURRENT_PIDLIMITS = 103,     
-        GET_CURRENT_PIDLIMITS = 104,         
+        SET_CURRENT_PIDLIMITS = 103,       
+        GET_CURRENT_PIDLIMITS = 104,            
         SET_VELOCITY_PID = 105,         
         GET_VELOCITY_PID = 106,
         SET_VELOCITY_PIDLIMITS = 107,   
@@ -477,6 +477,94 @@ namespace embot::prot::can::motor::polling {
         Info info {};
         
         Message_GET_TEMPERATURE_LIMIT() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);       
+    };   
+
+
+    struct Message_SET_CURRENT_PIDLIMITS : public Message
+    {                  
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::PIDlimits pidlimits {};            
+            Info() = default;
+        };
+        
+        Info info {};
+        
+        Message_SET_CURRENT_PIDLIMITS() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };
+       
+
+    struct Message_GET_CURRENT_PIDLIMITS : public Message
+    {
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};             
+            Info() = default;
+        };
+        
+        struct ReplyInfo
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::PIDlimits pidlimits {};            
+            ReplyInfo() = default;
+        };
+        
+        Info info {};
+        
+        Message_GET_CURRENT_PIDLIMITS() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);       
+    }; 
+
+
+    struct Message_SET_VELOCITY_PIDLIMITS : public Message
+    {                  
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::PIDlimits pidlimits {};            
+            Info() = default;
+        };
+        
+        Info info {};
+        
+        Message_SET_VELOCITY_PIDLIMITS() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };
+       
+
+    struct Message_GET_VELOCITY_PIDLIMITS : public Message
+    {
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};             
+            Info() = default;
+        };
+        
+        struct ReplyInfo
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::PIDlimits pidlimits {};            
+            ReplyInfo() = default;
+        };
+        
+        Info info {};
+        
+        Message_GET_VELOCITY_PIDLIMITS() = default;
             
         bool load(const embot::prot::can::Frame &inframe);
             
