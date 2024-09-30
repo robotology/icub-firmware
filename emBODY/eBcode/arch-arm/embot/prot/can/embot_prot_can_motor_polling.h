@@ -38,7 +38,6 @@ namespace embot::prot::can::motor::polling {
         GET_CONTROL_MODE = 7,
         SET_CONTROL_MODE = 9,
         SET_BOARD_ID = 50, 
-        GET_CURRENT_LIMIT = 124, 
         SET_CURRENT_LIMIT = 72, 
         GET_FIRMWARE_VERSION = 91,
         SET_CURRENT_PID = 101,  
@@ -50,9 +49,11 @@ namespace embot::prot::can::motor::polling {
         SET_VELOCITY_PIDLIMITS = 107,   
         GET_VELOCITY_PIDLIMITS = 108,   
         SET_MOTOR_CONFIG = 119,
-        GET_MOTOR_CONFIG = 123,
         SET_TEMPERATURE_LIMIT = 121,
-        GET_TEMPERATURE_LIMIT = 122       
+        GET_TEMPERATURE_LIMIT = 122, 
+        GET_MOTOR_CONFIG = 123,
+        GET_CURRENT_LIMIT = 124 
+      
     };
     
     // NOTES

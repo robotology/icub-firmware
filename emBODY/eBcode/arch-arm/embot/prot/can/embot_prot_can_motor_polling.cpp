@@ -51,7 +51,7 @@ namespace embot::prot::can::motor::polling {
         
     CMD convert(std::uint8_t cmd)
     {
-        static const std::uint64_t mcpollmask256[4] = 
+        constexpr std::uint64_t mcpollmask256[4] = 
         {
             // bits 0-63
             (1ULL << static_cast<std::uint8_t>(CMD::GET_CONTROL_MODE))              |
@@ -59,20 +59,20 @@ namespace embot::prot::can::motor::polling {
             (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ID))                  ,
             // bits 64-127
             (1ULL << (static_cast<std::uint8_t>(CMD::SET_CURRENT_LIMIT)-64))        |
-            (1ULL << (static_cast<std::uint8_t>(CMD::GET_CURRENT_LIMIT)-64))        | 
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)-64))     |
             (1ULL << (static_cast<std::uint8_t>(CMD::SET_CURRENT_PID)-64))          | 
             (1ULL << (static_cast<std::uint8_t>(CMD::GET_CURRENT_PID)-64))          | 
-            (1ULL << (static_cast<std::uint8_t>(CMD::SET_VELOCITY_PID)-64))         | 
-            (1ULL << (static_cast<std::uint8_t>(CMD::GET_VELOCITY_PID)-64))         | 
             (1ULL << (static_cast<std::uint8_t>(CMD::SET_CURRENT_PIDLIMITS)-64))    |
             (1ULL << (static_cast<std::uint8_t>(CMD::GET_CURRENT_PIDLIMITS)-64))    |
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_VELOCITY_PID)-64))         | 
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_VELOCITY_PID)-64))         | 
             (1ULL << (static_cast<std::uint8_t>(CMD::SET_VELOCITY_PIDLIMITS)-64))   |
             (1ULL << (static_cast<std::uint8_t>(CMD::GET_VELOCITY_PIDLIMITS)-64))   |   
             (1ULL << (static_cast<std::uint8_t>(CMD::SET_MOTOR_CONFIG)-64))         | 
-            (1ULL << (static_cast<std::uint8_t>(CMD::GET_MOTOR_CONFIG)-64))         |                
-            (1ULL << (static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)-64))     |
-            (1ULL << (static_cast<std::uint8_t>(CMD::SET_TEMPERATURE_LIMIT)-64))    |
-            (1ULL << (static_cast<std::uint8_t>(CMD::GET_TEMPERATURE_LIMIT)-64))    , 
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_TEMPERATURE_LIMIT)-64))    |             
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_TEMPERATURE_LIMIT)-64))    |
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_MOTOR_CONFIG)-64))         |   
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_CURRENT_LIMIT)-64))        ,                 
 
             // bits 128-191    
             0, 
