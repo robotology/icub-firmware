@@ -42,8 +42,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
+namespace embot::prot::can::motor::polling {
 
     bool supported(std::uint8_t cmd)
     {
@@ -52,14 +51,29 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         
     CMD convert(std::uint8_t cmd)
     {
-        static const std::uint64_t mcpollmask256[4] = 
+        constexpr std::uint64_t mcpollmask256[4] = 
         {
             // bits 0-63
             (1ULL << static_cast<std::uint8_t>(CMD::GET_CONTROL_MODE))              |
             (1ULL << static_cast<std::uint8_t>(CMD::SET_CONTROL_MODE))              |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ID)),
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ID))                  ,
             // bits 64-127
-            (1ULL << (static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)-64)),
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_CURRENT_LIMIT)-64))        |
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)-64))     |
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_CURRENT_PID)-64))          | 
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_CURRENT_PID)-64))          | 
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_CURRENT_PIDLIMITS)-64))    |
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_CURRENT_PIDLIMITS)-64))    |
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_VELOCITY_PID)-64))         | 
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_VELOCITY_PID)-64))         | 
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_VELOCITY_PIDLIMITS)-64))   |
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_VELOCITY_PIDLIMITS)-64))   |   
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_MOTOR_CONFIG)-64))         | 
+            (1ULL << (static_cast<std::uint8_t>(CMD::SET_TEMPERATURE_LIMIT)-64))    |             
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_TEMPERATURE_LIMIT)-64))    |
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_MOTOR_CONFIG)-64))         |   
+            (1ULL << (static_cast<std::uint8_t>(CMD::GET_CURRENT_LIMIT)-64))        ,                 
+
             // bits 128-191    
             0, 
             // bits 191-255
@@ -156,112 +170,30 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
 
         return "none";
     }        
-    
-    ControlMode toControlMode(uint8_t v)
-    {
-        ControlMode cm {ControlMode::none};
+      
         
-        switch(v)
-        {
-            case 0x00:
-            {
-                cm = ControlMode::Idle;
-            } break;
-
-            case 0x06:
-            {
-                cm = ControlMode::Current;
-            } break;
-            
-            case 0x09:
-            {
-                cm = ControlMode::ForceIdle;
-            } break;            
-
-            case 0x0A:
-            {
-                cm = ControlMode::SpeedVoltage;
-            } break;
-              
-            case 0x50:
-            {
-                cm = ControlMode::OpenLoop;
-            } break; 
-
-            case 0xA0:
-            {
-                cm = ControlMode::HWfault;
-            } break; 
-
-            case 0xB0:
-            {
-                cm = ControlMode::NotConfigured;
-            } break; 
-            
-            default:
-            {
-                cm = ControlMode::none;
-            } break;
-
-        }  
-
-        return cm;        
-    }
+        
     
-    uint8_t convert(ControlMode cm)
+    bool Message_SET_CONTROL_MODE::load(const embot::prot::can::Frame &inframe)
     {
-        return embot::core::tointegral(cm);
-    }
-    
-    std::string tostring(ControlMode cm)
-    {
-
-        switch(cm)
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_CONTROL_MODE) != frame2cmd(inframe))
         {
-            case ControlMode::Idle:
-            {
-                return "Idle";
-            } break;
-
-            case ControlMode::Current:
-            {
-                return "Current";
-            } break;
-
-            case ControlMode::ForceIdle:
-            {
-                return "ForceIdle";
-            } break;
-            
-            case ControlMode::SpeedVoltage:
-            {
-                return "SpeedVoltage";
-            } break;
-
-            case ControlMode::OpenLoop:
-            {
-                return "OpenLoop";
-            } break;
-
-            case ControlMode::HWfault:
-            {
-                return "HWfault";
-            } break;
-
-            case ControlMode::NotConfigured:
-            {
-                return "NotConfigured";
-            } break;
-            
-            default:
-            {
-                return "none";
-            } break;
-
-        } 
-
-        return "none";
-    }        
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.controlmode = embot::prot::can::motor::Converter::toControlMode(candata.datainframe[0]);
+                      
+        return true;         
+    }                    
+ 
+    
+    bool Message_SET_CONTROL_MODE::reply()
+    {
+        return false;
+    } 
     
     
     bool Message_GET_CONTROL_MODE::load(const embot::prot::can::Frame &inframe)
@@ -278,10 +210,11 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         return true;
     }  
 
+    
     bool Message_GET_CONTROL_MODE::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
     {
         std::uint8_t dd[7] = {0};
-        dd[0] = convert(replyinfo.controlmode); 
+        dd[0] = embot::prot::can::motor::Converter::convert(replyinfo.controlmode); 
                        
         std::uint8_t datalen = 1;
         uint8_t mcindex = convert(replyinfo.motorindex);
@@ -290,31 +223,407 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
         frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_CONTROL_MODE), candata.from, dd, datalen, mcindex);
         frame_set_size(outframe, datalen+1);
         return true;
-    }      
-        
+    }  
+
     
-    bool Message_SET_CONTROL_MODE::load(const embot::prot::can::Frame &inframe)
+    bool Message_SET_CURRENT_LIMIT::load(const embot::prot::can::Frame &inframe)
     {
         Message::set(inframe);  
         
-        if(static_cast<std::uint8_t>(CMD::SET_CONTROL_MODE) != frame2cmd(inframe))
+        if(static_cast<std::uint8_t>(CMD::SET_CURRENT_LIMIT) != frame2cmd(inframe))
         {
             return false; 
         }
         
         info.motorindex = motorpollingframe2motindex(inframe);
-        info.controlmode = toControlMode(candata.datainframe[0]);
+
+        info.currents.x = embot::core::binary::word::memory2value<uint8_t>(&candata.datainframe[0]);
+        info.currents.nominal = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[1]);
+        info.currents.peak = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[3]);        
+        info.currents.overload = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[5]);
                       
         return true;         
     }                    
         
-    bool Message_SET_CONTROL_MODE::reply()
+    bool Message_SET_CURRENT_LIMIT::reply()
     {
         return false;
     } 
+
+    bool Message_GET_CURRENT_LIMIT::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_CURRENT_LIMIT) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_CURRENT_LIMIT::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        
+        std::uint8_t dd[7] = {0};
+        // fill the 7 bytes
+        std::uint8_t datalen = 7;
+        
+        embot::core::binary::word::load2memory<uint8_t>(replyinfo.currents.x, &dd[0]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.currents.nominal, &dd[1]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.currents.peak, &dd[3]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.currents.overload, &dd[5]);       
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_CURRENT_LIMIT), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }          
+
+
+    bool Message_SET_CURRENT_PID::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_CURRENT_PID) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.pid.type = embot::prot::can::motor::PID::Type::CURR;
+        info.pid.kp = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
+        info.pid.ki = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
+        info.pid.kd = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);
+        info.pid.ks = embot::core::binary::word::memory2value<uint8_t>(&candata.datainframe[6]);
+                     
+        return true;         
+    }                    
+        
+    bool Message_SET_CURRENT_PID::reply()
+    {
+        return false;
+    } 
+
+    bool Message_GET_CURRENT_PID::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_CURRENT_PID) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_CURRENT_PID::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        
+        std::uint8_t dd[7] = {0};
+        // fill the 7 bytes
+        std::uint8_t datalen = 7;
+        
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pid.kp, &dd[0]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pid.ki, &dd[2]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pid.kd, &dd[4]);
+        embot::core::binary::word::load2memory<uint8_t>(replyinfo.pid.ks, &dd[6]);       
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_CURRENT_PID), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }  
+ 
+
+    bool Message_SET_VELOCITY_PID::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_VELOCITY_PID) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.pid.type = embot::prot::can::motor::PID::Type::VEL;
+        info.pid.kp = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
+        info.pid.ki = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
+        info.pid.kd = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);
+        info.pid.ks = embot::core::binary::word::memory2value<uint8_t>(&candata.datainframe[6]);
+                     
+        return true;         
+    }                    
+        
+    bool Message_SET_VELOCITY_PID::reply()
+    {
+        return false;
+    } 
+
+    bool Message_GET_VELOCITY_PID::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_VELOCITY_PID) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_VELOCITY_PID::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        
+        std::uint8_t dd[7] = {0};
+        // fill the 7 bytes
+        std::uint8_t datalen = 7;
+        
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pid.kp, &dd[0]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pid.ki, &dd[2]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pid.kd, &dd[4]);
+        embot::core::binary::word::load2memory<uint8_t>(replyinfo.pid.ks, &dd[6]);       
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_VELOCITY_PID), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    } 
+
+
+    bool Message_SET_MOTOR_CONFIG::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_MOTOR_CONFIG) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+
+        info.config.flags = embot::core::binary::word::memory2value<uint8_t>(&candata.datainframe[0]);
+        info.config.rotorEncoderResolution = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[1]);
+        info.config.rotorIndexOffset = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[3]);
+        info.config.motorPoles = embot::core::binary::word::memory2value<uint8_t>(&candata.datainframe[5]);
+        info.config.rotEncTolerance = embot::core::binary::word::memory2value<uint8_t>(&candata.datainframe[6]);
+                     
+        return true;         
+    }                    
+        
+    bool Message_SET_MOTOR_CONFIG::reply()
+    {
+        return false;
+    } 
+
+    bool Message_GET_MOTOR_CONFIG::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_MOTOR_CONFIG) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_MOTOR_CONFIG::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        
+        std::uint8_t dd[7] = {0};
+        // fill the 7 bytes
+        std::uint8_t datalen = 7;        
+       
+        embot::core::binary::word::load2memory<uint8_t>(replyinfo.config.flags, &dd[0]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.config.rotorEncoderResolution, &dd[1]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.config.rotorIndexOffset, &dd[3]);
+        embot::core::binary::word::load2memory<uint8_t>(replyinfo.config.motorPoles, &dd[5]); 
+        embot::core::binary::word::load2memory<uint8_t>(replyinfo.config.rotEncTolerance, &dd[6]);        
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_MOTOR_CONFIG), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }     
+
+
+    bool Message_SET_TEMPERATURE_LIMIT::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_TEMPERATURE_LIMIT) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+
+        info.hardwarelimit = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
+                     
+        return true;         
+    }                    
+        
+    bool Message_SET_TEMPERATURE_LIMIT::reply()
+    {
+        return false;
+    } 
+
+    bool Message_GET_TEMPERATURE_LIMIT::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_TEMPERATURE_LIMIT) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_TEMPERATURE_LIMIT::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        
+        std::uint8_t dd[7] = {0};
+        // fill the 2 bytes
+        std::uint8_t datalen = 2;        
+       
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.hardwarelimit, &dd[0]);     
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_TEMPERATURE_LIMIT), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    } 
     
+
+    bool Message_SET_CURRENT_PIDLIMITS::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_CURRENT_PIDLIMITS) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.pidlimits.type = embot::prot::can::motor::PIDlimits::Type::CURR;
+        info.pidlimits.offset = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
+        info.pidlimits.limitonoutput = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
+        info.pidlimits.limitonintegral = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);
+                     
+        return true;         
+    }                    
+        
+    bool Message_SET_CURRENT_PIDLIMITS::reply()
+    {
+        return false;
+    } 
+
+    bool Message_GET_CURRENT_PIDLIMITS::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_CURRENT_PIDLIMITS) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_CURRENT_PIDLIMITS::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        
+        std::uint8_t dd[7] = {0};
+        // fill the 6 bytes
+        std::uint8_t datalen = 6;
+        
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.offset, &dd[0]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.limitonoutput, &dd[2]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.limitonintegral, &dd[4]);    
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_CURRENT_PIDLIMITS), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }  
+ 
+
+    bool Message_SET_VELOCITY_PIDLIMITS::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_VELOCITY_PIDLIMITS) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.pidlimits.type = embot::prot::can::motor::PIDlimits::Type::VEL;
+        info.pidlimits.offset = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
+        info.pidlimits.limitonoutput = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
+        info.pidlimits.limitonintegral = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);
+                     
+        return true;         
+    }                    
+        
+    bool Message_SET_VELOCITY_PIDLIMITS::reply()
+    {
+        return false;
+    } 
+
+    bool Message_GET_VELOCITY_PIDLIMITS::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_VELOCITY_PIDLIMITS) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_VELOCITY_PIDLIMITS::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        
+        std::uint8_t dd[7] = {0};
+        // fill the 6 bytes
+        std::uint8_t datalen = 6;
+        
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.offset, &dd[0]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.limitonoutput, &dd[2]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.limitonintegral, &dd[4]);       
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_VELOCITY_PIDLIMITS), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }     
     
-}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
+}   // namespace embot::prot::can::motor::polling {
     
     
 
