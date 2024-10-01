@@ -59,14 +59,25 @@ using namespace embot::hw;
 
 #if !defined(EMBOT_ENABLE_hw_testpoint)
 
-namespace embot { namespace hw { namespace testpoint {
+namespace embot::hw::testpoint {
     
-    #error fill it
-}}}
+    bool supported(embot::hw::TESTPOINT testpoint)
+    { return false; }
+    bool initialised(embot::hw::TESTPOINT testpoint)
+    { return false; }        
+    result_t init(embot::hw::TESTPOINT testpoint)       
+    { return resNOK; }     
+    result_t on(embot::hw::TESTPOINT testpoint)       
+    { return resNOK; }  
+    result_t off(embot::hw::TESTPOINT testpoint)       
+    { return resNOK; }  
+    result_t toggle(embot::hw::TESTPOINT testpoint)       
+    { return resNOK; }  
+}
 
 #else
 
-namespace embot { namespace hw { namespace testpoint {
+namespace embot::hw::testpoint {
 
     // initialised mask
     static std::uint32_t initialisedmask = 0;
@@ -155,7 +166,7 @@ namespace embot { namespace hw { namespace testpoint {
     }
     
     
-}}} // namespace embot { namespace hw { namespace testpoint
+} // namespace embot::hw::testpoint {
 
 
 #endif //#if defined(EMBOT_ENABLE_hw_testpoint)

@@ -462,15 +462,21 @@ namespace embot::hw::icc::ltr::test {
     void tick(const std::string &str) {}
     
 #else
-        
+    #undef TEST_ICC_WITH_PRINTER    
     void init(DIR dir)
     {
+#if defined(TEST_ICC_WITH_PRINTER)        
         embot::hw::icc::printer::test::init(dir);
+#else        
+#endif        
     }
     
     void tick(const std::string &str)
     {
+#if defined(TEST_ICC_WITH_PRINTER)        
         embot::hw::icc::printer::test::tick(str);
+#else        
+#endif          
     }
 
 #endif    
