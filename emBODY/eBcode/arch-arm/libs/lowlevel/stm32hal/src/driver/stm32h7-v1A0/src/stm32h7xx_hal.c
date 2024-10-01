@@ -221,6 +221,9 @@ HAL_StatusTypeDef HAL_DeInit(void)
   return HAL_OK;
 }
 
+//#if defined(STM32HAL_BOAR D_AMCFOC_1CM7) | defined(STM32HAL_BOARD_AMCFOC_2CM4)
+
+//#else
 /**
   * @brief  Initializes the MSP.
   * @retval None
@@ -231,6 +234,8 @@ __weak void HAL_MspInit(void)
             the HAL_MspInit could be implemented in the user file
    */
 }
+
+//#endif
 
 /**
   * @brief  DeInitializes the MSP.
