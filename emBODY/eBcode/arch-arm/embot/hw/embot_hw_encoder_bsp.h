@@ -11,9 +11,6 @@
 #define __EMBOT_HW_ENCODER_BSP_H_
 
 
-#include "embot_hw_chip_AS5045.h"
-#include "embot_hw_chip_MA730.h"
-
 namespace embot { namespace hw { namespace encoder {
     
     struct nonePROP

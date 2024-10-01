@@ -51,35 +51,35 @@ using namespace embot::hw;
 namespace embot { namespace hw { namespace eth {
 
 #if 0
-    bool supported(ETH b)
+    bool supported(EtH b)
     { return false; }
-    bool initialised(ETH b)
+    bool initialised(EtH b)
     { return false; }
-    result_t init(ETH b, const Config &config)
+    result_t init(EtH b, const Config &config)
     { return resNOK; }
-    result_t deinit(ETH b)
+    result_t deinit(EtH b)
     { return resNOK; }
      
-    bool isbusy(embot::hw::ETH b, embot::core::relTime timeout, embot::core::relTime &remaining) 
+    bool isbusy(embot::hw::EtH b, embot::core::relTime timeout, embot::core::relTime &remaining) 
     { return false; }  
     // blocking      
-    result_t read(embot::hw::ETH b, embot::core::Data &destination, embot::core::relTime timeout) 
+    result_t read(embot::hw::EtH b, embot::core::Data &destination, embot::core::relTime timeout) 
     { return resNOK; } 
-    result_t write(embot::hw::ETH b, const embot::core::Data &source, embot::core::relTime timeout) 
+    result_t write(embot::hw::EtH b, const embot::core::Data &source, embot::core::relTime timeout) 
     { return resNOK; }  
     // non blocking
-    result_t read(embot::hw::ETH b, embot::core::Data &destination, const embot::core::Callback &oncompletion)
+    result_t read(embot::hw::EtH b, embot::core::Data &destination, const embot::core::Callback &oncompletion)
     { return resNOK; }
-    result_t write(embot::hw::ETH b, const embot::core::Data &source, const embot::core::Callback &oncompletion)
+    result_t write(embot::hw::EtH b, const embot::core::Data &source, const embot::core::Callback &oncompletion)
     { return resNOK; }  
 
 #endif
 
-    bool supported(ETH b)
+    bool supported(embot::hw::EtH b)
     { return false; }
-    bool initialised(ETH b)
+    bool initialised(embot::hw::EtH b)
     { return false; }
-    result_t init(ETH b)
+    result_t init(embot::hw::EtH b)
     { return resNOK; }
     
     ipal_result_t ipal_init(ipal_hal_eth_cfg_t *cfg)
@@ -145,7 +145,7 @@ namespace embot { namespace hw { namespace eth {
     }
 
     
-//    result_t deinit(ETH b)
+//    result_t deinit(EtH b)
 //    {       
 //        if(false == initialised(b))
 //        {

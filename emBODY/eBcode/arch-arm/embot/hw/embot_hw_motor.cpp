@@ -30,11 +30,7 @@
     #include "stm32hal.h"
 #else
     #warning this implementation is only for stm32hal
-#endif
-
-#if defined(STM32HAL_BOARD_AMC2C)
-    #include "motorhal.h"    
-#endif    
+#endif   
   
 
 using namespace embot::hw;
@@ -90,9 +86,21 @@ namespace embot { namespace hw { namespace motor {
 }}} // namespace embot { namespace hw { namespace MOTOR {
 
 
-#else
+#elif defined(EMBOT_ENABLE_hw_motor)
 
-
+#if defined(STM32HAL_BOARD_AMC2C)
+    // the case we use for the second core of the amc (so motor control on cm4)
+    #include "motorhal.h" 
+#elif defined(STM32HAL_BOARD_AMC1CM7) || defined(STM32HAL_BOARD_AMC2CM4)
+    // used for a case under test and then dropped for motor managed by either cm7 or cm4 
+    #include "motorhal.h"      
+#elif defined(STM32HAL_BOARD_AMCFOC_1CM7)
+    // used by the amcfoc.mot running on cm7
+    #include "embot_hw_motor_adc.h"  
+    #include "embot_hw_motor_enc.h"  
+    #include "embot_hw_motor_hall.h"  
+    #include "embot_hw_motor_pwm.h"  
+#endif    
 
 
 namespace embot { namespace hw { namespace motor {
@@ -363,6 +371,11 @@ namespace embot { namespace hw { namespace motor {
         
         return resOK;               
     }
+    
+//    float angle(embot::hw::MOTOR h)
+//    {
+//        return  embot::hw::motor::hall::angle(h);
+//    }
 
        
     result_t setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
@@ -400,7 +413,8 @@ namespace embot { namespace hw { namespace motor {
         return s_hw_getCin();        
     }
     
-// in here is the part for low level hw of the boards (amc2c or amcbldc)
+// in here is the part for low level hw of the boards (amc2c or amcbldc or amcfoc)
+// it is better, for now, to clearly separate the three cases      
     
 #if defined(STM32HAL_BOARD_AMC2C)
 
@@ -700,8 +714,168 @@ namespace embot { namespace hw { namespace motor {
         return 1.0f;
 #endif        
     } 
-      
+
+#elif defined(STM32HAL_BOARD_AMC1CM7) || defined(STM32HAL_BOARD_AMC2CM4)
+
+// to be filled w/ the same as amc2c because we manage yet a single motor
+
+#elif defined(STM32HAL_BOARD_AMCFOC_1CM7)      
+
+    result_t s_hw_init(MOTOR h)
+    {
+        // i want to be sure that the pwm is not active       
+        embot::hw::motor::pwm::deinit(h); 
+
+        // adc acquisition of the currents starts straigth away with ::init()
+        embot::hw::motor::adc::init(h, {}); 
+         
+        // then we init the encoder. we actually dont start acquisition because we do that in enc::start()            
+        embot::hw::motor::enc::init({}); 
+        // same applies for hall 
+        embot::hw::motor::hall::init(h, {});   
+            
+        // ok, we start pwm
+        embot::hw::motor::pwm::init(h, {});
+          
+        // now we calibrate adc acquisition
+        embot::hw::motor::adc::calibrate(h, {});
+
+        // now we start analog acquisition
+        embot::hw::analog::init({});
+            
+        // we may calibrate also the encoder so that it is aligned w/ hall values
+        // but maybe better do it later
+
+        return resOK; 
+    }
     
+    result_t s_hw_deinit(MOTOR h)
+    {
+        embot::hw::motor::adc::deinit(h); ;
+        embot::hw::motor::enc::deinit(); 
+        embot::hw::motor::hall::deinit(h); 
+        embot::hw::motor::pwm::deinit(h);
+        
+        return resOK;
+    }    
+ 
+    result_t s_hw_configure(MOTOR h, const Config &cfg)
+    { 
+        result_t res {resNOK};
+        
+        if((true == cfg.has_quad_enc) && (0 != cfg.enc_resolution) && (cfg.pwm_num_polar_couples > 0))
+        {
+            // start the encoder
+            embot::hw::motor::enc::Mode mode {cfg.enc_resolution, cfg.pwm_num_polar_couples, false, false};
+            embot::hw::motor::enc::start(mode);
+        }
+        
+        if(true == cfg.pwm_has_hall_sens)
+        {
+            // start the hall acquisition
+             embot::hw::motor::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::hall::Mode::SWAP::BC :  embot::hw::motor::hall::Mode::SWAP::none, cfg.pwm_hall_offset };
+             embot::hw::motor::hall::start(h, mode);
+        }
+                
+      
+        return resOK; 
+    }  
+    
+    result_t s_hw_motorEnable(MOTOR h)
+    {
+        embot::hw::motor::pwm::enable(h, true);
+        return resOK;
+    }
+    
+    result_t s_hw_motorDisable(MOTOR h)
+    {
+        embot::hw::motor::pwm::enable(h, false);
+        return resOK;
+    }    
+
+    Position s_hw_getencoder(MOTOR h)
+    {
+        Position p {0};
+        if(true == embot::hw::motor::enc::isstarted())
+        {
+           p = embot::hw::motor::enc::getvalue();
+        }
+        else if(true == embot::hw::motor::hall::isstarted(h))
+        {
+           p = embot::hw::motor::hall::getangle(h);
+        }
+        return p;
+    }
+
+//    Position s_hw_gethallcounter(MOTOR h)
+//    {
+//        #warning TODO-embot::hw::motor: .... get hall
+//        return 0;        
+////        return hallGetCounter();
+//    }
+        
+    HallStatus s_hw_gethallstatus(MOTOR h)
+    {       
+        return embot::hw::motor::hall::getstatus(h);
+    }
+
+    
+    result_t s_hw_setpwmUVW(MOTOR h, Pwm u, Pwm v, Pwm w)
+    {   
+        embot::hw::motor::pwm::set(h, u, v, w);        
+        return resOK;
+    }   
+
+    result_t s_hw_setpwmUVWperc(MOTOR h, const PWMperc &p)
+    {   
+        embot::hw::motor::pwm::setperc(h, p.a, p.b, p.c);        
+        return resOK;
+    }  
+    
+   
+    
+    result_t s_hw_setCallbackOnCurrents(MOTOR h, fpOnCurrents callback, void *owner)
+    {        
+        if((nullptr == callback))
+        {
+            return resNOK;
+        }      
+        
+//        embot::hw::motor::adc::OnCurrents cbk {reinterpret_cast<embot::hw::motor::adc::OnCurrents::Action>(callback), owner};
+//        embot::hw::motor::adc::set(h, cbk);
+        return resOK;   
+    }
+    
+//    bool s_hw_setOnPhaseCurrents(MOTOR h, OnPhaseCurrents onphasecurrents,  void *owner)
+//    {
+//        if((nullptr == onphasecurrents))
+//        {
+//            return false;
+//        }      
+//        
+//        //embot::hw::motor::adc::OnMotorCurrents cbk {reinterpret_cast<embot::hw::motor::adc::OnMotorCurrents::Action>(onphasecurrents), owner};
+//        embot::hw::motor::adc::OnMotorPhaseCurrents cbk1 {onphasecurrents, owner};
+//        embot::hw::motor::adc::set1(h, cbk1);
+//        return true;           
+//    }
+    
+    bool s_hw_isHardwareFault(MOTOR h){ return false; }
+    bool s_hw_isHallSequenceError(MOTOR h){ return false; }
+    bool s_hw_isHallValueError(MOTOR h){ return false; }
+    bool s_hw_isOvercurrent(MOTOR h){ return false; }
+    uint32_t s_hw_get32bit2FOCstyleFaultMask(MOTOR h){ return 0; }
+    
+    float s_hw_getVin()
+    {
+        return embot::hw::analog::getVin();
+    }
+    
+    float s_hw_getCin()
+    {
+        return embot::hw::analog::getCin();
+    } 
+
+
 #else
     #error define a board
 #endif    
@@ -712,7 +886,7 @@ namespace embot { namespace hw { namespace motor {
 
 
 
-#endif //defined(EMBOT_MOTOR_ENABLED)
+#endif // #elif defined(EMBOT_ENABLE_hw_motor)
  
 
 

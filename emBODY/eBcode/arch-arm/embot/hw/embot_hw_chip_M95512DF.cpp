@@ -171,17 +171,14 @@ private:
     bool writeinpage(ADR adr, const embot::core::Data &data);
     bool initpincontrol();
     bool deinitpincontrol();
-};    
+};  
+
 
 bool embot::hw::chip::M95512DF::Impl::initpincontrol()
 {
-//    static constexpr embot::hw::gpio::Config cfg 
-//    {
-//        embot::hw::gpio::Mode::OUTPUTpushpull,
-//        embot::hw::gpio::Pull::nopull,
-//        embot::hw::gpio::Speed::veryhigh
-//    };
-
+    // marco.accame it may be that any of nHOLD, nW or nS are mapped into the dummy GPIO value {}. 
+    // it is the case of the amcfoc board where nW and nHOLD are attached to ground and VCC  
+    // even in such a case it is safe to use the embot::hw::gpio:: functions because they nothing when the GPIO is {}. 
     if(true == _config.pincontrol.config.isvalid())
     {
         // marco.accame: cube-mx sets the value of the pin before initialization,

@@ -22,8 +22,7 @@ namespace embot { namespace hw { namespace multisda {
              
     struct PROP
     {
-        constexpr static std::uint8_t numberof = 5; // SD NSDA HERE
-//        constexpr static std::uint8_t numberof = 4; // SD NSDA HERE
+        constexpr static std::uint8_t numberof = 5; 
         embot::hw::gpio::PROP clk {};
         std::array<const embot::hw::gpio::PROP, numberof> sda;
         constexpr PROP() = default;

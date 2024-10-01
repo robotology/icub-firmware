@@ -338,9 +338,14 @@ namespace embot::hw::sys::DRIVER {
     uint64_t _uniqueid()
     {
         uint64_t r = 0;
-#if defined(STM32H7)    
+#if defined(STM32H7)
+#if defined(CORE_CM7)        
         r = HAL_GetUIDw0() | static_cast<uint64_t>(HAL_GetUIDw1()) << 32;
         r += HAL_GetUIDw2();
+#else
+        r = 1234;
+        #warning the call of HAL_GetUIDw0() on the H7 CM4 makes it crash
+#endif
 #endif    
         return r;  
     }

@@ -91,7 +91,7 @@ namespace embot { namespace hw { namespace chip {
         static constexpr size_t pagelength {128};
         
         struct PinControl
-        {   // contains: chip select, write protection and hold (see page 2 of [1])
+        {   // contains: chip select, write protection and hold (see page 2 of [1]). if in the PCB they are not attached to a GPIO use dummy value {}
             embot::hw::GPIO nS {}; 
             embot::hw::GPIO nW {};
             embot::hw::GPIO nHOLD {}; 

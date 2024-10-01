@@ -45,7 +45,29 @@
 
 
 using namespace std;
+    
+#if !defined(EMBOT_ENABLE_hw_button)
+    
+namespace embot::hw::button {    
+    
+    bool supported(BTN btn)
+    { return false; }        
+    bool initialised(BTN btn)
+    { return false; }        
+    result_t init(BTN btn, const Config &cfg)
+    { return resNOK; }        
+    const Config & config(BTN btn)
+    {
+        static constexpr Config c {};
+        return c;
+    }             
+    bool pressed(BTN btn)
+    { return false; }    
+    void onexti(BTN btn) {}    
+    
+}
 
+#elif defined(EMBOT_ENABLE_hw_button)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -276,7 +298,7 @@ namespace embot { namespace hw { namespace button {
 }}} // namespace embot { namespace hw { namespace button 
 
 
-
+#endif // #elif defined(EMBOT_ENABLE_hw_button)
 
     
 

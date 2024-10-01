@@ -54,6 +54,9 @@ namespace embot { namespace hw { namespace encoder {
 
 #else
 
+#include "embot_hw_chip_AS5045.h"
+#include "embot_hw_chip_MA730.h"
+
 namespace embot { namespace hw { namespace encoder {
     
     // initialised mask

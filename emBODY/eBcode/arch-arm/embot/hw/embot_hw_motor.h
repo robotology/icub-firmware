@@ -39,6 +39,19 @@ namespace embot { namespace hw { namespace motor {
         
     using fpOnCurrents = void (*)(void *owner, const Currents * const currents);
     
+#if 0    
+    struct PhaseCurrents
+    {
+        float v1 {0};
+        float v2 {0};
+        float v3 {0};
+        constexpr PhaseCurrents() = default;
+        constexpr PhaseCurrents(float c1, float c2, float c3) : v1(c1), v2(c2), v3(c3) {}        
+    };
+    
+    using OnPhaseCurrents = void (*)(MOTOR h, const PhaseCurrents * const phasecurrents, void *owner);
+#endif
+    
     // so far Config is an aggregate of the configuration values we need. 
     // we may need to add more along the way, so better having them organised in a struct    
     struct Config
@@ -90,7 +103,9 @@ namespace embot { namespace hw { namespace motor {
     // values of encoders and hall sensors can be read if(true == initialised(h))
     result_t getencoder(embot::hw::MOTOR h, Position &position);         
     result_t gethallstatus(embot::hw::MOTOR h, HallStatus &hs);
-     
+#if 0    
+    float angle(embot::hw::MOTOR h);
+#endif     
     // not used so far, so we keep it out                     
     // result_t gethallcounter(embot::hw::MOTOR h, Position &position);   
           

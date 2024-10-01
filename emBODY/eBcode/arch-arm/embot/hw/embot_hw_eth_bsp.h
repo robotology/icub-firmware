@@ -21,11 +21,12 @@
 
 namespace embot { namespace hw { namespace eth { namespace bsp {
     
-#if   defined(HAL_ETH_MODULE_ENABLED)        
+#if defined(HAL_ETH_MODULE_ENABLED)        
     using ETH_Handle = ETH_HandleTypeDef;
     using ETH_Device = ETH_TypeDef;
 #else
     using ETH_Handle = void;
+    using ETH_Device = void;
 #endif
  
 #if 1 
