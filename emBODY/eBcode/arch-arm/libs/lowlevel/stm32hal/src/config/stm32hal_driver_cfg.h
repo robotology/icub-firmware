@@ -222,6 +222,54 @@ extern "C" {
         #error unknown driver version
     #endif
 
+#elif   defined(STM32HAL_BOARD_AMC_1CM7)
+    
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+        #define USE_FULL_LL_DRIVER
+        // keep out of the compilation the weak functions of HAL_ETH
+        // they will be defined inside EMAC_STM32H7xx.c
+        #define STM32HAL_removeWEAK_ETH
+        #define STM32HAL_improveHANDLER_ETH
+        #include "../src/config/stm32hal_driver_cfg_of_amc_1cm7_v1A0.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_ll_gpio.h"
+    #elif (STM32HAL_DRIVER_VERSION == 0x1B1)
+        #define USE_FULL_LL_DRIVER
+        // keep out of the compilation the weak functions of HAL_ETH
+        // they will be defined inside EMAC_STM32H7xx.c
+        #define STM32HAL_removeWEAK_ETH
+        #define STM32HAL_improveHANDLER_ETH
+        #include "../src/config/stm32hal_driver_cfg_of_amc_1cm7_v1B1.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v1B1/inc/stm32h7xx_ll_gpio.h"        
+    #else
+        #error unknown driver version
+    #endif
+
+#elif   defined(STM32HAL_BOARD_AMC_2CM4)
+    
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+        #define USE_FULL_LL_DRIVER
+        // keep out of the compilation the weak functions of HAL_ETH
+        // they will be defined inside EMAC_STM32H7xx.c
+        #define STM32HAL_removeWEAK_ETH
+        #define STM32HAL_improveHANDLER_ETH
+        #include "../src/config/stm32hal_driver_cfg_of_amc_2cm4_v1A0.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_ll_gpio.h"
+    #elif (STM32HAL_DRIVER_VERSION == 0x1B1)
+        #define USE_FULL_LL_DRIVER
+        // keep out of the compilation the weak functions of HAL_ETH
+        // they will be defined inside EMAC_STM32H7xx.c
+        #define STM32HAL_removeWEAK_ETH
+        #define STM32HAL_improveHANDLER_ETH
+        #include "../src/config/stm32hal_driver_cfg_of_amc2c_v1B1.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v1B1/inc/stm32h7xx_ll_gpio.h"    
+    #else
+        #error unknown driver version
+    #endif
+    
 #elif   defined(STM32HAL_BOARD_AMCFOCM7)
     
     #if (STM32HAL_DRIVER_VERSION == 0x1A0)
@@ -237,6 +285,21 @@ extern "C" {
         #error unknown driver version
     #endif
 
+#elif   defined(STM32HAL_BOARD_AMCFOC_1CM7)
+    
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+        #define USE_FULL_LL_DRIVER
+        // keep out of the compilation the weak functions of HAL_ETH
+        // they will be defined inside EMAC_STM32H7xx.c
+        #define STM32HAL_removeWEAK_ETH
+        #define STM32HAL_improveHANDLER_ETH
+        #include "../src/config/stm32hal_driver_cfg_of_amcfoc_1cm7_v1A0.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_ll_gpio.h"
+    #else
+        #error unknown driver version
+    #endif
+    
 #elif   defined(STM32HAL_BOARD_AMCFOCM4)
     
     #if (STM32HAL_DRIVER_VERSION == 0x1A0)
@@ -246,6 +309,21 @@ extern "C" {
         #define STM32HAL_removeWEAK_ETH
         #define STM32HAL_improveHANDLER_ETH
         #include "../src/config/stm32hal_driver_cfg_of_amcfocm4_v1A0.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_ll_gpio.h"
+    #else
+        #error unknown driver version
+    #endif
+ 
+#elif   defined(STM32HAL_BOARD_AMCFOC_2CM4)
+    
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+        #define USE_FULL_LL_DRIVER
+        // keep out of the compilation the weak functions of HAL_ETH
+        // they will be defined inside EMAC_STM32H7xx.c
+        #define STM32HAL_removeWEAK_ETH
+        #define STM32HAL_improveHANDLER_ETH
+        #include "../src/config/stm32hal_driver_cfg_of_amcfoc_2cm4_v1A0.h"   
         // we also need some ll includes contained in the driver section
         #include "../src/driver/stm32h7-v1A0/inc/stm32h7xx_ll_gpio.h"
     #else

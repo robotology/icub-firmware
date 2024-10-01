@@ -1,0 +1,184 @@
+
+
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __CUBEMX_DEFINES_H
+#define __CUBEMX_DEFINES_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+#include "stm32hal.h"
+
+
+
+#define MOT1_HALL3_Pin GPIO_PIN_8
+#define MOT1_HALL3_GPIO_Port GPIOB
+#define MOT2_ENCB_Pin GPIO_PIN_3
+#define MOT2_ENCB_GPIO_Port GPIOB
+#define MAG1_MISO_Pin GPIO_PIN_9
+#define MAG1_MISO_GPIO_Port GPIOG
+#define MAG2_SCLK_Pin GPIO_PIN_3
+#define MAG2_SCLK_GPIO_Port GPIOD
+#define MOT2_ENCA_Pin GPIO_PIN_15
+#define MOT2_ENCA_GPIO_Port GPIOA
+#define SWCLK_Pin GPIO_PIN_14
+#define SWCLK_GPIO_Port GPIOA
+#define TRACED1_Pin GPIO_PIN_4
+#define TRACED1_GPIO_Port GPIOE
+#define TRACED0_Pin GPIO_PIN_3
+#define TRACED0_GPIO_Port GPIOE
+#define MAG2_nSEL_Pin GPIO_PIN_9
+#define MAG2_nSEL_GPIO_Port GPIOB
+#define MAG1_SPIEN_Pin GPIO_PIN_0
+#define MAG1_SPIEN_GPIO_Port GPIOE
+#define MOT1_HALL2_Pin GPIO_PIN_7
+#define MOT1_HALL2_GPIO_Port GPIOB
+#define MOT2_HALL1_Pin GPIO_PIN_4
+#define MOT2_HALL1_GPIO_Port GPIOB
+#define MAG1_MOSI_Pin GPIO_PIN_7
+#define MAG1_MOSI_GPIO_Port GPIOD
+#define TRACED2_Pin GPIO_PIN_2
+#define TRACED2_GPIO_Port GPIOD
+#define TRACED3_Pin GPIO_PIN_12
+#define TRACED3_GPIO_Port GPIOC
+#define MOT1_PWM2L_Pin GPIO_PIN_14
+#define MOT1_PWM2L_GPIO_Port GPIOH
+#define SWDIO_Pin GPIO_PIN_13
+#define SWDIO_GPIO_Port GPIOA
+#define MCO_Pin GPIO_PIN_8
+#define MCO_GPIO_Port GPIOA
+#define TRACECLK_Pin GPIO_PIN_2
+#define TRACECLK_GPIO_Port GPIOE
+#define MAG2_SPIEN_Pin GPIO_PIN_1
+#define MAG2_SPIEN_GPIO_Port GPIOE
+#define MOT2_HALL2_Pin GPIO_PIN_5
+#define MOT2_HALL2_GPIO_Port GPIOB
+#define MAG1_nSEL_Pin GPIO_PIN_10
+#define MAG1_nSEL_GPIO_Port GPIOG
+#define MOT1_PWM1L_Pin GPIO_PIN_13
+#define MOT1_PWM1L_GPIO_Port GPIOH
+#define RTC_XTAL2_Pin GPIO_PIN_15
+#define RTC_XTAL2_GPIO_Port GPIOC
+#define RTC_XTAL1_Pin GPIO_PIN_14
+#define RTC_XTAL1_GPIO_Port GPIOC
+#define MOT1_PWM3L_Pin GPIO_PIN_15
+#define MOT1_PWM3L_GPIO_Port GPIOH
+#define MOT1_PWM3H_Pin GPIO_PIN_8
+#define MOT1_PWM3H_GPIO_Port GPIOC
+#define MOT1_PWM2H_Pin GPIO_PIN_7
+#define MOT1_PWM2H_GPIO_Port GPIOC
+#define MOT2_BREAK2_Pin GPIO_PIN_6
+#define MOT2_BREAK2_GPIO_Port GPIOE
+#define MOT1_PWM4_Pin GPIO_PIN_9
+#define MOT1_PWM4_GPIO_Port GPIOC
+#define MOT1_PWM1H_Pin GPIO_PIN_6
+#define MOT1_PWM1H_GPIO_Port GPIOC
+#define MAG1_SCL_Pin GPIO_PIN_1
+#define MAG1_SCL_GPIO_Port GPIOF
+#define MAG1_SDA_Pin GPIO_PIN_0
+#define MAG1_SDA_GPIO_Port GPIOF
+#define MOT2_CLIMIT_Pin GPIO_PIN_5
+#define MOT2_CLIMIT_GPIO_Port GPIOG
+#define MOT1_CLIMIT_Pin GPIO_PIN_8
+#define MOT1_CLIMIT_GPIO_Port GPIOG
+#define MOT1_BREAK1_Pin GPIO_PIN_2
+#define MOT1_BREAK1_GPIO_Port GPIOG
+#define MOT2_VPHASE2_Pin GPIO_PIN_5
+#define MOT2_VPHASE2_GPIO_Port GPIOF
+#define MOT2_VPHASE3_Pin GPIO_PIN_3
+#define MOT2_VPHASE3_GPIO_Port GPIOF
+#define MOT1_BREAK2_Pin GPIO_PIN_3
+#define MOT1_BREAK2_GPIO_Port GPIOG
+#define OSC_IN_Pin GPIO_PIN_0
+#define OSC_IN_GPIO_Port GPIOH
+#define MOT1_TEMP_Pin GPIO_PIN_8
+#define MOT1_TEMP_GPIO_Port GPIOF
+#define MOT2_VPHASE1_Pin GPIO_PIN_7
+#define MOT2_VPHASE1_GPIO_Port GPIOF
+#define MOT1_VPHASE3_Pin GPIO_PIN_9
+#define MOT1_VPHASE3_GPIO_Port GPIOF
+#define MOT1_HALL1_Pin GPIO_PIN_12
+#define MOT1_HALL1_GPIO_Port GPIOD
+#define MOT2_TEMP_Pin GPIO_PIN_10
+#define MOT2_TEMP_GPIO_Port GPIOF
+#define MAG2_MOSI_Pin GPIO_PIN_15
+#define MAG2_MOSI_GPIO_Port GPIOB
+#define MOT2_PWM2L_Pin GPIO_PIN_14
+#define MOT2_PWM2L_GPIO_Port GPIOB
+#define PWR_CIN_Pin GPIO_PIN_0
+#define PWR_CIN_GPIO_Port GPIOC
+#define MOT2_PWM1L_Pin GPIO_PIN_13
+#define MOT2_PWM1L_GPIO_Port GPIOB
+#define MAG2_MISO_Pin GPIO_PIN_2
+#define MAG2_MISO_GPIO_Port GPIOC
+#define MOT1_CPHASE3_Pin GPIO_PIN_1
+#define MOT1_CPHASE3_GPIO_Port GPIOB
+#define MAG2_SCL_Pin GPIO_PIN_7
+#define MAG2_SCL_GPIO_Port GPIOH
+#define MOT2_PWM4_Pin GPIO_PIN_14
+#define MOT2_PWM4_GPIO_Port GPIOE
+#define MOT1_ENCB_Pin GPIO_PIN_11
+#define MOT1_ENCB_GPIO_Port GPIOH
+#define MOT1_VPHASE1_Pin GPIO_PIN_2
+#define MOT1_VPHASE1_GPIO_Port GPIOC
+#define MOT1_VPHASE2_Pin GPIO_PIN_3
+#define MOT1_VPHASE2_GPIO_Port GPIOC
+#define PWR_VIN_Pin GPIO_PIN_2
+#define PWR_VIN_GPIO_Port GPIOH
+#define MOT2_CPHASE3_Pin GPIO_PIN_11
+#define MOT2_CPHASE3_GPIO_Port GPIOF
+#define MAG2_I2CEN_Pin GPIO_PIN_8
+#define MAG2_I2CEN_GPIO_Port GPIOE
+#define MOT1_CPHASE1_Pin GPIO_PIN_13
+#define MOT1_CPHASE1_GPIO_Port GPIOF
+#define MOT2_ENCZ_Pin GPIO_PIN_10
+#define MOT2_ENCZ_GPIO_Port GPIOB
+#define MAG2_SDA_Pin GPIO_PIN_8
+#define MAG2_SDA_GPIO_Port GPIOH
+#define MOT1_ENCA_Pin GPIO_PIN_10
+#define MOT1_ENCA_GPIO_Port GPIOH
+#define MOT1_ENCZ_Pin GPIO_PIN_12
+#define MOT1_ENCZ_GPIO_Port GPIOH
+#define MOT2_CPHASE2_Pin GPIO_PIN_1
+#define MOT2_CPHASE2_GPIO_Port GPIOA
+#define PWR_VCC_Pin GPIO_PIN_4
+#define PWR_VCC_GPIO_Port GPIOH
+#define MAG1_SCLK_Pin GPIO_PIN_5
+#define MAG1_SCLK_GPIO_Port GPIOA
+#define BOOT1_Pin GPIO_PIN_2
+#define BOOT1_GPIO_Port GPIOB
+#define MAG1_I2CEN_Pin GPIO_PIN_7
+#define MAG1_I2CEN_GPIO_Port GPIOE
+#define MOT2_PWM3L_Pin GPIO_PIN_12
+#define MOT2_PWM3L_GPIO_Port GPIOE
+#define MOT2_PWM3H_Pin GPIO_PIN_13
+#define MOT2_PWM3H_GPIO_Port GPIOE
+#define MOT2_BREAK1_Pin GPIO_PIN_15
+#define MOT2_BREAK1_GPIO_Port GPIOE
+#define MOT2_CPHASE1_Pin GPIO_PIN_0
+#define MOT2_CPHASE1_GPIO_Port GPIOA
+#define PWR_VAUX_Pin GPIO_PIN_3
+#define PWR_VAUX_GPIO_Port GPIOH
+#define PWR_VCORE_Pin GPIO_PIN_5
+#define PWR_VCORE_GPIO_Port GPIOH
+#define MOT1_CPHASE2_Pin GPIO_PIN_6
+#define MOT1_CPHASE2_GPIO_Port GPIOA
+#define MOT2_HALL3_Pin GPIO_PIN_0
+#define MOT2_HALL3_GPIO_Port GPIOB
+#define MOT2_PWM1H_Pin GPIO_PIN_9
+#define MOT2_PWM1H_GPIO_Port GPIOE
+#define MOT2_PWM2H_Pin GPIO_PIN_11
+#define MOT2_PWM2H_GPIO_Port GPIOE
+
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __CUBEMX_DEFINES_H */
+
+
