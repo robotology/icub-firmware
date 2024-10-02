@@ -178,6 +178,7 @@ extern void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par
 extern BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref); //used only for WRIST_MK2
 extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_state);  //used only for WRIST_MK2
 extern void JointSet_stop(JointSet* o, int j);  //used only for WRIST_MK2
+extern void JointSet_update_status_reference(JointSet* o, Joint* j_ptr, int j); //used only for WRIST_MK2
 #endif
 extern void JointSet_set_constraints(JointSet* o, const eOmc_jointSet_constraints_t *constraints);
 extern void JointSet_init_wrist_decoupler(JointSet* o);
