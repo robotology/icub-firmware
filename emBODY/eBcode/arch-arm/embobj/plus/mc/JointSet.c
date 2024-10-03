@@ -2261,6 +2261,57 @@ extern void JointSet_init_wrist_decoupler(JointSet* o)
 }
 
 
+
+void JointSet_update_status_reference(JointSet* o, Joint* j_ptr, int j)
+{    
+    Trajectory *traj_ptr = &(o->wristMK2.ypr_trajectory[j]);
+    
+    switch (o->control_mode)
+    {
+        case eomc_controlmode_idle:
+        case eomc_controlmode_notConfigured:
+        case eomc_controlmode_configured:
+            break;
+        
+        case eomc_controlmode_mixed:
+        case eomc_ctrlmval_velocity_pos:
+            j_ptr->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(traj_ptr);
+            j_ptr->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(traj_ptr);
+            break;
+        case eomc_controlmode_velocity: //
+        case eomc_controlmode_vel_direct:
+        case eomc_controlmode_impedance_vel:
+            j_ptr->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(traj_ptr);
+            break;
+        case eomc_controlmode_position:
+        case eomc_controlmode_impedance_pos:
+            j_ptr->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(traj_ptr);
+            break;
+        case eomc_controlmode_direct:
+            j_ptr->eo_joint_ptr->status.target.trgt_positionraw = Trajectory_get_target_position(traj_ptr);
+            break;
+                
+        case eomc_controlmode_openloop:
+            j_ptr->eo_joint_ptr->status.target.trgt_pwm = j_ptr->out_ref;
+            break;
+
+        case eomc_controlmode_current:
+            j_ptr->eo_joint_ptr->status.target.trgt_current = j_ptr->out_ref;
+            break;
+        
+        case eomc_controlmode_torque:
+            j_ptr->eo_joint_ptr->status.target.trgt_torque = j_ptr->trq_ref;
+            break;
+            
+        default:
+            ;
+    }
+
+}
+
+
+
+
 BOOL JointSet_set_pos_ref(JointSet* o, int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref) //use only in WRIST_MK2 case
 {
     if (o->wristMK2.is_parking) return FALSE;
