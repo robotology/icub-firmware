@@ -20,6 +20,7 @@
 
 #include "embot_hw_bsp_config.h"
 #include "embot_hw_dualcore_bsp.h"
+#include "embot_hw_sys.h"
 
 #include <cstring>
 #include "embot_core_binary.h"
@@ -171,9 +172,15 @@ namespace embot::hw::dualcore {
                     HAL_HSEM_FastTake(hsem);
 
                     // 2. enable the other core C2
-                    HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);   
+                    HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);  
 
-                    // 3. and release hsem-0
+                    // 3. wait a bit to allow the other core to wake up, bootstrap and execute until the holding of the semaphore 
+                    //    it is not necessary but it is nice to proceed knowing that the other core (if good code is present) has the
+                    //    hw::bsp initted and is waiting for the semaphore to be released
+                    constexpr embot::core::relTime tinywait {20*embot::core::time1microsec};                    
+                    embot::hw::sys::delay(tinywait);                    
+
+                    // 4. and release hsem-0
                     HAL_HSEM_Release(hsem, procID0);
                     
                 } break;  
@@ -243,8 +250,14 @@ namespace embot::hw::dualcore {
 
                     // 2. enable the other core C2
                     HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);   
+                    
+                    // 3. wait a bit to allow the other core to wake up, bootstrap and execute until the holding of the semaphore 
+                    //    it is not necessary but it is nice to proceed knowing that the other core (if good code is present) has the
+                    //    hw::bsp initted and is waiting for the semaphore to be released
+                    constexpr embot::core::relTime tinywait {20*embot::core::time1microsec};                    
+                    embot::hw::sys::delay(tinywait); 
 
-                    // 3. and release hsem-0
+                    // 4. and release hsem-0
                     HAL_HSEM_Release(hsem, procID0);
                     
                 } break;  
@@ -313,8 +326,14 @@ namespace embot::hw::dualcore {
 
                     // 2. enable the other core c1
                     HAL_RCCEx_EnableBootCore(other_RCC_BOOT_Cx);   
+                    
+                    // 3. wait a bit to allow the other core to wake up, bootstrap and execute until the holding of the semaphore 
+                    //    it is not necessary but it is nice to proceed knowing that the other core (if good code is present) has the
+                    //    hw::bsp initted and is waiting for the semaphore to be released
+                    constexpr embot::core::relTime tinywait {20*embot::core::time1microsec};                    
+                    embot::hw::sys::delay(tinywait); 
 
-                    // 3. and release hsem-0
+                    // 4. and release hsem-0
                     HAL_HSEM_Release(hsem, procID0);
                     
                 } break;  
