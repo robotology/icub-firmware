@@ -56,7 +56,7 @@ namespace embot::app::board::amc2c::info {
     {
         embot::app::boards::Board::amcbldc,
         {embot::app::msg::BUS::can2, address},
-        {2, 0, 10, 0},  // application version
+        {2, 1, 10, 0},  // application version
         {2, 0},         // protocol version
         {2024, embot::app::eth::Month::Mar, embot::app::eth::Day::one, 17, 17}
     };
