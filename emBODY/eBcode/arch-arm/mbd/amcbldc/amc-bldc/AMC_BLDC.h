@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 8.11
+// Model version                  : 8.14
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Fri Aug 30 13:08:59 2024
+// C/C++ source code generated on : Wed Oct  2 10:44:04 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -79,7 +79,7 @@ struct DW_AMC_BLDC_T {
 // External inputs (root inport signals with default storage)
 struct ExtU_AMC_BLDC_T {
   SensorsData SensorsData_p;           // '<Root>/SensorsData'
-  ExternalFlags ExternalFlags_p;       // '<Root>/External  Flags'
+  ExternalFlags ExternalFlags_p;       // '<Root>/ExternalFlags'
   BUS_CAN_MULTIPLE PacketsRx;          // '<Root>/PacketsRx'
 };
 
@@ -146,9 +146,6 @@ extern "C"
 }
 
 #endif
-
-// External data declarations for dependent source files
-extern const boolean_T AMC_BLDC_BGND;  // boolean_T ground
 
 //
 //  Exported Global Parameters

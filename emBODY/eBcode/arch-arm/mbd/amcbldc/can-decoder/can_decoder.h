@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 6.115
+// Model version                  : 7.1
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Aug 28 12:31:35 2024
+// C/C++ source code generated on : Wed Oct  2 10:42:42 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -108,14 +108,12 @@ extern void can_decoder_initialize(const char_T **rt_errorStatus,
 extern void can_decoder_DecodingLogic_Init(DW_DecodingLogic_can_decoder_T
   *localDW);
 extern void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
-  BUS_CAN_PACKET_RX *rtu_pck_input, const ActuatorConfiguration
-  *rtu_ConfigurationParameters, uint8_T rtu_CAN_ID_DST, uint8_T
+  BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST, uint8_T
   rtu_CAN_VOLT_REF_SHIFT, real32_T rtu_CAN_VOLT_REF_GAIN,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
 extern void can_decoder_Init(B_can_decoder_c_T *localB, DW_can_decoder_f_T
   *localDW);
-extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
-  ActuatorConfiguration *rtu_ConfigurationParameters, ReceivedEvents
+extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
   rty_messages_rx[MAX_EVENTS_PER_TICK], B_can_decoder_c_T *localB,
   DW_can_decoder_f_T *localDW);
 

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 6.115
+// Model version                  : 7.1
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Aug 28 12:31:35 2024
+// C/C++ source code generated on : Wed Oct  2 10:42:42 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -264,8 +264,7 @@ void can_decoder_DecodingLogic_Init(DW_DecodingLogic_can_decoder_T *localDW)
 
 // Output and update for atomic system: '<S2>/Decoding Logic'
 void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
-  BUS_CAN_PACKET_RX *rtu_pck_input, const ActuatorConfiguration
-  *rtu_ConfigurationParameters, uint8_T rtu_CAN_ID_DST, uint8_T
+  BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST, uint8_T
   rtu_CAN_VOLT_REF_SHIFT, real32_T rtu_CAN_VOLT_REF_GAIN,
   B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW)
 {
@@ -298,7 +297,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
   localB->msg_set_motor_config.has_hall_sens = false;
   localB->msg_set_motor_config.has_quadrature_encoder = false;
   localB->msg_set_motor_config.has_speed_quadrature_encoder = false;
-  localB->msg_set_motor_config.has_torque_sens = false;
+  localB->msg_set_motor_config.has_temperature_sens = false;
   localB->msg_set_motor_config.encoder_tolerance = 0U;
   localB->msg_set_motor_config.pole_pairs = 0U;
   localB->msg_set_motor_config.rotor_encoder_resolution = 0;
@@ -393,10 +392,8 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
           (rtu_pck_input->PAYLOAD.ARG[idx + 1]));
         localB->msg_desired_targets.current = 0.001F * static_cast<real32_T>
           (tmp_merged);
-        localB->msg_desired_targets.voltage = static_cast<real32_T>
-          (static_cast<int16_T>(tmp_merged >> (rtu_CAN_VOLT_REF_SHIFT -
-             rtu_ConfigurationParameters->pids.currentPID.shift_factor))) /
-          rtu_CAN_VOLT_REF_GAIN;
+        localB->msg_desired_targets.voltage = static_cast<real32_T>(tmp_merged >>
+          rtu_CAN_VOLT_REF_SHIFT) / rtu_CAN_VOLT_REF_GAIN;
         localB->msg_desired_targets.velocity = 1000.0F * static_cast<real32_T>
           (tmp_merged) * CAN_ANGLE_ICUB2DEG;
         localDW->cmd_processed = static_cast<uint16_T>(localDW->cmd_processed +
@@ -429,7 +426,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
                 ((rtu_pck_input->PAYLOAD.ARG[1] & 1U) != 0U);
               localB->msg_set_motor_config.has_hall_sens =
                 ((rtu_pck_input->PAYLOAD.ARG[1] & 2U) != 0U);
-              localB->msg_set_motor_config.has_torque_sens =
+              localB->msg_set_motor_config.has_temperature_sens =
                 ((rtu_pck_input->PAYLOAD.ARG[1] & 4U) != 0U);
               localB->msg_set_motor_config.use_index =
                 ((rtu_pck_input->PAYLOAD.ARG[1] & 8U) != 0U);
@@ -537,10 +534,9 @@ void can_decoder_Init(B_can_decoder_c_T *localB, DW_can_decoder_f_T *localDW)
 }
 
 // Output and update for referenced model: 'can_decoder'
-void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
-                 ActuatorConfiguration *rtu_ConfigurationParameters,
-                 ReceivedEvents rty_messages_rx[MAX_EVENTS_PER_TICK],
-                 B_can_decoder_c_T *localB, DW_can_decoder_f_T *localDW)
+void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
+                 rty_messages_rx[MAX_EVENTS_PER_TICK], B_can_decoder_c_T *localB,
+                 DW_can_decoder_f_T *localDW)
 {
   int32_T ForEach_itr;
   int32_T input;
@@ -606,9 +602,9 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
 
     can_decoder_DecodingLogic(localB->CoreSubsys[ForEach_itr].
       pck_rx_struct.available, &localB->CoreSubsys[ForEach_itr].
-      pck_rx_struct.packet, rtu_ConfigurationParameters, CAN_ID_AMC, 5, 10.0F,
-      &localB->CoreSubsys[ForEach_itr].sf_DecodingLogic, &localDW->
-      CoreSubsys[ForEach_itr].sf_DecodingLogic);
+      pck_rx_struct.packet, CAN_ID_AMC, 5, 10.0F, &localB->
+      CoreSubsys[ForEach_itr].sf_DecodingLogic, &localDW->CoreSubsys[ForEach_itr]
+      .sf_DecodingLogic);
 
     // ForEachSliceAssignment generated from: '<S1>/message_rx' incorporates:
     //   BusCreator: '<S2>/Bus Creator'

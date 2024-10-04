@@ -9,7 +9,7 @@
 //
 // Model version                  : 7.0
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Aug 28 12:31:41 2024
+// C/C++ source code generated on : Wed Oct  2 10:42:50 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -240,7 +240,7 @@ struct MotorConfigurationExternal
   boolean_T has_hall_sens;
   boolean_T has_quadrature_encoder;
   boolean_T has_speed_quadrature_encoder;
-  boolean_T has_torque_sens;
+  boolean_T has_temperature_sens;
   uint8_T encoder_tolerance;
   uint8_T pole_pairs;
   int16_T rotor_encoder_resolution;

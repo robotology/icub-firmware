@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.7
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Aug 28 12:32:24 2024
+// C/C++ source code generated on : Wed Oct  2 10:43:35 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -916,7 +916,7 @@ void supervisor_Init(Targets *rty_targets, ActuatorConfiguration
   rty_ConfigurationParameters->motor.externals.has_quadrature_encoder = false;
   rty_ConfigurationParameters->motor.externals.has_speed_quadrature_encoder =
     false;
-  rty_ConfigurationParameters->motor.externals.has_torque_sens = false;
+  rty_ConfigurationParameters->motor.externals.has_temperature_sens = false;
   rty_ConfigurationParameters->motor.externals.encoder_tolerance = 0U;
   rty_ConfigurationParameters->motor.externals.pole_pairs = 0U;
   rty_ConfigurationParameters->motor.externals.rotor_encoder_resolution = 0;
