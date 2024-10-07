@@ -1238,6 +1238,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller.cpp</FilePath>
             </File>
+            <File>
+              <FileName>motion_controller_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller_data.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2475,6 +2480,11 @@
               <FileName>motion_controller.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motion_controller_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller_data.cpp</FilePath>
             </File>
           </Files>
         </Group>

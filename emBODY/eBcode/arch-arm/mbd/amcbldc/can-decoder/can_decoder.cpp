@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 7.1
+// Model version                  : 7.4
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Oct  2 10:42:42 2024
+// C/C++ source code generated on : Mon Oct  7 15:55:50 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -540,7 +540,7 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
 {
   int32_T ForEach_itr;
   int32_T input;
-  uint16_T rtu_pck_rx_raw_packets;
+  int32_T input_tmp;
   uint8_T minval;
   uint8_T x_idx_1;
 
@@ -554,8 +554,8 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
 
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.available =
       rtu_pck_rx_raw->packets[ForEach_itr].available;
-    rtu_pck_rx_raw_packets = rtu_pck_rx_raw->packets[ForEach_itr].packet.ID;
-    input = (rtu_pck_rx_raw_packets & 1792) >> 8;
+    input_tmp = rtu_pck_rx_raw->packets[ForEach_itr].packet.ID;
+    input = (input_tmp & 1792) >> 8;
 
     // Initialize output value to default value for CANClassTypes (Motor_Control_Command) 
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.CLS =
@@ -567,9 +567,9 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
     }
 
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.SRC =
-      static_cast<uint8_T>((rtu_pck_rx_raw_packets & 240) >> 4);
+      static_cast<uint8_T>((input_tmp & 240) >> 4);
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.DST_TYP =
-      static_cast<uint8_T>(rtu_pck_rx_raw_packets & 15);
+      static_cast<uint8_T>(input_tmp & 15);
     x_idx_1 = rtu_pck_rx_raw->packets[ForEach_itr].length;
     minval = 8U;
     if (x_idx_1 < 8) {
@@ -581,14 +581,14 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
       localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.LEN = minval;
     }
 
-    x_idx_1 = rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[0];
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.CMD.M =
-      ((x_idx_1 & 128U) != 0U);
+      ((rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[0] & 128U) != 0U);
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.CMD.OPC =
-      static_cast<uint8_T>(x_idx_1 & 127);
-    for (input = 0; input < 8; input++) {
-      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.ARG[input] =
-        rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[input];
+      static_cast<uint8_T>(rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[0]
+      & 127);
+    for (input_tmp = 0; input_tmp < 8; input_tmp++) {
+      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.ARG[input_tmp]
+        = rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[input_tmp];
     }
 
     // End of MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
@@ -608,7 +608,9 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
 
     // ForEachSliceAssignment generated from: '<S1>/message_rx' incorporates:
     //   BusCreator: '<S2>/Bus Creator'
+    //   Constant: '<S2>/Constant3'
 
+    rty_messages_rx[ForEach_itr].motor_id = 1U;
     rty_messages_rx[ForEach_itr].event_type = localB->CoreSubsys[ForEach_itr].
       sf_DecodingLogic.event_type;
     rty_messages_rx[ForEach_itr].targets_content = localB->

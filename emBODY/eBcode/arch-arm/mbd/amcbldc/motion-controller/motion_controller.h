@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 3.10
+// Model version                  : 3.12
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Oct  2 10:43:46 2024
+// C/C++ source code generated on : Mon Oct  7 15:56:40 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -78,11 +78,10 @@ extern void motion_controllerTID1(const SensorsData *rtu_SensorData, FOCOutputs 
   rty_FOCOutputs, B_motion_controller_c_T *localB, DW_motion_controller_f_T
   *localDW);
 extern void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const
-  GlobalConfiguration *rtu_globalConfig, const ReceivedEvents
-  rtu_Events[MAX_EVENTS_PER_TICK], const ActuatorConfiguration *rtu_InitConf,
-  EstimatedData *rty_EstimatedData, Flags *rty_Flags, ActuatorConfiguration
-  *rty_ActuatorsConfiguration, B_motion_controller_c_T *localB,
-  DW_motion_controller_f_T *localDW);
+  ReceivedEvents rtu_Events[MAX_EVENTS_PER_TICK], const ActuatorConfiguration
+  *rtu_InitConf, EstimatedData *rty_EstimatedData, Flags *rty_Flags,
+  ActuatorConfiguration *rty_ActuatorsConfiguration, B_motion_controller_c_T
+  *localB, DW_motion_controller_f_T *localDW);
 extern void motion_controller_Term(DW_motion_controller_f_T *localDW);
 
 //-
@@ -101,8 +100,9 @@ extern void motion_controller_Term(DW_motion_controller_f_T *localDW);
 //
 //  '<Root>' : 'motion_controller'
 //  '<S1>'   : 'motion_controller/Estimation'
-//  '<S2>'   : 'motion_controller/Estimation/Thermal model'
-//  '<S3>'   : 'motion_controller/Estimation/Thermal model/Thermal model OFF'
+//  '<S2>'   : 'motion_controller/Global configuration'
+//  '<S3>'   : 'motion_controller/Estimation/Thermal model'
+//  '<S4>'   : 'motion_controller/Estimation/Thermal model/Thermal model OFF'
 
 #endif                                 // motion_controller_h_
 

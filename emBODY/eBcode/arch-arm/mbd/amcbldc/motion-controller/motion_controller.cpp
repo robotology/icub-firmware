@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 3.10
+// Model version                  : 3.12
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Oct  2 10:43:46 2024
+// C/C++ source code generated on : Mon Oct  7 15:56:40 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,7 @@
 #include "motion_controller_types.h"
 #include "rtw_mutex.h"
 #include "rtwtypes.h"
+#include "motion_controller_private.h"
 #include "rtw_defines.h"
 #include "control_foc.h"
 #include "estimation_velocity.h"
@@ -167,8 +168,7 @@ void motion_controllerTID1(const SensorsData *rtu_SensorData, FOCOutputs
 }
 
 // Output and update for referenced model: 'motion_controller'
-void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const
-                 GlobalConfiguration *rtu_globalConfig, const ReceivedEvents
+void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
                  rtu_Events[MAX_EVENTS_PER_TICK], const ActuatorConfiguration
                  *rtu_InitConf, EstimatedData *rty_EstimatedData, Flags
                  *rty_Flags, ActuatorConfiguration *rty_ActuatorsConfiguration,
@@ -202,8 +202,11 @@ void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const
 
   // End of RateTransition: '<Root>/Transition to 1ms'
 
-  // ModelReference: '<S1>/Velocity Estimator'
-  estimation_velocity(&rtu_globalConfig->estimation.velocity_est_mode,
+  // ModelReference: '<S1>/Velocity Estimator' incorporates:
+  //   BusCreator: '<S2>/Bus Creator5'
+  //   Constant: '<S2>/Velocity Estimation Mode'
+
+  estimation_velocity(&motion_controller_ConstP.VelocityEstimationMode_Value,
                       &localB->Transitionto1ms.position,
                       &rty_EstimatedData->velocity,
                       &(localDW->VelocityEstimator_InstanceData.rtdw));
@@ -256,6 +259,7 @@ void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const
 
   // RateTransition: '<Root>/Rate Transition' incorporates:
   //   BusCreator: '<Root>/Bus Creator'
+  //   BusCreator: '<S2>/Bus Creator9'
 
   rtw_mutex_lock();
   wrBufIdx = static_cast<int8_T>(localDW->RateTransition_LstBufWR + 1);
@@ -271,7 +275,13 @@ void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const
   }
 
   rtw_mutex_unlock();
-  localDW->RateTransition_Buf[wrBufIdx].global_configuration = *rtu_globalConfig;
+  localDW->RateTransition_Buf[wrBufIdx].
+    global_configuration.estimation.environment_temperature = 0.995F;
+  localDW->RateTransition_Buf[wrBufIdx].
+    global_configuration.estimation.current_rms_lambda = 25.0F;
+  localDW->RateTransition_Buf[wrBufIdx].
+    global_configuration.estimation.velocity_est_mode =
+    EstimationVelocityModes_MovingAverage;
   localDW->RateTransition_Buf[wrBufIdx].actuator_configuration =
     rtb_BusCreator_actuator_configuration;
   localDW->RateTransition_Buf[wrBufIdx].estimated_data = *rty_EstimatedData;

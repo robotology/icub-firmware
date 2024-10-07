@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 2.0
+// Model version                  : 2.2
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Oct  2 10:43:53 2024
+// C/C++ source code generated on : Mon Oct  7 15:56:44 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,18 +22,6 @@
 
 // Includes for objects with custom storage classes
 #include "rtw_defines.h"
-
-//
-//  Registered constraints for dimension variants
-
-#if MAX_EVENTS_PER_TICK <= 0
-# error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be greater than '0'"
-#endif
-
-#if MAX_EVENTS_PER_TICK >= 16
-# error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be less than '16'"
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
 #define DEFINED_TYPEDEF_FOR_DriverSensors_
 
@@ -185,45 +173,13 @@ struct MotorConfigurationExternal
 
 struct ReceivedEvents
 {
+  uint8_T motor_id;
   EventTypes event_type;
   Targets targets_content;
   PID pid_content;
   ControlModes control_mode_content;
   SupervisorInputLimits limits_content;
   MotorConfigurationExternal motor_config_content;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-
-struct EstimationConfiguration
-{
-  real32_T environment_temperature;
-  real32_T current_rms_lambda;
-  EstimationVelocityModes velocity_est_mode;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
-#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
-
-struct GlobalConfiguration
-{
-  EstimationConfiguration estimation;
 };
 
 #endif
@@ -371,6 +327,17 @@ struct Flags
   // control mode
   ControlModes control_mode;
 };
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
 
 #endif
 

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 2.0
+// Model version                  : 2.2
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Oct  2 10:43:53 2024
+// C/C++ source code generated on : Mon Oct  7 15:56:44 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,7 +27,6 @@
 // Block signals for model 'motion_controller_single'
 struct B_motion_controller_single_c_T {
   ActuatorConfiguration Constant;      // '<Root>/Constant'
-  GlobalConfiguration BusCreator;      // '<Root>/Bus Creator'
 };
 
 // Block states (default storage) for model 'motion_controller_single'

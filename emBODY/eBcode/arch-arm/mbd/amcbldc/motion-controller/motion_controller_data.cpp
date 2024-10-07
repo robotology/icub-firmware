@@ -3,7 +3,7 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: motion_controller_private.h
+// File: motion_controller_data.cpp
 //
 // Code generated for Simulink model 'motion_controller'.
 //
@@ -16,24 +16,15 @@
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef motion_controller_private_h_
-#define motion_controller_private_h_
-#include "rtwtypes.h"
-#include "zero_crossing_types.h"
-#include "motion_controller_types.h"
+#include "motion_controller_private.h"
 
 // Constant parameters (default storage)
-struct ConstP_motion_controller_T {
+const ConstP_motion_controller_T motion_controller_ConstP = {
   // Expression: EstimationVelocityModes.MovingAverage
   //  Referenced by: '<S2>/Velocity Estimation Mode'
 
-  EstimationVelocityModes VelocityEstimationMode_Value;
+  EstimationVelocityModes_MovingAverage
 };
-
-// Constant parameters (default storage)
-extern const ConstP_motion_controller_T motion_controller_ConstP;
-
-#endif                                 // motion_controller_private_h_
 
 //
 // File trailer for generated code.

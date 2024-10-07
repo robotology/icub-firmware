@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 7.1
+// Model version                  : 7.4
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Oct  2 10:42:42 2024
+// C/C++ source code generated on : Mon Oct  7 15:55:50 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -34,20 +34,12 @@
 //
 //  Registered constraints for dimension variants
 
-#if MAX_EVENTS_PER_TICK <= 0
-# error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be greater than '0'"
-#endif
-
 #if CAN_MAX_NUM_PACKETS <= 0
 # error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be greater than '0'"
 #endif
 
 #if (CAN_MAX_NUM_PACKETS+1) <= MAX_EVENTS_PER_TICK
 # error "The preprocessor definition '(CAN_MAX_NUM_PACKETS+1)' must be greater than 'MAX_EVENTS_PER_TICK'"
-#endif
-
-#if MAX_EVENTS_PER_TICK >= 16
-# error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be less than '16'"
 #endif
 
 #if CAN_MAX_NUM_PACKETS >= 16
@@ -358,6 +350,7 @@ struct SupervisorInputLimits
 
 struct ReceivedEvents
 {
+  uint8_T motor_id;
   EventTypes event_type;
   Targets targets_content;
   PID pid_content;

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 2.0
+// Model version                  : 2.2
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Oct  2 10:43:53 2024
+// C/C++ source code generated on : Mon Oct  7 15:56:44 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -63,23 +63,12 @@ void mc_1ms_tick(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
                  *rty_ConfigurationParameters, B_motion_controller_single_c_T
                  *localB, DW_motion_controller_single_f_T *localDW)
 {
-  // BusCreator: '<Root>/Bus Creator1' incorporates:
-  //   Constant: '<Root>/current_rms_lambda'
-  //   Constant: '<Root>/environment_temperature'
-  //   Constant: '<Root>/velocity_est_mode'
-
-  localB->BusCreator.estimation.environment_temperature = 25.0F;
-  localB->BusCreator.estimation.current_rms_lambda = 0.99995F;
-  localB->BusCreator.estimation.velocity_est_mode =
-    EstimationVelocityModes_MovingAverage;
-
   // Constant: '<Root>/Constant'
   localB->Constant = AmcbldcInitConf;
 
   // ModelReference: '<Root>/Motion Controller'
-  mc_step_1ms(rtu_ExternalFlags, &localB->BusCreator, &rtu_messages_rx[0],
-              &localB->Constant, rty_Estimates, rty_Flags,
-              rty_ConfigurationParameters,
+  mc_step_1ms(rtu_ExternalFlags, &rtu_messages_rx[0], &localB->Constant,
+              rty_Estimates, rty_Flags, rty_ConfigurationParameters,
               &(localDW->MotionController_InstanceData.rtb),
               &(localDW->MotionController_InstanceData.rtdw));
 }

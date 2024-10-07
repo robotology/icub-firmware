@@ -9,7 +9,7 @@
 //
 // Model version                  : 2.7
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Wed Oct  2 10:43:35 2024
+// C/C++ source code generated on : Mon Oct  7 15:56:35 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,18 +22,6 @@
 
 // Includes for objects with custom storage classes
 #include "rtw_defines.h"
-
-//
-//  Registered constraints for dimension variants
-
-#if MAX_EVENTS_PER_TICK <= 0
-# error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be greater than '0'"
-#endif
-
-#if MAX_EVENTS_PER_TICK >= 16
-# error "The preprocessor definition 'MAX_EVENTS_PER_TICK' must be less than '16'"
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_ExternalFlags_
 #define DEFINED_TYPEDEF_FOR_ExternalFlags_
 
@@ -228,6 +216,7 @@ struct MotorConfigurationExternal
 
 struct ReceivedEvents
 {
+  uint8_T motor_id;
   EventTypes event_type;
   Targets targets_content;
   PID pid_content;

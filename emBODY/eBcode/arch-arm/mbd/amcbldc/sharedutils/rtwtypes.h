@@ -9,7 +9,7 @@
 //
 // Model version                  : 8.0
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Sep 23 13:17:34 2024
+// C/C++ source code generated on : Mon Oct  7 15:55:31 2024
 //
 #ifndef RTWTYPES_H
 #define RTWTYPES_H
