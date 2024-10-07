@@ -40,7 +40,7 @@ namespace embot::app::board::amc2c::info {
         {embot::app::msg::BUS::icc1, address},
         {3, 2, 0, 0},   // application version
         {2, 0},         // protocol version
-        {2024, embot::app::eth::Month::Apr, embot::app::eth::Day::eleven, 11, 15}
+        {2024, embot::app::eth::Month::Oct, embot::app::eth::Day::seven, 16, 38}
     };
     
     constexpr embot::app::msg::Location icclocation {signature.location};
@@ -56,9 +56,9 @@ namespace embot::app::board::amc2c::info {
     {
         embot::app::boards::Board::amcbldc,
         {embot::app::msg::BUS::can2, address},
-        {2, 1, 10, 0},  // application version
+        {2, 1, 0, 0},  // application version
         {2, 0},         // protocol version
-        {2024, embot::app::eth::Month::Mar, embot::app::eth::Day::one, 17, 17}
+        {2024, embot::app::eth::Month::Oct, embot::app::eth::Day::seven, 16, 38}
     };
     
     constexpr embot::app::msg::Location canlocation {signature.location};
