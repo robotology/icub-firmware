@@ -62,7 +62,9 @@ extern volatile int Icfbk;
 extern volatile int ElDegfbk;
 extern volatile int iQprot;
 extern volatile int maxCountfbk;
-extern volatile int Vqfbk;
+
+extern volatile int VqFbk;
+extern volatile int IqFbk;
 
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
@@ -141,7 +143,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
             payload.w[0]  = gQERawPosition;
             payload.b[2] = bitmask;
 
-        msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
             ECANSend(msgid, 3, &payload);
             
@@ -183,7 +185,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
             payload.b[0] = gControlMode;
             payload.b[1] = gEncoderError.bitmask;
 
-            payload.w[1] = (VqRef>>(IKs-VOLT_REF_SHIFT));
+            payload.w[1] = VqFbk;
 
             payload.b[4] = SysError.b[0];
             payload.b[5] = SysError.b[1];
