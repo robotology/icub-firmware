@@ -3,37 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/traps.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/iCubCanProto_classes.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/System.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/can_icubProto.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/can_icubProto_trasmitter.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/UserTypes.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/ADC.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/System.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/PWM.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/ecan.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/2FOC.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/iCubCanProto_bootloaderMessages.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/i2cTsens.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/Faults.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/DHES.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/ecan.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/PWM.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/iCubCanProto_motorControlMessages.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/i2cTsens.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/Faults.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/DCLink.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/can_icubProto_parser.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/2FOC.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/ADC.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/iCubCanProtocol.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/iCubCanProto_types.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/UserParms.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/can_icubProto_parser.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/iCubCanProto_analogSensorMessages.h</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/qep.c</file>
-            <file>file:/C:/Users/jlosi/Workspace/ICUB-FIRM/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/include/qep.h</file>
+            <file>file:/C:/Users/ascalzo/Documents/Work/Repos/2FOC-FILTERED/icub-firmware/emBODY/eBcode/arch-dspic/board/2foc/appl/2FOC-V3/src/2FOC.c</file>
         </group>
     </open-files>
 </project-private>
