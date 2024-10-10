@@ -71,7 +71,6 @@
 
 #include "EOtheMotionController_hid.h"
 
-
 #if defined(EOTHESERVICES_disable_theMotionController)
 
     // provide empty implementation, so that we dont need to change the caller of the API
@@ -1620,8 +1619,9 @@ extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
  */
 static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionController *p)
 {
-
     eOresult_t res = eores_OK;
+    
+    eOmc_joint_status_t *jstatus = NULL;
     
     // wait for the encoders for some time
     for (uint8_t i=0; i<30; ++i)
@@ -1662,6 +1662,17 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
             res = eores_NOK_generic;
         }
         
+        embot::app::eth::encoder::experimental::RawValuesOfJomo rawValsArray = {};
+            
+        embot::app::eth::theEncoderReader::getInstance().GetRaw(i, rawValsArray);
+
+        if(NULL != (jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), i)))
+        {
+            jstatus->addinfo.multienc[0] = rawValsArray.rawvalues[0].val;
+            jstatus->addinfo.multienc[1] = rawValsArray.rawvalues[1].val;
+            jstatus->addinfo.multienc[2] = rawValsArray.rawvalues[0].diagnInfo;
+            
+        }
     } 
     
     embot::app::eth::theEncoderReader::getInstance().Diagnostics_Tick();

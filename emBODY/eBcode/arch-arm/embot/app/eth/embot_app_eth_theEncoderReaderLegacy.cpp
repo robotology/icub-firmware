@@ -44,8 +44,9 @@ struct embot::app::eth::theEncoderReader::Impl
     bool Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler);
     
     // advanced
-    bool read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value);
-
+    bool GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray);
+    bool GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue);
+    
 };
 
 
@@ -113,12 +114,16 @@ bool embot::app::eth::theEncoderReader::Impl::Scale(const embot::app::eth::encod
     return eores_OK == eo_encoderreader_Scale(eo_encoderreader_GetHandle(), target.jomo, static_cast<eOencoderreader_Position_t>(embot::core::tointegral(target.pos)), &sca);
 }
 
-bool embot::app::eth::theEncoderReader::Impl::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
+bool embot::app::eth::theEncoderReader::Impl::GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray)
 {
-    value.raw = 0x123456789A;
-    value.error = embot::app::eth::encoder::experimental::Error::NONE;
+    eOencoderreader_RawValuesOfJomo_t *rvja = reinterpret_cast<eOencoderreader_RawValuesOfJomo_t*>(&rawValuesArray);
     
-    return true;
+    return eores_OK == eo_encoderreader_GetRaw(eo_encoderreader_GetHandle(), jomo, rvja);
+}
+
+bool embot::app::eth::theEncoderReader::Impl::GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue)
+{
+    return eores_OK;
 }
 
 
@@ -195,12 +200,15 @@ bool embot::app::eth::theEncoderReader::Scale(const embot::app::eth::encoder::v1
     return pImpl->Scale(target, scaler);
 }
 
-bool embot::app::eth::theEncoderReader::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
+bool embot::app::eth::theEncoderReader::GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray)
 {
-    return pImpl->read(target, value);
+    return pImpl->GetRaw(jomo, rawValuesArray);
 }
 
-
+bool embot::app::eth::theEncoderReader::GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue)
+{
+    return pImpl->GetRawSingle(jomo, pos, rawValue);
+}
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
 

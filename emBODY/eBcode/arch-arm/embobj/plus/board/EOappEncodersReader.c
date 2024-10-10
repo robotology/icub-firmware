@@ -220,6 +220,11 @@ static EOappEncReader s_eo_theappencreader =
         EO_INIT(.encoder_error_close_to_limit_counter ) {0, 0, 0, 0},
         EO_INIT(.encoder_error_hal_counter            ) {0, 0, 0, 0},
         EO_INIT(.encoder_error_total_timer_counter    ) {0, 0, 0, 0}
+    },
+    EO_INIT(.genericEncoderRawData) 
+    {
+        EO_INIT(.val)               { 0, 0, 0 },
+        EO_INIT(.diagnInfo)         { 0, 0, 0 }
     }
 };
 
@@ -609,24 +614,28 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
         hal_spiencoder_diagnostic_t diagn = {0};
         diagn.type = hal_spiencoder_diagnostic_type_none;
         
+        //hal_spiencoder_position_t spiRawValue = 0;
+        uint32_t rawValue = 0;
+        uint32_t rawdiagn = 0;
+        
         switch(prop.descriptor->type)
         {
             // they are eomc_enc_aea3, eomc_enc_aea, eomc_enc_amo, eomc_enc_spichainof2, eomc_enc_spichainof3, eomc_enc_qenc, eomc_enc_absanalog, eomc_enc_mais
             
             case eomc_enc_aea:
             {
-                hal_spiencoder_position_t spiRawValue = 0; 
+                
                 // hal_spiencoder_errors_flags flags = {0};
 
 #if defined(FAKE_AEA)                
-                spiRawValue = 0;
-                uint32_t ticks = (spiRawValue >> 6) & 0x0FFF;
+                rawValue = 0;
+                uint32_t ticks = (rawValue >> 6) & 0x0FFF;
                 prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos); 
 #else        
                 // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
-                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))                
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, (hal_spiencoder_position_t*)&rawValue, &diagn))                
                 {   // ok, the hal reads correctly
-                    if(eobool_true == s_eo_appEncReader_IsValidValue_AEA(&spiRawValue, &prop.valueinfo->errortype))
+                    if(eobool_true == s_eo_appEncReader_IsValidValue_AEA(&rawValue, &prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
 
                         // marco.accame: hal_spiencoder_get_value2() gives back a value in uint32_t with only 18 bits of information (internally masked with 0x03FFFF).
@@ -635,12 +644,12 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                         // the resolution is now 4096 ticks per revolution.
                         
                         // GOOD VALUE:
-                        uint32_t ticks = (spiRawValue >> 6) & 0x0FFF;
+                        uint32_t ticks = (rawValue >> 6) & 0x0FFF;
                         prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos);                           
                     }
                     else
                     {   // we have a valid raw value from hal but ... it is not valid after a check                        
-                        errorparam = (spiRawValue >> 6) & 0x0FFF;                                           
+                        errorparam = (rawValue >> 6) & 0x0FFF;                                           
                     }                    
                 }
                 else
@@ -654,24 +663,23 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
 
             case eomc_enc_aea3:
             {
-                hal_spiencoder_position_t spiRawValue = 0; 
   
-                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, (hal_spiencoder_position_t*)&rawValue, &diagn))
                 {   
                     // ok, the hal reads correctly
                     
                     // check validy for aea3
-                    if(eobool_true == s_eo_appEncReader_IsValidValue_AEA3(&spiRawValue, &prop.valueinfo->errortype))
+                    if(eobool_true == s_eo_appEncReader_IsValidValue_AEA3(&rawValue, &prop.valueinfo->errortype))
                     {   // the spi raw reading from hal is valid. i just need to rescale it.
                         // the resolution is 16384 ticks per revolution.
                         
                         // GOOD VALUE:
-                        uint32_t ticks = (spiRawValue >> 1) & 0x3FFF;
+                        uint32_t ticks = (rawValue >> 1) & 0x3FFF;
                         prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(ticks, jomo, (eOmc_position_t)prop.descriptor->pos);
                     }
                     else
                     {   // we have a valid raw value from hal but ... it is not valid after a check
-                        errorparam = (spiRawValue >> 1) & 0x3FFF;
+                        errorparam = (rawValue >> 1) & 0x3FFF;
                     }                    
                 }
                 else
@@ -688,15 +696,13 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 sev->on();
                 #endif
                 
-                hal_spiencoder_position_t position = 0;
-                
-                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &position, &diagn))
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, (hal_spiencoder_position_t*)&rawValue, &diagn))
                 {
                     // check validity for aksim2
                     if(eobool_true == s_eo_appEncReader_IsValidValue_AKSIM2(jomo, &diagn, &prop.valueinfo->errortype))
                     {
                         // rescale the position value of the position to icubdegrees
-                        prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(position, jomo, (eOmc_position_t)prop.descriptor->pos);
+                        prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(rawValue, jomo, (eOmc_position_t)prop.descriptor->pos);
                     }
                     else
                     {
@@ -708,6 +714,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 {   // we dont even have a valid reading from hal or the encoder is not properly connected to the board
                     ++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_hal_counter[jomo];
                 
+                    //diagn.info.value = hal_spiencoder_diagnostic_type_aksim2_not_connected;
                     prop.valueinfo->errortype = encreader_err_AKSIM2_GENERIC ;
                     errorparam = 0;
                 }
@@ -760,20 +767,22 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 #if defined(DEBUG_encoder_AKSIM)
                 sev->off();
                 #endif
+                
+                rawdiagn = ((uint32_t)diagn.type << 16) | (diagn.info.aksim2_status_crc & 0xFF);
+                //rawdiagn = 32;
             } break;
             
             
             case eomc_enc_amo:
             {
-                hal_spiencoder_position_t spiRawValue = 0; 
                 // hal_spiencoder_errors_flags flags = {0};
 #if defined(FAKE_AMO)  
                 static int32_t cnt = 0;                 
-                spiRawValue = cnt++;
-                prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(spiRawValue, jomo, (eOmc_position_t)prop.descriptor->pos); 
+                rawValue = cnt++;
+                prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(rawValue, jomo, (eOmc_position_t)prop.descriptor->pos); 
 #else                  
                 // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
-                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, (hal_spiencoder_position_t*)&rawValue, &diagn))
                 {   // the spi raw reading is ok. i just need to rescale it.                   
                     //spiRawValue = (spiRawValue>>4) & 0xFFFF; marco.accame on 07jun17: why is there this comment? shall we remove it?
                     
@@ -785,14 +794,14 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     
                     if (sectors == 32)
                     {
-                        spiRawValue = (spiRawValue >> 1) & 0x3FFF;
+                        rawValue = (rawValue >> 1) & 0x3FFF;
                     }
                     else if (sectors == 64)
                     {
-                        spiRawValue = spiRawValue & 0x3FFF;
+                        rawValue = rawValue & 0x3FFF;
                     }
                     
-                    prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(spiRawValue, jomo, (eOmc_position_t)prop.descriptor->pos);
+                    prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(rawValue, jomo, (eOmc_position_t)prop.descriptor->pos);
                 }
                 else
                 {   // we dont even have a valid reading from hal .....                    
@@ -805,33 +814,33 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 
                 // and now ... use diagn
                 // for legacy diagnostics
+                rawdiagn = ((uint32_t)diagn.type << 16) | (diagn.info.value & 0xFF);
                 
                 // and calls the following for amodiag                
-                s_eo_appEncReader_amodiag_Update(jomo, spiRawValue, &prop, &diagn);
+                s_eo_appEncReader_amodiag_Update(jomo, rawValue, &prop, &diagn);
                
             } break;
 
 
             case eomc_enc_spichainof2:
             {
-                hal_spiencoder_position_t spiRawValue = 0; 
                 // hal_spiencoder_errors_flags flags = {0};
                 
                 // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
-                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &diagn))    
+                if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, (hal_spiencoder_position_t*)&rawValue, &diagn))    
                 {   // ok, the hal reads correctly
-                    if(eobool_true == s_eo_appEncReader_IsValidValue_SPICHAIN2(&spiRawValue, &prop.valueinfo->errortype))
+                    if(eobool_true == s_eo_appEncReader_IsValidValue_SPICHAIN2(&rawValue, &prop.valueinfo->errortype))
                     {   // the hal value is valid. i just need to rescale it.
                         
                         // GOOD VALUE
                         // marco.accame on 07jun17: why is it not rescaled to icub-degrees?
-                        prop.valueinfo->value[0] = (spiRawValue <<  2) & 0xfff0; // it is the first encoder in the chain
-                        prop.valueinfo->value[1] = (spiRawValue >> 14) & 0xfff0; // it is the second encoder in the chain                        
+                        prop.valueinfo->value[0] = (rawValue <<  2) & 0xfff0; // it is the first encoder in the chain
+                        prop.valueinfo->value[1] = (rawValue >> 14) & 0xfff0; // it is the second encoder in the chain                        
                     }
                     else
                     {   // we have a valid value from hal but ... it is not valid after a check                    
                         prop.valueinfo->errortype = prop.valueinfo->errortype;  
-                        errorparam = spiRawValue & 0xffff;
+                        errorparam = rawValue & 0xffff;
                     }                    
                 }
                 else
@@ -877,17 +886,17 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
 
             case eomc_enc_qenc:
             {
-                uint32_t val = hal_quadencoder_get_counter((hal_quadencoder_t)prop.descriptor->port);
+                rawValue = hal_quadencoder_get_counter((hal_quadencoder_t)prop.descriptor->port);
                 
-                if(hal_NA32 != val)
+                if(hal_NA32 != rawValue)
                 {   // the hal reading is ok. i just need to rescale it. 
                     // GOOD VALUE
-                    prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(val, jomo, (eOmc_position_t)prop.descriptor->pos);
+                    prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(rawValue, jomo, (eOmc_position_t)prop.descriptor->pos);
                 } 
                 else
                 {   // the hal has detected a problem
                     prop.valueinfo->errortype = encreader_err_QENC_GENERIC;
-                    errorparam = val & 0xffff;
+                    errorparam = rawValue & 0xffff;
                 }   
                 
             } break;    
@@ -895,17 +904,17 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             
             case eomc_enc_absanalog:
             {
-                uint32_t val = hal_adc_get_hall_sensor_analog_input_mV((uint8_t)prop.descriptor->port);      
+                rawValue = hal_adc_get_hall_sensor_analog_input_mV((uint8_t)prop.descriptor->port);      
                 
-                if(hal_NA32 != val)
+                if(hal_NA32 != rawValue)
                 {   // the hal reading is ok. it is the voltage from the motor port (0 - 3300mV). i just need to rescale it
                     // GOOD VALUE
-                    prop.valueinfo->value[0] = s_eo_appEncReader_hallAdc_rescale2icubdegrees(p, val, jomo);                        
+                    prop.valueinfo->value[0] = s_eo_appEncReader_hallAdc_rescale2icubdegrees(p, rawValue, jomo);                        
                 }  
                 else 
                 {   // the hal has detected a problem
                      prop.valueinfo->errortype = encreader_err_ABSANALOG_GENERIC;  
-                     errorparam = val & 0xffff;                    
+                     errorparam = rawValue & 0xffff;                    
                 }              
                
             } break;  
@@ -914,18 +923,18 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             case eomc_enc_mais:
             {
 
-                uint32_t val = s_eo_read_mais_for_port(p, prop.descriptor->port); 
+                rawValue = s_eo_read_mais_for_port(p, prop.descriptor->port); 
   
                 //#warning marco.accame on 07jun17: when it fails s_eo_read_mais_for_port() return either hal_NA32 or 0. what is to be evaluated?
-                if(hal_NA32 != val)
+                if(hal_NA32 != rawValue)
                 {   // the hal reading is ok. it may be also 0. i just need to rescale it
                     // GOOD VALUE
-                    prop.valueinfo->value[0] = s_eo_appEncReader_mais_rescale2icubdegrees(p, val, jomo);                 
+                    prop.valueinfo->value[0] = s_eo_appEncReader_mais_rescale2icubdegrees(p, rawValue, jomo);                 
                 }                     
                 else
                 {   // the port is not correct for a mais.
                     prop.valueinfo->errortype = encreader_err_MAIS_GENERIC;
-                    errorparam = val & 0xffff;                    
+                    errorparam = rawValue & 0xffff;                    
                 }                           
                
             } break;   
@@ -959,8 +968,12 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 errorparam = 0;                
             } break;             
               
-            
         }
+
+        // here we are filling the struct that contains all the raw data (value and diagnostic) with what received from the sensor
+        p->genericEncoderRawData[jomo].rawvalues[i].val = (int32_t)rawValue;
+        p->genericEncoderRawData[jomo].rawvalues[i].diagnInfo = (int32_t)rawdiagn;
+        
         
         // now we see if there is any diagnostics to send up. we eval the errortype
         // we have only one diagnostics for the 4 joints.
@@ -1051,7 +1064,19 @@ extern eObool_t eo_appEncReader_isReady(EOappEncReader *p)
 	return(ready);
 }
 
-
+extern eOresult_t eo_appEncReader_GetRawValue(EOappEncReader *p, uint8_t jomo, eOencoderreader_RawValuesOfJomo_t *rawValuesArray)
+{
+    static int debug_counter = 0;
+    if((NULL == p) || (NULL == rawValuesArray))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    memcpy(rawValuesArray, &(p->genericEncoderRawData[jomo]), sizeof(eOencoderreader_RawValuesOfJomo_t));
+    
+    // now the return value. we return always OK
+    return eores_OK;
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

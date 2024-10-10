@@ -106,6 +106,27 @@ typedef enum
     eo_encreader_pos_any = 14,
     eo_encreader_pos_none = 15   
 } eOencoderreader_Position_t;    
+
+
+// The following enum and structs are the correspondent to the the ones in 
+// embot::app::eth::encoder::experimental in embot_app_eth_Encoder.h
+
+// enum for the maximum number of jomo components
+enum { eOencoderreader_maxnumberofencoderperjomo = 3 };
+
+// raw data for single component, raw value and diagnostic
+typedef struct
+{
+    int32_t val;
+    int32_t diagnInfo;
+} eOencoderreader_RawValueEncoder_t; 
+
+// struct for raw data and validity flag for entire jomo
+typedef struct
+{
+    eOencoderreader_RawValueEncoder_t rawvalues[eOencoderreader_maxnumberofencoderperjomo];
+    bool areValidReadings[eOencoderreader_maxnumberofencoderperjomo];
+} eOencoderreader_RawValuesOfJomo_t;
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -143,6 +164,8 @@ extern eOmc_encoder_t eo_encoderreader_GetType(EOtheEncoderReader* p, uint8_t jo
 
 extern eOresult_t eo_encoderreader_Scale(EOtheEncoderReader* p, uint8_t jomo, eOencoderreader_Position_t position, eOencoderreader_Scaler *scaler);
 
+// Correlated to IFreader
+extern eOresult_t eo_encoderreader_GetRaw(EOtheEncoderReader *p, uint8_t jomo, eOencoderreader_RawValuesOfJomo_t *rawValuesArray);
 
 /** @}            
     end of group eo_EOtheEncoderReader

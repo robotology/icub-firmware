@@ -139,6 +139,7 @@ struct EOappEncReader_hid
     eOappEncReader_hallAdc_conversionData_t hallAdcConversionData;
     eo_appEncReader_amodiag_t               amodiag;
     eOappEncReader_Aksim2_DiagnosticError_Counters_t aksim2DiagnerrorCounters;
+    eOencoderreader_RawValuesOfJomo_t       genericEncoderRawData[eOappEncReader_jomos_maxnumberof];
 }; 
 
 

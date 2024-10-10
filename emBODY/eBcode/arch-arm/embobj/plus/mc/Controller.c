@@ -1461,6 +1461,7 @@ void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
      Joint_get_state(j_ptr, j, joint_state);
 #endif
     
+    /**
     AbsEncoder* enc_ptr = smc->absEncoder + j*smc->multi_encs;
     
     for (int k=0; k<smc->multi_encs; ++k)
@@ -1468,7 +1469,7 @@ void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
         joint_state->addinfo.multienc[k] = AbsEncoder_position(enc_ptr++);
         //joint_state->addinfo.multienc[k] = count;
     }
-    
+    */
 
 }
 

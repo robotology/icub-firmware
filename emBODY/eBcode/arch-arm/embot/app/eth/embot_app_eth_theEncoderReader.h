@@ -56,10 +56,10 @@ namespace embot { namespace app { namespace eth {
         bool Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler) override;
     
         // experimental::IFreader
-        bool read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value) override;
-    
-        bool raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value);
-    
+        bool GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray) override;
+        bool GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue) override;
+        
+        
         void log();
         
     private:
