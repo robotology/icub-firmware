@@ -7,31 +7,27 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 6.19
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Mon Mar  4 13:07:25 2024
+// Model version                  : 7.3
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Oct  7 15:56:19 2024
 //
 #include "rtwtypes.h"
 #include "rt_hypotf.h"
 #include <cmath>
-#include "mw_cmsis.h"
 
 real32_T rt_hypotf(real32_T u0, real32_T u1)
 {
   real32_T a;
   real32_T b;
-  real32_T tmp;
   real32_T y;
   a = std::abs(u0);
   b = std::abs(u1);
   if (a < b) {
     a /= b;
-    mw_arm_sqrt_f32(a * a + 1.0F, &tmp);
-    y = tmp * b;
+    y = std::sqrt(a * a + 1.0F) * b;
   } else if (a > b) {
     b /= a;
-    mw_arm_sqrt_f32(b * b + 1.0F, &tmp);
-    y = tmp * a;
+    y = std::sqrt(b * b + 1.0F) * a;
   } else {
     y = a * 1.41421354F;
   }

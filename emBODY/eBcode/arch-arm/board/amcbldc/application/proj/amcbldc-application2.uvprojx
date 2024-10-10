@@ -10,13 +10,14 @@
       <TargetName>amcbldc-app-motorhal2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pArmCC>6190000::V6.19::.\ARMCLANG_6_19</pArmCC>
+      <pCCUsed>6190000::V6.19::.\ARMCLANG_6_19</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.5.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.1.6.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -340,7 +341,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DEMBOT_AMCBLDC_APP05</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_AMCBLDC STM32HAL_DRIVER_V122</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Include;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-raw2struct;..\..\..\..\mbd\amcbldc\supervisor-rx;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc;..\..\..\..\embot\app;..\..\..\..\embot\app\eth</IncludePath>
+              <IncludePath>..\..\bsp;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\embot\app;..\..\..\..\embot\i2h;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot;..\..\..\..\embot\app\dsp;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\libs\highlevel\abslayer\hal2\api;..\src\motorhal2;..\..\..\..\mbd\amcbldc\sharedutils;..\..\..\..\mbd\amcbldc\can-decoder;..\..\..\..\mbd\amcbldc\can-raw2struct;..\..\..\..\mbd\amcbldc\motion-controller-single;..\..\..\..\mbd\amcbldc\motion-controller;..\..\..\..\mbd\amcbldc\supervisor;..\..\..\..\mbd\amcbldc\supervisor-tx;..\..\..\..\mbd\amcbldc\can-encoder;..\..\..\..\mbd\amcbldc\control-outer;..\..\..\..\mbd\amcbldc\control-foc;..\..\..\..\mbd\amcbldc\estimator;..\..\..\..\mbd\amcbldc\amc-bldc;..\..\..\..\mbd\amcbldc\filter-current;..\..\..\..\embot\app\bldc;..\src\app-board-amcbldc;..\..\..\..\embot\app;..\..\..\..\embot\app\eth</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -902,85 +903,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others-cmsis-math</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
-          <Files>
-            <File>
-              <FileName>arm_cortexM4lf_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Lib\ARM\arm_cortexM4lf_math.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>others::motorhal</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1118,36 +1040,6 @@
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\const_params.cpp</FilePath>
             </File>
             <File>
-              <FileName>rt_hypotf_snf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf_snf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_nonfinite.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_nonfinite.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtGetInf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtGetInf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_roundf_snf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf_snf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_roundd_snf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundd_snf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtGetNaN.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtGetNaN.cpp</FilePath>
-            </File>
-            <File>
               <FileName>rtw_motor_config.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
@@ -1158,14 +1050,14 @@
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
-              <FileName>uMultiWord2Double.cpp</FileName>
+              <FileName>rt_hypotf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWord2Double.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf.cpp</FilePath>
             </File>
             <File>
-              <FileName>uMultiWordShl.cpp</FileName>
+              <FileName>rt_roundf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWordShl.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1190,17 +1082,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>mbd::supervisor-rx</GroupName>
+          <GroupName>mbd::supervisor</GroupName>
           <Files>
             <File>
-              <FileName>SupervisorFSM_RX.cpp</FileName>
+              <FileName>supervisor.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>SupervisorFSM_RX_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor\supervisor.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1306,11 +1193,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\control-foc\FOCInnerLoop.cpp</FilePath>
             </File>
-            <File>
-              <FileName>control_foc_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\control_foc_data.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1340,6 +1222,26 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::motion-controller</GroupName>
+          <Files>
+            <File>
+              <FileName>motion_controller_single.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller-single\motion_controller_single.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motion_controller.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motion_controller_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller_data.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1427,7 +1329,7 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.5.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.1.6.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2313,16 +2215,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>others-cmsis-math</GroupName>
-          <Files>
-            <File>
-              <FileName>arm_cortexM4lf_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\cmsis\dsp\v160\Lib\ARM\arm_cortexM4lf_math.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>others::motorhal</GroupName>
           <Files>
             <File>
@@ -2460,36 +2352,6 @@
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\const_params.cpp</FilePath>
             </File>
             <File>
-              <FileName>rt_hypotf_snf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf_snf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_nonfinite.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_nonfinite.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtGetInf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtGetInf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_roundf_snf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf_snf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rt_roundd_snf.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundd_snf.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>rtGetNaN.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtGetNaN.cpp</FilePath>
-            </File>
-            <File>
               <FileName>rtw_motor_config.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_motor_config.c</FilePath>
@@ -2500,14 +2362,14 @@
               <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rtw_enable_disable_motors.c</FilePath>
             </File>
             <File>
-              <FileName>uMultiWord2Double.cpp</FileName>
+              <FileName>rt_hypotf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWord2Double.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_hypotf.cpp</FilePath>
             </File>
             <File>
-              <FileName>uMultiWordShl.cpp</FileName>
+              <FileName>rt_roundf.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\uMultiWordShl.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\sharedutils\rt_roundf.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2532,17 +2394,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>mbd::supervisor-rx</GroupName>
+          <GroupName>mbd::supervisor</GroupName>
           <Files>
             <File>
-              <FileName>SupervisorFSM_RX.cpp</FileName>
+              <FileName>supervisor.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>SupervisorFSM_RX_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\supervisor-rx\SupervisorFSM_RX_data.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\supervisor\supervisor.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2579,11 +2436,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\control-foc\FOCInnerLoop.cpp</FilePath>
             </File>
-            <File>
-              <FileName>control_foc_data.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-foc\control_foc_data.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2613,6 +2465,26 @@
               <FileName>AMC_BLDC.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\mbd\amcbldc\amc-bldc\AMC_BLDC.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::motion-controller</GroupName>
+          <Files>
+            <File>
+              <FileName>motion_controller_single.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller-single\motion_controller_single.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motion_controller.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motion_controller_data.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\mbd\amcbldc\motion-controller\motion_controller_data.cpp</FilePath>
             </File>
           </Files>
         </Group>

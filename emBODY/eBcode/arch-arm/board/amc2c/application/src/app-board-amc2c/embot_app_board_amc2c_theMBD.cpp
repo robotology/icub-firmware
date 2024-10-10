@@ -492,7 +492,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
     }
     
     // read Vcc (in Volts)
-    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = _rounder.getRoundedValueOf(embot::hw::motor::getVIN());
+    AMC_BLDC_U.SensorsData_p.driversensors.Vcc = _rounder.getRoundedValueOf(embot::hw::motor::getVIN());
 
 // just a print debug    
 //    constexpr embot::core::Time freq { embot::core::time1second };
@@ -509,7 +509,7 @@ bool embot::app::board::amc2c::theMBD::Impl::tick(const std::vector<embot::app::
     // Model Step Function (1 ms)
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_step_Time_1ms();
+    AMC_BLDC_step_1ms();
     
 
     // -----------------------------------------------------------------------------
@@ -599,7 +599,7 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     electricalAngleOld = electricalAngle;
     
     // calculate the current joint position
-    uint8_t polepairs = (0 != AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs) ? AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs : 1;
+    uint8_t polepairs = (0 != AMC_BLDC_Y.ConfigurationParameters.motor.externals.pole_pairs) ? AMC_BLDC_Y.ConfigurationParameters.motor.externals.pole_pairs : 1;
     position = position + delta / polepairs;
     
     AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
@@ -617,11 +617,11 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
+    AMC_BLDC_U.SensorsData_p.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
     
     embot::hw::motor::PWMperc pwmperc 
     {
-        AMC_BLDC_Y.ControlOutputs_p.Vabc[0], AMC_BLDC_Y.ControlOutputs_p.Vabc[1], AMC_BLDC_Y.ControlOutputs_p.Vabc[2]
+        AMC_BLDC_Y.ControlOutputs.Vabc[0], AMC_BLDC_Y.ControlOutputs.Vabc[1], AMC_BLDC_Y.ControlOutputs.Vabc[2]
     };
     embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmperc);
 

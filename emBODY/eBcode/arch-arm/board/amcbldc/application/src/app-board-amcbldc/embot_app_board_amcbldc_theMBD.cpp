@@ -463,14 +463,14 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::app
     }
     
     // read the power supply voltage from ADC3
-    AMC_BLDC_U.SensorsData_p.supplyvoltagesensors.voltage = _rounder.getRoundedValueOf(embot::hw::motor::getVIN());
+    AMC_BLDC_U.SensorsData_p.driversensors.Vcc = _rounder.getRoundedValueOf(embot::hw::motor::getVIN());
 
     
     // -----------------------------------------------------------------------------
     // Model Step Function (1 ms)
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_step_Time_1ms();
+    AMC_BLDC_step_1ms();
     
 
     // -----------------------------------------------------------------------------
@@ -482,7 +482,7 @@ bool embot::app::board::amcbldc::theMBD::Impl::tick(const std::vector<embot::app
 
     if(thermal_model_counter % 10 == 0)
     {
-        AMC_BLDC_step_Time_10ms();
+        AMC_BLDC_step_10ms();
         thermal_model_counter = 0;
     }
     thermal_model_counter++;
@@ -547,7 +547,7 @@ void embot::app::board::amcbldc::theMBD::Impl::onCurrents_FOC_innerloop(void *ow
     electricalAngleOld = electricalAngle;
     
     // calculate the current joint position
-    position = position + delta / AMC_BLDC_Y.ConfigurationParameters_p.motorconfig.pole_pairs;
+    position = position + delta / AMC_BLDC_Y.ConfigurationParameters.motor.externals.pole_pairs;
     
     AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
     
@@ -564,13 +564,13 @@ void embot::app::board::amcbldc::theMBD::Impl::onCurrents_FOC_innerloop(void *ow
     
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_U.SensorsData_p.jointpositions.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
+    AMC_BLDC_U.SensorsData_p.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
 
     // Set the voltages 
     
     embot::hw::motor::PWMperc pwmperc 
     {
-        AMC_BLDC_Y.ControlOutputs_p.Vabc[0], AMC_BLDC_Y.ControlOutputs_p.Vabc[1], AMC_BLDC_Y.ControlOutputs_p.Vabc[2]
+        AMC_BLDC_Y.ControlOutputs.Vabc[0], AMC_BLDC_Y.ControlOutputs.Vabc[1], AMC_BLDC_Y.ControlOutputs.Vabc[2]
     };
     embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmperc);    
    
@@ -581,26 +581,18 @@ void embot::app::board::amcbldc::theMBD::Impl::onCurrents_FOC_innerloop(void *ow
     static uint32_t counter;
     if(counter % 10 == 0)
     {
-        sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f", \
-                                 Vabc0,  \
-                                 Vabc1,  \
-                                 Vabc2,  \
+        sprintf(msg2, "%u|%.2f %.2f %.2f|%.2f %.2f %.2f|%.2f %.2f %.3f %.2f", \
+                                 AMC_BLDC_Y.Flags_p.control_mode,
+                                 AMC_BLDC_Y.ControlOutputs.Vabc[0],  \
+                                 AMC_BLDC_Y.ControlOutputs.Vabc[1],  \
+                                 AMC_BLDC_Y.ControlOutputs.Vabc[2],  \
                                  AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
                                  AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
                                  AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2],       \
                                  AMC_BLDC_U.SensorsData_p.motorsensors.angle,         \
-                                 AMC_BLDC_Y.EstimatedData_p.jointvelocities.velocity, \
-                                 AMC_BLDC_B.Targets_n.motorcurrent.current,           \
-                                 AMC_BLDC_Y.ControlOutputs_p.Iq_fbk.current,          \
-                                 AMC_BLDC_Y.ControlOutputs_p.Vq);
-
-//        sprintf(msg2, "%d,%d,%d,%.3f,%.3f,%.3f", \
-//                                 Vabc0,  \
-//                                 Vabc1,  \
-//                                 Vabc2,  \
-//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0],       \
-//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[1],       \
-//                                 AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[2]);
+                                 AMC_BLDC_Y.EstimatedData_p.velocity, \
+                                 AMC_BLDC_Y.ControlOutputs.Iq_fbk,          \
+                                 AMC_BLDC_Y.ControlOutputs.Vq);
         embot::core::print(msg2);
         counter = 0;
     }
