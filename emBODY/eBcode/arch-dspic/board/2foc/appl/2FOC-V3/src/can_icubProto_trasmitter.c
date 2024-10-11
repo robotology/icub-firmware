@@ -71,7 +71,7 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     static tCanData payload; // = {{0}};
     unsigned long msgid;
 
-    payload.w[0]  = I2Tdata.IQMeasured;
+    payload.w[0]  = IqFbk;
     payload.w[1]  = gQEVelocity;
     payload.dw[1] = gQEPosition;
     

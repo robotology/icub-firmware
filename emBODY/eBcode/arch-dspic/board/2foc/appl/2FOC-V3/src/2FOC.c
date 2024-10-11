@@ -568,8 +568,8 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     
     static short Ia_raw_old = 0, Ic_raw_old = 0;
     
-    ParkParm.qIa = (Ia_raw+Ia_raw_old)/3;
-    ParkParm.qIc = (Ic_raw+Ic_raw_old)/3;
+    ParkParm.qIa = (Ia_raw+Ia_raw_old)/6;
+    ParkParm.qIc = (Ic_raw+Ic_raw_old)/6;
     
     Ia_raw_old = Ia_raw;
     Ic_raw_old = Ic_raw;
@@ -967,34 +967,34 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     static int Imax3 = 0x8000;
     static int Imin3 = 0x7FFF;
     
-    if (I2Tdata.IQMeasured < Imin1)
+    if (I2Tdata.IQMeasured <= Imin1)
     {
         Imin3 = Imin2;
         Imin2 = Imin1;
         Imin1 = I2Tdata.IQMeasured;
     }
-    else if (I2Tdata.IQMeasured < Imin2)
+    else if (I2Tdata.IQMeasured <= Imin2)
     {
         Imin3 = Imin2;
         Imin2 = I2Tdata.IQMeasured;
     }        
-    else if (I2Tdata.IQMeasured < Imin3)
+    else if (I2Tdata.IQMeasured <= Imin3)
     {
         Imin3 = I2Tdata.IQMeasured;
     }
     
-    if (I2Tdata.IQMeasured > Imax1)
+    if (I2Tdata.IQMeasured >= Imax1)
     {
         Imax3 = Imax2;
         Imax2 = Imax1;
         Imax1 = I2Tdata.IQMeasured;
     }
-    else if (I2Tdata.IQMeasured > Imax2)
+    else if (I2Tdata.IQMeasured >= Imax2)
     {
         Imax3 = Imax2;
         Imax2 = I2Tdata.IQMeasured;
     }        
-    else if (I2Tdata.IQMeasured > Imax3)
+    else if (I2Tdata.IQMeasured >= Imax3)
     {
         Imax3 = I2Tdata.IQMeasured;
     }
