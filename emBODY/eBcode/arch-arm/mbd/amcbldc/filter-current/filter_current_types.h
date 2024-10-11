@@ -7,33 +7,22 @@
 //
 // Code generated for Simulink model 'filter_current'.
 //
-// Model version                  : 6.3
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:38 2024
+// Model version                  : 7.1
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Oct  7 15:56:25 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_filter_current_types_h_
-#define RTW_HEADER_filter_current_types_h_
+#ifndef filter_current_types_h_
+#define filter_current_types_h_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_MotorCurrent_
-#define DEFINED_TYPEDEF_FOR_MotorCurrent_
+#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
+#define DEFINED_TYPEDEF_FOR_FOCOutputs_
 
-struct MotorCurrent
-{
-  // motor current
-  real32_T current;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ControlOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOutputs_
-
-struct ControlOutputs
+struct FOCOutputs
 {
   // control effort (quadrature)
   real32_T Vq;
@@ -42,16 +31,16 @@ struct ControlOutputs
   real32_T Vabc[3];
 
   // quadrature current
-  MotorCurrent Iq_fbk;
+  real32_T Iq_fbk;
 
   // direct current
-  MotorCurrent Id_fbk;
+  real32_T Id_fbk;
 
   // RMS of Iq
-  MotorCurrent Iq_rms;
+  real32_T Iq_rms;
 
   // RMS of Id
-  MotorCurrent Id_rms;
+  real32_T Id_rms;
 };
 
 #endif
@@ -99,11 +88,7 @@ struct dsp_simulink_MedianFilter_filter_current_T
 };
 
 #endif                     // struct_dsp_simulink_MedianFilter_filter_current_T
-
-// Forward declaration for rtModel
-typedef struct tag_RTM_filter_current_T RT_MODEL_filter_current_T;
-
-#endif                                 // RTW_HEADER_filter_current_types_h_
+#endif                                 // filter_current_types_h_
 
 //
 // File trailer for generated code.

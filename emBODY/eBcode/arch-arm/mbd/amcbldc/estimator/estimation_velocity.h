@@ -7,29 +7,19 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 6.4
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:36:26 2024
+// Model version                  : 7.3
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Oct  7 15:56:19 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_estimation_velocity_h_
-#define RTW_HEADER_estimation_velocity_h_
+#ifndef estimation_velocity_h_
+#define estimation_velocity_h_
 #include "rtwtypes.h"
 #include "estimation_velocity_types.h"
-
-extern "C"
-{
-
-#include "rt_nonfinite.h"
-
-}
-
-#include "rtGetNaN.h"
-#include <cstring>
 
 // Block states (default storage) for model 'estimation_velocity'
 struct DW_estimation_velocity_f_T {
@@ -41,23 +31,13 @@ struct DW_estimation_velocity_f_T {
   boolean_T objisempty;                // '<S1>/QR Solver'
 };
 
-// Real-time Model Data Structure
-struct tag_RTM_estimation_velocity_T {
-  const char_T **errorStatus;
-};
-
 struct MdlrefDW_estimation_velocity_T {
   DW_estimation_velocity_f_T rtdw;
-  RT_MODEL_estimation_velocity_T rtm;
 };
 
-// Model reference registration function
-extern void estimation_velocity_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_estimation_velocity_T *const estimation_velocity_M,
-  DW_estimation_velocity_f_T *localDW);
 extern void estimation_velocity_Init(DW_estimation_velocity_f_T *localDW);
-extern void estimation_velocity(const SensorsData *rtu_SensorsData, const
-  ConfigurationParameters *rtu_ConfigurationParameters, JointVelocities
+extern void estimation_velocity(const EstimationVelocityModes
+  *rtu_EstimationConfig, const real32_T *rtu_position, real32_T
   *rty_EstimatedVelocity, DW_estimation_velocity_f_T *localDW);
 
 //-
@@ -88,7 +68,7 @@ extern void estimation_velocity(const SensorsData *rtu_SensorsData, const
 //  '<S3>'   : 'estimation_velocity/Least Squares Polynomial Fit/Check Signal Attributes1'
 //  '<S4>'   : 'estimation_velocity/Least Squares Polynomial Fit/Check Signal Attributes2'
 
-#endif                                 // RTW_HEADER_estimation_velocity_h_
+#endif                                 // estimation_velocity_h_
 
 //
 // File trailer for generated code.

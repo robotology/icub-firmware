@@ -3,35 +3,33 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: control_outer_types.h
+// File: supervisor_types.h
 //
-// Code generated for Simulink model 'control_outer'.
+// Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 7.6
+// Model version                  : 2.7
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:09 2024
+// C/C++ source code generated on : Mon Oct  7 15:56:35 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef control_outer_types_h_
-#define control_outer_types_h_
+#ifndef supervisor_types_h_
+#define supervisor_types_h_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
-#define DEFINED_TYPEDEF_FOR_ControlModes_
 
-typedef enum {
-  ControlModes_NotConfigured = 0,      // Default value
-  ControlModes_Idle,
-  ControlModes_Position,
-  ControlModes_PositionDirect,
-  ControlModes_Current,
-  ControlModes_Velocity,
-  ControlModes_Voltage,
-  ControlModes_HwFaultCM
-} ControlModes;
+// Includes for objects with custom storage classes
+#include "rtw_defines.h"
+#ifndef DEFINED_TYPEDEF_FOR_ExternalFlags_
+#define DEFINED_TYPEDEF_FOR_ExternalFlags_
+
+struct ExternalFlags
+{
+  // External Fault Button (1 == pressed)
+  boolean_T fault_button;
+};
 
 #endif
 
@@ -48,6 +46,32 @@ struct EstimatedData
 
   // motor temperature
   real32_T motor_temperature;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
+#define DEFINED_TYPEDEF_FOR_FOCOutputs_
+
+struct FOCOutputs
+{
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
+  real32_T Vabc[3];
+
+  // quadrature current
+  real32_T Iq_fbk;
+
+  // direct current
+  real32_T Id_fbk;
+
+  // RMS of Iq
+  real32_T Iq_rms;
+
+  // RMS of Id
+  real32_T Id_rms;
 };
 
 #endif
@@ -93,6 +117,20 @@ struct SensorsData
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_EventTypes_
+#define DEFINED_TYPEDEF_FOR_EventTypes_
+
+typedef enum {
+  EventTypes_None = 0,                 // Default value
+  EventTypes_SetLimit,
+  EventTypes_SetControlMode,
+  EventTypes_SetMotorConfig,
+  EventTypes_SetPid,
+  EventTypes_SetTarget
+} EventTypes;
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_Targets_
 #define DEFINED_TYPEDEF_FOR_Targets_
 
@@ -106,27 +144,85 @@ struct Targets
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
-#define DEFINED_TYPEDEF_FOR_HardwareFaults_
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
 
-struct HardwareFaults
+typedef enum {
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_HwFaultCM
+} ControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PID_
+#define DEFINED_TYPEDEF_FOR_PID_
+
+struct PID
 {
-  boolean_T overcurrent;
+  ControlModes type;
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+  uint8_T shift_factor;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
+#ifndef DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
+#define DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
 
-struct Flags
+struct SupervisorInputLimits
 {
-  boolean_T enable_sending_msg_status;
-  HardwareFaults hw_faults;
-  boolean_T enable_thermal_protection;
+  real32_T overload;
+  real32_T peak;
+  real32_T nominal;
+  ControlModes type;
+};
 
-  // control mode
-  ControlModes control_mode;
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+
+struct MotorConfigurationExternal
+{
+  boolean_T enable_verbosity;
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_temperature_sens;
+  uint8_T encoder_tolerance;
+  uint8_T pole_pairs;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  boolean_T use_index;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
+#define DEFINED_TYPEDEF_FOR_ReceivedEvents_
+
+struct ReceivedEvents
+{
+  uint8_T motor_id;
+  EventTypes event_type;
+  Targets targets_content;
+  PID pid_content;
+  ControlModes control_mode_content;
+  SupervisorInputLimits limits_content;
+  MotorConfigurationExternal motor_config_content;
 };
 
 #endif
@@ -165,25 +261,6 @@ struct Thresholds
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_PID_
-#define DEFINED_TYPEDEF_FOR_PID_
-
-struct PID
-{
-  ControlModes type;
-  real32_T OutMax;
-  real32_T OutMin;
-  real32_T P;
-  real32_T I;
-  real32_T D;
-  real32_T N;
-  real32_T I0;
-  real32_T D0;
-  uint8_T shift_factor;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
 #define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
 
@@ -192,25 +269,6 @@ struct PIDsConfiguration
   PID currentPID;
   PID velocityPID;
   PID positionPID;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-
-struct MotorConfigurationExternal
-{
-  boolean_T enable_verbosity;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_temperature_sens;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  boolean_T use_index;
 };
 
 #endif
@@ -247,21 +305,31 @@ struct ActuatorConfiguration
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
+#define DEFINED_TYPEDEF_FOR_HardwareFaults_
 
-struct ControlOuterOutputs
+struct HardwareFaults
 {
-  boolean_T vel_en;
-  boolean_T cur_en;
-  boolean_T out_en;
-  boolean_T pid_reset;
-  real32_T motorcurrent;
-  real32_T current_limiter;
+  boolean_T overcurrent;
 };
 
 #endif
-#endif                                 // control_outer_types_h_
+
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
+
+struct Flags
+{
+  boolean_T enable_sending_msg_status;
+  HardwareFaults hw_faults;
+  boolean_T enable_thermal_protection;
+
+  // control mode
+  ControlModes control_mode;
+};
+
+#endif
+#endif                                 // supervisor_types_h_
 
 //
 // File trailer for generated code.

@@ -3,75 +3,25 @@
 // granting, nonprofit, education, and research organizations only. Not
 // for commercial or industrial use.
 //
-// File: control_foc_types.h
+// File: motion_controller_types.h
 //
-// Code generated for Simulink model 'control_foc'.
+// Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 7.11
+// Model version                  : 3.12
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:01 2024
+// C/C++ source code generated on : Mon Oct  7 15:56:40 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef control_foc_types_h_
-#define control_foc_types_h_
+#ifndef motion_controller_types_h_
+#define motion_controller_types_h_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
 
-struct EstimatedData
-{
-  // velocity
-  real32_T velocity;
-
-  // filtered motor current
-  real32_T Iq_filtered;
-
-  // motor temperature
-  real32_T motor_temperature;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
-
-struct Targets
-{
-  real32_T position;
-  real32_T velocity;
-  real32_T current;
-  real32_T voltage;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-
-struct EstimationConfiguration
-{
-  real32_T environment_temperature;
-  real32_T current_rms_lambda;
-  EstimationVelocityModes velocity_est_mode;
-};
-
-#endif
-
+// Includes for objects with custom storage classes
+#include "rtw_defines.h"
 #ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
 #define DEFINED_TYPEDEF_FOR_DriverSensors_
 
@@ -109,16 +59,6 @@ struct SensorsData
   real32_T position;
   DriverSensors driversensors;
   MotorSensors motorsensors;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
-#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
-
-struct GlobalConfiguration
-{
-  EstimationConfiguration estimation;
 };
 
 #endif
@@ -255,6 +195,123 @@ struct ActuatorConfiguration
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+
+struct EstimationConfiguration
+{
+  real32_T environment_temperature;
+  real32_T current_rms_lambda;
+  EstimationVelocityModes velocity_est_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+
+struct GlobalConfiguration
+{
+  EstimationConfiguration estimation;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocity
+  real32_T velocity;
+
+  // filtered motor current
+  real32_T Iq_filtered;
+
+  // motor temperature
+  real32_T motor_temperature;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ExternalFlags_
+#define DEFINED_TYPEDEF_FOR_ExternalFlags_
+
+struct ExternalFlags
+{
+  // External Fault Button (1 == pressed)
+  boolean_T fault_button;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EventTypes_
+#define DEFINED_TYPEDEF_FOR_EventTypes_
+
+typedef enum {
+  EventTypes_None = 0,                 // Default value
+  EventTypes_SetLimit,
+  EventTypes_SetControlMode,
+  EventTypes_SetMotorConfig,
+  EventTypes_SetPid,
+  EventTypes_SetTarget
+} EventTypes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Targets_
+#define DEFINED_TYPEDEF_FOR_Targets_
+
+struct Targets
+{
+  real32_T position;
+  real32_T velocity;
+  real32_T current;
+  real32_T voltage;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
+#define DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
+
+struct SupervisorInputLimits
+{
+  real32_T overload;
+  real32_T peak;
+  real32_T nominal;
+  ControlModes type;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
+#define DEFINED_TYPEDEF_FOR_ReceivedEvents_
+
+struct ReceivedEvents
+{
+  uint8_T motor_id;
+  EventTypes event_type;
+  Targets targets_content;
+  PID pid_content;
+  ControlModes control_mode_content;
+  SupervisorInputLimits limits_content;
+  MotorConfigurationExternal motor_config_content;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
 #define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
 
@@ -309,7 +366,32 @@ struct FOCOutputs
 };
 
 #endif
-#endif                                 // control_foc_types_h_
+
+#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
+#define DEFINED_TYPEDEF_FOR_HardwareFaults_
+
+struct HardwareFaults
+{
+  boolean_T overcurrent;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
+
+struct Flags
+{
+  boolean_T enable_sending_msg_status;
+  HardwareFaults hw_faults;
+  boolean_T enable_thermal_protection;
+
+  // control mode
+  ControlModes control_mode;
+};
+
+#endif
+#endif                                 // motion_controller_types_h_
 
 //
 // File trailer for generated code.

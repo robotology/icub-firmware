@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 6.3
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:32 2024
+// Model version                  : 7.4
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Oct  7 15:55:50 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_can_decoder_types_h_
-#define RTW_HEADER_can_decoder_types_h_
+#ifndef can_decoder_types_h_
+#define can_decoder_types_h_
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
 
@@ -36,6 +36,10 @@
 
 #if CAN_MAX_NUM_PACKETS <= 0
 # error "The preprocessor definition 'CAN_MAX_NUM_PACKETS' must be greater than '0'"
+#endif
+
+#if (CAN_MAX_NUM_PACKETS+1) <= MAX_EVENTS_PER_TICK
+# error "The preprocessor definition '(CAN_MAX_NUM_PACKETS+1)' must be greater than 'MAX_EVENTS_PER_TICK'"
 #endif
 
 #if CAN_MAX_NUM_PACKETS >= 16
@@ -80,107 +84,13 @@ struct BUS_CAN_MULTIPLE
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfig_
-#define DEFINED_TYPEDEF_FOR_MotorConfig_
-
-struct MotorConfig
-{
-  // Angular offset in degrees between the stator windings and the hall sensors. 
-  real32_T hall_sens_offset;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_torque_sens;
-  boolean_T use_index;
-  boolean_T enable_verbosity;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  real32_T Kbemf;
-  real32_T Rphase;
-  real32_T Imin;
-  real32_T Imax;
-  real32_T Vmax;
-  real32_T resistance;
-  real32_T inductance;
-  real32_T thermal_resistance;
-  real32_T thermal_time_constant;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationConfig_
-#define DEFINED_TYPEDEF_FOR_EstimationConfig_
-
-struct EstimationConfig
-{
-  EstimationVelocityModes velocity_mode;
-
-  // Forgetting factor in [0, 1] for exponential weighting-based estimation of RMS current value 
-  real32_T current_rms_lambda;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_PIDConfig_
-#define DEFINED_TYPEDEF_FOR_PIDConfig_
-
-struct PIDConfig
-{
-  real32_T OutMax;
-  real32_T OutMin;
-  real32_T P;
-  real32_T I;
-  real32_T D;
-  real32_T N;
-  real32_T I0;
-  real32_T D0;
-  uint8_T shift_factor;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_Thresholds_
 #define DEFINED_TYPEDEF_FOR_Thresholds_
 
 struct Thresholds
 {
-  // It shall be greater than hardwareJntPosMin
-  real32_T jntPosMin;
-
-  // It shall be smaller than hardwareJntPosMax
-  real32_T jntPosMax;
-
-  // Imposed by hardware constraint
-  real32_T hardwareJntPosMin;
-
-  // Imposed by hardware constraint
-  real32_T hardwareJntPosMax;
-
-  // If robotMin == rotorMax == 0, there's no check
-  real32_T rotorPosMin;
-
-  // If robotMin == rotorMax == 0, there's no check
-  real32_T rotorPosMax;
-
   // Can be only non-negative
   real32_T jntVelMax;
-
-  // Timeout on reception of velocity setpoint
-  // Can be only non-negative
-  uint32_T velocityTimeout;
 
   // Current that can be kept for an indefinite period of time w/o damaging the motor
   // Expressed in [A] as all the internal computations are done this way
@@ -208,227 +118,100 @@ struct Thresholds
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ConfigurationParameters_
-#define DEFINED_TYPEDEF_FOR_ConfigurationParameters_
-
-struct ConfigurationParameters
-{
-  MotorConfig motorconfig;
-  EstimationConfig estimationconfig;
-  PIDConfig CurLoopPID;
-  PIDConfig PosLoopPID;
-  PIDConfig VelLoopPID;
-  PIDConfig DirLoopPID;
-  Thresholds thresholds;
-  real32_T environment_temperature;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
-#define DEFINED_TYPEDEF_FOR_MCControlModes_
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
 
 typedef enum {
-  MCControlModes_Idle = 0,             // Default value
-  MCControlModes_OpenLoop = 80,
-  MCControlModes_SpeedVoltage = 10,
-  MCControlModes_SpeedCurrent = 11,
-  MCControlModes_Current = 6,
-  MCControlModes_NotConfigured = 176,
-  MCControlModes_HWFault = 160
-} MCControlModes;
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_HwFaultCM
+} ControlModes;
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CONTROL_MODE_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_CONTROL_MODE_
+#ifndef DEFINED_TYPEDEF_FOR_PID_
+#define DEFINED_TYPEDEF_FOR_PID_
 
-// Fields of a CONTROL_MODE message.
-struct BUS_MSG_CONTROL_MODE
+struct PID
 {
-  // Motor selector.
-  boolean_T motor;
-
-  // Control mode.
-  MCControlModes mode;
+  ControlModes type;
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+  uint8_T shift_factor;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_LIMIT_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_CURRENT_LIMIT_
+#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
 
-// Fields of a CURRENT_LIMIT message.
-struct BUS_MSG_CURRENT_LIMIT
+struct PIDsConfiguration
 {
-  // Motor selector.
-  boolean_T motor;
-
-  // Nominal current in A.
-  real32_T nominal;
-
-  // Peak current in A.
-  real32_T peak;
-
-  // Overload current in A.
-  real32_T overload;
+  PID currentPID;
+  PID velocityPID;
+  PID positionPID;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_TARGETS_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_DESIRED_TARGETS_
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
 
-// Fields of a DESIRED_TARGETS message.
-struct BUS_MSG_DESIRED_TARGETS
+struct MotorConfigurationExternal
 {
-  // Target current in A.
-  real32_T current;
-
-  // Target voltage in %.
-  real32_T voltage;
-
-  // Target veocity in deg/s.
-  real32_T velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_PID_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_PID_
-
-// Fields of a CURRENT_PID message.
-struct BUS_MSG_PID
-{
-  // Motor selector.
-  boolean_T motor;
-
-  // Proportional gain.
-  real32_T Kp;
-
-  // Integral gain.
-  real32_T Ki;
-
-  // Derivative gain.
-  real32_T Kd;
-
-  // Shift factor.
-  uint8_T Ks;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_MOTOR_CONFIG_
-#define DEFINED_TYPEDEF_FOR_BUS_MSG_MOTOR_CONFIG_
-
-struct BUS_MSG_MOTOR_CONFIG
-{
+  boolean_T enable_verbosity;
   boolean_T has_hall_sens;
   boolean_T has_quadrature_encoder;
   boolean_T has_speed_quadrature_encoder;
-  boolean_T has_torque_sens;
-  boolean_T use_index;
-  boolean_T enable_verbosity;
-
-  // Number of polese of the motor.
-  uint8_T number_poles;
-
-  // Encoder tolerance.
+  boolean_T has_temperature_sens;
   uint8_T encoder_tolerance;
-
-  // Resolution of rotor encoder.
+  uint8_T pole_pairs;
   int16_T rotor_encoder_resolution;
-
-  // Offset of the rotor encoder.
   int16_T rotor_index_offset;
+  boolean_T use_index;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
+#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
 
-// Aggregate of all CAN received messages.
-struct BUS_MESSAGES_RX
+struct MotorConfiguration
 {
-  BUS_MSG_CONTROL_MODE control_mode;
-  BUS_MSG_CURRENT_LIMIT current_limit;
-  BUS_MSG_DESIRED_TARGETS desired_targets;
-  BUS_MSG_PID pid;
-  BUS_MSG_MOTOR_CONFIG motor_config;
+  MotorConfigurationExternal externals;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Imin;
+  real32_T Imax;
+  real32_T Vmax;
+  real32_T resistance;
+  real32_T inductance;
+  real32_T thermal_resistance;
+  real32_T thermal_time_constant;
+  real32_T hall_sensors_offset;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_MESSAGES_RX_MULTIPLE_
+#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
 
-struct BUS_MESSAGES_RX_MULTIPLE
+struct ActuatorConfiguration
 {
-  BUS_MESSAGES_RX messages[CAN_MAX_NUM_PACKETS];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_
-#define DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_
-
-// Aggregate of all events specifying types of received messages.
-struct BUS_STATUS_RX
-{
-  boolean_T control_mode;
-  boolean_T current_limit;
-  boolean_T desired_targets;
-  boolean_T current_pid;
-  boolean_T velocity_pid;
-  boolean_T motor_config;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_STATUS_RX_MULTIPLE_
-
-struct BUS_STATUS_RX_MULTIPLE
-{
-  BUS_STATUS_RX status[CAN_MAX_NUM_PACKETS];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_CANErrorTypes_
-#define DEFINED_TYPEDEF_FOR_CANErrorTypes_
-
-typedef enum {
-  CANErrorTypes_No_Error = 0,          // Default value
-  CANErrorTypes_Packet_Not4Us,
-  CANErrorTypes_Packet_Unrecognized,
-  CANErrorTypes_Packet_Malformed,
-  CANErrorTypes_Packet_MultiFunctionsDetected,
-  CANErrorTypes_Mode_Unrecognized
-} CANErrorTypes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_
-
-// Specifies the CAN error types.
-struct BUS_CAN_RX_ERRORS
-{
-  // True if an error has been detected.
-  boolean_T event;
-  CANErrorTypes type;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_RX_ERRORS_MULTIPLE_
-
-struct BUS_CAN_RX_ERRORS_MULTIPLE
-{
-  BUS_CAN_RX_ERRORS errors[CAN_MAX_NUM_PACKETS];
+  Thresholds thresholds;
+  PIDsConfiguration pids;
+  MotorConfiguration motor;
 };
 
 #endif
@@ -522,6 +305,91 @@ struct BUS_CAN_RX
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_EventTypes_
+#define DEFINED_TYPEDEF_FOR_EventTypes_
+
+typedef enum {
+  EventTypes_None = 0,                 // Default value
+  EventTypes_SetLimit,
+  EventTypes_SetControlMode,
+  EventTypes_SetMotorConfig,
+  EventTypes_SetPid,
+  EventTypes_SetTarget
+} EventTypes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Targets_
+#define DEFINED_TYPEDEF_FOR_Targets_
+
+struct Targets
+{
+  real32_T position;
+  real32_T velocity;
+  real32_T current;
+  real32_T voltage;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
+#define DEFINED_TYPEDEF_FOR_SupervisorInputLimits_
+
+struct SupervisorInputLimits
+{
+  real32_T overload;
+  real32_T peak;
+  real32_T nominal;
+  ControlModes type;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ReceivedEvents_
+#define DEFINED_TYPEDEF_FOR_ReceivedEvents_
+
+struct ReceivedEvents
+{
+  uint8_T motor_id;
+  EventTypes event_type;
+  Targets targets_content;
+  PID pid_content;
+  ControlModes control_mode_content;
+  SupervisorInputLimits limits_content;
+  MotorConfigurationExternal motor_config_content;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CANErrorTypes_
+#define DEFINED_TYPEDEF_FOR_CANErrorTypes_
+
+typedef enum {
+  CANErrorTypes_No_Error = 0,          // Default value
+  CANErrorTypes_Packet_Not4Us,
+  CANErrorTypes_Packet_Unrecognized,
+  CANErrorTypes_Packet_Malformed,
+  CANErrorTypes_Packet_MultiFunctionsDetected,
+  CANErrorTypes_Mode_Unrecognized
+} CANErrorTypes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MCControlModes_
+#define DEFINED_TYPEDEF_FOR_MCControlModes_
+
+typedef enum {
+  MCControlModes_Idle = 0,             // Default value
+  MCControlModes_OpenLoop = 80,
+  MCControlModes_SpeedVoltage = 10,
+  MCControlModes_SpeedCurrent = 11,
+  MCControlModes_Current = 6,
+  MCControlModes_NotConfigured = 176,
+  MCControlModes_HWFault = 160
+} MCControlModes;
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_MCOPC_
 #define DEFINED_TYPEDEF_FOR_MCOPC_
 
@@ -548,7 +416,7 @@ typedef enum {
 // Forward declaration for rtModel
 typedef struct tag_RTM_can_decoder_T RT_MODEL_can_decoder_T;
 
-#endif                                 // RTW_HEADER_can_decoder_types_h_
+#endif                                 // can_decoder_types_h_
 
 //
 // File trailer for generated code.

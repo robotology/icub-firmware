@@ -7,19 +7,83 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 6.3
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:32 2024
+// Model version                  : 7.4
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Oct  7 15:55:50 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_can_decoder_h_
-#define RTW_HEADER_can_decoder_h_
+#ifndef can_decoder_h_
+#define can_decoder_h_
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
+#include "rtw_defines.h"
+
+// Block signals for system '<S2>/Decoding Logic'
+struct B_DecodingLogic_can_decoder_T {
+  PID msg_set_pid;                     // '<S2>/Decoding Logic'
+  Targets msg_desired_targets;         // '<S2>/Decoding Logic'
+  SupervisorInputLimits msg_set_current_limit;// '<S2>/Decoding Logic'
+  MotorConfigurationExternal msg_set_motor_config;// '<S2>/Decoding Logic'
+  EventTypes event_type;               // '<S2>/Decoding Logic'
+  ControlModes msg_set_control_mode;   // '<S2>/Decoding Logic'
+  CANErrorTypes error_type;            // '<S2>/Decoding Logic'
+  boolean_T ev_error;                  // '<S2>/Decoding Logic'
+};
+
+// Block states (default storage) for system '<S2>/Decoding Logic'
+struct DW_DecodingLogic_can_decoder_T {
+  int32_T sfEvent;                     // '<S2>/Decoding Logic'
+  uint32_T ev_errorEventCounter;       // '<S2>/Decoding Logic'
+  uint16_T cmd_processed;              // '<S2>/Decoding Logic'
+  uint8_T is_active_c3_can_decoder;    // '<S2>/Decoding Logic'
+  uint8_T is_active_SET_CONTROL_MODE;  // '<S2>/Decoding Logic'
+  uint8_T is_SET_CONTROL_MODE;         // '<S2>/Decoding Logic'
+  uint8_T is_active_DESIRED_TARGETS;   // '<S2>/Decoding Logic'
+  uint8_T is_DESIRED_TARGETS;          // '<S2>/Decoding Logic'
+  uint8_T is_active_SET_OPTIONS;       // '<S2>/Decoding Logic'
+  uint8_T is_SET_OPTIONS;              // '<S2>/Decoding Logic'
+  uint8_T is_active_SET_MOTOR_CONFIG;  // '<S2>/Decoding Logic'
+  uint8_T is_SET_MOTOR_CONFIG;         // '<S2>/Decoding Logic'
+  uint8_T is_active_ERROR_HANDLING;    // '<S2>/Decoding Logic'
+  uint8_T is_ERROR_HANDLING;           // '<S2>/Decoding Logic'
+  boolean_T ev_async;                  // '<S2>/Decoding Logic'
+};
+
+// Block signals for system '<Root>/Cycling Decoder'
+struct B_CoreSubsys_can_decoder_T {
+  BUS_CAN_RX pck_rx_struct;            // '<S3>/RAW2STRUCT Decoding Logic'
+  B_DecodingLogic_can_decoder_T sf_DecodingLogic;// '<S2>/Decoding Logic'
+};
+
+// Block states (default storage) for system '<Root>/Cycling Decoder'
+struct DW_CoreSubsys_can_decoder_T {
+  DW_DecodingLogic_can_decoder_T sf_DecodingLogic;// '<S2>/Decoding Logic'
+};
+
+// Block signals for model 'can_decoder'
+struct B_can_decoder_c_T {
+  B_CoreSubsys_can_decoder_T CoreSubsys[MAX_EVENTS_PER_TICK];// '<Root>/Cycling Decoder' 
+};
+
+// Block states (default storage) for model 'can_decoder'
+struct DW_can_decoder_f_T {
+  DW_CoreSubsys_can_decoder_T CoreSubsys[MAX_EVENTS_PER_TICK];// '<Root>/Cycling Decoder' 
+};
+
+// Real-time Model Data Structure
+struct tag_RTM_can_decoder_T {
+  const char_T **errorStatus;
+};
+
+struct MdlrefDW_can_decoder_T {
+  B_can_decoder_c_T rtb;
+  DW_can_decoder_f_T rtdw;
+  RT_MODEL_can_decoder_T rtm;
+};
 
 //
 //  Exported Global Parameters
@@ -37,14 +101,21 @@ extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  Referenced by: '<S2>/Constant'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
-extern void can_decoder_Init(void);
-extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, const
-  ConfigurationParameters *rtu_ConfigurationParameters, BUS_MESSAGES_RX_MULTIPLE
-  *rty_messages_rx, BUS_STATUS_RX_MULTIPLE *rty_status_rx,
-  BUS_CAN_RX_ERRORS_MULTIPLE *rty_errors_rx);
 
 // Model reference registration function
-extern void can_decoder_initialize(const char_T **rt_errorStatus);
+extern void can_decoder_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_can_decoder_T *const can_decoder_M);
+extern void can_decoder_DecodingLogic_Init(DW_DecodingLogic_can_decoder_T
+  *localDW);
+extern void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
+  BUS_CAN_PACKET_RX *rtu_pck_input, uint8_T rtu_CAN_ID_DST, uint8_T
+  rtu_CAN_VOLT_REF_SHIFT, real32_T rtu_CAN_VOLT_REF_GAIN,
+  B_DecodingLogic_can_decoder_T *localB, DW_DecodingLogic_can_decoder_T *localDW);
+extern void can_decoder_Init(B_can_decoder_c_T *localB, DW_can_decoder_f_T
+  *localDW);
+extern void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
+  rty_messages_rx[MAX_EVENTS_PER_TICK], B_can_decoder_c_T *localB,
+  DW_can_decoder_f_T *localDW);
 
 //-
 //  The generated code includes comments that allow you to trace directly
@@ -65,16 +136,9 @@ extern void can_decoder_initialize(const char_T **rt_errorStatus);
 //  '<S2>'   : 'can_decoder/Cycling Decoder/CAN_Decoder'
 //  '<S3>'   : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT'
 //  '<S4>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Decoding Logic'
-//  '<S5>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Detect Change'
-//  '<S6>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Detect Change1'
-//  '<S7>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Detect Change2'
-//  '<S8>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Detect Change3'
-//  '<S9>'   : 'can_decoder/Cycling Decoder/CAN_Decoder/Detect Change4'
-//  '<S10>'  : 'can_decoder/Cycling Decoder/CAN_Decoder/Detect Change5'
-//  '<S11>'  : 'can_decoder/Cycling Decoder/CAN_Decoder/Detect Change6'
-//  '<S12>'  : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT/RAW2STRUCT Decoding Logic'
+//  '<S5>'   : 'can_decoder/Cycling Decoder/CAN_RX_RAW2STRUCT/RAW2STRUCT Decoding Logic'
 
-#endif                                 // RTW_HEADER_can_decoder_h_
+#endif                                 // can_decoder_h_
 
 //
 // File trailer for generated code.
