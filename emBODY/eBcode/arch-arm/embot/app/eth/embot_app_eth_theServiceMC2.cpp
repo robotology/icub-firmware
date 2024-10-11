@@ -500,7 +500,7 @@ bool embot::app::eth::theServiceMC::Impl::process(const DescriptorCANframe &canf
 
 bool embot::app::eth::theServiceMC::Impl::process(const DescriptorFrame &framedescriptor)
 {
-//    p_traceprint("process(DescriptorCANframe)");    
+//    p_traceprint("process(DescriptorFrame)");    
     bool r {false};
 
     // i proceed a CAN/ICC frame only if service is active .... 

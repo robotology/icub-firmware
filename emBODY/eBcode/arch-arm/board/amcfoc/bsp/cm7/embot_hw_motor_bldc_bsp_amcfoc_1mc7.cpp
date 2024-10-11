@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2023 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
@@ -10,7 +10,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw_motor_bsp_amcfoc_1cm7.h"
+#include "embot_hw_motor_bldc_bsp_amcfoc_1cm7.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -53,35 +53,53 @@ using namespace embot::core::binary;
 #endif
 
 
-#include "embot_hw_motor_bsp.h"
+#include "embot_hw_motor_bldc_bsp.h"
 
 
-#if !defined(EMBOT_ENABLE_hw_motor)
+#if !defined(EMBOT_ENABLE_hw_motor_bldc)
 
-namespace embot::hw::motor::bsp {
+namespace embot::hw::motor::bldc::bsp {
     
-    constexpr BSP thebsp { };
-    void BSP::init(embot::hw::MOTOR h) const {}    
+    constexpr BSP thebsp { }; 
     const BSP& getBSP() 
     {
         return thebsp;
     }
     
+    bool BSP::init(embot::hw::MOTOR h) const { return false; }   
+
+    bool configure(embot::hw::MOTOR m, const Config &config) const { return false; }
+    bool enable(MOTOR m, bool on) const { return false; }
+//    bool enabled(MOTOR m) const { return false; }
+    
+    bool fault(MOTOR m, bool on) const { return false; }
+//    bool faulted(MOTOR m) const { return false; }
+
+    bool set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents) const { return false; }  
+    
+    HallStatus hall(MOTOR m) const { return 0; }
+    Angle angle(MOTOR m, Encoder enc) const { return 0.0f; } 
+    
+    bool set(MOTOR m, const PWM3 &pwm) const { return false; }
+    Voltage powersupply(MOTOR m) const { return 0.0f; }        
 }
 
-namespace embot::hw::motor::bsp::amcfoc::cm7 {
+namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
     void TIM_base_MspInit(TIM_HandleTypeDef* htim_base) {}
     void TIM_base_MspDeInit(TIM_HandleTypeDef* htim_base) {}    
 }
 
-#elif defined(EMBOT_ENABLE_hw_motor)
+#elif defined(EMBOT_ENABLE_hw_motor_bldc)
 
-//#include "motorhal_config.h"
 
-//#include "cubemx_defines.h"  
+// used by the amcfoc.mot running on cm7
+#include "embot_hw_motor_adc.h"  
+#include "embot_hw_motor_enc.h"  
+#include "embot_hw_motor_hall.h"  
+#include "embot_hw_motor_pwm.h" 
 
-namespace embot::hw::motor::bsp {
+namespace embot::hw::motor::bldc::bsp {
                   
     constexpr PROP propM1 { 0 };
     constexpr PROP propM2 { 0 };
@@ -97,26 +115,158 @@ namespace embot::hw::motor::bsp {
   
     };
     
-
-    void BSP::init(embot::hw::MOTOR h) const 
-    {  
-        // we init the two motors together. we cannot do one and not the other, so ...        
-        static bool initted {false};
-                
-        if(false == initted)
-        {
-            amcfoc::cm7::Init_MOTOR(h);
-            initted = true;
-        } 
-    }
     
     const BSP& getBSP() 
     {
         return thebsp;
     }
+    
+    
+    bool BSP::deinit(embot::hw::MOTOR m) const
+    {
+        embot::hw::motor::adc::deinit(m);
+        embot::hw::motor::enc::deinit(); 
+        embot::hw::motor::hall::deinit(m); 
+        embot::hw::motor::pwm::deinit(m); 
+
+        return true;
+    }
+    
+    
+    bool BSP::init(embot::hw::MOTOR m) const 
+    {  
+        // we init the two motors together. we cannot do one and not the other, so ...        
+        static bool onceonly_initted {false};
+                
+        if(false == onceonly_initted)
+        {
+            amcfoc::cm7::Init_MOTOR(m);
+            onceonly_initted = true;
+        } 
         
-              
-} // namespace embot::hw::motor::bsp {
+
+        // and now the init that can be done multiple times 
+        {
+            // i want to be sure that the pwm is not active       
+            embot::hw::motor::pwm::deinit(m); 
+            // adc acquisition of the currents starts straigth away with ::init()
+            embot::hw::motor::adc::init(m, {});         
+            // then we init the encoder. we actually dont start acquisition because we do that in enc::start()            
+            embot::hw::motor::enc::init({}); 
+            // same applies for hall 
+            embot::hw::motor::hall::init(m, {});               
+            // ok, we start pwm
+            embot::hw::motor::pwm::init(m, {});          
+            // now we calibrate adc acquisition
+            embot::hw::motor::adc::calibrate(m, {});
+            // now we start analog acquisition
+            embot::hw::analog::init({});
+                
+            // we may calibrate also the encoder so that it is aligned w/ hall values
+            // but maybe better do it later    
+        }            
+    
+        
+        return true;
+    }
+        
+    bool BSP::configure(embot::hw::MOTOR m, const Config &cfg) const
+    {
+        bool r {false};
+        
+        if((true == cfg.has_quad_enc) && (0 != cfg.enc_resolution) && (cfg.pwm_num_polar_couples > 0))
+        {
+            // start the encoder
+            #warning the amcfoc must init encoder using MOTOR m
+            embot::hw::motor::enc::Mode mode {cfg.enc_resolution, cfg.pwm_num_polar_couples, false, false};
+            embot::hw::motor::enc::start(mode);
+        }
+        
+        if(true == cfg.pwm_has_hall_sens)
+        {
+            // start the hall acquisition
+             embot::hw::motor::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::hall::Mode::SWAP::BC :  embot::hw::motor::hall::Mode::SWAP::none, cfg.pwm_hall_offset };
+             embot::hw::motor::hall::start(m, mode);
+        }
+        
+        r = true;
+        
+        return r;
+    }
+    
+    bool BSP::enable(MOTOR m, bool on) const
+    {
+        bool r {false};
+        embot::hw::motor::pwm::enable(m, on);
+        return true;
+    }     
+    
+//    bool BSP::enabled(MOTOR m) const
+//    {
+//        bool r {false};
+//        
+//        return r;
+//    }     
+   
+    bool BSP::fault(MOTOR m, bool on) const
+    {
+        bool r {false};        
+        // in this case it does NOTHING
+        r = true;
+        return r;
+    }     
+
+
+//    bool BSP::faulted(MOTOR m) const
+//    {
+//        bool r {false};
+//        
+//        return r;
+//    }     
+
+
+
+    bool BSP::set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents) const
+    {
+        bool r {false};
+        r = embot::hw::motor::adc::set(m, oncurrents);
+        return r;
+    }     
+
+
+    
+    HallStatus BSP::hall(MOTOR m) const
+    {
+        return embot::hw::motor::hall::getstatus(m);        
+    }     
+
+
+    Angle BSP::angle(MOTOR m, Encoder enc) const
+    {
+        Angle r {0.0f};
+        #warning fill BSP::angle(MOTOR m, Encoder enc) for amcfoc
+        //Angle r = (enc == Encoder::hall) ? 0.0 : 1.0;        
+        //r = embot::hw::motor::hall::angle(m) OR .....;         
+        return r;
+    }     
+
+    
+    bool BSP::set(MOTOR m, const PWM3 &pwm) const
+    {
+        embot::hw::motor::pwm::setperc(m, pwm.u, pwm.v, pwm.w);
+        return true;
+    }     
+
+
+    Voltage BSP::powersupply(MOTOR m) const
+    {
+        Voltage r {0.0f};
+        r = embot::hw::analog::getVin();
+        return r;
+    }     
+
+     
+} // namespace embot::hw::motor::bldc::bsp {
 
  
 
@@ -126,7 +276,7 @@ namespace embot::hw::motor::bsp {
 // ADC3 and TIM6 for measuring power supply and currents
 
 
-namespace embot::hw::motor::bsp::amcfoc::cm7 {
+namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 
 
     TIM_HandleTypeDef htim1;        // motor::2
@@ -191,10 +341,10 @@ namespace embot::hw::motor::bsp::amcfoc::cm7 {
 }
 
 
-namespace embot::hw::motor::bsp::amcfoc::cm7 {
+namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 
        
-    void Init_MOTOR(embot::hw::MOTOR h)
+    void Init_MOTOR(embot::hw::MOTOR m)
     {
         
         // add in here the initialisation of the GPIO that are relevant to the motor.
@@ -228,10 +378,11 @@ namespace embot::hw::motor::bsp::amcfoc::cm7 {
         //MX_DAC1_Init();
         MX_TIM15_Init(); 
 
-
     }   
     
-} // namespace embot::hw::motor::bsp::amcfoc::cm7 {
+     
+    
+} // namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 
 
 
@@ -240,7 +391,7 @@ namespace embot::hw::motor::bsp::amcfoc::cm7 {
 
 #include "cm7_cubemx_defines.h"
 
-namespace embot::hw::motor::bsp::amcfoc::cm7 {
+namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
     
 // DMA section
@@ -385,7 +536,7 @@ void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 0;
   htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-  htim1.Init.Period = embot::hw::motor::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod(); // 1023
+  htim1.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod(); // 1023
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -466,13 +617,13 @@ void MX_TIM1_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM2;
-  sConfigOC.Pulse = embot::hw::motor::bsp::amcfoc::cm7::PWMvals.valueofHIGHsampleoffset(); //1000;
+  sConfigOC.Pulse = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofHIGHsampleoffset(); //1000;
   if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_5) != HAL_OK)
   {
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = embot::hw::motor::bsp::amcfoc::cm7::PWMvals.valueofLOWsampleoffset(); // 24;
+  sConfigOC.Pulse = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofLOWsampleoffset(); // 24;
   if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_6) != HAL_OK)
   {
     Error_Handler();
@@ -726,7 +877,7 @@ void MX_TIM8_Init(void)
   htim8.Instance = TIM8;
   htim8.Init.Prescaler = 0;
   htim8.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
-  htim8.Init.Period = embot::hw::motor::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod(); // 1023;
+  htim8.Init.Period = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod(); // 1023;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim8.Init.RepetitionCounter = 0;
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -814,13 +965,13 @@ void MX_TIM8_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM2;
-  sConfigOC.Pulse = embot::hw::motor::bsp::amcfoc::cm7::PWMvals.valueofHIGHsampleoffset(); // 1000;
+  sConfigOC.Pulse = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofHIGHsampleoffset(); // 1000;
   if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_5) != HAL_OK)
   {
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = embot::hw::motor::bsp::amcfoc::cm7::PWMvals.valueofLOWsampleoffset(); // 24;
+  sConfigOC.Pulse = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofLOWsampleoffset(); // 24;
   if (HAL_TIM_PWM_ConfigChannel(&htim8, &sConfigOC, TIM_CHANNEL_6) != HAL_OK)
   {
     Error_Handler();
@@ -1338,7 +1489,7 @@ void MX_ADC3_Init(void)
 
 #elif !defined(WIP_REMOVE_AMC_1CM7_CODE)
 
-namespace embot::hw::motor::bsp::amcfoc::cm7 {
+namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
    
 
 
@@ -1918,22 +2069,22 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 
     /* ADC1 DMA Init */
     /* ADC1 Init */
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Instance = DMA2_Stream0;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.Request = DMA_REQUEST_ADC1;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.Mode = DMA_CIRCULAR;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.Priority = DMA_PRIORITY_VERY_HIGH;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1) != HAL_OK)
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Instance = DMA2_Stream0;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.Request = DMA_REQUEST_ADC1;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.Mode = DMA_CIRCULAR;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1) != HAL_OK)
     {
-      embot::hw::motor::bsp::amcfoc::cm7::Error_Handler();
+      embot::hw::motor::bldc::bsp::amcfoc::cm7::Error_Handler();
     }
 
-    __HAL_LINKDMA(adcHandle,DMA_Handle,embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1);
+    __HAL_LINKDMA(adcHandle,DMA_Handle,embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1);
 
     /* ADC1 interrupt Init */
     HAL_NVIC_SetPriority(ADC_IRQn, 5, 0);
@@ -1978,22 +2129,22 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 
     /* ADC2 DMA Init */
     /* ADC2 Init */
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Instance = DMA2_Stream1;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.Request = DMA_REQUEST_ADC2;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.PeriphInc = DMA_PINC_DISABLE;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.MemInc = DMA_MINC_ENABLE;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.Mode = DMA_CIRCULAR;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.Priority = DMA_PRIORITY_VERY_HIGH;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2) != HAL_OK)
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Instance = DMA2_Stream1;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.Request = DMA_REQUEST_ADC2;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.PeriphInc = DMA_PINC_DISABLE;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.MemInc = DMA_MINC_ENABLE;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.Mode = DMA_CIRCULAR;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2) != HAL_OK)
     {
-      embot::hw::motor::bsp::amcfoc::cm7::Error_Handler();
+      embot::hw::motor::bldc::bsp::amcfoc::cm7::Error_Handler();
     }
 
-    __HAL_LINKDMA(adcHandle,DMA_Handle,embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2);
+    __HAL_LINKDMA(adcHandle,DMA_Handle,embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2);
 
     /* ADC2 interrupt Init */
     HAL_NVIC_SetPriority(ADC_IRQn, 5, 0);
@@ -2050,22 +2201,22 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 
     /* ADC3 DMA Init */
     /* ADC3 Init */
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Instance = DMA2_Stream2;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.Request = DMA_REQUEST_ADC3;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.PeriphInc = DMA_PINC_DISABLE;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.MemInc = DMA_MINC_ENABLE;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.Mode = DMA_CIRCULAR;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.Priority = DMA_PRIORITY_HIGH;
-    embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3) != HAL_OK)
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Instance = DMA2_Stream2;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.Request = DMA_REQUEST_ADC3;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.PeriphInc = DMA_PINC_DISABLE;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.MemInc = DMA_MINC_ENABLE;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.Mode = DMA_CIRCULAR;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.Priority = DMA_PRIORITY_HIGH;
+    embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3) != HAL_OK)
     {
-      embot::hw::motor::bsp::amcfoc::cm7::Error_Handler();
+      embot::hw::motor::bldc::bsp::amcfoc::cm7::Error_Handler();
     }
 
-    __HAL_LINKDMA(adcHandle,DMA_Handle,embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3);
+    __HAL_LINKDMA(adcHandle,DMA_Handle,embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3);
 
     /* ADC3 interrupt Init */
     HAL_NVIC_SetPriority(ADC3_IRQn, 5, 0);
@@ -2202,71 +2353,71 @@ extern "C" {
     
     void TIM1_BRK_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim1);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim1);
     }
 
     void TIM1_UP_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim1);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim1);
     }
 
     void TIM2_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim2);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim2);
     }
 
     void TIM3_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim3);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim3);
     }
 
     void TIM4_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim4);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim4);
     }  
 
     void TIM8_BRK_TIM12_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim8);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim8);
     }
 
     void TIM8_UP_TIM13_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim8);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim8);
     }
 
     void TIM5_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim5);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim5);
     }
 
     void TIM6_DAC_IRQHandler(void)
     {
-        if(embot::hw::motor::bsp::amcfoc::cm7::hdac1.State != HAL_DAC_STATE_RESET) 
+        if(embot::hw::motor::bldc::bsp::amcfoc::cm7::hdac1.State != HAL_DAC_STATE_RESET) 
         {
-            HAL_DAC_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::hdac1);
+            HAL_DAC_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdac1);
         }
-        // HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim6);
+        // HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim6);
     }
 
     void TIM15_IRQHandler(void)
     {
-        HAL_TIM_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::htim15);
+        HAL_TIM_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htim15);
     }
 
     void DMA2_Stream0_IRQHandler(void)
     {
-        HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::hdma_adc1);
+        HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1);
     }
 
     void DMA2_Stream1_IRQHandler(void)
     {
-        HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::hdma_adc2);
+        HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2);
     }
 
     void DMA2_Stream2_IRQHandler(void)
     {
-        HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amcfoc::cm7::hdma_adc3);
+        HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc3);
     }
     
 }
@@ -2293,7 +2444,7 @@ extern "C" {
 #elif !defined(WIP_REMOVE_AMC_1CM7_CODE)
 
 
-namespace embot::hw::motor::bsp::amcfoc::cm7 {
+namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
     void TIM_base_MspInit(TIM_HandleTypeDef* htim_base)
     {
@@ -2466,7 +2617,7 @@ namespace embot::hw::motor::bsp::amcfoc::cm7 {
 
 
 
-} // namespace embot::hw::motor::bsp::amcfoc::cm7 {
+} // namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 
 #endif // #elif !defined(WIP_REMOVE_AMC_1CM7_CODE)  
 

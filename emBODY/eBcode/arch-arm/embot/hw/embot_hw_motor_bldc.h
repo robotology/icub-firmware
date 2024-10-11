@@ -16,7 +16,6 @@
 #include "embot_hw.h"
 #include "embot_hw_types.h"
 
-#include "embot_hw_motor.h"
 
 
 namespace embot::hw::motor::bldc {
@@ -100,9 +99,13 @@ namespace embot::hw::motor::bldc {
 
     bool supported(embot::hw::MOTOR m);     
     bool initialised(embot::hw::MOTOR m);
-
+    
+    bool deinit(MOTOR m);
+    
     // it prepares the low level HW and if config.isvalid() it also configures the HW w/ its content
     bool init(embot::hw::MOTOR m, const Config &config); 
+    
+
     
     // is to be called after init() and if config.isvalid() it configures the HW w/ its content.
     bool configure(embot::hw::MOTOR m, const Config &config);     
@@ -118,8 +121,6 @@ namespace embot::hw::motor::bldc {
     // it imposes the callback of reception of currents for a given motor.
     // it typically gets the motor position and applies PWMs properly rotated
     bool set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents);
-    
-//    bool hall(MOTOR m, HallStatus &hall);
 
     HallStatus hall(MOTOR m);
     

@@ -123,7 +123,7 @@ namespace embot::prot::can::motor::periodic {
                     } break;
                     case Type::VOLTAGE:
                     {   // i want to have [-100%, +100%]. i have [-32000, +32000] -> 
-                        v = embot::prot::can::motor::Converter::to_percentage(val);                        
+                        v = embot::prot::can::motor::Converter::to_percentage(val);    
                     } break; 
                     case Type::POSITION:
                     {   // i want to have [deg]. i have [icubdeg] ->
@@ -131,7 +131,15 @@ namespace embot::prot::can::motor::periodic {
                     } break;                     
                 }
                 return v;                
-            }            
+            } 
+
+            std::string to_string() const
+            {
+                return std::string("sig<MOTOR_TARGETS = (") 
+                                   + std::to_string(target[0]) + ", " + std::to_string(target[1]) + ", " 
+                                   + std::to_string(target[2]) + ", " + std::to_string(target[3]) + ")"
+                                   + ">";               
+            }                
         };
         
         Info info {};
