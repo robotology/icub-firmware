@@ -32,7 +32,7 @@
 //#include "embot_app_application_theCANtracer.h"
 
 
-
+#define DEBUG_print_decoded_CAN_frames
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -184,6 +184,11 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
             info.setVelocity(velocity);
             float position = _config.io2.get_position(embot::core::tointegral(m));
             info.setPosition(position); 
+                
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif 
+            
             // load                 
             msg.load(info);
             // get frame
@@ -223,6 +228,10 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
             uint8_t mfsmbd = _config.io2.get_motorfaultstate(embot::core::tointegral(m));
             embot::app::bldc::mbd::interface::Converter::tocan(mfsmbd, mfscan);
             info.motorfaultstate = mfscan.get();
+            
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif            
             
             // load                 
             msg.load(info);
@@ -338,7 +347,10 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info)
 {
-    // embot::core::print(info.to_string());
+    
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     // 1. we have info about all motors, so i must extract the targets of the two motors i need according to the address   
     for(const auto &m : themotors)
@@ -356,7 +368,9 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::per
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     // 1. get the motor index
     uint8_t motor = embot::core::tointegral(info.motorindex);   
@@ -374,7 +388,9 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_CURRENT_LIMIT::Info &info)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     // 1. get the motor index
     uint8_t motor = embot::core::tointegral(info.motorindex);   
@@ -391,7 +407,9 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PID::Info &info)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     // 1. get the motor index
     uint8_t motor = embot::core::tointegral(info.motorindex);   
@@ -408,7 +426,9 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
         
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PID::Info &info)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     // 1. get the motor index
     uint8_t motor = embot::core::tointegral(info.motorindex);   
@@ -425,7 +445,9 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
   
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_MOTOR_CONFIG::Info &info)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     // 1. get the motor index
     uint8_t motor = embot::core::tointegral(info.motorindex);   
@@ -442,7 +464,9 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_TEMPERATURE_LIMIT::Info &info)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     // it does nothing
     return true;
@@ -451,72 +475,113 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     auto mbdcm = _config.io2.get_controlmode(motor);
     embot::app::bldc::mbd::interface::Converter::tocan(mbdcm, replyinfo.controlmode);
+    
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif 
+    
     return true;    
 }
 
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::ReplyInfo &replyinfo)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     embot::app::bldc::mbd::interface::SupervisorInputLimits cl {};
     _config.io2.get_current_limits(motor, cl);    
     embot::app::bldc::mbd::interface::Converter::tocan(cl, replyinfo.currents);
+        
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif 
+        
     return true;          
 }
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PID::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PID::ReplyInfo &replyinfo)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     embot::app::bldc::mbd::interface::PID pid {};
     _config.io2.get_current_pid(motor, pid);    
     embot::app::bldc::mbd::interface::Converter::tocan(pid, replyinfo.pid);
+        
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif         
+        
     return true;        
 }
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::ReplyInfo &replyinfo)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
 
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     embot::app::bldc::mbd::interface::PID pid {};
     _config.io2.get_velocity_pid(motor, pid);    
     embot::app::bldc::mbd::interface::Converter::tocan(pid, replyinfo.pid);
+        
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif         
+        
     return true;          
 }
 
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_MOTOR_CONFIG::Info &info, embot::prot::can::motor::polling::Message_GET_MOTOR_CONFIG::ReplyInfo &replyinfo)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
        
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     embot::app::bldc::mbd::interface::MotorConfigurationExternal mc {};
     _config.io2.get_motor_config(motor, mc);    
     embot::app::bldc::mbd::interface::Converter::tocan(mc, replyinfo.config);
+        
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif 
+        
     return true;     
 }
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::ReplyInfo &replyinfo)
 {
-    // embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
     
     replyinfo.motorindex = info.motorindex;
     replyinfo.hardwarelimit = 666;
-      
+    
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif 
+    
     return true;    
 }
 

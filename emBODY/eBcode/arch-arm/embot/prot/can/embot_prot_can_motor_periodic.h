@@ -175,7 +175,16 @@ namespace embot::prot::can::motor::periodic {
             void setPosition(float pos)
             {
                 position = embot::prot::can::motor::Converter::to_can_fullposition(pos); 
-            }            
+            }
+
+            std::string to_string() const
+            {
+                return std::string("sig<FOC = (") 
+                                    + "current [mA] = " + std::to_string(current) + ", " + 
+                                    + "velocity [icubdeg/ms] = " + std::to_string(velocity) + ", " 
+                                    + "position [icubdeg] = " + std::to_string(position) + ")"
+                                    + ">";               
+            }             
         };
         
         Info info {};
@@ -198,6 +207,16 @@ namespace embot::prot::can::motor::periodic {
             int16_t pwmfeedback {0};        // [-100, +100] is mapped in [-32000, +32000]
             uint32_t motorfaultstate {0};   // treat the bit flags w/ suitable values. for board 2fos use embot::prot::can::motor::board::foc::MotorFaultState
             Info() = default;
+            
+            std::string to_string() const
+            {
+                return std::string("sig<STATUS = (") 
+                    + "ctrlmode = " + embot::prot::can::motor::Converter::tostring(static_cast<embot::prot::can::motor::ControlMode>(controlmode)) + ", "  
+                                    + "quadencoderstate [flags] = " + std::to_string(quadencoderstate) + ", " 
+                                    + "pwmfeedback [-32000, +32000] = " + std::to_string(3) 
+                                    + "motorfaultstate flags = " + std::to_string(motorfaultstate) + ")"
+                                    + ">";               
+            }             
         };
         
         Info info {};
