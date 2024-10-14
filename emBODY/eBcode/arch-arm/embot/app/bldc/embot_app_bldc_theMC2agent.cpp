@@ -151,24 +151,14 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
     
     for(const auto &m : themotors)
     {
-        bool transmit = _config.io2.get_transmitstatus(embot::core::tointegral(m));
-        bool emitFOC {transmit};
-        bool emitSTATUS {transmit};
-        bool emitADDITIONAL_STATUS {false};
+
+        bool emitFOC = _config.io2.get_transmit(embot::prot::can::motor::periodic::CMD::FOC, embot::core::tointegral(m));
+        bool emitSTATUS = _config.io2.get_transmit(embot::prot::can::motor::periodic::CMD::STATUS, embot::core::tointegral(m));
+        bool emitADDITIONAL_STATUS = _config.io2.get_transmit(embot::prot::can::motor::periodic::CMD::ADDITIONAL_STATUS, embot::core::tointegral(m)); // {false};
             
         // each motor transmits using a different address        
         uint8_t canaddress = _config.getaddress(m);
-        
-        #warning read that
-        // i need methods from mbd interface that tell me what is the content to transmit
-        // the likes of the method 
-        // bool IO2::get_transmitstatus(uint8_t motor) const 
-        // that i have just used 
-        // 
-        // or i just use the pointers directly. for now i do that.
-        //
-        // the best way is however the former because it moves changes of field names inside the .h file
-        
+                
         if(true == emitFOC)
         {
             emitted = true;
@@ -177,13 +167,12 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
             embot::prot::can::motor::periodic::Message_FOC::Info info {};
             
             info.canaddress = canaddress;
+            embot::app::bldc::mbd::interface::IO2::canFOCinfo cfi {};
+            _config.io2.get(cfi, embot::core::tointegral(m));
             // fill foc info from the MBD: i get and load directly because ... the setXXX() methods accept normal measures
-            float current = _config.io2.get_current(embot::core::tointegral(m));
-            info.setCurrent(current);
-            float velocity = _config.io2.get_velocity(embot::core::tointegral(m));
-            info.setVelocity(velocity);
-            float position = _config.io2.get_position(embot::core::tointegral(m));
-            info.setPosition(position); 
+            info.setCurrent(cfi.current);
+            info.setVelocity(cfi.velocity);
+            info.setPosition(cfi.position); 
                 
 #if defined(DEBUG_print_decoded_CAN_frames)
     embot::core::print(info.to_string());
@@ -207,25 +196,28 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
                 
             // fill info from the MBD: i get, convert to can format, assign to info
                 
+            embot::app::bldc::mbd::interface::IO2::canSTATUSinfo csi {};
+            _config.io2.get(csi, embot::core::tointegral(m));
+                
             // 1. controlmode
             auto ctrlmodecan {embot::prot::can::motor::ControlMode::none};
-            auto ctrlmodembd = _config.io2.get_controlmode(embot::core::tointegral(m));
+            auto ctrlmodembd = csi.controlmode; //_config.io2.get_controlmode(embot::core::tointegral(m));
             embot::app::bldc::mbd::interface::Converter::tocan(ctrlmodembd, ctrlmodecan);
             info.controlmode = embot::prot::can::motor::Converter::convert(ctrlmodecan);
             
             // 2. quadencoderstate
             embot::prot::can::motor::board::foc::QEstate qescan {0};
-            uint8_t qesmbd = _config.io2.get_quadencoderstate(embot::core::tointegral(m));
+            uint8_t qesmbd = csi.quadencoderstate; // _config.io2.get_quadencoderstate(embot::core::tointegral(m));
             embot::app::bldc::mbd::interface::Converter::tocan(qesmbd, qescan);
             info.quadencoderstate = qescan.get();
             
             // 3. pwmfeedback
-            float pwmperc =  _config.io2.get_pwmfeedback(embot::core::tointegral(m));
+            float pwmperc =  csi.pwmfeedback; // _config.io2.get_pwmfeedback(embot::core::tointegral(m));
             info.pwmfeedback = embot::prot::can::motor::Converter::to_can_percentage(pwmperc);;  
        
             // 4 motorfaultstate
             embot::prot::can::motor::board::foc::MotorFaultState mfscan {0};
-            uint8_t mfsmbd = _config.io2.get_motorfaultstate(embot::core::tointegral(m));
+            uint32_t mfsmbd = csi.motorfaultstate;// _config.io2.get_motorfaultstate(embot::core::tointegral(m));
             embot::app::bldc::mbd::interface::Converter::tocan(mfsmbd, mfscan);
             info.motorfaultstate = mfscan.get();
             

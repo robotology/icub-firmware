@@ -394,10 +394,15 @@ struct embot::app::board::amcfoc::cm7::theMBD::Impl
 #endif // #if defined(theMBDmotor_MEASURES_enabled)
 
 
-    embot::app::bldc::mbd::interface::ExtU_iterative_motion_controller_T input {};
-    embot::app::bldc::mbd::interface::ExtY_iterative_motion_controller_T output {};
-    embot::app::bldc::mbd::interface::Status_iterative_motion_controller_T status {};
-    embot::app::bldc::mbd::interface::IO2 io2 {&input, &output, &status};
+//    embot::app::bldc::mbd::interface::ExtU_iterative_motion_controller_T input {};
+//    embot::app::bldc::mbd::interface::ExtY_iterative_motion_controller_T output {};
+//    embot::app::bldc::mbd::interface::Status_iterative_motion_controller_T status {};
+//    embot::app::bldc::mbd::interface::IO2 io2 {&input, &output, &status};
+    
+//    embot::app::bldc::mbd::interface::ExtU_iterative_motion_controller_T input {};
+//    embot::app::bldc::mbd::interface::ExtY_iterative_motion_controller_T output {};
+
+    embot::app::bldc::mbd::interface::IO2 io2 {&iterative_motion_controller_U, &iterative_motion_controller_Y};    
     
     std::vector<embot::prot::can::Frame> caninputframes {};
     std::vector<embot::prot::can::Frame> canoutputframes {};

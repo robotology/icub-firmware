@@ -36,6 +36,17 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+// this is the memory of the controller
+extern "C"
+{
+  // External inputs (root inport signals with default storage)
+  ExtU_iterative_motion_controller_T iterative_motion_controller_U {};
+
+  // External outputs (root outports fed by signals with default storage)
+  ExtY_iterative_motion_controller_T iterative_motion_controller_Y {};
+}
+
+
 namespace embot::app::bldc::mbd::interface::mock {
     
     
@@ -105,45 +116,52 @@ namespace embot::app::bldc::mbd::interface::mock {
             return;
         }
         
-        Status_iterative_motion_controller_T *status = _thembddata.io2->get_status();
+//        Status_iterative_motion_controller_T *status = _thembddata.io2->get_status();
+        State state = _thembddata.io2->get_state();
         
         switch(e.event_type)
         {
             case EventTypes_SetLimit:
             {
-                status->currentlimits[e.motor] = e.limits_content;
-                _thembddata.LIMcurOK[e.motor] = true;                
+//                status->currentlimits[e.motor_id] = e.limits_content;
+                state.actcfg[e.motor_id]->thresholds.motorNominalCurrents = e.limits_content.nominal;
+                state.actcfg[e.motor_id]->thresholds.motorPeakCurrents = e.limits_content.peak;
+                state.actcfg[e.motor_id]->thresholds.motorOverloadCurrents = e.limits_content.overload;
+                _thembddata.LIMcurOK[e.motor_id] = true;                
             } break;
             
             case EventTypes_SetControlMode:
             {
-                _thembddata.io2->set_controlmode(e.control_mode_content, e.motor);
+                _thembddata.io2->set_controlmode(e.control_mode_content, e.motor_id);
             } break;
 
             case EventTypes_SetMotorConfig:
             {
-                status->motorconfig[e.motor] = e.motor_config_content;
-                _thembddata.MOTcfgOK[e.motor] = true;                               
+//                status->motorconfig[e.motor_id] = e.motor_config_content;
+                state.actcfg[e.motor_id]->motor.externals = e.motor_config_content;
+                _thembddata.MOTcfgOK[e.motor_id] = true;                               
             } break;
 
             case EventTypes_SetPid:
             {
                 if(ControlModes_Current == e.pid_content.type)
                 {
-                    status->pidcurrent[e.motor] = e.pid_content;  
-                    _thembddata.PIDcurOK[e.motor] = true;                    
+//                    status->pidcurrent[e.motor_id] = e.pid_content; 
+                    state.actcfg[e.motor_id]->pids.currentPID = e.pid_content;                     
+                    _thembddata.PIDcurOK[e.motor_id] = true;                    
                 }
                 else if(ControlModes_Velocity == e.pid_content.type)
                 {
-                    status->pidvelocity[e.motor] = e.pid_content;
-                    _thembddata.PIDvelOK[e.motor] = true;
+//                    status->pidvelocity[e.motor_id] = e.pid_content;
+                    state.actcfg[e.motor_id]->pids.velocityPID = e.pid_content;
+                    _thembddata.PIDvelOK[e.motor_id] = true;
                 }
             } break;
 
             case EventTypes_SetTarget:
             {
-                status->target[e.motor] = e.targets_content.current;
-                _thembddata.TRGjustarrived[e.motor] = true;
+//                status->target[e.motor_id] = e.targets_content.current;
+                _thembddata.TRGjustarrived[e.motor_id] = true;
             } break; 
 
             default: {} break;
@@ -163,7 +181,7 @@ namespace embot::app::bldc::mbd::interface::mock {
         _thembddata.targetclear();
         
         // retrieve the message events
-        for(const auto &i : _thembddata.io2->get_input()->Events)
+        for(const auto &i : _thembddata.io2->get_input()->EventsList)
         {
             process(i); 
         }  
@@ -201,25 +219,23 @@ namespace embot::app::bldc::mbd::interface::mock {
                 // i fill what will be used for the CAN messages:
                 
                 // 1. embot::prot::can::motor::periodic::CMD::FOC 
-                // - current
-                 _thembddata.io2->get_output()->Estimates[m].Iq_filtered = 2.0f;
-
-                // - velocity
-                _thembddata.io2->set_velocity(70.0, m);
                 
-                // - position
-                _thembddata.io2->set_position(45.0, m); 
-                
-                _thembddata.io2->get_output()->FOCOutputs_h[m].Vq = num;
-                // etc.
-                
+                embot::app::bldc::mbd::interface::IO2::canFOCinfo cfi {};
+                cfi.current = 2.0f;
+                cfi.position = 45.0;
+                cfi.velocity = 70.0f;
+                _thembddata.io2->set(cfi, m);    
+                 
                 
                 // 2. embot::prot::can::motor::periodic::CMD::STATUS
-                // - controlmode is already inside output
-                // - quadencoderstate ...
-                // - pwmfeedback ...
-                // - motorfaultstate ...
-                // 
+                    
+                embot::app::bldc::mbd::interface::IO2::canSTATUSinfo csi {};
+                               
+                csi.controlmode = _thembddata.io2->get_controlmode(m); // - controlmode is maintained  
+                csi.quadencoderstate = 0; // no flags
+                csi.pwmfeedback = 30.0; // we impose it
+                csi.motorfaultstate = 0; // no flags
+
                 
                 // 3. embot::prot::can::motor::periodic::CMD::ADDITIONAL_STATUS
                 // - temperature

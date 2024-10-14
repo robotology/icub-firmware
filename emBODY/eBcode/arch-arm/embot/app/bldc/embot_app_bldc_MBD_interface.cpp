@@ -123,195 +123,11 @@ namespace embot::app::bldc::mbd::interface {
 #endif
 
 
-#if 0
-
- removed
-
-    embot::prot::can::motor::ControlMode convert(const ControlModes x)
-    {
-        embot::prot::can::motor::ControlMode cm {embot::prot::can::motor::ControlMode::Idle};
-        
-        // w/ lookup table is quick
-        
-        constexpr uint8_t numOfmbd {8};
-        constexpr static embot::prot::can::motor::ControlMode toCANcm[numOfmbd] =
-        {
-            embot::prot::can::motor::ControlMode::NotConfigured,   // ControlModes_NotConfigured = 0
-            embot::prot::can::motor::ControlMode::Idle,            // ControlModes_Idle = 1
-            embot::prot::can::motor::ControlMode::Idle,            // ControlModes_Position = 2 we dont have CAN boards controlled in position
-            embot::prot::can::motor::ControlMode::Idle,            // ControlModes_PositionDirect = 3 we dont have CAN boards controlled in position direct
-            embot::prot::can::motor::ControlMode::Current,         // ControlModes_Current = 4 
-            embot::prot::can::motor::ControlMode::SpeedVoltage,    // ControlModes_Velocity = 5 
-            embot::prot::can::motor::ControlMode::OpenLoop,        // ControlModes_Voltage = 6 
-            embot::prot::can::motor::ControlMode::HWfault          // ControlModes_HwFaultCM = 7            
-        };
-        
-        uint8_t i = static_cast<uint8_t>(x);
-        
-        if(i<numOfmbd)
-        {
-            cm = toCANcm[i];
-        }
-        
-        return cm;
-    }
-    
-    struct Pair
-    {
-        embot::prot::can::motor::ControlMode  cmCAN {embot::prot::can::motor::ControlMode::NotConfigured};    
-        embot::app::bldc::mbd::interface::ControlModes cmMBD {embot::app::bldc::mbd::interface::ControlModes::ControlModes_NotConfigured}; 
-        constexpr Pair() = default; 
-        constexpr Pair(embot::prot::can::motor::ControlMode c1, embot::app::bldc::mbd::interface::ControlModes c2)  : cmCAN(c1), cmMBD(c2) {}       
-    };
-
-    ControlModes convert(const embot::prot::can::motor::ControlMode cm)
-    {
-        embot::app::bldc::mbd::interface::ControlModes c { embot::app::bldc::mbd::interface::ControlModes::ControlModes_NotConfigured};
-        
-        constexpr uint8_t numOfcan {8};
-        constexpr std::array<Pair, numOfcan> toMBDcm
-        {
-            Pair{embot::prot::can::motor::ControlMode::Idle,           embot::app::bldc::mbd::interface::ControlModes::ControlModes_Idle},
-            Pair{embot::prot::can::motor::ControlMode::Current,        embot::app::bldc::mbd::interface::ControlModes::ControlModes_Current},
-            Pair{embot::prot::can::motor::ControlMode::ForceIdle,      embot::app::bldc::mbd::interface::ControlModes::ControlModes_Idle},
-            Pair{embot::prot::can::motor::ControlMode::SpeedVoltage,   embot::app::bldc::mbd::interface::ControlModes::ControlModes_Velocity},      
-            Pair{embot::prot::can::motor::ControlMode::OpenLoop,       embot::app::bldc::mbd::interface::ControlModes::ControlModes_Voltage},
-            Pair{embot::prot::can::motor::ControlMode::HWfault,        embot::app::bldc::mbd::interface::ControlModes::ControlModes_HwFaultCM},
-            Pair{embot::prot::can::motor::ControlMode::NotConfigured,  embot::app::bldc::mbd::interface::ControlModes::ControlModes_NotConfigured},
-            Pair{embot::prot::can::motor::ControlMode::none,           embot::app::bldc::mbd::interface::ControlModes::ControlModes_NotConfigured}             
-        };
-        
-        // in here we loop
-        for(const auto &i : toMBDcm)
-        {
-            if(i.cmCAN == cm)
-            {
-                return i.cmMBD;
-            }
-        }   
-
-        return embot::app::bldc::mbd::interface::ControlModes::ControlModes_NotConfigured;
-    }
-    
-        
-    void convert(const embot::prot::can::motor::CurrentLimits &from, SupervisorInputLimits &to)
-    {
-        // CurrentLimits is in mA, SupervisorInputLimits in A 
-        to.nominal = CurrConv::toampere(from.nominal);
-        to.overload = CurrConv::toampere(from.overload);
-        to.peak = CurrConv::toampere(from.peak);
-        to.type = ControlModes::ControlModes_NotConfigured;
-    }
-    
-    void convert(const SupervisorInputLimits &from, embot::prot::can::motor::CurrentLimits &to)
-    {
-        // CurrentInfo is in mA, SupervisorInputLimits in A 
-        to.nominal = CurrConv::tomilliampere(from.nominal);
-        to.overload = CurrConv::tomilliampere(from.overload);
-        to.peak = CurrConv::tomilliampere(from.peak);
-    }
-    
-    void convert(const embot::prot::can::motor::PID &from, PID &to)
-    {       
-        to.type = (from.type == embot::prot::can::motor::PIDtype::VEL) ? ControlModes_Velocity : ControlModes_Current;
-        to.OutMax = 0;
-        to.OutMin = 0;
-        to.P = from.get(embot::prot::can::motor::PID::Gain::P);
-        to.I = from.get(embot::prot::can::motor::PID::Gain::I);
-        to.D = from.get(embot::prot::can::motor::PID::Gain::D);
-        to.N = 0;
-        to.I0 = 0;
-        to.D0 = 0;
-        to.shift_factor = from.ks;
-    }
-    
-    void convert(const PID &from, embot::prot::can::motor::PID &to)
-    {       
-        embot::prot::can::motor::PIDtype pidtype = (from.type == ControlModes_Velocity) ? embot::prot::can::motor::PIDtype::VEL :  embot::prot::can::motor::PIDtype::CURR;        
-        to.load(pidtype, from.P, from.I, from.D, from.shift_factor);
-    }    
-    
-    void convert(const embot::prot::can::motor::MotorConfig &from, MotorConfigurationExternal &to)
-    {
-        // flags
-        to.enable_verbosity = from.check(embot::prot::can::motor::MotorConfig::Flag::verbose);
-        to.has_hall_sens = from.check(embot::prot::can::motor::MotorConfig::Flag::hasHALLsensor);
-        to.has_quadrature_encoder = from.check(embot::prot::can::motor::MotorConfig::Flag::hasRotorEncoder);
-        to.has_speed_quadrature_encoder = from.check(embot::prot::can::motor::MotorConfig::Flag::hasSpeedEncoder);
-        to.use_index = from.check(embot::prot::can::motor::MotorConfig::Flag::hasRotorEncoderIndex);
-        to.has_temperature_sens = from.check(embot::prot::can::motor::MotorConfig::Flag::hasTempSensor);
-        // others
-        to.encoder_tolerance = from.rotEncTolerance;
-        to.pole_pairs = from.motorPoles;
-        to.rotor_encoder_resolution = from.rotorEncoderResolution;
-        to.rotor_index_offset = from.rotorIndexOffset;                
-    }
-    
-    void convert(const MotorConfigurationExternal &from, embot::prot::can::motor::MotorConfig &to)
-    {
-        // flags
-        to.flags = 0;
-        if(from.enable_verbosity)               to.set(embot::prot::can::motor::MotorConfig::Flag::verbose);
-        if(from.has_hall_sens)                  to.set(embot::prot::can::motor::MotorConfig::Flag::hasHALLsensor);
-        if(from.has_quadrature_encoder)         to.set(embot::prot::can::motor::MotorConfig::Flag::hasRotorEncoder);
-        if(from.has_speed_quadrature_encoder)   to.set(embot::prot::can::motor::MotorConfig::Flag::hasSpeedEncoder);
-        if(from.use_index)                      to.set(embot::prot::can::motor::MotorConfig::Flag::hasRotorEncoderIndex);
-        if(from.has_temperature_sens)           to.set(embot::prot::can::motor::MotorConfig::Flag::hasTempSensor);
-
-        // others
-        to.rotEncTolerance = from.encoder_tolerance;
-        to.motorPoles = from.pole_pairs;
-        to.rotorEncoderResolution = from.rotor_encoder_resolution;
-        to.rotorIndexOffset = from.rotor_index_offset;                
-    }    
-    
-    
-    void convert(const int16_t from, Targets &to)
-    {
-#if 1
-        to.current = embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::transform(
-                        from, 
-                        embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::Type::CURRENT);
-
-        to.voltage = embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::transform(
-                        from, 
-                        embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::Type::VOLTAGE);
-
-        to.velocity = embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::transform(
-                        from, 
-                        embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::Type::VELOCITY);
-
-        to.position = embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::transform(
-                        from, 
-                        embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::Type::POSITION);
-        
-#else        
-//        to.current = to.voltage = to.velocity = to.position = static_cast<float>(from);
-        
-        // from contains currents in [mA] and we want [A]          
-        to.current = 0.001f*static_cast<float>(from);
-        
-        // from contains voltages expressed as ??? and we want [V]
-        // the transformation needs some parameters that depend on the current PID shift factor, so we dont do it in here
-        to.voltage = static_cast<float>(from);
-        
-        // from contains velocity in [icubdegrees/ms] and we want [deg/s]
-        constexpr float todeg = 0.0054931640625f; // 1 icub-deg -> 360 deg / pow(2, 16)
-        constexpr float cnv = 1000.0f * todeg;  
-        to.velocity = cnv*static_cast<float>(from);   
-        
-        // from contains positions in [icubdegrees], we want [deg] 
-        to.position = todeg*static_cast<float>(from);  
-#endif        
-    }
-
-#endif
-
     
     // struct Converter
     
 
-    void Converter::tocan(const ControlModes from, embot::prot::can::motor::ControlMode &to)
+    void Converter::tocan(const embot::app::bldc::mbd::interface::ControlModes from, embot::prot::can::motor::ControlMode &to)
     {
         embot::prot::can::motor::ControlMode cm {embot::prot::can::motor::ControlMode::Idle};
         
@@ -338,7 +154,7 @@ namespace embot::app::bldc::mbd::interface {
         }
     }
     
-    void Converter::fromcan(const embot::prot::can::motor::ControlMode from, ControlModes &to)
+    void Converter::fromcan(const embot::prot::can::motor::ControlMode from, embot::app::bldc::mbd::interface::ControlModes &to)
     {
         to = embot::app::bldc::mbd::interface::ControlModes::ControlModes_NotConfigured;
         
@@ -375,7 +191,7 @@ namespace embot::app::bldc::mbd::interface {
 
     }    
     
-    void Converter::fromcan(const embot::prot::can::motor::CurrentLimits &from, SupervisorInputLimits &to)
+    void Converter::fromcan(const embot::prot::can::motor::CurrentLimits &from, embot::app::bldc::mbd::interface::SupervisorInputLimits &to)
     {
         // CurrentLimits is in mA, SupervisorInputLimits in A 
         to.nominal = millitoampere(from.nominal);
@@ -384,7 +200,7 @@ namespace embot::app::bldc::mbd::interface {
         to.type = ControlModes::ControlModes_NotConfigured;
     }
     
-    void Converter::tocan(const SupervisorInputLimits &from, embot::prot::can::motor::CurrentLimits &to)
+    void Converter::tocan(const embot::app::bldc::mbd::interface::SupervisorInputLimits &from, embot::prot::can::motor::CurrentLimits &to)
     {
         // CurrentInfo is in mA, SupervisorInputLimits in A 
         to.nominal = amperetomilli(from.nominal);
@@ -406,13 +222,13 @@ namespace embot::app::bldc::mbd::interface {
         to.shift_factor = from.ks;
     }
     
-    void Converter::tocan(const PID &from, embot::prot::can::motor::PID &to)
+    void Converter::tocan(const embot::app::bldc::mbd::interface::PID &from, embot::prot::can::motor::PID &to)
     {       
         embot::prot::can::motor::PIDtype pidtype = (from.type == ControlModes_Velocity) ? embot::prot::can::motor::PIDtype::VEL :  embot::prot::can::motor::PIDtype::CURR;        
         to.load(pidtype, from.P, from.I, from.D, from.shift_factor);
     }    
     
-    void Converter::fromcan(const embot::prot::can::motor::MotorConfig &from, MotorConfigurationExternal &to)
+    void Converter::fromcan(const embot::prot::can::motor::MotorConfig &from, embot::app::bldc::mbd::interface::MotorConfigurationExternal &to)
     {
         // flags
         to.enable_verbosity = from.check(embot::prot::can::motor::MotorConfig::Flag::verbose);
@@ -428,7 +244,7 @@ namespace embot::app::bldc::mbd::interface {
         to.rotor_index_offset = from.rotorIndexOffset;                
     }
     
-    void Converter::tocan(const MotorConfigurationExternal &from, embot::prot::can::motor::MotorConfig &to)
+    void Converter::tocan(const embot::app::bldc::mbd::interface::MotorConfigurationExternal &from, embot::prot::can::motor::MotorConfig &to)
     {
         // flags
         to.flags = 0;
@@ -459,9 +275,9 @@ namespace embot::app::bldc::mbd::interface {
     }    
     
     
-    void Converter::fromcan(const int16_t from, Targets &to)
+    void Converter::fromcan(const int16_t from, embot::app::bldc::mbd::interface::Targets &to)
     {
-#if 1
+
         to.current = embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::transform(
                         from, 
                         embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::Type::CURRENT);
@@ -477,33 +293,15 @@ namespace embot::app::bldc::mbd::interface {
         to.position = embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::transform(
                         from, 
                         embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info::Type::POSITION);
-        
-#else        
-//        to.current = to.voltage = to.velocity = to.position = static_cast<float>(from);
-        
-        // from contains currents in [mA] and we want [A]          
-        to.current = 0.001f*static_cast<float>(from);
-        
-        // from contains voltages expressed as ??? and we want [V]
-        // the transformation needs some parameters that depend on the current PID shift factor, so we dont do it in here
-        to.voltage = static_cast<float>(from);
-        
-        // from contains velocity in [icubdegrees/ms] and we want [deg/s]
-        constexpr float todeg = 0.0054931640625f; // 1 icub-deg -> 360 deg / pow(2, 16)
-        constexpr float cnv = 1000.0f * todeg;  
-        to.velocity = cnv*static_cast<float>(from);   
-        
-        // from contains positions in [icubdegrees], we want [deg] 
-        to.position = todeg*static_cast<float>(from);  
-#endif        
+           
     }    
     
     // struct IO2
     
     void IO2::event_clearall() 
     {
-        memset(input->Events, 0, sizeof(input->Events));
-        for(auto &i : input->Events)
+        memset(input->EventsList, 0, sizeof(input->EventsList));
+        for(auto &i : input->EventsList)
         {
             i.event_type = EventTypes_None;
         }
@@ -511,9 +309,9 @@ namespace embot::app::bldc::mbd::interface {
     }
     
     
-    int8_t IO2::getposofevent(EventTypes evt, uint8_t motor)
+    int8_t IO2::getposofevent(embot::app::bldc::mbd::interface::EventTypes evt, uint8_t motor)
     {
-        if(evtpos >= (sizeof(input->Events) / sizeof(ReceivedEvents)))
+        if(evtpos >= (sizeof(input->EventsList) / sizeof(ReceivedEvents)))
         {
             return -1;
         }
@@ -523,7 +321,7 @@ namespace embot::app::bldc::mbd::interface {
         return r;        
     }
     
-    bool IO2::addevent(const ReceivedEvents& re, uint8_t motor)
+    bool IO2::addevent(const embot::app::bldc::mbd::interface::ReceivedEvents& re, uint8_t motor)
     {
         int8_t pos = getposofevent(re.event_type, motor);
         if(pos < 0)
@@ -531,58 +329,58 @@ namespace embot::app::bldc::mbd::interface {
             return false;
         }
 
-        input->Events[pos] = re;
-        input->Events[pos].motor = motor; // just in case
+        input->EventsList[pos] = re;
+        input->EventsList[pos].motor_id = motor; // just in case
         
         return true;
     }
     
-    bool IO2::event_pushback(const ControlModes cm, uint8_t motor)
+    bool IO2::event_pushback(const embot::app::bldc::mbd::interface::ControlModes cm, uint8_t motor)
     {
         // the way we add an event it is to be clarified w/ mfussi                
         ReceivedEvents re {};                
         re.event_type = EventTypes_SetControlMode;
         re.control_mode_content = cm; 
-        re.motor = motor;            
+        re.motor_id = motor;            
             
         return addevent(re, motor); 
 
     }
     
-    bool IO2::event_pushback(const SupervisorInputLimits &limits, uint8_t motor)
+    bool IO2::event_pushback(const embot::app::bldc::mbd::interface::SupervisorInputLimits &limits, uint8_t motor)
     {
         // ControlModes cm = get_controlmode(motor);
         ReceivedEvents re {};                
         re.event_type = EventTypes_SetLimit;
         re.limits_content = limits;
         re.limits_content.type = get_controlmode(motor); // only in here we can know about control mode
-        re.motor = motor; 
+        re.motor_id = motor; 
             
         addevent(re, motor);
         
         return true;        
     }
 
-    bool IO2::event_pushback(const PID &pid, uint8_t motor)
+    bool IO2::event_pushback(const embot::app::bldc::mbd::interface::PID &pid, uint8_t motor)
     {
         //ControlModes cm = get_controlmode(motor);
         ReceivedEvents re {};                
         re.event_type = EventTypes_SetPid;
         re.pid_content = pid;
-        re.motor = motor; 
+        re.motor_id = motor; 
             
         addevent(re, motor);
         
         return true;        
     }
     
-    bool IO2::event_pushback(const MotorConfigurationExternal &mc, uint8_t motor)
+    bool IO2::event_pushback(const embot::app::bldc::mbd::interface::MotorConfigurationExternal &mc, uint8_t motor)
     {
         // ControlModes cm = get_controlmode(motor);
         ReceivedEvents re {};                
         re.event_type = EventTypes_SetMotorConfig;
         re.motor_config_content = mc;
-        re.motor = motor; 
+        re.motor_id = motor; 
             
         addevent(re, motor);
         
@@ -590,14 +388,14 @@ namespace embot::app::bldc::mbd::interface {
     }
     
 
-    bool IO2::event_pushback(const Targets &t, uint8_t motor)
+    bool IO2::event_pushback(const embot::app::bldc::mbd::interface::Targets &t, uint8_t motor)
     {
         // ControlModes cm = get_controlmode(motor);
         ReceivedEvents re {};                
         re.event_type = EventTypes_SetTarget;
         re.targets_content = t;
         // i need to adapt targets_content to the correct format. 
-        re.motor = motor; 
+        re.motor_id = motor; 
             
         addevent(re, motor);   
             
@@ -609,39 +407,16 @@ namespace embot::app::bldc::mbd::interface {
         input->ExternalFlags_j.fault_button = pressed;           
     }
     
-    void IO2::set_controlmode(const ControlModes cm, uint8_t motor)
+    void IO2::set_controlmode(const embot::app::bldc::mbd::interface::ControlModes cm, uint8_t motor)
     {
         output->Flags_d[motor].control_mode = cm;
     }
-    
-    void IO2::set_quadencoderstate(const uint8_t qes, uint8_t motor)
+ 
+    void IO2::set_temperature(float celsiusdegrees, uint8_t motor)
     {
-        #warning QES is TODEDONE    
-    }
-
-    uint8_t IO2::get_quadencoderstate(uint8_t motor)
-    {
-        #warning QES is TODEDONE  
-        return 0;        
+        float c = celsiusdegrees;
     }
     
-    uint32_t IO2::get_motorfaultstate(uint8_t motor)
-    {
-        uint32_t f {0};
-        constexpr uint8_t pos = embot::core::tointegral(embot::prot::can::motor::board::foc::MotorFaultState::Flag::ExternalFaultAsserted);
-        
-        if(true == get_fault())
-        {
-            embot::core::binary::bit::set(f, pos);
-        }
-        return f;       
-    }
-    
-    float IO2::get_pwmfeedback(uint8_t motor) const
-    {
-        #warning PWMFEEDBACK is TODEDONE  
-        return 30.0;         
-    }
     
     bool IO2::get_fault() const
     {
@@ -653,63 +428,104 @@ namespace embot::app::bldc::mbd::interface {
         return output->Flags_d[motor].control_mode;
     }
     
-    bool IO2::get_transmitstatus(uint8_t motor) const
+    
+    bool IO2::get_transmit(embot::prot::can::motor::periodic::CMD cmd, uint8_t motor) const
     {
-       return output->Flags_d[motor].enable_sending_msg_status; 
+        bool r {false};
+        
+        switch(cmd)
+        {
+            default: {} break;
+                
+            case embot::prot::can::motor::periodic::CMD::STATUS:
+            {
+                r = output->Flags_d[motor].enable_sending_msg_status;
+            } break;
+            
+            case embot::prot::can::motor::periodic::CMD::FOC:
+            {
+                r = output->Flags_d[motor].enable_sending_msg_status;
+            } break; 
+            case embot::prot::can::motor::periodic::CMD::ADDITIONAL_STATUS:
+            {
+                r = false;
+            } break;                
+        }
+        
+        return r;
+        
     }
     
-    float IO2::get_current(uint8_t motor) const
+    void IO2::set(const canFOCinfo &info, uint8_t motor)
     {
-        #warning or ... FOCOutputs::Iq_fbk / Iq_rms ??
-        return output->Estimates[motor].Iq_filtered; // mettiamo la 
+        state.messages[motor]->foc.current = info.current;
+        state.messages[motor]->foc.velocity = info.velocity;
+        state.messages[motor]->foc.position = info.position;
     }
+    
+    void IO2::get(canFOCinfo &info, uint8_t motor) const
+    {
+        info.current = state.messages[motor]->foc.current;
+        info.velocity = state.messages[motor]->foc.velocity;
+        info.position = state.messages[motor]->foc.position;
+    }
+    
+    
+    void IO2::set(const canSTATUSinfo &info, uint8_t motor)
+    {
+        set_controlmode(info.controlmode, motor);
+        #warning QES is TODEDONE // info.quadencoderstate;
+        embot::prot::can::motor::board::foc::QEstate qes {0};
+        qes.load(info.quadencoderstate);    // info.motorfaultstate
+        // nad now use qes
+        state.messages[motor]->status.flags.ExternalFaultAsserted = get_fault();
+        state.messages[motor]->status.pwm_fbk = info.pwmfeedback;
 
-    float IO2::get_velocity(uint8_t motor) const
-    {
-        return output->Estimates[motor].velocity;
-    }
-
-    void IO2::set_velocity(float dps, uint8_t motor)
-    {
-        output->Estimates[motor].velocity = dps;
     }
     
-    float IO2::get_position(uint8_t motor) const
+    void IO2::get(canSTATUSinfo &info, uint8_t motor) const
     {
-        #warning or ... something else
-        return input->SensorData[motor].position;
-    }  
+        #warning QES is TODEDONE
+        info.controlmode = get_controlmode(motor);
+        info.quadencoderstate = 0;
+        info.pwmfeedback = state.messages[motor]->status.pwm_fbk;       
+        embot::prot::can::motor::board::foc::MotorFaultState mfs {0};
+        if(true == get_fault())
+        {
+            mfs.set(embot::prot::can::motor::board::foc::MotorFaultState::Flag::ExternalFaultAsserted);
+        }
+        info.motorfaultstate = mfs.get();
+        
+    }   
     
-    void IO2::set_position(const float degrees, uint8_t motor)
-    {
-        input->SensorData[motor].position = degrees;
-    }
 
     float IO2::get_temperature(uint8_t motor) const
     {
-        #warning or ... something else
-        return output->Estimates[motor].motor_temperature;
+        return 66.6;
+//        return output->Estimates[motor].motor_temperature;
     } 
     
-    void IO2::get_current_limits(uint8_t motor, SupervisorInputLimits &cl)
-    {
-        cl = status->currentlimits[motor];
+    void IO2::get_current_limits(uint8_t motor, embot::app::bldc::mbd::interface::SupervisorInputLimits &cl)
+    {   
+        cl.overload = state.actcfg[motor]->thresholds.motorOverloadCurrents;
+        cl.peak = state.actcfg[motor]->thresholds.motorPeakCurrents;
+        cl.nominal = state.actcfg[motor]->thresholds.motorNominalCurrents; 
     }
     
 
     void IO2::get_current_pid(uint8_t motor, PID &pid)
-    {
-        pid = status->pidcurrent[motor];
+    {  
+        pid = state.actcfg[motor]->pids.currentPID;       
     }    
      
     void IO2::get_velocity_pid(uint8_t motor, PID &pid)
     {
-        pid = status->pidvelocity[motor];
+        pid = state.actcfg[motor]->pids.velocityPID;
     }
     
-    void IO2::get_motor_config(uint8_t motor, MotorConfigurationExternal &mc)
+    void IO2::get_motor_config(uint8_t motor, embot::app::bldc::mbd::interface::MotorConfigurationExternal &mc)
     {
-        mc = status->motorconfig[motor];
+        mc = state.actcfg[motor]->motor.externals;
     }    
     
     ExtU_iterative_motion_controller_T * IO2::get_input() const
@@ -722,10 +538,11 @@ namespace embot::app::bldc::mbd::interface {
         return output;
     }
     
-    Status_iterative_motion_controller_T * IO2::get_status() const
+
+    State& IO2::get_state()
     {
-        return status;
-    }    
+        return state;
+    }      
     
 } // namespace embot::app::bldc::mbd::interface {
 
