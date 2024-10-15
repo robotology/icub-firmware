@@ -996,7 +996,7 @@ void StartI2CMaster(unsigned char Channel) {
 #warning marco.accame: why param input is not used?
 void SetSdaReg(i2c_sda_num_t sdaNum, unsigned char input) 
 {    
-    if(sdaNum < 4)
+    if(sdaNum < 5)
     {       
         LL_GPIO_SetPinMode(props.sda[sdaNum].stmport, props.sda[sdaNum].stmpin, LL_GPIO_MODE_INPUT);
     }
@@ -1005,7 +1005,7 @@ void SetSdaReg(i2c_sda_num_t sdaNum, unsigned char input)
 
 void SetValReg(i2c_sda_num_t sdaNum, unsigned char val) 
 {
-    if(sdaNum < 4)
+    if(sdaNum < 5)
     {   // because val=0 -> GPIO_PIN_RESET else -> GPIO_PIN_SET
         HAL_GPIO_WritePin(props.sda[sdaNum].stmport, props.sda[sdaNum].stmpin, (0==val) ? (GPIO_PIN_RESET) : (GPIO_PIN_SET));        
     }
