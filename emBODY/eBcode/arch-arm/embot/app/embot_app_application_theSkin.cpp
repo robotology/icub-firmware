@@ -62,13 +62,16 @@
 std::uint16_t dbg = 0;
 constexpr std::uint8_t dotNumberOf = 12;
 constexpr std::uint8_t trgNumberOf = 16; //4 for each sda. This is used in the CAN message forming so it's locked to 16
-#ifdef USE_FIFTH_I2C 
-    uint16_t trianglesOrder[16]  = {0,4,8,12,16,10,11,13,15,1,2,3,5,6,7,9};
-#else
+//#ifdef USE_FIFTH_I2C 
+//    uint16_t trianglesOrder[16]  = {0,4,8,12,16,10,11,13,15,1,2,3,5,6,7,9};
+//    uint16_t origTrianglesOrder[16]  = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+//    uint16_t altTrianglesOrder[16]  = {0,4,8,12,16,10,11,13,15,1,2,3,5,6,7,9}; //to reshuffle the triangles on-the-run
+//#else
     uint16_t trianglesOrder[16]  = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    uint16_t origTrianglesOrder[16]  = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     uint16_t altTrianglesOrder[16]  = {0,4,8,12,16,10,11,13,15,1,2,3,5,6,7,9}; //to reshuffle the triangles on-the-run
 
-#endif
+//#endif
 
 struct TriangleCfg
 {
@@ -344,7 +347,10 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
         case embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation:
         case embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::palmFingerTip:
         case embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensationV2:
+        case embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::ergoHand:
         {
+//						for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = origTrianglesOrder[i];
+						
             if(embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation == boardconfig.skintype)
             {
                 gain = triangles.GAIN[dot];  
@@ -355,14 +361,27 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
                 gain = triangles.GAIN_PALM[dot];
                 posTemp = 11;
             }
+            else if(embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::ergoHand == boardconfig.skintype)
+            {
+                if(trg>4){ //are the indexes of the triangles 
+									gain = triangles.GAIN_V2[dot];
+                  posTemp = 6;
+								}
+								else { // are the indexes of the 3DMID
+                  gain = triangles.GAIN_PALM[dot];
+                  posTemp = 11;
+								} 
+//								for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = altTrianglesOrder[i];
+            }
             else
             {
                 gain = triangles.GAIN_V2[dot];
                 posTemp = 6;
             }
                         
-            Tpad_base = triangles.capoffsets[trg][posTemp]; // in original mtb3 code there is ADCRESULT_S6 which is defined as 6
-            Tpad = triangles.rawvalues[trg][posTemp];
+						// temperature compensation does not apply to fingertips i.e. triangles 0,4,8,12,16 thus this module-16 op is a bug but not having any effect: 
+            Tpad_base = triangles.capoffsets[trianglesOrder[trg]%16][posTemp]; // in original mtb3 code there is ADCRESULT_S6 which is defined as 6
+            Tpad = triangles.rawvalues[trianglesOrder[trg]%16][posTemp]; 
                 
             if(Tpad > Tpad_base)
             {
@@ -379,6 +398,9 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
         case embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::testmodeRAW:
         case embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withoutTempCompensation:
         {
+//						for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = origTrianglesOrder[i];
+					
+
             drift = 0;
         } break;                
     }
@@ -390,7 +412,15 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
 bool embot::app::application::theSkin::Impl::fill(embot::prot::can::skin::periodic::Message_TRG::Info &info, const std::uint8_t trg)
 {
     bool ret = true;
- 
+    if(embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::ergoHand == boardconfig.skintype)
+		{
+				for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = altTrianglesOrder[i];
+		}
+		else 
+		{
+				for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = origTrianglesOrder[i];
+		}
+
     if2hw_data_ad7147_t *the12rawvalues = ad7147_get12rawvaluesoftriangle(trianglesOrder[trg]);
     if2hw_data_ad7147_t *the12capoffsets = ad7147_get12capoffsetsoftriangle(trianglesOrder[trg]);
     
