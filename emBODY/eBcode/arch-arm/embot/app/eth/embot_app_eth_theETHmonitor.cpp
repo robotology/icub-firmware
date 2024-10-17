@@ -20,8 +20,7 @@
 #include "embot_os.h"
 #include "embot_os_rtos.h"
 #include "embot_hw_eth.h"
-#include "embot_app_eth_theErrorManager.h"
-#include "embot_os_theScheduler.h"
+//#include "embot_app_eth_theErrorManager.h"
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOMtheEMSrunner.h"
@@ -32,8 +31,6 @@
 
 struct embot::app::eth::theETHmonitor::Impl
 {
-		//constexpr static char objectname[] = "theETHmonitor"; 
-		
     Config _config {};
     bool _initted {false};
     
@@ -48,17 +45,17 @@ struct embot::app::eth::theETHmonitor::Impl
     bool set(const embot::core::Callback &tkr);
     bool tick();
     
-		
-		struct linkinfo
-		{   
-			bool previsup {false};
-			embot::core::Time changedTime {0};
-		}; 
-		
-		linkinfo link1 {};
-		linkinfo link2 {};
+	bool first_time;
+	struct linkinfo
+	{   
+		bool previsup {false};
+		embot::core::Time changedTime {0};
+	}; 
+	
+	linkinfo link1 {};
+	linkinfo link2 {};
 
-		embot::core::Time lastreportTime {0};
+	embot::core::Time lastreportTime {0};
 
     static void startup(embot::os::Thread *t, void *p);  
     static void onperiod(embot::os::Thread *t, void *p);  
@@ -68,7 +65,7 @@ private:
 };
 
 
-static const char s_eobj_ownname[] = "EOtheETHmonitor";
+static const char s_eobj_ownname[] = "theETHmonitor";
 
 void tETHmon(void *p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
 
@@ -103,13 +100,14 @@ bool embot::app::eth::theETHmonitor::Impl::initialise(const Config &config)
         "tETHmonitor"
     };
 	
-		lastreportTime = embot::core::now();
+	    first_time = true;
+		lastreportTime = 0;
 	
 		link1.previsup = false;
-		link1.changedTime = embot::core::now();
+		link1.changedTime = 0;
 		
 		link2.previsup = false;
-		link2.changedTime = embot::core::now();
+		link2.changedTime = 0;
        
         
     // create the periodic thread 
@@ -145,7 +143,6 @@ bool embot::app::eth::theETHmonitor::Impl::tick()
 }
 
 
-
 // the static ones 
 
 void embot::app::eth::theETHmonitor::Impl::startup(embot::os::Thread *t, void *p)
@@ -158,48 +155,40 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 {
 	embot::app::eth::theETHmonitor::Impl *impl = reinterpret_cast<embot::app::eth::theETHmonitor::Impl*>(p);
 	
-	embot::core::Time nowTime = embot::core::now();
-	
-	bool link1isup = false;    
-	bool link2isup = false;
-
-	link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one); 
-	link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two); 
-	
-//	embot::app::eth::theErrorManager::Descriptor errdescr {};
-	
 	eOerrmanDescriptor_t errdes = {0};
 	
-	uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);   
-		
-	
-	if((impl->link1.previsup != link1isup) || ((impl->link2.previsup != link2isup)))
+	if(impl->first_time)
 	{
-		std::string msg = std::string("ETH link 1 (J6) is ") + (link1isup ? "UP" : "DOWN") + ", ETH link 2 (J7) is " + (link2isup ? "UP" : "DOWN");
+		errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_juststarted);
+		errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+		errdes.sourceaddress    = 0;
+		errdes.par16            = 0;
+		errdes.par64            = 0;
+		eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+		impl->first_time = false;
+	}
+	
+	embot::core::Time nowTime = embot::core::now();
+	
+	bool link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one); 
+	bool link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two);
 		
+	uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);   
+
+	if((impl->link1.previsup != link1isup) || ((impl->link2.previsup != link2isup)))
+	{		
 		if(true == link1isup)
 		{
 			if (false == impl->link1.previsup)
 			{
-				
-				//			this is the implementation in C++, but emit miss some functionality 
-//			errdescr.code = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
-//			errdescr.sourcedevice = eo_errman_sourcedevice_localboard;	
-//			errdescr.sourceaddress = 0;
-//			errdescr.par16 = 0;
-//			errdescr.par64 = applstate; /// attention if error rxcrc, this shuld be modified
-//							
-//			embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::info, {objectname, t}, errdescr, "z");    
-								
 				errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_link_goes_up);
 				errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
 				errdes.sourceaddress    = 0;
 				errdes.par16            = 0;
 				errdes.par64            = applstate;
 				eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+				impl->link1.changedTime = nowTime;
 			}
-			impl->link1.changedTime = nowTime;
-			//here code for crc errors
 		}
 		else
 		{
@@ -211,12 +200,10 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 				errdes.par16            = 0;
 				errdes.par64            = applstate;
 				eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
+				impl->link1.changedTime = nowTime;
 			}
-			
-			impl->link1.changedTime = nowTime;
 		}
 	
-		
 		if(true == link2isup)
 		{
 			if (false == impl->link2.previsup)
@@ -227,9 +214,8 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 				errdes.par16            = 1;
 				errdes.par64            = applstate;
 				eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+				impl->link2.changedTime = nowTime;
 			}
-			impl->link2.changedTime = nowTime;
-			//here code for crc errors
 		}
 		else
 		{
@@ -241,47 +227,23 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 				errdes.par16            = 1;
 				errdes.par64            = applstate;
 				eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
+				impl->link2.changedTime = nowTime;
 			}
-			
-			impl->link2.changedTime = nowTime;
 		}
-
-		
-		embot::app::eth::theErrorManager::getInstance().trace(msg, {"onperiod(): change link status: ",     
-						embot::os::theScheduler::getInstance().scheduled()});
+		impl->link1.previsup = link1isup;
+		impl->link2.previsup = link2isup;
 	}
-	
-	if(nowTime - impl->lastreportTime >= impl->_config.reportOKperiod)
-	{
-		embot::core::Time delta1 = embot::core::TimeFormatter(nowTime - impl->link1.changedTime).to_seconds();
-		embot::core::Time delta2 = embot::core::TimeFormatter(nowTime - impl->link2.changedTime).to_seconds();
-		
-		std::string msgOK = std::string("ETH link 1 (J6) is ") + (link1isup ? "UP" : "DOWN")+ " by " +std::to_string(delta1) +" seconds, " +  
-											std::string("ETH link 2 (J7) is ") + (link2isup ? "UP" : "DOWN")+ " by " +std::to_string(delta2) +" seconds";
-		
-		embot::app::eth::theErrorManager::getInstance().trace(msgOK, {"onperiod(): report OK period: ",     
-						embot::os::theScheduler::getInstance().scheduled()});
-					
-			errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
-			errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-			errdes.sourceaddress    = 0;
-			errdes.par16            = link1isup | (link2isup << 1) | (true << 2);
-			errdes.par64            = applstate;
-			eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);  
-		
-//		errdescr.code = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
-//		errdescr.sourcedevice = eo_errman_sourcedevice_localboard;	
-//		errdescr.sourceaddress = 0;
-//		errdescr.par16 = link1isup | (link2isup << 1) | 0x01<<2 ; // 0x01<<2 there is a third port embedded
-//		errdescr.par64 = applstate; /// attention if error rxcrc, this shuld be modified
-						
-//		embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::info, {objectname, t}, errdescr, msg);    
+	else if(nowTime - impl->lastreportTime >= impl->_config.reportOKperiod)
+	{					
+		errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
+		errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+		errdes.sourceaddress    = 0;
+		errdes.par16            = link1isup | (link2isup << 1) | (true << 2);
+		errdes.par64            = applstate;
+		eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);  
 
 		impl->lastreportTime = nowTime;
 	}
-
-	impl->link1.previsup = link1isup;
-	impl->link2.previsup = link2isup;
 }
 
 
