@@ -38,8 +38,8 @@ namespace embot { namespace app { namespace eth {
         .property =
         {
             Process::eApplication,
-            {2, 8},
-            {2024, Month::Jul, Day::twenty, 14, 00}
+            {2, 9},
+            {2024, Month::Oct, Day::twentyone, 14, 00}
         },
         .OStick = 1000*embot::core::time1microsec,
         .OSstacksizeinit = 10*1024,
