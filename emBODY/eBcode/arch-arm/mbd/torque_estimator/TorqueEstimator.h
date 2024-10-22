@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'TorqueEstimator'.
 //
-// Model version                  : 2.98
+// Model version                  : 2.100
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Sun Sep  8 21:32:31 2024
+// C/C++ source code generated on : Tue Oct 22 09:33:53 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -56,14 +56,16 @@ class TorqueEstimator final
     real_T S0;                         // '<Root>/S0'
     real_T S1;                         // '<Root>/S1'
     real_T Vth;                        // '<Root>/Vth'
-    real_T Fc;                         // '<Root>/Fc'
-    real_T Fs;                         // '<Root>/Fs'
+    real_T Fc_pos;                     // '<Root>/Fc_pos'
+    real_T Fc_neg;                     // '<Root>/Fc_neg'
+    real_T Fs_pos;                     // '<Root>/Fs_pos'
+    real_T Fs_neg;                     // '<Root>/Fs_neg'
   };
 
   // External outputs (root outports fed by signals with default storage)
   struct ExtY {
     real_T Torque;                     // '<Root>/Torque'
-    real_T Motor;                      // '<Root>/Motor'
+    real_T Motor_torque;               // '<Root>/Motor_torque'
     real_T Friction;                   // '<Root>/Friction'
   };
 
@@ -113,8 +115,9 @@ class TorqueEstimator final
   // private member function(s) for subsystem '<Root>/TorqueEstimator'
   static void TorqueEstimator_l(real_T rtu_Current, real_T rtu_Velocity, real_T
     rtu_Km, real_T rtu_Kw, real_T rtu_S0, real_T rtu_S1, real_T rtu_Vth, real_T
-    rtu_Fc, real_T rtu_Fs, real_T *rty_Torque, real_T *rty_Motor, real_T
-    *rty_Friction, DW_TorqueEstimator *localDW);
+    rtu_Fc_pos, real_T rtu_Fc_neg, real_T rtu_Fs_pos, real_T rtu_Fs_neg, real_T *
+    rty_Torque, real_T *rty_Motor_torque, real_T *rty_Friction,
+    DW_TorqueEstimator *localDW);
 
   // Real-Time Model
   RT_MODEL rtM;

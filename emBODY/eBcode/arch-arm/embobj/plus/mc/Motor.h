@@ -58,7 +58,7 @@ extern void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pid);
 
 extern void Motor_config_filter(Motor* o, uint8_t filter); //
 extern void Motor_config_friction(Motor* o, float Bemf, float Ktau, eOmc_FrictionParams_t friction); //
-extern void Motor_config_LuGre(Motor* o, float Km, float Kw, float S0, float S1, float Vth, float Fc, float Fs);
+extern void Motor_config_LuGre(Motor* o, float Km, float Kw, float S0, float S1, float Vth, float Fc_pos, float Fc_neg, float Fs_pos, float Fs_neg);
 extern void Motor_calibrate_withOffset(Motor* o, int32_t offset); //
 extern BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero); //
 extern void Motor_uncalibrate(Motor* o);

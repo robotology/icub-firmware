@@ -1010,8 +1010,10 @@ void MController_config_LuGre_params(int m, eOmc_LuGre_params_t* params) //
         params->S0,
         params->S1,
         params->Vth,
-        params->Fc,
-        params->Fs
+        params->Fc_pos,
+        params->Fc_neg,
+        params->Fs_pos,
+        params->Fs_neg
     );
 }
 

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'TorqueEstimator'.
 //
-// Model version                  : 2.98
+// Model version                  : 2.100
 // Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Sun Sep  8 21:32:31 2024
+// C/C++ source code generated on : Tue Oct 22 09:33:53 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
