@@ -371,8 +371,10 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
         o->torque_estimator.rtU.S0  = 2.5;
         o->torque_estimator.rtU.S1  = 0.0;
         o->torque_estimator.rtU.Vth = 5.0;
-        o->torque_estimator.rtU.Fc  = 3.3;
-        o->torque_estimator.rtU.Fs  = 7.0;
+        o->torque_estimator.rtU.Fc_pos = 3.3;
+        o->torque_estimator.rtU.Fc_neg = 3.3;
+        o->torque_estimator.rtU.Fs_pos = 7.0;
+        o->torque_estimator.rtU.Fs_neg = 7.0;
     }
 }
 
@@ -446,15 +448,17 @@ void Motor_config_friction(Motor* o, float Bemf, float Ktau, eOmc_FrictionParams
     PID_config_friction(&o->trqPID, Bemf, Ktau, friction);
 }
 
-void Motor_config_LuGre(Motor* o, float Km, float Kw, float S0, float S1, float Vth, float Fc, float Fs)
+void Motor_config_LuGre(Motor* o, float Km, float Kw, float S0, float S1, float Vth, float Fc_pos, float Fc_neg, float Fs_pos, float Fs_neg)
 {
     o->torque_estimator.rtU.Km  = Km;
     o->torque_estimator.rtU.Kw  = Kw;
     o->torque_estimator.rtU.S0  = S0;
     o->torque_estimator.rtU.S1  = S1;
     o->torque_estimator.rtU.Vth = Vth;
-    o->torque_estimator.rtU.Fc  = Fc;
-    o->torque_estimator.rtU.Fs  = Fs;
+    o->torque_estimator.rtU.Fc_pos  = Fc_pos;
+    o->torque_estimator.rtU.Fc_neg  = Fc_neg;
+    o->torque_estimator.rtU.Fs_pos  = Fs_pos;
+    o->torque_estimator.rtU.Fs_neg  = Fs_neg;
 }
 
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
