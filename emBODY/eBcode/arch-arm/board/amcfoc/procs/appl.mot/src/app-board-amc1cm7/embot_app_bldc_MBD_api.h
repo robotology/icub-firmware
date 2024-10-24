@@ -21,7 +21,7 @@
 #define MBD_API_VERSION_1_0
 
 #if defined(MBD_API_VERSION_1_0)
-#define MBD_API_standalone_usage
+//#define MBD_API_standalone_usage
 #endif
 
 #if defined(MBD_API_VERSION_draft)
@@ -264,6 +264,10 @@ namespace embot::app::bldc::mbd::interface {
 #include "mbd-api-v1/iterative_motion_controller_types.h"
 #include "mbd-api-v1/iterative_motion_controller.h"
 
+#else
+
+#include "iterative_motion_controller_types.h"
+#include "iterative_motion_controller.h"
 #endif
 
 namespace embot::app::bldc::mbd::interface {

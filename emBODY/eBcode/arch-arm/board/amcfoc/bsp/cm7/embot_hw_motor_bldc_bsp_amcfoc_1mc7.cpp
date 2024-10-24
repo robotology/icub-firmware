@@ -78,7 +78,7 @@ namespace embot::hw::motor::bldc::bsp {
     bool set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents) const { return false; }  
     
     HallStatus hall(MOTOR m) const { return 0; }
-    Angle angle(MOTOR m, Encoder enc) const { return 0.0f; } 
+    Angle angle(MOTOR m, AngleType type) const { return 0.0f; } 
     
     bool set(MOTOR m, const PWM3 &pwm) const { return false; }
     Voltage powersupply(MOTOR m) const { return 0.0f; }        
@@ -169,6 +169,8 @@ namespace embot::hw::motor::bldc::bsp {
         
         return true;
     }
+    
+    std::array<Config, 2> _configs {};
         
     bool BSP::configure(embot::hw::MOTOR m, const Config &cfg) const
     {
@@ -185,9 +187,11 @@ namespace embot::hw::motor::bldc::bsp {
         if(true == cfg.pwm_has_hall_sens)
         {
             // start the hall acquisition
-             embot::hw::motor::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::hall::Mode::SWAP::BC :  embot::hw::motor::hall::Mode::SWAP::none, cfg.pwm_hall_offset };
+             embot::hw::motor::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::hall::Mode::SWAP::BC :  embot::hw::motor::hall::Mode::SWAP::none, cfg.pwm_hall_offset, cfg.pwm_num_polar_couples };
              embot::hw::motor::hall::start(m, mode);
         }
+        
+        _configs[embot::core::tointegral(m)] = cfg;
         
         r = true;
         
@@ -241,10 +245,14 @@ namespace embot::hw::motor::bldc::bsp {
     }     
 
 
-    Angle BSP::angle(MOTOR m, Encoder enc) const
+    Angle BSP::angle(MOTOR m, AngleType type) const
     {
         Angle r {0.0f};
-        #warning fill BSP::angle(MOTOR m, Encoder enc) for amcfoc
+        #warning fill BSP::angle(MOTOR m, AngleType type) for amcfoc
+        if((type == AngleType::hall_electrical) || (type == AngleType::hall_mechanical))
+        {
+            r = embot::hw::motor::hall::angle(m, type);
+        }            
         //Angle r = (enc == Encoder::hall) ? 0.0 : 1.0;        
         //r = embot::hw::motor::hall::angle(m) OR .....;         
         return r;

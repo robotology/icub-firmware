@@ -50,7 +50,7 @@ namespace embot::hw::motor::bldc::bsp {
         bool set(MOTOR m, const embot::hw::motor::bldc::OnCurrents &oncurrents) const;  
         
         HallStatus hall(MOTOR m) const;
-        Angle angle(MOTOR m, Encoder enc) const; 
+        Angle angle(MOTOR m, AngleType type) const; 
         
         bool set(MOTOR m, const PWM3 &pwm) const;
         Voltage powersupply(MOTOR m) const;        

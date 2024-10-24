@@ -29,11 +29,12 @@
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
 
-#define USE_MOCK
+//#define USE_MOCK
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
+
 
 
 #if defined(USE_MOCK)
@@ -42,22 +43,40 @@
 
 #else
 
-    #warning TODO: include mbd.h
+#include "iterative_motion_controller.h"
     
 #endif
 
+embot::app::bldc::mbd::interface::IO2 _io2 {&iterative_motion_controller_U, &iterative_motion_controller_Y}; 
+
 
 namespace embot::app::bldc::mbd::interface {
- 
-    void init(IO2 *io2)
+    
+    
+    IO2& getIO2handle()
     {
-#if defined(USE_MOCK)
-        embot::app::bldc::mbd::interface::mock::init(io2);
-#else     
-        #warning TODO: init mbd
-#endif        
+        return _io2;
     }
     
+    void init()
+    {
+        static bool _initted {false};
+        
+        if(true == _initted)
+        {
+            return;
+        }
+        
+#if defined(USE_MOCK)
+        embot::app::bldc::mbd::interface::mock::init(&_io2);
+#else             
+        AMCFOC_initialize();
+#endif   
+
+        _initted = true;
+    }
+ 
+
     void tick()
     {
 #if defined(USE_MOCK)
@@ -66,9 +85,30 @@ namespace embot::app::bldc::mbd::interface {
         embot::app::bldc::mbd::interface::mock::process_02_activity();
         embot::app::bldc::mbd::interface::mock::process_03_output();  
 #else           
-        #warning TODO: tick mbd
+        AMCFOC_step_Time_1ms();
 #endif        
     }
+    
+    
+    void foc(const std::array<IO2::FOCinput, 2> &i, std::array<IO2::FOCoutput, 2> &o)
+    {
+        
+        // set
+        for(uint8_t n=0; n<i.size(); n++)
+        {
+            _io2.set(i[n], n);
+        }
+
+        
+        AMCFOC_step_FOC();
+        
+        // get
+        for(uint8_t n=0; n<o.size(); n++)
+        {
+            _io2.get(o[n], n);
+        }
+
+    }        
     
     
     
@@ -239,7 +279,7 @@ namespace embot::app::bldc::mbd::interface {
         to.has_temperature_sens = from.check(embot::prot::can::motor::MotorConfig::Flag::hasTempSensor);
         // others
         to.encoder_tolerance = from.rotEncTolerance;
-        to.pole_pairs = from.motorPoles;
+        to.pole_pairs = from.motorPoles/2;
         to.rotor_encoder_resolution = from.rotorEncoderResolution;
         to.rotor_index_offset = from.rotorIndexOffset;                
     }
@@ -257,7 +297,7 @@ namespace embot::app::bldc::mbd::interface {
 
         // others
         to.rotEncTolerance = from.encoder_tolerance;
-        to.motorPoles = from.pole_pairs;
+        to.motorPoles = 2*from.pole_pairs;
         to.rotorEncoderResolution = from.rotor_encoder_resolution;
         to.rotorIndexOffset = from.rotor_index_offset;                
     }  
@@ -417,7 +457,26 @@ namespace embot::app::bldc::mbd::interface {
         float c = celsiusdegrees;
     }
     
+    void IO2::set_powersupply(float volt, uint8_t motor)
+    {
+        input->SensorData[motor].driversensors.Vcc = volt;
+    }
     
+    void IO2::set(const FOCinput &i, uint8_t motor)
+    {
+        input->SensorData[motor].motorsensors.angle = i.electricalangle;
+        input->SensorData[motor].motorsensors.Iabc[0] = i.currents.u;
+        input->SensorData[motor].motorsensors.Iabc[1] = i.currents.v;
+        input->SensorData[motor].motorsensors.Iabc[2] = i.currents.w;
+        input->SensorData[motor].position = i.mechanicalangle;
+        input->SensorData[motor].motorsensors.hallABC = i.hall;
+    }
+    
+    void IO2::get(FOCoutput &o, uint8_t motor)
+    {
+        o.pwm = { output->FOCOutputs_h[motor].Vabc[0], output->FOCOutputs_h[motor].Vabc[1], output->FOCOutputs_h[motor].Vabc[2] };    
+    }
+        
     bool IO2::get_fault() const
     {
         return input->ExternalFlags_j.fault_button;
@@ -428,7 +487,7 @@ namespace embot::app::bldc::mbd::interface {
         return output->Flags_d[motor].control_mode;
     }
     
-    
+#warning verifica perche' entrambi i motori mandano ..... e non va bene    
     bool IO2::get_transmit(embot::prot::can::motor::periodic::CMD cmd, uint8_t motor) const
     {
         bool r {false};
@@ -515,12 +574,14 @@ namespace embot::app::bldc::mbd::interface {
 
     void IO2::get_current_pid(uint8_t motor, PID &pid)
     {  
-        pid = state.actcfg[motor]->pids.currentPID;       
+        pid = state.actcfg[motor]->pids.currentPID;   
+        pid.type = ControlModes_Current; // marco.accame: i use the type field to tell that the PID is a velocity / current / position        
     }    
      
     void IO2::get_velocity_pid(uint8_t motor, PID &pid)
     {
         pid = state.actcfg[motor]->pids.velocityPID;
+        pid.type = ControlModes_Velocity; // marco.accame: i use the type field to tell that the PID is a velocity / current / position
     }
     
     void IO2::get_motor_config(uint8_t motor, embot::app::bldc::mbd::interface::MotorConfigurationExternal &mc)

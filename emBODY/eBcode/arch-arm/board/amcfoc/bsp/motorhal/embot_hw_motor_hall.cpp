@@ -140,8 +140,17 @@ struct hall_Data
     static constexpr uint8_t CURR = 1;
     
     
-    int32_t angle {0};      // in icub degrees
-    float degrees {0.0f};  // in degrees
+    // electrical angles
+    int32_t electricalangleicubdeg {0};      // in icub degrees
+    float electricalangle {0.0f};   // in degrees
+    
+    // delta
+    float deltamechanical {60.0/1.0f};
+    
+    // mechanical angles (computed in incremental steps and divided by polar couples)
+    float mechanicalangle {0.0};    
+    
+    uint8_t sector {0};
 
     std::array<uint8_t, 2> h3h2h1 = {0, 0}; 
 
@@ -161,8 +170,8 @@ struct hall_Data
         {
             return false;
         }
-        #warning .... rimuovere il return qui
-        return true;
+//        #warning .... rimuovere il return qui
+//        return true;
         
         if((curr == prev) || (curr == nextclockwise[prev]) || (curr == nextcounterclockwise[prev]))
         {   // it is ok if the transition happens by a single step clockwise or counterclockise
@@ -172,12 +181,44 @@ struct hall_Data
         return false;
     }
     
+    static constexpr int8_t incrementOfH3H2H1(uint8_t prev, uint8_t curr)
+    {   // the prev and curr values must be valid
+        // the following lut tells which h3h2h1 is expected for clockwise and counter clockwise rotation
+        // given the value of the previous h3h2h1 which must be in range [1, 6]
+        constexpr uint8_t nextclockwise[7] =        {255, 5, 3, 1, 6, 4, 2};
+        constexpr uint8_t nextcounterclockwise[7] = {255, 3, 6, 2, 5, 1, 4};
+        
+        if(false == isH3H2H1valid(prev))
+        {
+            return 0;
+        }
+
+        
+        if(curr == prev) 
+        {
+            return 0;
+        }
+        else if(curr == nextclockwise[prev])
+        {
+            return +1;
+        }
+        else if(curr == nextcounterclockwise[prev])
+        {   
+            return -1;
+        }
+        
+        return 0;
+    }    
+    
     bool firstacquisition {true};       
     
     void reset()
     {
-        angle = 0;
-        degrees = 0.0;
+        electricalangleicubdeg = 0;
+        electricalangle = 0.0f;
+        mechanicalangle = 0.0f;
+        deltamechanical = 60.0/1.0f;
+        sector = 0;
         h3h2h1[hall_Data::CURR] = h3h2h1[hall_Data::PREV] = 0;
         firstacquisition = true;
     }
@@ -232,12 +273,22 @@ struct hall_Internals
     void load(embot::hw::MOTOR m, const Configuration &c)
     {
         _items[embot::core::tointegral(m)].load(c);
+    }  
+
+    void load(embot::hw::MOTOR m, const Mode &mo)
+    {
+        _items[embot::core::tointegral(m)].mode = mo;
+        _items[embot::core::tointegral(m)].mode.polarpairs = (mo.polarpairs == 0) ? 1 : mo.polarpairs;
+        float div = static_cast<float>(_items[embot::core::tointegral(m)].mode.polarpairs);
+        _items[embot::core::tointegral(m)].data.deltamechanical = 60.0f / div;        
     }        
         
-    uint8_t input(embot::hw::MOTOR m)
+    uint8_t swap(embot::hw::MOTOR m, uint8_t threebits)
     {
         // we get the values of the three bits: H3|H2|H1. they correspond to C|B|A
-        uint8_t x = embot::hw::motor::hall::bsp::triple(embot::hw::MOTOR::one);
+        uint8_t x = threebits; // embot::hw::motor::hall::bsp::triple(m);
+        
+        
         
         uint8_t v = x & 0b111; // already masked by hall_INPUT() but better be sure
         
@@ -253,12 +304,11 @@ struct hall_Internals
         return v;        
     }
     
-    void acquire(embot::hw::MOTOR m)
+    void process(embot::hw::MOTOR m, uint8_t hall)
     {
         // actually ... we
-        // get the input and validate it vs possible states and possible transitions       
-        
-        uint8_t ha = input(m);
+        // i validate it vs possible states and possible transitions       
+        uint8_t ha = swap(m, hall);
         
 //        static uint64_t lasT = 0;
 //        uint64_t n = embot::core::now();
@@ -267,12 +317,16 @@ struct hall_Internals
 //        lasT = n;
 //        static float poscum = 0;
              
-        
-        if(true == validate(m, ha))
+        int8_t increment = 0;
+        if(true == validate(m, ha, increment))
         {
-            // i assign angle
-            _items[embot::core::tointegral(m)].data.angle = _items[embot::core::tointegral(m)].mode.offset + hall_Table::status2angle(_items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::CURR]);  
-            _items[embot::core::tointegral(m)].data.degrees = hall_Table::status2degrees(_items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::CURR]);
+            // i assign angles
+            _items[embot::core::tointegral(m)].data.electricalangleicubdeg = _items[embot::core::tointegral(m)].mode.offset + hall_Table::status2angle(_items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::CURR]);  
+            _items[embot::core::tointegral(m)].data.electricalangle = hall_Table::status2degrees(_items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::CURR]);
+            _items[embot::core::tointegral(m)].data.sector = hall_Table::status2sector(_items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::CURR]);
+            
+            float delta = _items[embot::core::tointegral(m)].data.deltamechanical * static_cast<float>(increment);
+            _items[embot::core::tointegral(m)].data.mechanicalangle += delta;
             
 //            float prevposcum = poscum;
 //            poscum += (60/7.0);
@@ -288,7 +342,7 @@ struct hall_Internals
 //            {
 //                case Configuration::ENCODERtuning::forcevalue:
 //                {   
-//                    embot::hw::motor::enc::force(data.angle);
+//                    embot::hw::motor::enc::force(data.electricalangleicubdeg);
 //                } break;
 
 //                case Configuration::ENCODERtuning::adjust:
@@ -307,9 +361,11 @@ struct hall_Internals
     }
     
         
-    bool validate(embot::hw::MOTOR m, uint8_t v)
+    bool validate(embot::hw::MOTOR m, uint8_t v, int8_t &increment)
     {
         bool r {true};
+        
+        increment = 0;
                
         // 1. validate h3h2h1
                 
@@ -349,8 +405,10 @@ struct hall_Internals
             {
 //                motorhal_set_fault(DHESInvalidSequence);
                 return false; 
-            }
+            }           
         }
+
+        increment = hall_Data::incrementOfH3H2H1(_items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::PREV], _items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::CURR]);
         
         return true;                
     }
@@ -365,7 +423,7 @@ struct hall_Internals
         {            
             hallCounter = 0;
             encoder_Reset();
-            encoder_Force(angle);
+            encoder_Force(electricalangleicubdeg);
         }
         else
         {
@@ -375,12 +433,12 @@ struct hall_Internals
             if (forward) // forward
             {
                 ++hallCounter;
-                angle -= minHallAngleDelta; // -30 deg
+                electricalangleicubdeg -= minHallAngleDelta; // -30 deg
             }
             else
             {
                 --hallCounter;
-                angle += minHallAngleDelta; // +30 deg
+                electricalangleicubdeg += minHallAngleDelta; // +30 deg
             }
              /*
             0) Use the Hall sensors to rotate until the wrap-around border is reached,
@@ -388,7 +446,7 @@ struct hall_Internals
             */
             if (calibration_step == 0)
             {
-                encoder_Force(angle);
+                encoder_Force(electricalangleicubdeg);
                 
                 if ((sector == 0 && sector_old == 5) || (sector == 5 && sector_old == 0))
                 {
@@ -404,7 +462,7 @@ struct hall_Internals
             */
             else if (calibration_step == 1)
             {
-                encoder_Force(angle);
+                encoder_Force(electricalangleicubdeg);
             
                 // use the current sector if forward rotation or previous if reverse
                 uint8_t sector_index = forward ? sector : (sector+1)%numHallSectors;
@@ -441,7 +499,7 @@ struct hall_Internals
             */
             else if (calibration_step == 2)
             {
-                encoder_Force(angle);
+                encoder_Force(electricalangleicubdeg);
                 // reset the angle after full rotation
                 if ((sector == 0 && sector_old == 5) || (sector == 5 && sector_old == 0))
                 {
@@ -456,7 +514,8 @@ struct hall_Internals
     
     static void capture(embot::hw::MOTOR m, hall_Internals &hint)
     {
-        hint.acquire(m);        
+        uint8_t hall = embot::hw::motor::hall::bsp::triple(m);
+        hint.process(m, hall);        
     }    
 };
 
@@ -505,7 +564,7 @@ bool start(embot::hw::MOTOR m, const Mode &mode)
 { 
     bool ret {true};  
 
-    _hall_internals._items[embot::core::tointegral(m)].mode = mode;   
+    _hall_internals.load(m, mode);   
         
     hall_Internals::capture(m, _hall_internals);
 
@@ -565,21 +624,23 @@ bool isstarted(embot::hw::MOTOR m)
 
 uint8_t getstatus(embot::hw::MOTOR m)
 {
-//    _hall_internals.acquire();
     return _hall_internals._items[embot::core::tointegral(m)].data.h3h2h1[hall_Data::CURR];
 }   
 
 int32_t getangle(embot::hw::MOTOR m)
 {
-//    _hall_internals.acquire();
-    return _hall_internals._items[embot::core::tointegral(m)].data.angle;
+    return _hall_internals._items[embot::core::tointegral(m)].data.electricalangleicubdeg;
 } 
 
 
-float angle(embot::hw::MOTOR m)
+float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type)
 {
-//    _hall_internals.acquire();
-    return _hall_internals._items[embot::core::tointegral(m)].data.degrees;
+    return (embot::hw::motor::bldc::AngleType::hall_electrical == type) ? _hall_internals._items[embot::core::tointegral(m)].data.electricalangle : _hall_internals._items[embot::core::tointegral(m)].data.mechanicalangle;
+}
+
+uint8_t sector(embot::hw::MOTOR m)
+{
+    return _hall_internals._items[embot::core::tointegral(m)].data.sector;
 }
 
 } // namespace embot::hw::motor::hall {
@@ -630,7 +691,134 @@ namespace embot::hw::motor::hall::bsp {
             }
         }
         
+ //       embot::core::print("hall value for " + embot::hw::motor::bldc::to_string(m) + " = " + std::to_string(v));
+        
         return v;        
+    }
+    
+}
+
+namespace embot::hw::motor::hall::bsp::debug {
+    
+    // i assume s = [0, 5]. if not i return hall of sector 0
+    uint8_t sector2hall(uint8_t s, bool swapbc)
+    {
+        constexpr uint8_t halltable[6] =          { 0b100, 0b110, 0b010, 0b011, 0b001, 0b101 };
+        constexpr uint8_t halltableBCswapped[6] = { 0b010, 0b110, 0b100, 0b101, 0b001, 0b011 };
+        
+        if(false == swapbc)
+            return (s<6) ? halltable[s] : halltable[0];
+        else
+            return (s<6) ? halltable[s] : halltable[0];
+    }
+    
+    int mymod(int a, int b)
+    {
+        int r = a % b;
+        return r < 0 ? r + b : r;
+    }
+
+    uint8_t mechanicalangle2hall(float mechangle, uint8_t npoles, bool swapbc)
+    {       
+        int32_t elecangle = mymod(static_cast<int32_t>(mechangle * static_cast<float>(npoles)), 360);
+        // now i have elecngle in [0, 360)
+        
+        // i set it to be 
+        
+        // i get sector
+        uint8_t s = (elecangle + 30) / 60;
+        
+        return sector2hall(s, swapbc);
+    }
+
+//     return (embot::hw::motor::bldc::AngleType::hall_electrical == type) ? _hall_internals._items[embot::core::tointegral(m)].data.electricalangle : _hall_internals._items[embot::core::tointegral(m)].data.mechanicalangle;
+    volatile bool stop {false};   
+    void set(embot::hw::MOTOR m, float angle, embot::hw::motor::bldc::AngleType type)
+    {
+        if(embot::hw::motor::bldc::AngleType::hall_mechanical == type)
+        {
+            uint8_t npoles = _hall_internals._items[embot::core::tointegral(m)].mode.polarpairs;
+            bool swapbc = (_hall_internals._items[embot::core::tointegral(m)].mode.swap == Mode::SWAP::BC);
+            uint8_t hall = mechanicalangle2hall(angle, npoles, swapbc);
+            // and now i load the hall value
+            
+            _hall_internals.process(m, hall);
+            
+        }
+        
+    }
+    
+  
+    
+    struct Wave::Impl    
+    {
+        Config _config {};  
+        
+        uint64_t _step {0};
+        embot::core::Time _time {0};
+        float _incr {0.0f};
+        float _value {0};
+
+        bool configure(const Config &cfg) 
+        { 
+            _config = cfg;    
+
+            _incr = _config.ticktime * _config.maxvalue / (_config.period/2);
+            
+            return true; 
+        }
+        
+        void tick()
+        {
+            _step++;
+            _time += _config.ticktime;
+            if(_time <= (_config.period/2))
+            {
+                _value += _incr; 
+            }
+            else if(_time < (_config.period))
+            {
+                _value -= _incr;
+            }
+            else
+            {
+                _step = 0;
+                _time = 0;
+                _value = 0.0;
+            }            
+        }
+            
+        float get() const { return _value; }
+    };
+ 
+
+
+    
+    Wave::Wave()
+    : pImpl(new Impl())
+    { 
+
+    }
+
+    Wave::~Wave()
+    {   
+        delete pImpl;
+    }
+
+    bool Wave::configure(const Config &cfg)
+    {
+        return pImpl->configure(cfg);
+    }   
+
+    
+    void Wave::tick()
+    {
+        pImpl->tick();
+    }
+        
+    float Wave::get() const
+    {
+        return pImpl->get();
     }
     
 }

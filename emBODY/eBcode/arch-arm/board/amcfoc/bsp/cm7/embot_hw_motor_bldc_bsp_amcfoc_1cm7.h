@@ -84,7 +84,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     
     constexpr PWMvalues pwmZINI {10240};        // pwm @  97.656 kHz [pwm 10.240us, foc 30.720us]
     
-    constexpr PWMvalues PWMvals {pwm050000Hz}; // {pwm066666Hz}; //{pwmZINI}; // {pwm020000Hz}
+    constexpr PWMvalues PWMvals {pwm066666Hz}; // {pwm066666Hz}; //{pwmZINI}; // {pwm020000Hz}
         
 //    constexpr PWMvalues PWMvals {pwm066666Hz};
 //    constexpr PWMvalues PWMvals {PWM100000Hz};

@@ -29,10 +29,14 @@
 
 #include "embot_prot_can_motor_board.h"
 
+
+#include "embot_hw_motor_bldc.h"
+
 //#include "embot_app_application_theCANtracer.h"
 
 
 #define DEBUG_print_decoded_CAN_frames
+//#define DEBUG_print_decoded_CAN_frames_periodic
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -42,6 +46,10 @@
 struct embot::app::bldc::theMC2agent::Impl : public embot::app::application::CANagentMC2
 {   
     Config _config {};
+        
+    embot::app::bldc::mbd::interface::IO2 &io2handle {embot::app::bldc::mbd::interface::getIO2handle()};
+    
+    // use io2handle instead of _config.io2 or .... embot::app::bldc::mbd::interface::getIO2handle()
       
     Impl() = default;     
 
@@ -81,13 +89,16 @@ bool embot::app::bldc::theMC2agent::Impl::initialise(const Config &config)
     // initialise the CAN parser MC2, moved to mbd namespace    
     embot::app::application::theCANparserMC2::getInstance().initialise({this, _config.address});
     
-    // init hw::motor
+    // init mbd
+    embot::app::bldc::mbd::interface::init();
+    
+    
+    // init hw::motor et al
     
     // assign the callback on currents
     
     // and now calls whatever the MBD needs to be initialised
     
-    embot::app::bldc::mbd::interface::init(&_config.io2);
     
     return true;
 }
@@ -106,7 +117,7 @@ bool embot::app::bldc::theMC2agent::Impl::tick(const std::vector<embot::prot::ca
     //    the parser will call the agent (this Impl) and fill the replies w/ data updated by the recent embot::app::bldc::mbd::interface::tick()
     // 5. call the agent so that any SIG<> emitted by the mbd can be converted in can frames.
       
-    _config.io2.event_clearall();
+    io2handle.event_clearall();
     
     // 1. parse all but GET<>
     embot::app::application::theCANparserMC2::Result result {};
@@ -141,7 +152,12 @@ void embot::app::bldc::theMC2agent::Impl::update(const HWinfo &hwinfo)
 {
     // in here we just use the hwinfo to update the MBD interface
     
-     _config.io2.set_fault(hwinfo.faultpressed);   
+    io2handle.set_fault(hwinfo.faultpressed);   
+
+    for(const auto &m : themotors)
+    {        
+        embot::app::bldc::mbd::interface::getIO2handle().set_powersupply(hwinfo.vcc, embot::core::tointegral(m)); 
+    }
     
 }
 
@@ -152,9 +168,9 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
     for(const auto &m : themotors)
     {
 
-        bool emitFOC = _config.io2.get_transmit(embot::prot::can::motor::periodic::CMD::FOC, embot::core::tointegral(m));
-        bool emitSTATUS = _config.io2.get_transmit(embot::prot::can::motor::periodic::CMD::STATUS, embot::core::tointegral(m));
-        bool emitADDITIONAL_STATUS = _config.io2.get_transmit(embot::prot::can::motor::periodic::CMD::ADDITIONAL_STATUS, embot::core::tointegral(m)); // {false};
+        bool emitFOC = io2handle.get_transmit(embot::prot::can::motor::periodic::CMD::FOC, embot::core::tointegral(m));
+        bool emitSTATUS = io2handle.get_transmit(embot::prot::can::motor::periodic::CMD::STATUS, embot::core::tointegral(m));
+        bool emitADDITIONAL_STATUS = io2handle.get_transmit(embot::prot::can::motor::periodic::CMD::ADDITIONAL_STATUS, embot::core::tointegral(m)); // {false};
             
         // each motor transmits using a different address        
         uint8_t canaddress = _config.getaddress(m);
@@ -168,14 +184,14 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
             
             info.canaddress = canaddress;
             embot::app::bldc::mbd::interface::IO2::canFOCinfo cfi {};
-            _config.io2.get(cfi, embot::core::tointegral(m));
+            io2handle.get(cfi, embot::core::tointegral(m));
             // fill foc info from the MBD: i get and load directly because ... the setXXX() methods accept normal measures
             info.setCurrent(cfi.current);
             info.setVelocity(cfi.velocity);
             info.setPosition(cfi.position); 
                 
-#if defined(DEBUG_print_decoded_CAN_frames)
-    embot::core::print(info.to_string());
+#if defined(DEBUG_print_decoded_CAN_frames_periodic)
+            embot::core::print(embot::hw::motor::bldc::to_string(m) + ": " + info.to_string());
 #endif 
             
             // load                 
@@ -197,33 +213,33 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
             // fill info from the MBD: i get, convert to can format, assign to info
                 
             embot::app::bldc::mbd::interface::IO2::canSTATUSinfo csi {};
-            _config.io2.get(csi, embot::core::tointegral(m));
+            io2handle.get(csi, embot::core::tointegral(m));
                 
             // 1. controlmode
             auto ctrlmodecan {embot::prot::can::motor::ControlMode::none};
-            auto ctrlmodembd = csi.controlmode; //_config.io2.get_controlmode(embot::core::tointegral(m));
+            auto ctrlmodembd = csi.controlmode; //io2handle.get_controlmode(embot::core::tointegral(m));
             embot::app::bldc::mbd::interface::Converter::tocan(ctrlmodembd, ctrlmodecan);
             info.controlmode = embot::prot::can::motor::Converter::convert(ctrlmodecan);
             
             // 2. quadencoderstate
             embot::prot::can::motor::board::foc::QEstate qescan {0};
-            uint8_t qesmbd = csi.quadencoderstate; // _config.io2.get_quadencoderstate(embot::core::tointegral(m));
+            uint8_t qesmbd = csi.quadencoderstate; // io2handle.get_quadencoderstate(embot::core::tointegral(m));
             embot::app::bldc::mbd::interface::Converter::tocan(qesmbd, qescan);
             info.quadencoderstate = qescan.get();
             
             // 3. pwmfeedback
-            float pwmperc =  csi.pwmfeedback; // _config.io2.get_pwmfeedback(embot::core::tointegral(m));
+            float pwmperc =  csi.pwmfeedback; // io2handle.get_pwmfeedback(embot::core::tointegral(m));
             info.pwmfeedback = embot::prot::can::motor::Converter::to_can_percentage(pwmperc);;  
        
             // 4 motorfaultstate
             embot::prot::can::motor::board::foc::MotorFaultState mfscan {0};
-            uint32_t mfsmbd = csi.motorfaultstate;// _config.io2.get_motorfaultstate(embot::core::tointegral(m));
+            uint32_t mfsmbd = csi.motorfaultstate;// io2handle.get_motorfaultstate(embot::core::tointegral(m));
             embot::app::bldc::mbd::interface::Converter::tocan(mfsmbd, mfscan);
             info.motorfaultstate = mfscan.get();
             
-#if defined(DEBUG_print_decoded_CAN_frames)
-    embot::core::print(info.to_string());
-#endif            
+#if defined(DEBUG_print_decoded_CAN_frames_periodic)
+            embot::core::print(embot::hw::motor::bldc::to_string(m) + ": " + info.to_string());
+#endif           
             
             // load                 
             msg.load(info);
@@ -242,9 +258,14 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
             // fill info info from the MBD
             info.canaddress = canaddress;
                 
-            float temp = _config.io2.get_temperature(embot::core::tointegral(m));
+            float temp = io2handle.get_temperature(embot::core::tointegral(m));
             int16_t t = static_cast<int16_t>(0.1*temp);
             info.temperature = t;
+
+#if defined(DEBUG_print_decoded_CAN_frames_periodic)
+            embot::core::print(embot::hw::motor::bldc::to_string(m) + ": " + info.to_string());
+#endif                 
+                
             // load                 
             msg.load(info);
             // get frame
@@ -254,82 +275,6 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
         }          
     }
     
-    // in here we form the can frames spontaneously emitted by the MBD.
-    // they belong to the periodic motor class
-    
-//    #warning find out how to see if we need to emit for a given motor
-//        
-//    for(uint8_t m=0; m<2; m++)
-//    {
-//        bool emitFOC {true};
-//        bool emitSTATUS {true};
-//        bool emitADDITIONAL_STATUS {false};
-//        
-//        if(1 == m)
-//        {
-//            emitFOC = emitSTATUS = false;
-//        }
-//        
-//        if(true == emitFOC)
-//        {
-//            emitted = true;
-//            embot::prot::can::motor::periodic::Message_FOC msg {};
-//            embot::prot::can::Frame f {};
-//            embot::prot::can::motor::periodic::Message_FOC::Info info {};
-//            // fill foc info from the MBD
-//            info.canaddress = _config.address[m];
-//            info.current = 0;
-//            info.position = 0;
-//            info.velocity = 0;
-//            // load                 
-//            msg.load(info);
-//            // get frame
-//            msg.get(f);
-//            // push it back to vector
-//            output.push_back(f);            
-//        }        
-
-//        if(true == emitSTATUS)
-//        {
-//            emitted = true;
-//            embot::prot::can::motor::periodic::Message_STATUS msg {};
-//            embot::prot::can::Frame f {};
-//            embot::prot::can::motor::periodic::Message_STATUS::Info info {};
-//            info.canaddress = _config.address[m];
-//            // fill info info from the MBD
-//            info.controlmode = 0;
-//            embot::prot::can::motor::board::foc::QEstate qes(0);
-//            info.quadencoderstate = qes.get();
-//            info.pwmfeedback = 0;
-//            embot::prot::can::motor::board::foc::MotorFaultState mfs(0);
-//            info.motorfaultstate = mfs.get();
-//            // load                 
-//            msg.load(info);
-//            // get frame
-//            msg.get(f);
-//            // push it back to vector
-//            output.push_back(f);        
-//        }
-
-//        if(true == emitADDITIONAL_STATUS)
-//        {
-//            emitted = true;
-//            embot::prot::can::motor::periodic::Message_ADDITIONAL_STATUS msg {};
-//            embot::prot::can::Frame f {};
-//            embot::prot::can::motor::periodic::Message_ADDITIONAL_STATUS::Info info {};
-//            // fill info info from the MBD
-//            info.canaddress = _config.address[m];
-//            info.temperature = 0;
-//            // load                 
-//            msg.load(info);
-//            // get frame
-//            msg.get(f);
-//            // push it back to vector
-//            output.push_back(f);        
-//        }                  
-//    }
-//    
-//    
    
     return emitted;    
 }
@@ -340,7 +285,7 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::periodic::Message_EMSTO2FOC_DESIRED_CURRENT::Info &info)
 {
     
-#if defined(DEBUG_print_decoded_CAN_frames)
+#if defined(DEBUG_print_decoded_CAN_frames_periodic)
     embot::core::print(info.to_string());
 #endif
     
@@ -350,7 +295,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::per
         int16_t trg = info.target[_config.getaddress(m)-1];
         embot::app::bldc::mbd::interface::Targets t {};        
         embot::app::bldc::mbd::interface::Converter::fromcan(trg, t);
-        _config.io2.event_pushback(t, embot::core::tointegral(m));
+        io2handle.event_pushback(t, embot::core::tointegral(m));
     }
      
     return true;        
@@ -372,7 +317,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     embot::app::bldc::mbd::interface::Converter::fromcan(info.controlmode, cm);
     
     // 3. load the object into mbd for a given motor
-    _config.io2.event_pushback(cm, motor);        
+    io2handle.event_pushback(cm, motor);        
     
     return true;    
 }
@@ -392,7 +337,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     embot::app::bldc::mbd::interface::Converter::fromcan(info.currents, currlimits);
     
     // 3. load the object into mbd for a given motor
-    _config.io2.event_pushback(currlimits, motor);    
+    io2handle.event_pushback(currlimits, motor);    
         
     return true;
 } 
@@ -411,7 +356,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     embot::app::bldc::mbd::interface::Converter::fromcan(info.pid, pid);
     
     // 3. load the object into mbd for a given motor
-    _config.io2.event_pushback(pid, motor);    
+    io2handle.event_pushback(pid, motor);    
         
     return true;
 } 
@@ -430,7 +375,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     embot::app::bldc::mbd::interface::Converter::fromcan(info.pid, pid);
     
     // 3. load the object into mbd for a given motor
-    _config.io2.event_pushback(pid, motor);    
+    io2handle.event_pushback(pid, motor);    
         
     return true;
 } 
@@ -449,7 +394,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     embot::app::bldc::mbd::interface::Converter::fromcan(info.config, mc);
     
     // 3. load the object into mbd for a given motor
-    _config.io2.event_pushback(mc, motor);    
+    io2handle.event_pushback(mc, motor);    
         
     return true;    
 } 
@@ -473,7 +418,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
-    auto mbdcm = _config.io2.get_controlmode(motor);
+    auto mbdcm = io2handle.get_controlmode(motor);
     embot::app::bldc::mbd::interface::Converter::tocan(mbdcm, replyinfo.controlmode);
     
 #if defined(DEBUG_print_decoded_CAN_frames)
@@ -493,7 +438,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     embot::app::bldc::mbd::interface::SupervisorInputLimits cl {};
-    _config.io2.get_current_limits(motor, cl);    
+    io2handle.get_current_limits(motor, cl);    
     embot::app::bldc::mbd::interface::Converter::tocan(cl, replyinfo.currents);
         
 #if defined(DEBUG_print_decoded_CAN_frames)
@@ -512,7 +457,9 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     embot::app::bldc::mbd::interface::PID pid {};
-    _config.io2.get_current_pid(motor, pid);    
+    io2handle.get_current_pid(motor, pid);   
+    // marco.accame pid.type must be ControlModes_Current so that embot::app::bldc::mbd::interface::Converter::tocan() works fine
+    // that is done inside get_current_pid()
     embot::app::bldc::mbd::interface::Converter::tocan(pid, replyinfo.pid);
         
 #if defined(DEBUG_print_decoded_CAN_frames)
@@ -531,7 +478,9 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     embot::app::bldc::mbd::interface::PID pid {};
-    _config.io2.get_velocity_pid(motor, pid);    
+    io2handle.get_velocity_pid(motor, pid);  
+    // marco.accame pid.type must be ControlModes_Velocity so that embot::app::bldc::mbd::interface::Converter::tocan() works fine
+    // that is done inside get_velocity_pid()
     embot::app::bldc::mbd::interface::Converter::tocan(pid, replyinfo.pid);
         
 #if defined(DEBUG_print_decoded_CAN_frames)
@@ -551,7 +500,7 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     replyinfo.motorindex = info.motorindex;
     uint8_t motor = embot::core::tointegral(info.motorindex);
     embot::app::bldc::mbd::interface::MotorConfigurationExternal mc {};
-    _config.io2.get_motor_config(motor, mc);    
+    io2handle.get_motor_config(motor, mc);    
     embot::app::bldc::mbd::interface::Converter::tocan(mc, replyinfo.config);
         
 #if defined(DEBUG_print_decoded_CAN_frames)

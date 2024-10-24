@@ -53,9 +53,10 @@ namespace embot::app::bldc {
         struct HWinfo
         {
             bool faultpressed {false};
+            float vcc {48.0};
             
             HWinfo() = default;
-            HWinfo(bool fp) : faultpressed(fp) {}
+            HWinfo(bool fp, float v) : faultpressed(fp), vcc(v) {}
         };
 
         bool tick(const std::vector<embot::prot::can::Frame> &input, const HWinfo &hwinfo, std::vector<embot::prot::can::Frame> &output);

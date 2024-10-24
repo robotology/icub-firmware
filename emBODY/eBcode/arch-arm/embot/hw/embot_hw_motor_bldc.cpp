@@ -45,6 +45,16 @@ using namespace embot::hw;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+std::string embot::hw::motor::bldc::to_string(embot::hw::MOTOR id)
+{
+    constexpr std::array<const char *, embot::core::tointegral(embot::hw::MOTOR::maxnumberof)> MOTOR_map =
+    { 
+        "MOTOR::one", "MOTOR::two", "MOTOR::three", "MOTOR::four"
+    };
+    uint8_t pos = embot::core::tointegral(id);
+    return (pos < MOTOR_map.size()) ? MOTOR_map[pos] : "MOTOR::none";    
+}
+
 
 #if !defined(EMBOT_ENABLE_hw_motor_bldc)
 
@@ -62,7 +72,7 @@ namespace embot::hw::motor::bldc {
     bool faulted(MOTOR m) { return false; }    
     bool set(MOTOR m, const OnCurrents &oncurrents) { return false; }    
     HallStatus hall(MOTOR m) { return 0; }     
-    Angle angle(MOTOR m, Encoder enc) { return 0.0f; }     
+    Angle angle(MOTOR m, AngleType type) { return 0.0f; }     
     bool set(MOTOR m, const PWMs &pwms) { return false; }     
     Voltage powersupply(MOTOR m) { return 0.0f; } 
     
@@ -161,7 +171,7 @@ namespace embot::hw::motor::bldc {
         
         if(true == initialised(m))
         {
-            embot::hw::motor::bldc::bsp::getBSP().deinit(m);
+            deinit(m);
         }
                         
         // prepare the hw environment. something such as prepare GPIOs, TIMs, ADC, link them together, etc.
@@ -309,14 +319,14 @@ namespace embot::hw::motor::bldc {
     }
   
     
-    Angle angle(MOTOR m, Encoder enc)
+    Angle angle(MOTOR m, AngleType type)
     {
         if(false == initialised(m))
         {
             return 0.0f;
         }         
         
-        return embot::hw::motor::bldc::bsp::getBSP().angle(m, enc);     
+        return embot::hw::motor::bldc::bsp::getBSP().angle(m, type);     
     }
     
      

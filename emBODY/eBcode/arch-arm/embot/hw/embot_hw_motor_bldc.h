@@ -74,7 +74,7 @@ namespace embot::hw::motor::bldc {
     
     using Angle = float; // in [degrees]
     
-    enum class Encoder : uint8_t { hall = 0, quadenc = 1 };
+    enum class AngleType : uint8_t { hall_electrical = 0, hall_mechanical = 2, quadenc = 3 };
     
     struct Config
     {
@@ -96,6 +96,8 @@ namespace embot::hw::motor::bldc {
     };
     
     // functions
+    
+    std::string to_string(embot::hw::MOTOR id);
 
     bool supported(embot::hw::MOTOR m);     
     bool initialised(embot::hw::MOTOR m);
@@ -124,7 +126,7 @@ namespace embot::hw::motor::bldc {
 
     HallStatus hall(MOTOR m);
     
-    Angle angle(MOTOR m, Encoder enc);
+    Angle angle(MOTOR m, AngleType type);
     
     bool set(MOTOR m, const PWM3 &pwm);
     

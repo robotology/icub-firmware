@@ -213,7 +213,7 @@ namespace embot::prot::can::motor::periodic {
                 return std::string("sig<STATUS = (") 
                     + "ctrlmode = " + embot::prot::can::motor::Converter::tostring(static_cast<embot::prot::can::motor::ControlMode>(controlmode)) + ", "  
                                     + "quadencoderstate [flags] = " + std::to_string(quadencoderstate) + ", " 
-                                    + "pwmfeedback [-32000, +32000] = " + std::to_string(3) 
+                                    + "pwmfeedback [-32000, +32000] = " + std::to_string(pwmfeedback) + ", " 
                                     + "motorfaultstate flags = " + std::to_string(motorfaultstate) + ")"
                                     + ">";               
             }             
@@ -236,6 +236,13 @@ namespace embot::prot::can::motor::periodic {
             uint8_t tbd[2] {0};
             int16_t temperature {0};
             Info() = default;
+            
+            std::string to_string() const
+            {
+                return std::string("sig<ADDITIONAL_STATUS = (") 
+                    + "temperature = " + std::to_string(temperature) + ")"
+                                    + ">";               
+            }             
         };
         
         Info info {}; 

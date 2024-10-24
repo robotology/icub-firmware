@@ -42,14 +42,15 @@ namespace embot::hw::motor::hall {
         enum class SWAP { none, BC };
         SWAP swap {SWAP::none};
         uint16_t offset {0};
+        uint8_t polarpairs {1};
         
         constexpr Mode() = default;
-        constexpr Mode(SWAP s, uint16_t o) : swap(s), offset(o) {}
+        constexpr Mode(SWAP s, uint16_t o, uint8_t n) : swap(s), offset(o), polarpairs(n) {}
         constexpr bool isvalid() const { 
             bool notok = false;
             return !notok;
         }
-        void reset() { swap = SWAP::none; offset = 0; }
+        void reset() { swap = SWAP::none; offset = 0; polarpairs = 1; }
     };
 
     bool init(embot::hw::MOTOR m, const Configuration &config);
@@ -58,10 +59,45 @@ namespace embot::hw::motor::hall {
     bool isstarted(embot::hw::MOTOR m);
     uint8_t getstatus(embot::hw::MOTOR m);    
     int32_t getangle(embot::hw::MOTOR m);    
-    float angle(embot::hw::MOTOR m); // in degrees
+    float angle(embot::hw::MOTOR m, embot::hw::motor::bldc::AngleType type); // in degrees
+    uint8_t sector(embot::hw::MOTOR m);
     
 } // namespace embot::hw::motor::hall {
 
+namespace embot::hw::motor::hall::bsp {
+    uint8_t triple(embot::hw::MOTOR m);
+}
+
+namespace embot::hw::motor::hall::bsp::debug {
+    
+    void set(embot::hw::MOTOR m, float angle, embot::hw::motor::bldc::AngleType type);
+    
+    // this is a waveform, so far only a triangolar wave w/ semiperiod T1. it starts from 0 and goes to MAX in =T1 steps
+    // i use a struct but it would be nice to generalize it and made it a pimpl
+    struct Wave
+    {        
+        struct Config
+        {
+            embot::core::relTime period {embot::core::time1second};
+            float maxvalue {1000.0f};
+            embot::core::relTime ticktime {1000*embot::core::time1microsec}; // {45*embot::core::time1microsec};
+
+            Config() = default;
+        };
+        
+        bool configure(const Config &cfg);
+        void tick();
+        
+        float get() const;
+        
+        Wave();
+        ~Wave();
+
+    private:        
+        struct Impl;
+        Impl *pImpl;                
+    };
+}
 
 
 #endif  // include-guard

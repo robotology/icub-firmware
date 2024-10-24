@@ -391,14 +391,14 @@ namespace embot::hw::motor::adc::bsp {
     
     int32_t sampletomilliampere(int16_t s)
     {
-        int32_t v = s*50000;
+        int32_t v = s*5000;
         bool neg = (v < 0);
         if(true == neg)
         {
             v = -v;
         }
         
-        v >>= 12;
+        v >>= 10;
         
         return (true == neg) ? -v : +v;
     }

@@ -36,7 +36,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// this is the memory of the controller
+// this is the memory of the controller that the MBD code contains inside iterative_motion_controller.cpp
+// comment it out if you compile also iterative_motion_controller.cpp
+//#define DEFINE_MBD_MEMORY_IN_HERE
+
+#if defined(DEFINE_MBD_MEMORY_IN_HERE)
+#warning the mock allocates memory for the MBD (iterative_motion_controller_U and iterative_motion_controller_Y. uncomment if you compile the MBD files
 extern "C"
 {
   // External inputs (root inport signals with default storage)
@@ -45,7 +50,7 @@ extern "C"
   // External outputs (root outports fed by signals with default storage)
   ExtY_iterative_motion_controller_T iterative_motion_controller_Y {};
 }
-
+#endif
 
 namespace embot::app::bldc::mbd::interface::mock {
     

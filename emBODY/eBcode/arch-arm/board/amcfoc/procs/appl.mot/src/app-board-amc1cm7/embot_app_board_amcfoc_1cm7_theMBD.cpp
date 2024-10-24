@@ -12,10 +12,36 @@
 
 #include "embot_app_board_amcfoc_1cm7_theMBD.h"
 
+int32_t ImposedMechAngle = 0;
+int32_t readMechAngle = 0;
+int32_t readElecAngle = 0;
+uint32_t readSector = 0;
+uint8_t readHALL = 0;
+
+int32_t pwm1 =0;
+int32_t pwm2 =0;
+int32_t pwm3 =0;
+
+int32_t CU1 = 0;
+int32_t CU2 = 0;
+int32_t CU3 = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
+
+
+// -
+// - debug section
+//
+
+//#define DEBUG_IMPOSE_MECH_ANGLE  
+//#define DEBUG_LOG_ANGLE_VARIATIONS
+//#define DEBUG_LOG_ANGLE_VARIATIONS__PRINT_CHANGES
+//#define DEBUG_PRINT_PWM_VARIATIONS
+//#define DEBUG_PRINT_CURRENTS_PWM
+
+//#define DEBUG_PWM_min_0perc
 
 // -
 // - MBD code section
@@ -100,12 +126,14 @@
 
 
 #if defined(theMBDmotor_MBD_code_removed)
+#include "embot_app_bldc_MBD_interface.h"
 #else
-// mdb components
-#include "AMC_BLDC.h"
+#include "embot_app_bldc_MBD_interface.h"
+//// mdb components
+//#include "AMC_BLDC.h"
 #endif
 
-
+#include "embot_hw_motor_hall.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -282,7 +310,7 @@ struct embot::app::board::amcfoc::cm7::theMBD::Impl
     static void onCurrents(embot::hw::MOTOR m, const embot::hw::motor::bldc::Currents * const currs, void *owner); 
     
     // executed once every 45 usec and called inside (or triggered by) the onCurrents() callback when all the motors have current measures
-    void FOC();  
+    void FOC(embot::hw::MOTOR m);  
 
     // it acquires the positions
     void updatePosition(embot::hw::MOTOR m);
@@ -306,7 +334,8 @@ struct embot::app::board::amcfoc::cm7::theMBD::Impl
         embot::hw::motor::bldc::Currents currents {}; 
         embot::hw::motor::bldc::HallStatus hallstatus {}; 
         embot::hw::motor::bldc::Angle electricalangle {}; 
-        embot::hw::motor::bldc::Angle position {};            
+        embot::hw::motor::bldc::Angle position {};  
+        bool currOK {false};            
     }; 
 
     std::array<Item, embot::hw::motor::bldc::MAXnumber> _items {};    
@@ -394,19 +423,16 @@ struct embot::app::board::amcfoc::cm7::theMBD::Impl
 #endif // #if defined(theMBDmotor_MEASURES_enabled)
 
 
-//    embot::app::bldc::mbd::interface::ExtU_iterative_motion_controller_T input {};
-//    embot::app::bldc::mbd::interface::ExtY_iterative_motion_controller_T output {};
-//    embot::app::bldc::mbd::interface::Status_iterative_motion_controller_T status {};
-//    embot::app::bldc::mbd::interface::IO2 io2 {&input, &output, &status};
-    
-//    embot::app::bldc::mbd::interface::ExtU_iterative_motion_controller_T input {};
-//    embot::app::bldc::mbd::interface::ExtY_iterative_motion_controller_T output {};
-
-    embot::app::bldc::mbd::interface::IO2 io2 {&iterative_motion_controller_U, &iterative_motion_controller_Y};    
+//    embot::app::bldc::mbd::interface::IO2 io2 {&iterative_motion_controller_U, &iterative_motion_controller_Y};    
     
     std::vector<embot::prot::can::Frame> caninputframes {};
     std::vector<embot::prot::can::Frame> canoutputframes {};
+        
 
+#if defined(DEBUG_IMPOSE_MECH_ANGLE)          
+    embot::hw::motor::hall::bsp::debug::Wave debugwave1 {};
+#endif
+        
 };
 
 #warning develop / test also the embot::hw::motor::getVIN() 
@@ -422,6 +448,11 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::initialise(const Config &conf
     _config = config;
     
     embot::core::print("embot::app::board::amcfoc::cm7::theMBD::Impl::initialise()");
+    
+    
+    // init motors: because if we delay that .... the embot::hw::motor::bldc::fault() will not work
+    embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
+    embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});
 
 #if defined(theMBDmotor_MEASURES_enable_duration_foc)    
     // create the measure for the foc
@@ -495,7 +526,6 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::initialise(const Config &conf
     }
     else 
     {
-        #warning TODO: maybe use a single call such as embot::hw::motor::bldc::fault(embot::hw::MOTOR::every, false)
         embot::hw::motor::bldc::fault(embot::hw::MOTOR::one, false);
         embot::hw::motor::bldc::fault(embot::hw::MOTOR::two, false);
         embot::app::theLEDmanager::getInstance().get(ledEXTfault).off();
@@ -514,30 +544,44 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::initialise(const Config &conf
     
     std::array<uint8_t, embot::app::bldc::theMC2agent::numberofmotors> adrs {static_cast<uint8_t>(config.adr), static_cast<uint8_t>(config.adr+1)};
     
-    embot::app::bldc::theMC2agent::getInstance().initialise({adrs, io2});
+    embot::app::bldc::theMC2agent::getInstance().initialise({adrs, {}});
     
 #if defined(theMBDmotor_MBD_code_removed)
     
     // just init it
+    embot::app::bldc::mbd::interface::init();
+    embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);
     
 #else  
-    #erorr this is the old code    
-    // init MBD
-    AMC_BLDC_initialize();
-    
-    AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;
+
+    // just init it
+    embot::app::bldc::mbd::interface::init();
+    embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);        
+        
+//    #erorr this is the old code    
+//    // init MBD
+//    AMC_BLDC_initialize();
+//    
+//    AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;
+        
 #endif
     
-    // init motors
-    embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
-    embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});
-    
+//    // init motors
+//    embot::hw::motor::bldc::init(embot::hw::MOTOR::one, {});
+//    embot::hw::motor::bldc::init(embot::hw::MOTOR::two, {});
+
+
+#if defined(DEBUG_IMPOSE_MECH_ANGLE)  
+    debugwave1.configure({});
+#endif
+
     // assign the callback to the current availability         
     embot::hw::motor::bldc::set(embot::hw::MOTOR::one, {embot::hw::MOTOR::one, Impl::onCurrents, this});
     embot::hw::motor::bldc::set(embot::hw::MOTOR::two, {embot::hw::MOTOR::two, Impl::onCurrents, this});    
         
         
 #if defined(theMBDmotor_MBD_code_removed)
+    // nothing to set
 #else    
     CAN_ID_AMC = _config.adr;
 #endif        
@@ -545,6 +589,19 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::initialise(const Config &conf
     
     // init the rounder used to get the Vcc
     _rounder.init(0.0f, 1); // default initial value=0, decimals=1
+    
+    
+#if defined(DEBUG_PWM_min_0perc)
+    
+    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();        
+    theleds.get(embot::hw::LED::one).pulse(2*embot::core::time1second);
+    
+#else
+
+//    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();        
+//    theleds.get(embot::hw::LED::one).pulse(4*embot::core::time1second);
+
+#endif
         
     initted = true;
     return initted;
@@ -566,8 +623,10 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::onEXTFAULTpolling()
     
     EXTFAULTisPRESSED = allpressed; 
 #if defined(theMBDmotor_MBD_code_removed)
-#else    
-    AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;
+    embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);
+#else 
+    embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);    
+//    AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;
 #endif
     
     if(true == EXTFAULTisPRESSED)
@@ -600,8 +659,10 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::onEXTFAULTpressedreleased(voi
     
     impl->EXTFAULTisPRESSED = embot::hw::button::pressed(impl->buttonEXTfault);
 #if defined(theMBDmotor_MBD_code_removed)
-#else    
-    AMC_BLDC_U.ExternalFlags_p.fault_button = impl->EXTFAULTisPRESSED;
+    embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);
+#else
+    embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);
+//    AMC_BLDC_U.ExternalFlags_p.fault_button = impl->EXTFAULTisPRESSED;
 #endif
     
     if(true == impl->EXTFAULTisPRESSED)
@@ -623,10 +684,126 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::onEXTFAULTpressedreleased(voi
 
 #endif // #if defined(theMBDmotor_EXTFAULT_enabled)
 
+#include "embot_hw_motor_hall.h"
 
 // Called every 1 ms
 bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot::app::bldc::MSG> &inputmessages, std::vector<embot::app::bldc::MSG> &outputmessages)
-{     
+{ 
+
+#if defined(DEBUG_IMPOSE_MECH_ANGLE)  
+    
+    debugwave1.tick();
+
+    float a = debugwave1.get();
+    ImposedMechAngle = static_cast<int32_t>(a);
+    embot::hw::motor::hall::bsp::debug::set(embot::hw::MOTOR::one, a, embot::hw::motor::bldc::AngleType::hall_mechanical);
+    
+#endif // #if defined(DEBUG_IMPOSE_MECH_ANGLE)  
+
+
+#if defined(DEBUG_LOG_ANGLE_VARIATIONS)  
+    
+    static uint32_t readMechAngle_prev = 0;
+    static uint32_t readElecAngle_prev = 0;
+    static uint32_t readSector_prev = 0;
+    static uint32_t readHALL_prev = 0;
+    
+    
+    readMechAngle = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_mechanical);
+    readElecAngle = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_electrical);
+    readSector = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
+    readHALL = embot::hw::motor::bldc::hall(embot::hw::MOTOR::one);
+    
+    if(readMechAngle != readMechAngle_prev)
+    {
+
+#if defined(DEBUG_LOG_ANGLE_VARIATIONS__PRINT_CHANGES)  
+        //  print them
+      
+        embot::core::TimeFormatter tf {embot::core::now()};
+
+        
+        embot::core::print(tf.to_string() + ": mech = " + std::to_string(readMechAngle_prev) + " -> " + std::to_string(readMechAngle) +  "; " + 
+                                              "elec = " + std::to_string(readElecAngle_prev) + " -> " + std::to_string(readElecAngle) +  "; " +
+                                              "sect = " + std::to_string(readSector_prev) + " -> " + std::to_string(readSector) +  "; " +
+                                              "hall = " + std::to_string(readHALL_prev) + " -> " + std::to_string(readHALL) +  "; "
+        
+        );
+#endif
+        // and now change them
+        
+        readMechAngle_prev = readMechAngle;
+        readElecAngle_prev = readElecAngle;
+        readSector_prev = readSector;
+        readHALL_prev = readHALL;        
+    }
+    
+#endif // #if defined(DEBUG_LOG_ANGLE_VARIATIONS)    
+    
+
+//#if defined PRINT_1MS    
+
+//    static embot::hw::motor::bldc::Angle aa[2] = {0, 0};
+//    
+//    embot::hw::motor::bldc::Angle a0 = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_mechanical);
+////    embot::hw::motor::bldc::Angle a1 = embot::hw::motor::bldc::angle(embot::hw::MOTOR::two, embot::hw::motor::bldc::AngleType::hall_mechanical);
+//    
+//    if(aa[0] != a0)
+//    {
+//        embot::core::TimeFormatter tf {embot::core::now()};
+//        embot::core::print(tf.to_string() + ": mech angle MOTOR::one = " + std::to_string(a0) + " (was: " +  std::to_string(aa[0]));
+//        aa[0] = a0;
+//    }
+
+////    if(aa[1] != a1)
+////    {
+////        embot::core::TimeFormatter tf {embot::core::now()};
+////        embot::core::print(tf.to_string() + ": mech angle MOTOR::two = " + std::to_string(a1) + " (was: " +  std::to_string(aa[1]));
+////        aa[1] = a1;
+////    }  
+//    
+//    
+//    static embot::hw::motor::bldc::Angle bb[2] = {0, 0};
+//    
+//    embot::hw::motor::bldc::Angle b0 = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_electrical);
+////    embot::hw::motor::bldc::Angle b1 = embot::hw::motor::bldc::angle(embot::hw::MOTOR::two, embot::hw::motor::bldc::AngleType::hall_electrical);
+//    
+//    if(bb[0] != b0)
+//    {
+//        embot::core::TimeFormatter tf {embot::core::now()};
+//        uint8_t sector = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
+//        embot::core::print(tf.to_string() + ": elec angle MOTOR::one = " + std::to_string(b0) + " (was: " +  std::to_string(bb[0]) + 
+//        "), sector =  " + std::to_string(sector));
+//        bb[0] = b0;
+//    }
+
+////    if(bb[1] != b1)
+////    {
+////        embot::core::TimeFormatter tf {embot::core::now()};
+////        embot::core::print(tf.to_string() + ": elc angle MOTOR::two = " + std::to_string(b1) + " (was: " +  std::to_string(bb[1]));
+////        bb[1] = b1;
+////    }      
+
+////    static uint8_t halls[2] = {0, 0};
+////    
+////    uint8_t hallsnow[2] = {0, 0};
+////    hallsnow[0] = embot::hw::motor::hall::bsp::triple(embot::hw::MOTOR::one);
+////    hallsnow[1] = embot::hw::motor::hall::bsp::triple(embot::hw::MOTOR::two);
+////    
+////    if(hallsnow[0] != halls[0])
+////    {
+////        embot::core::print("hall value for " + embot::hw::motor::bldc::to_string(embot::hw::MOTOR::one) + " = " + std::to_string(hallsnow[0]));
+////        halls[0] = hallsnow[0];
+////    }        
+
+////    if(hallsnow[1] != halls[1])
+////    {
+////        embot::core::print("hall value for " + embot::hw::motor::bldc::to_string(embot::hw::MOTOR::two) + " = " + std::to_string(hallsnow[1]));
+////        halls[1] = hallsnow[1];
+////    } 
+//#endif
+
+    
 #if defined(COMM_BUS_LOCKED_AT_FIRST_MC_RECEPTION)
     // the first time we receive a message we use its bus forever    
     static bool lockedtobus {false};
@@ -669,9 +846,11 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
         prevEXTFAULTisPRESSED = EXTFAULTisPRESSED;  
         // and manage the transitions [pressed -> unpressed] or vice-versa and use also
         // EXTFAULTpressedtime and / or EXTFAULTreleasedtime and
-#if defined(theMBDmotor_MBD_code_removed)
+#if defined(theMBDmotor_MBD_code_removed)        
+        embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);
 #else
-        AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;        
+        embot::app::bldc::mbd::interface::getIO2handle().set_fault(EXTFAULTisPRESSED);
+//        AMC_BLDC_U.ExternalFlags_p.fault_button = EXTFAULTisPRESSED;        
 #endif
         
         if(true == EXTFAULTisPRESSED)
@@ -705,8 +884,11 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     {
         caninputframes.push_back(i.frame);
     }
+
     
-    embot::app::bldc::theMC2agent::getInstance().tick(caninputframes, {EXTFAULTisPRESSED}, canoutputframes);
+    float vcc = 24.0f;
+    
+    embot::app::bldc::theMC2agent::getInstance().tick(caninputframes, {EXTFAULTisPRESSED, vcc}, canoutputframes);
     
     for(const auto o : canoutputframes)
     {
@@ -714,6 +896,7 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
         embot::app::bldc::MSG msg {l, o};
         outputmessages.push_back(msg);
     }  
+        
     
 #else
 
@@ -821,7 +1004,7 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::onCurrents(embot::hw::MOTOR m
     
     if(true == allmotorshavethelatestcurrents)
     {
-        impl->FOC();
+        impl->FOC(m);
     }
     
     
@@ -829,13 +1012,23 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::onCurrents(embot::hw::MOTOR m
 
 void embot::app::board::amcfoc::cm7::theMBD::Impl::loadCurrents(embot::hw::MOTOR m, const embot::hw::motor::bldc::Currents * const currs, bool &allmotorsok)
 {
-   _items[embot::core::tointegral(m)].currents = *currs; 
+    _items[embot::core::tointegral(m)].currents = *currs; 
+    
+    _items[embot::core::tointegral(m)].currOK = true;
     
     // now verify if all motors have updated currents
     // check if we have received the currenst for all motors
     //    to be done by a bitmask that is set for each motor, then checked and if ok allmotorsok gets true and mask cleared
     
-    allmotorsok = true;
+    if((_items[0].currOK == true) && (_items[1].currOK == true))
+    {
+        allmotorsok = true;
+        _items[0].currOK = _items[1].currOK = false;
+    }
+    else
+    {
+        allmotorsok = false;
+    }
 }
 
 void embot::app::board::amcfoc::cm7::theMBD::Impl::updatePosition(embot::hw::MOTOR m)
@@ -844,11 +1037,11 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::updatePosition(embot::hw::MOT
     // the following two must be verified carefully. previous implementation used the following:
     // - electical angle uses number of poles, so: BE SURE WE USE THEM ....
     // - position is computed incrementally, so: KEEP a static variable for it ....        
-    _items[embot::core::tointegral(m)].electricalangle = embot::hw::motor::bldc::angle(m, embot::hw::motor::bldc::Encoder::hall);
-    _items[embot::core::tointegral(m)].position = 60.0; // degrees ....    
+    _items[embot::core::tointegral(m)].electricalangle = embot::hw::motor::bldc::angle(m, embot::hw::motor::bldc::AngleType::hall_electrical);
+    _items[embot::core::tointegral(m)].position = embot::hw::motor::bldc::angle(m, embot::hw::motor::bldc::AngleType::hall_mechanical);   
 }
 
-void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC()
+void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
 {
     // in here we call everything for the motors on the list
     
@@ -859,6 +1052,16 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC()
     // [ ] i need the position of the rotor 
     // [ ] anything else ?
     
+//    debugwave1.tick();
+
+//    float a = debugwave1.get();
+//    ImposedMechAngle = static_cast<int32_t>(a);
+//    embot::hw::motor::hall::bsp::debug::set(embot::hw::MOTOR::one, a, embot::hw::motor::bldc::AngleType::hall_mechanical);
+//    
+//    readMechAngle = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_mechanical);
+//    readElecAngle = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_electrical);
+//    readHALL = embot::hw::motor::bldc::hall(embot::hw::MOTOR::one);
+    
     for(const auto m : themotors)
     {
         updatePosition(m);
@@ -867,44 +1070,91 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC()
     
     // i call MBD code and i get the PWM3
     
-    std::array<embot::hw::motor::bldc::PWM3, embot::hw::motor::bldc::MAXnumber> pwmtoapply {{ {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} }};
+//    std::array<embot::hw::motor::bldc::PWM3, embot::hw::motor::bldc::MAXnumber> pwmtoapply {{ {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} }};
     
 #if defined(theMBDmotor_MBD_code_removed)
     #warning add MBD code for the FOC 
+        
+    std::array<embot::app::bldc::mbd::interface::IO2::FOCinput, embot::hw::motor::bldc::MAXnumber> input {};
+        
+    std::array<embot::app::bldc::mbd::interface::IO2::FOCoutput, embot::hw::motor::bldc::MAXnumber> output {};
 
     for(const auto m : themotors)
     {
         uint8_t hall = _items[embot::core::tointegral(m)].hallstatus;
         float electricalangle = _items[embot::core::tointegral(m)].electricalangle;
-        float rotorposition = _items[embot::core::tointegral(m)].position;
-        float c1 = _items[embot::core::tointegral(m)].currents.u;  
-        float c2 = _items[embot::core::tointegral(m)].currents.v;  
-        float c3 = _items[embot::core::tointegral(m)].currents.w;        
+        float mechanicalangle = _items[embot::core::tointegral(m)].position;
+        
+        input[embot::core::tointegral(m)].load(electricalangle, _items[embot::core::tointegral(m)].currents, mechanicalangle, hall); 
     }
     
-    // just for test:
-    pwmtoapply[embot::core::tointegral(embot::hw::MOTOR::one)] = {10, 50, 60};    
-#else 
-    #warning MBD code for the FOC is missing
-    #if 0
-    in here i run a for loop for each motor, where,
-    - i give: 
-      - hall status [bits], 
-      - electrical angle [deg],
-      - position [deg],
-      - currents [A]    
-    - i get:
-      - pwm for the three phases [perc]
-    #endif
+    embot::app::bldc::mbd::interface::foc(input, output);
+    
+#if defined(DEBUG_PRINT_CURRENTS_PWM)
+    
+    static uint32_t cnt {0};
+    static constexpr uint32_t CNT {20000};
+    if(CNT == ++cnt)
+    {
+        cnt = 0;
+//        uint8_t sec = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
+        embot::core::print("currs = (" + std::to_string(input[0].currents.u) + ", " + std::to_string(input[0].currents.v) + ", " + std::to_string(input[0].currents.w) + ")");           
+    
+    }
+
+
+#endif    
+    
+//    // just for test:
+//    pwmtoapply[embot::core::tointegral(embot::hw::MOTOR::one)] = {10, 50, 60};    
+//#else 
+//    #warning MBD code for the FOC is missing
+//    #if 0
+//    in here i run a for loop for each motor, where,
+//    - i give: 
+//      - hall status [bits], 
+//      - electrical angle [deg],
+//      - position [deg],
+//      - currents [A]    
+//    - i get:
+//      - pwm for the three phases [perc]
+//    #endif
 #endif   
-    
-    
+
+
+#if defined(DEBUG_PRINT_PWM_VARIATIONS)
+   static embot::hw::motor::bldc::PWM3 prevPWM {0, 0, 0};
+   if( (output[0].pwm.u != prevPWM.u) || (output[0].pwm.v != prevPWM.v) || (output[0].pwm.w != prevPWM.w) )
+   {
+       uint8_t sec = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
+       auto pwm = output[0].pwm;
+//       embot::core::print("sect, pwm = " + std::to_string(pwm.u) + ", " + std::to_string(pwm.v) + ", " + std::to_string(pwm.w) + ", " + std::to_string(sec));
+       prevPWM = output[0].pwm;
+   }
+#endif // #if defined(DEBUG_PRINT_PWM_VARIATIONS)  
 
     // i apply pwm
     
     for(const auto m : themotors)
     {
-        _items[embot::core::tointegral(m)].pwm = pwmtoapply[embot::core::tointegral(m)];        
+#if defined(DEBUG_PWM_min_0perc)
+        _items[embot::core::tointegral(m)].pwm.u = std::clamp(output[embot::core::tointegral(m)].pwm.u - 5.0f, 0.0f, 100.0f);
+        _items[embot::core::tointegral(m)].pwm.v = std::clamp(output[embot::core::tointegral(m)].pwm.v - 5.0f, 0.0f, 100.0f);   
+        _items[embot::core::tointegral(m)].pwm.w = std::clamp(output[embot::core::tointegral(m)].pwm.w - 5.0f, 0.0f, 100.0f);        
+#else        
+        _items[embot::core::tointegral(m)].pwm = output[embot::core::tointegral(m)].pwm; 
+#endif
+        if(m == embot::hw::MOTOR::one)
+        {
+            pwm1 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.u);
+            pwm2 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.v);
+            pwm3 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.w);
+            
+            CU1 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.u);
+            CU2 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.v);
+            CU3 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.w);
+        }
+        
         embot::hw::motor::bldc::set(m, _items[embot::core::tointegral(m)].pwm);        
     }
     

@@ -20,7 +20,7 @@
 #include "embot_prot_can_analog_periodic.h"
 #include "embot_prot_can_analog_polling.h"
 #include "embot_prot_can_motor_board.h"
-
+#include "embot_hw_motor_bldc.h"
 
 #include "embot_app_bldc_MBD_api.h"
 
@@ -81,7 +81,37 @@ namespace embot::app::bldc::mbd::interface {
             float pwmfeedback {0.0f};
             uint32_t motorfaultstate {0};
             canADDITIONALSTATUSinfo() = default;            
-        };          
+        };
+
+
+        struct FOCinput
+        {
+            float electricalangle {0.0};
+            embot::hw::motor::bldc::Currents currents {}; 
+            float mechanicalangle {0.0};
+            uint8_t hall {0};
+                
+            FOCinput() = default;
+            FOCinput(float ea, const embot::hw::motor::bldc::Currents &cu, float me, uint8_t h) 
+                : electricalangle(ea), currents(cu), mechanicalangle(me), hall(h) {}
+                    
+            void load(float ea, const embot::hw::motor::bldc::Currents &cu, float me, uint8_t h)
+            {
+                electricalangle = ea;
+                currents = cu;
+                mechanicalangle = me;
+                hall = h;
+            }
+        };  
+
+        struct FOCoutput
+        {
+            embot::hw::motor::bldc::PWM3 pwm {}; 
+
+            FOCoutput() = default;
+            FOCoutput(const embot::hw::motor::bldc::PWM3 &p) 
+                : pwm(p) {}
+        };         
         
         IO2() = default;
         
@@ -115,6 +145,8 @@ namespace embot::app::bldc::mbd::interface {
         void set_fault(const bool pressed);
         void set_controlmode(const embot::app::bldc::mbd::interface::ControlModes cm, uint8_t motor);     
         void set_temperature(float celsiusdegrees, uint8_t motor);
+        void set_powersupply(float volt, uint8_t motor);
+        void set(const FOCinput &i, uint8_t motor);
         
         // getter
         bool get_fault() const;
@@ -123,6 +155,7 @@ namespace embot::app::bldc::mbd::interface {
         void get(canFOCinfo &info, uint8_t motor) const;
         void get(canSTATUSinfo &info, uint8_t motor) const;        
         float get_temperature(uint8_t motor) const;
+        void get(FOCoutput &o, uint8_t motor);
 
         void get_current_limits(uint8_t motor, embot::app::bldc::mbd::interface::SupervisorInputLimits &cl);
         void get_current_pid(uint8_t motor, embot::app::bldc::mbd::interface::PID &pid);
@@ -165,8 +198,13 @@ namespace embot::app::bldc::mbd::interface {
 
 namespace embot::app::bldc::mbd::interface {
     
-    void init(IO2 *io2);
+    IO2& getIO2handle();    
+    
+    void init();
+
     void tick();
+    
+    void foc(const std::array<IO2::FOCinput, 2> &i, std::array<IO2::FOCoutput, 2> &o);
     
 } // namespace embot::app::bldc::mbd::interface {
 
