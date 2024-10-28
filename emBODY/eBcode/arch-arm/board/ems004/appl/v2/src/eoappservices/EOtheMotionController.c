@@ -1669,7 +1669,7 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
         if(NULL != (jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), i)))
         {
             jstatus->addinfo.multienc[0] = rawValsArray.rawvalues[0].val;
-            jstatus->addinfo.multienc[1] = rawValsArray.rawvalues[1].val;
+            //jstatus->addinfo.multienc[1] = rawValsArray.rawvalues[1].val; for now do not update the raw value for the motor encoder since we are adding to it the raw planned target --> see lines 292..294 in Joint.c
             jstatus->addinfo.multienc[2] = rawValsArray.rawvalues[0].diagnInfo;
             
         }
