@@ -93,7 +93,7 @@ struct embot::app::eth::theEncoderReader::Impl
     eOservice_core_t service {dummy_service_core};
     eOservice_diagnostics_t diagnostics {dummy_service_diagnostics};
     
-    std::array<std::array<embot::app::eth::encoder::experimental::Value, 2>, max_number_of_jomos> rawvalues {};
+    std::array<std::array<embot::app::eth::encoder::experimental::RawValueEncoder, 2>, max_number_of_jomos> rawvalues {};
     
     typedef struct
     {
@@ -117,13 +117,12 @@ struct embot::app::eth::theEncoderReader::Impl
     bool Diagnostics_Tick() { return true; }
     embot::app::eth::encoder::v1::Type GetType(const embot::app::eth::encoder::v1::Target &target);
     bool Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler);
-    
-    bool raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value);
 
     void log();
     
     // advanced
-    bool read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value);
+    bool GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray);
+    bool GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue);
 
 private:    
     static bool s_eo_isconnected(eOmc_encoder_descriptor_t *des);
@@ -441,8 +440,8 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                     errorparam = 0xffff;                                         
                 }   
                 
-                rawvalues[i][jomo].raw = spiRawValue;
-                rawvalues[i][jomo].error = (resOK == rr) ? embot::app::eth::encoder::experimental::Error::NONE : embot::app::eth::encoder::experimental::Error::SOME;
+                rawvalues[i][jomo].val = (int32_t)spiRawValue;
+                //rawvalues[i][jomo].diagnInfo = (resOK == rr) ? 0 : 1;
                
             } break;
             
@@ -471,7 +470,7 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                     errorparam = 0xffff;                                         
                 } 
 
-                rawvalues[i][jomo].raw = spiRawValue;                
+                rawvalues[i][jomo].val = spiRawValue;                
                
             } break;
             
@@ -480,8 +479,8 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                 prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::GENERIC;   
                 errorparam = 0; 
                 
-                rawvalues[i][jomo].raw = 0;
-                rawvalues[i][jomo].error = embot::app::eth::encoder::experimental::Error::SOME;
+                rawvalues[i][jomo].val = 0;
+                //rawvalues[i][jomo].error = embot::app::eth::encoder::experimental::Error::SOME;
                 
             } break;
         }
@@ -514,19 +513,6 @@ bool embot::app::eth::theEncoderReader::Impl::Scale(const embot::app::eth::encod
     return false;
 }
 
-bool embot::app::eth::theEncoderReader::Impl::raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value)
-{
-    uint8_t p = embot::core::tointegral(pos);
-    
-    if((p > 2) || (jomo > max_number_of_jomos))
-    {
-        return false;
-    }   
-    
-    value = rawvalues[p][jomo];
-    return embot::app::eth::encoder::experimental::Error::NONE == value.error;
-}
-
 
 void embot::app::eth::theEncoderReader::Impl::log()
 {
@@ -548,14 +534,15 @@ void embot::app::eth::theEncoderReader::Impl::log()
 #endif    
 }
 
-bool embot::app::eth::theEncoderReader::Impl::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
+bool embot::app::eth::theEncoderReader::Impl::GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray)
 {
-    value.raw = 0x123456789A;
-    value.error = embot::app::eth::encoder::experimental::Error::NONE;
-    
-    return true;
+    return eores_OK;
 }
 
+bool embot::app::eth::theEncoderReader::Impl::GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue)
+{
+    return eores_OK;
+}
 
 // private members
 
@@ -741,20 +728,19 @@ bool embot::app::eth::theEncoderReader::Scale(const embot::app::eth::encoder::v1
     return pImpl->Scale(target, scaler);
 }
 
-bool embot::app::eth::theEncoderReader::raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value)
-{
-    return pImpl->raw(jomo, pos, value);
-}
-
 void embot::app::eth::theEncoderReader::log()
 {
     pImpl->log();
 }
 
-
-bool embot::app::eth::theEncoderReader::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
+bool embot::app::eth::theEncoderReader::GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray)
 {
-    return pImpl->read(target, value);
+    return pImpl->GetRaw(jomo, rawValuesArray);
+}
+
+bool embot::app::eth::theEncoderReader::GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue)
+{
+    return pImpl->GetRawSingle(jomo, pos, rawValue);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
