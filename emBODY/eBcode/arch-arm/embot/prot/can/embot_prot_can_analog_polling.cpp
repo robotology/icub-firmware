@@ -270,7 +270,6 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             case static_cast<std::uint8_t>(SkinType::ergoHand):
             {
                 info.skintype = SkinType::ergoHand;
-//                trianglesOrder = altTrianglesOrder; 
             } break;
                       
             default:

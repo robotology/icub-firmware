@@ -348,7 +348,7 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     {
         public:
             
-        enum class SkinType { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, testmodeRAW = 7, withTemperatureCompensationV2 = 8, none = 254, ergoHand = 3};
+        enum class SkinType { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, ergoHand = 3, testmodeRAW = 7, withTemperatureCompensationV2 = 8, none = 254};
                         
         struct Info
         { 
