@@ -338,7 +338,7 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
         case embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensationV2:
         case embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::ergoHand:
         {
-						
+                        
             if(embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation == boardconfig.skintype)
             {
                 gain = triangles.GAIN[dot];  
@@ -360,7 +360,7 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
                 { // are the indexes of the 3DMID
                     gain = triangles.GAIN_PALM[dot];
                     posTemp = 11;
-				} 
+                } 
             }
             else
             {
@@ -368,7 +368,7 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
                 posTemp = 6;
             }
                         
-			// temperature compensation does not apply to fingertips i.e. triangles 0,4,8,12,16 thus this module-16 op is a bug but not having any effect: 
+            // temperature compensation does not apply to fingertips i.e. triangles 0,4,8,12,16 thus this module-16 op is a bug but not having any effect: 
             Tpad_base = triangles.capoffsets[trianglesOrder[trg]%16][posTemp]; // in original mtb3 code there is ADCRESULT_S6 which is defined as 6
             Tpad = triangles.rawvalues[trianglesOrder[trg]%16][posTemp]; 
                 
@@ -399,13 +399,13 @@ bool embot::app::application::theSkin::Impl::fill(embot::prot::can::skin::period
 {
     bool ret = true;
     if(embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::ergoHand == boardconfig.skintype)
-		{
-			for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = altTrianglesOrder[i];
-		}
-		else 
-		{
-			for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = origTrianglesOrder[i];
-		}
+    {
+        for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = altTrianglesOrder[i];
+    }
+    else 
+    {
+        for (uint8_t i = 0; i<16; i++) trianglesOrder[i] = origTrianglesOrder[i];
+    }
 
     if2hw_data_ad7147_t *the12rawvalues = ad7147_get12rawvaluesoftriangle(trianglesOrder[trg]);
     if2hw_data_ad7147_t *the12capoffsets = ad7147_get12capoffsetsoftriangle(trianglesOrder[trg]);
