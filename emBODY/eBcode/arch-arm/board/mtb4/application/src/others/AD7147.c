@@ -94,9 +94,6 @@ static if2hw_data_ad7147_t (*s_CapOffset)[12] = CapOffset;
 #endif
 
 uint16_t SKV = 0;
-uint16_t taxsel0 = 0;
-uint16_t taxsel4 = 0;
-uint16_t taxsel5 = 0;
 
 static uint32_t triangleconnectionmask = 0xffff;
 
@@ -153,7 +150,6 @@ void ServiceAD7147Isr(unsigned char Channel)
 {
   unsigned int i=0;
     // code added SD + Marco Accame
-    constexpr size_t nI2Clines {1};
     constexpr size_t NumberOfRegistertoRead  {12};
 	for (i=0;i<4;i++)// this 4 is number of addresses on each I2C line
 	{
@@ -162,21 +158,16 @@ void ServiceAD7147Isr(unsigned char Channel)
         s_AD7147Registers[i+4],
         s_AD7147Registers[i+8],
         s_AD7147Registers[i+12],
-//        s_AD7147Registers[i+16],
         s_AD7147Registers_5th[i],
         0);
 	}
     static int x = 0;
     x++;
     if(x > 11) x =0;
-#ifdef USE_FIFTH_I2C
+#ifdef DEBUG_FIFTH_I2C
     SKV = s_AD7147Registers_5th[0][x];
 #endif
-//    SKV = s_AD7147Registers[16][x];
 
-    taxsel0 = s_AD7147Registers_5th[0][0];
-    taxsel4 = s_AD7147Registers_5th[0][4];
-    taxsel5 = s_AD7147Registers_5th[0][5];
     
 }
 
