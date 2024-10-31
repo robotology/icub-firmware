@@ -1312,7 +1312,7 @@
       <GroupNumber>12</GroupNumber>
       <FileNumber>58</FileNumber>
       <FileType>8</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\mtb4\application\src\others\AD7147.c</PathWithFileName>

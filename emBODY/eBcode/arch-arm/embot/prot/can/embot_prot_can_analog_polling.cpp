@@ -266,7 +266,12 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
             {
                 info.skintype = SkinType::withTemperatureCompensationV2;
             } break;
-                       
+            
+            case static_cast<std::uint8_t>(SkinType::ergoHand):
+            {
+                info.skintype = SkinType::ergoHand;
+            } break;
+                      
             default:
             {
                 info.skintype = SkinType::none;

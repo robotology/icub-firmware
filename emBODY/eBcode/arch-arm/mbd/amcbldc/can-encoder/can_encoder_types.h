@@ -7,17 +7,17 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 6.9
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:43 2024
+// Model version                  : 7.0
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Oct  7 15:55:55 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_can_encoder_types_h_
-#define RTW_HEADER_can_encoder_types_h_
+#ifndef can_encoder_types_h_
+#define can_encoder_types_h_
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
 
@@ -150,107 +150,13 @@ struct BUS_STATUS_TX
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfig_
-#define DEFINED_TYPEDEF_FOR_MotorConfig_
-
-struct MotorConfig
-{
-  // Angular offset in degrees between the stator windings and the hall sensors. 
-  real32_T hall_sens_offset;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_torque_sens;
-  boolean_T use_index;
-  boolean_T enable_verbosity;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  real32_T Kbemf;
-  real32_T Rphase;
-  real32_T Imin;
-  real32_T Imax;
-  real32_T Vmax;
-  real32_T resistance;
-  real32_T inductance;
-  real32_T thermal_resistance;
-  real32_T thermal_time_constant;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationConfig_
-#define DEFINED_TYPEDEF_FOR_EstimationConfig_
-
-struct EstimationConfig
-{
-  EstimationVelocityModes velocity_mode;
-
-  // Forgetting factor in [0, 1] for exponential weighting-based estimation of RMS current value 
-  real32_T current_rms_lambda;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_PIDConfig_
-#define DEFINED_TYPEDEF_FOR_PIDConfig_
-
-struct PIDConfig
-{
-  real32_T OutMax;
-  real32_T OutMin;
-  real32_T P;
-  real32_T I;
-  real32_T D;
-  real32_T N;
-  real32_T I0;
-  real32_T D0;
-  uint8_T shift_factor;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_Thresholds_
 #define DEFINED_TYPEDEF_FOR_Thresholds_
 
 struct Thresholds
 {
-  // It shall be greater than hardwareJntPosMin
-  real32_T jntPosMin;
-
-  // It shall be smaller than hardwareJntPosMax
-  real32_T jntPosMax;
-
-  // Imposed by hardware constraint
-  real32_T hardwareJntPosMin;
-
-  // Imposed by hardware constraint
-  real32_T hardwareJntPosMax;
-
-  // If robotMin == rotorMax == 0, there's no check
-  real32_T rotorPosMin;
-
-  // If robotMin == rotorMax == 0, there's no check
-  real32_T rotorPosMax;
-
   // Can be only non-negative
   real32_T jntVelMax;
-
-  // Timeout on reception of velocity setpoint
-  // Can be only non-negative
-  uint32_T velocityTimeout;
 
   // Current that can be kept for an indefinite period of time w/o damaging the motor
   // Expressed in [A] as all the internal computations are done this way
@@ -278,19 +184,100 @@ struct Thresholds
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ConfigurationParameters_
-#define DEFINED_TYPEDEF_FOR_ConfigurationParameters_
+#ifndef DEFINED_TYPEDEF_FOR_ControlModes_
+#define DEFINED_TYPEDEF_FOR_ControlModes_
 
-struct ConfigurationParameters
+typedef enum {
+  ControlModes_NotConfigured = 0,      // Default value
+  ControlModes_Idle,
+  ControlModes_Position,
+  ControlModes_PositionDirect,
+  ControlModes_Current,
+  ControlModes_Velocity,
+  ControlModes_Voltage,
+  ControlModes_HwFaultCM
+} ControlModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PID_
+#define DEFINED_TYPEDEF_FOR_PID_
+
+struct PID
 {
-  MotorConfig motorconfig;
-  EstimationConfig estimationconfig;
-  PIDConfig CurLoopPID;
-  PIDConfig PosLoopPID;
-  PIDConfig VelLoopPID;
-  PIDConfig DirLoopPID;
+  ControlModes type;
+  real32_T OutMax;
+  real32_T OutMin;
+  real32_T P;
+  real32_T I;
+  real32_T D;
+  real32_T N;
+  real32_T I0;
+  real32_T D0;
+  uint8_T shift_factor;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
+
+struct PIDsConfiguration
+{
+  PID currentPID;
+  PID velocityPID;
+  PID positionPID;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
+
+struct MotorConfigurationExternal
+{
+  boolean_T enable_verbosity;
+  boolean_T has_hall_sens;
+  boolean_T has_quadrature_encoder;
+  boolean_T has_speed_quadrature_encoder;
+  boolean_T has_temperature_sens;
+  uint8_T encoder_tolerance;
+  uint8_T pole_pairs;
+  int16_T rotor_encoder_resolution;
+  int16_T rotor_index_offset;
+  boolean_T use_index;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
+#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
+
+struct MotorConfiguration
+{
+  MotorConfigurationExternal externals;
+  real32_T Kbemf;
+  real32_T Rphase;
+  real32_T Imin;
+  real32_T Imax;
+  real32_T Vmax;
+  real32_T resistance;
+  real32_T inductance;
+  real32_T thermal_resistance;
+  real32_T thermal_time_constant;
+  real32_T hall_sensors_offset;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
+
+struct ActuatorConfiguration
+{
   Thresholds thresholds;
-  real32_T environment_temperature;
+  PIDsConfiguration pids;
+  MotorConfiguration motor;
 };
 
 #endif
@@ -336,7 +323,7 @@ struct BUS_CAN_MULTIPLE
 // Forward declaration for rtModel
 typedef struct tag_RTM_can_encoder_T RT_MODEL_can_encoder_T;
 
-#endif                                 // RTW_HEADER_can_encoder_types_h_
+#endif                                 // can_encoder_types_h_
 
 //
 // File trailer for generated code.

@@ -290,7 +290,7 @@ extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_BRD_CFG(eOcanprot_de
     icubCanProto_skinboard_config_t* bcfg = (icubCanProto_skinboard_config_t *)descriptor->cmd.value;    
     /* 2) set can command (see SkinPrototype::calibrateSensor)*/
     frame->data[0] = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;  
-    frame->data[1] = (bcfg->skintype &0x07);
+    frame->data[1] = bcfg->skintype;
     frame->data[2] = bcfg->period;
     frame->data[3] = bcfg->noload;
 

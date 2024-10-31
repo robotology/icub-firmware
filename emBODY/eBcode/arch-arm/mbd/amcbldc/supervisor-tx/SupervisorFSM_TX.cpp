@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 7.4
-// Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Mar 13 10:35:18 2024
+// Model version                  : 8.0
+// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
+// C/C++ source code generated on : Mon Oct  7 15:55:31 2024
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,15 +18,8 @@
 //
 #include "SupervisorFSM_TX.h"
 #include "SupervisorFSM_TX_types.h"
+#include "rtwtypes.h"
 #include "SupervisorFSM_TX_private.h"
-
-MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_MdlrefDW;
-
-// Block signals (default storage)
-B_SupervisorFSM_TX_c_T SupervisorFSM_TX_B;
-
-// Block states (default storage)
-DW_SupervisorFSM_TX_f_T SupervisorFSM_TX_DW;
 
 // Forward declaration for local functions
 static MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode);
@@ -114,33 +107,38 @@ void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx)
 // Output and update for referenced model: 'SupervisorFSM_TX'
 void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
                       *rtu_EstimatedData, const Flags *rtu_Flags, const
-                      ControlOutputs *rtu_ControlOutputs, BUS_MESSAGES_TX
-                      *rty_MessagesTx, BUS_STATUS_TX *rty_StatusTx)
+                      FOCOutputs *rtu_ControlOutputs, const boolean_T
+                      *rtu_ExternalFlags_fault_button, BUS_MESSAGES_TX
+                      *rty_MessagesTx, BUS_STATUS_TX *rty_StatusTx,
+                      B_SupervisorFSM_TX_c_T *localB, DW_SupervisorFSM_TX_f_T
+                      *localDW)
 {
   // Chart: '<Root>/SupervisorFSM_TX'
-  if (SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX == 0U) {
-    SupervisorFSM_TX_DW.is_active_c3_SupervisorFSM_TX = 1U;
+  if (localDW->is_active_c3_SupervisorFSM_TX == 0U) {
+    localDW->is_active_c3_SupervisorFSM_TX = 1U;
   } else if (rtu_Flags->enable_sending_msg_status) {
-    rty_MessagesTx->foc.current = rtu_EstimatedData->Iq_filtered.current;
-    rty_MessagesTx->foc.velocity = rtu_EstimatedData->jointvelocities.velocity;
-    rty_MessagesTx->foc.position = rtu_SensorsData->jointpositions.position;
-    SupervisorFSM_TX_DW.ev_focEventCounter++;
+    rty_MessagesTx->foc.current = rtu_EstimatedData->Iq_filtered;
+    rty_MessagesTx->foc.velocity = rtu_EstimatedData->velocity;
+    rty_MessagesTx->foc.position = rtu_SensorsData->position;
+    localDW->ev_focEventCounter++;
     rty_MessagesTx->status.control_mode = SupervisorFSM_TX_convert
       (rtu_Flags->control_mode);
     rty_MessagesTx->status.pwm_fbk = rtu_ControlOutputs->Vq;
-    rty_MessagesTx->status.flags.ExternalFaultAsserted = rtu_Flags->fault_button;
-    rty_MessagesTx->status.flags.OverCurrentFailure = rtu_Flags->overcurrent;
-    SupervisorFSM_TX_DW.ev_statusEventCounter++;
+    rty_MessagesTx->status.flags.ExternalFaultAsserted =
+      *rtu_ExternalFlags_fault_button;
+    rty_MessagesTx->status.flags.OverCurrentFailure =
+      rtu_Flags->hw_faults.overcurrent;
+    localDW->ev_statusEventCounter++;
   }
 
-  if (SupervisorFSM_TX_DW.ev_focEventCounter > 0U) {
-    SupervisorFSM_TX_B.ev_foc = !SupervisorFSM_TX_B.ev_foc;
-    SupervisorFSM_TX_DW.ev_focEventCounter--;
+  if (localDW->ev_focEventCounter > 0U) {
+    localB->ev_foc = !localB->ev_foc;
+    localDW->ev_focEventCounter--;
   }
 
-  if (SupervisorFSM_TX_DW.ev_statusEventCounter > 0U) {
-    SupervisorFSM_TX_B.ev_status = !SupervisorFSM_TX_B.ev_status;
-    SupervisorFSM_TX_DW.ev_statusEventCounter--;
+  if (localDW->ev_statusEventCounter > 0U) {
+    localB->ev_status = !localB->ev_status;
+    localDW->ev_statusEventCounter--;
   }
 
   // End of Chart: '<Root>/SupervisorFSM_TX'
@@ -152,8 +150,7 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
   //
   //   Store in Global RAM
 
-  rty_StatusTx->foc = (SupervisorFSM_TX_B.ev_foc !=
-                       SupervisorFSM_TX_DW.DelayInput1_DSTATE);
+  rty_StatusTx->foc = (localB->ev_foc != localDW->DelayInput1_DSTATE);
 
   // RelationalOperator: '<S2>/FixPt Relational Operator' incorporates:
   //   UnitDelay: '<S2>/Delay Input1'
@@ -162,8 +159,7 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
   //
   //   Store in Global RAM
 
-  rty_StatusTx->status = (SupervisorFSM_TX_B.ev_status !=
-    SupervisorFSM_TX_DW.DelayInput1_DSTATE_d);
+  rty_StatusTx->status = (localB->ev_status != localDW->DelayInput1_DSTATE_d);
 
   // Update for UnitDelay: '<S1>/Delay Input1'
   //
@@ -171,7 +167,7 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
   //
   //   Store in Global RAM
 
-  SupervisorFSM_TX_DW.DelayInput1_DSTATE = SupervisorFSM_TX_B.ev_foc;
+  localDW->DelayInput1_DSTATE = localB->ev_foc;
 
   // Update for UnitDelay: '<S2>/Delay Input1'
   //
@@ -179,15 +175,13 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
   //
   //   Store in Global RAM
 
-  SupervisorFSM_TX_DW.DelayInput1_DSTATE_d = SupervisorFSM_TX_B.ev_status;
+  localDW->DelayInput1_DSTATE_d = localB->ev_status;
 }
 
 // Model initialize function
-void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus)
+void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus,
+  RT_MODEL_SupervisorFSM_TX_T *const SupervisorFSM_TX_M)
 {
-  RT_MODEL_SupervisorFSM_TX_T *const SupervisorFSM_TX_M =
-    &(SupervisorFSM_TX_MdlrefDW.rtm);
-
   // Registration code
 
   // initialize error status

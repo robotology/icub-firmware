@@ -71,11 +71,11 @@ struct embot::app::eth::theEncoderReader::Impl
     static constexpr size_t max_number_of_encoders { 2 * max_number_of_jomos }; 
 
     
-    typedef struct
+    struct jomoconfig_t
     {
         eOmc_encoder_descriptor_t   encoder1des;
         eOmc_encoder_descriptor_t   encoder2des;
-    } jomoconfig_t;
+    };
 
     struct ImplConfig
     {
@@ -93,13 +93,15 @@ struct embot::app::eth::theEncoderReader::Impl
     eOservice_core_t service {dummy_service_core};
     eOservice_diagnostics_t diagnostics {dummy_service_diagnostics};
     
-    std::array<std::array<embot::app::eth::encoder::experimental::Value, 2>, max_number_of_jomos> rawvalues {};
+    std::array<std::array<embot::app::eth::encoder::experimental::RawValueEncoder, 2>, max_number_of_jomos> rawvalues {};
     
-    typedef struct
+    struct eOencoderProperties_t
     {
         eOmc_encoder_descriptor_t *descriptor;
         embot::app::eth::encoder::v1::valueInfo *valueinfo;
-    } eOencoderProperties_t;
+        eOencoderProperties_t() = default;
+        eOencoderProperties_t(eOmc_encoder_descriptor_t *d, embot::app::eth::encoder::v1::valueInfo *v) : descriptor(d), valueinfo(v) {}
+    };
     
     constexpr static const char s_eobj_ownname[] = "theEncoderReader";
     
@@ -117,13 +119,12 @@ struct embot::app::eth::theEncoderReader::Impl
     bool Diagnostics_Tick() { return true; }
     embot::app::eth::encoder::v1::Type GetType(const embot::app::eth::encoder::v1::Target &target);
     bool Scale(const embot::app::eth::encoder::v1::Target &target, const embot::app::eth::encoder::v1::Scaler &scaler);
-    
-    bool raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value);
 
     void log();
     
     // advanced
-    bool read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value);
+    bool GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray);
+    bool GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue);
 
 private:    
     static bool s_eo_isconnected(eOmc_encoder_descriptor_t *des);
@@ -137,6 +138,19 @@ private:
     eOipv4port_t hostport {6666};
     char sss[512] = {0};
 #endif
+
+
+    // port is a uint8_t taken by eOmc_encoder_descriptor_t::port
+    embot::hw::ENCODER port2encoder(uint8_t port)
+    {
+        // marco.accame on 29 oct 2024: for now it is simple .... 
+        // on the amc we have port equal only to eobrd_port_amc_J5_X1 / X2 / X3 = 0 / 1 / 2
+        // and we want them to be mapped onto embot::hw::ENCODER::one / two / three = 0 / 1 / 2 
+        // so .... if we have an amc and port is 0, 1, or 2 we just do a static_cast<>
+        // for other boards to come (amcfoc, etc) the port will have the same values 0, 1, 2 so that 
+        // it is easy to convert w/ a static_cast<>
+        return static_cast<embot::hw::ENCODER>(port);        
+    }
     
 };
 
@@ -233,16 +247,19 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 
 bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "::Activate()", s_eobj_ownname);
+//    eo_errman_Trace(eo_errman_GetHandle(), "::Activate()", s_eobj_ownname);
+    bool ret {true};
     
     if((nullptr == config.carrayofjomodes))
     {
-        return false;
+        ret = false;
+        return ret;
     } 
 
     if(eo_constarray_Size(config.carrayofjomodes) > max_number_of_jomos)
     {
-        return false;
+        ret = false;
+        return ret;
     }
 
     EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
@@ -286,62 +303,43 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
                 default:
                 {
                     // unsupported encoder
-                    return eores_NOK_unsupported;
+                    ret = false;
                 } break;
             }
             
-            // 2. configure and initialize SPI encoders
-            switch(_implconfig.jomo_cfg[i].encoder1des.port)
+            // 2. configure and initialize SPI encoder
+            
+            embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
+            embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
+            if(embot::hw::resOK != r)
             {
-                case eobrd_port_amc_J5_X1:
-                {
-                    embot::hw::encoder::init(embot::hw::ENCODER::one, cfg);
-                } break;
-                
-                case eobrd_port_amc_J5_X2:
-                {
-                    embot::hw::encoder::init(embot::hw::ENCODER::two, cfg);
-                }  break;
-                
-                case eobrd_port_amc_J5_X3:
-                {
-                    embot::hw::encoder::init(embot::hw::ENCODER::three, cfg);
-                } break;
-                
-                default:
-                {
-                    // error invalid SPI
-                    return eores_NOK_generic;
-                } break;
+                ret = false;
             }
+            
         }
     }
+    
+    if(false == ret)
+    {
+        Deactivate();      
+    }
         
-    _actived = true;
+    _actived = ret;
       
-    return true;
+    return _actived;
 }
 
 bool embot::app::eth::theEncoderReader::Impl::Deactivate()
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
+//    eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
     
-    if(false == _actived)
-    {
-        return true;
-    }
+    _implconfig.numofjomos = 0;
+    embot::hw::encoder::deinit(embot::hw::ENCODER::one);
+    embot::hw::encoder::deinit(embot::hw::ENCODER::two);
+    embot::hw::encoder::deinit(embot::hw::ENCODER::three);
+    _actived = false;
     
-    if((resOK == embot::hw::encoder::deinit(embot::hw::ENCODER::one)) &&
-       (resOK == embot::hw::encoder::deinit(embot::hw::ENCODER::two)) &&
-       (resOK == embot::hw::encoder::deinit(embot::hw::ENCODER::three)))
-    {
-        _implconfig.numofjomos = 0;
-        _actived = false;
-        
-        return true;
-    }
-    
-    return false;
+    return _actived;
 }
 
 bool embot::app::eth::theEncoderReader::Impl::StartReading()
@@ -349,6 +347,7 @@ bool embot::app::eth::theEncoderReader::Impl::StartReading()
     //eo_errman_Trace(eo_errman_GetHandle(), "::Start()", s_eobj_ownname);
     
     // start the encoder reading
+    // marco.accame on 29 oct 2024: maybe we can read just the configured ones. 
     embot::hw::encoder::startRead(embot::hw::ENCODER::one);
     embot::hw::encoder::startRead(embot::hw::ENCODER::two);
     embot::hw::encoder::startRead(embot::hw::ENCODER::three);
@@ -363,23 +362,22 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
     {   // nothing to do because we dont have it
         return true;
     }
-    
-    embot::hw::ENCODER e = static_cast<embot::hw::ENCODER>(jomo);
-    if(e >= embot::hw::ENCODER::maxnumberof)
+
+    if(jomo >= _implconfig.numofjomos)
     {
         return false;
     }
     
-    eOencoderProperties_t encProp[2] = {nullptr};
+    constexpr size_t numOfEncodersPerJoint {2};
     
-    encProp[0].descriptor = &_implconfig.jomo_cfg[jomo].encoder1des;
-    encProp[0].valueinfo = &primary;
-    
-    encProp[1].descriptor = &_implconfig.jomo_cfg[jomo].encoder2des;
-    encProp[1].valueinfo = &secondary;
-    
-    for(uint8_t i=0; i<2; i++)
+    eOencoderProperties_t encProp[numOfEncodersPerJoint] = { 
+        {&_implconfig.jomo_cfg[jomo].encoder1des, &primary}, 
+        {&_implconfig.jomo_cfg[jomo].encoder2des, &secondary }
+    };
+        
+    for(uint8_t i=0; i<numOfEncodersPerJoint; i++)
     {   // for each of the two encoders ....
+        
         eOencoderProperties_t prop = encProp[i]; 
         uint16_t errorparam = 0;
         
@@ -409,12 +407,13 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
         switch(prop.descriptor->type)
         {
             // they are: eomc_enc_aea3, eomc_enc_aea, eomc_enc_amo, eomc_enc_spichainof2,
-            //           eomc_enc_spichainof3, eomc_enc_qenc, eomc_enc_absanalog, eomc_enc_mais
+            //           eomc_enc_spichainof3, eomc_enc_qenc, eomc_enc_absanalog, eomc_enc_mais            
+            // however, in here we support (so far) only: aea and aea3
                        
             case eomc_enc_aea:
-            {               
+            {                               
+                embot::hw::ENCODER e = port2encoder(prop.descriptor->port);
                 
-                // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
                 if(resOK == (rr = embot::hw::encoder::getValue(e, spiRawValue/*, &diagn*/)))                
                 {   // ok, the hal reads correctly
                     if(true == isValidValue_AEA(spiRawValue, prop.valueinfo->errortype))
@@ -441,16 +440,16 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                     errorparam = 0xffff;                                         
                 }   
                 
-                rawvalues[i][jomo].raw = spiRawValue;
-                rawvalues[i][jomo].error = (resOK == rr) ? embot::app::eth::encoder::experimental::Error::NONE : embot::app::eth::encoder::experimental::Error::SOME;
+                rawvalues[i][jomo].val = (int32_t)spiRawValue;
+                //rawvalues[i][jomo].diagnInfo = (resOK == rr) ? 0 : 1;
                
             } break;
             
             
             case eomc_enc_aea3:
-            {
-                               
-                // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
+            {                         
+                embot::hw::ENCODER e = port2encoder(prop.descriptor->port);  
+                
                 if(resOK == (rr = embot::hw::encoder::getValue(e, spiRawValue/*, &diagn*/)))                
                 {   // ok, the hal reads correctly
                     if(true == isValidValue_AEA3(spiRawValue, prop.valueinfo->errortype))
@@ -471,7 +470,7 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                     errorparam = 0xffff;                                         
                 } 
 
-                rawvalues[i][jomo].raw = spiRawValue;                
+                rawvalues[i][jomo].val = spiRawValue;                
                
             } break;
             
@@ -480,8 +479,8 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
                 prop.valueinfo->errortype = embot::app::eth::encoder::v1::Error::GENERIC;   
                 errorparam = 0; 
                 
-                rawvalues[i][jomo].raw = 0;
-                rawvalues[i][jomo].error = embot::app::eth::encoder::experimental::Error::SOME;
+                rawvalues[i][jomo].val = 0;
+                //rawvalues[i][jomo].error = embot::app::eth::encoder::experimental::Error::SOME;
                 
             } break;
         }
@@ -514,19 +513,6 @@ bool embot::app::eth::theEncoderReader::Impl::Scale(const embot::app::eth::encod
     return false;
 }
 
-bool embot::app::eth::theEncoderReader::Impl::raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value)
-{
-    uint8_t p = embot::core::tointegral(pos);
-    
-    if((p > 2) || (jomo > max_number_of_jomos))
-    {
-        return false;
-    }   
-    
-    value = rawvalues[p][jomo];
-    return embot::app::eth::encoder::experimental::Error::NONE == value.error;
-}
-
 
 void embot::app::eth::theEncoderReader::Impl::log()
 {
@@ -548,14 +534,15 @@ void embot::app::eth::theEncoderReader::Impl::log()
 #endif    
 }
 
-bool embot::app::eth::theEncoderReader::Impl::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
+bool embot::app::eth::theEncoderReader::Impl::GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray)
 {
-    value.raw = 0x123456789A;
-    value.error = embot::app::eth::encoder::experimental::Error::NONE;
-    
-    return true;
+    return eores_OK;
 }
 
+bool embot::app::eth::theEncoderReader::Impl::GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue)
+{
+    return eores_OK;
+}
 
 // private members
 
@@ -741,20 +728,19 @@ bool embot::app::eth::theEncoderReader::Scale(const embot::app::eth::encoder::v1
     return pImpl->Scale(target, scaler);
 }
 
-bool embot::app::eth::theEncoderReader::raw(uint8_t jomo, embot::app::eth::encoder::v1::Position pos, embot::app::eth::encoder::experimental::Value &value)
-{
-    return pImpl->raw(jomo, pos, value);
-}
-
 void embot::app::eth::theEncoderReader::log()
 {
     pImpl->log();
 }
 
-
-bool embot::app::eth::theEncoderReader::read(const embot::app::eth::encoder::experimental::Target &target, embot::app::eth::encoder::experimental::Value &value)
+bool embot::app::eth::theEncoderReader::GetRaw(uint8_t jomo, embot::app::eth::encoder::experimental::RawValuesOfJomo &rawValuesArray)
 {
-    return pImpl->read(target, value);
+    return pImpl->GetRaw(jomo, rawValuesArray);
+}
+
+bool embot::app::eth::theEncoderReader::GetRawSingle(uint8_t jomo, embot::app::eth::encoder::experimental::Position pos, embot::app::eth::encoder::experimental::RawValueEncoder &rawValue)
+{
+    return pImpl->GetRawSingle(jomo, pos, rawValue);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
