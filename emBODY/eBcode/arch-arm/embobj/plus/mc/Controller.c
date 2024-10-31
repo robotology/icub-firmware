@@ -1509,7 +1509,18 @@ void MController_update_motor_temperature_fbk(int m, int16_t temperature)
 
 void MController_update_joint_targets(int j)
 {
-    Joint_update_status_reference(smc->joint+j);
+    Joint *j_ptr= smc->joint+j;
+    
+#ifdef WRIST_MK2
+    if(!j_ptr->belong2WristMK2)
+        Joint_update_status_reference(j_ptr);
+
+    else
+        JointSet_update_status_reference(&(smc->jointSet[0]), j_ptr, j);
+#else
+    
+    Joint_update_status_reference(j_ptr);
+#endif
 }
 
 
