@@ -568,6 +568,8 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     
     static short Ia_raw_old = 0, Ic_raw_old = 0;
     
+    // here we have a first stage filtering
+    // each sample is mediated with the previous one
     ParkParm.qIa = (Ia_raw+Ia_raw_old)/6;
     ParkParm.qIc = (Ic_raw+Ic_raw_old)/6;
     
@@ -957,57 +959,64 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 ////////////////////////////////////////////////////////////////////////////
 // CURRENT FILTER
     
-    static long Vacc = 0;
-    static long Iacc = 0;
+    // in a 20 sample window, we discard the 3 lowest and 3 highest current values
+    // and then we take the average of the 14 remaining values
+    
+    static long Vacc = 0; // pwm accumulator for average
+    static long Iacc = 0; // current accumulator for average
     static char cntr = 0;
-    static int Imax1 = 0x8000;
+    // extremal values
+    static int Imax1 = 0x8000; 
     static int Imin1 = 0x7FFF;
     static int Imax2 = 0x8000;
     static int Imin2 = 0x7FFF;
     static int Imax3 = 0x8000;
     static int Imin3 = 0x7FFF;
     
-    if (I2Tdata.IQMeasured <= Imin1)
+    if (I2Tdata.IQMeasured <= Imin1) // find the lowest value
     {
         Imin3 = Imin2;
         Imin2 = Imin1;
         Imin1 = I2Tdata.IQMeasured;
-    }
-    else if (I2Tdata.IQMeasured <= Imin2)
+    } 
+    else if (I2Tdata.IQMeasured <= Imin2) // find the 2nd lowest value
     {
         Imin3 = Imin2;
         Imin2 = I2Tdata.IQMeasured;
     }        
-    else if (I2Tdata.IQMeasured <= Imin3)
+    else if (I2Tdata.IQMeasured <= Imin3) // find the 3rd lowest value
     {
         Imin3 = I2Tdata.IQMeasured;
     }
     
-    if (I2Tdata.IQMeasured >= Imax1)
+    if (I2Tdata.IQMeasured >= Imax1) // find the highest value
     {
         Imax3 = Imax2;
         Imax2 = Imax1;
         Imax1 = I2Tdata.IQMeasured;
     }
-    else if (I2Tdata.IQMeasured >= Imax2)
+    else if (I2Tdata.IQMeasured >= Imax2) // find the 2nd highest value
     {
         Imax3 = Imax2;
         Imax2 = I2Tdata.IQMeasured;
     }        
-    else if (I2Tdata.IQMeasured >= Imax3)
+    else if (I2Tdata.IQMeasured >= Imax3) // find the 3rd highest value
     {
         Imax3 = I2Tdata.IQMeasured;
     }
         
+    // the PWM feedback is smoothed as well since it is transmitted at 1 kHz
     Vacc += Vq<<VOLT_REF_SHIFT;
     Iacc += I2Tdata.IQMeasured;
     
-    if (++cntr == 20)
+    if (++cntr == 20) // 20 kHz / 20 = 1 kHz 
     {
         cntr = 0;
         
+        // subtract extremal values from the accumulator
         Iacc -= Imin1+Imax1+Imin2+Imax2+Imin3+Imax3;
         
+        // make the average
         IqFbk = __builtin_divsd(Iacc,14);
         VqFbk = __builtin_divsd(Vacc,20);
         
