@@ -40,13 +40,13 @@
 #include "EOtheMAIS.h"
 #endif
 
+
 /////////////////////////////////////////////////////////
 // AbsEncoder
 
 
 #define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)   [ X X X X X X X X X X 1 0 0 0 0] (2^4)
 #define AEA3_MIN_SPIKE 4 //2 bitsof zero padding(aea3 use 14 bits)  [ X X X X X X X X X X X X 1 0 0] (2^2)
-          
 
 AbsEncoder* AbsEncoder_new(uint8_t n)
 {
@@ -77,6 +77,7 @@ void AbsEncoder_init(AbsEncoder* o)
     o->fake = FALSE;
     
     o->offset = 0;
+    o->zero = 0;
     
     o->distance = 0;
     o->position_last = 0;
@@ -147,7 +148,7 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
             if(toleranceIDeg < AEA3_MIN_SPIKE)
                 o->spike_mag_limit = AEA3_MIN_SPIKE * o->div;
             else
-                o->spike_mag_limit = toleranceIDeg *o->div;
+                o->spike_mag_limit = toleranceIDeg * o->div;
             
             o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
             
@@ -209,7 +210,7 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, float32_t 
     
     if (!o->fake)
     {
-       o->toleranceCfg = tolerance;
+        o->toleranceCfg = tolerance;
         s_AbsEncoder_set_spikes_limis(o);
     }
     else
@@ -308,20 +309,21 @@ void AbsEncoder_posvel(AbsEncoder* o, int32_t* position, int32_t* velocity)
 //static void AbsEncoder_position_init(AbsEncoder* o, int32_t position)
 static void AbsEncoder_position_init_aea(AbsEncoder* o, uint16_t position)
 {
-    
     if (!o->valid_first_data_cnt)
     {
         o->position_last = position;
     }
     
-    if (o->position_last != position)
+    // check difference between last and current position using minimum tolerance given by configuration 
+    // if difference larger than tolerance we need to restart to count minimum number of valid samples (10) necessary for initializing the AbsEncoder
+    if (((o->position_last - position) >= o->spike_mag_limit) && ((o->position_last - position) <= -o->spike_mag_limit))
     {
         o->valid_first_data_cnt = 0;
         
         return;
     }
     
-    if (++o->valid_first_data_cnt >= 3)
+    if (++o->valid_first_data_cnt >= 10)
     {
         o->position_last = position;
         o->position_sure = position;
@@ -362,7 +364,7 @@ static void AbsEncoder_position_init_others(AbsEncoder* o, uint16_t position)
 }
 
 static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
-{
+{   
     if (!o) return;
     
     if (o->fake) return;
@@ -453,7 +455,7 @@ void AbsEncoder_invalid(AbsEncoder* o, ae_errortype_t error_type)
             o->fault_state.bits.data_error = TRUE;
             break;
     }
-        
+    
     o->valid_first_data_cnt = 0;
 }
 
@@ -466,7 +468,7 @@ BOOL AbsEncoder_is_still(AbsEncoder* o, int32_t space_window, int32_t time_windo
     if (++o->partial_timer > time_window)
     {        
         still = abs(o->partial_space) < space_window;
-        
+
         o->partial_timer = 0;
         o->partial_space = 0;
     }
@@ -555,7 +557,7 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
             descriptor.par64 = o->spike_cnt;
             descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
             descriptor.sourceaddress = 0;
-            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_abs_enc_spikes);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
                 
             if (o->spike_cnt > o->spike_cnt_limit)
@@ -653,7 +655,7 @@ void AbsEncoder_update(AbsEncoder* o, int32_t position)
             descriptor.par64 = o->spike_cnt;
             descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
             descriptor.sourceaddress = 0;
-            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_abs_enc_spikes);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
                 
             if (o->spike_cnt > o->spike_cnt_limit)
@@ -736,17 +738,17 @@ BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
          || (o->fault_state.bits.data_error && !o->fault_state_prec.bits.data_error) 
          || (o->fault_state.bits.chip_error && !o->fault_state_prec.bits.chip_error))
         {
-            AbsEncoder_send_error(o->ID, eoerror_value_MC_aea_abs_enc_invalid, o->fault_state.bitmask);
+            AbsEncoder_send_error(o->ID, eoerror_value_MC_abs_enc_invalid, o->fault_state.bitmask);
         }
         
         if (o->fault_state.bits.data_notready)
         {
-            AbsEncoder_send_error(o->ID, eoerror_value_MC_aea_abs_enc_timeout, 0);
+            AbsEncoder_send_error(o->ID, eoerror_value_MC_abs_enc_timeout, 0);
         }
         
         if (o->fault_state.bits.spikes)
         {
-            AbsEncoder_send_error(o->ID, eoerror_value_MC_aea_abs_enc_spikes, 0);
+            AbsEncoder_send_error(o->ID, eoerror_value_MC_abs_enc_spikes, 0);
         }
         
         o->fault_state_prec.bitmask = o->fault_state.bitmask;

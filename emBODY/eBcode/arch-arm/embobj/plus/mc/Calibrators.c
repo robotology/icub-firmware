@@ -626,7 +626,7 @@ BOOL JointSet_do_wait_calibration_10(JointSet* o)
         }
         else
         {
-            if (AbsEncoder_is_hard_stop_calibrating(encoder))
+            if (AbsEncoder_is_hard_stop_calibrating(encoder) && (!encoder->state.bits.not_initialized))
             {
                 Motor_set_pwm_ref(o->motor+m, o->motor[m].calib_pwm);
         
