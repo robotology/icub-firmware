@@ -529,7 +529,8 @@ volatile int Iafbk = 0;
 volatile int Icfbk = 0;
 volatile int ElDegfbk = 0;
 volatile int CurLimfbk = 0;
-volatile int Vqfbk = 0;
+volatile int VqFbk = 0;
+volatile int IqFbk = 0;
 
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
@@ -553,16 +554,34 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetb, Offsetc
     // scale currents by MeasCurrParm.qKa, qKb, qKc
     // Calculate ParkParm.qIa, qIb, qIc
-    MeasAndCompIaIcCalculateIb();
 
-    Iafbk = ParkParm.qIa;
-    Icfbk = ParkParm.qIc;
+    // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetc
+    // scale currents by MeasCurrParm.qKa, qKc
+    
+    short Ia_raw = (int)(__builtin_mulss(MeasCurrParm.Offseta-ADCBuffer[0],MeasCurrParm.qKa)>>14); // TEST 
+    short Ic_raw = (int)(__builtin_mulss(MeasCurrParm.Offsetc-ADCBuffer[1],MeasCurrParm.qKc)>>14); // TEST
+    
+    // Ix_raw = 64 is equal to 49.03 mA current here
+    // since we have 10 bits resolution, left aligned, with LSB = 49.03 mA
+    
+    // gain = 64/49.03
+    
+    static short Ia_raw_old = 0, Ic_raw_old = 0;
+    
+    // here we have a first stage filtering
+    // each sample is mediated with the previous one
+    ParkParm.qIa = (Ia_raw+Ia_raw_old)/6;
+    ParkParm.qIc = (Ic_raw+Ic_raw_old)/6;
+    
+    Ia_raw_old = Ia_raw;
+    Ic_raw_old = Ic_raw;
+    
+    // gain = (64/49.03) * (2/3)
+    
+    Iafbk = Ia_raw;
+    Icfbk = Ic_raw;
     
     ParkParm.qIb = -ParkParm.qIa-ParkParm.qIc;
-
-    ParkParm.qIa /= 3;
-    ParkParm.qIb /= 3;
-    ParkParm.qIc /= 3;
 
     int enc = 0;
     static int enc_start_sec = 0;
@@ -728,6 +747,8 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     if (negative_sec)
     {
+        // gain = (64/49.03) * (2/3) * (2/sqrt3) = 1.0048 OK!
+        
         I2Tdata.IQMeasured = /* sqrt3/2 */  (int)(__builtin_mulss((*iH-*iL),cosT)>>15)-3*(int)(__builtin_mulss(   *i0   ,sinT)>>15);
         I2Tdata.IDMeasured = /* 3/2 */     -(int)(__builtin_mulss(   *i0   ,cosT)>>15)-  (int)(__builtin_mulss((*iH-*iL),sinT)>>15);
     }
@@ -934,14 +955,75 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         }
     }
     
-    Vqfbk = Vq;
-
-    // Re-scale Vq, Vd with respect to the PWM resolution and fullscale.
-//    if (PWM_50_DUTY_CYC!=1000)
-//    {
-//        Vq /= 2;
-//        Vd /= 2;
-//    }
+    
+////////////////////////////////////////////////////////////////////////////
+// CURRENT FILTER
+    
+    // in a 20 sample window, we discard the 3 lowest and 3 highest current values
+    // and then we take the average of the 14 remaining values
+    
+    static long Vacc = 0; // pwm accumulator for average
+    static long Iacc = 0; // current accumulator for average
+    static char cntr = 0;
+    // extremal values
+    static int Imax1 = 0x8000; 
+    static int Imin1 = 0x7FFF;
+    static int Imax2 = 0x8000;
+    static int Imin2 = 0x7FFF;
+    static int Imax3 = 0x8000;
+    static int Imin3 = 0x7FFF;
+    
+    if (I2Tdata.IQMeasured <= Imin1) // find the lowest value
+    {
+        Imin3 = Imin2;
+        Imin2 = Imin1;
+        Imin1 = I2Tdata.IQMeasured;
+    } 
+    else if (I2Tdata.IQMeasured <= Imin2) // find the 2nd lowest value
+    {
+        Imin3 = Imin2;
+        Imin2 = I2Tdata.IQMeasured;
+    }        
+    else if (I2Tdata.IQMeasured <= Imin3) // find the 3rd lowest value
+    {
+        Imin3 = I2Tdata.IQMeasured;
+    }
+    
+    if (I2Tdata.IQMeasured >= Imax1) // find the highest value
+    {
+        Imax3 = Imax2;
+        Imax2 = Imax1;
+        Imax1 = I2Tdata.IQMeasured;
+    }
+    else if (I2Tdata.IQMeasured >= Imax2) // find the 2nd highest value
+    {
+        Imax3 = Imax2;
+        Imax2 = I2Tdata.IQMeasured;
+    }        
+    else if (I2Tdata.IQMeasured >= Imax3) // find the 3rd highest value
+    {
+        Imax3 = I2Tdata.IQMeasured;
+    }
+        
+    // the PWM feedback is smoothed as well since it is transmitted at 1 kHz
+    Vacc += Vq<<VOLT_REF_SHIFT;
+    Iacc += I2Tdata.IQMeasured;
+    
+    if (++cntr == 20) // 20 kHz / 20 = 1 kHz 
+    {
+        cntr = 0;
+        
+        // subtract extremal values from the accumulator
+        Iacc -= Imin1+Imax1+Imin2+Imax2+Imin3+Imax3;
+        
+        // make the average
+        IqFbk = __builtin_divsd(Iacc,14);
+        VqFbk = __builtin_divsd(Vacc,20);
+        
+        Iacc = Vacc = 0;
+        Imax1 = Imax2 = Imax3 = 0x8000;
+        Imin1 = Imin2 = Imin3 = 0x7FFF;
+    }
 
     //
     ////////////////////////////////////////////////////////////////////////////
@@ -1011,10 +1093,26 @@ void DriveInit()
 // Perform drive SW/HW init
 {
     pwmInit(PWM_50_DUTY_CYC, DDEADTIME, PWM_MAX /*pwm max = 80%*/);
-
-    // setup and perform ADC offset calibration in MeasCurrParm.Offseta and Offsetb
+    
+    // setup and perform ADC offset calibration in MeasCurrParm.Offseta and MeasCurrParm.Offsetc
     ADCDoOffsetCalibration();
 
+#if 0  // to be moved to EnableDrive() but to be tested before  
+    pwmON();
+
+    int pwm3_00 = PWM_MAX / 25;
+
+    pwmOut(pwm3_00, -2*pwm3_00, pwm3_00);
+    
+    int d;
+    
+    for (d=0; d<5000; ++d) __delay32(4000); // 500 ms
+    
+    ADCDoGainCalibration();
+
+    pwmOFF();
+#endif
+    
     // Enable DMA interrupt, arm DMA for transfer
     ADCConfigPWMandDMAMode();
 
@@ -1061,6 +1159,29 @@ inline void I2Twatcher(void)
 void EnableDrive()
 {
     bDriveEnabled = 1;
+    
+    static BOOL uncalibrated = TRUE;
+    
+#if 1
+    if (uncalibrated)
+    {
+        uncalibrated = FALSE;
+    
+        pwmON();
+
+        int pwm3_00 = PWM_MAX / 25;
+
+        pwmOut(pwm3_00, -2*pwm3_00, pwm3_00);
+    
+        int d;
+    
+        for (d=0; d<5000; ++d) __delay32(4000); // 500 ms
+    
+        ADCDoGainCalibration();
+
+        pwmOFF();
+    }
+#endif
 
     Timer3Disable();
 

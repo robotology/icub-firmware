@@ -9,11 +9,7 @@
 
 #include "MeasCurr.h"
 
-// number of samples taken to calculate zero calibration
-#define ADC_CAL_N_SAMPLES 200
-
-// Timeout for polling loops during zero calibration
-#define ADC_CAL_TIMEOUT   1000
+extern SFRAC16 ADCBuffer[4];
 
 extern volatile tMeasCurrParm MeasCurrParm;
 
@@ -22,6 +18,7 @@ int ADCGetVDCLink();
 unsigned int ADCVDCLinkTo100mV(int vdc);
 // pewrform offset calibration
 void ADCDoOffsetCalibration();
+void ADCDoGainCalibration();
 // setup ADC for PWM sync and DMA
 void ADCConfigPWMandDMAMode();
 void ADCInterruptAndDMAEnable();
