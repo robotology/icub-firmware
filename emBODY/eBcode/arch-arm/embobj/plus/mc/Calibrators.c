@@ -108,10 +108,10 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
     
     //get the encoder of joint to calibrate
     AbsEncoder* e_ptr = o->absEncoder+ o->encoders_of_set[indexSet];
-	  
+
     
     jointCalibType6Data *jCalib6Data_ptr = &(j_ptr->running_calibration.data.type6);
-	
+
     
     switch(jCalib6Data_ptr->state)
     {

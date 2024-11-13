@@ -42,7 +42,7 @@ enum wrist_mk_version_t {WRIST_MK_VER_2_0 = 20,  WRIST_MK_VER_2_1 = 21};
 /* The struct wristMk2_t contains all the data related to the wrist MK2*/
 typedef struct //wristMk2_t
 {
-	// The warmup flag is == 2 at startup and makes the wrist start a first parking move.
+    // The warmup flag is == 2 at startup and makes the wrist start a first parking move.
     // warmup == 1 means first parking in progress, and warmup == 0 means first parking done.
     // Thanks to the new direct kinematics solver all the parking procedures will be likely removed
     // after some time of use of the robot without problems because no more necessary.
@@ -135,9 +135,6 @@ typedef struct // JointSet
 
     TripodCalib tripod_calib;
     HardStopCalib hard_stop_calib;
-    
-    BOOL sensorless_torque;
-
 } JointSet;
 
 extern JointSet* JointSet_new(uint8_t n); //

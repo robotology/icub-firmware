@@ -136,8 +136,8 @@ void Trajectory_set_pos_end(Trajectory *o, /*float x0,*/ float xStar, float velA
         o->xTimer = o->xT = 0.0f;
         
         o->xX = (float)xStar;
-		
-		o->xV = o->xA = 0.0f;
+
+        o->xV = o->xA = 0.0f;
         
         return;
     }
@@ -181,9 +181,9 @@ void Trajectory_set_vel_end(Trajectory *o, float vStar, float accAvg)
         o->vTimer = o->vT = 0.0f;
         
         o->vV = vStar;
-		
-		o->vA = 0.0f;  
-        
+
+        o->vA = 0.0f;  
+
         return;
     }
     
@@ -279,7 +279,7 @@ int8_t Trajectory_do_step(Trajectory* o, float *p, float *v, float *a)
 
                 *v = 0.0f;
             }
-		
+
             if (*a < 0.0f) *a = 0.0f;
         
             *p = o->pos_min;
@@ -294,7 +294,7 @@ int8_t Trajectory_do_step(Trajectory* o, float *p, float *v, float *a)
           
                 *v = 0.0f;
             }
-		
+
             if (*a > 0.0f) *a = 0.0f;
              
             *p = o->pos_max;
