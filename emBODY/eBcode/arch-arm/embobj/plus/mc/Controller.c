@@ -935,8 +935,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     if(!isIdentityMatrix)
         Sje_aux = o->Sje;
 
-		
-		
+
+
     for (int s=0; s<o->nSets; ++s)
     {
         JointSet_config
@@ -1001,22 +1001,6 @@ void MController_config_motor_friction(int m, eOmc_motor_params_t* params) //
 {
     Motor_config_friction(smc->motor+m, params->bemf_value, params->ktau_value, params->friction);
 }
-
-void MController_config_LuGre_params(int m, eOmc_LuGre_params_t* params) //
-{
-    Motor_config_LuGre(smc->motor+m,
-        params->Km,
-        params->Kw,
-        params->S0,
-        params->S1,
-        params->Vth,
-        params->Fc_pos,
-        params->Fc_neg,
-        params->Fs_pos,
-        params->Fs_neg
-    );
-}
-
 
 void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance) //
 {

@@ -308,6 +308,12 @@ void Motor_init(Motor* o) //
     Motor_hardStopCalbData_reset(o);
     
     //o->outOfLimitsSignaled = FALSE;
+    
+#if defined(SENSORLESS_TORQUE)
+    o->torque = ZERO;
+    o->sensorless_torque = FALSE;
+    o->torque_estimator.initialize();
+#endif
 }
 
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
@@ -358,24 +364,27 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     }    
  
 #if defined(SENSORLESS_TORQUE)
-    o->sensorless_torque = TRUE;
-#else
-    o->sensorless_torque = FALSE;
-#endif
-
-    if (o->sensorless_torque)
+    o->torque = ZERO;
+    
+    if (config->LuGre_params.Km > ZERO)
     {
-        o->torque_estimator.initialize();
-        o->torque_estimator.rtU.Km  = 4.3;
-        o->torque_estimator.rtU.Kw  = 0.045;
-        o->torque_estimator.rtU.S0  = 2.5;
-        o->torque_estimator.rtU.S1  = 0.0;
-        o->torque_estimator.rtU.Vth = 5.0;
-        o->torque_estimator.rtU.Fc_pos = 3.3;
-        o->torque_estimator.rtU.Fc_neg = 3.3;
-        o->torque_estimator.rtU.Fs_pos = 7.0;
-        o->torque_estimator.rtU.Fs_neg = 7.0;
+        o->sensorless_torque = TRUE;
+
+        o->torque_estimator.rtU.Km  = config->LuGre_params.Km; //4.3;
+        o->torque_estimator.rtU.Kw  = config->LuGre_params.Kw; //0.045;
+        o->torque_estimator.rtU.S0  = config->LuGre_params.S0; //2.5;
+        o->torque_estimator.rtU.S1  = config->LuGre_params.S1; //0.0;
+        o->torque_estimator.rtU.Vth = config->LuGre_params.Vth; //5.0;
+        o->torque_estimator.rtU.Fc_pos = config->LuGre_params.Fc_pos; //3.3;
+        o->torque_estimator.rtU.Fc_neg = config->LuGre_params.Fc_neg; //3.3;
+        o->torque_estimator.rtU.Fs_pos = config->LuGre_params.Fs_pos; //7.0;
+        o->torque_estimator.rtU.Fs_neg = config->LuGre_params.Fs_neg; //7.0;
     }
+    else
+    {
+        o->sensorless_torque = FALSE;
+    }
+#endif
 }
 
 void Motor_config_encoder(Motor* o, int32_t resolution)
@@ -446,19 +455,6 @@ void Motor_config_filter(Motor* o, uint8_t filter) //
 void Motor_config_friction(Motor* o, float Bemf, float Ktau, eOmc_FrictionParams_t friction) //
 {
     PID_config_friction(&o->trqPID, Bemf, Ktau, friction);
-}
-
-void Motor_config_LuGre(Motor* o, float Km, float Kw, float S0, float S1, float Vth, float Fc_pos, float Fc_neg, float Fs_pos, float Fs_neg)
-{
-    o->torque_estimator.rtU.Km  = Km;
-    o->torque_estimator.rtU.Kw  = Kw;
-    o->torque_estimator.rtU.S0  = S0;
-    o->torque_estimator.rtU.S1  = S1;
-    o->torque_estimator.rtU.Vth = Vth;
-    o->torque_estimator.rtU.Fc_pos  = Fc_pos;
-    o->torque_estimator.rtU.Fc_neg  = Fc_neg;
-    o->torque_estimator.rtU.Fs_pos  = Fs_pos;
-    o->torque_estimator.rtU.Fs_neg  = Fs_neg;
 }
 
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
@@ -919,7 +915,7 @@ BOOL Motor_check_faults(Motor* o) //
             fault_state.bits.EncoderFault = FALSE;
         }
 */
-				
+
 
         if (can_dead && !o->can_dead)
         {
@@ -1227,6 +1223,7 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
     o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX;
     
+#if defined(SENSORLESS_TORQUE)
     if (o->sensorless_torque)
     {
         static const float IDEG2RAD = 6.28f/65536.0f;
@@ -1244,6 +1241,7 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     
         o->torque = o->torque_estimator.rtY.Torque;
     }
+#endif
 }
 
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
