@@ -145,7 +145,7 @@ namespace embot { namespace hw { namespace chip {
 }}} // namespace embot { namespace hw { namespace chip {
 
 
-#define EMBOT_HW_CHIP_M95512DF_enable_test   
+#undef EMBOT_HW_CHIP_M95512DF_enable_test   
 #if defined(EMBOT_HW_CHIP_M95512DF_enable_test)    
 namespace embot { namespace hw { namespace chip {
     // it tests the chip and offers an example of use

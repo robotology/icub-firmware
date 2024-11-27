@@ -114,7 +114,7 @@ namespace embot::hw::spi::bsp {
     SPI_HandleTypeDef hspi3 {};
     constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi3 = { {
         {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::eleven},   // miso
-        {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::ten},      // mosi
+        {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::six},      // mosi
         {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::ten},      // sckl
         {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four}      // ssel
     } };
