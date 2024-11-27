@@ -34,10 +34,11 @@ constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::
 constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 
-
+#define TEST_EEPROM
 void test_eeprom_init();
 void test_eeprom_tick();
 
+#undef TEST_CAN
 void test_can_init(embot::os::Thread *t, void *param);
 void test_can_tick(embot::os::Thread *t, embot::os::EventMask eventmask, void *param);
 
@@ -65,9 +66,17 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     constexpr embot::app::scope::SignalEViewer::Config cc{ON, embot::app::scope::SignalEViewer::Config::LABEL::one};
     signal = new embot::app::scope::SignalEViewer(cc);    
     
-//    test_eeprom_init();
+	
+#if defined(TEST_EEPROM)    
+    test_eeprom_init();
+#endif
+
+	
+#if defined(TEST_CAN)    
+    test_can_init(t, param);
+#endif
+
     
-//    test_can_init(t, param);
 
 #if defined(TEST_ETH)    
     test_eth_init();
@@ -147,18 +156,23 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
 //        signal->on();   
 //        testduration();   
 //        signal->off();   
-        
-//        test_eth_tick();
-        
-//        test_eeprom_tick();
+		
+#if defined(TEST_ETH)    
+		test_eth_tick();
+#endif
+		
+#if defined(TEST_EEPROM)    
+		test_eeprom_tick();
+#endif		
         
 //        embot::core::TimeFormatter tf(embot::core::now());        
 //        embot::core::print("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
-    }
     
-//    test_can_tick(t, eventmask, param);
+#if defined(TEST_CAN)    
+		test_can_tick(t, eventmask, param);
+#endif
     
-
+	}
 }
 
 
@@ -290,7 +304,7 @@ constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
 void test_eeprom_init()
 {
     embot::hw::eeprom::init(eeprom2test, {});
-    embot::hw::eeprom::erase(eeprom2test, 0, 8*1024, 100000);
+    //embot::hw::eeprom::erase(eeprom2test, 0, 8*1024, 100000);
 }
 
 constexpr size_t capacity {2048};
@@ -321,16 +335,18 @@ void test_eeprom_tick()
     std::memset(dd, 0, sizeof(dd));
     embot::core::Data data {dd, numberofbytes};
     
-    embot::hw::eeprom::read(eeprom2test, adr2use, data, 3*embot::core::time1millisec);
+    embot::hw::eeprom::read(eeprom2test, adr2use, data, 5*embot::core::time1millisec);
+	stophere++;
     
     
     std::memset(dd, cnt, sizeof(dd));
-    embot::hw::eeprom::write(eeprom2test, adr2use, data, 3*embot::core::time1millisec);    
+	stophere++;
+    embot::hw::eeprom::write(eeprom2test, adr2use, data, 5*embot::core::time1millisec);    
     
-    
+
     std::memset(dd, 0, sizeof(dd));
-    embot::hw::eeprom::read(eeprom2test, adr2use, data, 3*embot::core::time1millisec);
-     
+    embot::hw::eeprom::read(eeprom2test, adr2use, data, 5*embot::core::time1millisec);
+    
     stophere++;    
     
 }
@@ -376,7 +392,7 @@ void test_can_init(embot::os::Thread *t, void *param)
     
 }
 
-#define TEST_EMBOT_HW_CAN_BURST
+//#define TEST_EMBOT_HW_CAN_BURST
 void test_can_tick(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {
     if(0 == eventmask)
@@ -402,7 +418,7 @@ void test_can_tick(embot::os::Thread *t, embot::os::EventMask eventmask, void *p
             loop_put_transmit_eachtime,         // as we do in ems when in cfg state
             loop_put_transmit_onlyfirsttime     // a new mode i wnat to test 
         };
-        constexpr burstmode bm {burstmode::loop_put_transmit_eachtime};
+        constexpr buprrstmode bm {burstmode::loop_put_transmit_eachtime};
         constexpr bool getoutputsize {true}; // to verify if a irq tx disable / enable gives problems
         constexpr embot::core::relTime delay {0}; // 0 10 200 300 400 500 
 
