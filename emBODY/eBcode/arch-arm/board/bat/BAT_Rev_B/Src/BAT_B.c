@@ -11,7 +11,7 @@
 
 char Firmware_vers = 1;
 char Revision_vers = 3;
-char Build_number  = 4;
+char Build_number  = 5;
 
 uint32_t vtol=100;  // voltage tolerance for hysteresis
 uint32_t vhyst=0;    // voltage hysteresis
@@ -102,7 +102,7 @@ __IO ITStatus UartReady = RESET;
 #ifdef BAT_B_R1
 uint32_t VTH[7]={23000, 24000, 25000, 26000, 27000, 28000, 29000};   // threshold in mV R1 Battery
 uint16_t Battery_high=4200*7;   // 7s5p battery
-uint16_t Battery_low=3300*7;    // 7s5p battery
+uint16_t Battery_low=3000*7;    // 7s5p battery
 #endif 
 
 #ifdef BAT_B_Generic
