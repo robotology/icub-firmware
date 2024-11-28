@@ -32,7 +32,7 @@
     
 //    #define EMBOT_ENABLE_hw_encoder
 //    #define EMBOT_ENABLE_hw_can
-//    #define EMBOT_ENABLE_hw_eth
+    #define EMBOT_ENABLE_hw_eth
 //    #define EMBOT_ENABLE_hw_timer
     
 //    #define EMBOT_ENABLE_hw_testpoint

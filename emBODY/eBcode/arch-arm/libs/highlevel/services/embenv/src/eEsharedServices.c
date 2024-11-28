@@ -425,6 +425,11 @@ extern eEresult_t ee_sharserv_sys_storage_clr(const eEstorage_t *strg, const uin
     return(shalbase_storage_clr(strg, size));
 }
 
+extern eEresult_t ee_sharserv_sys_storage_reset(void)
+{
+    return shalbase_storage_clr(&s_sharserv_strg_info, s_sharserv_strg_info.size);
+}
+
 
 // - part
 
