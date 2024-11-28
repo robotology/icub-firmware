@@ -14,15 +14,15 @@ LR_IROM1 0x08100000 0x00020000  {    ; load region size_region
   }
   
   ; eth mapping. comment it out if ethram.o is not linked
-;  RX_DESCR	0x30040000 0x00000060 {
-;  	ethram.o(.RxDecripSection)
-;  }
-;  TX_DESCR	0x30040060 0x000001A0 {
-;  	ethram.o(.TxDecripSection)
-;  }
-;  RX_ARRAY 	0x30040200 0x00001800 {
-;  	ethram.o(.RxArraySection)
-;  }
+  RX_DESCR	0x30040000 0x00000060 {
+  	ethram.o(.RxDecripSection)
+  }
+  TX_DESCR	0x30040060 0x000001A0 {
+  	ethram.o(.TxDecripSection)
+  }
+  RX_ARRAY 	0x30040200 0x00001800 {
+  	ethram.o(.RxArraySection)
+  }
   
   ; banks sram1 and sram2 joined together w/ a memory hole on top
   RW_IRAM1 0x10000000 0x0003FFC0 {
