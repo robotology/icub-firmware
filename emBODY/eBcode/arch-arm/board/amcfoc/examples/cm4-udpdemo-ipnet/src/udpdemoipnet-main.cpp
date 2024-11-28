@@ -87,8 +87,8 @@ static void s_initialiser(void);
 
 int main(void)
 {
-    embot::hw::dualcore::config({embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing});
-    
+//    embot::hw::dualcore::config({embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing});
+     embot::hw::dualcore::config({embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate });   
     uint64_t x =  embot::hw::sys::uniqueid();
     
     eom_sys_Initialise( &s_used_syscfg,
@@ -139,7 +139,7 @@ static void s_initialiser(void)
 #include "embot_os.h"
 #include "embot_prot_eth.h"
 
-embot::prot::eth::IPv4 localIPaddress {10, 0, 1, 99};
+embot::prot::eth::IPv4 localIPaddress {10, 0, 1, 1};
 
 static void s_init_ipnet()
 {
@@ -153,7 +153,7 @@ static void s_init_ipnet()
     static const eOmipnet_cfg_t eom_ipnet_Cfg = 
     { 
         .procpriority = embot::core::tointegral(embot::os::Priority::high44), // default = 220 .. but we must give a different value
-        .procstacksize = 4*1024, // default = 1024 .. 
+        .procstacksize = 8*1024, // default = 1024 .. 
         .procmaxidletime = 25000, // 25 ms
         .procwakeuponrxframe = eobool_true, 
         .tickpriority = embot::core::tointegral(embot::os::Priority::high43), // default = 219 .. but we must give a different value

@@ -56,7 +56,7 @@ constexpr ipal_cfg2_system_t syscfg2 =
 
 constexpr ipal_cfg2_eth_t ethcfg2 =
 {
-    .eth_mac = IPAL_mac48addr(0x1E,0x30,0x6C,0xA2,0x45,0x5E),
+    .eth_mac = IPAL_mac48addr(0x1E,0x30,0x6C,0xA2,0x45,0x5A),
     .eth_ip = IPAL_ipv4addr(10, 0, 1, 99),
     .eth_mask = IPAL_ipv4addr(255, 255, 255, 0),
     .eth_isrpriority = 0,
