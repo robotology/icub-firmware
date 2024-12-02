@@ -935,8 +935,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     if(!isIdentityMatrix)
         Sje_aux = o->Sje;
 
-		
-		
+
+
     for (int s=0; s<o->nSets; ++s)
     {
         JointSet_config

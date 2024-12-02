@@ -108,7 +108,6 @@ void JointSet_init(JointSet* o) //
     o->special_constraint = eomc_jsetconstraint_none;
     
     o->calibration_in_progress = eomc_calibration_typeUndefined;
-
 }
 
 void JointSet_config //
@@ -185,6 +184,50 @@ void JointSet_do_odometry(JointSet* o) //
             }
         }
     }
+
+#if defined(SENSORLESS_TORQUE)
+    if (o->Jmj)
+    {
+        for (int js=0; js<N; ++js)
+        {
+            CTRL_UNITS joint_trq_fbk = ZERO;
+            BOOL sensorless_torque = FALSE;
+            
+            int j = o->joints_of_set[js];
+            
+            for (int ms=0; ms<N; ++ms)
+            {
+                int m = o->motors_of_set[ms];
+                
+                if (o->motor[m].sensorless_torque)
+                {
+                    sensorless_torque = TRUE;
+                    
+                    // Tau = Jinvt mu 
+                    // transposed inverse Jacobian
+                    joint_trq_fbk += o->Jmj[m][j]*o->motor[m].torque;
+                }
+            }
+            
+            if (sensorless_torque)
+            {
+                Joint_update_torque_fbk(o->joint+j, joint_trq_fbk*1000000.0f);
+            }
+        }
+    }
+    else
+    {
+        for (int k=0; k<N; ++k)
+        {
+            int m = o->motors_of_set[k];
+            
+            if (o->motor[m].sensorless_torque)
+            {
+                Joint_update_torque_fbk(o->joint+o->joints_of_set[k], o->motor[m].torque*1000000.0f);
+            }
+        }
+    }
+#endif
     
     float kf_input[MAX_JOINTS_PER_BOARD];
     
@@ -1279,6 +1322,7 @@ static void JointSet_do_current_control(JointSet* o)
             else
             {
                 motor_vel_kf_icubdeg_sec = o->joint[m].vel_fbk * o->motor[m].GEARBOX;
+
                 motor_current_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk, motor_vel_kf_icubdeg_sec);
             }
         }
