@@ -38,11 +38,13 @@
 
 #include "embOBJporting.h"
 
-#include "hal.h"
+
 
 #if defined(USE_EMBOT_HW)
 #include "embot_hw_sys.h"
 #include "embot_hw_eeprom.h"
+#else
+#include "hal.h"
 #endif
 
 #include "string.h"
@@ -472,8 +474,6 @@ extern eEresult_t shalbase_system_restart(void)
 
 extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint32_t size)
 {
-    volatile hal_result_t res = hal_res_NOK_generic;
-
     if(ee_true != s_shalbase_is_initted())
     {
         return(ee_res_NOK_generic); 
@@ -499,7 +499,8 @@ extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint
 #if defined(USE_EMBOT_HW)
     embot::core::Data dd {data, size};
     embot::hw::eeprom::read(embot::hw::EEPROM::one, strg->addr, dd, 5*embot::core::time1millisec);
-#else        
+#else 
+        volatile hal_result_t res = hal_res_NOK_generic;    
         res = hal_eeprom_read(hal_eeprom_i2c_01, strg->addr, size, data);
 #endif
     }
@@ -510,14 +511,11 @@ extern eEresult_t shalbase_storage_get(const eEstorage_t *strg, void *data, uint
 
 extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data, uint32_t size)
 {
-    volatile hal_result_t res = hal_res_NOK_generic;
-
     if(ee_true != s_shalbase_is_initted())
     {
         return(ee_res_NOK_generic); 
     }
-    
-    
+       
     if(NULL == strg)
     {
         return(ee_res_NOK_generic);
@@ -530,14 +528,15 @@ extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data
 
     if(ee_strg_eflash == strg->type)
     {
-        res = hal_res_NOK_generic;
+        return(ee_res_NOK_generic);
     }
     else if(ee_strg_eeprom == strg->type)
     {
 #if defined(USE_EMBOT_HW)
         embot::core::Data dd {const_cast<void*>(data), size};
         embot::hw::eeprom::write(embot::hw::EEPROM::one, strg->addr, dd, 5*embot::core::time1millisec);       
-#else        
+#else
+        volatile hal_result_t res = hal_res_NOK_generic;         
         res = hal_eeprom_write(hal_eeprom_i2c_01, strg->addr, size, (void*)data);
 #endif
     } 
@@ -547,8 +546,6 @@ extern eEresult_t shalbase_storage_set(const eEstorage_t *strg, const void *data
 
 extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t size)
 {
-    volatile hal_result_t res = hal_res_NOK_generic;
-
     if(ee_true != s_shalbase_is_initted())
     {
         return(ee_res_NOK_generic); 
@@ -566,13 +563,14 @@ extern eEresult_t shalbase_storage_clr(const eEstorage_t *strg, const uint32_t s
 
     if(ee_strg_eflash == strg->type)
     {
-        res = hal_res_NOK_generic;
+        return(ee_res_NOK_generic);
     }
     else if(ee_strg_eeprom == strg->type)
     {
 #if defined(USE_EMBOT_HW)
         embot::hw::eeprom::erase(embot::hw::EEPROM::one, strg->addr, size, 5*embot::core::time1millisec);
 #else
+        volatile hal_result_t res = hal_res_NOK_generic;
         res = hal_eeprom_erase(hal_eeprom_i2c_01, strg->addr, size);
 #endif
     }    
@@ -679,9 +677,6 @@ static void s_shalbase_jump_to(uint32_t appaddr)
 
 static void s_shalbase_storage_init(const eEstorageType_t strgtype)
 {
-    volatile hal_result_t res = hal_res_NOK_generic;
-    
-    
     
 //  acemor or 5 july 2013: removed the irq disable and enable between eeprom init because:
 //  1. it is not necessary 
@@ -690,13 +685,14 @@ static void s_shalbase_storage_init(const eEstorageType_t strgtype)
     
     if(ee_strg_eflash == strgtype)
     {
-        res = hal_res_NOK_generic;
+        // res = hal_res_NOK_generic;
     }
     else if(ee_strg_eeprom == strgtype)
     {
 #if defined(USE_EMBOT_HW)
         embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
-#else        
+#else
+        volatile hal_result_t res = hal_res_NOK_generic;            
         res = hal_eeprom_init(hal_eeprom_i2c_01, NULL);
 #endif
     }

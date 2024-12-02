@@ -34,10 +34,11 @@
 
 #include "eEmemorymap.h"
 
-#include "hal.h"
+
 #if defined(USE_EMBOT_HW)
 #include "embot_hw_sys.h"
 #else
+#include "hal.h"
 #include "hal_uniqueid.h"
 #endif
 
