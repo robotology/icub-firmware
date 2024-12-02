@@ -4,10 +4,10 @@
 ; - ram in banks sram1 and sram2  w/ a memory hole of 64 bytes on top for ipc (shall we make make 256?)
 ; - the placing of the memory required by the ETH driver (commented out because eloader does not compile the driver)
 
-LR_IROM1 0x08120000 0x00080000  {    ; load region size_region
+LR_IROM1 0x08120000 0x00040000  {    ; load region size_region
   
   ; flash
-  ER_IROM1 0x08120000 0x00080000  {  ; load address = execution address
+  ER_IROM1 0x08120000 0x00040000  {  ; load address = execution address
    *.o (RESET, +First)
    *(InRoot$$Sections)
    .ANY (+RO)
