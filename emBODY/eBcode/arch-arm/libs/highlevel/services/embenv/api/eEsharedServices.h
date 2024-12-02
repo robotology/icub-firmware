@@ -184,7 +184,7 @@ extern eEresult_t ee_sharserv_ipc_userdefdata_clr(void);
 extern eEresult_t ee_sharserv_sys_storage_get(const eEstorage_t *strg, void *data, uint32_t size);
 extern eEresult_t ee_sharserv_sys_storage_set(const eEstorage_t *strg, const void *data, uint32_t size);
 extern eEresult_t ee_sharserv_sys_storage_clr(const eEstorage_t *strg, const uint32_t size);
-
+extern eEresult_t ee_sharserv_sys_storage_reset(void);
 
 extern eEresult_t ee_sharserv_ipc_jump2addr_get(uint32_t *addr);			
 extern eEresult_t ee_sharserv_ipc_jump2addr_set(uint32_t addr);
