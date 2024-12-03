@@ -719,8 +719,13 @@ namespace embot { namespace hw { namespace motor {
 
 // to be filled w/ the same as amc2c because we manage yet a single motor
 
-#elif defined(STM32HAL_BOARD_AMCFOC_1CM7)      
+#elif defined(STM32HAL_BOARD_AMCFOC_1CM7)
 
+    // this part is actually .... used by embot::hw::motor::bldc that call embot::hw::motor that call these functions.
+    // so, better move them in the future and use just embot::hw::motor::bldc tha directly calls them.
+    // also: these functions much depend on the board, so it would be better to meove them in the bsp section    
+    
+    
     result_t s_hw_init(MOTOR h)
     {
         // i want to be sure that the pwm is not active       
@@ -751,7 +756,7 @@ namespace embot { namespace hw { namespace motor {
     
     result_t s_hw_deinit(MOTOR h)
     {
-        embot::hw::motor::adc::deinit(h); ;
+        embot::hw::motor::adc::deinit(h);
         embot::hw::motor::enc::deinit(); 
         embot::hw::motor::hall::deinit(h); 
         embot::hw::motor::pwm::deinit(h);
@@ -840,24 +845,10 @@ namespace embot { namespace hw { namespace motor {
         {
             return resNOK;
         }      
-        
-//        embot::hw::motor::adc::OnCurrents cbk {reinterpret_cast<embot::hw::motor::adc::OnCurrents::Action>(callback), owner};
-//        embot::hw::motor::adc::set(h, cbk);
-        return resOK;   
+        // we dont use this ....
+        return resNOK;   
     }
     
-//    bool s_hw_setOnPhaseCurrents(MOTOR h, OnPhaseCurrents onphasecurrents,  void *owner)
-//    {
-//        if((nullptr == onphasecurrents))
-//        {
-//            return false;
-//        }      
-//        
-//        //embot::hw::motor::adc::OnMotorCurrents cbk {reinterpret_cast<embot::hw::motor::adc::OnMotorCurrents::Action>(onphasecurrents), owner};
-//        embot::hw::motor::adc::OnMotorPhaseCurrents cbk1 {onphasecurrents, owner};
-//        embot::hw::motor::adc::set1(h, cbk1);
-//        return true;           
-//    }
     
     bool s_hw_isHardwareFault(MOTOR h){ return false; }
     bool s_hw_isHallSequenceError(MOTOR h){ return false; }

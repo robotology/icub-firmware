@@ -136,7 +136,7 @@ namespace embot::prot::can::motor::polling {
         return embot::core::tointegral(mo);
     }
            
-    std::string tostring(MotIndex mo)
+    std::string tostring(const MotIndex mo)
     {
 
         switch(mo)
@@ -294,7 +294,7 @@ namespace embot::prot::can::motor::polling {
         }
         
         info.motorindex = motorpollingframe2motindex(inframe);
-        info.pid.type = embot::prot::can::motor::PID::Type::CURR;
+        info.pid.type = embot::prot::can::motor::PIDtype::CURR;
         info.pid.kp = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
         info.pid.ki = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
         info.pid.kd = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);
@@ -352,7 +352,7 @@ namespace embot::prot::can::motor::polling {
         }
         
         info.motorindex = motorpollingframe2motindex(inframe);
-        info.pid.type = embot::prot::can::motor::PID::Type::VEL;
+        info.pid.type = embot::prot::can::motor::PIDtype::VEL;
         info.pid.kp = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
         info.pid.ki = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
         info.pid.kd = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);
@@ -522,7 +522,7 @@ namespace embot::prot::can::motor::polling {
         }
         
         info.motorindex = motorpollingframe2motindex(inframe);
-        info.pidlimits.type = embot::prot::can::motor::PIDlimits::Type::CURR;
+        info.pidlimits.type = embot::prot::can::motor::PIDtype::CURR;
         info.pidlimits.offset = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
         info.pidlimits.limitonoutput = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
         info.pidlimits.limitonintegral = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);
@@ -578,7 +578,7 @@ namespace embot::prot::can::motor::polling {
         }
         
         info.motorindex = motorpollingframe2motindex(inframe);
-        info.pidlimits.type = embot::prot::can::motor::PIDlimits::Type::VEL;
+        info.pidlimits.type = embot::prot::can::motor::PIDtype::VEL;
         info.pidlimits.offset = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
         info.pidlimits.limitonoutput = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
         info.pidlimits.limitonintegral = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);

@@ -93,6 +93,13 @@ namespace embot::prot::can::motor::polling {
           
 
 namespace embot::prot::can::motor::polling {
+    
+    
+//    struct InfoGET
+//    { 
+//        MotIndex motorindex {MotIndex::one};             
+//        InfoGET() = default;
+//    };
             
     // the management of commands
     
@@ -118,6 +125,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::ControlMode controlmode {embot::prot::can::motor::ControlMode::Idle};            
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<CONTROL_MODE = ControlMode::") + Converter::tostring(controlmode) + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                        
         };
         
         Info info {};
@@ -135,6 +146,10 @@ namespace embot::prot::can::motor::polling {
         { 
             MotIndex motorindex {MotIndex::one};             
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<CONTROL_MODE, MotIndex::") + tostring(motorindex) + ">";             
+            }  
         };
         
         struct ReplyInfo
@@ -142,6 +157,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::ControlMode controlmode {embot::prot::can::motor::ControlMode::Idle};            
             ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("reply<CONTROL_MODE = ControlMode::") + Converter::tostring(controlmode) + ", MotIndex::" + tostring(motorindex) + ">";               
+            }              
         };        
         
         Info info {};
@@ -151,15 +170,7 @@ namespace embot::prot::can::motor::polling {
         bool load(const embot::prot::can::Frame &inframe);
             
         bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
-    };      
-
-    struct CurrentLimits
-    {   
-        uint8_t x {0};
-        embot::prot::can::motor::Current nominal {0};
-        embot::prot::can::motor::Current peak {0};
-        embot::prot::can::motor::Current overload {0};
-    };     
+    };        
     
     struct Message_SET_CURRENT_LIMIT : public Message
     {                  
@@ -168,6 +179,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             CurrentLimits currents {};            
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<CURRENT_LIMIT = ") + currents.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            } 
         };
         
         Info info {};
@@ -186,6 +201,10 @@ namespace embot::prot::can::motor::polling {
         { 
             MotIndex motorindex {MotIndex::one};             
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<CURRENT_LIMIT, MotIndex::") + tostring(motorindex) + ">";             
+            } 
         };
         
         struct ReplyInfo
@@ -193,6 +212,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             CurrentLimits currents {};            
             ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("reply<CURRENT_LIMIT = ") + currents.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                 
         };
         
         Info info {};
@@ -276,6 +299,13 @@ namespace embot::prot::can::motor::polling {
 //        }
 //    };
 
+//    struct InfoPID
+//    { 
+//        MotIndex motorindex {MotIndex::one};
+//        embot::prot::can::motor::PID pid {};            
+//        InfoPID() = default;
+//    };
+
     struct Message_SET_CURRENT_PID : public Message
     {                  
         struct Info
@@ -283,6 +313,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::PID pid {};            
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<CURRENT_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                 
         };
         
         Info info {};
@@ -301,6 +335,10 @@ namespace embot::prot::can::motor::polling {
         { 
             MotIndex motorindex {MotIndex::one};             
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<CURRENT_PID, MotIndex::") + tostring(motorindex) + ">";             
+            }              
         };
         
         struct ReplyInfo
@@ -308,6 +346,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::PID pid {};            
             ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("reply<CURRENT_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
         };
         
         Info info {};
@@ -327,6 +369,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::PID pid {};            
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<VELOCITY_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
         };
         
         Info info {};
@@ -345,6 +391,10 @@ namespace embot::prot::can::motor::polling {
         { 
             MotIndex motorindex {MotIndex::one};             
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<VELOCITY_PID, MotIndex::") + tostring(motorindex) + ">";             
+            } 
         };
         
         struct ReplyInfo
@@ -352,6 +402,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::PID pid {};            
             ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("reply<VELOCITY_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
         };
         
         Info info {};
@@ -363,38 +417,6 @@ namespace embot::prot::can::motor::polling {
         bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);       
     };
 
-    struct MotorConfig 
-    {
-        enum class Flag : uint8_t
-        {
-            hasRotorEncoder         = 0,
-            hasHALLsensor           = 1,
-            hasTempSensor           = 2,
-            hasRotorEncoderIndex    = 3,
-            hasSpeedEncoder         = 4,
-            verbose                 = 5,
-            ffu6                    = 6,
-            ffu7                    = 7
-        };
-        
-        uint8_t flags {0}; // use struct MotorConfig::Flag to manage it
-        int16_t rotorEncoderResolution {0};
-        int16_t rotorIndexOffset {0};
-        uint8_t motorPoles {0};
-        uint8_t rotEncTolerance {0};        
-
-        MotorConfig() = default; 
-
-        void set(Flag f)
-        {
-            embot::core::binary::bit::set(flags, embot::core::tointegral(f));
-        }
-        
-        bool check(Flag f) const
-        {
-            return embot::core::binary::bit::check(flags, embot::core::tointegral(f));
-        }        
-    };
 
     struct Message_SET_MOTOR_CONFIG : public Message
     {                  
@@ -403,6 +425,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             MotorConfig config {};            
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<MOTOR_CONFIG = ") + config.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
         };
         
         Info info {};
@@ -421,6 +447,10 @@ namespace embot::prot::can::motor::polling {
         { 
             MotIndex motorindex {MotIndex::one};             
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<MOTOR_CONFIG, MotIndex::") + tostring(motorindex) + ">";             
+            }             
         };
         
         struct ReplyInfo
@@ -428,6 +458,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             MotorConfig config {};           
             ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("reply<MOTOR_CONFIG = ") + config.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                   
         };
         
         Info info {};
@@ -448,6 +482,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             int16_t hardwarelimit {0};            
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<TEMPERATURE_LIMIT = ") + std::to_string(hardwarelimit) + "[?]" + ", MotIndex::" + tostring(motorindex) + ">";               
+            }               
         };
         
         Info info {};
@@ -466,6 +504,10 @@ namespace embot::prot::can::motor::polling {
         { 
             MotIndex motorindex {MotIndex::one};             
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<TEMPERATURE_LIMIT, MotIndex::") + tostring(motorindex) + ">";             
+            }           
         };
         
         struct ReplyInfo
@@ -473,6 +515,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             int16_t hardwarelimit {0};           
             ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("reply<TEMPERATURE_LIMIT = ") + std::to_string(hardwarelimit) + "[?]" + ", MotIndex::" + tostring(motorindex) + ">";               
+            }              
         };
         
         Info info {};
@@ -485,6 +531,13 @@ namespace embot::prot::can::motor::polling {
     };   
 
 
+    struct InfoPIDlimits
+    { 
+        MotIndex motorindex {MotIndex::one};
+        embot::prot::can::motor::PIDlimits pidlimits {};            
+        InfoPIDlimits() = default;
+    };
+        
     struct Message_SET_CURRENT_PIDLIMITS : public Message
     {                  
         struct Info
@@ -492,6 +545,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::PIDlimits pidlimits {};            
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<CURRENT_PIDLIMITS = ") + "TBD" + "[?]" + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
         };
         
         Info info {};
@@ -510,6 +567,10 @@ namespace embot::prot::can::motor::polling {
         { 
             MotIndex motorindex {MotIndex::one};             
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<CURRENT_PIDLIMIT, MotIndex::") + tostring(motorindex) + ">";             
+            } 
         };
         
         struct ReplyInfo
@@ -517,6 +578,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::PIDlimits pidlimits {};            
             ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("reply<CURRENT_PIDLIMITS = ") + "TBD" + "[?]" + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
         };
         
         Info info {};
@@ -536,6 +601,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::PIDlimits pidlimits {};            
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<VELOCITY_PIDLIMITS = ") + "TBD" + "[?]" + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
         };
         
         Info info {};
@@ -554,6 +623,10 @@ namespace embot::prot::can::motor::polling {
         { 
             MotIndex motorindex {MotIndex::one};             
             Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<VELOCITY_PIDLIMIT, MotIndex::") + tostring(motorindex) + ">";             
+            } 
         };
         
         struct ReplyInfo
@@ -561,6 +634,10 @@ namespace embot::prot::can::motor::polling {
             MotIndex motorindex {MotIndex::one};
             embot::prot::can::motor::PIDlimits pidlimits {};            
             ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("signal<VELOCITY_PIDLIMITS = ") + "TBD" + "[?]" + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                 
         };
         
         Info info {};

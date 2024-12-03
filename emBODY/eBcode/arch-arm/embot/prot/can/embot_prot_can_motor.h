@@ -44,7 +44,7 @@ namespace embot::prot::can::motor {
     
     MotIndex toMotIndex(uint8_t v);
     uint8_t convert(MotIndex mo);  
-    std::string tostring(MotIndex mo);    
+    std::string tostring(const MotIndex mo);    
     
     enum class ControlMode : uint8_t { 
         // in here the ones used by modern MC boards 
@@ -61,6 +61,11 @@ namespace embot::prot::can::motor {
         none = 254 
     };  
     constexpr uint8_t ControlModeNumberOf {8};    
+    
+    
+    enum class PIDtype : uint8_t { CURR = 0, VEL = 1, NONE = 7 };
+    constexpr uint8_t PIDtypeNumberOf {3}; 
+    
     
         
     struct Converter
@@ -162,16 +167,22 @@ namespace embot::prot::can::motor {
         
         static constexpr float to_percentage(const PWM &cp)
         {
-            PWM v = std::clamp(v, static_cast<PWM>(-32000), static_cast<PWM>(+32000));
             constexpr float toperc = 1.0f/320.f;
-            return static_cast<float>(v) * toperc;
+            float r = static_cast<float>(cp) * toperc;
+            return std::clamp(r, -100.0f, +100.0f);
         } 
 
         static constexpr PWM to_can_percentage(const float &p)
-        {
-            float v = std::clamp(p, static_cast<float>(-100.0f), static_cast<float>(+100.0f));
+        {           
             constexpr float toPWM = 320.f;
-            return static_cast<PWM>(v*toPWM);
+            float r = p*toPWM;
+            return std::clamp(static_cast<PWM>(r), static_cast<PWM>(-32000), static_cast<PWM>(+32000));            
+        }
+        
+        static std::string to_string(const PIDtype &t)
+        {
+            static const char * typ[8] { "CURR", "VEL", "unknown", "unknown", "unknown", "unknown", "unknown", "NONE" };
+            return typ[embot::core::tointegral(t)];
         }
     
     };      
@@ -217,22 +228,22 @@ flowchart LR
 ```
 
 #endif
-
+    
     struct PID
     {
-        enum class Type : uint8_t { CURR = 0, VEL = 1, NONE = 7 };
         enum class Gain : uint8_t { P = 0, I = 1, D = 2 };
+        static constexpr uint8_t maxshift {15};
         
-        Type type {Type::NONE};         
+        PIDtype type {PIDtype::NONE};         
         int16_t kp {0}; // proportional gain
         int16_t ki {0}; // integral gain
         int16_t kd {0}; // derivative gain
         uint8_t ks {0}; // shift factor w/ values in range [0, 15]. it gives a scalefactor of pow(2, -ks) that we apply to kx
         
         constexpr PID() = default;
-        constexpr PID(Type t, int16_t p, int16_t i, int16_t d, uint8_t s) : type(t), kp(p), ki(i), kd(d), ks(s) {}
+        constexpr PID(PIDtype t, int16_t p, int16_t i, int16_t d, uint8_t s) : type(t), kp(p), ki(i), kd(d), ks(s) {}
         
-        constexpr bool isvalid() const { return ks<16; }
+        constexpr bool isvalid() const { return ks<=maxshift; }
         
         constexpr float scalefactor() const 
         {   // pow(2, -ks) implemented as 1/(1<<ks) if ks is in range [0, 15], else very small, so  0.0
@@ -240,6 +251,16 @@ flowchart LR
             float r = 0.0f; 
             if(isvalid()) { r = 1.0 / static_cast<float>(1 << ks);    }
             return r;
+        }
+        
+        constexpr float inversescalefactor() const 
+        {
+            float r = 0.0f; 
+            if(isvalid())
+            { 
+                r = static_cast<float>(1 << ks);    
+            }
+            return r;            
         }
         
         constexpr float get(Gain g) const 
@@ -253,27 +274,119 @@ flowchart LR
                 default: {} break;
             };
             constexpr float milli2ampere = 0.001f;
-            return (Type::VEL == type) ? milli2ampere*scalefactor()*v :  scalefactor()*v;
+            return (PIDtype::VEL == type) ? milli2ampere*scalefactor()*v :  scalefactor()*v;
+        }
+        
+        void load(PIDtype t, float p, float i, float d, uint8_t shift)
+        {
+            type = t;
+            ks = std::min(shift, maxshift);
+            
+            constexpr float ampere2milli = 1000.0f;
+            float correctionfactor = (PIDtype::VEL == type) ? ampere2milli : 1.0f;
+            float invscalefactor = inversescalefactor(); // it depends from ks, so call it after ks = ....
+            kp = static_cast<int16_t>(p * invscalefactor * correctionfactor);
+            ki = static_cast<int16_t>(i * invscalefactor * correctionfactor);
+            kd = static_cast<int16_t>(d * invscalefactor * correctionfactor);
+        }  
+        
+        std::string to_string() const
+        {
+            return std::string("{") + Converter::to_string(type) + " (kp, ki, kp, ks) = (" + std::to_string(kp) + ", " + std::to_string(ki) + ", " + std::to_string(kd) + ", " + std::to_string(ks) + ")}"; 
         }
     };  
   
 
     struct PIDlimits
     {
-        enum class Type : uint8_t { CURR = 0, VEL = 1, NONE = 7 };
-        
-        Type type {Type::NONE};         
+        PIDtype type {PIDtype::NONE};           
         int16_t offset {0}; 
         int16_t limitonoutput{0}; // derivative gain
         int16_t limitonintegral {0}; // integral gain
         
         constexpr PIDlimits() = default;
-        constexpr PIDlimits(Type t, int16_t o, int16_t li, int16_t lo) : type(t), offset(o), limitonintegral(li), limitonoutput(lo) {}
+        constexpr PIDlimits(PIDtype t, int16_t o, int16_t li, int16_t lo) : type(t), offset(o), limitonintegral(li), limitonoutput(lo) {}
         
         // note:
         // so far, we dont use PIDlimits so we dont provide any getter /setter function 
-        // the way its members are used may follow the same rules of PID, so we may need PID::ks to scale          
-    };      
+        // the way its members are used may follow the same rules of PID, so we may need PID::ks to scale     
+
+        std::string to_string() const
+        {
+            return std::string("{") + Converter::to_string(type) + " (offset, limitonputput, limitonintegral) = (" + std::to_string(offset) + ", " + std::to_string(limitonoutput) + ", " + std::to_string(limitonintegral) + ")}"; 
+        }           
+    };   
+
+
+    struct CurrentLimits
+    {   
+        uint8_t x {0};
+        embot::prot::can::motor::Current nominal {0};
+        embot::prot::can::motor::Current peak {0};
+        embot::prot::can::motor::Current overload {0};
+        
+        void load(float n, float p, float o)
+        {
+            constexpr float ampere2milli = 1000.0f;
+            nominal = ampere2milli * n;
+            peak = ampere2milli * p;
+            overload = ampere2milli * o;
+        }
+        
+        std::string to_string() const
+        {
+            return std::string("{(nominal, peak, overload) = (") + std::to_string(nominal) + ", " + std::to_string(peak) + ", " + std::to_string(overload) + ") [mA]}"; 
+        }
+    };  
+
+
+    struct MotorConfig 
+    {
+        enum class Flag : uint8_t
+        {
+            hasRotorEncoder         = 0,
+            hasHALLsensor           = 1,
+            hasTempSensor           = 2,
+            hasRotorEncoderIndex    = 3,
+            hasSpeedEncoder         = 4,
+            verbose                 = 5,
+            ffu6                    = 6,
+            ffu7                    = 7
+        };
+        
+        uint8_t flags {0}; // use struct MotorConfig::Flag to manage it
+        int16_t rotorEncoderResolution {0};
+        int16_t rotorIndexOffset {0};
+        uint8_t motorPoles {0};
+        uint8_t rotEncTolerance {0};        
+
+        MotorConfig() = default; 
+
+        void set(Flag f)
+        {
+            embot::core::binary::bit::set(flags, embot::core::tointegral(f));
+        }
+        
+        bool check(Flag f) const
+        {
+            return embot::core::binary::bit::check(flags, embot::core::tointegral(f));
+        } 
+
+        std::string to_string() const
+        {
+            char fl[48] = {0};
+            snprintf(fl, sizeof(fl), "enco=%d:hall=%d:tsen=%d:indx=%d:spen=%d:verb=%d", 
+                                      check(Flag::hasRotorEncoder), check(Flag::hasHALLsensor), 
+                                      check(Flag::hasTempSensor), check(Flag::hasRotorEncoderIndex), 
+                                      check(Flag::hasSpeedEncoder), check(Flag::verbose));
+            return std::string("{(flags, rotorEncoderResolution, rotorIndexOffset, motorPoles, rotEncTolerance) = (") +
+                                  std::string(fl) + ", " + std::to_string(rotorEncoderResolution) + ", " + std::to_string(rotorIndexOffset) 
+                                  + ", " + std::to_string(motorPoles) 
+                                  + ", " + std::to_string(rotEncTolerance) 
+                                  + ")}"; 
+        }
+        
+    };    
     
 } // namespace embot::prot::can::motor {
 

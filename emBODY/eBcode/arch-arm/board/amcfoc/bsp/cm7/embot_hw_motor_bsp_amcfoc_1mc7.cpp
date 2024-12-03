@@ -238,7 +238,7 @@ namespace embot::hw::motor::bsp::amcfoc::cm7 {
 
 #if defined(WIP_REMOVE_AMC_1CM7_CODE)
 
-#include "cubemx_defines.h"
+#include "cm7_cubemx_defines.h"
 
 namespace embot::hw::motor::bsp::amcfoc::cm7 {
     

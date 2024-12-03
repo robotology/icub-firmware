@@ -215,7 +215,12 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_Startup(embot::os::Thread *t, void *
     canconfig.txcapacity = impl->_config.tCOMMmaxOUTmessages;
     canconfig.onrxframe = embot::core::Callback(impl->alertonrxcanframe, t); 
     embot::hw::can::init(impl->_tCOMMcanbus, canconfig);
+    
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7)
+    #warning be careful: the amcfoc.mot has removed the embot::hw::can::setfilters()
+#else        
     embot::hw::can::setfilters(impl->_tCOMMcanbus, impl->_tCOMMcanaddress); 
+#endif
         
     // pre-allocate output vector of msgs
     impl->_tCOMMoutmessages.reserve(impl->_config.tCOMMmaxOUTmessages);    

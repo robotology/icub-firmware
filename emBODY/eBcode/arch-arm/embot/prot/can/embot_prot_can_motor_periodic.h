@@ -123,7 +123,7 @@ namespace embot::prot::can::motor::periodic {
                     } break;
                     case Type::VOLTAGE:
                     {   // i want to have [-100%, +100%]. i have [-32000, +32000] -> 
-                        v = embot::prot::can::motor::Converter::to_percentage(val);                        
+                        v = embot::prot::can::motor::Converter::to_percentage(val);    
                     } break; 
                     case Type::POSITION:
                     {   // i want to have [deg]. i have [icubdeg] ->
@@ -131,7 +131,15 @@ namespace embot::prot::can::motor::periodic {
                     } break;                     
                 }
                 return v;                
-            }            
+            } 
+
+            std::string to_string() const
+            {
+                return std::string("sig<MOTOR_TARGETS = (") 
+                                   + std::to_string(target[0]) + ", " + std::to_string(target[1]) + ", " 
+                                   + std::to_string(target[2]) + ", " + std::to_string(target[3]) + ")"
+                                   + ">";               
+            }                
         };
         
         Info info {};
@@ -167,7 +175,16 @@ namespace embot::prot::can::motor::periodic {
             void setPosition(float pos)
             {
                 position = embot::prot::can::motor::Converter::to_can_fullposition(pos); 
-            }            
+            }
+
+            std::string to_string() const
+            {
+                return std::string("sig<FOC = (") 
+                                    + "current [mA] = " + std::to_string(current) + ", " + 
+                                    + "velocity [icubdeg/ms] = " + std::to_string(velocity) + ", " 
+                                    + "position [icubdeg] = " + std::to_string(position) + ")"
+                                    + ">";               
+            }             
         };
         
         Info info {};
@@ -190,6 +207,16 @@ namespace embot::prot::can::motor::periodic {
             int16_t pwmfeedback {0};        // [-100, +100] is mapped in [-32000, +32000]
             uint32_t motorfaultstate {0};   // treat the bit flags w/ suitable values. for board 2fos use embot::prot::can::motor::board::foc::MotorFaultState
             Info() = default;
+            
+            std::string to_string() const
+            {
+                return std::string("sig<STATUS = (") 
+                    + "ctrlmode = " + embot::prot::can::motor::Converter::tostring(static_cast<embot::prot::can::motor::ControlMode>(controlmode)) + ", "  
+                                    + "quadencoderstate [flags] = " + std::to_string(quadencoderstate) + ", " 
+                                    + "pwmfeedback [-32000, +32000] = " + std::to_string(pwmfeedback) + ", " 
+                                    + "motorfaultstate flags = " + std::to_string(motorfaultstate) + ")"
+                                    + ">";               
+            }             
         };
         
         Info info {};
@@ -209,6 +236,13 @@ namespace embot::prot::can::motor::periodic {
             uint8_t tbd[2] {0};
             int16_t temperature {0};
             Info() = default;
+            
+            std::string to_string() const
+            {
+                return std::string("sig<ADDITIONAL_STATUS = (") 
+                    + "temperature = " + std::to_string(temperature) + ")"
+                                    + ">";               
+            }             
         };
         
         Info info {}; 
