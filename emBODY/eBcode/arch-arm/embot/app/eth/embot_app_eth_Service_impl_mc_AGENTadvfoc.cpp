@@ -716,12 +716,12 @@ volatile const embot::app::icc::Signature * const getsignature(size_t i)
 {
     #warning MAYBE USE the bsp flash
 #if defined(CORE_CM7)   // this code runs on cm7 (as amc.hex does) so needs to read signature on flash of the cm4     
-    constexpr uint32_t signatureaddress {0x08100000};
+    constexpr uint32_t signatureaddress {0x08100000+0x800};
 #else                   // this code runs on cm4 (as amcfoc.mot.hex) so needs to read flash of the cm7 
-    constexpr uint32_t signatureaddress {0x08000000};
+    constexpr uint32_t signatureaddress {0x08000000+0x800};
 #endif
     
-    return (volatile const embot::app::icc::Signature * const)(0x08000000+0x800);
+    return (volatile const embot::app::icc::Signature * const)(signatureaddress);
 }
 
 bool AGENTadvfoc::iccdiscovery()
