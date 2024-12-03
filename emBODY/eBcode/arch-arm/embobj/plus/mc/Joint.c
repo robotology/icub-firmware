@@ -288,10 +288,6 @@ void Joint_update_status_reference(Joint* o)
         default:
             ;
     }
-    
-    // Debug for temporary adding the raw planned target position to the motor encoder value which
-    o->eo_joint_ptr->status.addinfo.multienc[1] = (int32_t)Trajectory_get_target_position(&(o->trajectory));
-    //ends here
 }
 
 static void Joint_send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64)
