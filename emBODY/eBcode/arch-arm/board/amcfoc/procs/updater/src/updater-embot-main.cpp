@@ -25,7 +25,7 @@ constexpr uint32_t offset {EENV_MEMMAP_EUPDATER_ROMADDR};
 
 
 
-constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::donothing };
+constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate };
 
 
 int main(void)
@@ -505,6 +505,9 @@ extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsoc
 
     return(host_connected);
 }
+
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
