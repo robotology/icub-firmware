@@ -308,6 +308,12 @@ void Motor_init(Motor* o) //
     Motor_hardStopCalbData_reset(o);
     
     //o->outOfLimitsSignaled = FALSE;
+    
+#if defined(SENSORLESS_TORQUE)
+    o->torque = ZERO;
+    o->sensorless_torque = FALSE;
+    o->torque_estimator.initialize();
+#endif
 }
 
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
@@ -356,7 +362,29 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
         o->control_mode = icubCanProto_controlmode_idle;
         hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     }    
-       
+ 
+#if defined(SENSORLESS_TORQUE)
+    o->torque = ZERO;
+    
+    if (config->LuGre_params.Km > ZERO)
+    {
+        o->sensorless_torque = TRUE;
+
+        o->torque_estimator.rtU.Km  = config->LuGre_params.Km; //4.3;
+        o->torque_estimator.rtU.Kw  = config->LuGre_params.Kw; //0.045;
+        o->torque_estimator.rtU.S0  = config->LuGre_params.S0; //2.5;
+        o->torque_estimator.rtU.S1  = config->LuGre_params.S1; //0.0;
+        o->torque_estimator.rtU.Vth = config->LuGre_params.Vth; //5.0;
+        o->torque_estimator.rtU.Fc_pos = config->LuGre_params.Fc_pos; //3.3;
+        o->torque_estimator.rtU.Fc_neg = config->LuGre_params.Fc_neg; //3.3;
+        o->torque_estimator.rtU.Fs_pos = config->LuGre_params.Fs_pos; //7.0;
+        o->torque_estimator.rtU.Fs_neg = config->LuGre_params.Fs_neg; //7.0;
+    }
+    else
+    {
+        o->sensorless_torque = FALSE;
+    }
+#endif
 }
 
 void Motor_config_encoder(Motor* o, int32_t resolution)
@@ -887,7 +915,7 @@ BOOL Motor_check_faults(Motor* o) //
             fault_state.bits.EncoderFault = FALSE;
         }
 */
-				
+
 
         if (can_dead && !o->can_dead)
         {
@@ -962,13 +990,40 @@ BOOL Motor_is_calibrated(Motor* o) //
     return !(o->not_calibrated);
 }
 
+
+CTRL_UNITS Motor_do_trq_control_EXPERIMENTAL(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk, CTRL_UNITS motor_vel_icubdeg_sec) //
+{
+    o->trq_ref = trq_ref;
+    o->trq_fbk = trq_fbk;
+    
+    o->trq_err = trq_ref - trq_fbk;
+ 
+//  CTRL_UNITS current = (o->motor[m].GEARBOX > 0)? o->motor[m].Iqq_fbk : -o->motor[m].Iqq_fbk;
+//  motor_current_ref = 0.975f*current + (o->joint[m].trq_ref - o->joint[m].trq_fbk)/4500.0f - 0.04f*o->joint[m].vel_fbk;
+//  LIMIT(motor_current_ref, 3000.0f);
+//  if (o->motor[m].GEARBOX < 0) motor_current_ref = -motor_current_ref;
+//  //motor_current_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk, motor_vel_kf_icubdeg_sec);
+        
+    
+    CTRL_UNITS current = (o->GEARBOX > 0)? o->Iqq_fbk : -o->Iqq_fbk;
+      
+    CTRL_UNITS motor_current_ref = 0.975f*current + o->trqPID.Ktau*(trq_ref - trq_fbk) - 0.0004f*motor_vel_icubdeg_sec;
+                
+    LIMIT(motor_current_ref, o->trqPID.out_max);
+                
+    if (o->GEARBOX < 0) motor_current_ref = -motor_current_ref;
+    
+    return motor_current_ref;
+}
+
+
 CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk, CTRL_UNITS motor_vel_icubdeg_sec) //
 {
     o->trq_ref = trq_ref;
     o->trq_fbk = trq_fbk;
     
     o->trq_err = trq_ref - trq_fbk;
-    
+ 
     return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, motor_vel_icubdeg_sec, o->trq_ref);
 }
 
@@ -1167,6 +1222,26 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     o->pos_raw_fbk = can_msg->position;
     o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
     o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX;
+    
+#if defined(SENSORLESS_TORQUE)
+    if (o->sensorless_torque)
+    {
+        static const float IDEG2RAD = 6.28f/65536.0f;
+    
+        o->torque_estimator.rtU.Current  = 0.001f* o->Iqq_fbk;
+        o->torque_estimator.rtU.Velocity = IDEG2RAD*o->vel_raw_fbk;
+
+        if (o->GEARBOX < 0)
+        {
+            o->torque_estimator.rtU.Current      = -o->torque_estimator.rtU.Current;
+            o->torque_estimator.rtU.Velocity     = -o->torque_estimator.rtU.Velocity;
+        }
+    
+        o->torque_estimator.step();
+    
+        o->torque = o->torque_estimator.rtY.Torque;
+    }
+#endif
 }
 
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
