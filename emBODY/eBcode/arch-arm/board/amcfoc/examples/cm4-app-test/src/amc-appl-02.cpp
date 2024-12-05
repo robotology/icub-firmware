@@ -45,7 +45,7 @@ and ... produce a file named `theApplication_config.h`  w/ following definition:
  
 #include "embot_hw_dualcore.h"
 
-constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::release }; // donothing };
+constexpr embot::hw::dualcore::Config dcc {embot::hw::dualcore::Config::HW::forceinit, embot::hw::dualcore::Config::CMD::activate }; // donothing };
 
 
 int main(void)
