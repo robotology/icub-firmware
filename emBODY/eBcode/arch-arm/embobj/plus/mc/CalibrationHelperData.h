@@ -41,7 +41,7 @@ typedef struct // CableCalib
 
 typedef struct // HardStopCalib
 {
-	  int32_t pwm;       // [2FOC PWM units] (-32000 : +32000) = (-100% : +100%)
+	int32_t pwm;       // [2FOC PWM units] (-32000 : +32000) = (-100% : +100%)
     int32_t zero;      // [icubdegrees]
     int32_t space_thr; // [icubdegrees]  
     int32_t time_thr;  // [milliseconds]
