@@ -77,6 +77,11 @@ namespace embot { namespace hw { namespace can {
     std::uint8_t inputqueuesize(embot::hw::CAN p)  { return 0; }
     
     result_t get(embot::hw::CAN p, Frame &frame, std::uint8_t &remaining)  { return resNOK; }    
+	
+    bool lock(embot::hw::CAN p, embot::hw::can::Direction dir) {return false;}
+	
+    void unlock(embot::hw::CAN p, embot::hw::can::Direction dir, bool lockstatus){}
+
     
 }}} // namespace embot { namespace hw { namespace can {
 

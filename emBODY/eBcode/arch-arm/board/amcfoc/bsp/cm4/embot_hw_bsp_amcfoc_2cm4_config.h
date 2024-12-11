@@ -41,7 +41,6 @@
 //    #define EMBOT_ENABLE_hw_motor
 //    #define EMBOT_ENABLE_hw_flash
 //    #define EMBOT_ENABLE_hw_timer
-//    #define EMBOT_ENABLE_hw_can
 //    
 //    #define EMBOT_ENABLE_hw_mtx
 //    #define EMBOT_ENABLE_hw_icc_sig
