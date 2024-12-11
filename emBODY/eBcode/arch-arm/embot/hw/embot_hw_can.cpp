@@ -78,9 +78,9 @@ namespace embot { namespace hw { namespace can {
     
     result_t get(embot::hw::CAN p, Frame &frame, std::uint8_t &remaining)  { return resNOK; }    
 	
-	bool lock(embot::hw::CAN p, embot::hw::can::Direction dir) {return false;}
+    bool lock(embot::hw::CAN p, embot::hw::can::Direction dir) {return false;}
 	
-	void unlock(embot::hw::CAN p, embot::hw::can::Direction dir, bool lockstatus){}
+    void unlock(embot::hw::CAN p, embot::hw::can::Direction dir, bool lockstatus){}
 
     
 }}} // namespace embot { namespace hw { namespace can {
