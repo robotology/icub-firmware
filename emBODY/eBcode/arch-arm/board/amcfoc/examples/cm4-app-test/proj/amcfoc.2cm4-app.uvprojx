@@ -460,9 +460,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.h7.startup.amc.CM4.s</FileName>
+              <FileName>stm32hal.h7.startup.amcfoc.CM4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.h7.startup.amc.CM4.s</FilePath>
+              <FilePath>..\cfg\stm32hal.h7.startup.amcfoc.CM4.s</FilePath>
             </File>
             <File>
               <FileName>stm32hal.h7.amcfoc.2cm4.v1A0.lib</FileName>
