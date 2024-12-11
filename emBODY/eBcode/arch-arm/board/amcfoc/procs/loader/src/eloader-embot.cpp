@@ -218,7 +218,7 @@ static eEboardInfo_t s_loader_boardinfo =
         .entity     =
         {
             .type       = ee_entity_board,
-            .signature  = eobrd_amc,
+            .signature  = eobrd_amcfoc,
             .version    = 
             { 
                 .major = 1, 
@@ -250,7 +250,7 @@ static eEboardInfo_t s_loader_boardinfo =
             .addr   = EENV_STGSTART
         },
         .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
-        .name           = "amc"
+        .name           = "amcfoc"
     },
     .uniqueid       = 0,
     .extra          = {0}
