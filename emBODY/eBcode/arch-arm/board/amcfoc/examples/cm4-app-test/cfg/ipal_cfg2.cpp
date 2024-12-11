@@ -16,16 +16,16 @@
 
 static void ipal_app_on_fatal_error(ipal_fatalerror_t errorcode, const char * errormsg)
 {
-	/* Avoid compiler warnings*/ 
-	errorcode = errorcode;
-	errormsg = errormsg;
-	volatile uint32_t n = 0;
+    /* Avoid compiler warnings*/ 
+    errorcode = errorcode;
+    errormsg = errormsg;
+    volatile uint32_t n = 0;
     volatile const char * m = errormsg;
     m = errormsg;
     
 //    itm_puts(errormsg);
     
-	for(;;)
+    for(;;)
     {
        n = errorcode; 
        m = errormsg;
