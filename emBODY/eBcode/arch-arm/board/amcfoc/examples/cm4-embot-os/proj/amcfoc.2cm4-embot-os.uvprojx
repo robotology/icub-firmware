@@ -494,6 +494,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_dualcore.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -740,6 +745,11 @@
               <FilePath>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_timer_bsp_amcfoc_2cm4.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\cm4\embot_hw_timer_bsp_amcfoc_2cm4.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\cm4\embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FilePath>
@@ -777,8 +787,7 @@
       <TargetName>amcfoc.2cm4-master</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>6190000::V6.19::.\armclang-r6p19-00rel0</pArmCC>
-      <pCCUsed>6190000::V6.19::.\armclang-r6p19-00rel0</pCCUsed>
+      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -1082,7 +1091,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1312,6 +1321,11 @@
               <FileName>embot_hw_dualcore.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_dualcore.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1557,6 +1571,11 @@
               <FileName>embot_hw_spi_bsp_amcfoc_2cm4.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\cm4\embot_hw_spi_bsp_amcfoc_2cm4.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer_bsp_amcfoc_2cm4.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\cm4\embot_hw_timer_bsp_amcfoc_2cm4.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_eeprom_bsp_amcfoc_2cm4.cpp</FileName>

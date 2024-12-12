@@ -78,7 +78,7 @@ namespace embot { namespace hw { namespace timer {
         // maskofsupported
         mask::pos2mask<uint32_t>(TIMER::one) | mask::pos2mask<uint32_t>(TIMER::two) | 
         mask::pos2mask<uint32_t>(TIMER::three) | mask::pos2mask<uint32_t>(TIMER::four) |
-        mask::pos2mask<uint32_t>(TIMER::four) | mask::pos2mask<uint32_t>(TIMER::five),        
+        mask::pos2mask<uint32_t>(TIMER::five) | mask::pos2mask<uint32_t>(TIMER::six),        
         // properties
         {{
             &tim01p, &tim02p, &tim03p, &tim04p, &tim05p, &tim06p, nullptr, nullptr,     // from 1 to 8
@@ -99,21 +99,21 @@ namespace embot { namespace hw { namespace timer {
 namespace embot { namespace hw { namespace timer {
 
     // sadly we cannot use constexpr because of the reinterpret_cast<> inside TIM6 etc.
-    TIM_HandleTypeDef htim13;
-    static const PROP tim13p = { .TIMx = TIM13,  .handle = &htim13,  .clock = embot::hw::CLOCK::none, .speed = 200 * 1000000, .isonepulse = false, .mastermode = true };
-        
-    TIM_HandleTypeDef htim15;
-    static const PROP tim15p = { .TIMx = TIM15,  .handle = &htim15,  .clock = embot::hw::CLOCK::none, .speed = 200 * 1000000, .isonepulse = false, .mastermode = true };
+    TIM_HandleTypeDef htim7;
+    static const PROP tim7p = { .TIMx = TIM7,  .handle = &htim7,  .clock = embot::hw::CLOCK::none, .speed = 200 * 1000000, .isonepulse = false, .mastermode = true };
         
     TIM_HandleTypeDef htim16;
     static const PROP tim16p = { .TIMx = TIM16,  .handle = &htim16,  .clock = embot::hw::CLOCK::none, .speed = 200 * 1000000, .isonepulse = false, .mastermode = true };
+        
+    TIM_HandleTypeDef htim17;
+    static const PROP tim17p = { .TIMx = TIM17,  .handle = &htim17,  .clock = embot::hw::CLOCK::none, .speed = 200 * 1000000, .isonepulse = false, .mastermode = true };
         
     constexpr BSP thebsp {        
         // maskofsupported
         mask::pos2mask<uint32_t>(TIMER::one) | mask::pos2mask<uint32_t>(TIMER::two) | mask::pos2mask<uint32_t>(TIMER::three),        
         // properties
         {{
-            &tim13p, &tim15p, &tim16p, nullptr, nullptr, nullptr, nullptr, nullptr,     // from 1 to 8
+            &tim7p, &tim16p, &tim17p, nullptr, nullptr, nullptr, nullptr, nullptr,     // from 1 to 8
             nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16            
         }}        
     };
@@ -147,20 +147,20 @@ void manageInterrupt(embot::hw::TIMER t, TIM_HandleTypeDef *htim)
 
 extern "C" {
     
-    void TIM8_UP_TIM13_IRQHandler(void)
+    void TIM7_IRQHandler(void)
     {
         //#warning TODO: cambiare il modo in cui si chiama la callback. usare le callback di stm32
-        manageInterrupt(embot::hw::TIMER::one, &embot::hw::timer::htim13);
-    }
-    
-    void TIM15_IRQHandler(void)
-    {
-        manageInterrupt(embot::hw::TIMER::two, &embot::hw::timer::htim15);
+        manageInterrupt(embot::hw::TIMER::one, &embot::hw::timer::htim7);
     }
     
     void TIM16_IRQHandler(void)
     {
-        manageInterrupt(embot::hw::TIMER::three, &embot::hw::timer::htim16);
+        manageInterrupt(embot::hw::TIMER::two, &embot::hw::timer::htim16);
+    }
+    
+    void TIM17_IRQHandler(void)
+    {
+        manageInterrupt(embot::hw::TIMER::three, &embot::hw::timer::htim17);
     }
 }
 
@@ -169,83 +169,69 @@ extern "C"
 {
     void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     {
-      if(tim_baseHandle->Instance==TIM13)
+      if(tim_baseHandle->Instance==TIM7)
       {
-      /* USER CODE BEGIN TIM13_MspInit 0 */
+      /* USER CODE BEGIN TIM7_MspInit 0 */
 
-      /* USER CODE END TIM13_MspInit 0 */
-        /* TIM13 clock enable */
-        __HAL_RCC_TIM13_CLK_ENABLE();
+      /* USER CODE END TIM7_MspInit 0 */
+        /* TIM7 clock enable */
+        __HAL_RCC_TIM7_CLK_ENABLE();
 
-        /* TIM13 interrupt Init */
-        HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
-      /* USER CODE BEGIN TIM13_MspInit 1 */
+        /* TIM7 interrupt Init */
+        HAL_NVIC_SetPriority(TIM7_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(TIM7_IRQn);
+      /* USER CODE BEGIN TIM7_MspInit 1 */
 
-      /* USER CODE END TIM13_MspInit 1 */
-      }
-      else if(tim_baseHandle->Instance==TIM15)
-      {
-      /* USER CODE BEGIN TIM15_MspInit 0 */
-
-      /* USER CODE END TIM15_MspInit 0 */
-        /* TIM15 clock enable */
-        __HAL_RCC_TIM15_CLK_ENABLE();
-
-        /* TIM15 interrupt Init */
-        HAL_NVIC_SetPriority(TIM15_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(TIM15_IRQn);
-      /* USER CODE BEGIN TIM15_MspInit 1 */
-
-      /* USER CODE END TIM15_MspInit 1 */
+      /* USER CODE END TIM7_MspInit 1 */
       }
       else if(tim_baseHandle->Instance==TIM16)
       {
       /* USER CODE BEGIN TIM16_MspInit 0 */
 
       /* USER CODE END TIM16_MspInit 0 */
-        /* TIM15 clock enable */
+        /* TIM16 clock enable */
         __HAL_RCC_TIM16_CLK_ENABLE();
 
         /* TIM16 interrupt Init */
         HAL_NVIC_SetPriority(TIM16_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(TIM16_IRQn);
-      /* USER CODE BEGIN TIM15_MspInit 1 */
+      /* USER CODE BEGIN TIM16_MspInit 1 */
 
-      /* USER CODE END TIM15_MspInit 1 */
+      /* USER CODE END TIM16_MspInit 1 */
+      }
+      else if(tim_baseHandle->Instance==TIM17)
+      {
+      /* USER CODE BEGIN TIM17_MspInit 0 */
+
+      /* USER CODE END TIM17_MspInit 0 */
+        /* TIM17 clock enable */
+        __HAL_RCC_TIM17_CLK_ENABLE();
+
+        /* TIM17 interrupt Init */
+        HAL_NVIC_SetPriority(TIM17_IRQn, 0, 0);
+        HAL_NVIC_EnableIRQ(TIM17_IRQn);
+      /* USER CODE BEGIN TIM17_MspInit 1 */
+
+      /* USER CODE END TIM17_MspInit 1 */
       }
     }
 
     void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
     {
 
-      if(tim_baseHandle->Instance==TIM13)
+      if(tim_baseHandle->Instance==TIM7)
       {
-      /* USER CODE BEGIN TIM13_MspDeInit 0 */
+      /* USER CODE BEGIN TIM7_MspDeInit 0 */
 
-      /* USER CODE END TIM13_MspDeInit 0 */
+      /* USER CODE END TIM7_MspDeInit 0 */
         /* Peripheral clock disable */
-        __HAL_RCC_TIM13_CLK_DISABLE();
+        __HAL_RCC_TIM7_CLK_DISABLE();
 
-        /* TIM13 interrupt Deinit */
-        HAL_NVIC_DisableIRQ(TIM8_UP_TIM13_IRQn);
-      /* USER CODE BEGIN TIM13_MspDeInit 1 */
+        /* TIM7 interrupt Deinit */
+        HAL_NVIC_DisableIRQ(TIM7_IRQn);
+      /* USER CODE BEGIN TIM7_MspDeInit 1 */
 
-      /* USER CODE END TIM13_MspDeInit 1 */
-      }
-      else if(tim_baseHandle->Instance==TIM15)
-      {
-      /* USER CODE BEGIN TIM15_MspDeInit 0 */
-
-      /* USER CODE END TIM15_MspDeInit 0 */
-        /* Peripheral clock disable */
-        __HAL_RCC_TIM15_CLK_DISABLE();
-
-        /* TIM15 interrupt Deinit */
-        HAL_NVIC_DisableIRQ(TIM15_IRQn);
-      /* USER CODE BEGIN TIM15_MspDeInit 1 */
-
-      /* USER CODE END TIM15_MspDeInit 1 */
+      /* USER CODE END TIM7_MspDeInit 1 */
       }
       else if(tim_baseHandle->Instance==TIM16)
       {
@@ -260,6 +246,20 @@ extern "C"
       /* USER CODE BEGIN TIM16_MspDeInit 1 */
 
       /* USER CODE END TIM16_MspDeInit 1 */
+      }
+      else if(tim_baseHandle->Instance==TIM17)
+      {
+      /* USER CODE BEGIN TIM17_MspDeInit 0 */
+
+      /* USER CODE END TIM17_MspDeInit 0 */
+        /* Peripheral clock disable */
+        __HAL_RCC_TIM17_CLK_DISABLE();
+
+        /* TIM17 interrupt Deinit */
+        HAL_NVIC_DisableIRQ(TIM17_IRQn);
+      /* USER CODE BEGIN TIM17_MspDeInit 1 */
+
+      /* USER CODE END TIM17_MspDeInit 1 */
       }
     }
 }
