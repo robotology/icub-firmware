@@ -96,7 +96,7 @@ namespace embot::hw::spi::bsp {
     constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi1 = { {
         {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine},     // miso
         {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::seven},    // mosi
-        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eleven},   // sckl
+        {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five},     // sckl
         {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::ten}       // ssel
     } };
     constexpr PROP spi1p = { &hspi1, 50*1000*1000, pinoutspi1 }; 
@@ -104,7 +104,7 @@ namespace embot::hw::spi::bsp {
     
     SPI_HandleTypeDef hspi2 {};
     constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi2 = { {
-        {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fourteen}, // miso
+        {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::two},      // miso
         {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen},  // mosi
         {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::three},    // sckl
         {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::nine}      // ssel
@@ -120,34 +120,14 @@ namespace embot::hw::spi::bsp {
     } };
     constexpr PROP spi3p = { &hspi3, 50*1000*1000, pinoutspi3 };       
     
-    SPI_HandleTypeDef hspi5 {};
-    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi5 = { {
-        {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::eight},    // miso
-        {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::eleven},   // mosi
-        {embot::hw::GPIO::PORT::H, embot::hw::GPIO::PIN::six},      // sckl
-        {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none}   // ssel
-    } };
-    constexpr PROP spi5p = { &hspi5, 100*1000*1000, pinoutspi5 };   
-    
-    SPI_HandleTypeDef hspi6 {};
-    constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi6 = { {
-        {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::four},     // miso
-        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::fourteen}, // mosi
-        {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::thirteen}, // sckl
-        {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none}   // ssel
-    } };
-    constexpr PROP spi6p = { &hspi6, 100*1000*1000, pinoutspi6 };     
-    
-    static_assert(spi6p.clockrate == 100*1000*1000, "SPI::six is now 12.5Mhz and must be changed inside MX_SPI6_Init() or similar");
-    // SPI::six is used @ 12.Mhz by a M95512-DFMC6 EEPROM and must be < 16MHz
     
     constexpr BSP thebsp {        
         // maskofsupported
-//        mask::pos2mask<uint32_t>(SPI::one) | mask::pos2mask<uint32_t>(SPI::two) | 
+        mask::pos2mask<uint32_t>(SPI::one) | mask::pos2mask<uint32_t>(SPI::two) |  
         mask::pos2mask<uint32_t>(SPI::three),        
         // properties
         {{
-            nullptr, nullptr,       // used by encoders
+            &spi1p, &spi2p,         // used by encoders
             &spi3p,                 // used by eeprom and eth
             nullptr, 
             nullptr,                     
@@ -156,40 +136,40 @@ namespace embot::hw::spi::bsp {
     };
  
  
-    void s_J5_SPIpinout(embot::hw::SPI h, bool enable)
-    {
-        static constexpr embot::hw::gpio::Config out { embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::medium };    
-        static constexpr embot::hw::gpio::State stateSPI[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::SET};
-        static constexpr embot::hw::gpio::State stateNONE[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::RESET};
-    
-        static constexpr size_t spinum {embot::core::tointegral(embot::hw::SPI::three)+1};
-        static constexpr embot::hw::GPIO X1ENspi[spinum][2] = 
-        {
-            {   // spi1
-                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::zero},   // i2c1 ENABLE
-                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::eight}   // spi1 ENABLE
-            },
-            {   // spi2
-                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::one},   // i2c2 ENABLE
-                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::nine}   // spi2 ENABLE
-            },
-            {   // spi3
-                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::two},   // i2c3 ENABLE
-                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::ten}    // spi3 ENABLE 
-            }
-        };
-        
-        uint8_t x = embot::core::tointegral(h);
-        if(x <= spinum)
-        {
-            // spix
-            for(uint8_t i=0; i<2; i++)
-            {
-                embot::hw::gpio::init(X1ENspi[x][i], out);
-                embot::hw::gpio::set(X1ENspi[x][i], enable ? stateSPI[i] : stateNONE[i]);
-            }  
-        }
-    }  
+//    void s_J5_SPIpinout(embot::hw::SPI h, bool enable)
+//    {
+//        static constexpr embot::hw::gpio::Config out { embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::medium };    
+//        static constexpr embot::hw::gpio::State stateSPI[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::SET};
+//        static constexpr embot::hw::gpio::State stateNONE[2] = {embot::hw::gpio::State::RESET, embot::hw::gpio::State::RESET};
+//    
+//        static constexpr size_t spinum {embot::core::tointegral(embot::hw::SPI::three)+1};
+//        static constexpr embot::hw::GPIO X1ENspi[spinum][2] = 
+//        {
+//            {   // spi1
+//                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::zero},   // i2c1 ENABLE
+//                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::eight}   // spi1 ENABLE
+//            },
+//            {   // spi2
+//                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::one},   // i2c2 ENABLE
+//                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::nine}   // spi2 ENABLE
+//            },
+//            {   // spi3
+//                {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::two},   // i2c3 ENABLE
+//                {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::ten}    // spi3 ENABLE 
+//            }
+//        };
+//        
+//        uint8_t x = embot::core::tointegral(h);
+//        if(x <= spinum)
+//        {
+//            // spix
+//            for(uint8_t i=0; i<2; i++)
+//            {
+//                embot::hw::gpio::init(X1ENspi[x][i], out);
+//                embot::hw::gpio::set(X1ENspi[x][i], enable ? stateSPI[i] : stateNONE[i]);
+//            }  
+//        }
+//    }  
 
     // we need this extconfig because we wamt to pass information to HAL_SPI_MspInit() and HAL_SPI_MspDeInit()
     utils::ExtendedConfig extconfig {};
@@ -407,9 +387,10 @@ extern "C"
         /* SPI1 clock enable */
         __HAL_RCC_SPI1_CLK_ENABLE();
 
-        // must prepare the clocks of the sckl, mosi, miso, (ssel ?): D and G in our case
+        // must prepare the clocks of the sckl, mosi, miso, (ssel ?)
         __HAL_RCC_GPIOD_CLK_ENABLE();
         __HAL_RCC_GPIOG_CLK_ENABLE();
+        __HAL_RCC_GPIOA_CLK_ENABLE();
         
         /**SPI6 GPIO Configuration
         PG9      ------> SPI1_MISO
@@ -455,9 +436,10 @@ extern "C"
         /* SPI2 clock enable */
         __HAL_RCC_SPI2_CLK_ENABLE();
 
-        // must prepare the clocks of the sckl, mosi, miso, (ssel ?): B and D in our case
+        // must prepare the clocks of the sckl, mosi, miso, (ssel ?)
         __HAL_RCC_GPIOB_CLK_ENABLE();
         __HAL_RCC_GPIOD_CLK_ENABLE();
+        __HAL_RCC_GPIOC_CLK_ENABLE();
         
         GPIO_InitStruct.Pin = extcfg->pin(embot::hw::spi::Signal::MISO, 0);
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -716,15 +698,15 @@ extern "C"
         HAL_SPI_IRQHandler(&embot::hw::spi::bsp::hspi3);
     }
 
-    void SPI5_IRQHandler(void)
-    {
-        HAL_SPI_IRQHandler(&embot::hw::spi::bsp::hspi5);
-    }
-    
-    void SPI6_IRQHandler(void)
-    {
-        HAL_SPI_IRQHandler(&embot::hw::spi::bsp::hspi6);
-    }
+////    void SPI5_IRQHandler(void)
+////    {
+////        HAL_SPI_IRQHandler(&embot::hw::spi::bsp::hspi5);
+////    }
+////    
+////    void SPI6_IRQHandler(void)
+////    {
+////        HAL_SPI_IRQHandler(&embot::hw::spi::bsp::hspi6);
+////    }
 }
 
 #endif // #elif defined(EMBOT_ENABLE_hw_spi)

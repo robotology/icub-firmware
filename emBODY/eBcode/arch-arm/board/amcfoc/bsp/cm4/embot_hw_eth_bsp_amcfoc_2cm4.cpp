@@ -101,6 +101,7 @@ namespace embot::hw::eth::bsp {
     {
         // embot::hw::SPI ->
         embot::hw::SPI::five,
+        #warning there is not spi 5
         // embot::hw::spi::Config ->
         {
             embot::hw::spi::Prescaler::two,
