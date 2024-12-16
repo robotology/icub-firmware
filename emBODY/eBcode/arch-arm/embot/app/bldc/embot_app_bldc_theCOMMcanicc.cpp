@@ -292,7 +292,8 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
             remainingINrx = 0;   
             if(true == embot::app::eth::theICCservice::getInstance().get(item, remainingINrx))
             {
-                impl->tCOMM_OnRXmessage(t, eventmask, param, {item.des, item.frame}, impl->_tCOMMoutmessages); 
+                embot::app::eth::theICCservice::ItemCANframe icf {item};
+                impl->tCOMM_OnRXmessage(t, eventmask, param, {icf.des, icf.frame}, impl->_tCOMMoutmessages); 
             }
         }
         // if any arrives since we called embot::hw::can::inputqueuesize(tCOMMcanbus) ...
@@ -358,8 +359,9 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
             else
             {
                 nicc++;
-                embot::app::eth::theICCservice::Item item { impl->ICClocation, impl->_tCOMMoutmessages[i].frame };
-                bool r = embot::app::eth::theICCservice::getInstance().put(item, embot::core::reltimeWaitForever);
+                embot::app::eth::theICCservice::ItemCANframe icf {impl->ICClocation, impl->_tCOMMoutmessages[i].frame};
+                //embot::app::eth::theICCservice::Item item { impl->ICClocation, impl->_tCOMMoutmessages[i].frame };
+                bool r = embot::app::eth::theICCservice::getInstance().put(icf.item(), embot::core::reltimeWaitForever);
                 // if r is false then  we have a failure. but timeout is infinite 
             }       
         }

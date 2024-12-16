@@ -1174,9 +1174,11 @@ void sendicc()
     uint32_t ID = 0x101; // i want the sender to have 0 address .........
     embot::prot::can::Frame frame1 {ID, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
     embot::app::msg::Location loc1 {embot::app::msg::Location::BUS::icc1, 3};
-    embot::prot::can::Frame frame2 {ID, 8, {n, 2, 2, 2, 2, 2, 2, 2}};    
-    embot::app::eth::theICCservice::getInstance().put({loc1, frame1});
-    embot::app::eth::theICCservice::getInstance().put({loc1, frame2});
+    embot::prot::can::Frame frame2 {ID, 8, {n, 2, 2, 2, 2, 2, 2, 2}}; 
+    embot::app::eth::theICCservice::ItemCANframe i1 {loc1, frame1}};    
+    embot::app::eth::theICCservice::getInstance().put(i1);
+    embot::app::eth::theICCservice::ItemCANframe i2 {loc1, frame2}};
+    embot::app::eth::theICCservice::getInstance().put(i2);
     
     embot::core::print(embot::core::TimeFormatter(now).to_string() + ": thread tCFG will transmit some messages via ICC to the amc2c application");
 
