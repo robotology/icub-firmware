@@ -36,9 +36,9 @@ struct embot::app::board::amcfoc::cm7::theCANagentCORE::Impl
 {  
     
 #if defined(USE_ICC_COMM)
-    static constexpr embot::prot::can::Board theboard {embot::prot::can::Board::amc2c};
+    static constexpr embot::prot::can::Board theboard {embot::prot::can::Board::amcfoc2c};
 #else
-    static constexpr embot::prot::can::Board theboard {embot::prot::can::Board::amcbldc};
+    static constexpr embot::prot::can::Board theboard {embot::prot::can::Board::amcfoc2c};
 #endif    
         
     Config _config {};
@@ -51,7 +51,7 @@ struct embot::app::board::amcfoc::cm7::theCANagentCORE::Impl
         std::uint8_t        boardtype { embot::core::tointegral(theboard) };
         std::uint8_t        bootloaderVmajor {0};
         std::uint8_t        bootloaderVminor {0};
-        std::uint8_t        info32[32] {"i am a amc1cm7"};
+        std::uint8_t        info32[32] {"amcfoc1cm7"};
         std::uint8_t        applicationVmajor {0};
         std::uint8_t        applicationVminor {0};
         std::uint8_t        applicationVbuild {0};
