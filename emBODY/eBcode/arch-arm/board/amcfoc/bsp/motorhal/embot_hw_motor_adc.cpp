@@ -389,6 +389,8 @@ namespace embot::hw::motor::adc::bsp {
     
     constexpr uint32_t pwm50perc = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2; // originally 512
     
+    #warning TODO: change it and document why
+    
     int32_t sampletomilliampere(int16_t s)
     {
         int32_t v = s*5000;
@@ -435,7 +437,7 @@ namespace embot::hw::motor::adc::bsp {
 //        AinMot2Current[1] = AinAdc1Lsb * (float)AinAdc1Buffer[1];
 //        AinMot2Current[2] = AinAdc1Lsb * (float)AinAdc1Buffer[2];
         //on_acquisition_of_currents(1, AinMot2Current[0], AinMot2Current[1], AinMot2Current[2]);        
-        int32_t u = generator(); //sampletomilliampere(AinAdc1Buffer[0]);
+        int32_t u = sampletomilliampere(AinAdc1Buffer[0]);
         int32_t v = sampletomilliampere(AinAdc1Buffer[1]);
         int32_t w = sampletomilliampere(AinAdc1Buffer[2]);
         embot::hw::motor::bldc::Currents cc {0.001f * u, 0.001f * v, 0.001f * w};
@@ -461,7 +463,7 @@ namespace embot::hw::motor::adc::bsp {
 //        AinMot2Current[2] = AinAdc1Lsb * (float)AinAdc1Buffer[2];
         //on_acquisition_of_currents(1, AinMot2Current[0], AinMot2Current[1], AinMot2Current[2]);
         
-        int32_t u = generator(); // sampletomilliampere(AinAdc1Buffer[0]);
+        int32_t u = sampletomilliampere(AinAdc1Buffer[0]);
         int32_t v = sampletomilliampere(AinAdc1Buffer[1]);
         int32_t w = sampletomilliampere(AinAdc1Buffer[2]);
         embot::hw::motor::bldc::Currents cc {0.001f * u, 0.001f * v, 0.001f * w};
