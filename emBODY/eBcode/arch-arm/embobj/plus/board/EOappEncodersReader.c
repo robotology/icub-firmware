@@ -736,33 +736,35 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                         
                         s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_hal_counter[jomo] = 0;
                     }
-                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] > 0)
+                    else
                     {
-                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
-                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo];
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-                        
-                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] = 0;
+                        if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] > 0)
+                        {
+                            errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
+                            errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo];
+                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                                                    
+                            s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] = 0;
+                        }
+                        if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] > 0)
+                        {
+                            errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_close_to_limits);
+                            errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo];
+                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                                                    
+                            s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] = 0;
+                        }
+                        if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] > 0)
+                        {
+                            errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
+                            errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo];
+                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                                                    
+                            s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] = 0;
+                        }
+                     }
+                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_total_timer_counter[jomo] = 0;
                     }
-                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] > 0)
-                    {
-                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_close_to_limits);
-                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo];
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-                        
-                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] = 0;
-                    }
-                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] > 0)
-                    {
-                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
-                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo];
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-                        
-                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] = 0;
-                    }
-                    
-                    s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_total_timer_counter[jomo] = 0;
-                }
             
                 #if defined(DEBUG_encoder_AKSIM)
                 sev->off();
@@ -780,8 +782,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 static int32_t cnt = 0;                 
                 rawValue = cnt++;
                 prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(rawValue, jomo, (eOmc_position_t)prop.descriptor->pos); 
-#else            
-                hal_spiencoder_position_t aux_rawvalue = 0;                
+#else                  
                 // if(hal_res_OK == hal_spiencoder_get_value((hal_spiencoder_t)prop.descriptor->port, &spiRawValue, &flags))
                 if(hal_res_OK == hal_spiencoder_get_value2((hal_spiencoder_t)prop.descriptor->port, (hal_spiencoder_position_t*)&rawValue, &diagn))
                 {   // the spi raw reading is ok. i just need to rescale it.                   
@@ -793,17 +794,16 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     
                     int16_t sectors = (int16_t)(joint->config.gearbox_E2J + 0.5f);
                     
-                    aux_rawvalue = rawValue;
                     if (sectors == 32)
                     {
-                        aux_rawvalue = (aux_rawvalue >> 1) & 0x3FFF;
+                        rawValue = (rawValue >> 1) & 0x3FFF;
                     }
                     else if (sectors == 64)
                     {
-                        aux_rawvalue = aux_rawvalue & 0x3FFF;
+                        rawValue = rawValue & 0x3FFF;
                     }
                     
-                    prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(aux_rawvalue, jomo, (eOmc_position_t)prop.descriptor->pos);
+                    prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(rawValue, jomo, (eOmc_position_t)prop.descriptor->pos);
                 }
                 else
                 {   // we dont even have a valid reading from hal .....                    
@@ -819,7 +819,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 rawdiagn = ((uint32_t)diagn.type << 16) | (diagn.info.value & 0xFF);
                 
                 // and calls the following for amodiag                
-                s_eo_appEncReader_amodiag_Update(jomo, aux_rawvalue, &prop, &diagn);
+                s_eo_appEncReader_amodiag_Update(jomo, rawValue, &prop, &diagn);
                
             } break;
 
@@ -1734,7 +1734,6 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     uint64_t aux = (uint64_t)val_raw* 65535;
     
     retval = aux /divider;
-    
     return(retval);
 
 }
