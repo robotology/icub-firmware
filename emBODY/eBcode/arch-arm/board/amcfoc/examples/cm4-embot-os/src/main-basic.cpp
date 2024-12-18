@@ -13,7 +13,11 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_led.h"
 #include "embot_hw_sys.h"
-
+#include "embot_hw_encoder.h"
+#include "embot_hw_encoder_bsp.h"
+#include "embot_hw_timer.h"
+#include "embot_hw_eth.h"
+#include "embot_hw_eeprom.h"
 
 #include "embot_os_theScheduler.h"
 #include "embot_os_theTimerManager.h"
@@ -25,6 +29,9 @@
 #include <vector>
 
 #include "embot_hw_bsp_amcfoc_2cm4.h"
+
+
+
 
 embot::app::scope::Signal *signal {nullptr};
 
@@ -54,6 +61,28 @@ void test_eth_tick();
 #define TEST_EMBOT_HW_TIMER
 #define TEST_EMBOT_HW_TIMER_ONESHOT
 void test_timer();
+
+
+//#define TEST_EMBOT_HW_ENCODER
+#define TEST_EMBOT_HW_CHIP_MA730
+#if defined(TEST_EMBOT_HW_ENCODER)
+    #include "embot_hw_encoder.h"
+#endif
+#if defined(TEST_EMBOT_HW_CHIP_M95512DF)
+    #include "embot_hw_chip_M95512DF.h"
+#endif
+#if defined(TEST_EMBOT_HW_CHIP_AS5045)
+    #include "embot_hw_chip_AS5045.h"
+#endif
+#if defined(TEST_EMBOT_HW_CHIP_MB049)
+    #include "embot_hw_chip_MB049.h"
+#endif
+#if defined(TEST_EMBOT_HW_CHIP_MA730)
+    #include "embot_hw_chip_MA730.h"
+#endif
+
+void test_encoder();
+
 
 
 
@@ -93,6 +122,13 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
 #if defined(TEST_EMBOT_HW_TIMER) ||  defined(TEST_EMBOT_HW_TIMER_ONESHOT)  
     test_timer();
 #endif    
+    
+    
+#if defined(TEST_EMBOT_HW_ENCODER)  ||  defined(TEST_EMBOT_HW_CHIP_MA730)  
+    test_encoder();
+#endif
+    
+    
     
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
@@ -308,10 +344,18 @@ int main(void)
 
 // - other code
 
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//EEPROM
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#if defined(TEST_EEPROM)    
+
 volatile uint8_t stophere = 0;
 constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
 
-#include "embot_hw_eeprom.h"
 
 void test_eeprom_init()
 {
@@ -362,7 +406,7 @@ void test_eeprom_tick()
     stophere++;    
     
 }
-
+#endif
 
 #include "embot_hw_can.h"
 
@@ -541,20 +585,20 @@ void test_can_tick(embot::os::Thread *t, embot::os::EventMask eventmask, void *p
 }
 
 
-#include "embot_hw_eth.h"
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//ETH
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+#if defined(TEST_ETH)  
 void test_eth_init()
 {
-#if defined(TEST_ETH)       
     ipal_hal_eth_cfg_t c {};
-    embot::hw::eth::init(&c);
-#endif        
+    embot::hw::eth::init(&c);       
 }
 
 void test_eth_tick()
 {
-#if defined(TEST_ETH)       
+       
     static bool prevlink1isup = false;    
     static bool prevlink2isup = false;
     
@@ -572,27 +616,16 @@ void test_eth_tick()
         embot::core::print(msg + " @ " + embot::core::TimeFormatter(embot::core::now()).to_string()); 
     }    
     
-    
     prevlink1isup = link1isup;
     prevlink2isup = link2isup;  
-#endif    
 }
-
-
-
-
-
-
-
+#endif
 
 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //TIMER
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-#include "embot_hw_timer.h"
 
 #if defined(TEST_EMBOT_HW_TIMER_ONESHOT)
 static std::uint8_t on = 0;
@@ -628,9 +661,6 @@ void tTIMTEST(void *p)
     embot::os::Thread* t = reinterpret_cast<embot::os::Thread*>(p);
     t->run();
 }
-#endif
-
-#if defined(TEST_EMBOT_HW_TIMER_ONESHOT)
 
 constexpr embot::hw::TIMER timeroneshot2test {embot::hw::TIMER::one};
 constexpr embot::core::relTime timeoneshot {1400*embot::core::time1microsec};
@@ -776,10 +806,69 @@ void test_timer()
 
 
 
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//ENCODER
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+#if defined(TEST_EMBOT_HW_ENCODER) ||  defined(TEST_EMBOT_HW_CHIP_MA730)  
 
+void test_encoder()
+{
+#if defined(TEST_EMBOT_HW_ENCODER)
+    embot::hw::encoder::Config cfgONE   { .type = embot::hw::encoder::Type::chipAS5045 };
+    embot::hw::encoder::Config cfgTWO   { .type = embot::hw::encoder::Type::chipAS5045 };
+    
+    embot::hw::ENCODER encoder_ONE = embot::hw::ENCODER::one;
+    embot::hw::ENCODER encoder_TWO = embot::hw::ENCODER::two;
+    
+    uint16_t posONE, posTWO = 0;
+    
+    // init the encoder(s)
+    if( embot::hw::resOK == embot::hw::encoder::init(encoder_ONE, cfgONE) &&
+        embot::hw::resOK == embot::hw::encoder::init(encoder_TWO, cfgTWO) )
+    {
+        for(;;)
+        {
+            sigEVenc->on();
+            sigEVenc->off();
+            
+            // start the encoder reading
+            embot::hw::encoder::startRead(encoder_ONE);
+            embot::hw::encoder::startRead(encoder_TWO);
+            
+            for(;;)
+            {
+                // try to get the value read when the data is ready
+                if(embot::hw::resOK == embot::hw::encoder::getValue(encoder_ONE, posONE) &&
+                   embot::hw::resOK == embot::hw::encoder::getValue(encoder_TWO, posTWO))
+                {
+                    //embot::core::print(std::to_string(posONE) + " | " + 
+                    //                   std::to_string(posTWO) + " | " +
+                    //                   std::to_string(posTHREE));
+                    sigEVenc->on();
+                    sigEVenc->off();
+                    break;
+                }
+            }
+            embot::core::wait(600); // "simulate" DO + TX phase
+        }
+    }
 
+#elif defined(TEST_EMBOT_HW_CHIP_AS5045)
 
+    embot::hw::chip::testof_AS5045();
+
+#elif defined(TEST_EMBOT_HW_CHIP_MB049)
+
+    embot::hw::chip::testof_MB049();
+#elif defined(TEST_EMBOT_HW_CHIP_MA730)
+
+    embot::hw::chip::testof_MA730();
+
+#endif
+
+}
+#endif
 
 
 

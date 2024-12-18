@@ -79,7 +79,7 @@ namespace embot::hw::encoder {
 //        
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(ENCODER::one) | mask::pos2mask<uint32_t>(ENCODER::two) | mask::pos2mask<uint32_t>(ENCODER::three),
+        mask::pos2mask<uint32_t>(ENCODER::one) | mask::pos2mask<uint32_t>(ENCODER::two), // | mask::pos2mask<uint32_t>(ENCODER::three),
         // properties
         {{ &e1p, &e2p, nullptr }}
     };
