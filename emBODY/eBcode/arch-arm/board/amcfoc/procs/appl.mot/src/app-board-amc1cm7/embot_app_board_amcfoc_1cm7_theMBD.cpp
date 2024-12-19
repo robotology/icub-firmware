@@ -886,7 +886,7 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     }
 
     
-    float vcc = 24.0f;
+    float vcc = 48.0f;
     
     embot::app::bldc::theMC2agent::getInstance().tick(caninputframes, {EXTFAULTisPRESSED, vcc}, canoutputframes);
     

@@ -59,6 +59,11 @@ struct embot::app::eth::theICCservice::Impl
     bool get(Item &item, size_t &remaining); 
     bool parse();        
 
+    bool ask(uint8_t id, uint8_t size, void *reply, embot::core::relTime timeout);
+    bool say(uint8_t id, uint8_t size, void *value);
+    bool set(uint8_t id, uint8_t size, void *value, embot::core::relTime timeout);
+    bool ack(uint8_t id);
+        
 private:    
     
     // we exchange this data structure
@@ -72,7 +77,7 @@ private:
             //std::memset(items.data(), 0, items.size()*sizeof(Item));
         }            
     };
-    static_assert(964 == sizeof(lrtData), "lrtData is not 964");
+    static_assert(sizeof(lrtData) <= 1024, "lrtData is more than 1024");
     
     struct iccInfo
     {        
@@ -493,6 +498,27 @@ bool embot::app::eth::theICCservice::Impl::parse()
 }
 
 
+bool embot::app::eth::theICCservice::Impl::ask(uint8_t id, uint8_t size, void *reply, embot::core::relTime timeout)
+{
+    return true;
+}
+
+bool embot::app::eth::theICCservice::Impl::say(uint8_t id, uint8_t size, void *value)
+{
+    return true;    
+}
+
+bool embot::app::eth::theICCservice::Impl::set(uint8_t id, uint8_t size, void *value, embot::core::relTime timeout)
+{
+    return true;
+}
+
+bool embot::app::eth::theICCservice::Impl::ack(uint8_t id)
+{
+    return true;    
+}
+
+
 
 // private members
 
@@ -697,6 +723,26 @@ bool embot::app::eth::theICCservice::get(Item &item, size_t &remaining)
 bool embot::app::eth::theICCservice::parse()
 {
     return pImpl->parse();
+}
+
+bool embot::app::eth::theICCservice::ask(uint8_t id, uint8_t size, void *reply, embot::core::relTime timeout)
+{
+    return pImpl->ask(id, size, reply, timeout);
+}
+
+bool embot::app::eth::theICCservice::say(uint8_t id, uint8_t size, void *value)
+{
+    return pImpl->say(id, size, value);
+}
+
+bool embot::app::eth::theICCservice::set(uint8_t id, uint8_t size, void *value, embot::core::relTime timeout)
+{
+    return pImpl->set(id, size, value, timeout);
+}
+
+bool embot::app::eth::theICCservice::ack(uint8_t id)
+{
+    return pImpl->ack(id);
 }
 
 

@@ -27,26 +27,27 @@
 // - the configurable constants
 // --------------------------------------------------------------------------------------------------------------------
     
-// for now we keep the dual situation only ICC or only CAN, but maybe later on we can have both
-// we used macro USE_ICC_COMM to config the former or the latter
+// we use macro USE_ICC_COMM + USE_ICC_CAN_COMM to config the both icc and can
+// 
 namespace embot::app::board::amcfoc::cm7::info { 
     
+    constexpr embot::app::msg::BUS bus {embot::app::msg::BUS::can2};
     constexpr uint8_t address {1}; 
     
 #if defined(USE_ICC_COMM)
     static constexpr embot::app::icc::Signature signature __attribute__((section(".ARM.__at_0x08000800"))) =
     {
-        embot::app::boards::Board::amc2c,
+        embot::app::boards::Board::amcfoc2c,
         {embot::app::msg::BUS::icc1, address},
-        {3, 0, 4, 0},   // application version
+        {1, 0, 0, 0},   // application version
         {2, 0},         // protocol version
-        {2024, embot::app::eth::Month::Sep, embot::app::eth::Day::six, 17, 17}
+        {2024, embot::app::eth::Month::Dec, embot::app::eth::Day::twelve, 10, 31}
     };
     
     constexpr embot::app::msg::Location icclocation {signature.location};
     
 #if defined(USE_ICC_CAN_COMM)
-    constexpr embot::app::msg::Location canlocation {embot::app::msg::BUS::can2, address};
+    constexpr embot::app::msg::Location canlocation {bus, address};
 #else
     constexpr embot::app::msg::Location canlocation {embot::app::msg::BUS::none, 0};
 #endif
@@ -54,11 +55,11 @@ namespace embot::app::board::amcfoc::cm7::info {
 #else
     static constexpr embot::app::icc::Signature signature __attribute__((section(".ARM.__at_0x08000800"))) =
     {
-        embot::app::boards::Board::amcbldc,
+        embot::app::boards::Board::amcfoc2c,
         {embot::app::msg::BUS::can2, address},
-        {2, 0, 10, 0},  // application version
+        {1, 0, 1, 0},  // application version
         {2, 0},         // protocol version
-        {2024, embot::app::eth::Month::Sep, embot::app::eth::Day::six, 17, 17}
+        {2024, embot::app::eth::Month::Dec, embot::app::eth::Day::twelve, 10, 33}
     };
     
     constexpr embot::app::msg::Location canlocation {signature.location};
@@ -76,15 +77,14 @@ namespace embot::app::board::amcfoc::cm7::info {
  
 #if defined(USE_ICC_COMM)     
                  // 0123456789abcde0123456789abcde
-    #define INFO32 "i am an amcfoc @ ICC1:3/CAN2:3"
+    #define INFO32 "amcfoc2c @ ICC1:1-2/CAN2:1-2"
 #else
                  // 0123456789abcde0123456789abcde
-    #define INFO32 "i am an amcfoc @ CAN2:3"
+    #define INFO32 "amcfoc2c @ CAN2:1-2"
 #endif    
 
     constexpr const char *info32  
     { // 0123456789abcde0123456789abcde
-      //"hi, i am an amc1cm7 CAN2:3"
         INFO32
     };
     

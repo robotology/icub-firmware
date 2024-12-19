@@ -389,9 +389,30 @@ namespace embot::hw::motor::adc::bsp {
     
     constexpr uint32_t pwm50perc = embot::hw::motor::bldc::bsp::amcfoc::cm7::PWMvals.valueofTIMperiod()/2; // originally 512
     
+//    #warning TODO: change it and document why
+
+#if 0
+    the currents are in range [-25, +25] A
+    they are scaled by the currenet sensor to [-10, +10] V and then by a partitor to [0, 2.5] V
+    then the ADC samples the [0, 2.5] with 12 bits resolution.
+    the ADC is connfigured to give a signed int16_t which returns 0 if V = 1.25, +2047 if V = 2.5 and -2048 is V = 0
+    but what matters is that the whole current range of 50000 mA is mapped into 12 bits (aka 4096)
+    so that each tick value of the adc represents 50000/4096 = 12.20703125 mA
+    the correct conversion is
+    ``` C++
+        `int32_t sampletomilliampere(int16_t s) { return static_cast<int32_t>(12.20703125*static_cast<float>(s)); }
+    ```    
+    but we instead use integer operations so:
+    - we multiply first by (50000/4) = 12500
+    - we divide by 1024 by a right shift of 10 positions
+    - since i am paranoid i also check the sign so that i always shift positive numbers 
+      NOTE: C / C++ maintains the sign when shifting negative numbers but ..... i am paranoid   
+
+#endif
+    
     int32_t sampletomilliampere(int16_t s)
     {
-        int32_t v = s*5000;
+        int32_t v = static_cast<int32_t>(s)*12500;
         bool neg = (v < 0);
         if(true == neg)
         {
@@ -403,21 +424,21 @@ namespace embot::hw::motor::adc::bsp {
         return (true == neg) ? -v : +v;
     }
     
-    #warning REMOVE generator()
-    int16_t generator()
-    {
-        static int16_t v {0};
+//    #warning REMOVE generator()
+//    int16_t generator()
+//    {
+//        static int16_t v {0};
 
-        
-        v++;
-        
-        if(v>1023)
-        {
-            v = 0;
-        }
-        
-        return v;        
-    }
+//        
+//        v++;
+//        
+//        if(v>1023)
+//        {
+//            v = 0;
+//        }
+//        
+//        return v;        
+//    }
     
     /*******************************************************************************************************************//**
      * @brief   Callback function called by the DMA handler when the 1st half of the analog buffer has been loaded
@@ -435,7 +456,7 @@ namespace embot::hw::motor::adc::bsp {
 //        AinMot2Current[1] = AinAdc1Lsb * (float)AinAdc1Buffer[1];
 //        AinMot2Current[2] = AinAdc1Lsb * (float)AinAdc1Buffer[2];
         //on_acquisition_of_currents(1, AinMot2Current[0], AinMot2Current[1], AinMot2Current[2]);        
-        int32_t u = generator(); //sampletomilliampere(AinAdc1Buffer[0]);
+        int32_t u = sampletomilliampere(AinAdc1Buffer[0]);
         int32_t v = sampletomilliampere(AinAdc1Buffer[1]);
         int32_t w = sampletomilliampere(AinAdc1Buffer[2]);
         embot::hw::motor::bldc::Currents cc {0.001f * u, 0.001f * v, 0.001f * w};
@@ -461,7 +482,7 @@ namespace embot::hw::motor::adc::bsp {
 //        AinMot2Current[2] = AinAdc1Lsb * (float)AinAdc1Buffer[2];
         //on_acquisition_of_currents(1, AinMot2Current[0], AinMot2Current[1], AinMot2Current[2]);
         
-        int32_t u = generator(); // sampletomilliampere(AinAdc1Buffer[0]);
+        int32_t u = sampletomilliampere(AinAdc1Buffer[0]);
         int32_t v = sampletomilliampere(AinAdc1Buffer[1]);
         int32_t w = sampletomilliampere(AinAdc1Buffer[2]);
         embot::hw::motor::bldc::Currents cc {0.001f * u, 0.001f * v, 0.001f * w};

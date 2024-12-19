@@ -79,7 +79,7 @@ namespace embot::prot::can {
 
     
     enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, 
-                       pmc = 17, amcbldc = 18, bms = 19, mtb4c = 20, amc2c = 21, strain2c = 22, bat = 23,
+                       pmc = 17, amcbldc = 18, bms = 19, mtb4c = 20, amc2c = 21, strain2c = 22, bat = 23, amcfoc2c = 24,
                        none = 254, unknown = 0xff };
     
     enum class Process { bootloader = 0, application = 1, unknown = 0xff };

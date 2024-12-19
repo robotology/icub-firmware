@@ -33,14 +33,26 @@ inline void rtw_mutex_lock(void)
     if(false == IsException())
     {
     #ifdef STM32HAL_BOARD_AMCBLDC
+        // e' corretto DMA1_Channel2_IRQn perche':
+        // DMA1_Channel2_IRQHandler() chiama HAL_DMA_IRQHandler(&hdma_adc2);
+        // e hdma_adc2 e' associato a adc2 che gestisce acquisizioni delle correnti del motore        
         NVIC_DisableIRQ(DMA1_Channel2_IRQn);
     #endif    
     #ifdef STM32HAL_BOARD_AMC2C
-        NVIC_DisableIRQ(BDMA_Channel2_IRQn);
+        // dovrebbe essere DMA2_Stream0_IRQn
+        // perche' si usa il DMA2_Stream0_IRQHandler() che chiama HAL_DMA_IRQHandler(&embot::hw::motor::bsp::amc2c::hdma_adc1); 
+        // e hdma_adc1 e' associato a hADC1 (alias hadc1) che acquisisce le correnti del motore
+        NVIC_DisableIRQ(DMA2_Stream0_IRQn);
+        //NVIC_DisableIRQ(BDMA_Channel2_IRQn);
     #endif
     #ifdef STM32HAL_BOARD_AMCFOC_1CM7
-        #warning TO BE DEFINED
-        //NVIC_DisableIRQ(BDMA_Channel2_IRQn);
+        // blocca la DMA2_Stream0_IRQHandler() che chiama HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc1);
+        // dove hdma_adc1 e' associato a hadc1 che acquisisce correnti per il motore 2
+        NVIC_DisableIRQ(DMA2_Stream0_IRQn); // motor 2. 
+        
+        // blocca la DMA2_Stream1_IRQHandler() che chiama  HAL_DMA_IRQHandler(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hdma_adc2);
+        // dove hdma_adc2 e' associato a hadc2 che acquisisce correnti per il motore 1
+        NVIC_DisableIRQ(DMA2_Stream1_IRQn); // motor 1
     #endif        
         
     }  
@@ -54,11 +66,12 @@ inline void rtw_mutex_unlock(void)
         NVIC_EnableIRQ(DMA1_Channel2_IRQn);
     #endif
     #ifdef STM32HAL_BOARD_AMC2C
-        NVIC_EnableIRQ(BDMA_Channel2_IRQn);
+        NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+        // NVIC_EnableIRQ(BDMA_Channel2_IRQn);
     #endif        
     #ifdef STM32HAL_BOARD_AMCFOC_1CM7
-        #warning TO BE DEFINED
-        //NVIC_EnableIRQ(BDMA_Channel2_IRQn);
+        NVIC_EnableIRQ(DMA2_Stream0_IRQn); // motor 2
+        NVIC_EnableIRQ(DMA2_Stream1_IRQn); // motor 1
     #endif         
     }
 }

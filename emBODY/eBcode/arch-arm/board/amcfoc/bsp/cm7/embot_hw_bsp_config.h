@@ -11,7 +11,7 @@
 #define __EMBOT_HW_BSP_CONFIG_H_
 
   
-#if   defined(STM32HAL_BOARD_AMCFOC_1CM7)
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7)
 
     #include "embot_hw_bsp_amcfoc_1cm7_config.h"    
     
