@@ -148,7 +148,56 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>868</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>135781046</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\amcfocapp\../../../../../embot/app/eth/embot_app_eth_theICCservice.cpp\868</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>895</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>135781060</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\amcfocapp\../../../../../embot/app/eth/embot_app_eth_theICCservice.cpp\895</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>283</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>135782528</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\amcfocapp\../../../../../embot/app/eth/embot_app_eth_theICCservice.cpp\283</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -180,7 +229,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -197,7 +246,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>1</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -364,7 +413,7 @@
 
   <Group>
     <GroupName>embot::app::eth::config</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2792,7 +2841,7 @@
 
   <Group>
     <GroupName>embot::app::eth::theICCservice</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
