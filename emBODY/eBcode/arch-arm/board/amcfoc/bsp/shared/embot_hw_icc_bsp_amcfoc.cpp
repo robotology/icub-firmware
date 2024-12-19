@@ -194,10 +194,10 @@ namespace embot::hw::icc::ltr::bsp {
     
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LTR::one) | mask::pos2mask<uint32_t>(LTR::two),        
+        mask::pos2mask<uint32_t>(LTR::one) | mask::pos2mask<uint32_t>(LTR::two) | mask::pos2mask<uint32_t>(LTR::three) | mask::pos2mask<uint32_t>(LTR::four),        
         // properties
         {{
-            &ltr01, &ltr02
+            &ltr01, &ltr02, &ltr03, &ltr04
         }}        
     };
     
