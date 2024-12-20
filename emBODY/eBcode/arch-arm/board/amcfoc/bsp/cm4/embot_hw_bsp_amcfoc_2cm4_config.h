@@ -31,9 +31,14 @@
     #define EMBOT_ENABLE_hw_eeprom
     
 //    #define EMBOT_ENABLE_hw_encoder
-//    #define EMBOT_ENABLE_hw_can
-//    #define EMBOT_ENABLE_hw_eth
+
+    #define EMBOT_ENABLE_hw_eth
     #define EMBOT_ENABLE_hw_timer
+    
+    #define EMBOT_ENABLE_hw_can
+    #if defined(EMBOT_ENABLE_hw_can)
+        #define EMBOT_ENABLE_hw_can_one
+    #endif    
     
 //    #define EMBOT_ENABLE_hw_testpoint
 //    #define EMBOT_ENABLE_hw_button
@@ -41,10 +46,10 @@
 //    #define EMBOT_ENABLE_hw_motor
 //    #define EMBOT_ENABLE_hw_flash
 //    
-//    #define EMBOT_ENABLE_hw_mtx
-//    #define EMBOT_ENABLE_hw_icc_sig
-//    #define EMBOT_ENABLE_hw_icc_mem
-//    #define EMBOT_ENABLE_hw_icc_ltr
+    #define EMBOT_ENABLE_hw_mtx
+    #define EMBOT_ENABLE_hw_icc_sig
+    #define EMBOT_ENABLE_hw_icc_mem
+    #define EMBOT_ENABLE_hw_icc_ltr
 //    #define EMBOT_ENABLE_hw_icc_printer
 
 #else

@@ -80,7 +80,14 @@ namespace embot::hw::can {
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(CAN::one) | mask::pos2mask<uint32_t>(CAN::two),        
+        0 |
+#if defined(EMBOT_ENABLE_hw_can_one)
+        mask::pos2mask<uint32_t>(CAN::one) | 
+#endif  
+#if defined(EMBOT_ENABLE_hw_can_two)   
+        mask::pos2mask<uint32_t>(CAN::two) |
+#endif        
+        0,        
         // properties
         {{
             &can1p,
