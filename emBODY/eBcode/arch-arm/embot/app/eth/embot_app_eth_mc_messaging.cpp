@@ -418,9 +418,8 @@ namespace embot::app::eth::mc::messaging::sender {
 //        #warning TODO: solve the use of theICCservice by ems etc
 #if defined(USE_ICC_COMM)
 #if defined(debugNOicc)
-#else     
-        embot::app::eth::theICCservice::ItemCANframe icf {des, frame};         
-        embot::app::eth::theICCservice::getInstance().put(icf.item());        
+#else        
+        embot::app::eth::theICCservice::getInstance().put({des, frame});
 #endif        
 #endif        
         return true;

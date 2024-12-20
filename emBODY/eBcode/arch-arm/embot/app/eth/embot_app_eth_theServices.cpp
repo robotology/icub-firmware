@@ -859,15 +859,9 @@ void embot::app::eth::theServices::Impl::onendverifyactivate2(Service *s, bool o
 
 #if defined(USE_ICC_COMM) 
 bool embot::app::eth::theServices::Impl::iccitemparser(const embot::app::eth::theICCservice::Item &item)
-{
-    bool r {false};
-    if(embot::app::eth::theICCservice::ItemType::CANframe == item.type)
-    {
-        // if a can frame we just ask to the MC service
-        embot::app::eth::theICCservice::ItemCANframe icf {item};
-        r = embot::app::eth::theServiceMC::getInstance().process({icf.des.getbus(), icf.frame});        
-    }
-    return r;
+{   
+    // now we just ask to the MC service
+    return embot::app::eth::theServiceMC::getInstance().process({item.des.getbus(), item.frame});
     // and we do not call that anymore....
 //    return embot::app::eth::mc::messaging::receiver::parse(item.des.bus, item.frame);
 }
