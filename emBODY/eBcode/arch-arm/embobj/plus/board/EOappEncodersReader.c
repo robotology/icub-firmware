@@ -736,29 +736,31 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                         
                         s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_hal_counter[jomo] = 0;
                     }
-                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] > 0)
+                    else
                     {
-                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
-                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo];
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-                        
-                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] = 0;
-                    }
-                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] > 0)
-                    {
-                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_close_to_limits);
-                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo];
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-                        
-                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] = 0;
-                    }
-                    if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] > 0)
-                    {
-                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
-                        errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo];
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
-                        
-                        s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] = 0;
+                        if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] > 0)
+                        {
+                            errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_invalid_value);
+                            errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo];
+                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                            
+                            s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo] = 0;
+                        }
+                        if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] > 0)
+                        {
+                            errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_close_to_limits);
+                            errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo];
+                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                            
+                            s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo] = 0;
+                        }
+                        if(s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] > 0)
+                        {
+                            errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_encoder_crc);
+                            errdes.par64      |= s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo];
+                            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                        }    
+                            s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo] = 0;
                     }
                     
                     s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_total_timer_counter[jomo] = 0;
