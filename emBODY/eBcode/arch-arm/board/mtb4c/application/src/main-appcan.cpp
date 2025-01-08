@@ -18,7 +18,7 @@ constexpr embot::app::theCANboardInfo::applicationInfo applInfo
     embot::prot::can::versionOfAPPLICATION {22, 0, 0},    
     embot::prot::can::versionOfCANPROTOCOL {20, 0} 
 #else   
-    embot::prot::can::versionOfAPPLICATION {2, 3, 0},    
+    embot::prot::can::versionOfAPPLICATION {2, 4, 0},    
     embot::prot::can::versionOfCANPROTOCOL {2, 0} 
 #endif    
 };
