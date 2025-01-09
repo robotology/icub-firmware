@@ -43,9 +43,11 @@ constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::
 constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 
-#define TEST_EEPROM
+//#define TEST_EEPROM
+#define ERASE_EEPROM
 void test_eeprom_init();
 void test_eeprom_tick();
+
 
 #undef TEST_CAN
 void test_can_init(embot::os::Thread *t, void *param);
@@ -60,13 +62,13 @@ void test_eth_init();
 void test_eth_tick();
 
 
-#define TEST_EMBOT_HW_TIMER
-#define TEST_EMBOT_HW_TIMER_ONESHOT
+//#define TEST_EMBOT_HW_TIMER
+//#define TEST_EMBOT_HW_TIMER_ONESHOT
 void test_timer();
 
 
 //#define TEST_EMBOT_HW_ENCODER
-#define TEST_EMBOT_HW_CHIP_MA730
+//#define TEST_EMBOT_HW_CHIP_MA730
 #if defined(TEST_EMBOT_HW_ENCODER)
     #include "embot_hw_encoder.h"
 #endif
@@ -105,7 +107,7 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     signal = new embot::app::scope::SignalEViewer(cc);    
     
 	
-#if defined(TEST_EEPROM)    
+#if defined(TEST_EEPROM)  ||  defined(ERASE_EEPROM)    
     test_eeprom_init();
 #endif
 
@@ -353,7 +355,7 @@ int main(void)
 //EEPROM
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#if defined(TEST_EEPROM)    
+#if defined(TEST_EEPROM)  ||  defined(ERASE_EEPROM)  
 
 volatile uint8_t stophere = 0;
 constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
@@ -362,7 +364,7 @@ constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
 void test_eeprom_init()
 {
     embot::hw::eeprom::init(eeprom2test, {});
-    //embot::hw::eeprom::erase(eeprom2test, 0, 8*1024, 100000);
+    embot::hw::eeprom::erase(eeprom2test, 0, 8*1024, 100000);
 }
 
 constexpr size_t capacity {2048};
