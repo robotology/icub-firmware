@@ -158,7 +158,7 @@ namespace embot::app::board::amcfoc::cm7::info {
 #define RAMADDR 0x10000000
 #define RAMSIZE 0x00048000
 
-constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended = // __attribute__((section(EENV_MODULEINFO_LOADER_AT))) =
+constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended  __attribute__((section(EENV_MODULEINFO_LOADER_AT))) =
 {
     .moduleinfo     =
     {

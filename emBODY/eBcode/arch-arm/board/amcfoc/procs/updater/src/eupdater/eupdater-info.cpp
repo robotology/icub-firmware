@@ -117,7 +117,7 @@ constexpr eEmoduleExtendedInfo_t eupdater_modinfo_extended  __attribute__((secti
                 .addr   = 0
             },
             .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-            .name           = "amc eUpdater"
+            .name           = "amc eUpdatr"
         },
         .protocols  =
         {
