@@ -104,8 +104,8 @@ int ADCCalibrateOffset(void)
     long ADCVdcZero = 0;
   
     // Put an 'accettable' value in case of error in the calibration process
-    MeasCurrParm.Offseta = 0x200;
-    MeasCurrParm.Offsetc = 0x200;
+    MeasCurrParm.Offseta = 0;
+    MeasCurrParm.Offsetc = 0;
 
     // Turn on ADC module
     AD1CON1bits.ADON = 1;
