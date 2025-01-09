@@ -525,8 +525,6 @@ int alignRotor(volatile int* IqRef)
 
 // DMA0 IRQ Service Routine used for FOC loop
 
-volatile int Iafbk = 0;
-volatile int Icfbk = 0;
 volatile int ElDegfbk = 0;
 volatile int CurLimfbk = 0;
 volatile int VqFbk = 0;
@@ -558,30 +556,21 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetc
     // scale currents by MeasCurrParm.qKa, qKc
     
-    short Ia_raw = (int)(__builtin_mulss(MeasCurrParm.Offseta-ADCBuffer[0],MeasCurrParm.qKa)>>14); // TEST 
-    short Ic_raw = (int)(__builtin_mulss(MeasCurrParm.Offsetc-ADCBuffer[1],MeasCurrParm.qKc)>>14); // TEST
+    //ParkParm.qIa = (int)(__builtin_mulss(MeasCurrParm.Offseta-ADCBuffer[0],MeasCurrParm.qKa)>>14); // TEST 
+    //ParkParm.qIc = (int)(__builtin_mulss(MeasCurrParm.Offsetc-ADCBuffer[1],MeasCurrParm.qKc)>>14); // TEST
     
     // Ix_raw = 64 is equal to 49.03 mA current here
     // since we have 10 bits resolution, left aligned, with LSB = 49.03 mA
     
     // gain = 64/49.03
     
-    static short Ia_raw_old = 0, Ic_raw_old = 0;
-    
     // here we have a first stage filtering
     // each sample is mediated with the previous one
-    ParkParm.qIa = (Ia_raw+Ia_raw_old)/6;
-    ParkParm.qIc = (Ic_raw+Ic_raw_old)/6;
-    
-    Ia_raw_old = Ia_raw;
-    Ic_raw_old = Ic_raw;
-    
-    // gain = (64/49.03) * (2/3)
-    
-    Iafbk = Ia_raw;
-    Icfbk = Ic_raw;
-    
+    ParkParm.qIa = (MeasCurrParm.Offseta-ADCBuffer[0]) / 3;
+    ParkParm.qIc = (MeasCurrParm.Offsetc-ADCBuffer[1]) / 3;
     ParkParm.qIb = -ParkParm.qIa-ParkParm.qIc;
+        
+    // gain = (64/49.03) * (1/3)
 
     int enc = 0;
     static int enc_start_sec = 0;
@@ -1160,9 +1149,9 @@ void EnableDrive()
 {
     bDriveEnabled = 1;
     
+#if 0
     static BOOL uncalibrated = TRUE;
     
-#if 1
     if (uncalibrated)
     {
         uncalibrated = FALSE;

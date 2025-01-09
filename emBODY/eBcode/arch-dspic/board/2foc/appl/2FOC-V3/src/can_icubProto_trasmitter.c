@@ -57,8 +57,6 @@ extern volatile char IKs;
 
 extern volatile tMotorConfig MotorConfig;
 
-extern volatile int Iafbk;
-extern volatile int Icfbk;
 extern volatile int ElDegfbk;
 extern volatile int iQprot;
 extern volatile int maxCountfbk;
