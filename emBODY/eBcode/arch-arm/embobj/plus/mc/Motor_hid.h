@@ -20,6 +20,9 @@
 #ifndef MC_MOTOR_HID_H___
 #define MC_MOTOR_HID_H___
 
+#if defined(SENSORLESS_TORQUE)
+    #include "TorqueEstimator.h"
+#endif
 
 #include "WatchDog.h"
 
@@ -178,6 +181,11 @@ struct Motor_hid
     uint8_t can_motor_config[7];
     //BOOL outOfLimitsSignaled;
 
+#if defined(SENSORLESS_TORQUE)
+    float torque;
+    BOOL sensorless_torque;
+    TorqueEstimator torque_estimator {};
+#endif
 };
 
 

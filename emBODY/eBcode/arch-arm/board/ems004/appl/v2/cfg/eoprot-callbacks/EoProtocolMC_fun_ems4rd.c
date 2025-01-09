@@ -322,6 +322,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const e
 }
 
 
+
 // f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {

@@ -159,7 +159,7 @@ void Joint_reset_calibration_data(Joint* o)
 
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 {
-	 o->ID = ID;
+    o->ID = ID;
     if(o->belong2WristMK2)
     {
         const CTRL_UNITS lim = (150.0f/360.0f)*65536.0f;
