@@ -158,7 +158,7 @@ namespace embot::app::board::amcfoc::cm7::info {
 #define RAMADDR 0x10000000
 #define RAMSIZE 0x00048000
 
-constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended = // __attribute__((section(EENV_MODULEINFO_LOADER_AT))) =
+constexpr eEmoduleExtendedInfo_t s_cm7app_info_extended  __attribute__((section(EENV_MODULEINFO_LOADER_AT))) =
 {
     .moduleinfo     =
     {
@@ -223,7 +223,7 @@ void force_placement_of_flashmappedinfo()
 {
     static volatile uint8_t used {0};
         
-    if(s_cm4app_info_extended.moduleinfo.info.entity.type == ee_entity_process)
+    if(s_cm7app_info_extended.moduleinfo.info.entity.type == ee_entity_process)
     {
         used = 1;
     }        
@@ -232,7 +232,7 @@ void force_placement_of_flashmappedinfo()
         used = 2;
     }
     
-    std::memmove(&ss, &s_cm4app_info_extended, sizeof(ss)); 
+    std::memmove(&ss, &s_cm7app_info_extended, sizeof(ss)); 
     std::memmove(&sig, &embot::app::board::amcfoc::cm7::info::signature, sizeof(sig));     
 }
 
