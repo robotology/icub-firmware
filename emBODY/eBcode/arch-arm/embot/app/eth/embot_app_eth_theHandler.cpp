@@ -1325,12 +1325,12 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     status.txdecimationfactor = embot::app::eth::theHandler_EOMtheEMSrunner_Config.defaultTXdecimationfactor;
     
     // name
-    static const char * nn[] = {"amc"};
+    static const char * nn[] = {"amcfoc"};
     memcpy(status.name, nn, std::min(sizeof(status.name), sizeof(nn)));
        
     // curr state
     status.currstate = applstate_config;
-    status.boardtype = eobrd_ethtype_amc;
+    status.boardtype = eobrd_ethtype_amcfoc;
     
 
     // set it
