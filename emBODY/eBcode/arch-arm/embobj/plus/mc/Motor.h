@@ -68,6 +68,7 @@ extern void Motor_force_idle(Motor* o); //
 
 extern void Motor_motion_reset(Motor *o); //
 extern BOOL Motor_is_calibrated(Motor* o); //
+extern BOOL Calibration_check(Motor* o); //
 extern BOOL Motor_check_faults(Motor* o); //
 extern void Motor_reset(Motor *o);//
 
