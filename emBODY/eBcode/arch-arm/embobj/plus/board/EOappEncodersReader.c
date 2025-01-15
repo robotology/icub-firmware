@@ -42,6 +42,7 @@
 #include "hal_spiencoder.h"
 #include "hal_quadencoder.h"
 #include "hal_adc.h"
+#include "embot_core_binary.h"
 
 #include "EOtheEntities.h"
 #include "EOconstarray.h"
@@ -131,6 +132,7 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA3(uint32_t *valueraw, eOencode
 static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(uint8_t jomo, hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error);
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOencoderreader_errortype_t *error);
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN3(uint32_t *valueraw, eOencoderreader_errortype_t *error);
+static eObool_t s_eo_appEncReader_IsValidValue_AMO(uint8_t jomo, hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error);
 
 static void s_eo_appEncReader_deconfigure_NONSPI_encoders(EOappEncReader *p);
 static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p);
@@ -211,7 +213,7 @@ static EOappEncReader s_eo_theappencreader =
         EO_INIT(.regs)              { 0, 0 },
         EO_INIT(.cnts)              { 0, 0},
         EO_INIT(.one)               { 0, 0, 0, 0, 0 },
-        EO_INIT(.two)               { 0, 0, 0, 0, 0 }       
+        EO_INIT(.two)               { 0, 0, 0, 0, 0 }
     },
     EO_INIT(.aksim2DiagnerrorCounters )
     {
@@ -220,6 +222,15 @@ static EOappEncReader s_eo_theappencreader =
         EO_INIT(.encoder_error_close_to_limit_counter ) {0, 0, 0, 0},
         EO_INIT(.encoder_error_hal_counter            ) {0, 0, 0, 0},
         EO_INIT(.encoder_error_total_timer_counter    ) {0, 0, 0, 0}
+    },
+    EO_INIT(.amoDiagnerrorCounters )
+    {
+        EO_INIT(.status0_poorlevel_clipping_master_counter ) {0, 0, 0, 0},
+        EO_INIT(.status0_poorlevel_clipping_nonius_counter )  {0, 0, 0, 0},
+        EO_INIT(.status1_CRC_counter )                        {0, 0, 0, 0},
+        EO_INIT(.status1_i2C_communication_counter )          {0, 0, 0, 0},
+        EO_INIT(.status1_period_consistency_warning_counter ) {0, 0, 0, 0},
+        EO_INIT(.status1_eccessive_signal_freq_counter )      {0, 0, 0, 0}
     },
     EO_INIT(.genericEncoderRawData) 
     {
@@ -777,6 +788,8 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
             
             case eomc_enc_amo:
             {
+                // TODO: move or update --> japo
+                static uint16_t amodiagnostic_counter[2] = {};
                 // hal_spiencoder_errors_flags flags = {0};
 #if defined(FAKE_AMO)  
                 static int32_t cnt = 0;                 
@@ -790,22 +803,32 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     //spiRawValue = (spiRawValue>>4) & 0xFFFF; marco.accame on 07jun17: why is there this comment? shall we remove it?
                     
                     // GOOD VALUE
-                    
-                    eOmc_joint_t *joint = (eOmc_joint_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jomo);
-                    
-                    int16_t sectors = (int16_t)(joint->config.gearbox_E2J + 0.5f);
-                    
-                    aux_rawvalue = rawValue;
-                    if (sectors == 32)
+                    if(eobool_true == s_eo_appEncReader_IsValidValue_AMO(jomo, &diagn, &prop.valueinfo->errortype))
                     {
-                        aux_rawvalue = (aux_rawvalue >> 1) & 0x3FFF;
-                    }
-                    else if (sectors == 64)
-                    {
-                        aux_rawvalue = aux_rawvalue & 0x3FFF;
-                    }
+                        eOmc_joint_t *joint = (eOmc_joint_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jomo);
                     
-                    prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(aux_rawvalue, jomo, (eOmc_position_t)prop.descriptor->pos);
+                        int16_t sectors = (int16_t)(joint->config.gearbox_E2J + 0.5f);
+                        
+                        aux_rawvalue = rawValue;
+                        if (sectors == 32)
+                        {
+                            aux_rawvalue = (aux_rawvalue >> 1) & 0x3FFF;
+                        }
+                        else if (sectors == 64)
+                        {
+                            aux_rawvalue = aux_rawvalue & 0x3FFF;
+                        }
+                        
+                        prop.valueinfo->value[0] = s_eo_appEncReader_rescale2icubdegrees(aux_rawvalue, jomo, (eOmc_position_t)prop.descriptor->pos);
+                    }
+                    else
+                    {
+                        // we have a valid reading from hal but ... it is not valid after a check
+                        //errorparam = diagn.info.value.hal_spiencoder_diagnostic_type_amo_notconn;
+                        //TODO: probably we need to add another error 
+                        // for now let's just use error generic
+                        prop.valueinfo->errortype = encreader_err_AMO_GENERIC;
+                    }
                 }
                 else
                 {   // we dont even have a valid reading from hal .....                    
@@ -815,6 +838,48 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 }
                 
 #endif
+                
+                if( ++amodiagnostic_counter[jomo] > 10000)
+                {
+                    // preperare data for diagnostics
+                    eOerrmanDescriptor_t errdes = {0};
+                    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress        = 0;
+                    errdes.par16                = jomo;
+                    errdes.par64                = 0;
+                    
+                    if(s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_master_counter[jomo] > 0 || 
+                        s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_nonius_counter[jomo] > 0)
+                    {
+                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_amo_encoder_status0);
+                        errdes.par64       = ((uint64_t)s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_nonius_counter[jomo] << 32) |
+                                                ((uint64_t)s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_master_counter[jomo]);
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
+                        
+                        s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_master_counter[jomo] = 0;
+                        s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_nonius_counter[jomo] = 0;
+                    }
+                    if((s_eo_theappencreader.amoDiagnerrorCounters.status1_CRC_counter[jomo] > 0) ||
+                        (s_eo_theappencreader.amoDiagnerrorCounters.status1_i2C_communication_counter[jomo] > 0) || 
+                        (s_eo_theappencreader.amoDiagnerrorCounters.status1_period_consistency_warning_counter[jomo] > 0) || 
+                        (s_eo_theappencreader.amoDiagnerrorCounters.status1_eccessive_signal_freq_counter[jomo] > 0 ))
+                    {
+         
+                        errdes.code        = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_amo_encoder_status1);
+                        errdes.par64       = ((uint64_t)s_eo_theappencreader.amoDiagnerrorCounters.status1_CRC_counter[jomo] << 48) |
+                            ((uint64_t)s_eo_theappencreader.amoDiagnerrorCounters.status1_i2C_communication_counter[jomo] << 32) |
+                            ((uint64_t)s_eo_theappencreader.amoDiagnerrorCounters.status1_period_consistency_warning_counter[jomo] << 16) |
+                            ((uint64_t)s_eo_theappencreader.amoDiagnerrorCounters.status1_eccessive_signal_freq_counter[jomo]);
+                        
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
+                        
+                        s_eo_theappencreader.amoDiagnerrorCounters.status1_CRC_counter[jomo] = 0;
+                        s_eo_theappencreader.amoDiagnerrorCounters.status1_i2C_communication_counter[jomo] = 0;
+                        s_eo_theappencreader.amoDiagnerrorCounters.status1_period_consistency_warning_counter[jomo] = 0;
+                        s_eo_theappencreader.amoDiagnerrorCounters.status1_eccessive_signal_freq_counter[jomo] = 0;
+                    }
+                    amodiagnostic_counter[jomo] = 0;
+                }
                 
                 // and now ... use diagn
                 // for legacy diagnostics
@@ -1016,10 +1081,6 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                         p->diagnostics.par16[i] |= (encreader_err_GENERIC<<(4*jomo));       // shift by nibbles ..
                     } break;
                     
-                    case encreader_err_AKSIM2_CLOSE_TO_LIMITS:
-                    case encreader_err_AKSIM2_CRC_ERROR:
-                    case encreader_err_AKSIM2_INVALID_DATA:
-                    case encreader_err_AKSIM2_GENERIC:
                     case encreader_err_AEA_READING:
                     case encreader_err_AEA_PARITY:
                     case encreader_err_AEA_CHIP:
@@ -1028,7 +1089,6 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     case encreader_err_MAIS_GENERIC:
                     case encreader_err_PSC_GENERIC:
                     case encreader_err_POS_GENERIC:
-                    case encreader_err_AMO_GENERIC:
                     case encreader_err_SPICHAINOF2_GENERIC:
                     case encreader_err_SPICHAINOF3_GENERIC:
                     {   // in such cases, we report the errortype and the errorparam that someone has prepared 
@@ -1477,18 +1537,21 @@ static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(uint8_t jomo, hal_spiencod
 
     if(0x04 == (0x04 & diag->info.aksim2_status_crc))
     {
+        *error = encreader_err_AKSIM2_INVALID_DATA;
         ++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_invalid_data_counter[jomo];
         ret = eobool_false;
     }
 
     if(0x02 == (0x02 & diag->info.aksim2_status_crc))
     {
+        *error = encreader_err_AKSIM2_CLOSE_TO_LIMITS;
         ++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_close_to_limit_counter[jomo];
         ret = eobool_false;
     }
     
     if(0x01 == (0x01 & diag->info.aksim2_status_crc))
     {
+        *error = encreader_err_AKSIM2_CRC_ERROR;
         ++s_eo_theappencreader.aksim2DiagnerrorCounters.encoder_error_crc_counter[jomo];
         ret = eobool_false;
     }
@@ -1496,6 +1559,67 @@ static eObool_t s_eo_appEncReader_IsValidValue_AKSIM2(uint8_t jomo, hal_spiencod
     
     return ret;
 }
+
+static eObool_t s_eo_appEncReader_IsValidValue_AMO(uint8_t jomo, hal_spiencoder_diagnostic_t* diag, eOencoderreader_errortype_t *error)
+{
+    // in case of errors we return false. Initially we assume no errors
+    eObool_t ret = eobool_true;
+    
+    if(hal_spiencoder_diagnostic_type_amo_status0 == diag->type)
+    {
+        uint16_t diagnostic_status_0 = diag->info.value;
+        
+        switch(diagnostic_status_0)
+        {
+        
+            case 1:
+            case 2:
+            {
+                ++s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_master_counter[jomo];
+                
+            } break;
+            case 4:
+            case 8:
+            {
+                ++s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_nonius_counter[jomo];
+                
+            } break;
+            default:
+            {
+                ++s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_master_counter[jomo];
+                ++s_eo_theappencreader.amoDiagnerrorCounters.status0_poorlevel_clipping_nonius_counter[jomo];
+                
+            } break;
+        }
+    }
+    else if(hal_spiencoder_diagnostic_type_amo_status1 == diag->type)
+    {
+        uint16_t diagnostic_status_1 = diag->info.value;
+        if((embot::core::binary::bit::check(diagnostic_status_1, 1)) || (embot::core::binary::bit::check(diagnostic_status_1, 2)))
+        {
+            // eccessive frequency error
+            ++s_eo_theappencreader.amoDiagnerrorCounters.status1_eccessive_signal_freq_counter[jomo];
+        }
+        if((embot::core::binary::bit::check(diagnostic_status_1, 3)))
+        {
+            // period counter  consistency error --> counted period != calculated Nonius position
+            ++s_eo_theappencreader.amoDiagnerrorCounters.status1_period_consistency_warning_counter[jomo];
+        }
+        if((embot::core::binary::bit::check(diagnostic_status_1, 6)))
+        {
+            // i2c comunication error --> no eeprom or i2c communication error
+            ++s_eo_theappencreader.amoDiagnerrorCounters.status1_i2C_communication_counter[jomo];
+        }
+        if((embot::core::binary::bit::check(diagnostic_status_1, 7)))
+        {
+            // crc error --> invalid check sum internal RAM
+            ++s_eo_theappencreader.amoDiagnerrorCounters.status1_CRC_counter[jomo];
+        }
+    }
+    
+    return ret;
+}
+
 
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOencoderreader_errortype_t *error)
 {    

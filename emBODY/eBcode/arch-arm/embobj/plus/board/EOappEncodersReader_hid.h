@@ -126,6 +126,17 @@ typedef struct
     
 } eOappEncReader_Aksim2_DiagnosticError_Counters_t;
 
+// structure defined for counting the errors related to amo encoder
+typedef struct
+{
+    uint16_t status0_poorlevel_clipping_master_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t status0_poorlevel_clipping_nonius_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t status1_CRC_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t status1_i2C_communication_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t status1_period_consistency_warning_counter[eOappEncReader_jomos_maxnumberof];
+    uint16_t status1_eccessive_signal_freq_counter[eOappEncReader_jomos_maxnumberof];
+} eOappEncReader_Amo_DiagnosticError_Counters_t;
+
 struct EOappEncReader_hid
 {
     eObool_t                                initted;
@@ -139,6 +150,7 @@ struct EOappEncReader_hid
     eOappEncReader_hallAdc_conversionData_t hallAdcConversionData;
     eo_appEncReader_amodiag_t               amodiag;
     eOappEncReader_Aksim2_DiagnosticError_Counters_t aksim2DiagnerrorCounters;
+    eOappEncReader_Amo_DiagnosticError_Counters_t amoDiagnerrorCounters;
     eOencoderreader_RawValuesOfJomo_t       genericEncoderRawData[eOappEncReader_jomos_maxnumberof];
 }; 
 

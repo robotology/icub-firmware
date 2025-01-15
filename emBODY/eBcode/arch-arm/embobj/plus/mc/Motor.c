@@ -894,6 +894,12 @@ BOOL Motor_check_faults(Motor* o) //
             fault_state.bits.OverHeatingFailure = FALSE;
         }
         
+        if (o->fault_state.bits.I2C_CommFailure && !o->fault_state_prec.bits.I2C_CommFailure)
+        {
+            Motor_send_error(o->ID, eoerror_value_MC_motor_tdb_not_reading, 0);
+            fault_state.bits.I2C_CommFailure = FALSE;
+        }
+        
 //        #define CAN_GENERIC_ERROR 0x00003D00
 //        
 //        if ((o->fault_state.bitmask & CAN_GENERIC_ERROR) && ((o->fault_state.bitmask & CAN_GENERIC_ERROR) != (o->fault_state_prec.bitmask & CAN_GENERIC_ERROR)))
@@ -946,15 +952,6 @@ static void Motor_raise_fault_overcurrent(Motor* o)
     hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
     
     o->fault_state.bits.OverCurrentFailure = TRUE;
-    
-    o->control_mode = icubCanProto_controlmode_hwFault;
-}
-
-static void Motor_raise_fault_overheating(Motor* o)
-{
-    hal_motor_disable(static_cast<hal_motor_t>(o->motorlocation.adr));
-    
-    o->fault_state.bits.OverHeatingFailure = TRUE;
     
     o->control_mode = icubCanProto_controlmode_hwFault;
 }
