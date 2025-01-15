@@ -400,9 +400,28 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.v120.amcbldc.lib</FileName>
+              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v120.amcbldc.lib</FilePath>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -448,30 +467,6 @@
               <FileName>embot_app_theCANboardInfo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theCANboardInfo.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
             </File>
             <File>
               <FileName>embot_os.cpp</FileName>
@@ -1204,28 +1199,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.v120.amcbldc.lib</FileName>
+              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v120.amcbldc.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1271,11 +1247,6 @@
               <FileName>embot_app_theCANboardInfo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theCANboardInfo.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
             </File>
             <File>
               <FileName>embot_os.cpp</FileName>
@@ -2008,28 +1979,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.v120.amcbldc.lib</FileName>
+              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v120.amcbldc.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -2075,11 +2027,6 @@
               <FileName>embot_app_theCANboardInfo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theCANboardInfo.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.g4.v122.amcbldc.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.v122.amcbldc.lib</FilePath>
             </File>
             <File>
               <FileName>embot_os.cpp</FileName>

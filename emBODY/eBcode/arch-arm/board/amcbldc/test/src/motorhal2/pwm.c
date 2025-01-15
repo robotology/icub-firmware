@@ -856,6 +856,7 @@ void pwmSet(uint16_t u, uint16_t v, uint16_t w)
     if (u > (uint16_t)MAX_PWM) u = MAX_PWM;
     if (v > (uint16_t)MAX_PWM) v = MAX_PWM;
     if (w > (uint16_t)MAX_PWM) w = MAX_PWM;
+    
     /* Update PWM generators */
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, u);
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, v);

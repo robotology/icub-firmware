@@ -850,6 +850,26 @@ std::make_tuple(0x00470027, 0x484E500E, 0x20343356 ) // scheda jointlab camozzi
         return c;
         
     }
+    
+    bool getOptionBytes()
+    {
+        FLASH_OBProgramInitTypeDef OB;
+        HAL_StatusTypeDef res {HAL_ERROR};
+
+        HAL_FLASH_Unlock();
+        HAL_FLASH_OB_Unlock();
+
+        OB.OptionType = OPTIONBYTE_USER;
+        OB.USERType = OB_USER_DBANK | OB_USER_BOR_LEV;
+        OB.USERConfig = OB_DBANK_128_BITS | OB_BFB2_DISABLE | OB_BOR_LEVEL_4;
+        
+        res = HAL_FLASHEx_OBProgram(&OB);
+        
+        HAL_FLASH_OB_Lock();
+        HAL_FLASH_Lock();
+        
+        return (res != HAL_OK) ? false : true;
+    }
 
 }}}}
 

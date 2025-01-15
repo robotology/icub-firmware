@@ -14,7 +14,7 @@
 
 
 constexpr extern uint8_t  Firmware_vers = 1;
-constexpr extern uint8_t  Revision_vers = 0;
+constexpr extern uint8_t  Revision_vers = 1;
 constexpr extern uint8_t  Build_number  = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -129,6 +129,9 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
     constexpr std::uint8_t maxINPcanframes = 16;
     constexpr std::uint8_t maxOUTcanframes = 32;
     constexpr embot::os::Event evRXcanframe = 0x00000001;
+    
+    constexpr int32_t currentThresholdMin = 210; //mA
+    constexpr int32_t currentThresholdMax = 270; //mA
 
     static void eventhread_init(embot::os::Thread *t, void *p);
     static void eventhread_onevent(embot::os::Thread *t, embot::os::Event evt, void *p);
@@ -136,8 +139,16 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
     static void alerteventhread(void *arg);
 
     static std::vector<embot::prot::can::Frame> outframes;
-
-
+    static embot::hw::motor::Currents pwmCurrents(0, 0, 0);
+    
+    void onCurrents_FOC_innerloop(void *owner, const embot::hw::motor::Currents * const currents)
+    {
+        pwmCurrents.u = currents->u;
+        pwmCurrents.v = currents->v;
+        pwmCurrents.w = currents->w;
+    }
+    
+    
     void activity_function(void* param)
     {
         ActivityParam* pp = reinterpret_cast<ActivityParam*>(param);    
@@ -187,8 +198,8 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
         embot::hw::can::init(embot::hw::CAN::one, canconfig);
 //        embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());  
 
-    embot::hw::motor::init(embot::hw::MOTOR::one, {});
-
+        embot::hw::motor::init(embot::hw::MOTOR::one, {});
+        embot::hw::motor::setCallbackOnCurrents(embot::hw::MOTOR::one, onCurrents_FOC_innerloop, nullptr);
     }
         
     static void alerteventhread(void *arg)
@@ -224,7 +235,6 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 		static void testCan(){
 			uint8_t data[8] {0};
 			data[0] = 0xAA;
-			
 			sendCan(data);
 		}
 
@@ -291,20 +301,27 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			if(vin > 11.5 && vin < 12.5) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
-  		sendCan(data);
+            sendCan(data);
 		}
 		
 		void testCin(){
-			uint8_t data[8] {0};
-	    float cin {0.00};
+			
+            uint8_t data[8] {0};
+            float cin {0.00};
 			cin = embot::hw::bsp::amcbldc::getCIN();
 
 			embot::core::print("Cin : " + std::to_string(cin));
 			
-			if(cin > 0.030 && cin < 0.060) data[0] = 0xAA;
+			if(cin > 0.020 && cin < 0.060) data[0] = 0xAA;          
 			else data[0] = 0xBB;
-			
-  		sendCan(data);
+            
+            int32_t cin2Int = (static_cast<int32_t>(cin * 1000));
+            data[4] = ((cin2Int) & 0xff000000) >> 24;
+            data[3] = ((cin2Int) & 0x00ff0000) >> 16;
+            data[2] = ((cin2Int) & 0x0000ff00) >> 8;
+            data[1] = ((cin2Int) & 0x000000ff);
+                
+            sendCan(data);
 		}
 		
 
@@ -317,7 +334,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
 			else{embot::core::print("NOK"); data[0] = 0xBB;}
 			
-  		sendCan(data);
+            sendCan(data);
 		}
 		
 		constexpr embot::hw::GPIO VCCOK {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen};
@@ -326,10 +343,10 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			uint8_t data[8] {0};
 			auto s = embot::hw::gpio::get(VCCOK);
 			
-		  if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+            if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
 			else{embot::core::print("NOK"); data[0] = 0xBB;}
 			
-  		sendCan(data);
+            sendCan(data);
 		}
 		
 		constexpr embot::hw::GPIO EXTFAULT {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen};
@@ -376,23 +393,23 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 		void testHall(){
 			uint8_t data[8] {0};		
 			uint8_t res {0};
+            embot::hw::motor::HallStatus hallStatus {0};
 
-			for(int i=0; i<150; i++){	
-				if((HAL_GPIO_ReadPin(HALL1_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET)) res |= 1;
-				else res |= 2;
-				if((HAL_GPIO_ReadPin(HALL2_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET)) res |= 4;
-				else res |= 8;
-				if((HAL_GPIO_ReadPin(HALL3_GPIO_Port, HALL3_Pin)     != GPIO_PIN_RESET)) res |= 16;
-				else res |= 32;
+			for(int i=0; i<300; i++)
+            {
+                
+                if(embot::hw::motor::gethallstatus(embot::hw::MOTOR::one, hallStatus) != embot::hw::resOK)
+                {
+                    data[0] = 0xBB;
+                }
+                else
+                {
+                    data[0] = 0xAA;
+                }
 
-				embot::core::wait(10* embot::core::time1millisec);
-			
-				embot::core::print(std::to_string(res));
-				
-			}
-
-			if(res == 63) data[0] = 0xAA;
-			else data[0] = 0xBB;
+                embot::core::wait(10* embot::core::time1millisec);
+                
+            }
 			
 			sendCan(data);
 		}
@@ -401,26 +418,214 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			uint8_t data[8] {0};		
 			uint8_t res {0};
 
-			for(int i=0; i<150; i++){	
-				if((HAL_GPIO_ReadPin(ENCA_GPIO_Port, HALL1_Pin)     != GPIO_PIN_RESET)) res |= 1;
+			for(int i=0; i<300; i++){	
+				if((HAL_GPIO_ReadPin(ENCA_GPIO_Port, ENCA_Pin)     != GPIO_PIN_RESET)) res |= 1;
 				else res |= 2;
-				if((HAL_GPIO_ReadPin(ENCB_GPIO_Port, HALL2_Pin)     != GPIO_PIN_RESET)) res |= 4;
+				if((HAL_GPIO_ReadPin(ENCB_GPIO_Port, ENCB_Pin)     != GPIO_PIN_RESET)) res |= 4;
 				else res |= 8;
-				if((HAL_GPIO_ReadPin(ENCZ_GPIO_Port, HALL3_Pin)     != GPIO_PIN_RESET)) res |= 16;
+				if((HAL_GPIO_ReadPin(ENCZ_GPIO_Port, ENCZ_Pin)     != GPIO_PIN_RESET)) res |= 16;
 				else res |= 32;
-
+                
 				embot::core::wait(10* embot::core::time1millisec);
-			
-				embot::core::print(std::to_string(res));
-				
 			}
 
-			if(res == 47) data[0] = 0xAA;
+			if(res == 63) data[0] = 0xAA;
 			else data[0] = 0xBB;
 			
 			sendCan(data);
 		}
+        
+        // TODO: write low level function that returns HAL_StatusTypeDef somewhere in embot
+        void testOB()
+        {
+			uint8_t data[8] {0};
+			data[0] = 0xBB;
+
+			if(!(embot::hw::bsp::amcbldc::getOptionBytes()))
+            {
+                data[0] = 0xBB;
+            }
+            else
+            {
+                data[0] = 0xAA;
+            }
+            
+			sendCan(data);
+		}
+        
+        void testPWM1() 
+        {
+            uint8_t data[8] {0};		
+			uint8_t res {0};
+            
+            
+            data[0] = 0xBB;
+            embot::hw::motor::PWMperc pwmPerc(50, 0, 0);
+            // enable power supply, it should be already enabled, just check
+            // enable motorX driver
+            if((embot::hw::motor::enable(embot::hw::MOTOR::one, true)) == embot::hw::resOK)
+            {
+                // set the PWM pulses and check currents on the ADC
+                // to configure I will use the embot::hw::motor::PWMperc()
+                // or with embot::core::hw::motor::setpwm(h, u, v, w)
+                //embot::hw::motor::init(embot::hw::MOTOR::one, {});
+                
+                // delay
+                embot::core::wait(500* embot::core::time1millisec);
+                
+                if((embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmPerc)) != embot::hw::resOK)
+                {
+                    return;
+                }
+                
+                // delay
+                embot::core::wait(5000* embot::core::time1millisec);
+                
+                //check currents
+                if(pwmCurrents.u >= currentThresholdMin && pwmCurrents.u <= currentThresholdMax)
+                {
+                    data[0] = 0xAA;
+                }
+                
+                data[3] = (static_cast<int16_t>(pwmCurrents.u & 0xffff)) & 0x00ff;
+                data[2] = ((static_cast<int16_t>(pwmCurrents.u & 0xffff)) & 0xff00) >> 8;
+                data[5] = (static_cast<int16_t>(pwmCurrents.v & 0xffff)) & 0x00ff;
+                data[4] = ((static_cast<int16_t>(pwmCurrents.v & 0xffff)) & 0xff00) >> 8;
+                data[7] = (static_cast<int16_t>(pwmCurrents.w & 0xffff)) & 0x00ff;
+                data[6] = ((static_cast<int16_t>(pwmCurrents.w & 0xffff)) & 0xff00) >> 8;
+              
+            }
+            
+            
+            // delay
+            embot::core::wait(2000* embot::core::time1millisec);
+            
+            // disable motorX driver
+            // disable power supply/ absorption
+            if((embot::hw::motor::enable(embot::hw::MOTOR::one, false)) != embot::hw::resOK)
+            {
+                data[0] = 0xBB;
+            }
+            
+            sendCan(data);
+        }
 		
+        void testPWM2() 
+        {
+            uint8_t data[8] {0};		
+			uint8_t res {0};
+                
+            data[0] = 0xBB;
+            embot::hw::motor::PWMperc pwmPerc(0, 50, 0);
+            // enable power supply, it should be already enabled, just check
+            // enable motorX driver
+            if((embot::hw::motor::enable(embot::hw::MOTOR::one, true)) == embot::hw::resOK)
+            {
+                // set the PWM pulses and check currents on the ADC
+                // to configure I will use the embot::hw::motor::PWMperc()
+                // or with embot::core::hw::motor::setpwm(h, u, v, w)
+                //embot::hw::motor::init(embot::hw::MOTOR::one, {});
+                
+                // delay
+                embot::core::wait(500* embot::core::time1millisec);
+                
+                if((embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmPerc)) != embot::hw::resOK)
+                {
+                    return;
+                }
+                
+                // delay
+                embot::core::wait(5000* embot::core::time1millisec);
+                embot::core::print("After setPWM currents on the phases are:");
+                embot::core::print("c1 = " + std::to_string(pwmCurrents.u) + " [mA]");
+                embot::core::print("c2 = " + std::to_string(pwmCurrents.v) + " [mA]");
+                embot::core::print("c3 = " + std::to_string(pwmCurrents.w) + " [mA]");
+                
+                //check currents
+                if(pwmCurrents.v >= currentThresholdMin && pwmCurrents.v <= currentThresholdMax)
+                {
+                    data[0] = 0xAA;
+                }
+                
+                data[3] = (static_cast<int16_t>(pwmCurrents.u & 0xffff)) & 0x00ff;
+                data[2] = ((static_cast<int16_t>(pwmCurrents.u & 0xffff)) & 0xff00) >> 8;
+                data[5] = (static_cast<int16_t>(pwmCurrents.v & 0xffff)) & 0x00ff;
+                data[4] = ((static_cast<int16_t>(pwmCurrents.v & 0xffff)) & 0xff00) >> 8;
+                data[7] = (static_cast<int16_t>(pwmCurrents.w & 0xffff)) & 0x00ff;
+                data[6] = ((static_cast<int16_t>(pwmCurrents.w & 0xffff)) & 0xff00) >> 8;
+               
+            }
+            
+            // delay
+            embot::core::wait(2000* embot::core::time1millisec);
+            
+            // disable motorX driver
+            // disable power supply/ absorption
+            if((embot::hw::motor::enable(embot::hw::MOTOR::one, false)) != embot::hw::resOK)
+            {
+                data[0] = 0xBB;
+            }
+            
+            sendCan(data);
+        }
+        
+        void testPWM3() 
+        {
+            uint8_t data[8] {0};		
+			uint8_t res {0};
+                
+            data[0] = 0xBB;
+            embot::hw::motor::PWMperc pwmPerc(0, 0, 50);
+            // enable power supply, it should be already enabled, just check
+            // enable motorX driver
+            if((embot::hw::motor::enable(embot::hw::MOTOR::one, true)) == embot::hw::resOK)
+            {
+                // set the PWM pulses and check currents on the ADC
+                // to configure I will use the embot::hw::motor::PWMperc()
+                // or with embot::core::hw::motor::setpwm(h, u, v, w)
+                //embot::hw::motor::init(embot::hw::MOTOR::one, {});
+                
+                // delay
+                embot::core::wait(500* embot::core::time1millisec);
+                
+                if((embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmPerc)) != embot::hw::resOK)
+                {
+                    return;
+                }
+                
+                // delay
+                embot::core::wait(5000* embot::core::time1millisec);
+                embot::core::print("After setPWM currents on the phases are:");
+                embot::core::print("c1 = " + std::to_string(pwmCurrents.u) + " [mA]");
+                embot::core::print("c2 = " + std::to_string(pwmCurrents.v) + " [mA]");
+                embot::core::print("c3 = " + std::to_string(pwmCurrents.w) + " [mA]");
+                
+                //check currents
+                if(pwmCurrents.w >= currentThresholdMin && pwmCurrents.w <= currentThresholdMax)
+                {
+                    data[0] = 0xAA;
+                }
+                
+                data[3] = (static_cast<int16_t>(pwmCurrents.u & 0xffff)) & 0x00ff;
+                data[2] = ((static_cast<int16_t>(pwmCurrents.u & 0xffff)) & 0xff00) >> 8;
+                data[5] = (static_cast<int16_t>(pwmCurrents.v & 0xffff)) & 0x00ff;
+                data[4] = ((static_cast<int16_t>(pwmCurrents.v & 0xffff)) & 0xff00) >> 8;
+                data[7] = (static_cast<int16_t>(pwmCurrents.w & 0xffff)) & 0x00ff;
+                data[6] = ((static_cast<int16_t>(pwmCurrents.w & 0xffff)) & 0xff00) >> 8;
+            }
+            
+            // delay
+            embot::core::wait(2000* embot::core::time1millisec);
+            
+            // disable motorX driver
+            // disable power supply/ absorption
+            if((embot::hw::motor::enable(embot::hw::MOTOR::one, false)) != embot::hw::resOK)
+            {
+                data[0] = 0xBB;
+            }
+            
+            sendCan(data);
+        }
 //******************** END TESTS ******************************************************************//
 
 		
@@ -472,7 +677,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 						//Test FAULT ON
 						case 0x09 : embot::core::wait(300* embot::core::time1millisec); testFault(1); break;
 						
-  					//Test FAULT OFF
+  					    //Test FAULT OFF
 						case 0x0A : embot::core::wait(300* embot::core::time1millisec); testFault(0); break;
 
 						//Test I2C
@@ -484,6 +689,18 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 						//Test ECODER
 						case 0x0D : embot::core::wait(300* embot::core::time1millisec); testEncoder(); break;
 						
+                        //Test Option Bytes
+						case 0x0E : embot::core::wait(300* embot::core::time1millisec); testOB(); break;
+                        
+                        // Test PWM Motor Phase1
+                        case 0x0F : embot::core::wait(300* embot::core::time1millisec); testPWM1(); break;
+                        
+                        // Test PWM Motor Phase2
+                        case 0x10 : embot::core::wait(300* embot::core::time1millisec); testPWM2(); break;
+                        
+                        // Test PWM Motor Phase3
+                        case 0x11 : embot::core::wait(300* embot::core::time1millisec); testPWM3(); break;
+                        
 						default : break;
 					}			
         }   
