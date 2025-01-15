@@ -43,6 +43,9 @@
 
 #if defined(USE_ICC_COMM) 
 #include "embot_app_eth_theICCservice.h"
+#include "embot_app_eth_icc_ItemCANframe.h"
+#include "embot_app_eth_theICCserviceROP.h"
+#include "embot_app_eth_theICCserviceCAN.h"
 #endif
 
 #include "EOtheCANservice.h"
@@ -62,11 +65,29 @@
 
 #include "EOMtheEMSrunner_hid.h" 
 
+#include "theIPnet_config.h"
+#if !defined(THEIPNET_CONFIG_dontuse_theEnvironment)
+#include "embot_app_eth_theEnvironment.h"
+#endif
+
+#if defined(STM32HAL_BOARD_AMCFOC_2CM4)        
+#include "embot_hw_bsp_amcfoc_2cm4.h"
+#endif
+
+#include "embot_app_eth_theErrorManager.h"
+#include "embot_os_theScheduler.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
 #define CANICCflushMODE_DO_phase
+
+#define TEST_ICCROP
+
+#if defined(TEST_ICCROP)
+void testiccrop();
+#endif // TEST_ICCROP
 
 // the theCTRLsocket objects wraps the use of EOMtheEMSsocket + EOMtheEMStransceiver inside theHandler
 struct theCTRLsocket
@@ -287,12 +308,28 @@ struct theSM
 #if defined(debugNOicc)
 #else            
         // theICCservice
-        embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
-        embot::app::eth::theICCservice::getInstance().parse();
-        embot::app::eth::theICCservice::getInstance().flush(5*embot::core::time1millisec); 
-        embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_idle, nullptr});             
-#endif
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);
+        embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, 5*embot::core::time1millisec); 
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, {s_icc_cbkonrx_idle, nullptr});  
+#if 0
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().parse();
+        embot::app::eth::icc::theICCserviceCAN::getInstance().flush(5*embot::core::time1millisec); 
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set({s_icc_cbkonrx_idle, nullptr}); 
 #endif        
+        
+   
+#endif
+#endif 
+
+        // in here i can test the icc rop
+        
+        #if defined(TEST_ICCROP)
+        testiccrop();
+        #endif // TEST_ICCROP
+
+       
         // can discovery
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
@@ -327,9 +364,15 @@ struct theSM
 #if defined(debugNOicc)
 #else            
         // theICCservice
-        embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::onflush);  
-        embot::app::eth::theICCservice::getInstance().flush(5*embot::core::time1millisec);  
-        embot::app::eth::theICCservice::getInstance().set(embot::core::Callback());             
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::onflush);  
+        embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, 5*embot::core::time1millisec);  
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::core::Callback());  
+#if 0
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::onflush);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().flush(5*embot::core::time1millisec);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::core::Callback());  
+#endif
+
 #endif         
 #endif            
         
@@ -366,9 +409,17 @@ struct theSM
 #if defined(debugNOicc)
 #else            
         // theICCservice
-        embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
-        embot::app::eth::theICCservice::getInstance().parse();   
-        embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())});             
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);   
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, {s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())});             
+
+#if 0
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().parse();   
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set({s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())});             
+#endif
+
+        
 #endif
 #endif                      
         // can discovery
@@ -410,9 +461,16 @@ struct theSM
 #if defined(debugNOicc)
 #else        
         // theICCservice
-        embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::instant);  
-        embot::app::eth::theICCservice::getInstance().parse();  
-        embot::app::eth::theICCservice::getInstance().set({s_icc_cbkonrx_idle, nullptr});                     
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);  
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, {s_icc_cbkonrx_idle, nullptr});   
+
+#if 0
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().parse();  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set({s_icc_cbkonrx_idle, nullptr});  
+#endif
+        
 #endif      
 #endif        
         // stop and deactivate all the services which may have been started 
@@ -449,7 +507,12 @@ struct theSM
             {
 #if defined(debugNOicc)
 #else                
-                embot::app::eth::theICCservice::getInstance().parse();  
+                embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);  
+
+#if 0
+                embot::app::eth::icc::theICCserviceCAN::getInstance().parse();
+#endif                
+                
 #endif                
             } break;
 #endif            
@@ -478,7 +541,12 @@ struct theSM
 #if defined(debugNOicc)
 #else        
         // theICCservice
-        embot::app::eth::theICCservice::getInstance().parse();                        
+        embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one); 
+
+#if 0
+        embot::app::eth::icc::theICCserviceCAN::getInstance().parse(); 
+#endif
+        
 #endif
 #endif
         
@@ -519,15 +587,21 @@ struct theSM
 #else        
         // theICCservice: i call the flush() with a callback so it returns immediately
         constexpr embot::core::Callback donothingonflushdone {};
-        embot::app::eth::theICCservice::getInstance().flush(donothingonflushdone);  
+        embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, donothingonflushdone); 
+
+#if 0
+        embot::app::eth::icc::theICCserviceCAN::getInstance().flush(donothingonflushdone);
+#endif
+            
 #endif        
     }
     
     static void waitICCisflushed()
     {
 #if defined(debugNOicc)
-#else        
-        if(true == embot::app::eth::theICCservice::getInstance().flushed())
+#else
+#if 1        
+        if(true == embot::app::eth::icc::theICCservice::getInstance().flushed(embot::app::eth::icc::theICCservice::Pipe::one))
         {
             return;   
         }
@@ -536,7 +610,7 @@ struct theSM
         embot::core::Time expirytime {embot::core::now() + 3*embot::core::time1millisec};
         for(;;)
         {
-            if(true == embot::app::eth::theICCservice::getInstance().flushed())
+            if(true == embot::app::eth::icc::theICCservice::getInstance().flushed(embot::app::eth::icc::theICCservice::Pipe::one))
             {
                 break;
             }
@@ -545,6 +619,28 @@ struct theSM
                 break;
             }
         }
+#else
+        if(true == embot::app::eth::icc::theICCserviceCAN::getInstance().flushed())
+        {
+            return;   
+        }
+        
+        // theICCservice
+        embot::core::Time expirytime {embot::core::now() + 3*embot::core::time1millisec};
+        for(;;)
+        {
+            if(true == embot::app::eth::icc::theICCserviceCAN::getInstance().flushed())
+            {
+                break;
+            }
+            if(embot::core::now() >= expirytime)
+            {
+                break;
+            }
+        }
+
+#endif
+
 #endif        
     }
 #endif    
@@ -617,7 +713,9 @@ struct theSM
 
 
 struct embot::app::eth::theHandler::Impl
-{       
+{
+    constexpr static char objectname[] = "theHandler";    
+    
     Config _config {};  
         
     State _state {State::IDLE};    
@@ -650,22 +748,7 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
     _config = cfg;   
     _state = State::IDLE;
 
-#if defined(USE_ICC_COMM)     
-#if 0
-    marco.accame on 24 nov 2023
-    i anticipate in here the init of theICCservice because:
-    - theCTRLsocket initialization takes long time
-    - the ICC receiver must be ready to accept data from the slave running on the amc2c that
-      is faster in booting up.
-    so: we init in here and we configure the parsing inside theHandler together with the init
-    of theICCmapping and the CAN protocol things
-#endif
-
-#if defined(debugNOicc)
-#else    
-    embot::app::eth::theICCservice::getInstance().initialise(embot::app::eth::iccmastercfg);    
-#endif
-#endif
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
     
     embot::app::eth::theETHmonitor::getInstance().initialise(theHandler_theETHmonitor_Config);    
     
@@ -699,8 +782,8 @@ bool embot::app::eth::theHandler::Impl::initialise(const Config &cfg)
     theSM::start(_sm);
         
     // tell the world that we have started
-    embot::app::eth::emit(sevTRACE, {"testThread", nullptr}, {}, "embot::app::eth::theHandler::initialise() has started its state machine w/ CFG, RUN, ERR");   
-        
+    theErrorManager::getInstance().emit(theErrorManager::Severity::trace, {objectname, thr}, {}, "started state machine w/ CFG, RUN, ERR");         
+
     return true;
 } 
 
@@ -1173,14 +1256,16 @@ void sendicc()
     #warning DEBUG... remove it later on
     uint32_t ID = 0x101; // i want the sender to have 0 address .........
     embot::prot::can::Frame frame1 {ID, 8, {n, 1, 1, 1, 1, 1, 1, 1}};
-    embot::app::msg::Location loc1 {embot::app::msg::Location::BUS::icc1, 3};
-    embot::prot::can::Frame frame2 {ID, 8, {n, 2, 2, 2, 2, 2, 2, 2}};    
-    embot::app::eth::theICCservice::getInstance().put({loc1, frame1});
-    embot::app::eth::theICCservice::getInstance().put({loc1, frame2});
+    embot::app::msg::Location loc1 {embot::app::msg::BUS::icc1, 3};
+    embot::prot::can::Frame frame2 {ID, 8, {n, 2, 2, 2, 2, 2, 2, 2}}; 
+    embot::app::eth::icc::ItemCANframe i1 {loc1, frame1};    
+    embot::app::eth::icc::theICCservice::getInstance().put(embot::app::eth::icc::theICCservice::Pipe::one, i1.item());
+    embot::app::eth::icc::ItemCANframe i2 {loc1, frame2};
+    embot::app::eth::icc::theICCservice::getInstance().put(embot::app::eth::icc::theICCservice::Pipe::one, i2.item());
     
     embot::core::print(embot::core::TimeFormatter(now).to_string() + ": thread tCFG will transmit some messages via ICC to the amc2c application");
 
-    embot::app::eth::theICCservice::getInstance().flush();    
+    embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one);    
 }
 extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p) 
 {
@@ -1345,6 +1430,146 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     // set it
     eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
 }
+
+
+
+#if defined(TEST_ICCROP)
+
+#define useICCserviceROP
+
+void testiccrop()
+{
+
+//#if defined(STM32HAL_DUALCORE) && defined(CORE_CM4)
+//        
+//        volatile bool pinged = embot::app::eth::icc::theICCserviceROP::getInstance().ping(100*embot::core::time1millisec);
+
+//        if(true == pinged)
+//        {
+//            
+//            uint64_t u = embot::hw::sys::uniqueid();
+//            if((embot::hw::sys::UIDinvalid == u))
+//            {               
+//                uint64_t uid {0};                
+//                bool ok {false};
+//                embot::app::eth::icc::ItemROP::Variable varUID {embot::app::eth::icc::ItemROP::IDunique64, 8, &uid};           
+//                ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varUID, 30*1000);
+//                if(true == ok)
+//                {
+//                    embot::hw::sys::setuniqueid(uid);
+//                }                
+//            }
+//            
+//        }
+//                      
+//#endif
+
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+
+
+#if defined(useICCserviceROP)
+        
+        volatile bool pp = embot::app::eth::icc::theICCserviceROP::getInstance().ping(30*1000);
+        pp = pp;   
+        
+        uint64_t tol {0};
+        uint64_t first {0};
+        volatile int64_t delta {0};
+        uint32_t du32 {7};
+        uint64_t uid {0};
+        embot::app::icc::Signature sign {};
+            
+        bool ok {false};
+
+        embot::app::eth::icc::ItemROP::Variable varTOL {embot::app::eth::icc::ItemROP::IDtimeoflife, 8, &tol};        
+        embot::app::eth::icc::ItemROP::Variable varDU32 {embot::app::eth::icc::ItemROP::IDdummyUINT32, 4, &du32};
+        embot::app::eth::icc::ItemROP::Variable varUID {embot::app::eth::icc::ItemROP::IDunique64, 8, &uid};
+        embot::app::eth::icc::ItemROP::Variable varSIGN {embot::app::eth::icc::ItemROP::IDsignature, 16, &sign};
+        
+        ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varUID, 30*1000);
+        ok = ok;
+        
+        embot::app::eth::theErrorManager::getInstance().emit(
+                embot::app::eth::theErrorManager::Severity::trace, 
+                {"testiccrop()", thr}, 
+                {}, 
+                ok ? "ask<IDunique64> is OK = " + std::to_string(uid) : "ask<IDunique64> is KO"
+        );    
+
+ 
+
+        ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varSIGN, 30*1000);
+        ok = ok;
+
+        embot::app::eth::theErrorManager::getInstance().emit(
+                embot::app::eth::theErrorManager::Severity::trace, 
+                {"testiccrop()", thr}, 
+                {}, 
+                ok ? "ask<IDsignature> is OK = " + sign.to_string() : "ask<IDsignature> is KO"
+        ); 
+                    
+        du32 = du32;  
+
+        ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varDU32, 30*1000);
+                    
+        embot::app::eth::theErrorManager::getInstance().emit(
+                embot::app::eth::theErrorManager::Severity::trace, 
+                {"testiccrop()", thr}, 
+                {}, 
+                ok ? "ask<IDdummyUINT32> is OK = " + std::to_string(du32) : "ask<IDdummyUINT32> is KO"
+        );  
+                    
+        du32 = du32;
+        du32 = 1;
+        ok = embot::app::eth::icc::theICCserviceROP::getInstance().set(varDU32, 30*1000);
+                    
+        embot::app::eth::theErrorManager::getInstance().emit(
+                embot::app::eth::theErrorManager::Severity::trace, 
+                {"testiccrop()", thr}, 
+                {}, 
+                ok ? "set<IDdummyUINT32, " + std::to_string(du32) + "> is OK" : "set<IDdummyUINT32, " + std::to_string(du32) + "> is KO"
+        );  
+                    
+        du32 = 0; 
+        ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varDU32, 30*1000);
+                    
+        embot::app::eth::theErrorManager::getInstance().emit(
+                embot::app::eth::theErrorManager::Severity::trace, 
+                {"testiccrop()", thr}, 
+                {}, 
+                ok ? "ask<IDdummyUINT32> is OK = " + std::to_string(du32) : "ask<IDdummyUINT32> is KO"
+        );  
+                    
+        du32 = du32;        
+        
+        volatile uint64_t n0 = embot::core::now();
+        ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varTOL, 30*1000);
+
+        first = tol;
+        
+        ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varTOL, 30*1000);
+        
+        volatile uint64_t n1 = embot::core::now();
+        volatile int64_t d = n1 - n0;            
+        delta = tol - first;
+        delta = delta;
+                    
+        embot::app::eth::theErrorManager::getInstance().emit(
+                embot::app::eth::theErrorManager::Severity::trace, 
+                {"testiccrop()", thr}, 
+                {}, 
+                ok ? "two ask<IDtimeoflife> are OK w/ difference = " + std::to_string(delta) + " [us] and exec time = " + std::to_string(d) + " [us]" : "two ask<IDtimeoflife> are KO"
+        ); 
+
+        delta = delta;                    
+
+#else         
+
+#endif // useICCserviceROP
+
+} // void testiccrop()
+
+#endif // TEST_ICCROP 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -61,7 +61,8 @@ namespace embot::hw::sys::DRIVER {
     void _jump2address(embot::hw::flash::ADDR address);   
     void _jump2address2(embot::hw::flash::ADDR address);    
     void _relocatevectortable(std::uint32_t offset); 
-    uint64_t _uniqueid(); 
+    uint64_t _uniqueid();
+    bool _setuniqueid(uint64_t v); 
     void _delay(embot::core::relTime t);
     std::uint32_t _random();
     void _irq_disable();
@@ -101,12 +102,24 @@ namespace embot::hw::sys {
     {
         DRIVER::_relocatevectortable(offset);        
     }
-    
+
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
+    #warning EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid is defined
+#else     
     uint64_t uniqueid()
     {
         return DRIVER::_uniqueid();
     }    
+#endif
 
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid)
+    #warning EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid is defined
+#else 
+    bool setuniqueid(uint64_t v)
+    {
+        return DRIVER::_setuniqueid(v);
+    }  
+#endif
     
     void delay(embot::core::relTime t)
     {   
@@ -343,11 +356,19 @@ namespace embot::hw::sys::DRIVER {
         r = HAL_GetUIDw0() | static_cast<uint64_t>(HAL_GetUIDw1()) << 32;
         r += HAL_GetUIDw2();
 #else
-        r = 1234;
-        #warning the call of HAL_GetUIDw0() on the H7 CM4 makes it crash
+        r = 0; // because the call of HAL_GetUIDw0() on the H7 CM4 makes it crash
+        #if !defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
+            #warning evaluate if using EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid
+        #endif
+        
 #endif
 #endif    
         return r;  
+    }
+    
+    bool _setuniqueid(uint64_t v)
+    {
+        return false;   
     }
     
     void _delay(embot::core::relTime t)

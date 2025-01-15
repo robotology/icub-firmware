@@ -17,7 +17,7 @@ namespace embot::hw::bsp::amcfoc2cm4 {
     
     // adds in here constants or functions specific to the board
 
-      
+    uint64_t synchUID();
     
 }
 

@@ -25,6 +25,40 @@ namespace embot::app::boards {
         unknown = 255
     };
     
+    
+    constexpr const char * to_constchar(Board b)
+    {
+        const char *c = "unknown"; 
+        switch(b)
+        {
+            case Board::mtb:        { c = "mtb"; } break;
+            case Board::strain:     { c = "strain"; } break;
+            case Board::mais:       { c = "mais"; } break;
+            case Board::mtb4:       { c = "mtb4"; } break;
+            case Board::strain2:    { c = "strain2"; } break;
+            case Board::rfe:        { c = "rfe"; } break;
+            case Board::sg3:        { c = "sg3"; } break;
+            case Board::psc:        { c = "psc"; } break;
+            case Board::mtb4w:      { c = "mtb4w"; } break;
+            case Board::pmc:        { c = "pmc"; } break;
+            case Board::amcbldc:    { c = "amcbldc"; } break;
+            case Board::mtb4c:      { c = "mtb4c"; } break;
+            case Board::amc2c:      { c = "amc2c"; } break;
+            case Board::strain2c:   { c = "strain2c"; } break;
+            case Board::bat:        { c = "bat"; } break;
+            case Board::amcfoc2c:   { c = "amcfoc2c"; } break;
+            case Board::ems4:       { c = "ems4"; } break;
+            case Board::mc4plus:    { c = "mc4plus"; } break;
+            case Board::mc2plus:    { c = "mc2plus"; } break;
+            case Board::amc:        { c = "amc"; } break;
+            case Board::amcfoc:     { c = "amcfoc"; } break;
+            case Board::none:       { c = "none"; } break;
+            
+            default:                { c = "unknown"; } break;            
+        }
+        return c;
+    }
+    
 }
 
  

@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -476,11 +476,6 @@
           <GroupName>embot::app::bldc</GroupName>
           <Files>
             <File>
-              <FileName>embot_app_eth_theICCservice.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_app_bldc_theCOMMcanicc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMMcanicc.cpp</FilePath>
@@ -506,6 +501,11 @@
           <GroupName>embot::app::application</GroupName>
           <Files>
             <File>
+              <FileName>embot_app_eth_theICCservice.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
@@ -524,6 +524,16 @@
               <FileName>embot_app_scope.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceROP.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceROP.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceCAN.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceCAN.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1133,13 +1143,14 @@
       <TargetName>appl-icc-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pArmCC>6220000::V6.22::ARMCLANG</pArmCC>
       <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1548,11 +1559,6 @@
           <GroupName>embot::app::bldc</GroupName>
           <Files>
             <File>
-              <FileName>embot_app_eth_theICCservice.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_app_bldc_theCOMMcanicc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMMcanicc.cpp</FilePath>
@@ -1578,6 +1584,11 @@
           <GroupName>embot::app::application</GroupName>
           <Files>
             <File>
+              <FileName>embot_app_eth_theICCservice.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
@@ -1596,6 +1607,16 @@
               <FileName>embot_app_scope.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceROP.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceROP.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceCAN.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceCAN.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2211,7 +2232,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2671,11 +2692,6 @@
           <GroupName>embot::app::bldc</GroupName>
           <Files>
             <File>
-              <FileName>embot_app_eth_theICCservice.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_app_bldc_theCOMMcanicc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\bldc\embot_app_bldc_theCOMMcanicc.cpp</FilePath>
@@ -2701,6 +2717,11 @@
           <GroupName>embot::app::application</GroupName>
           <Files>
             <File>
+              <FileName>embot_app_eth_theICCservice.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCservice.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
@@ -2719,6 +2740,16 @@
               <FileName>embot_app_scope.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_scope.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceROP.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceROP.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceCAN.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceCAN.cpp</FilePath>
             </File>
           </Files>
         </Group>

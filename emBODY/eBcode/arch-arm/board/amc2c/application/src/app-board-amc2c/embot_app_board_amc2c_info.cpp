@@ -22,6 +22,7 @@
 #include "embot_app_icc.h"
 #include "embot_app_eth.h"
 #include "embot_app_board_amc2c_theCANagentCORE.h"
+#include "embot_hw_sys.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - the configurable constants
@@ -98,6 +99,112 @@ namespace embot::app::board::amc2c::info {
     {
         return icclocation;        
     }
+    
+    
+    bool OnROPrx(const embot::app::eth::icc::ItemROP &rxrop, embot::app::eth::icc::ItemROP &reply)
+    {
+        bool r {false};
+        // it is mandatory that the memory of the varibles stays alive after defOnROPrx() returns so in here we mark it as static 
+        // to move it away from being a temporary variable allocated on the stack
+        // a proper implementation however requires to have these variables somehow global.
+        static embot::core::Time timeoflife {0};
+        static uint64_t uid {0};
+        static uint32_t dummyUINT32 {0};
+        static embot::app::icc::Signature sign {signature};
+
+        // we fill the default w/ nothing to transmit back 
+        reply.fill(embot::app::eth::icc::ItemROP::CMD::none, rxrop.var);
+        
+        switch(rxrop.cmd)
+        {               
+            case embot::app::eth::icc::ItemROP::CMD::ping:
+            {
+                reply.fill(embot::app::eth::icc::ItemROP::CMD::ack, rxrop.var);
+            } break;
+            
+            case embot::app::eth::icc::ItemROP::CMD::ask:
+            {
+                switch(rxrop.var.descriptor.id)
+                {
+                    case embot::app::eth::icc::ItemROP::IDtimeoflife:
+                    {
+                        timeoflife = embot::core::now();
+                        reply.fill(embot::app::eth::icc::ItemROP::CMD::say, {{embot::app::eth::icc::ItemROP::IDtimeoflife, 8}, &timeoflife});
+                    } break;
+                    
+                    case embot::app::eth::icc::ItemROP::IDdummyUINT32:
+                    {
+                        reply.fill(embot::app::eth::icc::ItemROP::CMD::say, {{embot::app::eth::icc::ItemROP::IDdummyUINT32, 4}, &dummyUINT32});                            
+                    } break;
+
+                    case embot::app::eth::icc::ItemROP::IDunique64:
+                    {
+                        uid = 0; // embot::hw::sys::uniqueid();
+                        reply.fill(embot::app::eth::icc::ItemROP::CMD::say, {{embot::app::eth::icc::ItemROP::IDunique64, 8}, &uid});                            
+                    } break;                    
+                    // ... other managed cases
+
+                    case embot::app::eth::icc::ItemROP::IDsignature:
+                    {
+                        reply.fill(embot::app::eth::icc::ItemROP::CMD::say, {{embot::app::eth::icc::ItemROP::IDsignature, 16}, &sign});                            
+                    } break;                       
+                    
+                    
+                    default: 
+                    {   // if the ID is not managed we do nothing but we send a nak back   
+                        reply.fill(embot::app::eth::icc::ItemROP::CMD::nak, rxrop.var);
+                    } break;                     
+                }                    
+            } break;
+        
+            case embot::app::eth::icc::ItemROP::CMD::set:
+            {
+                switch(rxrop.var.descriptor.id)
+                {                        
+                    case embot::app::eth::icc::ItemROP::IDdummyUINT32:
+                    {
+                        dummyUINT32 = *reinterpret_cast<uint32_t*>(rxrop.var.memory);
+                        reply.fill(embot::app::eth::icc::ItemROP::CMD::ack, {{embot::app::eth::icc::ItemROP::IDdummyUINT32, 4}, &dummyUINT32});                                                      
+                    } break;
+                    
+                    // ... other managed cases
+                    
+                    default: 
+                    {   // if the ID is not managed we do nothing but we send a nak back   
+                        reply.fill(embot::app::eth::icc::ItemROP::CMD::nak, rxrop.var);
+                    } break;                          
+                }
+                
+            } break;                
+
+            case embot::app::eth::icc::ItemROP::CMD::sig:
+            {
+                switch(rxrop.var.descriptor.id)
+                {                        
+                    case embot::app::eth::icc::ItemROP::IDdummyUINT32:
+                    {
+                        dummyUINT32 = *reinterpret_cast<uint32_t*>(rxrop.var.memory);
+                        // i dont send any ack back                                                      
+                    } break;
+                    
+                    // ... other managed cases
+                    
+                    default: 
+                    {   // if the ID is not managed we do nothing and we send nothing back   
+                        reply.fill(embot::app::eth::icc::ItemROP::CMD::none, rxrop.var);
+                    } break;                        
+                }
+                
+            } break;  
+            
+            default: { } break; // we dont manage any other received commands
+            
+        }
+
+        r = (embot::app::eth::icc::ItemROP::CMD::none != rxrop.cmd);
+        
+        return r; 
+    }    
     
 } // embot::app::board::amc2c::info {
 

@@ -1654,6 +1654,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCmapping.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceCAN.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceCAN.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_eth_theICCserviceROP.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\eth\embot_app_eth_theICCserviceROP.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

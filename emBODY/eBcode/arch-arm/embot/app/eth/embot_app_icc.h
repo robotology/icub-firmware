@@ -32,7 +32,15 @@ namespace embot::app::icc {
                             const embot::app::eth::Version &p,
                             const embot::app::eth::Date &d)
                             : board(b), location(l), application(a), protocol(p), date(d) {};
+                                
+        std::string to_string() const
+        {
+            return std::string(embot::app::boards::to_constchar(board)) + " @ " + location.to_string() 
+                + ", vers " + application.to_string() + ", prot " + protocol.to_string() + ", date " + date.to_string();
+        }                                  
     };
+    
+    static_assert(sizeof(Signature) == 16, "Signature is not of correct size");
     
 }
 

@@ -34,6 +34,16 @@
 
 #include "embot_os_eom.h"
 
+#if defined(USE_ICC_COMM) 
+#include "embot_app_eth_theICCservice.h"
+#include "embot_app_eth_theICCserviceROP.h"
+#include "embot_app_eth_theICCserviceCAN.h"
+#include "embot_os_rtos.h"
+#endif
+
+#if defined(STM32HAL_BOARD_AMCFOC_2CM4)        
+#include "embot_hw_bsp_amcfoc_2cm4.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -79,6 +89,43 @@ void embot::app::eth::theApplication::Impl::initSystem(embot::os::Thread *t, voi
     embot::app::theLEDmanager::getInstance().init(embot::app::eth::theApplication_Config.allLEDs);
     embot::app::theLEDmanager::getInstance().get(embot::app::eth::theApplication_Config.pulseLED).pulse(embot::app::eth::theApplication_Config.pulseFREQ, 0);
 
+    
+    // -- icc starts in here. we are in the tINIT, so we must somehow let the threads of the ICC run
+    //    so, we shall put the thread to sleep for a bit and wait some more time so that the other core can be activated  
+    embot::app::eth::icc::theICCservice::getInstance().initialise(embot::app::eth::icc::iccmastercfg);  
+    embot::app::eth::icc::theICCserviceROP::getInstance().initialise({});
+#if 0
+    embot::app::eth::icc::theICCserviceCAN::getInstance().initialise({});
+#endif        
+
+    embot::os::rtos::thread_sleep( embot::os::rtos::scheduler_thread_running(), 20*embot::core::time1millisec);        
+    embot::core::wait(10*embot::core::time1millisec);
+       
+    volatile bool pinged {false};
+
+    pinged = embot::app::eth::icc::theICCserviceROP::getInstance().ping(100*embot::core::time1millisec);
+
+    theErrorManager::getInstance().emit(theErrorManager::Severity::trace, {objectname, t}, {}, pinged ? "the other core replies to ICC ping" : "the other core does not ack to ICC ping");    
+
+    {
+        embot::app::icc::Signature sign {};
+        embot::app::eth::icc::ItemROP::Variable varSIGN {embot::app::eth::icc::ItemROP::IDsignature, 16, &sign};
+        
+        bool ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varSIGN, 30*1000);
+        embot::app::eth::theErrorManager::getInstance().emit(
+                embot::app::eth::theErrorManager::Severity::trace, 
+                {objectname, t}, {}, 
+                ok ? "the other core has signature = " + sign.to_string() : "ask<IDsignature> to other core is KO"
+        );         
+    }
+        
+#if defined(STM32HAL_BOARD_AMCFOC_2CM4)    
+    if(true == pinged)
+    {                
+        uint64_t uid = embot::hw::bsp::amcfoc2cm4::synchUID(); 
+        theErrorManager::getInstance().emit(theErrorManager::Severity::trace, {objectname, t}, {}, "UID is synched");            
+    }  
+#endif       
     // this starts initialization of legacy and usefuls EOM services to use embot objects:
     // EOVtheCallbackManager, EOVtheTimerManager, EOVtheSystem, ...
     embot::os::EOM::initialise(eomcfg);  
@@ -97,7 +144,7 @@ void embot::app::eth::theApplication::Impl::initSystem(embot::os::Thread *t, voi
         
     embot::app::eth::theApplication_Config.OSuserdefinit.execute();
     
-    theErrorManager::getInstance().emit(theErrorManager::Severity::info, {objectname, t}, {}, "quitting the INIT thread. Normal scheduling starts");    
+    theErrorManager::getInstance().emit(theErrorManager::Severity::trace, {objectname, t}, {}, "quitting the INIT thread. Normal scheduling starts");    
 }
 
 

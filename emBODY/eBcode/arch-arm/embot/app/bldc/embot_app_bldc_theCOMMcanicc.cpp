@@ -33,8 +33,18 @@
 #include "embot_app_bldc_theMSGbroker.h"
 
 #include "embot_app_eth_theICCservice.h"
+#include "embot_app_eth_icc_ItemCANframe.h"
+#include "embot_app_eth_theICCserviceROP.h"
 #include "embot_app_application_theCANtracer.h"
 #include "embot_app_theLEDmanager.h"
+
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7)
+#include "embot_app_board_amcfoc_1cm7_info.h"
+#elif defined(STM32HAL_BOARD_AMC2C)
+#include "embot_app_board_amc2c_info.h"
+#else
+#error fix me
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
@@ -110,6 +120,58 @@ struct embot::app::bldc::theCOMM::Impl
     void locktoBUS(const embot::app::bldc::MSG &msg);
 };
 
+#if 0
+#include "embot_hw_sys.h"
+
+static uint32_t val1 {666};
+static embot::core::Time tol {0};
+static uint64_t uid {0};
+#if 0
+bool onROPrx(const embot::app::eth::icc::ItemROP &rxrop, embot::app::eth::icc::ItemROP &reply)
+{
+    // in here we add the supported IDs
+    bool r {true};
+    
+    reply.fill(embot::app::eth::icc::ItemROP::CMD::nak, rxrop.var);
+    
+    // and now we manage the ask of ... IDtimeoflife and IDunique64 and IDval1 
+    if(embot::app::eth::icc::ItemROP::CMD::ask == rxrop.cmd)
+    {        
+        if(embot::app::eth::icc::ItemROP::IDtimeoflife == rxrop.var.descriptor.id)
+        {            
+            tol = embot::core::now();
+            reply.fill(embot::app::eth::icc::ItemROP::CMD::say, {embot::app::eth::icc::ItemROP::IDtimeoflife, 8, &tol});           
+        }
+        else if(embot::app::eth::icc::ItemROP::IDunique64 == rxrop.var.descriptor.id)
+        {
+            #warning ... only if this is the cm7 core
+
+            uid = embot::hw::sys::uniqueid();
+            reply.fill(embot::app::eth::icc::ItemROP::CMD::say, {embot::app::eth::icc::ItemROP::IDunique64, 8, &uid});            
+        }
+        else if(embot::app::eth::icc::ItemROP::IDval1 == rxrop.var.descriptor.id)
+        {
+            reply.fill(embot::app::eth::icc::ItemROP::CMD::say, {embot::app::eth::icc::ItemROP::IDval1, 4, &val1});           
+        }        
+    }
+    else if(embot::app::eth::icc::ItemROP::CMD::set == rxrop.cmd)
+    {
+        if(embot::app::eth::icc::ItemROP::IDval1 == rxrop.var.descriptor.id)
+        {
+            if(nullptr != rxrop.var.memory)
+            {
+                val1 = *reinterpret_cast<uint32_t*>(rxrop.var.memory);
+                reply.fill(embot::app::eth::icc::ItemROP::CMD::ack, {embot::app::eth::icc::ItemROP::IDval1, 4, &val1});  
+            }            
+        }          
+    }
+    
+    
+    
+    return r;
+}
+#endif
+#endif
       
 bool embot::app::bldc::theCOMM::Impl::initialise(const Config &config)
 {
@@ -199,15 +261,29 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_Startup(embot::os::Thread *t, void *
 {
     Impl *impl = reinterpret_cast<Impl*>(param);
     
-    // init ICC. at first w/ the default slave configuration. then w/ focused tuning       
-    embot::app::eth::theICCservice::getInstance().initialise(embot::app::eth::iccslavecfg);  
+    // init ICC w/ the default slave configuration.        
+    embot::app::eth::icc::theICCservice::getInstance().initialise(embot::app::eth::icc::iccslavecfg); 
+    
+    // init ICC CAN
     // alert this thread on RX of messages    
     embot::core::Callback oniccRX {impl->alertonrxiccframe, t};
-    embot::app::eth::theICCservice::getInstance().set(oniccRX);
+    embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, oniccRX);
     // tx only on explicit command
-    embot::app::eth::theICCservice::getInstance().set(embot::app::eth::theICCservice::modeTX::onflush);
+    embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::onflush);
     // use the dummy parser because we get messages one by one
-    embot::app::eth::theICCservice::getInstance().set(nullptr);
+    embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::ItemParserDummy);
+ 
+    
+    // init ICC ROP.
+    embot::app::eth::icc::theICCserviceROP::getInstance().initialise({});    
+        
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7)       
+    embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::board::amcfoc::cm7::info::OnROPrx);
+#elif defined(STM32HAL_BOARD_AMC2C)
+    embot::app::eth::icc::theICCserviceROP::getInstance().set(embot::app::board::amc2c::info::OnROPrx);    
+#else
+#error fix me
+#endif        
 
     // init the can ...
     embot::hw::can::Config canconfig {};
@@ -284,15 +360,16 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
         
 #if defined(PARSE_RX_ALLINONESHOT)
         
-        size_t insideRXQ = embot::app::eth::theICCservice::getInstance().input();
+        size_t insideRXQ = embot::app::eth::icc::theICCservice::getInstance().input(embot::app::eth::icc::theICCservice::Pipe::one);
         size_t remainingINrx = 0;
-        embot::app::eth::theICCservice::Item item {};
+        embot::app::eth::icc::Item item {};
         for(size_t i=0; i<insideRXQ; i++)
         {
             remainingINrx = 0;   
-            if(true == embot::app::eth::theICCservice::getInstance().get(item, remainingINrx))
+            if(true == embot::app::eth::icc::theICCservice::getInstance().get(embot::app::eth::icc::theICCservice::Pipe::one, item, remainingINrx))
             {
-                impl->tCOMM_OnRXmessage(t, eventmask, param, {item.des, item.frame}, impl->_tCOMMoutmessages); 
+                embot::app::eth::icc::ItemCANframe icf {item};
+                impl->tCOMM_OnRXmessage(t, eventmask, param, {icf.des, icf.frame}, impl->_tCOMMoutmessages); 
             }
         }
         // if any arrives since we called embot::hw::can::inputqueuesize(tCOMMcanbus) ...
@@ -358,15 +435,15 @@ void embot::app::bldc::theCOMM::Impl::tCOMM_OnEvent(embot::os::Thread *t, embot:
             else
             {
                 nicc++;
-                embot::app::eth::theICCservice::Item item { impl->ICClocation, impl->_tCOMMoutmessages[i].frame };
-                bool r = embot::app::eth::theICCservice::getInstance().put(item, embot::core::reltimeWaitForever);
+                embot::app::eth::icc::ItemCANframe icf {impl->ICClocation, impl->_tCOMMoutmessages[i].frame};
+                bool r = embot::app::eth::icc::theICCservice::getInstance().put(embot::app::eth::icc::theICCservice::Pipe::one, icf.item(), embot::core::reltimeWaitForever);
                 // if r is false then  we have a failure. but timeout is infinite 
             }       
         }
         
         if(nicc > 0)
         {
-            bool r1 = embot::app::eth::theICCservice::getInstance().flush(embot::core::reltimeWaitForever);  
+            bool r1 = embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, embot::core::reltimeWaitForever);  
         }
         
         if(ncan > 0)
@@ -529,5 +606,3 @@ bool embot::app::bldc::theCOMM::get(size_t &remaining, std::vector<embot::app::b
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
-

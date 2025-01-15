@@ -25,6 +25,8 @@
 #include "embot_app_eth_theEnvironment.h"
 #endif
 
+#include "embot_os_theScheduler.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
@@ -32,6 +34,8 @@
 
 struct embot::app::eth::theIPnet::Impl
 {
+    constexpr static char objectname[] = "theIPnet";
+    
     Config _config {};
     bool _initted {false};
     IPconfig ipconfig {};
@@ -66,9 +70,8 @@ bool embot::app::eth::theIPnet::Impl::initialise(const Config &config)
     {
         _config = theIPnet_Config;
     }
-    
      
-    embot::core::print("embot::app::eth::theIPnet::Impl::initialise()");
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
     
     
     eOmipnet_cfg_dtgskt_t eom_ipnet_dtgskt_MyCfg = 
@@ -105,11 +108,18 @@ bool embot::app::eth::theIPnet::Impl::initialise(const Config &config)
       
     ipal_cfg_any_t * ipal_cfg2use = _config.ipal.cfg2;
     
-    embot::core::print(std::string("embot::app::eth::theIPnet: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
-                       " starting with IP addr " + ipconfig.ipaddr.to_string() +
-                       ", IP mask " + ipconfig.ipmask.to_string() +
-                       ", MAC addr " + ipconfig.macaddr.to_string() 
+//    embot::core::print(std::string("embot::app::eth::theIPnet: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
+//                       " starting with IP addr " + ipconfig.ipaddr.to_string() +
+//                       ", IP mask " + ipconfig.ipmask.to_string() +
+//                       ", MAC addr " + ipconfig.macaddr.to_string() 
+//    
+//    ); 
     
+    theErrorManager::getInstance().emit(theErrorManager::Severity::trace, {objectname, thr}, {}, 
+                        " starting with IP addr " + ipconfig.ipaddr.to_string() +
+                        ", IP mask " + ipconfig.ipmask.to_string() +
+                        ", MAC addr " + ipconfig.macaddr.to_string()        
+        
     ); 
 
     // ok, we can safely initialise the IPnet

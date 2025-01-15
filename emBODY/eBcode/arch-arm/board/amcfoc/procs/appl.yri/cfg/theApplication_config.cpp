@@ -13,6 +13,9 @@
 
 #include "embot_app_eth_theBackdoor.h"
 
+#include "embot_app_eth_theErrorManager.h"
+#include "embot_os_theScheduler.h"
+
 
 namespace embot { namespace app { namespace eth {
     
@@ -35,7 +38,10 @@ namespace embot { namespace app { namespace eth {
         // add what yout want
         volatile uint32_t ciao {0};
         ciao++;
-        embot::core::print("hello world... you can ping me now");
+        
+        
+        embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};            
+        embot::app::eth::theErrorManager::getInstance().trace("calling embot::app::eth::addservice()", {"theApplication_Config_inituserdefined()", thr});         
         
         
         embot::app::eth::addservice();
@@ -81,8 +87,7 @@ namespace embot { namespace app { namespace eth {
 
 void addservice()
 { 
-    embot::app::eth::theHandler::getInstance().initialise({});
-   
+    embot::app::eth::theHandler::getInstance().initialise({}); 
 }
 
 

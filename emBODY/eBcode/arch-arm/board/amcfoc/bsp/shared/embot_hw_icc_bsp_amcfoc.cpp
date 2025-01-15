@@ -121,8 +121,8 @@ namespace embot::hw::icc::mem::bsp {
 
     // -- MEM
     
-    constexpr uint32_t startmemory {0x38001000};
-    constexpr uint32_t memsizes[] = {1024, 1024, 512, 512};
+    constexpr uint32_t startmemory {0x38000000}; // SRAM4 that is 64K wide and in range [0x38000000, 0x38010000)
+    constexpr uint32_t memsizes[] = {1024, 1024, 1024, 1024};
     
     static const PROP mm1 = {
         reinterpret_cast<void*>(startmemory),

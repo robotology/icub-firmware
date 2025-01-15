@@ -71,15 +71,21 @@ namespace embot::hw::icc::sig::bsp {
     constexpr PROP sig02 = { embot::hw::MTX::six };
     constexpr PROP sig03 = { embot::hw::MTX::seven };
     constexpr PROP sig04 = { embot::hw::MTX::eight };
-    
+
+    constexpr PROP sig05 = { embot::hw::MTX::thirteen };
+    constexpr PROP sig06 = { embot::hw::MTX::fourteen };
+    constexpr PROP sig07 = { embot::hw::MTX::fifteen };
+    constexpr PROP sig08 = { embot::hw::MTX::sixteen };    
     
     constexpr BSP thebsp {        
         // maskofsupported
         mask::pos2mask<uint32_t>(SIG::one) | mask::pos2mask<uint32_t>(SIG::two) | 
-        mask::pos2mask<uint32_t>(SIG::three) | mask::pos2mask<uint32_t>(SIG::four),        
+        mask::pos2mask<uint32_t>(SIG::three) | mask::pos2mask<uint32_t>(SIG::four) |
+        mask::pos2mask<uint32_t>(SIG::five) | mask::pos2mask<uint32_t>(SIG::six) |
+        mask::pos2mask<uint32_t>(SIG::seven) | mask::pos2mask<uint32_t>(SIG::eight),        
         // properties
         {{
-            &sig01, &sig02, &sig03, &sig04    
+            &sig01, &sig02, &sig03, &sig04, &sig05, &sig06, &sig07, &sig08
         }}        
     };
     
@@ -115,8 +121,8 @@ namespace embot::hw::icc::mem::bsp {
 
     // -- MEM
     
-    constexpr uint32_t startmemory {0x38001000};
-    constexpr uint32_t memsizes[] = {1024, 1024, 512, 512};
+    constexpr uint32_t startmemory {0x38000000}; // SRAM4 that is 64K wide and in range [0x38000000, 0x38010000)
+    constexpr uint32_t memsizes[] = {1024, 1024, 1024, 1024};
     
     static const PROP mm1 = {
         reinterpret_cast<void*>(startmemory),
@@ -138,11 +144,12 @@ namespace embot::hw::icc::mem::bsp {
         memsizes[3],
         MTX::twelve
     };  
+
     
     constexpr BSP thebsp {        
         // maskofsupported
         mask::pos2mask<uint32_t>(MEM::one) | mask::pos2mask<uint32_t>(MEM::two) | 
-        mask::pos2mask<uint32_t>(MEM::three) | mask::pos2mask<uint32_t>(MEM::four),        
+        mask::pos2mask<uint32_t>(MEM::three) | mask::pos2mask<uint32_t>(MEM::four),
         // properties
         {{
             &mm1, &mm2, &mm3, &mm4      
@@ -182,13 +189,15 @@ namespace embot::hw::icc::ltr::bsp {
 
     constexpr PROP ltr01 = { embot::hw::icc::MEM::one, embot::hw::icc::SIG::one, embot::hw::icc::SIG::two };
     constexpr PROP ltr02 = { embot::hw::icc::MEM::two, embot::hw::icc::SIG::three, embot::hw::icc::SIG::four };
+    constexpr PROP ltr03 = { embot::hw::icc::MEM::three, embot::hw::icc::SIG::five, embot::hw::icc::SIG::six };
+    constexpr PROP ltr04 = { embot::hw::icc::MEM::four, embot::hw::icc::SIG::seven, embot::hw::icc::SIG::eight };
     
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LTR::one) | mask::pos2mask<uint32_t>(LTR::two),        
+        mask::pos2mask<uint32_t>(LTR::one) | mask::pos2mask<uint32_t>(LTR::two) | mask::pos2mask<uint32_t>(LTR::three) | mask::pos2mask<uint32_t>(LTR::four),        
         // properties
         {{
-            &ltr01, &ltr02
+            &ltr01, &ltr02, &ltr03, &ltr04
         }}        
     };
     
