@@ -128,7 +128,7 @@ namespace embot { namespace hw { namespace motor {
     // Return Vin in Volts
     float getVIN();
 
-    // Return Cin in Ampere (not yet implemented)
+    // Return Cin in Ampere
     float getCIN();
     
 }}} // namespace embot { namespace hw { namespace motor {
