@@ -64,7 +64,7 @@ constexpr std::uint8_t dotNumberOf = 12;
 constexpr std::uint8_t trgNumberOf = 16; //4 for each sda. This is used in the CAN message forming so it's locked to 16
 uint16_t trianglesOrder[16]  = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};    
 uint16_t origTrianglesOrder[16]  = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}; //consecutive ordergin of triangles used in iCub skin patches
-uint16_t altTrianglesOrder[16]  = {0,4,8,12,16,10,11,13,15,1,2,3,5,6,7,9}; //to reshuffle the triangles on-the-run with the ergoCub hand mapping
+uint16_t altTrianglesOrder[16]  = {0,4,8,12,16,9,10,11,13,15,1,2,3,5,6,7}; //to reshuffle the triangles on-the-run with the ergoCub hand mapping
 
 
 struct TriangleCfg
