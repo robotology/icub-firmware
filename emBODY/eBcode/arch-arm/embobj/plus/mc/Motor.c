@@ -990,6 +990,10 @@ BOOL Motor_is_calibrated(Motor* o) //
     return !(o->not_calibrated);
 }
 
+BOOL Calibration_check(Motor* o)
+{
+    return (o->hardstop_calibdata.u.bits.iscalibrating && !(o->hardstop_calibdata.u.bits.hwlimitreached));
+}
 
 CTRL_UNITS Motor_do_trq_control_EXPERIMENTAL(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk, CTRL_UNITS motor_vel_icubdeg_sec) //
 {
