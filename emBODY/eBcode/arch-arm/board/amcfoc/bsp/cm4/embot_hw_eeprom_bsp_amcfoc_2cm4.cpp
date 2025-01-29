@@ -83,6 +83,7 @@ namespace embot::hw::eeprom {
                                     embot::hw::spi::Prescaler::eight, 
                                     embot::hw::spi::DataSize::eight, 
                                     embot::hw::spi::Mode::zero,
+                                    #warning this works but clk should be pulldown for mode zero
                                     { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::none} }
                                 },
                                 {

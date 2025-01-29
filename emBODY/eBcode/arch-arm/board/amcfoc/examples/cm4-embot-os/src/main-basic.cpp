@@ -44,7 +44,7 @@ constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 
 //#define TEST_EEPROM
-#define ERASE_EEPROM
+//#define ERASE_EEPROM
 void test_eeprom_init();
 void test_eeprom_tick();
 
@@ -67,7 +67,7 @@ void test_eth_tick();
 void test_timer();
 
 
-//#define TEST_EMBOT_HW_ENCODER
+#define TEST_EMBOT_HW_ENCODER
 //#define TEST_EMBOT_HW_CHIP_MA730
 #if defined(TEST_EMBOT_HW_ENCODER)
     #include "embot_hw_encoder.h"
@@ -222,6 +222,11 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     
 #if defined(TEST_CAN)    
 		test_can_tick(t, eventmask, param);
+#endif
+
+
+#if defined(TEST_EMBOT_HW_ENCODER)  ||  defined(TEST_EMBOT_HW_CHIP_MA730)  
+    test_encoder();
 #endif
     
 	}
@@ -820,13 +825,13 @@ void test_timer()
 //ENCODER
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#if defined(TEST_EMBOT_HW_ENCODER) ||  defined(TEST_EMBOT_HW_CHIP_MA730)  
+#if defined(TEST_EMBOT_HW_ENCODER)  ||  defined(TEST_EMBOT_HW_CHIP_MA730)  
 
 void test_encoder()
 {
 #if defined(TEST_EMBOT_HW_ENCODER)
-    embot::hw::encoder::Config cfgONE   { .type = embot::hw::encoder::Type::chipAS5045 };
-    embot::hw::encoder::Config cfgTWO   { .type = embot::hw::encoder::Type::chipAS5045 };
+    embot::hw::encoder::Config cfgONE   { .type = embot::hw::encoder::Type::chipMA730 };
+    embot::hw::encoder::Config cfgTWO   { .type = embot::hw::encoder::Type::chipMA730 };
     
     embot::hw::ENCODER encoder_ONE = embot::hw::ENCODER::one;
     embot::hw::ENCODER encoder_TWO = embot::hw::ENCODER::two;
@@ -834,13 +839,13 @@ void test_encoder()
     uint16_t posONE, posTWO = 0;
     
     // init the encoder(s)
-    if( embot::hw::resOK == embot::hw::encoder::init(encoder_ONE, cfgONE) &&
+    if( embot::hw::resOK == embot::hw::encoder::init(encoder_ONE, cfgONE) ||
         embot::hw::resOK == embot::hw::encoder::init(encoder_TWO, cfgTWO) )
     {
         for(;;)
         {
-            sigEVenc->on();
-            sigEVenc->off();
+//            sigEVenc->on();
+//            sigEVenc->off();
             
             // start the encoder reading
             embot::hw::encoder::startRead(encoder_ONE);
@@ -849,14 +854,14 @@ void test_encoder()
             for(;;)
             {
                 // try to get the value read when the data is ready
-                if(embot::hw::resOK == embot::hw::encoder::getValue(encoder_ONE, posONE) &&
+                if(embot::hw::resOK == embot::hw::encoder::getValue(encoder_ONE, posONE) ||
                    embot::hw::resOK == embot::hw::encoder::getValue(encoder_TWO, posTWO))
                 {
-                    //embot::core::print(std::to_string(posONE) + " | " + 
-                    //                   std::to_string(posTWO) + " | " +
-                    //                   std::to_string(posTHREE));
-                    sigEVenc->on();
-                    sigEVenc->off();
+                    embot::core::print(std::to_string(posONE) + " | " + 
+                                       std::to_string(posTWO));
+                                       
+//                    sigEVenc->on();
+//                    sigEVenc->off();
                     break;
                 }
             }
@@ -871,6 +876,7 @@ void test_encoder()
 #elif defined(TEST_EMBOT_HW_CHIP_MB049)
 
     embot::hw::chip::testof_MB049();
+    
 #elif defined(TEST_EMBOT_HW_CHIP_MA730)
 
     embot::hw::chip::testof_MA730();

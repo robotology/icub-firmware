@@ -86,8 +86,10 @@ namespace embot { namespace hw { namespace chip {
         
         static constexpr embot::hw::spi::Config standardspiconfig
         { 
-            embot::hw::spi::Prescaler::sixtyfour, 
+            #warning Prescaler depend on SPI clock use
+            embot::hw::spi::Prescaler::onehundredtwentyeigth, 
             embot::hw::spi::DataSize::eight, 
+            #warning check SPI Mode and pull mode of pin
             embot::hw::spi::Mode::one,
             { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::nopull,      // | miso | mosi |
                embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::pullup} }  // | sclk | sel  |
