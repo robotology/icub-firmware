@@ -307,18 +307,21 @@ struct theSM
 #if defined(USE_ICC_COMM) 
 #if defined(debugNOicc)
 #else            
-        // theICCservice
-        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::instant);  
-        embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);
-        embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, 5*embot::core::time1millisec); 
-        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, {s_icc_cbkonrx_idle, nullptr});  
-#if 0
+
+ 
+#if defined(useICCserviceCAN)
         embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::instant);  
         embot::app::eth::icc::theICCserviceCAN::getInstance().parse();
         embot::app::eth::icc::theICCserviceCAN::getInstance().flush(5*embot::core::time1millisec); 
         embot::app::eth::icc::theICCserviceCAN::getInstance().set({s_icc_cbkonrx_idle, nullptr}); 
-#endif        
-        
+#else
+       // theICCservice
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);
+        embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, 5*embot::core::time1millisec); 
+        embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, {s_icc_cbkonrx_idle, nullptr});  
+#endif // #if defined(useICCserviceCAN)
+
    
 #endif
 #endif 
@@ -363,18 +366,22 @@ struct theSM
 #if defined(USE_ICC_COMM)  
 #if defined(debugNOicc)
 #else            
+
+#if defined(useICCserviceCAN)
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::onflush);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().flush(5*embot::core::time1millisec);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::core::Callback()); 
+#else
         // theICCservice
         embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::onflush);  
         embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, 5*embot::core::time1millisec);  
         embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::core::Callback());  
-#if 0
-        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::onflush);  
-        embot::app::eth::icc::theICCserviceCAN::getInstance().flush(5*embot::core::time1millisec);  
-        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::core::Callback());  
+#endif // #if defined(useICCserviceCAN)
+
 #endif
 
 #endif         
-#endif            
+           
         
         // can discovery
         eo_candiscovery2_SetTicker(eo_candiscovery2_GetHandle(), nullptr);
@@ -408,16 +415,17 @@ struct theSM
 #if defined(USE_ICC_COMM) 
 #if defined(debugNOicc)
 #else            
+
+#if defined(useICCserviceCAN)
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().parse();   
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set({s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())}); 
+#else
         // theICCservice
         embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::instant);  
         embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);   
         embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, {s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())});             
-
-#if 0
-        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::instant);  
-        embot::app::eth::icc::theICCserviceCAN::getInstance().parse();   
-        embot::app::eth::icc::theICCserviceCAN::getInstance().set({s_icc_cbkonrx_fatalerror, eom_emserror_GetTask(eom_emserror_GetHandle())});             
-#endif
+#endif // #if defined(useICCserviceCAN)
 
         
 #endif
@@ -458,20 +466,22 @@ struct theSM
         eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
         eo_canserv_ParseAll(eo_canserv_GetHandle());  
 #if defined(USE_ICC_COMM) 
+        
 #if defined(debugNOicc)
 #else        
+
+#if defined(useICCserviceCAN)
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::instant);  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().parse();  
+        embot::app::eth::icc::theICCserviceCAN::getInstance().set({s_icc_cbkonrx_idle, nullptr});  
+#else
         // theICCservice
         embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, embot::app::eth::icc::theICCservice::modeTX::instant);  
         embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);  
         embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, {s_icc_cbkonrx_idle, nullptr});   
 
-#if 0
-        embot::app::eth::icc::theICCserviceCAN::getInstance().set(embot::app::eth::icc::theICCservice::modeTX::instant);  
-        embot::app::eth::icc::theICCserviceCAN::getInstance().parse();  
-        embot::app::eth::icc::theICCserviceCAN::getInstance().set({s_icc_cbkonrx_idle, nullptr});  
+#endif // #if defined(useICCserviceCAN)     
 #endif
-        
-#endif      
 #endif        
         // stop and deactivate all the services which may have been started 
         embot::app::eth::theServices::getInstance().stop();        
@@ -507,10 +517,12 @@ struct theSM
             {
 #if defined(debugNOicc)
 #else                
-                embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);  
 
-#if 0
+
+#if defined(useICCserviceCAN)
                 embot::app::eth::icc::theICCserviceCAN::getInstance().parse();
+#else
+                embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one);                  
 #endif                
                 
 #endif                
@@ -540,11 +552,13 @@ struct theSM
 #if defined(USE_ICC_COMM) 
 #if defined(debugNOicc)
 #else        
+
+
+#if defined(useICCserviceCAN)
+        embot::app::eth::icc::theICCserviceCAN::getInstance().parse(); 
+#else
         // theICCservice
         embot::app::eth::icc::theICCservice::getInstance().parse(embot::app::eth::icc::theICCservice::Pipe::one); 
-
-#if 0
-        embot::app::eth::icc::theICCserviceCAN::getInstance().parse(); 
 #endif
         
 #endif
@@ -586,11 +600,14 @@ struct theSM
 #if defined(debugNOicc)
 #else        
         // theICCservice: i call the flush() with a callback so it returns immediately
+        
+#if defined(useICCserviceCAN)        
+        constexpr embot::core::Callback donothingonflushdone {};
+        embot::app::eth::icc::theICCserviceCAN::getInstance().flush(donothingonflushdone);
+#else
+        // theICCservice: i call the flush() with a callback so it returns immediately
         constexpr embot::core::Callback donothingonflushdone {};
         embot::app::eth::icc::theICCservice::getInstance().flush(embot::app::eth::icc::theICCservice::Pipe::one, donothingonflushdone); 
-
-#if 0
-        embot::app::eth::icc::theICCserviceCAN::getInstance().flush(donothingonflushdone);
 #endif
             
 #endif        
@@ -600,26 +617,9 @@ struct theSM
     {
 #if defined(debugNOicc)
 #else
-#if 1        
-        if(true == embot::app::eth::icc::theICCservice::getInstance().flushed(embot::app::eth::icc::theICCservice::Pipe::one))
-        {
-            return;   
-        }
-        
-        // theICCservice
-        embot::core::Time expirytime {embot::core::now() + 3*embot::core::time1millisec};
-        for(;;)
-        {
-            if(true == embot::app::eth::icc::theICCservice::getInstance().flushed(embot::app::eth::icc::theICCservice::Pipe::one))
-            {
-                break;
-            }
-            if(embot::core::now() >= expirytime)
-            {
-                break;
-            }
-        }
-#else
+     
+
+#if defined(useICCserviceCAN)
         if(true == embot::app::eth::icc::theICCserviceCAN::getInstance().flushed())
         {
             return;   
@@ -638,8 +638,26 @@ struct theSM
                 break;
             }
         }
-
-#endif
+#else
+        if(true == embot::app::eth::icc::theICCservice::getInstance().flushed(embot::app::eth::icc::theICCservice::Pipe::one))
+        {
+            return;   
+        }
+        
+        // theICCservice
+        embot::core::Time expirytime {embot::core::now() + 3*embot::core::time1millisec};
+        for(;;)
+        {
+            if(true == embot::app::eth::icc::theICCservice::getInstance().flushed(embot::app::eth::icc::theICCservice::Pipe::one))
+            {
+                break;
+            }
+            if(embot::core::now() >= expirytime)
+            {
+                break;
+            }
+        }        
+#endif // #if defined(useICCserviceCAN)
 
 #endif        
     }

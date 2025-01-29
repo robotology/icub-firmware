@@ -94,7 +94,7 @@ void embot::app::eth::theApplication::Impl::initSystem(embot::os::Thread *t, voi
     //    so, we shall put the thread to sleep for a bit and wait some more time so that the other core can be activated  
     embot::app::eth::icc::theICCservice::getInstance().initialise(embot::app::eth::icc::iccmastercfg);  
     embot::app::eth::icc::theICCserviceROP::getInstance().initialise({});
-#if 0
+#if defined(useICCserviceCAN)
     embot::app::eth::icc::theICCserviceCAN::getInstance().initialise({});
 #endif        
 

@@ -420,12 +420,14 @@ namespace embot::app::eth::mc::messaging::sender {
 //        #warning TODO: solve the use of theICCservice by ems etc
 #if defined(USE_ICC_COMM)
 #if defined(debugNOicc)
-#else     
+#else
+  
         embot::app::eth::icc::ItemCANframe icf {des, frame};         
-        embot::app::eth::icc::theICCservice::getInstance().put(embot::app::eth::icc::theICCservice::Pipe::one, icf.item());
-
-#if 0        
+        
+#if defined(useICCserviceCAN)     
         embot::app::eth::icc::theICCserviceCAN::getInstance().put(icf);  
+#else
+        embot::app::eth::icc::theICCservice::getInstance().put(embot::app::eth::icc::theICCservice::Pipe::one, icf.item());        
 #endif
         
 #endif        

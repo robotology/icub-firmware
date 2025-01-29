@@ -290,10 +290,14 @@ void embot::app::eth::theServices::Impl::init_step2()
 
 #if defined(debugNOicc)
 #else
+#if defined(useICCserviceCAN)
+    embot::app::eth::icc::theICCserviceCAN::getInstance().set(oniccRX); 
+    embot::app::eth::icc::theICCserviceCAN::getInstance().set(iccitemparsercan); 
+#else
     embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, oniccRX); 
     embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, iccitemparser);  
-//    embot::app::eth::icc::theICCserviceCAN::getInstance().set(oniccRX); 
-//    embot::app::eth::icc::theICCserviceCAN::getInstance().set(iccitemparsercan);     
+#endif // #if defined(useICCserviceCAN)
+        
 #endif        
 
 #endif // #if defined(USE_ICC_COMM)
