@@ -83,7 +83,7 @@
 
 #define CANICCflushMODE_DO_phase
 
-#define TEST_ICCROP
+//#define TEST_ICCROP
 
 #if defined(TEST_ICCROP)
 void testiccrop();
