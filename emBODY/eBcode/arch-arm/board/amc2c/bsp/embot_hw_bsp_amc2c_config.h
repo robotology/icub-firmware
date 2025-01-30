@@ -22,6 +22,7 @@
 //    #define EMBOT_ENABLE_hw_bsp_redefine_puts
     
     #define EMBOT_ENABLE_hw_sys_emulateRAND
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid
     #define EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
