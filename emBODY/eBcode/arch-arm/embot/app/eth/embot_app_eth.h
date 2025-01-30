@@ -43,7 +43,7 @@ namespace embot::app::eth {
         thirteen = 13, fourteen = 14, fifteen = 15, sixteen = 16, seventeen = 17, 
         eigthteen = 18, nineteen = 19, twenty = 20, twentyone = 21, twentytwo = 22, 
         twentythree = 23, twentyfour = 24, twentyfive = 25, twentysix = 26, twentyseven = 27, 
-        twentyeight = 28, twentynine = 29, thirthy = 30, thirthyone = 31
+        twentyeight = 28, twentynine = 29, thirty = 30, thirtyone = 31
     };
     
     struct Date
