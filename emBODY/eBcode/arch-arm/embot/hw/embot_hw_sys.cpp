@@ -348,6 +348,8 @@ namespace embot::hw::sys::DRIVER {
         SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);
     }
     
+#if !defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
+
     uint64_t _uniqueid()
     {
         uint64_t r = 0;
@@ -366,10 +368,17 @@ namespace embot::hw::sys::DRIVER {
         return r;  
     }
     
+#endif // !defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
+
+
+#if !defined(EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid)
+
     bool _setuniqueid(uint64_t v)
     {
         return false;   
     }
+
+#endif // #if !defined(EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid)
     
     void _delay(embot::core::relTime t)
     {
