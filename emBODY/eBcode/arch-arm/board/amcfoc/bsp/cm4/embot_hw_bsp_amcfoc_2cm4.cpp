@@ -52,9 +52,30 @@ using namespace embot::core::binary;
 
 #include "embot_hw_bsp_amcfoc_2cm4.h"
 
+#include "embot_app_eth_theICCserviceROP.h"
+#include "embot_hw_eeprom.h"
+#include "embot_hw_sys.h"
 
 namespace embot::hw::bsp::amcfoc2cm4 {
     
+    
+    uint64_t synchUID()
+    {            
+        
+        uint64_t uid = embot::hw::sys::uniqueid();
+        if((embot::hw::sys::UIDinvalid == uid))
+        {            
+            embot::app::eth::icc::ItemROP::Variable varUID {embot::app::eth::icc::ItemROP::IDunique64, 8, &uid};           
+            bool ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varUID, 30*1000);
+            if(true == ok)
+            {
+                embot::hw::sys::setuniqueid(uid);
+            } 
+            uid = embot::hw::sys::uniqueid();            
+        }
+
+        return uid;       
+    }   
 
 }
 
@@ -64,6 +85,9 @@ bool embot::hw::bsp::specialize() { return true; }
 
 bool embot::hw::bsp::specialize()
 {
+    
+    embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+        
     // all the rest
     // nothing for now
 
@@ -100,6 +124,36 @@ bool embot::hw::bsp::specialize()
 //    }
 
 //}    
+
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
+
+#include "embot_hw_sys.h"
+#include "embot_hw_eeprom.h"
+
+constexpr embot::hw::eeprom::ADR uidloc {4096};
+uint64_t embot::hw::sys::uniqueid()
+{
+    static uint64_t val {0};
+    
+    embot::core::Data d {&val, 8};
+    embot::hw::eeprom::read(embot::hw::EEPROM::one, uidloc, d, 10*embot::core::time1millisec);
+    
+    return val;    
+}
+
+bool embot::hw::sys::setuniqueid(uint64_t v)
+{
+    bool r {true};
+
+    embot::core::Data d {&v, 8};
+    embot::hw::eeprom::write(embot::hw::EEPROM::one, uidloc, d, 10*embot::core::time1millisec);
+
+    return r;
+}
+
+
+#endif
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

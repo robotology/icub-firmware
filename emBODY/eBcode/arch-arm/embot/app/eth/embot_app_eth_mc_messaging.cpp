@@ -29,6 +29,8 @@
 #include "EOtheCANservice.h"
 #if defined(USE_ICC_COMM) 
 #include "embot_app_eth_theICCservice.h"
+#include "embot_app_eth_icc_ItemCANframe.h"
+#include "embot_app_eth_theICCserviceCAN.h"
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -418,8 +420,16 @@ namespace embot::app::eth::mc::messaging::sender {
 //        #warning TODO: solve the use of theICCservice by ems etc
 #if defined(USE_ICC_COMM)
 #if defined(debugNOicc)
-#else        
-        embot::app::eth::theICCservice::getInstance().put({des, frame});
+#else
+  
+        embot::app::eth::icc::ItemCANframe icf {des, frame};         
+        
+#if defined(useICCserviceCAN)     
+        embot::app::eth::icc::theICCserviceCAN::getInstance().put(icf);  
+#else
+        embot::app::eth::icc::theICCservice::getInstance().put(embot::app::eth::icc::theICCservice::Pipe::one, icf.item());        
+#endif
+        
 #endif        
 #endif        
         return true;
@@ -569,5 +579,3 @@ namespace embot::app::eth::mc::messaging::receiver {
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-

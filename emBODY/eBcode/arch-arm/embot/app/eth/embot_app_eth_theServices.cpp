@@ -31,6 +31,8 @@
 #if defined(USE_ICC_COMM) 
 #include "embot_app_eth_theICCservice.h"
 #include "embot_app_eth_theICCmapping.h"
+#include "embot_app_eth_icc_ItemCANframe.h"
+#include "embot_app_eth_theICCserviceCAN.h"
 #endif
 
 #include "EOtheCANprotocol.h"
@@ -89,7 +91,8 @@ struct embot::app::eth::theServices::Impl
     static void onendverifyactivate2(Service *s, bool ok);
 
 #if defined(USE_ICC_COMM)     
-    static bool iccitemparser(const embot::app::eth::theICCservice::Item &item);
+    static bool iccitemparser(const embot::app::eth::icc::Item &item);
+    static bool iccitemparsercan(const embot::app::eth::icc::ItemCANframe &itemcan);
 #endif    
 
 };
@@ -272,23 +275,29 @@ void embot::app::eth::theServices::Impl::init_step2()
     1. very early we init the theICCservice w/ dummy callback on rx and parser
     2. in here we just configure those two correctly
            
-    embot::app::eth::theICCservice::Config cfgicc
+    embot::app::eth::icc::theICCservice::Config cfgicc
     {
         embot::hw::icc::LTR::one, embot::hw::icc::LTR::two,
         32, 32,
-        embot::app::eth::theICCservice::modeTX::onflush,
+        embot::app::eth::icc::theICCservice::modeTX::onflush,
         embot::os::Priority::system54, embot::os::Priority::system53,
         oniccRX,
         iccitemparser
     };
             
-    embot::app::eth::theICCservice::getInstance().initialise(cfgicc);
+    embot::app::eth::icc::theICCservice::getInstance().initialise(cfgicc);
 #endif
 
 #if defined(debugNOicc)
 #else
-    embot::app::eth::theICCservice::getInstance().set(oniccRX); 
-    embot::app::eth::theICCservice::getInstance().set(iccitemparser);     
+#if defined(useICCserviceCAN)
+    embot::app::eth::icc::theICCserviceCAN::getInstance().set(oniccRX); 
+    embot::app::eth::icc::theICCserviceCAN::getInstance().set(iccitemparsercan); 
+#else
+    embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, oniccRX); 
+    embot::app::eth::icc::theICCservice::getInstance().set(embot::app::eth::icc::theICCservice::Pipe::one, iccitemparser);  
+#endif // #if defined(useICCserviceCAN)
+        
 #endif        
 
 #endif // #if defined(USE_ICC_COMM)
@@ -858,13 +867,29 @@ void embot::app::eth::theServices::Impl::onendverifyactivate2(Service *s, bool o
 }
 
 #if defined(USE_ICC_COMM) 
-bool embot::app::eth::theServices::Impl::iccitemparser(const embot::app::eth::theICCservice::Item &item)
-{   
-    // now we just ask to the MC service
-    return embot::app::eth::theServiceMC::getInstance().process({item.des.getbus(), item.frame});
+bool embot::app::eth::theServices::Impl::iccitemparser(const embot::app::eth::icc::Item &item)
+{
+    bool r {false};
+    if(embot::app::eth::icc::ItemType::CANframe == item.type)
+    {
+        // if a can frame we just ask to the MC service
+        embot::app::eth::icc::ItemCANframe icf {item};
+        r = embot::app::eth::theServiceMC::getInstance().process({icf.des.getbus(), icf.frame});        
+    }
+    return r;
     // and we do not call that anymore....
 //    return embot::app::eth::mc::messaging::receiver::parse(item.des.bus, item.frame);
 }
+
+bool embot::app::eth::theServices::Impl::iccitemparsercan(const embot::app::eth::icc::ItemCANframe &itemcan)
+{
+    bool r {false};
+
+    r = embot::app::eth::theServiceMC::getInstance().process({itemcan.des.getbus(), itemcan.frame});        
+
+    return r;
+}
+
 #endif // #if defined(USE_ICC_COMM) 
 
 // --------------------------------------------------------------------------------------------------------------------

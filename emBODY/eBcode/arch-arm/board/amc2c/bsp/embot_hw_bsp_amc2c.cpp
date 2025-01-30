@@ -409,6 +409,15 @@ void leds_init_off()
 #endif
 
 
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
+
+#include "embot_hw_sys.h"
+uint64_t embot::hw::sys::uniqueid()
+{
+    return 0;
+}  
+
+#endif // #if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid)
 
 bool embot::hw::bsp::specialize()
 {
@@ -430,6 +439,9 @@ bool embot::hw::bsp::specialize()
     #warning TODO: verificare che le priorita' delle IRQ del motor control possano essere impostate anche dopo la partenza del rtos
     return true;
 }
+
+
+
 
 
 #endif  //EMBOT_ENABLE_hw_bsp_specialize

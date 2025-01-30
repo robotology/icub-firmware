@@ -43,7 +43,7 @@ namespace embot::app::eth {
         thirteen = 13, fourteen = 14, fifteen = 15, sixteen = 16, seventeen = 17, 
         eigthteen = 18, nineteen = 19, twenty = 20, twentyone = 21, twentytwo = 22, 
         twentythree = 23, twentyfour = 24, twentyfive = 25, twentysix = 26, twentyseven = 27, 
-        twentyeight = 28, twentynine = 29, thirthy = 30, thirthyone = 31
+        twentyeight = 28, twentynine = 29, thirty = 30, thirtyone = 31
     };
     
     struct Date
@@ -55,7 +55,12 @@ namespace embot::app::eth {
         uint32_t minute : 6;         /**< the minute from 0 to 59 */  
         constexpr Date(uint16_t y, Month mo, Day d, uint8_t h, uint8_t m)
             : year(y), month(embot::core::tointegral(mo)), day(embot::core::tointegral(d)), hour(h>23?23:h), minute(m>59?59:m) {}
-        //constexpr Date() = default;                
+        constexpr Date() : year(1999), month(9), day(9), hour(12), minute(0) {} 
+        
+        std::string to_string() const
+        {
+            return std::to_string(year) + "/" + std::to_string(month) + "/" + std::to_string(day) + "@" + std::to_string(hour) + ":" + std::to_string(minute);
+        }         
     };
     
     struct Version
@@ -63,6 +68,11 @@ namespace embot::app::eth {
         uint8_t major {3};
         uint8_t minor {0};
         constexpr Version(uint8_t ma, uint8_t mi) : major(ma), minor(mi) {}
+            
+        std::string to_string() const
+        {
+            return std::to_string(major) + "." + std::to_string(minor);
+        }
     };
 
     struct Version2
@@ -73,6 +83,11 @@ namespace embot::app::eth {
         uint8_t extra {0};
         constexpr Version2(uint8_t ma, uint8_t mi, uint8_t bu, uint8_t ex) 
             : major(ma), minor(mi), build(bu), extra(ex) {}
+                
+        std::string to_string() const
+        {
+            return std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(build) + "." + std::to_string(extra);
+        }                
     };
     
     struct Property 

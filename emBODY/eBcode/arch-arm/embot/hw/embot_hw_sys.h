@@ -54,8 +54,11 @@ namespace embot::hw::sys {
     std::uint32_t minrandom();
     std::uint32_t maxrandom();
     
+    constexpr uint64_t UIDinvalid {0xffffffffffffffff};
     // get a unique id
     uint64_t uniqueid();
+    // and if needed set it (only on some targets)
+    bool setuniqueid(uint64_t v);
     
     // prints on the trace port. 
     // [[deprecated( "use embot::core::print()" )]] 

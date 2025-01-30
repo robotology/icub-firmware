@@ -20,6 +20,8 @@
 #if defined(STM32HAL_BOARD_AMCFOC_2CM4)
 
     #define EMBOT_REDEFINE_hw_bsp_DRIVER_init    
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_uniqueid
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid    
     #define EMBOT_ENABLE_hw_dualcore
     #define EMBOT_ENABLE_hw_sys_emulateRAND
     #define EMBOT_ENABLE_hw_bsp_specialize
