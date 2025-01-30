@@ -888,6 +888,46 @@ bool embot::app::eth::theHandler::Impl::moveto(State st)
 
 extern void xxx_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *errdes);
 
+
+static void s_manage_dispatch(const eOerrmanErrorType_t errtype, const char *info, const eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
+
+void xxx_errorman_onemit(embot::app::eth::theErrorManager::Severity sev, const embot::app::eth::theErrorManager::Caller &caller, const embot::app::eth::theErrorManager::Descriptor &des, const std::string &str)
+{
+    std::string timenow = embot::core::TimeFormatter(embot::core::now()).to_string();
+    std::string eobjstr = (true == caller.isvalid()) ? caller.objectname : "OBJ";
+    std::string threadname = (true == caller.isvalid()) ? caller.owner->getName() : "THR";
+    std::string severity = embot::app::eth::theErrorManager::to_cstring(sev);
+    
+    embot::core::print(std::string("[[") + severity + "]] @" + timenow + " (" + eobjstr + ", " + threadname + "): " + str);
+    
+    if(embot::app::eth::theErrorManager::Severity::trace == sev) 
+    {
+        return;
+    } 
+
+    // you may in here send the diagnostics message
+    if(true == des.isvalid())
+    {
+        eOerrmanErrorType_t et {static_cast<eOerrmanErrorType_t>(sev)};
+        eOerrmanCaller_t cl {0, caller.objectname};
+        eOerrmanDescriptor_t ed {};
+        ed.code = des.code;
+        ed.sourcedevice = des.sourcedevice;
+        ed.sourceaddress = des.sourceaddress;
+        ed.par16 = des.par16;
+        ed.par64 = des.par64;
+        s_manage_dispatch(et, str.c_str(), &cl, &ed);
+    }
+  
+    if(embot::app::eth::theErrorManager::Severity::fatal == sev)
+    {
+        for(;;);
+    }        
+    
+}
+
+
+
 #include "embot_os_rtos.h"
 embot::os::rtos::mutex_t* onerrormutex {nullptr};
 embot::os::rtos::semaphore_t* blockingsemaphore {nullptr};
@@ -898,6 +938,8 @@ void embot::app::eth::theHandler::Impl::redefine_errorhandler()
     blockingsemaphore = embot::os::rtos::semaphore_new(2, 0);
     
     eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), xxx_OnError);
+    
+    embot::app::eth::theErrorManager::getInstance().set(xxx_errorman_onemit);
 
 
 //#if !defined(DIAGNOSTIC2_enabled)
