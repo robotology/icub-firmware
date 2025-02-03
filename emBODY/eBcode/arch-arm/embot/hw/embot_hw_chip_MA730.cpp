@@ -23,6 +23,7 @@ bool embot::hw::chip::testof_MA730()
 {    
     // this configuration tells about which spi bus to use, which are the control pins
     // and their low level GPIO configuration
+    //SPI Mode one is for using the chip in SSI mode
     // some extra info:
     // 1. this configuration is typically used by the embot::hw::eeprom and defined
     //    inside embot::hw::eeprom::thebsp located inside mbot_hw_bsp_nameofboard.cpp
@@ -37,7 +38,7 @@ bool embot::hw::chip::testof_MA730()
         { 
             embot::hw::spi::Prescaler::sixtyfour, 
             embot::hw::spi::DataSize::eight, 
-            embot::hw::spi::Mode::two,
+            embot::hw::spi::Mode::one,
             { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::nopull,      // | miso | mosi |
                embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::pullup} }  // | sclk | sel  |
         }

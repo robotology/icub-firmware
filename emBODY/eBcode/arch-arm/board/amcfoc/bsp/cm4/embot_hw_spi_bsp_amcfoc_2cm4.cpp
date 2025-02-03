@@ -187,14 +187,14 @@ namespace embot::hw::spi::bsp {
         hspi->Init.TIMode = SPI_TIMODE_DISABLE;
         hspi->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
         hspi->Init.CRCPolynomial = 0x0;
-        hspi->Init.NSSPMode = SPI_NSS_PULSE_ENABLE; // SPI5 for eth-switch used SPI_NSS_PULSE_DISABLE
+        hspi->Init.NSSPMode = SPI_NSS_PULSE_ENABLE; 
         hspi->Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
         hspi->Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
         hspi->Init.TxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
         hspi->Init.RxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
         hspi->Init.MasterSSIdleness = SPI_MASTER_SS_IDLENESS_00CYCLE;
-        hspi->Init.MasterInterDataIdleness = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE; // SPI5 used SPI_MASTER_INTERDATA_IDLENESS_01CYCLE
-        hspi->Init.MasterReceiverAutoSusp = SPI_MASTER_RX_AUTOSUSP_DISABLE;  // SPI5 used SPI_MASTER_RX_AUTOSUSP_ENABLE
+        hspi->Init.MasterInterDataIdleness = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE; 
+        hspi->Init.MasterReceiverAutoSusp = SPI_MASTER_RX_AUTOSUSP_DISABLE;  
         hspi->Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_DISABLE;
         hspi->Init.IOSwap = SPI_IO_SWAP_DISABLE;
         
@@ -301,7 +301,7 @@ extern "C"
       if(spiHandle->Instance == SPI1)
       {
           
-          #warning CHECK SPI1
+          //#warning CHECK SPI1
           
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPI1;
         PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL; //
@@ -325,7 +325,6 @@ extern "C"
         */
         GPIO_InitStruct.Pin = extcfg->pin(embot::hw::spi::Signal::MISO, 0);
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        #warning GPIO_NOPULL? should be GPIO_PULLUP? Kevin
         GPIO_InitStruct.Pull = extcfg->pull(embot::hw::spi::Signal::MISO, GPIO_NOPULL);
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
@@ -351,7 +350,7 @@ extern "C"
       }
       else if(spiHandle->Instance == SPI2)
       {
-          #warning CHECK SPI2
+          //#warning CHECK SPI2
           
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPI2;
         PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;

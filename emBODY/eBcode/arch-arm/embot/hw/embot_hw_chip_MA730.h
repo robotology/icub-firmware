@@ -84,15 +84,35 @@ namespace embot { namespace hw { namespace chip {
             }
         }; 
         
+        //pay attention: we are using the chip in SSI mode!!!!!
+        //SPI chip ask for mode 0 or 3
+        //for SSI we use mode one but we discard the first bit (implemented in embot::hw::chip::MA730::Impl::read in embot_hw_chip_MA730.cpp)
         static constexpr embot::hw::spi::Config standardspiconfig
         { 
-            #warning Prescaler depend on SPI clock use
+            
+#if defined(STM32HAL_BOARD_AMC)
+        
+            embot::hw::spi::Prescaler::sixtyfour, 
+            embot::hw::spi::DataSize::eight, 
+            embot::hw::spi::Mode::one,
+            { {embot::hw::gpio::Pull::pullup,   embot::hw::gpio::Pull::nopull,    // | miso | mosi |
+               embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::pullup} }  // | sclk | sel  |
+        
+#elif defined(STM32HAL_BOARD_AMCFOC_2CM4)
+            
+            //Prescaler depends on the SPI clock used
             embot::hw::spi::Prescaler::onehundredtwentyeigth, 
             embot::hw::spi::DataSize::eight, 
-            #warning check SPI Mode and pull mode of pin
             embot::hw::spi::Mode::one,
-            { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::nopull,      // | miso | mosi |
+            { {embot::hw::gpio::Pull::pullup,   embot::hw::gpio::Pull::pullup,    // | miso | mosi |
                embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::pullup} }  // | sclk | sel  |
+            
+              
+#else
+           
+           #error board not defined
+           
+#endif
         };
         
         MA730();

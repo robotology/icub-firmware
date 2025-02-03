@@ -73,15 +73,13 @@ namespace embot::hw::encoder {
 
     // encoder two --> SPI2
     constexpr PROP e2p = { embot::hw::SPI::two };
-//    
-//    // encoder one --> SPI3
-//    constexpr PROP e3p = { embot::hw::SPI::three };
-//        
+
+   
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(ENCODER::one) | mask::pos2mask<uint32_t>(ENCODER::two), // | mask::pos2mask<uint32_t>(ENCODER::three),
+        mask::pos2mask<uint32_t>(ENCODER::one) | mask::pos2mask<uint32_t>(ENCODER::two),
         // properties
-        {{ &e1p, &e2p, nullptr }}
+        {{ &e1p, &e2p}}
     };
         
     void BSP::init(embot::hw::ENCODER h) const {}

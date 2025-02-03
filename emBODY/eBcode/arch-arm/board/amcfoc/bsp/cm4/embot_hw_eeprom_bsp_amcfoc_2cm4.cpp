@@ -83,15 +83,14 @@ namespace embot::hw::eeprom {
                                     embot::hw::spi::Prescaler::eight, 
                                     embot::hw::spi::DataSize::eight, 
                                     embot::hw::spi::Mode::zero,
-                                    #warning this works but clk should be pulldown for mode zero
-                                    { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::none} }
+                                    { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::none} }
                                 },
                                 {
                                     {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::zero},    // nS
                                     {}, // nW ?? schematics does not show
                                     {}, // it is always high
-//                                    {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::twelve},   // nW
-//                                    {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::thirteen}, // nHOLD
+//                                    {embot::hw::GPIO::PORT::, embot::hw::GPIO::PIN::},   // nW
+//                                    {embot::hw::GPIO::PORT::, embot::hw::GPIO::PIN::}, // nHOLD
                                     {
                                         embot::hw::gpio::Mode::OUTPUTpushpull,
                                         embot::hw::gpio::Pull::nopull,
@@ -106,7 +105,7 @@ namespace embot::hw::eeprom {
         mask::pos2mask<uint32_t>(EEPROM::one),        
         // properties
         {{
-            &ee1p, nullptr            
+            &ee1p        
         }}        
     };
     
