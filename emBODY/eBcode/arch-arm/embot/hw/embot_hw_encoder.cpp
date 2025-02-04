@@ -120,11 +120,6 @@ namespace embot { namespace hw { namespace encoder {
         const embot::hw::encoder::BSP &encoderbsp = embot::hw::encoder::getBSP();
         embot::hw::SPI spiBus = encoderbsp.getPROP(e)->spiBus;
         
-//        // TODO: safe guard (remove it when AEA3 is completely implemented)
-//        if(cfg.type != embot::hw::encoder::Type::chipAS5045)
-//        {
-//            return resNOK;
-//        }
         
         uint8_t index = embot::core::tointegral(e);
         
@@ -162,11 +157,7 @@ namespace embot { namespace hw { namespace encoder {
         
         const embot::hw::encoder::BSP &encoderbsp = embot::hw::encoder::getBSP();
         embot::hw::encoder::Type type = _data_array[index].config.type;
-        
-//        if(type != embot::hw::encoder::Type::chipAS5045)
-//        {
-//            return resNOK;
-//        }
+
         
         if(embot::hw::encoder::Type::chipAS5045 == type)
         {

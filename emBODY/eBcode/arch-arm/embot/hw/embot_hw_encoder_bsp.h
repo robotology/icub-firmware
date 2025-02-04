@@ -10,8 +10,13 @@
 #ifndef __EMBOT_HW_ENCODER_BSP_H_
 #define __EMBOT_HW_ENCODER_BSP_H_
 
+#include "embot_core.h"
+#include "embot_hw_types.h"
+#include "embot_hw_bsp.h"
+#include "embot_hw_encoder.h"
+#include "embot_hw_spi.h"
 
-namespace embot { namespace hw { namespace encoder {
+namespace embot::hw::encoder {
     
     struct nonePROP
     {
@@ -42,7 +47,7 @@ namespace embot { namespace hw { namespace encoder {
     
     const BSP& getBSP();
         
-}}} // namespace embot { namespace hw { namespace encoder { 
+} // namespace embot::hw::encoder { 
 
 
 
