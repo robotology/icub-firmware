@@ -52,7 +52,7 @@ using namespace embot::core::binary;
 
 #if !defined(EMBOT_ENABLE_hw_encoder)
 
-namespace embot::hw::encoder {
+namespace embot::hw::encoder::bsp {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::ENCODER h) const {}
@@ -66,13 +66,32 @@ namespace embot::hw::encoder {
 
 #elif defined(EMBOT_ENABLE_hw_encoder)
 
-namespace embot::hw::encoder {
+#include "embot_hw_chip_AS5045.h"
+#include "embot_hw_chip_MA730.h"
+#include "embot_hw_chip_MB049.h"
+
+namespace embot::hw::encoder::bsp {
+    
+    constexpr embot::hw::spi::Config spiCFGchipMA730_aea3_spix
+    { 
+    embot::hw::spi::Prescaler::onehundredtwentyeigth, 
+    embot::hw::spi::DataSize::eight, 
+    embot::hw::spi::Mode::one,
+    { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::nopull,      // | miso | mosi |
+       embot::hw::gpio::Pull::pulldown, embot::hw::gpio::Pull::pullup} }  // | sclk | sel  |
+    };
+    
+    constexpr embot::hw::spi::Config spiCFGchipAS5045 {embot::hw::chip::AS5045::standardspiconfig};
+    constexpr embot::hw::spi::Config spiCFGchipMB049  {embot::hw::chip::MB049::standardspiconfig};
+    
+    
+    // the above config is because spi1 and spi2 both have the same clock ....
     
     // encoder one --> SPI1
-    constexpr PROP e1p = { embot::hw::SPI::one };
+    constexpr PROP e1p = { embot::hw::SPI::one, { spiCFGchipAS5045, spiCFGchipMA730_aea3_spix, spiCFGchipMB049 } };
 
     // encoder two --> SPI2
-    constexpr PROP e2p = { embot::hw::SPI::two };
+    constexpr PROP e2p = { embot::hw::SPI::two, { spiCFGchipAS5045, spiCFGchipMA730_aea3_spix, spiCFGchipMB049 } };
 
    
     constexpr BSP thebsp {        
@@ -94,7 +113,7 @@ namespace embot::hw::encoder {
 
 #endif // defined(EMBOT_ENABLE_hw_encoder)
 
-// - support map: end of embot::hw::encoder
+// - support map: end of embot::hw::encoder::bsp
 
 
 

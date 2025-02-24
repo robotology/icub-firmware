@@ -12,6 +12,7 @@
 
 #include "embot_hw_encoder.h"
 
+#include "embot_app_eth_theErrorManager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -57,7 +58,7 @@ namespace embot { namespace hw { namespace encoder {
 #include "embot_hw_chip_AS5045.h"
 #include "embot_hw_chip_MA730.h"
 
-namespace embot { namespace hw { namespace encoder {
+namespace embot::hw::encoder {
     
     // initialised mask
     static std::uint32_t initialisedmask = 0;
@@ -92,7 +93,7 @@ namespace embot { namespace hw { namespace encoder {
     
     bool supported(ENCODER e)
     {
-        return embot::hw::encoder::getBSP().supported(e);
+        return embot::hw::encoder::bsp::getBSP().supported(e);
     }
     
     bool initialised(ENCODER e)
@@ -117,28 +118,43 @@ namespace embot { namespace hw { namespace encoder {
             return resNOK;
         }
         
-        const embot::hw::encoder::BSP &encoderbsp = embot::hw::encoder::getBSP();
-        embot::hw::SPI spiBus = encoderbsp.getPROP(e)->spiBus;
-        
         
         uint8_t index = embot::core::tointegral(e);
         
         _data_array[index].config = cfg;
                        
         // bsp specific initialization
-        encoderbsp.init(e);
+        embot::hw::encoder::bsp::getBSP().init(e);  
 
         // but ... true initialization is in here
         
         if(embot::hw::encoder::Type::chipAS5045 == cfg.type)
         {
             _data_array[index].chip_AS5045 = new embot::hw::chip::AS5045;
-            _data_array[index].chip_AS5045->init({spiBus, _data_array[index].chip_AS5045->standardspiconfig} );
+            uint8_t posinarray = embot::core::tointegral(cfg.type);
+            _data_array[index].chip_AS5045->init(
+                        {
+                            embot::hw::encoder::bsp::getBSP().getPROP(e)->spiBus, 
+                            embot::hw::encoder::bsp::getBSP().getPROP(e)->spicfg[posinarray]
+                        }
+            );
         }
         else if(embot::hw::encoder::Type::chipMA730 == cfg.type)
         {
              _data_array[index].chip_MA730 = new embot::hw::chip::MA730;
-            _data_array[index].chip_MA730->init({spiBus, _data_array[index].chip_MA730->standardspiconfig} );
+            uint8_t posinarray = embot::core::tointegral(cfg.type);
+            _data_array[index].chip_MA730->init(
+                        { 
+                            embot::hw::encoder::bsp::getBSP().getPROP(e)->spiBus, 
+                            embot::hw::encoder::bsp::getBSP().getPROP(e)->spicfg[posinarray]
+                        } 
+            );
+        }
+        else
+        {
+            //this error message is onl for debugging on keil
+            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::error, {}, {}, "encoder type not supported");        
+            return resNOK;
         }
         
         embot::core::binary::bit::set(initialisedmask, index);
@@ -155,7 +171,7 @@ namespace embot { namespace hw { namespace encoder {
         
         uint8_t index = embot::core::tointegral(e);
         
-        const embot::hw::encoder::BSP &encoderbsp = embot::hw::encoder::getBSP();
+        const embot::hw::encoder::bsp::BSP &encoderbsp = embot::hw::encoder::bsp::getBSP();
         embot::hw::encoder::Type type = _data_array[index].config.type;
 
         
@@ -308,9 +324,9 @@ namespace embot { namespace hw { namespace encoder {
     }
 
 
-}}} // namespace embot { namespace hw { namespace eeprom 
+} // namespace embot::hw::encoder
 
-#endif // #if !defined(EMBOT_ENABLE_hw_eeprom)
+#endif // #if !defined(EMBOT_ENABLE_hw_encoder
 
 
 
