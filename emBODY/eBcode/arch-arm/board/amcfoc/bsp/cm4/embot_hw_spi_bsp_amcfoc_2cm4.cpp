@@ -69,6 +69,7 @@ namespace embot::hw::spi::bsp {
 namespace embot::hw::spi::bsp {
     
 #if 0
+    spi1 and spi2 are used by the encoders
     spi3 is shared between eth and eeprom
         
     uses SPI_BAUDRATEPRESCALER_16
@@ -304,7 +305,7 @@ extern "C"
           //#warning CHECK SPI1
           
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPI1;
-        PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL; //
+        PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
         {
           Error_Handler("");

@@ -42,7 +42,7 @@ bool embot::hw::chip::testof_AS5045()
     {
         embot::hw::SPI::one,  // the spi bus
         {
-            embot::hw::spi::Prescaler::sixtyfour,
+            embot::hw::spi::Prescaler::onehundredtwentyeigth,
             embot::hw::spi::DataSize::eight,
             embot::hw::spi::Mode::two,
             { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::nopull,      // | miso | mosi |

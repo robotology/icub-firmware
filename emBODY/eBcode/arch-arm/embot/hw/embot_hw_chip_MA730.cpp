@@ -111,7 +111,7 @@ struct embot::hw::chip::MA730::Impl
 {                
     bool _initted {false};
     Config _config {};
-    uint8_t _databuffer[3] = {0, 0, 0};
+    uint8_t _databuffer[2] = {0, 0};
     embot::hw::GPIO _sslsegopio {};
     
     Data *_tmpdata {nullptr};
