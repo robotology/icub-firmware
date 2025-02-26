@@ -42,7 +42,7 @@ bool embot::hw::chip::testof_MB049()
     {
         embot::hw::SPI::one,  // the spi bus
         {
-            embot::hw::spi::Prescaler::sixtyfour,    // onehundredtwentyeigth
+            embot::hw::spi::Prescaler::sixtyfour,    //probably the right value is: onehundredtwentyeigth, this has to be tested
             embot::hw::spi::DataSize::eight,
             embot::hw::spi::Mode::one,
             { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::pulldown,      // | miso | mosi |

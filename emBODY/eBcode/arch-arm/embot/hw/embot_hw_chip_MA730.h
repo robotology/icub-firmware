@@ -3,6 +3,8 @@
  * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Simone Girardi
  * email:   simone.girardi@iit.it
+ * Author:  Kevin Sangalli
+ * email:   kevin.sangalli@iit.it
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
@@ -19,8 +21,22 @@
 #if 0
 ## Description
 
-tbd
+### SSI
+In this particular setup, `amc` and `amcfoc` so far, we are using the chip MA730 in SSI mode!
+Also the datasheet tells that is it not a classic SSI, but has some particular configuration. 
+From the datasheet:
+- This sensor uses an SSI with a low SSCK idle state instead of the high SSCK idle state used in the standard protocol. 
+- This sensor also requires a dummy rising edge on the SSCK signal at the beginning of the SSI frame, while the standard SSI does not.
 
+In this code, we read the chip using a SPI bus configured in mode one to be compliant to the required chip functioning. 
+Also we discard the first bit while reading the data.
+The maximum frequency of the clock is 5MHz in SSI mode, the minimum frequency is 62.5kHz.
+
+
+### SPI
+In a future case in which the chip will be used in an SPI standard configuration, the chip ask for mode 0 or 3 for the SPI.
+The maximum frequency for the clock is 25MHz.
+Right now this is not implemented and not used here.
 
 
 ## Basic usage
@@ -47,7 +63,7 @@ The interface of the device driver is kept intentionally simple and some feature
 #endif    
 
 
-namespace embot { namespace hw { namespace chip {
+namespace embot::hw::chip {
     
     class MA730
     {
@@ -84,12 +100,13 @@ namespace embot { namespace hw { namespace chip {
             }
         }; 
         
-        //pay attention: we are using the chip in SSI mode!!!!!
-        //SPI chip ask for mode 0 or 3
+        //remember: we are using the chip in SSI mode!!
         //for SSI we use mode one but we discard the first bit (implemented in embot::hw::chip::MA730::Impl::read in embot_hw_chip_MA730.cpp)
+        //with this prescaler we are driving the SPI clock to 781.2kHz. 
+        //we are going "slow" because we are using the SPI to read a sensor external to the board and connected with a wire.
         static constexpr embot::hw::spi::Config standardspiconfig
         { 
-            embot::hw::spi::Prescaler::sixtyfour, 
+            embot::hw::spi::Prescaler::onehundredtwentyeigth, 
             embot::hw::spi::DataSize::eight, 
             embot::hw::spi::Mode::one,
             { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::nopull,      // | miso | mosi |
@@ -112,7 +129,7 @@ namespace embot { namespace hw { namespace chip {
     };
     
     
-}}} // namespace embot { namespace hw { namespace chip {
+    } // namespace embot::hw::chip {
 
 
 #define EMBOT_HW_CHIP_MA730_enable_test   

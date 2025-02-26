@@ -907,7 +907,7 @@ namespace embot { namespace hw { namespace encoder {
 #include "embot_hw_chip_MA730.h"
 #include "embot_hw_chip_MB049.h"
 
-namespace embot { namespace hw { namespace encoder {
+namespace embot::hw::encoder::bsp{
     
     #if defined(STM32HAL_BOARD_AMC)
     
@@ -946,7 +946,7 @@ namespace embot { namespace hw { namespace encoder {
         return thebsp;
     }
     
-}}}
+}
 
 #endif // encoder
 
@@ -991,7 +991,7 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
         {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::eleven},   // sckl
         {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::ten}       // ssel
     } };
-    constexpr PROP spi1p = { &hspi1, 50*1000*1000, pinoutspi1 }; 
+    constexpr PROP spi1p = { &hspi1, 100*1000*1000, pinoutspi1 }; 
     
     
     SPI_HandleTypeDef hspi2;
@@ -1001,7 +1001,7 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
         {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::three},    // sckl
         {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::nine}      // ssel
     } };
-    constexpr PROP spi2p = { &hspi2, 50*1000*1000, pinoutspi2 };     
+    constexpr PROP spi2p = { &hspi2, 100*1000*1000, pinoutspi2 };     
     
     SPI_HandleTypeDef hspi3;
     constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi3 = { {
@@ -1010,7 +1010,7 @@ namespace embot { namespace hw { namespace spi { namespace bsp {
         {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::ten},      // sckl
         {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::four}      // ssel
     } };
-    constexpr PROP spi3p = { &hspi3, 50*1000*1000, pinoutspi3 };       
+    constexpr PROP spi3p = { &hspi3, 100*1000*1000, pinoutspi3 };       
     
 
     constexpr std::array<embot::hw::GPIO, SignalsNumberOf> pinoutspi5 = { {
@@ -1227,7 +1227,7 @@ extern "C"
       if(spiHandle->Instance == SPI1)
       {
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPI1;
-        PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_CLKP;
+        PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
         {
           Error_Handler();
@@ -1273,7 +1273,7 @@ extern "C"
       else if(spiHandle->Instance == SPI2)
       {
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPI2;
-        PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_CLKP;
+        PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
         {
           Error_Handler();
@@ -1314,7 +1314,7 @@ extern "C"
       else if(spiHandle->Instance == SPI3)
       {
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPI3;
-        PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_CLKP;
+        PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
         {
           Error_Handler();

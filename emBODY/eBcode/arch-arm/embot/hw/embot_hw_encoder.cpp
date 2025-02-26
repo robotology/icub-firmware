@@ -34,7 +34,7 @@ using namespace embot::hw;
 
 #if !defined(EMBOT_ENABLE_hw_encoder)
 
-namespace embot { namespace hw { namespace encoder {
+namespace embot::hw::encoder {
 
     bool supported(ENCODER e)
     { return false; }
@@ -51,7 +51,7 @@ namespace embot { namespace hw { namespace encoder {
     result_t read(ENCODER e, POS &pos, embot::core::relTime timeout)
     { return resNOK; }
 
-}}} // namespace embot { namespace hw { namespace encoder {
+} // namespace embot::hw::encoder {
 
 #else
 

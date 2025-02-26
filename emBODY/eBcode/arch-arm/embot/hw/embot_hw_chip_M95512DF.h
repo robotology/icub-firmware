@@ -79,7 +79,7 @@ The interface of the device driver is kept intentionally simple and some feature
 #endif    
 
 
-namespace embot { namespace hw { namespace chip {
+namespace embot::hw::chip {
     
     class M95512DF
     {
@@ -117,7 +117,7 @@ namespace embot { namespace hw { namespace chip {
             embot::hw::spi::Config spicfg {};
             PinControl pincontrol {};                
             constexpr Config() = default;
-                constexpr Config(embot::hw::SPI s, const embot::hw::spi::Config &sc, const PinControl &pc) 
+            constexpr Config(embot::hw::SPI s, const embot::hw::spi::Config &sc, const PinControl &pc) 
                 : spi(s), spicfg(sc), pincontrol(pc) {}   
             constexpr bool isvalid() const { 
                 return embot::hw::spi::supported(spi) && pincontrol.isvalid(); 
@@ -142,15 +142,15 @@ namespace embot { namespace hw { namespace chip {
     };
     
     
-}}} // namespace embot { namespace hw { namespace chip {
+} // namespace embot::hw::chip {
 
 
 #undef EMBOT_HW_CHIP_M95512DF_enable_test   
 #if defined(EMBOT_HW_CHIP_M95512DF_enable_test)    
-namespace embot { namespace hw { namespace chip {
+namespace embot::hw::chip {
     // it tests the chip and offers an example of use
     bool testof_M95512DF();
-}}}
+}
 #endif
 
 
