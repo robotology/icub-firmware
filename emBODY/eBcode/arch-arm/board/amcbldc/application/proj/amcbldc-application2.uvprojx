@@ -795,11 +795,6 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amcbldc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_led_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_led_bsp_amcbldc.cpp</FilePath>
@@ -813,6 +808,31 @@
               <FileName>embot_hw_gpio_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_gpio_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_button_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_can_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_flash_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_motor_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_specialize_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_specialize_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2127,11 +2147,6 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amcbldc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_led_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_led_bsp_amcbldc.cpp</FilePath>
@@ -2145,6 +2160,31 @@
               <FileName>embot_hw_gpio_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_gpio_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_button_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_can_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_flash_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_motor_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_specialize_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_specialize_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>

@@ -29,7 +29,6 @@
     #define EMBOT_ENABLE_hw_analog_ish
     #define EMBOT_ENABLE_hw_button
 
-    // #define EMBOT_ENABLE_hw_i2c    
     // #define EMBOT_ENABLE_hw_pwm 
     // #define EMBOT_ENABLE_hw_hall 
         
