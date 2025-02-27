@@ -68,6 +68,9 @@ extern void MController_timeout_absEncoder_fbk(uint8_t e);
 
 extern int32_t MController_get_absEncoder(uint8_t j); //
 
+extern BOOL MController_get_maintenanceMode();
+extern void MController_set_maintenanceMode(eObool_t useMaintenanceMode);
+
 extern void MController_do(void); //
 
 extern BOOL MController_set_control_mode(uint8_t j, eOmc_controlmode_command_t control_mode);

@@ -1683,7 +1683,10 @@ static void JointSet_do_wait_calibration(JointSet* o)
             break;
     }
     
-    if (!o->is_calibrated) return;
+    if (!o->is_calibrated) 
+    {
+        return;
+    }
     
     for (int es=0; es<E; ++es)
     {
@@ -1706,6 +1709,7 @@ static void JointSet_do_wait_calibration(JointSet* o)
     }
     
     JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
+   
 }
 
 void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)

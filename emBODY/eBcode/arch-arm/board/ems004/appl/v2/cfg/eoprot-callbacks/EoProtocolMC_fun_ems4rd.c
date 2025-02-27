@@ -1579,6 +1579,18 @@ extern void eoprot_fun_UPDT_mc_motor_config_temperaturelimit(const EOnv* nv, con
     }
 }
 
+// -- entity controller
+
+
+// f-marker-begin
+extern void eoprot_fun_UPDT_mc_controller_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_controller_config_t *cconfig = (eOmc_controller_config_t*)rd->data;
+    eOprotIndex_t cxx = eoprot_ID2index(rd->id32);
+    
+    MController_set_maintenanceMode(cconfig->enableskiprecalibration);
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

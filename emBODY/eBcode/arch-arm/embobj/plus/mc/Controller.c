@@ -96,7 +96,9 @@ struct MController_hid
     // it gets those values of eOmn_serv_type_t that belong to category eomn_serv_category_mc.
     // they are: eomn_serv_MC* 
     // i could use also values of eOmotioncontroller_mode_t but i prefere remove dependancy from EOtheMotionController.h in here
-    eOmn_serv_type_t mcmode; 
+    eOmn_serv_type_t mcmode;
+    
+    BOOL isMaintenanceMode;
 };
 
 
@@ -188,6 +190,8 @@ MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
     {
         o->eos[i] = NEW(uint8_t, MAX_ENCODS_PER_BOARD);
     }
+    
+    o->isMaintenanceMode = FALSE;
     
     MController_init();
 
@@ -1253,6 +1257,16 @@ int32_t MController_get_absEncoder(uint8_t j)
     return AbsEncoder_position(smc->absEncoder+j);
 }
 
+BOOL MController_get_maintenanceMode()
+{
+    return smc->isMaintenanceMode;
+}
+
+void MController_set_maintenanceMode(eObool_t useMaintenanceMode)
+{
+    smc->isMaintenanceMode = (BOOL)(useMaintenanceMode);
+}
+
 void MController_do()
 {    
     for (int s=0; s<smc->nSets; ++s)
@@ -1430,6 +1444,7 @@ static char invert_matrix(float** M, float** I, char n)
 
 void MController_calibrate(uint8_t e, eOmc_calibrator_t *calibrator)
 {
+    if(smc->isMaintenanceMode && (smc->jointSet+smc->e2s[e*smc->multi_encs])->is_calibrated) return;
     JointSet_calibrate(smc->jointSet+smc->e2s[e*smc->multi_encs], e, calibrator);
 }
 
