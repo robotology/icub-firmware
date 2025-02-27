@@ -10,8 +10,7 @@
       <TargetName>amcbldc-app-motorhal2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>6190000::V6.19::.\ARMCLANG_6_19</pArmCC>
-      <pCCUsed>6190000::V6.19::.\ARMCLANG_6_19</pCCUsed>
+      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -315,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -796,9 +795,44 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amcbldc.cpp</FileName>
+              <FileName>embot_hw_application_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
+              <FilePath>..\..\bsp\embot_hw_application_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_button_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_can_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_flash_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_gpio_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_led_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_motor_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_specialize_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_specialize_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -814,6 +848,11 @@
               <FileName>embot_app_theCANboardInfo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theCANboardInfo.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_application_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_application_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1323,7 +1362,7 @@
       <TargetName>amcbldc-app-motorhal1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -2108,9 +2147,44 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amcbldc.cpp</FileName>
+              <FileName>embot_hw_application_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
+              <FilePath>..\..\bsp\embot_hw_application_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_button_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_can_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_flash_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_gpio_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_led_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_motor_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_motor_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_specialize_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_specialize_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2126,6 +2200,11 @@
               <FileName>embot_app_theCANboardInfo.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theCANboardInfo.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_application_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_application_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>
