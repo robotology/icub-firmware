@@ -667,6 +667,15 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         { 
             Joint_set_control_mode(o->joint+o->joints_of_set[k], control_mode_cmd);
         }
+        
+        if(eomc_controlmode_cmd_current == control_mode_cmd)
+        {
+            for (int k=0; k<N; ++k)
+            { 
+                Joint_set_cur_ref(o->joint+o->joints_of_set[k], Motor_get_IqqFbk_avg(o->motor+o->motors_of_set[k]));
+                Joint_update_status_reference(o->joint+o->joints_of_set[k]);
+            }
+        }
         break;
     }    
     default:

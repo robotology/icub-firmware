@@ -314,6 +314,8 @@ void Motor_init(Motor* o) //
     o->sensorless_torque = FALSE;
     o->torque_estimator.initialize();
 #endif
+
+    o->mv_avg.init(100, 0);
 }
 
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
@@ -1211,11 +1213,19 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     }
 }
 
+
+extern int32_t Motor_get_IqqFbk_avg(Motor* o)
+{
+return o->mv_avg.getAvg();
+}
+
+
 void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
 {
     WatchDog_rearm(&o->can_2FOC_alive_wdog);
     
     o->Iqq_fbk = can_msg->current;
+    o->mv_avg.calculateAvg(o->Iqq_fbk);
     
     o->vel_raw_fbk = can_msg->velocity*1000;
     o->vel_fbk = o->vel_raw_fbk/o->GEARBOX;

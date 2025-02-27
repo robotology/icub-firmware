@@ -84,6 +84,64 @@ typedef struct //HardStopCalibData
     
 } HardStopCalibData;
 
+////first order moving average
+//constexpr float NUM_SAMPLE_MOV_AVERAGE = 100.0;
+//constexpr float FACTOR_A = 1.0/NUM_SAMPLE_MOV_AVERAGE;
+//constexpr float FACTOR_B = 1.0 - FACTOR_A;
+//typedef struct 
+//{
+//    float
+//}moving_avarage;
+
+class MovingAverage
+{
+    private:
+        float numSampl;
+        float coeff_1;
+        float coeff_2;
+        float filterValue;
+        bool completed;
+        int count;
+    public:
+        MovingAverage() = delete;
+        MovingAverage(float numberOfSample):
+                numSampl(numberOfSample),
+                coeff_1(1.0/numSampl),
+                coeff_2(1- coeff_1),
+                completed(false),
+                count(0){;}
+                    
+                    
+        MovingAverage(float numberOfSample, float firstValue):
+                numSampl(numberOfSample), 
+                filterValue(firstValue),
+                coeff_1(1.0/numSampl),
+                coeff_2(1- coeff_1),
+                completed(false),
+                count(0){;}
+                    
+        float calculateAvg(float sample)
+        {
+            filterValue = coeff_1 * sample + coeff_2 * filterValue;
+            //count++;
+            return(filterValue);
+        }
+        
+        float getAvg(void){return filterValue;}
+        
+        bool isCompleted() {return completed;}
+        
+        void init(float numberOfSample, float firstValue)
+        {
+            numSampl= numberOfSample;
+            filterValue= firstValue;
+            coeff_1= 1.0/numSampl;
+            coeff_2 = 1- coeff_1;
+            completed = false;
+            count = 0;
+        }
+};
+
 struct Motor_hid
 {
     // the location of the hw actuator that host the motor. it can hold: 
@@ -144,6 +202,7 @@ struct Motor_hid
     int32_t Iqq_fbk;
     int32_t Iqq_ovl;
     int32_t Iqq_err;
+    int32_t Iqq_fbk_mean;
     
     CTRL_UNITS trq_max;
     CTRL_UNITS trq_ref;
@@ -180,6 +239,7 @@ struct Motor_hid
     WatchDog can_2FOC_alive_wdog;
     uint8_t can_motor_config[7];
     //BOOL outOfLimitsSignaled;
+    MovingAverage mv_avg={100,0};
 
 #if defined(SENSORLESS_TORQUE)
     float torque;

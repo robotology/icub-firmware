@@ -104,6 +104,8 @@ extern BOOL Motor_is_running(Motor* o);
 
 extern BOOL Motor_is_motor_joint_fault_over(Motor* o);
 
+extern int32_t Motor_get_IqqFbk_avg(Motor* o);
+
 //BOOL Motor_clear_ext_fault(Motor *o);
 
 ////////////////////////////////////////////////////////////////////////////
