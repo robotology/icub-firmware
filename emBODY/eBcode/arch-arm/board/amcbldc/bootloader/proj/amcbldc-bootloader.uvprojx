@@ -679,6 +679,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_led_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_gpio_bsp_amcbldc.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1427,6 +1437,16 @@
               <FileName>embot_hw_bsp_amcbldc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\bsp\embot_hw_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_led_bsp_amcbldc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio_bsp_amcbldc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_gpio_bsp_amcbldc.cpp</FilePath>
             </File>
           </Files>
         </Group>
