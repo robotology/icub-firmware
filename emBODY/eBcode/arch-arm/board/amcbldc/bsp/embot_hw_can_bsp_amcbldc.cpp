@@ -118,7 +118,7 @@ namespace embot::hw::can {
         return thebsp;
     }
               
-} // namespace embotembot::hw::cancan {
+} // namespace embotembot::hw::can {
     
 
 #if defined(HAL_FDCAN_MODULE_ENABLED)
@@ -137,7 +137,7 @@ extern "C"
 }
         
 
-#endif //
+#endif // HAL_FDCAN_MODULE_ENABLED
 
 #endif // EMBOT_ENABLE_hw_can
 
