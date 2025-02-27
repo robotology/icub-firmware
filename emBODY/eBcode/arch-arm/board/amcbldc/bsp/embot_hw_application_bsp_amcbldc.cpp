@@ -118,10 +118,9 @@ std::make_tuple(0x00470027, 0x484E500E, 0x20343356 ) // scheda jointlab camozzi
     
     float getVIN()
     {
-        volatile float v {0.0};
+        float v {0.0};
         
         v = analogVin() * 0.001;
-        v= v +1-1;
         return v;
         
     }
