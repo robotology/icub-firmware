@@ -54,6 +54,7 @@ using namespace embot::core::binary;
 
 
 #include "embot_hw_motor_bldc_bsp.h"
+#include "embot_hw_analog.h"
 
 
 #if !defined(EMBOT_ENABLE_hw_motor_bldc)
