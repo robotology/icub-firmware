@@ -867,17 +867,27 @@ namespace embot { namespace hw { namespace encoder {
 
 #else
 
-namespace embot { namespace hw { namespace encoder {
-        
+#include "embot_hw_chip_AS5045.h"
+#include "embot_hw_chip_MA730.h"
+#include "embot_hw_chip_MB049.h"
+
+namespace embot::hw::encoder {
+    
+    constexpr embot::hw::spi::Config spiCFGchipMA730  {embot::hw::chip::MA730::standardspiconfig};
+    constexpr embot::hw::spi::Config spiCFGchipAS5045 {embot::hw::chip::AS5045::standardspiconfig};
+    constexpr embot::hw::spi::Config spiCFGchipMB049  {embot::hw::chip::MB049::standardspiconfig};    
+    
     // encoder one --> SPI1
-    constexpr PROP e1p = { embot::hw::SPI::one };
+    constexpr PROP e1p = { embot::hw::SPI::one, { spiCFGchipAS5045, spiCFGchipMA730, spiCFGchipMB049 } };
 
     // encoder one --> SPI2
-    constexpr PROP e2p = { embot::hw::SPI::two };
+    constexpr PROP e2p = { embot::hw::SPI::two, { spiCFGchipAS5045, spiCFGchipMA730, spiCFGchipMB049 } };
     
     // encoder one --> SPI3
-    constexpr PROP e3p = { embot::hw::SPI::three };
-        
+    constexpr PROP e3p = { embot::hw::SPI::three, { spiCFGchipAS5045, spiCFGchipMA730, spiCFGchipMB049 } };
+       
+
+   
     constexpr BSP thebsp {        
         // maskofsupported
         mask::pos2mask<uint32_t>(ENCODER::one) | mask::pos2mask<uint32_t>(ENCODER::two) | mask::pos2mask<uint32_t>(ENCODER::three),
@@ -895,7 +905,7 @@ namespace embot { namespace hw { namespace encoder {
         return thebsp;
     }
     
-}}}
+}
 
 #endif // encoder
 

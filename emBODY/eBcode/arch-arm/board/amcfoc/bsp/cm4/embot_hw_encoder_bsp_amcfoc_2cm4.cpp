@@ -52,7 +52,7 @@ using namespace embot::core::binary;
 
 #if !defined(EMBOT_ENABLE_hw_encoder)
 
-namespace embot::hw::encoder {
+namespace embot::hw::encoder::bsp {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::ENCODER h) const {}
@@ -66,13 +66,40 @@ namespace embot::hw::encoder {
 
 #elif defined(EMBOT_ENABLE_hw_encoder)
 
-namespace embot::hw::encoder {
+#include "embot_hw_chip_AS5045.h"
+#include "embot_hw_chip_MA730.h"
+#include "embot_hw_chip_MB049.h"
+
+
+#if 0
+    //in general, the standardspiconfig should work on every board,
+    //if you need some more customization you can change the SPI configuration
+    //example for a SPI config for an encoder
+    constexpr embot::hw::spi::Config spiCFGchip..._spix
+    { 
+    embot::hw::spi::Prescaler::onehundredtwentyeigth,         //prescaler depends on SPI BUS freq and wanted clock freq for the chip used
+    embot::hw::spi::DataSize::eight,                          //depends on chip used
+    embot::hw::spi::Mode::one,                                //depends on chip used
+    { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull,      // | miso | mosi |  //depends on board and mode used
+       embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull} }    // | sclk | sel  |  //depends on board and mode used
+    };
+    
+#endif
+
+
+namespace embot::hw::encoder::bsp {
+       
+    constexpr embot::hw::spi::Config spiCFGchipAS5045 {embot::hw::chip::AS5045::standardspiconfig};
+    constexpr embot::hw::spi::Config spiCFGchipMA730  {embot::hw::chip::MA730::standardspiconfig};
+    constexpr embot::hw::spi::Config spiCFGchipMB049  {embot::hw::chip::MB049::standardspiconfig};
+    
+    //amcfoc supports 2 encoders
     
     // encoder one --> SPI1
-    constexpr PROP e1p = { embot::hw::SPI::one };
+    constexpr PROP e1p = { embot::hw::SPI::one, { spiCFGchipAS5045, spiCFGchipMA730, spiCFGchipMB049 } };
 
     // encoder two --> SPI2
-    constexpr PROP e2p = { embot::hw::SPI::two };
+    constexpr PROP e2p = { embot::hw::SPI::two, { spiCFGchipAS5045, spiCFGchipMA730, spiCFGchipMB049 } };
 
    
     constexpr BSP thebsp {        
@@ -94,7 +121,7 @@ namespace embot::hw::encoder {
 
 #endif // defined(EMBOT_ENABLE_hw_encoder)
 
-// - support map: end of embot::hw::encoder
+// - support map: end of embot::hw::encoder::bsp
 
 
 

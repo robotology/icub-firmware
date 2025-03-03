@@ -43,7 +43,7 @@ The interface of the device driver is kept intentionally simple and some feature
 #endif
 
 
-namespace embot { namespace hw { namespace chip {
+namespace embot::hw::chip {
     
     class MB049
     {
@@ -102,7 +102,7 @@ namespace embot { namespace hw { namespace chip {
         
         static constexpr embot::hw::spi::Config standardspiconfig
         {
-            embot::hw::spi::Prescaler::sixtyfour,
+            embot::hw::spi::Prescaler::sixtyfour,  //probably the right value is: onehundredtwentyeigth, this has to be tested (I doubled the SPI BUS clock freq so the prescaler must be doubled)
             embot::hw::spi::DataSize::eight,
             embot::hw::spi::Mode::one,
             { {embot::hw::gpio::Pull::pullup, embot::hw::gpio::Pull::pulldown,      // | miso | mosi |
@@ -130,7 +130,7 @@ namespace embot { namespace hw { namespace chip {
         Impl *pImpl;
         POS position;
     };
-}}} // namespace embot { namespace hw { namespace chip {
+} // namespace embot::hw::chip {
 
 
 #define EMBOT_HW_CHIP_MB049_enable_test

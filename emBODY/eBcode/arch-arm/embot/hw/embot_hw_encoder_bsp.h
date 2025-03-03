@@ -16,7 +16,7 @@
 #include "embot_hw_encoder.h"
 #include "embot_hw_spi.h"
 
-namespace embot::hw::encoder {
+namespace embot::hw::encoder::bsp {
     
     struct nonePROP
     {
@@ -27,9 +27,10 @@ namespace embot::hw::encoder {
     struct PROP
     {   // this one is ok for a spi encoder.
         embot::hw::SPI spiBus {embot::hw::SPI::none};
+        std::array<embot::hw::spi::Config, embot::hw::encoder::numberofSPIencoders> spicfg {};
         constexpr PROP() = default;
-        constexpr PROP(const embot::hw::SPI &b)
-            : spiBus(b) {}
+        constexpr PROP(const embot::hw::SPI &b, const std::array<embot::hw::spi::Config, embot::hw::encoder::numberofSPIencoders> &c)
+            : spiBus(b), spicfg(c) {}
         
     };
     
@@ -47,7 +48,7 @@ namespace embot::hw::encoder {
     
     const BSP& getBSP();
         
-} // namespace embot::hw::encoder { 
+} // namespace embot::hw::encoder::bsp { 
 
 
 
