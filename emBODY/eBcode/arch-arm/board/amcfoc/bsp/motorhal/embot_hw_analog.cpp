@@ -52,6 +52,22 @@ namespace embot::hw::analog {
 
 #elif defined(EMBOT_ENABLE_hw_analog_ish)  
 
+
+namespace embot::hw::analog::bsp {
+    
+    constexpr uint8_t NUMBER_OF_ADC3_CHANNELS = {6}; // for ADC3
+
+    /* Hardware related constants */
+    constexpr uint32_t VREFINT_CAL = {24243};    /* (*VREFINT_CAL_ADDR) is the 16 bits calibration value stored by the manufacturer at location 0x1FF1E860 */
+    constexpr double VREF_NOM      = {3300.0};   /* mV  */
+    constexpr double VREFINT_NOM   = {1212.0};   /* mV  */
+    constexpr double R110          = {560000.0}; /* Ohm */
+    constexpr double R115          = {33000.0};  /* Ohm */
+//    constexpr uint32_t VIN_GAIN    = static_cast<uint32_t>((R110+R115)/R115 + 0.5);
+}
+
+
+
 namespace embot::hw::analog {
      
     
@@ -68,6 +84,9 @@ namespace embot::hw::analog {
 
 #endif  
     
+
+#warning check if this is valid for amcfoc
+
 #if 0
     enum AdcSignals 
     {
@@ -80,15 +99,7 @@ namespace embot::hw::analog {
     };
 #endif
     
-    constexpr uint8_t NUMBER_OF_ADC3_CHANNELS = {6}; // for ADC3
 
-    /* Hardware related constants */
-    constexpr uint32_t VREFINT_CAL = {24243};    /* (*VREFINT_CAL_ADDR) is the 16 bits calibration value stored by the manufacturer at location 0x1FF1E860 */
-    constexpr double VREF_NOM      = {3300.0};   /* mV  */
-    constexpr double VREFINT_NOM   = {1212.0};   /* mV  */
-    constexpr double R110          = {560000.0}; /* Ohm */
-    constexpr double R115          = {33000.0};  /* Ohm */
-    constexpr uint32_t VIN_GAIN    = static_cast<uint32_t>((R110+R115)/R115 + 0.5);
 
     
     
