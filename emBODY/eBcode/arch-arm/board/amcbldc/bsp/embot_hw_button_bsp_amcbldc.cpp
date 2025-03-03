@@ -36,7 +36,7 @@ using namespace embot::core::binary;
 // - configuration of peripherals and chips. it is done board by board. it contains a check vs correct STM32HAL_BOARD_*
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw_bsp_amcbldc_config.h"
+#include "embot_hw_bsp_config.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - support maps for the supported drivers

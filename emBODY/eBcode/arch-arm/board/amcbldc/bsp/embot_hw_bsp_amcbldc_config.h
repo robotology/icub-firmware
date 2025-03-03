@@ -25,9 +25,14 @@
     #define EMBOT_ENABLE_hw_flash_SINGLEBANK
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_can
+    
+#if defined(EMBOT_bootloader)
+    // bootloader does not need them
+#else
     #define EMBOT_ENABLE_hw_motor
     #define EMBOT_ENABLE_hw_analog_ish
     #define EMBOT_ENABLE_hw_button
+#endif
 
     // #define EMBOT_ENABLE_hw_pwm 
     // #define EMBOT_ENABLE_hw_hall 
