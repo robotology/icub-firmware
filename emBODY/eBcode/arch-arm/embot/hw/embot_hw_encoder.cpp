@@ -151,7 +151,7 @@ namespace embot::hw::encoder {
         else
         {
             //this error message is onl for debugging on keil
-            embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::error, {}, {}, "encoder type not supported");        
+            embot::core::print("encoder type not supported");
             return resNOK;
         }
         
