@@ -1,11 +1,8 @@
-
 /*
  * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
-
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -18,7 +15,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
-
 
 #include "embot_core.h"
 #include <array>
@@ -60,11 +56,11 @@ namespace embot::hw::motor::pwm::bsp {
 
 namespace embot::hw::motor::pwm {
     
-#if defined(STM32HAL_BOARD_AMC1CM7) 
-#define htim1 (embot::hw::motor::bsp::amc1cm7::hTIM1)
-#elif defined(STM32HAL_BOARD_AMC2CM4)
-#define htim1 (embot::hw::motor::bsp::amc2cm4::hTIM1)
-#endif   
+//#if defined(STM32HAL_BOARD_AMC1CM7) 
+//#define htim1 (embot::hw::motor::bsp::amc1cm7::hTIM1)
+//#elif defined(STM32HAL_BOARD_AMC2CM4)
+//#define htim1 (embot::hw::motor::bsp::amc2cm4::hTIM1)
+//#endif   
     
 
 
