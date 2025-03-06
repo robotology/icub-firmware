@@ -44,6 +44,8 @@ using namespace embot::hw;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+static constexpr float DUMMY_HW_MOTOR_FLOAT_VALUE = 6.66f;
+
 std::string embot::hw::motor::to_string(embot::hw::MOTOR id)
 {
     constexpr std::array<const char *, embot::core::tointegral(embot::hw::MOTOR::maxnumberof)> MOTOR_map =
@@ -82,7 +84,8 @@ namespace embot { namespace hw { namespace motor {
     result_t init(MOTOR h, const Config &config) { return resNOK; } 
     result_t configure(embot::hw::MOTOR h, const Config &config) { return resNOK; }   
     result_t setPWM(MOTOR h, const PWMperc &p) { return resNOK; }
-    
+    float getVIN() { return DUMMY_HW_MOTOR_FLOAT_VALUE; }
+    float getCIN() { return DUMMY_HW_MOTOR_FLOAT_VALUE; }
 }}} // namespace embot { namespace hw { namespace MOTOR {
 
 

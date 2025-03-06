@@ -35,11 +35,15 @@
     #define EMBOT_ENABLE_hw_timer
     #define EMBOT_ENABLE_hw_can
     
+#if defined(ENABLE_TEST)
     #define EMBOT_ENABLE_hw_mtx
+#else
+
     #define EMBOT_ENABLE_hw_icc_sig
     #define EMBOT_ENABLE_hw_icc_mem
     #define EMBOT_ENABLE_hw_icc_ltr
 //    #define EMBOT_ENABLE_hw_icc_printer
+#endif
 
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMC2C ...
