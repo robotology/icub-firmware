@@ -593,7 +593,7 @@ namespace embot::hw::motor::adc::bsp {
     void AinInit(void)
     {
         /* Stop the ADC3 trigger */
-        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);
+//        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);
         /* Create the binary semaphore */
 //        if ((NULL ==  AinAdc3SemHandle) &&
 //            (NULL != (AinAdc3SemHandle = xSemaphoreCreateBinary())))
@@ -604,32 +604,32 @@ namespace embot::hw::motor::adc::bsp {
 //                (NULL != AinAdc3TaskHandle))
             {
                 
-                __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS, 0);
-                HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);                  
+//                __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS, 0);
+//                HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);                  
                 
                 /* Stop all ADCs */
                 HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2);
                 HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1);
-                HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS);
+//                HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS);
 
 #warning RICORDATI DI FAR PARTIRE I LORO CLOCK NL MSP                
                 /* Calibrate all ADCs. Caution: blocking functions! */
                 HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
                 HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
-                HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
+//                HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
 
                 /* Register all the callback functions */
                 HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc1HT_cb);
                 HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc1TC_cb);
                 HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc2HT_cb);
                 HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc2TC_cb);
-                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc3HT_cb);
-                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc3TC_cb);
+//                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc3HT_cb);
+//                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc3TC_cb);
 
                 /* Start conversions */
                 HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, (uint32_t *)AinDma1Buffer, sizeof(AinDma1Buffer)/sizeof(AinDma1Buffer[0]));
                 HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, (uint32_t *)AinDma2Buffer, sizeof(AinDma2Buffer)/sizeof(AinDma2Buffer[0]));
-                HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, (uint32_t *)AinDma3Buffer, sizeof(AinDma3Buffer)/sizeof(AinDma3Buffer[0]));
+//                HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, (uint32_t *)AinDma3Buffer, sizeof(AinDma3Buffer)/sizeof(AinDma3Buffer[0]));
                 
                 
                 // start timer for hadcOTHERS   
@@ -647,7 +647,7 @@ namespace embot::hw::motor::adc::bsp {
 //            AinAdc3SemHandle = NULL;
         }
         /* Stop ADC3 trigger */
-        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);
+//        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);
         /* Out of memory */
 //        return HAL_ERROR;
     }
@@ -672,15 +672,15 @@ namespace embot::hw::motor::adc::bsp {
         /* Stop all ADCs */
         HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2);
         HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1);
-        HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS);
+//        HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS);
         
         /* Remove all callback functions */
         HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
         HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID);
         HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
         HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID);
-        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
-        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_HALF_CB_ID);
+//        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
+//        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_HALF_CB_ID);
     }    
     
 }
