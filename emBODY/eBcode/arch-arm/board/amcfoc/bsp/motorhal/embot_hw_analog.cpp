@@ -197,14 +197,14 @@ typedef enum
 } Ain3Channels_t;
 
 
-float       AinInputCurrent;           /* Input current (A) */
-float       AinInputVoltage;           /* Input voltage (V) */
-float       AinVaux;                   /* Auxiliary +5V voltage (V) */
-float       AinVcc;                    /* Main 3.3V voltage (V) */
-float       AinVcore;                  /* Core 1.2V voltage (V) */
-float       AinCoreTemp;               /* Core temperature (C) */
-float       AinMot1Temp;               /* Motor 1 temperature (C) */
-float       AinMot2Temp;               /* Motor 2 temperature (C) */
+volatile float       AinInputCurrent;           /* Input current (A) */
+volatile float       AinInputVoltage;           /* Input voltage (V) */
+volatile float       AinVaux;                   /* Auxiliary +5V voltage (V) */
+volatile float       AinVcc;                    /* Main 3.3V voltage (V) */
+volatile float       AinVcore;                  /* Core 1.2V voltage (V) */
+volatile float       AinCoreTemp;               /* Core temperature (C) */
+volatile float       AinMot1Temp;               /* Motor 1 temperature (C) */
+volatile float       AinMot2Temp;               /* Motor 2 temperature (C) */
     
     //could be a class?
     typedef struct
@@ -232,6 +232,7 @@ float       AinMot2Temp;               /* Motor 2 temperature (C) */
     /* DMA buffer for ADC3 raw data */
     //static uint16_t AinAdc3Buffer[16]; // TODO: re-check (compare) this parameter w/ the one used by GZini (it is different)
     alignas(32) static std::array<uint16_t, 2 * ADC3_NUMBER_OF_CHANNELS> AinAdc3Buffer;
+    /* DMA circular buffers for ADC3: Double buffer */
 
     /*******************************************************************************************************************//**
      * @brief
@@ -254,6 +255,10 @@ float       AinMot2Temp;               /* Motor 2 temperature (C) */
      */
     void Adc3DmaComplete_callback(volatile uint16_t sample[])
     {       
+        
+        
+        
+        #warning: to do
             /* Calculate the VREFINT value given by the manufacturer */
 //            AinVrefintCal = ((double)VREFINT_CAL)*(double)VREFINT_CAL_VREF/65536000.0;
 //            AinTempGain = (float)(TEMPSENSOR_CAL2_TEMP - TEMPSENSOR_CAL1_TEMP)/(float)(TS_CAL2 - TS_CAL1);

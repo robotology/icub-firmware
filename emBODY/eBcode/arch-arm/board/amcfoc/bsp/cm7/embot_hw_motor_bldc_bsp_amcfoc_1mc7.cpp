@@ -129,6 +129,7 @@ namespace embot::hw::motor::bldc::bsp {
         embot::hw::motor::enc::deinit(); 
         embot::hw::motor::hall::deinit(m); 
         embot::hw::motor::pwm::deinit(m);
+        embot::hw::analog::deinit();
 
         return true;
     }
