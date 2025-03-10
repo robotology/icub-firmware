@@ -54,7 +54,6 @@ using namespace embot::core::binary;
 
 
 #include "embot_hw_motor_bldc_bsp.h"
-#include "embot_hw_analog.h"
 
 
 #if !defined(EMBOT_ENABLE_hw_motor_bldc)
@@ -99,6 +98,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 #include "embot_hw_motor_enc.h"  
 #include "embot_hw_motor_hall.h"  
 #include "embot_hw_motor_pwm.h" 
+#include "embot_hw_analog.h"
 
 namespace embot::hw::motor::bldc::bsp {
                   
@@ -128,7 +128,7 @@ namespace embot::hw::motor::bldc::bsp {
         embot::hw::motor::adc::deinit(m);
         embot::hw::motor::enc::deinit(); 
         embot::hw::motor::hall::deinit(m); 
-        embot::hw::motor::pwm::deinit(m); 
+        embot::hw::motor::pwm::deinit(m);
 
         return true;
     }
@@ -1022,9 +1022,9 @@ void MX_TIM15_Init(void)
 
   /* USER CODE END TIM15_Init 1 */
   htim15.Instance = TIM15;
-  htim15.Init.Prescaler = 200;
+  htim15.Init.Prescaler = 20000;
   htim15.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim15.Init.Period = 63;
+  htim15.Init.Period = 10;
   htim15.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim15.Init.RepetitionCounter = 0;
   htim15.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;

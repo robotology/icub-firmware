@@ -134,6 +134,7 @@ int32_t CU3 = 0;
 #endif
 
 #include "embot_hw_motor_hall.h"
+#include "embot_hw_analog.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -886,7 +887,7 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     }
 
     
-    float vcc = 48.0f;
+    volatile float vcc = embot::hw::analog::getVin();
     
     embot::app::bldc::theMC2agent::getInstance().tick(caninputframes, {EXTFAULTisPRESSED, vcc}, canoutputframes);
     
