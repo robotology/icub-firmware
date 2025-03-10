@@ -347,19 +347,19 @@ namespace embot::hw::motor::adc::bsp {
     
     constexpr size_t ADC1_NUMBER_OF_CHANNELS {3};
     constexpr size_t ADC2_NUMBER_OF_CHANNELS {3};
-    constexpr size_t ADC3_NUMBER_OF_CHANNELS {10};
+//    constexpr size_t ADC3_NUMBER_OF_CHANNELS {10};
     
     /* DMA circular buffers for ADC1 and ADC2: Dual samples per phase, double buffer */
     volatile  int16_t AinDma1Buffer[4 * ADC1_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
     volatile  int16_t AinDma2Buffer[4 * ADC2_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
 
-    /* DMA circular buffers for ADC3: Double buffer */
-    volatile uint16_t AinDma3Buffer[2 * ADC3_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
+//    /* DMA circular buffers for ADC3: Double buffer */
+//    volatile uint16_t AinDma3Buffer[2 * ADC3_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
 
     /* ADC1, ADC2 and ADC3 raw data */
     volatile  int16_t AinAdc2Buffer[ADC2_NUMBER_OF_CHANNELS];  /* Motor 1 currents */
     volatile  int16_t AinAdc1Buffer[ADC1_NUMBER_OF_CHANNELS];  /* Motor 2 currents */
-    volatile uint16_t AinAdc3Buffer[ADC3_NUMBER_OF_CHANNELS];  /* Miscellaneous data */    
+//    volatile uint16_t AinAdc3Buffer[ADC3_NUMBER_OF_CHANNELS];  /* Miscellaneous data */    
     
     
     /* Calibrated motor currents (Amperes) */
