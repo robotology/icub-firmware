@@ -42,7 +42,7 @@ typedef union uSysError
 /*b4*/  unsigned CAN_IsWarnTX:1;              /* can IS in bus warn in tx (exist only one error for rx and tx, so the bits are used together)*/
 /*b5*/  unsigned CAN_IsWarnRX:1;              /* can IS in bus warn in rx*/
 /*b6*/  unsigned OverHeatingFailure:1;        /* overheating failure */
-/*b7*/  unsigned unused4:1;                   /* UNUSED: put here for mad in msg */
+/*b7*/  unsigned I2C_CommFailure:1;           /* I2C communication failure */
 
 
 /********************************************************************************************************/

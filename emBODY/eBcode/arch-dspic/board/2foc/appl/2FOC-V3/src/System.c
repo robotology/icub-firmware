@@ -151,8 +151,6 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
   
     if (MotorConfig.has_tsens && isActiveI2CTsens())
     {
-        extern volatile BOOL overheating;
-        
         static int cycle = 0;
         
         if (++cycle>=21)
@@ -161,9 +159,10 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
             
             int err = readI2CTsens(&gTemperature);
             
-            if(err == -21)
+            if((err == -21) && !SysError.I2C_CommFailure)
             {
-                overheating = TRUE;
+                SysError.I2C_CommFailure = TRUE;
+                FaultConditionsHandler();
             }
             else if (!err)
             {     
@@ -174,10 +173,9 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
                 else if (gTemperature < gTemperatureLimit)
                 {
                     gTemperatureOverheatingCounter = 0;
-                    overheating = FALSE;
                 }
             }
-            if (((gTemperatureOverheatingCounter > 100)  || overheating) && !SysError.OverHeatingFailure)
+            if ((gTemperatureOverheatingCounter > 100) && !SysError.OverHeatingFailure)
             {
                 SysError.OverHeatingFailure = TRUE;
                 FaultConditionsHandler();
