@@ -347,20 +347,14 @@ namespace embot::hw::motor::adc::bsp {
     
     constexpr size_t ADC1_NUMBER_OF_CHANNELS {3};
     constexpr size_t ADC2_NUMBER_OF_CHANNELS {3};
-//    constexpr size_t ADC3_NUMBER_OF_CHANNELS {10};
     
     /* DMA circular buffers for ADC1 and ADC2: Dual samples per phase, double buffer */
     volatile  int16_t AinDma1Buffer[4 * ADC1_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
     volatile  int16_t AinDma2Buffer[4 * ADC2_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
 
-//    /* DMA circular buffers for ADC3: Double buffer */
-//    volatile uint16_t AinDma3Buffer[2 * ADC3_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
-
     /* ADC1, ADC2 and ADC3 raw data */
     volatile  int16_t AinAdc2Buffer[ADC2_NUMBER_OF_CHANNELS];  /* Motor 1 currents */
-    volatile  int16_t AinAdc1Buffer[ADC1_NUMBER_OF_CHANNELS];  /* Motor 2 currents */
-//    volatile uint16_t AinAdc3Buffer[ADC3_NUMBER_OF_CHANNELS];  /* Miscellaneous data */    
-    
+    volatile  int16_t AinAdc1Buffer[ADC1_NUMBER_OF_CHANNELS];  /* Motor 2 currents */    
     
     /* Calibrated motor currents (Amperes) */
     float AinMot1Current[3] = {0};
@@ -561,39 +555,6 @@ namespace embot::hw::motor::adc::bsp {
     
     
     
-    #warning: remove this when finished
-//    /*******************************************************************************************************************//**
-//     * @brief   Callback function called by the DMA handler when the 1st half of the analog buffer has been loaded
-//     * @param   ADC handler (unused)
-//     * @return  void
-//     */
-//    static void AinAdc3HT_cb(ADC_HandleTypeDef *hadc)
-//    {
-////        UNUSED(hadc);
-////        BaseType_t woken = pdFALSE;
-//        /* Copy the 1st half of the buffer filled by DMA */
-//        memcpy((void *)AinAdc3Buffer, (void *)&(AinDma3Buffer[0]), sizeof(AinAdc3Buffer));
-//        /* Release control to the interrupt handler task */
-////        xSemaphoreGiveFromISR(AinAdc3SemHandle, &woken );
-////        portYIELD_FROM_ISR(woken);
-//    }
-
-    /*******************************************************************************************************************//**
-//     * @brief   Callback function called by the DMA handler when the 2nd half of the analog buffer has been loaded
-//     * @param   ADC handler (unused)
-//     * @return  void
-//     */
-//    static void AinAdc3TC_cb(ADC_HandleTypeDef *hadc)
-//    {
-////        UNUSED(hadc);
-////        BaseType_t woken = pdFALSE;
-//        /* Copy the 2nd half of the buffer filled by DMA */
-//        memcpy((void *)AinAdc3Buffer, (void *)&(AinDma3Buffer[ADC3_NUMBER_OF_CHANNELS]), sizeof(AinAdc3Buffer));
-//        /* Release control to the interrupt handler task */
-////        xSemaphoreGiveFromISR(AinAdc3SemHandle, &woken );
-////        portYIELD_FROM_ISR(woken);
-//    }    
-    
     void AinInit(void)
     {
         static bool onceonly_initted {false};
@@ -604,9 +565,8 @@ namespace embot::hw::motor::adc::bsp {
             /* Stop all ADCs */
             HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2);
             HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1);
-
-#warning RICORDATI DI FAR PARTIRE I LORO CLOCK NL MSP                
-                /* Calibrate all ADCs. Caution: blocking functions! */
+             
+            /* Calibrate all ADCs. Caution: blocking functions! */
             HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
             HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
 
