@@ -102,8 +102,10 @@ void __attribute__((__interrupt__, no_auto_psv)) _T3Interrupt(void)
 // and to perform encoder turn count
 {
     extern volatile long VqRef;
+    extern volatile long IqFbk;
 
     VqRef = 0;
+    IqFbk = 0;
 
     I2Tdata.IQMeasured = 0;
     I2Tdata.IDMeasured = 0;

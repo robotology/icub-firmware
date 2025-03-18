@@ -955,12 +955,12 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     static long Iacc = 0; // current accumulator for average
     static char cntr = 0;
     // extremal values
-    static int Imax1 = 0x8000; 
-    static int Imin1 = 0x7FFF;
-    static int Imax2 = 0x8000;
-    static int Imin2 = 0x7FFF;
-    static int Imax3 = 0x8000;
-    static int Imin3 = 0x7FFF;
+    static long Imax1 = -1000000; 
+    static long Imin1 =  1000000;
+    static long Imax2 = -1000000;
+    static long Imin2 =  1000000;
+    static long Imax3 = -1000000;
+    static long Imin3 =  1000000;
     
     if (I2Tdata.IQMeasured <= Imin1) // find the lowest value
     {
@@ -1010,8 +1010,8 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         VqFbk = __builtin_divsd(Vacc,20);
         
         Iacc = Vacc = 0;
-        Imax1 = Imax2 = Imax3 = 0x8000;
-        Imin1 = Imin2 = Imin3 = 0x7FFF;
+        Imax1 = Imax2 = Imax3 = -1000000;
+        Imin1 = Imin2 = Imin3 =  1000000;
     }
 
     //
