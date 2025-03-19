@@ -63,6 +63,7 @@ namespace embot::hw::analog {
     constexpr float    ADC_LSB = ADC_VREF / static_cast<float>(ADC_RESOLUTION);
     constexpr uint8_t  NUMBER_OF_ADC3_CHANNELS = 10;
     
+    
 #if 0 
     //These limits are not used right now
     /* Currents, voltages and temperature limits */
@@ -79,9 +80,8 @@ namespace embot::hw::analog {
     #define AIN_MAX_PTC1_TEMP       (90.0)
     #define AIN_MAX_PTC2_TEMP       (90.0)
 #endif
-    
-       
 
+       
     /* AMC-FOC schematics related constants */
     constexpr float R73  = 33000.0;
     constexpr float R84  = 22000.0;
@@ -104,16 +104,26 @@ namespace embot::hw::analog {
     volatile float AinLsb = ADC_LSB;
 
 
-    //to do
-//        #define VREFINT_CAL                 VREFINT_CAL_ADDR
+    //values taken from stm32h7xx_ll_adc.h
+    #define VREFINT_CAL_ADDR                   ((uint16_t*) (0x1FF1E860UL)) /* Internal voltage reference, address of parameter VREFINT_CAL: VrefInt ADC raw data acquired at temperature 30 DegC (tolerance: +-5 DegC), Vref+ = 3.3 V (tolerance: +-10 mV). */
+    #define VREFINT_CAL_VREF                   (3300UL)                     /* Analog voltage reference (Vref+) value with which temperature sensor has been calibrated in production (tolerance: +-10 mV) (unit: mV). */
     //    #define TS_CAL1                     TEMPSENSOR_CAL1_ADDR  
     //    #define TS_CAL2                     TEMPSENSOR_CAL2_ADDR
+    
+    /* Calculate the VREFINT value given by the manufacturer */
+    static const float AinVrefintCal = ((float)(*VREFINT_CAL_ADDR))*(float)VREFINT_CAL_VREF/65536000.0;
+    
+    
+      //to do for measuring AinCoreTemp
+      /* Core temperature and VREFINT calibration */
+      //are constant, to be calculated
+//    float AinTempGain;
+//    float AinTempOffs;
 
-
-    /* Core temperature and VREFINT calibration */
-    float AinTempGain;
-    float AinTempOffs;
-    float AinVrefintCal = 1.216 /*V*/;
+//    AinTempGain = (float)(TEMPSENSOR_CAL2_TEMP - TEMPSENSOR_CAL1_TEMP)/(float)(TS_CAL2 - TS_CAL1);
+//    AinTempOffs = (float)TEMPSENSOR_CAL1_TEMP - AinTempGain*(float)TS_CAL1;
+//    /* Compensate the resolution and VREF */
+//    AinTempGain *= 65536000.0/(float)TEMPSENSOR_CAL_VREFANALOG;
 
 
 }
@@ -134,9 +144,8 @@ namespace embot::hw::analog {
 
     #endif  
         
-
-        
-    typedef enum
+    
+    enum class Ain3Channels
     {
         PTC1,
         PTC2,
@@ -148,28 +157,18 @@ namespace embot::hw::analog {
         VBAT,
         VREFINT,
         TEMP
-    } Ain3Channels_t;
+    };
 
 
-    volatile float       AinInputCurrent;           /* Input current (A) */
-    volatile float       AinInputVoltage;           /* Input voltage (V) */
-    volatile float       AinVaux;                   /* Auxiliary +5V voltage (V) */
-    volatile float       AinVcc;                    /* Main 3.3V voltage (V) */
-    volatile float       AinVcore;                  /* Core 1.2V voltage (V) */
-    volatile float       AinCoreTemp;               /* Core temperature (C) */
-    volatile float       AinMot1Temp;               /* Motor 1 temperature (C) */
-    volatile float       AinMot2Temp;               /* Motor 2 temperature (C) */
+    volatile float    AinInputCurrent;           /* Input current (A) */
+    volatile float    AinInputVoltage;           /* Input voltage (V) */
+    volatile float    AinVaux;                   /* Auxiliary +5V voltage (V) */
+    volatile float    AinVcc;                    /* Main 3.3V voltage (V) */
+    volatile float    AinVcore;                  /* Core 1.2V voltage (V) */
+    volatile float    AinCoreTemp;               /* Core temperature (C) */
+    volatile float    AinMot1Temp;               /* Motor 1 temperature (C) */    //temperature of the motor driver of T-drive
+    volatile float    AinMot2Temp;               /* Motor 2 temperature (C) */
     
-    //could be a class?
-    typedef struct
-    {
-        int32_t avg;
-        uint32_t idx;
-        std::array<int32_t, 128> buf;
-    } AdcMovingAverageFilter_t;
-    
-    
-    static AdcMovingAverageFilter_t VrefFilter {0};
 
 
 //    /* DMA circular buffers for ADC3: Double buffer */
@@ -179,18 +178,7 @@ namespace embot::hw::analog {
     alignas(32) static std::array<uint16_t, 2 * NUMBER_OF_ADC3_CHANNELS> AinAdc3Buffer;
     /* DMA circular buffers for ADC3: Double buffer */
 
-    /*******************************************************************************************************************//**
-     * @brief
-     * @param
-     * @return
-     */
-    int32_t AdcMovingAverageFilter(AdcMovingAverageFilter_t *pFilter, int32_t sample)
-    {
-        pFilter->avg -= pFilter->buf[pFilter->idx];
-        pFilter->avg += (pFilter->buf[pFilter->idx] = sample);
-        if (++(pFilter->idx) >= pFilter->buf.size()) pFilter->idx = 0;
-        return (pFilter->avg + (pFilter->buf.size() >> 1)) / pFilter->buf.size();
-    }
+
 
 
     /*******************************************************************************************************************//**
@@ -198,29 +186,23 @@ namespace embot::hw::analog {
      * @param
      * @return
      */
-    void Adc3DmaComplete_callback(volatile uint16_t sample[])
+    void Adc3DmaComplete_callback(volatile uint16_t sample[], uint8_t x)
     {       
         
-       
-            #warning: to do for AinCoreTemp
-            /* Calculate the VREFINT value given by the manufacturer */
-//            AinVrefintCal = ((double)VREFINT_CAL)*(double)VREFINT_CAL_VREF/65536000.0;
-//            AinTempGain = (float)(TEMPSENSOR_CAL2_TEMP - TEMPSENSOR_CAL1_TEMP)/(float)(TS_CAL2 - TS_CAL1);
-//            AinTempOffs = (float)TEMPSENSOR_CAL1_TEMP - AinTempGain*(float)TS_CAL1;
-//            /* Compensate the resolution and VREF */
-//            AinTempGain *= 65536000.0/(float)TEMPSENSOR_CAL_VREFANALOG;
+        AinLsb = (0 == AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VREFINT)])? ADC_LSB : AinVrefintCal/(float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VREFINT)];
+        AinInputCurrent = CIN_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::CIN)] * AinLsb;
+        AinInputVoltage = VIN_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VIN)] * AinLsb;
         
-     
-        AinLsb = (0 == AinAdc3Buffer[VREFINT])? ADC_LSB : AinVrefintCal/(float)AinAdc3Buffer[VREFINT];
-        AinInputCurrent = CIN_ATTEN * (float)AinAdc3Buffer[CIN] * AinLsb;
-        AinInputVoltage = VIN_ATTEN * (float)AinAdc3Buffer[VIN] * AinLsb;
-        embot::core::print(std::to_string(AinInputVoltage));
-        AinVaux = VAUX_ATTEN * (float)AinAdc3Buffer[VAUX] * AinLsb;
-        AinVcc = VCC_ATTEN * (float)AinAdc3Buffer[VCC] * AinLsb;
-        AinVcore = VCORE_ATTEN * (float)AinAdc3Buffer[VCORE] * AinLsb;
-//        AinCoreTemp = AinTempGain * (float)AinAdc3Buffer[TEMP] * AinLsb + AinTempOffs;
-        AinMot1Temp = PTC_GAIN * (float)AinAdc3Buffer[PTC1] * AinLsb + PTC_OFFS;
-        AinMot2Temp = PTC_GAIN * (float)AinAdc3Buffer[PTC2] * AinLsb + PTC_OFFS;
+//        uint64_t t = embot::core::now(); 
+//        embot::core::TimeFormatter tf{t};
+//        embot::core::print(std::to_string(x) +" "+tf.to_string() +" "+ std::to_string(AinInputVoltage));
+
+        AinVaux = VAUX_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VAUX)] * AinLsb;
+        AinVcc = VCC_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VCC)] * AinLsb;
+        AinVcore = VCORE_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VCORE)] * AinLsb;
+//        AinCoreTemp = AinTempGain * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::TEMP)] * AinLsb + AinTempOffs;
+        AinMot1Temp = PTC_GAIN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::PTC1)] * AinLsb + PTC_OFFS;
+        AinMot2Temp = PTC_GAIN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::PTC2)] * AinLsb + PTC_OFFS;
     }
 
     /* Callback functions *************************************************************************************************/
@@ -233,18 +215,18 @@ namespace embot::hw::analog {
     void AdcPwrHalfTransfer_callback(ADC_HandleTypeDef *hadc)
     {
         /* Force the readback of the DMA buffer */
-        //SCB_InvalidateDCache_by_Addr((void *)AinAdc3Buffer, sizeof(AinAdc3Buffer));
+//        SCB_InvalidateDCache_by_Addr(reinterpret_cast<void*>(AinAdc3Buffer.data()), sizeof(AinAdc3Buffer));
         /* First half of the buffer ready */
-        Adc3DmaComplete_callback(&(AinAdc3Buffer[0]));
+        Adc3DmaComplete_callback(&(AinAdc3Buffer[0]),0);
     }
 
 
     void AdcPwrTransferComplete_callback(ADC_HandleTypeDef *hadc)
     {
         /* Force the readback of the DMA buffer */
-        //SCB_InvalidateDCache_by_Addr((void *)AinAdc3Buffer, sizeof(AinAdc3Buffer));
+//        SCB_InvalidateDCache_by_Addr(reinterpret_cast<void*>(AinAdc3Buffer.data()), sizeof(AinAdc3Buffer));
         /* Second half of the buffer ready */
-        Adc3DmaComplete_callback(&(AinAdc3Buffer[NUMBER_OF_ADC3_CHANNELS]));
+        Adc3DmaComplete_callback(&(AinAdc3Buffer[NUMBER_OF_ADC3_CHANNELS]),1);
     }
 
         

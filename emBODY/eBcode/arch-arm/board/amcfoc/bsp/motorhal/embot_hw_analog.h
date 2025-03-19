@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
@@ -13,9 +12,6 @@
 #include "embot_core.h"
 #include "embot_hw.h"
 
-
-#if 0
-#endif
 
 namespace embot::hw::analog {
         
