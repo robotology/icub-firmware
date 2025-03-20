@@ -180,6 +180,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>AinVrefintCal</ItemText>
         </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>vin</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
