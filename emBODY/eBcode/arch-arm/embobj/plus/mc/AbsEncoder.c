@@ -424,7 +424,9 @@ void AbsEncoder_invalid(AbsEncoder* o, ae_errortype_t error_type)
     if (o->state.bits.not_configured) return;
     
     if (o->state.bits.not_calibrated) return;
-
+    
+    if (error_type == embot::app::eth::encoder::v1::Error::AKSIM2_CRC_ERROR) return;
+    
     if (o->invalid_cnt > ENCODER_INVALID_LIMIT)
     {
         o->hardware_fault = TRUE;
@@ -444,7 +446,6 @@ void AbsEncoder_invalid(AbsEncoder* o, ae_errortype_t error_type)
         case embot::app::eth::encoder::v1::Error::AKSIM2_GENERIC:
         case embot::app::eth::encoder::v1::Error::AKSIM2_INVALID_DATA:
         case embot::app::eth::encoder::v1::Error::AKSIM2_CLOSE_TO_LIMITS:
-        case embot::app::eth::encoder::v1::Error::AKSIM2_CRC_ERROR:
             break;
         
         // all other cases are errors: AEA_PARITY, AEA_CHIP, AEA_READING have their tx_error, chip_error, data_error. all others: are data_error. 
