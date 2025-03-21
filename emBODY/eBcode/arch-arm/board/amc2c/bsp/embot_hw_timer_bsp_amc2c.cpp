@@ -89,7 +89,7 @@ namespace embot::hw::timer {
     {
         return thebsp;
     }    
-}}}
+}
 
 #else
 

@@ -65,271 +65,271 @@ fp_uint8_float_float_float_t on_acquisition_of_currents {dummyONcurrents};
 namespace embot::hw::motor::adc {
     
 
-struct Converter
-{
-    static constexpr uint32_t defOffset {29789};
-    uint32_t offset {defOffset};
-    
-    constexpr Converter() = default;
-    constexpr Converter(uint32_t o) : offset(o) {};  
-
-    void clear() 
+    struct Converter
     {
-        set(defOffset);
-    }        
-
-    void set(uint32_t o) 
-    {
-        offset = o;
-    }
-
-    int32_t raw2current(uint32_t r)
-    {
-        int32_t t = static_cast<int32_t>(r - offset)*33000;
-        return t/(256*1024);
-    }
-    
-    uint32_t current2raw(int32_t c)
-    {
-        int32_t t = c*256*1024;
-        return t/33000 + offset;
-    }    
-    
-};
-
-
-struct Calibrator
-{
-    static constexpr uint8_t _shift {10};
-    static constexpr size_t _maxcount {1 << _shift};
-    
-    embot::hw::MOTOR mot {embot::hw::MOTOR::one};
-    volatile bool _done {false};
-    volatile size_t _count {0};
-    
-    embot::hw::motor::bldc::Currents _currents {};
-    std::array<uint64_t, 3> cumulativerawvalues {0, 0, 0};
-    
-
-    std::array<Converter, 3> _conv {};
-    
-    constexpr Calibrator() = default;
-    
-    void init(embot::hw::MOTOR m)
-    {
-       for(auto &i : _conv) { i.clear(); } // but the clear is not necessary
-       _count = 0;
-       _done = false; 
-       cumulativerawvalues.fill(0); 
-       mot = m;
-       embot::hw::motor::bldc::OnCurrents oncurs { mot, oncurrentscalib, this };       
-       embot::hw::motor::adc::set(mot, oncurs);
-//       embot::hw::motor::adc::set(mot, {oncurrentscalib, this});
-    }
-    
-    void stop()
-    {
-        embot::hw::motor::adc::set(mot, {});
-        _count = 0;
-       _done = true;  
-    }
-    
-    
-    bool wait(const embot::core::relTime timeout = 500*embot::core::time1millisec)
-    {
-        bool ret {false};
+        static constexpr uint32_t defOffset {29789};
+        uint32_t offset {defOffset};
         
-        volatile embot::core::Time endtime = embot::core::now() + timeout;
-        
-        for(;;)
+        constexpr Converter() = default;
+        constexpr Converter(uint32_t o) : offset(o) {};  
+
+        void clear() 
         {
-            volatile embot::core::Time n = embot::core::now();
-            if(true == _done)
-            { 
-                ret = true; 
-                break; 
-            }
-            else if(n > endtime)
-            {
-                ret = false; 
-                stop();
-                break;
-            }
+            set(defOffset);
+        }        
+
+        void set(uint32_t o) 
+        {
+            offset = o;
         }
 
-        return ret;
-    }   
-
-
-    static void oncurrentscalib(MOTOR h, const embot::hw::motor::bldc::Currents * const currs, void *owner)
-    {
-        Calibrator *o = reinterpret_cast<Calibrator*>(owner);   
-     
-//        // currents is in A 
-//     
-//        // i use Converter::current2raw() because technically Currents does not contain the raw ADC values but transformed values
-//        o->cumulativerawvalues[0] += o->_conv[0].current2raw(currents->u);
-//        o->cumulativerawvalues[1] += o->_conv[1].current2raw(currents->v);
-//        o->cumulativerawvalues[2] += o->_conv[2].current2raw(currents->w);
-        
-        o->_count++;
-        
-        if(o->_count >= Calibrator::_maxcount)
+        int32_t raw2current(uint32_t r)
         {
-//            // time to do business: prepare average currents, impose the offset to ADC, stop the calibrator  
-//            
-//            // dont use the >> _shift because ... 1. this operation is done only once, so who bother. 
-//            //                                    2. cumulativerawvalues is int64_t, so shift does niot work for negative values
-//            // impose offset to adc.
-//            volatile int64_t cc[3] {0, 0, 0};
-//            cc[0] = o->cumulativerawvalues[0] / o->_count;
-//            cc[1] = o->cumulativerawvalues[1] / o->_count;
-//            cc[2] = o->cumulativerawvalues[2] / o->_count;
-//            
-//            o->_conv[0].set(cc[0]);
-//            o->_conv[1].set(cc[1]);
-//            o->_conv[2].set(cc[2]);
-            
-            // stop: deregister this callback
-            o->stop();
-        }                     
-    }    
-    
-};
-
-struct adcm_Internals
-{
-    struct Item
-    {
-        Configuration config {};
-        Calibrator calibrator {};   
-        Item() = default;            
+            int32_t t = static_cast<int32_t>(r - offset)*33000;
+            return t/(256*1024);
+        }
+        
+        uint32_t current2raw(int32_t c)
+        {
+            int32_t t = c*256*1024;
+            return t/33000 + offset;
+        }    
+        
     };
-    
-    std::array<Item, embot::hw::motor::bldc::MAXnumber> _items {};
-        
-//    static void dummy_adc_callback(void *owner, const Currents * const currents) {}  
-//    static constexpr OnCurrents dummyADCcbk { dummy_adc_callback, nullptr };    
-//    static void dummy_adc_motorcallback(const embot::hw::MOTOR m, const PhaseCurrents * const phasecurrents) {}      
-//    static constexpr OnMotorPhaseCurrents dummyADCmotorcbk { };    
-        
-    adcm_Internals() = default;    
-};
 
-adcm_Internals _adcm_internals {};
-    
-    
-void adc_on_currents(MOTOR m, const embot::hw::motor::bldc::Currents * const currs)
-{
-    _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(currs);  
-}    
-    
-//// this is the callback executed inside the ADC handler  
-//// {c1, c2, c3} are in adc units [0, 64k)
-//// so, we need to transform them into currents expressed in milli-ampere
-//    // and call the callback imposed by the embot::hw::motor::setCallbackOnCurrents()
-//void adcm_on_acquisition_of_currents(uint16_t c1, uint16_t c2, uint16_t c3)
-//{
-//    
-//    embot::hw::MOTOR m {embot::hw::MOTOR::one};
-//    
-//    // important note: {{c1, c2, c3} are in adc units [0, 64k). no conversion yet. 
-//    Currents currents = 
-//    {
-//        _adcm_internals._items[embot::core::tointegral(m)].calibrator._conv[0].raw2current(c1), 
-//        _adcm_internals._items[embot::core::tointegral(m)].calibrator._conv[1].raw2current(c2),
-//        _adcm_internals._items[embot::core::tointegral(m)].calibrator._conv[2].raw2current(c3),
-//    };
-//    _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&currents);         
-//}   
-//    
 
-bool init(embot::hw::MOTOR m, const Configuration &config)
-{
-    bool r {true};
-    
-    if(false == config.isvalid())
+    struct Calibrator
     {
-        return false;
-    }
+        static constexpr uint8_t _shift {10};
+        static constexpr size_t _maxcount {1 << _shift};
+        
+        embot::hw::MOTOR mot {embot::hw::MOTOR::one};
+        volatile bool _done {false};
+        volatile size_t _count {0};
+        
+        embot::hw::motor::bldc::Currents _currents {};
+        std::array<uint64_t, 3> cumulativerawvalues {0, 0, 0};
+        
+
+        std::array<Converter, 3> _conv {};
+        
+        constexpr Calibrator() = default;
+        
+        void init(embot::hw::MOTOR m)
+        {
+           for(auto &i : _conv) { i.clear(); } // but the clear is not necessary
+           _count = 0;
+           _done = false; 
+           cumulativerawvalues.fill(0); 
+           mot = m;
+           embot::hw::motor::bldc::OnCurrents oncurs { mot, oncurrentscalib, this };       
+           embot::hw::motor::adc::set(mot, oncurs);
+    //       embot::hw::motor::adc::set(mot, {oncurrentscalib, this});
+        }
+        
+        void stop()
+        {
+            embot::hw::motor::adc::set(mot, {});
+            _count = 0;
+           _done = true;  
+        }
+        
+        
+        bool wait(const embot::core::relTime timeout = 500*embot::core::time1millisec)
+        {
+            bool ret {false};
+            
+            volatile embot::core::Time endtime = embot::core::now() + timeout;
+            
+            for(;;)
+            {
+                volatile embot::core::Time n = embot::core::now();
+                if(true == _done)
+                { 
+                    ret = true; 
+                    break; 
+                }
+                else if(n > endtime)
+                {
+                    ret = false; 
+                    stop();
+                    break;
+                }
+            }
+
+            return ret;
+        }   
+
+
+        static void oncurrentscalib(MOTOR h, const embot::hw::motor::bldc::Currents * const currs, void *owner)
+        {
+            Calibrator *o = reinterpret_cast<Calibrator*>(owner);   
+         
+    //        // currents is in A 
+    //     
+    //        // i use Converter::current2raw() because technically Currents does not contain the raw ADC values but transformed values
+    //        o->cumulativerawvalues[0] += o->_conv[0].current2raw(currents->u);
+    //        o->cumulativerawvalues[1] += o->_conv[1].current2raw(currents->v);
+    //        o->cumulativerawvalues[2] += o->_conv[2].current2raw(currents->w);
+            
+            o->_count++;
+            
+            if(o->_count >= Calibrator::_maxcount)
+            {
+    //            // time to do business: prepare average currents, impose the offset to ADC, stop the calibrator  
+    //            
+    //            // dont use the >> _shift because ... 1. this operation is done only once, so who bother. 
+    //            //                                    2. cumulativerawvalues is int64_t, so shift does niot work for negative values
+    //            // impose offset to adc.
+    //            volatile int64_t cc[3] {0, 0, 0};
+    //            cc[0] = o->cumulativerawvalues[0] / o->_count;
+    //            cc[1] = o->cumulativerawvalues[1] / o->_count;
+    //            cc[2] = o->cumulativerawvalues[2] / o->_count;
+    //            
+    //            o->_conv[0].set(cc[0]);
+    //            o->_conv[1].set(cc[1]);
+    //            o->_conv[2].set(cc[2]);
+                
+                // stop: deregister this callback
+                o->stop();
+            }                     
+        }    
+        
+    };
+
+    struct adcm_Internals
+    {
+        struct Item
+        {
+            Configuration config {};
+            Calibrator calibrator {};   
+            Item() = default;            
+        };
+        
+        std::array<Item, embot::hw::motor::bldc::MAXnumber> _items {};
+            
+    //    static void dummy_adc_callback(void *owner, const Currents * const currents) {}  
+    //    static constexpr OnCurrents dummyADCcbk { dummy_adc_callback, nullptr };    
+    //    static void dummy_adc_motorcallback(const embot::hw::MOTOR m, const PhaseCurrents * const phasecurrents) {}      
+    //    static constexpr OnMotorPhaseCurrents dummyADCmotorcbk { };    
+            
+        adcm_Internals() = default;    
+    };
+
+    adcm_Internals _adcm_internals {};
+        
+        
+    void adc_on_currents(MOTOR m, const embot::hw::motor::bldc::Currents * const currs)
+    {
+        _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(currs);  
+    }    
+        
+    //// this is the callback executed inside the ADC handler  
+    //// {c1, c2, c3} are in adc units [0, 64k)
+    //// so, we need to transform them into currents expressed in milli-ampere
+    //    // and call the callback imposed by the embot::hw::motor::setCallbackOnCurrents()
+    //void adcm_on_acquisition_of_currents(uint16_t c1, uint16_t c2, uint16_t c3)
+    //{
+    //    
+    //    embot::hw::MOTOR m {embot::hw::MOTOR::one};
+    //    
+    //    // important note: {{c1, c2, c3} are in adc units [0, 64k). no conversion yet. 
+    //    Currents currents = 
+    //    {
+    //        _adcm_internals._items[embot::core::tointegral(m)].calibrator._conv[0].raw2current(c1), 
+    //        _adcm_internals._items[embot::core::tointegral(m)].calibrator._conv[1].raw2current(c2),
+    //        _adcm_internals._items[embot::core::tointegral(m)].calibrator._conv[2].raw2current(c3),
+    //    };
+    //    _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&currents);         
+    //}   
+    //    
+
+    bool init(embot::hw::MOTOR m, const Configuration &config)
+    {
+        bool r {true};
+        
+        if(false == config.isvalid())
+        {
+            return false;
+        }
+         
+        _adcm_internals._items[embot::core::tointegral(m)].config = config;
+        
+        // 1. at first we want to be sure that everything is stopped, so:
+        deinit(m);  
+        
+    //    adcm_FP_on_acquisition_of_currents = adcm_on_acquisition_of_currents;
+        
+    //    on_acquisition_of_currents = dummyONcurrents;
+
+        // 2. then we init the bsp
+
+        bsp::AinInit();      
      
-    _adcm_internals._items[embot::core::tointegral(m)].config = config;
-    
-    // 1. at first we want to be sure that everything is stopped, so:
-    deinit(m);  
-    
-//    adcm_FP_on_acquisition_of_currents = adcm_on_acquisition_of_currents;
-    
-//    on_acquisition_of_currents = dummyONcurrents;
+        
+        return r;   
+    }  
 
-    // 2. then we init the bsp
-
-    bsp::AinInit();      
- 
-    
-    return r;   
-}  
-
-bool calibrate(embot::hw::MOTOR m, const Calibration &calib)
-{
-    bool r {true};
-    
-    if(calib.calibration != Calibration::CALIBRATION::current)
+    bool calibrate(embot::hw::MOTOR m, const Calibration &calib)
     {
-        return r;
+        bool r {true};
+        
+        if(calib.calibration != Calibration::CALIBRATION::current)
+        {
+            return r;
+        }
+        // in here we need to have zero pwm, so we force it
+    //    PwmPhaseSet(0, 0, 0);
+    //    PwmPhaseEnable(PWM_PHASE_NONE);   
+        
+        _adcm_internals._items[embot::core::tointegral(m)].calibrator.init(m);
+
+        r = _adcm_internals._items[embot::core::tointegral(m)].calibrator.wait(calib.timeout);
+       
+        return r;   
+    }    
+
+
+    bool set(embot::hw::MOTOR m, const embot::hw::motor::bldc::OnCurrents &cbk)
+    {
+        // marco.accame: the config.oncurrent.execute() verifies that is valid before calling its .action(), 
+        // so we are sure that we never call a nullptr function ptr
+        _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents = cbk;    
+
+        return true;
     }
-    // in here we need to have zero pwm, so we force it
-//    PwmPhaseSet(0, 0, 0);
-//    PwmPhaseEnable(PWM_PHASE_NONE);   
-    
-    _adcm_internals._items[embot::core::tointegral(m)].calibrator.init(m);
-
-    r = _adcm_internals._items[embot::core::tointegral(m)].calibrator.wait(calib.timeout);
-   
-    return r;   
-}    
 
 
-bool set(embot::hw::MOTOR m, const embot::hw::motor::bldc::OnCurrents &cbk)
-{
-    // marco.accame: the config.oncurrent.execute() verifies that is valid before calling its .action(), 
-    // so we are sure that we never call a nullptr function ptr
-    _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents = cbk;    
+    //void set(embot::hw::MOTOR m, const OnCurrents &cbk)
+    //{
+    ////    // maybe better to protect execution of s_adcm_ADC_cbk by ...
+    ////    // temporarily suspending the AdcMotTransferComplete_cb() and AdcMotHalfTransfer_cb()  
+    ////    HAL_ADC_UnRegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
+    ////    HAL_ADC_UnRegisterCallback(&hadc1, HAL_ADC_CONVERSION_HALF_CB_ID);
+    ////    
+    ////    _adcm_internals.config.oncurrents = cbk.isvalid() ? cbk : _adcm_internals.dummyADCcbk;
+    ////    
+    ////    HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AdcMotTransferComplete_cb);
+    ////    HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_HALF_CB_ID, AdcMotHalfTransfer_cb);    
+    //}
 
-    return true;
-}
+    //void set1(embot::hw::MOTOR m, const OnMotorPhaseCurrents &mcbk)
+    //{
+    //    _adcm_internals._items[embot::core::tointegral(m)].config.onmotorphasecurrents[embot::core::tointegral(m)] = mcbk.isvalid() ? mcbk : _adcm_internals.dummyADCmotorcbk;
+    //}
 
-
-//void set(embot::hw::MOTOR m, const OnCurrents &cbk)
-//{
-////    // maybe better to protect execution of s_adcm_ADC_cbk by ...
-////    // temporarily suspending the AdcMotTransferComplete_cb() and AdcMotHalfTransfer_cb()  
-////    HAL_ADC_UnRegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
-////    HAL_ADC_UnRegisterCallback(&hadc1, HAL_ADC_CONVERSION_HALF_CB_ID);
-////    
-////    _adcm_internals.config.oncurrents = cbk.isvalid() ? cbk : _adcm_internals.dummyADCcbk;
-////    
-////    HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AdcMotTransferComplete_cb);
-////    HAL_ADC_RegisterCallback(&hadc1, HAL_ADC_CONVERSION_HALF_CB_ID, AdcMotHalfTransfer_cb);    
-//}
-
-//void set1(embot::hw::MOTOR m, const OnMotorPhaseCurrents &mcbk)
-//{
-//    _adcm_internals._items[embot::core::tointegral(m)].config.onmotorphasecurrents[embot::core::tointegral(m)] = mcbk.isvalid() ? mcbk : _adcm_internals.dummyADCmotorcbk;
-//}
-
-// as AdcMotDeInit() but ... see the changes in analog_DeInit() of amcbldc
-bool deinit(embot::hw::MOTOR m)
-{
-    bool r = true;    
-    // AdcMotDeInit() unchanged is OK 
-    // AdcMotDeInit();
-    // i also clear the callback
-    constexpr embot::hw::motor::bldc::OnCurrents dummy {};
-    embot::hw::motor::bldc::set(embot::hw::MOTOR::one, dummy);  
-    embot::hw::motor::bldc::set(embot::hw::MOTOR::two, dummy);         
-    return r;    
-}
+    // as AdcMotDeInit() but ... see the changes in analog_DeInit() of amcbldc
+    bool deinit(embot::hw::MOTOR m)
+    {
+        bool r = true;    
+        // AdcMotDeInit() unchanged is OK 
+        // AdcMotDeInit();
+        // i also clear the callback
+        constexpr embot::hw::motor::bldc::OnCurrents dummy {};
+        embot::hw::motor::bldc::set(embot::hw::MOTOR::one, dummy);  
+        embot::hw::motor::bldc::set(embot::hw::MOTOR::two, dummy);         
+        return r;    
+    }
    
     
     
@@ -347,20 +347,14 @@ namespace embot::hw::motor::adc::bsp {
     
     constexpr size_t ADC1_NUMBER_OF_CHANNELS {3};
     constexpr size_t ADC2_NUMBER_OF_CHANNELS {3};
-    constexpr size_t ADC3_NUMBER_OF_CHANNELS {10};
     
     /* DMA circular buffers for ADC1 and ADC2: Dual samples per phase, double buffer */
     volatile  int16_t AinDma1Buffer[4 * ADC1_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
     volatile  int16_t AinDma2Buffer[4 * ADC2_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
 
-    /* DMA circular buffers for ADC3: Double buffer */
-    volatile uint16_t AinDma3Buffer[2 * ADC3_NUMBER_OF_CHANNELS] __attribute__((aligned (4)));
-
     /* ADC1, ADC2 and ADC3 raw data */
     volatile  int16_t AinAdc2Buffer[ADC2_NUMBER_OF_CHANNELS];  /* Motor 1 currents */
-    volatile  int16_t AinAdc1Buffer[ADC1_NUMBER_OF_CHANNELS];  /* Motor 2 currents */
-    volatile uint16_t AinAdc3Buffer[ADC3_NUMBER_OF_CHANNELS];  /* Miscellaneous data */    
-    
+    volatile  int16_t AinAdc1Buffer[ADC1_NUMBER_OF_CHANNELS];  /* Motor 2 currents */    
     
     /* Calibrated motor currents (Amperes) */
     float AinMot1Current[3] = {0};
@@ -558,129 +552,54 @@ namespace embot::hw::motor::adc::bsp {
         _adcm_internals._items[embot::core::tointegral(m)].config.oncurrents.execute(&cc);           
     }
 
-    /*******************************************************************************************************************//**
-     * @brief   Callback function called by the DMA handler when the 1st half of the analog buffer has been loaded
-     * @param   ADC handler (unused)
-     * @return  void
-     */
-    static void AinAdc3HT_cb(ADC_HandleTypeDef *hadc)
-    {
-//        UNUSED(hadc);
-//        BaseType_t woken = pdFALSE;
-        /* Copy the 1st half of the buffer filled by DMA */
-        memcpy((void *)AinAdc3Buffer, (void *)&(AinDma3Buffer[0]), sizeof(AinAdc3Buffer));
-        /* Release control to the interrupt handler task */
-//        xSemaphoreGiveFromISR(AinAdc3SemHandle, &woken );
-//        portYIELD_FROM_ISR(woken);
-    }
-
-    /*******************************************************************************************************************//**
-     * @brief   Callback function called by the DMA handler when the 2nd half of the analog buffer has been loaded
-     * @param   ADC handler (unused)
-     * @return  void
-     */
-    static void AinAdc3TC_cb(ADC_HandleTypeDef *hadc)
-    {
-//        UNUSED(hadc);
-//        BaseType_t woken = pdFALSE;
-        /* Copy the 2nd half of the buffer filled by DMA */
-        memcpy((void *)AinAdc3Buffer, (void *)&(AinDma3Buffer[ADC3_NUMBER_OF_CHANNELS]), sizeof(AinAdc3Buffer));
-        /* Release control to the interrupt handler task */
-//        xSemaphoreGiveFromISR(AinAdc3SemHandle, &woken );
-//        portYIELD_FROM_ISR(woken);
-    }    
+    
+    
     
     void AinInit(void)
     {
-        /* Stop the ADC3 trigger */
-        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);
-        /* Create the binary semaphore */
-//        if ((NULL ==  AinAdc3SemHandle) &&
-//            (NULL != (AinAdc3SemHandle = xSemaphoreCreateBinary())))
+        static bool onceonly_initted {false};
+                
+        if(false == onceonly_initted)
         {
-            /* Create the task */
-//            if ((NULL == AinAdc3TaskHandle) &&
-//                (pdPASS == xTaskCreate(AinAdc3Task, "ADC3 task", 128, NULL, uxTaskPriorityGet(NULL), &AinAdc3TaskHandle)) &&
-//                (NULL != AinAdc3TaskHandle))
-            {
-                
-                __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS, 0);
-                HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);                  
-                
-                /* Stop all ADCs */
-                HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2);
-                HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1);
-                HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS);
+               
+            /* Stop all ADCs */
+            HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2);
+            HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1);
+             
+            /* Calibrate all ADCs. Caution: blocking functions! */
+            HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
+            HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
 
-#warning RICORDATI DI FAR PARTIRE I LORO CLOCK NL MSP                
-                /* Calibrate all ADCs. Caution: blocking functions! */
-                HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
-                HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
-                HAL_ADCEx_Calibration_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, ADC_CALIB_OFFSET_LINEARITY, ADC_SINGLE_ENDED);
+            /* Register all the callback functions */
+            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc1HT_cb);
+            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc1TC_cb);
+            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc2HT_cb);
+            HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc2TC_cb);
 
-                /* Register all the callback functions */
-                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc1HT_cb);
-                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc1TC_cb);
-                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc2HT_cb);
-                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc2TC_cb);
-                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_COMPLETE_CB_ID, AinAdc3HT_cb);
-                HAL_ADC_RegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_HALF_CB_ID,     AinAdc3TC_cb);
-
-                /* Start conversions */
-                HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, (uint32_t *)AinDma1Buffer, sizeof(AinDma1Buffer)/sizeof(AinDma1Buffer[0]));
-                HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, (uint32_t *)AinDma2Buffer, sizeof(AinDma2Buffer)/sizeof(AinDma2Buffer[0]));
-                HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, (uint32_t *)AinDma3Buffer, sizeof(AinDma3Buffer)/sizeof(AinDma3Buffer[0]));
-                
-                
-                // start timer for hadcOTHERS   
-                //embot::hw::sys::delay(100);                
-//                __HAL_TIM_SetCounter(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS, 0);
-//                HAL_TIM_Base_Start(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);                
-                
-                /* All done */
-                return;
-            }
-            /* Cannot run the task */
-//            AinAdc3TaskHandle = NULL;
-            /* Remove the semaphore */
-//            vSemaphoreDelete(AinAdc3SemHandle);
-//            AinAdc3SemHandle = NULL;
+            /* Start conversions */
+            HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, (uint32_t *)AinDma1Buffer, sizeof(AinDma1Buffer)/sizeof(AinDma1Buffer[0]));
+            HAL_ADC_Start_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, (uint32_t *)AinDma2Buffer, sizeof(AinDma2Buffer)/sizeof(AinDma2Buffer[0]));
+ 
+            /* All done */
+            onceonly_initted = true;
+            return;
         }
-        /* Stop ADC3 trigger */
-        HAL_TIM_Base_Stop(&embot::hw::motor::bldc::bsp::amcfoc::cm7::htimTriggerOfadcOTHERS);
-        /* Out of memory */
-//        return HAL_ERROR;
+        
     }
     
     
     void AinDeInit(void)
     {
-//        /* Kill the ADC3 management task */
-//        if (NULL != AinAdc3TaskHandle)
-//        {
-//            vTaskDelete(AinAdc3TaskHandle);
-//            AinAdc3TaskHandle = NULL;
-//        }
-        
-//        /* Remove the semaphore */
-//        if (NULL != AinAdc3SemHandle)
-//        {
-//            vSemaphoreDelete(AinAdc3SemHandle);
-//            AinAdc3SemHandle = NULL;
-//        }
 
         /* Stop all ADCs */
         HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2);
         HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1);
-        HAL_ADC_Stop_DMA(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS);
         
         /* Remove all callback functions */
         HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
         HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT2, HAL_ADC_CONVERSION_HALF_CB_ID);
         HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
         HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcMOT1, HAL_ADC_CONVERSION_HALF_CB_ID);
-        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_COMPLETE_CB_ID);
-        HAL_ADC_UnRegisterCallback(&embot::hw::motor::bldc::bsp::amcfoc::cm7::hadcOTHERS, HAL_ADC_CONVERSION_HALF_CB_ID);
     }    
     
 }

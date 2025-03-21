@@ -98,6 +98,7 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 #include "embot_hw_motor_enc.h"  
 #include "embot_hw_motor_hall.h"  
 #include "embot_hw_motor_pwm.h" 
+#include "embot_hw_analog.h"
 
 namespace embot::hw::motor::bldc::bsp {
                   
@@ -127,7 +128,8 @@ namespace embot::hw::motor::bldc::bsp {
         embot::hw::motor::adc::deinit(m);
         embot::hw::motor::enc::deinit(); 
         embot::hw::motor::hall::deinit(m); 
-        embot::hw::motor::pwm::deinit(m); 
+        embot::hw::motor::pwm::deinit(m);
+        embot::hw::analog::deinit();
 
         return true;
     }
@@ -281,7 +283,7 @@ namespace embot::hw::motor::bldc::bsp {
 // the motorhal requires:
 // ADC1, ADC2
 // TIM1, TIM4, TIM5
-// ADC3 and TIM6 for measuring power supply and currents
+// ADC3 and TIM15 for measuring power supply and currents
 
 
 namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
@@ -431,7 +433,7 @@ void MX_DMA_Init(void)
 // - as many _Init() you need, one for each TIMx
 //   TIM1, TIM2, TIM3, TIM4, TIM5, TIM8
 // TIM1 TIM8 TIM5
-// - one HAL_TIM_Base_MspInit() and one HAL_TIM_Base_MspDeInit() for TIM1 TIM8 (TIM15 removed)
+// - one HAL_TIM_Base_MspInit() and one HAL_TIM_Base_MspDeInit() for TIM1 TIM8 TIM15 
 // - one HAL_TIM_MspPostInit() for TIM1 TIM8
 // TIM2 TIM5
 // - one HAL_TIM_IC_MspInit() and one HAL_TIM_IC_MspDeInit() for TIM2 TIM5
@@ -456,7 +458,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PE14     ------> TIM1_CH4
     PE12     ------> TIM1_CH3N
     PE13     ------> TIM1_CH3
-    PE9     ------> TIM1_CH1
+    PE9      ------> TIM1_CH1
     PE11     ------> TIM1_CH2
     */
     GPIO_InitStruct.Pin = MOT2_PWM2L_Pin|MOT2_PWM1L_Pin;
@@ -494,10 +496,10 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PH14     ------> TIM8_CH2N
     PH13     ------> TIM8_CH1N
     PH15     ------> TIM8_CH3N
-    PC8     ------> TIM8_CH3
-    PC7     ------> TIM8_CH2
-    PC9     ------> TIM8_CH4
-    PC6     ------> TIM8_CH1
+    PC8      ------> TIM8_CH3
+    PC7      ------> TIM8_CH2
+    PC9      ------> TIM8_CH4
+    PC6      ------> TIM8_CH1
     */
     GPIO_InitStruct.Pin = MOT1_PWM2L_Pin|MOT1_PWM1L_Pin|MOT1_PWM3L_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -1021,9 +1023,9 @@ void MX_TIM15_Init(void)
 
   /* USER CODE END TIM15_Init 1 */
   htim15.Instance = TIM15;
-  htim15.Init.Prescaler = 200;
+  htim15.Init.Prescaler = 20000;
   htim15.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim15.Init.Period = 63;
+  htim15.Init.Period = 10;
   htim15.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim15.Init.RepetitionCounter = 0;
   htim15.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -1697,21 +1699,22 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 
   /* USER CODE END TIM8_MspInit 1 */
   }
-//  else if(tim_baseHandle->Instance==TIM15)
-//  {
-//  /* USER CODE BEGIN TIM15_MspInit 0 */
+  else if(tim_baseHandle->Instance==TIM15)
+  {
+  /* USER CODE BEGIN TIM15_MspInit 0 */
 
-//  /* USER CODE END TIM15_MspInit 0 */
-//    /* TIM15 clock enable */
-//    __HAL_RCC_TIM15_CLK_ENABLE();
+  /* USER CODE END TIM15_MspInit 0 */
+    /* TIM15 clock enable */
+    __HAL_RCC_TIM15_CLK_ENABLE();
 
-//    /* TIM15 interrupt Init */
-//    HAL_NVIC_SetPriority(TIM15_IRQn, 5, 0);
-//    HAL_NVIC_EnableIRQ(TIM15_IRQn);
-//  /* USER CODE BEGIN TIM15_MspInit 1 */
+    /* TIM15 interrupt Init */
+    HAL_NVIC_SetPriority(TIM15_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(TIM15_IRQn);
+  /* USER CODE BEGIN TIM15_MspInit 1 */
 
-//  /* USER CODE END TIM15_MspInit 1 */
-//  }
+  /* USER CODE END TIM15_MspInit 1 */
+  }
+
 }   
 
 

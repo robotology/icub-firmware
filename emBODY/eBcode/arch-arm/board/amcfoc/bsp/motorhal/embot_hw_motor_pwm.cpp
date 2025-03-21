@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
@@ -6,24 +5,19 @@
 */
 
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_motor_pwm.h"
-
+#include "embot_hw_analog.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
 #include "embot_core.h"
 #include <array>
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - configuration of peripherals and chips. it is done board by board. it contains a check vs correct STM32HAL_BOARD_*
@@ -62,11 +56,11 @@ namespace embot::hw::motor::pwm::bsp {
 
 namespace embot::hw::motor::pwm {
     
-#if defined(STM32HAL_BOARD_AMC1CM7) 
-#define htim1 (embot::hw::motor::bsp::amc1cm7::hTIM1)
-#elif defined(STM32HAL_BOARD_AMC2CM4)
-#define htim1 (embot::hw::motor::bsp::amc2cm4::hTIM1)
-#endif   
+//#if defined(STM32HAL_BOARD_AMC1CM7) 
+//#define htim1 (embot::hw::motor::bsp::amc1cm7::hTIM1)
+//#elif defined(STM32HAL_BOARD_AMC2CM4)
+//#define htim1 (embot::hw::motor::bsp::amc2cm4::hTIM1)
+//#endif   
     
 
 
