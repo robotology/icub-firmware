@@ -41,9 +41,8 @@
 #include "embot_os_rtos.h"
 #endif
 
-#if defined(STM32HAL_BOARD_AMCFOC_2CM4)        
-#include "embot_hw_bsp_amcfoc_2cm4.h"
-#endif
+#include "embot_hw_sys.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -66,7 +65,25 @@ struct embot::app::eth::theApplication::Impl
     static constexpr embot::os::Config osconfig {embot::app::eth::theApplication_Config.OStick, initcfg, idlecfg, {embotOSerror, nullptr}};
     
     static void s_used_errman_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
-    static constexpr embot::os::EOM::Config eomcfg {{s_used_errman_OnError}};   
+    static constexpr embot::os::EOM::Config eomcfg {{s_used_errman_OnError}};  
+
+    static uint64_t synchUID()
+    {                
+        uint64_t uid = embot::hw::sys::uniqueid();
+#if defined(STM32HAL_BOARD_AMCFOC_2CM4)            
+        if((embot::hw::sys::UIDinvalid == uid))
+        {            
+            embot::app::eth::icc::ItemROP::Variable varUID {embot::app::eth::icc::ItemROP::IDunique64, 8, &uid};           
+            bool ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varUID, 30*1000);
+            if(true == ok)
+            {
+                embot::hw::sys::setuniqueid(uid);
+            } 
+            uid = embot::hw::sys::uniqueid();            
+        }
+#endif
+        return uid;       
+    }       
 };
 
       
@@ -122,7 +139,7 @@ void embot::app::eth::theApplication::Impl::initSystem(embot::os::Thread *t, voi
 #if defined(STM32HAL_BOARD_AMCFOC_2CM4)    
     if(true == pinged)
     {                
-        uint64_t uid = embot::hw::bsp::amcfoc2cm4::synchUID(); 
+        uint64_t uid = embot::app::eth::theApplication::Impl::synchUID(); 
         theErrorManager::getInstance().emit(theErrorManager::Severity::trace, {objectname, t}, {}, "UID is synched");            
     }  
 #endif       

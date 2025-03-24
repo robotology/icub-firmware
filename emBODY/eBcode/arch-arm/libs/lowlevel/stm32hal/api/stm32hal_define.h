@@ -49,6 +49,14 @@ extern "C" {
 #define USE_HAL_DRIVER
 #endif   
 
+#if !defined(STM32HAL_DUALCORE)
+#if defined(STM32HAL_BOARD_AMC_1CM7) | defined(STM32HAL_BOARD_AMC_1CM7) | defined(STM32HAL_BOARD_AMC_2CM4) | defined(STM32HAL_BOARD_AMCFOC_1CM7) | defined(STM32HAL_BOARD_AMCFOC_2CM4)
+    #define STM32HAL_DUALCORE
+#endif
+#endif
+
+//#define ISDUALCORE() (STM32HAL_DUAL_CORE | STM32HAL_BOARD_AMC_1CM7 | STM32HAL_BOARD_AMC_2CM4 | STM32HAL_BOARD_AMCFOC_1CM7 | STM32HAL_BOARD_AMCFOC_2CM4)
+
 
 // c++-11 makes deprecated keyword volatile. c++-17 makes it not valid anymore
 // i have two options: (a) use  -Wno-deprecated-register (b) remove it to avoid armclang complains.
@@ -235,7 +243,50 @@ extern "C" {
     #if !defined(STM32HAL_STM32G4)
     #define STM32HAL_STM32G4
     #endif  
+    
+#elif   defined(STM32HAL_BOARD_MTB4C)
+    
+    // it has a STM32L452xx mpu
+    #if !defined(STM32L452xx)
+    #define STM32L452xx
+    #endif	
+    
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
 
+    // of family STM32L4 but in STM32HAL_ format    
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
+    #endif  
+    
+#elif   defined(STM32HAL_BOARD_STRAIN2C)
+    
+    // it has a STM32L452xx mpu
+    #if !defined(STM32L452xx)
+    #define STM32L452xx
+    #endif	
+    
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
+
+    // of family STM32L4 but in STM32HAL_ format    
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
+    #endif   
+
+#elif   defined(USE_hal2_DRIVER) & defined(STM32HAL_BOARD_EMS)
+
+    //  nothing to define
+    
+#elif   defined(USE_hal2_DRIVER) & defined(STM32HAL_BOARD_MC4PLUS)
+
+    //  nothing to define
+    
+    
 #elif   defined(STM32HAL_BOARD_STM32H745DISCO)
 
     // it has a STM32H745xx mpu
@@ -388,31 +439,31 @@ extern "C" {
     #define STM32HAL_DUALCORE
     #endif
 
-#elif   defined(STM32HAL_BOARD_AMCFOC_1CM7)
+//#elif   defined(STM32HAL_BOARD_AMCFOC_1CM7)
 
-    // it has a STM32H745xx mpu
-    #if !defined(STM32H745xx)
-    #define STM32H745xx
-    #endif  
+//    // it has a STM32H745xx mpu
+//    #if !defined(STM32H745xx)
+//    #define STM32H745xx
+//    #endif  
 
-    // of family STM32H7
-    #if !defined(STM32H7)
-    #define STM32H7
-    #endif  
+//    // of family STM32H7
+//    #if !defined(STM32H7)
+//    #define STM32H7
+//    #endif  
 
-    // of family STM32H7 but in STM32HAL_ format  
-    #if !defined(STM32HAL_STM32H7)
-    #define STM32HAL_STM32H7
-    #endif  
-	
-	// so far we use only the core CM7 for it
-    #if !defined(CORE_CM7)
-    #define CORE_CM7
-    #endif  
-    
-    #if !defined(STM32HAL_DUALCORE)
-    #define STM32HAL_DUALCORE
-    #endif
+//    // of family STM32H7 but in STM32HAL_ format  
+//    #if !defined(STM32HAL_STM32H7)
+//    #define STM32HAL_STM32H7
+//    #endif  
+//	
+//	// so far we use only the core CM7 for it
+//    #if !defined(CORE_CM7)
+//    #define CORE_CM7
+//    #endif  
+//    
+//    #if !defined(STM32HAL_DUALCORE)
+//    #define STM32HAL_DUALCORE
+//    #endif
     
 #elif   defined(STM32HAL_BOARD_AMCFOCM4)
 
@@ -441,73 +492,36 @@ extern "C" {
     #endif  
 
 
-#elif   defined(STM32HAL_BOARD_AMCFOC_2CM4)
+//#elif   defined(STM32HAL_BOARD_AMCFOC_2CM4)
 
-    // it has a STM32H745xx mpu
-    #if !defined(STM32H745xx)
-    #define STM32H745xx
-    #endif  
+//    // it has a STM32H745xx mpu
+//    #if !defined(STM32H745xx)
+//    #define STM32H745xx
+//    #endif  
 
-    // of family STM32H7
-    #if !defined(STM32H7)
-    #define STM32H7
-    #endif  
+//    // of family STM32H7
+//    #if !defined(STM32H7)
+//    #define STM32H7
+//    #endif  
 
-    // of family STM32H7 but in STM32HAL_ format  
-    #if !defined(STM32HAL_STM32H7)
-    #define STM32HAL_STM32H7
-    #endif  
-	
-	// so far we use only the core CM4 for it
-    #if !defined(CORE_CM4)
-    #define CORE_CM4
-    #endif 
+//    // of family STM32H7 but in STM32HAL_ format  
+//    #if !defined(STM32HAL_STM32H7)
+//    #define STM32HAL_STM32H7
+//    #endif  
+//	
+//	// so far we use only the core CM4 for it
+//    #if !defined(CORE_CM4)
+//    #define CORE_CM4
+//    #endif 
 
-    #if !defined(STM32HAL_DUALCORE)
-    #define STM32HAL_DUALCORE
-    #endif  
-    
-#elif   defined(STM32HAL_BOARD_MTB4C)
-    
-    // it has a STM32L452xx mpu
-    #if !defined(STM32L452xx)
-    #define STM32L452xx
-    #endif	
-    
-    // of family STM32L4
-    #if !defined(STM32L4)
-    #define STM32L4
-    #endif  
+//    #if !defined(STM32HAL_DUALCORE)
+//    #define STM32HAL_DUALCORE
+//    #endif    
 
-    // of family STM32L4 but in STM32HAL_ format    
-    #if !defined(STM32HAL_STM32L4)
-    #define STM32HAL_STM32L4
-    #endif  
-    
-#elif   defined(STM32HAL_BOARD_STRAIN2C)
-    
-    // it has a STM32L452xx mpu
-    #if !defined(STM32L452xx)
-    #define STM32L452xx
-    #endif	
-    
-    // of family STM32L4
-    #if !defined(STM32L4)
-    #define STM32L4
-    #endif  
 
-    // of family STM32L4 but in STM32HAL_ format    
-    #if !defined(STM32HAL_STM32L4)
-    #define STM32HAL_STM32L4
-    #endif   
+#elif defined(STM32HAL_DUALCORE)
 
-#elif   defined(USE_hal2_DRIVER) & defined(STM32HAL_BOARD_EMS)
-
-    //  nothing to define
-    
-#elif   defined(USE_hal2_DRIVER) & defined(STM32HAL_BOARD_MC4PLUS)
-
-    //  nothing to define
+#include "../src/define/stm32hal_define_dualcore.h"
     
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
