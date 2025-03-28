@@ -23,7 +23,7 @@
 
 #endif  
 
-namespace embot { namespace hw { namespace eth {
+namespace embot::hw::eth {
     
     enum class PORT : uint8_t { one = 0, two = 1, three = 2, none = 31, maxnumberof = 3 };
     enum class ERR : uint8_t { crc = 0 };
@@ -52,7 +52,7 @@ namespace embot { namespace hw { namespace eth {
     
     uint64_t getnumberoferrors(embot::hw::PHY phy, ERR e);
     
-}}} // namespace embot { namespace hw { namespace eth {
+} // namespace embot::hw::eth {
     
     
 

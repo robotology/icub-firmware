@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
@@ -11,7 +10,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_bsp.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -41,7 +39,6 @@ using namespace embot::core::binary;
 #include "embot_hw_bsp_amc_config.h"
 
 
-
 // - support map: begin of embot::hw::eth
 
 #include "embot_hw_eth.h"
@@ -49,17 +46,17 @@ using namespace embot::core::binary;
 
 #if   !defined(EMBOT_ENABLE_hw_eth)
 
-namespace embot { namespace hw { namespace eth { namespace bsp {
+namespace embot::hw::eth::bsp {
     
     
-}}}}
+}
 
 #else   // EMBOT_ENABLE_hw_eth
 
 #include "ipal_hal_eth_stm32h7.h"
 #include "embot_hw_chip_KSZ8563.h"
     
-namespace embot { namespace hw { namespace eth { namespace bsp {
+namespace embot::hw::eth::bsp {
                
     #if   defined(STM32HAL_BOARD_AMC)
     
@@ -160,7 +157,7 @@ namespace embot { namespace hw { namespace eth { namespace bsp {
             embot::hw::chip::KSZ8563::PORT::three
         };
         static embot::hw::chip::KSZ8563::MIBdata data {};
-        ethswitch->read(ports[embot::core::tointegral(phy)], mibs[embot::core::tointegral(e)], data);
+        ethswitch->readCRC(ports[embot::core::tointegral(phy)], mibs[embot::core::tointegral(e)], data);
         
         return data.value();
     }
@@ -174,7 +171,7 @@ namespace embot { namespace hw { namespace eth { namespace bsp {
         return thebsp;
     }
               
-}}}} // namespace embot { namespace hw { namespace eth { namespace bsp {
+} // namespace embot::hw::eth::bsp {
     
 
     #if defined(HAL_ETH_MODULE_ENABLED)

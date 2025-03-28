@@ -244,6 +244,10 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 
 		impl->lastreportTime = nowTime;
 	}
+    
+    uint64_t CRC_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::crc);
+    CRC_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::crc);
+//    CRC_error_number = getnumberoferrors(embot::hw::PORT::three, embot::hw::eth::ERR::crc);
 }
 
 
