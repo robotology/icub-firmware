@@ -16,6 +16,8 @@ extern "C" {
 
 #define isActiveI2CTsens() (I2C1CONbits.I2CEN)
     
+//TODO: add a struct for setting up the temperature error values instead of using a define
+    
 int setupI2CTsens(void);
 int readI2CTsens(volatile int* temperature);
 // function used for generating synthetic temperature data useful for testing 

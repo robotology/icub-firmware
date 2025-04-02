@@ -169,6 +169,7 @@ volatile int gTemperatureLimit = 0;
 volatile int gTemperatureOverheatingCounter = 0;
 volatile BOOL isTemperatureRead = FALSE;
 volatile unsigned int i2cERRORS = 0;
+volatile unsigned int i2cConfigTimeoutErrorsCounter = 0;
 
 volatile char sAlignInProgress = 0;
 
@@ -1310,7 +1311,7 @@ int main(void)
     {
         if (MotorConfig.has_tsens) 
         {
-            gTemperature = SetupPorts_I2C();
+            gTemperature = SetupPorts_I2C();    
         }
         else
         {

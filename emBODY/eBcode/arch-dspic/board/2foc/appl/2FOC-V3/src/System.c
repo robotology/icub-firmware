@@ -159,12 +159,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
             
             int err = readI2CTsens(&gTemperature);
             
-            if((err == -21) && !SysError.I2C_CommFailure)
-            {
-                SysError.I2C_CommFailure = TRUE;
-                FaultConditionsHandler();
-            }
-            else if (!err)
+            if (!err)
             {     
                 if (gTemperature > gTemperatureLimit)
                 {
@@ -173,9 +168,20 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
                 else if (gTemperature < gTemperatureLimit)
                 {
                     gTemperatureOverheatingCounter = 0;
+                    i2cConfigTimeoutErrorsCounter = 0;
                 }
             }
-            if ((gTemperatureOverheatingCounter > 100) && !SysError.OverHeatingFailure)
+            else if(err >= -11)
+            {
+                ++i2cConfigTimeoutErrorsCounter;
+            }
+            
+            if(((err == -21) || (i2cConfigTimeoutErrorsCounter > 100)) && !SysError.I2C_CommFailure)
+            {
+                SysError.I2C_CommFailure = TRUE;
+                FaultConditionsHandler();
+            }
+            else if ((gTemperatureOverheatingCounter > 100) && !SysError.OverHeatingFailure)
             {
                 SysError.OverHeatingFailure = TRUE;
                 FaultConditionsHandler();
