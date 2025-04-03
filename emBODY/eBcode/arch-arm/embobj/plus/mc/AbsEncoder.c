@@ -446,6 +446,7 @@ void AbsEncoder_invalid(AbsEncoder* o, ae_errortype_t error_type)
         case embot::app::eth::encoder::v1::Error::AKSIM2_GENERIC:
         case embot::app::eth::encoder::v1::Error::AKSIM2_INVALID_DATA:
         case embot::app::eth::encoder::v1::Error::AKSIM2_CLOSE_TO_LIMITS:
+            o->fault_state.bits.data_error = TRUE;
             break;
         
         // all other cases are errors: AEA_PARITY, AEA_CHIP, AEA_READING have their tx_error, chip_error, data_error. all others: are data_error. 
