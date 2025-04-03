@@ -197,7 +197,7 @@ volatile int iQerror_old = 0;
 volatile int iDerror_old = 0;
 volatile int iQprot = 0;
 
-static const int PWM_MAX = 8*PWM_50_DUTY_CYC/10; // = 80%
+static const int PWM_MAX = (24*PWM_50_DUTY_CYC)/25; // = 96%
 
 volatile int gMaxCurrent = 0;
 volatile long sI2Tlimit = 0;
@@ -1081,7 +1081,7 @@ void DisableAuxServiceTimer()
 void DriveInit()
 // Perform drive SW/HW init
 {
-    pwmInit(PWM_50_DUTY_CYC, DDEADTIME, PWM_MAX /*pwm max = 80%*/);
+    pwmInit(PWM_50_DUTY_CYC, DDEADTIME, PWM_MAX /*pwm max = 96%*/);
     
     // setup and perform ADC offset calibration in MeasCurrParm.Offseta and MeasCurrParm.Offsetc
     ADCDoOffsetCalibration();

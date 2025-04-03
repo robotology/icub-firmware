@@ -87,7 +87,7 @@ void __attribute__((__interrupt__,no_auto_psv)) _FLTA1Interrupt(void)
 
 void pwmSetMax(short pwm_max)
 {
-    if (pwm_max < (PWM_50_DUTY_CYCLE*9)/10) PWM_MAX = pwm_max;
+    if (pwm_max <= (PWM_50_DUTY_CYCLE*24)/25) PWM_MAX = pwm_max;
 }
 
 char pwmON(void)
