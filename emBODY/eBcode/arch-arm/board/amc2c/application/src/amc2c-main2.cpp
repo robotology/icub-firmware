@@ -22,7 +22,7 @@ constexpr embot::app::bldc::theApplication::Config cfg
 
 int main(void)
 {
-    embot::app::bldc::theApplication::getInstance().start(cfg); 
+    for(;;){};
 }
 
 

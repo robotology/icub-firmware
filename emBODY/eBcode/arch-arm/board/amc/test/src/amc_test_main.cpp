@@ -101,7 +101,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
  
     static const std::initializer_list<embot::hw::LED> allleds = 
     {   
-        embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three  
+        embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three, embot::hw::LED::four  
     };  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
@@ -140,7 +140,8 @@ void initSystem(embot::os::Thread *t, void* initparam)
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::core::relTime tickperiod = 2*1000*embot::core::time1millisec;
 
-#include "test.h"
+#include "testManagerSingleton.h"
+#include "protocolManager.h"
 
 void evTHR_startup(embot::os::Thread *t, void *param)
 {   
@@ -153,16 +154,16 @@ void evTHR_startup(embot::os::Thread *t, void *param)
     tmr->name("TickTmr");
     tmr->start(cfg);
     
-    TesterSingleton& tInstance = TesterSingleton::getInstance();
+    TestManagerSingleton& tInstance = TestManagerSingleton::getInstance();
   
-    tInstance.test_embot_hw_init(t);    
+    tInstance.testManagerSystemInit(t);    
     
 }
 
 
 void evTHR_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {   
-    TesterSingleton& tInstance = TesterSingleton::getInstance();
+    TestManagerSingleton& tInstance = TestManagerSingleton::getInstance();
     
     if(0 == eventmask)
     {   // timeout ...         
@@ -174,16 +175,16 @@ void evTHR_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *p
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::core::print("tTEST.onevent(): evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));   
         
-        tInstance.test_embot_hw_tick();               
+        tInstance.testManagerTick();               
     }
     
     // this is the EVENT thread --> here we add the switch case with the calls to the different tests based on the index of the test
     //outframes.clear();   
     std::uint8_t remaining = 0;
-    if(true == embot::core::binary::mask::check(eventmask, TesterSingleton::evRXcanframe))
+    if(true == embot::core::binary::mask::check(eventmask, ProtocolManager::evRXcanframe))
     {      
         embot::core::print("In embot::core::binary::mask::check(eventmask, evRXcanframe)");
-        tInstance.test_embot_hw_run();
+        tInstance.testManagerRun();
     }
 
 }
