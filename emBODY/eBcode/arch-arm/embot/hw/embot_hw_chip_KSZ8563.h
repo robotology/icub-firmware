@@ -60,24 +60,17 @@ namespace embot::hw::chip {
 
         // the ports are the two PHYs plus the RMII / MII connection
         enum class PORT : uint8_t { one = 0, two = 1, three = 2 };
-//        enum class port_IDs : uint8_t {
-//            KSZ8563_GLOBAL = 0,
-//            KSZ8563_PORT1  = 1,
-//            KSZ8563_PORT2  = 2,
-//            KSZ8563_PORT3  = 3
-//            };
+
         constexpr static size_t numberofPORTs {3};
         // we can read the MIB (Management Information Base) counters for each port
-        enum class MIB : uint8_t { RxCRCerror = 0x06 };
-        enum class REG_MIB : uint8_t { REG_MIB_CSR = 0x0000, REG_MIB_DR  = 0x0004};
+        enum class MIB : uint8_t { RxCRCerror = 0x06, RxUnicast = 0x0C, RxByteCnt = 0x80 , TxByteCnt =0x81};
+        enum class REG_MIB : uint8_t { REG_MIB_CSR = 0x0000, REG_MIB_DR  = 0x0004};  /* 32 bits  - MIB Control and Status Register, 32 bits  - MIB Data Register */
         enum class COMMAND : uint8_t { WRITE = 2, READ  = 3};
         static constexpr uint8_t MIB_CSR_READ_ENABLE_POS = 25;
         static constexpr uint8_t MIB_INDEX_POS = 16;
-        /* Set MIB Index and Enable Read */ 
+        static constexpr uint32_t MIB_CSR_COUNTER_VALID = 1<<25;
+        static constexpr uint32_t MIB_CSR_OVERFLOW = 1<<31;
 
-        static constexpr uint32_t MIB_data_to_send = 0 | (static_cast<uint8_t>(MIB::RxCRCerror) << MIB_INDEX_POS) | (1 << MIB_CSR_READ_ENABLE_POS);
-//        constexpr uint32_t REG_MIB_CSR = 0x0000;			/* 32 bits  - MIB Control and Status Register */
-//        constexpr uint32_t REG_MIB_DR  = 0x0004;			/* 32 bits  - MIB Data Register */
         struct MIBdata
         {
             enum class Size : uint8_t { bits30 = 0, bits36 = 1 };
@@ -101,8 +94,7 @@ namespace embot::hw::chip {
             }
             uint64_t value() const { return (static_cast<uint64_t>(v8) << 32) | v32; }
             
-            
-            
+                
         };
         
         struct PinControl
@@ -142,7 +134,7 @@ namespace embot::hw::chip {
         bool deinit();
                
         bool read(PHY phy, Link &link, embot::core::relTime timeout = 5*embot::core::time1millisec);  
-        bool readCRC(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout = 5*embot::core::time1millisec);  
+        bool readMIB(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout = 5*embot::core::time1millisec);  
     private:        
         struct Impl;
         Impl *pImpl;    
@@ -157,10 +149,10 @@ namespace embot::hw::chip {
 
 //#define EMBOT_HW_CHIP_KSZ8563_enable_test   
 #if defined(EMBOT_HW_CHIP_KSZ8563_enable_test)    
-namespace embot { namespace hw { namespace chip {
+namespace embot::hw::chip {
     // it tests the chip and offers an example of use
     bool testof_KSZ8563();
-}}}
+}
 #endif
 
 

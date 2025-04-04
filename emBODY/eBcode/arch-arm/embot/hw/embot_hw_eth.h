@@ -26,8 +26,8 @@
 namespace embot::hw::eth {
     
     enum class PORT : uint8_t { one = 0, two = 1, three = 2, none = 31, maxnumberof = 3 };
-    enum class ERR : uint8_t { crc = 0 };
-    
+    enum class ERR : uint8_t { crc = 0, unicast = 1, RxByteCnt = 2, TxByteCnt = 3};
+
     // standard api
     bool supported(embot::hw::EtH b);    
     bool initialised(embot::hw::EtH b);    

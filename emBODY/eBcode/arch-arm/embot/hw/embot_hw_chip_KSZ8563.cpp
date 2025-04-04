@@ -99,9 +99,10 @@ struct embot::hw::chip::KSZ8563::Impl
     bool read(PHY phy, Link &link, embot::core::relTime timeout);
     //bool read0(PHY phy, Link &link, embot::core::relTime timeout);
     
-    bool readCRC(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout);
+    bool readMIB(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout);
     uint32_t make_address_CRC(PORT port, REG_MIB MIB_register, COMMAND cmd);
-//    uint32_t set_address(COMMAND cmd, uint16_t address);
+    uint32_t MIB_data_to_send(MIB mib);
+
     
     void initpincontrol();
     void chipselect(bool enable);
@@ -241,20 +242,23 @@ bool embot::hw::chip::KSZ8563::Impl::read(PHY phy, Link &link, embot::core::relT
 //} 
     
 
-bool embot::hw::chip::KSZ8563::Impl::readCRC(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout)
+bool embot::hw::chip::KSZ8563::Impl::readMIB(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout)
 {   
     constexpr MIBdata mibdata    {MIBdata::Size::bits30, false, 7, 0};
     constexpr MIBdata mibdataok  {MIBdata::Size::bits30, false, 0, 0};
     data = mibdataok; 
-    constexpr uint32_t MIB_CSR_COUNTER_VALID = 1<<25;
 
-   
+    constexpr size_t transactionlength {6};
+
+    uint32_t rx32reverted =0;
+    
+    
     uint32_t address = make_address_CRC(port, REG_MIB::REG_MIB_CSR, COMMAND::WRITE);
     
     std::memmove(_TXbuffer, &address, sizeof(uint32_t));
     //chip want MSB first
-    uint32_t reversed_data = reverse((uint32_t)MIB_data_to_send);
-    std::memmove(_TXbuffer+4, &reversed_data, sizeof(uint32_t));
+    uint32_t reversed_data = reverse(MIB_data_to_send(mib));
+    std::memmove(_TXbuffer + 4, &reversed_data, sizeof(uint32_t));
     _TXdata.load(_TXbuffer, 8);
 
 
@@ -263,16 +267,45 @@ bool embot::hw::chip::KSZ8563::Impl::readCRC(PORT port, MIB mib, MIBdata &data, 
     chipselect(false);
     #warning control on result SPI?
     
-    
-    
+    address = make_address_CRC(port, REG_MIB::REG_MIB_CSR, COMMAND::READ);
+    /* Read back status register until data is ready */
+	do 
+	{   
+        
+        std::memmove(_TXbuffer, &address, sizeof(uint32_t));
+        _TXdata.load(_TXbuffer, 8);
+        std::memset(_rxbuffer, 0, 8);
+        _rxdata.load(_rxbuffer, 8);
+        
+		chipselect(true);       
+        result_t r = embot::hw::spi::writeread(_config.spi, _TXdata, _rxdata, timeout);   
+        chipselect(false);
+        
+        rx32reverted = static_cast<uint32_t>(_rxbuffer[7]) | static_cast<uint32_t>(_rxbuffer[6])<< 8 | static_cast<uint32_t>(_rxbuffer[5])<< 16 | (static_cast<uint32_t>(_rxbuffer[4]) << 24);
+//		if (drv_err.status != END_OK)
+//		{
+//			return false;
+//		}
+        rx32reverted = reverse(rx32reverted);
+        rx32reverted = reverse(rx32reverted);
+	} while(rx32reverted & MIB_CSR_COUNTER_VALID);
+        
+    data.overflow = (rx32reverted & MIB_CSR_OVERFLOW) ? 1 : 0;
 
+    address = make_address_CRC(port, REG_MIB::REG_MIB_DR, COMMAND::READ);
     
-    //    address = make_address_CRC(port, REG_MIB::REG_MIB_DR, COMMAND::WRITE);
-
+    std::memmove(_TXbuffer, &address, sizeof(uint32_t));
+    _TXdata.load(_TXbuffer, 8);
+    std::memset(_rxbuffer, 0, 8);
+    _rxdata.load(_rxbuffer, 8);
     
+    chipselect(true);       
+    r = embot::hw::spi::writeread(_config.spi, _TXdata, _rxdata, timeout);   
+    chipselect(false);
     
-//    address = MIB_data_to_send;
-    
+    data.v32 = static_cast<uint32_t>(_rxbuffer[7]) | static_cast<uint32_t>(_rxbuffer[6])<< 8 | static_cast<uint32_t>(_rxbuffer[5])<< 16 | (static_cast<uint32_t>(_rxbuffer[4]) << 24);
+    	
+	return true;
     
 #if 0
     we need three stages:
@@ -287,13 +320,10 @@ bool embot::hw::chip::KSZ8563::Impl::readCRC(PORT port, MIB mib, MIBdata &data, 
     we need to use out timeout budget for all these oeprations. i cannot use a forever loop
     in step2 w/out a timeout....
     
-    this part is yet to be done.    
-    
+    as for now this does not work yet, need to debug it
     
 #endif
-
     
-    return true;
 }
 
 
@@ -303,20 +333,19 @@ uint32_t embot::hw::chip::KSZ8563::Impl::make_address_CRC(PORT port, REG_MIB MIB
 //    #define KSZ8563_REGADR(PORT_SPACE, FUNC_SPACE, REG_ADDR)	((PORT_SPACE << PORT_SPACE_POS) | (FUNC_SPACE << FUNC_SPACE_POS) | (REG_ADDR << REG_SPACE_POS))
     /* Those fields describe how the address is composed */
 
-    constexpr uint8_t PORT_SPACE_POS = 12;
-    constexpr uint8_t FUNC_SPACE_POS = 8;
-    constexpr uint8_t REG_SPACE_POS  = 0;
-    constexpr uint8_t PORT_FUNC_MIB_COUNTERS = 0x05;				/* MIB Counters (Management Information Base) */
+    static constexpr uint8_t PORT_SPACE_POS = 12;
+    static constexpr uint8_t FUNC_SPACE_POS = 8;
+    static constexpr uint8_t REG_SPACE_POS  = 0;
+    static constexpr uint8_t PORT_FUNC_MIB_COUNTERS = 0x05;				/* MIB Counters (Management Information Base) */
     
     /* Command pos */
-    constexpr uint8_t COMMAND_POS = 29;
+    static constexpr uint8_t COMMAND_POS = 29;
     /* Address Pos */
-    constexpr uint8_t ADDRESS_POS = 5;
+    static constexpr uint8_t ADDRESS_POS = 5;
     
     //port +1 bcs of chip driver
-    #warning 1 here? better in other way?
+    //1 here? better in other way?
     uint32_t adr_32 =  ((embot::core::tointegral(port)+1) << PORT_SPACE_POS) | PORT_FUNC_MIB_COUNTERS << FUNC_SPACE_POS | (static_cast<uint8_t>(MIB_register) << REG_SPACE_POS);
-    
     
     adr_32 = (static_cast<uint8_t>(cmd) << COMMAND_POS) | (adr_32 << ADDRESS_POS);
      //chip want MSB first, so i reverse the address
@@ -325,10 +354,11 @@ uint32_t embot::hw::chip::KSZ8563::Impl::make_address_CRC(PORT port, REG_MIB MIB
     return _adr_32;
 }
 
-
-
-
-
+uint32_t embot::hw::chip::KSZ8563::Impl::MIB_data_to_send(MIB mib)
+{
+    uint32_t MIB_CRC_data_to_send = 0 | (static_cast<uint8_t>(mib) << MIB_INDEX_POS) | (1 << MIB_CSR_READ_ENABLE_POS);
+    return MIB_CRC_data_to_send;
+}
 	
 
 
@@ -364,9 +394,9 @@ bool embot::hw::chip::KSZ8563::read(PHY phy, Link &link, embot::core::relTime ti
     return pImpl->read(phy, link, timeout);
 }
 
-bool embot::hw::chip::KSZ8563::readCRC(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout)
+bool embot::hw::chip::KSZ8563::readMIB(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout)
 {
-    return pImpl->readCRC(port, mib, data, timeout);
+    return pImpl->readMIB(port, mib, data, timeout);
 }
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

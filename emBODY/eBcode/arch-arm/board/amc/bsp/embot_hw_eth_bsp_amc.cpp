@@ -146,9 +146,10 @@ namespace embot::hw::eth::bsp {
             return 0;
         }  
                 
-        static constexpr embot::hw::chip::KSZ8563::MIB mibs[1] =
+        static constexpr embot::hw::chip::KSZ8563::MIB mibs[2] =
         {
-            embot::hw::chip::KSZ8563::MIB::RxCRCerror
+            embot::hw::chip::KSZ8563::MIB::RxCRCerror,
+            embot::hw::chip::KSZ8563::MIB::RxUnicast
         };
         static constexpr embot::hw::chip::KSZ8563::PORT ports[3] =
         {
@@ -157,7 +158,7 @@ namespace embot::hw::eth::bsp {
             embot::hw::chip::KSZ8563::PORT::three
         };
         static embot::hw::chip::KSZ8563::MIBdata data {};
-        ethswitch->readCRC(ports[embot::core::tointegral(phy)], mibs[embot::core::tointegral(e)], data);
+        ethswitch->readMIB(ports[embot::core::tointegral(phy)], mibs[embot::core::tointegral(e)], data);
         
         return data.value();
     }
