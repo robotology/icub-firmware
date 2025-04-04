@@ -152,7 +152,7 @@ void embot::app::eth::theETHmonitor::Impl::startup(embot::os::Thread *t, void *p
 }
 
 void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *p)
-{
+{  
 	embot::app::eth::theETHmonitor::Impl *impl = reinterpret_cast<embot::app::eth::theETHmonitor::Impl*>(p);
 	
 	eOerrmanDescriptor_t errdes = {0};
@@ -169,12 +169,13 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 	}
 	
 	embot::core::Time nowTime = embot::core::now();
-	
+	uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);   
+    
+    
+    //check for linkup and linkdown
 	bool link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one); 
 	bool link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two);
-		
-	uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);   
-
+    
 	if((impl->link1.previsup != link1isup) || ((impl->link2.previsup != link2isup)))
 	{		
 		if(true == link1isup)
@@ -244,6 +245,53 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 
 		impl->lastreportTime = nowTime;
 	}
+    //check for CRC errors
+    if (link1isup)
+    {
+        uint64_t CRC_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::crc);
+        
+        if(0 != CRC_error_number)
+        {
+        errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_error_rxcrc);
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.par16            = 0;
+        errdes.par64            = applstate | (CRC_error_number & 0xffffffff);    
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+        }
+    }
+    if (link2isup)
+    {
+
+        uint64_t CRC_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::crc);
+
+        if(0 != CRC_error_number)
+        {
+        errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_error_rxcrc);
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.par16            = 1;
+        errdes.par64            = applstate | (CRC_error_number & 0xffffffff);    
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+        }
+    }
+    
+      //test for CRC etc
+//    CRC_error_number = getnumberoferrors(embot::hw::PORT::three, embot::hw::eth::ERR::crc);
+//    uint64_t unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::unicast);
+//    static uint8_t iii=0;
+//    if((iii++)%100)
+//    {   
+//        
+//        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RxByteCnt);
+//        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
+//        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::TxByteCnt);
+//        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
+//        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::RxByteCnt);
+//        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
+//        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::TxByteCnt);
+//        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
+//    }
 }
 
 
