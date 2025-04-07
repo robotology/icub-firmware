@@ -311,7 +311,7 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
     
     if (o->control_mode == eomc_controlmode_notConfigured) return FALSE;  
         
-    if ((o->control_mode == eomc_controlmode_calib) && (control_mode != eomc_controlmode_cmd_force_idle || control_mode != eomc_controlmode_cmd_idle)) return FALSE;     
+    if (o->control_mode == eomc_controlmode_calib) return FALSE;     
     
     if (o->control_mode == eomc_controlmode_hwFault)
     {
