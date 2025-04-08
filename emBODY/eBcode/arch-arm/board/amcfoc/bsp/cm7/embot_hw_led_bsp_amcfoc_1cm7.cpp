@@ -63,6 +63,7 @@ namespace embot::hw::led {
 #else
 
 #include "embot_hw_led_bsp_pinout_amcfoc.h"
+#include "embot_hw_gpio_bsp.h"
 
 namespace embot::hw::led {         
     
@@ -78,21 +79,13 @@ namespace embot::hw::led {
         }}        
     };
     
-    void clock_enable_D() { __HAL_RCC_GPIOD_CLK_ENABLE(); }
     void BSP::init(embot::hw::LED h) const 
     {
-        uint8_t i = embot::core::tointegral(h);
-        // activate the clock as cube-mx may not do that
-        //constexpr std::array<embot::core::fpWorker, 6> clockenable { clock_enable_D, clock_enable_D, clock_enable_D, clock_enable_D, clock_enable_D, clock_enable_D};        
-        //if(i < clockenable.size())
-        //{
-        //    clockenable[i]();
-        //}
-        clock_enable_D(); // no need of the above as every LED is on bus H
+        const embot::hw::GPIO &g = thebsp.properties[embot::core::tointegral(h)]->gpio;
         
         // init the gpio
-        const embot::hw::GPIO &g = thebsp.properties[i]->gpio;
-        embot::hw::gpio::configure(g, embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::low);                        
+        embot::hw::gpio::getBSP().getPROP(g).clockenable();
+        embot::hw::gpio::configure(g, embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::low);         
     } 
 
     const BSP& getBSP() 
