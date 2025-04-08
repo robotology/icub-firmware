@@ -52,32 +52,9 @@ using namespace embot::core::binary;
 
 #include "embot_hw_bsp_amcfoc_2cm4.h"
 
-#include "embot_app_eth_theICCserviceROP.h"
 #include "embot_hw_eeprom.h"
 #include "embot_hw_sys.h"
 
-namespace embot::hw::bsp::amcfoc2cm4 {
-    
-    
-    uint64_t synchUID()
-    {            
-        
-        uint64_t uid = embot::hw::sys::uniqueid();
-        if((embot::hw::sys::UIDinvalid == uid))
-        {            
-            embot::app::eth::icc::ItemROP::Variable varUID {embot::app::eth::icc::ItemROP::IDunique64, 8, &uid};           
-            bool ok = embot::app::eth::icc::theICCserviceROP::getInstance().ask(varUID, 30*1000);
-            if(true == ok)
-            {
-                embot::hw::sys::setuniqueid(uid);
-            } 
-            uid = embot::hw::sys::uniqueid();            
-        }
-
-        return uid;       
-    }   
-
-}
 
 #if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
 bool embot::hw::bsp::specialize() { return true; }
@@ -85,8 +62,9 @@ bool embot::hw::bsp::specialize() { return true; }
 
 bool embot::hw::bsp::specialize()
 {
-    
+#if defined(EMBOT_ENABLE_hw_eeprom)    
     embot::hw::eeprom::init(embot::hw::EEPROM::one, {});
+#endif
         
     // all the rest
     // nothing for now

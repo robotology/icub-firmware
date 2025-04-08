@@ -207,15 +207,7 @@ extern "C" {
             #define STM32HAL_DRIVER_V1B1
         #endif        
         #define STM32HAL_DRIVER_VERSION 0x1B1   
-    #endif        
-
-#elif   defined(STM32HAL_BOARD_AMCFOCM7)
-
-    // one drive only: v1A0.
-    #if !defined(STM32HAL_DRIVER_V1A0)
-        #define STM32HAL_DRIVER_V1A0
-    #endif        
-    #define STM32HAL_DRIVER_VERSION 0x1A0   
+    #endif  
 
 #elif   defined(STM32HAL_BOARD_AMCFOC_1CM7)
 
@@ -225,15 +217,6 @@ extern "C" {
     #endif        
     #define STM32HAL_DRIVER_VERSION 0x1A0   
     
-#elif   defined(STM32HAL_BOARD_AMCFOCM4)
-
-    // one drive only: v1A0.
-    #if !defined(STM32HAL_DRIVER_V1A0)
-        #define STM32HAL_DRIVER_V1A0
-    #endif        
-    #define STM32HAL_DRIVER_VERSION 0x1A0   
- 
-
 #elif   defined(STM32HAL_BOARD_AMCFOC_2CM4)
 
     // one drive only: v1A0.
@@ -241,7 +224,23 @@ extern "C" {
         #define STM32HAL_DRIVER_V1A0
     #endif        
     #define STM32HAL_DRIVER_VERSION 0x1A0   
+ 
+#elif   defined(STM32HAL_BOARD_AMCMJ1_1CM7)
+
+    // one drive only: v1A0.
+    #if !defined(STM32HAL_DRIVER_V1A0)
+        #define STM32HAL_DRIVER_V1A0
+    #endif        
+    #define STM32HAL_DRIVER_VERSION 0x1A0   
     
+#elif   defined(STM32HAL_BOARD_AMCMJ1_2CM4)
+
+    // one drive only: v1A0.
+    #if !defined(STM32HAL_DRIVER_V1A0)
+        #define STM32HAL_DRIVER_V1A0
+    #endif        
+    #define STM32HAL_DRIVER_VERSION 0x1A0   
+
 #elif   defined(STM32HAL_BOARD_MTB4C)
 
     // two possible drivers. default is the 1D3 ...

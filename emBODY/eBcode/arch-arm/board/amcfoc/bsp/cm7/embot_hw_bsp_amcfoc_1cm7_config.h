@@ -19,6 +19,29 @@
 
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7)
 
+#if defined(EMBOT_ENABLE_hw_minimal)
+
+    #define EMBOT_REDEFINE_hw_bsp_DRIVER_init    
+    #define EMBOT_ENABLE_hw_dualcore
+    #define EMBOT_ENABLE_hw_sys_emulateRAND
+    #define EMBOT_ENABLE_hw_bsp_specialize
+    #define EMBOT_ENABLE_hw_gpio
+    #define EMBOT_ENABLE_hw_led
+    #define EMBOT_ENABLE_hw_flash    
+            
+    #define EMBOT_ENABLE_hw_can
+    #if defined(EMBOT_ENABLE_hw_can)
+        #define EMBOT_ENABLE_hw_can_two
+    #endif
+    
+    
+//    #define EMBOT_ENABLE_hw_mtx
+//    #define EMBOT_ENABLE_hw_icc_sig
+//    #define EMBOT_ENABLE_hw_icc_mem
+//    #define EMBOT_ENABLE_hw_icc_ltr
+
+#else
+
     #define EMBOT_REDEFINE_hw_bsp_DRIVER_init    
     #define EMBOT_ENABLE_hw_dualcore
     #define EMBOT_ENABLE_hw_sys_emulateRAND
@@ -56,7 +79,8 @@
     #define EMBOT_ENABLE_hw_icc_sig
     #define EMBOT_ENABLE_hw_icc_mem
     #define EMBOT_ENABLE_hw_icc_ltr
-//    #define EMBOT_ENABLE_hw_icc_printer
+
+#endif
 
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMCFOC_1CM7 ...

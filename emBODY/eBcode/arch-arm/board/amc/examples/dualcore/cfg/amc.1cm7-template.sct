@@ -1,0 +1,50 @@
+
+; this scatter file is for a single application on CM7. it uses following FLASH and RAM resources:
+;
+; - FLASH: first bank @ 0x08000000 for a size of 512k
+; 
+; - RAM: AXI SRAM @ 0x24000000 for a size of 512K
+;
+; - NOTES:
+;   1.  the maximum amount of flash is 1024k (0x100000) and one can decide to place the code in any position in its inside
+;       For instance:
+;       - on the core that uses eth, the loader starts at +000k (+0x00000), the updater at +128k (+0x20000) and the the appl.yri at +384k (0x60000) 
+;       - on the other core the appl.mot starts at +000k
+;   2. we must keep a RAM hole @ 0x1003FFC0 of size 64B for the core that uses IPC. 
+;      This hole is on top of SRAM1-SRAM2 used by the CM4
+;   3. The core that uses the ethernet must also specify that some modules are in dedicated RAM parts. See commented section
+;   4. The amc board now (at date of 27 march 20205) for IPC use RAM @ [0x2001FFC0, 0x20020000) that is on top of SRAM1  (aliased also @ 0x20000000)
+;      This memory is not used by the amc.cm7 uses AXI RAM in range [0x24000000, 0x24007FFC0) and SRAM4 in range [0x38000000, 0x38010000)
+;      but it is sadly allocated by the scatter file of the amc2c that uses banks SRAM1-SRAM2-SRAM3 in range [0x10000000, 0x10048000) for a total of 256k+32k.  
+;      WE SHOULD SOLVE THIS. 
+;      - Best thing is to uniform everything to memory hole @ 0x1003FFC0 or even better @ 0x1003FF00 so that we have 256B but we need to reprogram boards
+;      - Compatible remedy: reduce memory used by amc2c to be 128k - 64 
+
+LR_IROM1 0x08000000 0x00080000  {    ; load region size_region
+  
+  ; flash
+  ER_IROM1 0x08000000 0x00080000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  
+  
+  ; ram: AXI SRAM @ 0x24000000
+  RW_IRAM2 0x24000000 0x00080000  {
+   .ANY (+RW +ZI)
+  }
+  
+;  ; ram for eth
+;  RX_DESCR	0x30040000 0x00000060 {
+;  	ethram.o(.RxDecripSection)
+;  }
+;  TX_DESCR	0x30040060 0x000001A0 {
+;  	ethram.o(.TxDecripSection)
+;  }
+;  RX_ARRAY 	0x30040200 0x00001800 {
+;  	ethram.o(.RxArraySection)
+;  }  
+   
+
+}

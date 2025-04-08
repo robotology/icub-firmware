@@ -23,6 +23,7 @@
 #include "embot_hw_sys.h"
 
 #include <cstring>
+#include <array>
 #include "embot_core_binary.h"
 
 
@@ -35,10 +36,48 @@
 
 using namespace embot::hw;
 
+namespace embot::hw::dualcore {
+   
+    
+    const char *to_string(CORE c)
+    {
+        static constexpr std::array<const char *, embot::core::tointegral(CORE::maxnumberof)+1> cores
+        {
+            "CORE::cm4", "CORE::cm7", "CORE::none"
+        };
+        
+        uint8_t i = embot::core::tointegral(c);
+        if(i < embot::core::tointegral(CORE::maxnumberof))
+        {
+            return cores[i];
+        }
+        
+        return cores[embot::core::tointegral(CORE::maxnumberof)];                    
+    }
+    
+    const char *to_string(BOOT b)
+    {
+        static constexpr std::array<const char *, embot::core::tointegral(BOOT::maxnumberof)+1> boots
+        {
+            "BOOT::cm4master", "BOOT::cm7master", "BOOT::none"
+        };
+        
+        uint8_t i = embot::core::tointegral(b);
+        if(i < embot::core::tointegral(BOOT::maxnumberof))
+        {
+            return boots[i];
+        }
+        
+        return boots[embot::core::tointegral(BOOT::maxnumberof)];     
+    }  
+    
+} // namespace embot::hw::dualcore {
+
 
 #if !defined(EMBOT_ENABLE_hw_dualcore)
     #define useDUMMYimpl_of_embot_hw_dualcore
 #endif
+
 
 #if defined(useDUMMYimpl_of_embot_hw_dualcore)
 
@@ -53,6 +92,9 @@ namespace embot::hw::dualcore {
     
     BOOT boot()
     { return BOOT::none; }
+
+    bool ismaster()
+    { return false; }
     
     bool config(const Config &c)
     { return false; }
@@ -89,6 +131,16 @@ namespace embot::hw::dualcore {
             return CORE::none;
         }
         return embot::hw::dualcore::bsp::getBSP().getPROP()->core;
+    }
+    
+    bool ismaster()
+    { 
+        if(false == supported())
+        {
+            return false;
+        }
+        
+        return embot::hw::dualcore::bsp::getBSP().ismaster();
     }
     
     bool config(const Config &c)

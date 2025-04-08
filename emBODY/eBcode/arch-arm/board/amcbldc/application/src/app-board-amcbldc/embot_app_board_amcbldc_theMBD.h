@@ -12,10 +12,12 @@
 #define _EMBOT_APP_BOARD_AMCBLDC_THEMBD_H_
 
 
-#include <memory>
 
 #include "embot_core.h"
 #include "embot_app_bldc.h"
+
+#include <memory>
+#include <vector>
 
 namespace embot::app::board::amcbldc {
            

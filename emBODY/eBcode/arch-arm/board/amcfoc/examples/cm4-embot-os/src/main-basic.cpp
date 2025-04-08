@@ -1,9 +1,21 @@
 
 /*
- * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
+
+#if defined(STM32HAL_dualcore_BOOT_cm4master)
+
+    #warning this application behaves as a cm4 master
+
+#elif defined(STM32HAL_dualcore_BOOT_cm7master)
+
+    #warning this application behaves as a cm4 slave
+    
+#else
+    #error
+#endif
 
 
 #include "embot_core.h"
@@ -13,12 +25,6 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_led.h"
 #include "embot_hw_sys.h"
-#include "embot_hw_encoder.h"
-#include "embot_hw_encoder_bsp.h"
-#include "embot_hw_timer.h"
-#include "embot_hw_eth.h"
-#include "embot_hw_eeprom.h"
-#include "embot_hw_can.h"
 
 
 #include "embot_os_theScheduler.h"
@@ -43,13 +49,45 @@ constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::
 constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
 
-//#define TEST_EEPROM
-//#define ERASE_EEPROM
+#undef ENABLE_HW_TESTS
+
+#if !defined(ENABLE_HW_TESTS)
+    #undef TEST_EEPROM
+    //#define ERASE_EEPROM
+    #undef TEST_CAN
+    #undef TEST_ETH
+    #undef TEST_EMBOT_HW_CHIP_M95512DF
+    #undef TEST_EMBOT_HW_CHIP_AS5045
+    #undef TEST_EMBOT_HW_CHIP_MB049
+    #undef TEST_EMBOT_HW_CHIP_MB049
+    #undef TEST_EMBOT_HW_ENCODER
+
+    #undef TEST_EMBOT_HW_TIMER
+    #undef TEST_EMBOT_HW_TIMER_ONESHOT
+#else
+    // place in here them all
+
+
+
+
+#endif
+
+
+#if !defined(ENABLE_HW_TESTS)
+#else
+
+#include "embot_hw_encoder.h"
+#include "embot_hw_encoder_bsp.h"
+#include "embot_hw_timer.h"
+#include "embot_hw_eth.h"
+#include "embot_hw_eeprom.h"
+#include "embot_hw_can.h"
+
 void test_eeprom_init();
 void test_eeprom_tick();
 
 
-#undef TEST_CAN
+
 void test_can_init(embot::os::Thread *t, void *param);
 void test_can_tick(embot::os::Thread *t, embot::os::EventMask eventmask, void *param);
 
@@ -57,18 +95,14 @@ constexpr embot::os::Event evtCAN1tx = embot::core::binary::mask::pos2mask<embot
 constexpr embot::os::Event evtCAN1rx = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
 
 
-#undef TEST_ETH
 void test_eth_init();
 void test_eth_tick();
 
 
-//#define TEST_EMBOT_HW_TIMER
-//#define TEST_EMBOT_HW_TIMER_ONESHOT
 void test_timer();
 
 
-#define TEST_EMBOT_HW_ENCODER
-//#define TEST_EMBOT_HW_CHIP_MA730
+
 #if defined(TEST_EMBOT_HW_ENCODER)
     #include "embot_hw_encoder.h"
 #endif
@@ -81,13 +115,14 @@ void test_timer();
 #if defined(TEST_EMBOT_HW_CHIP_MB049)
     #include "embot_hw_chip_MB049.h"
 #endif
-#if defined(TEST_EMBOT_HW_CHIP_MA730)
+#if defined(TEST_EMBOT_HW_CHIP_MB049)
     #include "embot_hw_chip_MA730.h"
 #endif
 
 void test_encoder();
 
 
+#endif
 
 
 #include "embot_hw_led.h"
@@ -105,7 +140,9 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
 
     constexpr embot::app::scope::SignalEViewer::Config cc{ON, embot::app::scope::SignalEViewer::Config::LABEL::one};
     signal = new embot::app::scope::SignalEViewer(cc);    
-    
+
+
+#if defined(ENABLE_HW_TESTS)    
 	
 #if defined(TEST_EEPROM)  ||  defined(ERASE_EEPROM)    
     test_eeprom_init();
@@ -132,7 +169,7 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     test_encoder();
 #endif
     
-    
+#endif    
     
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
@@ -201,7 +238,10 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     }
 
     if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
-    { 
+    {
+
+        
+#if defined(ENABLE_HW_TESTS)    
         
 //        uid = embot::hw::sys::uniqueid();
 
@@ -229,6 +269,8 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     test_encoder();
 #endif
     
+#endif
+
 	}
 }
 
@@ -344,9 +386,6 @@ int main(void)
     
     // now i start the os    
     embot::os::start();
-
-    // just because i am paranoid (thescheduler.start() never returns)
-    for(;;);    
 }
 
 
@@ -354,6 +393,7 @@ int main(void)
 // - other code
 
 
+#if defined(ENABLE_HW_TESTS) 
 
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -887,5 +927,7 @@ void test_encoder()
 #endif
 
 
+
+#endif // #if defined(ENABLE_HW_TESTS)    
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
