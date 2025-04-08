@@ -528,19 +528,6 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for amc.2cm4
     #endif   
-        
-#elif   defined(STM32HAL_BOARD_AMCFOCM7) 
-
-    // one case: v1A0
-    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
-    
-        #include "../src/config/stm32hal_driver_cfg_of_amcfocm7_v1A0.h"
-        #include "../src/board/amcfocm7/v1A0/inc/gpio.h"
-        #include "../src/board/amcfocm7/v1A0/inc/stm32h7xx_it.h"
-		
-    #else
-        #error unsupported driver version for amcfocm7
-    #endif
 
 #elif   defined(STM32HAL_BOARD_AMCFOC_1CM7) 
 
@@ -553,20 +540,6 @@ extern void stm32hal_board_init(void);
         #error unsupported driver version for amcfoc.1cm7
     #endif
         
-#elif   defined(STM32HAL_BOARD_AMCFOCM4) 
-
-
-    // one case: v1A0
-    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
-       
-        #include "../src/config/stm32hal_driver_cfg_of_amcfocm4_v1A0.h"
-//        #include "../src/board/amcfocm4/v1A0/inc/gpio.h"
-        #include "../src/board/amcfocm4/v1A0/inc/stm32h7xx_it.h"
-		
-    #else
-        #error unsupported driver version for amcfocm4
-    #endif
- 
 
 #elif   defined(STM32HAL_BOARD_AMCFOC_2CM4) 
 
@@ -578,7 +551,30 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for amcfoc.2cm4
     #endif
+
+#elif   defined(STM32HAL_BOARD_AMCMJ1_1CM7) 
+
+    // one case: v1A0
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+    
+        #include "../src/config/stm32hal_driver_cfg_of_amcmj1_1cm7_v1A0.h"
+		
+    #else
+        #error unsupported driver version for amcmj1.1cm7
+    #endif
         
+
+#elif   defined(STM32HAL_BOARD_AMCMJ1_2CM4) 
+
+    // one case: v1A0
+    #if (STM32HAL_DRIVER_VERSION == 0x1A0)
+       
+        #include "../src/config/stm32hal_driver_cfg_of_amcmj1_2cm4_v1A0.h"
+		
+    #else
+        #error unsupported driver version for amcmj1.2cm4
+    #endif
+    
 #elif   defined(STM32HAL_BOARD_MTB4C)
         
     #if(STM32HAL_DRIVER_VERSION == 0x190)
