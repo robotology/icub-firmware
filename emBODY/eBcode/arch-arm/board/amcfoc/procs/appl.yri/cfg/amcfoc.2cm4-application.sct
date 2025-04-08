@@ -17,7 +17,7 @@ LR_IROM1 0x08160000 0x00080000  {    ; load region size_region
   	ethram.o(.RxArraySection)
   }
   
-  ; banks sram1 and sram2 joined together
+  ; banks sram1 and sram2 joined together with a 64 bytes hole on top for ipc
   RW_IRAM1 0x10000000 0x0003FFC0 {
    .ANY (+RW +ZI)
   }
