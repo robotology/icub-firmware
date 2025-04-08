@@ -42,6 +42,22 @@ namespace embot::hw::dualcore::bsp {
         constexpr const PROP * getPROP() const { return supported() ? properties[embot::core::tointegral(thempu)] : nullptr; }
         
         bool supported() const { return embot::hw::bsp::SUPP::supported(thempu); }
+        
+        bool ismaster() const {
+            const PROP *p = getPROP();
+            bool v { false };
+            if(nullptr != p)
+            {
+                switch(p->core) 
+                {
+                    case embot::hw::dualcore::CORE::cm7: { v = embot::hw::dualcore::BOOT::cm7master == p->boot; } break;
+                    case embot::hw::dualcore::CORE::cm4: { v = embot::hw::dualcore::BOOT::cm4master == p->boot; } break;                
+                    default: {} break; 
+                }
+            }
+            return v;            
+        } 
+        
         bool config(const Config &c) const;
         const Config& config() const;
         bool init() const;

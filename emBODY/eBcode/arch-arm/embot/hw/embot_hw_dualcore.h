@@ -21,6 +21,8 @@ namespace embot::hw::dualcore {
     enum class CORE : uint8_t { cm4 = 0, cm7 = 1, none = 31, maxnumberof = 2 };
     enum class BOOT : uint8_t { cm4master = 0, cm7master = 1, none = 31, maxnumberof = 2 };
     
+    const char *to_string(CORE c);
+    const char *to_string(BOOT b);    
     
     struct Config
     {   
@@ -41,10 +43,11 @@ namespace embot::hw::dualcore {
     // others
     CORE core();
     BOOT boot();
-    
+    bool ismaster();
 
     bool config(const Config &on);   
     bool init();
+    
     
    
 } // namespace embot::hw::dualcore {
