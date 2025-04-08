@@ -120,12 +120,16 @@ namespace embot::hw::sys {
         return DRIVER::_setuniqueid(v);
     }  
 #endif
-    
+
+#if defined(EMBOT_REDEFINE_hw_bsp_DRIVER_delay)   
+    #warning EMBOT_REDEFINE_hw_bsp_DRIVER_delay is defined
+#else    
     void delay(embot::core::relTime t)
     {   
         DRIVER::_delay(t);
     }
-         
+#endif
+    
     std::uint32_t random()
     {
         return DRIVER::_random();
@@ -379,6 +383,9 @@ namespace embot::hw::sys::DRIVER {
     }
 
 #endif // #if !defined(EMBOT_REDEFINE_hw_bsp_DRIVER_setuniqueid)
+
+
+#if !defined(EMBOT_REDEFINE_hw_bsp_DRIVER_delay)
     
     void _delay(embot::core::relTime t)
     {
@@ -400,6 +407,11 @@ namespace embot::hw::sys::DRIVER {
             #elif defined(STM32H7) & defined(CORE_CM4)
             // same as other CM4 cores: L4 and G4
             s_hl_sys_numofops1sec /= 3;
+                #if defined(STM32HAL_dualcore_BOOT_cm7master)
+                // sadly i have experimentally noticed this difference.
+                #warning consider to define EMBOT_REDEFINE_hw_bsp_DRIVER_delay
+                s_hl_sys_numofops1sec /= 4;
+                #endif
             #elif defined(STM32L4) 
             s_hl_sys_numofops1sec /= 3;
             #elif defined(STM32G4) 
@@ -425,6 +437,8 @@ namespace embot::hw::sys::DRIVER {
         embot::hw::lowlevel::asmEXECcycles(static_cast<uint32_t>(num));    
     }
 
+#endif // #if !defined(EMBOT_REDEFINE_hw_bsp_DRIVER_delay)
+    
     std::uint32_t _random()
     {
 #if defined(HAL_RNG_MODULE_ENABLED) && !defined(EMBOT_ENABLE_hw_sys_emulateRAND)
