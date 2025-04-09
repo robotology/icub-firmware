@@ -262,7 +262,7 @@ namespace embot::hw::eth::bsp {
             embot::hw::chip::KSZ8563::PORT::three
         };
         static embot::hw::chip::KSZ8563::MIBdata data {};
-        ethswitch->read(ports[embot::core::tointegral(phy)], mibs[embot::core::tointegral(e)], data);
+        ethswitch->readMIB(ports[embot::core::tointegral(phy)], mibs[embot::core::tointegral(e)], data);
         
         return data.value();
     }

@@ -13,6 +13,7 @@
 
 
 #include <memory>
+#include <vector>
 
 #include "embot_core.h"
 #include "embot_app_bldc.h"
