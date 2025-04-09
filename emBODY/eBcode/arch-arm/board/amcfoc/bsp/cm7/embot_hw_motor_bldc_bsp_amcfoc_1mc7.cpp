@@ -306,9 +306,10 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     TIM_HandleTypeDef &htimMOT2 = htim1;
     
     TIM_HandleTypeDef &htimTriggerOfadcOTHERS = htim15;
-
     
-    
+    TIM_HandleTypeDef &hTimEnc1 = htim5;        // qenc
+    TIM_HandleTypeDef &hTimEnc2 = htim2;        // qenc
+        
     // adc1 and adc2 sample motor currents in synch with pwm (tim1 and tim 8)
     // for each pwm cycle the adc samples the same current twice, when pwm line is low and then high.
     // hence 3 pwm cycles are required to collect all the three phases.
