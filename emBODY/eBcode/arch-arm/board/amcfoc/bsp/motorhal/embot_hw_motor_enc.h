@@ -56,6 +56,17 @@ namespace embot::hw::motor::enc {
     int32_t getvalue(); 
     void force(int32_t value);
     
+    
+    bool Enc1Init(void);
+    bool Enc2Init(void);
+    
+    int32_t Enc1GetRotorPosition(void);
+    int32_t Enc2GetRotorPosition(void);
+    void Enc1DeInit(void);
+    void Enc2DeInit(void);
+    
+    void encoder1_test(void);
+    
 } // namespace embot::hw::motor::enc {
 
 

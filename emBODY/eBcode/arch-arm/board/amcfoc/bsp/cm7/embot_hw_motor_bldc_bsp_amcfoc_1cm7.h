@@ -41,6 +41,12 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     extern ADC_HandleTypeDef &hadcMOT2;  
     extern ADC_HandleTypeDef &hadcOTHERS; 
     
+    
+    extern TIM_HandleTypeDef htim5;
+    extern TIM_HandleTypeDef htim2;
+    
+    
+    
     struct PWMvalues
     {   // the default is for pwm @ 10.240 us ....
 
