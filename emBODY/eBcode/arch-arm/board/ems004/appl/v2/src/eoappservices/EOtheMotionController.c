@@ -311,7 +311,7 @@ static EOtheMotionController s_eo_themotcon =
     EO_INIT(.id32ofregulars)            NULL,
     
     EO_INIT(.motor_delayer)             { {NULL, NULL, 0}, {NULL, NULL, 0}, {NULL, NULL, 0}, {NULL, NULL, 0} },
-    EO_INIT(.motor_delayer_flags)       0    
+    EO_INIT(.motor_delayer_flags)       0
 };
 
 
@@ -1507,7 +1507,12 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     else //foc, mc4plus, mc4plusmais, and others which use the MControler
     {
         MController_go_idle();
-        MController_deinit();
+        eo_errman_Trace(eo_errman_GetHandle(), "CALLED: MController_go_idle()", s_eobj_ownname);
+        if(!(MController_get_maintenanceMode()))
+        {
+            eo_errman_Trace(eo_errman_GetHandle(), "CALLED: MController_deinit()", s_eobj_ownname);
+            MController_deinit();
+        }
     }
       
     p->service.started = eobool_false;
@@ -1575,6 +1580,10 @@ static const eOmc_motor_t s_motor_default_value =
     0
 }; 
 
+static const eOmc_motor_t s_controller_default_value =
+{   // to simplify we set everything to zero and then we edit eoprot_fun_INIT_mc_controller*() functions
+    0
+}; 
 
 extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
 {
@@ -1606,6 +1615,11 @@ extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
     sta->mc_fault_state = eoerror_code_dummy;
 }
 
+extern void eoprot_fun_INIT_mc_controller_config(const EOnv* nv)
+{
+    eOmc_controller_config_t *cfg = (eOmc_controller_config_t*)eo_nv_RAM(nv);
+    memmove(cfg, &s_controller_default_value.config, sizeof(eOmc_controller_config_t));
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

@@ -665,7 +665,6 @@ namespace embot::app::eth::service::impl::mc {
                     r = true;                
                 } break;  
 
-                
                 // the unmanaged tags
                 case eoprot_tag_mc_motor_wholeitem: // = 0 and never used
                     
@@ -675,7 +674,23 @@ namespace embot::app::eth::service::impl::mc {
                 } break;
             }
             
-        } 
+        }
+        else if(eomc_entity_controller == entity)
+        {
+            switch(static_cast<eOprot_tag_mc_controller_t>(tag))
+            {
+                case eoprot_tag_mc_controller_config:
+                {
+                    // 1
+                    eOmc_controller_config_t *cconfig = reinterpret_cast<eOmc_controller_config_t*>(ropdescriptor.rd->data);
+                    MController_set_maintenanceMode(cconfig->enableskiprecalibration);  
+                } break;
+                default:
+                {    
+                    // add a print that tells that a command is not managed
+                } break;
+            }          
+        }
         
         return r;          
     }  
@@ -891,6 +906,11 @@ extern "C"
     {   // to simplify we set everything to zero and then we edit eoprot_fun_INIT_mc_motor*() functions
         0
     }; 
+    
+    static const eOmc_motor_t s_controller_default_value =
+    {   // to simplify we set everything to zero and then we edit eoprot_fun_INIT_mc_controller*() functions
+        0
+    }; 
 
 
     extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
@@ -921,6 +941,12 @@ extern "C"
         
         // Initialize the fault state to dummy since code zero is assigned to unspecified system error
         sta->mc_fault_state = eoerror_code_dummy;
+    }
+    
+    extern void eoprot_fun_INIT_mc_controller_config(const EOnv* nv)
+    {
+        eOmc_controller_config_t *cfg = (eOmc_controller_config_t*)eo_nv_RAM(nv);
+        memmove(cfg, &s_controller_default_value.config, sizeof(eOmc_controller_config_t));
     }
 
 }
