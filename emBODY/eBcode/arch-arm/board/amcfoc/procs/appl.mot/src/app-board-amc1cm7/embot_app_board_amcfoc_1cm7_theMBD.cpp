@@ -136,6 +136,9 @@ int32_t CU3 = 0;
 #include "embot_hw_motor_hall.h"
 #include "embot_hw_analog.h"
 
+
+#include "embot_hw_motor_enc.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
@@ -914,7 +917,12 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
         embot::app::msg::Location l {bus2use, _config.adr};
         embot::app::bldc::MSG msg {l, o};
         outputmessages.push_back(msg);
-    }  
+    }
+    
+    #warning this is enabled
+    
+    //encoder test
+    embot::hw::motor::enc::encoder1_test();
         
     
 #else
