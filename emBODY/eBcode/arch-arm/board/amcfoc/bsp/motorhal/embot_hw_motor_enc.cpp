@@ -47,8 +47,8 @@ namespace embot::hw::motor::enc {
     
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
    
-    #define htimEnc1    (embot::hw::motor::bldc::bsp::amcfoc::cm7::htim5)
-    #define htimEnc2 (embot::hw::motor::bldc::bsp::amcfoc::cm7::htim2)
+    #define htimEnc1  (embot::hw::motor::bldc::bsp::amcfoc::cm7::htim5)
+    #define htimEnc2  (embot::hw::motor::bldc::bsp::amcfoc::cm7::htim2)
 #endif    
     
     
@@ -128,7 +128,7 @@ extern bool deinit()
 //    HAL_TIM_Encoder_Stop(&ENC_TIM, TIM_CHANNEL_ALL);
 
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
-//    embot::hw::motor::bsp::amc::cm7::DeInit_TIM5();
+//    embot::hw::motor::bsp::amc::cm7::DeInit_TIM5();     //????
 #endif      
         
     
@@ -170,32 +170,6 @@ extern bool start(const Mode& mode)
     
     #warning TODO: we can use EncInit() in here
 
-//    /* Register the callback function used to signal the activation of the Index pulse */
-//    if (HAL_OK == HAL_TIM_RegisterCallback(&ENC_TIM, HAL_TIM_IC_CAPTURE_CB_ID, EncCapture_cb))
-//    {
-//        /* Clear local variables */
-////        EncStatus = ENC_STATUS_IDLE;
-////        EncAbsoluteZero = 0;
-////        EncRotorZero = 0;
-//        /* Clear counter */
-//        __HAL_TIM_SET_COUNTER(&ENC_TIM, 0);
-//        /* Start timers in encoder mode */
-//        if (HAL_OK == HAL_TIM_Encoder_Start(&ENC_TIM, TIM_CHANNEL_ALL))
-//        {
-//            /* Enable leading edge capture, without interrupts */
-//            HAL_TIM_IC_Start(&ENC_TIM, ENC_INDEX_LEADING_EDGE);
-//            /* Enable trailing edge capture, with interrupts */
-//            HAL_TIM_IC_Start_IT(&ENC_TIM, ENC_INDEX_TRAILING_EDGE);
-//            ret = true;
-//        }
-//        else
-//        {
-//            /* Failed start of the timer */
-//            HAL_TIM_UnRegisterCallback(&ENC_TIM, HAL_TIM_IC_CAPTURE_CB_ID);
-//            ret = false;
-//        }
-//    }
-//    /* Errors detected */    
        
     _enc_internals.started = ret;
     
@@ -420,19 +394,27 @@ int32_t Enc2GetRotorPosition(void)
     
 void encoder1_test(void)
 {   
-    uint8_t encoder_slots_number =25;
+    Enc1Init();
+
+    static uint8_t encoder_slots_number = 25;
+    embot::core::print( std::to_string( encoder_slots_number));
     do
     {
         embot::core::print
         ( 
-                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_10)? "H" : "L" +
-                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_11)? "H" : "L" +
-                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
+//                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_10)? "H" : "L" +
+//                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_11)? "H" : "L" +
+//                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
                     std::to_string(Enc1GetRotorPosition()) +
-                    " angle:" +
-                    std::to_string((float)Enc1GetRotorPosition()/(float)encoder_slots_number*360.0)
+                    "  angle: " +
+                    std::to_string((float)Enc1GetRotorPosition()/(float)encoder_slots_number*360.0/4) + 
+                    "  Enc1RotorZero: " +
+                    std::to_string( Enc1RotorZero)
+                     
+                    
+                    
         );
-        embot::core::wait(100);
+        embot::core::wait(10*embot::core::time1millisec);
     } while (1);
 
 }
