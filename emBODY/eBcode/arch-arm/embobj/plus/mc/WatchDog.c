@@ -23,6 +23,9 @@
 // - API
 #include "WatchDog.h"  
 
+// - HIDDEN DATA
+#include "WatchDog_hid.h"  
+
 // - dependencies    
 #include "EoCommon.h"
 #include "EOemsControllerCfg.h"
@@ -76,3 +79,6 @@ BOOL WatchDog_check_expired(WatchDog* o)
     
     return TRUE;
 }
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+

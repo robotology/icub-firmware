@@ -23,6 +23,9 @@
 // - API
 #include "Motor.h"
     
+// - HIDDEN DATA
+#include "Motor_hid.h"
+
 // - dependencies   
 #include "EoCommon.h"
 #include "iCubCanProto_types.h"
@@ -30,17 +33,10 @@
 #include "EOtheCANprotocol.h"
 #include "hal_motor.h"
 
-#include "hal_led.h"
-
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOtheEntities.h"
-    
-
-#include "Motor_hid.h"
-
-#include "embot_app_eth_mc_messaging.h"
-
+#include "embot_app_eth_mc_messaging.h"    
 
 
 /////////////////////////////////////////////////////////
@@ -1415,5 +1411,6 @@ BOOL Motor_is_motor_joint_fault_over(Motor* o)
 }
 
 
-// eof
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
 

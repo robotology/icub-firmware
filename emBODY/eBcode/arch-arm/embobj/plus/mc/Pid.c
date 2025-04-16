@@ -23,21 +23,25 @@
 // - API
 #include "Pid.h"  
 
+
+// - HIDDEN DATA
+#include "PID_hid.h"
+
 // - dependencies    
-#include "EOtheErrorManager.h"
-#include "EoError.h"
-    
-static void send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64)
-{
-    eOerrmanDescriptor_t errdes = {0};
-    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress    = jid;
-    errdes.par16            = par16;
-    errdes.par64            = par64;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
-    //eo_errman_Info(eo_errman_GetHandle(), message, "", &errdes);
-}
+//#include "EOtheErrorManager.h"
+//#include "EoError.h"
+//    
+//static void send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+//{
+//    eOerrmanDescriptor_t errdes = {0};
+//    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//    errdes.sourceaddress    = jid;
+//    errdes.par16            = par16;
+//    errdes.par64            = par64;
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+//    //eo_errman_Info(eo_errman_GetHandle(), message, "", &errdes);
+//}
 
 
 PID* PID_new(uint8_t n)
@@ -232,3 +236,5 @@ float PID_do_friction_comp(PID *o, float32_t vel_fbk, float32_t trq_ref)
         return o->Ktau*(o->Kff*trq_ref);
     }
 }
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------

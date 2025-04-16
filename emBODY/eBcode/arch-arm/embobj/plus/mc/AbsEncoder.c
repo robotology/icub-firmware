@@ -23,16 +23,17 @@
 // - API    
 #include "AbsEncoder.h"
     
-    
+
+// - HIDDEN DATA
+#include "AbsEncoder_hid.h"
+
+
 // - dependencies
 #include "EoCommon.h"
 #include "EoError.h"
 #include "EOtheErrorManager.h"
 #include "EOtheEntities.h"
 #include "EOMtheEMSrunner.h"
-#include "EOemsControllerCfg.h"
-
-
 
 #if defined(USE_EMBOT_theServices) 
 //#warning removed some code
@@ -783,5 +784,6 @@ BOOL AbsEncoder_is_initialized(AbsEncoder* o)
 {
     return (!o->state.bits.not_initialized);
 }
-// AbsEncoder
-/////////////////////////////////////////////////////////
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+

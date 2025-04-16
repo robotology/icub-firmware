@@ -27,11 +27,8 @@
 
 #define USE_FLOAT_CTRL_UNITS
 
-typedef struct // WatchDog
-{
-    uint32_t timer;
-    uint32_t base_time;
-} WatchDog;
+// opaque struct
+typedef struct WatchDog_hid WatchDog;
 
 extern void WatchDog_init(WatchDog* o);
 extern void WatchDog_new(uint8_t n);

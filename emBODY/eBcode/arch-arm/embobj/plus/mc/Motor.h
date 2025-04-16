@@ -25,9 +25,7 @@
 
 #include "EoCommon.h"
 #include "EoMotionControl.h"
-
-#include "WatchDog.h"
-#include "Pid.h"
+#include "EOemsControllerCfg.h"
 
 typedef struct
 {

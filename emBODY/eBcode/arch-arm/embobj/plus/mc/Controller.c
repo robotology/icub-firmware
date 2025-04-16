@@ -23,6 +23,9 @@
 // - API
 #include "Controller.h"
 
+// - HIDDEN DATA
+#include "Controller_hid.h"
+
     
 // - dependencies
 #include "EoCommon.h"
@@ -31,77 +34,13 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOtheEntities.h"
-#include "Joint_hid.h"
-#include "JointSet.h"
-#include "Joint.h"
-#include "Motor.h"
-#include "Motor_hid.h"
-#include "AbsEncoder.h"
-#include "Pid.h"
-#include "hal_led.h"
-#include "hal_trace.h"
 #include "stdio.h"
 
-//#ifdef WRIST_MK2
-#include "JointSet.h"
-//#endif
 
-#include "Joint.h"
-#include "Motor.h"
-#include "AbsEncoder.h"
-#include "Pid.h"
-//#ifndef WRIST_MK2
-//#include "JointSet.h"
-//#endif
-
-// - OPAQUE STRUCT
-
-struct MController_hid
-{
-    uint8_t nEncods;
-    uint8_t nJoints;
-    uint8_t nSets;
-    
-    JointSet *jointSet;
-    
-    uint8_t* set_dim;
-    uint8_t* enc_set_dim;
-    
-    uint8_t multi_encs;
-    
-    uint8_t** jos;
-    uint8_t** mos;
-    uint8_t** eos;
-    
-    uint8_t *j2s;
-    uint8_t *m2s;
-    uint8_t *e2s;
-    
-    Motor *motor;
-    Joint *joint;
-    
-    float **Jjm;
-    float **Jmj;
-    
-    float **Sjm;
-    float **Smj;
-    
-    float **Sje;
-    
-    uint8_t part_type;
-    MC_ACTUATION_t actuation_type;
-    
-    AbsEncoder *absEncoder;
-    
-    // it gets those values of eOmn_serv_type_t that belong to category eomn_serv_category_mc.
-    // they are: eomn_serv_MC* 
-    // i could use also values of eOmotioncontroller_mode_t but i prefere remove dependancy from EOtheMotionController.h in here
-    eOmn_serv_type_t mcmode;
-    
-    BOOL isMaintenanceMode;
-};
-
-
+#include "Joint_hid.h"          // we access internals of the object
+#include "JointSet_hid.h"       // we access internals of the object
+#include "Motor_hid.h"          // we access internals of the object
+#include "AbsEncoder_hid.h"     // we access internals of the object
 
 
 MController* smc = NULL;
@@ -959,7 +898,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             Sje_aux
         );
         
-        o->jointSet[s].led = (hal_led_t)(hal_led1 + s);
     }
 }
 
@@ -1022,8 +960,8 @@ void MController_motor_config_current_PID(int m, eOmc_PID_t* pid)
 
 void MController_motor_config_torque_PID(int m, eOmc_PID_t *pid)
 {
-    //Motor_config_trqPID(smc->motor+m, pid);
-    PID_config(&(smc->motor[m].trqPID), pid);
+    Motor_config_torque_PID(smc->motor+m, pid);
+    //PID_config(&(smc->motor[m].trqPID), pid);
 }
 
 void MController_motor_config_speed_PID(int m, eOmc_PID_t* pid)
@@ -1542,14 +1480,21 @@ void MController_update_joint_targets(int j)
 
 
 void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf)
-{
-    PID_config(&(smc->joint[j].minjerkPID), pid_conf);
-    PID_config(&(smc->joint[j].directPID), pid_conf);
+{    
+    Joint_config_minjerk_PID(smc->joint+j, pid_conf);
+    Joint_config_direct_PID(smc->joint+j, pid_conf);
+    // marco.accame on 16apr2025: it was like the following but i added the above funtions so that 
+    // only the Joint depends on PID
+//    PID_config(&(smc->joint[j].minjerkPID), pid_conf);
+//    PID_config(&(smc->joint[j].directPID), pid_conf);
 }
 
 void MController_config_direct_pid(int j, eOmc_PID_t *pid_conf)
 {
-    PID_config(&(smc->joint[j].directPID), pid_conf);
+    Joint_config_direct_PID(smc->joint+j, pid_conf);
+    // marco.accame on 16apr2025: it was like the following but i added the above funtions so that 
+    // only the Joint depends on PID    
+//    PID_config(&(smc->joint[j].directPID), pid_conf);
 }
 
 void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max)
@@ -1656,4 +1601,5 @@ void MController_motor_raise_fault_i2t(int m)
 
 
 
-////////////////////////////////////////////////////////////////////////////////
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+

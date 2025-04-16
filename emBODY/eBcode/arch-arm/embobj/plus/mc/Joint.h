@@ -23,96 +23,10 @@
 #include "EoCommon.h"
 #include "EOemsControllerCfg.h"
 
-#include "Pid.h"
-#include "Trajectory.h"
-#include "WatchDog.h"
-
-#include "CalibrationHelperData.h"
-
-typedef union
-{
-    struct
-    {
-        uint8_t torque_sensor_timeout:1;
-        uint8_t hard_limit_reached:1;
-    } bits;
-        
-    uint8_t bitmask;
-} JointFaultState;
+// to see eOmc_joint_status_t etc
+#include "EoMotionControl.h"  
 
 
-typedef struct
-{
-    int32_t motor_pos_min;
-    int32_t motor_pos_max;
-    //CTRL_UNITS last_joint_pos;
-    int32_t max_tension;
-} CableConstraintData;
-
-typedef enum
-{
-    calibtype6_st_inited = 0,
-    calibtype6_st_jntEncResComputed = 1,
-    calibtype6_st_absEncoderCalibrated = 2,
-    calibtype6_st_trajectoryStarted = 3,
-    calibtype6_st_finished = 4
-} calibtype6_states;
-
- typedef struct
- {
-     BOOL is_active;
-     CTRL_UNITS targetpos;
-     CTRL_UNITS velocity;
-     calibtype6_states state;
-     int32_t computedZero;
-     int32_t rotorposmin;
-     int32_t rotorposmax;
- } jointCalibType6Data;
-
-typedef enum
-{
-    calibtype7_st_inited =0,
-    calibtype7_st_jntEncResComputed = 1,
-    calibtype7_st_jntCheckLimits = 2,
-    calibtype7_st_finished = 3
-} calibtype7_states;
-
-typedef struct
-{
-    BOOL is_active;
-    calibtype7_states state;
-    int32_t computedZero; 
-} jointCalibType7Data;
-
-
-typedef enum
-{
-    calibtype14_st_inited = 0,
-    calibtype14_st_absEncoderCalib = 1,
-    calibtype14_st_hardLimitSet = 2,
-    calibtype14_st_finished = 3
-} calibtype14_states;
-
-typedef struct
-{
-    BOOL is_active;
-    calibtype14_states state;
-    CTRL_UNITS hardstopPos;
-    int32_t computedZero;
-    int32_t rotorposmin;
-    int32_t rotorposmax;
-} jointCalibType14Data;
-
-typedef struct
-{
-    union
-    {
-        jointCalibType6Data  type6;
-        jointCalibType7Data  type7;
-        jointCalibType14Data type14;
-    }data;
-    eOmc_calibration_type_t type;
-} jointCalibrationData;
 
 typedef struct Joint_hid Joint;
 
@@ -166,6 +80,10 @@ extern void Joint_stop(Joint* o);
 
 extern BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 extern BOOL Joint_set_pos_ref_in_calibType14(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
+
+
+extern void Joint_config_minjerk_PID(Joint* o, eOmc_PID_t *pid_conf);
+extern void Joint_config_direct_PID(Joint *o, eOmc_PID_t *pid_conf);
 
 //VALE: debug function. I'll remove it ASAP
 //extern void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep);

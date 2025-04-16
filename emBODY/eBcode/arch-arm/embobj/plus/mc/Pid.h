@@ -25,45 +25,8 @@
 
 #include "EOemsControllerCfg.h"
 
-typedef struct //PID 
-{
-    float Ko;
-    float Kp;
-    float Kd;
-    float Ki;
-    
-    float Kff;
-    float Kbemf;
-    float Ktau;
-    
-    float Dn;
-    float En;
-    float In;
-    float Imax;
-    
-    float A,B;
-    
-    float stiction_up;
-    float stiction_down;
-
-    float viscous_pos_val;
-    float viscous_neg_val;
-    float coulomb_pos_val;
-    float coulomb_neg_val;
-    float velocityThres_val;
-
-#ifdef FINGER_MK3
-    float out_max_open;
-    float out_max_close;
-#else
-    float out_max;
-#endif
-
-    float out_lpf;
-    float out;
-    
-    uint8_t filter;
-} PID; 
+// opaque struct
+typedef struct PID_hid PID;
 
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
