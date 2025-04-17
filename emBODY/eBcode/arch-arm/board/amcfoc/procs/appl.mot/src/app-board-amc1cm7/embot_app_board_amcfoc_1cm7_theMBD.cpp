@@ -708,13 +708,27 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     static uint32_t readSector_prev = 0;
     static uint32_t readHALL_prev = 0;
     
+    static float me_p = 0;
+    static float el_p = 0;
+    static float me = 0;
+    static float el = 0;
     
-    readMechAngle = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_mechanical);
-    readElecAngle = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_electrical);
+    me_p = me;
+    el_p = el;
+    
+    #warning debug mech angle
+    float tmp =0;
+    tmp = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_mechanical); // in deg
+    me = tmp;
+    readMechAngle = std::floor(tmp); // in  deg
+    tmp = embot::hw::motor::bldc::angle(embot::hw::MOTOR::one, embot::hw::motor::bldc::AngleType::hall_electrical); // in deg
+    el = tmp;
+    readElecAngle = std::floor(tmp); // in 0.1 deg
     readSector = embot::hw::motor::hall::sector(embot::hw::MOTOR::one);
     readHALL = embot::hw::motor::bldc::hall(embot::hw::MOTOR::one);
     
-    if(readMechAngle != readMechAngle_prev)
+//    if(readSector_prev != readMechAngle_prev)
+    if(readSector_prev != readSector)
     {
 
 #if defined(DEBUG_LOG_ANGLE_VARIATIONS__PRINT_CHANGES)  
@@ -722,11 +736,16 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
       
         embot::core::TimeFormatter tf {embot::core::now()};
 
+        embot::core::print(tf.to_string() + ": mech = " + std::to_string(me_p) + " -> " + std::to_string(me) +  "; " + 
+                                      "elec = " + std::to_string(el_p) + " -> " + std::to_string(el) +  "; " +
+                                      "sect = " + std::to_string(readSector_prev) + " -> " + std::to_string(readSector) +  "; " +
+                                      "hall = " + std::to_string(readHALL_prev) + " -> " + std::to_string(readHALL) +  "; "
+
         
-        embot::core::print(tf.to_string() + ": mech = " + std::to_string(readMechAngle_prev) + " -> " + std::to_string(readMechAngle) +  "; " + 
-                                              "elec = " + std::to_string(readElecAngle_prev) + " -> " + std::to_string(readElecAngle) +  "; " +
-                                              "sect = " + std::to_string(readSector_prev) + " -> " + std::to_string(readSector) +  "; " +
-                                              "hall = " + std::to_string(readHALL_prev) + " -> " + std::to_string(readHALL) +  "; "
+//        embot::core::print(tf.to_string() + ": mech = " + std::to_string(readMechAngle_prev) + " -> " + std::to_string(readMechAngle) +  "; " + 
+//                                              "elec = " + std::to_string(readElecAngle_prev) + " -> " + std::to_string(readElecAngle) +  "; " +
+//                                              "sect = " + std::to_string(readSector_prev) + " -> " + std::to_string(readSector) +  "; " +
+//                                              "hall = " + std::to_string(readHALL_prev) + " -> " + std::to_string(readHALL) +  "; "
         
         );
 #endif
@@ -887,6 +906,7 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
 
     
     volatile float vin = embot::hw::analog::getVin();
+    vin = 48.0f;
     
     embot::app::bldc::theMC2agent::getInstance().tick(caninputframes, {EXTFAULTisPRESSED, vin}, canoutputframes);
     
@@ -1144,6 +1164,33 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
 #else        
         _items[embot::core::tointegral(m)].pwm = output[embot::core::tointegral(m)].pwm; 
 #endif
+        
+        // uvw
+        float u = _items[embot::core::tointegral(m)].pwm.u;
+        float v = _items[embot::core::tointegral(m)].pwm.v;
+        float w = _items[embot::core::tointegral(m)].pwm.w;
+        
+//        // wvu
+//        _items[embot::core::tointegral(m)].pwm.u = w;
+//        _items[embot::core::tointegral(m)].pwm.v = v;
+//        _items[embot::core::tointegral(m)].pwm.w = u;
+
+//        // uwv
+//        _items[embot::core::tointegral(m)].pwm.u = u;
+//        _items[embot::core::tointegral(m)].pwm.v = w;
+//        _items[embot::core::tointegral(m)].pwm.w = v;
+ 
+
+//        // vuw -> vibra e suona
+//        _items[embot::core::tointegral(m)].pwm.u = v;
+//        _items[embot::core::tointegral(m)].pwm.v = u;
+//        _items[embot::core::tointegral(m)].pwm.w = w;
+
+        // vwu -> gira
+        _items[embot::core::tointegral(m)].pwm.u = v;
+        _items[embot::core::tointegral(m)].pwm.v = w;
+        _items[embot::core::tointegral(m)].pwm.w = u;
+        
         if(m == embot::hw::MOTOR::one)
         {
             pwm1 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.u);

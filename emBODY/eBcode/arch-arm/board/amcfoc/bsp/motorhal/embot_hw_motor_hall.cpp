@@ -283,6 +283,9 @@ struct hall_Internals
         _items[embot::core::tointegral(m)].data.deltamechanical = 60.0f / div;        
     }        
         
+    enum class Order { H3H2H1, H3H1H2, H2H3H1, H2H1H3, H1H2H3, H1H3H2 };
+    static constexpr Order order {Order::H3H2H1};
+    
     uint8_t swap(embot::hw::MOTOR m, uint8_t threebits)
     {
         // we get the values of the three bits: H3|H2|H1. they correspond to C|B|A
@@ -300,6 +303,50 @@ struct hall_Internals
                 ((x & 0b010) << 1)  |   // gets 0|H2|0 and moves it up by one position
                 ((x & 0b100) >> 1)  ;   // gets H3|0|0 and moves it down by one position
         } 
+        
+//        switch(order)
+//        {
+//            default:
+//            case Order::H3H2H1:
+//            {
+//                v = v;
+//            } break;
+//            
+//            case Order::H3H1H2:
+//            {
+//                v = ((x & 0b001) << 1)  |   // gets 0|0|H1 and move it up by one position
+//                    ((x & 0b010) >> 1)  |   // gets 0|H2|0 and moves it down by one position
+//                    ((x & 0b100) >> 1)  ;   // gets H3|0|0 and keeps it where it is                
+//            } break;            
+//            
+//            case Order::H2H3H1:
+//            {
+//                v = ((x & 0b001)     )  |   // gets 0|0|H1 and keeps it where it is
+//                    ((x & 0b010) << 1)  |   // gets 0|H2|0 and moves it up by one position
+//                    ((x & 0b100) >> 1)  ;   // gets H3|0|0 and moves it down by one position                
+//            } break;
+
+//            case Order::H2H1H3:
+//            {
+//                v = ((x & 0b001) << 1)  |   // gets 0|0|H1 and moves it up by one position
+//                    ((x & 0b010) << 1)  |   // gets 0|H2|0 and moves it up by one position
+//                    ((x & 0b100) >> 2)  ;   // gets H3|0|0 and moves it down by two positions                
+//            } break;            
+
+//            case Order::H1H2H3:
+//            {
+//                v = ((x & 0b001) << 2)  |   // gets 0|0|H1 and moves it up by two positions
+//                    ((x & 0b010) << 1)  |   // gets 0|H2|0 and keep it as it is
+//                    ((x & 0b100) >> 2)  ;   // gets H3|0|0 and moves it down by two positions                
+//            } break;   
+// 
+//            case Order::H1H3H2:
+//            {
+//                v = ((x & 0b001) << 2)  |   // gets 0|0|H1 and moves it up by two positions
+//                    ((x & 0b010) >> 1)  |   // gets 0|H2|0 and move it down by one position
+//                    ((x & 0b100) >> 1)  ;   // gets H3|0|0 and moves it down by one positions               
+//            } break;             
+//        }
 
         return v;        
     }

@@ -18,6 +18,7 @@
 #include "embot_app_bldc_MBD_interface.h"
 
 #include <array>
+#include <vector>
 #include <memory>
 
 namespace embot::app::bldc {
