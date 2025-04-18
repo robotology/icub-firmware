@@ -25,6 +25,9 @@
 #endif
 
 #include "WatchDog.h"
+#include "WatchDog_hid.h"
+#include "Pid.h"
+#include "Pid_hid.h"
 
 typedef struct
 {

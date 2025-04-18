@@ -23,11 +23,14 @@
 // - API
 #include "Joint.h"
     
+   
+// - HIDDEN DATA
+#include "Joint_hid.h"
+
     
 // - dependencies
 
 #include "hal_adc.h"
-#include "EOtheCANprotocol.h"
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOtheEntities.h"
@@ -35,10 +38,7 @@
 #if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_TORQUE)
 #include "embot_app_eth_theEncoderReader.h"
 #endif
-   
-// - OPAQUE STRUCT    
-#include "Joint_hid.h"
-    
+
     
 static void Joint_set_inner_control_flags(Joint* o);
 static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
@@ -1207,6 +1207,18 @@ static void Joint_set_inner_control_flags(Joint* o)
     }
 }
 
+extern void Joint_config_minjerk_PID(Joint* o, eOmc_PID_t *pid_conf)
+{
+    PID_config(&(o->minjerkPID), pid_conf);
+}
+
+extern void Joint_config_direct_PID(Joint *o, eOmc_PID_t *pid_conf)
+{
+    PID_config(&(o->directPID), pid_conf);
+}
+
+
+
 //VALE: debug function. I'll remove it ASAP
 //void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep)
 //{
@@ -1215,3 +1227,7 @@ static void Joint_set_inner_control_flags(Joint* o)
 //    o->eo_joint_ptr->status.core.measures.meas_acceleration = avgCurrent;
 //    o->eo_joint_ptr->status.core.measures.meas_velocity = accum_Ep;
 //}
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+

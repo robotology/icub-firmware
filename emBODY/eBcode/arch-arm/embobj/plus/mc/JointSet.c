@@ -23,8 +23,11 @@
 // - API
 #include "JointSet.h"
     
+
+// - HIDDEN DATA
+#include "JointSet_hid.h"
+
 // - dependencies
-#include "Motor_hid.h"
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
 #include "EOemsControllerCfg.h"
@@ -38,22 +41,36 @@
     #endif
 #else
 
-#include "embot_app_eth_theEncoderReader.h"
-#include "EOtheMAIS.h"
-#include "EOthePOS.h"
+
 #endif
-#include "EOtheEntities.h"
-#include "Joint_hid.h"
+
+#include "Joint.h"
+#include "Joint_hid.h"          // we access internals of the object
 #include "Motor.h"
+#include "Motor_hid.h"          // we access internals of the object
 #include "AbsEncoder.h"
-#include "Pid.h"
+#include "AbsEncoder_hid.h"     // we access internals of the object
+
 #include "Calibrators.h"
 #include <cmath>
 
-static void JointSet_set_inner_control_flags(JointSet* o);
 
-static const CTRL_UNITS DEG2ICUB = 65536.0f/360.0f;
-static const CTRL_UNITS ICUB2DEG = 360.0f/65536.0f;
+// static functions
+
+static void JointSet_set_inner_control_flags(JointSet* o);
+static void JointSet_do_vel_control(JointSet* o);
+static void JointSet_do_current_control(JointSet* o);
+static void JointSet_do_off(JointSet* o);
+
+static void JointSet_do_wait_calibration(JointSet* o);
+
+#if defined(MOVE_JointSet_calib_functions_to_Calibrator)
+#else
+#error DONT use it in here anymore
+static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot);
+#endif
+
+// public functions
 
 JointSet* JointSet_new(uint8_t n) //
 {
@@ -427,10 +444,6 @@ BOOL JointSet_do_check_faults(JointSet* o)
     return fault;
 }
 
-static void JointSet_do_vel_control(JointSet* o);
-static void JointSet_do_current_control(JointSet* o);
-static void JointSet_do_off(JointSet* o);
-static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot);
 
 void JointSet_do_control(JointSet* o)
 {
@@ -454,7 +467,6 @@ void JointSet_do_control(JointSet* o)
     }
 }
 
-static void JointSet_do_wait_calibration(JointSet* o);
 
 void JointSet_do(JointSet* o)
 {
@@ -823,6 +835,9 @@ static CTRL_UNITS wrap180(CTRL_UNITS x)
     return x;
 }
 
+#if defined(MOVE_JointSet_calib_functions_to_Calibrator)
+#else
+#error DONT use it in here anymore
 static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot)
 {
     eoas_pos_ROT_t retValue = eoas_pos_ROT_unknown;
@@ -858,6 +873,7 @@ static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot)
     
     return retValue;
 }
+#endif
 
 void JointSet_do_pwm_control(JointSet* o)
 {
@@ -1579,6 +1595,14 @@ static void JointSet_set_inner_control_flags(JointSet* o)
     }
 }
 
+
+#if defined(MOVE_JointSet_calib_functions_to_Calibrator)
+static void JointSet_do_wait_calibration(JointSet* o)
+{
+    Calibrator_do_wait_calibration(0);
+}
+#else
+#error DONT use it in here anymore
 static void JointSet_do_wait_calibration(JointSet* o)
 {
     int N = *(o->pN);
@@ -1709,9 +1733,17 @@ static void JointSet_do_wait_calibration(JointSet* o)
     }
     
     JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
-   
+    
 }
+#endif // MOVE_JointSet_calib_functions_to_Calibrator
 
+#if defined(MOVE_JointSet_calib_functions_to_Calibrator)
+void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
+{
+    Calibrator_calibrate(o, e, calibrator);
+}
+#else
+#error DONT use it in here anymore
 void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 {
 //    for (int js=0; js<*(o->pN); ++js)
@@ -2225,6 +2257,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             break;
     }
 }
+#endif // MOVE_JointSet_calib_functions_to_Calibrator
+
 
 void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {
@@ -2418,4 +2452,5 @@ extern void JointSet_get_state(JointSet* o, int j, eOmc_joint_status_t* joint_st
 
 #endif
 
-// eof
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+

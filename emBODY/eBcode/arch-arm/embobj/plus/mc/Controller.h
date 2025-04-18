@@ -43,8 +43,7 @@ extern "C" {
 // to see CTRL_UNITS
 #include "EOemsControllerCfg.h"
 
-// need to use this opaque struct in order to 
-// remove from the interface any possible .h files, such as Joint.h etc, containing C++ code.
+// opaque struct
 typedef struct MController_hid MController;
 
 extern MController* MController_new(uint8_t nJoints, uint8_t nEncoders); //

@@ -1,12 +1,104 @@
 #ifndef MC_JOINT_HID___
 #define MC_JOINT_HID___
+   
 
+#include "Pid.h"
+#include "Pid_hid.h"
+#include "Trajectory.h"
+#include "Trajectory_hid.h"
+#include "WatchDog.h"
+#include "WatchDog_hid.h"
+#include "CalibrationHelperData.h"
 #include "kalman_filter.h"
 
-    
-#include "Joint.h"
 
-struct Joint_hid // Joint
+typedef enum
+{
+    calibtype6_st_inited = 0,
+    calibtype6_st_jntEncResComputed = 1,
+    calibtype6_st_absEncoderCalibrated = 2,
+    calibtype6_st_trajectoryStarted = 3,
+    calibtype6_st_finished = 4
+} calibtype6_states;
+
+typedef struct
+{
+    BOOL is_active;
+    CTRL_UNITS targetpos;
+    CTRL_UNITS velocity;
+    calibtype6_states state;
+    int32_t computedZero;
+    int32_t rotorposmin;
+    int32_t rotorposmax;
+} jointCalibType6Data;
+
+typedef enum
+{
+    calibtype7_st_inited =0,
+    calibtype7_st_jntEncResComputed = 1,
+    calibtype7_st_jntCheckLimits = 2,
+    calibtype7_st_finished = 3
+} calibtype7_states;
+
+typedef struct
+{
+    BOOL is_active;
+    calibtype7_states state;
+    int32_t computedZero; 
+} jointCalibType7Data;
+
+
+typedef enum
+{
+    calibtype14_st_inited = 0,
+    calibtype14_st_absEncoderCalib = 1,
+    calibtype14_st_hardLimitSet = 2,
+    calibtype14_st_finished = 3
+} calibtype14_states;
+
+typedef struct
+{
+    BOOL is_active;
+    calibtype14_states state;
+    CTRL_UNITS hardstopPos;
+    int32_t computedZero;
+    int32_t rotorposmin;
+    int32_t rotorposmax;
+} jointCalibType14Data;
+
+typedef struct
+{
+    union
+    {
+        jointCalibType6Data  type6;
+        jointCalibType7Data  type7;
+        jointCalibType14Data type14;
+    }data;
+    eOmc_calibration_type_t type;
+} jointCalibrationData;
+
+
+typedef union
+{
+    struct
+    {
+        uint8_t torque_sensor_timeout:1;
+        uint8_t hard_limit_reached:1;
+    } bits;
+        
+    uint8_t bitmask;
+} JointFaultState;
+
+
+typedef struct
+{
+    int32_t motor_pos_min;
+    int32_t motor_pos_max;
+    //CTRL_UNITS last_joint_pos;
+    int32_t max_tension;
+} CableConstraintData;
+
+struct Joint_hid 
 {
     uint8_t ID;
     

@@ -23,6 +23,9 @@
 // - API
 #include "Trajectory.h"
 
+// - HIDDEN DATA
+#include "Trajectory_hid.h"
+
 // - dependencies
 // none
 
@@ -336,3 +339,6 @@ extern float Trajectory_get_target_velocity(Trajectory* o)
 {
     return o->target_vel;
 }
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+

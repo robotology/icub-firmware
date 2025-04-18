@@ -46,7 +46,6 @@
 
 #include "EOMtheEMStransceiver.h"
 
-#include "Controller.h"
 
 #include "EOVtheCallbackManager.h"
 
