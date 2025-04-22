@@ -47,8 +47,8 @@ namespace embot::hw::motor::enc {
     
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
    
-    #define htimEnc1  (embot::hw::motor::bldc::bsp::amcfoc::cm7::htim5)
-    #define htimEnc2  (embot::hw::motor::bldc::bsp::amcfoc::cm7::htim2)
+    #define htimEnc1  (embot::hw::motor::bldc::bsp::amcfoc::cm7::hTimEnc1)
+    #define htimEnc2  (embot::hw::motor::bldc::bsp::amcfoc::cm7::hTimEnc2)
 #endif    
     
     
@@ -70,9 +70,24 @@ static uint8_t  Enc1Status = ENC_STATUS_IDLE;
 static uint32_t Enc1RotorZero;
 static uint32_t Enc1AbsoluteZero;
 
+static int32_t  Enc1CounterZeroCross;
+static int32_t  Enc1DeltaFirstCross;
+static float    Enc1Angle;
+static int32_t  Enc1DeltaCurrentRotation;
+static uint8_t  Enc1Divider;
+
+
+
 static uint8_t  Enc2Status = ENC_STATUS_IDLE;
 static uint32_t Enc2RotorZero;
 static uint32_t Enc2AbsoluteZero;
+
+static int32_t  Enc2CounterZeroCross;
+static int32_t  Enc2DeltaFirstCross;
+static float    Enc2Angle;
+static int32_t  Enc2DeltaCurrentRotation;
+static uint8_t  Enc2Divider;
+
 
 struct enc_Conversion
 {
@@ -122,10 +137,7 @@ extern bool deinit()
 {
     Enc1DeInit();
     Enc2DeInit();
-    /* Stop any pending operation */
-//    HAL_TIM_IC_Stop_IT(&ENC_TIM, ENC_INDEX_TRAILING_EDGE);
-//    HAL_TIM_IC_Stop(&ENC_TIM, ENC_INDEX_LEADING_EDGE);
-//    HAL_TIM_Encoder_Stop(&ENC_TIM, TIM_CHANNEL_ALL);
+
 
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
 //    embot::hw::motor::bsp::amc::cm7::DeInit_TIM5();     //????
@@ -276,7 +288,13 @@ bool Enc1Init(void)
     HAL_TIM_IC_Stop_IT(&htimEnc1, ENC_INDEX_LEADING_EDGE);
     HAL_TIM_IC_Stop(&htimEnc1, ENC_INDEX_TRAILING_EDGE);
     HAL_TIM_Encoder_Stop(&htimEnc1, TIM_CHANNEL_ALL);
-
+    
+    
+    if      (TIM_ENCODERMODE_TI12 == bldc::bsp::amcfoc::cm7::QEncoder1Mode) {Enc1Divider = 4;}
+    else if (TIM_ENCODERMODE_TI2  == bldc::bsp::amcfoc::cm7::QEncoder1Mode) {Enc1Divider = 2;}
+    else if (TIM_ENCODERMODE_TI1  == bldc::bsp::amcfoc::cm7::QEncoder1Mode) {Enc1Divider = 1;}
+    
+    
     /* Register the callback function used to signal the activation of the Index pulse */
     if (HAL_OK == HAL_TIM_RegisterCallback(&htimEnc1, HAL_TIM_IC_CAPTURE_CB_ID, Enc1Capture_cb))
     {
@@ -351,6 +369,10 @@ bool Enc2Init(void)
     HAL_TIM_IC_Stop_IT(&htimEnc2, ENC_INDEX_LEADING_EDGE);
     HAL_TIM_IC_Stop(&htimEnc2, ENC_INDEX_TRAILING_EDGE);
     HAL_TIM_Encoder_Stop(&htimEnc2, TIM_CHANNEL_ALL);
+    
+    if      (TIM_ENCODERMODE_TI12 == bldc::bsp::amcfoc::cm7::QEncoder2Mode) {Enc2Divider = 4;}
+    else if (TIM_ENCODERMODE_TI2  == bldc::bsp::amcfoc::cm7::QEncoder2Mode) {Enc2Divider = 2;}
+    else if (TIM_ENCODERMODE_TI1  == bldc::bsp::amcfoc::cm7::QEncoder2Mode) {Enc2Divider = 1;}
 
     /* Register the callback function used to signal the activation of the Index pulse */
     if (HAL_OK == HAL_TIM_RegisterCallback(&htimEnc2, HAL_TIM_IC_CAPTURE_CB_ID, Enc2Capture_cb))
@@ -395,7 +417,7 @@ int32_t Enc2GetRotorPosition(void)
 void encoder1_test(void)
 {   
     Enc1Init();
-
+    
     static uint8_t encoder_slots_number = 25;
     embot::core::print( std::to_string( encoder_slots_number));
     do
@@ -407,7 +429,7 @@ void encoder1_test(void)
 //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
                     std::to_string(Enc1GetRotorPosition()) +
                     "  angle: " +
-                    std::to_string((float)Enc1GetRotorPosition()/(float)encoder_slots_number*360.0/4) + 
+                    std::to_string((float)Enc1GetRotorPosition()/(float)encoder_slots_number*360.0/Enc1Divider) + 
                     "  Enc1RotorZero: " +
                     std::to_string( Enc1RotorZero)
                      
