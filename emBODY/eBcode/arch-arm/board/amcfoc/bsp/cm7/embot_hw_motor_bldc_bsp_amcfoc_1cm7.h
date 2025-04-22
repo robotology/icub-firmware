@@ -42,8 +42,10 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     extern ADC_HandleTypeDef &hadcOTHERS; 
     
     
-    extern TIM_HandleTypeDef htim5;
-    extern TIM_HandleTypeDef htim2;
+//    extern TIM_HandleTypeDef htim5;
+//    extern TIM_HandleTypeDef htim2;
+    extern TIM_HandleTypeDef &hTimEnc1;        // qenc
+    extern TIM_HandleTypeDef &hTimEnc2;        // qenc
     
     
     
@@ -95,6 +97,9 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 //    constexpr PWMvalues PWMvals {pwm066666Hz};
 //    constexpr PWMvalues PWMvals {PWM100000Hz};
     
+    
+    constexpr uint8_t QEncoder1Mode TIM_ENCODERMODE_TI12;
+    constexpr uint8_t QEncoder2Mode TIM_ENCODERMODE_TI12;
     
 }
 
