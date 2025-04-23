@@ -110,7 +110,12 @@ void init(embot::hw::MOTOR m, const Configuration &config)
     _pwm_internals._items[embot::core::tointegral(m)].config =  config;
     _pwm_internals._items[embot::core::tointegral(m)].calibrating = false;
 
-    bsp::PwmInit();
+    static bool initted {false};
+    if(false == initted)
+    {
+        bsp::PwmInit();
+        initted = true;
+    }
     
     _pwm_internals._items[embot::core::tointegral(m)].started = true;
     

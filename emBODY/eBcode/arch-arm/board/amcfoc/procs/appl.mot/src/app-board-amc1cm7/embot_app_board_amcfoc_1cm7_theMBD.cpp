@@ -1186,7 +1186,7 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
 //        _items[embot::core::tointegral(m)].pwm.v = u;
 //        _items[embot::core::tointegral(m)].pwm.w = w;
 
-        // vwu -> gira
+        // vwu -> il motore del lego setup gira con questa configurazione
         _items[embot::core::tointegral(m)].pwm.u = v;
         _items[embot::core::tointegral(m)].pwm.v = w;
         _items[embot::core::tointegral(m)].pwm.w = u;
