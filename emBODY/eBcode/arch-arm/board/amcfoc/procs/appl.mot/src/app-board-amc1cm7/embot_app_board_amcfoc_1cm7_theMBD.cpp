@@ -906,7 +906,6 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
 
     
     volatile float vin = embot::hw::analog::getVin();
-    vin = 48.0f;
     
     embot::app::bldc::theMC2agent::getInstance().tick(caninputframes, {EXTFAULTisPRESSED, vin}, canoutputframes);
     
