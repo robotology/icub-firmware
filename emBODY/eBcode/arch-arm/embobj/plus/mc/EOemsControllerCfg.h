@@ -156,8 +156,7 @@ typedef enum {
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-static const CTRL_UNITS DEG2ICUB = 65536.0f/360.0f;
-static const CTRL_UNITS ICUB2DEG = 360.0f/65536.0f;
+
 
 #endif  // include guard
 
