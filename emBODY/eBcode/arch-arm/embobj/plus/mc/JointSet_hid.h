@@ -23,12 +23,6 @@
 #include "CalibrationHelperData.h" 
 
 
-// keep this macro defined because some code parts in JointSet are actually 
-// related to the calibration, so it is better to move them in Calibrator.c
-
-#define MOVE_JointSet_calib_functions_to_Calibrator
-
-
 #ifdef WRIST_MK2
 
 enum wrist_mk_version_t {WRIST_MK_VER_2_0 = 20,  WRIST_MK_VER_2_1 = 21};

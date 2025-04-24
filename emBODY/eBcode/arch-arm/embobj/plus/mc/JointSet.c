@@ -32,6 +32,7 @@
 #include "EOtheMemoryPool.h"
 #include "EOemsControllerCfg.h"
 #include "EOtheErrorManager.h"
+#include "EOtheEntities.h"
 #include "EoError.h"
 #if defined(USE_EMBOT_theServices) 
 //#warning USE_EMBOT_theServices is defined
@@ -54,23 +55,10 @@
 #include "Calibrators.h"
 #include <cmath>
 
-
-// static functions
-
 static void JointSet_set_inner_control_flags(JointSet* o);
-static void JointSet_do_vel_control(JointSet* o);
-static void JointSet_do_current_control(JointSet* o);
-static void JointSet_do_off(JointSet* o);
 
-static void JointSet_do_wait_calibration(JointSet* o);
-
-#if defined(MOVE_JointSet_calib_functions_to_Calibrator)
-#else
-#error DONT use it in here anymore
-static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot);
-#endif
-
-// public functions
+static const CTRL_UNITS DEG2ICUB = 65536.0f/360.0f;
+static const CTRL_UNITS ICUB2DEG = 360.0f/65536.0f;
 
 JointSet* JointSet_new(uint8_t n) //
 {
@@ -444,6 +432,10 @@ BOOL JointSet_do_check_faults(JointSet* o)
     return fault;
 }
 
+static void JointSet_do_vel_control(JointSet* o);
+static void JointSet_do_current_control(JointSet* o);
+static void JointSet_do_off(JointSet* o);
+static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot);
 
 void JointSet_do_control(JointSet* o)
 {
@@ -467,6 +459,7 @@ void JointSet_do_control(JointSet* o)
     }
 }
 
+static void JointSet_do_wait_calibration(JointSet* o);
 
 void JointSet_do(JointSet* o)
 {
@@ -835,9 +828,6 @@ static CTRL_UNITS wrap180(CTRL_UNITS x)
     return x;
 }
 
-#if defined(MOVE_JointSet_calib_functions_to_Calibrator)
-#else
-#error DONT use it in here anymore
 static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot)
 {
     eoas_pos_ROT_t retValue = eoas_pos_ROT_unknown;
@@ -873,7 +863,6 @@ static eoas_pos_ROT_t JointSet_calib14_ROT2pos_ROT(eOmc_calib14_ROT_t rot)
     
     return retValue;
 }
-#endif
 
 void JointSet_do_pwm_control(JointSet* o)
 {
@@ -1595,14 +1584,6 @@ static void JointSet_set_inner_control_flags(JointSet* o)
     }
 }
 
-
-#if defined(MOVE_JointSet_calib_functions_to_Calibrator)
-static void JointSet_do_wait_calibration(JointSet* o)
-{
-    Calibrator_do_wait_calibration(0);
-}
-#else
-#error DONT use it in here anymore
 static void JointSet_do_wait_calibration(JointSet* o)
 {
     int N = *(o->pN);
@@ -1733,17 +1714,9 @@ static void JointSet_do_wait_calibration(JointSet* o)
     }
     
     JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
-    
+   
 }
-#endif // MOVE_JointSet_calib_functions_to_Calibrator
 
-#if defined(MOVE_JointSet_calib_functions_to_Calibrator)
-void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
-{
-    Calibrator_calibrate(o, e, calibrator);
-}
-#else
-#error DONT use it in here anymore
 void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 {
 //    for (int js=0; js<*(o->pN); ++js)
@@ -2257,8 +2230,6 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             break;
     }
 }
-#endif // MOVE_JointSet_calib_functions_to_Calibrator
-
 
 void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {

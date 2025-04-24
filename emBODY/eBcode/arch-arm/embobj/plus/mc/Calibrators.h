@@ -20,10 +20,21 @@
 #define MC_CALIBRATORS_H___
 
 #include "JointSet.h"
-#include "EoMotionControl.h"
 
-extern void Calibrator_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator);
-extern void Calibrator_do_wait_calibration(JointSet* o);
+
+#include "EOemsControllerCfg.h"
+
+
+extern BOOL JointSet_do_wait_calibration_3(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_5(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_8(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_9(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_10(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_11(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_12(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_13(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_14(JointSet* o);
+extern BOOL JointSet_do_wait_calibration_mixed(JointSet* o); //calib type 6 and 7
 
 
  
