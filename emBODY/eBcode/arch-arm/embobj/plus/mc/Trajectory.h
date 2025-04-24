@@ -34,9 +34,10 @@ typedef struct Trajectory_hid Trajectory;
 // marco.accame on 16apr2025: not used
 // extern Trajectory* Trajectory_new(uint8_t n);
 
-
+// embot::app::mc::Trajectory::config()
 extern void Trajectory_config_limits(Trajectory *o, float pos_min, float pos_max, float vel_max, float acc_max);
 
+// embot::app::mc::Trajectory::set() for all of them
 extern void Trajectory_set_pos_end(Trajectory *o, float p1, float avg_vel);
 extern void Trajectory_set_vel_end(Trajectory *o, float v1, float avg_acc);
 extern void Trajectory_set_pos_raw(Trajectory *o, float p0);
@@ -47,10 +48,14 @@ extern void Trajectory_set_vel_raw(Trajectory *o, float v0);
 extern void Trajectory_start2end(Trajectory *o, int32_t start, float end, float velAvg);
 #endif
 
+// embot::app::mc::Trajectory::tick() once to advance simulation step + embot::app::mc::Trajectory::get() as may times we need to get the latest {p, v, a}
 extern int8_t Trajectory_do_step(Trajectory *o, float *p, float *v, float *a);
 
+// embot::app::mc::Trajectory::reset() as it is always used w/ 0 arguments
 extern void Trajectory_init(Trajectory *o, int32_t p0, int32_t v0, int32_t a0);
+// embot::app::mc::Trajectory::stop()
 extern void Trajectory_stop(Trajectory *o, int32_t pos);
+// embot::app::mc::Trajectory::stop()
 extern void Trajectory_velocity_stop(Trajectory *o);
 
 // marco.accame on 16apr2025: not used
@@ -58,8 +63,10 @@ extern void Trajectory_velocity_stop(Trajectory *o);
 // extern int32_t Trajectory_get_vel_ref(Trajectory *o);
 // extern int32_t Trajectory_get_acc_ref(Trajectory *o);
 
+// embot::app::mc::Trajectory::isdone()
 extern BOOL Trajectory_is_done(Trajectory* o);
 
+// embot::app::mc::Trajectory::get() for both of them
 extern float Trajectory_get_target_position(Trajectory* o);
 extern float Trajectory_get_target_velocity(Trajectory* o);
 

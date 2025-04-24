@@ -154,6 +154,9 @@ typedef enum {
 #define FALSE eobool_false
 #define TRUE  eobool_true
 
+#define MC_use_embot_app_mc_Trajectory
+//#define MC_use_Trajectory
+
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 

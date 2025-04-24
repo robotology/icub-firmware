@@ -7,10 +7,10 @@
 
   <Targets>
     <Target>
-      <TargetName>amc-icc-osal-ulpro</TargetName>
+      <TargetName>amcfoc</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
+      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -340,7 +340,7 @@
               <MiscControls> -DuseICCserviceCAN -DxdebugNOicc -DxYRI_uses_MC_foc_actuator_descriptor_generic -DxuseMCfoc_actuator_descriptor_generic -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2 -DUSE_EMBOT_theHandler -DUSE_EMBOT_theServices -DUSE_EMBOT_theServicesMC -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_ICC_COMM USE_EMBOT_HW EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_AMCFOC_2CM4 STM32HAL_DRIVER_V1A0 STM32HAL_dualcore_BOOT_cm4master</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;--..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\bsp;..\cfg;..\..\bsp\ipaldrv;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\app\eth;.;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\cfg\protocol\rop;..\..\..\..\..\embobj\plus\can;..\..\..\..\ems004\appl\v2\src\eoappservices;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\mbd\kalman_filter;..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embot\prot\can;..\..\..\..\..\mbd\wrist_decoupler;..\..\..\bsp\cm4;..\..\..\bsp\cm4\ipaldrv;..\..\..\bsp\shared</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;--..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\bsp;..\cfg;..\..\bsp\ipaldrv;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\app\eth;.;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\cfg\protocol\rop;..\..\..\..\..\embobj\plus\can;..\..\..\..\ems004\appl\v2\src\eoappservices;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\mbd\kalman_filter;..\..\..\..\..\embobj\plus\mc;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embot\prot\can;..\..\..\..\..\mbd\wrist_decoupler;..\..\..\bsp\cm4;..\..\..\bsp\cm4\ipaldrv;..\..\..\bsp\shared;..\..\..\..\..\embot\app\mc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2242,6 +2242,19 @@
               <FileName>embot_app_eth_theMCserviceEOtesterconfig.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\embot_app_eth_theMCserviceEOtesterconfig.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mbd::torque-estimator</GroupName>
+        </Group>
+        <Group>
+          <GroupName>embot::app::mc</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_app_mc_Trajectory.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\app\mc\embot_app_mc_Trajectory.cpp</FilePath>
             </File>
           </Files>
         </Group>

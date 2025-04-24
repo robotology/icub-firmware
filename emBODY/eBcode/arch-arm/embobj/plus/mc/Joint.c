@@ -114,8 +114,18 @@ void Joint_init(Joint* o)
     
     WatchDog_rearm(&o->trq_fbk_wdog);
     WatchDog_rearm(&o->vel_ref_wdog);
-    
+
+#if defined(MC_use_embot_app_mc_Trajectory)
+    if(nullptr == o->traj)
+    {
+        o->traj = new embot::app::mc::Trajectory;
+    }
+    o->traj->reset();
+#endif
+#if defined(MC_use_Trajectory)    
     Trajectory_init(&o->trajectory, 0, 0, 0);
+#endif
+    
     
     PID_init(&o->minjerkPID);
     PID_init(&o->directPID);
@@ -196,8 +206,13 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->tcKoffset = config->impedance.offset;
     
     o->Kadmitt = (o->tcKstiff == ZERO) ? ZERO : (1.0f/o->tcKstiff); 
-    
+  
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    o->traj->config({o->pos_min, o->pos_max, o->vel_max, o->acc_max});
+#endif
+#if defined(MC_use_Trajectory)    
     Trajectory_config_limits(&o->trajectory, o->pos_min, o->pos_max, o->vel_max, o->acc_max);
+#endif  
     
     WatchDog_set_base_time_msec(&o->vel_ref_wdog, config->velocitysetpointtimeout);
     WatchDog_rearm(&o->vel_ref_wdog);
@@ -230,9 +245,13 @@ void Joint_motion_reset(Joint *o)
 {
     PID_reset(&o->minjerkPID);
     PID_reset(&o->directPID);
-    
+   
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    o->traj->stop(o->pos_fbk);
+#endif 
+#if defined(MC_use_Trajectory)    
     Trajectory_stop(&o->trajectory, o->pos_fbk);
-        
+#endif     
     //Watchdog_disarm(&o->vel_ref_wdog);
     
     o->pos_ref = o->pos_fbk;
@@ -248,7 +267,18 @@ void Joint_motion_reset(Joint *o)
     o->output = ZERO;
 }
 void Joint_update_status_reference(Joint* o)
-{    
+{ 
+    float pos {0}; float vel {0}; float acc {0};
+
+#if defined(MC_use_embot_app_mc_Trajectory) 
+    embot::app::mc::Trajectory::Point target {};    
+    o->traj->get(target);
+    pos = target.pos; vel = target.vel; acc = target.acc;
+#endif
+#if defined(MC_use_Trajectory)    
+    pos = Trajectory_get_target_position(&(o->trajectory));
+    vel = Trajectory_get_target_velocity(&(o->trajectory));
+#endif    
     switch (o->control_mode)
     {
         case eomc_controlmode_idle:
@@ -258,20 +288,20 @@ void Joint_update_status_reference(Joint* o)
         
         case eomc_controlmode_mixed:
         case eomc_ctrlmval_velocity_pos:
-            o->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(&(o->trajectory));
-            o->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(&(o->trajectory));
+            o->eo_joint_ptr->status.target.trgt_velocity = vel;
+            o->eo_joint_ptr->status.target.trgt_position = pos;
             break;
         case eomc_controlmode_velocity: //
         case eomc_controlmode_vel_direct:
         case eomc_controlmode_impedance_vel:
-            o->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(&(o->trajectory));
+            o->eo_joint_ptr->status.target.trgt_velocity = vel;
             break;
         case eomc_controlmode_position:
         case eomc_controlmode_impedance_pos:
-            o->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(&(o->trajectory));
+            o->eo_joint_ptr->status.target.trgt_position = pos;
             break;
         case eomc_controlmode_direct:
-            o->eo_joint_ptr->status.target.trgt_positionraw = Trajectory_get_target_position(&(o->trajectory));
+            o->eo_joint_ptr->status.target.trgt_positionraw = pos;
             break;
                 
         case eomc_controlmode_openloop:
@@ -287,7 +317,7 @@ void Joint_update_status_reference(Joint* o)
             break;
             
         default:
-            ;
+            break;
     }
 }
 
@@ -504,8 +534,13 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
         o->pos_min = pos_min;
         o->pos_max = pos_max;
     }
-    
+ 
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    o->traj->config({pos_min, pos_max, 0.0f, 0.0f});
+#endif 
+#if defined(MC_use_Trajectory)    
     Trajectory_config_limits(&o->trajectory, pos_min, pos_max, 0.0f, 0.0f);
+#endif       
 }
 
 void Joint_set_hardware_limit(Joint* o)
@@ -637,7 +672,12 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
         {
             if (WatchDog_check_expired(&o->vel_ref_wdog))
             {
+#if defined(MC_use_embot_app_mc_Trajectory)  
+                o->traj->stopvel();
+#endif
+#if defined(MC_use_Trajectory)                
                 Trajectory_velocity_stop(&o->trajectory);
+#endif                
             }
         }
         case eomc_controlmode_direct:
@@ -651,8 +691,16 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
                 o->output = ZERO;
                 break;
             }
-            
+
+#if defined(MC_use_embot_app_mc_Trajectory)            
+            o->traj->tick();
+            embot::app::mc::Trajectory::Point target {};    
+            o->traj->get(target);
+            o->pos_ref = target.pos; o->vel_ref = target.vel; o->acc_ref = target.acc;            
+#endif
+#if defined(MC_use_Trajectory)                
             Trajectory_do_step(&o->trajectory, &o->pos_ref, &o->vel_ref, &o->acc_ref);
+#endif            
             
             //static int noflood = 0;
             //if (++noflood > 500)
@@ -829,16 +877,31 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
         case eomc_controlmode_velocity: //
         case eomc_controlmode_vel_direct:
             if (WatchDog_check_expired(&o->vel_ref_wdog))
-            {
+            {               
+#if defined(MC_use_embot_app_mc_Trajectory)
+                o->traj->stopvel();
+#endif 
+#if defined(MC_use_Trajectory)                
                 Trajectory_velocity_stop(&o->trajectory);
+#endif                 
             }
         case eomc_controlmode_direct:
         case eomc_controlmode_position:
         {
+
+#if defined(MC_use_embot_app_mc_Trajectory)            
+            o->traj->tick();
+            embot::app::mc::Trajectory::Point target {};    
+            o->traj->get(target);
+            o->pos_ref = target.pos; o->vel_ref = target.vel; o->acc_ref = target.acc;       
+#endif
+#if defined(MC_use_Trajectory)            
             Trajectory_do_step(&o->trajectory, &o->pos_ref, &o->vel_ref, &o->acc_ref);
-        
+#endif        
+            
             o->pos_err = o->pos_ref - o->pos_fbk;
-            o->vel_err = o->vel_ref - o->vel_fbk;        
+            o->vel_err = o->vel_ref - o->vel_fbk;   
+            
 
             break;
         }
@@ -959,7 +1022,14 @@ void Joint_get_state(Joint* o, int j, eOmc_joint_status_t* joint_state)
 {
     joint_state->core.modes.interactionmodestatus    = o->interaction_mode;
     joint_state->core.modes.controlmodestatus        = o->control_mode;
-    joint_state->core.modes.ismotiondone             = Trajectory_is_done(&o->trajectory);
+    bool isdone {false};
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    isdone = o->traj->isdone();
+#endif 
+#if defined(MC_use_Trajectory)    
+    isdone = Trajectory_is_done(&o->trajectory); 
+#endif    
+    joint_state->core.modes.ismotiondone             = isdone;
     joint_state->core.measures.meas_position         = o->pos_fbk;           
     joint_state->core.measures.meas_velocity         = o->vel_fbk;        
     joint_state->core.measures.meas_acceleration     = o->acc_fbk;   
@@ -1014,8 +1084,18 @@ static BOOL Joint_set_pos_ref_core(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_
     o->vel_ref = vel_ref;
 
     if (vel_ref == 0.0f) return TRUE;
-    
+   
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    embot::app::mc::Trajectory::Setpoint sp 
+    {
+        embot::app::mc::Trajectory::Setpoint::Type::POS,
+        {pos_ref, vel_ref, 0}
+    };
+    o->traj->set(sp);
+#endif
+#if defined(MC_use_Trajectory)    
     Trajectory_set_pos_end(&o->trajectory, pos_ref, vel_ref);
+#endif     
     
     return TRUE;  
 }
@@ -1043,8 +1123,19 @@ BOOL Joint_set_pos_raw(Joint* o, CTRL_UNITS pos_ref)
     
     o->pos_ref = pos_ref;
     o->vel_ref = ZERO;
-    
+
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    embot::app::mc::Trajectory::Setpoint sp 
+    {
+        embot::app::mc::Trajectory::Setpoint::Type::POSraw,
+        {pos_ref, 0, 0}
+    };
+    // or: sp.loadPOSraw(pos_ref);
+    o->traj->set(sp);
+#endif    
+#if defined(MC_use_Trajectory)    
     Trajectory_set_pos_raw(&o->trajectory, pos_ref);
+#endif
     
     return TRUE;  
 }
@@ -1105,12 +1196,32 @@ BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
     
     if (acc_ref == 0.0f)
     {
+#if defined(MC_use_embot_app_mc_Trajectory)  
+        o->traj->stopvel();
+        o->traj->stop(0);
+        // be careful:
+        // in here we are supposed to stop both the velocity and the position trajectory ... do we have two?
+#endif        
+#if defined(MC_use_Trajectory)        
         Trajectory_velocity_stop(&o->trajectory);
-
+        Trajectory_stop(&o->trajectory, 0);
+#endif
+        
         return TRUE;
     }
-     
+
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    embot::app::mc::Trajectory::Setpoint sp 
+    {
+        embot::app::mc::Trajectory::Setpoint::Type::VEL,
+        {0, vel_ref, acc_ref}
+    };
+    // or: sp.loadVEL(vel_ref, acc_ref);
+    o->traj->set(sp);
+#endif
+#if defined(MC_use_Trajectory)    
     Trajectory_set_vel_end(&o->trajectory, vel_ref, acc_ref);
+#endif
     
     return TRUE;
 }
@@ -1127,8 +1238,19 @@ BOOL Joint_set_vel_raw(Joint* o, CTRL_UNITS vel_ref)
     LIMIT(vel_ref, o->vel_max);
  
     o->vel_ref = vel_ref;
-     
+   
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    embot::app::mc::Trajectory::Setpoint sp 
+    {
+        embot::app::mc::Trajectory::Setpoint::Type::VELraw,
+        {0, vel_ref, 0}
+    };
+    // or: sp.loadVELraw(vel_ref);
+    o->traj->set(sp);
+#endif
+#if defined(MC_use_Trajectory)      
     Trajectory_set_vel_raw(&o->trajectory, vel_ref);
+#endif 
     
     return TRUE;
 }
@@ -1173,7 +1295,12 @@ BOOL Joint_set_cur_ref(Joint* o, CTRL_UNITS cur_ref)
 
 void Joint_stop(Joint* o)
 {
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    o->traj->stop(o->pos_fbk);
+#endif   
+#if defined(MC_use_Trajectory)      
     Trajectory_stop(&o->trajectory, o->pos_fbk);
+#endif    
 }
 
 static void Joint_set_inner_control_flags(Joint* o)
