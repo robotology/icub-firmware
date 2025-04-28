@@ -126,7 +126,7 @@ namespace embot::hw::motor::bldc::bsp {
     bool BSP::deinit(embot::hw::MOTOR m) const
     {
         embot::hw::motor::adc::deinit(m);
-        embot::hw::motor::enc::deinit(); 
+        embot::hw::motor::enc::deinit(m); 
         embot::hw::motor::hall::deinit(m); 
         embot::hw::motor::pwm::deinit(m);
         embot::hw::analog::deinit();
@@ -154,7 +154,7 @@ namespace embot::hw::motor::bldc::bsp {
             // adc acquisition of the currents starts straigth away with ::init()
             embot::hw::motor::adc::init(m, {});         
             // then we init the encoder. we actually dont start acquisition because we do that in enc::start()            
-            embot::hw::motor::enc::init({}); 
+            embot::hw::motor::enc::init(m, {}); 
             // same applies for hall 
             embot::hw::motor::hall::init(m, {});               
             // ok, we start pwm
@@ -183,7 +183,7 @@ namespace embot::hw::motor::bldc::bsp {
             // start the encoder
             #warning the amcfoc must init encoder using MOTOR m
             embot::hw::motor::enc::Mode mode {cfg.enc_resolution, cfg.pwm_num_polar_couples, false, false};
-            embot::hw::motor::enc::start(mode);
+            embot::hw::motor::enc::start(m, mode);
         }
         
         if(true == cfg.pwm_has_hall_sens)
@@ -254,6 +254,10 @@ namespace embot::hw::motor::bldc::bsp {
         if((type == AngleType::hall_electrical) || (type == AngleType::hall_mechanical))
         {
             r = embot::hw::motor::hall::angle(m, type);
+        }
+        else if(type == AngleType::hall_electrical)
+        {
+            r = embot::hw::motor::enc::angle(m);
         }            
         //Angle r = (enc == Encoder::hall) ? 0.0 : 1.0;        
         //r = embot::hw::motor::hall::angle(m) OR .....;         
