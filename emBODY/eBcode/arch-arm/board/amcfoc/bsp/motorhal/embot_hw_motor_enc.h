@@ -49,12 +49,13 @@ namespace embot::hw::motor::enc {
         }
     };
 
-    bool init(const Configuration &config);
-    bool deinit();
-    bool start(const Mode& mode);
-    bool isstarted();
-    int32_t getvalue(); 
-    void force(int32_t value);
+    bool init(embot::hw::MOTOR m, const Configuration &config);
+    bool deinit(embot::hw::MOTOR m);
+    bool start(embot::hw::MOTOR m, const Mode& mode);
+    bool isstarted(embot::hw::MOTOR m);
+//    int32_t getvalue(); 
+//    void force(int32_t value);
+    float angle(embot::hw::MOTOR m);
     
     
     bool Enc1Init(void);

@@ -919,10 +919,10 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
         outputmessages.push_back(msg);
     }
     
-    #warning this is enabled
+//    #warning this is enabled
     
-    //encoder test
-    embot::hw::motor::enc::encoder1_test();
+//    //encoder test
+//    embot::hw::motor::enc::encoder1_test();
         
     
 #else
