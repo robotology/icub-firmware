@@ -41,9 +41,11 @@
     #include "embot_app_eth_theEncoderReader.h"
     #endif
 #else
-
-
+#include "embot_app_eth_theEncoderReader.h"
+#include "EOtheMAIS.h"
+#include "EOthePOS.h"
 #endif
+
 
 #include "Joint.h"
 #include "Joint_hid.h"          // we access internals of the object
