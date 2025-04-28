@@ -388,7 +388,7 @@ bool trajectory::mbd01::Impl::start2end(int32_t start, float end, float avgvel)
  #endif // if defined(useMBDv01implementation)
 
 // --------------------------------------------------------------------------------------------------------------------
-// - choice of implemention
+// - choice of implementation
 // --------------------------------------------------------------------------------------------------------------------
 
 #if defined(useDUMMYimplementation)
