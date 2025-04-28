@@ -154,8 +154,16 @@ typedef enum {
 #define FALSE eobool_false
 #define TRUE  eobool_true
 
+
+#if defined(STM32HAL_BOARD_AMCFOC_2CM4)
+// for amcfoc, we use the new experimental MC embot::app::mc::trajectory
 #define MC_use_embot_app_mc_Trajectory
 //#define MC_use_Trajectory
+#else
+// in here we use the legacy trajectory code
+//#define MC_use_embot_app_mc_Trajectory
+#define MC_use_Trajectory
+#endif
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 

@@ -19,8 +19,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 //#define useDUMMYimplementation
-#define useLEGACYimplementation
-//#define useMBDv01implementation
+//#define useLEGACYimplementation
+#define useMBDv01implementation
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -33,7 +33,10 @@
 #include "Trajectory_hid.h"
 using LegacyTrajectory = Trajectory; // the one in Trajectory_hid.h
 #elif defined(useMBDv01implementation)
-// include the files from code generator
+
+#include "Trajectory1.h"
+using MBDv01Trajectory = namespace_s1::Trajectory;
+
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -233,43 +236,150 @@ namespace trajectory::mbd01
     
     struct Impl
     { 
-        // just a template for now
+        MBDv01Trajectory traj {};
         
-        MyMBDclass cla {};
+        struct Status
+        {
+            uint32_t tbd {0};  
+            embot::app::mc::Trajectory::Point target {};
+            embot::app::mc::Trajectory::Setpoint setpoint {};       
+            
+            constexpr Status(uint32_t t) : tbd(t) {}
+            constexpr Status() = default;
+            bool isvalid() const { return true; }
+        };
         
+        Status _status {};
+            
+            
+        embot::app::mc::Trajectory::Config _config {};    
+
         Impl() = default;     
 
         bool config(const  embot::app::mc::Trajectory::Config &c);
-        bool reset() { return false; }
-        bool set(const  embot::app::mc::Trajectory::Setpoint &s) { return false; }
-        bool tick() { return false; }
-        bool get( embot::app::mc::Trajectory::Point &target) const { return false; }
-        bool isdone() { return false; }    
-        bool stop(const float &v) { return false; }
-        bool start2end(int32_t start, float end, float avgvel) { return false; }         
+        bool reset();
+        bool set(const  embot::app::mc::Trajectory::Setpoint &s);
+        bool tick();
+        bool get( embot::app::mc::Trajectory::Point &target) const;
+        bool isdone();    
+        bool stop(const float &v);
+        bool stopvel();
+        bool start2end(int32_t start, float end, float avgvel);       
     };
     
-    bool Impl::config(const embot::app::mc::Trajectory::Config &c)
-    {
-        if(false == c.isvalid())
-        {
-            return false;
-        }
-        
-        // my mbd
-        
-        return true;    
-    } 
 
-    bool Impl::stop(const float &v) 
+bool trajectory::mbd01::Impl::config(const embot::app::mc::Trajectory::Config &c)
+{
+    if(false == c.isvalid())
     {
-        Mode mode = cla.getmode();
-        if mode == vel)
-        {
-            cla.Trajectory_velocity_stop();
-        }
+        return false;
+    }
+    
+    _config = c;
+    
+    traj.Trajectory_config_limits(_config.posmin, _config.posmax, _config.velmax, _config.accmax);
+    
+    return true;        
+}
 
-    }    
+
+bool trajectory::mbd01::Impl::reset()
+{
+    bool r {true};
+    
+    traj.Trajectory_init(0, 0, 0);
+    return r;
+}
+
+
+bool trajectory::mbd01::Impl::set(const embot::app::mc::Trajectory::Setpoint &s)
+{
+    _status.setpoint = s;
+    bool r {true};
+    
+    switch(_status.setpoint.type)
+    {
+        case embot::app::mc::Trajectory::Setpoint::Type::POS:
+        {
+            traj.Trajectory_set_pos_end(s.point.pos, s.point.vel);
+        } break;
+
+        case embot::app::mc::Trajectory::Setpoint::Type::VEL:
+        {
+            traj.Trajectory_set_vel_end(s.point.vel, s.point.acc);
+        } break;   
+
+        case embot::app::mc::Trajectory::Setpoint::Type::POSraw:
+        {
+            traj.Trajectory_set_pos_raw(s.point.pos);
+        } break; 
+
+        case embot::app::mc::Trajectory::Setpoint::Type::VELraw:
+        {
+        //    traj.Trajectory_set_vel_raw(s.point.vel);
+        } break; 
+        
+        default:
+        {
+        } break;
+    }
+    
+    
+    return r;
+}
+
+bool trajectory::mbd01::Impl::tick()
+{
+    bool r {true};
+     
+    float pos {0};
+    float vel {0};
+    float acc {0};
+    int32_t v {0};
+    traj.Trajectory_do_step(&pos, &vel, &acc, &v);
+    _status.target.pos = pos;
+    _status.target.vel = vel;
+    _status.target.acc = acc;
+    return r;
+}
+
+bool trajectory::mbd01::Impl::get(embot::app::mc::Trajectory::Point &target) const
+{
+    bool r {true};
+    target = _status.target;
+    return r;
+}
+
+bool trajectory::mbd01::Impl::isdone()
+{
+    bool r {true};
+    r = traj.Trajectory_is_done();
+    return r;
+}
+
+bool trajectory::mbd01::Impl::stop(const float &v)
+{
+    bool r {true};
+    traj.Trajectory_stop(v);
+    return r;    
+}  
+
+
+bool trajectory::mbd01::Impl::stopvel()
+{
+    bool r {true};
+    traj.Trajectory_velocity_stop();
+    return r;    
+}  
+
+bool trajectory::mbd01::Impl::start2end(int32_t start, float end, float avgvel)
+{
+    bool r {true};
+#if defined(WRIST_MK2)    
+    Trajectory_start2end(&traj, end, avgvel);
+#endif
+    return r;    
+}   
 
   
     
