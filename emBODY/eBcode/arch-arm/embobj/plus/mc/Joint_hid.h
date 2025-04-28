@@ -1,15 +1,31 @@
+
+/*
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+*/
+
 #ifndef MC_JOINT_HID___
 #define MC_JOINT_HID___
-   
+ 
+
+#include "EOemsControllerCfg.h"
 
 #include "Pid.h"
 #include "Pid_hid.h"
-#include "Trajectory.h"
-#include "Trajectory_hid.h"
 #include "WatchDog.h"
 #include "WatchDog_hid.h"
 #include "CalibrationHelperData.h"
 #include "kalman_filter.h"
+
+#if defined(MC_use_embot_app_mc_Trajectory)
+#include "embot_app_mc_Trajectory.h"
+#endif
+
+#if defined(MC_use_Trajectory)
+#include "Trajectory.h"
+#include "Trajectory_hid.h"
+#endif
 
 
 typedef enum
@@ -161,7 +177,14 @@ struct Joint_hid
     WatchDog trq_fbk_wdog;
     WatchDog vel_ref_wdog;
     
+#if defined(MC_use_embot_app_mc_Trajectory)    
+    embot::app::mc::Trajectory *traj {nullptr};
+#endif    
+
+#if defined(MC_use_Trajectory)
     Trajectory trajectory;
+#endif
+
     
     eOmc_controlmode_t     control_mode;
     eOmc_interactionmode_t interaction_mode;

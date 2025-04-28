@@ -18,17 +18,35 @@
 #include "Joint.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
+#include "CalibrationHelperData.h" 
+
+#if defined(MC_use_embot_app_mc_Trajectory)
+#include "embot_app_mc_Trajectory.h"
+#endif
+
+#if defined(MC_use_Trajectory)
 #include "Trajectory.h"
 #include "Trajectory_hid.h"
-#include "CalibrationHelperData.h" 
+#endif
+
+
 
 
 #ifdef WRIST_MK2
 
 enum wrist_mk_version_t {WRIST_MK_VER_2_0 = 20,  WRIST_MK_VER_2_1 = 21};
 
-/* The struct wristMk2_t contains all the data related to the wrist MK2*/
-typedef struct //wristMk2_t
+#if defined(MC_use_embot_app_mc_Trajectory)
+    struct Trajectories
+    {
+        static constexpr size_t njoints {3};    
+        embot::app::mc::Trajectory *ypr_trajectory[njoints] {nullptr, nullptr, nullptr};
+        embot::app::mc::Trajectory *prk_trajectory[njoints] {nullptr, nullptr, nullptr};
+    };
+#endif
+
+/* The struct wristMK2_t contains all the data related to the wrist MK2*/
+struct wristMK2_t
 {
     // The warmup flag is == 2 at startup and makes the wrist start a first parking move.
     // warmup == 1 means first parking in progress, and warmup == 0 means first parking done.
@@ -43,9 +61,18 @@ typedef struct //wristMk2_t
     BOOL is_right_wrist;
     
     wrist_decoupler wristDecoupler;
+
+#if defined(MC_use_embot_app_mc_Trajectory)
+//    static constexpr size_t njoints {3};    
+//    embot::app::mc::Trajectory *ypr_traj[njoints] {nullptr, nullptr, nullptr};
+//    embot::app::mc::Trajectory *prk_traj[njoints] {nullptr, nullptr, nullptr};
+    Trajectories trajectories {};
+#endif
     
+#if defined(MC_use_Trajectory)    
     Trajectory ypr_trajectory[3];
     Trajectory prk_trajectory[3];
+#endif
     
     CTRL_UNITS ypr_pos_ref[3];
     CTRL_UNITS ypr_vel_ref[3];
@@ -58,7 +85,7 @@ typedef struct //wristMk2_t
     
     CTRL_UNITS last_valid_pos[3];
 
-} wristMK2_t;
+};
 
 #endif
 
