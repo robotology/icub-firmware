@@ -926,8 +926,17 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     
 //    //encoder test
 
-        embot::hw::motor::enc::encoder1_test();
-    angle_global = (int32_t) embot::hw::motor::enc::Enc1GetAngle();
+////        embot::hw::motor::enc::encoder1_test();
+////    angle_global = (int32_t) embot::hw::motor::enc::Enc1GetAngle();
+    if(embot::hw::motor::enc::isstarted((embot::hw::MOTOR) 0))
+    {
+        angle_global = (int32_t) embot::hw::motor::enc::angle((embot::hw::MOTOR) 0);
+        static uint8_t ii=0;
+        if (ii++%100 == 0)
+            embot::core::print(
+        "angle:  "+
+        std::to_string(angle_global));
+    }
     
 #else
 

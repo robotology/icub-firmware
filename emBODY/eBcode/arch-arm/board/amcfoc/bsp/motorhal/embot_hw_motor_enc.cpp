@@ -60,6 +60,11 @@ namespace embot::hw::motor::enc {
    
     #define htimEnc1  (embot::hw::motor::bldc::bsp::amcfoc::cm7::hTimEnc1)
     #define htimEnc2  (embot::hw::motor::bldc::bsp::amcfoc::cm7::hTimEnc2)
+            
+    std::array<TIM_HandleTypeDef, embot::hw::motor::bldc::MAXnumber> htimEnc {htimEnc1,htimEnc2};
+    
+
+    std::array<uint8_t, embot::hw::motor::bldc::MAXnumber> QEncMode {bldc::bsp::amcfoc::cm7::QEncoder1Mode,bldc::bsp::amcfoc::cm7::QEncoder2Mode};
     
 #endif    
     
@@ -149,9 +154,7 @@ struct enc_Internals
         Mode mode {};    
         enc_Data data {};
         
-        
-        #warning vettore di handler!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        TIM_HandleTypeDef  timerhandler;
+
         uint8_t divider; //depend on timer settings
         float conversionfactor;
             
@@ -189,15 +192,19 @@ bool init(embot::hw::MOTOR m, const Configuration &config)
 
 bool deinit(embot::hw::MOTOR m)
 {
-    
-    if (0 == embot::core::tointegral(m))
-    {
-        Enc1DeInit();
-    }
-    else if (1 == embot::core::tointegral(m))
-    {
-         Enc2DeInit();
-    }
+    /* Stop any pending operation */
+    HAL_TIM_IC_Stop_IT(&htimEnc[embot::core::tointegral(m)], ENC_INDEX_TRAILING_EDGE);
+    HAL_TIM_IC_Stop(&htimEnc[embot::core::tointegral(m)], ENC_INDEX_LEADING_EDGE);
+    HAL_TIM_Encoder_Stop(&htimEnc[embot::core::tointegral(m)], TIM_CHANNEL_ALL);
+    HAL_TIM_UnRegisterCallback(&htimEnc[embot::core::tointegral(m)], HAL_TIM_IC_CAPTURE_CB_ID);
+//    if (0 == embot::core::tointegral(m))
+//    {
+//        Enc1DeInit();
+//    }
+//    else if (1 == embot::core::tointegral(m))
+//    {
+//         Enc2DeInit();
+//    }
 
 
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
@@ -236,7 +243,7 @@ bool start(embot::hw::MOTOR m, const Mode& mode)
     
     if (0 == embot::core::tointegral(m))
     {
-        ret = Enc1Init();
+        ret = Enc1Init(m);
     }
     else if (1 == embot::core::tointegral(m))
     {
@@ -250,7 +257,7 @@ bool start(embot::hw::MOTOR m, const Mode& mode)
     return ret;
 }
 
-extern bool isstarted(embot::hw::MOTOR m)
+bool isstarted(embot::hw::MOTOR m)
 {
     return _enc_internals._items[embot::core::tointegral(m)].started;
 }
@@ -369,28 +376,28 @@ int32_t Enc1GetRotorPosition(void)
     return __HAL_TIM_GetCounter(&htimEnc1) - Enc1RotorZero;
 }
 
-bool Enc1Init(void)
+bool Enc1Init(embot::hw::MOTOR m)
 {
+    
     /* Stop any pending operation */
-    HAL_TIM_IC_Stop_IT(&htimEnc1, ENC_INDEX_LEADING_EDGE);
-    HAL_TIM_IC_Stop(&htimEnc1, ENC_INDEX_TRAILING_EDGE);
-    HAL_TIM_Encoder_Stop(&htimEnc1, TIM_CHANNEL_ALL);
+    HAL_TIM_IC_Stop_IT(&htimEnc[embot::core::tointegral(m)], ENC_INDEX_TRAILING_EDGE);
+    HAL_TIM_IC_Stop(&htimEnc[embot::core::tointegral(m)], ENC_INDEX_LEADING_EDGE);
+    HAL_TIM_Encoder_Stop(&htimEnc[embot::core::tointegral(m)], TIM_CHANNEL_ALL);
+        
     
-    _enc_internals._items[0].timerhandler = htimEnc1;
-    
-    if(TIM_ENCODERMODE_TI12 == bldc::bsp::amcfoc::cm7::QEncoder1Mode) 
+    if(TIM_ENCODERMODE_TI12 == QEncMode[0]) 
     {
-        embot::core::print("Enc1Divider = 4");
+        embot::core::print("Enc Divider = 4");
         _enc_internals._items[0].divider = 4;
         Enc1Divider = 4;
     }
-    else if (TIM_ENCODERMODE_TI2  == bldc::bsp::amcfoc::cm7::QEncoder1Mode) 
+    else if (TIM_ENCODERMODE_TI2  == QEncMode[0]) 
     {
 //        embot::core::print("Enc1Divider = 2");
         _enc_internals._items[0].divider = 2;
         Enc1Divider = 2;
     }
-    else if (TIM_ENCODERMODE_TI1  == bldc::bsp::amcfoc::cm7::QEncoder1Mode) 
+    else if (TIM_ENCODERMODE_TI1  == QEncMode[0]) 
     {
 //        embot::core::print("Enc1Divider = 1");
         _enc_internals._items[0].divider = 1;
@@ -398,11 +405,11 @@ bool Enc1Init(void)
     }
 
     _enc_internals._items[0].conversionfactor = 360.0/(float)_enc_internals._items[0].divider/(float)_enc_internals._items[0].mode.resolution;
-    Enc1Conversionfactor = 360.0/(float)Enc1Divider/(float)_enc_internals._items[0].mode.resolution;
+//    Enc1Conversionfactor = 360.0/(float)Enc1Divider/(float)_enc_internals._items[0].mode.resolution;
     embot::core::print(
-        "resolution: " +
+        "Enc Resolution: " +
         std::to_string(_enc_internals._items[0].mode.resolution)+
-        " Enc1Conversionfactor: "+
+        " Enc Conversionfactor: "+
         std::to_string(_enc_internals._items[0].conversionfactor)
     
     );
@@ -436,14 +443,8 @@ bool Enc1Init(void)
 }
 
 
-void Enc1DeInit(void)
-{
-    /* Stop any pending operation */
-    HAL_TIM_IC_Stop_IT(&htimEnc1, ENC_INDEX_TRAILING_EDGE);
-    HAL_TIM_IC_Stop(&htimEnc1, ENC_INDEX_LEADING_EDGE);
-    HAL_TIM_Encoder_Stop(&htimEnc1, TIM_CHANNEL_ALL);
-    HAL_TIM_UnRegisterCallback(&htimEnc1, HAL_TIM_IC_CAPTURE_CB_ID);
-}
+
+
 
 
 
@@ -485,19 +486,19 @@ bool Enc2Init(void)
     HAL_TIM_IC_Stop(&htimEnc2, ENC_INDEX_TRAILING_EDGE);
     HAL_TIM_Encoder_Stop(&htimEnc2, TIM_CHANNEL_ALL);
     
-    if(TIM_ENCODERMODE_TI12 == bldc::bsp::amcfoc::cm7::QEncoder2Mode) 
+    if(TIM_ENCODERMODE_TI12 == QEncMode[1]) //1 should be embot::core::tointegral(m)
     {
         embot::core::print("Enc2Divider = 4");
         _enc_internals._items[1].divider = 4;
         Enc2Divider = 4;
     }
-    else if (TIM_ENCODERMODE_TI2  == bldc::bsp::amcfoc::cm7::QEncoder2Mode) 
+    else if (TIM_ENCODERMODE_TI2  == QEncMode[1]) 
     {
 //        embot::core::print("Enc2Divider = 2");
         _enc_internals._items[1].divider = 2;
         Enc2Divider = 2;
     }
-    else if (TIM_ENCODERMODE_TI1  == bldc::bsp::amcfoc::cm7::QEncoder2Mode) 
+    else if (TIM_ENCODERMODE_TI1  == QEncMode[1]) 
     {
 //        embot::core::print("Enc2Divider = 1");
         _enc_internals._items[1].divider = 1;
@@ -537,14 +538,7 @@ bool Enc2Init(void)
     return false;
 }
 
-void Enc2DeInit(void)
-{
-    /* Stop any pending operation */
-    HAL_TIM_IC_Stop_IT(&htimEnc2, ENC_INDEX_TRAILING_EDGE);
-    HAL_TIM_IC_Stop(&htimEnc2, ENC_INDEX_LEADING_EDGE);
-    HAL_TIM_Encoder_Stop(&htimEnc2, TIM_CHANNEL_ALL);
-    HAL_TIM_UnRegisterCallback(&htimEnc2, HAL_TIM_IC_CAPTURE_CB_ID);
-}
+
 
 int32_t Enc2GetRotorPosition(void)
 {
@@ -555,31 +549,9 @@ int32_t Enc2GetRotorPosition(void)
 
 float angle(embot::hw::MOTOR m)
 {
-    float r = 0.0;
-
-    if (0 == embot::core::tointegral(m))
-    {
-        r = (float)__HAL_TIM_GetCounter(&htimEnc1)*_enc_internals._items[embot::core::tointegral(m)].conversionfactor;
-//        embot::core::print
-//        ( 
-//                    "angle: " +
-//                    std::to_string(r)
-////                    std::to_string(Enc1GetRotorPosition()) +
-////                    "angle: " +
-////                    std::to_string((float)Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) + 
-////                    "  Enc1RotorZero: " +
-////                    std::to_string( Enc1RotorZero) +
-////                    " Enc 1 angle (my): " +
-////                    std::to_string(Enc1GetAngle())    
-//        );
-    }
-    else if (1 == embot::core::tointegral(m))
-    {
-        r = (float)__HAL_TIM_GetCounter(&htimEnc2)*_enc_internals._items[1].conversionfactor;
-    }
-
+    uint8_t index = embot::core::tointegral(m);
     
-    return r;
+    return (float)__HAL_TIM_GetCounter(&htimEnc[index]) * _enc_internals._items[index].conversionfactor;
 }
 
 
@@ -591,7 +563,7 @@ void encoder1_test(void)
                 
     if(false == onceonly_initted)
     {
-        Enc1Init();
+        Enc1Init((embot::hw::MOTOR) 0);
         onceonly_initted = true;
     }
     
@@ -614,6 +586,26 @@ void encoder1_test(void)
     );
 
 }
+
+
+
+//void Enc2DeInit(void)
+//{
+//    /* Stop any pending operation */
+//    HAL_TIM_IC_Stop_IT(&htimEnc2, ENC_INDEX_TRAILING_EDGE);
+//    HAL_TIM_IC_Stop(&htimEnc2, ENC_INDEX_LEADING_EDGE);
+//    HAL_TIM_Encoder_Stop(&htimEnc2, TIM_CHANNEL_ALL);
+//    HAL_TIM_UnRegisterCallback(&htimEnc2, HAL_TIM_IC_CAPTURE_CB_ID);
+//}
+
+//void Enc1DeInit(void)
+//{
+//    /* Stop any pending operation */
+//    HAL_TIM_IC_Stop_IT(&htimEnc1, ENC_INDEX_TRAILING_EDGE);
+//    HAL_TIM_IC_Stop(&htimEnc1, ENC_INDEX_LEADING_EDGE);
+//    HAL_TIM_Encoder_Stop(&htimEnc1, TIM_CHANNEL_ALL);
+//    HAL_TIM_UnRegisterCallback(&htimEnc1, HAL_TIM_IC_CAPTURE_CB_ID);
+//}
 
 
 } // namespace embot::hw::motor::enc {
