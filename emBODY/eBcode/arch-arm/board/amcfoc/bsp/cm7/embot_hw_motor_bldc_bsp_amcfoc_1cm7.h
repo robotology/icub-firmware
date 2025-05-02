@@ -42,8 +42,6 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     extern ADC_HandleTypeDef &hadcOTHERS; 
     
     
-//    extern TIM_HandleTypeDef htim5;
-//    extern TIM_HandleTypeDef htim2;
     extern TIM_HandleTypeDef &hTimEnc1;        // qenc
     extern TIM_HandleTypeDef &hTimEnc2;        // qenc
     

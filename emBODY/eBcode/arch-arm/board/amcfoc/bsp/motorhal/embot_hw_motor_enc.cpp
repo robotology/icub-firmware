@@ -31,6 +31,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+
 #if !defined(EMBOT_ENABLE_hw_motor_enc)
 
 #warning EMBOT_ENABLE_hw_motor is undefined, so we use dummy implementation 
@@ -125,9 +126,7 @@ struct enc_Data
 //    uint32_t encRotorZero = 0;
 //    uint32_t encAbsoluteZero = 0;
     
-    //depend on timer settings
-    uint16_t Divider;
-    uint16_t ConversionFactor;
+
     bool firstacquisition {true};       
     
     void reset()
@@ -149,6 +148,12 @@ struct enc_Internals
         Configuration config {};
         Mode mode {};    
         enc_Data data {};
+        
+        
+        #warning vettore di handler!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        TIM_HandleTypeDef  timerhandler;
+        uint8_t divider; //depend on timer settings
+        float conversionfactor;
             
         Item() = default;
 
@@ -173,7 +178,7 @@ struct enc_Internals
 
 
 enc_Internals _enc_internals {};
-
+    
 bool init(embot::hw::MOTOR m, const Configuration &config)
 {
     deinit(m);
@@ -221,7 +226,7 @@ bool start(embot::hw::MOTOR m, const Mode& mode)
     
     #warning marco.accame: so far we dont manage mode.calibrate_with_hall and mode.use_index
     
-    _enc_internals._items[embot::core::tointegral(m)].data.ConversionFactor = 360.0/_enc_internals._items[embot::core::tointegral(m)].mode.resolution;
+//    _enc_internals._items[embot::core::tointegral(m)].data.conversionFactor = 360.0/_enc_internals._items[embot::core::tointegral(m)].mode.resolution;
     
 #if defined(STM32HAL_BOARD_AMCFOC_1CM7) 
 //    embot::hw::motor::bldc::bsp::amcfoc::cm7::Init_TIM5(_enc_internals.mode.resolution, _enc_internals.mode.num_polar_couples);
@@ -237,12 +242,8 @@ bool start(embot::hw::MOTOR m, const Mode& mode)
     {
          ret = Enc2Init();
     }
-
     
 //     and now i can do what is required ... i also start the index ... who cares
-    
-
-//    #warning TODO: we can use EncInit() in here
  
     _enc_internals._items[embot::core::tointegral(m)].started = ret;
     
@@ -358,7 +359,8 @@ static void Enc1Capture_cb(TIM_HandleTypeDef *htim)
 }
 float Enc1GetAngle(void)
 {
-    return 360.0*(Enc1CounterZeroCross + (float)(Enc1DeltaFirstCross + (__HAL_TIM_GetCounter(&htimEnc1) - Enc1RotorZero))/(float)(Enc1SlotsNumber*Enc1Divider));
+    return (float)__HAL_TIM_GetCounter(&htimEnc1)*_enc_internals._items[0].conversionfactor;
+    //return 360.0*(Enc1CounterZeroCross + (float)(Enc1DeltaFirstCross + (__HAL_TIM_GetCounter(&htimEnc1) - Enc1RotorZero))/(float)(Enc1SlotsNumber*Enc1Divider));
 }
 
 int32_t Enc1GetRotorPosition(void)
@@ -374,12 +376,37 @@ bool Enc1Init(void)
     HAL_TIM_IC_Stop(&htimEnc1, ENC_INDEX_TRAILING_EDGE);
     HAL_TIM_Encoder_Stop(&htimEnc1, TIM_CHANNEL_ALL);
     
+    _enc_internals._items[0].timerhandler = htimEnc1;
     
-    if      (TIM_ENCODERMODE_TI12 == bldc::bsp::amcfoc::cm7::QEncoder1Mode) {Enc1Divider = 4;}
-    else if (TIM_ENCODERMODE_TI2  == bldc::bsp::amcfoc::cm7::QEncoder1Mode) {Enc1Divider = 2;}
-    else if (TIM_ENCODERMODE_TI1  == bldc::bsp::amcfoc::cm7::QEncoder1Mode) {Enc1Divider = 1;}
-    
+    if(TIM_ENCODERMODE_TI12 == bldc::bsp::amcfoc::cm7::QEncoder1Mode) 
+    {
+        embot::core::print("Enc1Divider = 4");
+        _enc_internals._items[0].divider = 4;
+        Enc1Divider = 4;
+    }
+    else if (TIM_ENCODERMODE_TI2  == bldc::bsp::amcfoc::cm7::QEncoder1Mode) 
+    {
+//        embot::core::print("Enc1Divider = 2");
+        _enc_internals._items[0].divider = 2;
+        Enc1Divider = 2;
+    }
+    else if (TIM_ENCODERMODE_TI1  == bldc::bsp::amcfoc::cm7::QEncoder1Mode) 
+    {
+//        embot::core::print("Enc1Divider = 1");
+        _enc_internals._items[0].divider = 1;
+        Enc1Divider = 1;
+    }
+
+    _enc_internals._items[0].conversionfactor = 360.0/(float)_enc_internals._items[0].divider/(float)_enc_internals._items[0].mode.resolution;
     Enc1Conversionfactor = 360.0/(float)Enc1Divider/(float)_enc_internals._items[0].mode.resolution;
+    embot::core::print(
+        "resolution: " +
+        std::to_string(_enc_internals._items[0].mode.resolution)+
+        " Enc1Conversionfactor: "+
+        std::to_string(_enc_internals._items[0].conversionfactor)
+    
+    );
+    
     
     /* Register the callback function used to signal the activation of the Index pulse */
     if (HAL_OK == HAL_TIM_RegisterCallback(&htimEnc1, HAL_TIM_IC_CAPTURE_CB_ID, Enc1Capture_cb))
@@ -458,11 +485,32 @@ bool Enc2Init(void)
     HAL_TIM_IC_Stop(&htimEnc2, ENC_INDEX_TRAILING_EDGE);
     HAL_TIM_Encoder_Stop(&htimEnc2, TIM_CHANNEL_ALL);
     
-    if      (TIM_ENCODERMODE_TI12 == bldc::bsp::amcfoc::cm7::QEncoder2Mode) {Enc2Divider = 4;}
-    else if (TIM_ENCODERMODE_TI2  == bldc::bsp::amcfoc::cm7::QEncoder2Mode) {Enc2Divider = 2;}
-    else if (TIM_ENCODERMODE_TI1  == bldc::bsp::amcfoc::cm7::QEncoder2Mode) {Enc2Divider = 1;}
+    if(TIM_ENCODERMODE_TI12 == bldc::bsp::amcfoc::cm7::QEncoder2Mode) 
+    {
+        embot::core::print("Enc2Divider = 4");
+        _enc_internals._items[1].divider = 4;
+        Enc2Divider = 4;
+    }
+    else if (TIM_ENCODERMODE_TI2  == bldc::bsp::amcfoc::cm7::QEncoder2Mode) 
+    {
+//        embot::core::print("Enc2Divider = 2");
+        _enc_internals._items[1].divider = 2;
+        Enc2Divider = 2;
+    }
+    else if (TIM_ENCODERMODE_TI1  == bldc::bsp::amcfoc::cm7::QEncoder2Mode) 
+    {
+//        embot::core::print("Enc2Divider = 1");
+        _enc_internals._items[1].divider = 1;
+        Enc2Divider = 1;
+    }
 
+    _enc_internals._items[1].conversionfactor = 360.0/(float)_enc_internals._items[1].divider/(float)_enc_internals._items[1].mode.resolution;
     Enc2Conversionfactor = 360.0/(float)Enc2Divider/(float)_enc_internals._items[1].mode.resolution; 
+    
+    
+    
+    
+    
     
     /* Register the callback function used to signal the activation of the Index pulse */
     if (HAL_OK == HAL_TIM_RegisterCallback(&htimEnc2, HAL_TIM_IC_CAPTURE_CB_ID, Enc2Capture_cb))
@@ -511,25 +559,25 @@ float angle(embot::hw::MOTOR m)
 
     if (0 == embot::core::tointegral(m))
     {
-        r = (float)__HAL_TIM_GetCounter(&htimEnc1)*Enc1Conversionfactor;
-        embot::core::print
-        ( 
-                    "angle: " +
-                    std::to_string(r)
-//                    std::to_string(Enc1GetRotorPosition()) +
+        r = (float)__HAL_TIM_GetCounter(&htimEnc1)*_enc_internals._items[embot::core::tointegral(m)].conversionfactor;
+//        embot::core::print
+//        ( 
 //                    "angle: " +
-//                    std::to_string((float)Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) + 
-//                    "  Enc1RotorZero: " +
-//                    std::to_string( Enc1RotorZero) +
-//                    " Enc 1 angle (my): " +
-//                    std::to_string(Enc1GetAngle())    
-        );
+//                    std::to_string(r)
+////                    std::to_string(Enc1GetRotorPosition()) +
+////                    "angle: " +
+////                    std::to_string((float)Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) + 
+////                    "  Enc1RotorZero: " +
+////                    std::to_string( Enc1RotorZero) +
+////                    " Enc 1 angle (my): " +
+////                    std::to_string(Enc1GetAngle())    
+//        );
     }
     else if (1 == embot::core::tointegral(m))
     {
-        r = (float)__HAL_TIM_GetCounter(&htimEnc2)*Enc2Conversionfactor;
+        r = (float)__HAL_TIM_GetCounter(&htimEnc2)*_enc_internals._items[1].conversionfactor;
     }
-//    _hall_internals._items[embot::core::tointegral(m)].data.electricalangle
+
     
     return r;
 }
@@ -539,26 +587,31 @@ float angle(embot::hw::MOTOR m)
 
 void encoder1_test(void)
 {   
-//    Enc1Init();
-
-        embot::core::print
-        ( 
+    static bool onceonly_initted {false};
+                
+    if(false == onceonly_initted)
+    {
+        Enc1Init();
+        onceonly_initted = true;
+    }
+    
+    embot::core::print
+    ( 
 //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_10)? "H" : "L" +
 //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_11)? "H" : "L" +
 //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
-                    "angle Enc1GetRotorPosition: " +
-                    std::to_string(Enc1GetRotorPosition()) +
-                    "angle: " +
-                    std::to_string((float)Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) + 
-                    "  Enc1RotorZero: " +
-                    std::to_string( Enc1RotorZero) //+
+                "angle Enc1GetRotorPosition: " +
+                std::to_string(Enc1GetRotorPosition()) +
+                " angle: " +
+                std::to_string((float)Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) + 
+                "  Enc1RotorZero: " +
+                std::to_string( Enc1RotorZero) +
 //                    " Enc 1 angle (my): " +
 //                    std::to_string((float)__HAL_TIM_GetCounter(&htimEnc1)*Enc1Conversionfactor)
-                     
-                    
-                    
-        );
-
+                " angle counter*factor: " +
+                std::to_string((float) __HAL_TIM_GetCounter(&htimEnc1)*360/Enc1Divider/1024)
+                                 
+    );
 
 }
 
