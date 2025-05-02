@@ -56,7 +56,7 @@ namespace embot::hw::motor::enc {
 //    int32_t getvalue(); 
 //    void force(int32_t value);
     float angle(embot::hw::MOTOR m);
-    
+    float Enc1GetAngle();
     
     bool Enc1Init(void);
     bool Enc2Init(void);

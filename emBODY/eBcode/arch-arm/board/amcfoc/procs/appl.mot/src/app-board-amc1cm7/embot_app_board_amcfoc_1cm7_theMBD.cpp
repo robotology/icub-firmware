@@ -26,6 +26,9 @@ int32_t CU1 = 0;
 int32_t CU2 = 0;
 int32_t CU3 = 0;
 
+
+int32_t angle_global=0;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
@@ -922,8 +925,9 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
 //    #warning this is enabled
     
 //    //encoder test
-//    embot::hw::motor::enc::encoder1_test();
-        
+
+        embot::hw::motor::enc::encoder1_test();
+    angle_global = (int32_t) embot::hw::motor::enc::Enc1GetAngle();
     
 #else
 
