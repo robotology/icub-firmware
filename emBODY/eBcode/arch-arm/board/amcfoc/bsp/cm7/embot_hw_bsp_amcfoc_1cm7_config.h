@@ -59,7 +59,7 @@
         #define EMBOT_ENABLE_hw_motor_adc
         #define EMBOT_ENABLE_hw_motor_enc
         #define EMBOT_ENABLE_hw_motor_pwm
-        #define  EMBOT_ENABLE_hw_analog_ish        
+        #define EMBOT_ENABLE_hw_analog_ish        
     #endif
     
     #define EMBOT_ENABLE_hw_can

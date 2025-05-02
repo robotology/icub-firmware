@@ -46,6 +46,9 @@ int32_t angle_global=0;
 
 //#define DEBUG_PWM_min_0perc
 
+#define TEST_Quad_Encoder_Mot_1
+
+
 // -
 // - MBD code section
 // -
@@ -922,9 +925,8 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
         outputmessages.push_back(msg);
     }
     
-//    #warning this is enabled
-    
-//    //encoder test
+
+#if defined(TEST_Quad_Encoder_Mot_1)
 
 ////        embot::hw::motor::enc::encoder1_test();
 ////    angle_global = (int32_t) embot::hw::motor::enc::Enc1GetAngle();
@@ -937,6 +939,7 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
         "angle:  "+
         std::to_string(angle_global));
     }
+#endif //defined(TEST_Quad_Encoder_Mot_1)
     
 #else
 
