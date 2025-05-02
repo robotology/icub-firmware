@@ -59,12 +59,12 @@ namespace embot::hw::motor::enc {
     float Enc1GetAngle();
     
     bool Enc1Init(embot::hw::MOTOR m);
-    bool Enc2Init(void);
+    bool Enc2Init(embot::hw::MOTOR m);
     
     int32_t Enc1GetRotorPosition(void);
     int32_t Enc2GetRotorPosition(void);
-//    void Enc1DeInit(void);
-//    void Enc2DeInit(void);
+    void Enc1DeInit(void);
+    void Enc2DeInit(void);
     
     void encoder1_test(void);
     
