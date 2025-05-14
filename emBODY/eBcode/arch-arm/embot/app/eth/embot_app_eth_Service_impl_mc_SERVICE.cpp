@@ -325,9 +325,7 @@ namespace embot::app::eth::service::impl::mc {
     {
         bool r {true};
         
-        // i just idle the controller, not the encoder reader      
-        MController_go_idle();
-        
+        // i just idle the controller, not the encoder reader    
         r = mcagents.stop();
       
         return r;          

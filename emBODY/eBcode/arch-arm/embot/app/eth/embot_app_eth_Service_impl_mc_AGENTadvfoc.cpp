@@ -536,8 +536,14 @@ bool AGENTadvfoc::activate()
 }
   
 bool AGENTadvfoc::stop()
-{
-    // nothing is required 
+{       
+    MController_go_idle();
+    if(!(MController_get_maintenanceMode()))
+    {
+        embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+        embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"MController_deinit()", thr}, {}, "called");        
+        MController_deinit();
+    }
     return true;        
 }
 
