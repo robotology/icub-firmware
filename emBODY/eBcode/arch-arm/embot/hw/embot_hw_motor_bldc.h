@@ -74,7 +74,7 @@ namespace embot::hw::motor::bldc {
     
     using Angle = float; // in [degrees]
     
-    enum class AngleType : uint8_t { hall_electrical = 0, hall_mechanical = 2, quadenc = 3 };
+    enum class AngleType : uint8_t { hall_electrical = 0, hall_mechanical = 2, quadenc_mechanical = 3 };
     
     struct Config
     {
