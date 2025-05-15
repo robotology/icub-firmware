@@ -928,16 +928,25 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
 
 #if defined(TEST_Quad_Encoder_Mot_1)
 
-////        embot::hw::motor::enc::encoder1_test();
-////    angle_global = (int32_t) embot::hw::motor::enc::Enc1GetAngle();
-    if(embot::hw::motor::enc::isstarted((embot::hw::MOTOR) 0))
+//        embot::hw::motor::enc::encoder1_test();
+//////    angle_global = (int32_t) embot::hw::motor::enc::Enc1GetAngle();
+    if(embot::hw::motor::enc::isstarted(static_cast<embot::hw::MOTOR> (0)))
     {
-        angle_global = (int32_t) embot::hw::motor::enc::angle((embot::hw::MOTOR) 0);
-        static uint8_t ii=0;
-        if (ii++%100 == 0)
-            embot::core::print(
-        "angle:  "+
-        std::to_string(angle_global));
+        embot::core::print("encoder started");
+//        
+//        
+////        angle_global = (int32_t) embot::hw::motor::enc::angle((embot::hw::MOTOR) 0);
+////        static uint8_t ii=1;
+////        if (ii++%150 == 0)
+////            embot::core::print(
+////        
+//////        "encoder angle:  "+
+//////        std::to_string(embot::hw::motor::enc::angle((embot::hw::MOTOR) 0)) //+
+////        
+////        
+////        "encoder angle:  "+
+////        std::to_string((int32_t) embot::hw::motor::enc::angle((embot::hw::MOTOR) 0))
+//        );
     }
 #endif //defined(TEST_Quad_Encoder_Mot_1)
     

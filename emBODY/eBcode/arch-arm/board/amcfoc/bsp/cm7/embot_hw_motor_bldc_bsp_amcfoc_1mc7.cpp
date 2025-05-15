@@ -1,17 +1,14 @@
-
 /*
  * Copyright (C) 2024 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
 */
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_motor_bldc_bsp_amcfoc_1cm7.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -39,7 +36,6 @@ using namespace embot::core::binary;
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_bsp_config.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - support maps
@@ -184,6 +180,7 @@ namespace embot::hw::motor::bldc::bsp {
             #warning the amcfoc must init encoder using MOTOR m
             embot::hw::motor::enc::Mode mode {cfg.enc_resolution, cfg.pwm_num_polar_couples, false, false};
             embot::hw::motor::enc::start(m, mode);
+            r = true;
         }
         
         if(true == cfg.pwm_has_hall_sens)
@@ -191,11 +188,13 @@ namespace embot::hw::motor::bldc::bsp {
             // start the hall acquisition
              embot::hw::motor::hall::Mode mode { cfg.pwm_swapBC ?  embot::hw::motor::hall::Mode::SWAP::BC :  embot::hw::motor::hall::Mode::SWAP::none, cfg.pwm_hall_offset, cfg.pwm_num_polar_couples };
              embot::hw::motor::hall::start(m, mode);
+             r = true;
         }
-        
+        if ((false == cfg.has_quad_enc) && false == cfg.pwm_has_hall_sens)
+        {
+            embot::core::print("motor config wrong, no motor encoder selected");
+        }
         _configs[embot::core::tointegral(m)] = cfg;
-        
-        r = true;
         
         return r;
     }
@@ -255,10 +254,11 @@ namespace embot::hw::motor::bldc::bsp {
         {
             r = embot::hw::motor::hall::angle(m, type);
         }
-        else if(type == AngleType::hall_electrical)
-        {
+        else if(type == AngleType::quadenc_mechanical)
+        {   
+            //only mechanical angle at the moment
             r = embot::hw::motor::enc::angle(m);
-        }            
+        }
         //Angle r = (enc == Encoder::hall) ? 0.0 : 1.0;        
         //r = embot::hw::motor::hall::angle(m) OR .....;         
         return r;

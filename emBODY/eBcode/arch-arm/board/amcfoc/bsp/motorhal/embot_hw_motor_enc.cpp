@@ -90,7 +90,7 @@ static int32_t  Enc1DeltaFirstCross;
 //static float    Enc1Angle;
 static int32_t  Enc1DeltaCurrentRotation;
 static uint8_t  Enc1Divider;
-static uint8_t  Enc1SlotsNumber = 25;
+static uint16_t  Enc1SlotsNumber = 1024;
 //static float    Enc1Conversionfactor;
 
 
@@ -126,15 +126,20 @@ struct enc_Data
 {
   
 //    uint8_t  encStatus = ENC_STATUS_IDLE;
-//    uint32_t encRotorZero = 0;
+    uint32_t encRotorZero = 0;
+    uint32_t encFirstIndexRotorZero = 0;
 //    uint32_t encAbsoluteZero = 0;
     
 
     bool firstacquisition {true};       
     
+    
+    
+    
     void reset()
     {
         firstacquisition = true;
+        encRotorZero = 0;
     }
       
     enc_Data() = default;
@@ -191,7 +196,7 @@ bool init(embot::hw::MOTOR m, const Configuration &config)
 bool deinit(embot::hw::MOTOR m)
 {
 //    /* Stop any pending operation */
-//    HAL_TIM_IC_Stop_IT(&htimEnc[embot::core::tointegral(m)], ENC_INDEX_TRAILING_EDGE);
+//    HAL_TIM_IC_Stop_IT(&(htimEnc[embot::core::tointegral(m)]), ENC_INDEX_TRAILING_EDGE);
 //    HAL_TIM_IC_Stop(&htimEnc[embot::core::tointegral(m)], ENC_INDEX_LEADING_EDGE);
 //    HAL_TIM_Encoder_Stop(&htimEnc[embot::core::tointegral(m)], TIM_CHANNEL_ALL);
 //    HAL_TIM_UnRegisterCallback(&htimEnc[embot::core::tointegral(m)], HAL_TIM_IC_CAPTURE_CB_ID);
@@ -278,39 +283,6 @@ bool isstarted(embot::hw::MOTOR m)
 //}
 
 
-//////bool EncInit(TIM_HandleTypeDef htimEncx, void (*EncxCapture_cb) , enc_Internals enc_internals)
-//////{
-//////    /* Stop any pending operation */
-//////    HAL_TIM_IC_Stop_IT(&htimEncx, ENC_INDEX_LEADING_EDGE);
-//////    HAL_TIM_IC_Stop(&htimEncx, ENC_INDEX_TRAILING_EDGE);
-//////    HAL_TIM_Encoder_Stop(&htimEncx, TIM_CHANNEL_ALL);
-
-//////    /* Register the callback function used to signal the activation of the Index pulse */
-//////    if (HAL_OK == HAL_TIM_RegisterCallback(&htimEncx, HAL_TIM_IC_CAPTURE_CB_ID, EncxCapture_cb))
-//////    {
-//////        /* Clear local variables */
-//////           
-//////        enc_internals.encStatus = ENC_STATUS_IDLE;
-//////        enc_internals.encRotorZero = 0;
-//////        enc_internals.encAbsoluteZero = 0;
-
-//////        /* Clear counter */
-//////        __HAL_TIM_SET_COUNTER(&htimEncx, 0);
-//////        /* Start timers in encoder mode */
-//////        if (HAL_OK == HAL_TIM_Encoder_Start(&htimEncx, TIM_CHANNEL_ALL))
-//////        {
-//////            /* Enable leading edge capture, without interrupts */
-//////            HAL_TIM_IC_Start(&htimEncx, ENC_INDEX_LEADING_EDGE);
-//////            /* Enable trailing edge capture, with interrupts */
-//////            HAL_TIM_IC_Start_IT(&htimEncx, ENC_INDEX_TRAILING_EDGE);
-//////            return true;
-//////        }
-//////        /* Failed start of the timer */
-//////        HAL_TIM_UnRegisterCallback(&htimEncx, HAL_TIM_IC_CAPTURE_CB_ID);
-//////    }
-//////    /* Errors detected */
-//////    return false;
-//////}
 
 
 static void Enc1Capture_cb(TIM_HandleTypeDef *htim)
@@ -335,21 +307,13 @@ static void Enc1Capture_cb(TIM_HandleTypeDef *htim)
             Enc1RotorZero = (uint32_t)((delta>=0)? (le + ENC_UP_COUNTING_OFFSET)
                                                  : (le - ENC_DOWN_COUNTING_OFFSET));
             
-//            if(false == firstcross)
-//            {
-//            Enc1DeltaFirstCross = Enc1RotorZero;
-//            firstcross = true;    
-//            }
-//            
-//            #warning if change rotation at index?
-//            if(delta > 0)
-//            {
-//                Enc1CounterZeroCross++;
-//            }
-//            else if (delta < 0)
-//            {
-//                Enc1CounterZeroCross--;
-//            }    
+            _enc_internals._items[0].data.encRotorZero = Enc1RotorZero;
+            
+            if(false == firstcross)
+            {
+                _enc_internals._items[0].data.encFirstIndexRotorZero = Enc1RotorZero;
+                firstcross = true;    
+            } 
             
             /* Mark the absolute zero position */
             if (ENC_STATUS_WAIT == Enc1Status)
@@ -424,7 +388,7 @@ bool Enc1Init(embot::hw::MOTOR m)
         Enc1CounterZeroCross = 0; 
         Enc1DeltaFirstCross = 0;
         /* Clear counter */
-        __HAL_TIM_SET_COUNTER(&htimEnc1, 0);
+        __HAL_TIM_SET_COUNTER(&htimEnc1, 2147483647); //half timer period
         /* Start timers in encoder mode */
         if (HAL_OK == HAL_TIM_Encoder_Start(&htimEnc1, TIM_CHANNEL_ALL))
         {
@@ -445,11 +409,9 @@ bool Enc1Init(embot::hw::MOTOR m)
 
 
 
-
-
-
 static void Enc2Capture_cb(TIM_HandleTypeDef *htim)
 {
+    static bool firstcross = false;
     int32_t le, te, delta;
     /* There must be a leading edge before */
     if (0 != __HAL_TIM_GET_FLAG(&htimEnc2, ENC_INDEX_IT_LEADING_EDGE))
@@ -466,6 +428,14 @@ static void Enc2Capture_cb(TIM_HandleTypeDef *htim)
             /* Update the index position */
             Enc2RotorZero = (uint32_t)((delta>=0)? (le + ENC_UP_COUNTING_OFFSET)
                                                  : (le - ENC_DOWN_COUNTING_OFFSET));
+            
+            _enc_internals._items[1].data.encRotorZero = Enc2RotorZero;
+            if(false == firstcross)
+            {
+                _enc_internals._items[1].data.encFirstIndexRotorZero = Enc2RotorZero;
+                firstcross = true;    
+            }
+            
             /* Mark the absolute zero position */
             if (ENC_STATUS_WAIT == Enc2Status)
             {
@@ -509,9 +479,7 @@ bool Enc2Init(embot::hw::MOTOR m)
     _enc_internals._items[motorIndex].conversionfactor = 360.0/(float)_enc_internals._items[motorIndex].divider/(float)_enc_internals._items[motorIndex].mode.resolution;
 //    Enc2Conversionfactor = 360.0/(float)Enc2Divider/(float)_enc_internals._items[1].mode.resolution; 
     
-    
 
-    
     /* Register the callback function used to signal the activation of the Index pulse */
     if (HAL_OK == HAL_TIM_RegisterCallback(&htimEnc2, HAL_TIM_IC_CAPTURE_CB_ID, Enc2Capture_cb))
     {
@@ -520,7 +488,7 @@ bool Enc2Init(embot::hw::MOTOR m)
         Enc2AbsoluteZero = 0;
         Enc2RotorZero = 0;
         /* Clear counter */
-        __HAL_TIM_SET_COUNTER(&htimEnc2, 0);
+        __HAL_TIM_SET_COUNTER(&htimEnc2, 2147483647);
         /* Start timers in encoder mode */
         if (HAL_OK == HAL_TIM_Encoder_Start(&htimEnc2, TIM_CHANNEL_ALL))
         {
@@ -548,19 +516,21 @@ int32_t Enc2GetRotorPosition(void)
 
 float angle(embot::hw::MOTOR m)
 {
-
     float r = 0.0;
-
+    
     if (0 == embot::core::tointegral(m))
-    {
-        r = (float)__HAL_TIM_GetCounter(&htimEnc1)*_enc_internals._items[embot::core::tointegral(m)].conversionfactor;
+    {          
+        //warning!!!!! check this conversion
+        float anglenew1 = __HAL_TIM_GetCounter(&htimEnc1)-2147483647;
+        r = anglenew1*_enc_internals._items[embot::core::tointegral(m)].conversionfactor;
 //        embot::core::print
 //        ( 
-//                    "angle: " +
-//                    std::to_string(r)
+//                    "counter: " +
+//                    std::to_string(__HAL_TIM_GetCounter(&htimEnc1)) +
 ////                    std::to_string(Enc1GetRotorPosition()) +
-////                    "angle: " +
-////                    std::to_string((float)Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) + 
+//                    "angle: " +
+//                    std::to_string((float)Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) 
+//                        //+ 
 ////                    "  Enc1RotorZero: " +
 ////                    std::to_string( Enc1RotorZero) +
 ////                    " Enc 1 angle (my): " +
@@ -569,10 +539,9 @@ float angle(embot::hw::MOTOR m)
     }
     else if (1 == embot::core::tointegral(m))
     {
-        r = (float)__HAL_TIM_GetCounter(&htimEnc2)*_enc_internals._items[1].conversionfactor;
+        r = (float)(__HAL_TIM_GetCounter(&htimEnc2)-2147483647)*_enc_internals._items[embot::core::tointegral(m)].conversionfactor;
     }
 
-    
     return r;
 }
 
@@ -585,27 +554,41 @@ void encoder1_test(void)
                 
     if(false == onceonly_initted)
     {
-        Enc1Init((embot::hw::MOTOR) 0);
+        if (true == Enc1Init((embot::hw::MOTOR) 0))
+        {
+            _enc_internals._items[0].started = true;
+            Enc1SlotsNumber = 1024;
+        }
         onceonly_initted = true;
     }
-    
-//    embot::core::print
-//    ( 
-////                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_10)? "H" : "L" +
-////                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_11)? "H" : "L" +
-////                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
-//                "angle Enc1GetRotorPosition: " +
-//                std::to_string(Enc1GetRotorPosition()) +
-//                " angle: " +
-//                std::to_string((float)Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) + 
-//                "  Enc1RotorZero: " +
-//                std::to_string( Enc1RotorZero) +
-////                    " Enc 1 angle (my): " +
-////                    std::to_string((float)__HAL_TIM_GetCounter(&htimEnc1)*Enc1Conversionfactor)
-//                " angle as counter*factor: " +
-//                std::to_string((float) __HAL_TIM_GetCounter(&htimEnc1)*360/Enc1Divider/1024)
-//                                 
-//    );
+    static uint8_t ii=0;
+    if (ii++%5 == 0)
+    {
+        static float angle1 = 0, angleold1 = 0;
+        
+//        r = (float)__HAL_TIM_GetCounter(&htimEnc1)*_enc_internals._items[embot::core::tointegral(m)].conversionfactor;
+        float anglenew1 = (float)Enc1GetRotorPosition();
+        float delta1 = anglenew1 - angleold1;
+        angle1 = angle1 + delta1;
+        angleold1 = anglenew1;
+        embot::core::print
+        ( 
+    //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_10)? "H" : "L" +
+    //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_11)? "H" : "L" +
+    //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
+                    "angle Enc1GetRotorPosition: " +
+                    std::to_string(Enc1GetRotorPosition()) +
+                    " angle: " +
+                    std::to_string(Enc1GetRotorPosition()/(float)Enc1SlotsNumber*360.0/Enc1Divider) + 
+                    "  Enc1RotorZero: " +
+                    std::to_string( Enc1RotorZero) +
+                    " delta: " +
+                    std::to_string(delta1) +
+                    " angle as counter*factor: " +
+                    std::to_string((float)angle1*360/Enc1Divider/Enc1SlotsNumber)
+                                     
+        );
+    }
 
 }
 
@@ -628,6 +611,41 @@ void Enc1DeInit(void)
     HAL_TIM_Encoder_Stop(&htimEnc1, TIM_CHANNEL_ALL);
     HAL_TIM_UnRegisterCallback(&htimEnc1, HAL_TIM_IC_CAPTURE_CB_ID);
 }
+
+
+//////bool EncInit(TIM_HandleTypeDef htimEncx, void (*EncxCapture_cb) , enc_Internals enc_internals)
+//////{
+//////    /* Stop any pending operation */
+//////    HAL_TIM_IC_Stop_IT(&htimEncx, ENC_INDEX_LEADING_EDGE);
+//////    HAL_TIM_IC_Stop(&htimEncx, ENC_INDEX_TRAILING_EDGE);
+//////    HAL_TIM_Encoder_Stop(&htimEncx, TIM_CHANNEL_ALL);
+
+//////    /* Register the callback function used to signal the activation of the Index pulse */
+//////    if (HAL_OK == HAL_TIM_RegisterCallback(&htimEncx, HAL_TIM_IC_CAPTURE_CB_ID, EncxCapture_cb))
+//////    {
+//////        /* Clear local variables */
+//////           
+//////        enc_internals.encStatus = ENC_STATUS_IDLE;
+//////        enc_internals.encRotorZero = 0;
+//////        enc_internals.encAbsoluteZero = 0;
+
+//////        /* Clear counter */
+//////        __HAL_TIM_SET_COUNTER(&htimEncx, 0);
+//////        /* Start timers in encoder mode */
+//////        if (HAL_OK == HAL_TIM_Encoder_Start(&htimEncx, TIM_CHANNEL_ALL))
+//////        {
+//////            /* Enable leading edge capture, without interrupts */
+//////            HAL_TIM_IC_Start(&htimEncx, ENC_INDEX_LEADING_EDGE);
+//////            /* Enable trailing edge capture, with interrupts */
+//////            HAL_TIM_IC_Start_IT(&htimEncx, ENC_INDEX_TRAILING_EDGE);
+//////            return true;
+//////        }
+//////        /* Failed start of the timer */
+//////        HAL_TIM_UnRegisterCallback(&htimEncx, HAL_TIM_IC_CAPTURE_CB_ID);
+//////    }
+//////    /* Errors detected */
+//////    return false;
+//////}
 
 
 } // namespace embot::hw::motor::enc {
