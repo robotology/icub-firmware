@@ -41,8 +41,8 @@ namespace embot::hw::motor::enc {
     bool  start(embot::hw::MOTOR m, const Mode &mode)           { return false; }
     bool  isstarted(embot::hw::MOTOR m)                         { return false; }
     float angle(embot::hw::MOTOR m)                             { return 0.0; }
-    float GetEncRotorZeroAngle(embot::hw::MOTOR m)              { return 0.0; }
-    float GetencFirstIndexRotorZeroAngle(embot::hw::MOTOR m)    { return 0.0; }
+    float GetencIndexAngle(embot::hw::MOTOR m)                  { return 0.0; }
+    float GetencFirstIndexCrossAngle(embot::hw::MOTOR m)        { return 0.0; }
     
 }
 
@@ -70,8 +70,8 @@ namespace embot::hw::motor::enc {
 struct enc_Data
 {
     uint8_t  encStatus = ENC_STATUS_IDLE;
-    uint32_t encRotorZero = 0;
-    uint32_t encFirstIndexRotorZero = 0;
+    uint32_t encIndexCounter = 0;
+    uint32_t encFirstIndexCross = 0;
     uint32_t encAbsoluteZero = 0;
 //    static int32_t  EncDeltaCurrentRotation;
 
@@ -80,7 +80,7 @@ struct enc_Data
     void reset()
     {
         firstacquisition = true;
-        encRotorZero = 0;
+        encIndexCounter = 0;
     }
       
     enc_Data() = default;
@@ -222,12 +222,12 @@ static void Enc1Capture_cb(TIM_HandleTypeDef *htim)
         {
             
             /* Update the index position */
-            _enc_internals._items[0].data.encRotorZero = (uint32_t)((delta>=0)? (le + ENC_UP_COUNTING_OFFSET)
+            _enc_internals._items[0].data.encIndexCounter = (uint32_t)((delta>=0)? (le + ENC_UP_COUNTING_OFFSET)
                                                  : (le - ENC_DOWN_COUNTING_OFFSET));
             
             if(false == firstcross)
             {
-                _enc_internals._items[0].data.encFirstIndexRotorZero = _enc_internals._items[0].data.encRotorZero;
+                _enc_internals._items[0].data.encFirstIndexCross = _enc_internals._items[0].data.encIndexCounter;
                 firstcross = true;    
             }
             
@@ -235,7 +235,7 @@ static void Enc1Capture_cb(TIM_HandleTypeDef *htim)
             if (ENC_STATUS_WAIT == _enc_internals._items[0].data.encStatus)
             {
                 /* Store the absolute zero */
-                _enc_internals._items[0].data.encAbsoluteZero = _enc_internals._items[0].data.encRotorZero;
+                _enc_internals._items[0].data.encAbsoluteZero = _enc_internals._items[0].data.encIndexCounter;
                 /* Do not repeat again */
                 _enc_internals._items[0].data.encStatus = ENC_STATUS_READY;
             }
@@ -247,7 +247,7 @@ static void Enc1Capture_cb(TIM_HandleTypeDef *htim)
 int32_t Enc1GetRotorPosition(void)
 {
     /* Read counter 32 bits value */
-    return __HAL_TIM_GetCounter(&htimEnc1) - _enc_internals._items[0].data.encRotorZero;
+    return __HAL_TIM_GetCounter(&htimEnc1) - _enc_internals._items[0].data.encIndexCounter;
 }
 
 bool Enc1Init(embot::hw::MOTOR m)
@@ -292,7 +292,7 @@ bool Enc1Init(embot::hw::MOTOR m)
         /* Clear local variables */
         _enc_internals._items[motorIndex].data.encStatus = ENC_STATUS_IDLE;
         _enc_internals._items[motorIndex].data.encAbsoluteZero = 0;
-        _enc_internals._items[motorIndex].data.encRotorZero = 0;
+        _enc_internals._items[motorIndex].data.encIndexCounter = 0;
         /* Clear counter */
         __HAL_TIM_SET_COUNTER(&htimEnc1, 0); 
         /* Start timers in encoder mode */
@@ -332,11 +332,11 @@ static void Enc2Capture_cb(TIM_HandleTypeDef *htim)
         if (0 != delta)
         {
             /* Update the index position */            
-            _enc_internals._items[1].data.encRotorZero = (uint32_t)((delta>=0)? (le + ENC_UP_COUNTING_OFFSET)
+            _enc_internals._items[1].data.encIndexCounter = (uint32_t)((delta>=0)? (le + ENC_UP_COUNTING_OFFSET)
                                                  : (le - ENC_DOWN_COUNTING_OFFSET));
             if(false == firstcross)
             {
-                _enc_internals._items[1].data.encFirstIndexRotorZero =  _enc_internals._items[1].data.encRotorZero;
+                _enc_internals._items[1].data.encFirstIndexCross =  _enc_internals._items[1].data.encIndexCounter;
                 firstcross = true;    
             }
             
@@ -344,7 +344,7 @@ static void Enc2Capture_cb(TIM_HandleTypeDef *htim)
             if (ENC_STATUS_WAIT == _enc_internals._items[1].data.encStatus)
             {
                 /* Store the absolute zero */
-                _enc_internals._items[1].data.encAbsoluteZero = _enc_internals._items[1].data.encRotorZero;
+                _enc_internals._items[1].data.encAbsoluteZero = _enc_internals._items[1].data.encIndexCounter;
                 /* Do not repeat again */
                 _enc_internals._items[1].data.encStatus = ENC_STATUS_READY;
             }
@@ -386,7 +386,7 @@ bool Enc2Init(embot::hw::MOTOR m)
         /* Clear local variables */
         _enc_internals._items[motorIndex].data.encStatus = ENC_STATUS_IDLE;
         _enc_internals._items[motorIndex].data.encAbsoluteZero = 0;
-        _enc_internals._items[motorIndex].data.encRotorZero = 0;
+        _enc_internals._items[motorIndex].data.encIndexCounter = 0;
         /* Clear counter */
         __HAL_TIM_SET_COUNTER(&htimEnc2, 0);
         /* Start timers in encoder mode */
@@ -410,7 +410,7 @@ bool Enc2Init(embot::hw::MOTOR m)
 int32_t Enc2GetRotorPosition(void)
 {
     /* Read counter 32 bits value */
-    return __HAL_TIM_GetCounter(&htimEnc2) - _enc_internals._items[1].data.encRotorZero;
+    return __HAL_TIM_GetCounter(&htimEnc2) - _enc_internals._items[1].data.encIndexCounter;
 }
 
 
@@ -433,16 +433,16 @@ float angle(embot::hw::MOTOR m)
     return r;
 }
 
-float GetEncRotorZeroAngle(embot::hw::MOTOR m)
+float GetencIndexAngle(embot::hw::MOTOR m)
 {
     uint8_t motorIndex = embot::core::tointegral(m);
-    return _enc_internals._items[motorIndex].data.encRotorZero*_enc_internals._items[motorIndex].conversionfactor;
+    return _enc_internals._items[motorIndex].data.encIndexCounter*_enc_internals._items[motorIndex].conversionfactor;
 }
 
-float GetencFirstIndexRotorZeroAngle(embot::hw::MOTOR m)
+float GetencFirstIndexCrossAngle(embot::hw::MOTOR m)
 {
     uint8_t motorIndex = embot::core::tointegral(m);
-    return _enc_internals._items[motorIndex].data.encFirstIndexRotorZero*_enc_internals._items[motorIndex].conversionfactor;
+    return _enc_internals._items[motorIndex].data.encFirstIndexCross*_enc_internals._items[motorIndex].conversionfactor;
 }
 
 
@@ -474,7 +474,7 @@ void encoder1_test(void)
                     " angle: " +
                     std::to_string(Enc1GetRotorPosition()/Enc1SlotsNumber*360.0/Enc1Divider) + 
                     "  Enc1RotorZero: " +
-                    std::to_string( _enc_internals._items[0].data.encRotorZero) +
+                    std::to_string( _enc_internals._items[0].data.encIndexCounter) +
                     " angle as counter*factor: " +
                     std::to_string((float)anglenew*360.0/Enc1Divider/Enc1SlotsNumber)                  
         );
@@ -516,7 +516,7 @@ void Enc1DeInit(void)
 //////        /* Clear local variables */
 //////           
 //////        enc_internals.encStatus = ENC_STATUS_IDLE;
-//////        enc_internals.encRotorZero = 0;
+//////        enc_internals.encIndexCounter = 0;
 //////        enc_internals.encAbsoluteZero = 0;
 
 //////        /* Clear counter */

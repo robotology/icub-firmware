@@ -66,9 +66,9 @@ namespace embot::hw::motor::enc {
     int32_t Enc1GetRotorPosition(void);
     int32_t Enc2GetRotorPosition(void);
     
-    float GetEncRotorZeroAngle(embot::hw::MOTOR m);
+    float GetencIndexAngle(embot::hw::MOTOR m);
 
-    float GetencFirstIndexRotorZeroAngle(embot::hw::MOTOR m);
+    float GetencFirstIndexCrossAngle(embot::hw::MOTOR m);
     
     
     void Enc1DeInit(void);

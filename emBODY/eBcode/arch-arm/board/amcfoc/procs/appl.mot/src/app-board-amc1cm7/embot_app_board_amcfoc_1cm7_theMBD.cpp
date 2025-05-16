@@ -931,11 +931,10 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     //this can be used to debug without sending the motor configuration
 //        embot::hw::motor::enc::encoder1_test();
     
+    
     //this can be used by sending thr motor configuration via CAN
     if(embot::hw::motor::enc::isstarted(static_cast<embot::hw::MOTOR> (0)))
-    {
-////        embot::core::print("encoder started");
-        
+    {        
         angle_global = (int32_t) embot::hw::motor::enc::angle(static_cast<embot::hw::MOTOR> (0) );
         static uint8_t ii=1;
         if (ii++%150 == 0)
