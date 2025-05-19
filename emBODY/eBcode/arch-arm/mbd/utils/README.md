@@ -1,19 +1,23 @@
-## How to use the Copier script
+# How to use the Copier script
 
 To use the Copier script, run the following command:
 
 ```bash
- Python3 copier.py <source1> <source2> ... <sourceN> <destination> <path_to_directories_json>.
+ python copier.py -s <source1> <source2> ... <sourceN> -d <destination> -j <path_to_directories_json>
 ```
 
-**Notes:**
+**Arguments:**
+
 - _source_: It's the directory where the generated code by Simulink resides. This should point to the `codegen` and/or `system` directory of the Model repository.
 
-- _destinantion_: It's the directory where to copy the code. This should point to the `src/model-based-design` directory of `icub-firmware` repo of the respective board.
+- _destination_: It's the directory where to copy the code. This should point to the `src/model-based-design` directory of `icub-firmware` repo of the respective board.
 
 - _path_to_directories_json_: It's the path to the `directories.json` file. This file should be placed, and properly configured, for each board that includes parts of `mbd` code.
 
-- ⚠️ The program is intended to work on **Windows** machines only. 
+⚠️ The script is intended to work on **Windows** machines only.
+
+The argument `--help` will show the helper and quit.
+
 
 ## `directories.json`
 
@@ -22,7 +26,7 @@ The json file is verified before running the script. If something is wrong, you 
 The structure of the json goes as follows:
 
 
-It's the directory where to paste the code. This should point to the `src/model-based-design` directory of the respective `icub-firmware` repo.
+It's the directory where to paste the code. This should point to the `arch-arm\mbd` directory of the respective `icub-firmware` repo.
 
 You can input the location by pieces in an array. The code will join the strings together.
 
@@ -45,6 +49,9 @@ Each entry in the `subdirectories_to_copy` should be another dictionary followin
     "target_directory": "...",            
     "files": [
         "...",
+    ],
+    "exclude": [
+        "...",
     ]
 }
 ```
@@ -57,14 +64,19 @@ For example, if inside the source there is a directory called `src/files` and `l
 
 `target_directory`: name of the directory in which to paste the files. This directory must exist already in the target. If you are copying into a new directory first create the empty target and then run the script.
 
-`files`: selectors for the files. The script will only copy files whose names match the given selectors. 
+`files`: selectors for the files. The script will only copy files whose names match the given selectors. Wildcard characters like "*" are allowed.
 
-For example, if you only want `.cpp` and `.h` files that begin with `helloworld` you could do the following:
+`exclude`: list of files that needs to be exclude from copy operation. Useful when using the wildcard character "*" in the `files` section.
+
+For example, if you only want `.cpp` and `.h` files that begin with `helloworld` but not `helloworld_ex`, you could do the following:
 
 ```json
 "files": [
     "helloworld*.cpp",
     "helloworld*.h"
+],
+"exclude": [
+    "helloworld_ex*"
 ]
 ```
 
@@ -97,5 +109,3 @@ Any file that doesn't follow this naming will be excluded from being copied.
     ]
 }
 ```
-
-[1]: ../../board/amcbldc/utils/directories.json

@@ -27,12 +27,18 @@ def is_empty(dir):
         return True
 
 def find_subdirectory(main_directory, subdirectory, parent = None):
-    for root, dirs, files in os.walk(main_directory):
-        for dir in dirs:
-            if dir == subdirectory:
-                dir_parent = root.split(os.sep)[-1]
-                if parent is None or dir_parent == parent:
-                    return os.path.join(root, subdirectory)
+
+    if not os.path.isdir(main_directory):
+        raise ValueError(f"Main directory '{main_directory}' does not exist")
+        return ""
+            
+    for root, dirs, _ in os.walk(main_directory):
+        if subdirectory in dirs:
+            dir_parent = os.path.basename(root)
+            
+            if parent is None or dir_parent == parent:
+                return os.path.join(root, subdirectory)
+
     return ""
 
 def check_dictionary_type(dictionary, key, type):
@@ -45,7 +51,6 @@ def parse_instructions(dictionary, source_directory, target_directory):
     check_dictionary_type(dictionary, "subdirectories_to_copy", list)
     subdirectories_to_copy = dictionary["subdirectories_to_copy"]
 
-    # loop over the subdirectories
     for subdirectory in subdirectories_to_copy:
         parent = subdirectory["source_directory_parent"] if "source_directory_parent" in subdirectory else None
         source_subdir = find_subdirectory(source_directory, subdirectory["source_directory"], parent)
@@ -54,7 +59,10 @@ def parse_instructions(dictionary, source_directory, target_directory):
         if(source_subdir == "" or target_subdir == ""):
             continue
 
-        copy_files(source_subdir, target_subdir, subdirectory["files"], subdirectory["exclude"])
+        if "exclude" in subdirectory:
+            copy_files(source_subdir, target_subdir, subdirectory["files"], subdirectory["exclude"])
+        else:
+            copy_files(source_subdir, target_subdir, subdirectory["files"])
 
 def copy_files(source_dir, target_dir, file_selectors, exclude_list=None):
     if not (os.path.isdir(source_dir) and os.path.isdir(target_dir)):
@@ -79,17 +87,13 @@ def main():
     parser = argparse.ArgumentParser(prog='The Copier',
                                     description="The copier has the purpose to copy the code generated from Simulink to the proper board folder in icub-firmware ",
                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('args', nargs='*')
+    # parser.add_argument('args', nargs='*')
     parser.add_argument('-s', '--source', help="Absolute paths to the codegen directory within icub-firmware-models")
     parser.add_argument('-d', '--destination', help="Absolute path to the model-based-design directory within icub-firmware (for a specific board)")
     parser.add_argument('-j', '--json_path', help="Absolute path to the directory containing the directories.json file")
 
     args = parser.parse_args()
     config = vars(args)
-
-    if not args.args:
-        parser.print_help()
-        return
 
     path_to_json = os.path.join(config['json_path'], "directories.json")
     path_to_src = config['source']
