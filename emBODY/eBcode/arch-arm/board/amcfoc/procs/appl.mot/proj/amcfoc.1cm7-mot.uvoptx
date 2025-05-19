@@ -1391,7 +1391,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\_sharedutils\const_params.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\sharedutils\const_params.cpp</PathWithFileName>
       <FilenameWithoutPath>const_params.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1403,7 +1403,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\_sharedutils\mul_s32_sat.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\sharedutils\mul_s32_sat.cpp</PathWithFileName>
       <FilenameWithoutPath>mul_s32_sat.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1415,7 +1415,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\_sharedutils\mul_wide_s32.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\sharedutils\mul_wide_s32.cpp</PathWithFileName>
       <FilenameWithoutPath>mul_wide_s32.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1427,7 +1427,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\_sharedutils\rt_hypotf.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\sharedutils\rt_hypotf.cpp</PathWithFileName>
       <FilenameWithoutPath>rt_hypotf.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1439,7 +1439,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\_sharedutils\rt_roundf.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\sharedutils\rt_roundf.cpp</PathWithFileName>
       <FilenameWithoutPath>rt_roundf.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1448,7 +1448,7 @@
 
   <Group>
     <GroupName>mbd</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1459,7 +1459,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\otherFiles\rtw_enable_disable_motors.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\sharedutils\rtw_enable_disable_motors.c</PathWithFileName>
       <FilenameWithoutPath>rtw_enable_disable_motors.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1471,7 +1471,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\otherFiles\rtw_motor_config.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\sharedutils\rtw_motor_config.c</PathWithFileName>
       <FilenameWithoutPath>rtw_motor_config.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1483,7 +1483,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\iterative_motion_controller_ert_rtw\iterative_motion_controller.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\iterative-motion-controller\iterative_motion_controller.cpp</PathWithFileName>
       <FilenameWithoutPath>iterative_motion_controller.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1492,7 +1492,7 @@
 
   <Group>
     <GroupName>mbd::supervisor</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1503,7 +1503,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\supervisor\supervisor.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\supervisor\supervisor.cpp</PathWithFileName>
       <FilenameWithoutPath>supervisor.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1512,7 +1512,7 @@
 
   <Group>
     <GroupName>mbd::supervisor-tx</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1523,7 +1523,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\SupervisorFSM_TX\SupervisorFSM_TX.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\supervisor-tx\SupervisorFSM_TX.cpp</PathWithFileName>
       <FilenameWithoutPath>SupervisorFSM_TX.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1532,7 +1532,7 @@
 
   <Group>
     <GroupName>mbd::control-outer</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1543,7 +1543,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\control_outer\control_outer.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\control-outer\control_outer.cpp</PathWithFileName>
       <FilenameWithoutPath>control_outer.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1552,7 +1552,7 @@
 
   <Group>
     <GroupName>mbd::control-foc</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1563,7 +1563,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\control_foc\control_foc.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\control-foc\control_foc.cpp</PathWithFileName>
       <FilenameWithoutPath>control_foc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1575,7 +1575,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\control_foc\FOCInnerLoop.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\control-foc\FOCInnerLoop.cpp</PathWithFileName>
       <FilenameWithoutPath>FOCInnerLoop.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1584,7 +1584,7 @@
 
   <Group>
     <GroupName>mbd::estimator-velocity</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1595,7 +1595,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\estimation_velocity\estimation_velocity.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\estimation-velocity\estimation_velocity.cpp</PathWithFileName>
       <FilenameWithoutPath>estimation_velocity.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1604,7 +1604,7 @@
 
   <Group>
     <GroupName>mbd::filter-current</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1615,7 +1615,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\filter_current\filter_current.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\filter-current\filter_current.cpp</PathWithFileName>
       <FilenameWithoutPath>filter_current.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1632,7 +1632,7 @@
 
   <Group>
     <GroupName>mbd::motion-controller</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1643,7 +1643,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\motion_controller\motion_controller.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\motion-controller\motion_controller.cpp</PathWithFileName>
       <FilenameWithoutPath>motion_controller.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1655,7 +1655,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\mbd\iterative_motion_controller\codegen\slprj\ert\motion_controller\motion_controller_data.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\mbd\amcfoc\motion-controller\motion_controller_data.cpp</PathWithFileName>
       <FilenameWithoutPath>motion_controller_data.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
