@@ -1,0 +1,119 @@
+{
+    "source_base_paths": 
+    [],
+    
+    "subdirectories_to_copy": [
+        {
+            "source_directory": "_sharedutils",
+            "source_directory_parent": "ert",
+            "target_directory": "sharedutils",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "iterative_motion_controller_ert_rtw",
+            "target_directory": "iterative-motion-controller",
+            "files": [
+                "iterative_motion_controller*.cpp",
+                "iterative_motion_controller*.h"
+            ],
+            "exclude": [
+                "ert_main.cpp",
+                "rtmodel.cpp",
+                "rtmodel.h"
+            ]
+        },
+        {
+            "source_directory": "can_decoder",
+            "source_directory_parent": "ert",
+            "target_directory": "can-decoder",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "can_encoder",
+            "source_directory_parent": "ert",
+            "target_directory": "can-encoder",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "control_foc",
+            "source_directory_parent": "ert",
+            "target_directory": "control-foc",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "control_outer",
+            "source_directory_parent": "ert",
+            "target_directory": "control-outer",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "estimation_velocity",
+            "source_directory_parent": "ert",
+            "target_directory": "estimator",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "filter_current",
+            "source_directory_parent": "ert",
+            "target_directory": "filter-current",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "supervisor",
+            "source_directory_parent": "ert",
+            "target_directory": "supervisor",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+		{
+            "source_directory": "motion_controller",
+            "source_directory_parent": "ert",
+            "target_directory": "motion-controller",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "SupervisorFSM_TX",
+            "source_directory_parent": "ert",
+            "target_directory": "supervisor-tx",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "src",
+            "source_directory_parent": "code_replacement",
+            "target_directory": "sharedutils",
+            "files": [
+                "*.c",
+                "*.h"
+            ]
+        }
+    ]
+}
