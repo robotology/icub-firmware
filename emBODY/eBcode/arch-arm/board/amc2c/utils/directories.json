@@ -10,25 +10,29 @@
             ]
         },
         {
-            "source_directory": "motion_controller",
+            "source_directory": "AMC_BLDC_ert_rtw",
+            "target_directory": "amc-bldc",
+            "files": [
+                "AMC*.cpp",
+                "AMC*.h"
+            ]
+        },
+        {
+            "source_directory": "can_decoder",
             "source_directory_parent": "ert",
-            "target_directory": "motion-controller",
+            "target_directory": "can-decoder",
             "files": [
                 "*.cpp",
                 "*.h"
             ]
         },
         {
-            "source_directory": "iterative_motion_controller",
-            "target_directory": "iterative-motion-controller",
+            "source_directory": "can_encoder",
+            "source_directory_parent": "ert",
+            "target_directory": "can-encoder",
             "files": [
-                "iterative*.cpp",
-                "iterative*.h"
-            ],
-            "exclude": [
-                "ert_main.cpp",
-                "rtmodel.cpp",
-                "rtmodel.h"
+                "*.cpp",
+                "*.h"
             ]
         },
         {
@@ -52,7 +56,7 @@
         {
             "source_directory": "estimation_velocity",
             "source_directory_parent": "ert",
-            "target_directory": "estimation-velocity",
+            "target_directory": "estimator",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -68,9 +72,9 @@
             ]
         },
         {
-            "source_directory": "supervisor",
+            "source_directory": "SupervisorFSM_RX",
             "source_directory_parent": "ert",
-            "target_directory": "supervisor",
+            "target_directory": "supervisor-rx",
             "files": [
                 "*.cpp",
                 "*.h"
