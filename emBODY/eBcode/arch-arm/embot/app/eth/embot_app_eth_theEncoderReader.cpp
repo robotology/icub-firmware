@@ -19,6 +19,7 @@
 
 #include "embot_hw_encoder.h"
 #include "EOtheErrorManager.h"
+#include "embot_app_eth_theErrorManager.h"
 #include "EoProtocol.h"
 #include "EoMotionControl.h"
 #include "EoError.h"
@@ -26,6 +27,8 @@
 
 #include "embot_app_eth_theServices.h"
 #include "embot_app_eth_Service_legacy.h"
+
+#include "embot_os_theScheduler.h"
 
 #if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)   
 #include "embot_app_eth_theBackdoor.h"
@@ -215,6 +218,17 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     
     constexpr bool verificationisOK {true};
     
+    static uint8_t ii=0;
+    if(ii==0)
+    {
+        ii++;
+    }
+    else if(ii==1)
+    {
+        ii++;
+    }
+        
+    
     if(true == activateafterverify)
     {
         Activate(config);        
@@ -247,7 +261,11 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 
 bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 {
-//    eo_errman_Trace(eo_errman_GetHandle(), "::Activate()", s_eobj_ownname);
+    
+    embot::app::eth::theErrorManager::getInstance().trace("", {"",     
+                          embot::os::theScheduler::getInstance().scheduled()}); 
+    
+    eo_errman_Trace(eo_errman_GetHandle(), "::Activate()", s_eobj_ownname);
     bool ret {true};
     
     if((nullptr == config.carrayofjomodes))
@@ -271,7 +289,7 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
    
     // 1. prepare the config
     _implconfig.numofjomos = eo_constarray_Size(carray);
-    
+    embot::core::print("theEncoderReader: number of jomos " + std::to_string(_implconfig.numofjomos));
     for(uint8_t i=0; i<_implconfig.numofjomos; i++)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
@@ -299,10 +317,28 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
                 {
                     cfg.type = embot::hw::encoder::Type::chipMB049;
                 } break;
+                case eomc_enc_unknown:
+                case eomc_enc_none:
+                {
+                    //no encoder
+                    embot::core::print("theEncoderReader: encoder none");
+                    ret = false;
+                } break;
                 
                 default:
                 {
                     // unsupported encoder
+                    embot::core::print("theEncoderReader: encoder type not supported");
+                    embot::core::print(std::to_string(i) +" enc type: "+ std::to_string(_implconfig.jomo_cfg[i].encoder1des.type));
+                    // in some cases, we need to alert the pc104 that the board does not support this service
+                    eOerrmanDescriptor_t errdes = {};
+                    errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_notsupported);  
+                    errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress = 0;
+                    errdes.par16 = errdes.par64 = 0;
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+                              
+                    #warning: to do send to yarp unsupported encoder, and block yarp?
                     ret = false;
                 } break;
             }
@@ -313,6 +349,8 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
             embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
             if(embot::hw::resOK != r)
             {
+                embot::core::print("theEncoderReader: encoder init failed");
+                #warning: to do send to yarp init failed encoder
                 ret = false;
             }
             
@@ -331,8 +369,11 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 
 bool embot::app::eth::theEncoderReader::Impl::Deactivate()
 {
-//    eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
-    
+    eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
+//    
+//    embot::app::eth::theErrorManager::getInstance().trace("", {"",     
+//                              embot::os::theScheduler::getInstance().scheduled()}); 
+//    
     _implconfig.numofjomos = 0;
     embot::hw::encoder::deinit(embot::hw::ENCODER::one);
     embot::hw::encoder::deinit(embot::hw::ENCODER::two);
