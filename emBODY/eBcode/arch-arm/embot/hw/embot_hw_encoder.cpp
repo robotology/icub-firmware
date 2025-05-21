@@ -148,10 +148,14 @@ namespace embot::hw::encoder {
                         } 
             );
         }
+        else if(embot::hw::encoder::Type::none == cfg.type)
+        {
+            #warning, verify if this is necessary
+        }
         else
         {
             //this error message is onl for debugging on keil
-            embot::core::print("encoder type not supported");
+            embot::core::print("hw_encoder:encoder type not supported");
             return resNOK;
         }
         
