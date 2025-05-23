@@ -85,6 +85,8 @@ namespace embot { namespace hw { namespace gpio {
     result_t init(const embot::hw::GPIO &g, const Config &config);
     result_t deinit(const embot::hw::GPIO &g);
     
+    result_t clockenable(const embot::hw::GPIO &g);
+    
     result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s);
     
     result_t set(const embot::hw::GPIO &g, State s);

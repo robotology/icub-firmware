@@ -69,6 +69,7 @@ namespace embot { namespace hw { namespace gpio {
 
 namespace embot::hw::gpio::DRIVER {    
     // these depend on the hal layer beneath
+    bool _clockenable(const embot::hw::gpio::PROP &gg);
     bool _configure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, Mode m, Pull p, Speed s);   
     bool _deconfigure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg);      
     bool _set(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, State s);
@@ -118,6 +119,21 @@ namespace embot::hw::gpio {
         return resOK;
     }
 
+
+    result_t clockenable(const embot::hw::GPIO &g)
+    { 
+        result_t r {resNOK};
+        embot::hw::gpio::PROP gg = embot::hw::gpio::getBSP().getPROP(g);    
+        if(!gg.isvalid())
+        {
+            return resNOK;
+        }            
+        if(true == embot::hw::gpio::DRIVER::_clockenable(gg))
+        {
+            r = resOK;
+        }
+        return r;
+    }  
     
     result_t configure(const embot::hw::GPIO &g, Mode m, Pull p, Speed s)
     { 
@@ -224,7 +240,12 @@ namespace embot::hw::gpio::DRIVER {
         
         return _map2stm32speed[embot::core::tointegral(s)];
     }
-        
+
+    bool _clockenable(const embot::hw::gpio::PROP &gg)
+    {
+        gg.clockenable();
+        return true;       
+    }      
    
     bool _configure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, Mode m, Pull p, Speed s)
     {
@@ -302,6 +323,11 @@ namespace embot::hw::gpio::DRIVER {
         }
         
     }    
+
+    bool _clockenable(const embot::hw::gpio::PROP &gg)
+    {
+        return true;
+    }
     
     bool _configure(const embot::hw::GPIO &g, const embot::hw::gpio::PROP &gg, Mode m, Pull p, Speed s)
     {

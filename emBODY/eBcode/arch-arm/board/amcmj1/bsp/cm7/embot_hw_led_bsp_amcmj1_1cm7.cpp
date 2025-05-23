@@ -74,7 +74,7 @@ namespace embot::hw::led {
         ,        
         // properties
         {{
-            &pled4, &pled5, &pled6,
+            &pled3, &pled4, &pled5,
             nullptr, nullptr, nullptr, nullptr, nullptr         
         }}        
     };

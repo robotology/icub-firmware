@@ -67,7 +67,18 @@ namespace embot::hw::led {
 
 namespace embot::hw::led {         
     
-    
+#if defined(STM32HAL_BOARD_AMCMJ1_1CM7)    
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) | mask::pos2mask<uint32_t>(LED::three) 
+        ,        
+        // properties
+        {{
+            &pled3red, &pled4green, &pled5blue,
+            nullptr, nullptr, nullptr, nullptr, nullptr         
+        }}        
+    };
+#elif defined(STM32HAL_BOARD_AMCMJ1_2CM4)
     constexpr BSP thebsp {        
         // maskofsupported
         mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) 
@@ -78,6 +89,7 @@ namespace embot::hw::led {
             nullptr, nullptr, nullptr, nullptr, nullptr, nullptr         
         }}        
     };
+#endif
     
     void BSP::init(embot::hw::LED h) const 
     {
@@ -85,7 +97,7 @@ namespace embot::hw::led {
         
         // init the gpio
         embot::hw::gpio::getBSP().getPROP(g).clockenable();
-        embot::hw::gpio::configure(g, embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::low);                        
+        embot::hw::gpio::configure(g, embot::hw::gpio::Mode::OUTPUTpushpull, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::low);         
     } 
 
     const BSP& getBSP() 
