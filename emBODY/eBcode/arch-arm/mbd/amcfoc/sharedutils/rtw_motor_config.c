@@ -21,7 +21,7 @@
 #include "embot_hw_motor_bldc.h"
 #endif
 
-void rtw_configMotor(uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t pole_pairs,
+void rtw_configMotor(uint8_t motor_id, uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t pole_pairs,
                      uint8_t has_hall_sens, uint8_t swapBC,
                      uint16_t hall_sens_offset)
 {
@@ -33,9 +33,7 @@ void rtw_configMotor(uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t
         (0 == has_hall_sens) ? false : true, 
         (0 == swapBC) ? false : true 
     };
-    embot::hw::motor::bldc::configure(embot::hw::MOTOR::one, cfg);
+    embot::hw::motor::bldc::configure(static_cast<embot::hw::MOTOR>(motor_id), cfg);
     
-    #warning ATTENZIONE: rtw_configMotor() deve avere info su quale motore usiamo
-
 #endif
 }

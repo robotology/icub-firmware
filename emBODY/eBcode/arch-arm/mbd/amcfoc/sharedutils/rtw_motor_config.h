@@ -27,7 +27,7 @@
 /*inizialize the motor encoder using the data read in the configuration files (yarprobotinterface) 
 swapBC = 1
 hall_sens_offset = 120 *65536/360 ; icubDeg*/
-void rtw_configMotor(uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t pole_pairs,
+void rtw_configMotor(uint8_t motor_id, uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t pole_pairs,
                      uint8_t has_hall_sens, uint8_t swapBC,
                      uint16_t hall_sens_offset);
 

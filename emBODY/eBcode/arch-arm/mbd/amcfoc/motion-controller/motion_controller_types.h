@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 3.12
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Thu Oct 10 12:24:40 2024
+// Model version                  : 4.6
+// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
+// C/C++ source code generated on : Fri May 23 10:49:34 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -214,6 +214,7 @@ struct EstimationConfiguration
   real32_T environment_temperature;
   real32_T current_rms_lambda;
   EstimationVelocityModes velocity_est_mode;
+  uint32_T velocity_est_window;
 };
 
 #endif
@@ -312,35 +313,6 @@ struct ReceivedEvents
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
-#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
-
-struct ControlOuterOutputs
-{
-  boolean_T vel_en;
-  boolean_T cur_en;
-  boolean_T out_en;
-  boolean_T pid_reset;
-  real32_T motorcurrent;
-  real32_T current_limiter;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_FOCSlowInputs_
-#define DEFINED_TYPEDEF_FOR_FOCSlowInputs_
-
-struct FOCSlowInputs
-{
-  GlobalConfiguration global_configuration;
-  ActuatorConfiguration actuator_configuration;
-  EstimatedData estimated_data;
-  Targets targets;
-  ControlOuterOutputs control_outer_outputs;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
 #define DEFINED_TYPEDEF_FOR_FOCOutputs_
 
@@ -388,6 +360,35 @@ struct Flags
 
   // control mode
   ControlModes control_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+
+struct ControlOuterOutputs
+{
+  boolean_T vel_en;
+  boolean_T cur_en;
+  boolean_T out_en;
+  boolean_T pid_reset;
+  real32_T motorcurrent;
+  real32_T current_limiter;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+#define DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+
+struct FOCSlowInputs
+{
+  GlobalConfiguration global_configuration;
+  ActuatorConfiguration actuator_configuration;
+  EstimatedData estimated_data;
+  Targets targets;
+  ControlOuterOutputs control_outer_outputs;
 };
 
 #endif

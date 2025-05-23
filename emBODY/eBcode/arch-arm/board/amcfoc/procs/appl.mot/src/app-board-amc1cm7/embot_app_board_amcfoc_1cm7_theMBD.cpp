@@ -1214,12 +1214,12 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
 //        _items[embot::core::tointegral(m)].pwm.w = w;
 
         // vwu -> il motore del lego setup gira con questa configurazione
-        _items[embot::core::tointegral(m)].pwm.u = v;
-        _items[embot::core::tointegral(m)].pwm.v = w;
-        _items[embot::core::tointegral(m)].pwm.w = u;
-        
-        if(m == embot::hw::MOTOR::one)
-        {
+//        _items[embot::core::tointegral(m)].pwm.u = v;
+//        _items[embot::core::tointegral(m)].pwm.v = w;
+//        _items[embot::core::tointegral(m)].pwm.w = u;
+//        
+//        if(m == embot::hw::MOTOR::one)
+//        {
             pwm1 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.u);
             pwm2 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.v);
             pwm3 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.w);
@@ -1227,7 +1227,7 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
             CU1 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.u);
             CU2 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.v);
             CU3 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.w);
-        }
+//        }
         
         embot::hw::motor::bldc::set(m, _items[embot::core::tointegral(m)].pwm);        
     }

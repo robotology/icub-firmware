@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 2.54
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Thu Oct 10 13:02:35 2024
+// Model version                  : 3.14
+// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
+// C/C++ source code generated on : Fri May 23 10:49:48 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -24,15 +24,6 @@
 #include "motion_controller.h"
 #include "rtw_defines.h"
 #include "zero_crossing_types.h"
-
-// Macros for accessing real-time model data structure
-#ifndef rtmStepTask
-#define rtmStepTask(rtm, idx)          ((rtm)->Timing.TaskCounters.TID[(idx)] == 0)
-#endif
-
-#ifndef rtmTaskCounter
-#define rtmTaskCounter(rtm, idx)       ((rtm)->Timing.TaskCounters.TID[(idx)])
-#endif
 
 // Block signals and states (default storage) for system '<Root>/Iterative Motion Controller' 
 struct DW_CoreSubsys_iterative_motion_controller_T {
@@ -92,8 +83,13 @@ struct tag_RTM_iterative_motion_controller_T {
   struct {
     struct {
       uint32_T TID[3];
+      uint32_T cLimit[3];
     } TaskCounters;
   } Timing;
+
+  boolean_T StepTask(int32_T idx) const;
+  uint32_T &CounterLimit(int32_T idx);
+  uint32_T &TaskCounter(int32_T idx);
 };
 
 // Block signals and states (default storage)
@@ -152,9 +148,9 @@ extern "C"
 
   // Model entry point functions
   extern void AMCFOC_initialize(void);
-  extern void AMCFOC_step_Time_0(void);
-  extern void AMCFOC_step_FOC(void);
-  extern void AMCFOC_step_Time_1ms(void);
+  extern void AMCFOC_step_Time_base(void);// Sample time: [5.0E-6s, 0.0s]
+  extern void AMCFOC_step_FOC(void);   // Sample time: [4.5E-5s, 0.0s]
+  extern void AMCFOC_step_Time_1ms(void);// Sample time: [0.001s, 0.0s]
   extern void AMCFOC_terminate(void);
 
 #ifdef __cplusplus

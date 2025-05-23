@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 7.3
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Thu Oct 10 12:24:13 2024
+// Model version                  : 8.11
+// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
+// C/C++ source code generated on : Fri May 23 10:48:53 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -17,8 +17,8 @@
 // Validation result: Not run
 //
 #include "estimation_velocity.h"
-#include "estimation_velocity_types.h"
 #include "rtwtypes.h"
+#include "estimation_velocity_types.h"
 #include <cmath>
 #include <cstring>
 #include "rt_hypotf.h"
@@ -38,7 +38,7 @@ static real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32],
 {
   real32_T y;
 
-  // Start for MATLABSystem: '<S1>/QR Solver'
+  // Start for MATLABSystem: '<S4>/QR Solver'
   y = 0.0F;
   if (n >= 1) {
     if (n == 1) {
@@ -67,7 +67,7 @@ static real32_T estimation_velocity_xnrm2(int32_T n, const real32_T x[32],
     }
   }
 
-  // End of Start for MATLABSystem: '<S1>/QR Solver'
+  // End of Start for MATLABSystem: '<S4>/QR Solver'
   return y;
 }
 
@@ -94,11 +94,11 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
   real32_T t;
   jpvt[0] = 1;
 
-  // Start for MATLABSystem: '<S1>/QR Solver'
+  // Start for MATLABSystem: '<S4>/QR Solver'
   tau[0] = 0.0F;
   jpvt[1] = 2;
 
-  // Start for MATLABSystem: '<S1>/QR Solver'
+  // Start for MATLABSystem: '<S4>/QR Solver'
   tau[1] = 0.0F;
   std::memcpy(&b_A[0], &A[0], sizeof(real32_T) << 5U);
   work[0] = 0.0F;
@@ -324,7 +324,7 @@ static void estimation_velocity_xgeqp3(const real32_T A[32], real32_T b_A[32],
 static void estimation_velocity_xtrsm(int32_T m, const real32_T A[32], real32_T
   B[2])
 {
-  // Start for MATLABSystem: '<S1>/QR Solver'
+  // Start for MATLABSystem: '<S4>/QR Solver'
   for (int32_T k = m; k >= 1; k--) {
     int32_T kAcol;
     real32_T B_0;
@@ -340,7 +340,7 @@ static void estimation_velocity_xtrsm(int32_T m, const real32_T A[32], real32_T
     }
   }
 
-  // End of Start for MATLABSystem: '<S1>/QR Solver'
+  // End of Start for MATLABSystem: '<S4>/QR Solver'
 }
 
 static real32_T estimation_velocity_xnrm2_p(int32_T n, const real32_T x[32],
@@ -348,7 +348,7 @@ static real32_T estimation_velocity_xnrm2_p(int32_T n, const real32_T x[32],
 {
   real32_T y;
 
-  // Start for MATLABSystem: '<S1>/QR Solver'
+  // Start for MATLABSystem: '<S4>/QR Solver'
   y = 0.0F;
   if (n >= 1) {
     if (n == 1) {
@@ -377,27 +377,30 @@ static real32_T estimation_velocity_xnrm2_p(int32_T n, const real32_T x[32],
     }
   }
 
-  // End of Start for MATLABSystem: '<S1>/QR Solver'
+  // End of Start for MATLABSystem: '<S4>/QR Solver'
   return y;
 }
 
 // System initialize for referenced model: 'estimation_velocity'
 void estimation_velocity_Init(DW_estimation_velocity_f_T *localDW)
 {
-  // Start for MATLABSystem: '<S1>/QR Solver'
+  // SystemInitialize for IfAction SubSystem: '<Root>/If Action Subsystem1'
+  // Start for MATLABSystem: '<S4>/QR Solver'
   localDW->objisempty = true;
   localDW->obj.isInitialized = 1;
+
+  // End of SystemInitialize for SubSystem: '<Root>/If Action Subsystem1'
 }
 
 // Output and update for referenced model: 'estimation_velocity'
 void estimation_velocity(const EstimationVelocityModes *rtu_EstimationConfig,
-  const real32_T *rtu_position, real32_T *rty_EstimatedVelocity,
-  DW_estimation_velocity_f_T *localDW)
+  const real32_T *rtu_position, const uint32_T *rtu_estwindow, real32_T
+  *rty_EstimatedVelocity, DW_estimation_velocity_f_T *localDW)
 {
   int32_T jpvt[2];
   int32_T cbeg_tmp;
   int32_T d;
-  int32_T i;
+  int32_T delayLen;
   int32_T ia0;
   int32_T k;
   int32_T knt;
@@ -408,196 +411,240 @@ void estimation_velocity(const EstimationVelocityModes *rtu_EstimationConfig,
   real32_T work[2];
   real32_T b_A_0;
   real32_T beta1;
-  real32_T wj;
+  real32_T rtb_Delay;
+  uint32_T tmp;
 
-  // S-Function (sdspsreg2): '<Root>/Delay Line'
-  for (k = 0; k < 15 - localDW->DelayLine_BUFF_OFFSET; k++) {
-    rtb_DelayLine[k] = localDW->DelayLine_Buff[localDW->DelayLine_BUFF_OFFSET +
-      k];
-  }
-
-  for (k = 0; k < localDW->DelayLine_BUFF_OFFSET; k++) {
-    rtb_DelayLine[(k - localDW->DelayLine_BUFF_OFFSET) + 15] =
-      localDW->DelayLine_Buff[k];
-  }
-
-  rtb_DelayLine[15] = *rtu_position;
-
-  // End of S-Function (sdspsreg2): '<Root>/Delay Line'
-
-  // MATLABSystem: '<S1>/QR Solver' incorporates:
+  // SwitchCase: '<Root>/Switch Case' incorporates:
   //   Constant: '<S1>/Constant'
+  //   MATLABSystem: '<S4>/QR Solver'
 
-  estimation_velocity_xgeqp3(rtCP_Constant_Value_c, b_A, work, jpvt);
-  for (rank = 0; rank < 2; rank++) {
-    if (work[rank] != 0.0F) {
-      wj = rtb_DelayLine[rank];
-      for (i = rank + 2; i < 17; i++) {
-        wj += b_A[((rank << 4) + i) - 1] * rtb_DelayLine[i - 1];
-      }
+  switch (*rtu_EstimationConfig) {
+   case EstimationVelocityModes_Disabled:
+    // Outputs for IfAction SubSystem: '<Root>/If Action Subsystem' incorporates:
+    //   ActionPort: '<S1>/Action Port'
 
-      wj *= work[rank];
-      if (wj != 0.0F) {
-        rtb_DelayLine[rank] -= wj;
-        for (i = rank + 2; i < 17; i++) {
-          rtb_DelayLine[i - 1] -= b_A[((rank << 4) + i) - 1] * wj;
+    *rty_EstimatedVelocity = 0.0F;
+
+    // End of Outputs for SubSystem: '<Root>/If Action Subsystem'
+    break;
+
+   case EstimationVelocityModes_LeastSquares:
+    // Outputs for IfAction SubSystem: '<Root>/If Action Subsystem1' incorporates:
+    //   ActionPort: '<S2>/Action Port'
+
+    // S-Function (sdspsreg2): '<S2>/Delay Line'
+    for (k = 0; k < 15 - localDW->DelayLine_BUFF_OFFSET; k++) {
+      rtb_DelayLine[k] = localDW->DelayLine_Buff[localDW->DelayLine_BUFF_OFFSET
+        + k];
+    }
+
+    for (k = 0; k < localDW->DelayLine_BUFF_OFFSET; k++) {
+      rtb_DelayLine[(k - localDW->DelayLine_BUFF_OFFSET) + 15] =
+        localDW->DelayLine_Buff[k];
+    }
+
+    rtb_DelayLine[15] = *rtu_position;
+
+    // End of S-Function (sdspsreg2): '<S2>/Delay Line'
+
+    // MATLABSystem: '<S4>/QR Solver' incorporates:
+    //   Constant: '<S4>/Constant'
+
+    estimation_velocity_xgeqp3(rtCP_Constant_Value_c, b_A, work, jpvt);
+    for (rank = 0; rank < 2; rank++) {
+      if (work[rank] != 0.0F) {
+        rtb_Delay = rtb_DelayLine[rank];
+        for (delayLen = rank + 2; delayLen < 17; delayLen++) {
+          rtb_Delay += b_A[((rank << 4) + delayLen) - 1] *
+            rtb_DelayLine[delayLen - 1];
+        }
+
+        rtb_Delay *= work[rank];
+        if (rtb_Delay != 0.0F) {
+          rtb_DelayLine[rank] -= rtb_Delay;
+          for (delayLen = rank + 2; delayLen < 17; delayLen++) {
+            rtb_DelayLine[delayLen - 1] -= b_A[((rank << 4) + delayLen) - 1] *
+              rtb_Delay;
+          }
         }
       }
     }
-  }
 
-  rank = 0;
-  wj = 1.90734863E-6F * std::abs(b_A[0]);
-  while ((rank < 2) && (std::abs(b_A[(rank << 4) + rank]) > wj)) {
-    rank++;
-  }
+    rank = 0;
+    rtb_Delay = 1.90734863E-6F * std::abs(b_A[0]);
+    while ((rank < 2) && (std::abs(b_A[(rank << 4) + rank]) > rtb_Delay)) {
+      rank++;
+    }
 
-  rtb_QRSolver_0[0] = 0.0F;
-  rtb_QRSolver_0[1] = 0.0F;
-  if (rank - 1 >= 0) {
-    std::memcpy(&rtb_QRSolver_0[0], &rtb_DelayLine[0], static_cast<uint32_T>
-                (rank) * sizeof(real32_T));
-  }
+    rtb_QRSolver_0[0] = 0.0F;
+    rtb_QRSolver_0[1] = 0.0F;
+    if (rank - 1 >= 0) {
+      std::memcpy(&rtb_QRSolver_0[0], &rtb_DelayLine[0], static_cast<uint32_T>
+                  (rank) * sizeof(real32_T));
+    }
 
-  if (rank < 2) {
-    work[0] = 0.0F;
-    if (rank != 0) {
-      for (i = 1; i >= 1; i--) {
-        wj = b_A[0];
-        work[0] = 0.0F;
-        beta1 = estimation_velocity_xnrm2_p(1, b_A, 17);
-        if (beta1 != 0.0F) {
-          beta1 = rt_hypotf(b_A[0], beta1);
-          if (b_A[0] >= 0.0F) {
-            beta1 = -beta1;
-          }
-
-          if (std::abs(beta1) < 9.86076132E-32F) {
-            knt = -1;
-            do {
-              knt++;
-              b_A_0 = b_A[16];
-              for (k = 17; k <= 17; k += 16) {
-                b_A_0 *= 1.01412048E+31F;
-              }
-
-              b_A[16] = b_A_0;
-              beta1 *= 1.01412048E+31F;
-              wj *= 1.01412048E+31F;
-            } while ((std::abs(beta1) < 9.86076132E-32F) && (knt + 1 < 20));
-
-            beta1 = rt_hypotf(wj, estimation_velocity_xnrm2_p(1, b_A, 17));
-            if (wj >= 0.0F) {
+    // MATLABSystem: '<S4>/QR Solver'
+    if (rank < 2) {
+      work[0] = 0.0F;
+      if (rank != 0) {
+        for (delayLen = 1; delayLen >= 1; delayLen--) {
+          rtb_Delay = b_A[0];
+          work[0] = 0.0F;
+          beta1 = estimation_velocity_xnrm2_p(1, b_A, 17);
+          if (beta1 != 0.0F) {
+            beta1 = rt_hypotf(b_A[0], beta1);
+            if (b_A[0] >= 0.0F) {
               beta1 = -beta1;
             }
 
-            work[0] = (beta1 - wj) / beta1;
-            wj = 1.0F / (wj - beta1);
-            for (k = 17; k <= 17; k += 16) {
-              b_A_0 *= wj;
-            }
+            if (std::abs(beta1) < 9.86076132E-32F) {
+              knt = -1;
+              do {
+                knt++;
+                b_A_0 = b_A[16];
+                for (k = 17; k <= 17; k += 16) {
+                  b_A_0 *= 1.01412048E+31F;
+                }
 
-            b_A[16] = b_A_0;
-            for (k = 0; k <= knt; k++) {
-              beta1 *= 9.86076132E-32F;
-            }
+                b_A[16] = b_A_0;
+                beta1 *= 1.01412048E+31F;
+                rtb_Delay *= 1.01412048E+31F;
+              } while ((std::abs(beta1) < 9.86076132E-32F) && (knt + 1 < 20));
 
-            wj = beta1;
-          } else {
-            work[0] = (beta1 - b_A[0]) / beta1;
-            wj = 1.0F / (b_A[0] - beta1);
-            b_A_0 = b_A[16];
-            for (k = 17; k <= 17; k += 16) {
-              b_A_0 *= wj;
-            }
+              beta1 = rt_hypotf(rtb_Delay, estimation_velocity_xnrm2_p(1, b_A,
+                17));
+              if (rtb_Delay >= 0.0F) {
+                beta1 = -beta1;
+              }
 
-            b_A[16] = b_A_0;
-            wj = beta1;
-          }
-        }
+              work[0] = (beta1 - rtb_Delay) / beta1;
+              rtb_Delay = 1.0F / (rtb_Delay - beta1);
+              for (k = 17; k <= 17; k += 16) {
+                b_A_0 *= rtb_Delay;
+              }
 
-        b_A[0] = wj;
-      }
-    }
+              b_A[16] = b_A_0;
+              for (k = 0; k <= knt; k++) {
+                beta1 *= 9.86076132E-32F;
+              }
 
-    estimation_velocity_xtrsm(rank, b_A, rtb_QRSolver_0);
-    for (i = 0; i < rank; i++) {
-      ia0 = (rank << 4) + 1;
-      if (work[0] != 0.0F) {
-        wj = rtb_QRSolver_0[0];
-        cbeg_tmp = rank + 1;
-        for (k = cbeg_tmp; k <= cbeg_tmp; k += 2) {
-          beta1 = 0.0F;
-          d = k - rank;
-          for (knt = k; knt <= d + 1; knt++) {
-            beta1 += b_A[(((knt - k) << 4) + ia0) - 1] * rtb_QRSolver_0[knt - 1];
-          }
+              rtb_Delay = beta1;
+            } else {
+              work[0] = (beta1 - b_A[0]) / beta1;
+              rtb_Delay = 1.0F / (b_A[0] - beta1);
+              b_A_0 = b_A[16];
+              for (k = 17; k <= 17; k += 16) {
+                b_A_0 *= rtb_Delay;
+              }
 
-          wj += beta1;
-        }
-
-        if (-work[0] != 0.0F) {
-          beta1 = -work[0] * wj;
-          rtb_QRSolver_0[0] += beta1;
-          if (wj != 0.0F) {
-            for (k = cbeg_tmp; k < 3; k++) {
-              rtb_QRSolver_0[k - 1] += b_A[((((k - rank) - 1) << 4) + ia0) - 1] *
-                beta1;
+              b_A[16] = b_A_0;
+              rtb_Delay = beta1;
             }
           }
+
+          b_A[0] = rtb_Delay;
         }
       }
+
+      estimation_velocity_xtrsm(rank, b_A, rtb_QRSolver_0);
+      for (delayLen = 0; delayLen < rank; delayLen++) {
+        ia0 = (rank << 4) + 1;
+        if (work[0] != 0.0F) {
+          rtb_Delay = rtb_QRSolver_0[0];
+          cbeg_tmp = rank + 1;
+          for (k = cbeg_tmp; k <= cbeg_tmp; k += 2) {
+            beta1 = 0.0F;
+            d = k - rank;
+            for (knt = k; knt <= d + 1; knt++) {
+              beta1 += b_A[(((knt - k) << 4) + ia0) - 1] * rtb_QRSolver_0[knt -
+                1];
+            }
+
+            rtb_Delay += beta1;
+          }
+
+          if (-work[0] != 0.0F) {
+            beta1 = -work[0] * rtb_Delay;
+            rtb_QRSolver_0[0] += beta1;
+            if (rtb_Delay != 0.0F) {
+              for (k = cbeg_tmp; k < 3; k++) {
+                rtb_QRSolver_0[k - 1] += b_A[((((k - rank) - 1) << 4) + ia0) - 1]
+                  * beta1;
+              }
+            }
+          }
+        }
+      }
+    } else {
+      estimation_velocity_xtrsm(2, b_A, rtb_QRSolver_0);
     }
-  } else {
-    estimation_velocity_xtrsm(2, b_A, rtb_QRSolver_0);
-  }
 
-  work[jpvt[0] - 1] = rtb_QRSolver_0[0];
-  work[jpvt[1] - 1] = rtb_QRSolver_0[1];
+    work[jpvt[0] - 1] = rtb_QRSolver_0[0];
+    work[jpvt[1] - 1] = rtb_QRSolver_0[1];
 
-  // MultiPortSwitch: '<Root>/Index Vector' incorporates:
-  //   Constant: '<Root>/Constant'
-  //   Gain: '<Root>/Gain'
-  //   MATLABSystem: '<S1>/QR Solver'
-  //
-  switch (*rtu_EstimationConfig) {
-   case EstimationVelocityModes_Disabled:
-    *rty_EstimatedVelocity = 0.0F;
-    break;
+    // SignalConversion generated from: '<S2>/Out1' incorporates:
+    //   MATLABSystem: '<S4>/QR Solver'
+    //
+    *rty_EstimatedVelocity = work[0];
 
-   case EstimationVelocityModes_MovingAverage:
-    // Sum: '<Root>/Sum' incorporates:
-    //   Delay: '<Root>/Delay'
+    // Update for S-Function (sdspsreg2): '<S2>/Delay Line'
+    localDW->DelayLine_Buff[localDW->DelayLine_BUFF_OFFSET] = *rtu_position;
+    localDW->DelayLine_BUFF_OFFSET++;
+    while (localDW->DelayLine_BUFF_OFFSET >= 15) {
+      localDW->DelayLine_BUFF_OFFSET -= 15;
+    }
 
-    wj = *rtu_position - localDW->Delay_DSTATE[localDW->CircBufIdx];
-    *rty_EstimatedVelocity = 62.5F * wj;
+    // End of Update for S-Function (sdspsreg2): '<S2>/Delay Line'
+    // End of Outputs for SubSystem: '<Root>/If Action Subsystem1'
     break;
 
    default:
-    *rty_EstimatedVelocity = work[0];
+    // Outputs for IfAction SubSystem: '<Root>/If Action Subsystem2' incorporates:
+    //   ActionPort: '<S3>/Action Port'
+
+    // Delay: '<S3>/Delay'
+    if (*rtu_estwindow <= 0U) {
+      rtb_Delay = *rtu_position;
+    } else {
+      if (*rtu_estwindow > 100U) {
+        delayLen = 100;
+      } else {
+        delayLen = static_cast<int32_T>(*rtu_estwindow);
+      }
+
+      if (static_cast<uint32_T>(delayLen) <= localDW->CircBufIdx) {
+        tmp = localDW->CircBufIdx - static_cast<uint32_T>(delayLen);
+      } else {
+        tmp = (localDW->CircBufIdx - static_cast<uint32_T>(delayLen)) + 100U;
+      }
+
+      rtb_Delay = localDW->Delay_DSTATE[tmp];
+    }
+
+    // End of Delay: '<S3>/Delay'
+
+    // Gain: '<S3>/Gain' incorporates:
+    //   DataTypeConversion: '<S3>/Cast To Single'
+    //   Product: '<S3>/Divide'
+    //   Sum: '<S3>/Sum'
+
+    *rty_EstimatedVelocity = (*rtu_position - rtb_Delay) / static_cast<real32_T>
+      (*rtu_estwindow) * 1000.0F;
+
+    // Update for Delay: '<S3>/Delay'
+    localDW->Delay_DSTATE[localDW->CircBufIdx] = *rtu_position;
+    if (localDW->CircBufIdx < 99U) {
+      localDW->CircBufIdx++;
+    } else {
+      localDW->CircBufIdx = 0U;
+    }
+
+    // End of Update for Delay: '<S3>/Delay'
+    // End of Outputs for SubSystem: '<Root>/If Action Subsystem2'
     break;
   }
 
-  // End of MultiPortSwitch: '<Root>/Index Vector'
-
-  // Update for S-Function (sdspsreg2): '<Root>/Delay Line'
-  localDW->DelayLine_Buff[localDW->DelayLine_BUFF_OFFSET] = *rtu_position;
-  localDW->DelayLine_BUFF_OFFSET++;
-  while (localDW->DelayLine_BUFF_OFFSET >= 15) {
-    localDW->DelayLine_BUFF_OFFSET -= 15;
-  }
-
-  // End of Update for S-Function (sdspsreg2): '<Root>/Delay Line'
-
-  // Update for Delay: '<Root>/Delay'
-  localDW->Delay_DSTATE[localDW->CircBufIdx] = *rtu_position;
-  if (localDW->CircBufIdx < 15U) {
-    localDW->CircBufIdx++;
-  } else {
-    localDW->CircBufIdx = 0U;
-  }
-
-  // End of Update for Delay: '<Root>/Delay'
+  // End of SwitchCase: '<Root>/Switch Case'
 }
 
 //

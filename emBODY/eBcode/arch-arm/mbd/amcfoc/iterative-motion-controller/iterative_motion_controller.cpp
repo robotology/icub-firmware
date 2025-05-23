@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 2.54
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Thu Oct 10 13:02:35 2024
+// Model version                  : 3.14
+// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
+// C/C++ source code generated on : Fri May 23 10:49:48 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -29,14 +29,14 @@
 // Exported block parameters
 ActuatorConfiguration AmcfocInitConf[2] = { {
     {
-      1000.0F,
+      60000.0F,
       1.0F,
       2.0F,
       3.0F,
       32000U,
       60.0F
     },
- 
+
     {
       {
         ControlModes_Current,
@@ -50,7 +50,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         0.0F,
         0U
       },
- 
+
       {
         ControlModes_Velocity,
         3.0F,
@@ -63,7 +63,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         0.0F,
         0U
       },
- 
+
       {
         ControlModes_Position,
         0.0F,
@@ -77,7 +77,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         0U
       }
     },
- 
+
     {
       {
         false,
@@ -91,8 +91,8 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         0,
         false
       },
-      3.37F,
-      25.6F,
+      0.0F,
+      0.0F,
       -3.0F,
       3.0F,
       24.0F,
@@ -103,14 +103,14 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
       0.0F
     }
   }, { {
-      1000.0F,
+      60000.0F,
       1.0F,
       2.0F,
       3.0F,
       32000U,
       60.0F
     },
- 
+
     {
       {
         ControlModes_Current,
@@ -124,7 +124,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         0.0F,
         0U
       },
- 
+
       {
         ControlModes_Velocity,
         3.0F,
@@ -137,7 +137,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         0.0F,
         0U
       },
- 
+
       {
         ControlModes_Position,
         0.0F,
@@ -151,7 +151,7 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         0U
       }
     },
- 
+
     {
       {
         false,
@@ -165,8 +165,8 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
         0,
         false
       },
-      3.37F,
-      25.6F,
+      0.0F,
+      0.0F,
       -3.0F,
       3.0F,
       24.0F,
@@ -196,7 +196,7 @@ RT_MODEL_iterative_motion_controller_T *const iterative_motion_controller_M =
   &iterative_motion_controller_M_;
 
 // Model step function for TID0
-void AMCFOC_step_Time_0(void)          // Sample time: [5.0E-6s, 0.0s]
+void AMCFOC_step_Time_base(void)       // Sample time: [5.0E-6s, 0.0s]
 {
   // local scratch DWork variables
   int32_T ForEach_itr;
@@ -611,6 +611,13 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
 // Model initialize function
 void AMCFOC_initialize(void)
 {
+  // Registration code
+
+  // Set task counter limit used by the static main program
+  (iterative_motion_controller_M)->Timing.TaskCounters.cLimit[0] = 1;
+  (iterative_motion_controller_M)->Timing.TaskCounters.cLimit[1] = 9;
+  (iterative_motion_controller_M)->Timing.TaskCounters.cLimit[2] = 200;
+
   // Model Initialize function for ModelReference Block: '<S1>/Motion Controller' 
   {
     int32_T i_1;
@@ -685,6 +692,21 @@ void AMCFOC_terminate(void)
   }
 
   // End of Terminate for SubSystem: '<Root>/Iterative Motion Controller'
+}
+
+boolean_T RT_MODEL_iterative_motion_controller_T::StepTask(int32_T idx) const
+{
+  return (Timing.TaskCounters.TID[(idx)] == 0);
+}
+
+uint32_T &RT_MODEL_iterative_motion_controller_T::CounterLimit(int32_T idx)
+{
+  return (Timing.TaskCounters.cLimit[(idx)]);
+}
+
+uint32_T &RT_MODEL_iterative_motion_controller_T::TaskCounter(int32_T idx)
+{
+  return (Timing.TaskCounters.TID[(idx)]);
 }
 
 //
