@@ -39,7 +39,6 @@
 #include "embot_app_eth_theEncoderReader.h"
 #endif
 
-    
 static void Joint_set_inner_control_flags(Joint* o);
 static BOOL Joint_set_pos_ref_in_calib(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 
