@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>amcmj1.1cm7-master</TargetName>
+      <TargetName>amcmj1.1cm7-hw-master</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
@@ -338,9 +338,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls> -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
-              <Define>EMBOT_ENABLE_hw_minimal STM32HAL_dualcore_BOOT_cm7master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1A0</Define>
+              <Define>EMBOT_ENABLE_hw_NOTminimal STM32HAL_dualcore_BOOT_cm7master USE_STM32HAL STM32HAL_BOARD_AMCMJ1_1CM7 STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\cm7;..\..\..\bsp\shared;..\..\..\..\..\libs\highlevel\abslayer\ipal\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\bsp\shared;..\..\..\bsp\cm7;..\..\..\bsp\portable</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -385,9 +385,60 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>main-dualcore.cpp</FileName>
+              <FileName>main-test-hw-cm7.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\main-dualcore.cpp</FilePath>
+              <FilePath>..\src\main-test-hw-cm7.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>2</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>1</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -508,51 +559,6 @@
               <FileName>embot_tools.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embot::hw-core</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_hw_bsp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_bsp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_gpio.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_led.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_sys.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_sys.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_can.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_can.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_flash.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_flash.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_dualcore.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_dualcore.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -687,7 +693,47 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-core-shared</GroupName>
+          <GroupName>embot::hw-minimal</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_bsp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_sys.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_sys.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_flash.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_dualcore.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_dualcore.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-minimal-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_dualcore_bsp_amcmj1.cpp</FileName>
@@ -715,16 +761,6 @@
               <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcmj1.h</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_mtx_bsp_amcmj1.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_mtx_bsp_amcmj1.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_icc_bsp_amcmj1.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_icc_bsp_amcmj1.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_led_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcmj1.cpp</FilePath>
@@ -732,7 +768,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-core-cm7</GroupName>
+          <GroupName>embot::hw::bsp-minimal-cm7</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp_amcmj1_1cm7.cpp</FileName>
@@ -742,77 +778,13 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw-others</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
+          <GroupName>embot::hw</GroupName>
           <Files>
+            <File>
+              <FileName>embot_hw_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_can.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_hw_mtx.cpp</FileName>
               <FileType>8</FileType>
@@ -833,79 +805,63 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eeprom.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-others-cm7</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <ClangAsOpt>0</ClangAsOpt>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
+          <GroupName>embot::hw::bsp-shared</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_icc_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_icc_bsp_amcmj1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_mtx_bsp_amcmj1.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-portable</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_can_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_can_bsp_amcmj1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcmj1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eeprom_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcmj1.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-cm7</GroupName>
+        </Group>
+        <Group>
+          <GroupName>info</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -1288,9 +1244,9 @@
           <GroupName>main</GroupName>
           <Files>
             <File>
-              <FileName>main-dualcore.cpp</FileName>
+              <FileName>main-test-hw-cm7.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\main-dualcore.cpp</FilePath>
+              <FilePath>..\src\main-test-hw-cm7.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1411,51 +1367,6 @@
               <FileName>embot_tools.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embot::hw-core</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_hw_bsp.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_bsp.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_gpio.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_led.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_sys.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_sys.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_can.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_can.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_flash.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_flash.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_dualcore.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embot\hw\embot_hw_dualcore.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1590,7 +1501,47 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-core-shared</GroupName>
+          <GroupName>embot::hw-minimal</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_bsp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_sys.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_sys.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_flash.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_dualcore.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_dualcore.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-minimal-shared</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_dualcore_bsp_amcmj1.cpp</FileName>
@@ -1618,16 +1569,6 @@
               <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_pinout_amcmj1.h</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_mtx_bsp_amcmj1.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_mtx_bsp_amcmj1.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_icc_bsp_amcmj1.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\shared\embot_hw_icc_bsp_amcmj1.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_led_bsp_amcmj1.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\shared\embot_hw_led_bsp_amcmj1.cpp</FilePath>
@@ -1635,7 +1576,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-core-cm7</GroupName>
+          <GroupName>embot::hw::bsp-minimal-cm7</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_bsp_amcmj1_1cm7.cpp</FileName>
@@ -1645,7 +1586,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw-others</GroupName>
+          <GroupName>embot::hw</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -1716,6 +1657,11 @@
             </GroupArmAds>
           </GroupOption>
           <Files>
+            <File>
+              <FileName>embot_hw_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_can.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_hw_mtx.cpp</FileName>
               <FileType>8</FileType>
@@ -1736,10 +1682,25 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_icc_sig.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eeprom.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_eeprom.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_spi.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_M95512DF.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_chip_M95512DF.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::bsp-others-cm7</GroupName>
+          <GroupName>embot::hw::bsp-shared</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -1809,6 +1770,44 @@
               </Aads>
             </GroupArmAds>
           </GroupOption>
+          <Files>
+            <File>
+              <FileName>embot_hw_icc_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_icc_bsp_amcmj1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\shared\embot_hw_mtx_bsp_amcmj1.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-portable</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_can_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_can_bsp_amcmj1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_spi_bsp_amcmj1.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eeprom_bsp_amcmj1.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\portable\embot_hw_eeprom_bsp_amcmj1.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::bsp-cm7</GroupName>
+        </Group>
+        <Group>
+          <GroupName>info</GroupName>
         </Group>
       </Groups>
     </Target>

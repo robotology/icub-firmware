@@ -82,6 +82,7 @@ namespace embot { namespace hw { namespace can {
 	
     void unlock(embot::hw::CAN p, embot::hw::can::Direction dir, bool lockstatus){}
 
+    result_t can::setfilters(embot::hw::CAN p, std::uint8_t address) { return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace can {
 
@@ -314,7 +315,7 @@ std::uint8_t can::inputqueuesize(embot::hw::CAN p)
 }
 
 // TODO: Temporary workaround in order validate this feature without affecting the other CAN baords
-#if defined(STM32HAL_BOARD_AMC) | defined(STM32HAL_BOARD_AMC2CM4) | defined(STM32HAL_BOARD_AMCFOC_2CM4) | defined(STM32HAL_BOARD_AMCFOC_1CM7)
+#if defined(STM32HAL_BOARD_AMC) | defined(STM32HAL_BOARD_AMC2CM4) | defined(STM32HAL_BOARD_AMCFOC_2CM4) | defined(STM32HAL_BOARD_AMCFOC_1CM7) | defined(STM32HAL_BOARD_AMCMJ1_1CM7) | defined(STM32HAL_BOARD_AMCMJ1_2CM4)
     #warning see how to make this option more general and not only dependent of boards amc or amc2cm4 or ...
     
     #define TEMPORARY_WORKAROUND_FOR_H7_master   

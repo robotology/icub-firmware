@@ -1,0 +1,46 @@
+; 
+; this scatter file is for a single application on CM4. it uses following FLASH and RAM resources:
+;
+; - FLASH: second bank @ 0x08100000 for a size of 512k
+; 
+; - RAM: SRAM1-SRAM2 @ 0x10000000 for a size of 256K - 64
+;
+; - NOTES:
+;   1.  the maximum amount of flash is 1024k (0x100000) and one can decide to place the code in any position in its inside
+;       For instance:
+;       - on the core that uses eth, the loader starts at +000k (+0x00000), the updater at +128k (+0x20000) and the the appl.yri at +384k (0x60000) 
+;       - on the other core the appl.mot starts at +000k
+;   2. we must keep a RAM hole @ 0x1003FFC0 of size 64B for the core that uses IPC. 
+;      This hole is on top of SRAM1-SRAM2 used by the CM4
+;   3. The core that uses the ethernet must also specify that some modules are in dedicated RAM parts. See commented section
+;
+
+LR_IROM1 0x08100000 0x00080000  {    ; load region size_region
+  
+  ; flash: 
+  ER_IROM1 0x08100000 0x00080000  {  ; load address = execution address
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  
+  
+  ; ram: banks sram1 and sram2 joined together with a 64 bytes hole on top for ipc
+  RW_IRAM1 0x10000000 0x0003FFC0 {
+   .ANY (+RW +ZI)
+  }
+  
+;  ; ram for eth
+;  RX_DESCR	0x30040000 0x00000060 {
+;  	ethram.o(.RxDecripSection)
+;  }
+;  TX_DESCR	0x30040060 0x000001A0 {
+;  	ethram.o(.TxDecripSection)
+;  }
+;  RX_ARRAY 	0x30040200 0x00001800 {
+;  	ethram.o(.RxArraySection)
+;  }  
+   
+
+}
+
