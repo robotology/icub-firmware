@@ -932,7 +932,6 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     //this can be used to debug without sending the motor configuration
 //        embot::hw::motor::enc::encoder1_test();
     
-    
     //this can be used by sending the motor configuration via CAN
     if(embot::hw::motor::enc::isstarted(static_cast<embot::hw::MOTOR> (0)))
     {        
