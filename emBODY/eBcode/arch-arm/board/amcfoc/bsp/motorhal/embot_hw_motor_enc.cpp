@@ -60,7 +60,6 @@ namespace embot::hw::motor::enc {
     #define htimEnc1  (embot::hw::motor::bldc::bsp::amcfoc::cm7::hTimEnc1)
     #define htimEnc2  (embot::hw::motor::bldc::bsp::amcfoc::cm7::hTimEnc2)
             
-//    std::array<TIM_HandleTypeDef, embot::hw::motor::bldc::MAXnumber> htimEnc {htimEnc1,htimEnc2};
     
     std::array<uint8_t, embot::hw::motor::bldc::MAXnumber> QEncMode {bldc::bsp::amcfoc::cm7::QEncoder1Mode,bldc::bsp::amcfoc::cm7::QEncoder2Mode};
     
@@ -257,7 +256,7 @@ bool Enc1Init(embot::hw::MOTOR m)
     
     if(TIM_ENCODERMODE_TI12 == QEncMode[motorIndex]) 
     {
-        embot::core::print("Enc Divider = 4");
+//        embot::core::print("Enc Divider = 4");
         _enc_internals._items[motorIndex].divider = 4;
     }
     else if (TIM_ENCODERMODE_TI2  == QEncMode[motorIndex]) 
@@ -272,15 +271,14 @@ bool Enc1Init(embot::hw::MOTOR m)
     }
     
     _enc_internals._items[motorIndex].conversionfactor = 360.0/(float)_enc_internals._items[motorIndex].divider/(float)_enc_internals._items[motorIndex].mode.resolution;
-    embot::core::print(
-        "Enc Resolution: " +
-        std::to_string(_enc_internals._items[motorIndex].mode.resolution)+
-        " Enc Conversionfactor: "+
-        std::to_string(_enc_internals._items[motorIndex].conversionfactor)
+//    embot::core::print(
+//        "Enc Resolution: " +
+//        std::to_string(_enc_internals._items[motorIndex].mode.resolution)+
+//        " Enc Conversionfactor: "+
+//        std::to_string(_enc_internals._items[motorIndex].conversionfactor) 
+//    );
     
-    );
-    
-    
+
     /* Register the callback function used to signal the activation of the Index pulse */
     if (HAL_OK == HAL_TIM_RegisterCallback(&htimEnc1, HAL_TIM_IC_CAPTURE_CB_ID, Enc1Capture_cb))
     {
@@ -305,7 +303,6 @@ bool Enc1Init(embot::hw::MOTOR m)
     /* Errors detected */
     return false;
 }
-
 
 
 
@@ -358,7 +355,7 @@ bool Enc2Init(embot::hw::MOTOR m)
     
     if(TIM_ENCODERMODE_TI12 == QEncMode[motorIndex]) 
     {
-        embot::core::print("Enc Divider = 4");
+//        embot::core::print("Enc Divider = 4");
         _enc_internals._items[motorIndex].divider = 4;
     }
     else if (TIM_ENCODERMODE_TI2  == QEncMode[motorIndex]) 
@@ -477,7 +474,14 @@ void encoder1_test(void)
 
 }
 
-
+void Enc1DeInit(void)
+{
+    /* Stop any pending operation */
+    HAL_TIM_IC_Stop_IT(&htimEnc1, ENC_INDEX_TRAILING_EDGE);
+    HAL_TIM_IC_Stop(&htimEnc1, ENC_INDEX_LEADING_EDGE);
+    HAL_TIM_Encoder_Stop(&htimEnc1, TIM_CHANNEL_ALL);
+    HAL_TIM_UnRegisterCallback(&htimEnc1, HAL_TIM_IC_CAPTURE_CB_ID);
+}
 
 void Enc2DeInit(void)
 {
@@ -488,95 +492,8 @@ void Enc2DeInit(void)
     HAL_TIM_UnRegisterCallback(&htimEnc2, HAL_TIM_IC_CAPTURE_CB_ID);
 }
 
-void Enc1DeInit(void)
-{
-    /* Stop any pending operation */
-    HAL_TIM_IC_Stop_IT(&htimEnc1, ENC_INDEX_TRAILING_EDGE);
-    HAL_TIM_IC_Stop(&htimEnc1, ENC_INDEX_LEADING_EDGE);
-    HAL_TIM_Encoder_Stop(&htimEnc1, TIM_CHANNEL_ALL);
-    HAL_TIM_UnRegisterCallback(&htimEnc1, HAL_TIM_IC_CAPTURE_CB_ID);
-}
-
-
-//////bool EncInit(TIM_HandleTypeDef htimEncx, void (*EncxCapture_cb) , enc_Internals enc_internals)
-//////{
-//////    /* Stop any pending operation */
-//////    HAL_TIM_IC_Stop_IT(&htimEncx, ENC_INDEX_LEADING_EDGE);
-//////    HAL_TIM_IC_Stop(&htimEncx, ENC_INDEX_TRAILING_EDGE);
-//////    HAL_TIM_Encoder_Stop(&htimEncx, TIM_CHANNEL_ALL);
-
-//////    /* Register the callback function used to signal the activation of the Index pulse */
-//////    if (HAL_OK == HAL_TIM_RegisterCallback(&htimEncx, HAL_TIM_IC_CAPTURE_CB_ID, EncxCapture_cb))
-//////    {
-//////        /* Clear local variables */
-//////           
-//////        enc_internals.encStatus = ENC_STATUS_IDLE;
-//////        enc_internals.encIndexCounter = 0;
-//////        enc_internals.encAbsoluteZero = 0;
-
-//////        /* Clear counter */
-//////        __HAL_TIM_SET_COUNTER(&htimEncx, 0);
-//////        /* Start timers in encoder mode */
-//////        if (HAL_OK == HAL_TIM_Encoder_Start(&htimEncx, TIM_CHANNEL_ALL))
-//////        {
-//////            /* Enable leading edge capture, without interrupts */
-//////            HAL_TIM_IC_Start(&htimEncx, ENC_INDEX_LEADING_EDGE);
-//////            /* Enable trailing edge capture, with interrupts */
-//////            HAL_TIM_IC_Start_IT(&htimEncx, ENC_INDEX_TRAILING_EDGE);
-//////            return true;
-//////        }
-//////        /* Failed start of the timer */
-//////        HAL_TIM_UnRegisterCallback(&htimEncx, HAL_TIM_IC_CAPTURE_CB_ID);
-//////    }
-//////    /* Errors detected */
-//////    return false;
-//////}
-
-//float Enc1GetAngle(void)
-//{
-//    return (float)__HAL_TIM_GetCounter(&htimEnc1)*_enc_internals._items[0].conversionfactor;
-//    //return 360.0*(Enc1CounterZeroCross + (float)(Enc1DeltaFirstCross + (__HAL_TIM_GetCounter(&htimEnc1) - Enc1RotorZero))/(float)(Enc1SlotsNumber*Enc1Divider));
-//}
-
-
-
-//struct enc_Conversion
-//{
-//    int32_t offset {0};
-//    int32_t factor {1}; 
-//    
-//    int32_t convert(int32_t v) const
-//    {
-//       return offset + (factor*v);
-//    }
-
-//    constexpr enc_Conversion() = default;  
-//    constexpr enc_Conversion(int32_t o, int32_t f) : offset(o), factor(f) {}        
-//};
-
-
-//int32_t getvalue()
-//{
-//    if(false == _enc_internals.started)
-//    {
-//        return _enc_internals.forcedvalue;
-//    }
-//    
-//    int32_t v = 0; //__HAL_TIM_GetCounter(&ENC_TIM);
-//    
-//    return _enc_internals.conversion.convert(v);
-//}
-
-
-//void force(int32_t value)
-//{
-//    _enc_internals.forcedvalue = value;
-//}
 
 } // namespace embot::hw::motor::enc {
-
-
-
 
 
 #endif // #elif defined(EMBOT_ENABLE_hw_motor_enc)
