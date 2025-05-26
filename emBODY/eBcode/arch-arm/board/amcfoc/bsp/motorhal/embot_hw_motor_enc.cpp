@@ -107,7 +107,6 @@ struct enc_Internals
         {
             started = false;
             config.acquisition = Configuration::ACQUISITION::deferred;
-//            mode.reset();
             data.reset();            
         }
         
@@ -135,11 +134,7 @@ bool init(embot::hw::MOTOR m, const Configuration &config)
 
 bool deinit(embot::hw::MOTOR m)
 {
-//    /* Stop any pending operation */
-//    HAL_TIM_IC_Stop_IT(&(htimEnc[embot::core::tointegral(m)]), ENC_INDEX_TRAILING_EDGE);
-//    HAL_TIM_IC_Stop(&htimEnc[embot::core::tointegral(m)], ENC_INDEX_LEADING_EDGE);
-//    HAL_TIM_Encoder_Stop(&htimEnc[embot::core::tointegral(m)], TIM_CHANNEL_ALL);
-//    HAL_TIM_UnRegisterCallback(&htimEnc[embot::core::tointegral(m)], HAL_TIM_IC_CAPTURE_CB_ID);
+    
     if (0 == embot::core::tointegral(m))
     {
         Enc1DeInit();
@@ -275,7 +270,7 @@ bool Enc1Init(embot::hw::MOTOR m)
 //        embot::core::print("Enc1Divider = 1");
         _enc_internals._items[motorIndex].divider = 1;
     }
-
+    
     _enc_internals._items[motorIndex].conversionfactor = 360.0/(float)_enc_internals._items[motorIndex].divider/(float)_enc_internals._items[motorIndex].mode.resolution;
     embot::core::print(
         "Enc Resolution: " +

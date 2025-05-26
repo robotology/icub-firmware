@@ -96,8 +96,10 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 //    constexpr PWMvalues PWMvals {PWM100000Hz};
     
     
-    constexpr uint8_t QEncoder1Mode TIM_ENCODERMODE_TI12;
-    constexpr uint8_t QEncoder2Mode TIM_ENCODERMODE_TI12;
+    constexpr auto QEncoder1Mode TIM_ENCODERMODE_TI12;
+    constexpr auto QEncoder2Mode TIM_ENCODERMODE_TI12;
+    
+    constexpr uint8_t QencICFilter = 4;
     
 }
 
