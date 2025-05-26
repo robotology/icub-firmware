@@ -177,7 +177,6 @@ namespace embot::hw::motor::bldc::bsp {
         if((true == cfg.has_quad_enc) && (0 != cfg.enc_resolution) && (cfg.pwm_num_polar_couples > 0))
         {
             // start the encoder
-            #warning the amcfoc must init encoder using MOTOR m
             embot::hw::motor::enc::Mode mode {cfg.enc_resolution, cfg.pwm_num_polar_couples, false, false};
             embot::hw::motor::enc::start(m, mode);
             r = true;

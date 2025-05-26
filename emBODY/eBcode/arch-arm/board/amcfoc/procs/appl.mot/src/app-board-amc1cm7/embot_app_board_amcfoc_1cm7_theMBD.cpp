@@ -27,8 +27,6 @@ int32_t CU2 = 0;
 int32_t CU3 = 0;
 
 
-int32_t angle_global=0;
-
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
@@ -46,8 +44,11 @@ int32_t angle_global=0;
 
 //#define DEBUG_PWM_min_0perc
 
-#define TEST_Quad_Encoder_Mot_1
+//#define TEST_Quad_Encoder_Mot_1
 
+#if defined(TEST_Quad_Encoder_Mot_1)
+    int32_t angle_global=0;
+#endif
 
 // -
 // - MBD code section
@@ -932,7 +933,7 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
 //        embot::hw::motor::enc::encoder1_test();
     
     
-    //this can be used by sending thr motor configuration via CAN
+    //this can be used by sending the motor configuration via CAN
     if(embot::hw::motor::enc::isstarted(static_cast<embot::hw::MOTOR> (0)))
     {        
         angle_global = (int32_t) embot::hw::motor::enc::angle(static_cast<embot::hw::MOTOR> (0) );
