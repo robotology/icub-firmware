@@ -385,7 +385,7 @@ BOOL JointSet_do_check_faults(JointSet* o)
     
     BOOL timeout = FALSE;
     
-    BOOL soft_limit_overcome = FALSE
+    BOOL soft_limit_overcome = FALSE;
 
     for (int k=0; k<N; ++k)
     {

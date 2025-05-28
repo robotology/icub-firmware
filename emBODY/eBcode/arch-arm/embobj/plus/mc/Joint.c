@@ -503,7 +503,7 @@ BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode, int* co
     return FALSE;
 }
 
-BOOL Joint_check_softwareboundaries_force_position(Joint* o, uint32_t errorcode)
+BOOL Joint_check_softwareboundaries_force_position(Joint* o, uint32_t* errorcode)
 {
     if ((o->control_mode == eomc_controlmode_current))
     {
