@@ -727,6 +727,29 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
             o->trq_err = o->trq_ref = ZERO;
         
             o->output = o->out_ref;
+            
+            // check on soft limit for limiting output
+            if (o->pos_min != o->pos_max)
+            {
+                if (o->pos_fbk <= o->pos_min) 
+                {
+                    o->output_lim = PID_do_out(pid, o->pos_min-o->pos_fbk);
+                    o->pushing_limit = -1;
+                }
+                else if (o->pos_fbk >= o->pos_max)
+                {
+                    o->output_lim = PID_do_out(pid, o->pos_max-o->pos_fbk);
+                    o->pushing_limit =  1;
+                }
+                else
+                {
+                    o->output_lim = ZERO;
+                }
+            }
+            else
+            {
+                o->output_lim = ZERO;
+            }
             break;
         }
         case eomc_controlmode_torque:
@@ -796,16 +819,6 @@ CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
 #if defined(MC_use_Trajectory)                
             Trajectory_do_step(&o->trajectory, &o->pos_ref, &o->vel_ref, &o->acc_ref);
 #endif            
-            
-            //static int noflood = 0;
-            //if (++noflood > 500)
-            //{
-            //    noflood = 0;
-            //
-            //    Joint_send_debug_message("PWM or CURRENT", o->ID, o->control_mode, (((uint64_t) o->vel_ref) << 32) | ((uint64_t) o->pos_ref));
-            //}
-        
-            //CTRL_UNITS pos_err_old = o->pos_err;
         
 
             if(o->belong2WristMK2)
@@ -1444,17 +1457,6 @@ extern void Joint_config_direct_PID(Joint *o, eOmc_PID_t *pid_conf)
 {
     PID_config(&(o->directPID), pid_conf);
 }
-
-
-
-//VALE: debug function. I'll remove it ASAP
-//void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep)
-//{
-//    if you use this function, comments updates meas_acceleration and meas_velocity in 
-//      Joint_get_state function
-//    o->eo_joint_ptr->status.core.measures.meas_acceleration = avgCurrent;
-//    o->eo_joint_ptr->status.core.measures.meas_velocity = accum_Ep;
-//}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
