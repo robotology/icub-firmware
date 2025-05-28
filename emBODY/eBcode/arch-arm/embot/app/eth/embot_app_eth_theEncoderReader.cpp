@@ -218,16 +218,6 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     
     constexpr bool verificationisOK {true};
     
-    static uint8_t ii=0;
-    if(ii==0)
-    {
-        ii++;
-    }
-    else if(ii==1)
-    {
-        ii++;
-    }
-        
     
     if(true == activateafterverify)
     {
@@ -319,40 +309,36 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
                 } break;
                 case eomc_enc_unknown:
                 case eomc_enc_none:
-                {
-                    //no encoder
-                    embot::core::print("theEncoderReader: encoder none");
-                    ret = false;
-                } break;
-                
                 default:
                 {
-                    // unsupported encoder
-                    embot::core::print("theEncoderReader: encoder type not supported");
-                    embot::core::print(std::to_string(i) +" enc type: "+ std::to_string(_implconfig.jomo_cfg[i].encoder1des.type));
-                    // in some cases, we need to alert the pc104 that the board does not support this service
-                    eOerrmanDescriptor_t errdes = {};
-                    errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_notsupported);  
-                    errdes.sourcedevice = eo_errman_sourcedevice_localboard;
-                    errdes.sourceaddress = 0;
-                    errdes.par16 = errdes.par64 = 0;
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
-                              
-                    #warning: to do send to yarp unsupported encoder, and block yarp?
+                    //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
+//                    embot::core::print("theEncoderReader: encoder unknown/none/unsupported");
                     ret = false;
                 } break;
             }
             
             // 2. configure and initialize SPI encoder
-            
             embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
             embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
             if(embot::hw::resOK != r)
             {
-                embot::core::print("theEncoderReader: encoder init failed");
-                #warning: to do send to yarp init failed encoder
+                embot::core::print("theEncoderReader: encoder type not supported");
+//                embot::core::print(std::to_string(i) +" enc type: "+ std::to_string(_implconfig.jomo_cfg[i].encoder1des.type));
+                // in some cases, we need to alert the pc104 that the board does not support this service, in our case the encoder
+                eOerrmanDescriptor_t errdes = {};
+                errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_notsupported);  
+                errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress = 0;
+                    //possible to do: tell which encoder is not supported by the specific joint    
+                errdes.par16 = errdes.par64 = 0;
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+                              
                 ret = false;
             }
+//            else
+//            {
+//                embot::core::print("theEncoderReader: encoder init successfull");
+//            }
             
         }
     }
@@ -369,7 +355,7 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 
 bool embot::app::eth::theEncoderReader::Impl::Deactivate()
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
+//    eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
 //    
 //    embot::app::eth::theErrorManager::getInstance().trace("", {"",     
 //                              embot::os::theScheduler::getInstance().scheduled()}); 
@@ -393,7 +379,7 @@ bool embot::app::eth::theEncoderReader::Impl::StartReading()
     embot::hw::encoder::startRead(embot::hw::ENCODER::two);
     embot::hw::encoder::startRead(embot::hw::ENCODER::three);
     
-    return true;;
+    return true;
 }
 
 bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth::encoder::v1::valueInfo &primary, embot::app::eth::encoder::v1::valueInfo &secondary)
