@@ -62,12 +62,14 @@ namespace embot::hw::encoder {
     static std::uint32_t initialisedmask = 0;
     
     struct privateData
-    {
+    {   
+        //chip used in AEA and AEA2
         embot::hw::chip::AS5045 *chip_AS5045 = {nullptr};
-        embot::hw::chip::MA730  *chip_MA730 = {nullptr};
-        
         embot::hw::chip::AS5045::Data as5045_data {};
+            
+        //chip used in AEA3
         embot::hw::chip::MA730::Data ma730_data {};
+        embot::hw::chip::MA730  *chip_MA730 = {nullptr};
         
         Config config = {};
         volatile bool data_is_ready {false};
@@ -148,14 +150,10 @@ namespace embot::hw::encoder {
                         } 
             );
         }
-        else if(embot::hw::encoder::Type::none == cfg.type)
-        {
-            #warning, verify if this is necessary
-        }
         else
         {
-            //this error message is onl for debugging on keil
-            embot::core::print("hw_encoder:encoder type not supported");
+            //this error message is for debugging on keil
+//            embot::core::print("embot_hw_encoder: encoder type not supported");
             return resNOK;
         }
         
@@ -263,8 +261,11 @@ namespace embot::hw::encoder {
             // retrieve the current encoder position from data saved internally.
             if(_data_array[index].data_is_ready)
             {
-                pos = _data_array[index].as5045_data.position;
-                res = resOK;
+                if(_data_array[index].as5045_data.status.ok)
+                {
+                    pos = _data_array[index].as5045_data.position;
+                    res = resOK;
+                }
             }
         }
         else if(embot::hw::encoder::Type::chipMA730 == _data_array[index].config.type)
@@ -277,8 +278,6 @@ namespace embot::hw::encoder {
                     pos = _data_array[index].ma730_data.position;
                     res = resOK;
                 }
-                else
-                    res = resNOK;
             }
         }
         
