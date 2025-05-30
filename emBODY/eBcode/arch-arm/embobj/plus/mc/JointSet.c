@@ -380,6 +380,32 @@ BOOL JointSet_do_check_faults(JointSet* o)
     BOOL fault = FALSE;
     o->external_fault = FALSE;
     
+    uint32_t errorcode;
+    
+    BOOL timeout = FALSE;
+
+    for (int k=0; k<N; ++k)
+    {
+        if (Joint_check_watchdogs_force_position(o->joint+o->joints_of_set[k], &errorcode))
+        {
+            timeout = TRUE;
+            eOerrmanDescriptor_t errdes = {0};
+                    
+            errdes.code             = errorcode;
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = o->joint[o->joints_of_set[k]].ID;
+            errdes.par16            = 0;
+            errdes.par64            = 0;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        }
+    }
+    
+    if (timeout)
+    {
+        JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
+        JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff);
+    }
+    
     for (int k=0; k<N; ++k)
     {
         if (Joint_check_faults(o->joint+o->joints_of_set[k]))
