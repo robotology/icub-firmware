@@ -63,6 +63,7 @@ volatile extern int gTemperatureLimit;
 volatile extern int gTemperatureOverheatingCounter;
 volatile extern BOOL isTemperatureRead;
 volatile extern unsigned int i2cERRORS;
+volatile extern unsigned int i2cConfigTimeoutErrorsCounter;
 volatile extern long gQEPosition;
 volatile extern int  gQEVelocity;
 

@@ -159,12 +159,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
             
             int err = readI2CTsens(&gTemperature);
             
-            if((err == -21) && !SysError.I2C_CommFailure)
-            {
-                SysError.I2C_CommFailure = TRUE;
-                FaultConditionsHandler();
-            }
-            else if (!err)
+            if (!err)
             {     
                 if (gTemperature > gTemperatureLimit)
                 {
@@ -174,8 +169,26 @@ void __attribute__((__interrupt__, no_auto_psv)) _T1Interrupt(void)
                 {
                     gTemperatureOverheatingCounter = 0;
                 }
+                i2cConfigTimeoutErrorsCounter = 0;
             }
-            if ((gTemperatureOverheatingCounter > 100) && !SysError.OverHeatingFailure)
+            else if(err >= -11)
+            {
+                // this error is related to a failing 
+                // in conifguration of the tdb_i2c
+                // it is raised when the i2c comm goes in I2Ctimeout before getting the ACK
+                ++i2cConfigTimeoutErrorsCounter;
+            }
+            
+            // Error -21 is related to the following cases:
+            // - we can configure the tdb_i2c sensor but we cannot receive the ACK reply
+            // - we can receive the ACK and data config byte is valid (==0x19) but the temp data are 0x7fff
+            // - we can receive the ACK but the data config byte is not valid (!= 0x19))
+            if(((err == -21) || (i2cConfigTimeoutErrorsCounter > 100)) && !SysError.I2C_CommFailure)
+            {
+                SysError.I2C_CommFailure = TRUE;
+                FaultConditionsHandler();
+            }
+            else if ((gTemperatureOverheatingCounter > 100) && !SysError.OverHeatingFailure)
             {
                 SysError.OverHeatingFailure = TRUE;
                 FaultConditionsHandler();
