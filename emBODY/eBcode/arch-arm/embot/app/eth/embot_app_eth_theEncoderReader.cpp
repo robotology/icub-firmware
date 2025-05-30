@@ -224,19 +224,10 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     
     if(false == IsEncoderSupported(config))
     {
-////        embot::core::print("theEncoderReader: encoder type not supported");
-////        // in some cases, we need to alert the pc104 that the board does not support this service, in our case the encoder
-////        eOerrmanDescriptor_t errdes = {};
-////        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_notsupported);  
-////        errdes.sourcedevice = eo_errman_sourcedevice_localboard;
-////        errdes.sourceaddress = 0;
-////        //to do: tell which encoder is not supported by the specific joint    
-////        errdes.par16 = errdes.par64 = 0;
-////        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
-////            
-////        _verified = false;
-////        constexpr bool verificationFailed {false};
-////        onverifycompleted.execute(verificationFailed);  
+
+        _verified = false;
+        constexpr bool verificationFailed {false};
+        onverifycompleted.execute(verificationFailed);  
     
         return false;  
     }
@@ -290,12 +281,13 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 
 
 
-
-
-
 bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &config)
 {
-
+    eOerrmanDescriptor_t errdes = {};
+    errdes.par16 = 0;
+    errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
+    errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress = 0;
     bool ret {true};
     
     if((nullptr == config.carrayofjomodes))
@@ -359,6 +351,13 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
             embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
             if(embot::hw::resOK != r)
             {                            
+                ////        embot::core::print("theEncoderReader: encoder type not supported");
+                // in some cases, we need to alert the pc104 that the board does not support this service, in our case the encoder
+                //to do: tell the specific error to yarp    
+                errdes.par16 = errdes.par16 |((_implconfig.numofjomos)<<12);
+                errdes.par16 = errdes.par16 | (1<<i);
+                errdes.par64 = 0;
+                
                 ret = false;
             }
             else
@@ -372,12 +371,12 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
     
     if(false == ret)
     {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
         Deactivate();      
     }
 
     return ret;
 }
-
 
 
 
