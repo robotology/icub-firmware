@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 2.2
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:44 2024
+// Model version                  : 3.1
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:27:50 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,7 +19,6 @@
 #include "motion_controller_single.h"
 #include "motion_controller_single_types.h"
 #include "rtw_defines.h"
-#include "motion_controller_single_private.h"
 #include "motion_controller.h"
 
 // System initialize for referenced model: 'motion_controller_single'
@@ -89,10 +88,33 @@ void mc_initialize(const char_T **rt_errorStatus,
   // Registration code
 
   // initialize error status
-  rtmSetErrorStatusPointer(motion_controller_single_M, rt_errorStatus);
+  motion_controller_single_M->setErrorStatusPointer(rt_errorStatus);
 
   // Model Initialize function for ModelReference Block: '<Root>/Motion Controller' 
   motion_controller_initialize(&(localDW->MotionController_InstanceData.rtdw));
+}
+
+const char_T* RT_MODEL_motion_controller_single_T::getErrorStatus() const
+{
+  return (*(errorStatus));
+}
+
+void RT_MODEL_motion_controller_single_T::setErrorStatus(const char_T* const
+  aErrorStatus) const
+{
+  (*(errorStatus) = aErrorStatus);
+}
+
+const char_T** RT_MODEL_motion_controller_single_T::getErrorStatusPointer()
+  const
+{
+  return errorStatus;
+}
+
+void RT_MODEL_motion_controller_single_T::setErrorStatusPointer(const char_T
+  ** aErrorStatusPointer)
+{
+  (errorStatus = aErrorStatusPointer);
 }
 
 //

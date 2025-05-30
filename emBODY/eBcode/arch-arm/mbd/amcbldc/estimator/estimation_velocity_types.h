@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'estimation_velocity'.
 //
-// Model version                  : 7.3
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:19 2024
+// Model version                  : 8.11
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:27:15 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

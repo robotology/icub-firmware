@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 8.0
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:55:31 2024
+// Model version                  : 9.0
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:26:10 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,7 +19,6 @@
 #include "SupervisorFSM_TX.h"
 #include "SupervisorFSM_TX_types.h"
 #include "rtwtypes.h"
-#include "SupervisorFSM_TX_private.h"
 
 // Forward declaration for local functions
 static MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode);
@@ -114,7 +113,7 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
                       *localDW)
 {
   // Chart: '<Root>/SupervisorFSM_TX'
-  if (localDW->is_active_c3_SupervisorFSM_TX == 0U) {
+  if (localDW->is_active_c3_SupervisorFSM_TX == 0) {
     localDW->is_active_c3_SupervisorFSM_TX = 1U;
   } else if (rtu_Flags->enable_sending_msg_status) {
     rty_MessagesTx->foc.current = rtu_EstimatedData->Iq_filtered;
@@ -152,14 +151,27 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
 
   rty_StatusTx->foc = (localB->ev_foc != localDW->DelayInput1_DSTATE);
 
-  // RelationalOperator: '<S2>/FixPt Relational Operator' incorporates:
-  //   UnitDelay: '<S2>/Delay Input1'
+  // UnitDelay: '<S2>/Delay Input1' incorporates:
+  //   UnitDelay: '<S1>/Delay Input1'
   //
   //  Block description for '<S2>/Delay Input1':
   //
   //   Store in Global RAM
+  //
+  //  Block description for '<S1>/Delay Input1':
+  //
+  //   Store in Global RAM
 
-  rty_StatusTx->status = (localB->ev_status != localDW->DelayInput1_DSTATE_d);
+  localDW->DelayInput1_DSTATE = localDW->DelayInput1_DSTATE_d;
+
+  // RelationalOperator: '<S2>/FixPt Relational Operator' incorporates:
+  //   UnitDelay: '<S1>/Delay Input1'
+  //
+  //  Block description for '<S1>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  rty_StatusTx->status = (localB->ev_status != localDW->DelayInput1_DSTATE);
 
   // Update for UnitDelay: '<S1>/Delay Input1'
   //
@@ -176,16 +188,6 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
   //   Store in Global RAM
 
   localDW->DelayInput1_DSTATE_d = localB->ev_status;
-}
-
-// Model initialize function
-void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_SupervisorFSM_TX_T *const SupervisorFSM_TX_M)
-{
-  // Registration code
-
-  // initialize error status
-  rtmSetErrorStatusPointer(SupervisorFSM_TX_M, rt_errorStatus);
 }
 
 //

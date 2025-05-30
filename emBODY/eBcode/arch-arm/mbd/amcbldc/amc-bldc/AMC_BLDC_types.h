@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 8.15
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:50 2024
+// Model version                  : 9.8
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:28:03 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -342,6 +342,44 @@ struct ActuatorConfiguration
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
+
+// Fields of a transmitted CAN packet.
+struct BUS_CAN_PACKET
+{
+  // ID of the CAN packet.
+  uint16_T ID;
+
+  // PAYLOAD of the CAN packet.
+  uint8_T PAYLOAD[8];
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_
+
+struct BUS_CAN
+{
+  // If true, the packet is available to be processed.
+  boolean_T available;
+  uint8_T length;
+  BUS_CAN_PACKET packet;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
+#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
+
+struct BUS_CAN_MULTIPLE
+{
+  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
 #define DEFINED_TYPEDEF_FOR_BUS_MSG_FOC_
 
@@ -454,44 +492,6 @@ struct BUS_STATUS_TX
 {
   boolean_T foc;
   boolean_T status;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_PACKET_
-
-// Fields of a transmitted CAN packet.
-struct BUS_CAN_PACKET
-{
-  // ID of the CAN packet.
-  uint16_T ID;
-
-  // PAYLOAD of the CAN packet.
-  uint8_T PAYLOAD[8];
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_
-
-struct BUS_CAN
-{
-  // If true, the packet is available to be processed.
-  boolean_T available;
-  uint8_T length;
-  BUS_CAN_PACKET packet;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-#define DEFINED_TYPEDEF_FOR_BUS_CAN_MULTIPLE_
-
-struct BUS_CAN_MULTIPLE
-{
-  BUS_CAN packets[CAN_MAX_NUM_PACKETS];
 };
 
 #endif

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 2.2
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:44 2024
+// Model version                  : 3.1
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:27:50 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,6 +37,10 @@ struct DW_motion_controller_single_f_T {
 // Real-time Model Data Structure
 struct tag_RTM_motion_controller_single_T {
   const char_T **errorStatus;
+  const char_T* getErrorStatus() const;
+  void setErrorStatus(const char_T* const aErrorStatus) const;
+  const char_T** getErrorStatusPointer() const;
+  void setErrorStatusPointer(const char_T** aErrorStatusPointer);
 };
 
 struct MdlrefDW_motion_controller_single_T {

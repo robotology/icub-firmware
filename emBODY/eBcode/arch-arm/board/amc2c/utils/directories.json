@@ -1,4 +1,7 @@
 {
+    "source_base_paths": 
+    [],
+    
     "subdirectories_to_copy": [
         {
             "source_directory": "_sharedutils",
@@ -72,9 +75,27 @@
             ]
         },
         {
-            "source_directory": "SupervisorFSM_RX",
+            "source_directory": "supervisor",
             "source_directory_parent": "ert",
-            "target_directory": "supervisor-rx",
+            "target_directory": "supervisor",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+		{
+            "source_directory": "motion_controller",
+            "source_directory_parent": "ert",
+            "target_directory": "motion-controller",
+            "files": [
+                "*.cpp",
+                "*.h"
+            ]
+        },
+		{
+            "source_directory": "motion_controller_single",
+            "source_directory_parent": "ert",
+            "target_directory": "motion-controller-single",
             "files": [
                 "*.cpp",
                 "*.h"
@@ -86,6 +107,15 @@
             "target_directory": "supervisor-tx",
             "files": [
                 "*.cpp",
+                "*.h"
+            ]
+        },
+        {
+            "source_directory": "src",
+            "source_directory_parent": "code_replacement",
+            "target_directory": "sharedutils",
+            "files": [
+                "*.c",
                 "*.h"
             ]
         }

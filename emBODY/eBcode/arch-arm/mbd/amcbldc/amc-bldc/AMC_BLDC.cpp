@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 8.15
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:50 2024
+// Model version                  : 9.8
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:28:03 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -107,17 +107,17 @@ ActuatorConfiguration AmcbldcInitConf = {
 
 
 real32_T CAN_ANGLE_DEG2ICUB = 182.044449F;// Variable: CAN_ANGLE_DEG2ICUB
-                                             //  Referenced by: '<S2>/CAN_Encoder'
+                                             //  Referenced by: '<S1>/CAN_Encoder'
                                              //  2^16/360
 
 real32_T CAN_ANGLE_ICUB2DEG = 0.00549316406F;// Variable: CAN_ANGLE_ICUB2DEG
-                                                //  Referenced by: '<S2>/CAN_Decoder'
+                                                //  Referenced by: '<S1>/CAN_Decoder'
                                                 //  360/2^16
 
 uint8_T CAN_ID_AMC = 3U;               // Variable: CAN_ID_AMC
                                           //  Referenced by:
-                                          //    '<S2>/CAN_Decoder'
-                                          //    '<S2>/CAN_Encoder'
+                                          //    '<S1>/CAN_Decoder'
+                                          //    '<S1>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 
@@ -138,19 +138,26 @@ RT_MODEL_AMC_BLDC_T AMC_BLDC_M_ = RT_MODEL_AMC_BLDC_T();
 RT_MODEL_AMC_BLDC_T *const AMC_BLDC_M = &AMC_BLDC_M_;
 
 // Model step function for TID0
-void AMC_BLDC_step0(void)              // Sample time: [5.0E-6s, 0.0s]
+void AMC_BLDC_step0(void)              // Sample time: [5e-06s, 0.0s]
 {
-  // ModelReference: '<Root>/Motion Controller Single'
+  // ModelReference: '<Root>/Motion Controller Single' incorporates:
+  //   Inport generated from: '<Root>/In Bus Element1'
+  //   Inport generated from: '<Root>/In Bus Element3'
+  //   Outport generated from: '<Root>/Out Bus Element3'
+  //   Outport generated from: '<Root>/Out Bus Element'
+  //   Outport generated from: '<Root>/Out Bus Element2'
+  //   Outport generated from: '<Root>/Out Bus Element4'
+
   motion_controller_singleTID0();
 }
 
 // Model step function for TID1
-void AMC_BLDC_step_FOC(void)           // Sample time: [4.5E-5s, 0.0s]
+void AMC_BLDC_step_FOC(void)           // Sample time: [4.5e-05s, 0.0s]
 {
   int8_T wrBufIdx;
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element'
 
   motion_controller_singleTID1(&AMC_BLDC_U.SensorsData_p,
@@ -201,11 +208,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
   BUS_STATUS_TX rtb_SupervisorFSM_TX_o2;
   FOCOutputs rtb_TmpRTBAtSupervisorFSM_TXInport4;
 
-  // UnitDelay generated from: '<Root>/Adapter'
-  AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter_at_outport_0 =
-    AMC_BLDC_DW.ZOHBlockInsertedForAdapter_InsertedFor_Adapter_at_outport_0_;
-
-  // ModelReference: '<S2>/CAN_Decoder' incorporates:
+  // ModelReference: '<S1>/CAN_Decoder' incorporates:
   //   Inport generated from: '<Root>/In Bus Element2'
 
   can_decoder(&AMC_BLDC_U.PacketsRx, &AMC_BLDC_B.CAN_Decoder[0],
@@ -250,7 +253,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
 
   // ModelReference generated from: '<Root>/SupervisorFSM_TX' incorporates:
   //   Inport generated from: '<Root>/In Bus Element1'
-  //   Inport generated from: '<Root>/In Bus Element6'
+  //   Inport generated from: '<Root>/In Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
@@ -261,18 +264,11 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
                    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtb),
                    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtdw));
 
-  // ModelReference: '<S2>/CAN_Encoder' incorporates:
+  // ModelReference: '<S1>/CAN_Encoder' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element1'
 
   can_encoder(&AMC_BLDC_B.MessagesTx, &rtb_SupervisorFSM_TX_o2,
-              &AMC_BLDC_B.ZOHBlockInsertedForAdapter_InsertedFor_Adapter_at_outport_0,
-              &AMC_BLDC_Y.PacketsTx, &(AMC_BLDC_DW.CAN_Encoder_InstanceData.rtb));
-
-  // Update for UnitDelay generated from: '<Root>/Adapter' incorporates:
-  //   Outport generated from: '<Root>/Out Bus Element3'
-
-  AMC_BLDC_DW.ZOHBlockInsertedForAdapter_InsertedFor_Adapter_at_outport_0_ =
-    AMC_BLDC_Y.ConfigurationParameters;
+              &AMC_BLDC_Y.PacketsTx);
 }
 
 // Model initialize function
@@ -285,27 +281,23 @@ void AMC_BLDC_initialize(void)
   (AMC_BLDC_M)->Timing.TaskCounters.cLimit[1] = 9;
   (AMC_BLDC_M)->Timing.TaskCounters.cLimit[2] = 200;
 
-  // Model Initialize function for ModelReference Block: '<S2>/CAN_Decoder'
-  can_decoder_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
+  // Model Initialize function for ModelReference Block: '<S1>/CAN_Decoder'
+  can_decoder_initialize(AMC_BLDC_M->getErrorStatusPointer(),
     &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtm));
 
-  // Model Initialize function for ModelReference Block: '<S2>/CAN_Encoder'
-  can_encoder_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
+  // Model Initialize function for ModelReference Block: '<S1>/CAN_Encoder'
+  can_encoder_initialize(AMC_BLDC_M->getErrorStatusPointer(),
     &(AMC_BLDC_DW.CAN_Encoder_InstanceData.rtm));
 
   // Model Initialize function for ModelReference Block: '<Root>/Motion Controller Single' 
-  mc_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
+  mc_initialize(AMC_BLDC_M->getErrorStatusPointer(),
                 &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtm),
                 &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtdw));
-
-  // Model Initialize function for ModelReference Block: '<Root>/SupervisorFSM_TX' 
-  SupervisorFSM_TX_initialize(rtmGetErrorStatusPointer(AMC_BLDC_M),
-    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtm));
 
   // Start for RateTransition generated from: '<Root>/SupervisorFSM_TX'
   rtw_mutex_init();
 
-  // SystemInitialize for ModelReference: '<S2>/CAN_Decoder'
+  // SystemInitialize for ModelReference: '<S1>/CAN_Decoder'
   can_decoder_Init(&(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtb),
                    &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtdw));
 
@@ -333,6 +325,36 @@ void AMC_BLDC_terminate(void)
 
   // Terminate for RateTransition generated from: '<Root>/SupervisorFSM_TX'
   rtw_mutex_destroy();
+}
+
+boolean_T RT_MODEL_AMC_BLDC_T::StepTask(int32_T idx) const
+{
+  return (Timing.TaskCounters.TID[(idx)] == 0);
+}
+
+uint32_T &RT_MODEL_AMC_BLDC_T::CounterLimit(int32_T idx)
+{
+  return (Timing.TaskCounters.cLimit[(idx)]);
+}
+
+const char_T* RT_MODEL_AMC_BLDC_T::getErrorStatus() const
+{
+  return (errorStatus);
+}
+
+void RT_MODEL_AMC_BLDC_T::setErrorStatus(const char_T* const aErrorStatus)
+{
+  (errorStatus = aErrorStatus);
+}
+
+uint32_T &RT_MODEL_AMC_BLDC_T::TaskCounter(int32_T idx)
+{
+  return (Timing.TaskCounters.TID[(idx)]);
+}
+
+const char_T** RT_MODEL_AMC_BLDC_T::getErrorStatusPointer()
+{
+  return &errorStatus;
 }
 
 //

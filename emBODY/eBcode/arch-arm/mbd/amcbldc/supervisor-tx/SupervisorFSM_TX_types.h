@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 8.0
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:55:31 2024
+// Model version                  : 9.0
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:26:10 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -144,122 +144,6 @@ struct FOCOutputs
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Thresholds_
-#define DEFINED_TYPEDEF_FOR_Thresholds_
-
-struct Thresholds
-{
-  // Can be only non-negative
-  real32_T jntVelMax;
-
-  // Current that can be kept for an indefinite period of time w/o damaging the motor
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorNominalCurrents;
-
-  // Current that can be applied for a short period of time
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorPeakCurrents;
-
-  // Currents over this threshold can instantaneously damages the motor
-  // Expressed in [A] as all the internal computations are done this way
-  // Can be only non-negative
-  real32_T motorOverloadCurrents;
-
-  // Expressed in ticks
-  // Max value is 32000
-  // Can be only non-negative
-  uint32_T motorPwmLimit;
-
-  // The critical temperature of the motor that triggers i2t current protection. 
-  real32_T motorCriticalTemperature;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_PID_
-#define DEFINED_TYPEDEF_FOR_PID_
-
-struct PID
-{
-  ControlModes type;
-  real32_T OutMax;
-  real32_T OutMin;
-  real32_T P;
-  real32_T I;
-  real32_T D;
-  real32_T N;
-  real32_T I0;
-  real32_T D0;
-  uint8_T shift_factor;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_PIDsConfiguration_
-#define DEFINED_TYPEDEF_FOR_PIDsConfiguration_
-
-struct PIDsConfiguration
-{
-  PID currentPID;
-  PID velocityPID;
-  PID positionPID;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-#define DEFINED_TYPEDEF_FOR_MotorConfigurationExternal_
-
-struct MotorConfigurationExternal
-{
-  boolean_T enable_verbosity;
-  boolean_T has_hall_sens;
-  boolean_T has_quadrature_encoder;
-  boolean_T has_speed_quadrature_encoder;
-  boolean_T has_temperature_sens;
-  uint8_T encoder_tolerance;
-  uint8_T pole_pairs;
-  int16_T rotor_encoder_resolution;
-  int16_T rotor_index_offset;
-  boolean_T use_index;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
-#define DEFINED_TYPEDEF_FOR_MotorConfiguration_
-
-struct MotorConfiguration
-{
-  MotorConfigurationExternal externals;
-  real32_T Kbemf;
-  real32_T Rphase;
-  real32_T Imin;
-  real32_T Imax;
-  real32_T Vmax;
-  real32_T resistance;
-  real32_T inductance;
-  real32_T thermal_resistance;
-  real32_T thermal_time_constant;
-  real32_T hall_sensors_offset;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
-#define DEFINED_TYPEDEF_FOR_ActuatorConfiguration_
-
-struct ActuatorConfiguration
-{
-  Thresholds thresholds;
-  PIDsConfiguration pids;
-  MotorConfiguration motor;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
 #define DEFINED_TYPEDEF_FOR_BUS_STATUS_TX_
 
@@ -375,10 +259,6 @@ struct BUS_MESSAGES_TX
 };
 
 #endif
-
-// Forward declaration for rtModel
-typedef struct tag_RTM_SupervisorFSM_TX_T RT_MODEL_SupervisorFSM_TX_T;
-
 #endif                                 // SupervisorFSM_TX_types_h_
 
 //

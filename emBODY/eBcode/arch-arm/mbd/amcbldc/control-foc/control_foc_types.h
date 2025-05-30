@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 7.11
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:01 2024
+// Model version                  : 8.9
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:26:50 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -68,6 +68,7 @@ struct EstimationConfiguration
   real32_T environment_temperature;
   real32_T current_rms_lambda;
   EstimationVelocityModes velocity_est_mode;
+  uint32_T velocity_est_window;
 };
 
 #endif

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 8.0
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:55:31 2024
+// Model version                  : 9.0
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri May 30 15:26:10 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -36,20 +36,11 @@ struct DW_SupervisorFSM_TX_f_T {
   uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
 };
 
-// Real-time Model Data Structure
-struct tag_RTM_SupervisorFSM_TX_T {
-  const char_T **errorStatus;
-};
-
 struct MdlrefDW_SupervisorFSM_TX_T {
   B_SupervisorFSM_TX_c_T rtb;
   DW_SupervisorFSM_TX_f_T rtdw;
-  RT_MODEL_SupervisorFSM_TX_T rtm;
 };
 
-// Model reference registration function
-extern void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_SupervisorFSM_TX_T *const SupervisorFSM_TX_M);
 extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx);
 extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
   EstimatedData *rtu_EstimatedData, const Flags *rtu_Flags, const FOCOutputs

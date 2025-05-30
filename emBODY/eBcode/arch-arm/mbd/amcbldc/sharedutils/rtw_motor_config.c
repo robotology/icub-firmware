@@ -29,7 +29,7 @@
     #warning: choose a STM32HAL_BOARD_*    
 #endif
 
-void rtw_configMotor(uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t pole_pairs, uint8_t has_hall_sens, uint8_t swapBC, uint16_t hall_sens_offset)
+void rtw_configMotor(uint8_t motor_id, uint8_t has_quad_enc, int16_t rotor_enc_resolution, uint8_t pole_pairs, uint8_t has_hall_sens, uint8_t swapBC, uint16_t hall_sens_offset)
 {
 #if defined(STM32HAL_BOARD_AMCBLDC) || defined(STM32HAL_BOARD_AMC2C)
 
