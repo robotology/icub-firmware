@@ -395,9 +395,6 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
         case eomc_controlmode_cmd_mixed:
         case eomc_controlmode_cmd_position:
         case eomc_controlmode_cmd_direct:
-        case eomc_controlmode_cmd_openloop:
-        case eomc_controlmode_cmd_current:
-        case eomc_controlmode_cmd_torque:
             break;
             
         default:
@@ -446,7 +443,7 @@ void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk)
     WatchDog_rearm(&o->trq_fbk_wdog);
 }
 
-BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode)
+BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode, int* controlmode)
 {
     //static int noflood = 0;
     //
@@ -469,7 +466,8 @@ BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode)
             o->trq_ref = ZERO;
             o->trq_err = ZERO;
       
-            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);             
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+            *controlmode = 0;            
             return TRUE;
         }
     }
@@ -478,7 +476,8 @@ BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode)
     {
         if (WatchDog_check_expired(&o->trq_ref_wdog))
         {  
-            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_trq_ref_timeout);
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            *controlmode = 1;
             return TRUE;
         }
     }
@@ -486,7 +485,8 @@ BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode)
     {
         if (WatchDog_check_expired(&o->cur_ref_wdog))
         {   
-            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_cur_ref_timeout);
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            *controlmode = 2;
             return TRUE;
         }
     }
@@ -494,7 +494,8 @@ BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode)
     {
         if (WatchDog_check_expired(&o->pwm_ref_wdog))
         {   
-            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_pwm_ref_timeout);
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            *controlmode = 3;
             return TRUE;
         }
     }
