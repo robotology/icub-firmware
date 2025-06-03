@@ -136,6 +136,7 @@ private:
     static bool isValidValue_AEA(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
     static bool isValidValue_AEA3(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
     bool IsEncoderSupported(const Config &config);
+    bool TestRead(const Config &config);
 
 #if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)    
     EOpacket *packet {nullptr};    
@@ -202,7 +203,7 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     activateafterverify = ActivateafterverifY;
     onverifycompleted = oncompletion;
     
-//    #warning acemor-says: embot::app::eth::theEncoderReader should be revised. for now it does NOT verify encoders ...
+//    #warning acemor-says: embot::app::eth::theEncoderReader should be revised again?
 
 #if 0 
     READ this:
@@ -215,23 +216,27 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 #endif    
 
     
-    // we dont check and we just assume that everything is all right.
-    // 1. we activate
-    // 2. we send a nice diagnostic message 
-    // 3. ...
-    
-
+    constexpr bool verificationFailed {false};
     
     if(false == IsEncoderSupported(config))
     {
 
         _verified = false;
-        constexpr bool verificationFailed {false};
         onverifycompleted.execute(verificationFailed);  
     
         return false;  
     }
-
+    if(false ==  TestRead(config))
+    {
+         _verified = false;
+        onverifycompleted.execute(verificationFailed);  
+        
+        return false;  
+        
+    }
+   
+    
+    
     
     diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.sourceaddress    = 0;
@@ -277,17 +282,14 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 
 
 
-
-
-
-
 bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &config)
 {
-    eOerrmanDescriptor_t errdes = {};
-    errdes.par16 = 0;
-    errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
-    errdes.sourcedevice = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress = 0;
+
+    diagnostics.errorDescriptor.par16 = 0;
+    diagnostics.errorDescriptor.par64 = 0;
+    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
+    diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+    diagnostics.errorDescriptor.sourceaddress = 0;
     bool ret {true};
     
     if((nullptr == config.carrayofjomodes))
@@ -311,67 +313,66 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
     _implconfig.numofjomos = eo_constarray_Size(carray);
     for(uint8_t i=0; i<_implconfig.numofjomos; i++)
     {
-        const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
+       const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
         
-        if(nullptr != jomodes)
+       if(nullptr == jomodes) { continue; }
+
+        _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
+        _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
+        
+        embot::hw::encoder::Config cfg {};
+        
+        switch(_implconfig.jomo_cfg[i].encoder1des.type)
         {
-            _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
-            _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
-            
-            embot::hw::encoder::Config cfg {};
-            
-            switch(_implconfig.jomo_cfg[i].encoder1des.type)
+            case eomc_enc_aea:
             {
-                case eomc_enc_aea:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipAS5045;
-                } break;
-                
-                case eomc_enc_aea3:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipMA730;
-                } break;
-                
-                case eomc_enc_aksim2:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipMB049;
-                } break;
-                case eomc_enc_unknown:
-                case eomc_enc_none:
-                default:
-                {
-                    //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
+                cfg.type = embot::hw::encoder::Type::chipAS5045;
+            } break;
+            
+            case eomc_enc_aea3:
+            {
+                cfg.type = embot::hw::encoder::Type::chipMA730;
+            } break;
+            
+            case eomc_enc_aksim2:
+            {
+                cfg.type = embot::hw::encoder::Type::chipMB049;
+            } break;
+            case eomc_enc_unknown:
+            case eomc_enc_none:
+            default:
+            {
+                //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
 //                    embot::core::print("theEncoderReader: encoder unknown/none/unsupported");
-                    ret = false;
-                } break;
-            }
-            
-            // 2. configure and initialize SPI encoder
-            embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
-            embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
-            if(embot::hw::resOK != r)
-            {                            
-                ////        embot::core::print("theEncoderReader: encoder type not supported");
-                // in some cases, we need to alert the pc104 that the board does not support this service, in our case the encoder
-                //to do: tell the specific error to yarp    
-                errdes.par16 = errdes.par16 |((_implconfig.numofjomos)<<12);
-                errdes.par16 = errdes.par16 | (1<<i);
-                errdes.par64 = 0;
-                
                 ret = false;
-            }
-            else
-            {
-                ret = true;
-//                embot::core::print("theEncoderReader: encoder init successfull");
-            }
+            } break;
+        }
+        
+        // 2. configure and initialize SPI encoder
+        embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
+        embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
+        if(embot::hw::resOK != r)
+        {                            
+            ////        embot::core::print("theEncoderReader: encoder type not supported");
+            //to do: tell the specific error to yarp    
+            diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 |((_implconfig.numofjomos)<<12);
+            diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | (1<<i);
+            diagnostics.errorDescriptor.par64 = 0;
             
+            ret = false;
+        }
+        else
+        {
+            ret = true;
+//                embot::core::print("theEncoderReader: encoder init successfull");
         }
     }
     
     if(false == ret)
     {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &diagnostics.errorDescriptor); 
+        diagnostics.errorDescriptor.par16 = 0;
+        diagnostics.errorDescriptor.par64 = 0;
         Deactivate();      
     }
 
@@ -380,7 +381,7 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
 
 
 
-
+//i assume no errors were encountered before
 bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 {
 
@@ -411,47 +412,47 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
         
-        if(nullptr != jomodes)
+        if(nullptr == jomodes) { continue; }
+
+        _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
+        _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
+        
+        embot::hw::encoder::Config cfg {};
+        
+        switch(_implconfig.jomo_cfg[i].encoder1des.type)
         {
-            _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
-            _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
-            
-            embot::hw::encoder::Config cfg {};
-            
-            switch(_implconfig.jomo_cfg[i].encoder1des.type)
+            case eomc_enc_aea:
             {
-                case eomc_enc_aea:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipAS5045;
-                } break;
-                
-                case eomc_enc_aea3:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipMA730;
-                } break;
-                
-                case eomc_enc_aksim2:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipMB049;
-                } break;
-                case eomc_enc_unknown:
-                case eomc_enc_none:
-                default:
-                {
-                    //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
-//                    embot::core::print("theEncoderReader: encoder unknown/none/unsupported");
-                    ret = false;
-                } break;
-            }
+                cfg.type = embot::hw::encoder::Type::chipAS5045;
+            } break;
             
-            // 2. configure and initialize SPI encoder
-            embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
-            embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
-            if(embot::hw::resOK != r)
-            {          
+            case eomc_enc_aea3:
+            {
+                cfg.type = embot::hw::encoder::Type::chipMA730;
+            } break;
+            
+            case eomc_enc_aksim2:
+            {
+                cfg.type = embot::hw::encoder::Type::chipMB049;
+            } break;
+            case eomc_enc_unknown:
+            case eomc_enc_none:
+            default:
+            {
+                //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
+//                    embot::core::print("theEncoderReader: encoder unknown/none/unsupported");
                 ret = false;
-            }
+            } break;
         }
+        
+        // 2. configure and initialize SPI encoder
+        embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
+        embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
+        if(embot::hw::resOK != r)
+        {          
+            ret = false;
+        }
+
     }
     
     if(false == ret)
@@ -630,6 +631,60 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
     
     return true;
 }
+
+
+
+
+bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
+{
+    diagnostics.errorDescriptor.par16 = 0; 
+    diagnostics.errorDescriptor.par64 = 0;
+//    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
+    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_HardWare,eoerror_value_HW_encoder_not_connected);  
+    diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+    diagnostics.errorDescriptor.sourceaddress = 0;
+    
+    bool ret {true};
+    
+    EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
+
+    _implconfig.numofjomos = eo_constarray_Size(carray);
+    //I will try to read the primary encoder, if the reading is succesfful (aka embot::hw::encoder::read reads plausible data) ok, if not I will send an error to yarp
+    for(uint8_t i=0; i<_implconfig.numofjomos; i++)
+    {
+       const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
+        
+       if(nullptr == jomodes) { continue; }
+
+        _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
+        _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
+        
+        embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
+        embot::hw::encoder::POS pos;
+       
+        if(resNOK == embot::hw::encoder::read(enc, pos, 5*embot::core::time1millisec))     
+        {                        
+            ////        embot::core::print("theEncoderReader: encoder reading fails");
+            //to do: tell the specific error to yarp    
+            diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | i;
+            diagnostics.errorDescriptor.par64 = 1;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
+            
+            diagnostics.errorDescriptor.par16 = 0;
+            diagnostics.errorDescriptor.par64 = 0;     
+            ret = false;            
+        }
+    }
+    
+    if(false == ret)
+    {
+       
+        Deactivate();      
+    }
+
+    return ret;
+}
+
 
 bool embot::app::eth::theEncoderReader::Impl::SendReport()
 {
