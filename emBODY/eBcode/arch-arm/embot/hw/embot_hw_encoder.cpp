@@ -304,6 +304,10 @@ namespace embot::hw::encoder {
                 pos = dd.position;
                 //destination.status = dd.status.ok;
             }
+            else
+            {
+                return resNOK;
+            }
         }
         else if(embot::hw::encoder::Type::chipMA730 == _data_array[index].config.type)
         {
@@ -314,6 +318,10 @@ namespace embot::hw::encoder {
             {
                 pos = dd.position;
                 //destination.status = dd.status.ok;
+            }
+            else
+            {
+                return resNOK;
             }
         }
         else
