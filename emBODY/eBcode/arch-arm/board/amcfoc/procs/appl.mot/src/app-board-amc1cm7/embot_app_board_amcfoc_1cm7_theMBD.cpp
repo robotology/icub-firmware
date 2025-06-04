@@ -26,6 +26,7 @@ int32_t CU1 = 0;
 int32_t CU2 = 0;
 int32_t CU3 = 0;
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - defines
 // --------------------------------------------------------------------------------------------------------------------
@@ -42,6 +43,12 @@ int32_t CU3 = 0;
 //#define DEBUG_PRINT_CURRENTS_PWM
 
 //#define DEBUG_PWM_min_0perc
+
+//#define TEST_Quad_Encoder_Mot_1
+
+#if defined(TEST_Quad_Encoder_Mot_1)
+    int32_t angle_global=0;
+#endif
 
 // -
 // - MBD code section
@@ -135,6 +142,9 @@ int32_t CU3 = 0;
 
 #include "embot_hw_motor_hall.h"
 #include "embot_hw_analog.h"
+
+
+#include "embot_hw_motor_enc.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -914,8 +924,26 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
         embot::app::msg::Location l {bus2use, _config.adr};
         embot::app::bldc::MSG msg {l, o};
         outputmessages.push_back(msg);
-    }  
-        
+    }
+    
+
+#if defined(TEST_Quad_Encoder_Mot_1)
+
+    //this can be used to debug without sending the motor configuration
+//        embot::hw::motor::enc::encoder1_test();
+    
+    //this can be used by sending the motor configuration via CAN
+    if(embot::hw::motor::enc::isstarted(static_cast<embot::hw::MOTOR> (0)))
+    {        
+        angle_global = (int32_t) embot::hw::motor::enc::angle(static_cast<embot::hw::MOTOR> (0) );
+        static uint8_t ii=1;
+        if (ii++%150 == 0)
+            embot::core::print(
+                    "encoder angle:  " +
+                    std::to_string( (int32_t) embot::hw::motor::enc::angle(static_cast<embot::hw::MOTOR> (0) ) )
+        );
+    }
+#endif //defined(TEST_Quad_Encoder_Mot_1)
     
 #else
 

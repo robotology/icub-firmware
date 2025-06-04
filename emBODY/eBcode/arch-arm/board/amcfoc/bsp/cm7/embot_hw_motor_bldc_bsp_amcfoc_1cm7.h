@@ -41,6 +41,12 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
     extern ADC_HandleTypeDef &hadcMOT2;  
     extern ADC_HandleTypeDef &hadcOTHERS; 
     
+    
+    extern TIM_HandleTypeDef &hTimEnc1;        // qenc
+    extern TIM_HandleTypeDef &hTimEnc2;        // qenc
+    
+    
+    
     struct PWMvalues
     {   // the default is for pwm @ 10.240 us ....
 
@@ -89,6 +95,11 @@ namespace embot::hw::motor::bldc::bsp::amcfoc::cm7 {
 //    constexpr PWMvalues PWMvals {pwm066666Hz};
 //    constexpr PWMvalues PWMvals {PWM100000Hz};
     
+    
+    constexpr auto QEncoder1Mode TIM_ENCODERMODE_TI12;
+    constexpr auto QEncoder2Mode TIM_ENCODERMODE_TI12;
+    
+    constexpr uint8_t QencICFilter = 4;
     
 }
 

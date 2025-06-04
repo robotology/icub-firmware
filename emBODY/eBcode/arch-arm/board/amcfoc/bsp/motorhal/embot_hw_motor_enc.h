@@ -13,6 +13,8 @@
 #include "embot_core.h"
 #include "embot_hw.h"
 
+#include "stm32hal.h"
+
 #if 0
 
 this API exposes what is required to move the motor using embot::hw::motor
@@ -49,12 +51,48 @@ namespace embot::hw::motor::enc {
         }
     };
 
-    bool init(const Configuration &config);
-    bool deinit();
-    bool start(const Mode& mode);
-    bool isstarted();
-    int32_t getvalue(); 
-    void force(int32_t value);
+    bool init(embot::hw::MOTOR m, const Configuration &config);
+    bool deinit(embot::hw::MOTOR m);
+    bool start(embot::hw::MOTOR m, const Mode& mode);
+    bool isstarted(embot::hw::MOTOR m);
+//    int32_t getvalue(); 
+//    void force(int32_t value);
+    float angle(embot::hw::MOTOR m);
+
+    
+    bool Enc1Init(embot::hw::MOTOR m);
+    bool Enc2Init(embot::hw::MOTOR m);
+    
+    int32_t Enc1GetRotorPosition(void);
+    int32_t Enc2GetRotorPosition(void);
+    
+    float GetencIndexAngle(embot::hw::MOTOR m);
+
+    float GetencFirstIndexCrossAngle(embot::hw::MOTOR m);
+    
+    
+    void Enc1DeInit(void);
+    void Enc2DeInit(void);
+    
+    void encoder1_test(void);
+    
+    
+    /* Common encoder constants */   
+    static constexpr auto ENC_INDEX_LEADING_EDGE = TIM_CHANNEL_3;
+    static constexpr auto ENC_INDEX_IT_LEADING_EDGE = TIM_IT_CC3;
+    static constexpr auto ENC_INDEX_TRAILING_EDGE = TIM_CHANNEL_4;
+    static constexpr auto ENC_INDEX_IT_TRAILING_EDGE = TIM_IT_CC4;
+
+    /* Status register values */
+    static constexpr auto ENC_STATUS_IDLE  = 0;
+    static constexpr auto ENC_STATUS_WAIT  = 1;
+    static constexpr auto ENC_STATUS_READY = 2;
+    
+    /* Offset between the counting edge and the index edge */
+    static constexpr auto ENC_UP_COUNTING_OFFSET = 1;
+    static constexpr auto ENC_DOWN_COUNTING_OFFSET = 1;
+
+    
     
 } // namespace embot::hw::motor::enc {
 
