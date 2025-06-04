@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 4.0
+// Model version                  : 4.2
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jun  4 12:19:27 2025
+// C/C++ source code generated on : Wed Jun  4 12:30:28 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -83,48 +83,41 @@ static void supervisor_ResetTargets(Targets *rty_targets)
 static void supervisor_TargetsManager(Targets *rty_targets, Flags *rty_Flags,
   DW_supervisor_f_T *localDW)
 {
-  boolean_T guard1;
-  if (localDW->is_TargetsManager == supervisor_IN_Home) {
-    guard1 = false;
-    if (localDW->sfEvent == supervisor_event_ControlModeSetpointChange) {
-      guard1 = true;
-    } else if (localDW->sfEvent == supervisor_event_DispatcherSetpointChange) {
-      rty_Flags->enable_sending_msg_status = true;
-      guard1 = true;
-    }
+  if ((localDW->is_TargetsManager == supervisor_IN_Home) && ((localDW->sfEvent ==
+        supervisor_event_ControlModeSetpointChange) || (localDW->sfEvent ==
+        supervisor_event_DispatcherSetpointChange))) {
+    switch (localDW->is_ControlModeHandler) {
+     case supervisor_IN_Current:
+      rty_targets->current = static_cast<real32_T>(localDW->newSetpoint);
+      break;
 
-    if (guard1) {
-      switch (localDW->is_ControlModeHandler) {
-       case supervisor_IN_Current:
-        rty_targets->current = static_cast<real32_T>(localDW->newSetpoint);
-        break;
+     case supervisor_IN_Voltage:
+      rty_targets->voltage = static_cast<real32_T>(localDW->newSetpoint);
+      break;
 
-       case supervisor_IN_Voltage:
-        rty_targets->voltage = static_cast<real32_T>(localDW->newSetpoint);
-        break;
+     default:
+      if ((localDW->is_ControlModeHandler == supervisor_IN_Idle) ||
+          (localDW->is_ControlModeHandler == supervisor_IN_HWFault)) {
+        supervisor_ResetTargets(rty_targets);
+      } else {
+        switch (localDW->is_ControlModeHandler) {
+         case supervisor_IN_Velocity:
+          rty_targets->velocity = static_cast<real32_T>(localDW->newSetpoint);
+          break;
 
-       default:
-        if ((localDW->is_ControlModeHandler == supervisor_IN_Idle) ||
-            (localDW->is_ControlModeHandler == supervisor_IN_HWFault)) {
-          supervisor_ResetTargets(rty_targets);
-        } else {
-          switch (localDW->is_ControlModeHandler) {
-           case supervisor_IN_Velocity:
-            rty_targets->velocity = static_cast<real32_T>(localDW->newSetpoint);
-            break;
+         case supervisor_IN_Position:
+          rty_targets->position = static_cast<real32_T>(localDW->newSetpoint);
+          break;
 
-           case supervisor_IN_Position:
-            rty_targets->position = static_cast<real32_T>(localDW->newSetpoint);
-            break;
-
-           default:
-            // Default Transition
-            break;
-          }
+         default:
+          // Default Transition
+          break;
         }
-        break;
       }
+      break;
     }
+
+    rty_Flags->enable_sending_msg_status = false;
   }
 }
 
@@ -1052,6 +1045,7 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
     localDW->is_active_TargetsManager = 1U;
     supervisor_ResetTargets(rty_targets);
     localDW->is_TargetsManager = supervisor_IN_Home;
+    rty_Flags->enable_sending_msg_status = false;
   } else {
     if (localDW->is_active_FaultsManager != 0) {
       if (localDW->is_active_HWFaults != 0) {
