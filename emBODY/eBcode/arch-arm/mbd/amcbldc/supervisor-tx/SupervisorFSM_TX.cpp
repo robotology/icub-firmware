@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 10.1
+// Model version                  : 10.2
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jun  4 12:01:43 2025
+// C/C++ source code generated on : Wed Jun  4 14:14:07 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -57,8 +57,7 @@ static MCControlModes SupervisorFSM_TX_convert(ControlModes controlmode)
 }
 
 // System initialize for referenced model: 'SupervisorFSM_TX'
-void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX
-  *rty_StatusTx)
+void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx)
 {
   // SystemInitialize for Chart: '<Root>/SupervisorFSM_TX'
   rty_MessagesTx->foc.current = 0.0F;
@@ -102,10 +101,6 @@ void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX
   rty_MessagesTx->status.flags.SiliconRevisionFault = false;
   rty_MessagesTx->status.flags.PositionLimitUpper = false;
   rty_MessagesTx->status.flags.PositionLimitLower = false;
-
-  // SystemInitialize for BusCreator: '<Root>/BUS_STATUS_TX'
-  rty_StatusTx->foc = false;
-  rty_StatusTx->status = false;
 }
 
 // Output and update for referenced model: 'SupervisorFSM_TX'
@@ -147,9 +142,52 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
 
   // End of Chart: '<Root>/SupervisorFSM_TX'
 
-  // BusCreator: '<Root>/BUS_STATUS_TX'
-  rty_StatusTx->foc = localB->ev_foc;
-  rty_StatusTx->status = localB->ev_status;
+  // RelationalOperator: '<S1>/FixPt Relational Operator' incorporates:
+  //   UnitDelay: '<S1>/Delay Input1'
+  //
+  //  Block description for '<S1>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  rty_StatusTx->foc = (localB->ev_foc != localDW->DelayInput1_DSTATE);
+
+  // UnitDelay: '<S2>/Delay Input1' incorporates:
+  //   UnitDelay: '<S1>/Delay Input1'
+  //
+  //  Block description for '<S2>/Delay Input1':
+  //
+  //   Store in Global RAM
+  //
+  //  Block description for '<S1>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  localDW->DelayInput1_DSTATE = localDW->DelayInput1_DSTATE_h;
+
+  // RelationalOperator: '<S2>/FixPt Relational Operator' incorporates:
+  //   UnitDelay: '<S1>/Delay Input1'
+  //
+  //  Block description for '<S1>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  rty_StatusTx->status = (localB->ev_status != localDW->DelayInput1_DSTATE);
+
+  // Update for UnitDelay: '<S1>/Delay Input1'
+  //
+  //  Block description for '<S1>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  localDW->DelayInput1_DSTATE = localB->ev_foc;
+
+  // Update for UnitDelay: '<S2>/Delay Input1'
+  //
+  //  Block description for '<S2>/Delay Input1':
+  //
+  //   Store in Global RAM
+
+  localDW->DelayInput1_DSTATE_h = localB->ev_status;
 }
 
 //
