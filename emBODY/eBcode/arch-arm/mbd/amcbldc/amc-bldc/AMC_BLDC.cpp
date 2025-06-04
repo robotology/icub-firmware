@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 9.8
+// Model version                  : 10.0
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri May 30 15:28:03 2025
+// C/C++ source code generated on : Wed Jun  4 12:02:34 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -204,8 +204,6 @@ void AMC_BLDC_step_FOC(void)           // Sample time: [4.5e-05s, 0.0s]
 // Model step function for TID2
 void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
 {
-  // local block i/o variables
-  BUS_STATUS_TX rtb_SupervisorFSM_TX_o2;
   FOCOutputs rtb_TmpRTBAtSupervisorFSM_TXInport4;
 
   // ModelReference: '<S1>/CAN_Decoder' incorporates:
@@ -260,14 +258,14 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
   SupervisorFSM_TX(&AMC_BLDC_U.SensorsData_p, &AMC_BLDC_Y.EstimatedData_p,
                    &AMC_BLDC_Y.Flags_p, &rtb_TmpRTBAtSupervisorFSM_TXInport4,
                    &AMC_BLDC_U.ExternalFlags_p.fault_button,
-                   &AMC_BLDC_B.MessagesTx, &rtb_SupervisorFSM_TX_o2,
+                   &AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2,
                    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtb),
                    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtdw));
 
   // ModelReference: '<S1>/CAN_Encoder' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element1'
 
-  can_encoder(&AMC_BLDC_B.MessagesTx, &rtb_SupervisorFSM_TX_o2,
+  can_encoder(&AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2,
               &AMC_BLDC_Y.PacketsTx);
 }
 
@@ -310,7 +308,7 @@ void AMC_BLDC_initialize(void)
     &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtdw));
 
   // SystemInitialize for ModelReference generated from: '<Root>/SupervisorFSM_TX' 
-  SupervisorFSM_TX_Init(&AMC_BLDC_B.MessagesTx);
+  SupervisorFSM_TX_Init(&AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2);
 
   // Enable for ModelReference: '<Root>/Motion Controller Single'
   motion_controller_single_Enable

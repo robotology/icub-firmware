@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 9.0
+// Model version                  : 10.1
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri May 30 15:26:10 2025
+// C/C++ source code generated on : Wed Jun  4 12:01:43 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -31,8 +31,6 @@ struct B_SupervisorFSM_TX_c_T {
 struct DW_SupervisorFSM_TX_f_T {
   uint32_T ev_focEventCounter;         // '<Root>/SupervisorFSM_TX'
   uint32_T ev_statusEventCounter;      // '<Root>/SupervisorFSM_TX'
-  boolean_T DelayInput1_DSTATE;        // '<S1>/Delay Input1'
-  boolean_T DelayInput1_DSTATE_d;      // '<S2>/Delay Input1'
   uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
 };
 
@@ -41,7 +39,8 @@ struct MdlrefDW_SupervisorFSM_TX_T {
   DW_SupervisorFSM_TX_f_T rtdw;
 };
 
-extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx);
+extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX
+  *rty_StatusTx);
 extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
   EstimatedData *rtu_EstimatedData, const Flags *rtu_Flags, const FOCOutputs
   *rtu_ControlOutputs, const boolean_T *rtu_ExternalFlags_fault_button,
@@ -63,9 +62,7 @@ extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'SupervisorFSM_TX'
-//  '<S1>'   : 'SupervisorFSM_TX/Detect Change'
-//  '<S2>'   : 'SupervisorFSM_TX/Detect Change1'
-//  '<S3>'   : 'SupervisorFSM_TX/SupervisorFSM_TX'
+//  '<S1>'   : 'SupervisorFSM_TX/SupervisorFSM_TX'
 
 #endif                                 // SupervisorFSM_TX_h_
 

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 9.8
+// Model version                  : 10.0
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri May 30 15:28:03 2025
+// C/C++ source code generated on : Wed Jun  4 12:02:34 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -31,6 +31,7 @@
 struct B_AMC_BLDC_T {
   ReceivedEvents CAN_Decoder[MAX_EVENTS_PER_TICK];// '<S1>/CAN_Decoder'
   BUS_MESSAGES_TX MessagesTx;          // '<Root>/SupervisorFSM_TX'
+  BUS_STATUS_TX SupervisorFSM_TX_o2;   // '<Root>/SupervisorFSM_TX'
 };
 
 // Block states (default storage) for system '<Root>'
