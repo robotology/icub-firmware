@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
 // Model version                  : 3.14
-// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
-// C/C++ source code generated on : Fri May 23 10:49:48 2025
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri Jun  6 14:55:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -40,6 +40,7 @@ struct DW_CoreSubsys_iterative_motion_controller_T {
   FOCOutputs TmpRTBAtModelInport4_Buf2;// synthesized block
   Flags Flags_l;                       // '<S1>/Motion Controller'
   EstimatedData MotionController_o2;   // '<S1>/Motion Controller'
+  BUS_STATUS_TX Model_o2;              // '<S1>/Model'
   void* TmpRTBAtModelInport1_SEMAPHORE;// synthesized block
   void* TmpRTBAtModelInport4_SEMAPHORE;// synthesized block
   int8_T TmpRTBAtModelInport1_LstBufWR;// synthesized block
@@ -51,9 +52,8 @@ struct DW_CoreSubsys_iterative_motion_controller_T {
 // Block signals and states (default storage) for system '<Root>'
 struct DW_iterative_motion_controller_T {
   DW_CoreSubsys_iterative_motion_controller_T CoreSubsys[N_MOTORS];// '<Root>/Iterative Motion Controller' 
-  ReceivedEvents M[(MAX_EVENTS_PER_TICK * N_MOTORS)];
-  ReceivedEvents
-    rtb_ImpSel_InsertedFor_Events_at_outport_0_m[MAX_EVENTS_PER_TICK];
+  ReceivedEvents ImpSel_InsertedFor_Events_at_outport_0[MAX_EVENTS_PER_TICK];
+  ReceivedEvents M[(MAX_EVENTS_PER_TICK * N_MOTORS)];// '<Root>/Sort Events'
 };
 
 // External inputs (root inport signals with default storage)
@@ -148,8 +148,8 @@ extern "C"
 
   // Model entry point functions
   extern void AMCFOC_initialize(void);
-  extern void AMCFOC_step_Time_base(void);// Sample time: [5.0E-6s, 0.0s]
-  extern void AMCFOC_step_FOC(void);   // Sample time: [4.5E-5s, 0.0s]
+  extern void AMCFOC_step_Time_base(void);// Sample time: [5e-06s, 0.0s]
+  extern void AMCFOC_step_FOC(void);   // Sample time: [4.5e-05s, 0.0s]
   extern void AMCFOC_step_Time_1ms(void);// Sample time: [0.001s, 0.0s]
   extern void AMCFOC_terminate(void);
 

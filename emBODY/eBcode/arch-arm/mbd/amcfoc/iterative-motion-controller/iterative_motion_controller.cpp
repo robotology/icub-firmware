@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
 // Model version                  : 3.14
-// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
-// C/C++ source code generated on : Fri May 23 10:49:48 2025
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri Jun  6 14:55:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,9 +18,9 @@
 //
 #include "iterative_motion_controller.h"
 #include "rtwtypes.h"
+#include "iterative_motion_controller_types.h"
 #include <cstring>
 #include "rtw_mutex.h"
-#include "iterative_motion_controller_types.h"
 #include "rtw_defines.h"
 #include "mul_s32_sat.h"
 #include "SupervisorFSM_TX.h"
@@ -196,34 +196,56 @@ RT_MODEL_iterative_motion_controller_T *const iterative_motion_controller_M =
   &iterative_motion_controller_M_;
 
 // Model step function for TID0
-void AMCFOC_step_Time_base(void)       // Sample time: [5.0E-6s, 0.0s]
+void AMCFOC_step_Time_base(void)       // Sample time: [5e-06s, 0.0s]
 {
+  // local block i/o variables
+  ActuatorConfiguration rtb_ImpSel_InsertedFor_InitConf_at_outport_0;
+  SensorsData rtb_ImpSel_InsertedFor_SensorData_at_outport_0;
+
   // local scratch DWork variables
   int32_T ForEach_itr;
+  int32_T i;
 
   // Outputs for Iterator SubSystem: '<Root>/Iterative Motion Controller' incorporates:
   //   ForEach: '<S1>/For Each'
 
   for (ForEach_itr = 0; ForEach_itr < N_MOTORS; ForEach_itr++) {
-    // Outputs for Iterator SubSystem: '<Root>/Iterative Motion Controller' incorporates:
-    //   ForEach: '<S1>/For Each'
+    // ModelReference: '<S1>/Motion Controller' incorporates:
+    //   Inport: '<Root>/ExternalFlags'
 
-    // ModelReference: '<S1>/Motion Controller'
     motion_controllerTID0();
 
-    // End of Outputs for SubSystem: '<Root>/Iterative Motion Controller'
+    // ForEachSliceSelector generated from: '<S1>/SensorData' incorporates:
+    //   Inport: '<Root>/SensorData'
+
+    rtb_ImpSel_InsertedFor_SensorData_at_outport_0 =
+      iterative_motion_controller_U.SensorData[ForEach_itr];
+    for (i = 0; i < MAX_EVENTS_PER_TICK; i++) {
+      // ForEachSliceSelector generated from: '<S1>/Events'
+      iterative_motion_controller_DW.ImpSel_InsertedFor_Events_at_outport_0[i] =
+        iterative_motion_controller_DW.M[N_MOTORS * i + ForEach_itr];
+    }
+
+    // ForEachSliceSelector generated from: '<S1>/InitConf' incorporates:
+    //   Constant: '<Root>/Constant'
+
+    rtb_ImpSel_InsertedFor_InitConf_at_outport_0 = AmcfocInitConf[ForEach_itr];
   }
 
   // End of Outputs for SubSystem: '<Root>/Iterative Motion Controller'
 }
 
 // Model step function for TID1
-void AMCFOC_step_FOC(void)             // Sample time: [4.5E-5s, 0.0s]
+void AMCFOC_step_FOC(void)             // Sample time: [4.5e-05s, 0.0s]
 {
+  // local block i/o variables
+  ActuatorConfiguration rtb_ImpSel_InsertedFor_InitConf_at_outport_0;
+  SensorsData rtb_ImpSel_InsertedFor_SensorData_at_outport_0;
+
   // local scratch DWork variables
   int32_T ForEach_itr;
   FOCOutputs rtb_ImpAsg_InsertedFor_FOCOutputs_at_inport_0[N_MOTORS];
-  SensorsData rtb_ImpSel_InsertedFor_SensorData_at_outport_0;
+  int32_T i;
   int8_T wrBufIdx;
 
   // Outputs for Iterator SubSystem: '<Root>/Iterative Motion Controller' incorporates:
@@ -337,6 +359,16 @@ void AMCFOC_step_FOC(void)             // Sample time: [4.5E-5s, 0.0s]
 
     rtb_ImpAsg_InsertedFor_FOCOutputs_at_inport_0[ForEach_itr] =
       iterative_motion_controller_DW.CoreSubsys[ForEach_itr].MotionController_o1;
+    for (i = 0; i < MAX_EVENTS_PER_TICK; i++) {
+      // ForEachSliceSelector generated from: '<S1>/Events'
+      iterative_motion_controller_DW.ImpSel_InsertedFor_Events_at_outport_0[i] =
+        iterative_motion_controller_DW.M[N_MOTORS * i + ForEach_itr];
+    }
+
+    // ForEachSliceSelector generated from: '<S1>/InitConf' incorporates:
+    //   Constant: '<Root>/Constant'
+
+    rtb_ImpSel_InsertedFor_InitConf_at_outport_0 = AmcfocInitConf[ForEach_itr];
   }
 
   // End of Outputs for SubSystem: '<Root>/Iterative Motion Controller'
@@ -353,13 +385,13 @@ void AMCFOC_step_FOC(void)             // Sample time: [4.5E-5s, 0.0s]
 void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
 {
   // local block i/o variables
-  BUS_STATUS_TX rtb_MessagesFlags_CoreSubsysCanOut;
+  ActuatorConfiguration rtb_ImpSel_InsertedFor_InitConf_at_outport_0;
+  SensorsData rtb_ImpSel_InsertedFor_SensorData_at_outport_0;
 
   // local scratch DWork variables
   int32_T ForEach_itr;
   ActuatorConfiguration
     rtb_ImpAsg_InsertedFor_ConfigurationParameters_at_inport_0[N_MOTORS];
-  ActuatorConfiguration rtb_ImpSel_InsertedFor_InitConf_at_outport_0;
   BUS_MESSAGES_TX rtb_ImpAsg_InsertedFor_Messages_at_inport_0[N_MOTORS];
   BUS_STATUS_TX rtb_ImpAsg_InsertedFor_MessagesFlags_at_inport_0[N_MOTORS];
   EstimatedData rtb_ImpAsg_InsertedFor_Estimates_at_inport_0[N_MOTORS];
@@ -453,10 +485,15 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
   //   ForEach: '<S1>/For Each'
 
   for (ForEach_itr = 0; ForEach_itr < N_MOTORS; ForEach_itr++) {
+    // ForEachSliceSelector generated from: '<S1>/SensorData' incorporates:
+    //   Inport: '<Root>/SensorData'
+
+    rtb_ImpSel_InsertedFor_SensorData_at_outport_0 =
+      iterative_motion_controller_U.SensorData[ForEach_itr];
     for (i = 0; i < MAX_EVENTS_PER_TICK; i++) {
       // ForEachSliceSelector generated from: '<S1>/Events'
-      iterative_motion_controller_DW.rtb_ImpSel_InsertedFor_Events_at_outport_0_m
-        [i] = iterative_motion_controller_DW.M[N_MOTORS * i + ForEach_itr];
+      iterative_motion_controller_DW.ImpSel_InsertedFor_Events_at_outport_0[i] =
+        iterative_motion_controller_DW.M[N_MOTORS * i + ForEach_itr];
     }
 
     // ForEachSliceSelector generated from: '<S1>/InitConf' incorporates:
@@ -468,7 +505,7 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
     //   Inport: '<Root>/ExternalFlags'
 
     mc_step_1ms(&iterative_motion_controller_U.ExternalFlags_j,
-                &iterative_motion_controller_DW.rtb_ImpSel_InsertedFor_Events_at_outport_0_m
+                &iterative_motion_controller_DW.ImpSel_InsertedFor_Events_at_outport_0
                 [0], &rtb_ImpSel_InsertedFor_InitConf_at_outport_0,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                 MotionController_o2,
@@ -546,21 +583,21 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
                      Flags_l, &rtb_TmpRTBAtModelInport4,
                      &iterative_motion_controller_U.ExternalFlags_j.fault_button,
                      &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
-                     MessagesTx, &rtb_MessagesFlags_CoreSubsysCanOut,
-                     &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
-                       Model_InstanceData.rtb),
+                     MessagesTx,
+                     &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
+                     Model_o2,
                      &(iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                        Model_InstanceData.rtdw));
-
-    // ForEachSliceAssignment generated from: '<S1>/MessagesFlags'
-    rtb_ImpAsg_InsertedFor_MessagesFlags_at_inport_0[ForEach_itr] =
-      rtb_MessagesFlags_CoreSubsysCanOut;
 
     // ForEachSliceAssignment generated from: '<S1>/Messages' incorporates:
     //   ModelReference generated from: '<S1>/Model'
 
     rtb_ImpAsg_InsertedFor_Messages_at_inport_0[ForEach_itr] =
       iterative_motion_controller_DW.CoreSubsys[ForEach_itr].MessagesTx;
+
+    // ForEachSliceAssignment generated from: '<S1>/MessagesFlags'
+    rtb_ImpAsg_InsertedFor_MessagesFlags_at_inport_0[ForEach_itr] =
+      iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Model_o2;
 
     // ForEachSliceAssignment generated from: '<S1>/Flags'
     rtb_ImpAsg_InsertedFor_Flags_at_inport_0[ForEach_itr] =
@@ -631,6 +668,8 @@ void AMCFOC_initialize(void)
   {
     // local scratch DWork variables
     int32_T ForEach_itr;
+    ReceivedEvents struct_temp;
+    int32_T i;
 
     // SystemInitialize for Iterator SubSystem: '<Root>/Iterative Motion Controller' 
     for (ForEach_itr = 0; ForEach_itr < N_MOTORS; ForEach_itr++) {
@@ -642,7 +681,8 @@ void AMCFOC_initialize(void)
 
       // SystemInitialize for ModelReference generated from: '<S1>/Model'
       SupervisorFSM_TX_Init
-        (&iterative_motion_controller_DW.CoreSubsys[ForEach_itr].MessagesTx);
+        (&iterative_motion_controller_DW.CoreSubsys[ForEach_itr].MessagesTx,
+         &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Model_o2);
 
       // SystemInitialize for ModelReference: '<S1>/Motion Controller'
       motion_controller_Init
@@ -656,6 +696,44 @@ void AMCFOC_initialize(void)
     }
 
     // End of SystemInitialize for SubSystem: '<Root>/Iterative Motion Controller' 
+
+    // SystemInitialize for Chart: '<Root>/Sort Events'
+    struct_temp.motor_id = 0U;
+    struct_temp.event_type = EventTypes_None;
+    struct_temp.targets_content.position = 0.0F;
+    struct_temp.targets_content.velocity = 0.0F;
+    struct_temp.targets_content.current = 0.0F;
+    struct_temp.targets_content.voltage = 0.0F;
+    struct_temp.pid_content.type = ControlModes_NotConfigured;
+    struct_temp.pid_content.OutMax = 0.0F;
+    struct_temp.pid_content.OutMin = 0.0F;
+    struct_temp.pid_content.P = 0.0F;
+    struct_temp.pid_content.I = 0.0F;
+    struct_temp.pid_content.D = 0.0F;
+    struct_temp.pid_content.N = 0.0F;
+    struct_temp.pid_content.I0 = 0.0F;
+    struct_temp.pid_content.D0 = 0.0F;
+    struct_temp.pid_content.shift_factor = 0U;
+    struct_temp.control_mode_content = ControlModes_NotConfigured;
+    struct_temp.limits_content.overload = 0.0F;
+    struct_temp.limits_content.peak = 0.0F;
+    struct_temp.limits_content.nominal = 0.0F;
+    struct_temp.limits_content.type = ControlModes_NotConfigured;
+    struct_temp.motor_config_content.enable_verbosity = false;
+    struct_temp.motor_config_content.has_hall_sens = false;
+    struct_temp.motor_config_content.has_quadrature_encoder = false;
+    struct_temp.motor_config_content.has_speed_quadrature_encoder = false;
+    struct_temp.motor_config_content.has_temperature_sens = false;
+    struct_temp.motor_config_content.encoder_tolerance = 0U;
+    struct_temp.motor_config_content.pole_pairs = 0U;
+    struct_temp.motor_config_content.rotor_encoder_resolution = 0;
+    struct_temp.motor_config_content.rotor_index_offset = 0;
+    struct_temp.motor_config_content.use_index = false;
+    for (i = 0; i < MAX_EVENTS_PER_TICK * N_MOTORS; i++) {
+      iterative_motion_controller_DW.M[i] = struct_temp;
+    }
+
+    // End of SystemInitialize for Chart: '<Root>/Sort Events'
     // Enable for Iterator SubSystem: '<Root>/Iterative Motion Controller'
     for (ForEach_itr = 0; ForEach_itr < N_MOTORS; ForEach_itr++) {
       // Enable for Iterator SubSystem: '<Root>/Iterative Motion Controller'

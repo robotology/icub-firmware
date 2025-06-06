@@ -8,8 +8,8 @@
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
 // Model version                  : 3.14
-// Simulink Coder version         : 24.2 (R2024b) 21-Jun-2024
-// C/C++ source code generated on : Fri May 23 10:49:48 2025
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri Jun  6 14:55:37 2025
 //
 #ifndef RTWTYPES_H
 #define RTWTYPES_H
