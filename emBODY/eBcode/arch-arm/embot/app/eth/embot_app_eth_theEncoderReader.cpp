@@ -1,17 +1,16 @@
-
 /*
- * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Simone Girardi
  * email:   simone.girardi@iit.it
+ * Author:  Kevin Sangalli
+ * email:   kevin.sangalli@iit.it
 */
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_app_eth_theEncoderReader.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -278,15 +277,15 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     return true;  
 }
 
-
+//check if the encoder(s) selected is supported by the board
 bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &config)
 {
-
     diagnostics.errorDescriptor.par16 = 0;
     diagnostics.errorDescriptor.par64 = 0;
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
     diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.sourceaddress = 0;
+    
     bool ret {true};
     
     if((nullptr == config.carrayofjomodes))
@@ -300,13 +299,12 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
         ret = false;
         return ret;
     }
-
-    EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
-
+    
+    //in doubt I deinit the embot::hw::encoders
     Deactivate();
     
-   
     // 1. prepare the config
+    EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
     _implconfig.numofjomos = eo_constarray_Size(carray);
     for(uint8_t i=0; i<_implconfig.numofjomos; i++)
     {
@@ -376,7 +374,7 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
 
 
 
-//i assume no errors were encountered before
+//I'm not giving error messages here bc I assume no errors will be encountered as the checks are done before
 bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 {
 
@@ -620,8 +618,6 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
         }
     }
     
-
-
     //eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, position, primary, secondary); 
     
     return true;
@@ -629,12 +625,11 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
 
 
 
-
+// I'll do one reading of the encoder
 bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
 {
     diagnostics.errorDescriptor.par16 = 0; 
     diagnostics.errorDescriptor.par64 = 0;
-//    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_HardWare,eoerror_value_HW_encoder_not_connected);  
     diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.sourceaddress = 0;
@@ -651,16 +646,13 @@ bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
         
        if(nullptr == jomodes) { continue; }
 
-        _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
-        _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
-        
+        _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;        
         embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
         embot::hw::encoder::POS pos;
        
         if(resNOK == embot::hw::encoder::read(enc, pos, 5*embot::core::time1millisec))     
         {                        
-            ////        embot::core::print("theEncoderReader: encoder reading fails");
-            //to do: tell the specific error to yarp    
+//            embot::core::print("theEncoderReader: encoder reading fails");   
             diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | i;
             diagnostics.errorDescriptor.par64 = 1;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
