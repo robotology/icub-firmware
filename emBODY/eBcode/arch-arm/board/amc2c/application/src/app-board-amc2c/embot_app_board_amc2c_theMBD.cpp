@@ -626,13 +626,6 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     embot::hw::motor::setPWM(embot::hw::MOTOR::one, pwmperc);
 
 
-		 static uint32_t cnt = 0;
-			if((++cnt % 100000) == 1)
-			{
-				embot::core::print("mode " + std::to_string(AMC_BLDC_Y.Flags_p.control_mode));
-
-			}
-		
 
 //    impl->measureFOC->stop();
 }
