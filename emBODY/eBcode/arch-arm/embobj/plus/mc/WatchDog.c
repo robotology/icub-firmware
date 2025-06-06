@@ -83,6 +83,8 @@ void Watchdog_disarm(WatchDog* o)
 
 BOOL WatchDog_check_expired(WatchDog* o)
 {
+    if (!o->base_time) return FALSE;
+    
     if (o->timer)
     {
         --o->timer;
