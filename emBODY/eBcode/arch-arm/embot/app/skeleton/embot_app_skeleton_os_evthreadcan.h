@@ -18,6 +18,7 @@
 
 #include "embot_prot_can.h"
 #include "embot_app_theCANboardInfo.h"
+#include <vector>
 
 namespace embot::app::skeleton::os::evthreadcan {
        

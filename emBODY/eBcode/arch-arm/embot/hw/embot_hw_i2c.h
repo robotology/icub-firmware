@@ -25,7 +25,7 @@
 #include "embot_core.h"
 #include "embot_core_utils.h"
 #include "embot_hw_types.h"
-
+#include <vector>
 
 
 // see also https://www.i2c-bus.org/

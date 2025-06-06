@@ -15,7 +15,7 @@ constexpr std::uint8_t defADDRESS = 11;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
     embot::prot::can::Board::mtb4, 
-    embot::prot::can::versionOfBOOTLOADER {1, 8}, 
+    embot::prot::can::versionOfBOOTLOADER {1, 9}, 
     defADDRESS,                                                  
     "I am a mtb4" 
 };
