@@ -203,7 +203,7 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     activateafterverify = ActivateafterverifY;
     onverifycompleted = oncompletion;
     
-//    #warning acemor-says: embot::app::eth::theEncoderReader should be revised again?
+//    #warning sanlordkevin-says: embot::app::eth::theEncoderReader should be revised again?
 
 #if 0 
     READ this:
@@ -218,21 +218,26 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     
     constexpr bool verificationFailed {false};
     
-    if(false == IsEncoderSupported(config))
-    {
-
+    if( false == IsEncoderSupported(config) )
+    {        
         _verified = false;
         onverifycompleted.execute(verificationFailed);  
-    
+
         return false;  
     }
-    if(false ==  TestRead(config))
+    if( false ==  TestRead(config) )
     {
+        diagnostics.errorDescriptor.par16            = 0;
+        diagnostics.errorDescriptor.par64            = 0;    
+        diagnostics.errorType = eo_errortype_error;
+        diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+        diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
+        eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, nullptr, s_eobj_ownname, &diagnostics.errorDescriptor);
+        
          _verified = false;
         onverifycompleted.execute(verificationFailed);  
-        
+
         return false;  
-        
     }
    
     
@@ -272,14 +277,6 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     
     return true;  
 }
-
-
-
-
-
-
-
-
 
 
 bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &config)
@@ -371,8 +368,6 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
     if(false == ret)
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &diagnostics.errorDescriptor); 
-        diagnostics.errorDescriptor.par16 = 0;
-        diagnostics.errorDescriptor.par64 = 0;
         Deactivate();      
     }
 
@@ -669,9 +664,7 @@ bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
             diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | i;
             diagnostics.errorDescriptor.par64 = 1;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
-            
-            diagnostics.errorDescriptor.par16 = 0;
-            diagnostics.errorDescriptor.par64 = 0;     
+             
             ret = false;            
         }
     }
