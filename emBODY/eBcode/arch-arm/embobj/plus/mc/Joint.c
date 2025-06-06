@@ -224,6 +224,11 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 #endif  
     
     WatchDog_set_base_time_msec(&o->vel_ref_wdog, config->velocitysetpointtimeout);
+    WatchDog_set_base_time_msec(&o->cur_ref_wdog, config->currentsetpointtimeout);
+    WatchDog_set_base_time_msec(&o->pwm_ref_wdog, config->openloopsetpointtimeout);
+    WatchDog_set_base_time_msec(&o->trq_ref_wdog, config->torquesetpointtimeout);
+    WatchDog_set_base_time_msec(&o->trq_fbk_wdog, config->torquefeedbacktimeout);
+    
     WatchDog_rearm(&o->vel_ref_wdog);
     
     WatchDog_rearm(&o->trq_ref_wdog);
