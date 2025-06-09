@@ -18,7 +18,6 @@
 
 #include "embot_hw_encoder.h"
 #include "EOtheErrorManager.h"
-#include "embot_app_eth_theErrorManager.h"
 #include "EoProtocol.h"
 #include "EoMotionControl.h"
 #include "EoError.h"
@@ -27,7 +26,6 @@
 #include "embot_app_eth_theServices.h"
 #include "embot_app_eth_Service_legacy.h"
 
-#include "embot_os_theScheduler.h"
 
 #if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)   
 #include "embot_app_eth_theBackdoor.h"
@@ -200,19 +198,7 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     eo_timer_Stop(diagnostics.reportTimer);  
         
     activateafterverify = ActivateafterverifY;
-    onverifycompleted = oncompletion;
-    
-//    #warning sanlordkevin-says: embot::app::eth::theEncoderReader should be revised again?
-
-#if 0 
-    READ this:
-    we should enhance this object w/   
-    - a proper verify and activate
-    - internal data structure as in namespace embot::app::eth::service::impl
-    - surely diagnostics
-    - ...    
-
-#endif    
+    onverifycompleted = oncompletion; 
 
     
     constexpr bool verificationFailed {false};
@@ -226,8 +212,7 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     }
     if( false ==  TestRead(config) )
     {
-        diagnostics.errorDescriptor.par16            = 0;
-        diagnostics.errorDescriptor.par64            = 0;    
+        diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par64 = 0;
         diagnostics.errorType = eo_errortype_error;
         diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
         diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
@@ -239,8 +224,6 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
         return false;  
     }
    
-    
-    
     
     diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.sourceaddress    = 0;
@@ -280,8 +263,7 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 //check if the encoder(s) selected is supported by the board
 bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &config)
 {
-    diagnostics.errorDescriptor.par16 = 0;
-    diagnostics.errorDescriptor.par64 = 0;
+    diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par64 = 0;
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
     diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.sourceaddress = 0;
@@ -432,8 +414,7 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
             case eomc_enc_none:
             default:
             {
-                //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
-//                    embot::core::print("theEncoderReader: encoder unknown/none/unsupported");
+                //unknown/no/unsupported encoder
                 ret = false;
             } break;
         }
@@ -460,11 +441,6 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 
 bool embot::app::eth::theEncoderReader::Impl::Deactivate()
 {
-//    eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
-//    
-//    embot::app::eth::theErrorManager::getInstance().trace("", {"",     
-//                              embot::os::theScheduler::getInstance().scheduled()}); 
-//    
     _implconfig.numofjomos = 0;
     embot::hw::encoder::deinit(embot::hw::ENCODER::one);
     embot::hw::encoder::deinit(embot::hw::ENCODER::two);
