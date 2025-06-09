@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 2.54
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Thu Oct 10 13:02:35 2024
+// Model version                  : 3.14
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri Jun  6 14:55:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -202,32 +202,6 @@ struct ReceivedEvents
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
-#define DEFINED_TYPEDEF_FOR_FOCOutputs_
-
-struct FOCOutputs
-{
-  // control effort (quadrature)
-  real32_T Vq;
-
-  // control effort (3-phases)
-  real32_T Vabc[3];
-
-  // quadrature current
-  real32_T Iq_fbk;
-
-  // direct current
-  real32_T Id_fbk;
-
-  // RMS of Iq
-  real32_T Iq_rms;
-
-  // RMS of Id
-  real32_T Id_rms;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
 #define DEFINED_TYPEDEF_FOR_EstimatedData_
 
@@ -266,6 +240,32 @@ struct Flags
 
   // control mode
   ControlModes control_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
+#define DEFINED_TYPEDEF_FOR_FOCOutputs_
+
+struct FOCOutputs
+{
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
+  real32_T Vabc[3];
+
+  // quadrature current
+  real32_T Iq_fbk;
+
+  // direct current
+  real32_T Id_fbk;
+
+  // RMS of Iq
+  real32_T Iq_rms;
+
+  // RMS of Id
+  real32_T Id_rms;
 };
 
 #endif

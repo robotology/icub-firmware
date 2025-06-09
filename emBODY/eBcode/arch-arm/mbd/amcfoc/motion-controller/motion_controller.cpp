@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 3.12
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Thu Oct 10 12:24:40 2024
+// Model version                  : 5.2
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri Jun  6 14:55:18 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -175,7 +175,6 @@ void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
                  B_motion_controller_c_T *localB, DW_motion_controller_f_T
                  *localDW)
 {
-  ActuatorConfiguration rtb_BusCreator_actuator_configuration;
   ControlOuterOutputs rtb_Controlouter;
   int8_T wrBufIdx;
 
@@ -203,12 +202,12 @@ void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
   // End of RateTransition: '<Root>/Transition to 1ms'
 
   // ModelReference: '<S1>/Velocity Estimator' incorporates:
-  //   BusCreator: '<S2>/Bus Creator5'
   //   Constant: '<S2>/Velocity Estimation Mode'
+  //   Constant: '<S2>/Velocity estimation window'
 
   estimation_velocity(&motion_controller_ConstP.VelocityEstimationMode_Value,
                       &localB->Transitionto1ms.position,
-                      &rty_EstimatedData->velocity,
+                      &rtCP_Velocityestimationwindow_Value, &localB->velocity,
                       &(localDW->VelocityEstimator_InstanceData.rtdw));
 
   // RateTransition: '<Root>/Rate Transition2'
@@ -239,6 +238,7 @@ void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
                  &(localDW->CurrentFilter_InstanceData.rtdw));
 
   // BusCreator generated from: '<S1>/Estimation_BusCreator'
+  rty_EstimatedData->velocity = localB->velocity;
   rty_EstimatedData->motor_temperature = 0.0F;
 
   // ModelReference: '<Root>/Motor Supervisor'
@@ -254,13 +254,9 @@ void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
                 &(localDW->Controlouter_InstanceData.rtdw),
                 &(localDW->Controlouter_InstanceData.rtzce));
 
-  // BusCreator: '<Root>/Bus Creator'
-  rtb_BusCreator_actuator_configuration = *rty_ActuatorsConfiguration;
-
   // RateTransition: '<Root>/Rate Transition' incorporates:
   //   BusCreator: '<Root>/Bus Creator'
-  //   BusCreator: '<S2>/Bus Creator9'
-
+  //
   rtw_mutex_lock();
   wrBufIdx = static_cast<int8_T>(localDW->RateTransition_LstBufWR + 1);
   if (wrBufIdx == 3) {
@@ -276,14 +272,16 @@ void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
 
   rtw_mutex_unlock();
   localDW->RateTransition_Buf[wrBufIdx].
-    global_configuration.estimation.environment_temperature = 0.995F;
+    global_configuration.estimation.environment_temperature = 25.0F;
   localDW->RateTransition_Buf[wrBufIdx].
-    global_configuration.estimation.current_rms_lambda = 25.0F;
+    global_configuration.estimation.current_rms_lambda = 0.995F;
   localDW->RateTransition_Buf[wrBufIdx].
     global_configuration.estimation.velocity_est_mode =
     EstimationVelocityModes_MovingAverage;
+  localDW->RateTransition_Buf[wrBufIdx].
+    global_configuration.estimation.velocity_est_window = 64U;
   localDW->RateTransition_Buf[wrBufIdx].actuator_configuration =
-    rtb_BusCreator_actuator_configuration;
+    *rty_ActuatorsConfiguration;
   localDW->RateTransition_Buf[wrBufIdx].estimated_data = *rty_EstimatedData;
   localDW->RateTransition_Buf[wrBufIdx].targets = localB->targets;
   localDW->RateTransition_Buf[wrBufIdx].control_outer_outputs = rtb_Controlouter;

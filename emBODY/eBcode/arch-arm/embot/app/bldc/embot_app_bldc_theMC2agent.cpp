@@ -35,8 +35,8 @@
 //#include "embot_app_application_theCANtracer.h"
 
 
-#define DEBUG_print_decoded_CAN_frames
-//#define DEBUG_print_decoded_CAN_frames_periodic
+// #define DEBUG_print_decoded_CAN_frames
+// #define DEBUG_print_decoded_CAN_frames_periodic
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++

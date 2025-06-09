@@ -18,13 +18,13 @@ int32_t readElecAngle = 0;
 uint32_t readSector = 0;
 uint8_t readHALL = 0;
 
-int32_t pwm1 =0;
-int32_t pwm2 =0;
-int32_t pwm3 =0;
+//int32_t pwm1 =0;
+//int32_t pwm2 =0;
+//int32_t pwm3 =0;
 
-int32_t CU1 = 0;
-int32_t CU2 = 0;
-int32_t CU3 = 0;
+//int32_t CU1 = 0;
+//int32_t CU2 = 0;
+//int32_t CU3 = 0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1190,47 +1190,10 @@ void embot::app::board::amcfoc::cm7::theMBD::Impl::FOC(embot::hw::MOTOR m)
         _items[embot::core::tointegral(m)].pwm.w = std::clamp(output[embot::core::tointegral(m)].pwm.w - 5.0f, 0.0f, 100.0f);        
 #else        
         _items[embot::core::tointegral(m)].pwm = output[embot::core::tointegral(m)].pwm; 
-#endif
-        
-        // uvw
-        float u = _items[embot::core::tointegral(m)].pwm.u;
-        float v = _items[embot::core::tointegral(m)].pwm.v;
-        float w = _items[embot::core::tointegral(m)].pwm.w;
-        
-//        // wvu
-//        _items[embot::core::tointegral(m)].pwm.u = w;
-//        _items[embot::core::tointegral(m)].pwm.v = v;
-//        _items[embot::core::tointegral(m)].pwm.w = u;
+#endif     
+				embot::hw::motor::bldc::set(m, _items[embot::core::tointegral(m)].pwm);        
 
-//        // uwv
-//        _items[embot::core::tointegral(m)].pwm.u = u;
-//        _items[embot::core::tointegral(m)].pwm.v = w;
-//        _items[embot::core::tointegral(m)].pwm.w = v;
- 
-
-//        // vuw -> vibra e suona
-//        _items[embot::core::tointegral(m)].pwm.u = v;
-//        _items[embot::core::tointegral(m)].pwm.v = u;
-//        _items[embot::core::tointegral(m)].pwm.w = w;
-
-        // vwu -> il motore del lego setup gira con questa configurazione
-        _items[embot::core::tointegral(m)].pwm.u = v;
-        _items[embot::core::tointegral(m)].pwm.v = w;
-        _items[embot::core::tointegral(m)].pwm.w = u;
-        
-        if(m == embot::hw::MOTOR::one)
-        {
-            pwm1 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.u);
-            pwm2 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.v);
-            pwm3 = static_cast<int32_t>(_items[embot::core::tointegral(m)].pwm.w);
-            
-            CU1 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.u);
-            CU2 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.v);
-            CU3 = static_cast<int32_t>(1000*_items[embot::core::tointegral(m)].currents.w);
-        }
-        
-        embot::hw::motor::bldc::set(m, _items[embot::core::tointegral(m)].pwm);        
-    }
+		}
     
 }
 

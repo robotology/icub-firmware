@@ -64,7 +64,7 @@
         {
             "source_directory": "estimation_velocity",
             "source_directory_parent": "ert",
-            "target_directory": "estimator",
+            "target_directory": "estimation-velocity",
             "files": [
                 "*.cpp",
                 "*.h"

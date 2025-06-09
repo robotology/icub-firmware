@@ -32,7 +32,8 @@ void rtw_enableMotor(){
     
     #ifdef STM32HAL_BOARD_AMCFOC_1CM7
     embot::hw::motor::bldc::enable(embot::hw::MOTOR::one, true);
-    #endif    
+    embot::hw::motor::bldc::enable(embot::hw::MOTOR::two, true);
+	#endif    
 }
 
 void rtw_disableMotor(){
@@ -42,6 +43,7 @@ void rtw_disableMotor(){
     
     #ifdef STM32HAL_BOARD_AMCFOC_1CM7
     embot::hw::motor::bldc::enable(embot::hw::MOTOR::one, false);
+    embot::hw::motor::bldc::enable(embot::hw::MOTOR::two, false);
     #endif     
     
 }

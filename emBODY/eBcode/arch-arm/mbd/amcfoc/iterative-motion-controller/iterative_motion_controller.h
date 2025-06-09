@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 2.54
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Thu Oct 10 13:02:35 2024
+// Model version                  : 3.14
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Fri Jun  6 14:55:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -24,15 +24,6 @@
 #include "motion_controller.h"
 #include "rtw_defines.h"
 #include "zero_crossing_types.h"
-
-// Macros for accessing real-time model data structure
-#ifndef rtmStepTask
-#define rtmStepTask(rtm, idx)          ((rtm)->Timing.TaskCounters.TID[(idx)] == 0)
-#endif
-
-#ifndef rtmTaskCounter
-#define rtmTaskCounter(rtm, idx)       ((rtm)->Timing.TaskCounters.TID[(idx)])
-#endif
 
 // Block signals and states (default storage) for system '<Root>/Iterative Motion Controller' 
 struct DW_CoreSubsys_iterative_motion_controller_T {
@@ -49,6 +40,7 @@ struct DW_CoreSubsys_iterative_motion_controller_T {
   FOCOutputs TmpRTBAtModelInport4_Buf2;// synthesized block
   Flags Flags_l;                       // '<S1>/Motion Controller'
   EstimatedData MotionController_o2;   // '<S1>/Motion Controller'
+  BUS_STATUS_TX Model_o2;              // '<S1>/Model'
   void* TmpRTBAtModelInport1_SEMAPHORE;// synthesized block
   void* TmpRTBAtModelInport4_SEMAPHORE;// synthesized block
   int8_T TmpRTBAtModelInport1_LstBufWR;// synthesized block
@@ -60,9 +52,8 @@ struct DW_CoreSubsys_iterative_motion_controller_T {
 // Block signals and states (default storage) for system '<Root>'
 struct DW_iterative_motion_controller_T {
   DW_CoreSubsys_iterative_motion_controller_T CoreSubsys[N_MOTORS];// '<Root>/Iterative Motion Controller' 
-  ReceivedEvents M[(MAX_EVENTS_PER_TICK * N_MOTORS)];
-  ReceivedEvents
-    rtb_ImpSel_InsertedFor_Events_at_outport_0_m[MAX_EVENTS_PER_TICK];
+  ReceivedEvents ImpSel_InsertedFor_Events_at_outport_0[MAX_EVENTS_PER_TICK];
+  ReceivedEvents M[(MAX_EVENTS_PER_TICK * N_MOTORS)];// '<Root>/Sort Events'
 };
 
 // External inputs (root inport signals with default storage)
@@ -92,8 +83,13 @@ struct tag_RTM_iterative_motion_controller_T {
   struct {
     struct {
       uint32_T TID[3];
+      uint32_T cLimit[3];
     } TaskCounters;
   } Timing;
+
+  boolean_T StepTask(int32_T idx) const;
+  uint32_T &CounterLimit(int32_T idx);
+  uint32_T &TaskCounter(int32_T idx);
 };
 
 // Block signals and states (default storage)
@@ -152,9 +148,9 @@ extern "C"
 
   // Model entry point functions
   extern void AMCFOC_initialize(void);
-  extern void AMCFOC_step_Time_0(void);
-  extern void AMCFOC_step_FOC(void);
-  extern void AMCFOC_step_Time_1ms(void);
+  extern void AMCFOC_step_Time_base(void);// Sample time: [5e-06s, 0.0s]
+  extern void AMCFOC_step_FOC(void);   // Sample time: [4.5e-05s, 0.0s]
+  extern void AMCFOC_step_Time_1ms(void);// Sample time: [0.001s, 0.0s]
   extern void AMCFOC_terminate(void);
 
 #ifdef __cplusplus
