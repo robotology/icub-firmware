@@ -5,11 +5,11 @@
 //  granting, nonprofit, education, and research organizations only. Not
 //  for commercial or industrial use.
 //
-//  Code generation for model "estimation_velocity".
+//  Code generation for model "motion_controller".
 //
-//  Model version              : 7.3
-//  Simulink Coder version : 24.1 (R2024a) 19-Nov-2023
-//  C++ source code generated on : Mon Oct  7 15:56:19 2024
+//  Model version              : 4.6
+//  Simulink Coder version : 25.1 (R2025a) 21-Nov-2024
+//  C++ source code generated on : Fri May 30 15:27:43 2025
 
 #include "rtwtypes.h"
 
@@ -23,6 +23,8 @@ extern const real32_T rtCP_pooled_IgamRjjg0YgF[6];
 const real32_T rtCP_pooled_IgamRjjg0YgF[6] = { 0.666666687F, -0.333333343F,
   -0.333333343F, 0.666666687F, -0.333333343F, -0.333333343F } ;
 
+extern const uint32_T rtCP_pooled_UdZPJ5vElovg;
+const uint32_T rtCP_pooled_UdZPJ5vElovg = 64U;
 extern const boolean_T rtCP_pooled_kUC6nmgO8rex[16];
 const boolean_T rtCP_pooled_kUC6nmgO8rex[16] = { false, true, false, false, true,
   true, false, false, true, false, true, true, false, false, false, false } ;

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 8.15
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:50 2024
+// Model version                  : 10.0
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Wed Jun  4 18:02:19 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -27,43 +27,15 @@
 #include "rtw_defines.h"
 #include "zero_crossing_types.h"
 
-// Macros for accessing real-time model data structure
-#ifndef rtmCounterLimit
-#define rtmCounterLimit(rtm, idx)      ((rtm)->Timing.TaskCounters.cLimit[(idx)])
-#endif
-
-#ifndef rtmGetErrorStatus
-#define rtmGetErrorStatus(rtm)         ((rtm)->errorStatus)
-#endif
-
-#ifndef rtmSetErrorStatus
-#define rtmSetErrorStatus(rtm, val)    ((rtm)->errorStatus = (val))
-#endif
-
-#ifndef rtmGetErrorStatusPointer
-#define rtmGetErrorStatusPointer(rtm)  ((const char_T **)(&((rtm)->errorStatus)))
-#endif
-
-#ifndef rtmStepTask
-#define rtmStepTask(rtm, idx)          ((rtm)->Timing.TaskCounters.TID[(idx)] == 0)
-#endif
-
-#ifndef rtmTaskCounter
-#define rtmTaskCounter(rtm, idx)       ((rtm)->Timing.TaskCounters.TID[(idx)])
-#endif
-
 // Block signals (default storage)
 struct B_AMC_BLDC_T {
-  ActuatorConfiguration
-    ZOHBlockInsertedForAdapter_InsertedFor_Adapter_at_outport_0;// '<Root>/Adapter' 
-  ReceivedEvents CAN_Decoder[MAX_EVENTS_PER_TICK];// '<S2>/CAN_Decoder'
+  ReceivedEvents CAN_Decoder[MAX_EVENTS_PER_TICK];// '<S1>/CAN_Decoder'
   BUS_MESSAGES_TX MessagesTx;          // '<Root>/SupervisorFSM_TX'
+  BUS_STATUS_TX SupervisorFSM_TX_o2;   // '<Root>/SupervisorFSM_TX'
 };
 
 // Block states (default storage) for system '<Root>'
 struct DW_AMC_BLDC_T {
-  ActuatorConfiguration
-    ZOHBlockInsertedForAdapter_InsertedFor_Adapter_at_outport_0_;// synthesized block 
   FOCOutputs TmpRTBAtSupervisorFSM_TXInport4_Buf0;// synthesized block
   FOCOutputs TmpRTBAtSupervisorFSM_TXInport4_Buf1;// synthesized block
   FOCOutputs TmpRTBAtSupervisorFSM_TXInport4_Buf2;// synthesized block
@@ -71,9 +43,9 @@ struct DW_AMC_BLDC_T {
   int8_T TmpRTBAtSupervisorFSM_TXInport4_LstBufWR;// synthesized block
   int8_T TmpRTBAtSupervisorFSM_TXInport4_RDBuf;// synthesized block
   MdlrefDW_motion_controller_single_T MotionControllerSingle_InstanceData;// '<Root>/Motion Controller Single' 
-  MdlrefDW_can_decoder_T CAN_Decoder_InstanceData;// '<S2>/CAN_Decoder'
+  MdlrefDW_can_decoder_T CAN_Decoder_InstanceData;// '<S1>/CAN_Decoder'
   MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_InstanceData;// '<Root>/SupervisorFSM_TX' 
-  MdlrefDW_can_encoder_T CAN_Encoder_InstanceData;// '<S2>/CAN_Encoder'
+  MdlrefDW_can_encoder_T CAN_Encoder_InstanceData;// '<S1>/CAN_Encoder'
 };
 
 // External inputs (root inport signals with default storage)
@@ -107,6 +79,13 @@ struct tag_RTM_AMC_BLDC_T {
       uint32_T cLimit[3];
     } TaskCounters;
   } Timing;
+
+  boolean_T StepTask(int32_T idx) const;
+  uint32_T &CounterLimit(int32_T idx);
+  const char_T* getErrorStatus() const;
+  void setErrorStatus(const char_T* const aErrorStatus);
+  uint32_T &TaskCounter(int32_T idx);
+  const char_T** getErrorStatusPointer();
 };
 
 // Block signals (default storage)
@@ -159,17 +138,17 @@ extern ActuatorConfiguration AmcbldcInitConf;// Variable: AmcbldcInitConf
                                                 //  Referenced by: '<Root>/Motion Controller Single'
 
 extern real32_T CAN_ANGLE_DEG2ICUB;    // Variable: CAN_ANGLE_DEG2ICUB
-                                          //  Referenced by: '<S2>/CAN_Encoder'
+                                          //  Referenced by: '<S1>/CAN_Encoder'
                                           //  2^16/360
 
 extern real32_T CAN_ANGLE_ICUB2DEG;    // Variable: CAN_ANGLE_ICUB2DEG
-                                          //  Referenced by: '<S2>/CAN_Decoder'
+                                          //  Referenced by: '<S1>/CAN_Decoder'
                                           //  360/2^16
 
 extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  Referenced by:
-                                          //    '<S2>/CAN_Decoder'
-                                          //    '<S2>/CAN_Encoder'
+                                          //    '<S1>/CAN_Decoder'
+                                          //    '<S1>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 
@@ -182,9 +161,9 @@ extern "C"
 
   // Model entry point functions
   extern void AMC_BLDC_initialize(void);
-  extern void AMC_BLDC_step0(void);
-  extern void AMC_BLDC_step_FOC(void);
-  extern void AMC_BLDC_step_1ms(void);
+  extern void AMC_BLDC_step0(void);    // Sample time: [5e-06s, 0.0s]
+  extern void AMC_BLDC_step_FOC(void); // Sample time: [4.5e-05s, 0.0s]
+  extern void AMC_BLDC_step_1ms(void); // Sample time: [0.001s, 0.0s]
   extern void AMC_BLDC_terminate(void);
 
 #ifdef __cplusplus
@@ -224,8 +203,7 @@ extern "C"
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'AMC_BLDC'
-//  '<S1>'   : 'AMC_BLDC/Adapter'
-//  '<S2>'   : 'AMC_BLDC/Messaging'
+//  '<S1>'   : 'AMC_BLDC/Messaging'
 
 #endif                                 // AMC_BLDC_h_
 

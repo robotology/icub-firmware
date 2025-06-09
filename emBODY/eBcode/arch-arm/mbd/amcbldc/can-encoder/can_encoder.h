@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_encoder'.
 //
-// Model version                  : 7.0
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:55:55 2024
+// Model version                  : 9.1
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Wed Jun  4 18:02:10 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,24 +21,16 @@
 #include "rtwtypes.h"
 #include "can_encoder_types.h"
 
-// Block signals for system '<S5>/format_can_id'
-struct B_format_can_id_can_encoder_T {
-  uint16_T pkt_id;                     // '<S5>/format_can_id'
-};
-
-// Block signals for model 'can_encoder'
-struct B_can_encoder_c_T {
-  B_format_can_id_can_encoder_T sf_format_can_id_n;// '<S8>/format_can_id'
-  B_format_can_id_can_encoder_T sf_format_can_id;// '<S5>/format_can_id'
-};
-
 // Real-time Model Data Structure
 struct tag_RTM_can_encoder_T {
   const char_T **errorStatus;
+  const char_T* getErrorStatus() const;
+  void setErrorStatus(const char_T* const aErrorStatus) const;
+  const char_T** getErrorStatusPointer() const;
+  void setErrorStatusPointer(const char_T** aErrorStatusPointer);
 };
 
 struct MdlrefDW_can_encoder_T {
-  B_can_encoder_c_T rtb;
   RT_MODEL_can_encoder_T rtm;
 };
 
@@ -66,12 +58,8 @@ extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
 // Model reference registration function
 extern void can_encoder_initialize(const char_T **rt_errorStatus,
   RT_MODEL_can_encoder_T *const can_encoder_M);
-extern void can_encoder_format_can_id(uint8_T rtu_class, uint8_T rtu_can_id_amc,
-  uint8_T rtu_dst_typ, B_format_can_id_can_encoder_T *localB);
 extern void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const
-  BUS_STATUS_TX *rtu_status_tx, const ActuatorConfiguration
-  *rtu_ConfigurationParameters, BUS_CAN_MULTIPLE *rty_pck_tx, B_can_encoder_c_T *
-  localB);
+  BUS_STATUS_TX *rtu_status_tx, BUS_CAN_MULTIPLE *rty_pck_tx);
 
 //-
 //  The generated code includes comments that allow you to trace directly

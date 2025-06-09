@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 7.4
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:55:50 2024
+// Model version                  : 9.0
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Wed Jun  4 18:02:05 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -22,16 +22,15 @@
 #include <cstring>
 #include <stddef.h>
 #include "rtw_defines.h"
-#include "can_decoder_private.h"
 
 // Named constants for Chart: '<S2>/Decoding Logic'
 const int32_T can_decoder_CALL_EVENT = -1;
 const uint8_T can_decoder_IN_Event_Error = 1U;
 const uint8_T can_decoder_IN_Home = 1U;
-const uint8_T can_decoder_IN_Home_o = 2U;
-const int32_T can_decoder_event_ev_error_mode_unrecognized = 0;
-const int32_T can_decoder_event_ev_error_pck_malformed = 1;
-const int32_T can_decoder_event_ev_error_pck_not4us = 2;
+const uint8_T can_decoder_IN_Home_a = 2U;
+const int32_T can_decoder_event_ev_error_mode_unrecognized = 50;
+const int32_T can_decoder_event_ev_error_pck_malformed = 99;
+const int32_T can_decoder_event_ev_error_pck_not4us = 120;
 
 // Forward declaration for local functions
 static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
@@ -52,11 +51,11 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
   guard1 = false;
   switch (localDW->is_ERROR_HANDLING) {
    case can_decoder_IN_Event_Error:
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_o;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_a;
     localDW->cmd_processed = 0U;
     break;
 
-   case can_decoder_IN_Home_o:
+   case can_decoder_IN_Home_a:
     if (localDW->sfEvent == can_decoder_event_ev_error_pck_not4us) {
       localB->error_type = CANErrorTypes_Packet_Not4Us;
       localDW->ev_errorEventCounter++;
@@ -84,7 +83,7 @@ static void can_decoder_ERROR_HANDLING(boolean_T rtu_pck_available,
       }
 
       localDW->ev_async = false;
-      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_o;
+      localDW->is_ERROR_HANDLING = can_decoder_IN_Home_a;
       localDW->cmd_processed = 0U;
     }
     break;
@@ -188,7 +187,7 @@ static void can_decoder_SET_OPTIONS(boolean_T rtu_pck_available, const
         if (guard1) {
           b_previousEvent = localDW->sfEvent;
           localDW->sfEvent = can_decoder_event_ev_error_pck_malformed;
-          if (localDW->is_active_ERROR_HANDLING != 0U) {
+          if (localDW->is_active_ERROR_HANDLING != 0) {
             can_decoder_ERROR_HANDLING(true, localB, localDW);
           }
 
@@ -198,7 +197,7 @@ static void can_decoder_SET_OPTIONS(boolean_T rtu_pck_available, const
       } else {
         b_previousEvent = localDW->sfEvent;
         localDW->sfEvent = can_decoder_event_ev_error_pck_malformed;
-        if (localDW->is_active_ERROR_HANDLING != 0U) {
+        if (localDW->is_active_ERROR_HANDLING != 0) {
           can_decoder_ERROR_HANDLING(true, localB, localDW);
         }
 
@@ -208,7 +207,7 @@ static void can_decoder_SET_OPTIONS(boolean_T rtu_pck_available, const
     } else {
       b_previousEvent = localDW->sfEvent;
       localDW->sfEvent = can_decoder_event_ev_error_pck_not4us;
-      if (localDW->is_active_ERROR_HANDLING != 0U) {
+      if (localDW->is_active_ERROR_HANDLING != 0) {
         can_decoder_ERROR_HANDLING(true, localB, localDW);
       }
 
@@ -308,7 +307,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
 
   // Chart: '<S2>/Decoding Logic'
   // This state chart is responsible for decoding incoming CAN packets.
-  if (localDW->is_active_c3_can_decoder == 0U) {
+  if (localDW->is_active_c3_can_decoder == 0) {
     localDW->is_active_c3_can_decoder = 1U;
     localDW->is_active_SET_CONTROL_MODE = 1U;
     localDW->is_SET_CONTROL_MODE = can_decoder_IN_Home;
@@ -320,14 +319,14 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
     localDW->is_SET_MOTOR_CONFIG = can_decoder_IN_Home;
     localDW->is_active_ERROR_HANDLING = 1U;
     localDW->ev_async = false;
-    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_o;
+    localDW->is_ERROR_HANDLING = can_decoder_IN_Home_a;
     localDW->cmd_processed = 0U;
   } else {
     tmp = !rtu_pck_available;
-    tmp_0 = (tmp || (rtu_pck_input->ID.CLS !=
-                     CANClassTypes_Motor_Control_Command));
-    if ((localDW->is_active_SET_CONTROL_MODE != 0U) &&
-        (localDW->is_SET_CONTROL_MODE == can_decoder_IN_Home) && (!tmp_0)) {
+    tmp_0 = ((!tmp) && (rtu_pck_input->ID.CLS ==
+                        CANClassTypes_Motor_Control_Command));
+    if ((localDW->is_active_SET_CONTROL_MODE != 0) &&
+        (localDW->is_SET_CONTROL_MODE == can_decoder_IN_Home) && tmp_0) {
       if (rtu_pck_input->ID.DST_TYP == rtu_CAN_ID_DST) {
         if (rtu_pck_input->PAYLOAD.LEN >= 1) {
           if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
@@ -343,7 +342,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
                 localB->event_type = EventTypes_SetControlMode;
               } else {
                 localDW->sfEvent = can_decoder_event_ev_error_mode_unrecognized;
-                if (localDW->is_active_ERROR_HANDLING != 0U) {
+                if (localDW->is_active_ERROR_HANDLING != 0) {
                   can_decoder_ERROR_HANDLING(true, localB, localDW);
                 }
 
@@ -352,7 +351,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
               }
             } else {
               localDW->sfEvent = can_decoder_event_ev_error_pck_malformed;
-              if (localDW->is_active_ERROR_HANDLING != 0U) {
+              if (localDW->is_active_ERROR_HANDLING != 0) {
                 can_decoder_ERROR_HANDLING(true, localB, localDW);
               }
 
@@ -362,7 +361,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
           }
         } else {
           localDW->sfEvent = can_decoder_event_ev_error_pck_malformed;
-          if (localDW->is_active_ERROR_HANDLING != 0U) {
+          if (localDW->is_active_ERROR_HANDLING != 0) {
             can_decoder_ERROR_HANDLING(true, localB, localDW);
           }
 
@@ -371,7 +370,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
         }
       } else {
         localDW->sfEvent = can_decoder_event_ev_error_pck_not4us;
-        if (localDW->is_active_ERROR_HANDLING != 0U) {
+        if (localDW->is_active_ERROR_HANDLING != 0) {
           can_decoder_ERROR_HANDLING(true, localB, localDW);
         }
 
@@ -380,7 +379,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
       }
     }
 
-    if ((localDW->is_active_DESIRED_TARGETS != 0U) &&
+    if ((localDW->is_active_DESIRED_TARGETS != 0) &&
         (localDW->is_DESIRED_TARGETS == can_decoder_IN_Home) && ((!tmp) &&
          (rtu_pck_input->ID.CLS == CANClassTypes_Motor_Control_Streaming) &&
          (rtu_pck_input->ID.DST_TYP == static_cast<int32_T>
@@ -401,7 +400,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
         localB->event_type = EventTypes_SetTarget;
       } else {
         localDW->sfEvent = can_decoder_event_ev_error_pck_malformed;
-        if (localDW->is_active_ERROR_HANDLING != 0U) {
+        if (localDW->is_active_ERROR_HANDLING != 0) {
           can_decoder_ERROR_HANDLING(true, localB, localDW);
         }
 
@@ -410,30 +409,36 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
       }
     }
 
-    if (localDW->is_active_SET_OPTIONS != 0U) {
+    if (localDW->is_active_SET_OPTIONS != 0) {
       can_decoder_SET_OPTIONS(rtu_pck_available, rtu_pck_input, rtu_CAN_ID_DST,
         localB, localDW);
     }
 
-    if ((localDW->is_active_SET_MOTOR_CONFIG != 0U) &&
-        (localDW->is_SET_MOTOR_CONFIG == can_decoder_IN_Home) && (!tmp_0)) {
+    if ((localDW->is_active_SET_MOTOR_CONFIG != 0) &&
+        (localDW->is_SET_MOTOR_CONFIG == can_decoder_IN_Home) && tmp_0) {
       if (rtu_pck_input->ID.DST_TYP == rtu_CAN_ID_DST) {
         if (rtu_pck_input->PAYLOAD.LEN >= 1) {
           if (rtu_pck_input->PAYLOAD.CMD.OPC == static_cast<int32_T>
               (MCOPC_Set_Motor_Config)) {
             if (rtu_pck_input->PAYLOAD.LEN == 8) {
               localB->msg_set_motor_config.has_quadrature_encoder =
-                ((rtu_pck_input->PAYLOAD.ARG[1] & 1U) != 0U);
+                ((rtu_pck_input->PAYLOAD.ARG[1] & static_cast<uint32_T>(0x01))
+                 != 0U);
               localB->msg_set_motor_config.has_hall_sens =
-                ((rtu_pck_input->PAYLOAD.ARG[1] & 2U) != 0U);
+                ((rtu_pck_input->PAYLOAD.ARG[1] & static_cast<uint32_T>(0x02))
+                 != 0U);
               localB->msg_set_motor_config.has_temperature_sens =
-                ((rtu_pck_input->PAYLOAD.ARG[1] & 4U) != 0U);
+                ((rtu_pck_input->PAYLOAD.ARG[1] & static_cast<uint32_T>(0x04))
+                 != 0U);
               localB->msg_set_motor_config.use_index =
-                ((rtu_pck_input->PAYLOAD.ARG[1] & 8U) != 0U);
+                ((rtu_pck_input->PAYLOAD.ARG[1] & static_cast<uint32_T>(0x08))
+                 != 0U);
               localB->msg_set_motor_config.has_speed_quadrature_encoder =
-                ((rtu_pck_input->PAYLOAD.ARG[1] & 16U) != 0U);
+                ((rtu_pck_input->PAYLOAD.ARG[1] & static_cast<uint32_T>(0x10))
+                 != 0U);
               localB->msg_set_motor_config.enable_verbosity =
-                ((rtu_pck_input->PAYLOAD.ARG[1] & 32U) != 0U);
+                ((rtu_pck_input->PAYLOAD.ARG[1] & static_cast<uint32_T>(0x20))
+                 != 0U);
               localB->msg_set_motor_config.rotor_encoder_resolution =
                 can_decoder_merge_2bytes_signed(static_cast<uint16_T>
                 (rtu_pck_input->PAYLOAD.ARG[2]), static_cast<uint16_T>
@@ -452,7 +457,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
             } else {
               b_previousEvent = localDW->sfEvent;
               localDW->sfEvent = can_decoder_event_ev_error_pck_malformed;
-              if (localDW->is_active_ERROR_HANDLING != 0U) {
+              if (localDW->is_active_ERROR_HANDLING != 0) {
                 can_decoder_ERROR_HANDLING(true, localB, localDW);
               }
 
@@ -463,7 +468,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
         } else {
           b_previousEvent = localDW->sfEvent;
           localDW->sfEvent = can_decoder_event_ev_error_pck_malformed;
-          if (localDW->is_active_ERROR_HANDLING != 0U) {
+          if (localDW->is_active_ERROR_HANDLING != 0) {
             can_decoder_ERROR_HANDLING(true, localB, localDW);
           }
 
@@ -473,7 +478,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
       } else {
         b_previousEvent = localDW->sfEvent;
         localDW->sfEvent = can_decoder_event_ev_error_pck_not4us;
-        if (localDW->is_active_ERROR_HANDLING != 0U) {
+        if (localDW->is_active_ERROR_HANDLING != 0) {
           can_decoder_ERROR_HANDLING(true, localB, localDW);
         }
 
@@ -482,7 +487,7 @@ void can_decoder_DecodingLogic(boolean_T rtu_pck_available, const
       }
     }
 
-    if (localDW->is_active_ERROR_HANDLING != 0U) {
+    if (localDW->is_active_ERROR_HANDLING != 0) {
       can_decoder_ERROR_HANDLING(rtu_pck_available, localB, localDW);
     }
   }
@@ -540,7 +545,7 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
 {
   int32_T ForEach_itr;
   int32_T input;
-  int32_T input_tmp;
+  uint32_T input_tmp;
   uint8_T minval;
   uint8_T x_idx_1;
 
@@ -555,7 +560,7 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.available =
       rtu_pck_rx_raw->packets[ForEach_itr].available;
     input_tmp = rtu_pck_rx_raw->packets[ForEach_itr].packet.ID;
-    input = (input_tmp & 1792) >> 8;
+    input = static_cast<int32_T>(input_tmp & 1792U) >> 8;
 
     // Initialize output value to default value for CANClassTypes (Motor_Control_Command) 
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.CLS =
@@ -567,9 +572,9 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
     }
 
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.SRC =
-      static_cast<uint8_T>((input_tmp & 240) >> 4);
+      static_cast<uint8_T>(static_cast<int32_T>(input_tmp & 240U) >> 4);
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.ID.DST_TYP =
-      static_cast<uint8_T>(input_tmp & 15);
+      static_cast<uint8_T>(input_tmp & 15U);
     x_idx_1 = rtu_pck_rx_raw->packets[ForEach_itr].length;
     minval = 8U;
     if (x_idx_1 < 8) {
@@ -586,9 +591,9 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
     localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.CMD.OPC =
       static_cast<uint8_T>(rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[0]
       & 127);
-    for (input_tmp = 0; input_tmp < 8; input_tmp++) {
-      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.ARG[input_tmp]
-        = rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[input_tmp];
+    for (input = 0; input < 8; input++) {
+      localB->CoreSubsys[ForEach_itr].pck_rx_struct.packet.PAYLOAD.ARG[input] =
+        rtu_pck_rx_raw->packets[ForEach_itr].packet.PAYLOAD[input];
     }
 
     // End of MATLAB Function: '<S3>/RAW2STRUCT Decoding Logic'
@@ -608,9 +613,9 @@ void can_decoder(const BUS_CAN_MULTIPLE *rtu_pck_rx_raw, ReceivedEvents
 
     // ForEachSliceAssignment generated from: '<S1>/message_rx' incorporates:
     //   BusCreator: '<S2>/Bus Creator'
-    //   Constant: '<S2>/Constant3'
+    //   Constant: '<S2>/motor_id'
 
-    rty_messages_rx[ForEach_itr].motor_id = 1U;
+    rty_messages_rx[ForEach_itr].motor_id = 0U;
     rty_messages_rx[ForEach_itr].event_type = localB->CoreSubsys[ForEach_itr].
       sf_DecodingLogic.event_type;
     rty_messages_rx[ForEach_itr].targets_content = localB->
@@ -637,7 +642,29 @@ void can_decoder_initialize(const char_T **rt_errorStatus,
   // Registration code
 
   // initialize error status
-  rtmSetErrorStatusPointer(can_decoder_M, rt_errorStatus);
+  can_decoder_M->setErrorStatusPointer(rt_errorStatus);
+}
+
+const char_T* RT_MODEL_can_decoder_T::getErrorStatus() const
+{
+  return (*(errorStatus));
+}
+
+void RT_MODEL_can_decoder_T::setErrorStatus(const char_T* const aErrorStatus)
+  const
+{
+  (*(errorStatus) = aErrorStatus);
+}
+
+const char_T** RT_MODEL_can_decoder_T::getErrorStatusPointer() const
+{
+  return errorStatus;
+}
+
+void RT_MODEL_can_decoder_T::setErrorStatusPointer(const char_T
+  ** aErrorStatusPointer)
+{
+  (errorStatus = aErrorStatusPointer);
 }
 
 //

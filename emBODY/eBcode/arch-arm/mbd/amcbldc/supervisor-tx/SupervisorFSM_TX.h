@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 8.0
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:55:31 2024
+// Model version                  : 10.14
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Wed Jun  4 17:57:49 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,41 +21,22 @@
 #include "rtwtypes.h"
 #include "SupervisorFSM_TX_types.h"
 
-// Block signals for model 'SupervisorFSM_TX'
-struct B_SupervisorFSM_TX_c_T {
-  boolean_T ev_foc;                    // '<Root>/SupervisorFSM_TX'
-  boolean_T ev_status;                 // '<Root>/SupervisorFSM_TX'
-};
-
 // Block states (default storage) for model 'SupervisorFSM_TX'
 struct DW_SupervisorFSM_TX_f_T {
-  uint32_T ev_focEventCounter;         // '<Root>/SupervisorFSM_TX'
-  uint32_T ev_statusEventCounter;      // '<Root>/SupervisorFSM_TX'
-  boolean_T DelayInput1_DSTATE;        // '<S1>/Delay Input1'
-  boolean_T DelayInput1_DSTATE_d;      // '<S2>/Delay Input1'
   uint8_T is_active_c3_SupervisorFSM_TX;// '<Root>/SupervisorFSM_TX'
 };
 
-// Real-time Model Data Structure
-struct tag_RTM_SupervisorFSM_TX_T {
-  const char_T **errorStatus;
-};
-
 struct MdlrefDW_SupervisorFSM_TX_T {
-  B_SupervisorFSM_TX_c_T rtb;
   DW_SupervisorFSM_TX_f_T rtdw;
-  RT_MODEL_SupervisorFSM_TX_T rtm;
 };
 
-// Model reference registration function
-extern void SupervisorFSM_TX_initialize(const char_T **rt_errorStatus,
-  RT_MODEL_SupervisorFSM_TX_T *const SupervisorFSM_TX_M);
-extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx);
+extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX
+  *rty_StatusTx);
 extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
   EstimatedData *rtu_EstimatedData, const Flags *rtu_Flags, const FOCOutputs
   *rtu_ControlOutputs, const boolean_T *rtu_ExternalFlags_fault_button,
   BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX *rty_StatusTx,
-  B_SupervisorFSM_TX_c_T *localB, DW_SupervisorFSM_TX_f_T *localDW);
+  DW_SupervisorFSM_TX_f_T *localDW);
 
 //-
 //  The generated code includes comments that allow you to trace directly
@@ -72,9 +53,7 @@ extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'SupervisorFSM_TX'
-//  '<S1>'   : 'SupervisorFSM_TX/Detect Change'
-//  '<S2>'   : 'SupervisorFSM_TX/Detect Change1'
-//  '<S3>'   : 'SupervisorFSM_TX/SupervisorFSM_TX'
+//  '<S1>'   : 'SupervisorFSM_TX/SupervisorFSM_TX'
 
 #endif                                 // SupervisorFSM_TX_h_
 

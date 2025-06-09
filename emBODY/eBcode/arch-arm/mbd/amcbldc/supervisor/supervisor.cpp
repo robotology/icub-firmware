@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 2.7
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:56:35 2024
+// Model version                  : 4.13
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Wed Jun  4 17:58:49 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -37,10 +37,10 @@ const uint8_T supervisor_IN_OverCurrentFault = 3U;
 const uint8_T supervisor_IN_Position = 5U;
 const uint8_T supervisor_IN_Velocity = 6U;
 const uint8_T supervisor_IN_Voltage = 7U;
-const int32_T supervisor_event_ControlModeSetpointChange = 0;
-const int32_T supervisor_event_DispatcherSetpointChange = 1;
-const int32_T supervisor_event_SetCtrlMode = 2;
-const int32_T supervisor_event_initialControlModeTrigger = 3;
+const int32_T supervisor_event_ControlModeSetpointChange = 599;
+const int32_T supervisor_event_DispatcherSetpointChange = 1005;
+const int32_T supervisor_event_SetCtrlMode = 906;
+const int32_T supervisor_event_initialControlModeTrigger = 598;
 
 // Forward declaration for local functions
 static void supervisor_ResetTargets(Targets *rty_targets);
@@ -56,20 +56,18 @@ static boolean_T supervisor_isConfigurationSet(DW_supervisor_f_T *localDW);
 static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData,
   const FOCOutputs *rtu_ControlOutputs, const SensorsData *rtu_SensorsData,
   Targets *rty_targets, Flags *rty_Flags, DW_supervisor_f_T *localDW);
-static void supervisor_SetLimits(real32_T ev_limits_content_overload, real32_T
-  ev_limits_content_peak, real32_T ev_limits_content_nominal, const
-  EstimatedData *rtu_EstimatedData, const FOCOutputs *rtu_ControlOutputs, const
-  SensorsData *rtu_SensorsData, Targets *rty_targets, ActuatorConfiguration
-  *rty_ConfigurationParameters, Flags *rty_Flags, DW_supervisor_f_T *localDW);
-static void supervisor_SetPid(ControlModes ev_pid_content_type, real32_T
-  ev_pid_content_P, real32_T ev_pid_content_I, real32_T ev_pid_content_D,
-  uint8_T ev_pid_content_shift_factor, ActuatorConfiguration
+static void supervisor_SetLimits(real32_T limits_overload, real32_T limits_peak,
+  real32_T limits_nominal, const EstimatedData *rtu_EstimatedData, const
+  FOCOutputs *rtu_ControlOutputs, const SensorsData *rtu_SensorsData, Targets
+  *rty_targets, ActuatorConfiguration *rty_ConfigurationParameters, Flags
+  *rty_Flags, DW_supervisor_f_T *localDW);
+static void supervisor_SetPid(ControlModes pid_type, real32_T pid_P, real32_T
+  pid_I, real32_T pid_D, uint8_T pid_shift_factor, ActuatorConfiguration
   *rty_ConfigurationParameters);
-static void supervisor_SetTarget(real32_T ev_targets_content_velocity, real32_T
-  ev_targets_content_current, real32_T ev_targets_content_voltage, Targets
-  *rty_targets, DW_supervisor_f_T *localDW);
-static void supervisor_hardwareConfigMotor(ActuatorConfiguration
-  *rty_ConfigurationParameters);
+static void supervisor_hardwareConfigMotor(uint8_T b_motor_id,
+  ActuatorConfiguration *rty_ConfigurationParameters);
+static void supervisor_SetTarget(real32_T tg_velocity, real32_T tg_current,
+  real32_T tg_voltage, Targets *rty_targets, DW_supervisor_f_T *localDW);
 
 // Function for Chart: '<Root>/Supervisor'
 static void supervisor_ResetTargets(Targets *rty_targets)
@@ -87,19 +85,35 @@ static void supervisor_TargetsManager(Targets *rty_targets, DW_supervisor_f_T
   if ((localDW->is_TargetsManager == supervisor_IN_Home) && ((localDW->sfEvent ==
         supervisor_event_ControlModeSetpointChange) || (localDW->sfEvent ==
         supervisor_event_DispatcherSetpointChange))) {
-    if (localDW->is_ControlModeHandler == supervisor_IN_Current) {
+    switch (localDW->is_ControlModeHandler) {
+     case supervisor_IN_Current:
       rty_targets->current = static_cast<real32_T>(localDW->newSetpoint);
-    } else if (localDW->is_ControlModeHandler == supervisor_IN_Voltage) {
+      break;
+
+     case supervisor_IN_Voltage:
       rty_targets->voltage = static_cast<real32_T>(localDW->newSetpoint);
-    } else if ((localDW->is_ControlModeHandler == supervisor_IN_Idle) ||
-               (localDW->is_ControlModeHandler == supervisor_IN_HWFault)) {
-      supervisor_ResetTargets(rty_targets);
-    } else if (localDW->is_ControlModeHandler == supervisor_IN_Velocity) {
-      rty_targets->velocity = static_cast<real32_T>(localDW->newSetpoint);
-    } else if (localDW->is_ControlModeHandler == supervisor_IN_Position) {
-      rty_targets->position = static_cast<real32_T>(localDW->newSetpoint);
-    } else {
-      // Default Transition
+      break;
+
+     default:
+      if ((localDW->is_ControlModeHandler == supervisor_IN_Idle) ||
+          (localDW->is_ControlModeHandler == supervisor_IN_HWFault)) {
+        supervisor_ResetTargets(rty_targets);
+      } else {
+        switch (localDW->is_ControlModeHandler) {
+         case supervisor_IN_Velocity:
+          rty_targets->velocity = static_cast<real32_T>(localDW->newSetpoint);
+          break;
+
+         case supervisor_IN_Position:
+          rty_targets->position = static_cast<real32_T>(localDW->newSetpoint);
+          break;
+
+         default:
+          // Default Transition
+          break;
+        }
+      }
+      break;
     }
   }
 }
@@ -121,7 +135,7 @@ static void supervisor_Idle(const EstimatedData *rtu_EstimatedData, const
       // this updates the targets value
       g_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         supervisor_TargetsManager(rty_targets, localDW);
       }
 
@@ -134,7 +148,7 @@ static void supervisor_Idle(const EstimatedData *rtu_EstimatedData, const
       // this updates the targets value
       g_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         supervisor_TargetsManager(rty_targets, localDW);
       }
 
@@ -156,7 +170,7 @@ static void supervisor_Idle(const EstimatedData *rtu_EstimatedData, const
         localDW->newSetpoint = rtu_SensorsData->position;
         g_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           supervisor_TargetsManager(rty_targets, localDW);
         }
 
@@ -168,7 +182,7 @@ static void supervisor_Idle(const EstimatedData *rtu_EstimatedData, const
         rty_Flags->control_mode = ControlModes_Current;
         g_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           supervisor_TargetsManager(rty_targets, localDW);
         }
 
@@ -180,7 +194,7 @@ static void supervisor_Idle(const EstimatedData *rtu_EstimatedData, const
         rty_Flags->control_mode = ControlModes_Voltage;
         g_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           supervisor_TargetsManager(rty_targets, localDW);
         }
 
@@ -192,7 +206,7 @@ static void supervisor_Idle(const EstimatedData *rtu_EstimatedData, const
         rty_Flags->control_mode = ControlModes_Velocity;
         g_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           supervisor_TargetsManager(rty_targets, localDW);
         }
 
@@ -221,7 +235,7 @@ static void supervisor_Velocity(const EstimatedData *rtu_EstimatedData, const
       // this updates the targets value
       e_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         supervisor_TargetsManager(rty_targets, localDW);
       }
 
@@ -245,7 +259,7 @@ static void supervisor_Velocity(const EstimatedData *rtu_EstimatedData, const
         rty_Flags->control_mode = ControlModes_Voltage;
         e_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           supervisor_TargetsManager(rty_targets, localDW);
         }
 
@@ -257,7 +271,7 @@ static void supervisor_Velocity(const EstimatedData *rtu_EstimatedData, const
         rty_Flags->control_mode = ControlModes_Current;
         e_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           supervisor_TargetsManager(rty_targets, localDW);
         }
 
@@ -269,7 +283,7 @@ static void supervisor_Velocity(const EstimatedData *rtu_EstimatedData, const
         localDW->newSetpoint = rtu_SensorsData->position;
         e_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           supervisor_TargetsManager(rty_targets, localDW);
         }
 
@@ -289,7 +303,7 @@ static void supervisor_Velocity(const EstimatedData *rtu_EstimatedData, const
     // this updates the targets value
     e_previousEvent = localDW->sfEvent;
     localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-    if (localDW->is_active_TargetsManager != 0U) {
+    if (localDW->is_active_TargetsManager != 0) {
       supervisor_TargetsManager(rty_targets, localDW);
     }
 
@@ -338,7 +352,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
         // this updates the targets value
         m_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           // Chart: '<Root>/Supervisor'
           supervisor_TargetsManager(rty_targets, localDW);
         }
@@ -375,7 +389,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
       // this updates the targets value
       m_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         // Chart: '<Root>/Supervisor'
         supervisor_TargetsManager(rty_targets, localDW);
       }
@@ -402,7 +416,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
       // this updates the targets value
       m_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         // Chart: '<Root>/Supervisor'
         supervisor_TargetsManager(rty_targets, localDW);
       }
@@ -418,7 +432,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
       // this updates the targets value
       m_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         // Chart: '<Root>/Supervisor'
         supervisor_TargetsManager(rty_targets, localDW);
       }
@@ -439,7 +453,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
         // this updates the targets value
         m_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           // Chart: '<Root>/Supervisor'
           supervisor_TargetsManager(rty_targets, localDW);
         }
@@ -473,7 +487,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
         // this updates the targets value
         m_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           // Chart: '<Root>/Supervisor'
           supervisor_TargetsManager(rty_targets, localDW);
         }
@@ -503,7 +517,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
         rty_Flags->control_mode = ControlModes_Current;
         m_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           // Chart: '<Root>/Supervisor'
           supervisor_TargetsManager(rty_targets, localDW);
         }
@@ -519,7 +533,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
         rty_Flags->control_mode = ControlModes_Voltage;
         m_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           // Chart: '<Root>/Supervisor'
           supervisor_TargetsManager(rty_targets, localDW);
         }
@@ -535,7 +549,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
         rty_Flags->control_mode = ControlModes_Velocity;
         m_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           // Chart: '<Root>/Supervisor'
           supervisor_TargetsManager(rty_targets, localDW);
         }
@@ -563,7 +577,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
         rty_Flags->control_mode = ControlModes_Voltage;
         m_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           // Chart: '<Root>/Supervisor'
           supervisor_TargetsManager(rty_targets, localDW);
         }
@@ -579,7 +593,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
         rty_Flags->control_mode = ControlModes_Velocity;
         m_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-        if (localDW->is_active_TargetsManager != 0U) {
+        if (localDW->is_active_TargetsManager != 0) {
           // Chart: '<Root>/Supervisor'
           supervisor_TargetsManager(rty_targets, localDW);
         }
@@ -604,7 +618,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
       rty_Flags->control_mode = ControlModes_Current;
       m_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         // Chart: '<Root>/Supervisor'
         supervisor_TargetsManager(rty_targets, localDW);
       }
@@ -619,7 +633,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
       localDW->newSetpoint = rtu_SensorsData->position;
       m_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         // Chart: '<Root>/Supervisor'
         supervisor_TargetsManager(rty_targets, localDW);
       }
@@ -638,7 +652,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
       rty_Flags->control_mode = ControlModes_Velocity;
       m_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         // Chart: '<Root>/Supervisor'
         supervisor_TargetsManager(rty_targets, localDW);
       }
@@ -664,7 +678,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
       localDW->newSetpoint = rtu_SensorsData->position;
       m_previousEvent = localDW->sfEvent;
       localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-      if (localDW->is_active_TargetsManager != 0U) {
+      if (localDW->is_active_TargetsManager != 0) {
         // Chart: '<Root>/Supervisor'
         supervisor_TargetsManager(rty_targets, localDW);
       }
@@ -686,7 +700,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
     // this updates the targets value
     m_previousEvent = localDW->sfEvent;
     localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-    if (localDW->is_active_TargetsManager != 0U) {
+    if (localDW->is_active_TargetsManager != 0) {
       // Chart: '<Root>/Supervisor'
       supervisor_TargetsManager(rty_targets, localDW);
     }
@@ -704,7 +718,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
     // this updates the targets value
     m_previousEvent = localDW->sfEvent;
     localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-    if (localDW->is_active_TargetsManager != 0U) {
+    if (localDW->is_active_TargetsManager != 0) {
       // Chart: '<Root>/Supervisor'
       supervisor_TargetsManager(rty_targets, localDW);
     }
@@ -722,7 +736,7 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
     // this updates the targets value
     m_previousEvent = localDW->sfEvent;
     localDW->sfEvent = supervisor_event_ControlModeSetpointChange;
-    if (localDW->is_active_TargetsManager != 0U) {
+    if (localDW->is_active_TargetsManager != 0) {
       // Chart: '<Root>/Supervisor'
       supervisor_TargetsManager(rty_targets, localDW);
     }
@@ -732,26 +746,26 @@ static void supervisor_ControlModeHandler(const EstimatedData *rtu_EstimatedData
 }
 
 // Function for Chart: '<Root>/Supervisor'
-static void supervisor_SetLimits(real32_T ev_limits_content_overload, real32_T
-  ev_limits_content_peak, real32_T ev_limits_content_nominal, const
-  EstimatedData *rtu_EstimatedData, const FOCOutputs *rtu_ControlOutputs, const
-  SensorsData *rtu_SensorsData, Targets *rty_targets, ActuatorConfiguration
-  *rty_ConfigurationParameters, Flags *rty_Flags, DW_supervisor_f_T *localDW)
+static void supervisor_SetLimits(real32_T limits_overload, real32_T limits_peak,
+  real32_T limits_nominal, const EstimatedData *rtu_EstimatedData, const
+  FOCOutputs *rtu_ControlOutputs, const SensorsData *rtu_SensorsData, Targets
+  *rty_targets, ActuatorConfiguration *rty_ConfigurationParameters, Flags
+  *rty_Flags, DW_supervisor_f_T *localDW)
 {
   int32_T b_previousEvent;
 
   // Chart: '<Root>/Supervisor'
   rty_ConfigurationParameters->thresholds.motorNominalCurrents = std::abs
-    (ev_limits_content_nominal);
+    (limits_nominal);
   rty_ConfigurationParameters->thresholds.motorPeakCurrents = std::abs
-    (ev_limits_content_peak);
+    (limits_peak);
   rty_ConfigurationParameters->thresholds.motorOverloadCurrents = std::abs
-    (ev_limits_content_overload);
+    (limits_overload);
   if (!localDW->areLimitsSet) {
     localDW->areLimitsSet = true;
     b_previousEvent = localDW->sfEvent;
     localDW->sfEvent = supervisor_event_initialControlModeTrigger;
-    if (localDW->is_active_ControlModeHandler != 0U) {
+    if (localDW->is_active_ControlModeHandler != 0) {
       // Chart: '<Root>/Supervisor'
       supervisor_ControlModeHandler(rtu_EstimatedData, rtu_ControlOutputs,
         rtu_SensorsData, rty_targets, rty_Flags, localDW);
@@ -762,75 +776,47 @@ static void supervisor_SetLimits(real32_T ev_limits_content_overload, real32_T
 }
 
 // Function for Chart: '<Root>/Supervisor'
-static void supervisor_SetPid(ControlModes ev_pid_content_type, real32_T
-  ev_pid_content_P, real32_T ev_pid_content_I, real32_T ev_pid_content_D,
-  uint8_T ev_pid_content_shift_factor, ActuatorConfiguration
+static void supervisor_SetPid(ControlModes pid_type, real32_T pid_P, real32_T
+  pid_I, real32_T pid_D, uint8_T pid_shift_factor, ActuatorConfiguration
   *rty_ConfigurationParameters)
 {
-  switch (ev_pid_content_type) {
+  switch (pid_type) {
    case ControlModes_Current:
     // Chart: '<Root>/Supervisor'
-    rty_ConfigurationParameters->pids.currentPID.P = ev_pid_content_P;
-    rty_ConfigurationParameters->pids.currentPID.I = ev_pid_content_I;
-    rty_ConfigurationParameters->pids.currentPID.D = ev_pid_content_D;
-    rty_ConfigurationParameters->pids.currentPID.shift_factor =
-      ev_pid_content_shift_factor;
+    rty_ConfigurationParameters->pids.currentPID.P = pid_P;
+    rty_ConfigurationParameters->pids.currentPID.I = pid_I;
+    rty_ConfigurationParameters->pids.currentPID.D = pid_D;
+    rty_ConfigurationParameters->pids.currentPID.shift_factor = pid_shift_factor;
     rty_ConfigurationParameters->pids.currentPID.type = ControlModes_Current;
     break;
 
    case ControlModes_Position:
     // Chart: '<Root>/Supervisor'
-    rty_ConfigurationParameters->pids.positionPID.P = 9.0F;
-    rty_ConfigurationParameters->pids.positionPID.I = 15.0F;
-    rty_ConfigurationParameters->pids.positionPID.D = 7.0F;
+    rty_ConfigurationParameters->pids.positionPID.P = pid_P;
+    rty_ConfigurationParameters->pids.positionPID.I = pid_I;
+    rty_ConfigurationParameters->pids.positionPID.D = pid_D;
     rty_ConfigurationParameters->pids.positionPID.shift_factor =
-      ev_pid_content_shift_factor;
+      pid_shift_factor;
     rty_ConfigurationParameters->pids.positionPID.type = ControlModes_Position;
     break;
 
    default:
-    if ((ev_pid_content_type != ControlModes_Voltage) && (ev_pid_content_type ==
-         ControlModes_Velocity)) {
+    if ((pid_type != ControlModes_Voltage) && (pid_type == ControlModes_Velocity))
+    {
       // Chart: '<Root>/Supervisor'
-      rty_ConfigurationParameters->pids.velocityPID.P = ev_pid_content_P;
-      rty_ConfigurationParameters->pids.velocityPID.I = ev_pid_content_I;
-      rty_ConfigurationParameters->pids.velocityPID.D = ev_pid_content_D;
+      rty_ConfigurationParameters->pids.velocityPID.P = pid_P;
+      rty_ConfigurationParameters->pids.velocityPID.I = pid_I;
+      rty_ConfigurationParameters->pids.velocityPID.D = pid_D;
       rty_ConfigurationParameters->pids.velocityPID.shift_factor =
-        ev_pid_content_shift_factor;
+        pid_shift_factor;
     }
     break;
   }
 }
 
 // Function for Chart: '<Root>/Supervisor'
-static void supervisor_SetTarget(real32_T ev_targets_content_velocity, real32_T
-  ev_targets_content_current, real32_T ev_targets_content_voltage, Targets
-  *rty_targets, DW_supervisor_f_T *localDW)
-{
-  int32_T b_previousEvent;
-  if (localDW->is_ControlModeHandler == supervisor_IN_Voltage) {
-    localDW->newSetpoint = ev_targets_content_voltage;
-  } else if (localDW->is_ControlModeHandler == supervisor_IN_Current) {
-    localDW->newSetpoint = ev_targets_content_current;
-  } else if (localDW->is_ControlModeHandler == supervisor_IN_Velocity) {
-    localDW->newSetpoint = ev_targets_content_velocity;
-  } else {
-    localDW->newSetpoint = 0.0;
-  }
-
-  b_previousEvent = localDW->sfEvent;
-  localDW->sfEvent = supervisor_event_DispatcherSetpointChange;
-  if (localDW->is_active_TargetsManager != 0U) {
-    // Chart: '<Root>/Supervisor'
-    supervisor_TargetsManager(rty_targets, localDW);
-  }
-
-  localDW->sfEvent = b_previousEvent;
-}
-
-// Function for Chart: '<Root>/Supervisor'
-static void supervisor_hardwareConfigMotor(ActuatorConfiguration
-  *rty_ConfigurationParameters)
+static void supervisor_hardwareConfigMotor(uint8_T b_motor_id,
+  ActuatorConfiguration *rty_ConfigurationParameters)
 {
   real32_T tmp;
   uint16_T tmp_0;
@@ -849,13 +835,46 @@ static void supervisor_hardwareConfigMotor(ActuatorConfiguration
   }
 
   // Chart: '<Root>/Supervisor'
-  rtw_configMotor(static_cast<uint8_T>
+  rtw_configMotor(b_motor_id, static_cast<uint8_T>
                   (rty_ConfigurationParameters->motor.externals.has_quadrature_encoder),
                   rty_ConfigurationParameters->motor.externals.rotor_encoder_resolution,
                   rty_ConfigurationParameters->motor.externals.pole_pairs,
                   static_cast<uint8_T>
                   (rty_ConfigurationParameters->motor.externals.has_hall_sens),
                   1U, tmp_0);
+}
+
+// Function for Chart: '<Root>/Supervisor'
+static void supervisor_SetTarget(real32_T tg_velocity, real32_T tg_current,
+  real32_T tg_voltage, Targets *rty_targets, DW_supervisor_f_T *localDW)
+{
+  int32_T b_previousEvent;
+  switch (localDW->is_ControlModeHandler) {
+   case supervisor_IN_Voltage:
+    localDW->newSetpoint = tg_voltage;
+    break;
+
+   case supervisor_IN_Current:
+    localDW->newSetpoint = tg_current;
+    break;
+
+   case supervisor_IN_Velocity:
+    localDW->newSetpoint = tg_velocity;
+    break;
+
+   default:
+    localDW->newSetpoint = 0.0;
+    break;
+  }
+
+  b_previousEvent = localDW->sfEvent;
+  localDW->sfEvent = supervisor_event_DispatcherSetpointChange;
+  if (localDW->is_active_TargetsManager != 0) {
+    // Chart: '<Root>/Supervisor'
+    supervisor_TargetsManager(rty_targets, localDW);
+  }
+
+  localDW->sfEvent = b_previousEvent;
 }
 
 // System initialize for referenced model: 'supervisor'
@@ -951,7 +970,7 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
   localDW->ExternalFlags_fault_button_prev =
     localDW->ExternalFlags_fault_button_start;
   localDW->ExternalFlags_fault_button_start = rtu_ExternalFlags->fault_button;
-  if (localDW->is_active_c3_supervisor == 0U) {
+  if (localDW->is_active_c3_supervisor == 0) {
     *rty_ConfigurationParameters = *rtu_InitConf;
     localDW->ExternalFlags_fault_button_prev = rtu_ExternalFlags->fault_button;
     localDW->ExternalFlags_fault_button_start = rtu_ExternalFlags->fault_button;
@@ -992,24 +1011,24 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
        case EventTypes_SetMotorConfig:
         rty_ConfigurationParameters->motor.externals = rtu_ReceivedEvents[ei].
           motor_config_content;
-        supervisor_hardwareConfigMotor(rty_ConfigurationParameters);
+        supervisor_hardwareConfigMotor(rtu_ReceivedEvents[ei].motor_id,
+          rty_ConfigurationParameters);
         break;
 
        case EventTypes_SetTarget:
+        rty_Flags->enable_sending_msg_status = true;
         supervisor_SetTarget(rtu_ReceivedEvents[ei].targets_content.velocity,
                              rtu_ReceivedEvents[ei].targets_content.current,
                              rtu_ReceivedEvents[ei].targets_content.voltage,
                              rty_targets, localDW);
-        rty_Flags->enable_sending_msg_status = true;
         break;
 
        case EventTypes_SetControlMode:
         localDW->requestedControlMode = rtu_ReceivedEvents[ei].
           control_mode_content;
-        rty_Flags->enable_sending_msg_status = true;
         b_previousEvent = localDW->sfEvent;
         localDW->sfEvent = supervisor_event_SetCtrlMode;
-        if (localDW->is_active_ControlModeHandler != 0U) {
+        if (localDW->is_active_ControlModeHandler != 0) {
           supervisor_ControlModeHandler(rtu_EstimatedData, rtu_ControlOutputs,
             rtu_SensorsData, rty_targets, rty_Flags, localDW);
         }
@@ -1024,8 +1043,8 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
     supervisor_ResetTargets(rty_targets);
     localDW->is_TargetsManager = supervisor_IN_Home;
   } else {
-    if (localDW->is_active_FaultsManager != 0U) {
-      if (localDW->is_active_HWFaults != 0U) {
+    if (localDW->is_active_FaultsManager != 0) {
+      if (localDW->is_active_HWFaults != 0) {
         switch (localDW->is_HWFaults) {
          case supervisor_IN_LimitNonConfigured:
           if (localDW->areLimitsSet) {
@@ -1055,7 +1074,7 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
         }
       }
 
-      if (localDW->is_active_FaultButton != 0U) {
+      if (localDW->is_active_FaultButton != 0) {
         switch (localDW->is_FaultButton) {
          case supervisor_IN_ButtonPressed:
           if ((localDW->ExternalFlags_fault_button_prev !=
@@ -1078,12 +1097,12 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
       }
     }
 
-    if (localDW->is_active_ControlModeHandler != 0U) {
+    if (localDW->is_active_ControlModeHandler != 0) {
       supervisor_ControlModeHandler(rtu_EstimatedData, rtu_ControlOutputs,
         rtu_SensorsData, rty_targets, rty_Flags, localDW);
     }
 
-    if ((localDW->is_active_InputsDispatcher != 0U) &&
+    if ((localDW->is_active_InputsDispatcher != 0) &&
         (localDW->is_InputsDispatcher == supervisor_IN_Home)) {
       rty_Flags->enable_sending_msg_status = false;
       for (ei = 0; ei < MAX_EVENTS_PER_TICK; ei++) {
@@ -1109,24 +1128,24 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
          case EventTypes_SetMotorConfig:
           rty_ConfigurationParameters->motor.externals = rtu_ReceivedEvents[ei].
             motor_config_content;
-          supervisor_hardwareConfigMotor(rty_ConfigurationParameters);
+          supervisor_hardwareConfigMotor(rtu_ReceivedEvents[ei].motor_id,
+            rty_ConfigurationParameters);
           break;
 
          case EventTypes_SetTarget:
+          rty_Flags->enable_sending_msg_status = true;
           supervisor_SetTarget(rtu_ReceivedEvents[ei].targets_content.velocity,
                                rtu_ReceivedEvents[ei].targets_content.current,
                                rtu_ReceivedEvents[ei].targets_content.voltage,
                                rty_targets, localDW);
-          rty_Flags->enable_sending_msg_status = true;
           break;
 
          case EventTypes_SetControlMode:
           localDW->requestedControlMode = rtu_ReceivedEvents[ei].
             control_mode_content;
-          rty_Flags->enable_sending_msg_status = true;
           b_previousEvent = localDW->sfEvent;
           localDW->sfEvent = supervisor_event_SetCtrlMode;
-          if (localDW->is_active_ControlModeHandler != 0U) {
+          if (localDW->is_active_ControlModeHandler != 0) {
             supervisor_ControlModeHandler(rtu_EstimatedData, rtu_ControlOutputs,
               rtu_SensorsData, rty_targets, rty_Flags, localDW);
           }
@@ -1139,7 +1158,7 @@ void supervisor(const ExternalFlags *rtu_ExternalFlags, const EstimatedData
       localDW->is_InputsDispatcher = supervisor_IN_Home;
     }
 
-    if (localDW->is_active_TargetsManager != 0U) {
+    if (localDW->is_active_TargetsManager != 0) {
       supervisor_TargetsManager(rty_targets, localDW);
     }
   }

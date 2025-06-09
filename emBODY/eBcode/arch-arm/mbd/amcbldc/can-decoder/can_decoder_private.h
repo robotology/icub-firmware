@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'can_decoder'.
 //
-// Model version                  : 7.4
-// Simulink Coder version         : 24.1 (R2024a) 19-Nov-2023
-// C/C++ source code generated on : Mon Oct  7 15:55:50 2024
+// Model version                  : 9.0
+// Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
+// C/C++ source code generated on : Wed Jun  4 18:02:05 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,23 +20,6 @@
 #define can_decoder_private_h_
 #include "rtwtypes.h"
 #include "can_decoder_types.h"
-
-// Macros for accessing real-time model data structure
-#ifndef rtmGetErrorStatus
-#define rtmGetErrorStatus(rtm)         (*((rtm)->errorStatus))
-#endif
-
-#ifndef rtmSetErrorStatus
-#define rtmSetErrorStatus(rtm, val)    (*((rtm)->errorStatus) = (val))
-#endif
-
-#ifndef rtmGetErrorStatusPointer
-#define rtmGetErrorStatusPointer(rtm)  (rtm)->errorStatus
-#endif
-
-#ifndef rtmSetErrorStatusPointer
-#define rtmSetErrorStatusPointer(rtm, val) ((rtm)->errorStatus = (val))
-#endif
 #endif                                 // can_decoder_private_h_
 
 //
