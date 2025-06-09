@@ -244,7 +244,6 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 //    }
     
   
-    
     bool _verified = true;
     constexpr bool verificationisOK {true};
 
@@ -320,7 +319,7 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
             default:
             {
                 //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
-//                    embot::core::print("theEncoderReader: encoder unknown/none/unsupported");
+//                embot::core::print("theEncoderReader: encoder unknown/none/unsupported");
                 ret = false;
             } break;
         }
@@ -330,7 +329,7 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
         embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
         if(embot::hw::resOK != r)
         {                            
-            ////        embot::core::print("theEncoderReader: encoder type not supported");
+//            embot::core::print("theEncoderReader: encoder type not supported");
             //to do: tell the specific error to yarp    
             diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 |((_implconfig.numofjomos)<<12);
             diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | (1<<i);
@@ -601,11 +600,10 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
 
 
 
-// I'll do one reading of the encoder
+// I'll do one reading for each one of the encoder
 bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
 {
-    diagnostics.errorDescriptor.par16 = 0; 
-    diagnostics.errorDescriptor.par64 = 0;
+    diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par64 = 0;
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_HardWare,eoerror_value_HW_encoder_not_connected);  
     diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.sourceaddress = 0;
@@ -613,8 +611,8 @@ bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
     bool ret {true};
     
     EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
-
     _implconfig.numofjomos = eo_constarray_Size(carray);
+    
     //I will try to read the primary encoder, if the reading is succesfful (aka embot::hw::encoder::read reads plausible data) ok, if not I will send an error to yarp
     for(uint8_t i=0; i<_implconfig.numofjomos; i++)
     {
