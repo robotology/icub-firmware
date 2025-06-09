@@ -404,16 +404,16 @@ BOOL JointSet_do_check_faults(JointSet* o)
         
         // TODO: before Joint_check_faults check SW LIMITS when control mode PWM or CURRENT ??
         // TODO: Or it is better to add the check at JointSet_do_<specific_control_mode> exploiting the variable pushing_limits ??
-        if (Joint_check_softwareboundaries_force_position(o->joint+o->joints_of_set[k], &errorcode))
+        if (Joint_check_softwareboundaries_force_position(o->joint+o->joints_of_set[k], &errorcode, &controlmode))
         {
             soft_limit_overcome = TRUE;
             eOerrmanDescriptor_t errdes = {0};
                     
             errdes.code             = errorcode;
             errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-            errdes.sourceaddress    = o->joint[o->joints_of_set[k]].ID;
-            errdes.par16            = 0;
-            errdes.par64            = 0;
+            errdes.sourceaddress    = 0;
+            errdes.par16            = o->joint[o->joints_of_set[k]].ID;
+            errdes.par64            = ((uint64_t)o->joint[o->joints_of_set[k]].pos_fbk << 32) | ((uint64_t)controlmode & 0xff);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
         }
     }

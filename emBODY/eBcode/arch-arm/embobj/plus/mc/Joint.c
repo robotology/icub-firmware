@@ -503,27 +503,18 @@ BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode, int* co
     return FALSE;
 }
 
-BOOL Joint_check_softwareboundaries_force_position(Joint* o, uint32_t* errorcode)
+BOOL Joint_check_softwareboundaries_force_position(Joint* o, uint32_t* errorcode, int* controlmode)
 {
-    if ((o->control_mode == eomc_controlmode_current))
+    if ((o->control_mode == eomc_controlmode_current) || (o->control_mode == eomc_controlmode_openloop))
     {
         // TODO: do we wanna add a - POS_LIMIT_MARGIN for the check??
         if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min ) || (o->pos_fbk > o->pos_max))) 
         {
-            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_cur_ref_soft_limit);
-            return TRUE;
-        }
-        
-    }
-    else if (o->control_mode == eomc_controlmode_openloop)
-    {
-        if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min ) || (o->pos_fbk > o->pos_max)))
-        {   
-            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_pwm_ref_soft_limit);
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_soft_boundaries);
+            *controlmode = (int)o->control_mode;
             return TRUE;
         }
     }
-    
     return FALSE;
 }
 
