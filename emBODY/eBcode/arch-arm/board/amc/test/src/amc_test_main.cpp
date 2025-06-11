@@ -46,6 +46,15 @@ void initSystem(embot::os::Thread *t, void* initparam);
         embot::hw::FLASHpartitionID::eapplication00
     };
     
+    // Test J5_power enabling
+    constexpr embot::hw::bsp::amc::OnSpecialize specConfig
+    {
+        embot::hw::bsp::amc::OnSpecialize::CM4MODE::donothing,
+        true,
+        false
+    };
+    embot::hw::bsp::amc::set(specConfig);
+    
     // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
     embot::os::init(osconfig);
     
