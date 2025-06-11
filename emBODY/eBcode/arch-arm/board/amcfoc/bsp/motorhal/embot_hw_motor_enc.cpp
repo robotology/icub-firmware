@@ -256,18 +256,13 @@ bool Enc1Init(embot::hw::MOTOR m)
     
     if(TIM_ENCODERMODE_TI12 == QEncMode[motorIndex]) 
     {
-//        embot::core::print("Enc Divider = 4");
+//        embot::core::print("Enc1 Divider = 4");
         _enc_internals._items[motorIndex].divider = 4;
     }
-    else if (TIM_ENCODERMODE_TI2  == QEncMode[motorIndex]) 
+    else if ( ( TIM_ENCODERMODE_TI1  == QEncMode[motorIndex] ) || ( TIM_ENCODERMODE_TI2  == QEncMode[motorIndex] ) ) 
     {
-//        embot::core::print("Enc1Divider = 2");
+//        embot::core::print("Enc1 Divider = 2");
         _enc_internals._items[motorIndex].divider = 2;
-    }
-    else if (TIM_ENCODERMODE_TI1  == QEncMode[motorIndex]) 
-    {
-//        embot::core::print("Enc1Divider = 1");
-        _enc_internals._items[motorIndex].divider = 1;
     }
     
     _enc_internals._items[motorIndex].conversionfactor = 360.0/(float)_enc_internals._items[motorIndex].divider/(float)_enc_internals._items[motorIndex].mode.resolution;
@@ -355,19 +350,14 @@ bool Enc2Init(embot::hw::MOTOR m)
     
     if(TIM_ENCODERMODE_TI12 == QEncMode[motorIndex]) 
     {
-//        embot::core::print("Enc Divider = 4");
+//        embot::core::print("Enc2 Divider = 4");
         _enc_internals._items[motorIndex].divider = 4;
     }
-    else if (TIM_ENCODERMODE_TI2  == QEncMode[motorIndex]) 
+    else if ( ( TIM_ENCODERMODE_TI1  == QEncMode[motorIndex] ) || ( TIM_ENCODERMODE_TI2  == QEncMode[motorIndex] ) ) 
     {
-//        embot::core::print("Enc1Divider = 2");
+//        embot::core::print("Enc2 Divider = 2");
         _enc_internals._items[motorIndex].divider = 2;
-    }
-    else if (TIM_ENCODERMODE_TI1  == QEncMode[motorIndex]) 
-    {
-//        embot::core::print("Enc1Divider = 1");
-        _enc_internals._items[motorIndex].divider = 1;
-    }
+    } 
 
     _enc_internals._items[motorIndex].conversionfactor = 360.0/(float)_enc_internals._items[motorIndex].divider/(float)_enc_internals._items[motorIndex].mode.resolution;
     
