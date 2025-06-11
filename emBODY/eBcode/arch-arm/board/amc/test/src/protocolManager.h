@@ -56,6 +56,8 @@ class ProtocolManager
         testI2C         = 11,
         testHallSensor  = 12,
         testQuadEncoder = 13,
+        testETH         = 14,
+        testSPIEncoder  = 15,
         testUndefined   = 254,
         testDummy       = 255
     };

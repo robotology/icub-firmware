@@ -15,17 +15,19 @@ class TestRunnerBase
         ~TestRunnerBase() = default;
     
         virtual bool testCanComm(uint8_t *data);
-        virtual bool testFwVersion();
+        virtual bool testEthComm(uint8_t *data);
+        virtual bool testFwVersion(uint8_t *data);
         virtual bool testLed(uint8_t on);
         virtual bool testMicroId(uint8_t *data);
         virtual bool testVin(uint8_t *data);
         virtual bool testCin(uint8_t *data);
-        virtual bool testVauxOK();
+        virtual bool testVauxOK(uint8_t *data);
         virtual bool testPwrnFailOK();
         virtual bool testFault(uint8_t on, uint8_t *data);
         virtual bool testI2C();
         virtual bool testHallSensor();
         virtual bool testQuadEncoder();
+        virtual bool testSpiAeaEncoder(uint8_t *data);
 };
 
 #endif

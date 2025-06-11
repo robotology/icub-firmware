@@ -17,7 +17,7 @@
 class TestManagerSingleton 
 {
 private:
-    
+
     // instantiate the derived factory creator
     std::unique_ptr<FactoryTestRunner> _factoryTestRunner_ptr;
     std::unique_ptr<TestRunnerBase> _testRunner_ptr;

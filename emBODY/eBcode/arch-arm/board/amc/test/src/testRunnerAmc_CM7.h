@@ -19,14 +19,16 @@ class TestRunnerAmc_CM7 : public TestRunnerBase
         ~TestRunnerAmc_CM7() = default;    
     
         bool testCanComm(uint8_t *data) override;
-        bool testFwVersion() override;
+        bool testEthComm(uint8_t *data) override;
+        bool testFwVersion(uint8_t *data) override;
         bool testLed(uint8_t on) override;
         bool testMicroId(uint8_t *data) override;
         bool testVin(uint8_t *data) override;
         bool testCin(uint8_t *data) override;
-        bool testVauxOK() override;
+        bool testVauxOK(uint8_t *data) override;
         bool testPwrnFailOK() override;
         bool testFault(uint8_t on, uint8_t *data) override;
+        bool testSpiAeaEncoder(uint8_t *data) override;
 };
 
 #endif
