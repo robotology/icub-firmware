@@ -46,6 +46,7 @@ extern void Joint_update_status_reference(Joint* o);
 
 extern BOOL Joint_check_faults(Joint* o);
 extern void Joint_clear_faults(Joint* o);
+extern BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode, int* controlmode);
 
 extern int8_t Joint_check_limits(Joint* o);
 extern int8_t Joint_pushing_limit(Joint* o);
