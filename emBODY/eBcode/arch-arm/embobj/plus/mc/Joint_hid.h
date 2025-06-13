@@ -175,7 +175,10 @@ struct Joint_hid
     CTRL_UNITS Kadmitt;
     
     WatchDog trq_fbk_wdog;
+    WatchDog trq_ref_wdog;
     WatchDog vel_ref_wdog;
+    WatchDog pwm_ref_wdog;
+    WatchDog cur_ref_wdog;
     
 #if defined(MC_use_embot_app_mc_Trajectory)    
     embot::app::mc::Trajectory *traj {nullptr};
