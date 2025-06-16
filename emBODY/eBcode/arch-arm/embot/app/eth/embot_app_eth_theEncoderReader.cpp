@@ -175,7 +175,6 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     service.started = eobool_false;    
     service.state = eomn_serv_state_idle;  
     
-    diagnostics.reportTimer = eo_timer_New();
     diagnostics.errorType = eo_errortype_error;
     diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);   
@@ -189,13 +188,19 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     return true;
 }
 
+
+//some info onn how to fil in the par16 and par64 for theEncoderReader
+// in par16 = [N3|N2|N1|N0] I put: number of joint in N3, 0 in N2, failure mask of secondary in N1, failure mask of primary in N0
+// in par64 = [N15|N14|N13|N12|N11|N10|N09|N08|N07|N06|N05|N04|N03|N02|N01|N00] i put:
+// in nibbles N00-N03 i put error codes of primary
+// in nibbles N04-N07 i put error codes of secondary
+
+
+
 bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool ActivateafterverifY, const embot::core::Confirmer &oncompletion)
 {    
     service.state = eomn_serv_state_verifying;
-    
-    //check this
-    // make sure the timer is not running
-    eo_timer_Stop(diagnostics.reportTimer);  
+
         
     activateafterverify = ActivateafterverifY;
     onverifycompleted = oncompletion; 
@@ -203,21 +208,18 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     
     constexpr bool verificationFailed {false};
     
-    if( false == IsEncoderSupported(config) )
-    {        
-        _verified = false;
-        onverifycompleted.execute(verificationFailed);  
-
-        return false;  
-    }
-    if( false ==  TestRead(config) )
+    diagnostics.errorDescriptor.sourcedevice    = eo_errman_sourcedevice_localboard;
+    diagnostics.errorDescriptor.par16           = diagnostics.errorDescriptor.par64 = 0;
+    diagnostics.errorDescriptor.sourceaddress   = 0;
+    
+    if( false == IsEncoderSupported(config) || false ==  TestRead(config))
     {
-        diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par64 = 0;
+        
         diagnostics.errorType = eo_errortype_error;
-        diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
         diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
         eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, nullptr, s_eobj_ownname, &diagnostics.errorDescriptor);
         
+        Deactivate();     
          _verified = false;
         onverifycompleted.execute(verificationFailed);  
 
@@ -225,34 +227,18 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
     }
    
     
-    diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
-    diagnostics.errorDescriptor.sourceaddress    = 0;
-    diagnostics.errorDescriptor.par16            = 0;
-    diagnostics.errorDescriptor.par64            = 0;    
-//    EOaction_strg astrg = {0};
-//    EOaction *act = (EOaction*)&astrg;
-//    eo_action_SetCallback(act, s_send_periodic_error_report, this, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
-              
-    diagnostics.errorType = eo_errortype_debug;
-    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_ok);
-    eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, nullptr, s_eobj_ownname, &diagnostics.errorDescriptor);
-    
-//    if((0 != diagnostics.repetitionOKcase) && (0 != diagnostics.reportPeriod))
-//    {
-//        diagnostics.errorCallbackCount = diagnostics.repetitionOKcase;        
-//        eo_timer_Start(diagnostics.reportTimer, eok_abstimeNOW, diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
-//    }
-    
-  
     bool _verified = true;
     constexpr bool verificationisOK {true};
-
-    
+ 
     if(true == activateafterverify)
     {
         Activate(config);      
         _actived = true;        
     } 
+    
+    diagnostics.errorType = eo_errortype_debug;
+    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_ok);
+    eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, nullptr, s_eobj_ownname, &diagnostics.errorDescriptor);
     
     onverifycompleted.execute(verificationisOK);  
     
@@ -262,10 +248,6 @@ bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool 
 //check if the encoder(s) selected is supported by the board
 bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &config)
 {
-    diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par64 = 0;
-    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
-    diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-    diagnostics.errorDescriptor.sourceaddress = 0;
     
     bool ret {true};
     
@@ -327,27 +309,18 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
         // 2. configure and initialize SPI encoder
         embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
         embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
+        //I write how main motor joints there are
+        diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 |((_implconfig.numofjomos)<<12);
+        
         if(embot::hw::resOK != r)
         {                            
 //            embot::core::print("theEncoderReader: encoder type not supported");
-            //to do: tell the specific error to yarp    
-            diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 |((_implconfig.numofjomos)<<12);
+            //in par16 we put the encoder with problems, in par64 we tell the specific error, in this case is a generic error
             diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | (1<<i);
-            diagnostics.errorDescriptor.par64 = 0;
+            diagnostics.errorDescriptor.par64 = diagnostics.errorDescriptor.par64 | (embot::core::tointegral(embot::app::eth::encoder::v1::Error::GENERIC)<<(i*4));
             
             ret = false;
         }
-        else
-        {
-            ret = true;
-//                embot::core::print("theEncoderReader: encoder init successfull");
-        }
-    }
-    
-    if(false == ret)
-    {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &diagnostics.errorDescriptor); 
-        Deactivate();      
     }
 
     return ret;
@@ -372,14 +345,13 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
         ret = false;
         return ret;
     }
-
-    EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
     
     if(true == _actived)
     {
         Deactivate();
     }
-   
+
+    EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
     // 1. prepare the config
     _implconfig.numofjomos = eo_constarray_Size(carray);
     for(uint8_t i=0; i<_implconfig.numofjomos; i++)
@@ -603,10 +575,6 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
 // I'll do one reading for each one of the encoder
 bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
 {
-    diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par64 = 0;
-    diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_HardWare,eoerror_value_HW_encoder_not_connected);  
-    diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-    diagnostics.errorDescriptor.sourceaddress = 0;
     
     bool ret {true};
     
@@ -626,19 +594,11 @@ bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
        
         if(resNOK == embot::hw::encoder::read(enc, pos, 5*embot::core::time1millisec))     
         {                        
+            diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | (1<<i);
+            
 //            embot::core::print("theEncoderReader: encoder reading fails");   
-            diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | i;
-            diagnostics.errorDescriptor.par64 = 1;
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &diagnostics.errorDescriptor);
-             
             ret = false;            
         }
-    }
-    
-    if(false == ret)
-    {
-       
-        Deactivate();      
     }
 
     return ret;
