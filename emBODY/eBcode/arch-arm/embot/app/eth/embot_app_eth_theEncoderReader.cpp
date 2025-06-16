@@ -1,17 +1,16 @@
-
 /*
- * Copyright (C) 2022 iCub Tech - Istituto Italiano di Tecnologia
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Simone Girardi
  * email:   simone.girardi@iit.it
+ * Author:  Kevin Sangalli
+ * email:   kevin.sangalli@iit.it
 */
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_app_eth_theEncoderReader.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -26,6 +25,7 @@
 
 #include "embot_app_eth_theServices.h"
 #include "embot_app_eth_Service_legacy.h"
+
 
 #if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)   
 #include "embot_app_eth_theBackdoor.h"
@@ -85,8 +85,9 @@ struct embot::app::eth::theEncoderReader::Impl
     
     embot::app::eth::encoder::v1::IFreader::Config config {};
     ImplConfig _implconfig {};
-    bool _initted {false};
-    bool _actived {false};
+    bool _initted  {false};
+    bool _actived  {false};
+    bool _verified {false};
     
     bool activateafterverify {true};
     embot::core::Confirmer onverifycompleted {};
@@ -131,6 +132,8 @@ private:
     static uint32_t rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmc_position_t pos);
     static bool isValidValue_AEA(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
     static bool isValidValue_AEA3(const uint32_t &valueraw, embot::app::eth::encoder::v1::Error &error);
+    bool IsEncoderSupported(const Config &config);
+    bool TestRead(const Config &config);
 
 #if defined(STM32HAL_BOARD_AMC) && defined(DEBUG_AEA3_stream_over_theBackdoor)    
     EOpacket *packet {nullptr};    
@@ -172,7 +175,6 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     service.started = eobool_false;    
     service.state = eomn_serv_state_idle;  
     
-    diagnostics.reportTimer = eo_timer_New();
     diagnostics.errorType = eo_errortype_error;
     diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);   
@@ -186,68 +188,67 @@ bool embot::app::eth::theEncoderReader::Impl::initialise()
     return true;
 }
 
+
+//some info onn how to fil in the par16 and par64 for theEncoderReader
+// in par16 = [N3|N2|N1|N0] I put: number of joint in N3, 0 in N2, failure mask of secondary in N1, failure mask of primary in N0
+// in par64 = [N15|N14|N13|N12|N11|N10|N09|N08|N07|N06|N05|N04|N03|N02|N01|N00] i put:
+// in nibbles N00-N03 i put error codes of primary
+// in nibbles N04-N07 i put error codes of secondary
+
+
+
 bool embot::app::eth::theEncoderReader::Impl::Verify(const Config &config, bool ActivateafterverifY, const embot::core::Confirmer &oncompletion)
 {    
     service.state = eomn_serv_state_verifying;
 
-    // make sure the timer is not running
-    eo_timer_Stop(diagnostics.reportTimer);  
         
     activateafterverify = ActivateafterverifY;
-    onverifycompleted = oncompletion;
-    
-//    #warning acemor-says: embot::app::eth::theEncoderReader should be revised. for now it does NOT verify encoders ...
+    onverifycompleted = oncompletion; 
 
-#if 0 
-    READ this:
-    we should enhance this object w/   
-    - a proper verify and activate
-    - internal data structure as in namespace embot::app::eth::service::impl
-    - surely diagnostics
-    - ...    
+    
+    constexpr bool verificationFailed {false};
+    
+    diagnostics.errorDescriptor.sourcedevice    = eo_errman_sourcedevice_localboard;
+    diagnostics.errorDescriptor.par16           = diagnostics.errorDescriptor.par64 = 0;
+    diagnostics.errorDescriptor.sourceaddress   = 0;
+    
+    if( false == IsEncoderSupported(config) || false ==  TestRead(config))
+    {
+        
+        diagnostics.errorType = eo_errortype_error;
+        diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);  
+        eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, nullptr, s_eobj_ownname, &diagnostics.errorDescriptor);
+        
+        Deactivate();     
+         _verified = false;
+        onverifycompleted.execute(verificationFailed);  
 
-#endif    
+        return false;  
+    }
+   
     
-    // we dont check and we just assume that everything is all right.
-    // 1. we activate
-    // 2. we send a nice diagnostic message 
-    // 3. ...
-    
+    bool _verified = true;
     constexpr bool verificationisOK {true};
-    
+ 
     if(true == activateafterverify)
     {
-        Activate(config);        
-    }
+        Activate(config);      
+        _actived = true;        
+    } 
     
-    diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
-    diagnostics.errorDescriptor.sourceaddress    = 0;
-    diagnostics.errorDescriptor.par16            = 0;
-    diagnostics.errorDescriptor.par64            = 0;    
-//    EOaction_strg astrg = {0};
-//    EOaction *act = (EOaction*)&astrg;
-//    eo_action_SetCallback(act, s_send_periodic_error_report, this, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
-              
     diagnostics.errorType = eo_errortype_debug;
     diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_ok);
     eo_errman_Error(eo_errman_GetHandle(), diagnostics.errorType, nullptr, s_eobj_ownname, &diagnostics.errorDescriptor);
-    
-//    if((0 != diagnostics.repetitionOKcase) && (0 != diagnostics.reportPeriod))
-//    {
-//        diagnostics.errorCallbackCount = diagnostics.repetitionOKcase;        
-//        eo_timer_Start(diagnostics.reportTimer, eok_abstimeNOW, diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
-//    }
-         
     
     onverifycompleted.execute(verificationisOK);  
     
     return true;  
 }
 
-
-bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
+//check if the encoder(s) selected is supported by the board
+bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &config)
 {
-//    eo_errman_Trace(eo_errman_GetHandle(), "::Activate()", s_eobj_ownname);
+    
     bool ret {true};
     
     if((nullptr == config.carrayofjomodes))
@@ -261,62 +262,142 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
         ret = false;
         return ret;
     }
-
+    
+    //in doubt I deinit the embot::hw::encoders
+    Deactivate();
+    
+    // 1. prepare the config
     EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
+    _implconfig.numofjomos = eo_constarray_Size(carray);
+    for(uint8_t i=0; i<_implconfig.numofjomos; i++)
+    {
+       const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
+        
+       if(nullptr == jomodes) { continue; }
+
+        _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
+        _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
+        
+        embot::hw::encoder::Config cfg {};
+        
+        switch(_implconfig.jomo_cfg[i].encoder1des.type)
+        {
+            case eomc_enc_aea:
+            {
+                cfg.type = embot::hw::encoder::Type::chipAS5045;
+            } break;
+            
+            case eomc_enc_aea3:
+            {
+                cfg.type = embot::hw::encoder::Type::chipMA730;
+            } break;
+            
+            case eomc_enc_aksim2:
+            {
+                cfg.type = embot::hw::encoder::Type::chipMB049;
+            } break;
+            case eomc_enc_unknown:
+            case eomc_enc_none:
+            default:
+            {
+                //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
+//                embot::core::print("theEncoderReader: encoder unknown/none/unsupported");
+                ret = false;
+            } break;
+        }
+        
+        // 2. configure and initialize SPI encoder
+        embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
+        embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
+        //I write how main motor joints there are
+        diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 |((_implconfig.numofjomos)<<12);
+        
+        if(embot::hw::resOK != r)
+        {                            
+//            embot::core::print("theEncoderReader: encoder type not supported");
+            //in par16 we put the encoder with problems, in par64 we tell the specific error, in this case is a generic error
+            diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | (1<<i);
+            diagnostics.errorDescriptor.par64 = diagnostics.errorDescriptor.par64 | (embot::core::tointegral(embot::app::eth::encoder::v1::Error::GENERIC)<<(i*4));
+            
+            ret = false;
+        }
+    }
+
+    return ret;
+}
+
+
+
+//I'm not giving error messages here bc I assume no errors will be encountered as the checks are done before
+bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
+{
+
+    bool ret {true};
+    
+    if((nullptr == config.carrayofjomodes))
+    {
+        ret = false;
+        return ret;
+    } 
+
+    if(eo_constarray_Size(config.carrayofjomodes) > max_number_of_jomos)
+    {
+        ret = false;
+        return ret;
+    }
     
     if(true == _actived)
     {
         Deactivate();
     }
-   
+
+    EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
     // 1. prepare the config
     _implconfig.numofjomos = eo_constarray_Size(carray);
-    
     for(uint8_t i=0; i<_implconfig.numofjomos; i++)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
         
-        if(nullptr != jomodes)
+        if(nullptr == jomodes) { continue; }
+
+        _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
+        _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
+        
+        embot::hw::encoder::Config cfg {};
+        
+        switch(_implconfig.jomo_cfg[i].encoder1des.type)
         {
-            _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;
-            _implconfig.jomo_cfg[i].encoder2des = jomodes->encoder2;
-            
-            embot::hw::encoder::Config cfg {};
-            
-            switch(_implconfig.jomo_cfg[i].encoder1des.type)
+            case eomc_enc_aea:
             {
-                case eomc_enc_aea:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipAS5045;
-                } break;
-                
-                case eomc_enc_aea3:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipMA730;
-                } break;
-                
-                case eomc_enc_aksim2:
-                {
-                    cfg.type = embot::hw::encoder::Type::chipMB049;
-                } break;
-                
-                default:
-                {
-                    // unsupported encoder
-                    ret = false;
-                } break;
-            }
+                cfg.type = embot::hw::encoder::Type::chipAS5045;
+            } break;
             
-            // 2. configure and initialize SPI encoder
-            
-            embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
-            embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
-            if(embot::hw::resOK != r)
+            case eomc_enc_aea3:
             {
+                cfg.type = embot::hw::encoder::Type::chipMA730;
+            } break;
+            
+            case eomc_enc_aksim2:
+            {
+                cfg.type = embot::hw::encoder::Type::chipMB049;
+            } break;
+            case eomc_enc_unknown:
+            case eomc_enc_none:
+            default:
+            {
+                //unknown/no/unsupported encoder
                 ret = false;
-            }
-            
+            } break;
         }
+        
+        // 2. configure and initialize SPI encoder
+        embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
+        embot::hw::result_t r = embot::hw::encoder::init(enc, cfg);
+        if(embot::hw::resOK != r)
+        {          
+            ret = false;
+        }
+
     }
     
     if(false == ret)
@@ -331,8 +412,6 @@ bool embot::app::eth::theEncoderReader::Impl::Activate(const Config &config)
 
 bool embot::app::eth::theEncoderReader::Impl::Deactivate()
 {
-//    eo_errman_Trace(eo_errman_GetHandle(), "::Deactivate()", s_eobj_ownname);
-    
     _implconfig.numofjomos = 0;
     embot::hw::encoder::deinit(embot::hw::ENCODER::one);
     embot::hw::encoder::deinit(embot::hw::ENCODER::two);
@@ -352,7 +431,7 @@ bool embot::app::eth::theEncoderReader::Impl::StartReading()
     embot::hw::encoder::startRead(embot::hw::ENCODER::two);
     embot::hw::encoder::startRead(embot::hw::ENCODER::three);
     
-    return true;;
+    return true;
 }
 
 bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth::encoder::v1::valueInfo &primary, embot::app::eth::encoder::v1::valueInfo &secondary)
@@ -486,12 +565,60 @@ bool embot::app::eth::theEncoderReader::Impl::Read(uint8_t jomo, embot::app::eth
         }
     }
     
-
-
     //eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, position, primary, secondary); 
     
     return true;
 }
+
+
+
+// I'll do one reading for each one of the encoder
+bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
+{
+    
+    bool ret {true};
+    
+    EOconstarray* carray = eo_constarray_Load(reinterpret_cast<EOconstarray*>(config.carrayofjomodes));
+    _implconfig.numofjomos = eo_constarray_Size(carray);
+    
+    //I will try to read the primary encoder, if the reading is succesfful (aka embot::hw::encoder::read reads plausible data) ok, if not I will send an error to yarp
+    for(uint8_t i=0; i<_implconfig.numofjomos; i++)
+    {
+       const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
+        
+       if(nullptr == jomodes) { continue; }
+
+        _implconfig.jomo_cfg[i].encoder1des = jomodes->encoder1;        
+        embot::hw::ENCODER enc = port2encoder(_implconfig.jomo_cfg[i].encoder1des.port);
+        embot::hw::encoder::POS pos;
+       
+        if(resNOK == embot::hw::encoder::read(enc, pos, 5*embot::core::time1millisec))     
+        {                        
+            diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | (1<<i);
+            switch(_implconfig.jomo_cfg[i].encoder1des.type)
+            {
+                case eomc_enc_aea:
+                case eomc_enc_aea3:
+                {
+                    diagnostics.errorDescriptor.par64 = diagnostics.errorDescriptor.par64 | (embot::core::tointegral(embot::app::eth::encoder::v1::Error::AEA_READING)<<(i*4));
+                } break;
+                
+                case eomc_enc_aksim2:
+                case eomc_enc_unknown:
+                case eomc_enc_none:
+                default:
+                {
+                    diagnostics.errorDescriptor.par64 = diagnostics.errorDescriptor.par64 | (embot::core::tointegral(embot::app::eth::encoder::v1::Error::GENERIC)<<(i*4));
+                } break;
+            }
+//            embot::core::print("theEncoderReader: encoder test reading fails");   
+            ret = false;            
+        }
+    }
+
+    return ret;
+}
+
 
 bool embot::app::eth::theEncoderReader::Impl::SendReport()
 {
