@@ -595,8 +595,23 @@ bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
         if(resNOK == embot::hw::encoder::read(enc, pos, 5*embot::core::time1millisec))     
         {                        
             diagnostics.errorDescriptor.par16 = diagnostics.errorDescriptor.par16 | (1<<i);
-            
-//            embot::core::print("theEncoderReader: encoder reading fails");   
+            switch(_implconfig.jomo_cfg[i].encoder1des.type)
+            {
+                case eomc_enc_aea:
+                case eomc_enc_aea3:
+                {
+                    diagnostics.errorDescriptor.par64 = diagnostics.errorDescriptor.par64 | (embot::core::tointegral(embot::app::eth::encoder::v1::Error::AEA_READING)<<(i*4));
+                } break;
+                
+                case eomc_enc_aksim2:
+                case eomc_enc_unknown:
+                case eomc_enc_none:
+                default:
+                {
+                    diagnostics.errorDescriptor.par64 = diagnostics.errorDescriptor.par64 | (embot::core::tointegral(embot::app::eth::encoder::v1::Error::GENERIC)<<(i*4));
+                } break;
+            }
+//            embot::core::print("theEncoderReader: encoder test reading fails");   
             ret = false;            
         }
     }
