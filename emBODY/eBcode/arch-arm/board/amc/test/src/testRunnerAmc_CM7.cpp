@@ -35,7 +35,7 @@ bool TestRunnerAmc_CM7::testCanComm(uint8_t *data)
 bool TestRunnerAmc_CM7::testEthComm(uint8_t *data)
 {
     embot::core::print("Called method from testRunnerAmc_CM7");
-    embot::core::wait(300* embot::core::time1millisec);	
+    embot::core::wait(300* embot::core::time1millisec);	// wait some time to be sure that the link went up
     bool link1isup = embot::hw::eth::islinkup(embot::hw::PHY::one);    
     bool link2isup = embot::hw::eth::islinkup(embot::hw::PHY::two);
     std::string msg = std::string("ETH link 1 is ") + (link1isup ? "UP" : "DOWN") + " ETH link 2 is " + (link2isup ? "UP" : "DOWN");
@@ -206,15 +206,18 @@ bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
 
     // Configure type of encoder chip depending on the requested one passed by arg
     constexpr embot::hw::encoder::Config cfgAEA3 {embot::hw::encoder::Type::chipMA730}; 
-    //constexpr embot::hw::encoder::Config cfgAEA {embot::hw::encoder::Type::chipAS5045}; --> encoder chip for AEA
+    // constexpr embot::hw::encoder::Config cfgAEA {embot::hw::encoder::Type::chipAS5045}; --> encoder chip for AEA
     // Configure three encoder since we have 3 spi channels and we wanna test all of them
     constexpr size_t nENCs {3};
-    constexpr embot::core::Time periodofreport {2*embot::core::time1millisec};
+    // now just set for blocking reading call
+    // timeout for blocking call to read. For sake of test blocking call is fine. No need to define callbacks
+    // set a timeout for letting the reading process complete before getting the raw value
+    constexpr embot::core::Time timeout {300*embot::core::time1microsec}; 
     
     // data arrays
     std::array<embot::hw::encoder::POS, nENCs> spiRawValues {};
-    std::array<embot::hw::ENCODER, nENCs> encs {}; 
-    std::array<volatile bool, nENCs> done {}; 
+    std::array<embot::hw::ENCODER, nENCs> encs {};
+    std::array<volatile bool, nENCs> done {};
         
     // result value for stopping flow if error before end of test
     // same type as for methods in embot::hw::encoder
@@ -224,10 +227,9 @@ bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
     for(size_t i=0; i<nENCs; i++)
     {
         embot::hw::ENCODER enc {static_cast<embot::hw::ENCODER>(i)};
-        embot::hw::encoder::init(enc, cfgAEA3);
+        hwres = embot::hw::encoder::init(enc, cfgAEA3);
+        done[i] = (hwres != embot::hw::resOK) ? false : true;
         encs[i] = enc;
-        //thecallbacks[i] = {onreadingdone, &encs[i]};
-        done[i] = true;
     }
     
     // Start the data array with some initial values
@@ -237,35 +239,22 @@ bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
     {
         spiRawValues[i] = 60666;
         
-        // we want to be sure that our embot::hw::ENCODER objects have been intialized
-        embot::hw::ENCODER enc {static_cast<embot::hw::ENCODER>(i)};
-        // start non-blocking reading process (??stopped by callback??)
-        hwres = embot::hw::encoder::startRead(enc, {});
-    }
-    
-    if(hwres != embot::hw::resOK)
-    {
-        embot::core::print("AEA3 reading NOK"); 
-        data[0] = 0xBB;
-        return false;
+        if(!done[i])
+        {
+            embot::core::print("AEA3 #" + std::to_string(i) + " init NOK"); 
+            data[0] = 0xBB;
+            return false; 
+        }
     }
     
     // Get the spi encoder value
-    // Set a timeput for letting the reading process complete before getting the raw value
-    constexpr embot::core::Time timeout {200*embot::core::time1microsec};
-    embot::core::wait(timeout);
     for(size_t i=0; i<nENCs; i++)
     {
         embot::hw::ENCODER enc {static_cast<embot::hw::ENCODER>(i)};
-        hwres = embot::hw::encoder::getValue(enc, spiRawValues[i]);
+        hwres = embot::hw::encoder::read(enc, spiRawValues[i], timeout);
+        // Override done array for storing all reads
+        done[i] = (hwres != embot::hw::resOK) ? false : true;
     } 
-    
-    if(hwres != embot::hw::resOK)
-    {
-        embot::core::print("AEA3 reading NOK"); 
-        data[0] = 0xBB;
-        return false;
-    }
     
     // Print results for debugging purposes
     char messageAEA3[512] = {0};
@@ -274,7 +263,15 @@ bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
     std::string s {embot::core::TimeFormatter(n).to_string() + ":"};
     for(size_t i=0; i<nENCs; i++)
     {
-        s += " ";
+        if(!done[i])
+        {
+            s += " AEA3 #" + std::to_string(i) + " read NOK. val: ";
+            data[0] = 0xBB;
+        }
+        else
+        {
+            s += " AEA3 #" + std::to_string(i) + " read OK. val: ";
+        }
         s += std::to_string(spiRawValues[i]);           
     } 
     std::snprintf(messageAEA3, sizeof(messageAEA3), "%s\n", s.c_str());
