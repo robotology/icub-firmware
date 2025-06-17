@@ -380,6 +380,51 @@ BOOL JointSet_do_check_faults(JointSet* o)
     BOOL fault = FALSE;
     o->external_fault = FALSE;
     
+    uint32_t errorcode;
+    int controlmode;
+    
+    BOOL timeout = FALSE;
+    
+    BOOL soft_limit_overcome = FALSE;
+
+    for (int k=0; k<N; ++k)
+    {
+        if (Joint_check_watchdogs_force_position(o->joint+o->joints_of_set[k], &errorcode, &controlmode))
+        {
+            timeout = TRUE;
+            eOerrmanDescriptor_t errdes = {0};
+                    
+            errdes.code             = errorcode;
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = o->joint[o->joints_of_set[k]].ID;
+            errdes.par16            = controlmode;
+            errdes.par64            = 0;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        }
+        
+        // TODO: before Joint_check_faults check SW LIMITS when control mode PWM or CURRENT ??
+        // TODO: Or it is better to add the check at JointSet_do_<specific_control_mode> exploiting the variable pushing_limits ??
+        if (Joint_check_softwareboundaries_force_position(o->joint+o->joints_of_set[k], &errorcode, &controlmode))
+        {
+            soft_limit_overcome = TRUE;
+            eOerrmanDescriptor_t errdes = {0};
+                    
+            errdes.code             = errorcode;
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.par16            = o->joint[o->joints_of_set[k]].ID;
+            errdes.par64            = ((uint64_t)o->joint[o->joints_of_set[k]].pos_fbk << 32) | ((uint64_t)controlmode & 0xff);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        }
+    }
+    
+    if (timeout || soft_limit_overcome)
+    {
+        JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
+        JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff);
+    }
+    
+    
     for (int k=0; k<N; ++k)
     {
         if (Joint_check_faults(o->joint+o->joints_of_set[k]))
@@ -483,6 +528,15 @@ static void JointSet_do_wait_calibration(JointSet* o);
 
 void JointSet_do(JointSet* o)
 {
+    // TODO: when checking for overcoming of sw limits while in pwm and current control
+    // looking at the following state machine, it is probably best to perfomr the check at
+    // JointSet_do_check_faults, instead of at JointSet_do_control()
+    // Therefore, if we are outside of sw limits we do not even do the control
+    // However, it is possible that we fall in a case where we overcome the sw limits while doing the control phase
+    // And before going back to the following do_odometry() ??
+    // This probably cannot happen since check of joint position from encoders and control cannot happen at the same time
+    // thus I can check the joint position at the following loop, after the TX and RX phase, which will eventually happen 1ms after
+    // thus it might be the best option to check the sw limits at the joint_set_do_check_faults
     JointSet_do_odometry(o);
     JointSet_do_check_faults(o);
     
