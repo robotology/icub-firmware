@@ -40,9 +40,13 @@ void TestManagerSingleton::testManagerRun()
         {
            _testRunner_ptr->testCanComm(data);
         } break;
+        case ProtocolManager::TestCommand::testETH:
+        {
+            _testRunner_ptr->testEthComm(data);
+        } break;
         case ProtocolManager::TestCommand::testFwVersion:
         {
-            _testRunner_ptr->testFwVersion();
+            _testRunner_ptr->testFwVersion(data);
         } break;
         case ProtocolManager::TestCommand::testLedOff:
         {
@@ -66,11 +70,11 @@ void TestManagerSingleton::testManagerRun()
         } break;
         case ProtocolManager::TestCommand::testVauxOK:
         {
-            _testRunner_ptr->testVauxOK();
+            _testRunner_ptr->testVauxOK(data);
         } break;
         case ProtocolManager::TestCommand::testPwrnFailOK:
         {
-            _testRunner_ptr->testPwrnFailOK();
+            _testRunner_ptr->testPwrnFailOK(data);
         } break;
         case ProtocolManager::TestCommand::testFaultOff:
         {
@@ -91,6 +95,10 @@ void TestManagerSingleton::testManagerRun()
         case ProtocolManager::TestCommand::testQuadEncoder:
         {
              _testRunner_ptr->testQuadEncoder();
+        } break;
+        case ProtocolManager::TestCommand::testSPIEncoder:
+        {
+            _testRunner_ptr->testSpiAeaEncoder(data);
         } break;
         default: break;
     }
