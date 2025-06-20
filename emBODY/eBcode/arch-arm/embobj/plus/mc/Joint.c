@@ -177,6 +177,8 @@ void Joint_reset_calibration_data(Joint* o)
     o->running_calibration.type = eomc_calibration_typeUndefined;
 }
 
+static void Joint_send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64);
+
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 {
     o->ID = ID;
@@ -228,12 +230,12 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     WatchDog_set_base_time_msec(&o->pwm_ref_wdog, config->openloopsetpointtimeout);
     WatchDog_set_base_time_msec(&o->trq_ref_wdog, config->torquesetpointtimeout);
     WatchDog_set_base_time_msec(&o->trq_fbk_wdog, config->torquefeedbacktimeout);
-    
+
     WatchDog_rearm(&o->vel_ref_wdog);
-    
     WatchDog_rearm(&o->trq_ref_wdog);
     WatchDog_rearm(&o->pwm_ref_wdog);
     WatchDog_rearm(&o->cur_ref_wdog);
+    WatchDog_rearm(&o->trq_fbk_wdog);
     
     // TODOALE joint admittance missing
     o->Kadmitt = ZERO;
