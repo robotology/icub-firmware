@@ -26,7 +26,7 @@ bool TestRunnerBase::testMicroId(uint8_t *data){ return true; }
 bool TestRunnerBase::testVin(uint8_t *data){ return true; }
 bool TestRunnerBase::testCin(uint8_t *data){ return true; }
 bool TestRunnerBase::testVauxOK(uint8_t *data){ return true; }
-bool TestRunnerBase::testPwrnFailOK(){ return true; }
+bool TestRunnerBase::testPwrnFailOK(uint8_t *data){ return true; }
 bool TestRunnerBase::testFault(uint8_t on, uint8_t *data){ return true; }
 bool TestRunnerBase::testI2C(){ return true; }
 bool TestRunnerBase::testHallSensor(){ return true; }

@@ -22,7 +22,7 @@ class TestRunnerBase
         virtual bool testVin(uint8_t *data);
         virtual bool testCin(uint8_t *data);
         virtual bool testVauxOK(uint8_t *data);
-        virtual bool testPwrnFailOK();
+        virtual bool testPwrnFailOK(uint8_t *data);
         virtual bool testFault(uint8_t on, uint8_t *data);
         virtual bool testI2C();
         virtual bool testHallSensor();

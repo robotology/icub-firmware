@@ -26,7 +26,7 @@ class TestRunnerAmc_CM7 : public TestRunnerBase
         bool testVin(uint8_t *data) override;
         bool testCin(uint8_t *data) override;
         bool testVauxOK(uint8_t *data) override;
-        bool testPwrnFailOK() override;
+        bool testPwrnFailOK(uint8_t *data) override;
         bool testFault(uint8_t on, uint8_t *data) override;
         bool testSpiAeaEncoder(uint8_t *data) override;
 };

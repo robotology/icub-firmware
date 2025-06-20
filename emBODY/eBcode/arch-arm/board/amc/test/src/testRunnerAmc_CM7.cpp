@@ -138,7 +138,33 @@ bool TestRunnerAmc_CM7::testVauxOK(uint8_t *data)
     return true; 
 }
 
-bool TestRunnerAmc_CM7::testPwrnFailOK(){ return true; }
+bool TestRunnerAmc_CM7::testPwrnFailOK(uint8_t *data)
+{ 
+    // Set an embot::hw::GPIO tyoe variable to desired PORT::pin to be checked
+    constexpr embot::hw::GPIO PWR_nFAIL {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::zero};
+    constexpr embot::hw::gpio::Config PWR_nFAIL_Cfg {
+        embot::hw::gpio::Mode::INPUT, 
+        embot::hw::gpio::Pull::nopull, 
+        embot::hw::gpio::Speed::medium
+    };
+    embot::hw::gpio::init(PWR_nFAIL, PWR_nFAIL_Cfg);
+    
+    embot::hw::gpio::set(PWR_nFAIL, embot::hw::gpio::State::SET);        
+    HAL_Delay(10); // wait for 10 ms to stabilize ...
+    
+    
+    auto s = embot::hw::gpio::get(embot::hw::GPIO(embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::zero));
+    
+    embot::core::wait(10*embot::core::time1millisec); // wait for 10 ms to stabilize ...
+    
+    if(s == embot::hw::gpio::State::SET){embot::core::print("OK"); data[0] = 0xAA;}
+    else{embot::core::print("NOK"); data[0] = 0xBB;}
+    
+    // Deinit the GPIO at the end
+    embot::hw::gpio::deinit(PWR_nFAIL);
+    
+    return true; 
+}
 
 bool TestRunnerAmc_CM7::testFault(uint8_t on, uint8_t *data)
 {

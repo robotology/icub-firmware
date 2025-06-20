@@ -74,7 +74,7 @@ void TestManagerSingleton::testManagerRun()
         } break;
         case ProtocolManager::TestCommand::testPwrnFailOK:
         {
-            _testRunner_ptr->testPwrnFailOK();
+            _testRunner_ptr->testPwrnFailOK(data);
         } break;
         case ProtocolManager::TestCommand::testFaultOff:
         {
