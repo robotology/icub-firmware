@@ -340,7 +340,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_EMBOT_HW USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0 EMBOT_USE_rtos_osa</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\cfg;..\..\..\..\embot\app\eth;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\bsp.minimal;..\src;.;.;..\..\..\..\embot\prot\can</IncludePath>
+              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\libs\midware\eventviewer\api;..\cfg;..\..\..\..\embot\app\eth;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\bsp;..\..\bsp\ethdriver;..\src;.;..\..\..\..\embot\prot\can;..\..\..\..\libs\highlevel\abslayer\ipal\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -713,15 +713,55 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_motor.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_eth.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_eth.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_chip_KSZ8563.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_chip_KSZ8563.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amc_minimal.cpp</FileName>
+              <FileName>embot_hw_bsp_amc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\bsp.minimal\embot_hw_bsp_amc_minimal.cpp</FilePath>
+              <FilePath>..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>ipal_hal_eth_stm32h7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
+            </File>
+            <File>
+              <FileName>PHY_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
             </File>
           </Files>
         </Group>
