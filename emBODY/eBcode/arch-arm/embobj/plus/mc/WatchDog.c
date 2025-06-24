@@ -34,6 +34,7 @@
 
 void WatchDog_init(WatchDog* o)
 {
+    o->min_timer = 1000000000;
     o->timer = 0;
     o->base_time = 0;
 }
@@ -51,15 +52,27 @@ void WatchDog_new(uint8_t n)
 void WatchDog_set_base_time_msec(WatchDog* o, uint32_t base_time_msec)
 {
     o->base_time = (base_time_msec*(uint32_t)CTRL_LOOP_FREQUENCY)/1000;
+    o->min_timer = o->base_time;
+    o->timer = o->base_time;
 }
 
 void WatchDog_rearm(WatchDog* o)
 {
+    if (o->timer < o->min_timer)
+    {
+        o->min_timer = o->timer;
+    }
+        
     o->timer = o->base_time;
 }
 
 void WatchDog_rearm_from(WatchDog* o, uint32_t from)
 {
+    if (o->timer < o->min_timer)
+    {
+        o->min_timer = o->timer;
+    }
+    
     o->timer = from;
 }
 
@@ -70,6 +83,8 @@ void Watchdog_disarm(WatchDog* o)
 
 BOOL WatchDog_check_expired(WatchDog* o)
 {
+    if (!o->base_time) return FALSE;
+    
     if (o->timer)
     {
         --o->timer;
