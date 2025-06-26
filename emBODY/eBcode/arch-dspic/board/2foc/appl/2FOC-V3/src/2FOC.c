@@ -193,7 +193,7 @@ volatile long VqRef = 0;
 volatile int  IqRef = 0;
 
 volatile int speed_error_old = 0;
-volatile long Is = 0;
+volatile long IsA = 0;
 volatile int iQerror_old = 0;
 volatile int iDerror_old = 0;
 volatile int iQprot = 0;
@@ -203,13 +203,15 @@ static const int PWM_MAX = (24*PWM_50_DUTY_CYC)/25; // = 96%
 volatile int gMaxCurrent = 0;
 volatile long sI2Tlimit = 0;
 
-volatile int  IKp = 0; //8;
-volatile int  IKi = 0; //2;
-volatile char IKs = 0; //10;
+volatile int  IKp       = 0; //8;
+volatile int  IKi       = 0; //2;
+volatile int  IKbemf    = 0;
+volatile char IKs       = 0; //10;
 volatile long IIntLimit = 0;//800L*1024L;
 
 volatile int  SKp = 0x0C;
 volatile int  SKi = 0x10;
+volatile int  SKf = 0x00;
 volatile char SKs = 0x0A;
 volatile long SIntLimit = 0;//800L*1024L;
 
@@ -229,19 +231,27 @@ void setMaxTemperature(int peak)
     gTemperatureLimit = peak;
 }
 
-void setIPid(int kp, int ki, char shift)
+void setIPid(int kp, int ki, int kbemf, char shift)
 {
-    IKp = kp;
-    IKi = ki/2;
-    IKs = shift;
+    IKp    = kp;
+    IKi    = ki/2;
+    IKbemf = kbemf;
+    IKs    = shift;
+    
+    if (ki == 0) ZeroControlReferences();
+                    
     IIntLimit = ((long)PWM_MAX)<<shift;
 }
 
-void setSPid(int kp, int ki, char shift)
+void setSPid(int kp, int ki, int kf, char shift)
 {
     SKp = kp;
     SKi = ki/2;
+    SKf = kf;
     SKs = shift;
+    
+    if (ki == 0) ZeroControlReferences();
+    
     SIntLimit = ((long)PWM_MAX)<<shift;
 }
 
@@ -257,7 +267,7 @@ void ZeroControlReferences()
     VqRef = 0;
     IqRef = 0;
     speed_error_old = 0;
-    Is = 0;
+    IsA = 0;
     iQerror_old = 0;
     iDerror_old = 0;
     iQprot = 0;
@@ -307,6 +317,67 @@ void ResetSetpointWatchdog()
 
 BOOL updateOdometry()
 {
+    static int vel_loop_clock = 0;
+    
+    if (MotorConfig.has_qe || MotorConfig.has_speed_qe)
+    {        
+        static int position_old = 0;
+        int position = QEgetPos();
+        int delta = position - position_old;
+
+        position_old = position;
+
+        if (sAlignInProgress)
+        {
+            gQEPosition = 0;
+            gQEVelocity = 0;
+            return FALSE;
+        }
+
+        gQEPosition += delta;
+
+        #define UNDERSAMPLING 20 // PWMFREQUENCY / 1000;
+        static int samples_circ_buffer[UNDERSAMPLING];
+        static BOOL init_samples = TRUE;
+        static int head = 0;   
+        
+        if (init_samples)
+        {
+            int i;
+            
+            for (i=0; i<UNDERSAMPLING; ++i) samples_circ_buffer[i] = gQEPosition;
+            
+            init_samples = FALSE;
+        }
+        
+        // gQEVelocity = (1 + gQEVelocity + gQEPosition - samples_circ_buffer[head]) / 2;        
+        gQEVelocity = gQEPosition - samples_circ_buffer[head];
+        samples_circ_buffer[head++] = gQEPosition;
+        head %= UNDERSAMPLING;
+        
+        if (++vel_loop_clock >= 20)
+        {
+            vel_loop_clock = 0;
+            return TRUE;
+        }
+        else
+        {
+            return FALSE;
+        }
+    }
+    else if (MotorConfig.has_hall)
+    {
+        gQEPosition = DHESPosition();
+        gQEVelocity = DHESVelocity();
+
+        return FALSE;
+    }
+
+    return FALSE;
+}
+/*
+BOOL updateOdometry()
+{
     if (MotorConfig.has_qe || MotorConfig.has_speed_qe)
     {
         static const int UNDERSAMPLING = PWMFREQUENCY / 1000;
@@ -352,6 +423,7 @@ BOOL updateOdometry()
 
     return FALSE;
 }
+*/
 
 volatile int rotorAfbk = 0;
 volatile int rotorBfbk = 0;
@@ -543,7 +615,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     static short *iH,*iL,*i0;
 
-    static BOOL starting = TRUE;
+    //static BOOL starting = TRUE;
 
     // setting CORCON in this way rather than using CORCONbits is
     // slightly more efficient (because CORCONbits is volatile and
@@ -567,10 +639,19 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     
     // here we have a first stage filtering
     // each sample is mediated with the previous one
-    ParkParm.qIa = (MeasCurrParm.Offseta-ADCBuffer[0]) / 3;
-    ParkParm.qIc = (MeasCurrParm.Offsetc-ADCBuffer[1]) / 3;
+    int Ia = (MeasCurrParm.Offseta-ADCBuffer[0]) / 3;
+    int Ic = (MeasCurrParm.Offsetc-ADCBuffer[1]) / 3;
+    
+    static int IaOld = 0;
+    static int IcOld = 0;
+    
+    ParkParm.qIa = (Ia + IaOld)/2; 
+    ParkParm.qIc = (Ic + IcOld)/2;
     ParkParm.qIb = -ParkParm.qIa-ParkParm.qIc;
-        
+    
+    IaOld = Ia;
+    IcOld = Ic;
+    
     // gain = (64/49.03) * (1/3)
 
     int enc = 0;
@@ -750,6 +831,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     if (!sAlignInProgress)
     {
+        // SPEED LOOP
         if (gControlMode == icubCanProto_controlmode_speed_current
          || gControlMode == icubCanProto_controlmode_speed_voltage)
         {
@@ -759,25 +841,25 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
                 if (gControlMode == icubCanProto_controlmode_speed_current)
                 {
-                    Is += (((long) (speed_error - speed_error_old)) << 4) + (long) (speed_error + speed_error_old);
+                    // alternative formulation with ff term
+                    IsA += __builtin_mulss(speed_error+speed_error_old,SKi);
 
-                    if (Is > Ipeak) Is = Ipeak; else if (Is < -Ipeak) Is = -Ipeak;
+                    long IsF = __builtin_mulss(speed_error,SKp) + __builtin_mulss(SKf,CtrlReferences.WRef);
+                
+                    long IsT = IsA + IsF;
+        
+                    if (IsT > SIntLimit)
+                    {
+                        IsA = SIntLimit - IsF;
+                        IsT = SIntLimit;
+                    }
+                    else if (IsT < -SIntLimit)
+                    {
+                        IsA = -SIntLimit - IsF;
+                        IsT = -SIntLimit;
+                    }
 
-                    if (starting)
-                    {
-                        if (Is > 0)
-                        {
-                            if (Is > IqRef) ++IqRef; else { IqRef = (int)Is; starting = FALSE; }
-                        }
-                        else
-                        {
-                            if (Is < IqRef) --IqRef; else { IqRef = (int)Is; starting = FALSE; }
-                        }
-                    }
-                    else
-                    {
-                        IqRef = (int)Is;
-                    }
+                    IqRef = (int)(IsT>>SKs);
                 }
                 else
                 {
@@ -827,29 +909,36 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     Vq = 0;
 
-    // current closed loop
+    // CURRENT LOOP
     if (gControlMode == icubCanProto_controlmode_speed_current
      || gControlMode == icubCanProto_controlmode_current
      || sAlignInProgress)
     {
         int iQerror = IqRef-I2Tdata.IQMeasured;
 
-        VqA += __builtin_mulss(iQerror-iQerror_old,IKp) + __builtin_mulss(iQerror+iQerror_old,IKi);
-
-        iQerror_old = iQerror;
-
-        if (VqA > IIntLimit) VqA = IIntLimit; else if (VqA < -IIntLimit) VqA = -IIntLimit;
-
-        Vq = (int)(VqA>>IKs);
-
         // alternative formulation with ff term
-        //VqA += __builtin_mulss(iQerror+iQerror_old,Ki);
-        //if (VqA > V_INT_LIMIT) VqA = V_INT_LIMIT; else if (VqA < -V_INT_LIMIT) VqA = -V_INT_LIMIT;
-        //long VqF = VqA + __builtin_mulss(43,IqRef) + __builtin_mulss(93,gQEVelocity);
-        //if (VqF > V_INT_LIMIT) VqF = V_INT_LIMIT; else if (VqF < -V_INT_LIMIT) VqF = -V_INT_LIMIT;
-        //Vq = (int)(VqF>>Kshift);
+        VqA += __builtin_mulss(iQerror+iQerror_old,IKi);
+
+        long VqF = __builtin_mulss(iQerror,IKp) + __builtin_mulss(IKbemf,gQEVelocity);
+                
+        long VqT = VqA + VqF;
+        
+        if (VqT > IIntLimit)
+        {
+            VqA = IIntLimit - VqF;
+            VqT = IIntLimit;
+        }
+        else if (VqT < -IIntLimit)
+        {
+            VqA = -IIntLimit - VqF;
+            VqT = -IIntLimit;
+        }
+
+        Vq = (int)(VqT>>IKs);
+        
+        iQerror_old = iQerror;
     }
-    else // current open loop
+    else // NO CURRENT CONTROL
     {
         if (I2Tdata.IQMeasured > Ipeak)
         {
@@ -897,7 +986,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     ////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////
-    // BEMF section
+    // Id section
     int iDerror = -I2Tdata.IDMeasured;
 
     VdA += __builtin_mulss(iDerror-iDerror_old,IKp) + __builtin_mulss(iDerror+iDerror_old,IKi);
@@ -1311,7 +1400,7 @@ int main(void)
     {
         if (MotorConfig.has_tsens) 
         {
-            gTemperature = SetupPorts_I2C();    
+            gTemperature = SetupPorts_I2C();
         }
         else
         {
@@ -1327,7 +1416,7 @@ int main(void)
         }
     }
 
-    setSPid(SKp, SKi, SKs);
+    setSPid(SKp, SKi, SKf, SKs);
 
     Timer3Enable(); // EnableAuxServiceTimer();
 

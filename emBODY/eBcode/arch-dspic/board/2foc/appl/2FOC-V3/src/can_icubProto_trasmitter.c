@@ -200,6 +200,13 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     }
 }
 
+extern void CanSendDebug(tCanData* data, int len)
+{
+    unsigned long msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+
+    ECANSend(msgid, len, data);
+}
+
 extern void CanIcubProtoTransmitterUpdateBoardId(unsigned char bid)
 {
     canprototransmitter_bid = bid;

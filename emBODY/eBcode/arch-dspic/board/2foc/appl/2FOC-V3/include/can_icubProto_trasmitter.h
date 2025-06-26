@@ -22,6 +22,7 @@
 extern void CanIcubProtoTransmitterInit(unsigned char bid);
 extern void CanIcubProtoTrasmitterSendPeriodicData(void);
 extern void CanIcubProtoTransmitterUpdateBoardId(unsigned char bid);
+extern void CanSendDebug(tCanData* data, int len);
 
 #endif
 

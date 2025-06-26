@@ -276,27 +276,40 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
             int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
+            int  kf=((int)rxpayload->b[5])|(((int)rxpayload->b[6])<<8);
             char ks=rxpayload->b[7];
-
-            setIPid(kp,ki,ks);
-
+            
+            setIPid(kp,ki,kf,ks);
+            
+            //static tCanData payload;
+            
+            //payload.w[0] = rxpayload->w[0];
+            //payload.w[1] = rxpayload->w[1];
+            //payload.w[2] = rxpayload->w[2];
+            //payload.w[3] = rxpayload->w[3];
+            
+            //CanSendDebug(&payload, 8);
+            
             return 1;
         }
         else if (rxlen==6)
         {
             static float fkp = 0.0f;
             static float fki = 0.0f;
+            static float fkf = 0.0f;
 
             switch (rxpayload->b[1])
             {
                 case 1: fkp = *(float*)&rxpayload->b[2]; break;
                 case 2: fki = *(float*)&rxpayload->b[2]; break;
+                case 3: fkf = *(float*)&rxpayload->b[2]; break;
                 default: return 0;
             }
             
             float max = fkp;
             if (fki > max) max = fki;
-    
+            if (fkf > max) max = fkf;
+            
             int exponent = 0;
             
             for (exponent = 0; exponent < 16; ++exponent)
@@ -305,7 +318,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
                 if (max < power)
                 {
-                    setIPid((int)(fkp*32768.0f/power),(int)(fki*32768.0f/power),15-exponent);
+                    int kp = (int)(fkp*32768.0f/power);
+                    int ki = (int)(fki*32768.0f/power);
+                    int kf = (int)(fkf*32768.0f/power);
+                    
+                    setIPid(kp,ki,kf,15-exponent);
                     
                     return 1;
                 }
@@ -325,9 +342,19 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
             int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
+            int  kf=((int)rxpayload->b[5])|(((int)rxpayload->b[6])<<8);
             char ks=rxpayload->b[7];
-
-            setSPid(kp,ki,ks);
+            
+            setSPid(kp,ki,kf,ks);
+            
+            //static tCanData payload;
+            
+            //payload.w[0] = rxpayload->w[0];
+            //payload.w[1] = rxpayload->w[1];
+            //payload.w[2] = rxpayload->w[2];
+            //payload.w[3] = rxpayload->w[3];
+            
+            //CanSendDebug(&payload, 8);
             
             return 1;
         }
@@ -335,17 +362,20 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         {
             static float fkp = 0.0f;
             static float fki = 0.0f;
+            static float fkf = 0.0f;
             
             switch (rxpayload->b[1])
             {
                 case 1: fkp = *(float*)&rxpayload->b[2]; break;
                 case 2: fki = *(float*)&rxpayload->b[2]; break;
+                case 3: fkf = *(float*)&rxpayload->b[2]; break;
                 default: return 0;
             }
             
             float max = fkp;
             if (fki > max) max = fki;
-    
+            if (fkf > max) max = fkf;
+            
             int exponent = 0;
             
             for (exponent = 0; exponent < 16; ++exponent)
@@ -354,7 +384,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         
                 if (max < power)
                 {
-                    setSPid((int)(fkp*32768.0f/power),(int)(fki*32768.0f/power),15-exponent);
+                    int kp = (int)(fkp*32768.0f/power);
+                    int ki = (int)(fki*32768.0f/power);
+                    int ke = (int)(fkf*32768.0f/power);
+                    
+                    setSPid(kp,ki,ke,15-exponent);
                     
                     return 1;
                 }
