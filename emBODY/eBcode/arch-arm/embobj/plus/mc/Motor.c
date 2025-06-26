@@ -104,21 +104,21 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
 {
     int8_t KpKiKdKs[7];
     
-    float32_t ks = 1.0f/(float32_t)(1<<pidcurrent->scale);
-    float32_t kp = ks*pidcurrent->kp;
-    float32_t ki = ks*pidcurrent->ki;
-    float32_t kd = ks*pidcurrent->kd;
+    float32_t ks    = 1.0f/(float32_t)(1<<pidcurrent->scale);
+    float32_t kp    = ks*pidcurrent->kp;
+    float32_t ki    = ks*pidcurrent->ki;
+    float32_t kbemf = ks*pidcurrent->kff;
     
-    if (kp<0.0f || ki<0.0f || kd<0.0f) return;
+    if (kp<0.0f || ki<0.0f || kbemf<0.0f) return;
     
-    float32_t   max = kp;
-    if (ki>max) max = ki;
-    if (kd>max) max = kd;
+    float32_t      max = kp;
+    if (ki>max)    max = ki;
+    if (kbemf>max) max = kbemf;
     
-    int16_t Kp = 0;
-    int16_t Ki = 0;
-    int16_t Kd = 0;
-    uint8_t Ks = 0;
+    int16_t Kp    = 0;
+    int16_t Ki    = 0;
+    int16_t Kbemf = 0;
+    uint8_t Ks    = 0;
     
     for (int exponent = 0; exponent < 16; ++exponent)
     {
@@ -126,17 +126,17 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
         
         if (max < power)
         {
-            Kp = (int16_t)(kp*32768.0f/power);
-            Ki = (int16_t)(ki*32768.0f/power);
-            Kd = (int16_t)(kd*32768.0f/power);
-            Ks = 15-exponent;
+            Kp    = (int16_t)(kp   *32768.0f/power);
+            Ki    = (int16_t)(ki   *32768.0f/power);
+            Kbemf = (int16_t)(kbemf*32768.0f/power);
+            Ks    = 15-exponent;
             
             break;
         }    
     }
     
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID
-    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{&o->motorlocation}, {Kp, Ki, Kd, Ks}};
+    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{&o->motorlocation}, {Kp, Ki, Kbemf, Ks}};
     msg.transmit(); 
 }
 
@@ -144,21 +144,21 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
 {
     int8_t KpKiKdKs[7];
     
-    float32_t ks = 1.0f/(float32_t)(1<<pidvelocity->scale);
-    float32_t kp = ks*pidvelocity->kp;
-    float32_t ki = ks*pidvelocity->ki;
-    float32_t kd = ks*pidvelocity->kd;
+    float32_t ks  = 1.0f/(float32_t)(1<<pidvelocity->scale);
+    float32_t kp  = ks*pidvelocity->kp;
+    float32_t ki  = ks*pidvelocity->ki;
+    float32_t kff = ks*pidvelocity->kff;
     
-    if (kp<0.0f || ki<0.0f || kd<0.0f) return;
+    if (kp<0.0f || ki<0.0f || kff<0.0f) return;
     
-    float32_t   max = kp;
-    if (ki>max) max = ki;
-    if (kd>max) max = kd;
+    float32_t    max = kp;
+    if (ki >max) max = ki;
+    if (kff>max) max = kff;
     
-    int16_t Kp = 0;
-    int16_t Ki = 0;
-    int16_t Kd = 0;
-    uint8_t Ks = 0;
+    int16_t Kp  = 0;
+    int16_t Ki  = 0;
+    int16_t Kff = 0;
+    uint8_t Ks  = 0;
     
     for (int exponent = 0; exponent < 16; ++exponent)
     {
@@ -166,17 +166,17 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
         
         if (max < power)
         {
-            Kp = (int16_t)(kp*32768.0f/power);
-            Ki = (int16_t)(ki*32768.0f/power);
-            Kd = (int16_t)(kd*32768.0f/power);
-            Ks = 15-exponent;
+            Kp  = (int16_t)(kp *32768.0f/power);
+            Ki  = (int16_t)(ki *32768.0f/power);
+            Kff = (int16_t)(kff*32768.0f/power);
+            Ks  = 15-exponent;
             
             break;
         }    
     }
 
     // ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID    
-    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{&o->motorlocation}, {Kp, Ki, Kd, Ks}};
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{&o->motorlocation}, {Kp, Ki, Kff, Ks}};
     msg.transmit();    
 }
 
@@ -591,7 +591,8 @@ BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
             break;
         
         case eomc_ctrl_out_type_vel:
-            control_mode = icubCanProto_controlmode_speed_voltage;
+            //control_mode = icubCanProto_controlmode_speed_voltage;
+            control_mode = icubCanProto_controlmode_speed_current;
             break;
 
         case eomc_ctrl_out_type_cur:
@@ -1354,6 +1355,7 @@ BOOL Motor_is_running(Motor* o)
         case icubCanProto_controlmode_openloop:
         case icubCanProto_controlmode_speed_voltage:
         case icubCanProto_controlmode_current:
+        case icubCanProto_controlmode_speed_current:
             return TRUE;
         
         default: 
