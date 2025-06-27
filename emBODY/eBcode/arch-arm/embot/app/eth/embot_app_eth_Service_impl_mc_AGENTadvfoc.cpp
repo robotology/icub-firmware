@@ -748,8 +748,7 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
 
             if (false == embot::app::eth::icc::theICCserviceROP::getInstance().ping(100*embot::core::time1millisec))
             {
-                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_value_CFG_mc_advfoc_failed_ICCping);
-    //remember to test this         
+                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_failed_ICCping));        
                 break;
             }
            
