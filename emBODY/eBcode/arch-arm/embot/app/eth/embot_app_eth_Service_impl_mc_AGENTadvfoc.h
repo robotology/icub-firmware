@@ -101,7 +101,7 @@ protected:
     static eOresult_t verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANdiscovery2* cd2, eObool_t searchisok);
         
         
-    bool iccdiscovery();
+    bool iccdiscovery(void *tHIS);
     bool adapt2FOCconfig();
 }; 
 

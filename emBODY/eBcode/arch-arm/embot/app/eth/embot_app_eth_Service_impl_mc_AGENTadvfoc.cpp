@@ -22,6 +22,7 @@
 #include "Controller.h"
 #include "embot_app_eth_theEncoderReader.h"
 #include "embot_app_eth_theICCmapping.h"
+#include "embot_app_eth_theICCserviceROP.h"
 #include "embot_app_eth_theServices.h"
 
 #include "EOarray.h"
@@ -577,7 +578,7 @@ void AGENTadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operatio
         embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::error};
         eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_foc_failed_encoders_verify)};      
         mcadvfoc->emit(s, errorcode);
-        
+
         // 3. on verify
         if(nullptr != mcadvfoc->afterverifyactivate)
         {
@@ -596,7 +597,7 @@ void AGENTadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operatio
     
     if(true == ICCdiscovery)
     {
-        bool iicdiscoveryOK = mcadvfoc->iccdiscovery();
+        bool iicdiscoveryOK = mcadvfoc->iccdiscovery(tHIS);
         verify_step02_onENDof_iccdiscovery(tHIS, iicdiscoveryOK);
     }
     else
@@ -629,7 +630,7 @@ void AGENTadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok
 
         // 2. diagnostics
         embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::error};
-        eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_foc_failed_candiscovery_of_foc)};      
+        eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_failed_ICCdiscovery)};      
         mcadvfoc->emit(s, errorcode);
         
         // 3. on verify
@@ -682,7 +683,7 @@ eOresult_t AGENTadvfoc::verify_step03_onENDof_candiscovery(void *tHIS, EOtheCANd
     embot::app::eth::Service::State state {embot::app::eth::Service::State::verified};
     bool OK {true};
     embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::debug};
-    eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_foc_ok)};
+    eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ok)};
  
     if(eobool_false == searchisok)
     {
@@ -730,8 +731,9 @@ volatile const embot::app::icc::Signature * const getsignature(size_t i)
     return (volatile const embot::app::icc::Signature * const)(signatureaddress);
 }
 
-bool AGENTadvfoc::iccdiscovery()
+bool AGENTadvfoc::iccdiscovery(void *tHIS)
 {
+    AGENTadvfoc *mcadvfoc = reinterpret_cast<AGENTadvfoc*>(tHIS);
     bool r {false};
     
     if(false == iccactuators.empty())
@@ -742,6 +744,15 @@ bool AGENTadvfoc::iccdiscovery()
             const auto &item = iccactuators[i];
             volatile embot::app::msg::Location targetlocation {&item.actua.location};
             eObrd_info_t target = item.actua.board;
+            
+
+            if (false == embot::app::eth::icc::theICCserviceROP::getInstance().ping(100*embot::core::time1millisec))
+            {
+                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_value_CFG_mc_advfoc_failed_ICCping);
+    //remember to test this         
+                break;
+            }
+           
             
             if(0 == (target.firmware.major + target.firmware.minor + target.firmware.build + target.protocol.major + target.protocol.minor))
             {
@@ -769,19 +780,36 @@ bool AGENTadvfoc::iccdiscovery()
                     
                     if(detected.type == target.type)
                     {
-                        if((detected.protocol.major == signature->protocol.major) && (detected.protocol.minor == signature->protocol.minor))
+                        if((detected.protocol.major == target.protocol.major) && (detected.protocol.minor == target.protocol.minor))
                         {
-                            if((detected.firmware.major == target.firmware.major) && (detected.firmware.minor == target.firmware.minor))
-                            {
-                                r = (detected.firmware.build >= target.firmware.build);
-                            }
-                        }                          
+                           r = true; 
+                        }
+                        else
+                        {
+                            desc.par64 |= 0x4;
+                        }
+                        
+                        if((detected.firmware.major == target.firmware.major) && (detected.firmware.minor == target.firmware.minor))
+                        {
+                            r = (detected.firmware.build >= target.firmware.build);
+                        }
+                        else
+                        {
+                            desc.par64 |= 0x2;
+                            r = false;
+                        }
+                    }
+                    else
+                    {
+                        desc.par64 |= 0x1;
                     }
                 }
             }
             
             if(false == r)
             {
+                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_invalid));
+                desc.code = desc.par64 = 0;
                 break;
             }
             
