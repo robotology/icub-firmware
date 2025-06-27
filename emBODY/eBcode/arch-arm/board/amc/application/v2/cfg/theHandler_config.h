@@ -209,7 +209,7 @@ namespace embot { namespace app { namespace eth {
         .safeTXexecutiontime = sc*runner_safeTXexecutiontime,
         .maxnumofRXpackets = 3,
         .maxnumofTXpackets = 1,
-        .modeatstartup = eo_emsrunner_mode_besteffort,
+        .modeatstartup = eo_emsrunner_mode_synchronized,
         .defaultTXdecimationfactor = 1        
     };      
 
