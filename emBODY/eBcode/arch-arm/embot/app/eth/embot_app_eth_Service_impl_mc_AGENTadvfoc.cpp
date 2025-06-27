@@ -578,7 +578,7 @@ void AGENTadvfoc::verify_step01_onENDof_verifyencoders(void *tHIS, bool operatio
         embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::error};
         eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_foc_failed_encoders_verify)};      
         mcadvfoc->emit(s, errorcode);
-
+        
         // 3. on verify
         if(nullptr != mcadvfoc->afterverifyactivate)
         {
@@ -789,9 +789,9 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
                             desc.par64 |= 0x4;
                         }
                         
-                        if((detected.firmware.major == target.firmware.major) && (detected.firmware.minor == target.firmware.minor))
+                        if((detected.firmware.major == target.firmware.major) && (detected.firmware.minor == target.firmware.minor) && (detected.firmware.build == target.firmware.build))
                         {
-                            r = (detected.firmware.build >= target.firmware.build);
+                            
                         }
                         else
                         {
