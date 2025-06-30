@@ -106,13 +106,23 @@ void Joint_init(Joint* o)
     //o->scKvel   = ZERO;
     
     WatchDog_init(&o->trq_fbk_wdog);
+    WatchDog_init(&o->trq_ref_wdog);
     WatchDog_init(&o->vel_ref_wdog);
+    WatchDog_init(&o->pwm_ref_wdog);
+    WatchDog_init(&o->cur_ref_wdog);
     
-    WatchDog_set_base_time_msec(&o->trq_fbk_wdog, 2*DEFAULT_WATCHDOG_TIME_MSEC);
-    WatchDog_set_base_time_msec(&o->vel_ref_wdog,   DEFAULT_WATCHDOG_TIME_MSEC);
+    WatchDog_set_base_time_msec(&o->trq_fbk_wdog, TRQ_SENSOR_TIMEOUT);
+    
+    WatchDog_set_base_time_msec(&o->trq_ref_wdog, TRQ_CMD_TIMEOUT);
+    WatchDog_set_base_time_msec(&o->vel_ref_wdog, VEL_CMD_TIMEOUT);
+    WatchDog_set_base_time_msec(&o->pwm_ref_wdog, PWM_CMD_TIMEOUT);
+    WatchDog_set_base_time_msec(&o->cur_ref_wdog, CUR_CMD_TIMEOUT);
     
     WatchDog_rearm(&o->trq_fbk_wdog);
     WatchDog_rearm(&o->vel_ref_wdog);
+    WatchDog_rearm(&o->trq_ref_wdog);
+    WatchDog_rearm(&o->pwm_ref_wdog);
+    WatchDog_rearm(&o->cur_ref_wdog);
 
 #if defined(MC_use_embot_app_mc_Trajectory)
     if(nullptr == o->traj)
@@ -215,6 +225,10 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     
     WatchDog_set_base_time_msec(&o->vel_ref_wdog, config->velocitysetpointtimeout);
     WatchDog_rearm(&o->vel_ref_wdog);
+    
+    WatchDog_rearm(&o->trq_ref_wdog);
+    WatchDog_rearm(&o->pwm_ref_wdog);
+    WatchDog_rearm(&o->cur_ref_wdog);
     
     // TODOALE joint admittance missing
     o->Kadmitt = ZERO;
@@ -366,13 +380,21 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
         //    control_mode = eomc_controlmode_cmd_vel_direct;
         //    break;
         case eomc_controlmode_cmd_vel_direct:
+            WatchDog_rearm(&o->vel_ref_wdog);
+            break;
+        case eomc_controlmode_cmd_openloop:
+            WatchDog_rearm(&o->pwm_ref_wdog);
+            break;
+        case eomc_controlmode_cmd_current:
+            WatchDog_rearm(&o->cur_ref_wdog);
+            break;
+        case eomc_controlmode_cmd_torque:
+            WatchDog_rearm(&o->trq_ref_wdog);
+            break;
         case eomc_controlmode_cmd_idle:
         case eomc_controlmode_cmd_mixed:
         case eomc_controlmode_cmd_position:
         case eomc_controlmode_cmd_direct:
-        case eomc_controlmode_cmd_openloop:
-        case eomc_controlmode_cmd_current:
-        case eomc_controlmode_cmd_torque:
             break;
             
         default:
@@ -421,22 +443,83 @@ void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk)
     WatchDog_rearm(&o->trq_fbk_wdog);
 }
 
-BOOL Joint_check_faults(Joint* o)
+BOOL Joint_check_watchdogs_force_position(Joint* o, uint32_t* errorcode, int* controlmode)
 {
-    if (WatchDog_check_expired(&o->trq_fbk_wdog))
+    //static int noflood = 0;
+    //
+    //if (noflood == o->ID*1000)
+    //{
+    //    uint64_t mask = ((uint64_t)(o->cur_ref_wdog.min_timer) << 48) | ((uint64_t)(o->pwm_ref_wdog.min_timer) << 32) | ((uint64_t)(o->trq_fbk_wdog.min_timer) << 16) | (uint64_t)(o->trq_ref_wdog.min_timer); 
+    //    
+    //    Joint_send_debug_message("min watchdog", o->ID, o->vel_ref_wdog.min_timer, mask);
+    //}
+    //
+    //++noflood;
+    //
+    //if (noflood >= 4000) noflood = 0;
+    
+    if (o->trq_control_active) 
     {
-        o->trq_fbk = ZERO;
-        o->trq_ref = ZERO;
-        o->trq_err = ZERO;
-        
-        if (o->trq_control_active)
+        if (WatchDog_check_expired(&o->trq_fbk_wdog))
         {
-            o->fault_state.bits.torque_sensor_timeout = TRUE;
-            
-            o->control_mode = eomc_controlmode_hwFault;
+            o->trq_fbk = ZERO;
+            o->trq_ref = ZERO;
+            o->trq_err = ZERO;
+      
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+            *controlmode = 0;            
+            return TRUE;
+        }
+    }
+
+    if (o->control_mode == eomc_controlmode_torque)
+    {
+        if (WatchDog_check_expired(&o->trq_ref_wdog))
+        {  
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            *controlmode = 1;
+            return TRUE;
+        }
+    }
+    else if (o->control_mode == eomc_controlmode_current)
+    {
+        if (WatchDog_check_expired(&o->cur_ref_wdog))
+        {   
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            *controlmode = 2;
+            return TRUE;
+        }
+    }
+    else if (o->control_mode == eomc_controlmode_openloop)
+    {
+        if (WatchDog_check_expired(&o->pwm_ref_wdog))
+        {   
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            *controlmode = 3;
+            return TRUE;
         }
     }
     
+    return FALSE;
+}
+
+BOOL Joint_check_softwareboundaries_force_position(Joint* o, uint32_t* errorcode, int* controlmode)
+{
+    if ((o->control_mode == eomc_controlmode_current) || (o->control_mode == eomc_controlmode_openloop))
+    {
+        // TODO: do we wanna add a - POS_LIMIT_MARGIN for the check??
+        if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min ) || (o->pos_fbk > o->pos_max))) 
+        {
+            *errorcode = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_soft_boundaries);
+            *controlmode = (int)o->control_mode;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+BOOL Joint_check_faults(Joint* o)
+{    
     if ((o->control_mode != eomc_controlmode_notConfigured) && (o->control_mode != eomc_controlmode_calib))
     {
         if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
@@ -1256,6 +1339,8 @@ BOOL Joint_set_vel_raw(Joint* o, CTRL_UNITS vel_ref)
 
 BOOL Joint_set_trq_ref(Joint* o, CTRL_UNITS trq_ref)
 {
+    WatchDog_rearm(&o->trq_ref_wdog);
+    
     if (o->control_mode != eomc_controlmode_torque)
     {
         return FALSE;
@@ -1268,6 +1353,8 @@ BOOL Joint_set_trq_ref(Joint* o, CTRL_UNITS trq_ref)
 
 BOOL Joint_set_pwm_ref(Joint* o, CTRL_UNITS pwm_ref)
 {
+    WatchDog_rearm(&o->pwm_ref_wdog);
+    
     if (o->control_mode != eomc_controlmode_openloop)
     {
         return FALSE;
@@ -1280,6 +1367,8 @@ BOOL Joint_set_pwm_ref(Joint* o, CTRL_UNITS pwm_ref)
 
 BOOL Joint_set_cur_ref(Joint* o, CTRL_UNITS cur_ref)
 {
+    WatchDog_rearm(&o->cur_ref_wdog);
+    
     if (o->control_mode != eomc_controlmode_current)
     {
         return FALSE;
