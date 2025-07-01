@@ -890,22 +890,11 @@ extern void xxx_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanC
 
 
 static void s_manage_dispatch(const eOerrmanErrorType_t errtype, const char *info, const eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
+static void s_manage_fatal(const char *info, const eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
+static void s_manage_haltrace(const eOerrmanErrorType_t errtype, const char *info, const eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *edes);
 
 void xxx_errorman_onemit(embot::app::eth::theErrorManager::Severity sev, const embot::app::eth::theErrorManager::Caller &caller, const embot::app::eth::theErrorManager::Descriptor &des, const std::string &str)
 {
-    std::string timenow = embot::core::TimeFormatter(embot::core::now()).to_string();
-    std::string eobjstr = (true == caller.isvalid()) ? caller.objectname : "OBJ";
-    std::string threadname = (true == caller.isvalid()) ? caller.owner->getName() : "THR";
-    std::string severity = embot::app::eth::theErrorManager::to_cstring(sev);
-    
-    embot::core::print(std::string("[[") + severity + "]] @" + timenow + " (" + eobjstr + ", " + threadname + "): " + str);
-    
-    if(embot::app::eth::theErrorManager::Severity::trace == sev) 
-    {
-        return;
-    } 
-
-    // you may in here send the diagnostics message
     if(true == des.isvalid())
     {
         eOerrmanErrorType_t et {static_cast<eOerrmanErrorType_t>(sev)};
@@ -916,13 +905,40 @@ void xxx_errorman_onemit(embot::app::eth::theErrorManager::Severity sev, const e
         ed.sourceaddress = des.sourceaddress;
         ed.par16 = des.par16;
         ed.par64 = des.par64;
+            
+        s_manage_haltrace(et, str.c_str(), &cl, &ed);
+    
+        if(embot::app::eth::theErrorManager::Severity::trace == sev) 
+        {
+            return;
+        } 
+
         s_manage_dispatch(et, str.c_str(), &cl, &ed);
+
+        if(embot::app::eth::theErrorManager::Severity::fatal == sev)
+        {         
+            s_manage_fatal(str.c_str(), &cl, &ed);
+        }               
     }
-  
-    if(embot::app::eth::theErrorManager::Severity::fatal == sev)
+    else
     {
-        for(;;);
-    }        
+        std::string timenow = embot::core::TimeFormatter(embot::core::now()).to_string();
+        std::string eobjstr = (true == caller.isvalid()) ? caller.objectname : "OBJ";
+        std::string threadname = (true == caller.isvalid()) ? caller.owner->getName() : "THR";
+        std::string severity = embot::app::eth::theErrorManager::to_cstring(sev);
+        
+        embot::core::print(std::string("[[") + severity + "]] @" + timenow + " (" + eobjstr + ", " + threadname + "): " + str);  
+
+        if(embot::app::eth::theErrorManager::Severity::trace == sev) 
+        {
+            return;
+        } 
+        
+        if(embot::app::eth::theErrorManager::Severity::fatal == sev)
+        {
+            for(;;);
+        }    
+    }
     
 }
 
@@ -958,11 +974,6 @@ void embot::app::eth::theHandler::Impl::redefine_errorhandler()
 
 #include "EoError.h"
 #include "EOtheInfoDispatcher.h"
-
-static void s_manage_haltrace(const eOerrmanErrorType_t errtype, const char *info, const eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *edes);
-static void s_manage_dispatch(const eOerrmanErrorType_t errtype, const char *info, const eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
-static void s_manage_fatal(const char *info, const eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
-
 
 
 extern void xxx_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *errdes)
