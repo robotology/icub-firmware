@@ -43,7 +43,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EOtransceiver.h"
-//#include "EOMtask.h"
+#include "EoManagement.h"
 #include "hal_timer.h"
 
 #include "eOcfg_sm_EMSappl.h"
@@ -83,9 +83,8 @@ typedef enum
 
 typedef enum
 {
-    eo_emsrunner_mode_besteffort        = 0,
-    eo_emsrunner_mode_softrealtime      = 1,
-    eo_emsrunner_mode_hardrealtime      = 2
+    eo_emsrunner_mode_synchronized  = eomn_appl_runnermode_synchronized,    // the activation is on RX, DO, TX in three separated slots
+    eo_emsrunner_mode_besteffort    = eomn_appl_runnermode_besteffort       // the activation is only on RX. DO and TX are executed immediately after
 } eOemsrunner_mode_t;
 
 

@@ -27,9 +27,10 @@
 #if defined(EMBOBJ_USE_EMBOT)
 // use c++ linkage
 #else
-#ifdef __cplusplus
-extern "C" {
-#endif
+// use c++ linkage
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 #endif
 
 /* @file       EOMtheEMSrunner_hid.h
@@ -53,6 +54,8 @@ extern "C" {
 #endif
 
 #include "hal_timer.h"
+
+#include "embot_tools.h"
     
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -62,6 +65,7 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
+#define EOMTHERUNNER_DONT_USE_safestop
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
@@ -77,6 +81,23 @@ typedef struct
     volatile eObool_t   isoverflown;
 } eOemsrunner_tasktiming_t;
 
+struct eOemsrunner_periodtiming_t
+{   eOabstime_t         budget {0};
+    eOabstime_t         started {0};
+    eOabstime_t         stopped {0};
+    eOabstime_t         duration[2] {0, 0};    // 0 is current iteration, 1 is previous iteration
+    volatile bool       isexecuting {false};
+    volatile bool       isabout2overflow {false};
+    volatile bool       isoverflown {false};
+    embot::tools::Histogram histogram {};
+    void reset()
+    {
+        budget = started = stopped = duration[0] = duration[1] = 0;
+        isexecuting = isabout2overflow = isoverflown = false;
+        histogram.reset();
+    }
+};
+
 
 typedef struct
 {
@@ -85,6 +106,7 @@ typedef struct
     eOemsrunner_taskid_t        taskterminatedaslatest;
     uint64_t                    iterationnumber;
     eOemsrunner_tasktiming_t    tasktiming[eo_emsrunner_task_numberof];    
+    eOemsrunner_periodtiming_t  periodtiming;
 } eOemsrunner_cycletiming_t;
 
 
@@ -99,7 +121,10 @@ struct EOMtheEMSrunner_hid
     EOMtask*                    task[eo_emsrunner_task_numberof];
     eOsmEventsEMSappl_t         event;
     hal_timer_t                 haltimer_start[eo_emsrunner_task_numberof];
+#if defined(EOMTHERUNNER_DONT_USE_safestop)
+#else    
     hal_timer_t                 haltimer_safestop[eo_emsrunner_task_numberof];
+#endif    
     uint16_t                    numofrxpackets;
     uint16_t                    numofrxrops;
     uint16_t                    numoftxpackets;
@@ -118,6 +143,7 @@ struct EOMtheEMSrunner_hid
     eOemsrunner_cycletiming_t   cycletiming;
     eObool_t                    isrunning;
     eOmn_appl_config_logging_t  logging;
+    eOemsrunner_timing_t        timing;
 };
 
 
@@ -147,9 +173,10 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 #if defined(EMBOBJ_USE_EMBOT)
 // use c++ linkage
 #else
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
+// use c++ linkage
+//#ifdef __cplusplus
+//}       // closing brace for extern "C"
+//#endif 
 #endif
 
 #endif  // include-guard
