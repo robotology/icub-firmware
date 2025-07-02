@@ -209,10 +209,10 @@ volatile int  IKbemf    = 0;
 volatile char IKs       = 0; //10;
 volatile long IIntLimit = 0;//800L*1024L;
 
-volatile int  SKp = 0x0C;
-volatile int  SKi = 0x10;
-volatile int  SKf = 0x00;
-volatile char SKs = 0x0A;
+volatile int  SKp  = 0x0C;
+volatile int  SKi  = 0x10;
+volatile int  SKff = 0x00;
+volatile char SKs  = 0x0A;
 volatile long SIntLimit = 0;//800L*1024L;
 
 /////////////////////////////////////////
@@ -243,11 +243,11 @@ void setIPid(int kp, int ki, int kbemf, char shift)
     IIntLimit = ((long)PWM_MAX)<<shift;
 }
 
-void setSPid(int kp, int ki, int kf, char shift)
+void setSPid(int kp, int ki, int kff, char shift)
 {
     SKp = kp;
     SKi = ki/2;
-    SKf = kf;
+    SKff = kff;
     SKs = shift;
     
     if (ki == 0) ZeroControlReferences();
@@ -355,7 +355,7 @@ BOOL updateOdometry()
         samples_circ_buffer[head++] = gQEPosition;
         head %= UNDERSAMPLING;
         
-        if (++vel_loop_clock >= 20)
+        if (++vel_loop_clock >= UNDERSAMPLING)
         {
             vel_loop_clock = 0;
             return TRUE;
@@ -844,7 +844,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                     // alternative formulation with ff term
                     IsA += __builtin_mulss(speed_error+speed_error_old,SKi);
 
-                    long IsF = __builtin_mulss(speed_error,SKp) + __builtin_mulss(SKf,CtrlReferences.WRef);
+                    long IsF = __builtin_mulss(speed_error,SKp) + __builtin_mulss(SKff,CtrlReferences.WRef);
                 
                     long IsT = IsA + IsF;
         
@@ -1416,7 +1416,7 @@ int main(void)
         }
     }
 
-    setSPid(SKp, SKi, SKf, SKs);
+    setSPid(SKp, SKi, SKff, SKs);
 
     Timer3Enable(); // EnableAuxServiceTimer();
 
