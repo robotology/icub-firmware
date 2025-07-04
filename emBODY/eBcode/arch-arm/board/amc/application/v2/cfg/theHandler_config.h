@@ -32,15 +32,19 @@
 namespace embot { namespace app { namespace eth {
     
     
-    // can receive datagrams up to 768 in size and we can transmit datagrams of size 1416
-    // 1416 is the highest possible value given the used IPAL, even when is lwip-based
+    // can receive datagrams up to 768 in size and we can transmit datagrams of size 1472
+    // 1472 is the highest possible value given the used IPAL, even when is lwip-based
+    // see UDP Maximum Packet Size (1472 bytes) in: https://www.keil.com/support/man/docs/rlarm/rlarm_udp_get_buf.htm
+    // also: stm32h7xx_hal_eth.h defined ETH_MAX_PAYLOAD to be 1500. we must remove 20 bytes fro IP header and 8 bytes for UDP and we have 1472
+    
+    constexpr size_t IPALmaxsizeofUDPframe {1472};
 
     constexpr eOemssocket_cfg_t theHandler_EOMtheEMSsocket_Config
     {
         .inpdatagramnumber = 3,
         .outdatagramnumber = 2,
         .inpdatagramsizeof = 768,
-        .outdatagramsizeof = 1416, //EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF
+        .outdatagramsizeof = IPALmaxsizeofUDPframe, 
         .localport = 12345,
         .usemutex = eobool_true
     };
@@ -48,6 +52,16 @@ namespace embot { namespace app { namespace eth {
     
 #if 0
     
+    ROPframe
+     ---------------- ----....---- ---------------- 
+    | ROPFrameHeader | BODY       | ROPFrameFooter |
+     ---------------- ----....---- ----------------
+    fixed: 24         var          fixed: 4
+    
+    BODY = {ROP}_n
+    sizeof(ROPframe) = 28 + sizeof(BODY)
+    
+    ROP
      ---------------- ----....---- -------- ---------------- 
     | header         | data       | signat | time           |
      ---------------- ----....---- -------- ----------------
@@ -56,21 +70,38 @@ namespace embot { namespace app { namespace eth {
     ROPsize = 8 + sizeof(data) + ((header.plussignature == 1) ? 4 : 0) + ((header.plustime == 1) ? 8 : 0)
 #endif
 
+    constexpr size_t ROPframe_headfoot {28}; 
+    constexpr size_t ROPheadersize {8};
+    constexpr size_t ROPsignaturesize {4};
+
     // the biggest ROPs can be the following:
-    // set<eOmn_service_cmmnds_t, 1sign, 0time>, where sizeof(eOmn_service_cmmnds_t) = 348 -> ROPsize = 360
-    // set<eOmc_motor_config_t, 0sign, 0time>, where sizeof(eOmc_motor_config_t) = 120 -> ROPsize = 128
-    // set<eOmc_joint_config_t, 0sign, 0time>, where sizeof(eOmc_joint_config_t) = 240 -> ROPsize = 248
-    // so, a value of 384 is OK
-    constexpr size_t maxsizeofROP = 384;    
+    // set<eOmn_service_cmmnds_t, 1sign, 0time>, where sizeof(eOmn_service_cmmnds_t) = 348 -> ROPsize = 348+8+4 = 360
+    // set<eOmc_motor_config_t, 1sign, 0time>, where sizeof(eOmc_motor_config_t) = 156 -> ROPsize = 164 + 4 = 168 
+    // set<eOmc_joint_config_t, 1sign, 0time>, where sizeof(eOmc_joint_config_t) = 240 -> ROPsize = 248 + 4 = 252 
+    // so, a value of 384 is OK for ROP input
+    // it could be bigger (512), but ... the smaller the better on the board because we dont want to waste RAM
+    constexpr size_t maxsizeofROP = 384;   
+
+    // i add a check
+    static_assert    
+    (
+        (sizeof(eOmn_service_cmmnds_t)+ROPheadersize+ROPsignaturesize) <= maxsizeofROP,
+        "pls correct maxsizeofROP"
+    );
     
     // we use ROP reply when we receive a ask<> and we transmit back a say<>
-    // the format is the same as a set<> and the biggest ROP is:
-    // say<eOmc_joint_config_t, 0sign, 0time>, where sizeof(eOmc_joint_config_t) = 240 -> ROPsize = 248
+    // the format is the same as a set<> and the biggest ROP emitted by the ETH board is:
+    // say<eOmc_joint_config_t, 1sign, 0time>, where sizeof(eOmc_joint_config_t) = 240 -> ROPsize = 240 + 8 + 4 = 252
     // NOTE: we use a say<eOmn_service_command_result_t, 1sign, 0time> but 
     // sizeof(eOmn_service_command_result_t) is 32 so no problem in here.
-    // as a result max ROPsize is now 248, so we can safely use a value between 248 and 384. 
-    // 256 is the minimum value, 288 would be better
-    constexpr size_t effectivecapacityofREPLYs = 256; // was 384
+    // so, we must fill at least one say<> of the biggest size inside the reply ropframe
+    // we have multiple possibilities in here: 
+    // (1) i compute each time the max size of the ROP containing the biggest variable and i set maxsizeofROPreply just a little higher than that.
+    //     if i forget to rise maxsizeofROPreply when i make a variable bigger i can rely on the eo_errman_Trace() inside EOropframe.c
+    // (2) i just set maxsizeofROPreply = maxsizeofROP, so i have more clarity on how a reply ROP is.
+    //     but i potentially waste bytes for the regulars...
+    constexpr size_t maxsizeofROPreply = maxsizeofROP; // use option 2
+    constexpr size_t effectivecapacityofREPLYs = maxsizeofROPreply;  
     constexpr size_t capacityofREPLYs = 28+effectivecapacityofREPLYs;    
 
     // the ropframe of occasional ROPs transports for instance diagnostics messages
@@ -80,37 +111,45 @@ namespace embot { namespace app { namespace eth {
     // and if still any present they are transmitted at the next cycle.
     // so, if the rate of emission is correct 128 is enough because it can host up to 4 simple messages    
     constexpr size_t effectivecapacityofOCCASIONALs = 128;
-    constexpr size_t capacityofOCCASIONALs = 28+effectivecapacityofOCCASIONALs;
+    constexpr size_t capacityofOCCASIONALs = ROPframe_headfoot+effectivecapacityofOCCASIONALs;
         
     // all the remaing space in the udp packet can be allocated to the regulars ROPs.
-    // we have NREGs = 972 (+32) bytes available which we can use:
-    // - n1 < N1 = NREGs*0.75 = 729 (753) available for MC
-    // - n2 < N2 = NREgs*0.75 = 729 (753) available for all the rest (SK, As-ft, As-battery, AS-inertials3, ...)
-    // as long as n1 + n2 < NREgs
-    // are they enough?
-    // now that we have at most 4 joints managed we can estimate the space in this way:
+    // the max size of teh UDP frame is 1472, of which 1472-28 = 1444 reserved for the ROPs.
+    // with the above values of 384 reseved to reply ROPs and 128 to occasional ROPs, we have bytesREGs = 932 remaining.
+    // are they enough to transmit all the regular ROPs? not in every case.
+    // we have some legacy robots where the ETH board must manage 12 joints. we already cycled in two rounds of 6 but
+    // now since 4 july 2025 we shall cycle in three rounds of 4, so we shall have max 4 joints to transmit in a ropframe
+    // so: at each cycle we can have up to a maximum of bytesREGs = 932 bytes for any combination of up to 4 jomos, skin, etc.
+    // NOTE-1: w/ EOTRANSMITTER_ROPFRAMES_use100percent defined that uses more memory ....
+    // how much do we need for each?
     // - MC will use at 1 eOmc_joint_status_t (sizeof = 96) and 1 eOmc_motor_status_t (sizeof = 24) per jomo
     //   each with a sig<xxx, 0sign, 0time> with a budget of (96+8)+(24+8) = 136 bytes per jomo.
-    //   so, the full 4 jomos need 544 bytes. The N1 = 729 are well enough for now and for adding extra signalling.
+    //   so, the full 4 jomos need 544 bytes. OK and we still have some margin to increase
     // - SK uses a sig<eOsk_status_t, 0sign, 0time> of 248+8 = 256 bytes for each skin patch
     // - AS inertials3 uses a sig<eOas_inertial3_status_t, 0sign, 0time> of 68+8 = 76 bytes
     // - AS ft uses a sig<eOas_ft_status_t, 0sign, 0time> of 56+8 = 64 bytes for each sensor (some boards have two)
-    // - AS battery uses a sig<eOas_battery_status_t, 0sign, 0time> of 32+8 = 40 bytes
-    // so, in N2 we can surely fit most entities but not all of them. the skin is the tricky one  
-    // so, we can safely use MC-4jomos + AS-battery + AS-inertials3 + 2*AS-ft = 788 bytes
-    // we cannot however add one skin becase it would become 1044 bytes
-    constexpr size_t effectivecapacityofREGULARs = 972+32; 
-    constexpr size_t capacityofREGULARs = 28+effectivecapacityofREGULARs;
+    // - AS battery uses a sig<eOas_battery_status_t, 0sign, 0time> of 32+8 = 40 bytes  
+    // - AS mais  uses a sig<eOas_mais_status_t, 0sign, 0time> of 40+8 = 48 bytes 
+    // SO: in the bytesREGs = 932 we can accomodate: 
+    // - MC-4jomo (544) + SK (256) + mais (48) = 848 and we have margin of other 21 bytes for each jomo 
+    //   [that is the case of the lower arms w/ 12 joints after that i have cycled in three rather than 2 times because if we
+    //    cycle twice we would have MC6-jomo (816) + 256 + 48 = 1120 > bytesREGs
+    // - MC-4jomo (544) + FT-2 (128) + Inertials (76) = 748 
+    // - etc.
+    // NOTE: in case we need for more we shall reduce maxsizeofROPreply from 384 to be > sizeof(eOmc_joint_config_t) + 8 + 4 = 252
+    
+    constexpr size_t effectivecapacityofREGULARs = IPALmaxsizeofUDPframe - ROPframe_headfoot - effectivecapacityofREPLYs - effectivecapacityofOCCASIONALs; 
+    constexpr size_t capacityofREGULARs = ROPframe_headfoot+effectivecapacityofREGULARs;
     
     static_assert
-    (   // capacityoftxpacket is theHandler_EOMtheEMSsocket_Config.outdatagramsizeof = 1416
-        theHandler_EOMtheEMSsocket_Config.outdatagramsizeof >=  // 1416
+    (   // capacityoftxpacket is theHandler_EOMtheEMSsocket_Config.outdatagramsizeof = 1472
+        theHandler_EOMtheEMSsocket_Config.outdatagramsizeof >=  // 1472
         (
-            28 +                                                // the header+footer of the ropframe
-            effectivecapacityofREGULARs +                       // 972+32
+            ROPframe_headfoot +                                 // 28 
+            effectivecapacityofREGULARs +                       // 1472-28-128-384 = 932
             effectivecapacityofOCCASIONALs +                    // 128
-            effectivecapacityofREPLYs                           // 256
-                                                                // = 1416
+            effectivecapacityofREPLYs                           // 384
+                                                                // = 1472
         ), 
         "pls correct capacities of the ropframes"
     );    
@@ -122,12 +161,12 @@ namespace embot { namespace app { namespace eth {
         .hostipv4port = 12345,
         .sizes = 
         {
-            .capacityoftxpacket = theHandler_EOMtheEMSsocket_Config.outdatagramsizeof, //EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY, 
-            .capacityofrop = maxsizeofROP,                          // EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY, was 384
-            .capacityofropframeregulars = capacityofREGULARs,       // EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY
-            .capacityofropframeoccasionals = capacityofOCCASIONALs, // EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY, 
-            .capacityofropframereplies = capacityofREPLYs,          // EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY
-            .maxnumberofregularrops = 32                            // EOMTHEEMSAPPLCFG_TRANSCEIVER_MAXNUMOFREGULARROPS         
+            .capacityoftxpacket = theHandler_EOMtheEMSsocket_Config.outdatagramsizeof, 
+            .capacityofrop = maxsizeofROP,                          
+            .capacityofropframeregulars = capacityofREGULARs,       
+            .capacityofropframeoccasionals = capacityofOCCASIONALs, 
+            .capacityofropframereplies = capacityofREPLYs,          
+            .maxnumberofregularrops = 32                                   
         },
         .transprotection = eo_trans_protection_none,
         .nvsetprotection = eo_nvset_protection_none,

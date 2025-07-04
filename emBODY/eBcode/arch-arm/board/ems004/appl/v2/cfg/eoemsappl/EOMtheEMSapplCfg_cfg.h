@@ -493,8 +493,9 @@ extern "C" {
 #define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMNUMBER                  2
 
 //  <o> max size of output datagrams <64-1500>
+//  <i> maximum size is 1500-20-8 = 1472
 //  <i> default: 1024
-#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1432
+#define EOMTHEEMSAPPLCFG_SOCKET_OUTDGRAMSIZEOF                  1472
 
 //  </h>datagrams in socket
 
@@ -544,20 +545,23 @@ extern "C" {
 #endif
 
 //  <o> capacity of the ropframe of regular rops    <16-1440:8>
+//  <i> You must add 28 to the effective size you want. So, write 932+28 to have 932 bytes for the ROPs 
 //  <i> default: 768
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  1024  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY  960  
 
 //  <o> capacity of the ropframe of occasional rops    <16-1440:8>
-//  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY  128  
+//  <i> You must add 28 to the effective size you want. So, write 128+28 to have 128 bytes for the ROPs 
+//  <i> default: 128. 
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY  156  
 
 //  <o> capacity of the ropframe of reply rops    <16-1440:8>
+//  <i> You must add 28 to the effective size you want. So, write 384+28 to have 384 bytes for the ROPs 
 //  <i> default: 128
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  280
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY  412
 
 
 
-#if( (EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY) < (EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY+EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY+EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY)) 
+#if( (EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMECAPACITY) < (28 + (EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREGULARSCAPACITY-28)+(EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEOCCASIONALSCAPACITY-28)+(EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPFRAMEREPLIESCAPACITY-28))) 
     #error --> the sum of sizes regulars, occasionals and replies must be lower than the size of the complete ropframe
 #endif
 
