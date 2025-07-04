@@ -296,8 +296,11 @@ bool embot::app::eth::theEncoderReader::Impl::IsEncoderSupported(const Config &c
             {
                 cfg.type = embot::hw::encoder::Type::chipMB049;
             } break;
-            case eomc_enc_unknown:
             case eomc_enc_none:
+            {
+                continue;
+            }break;
+            case eomc_enc_unknown:
             default:
             {
                 //unknown/no/unsupported encoder, pass to embot::hw::encoder::init cfg.type = embot::hw::encoder::Type::none, it will rise an error
@@ -602,10 +605,12 @@ bool embot::app::eth::theEncoderReader::Impl::TestRead(const Config &config)
                 {
                     diagnostics.errorDescriptor.par64 = diagnostics.errorDescriptor.par64 | (embot::core::tointegral(embot::app::eth::encoder::v1::Error::AEA_READING)<<(i*4));
                 } break;
-                
+                case eomc_enc_none:
+                {  
+                    continue;
+                }break;
                 case eomc_enc_aksim2:
                 case eomc_enc_unknown:
-                case eomc_enc_none:
                 default:
                 {
                     diagnostics.errorDescriptor.par64 = diagnostics.errorDescriptor.par64 | (embot::core::tointegral(embot::app::eth::encoder::v1::Error::GENERIC)<<(i*4));
