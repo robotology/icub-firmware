@@ -643,6 +643,12 @@ void AGENTadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok
                  
         return;
     }
+    else if (true == searchisok)
+    {
+        embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::debug};
+        eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_failed_ICCdiscovery)};      
+        mcadvfoc->emit(s, errorcode);
+    }
 
     
     // if we have can boards to discover we start can discovery and exit.
@@ -806,9 +812,10 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
             }
             
             if(false == r)
-            {
-                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_invalid));
-                desc.code = desc.par64 = 0;
+            {               
+                embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::error};
+                eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_invalid)};   
+                mcadvfoc->emit(s, errorcode);
                 break;
             }
             
