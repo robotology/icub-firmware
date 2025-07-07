@@ -643,12 +643,6 @@ void AGENTadvfoc::verify_step02_onENDof_iccdiscovery(void *tHIS, bool searchisok
                  
         return;
     }
-    else if (true == searchisok)
-    {
-        embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::debug};
-        eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_failed_ICCdiscovery)};      
-        mcadvfoc->emit(s, errorcode);
-    }
 
     
     // if we have can boards to discover we start can discovery and exit.
@@ -751,14 +745,13 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
             volatile embot::app::msg::Location targetlocation {&item.actua.location};
             eObrd_info_t target = item.actua.board;
             
-
             if (false == embot::app::eth::icc::theICCserviceROP::getInstance().ping(100*embot::core::time1millisec))
             {
-                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_failed_ICCping));        
+                desc.par16 |= 0x16;
+                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_result));        
                 break;
             }
            
-            
             if(0 == (target.firmware.major + target.firmware.minor + target.firmware.build + target.protocol.major + target.protocol.minor))
             {
                 r =  true;
@@ -782,7 +775,15 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
                     detected.firmware.build = signature->application.build;
                     detected.protocol.major = signature->protocol.major;
                     detected.protocol.minor = signature->protocol.minor; 
-                    
+
+                    desc.par64 |= ((uint64_t)(detected.firmware.build  & 0xFF));
+                    desc.par64 |= ((uint64_t)(detected.firmware.minor  & 0xFF)) << 8;
+                    desc.par64 |= ((uint64_t)(detected.firmware.major  & 0xFF)) << 16;
+                    desc.par64 |= ((uint64_t)(detected.protocol.minor  & 0xFF)) << 24;
+                    desc.par64 |= ((uint64_t)(detected.protocol.major  & 0xFF)) << 32;
+                    desc.par64 |= ((uint64_t)(detected.type            & 0xFF)) << 40;
+
+
                     if(detected.type == target.type)
                     {
                         if((detected.protocol.major == target.protocol.major) && (detected.protocol.minor == target.protocol.minor))
@@ -791,7 +792,7 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
                         }
                         else
                         {
-                            desc.par64 |= 0x4;
+                            desc.par16 |= 0x4;
                         }
                         
                         if((detected.firmware.major == target.firmware.major) && (detected.firmware.minor == target.firmware.minor) && (detected.firmware.build == target.firmware.build))
@@ -800,29 +801,39 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
                         }
                         else
                         {
-                            desc.par64 |= 0x2;
+                            desc.par16 |= 0x2;
                             r = false;
                         }
                     }
                     else
                     {
-                        desc.par64 |= 0x1;
+                        desc.par16 |= 0x1;
                     }
+                }
+                else
+                {
+                desc.par16 |= 0x8;
                 }
             }
             
             if(false == r)
             {               
-                embot::app::eth::theErrorManager::Severity s {embot::app::eth::theErrorManager::Severity::error};
-                eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_invalid)};   
-                mcadvfoc->emit(s, errorcode);
+                embot::app::eth::theErrorManager::Severity sev {embot::app::eth::theErrorManager::Severity::error};
+                eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_result)};   
+                mcadvfoc->emit(sev, errorcode);
                 break;
             }
-            
+
         }
-        
+
+        if(true == r)
+        {               
+            embot::app::eth::theErrorManager::Severity sev {embot::app::eth::theErrorManager::Severity::debug};
+            eOerror_code_t errorcode {eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_result)};   
+            mcadvfoc->emit(sev, errorcode);  
+        }
     }
-    
+    desc.clear();
     return r;    
 }
     
