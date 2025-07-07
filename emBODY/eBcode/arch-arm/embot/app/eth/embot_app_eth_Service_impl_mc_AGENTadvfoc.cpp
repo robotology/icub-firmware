@@ -747,8 +747,8 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
             
             if (false == embot::app::eth::icc::theICCserviceROP::getInstance().ping(100*embot::core::time1millisec))
             {
-                desc.par16 |= 0x16;
-                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_result));        
+                desc.par16 |= 0x10;
+                mcadvfoc->emit(theErrorManager::Severity::error, eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_advfoc_ICCdiscovery_result));    
                 break;
             }
            
@@ -776,12 +776,14 @@ bool AGENTadvfoc::iccdiscovery(void *tHIS)
                     detected.protocol.major = signature->protocol.major;
                     detected.protocol.minor = signature->protocol.minor; 
 
-                    desc.par64 |= ((uint64_t)(detected.firmware.build  & 0xFF));
-                    desc.par64 |= ((uint64_t)(detected.firmware.minor  & 0xFF)) << 8;
-                    desc.par64 |= ((uint64_t)(detected.firmware.major  & 0xFF)) << 16;
-                    desc.par64 |= ((uint64_t)(detected.protocol.minor  & 0xFF)) << 24;
-                    desc.par64 |= ((uint64_t)(detected.protocol.major  & 0xFF)) << 32;
-                    desc.par64 |= ((uint64_t)(detected.type            & 0xFF)) << 40;
+                    desc.par64 |= ((uint64_t)(detected.firmware.build               & 0xFF));
+                    desc.par64 |= ((uint64_t)(detected.firmware.minor               & 0xFF)) << 8;
+                    desc.par64 |= ((uint64_t)(detected.firmware.major               & 0xFF)) << 16;
+                    desc.par64 |= ((uint64_t)(detected.protocol.minor               & 0xFF)) << 24;
+                    desc.par64 |= ((uint64_t)(detected.protocol.major               & 0xFF)) << 32;
+                    desc.par64 |= ((uint64_t)(detected.type                         & 0xFF)) << 40;
+                    desc.par64 |= ((uint64_t)(location.adr                          & 0xFF)) << 48;
+                    desc.par64 |= ((uint64_t)(embot::core::tointegral(location.bus) & 0xFF)) << 56;
 
 
                     if(detected.type == target.type)
