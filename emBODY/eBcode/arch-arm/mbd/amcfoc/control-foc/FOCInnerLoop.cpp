@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 8.9
+// Model version                  : 9.11
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun  6 14:54:03 2025
+// C/C++ source code generated on : Tue Jul  8 13:04:41 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -103,7 +103,7 @@ void FOCInnerLoop(const SensorsData *rtu_Sensors, const ActuatorConfiguration
   // End of Outputs for SubSystem: '<S16>/Two phase CRL wrap'
 
   // Gain: '<S5>/Gain1'
-  rtb_Diff = 0.0174532924F * rtu_Sensors->motorsensors.angle;
+  rtb_Diff = 0.0174532924F * rtu_Sensors->motorsensors.electrical_angle;
 
   // Trigonometry: '<S19>/SinCos'
   rtb_SinCos_o1 = std::sin(rtb_Diff);

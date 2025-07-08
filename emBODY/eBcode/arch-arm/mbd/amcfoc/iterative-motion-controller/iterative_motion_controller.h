@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 3.14
+// Model version                  : 4.0
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun  6 14:55:37 2025
+// C/C++ source code generated on : Tue Jul  8 13:05:51 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -126,6 +126,9 @@ extern "C"
 }
 
 #endif
+
+// External data declarations for dependent source files
+extern const JointData iterative_motion_controller_rtZJointData;// JointData ground 
 
 //
 //  Exported Global Parameters

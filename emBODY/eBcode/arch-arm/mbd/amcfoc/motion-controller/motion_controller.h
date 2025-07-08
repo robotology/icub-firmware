@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 5.2
+// Model version                  : 5.32
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun  6 14:55:18 2025
+// C/C++ source code generated on : Tue Jul  8 13:05:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -24,7 +24,7 @@
 #include "estimation_velocity.h"
 #include "filter_current.h"
 #include "supervisor.h"
-#include "control_outer.h"
+#include "position_velocity_cascade.h"
 #include "rtw_defines.h"
 #include "zero_crossing_types.h"
 
@@ -34,7 +34,8 @@ struct B_motion_controller_c_T {
   SensorsData Transitionto1ms;         // '<Root>/Transition to 1ms'
   FOCOutputs RateTransition2;          // '<Root>/Rate Transition2'
   Targets targets;                     // '<Root>/Motor Supervisor'
-  real32_T velocity;                   // '<S1>/Velocity Estimator'
+  real32_T velocity;                   // '<S1>/Motor Velocity Estimator'
+  real32_T velocity_j;                 // '<S1>/Joint Velocity Estimator'
 };
 
 // Block states (default storage) for model 'motion_controller'
@@ -56,10 +57,11 @@ struct DW_motion_controller_f_T {
   int8_T Transitionto1ms_LstBufWR;     // '<Root>/Transition to 1ms'
   int8_T Transitionto1ms_RDBuf;        // '<Root>/Transition to 1ms'
   MdlrefDW_control_foc_T FOC_InstanceData;// '<Root>/FOC'
-  MdlrefDW_estimation_velocity_T VelocityEstimator_InstanceData;// '<S1>/Velocity Estimator' 
+  MdlrefDW_estimation_velocity_T MotorVelocityEstimator_InstanceData;// '<S1>/Motor Velocity Estimator' 
   MdlrefDW_filter_current_T CurrentFilter_InstanceData;// '<S1>/Current Filter'
+  MdlrefDW_estimation_velocity_T JointVelocityEstimator_InstanceData;// '<S1>/Joint Velocity Estimator' 
   MdlrefDW_supervisor_T MotorSupervisor_InstanceData;// '<Root>/Motor Supervisor' 
-  MdlrefDW_control_outer_T Controlouter_InstanceData;// '<Root>/Control outer'
+  MdlrefDW_position_velocity_cascade_T Positionvelocitycascade_InstanceData;// '<Root>/Position velocity cascade' 
 };
 
 struct MdlrefDW_motion_controller_T {
@@ -80,9 +82,10 @@ extern void motion_controllerTID1(const SensorsData *rtu_SensorData, FOCOutputs 
   *localDW);
 extern void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const
   ReceivedEvents rtu_Events[MAX_EVENTS_PER_TICK], const ActuatorConfiguration
-  *rtu_InitConf, EstimatedData *rty_EstimatedData, Flags *rty_Flags,
-  ActuatorConfiguration *rty_ActuatorsConfiguration, B_motion_controller_c_T
-  *localB, DW_motion_controller_f_T *localDW);
+  *rtu_InitConf, const JointData *rtu_JointData, EstimatedData
+  *rty_EstimatedData, Flags *rty_Flags, ActuatorConfiguration
+  *rty_ActuatorsConfiguration, B_motion_controller_c_T *localB,
+  DW_motion_controller_f_T *localDW);
 extern void motion_controller_Term(DW_motion_controller_f_T *localDW);
 
 //-
