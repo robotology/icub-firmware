@@ -489,14 +489,24 @@ void embot::app::bldc::theCOMM::Impl::locktoBUS(const embot::app::bldc::MSG &msg
 void embot::app::bldc::theCOMM::Impl::locktoBUS(const embot::app::bldc::MSG &msg)
 {
     // we lock to bus in case of unicast messages of MC only
-    bool isUnicast = (embot::prot::can::frame2destination(msg.frame) == _tCOMMcanaddress); // _tCOMMcanaddress is both icc or can address 
+    bool isUnicastToBoardRealAddress = (embot::prot::can::frame2destination(msg.frame) == _tCOMMcanaddress); // _tCOMMcanaddress is both icc or can address 
+    bool isUnicastToBoardVirtualAddress = 
+#if defined(STM32HAL_BOARD_AMCFOC_1CM7)        
+    (embot::prot::can::frame2destination(msg.frame) == (_tCOMMcanaddress+1));
+#elif defined(STM32HAL_BOARD_AMC2C)
+    false;
+#else
+    #error verify w/ new board ....
+#endif    
     bool isMCpolling = (embot::prot::can::Clas::pollingMotorControl == embot::prot::can::frame2clas(msg.frame));
     
     // and if the bus is different from the one we are locked now.
-    // surely nobody must send a unicast mc polling over CAN to this board when we it uses icc
+    // surely nobody must send a unicast mc polling over CAN to this board when it uses icc
     auto b = msg.location.getbus();
     
-    if((true == isUnicast) && (true == isMCpolling) && (b != mcBUS2use))
+    bool isUnicastToBoard = isUnicastToBoardRealAddress || isUnicastToBoardVirtualAddress; 
+    
+    if((true == isUnicastToBoard) && (true == isMCpolling) && (b != mcBUS2use))
     {
        mcBUS2use = b;
        embot::app::theLEDmanager::getInstance().get(embot::hw::LED::one).wave((embot::app::msg::typeofBUS::CAN == embot::app::msg::bus_to_type(mcBUS2use)) ? (&ledwavemcBUScan) : (&ledwavemcBUSicc));
