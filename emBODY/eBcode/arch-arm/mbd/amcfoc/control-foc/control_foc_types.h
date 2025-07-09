@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 9.11
+// Model version                  : 9.2
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Tue Jul  8 13:04:41 2025
+// C/C++ source code generated on : Wed Jul  9 14:15:17 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,63 +19,6 @@
 #ifndef control_foc_types_h_
 #define control_foc_types_h_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // velocity
-  real32_T rotor_velocity;
-
-  // filtered motor current
-  real32_T Iq_filtered;
-
-  // motor temperature
-  real32_T motor_temperature;
-
-  // velocity
-  real32_T joint_velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_Targets_
-#define DEFINED_TYPEDEF_FOR_Targets_
-
-struct Targets
-{
-  real32_T position;
-  real32_T velocity;
-  real32_T current;
-  real32_T voltage;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
-
-struct EstimationConfiguration
-{
-  real32_T environment_temperature;
-  real32_T current_rms_lambda;
-  EstimationVelocityModes velocity_est_mode;
-  uint32_T velocity_est_window;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
 #define DEFINED_TYPEDEF_FOR_DriverSensors_
 
@@ -132,6 +75,63 @@ struct SensorsData
 {
   DriverSensors driversensors;
   MotorSensors motorsensors;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocity
+  real32_T rotor_velocity;
+
+  // filtered motor current
+  real32_T Iq_filtered;
+
+  // motor temperature
+  real32_T motor_temperature;
+
+  // velocity
+  real32_T joint_velocity;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Targets_
+#define DEFINED_TYPEDEF_FOR_Targets_
+
+struct Targets
+{
+  real32_T position;
+  real32_T velocity;
+  real32_T current;
+  real32_T voltage;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+
+typedef enum {
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+
+struct EstimationConfiguration
+{
+  real32_T environment_temperature;
+  real32_T current_rms_lambda;
+  EstimationVelocityModes velocity_est_mode;
+  uint32_T velocity_est_window;
 };
 
 #endif
