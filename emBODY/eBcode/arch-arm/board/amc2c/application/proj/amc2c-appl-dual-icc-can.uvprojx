@@ -1066,9 +1066,9 @@
           <GroupName>mbd::control-outer</GroupName>
           <Files>
             <File>
-              <FileName>control_outer.cpp</FileName>
+              <FileName>position_velocity_cascade.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\position_velocity_cascade.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2148,9 +2148,9 @@
           <GroupName>mbd::control-outer</GroupName>
           <Files>
             <File>
-              <FileName>control_outer.cpp</FileName>
+              <FileName>position_velocity_cascade.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\position_velocity_cascade.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3281,9 +3281,9 @@
           <GroupName>mbd::control-outer</GroupName>
           <Files>
             <File>
-              <FileName>control_outer.cpp</FileName>
+              <FileName>position_velocity_cascade.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\position_velocity_cascade.cpp</FilePath>
             </File>
           </Files>
         </Group>

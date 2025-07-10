@@ -48,7 +48,7 @@
             ]
         },
         {
-            "source_directory": "control_outer",
+            "source_directory": "position_velocity_cascade",
             "source_directory_parent": "ert",
             "target_directory": "control-outer",
             "files": [

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.0
+// Model version                  : 4.4
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jun  4 17:59:08 2025
+// C/C++ source code generated on : Tue Jul  8 15:26:53 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -79,6 +79,7 @@ extern void mc_1ms_tick(const ExternalFlags *rtu_ExternalFlags, const
   *rty_ConfigurationParameters, B_motion_controller_single_c_T *localB,
   DW_motion_controller_single_f_T *localDW);
 extern void mc_terminate(DW_motion_controller_single_f_T *localDW);
+extern const JointData motion_controller_single_rtZJointData;// JointData ground 
 
 //-
 //  The generated code includes comments that allow you to trace directly

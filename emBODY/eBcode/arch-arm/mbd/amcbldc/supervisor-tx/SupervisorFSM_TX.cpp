@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 10.14
+// Model version                  : 10.22
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jun  4 17:57:49 2025
+// C/C++ source code generated on : Fri Jun 20 15:49:47 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -112,8 +112,8 @@ void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX
 
 // Output and update for referenced model: 'SupervisorFSM_TX'
 void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
-                      *rtu_EstimatedData, const Flags *rtu_Flags, const
-                      FOCOutputs *rtu_ControlOutputs, const boolean_T
+                      *rtu_Estimates, const Flags *rtu_Flags, const FOCOutputs
+                      *rtu_FOCOutputs, const boolean_T
                       *rtu_ExternalFlags_fault_button, BUS_MESSAGES_TX
                       *rty_MessagesTx, BUS_STATUS_TX *rty_StatusTx,
                       DW_SupervisorFSM_TX_f_T *localDW)
@@ -173,13 +173,14 @@ void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const EstimatedData
   if (localDW->is_active_c3_SupervisorFSM_TX == 0) {
     localDW->is_active_c3_SupervisorFSM_TX = 1U;
   } else if (rtu_Flags->enable_sending_msg_status) {
-    rty_MessagesTx->foc.current = rtu_EstimatedData->Iq_filtered;
-    rty_MessagesTx->foc.velocity = rtu_EstimatedData->velocity;
-    rty_MessagesTx->foc.position = rtu_SensorsData->position;
+    rty_MessagesTx->foc.current = rtu_Estimates->Iq_filtered;
+    rty_MessagesTx->foc.velocity = rtu_Estimates->rotor_velocity;
+    rty_MessagesTx->foc.position =
+      rtu_SensorsData->motorsensors.qencoder.rotor_angle;
     ev_foc = true;
     rty_MessagesTx->status.control_mode = SupervisorFSM_TX_convert
       (rtu_Flags->control_mode);
-    rty_MessagesTx->status.pwm_fbk = rtu_ControlOutputs->Vq;
+    rty_MessagesTx->status.pwm_fbk = rtu_FOCOutputs->Vq;
     rty_MessagesTx->status.flags.ExternalFaultAsserted =
       *rtu_ExternalFlags_fault_button;
     rty_MessagesTx->status.flags.OverCurrentFailure =

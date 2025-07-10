@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 10.0
+// Model version                  : 10.6
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jun  4 18:02:19 2025
+// C/C++ source code generated on : Thu Jul 10 11:34:58 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -96,11 +96,12 @@ ActuatorConfiguration AmcbldcInitConf = {
     0.0F,
     0.0F,
     24.0F,
-    25.9F,
-    271.0F,
-    16.0F,
-    797.5F,
-    30.0F
+    0.0F,
+    0.0F,
+    0.0F,
+    0.0F,
+    30.0F,
+    ReferenceEncoder_Motor
   }
 } ;                                    // Variable: AmcbldcInitConf
                                           //  Referenced by: '<Root>/Motion Controller Single'
@@ -141,7 +142,7 @@ RT_MODEL_AMC_BLDC_T *const AMC_BLDC_M = &AMC_BLDC_M_;
 void AMC_BLDC_step0(void)              // Sample time: [5e-06s, 0.0s]
 {
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element5'
+  //   Inport generated from: '<Root>/In Bus Element1'
   //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element'
@@ -214,7 +215,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
               &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtdw));
 
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element5'
+  //   Inport generated from: '<Root>/In Bus Element1'
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
@@ -250,7 +251,7 @@ void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
   // End of RateTransition generated from: '<Root>/SupervisorFSM_TX'
 
   // ModelReference generated from: '<Root>/SupervisorFSM_TX' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element5'
+  //   Inport generated from: '<Root>/In Bus Element1'
   //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
