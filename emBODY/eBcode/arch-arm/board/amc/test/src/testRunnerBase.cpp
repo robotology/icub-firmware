@@ -28,10 +28,11 @@ bool TestRunnerBase::testCin(uint8_t *data){ return true; }
 bool TestRunnerBase::testVauxOK(uint8_t *data){ return true; }
 bool TestRunnerBase::testPwrnFailOK(uint8_t *data){ return true; }
 bool TestRunnerBase::testFault(uint8_t on, uint8_t *data){ return true; }
-bool TestRunnerBase::testI2C(){ return true; }
+bool TestRunnerBase::testI2C(uint8_t *data){ return true; }
 bool TestRunnerBase::testHallSensor(){ return true; }
 bool TestRunnerBase::testQuadEncoder(){ return true; }
 bool TestRunnerBase::testSpiAeaEncoder(uint8_t *data){ return true; }
+bool TestRunnerBase::testPWMChannelx(const uint8_t channel, uint8_t *data) { return true; };
 
 
 // --------------------------------------------------------------------------------------------------------------------

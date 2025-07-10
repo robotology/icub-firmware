@@ -25,12 +25,17 @@
 #include "embot_core.h"
 #include "embot_core_utils.h"
 #include "embot_hw_types.h"
-#include <vector>
+#include "embot_hw_gpio.h"
 
+#include <vector>
+#include <array>
 
 // see also https://www.i2c-bus.org/
 
 namespace embot { namespace hw { namespace i2c {
+    
+    enum class Signal { SDA = 0, SCL = 1, NumberOf = 2 };
+    constexpr size_t SignalsNumberOf {embot::core::tointegral(Signal::NumberOf)};
     
     // speeds so far are those 
     enum class Speed : uint32_t { standard100 = 100000, fast400 = 400000, fastplus1000 = 1000000, high3400 = 3400000, none = 0 };
@@ -50,10 +55,18 @@ namespace embot { namespace hw { namespace i2c {
         constexpr Reg() = default;
     };
    
+    struct GPIOspecials
+    {
+        std::array<embot::hw::gpio::Pull, SignalsNumberOf> pulls {  embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull};
+        constexpr GPIOspecials() = default;
+        constexpr GPIOspecials(const std::array<embot::hw::gpio::Pull, SignalsNumberOf> &p) : pulls(p) {}
+        void clear() { for( auto &v : pulls) v = embot::hw::gpio::Pull::none; } 
+    };
           
     struct Config
     {   // so far we cannot initialize I2C with a given speed at runtime   
-        uint8_t speedIStobedone {0};       
+        uint8_t speedIStobedone {0};
+        GPIOspecials gpiospecials {};              
         constexpr Config() = default;
         constexpr bool isvalid() const { return true; }
     };
@@ -66,7 +79,6 @@ namespace embot { namespace hw { namespace i2c {
         constexpr Descriptor(embot::hw::I2C b, ADR a = 0) : bus(b), adr(a) {}
         constexpr bool isvalid() const { return (embot::hw::I2C::none != bus) && (0 != adr); }              
     };
-
     
     bool supported(embot::hw::I2C b);    
     bool initialised(embot::hw::I2C b);    

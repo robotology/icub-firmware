@@ -41,6 +41,7 @@ namespace embot { namespace hw { namespace i2c {
         std::array<const PROP*, maxnumberof> properties;    
         constexpr const PROP * getPROP(embot::hw::I2C h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::I2C h) const;
+        bool deinit(embot::hw::I2C h) const;
         constexpr embot::hw::I2C toID(const PROP& p) const
         { 
             if(nullptr == p.handle) { return embot::hw::I2C::none; }
@@ -60,5 +61,4 @@ namespace embot { namespace hw { namespace i2c {
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
 

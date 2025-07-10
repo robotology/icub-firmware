@@ -49,6 +49,7 @@ void ProtocolManager::emitONcan(embot::app::eth::theErrorManager::Severity sev, 
     } 
 
     // you may in here send the diagnostics message over a channel, maybe udp or can
+    #if defined(ENABLE_DEBUG_FEAT)
     if(true == des.isvalid())
     {
         embot::prot::can::Frame frame 
@@ -66,7 +67,8 @@ void ProtocolManager::emitONcan(embot::app::eth::theErrorManager::Severity sev, 
         
         embot::hw::can::put(canbus, {frame.id, frame.size, frame.data});                         
     }
-  
+    #endif
+    
     if(embot::app::eth::theErrorManager::Severity::fatal == sev)
     {
         // fatal error. i must do something. maybe send the system in an error state and ...
@@ -104,13 +106,15 @@ void ProtocolManager::tick(size_t tt)
     
 
     // and now tx the can frames we need
+    #if defined(ENABLE_DEBUG_FEAT)
     constexpr size_t num {8};
     for(size_t i=0; i<num; i++)
     {   
         embot::prot::can::Frame frame {0x123, 8, {static_cast<uint8_t>(tt), static_cast<uint8_t>(i), 2, 3, 4, 5, 6, 7}};
         embot::hw::can::put(canbus, {frame.id, frame.size, frame.data});                                       
     }
-    embot::hw::can::transmit(canbus);          
+    embot::hw::can::transmit(canbus);    
+    #endif    
 }
 
 void ProtocolManager::canProtocolInit(void *t)
@@ -168,7 +172,12 @@ void ProtocolManager::parseTestCommand(ProtocolManager::TestCommand &cmd)
 
 void ProtocolManager::sendTestResult(uint8_t *outdata)
 {
+    embot::os::Thread *thr {embot::os::theScheduler::getInstance().scheduled()};
+    std::string str = thr->getName();
+    str += + "just called";
+    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::warning, {"ProtocolManager::sendTestResult", thr}, {}, str.c_str());
     // overwrite canframe data
+    
     for(uint8_t i = 0; i < 8; i++) {_outputCanFrame.data[i] = outdata[i];}
     embot::hw::can::put(canbus, {_outputCanFrame.id, _outputCanFrame.size, _outputCanFrame.data});       
     embot::hw::can::transmit(canbus);

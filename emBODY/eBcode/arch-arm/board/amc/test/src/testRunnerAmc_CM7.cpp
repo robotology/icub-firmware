@@ -13,13 +13,17 @@
 #include "embot_hw_button.h"
 #include "embot_hw_eth.h"
 #include "embot_hw_encoder.h"
+#include "embot_hw_i2c.h"
 
 #include "embot_app_theLEDmanager.h"
 #include "embot_app_eth_theErrorManager.h"
 
+// other includes
+#include <numeric>
+
 // Firmware versions - No need to be shared across multiple files - constexpress so that evaluated just at compile time
 static constexpr uint8_t _fMajorVersion = 1;
-static constexpr uint8_t _fMinorVersion = 0;
+static constexpr uint8_t _fMinorVersion = 1;
 static constexpr uint8_t _fPatchVersion = 0;
 
 bool TestRunnerAmc_CM7::testCanComm(uint8_t *data)
@@ -98,32 +102,6 @@ bool TestRunnerAmc_CM7::testMicroId(uint8_t *data)
     data[1] = rev2;
     data[2] = id1;
     data[3] = id2;
-    
-    return true; 
-}
-
-bool TestRunnerAmc_CM7::testVin(uint8_t *data)
-{
-    float vin {0.0};
-    
-    vin = embot::hw::motor::getVIN();
-    
-    embot::core::print("Vin : " + std::to_string(vin));
-    
-    data [0] = (vin == 6.66f) ?  0xAA : 0xBB;      
-    
-    return true; 
-}
-
-bool TestRunnerAmc_CM7::testCin(uint8_t *data)
-{
-    float cin {0.0};
-
-    cin = embot::hw::motor::getCIN();
-    
-    embot::core::print("Cin : " + std::to_string(cin));
-    
-    data [0] = (cin == 6.66f) ?  0xAA : 0xBB;  
     
     return true; 
 }
@@ -227,6 +205,112 @@ bool TestRunnerAmc_CM7::testFault(uint8_t on, uint8_t *data)
     return true;
 }	
 
+bool TestRunnerAmc_CM7::testI2C(uint8_t *data)
+{
+    // Test all 3 i2c channels
+    // Configure channels
+    enum class MODE {blocking};
+    constexpr embot::core::Time timeout {300*embot::core::time1microsec}; 
+    volatile embot::hw::result_t hwres {embot::hw::resNOK};
+        
+    constexpr size_t nI2Cs {3}; // maxnumberof is 4 but we are only using i2c1, i2c2, i2c3
+    constexpr MODE mode {MODE::blocking};
+    constexpr embot::hw::i2c::Config cfg {};
+    std::array<embot::hw::i2c::ADR, nI2Cs> i2cAddresses {}; // vector for the addresses pinged. We should have 1 per channel
+
+    // Default Config. We just need init all 3 channels that we have
+    for(size_t i=0; i<nI2Cs; i++)
+    {
+        // Inizialize return values in data to 0xAA (true). 
+        // Pass a different value per each channel
+        data[i] = 0xAA;
+        embot::hw::I2C i2c {static_cast<embot::hw::I2C>(i)};
+        embot::hw::i2c::init(i2c, cfg);
+    }
+    
+    // Discovery on the 3 channels 
+    char sss[512] = {0};
+    std::string s {};
+        
+    bool res = false;
+    
+    
+    std::vector<embot::hw::i2c::ADR> adrsvec = {};
+    
+    for(size_t i=0; i<nI2Cs; i++)
+    {
+        embot::hw::I2C i2c {static_cast<embot::hw::I2C>(i)};
+        if(!embot::hw::i2c::discover(i2c, adrsvec))
+        {
+            data[i] = 0xBB;
+            res |= true;
+        }
+        else
+        {
+            data[i] = 0xAA;
+        }
+        
+        // We should have discivered just 1 address per channel
+        i2cAddresses[i] = adrsvec[0];
+        
+        s += "\n";
+        s += "I2C channel #" + std::to_string((uint8_t)i2c) + " adrs: ";
+        for(size_t j=0; j<adrsvec.size(); j++)
+        {
+            s += std::to_string(adrsvec[j]);
+            s += " ";                
+        }
+        s += "\n";
+    }
+    std::snprintf(sss, sizeof(sss), "%s\n", s.c_str());
+    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"print()", nullptr}, {}, sss); 
+    
+    if(!res)
+    {
+        return false;
+    }
+            
+    // Ping
+    memset(sss,0,sizeof(sss));
+    s = {};
+    
+    embot::core::relTime pingTimeout = 500*embot::core::time1millisec;
+    
+    for(size_t i=0; i<nI2Cs; i++)
+    {
+        embot::hw::I2C i2c {static_cast<embot::hw::I2C>(i)};
+        if(!(embot::hw::i2c::ping(i2c, i2cAddresses[i], pingTimeout)))
+        {
+            data[i] = 0xBB;
+            res |= true;
+        }
+        else
+        {
+            data[i] = 0xAA;
+        }
+        s += "\n";
+        s += "I2C channel #" + std::to_string((uint8_t)i2c) + " pinged adr: " + std::to_string((uint8_t)i2cAddresses[i]);
+        
+        s += "\n";
+    }
+    std::snprintf(sss, sizeof(sss), "%s\n", s.c_str());
+    embot::app::eth::theErrorManager::getInstance().emit(embot::app::eth::theErrorManager::Severity::trace, {"print()", nullptr}, {}, sss); 
+    
+    if(!res)
+    {
+        return false;
+    }
+    
+    
+    for(size_t i=0; i<nI2Cs; i++)
+    {
+        embot::hw::I2C i2c {static_cast<embot::hw::I2C>(i)};
+        embot::hw::i2c::deinit(i2c);
+    }
+    
+    return true;
+}
+
 bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
 {
 
@@ -250,26 +334,26 @@ bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
     volatile embot::hw::result_t hwres {embot::hw::resNOK};
         
     // Initialize Encoders
-    for(size_t i=0; i<nENCs; i++)
-    {
-        embot::hw::ENCODER enc {static_cast<embot::hw::ENCODER>(i)};
-        hwres = embot::hw::encoder::init(enc, cfgAEA3);
-        done[i] = (hwres != embot::hw::resOK) ? false : true;
-        encs[i] = enc;
-    }
-    
     // Start the data array with some initial values
     // to be sure that if we are reading 0xFFFF we have actually problem with the chip
     // and not with initialization of random values
     for(size_t i=0; i<nENCs; i++)
     {
         spiRawValues[i] = 60666;
-        
+        embot::hw::ENCODER enc {static_cast<embot::hw::ENCODER>(i)};
+        hwres = embot::hw::encoder::init(enc, cfgAEA3);
+        done[i] = (hwres != embot::hw::resOK) ? false : true;
+        data[i] = (hwres != embot::hw::resOK) ? 0xBB : 0xAA;
+        encs[i] = enc;
+    }
+    
+
+    for(size_t i=0; i<nENCs; i++)
+    {
         if(!done[i])
         {
             embot::core::print("AEA3 #" + std::to_string(i) + " init NOK"); 
-            data[0] = 0xBB;
-            return false; 
+            return false;
         }
     }
     
@@ -292,11 +376,12 @@ bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
         if(!done[i])
         {
             s += " AEA3 #" + std::to_string(i) + " read NOK. val: ";
-            data[0] = 0xBB;
+            data[i] = 0xBB;
         }
         else
         {
             s += " AEA3 #" + std::to_string(i) + " read OK. val: ";
+            data[i] = 0xAA;
         }
         s += std::to_string(spiRawValues[i]);           
     } 
@@ -309,14 +394,13 @@ bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
     for(size_t i=0; i<nENCs; i++)
     {
         embot::hw::ENCODER enc {static_cast<embot::hw::ENCODER>(i)};
-        embot::hw::encoder::deinit(enc);
+        hwres = embot::hw::encoder::deinit(enc);
+        done[i] = (hwres != embot::hw::resOK) ? false : true;
     }
-    
-    embot::core::print("AEA3 reading OK"); 
-    data[0] = 0xAA;
     
     return true;
 }
+
 
                     
 // --------------------------------------------------------------------------------------------------------------------
