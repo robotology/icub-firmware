@@ -75,6 +75,7 @@ namespace embot::hw::motor::enc {
     void Enc2DeInit(void);
     
     void encoder1_test(void);
+    int32_t Enc1GetCounter(void);
     
     
     /* Common encoder constants */   

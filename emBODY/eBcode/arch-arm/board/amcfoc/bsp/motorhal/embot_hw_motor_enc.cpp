@@ -427,6 +427,12 @@ float GetencFirstIndexCrossAngle(embot::hw::MOTOR m)
     return _enc_internals._items[motorIndex].data.encFirstIndexCross*_enc_internals._items[motorIndex].conversionfactor;
 }
 
+int32_t Enc1GetCounter(void)
+{
+    /* Read counter 32 bits value */
+    return __HAL_TIM_GetCounter(&htimEnc1);
+}
+
 
 //for debug
 void encoder1_test(void)
