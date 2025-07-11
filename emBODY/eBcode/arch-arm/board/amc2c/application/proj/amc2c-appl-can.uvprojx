@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1107,9 +1107,9 @@
           <GroupName>mbd::control-outer</GroupName>
           <Files>
             <File>
-              <FileName>control_outer.cpp</FileName>
+              <FileName>position_velocity_cascade.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\position_velocity_cascade.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1191,7 +1191,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2282,9 +2282,9 @@
           <GroupName>mbd::control-outer</GroupName>
           <Files>
             <File>
-              <FileName>control_outer.cpp</FileName>
+              <FileName>position_velocity_cascade.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\position_velocity_cascade.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2434,7 +2434,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM4</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.1.1</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.0.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x10000000,0x00048000) IROM(0x08100000,0x00100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -3474,9 +3474,9 @@
           <GroupName>mbd::control-outer</GroupName>
           <Files>
             <File>
-              <FileName>control_outer.cpp</FileName>
+              <FileName>position_velocity_cascade.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\position_velocity_cascade.cpp</FilePath>
             </File>
           </Files>
         </Group>
