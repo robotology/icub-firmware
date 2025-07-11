@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.0
+// Model version                  : 4.4
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jun  4 17:59:08 2025
+// C/C++ source code generated on : Tue Jul  8 15:26:53 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M

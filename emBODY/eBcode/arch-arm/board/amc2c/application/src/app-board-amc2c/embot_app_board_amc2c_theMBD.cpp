@@ -602,7 +602,7 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     uint8_t polepairs = (0 != AMC_BLDC_Y.ConfigurationParameters.motor.externals.pole_pairs) ? AMC_BLDC_Y.ConfigurationParameters.motor.externals.pole_pairs : 1;
     position = position + delta / polepairs;
     
-    AMC_BLDC_U.SensorsData_p.motorsensors.angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
+    AMC_BLDC_U.SensorsData_p.motorsensors.electrical_angle = static_cast<real32_T>(electricalAngle)*0.0054931640625f; // (60 interval angle)
     
     // convert the current from mA to A
     AMC_BLDC_U.SensorsData_p.motorsensors.Iabc[0] = 0.001f*currs.u;
@@ -617,7 +617,7 @@ void embot::app::board::amc2c::theMBD::Impl::onCurrents_FOC_innerloop(void *owne
     
     // -----------------------------------------------------------------------------
     
-    AMC_BLDC_U.SensorsData_p.position = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
+    AMC_BLDC_U.SensorsData_p.motorsensors.qencoder.rotor_angle = static_cast<real32_T>(position) * 0.0054931640625f; // iCubDegree -> deg
     
     embot::hw::motor::PWMperc pwmperc 
     {

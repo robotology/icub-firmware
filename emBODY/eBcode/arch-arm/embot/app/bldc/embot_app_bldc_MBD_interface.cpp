@@ -464,11 +464,11 @@ namespace embot::app::bldc::mbd::interface {
     
     void IO2::set(const FOCinput &i, uint8_t motor)
     {
-        input->SensorData[motor].motorsensors.angle = i.electricalangle;
+        input->SensorData[motor].motorsensors.electrical_angle = i.electricalangle;
         input->SensorData[motor].motorsensors.Iabc[0] = i.currents.u;
         input->SensorData[motor].motorsensors.Iabc[1] = i.currents.v;
         input->SensorData[motor].motorsensors.Iabc[2] = i.currents.w;
-        input->SensorData[motor].position = i.mechanicalangle;
+        input->SensorData[motor].motorsensors.qencoder.rotor_angle = i.mechanicalangle;
         input->SensorData[motor].motorsensors.hallABC = i.hall;
     }
     

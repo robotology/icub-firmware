@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 4.13
+// Model version                  : 4.45
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun  6 14:55:04 2025
+// C/C++ source code generated on : Tue Jul  8 15:09:26 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -39,13 +39,16 @@ struct ExternalFlags
 struct EstimatedData
 {
   // velocity
-  real32_T velocity;
+  real32_T rotor_velocity;
 
   // filtered motor current
   real32_T Iq_filtered;
 
   // motor temperature
   real32_T motor_temperature;
+
+  // velocity
+  real32_T joint_velocity;
 };
 
 #endif
@@ -87,15 +90,36 @@ struct DriverSensors
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_QuadratureEncoder_
+#define DEFINED_TYPEDEF_FOR_QuadratureEncoder_
+
+struct QuadratureEncoder
+{
+  // Offset of the rotor-stator calibration, difference angle between the 0 of the sensors(index) and the electrical zero 
+  real32_T offset;
+
+  // Mechanical Angle before gearbox
+  real32_T rotor_angle;
+
+  // Counter of the QENC
+  real32_T counter;
+
+  // Last QENC count where the index has been detected
+  real32_T Idx_counter;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_MotorSensors_
 #define DEFINED_TYPEDEF_FOR_MotorSensors_
 
 struct MotorSensors
 {
+  QuadratureEncoder qencoder;
   real32_T Iabc[3];
 
   // electrical angle = angle * pole_pairs
-  real32_T angle;
+  real32_T electrical_angle;
   real32_T temperature;
   real32_T voltage;
   real32_T current;
@@ -109,8 +133,6 @@ struct MotorSensors
 
 struct SensorsData
 {
-  // position encoders
-  real32_T position;
   DriverSensors driversensors;
   MotorSensors motorsensors;
 };
@@ -273,6 +295,16 @@ struct PIDsConfiguration
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_ReferenceEncoder_
+#define DEFINED_TYPEDEF_FOR_ReferenceEncoder_
+
+typedef enum {
+  ReferenceEncoder_Motor = 0,          // Default value
+  ReferenceEncoder_Joint
+} ReferenceEncoder;
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_MotorConfiguration_
 #define DEFINED_TYPEDEF_FOR_MotorConfiguration_
 
@@ -289,6 +321,7 @@ struct MotorConfiguration
   real32_T thermal_resistance;
   real32_T thermal_time_constant;
   real32_T hall_sensors_offset;
+  ReferenceEncoder reference_encoder;
 };
 
 #endif
@@ -302,6 +335,17 @@ struct ActuatorConfiguration
   PIDsConfiguration pids;
   MotorConfiguration motor;
 };
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CalibrationTypes_
+#define DEFINED_TYPEDEF_FOR_CalibrationTypes_
+
+typedef enum {
+  CalibrationTypes_None = 0,           // Default value
+  CalibrationTypes_Search_Index,
+  CalibrationTypes_Full_Calibration
+} CalibrationTypes;
 
 #endif
 
@@ -320,6 +364,11 @@ struct HardwareFaults
 
 struct Flags
 {
+  // Flag that shows if:
+  // 0. None calibration
+  // 1. Search Index must be done
+  // 2. Full calibration must be done
+  CalibrationTypes calibration_type;
   boolean_T enable_sending_msg_status;
   HardwareFaults hw_faults;
   boolean_T enable_thermal_protection;

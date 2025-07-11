@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.0
+// Model version                  : 4.4
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jun  4 17:59:08 2025
+// C/C++ source code generated on : Tue Jul  8 15:26:53 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,10 @@
 #include "motion_controller_single_types.h"
 #include "rtw_defines.h"
 #include "motion_controller.h"
+
+const JointData motion_controller_single_rtZJointData = {
+  0.0F                                 // position
+};                                     // JointData ground
 
 // System initialize for referenced model: 'motion_controller_single'
 void motion_controller_single_Init(Flags *rty_Flags, ActuatorConfiguration
@@ -67,7 +71,8 @@ void mc_1ms_tick(const ExternalFlags *rtu_ExternalFlags, const ReceivedEvents
 
   // ModelReference: '<Root>/Motion Controller'
   mc_step_1ms(rtu_ExternalFlags, &rtu_messages_rx[0], &localB->Constant,
-              rty_Estimates, rty_Flags, rty_ConfigurationParameters,
+              &motion_controller_single_rtZJointData, rty_Estimates, rty_Flags,
+              rty_ConfigurationParameters,
               &(localDW->MotionController_InstanceData.rtb),
               &(localDW->MotionController_InstanceData.rtdw));
 }

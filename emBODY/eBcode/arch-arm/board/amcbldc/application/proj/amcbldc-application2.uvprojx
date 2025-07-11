@@ -10,13 +10,13 @@
       <TargetName>amcbldc-app-motorhal2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
+      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.6.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.2.0.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1144,9 +1144,9 @@
           <GroupName>mbd::control-outer</GroupName>
           <Files>
             <File>
-              <FileName>control_outer.cpp</FileName>
+              <FileName>position_velocity_cascade.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\position_velocity_cascade.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1368,7 +1368,7 @@
         <TargetCommonOption>
           <Device>STM32G474QETx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32G4xx_DFP.1.6.0</PackID>
+          <PackID>Keil.STM32G4xx_DFP.2.0.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2496,9 +2496,9 @@
           <GroupName>mbd::control-outer</GroupName>
           <Files>
             <File>
-              <FileName>control_outer.cpp</FileName>
+              <FileName>position_velocity_cascade.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\control_outer.cpp</FilePath>
+              <FilePath>..\..\..\..\mbd\amcbldc\control-outer\position_velocity_cascade.cpp</FilePath>
             </File>
           </Files>
         </Group>

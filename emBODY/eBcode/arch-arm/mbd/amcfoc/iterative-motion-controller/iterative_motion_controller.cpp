@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 3.14
+// Model version                  : 4.0
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun  6 14:55:37 2025
+// C/C++ source code generated on : Wed Jul  9 14:16:48 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -25,6 +25,10 @@
 #include "mul_s32_sat.h"
 #include "SupervisorFSM_TX.h"
 #include "motion_controller.h"
+
+const JointData iterative_motion_controller_rtZJointData = {
+  0.0F                                 // position
+};                                     // JointData ground
 
 // Exported block parameters
 ActuatorConfiguration AmcfocInitConf[2] = { {
@@ -96,11 +100,12 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
       -3.0F,
       3.0F,
       24.0F,
-      25.6F,
-      1000.0F,
       0.0F,
       0.0F,
-      0.0F
+      0.0F,
+      0.0F,
+      0.0F,
+      ReferenceEncoder_Motor
     }
   }, { {
       60000.0F,
@@ -170,11 +175,12 @@ ActuatorConfiguration AmcfocInitConf[2] = { {
       -3.0F,
       3.0F,
       24.0F,
-      25.6F,
-      1000.0F,
       0.0F,
       0.0F,
-      0.0F
+      0.0F,
+      0.0F,
+      0.0F,
+      ReferenceEncoder_Motor
     }
   } } ;                                // Variable: AmcfocInitConf
                                           //  Referenced by: '<Root>/Constant'
@@ -507,6 +513,7 @@ void AMCFOC_step_Time_1ms(void)        // Sample time: [0.001s, 0.0s]
     mc_step_1ms(&iterative_motion_controller_U.ExternalFlags_j,
                 &iterative_motion_controller_DW.ImpSel_InsertedFor_Events_at_outport_0
                 [0], &rtb_ImpSel_InsertedFor_InitConf_at_outport_0,
+                &iterative_motion_controller_rtZJointData,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].
                 MotionController_o2,
                 &iterative_motion_controller_DW.CoreSubsys[ForEach_itr].Flags_l,

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'supervisor'.
 //
-// Model version                  : 4.13
+// Model version                  : 4.45
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Fri Jun  6 14:55:04 2025
+// C/C++ source code generated on : Tue Jul  8 15:09:26 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -33,7 +33,7 @@ struct DW_supervisor_f_T {
   real_T newSetpoint;                  // '<Root>/Supervisor'
   int32_T sfEvent;                     // '<Root>/Supervisor'
   ControlModes requestedControlMode;   // '<Root>/Supervisor'
-  uint8_T is_active_c3_supervisor;     // '<Root>/Supervisor'
+  uint8_T is_active_c1_supervisor;     // '<Root>/Supervisor'
   uint8_T is_active_FaultsManager;     // '<Root>/Supervisor'
   uint8_T is_active_HWFaults;          // '<Root>/Supervisor'
   uint8_T is_HWFaults;                 // '<Root>/Supervisor'

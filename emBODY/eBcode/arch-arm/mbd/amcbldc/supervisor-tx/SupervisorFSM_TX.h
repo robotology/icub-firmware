@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'SupervisorFSM_TX'.
 //
-// Model version                  : 10.14
+// Model version                  : 10.22
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jun  4 17:57:49 2025
+// C/C++ source code generated on : Fri Jun 20 15:49:47 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -33,8 +33,8 @@ struct MdlrefDW_SupervisorFSM_TX_T {
 extern void SupervisorFSM_TX_Init(BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX
   *rty_StatusTx);
 extern void SupervisorFSM_TX(const SensorsData *rtu_SensorsData, const
-  EstimatedData *rtu_EstimatedData, const Flags *rtu_Flags, const FOCOutputs
-  *rtu_ControlOutputs, const boolean_T *rtu_ExternalFlags_fault_button,
+  EstimatedData *rtu_Estimates, const Flags *rtu_Flags, const FOCOutputs
+  *rtu_FOCOutputs, const boolean_T *rtu_ExternalFlags_fault_button,
   BUS_MESSAGES_TX *rty_MessagesTx, BUS_STATUS_TX *rty_StatusTx,
   DW_SupervisorFSM_TX_f_T *localDW);
 

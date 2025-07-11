@@ -42,7 +42,7 @@ namespace embot::app::board::amcfoc::cm7::info {
         {embot::app::msg::BUS::icc1, address},
         {1, 0, 0, 0},   // application version
         {2, 0},         // protocol version
-        {2024, embot::app::eth::Month::Dec, embot::app::eth::Day::twelve, 10, 31}
+        {2025, embot::app::eth::Month::Jul, embot::app::eth::Day::eleven, 15, 31}
     };
     
     constexpr embot::app::msg::Location icclocation {signature.location};
