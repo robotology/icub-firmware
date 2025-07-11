@@ -449,7 +449,7 @@ void encoder1_test(void)
         }
     }
     static uint8_t ii=0;
-    if (ii++%5 == 0)
+    if (ii++%10 == 0)
     {
         int32_t anglenew = __HAL_TIM_GetCounter(&htimEnc1);
         embot::core::print
@@ -458,7 +458,7 @@ void encoder1_test(void)
     //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_11)? "H" : "L" +
     //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
                     "tick Enc1GetRotorPosition: " +
-                    std::to_string(Enc1GetRotorPosition()) +
+                    std::to_string(Enc1GetCounter()) +
                     " angle: " +
                     std::to_string(Enc1GetRotorPosition()/Enc1SlotsNumber*360.0/Enc1Divider) + 
                     "  Enc1RotorZero: " +
