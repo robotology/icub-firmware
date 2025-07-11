@@ -52,6 +52,49 @@ embot::app::bldc::mbd::interface::IO2 _io2 {&iterative_motion_controller_U, &ite
 
 namespace embot::app::bldc::mbd::interface {
     
+   
+    std::string to_string(const ControlModes &cm)
+    {
+        static constexpr size_t size {8};
+        static constexpr const char * ss[size] 
+        {
+          "ControlModes_NotConfigured",      // Default value
+          "ControlModes_Idle",
+          "ControlModes_Position",
+          "ControlModes_PositionDirect",
+          "ControlModes_Current",
+          "ControlModes_Velocity",
+          "ControlModes_Voltage",
+          "ControlModes_HwFaultCM"            
+        };
+        static constexpr const char * unk {"ControlModes_ none in MBD"};
+        
+        std::string s {};
+        s = std::string("ControlModes: ");
+        if(cm < size)
+        {
+            s += ss[cm];
+        }
+        else
+        {
+            s += unk;
+        }
+            
+        return s;    
+    }
+    // utilities
+    std::string to_string(const SupervisorInputLimits &sil)
+    {
+        std::string s {};
+        s = std::string("SIL:") +
+            ", nominal = " + std::to_string(sil.nominal) + 
+            ", peak = " + std::to_string(sil.peak) +            
+            " overload = " + std::to_string(sil.overload) +
+            ", type = " + to_string(sil.type);
+            
+        return s;
+    }    
+    
     
     IO2& getIO2handle()
     {

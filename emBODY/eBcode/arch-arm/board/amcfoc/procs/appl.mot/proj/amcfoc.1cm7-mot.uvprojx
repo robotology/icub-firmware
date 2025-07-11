@@ -337,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-DSTM32HAL_dualcore_BOOT_cm4master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
+              <MiscControls>-D_dont_MBD_foc_keep_degenerated_code -DSTM32HAL_dualcore_BOOT_cm4master -Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal</MiscControls>
               <Define>USE_ICC_COMM USE_ICC_CAN_COMM USE_STM32HAL STM32HAL_BOARD_AMCFOC_1CM7 STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\embot\app\bldc;..\..\..\..\..\embot\prot\can;..\..\..\..\..\embot\app\eth;..\src\app-board-amc1cm7;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\bsp\shared;..\..\..\bsp\cm7;..\..\..\bsp\motorhal;..\src\bldc-mbd-moc;.;..\..\..\..\..\mbd\amcfoc\control-foc;..\..\..\..\..\mbd\amcfoc\control-outer;..\..\..\..\..\mbd\amcfoc\estimation-velocity;..\..\..\..\..\mbd\amcfoc\filter-current;..\..\..\..\..\mbd\amcfoc\motion-controller;..\..\..\..\..\mbd\amcfoc\supervisor;..\..\..\..\..\mbd\amcfoc\supervisor-tx;..\..\..\..\..\mbd\amcfoc\sharedutils;..\..\..\..\..\mbd\amcfoc\iterative-motion-controller\</IncludePath>
