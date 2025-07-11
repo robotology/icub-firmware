@@ -23,6 +23,8 @@
 #include "rt_roundf.h"
 #include "rtw_defines.h"
 
+//#include "embot_core.h"
+
 // Named constants for Chart: '<Root>/Supervisor'
 const int32_T supervisor_CALL_EVENT = -1;
 const uint8_T supervisor_IN_ButtonPressed = 1U;
@@ -781,6 +783,8 @@ static void supervisor_SetLimits(real32_T limits_overload, real32_T limits_peak,
   *rty_Flags, DW_supervisor_f_T *localDW)
 {
   int32_T b_previousEvent;
+    
+//    embot::core::print("BINGO: supervisor_SetLimits() executes .....................................................................");
 
   // Chart: '<Root>/Supervisor'
   rty_ConfigurationParameters->thresholds.motorNominalCurrents = std::abs

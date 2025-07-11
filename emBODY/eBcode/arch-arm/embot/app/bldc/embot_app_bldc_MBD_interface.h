@@ -26,6 +26,10 @@
 
 namespace embot::app::bldc::mbd::interface {
     
+    // utilities
+    std::string to_string(const ControlModes &cm);
+    std::string to_string(const SupervisorInputLimits &sil);
+    
     struct Converter
     {
         // from mbd to can
