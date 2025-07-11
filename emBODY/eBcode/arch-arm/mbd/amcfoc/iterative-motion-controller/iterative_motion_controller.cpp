@@ -365,12 +365,16 @@ void AMCFOC_step_FOC(void)             // Sample time: [4.5e-05s, 0.0s]
 
     rtb_ImpAsg_InsertedFor_FOCOutputs_at_inport_0[ForEach_itr] =
       iterative_motion_controller_DW.CoreSubsys[ForEach_itr].MotionController_o1;
+#if defined(MBD_foc_keep_degenerated_code)
+    #warning MBD_foc_keep_degenerated_code is defined
     for (i = 0; i < MAX_EVENTS_PER_TICK; i++) {
       // ForEachSliceSelector generated from: '<S1>/Events'
       iterative_motion_controller_DW.ImpSel_InsertedFor_Events_at_outport_0[i] =
         iterative_motion_controller_DW.M[N_MOTORS * i + ForEach_itr];
     }
-
+#else  
+    #warning MBD_foc_keep_degenerated_code is undefined
+#endif
     // ForEachSliceSelector generated from: '<S1>/InitConf' incorporates:
     //   Constant: '<Root>/Constant'
 
