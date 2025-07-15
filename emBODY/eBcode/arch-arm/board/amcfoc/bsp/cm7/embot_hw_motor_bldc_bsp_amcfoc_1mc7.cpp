@@ -258,8 +258,11 @@ namespace embot::hw::motor::bldc::bsp {
             //only mechanical angle at the moment
             r = embot::hw::motor::enc::angle(m);
         }
-        //Angle r = (enc == Encoder::hall) ? 0.0 : 1.0;        
-        //r = embot::hw::motor::hall::angle(m) OR .....;         
+        else if(type == AngleType::quadenc_mechanical_lastindex)
+        {
+            r = embot::hw::motor::enc::GetencIndexAngle(m);
+        }
+  
         return r;
     }     
 

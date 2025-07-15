@@ -39,6 +39,7 @@ namespace embot::prot::can::motor::periodic {
         FOC = 0,
         STATUS = 3,
         PRINT = 6,
+        DEBUG = 9,
         ADDITIONAL_STATUS = 12,
         EMSTO2FOC_DESIRED_CURRENT = 15        
     };
@@ -85,7 +86,43 @@ namespace embot::prot::can::motor::periodic {
         std::uint8_t nchars;           
         static std::uint8_t textIDmod4;  // 0, 1, 2, 3, 0, 1, 2, etc      
     }; 
-   
+    
+    
+//    template< typename T >
+//    std::string int_to_hex( T i )
+//    {
+//      std::stringstream stream;
+//      stream << "0x" 
+//             << std::setfill ('0') << std::setw(sizeof(T)*2) 
+//             << std::hex << i;
+//      return stream.str();
+//    }    
+       
+    struct Message_DEBUG : public Message
+    {
+        struct Info
+        { 
+            uint64_t                    payload {0};   // the full payload
+            std::uint8_t                canaddress {0};
+            Info() = default;
+            Info(uint64_t p, uint8_t a) : payload(p), canaddress(a) {}
+            std::string to_string() const
+            {
+                return std::string("sig<DEBUG = (") 
+                                    + std::to_string(payload) 
+//                                    + int_to_hex(payload) 
+                                    + ")"
+                                   + ">";               
+            }
+        };
+        
+        Info info {};
+        
+        Message_DEBUG() = default;
+            
+        bool load(const Info& inf);            
+        bool get(embot::prot::can::Frame &outframe);  
+    }; 
     
     class Message_EMSTO2FOC_DESIRED_CURRENT : public Message
     {
