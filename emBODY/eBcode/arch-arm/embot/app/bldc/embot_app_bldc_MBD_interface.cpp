@@ -513,9 +513,12 @@ namespace embot::app::bldc::mbd::interface {
         input->SensorData[motor].motorsensors.Iabc[2] = i.currents.w;
         input->SensorData[motor].motorsensors.qencoder.rotor_angle = i.mechanicalangle;
         input->SensorData[motor].motorsensors.hallABC = i.hall;
+        input->SensorData[motor].motorsensors.qencoder.counter = i.qenc.counter;
+        input->SensorData[motor].motorsensors.qencoder.Idx_counter = i.qenc.indexcounter;
+        //input->SensorData[motor].motorsensors.qencoder.offset = 0; // stays 0 because it is actually a value coing from motor_config message
     }
     
-    void IO2::get(FOCoutput &o, uint8_t motor)
+    void IO2::get(FOCoutput &o, uint8_t motor) const
     {
         o.pwm = { output->FOCOutputs_h[motor].Vabc[0], output->FOCOutputs_h[motor].Vabc[1], output->FOCOutputs_h[motor].Vabc[2] };    
     }
@@ -550,8 +553,19 @@ namespace embot::app::bldc::mbd::interface {
             } break; 
             case embot::prot::can::motor::periodic::CMD::ADDITIONAL_STATUS:
             {
+                #warning TODO: verify why ADDITIONAL_STATUS is not sent.......................
                 r = false;
-            } break;                
+            } break;   
+            case embot::prot::can::motor::periodic::CMD::DEBUG:
+            {
+#if defined(DEBUG_canQENCemission)
+                r = true;
+#elif defined(temporaryDISABLEqencMBD)
+                r = false;                
+#else
+                r = output->Flags_d[motor].calibration_done;
+#endif                
+            } break;             
         }
         
         return r;
@@ -606,6 +620,21 @@ namespace embot::app::bldc::mbd::interface {
         return 66.6;
 //        return output->Estimates[motor].motor_temperature;
     } 
+
+    void IO2::get(canDEBUGqenccalibresult &info, uint8_t motor) const
+    {
+#if defined(DEBUG_canQENCemission)
+        info.calibrationdone = true;
+        info.offset = 255 + 3;
+#elif defined(temporaryDISABLEqencMBD)
+        info.calibrationdone = false;
+        info.offset = 0;
+#else        
+        info.calibrationdone = get_output()->Flags_d[motor].calibration_done;
+        info.offset = get_output()->SensorDataOut[motor].motorsensors.qencoder.offset;   
+#endif        
+    }   
+    
     
     void IO2::get_current_limits(uint8_t motor, embot::app::bldc::mbd::interface::SupervisorInputLimits &cl)
     {   

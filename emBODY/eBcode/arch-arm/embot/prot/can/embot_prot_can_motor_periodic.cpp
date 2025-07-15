@@ -131,6 +131,24 @@ namespace embot { namespace prot { namespace can { namespace motor { namespace p
     } 
 
 
+    bool Message_DEBUG::load(const Info& inf)
+    {
+        info = inf;  
+        return true;
+    }
+            
+    bool Message_DEBUG::get(embot::prot::can::Frame &outframe)
+    {
+        std::uint8_t data08[8] = {0};
+        std::memmove(data08, &info.payload, sizeof(data08));
+        std::uint8_t size = 8;
+               
+        Message::set(info.canaddress, 0xf, Clas::periodicMotorControl, static_cast<std::uint8_t>(CMD::DEBUG), data08, size);
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
+                    
+        return true;
+    } 
+    
     bool Message_EMSTO2FOC_DESIRED_CURRENT::load(const embot::prot::can::Frame &inframe)
     {
         Message::set(inframe);  

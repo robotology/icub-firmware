@@ -86,7 +86,19 @@ namespace embot::app::bldc::mbd::interface {
             uint32_t motorfaultstate {0};
             canADDITIONALSTATUSinfo() = default;            
         };
+        
+        struct canDEBUGqenccalibresult
+        {
+            int16_t offset {0};
+            bool calibrationdone {false};
+            canDEBUGqenccalibresult() = default;            
+        };        
 
+        struct Qenc
+        {
+            float counter {0};
+            float indexcounter {0};  
+        };
 
         struct FOCinput
         {
@@ -94,17 +106,19 @@ namespace embot::app::bldc::mbd::interface {
             embot::hw::motor::bldc::Currents currents {}; 
             float mechanicalangle {0.0};
             uint8_t hall {0};
+            Qenc qenc {};
                 
             FOCinput() = default;
-            FOCinput(float ea, const embot::hw::motor::bldc::Currents &cu, float me, uint8_t h) 
-                : electricalangle(ea), currents(cu), mechanicalangle(me), hall(h) {}
+            FOCinput(float ea, const embot::hw::motor::bldc::Currents &cu, float me, uint8_t h, const Qenc &q) 
+                : electricalangle(ea), currents(cu), mechanicalangle(me), hall(h), qenc {q} {}
                     
-            void load(float ea, const embot::hw::motor::bldc::Currents &cu, float me, uint8_t h)
+            void load(float ea, const embot::hw::motor::bldc::Currents &cu, float me, uint8_t h, const Qenc &q)
             {
                 electricalangle = ea;
                 currents = cu;
                 mechanicalangle = me;
                 hall = h;
+                qenc = q;
             }
         };  
 
@@ -159,7 +173,8 @@ namespace embot::app::bldc::mbd::interface {
         void get(canFOCinfo &info, uint8_t motor) const;
         void get(canSTATUSinfo &info, uint8_t motor) const;        
         float get_temperature(uint8_t motor) const;
-        void get(FOCoutput &o, uint8_t motor);
+        void get(FOCoutput &o, uint8_t motor) const;
+        void get(canDEBUGqenccalibresult &info, uint8_t motor) const;
 
         void get_current_limits(uint8_t motor, embot::app::bldc::mbd::interface::SupervisorInputLimits &cl);
         void get_current_pid(uint8_t motor, embot::app::bldc::mbd::interface::PID &pid);

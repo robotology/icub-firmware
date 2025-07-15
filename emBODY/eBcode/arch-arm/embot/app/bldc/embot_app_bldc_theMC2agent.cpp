@@ -171,7 +171,8 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
         bool emitFOC = io2handle.get_transmit(embot::prot::can::motor::periodic::CMD::FOC, embot::core::tointegral(m));
         bool emitSTATUS = io2handle.get_transmit(embot::prot::can::motor::periodic::CMD::STATUS, embot::core::tointegral(m));
         bool emitADDITIONAL_STATUS = io2handle.get_transmit(embot::prot::can::motor::periodic::CMD::ADDITIONAL_STATUS, embot::core::tointegral(m)); // {false};
-            
+        bool emitDEBUG = io2handle.get_transmit(embot::prot::can::motor::periodic::CMD::DEBUG, embot::core::tointegral(m)); 
+        
         // each motor transmits using a different address        
         uint8_t canaddress = _config.getaddress(m);
                 
@@ -272,8 +273,56 @@ bool embot::app::bldc::theMC2agent::Impl::loadSIG(std::vector<embot::prot::can::
             msg.get(f);
             // push it back to vector
             output.push_back(f);        
-        }          
+        }   
+
+
+        if(true == emitDEBUG)
+        {
+            
+            // we may emitted = true;
+            embot::app::bldc::mbd::interface::IO2::canDEBUGqenccalibresult cc {};
+            io2handle.get(cc, embot::core::tointegral(m));
+            if(true == cc.calibrationdone)
+            {
+                // ok, we can emit. but we should do it every 1 sec.
+                static std::array<size_t, 2> counts {0};
+                constexpr size_t decimation {5000};
+                
+                counts[embot::core::tointegral(m)]++;
+                if(counts[embot::core::tointegral(m)] >= decimation)
+                {
+                    counts[embot::core::tointegral(m)] = 0;
+                    
+                    // we can surely emit                   
+                    emitted = true;                    
+
+                    embot::prot::can::motor::periodic::Message_DEBUG msg {};
+                    embot::prot::can::Frame f {};
+                    embot::prot::can::motor::periodic::Message_DEBUG::Info info {};
+                
+                    info.canaddress = canaddress;
+                    int16_t offset = cc.offset; // it is a signed i16 that may be complement two is negative
+                    info.payload = static_cast<uint16_t>(offset); // i must put the two bytes into lowest two bytes of the payload.
+                    
+                    #if defined(DEBUG_print_decoded_CAN_frames_periodic)
+                    embot::core::print(embot::hw::motor::bldc::to_string(m) + ": " + info.to_string());
+                    #endif 
+                
+                    // load                 
+                    msg.load(info);
+                    // get frame
+                    msg.get(f);
+                    // push it back to vector
+                    output.push_back(f);  
+                }                        
+            }
+                
+         
+        }   
+        
     }
+    
+   
     
    
     return emitted;    
