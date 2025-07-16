@@ -13,6 +13,7 @@
 
 struct WatchDog_hid
 {
+    uint32_t min_timer;
     uint32_t timer;
     uint32_t base_time;
 };

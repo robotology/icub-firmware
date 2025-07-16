@@ -379,6 +379,17 @@ BOOL JointSet_do_check_faults(JointSet* o)
     
     BOOL fault = FALSE;
     o->external_fault = FALSE;
+
+//            //timeout = TRUE;
+//            fault = TRUE;
+//            eOerrmanDescriptor_t errdes = {0};
+//                    
+//            errdes.code             = errorcode;
+//            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//            errdes.sourceaddress    = o->joint[o->joints_of_set[k]].ID;
+//            errdes.par16            = controlmode;
+//            errdes.par64            = 0;
+//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
     
     for (int k=0; k<N; ++k)
     {

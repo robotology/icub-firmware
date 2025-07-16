@@ -106,13 +106,23 @@ void Joint_init(Joint* o)
     //o->scKvel   = ZERO;
     
     WatchDog_init(&o->trq_fbk_wdog);
+    WatchDog_init(&o->trq_ref_wdog);
     WatchDog_init(&o->vel_ref_wdog);
+    WatchDog_init(&o->pwm_ref_wdog);
+    WatchDog_init(&o->cur_ref_wdog);
     
-    WatchDog_set_base_time_msec(&o->trq_fbk_wdog, 2*DEFAULT_WATCHDOG_TIME_MSEC);
-    WatchDog_set_base_time_msec(&o->vel_ref_wdog,   DEFAULT_WATCHDOG_TIME_MSEC);
+    WatchDog_set_base_time_msec(&o->trq_fbk_wdog, TRQ_SENSOR_TIMEOUT);
+    
+    WatchDog_set_base_time_msec(&o->trq_ref_wdog, TRQ_CMD_TIMEOUT);
+    WatchDog_set_base_time_msec(&o->vel_ref_wdog, VEL_CMD_TIMEOUT);
+    WatchDog_set_base_time_msec(&o->pwm_ref_wdog, PWM_CMD_TIMEOUT);
+    WatchDog_set_base_time_msec(&o->cur_ref_wdog, CUR_CMD_TIMEOUT);
     
     WatchDog_rearm(&o->trq_fbk_wdog);
     WatchDog_rearm(&o->vel_ref_wdog);
+    WatchDog_rearm(&o->trq_ref_wdog);
+    WatchDog_rearm(&o->pwm_ref_wdog);
+    WatchDog_rearm(&o->cur_ref_wdog);
 
 #if defined(MC_use_embot_app_mc_Trajectory)
     if(nullptr == o->traj)
@@ -167,6 +177,8 @@ void Joint_reset_calibration_data(Joint* o)
     o->running_calibration.type = eomc_calibration_typeUndefined;
 }
 
+static void Joint_send_debug_message(const char *message, uint8_t jid, uint16_t par16, uint64_t par64);
+
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 {
     o->ID = ID;
@@ -214,7 +226,16 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 #endif  
     
     WatchDog_set_base_time_msec(&o->vel_ref_wdog, config->velocitysetpointtimeout);
+    WatchDog_set_base_time_msec(&o->cur_ref_wdog, config->currentsetpointtimeout);
+    WatchDog_set_base_time_msec(&o->pwm_ref_wdog, config->openloopsetpointtimeout);
+    WatchDog_set_base_time_msec(&o->trq_ref_wdog, config->torquesetpointtimeout);
+    WatchDog_set_base_time_msec(&o->trq_fbk_wdog, config->torquefeedbacktimeout);
+
     WatchDog_rearm(&o->vel_ref_wdog);
+    WatchDog_rearm(&o->trq_ref_wdog);
+    WatchDog_rearm(&o->pwm_ref_wdog);
+    WatchDog_rearm(&o->cur_ref_wdog);
+    WatchDog_rearm(&o->trq_fbk_wdog);
     
     // TODOALE joint admittance missing
     o->Kadmitt = ZERO;
@@ -366,13 +387,21 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
         //    control_mode = eomc_controlmode_cmd_vel_direct;
         //    break;
         case eomc_controlmode_cmd_vel_direct:
+            WatchDog_rearm(&o->vel_ref_wdog);
+            break;
+        case eomc_controlmode_cmd_openloop:
+            WatchDog_rearm(&o->pwm_ref_wdog);
+            break;
+        case eomc_controlmode_cmd_current:
+            WatchDog_rearm(&o->cur_ref_wdog);
+            break;
+        case eomc_controlmode_cmd_torque:
+            WatchDog_rearm(&o->trq_ref_wdog);
+            break;
         case eomc_controlmode_cmd_idle:
         case eomc_controlmode_cmd_mixed:
         case eomc_controlmode_cmd_position:
         case eomc_controlmode_cmd_direct:
-        case eomc_controlmode_cmd_openloop:
-        case eomc_controlmode_cmd_current:
-        case eomc_controlmode_cmd_torque:
             break;
             
         default:
@@ -422,27 +451,50 @@ void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk)
 }
 
 BOOL Joint_check_faults(Joint* o)
-{
-    if (WatchDog_check_expired(&o->trq_fbk_wdog))
-    {
-        o->trq_fbk = ZERO;
-        o->trq_ref = ZERO;
-        o->trq_err = ZERO;
-        
-        if (o->trq_control_active)
-        {
-            o->fault_state.bits.torque_sensor_timeout = TRUE;
-            
-            o->control_mode = eomc_controlmode_hwFault;
-        }
-    }
-    
+{    
     if ((o->control_mode != eomc_controlmode_notConfigured) && (o->control_mode != eomc_controlmode_calib))
     {
         if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
         {
             o->fault_state.bits.hard_limit_reached = TRUE;
-            
+            o->control_mode = eomc_controlmode_hwFault;
+        }
+    }
+    
+    if (o->trq_control_active) 
+    {
+        if (WatchDog_check_expired(&o->trq_fbk_wdog))
+        {
+            o->trq_fbk = ZERO;
+            o->trq_ref = ZERO;
+            o->trq_err = ZERO;
+      
+            o->fault_state.bits.torque_sensor_timeout = TRUE;
+            o->control_mode = eomc_controlmode_hwFault;
+        }
+    }
+
+    if (o->control_mode == eomc_controlmode_torque)
+    {
+        if (WatchDog_check_expired(&o->trq_ref_wdog))
+        {  
+            o->fault_state.bits.torque_ref_timeout = TRUE; 
+            o->control_mode = eomc_controlmode_hwFault;
+        }
+    }
+    else if (o->control_mode == eomc_controlmode_current)
+    {
+        if (WatchDog_check_expired(&o->cur_ref_wdog))
+        {   
+            o->fault_state.bits.current_ref_timeout = TRUE; 
+            o->control_mode = eomc_controlmode_hwFault;
+        }
+    }
+    else if (o->control_mode == eomc_controlmode_openloop)
+    {
+        if (WatchDog_check_expired(&o->pwm_ref_wdog))
+        {   
+            o->fault_state.bits.pwm_ref_timeout = TRUE;
             o->control_mode = eomc_controlmode_hwFault;
         }
     }
@@ -465,6 +517,60 @@ BOOL Joint_check_faults(Joint* o)
             descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
             descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+            
+            eOmc_motor_status_t *mstatus = NULL;
+            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
+            if (NULL != mstatus)
+            {
+                mstatus->mc_fault_state = descriptor.code;
+            }
+        }
+        
+        if (o->fault_state.bits.torque_ref_timeout && !o->fault_state_prec.bits.torque_ref_timeout)
+        {   
+            static eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = eoerror_value_MC_ref_timeout_torque;
+            descriptor.par64 = 0;
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+            
+            eOmc_motor_status_t *mstatus = NULL;
+            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
+            if (NULL != mstatus)
+            {
+                mstatus->mc_fault_state = descriptor.code;
+            }
+        }
+        
+        if (o->fault_state.bits.current_ref_timeout && !o->fault_state_prec.bits.current_ref_timeout)
+        {   
+            static eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = eoerror_value_MC_ref_timeout_current;
+            descriptor.par64 = 0;
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+            
+            eOmc_motor_status_t *mstatus = NULL;
+            mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), o->ID);
+            if (NULL != mstatus)
+            {
+                mstatus->mc_fault_state = descriptor.code;
+            }
+        }
+        
+        if (o->fault_state.bits.pwm_ref_timeout && !o->fault_state_prec.bits.pwm_ref_timeout)
+        {   
+            static eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = eoerror_value_MC_ref_timeout_pwm;
+            descriptor.par64 = 0;
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
             
             eOmc_motor_status_t *mstatus = NULL;
@@ -1256,6 +1362,8 @@ BOOL Joint_set_vel_raw(Joint* o, CTRL_UNITS vel_ref)
 
 BOOL Joint_set_trq_ref(Joint* o, CTRL_UNITS trq_ref)
 {
+    WatchDog_rearm(&o->trq_ref_wdog);
+    
     if (o->control_mode != eomc_controlmode_torque)
     {
         return FALSE;
@@ -1268,6 +1376,8 @@ BOOL Joint_set_trq_ref(Joint* o, CTRL_UNITS trq_ref)
 
 BOOL Joint_set_pwm_ref(Joint* o, CTRL_UNITS pwm_ref)
 {
+    WatchDog_rearm(&o->pwm_ref_wdog);
+    
     if (o->control_mode != eomc_controlmode_openloop)
     {
         return FALSE;
@@ -1280,6 +1390,8 @@ BOOL Joint_set_pwm_ref(Joint* o, CTRL_UNITS pwm_ref)
 
 BOOL Joint_set_cur_ref(Joint* o, CTRL_UNITS cur_ref)
 {
+    WatchDog_rearm(&o->cur_ref_wdog);
+    
     if (o->control_mode != eomc_controlmode_current)
     {
         return FALSE;
