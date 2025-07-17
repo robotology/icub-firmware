@@ -609,6 +609,12 @@ extern void Joint_clear_faults(Joint* o)
 {
     o->fault_state_prec.bitmask = 0;
     o->fault_state.bitmask = 0;
+    
+    WatchDog_rearm(&o->vel_ref_wdog);
+    WatchDog_rearm(&o->trq_ref_wdog);
+    WatchDog_rearm(&o->pwm_ref_wdog);
+    WatchDog_rearm(&o->cur_ref_wdog);
+    WatchDog_rearm(&o->trq_fbk_wdog);
 }
 
 int8_t Joint_check_limits(Joint* o)
