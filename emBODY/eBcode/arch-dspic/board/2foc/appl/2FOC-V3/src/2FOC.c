@@ -847,16 +847,18 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                     long IsF = __builtin_mulss(speed_error,SKp) + __builtin_mulss(SKff,CtrlReferences.WRef);
                 
                     long IsT = IsA + IsF;
+                    
+                    long IntLimit = ((long)Ipeak)<<SKs;
         
-                    if (IsT > SIntLimit)
+                    if (IsT > IntLimit)
                     {
-                        IsA = SIntLimit - IsF;
-                        IsT = SIntLimit;
+                        IsA = IntLimit - IsF;
+                        IsT = IntLimit;
                     }
-                    else if (IsT < -SIntLimit)
+                    else if (IsT < -IntLimit)
                     {
-                        IsA = -SIntLimit - IsF;
-                        IsT = -SIntLimit;
+                        IsA = -IntLimit - IsF;
+                        IsT = -IntLimit;
                     }
 
                     IqRef = (int)(IsT>>SKs);
