@@ -14,7 +14,7 @@
 
 
 constexpr extern uint8_t  Firmware_vers = 1;
-constexpr extern uint8_t  Revision_vers = 1;
+constexpr extern uint8_t  Revision_vers = 2;
 constexpr extern uint8_t  Build_number  = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
