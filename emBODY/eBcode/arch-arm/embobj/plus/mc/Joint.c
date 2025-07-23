@@ -509,13 +509,14 @@ BOOL Joint_check_faults(Joint* o)
         
     if (o->fault_state.bitmask != o->fault_state_prec.bitmask)
     {        
+        static eOerrmanDescriptor_t descriptor = {0};
+        descriptor.par64 = 0;
+        descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+        descriptor.sourceaddress = 0;
+                    
         if (o->fault_state.bits.torque_sensor_timeout && !o->fault_state_prec.bits.torque_sensor_timeout)
         {   
-            static eOerrmanDescriptor_t descriptor = {0};
             descriptor.par16 = o->ID;
-            descriptor.par64 = 0;
-            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-            descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
             
@@ -529,11 +530,7 @@ BOOL Joint_check_faults(Joint* o)
         
         if (o->fault_state.bits.torque_ref_timeout && !o->fault_state_prec.bits.torque_ref_timeout)
         {   
-            static eOerrmanDescriptor_t descriptor = {0};
             descriptor.par16 = eoerror_value_MC_ref_timeout_torque;
-            descriptor.par64 = 0;
-            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-            descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
             
@@ -547,11 +544,7 @@ BOOL Joint_check_faults(Joint* o)
         
         if (o->fault_state.bits.current_ref_timeout && !o->fault_state_prec.bits.current_ref_timeout)
         {   
-            static eOerrmanDescriptor_t descriptor = {0};
             descriptor.par16 = eoerror_value_MC_ref_timeout_current;
-            descriptor.par64 = 0;
-            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-            descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
             
@@ -565,11 +558,7 @@ BOOL Joint_check_faults(Joint* o)
         
         if (o->fault_state.bits.pwm_ref_timeout && !o->fault_state_prec.bits.pwm_ref_timeout)
         {   
-            static eOerrmanDescriptor_t descriptor = {0};
             descriptor.par16 = eoerror_value_MC_ref_timeout_pwm;
-            descriptor.par64 = 0;
-            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-            descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_ref_setpoint_timeout);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
             
@@ -583,11 +572,7 @@ BOOL Joint_check_faults(Joint* o)
         
         if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
         {   
-            static eOerrmanDescriptor_t descriptor = {0};
             descriptor.par16 = o->ID;
-            descriptor.par64 = 0;
-            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-            descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
             
