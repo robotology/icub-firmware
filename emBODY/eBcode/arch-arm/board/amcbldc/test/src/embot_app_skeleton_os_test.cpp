@@ -313,7 +313,7 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			constexpr uint8_t sizeOfCins = 100;
             // Create an array that stores 10 reading for the CIN, then we do a simple mean of those
             // to apply a second filtering to the currents read
-            std::array<float, sizeOfCins> arrayOfCins {};
+            static std::array<float, sizeOfCins> arrayOfCins {};
             
             for(uint8_t i = 0; i < arrayOfCins.size(); ++i)
             {
