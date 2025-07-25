@@ -14,7 +14,7 @@
 
 
 constexpr extern uint8_t  Firmware_vers = 1;
-constexpr extern uint8_t  Revision_vers = 1;
+constexpr extern uint8_t  Revision_vers = 2;
 constexpr extern uint8_t  Build_number  = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -40,6 +40,8 @@ constexpr extern uint8_t  Build_number  = 0;
 #include "analog.h"
 #include "pwm.h"
 #include "encoder.h"
+
+#include <numeric>
 
 #include "tests.h"
 
@@ -308,7 +310,18 @@ namespace embot { namespace app { namespace skeleton { namespace os { namespace 
 			
             uint8_t data[8] {0};
             float cin {0.00};
-			cin = embot::hw::bsp::amcbldc::getCIN();
+			constexpr uint8_t sizeOfCins = 100;
+            // Create an array that stores 10 reading for the CIN, then we do a simple mean of those
+            // to apply a second filtering to the currents read
+            static std::array<float, sizeOfCins> arrayOfCins {};
+            
+            for(uint8_t i = 0; i < arrayOfCins.size(); ++i)
+            {
+                arrayOfCins[i] = embot::hw::bsp::amcbldc::getCIN();
+            }
+            
+
+			cin = std::accumulate(arrayOfCins.begin(), arrayOfCins.end(), 0.0) / sizeOfCins;
 
 			embot::core::print("Cin : " + std::to_string(cin));
 			
