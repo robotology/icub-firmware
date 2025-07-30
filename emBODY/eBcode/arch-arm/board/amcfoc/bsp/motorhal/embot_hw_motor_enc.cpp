@@ -439,7 +439,7 @@ void encoder1_test(void)
 {   
     static bool onceonly_initted {false};
     static uint8_t  Enc1Divider = 4;   
-    static uint16_t Enc1SlotsNumber = 1024;    
+    static uint16_t Enc1SlotsNumber = 4000;    
     if(false == onceonly_initted)
     {
         if (true == Enc1Init((embot::hw::MOTOR) 0))
@@ -460,7 +460,7 @@ void encoder1_test(void)
                     "tick Enc1GetRotorPosition: " +
                     std::to_string(Enc1GetCounter()) +
                     " angle: " +
-                    std::to_string(Enc1GetRotorPosition()/Enc1SlotsNumber*360.0/Enc1Divider) + 
+                    std::to_string(Enc1GetRotorPosition()*360.0/Enc1SlotsNumber/Enc1Divider) + 
                     "  Enc1RotorZero: " +
                     std::to_string( _enc_internals._items[0].data.encIndexCounter) +
                     " angle as counter*factor: " +
