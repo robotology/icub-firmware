@@ -427,13 +427,19 @@ float GetencFirstIndexCrossAngle(embot::hw::MOTOR m)
     return _enc_internals._items[motorIndex].data.encFirstIndexCross*_enc_internals._items[motorIndex].conversionfactor;
 }
 
+int32_t Enc1GetCounter(void)
+{
+    /* Read counter 32 bits value */
+    return __HAL_TIM_GetCounter(&htimEnc1);
+}
+
 
 //for debug
 void encoder1_test(void)
 {   
     static bool onceonly_initted {false};
     static uint8_t  Enc1Divider = 4;   
-    static uint16_t Enc1SlotsNumber = 1024;    
+    static uint16_t Enc1SlotsNumber = 4000;    
     if(false == onceonly_initted)
     {
         if (true == Enc1Init((embot::hw::MOTOR) 0))
@@ -443,7 +449,7 @@ void encoder1_test(void)
         }
     }
     static uint8_t ii=0;
-    if (ii++%5 == 0)
+    if (ii++%10 == 0)
     {
         int32_t anglenew = __HAL_TIM_GetCounter(&htimEnc1);
         embot::core::print
@@ -452,9 +458,9 @@ void encoder1_test(void)
     //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_11)? "H" : "L" +
     //                    HAL_GPIO_ReadPin(GPIOH, GPIO_PIN_12)? "H" : "L " +
                     "tick Enc1GetRotorPosition: " +
-                    std::to_string(Enc1GetRotorPosition()) +
+                    std::to_string(Enc1GetCounter()) +
                     " angle: " +
-                    std::to_string(Enc1GetRotorPosition()/Enc1SlotsNumber*360.0/Enc1Divider) + 
+                    std::to_string(Enc1GetRotorPosition()*360.0/Enc1SlotsNumber/Enc1Divider) + 
                     "  Enc1RotorZero: " +
                     std::to_string( _enc_internals._items[0].data.encIndexCounter) +
                     " angle as counter*factor: " +

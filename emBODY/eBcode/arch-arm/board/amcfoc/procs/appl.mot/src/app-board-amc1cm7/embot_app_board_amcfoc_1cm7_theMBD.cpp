@@ -943,6 +943,9 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
             embot::core::print(
                     "encoder angle:  " +
                     std::to_string( (int32_t) embot::hw::motor::enc::angle(static_cast<embot::hw::MOTOR> (0) ) )
+                    +
+                    " encoder counter:  " +
+                     std::to_string( embot::hw::motor::enc::Enc1GetCounter() )       
         );
     }
 #endif //defined(TEST_Quad_Encoder_Mot_1)
