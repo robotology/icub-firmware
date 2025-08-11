@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 9.2
+// Model version                  : 9.13
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jul  9 14:15:17 2025
+// C/C++ source code generated on : Thu Aug  7 11:08:14 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -18,6 +18,7 @@
 //
 #include "control_foc.h"
 #include "control_foc_types.h"
+#include "rtwtypes.h"
 #include "FOCInnerLoop.h"
 
 // System initialize for referenced model: 'control_foc'
@@ -31,12 +32,13 @@ void control_foc_Init(DW_control_foc_f_T *localDW)
 
 // Output and update for referenced model: 'control_foc'
 void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
-                 *rtu_FocSlowInputs, FOCOutputs *rty_FOCOutputs,
-                 B_control_foc_c_T *localB, DW_control_foc_f_T *localDW,
-                 ZCE_control_foc_T *localZCE)
+                 *rtu_FocSlowInputs, const boolean_T *rtu_CalibrationDone,
+                 FOCOutputs *rty_FOCOutputs, B_control_foc_c_T *localB,
+                 DW_control_foc_f_T *localDW, ZCE_control_foc_T *localZCE)
 {
   // Outputs for Atomic SubSystem: '<Root>/FOC inner loop'
-  FOCInnerLoop(rtu_Sensors, &rtu_FocSlowInputs->actuator_configuration,
+  FOCInnerLoop(rtu_CalibrationDone, rtu_Sensors,
+               &rtu_FocSlowInputs->actuator_configuration,
                &rtu_FocSlowInputs->targets,
                &rtu_FocSlowInputs->control_outer_outputs, rty_FOCOutputs,
                &localB->FOCinnerloop, &localDW->FOCinnerloop,

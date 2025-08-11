@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller_single'.
 //
-// Model version                  : 4.4
+// Model version                  : 4.16
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Tue Jul  8 15:26:53 2025
+// C/C++ source code generated on : Mon Aug 11 10:31:52 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,9 +19,6 @@
 #ifndef motion_controller_single_types_h_
 #define motion_controller_single_types_h_
 #include "rtwtypes.h"
-
-// Includes for objects with custom storage classes
-#include "rtw_defines.h"
 #ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
 #define DEFINED_TYPEDEF_FOR_DriverSensors_
 
@@ -203,6 +200,34 @@ struct ReceivedEvents
 
 #endif
 
+#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
+#define DEFINED_TYPEDEF_FOR_FOCOutputs_
+
+struct FOCOutputs
+{
+  boolean_T calibrationdone;
+
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
+  real32_T Vabc[3];
+
+  // quadrature current
+  real32_T Iq_fbk;
+
+  // direct current
+  real32_T Id_fbk;
+
+  // RMS of Iq
+  real32_T Iq_rms;
+
+  // RMS of Id
+  real32_T Id_rms;
+};
+
+#endif
+
 #ifndef DEFINED_TYPEDEF_FOR_Thresholds_
 #define DEFINED_TYPEDEF_FOR_Thresholds_
 
@@ -303,32 +328,6 @@ struct JointData
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
-#define DEFINED_TYPEDEF_FOR_FOCOutputs_
-
-struct FOCOutputs
-{
-  // control effort (quadrature)
-  real32_T Vq;
-
-  // control effort (3-phases)
-  real32_T Vabc[3];
-
-  // quadrature current
-  real32_T Iq_fbk;
-
-  // direct current
-  real32_T Id_fbk;
-
-  // RMS of Iq
-  real32_T Iq_rms;
-
-  // RMS of Id
-  real32_T Id_rms;
-};
-
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
 #define DEFINED_TYPEDEF_FOR_EstimatedData_
 
@@ -380,6 +379,7 @@ struct Flags
   // 1. Search Index must be done
   // 2. Full calibration must be done
   CalibrationTypes calibration_type;
+  boolean_T calibration_done;
   boolean_T enable_sending_msg_status;
   HardwareFaults hw_faults;
   boolean_T enable_thermal_protection;
@@ -398,6 +398,58 @@ typedef enum {
   EstimationVelocityModes_MovingAverage,
   EstimationVelocityModes_LeastSquares
 } EstimationVelocityModes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+
+struct EstimationConfiguration
+{
+  real32_T environment_temperature;
+  real32_T current_rms_lambda;
+  EstimationVelocityModes velocity_est_mode;
+  uint32_T velocity_est_window;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+
+struct GlobalConfiguration
+{
+  EstimationConfiguration estimation;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+
+struct ControlOuterOutputs
+{
+  boolean_T vel_en;
+  boolean_T cur_en;
+  boolean_T out_en;
+  boolean_T pid_reset;
+  real32_T motorcurrent;
+  real32_T current_limiter;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+#define DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+
+struct FOCSlowInputs
+{
+  GlobalConfiguration global_configuration;
+  ActuatorConfiguration actuator_configuration;
+  EstimatedData estimated_data;
+  Targets targets;
+  ControlOuterOutputs control_outer_outputs;
+};
 
 #endif
 

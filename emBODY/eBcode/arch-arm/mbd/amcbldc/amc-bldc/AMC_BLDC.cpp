@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 10.6
+// Model version                  : 10.26
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Jul 10 11:34:58 2025
+// C/C++ source code generated on : Mon Aug 11 10:32:10 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,11 +20,13 @@
 #include "rtw_mutex.h"
 #include "rtwtypes.h"
 #include "AMC_BLDC_types.h"
+#include "control_foc.h"
 #include "can_decoder.h"
 #include "SupervisorFSM_TX.h"
 #include "can_encoder.h"
 #include "motion_controller_single.h"
-#include "rtw_defines.h"
+
+const boolean_T AMC_BLDC_BGND = false; // boolean_T ground
 
 // Exported block parameters
 ActuatorConfiguration AmcbldcInitConf = {
@@ -108,17 +110,17 @@ ActuatorConfiguration AmcbldcInitConf = {
 
 
 real32_T CAN_ANGLE_DEG2ICUB = 182.044449F;// Variable: CAN_ANGLE_DEG2ICUB
-                                             //  Referenced by: '<S1>/CAN_Encoder'
+                                             //  Referenced by: '<S3>/CAN_Encoder'
                                              //  2^16/360
 
 real32_T CAN_ANGLE_ICUB2DEG = 0.00549316406F;// Variable: CAN_ANGLE_ICUB2DEG
-                                                //  Referenced by: '<S1>/CAN_Decoder'
+                                                //  Referenced by: '<S3>/CAN_Decoder'
                                                 //  360/2^16
 
 uint8_T CAN_ID_AMC = 3U;               // Variable: CAN_ID_AMC
                                           //  Referenced by:
-                                          //    '<S1>/CAN_Decoder'
-                                          //    '<S1>/CAN_Encoder'
+                                          //    '<S3>/CAN_Decoder'
+                                          //    '<S3>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 
@@ -142,10 +144,9 @@ RT_MODEL_AMC_BLDC_T *const AMC_BLDC_M = &AMC_BLDC_M_;
 void AMC_BLDC_step0(void)              // Sample time: [5e-06s, 0.0s]
 {
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element1'
+  //   Inport generated from: '<Root>/In Bus Element5'
   //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element3'
-  //   Outport generated from: '<Root>/Out Bus Element'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
@@ -157,25 +158,41 @@ void AMC_BLDC_step_FOC(void)           // Sample time: [4.5e-05s, 0.0s]
 {
   int8_T wrBufIdx;
 
-  // ModelReference: '<Root>/Motion Controller Single' incorporates:
+  // RateTransition generated from: '<Root>/Component1'
+  rtw_mutex_lock();
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_RD =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_Ls;
+  rtw_mutex_unlock();
+
+  // RateTransition generated from: '<Root>/Component1'
+  AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0 =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_Bu[AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_RD];
+
+  // ModelReference: '<Root>/FOC' incorporates:
   //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element'
 
-  motion_controller_singleTID1(&AMC_BLDC_U.SensorsData_p,
-    &AMC_BLDC_Y.ControlOutputs,
-    &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtdw));
+  control_foc(&AMC_BLDC_U.SensorsData_p,
+              &AMC_BLDC_B.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0,
+              (const_cast<boolean_T*>(&AMC_BLDC_BGND)),
+              &AMC_BLDC_Y.ControlOutputs, &(AMC_BLDC_DW.FOC_InstanceData.rtb),
+              &(AMC_BLDC_DW.FOC_InstanceData.rtdw),
+              &(AMC_BLDC_DW.FOC_InstanceData.rtzce));
 
-  // RateTransition generated from: '<Root>/SupervisorFSM_TX' incorporates:
+  // RateTransition generated from: '<Root>/Component2' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element'
 
   rtw_mutex_lock();
   wrBufIdx = static_cast<int8_T>
-    (AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_LstBufWR + 1);
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_Ls +
+     1);
   if (wrBufIdx == 3) {
     wrBufIdx = 0;
   }
 
-  if (wrBufIdx == AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_RDBuf) {
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_RD)
+  {
     wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
     if (wrBufIdx == 3) {
       wrBufIdx = 0;
@@ -185,88 +202,194 @@ void AMC_BLDC_step_FOC(void)           // Sample time: [4.5e-05s, 0.0s]
   rtw_mutex_unlock();
   switch (wrBufIdx) {
    case 0:
-    AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_Buf0 = AMC_BLDC_Y.ControlOutputs;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_Bu =
+      AMC_BLDC_Y.ControlOutputs;
     break;
 
    case 1:
-    AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_Buf1 = AMC_BLDC_Y.ControlOutputs;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0__h =
+      AMC_BLDC_Y.ControlOutputs;
     break;
 
    case 2:
-    AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_Buf2 = AMC_BLDC_Y.ControlOutputs;
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0__a =
+      AMC_BLDC_Y.ControlOutputs;
     break;
   }
 
-  AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_LstBufWR = wrBufIdx;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_Ls =
+    wrBufIdx;
 
-  // End of RateTransition generated from: '<Root>/SupervisorFSM_TX'
+  // End of RateTransition generated from: '<Root>/Component2'
+
+  // RateTransition generated from: '<Root>/Motion Controller Single' incorporates:
+  //   Outport generated from: '<Root>/Out Bus Element'
+
+  rtw_mutex_lock();
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_LstBufWR + 1);
+  if (wrBufIdx == 3) {
+    wrBufIdx = 0;
+  }
+
+  if (wrBufIdx == AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_RDBuf) {
+    wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+  }
+
+  rtw_mutex_unlock();
+  switch (wrBufIdx) {
+   case 0:
+    AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_Buf0 =
+      AMC_BLDC_Y.ControlOutputs;
+    break;
+
+   case 1:
+    AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_Buf1 =
+      AMC_BLDC_Y.ControlOutputs;
+    break;
+
+   case 2:
+    AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_Buf2 =
+      AMC_BLDC_Y.ControlOutputs;
+    break;
+  }
+
+  AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_LstBufWR = wrBufIdx;
+
+  // End of RateTransition generated from: '<Root>/Motion Controller Single'
+
+  // ModelReference: '<Root>/Motion Controller Single' incorporates:
+  //   Inport generated from: '<Root>/In Bus Element6'
+
+  motion_controller_singleTID1(&AMC_BLDC_U.SensorsData_p,
+    &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtdw));
 }
 
 // Model step function for TID2
 void AMC_BLDC_step_1ms(void)           // Sample time: [0.001s, 0.0s]
 {
-  FOCOutputs rtb_TmpRTBAtSupervisorFSM_TXInport4;
+  FOCOutputs rtb_RTBInsertedForAdapter_InsertedFor_Component2_at_outport_;
+  int8_T wrBufIdx;
 
-  // ModelReference: '<S1>/CAN_Decoder' incorporates:
+  // ModelReference: '<S3>/CAN_Decoder' incorporates:
   //   Inport generated from: '<Root>/In Bus Element2'
 
   can_decoder(&AMC_BLDC_U.PacketsRx, &AMC_BLDC_B.CAN_Decoder[0],
               &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtb),
               &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtdw));
 
+  // RateTransition generated from: '<Root>/Motion Controller Single'
+  rtw_mutex_lock();
+  AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_RDBuf =
+    AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_LstBufWR;
+  rtw_mutex_unlock();
+  switch (AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_RDBuf) {
+   case 0:
+    // RateTransition generated from: '<Root>/Motion Controller Single'
+    AMC_BLDC_B.TmpRTBAtMotionControllerSingleInport4 =
+      AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_Buf0;
+    break;
+
+   case 1:
+    // RateTransition generated from: '<Root>/Motion Controller Single'
+    AMC_BLDC_B.TmpRTBAtMotionControllerSingleInport4 =
+      AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_Buf1;
+    break;
+
+   case 2:
+    // RateTransition generated from: '<Root>/Motion Controller Single'
+    AMC_BLDC_B.TmpRTBAtMotionControllerSingleInport4 =
+      AMC_BLDC_DW.TmpRTBAtMotionControllerSingleInport4_Buf2;
+    break;
+  }
+
+  // End of RateTransition generated from: '<Root>/Motion Controller Single'
+
   // ModelReference: '<Root>/Motion Controller Single' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element1'
+  //   Inport generated from: '<Root>/In Bus Element5'
   //   Outport generated from: '<Root>/Out Bus Element3'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
   mc_1ms_tick(&AMC_BLDC_U.ExternalFlags_p, &AMC_BLDC_B.CAN_Decoder[0],
+              &AMC_BLDC_B.TmpRTBAtMotionControllerSingleInport4,
               &AMC_BLDC_Y.EstimatedData_p, &AMC_BLDC_Y.Flags_p,
               &AMC_BLDC_Y.ConfigurationParameters,
-              &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtb),
+              &AMC_BLDC_B.MotionControllerSingle_o4,
               &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtdw));
 
-  // RateTransition generated from: '<Root>/SupervisorFSM_TX'
+  // RateTransition generated from: '<Root>/Component2'
   rtw_mutex_lock();
-  AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_RDBuf =
-    AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_LstBufWR;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_RD =
+    AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_Ls;
   rtw_mutex_unlock();
-  switch (AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_RDBuf) {
+  switch
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_RD) {
    case 0:
-    rtb_TmpRTBAtSupervisorFSM_TXInport4 =
-      AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_Buf0;
+    rtb_RTBInsertedForAdapter_InsertedFor_Component2_at_outport_ =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_Bu;
     break;
 
    case 1:
-    rtb_TmpRTBAtSupervisorFSM_TXInport4 =
-      AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_Buf1;
+    rtb_RTBInsertedForAdapter_InsertedFor_Component2_at_outport_ =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0__h;
     break;
 
    case 2:
-    rtb_TmpRTBAtSupervisorFSM_TXInport4 =
-      AMC_BLDC_DW.TmpRTBAtSupervisorFSM_TXInport4_Buf2;
+    rtb_RTBInsertedForAdapter_InsertedFor_Component2_at_outport_ =
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0__a;
     break;
   }
 
-  // End of RateTransition generated from: '<Root>/SupervisorFSM_TX'
+  // End of RateTransition generated from: '<Root>/Component2'
 
   // ModelReference generated from: '<Root>/SupervisorFSM_TX' incorporates:
-  //   Inport generated from: '<Root>/In Bus Element1'
+  //   Inport generated from: '<Root>/In Bus Element5'
   //   Inport generated from: '<Root>/In Bus Element6'
   //   Outport generated from: '<Root>/Out Bus Element2'
   //   Outport generated from: '<Root>/Out Bus Element4'
 
   SupervisorFSM_TX(&AMC_BLDC_U.SensorsData_p, &AMC_BLDC_Y.EstimatedData_p,
-                   &AMC_BLDC_Y.Flags_p, &rtb_TmpRTBAtSupervisorFSM_TXInport4,
+                   &AMC_BLDC_Y.Flags_p,
+                   &rtb_RTBInsertedForAdapter_InsertedFor_Component2_at_outport_,
                    &AMC_BLDC_U.ExternalFlags_p.fault_button,
                    &AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2,
                    &(AMC_BLDC_DW.SupervisorFSM_TX_InstanceData.rtdw));
 
-  // ModelReference: '<S1>/CAN_Encoder' incorporates:
+  // ModelReference: '<S3>/CAN_Encoder' incorporates:
   //   Outport generated from: '<Root>/Out Bus Element1'
 
   can_encoder(&AMC_BLDC_B.MessagesTx, &AMC_BLDC_B.SupervisorFSM_TX_o2,
               &AMC_BLDC_Y.PacketsTx);
+
+  // RateTransition generated from: '<Root>/Component1'
+  rtw_mutex_lock();
+  wrBufIdx = static_cast<int8_T>
+    (AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_Ls +
+     1);
+  if (wrBufIdx == 3) {
+    wrBufIdx = 0;
+  }
+
+  if (wrBufIdx ==
+      AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_RD)
+  {
+    wrBufIdx = static_cast<int8_T>(wrBufIdx + 1);
+    if (wrBufIdx == 3) {
+      wrBufIdx = 0;
+    }
+  }
+
+  rtw_mutex_unlock();
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_Bu[wrBufIdx]
+    = AMC_BLDC_B.MotionControllerSingle_o4;
+  AMC_BLDC_DW.RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_Ls =
+    wrBufIdx;
+
+  // End of RateTransition generated from: '<Root>/Component1'
 }
 
 // Model initialize function
@@ -279,11 +402,14 @@ void AMC_BLDC_initialize(void)
   (AMC_BLDC_M)->Timing.TaskCounters.cLimit[1] = 9;
   (AMC_BLDC_M)->Timing.TaskCounters.cLimit[2] = 200;
 
-  // Model Initialize function for ModelReference Block: '<S1>/CAN_Decoder'
+  // Model Initialize function for ModelReference Block: '<Root>/FOC'
+  control_foc_initialize(&(AMC_BLDC_DW.FOC_InstanceData.rtzce));
+
+  // Model Initialize function for ModelReference Block: '<S3>/CAN_Decoder'
   can_decoder_initialize(AMC_BLDC_M->getErrorStatusPointer(),
     &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtm));
 
-  // Model Initialize function for ModelReference Block: '<S1>/CAN_Encoder'
+  // Model Initialize function for ModelReference Block: '<S3>/CAN_Encoder'
   can_encoder_initialize(AMC_BLDC_M->getErrorStatusPointer(),
     &(AMC_BLDC_DW.CAN_Encoder_InstanceData.rtm));
 
@@ -292,10 +418,19 @@ void AMC_BLDC_initialize(void)
                 &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtm),
                 &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtdw));
 
-  // Start for RateTransition generated from: '<Root>/SupervisorFSM_TX'
+  // Start for RateTransition generated from: '<Root>/Component1'
   rtw_mutex_init();
 
-  // SystemInitialize for ModelReference: '<S1>/CAN_Decoder'
+  // Start for RateTransition generated from: '<Root>/Component2'
+  rtw_mutex_init();
+
+  // Start for RateTransition generated from: '<Root>/Motion Controller Single'
+  rtw_mutex_init();
+
+  // SystemInitialize for ModelReference: '<Root>/FOC'
+  control_foc_Init(&(AMC_BLDC_DW.FOC_InstanceData.rtdw));
+
+  // SystemInitialize for ModelReference: '<S3>/CAN_Decoder'
   can_decoder_Init(&(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtb),
                    &(AMC_BLDC_DW.CAN_Decoder_InstanceData.rtdw));
 
@@ -304,7 +439,7 @@ void AMC_BLDC_initialize(void)
   //   Outport generated from: '<Root>/Out Bus Element4'
 
   motion_controller_single_Init(&AMC_BLDC_Y.Flags_p,
-    &AMC_BLDC_Y.ConfigurationParameters,
+    &AMC_BLDC_Y.ConfigurationParameters, &AMC_BLDC_B.MotionControllerSingle_o4,
     &(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtdw));
 
   // SystemInitialize for ModelReference generated from: '<Root>/SupervisorFSM_TX' 
@@ -321,7 +456,13 @@ void AMC_BLDC_terminate(void)
   // Terminate for ModelReference: '<Root>/Motion Controller Single'
   mc_terminate(&(AMC_BLDC_DW.MotionControllerSingle_InstanceData.rtdw));
 
-  // Terminate for RateTransition generated from: '<Root>/SupervisorFSM_TX'
+  // Terminate for RateTransition generated from: '<Root>/Component1'
+  rtw_mutex_destroy();
+
+  // Terminate for RateTransition generated from: '<Root>/Component2'
+  rtw_mutex_destroy();
+
+  // Terminate for RateTransition generated from: '<Root>/Motion Controller Single' 
   rtw_mutex_destroy();
 }
 
