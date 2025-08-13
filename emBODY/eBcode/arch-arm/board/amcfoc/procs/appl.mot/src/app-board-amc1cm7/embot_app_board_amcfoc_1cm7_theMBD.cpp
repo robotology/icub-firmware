@@ -45,6 +45,7 @@ uint8_t readHALL = 0;
 //#define DEBUG_PWM_min_0perc
 
 //#define TEST_Quad_Encoder_Mot_1
+#define TEST_ADC_Analog
 
 #if defined(TEST_Quad_Encoder_Mot_1)
     int32_t angle_global=0;
@@ -949,6 +950,27 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
         );
     }
 #endif //defined(TEST_Quad_Encoder_Mot_1)
+
+#if defined(TEST_ADC_Analog)
+            
+    static uint16_t ii=1;
+    if (ii++%500 == 0)
+        embot::core::print(
+                "Input current (A):  " + std::to_string( embot::hw::analog::getCin() )
+                +
+                " Input voltage (V):  " + std::to_string( embot::hw::analog::getVin() )
+                +  
+                " Core temperature (C):  " + std::to_string( embot::hw::analog::getCoreTemp() )
+                +  
+                " T-Driver 1 temperature (C):  " + std::to_string( embot::hw::analog::getMot1Temp() )
+                +  
+                " T-Driver 2 temperature (C):  " + std::to_string( embot::hw::analog::getMot2Temp() )
+    );
+    
+#endif //defined(TEST_ADC_Analog)
+
+
+
     
 #else
 
