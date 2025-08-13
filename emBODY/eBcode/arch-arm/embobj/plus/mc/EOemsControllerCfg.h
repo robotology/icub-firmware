@@ -88,11 +88,13 @@ typedef enum {
 #define TICKS_PER_REVOLUTION      65536
 #define TICKS_PER_HALF_REVOLUTION 32768
 #define ENCODER_QUANTIZATION      16
-    
-#define VELOCITY_CMD_TIMEOUT      100 // cycles
-#define TORQUE_CMD_TIMEOUT        100 // cycles
-#define TORQUE_SENSOR_TIMEOUT     100 // cycles
-#define ENCODER_TIMEOUT            50 // cycles
+
+#define TRQ_SENSOR_TIMEOUT     100 // cycles
+
+#define VEL_CMD_TIMEOUT        100 // cycles
+#define PWM_CMD_TIMEOUT        100 // cycles
+#define CUR_CMD_TIMEOUT        100 // cycles
+#define TRQ_CMD_TIMEOUT        100 // cycles
 
 #define CAN_ALIVE_TIMEOUT  50
 #define CTRL_REQ_TIMEOUT   50

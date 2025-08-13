@@ -100,6 +100,10 @@ typedef union
     {
         uint8_t torque_sensor_timeout:1;
         uint8_t hard_limit_reached:1;
+        uint8_t velocity_ref_timeout:1;
+        uint8_t pwm_ref_timeout:1;
+        uint8_t current_ref_timeout:1;
+        uint8_t torque_ref_timeout;
     } bits;
         
     uint8_t bitmask;
@@ -175,7 +179,10 @@ struct Joint_hid
     CTRL_UNITS Kadmitt;
     
     WatchDog trq_fbk_wdog;
+    WatchDog trq_ref_wdog;
     WatchDog vel_ref_wdog;
+    WatchDog pwm_ref_wdog;
+    WatchDog cur_ref_wdog;
     
 #if defined(MC_use_embot_app_mc_Trajectory)    
     embot::app::mc::Trajectory *traj {nullptr};
