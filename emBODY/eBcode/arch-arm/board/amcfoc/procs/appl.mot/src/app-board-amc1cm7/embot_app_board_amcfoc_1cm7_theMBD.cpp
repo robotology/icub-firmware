@@ -45,7 +45,7 @@ uint8_t readHALL = 0;
 //#define DEBUG_PWM_min_0perc
 
 //#define TEST_Quad_Encoder_Mot_1
-#define TEST_ADC_Analog
+//#define TEST_ADC_Analog
 
 #if defined(TEST_Quad_Encoder_Mot_1)
     int32_t angle_global=0;
