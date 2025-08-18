@@ -962,9 +962,9 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
                 +  
                 " Core temperature (C):  " + std::to_string( embot::hw::analog::getCoreTemp() )
                 +  
-                " T-Driver 1 temperature (C):  " + std::to_string( embot::hw::analog::getMot1Temp() )
+                " T-Driver 1 temperature (C):  " + std::to_string( embot::hw::analog::getDriver1Temp() )
                 +  
-                " T-Driver 2 temperature (C):  " + std::to_string( embot::hw::analog::getMot2Temp() )
+                " T-Driver 2 temperature (C):  " + std::to_string( embot::hw::analog::getDriver2Temp() )
     );
     
 #endif //defined(TEST_ADC_Analog)

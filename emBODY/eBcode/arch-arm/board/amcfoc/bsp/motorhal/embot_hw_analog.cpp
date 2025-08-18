@@ -48,8 +48,8 @@ namespace embot::hw::analog {
     float getVin() { return 18.0f; }
     float getCin() { return 1.0f; }
     float getCoreTemp() { return 25.0f; }
-    float getMot1Temp() { return 25.0f; }
-    float getMot2Temp() { return 25.0f; }
+    float getDriver1Temp() { return 25.0f; }
+    float getDriver2Temp() { return 25.0f; }
        
 }
 
@@ -74,8 +74,8 @@ namespace embot::hw::analog {
     volatile float    AinVcc;                    /* Main 3.3V voltage (V) */
     volatile float    AinVcore;                  /* Core 1.2V voltage (V) */
     volatile float    AinCoreTemp;               /* Core temperature (C) */
-    volatile float    AinMot1Temp;               /* Motor 1 temperature (C) */    //temperature of the motor driver of T-drive
-    volatile float    AinMot2Temp;               /* Motor 2 temperature (C) */
+    volatile float    AinDriverMot1Temp;         /* Motor 1 temperature (C) */    //temperature of the motor driver of T-drive
+    volatile float    AinDriverMot2Temp;         /* Motor 2 temperature (C) */
 
     
     /* Calculate the VREFINT value given by the manufacturer */
@@ -112,17 +112,12 @@ namespace embot::hw::analog {
         AinLsb = (0 == AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VREFINT)])? ADC_LSB : AinVrefintCal/(float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VREFINT)];
         AinInputCurrent = CIN_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::CIN)] * AinLsb;
         AinInputVoltage = VIN_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VIN)] * AinLsb;
-        
-//        uint64_t t = embot::core::now(); 
-//        embot::core::TimeFormatter tf{t};
-//        embot::core::print(std::to_string(x) +" "+tf.to_string() +" "+ std::to_string(AinInputVoltage));
-
         AinVaux = VAUX_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VAUX)] * AinLsb;
         AinVcc = VCC_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VCC)] * AinLsb;
         AinVcore = VCORE_ATTEN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::VCORE)] * AinLsb;
         AinCoreTemp = AinTempGain_compensated * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::TEMP)] * AinLsb + AinTempOffs;
-        AinMot1Temp = PTC_GAIN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::PTC1)] * AinLsb + PTC_OFFS;
-        AinMot2Temp = PTC_GAIN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::PTC2)] * AinLsb + PTC_OFFS;
+        AinDriverMot1Temp = PTC_GAIN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::PTC1)] * AinLsb + PTC_OFFS;
+        AinDriverMot2Temp = PTC_GAIN * (float)AinAdc3Buffer[embot::core::tointegral(Ain3Channels::PTC2)] * AinLsb + PTC_OFFS;
     }
 
     /* Callback functions *************************************************************************************************/
@@ -211,14 +206,14 @@ namespace embot::hw::analog {
     }
     
     
-    float getMot1Temp()
+    float getDriver1Temp()
     {
-        return AinMot1Temp;
+        return AinDriverMot1Temp;
     }
     
-    float getMot2Temp()
+    float getDriver2Temp()
     {
-        return AinMot2Temp;
+        return AinDriverMot2Temp;
     }
     
     

@@ -28,8 +28,8 @@ namespace embot::hw::analog {
     float getVin();
     float getCin();
     float getCoreTemp();
-    float getMot1Temp();
-    float getMot2Temp();
+    float getDriver1Temp();
+    float getDriver2Temp();
     
     
         
