@@ -956,15 +956,15 @@ bool embot::app::board::amcfoc::cm7::theMBD::Impl::tick(const std::vector<embot:
     static uint16_t ii=1;
     if (ii++%500 == 0)
         embot::core::print(
-                "Input current (A):  " + std::to_string( embot::hw::analog::getCin() )
+                "Input current (A): "     + std::to_string( embot::hw::analog::getCin() )
                 +
-                " Input voltage (V):  " + std::to_string( embot::hw::analog::getVin() )
+                " Input voltage (V): "    + std::to_string( embot::hw::analog::getVin() )
                 +  
-                " Core temperature (C):  " + std::to_string( embot::hw::analog::getCoreTemp() )
+                " Core temperature (C): " + std::to_string( embot::hw::analog::getCoreTemp() )
                 +  
-                " T-Driver 1 temperature (C):  " + std::to_string( embot::hw::analog::getDriver1Temp() )
+                " T-Driver 1 temperature (C): " + std::to_string( embot::hw::analog::getDriver1Temp() )
                 +  
-                " T-Driver 2 temperature (C):  " + std::to_string( embot::hw::analog::getDriver2Temp() )
+                " T-Driver 2 temperature (C): " + std::to_string( embot::hw::analog::getDriver2Temp() )
     );
     
 #endif //defined(TEST_ADC_Analog)
