@@ -42,6 +42,7 @@ using namespace embot::core::binary;
 
 #include "embot_hw_spi.h"
 #include "embot_hw_spi_bsp.h"
+#include "embot_hw_spi_bsp_amc.h"
 
 #if !defined(EMBOT_ENABLE_hw_spi)
 
