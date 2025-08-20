@@ -844,6 +844,16 @@
               <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_flash_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_flash_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_gpio_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
               <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
@@ -867,6 +877,11 @@
               <FileName>embot_hw_timer_bsp_amc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_timer_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_testpoint_bsp_amc .cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_testpoint_bsp_amc .cpp</FilePath>
             </File>
           </Files>
         </Group>

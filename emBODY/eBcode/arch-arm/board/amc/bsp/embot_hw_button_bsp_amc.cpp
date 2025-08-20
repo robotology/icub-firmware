@@ -30,9 +30,6 @@
 #endif
 
 
-using namespace std;
-using namespace embot::core::binary;
-
 // --------------------------------------------------------------------------------------------------------------------
 // - configuration of peripherals and chips. it is done board by board. it contains a check vs correct STM32HAL_BOARD_*
 // --------------------------------------------------------------------------------------------------------------------

@@ -2017,6 +2017,8 @@ void J5power(bool on)
 
 //#if defined(EMBOT_ENABLE_hw_spi_123_atstartup)    
 #include "embot_hw_gpio.h"
+#include "embot_hw_spi.h"
+#include "embot_hw_spi_bsp.h"
 // it selects spi1 / spi2 / spi3 in connector J5
 void prepare_connector_j5_spi123()
 {

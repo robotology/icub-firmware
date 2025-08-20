@@ -39,8 +39,6 @@ using namespace embot::core::binary;
 #include "embot_hw_bsp_amc_config.h"
 
 
-// - support map: begin of embot::hw::eth
-
 #include "embot_hw_eth.h"
 #include "embot_hw_eth_bsp.h"
 
@@ -192,9 +190,6 @@ namespace embot::hw::eth::bsp {
     #endif //#if defined(HAL_ETH_MODULE_ENABLED)
             
 #endif // EMBOT_ENABLE_hw_eth
-
-
-// - support map: end of embot::hw::eth
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
