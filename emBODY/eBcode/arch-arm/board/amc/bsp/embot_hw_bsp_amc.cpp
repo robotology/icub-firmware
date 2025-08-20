@@ -1,7 +1,9 @@
 /*
- * Copyright (C) 2021 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Copyright (C) 2025 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:    Marco Accame
+ * email:     marco.accame@iit.it
+ * Coauthor:  Kevin Sangalli
+ * email:     kevin.sangalli@iit.it
 */
 
 
@@ -2030,7 +2032,7 @@ void prepare_connector_j5_spi123()
 }
 //#endif
 
-#if     !defined(EMBOT_ENABLE_hw_bsp_specialize)
+#if   !defined(EMBOT_ENABLE_hw_bsp_specialize)
 bool embot::hw::bsp::specialize() { return true; }
 #else   
 
