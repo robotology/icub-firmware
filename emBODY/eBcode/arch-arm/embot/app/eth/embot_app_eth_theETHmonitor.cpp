@@ -156,12 +156,13 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 	embot::app::eth::theETHmonitor::Impl *impl = reinterpret_cast<embot::app::eth::theETHmonitor::Impl*>(p);
 	
 	eOerrmanDescriptor_t errdes = {0};
+    
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
 	
 	if(impl->first_time)
 	{
 		errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_juststarted);
-		errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-		errdes.sourceaddress    = 0;
 		errdes.par16            = 0;
 		errdes.par64            = 0;
 		eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
@@ -183,8 +184,6 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 			if (false == impl->link1.previsup)
 			{
 				errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_link_goes_up);
-				errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-				errdes.sourceaddress    = 0;
 				errdes.par16            = 0;
 				errdes.par64            = applstate;
 				eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
@@ -196,8 +195,6 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 			if (true == impl->link1.previsup)
 			{
 				errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_link_goes_down);
-				errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-				errdes.sourceaddress    = 0;
 				errdes.par16            = 0;
 				errdes.par64            = applstate;
 				eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
@@ -210,8 +207,6 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 			if (false == impl->link2.previsup)
 			{
 				errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_link_goes_up);
-				errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-				errdes.sourceaddress    = 0;
 				errdes.par16            = 1;
 				errdes.par64            = applstate;
 				eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
@@ -223,8 +218,6 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 			if (true == impl->link2.previsup)
 			{
 				errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_link_goes_down);
-				errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-				errdes.sourceaddress    = 0;
 				errdes.par16            = 1;
 				errdes.par64            = applstate;
 				eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
@@ -237,8 +230,6 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 	else if(nowTime - impl->lastreportTime >= impl->_config.reportOKperiod)
 	{					
 		errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
-		errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-		errdes.sourceaddress    = 0;
 		errdes.par16            = link1isup | (link2isup << 1) | (true << 2);
 		errdes.par64            = applstate;
 		eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);  
@@ -253,8 +244,6 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
         if(0 != CRC_error_number)
         {
         errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_error_rxcrc);
-        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress    = 0;
         errdes.par16            = 0;
         errdes.par64            = applstate | (CRC_error_number & 0xffffffff);    
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
@@ -268,8 +257,6 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
         if(0 != CRC_error_number)
         {
         errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_error_rxcrc);
-        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress    = 0;
         errdes.par16            = 1;
         errdes.par64            = applstate | (CRC_error_number & 0xffffffff);    
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
@@ -277,21 +264,21 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
     }
     
       //test for CRC etc
-//    CRC_error_number = getnumberoferrors(embot::hw::PORT::three, embot::hw::eth::ERR::crc);
-//    uint64_t unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::unicast);
-//    static uint8_t iii=0;
-//    if((iii++)%100)
-//    {   
-//        
-//        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RxByteCnt);
-//        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
-//        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::TxByteCnt);
-//        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
-//        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::RxByteCnt);
-//        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
-//        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::TxByteCnt);
-//        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
-//    }
+//    uint64_t CRC_error_number = getnumberoferrors(embot::hw::PORT::three, embot::hw::eth::ERR::crc);
+    uint64_t unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::unicast);
+    static uint8_t iii=0;
+    if((iii++)%500)
+    {   
+        
+        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RxByteCnt);
+        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
+        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::TxByteCnt);
+        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
+        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::RxByteCnt);
+        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
+        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::TxByteCnt);
+        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
+    }
 }
 
 
