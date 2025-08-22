@@ -113,10 +113,21 @@ namespace embot::hw::chip {
             }        
         };
         
+        
+        static constexpr embot::hw::spi::Config standardspiconfig
+        {
+            embot::hw::spi::Prescaler::eight,
+            embot::hw::spi::DataSize::eight,
+            embot::hw::spi::Mode::zero,
+            { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull,    // | miso | mosi |
+               embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull} }  // | sclk | sel  |
+        };
+        
+        
         struct Config
         {   // contains: spi bus and ... tbd            
             embot::hw::SPI spi {embot::hw::SPI::five};
-            embot::hw::spi::Config spicfg {}; // w/ Mode::zero
+            embot::hw::spi::Config spicfg = standardspiconfig; // w/ Mode::zero   
             PinControl pincontrol {};
             constexpr Config() = default;
             constexpr Config(embot::hw::SPI s, const embot::hw::spi::Config &sc, const PinControl &pc) 
