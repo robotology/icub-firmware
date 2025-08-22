@@ -29,6 +29,7 @@ class TestRunnerBase
         virtual bool testQuadEncoder();
         virtual bool testSpiAeaEncoder(uint8_t *data);
         virtual bool testPWMChannelx(const uint8_t channel, uint8_t *data);
+        virtual bool testEEPROM(uint8_t *data);
 };
 
 #endif

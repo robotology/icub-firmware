@@ -28,6 +28,7 @@ class TestRunnerAmc_CM7 : public TestRunnerBase
         bool testFault(uint8_t on, uint8_t *data) override;
         bool testI2C(uint8_t *data) override;
         bool testSpiAeaEncoder(uint8_t *data) override;
+        bool testEEPROM(uint8_t *data) override;
 };
 
 #endif

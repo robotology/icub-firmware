@@ -61,6 +61,7 @@ class ProtocolManager
         testPWM1        = 16,
         testPWM2        = 17,
         testPWM3        = 18,
+        testEEPROM      = 19,
         testUndefined   = 254,
         testDummy       = 255
     };

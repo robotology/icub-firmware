@@ -14,6 +14,8 @@
 #include "embot_hw_eth.h"
 #include "embot_hw_encoder.h"
 #include "embot_hw_i2c.h"
+#include "embot_hw_eeprom.h"
+#include "embot_os_Timer.h"
 
 #include "embot_app_theLEDmanager.h"
 #include "embot_app_eth_theErrorManager.h"
@@ -401,6 +403,97 @@ bool TestRunnerAmc_CM7::testSpiAeaEncoder(uint8_t *data)
     return true;
 }
 
+uint32_t data2readeeprom[16] = {0};
+constexpr embot::hw::EEPROM eeprom2test {embot::hw::EEPROM::one};
+
+//void onForever(void *p)
+//{
+//    embot::os::Timer *t = reinterpret_cast<embot::os::Timer*>(p);
+//    
+//    std::memset(data2readeeprom, 0, sizeof(data2readeeprom));
+//    embot::core::Data data {data2readeeprom, sizeof(data2readeeprom)};
+//    
+//    embot::hw::eeprom::read(embot::hw::EEPROM::one, 0, data, 3*embot::core::time1millisec);
+
+
+//    embot::core::TimeFormatter tf(embot::core::now());        
+//    embot::core::print("@ " + tf.to_string(embot::core::TimeFormatter::Mode::full) + ": "+ t->name() + " w/ shots: " + std::to_string(t->shots()));    
+//    constexpr size_t max {5};
+//    if(t->shots() > max)
+//    {
+//        embot::core::print("stop it");    
+//        t->stop();     
+
+//        embot::core::print("and restart it");    
+//        t->start();                
+//    }
+//}
+
+bool TestRunnerAmc_CM7::testEEPROM(uint8_t *data)
+{
+    // init eeprom
+    embot::hw::eeprom::init(eeprom2test, {});
+        
+    // setup eeprom data
+    constexpr size_t capacity {2048};
+    uint8_t dd[capacity] = {0};
+    constexpr size_t adr2use {0};
+    volatile uint8_t stophere = 0;
+    embot::core::Time startread {0};
+    embot::core::Time readtime {0};
+    embot::core::Time startwrite {0};
+    embot::core::Time writetime {0};
+    
+    static size_t cnt = 0;
+    static uint8_t shift = 0;
+    
+    data[0] = 0xBB;
+    
+    for(size_t i=0; i<1000; i++)
+    {
+        
+        size_t numberofbytes = capacity >> shift;
+        
+        if(shift>8)
+        {
+            shift = 0;
+        }
+        else
+        {
+            shift++;
+        }
+        
+        
+        std::memset(dd, 0, sizeof(dd));
+        embot::core::Data dataHolder {dd, numberofbytes};
+        constexpr embot::core::relTime tout {3*embot::core::time1millisec};
+        
+        startread = embot::core::now(); 
+        embot::hw::eeprom::read(eeprom2test, adr2use, dataHolder, 3*embot::core::time1millisec);
+        readtime = embot::core::now() - startread;
+        stophere++;
+        
+        std::memset(dd, cnt, sizeof(dd));
+        startwrite = embot::core::now(); 
+        embot::hw::eeprom::write(eeprom2test, adr2use, dataHolder, 3*embot::core::time1millisec);
+        writetime = embot::core::now() - startwrite;
+        stophere++;
+        
+    //    embot::hw::eeprom::erase(eeprom2test, adr2use+1, 200, 3*embot::core::time1millisec);
+    //    embot::hw::eeprom::erase(eeprom2test, 3*embot::core::time1millisec);  
+        
+        std::memset(dd, 0, sizeof(dd));
+        embot::hw::eeprom::read(eeprom2test, adr2use, dataHolder, 3*embot::core::time1millisec);
+        stophere++;
+        
+        embot::core::print("numberofbytes = " + std::to_string(numberofbytes) + ", read time = " + embot::core::TimeFormatter(readtime).to_string() + ", write time = " + embot::core::TimeFormatter(writetime).to_string());
+        
+        cnt++;
+    }
+    
+    data[0] = 0xAA;
+    return true;
+}
 
                     
 // --------------------------------------------------------------------------------------------------------------------

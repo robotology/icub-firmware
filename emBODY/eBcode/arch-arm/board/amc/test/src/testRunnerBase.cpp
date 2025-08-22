@@ -33,6 +33,7 @@ bool TestRunnerBase::testHallSensor(){ return true; }
 bool TestRunnerBase::testQuadEncoder(){ return true; }
 bool TestRunnerBase::testSpiAeaEncoder(uint8_t *data){ return true; }
 bool TestRunnerBase::testPWMChannelx(const uint8_t channel, uint8_t *data) { return true; };
+bool TestRunnerBase::testEEPROM(uint8_t *data) { return true; };
 
 
 // --------------------------------------------------------------------------------------------------------------------

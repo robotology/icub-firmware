@@ -112,6 +112,10 @@ void TestManagerSingleton::testManagerRun()
         {
             _testRunner_ptr->testPWMChannelx(3, data);
         } break;
+        case ProtocolManager::TestCommand::testEEPROM:
+        {
+            _testRunner_ptr->testEEPROM(data);
+        } break;
         default: break;
     }
     _ptcMgrInstance.sendTestResult(data);
