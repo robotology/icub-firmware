@@ -265,20 +265,26 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
     
       //test for CRC etc
 //    uint64_t CRC_error_number = getnumberoferrors(embot::hw::PORT::three, embot::hw::eth::ERR::crc);
-    uint64_t unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::unicast);
-    static uint8_t iii=0;
-    if((iii++)%500)
-    {   
-        
-        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RxByteCnt);
-        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
-        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::TxByteCnt);
-        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
-        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::RxByteCnt);
-        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
-        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::TxByteCnt);
-        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
-    }
+//    uint64_t unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::unicast);
+//    static uint16_t iii=0;
+//    if((iii++)%10 == 0)
+//    {   
+
+//        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::unicast);
+//        embot::core::print("RxUnicast 1: " +std::to_string(unicast_error_number));
+//        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::unicast);
+//        embot::core::print("RxUnicast 2: " +std::to_string(unicast_error_number));
+
+//        
+////        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RxByteCnt);
+////        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
+////        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::TxByteCnt);
+////        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
+////        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::RxByteCnt);
+////        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
+////        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::TxByteCnt);
+////        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
+//    }
 }
 
 
