@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'control_foc'.
 //
-// Model version                  : 9.2
+// Model version                  : 9.13
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Tue Jul  8 15:25:49 2025
+// C/C++ source code generated on : Mon Aug 11 10:30:37 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -47,8 +47,9 @@ struct MdlrefDW_control_foc_T {
 extern void control_foc_initialize(ZCE_control_foc_T *localZCE);
 extern void control_foc_Init(DW_control_foc_f_T *localDW);
 extern void control_foc(const SensorsData *rtu_Sensors, const FOCSlowInputs
-  *rtu_FocSlowInputs, FOCOutputs *rty_FOCOutputs, B_control_foc_c_T *localB,
-  DW_control_foc_f_T *localDW, ZCE_control_foc_T *localZCE);
+  *rtu_FocSlowInputs, const boolean_T *rtu_CalibrationDone, FOCOutputs
+  *rty_FOCOutputs, B_control_foc_c_T *localB, DW_control_foc_f_T *localDW,
+  ZCE_control_foc_T *localZCE);
 
 //-
 //  These blocks were eliminated from the model due to optimizations:

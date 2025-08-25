@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 4.0
+// Model version                  : 4.14
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jul  9 14:16:48 2025
+// C/C++ source code generated on : Mon Aug 11 10:40:02 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,6 +21,12 @@
 #include "rtwtypes.h"
 #include "zero_crossing_types.h"
 #include "iterative_motion_controller_types.h"
+
+extern const boolean_T rtCP_pooled_DpagMRBkrPSQ;
+
+#define rtCP_Constant_Value            rtCP_pooled_DpagMRBkrPSQ  // Expression: true
+                                                                 //  Referenced by: '<S1>/Constant'
+
 #endif                                // iterative_motion_controller_private_h_
 
 //

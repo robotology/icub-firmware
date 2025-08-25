@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'AMC_BLDC'.
 //
-// Model version                  : 10.6
+// Model version                  : 10.26
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Jul 10 11:34:58 2025
+// C/C++ source code generated on : Mon Aug 11 10:32:10 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -21,6 +21,7 @@
 #include "rtwtypes.h"
 #include "AMC_BLDC_types.h"
 #include "motion_controller_single.h"
+#include "control_foc.h"
 #include "can_decoder.h"
 #include "SupervisorFSM_TX.h"
 #include "can_encoder.h"
@@ -29,23 +30,37 @@
 
 // Block signals (default storage)
 struct B_AMC_BLDC_T {
-  ReceivedEvents CAN_Decoder[MAX_EVENTS_PER_TICK];// '<S1>/CAN_Decoder'
+  FOCSlowInputs RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0;// '<Root>/Component1' 
+  FOCSlowInputs MotionControllerSingle_o4;// '<Root>/Motion Controller Single'
+  ReceivedEvents CAN_Decoder[MAX_EVENTS_PER_TICK];// '<S3>/CAN_Decoder'
   BUS_MESSAGES_TX MessagesTx;          // '<Root>/SupervisorFSM_TX'
+  FOCOutputs TmpRTBAtMotionControllerSingleInport4;// '<Root>/FOC'
   BUS_STATUS_TX SupervisorFSM_TX_o2;   // '<Root>/SupervisorFSM_TX'
 };
 
 // Block states (default storage) for system '<Root>'
 struct DW_AMC_BLDC_T {
-  FOCOutputs TmpRTBAtSupervisorFSM_TXInport4_Buf0;// synthesized block
-  FOCOutputs TmpRTBAtSupervisorFSM_TXInport4_Buf1;// synthesized block
-  FOCOutputs TmpRTBAtSupervisorFSM_TXInport4_Buf2;// synthesized block
-  void* TmpRTBAtSupervisorFSM_TXInport4_SEMAPHORE;// synthesized block
-  int8_T TmpRTBAtSupervisorFSM_TXInport4_LstBufWR;// synthesized block
-  int8_T TmpRTBAtSupervisorFSM_TXInport4_RDBuf;// synthesized block
+  FOCSlowInputs RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_Bu[3];// synthesized block 
+  FOCOutputs RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_Bu;// synthesized block 
+  FOCOutputs RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0__h;// synthesized block 
+  FOCOutputs RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0__a;// synthesized block 
+  FOCOutputs TmpRTBAtMotionControllerSingleInport4_Buf0;// synthesized block
+  FOCOutputs TmpRTBAtMotionControllerSingleInport4_Buf1;// synthesized block
+  FOCOutputs TmpRTBAtMotionControllerSingleInport4_Buf2;// synthesized block
+  void* RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_SE;// synthesized block 
+  void* RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_SE;// synthesized block 
+  void* TmpRTBAtMotionControllerSingleInport4_SEMAPHORE;// synthesized block
+  int8_T RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_Ls;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Component1_at_outport_0_RD;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_Ls;// synthesized block 
+  int8_T RTBInsertedForAdapter_InsertedFor_Component2_at_outport_0_RD;// synthesized block 
+  int8_T TmpRTBAtMotionControllerSingleInport4_LstBufWR;// synthesized block
+  int8_T TmpRTBAtMotionControllerSingleInport4_RDBuf;// synthesized block
   MdlrefDW_motion_controller_single_T MotionControllerSingle_InstanceData;// '<Root>/Motion Controller Single' 
-  MdlrefDW_can_decoder_T CAN_Decoder_InstanceData;// '<S1>/CAN_Decoder'
+  MdlrefDW_control_foc_T FOC_InstanceData;// '<Root>/FOC'
+  MdlrefDW_can_decoder_T CAN_Decoder_InstanceData;// '<S3>/CAN_Decoder'
   MdlrefDW_SupervisorFSM_TX_T SupervisorFSM_TX_InstanceData;// '<Root>/SupervisorFSM_TX' 
-  MdlrefDW_can_encoder_T CAN_Encoder_InstanceData;// '<S1>/CAN_Encoder'
+  MdlrefDW_can_encoder_T CAN_Encoder_InstanceData;// '<S3>/CAN_Encoder'
 };
 
 // External inputs (root inport signals with default storage)
@@ -126,6 +141,9 @@ extern "C"
 
 #endif
 
+// External data declarations for dependent source files
+extern const boolean_T AMC_BLDC_BGND;  // boolean_T ground
+
 //
 //  Exported Global Parameters
 //
@@ -138,17 +156,17 @@ extern ActuatorConfiguration AmcbldcInitConf;// Variable: AmcbldcInitConf
                                                 //  Referenced by: '<Root>/Motion Controller Single'
 
 extern real32_T CAN_ANGLE_DEG2ICUB;    // Variable: CAN_ANGLE_DEG2ICUB
-                                          //  Referenced by: '<S1>/CAN_Encoder'
+                                          //  Referenced by: '<S3>/CAN_Encoder'
                                           //  2^16/360
 
 extern real32_T CAN_ANGLE_ICUB2DEG;    // Variable: CAN_ANGLE_ICUB2DEG
-                                          //  Referenced by: '<S1>/CAN_Decoder'
+                                          //  Referenced by: '<S3>/CAN_Decoder'
                                           //  360/2^16
 
 extern uint8_T CAN_ID_AMC;             // Variable: CAN_ID_AMC
                                           //  Referenced by:
-                                          //    '<S1>/CAN_Decoder'
-                                          //    '<S1>/CAN_Encoder'
+                                          //    '<S3>/CAN_Decoder'
+                                          //    '<S3>/CAN_Encoder'
                                           //  4 bits defining the ID of the AMC_BLDC board.
 
 
@@ -203,7 +221,9 @@ extern "C"
 //  Here is the system hierarchy for this model
 //
 //  '<Root>' : 'AMC_BLDC'
-//  '<S1>'   : 'AMC_BLDC/Messaging'
+//  '<S1>'   : 'AMC_BLDC/Component1'
+//  '<S2>'   : 'AMC_BLDC/Component2'
+//  '<S3>'   : 'AMC_BLDC/Messaging'
 
 #endif                                 // AMC_BLDC_h_
 

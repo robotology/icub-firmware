@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 5.32
+// Model version                  : 5.44
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jul  9 14:16:19 2025
+// C/C++ source code generated on : Thu Aug  7 11:09:44 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,43 +20,28 @@
 #define motion_controller_h_
 #include "rtwtypes.h"
 #include "motion_controller_types.h"
-#include "control_foc.h"
 #include "estimation_velocity.h"
 #include "filter_current.h"
 #include "supervisor.h"
 #include "position_velocity_cascade.h"
-#include "rtw_defines.h"
 #include "zero_crossing_types.h"
+
+// Includes for objects with custom storage classes
+#include "rtw_defines.h"
 
 // Block signals for model 'motion_controller'
 struct B_motion_controller_c_T {
-  FOCSlowInputs RateTransition;        // '<Root>/Rate Transition'
-  SensorsData Transitionto1ms;         // '<Root>/Transition to 1ms'
-  FOCOutputs RateTransition2;          // '<Root>/Rate Transition2'
+  SensorsData RateTransition1;         // '<Root>/Rate Transition1'
+  FOCOutputs RateTransition;           // '<Root>/Rate Transition'
   Targets targets;                     // '<Root>/Motor Supervisor'
+  uint32_T Velocityestimationwindow;   // '<S2>/Velocity estimation window'
   real32_T velocity;                   // '<S1>/Motor Velocity Estimator'
   real32_T velocity_j;                 // '<S1>/Joint Velocity Estimator'
+  EstimationVelocityModes VelocityEstimationMode;// '<S2>/Velocity Estimation Mode' 
 };
 
 // Block states (default storage) for model 'motion_controller'
 struct DW_motion_controller_f_T {
-  FOCSlowInputs RateTransition_Buf[3]; // '<Root>/Rate Transition'
-  SensorsData Transitionto1ms_Buf0;    // '<Root>/Transition to 1ms'
-  SensorsData Transitionto1ms_Buf1;    // '<Root>/Transition to 1ms'
-  SensorsData Transitionto1ms_Buf2;    // '<Root>/Transition to 1ms'
-  FOCOutputs RateTransition2_Buf0;     // '<Root>/Rate Transition2'
-  FOCOutputs RateTransition2_Buf1;     // '<Root>/Rate Transition2'
-  FOCOutputs RateTransition2_Buf2;     // '<Root>/Rate Transition2'
-  void* RateTransition_SEMAPHORE;      // '<Root>/Rate Transition'
-  void* RateTransition2_SEMAPHORE;     // '<Root>/Rate Transition2'
-  void* Transitionto1ms_SEMAPHORE;     // '<Root>/Transition to 1ms'
-  int8_T RateTransition_LstBufWR;      // '<Root>/Rate Transition'
-  int8_T RateTransition_RDBuf;         // '<Root>/Rate Transition'
-  int8_T RateTransition2_LstBufWR;     // '<Root>/Rate Transition2'
-  int8_T RateTransition2_RDBuf;        // '<Root>/Rate Transition2'
-  int8_T Transitionto1ms_LstBufWR;     // '<Root>/Transition to 1ms'
-  int8_T Transitionto1ms_RDBuf;        // '<Root>/Transition to 1ms'
-  MdlrefDW_control_foc_T FOC_InstanceData;// '<Root>/FOC'
   MdlrefDW_estimation_velocity_T MotorVelocityEstimator_InstanceData;// '<S1>/Motor Velocity Estimator' 
   MdlrefDW_filter_current_T CurrentFilter_InstanceData;// '<S1>/Current Filter'
   MdlrefDW_estimation_velocity_T JointVelocityEstimator_InstanceData;// '<S1>/Joint Velocity Estimator' 
@@ -72,20 +57,17 @@ struct MdlrefDW_motion_controller_T {
 // Model reference registration function
 extern void motion_controller_initialize(DW_motion_controller_f_T *localDW);
 extern void motion_controller_Init(Flags *rty_Flags, ActuatorConfiguration
-  *rty_ActuatorsConfiguration, B_motion_controller_c_T *localB,
-  DW_motion_controller_f_T *localDW);
+  *rty_ActuatorsConfiguration, FOCSlowInputs *rty_FOCSlowInputs,
+  B_motion_controller_c_T *localB, DW_motion_controller_f_T *localDW);
 extern void motion_controller_Enable(DW_motion_controller_f_T *localDW);
 extern void motion_controller_Disable(DW_motion_controller_f_T *localDW);
-extern void motion_controllerTID0(void);
-extern void motion_controllerTID1(const SensorsData *rtu_SensorData, FOCOutputs *
-  rty_FOCOutputs, B_motion_controller_c_T *localB, DW_motion_controller_f_T
-  *localDW);
-extern void mc_step_1ms(const ExternalFlags *rtu_ExternalFlags, const
-  ReceivedEvents rtu_Events[MAX_EVENTS_PER_TICK], const ActuatorConfiguration
-  *rtu_InitConf, const JointData *rtu_JointData, EstimatedData
-  *rty_EstimatedData, Flags *rty_Flags, ActuatorConfiguration
-  *rty_ActuatorsConfiguration, B_motion_controller_c_T *localB,
-  DW_motion_controller_f_T *localDW);
+extern void mc_step_1ms(const SensorsData *rtu_SensorData, const ExternalFlags
+  *rtu_ExternalFlags, const ReceivedEvents rtu_Events[4], const
+  ActuatorConfiguration *rtu_InitConf, const JointData *rtu_JointData, const
+  FOCOutputs *rtu_FOCOutputs, EstimatedData *rty_EstimatedData, Flags *rty_Flags,
+  ActuatorConfiguration *rty_ActuatorsConfiguration, FOCSlowInputs
+  *rty_FOCSlowInputs, B_motion_controller_c_T *localB, DW_motion_controller_f_T *
+  localDW);
 extern void motion_controller_Term(DW_motion_controller_f_T *localDW);
 
 //-

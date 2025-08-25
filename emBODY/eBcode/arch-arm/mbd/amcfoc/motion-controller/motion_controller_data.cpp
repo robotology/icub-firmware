@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 5.32
+// Model version                  : 5.44
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jul  9 14:16:19 2025
+// C/C++ source code generated on : Thu Aug  7 11:09:44 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -23,12 +23,7 @@ const ConstP_motion_controller_T motion_controller_ConstP = {
   // Expression: EstimationVelocityModes.Disabled
   //  Referenced by: '<S1>/Constant'
 
-  EstimationVelocityModes_Disabled,
-
-  // Expression: EstimationVelocityModes.MovingAverage
-  //  Referenced by: '<S2>/Velocity Estimation Mode'
-
-  EstimationVelocityModes_MovingAverage
+  EstimationVelocityModes_Disabled
 };
 
 //

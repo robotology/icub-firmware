@@ -5,11 +5,11 @@
 //  granting, nonprofit, education, and research organizations only. Not
 //  for commercial or industrial use.
 //
-//  Code generation for model "motion_controller".
+//  Code generation for model "iterative_motion_controller".
 //
-//  Model version              : 5.2
+//  Model version              : 4.12
 //  Simulink Coder version : 25.1 (R2025a) 21-Nov-2024
-//  C++ source code generated on : Fri Jun  6 14:55:18 2025
+//  C++ source code generated on : Thu Aug  7 11:09:57 2025
 
 #include "rtwtypes.h"
 
@@ -19,12 +19,12 @@ const real32_T rtCP_pooled_Az3IVI54Pn7X[32] = { 0.0F, 0.001F, 0.002F, 0.003F,
   0.014F, 0.015F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F,
   1.0F, 1.0F, 1.0F, 1.0F, 1.0F, 1.0F } ;
 
+extern const boolean_T rtCP_pooled_DpagMRBkrPSQ;
+const boolean_T rtCP_pooled_DpagMRBkrPSQ = true;
 extern const real32_T rtCP_pooled_IgamRjjg0YgF[6];
 const real32_T rtCP_pooled_IgamRjjg0YgF[6] = { 0.666666687F, -0.333333343F,
   -0.333333343F, 0.666666687F, -0.333333343F, -0.333333343F } ;
 
-extern const uint32_T rtCP_pooled_UdZPJ5vElovg;
-const uint32_T rtCP_pooled_UdZPJ5vElovg = 64U;
 extern const boolean_T rtCP_pooled_kUC6nmgO8rex[16];
 const boolean_T rtCP_pooled_kUC6nmgO8rex[16] = { false, true, false, false, true,
   true, false, false, true, false, true, true, false, false, false, false } ;

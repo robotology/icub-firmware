@@ -9,7 +9,7 @@
 //
 // Model version                  : 9.1
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Thu Jun 12 14:15:58 2025
+// C/C++ source code generated on : Mon Aug 11 10:30:28 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -161,6 +161,7 @@ void can_encoder(const BUS_MESSAGES_TX *rtu_messages_tx, const BUS_STATUS_TX
 
   // MATLAB Function: '<S8>/format_can_id' incorporates:
   //   Constant: '<S4>/Constant'
+  //   MATLAB Function: '<S5>/format_can_id'
 
   tmp_0 = static_cast<uint32_T>(CAN_ID_AMC << 4);
 

@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'iterative_motion_controller'.
 //
-// Model version                  : 4.0
+// Model version                  : 4.14
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jul  9 14:16:48 2025
+// C/C++ source code generated on : Mon Aug 11 10:40:02 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,27 +19,6 @@
 #ifndef iterative_motion_controller_types_h_
 #define iterative_motion_controller_types_h_
 #include "rtwtypes.h"
-
-// Includes for objects with custom storage classes
-#include "rtw_defines.h"
-
-//
-//  Constraints for division operations in dimension variants
-
-#if (1 == 0) || ((N_MOTORS % 1) != 0)
-# error "The preprocessor definition '1' must not be equal to zero and     the division of 'N_MOTORS' by '1' must not have a remainder."
-#endif
-
-//
-//  Registered constraints for dimension variants
-
-// Constraint 'N_MOTORS == 2' registered by:
-//  '<Root>/Iterative Motion Controller'
-
-#if N_MOTORS != 2
-# error "The preprocessor definition 'N_MOTORS' must be equal to '2'"
-#endif
-
 #ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
 #define DEFINED_TYPEDEF_FOR_DriverSensors_
 
@@ -221,89 +200,36 @@ struct ReceivedEvents
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
-#define DEFINED_TYPEDEF_FOR_EstimatedData_
-
-struct EstimatedData
-{
-  // velocity
-  real32_T rotor_velocity;
-
-  // filtered motor current
-  real32_T Iq_filtered;
-
-  // motor temperature
-  real32_T motor_temperature;
-
-  // velocity
-  real32_T joint_velocity;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_CalibrationTypes_
-#define DEFINED_TYPEDEF_FOR_CalibrationTypes_
+#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
+#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
 
 typedef enum {
-  CalibrationTypes_None = 0,           // Default value
-  CalibrationTypes_Search_Index,
-  CalibrationTypes_Full_Calibration
-} CalibrationTypes;
+  EstimationVelocityModes_Disabled = 0,// Default value
+  EstimationVelocityModes_MovingAverage,
+  EstimationVelocityModes_LeastSquares
+} EstimationVelocityModes;
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
-#define DEFINED_TYPEDEF_FOR_HardwareFaults_
+#ifndef DEFINED_TYPEDEF_FOR_EstimationConfiguration_
+#define DEFINED_TYPEDEF_FOR_EstimationConfiguration_
 
-struct HardwareFaults
+struct EstimationConfiguration
 {
-  boolean_T overcurrent;
+  real32_T environment_temperature;
+  real32_T current_rms_lambda;
+  EstimationVelocityModes velocity_est_mode;
+  uint32_T velocity_est_window;
 };
 
 #endif
 
-#ifndef DEFINED_TYPEDEF_FOR_Flags_
-#define DEFINED_TYPEDEF_FOR_Flags_
+#ifndef DEFINED_TYPEDEF_FOR_GlobalConfiguration_
+#define DEFINED_TYPEDEF_FOR_GlobalConfiguration_
 
-struct Flags
+struct GlobalConfiguration
 {
-  // Flag that shows if:
-  // 0. None calibration
-  // 1. Search Index must be done
-  // 2. Full calibration must be done
-  CalibrationTypes calibration_type;
-  boolean_T enable_sending_msg_status;
-  HardwareFaults hw_faults;
-  boolean_T enable_thermal_protection;
-
-  // control mode
-  ControlModes control_mode;
-};
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
-#define DEFINED_TYPEDEF_FOR_FOCOutputs_
-
-struct FOCOutputs
-{
-  // control effort (quadrature)
-  real32_T Vq;
-
-  // control effort (3-phases)
-  real32_T Vabc[3];
-
-  // quadrature current
-  real32_T Iq_fbk;
-
-  // direct current
-  real32_T Id_fbk;
-
-  // RMS of Iq
-  real32_T Iq_rms;
-
-  // RMS of Id
-  real32_T Id_rms;
+  EstimationConfiguration estimation;
 };
 
 #endif
@@ -393,6 +319,125 @@ struct ActuatorConfiguration
   Thresholds thresholds;
   PIDsConfiguration pids;
   MotorConfiguration motor;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_EstimatedData_
+#define DEFINED_TYPEDEF_FOR_EstimatedData_
+
+struct EstimatedData
+{
+  // velocity
+  real32_T rotor_velocity;
+
+  // filtered motor current
+  real32_T Iq_filtered;
+
+  // motor temperature
+  real32_T motor_temperature;
+
+  // velocity
+  real32_T joint_velocity;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+#define DEFINED_TYPEDEF_FOR_ControlOuterOutputs_
+
+struct ControlOuterOutputs
+{
+  boolean_T vel_en;
+  boolean_T cur_en;
+  boolean_T out_en;
+  boolean_T pid_reset;
+  real32_T motorcurrent;
+  real32_T current_limiter;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+#define DEFINED_TYPEDEF_FOR_FOCSlowInputs_
+
+struct FOCSlowInputs
+{
+  GlobalConfiguration global_configuration;
+  ActuatorConfiguration actuator_configuration;
+  EstimatedData estimated_data;
+  Targets targets;
+  ControlOuterOutputs control_outer_outputs;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_CalibrationTypes_
+#define DEFINED_TYPEDEF_FOR_CalibrationTypes_
+
+typedef enum {
+  CalibrationTypes_None = 0,           // Default value
+  CalibrationTypes_Search_Index,
+  CalibrationTypes_Full_Calibration
+} CalibrationTypes;
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_HardwareFaults_
+#define DEFINED_TYPEDEF_FOR_HardwareFaults_
+
+struct HardwareFaults
+{
+  boolean_T overcurrent;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_Flags_
+#define DEFINED_TYPEDEF_FOR_Flags_
+
+struct Flags
+{
+  // Flag that shows if:
+  // 0. None calibration
+  // 1. Search Index must be done
+  // 2. Full calibration must be done
+  CalibrationTypes calibration_type;
+  boolean_T calibration_done;
+  boolean_T enable_sending_msg_status;
+  HardwareFaults hw_faults;
+  boolean_T enable_thermal_protection;
+
+  // control mode
+  ControlModes control_mode;
+};
+
+#endif
+
+#ifndef DEFINED_TYPEDEF_FOR_FOCOutputs_
+#define DEFINED_TYPEDEF_FOR_FOCOutputs_
+
+struct FOCOutputs
+{
+  boolean_T calibrationdone;
+
+  // control effort (quadrature)
+  real32_T Vq;
+
+  // control effort (3-phases)
+  real32_T Vabc[3];
+
+  // quadrature current
+  real32_T Iq_fbk;
+
+  // direct current
+  real32_T Id_fbk;
+
+  // RMS of Iq
+  real32_T Iq_rms;
+
+  // RMS of Id
+  real32_T Id_rms;
 };
 
 #endif
@@ -521,17 +566,6 @@ struct BUS_STATUS_TX
   boolean_T foc;
   boolean_T status;
 };
-
-#endif
-
-#ifndef DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-#define DEFINED_TYPEDEF_FOR_EstimationVelocityModes_
-
-typedef enum {
-  EstimationVelocityModes_Disabled = 0,// Default value
-  EstimationVelocityModes_MovingAverage,
-  EstimationVelocityModes_LeastSquares
-} EstimationVelocityModes;
 
 #endif
 

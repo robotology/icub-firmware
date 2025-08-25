@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'motion_controller'.
 //
-// Model version                  : 5.32
+// Model version                  : 5.44
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Wed Jul  9 14:16:19 2025
+// C/C++ source code generated on : Thu Aug  7 11:09:44 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -19,9 +19,6 @@
 #ifndef motion_controller_types_h_
 #define motion_controller_types_h_
 #include "rtwtypes.h"
-
-// Includes for objects with custom storage classes
-#include "rtw_defines.h"
 #ifndef DEFINED_TYPEDEF_FOR_DriverSensors_
 #define DEFINED_TYPEDEF_FOR_DriverSensors_
 
@@ -362,6 +359,8 @@ struct ReceivedEvents
 
 struct FOCOutputs
 {
+  boolean_T calibrationdone;
+
   // control effort (quadrature)
   real32_T Vq;
 
@@ -443,6 +442,7 @@ struct Flags
   // 1. Search Index must be done
   // 2. Full calibration must be done
   CalibrationTypes calibration_type;
+  boolean_T calibration_done;
   boolean_T enable_sending_msg_status;
   HardwareFaults hw_faults;
   boolean_T enable_thermal_protection;

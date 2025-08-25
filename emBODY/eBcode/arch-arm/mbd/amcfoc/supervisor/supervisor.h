@@ -9,7 +9,7 @@
 //
 // Model version                  : 4.45
 // Simulink Coder version         : 25.1 (R2025a) 21-Nov-2024
-// C/C++ source code generated on : Tue Jul  8 15:09:26 2025
+// C/C++ source code generated on : Thu Aug  7 11:09:30 2025
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -20,6 +20,8 @@
 #define supervisor_h_
 #include "rtwtypes.h"
 #include "supervisor_types.h"
+
+// Includes for objects with custom storage classes
 #include "rtw_defines.h"
 
 // user code (top of header file)
@@ -58,10 +60,10 @@ extern void supervisor_Init(Targets *rty_targets, ActuatorConfiguration
   *rty_ConfigurationParameters, Flags *rty_Flags, DW_supervisor_f_T *localDW);
 extern void supervisor(const ExternalFlags *rtu_ExternalFlags, const
   EstimatedData *rtu_EstimatedData, const FOCOutputs *rtu_ControlOutputs, const
-  SensorsData *rtu_SensorsData, const ReceivedEvents
-  rtu_ReceivedEvents[MAX_EVENTS_PER_TICK], const ActuatorConfiguration
-  *rtu_InitConf, Targets *rty_targets, ActuatorConfiguration
-  *rty_ConfigurationParameters, Flags *rty_Flags, DW_supervisor_f_T *localDW);
+  SensorsData *rtu_SensorsData, const ReceivedEvents rtu_ReceivedEvents[4],
+  const ActuatorConfiguration *rtu_InitConf, Targets *rty_targets,
+  ActuatorConfiguration *rty_ConfigurationParameters, Flags *rty_Flags,
+  DW_supervisor_f_T *localDW);
 
 //-
 //  The generated code includes comments that allow you to trace directly
