@@ -205,6 +205,7 @@ volatile long sI2Tlimit = 0;
 
 volatile int  IKp       = 0; //8;
 volatile int  IKi       = 0; //2;
+volatile int  IKff      = 0;
 volatile int  IKbemf    = 0;
 volatile char IKs       = 0; //10;
 volatile long IIntLimit = 0;//800L*1024L;
@@ -231,10 +232,11 @@ void setMaxTemperature(int peak)
     gTemperatureLimit = peak;
 }
 
-void setIPid(int kp, int ki, int kbemf, char shift)
+void setIPid(int kp, int ki, int kff, int kbemf, char shift)
 {
     IKp    = kp;
     IKi    = ki/2;
+    IKff   = kff;
     IKbemf = kbemf;
     IKs    = shift;
     

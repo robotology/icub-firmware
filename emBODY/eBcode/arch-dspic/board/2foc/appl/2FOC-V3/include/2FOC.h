@@ -72,7 +72,7 @@ volatile extern int Ipeak;
 extern void DisableDrive(void);
 extern void I2Twatcher(void);
 
-extern void setIPid(int kp, int ki, int kbemf, char shift);
+extern void setIPid(int kp, int ki, int kff, int kbemf, char shift);
 extern void setSPid(int kp, int ki, int kff, char shift);
 extern void setMaxCurrent(int nom, int peak, int ovr);
 extern void setMaxTemperature(int peak);

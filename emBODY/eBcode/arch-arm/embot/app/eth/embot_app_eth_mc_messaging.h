@@ -85,7 +85,7 @@ namespace embot::app::eth::mc::messaging::info {
 
     
     using MOTOR_CONFIG = GenericData;    
-
+    using MOTOR_PARAM_CONFIG = GenericData;
 
     struct CALIBRATE_ENCODER
     {   
@@ -176,6 +176,17 @@ namespace embot::app::eth::mc::messaging::sender {
         bool transmit();    
     };  
 
+    struct Set_Motor_Param_Config
+    { 
+        embot::app::msg::Location destination {};           
+        info::MOTOR_PARAM_CONFIG info{};
+            
+        Set_Motor_Param_Config() = default;
+        Set_Motor_Param_Config(const embot::app::msg::Location &d, const info::MOTOR_PARAM_CONFIG &i) : destination(d), info(i) {}
+            
+        bool transmit();    
+    };
+    
     struct Calibrate_Encoder
     {
         embot::app::msg::Location destination {};           

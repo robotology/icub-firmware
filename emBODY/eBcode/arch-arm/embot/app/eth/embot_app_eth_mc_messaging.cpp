@@ -260,7 +260,20 @@ namespace embot::app::eth::mc::messaging::sender {
         
         return command.transmit();  
     }
-
+    
+    bool Set_Motor_Param_Config::transmit()
+    {
+        Command command 
+        {
+            destination, 
+            eocanprot_msgclass_pollingMotorControl, 
+            ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG, 
+            const_cast<void*>(reinterpret_cast<const void*>(&info)), 
+            eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG
+        };
+        
+        return command.transmit();  
+    }    
 
     bool Calibrate_Encoder::transmit()
     {

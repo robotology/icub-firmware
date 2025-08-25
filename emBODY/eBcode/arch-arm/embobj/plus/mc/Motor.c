@@ -38,7 +38,6 @@
 #include "EOtheEntities.h"
 #include "embot_app_eth_mc_messaging.h"    
 
-
 /////////////////////////////////////////////////////////
 // Motor
 
@@ -100,49 +99,53 @@ static void Motor_hardStopCalbData_reset(Motor* o)
     o->hardstop_calibdata.u.bits.iscalibrating = 0;
 }
 
+#define CURRENT_Kp     1
+#define CURRENT_Ki     2
+#define CURRENT_Kd     3
+#define CURRENT_Kff    4
+#define CURRENT_Kbemf  5
+
 static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
 {
-    int8_t KpKiKdKs[7];
+    int8_t can_motor_param_config[8];
     
-    float32_t ks    = 1.0f/(float32_t)(1<<pidcurrent->scale);
-    float32_t kp    = ks*pidcurrent->kp;
-    float32_t ki    = ks*pidcurrent->ki;
-    float32_t kbemf = ks*pidcurrent->kff;
+    //float32_t ks    = 1.0f/(float32_t)(1<<pidcurrent->scale);
+    float32_t kp    = pidcurrent->kp;
+    float32_t ki    = pidcurrent->ki;
+    float32_t kff   = pidcurrent->kff;
+    float32_t kbemf = pidcurrent->kbemf;
     
-    if (kp<0.0f || ki<0.0f || kbemf<0.0f) return;
+    if (kp<0.0f || ki<0.0f || kff<0.0f || kbemf<0.0f) return;
     
-    float32_t      max = kp;
-    if (ki>max)    max = ki;
-    if (kbemf>max) max = kbemf;
+    can_motor_param_config[1] = CURRENT_Kp;
+    memcpy(can_motor_param_config+2,&kp,4);
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kp {{&o->motorlocation}, {can_motor_param_config}};
+    msgmc_kp.transmit();   
     
-    int16_t Kp    = 0;
-    int16_t Ki    = 0;
-    int16_t Kbemf = 0;
-    uint8_t Ks    = 0;
+    can_motor_param_config[1] = CURRENT_Ki;
+    memcpy(can_motor_param_config+2,&ki,4);
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_ki {{&o->motorlocation}, {can_motor_param_config}};
+    msgmc_ki.transmit();
     
-    for (int exponent = 0; exponent < 16; ++exponent)
-    {
-        float32_t power = (float32_t)(1<<exponent);
-        
-        if (max < power)
-        {
-            Kp    = (int16_t)(kp   *32768.0f/power);
-            Ki    = (int16_t)(ki   *32768.0f/power);
-            Kbemf = (int16_t)(kbemf*32768.0f/power);
-            Ks    = 15-exponent;
-            
-            break;
-        }    
-    }
+    can_motor_param_config[1] = CURRENT_Kff;
+    memcpy(can_motor_param_config+2,&kff,4);
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kff {{&o->motorlocation}, {can_motor_param_config}};
+    msgmc_kff.transmit();
     
-    // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID
-    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{&o->motorlocation}, {Kp, Ki, Kbemf, Ks}};
-    msg.transmit(); 
+    can_motor_param_config[1] = CURRENT_Kbemf;
+    memcpy(can_motor_param_config+2,&kff,4);
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kbemf {{&o->motorlocation}, {can_motor_param_config}};
+    msgmc_kbemf.transmit();
 }
+
+#define SPEED_Kp       6
+#define SPEED_Ki       7
+#define SPEED_Kd       8
+#define SPEED_Kff      9
 
 static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
 {
-    int8_t KpKiKdKs[7];
+    int8_t can_motor_param_config[8];
     
     float32_t ks  = 1.0f/(float32_t)(1<<pidvelocity->scale);
     float32_t kp  = ks*pidvelocity->kp;
@@ -151,33 +154,20 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
     
     if (kp<0.0f || ki<0.0f || kff<0.0f) return;
     
-    float32_t    max = kp;
-    if (ki >max) max = ki;
-    if (kff>max) max = kff;
+    can_motor_param_config[1] = SPEED_Kp;
+    memcpy(can_motor_param_config+2,&kp,4);
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kp {{&o->motorlocation}, {can_motor_param_config}};
+    msgmc_kp.transmit();   
     
-    int16_t Kp  = 0;
-    int16_t Ki  = 0;
-    int16_t Kff = 0;
-    uint8_t Ks  = 0;
+    can_motor_param_config[1] = SPEED_Ki;
+    memcpy(can_motor_param_config+2,&ki,4);
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_ki {{&o->motorlocation}, {can_motor_param_config}};
+    msgmc_ki.transmit();
     
-    for (int exponent = 0; exponent < 16; ++exponent)
-    {
-        float32_t power = (float32_t)(1<<exponent);
-        
-        if (max < power)
-        {
-            Kp  = (int16_t)(kp *32768.0f/power);
-            Ki  = (int16_t)(ki *32768.0f/power);
-            Kff = (int16_t)(kff*32768.0f/power);
-            Ks  = 15-exponent;
-            
-            break;
-        }    
-    }
-
-    // ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID    
-    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{&o->motorlocation}, {Kp, Ki, Kff, Ks}};
-    msg.transmit();    
+    can_motor_param_config[1] = SPEED_Kff;
+    memcpy(can_motor_param_config+2,&kff,4);
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kff {{&o->motorlocation}, {can_motor_param_config}};
+    msgmc_kff.transmit();
 }
 
 static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_t* current_params)
@@ -249,6 +239,18 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
         
     // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG    
     embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{&o->motorlocation}, {&o->can_motor_config[0]}};
+    msgmc.transmit();          
+}
+
+static void Motor_config_2FOC(Motor* o, int8_t param_id, float param_val)
+{           
+    int8_t can_motor_param_config[6];
+    
+    can_motor_param_config[1] = param_id;
+    memcpy(can_motor_param_config+2,&param_val,4);
+    
+    // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc {{&o->motorlocation}, {can_motor_param_config}};
     msgmc.transmit();          
 }
 

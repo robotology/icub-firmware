@@ -806,6 +806,12 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG(eOcanpr
     return(eores_OK);  
 }
 
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_PARAM_CONFIG(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 6, ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG);   
+    memcpy(frame->data+1,descriptor->cmd.value,5);
+    return(eores_OK);  
+}
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_POS_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
