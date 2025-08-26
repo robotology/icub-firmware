@@ -164,7 +164,7 @@ namespace embot::hw::spi::bsp {
         }
     }  
 
-    // we need this extconfig because we wamt to pass information to HAL_SPI_MspInit() and HAL_SPI_MspDeInit()
+    // we need this extconfig because we want to pass information to HAL_SPI_MspInit() and HAL_SPI_MspDeInit()
     utils::ExtendedConfig extconfig {};
         
     void s_SPIinit(embot::hw::SPI h, const Config &config)

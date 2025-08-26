@@ -869,11 +869,6 @@
               <FilePath>..\..\..\bsp\embot_hw_spi_bsp_amc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_specialize_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\embot_hw_specialize_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_timer_bsp_amc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_timer_bsp_amc.cpp</FilePath>
@@ -882,6 +877,11 @@
               <FileName>embot_hw_testpoint_bsp_amc .cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\bsp\embot_hw_testpoint_bsp_amc .cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>

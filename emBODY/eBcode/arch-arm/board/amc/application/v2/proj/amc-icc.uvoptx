@@ -878,7 +878,7 @@
 
   <Group>
     <GroupName>embot::hw::bsp</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1057,8 +1057,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\embot_hw_specialize_bsp_amc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_specialize_bsp_amc.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\embot_hw_timer_bsp_amc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_timer_bsp_amc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1069,8 +1069,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\embot_hw_timer_bsp_amc.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_timer_bsp_amc.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\embot_hw_testpoint_bsp_amc .cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_testpoint_bsp_amc .cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1081,8 +1081,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\bsp\embot_hw_testpoint_bsp_amc .cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_testpoint_bsp_amc .cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\bsp\embot_hw_bsp_amc.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp_amc.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
