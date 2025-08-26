@@ -104,48 +104,41 @@ static void Motor_hardStopCalbData_reset(Motor* o)
 #define CURRENT_Kd     3
 #define CURRENT_Kff    4
 #define CURRENT_Kbemf  5
-
-static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
-{
-    int8_t can_motor_param_config[8];
-    
-    //float32_t ks    = 1.0f/(float32_t)(1<<pidcurrent->scale);
-    float32_t kp    = pidcurrent->kp;
-    float32_t ki    = pidcurrent->ki;
-    float32_t kff   = pidcurrent->kff;
-    float32_t kbemf = pidcurrent->kbemf;
-    
-    if (kp<0.0f || ki<0.0f || kff<0.0f || kbemf<0.0f) return;
-    
-    can_motor_param_config[1] = CURRENT_Kp;
-    memcpy(can_motor_param_config+2,&kp,4);
-    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kp {{&o->motorlocation}, {can_motor_param_config}};
-    msgmc_kp.transmit();   
-    
-    can_motor_param_config[1] = CURRENT_Ki;
-    memcpy(can_motor_param_config+2,&ki,4);
-    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_ki {{&o->motorlocation}, {can_motor_param_config}};
-    msgmc_ki.transmit();
-    
-    can_motor_param_config[1] = CURRENT_Kff;
-    memcpy(can_motor_param_config+2,&kff,4);
-    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kff {{&o->motorlocation}, {can_motor_param_config}};
-    msgmc_kff.transmit();
-    
-    can_motor_param_config[1] = CURRENT_Kbemf;
-    memcpy(can_motor_param_config+2,&kff,4);
-    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kbemf {{&o->motorlocation}, {can_motor_param_config}};
-    msgmc_kbemf.transmit();
-}
-
 #define SPEED_Kp       6
 #define SPEED_Ki       7
 #define SPEED_Kd       8
 #define SPEED_Kff      9
 
+static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
+{
+    int8_t can_pid_param_config[8];
+    
+    //float32_t ks    = 1.0f/(float32_t)(1<<pidcurrent->scale);
+    float32_t kp    = pidcurrent->kp;
+    float32_t ki    = pidcurrent->ki;
+    float32_t kff   = pidcurrent->kff;
+    
+    if (kp<0.0f || ki<0.0f || kff<0.0f) return;
+    
+    can_pid_param_config[1] = CURRENT_Kp;
+    memcpy(can_pid_param_config+2,&kp,4);
+    embot::app::eth::mc::messaging::sender::Set_Current_PID_Param_Config msgmc_kp {{&o->motorlocation}, {can_pid_param_config}};
+    msgmc_kp.transmit();   
+    
+    can_pid_param_config[1] = CURRENT_Ki;
+    memcpy(can_pid_param_config+2,&ki,4);
+    embot::app::eth::mc::messaging::sender::Set_Current_PID_Param_Config msgmc_ki {{&o->motorlocation}, {can_pid_param_config}};
+    msgmc_ki.transmit();
+    
+    can_pid_param_config[1] = CURRENT_Kff;
+    memcpy(can_pid_param_config+2,&kff,4);
+    embot::app::eth::mc::messaging::sender::Set_Current_PID_Param_Config msgmc_kff {{&o->motorlocation}, {can_pid_param_config}};
+    msgmc_kff.transmit();
+}
+
 static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
 {
-    int8_t can_motor_param_config[8];
+    int8_t can_pid_param_config[8];
     
     float32_t ks  = 1.0f/(float32_t)(1<<pidvelocity->scale);
     float32_t kp  = ks*pidvelocity->kp;
@@ -154,19 +147,19 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
     
     if (kp<0.0f || ki<0.0f || kff<0.0f) return;
     
-    can_motor_param_config[1] = SPEED_Kp;
-    memcpy(can_motor_param_config+2,&kp,4);
-    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kp {{&o->motorlocation}, {can_motor_param_config}};
+    can_pid_param_config[1] = SPEED_Kp;
+    memcpy(can_pid_param_config+2,&kp,4);
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID_Param_Config msgmc_kp {{&o->motorlocation}, {can_pid_param_config}};
     msgmc_kp.transmit();   
     
-    can_motor_param_config[1] = SPEED_Ki;
-    memcpy(can_motor_param_config+2,&ki,4);
-    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_ki {{&o->motorlocation}, {can_motor_param_config}};
+    can_pid_param_config[1] = SPEED_Ki;
+    memcpy(can_pid_param_config+2,&ki,4);
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID_Param_Config msgmc_ki {{&o->motorlocation}, {can_pid_param_config}};
     msgmc_ki.transmit();
     
-    can_motor_param_config[1] = SPEED_Kff;
-    memcpy(can_motor_param_config+2,&kff,4);
-    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc_kff {{&o->motorlocation}, {can_motor_param_config}};
+    can_pid_param_config[1] = SPEED_Kff;
+    memcpy(can_pid_param_config+2,&kff,4);
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID_Param_Config msgmc_kff {{&o->motorlocation}, {can_pid_param_config}};
     msgmc_kff.transmit();
 }
 
@@ -230,7 +223,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     msgtmp.transmit();
 
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT 
-    embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
+    embot::app::eth::mc::messaging::sender::Set_Current_Limit msg
     {
         {&o->motorlocation},
         {config->currentLimits.nominalCurrent, config->currentLimits.peakCurrent, config->currentLimits.overloadCurrent}
@@ -239,19 +232,14 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
         
     // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG    
     embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{&o->motorlocation}, {&o->can_motor_config[0]}};
-    msgmc.transmit();          
-}
+    msgmc.transmit();
 
-static void Motor_config_2FOC(Motor* o, int8_t param_id, float param_val)
-{           
-    int8_t can_motor_param_config[6];
-    
-    can_motor_param_config[1] = param_id;
-    memcpy(can_motor_param_config+2,&param_val,4);
-    
-    // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG
-    embot::app::eth::mc::messaging::sender::Set_Motor_Param_Config msgmc {{&o->motorlocation}, {can_motor_param_config}};
-    msgmc.transmit();          
+    int8_t can_pid_param_config[8];
+    float32_t kbemf = config->Kbemf;
+    can_pid_param_config[1] = CURRENT_Kbemf;
+    memcpy(can_pid_param_config+2,&kbemf,4);
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID_Param_Config msgmc_kbemf {{&o->motorlocation}, {can_pid_param_config}};
+    msgmc_kbemf.transmit();    
 }
 
 static void Motor_set_control_mode_2FOC(Motor* o, icubCanProto_controlmode_t control_mode)

@@ -85,7 +85,7 @@ namespace embot::app::eth::mc::messaging::info {
 
     
     using MOTOR_CONFIG = GenericData;    
-    using MOTOR_PARAM_CONFIG = GenericData;
+    using PID_PARAM_CONFIG = GenericData;
 
     struct CALIBRATE_ENCODER
     {   
@@ -176,13 +176,24 @@ namespace embot::app::eth::mc::messaging::sender {
         bool transmit();    
     };  
 
-    struct Set_Motor_Param_Config
+    struct Set_Velocity_PID_Param_Config
     { 
         embot::app::msg::Location destination {};           
-        info::MOTOR_PARAM_CONFIG info{};
+        info::PID_PARAM_CONFIG info{};
             
-        Set_Motor_Param_Config() = default;
-        Set_Motor_Param_Config(const embot::app::msg::Location &d, const info::MOTOR_PARAM_CONFIG &i) : destination(d), info(i) {}
+        Set_Velocity_PID_Param_Config() = default;
+        Set_Velocity_PID_Param_Config(const embot::app::msg::Location &d, const info::PID_PARAM_CONFIG &i) : destination(d), info(i) {}
+            
+        bool transmit();    
+    };
+    
+    struct Set_Current_PID_Param_Config
+    { 
+        embot::app::msg::Location destination {};           
+        info::PID_PARAM_CONFIG info{};
+            
+        Set_Current_PID_Param_Config() = default;
+        Set_Current_PID_Param_Config(const embot::app::msg::Location &d, const info::PID_PARAM_CONFIG &i) : destination(d), info(i) {}
             
         bool transmit();    
     };

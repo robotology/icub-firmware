@@ -210,122 +210,31 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG)
     {
-        if (rxlen < 6) return 0;
+        if (rxlen < 7) return 0;
         
         if (!gCanProtocolCompatible) return 0;
 
-        if (rxlen == 6)
+        MotorConfig.bitmask = rxpayload->b[1];
+
+        gEncoderConfig.resolution = rxpayload->w[1];
+        gEncoderConfig.offset     = rxpayload->w[2];
+        gEncoderConfig.numPoles   = rxpayload->b[6]/2;
+
+        if (gEncoderConfig.offset == -1)
         {
-            int8_t param_id = rxpayload->b[1];
-            float fk = *(float*)&rxpayload->b[2];
-            
-            if (param_id <= 5) // CURRENT
-            {
-                static float fkp    = 0.0f;
-                static float fki    = 0.0f;
-                static float fkd    = 0.0f;
-                static float fkff   = 0.0f;
-                static float fkbemf = 0.0f;
-                
-                switch (param_id)
-                {
-                    case 1: fkp    = fk; break;
-                    case 2: fki    = fk; break;
-                    case 3: fkd    = fk; break;
-                    case 4: fkff   = fk; break;
-                    case 5: fkbemf = fk; break;
-                }
-                
-                float max = fkp;
-                if (fki    > max) max = fki;
-                if (fkd    > max) max = fkd;
-                if (fkff   > max) max = fkff;
-                if (fkbemf > max) max = fkbemf;
-                
-                int exponent = 0;
-            
-                for (exponent = 0; exponent < 16; ++exponent)
-                {
-                    float power = (float)(1<<exponent);
-        
-                    if (max < power)
-                    {
-                        int kp    = (int)(fkp   *32768.0f/power);
-                        int ki    = (int)(fki   *32768.0f/power);
-                      //int kd    = (int)(fkd   *32768.0f/power);
-                        int kff   = (int)(fkff  *32768.0f/power);
-                        int kbemf = (int)(fkbemf*32768.0f/power);
-                    
-                        setIPid(kp,ki,kff,kbemf,15-exponent);
-                    
-                        return 1;
-                    }
-                }
-            }
-            else if (param_id <= 9) // SPEED
-            {
-                static float fkp    = 0.0f;
-                static float fki    = 0.0f;
-                static float fkd    = 0.0f;
-                static float fkff   = 0.0f;
-                
-                switch (param_id)
-                {
-                    case 6: fkp    = fk; break;
-                    case 7: fki    = fk; break;
-                    case 8: fkd    = fk; break;
-                    case 9: fkff   = fk; break;
-                }
-                
-                float max = fkp;
-                if (fki    > max) max = fki;
-                if (fkd    > max) max = fkd;
-                if (fkff   > max) max = fkff;
-                
-                int exponent = 0;
-            
-                for (exponent = 0; exponent < 16; ++exponent)
-                {
-                    float power = (float)(1<<exponent);
-        
-                    if (max < power)
-                    {
-                        int kp    = (int)(fkp   *32768.0f/power);
-                        int ki    = (int)(fki   *32768.0f/power);
-                      //int kd    = (int)(fkd   *32768.0f/power);
-                        int kff   = (int)(fkff  *32768.0f/power);
-                    
-                        setSPid(kp,ki,kff,15-exponent);
-                    
-                        return 1;
-                    }
-                }
-            }
+            MotorConfig.fullcalib = TRUE;
+            gEncoderConfig.full_calibration = TRUE;
+            //gEncoderConfig.offset = 0;
         }
         else
         {
-            MotorConfig.bitmask = rxpayload->b[1];
-
-            gEncoderConfig.resolution = rxpayload->w[1];
-            gEncoderConfig.offset     = rxpayload->w[2];
-            gEncoderConfig.numPoles   = rxpayload->b[6]/2;
-
-            if (gEncoderConfig.offset == -1)
-            {
-                MotorConfig.fullcalib = TRUE;
-                gEncoderConfig.full_calibration = TRUE;
-                //gEncoderConfig.offset = 0;
-            }
-            else
-            {
-                MotorConfig.fullcalib = FALSE;
-                gEncoderConfig.full_calibration = FALSE;
-            }
-        
-            gEncoderConfig.tolerance = (rxlen == 8) ? rxpayload->b[7] : 36;
-        
-            if (MotorConfig.has_qe) MotorConfig.has_speed_qe = FALSE;
+            MotorConfig.fullcalib = FALSE;
+            gEncoderConfig.full_calibration = FALSE;
         }
+        
+        gEncoderConfig.tolerance = (rxlen == 8) ? rxpayload->b[7] : 36;
+        
+        if (MotorConfig.has_qe) MotorConfig.has_speed_qe = FALSE;
         
         return 1;
     }
@@ -363,6 +272,55 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     {
         if (!gCanProtocolCompatible) return 0;
 
+        if (rxlen == 6)
+        {
+            int8_t param_id = rxpayload->b[1];
+            float fk = *(float*)&rxpayload->b[2];
+            
+            static float fkp    = 0.0f;
+            static float fki    = 0.0f;
+            static float fkd    = 0.0f;
+            static float fkff   = 0.0f;
+            static float fkbemf = 0.0f;
+                
+            switch (param_id)
+            {
+                case 1: fkp    = fk; break;
+                case 2: fki    = fk; break;
+                case 3: fkd    = fk; break;
+                case 4: fkff   = fk; break;
+                case 5: fkbemf = fk; break;
+            }
+                
+            float max = fkp;
+            if (fki    > max) max = fki;
+            if (fkd    > max) max = fkd;
+            if (fkff   > max) max = fkff;
+            if (fkbemf > max) max = fkbemf;
+                
+            int exponent = 0;
+            
+            for (exponent = 0; exponent < 16; ++exponent)
+            {
+                float power = (float)(1<<exponent);
+        
+                if (max < power)
+                {
+                    int kp    = (int)(fkp   *32768.0f/power);
+                    int ki    = (int)(fki   *32768.0f/power);
+                  //int kd    = (int)(fkd   *32768.0f/power);
+                    int kff   = (int)(fkff  *32768.0f/power);
+                    int kbemf = (int)(fkbemf*32768.0f/power);
+                    
+                    setIPid(kp,ki,kff,kbemf,15-exponent);
+                    
+                    return 1;
+                }
+            }
+            
+            return 0;
+        }
+        
         if (rxlen==8)
         {
             int  kp    = ((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
@@ -390,6 +348,49 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     {
         if (!gCanProtocolCompatible) return 0;
 
+        int8_t param_id = rxpayload->b[1];
+        float fk = *(float*)&rxpayload->b[2];
+        
+        if (rxlen == 6)
+        {
+            static float fkp    = 0.0f;
+            static float fki    = 0.0f;
+            static float fkd    = 0.0f;
+            static float fkff   = 0.0f;
+                
+            switch (param_id)
+            {
+                case 6: fkp    = fk; break;
+                case 7: fki    = fk; break;
+                case 8: fkd    = fk; break;
+                case 9: fkff   = fk; break;
+            }
+                
+            float max = fkp;
+            if (fki    > max) max = fki;
+            if (fkd    > max) max = fkd;
+            if (fkff   > max) max = fkff;
+             
+            int exponent = 0;
+            
+            for (exponent = 0; exponent < 16; ++exponent)
+            {
+                float power = (float)(1<<exponent);
+        
+                if (max < power)
+                {
+                    int kp    = (int)(fkp   *32768.0f/power);
+                    int ki    = (int)(fki   *32768.0f/power);
+                  //int kd    = (int)(fkd   *32768.0f/power);
+                    int kff   = (int)(fkff  *32768.0f/power);
+                    
+                    setSPid(kp,ki,kff,15-exponent);
+                    
+                    return 1;
+                }
+            }
+        }
+        
         if (rxlen==8)
         {
             int  kp  = ((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
