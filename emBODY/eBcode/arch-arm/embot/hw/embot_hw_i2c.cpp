@@ -158,10 +158,6 @@ namespace embot { namespace hw { namespace i2c {
                        
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(b));
                 
-        std::string s {};
-            s += "Init for I2C bus with mask: " + std::to_string(initialisedmask);
-            s += " And BUS: " + std::to_string(embot::core::tointegral(b));
-        embot::core::print(s.c_str());
         return resOK;
     }
            
@@ -203,10 +199,6 @@ namespace embot { namespace hw { namespace i2c {
             
             if(true == ping(b, i, 3*embot::core::time1millisec))
             {
-                char m[128] = {};
-                snprintf(m, sizeof(m), "Found address: %d for bus: %d", i, embot::core::tointegral(b));
-                embot::core::print(m);
-            
                 adrs.push_back(i);
             }
         } 

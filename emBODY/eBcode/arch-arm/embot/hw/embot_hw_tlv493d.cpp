@@ -737,10 +737,8 @@ namespace embot { namespace hw { namespace tlv493d {
             ff = ff;
             #endif
             
-            embot::core::print("FAILED the PING");
             return resNOK;
         }
-        embot::core::print("GOT the PING");
         
         // 2. read the registers
         data.load(s_privatedata.acquisition[index].registermap.readmemory, s_privatedata.acquisition[index].registermap.readsize); 

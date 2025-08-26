@@ -34,9 +34,6 @@
 
 namespace embot { namespace hw { namespace i2c {
     
-    enum class Signal { SDA = 0, SCL = 1, NumberOf = 2 };
-    constexpr size_t SignalsNumberOf {embot::core::tointegral(Signal::NumberOf)};
-    
     // speeds so far are those 
     enum class Speed : uint32_t { standard100 = 100000, fast400 = 400000, fastplus1000 = 1000000, high3400 = 3400000, none = 0 };
     
@@ -54,19 +51,11 @@ namespace embot { namespace hw { namespace i2c {
         constexpr Reg(uint16_t a, Size s = Size::eightbits) { address = a; size = s; }
         constexpr Reg() = default;
     };
-   
-    struct GPIOspecials
-    {
-        std::array<embot::hw::gpio::Pull, SignalsNumberOf> pulls {  embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull};
-        constexpr GPIOspecials() = default;
-        constexpr GPIOspecials(const std::array<embot::hw::gpio::Pull, SignalsNumberOf> &p) : pulls(p) {}
-        void clear() { for( auto &v : pulls) v = embot::hw::gpio::Pull::none; } 
-    };
+
           
     struct Config
     {   // so far we cannot initialize I2C with a given speed at runtime   
-        uint8_t speedIStobedone {0};
-        GPIOspecials gpiospecials {};              
+        uint8_t speedIStobedone {0};           
         constexpr Config() = default;
         constexpr bool isvalid() const { return true; }
     };
