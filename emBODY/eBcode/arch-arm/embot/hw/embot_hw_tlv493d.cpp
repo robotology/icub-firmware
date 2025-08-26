@@ -450,7 +450,7 @@ namespace embot { namespace hw { namespace tlv493d {
 
         // deinit i2c / i2ce for the relevant bus specified by the bsp for this chip
         // note by marco.accame: the following works only if the chip does not share the bus with other chips.
-        //                       because if we disable the bus for this chip then the otehr cannot use it anymore
+        //                       because if we disable the bus for this chip then the other cannot use it anymore
 
         #if defined(EMBOT_ENABLE_hw_tlv493d_i2ceMODE)
         embot::hw::i2ce::deinit(embot::hw::tlv493d::getBSP().getPROP(h)->i2cdes.getI2CEbus());
@@ -736,9 +736,10 @@ namespace embot { namespace hw { namespace tlv493d {
             ff = embot::hw::i2c::discover(s_privatedata.i2cdes[index].getI2Cbus(), addresses);
             ff = ff;
             #endif
+            
             return resNOK;
         }
-                       
+        
         // 2. read the registers
         data.load(s_privatedata.acquisition[index].registermap.readmemory, s_privatedata.acquisition[index].registermap.readsize); 
 

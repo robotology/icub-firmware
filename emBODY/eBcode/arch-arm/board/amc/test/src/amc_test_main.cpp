@@ -49,7 +49,11 @@ void initSystem(embot::os::Thread *t, void* initparam);
     // Test J5_power enabling
     constexpr embot::hw::bsp::amc::OnSpecialize specConfig
     {
-        embot::hw::bsp::amc::OnSpecialize::CM4MODE::donothing,
+        #if defined(AMC_TEST_CM7_ONLY)
+            embot::hw::bsp::amc::OnSpecialize::CM4MODE::donothing,
+        #elif defined(AMC_DUALCORE_TEST)
+            embot::hw::bsp::amc::OnSpecialize::CM4MODE::release,
+        #endif
         true,
         false
     };

@@ -62,7 +62,8 @@ namespace embot { namespace hw { namespace i2c {
 
     bool supported(I2C b)                                                                           { return false; }
     bool initialised(I2C b)                                                                         { return false; }
-    result_t init(I2C b, const Config &config)                                                      { return resNOK; }
+    //void init(I2C b)                                                                                { return resNOK; }
+    //result_t init(I2C b, const Config &config)                                                      { return resNOK; }
     result_t deinit(I2C b)                                                                          { return resNOK; }     
     // blocking   
     bool isbusy(embot::hw::I2C b, embot::core::relTime timeout, embot::core::relTime &remaining) { return false; }      
@@ -176,7 +177,7 @@ namespace embot { namespace hw { namespace i2c {
         std::uint8_t index = embot::core::tointegral(b);
                
         s_privatedata.config[index] = {};
-        //embot::hw::i2c::bsp::getBSP().deinit(b);
+        embot::hw::i2c::getBSP().deinit(b);
         
         embot::core::binary::bit::clear(initialisedmask, embot::core::tointegral(b));
                 
@@ -191,7 +192,6 @@ namespace embot { namespace hw { namespace i2c {
         }
                       
         adrs.clear();
-        
         static const uint8_t start = 2;
         for(int i=start; i<256; i++)
         {
@@ -278,7 +278,7 @@ namespace embot { namespace hw { namespace i2c {
         if(false == initialised(b))
         {
             return false;
-        } 
+        }
           
         embot::core::relTime remaining = timeout;
         if(true == isbusy(b, timeout, remaining))
@@ -289,7 +289,8 @@ namespace embot { namespace hw { namespace i2c {
         // we use a call to HAL_I2C_IsDeviceReady() which has a timeout. nevertheless we set the bus busy and we clear afterwards. 
         std::uint8_t index = embot::core::tointegral(b);        
         s_privatedata.transaction[index].ongoing = true;                
-        HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(s_privatedata.handles[index], adr, 1, remaining/1000);        
+        HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(s_privatedata.handles[index], adr, 1, remaining/1000);      
+        
         s_privatedata.transaction[index].ongoing = false;
         
         return (HAL_OK == status) ? true : false;       

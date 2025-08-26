@@ -58,6 +58,10 @@ class ProtocolManager
         testQuadEncoder = 13,
         testETH         = 14,
         testSPIEncoder  = 15,
+        testPWM1        = 16,
+        testPWM2        = 17,
+        testPWM3        = 18,
+        testEEPROM      = 19,
         testUndefined   = 254,
         testDummy       = 255
     };
@@ -78,8 +82,8 @@ class ProtocolManager
     
     // Constexpr to be used in the tests
     static constexpr embot::os::Event evRXcanframe = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
-    static inline const std::uint8_t canRXcapacity = 32;
-    static inline const std::uint8_t canTXcapacity = 32;
+    static inline const std::uint8_t canRXcapacity = 64;
+    static inline const std::uint8_t canTXcapacity = 64;
     
     embot::hw::can::Frame _inputCanFrame;
     embot::hw::can::Frame _outputCanFrame;

@@ -36,7 +36,6 @@ constexpr extern uint8_t  Build_number  = 0;
 #include "embot_hw_types.h"
 
 #include "stm32hal.h"
-
 #include "analog.h"
 #include "pwm.h"
 #include "encoder.h"
@@ -44,6 +43,8 @@ constexpr extern uint8_t  Build_number  = 0;
 #include <numeric>
 
 #include "tests.h"
+
+#include <numeric>
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest

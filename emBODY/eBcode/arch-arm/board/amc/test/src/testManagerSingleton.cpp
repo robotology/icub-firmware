@@ -86,7 +86,7 @@ void TestManagerSingleton::testManagerRun()
         } break;
         case ProtocolManager::TestCommand::testI2C:
         {
-             _testRunner_ptr->testI2C();
+             _testRunner_ptr->testI2C(data);
         } break;
         case ProtocolManager::TestCommand::testHallSensor:
         {
@@ -99,6 +99,22 @@ void TestManagerSingleton::testManagerRun()
         case ProtocolManager::TestCommand::testSPIEncoder:
         {
             _testRunner_ptr->testSpiAeaEncoder(data);
+        } break;
+        case ProtocolManager::TestCommand::testPWM1:
+        {
+            _testRunner_ptr->testPWMChannelx(1, data);
+        } break;
+        case ProtocolManager::TestCommand::testPWM2:
+        {
+            _testRunner_ptr->testPWMChannelx(2, data);
+        } break;
+        case ProtocolManager::TestCommand::testPWM3:
+        {
+            _testRunner_ptr->testPWMChannelx(3, data);
+        } break;
+        case ProtocolManager::TestCommand::testEEPROM:
+        {
+            _testRunner_ptr->testEEPROM(data);
         } break;
         default: break;
     }

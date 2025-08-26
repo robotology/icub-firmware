@@ -623,6 +623,8 @@ namespace embot { namespace hw { namespace i2c {
         }   				
     }
     
+    bool BSP::deinit(embot::hw::I2C h) const { return true; }
+    
     #else
         #error embot::hw::i2c::thebsp must be defined    
     #endif

@@ -30,6 +30,9 @@
     #define EMBOT_ENABLE_hw_spi
 //    #define EMBOT_ENABLE_hw_spi_123
 //    #define EMBOT_ENABLE_hw_J5_powersupply
+
+    #define EMBOT_ENABLE_hw_i2c
+//    #define EMBOT_ENABLE_hw_tlv493d
     
     #define EMBOT_ENABLE_hw_encoder
     
@@ -49,7 +52,13 @@
     #define EMBOT_ENABLE_hw_icc_mem
     #define EMBOT_ENABLE_hw_icc_ltr
 //    #define EMBOT_ENABLE_hw_icc_printer
-        
+
+// define used jsut for testing --> accessing embot::hw::motor APIs from the h7cm7 core
+// usually they are managed by the h7cm4 core but we should able just to access resources from cm7 core
+#if defined(ENABLE_TEST)
+    #define EMBOT_ENABLE_hw_motor
+#endif      
+
 #else
     #error this is the bsp config of STM32HAL_BOARD_AMC ...
 #endif

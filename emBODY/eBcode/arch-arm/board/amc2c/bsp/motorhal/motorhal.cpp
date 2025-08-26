@@ -1008,7 +1008,9 @@ constexpr double VREF_NOM      = {3300.0};   /* mV  */
 constexpr double VREFINT_NOM   = {1212.0};   /* mV  */
 constexpr double R110          = {560000.0}; /* Ohm */
 constexpr double R115          = {33000.0};  /* Ohm */
+constexpr double ACS70331_GAIN = {2.5};      /* mA/mV */
 constexpr uint32_t VIN_GAIN    = static_cast<uint32_t>((R110+R115)/R115 + 0.5);
+constexpr int16_t CIN_GAINx4   = static_cast<int16_t>(4.0*ACS70331_GAIN);
 
 typedef struct
 {
@@ -1034,7 +1036,7 @@ static uint32_t Kvrefcal = static_cast<uint32_t>(VREFINT_NOM * VREF_NOM + 0.5);
 static volatile uint16_t Vcc_mV = VREF_NOM;
 static volatile uint16_t Vin_mV = 18000;
 static AdcMovingAverageFilter_t VrefFilter {0};
-//static AdcMovingAverageFilter_t CinFilter {0};
+static AdcMovingAverageFilter_t CinFilter {0};
 
 static volatile int16_t Cin_mA = +1000;
 
@@ -1071,9 +1073,9 @@ void Adc3DmaComplete_callback(volatile uint16_t sample[])
     Vcc_mV   = (0 < Vref)? Kvrefcal / Vref : 3300u;
 //    Vcore_mV = (uint32_t)sample[Vcore] * VCORE_GAIN * (uint32_t)Vcc_mV / 65536u;
 //    Vaux_mV  = (uint32_t)sample[Vaux]  * VAUX_GAIN  * (uint32_t)Vcc_mV / 65536u;
-    Vin_mV   = static_cast<uint32_t>(sample[Vin]) * VIN_GAIN * static_cast<uint32_t>(Vcc_mV) / 65536u;
-//    Cin_mA   = (int16_t)AdcMovingAverageFilter(&CinFilter,
-//               (int32_t)(int16_t)sample[Cin] * CIN_GAINx4 * (int32_t)(int16_t)Vcc_mV / (65536*4));
+    Vin_mV   = static_cast<uint16_t>(sample[Vin]) * VIN_GAIN * static_cast<uint16_t>(Vcc_mV) / 65536u;
+    Cin_mA   = (int16_t)AdcMovingAverageFilter(&CinFilter,
+               (int32_t)(int16_t)sample[Cin] * CIN_GAINx4 * (int32_t)(int16_t)Vcc_mV / (65536*4));
 }
 
 /* Callback functions *************************************************************************************************/

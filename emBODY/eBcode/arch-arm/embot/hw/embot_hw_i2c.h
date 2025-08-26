@@ -25,8 +25,10 @@
 #include "embot_core.h"
 #include "embot_core_utils.h"
 #include "embot_hw_types.h"
-#include <vector>
+#include "embot_hw_gpio.h"
 
+#include <vector>
+#include <array>
 
 // see also https://www.i2c-bus.org/
 
@@ -49,11 +51,11 @@ namespace embot { namespace hw { namespace i2c {
         constexpr Reg(uint16_t a, Size s = Size::eightbits) { address = a; size = s; }
         constexpr Reg() = default;
     };
-   
+
           
     struct Config
     {   // so far we cannot initialize I2C with a given speed at runtime   
-        uint8_t speedIStobedone {0};       
+        uint8_t speedIStobedone {0};           
         constexpr Config() = default;
         constexpr bool isvalid() const { return true; }
     };
@@ -66,7 +68,6 @@ namespace embot { namespace hw { namespace i2c {
         constexpr Descriptor(embot::hw::I2C b, ADR a = 0) : bus(b), adr(a) {}
         constexpr bool isvalid() const { return (embot::hw::I2C::none != bus) && (0 != adr); }              
     };
-
     
     bool supported(embot::hw::I2C b);    
     bool initialised(embot::hw::I2C b);    

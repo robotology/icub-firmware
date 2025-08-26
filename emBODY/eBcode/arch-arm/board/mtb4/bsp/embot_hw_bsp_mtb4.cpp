@@ -492,6 +492,8 @@ namespace embot { namespace hw { namespace i2c {
             MX_I2C2_Init();
         }         
     }
+    
+    bool BSP::deinit(embot::hw::I2C h) const { return true; }
 
     
     #else

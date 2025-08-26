@@ -9,11 +9,15 @@
 
 #include "testRunnerBase.h"
 
+// embot library includes
+#include "embot_core.h"
 
 
 class TestRunnerAmc_CM4 : public TestRunnerBase 
 {
-    
+    public:
+        TestRunnerAmc_CM4() {embot::core::print("Built TestRunnerAmc_CM4");}
+        ~TestRunnerAmc_CM4() = default;
 };
 
 #endif

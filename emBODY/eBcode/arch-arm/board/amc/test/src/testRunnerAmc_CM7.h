@@ -23,12 +23,12 @@ class TestRunnerAmc_CM7 : public TestRunnerBase
         bool testFwVersion(uint8_t *data) override;
         bool testLed(uint8_t on) override;
         bool testMicroId(uint8_t *data) override;
-        bool testVin(uint8_t *data) override;
-        bool testCin(uint8_t *data) override;
         bool testVauxOK(uint8_t *data) override;
         bool testPwrnFailOK(uint8_t *data) override;
         bool testFault(uint8_t on, uint8_t *data) override;
+        bool testI2C(uint8_t *data) override;
         bool testSpiAeaEncoder(uint8_t *data) override;
+        bool testEEPROM(uint8_t *data) override;
 };
 
 #endif
