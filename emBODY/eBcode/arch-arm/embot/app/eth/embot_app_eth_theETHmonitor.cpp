@@ -12,7 +12,6 @@
 
 #include "embot_app_eth_theETHmonitor.h"
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -20,7 +19,6 @@
 #include "embot_os.h"
 #include "embot_os_rtos.h"
 #include "embot_hw_eth.h"
-//#include "embot_app_eth_theErrorManager.h"
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOMtheEMSrunner.h"
@@ -239,7 +237,7 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
     //check for CRC errors
     if (link1isup)
     {
-        uint64_t CRC_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::crc);
+        uint64_t CRC_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RxCRCerror);
         
         if(0 != CRC_error_number)
         {
@@ -252,7 +250,7 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
     if (link2isup)
     {
 
-        uint64_t CRC_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::crc);
+        uint64_t CRC_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::RxCRCerror);
 
         if(0 != CRC_error_number)
         {
@@ -266,9 +264,11 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 //      //test for CRC etc
 //    uint64_t CRC_error_number = getnumberoferrors(embot::hw::PORT::three, embot::hw::eth::ERR::crc);
     uint64_t unicast_error_number;// = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::unicast);
-//    static uint16_t iii=0;
-//    if((iii++)%10 == 0)
-//    {   
+    static uint16_t iii=0;
+    if((iii++)%10 == 0)
+    {   
+        uint64_t t = embot::core::now(); 
+        embot::core::TimeFormatter tf{t};   
 
 //        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RXunicast);
 //        embot::core::print("RxUnicast 1: " +std::to_string(unicast_error_number));
@@ -278,7 +278,8 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 //        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::TXunicast);
 //        embot::core::print("TxUnicast 1: " +std::to_string(unicast_error_number));
         unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::TXunicast);
-        embot::core::print("TxUnicast 2: " +std::to_string(unicast_error_number));
+        embot::core::print(tf.to_string()+ " TxUnicast 2: " +std::to_string(unicast_error_number));
+//        embot::core::print("TxUnicast 2: " +std::to_string(unicast_error_number));
         
 
 //        unicast_error_number = getnumberoferrors(embot::hw::PHY::one, embot::hw::eth::ERR::RxByteCnt);
@@ -289,7 +290,7 @@ void embot::app::eth::theETHmonitor::Impl::onperiod(embot::os::Thread *t, void *
 //        embot::core::print("RxByteCnt: " +std::to_string(unicast_error_number));
 //        unicast_error_number = getnumberoferrors(embot::hw::PHY::two, embot::hw::eth::ERR::TxByteCnt);
 //        embot::core::print("TxByteCnt: " +std::to_string(unicast_error_number));
-//    }
+    }
 }
 
 

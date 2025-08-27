@@ -259,7 +259,6 @@ bool embot::hw::chip::KSZ8563::Impl::read(PHY phy, Link &link, embot::core::relT
 
 bool embot::hw::chip::KSZ8563::Impl::readMIB(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout)
 {   
-    constexpr MIBdata mibdata    {MIBdata::Size::bits30, false, 7, 0};
     constexpr MIBdata mibdataok  {MIBdata::Size::bits30, false, 0, 0};
     data = mibdataok; 
 
@@ -334,13 +333,13 @@ uint32_t embot::hw::chip::KSZ8563::Impl::make_address(PORT port, REG_MIB MIB_reg
     static constexpr uint8_t REG_SPACE_POS  = 0;
     static constexpr uint8_t PORT_FUNC_MIB_COUNTERS = 0x05;				/* MIB Counters (Management Information Base) */
     
-    /* Command pos */
+    /* Command position, first 3 bits  */
     static constexpr uint8_t COMMAND_POS = 29;
-    /* Address Pos */
+    /* Address position, i have to keep 5 bit for the turnaround of the chip, see KSZ8563R datasheet at sPI read write operation */
     static constexpr uint8_t ADDRESS_POS = 5;
     
     //port +1 bcs of chip driver
-    //1 here? better in other way?
+    //real address is a 16 bit
     uint32_t adr_32 =  ((embot::core::tointegral(port)+1) << PORT_SPACE_POS) | PORT_FUNC_MIB_COUNTERS << FUNC_SPACE_POS | (static_cast<uint8_t>(MIB_register) << REG_SPACE_POS);
     
     adr_32 = (static_cast<uint8_t>(cmd) << COMMAND_POS) | (adr_32 << ADDRESS_POS);
@@ -360,7 +359,6 @@ uint32_t embot::hw::chip::KSZ8563::Impl::MIB_data_to_send(MIB mib)
     uint32_t MIB_data_to_send = 0 | (static_cast<uint8_t>(mib) << MIB_INDEX_POS) | (1 << MIB_CSR_READ_ENABLE_POS);
     return MIB_data_to_send;
 }
-	
 
 
 
