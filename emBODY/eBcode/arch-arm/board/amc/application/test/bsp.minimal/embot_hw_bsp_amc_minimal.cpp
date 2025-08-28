@@ -853,7 +853,7 @@ namespace embot { namespace hw { namespace eeprom {
 
 #if !defined(EMBOT_ENABLE_hw_encoder)
 
-namespace embot { namespace hw { namespace encoder {
+namespace embot::hw::encoder::bsp {
     
     constexpr BSP thebsp { };
     void BSP::init(embot::hw::ENCODER h) const {}
@@ -863,7 +863,7 @@ namespace embot { namespace hw { namespace encoder {
         return thebsp;
     }
     
-}}}
+}
 
 #else
 
@@ -871,7 +871,7 @@ namespace embot { namespace hw { namespace encoder {
 #include "embot_hw_chip_MA730.h"
 #include "embot_hw_chip_MB049.h"
 
-namespace embot::hw::encoder {
+namespace embot::hw::encoder::bsp {
     
     constexpr embot::hw::spi::Config spiCFGchipMA730  {embot::hw::chip::MA730::standardspiconfig};
     constexpr embot::hw::spi::Config spiCFGchipAS5045 {embot::hw::chip::AS5045::standardspiconfig};
