@@ -215,6 +215,5 @@ namespace embot::hw::icc::ltr::bsp {
 
 
 
-
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

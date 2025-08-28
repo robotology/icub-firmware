@@ -23,7 +23,7 @@
     #define EMBOT_ENABLE_hw_bsp_specialize
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
-    #define EMBOT_ENABLE_hw_testpoint
+//    #define EMBOT_ENABLE_hw_testpoint
     #define EMBOT_ENABLE_hw_eeprom
 //    #define EMBOT_ENABLE_hw_eeprom_emulatedMODE
     
@@ -39,7 +39,6 @@
 //    #define EMBOT_ENABLE_hw_button
     #define EMBOT_ENABLE_hw_can
     #define EMBOT_ENABLE_hw_flash
-//    #define EMBOT_ENABLE_hw_eth
 
     #define EMBOT_ENABLE_hw_eth
     #define EMBOT_ENABLE_hw_timer

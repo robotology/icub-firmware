@@ -799,11 +799,6 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
               <FileName>PHY_KSZ8563.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
@@ -819,9 +814,39 @@
               <FilePath>..\..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileName>embot_hw_button_bsp_amc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\embot_hw_button_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_can_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eeprom_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_eeprom_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_encoder_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_flash_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_gpio_bsp_amc.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
@@ -829,9 +854,39 @@
               <FilePath>..\..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_bsp_amc.cpp</FileName>
+              <FileName>embot_hw_i2c_bsp_amc.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
+              <FilePath>..\..\..\bsp\embot_hw_i2c_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_led_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_spi_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_specialize_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_specialize_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_timer_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_testpoint_bsp_amc .cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\bsp\embot_hw_testpoint_bsp_amc .cpp</FilePath>
             </File>
           </Files>
         </Group>
