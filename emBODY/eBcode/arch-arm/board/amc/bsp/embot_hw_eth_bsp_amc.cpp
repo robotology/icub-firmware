@@ -137,26 +137,17 @@ namespace embot::hw::eth::bsp {
         return (embot::hw::chip::KSZ8563::Link::UP == lnk) ? true : false;       
     }
     
-    
-    
     uint64_t BSP::errors(embot::hw::PHY phy, ERR e) const
     {
         if(nullptr == ethswitch)
         {            
             return 0;
         }  
-                
-        static constexpr embot::hw::chip::KSZ8563::MIB mibs[3] =
-        {
-            embot::hw::chip::KSZ8563::MIB::RxCRCerror,
-            embot::hw::chip::KSZ8563::MIB::RxUnicast,
-            embot::hw::chip::KSZ8563::MIB::TxUnicastPkts
-        };
-
+        
         //Convert PHY to PORT
         const auto port = static_cast<embot::hw::chip::KSZ8563::PORT> ( embot::core::tointegral(phy) );
         
-        const auto mib  = mibs[embot::core::tointegral(e)];
+        const auto mib  = embot::hw::chip::KSZ8563::mibs[embot::core::tointegral(e)];
         
         embot::hw::chip::KSZ8563::MIBdata data {};
         ethswitch->readMIB(port, mib, data);

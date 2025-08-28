@@ -32,13 +32,6 @@ bool embot::hw::chip::testof_KSZ8563()
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------    
 
-// we dont actually need stm32hal in here ... just embot::hw gpio and spi
-//#if defined(USE_STM32HAL)
-//    #include "stm32hal.h"
-//#else
-//    #warning this implementation is only for stm32hal
-//#endif
-
 #include "embot_hw_gpio.h"
 #include "embot_hw_spi.h"
 
@@ -97,10 +90,9 @@ struct embot::hw::chip::KSZ8563::Impl
     bool init(const Config &cfg);   
     bool deinit();
     bool read(PHY phy, Link &link, embot::core::relTime timeout);
-    //bool read0(PHY phy, Link &link, embot::core::relTime timeout);
     
     bool readMIB(PORT port, MIB mib, MIBdata &data, embot::core::relTime timeout);
-    uint32_t make_address(PORT port, REG_MIB MIB_register, COMMAND cmd);
+    uint32_t make_address_MIB(PORT port, REG_MIB MIB_register, COMMAND cmd);
     uint32_t MIB_data_to_send(MIB mib);
 
     
@@ -108,10 +100,7 @@ struct embot::hw::chip::KSZ8563::Impl
     void chipselect(bool enable);
     
     
-    
-    
-    
-    
+        
     
 private:
 
@@ -181,7 +170,6 @@ bool embot::hw::chip::KSZ8563::Impl::read(PHY phy, Link &link, embot::core::relT
         reverse(static_cast<uint32_t>(0x60042040))
     };
     
-    constexpr size_t BSRtxrxsize {6}; 
     constexpr size_t transactionlength {6};
     
 #if 0
@@ -215,31 +203,7 @@ bool embot::hw::chip::KSZ8563::Impl::read(PHY phy, Link &link, embot::core::relT
 } 
 
 
-//bool embot::hw::chip::KSZ8563::Impl::read0(PHY phy, Link &link, embot::core::relTime timeout)
-//{   
-//        static constexpr uint32_t linkregs[numberofPHYs] = 
-//    {
-//        reverse(static_cast<uint32_t>(0x60022040)), 
-//        reverse(static_cast<uint32_t>(0x60042040))
-//    };   
-//    
-//    // we transmit 4 bytes and after them we have 2 bytes.
-//    // so i need txbuffer and rx buffer both of 6 bytes for calling embot::hw::spi::writeread()
-//    uint8_t tx[6] = {0};
-//    uint16_t rx[3] {0};
-//    std::memmove(tx, &linkregs[(phy == PHY::one) ? 0 : 1], sizeof(uint32_t));
-//    embot::core::Data frankzappa {&tx, sizeof(tx)};    
-//    embot::core::Data hotrats {&rx, sizeof(rx)};
-//    
-//    chipselect(true);       
-//    embot::hw::spi::writeread(_config.spi, frankzappa, hotrats, 5*1000);   
-//    chipselect(false);
 
-//    phyBSR bsr {reverse(rx[2])};
-//    link = (1 == bsr.fields.link_status) ? Link::UP : Link::DOWN;
-//    
-//    return true;
-//} 
 #if 0
     we need three stages:
     
@@ -265,7 +229,8 @@ bool embot::hw::chip::KSZ8563::Impl::readMIB(PORT port, MIB mib, MIBdata &data, 
     uint32_t rx32reverted =0;
     
     //start of step 1
-    uint32_t address = make_address(port, REG_MIB::REG_MIB_CSR, COMMAND::WRITE);
+    //make address gives apready the address reversed
+    uint32_t address = make_address_MIB(port, REG_MIB::REG_MIB_CSR, COMMAND::WRITE);
     std::memmove(_TXbuffer, &address, sizeof(address));
     
     //chip want MSB first, so i reverse the data
@@ -282,7 +247,7 @@ bool embot::hw::chip::KSZ8563::Impl::readMIB(PORT port, MIB mib, MIBdata &data, 
     //end of step 1
     
     //start of step 2
-    address = make_address(port, REG_MIB::REG_MIB_CSR, COMMAND::READ);
+    address = make_address_MIB(port, REG_MIB::REG_MIB_CSR, COMMAND::READ);
     /* Read back status register until data is ready */
 	do 
 	{   
@@ -302,8 +267,9 @@ bool embot::hw::chip::KSZ8563::Impl::readMIB(PORT port, MIB mib, MIBdata &data, 
 
     data.overflow = (rx32reverted & MIB_CSR_OVERFLOW) ? 1 : 0;
     //end of step 2
-
-    address = make_address(port, REG_MIB::REG_MIB_DR, COMMAND::READ);
+    
+    //start of step 3
+    address = make_address_MIB(port, REG_MIB::REG_MIB_DR, COMMAND::READ);
     
     std::memmove(_TXbuffer, &address, sizeof(address));
     _TXdata.load(_TXbuffer, sizeof(address) + sizeof(data.v32));
@@ -315,14 +281,13 @@ bool embot::hw::chip::KSZ8563::Impl::readMIB(PORT port, MIB mib, MIBdata &data, 
     chipselect(false);
     
     data.v32 = static_cast<uint32_t>(_rxbuffer[7]) | static_cast<uint32_t>(_rxbuffer[6])<< 8 | static_cast<uint32_t>(_rxbuffer[5])<< 16 | (static_cast<uint32_t>(_rxbuffer[4]) << 24);
-    	
+    //end of step 3	
 	return true;
 
-    
 }
 
 
-uint32_t embot::hw::chip::KSZ8563::Impl::make_address(PORT port, REG_MIB MIB_register, COMMAND cmd)
+uint32_t embot::hw::chip::KSZ8563::Impl::make_address_MIB(PORT port, REG_MIB MIB_register, COMMAND cmd)
 {
     
 //    #define KSZ8563_REGADR(PORT_SPACE, FUNC_SPACE, REG_ADDR)	((PORT_SPACE << PORT_SPACE_POS) | (FUNC_SPACE << FUNC_SPACE_POS) | (REG_ADDR << REG_SPACE_POS))
@@ -356,6 +321,9 @@ uint32_t embot::hw::chip::KSZ8563::Impl::make_address(PORT port, REG_MIB MIB_reg
 //      depending on MIB i want to read i write a diff address
 uint32_t embot::hw::chip::KSZ8563::Impl::MIB_data_to_send(MIB mib)
 {
+    static constexpr uint8_t MIB_CSR_READ_ENABLE_POS = 25;
+    static constexpr uint8_t MIB_INDEX_POS = 16;
+    
     uint32_t MIB_data_to_send = 0 | (static_cast<uint8_t>(mib) << MIB_INDEX_POS) | (1 << MIB_CSR_READ_ENABLE_POS);
     return MIB_data_to_send;
 }

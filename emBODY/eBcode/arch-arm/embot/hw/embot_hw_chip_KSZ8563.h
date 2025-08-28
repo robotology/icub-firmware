@@ -65,11 +65,15 @@ namespace embot::hw::chip {
         // we can read the MIB (Management Information Base) counters for each port
         enum class MIB : uint8_t { RxCRCerror = 0x06, RxUnicast = 0x0C, TxUnicastPkts = 0x1A, RxByteCnt = 0x80 , TxByteCnt =0x81};
         enum class REG_MIB : uint8_t { REG_MIB_CSR = 0x0000, REG_MIB_DR  = 0x0004};  /* 32 bits  - MIB Control and Status Register, 32 bits  - MIB Data Register */
-        enum class COMMAND : uint8_t { WRITE = 2, READ  = 3};
-        static constexpr uint8_t MIB_CSR_READ_ENABLE_POS = 25;
-        static constexpr uint8_t MIB_INDEX_POS = 16;
+        enum class COMMAND : uint8_t { WRITE = 0x2, READ  = 0x3};
         static constexpr uint32_t MIB_CSR_COUNTER_VALID = 1<<25;
         static constexpr uint32_t MIB_CSR_OVERFLOW = 1<<31;
+        static constexpr embot::hw::chip::KSZ8563::MIB mibs[3] =
+        {
+            embot::hw::chip::KSZ8563::MIB::RxCRCerror,
+            embot::hw::chip::KSZ8563::MIB::RxUnicast,
+            embot::hw::chip::KSZ8563::MIB::TxUnicastPkts
+        };
 
         struct MIBdata
         {
