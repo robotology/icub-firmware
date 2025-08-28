@@ -236,8 +236,8 @@ namespace embot::hw::spi::bsp {
             
             case SPI::five:
             {
-                // ETH ... use what cube-mx has chosen
-                MX_SPI5_Init();
+                // ETH
+                s_SPIinit(h, config);  
             } break;
             
             case SPI::six:
@@ -273,8 +273,8 @@ namespace embot::hw::spi::bsp {
             
             case SPI::five:
             {
-                // ETH ... use what cube-mx has chosen
-                HAL_SPI_DeInit(&hspi5);
+                // ETH
+                s_J5_SPIpinout(h, false);
             } break;
             
             case SPI::six:
