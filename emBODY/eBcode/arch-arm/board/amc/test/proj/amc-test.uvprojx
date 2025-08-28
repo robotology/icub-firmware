@@ -16,8 +16,8 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -739,29 +739,14 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>PHY_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
@@ -769,9 +754,69 @@
               <FilePath>..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
             <File>
-              <FileName>PHY_KSZ8563.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+              <FileName>embot_hw_can_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_can_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eeprom_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_eeprom_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_encoder_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_flash_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_gpio_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_i2c_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_i2c_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_led_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_specialize_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_specialize_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_spi_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_timer_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -856,14 +901,14 @@
       <TargetName>test-ulpro_cm7_dualcore</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
+      <pCCUsed>6230000::V6.23::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.3.0.0</PackID>
-          <PackURL>http://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
+          <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -1585,29 +1630,14 @@
           <GroupName>embot::hw::bsp</GroupName>
           <Files>
             <File>
-              <FileName>embot_hw_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
-            </File>
-            <File>
               <FileName>ipal_hal_eth_stm32h7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\bsp\ethdriver\ipal_hal_eth_stm32h7.c</FilePath>
+            </File>
+            <File>
+              <FileName>PHY_KSZ8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
             </File>
             <File>
               <FileName>EMAC_STM32H7xx_KSZ8563.c</FileName>
@@ -1615,9 +1645,69 @@
               <FilePath>..\..\bsp\ethdriver\EMAC_STM32H7xx_KSZ8563.c</FilePath>
             </File>
             <File>
-              <FileName>PHY_KSZ8563.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\bsp\ethdriver\PHY_KSZ8563.c</FilePath>
+              <FileName>embot_hw_can_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_can_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eeprom_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_eeprom_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_encoder_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_encoder_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_eth_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_eth_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_flash_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_gpio_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_icc_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_icc_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_i2c_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_i2c_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_led_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_mtx_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_mtx_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_specialize_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_specialize_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_spi_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_spi_bsp_amc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer_bsp_amc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\bsp\embot_hw_timer_bsp_amc.cpp</FilePath>
             </File>
           </Files>
         </Group>
