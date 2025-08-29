@@ -251,7 +251,7 @@ bool embot::hw::chip::KSZ8563::Impl::readMIB(PORT port, MIB mib, MIBdata &data, 
     /* Read back status register until data is ready */
 	do 
 	{   
-        
+        std::memset(_TXbuffer, 0, sizeof(_TXbuffer));
         std::memmove(_TXbuffer, &address, sizeof(address));
         _TXdata.load(_TXbuffer, sizeof(address) + sizeof(rx32reverted));
         std::memset(_rxbuffer, 0, sizeof(address) + sizeof(rx32reverted));
@@ -270,7 +270,7 @@ bool embot::hw::chip::KSZ8563::Impl::readMIB(PORT port, MIB mib, MIBdata &data, 
     
     //start of step 3
     address = make_address_MIB(port, REG_MIB::REG_MIB_DR, COMMAND::READ);
-    
+    std::memset(_TXbuffer, 0, sizeof(_TXbuffer));
     std::memmove(_TXbuffer, &address, sizeof(address));
     _TXdata.load(_TXbuffer, sizeof(address) + sizeof(data.v32));
     std::memset(_rxbuffer, 0, sizeof(address) + sizeof(data.v32));

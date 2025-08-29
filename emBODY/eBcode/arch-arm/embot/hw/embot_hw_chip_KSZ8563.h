@@ -120,7 +120,7 @@ namespace embot::hw::chip {
         
         static constexpr embot::hw::spi::Config standardspiconfig
         {
-            embot::hw::spi::Prescaler::eight,
+            embot::hw::spi::Prescaler::four,
             embot::hw::spi::DataSize::eight,
             embot::hw::spi::Mode::zero,
             { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull,    // | miso | mosi |
