@@ -79,8 +79,36 @@ namespace embot::hw::eth::bsp {
         {   // already initted
             return;
         }
+        
+         // amc PinControl
+        constexpr embot::hw::chip::KSZ8563::PinControl amc_pincontrol 
+        {
+            { embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::six },   
+            { embot::hw::gpio::Mode::OUTPUTpushpull,
+              embot::hw::gpio::Pull::nopull,
+              embot::hw::gpio::Speed::veryhigh }
+        };
+
+        // amc SPI config 
+        constexpr embot::hw::spi::Config amc_spiconfig 
+        {
+            embot::hw::spi::Prescaler::four,
+            embot::hw::spi::DataSize::eight,
+            embot::hw::spi::Mode::zero,
+            { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull,
+               embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull} }
+        };
+        
+        //amc configuration
+        constexpr embot::hw::chip::KSZ8563::Config amc_config 
+        {
+            embot::hw::SPI::five,
+            amc_spiconfig,
+            amc_pincontrol
+        };       
+        
         ethswitch = new embot::hw::chip::KSZ8563;
-        ethswitch->init({});
+        ethswitch->init(amc_config);
         ipal_hal_eth_stm32h7_init(cfg);
     }
     

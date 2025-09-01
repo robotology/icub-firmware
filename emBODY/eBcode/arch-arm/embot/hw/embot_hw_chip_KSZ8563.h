@@ -63,7 +63,7 @@ namespace embot::hw::chip {
 
         constexpr static size_t numberofPORTs {3};
         // we can read the MIB (Management Information Base) counters for each port
-        enum class MIB : uint8_t { RxCRCerror = 0x06, RxUnicast = 0x0C, TxUnicastPkts = 0x1A}; //, RxByteCnt = 0x80 , TxByteCnt =0x81}; this last two are not well read
+        enum class MIB : uint8_t { RxCRCerror = 0x06, RxUnicast = 0x0C, TxUnicastPkts = 0x1A}; //, RxByteCnt = 0x80 , TxByteCnt =0x81}; this last two are not well read, driver not implemented
         enum class REG_MIB : uint8_t { REG_MIB_CSR = 0x0000, REG_MIB_DR  = 0x0004};  /* 32 bits  - MIB Control and Status Register, 32 bits  - MIB Data Register */
         enum class COMMAND : uint8_t { WRITE = 0x2, READ  = 0x3};
         static constexpr uint32_t MIB_CSR_COUNTER_VALID = 1<<25;
@@ -117,7 +117,6 @@ namespace embot::hw::chip {
             }        
         };
         
-        
         static constexpr embot::hw::spi::Config standardspiconfig
         {
             embot::hw::spi::Prescaler::four,
@@ -126,7 +125,6 @@ namespace embot::hw::chip {
             { {embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull,    // | miso | mosi |
                embot::hw::gpio::Pull::nopull, embot::hw::gpio::Pull::nopull} }  // | sclk | sel  |
         };
-        
         
         struct Config
         {   // contains: spi bus and ... tbd            
