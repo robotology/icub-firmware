@@ -216,6 +216,9 @@ volatile int  SKff = 0x00;
 volatile char SKs  = 0x0A;
 volatile long SIntLimit = 0;//800L*1024L;
 
+volatile BOOL IPIDready = FALSE;
+volatile BOOL SPIDready = FALSE;
+
 /////////////////////////////////////////
 
 void setMaxCurrent(int nom, int peak, int ovr)
@@ -1375,7 +1378,9 @@ int main(void)
 
         if (!Ipeak) continue;
 
-        if (!IIntLimit) continue;
+        if (!IPIDready) continue;
+        
+        if (!SPIDready) continue;
 
         break; // board is configured
     }

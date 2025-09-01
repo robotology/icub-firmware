@@ -272,20 +272,33 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     {
         if (!gCanProtocolCompatible) return 0;
 
+        extern volatile BOOL IPIDready;
+        
         if (rxlen == 6)
         {
+            static tCanData payload;
+            
+            payload.w[0] = rxpayload->w[0];
+            payload.w[1] = rxpayload->w[1];
+            payload.w[2] = rxpayload->w[2];
+            payload.w[3] = rxpayload->w[3];
+            
+            CanSendDebug(&payload, 8);
+            
             int8_t param_id = rxpayload->b[1];
-            float fk = *(float*)&rxpayload->b[2];
+            float fk;
+            memcpy(&fk,&(rxpayload->b[2]),4);
             
             static float fkp    = 0.0f;
             static float fki    = 0.0f;
             static float fkd    = 0.0f;
             static float fkff   = 0.0f;
             static float fkbemf = 0.0f;
-                
+                            
             switch (param_id)
             {
-                case 1: fkp    = fk; break;
+                case 1: IPIDready = TRUE;
+                        fkp    = fk; break;
                 case 2: fki    = fk; break;
                 case 3: fkd    = fk; break;
                 case 4: fkff   = fk; break;
@@ -329,6 +342,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             setIPid(kp,ki,0,0,ks);
             
+            IPIDready = TRUE;
+            
             //static tCanData payload;
             
             //payload.w[0] = rxpayload->w[0];
@@ -347,12 +362,24 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID)
     {
         if (!gCanProtocolCompatible) return 0;
-
-        int8_t param_id = rxpayload->b[1];
-        float fk = *(float*)&rxpayload->b[2];
+        
+        extern volatile BOOL SPIDready;
         
         if (rxlen == 6)
         {
+            static tCanData payload;
+                        
+            payload.w[0] = rxpayload->w[0];
+            payload.w[1] = rxpayload->w[1];
+            payload.w[2] = rxpayload->w[2];
+            payload.w[3] = rxpayload->w[3];
+            
+            CanSendDebug(&payload, 8);
+            
+            int8_t param_id = rxpayload->b[1];
+            float fk;
+            memcpy(&fk,&(rxpayload->b[2]),4);
+            
             static float fkp    = 0.0f;
             static float fki    = 0.0f;
             static float fkd    = 0.0f;
@@ -360,10 +387,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 
             switch (param_id)
             {
-                case 6: fkp    = fk; break;
-                case 7: fki    = fk; break;
-                case 8: fkd    = fk; break;
-                case 9: fkff   = fk; break;
+                case 1: SPIDready = TRUE;
+                        fkp    = fk; break;
+                case 2: fki    = fk; break;
+                case 3: fkd    = fk; break;
+                case 4: fkff   = fk; break;
             }
                 
             float max = fkp;
@@ -398,6 +426,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             char ks  = rxpayload->b[7];
             
             setSPid(kp,ki,0,ks);
+            
+            SPIDready = TRUE;
             
             //static tCanData payload;
             

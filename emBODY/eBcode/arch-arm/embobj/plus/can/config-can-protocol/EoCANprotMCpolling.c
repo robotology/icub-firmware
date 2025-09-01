@@ -705,8 +705,8 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION(eOc
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID);   
-    memcpy(frame->data+1,descriptor->cmd.value,7);
+    s_former_POL_MC_prepare_frame(descriptor, frame, 6, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID);   
+    memcpy(frame->data+1,descriptor->cmd.value,5);
     return(eores_OK);      
 }
 
@@ -720,8 +720,8 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS(eO
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID);
-    memcpy(frame->data+1,descriptor->cmd.value,7);
+    s_former_POL_MC_prepare_frame(descriptor, frame, 6, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID);
+    memcpy(frame->data+1,descriptor->cmd.value,5);
     return(eores_OK);      
 }
 
@@ -803,20 +803,6 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG(eOcanpr
     s_former_POL_MC_prepare_frame(descriptor, frame, 7, ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG);   
     memcpy(frame->data+1,descriptor->cmd.value,6);
 #endif
-    return(eores_OK);  
-}
-
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID_PARAM_CONFIG(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 6, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID);   
-    memcpy(frame->data+1,descriptor->cmd.value,5);
-    return(eores_OK);  
-}
-
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PID_PARAM_CONFIG(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 6, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID);   
-    memcpy(frame->data+1,descriptor->cmd.value,5);
     return(eores_OK);  
 }
 

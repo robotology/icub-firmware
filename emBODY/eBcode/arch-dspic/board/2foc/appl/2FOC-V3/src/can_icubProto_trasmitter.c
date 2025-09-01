@@ -107,12 +107,21 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
  *      use the debug message for qe_encoder info instead of for I2C debug info.
  *      I cannot downsampling the qe info.
  * 
- * 
- *      static int noflood = 0;
+ */ 
+        static int noflood = 0;      
+        //extern volatile char I2Cdead;
+        //extern volatile uint16_t I2Cerrors;
+        //extern volatile int I2Cerrcode;
         
-        extern volatile char I2Cdead;
-        extern volatile uint16_t I2Cerrors;
-        extern volatile int I2Cerrcode;
+        extern volatile int IKp;
+        extern volatile int IKi;
+        extern volatile int IKff;
+        extern volatile int IKbemf;
+        
+        extern volatile int SKp;
+        extern volatile int SKi;
+        extern volatile int SKff;
+        extern volatile int SKs;
         
         int Tsend = 500 + canprototransmitter_bid*100;
         
@@ -122,34 +131,37 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         {
             noflood = 0;
             
-           
-            payload.w[1] = I2Cerrcode;
-            payload.w[2] = I2Cdead;
-            payload.w[3] = I2Cerrors;
-        
+            static BOOL bcurr = FALSE;
+            
+            payload.w[0] = bcurr?IKp:SKp;
+            payload.w[1] = bcurr?IKi:SKi;
+            payload.w[2] = bcurr?IKff:SKff;
+            payload.w[3] = bcurr?IKbemf:SKs;
+            
+            bcurr = !bcurr;
+            
             msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
 
             ECANSend(msgid, 8, &payload);
         }
- */
-        if(gControlMode != icubCanProto_controlmode_notConfigured)
-        {
-            uint8_t bitmask = 0;
-            bitmask |= ((uint8_t)qe_index_found_debug) << 1;
-            bitmask |= ((uint8_t)gEncoderError.dirty) << 2;
-            bitmask |= ((uint8_t)gEncoderError.index_broken) << 3;
-            payload.w[0]  = gQERawPosition;
-            payload.b[2] = bitmask;
-
-            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
-
-            ECANSend(msgid, 3, &payload);
-            
-            //commented because I clean the same flags on ICUBCANPROTO_PER_MC_MSG__STATUS sent
-            //gEncoderError.dirty = FALSE; 
-            //gEncoderError.index_broken = FALSE;
-            qe_index_found_debug = FALSE;
-        }
+//        if(gControlMode != icubCanProto_controlmode_notConfigured)
+//        {
+//            uint8_t bitmask = 0;
+//            bitmask |= ((uint8_t)qe_index_found_debug) << 1;
+//            bitmask |= ((uint8_t)gEncoderError.dirty) << 2;
+//            bitmask |= ((uint8_t)gEncoderError.index_broken) << 3;
+//            payload.w[0]  = gQERawPosition;
+//            payload.b[2] = bitmask;
+//
+//            msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__DEBUG );
+//
+//            ECANSend(msgid, 3, &payload);
+//            
+//            //commented because I clean the same flags on ICUBCANPROTO_PER_MC_MSG__STATUS sent
+//            //gEncoderError.dirty = FALSE; 
+//            //gEncoderError.index_broken = FALSE;
+//            qe_index_found_debug = FALSE;
+//        }
     }
     
     if (!bequiet)
