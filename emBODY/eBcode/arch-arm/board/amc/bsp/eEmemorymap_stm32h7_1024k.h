@@ -147,6 +147,21 @@
 #endif
 
 
+
+
+
+
+// --- emaintainer: 512K [0x08060000, 0x08060000 + 0x00080000 = 0x080E0000]
+#define EENV_MEMMAP_EMAINTAINER_ROMADDR        (EENV_MEMMAP_EUPDATER_ROMADDR + EENV_MEMMAP_EUPDATER_ROMSIZE)
+#define EENV_MEMMAP_EMAINTAINER_ROMSIZE        (512*1024)
+
+#define EENV_MEMMAP_EMAINTAINER_RAMADDR            (EENV_RAMSTART) 
+#define EENV_MEMMAP_EMAINTAINER_RAMSIZE            (EENV_RAMSIZE-EENV_MEMMAP_SHARSERV_RAMSIZE)
+
+
+
+
+
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

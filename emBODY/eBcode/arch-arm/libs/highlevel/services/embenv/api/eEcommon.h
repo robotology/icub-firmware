@@ -376,6 +376,7 @@ typedef enum
     ee_procLoader               = 0,    /**< the eLoader: the one executed just after reset which loads any other eProcess */
     ee_procUpdater              = 1,    /**< the eUpdater: the one responsible for performing FW update */
     ee_procApplication          = 2,    /**< the eApplication: the standard application */
+    ee_procMaintainer           = 3,
     ee_procOther01              = 4,
     ee_procOther02              = 5,
     ee_procOther03              = 6,

@@ -509,9 +509,13 @@ static void s_toggle_led(void *p)
     
     switch(num)
     {
-        case 0:     /*hal_led_toggle(hal_led0);*/ hal_led_toggle(hal_led1);     break; 
-        case 1:     hal_led_toggle(hal_led2); hal_led_toggle(hal_led3);     break;   
-        case 2:     hal_led_toggle(hal_led4); hal_led_toggle(hal_led5);     break;        
+        case 0:     /*hal_led_toggle(hal_led0);*/ embot::hw::led::toggle(embot::hw::LED::two);     break; 
+        case 1:     embot::hw::led::toggle(embot::hw::LED::three);
+                    embot::hw::led::toggle(embot::hw::LED::four);     
+            break;   
+        case 2:     embot::hw::led::toggle(embot::hw::LED::five);
+                    embot::hw::led::toggle(embot::hw::LED::six);     
+            break;        
     }
     
     num = (num+1)%3;
