@@ -1,6 +1,3 @@
-#! armcc -E
-; the above must be on teh first line of teh scatter file ...
-
 ; Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
 ; Author:  Marco Accame
 ; email:   marco.accame@iit.it
@@ -17,20 +14,19 @@
 ; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
 ; Public License for more details
 
-; due to a bug in linker (in some older versions), you may need to put the whole path ... thus change it by hand
-;#include "D:\#inhere\sdl\embedded\arm\embody\body\embenv\envcom\eEmemorymap.h"
-#include "..\..\cfg\eEmemorymap.h"
 
-LR_IROM1 EENV_MEMMAP_EUPDATER_ROMADDR EENV_MEMMAP_EUPDATER_ROMSIZE  {    ; load region size_region
-  ER_IROM1 EENV_MEMMAP_EUPDATER_ROMADDR EENV_MEMMAP_EUPDATER_ROMSIZE  {  ; load address = execution address
+LR_IROM1 0x08008000 0x00018000  {    ; load region size_region
+  ER_IROM1 0x08008000 0x00018000  {  ; load address = execution address
    *.o (RESET, +First)
    *(InRoot$$Sections)
    .ANY (+RO)
   }
-  RW_IRAM1 EENV_MEMMAP_EUPDATER_RAMADDR EENV_MEMMAP_EUPDATER_RAMSIZE  {  ; RW data
+  RW_IRAM1 0x20000000 0x1FFC0  {    ; RW data - memory hole of 064B on top for ipc
    .ANY (+RW +ZI)
   }
+  RW_IRAM2 0x10000200 0xFE00  {     ; RW data - memory hole of 512B at start for fatal error on restart 
+   .ANY (+RW +ZI)
+  } 
 } 
-
 
 

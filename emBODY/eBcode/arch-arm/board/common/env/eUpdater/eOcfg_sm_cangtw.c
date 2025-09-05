@@ -52,7 +52,7 @@ extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsoc
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "eOcfg_sm_CanGtw.h"
+#include "eOcfg_sm_cangtw.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -39,7 +39,7 @@
 
 
 #include "EoCommon.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 #include "EOMtask.h"
 
 #include "osal_semaphore.h"
@@ -49,10 +49,10 @@
 #include "EOMmutex.h"
 #include "EOsocketDatagram.h"
 #include "EOtimer.h"
-#include "EOMtheCallbackmanager.h"
+#include "EOMtheCallbackManager.h"
 
 // sm
-#include "eOcfg_sm_CanGtw.h"
+#include "eOcfg_sm_cangtw.h"
 
 
 #include "eupdater-info.h"

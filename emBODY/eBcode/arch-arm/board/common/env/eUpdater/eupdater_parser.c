@@ -40,7 +40,7 @@
 #include "EOtimer.h"
 #include "EOaction.h"
 #include "eEsharedServices.h"
-#include "EOMtheCallbackmanager.h"
+#include "EOMtheCallbackManager.h"
 
 #include "hal.h"
 
