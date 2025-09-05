@@ -127,8 +127,12 @@ extern const ipal_cfg_t    ipal_cfg;
 
 #elif defined(BOARD_ems4) | defined(BOARD_mc4plus) | defined(BOARD_mc2plus)
 
+#if (__ARMCC_VERSION > 6000000)
+const eEmoduleExtendedInfo_t emaintainer_modinfo_extended    __attribute__((section(".ARM.__at_0x08020200"))) = 
+#else
+const eEmoduleExtendedInfo_t emaintainer_modinfo_extended    __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+#endif
 
-const eEmoduleExtendedInfo_t emaintainer_modinfo_extended __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .moduleinfo     =
     {
