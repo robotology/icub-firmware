@@ -1,6 +1,3 @@
-#! armcc -E
-; the above must be on teh first line of teh scatter file ...
-
 ; Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
 ; Author:  Marco Accame
 ; email:   marco.accame@iit.it
@@ -16,19 +13,16 @@
 ; WITHOUT ANY WARRANTY; without even the implied warranty of
 ; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
 ; Public License for more details
-; due to a bug in linker (in some older versions), you may need to put the whole path ... thus change it by hand
-;#include "D:\#inhere\sdl\embedded\arm\embody\body\embenv\envcom\eEmemorymap.h"
-#include "..\..\cfg\eEmemorymap.h"
 
 
 ; flash starts from xx and its size is xxx
-LR_IROM1 EENV_MEMMAP_ELOADER_ROMADDR EENV_MEMMAP_ELOADER_ROMSIZE  {    ; load region size_region
-  ER_IROM1 EENV_MEMMAP_ELOADER_ROMADDR EENV_MEMMAP_ELOADER_ROMSIZE  {  ; load address = execution address
+LR_IROM1 0x08000000 0x00008000  {    ; load region size_region
+  ER_IROM1 0x08000000 0x00008000  {  ; load address = execution address
    *.o (RESET, +First)
    *(InRoot$$Sections)
    .ANY (+RO)
   }
-  RW_IRAM1 EENV_MEMMAP_ELOADER_RAMADDR EENV_MEMMAP_ELOADER_RAMSIZE  {  ; RW data
+  RW_IRAM1 0x20000000 0x0001FFC0  {  ; RW data
    .ANY (+RW +ZI)
   }
 }  
