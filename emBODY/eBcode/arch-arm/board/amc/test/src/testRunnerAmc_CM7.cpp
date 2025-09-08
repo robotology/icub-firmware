@@ -31,7 +31,7 @@ static constexpr uint8_t _fPatchVersion = 0;
 bool TestRunnerAmc_CM7::testCanComm(uint8_t *data)
 { 
     embot::core::print("Called method from testRunnerAmc_CM7");
-    embot::core::wait(300* embot::core::time1millisec);	
+    embot::core::wait(600* embot::core::time1millisec);	
     data[0] = 0xAA;
     return true; 
 }
@@ -52,7 +52,9 @@ bool TestRunnerAmc_CM7::testEthComm(uint8_t *data)
 
 bool TestRunnerAmc_CM7::testFwVersion(uint8_t *data)
 { 
-    // saving fw versions to data in order
+    // wait some time so that the GUI application is ready to receive the message
+    embot::core::wait(1000*embot::core::time1millisec);
+    // saving fw versions to data in order	
     data[0] = _fMajorVersion;
     data[1] = _fMinorVersion;
     data[2] = _fPatchVersion;
@@ -95,6 +97,8 @@ bool TestRunnerAmc_CM7::testMicroId(uint8_t *data)
     size_t size = (sizeof(data))/(sizeof(data[0]));
     for(uint8_t i = 0; i < size; i++) {data[i] = 0;}
     
+    // wait some time so that the GUI application is ready to receive the message
+    embot::core::wait(1000*embot::core::time1millisec);
     uint8_t rev1 = id_rev >> 8; //20
     uint8_t rev2 = id_rev;      //03
     uint8_t id1 = id_ver >> 8;  //64
