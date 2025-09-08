@@ -81,7 +81,7 @@ bool TestRunnerAmc_CM4::testCin(uint8_t *data)
     data[2] = ((cin2Int) & 0x0000ff00) >> 8;
     data[1] = ((cin2Int) & 0x000000ff);
     
-    if(cin > 0.020 && cin < 0.060) data[0] = 0xAA;          
+    if(cin > 0.020 && cin < 0.080) data[0] = 0xAA;          
     else data[0] = 0xBB;
     
     return true; 
@@ -231,8 +231,8 @@ bool TestRunnerAmc_CM4::testQuadEncoder(uint8_t *data)
 }
 
 static embot::hw::motor::Currents pwmCurrents(0, 0, 0);
-constexpr int32_t currentThresholdMin = 210; //mA
-constexpr int32_t currentThresholdMax = 270; //mA
+constexpr int32_t currentThresholdMin = 260; //mA
+constexpr int32_t currentThresholdMax = 340; //mA
 
 void onCurrents_FOC_innerloop(void *owner, const embot::hw::motor::Currents * const currents)
 {
