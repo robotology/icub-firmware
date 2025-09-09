@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -410,75 +410,9 @@
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_sm_cangtw.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eOcfg_sm_cangtw.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater_cangtw.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater_cangtw.c</FilePath>
-            </File>
-            <File>
               <FileName>eupdater_parser.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\eupdater\src\eupdater\eupdater_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater-info.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater-info.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
             </File>
             <File>
               <FileName>updater-core.c</FileName>
@@ -1317,7 +1251,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1711,24 +1645,9 @@
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_sm_cangtw.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eOcfg_sm_cangtw.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater_cangtw.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater_cangtw.c</FilePath>
-            </File>
-            <File>
               <FileName>eupdater_parser.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\eupdater\src\eupdater\eupdater_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater-info.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater-info.c</FilePath>
             </File>
             <File>
               <FileName>updater-core.c</FileName>
@@ -2414,7 +2333,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2808,24 +2727,9 @@
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_sm_cangtw.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eOcfg_sm_cangtw.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater_cangtw.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater_cangtw.c</FilePath>
-            </File>
-            <File>
               <FileName>eupdater_parser.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\eupdater\src\eupdater\eupdater_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater-info.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater-info.c</FilePath>
             </File>
             <File>
               <FileName>updater-core.c</FileName>
@@ -3511,7 +3415,7 @@
         <TargetCommonOption>
           <Device>STM32H745IIKx:CM7</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.4.1.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.4.1.2</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x38000000,0x00010000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) XRAM(0x20000000,0x00020000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -3905,24 +3809,9 @@
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
             <File>
-              <FileName>eOcfg_sm_cangtw.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eOcfg_sm_cangtw.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater_cangtw.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater_cangtw.c</FilePath>
-            </File>
-            <File>
               <FileName>eupdater_parser.c</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\eupdater\src\eupdater\eupdater_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>eupdater-info.c</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater-info.c</FilePath>
             </File>
             <File>
               <FileName>updater-core.c</FileName>

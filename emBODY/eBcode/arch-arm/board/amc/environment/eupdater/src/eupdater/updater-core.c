@@ -46,7 +46,11 @@
 
 #include "eEmemorymap.h"
 
+#if !defined(_MAINTAINER_APPL_)
 #include "eupdater-info.h"
+#else
+#include "emaintainer-info.h"
+#endif
 
 #include "EoUpdaterProtocol.h"
 

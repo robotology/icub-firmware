@@ -220,6 +220,11 @@ static void s_eo_armenv_prepare(const eEmoduleInfo_t *modinfo, const eEboardInfo
         {
             s_the_armenv.codeprocoffset = (EENV_MEMMAP_EAPPLICATION_ROMADDR-EENV_ROMSTART);    
         } break;  
+    
+        case ee_procMaintainer:        
+        {
+            s_the_armenv.codeprocoffset = (EENV_MEMMAP_EMAINTAINER_ROMADDR-EENV_ROMSTART);    
+        } break;  
 
         default:
         {

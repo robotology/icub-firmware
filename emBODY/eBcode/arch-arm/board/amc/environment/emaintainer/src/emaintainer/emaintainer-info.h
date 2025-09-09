@@ -17,18 +17,18 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EUPDATERINFO_H_
-#define _EUPDATERINFO_H_
+#ifndef _MAINTAINERERINFO_H_
+#define _MAINTAINERERINFO_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       eupdater-info.h
+/** @file       maintainer-info.h
     @brief      This header file implements ....
     @author     marco.accame@iit.it
     @date       01/11/2012
 **/
 
-/** @defgroup eupdaterinfo cedcew fcevw
+/** @defgroup maintainerrinfo cedcew fcevw
     The embENV allows ...... 
  
     @todo acemor-facenda: do documentation.

@@ -16,9 +16,9 @@
  * Public License for more details
 */
 
-/* @file       eupdater-info.c
-	@brief      This file keeps the module info of the updatre
-	@author     marco.accame@iit.it
+/* @file       maintainer-info.c
+	@brief      This file keeps the module info of the maintainer
+	@author     marco.accame@iit.it, kevin.sangalli@iit.it
     @date       01/11/2012
 **/
 
@@ -76,7 +76,7 @@ extern const ipal_cfg_t    ipal_cfg;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((section(EENV_MODULEINFO_UPDATER_AT))) =
+constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((section(EENV_MODULEINFO_MAINTAINER_AT))) =
 {
     .moduleinfo     =
     {
