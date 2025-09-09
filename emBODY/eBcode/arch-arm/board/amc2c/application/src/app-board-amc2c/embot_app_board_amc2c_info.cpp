@@ -255,17 +255,10 @@ namespace embot::app::board::amc2c::info {
 
 #include "eEsharedServices.h" 
 
-
-#define ROMADDR 0x08100000
-#define ROMSIZE 0x20000
-
-#define EENV_MODULEINFO_LOADER_AT ".ARM.__at_0x08100400"
+#include "eEmemorymap_stm32h7_1024k.h"
 
 
-#define RAMADDR 0x10000000
-#define RAMSIZE 0x00048000
-
-constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended __attribute__((section(EENV_MODULEINFO_LOADER_AT))) =
+constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended __attribute__((section(EENV_MODULEINFO_APPLICATION_2_AT))) =
 {
     .moduleinfo     =
     {
@@ -291,13 +284,13 @@ constexpr eEmoduleExtendedInfo_t s_cm4app_info_extended __attribute__((section(E
             },
             .rom        = 
             {   
-                .addr   = ROMADDR,
-                .size   = ROMSIZE
+                .addr   = EENV_MEMMAP_EAPPLICATION_2_ROMADDR,
+                .size   = EENV_MEMMAP_EAPPLICATION_2_ROMSIZE
             },
             .ram        = 
             {   
-                .addr   = RAMADDR,
-                .size   = RAMSIZE
+                .addr   = EENV_MEMMAP_EAPPLICATION_2_RAMADDR,
+                .size   = EENV_MEMMAP_EAPPLICATION_2_RAMSIZE
             },
             .storage    = 
             {
