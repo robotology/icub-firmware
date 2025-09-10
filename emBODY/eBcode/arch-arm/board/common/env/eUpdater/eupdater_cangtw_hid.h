@@ -32,7 +32,7 @@
 
 #include "eupdater_cangtw.h"
 
-#include "eOcfg_sm_CanGtw.h"
+#include "eOcfg_sm_cangtw.h"
 
 #define UDPCANSIGN  0x12
 

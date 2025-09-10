@@ -42,7 +42,7 @@
 #include "EOMtheSystem.h"
 #include "EOVtheSystem.h"
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 #include "EOMtheIPnet.h"
 
 #include "EOaction.h"

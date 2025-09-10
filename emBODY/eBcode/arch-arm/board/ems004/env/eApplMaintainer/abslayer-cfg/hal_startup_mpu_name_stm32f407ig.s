@@ -58,11 +58,11 @@
 
 ; in case of error from assembler, you surely forgot --cpreproc in menu asm-options/misc-controls
 ; or may also to include it into asm path in menu asm-options/include-paths
-#include "hal_core_cfg.h"
+;#include "hal_core_cfg.h"
     
 
-;Stack_Size      EQU     0x00000400
-Stack_Size      EQU     HAL_SYS_CFG_STACKSIZE
+Stack_Size      EQU     0x00003000
+;Stack_Size      EQU     HAL_SYS_CFG_STACKSIZE
                 EXPORT  Stack_Size
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
@@ -74,8 +74,8 @@ __initial_sp
 ;   o  Heap Size (in Bytes) 0x0-0xFFFFFFFF:8
 ; </h>
 
-;Heap_Size       EQU     0x00002000
-Heap_Size       EQU     HAL_SYS_CFG_HEAPSIZE
+Heap_Size       EQU     0x0001FC00
+;Heap_Size       EQU     HAL_SYS_CFG_HEAPSIZE
                 EXPORT Heap_Size
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3

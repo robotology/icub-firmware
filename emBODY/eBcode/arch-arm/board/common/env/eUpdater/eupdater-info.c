@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 
 #include "EOMtheSystem.h"
 
@@ -81,8 +81,11 @@ extern const ipal_cfg_t    ipal_cfg;
 
 #elif defined(BOARD_ems4) | defined(BOARD_mc4plus) | defined(BOARD_mc2plus)
 
-
+#if (__ARMCC_VERSION > 6000000)
+const eEmoduleExtendedInfo_t eupdater_modinfo_extended    __attribute__((section(".ARM.__at_0x08008200"))) = 
+#else
 const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+#endif
 {
     .moduleinfo     =
     {

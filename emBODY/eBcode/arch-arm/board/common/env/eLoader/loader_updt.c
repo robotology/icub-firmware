@@ -132,9 +132,12 @@ static void s_eeprom_erase(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+#if (__ARMCC_VERSION > 6000000)
+const eEmoduleExtendedInfo_t s_loader_info_extended    __attribute__((section(".ARM.__at_0x08000200"))) = 
+#else
+const eEmoduleExtendedInfo_t s_loader_info_extended    __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+#endif
 
-
-static const eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((at(EENV_MEMMAP_ELOADER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
     .moduleinfo     =
     {
@@ -243,7 +246,7 @@ static eEboardInfo_t s_loader_boardinfo =
 
 static eEboardInfo_t s_loader_boardinfo =                        
 {
-    .info           =
+    .info           =c
     {
         .entity     =
         {
