@@ -88,8 +88,8 @@ constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((se
                 .signature  = ee_procMaintainer,
                 .version    = 
                 { 
-                    .major = 7, 
-                    .minor = 7
+                    .major = 1, 
+                    .minor = 0
                 },  
                 .builddate  = 
                 {
