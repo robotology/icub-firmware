@@ -21,14 +21,6 @@
       <itemPath>../include/crc16.h</itemPath>
       <itemPath>../include/ecan.h</itemPath>
       <itemPath>../include/i2cTsens.h</itemPath>
-      <itemPath>../include/iCubCanProto_analogSensorMessages.h</itemPath>
-      <itemPath>../include/iCubCanProto_bootloaderMessages.h</itemPath>
-      <itemPath>../include/iCubCanProto_classes.h</itemPath>
-      <itemPath>../include/iCubCanProto_inertialSensorMessages.h</itemPath>
-      <itemPath>../include/iCubCanProto_motorControlMessages.h</itemPath>
-      <itemPath>../include/iCubCanProto_skinMessages.h</itemPath>
-      <itemPath>../include/iCubCanProto_types.h</itemPath>
-      <itemPath>../include/iCubCanProtocol.h</itemPath>
       <itemPath>../include/park.h</itemPath>
       <itemPath>../include/qep.h</itemPath>
     </logicalFolder>
@@ -125,7 +117,8 @@
         <property key="enable-symbols" value="false"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="expand-pragma-config" value="false"/>
-        <property key="extra-include-directories" value="..\include"/>
+        <property key="extra-include-directories"
+                  value="..\include;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib"/>
         <property key="isolate-each-function" value="true"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

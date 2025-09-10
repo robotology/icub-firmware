@@ -31,6 +31,64 @@
 #include "ecan.h"
 #include "qep.h"
 
+// temporary here, they will be defined in icub-firmware-shared 
+#define ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAM                1 
+#define ICUBCANPROTO_POL_MC_CMD__SET_PID                        125
+typedef enum
+{ 
+    CURR = 0, VEL = 1, POS = 2, // and others if needed
+    NONE = 15 
+} PIDtype;
+typedef enum 
+{ 
+    KP = 0, KI = 1, KD = 2, 
+    KFF = 3, 
+    LIMINT = 4, LIMOUT = 5,
+    STICTION_UP = 6, STICTION_DOWN = 7, // maybe useful 
+    // KBEMF = 8, // possibly even if it is a motor parameter. TO BE DECIDED!!! 
+    LOCK = 13, UNLOCK = 14
+} PIDparam;
+typedef enum 
+{
+    BEMF = 0x01,
+    HALL = 0x02,
+    ELECT_VMAX = 0x02
+} MotorParam;
+
+volatile static float fIKp    = 0.0f;
+volatile static float fIKi    = 0.0f;
+volatile static float fIKff   = 0.0f;
+volatile static float fIKbemf = 0.0f;
+
+volatile static float fSKp    = 0.0f;
+volatile static float fSKi    = 0.0f;
+volatile static float fSKff   = 0.0f;
+
+extern volatile BOOL IPIDready;
+extern volatile BOOL SPIDready;
+
+static int calcExp(float kp, float ki, float kff, float kbemf)
+{
+    float max = kp;
+    if (ki    > max) max = ki;
+    if (kff   > max) max = kff;
+    if (kbemf > max) max = kbemf;
+    
+    int exponent = 0;
+            
+    for (exponent = 0; exponent < 16; ++exponent)
+    {
+        float power = (float)(1<<exponent);
+        
+        if (max < power)
+        {
+            break;
+        }
+    }
+    
+    return exponent;
+}
+        
 typedef struct      // size is 4+60+4+4 = 72
 {
     uint32_t        canadr;
@@ -271,69 +329,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID)
     {
         if (!gCanProtocolCompatible) return 0;
-
-        extern volatile BOOL IPIDready;
-        
-        if (rxlen == 6)
-        {
-            static tCanData payload;
-            
-            payload.w[0] = rxpayload->w[0];
-            payload.w[1] = rxpayload->w[1];
-            payload.w[2] = rxpayload->w[2];
-            payload.w[3] = rxpayload->w[3];
-            
-            CanSendDebug(&payload, 8);
-            
-            int8_t param_id = rxpayload->b[1];
-            float fk;
-            memcpy(&fk,&(rxpayload->b[2]),4);
-            
-            static float fkp    = 0.0f;
-            static float fki    = 0.0f;
-            static float fkd    = 0.0f;
-            static float fkff   = 0.0f;
-            static float fkbemf = 0.0f;
-                            
-            switch (param_id)
-            {
-                case 1: IPIDready = TRUE;
-                        fkp    = fk; break;
-                case 2: fki    = fk; break;
-                case 3: fkd    = fk; break;
-                case 4: fkff   = fk; break;
-                case 5: fkbemf = fk; break;
-            }
-                
-            float max = fkp;
-            if (fki    > max) max = fki;
-            if (fkd    > max) max = fkd;
-            if (fkff   > max) max = fkff;
-            if (fkbemf > max) max = fkbemf;
-                
-            int exponent = 0;
-            
-            for (exponent = 0; exponent < 16; ++exponent)
-            {
-                float power = (float)(1<<exponent);
-        
-                if (max < power)
-                {
-                    int kp    = (int)(fkp   *32768.0f/power);
-                    int ki    = (int)(fki   *32768.0f/power);
-                  //int kd    = (int)(fkd   *32768.0f/power);
-                    int kff   = (int)(fkff  *32768.0f/power);
-                    int kbemf = (int)(fkbemf*32768.0f/power);
-                    
-                    setIPid(kp,ki,kff,kbemf,15-exponent);
-                    
-                    return 1;
-                }
-            }
-            
-            return 0;
-        }
-        
+       
         if (rxlen==8)
         {
             int  kp    = ((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
@@ -362,63 +358,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID)
     {
         if (!gCanProtocolCompatible) return 0;
-        
-        extern volatile BOOL SPIDready;
-        
-        if (rxlen == 6)
-        {
-            static tCanData payload;
-                        
-            payload.w[0] = rxpayload->w[0];
-            payload.w[1] = rxpayload->w[1];
-            payload.w[2] = rxpayload->w[2];
-            payload.w[3] = rxpayload->w[3];
-            
-            CanSendDebug(&payload, 8);
-            
-            int8_t param_id = rxpayload->b[1];
-            float fk;
-            memcpy(&fk,&(rxpayload->b[2]),4);
-            
-            static float fkp    = 0.0f;
-            static float fki    = 0.0f;
-            static float fkd    = 0.0f;
-            static float fkff   = 0.0f;
-                
-            switch (param_id)
-            {
-                case 1: SPIDready = TRUE;
-                        fkp    = fk; break;
-                case 2: fki    = fk; break;
-                case 3: fkd    = fk; break;
-                case 4: fkff   = fk; break;
-            }
-                
-            float max = fkp;
-            if (fki    > max) max = fki;
-            if (fkd    > max) max = fkd;
-            if (fkff   > max) max = fkff;
-             
-            int exponent = 0;
-            
-            for (exponent = 0; exponent < 16; ++exponent)
-            {
-                float power = (float)(1<<exponent);
-        
-                if (max < power)
-                {
-                    int kp    = (int)(fkp   *32768.0f/power);
-                    int ki    = (int)(fki   *32768.0f/power);
-                  //int kd    = (int)(fkd   *32768.0f/power);
-                    int kff   = (int)(fkff  *32768.0f/power);
-                    
-                    setSPid(kp,ki,kff,15-exponent);
-                    
-                    return 1;
-                }
-            }
-        }
-        
+       
         if (rxlen==8)
         {
             int  kp  = ((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
@@ -441,6 +381,112 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             return 1;
         }
         
+        return 0;
+    }
+    
+    if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_PID)
+    {
+        if (rxlen!=8) return 0;
+        
+        float fk;
+        memcpy(&fk,&(rxpayload->b[4]),4);
+        
+        PIDtype  pid_type  = rxpayload->b[1];
+        PIDparam pid_param = rxpayload->b[2];
+        
+        if (pid_type == CURR)
+        {            
+            static BOOL locked = FALSE;
+            
+            switch (pid_param)
+            {
+                case KP:     fIKp  = fk; break;
+                case KI:     fIKi  = fk; break;
+                case KFF:    fIKff = fk; break;
+                case LOCK:   locked = TRUE; break;
+                default: break;
+            }
+            
+            if (!locked || pid_param==UNLOCK)
+            {
+                locked = FALSE;
+                
+                int exponent = calcExp(fIKp,fIKi,fIKff,fIKbemf);
+                float Knorm = 32768.0f/((float)(1<<exponent));
+            
+                int kp    = (int)(fIKp   *Knorm);
+                int ki    = (int)(fIKi   *Knorm);
+                int kff   = (int)(fIKff  *Knorm);
+                int kbemf = (int)(fIKbemf*Knorm);
+                    
+                setIPid(kp,ki,kff,kbemf,15-exponent);
+                    
+                IPIDready = TRUE;
+            }
+        
+            return 1;
+        }
+        else if (pid_type == VEL)
+        {
+            static BOOL locked = FALSE;
+            
+            switch (pid_param)
+            {
+                case KP:     fSKp  = fk; break;
+                case KI:     fSKi  = fk; break;
+                case KFF:    fSKff = fk; break;
+                case LOCK:   locked = TRUE; break;
+                default: break;
+            }
+            
+            if (!locked || pid_param==UNLOCK)
+            {
+                locked = FALSE;
+                
+                int exponent = calcExp(fSKp,fSKi,fSKff,0);
+                float Knorm = 32768.0f/((float)(1<<exponent));
+            
+                int kp    = (int)(fSKp   *Knorm);
+                int ki    = (int)(fSKi   *Knorm);
+                int kff   = (int)(fSKff  *Knorm);
+                
+                setSPid(kp,ki,kff,15-exponent);
+                    
+                SPIDready = TRUE;
+            }
+        
+            return 1;
+        }
+                
+        return 0;
+    }
+    
+    if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAM)
+    {
+        if (rxlen!=8) return 0;
+        
+        float fk;
+        memcpy(&fk,&(rxpayload->b[2]),4);
+        
+        MotorParam param_type = rxpayload->b[1];
+        
+        if (param_type == BEMF)
+        {
+            fIKbemf = fk;
+            
+            int exponent = calcExp(fIKp,fIKi,fIKff,fIKbemf);
+            float Knorm = 32768.0f/((float)(1<<exponent));
+            
+            int kp    = (int)(fIKp   *Knorm);
+            int ki    = (int)(fIKi   *Knorm);
+            int kff   = (int)(fIKff  *Knorm);
+            int kbemf = (int)(fIKbemf*Knorm);
+                    
+            setIPid(kp,ki,kff,kbemf,15-exponent);
+                                
+            return 1;
+        }
+
         return 0;
     }
 

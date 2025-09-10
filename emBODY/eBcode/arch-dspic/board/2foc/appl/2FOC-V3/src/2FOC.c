@@ -295,30 +295,30 @@ void ResetSetpointWatchdog()
     IFS1bits.T5IF = 0;
 }
 
-        ///////////////////////////
-        /*
-        static int qe_watchdog = 0;
-        if (delta)
+    ///////////////////////////
+    /*
+    static int qe_watchdog = 0;
+    if (delta)
+    {
+        QEisOk = 1;
+        qe_watchdog = 0;
+    }
+    else if (!MotorConfig.has_hall)
+    {
+        if ((I2Tdata.IQMeasured > Ipeak/2) || (I2Tdata.IQMeasured < -Ipeak/2))
         {
-            QEisOk = 1;
-            qe_watchdog = 0;
-        }
-        else if (!MotorConfig.has_hall)
-        {
-            if ((I2Tdata.IQMeasured > Ipeak/2) || (I2Tdata.IQMeasured < -Ipeak/2))
+            if (++qe_watchdog > 10000)
             {
-                if (++qe_watchdog > 10000)
-                {
-                    // QE is broken
-                    qe_watchdog = 0;
-                    gEncoderError.stuck = TRUE;
-                    SysError.EncoderFault = TRUE;
-                    FaultConditionsHandler();
-                }
+                // QE is broken
+                qe_watchdog = 0;
+                gEncoderError.stuck = TRUE;
+                SysError.EncoderFault = TRUE;
+                FaultConditionsHandler();
             }
         }
-        */
-        ///////////////////////////
+    }
+    */
+    ///////////////////////////
 
 BOOL updateOdometry()
 {
@@ -380,55 +380,6 @@ BOOL updateOdometry()
 
     return FALSE;
 }
-/*
-BOOL updateOdometry()
-{
-    if (MotorConfig.has_qe || MotorConfig.has_speed_qe)
-    {
-        static const int UNDERSAMPLING = PWMFREQUENCY / 1000;
-        static int speed_undersampler = 0;
-
-        static int position_old = 0;
-        int position = QEgetPos();
-        int delta = position - position_old;
-
-        position_old = position;
-
-        if (sAlignInProgress)
-        {
-            gQEPosition = 0;
-            gQEVelocity = 0;
-            return FALSE;
-        }
-
-        gQEPosition += delta;
-
-        if (++speed_undersampler == UNDERSAMPLING) // we obtain ticks per ms
-        {
-            speed_undersampler = 0;
-
-            static long QEPosition_old = 0;
-
-            gQEVelocity = (1 + gQEVelocity + gQEPosition - QEPosition_old) / 2;
-
-            QEPosition_old = gQEPosition;
-
-            return TRUE;
-        }
-
-        return FALSE;
-    }
-    else if (MotorConfig.has_hall)
-    {
-        gQEPosition = DHESPosition();
-        gQEVelocity = DHESVelocity();
-
-        return FALSE;
-    }
-
-    return FALSE;
-}
-*/
 
 volatile int rotorAfbk = 0;
 volatile int rotorBfbk = 0;
