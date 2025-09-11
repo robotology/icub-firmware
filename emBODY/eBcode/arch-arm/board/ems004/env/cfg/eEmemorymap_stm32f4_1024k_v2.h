@@ -127,6 +127,17 @@
 
 // 32+96+256 = 384
 
+
+
+// --- emaintainer: in 128K+128k.
+#define EENV_MEMMAP_EMAINTAINER_ROMADDR        EENV_MEMMAP_EAPPLICATION_ROMADDR
+#define EENV_MEMMAP_EMAINTAINER_ROMSIZE        EENV_MEMMAP_EAPPLICATION_ROMSIZE
+
+#define EENV_MEMMAP_EMAINTAINER_RAMADDR        EENV_MEMMAP_EAPPLICATION_RAMADDR 
+#define EENV_MEMMAP_EMAINTAINER_RAMSIZE        EENV_MEMMAP_EAPPLICATION_RAMSIZE
+
+
+
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

@@ -85,7 +85,7 @@ constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((se
             .entity     =
             {
                 .type       = ee_entity_process,
-                .signature  = ee_procMaintainer,
+                .signature  = ee_procApplication,
                 .version    = 
                 { 
                     .major = 1, 
@@ -102,7 +102,7 @@ constexpr eEmoduleExtendedInfo_t emaintainer_modinfo_extended  __attribute__((se
             },
             .rom        = 
             {   
-                .addr   = EENV_MEMMAP_EMAINTAINER_ROMADDR,
+                .addr   = EENV_MEMMAP_EMAINTAINER_ROMADDR, //rom and ram are the same as the application
                 .size   = EENV_MEMMAP_EMAINTAINER_ROMSIZE
             },
             .ram        = 
