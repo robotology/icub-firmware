@@ -220,7 +220,7 @@ static void s_eo_armenv_prepare(const eEmoduleInfo_t *modinfo, const eEboardInfo
         {
             s_the_armenv.codeprocoffset = (EENV_MEMMAP_EAPPLICATION_ROMADDR-EENV_ROMSTART);    
         } break;  
-    
+
         default:
         {
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "s_eo_armenv_prepare(): unsupported proc", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
