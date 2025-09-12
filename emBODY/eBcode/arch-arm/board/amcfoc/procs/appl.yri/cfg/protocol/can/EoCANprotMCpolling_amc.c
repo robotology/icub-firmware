@@ -5,7 +5,6 @@
  * email:   marco.accame@iit.it
 */
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -66,9 +65,11 @@ static void* s_eocanprotMCpolling_get_entity(eOprot_entity_t entity, eOcanframe_
 // former helper funtions
 
 static void s_former_POL_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type);
+
 static void s_former_POL_MC_CMD_setpid(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
+
 static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
 static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
 static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
@@ -84,19 +85,13 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_RUN(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_PARAM(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN);
+    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAM);
+    memmove(&frame->data[1], descriptor->cmd.value, 7); // 1 byte for param + 6 bytes for data 
     return(eores_OK);      
 }
-
-
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_IDLE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE);
-    return(eores_OK); 
-}
-
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -169,17 +164,6 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(eOcanp
     return(eores_OK);
 }
 
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__ENABLE_PWM_PAD(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD);
-    return(eores_OK);   
-}
-
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__DISABLE_PWM_PAD(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD);
-    return(eores_OK);       
-}
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_CONTROL_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -337,6 +321,10 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_MAX_POSITION(eOcanpr
 }
 
 
+
+
+
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_PWM_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_PWM_LIMIT);      
@@ -360,6 +348,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT(eOcanframe
     }
     return(eores_NOK_generic); 
 }
+
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_MOTOR_POS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -594,6 +583,9 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_OFFSET(eOc
 //   return(s_parser_POL_MC_CMD_getimpedance(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET));
 }
 
+
+
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_FIRMWARE_VERSION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     eObrd_protocolversion_t *reqprot = (eObrd_protocolversion_t*)descriptor->cmd.value;
@@ -604,6 +596,9 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_FIRMWARE_VERSION(eOc
     
     return(eores_OK);      
 }
+
+
+
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION(eOcanframe_t *frame, eOcanport_t port)
 {
@@ -632,6 +627,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION(eOc
           
     return(eores_OK);
 }
+
 
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -775,7 +771,6 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_STICTION_PARAMS(
 //    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS));
 }
 
-
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
@@ -813,6 +808,12 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT(eO
 }
 
 
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_PID);   
+    memmove(&frame->data[1], descriptor->cmd.value, 7); // 1 byte for pidtype, 1 byte for paramtype, 1 byte dummy, 4 bytes for the float value    
+    return(eores_OK);      
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

@@ -49,6 +49,7 @@ namespace embot::prot::can::motor {
     enum class ControlMode : uint8_t { 
         // in here the ones used by modern MC boards 
         Idle = 0x00,            // the Idle control mode we use in simulink model
+        Position = 0x01,
         ForceIdle = 0x09,       // assimilated to Idle control mode, possibly used as command and not to report a state
         Current = 0x06,         // the Current control mode we use in simulink model
         SpeedVoltage = 0x0A,    // the Velocity control mode we use in simulink model
@@ -63,10 +64,13 @@ namespace embot::prot::can::motor {
     constexpr uint8_t ControlModeNumberOf {8};    
     
     
-    enum class PIDtype : uint8_t { CURR = 0, VEL = 1, NONE = 7 };
+    enum class PIDtype : uint8_t 
+    { 
+        CURR = 0, VEL = 1, POS = 2, 
+        NONE = 15 
+    };    
     constexpr uint8_t PIDtypeNumberOf {3}; 
-    
-    
+                    
         
     struct Converter
     {
@@ -88,8 +92,8 @@ namespace embot::prot::can::motor {
         static constexpr ControlMode convert(uint8_t v)
         {
             constexpr std::array<ControlMode, ControlModeNumberOf> values { 
-                ControlMode::Idle, ControlMode::ForceIdle, ControlMode::Current, ControlMode::SpeedVoltage, 
-                ControlMode::OpenLoop, ControlMode::NotConfigured, ControlMode::HWfault, ControlMode::none 
+                ControlMode::Idle, ControlMode::Position, ControlMode::ForceIdle, ControlMode::Current, 
+                ControlMode::SpeedVoltage, ControlMode::OpenLoop, ControlMode::NotConfigured, ControlMode::HWfault 
             };  
             
             ControlMode r {ControlMode::none};            
@@ -108,13 +112,13 @@ namespace embot::prot::can::motor {
         {
             constexpr std::array<std::pair<ControlMode, const char *>, ControlModeNumberOf> pairs { 
                 std::pair(ControlMode::Idle, "Idle"), 
+                std::pair(ControlMode::Position, "Position"),
                 std::pair(ControlMode::ForceIdle, "ForceIdle"), 
                 std::pair(ControlMode::Current, "Current"), 
                 std::pair(ControlMode::SpeedVoltage, "SpeedVoltage"),  
                 std::pair(ControlMode::OpenLoop, "OpenLoop"), 
                 std::pair(ControlMode::NotConfigured, "NotConfigured"), 
-                std::pair(ControlMode::HWfault, "HWfault"), 
-                std::pair(ControlMode::none, "none")                
+                std::pair(ControlMode::HWfault, "HWfault")          
             };
 
             auto pp = std::find_if(pairs.begin(), pairs.end(), [&](const auto& p){ return p.first == cm; });            
@@ -181,16 +185,17 @@ namespace embot::prot::can::motor {
         
         static std::string to_string(const PIDtype &t)
         {
-            static const char * typ[8] { "CURR", "VEL", "unknown", "unknown", "unknown", "unknown", "unknown", "NONE" };
-            return typ[embot::core::tointegral(t)];
+            static const char * typ[PIDtypeNumberOf] { "CURR", "VEL", "POS" };
+            size_t p = embot::core::tointegral(t);
+            return (p<PIDtypeNumberOf) ? typ[p] : "NONE";
         }
     
     };      
     
     
 #if 0
-## The `PIDInfo` explained
-The `PIDInfo` contains the PID gains (proportional, integral and derivative) transported by iCub CAN protocol
+## The `embot::prot::can::motor::PID` explained
+The `embot::prot::can::motor::PID` contains the PID gains (proportional, integral and derivative) transported by iCub CAN protocol
 that uses a limited number of bytes.
 The gains are expressed with `int16_t` values, so in range [-32K, +32K-1]. 
 The protocol contains also a parameter `ks` in range [0, 15] that scales the three gains with a factor 
@@ -202,7 +207,19 @@ The protocol contains also a parameter `ks` in range [0, 15] that scales the thr
 - ...
 - `ks` = 15 allows 0.000030517578125 granularity in range [-1.0, +0.999969482421875]
 
-It is important also to tell the measurement units of the gains in case of velocity and current PID.
+It is important also to tell the measurement units of the gains in case of position, velocity and current PID.
+    
+### Position PID
+
+The position PID transforms position [deg] into velocity [deg/s], so the measurement unit of the proportional gain is [1/s].
+
+```mermaid
+flowchart LR
+    id1((position)) --[deg]--> positionPID
+    positionPID --[deg/s]--> id2((velocity))
+```
+The `PIDInfo`, uses [ 1/s] for its `kd`, so the transformation into a floating point gain requires only the `pow(2.0, -ks)`.
+
 
 ### Velocity PID
 
@@ -301,8 +318,8 @@ flowchart LR
     {
         PIDtype type {PIDtype::NONE};           
         int16_t offset {0}; 
-        int16_t limitonoutput{0}; // derivative gain
-        int16_t limitonintegral {0}; // integral gain
+        int16_t limitonoutput{0}; 
+        int16_t limitonintegral {0}; 
         
         constexpr PIDlimits() = default;
         constexpr PIDlimits(PIDtype t, int16_t o, int16_t li, int16_t lo) : type(t), offset(o), limitonintegral(li), limitonoutput(lo) {}
@@ -386,7 +403,319 @@ flowchart LR
                                   + ")}"; 
         }
         
-    };    
+    };  
+    
+    
+    namespace pid {
+        
+        // this namespace manages the types for the SET_PID / GET_PID in floating point 
+        
+        enum class Type : uint8_t
+        {
+            CURR = embot::core::tointegral(PIDtype::CURR),  // 0 
+            VEL = embot::core::tointegral(PIDtype::VEL),    // 1
+            POS = embot::core::tointegral(PIDtype::POS),    // 2
+            NONE = embot::core::tointegral(PIDtype::NONE),  // 15            
+        };
+        constexpr size_t TypeNumberOf {3};
+        
+        
+        enum class Param : uint8_t 
+        { 
+            LOCK = 0, UNLOCK = 1,             
+            KP = 2, KI = 3, KD = 4, 
+            LIMINTEGRAL = 5, LIMOUTPUT = 6,
+            KFF = 7, 
+            STICTION_UP = 8, STICTION_DOWN = 9, 
+
+            NONE = 15 
+        };
+        constexpr size_t ParamNumberOf {10};    
+
+
+        struct Converter
+        {
+            static std::string to_string(const Type &t)
+            {
+                static const char * typ[TypeNumberOf] { "CURR", "VEL", "POS" };
+                size_t i = embot::core::tointegral(t);
+                return (i<PIDtypeNumberOf) ? typ[i] : "NONE";
+            }
+            
+            static std::string to_string(const Param &p)
+            {
+                static const char * par[ParamNumberOf] { "LOCK", "UNLOCK", "KP", "KI", "KD", "LIMINTEGRAL", "LIMOUTPUT", "KFF", "STICTION_UP", "STICTION_DOWN" };
+                size_t i = embot::core::tointegral(p);
+                return (i<ParamNumberOf) ? par[i] : "NONE";
+            }
+        };
+        
+        struct Descriptor
+        {
+            // this struct holds the description of the payload of the SET_PID command (and GET_PID replay)
+            // the payload is 7 bytes [T|P|x|f32t], where T is 1, P is 1, x is 1 and f32t is 4 
+            constexpr Descriptor() = default;
+            
+            constexpr Descriptor(Type t, Param p, float v)
+            {
+                load(t, p, v);
+            }
+            
+            void clear()
+            {
+                load(Type::NONE, Param::NONE, 0.0);
+            }
+                
+            void load(Type t, Param p, float v)
+            { 
+                type = t; param = p; value = v;
+                data[0] = embot::core::tointegral(type);
+                data[1] = embot::core::tointegral(param);
+                data[2] = 0;
+                memmove(&data[3], &value, sizeof(float));
+            }
+            
+            // it loads the bytes of payload[1:7] of a received can frame
+            void load(void *stream)
+            {
+                if(nullptr == stream)
+                {
+                    return;
+                }
+                memmove(data, stream, sizeof(data));
+                type = static_cast<Type>(data[0]);
+                param = static_cast<Param>(data[1]);
+                ffu = data[2];
+                memmove(&value, &data[3], sizeof(float));
+            }   
+
+            const Type getType() const
+            {
+                return type;
+            }            
+
+            const Param getParam() const
+            {
+                return param;
+            } 
+
+            const float getValue() const
+            {
+                return value;
+            } 
+            
+            const uint8_t * getstream() const
+            {
+                return data;
+            }
+
+            constexpr size_t getsizeofstream() const 
+            {
+                return sizeof(data);
+            }
+            
+            constexpr bool isvalid() const { return (Type::NONE != type) && (Param::NONE != param); }     
+
+            std::string to_string() const
+            {
+                return std::string("{") + pid::Converter::to_string(type);  + ", " + pid::Converter::to_string(param) + ", " + std::to_string(value) + "}"; 
+            }  
+        
+        private:
+            uint8_t data[7] = {embot::core::tointegral(Type::NONE), embot::core::tointegral(Param::NONE), 0, 0, 0, 0, 0}; 
+            Type type {Type::NONE};  
+            Param param {Param::NONE};
+            uint8_t ffu {0};
+            float value {0.0};             
+        };
+    
+    } // namespace pid {
+    
+    
+    namespace motorparam {
+        
+        // In here we define a Descriptor able to manipulate [ID|DATA] used in the SET / GET _MOTOR_PARAM messages
+                
+        enum class ID
+        {
+            GENERIC = 0x00,
+            BEMF = 0x01,
+            HALL = 0x02,
+            ELECTR_VMAX = 0x03,
+            NONE = 0xff
+        };
+        constexpr size_t IDnumberOf {4}; 
+                                    
+        constexpr ID toID(const uint8_t id)
+        {
+            return (id < IDnumberOf) ? static_cast<ID>(id) : ID::NONE;
+        }   
+
+        struct Converter
+        {
+            static std::string to_string(const ID &id)
+            {
+                static const char * ids[IDnumberOf] { "GENERIC", "BEMF", "HALL", "ELECTR_VMAX" };
+                size_t i = embot::core::tointegral(id);
+                return (i<IDnumberOf) ? ids[i] : "NONE";
+            }
+        };        
+
+        struct vGENERIC
+        {
+            uint8_t generic[6] {0};
+            // must have
+            uint16_t filler {0};
+            static constexpr size_t size {6};
+            static constexpr motorparam::ID id {motorparam::ID::GENERIC};
+        };  static_assert(sizeof(vGENERIC) == 8, "size must be 8");
+        
+        struct vBEMF
+        {
+            float kbemf {0.0};
+            uint8_t ffu[2] {0};
+            // must have
+            uint16_t filler {0};
+            static constexpr size_t size {6};
+            static constexpr motorparam::ID id {motorparam::ID::BEMF};
+        };  static_assert(sizeof(vBEMF) == 8, "size must be 8");
+            
+        struct vHALL
+        {
+            enum class SwapMode : uint8_t { none = 0, bc = 1 };
+            uint16_t offset {0}; // in degrees
+            SwapMode swapmode {SwapMode::none};
+            uint8_t ffu[3] {0};
+            // must have
+            uint16_t filler {0};
+            static constexpr size_t size {6};
+            static constexpr motorparam::ID id {motorparam::ID::HALL};
+        };  static_assert(sizeof(vHALL) == 8, "size must be 8");   
+        
+        struct vELECTR_VMAX
+        {
+            float vmax {0.0};
+            uint8_t ffu[2] {0};
+            // must have
+            uint16_t filler {0};
+            static constexpr size_t size {6};
+            static constexpr motorparam::ID id {motorparam::ID::ELECTR_VMAX};
+        };  static_assert(sizeof(vBEMF) == 8, "size must be 8");
+                
+        template<typename T>    
+        struct Data 
+        {   // this template struct contains a T that models the 6 bytes of DATA of a SET / GET _MOTOR_PARAM message.
+            // DATA must be 6 bytes accomodated inside a struct of size 8. 
+            // T must have some properties:          
+            static_assert(sizeof(T) == 8, "sizeof(T) must be 8"); 
+            static_assert(T::size == 6, "T::size must be 6");         
+            // static_assert(has_static_id<T>::value, "T must have a static constexpr motorparam::ID id");
+            
+            T v {};
+                
+            Data() = default;
+            Data(const uint8_t* data) { load(data); }    
+                                   
+            // we load data into T
+            void load(const uint8_t* data) { memmove(&v, &data[0], v.size); }            
+            // we get a mutable reference to T so that we can change it
+            T& value() { return v; }    
+            // and also a non mutable reference
+            const T& value() const { return v; }                      
+            // we get the serialization of T to be placed in a can frame
+            const uint8_t * serialize() const { return reinterpret_cast<const uint8_t*>(&v); }                         
+        };
+                
+        
+        struct Descriptor
+        { 
+            // this struct holds the description of the information transported by the SET_MOTOR_PARAM command (and the reply to GET_MOTOR_PARAM)
+            // it manages: ID + DATA[6], where the format of DATA[6] depends on ID
+               
+            // basic ctor 
+            constexpr Descriptor() = default;
+            
+            constexpr Descriptor(ID id, const uint8_t *data)
+            {
+                load(id, data);
+            }
+            
+            // clear to default values
+            void clear()
+            {
+                memset(id_data, 0, sizeof(id_data));
+                id_data[0] = embot::core::tointegral(ID::NONE);
+            }
+            
+            // it loads the bytes of payload[1:7] of a received can frame
+            bool load(const uint8_t *stream)
+            {
+                if((nullptr == stream) || (ID::NONE == toID(stream[0])))
+                {
+                    return false;
+                }
+                memmove(id_data, stream, sizeof(id_data)); 
+                return true;            
+            }
+            
+            // fills the object w/ [id|data] so that we can later get the stream to fill a frame we wnat to transmit
+            // data should be taken from .... Data::serialize()
+            bool load(ID id, const uint8_t *data)
+            {
+                if((ID::NONE == id) || (nullptr == data)) 
+                {
+                    return false;
+                }
+                id_data[0] = embot::core::tointegral(id);
+                memmove(&id_data[1], data, sizeof(id_data)-1);  
+                return true;
+            }
+            
+            // verify validity
+            bool isvalid() const
+            {
+                return id_data[0] != embot::core::tointegral(ID::NONE);
+            }
+            
+            // retrieves the ID
+            const ID getID() const
+            {
+                return toID(id_data[0]);
+            }
+            
+            // retrieves only the data (not the ID)
+            const uint8_t * getdata() const
+            {
+                return &id_data[1];
+            }        
+            
+            // retrieves all the seven bytes of the stream [id|data]
+            const uint8_t * getstream() const
+            {
+                return id_data;
+            }
+                 
+            constexpr size_t getsizeofstream() const 
+            {
+                return sizeof(id_data);
+            }
+            
+
+            std::string to_string() const
+            {
+                return std::string("{") + Converter::to_string(getID()) + ", data = TBD" + "}"; 
+            } 
+
+            
+        private:
+            // id_data[0] contains the ID, id_data[1:6] contains up to 6 bytes of data
+            uint8_t id_data[7] = {embot::core::tointegral(motorparam::ID::NONE), 0, 0, 0, 0, 0, 0};                                 
+        }; 
+    
+        
+    } // namespace motorparam {        
+
+ 
     
 } // namespace embot::prot::can::motor {
 

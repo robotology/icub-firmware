@@ -35,25 +35,39 @@ namespace embot::prot::can::motor::polling {
     enum class CMD : uint8_t { 
         none = 0xfe, 
      
+        SET_MOTOR_PARAM = 1,
+        GET_MOTOR_PARAM = 2,
+        
         GET_CONTROL_MODE = 7,
         SET_CONTROL_MODE = 9,
         SET_BOARD_ID = 50, 
         SET_CURRENT_LIMIT = 72, 
+        
+        SET_POS_PID = 82,
+        GET_POS_PID = 83,
+        SET_POS_PIDLIMITS = 84,
+        GET_POS_PIDLIMITS = 85,        
+        
         GET_FIRMWARE_VERSION = 91,
+        
         SET_CURRENT_PID = 101,  
         GET_CURRENT_PID = 102,
         SET_CURRENT_PIDLIMITS = 103,       
-        GET_CURRENT_PIDLIMITS = 104,            
+        GET_CURRENT_PIDLIMITS = 104, 
+                   
         SET_VELOCITY_PID = 105,         
         GET_VELOCITY_PID = 106,
         SET_VELOCITY_PIDLIMITS = 107,   
-        GET_VELOCITY_PIDLIMITS = 108,   
+        GET_VELOCITY_PIDLIMITS = 108,  
+         
         SET_MOTOR_CONFIG = 119,
         SET_TEMPERATURE_LIMIT = 121,
         GET_TEMPERATURE_LIMIT = 122, 
         GET_MOTOR_CONFIG = 123,
-        GET_CURRENT_LIMIT = 124 
-      
+        GET_CURRENT_LIMIT = 124,
+        
+        SET_PID = 125,
+        GET_PID = 126      
     };
     
     // NOTES
@@ -227,86 +241,8 @@ namespace embot::prot::can::motor::polling {
         bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);       
     };    
 
-//#if 0
-//## The `PIDInfo` explained
-//The `PIDInfo` contains the PID gains (proportional, integral and derivative) transported by iCub CAN protocol
-//that uses a limited number of bytes.
-//The gains are expressed with `int16_t` values, so in range [-32K, +32K-1]. 
-//The protocol contains also a parameter `ks` in range [0, 15] that scales the three gains with a factor 
-//`pow(2.0f, -ks)`, so that:
 
-//- `ks` = 0 does not scale the three gains that assume only integer values in [-32768.0, +32767.0], 
-//- `ks` = 1 allows 0.5 granularity in range [-16384.0, +16383.5],
-//- `ks` = 2 allows 0.25 granularity in range [-8192.0, +8191.75],
-//- ...
-//- `ks` = 15 allows 0.000030517578125 granularity in range [-1.0, +0.999969482421875]
-
-//It is important also to tell the measurement units of the gains in case of velocity and current PID.
-
-//### Velocity PID
-
-//The velocity PID transforms velocity [deg/s] into current [A], so the measurement unit of the proportional gain is [A/(deg/s)].
-
-//```mermaid
-//flowchart LR
-//    id1((velocity)) --[deg/s]--> velocityPID
-//    velocityPID --[A]--> id2((current))
-//```
-//The `PIDInfo`, uses [milli-A / (deg/s)] for its `kd`, so the transformation into a floating point gain requires a further 0.001 conversion factor after the `pow(2.0, -ks)`.
-
-//### Current PID
-
-//The current PID transforms current [A] into voltage [V], so the measurement unit of the proportional gain is [V/A].
-
-//The `PIDInfo`, uses [V/A] for its `kd`, so the transformation into a floating point gain requires only the `pow(2.0, -ks)`.
-
-//```mermaid
-//flowchart LR
-//    id1((current)) --[A]--> currentPID
-//    currentPID --[V]--> id2((voltage))
-//```
-
-//#endif
-//    struct PIDInfo
-//    {
-//        enum class Type : uint8_t { CURR = 0, VEL = 1, NONE = 7 };
-//        enum class Gain : uint8_t { P = 0, I = 1, D = 2 };
-//        Type type {Type::NONE};         
-//        int16_t kp {0}; // proportional gain
-//        int16_t ki {0}; // integral gain
-//        int16_t kd {0}; // derivative gain
-//        uint8_t ks {0}; // shift factor w/ values in range [0, 15]. it gives a scalefactor of pow(2, -ks) that we apply to kx
-//        constexpr bool isvalid() const { return ks<16; }
-//        constexpr float scalefactor() const 
-//        {   // pow(2, -ks) implemented as 1/(1<<ks) if ks is in range [0, 15], else very small, so  0.0
-//            // alternate implementation is: static_cast<float>(0x1 << (15-ks))/ (32.0f*1024.0f)
-//            float r = 0.0f; 
-//            if(isvalid()) { r = 1.0 / static_cast<float>(1 << ks);    }
-//            return r;
-//        }
-//        constexpr float get(Gain g) const 
-//        {
-//            float v {0};
-//            switch(g)
-//            {
-//                case Gain::P: { v = static_cast<float>(kp); } break;
-//                case Gain::I: { v = static_cast<float>(ki); } break;
-//                case Gain::D: { v = static_cast<float>(kd); } break;
-//                default: {} break;
-//            };
-//            constexpr float milli2ampere = 0.001f;
-//            return (Type::VEL == type) ? milli2ampere*scalefactor()*v :  scalefactor()*v;
-//        }
-//    };
-
-//    struct InfoPID
-//    { 
-//        MotIndex motorindex {MotIndex::one};
-//        embot::prot::can::motor::PID pid {};            
-//        InfoPID() = default;
-//    };
-
-    struct Message_SET_CURRENT_PID : public Message
+    struct Message_SET_POS_PID : public Message
     {                  
         struct Info
         { 
@@ -315,13 +251,13 @@ namespace embot::prot::can::motor::polling {
             Info() = default;
             std::string to_string() const
             {
-                return std::string("set<CURRENT_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+                return std::string("set<POS_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
             }                 
         };
         
         Info info {};
         
-        Message_SET_CURRENT_PID() = default;
+        Message_SET_POS_PID() = default;
             
         bool load(const embot::prot::can::Frame &inframe);
             
@@ -329,7 +265,7 @@ namespace embot::prot::can::motor::polling {
     };
        
 
-    struct Message_GET_CURRENT_PID : public Message
+    struct Message_GET_POS_PID : public Message
     {
         struct Info
         { 
@@ -337,7 +273,7 @@ namespace embot::prot::can::motor::polling {
             Info() = default;
             std::string to_string() const
             {
-                return std::string("get<CURRENT_PID, MotIndex::") + tostring(motorindex) + ">";             
+                return std::string("get<POS_PID, MotIndex::") + tostring(motorindex) + ">";             
             }              
         };
         
@@ -348,13 +284,13 @@ namespace embot::prot::can::motor::polling {
             ReplyInfo() = default;
             std::string to_string() const
             {
-                return std::string("reply<CURRENT_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+                return std::string("reply<POS_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
             }                  
         };
         
         Info info {};
         
-        Message_GET_CURRENT_PID() = default;
+        Message_GET_POS_PID() = default;
             
         bool load(const embot::prot::can::Frame &inframe);
             
@@ -417,7 +353,63 @@ namespace embot::prot::can::motor::polling {
         bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);       
     };
 
+    
+    struct Message_SET_CURRENT_PID : public Message
+    {                  
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::PID pid {};            
+            Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<CURRENT_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                 
+        };
+        
+        Info info {};
+        
+        Message_SET_CURRENT_PID() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };
+       
 
+    struct Message_GET_CURRENT_PID : public Message
+    {
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};             
+            Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<CURRENT_PID, MotIndex::") + tostring(motorindex) + ">";             
+            }              
+        };
+        
+        struct ReplyInfo
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::PID pid {};            
+            ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("reply<CURRENT_PID = ") + pid.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
+        };
+        
+        Info info {};
+        
+        Message_GET_CURRENT_PID() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);       
+    }; 
+    
+    
     struct Message_SET_MOTOR_CONFIG : public Message
     {                  
         struct Info
@@ -647,7 +639,200 @@ namespace embot::prot::can::motor::polling {
         bool load(const embot::prot::can::Frame &inframe);
             
         bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);       
-    };    
+    };  
+
+    
+    struct Message_SET_PID : public Message
+    {                     
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::pid::Descriptor descriptor {};            
+            Info() = default;
+            Info(const embot::prot::can::motor::pid::Descriptor &d, MotIndex m) : descriptor(d), motorindex(m) {}
+            std::string to_string() const
+            {
+                return std::string("set<PID = ") + descriptor.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                 
+        };
+        
+        Info info {};
+        
+        Message_SET_PID() = default;            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+            
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info, transmits it and stop 
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address to, Address sender);
+        };    
+
+        struct Receiver
+        {   // the reveiver use ::parse() to get Info from the inframe, use it to set the required value and stop
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);       
+        }; 
+
+        struct Examples
+        {
+            static void sender();
+            static void receiver();
+        };
+    };
+       
+
+    struct Message_GET_PID : public Message
+    {
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};    
+            embot::prot::can::motor::pid::Type type { embot::prot::can::motor::pid::Type::NONE }; 
+            embot::prot::can::motor::pid::Param param { embot::prot::can::motor::pid::Param::NONE };  
+            
+            Info() = default;
+            Info(embot::prot::can::motor::pid::Type t, embot::prot::can::motor::pid::Param p, MotIndex m = MotIndex::one) : type(t), param(p), motorindex(m) {}
+            std::string to_string() const
+            {
+                return std::string("get<PID, MotIndex::") + tostring(motorindex) + ", Type::" + pid::Converter::to_string(type) +  ", Param::" + pid::Converter::to_string(param) + ">";             
+            }              
+        };
+        
+        struct ReplyInfo
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::pid::Descriptor descriptor {};            
+            ReplyInfo() = default;
+            ReplyInfo(const embot::prot::can::motor::pid::Descriptor &d, MotIndex m) : descriptor(d), motorindex(m) {}
+            std::string to_string() const
+            {
+                return std::string("reply<PID = ") + descriptor.to_string() + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
+        };
+        
+        Info info {};
+        
+        Message_GET_PID() = default;            
+        bool load(const embot::prot::can::Frame &inframe);                      
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);  
+                
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info, transmits it and waits for a inframe, finally it gets the ReplyInfo w/ ::parse() 
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address to, Address sender);
+            static bool parse(ReplyInfo &repinf, const embot::prot::can::Frame &inframe);
+        };    
+
+        struct Receiver
+        {   // the reveiver use ::parse() to get Info from the inframe, fills the ReplyInfo, prepares an outframe w/ ::form() and transmits it back
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);
+            static bool form(embot::prot::can::Frame &outframe, const ReplyInfo &repinf, Address to, Address sender);            
+        };  
+
+        struct Examples
+        {
+            static void sender();
+            static void receiver();
+        };            
+      
+    }; 
+
+
+    struct Message_SET_MOTOR_PARAM : public Message
+    {                    
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::motorparam::Descriptor descriptor {};            
+            Info() = default;
+            Info(const embot::prot::can::motor::motorparam::Descriptor &d, MotIndex m) : descriptor(d), motorindex(m) {}
+            std::string to_string() const
+            {
+                return std::string("set<MOTOR_PARAM, MotIndex::") + tostring(motorindex) + "> = (" + descriptor.to_string() +  ")";            
+            }                 
+        };
+                
+        Info info {};
+       
+        Message_SET_MOTOR_PARAM() = default;            
+        bool load(const embot::prot::can::Frame &inframe);       
+
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info, transmits it and stop 
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address to, Address sender);
+        };    
+
+        struct Receiver
+        {   // the reveiver use ::parse() to get Info from the inframe, use it to set the required value and stop
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);       
+        }; 
+
+        struct Examples
+        {
+            static void sender();
+            static void receiver();
+        };            
+
+    };
+    
+       
+
+    struct Message_GET_MOTOR_PARAM : public Message
+    {
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one}; 
+            embot::prot::can::motor::motorparam::ID id;           
+            Info() = default;
+            Info(embot::prot::can::motor::motorparam::ID i, MotIndex m) : id(i), motorindex(m) {}
+            std::string to_string() const
+            {
+                return std::string("get<MOTOR_PARAM, MotIndex::") + tostring(motorindex) + ", ID::" + embot::prot::can::motor::motorparam::Converter::to_string(id) +  ">";             
+            }              
+        };
+        
+        struct ReplyInfo
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::motorparam::Descriptor descriptor {};            
+            ReplyInfo() = default;
+            ReplyInfo(const embot::prot::can::motor::motorparam::Descriptor &d, MotIndex m) : descriptor(d), motorindex(m) {}
+            std::string to_string() const
+            {
+                return std::string("reply<MOTOR_PARAM, MotIndex::") + tostring(motorindex) + "> = (" + descriptor.to_string() +  ")";               
+            }                  
+        };
+        
+        Info info {};
+        
+        Message_GET_MOTOR_PARAM() = default;            
+        bool load(const embot::prot::can::Frame &inframe);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);   
+            
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info, transmits it and waits for a inframe, finally it gets the ReplyInfo w/ ::parse() 
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address to, Address sender);
+            static bool parse(ReplyInfo &repinf, const embot::prot::can::Frame &inframe);
+        };    
+
+        struct Receiver
+        {   // the reveiver use ::parse() to get Info from the inframe, fills the ReplyInfo, prepares an outframe w/ ::form() and transmits it back
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);
+            static bool form(embot::prot::can::Frame &outframe, const ReplyInfo &repinf, Address to, Address sender);            
+        };  
+
+        struct Examples
+        {
+            static void sender();
+            static void receiver();
+        };              
+
+        static bool extract(Info &info, const embot::prot::can::Frame &inframe);
+        static bool prepare(embot::prot::can::Frame &outframe, const Info &inf, Address to, Address sender);            
+    
+        static void exampleRXprocessing(const Info &info);
+        static void exampleTXprocessing(Info &info);
+    }; 
+    
     
 } // namespace embot::prot::can::motor::polling {
     

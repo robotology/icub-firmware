@@ -98,6 +98,9 @@ namespace embot::app::eth::mc::messaging::info {
 
     using MOTOR_ACTUATION = int32_t;
     
+    using PID_DESCRIPTOR = embot::prot::can::motor::pid::Descriptor;
+    using MOTORPARAM_DESCRIPTOR = embot::prot::can::motor::motorparam::Descriptor;
+    
                              
 } // namespace embot::app::eth::mc::messaging::info {
 
@@ -209,6 +212,28 @@ namespace embot::app::eth::mc::messaging::sender {
 
         bool transmit();    
     };   
+       
+    struct Set_PID
+    { 
+        embot::app::msg::Location destination {};           
+        info::PID_DESCRIPTOR descriptor{};
+            
+        Set_PID() = default;
+        Set_PID(const embot::app::msg::Location &d, const info::PID_DESCRIPTOR &desc) : destination(d), descriptor(desc) {}
+            
+        bool transmit();    
+    };
+             
+    struct Set_Motor_Param
+    { 
+        embot::app::msg::Location destination {};           
+        info::MOTORPARAM_DESCRIPTOR descriptor{};
+            
+        Set_Motor_Param() = default;
+        Set_Motor_Param(const embot::app::msg::Location &d, const info::MOTORPARAM_DESCRIPTOR &desc) : destination(d), descriptor(desc) {}
+            
+        bool transmit();    
+    };    
     
 } // namespace embot::app::eth::mc::messaging::sender {
 
