@@ -104,7 +104,19 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
     eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
 }
 
-
+#if 0
+#include "Motor.h"
+extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
+{
+    // just for debug
+    eOlocation_t loc {0};
+    loc.bus = eobus_can1; loc.adr = 5;
+    Motor_DEBUG_send_KFFcurr(2.0, loc);
+    Motor_DEBUG_send_KFFvel(3.0, loc);
+    Motor_DEBUG_send_KBEMF(4.0, loc);
+     
+}
+#endif
 
 //#include "osal.h"
 

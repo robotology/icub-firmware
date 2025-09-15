@@ -111,12 +111,12 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     },  
-    {   // 001      ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN
-        EO_INIT(.former) eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_RUN,
+    {   // 001      ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAM
+        EO_INIT(.former) eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_PARAM,
         EO_INIT(.parser) NULL
     }, 
-    {   // 002      ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE
-        EO_INIT(.former) eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_IDLE,
+    {   // 002      ICUBCANPROTO_POL_MC_CMD__GET_MOTOR_PARAM
+        EO_INIT(.former) NULL, 
         EO_INIT(.parser) NULL
     },  
     {   // 003
@@ -127,12 +127,12 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         EO_INIT(.former) eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER,
         EO_INIT(.parser) NULL
     },  
-    {   // 005      ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD
-        EO_INIT(.former) eocanprotMCpolling_former_POL_MC_CMD__ENABLE_PWM_PAD,
+    {   // 005      ICUBCANPROTO_POL_MC_CMD__SET
+        EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     }, 
-    {   // 006      ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD
-        EO_INIT(.former) eocanprotMCpolling_former_POL_MC_CMD__DISABLE_PWM_PAD,
+    {   // 006      ICUBCANPROTO_POL_MC_CMD__GET
+        EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     },  
     {   // 007      ICUBCANPROTO_POL_MC_CMD__GET_CONTROL_MODE
@@ -607,7 +607,15 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     {   // 124      ICUBCANPROTO_POL_MC_CMD__GET_CURRENT_LIMIT 
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
-    }     
+    },
+    {   // 125      ICUBCANPROTO_POL_MC_CMD__SET_PID 
+        EO_INIT(.former) eocanprotMCpolling_former_POL_MC_CMD__SET_PID,
+        EO_INIT(.parser) NULL
+    },
+    {   // 126      ICUBCANPROTO_POL_MC_CMD__GET_PID 
+        EO_INIT(.former) NULL,
+        EO_INIT(.parser) NULL
+    }      
 };  EO_VERIFYsizeof(s_eo_canprot_functions_pollingMotorControl, (ICUBCANPROTO_POL_MC_CMD_MAXNUM)*sizeof(eOcanprot_functions_t))
 
 

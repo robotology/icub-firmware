@@ -155,20 +155,13 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_STATUS(eOcanframe_t
 
 // - motion control: polling
 
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_RUN(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_PARAM(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 // no parser
 
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_IDLE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
-// no parser
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 // no parser
 
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__ENABLE_PWM_PAD(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
-// no parser
-
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__DISABLE_PWM_PAD(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
-// no parser
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_CONTROL_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_CONTROL_MODE(eOcanframe_t *frame, eOcanport_t port);
@@ -328,6 +321,9 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_STICTION_PARA
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port);
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+// no parser
 
 // - motion control: periodic
 

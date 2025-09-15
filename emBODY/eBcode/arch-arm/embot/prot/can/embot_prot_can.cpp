@@ -275,7 +275,13 @@ namespace embot { namespace prot { namespace can {
         }
         return true;
     }
-                
+
+
+    Message::Message(const embot::prot::can::Frame &fr)
+    {
+        set(fr);
+    } 
+    
     void Message::set(const embot::prot::can::Frame &fr)
     {
         canframe = fr;

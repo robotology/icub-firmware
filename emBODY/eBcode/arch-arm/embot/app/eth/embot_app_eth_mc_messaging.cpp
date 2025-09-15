@@ -386,7 +386,34 @@ namespace embot::app::eth::mc::messaging::sender {
 #endif        
     }        
    
-
+    bool Set_PID::transmit()
+    {
+        Command command 
+        {
+            destination, 
+            eocanprot_msgclass_pollingMotorControl, 
+            ICUBCANPROTO_POL_MC_CMD__SET_PID, 
+            const_cast<uint8_t*>(descriptor.getstream()),
+            eocanprotMCpolling_former_POL_MC_CMD__SET_PID
+        };
+        
+        return command.transmit();  
+    } 
+    
+    bool Set_Motor_Param::transmit()
+    {
+        Command command 
+        {
+            destination, 
+            eocanprot_msgclass_pollingMotorControl, 
+            ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAM, 
+            const_cast<uint8_t*>(descriptor.getstream()),
+            eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_PARAM
+        };
+        
+        return command.transmit();  
+    }
+    
 } // namespace embot::app::eth::mc::messaging::sender {
 
  

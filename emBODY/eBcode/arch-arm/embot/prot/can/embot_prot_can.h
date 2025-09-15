@@ -65,6 +65,12 @@ namespace embot::prot::can {
             }
             return false;
         }
+        void clear()
+        {
+            id = size = 0;
+            memset(filler, 0, sizeof(filler));
+            memset(data, 0, sizeof(data));
+        }
         std::string to_string() const
         {
             char i[8] = {0};
@@ -233,6 +239,8 @@ namespace embot::prot::can {
     
               
         Message() = default;
+            
+        Message(const embot::prot::can::Frame &fr);
            
         // it copies a received frame and it computes other data structure with it. it sets valid = true. after that, if valid == true one can use the public data structures
         void set(const embot::prot::can::Frame &fr);

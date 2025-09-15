@@ -65,7 +65,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -87,8 +87,7 @@ static void* s_eocanprotMCpolling_get_entity(eOprot_entity_t entity, eOcanframe_
 
 
 // parser helper funtions
-
-//static eOresult_t s_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port);
+// none so far
 
 // former helper funtions
 
@@ -107,7 +106,7 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -116,17 +115,11 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
 
 
 
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_RUN(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_PARAM(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__CONTROLLER_RUN);
+    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAM);
+    memmove(&frame->data[1], descriptor->cmd.value, 7); // 1 byte for param + 6 bytes for data 
     return(eores_OK);      
-}
-
-
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CONTROLLER_IDLE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__CONTROLLER_IDLE);
-    return(eores_OK); 
 }
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
@@ -200,17 +193,6 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(eOcanp
     return(eores_OK);
 }
 
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__ENABLE_PWM_PAD(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__ENABLE_PWM_PAD);
-    return(eores_OK);   
-}
-
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__DISABLE_PWM_PAD(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__DISABLE_PWM_PAD);
-    return(eores_OK);       
-}
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_CONTROL_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -530,14 +512,6 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_LIMIT(eOcanp
     return(eores_OK);
 }
 
-extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT);
-    // now i prepare data[1] -> data[2]   
-    *((int16_t*)(&frame->data[1])) = *((eOmeas_temperature_t*)descriptor->cmd.value);
-    
-    return(eores_OK);
-}
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_BCAST_POLICY(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
@@ -869,13 +843,28 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_STICTION_PARA
     s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS);
     return(eores_OK);
 }
+
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port)
 {
     return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS));
 }
 
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TEMPERATURE_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_TEMPERATURE_LIMIT);
+    // now i prepare data[1] -> data[2]   
+    *((int16_t*)(&frame->data[1])) = *((eOmeas_temperature_t*)descriptor->cmd.value);
+    
+    return(eores_OK);
+}
 
 
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_PID);   
+    memmove(&frame->data[1], descriptor->cmd.value, 7); // 1 byte for pidtype, 1 byte for paramtype, 1 byte dummy, 4 bytes for the float value    
+    return(eores_OK);      
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
