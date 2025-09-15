@@ -38,6 +38,7 @@
 #include "EOtheEntities.h"
 #include "embot_app_eth_mc_messaging.h"    
 
+
 /////////////////////////////////////////////////////////
 // Motor
 
@@ -99,6 +100,74 @@ static void Motor_hardStopCalbData_reset(Motor* o)
     o->hardstop_calibdata.u.bits.iscalibrating = 0;
 }
 
+void Motor_send_KFFcurr(float kff, eOlocation_t mloc)
+{
+    embot::app::eth::mc::messaging::sender::Set_PID sp {{&mloc}, {embot::prot::can::motor::pid::Type::CURR, embot::prot::can::motor::pid::Param::KFF, kff}};
+    sp.transmit();     
+}
+
+void Motor_send_KFFvel(float kff, eOlocation_t mloc)
+{
+    embot::app::eth::mc::messaging::sender::Set_PID sp {{&mloc}, {embot::prot::can::motor::pid::Type::VEL, embot::prot::can::motor::pid::Param::KFF, kff}};
+    sp.transmit();     
+}
+
+void Motor_send_KBEMF(float kbemf, eOlocation_t mloc)
+{       
+    embot::prot::can::motor::motorparam::Data<embot::prot::can::motor::motorparam::vBEMF> bemf {};
+    bemf.value().kbemf = kbemf;
+
+    embot::app::eth::mc::messaging::sender::Set_Motor_Param mp {{&mloc}, {embot::prot::can::motor::motorparam::ID::BEMF, bemf.serialize()}};
+    mp.transmit();         
+}
+
+static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
+{
+    int8_t KpKiKdKs[7];
+    
+    float32_t ks = 1.0f/(float32_t)(1<<pidcurrent->scale);
+    float32_t kp = ks*pidcurrent->kp;
+    float32_t ki = ks*pidcurrent->ki;
+    float32_t kd = ks*pidcurrent->kd;
+    float32_t kff = ks*pidcurrent->kff;
+    
+    if (kp<0.0f || ki<0.0f || kd<0.0f || kff<0.0f) return;
+    
+    // kp, ki and kd are sent via legacy CAN message, so they need to be scaled
+    float32_t   max = kp;
+    if (ki>max) max = ki;
+    if (kd>max) max = kd;
+    
+    int16_t Kp = 0;
+    int16_t Ki = 0;
+    int16_t Kd = 0;
+    uint8_t Ks = 0;
+    
+    for (int exponent = 0; exponent < 16; ++exponent)
+    {
+        float32_t power = (float32_t)(1<<exponent);
+        
+        if (max < power)
+        {
+            Kp = (int16_t)(kp*32768.0f/power);
+            Ki = (int16_t)(ki*32768.0f/power);
+            Kd = (int16_t)(kd*32768.0f/power);
+            Ks = 15-exponent;
+            
+            break;
+        }    
+    }
+ 
+    // ICUBCANPROTO_POL_MC_CMD__SET_PID (current, kff)
+    Motor_send_KFFcurr(kff, o->motorlocation);
+        
+    // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID
+    embot::app::eth::mc::messaging::sender::Set_Current_PID msg {{&o->motorlocation}, {Kp, Ki, Kd, Ks}};
+    msg.transmit(); 
+}
+
+#if 0
+// former
 static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
 {
     int8_t can_pid_param_config[5];
@@ -126,6 +195,56 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     msgmc_kp.transmit();
 }
 
+#endif
+
+static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
+{
+    int8_t KpKiKdKs[7];
+    
+    float32_t ks = 1.0f/(float32_t)(1<<pidvelocity->scale);
+    float32_t kp = ks*pidvelocity->kp;
+    float32_t ki = ks*pidvelocity->ki;
+    float32_t kd = ks*pidvelocity->kd;
+    float32_t kff = ks*pidvelocity->kff;
+    
+    if (kp<0.0f || ki<0.0f || kd<0.0f || kff<0.0f) return;
+    
+    // kp, ki and kd are sent via legacy CAN message, so they need to be scaled
+    float32_t   max = kp;
+    if (ki>max) max = ki;
+    if (kd>max) max = kd;
+    
+    int16_t Kp = 0;
+    int16_t Ki = 0;
+    int16_t Kd = 0;
+    uint8_t Ks = 0;
+    
+    for (int exponent = 0; exponent < 16; ++exponent)
+    {
+        float32_t power = (float32_t)(1<<exponent);
+        
+        if (max < power)
+        {
+            Kp = (int16_t)(kp*32768.0f/power);
+            Ki = (int16_t)(ki*32768.0f/power);
+            Kd = (int16_t)(kd*32768.0f/power);
+            Ks = 15-exponent;
+            
+            break;
+        }    
+    }
+
+    // ICUBCANPROTO_POL_MC_CMD__SET_PID (velocity, kff)
+    Motor_send_KFFvel(kff, o->motorlocation); 
+    
+    // ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID    
+    embot::app::eth::mc::messaging::sender::Set_Velocity_PID msg {{&o->motorlocation}, {Kp, Ki, Kd, Ks}};
+    msg.transmit();    
+}
+
+
+#if 0
+// former
 static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
 {
     int8_t can_pid_param_config[5];
@@ -152,6 +271,7 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
     embot::app::eth::mc::messaging::sender::Set_Velocity_PID msgmc_kff {{&o->motorlocation}, {&can_pid_param_config[0]}};
     msgmc_kff.transmit();
 }
+#endif
 
 static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_t* current_params)
 { 
@@ -213,23 +333,20 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     msgtmp.transmit();
 
     // ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT 
-    embot::app::eth::mc::messaging::sender::Set_Current_Limit msg
+    embot::app::eth::mc::messaging::sender::Set_Current_Limit msg 
     {
         {&o->motorlocation},
         {config->currentLimits.nominalCurrent, config->currentLimits.peakCurrent, config->currentLimits.overloadCurrent}
     };
     msg.transmit(); 
+    
+    // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAM
+    float32_t kbemf = config->Kbemf;
+    Motor_send_KBEMF(kbemf, o->motorlocation);     
         
     // ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG    
     embot::app::eth::mc::messaging::sender::Set_Motor_Config msgmc {{&o->motorlocation}, {&o->can_motor_config[0]}};
-    msgmc.transmit();
-
-    int8_t can_pid_param_config[7];
-    float32_t kbemf = config->Kbemf;
-    can_pid_param_config[0] = 5;
-    memcpy((void *)(can_pid_param_config+1),(const void*)&kbemf,4);
-    embot::app::eth::mc::messaging::sender::Set_Current_PID msgmc_kbemf {{&o->motorlocation}, {&can_pid_param_config[0]}};
-    msgmc_kbemf.transmit();    
+    msgmc.transmit();          
 }
 
 static void Motor_set_control_mode_2FOC(Motor* o, icubCanProto_controlmode_t control_mode)
