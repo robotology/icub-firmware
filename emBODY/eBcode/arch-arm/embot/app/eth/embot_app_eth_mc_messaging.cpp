@@ -259,7 +259,8 @@ namespace embot::app::eth::mc::messaging::sender {
         };
         
         return command.transmit();  
-    }        
+    }
+
 
     bool Calibrate_Encoder::transmit()
     {

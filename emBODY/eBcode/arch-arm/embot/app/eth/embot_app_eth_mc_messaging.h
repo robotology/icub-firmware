@@ -70,9 +70,9 @@ namespace embot::app::eth::mc::messaging::info {
         PID16bit(int16_t p, int16_t i, int16_t d, uint8_t s) : Kp(p), Ki(i), Kd(d), Ks(s) {}
     };  
 
-    //using CURRENT_PID = PID16bit;
+    using CURRENT_PID = PID16bit;
     
-    //using VELOCITY_PID = PID16bit; 
+    using VELOCITY_PID = PID16bit;
     
     struct GenericData
     {   // but we can use less bytes
@@ -83,11 +83,9 @@ namespace embot::app::eth::mc::messaging::info {
         GenericData(void *p) { if(nullptr != p) { std::memmove(bytes, p, 8); } }
     };  
 
-    using CURRENT_PID = GenericData;
     
-    using VELOCITY_PID = GenericData; 
-   
     using MOTOR_CONFIG = GenericData;    
+
 
     struct CALIBRATE_ENCODER
     {   
@@ -177,7 +175,7 @@ namespace embot::app::eth::mc::messaging::sender {
             
         bool transmit();    
     };  
-    
+
     struct Calibrate_Encoder
     {
         embot::app::msg::Location destination {};           
