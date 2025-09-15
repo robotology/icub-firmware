@@ -825,12 +825,6 @@ namespace embot::prot::can::motor::polling {
             static void sender();
             static void receiver();
         };              
-
-        static bool extract(Info &info, const embot::prot::can::Frame &inframe);
-        static bool prepare(embot::prot::can::Frame &outframe, const Info &inf, Address to, Address sender);            
-    
-        static void exampleRXprocessing(const Info &info);
-        static void exampleTXprocessing(Info &info);
     }; 
     
     

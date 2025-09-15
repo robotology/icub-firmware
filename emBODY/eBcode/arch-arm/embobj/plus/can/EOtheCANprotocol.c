@@ -127,11 +127,11 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         EO_INIT(.former) eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER,
         EO_INIT(.parser) NULL
     },  
-    {   // 005      ICUBCANPROTO_POL_MC_CMD__FFU005
+    {   // 005      ICUBCANPROTO_POL_MC_CMD__SET
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     }, 
-    {   // 006      ICUBCANPROTO_POL_MC_CMD__FFU006
+    {   // 006      ICUBCANPROTO_POL_MC_CMD__GET
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     },  
