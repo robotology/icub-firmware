@@ -25,11 +25,12 @@ namespace embot::app::bldc {
            
     class theMC2agent
     {
+            
     public:
         static theMC2agent& getInstance();
         
         static constexpr std::initializer_list<embot::hw::MOTOR> themotors {embot::hw::MOTOR::one, embot::hw::MOTOR::two};    
-        static constexpr size_t numberofmotors {themotors.size()}; // {embot::hw::motor::bldc::MAXnumber};         
+        static constexpr size_t numberofmotors {themotors.size()};        
  
         struct Config
         {

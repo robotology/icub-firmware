@@ -38,6 +38,9 @@ namespace embot::prot::can::motor::polling {
         SET_MOTOR_PARAM = 1,
         GET_MOTOR_PARAM = 2,
         
+        SET = 5,
+        GET = 6,
+        
         GET_CONTROL_MODE = 7,
         SET_CONTROL_MODE = 9,
         SET_BOARD_ID = 50, 
@@ -852,6 +855,11 @@ namespace embot::prot::can::motor::polling {
             embot::prot::can::motor::motorparam::Descriptor descriptor {};            
             ReplyInfo() = default;
             ReplyInfo(const embot::prot::can::motor::motorparam::Descriptor &d, MotIndex m) : descriptor(d), motorindex(m) {}
+            void load(const embot::prot::can::motor::motorparam::Descriptor &d, MotIndex m)
+            {
+                motorindex = m;
+                descriptor = d;
+            }
             std::string to_string() const
             {
                 return std::string("reply<MOTOR_PARAM, MotIndex::") + tostring(motorindex) + "> = (" + descriptor.to_string() +  ")";               
@@ -884,6 +892,103 @@ namespace embot::prot::can::motor::polling {
         };              
     }; 
     
+
+    struct Message_SET : public Message
+    {                    
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::generic::Descriptor descriptor {};            
+            Info() = default;
+            Info(const embot::prot::can::motor::generic::Descriptor &d, MotIndex m) : descriptor(d), motorindex(m) {}
+            std::string to_string() const
+            {
+                return std::string("set<ID, MotIndex::") + tostring(motorindex) + "> = (" + descriptor.to_string() +  ")";            
+            }                 
+        };
+                
+        Info info {};
+       
+        Message_SET() = default;            
+        bool load(const embot::prot::can::Frame &inframe);       
+
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info, transmits it and stop 
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address to, Address sender);
+        };    
+
+        struct Receiver
+        {   // the reveiver use ::parse() to get Info from the inframe, use it to set the required value and stop
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);       
+        }; 
+
+        struct Examples
+        {
+            static void sender();
+            static void receiver();
+        };            
+
+    };
+    
+       
+
+    struct Message_GET : public Message
+    {
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one}; 
+            embot::prot::can::motor::generic::ID id;           
+            Info() = default;
+            Info(embot::prot::can::motor::generic::ID i, MotIndex m) : id(i), motorindex(m) {}
+            std::string to_string() const
+            {
+                return std::string("get<ID, MotIndex::") + tostring(motorindex) + ", ID::" + embot::prot::can::motor::generic::Converter::to_string(id) +  ">";             
+            }              
+        };
+        
+        struct ReplyInfo
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::generic::Descriptor descriptor {};            
+            ReplyInfo() = default;
+            ReplyInfo(const embot::prot::can::motor::generic::Descriptor &d, MotIndex m) : descriptor(d), motorindex(m) {}
+            void load(const embot::prot::can::motor::generic::Descriptor &d, MotIndex m)
+            {
+                motorindex = m;
+                descriptor = d;
+            }
+            std::string to_string() const
+            {
+                return std::string("reply<ID, MotIndex::") + tostring(motorindex) + "> = (" + descriptor.to_string() +  ")";               
+            }                  
+        };
+        
+        Info info {};
+        
+        Message_GET() = default;            
+        bool load(const embot::prot::can::Frame &inframe);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);   
+            
+
+        struct Sender
+        {   // the sender use ::form() to prepare an outframe from an Info, transmits it and waits for a inframe, finally it gets the ReplyInfo w/ ::parse() 
+            static bool form(embot::prot::can::Frame &outframe, const Info &inf, Address to, Address sender);
+            static bool parse(ReplyInfo &repinf, const embot::prot::can::Frame &inframe);
+        };    
+
+        struct Receiver
+        {   // the reveiver use ::parse() to get Info from the inframe, fills the ReplyInfo, prepares an outframe w/ ::form() and transmits it back
+            static bool parse(Info &info, const embot::prot::can::Frame &inframe);
+            static bool form(embot::prot::can::Frame &outframe, const ReplyInfo &repinf, Address to, Address sender);            
+        };  
+
+        struct Examples
+        {
+            static void sender();
+            static void receiver();
+        };              
+    }; 
     
 } // namespace embot::prot::can::motor::polling {
     
