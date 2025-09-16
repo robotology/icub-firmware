@@ -95,14 +95,20 @@ struct embot::app::application::theCANparserMC2::Impl
     // polling parsers, set<>
     static bool parse_set_controlmode(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_set_currentlimit(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    static bool parse_set_pospid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    static bool parse_set_pospidlimits(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_set_currentpid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_set_currentpidlimits(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_set_velocitypid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_set_velocitypidlimits(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_set_motorconfig(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_set_temperaturelimit(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    static bool parse_set_pid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    static bool parse_set_motorparam(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     // polling parses, get<>
     static bool parse_get_controlmode(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    static bool parse_get_pospid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);  
+    static bool parse_get_pospidlimits(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);    
     static bool parse_get_currentpid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);  
     static bool parse_get_currentpidlimits(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_get_velocitypid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
@@ -110,13 +116,18 @@ struct embot::app::application::theCANparserMC2::Impl
     static bool parse_get_temperaturelimit(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_get_motorconfig(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     static bool parse_get_currentlimit(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    static bool parse_get_pid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    static bool parse_get_motorparam(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
             
     static constexpr std::array<ParserItem, 128> lutMCparserPOLLING
     {
-          0,  1,  2,  3,  4,  5,  6,
-        {7, embot::prot::can::OPC::get, parse_get_controlmode},         // GET_CONTROL_MODE
-         8,
-        {9, embot::prot::can::OPC::set, parse_set_controlmode},         // SET_CONTROL_MODE
+          0,  
+        { 1, embot::prot::can::OPC::set, parse_set_motorparam},         // SET_MOTOR_PARAM
+        { 2, embot::prot::can::OPC::get, parse_get_motorparam},         // GET_MOTOR_PARAM
+          3,  4,  5,  6,
+        { 7, embot::prot::can::OPC::get, parse_get_controlmode},        // GET_CONTROL_MODE
+          8,
+        { 9, embot::prot::can::OPC::set, parse_set_controlmode},        // SET_CONTROL_MODE
          10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 
          20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 
          30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 
@@ -128,7 +139,14 @@ struct embot::app::application::theCANparserMC2::Impl
          70, 71, 
         {72, embot::prot::can::OPC::set, parse_set_currentlimit},       // SET_CURRENT_LIMIT
                      73, 74, 75, 76, 77, 78, 79,
-         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 
+         80, 81, 
+        
+        {82, embot::prot::can::OPC::set, parse_set_pospid},        // SET_POS_PID   
+        {83, embot::prot::can::OPC::get, parse_get_pospid},        // GET_POS_PID 
+        {84, embot::prot::can::OPC::set, parse_set_pospidlimits},  // SET_POS_PIDLIMITS
+        {85, embot::prot::can::OPC::get, parse_get_pospidlimits},  // GET_POS_PIDLIMITS
+        
+                                 86, 87, 88, 89, 
          90,         
         {91, embot::prot::can::OPC::get, nullptr},                      // GET_FIRMWARE_VERSION = 91 is not parsed in here
                  92, 93, 94, 95, 96, 97, 98, 99,
@@ -149,7 +167,10 @@ struct embot::app::application::theCANparserMC2::Impl
         {122, embot::prot::can::OPC::get, parse_get_temperaturelimit},  // GET_TEMPERATURE_LIMIT
         {123, embot::prot::can::OPC::get, parse_get_motorconfig},       // GET_MOTOR_CONFIG
         {124, embot::prot::can::OPC::get, parse_get_currentlimit},      // GET_CURRENT_LIMIT
-                           125,126,127                                                
+        {125, embot::prot::can::OPC::set, parse_set_pid},               // SET_PID
+        {126, embot::prot::can::OPC::get, parse_get_pid},               // GET_PID
+
+                                   127                                                
     };
     
 };
@@ -254,6 +275,13 @@ embot::app::utils::fpParser embot::app::application::theCANparserMC2::Impl::getp
                 } break;
                 
                 // all the SET<> but not SET_BOARD_ID
+                
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_MOTOR_PARAM):
+                {
+                    result.processed = (filter != FILTER::onlyGET);
+                    fp = parse_set_motorparam;                 
+                } break;
+                
                 case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_CONTROL_MODE):
                 {
                     result.processed = (filter != FILTER::onlyGET);
@@ -265,17 +293,41 @@ embot::app::utils::fpParser embot::app::application::theCANparserMC2::Impl::getp
                     result.processed = (filter != FILTER::onlyGET);
                     fp = parse_set_currentlimit;               
                 } break;
+ 
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_POS_PID):
+                {
+                    result.processed = (filter != FILTER::onlyGET);
+                    fp = parse_set_pospid;               
+                } break;
+
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_POS_PIDLIMITS):
+                {
+                    result.processed = (filter != FILTER::onlyGET);
+                    fp = parse_set_pospidlimits;               
+                } break;
                 
                 case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_CURRENT_PID):
                 {
                     result.processed = (filter != FILTER::onlyGET);
                     fp = parse_set_currentpid;               
                 } break;
+ 
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_CURRENT_PIDLIMITS):
+                {
+                    result.processed = (filter != FILTER::onlyGET);
+                    fp = parse_set_currentpidlimits;               
+                } break;
                 
                 case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_VELOCITY_PID):
                 {
                     result.processed = (filter != FILTER::onlyGET);
                     fp = parse_set_velocitypid;
+                } break;
+
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_VELOCITY_PIDLIMITS):
+                {
+                    result.processed = (filter != FILTER::onlyGET);
+                    fp = parse_set_velocitypidlimits;
                 } break;
                 
                 case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_MOTOR_CONFIG):
@@ -290,13 +342,82 @@ embot::app::utils::fpParser embot::app::application::theCANparserMC2::Impl::getp
                     fp = parse_set_temperaturelimit;
                 } break;
                 
+                
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_PID):
+                {
+                    result.processed = (filter != FILTER::onlyGET);
+                    fp = parse_set_pid;
+                } break;  
+                
+                
                 // the relevant GET<>
+ 
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_MOTOR_PARAM):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_motorparam;
+                } break; 
+                
                 case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_CONTROL_MODE):
                 {
                     result.processed = (filter != FILTER::dontGET);
                     fp = parse_get_controlmode;
-                } break;                      
+                } break;  
+
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_POS_PID):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_pospid;
+                } break;                 
+
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_POS_PIDLIMITS):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_pospidlimits;
+                } break; 
+                
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_CURRENT_PID):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_currentpid;
+                } break;                 
+
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_CURRENT_PIDLIMITS):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_currentpidlimits;
+                } break;
+                
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_VELOCITY_PID):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_velocitypid;
+                } break;                 
+
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_VELOCITY_PIDLIMITS):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_velocitypidlimits;
+                } break;   
+
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_TEMPERATURE_LIMIT):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_temperaturelimit;
+                } break;                  
+                
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_MOTOR_CONFIG):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_motorconfig;
+                } break;  
             
+                case static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_PID):
+                {
+                    result.processed = (filter != FILTER::dontGET);
+                    fp = parse_get_pid;
+                } break;  
+                
             } // switch(cmd)
             
         } break; // case embot::prot::can::Clas::pollingMotorControl:
@@ -556,6 +677,18 @@ bool embot::app::application::theCANparserMC2::Impl::parse_ems2foc_desired_curre
     return hasreply;        
 }
 
+bool embot::app::application::theCANparserMC2::Impl::parse_set_motorparam(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    Impl *impl = reinterpret_cast<Impl*>(p);
+    constexpr bool hasreply {false};
+    embot::prot::can::motor::polling::Message_SET_MOTOR_PARAM msg;
+    msg.load(frame); 
+    // msg.info.motorindex contains the information about the target motor and we MAY want to use the destination address for it     
+    impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
+    impl->config.agent->get(msg.info);    
+    return hasreply;        
+}
+
 bool embot::app::application::theCANparserMC2::Impl::parse_set_controlmode(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
     Impl *impl = reinterpret_cast<Impl*>(p);
@@ -580,6 +713,27 @@ bool embot::app::application::theCANparserMC2::Impl::parse_set_currentlimit(void
     return hasreply;        
 }
 
+bool embot::app::application::theCANparserMC2::Impl::parse_set_pospid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    Impl *impl = reinterpret_cast<Impl*>(p);
+    constexpr bool hasreply {false};
+    embot::prot::can::motor::polling::Message_SET_POS_PID msg;
+    msg.load(frame);
+    impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
+    impl->config.agent->get(msg.info);    
+    return hasreply;        
+}
+
+bool embot::app::application::theCANparserMC2::Impl::parse_set_pospidlimits(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    Impl *impl = reinterpret_cast<Impl*>(p);
+    constexpr bool hasreply {false};
+    embot::prot::can::motor::polling::Message_SET_POS_PIDLIMITS msg;
+    msg.load(frame);
+    impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
+//    impl->config.agent->get(msg.info);    
+    return hasreply;        
+}
 
 bool embot::app::application::theCANparserMC2::Impl::parse_set_currentpid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
@@ -649,6 +803,39 @@ bool embot::app::application::theCANparserMC2::Impl::parse_set_temperaturelimit(
     return hasreply;        
 }
 
+bool embot::app::application::theCANparserMC2::Impl::parse_set_pid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    Impl *impl = reinterpret_cast<Impl*>(p);
+    constexpr bool hasreply {false};
+    embot::prot::can::motor::polling::Message_SET_PID msg;
+    msg.load(frame); 
+    impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
+    impl->config.agent->get(msg.info);    
+    return hasreply;        
+}
+
+bool embot::app::application::theCANparserMC2::Impl::parse_get_motorparam(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    Impl *impl = reinterpret_cast<Impl*>(p);
+    
+    embot::prot::can::motor::polling::Message_GET_MOTOR_PARAM msg;
+    msg.load(frame);
+    
+    embot::prot::can::motor::polling::Message_GET_MOTOR_PARAM::ReplyInfo replyinfo {};
+    
+    impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
+    impl->config.agent->get(msg.info, replyinfo);
+
+    embot::prot::can::Frame frame0 {};
+    uint8_t adr = impl->config.getaddress(static_cast<embot::hw::MOTOR>(msg.info.motorindex));
+    if(true == msg.reply(frame0, adr, replyinfo))
+    {
+        replies.push_back(frame0);
+        return true;
+    }    
+    return false;         
+}
+
 bool embot::app::application::theCANparserMC2::Impl::parse_get_controlmode(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
     Impl *impl = reinterpret_cast<Impl*>(p);
@@ -671,6 +858,49 @@ bool embot::app::application::theCANparserMC2::Impl::parse_get_controlmode(void 
     return false;         
 }
 
+bool embot::app::application::theCANparserMC2::Impl::parse_get_pospid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    Impl *impl = reinterpret_cast<Impl*>(p);
+    
+    embot::prot::can::motor::polling::Message_GET_POS_PID msg;
+    msg.load(frame);
+    
+    embot::prot::can::motor::polling::Message_GET_POS_PID::ReplyInfo replyinfo {};
+    
+    impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
+    impl->config.agent->get(msg.info, replyinfo);
+
+    embot::prot::can::Frame frame0 {};
+    uint8_t adr = impl->config.getaddress(static_cast<embot::hw::MOTOR>(msg.info.motorindex));
+    if(true == msg.reply(frame0, adr, replyinfo))
+    {
+        replies.push_back(frame0);
+        return true;
+    }    
+    return false;       
+}
+
+bool embot::app::application::theCANparserMC2::Impl::parse_get_pospidlimits(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    Impl *impl = reinterpret_cast<Impl*>(p);
+    
+    embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS msg;
+    msg.load(frame);
+    
+    embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::ReplyInfo replyinfo {};
+    
+    impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
+//    impl->config.agent->get(msg.info, replyinfo);
+
+    embot::prot::can::Frame frame0 {};
+    uint8_t adr = impl->config.getaddress(static_cast<embot::hw::MOTOR>(msg.info.motorindex));
+    if(true == msg.reply(frame0, adr, replyinfo))
+    {
+        replies.push_back(frame0);
+        return true;
+    }    
+    return false;       
+}
 
 bool embot::app::application::theCANparserMC2::Impl::parse_get_currentpid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
@@ -813,6 +1043,28 @@ bool embot::app::application::theCANparserMC2::Impl::parse_get_currentlimit(void
     msg.load(frame);
     
     embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::ReplyInfo replyinfo {};
+    
+    impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
+    impl->config.agent->get(msg.info, replyinfo);
+
+    embot::prot::can::Frame frame0 {};
+    uint8_t adr = impl->config.getaddress(static_cast<embot::hw::MOTOR>(msg.info.motorindex));
+    if(true == msg.reply(frame0, adr, replyinfo))
+    {
+        replies.push_back(frame0);
+        return true;
+    }    
+    return false;          
+}
+
+bool embot::app::application::theCANparserMC2::Impl::parse_get_pid(void *p, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
+{
+    Impl *impl = reinterpret_cast<Impl*>(p);
+    
+    embot::prot::can::motor::polling::Message_GET_PID msg;
+    msg.load(frame);
+    
+    embot::prot::can::motor::polling::Message_GET_PID::ReplyInfo replyinfo {};
     
     impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
     impl->config.agent->get(msg.info, replyinfo);

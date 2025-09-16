@@ -179,6 +179,7 @@ namespace embot::app::bldc::mbd::interface {
         void get_current_limits(uint8_t motor, embot::app::bldc::mbd::interface::SupervisorInputLimits &cl);
         void get_current_pid(uint8_t motor, embot::app::bldc::mbd::interface::PID &pid);
         void get_velocity_pid(uint8_t motor, embot::app::bldc::mbd::interface::PID &pid);
+        void get_pos_pid(uint8_t motor, embot::app::bldc::mbd::interface::PID &pid);
         void get_motor_config(uint8_t motor, embot::app::bldc::mbd::interface::MotorConfigurationExternal &mc);
 
     public:

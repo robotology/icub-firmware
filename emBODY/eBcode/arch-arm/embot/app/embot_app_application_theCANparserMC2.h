@@ -11,12 +11,6 @@
 #ifndef _EMBOT_APP_APPLICATION_THECANPARSERMC2_H_
 #define _EMBOT_APP_APPLICATION_THECANPARSERMC2_H_
 
-//#include "embot_core.h"
-//#include "embot_prot_can.h"
-//#include "embot_prot_can_motor_polling.h"
-//#include "embot_prot_can_motor_periodic.h"
-//#include <vector>
-//#include <memory>
 
 #include <vector>
 #include <memory>
@@ -37,7 +31,7 @@ namespace embot::app::application {
     public:
         
         static constexpr std::initializer_list<embot::hw::MOTOR> themotors {embot::hw::MOTOR::one, embot::hw::MOTOR::two};    
-        static constexpr size_t numberofmotors {themotors.size()}; // {embot::hw::motor::bldc::MAXnumber};       
+        static constexpr size_t numberofmotors {themotors.size()};       
         
         struct Config
         {
@@ -86,7 +80,7 @@ namespace embot::app::application {
             // there are typically no 
             theCANparserMC2.getInstance().process(theCANparserMC2::Step::one, frame, replies);
         }
-        MBD..tick(); // the MBD will use the received data and fill up possible new data
+        MBD.tick(); // the MBD will use the received data and fill up possible new data
         for(const auto &frame : inputframes)
         {
             // the step two just picks up the get<> commands that must contain values modified by the MBD 
@@ -96,17 +90,7 @@ namespace embot::app::application {
         }
 #endif        
         
-        // it loads all. it calls agent on set<> or received sig<>, possibly produces acks that are pushed back in output (nearly never)
-        // AND it defers all the get<> that are internally stored and processed by replies()
-//        bool feed(const std::vector<embot::prot::can::Frame> &input, std::vector<embot::prot::can::Frame> &output);
-        // time to call the agent.tick()
-        // if there are deferred get<> it calls agent for them and push back replies in output 
-//        bool replies(std::vector<embot::prot::can::Frame> &output);
-//        // if the agent needs to emit frames it pushes back in output
-//        bool emitted(std::vector<embot::prot::can::Frame> &output);
-        
-        // the above is always ok if it processes only set() commands. it may fail if it process a get() command about
-        // something modified by a previous set(). So pls check this case.
+
 
     private:
         theCANparserMC2(); 
