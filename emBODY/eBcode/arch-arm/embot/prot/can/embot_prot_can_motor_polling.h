@@ -529,7 +529,64 @@ namespace embot::prot::can::motor::polling {
         embot::prot::can::motor::PIDlimits pidlimits {};            
         InfoPIDlimits() = default;
     };
+    
+    
+    struct Message_SET_POS_PIDLIMITS : public Message
+    {                  
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::PIDlimits pidlimits {};            
+            Info() = default;
+            std::string to_string() const
+            {
+                return std::string("set<POS_PIDLIMITS = ") + "TBD" + "[?]" + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                  
+        };
         
+        Info info {};
+        
+        Message_SET_POS_PIDLIMITS() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };
+       
+
+    struct Message_GET_POS_PIDLIMITS : public Message
+    {
+        struct Info
+        { 
+            MotIndex motorindex {MotIndex::one};             
+            Info() = default;
+            std::string to_string() const
+            {
+                return std::string("get<POS_PIDLIMIT, MotIndex::") + tostring(motorindex) + ">";             
+            } 
+        };
+        
+        struct ReplyInfo
+        { 
+            MotIndex motorindex {MotIndex::one};
+            embot::prot::can::motor::PIDlimits pidlimits {};            
+            ReplyInfo() = default;
+            std::string to_string() const
+            {
+                return std::string("signal<POS_PIDLIMITS = ") + "TBD" + "[?]" + ", MotIndex::" + tostring(motorindex) + ">";               
+            }                 
+        };
+        
+        Info info {};
+        
+        Message_GET_POS_PIDLIMITS() = default;
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);       
+    };     
+
+    
     struct Message_SET_CURRENT_PIDLIMITS : public Message
     {                  
         struct Info
