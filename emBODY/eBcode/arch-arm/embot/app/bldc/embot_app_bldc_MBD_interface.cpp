@@ -221,7 +221,7 @@ namespace embot::app::bldc::mbd::interface {
         {
             embot::prot::can::motor::ControlMode::NotConfigured,   // ControlModes_NotConfigured = 0
             embot::prot::can::motor::ControlMode::Idle,            // ControlModes_Idle = 1
-            embot::prot::can::motor::ControlMode::Idle,            // ControlModes_Position = 2 we dont have CAN boards controlled in position
+            embot::prot::can::motor::ControlMode::Position,         // ControlModes_Position = 2 
             embot::prot::can::motor::ControlMode::Idle,            // ControlModes_PositionDirect = 3 we dont have CAN boards controlled in position direct
             embot::prot::can::motor::ControlMode::Current,         // ControlModes_Current = 4 
             embot::prot::can::motor::ControlMode::SpeedVoltage,    // ControlModes_Velocity = 5 
@@ -249,10 +249,11 @@ namespace embot::app::bldc::mbd::interface {
             constexpr Pair(embot::prot::can::motor::ControlMode c1, embot::app::bldc::mbd::interface::ControlModes c2)  : cmCAN(c1), cmMBD(c2) {}       
         };  
         
-        constexpr uint8_t numOfcan {8};
+        constexpr uint8_t numOfcan {embot::prot::can::motor::ControlModeNumberOf+1};
         constexpr std::array<Pair, numOfcan> toMBDcm
         {
             Pair{embot::prot::can::motor::ControlMode::Idle,           embot::app::bldc::mbd::interface::ControlModes::ControlModes_Idle},
+            Pair{embot::prot::can::motor::ControlMode::Position,      embot::app::bldc::mbd::interface::ControlModes::ControlModes_Position},
             Pair{embot::prot::can::motor::ControlMode::Current,        embot::app::bldc::mbd::interface::ControlModes::ControlModes_Current},
             Pair{embot::prot::can::motor::ControlMode::ForceIdle,      embot::app::bldc::mbd::interface::ControlModes::ControlModes_Idle},
             Pair{embot::prot::can::motor::ControlMode::SpeedVoltage,   embot::app::bldc::mbd::interface::ControlModes::ControlModes_Velocity},      
@@ -292,8 +293,14 @@ namespace embot::app::bldc::mbd::interface {
     }
     
     void Converter::fromcan(const embot::prot::can::motor::PID &from, PID &to)
-    {       
-        to.type = (from.type == embot::prot::can::motor::PIDtype::VEL) ? ControlModes_Velocity : ControlModes_Current;
+    {   
+        switch(from.type)
+        {
+            case embot::prot::can::motor::PIDtype::POS: { to.type = ControlModes_Position; } break;
+            case embot::prot::can::motor::PIDtype::VEL: { to.type = ControlModes_Velocity; } break;
+            case embot::prot::can::motor::PIDtype::CURR: { to.type = ControlModes_Current; } break;
+            default: { to.type = ControlModes_NotConfigured; } break; 
+        };            
         to.OutMax = 0;
         to.OutMin = 0;
         to.P = from.get(embot::prot::can::motor::PID::Gain::P);
@@ -306,8 +313,15 @@ namespace embot::app::bldc::mbd::interface {
     }
     
     void Converter::tocan(const embot::app::bldc::mbd::interface::PID &from, embot::prot::can::motor::PID &to)
-    {       
-        embot::prot::can::motor::PIDtype pidtype = (from.type == ControlModes_Velocity) ? embot::prot::can::motor::PIDtype::VEL :  embot::prot::can::motor::PIDtype::CURR;        
+    { 
+        embot::prot::can::motor::PIDtype pidtype {embot::prot::can::motor::PIDtype::NONE};
+        switch(from.type)
+        {
+            case ControlModes_Position: { pidtype = embot::prot::can::motor::PIDtype::POS;} break;
+            case ControlModes_Velocity: { pidtype = embot::prot::can::motor::PIDtype::VEL;} break;
+            case ControlModes_Current: { pidtype = embot::prot::can::motor::PIDtype::CURR;} break;
+            default: {} break;
+        }   
         to.load(pidtype, from.P, from.I, from.D, from.shift_factor);
     }    
     
@@ -654,6 +668,12 @@ namespace embot::app::bldc::mbd::interface {
     {
         pid = state.actcfg[motor]->pids.velocityPID;
         pid.type = ControlModes_Velocity; // marco.accame: i use the type field to tell that the PID is a velocity / current / position
+    }
+
+    void IO2::get_pos_pid(uint8_t motor, PID &pid)
+    {
+        pid = state.actcfg[motor]->pids.positionPID;
+        pid.type = ControlModes_Position; // marco.accame: i use the type field to tell that the PID is a velocity / current / position
     }
     
     void IO2::get_motor_config(uint8_t motor, embot::app::bldc::mbd::interface::MotorConfigurationExternal &mc)

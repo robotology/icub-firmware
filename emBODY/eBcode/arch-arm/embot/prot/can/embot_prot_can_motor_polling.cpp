@@ -56,6 +56,8 @@ namespace embot::prot::can::motor::polling {
             // bits 0-63
             (1ULL << static_cast<std::uint8_t>(CMD::SET_MOTOR_PARAM))               |
             (1ULL << static_cast<std::uint8_t>(CMD::GET_MOTOR_PARAM))               |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET))                           |
+            (1ULL << static_cast<std::uint8_t>(CMD::GET))                           |                
             (1ULL << static_cast<std::uint8_t>(CMD::GET_CONTROL_MODE))              |
             (1ULL << static_cast<std::uint8_t>(CMD::SET_CONTROL_MODE))              |
             (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ID))                  ,
@@ -577,7 +579,63 @@ namespace embot::prot::can::motor::polling {
         return true;
     } 
     
+    
+    bool Message_SET_POS_PIDLIMITS::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET_POS_PIDLIMITS) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.pidlimits.type = embot::prot::can::motor::PIDtype::POS;
+        info.pidlimits.offset = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[0]);
+        info.pidlimits.limitonoutput = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[2]);
+        info.pidlimits.limitonintegral = embot::core::binary::word::memory2value<int16_t>(&candata.datainframe[4]);
+                     
+        return true;         
+    }                    
+        
+    bool Message_SET_POS_PIDLIMITS::reply()
+    {
+        return false;
+    } 
 
+    bool Message_GET_POS_PIDLIMITS::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_POS_PIDLIMITS) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        
+        return true;
+    }  
+
+    bool Message_GET_POS_PIDLIMITS::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        
+        std::uint8_t dd[7] = {0};
+        // fill the 6 bytes
+        std::uint8_t datalen = 6;
+        
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.offset, &dd[0]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.limitonoutput, &dd[2]);
+        embot::core::binary::word::load2memory<int16_t>(replyinfo.pidlimits.limitonintegral, &dd[4]);    
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_POS_PIDLIMITS), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }  
+    
+    
     bool Message_SET_CURRENT_PIDLIMITS::load(const embot::prot::can::Frame &inframe)
     {
         Message::set(inframe);  
@@ -1150,6 +1208,244 @@ namespace embot::prot::can::motor::polling {
 
     
  
+    bool Message_SET::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.descriptor.load(&candata.datainframe[0]);
+                
+        return true;         
+    }   
+
+
+    bool Message_SET::Sender::form(embot::prot::can::Frame &outframe, const Info &info, Address to, Address sender)
+    {
+        constexpr std::uint8_t datalen {7};        
+        std::uint8_t dd[datalen] = {0};
+         
+        memmove(&dd[0], info.descriptor.getstream(), datalen);
+        uint8_t mcindex = convert(info.motorindex);
+        
+        outframe.clear();
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::SET), to, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);        
+                
+        return true;
+    }  
+
+    bool Message_SET::Receiver::parse(Info &info, const embot::prot::can::Frame &inframe)
+    {
+        if(static_cast<std::uint8_t>(CMD::SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        Message msg {inframe};
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.descriptor.load(&msg.candata.datainframe[0]);
+
+        return true;   
+    } 
+
+    void Message_SET::Examples::sender()
+    {
+        // the sender board has address = 0. but it could be any ...
+        constexpr Address ownaddress {0};
+        
+        // suppose we want to set a vTargetPOS w/ {position, withvelocity} = {3.0, 2.0}
+        generic::Data<generic::vTargetPOS> tp {};
+        tp.value().position = 3.0;
+        tp.value().withvelocity = 2.0;
+                        
+        embot::prot::can::motor::generic::Descriptor descriptor {generic::ID::TargetPOS, tp.serialize()};
+        Info info {descriptor, MotIndex::one};
+
+        Address destination {3}; 
+        // we prepare a outframe
+        embot::prot::can::Frame outframe {}; 
+        Message_SET::Sender::form(outframe, info, destination, ownaddress);
+        // we transmit outframe and that's it
+    }
+    
+    void Message_SET::Examples::receiver()
+    {
+        constexpr Address ownaddress {3};
+        // we have received an inframe w/ a SET<> from a given board and we want to extract a Info from it
+        embot::prot::can::Frame inframe {};
+        Address senderaddress = frame2sender(inframe);
+            
+        Info info {};
+        Message_SET::Receiver::parse(info, inframe);
+        // inside info is what we are asked to set
+        MotIndex motorindex = info.motorindex;
+        generic::ID id = info.descriptor.getID();        
+        switch(id)
+        {
+            case generic::ID::TargetPOS:
+            {
+                generic::Data<generic::vTargetPOS> tp {}; 
+                tp.load(info.descriptor.getdata());
+                float pos = tp.value().position; 
+                // and now info.motorindex will use pos                    
+            } break;
+            
+            default: {} break;
+        }         
+    }     
+        
+
+
+   
+    bool Message_GET::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.id = generic::toID(candata.datainframe[0]);
+        
+        return true;
+    }  
+
+    bool Message_GET::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        constexpr std::uint8_t datalen {7};
+        std::uint8_t dd[datalen] = {0};
+
+        memmove(&dd[0], replyinfo.descriptor.getstream(), datalen);    
+
+        uint8_t mcindex = convert(replyinfo.motorindex);
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET), candata.from, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    } 
+
+    bool Message_GET::Sender::form(embot::prot::can::Frame &outframe, const Info &info, Address to, Address sender)
+    {
+        constexpr std::uint8_t datalen {1};        
+        std::uint8_t dd[datalen] = {0};
+        
+        dd[0] = embot::core::tointegral(info.id);
+           
+        uint8_t mcindex = convert(info.motorindex);
+        
+        outframe.clear();
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET), to, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);        
+                
+        return true;
+    }  
+
+    bool Message_GET::Sender::parse(ReplyInfo &repinfo, const embot::prot::can::Frame &inframe)
+    {
+        if(static_cast<std::uint8_t>(CMD::GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        Message msg {inframe};
+        
+        repinfo.motorindex = motorpollingframe2motindex(inframe);
+        repinfo.descriptor.load(&msg.candata.datainframe[0]);
+
+        return true;   
+    }   
+    
+    bool Message_GET::Receiver::parse(Info &info, const embot::prot::can::Frame &inframe)
+    {
+        if(static_cast<std::uint8_t>(CMD::GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        Message msg {inframe};
+        
+        info.motorindex = motorpollingframe2motindex(inframe);
+        info.id = generic::toID(msg.candata.datainframe[0]);
+
+        return true;   
+    }
+    
+    bool Message_GET::Receiver::form(embot::prot::can::Frame &outframe, const ReplyInfo &repinf, Address to, Address sender)
+    {        
+        constexpr std::uint8_t datalen {7};        
+        std::uint8_t dd[datalen] = {0};
+        
+        memmove(&dd[0], repinf.descriptor.getstream(), datalen);
+                
+        uint8_t mcindex = convert(repinf.motorindex);
+        
+        outframe.clear();
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET), to, dd, datalen, mcindex);
+        frame_set_size(outframe, datalen+1);        
+                
+        return true;
+    }   
+ 
+    
+    void Message_GET::Examples::sender()
+    {
+        // the sender board has address = 0. but it could be any ...
+        constexpr Address ownaddress {0};
+        // we decide what we want to ask to another board w/ address 3   
+        Info info {generic::ID::TargetPOS, MotIndex::one};
+        Address destination {3}; 
+        // we prepare a outframe
+        embot::prot::can::Frame outframe {}; 
+        Message_GET::Sender::form(outframe, info, destination, ownaddress);
+        // we transmit outframe and we wait for a inframe from which we extract the ReplyInfo
+        embot::prot::can::Frame inframe {};
+        ReplyInfo replyinfo {};
+        Message_GET::Sender::parse(replyinfo, inframe);
+        // we use replyinfo
+        generic::ID id = replyinfo.descriptor.getID();  
+        if((generic::ID::TargetPOS == id) && (MotIndex::one == replyinfo.motorindex))
+        {
+            generic::Data<generic::vTargetPOS> tp { replyinfo.descriptor.getdata() };
+            // get get and use the value 
+            float pos = tp.value().position; 
+            float withvel = tp.value().withvelocity;
+        }            
+    }
+    
+    void Message_GET::Examples::receiver()
+    {
+        constexpr Address ownaddress {3};
+        // we have received an inframe w/ a GET<> from a given board and we want to extract a Info from it
+        embot::prot::can::Frame inframe {};
+        Address senderaddress = frame2sender(inframe);
+            
+        Info info {};
+        Message_GET::Receiver::parse(info, inframe);
+        // inside info is what we are asked. suppose BMEF and the value is 3.3
+        generic::Data<generic::vTargetPOS> tp {};
+        tp.value().position = 3.3;
+        tp.value().withvelocity = 1.0;
+            
+        // we prepare a ReplyInfo 
+        embot::prot::can::motor::generic::Descriptor des { generic::ID::TargetPOS, tp.serialize() };
+        ReplyInfo replyinfo {des, MotIndex::one};
+        // we fill a outframe that we send back          
+        embot::prot::can::Frame outframe {}; 
+        Message_GET::Sender::form(outframe, info, senderaddress, ownaddress);
+        // we transmit outframe and that's it!      
+    }    
+    
     
 }   // namespace embot::prot::can::motor::polling {
     

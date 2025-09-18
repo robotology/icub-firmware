@@ -324,6 +324,10 @@ flowchart LR
         constexpr PIDlimits() = default;
         constexpr PIDlimits(PIDtype t, int16_t o, int16_t li, int16_t lo) : type(t), offset(o), limitonintegral(li), limitonoutput(lo) {}
         
+        void load(PIDtype t, int16_t o, int16_t li, int16_t lo)
+        {
+            type = t; limitonintegral = li; limitonoutput = lo; offset = o; 
+        }
         // note:
         // so far, we dont use PIDlimits so we dont provide any getter /setter function 
         // the way its members are used may follow the same rules of PID, so we may need PID::ks to scale     
@@ -532,6 +536,133 @@ flowchart LR
     } // namespace pid {
     
     
+    namespace basic {
+        
+        using ID = uint8_t;
+        constexpr ID IDnone {0xff};
+        
+        struct vTEMPLATE
+        {
+            uint8_t generic[6] {0};
+            // must have
+            uint16_t filler {0};
+            static constexpr size_t size {6};
+            static constexpr ID id {IDnone};
+        };  static_assert(sizeof(vTEMPLATE) == 8, "size must be 8");
+
+        template<typename T>    
+        struct Data 
+        {   // this template struct contains a T that models the 6 bytes of DATA of a SET / GET message
+            // DATA must be 6 bytes accomodated inside a struct of size 8. 
+            // T must have some properties:          
+            static_assert(sizeof(T) == 8, "sizeof(T) must be 8"); 
+            static_assert(T::size == 6, "T::size must be 6");         
+            
+            T v {};
+                
+            Data() = default;
+            Data(const uint8_t* data) { load(data); }    
+                                   
+            // we load data into T
+            void load(const uint8_t* data) { memmove(&v, &data[0], v.size); }            
+            // we get a mutable reference to T so that we can change it
+            T& value() { return v; }    
+            // and also a non mutable reference
+            const T& value() const { return v; }                      
+            // we get the serialization of T to be placed in a can frame
+            const uint8_t * serialize() const { return reinterpret_cast<const uint8_t*>(&v); }                         
+        };
+                
+        template<typename I>
+        struct Descriptor
+        { 
+            // this struct holds the description of the information transported by the SET command (and the reply to GET)
+            // it manages: ID + DATA[6], where the format of DATA[6] depends on ID
+               
+            // basic ctor 
+            constexpr Descriptor() = default;
+            
+            constexpr Descriptor(I id, const uint8_t *data)
+            {
+                load(id, data);
+            }
+            
+            // clear to default values
+            void clear()
+            {
+                memset(id_data, 0, sizeof(id_data));
+                id_data[0] = embot::core::tointegral(I::NONE);
+            }
+            
+            // it loads the bytes of payload[1:7] of a received can frame
+            bool load(const uint8_t *stream)
+            {
+                if((nullptr == stream) || (I::NONE == static_cast<I>(stream[0])))
+                {
+                    return false;
+                }
+                memmove(id_data, stream, sizeof(id_data)); 
+                return true;            
+            }
+            
+            // fills the object w/ [id|data] so that we can later get the stream to fill a frame we wnat to transmit
+            // data should be taken from .... Data::serialize()
+            bool load(I id, const uint8_t *data)
+            {
+                if((I::NONE == id) || (nullptr == data)) 
+                {
+                    return false;
+                }
+                id_data[0] = embot::core::tointegral(id);
+                memmove(&id_data[1], data, sizeof(id_data)-1);  
+                return true;
+            }
+            
+            // verify validity
+            bool isvalid() const
+            {
+                return id_data[0] != embot::core::tointegral(I::NONE);
+            }
+            
+            // retrieves the ID
+            const I getID() const
+            {
+                return static_cast<I>(id_data[0]);
+            }
+            
+            // retrieves only the data (not the ID)
+            const uint8_t * getdata() const
+            {
+                return &id_data[1];
+            }        
+            
+            // retrieves all the seven bytes of the stream [id|data]
+            const uint8_t * getstream() const
+            {
+                return id_data;
+            }
+                 
+            constexpr size_t getsizeofstream() const 
+            {
+                return sizeof(id_data);
+            }
+            
+
+            std::string to_string() const
+            {
+                return std::string("{") + "tbd" + ", data = TBD" + "}"; 
+            } 
+
+            
+        private:
+            // id_data[0] contains the ID, id_data[1:6] contains up to 6 bytes of data
+            uint8_t id_data[7] = {embot::core::tointegral(I::NONE), 0, 0, 0, 0, 0, 0};                                 
+        }; 
+    
+        
+    } // namespace generic {     
+    
+    
     namespace motorparam {
         
         // In here we define a Descriptor able to manipulate [ID|DATA] used in the SET / GET _MOTOR_PARAM messages
@@ -542,7 +673,7 @@ flowchart LR
             BEMF = 0x01,
             HALL = 0x02,
             ELECTR_VMAX = 0x03,
-            NONE = 0xff
+            NONE = basic::IDnone
         };
         constexpr size_t IDnumberOf {4}; 
                                     
@@ -602,118 +733,71 @@ flowchart LR
             static constexpr motorparam::ID id {motorparam::ID::ELECTR_VMAX};
         };  static_assert(sizeof(vBEMF) == 8, "size must be 8");
                 
-        template<typename T>    
-        struct Data 
-        {   // this template struct contains a T that models the 6 bytes of DATA of a SET / GET _MOTOR_PARAM message.
-            // DATA must be 6 bytes accomodated inside a struct of size 8. 
-            // T must have some properties:          
-            static_assert(sizeof(T) == 8, "sizeof(T) must be 8"); 
-            static_assert(T::size == 6, "T::size must be 6");         
-            // static_assert(has_static_id<T>::value, "T must have a static constexpr motorparam::ID id");
-            
-            T v {};
-                
-            Data() = default;
-            Data(const uint8_t* data) { load(data); }    
-                                   
-            // we load data into T
-            void load(const uint8_t* data) { memmove(&v, &data[0], v.size); }            
-            // we get a mutable reference to T so that we can change it
-            T& value() { return v; }    
-            // and also a non mutable reference
-            const T& value() const { return v; }                      
-            // we get the serialization of T to be placed in a can frame
-            const uint8_t * serialize() const { return reinterpret_cast<const uint8_t*>(&v); }                         
-        };
-                
-        
-        struct Descriptor
-        { 
-            // this struct holds the description of the information transported by the SET_MOTOR_PARAM command (and the reply to GET_MOTOR_PARAM)
-            // it manages: ID + DATA[6], where the format of DATA[6] depends on ID
-               
-            // basic ctor 
-            constexpr Descriptor() = default;
-            
-            constexpr Descriptor(ID id, const uint8_t *data)
-            {
-                load(id, data);
-            }
-            
-            // clear to default values
-            void clear()
-            {
-                memset(id_data, 0, sizeof(id_data));
-                id_data[0] = embot::core::tointegral(ID::NONE);
-            }
-            
-            // it loads the bytes of payload[1:7] of a received can frame
-            bool load(const uint8_t *stream)
-            {
-                if((nullptr == stream) || (ID::NONE == toID(stream[0])))
-                {
-                    return false;
-                }
-                memmove(id_data, stream, sizeof(id_data)); 
-                return true;            
-            }
-            
-            // fills the object w/ [id|data] so that we can later get the stream to fill a frame we wnat to transmit
-            // data should be taken from .... Data::serialize()
-            bool load(ID id, const uint8_t *data)
-            {
-                if((ID::NONE == id) || (nullptr == data)) 
-                {
-                    return false;
-                }
-                id_data[0] = embot::core::tointegral(id);
-                memmove(&id_data[1], data, sizeof(id_data)-1);  
-                return true;
-            }
-            
-            // verify validity
-            bool isvalid() const
-            {
-                return id_data[0] != embot::core::tointegral(ID::NONE);
-            }
-            
-            // retrieves the ID
-            const ID getID() const
-            {
-                return toID(id_data[0]);
-            }
-            
-            // retrieves only the data (not the ID)
-            const uint8_t * getdata() const
-            {
-                return &id_data[1];
-            }        
-            
-            // retrieves all the seven bytes of the stream [id|data]
-            const uint8_t * getstream() const
-            {
-                return id_data;
-            }
-                 
-            constexpr size_t getsizeofstream() const 
-            {
-                return sizeof(id_data);
-            }
-            
 
-            std::string to_string() const
-            {
-                return std::string("{") + Converter::to_string(getID()) + ", data = TBD" + "}"; 
-            } 
 
-            
-        private:
-            // id_data[0] contains the ID, id_data[1:6] contains up to 6 bytes of data
-            uint8_t id_data[7] = {embot::core::tointegral(motorparam::ID::NONE), 0, 0, 0, 0, 0, 0};                                 
-        }; 
+        template<typename T>
+        using Data = basic::Data<T>;
+                
+        using Descriptor = basic::Descriptor<motorparam::ID>;
     
         
-    } // namespace motorparam {        
+    } // namespace motorparam {   
+
+
+    namespace generic { 
+
+        // In here we define a Descriptor able to manipulate generic [ID|DATA] used in the SET / GET messages
+                
+        enum class ID
+        {
+            GENERIC = 0x00,
+            TargetPOS = 0x01,
+            NONE = basic::IDnone
+        };
+        constexpr size_t IDnumberOf {2}; 
+                                    
+        constexpr ID toID(const uint8_t id)
+        {
+            return (id < IDnumberOf) ? static_cast<ID>(id) : ID::NONE;
+        }   
+
+        struct Converter
+        {
+            static std::string to_string(const ID &id)
+            {
+                static const char * ids[IDnumberOf] { "GENERIC", "TargetPOS" };
+                size_t i = embot::core::tointegral(id);
+                return (i<IDnumberOf) ? ids[i] : "NONE";
+            }
+        };        
+
+        struct vGENERIC
+        {
+            uint8_t generic[6] {0};
+            // must have
+            uint16_t filler {0};
+            static constexpr size_t size {6};
+            static constexpr generic::ID id {generic::ID::GENERIC};
+        };  static_assert(sizeof(vGENERIC) == 8, "size must be 8");
+        
+        struct vTargetPOS
+        {
+            float position {0.0};
+            _Float16 withvelocity {0.0};
+            // must have
+            uint16_t filler {0};
+            static constexpr size_t size {6};
+            static constexpr generic::ID id {generic::ID::TargetPOS};
+        };  static_assert(sizeof(vTargetPOS) == 8, "size must be 8");
+            
+    
+
+        template<typename T>
+        using Data = basic::Data<T>;
+                
+        using Descriptor = basic::Descriptor<generic::ID>;        
+
+    } // namespace generic {         
 
  
     
