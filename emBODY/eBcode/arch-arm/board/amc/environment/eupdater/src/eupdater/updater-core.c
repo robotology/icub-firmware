@@ -46,7 +46,11 @@
 
 #include "eEmemorymap.h"
 
+#if !defined(_MAINTAINER_APPL_)
 #include "eupdater-info.h"
+#else
+#include "emaintainer-info.h"
+#endif
 
 #include "EoUpdaterProtocol.h"
 
@@ -1570,7 +1574,12 @@ static uint8_t s_uprot_proc_JUMP2UPDATER(eOuprot_opcodes_t opc, uint8_t *pktin, 
         return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
     }
     
-//#if defined(_MAINTAINER_APPL_)   
+//#if defined(_MAINTAINER_APPL_) 
+//    embot::hw::sys::irq_disable();    
+    ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+    embot::hw::sys::delay(50);    
+    ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+    embot::hw::sys::delay(50);
     ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
     ee_sharserv_sys_restart();
 //#endif
