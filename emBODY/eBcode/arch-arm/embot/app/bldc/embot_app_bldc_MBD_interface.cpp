@@ -221,7 +221,7 @@ namespace embot::app::bldc::mbd::interface {
         {
             embot::prot::can::motor::ControlMode::NotConfigured,   // ControlModes_NotConfigured = 0
             embot::prot::can::motor::ControlMode::Idle,            // ControlModes_Idle = 1
-            embot::prot::can::motor::ControlMode::Idle,            // ControlModes_Position = 2 we dont have CAN boards controlled in position
+            embot::prot::can::motor::ControlMode::Position,         // ControlModes_Position = 2 
             embot::prot::can::motor::ControlMode::Idle,            // ControlModes_PositionDirect = 3 we dont have CAN boards controlled in position direct
             embot::prot::can::motor::ControlMode::Current,         // ControlModes_Current = 4 
             embot::prot::can::motor::ControlMode::SpeedVoltage,    // ControlModes_Velocity = 5 
@@ -249,10 +249,11 @@ namespace embot::app::bldc::mbd::interface {
             constexpr Pair(embot::prot::can::motor::ControlMode c1, embot::app::bldc::mbd::interface::ControlModes c2)  : cmCAN(c1), cmMBD(c2) {}       
         };  
         
-        constexpr uint8_t numOfcan {8};
+        constexpr uint8_t numOfcan {embot::prot::can::motor::ControlModeNumberOf+1};
         constexpr std::array<Pair, numOfcan> toMBDcm
         {
             Pair{embot::prot::can::motor::ControlMode::Idle,           embot::app::bldc::mbd::interface::ControlModes::ControlModes_Idle},
+            Pair{embot::prot::can::motor::ControlMode::Position,      embot::app::bldc::mbd::interface::ControlModes::ControlModes_Position},
             Pair{embot::prot::can::motor::ControlMode::Current,        embot::app::bldc::mbd::interface::ControlModes::ControlModes_Current},
             Pair{embot::prot::can::motor::ControlMode::ForceIdle,      embot::app::bldc::mbd::interface::ControlModes::ControlModes_Idle},
             Pair{embot::prot::can::motor::ControlMode::SpeedVoltage,   embot::app::bldc::mbd::interface::ControlModes::ControlModes_Velocity},      
