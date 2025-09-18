@@ -436,20 +436,16 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
         case embot::prot::can::motor::generic::ID::TargetPOS:
         {
             vvgTargetPOS[motor].load(info.descriptor.getdata());
+            // but also it is passed to the MBD interface using a Targets item properly initted
+            embot::app::bldc::mbd::interface::Targets t {};        
+            t.position = vvgTargetPOS[motor].value().position;
+            t.velocity = vvgTargetPOS[motor].value().withvelocity;
+            io2handle.event_pushback(t, motor);            
         } break;
         
         default: {} break;
     }             
-    
-#if 0      
-    // 2. copy from info into the relevant mbd::interface type     
-    embot::app::bldc::mbd::interface::XXX xxx {};    
-    embot::app::bldc::mbd::interface::Converter::fromcan(vvGENERIC, xxx);
-    
-    // 3. load the object into mbd for a given motor
-    io2handle.event_pushback(xxx, motor);    
-#endif
-    
+       
     return true;
 } 
 
