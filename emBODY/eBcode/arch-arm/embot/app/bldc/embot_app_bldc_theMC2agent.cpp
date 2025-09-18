@@ -70,8 +70,11 @@ struct embot::app::bldc::theMC2agent::Impl : public embot::app::application::CAN
     bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) override;
     bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_LIMIT::Info &info) override; 
     bool get(const embot::prot::can::motor::polling::Message_SET_POS_PID::Info &info) override;
-    bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PID::Info &info) override;          
-    bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PID::Info &info) override;  
+    bool get(const embot::prot::can::motor::polling::Message_SET_POS_PIDLIMITS::Info &info) override;
+    bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PID::Info &info) override; 
+    bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PIDLIMITS::Info &info) override;    
+    bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PID::Info &info) override; 
+    bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PIDLIMITS::Info &info) override;    
     bool get(const embot::prot::can::motor::polling::Message_SET_MOTOR_CONFIG::Info &info) override; 
     bool get(const embot::prot::can::motor::polling::Message_SET_TEMPERATURE_LIMIT::Info &info) override; 
     bool get(const embot::prot::can::motor::polling::Message_SET_PID::Info &info) override;
@@ -80,8 +83,11 @@ struct embot::app::bldc::theMC2agent::Impl : public embot::app::application::CAN
     bool get(const embot::prot::can::motor::polling::Message_GET::Info &info, embot::prot::can::motor::polling::Message_GET::ReplyInfo &replyinfo) override;    
     bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) override;
     bool get(const embot::prot::can::motor::polling::Message_GET_POS_PID::Info &info, embot::prot::can::motor::polling::Message_GET_POS_PID::ReplyInfo &replyinfo) override;
-    bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PID::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PID::ReplyInfo &replyinfo) override;   
+    bool get(const embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::ReplyInfo &replyinfo) override;
+    bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PID::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PID::ReplyInfo &replyinfo) override; 
+    bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::ReplyInfo &replyinfo) override;    
     bool get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::ReplyInfo &replyinfo) override;
+    bool get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::ReplyInfo &replyinfo) override;
     bool get(const embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::ReplyInfo &replyinfo) override;
     bool get(const embot::prot::can::motor::polling::Message_GET_MOTOR_CONFIG::Info &info, embot::prot::can::motor::polling::Message_GET_MOTOR_CONFIG::ReplyInfo &replyinfo) override;
     bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::ReplyInfo &replyinfo) override; 
@@ -89,6 +95,10 @@ struct embot::app::bldc::theMC2agent::Impl : public embot::app::application::CAN
   
 
     // motor params that are temporarily in here and not in the MBD
+    
+    std::array<embot::prot::can::motor::PIDlimits, 2> posPIDlimits { {{embot::prot::can::motor::PIDtype::POS, 0, 1, 2}} };
+    std::array<embot::prot::can::motor::PIDlimits, 2> velPIDlimits { {{embot::prot::can::motor::PIDtype::VEL, 0, 11, 12}} };
+    std::array<embot::prot::can::motor::PIDlimits, 2> curPIDlimits { {{embot::prot::can::motor::PIDtype::CURR, 0, 21, 31}} };
     
     std::array<embot::prot::can::motor::motorparam::Data<embot::prot::can::motor::motorparam::vGENERIC>, 2> vvmGENERIC {};
     std::array<embot::prot::can::motor::motorparam::Data<embot::prot::can::motor::motorparam::vBEMF>, 2> vvmBEMF {};
@@ -502,6 +512,26 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
 } 
   
 
+bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_POS_PIDLIMITS::Info &info)
+{
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
+    
+    // 1. get the motor index
+    uint8_t motor = embot::core::tointegral(info.motorindex);   
+    posPIDlimits[motor] = info.pidlimits;
+    
+//    // 2. copy from info into the relevant mbd::interface type     
+//    embot::app::bldc::mbd::interface::PID pid {};    
+//    embot::app::bldc::mbd::interface::Converter::fromcan(info.pid, pid);
+//    
+//    // 3. load the object into mbd for a given motor
+//    io2handle.event_pushback(pid, motor);    
+        
+    return true;
+} 
+  
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PID::Info &info)
 {
 #if defined(DEBUG_print_decoded_CAN_frames)
@@ -520,7 +550,27 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
         
     return true;
 } 
+   
+bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PIDLIMITS::Info &info)
+{
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
+    
+    // 1. get the motor index
+    uint8_t motor = embot::core::tointegral(info.motorindex);   
+    curPIDlimits[motor] = info.pidlimits;
+    
+//    // 2. copy from info into the relevant mbd::interface type     
+//    embot::app::bldc::mbd::interface::PID pid {};    
+//    embot::app::bldc::mbd::interface::Converter::fromcan(info.pid, pid);
+//    
+//    // 3. load the object into mbd for a given motor
+//    io2handle.event_pushback(pid, motor);    
         
+    return true;
+} 
+
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PID::Info &info)
 {
 #if defined(DEBUG_print_decoded_CAN_frames)
@@ -540,6 +590,25 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     return true;
 } 
 
+bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PIDLIMITS::Info &info)
+{
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
+    
+    // 1. get the motor index
+    uint8_t motor = embot::core::tointegral(info.motorindex);   
+    velPIDlimits[motor] = info.pidlimits;
+    
+//    // 2. copy from info into the relevant mbd::interface type     
+//    embot::app::bldc::mbd::interface::PID pid {};    
+//    embot::app::bldc::mbd::interface::Converter::fromcan(info.pid, pid);
+//    
+//    // 3. load the object into mbd for a given motor
+//    io2handle.event_pushback(pid, motor);    
+        
+    return true;
+} 
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_SET_MOTOR_CONFIG::Info &info)
 {
@@ -575,20 +644,133 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
 #if defined(DEBUG_print_decoded_CAN_frames)
     embot::core::print(info.to_string());
 #endif
+    
+    #if 0
+        replyinfo.motorindex = info.motorindex;
+    replyinfo.descriptor.clear();
+    uint8_t motor = embot::core::tointegral(info.motorindex);
+    embot::app::bldc::mbd::interface::PID pid {};
+    bool found {true};
+    switch(info.type)
+    {
+        case embot::prot::can::motor::pid::Type::POS:
+        {
+            io2handle.get_pos_pid(motor, pid);
+        } break;
+        case embot::prot::can::motor::pid::Type::VEL:
+        {
+            io2handle.get_velocity_pid(motor, pid);
+        } break;        
+        case embot::prot::can::motor::pid::Type::CURR:
+        {
+            io2handle.get_current_pid(motor, pid);
+        } break; 
+        default:
+        {
+            found = false;
+        } break;            
+    }
+    
+    if(false == found)
+    {
+        return true;
+    }
+    
+    float value {0.0};
+    
+    switch(info.param)
+    {
+        case embot::prot::can::motor::pid::Param::KP:
+        {   
+            value = pid.P;            
+        } break; 
+
+        case embot::prot::can::motor::pid::Param::KI:
+        {   
+            value = pid.I;            
+        } break; 
+
+        case embot::prot::can::motor::pid::Param::KD:
+        {   
+            value = pid.D;            
+        } break; 
+                       
+        default:
+        {
+            found = false;
+        } break;            
+    }
+    
+    if(false == found)
+    {
+        return true;
+    }
+    
+    replyinfo.descriptor.load(info.type, info.param, value);
+    #endif
 
     // to be done
-#if 0    
-    // 1. get the motor index
-    uint8_t motor = embot::core::tointegral(info.motorindex);   
+
+    uint8_t motor = embot::core::tointegral(info.motorindex);
+    embot::prot::can::motor::pid::Type t = info.descriptor.getType();
+    embot::prot::can::motor::pid::Param p = info.descriptor.getParam();
+    float value = info.descriptor.getValue();
     
-    // 2. copy from info into the relevant mbd::interface type     
-    embot::app::bldc::mbd::interface::PID pid {};    
-    embot::app::bldc::mbd::interface::Converter::fromcan(info.pid, pid);
+    embot::app::bldc::mbd::interface::PID pid {};
+        
+    bool found {true};
+    switch(t)
+    {
+        case embot::prot::can::motor::pid::Type::POS:
+        {
+            io2handle.get_pos_pid(motor, pid);
+        } break;
+        case embot::prot::can::motor::pid::Type::VEL:
+        {
+            io2handle.get_velocity_pid(motor, pid);
+        } break;        
+        case embot::prot::can::motor::pid::Type::CURR:
+        {
+            io2handle.get_current_pid(motor, pid);
+        } break; 
+        default:
+        {
+            found = false;
+        } break;            
+    }
+    
+    if(false == found)
+    {
+        return true;
+    } 
+    
+    
+    switch(p)
+    {
+        case embot::prot::can::motor::pid::Param::KP:
+        {   
+            pid.P = value;            
+        } break; 
+
+        case embot::prot::can::motor::pid::Param::KI:
+        {   
+            pid.I = value;            
+        } break; 
+
+        case embot::prot::can::motor::pid::Param::KD:
+        {   
+            pid.D = value;            
+        } break; 
+                       
+        default:
+        {
+            found = false;
+        } break;            
+    }    
     
     // 3. load the object into mbd for a given motor
     io2handle.event_pushback(pid, motor);    
-#endif
-    
+
     return true;
 } 
 
@@ -722,7 +904,29 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     return true;          
 }
 
+bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::ReplyInfo &replyinfo)
+{
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
 
+    replyinfo.motorindex = info.motorindex;
+    uint8_t motor = embot::core::tointegral(info.motorindex);
+    //replyinfo.pidlimits.load(embot::prot::can::motor::PIDtype::POS, 0, 1000, 2000);
+    replyinfo.pidlimits = posPIDlimits[motor];
+//    embot::app::bldc::mbd::interface::PID pid {};
+//    io2handle.get_pos_pid(motor, pid);  
+//    // marco.accame pid.type must be ControlModes_Position so that embot::app::bldc::mbd::interface::Converter::tocan() works fine
+//    // that is done inside get_pos_pid()
+//    embot::app::bldc::mbd::interface::Converter::tocan(pid, replyinfo.pid);
+
+        
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif         
+        
+    return true;          
+}
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PID::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PID::ReplyInfo &replyinfo)
 {
@@ -737,6 +941,29 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     // marco.accame pid.type must be ControlModes_Current so that embot::app::bldc::mbd::interface::Converter::tocan() works fine
     // that is done inside get_current_pid()
     embot::app::bldc::mbd::interface::Converter::tocan(pid, replyinfo.pid);
+        
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif         
+        
+    return true;        
+}
+
+bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::ReplyInfo &replyinfo)
+{
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
+    
+    replyinfo.motorindex = info.motorindex;
+    uint8_t motor = embot::core::tointegral(info.motorindex);
+    //replyinfo.pidlimits.load(embot::prot::can::motor::PIDtype::CURR, 0, 1001, 2001);
+    replyinfo.pidlimits = curPIDlimits[motor];
+//    embot::app::bldc::mbd::interface::PID pid {};
+//    io2handle.get_current_pid(motor, pid);   
+//    // marco.accame pid.type must be ControlModes_Current so that embot::app::bldc::mbd::interface::Converter::tocan() works fine
+//    // that is done inside get_current_pid()
+//    embot::app::bldc::mbd::interface::Converter::tocan(pid, replyinfo.pid);
         
 #if defined(DEBUG_print_decoded_CAN_frames)
     embot::core::print(replyinfo.to_string());
@@ -766,6 +993,28 @@ bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::pol
     return true;          
 }
 
+bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::ReplyInfo &replyinfo)
+{
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(info.to_string());
+#endif
+
+    replyinfo.motorindex = info.motorindex;
+    uint8_t motor = embot::core::tointegral(info.motorindex);
+    //replyinfo.pidlimits.load(embot::prot::can::motor::PIDtype::VEL, 0, 1002, 2002);
+    replyinfo.pidlimits = velPIDlimits[motor];
+//    embot::app::bldc::mbd::interface::PID pid {};
+//    io2handle.get_velocity_pid(motor, pid);  
+//    // marco.accame pid.type must be ControlModes_Velocity so that embot::app::bldc::mbd::interface::Converter::tocan() works fine
+//    // that is done inside get_velocity_pid()
+//    embot::app::bldc::mbd::interface::Converter::tocan(pid, replyinfo.pid);
+//        
+#if defined(DEBUG_print_decoded_CAN_frames)
+    embot::core::print(replyinfo.to_string());
+#endif         
+        
+    return true;          
+}
 
 bool embot::app::bldc::theMC2agent::Impl::get(const embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::ReplyInfo &replyinfo)
 {

@@ -32,10 +32,13 @@ namespace embot::app::application {
         virtual bool get(const embot::prot::can::motor::polling::Message_SET::Info &info) = 0;
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) = 0; 
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_LIMIT::Info &info) = 0; 
-        virtual bool get(const embot::prot::can::motor::polling::Message_SET_POS_PID::Info &info) = 0;    
+        virtual bool get(const embot::prot::can::motor::polling::Message_SET_POS_PID::Info &info) = 0; 
+        virtual bool get(const embot::prot::can::motor::polling::Message_SET_POS_PIDLIMITS::Info &info) = 0;     
     
-        virtual bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PID::Info &info) = 0;     
-        virtual bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PID::Info &info) = 0;          
+        virtual bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PID::Info &info) = 0;  
+        virtual bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PIDLIMITS::Info &info) = 0;    
+        virtual bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PID::Info &info) = 0; 
+        virtual bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PIDLIMITS::Info &info) = 0;    
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_MOTOR_CONFIG::Info &info) = 0;  
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_TEMPERATURE_LIMIT::Info &info) = 0; 
         virtual bool get(const embot::prot::can::motor::polling::Message_SET_PID::Info &info) = 0;
@@ -44,9 +47,12 @@ namespace embot::app::application {
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_MOTOR_PARAM::Info &info, embot::prot::can::motor::polling::Message_GET_MOTOR_PARAM::ReplyInfo &replyinfo) = 0;  
         virtual bool get(const embot::prot::can::motor::polling::Message_GET::Info &info, embot::prot::can::motor::polling::Message_GET::ReplyInfo &replyinfo) = 0;    
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) = 0;
-        virtual bool get(const embot::prot::can::motor::polling::Message_GET_POS_PID::Info &info, embot::prot::can::motor::polling::Message_GET_POS_PID::ReplyInfo &replyinfo) = 0;         
-        virtual bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PID::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PID::ReplyInfo &replyinfo) = 0;    
-        virtual bool get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::ReplyInfo &replyinfo) = 0; 
+        virtual bool get(const embot::prot::can::motor::polling::Message_GET_POS_PID::Info &info, embot::prot::can::motor::polling::Message_GET_POS_PID::ReplyInfo &replyinfo) = 0; 
+        virtual bool get(const embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::ReplyInfo &replyinfo) = 0;        
+        virtual bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PID::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PID::ReplyInfo &replyinfo) = 0;  
+        virtual bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::ReplyInfo &replyinfo) = 0;         
+        virtual bool get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::ReplyInfo &replyinfo) = 0;         
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::ReplyInfo &replyinfo) = 0;
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_MOTOR_CONFIG::Info &info, embot::prot::can::motor::polling::Message_GET_MOTOR_CONFIG::ReplyInfo &replyinfo) = 0; 
         virtual bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::ReplyInfo &replyinfo) = 0;
@@ -70,8 +76,11 @@ namespace embot::app::application {
         bool get(const embot::prot::can::motor::polling::Message_SET_CONTROL_MODE::Info &info) override { return false; }  
         bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_LIMIT::Info &info) override { return false; } 
         bool get(const embot::prot::can::motor::polling::Message_SET_POS_PID::Info &info) override { return false; } 
-        bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PID::Info &info) override { return false; }        
-        bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PID::Info &info) override { return false; }    
+        bool get(const embot::prot::can::motor::polling::Message_SET_POS_PIDLIMITS::Info &info) override { return false; }
+        bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PID::Info &info) override { return false; }
+        bool get(const embot::prot::can::motor::polling::Message_SET_CURRENT_PIDLIMITS::Info &info) override { return false; }        
+        bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PID::Info &info) override { return false; } 
+        bool get(const embot::prot::can::motor::polling::Message_SET_VELOCITY_PIDLIMITS::Info &info) override { return false; }        
         bool get(const embot::prot::can::motor::polling::Message_SET_MOTOR_CONFIG::Info &info) override { return false; } 
         bool get(const embot::prot::can::motor::polling::Message_SET_TEMPERATURE_LIMIT::Info &info) override { return false; } 
         bool get(const embot::prot::can::motor::polling::Message_SET_PID::Info &info) override { return false; } 
@@ -81,8 +90,11 @@ namespace embot::app::application {
         bool get(const embot::prot::can::motor::polling::Message_GET::Info &info, embot::prot::can::motor::polling::Message_GET::ReplyInfo &replyinfo) override { return false; }         
         bool get(const embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::Info &info, embot::prot::can::motor::polling::Message_GET_CONTROL_MODE::ReplyInfo &replyinfo) override { return false; } 
         bool get(const embot::prot::can::motor::polling::Message_GET_POS_PID::Info &info, embot::prot::can::motor::polling::Message_GET_POS_PID::ReplyInfo &replyinfo) override { return false; }
-        bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PID::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PID::ReplyInfo &replyinfo) override { return false; }    
+        bool get(const embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::ReplyInfo &replyinfo) override { return false; }
+        bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PID::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PID::ReplyInfo &replyinfo) override { return false; }
+        bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::ReplyInfo &replyinfo) override { return false; }        
         bool get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PID::ReplyInfo &replyinfo) override { return false; } 
+        bool get(const embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::Info &info, embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::ReplyInfo &replyinfo) override { return false; }
         bool get(const embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_TEMPERATURE_LIMIT::ReplyInfo &replyinfo) override { return false; }
         bool get(const embot::prot::can::motor::polling::Message_GET_MOTOR_CONFIG::Info &info, embot::prot::can::motor::polling::Message_GET_MOTOR_CONFIG::ReplyInfo &replyinfo) override { return false; } 
         bool get(const embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::Info &info, embot::prot::can::motor::polling::Message_GET_CURRENT_LIMIT::ReplyInfo &replyinfo) override { return false; } 

@@ -324,6 +324,10 @@ flowchart LR
         constexpr PIDlimits() = default;
         constexpr PIDlimits(PIDtype t, int16_t o, int16_t li, int16_t lo) : type(t), offset(o), limitonintegral(li), limitonoutput(lo) {}
         
+        void load(PIDtype t, int16_t o, int16_t li, int16_t lo)
+        {
+            type = t; limitonintegral = li; limitonoutput = lo; offset = o; 
+        }
         // note:
         // so far, we dont use PIDlimits so we dont provide any getter /setter function 
         // the way its members are used may follow the same rules of PID, so we may need PID::ks to scale     

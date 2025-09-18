@@ -45,8 +45,6 @@ namespace embot::app::utils
     };
 }
     
-// the implementation uses a LUT but we keep also a non LUT code
-#define Impl_useLUT
         
 struct embot::app::application::theCANparserMC2::Impl
 { 
@@ -376,7 +374,7 @@ bool embot::app::application::theCANparserMC2::Impl::parse_set_pospidlimits(void
     embot::prot::can::motor::polling::Message_SET_POS_PIDLIMITS msg;
     msg.load(frame);
     impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
-//    impl->config.agent->get(msg.info);    
+    impl->config.agent->get(msg.info);    
     return hasreply;        
 }
 
@@ -398,7 +396,7 @@ bool embot::app::application::theCANparserMC2::Impl::parse_set_currentpidlimits(
     embot::prot::can::motor::polling::Message_SET_CURRENT_PIDLIMITS msg;
     msg.load(frame);
     impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
-//    impl->config.agent->get(msg.info);    
+    impl->config.agent->get(msg.info);    
     return hasreply;        
 }
 
@@ -422,7 +420,7 @@ bool embot::app::application::theCANparserMC2::Impl::parse_set_velocitypidlimits
     embot::prot::can::motor::polling::Message_SET_VELOCITY_PIDLIMITS msg;
     msg.load(frame);
     impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
-//    impl->config.agent->get(msg.info);    
+    impl->config.agent->get(msg.info);    
     return hasreply;        
 }
 
@@ -560,7 +558,7 @@ bool embot::app::application::theCANparserMC2::Impl::parse_get_pospidlimits(void
     embot::prot::can::motor::polling::Message_GET_POS_PIDLIMITS::ReplyInfo replyinfo {};
     
     impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
-//    impl->config.agent->get(msg.info, replyinfo);
+    impl->config.agent->get(msg.info, replyinfo);
 
     embot::prot::can::Frame frame0 {};
     uint8_t adr = impl->config.getaddress(static_cast<embot::hw::MOTOR>(msg.info.motorindex));
@@ -604,7 +602,7 @@ bool embot::app::application::theCANparserMC2::Impl::parse_get_currentpidlimits(
     embot::prot::can::motor::polling::Message_GET_CURRENT_PIDLIMITS::ReplyInfo replyinfo {};
     
     impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
-//    impl->config.agent->get(msg.info, replyinfo);
+    impl->config.agent->get(msg.info, replyinfo);
 
     embot::prot::can::Frame frame0 {};
     uint8_t adr = impl->config.getaddress(static_cast<embot::hw::MOTOR>(msg.info.motorindex));
@@ -649,7 +647,7 @@ bool embot::app::application::theCANparserMC2::Impl::parse_get_velocitypidlimits
     embot::prot::can::motor::polling::Message_GET_VELOCITY_PIDLIMITS::ReplyInfo replyinfo {};
     
     impl->updatemotorindex(embot::prot::can::frame2destination(frame), msg.info.motorindex);    
-//    impl->config.agent->get(msg.info, replyinfo);
+    impl->config.agent->get(msg.info, replyinfo);
 
     embot::prot::can::Frame frame0 {};
     uint8_t adr = impl->config.getaddress(static_cast<embot::hw::MOTOR>(msg.info.motorindex));

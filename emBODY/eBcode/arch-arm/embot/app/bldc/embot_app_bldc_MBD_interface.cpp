@@ -312,8 +312,15 @@ namespace embot::app::bldc::mbd::interface {
     }
     
     void Converter::tocan(const embot::app::bldc::mbd::interface::PID &from, embot::prot::can::motor::PID &to)
-    {       
-        embot::prot::can::motor::PIDtype pidtype = (from.type == ControlModes_Velocity) ? embot::prot::can::motor::PIDtype::VEL :  embot::prot::can::motor::PIDtype::CURR;        
+    { 
+        embot::prot::can::motor::PIDtype pidtype {embot::prot::can::motor::PIDtype::NONE};
+        switch(from.type)
+        {
+            case ControlModes_Position: { pidtype = embot::prot::can::motor::PIDtype::POS;} break;
+            case ControlModes_Velocity: { pidtype = embot::prot::can::motor::PIDtype::VEL;} break;
+            case ControlModes_Current: { pidtype = embot::prot::can::motor::PIDtype::CURR;} break;
+            default: {} break;
+        }   
         to.load(pidtype, from.P, from.I, from.D, from.shift_factor);
     }    
     
