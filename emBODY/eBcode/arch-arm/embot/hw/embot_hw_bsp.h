@@ -41,6 +41,8 @@ namespace embot::hw::bsp {
                 
     bool initialised();
     
+    void initialised(bool v);
+    
     // it is used by embot::hw::init().
     // it calls the proper initialisations for the chosen HAL (e.g., stm32hal) etc. 
     bool init(const embot::hw::Config &config); 

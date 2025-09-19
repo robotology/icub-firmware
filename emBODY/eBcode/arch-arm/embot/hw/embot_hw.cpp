@@ -41,12 +41,10 @@ using namespace std;
 
 namespace embot { namespace hw {
         
-    static bool initted = false; 
 
-    
     bool initialised()
     {
-        return initted;
+        return embot::hw::bsp::initialised();
     }   
         
 
@@ -70,8 +68,7 @@ namespace embot { namespace hw {
         
         embot::core::init({{nullptr, config.get1microtime}, {embot::hw::bsp::print}});        
         embot::hw::bsp::init(config);
-                      
-        initted = true;
+
         return true;
     }
     
