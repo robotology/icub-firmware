@@ -111,7 +111,7 @@ bool embot::hw::bsp::specialize()
 constexpr embot::hw::eeprom::ADR uidloc {4096};
 uint64_t embot::hw::sys::uniqueid()
 {
-    static uint64_t val {0};
+    static uint64_t val {embot::hw::sys::UIDinvalid};
     
     embot::core::Data d {&val, 8};
     embot::hw::eeprom::read(embot::hw::EEPROM::one, uidloc, d, 10*embot::core::time1millisec);

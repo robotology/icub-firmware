@@ -40,6 +40,18 @@ using namespace embot::core::binary;
     
 namespace embot::hw::bsp {
     
+    bool _initted {false};
+    
+    bool initialised()
+    {
+        return _initted;
+    }
+    
+    void initialised(bool v)
+    {
+        _initted = v;
+    }
+    
     static uint32_t _get1millitick()
     {
         return embot::core::now() / 1000;        
@@ -48,6 +60,8 @@ namespace embot::hw::bsp {
     bool init(const embot::hw::Config &config)
     {                  
         embot::hw::bsp::DRIVER::init(config);
+        
+        embot::hw::bsp::initialised(true);
         
         // perform further initialization defined board by board        
         specialize();
