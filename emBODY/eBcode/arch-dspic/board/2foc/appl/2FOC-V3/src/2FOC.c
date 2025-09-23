@@ -1376,8 +1376,6 @@ int main(void)
         }
     }
 
-    setSPid(SKp, SKi, SKff, SKs);
-
     Timer3Enable(); // EnableAuxServiceTimer();
 
     gControlMode = icubCanProto_controlmode_idle;

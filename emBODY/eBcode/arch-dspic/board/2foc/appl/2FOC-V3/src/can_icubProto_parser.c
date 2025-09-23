@@ -31,28 +31,26 @@
 #include "ecan.h"
 #include "qep.h"
 
-// temporary here, they will be defined in icub-firmware-shared 
-#define ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAM                1 
-#define ICUBCANPROTO_POL_MC_CMD__SET_PID                        125
 typedef enum
 { 
-    CURR = 0, VEL = 1, POS = 2, // and others if needed
-    NONE = 15 
+    CURR = 0, VEL = 1, POS = 2
 } PIDtype;
+
 typedef enum 
 { 
-    KP = 0, KI = 1, KD = 2, 
-    KFF = 3, 
-    LIMINT = 4, LIMOUT = 5,
-    STICTION_UP = 6, STICTION_DOWN = 7, // maybe useful 
-    // KBEMF = 8, // possibly even if it is a motor parameter. TO BE DECIDED!!! 
-    LOCK = 13, UNLOCK = 14
+    LOCK = 0, UNLOCK = 1,             
+    KP = 2, KI = 3, KD = 4, 
+    LIMINTEGRAL = 5, LIMOUTPUT = 6,
+    KFF = 7, 
+    STICTION_UP = 8, STICTION_DOWN = 9 
 } PIDparam;
+
 typedef enum 
 {
+    GENERIC = 0x00,
     BEMF = 0x01,
     HALL = 0x02,
-    ELECT_VMAX = 0x02
+    ELECTR_VMAX = 0x03
 } MotorParam;
 
 volatile static float fIKp    = 0.0f;
@@ -80,10 +78,7 @@ static int calcExp(float kp, float ki, float kff, float kbemf)
     {
         float power = (float)(1<<exponent);
         
-        if (max < power)
-        {
-            break;
-        }
+        if (max < power) return exponent;
     }
     
     return exponent;
@@ -336,18 +331,22 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             int  ki    = ((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
             char ks    = rxpayload->b[7];
             
-            setIPid(kp,ki,0,0,ks);
+            fIKp = ((float)kp)/((float)(1<<ks)); 
+            fIKi = ((float)ki)/((float)(1<<ks));
+            
+            int exponent = calcExp(fIKp,fIKi,fIKff,fIKbemf);
+            float Knorm = 32768.0f/((float)(1<<exponent));
+            
+                kp    = (int)(fIKp   *Knorm);
+                ki    = (int)(fIKi   *Knorm);
+            int kff   = (int)(fIKff  *Knorm);
+            int kbemf = (int)(fIKbemf*Knorm);
+                    
+            setIPid(kp,ki,kff,kbemf,15-exponent);
             
             IPIDready = TRUE;
-            
-            //static tCanData payload;
-            
-            //payload.w[0] = rxpayload->w[0];
-            //payload.w[1] = rxpayload->w[1];
-            //payload.w[2] = rxpayload->w[2];
-            //payload.w[3] = rxpayload->w[3];
-            
-            //CanSendDebug(&payload, 8);
+
+            //CanSendDebug(rxpayload, 8);
             
             return 1;
         }
@@ -365,18 +364,21 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             int  ki  = ((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
             char ks  = rxpayload->b[7];
             
-            setSPid(kp,ki,0,ks);
+            fSKp = ((float)kp)/((float)(1<<ks)); 
+            fSKi = ((float)ki)/((float)(1<<ks));
+            
+            int exponent = calcExp(fSKp,fSKi,fSKff,0);
+            float Knorm = 32768.0f/((float)(1<<exponent));
+            
+                kp    = (int)(fSKp   *Knorm);
+                ki    = (int)(fSKi   *Knorm);
+            int kff   = (int)(fSKff  *Knorm);
+ 
+            setSPid(kp,ki,kff,15-exponent);
             
             SPIDready = TRUE;
-            
-            //static tCanData payload;
-            
-            //payload.w[0] = rxpayload->w[0];
-            //payload.w[1] = rxpayload->w[1];
-            //payload.w[2] = rxpayload->w[2];
-            //payload.w[3] = rxpayload->w[3];
-            
-            //CanSendDebug(&payload, 8);
+
+            //CanSendDebug(rxpayload, 8);
             
             return 1;
         }
@@ -400,9 +402,9 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             
             switch (pid_param)
             {
-                case KP:     fIKp  = fk; break;
-                case KI:     fIKi  = fk; break;
-                case KFF:    fIKff = fk; break;
+                case KP:     fIKp    = fk;  break;
+                case KI:     fIKi    = fk;  break;
+                case KFF:    fIKff   = fk;  break;
                 case LOCK:   locked = TRUE; break;
                 default: break;
             }

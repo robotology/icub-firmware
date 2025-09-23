@@ -53,7 +53,6 @@ extern volatile int  IqRef;
 
 extern volatile int rotorAfbk;
 extern volatile int rotorBfbk;
-extern volatile char IKs;
 
 extern volatile tMotorConfig MotorConfig;
 
@@ -113,15 +112,16 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
         //extern volatile uint16_t I2Cerrors;
         //extern volatile int I2Cerrcode;
         
-        extern volatile int IKp;
-        extern volatile int IKi;
-        extern volatile int IKff;
-        extern volatile int IKbemf;
+        extern volatile int  IKp;
+        extern volatile int  IKi;
+        extern volatile int  IKff;
+        extern volatile int  IKbemf;
+        extern volatile char IKs;
         
-        extern volatile int SKp;
-        extern volatile int SKi;
-        extern volatile int SKff;
-        extern volatile int SKs;
+        extern volatile int  SKp;
+        extern volatile int  SKi;
+        extern volatile int  SKff;
+        extern volatile char SKs;
         
         int Tsend = 500 + canprototransmitter_bid*100;
         
@@ -133,10 +133,10 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
             
             static BOOL bcurr = FALSE;
             
-            payload.w[0] = bcurr?IKp:SKp;
-            payload.w[1] = bcurr?IKi:SKi;
-            payload.w[2] = bcurr?IKff:SKff;
-            payload.w[3] = bcurr?IKbemf:SKs;
+            payload.w[0] = bcurr ? IKp    >> IKs    : SKp  >> SKs;
+            payload.w[1] = bcurr ? IKi    >>(IKs-1) : SKi  >>(SKs-1);
+            payload.w[2] = bcurr ? IKff   >> IKs    : SKff >> SKs;
+            payload.w[3] = bcurr ? IKbemf >> IKs    : SKs;
             
             bcurr = !bcurr;
             
