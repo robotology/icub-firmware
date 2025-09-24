@@ -340,7 +340,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal -DIPAL_use_cfg2 -Ddont_USE_IPADDR_FROM_IPAL_CFG_</MiscControls>
               <Define>_MAINTAINER_APPL_ USE_EMBOT_HW EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_AMC STM32HAL_DRIVER_V1A0</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\cfg;..\..\..\bsp\ethdriver;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\env;..\..\eupdater\src\eupdater;..\src\emaintainer</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ipnet;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth;..\..\..\bsp;..\cfg;..\..\..\bsp\ethdriver;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\embenv;..\..\..\env;..\..\..\..\common\env\dualcore\eUpdater;..\src\emaintainer</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,7 +392,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>maintainer-code</GroupName>
+          <GroupName>maintainer-info</GroupName>
           <Files>
             <File>
               <FileName>emaintainer-info.cpp</FileName>
@@ -410,14 +410,14 @@
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
             <File>
-              <FileName>eupdater_parser.c</FileName>
+              <FileName>eupdater_parser.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater_parser.c</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\eupdater_parser.cpp</FilePath>
             </File>
             <File>
-              <FileName>updater-core.c</FileName>
+              <FileName>updater-core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\updater-core.c</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\updater-core.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1627,7 +1627,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>maintainer-code</GroupName>
+          <GroupName>maintainer-info</GroupName>
           <Files>
             <File>
               <FileName>emaintainer-info.cpp</FileName>
@@ -1645,14 +1645,14 @@
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
             <File>
-              <FileName>eupdater_parser.c</FileName>
+              <FileName>eupdater_parser.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater_parser.c</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\eupdater_parser.cpp</FilePath>
             </File>
             <File>
-              <FileName>updater-core.c</FileName>
+              <FileName>updater-core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\updater-core.c</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\updater-core.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2709,7 +2709,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>maintainer-code</GroupName>
+          <GroupName>maintainer-info</GroupName>
           <Files>
             <File>
               <FileName>emaintainer-info.cpp</FileName>
@@ -2727,14 +2727,14 @@
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
             <File>
-              <FileName>eupdater_parser.c</FileName>
+              <FileName>eupdater_parser.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater_parser.c</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\eupdater_parser.cpp</FilePath>
             </File>
             <File>
-              <FileName>updater-core.c</FileName>
+              <FileName>updater-core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\updater-core.c</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\updater-core.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3791,7 +3791,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>maintainer-code</GroupName>
+          <GroupName>maintainer-info</GroupName>
           <Files>
             <File>
               <FileName>emaintainer-info.cpp</FileName>
@@ -3809,14 +3809,14 @@
               <FilePath>..\..\..\..\..\embot\hw\hal_embot.cpp</FilePath>
             </File>
             <File>
-              <FileName>eupdater_parser.c</FileName>
+              <FileName>eupdater_parser.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\eupdater_parser.c</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\eupdater_parser.cpp</FilePath>
             </File>
             <File>
-              <FileName>updater-core.c</FileName>
+              <FileName>updater-core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\eupdater\src\eupdater\updater-core.c</FilePath>
+              <FilePath>..\..\..\..\common\env\dualcore\eUpdater\updater-core.cpp</FilePath>
             </File>
           </Files>
         </Group>

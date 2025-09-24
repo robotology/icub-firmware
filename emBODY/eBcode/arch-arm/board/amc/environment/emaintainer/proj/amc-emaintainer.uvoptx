@@ -645,7 +645,7 @@
   </Group>
 
   <Group>
-    <GroupName>maintainer-code</GroupName>
+    <GroupName>maintainer-info</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -689,8 +689,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\eupdater\src\eupdater\eupdater_parser.c</PathWithFileName>
-      <FilenameWithoutPath>eupdater_parser.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\common\env\dualcore\eUpdater\eupdater_parser.cpp</PathWithFileName>
+      <FilenameWithoutPath>eupdater_parser.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -701,8 +701,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\eupdater\src\eupdater\updater-core.c</PathWithFileName>
-      <FilenameWithoutPath>updater-core.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\common\env\dualcore\eUpdater\updater-core.cpp</PathWithFileName>
+      <FilenameWithoutPath>updater-core.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
